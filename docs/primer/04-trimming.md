@@ -91,7 +91,7 @@ Between your orders **the watch on deck tends the fore-and-aft sheets for you**:
 
 Package 13 adds the order the owner reached for at the gate. It braces every yard that has sail set to the best angle for the present apparent wind, each as its own `brace` evolution, and sheets the fore-and-aft sails at once:
 
-```orders-pending frigate plain-sail
+```orders frigate plain-sail
 trim the yards
 trim the sheets
 trim sails
