@@ -35,7 +35,7 @@ python --version
 *Python 3.11.x or higher. If you see "not recognized", Python was not added to PATH; try `py --version`, and if that works use `py` wherever `python` appears below.*
 
 ```
-pip install -e ".[dev]"
+python -m pip install -e ".[dev]"
 ```
 *A few lines about collecting and installing packages, ending in "Successfully installed ..." (the exact list varies). This can take a minute the first time.*
 

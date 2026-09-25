@@ -9,7 +9,7 @@ Status: milestone 1 built (ship files, sail and hull physics, the Orders languag
 Requires Python 3.11 or newer.
 
 ```
-pip install -e ".[dev]"
+python -m pip install -e ".[dev]"
 python -m pytest              # the test suite
 python -m freesail.ui.console data/ships/frigate-36.yaml --wind 0,15 --heading 293
 ```

@@ -23,9 +23,9 @@ As for gate M0: Python 3.11 or newer with "Add python.exe to PATH" ticked, and t
 Open a terminal in the extracted folder (File Explorer, click the address bar, type `cmd`, Enter). Then:
 
 ```
-pip install -e ".[dev]"
+python -m pip install -e ".[dev]"
 ```
-*Ends with "Successfully installed ...". One new package this time, prompt_toolkit, which fixes the typing problem you found in gate M0.*
+*Ends with "Successfully installed ...". One new package this time, prompt_toolkit, which fixes the typing problem you found in gate M0. The `python -m pip` form is used because on many Windows installs `pip` on its own is not on the PATH even when `python` is; if `python` is not recognised either, use `py` in its place throughout.*
 
 ```
 python -m pytest
