@@ -171,9 +171,26 @@ class Console:
         every log line that arrives, so nothing you are typing is swallowed.
         """
         from prompt_toolkit import PromptSession
+        from prompt_toolkit.completion import Completer, Completion
         from prompt_toolkit.patch_stdout import patch_stdout
 
-        session: PromptSession[str] = PromptSession()
+        from freesail.orders.complete import suggestions
+
+        console = self
+
+        class OrdersCompleter(Completer):
+            """Offers whole orders the parser would accept, as the player types."""
+
+            def get_completions(self, document, complete_event):
+                text = document.text_before_cursor
+                with console.lock:
+                    cands = suggestions(console.world.ship, text)
+                for c in cands:
+                    yield Completion(c, start_position=-len(text))
+
+        session: PromptSession[str] = PromptSession(
+            completer=OrdersCompleter(), complete_while_typing=True
+        )
         ticker = threading.Thread(target=self._clock_thread, daemon=True)
         with patch_stdout(raw=True):
             ticker.start()
