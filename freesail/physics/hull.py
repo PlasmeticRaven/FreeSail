@@ -31,7 +31,7 @@ from freesail.ship.parts import HelmMode, Hull
 # Tuning constants (package 10 adjusts these against the known truths, §7.6)
 # ---------------------------------------------------------------------------
 
-C_F = 0.004  # skin-friction coefficient on the wetted surface: how much the water rubs
+C_F = 0.008  # resistance coefficient on the wetted surface: friction, form and a coppered hull's roughness
 C_LAT = 1.0  # cross-flow drag of the lateral plane when the hull slides sideways (v |v|)
 C_LAT_LIFT = 1.0  # keel lift per radian of leeway at speed (u v); the keel's "grip" when moving
 C_YAW = 2.0  # quadratic yaw damping of the lateral plane when the ship swings fast (r |r|)
@@ -39,8 +39,8 @@ C_YAW_LIN = 2.5  # linear yaw damping when moving ahead (u r): a moving hull res
 C_R = 2.0  # rudder lift per radian of helm; rudder side force = q * A_rudder * C_R * delta
 RUDDER_X_FRACTION = 0.5  # the rudder hangs this fraction of the waterline length abaft amidships
 RUDDER_SMALL_SPEED2 = 0.01  # m^2/s^2 added to u^2 so the rudder keeps a whisper of effect at rest
-HEEL_DRAG_PER_RAD = 1.5  # extra resistance per radian of heel beyond HEEL_DRAG_ONSET (dragging)
-HEEL_DRAG_ONSET = math.radians(25.0)  # heel at which the lee side starts dragging and speed falls
+HEEL_DRAG_PER_RAD = 3.0  # extra resistance per radian of heel beyond HEEL_DRAG_ONSET (dragging)
+HEEL_DRAG_ONSET = math.radians(12.0)  # heel at which the lee side starts dragging and speed falls
 HEEL_KEEL_LEVER_FRACTION = 0.5  # the keel's reaction acts this fraction of the draught below water
 HEEL_TIME_CONSTANT = 4.0  # seconds for the heel to settle to its balance (quasi-static heel)
 BEAM_ENDS_HEEL = math.radians(40.0)  # heel at which the log cries "on her beam ends"
@@ -57,7 +57,7 @@ HELM_KI = 0.03  # helmsman: per second; how quickly he learns the helm she carri
 HELM_KI_WINDOW = math.radians(10.0)  # he only learns the helm once within this much of the course
 HELM_KI_LEAK_S = 60.0  # seconds; outside that window, or without way, what he learned fades
 HELM_STEERAGE_SPEED = 0.75  # m/s (1.5 kn); under this the rudder bites too little to learn from
-FULL_AND_BY_MARGIN = math.radians(5.0)  # sailed this much fuller than the sails' luffing angle
+FULL_AND_BY_MARGIN = math.radians(8.0)  # sailed this much fuller than the sails' luffing angle
 FULL_AND_BY_DEFAULT_LUFF = math.radians(45.0)  # luffing angle when package 4 has not said
 WEATHER_HELM_TIME_CONSTANT = 30.0  # seconds; the weather-helm reading averages the rudder
 STEADY_TOLERANCE = math.radians(2.0)  # within this of the ordered heading counts as on it

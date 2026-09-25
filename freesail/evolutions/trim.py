@@ -24,8 +24,8 @@ TRIM_OFFSET = {
     "sprit": units.deg_to_rad(25.0),
 }
 TRIM_RANGE = {
-    "gaff": (units.deg_to_rad(8.0), units.deg_to_rad(85.0)),
-    "jibheaded": (units.deg_to_rad(5.0), units.deg_to_rad(60.0)),
+    "gaff": (units.deg_to_rad(18.0), units.deg_to_rad(85.0)),
+    "jibheaded": (units.deg_to_rad(15.0), units.deg_to_rad(60.0)),
     "lug": (units.deg_to_rad(8.0), units.deg_to_rad(85.0)),
     "lateen": (units.deg_to_rad(8.0), units.deg_to_rad(85.0)),
     "sprit": (units.deg_to_rad(8.0), units.deg_to_rad(85.0)),

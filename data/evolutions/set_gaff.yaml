@@ -21,11 +21,11 @@ steps:
   - do: hoist
     duration_s: 120
     via: halyard_of(sail)
-    sets: {sail.state: set, sail.sheet_angle: "clamp(abs(dyn.apparent_wind_angle) - deg(25), deg(8), deg(85))"}
+    sets: {sail.state: set, sail.sheet_angle: "clamp(abs(dyn.apparent_wind_angle) - deg(25), deg(18), deg(85))"}
   - do: haul_out
     duration_s: 30
     if: sail.state != set
-    sets: {sail.state: set, sail.sheet_angle: "clamp(abs(dyn.apparent_wind_angle) - deg(25), deg(8), deg(85))"}
+    sets: {sail.state: set, sail.sheet_angle: "clamp(abs(dyn.apparent_wind_angle) - deg(25), deg(18), deg(85))"}
 on_start: {log: "Hands to the {sail} halyards and outhaul."}
 on_complete: {log: "Set the {sail}.", kind: sail.set, severity: notable}
 on_fail: {log: "Could not set the {sail}: {reason}.", kind: evolution.failed, severity: notable}
