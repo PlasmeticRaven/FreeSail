@@ -1,0 +1,69 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "seed": 7,
+  "scenario": {
+    "name": "Open water",
+    "start_time": "1805-06-01T04:00:00",
+    "wind_from_deg": 0.0,
+    "wind_speed_kn": 15.0,
+    "gustiness": 0.3,
+    "variability": 0.3,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 293.0,
+    "ship_speed_kn": 0.0
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/frigate-36.yaml"
+  },
+  "end_tick": 4060,
+  "journal": [
+    [
+      0,
+      "captain",
+      "set the fore topsail"
+    ],
+    [
+      360,
+      "captain",
+      "set plain sail"
+    ],
+    [
+      360,
+      "captain",
+      "brace sharp up on the starboard tack"
+    ],
+    [
+      1260,
+      "captain",
+      "haul the weather main brace"
+    ],
+    [
+      1260,
+      "captain",
+      "tack ship"
+    ],
+    [
+      1860,
+      "captain",
+      "reef the topsails, one reef"
+    ],
+    [
+      2260,
+      "captain",
+      "wear ship"
+    ],
+    [
+      3160,
+      "captain",
+      "heave to"
+    ],
+    [
+      3760,
+      "captain",
+      "fill away"
+    ]
+  ]
+}

@@ -29,4 +29,6 @@ What is wrong and where to look:
 4. **Package 4 flags**: the post-peak shape of the square curve (truths 3 and 5), blanketing constants, spar ratings versus sail forces at 30 kn (topgallant masts at 0.94 of rating on a reach under plain sail, so royals in 35 kn will carry away, which is truth 9), and reef factors from Lever.
 5. **Package 5 flags**: `C_LAT_LIFT` sets leeway more than `C_LAT`; `C_YAW_LIN`/`C_YAW`/`C_R` set turning; the frigate hard over at 8 kn swings about 1.1°/s with a 4.6-length radius, which is plausible; helmsman gains once real yaw moments exist.
 
+**Change made at integration (M1):** frigate `clr_x_m` moved from −0.8 to +2.5 m. With it she carries about 1° of weather helm under plain sail close-hauled and lies hove to (courses hauled up, main topsail aback, helm a-lee) at about 50° off the wind making 3 kn; at −0.8 she had lee helm and would not lie to, at +4.0 she griped and was taken aback. Forereaching at 3 kn is still too much for truth 12 (under 1.5 kn); expect to revisit with the resistance and curve changes above. Heave to now backs the yards of the mast with the most square sail (the main), per Luce, rather than the aftermost mast.
+
 Method for package 10: encode the truths table as tests first, then tune one constant at a time, recording each change and its effect here.

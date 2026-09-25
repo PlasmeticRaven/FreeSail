@@ -47,7 +47,7 @@ from typing import TYPE_CHECKING, Any
 
 from freesail import units
 from freesail.ship.graph import Ship
-from freesail.ship.parts import HelmMode, Spar
+from freesail.ship.parts import HelmMode, SailState, Spar
 from freesail.ship.schema import YARD_LIKE_CLASSES
 
 if TYPE_CHECKING:
@@ -98,14 +98,46 @@ def head_and_after_yards(ship: Ship) -> tuple[list[Spar], list[Spar]]:
 
 
 def after_square_yards(ship: Ship) -> list[Spar]:
-    """The yards on the aftermost mast that carries yards: the ones laid aback
-    to heave to (the mizzen topsail yard on a frigate, the fore topsail yard
-    on a topsail schooner)."""
+    """The yards on the aftermost mast that carries yards (the mizzen on a
+    frigate, the fore on a topsail schooner)."""
     masts = _masts_with_yards(ship)
     if not masts:
         return []
     aftermost = min(masts, key=lambda m: m.x_m)
     return [y for y in working_yards(ship) if ship.mast_of(y) is aftermost]
+
+
+def yards_to_back(ship: Ship) -> list[Spar]:
+    """The yards laid aback to heave to: those on the mast carrying the most
+    square sail (Luce 1866 ch. XXVI: "the main topsail to the mast"). On a
+    ship-rigged vessel that is the main; on a topsail schooner the fore, being
+    the only mast with yards."""
+    masts = _masts_with_yards(ship)
+    if not masts:
+        return []
+
+    def square_area(mast: Spar) -> float:
+        return sum(
+            sl.area_m2
+            for y in working_yards(ship)
+            if ship.mast_of(y) is mast
+            for sl in [ship.sail_of(y)]
+            if sl is not None and sl.cls == "square"
+        )
+
+    chosen = max(masts, key=square_area)
+    return [y for y in working_yards(ship) if ship.mast_of(y) is chosen]
+
+
+def lowest_square_sails(ship: Ship) -> list:
+    """The courses: square sails on yards that hang directly on a lower mast."""
+    out = []
+    for y in working_yards(ship):
+        parent = ship.parent_of(y)
+        sl = ship.sail_of(y)
+        if parent is not None and parent.cls == "mast" and sl is not None and sl.cls == "square":
+            out.append(sl)
+    return out
 
 
 def wind_rel(ship: Ship, wind: Wind) -> float:
@@ -471,14 +503,17 @@ class WearScript(Script):
 
 
 class HeaveToScript(Script):
-    """Heave to (M2 simplified, after Luce 1866 ch. XXVI 'To heave to'): lay the
-    aftermost square yards aback, the rest full, and put the helm a-lee. The
+    """Heave to (M2 simplified, after Luce 1866 ch. XXVI 'To heave to'): haul up
+    the courses, lay the yards of the mast carrying the most square sail aback
+    (the main topsail to the mast), the rest full, and put the helm a-lee. The
     physics does the rest. The backed yards are remembered in
-    ``ship.extra["hove_to"]`` so that fill away can undo it."""
+    ``ship.extra["hove_to"]`` so that fill away can undo it. Hauling up the
+    courses is done directly here rather than through their own evolutions,
+    which is the M2 simplification; the crew system will replace it."""
 
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
-        self.yards = after_square_yards(ship)
+        self.yards = yards_to_back(ship)
         self.sign = 1.0 if ship.dyn.tack == "starboard" else -1.0
         self.swing: YardSwing | None = None
 
@@ -514,6 +549,11 @@ class HeaveToScript(Script):
         dyn.target_rudder = self.sign * units.deg_to_rad(self.timing_value("helm_deg", 15.0))
         dyn.steady = False
         self.phase = "back_after_yards"
+        courses = [sl for sl in lowest_square_sails(self.ship) if sl.is_set]
+        for sl in courses:
+            sl.state = SailState.IN_THE_GEAR
+        if courses:
+            self.note("Hauled up the courses.")
         self.note(f"Braced the {sail_name_on(self.ship, self.yards)} aback; helm a-lee.")
 
     def tick(self, dt: float, wind: Wind, factor: float) -> None:

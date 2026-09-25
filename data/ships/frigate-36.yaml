@@ -11,7 +11,7 @@ hull:
   draught_m: 4.9
   displacement_kg: 1400000
   gm_m: 1.3
-  clr_x_m: -0.8
+  clr_x_m: 2.5
   lateral_area_m2: 170
   deck_height_m: 2.0
   rudder:

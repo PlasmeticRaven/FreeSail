@@ -684,7 +684,7 @@ def test_wear_gives_up_when_she_will_not_pay_off():
 @pytest.mark.parametrize(
     "path, backed_sail, backed_yard",
     [
-        (FRIGATE, "mizzen.topsail", "mizzen.topsail.yard"),
+        (FRIGATE, "main.topsail", "main.topsail.yard"),
         (SCHOONER, "fore.topsail", "fore.topsail.yard"),
     ],
 )
