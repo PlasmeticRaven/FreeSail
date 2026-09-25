@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FreeSail</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Cpath d=%27M3 13h10l-1 2H4z%27 fill=%27%234a3d31%27/%3E%3Cpath d=%27M8 1v12M8 3l5 8H8z%27 fill=%27%23ece5d3%27 stroke=%27%233b3128%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/client/style.css">
+</head>
+<body>
+<header>
+  <span class="brand">FreeSail</span>
+  <span id="ship-name" class="ship-name"></span>
+  <span class="spacer"></span>
+  <span class="driver">
+    <button id="btn-hold" type="button" title="hold the clock">hold</button>
+    <button id="btn-go" type="button" title="run the clock">go</button>
+    <button id="btn-tick" type="button" title="advance one minute, then hold">tick 60</button>
+    <span class="sep"></span>
+    <button type="button" data-time="1">1x</button>
+    <button type="button" data-time="10">10x</button>
+    <button type="button" data-time="60">60x</button>
+    <button type="button" data-time="600">600x</button>
+  </span>
+  <span id="status" class="bad">connecting</span>
+</header>
+
+<main>
+  <section id="log-panel" class="panel">
+    <div class="panel-head">
+      <span>Log</span>
+      <span class="filters">
+        <button type="button" data-filter="routine" class="active">all</button>
+        <button type="button" data-filter="notable">notable</button>
+        <button type="button" data-filter="urgent">urgent</button>
+      </span>
+    </div>
+    <div class="log-scroll"><div id="log-list" data-filter="routine"></div></div>
+    <div class="command-line">
+      <span class="prompt">&gt;</span>
+      <input id="command" type="text" autocomplete="off" spellcheck="false"
+             placeholder="an order, or hold / go / time 30 / tick 600">
+    </div>
+  </section>
+
+  <section id="ship-panel" class="panel">
+    <div class="panel-head"><span>Ship</span><span class="hint">[ and ] turn the view; \ returns to leeward</span></div>
+    <svg id="ship-view" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="the ship, drawn from her part graph"></svg>
+  </section>
+
+  <section id="instruments-panel" class="panel">
+    <div class="panel-head"><span>Instruments</span><span id="i-tick" class="hint"></span></div>
+    <dl class="instruments">
+      <dt>Ship's time</dt><dd id="i-time"></dd>
+      <dt>Bells</dt><dd id="i-bell"></dd>
+      <dt>Clock</dt><dd id="i-clock"></dd>
+      <dt>Heading</dt><dd id="i-heading"></dd>
+      <dt>Course</dt><dd id="i-course"></dd>
+      <dt>Speed</dt><dd id="i-speed"></dd>
+      <dt>Leeway</dt><dd id="i-leeway"></dd>
+      <dt>Heel</dt><dd id="i-heel"></dd>
+      <dt>True wind</dt><dd><span id="i-true-wind"></span> <span id="i-wind-words" class="muted"></span></dd>
+      <dt>Apparent</dt><dd id="i-apparent"></dd>
+      <dt>Tack</dt><dd id="i-tack"></dd>
+      <dt>Helm</dt><dd><span id="i-helm"></span> <span id="i-balance" class="muted"></span></dd>
+      <dt>Sail set</dt><dd id="i-sails" class="wrap"></dd>
+      <dt>Strain</dt><dd id="i-strain" class="wrap"></dd>
+      <dt>In hand</dt><dd><ul id="i-evolutions" class="evolutions"></ul></dd>
+    </dl>
+  </section>
+
+  <section id="map-panel" class="panel">
+    <div class="panel-head"><span>Map</span><span class="hint">north up, last hour's track</span></div>
+    <canvas id="map"></canvas>
+  </section>
+</main>
+
+<script src="/client/units.js"></script>
+<script src="/client/projection.js"></script>
+<script src="/client/shipview.js"></script>
+<script src="/client/log.js"></script>
+<script src="/client/instruments.js"></script>
+<script src="/client/map.js"></script>
+<script src="/client/app.js"></script>
+</body>
+</html>
