@@ -1,0 +1,13 @@
+Code-based sailing game with LLM integration for watching, playing solo/cooperatively, maybe competitively?
+Build code that controls your ship, broad range of possibilities for how to control your ship, realism/granular features emerging from strong, modular bottom-up build (every part of the ship can be used)
+Text based log, graphical representation (map + sideview/faux-3D render?), customizable with the code or fixed?
+Simulation depth for wind/physics/world? As deep as possible, focus on depth over graphics?
+Budgeting for LLM usage? Plan for local model baseline, Claude integration? Use Qudbridge as partial reference for LLM integration, or fresh design?
+Require coding for control, or provide basic commands to cover baseline functionality? Probably basic commands at least/basic mechanisms for expansion by powerusers/LLMs playing.
+Custom coding language in-game?
+Parity for human players and LLM agents. Multiplayer competitive or cooperative only requires balance consideration.
+Game engine decision: consider pros and cons across a few after building rubric. Python for in-game AND actual coding language? Consider ease-of-use.
+NPCs as simplified ships? NPC per person, or abstracted to ships + fixed characters on land? LLM control of NPCs/crew versus other implementation? Consider as deep design question.
+Era probably generic late age-of-sail, Napoleonic, or blend. Specific year probably not necessary except to establish for technological baseline (studding sails, common sail types, sail handling and behavior of crew on the ship, various era peculiarities). Probably strive for wide range of possibilities and constrain realism on physical possibility/general usage in history (not being a stickler except for things that never happened or really couldn't happen/be done).
+Consider scope for achievability, but be bold in planning for depth.
+MUST HAVE STUDDING SAILS! AND OTHER COOL, OBSCURE SHIT!

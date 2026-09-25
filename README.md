@@ -1,0 +1,8 @@
+# FreeSail
+
+A ticked, text-first sailing simulation of a late-age-of-sail ship, controlled through layered orders (from hauling a single line to standing orders and scripts), with language models able to watch, crew, or captain through the same channel a human uses.
+
+Status: design phase. Nothing is built yet.
+
+- `docs/DesignProposal.md`: the current design proposal, for refinement.
+- `docs/InitialDesignBrainstorm.txt`: the original brainstorm the proposal responds to.
