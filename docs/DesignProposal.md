@@ -334,7 +334,12 @@ Combat is another set of evolutions and parts, not a separate system:
 
 - **The log.** Primary. Ship's-log style, with severity levels and filtering (routine, notable, urgent). Time-compression rolls up routine. Every entry is a link to the state that produced it.
 - **The map.** Top-down. Coast, depth, wind arrows, your estimated position and track, sightings with bearing and range uncertainty, other ships at the fidelity your lookouts can actually see.
-- **The profile.** A side-on schematic of the ship's sail plan, generated from the ship data: every sail drawn in its current state, spars coloured by condition, a heel indicator. Fixed presentation, but it is a *true* picture of the part graph, so when a studding sail boom carries away it vanishes from the drawing.
+- **The ship view.** A side-on schematic of the ship's sail plan, generated from the ship data: every sail drawn in its current state, spars coloured by condition, a heel indicator. Fixed presentation, but it is a *true* picture of the part graph, so when a studding sail boom carries away it vanishes from the drawing. The M2 version is a single profile. The intended endpoint (added after v0.2) is a **2.5D ship view** with a *comfy, 90s vibe*: not a high-definition display of the physics, but enough to give visual interest and a sense of what is happening beyond the log:
+  - a small set of **aspects** (profile, bow and stern quarters, ahead and astern) so the ship visibly turns as she tacks or wears, chosen by her heading relative to the viewer's fixed vantage or to the wind;
+  - **movement**: a gentle roll and pitch with the sea state, sails that fill and shiver, a wake that lengthens with speed;
+  - **backgrounds** by conditions and locale: time of day, cloud and squall, sea state, open sea or coast or harbour, palette-swapped rather than painted anew;
+  - a low-fidelity illustrated style (limited palette, flat shapes, the feel of a mid-90s adventure or strategy game) that suits schematic truth better than realism would.
+  Because every frame is composed from the part graph, the view stays rig-agnostic: a lugger and a frigate use the same renderer with different parts. This is the natural halfway house to the long-term 3D dream and may well make it unnecessary.
 - **The deck (later).** A top-down deck plan showing where hands are and what they are doing. Very useful for understanding why the tack was slow.
 - **Instruments.** Wind, heading, speed, heel, the glass, the well, the clock. Scripts can register custom readouts here, which is the modest answer to "customisable with code": the core views are fixed, the instrument panel is extensible.
 
@@ -533,7 +538,7 @@ Each milestone ends in something you can run, and in a **gate**: a report writte
 
 **M7b. The director.** The director agent on the world-order channel with a brief, a hidden director's log, and a replay view. Depends on M5's world orders and M6's agent plumbing; small once both exist.
 
-**M8. Obscure kit and polish.** The rest of §9, including the remaining rigs as data; the deck view; the tutorial; the reference library as a proper in-client book. *Proves: it is presentable to friends.*
+**M8. Obscure kit and polish.** The rest of §9, including the remaining rigs as data; the deck view; the 2.5D ship view with aspects, movement and backgrounds (§6.1); the tutorial; the reference library as a proper in-client book. *Proves: it is presentable to friends.*
 
 M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is where it becomes *this* game.
 
@@ -561,6 +566,8 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
 13. **Next document.** The M0 to M2 technical specification: `docs/TechnicalSpec-M0-M2.md`.
 
 14. **The director role.** Added after v0.2 as §7.6: an omniscient LLM agent acting through journaled world orders and plausible causes only, visible after the fact, scheduled after parity. The M5 world-order channel is designed with it in mind.
+
+15. **The ship view.** The M2 profile is the first frame of a 2.5D ship view with a few aspects, gentle movement, condition and locale backgrounds, and a comfy 90s illustrated style (§6.1), scheduled for M8.
 
 ### Still open
 
