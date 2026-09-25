@@ -67,7 +67,22 @@ haul down the main topmast staysail
 # rejected: take in the royals
 ```
 
-The last is refused with "Nothing done: the fore royal is already furled; the main royal is already furled; the mizzen royal is already furled." The synonyms are period: `clew up`, `haul down` (head sails), `douse`, `hand`. What the log says:
+The last is refused with "Nothing done: the fore royal is already furled; the main royal is already furled; the mizzen royal is already furled."
+
+The period words for taking in are particular to the sail, and the parser keeps them so (Luce 1866, ch. XXIII, 'To take in a Course', 'To take in a Topsail', 'The Spanker': "Up mainsail and spanker!"). A course is **hauled up** by its clew garnets and buntlines; a topsail or a light sail is **clewed up**; a spanker is **brailed up**; a jib is **hauled down**; a studding sail is taken in. `take in`, `douse` and `hand` suit any sail. Use the wrong word and the ship corrects you: "A gaff sail is brailed up, not clewed up; say 'brail up the mizzen spanker' or 'take in the mizzen spanker'."
+
+```orders frigate plain-sail
+haul up the mainsail
+haul up the courses
+brail up the spanker
+clew up the topsails
+haul down the jib
+# rejected: clew up the spanker
+# rejected: haul up the topsails
+# rejected: lower the mainsail
+```
+
+What the log says:
 
 ```
   Morning watch (05:20)  Order: take in the fore topgallant.
@@ -108,7 +123,7 @@ To reef a topsail the halyards are settled and the yard clewed down, the reef ta
 * Morning watch (04:38)  Reefed the fore topsail; now set, 1 reef.
 ```
 
-You say how many reefs, or *close* for all of them (a *close-reefed* topsail has every reef in). A reef comes out with `shake out`:
+You say how many reefs, or *close* for all of them (a *close-reefed* topsail has every reef in), after the sail or in the verb: `close reef`, `double reef`, `single reef`, `treble reef`, or Luce's `take in one reef in the topsails`. A reef comes out with `shake out`; `shake out the reefs` shakes out all of them:
 
 ```orders frigate plain-sail
 reef the topsails, one reef
@@ -122,10 +137,15 @@ shake out a reef in the mizzen topsail
 shake out two reefs in the fore topsail
 shake out all reefs in the main topsail
 # rejected: reef the fore royal
+close reef the topsails
 # rejected: close reef the topsails
+shake out the reefs in the topsails
+double reef the fore topsail
+take in one reef in the main topsail
+single reef the mizzen topsail
 ```
 
-The refusals: the fore topsail with three reefs in is "already close reefed (3 reefs in)"; the mizzen topsail with none in has "no reef in the mizzen topsail to shake out"; the royal "has no reef bands; it is set whole or not at all"; and *close* is a modifier after the sail, not a verb before it. A sail must be set to be reefed; reef a furled sail and the runner refuses it.
+The refusals: the fore topsail with three reefs in is "already close reefed (3 reefs in)"; the mizzen topsail with none in has "no reef in the mizzen topsail to shake out"; the royal "has no reef bands; it is set whole or not at all"; and the second `close reef` finds every topsail "already close reefed". A sail must be set to be reefed; reef a furled sail and the runner refuses it.
 
 The schooner's boom mainsail reefs by settling the throat and peak halyards, hauling out the reef earing along the boom and tying the points (Luce 1866, ch. XXVII, 'Boom Mainsail'):
 
@@ -152,7 +172,7 @@ A studding sail comes in made up and stowed, so `take in` is enough; there is no
 
 ## The schooner
 
-Her sails are named in chapter 1; the verbs are the same. Her gaff sails are not furled on a yard but brailed up or lowered onto the boom, so `furl` is refused for them ("A gaff sail is not furled on its spar; take it in instead"), and her square topsail behaves exactly as the frigate's do (Luce 1884, ch. XXXIV Handling Fore-and-Afters).
+Her sails are named in chapter 1; the verbs are the same. Her gaff sails are not furled on a yard but brailed up or lowered onto the boom, so `furl` is refused for them ("A gaff sail is not furled on its spar; take it in instead") and `lower the mainsail` is taken in its place; her square topsail behaves exactly as the frigate's do (Luce 1884, ch. XXXIV Handling Fore-and-Afters). What she cannot do is **scandalise** a sail, dropping the peak of the mainsail to spill the wind, as Luce does before wearing her: the physics has no state for a gaff sail with its peak down, and the order says so.
 
 ```orders schooner
 set the foresail
@@ -167,6 +187,10 @@ take in the gaff topsail
 take in the topgallant
 furl the topgallant
 haul down the flying jib
-take in the mainsail
+lower the mainsail
+brail up the foresail
 # rejected: furl the mainsail
+# rejected: scandalise the mainsail
 ```
+
+The refusal: "The main sail cannot be scandalised: the physics has no state for a gaff sail with its peak dropped yet, only set, reefed or taken in. Ease the sheet, reef it or take it in instead."

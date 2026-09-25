@@ -96,12 +96,15 @@ def unknown_verb(text: str, verbs: Iterable[str]) -> OrderError:
     verbs = list(verbs)
     words = text.split()
     # Try the first one or two words: most verbs are one word, some are two.
-    hints: list[str] = []
+    # The closer spelling comes first, whichever length found it.
+    scored: dict[str, float] = {}
     for n in (2, 1):
         if len(words) >= n:
-            for h in nearest(" ".join(words[:n]), verbs, n=2):
-                if h not in hints:
-                    hints.append(h)
+            said = " ".join(words[:n])
+            for h in nearest(said, verbs, n=2):
+                ratio = difflib.SequenceMatcher(None, said, h).ratio()
+                scored[h] = max(scored.get(h, 0.0), ratio)
+    hints = sorted(scored, key=lambda h: -scored[h])
     hint = ("; did you mean " + join_names(f"'{h}'" for h in hints[:3]) + "?") if hints else "."
     return OrderError(
         f"'{text}' is not an order this ship understands{hint} "

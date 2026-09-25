@@ -87,13 +87,46 @@ full and by
 come up a point
 luff
 come up two points
+come up half a point
 bear away
 bear away two points
+bear away a point and a half
 keep her off two points
 steer full and by
+nothing off
+no higher
+luff and touch her
+bring her by the wind
 ```
 
-`keep her full` (or `full and by`) hands the helmsman the standing task: he steers as close as she will lie with the sails drawing, and follows the wind as it shifts. `come up` (*luff*) and `bear away` (*keep away*, *bear up*, *up helm*) move the ordered course by a point, or the number of points you give, and put her on a fixed compass course from then on; say `keep her full` again to go back to sailing by the wind. Falconer, *Luff*: "the order from the pilot to the steersman to put the helm towards the lee-side of the ship, in order to make the ship sail nearer the direction of the wind."
+`keep her full` (or `full and by`, *bring her by the wind*, *steer by the wind*) hands the helmsman the standing task: he steers as close as she will lie with the sails drawing, and follows the wind as it shifts. Luce's *Nothing off!*, *No higher!* and *Luff and touch her!* are the same order given from either side of it, and the log echoes the word you used: "Helm ordered: no higher; keep her full and by." `come up` (*luff*) and `bear away` (*keep away*, *bear up*) move the ordered course by a point, or the number of points you give (halves are taken: *half a point*, *a point and a half*), and put her on a fixed compass course from then on; say `keep her full` again to go back to sailing by the wind. Falconer, *Luff*: "the order from the pilot to the steersman to put the helm towards the lee-side of the ship, in order to make the ship sail nearer the direction of the wind."
+
+### Conning the helm
+
+The rest of the conning words (Luce 1866, ch. XXIV, 'Conning'; Falconer, *Helm*) speak to the wheel rather than to the course, and the game takes them as they were meant:
+
+```orders frigate
+steady
+steady as she goes
+meet her
+right the helm
+hard a-lee
+helm's a-lee
+hard up
+helm a-weather
+up helm
+down helm
+```
+
+| Order | What the helmsman does |
+|---|---|
+| **steady**, *steady as she goes*, *very well thus*, *thus* | holds the heading she has at that moment, as a compass course |
+| **meet her**, *check her* | meets her swing with the opposite helm and steadies her on the heading she has |
+| **right the helm**, *helm amidships*, *midships* | puts the rudder amidships and leaves it there: she steers herself until you say otherwise |
+| **hard a-lee**, *helm's a-lee*, *down helm*, *put the helm down* | rudder hard over to windward, her head coming up to the wind, and left there |
+| **hard up**, *helm a-weather*, *up helm*, *put the helm up* | rudder hard over to leeward, her head paying off, and left there |
+
+*Helm* here is the tiller: the helm a-lee puts the rudder to windward, which is why "helm's a-lee" begins a tack. The log says which way the rudder went: "Helm ordered: hard a-lee; rudder hard over to windward (35° to starboard), her head coming up to the wind." After *hard a-lee* or *hard up* nobody is steering a course: she turns until you say *meet her* or *steady*, or give a course. This is what the tack and the wear do for themselves in chapter 5, and it is how you would work a box-haul by hand.
 
 ## What `state` reports
 
