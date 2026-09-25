@@ -359,6 +359,7 @@ An **agent** is anything that subscribes to observations and submits orders. Hum
 | **Watcher / narrator** | The log and any query | Nothing (or commentary into a side channel) | Must-have |
 | **Crew / officer** | The log, queries, and the orders of superiors | Orders within a station's authority (a lieutenant can trim sail; cannot change the ordered course) | Close second |
 | **Captain / player** | Everything the human player would | Everything the human player could | Close third |
+| **Director** (§7.6) | Everything, at true fidelity: the world as it is, not as any lookout sees it | World orders: weather, encounters, NPC goals, plausible events aboard; never direct orders to the player's crew | After parity (M6+) |
 
 Parity is then a consequence of the architecture: the captain-level LLM has exactly the human's observation and action surface because they are the same surface.
 
@@ -401,6 +402,21 @@ A model that writes `ship.set("fore topgallant")` and a model that writes `set t
 Because runs are deterministic (§3.2), we can build a **regatta harness**: a fixed seed, a fixed course, and a set of agents (rules-based, local model, Claude, human replay) sailing it. Elapsed time, damage, and crew fatigue give a score. This is how we tune the physics for honesty, tune the documentation for the models, and check that parity holds. It is also, incidentally, the first competitive mode.
 
 ---
+
+### 7.6 The director
+
+A fourth role, proposed after v0.2: an LLM that sits *above* the game rather than in it. It sees the world at true fidelity (where every ship really is, what the weather will do, what the crew are muttering) and makes dynamic choices to challenge, help or interest the player: a privateer brig appears to leeward on the second morning; the glass starts falling as the ship approaches the coast; the carpenter reports a seam working. It can run alone with a human player, or alongside officer and NPC-captain agents.
+
+How it fits the architecture:
+
+- **It is an agent on a different channel.** The director submits *world orders*, not ship orders: `weather: a squall line from the north-west in forty minutes`, `encounter: a brig, privateer, six miles to leeward, goal chase`, `npc <id>: goal escort the convoy`, `aboard: the fore topmast is found sprung`. World orders are journaled with a tick like ship orders, so a directed voyage replays exactly and can be reviewed afterwards.
+- **It acts only through plausible causes.** The director cannot move the player's ship, change a sail, or countermand an order; it can only change the world the ship is in, and only in ways the simulation could have produced on its own. Every director action is something that could have happened anyway. This keeps the physics honest and keeps the player's agency whole.
+- **Its actions are visible after the fact.** A director's log records what it did and why, hidden during play (a director you can see coming is not a director) and revealed on request or at the end of the voyage. In replays it is shown inline.
+- **It samples on events and on a slow clock.** A director thinks when something notable happens or every glass or watch, not every tick. It is the natural home for the more capable model, since it makes few decisions and each one matters; officers and NPC captains can run on cheaper local models beneath it.
+- **It has a brief.** Like a station holder (§3.5), a director gets a character outline: the tone of the voyage (a quiet passage, a hard-luck cruise, a chase), the kind of challenge wanted, and the limits the player set. The player writes the brief; the director keeps it.
+- **Multiple modes coexist.** A director alongside an LLM officer of the watch and rules-based NPC captains is three agents on three channels with three authorities, which the agent model already supports. The only new mechanism is the world-order channel, which M5 (world) has to provide anyway for scenarios.
+
+Open questions for later: whether the director should have a budget (so that it cannot make every day a hurricane), whether the player can ask the director for a hint in character (the "old shellback" who happens to be aboard), and whether two directors could compete for a player's fortune. None of these change the M5 to M6 plan; the world-order channel is the one thing to build with the director in mind.
 
 ## 8. Engine and technology
 
@@ -514,6 +530,8 @@ Each milestone ends in something you can run, and in a **gate**: a report writte
 
 **M7. Powder.** Guns, shot, damage into the part graph, a two-ship action, prize resolution. *Proves: combat is the same system.*
 
+**M7b. The director.** The director agent on the world-order channel with a brief, a hidden director's log, and a replay view. Depends on M5's world orders and M6's agent plumbing; small once both exist.
+
 **M8. Obscure kit and polish.** The rest of §9, including the remaining rigs as data; the deck view; the tutorial; the reference library as a proper in-client book. *Proves: it is presentable to friends.*
 
 M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is where it becomes *this* game.
@@ -540,6 +558,8 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
 11. **Second reference rig.** Topsail schooner, confirmed. A cutter is the intended third vessel, and a small lateen-rigged vessel a fourth, chosen to handle as differently as possible from the ship-rigged reference.
 12. **The language's name.** Orders.
 13. **Next document.** The M0 to M2 technical specification: `docs/TechnicalSpec-M0-M2.md`.
+
+14. **The director role.** Added after v0.2 as §7.6: an omniscient LLM agent acting through journaled world orders and plausible causes only, visible after the fact, scheduled after parity. The M5 world-order channel is designed with it in mind.
 
 ### Still open
 
