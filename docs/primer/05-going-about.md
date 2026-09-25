@@ -91,11 +91,14 @@ Two manoeuvres for a ship that cannot tack and has not room to wear. The parser 
 ```orders frigate plain-sail
 # rejected: box haul
 # rejected: club haul
-# rejected: back the main topsail
-# rejected: lay the main topsail aback
+hard a-lee
+haul up the mainsail
+brail up the spanker
+square the after yards
+brace the head yards sharp aback
 ```
 
-The last two are how you would begin a box-haul by hand. The game's brace evolution braces a yard *for* a tack, never *aback*: to lay a yard aback you must name the other tack, `brace the head yards sharp up on the larboard tack` while she is on the starboard, which is what heaving to does underneath. That works, and a determined player can box-haul with it and the helm, but nothing will tell the physics that she is box-hauling.
+The five orders after the refusals are how you would begin a box-haul by hand, in Luce's own words: the helm a-lee, up mainsail and spanker, the after yards squared and the head yards aback (chapter 4, 'Laying a yard aback'). A determined player can carry it through with `right the helm` as she gathers sternway, `hard up` when her head has fallen off, and `brace round the after yards` and `brace the head yards sharp up` as the wind comes on the quarter, but nothing tells the physics that she is box-hauling, and the log will not say *Box-hauled*.
 
 ## Heaving to
 
@@ -156,7 +159,10 @@ tack ship
 wear ship
 heave to
 fill away
+gybe
 ```
+
+The later word for wearing a fore-and-aft vessel is *gybe*, and the parser takes it as a synonym of `wear ship` with a note in the log ("Gybe, that is, wear ship (the period word); the boom will come over as the wind crosses her stern"). Luce 1884 says *wear*; so should you.
 
 ```
   Morning watch (04:20)  Order: tack ship.
@@ -169,4 +175,4 @@ fill away
 * Morning watch (04:22)  Tacked; braced up on the larboard tack, heading ENE (68°).
 ```
 
-What she does not do yet: gybe. There is no order to shift the main boom over with the wind aft; wearing does it silently inside the evolution, and running by the lee costs nothing. Both are later work.
+What she does not do yet: gybe as a thing of its own. There is no separate evolution to shift the main boom over with the wind aft; wearing (and so `gybe`) does it silently inside the evolution, and running by the lee costs nothing. Both are later work.

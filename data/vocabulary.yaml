@@ -22,7 +22,11 @@ verbs:
     object: sail
     level: 1
   take in:
-    synonyms: [clew up, haul down, take in the, douse, hand]
+    # The period words are particular: a course is hauled up, a topsail
+    # clewed up, a spanker brailed up, a boom mainsail lowered, a jib hauled
+    # down (Luce 1866, ch. XXIII: "Up mainsail and spanker"). `take_in_words`
+    # below says which suit which sail; the others suit any.
+    synonyms: [clew up, haul down, take in the, douse, hand, haul up, brail up, brail in, lower]
     object: sail
     level: 1
   furl:
@@ -30,15 +34,22 @@ verbs:
     object: sail
     level: 1
   reef:
-    synonyms: [take a reef in, take in a reef in]
+    # "close reef", "double reef" and "single reef" carry their count in the
+    # verb (`phrase_modifiers` below); "take in one reef in the topsails" is
+    # read as a reef too (grammar.py), whatever the number.
+    synonyms: [take a reef in, take in a reef in, close reef, double reef, single reef, treble reef]
     object: sail
     level: 1
   shake out:
-    synonyms: [shake out the reef in, shake the reef out of, shake the reefs out of]
+    synonyms: [shake out the reef in, shake the reef out of, shake the reefs out of,
+               shake out the reefs in]
     object: sail
     level: 1
   brace:
-    synonyms: [brace round]
+    # "lay" is Luce's word for the same act ("Lay the head yards square!",
+    # "lay the main topsail aback"). "brace round" with no mode braces sharp
+    # up for the tack the wind is on (`phrase_modifiers`).
+    synonyms: [brace round, lay]
     object: yards
     level: 1
   trim:
@@ -50,7 +61,9 @@ verbs:
     object: none
     level: 1
   haul:
-    synonyms: [haul on, haul in, haul taut, round in]
+    # "haul aft", "haul home" and "haul flat" haul the line all the way in
+    # (`phrase_modifiers`); so does "aft" or "home" after the line's name.
+    synonyms: [haul on, haul in, haul taut, round in, haul aft, haul home, haul flat]
     object: line
     level: 0
   ease:
@@ -69,6 +82,24 @@ verbs:
     synonyms: [make fast, avast hauling on, avast]
     object: line
     level: 0
+  square:
+    # "Square the yards!": brace square. Nothing after it means every yard.
+    synonyms: []
+    object: yards
+    level: 1
+  back:
+    # "Back the main topsail": brace its yard aback, that is, sharp up for
+    # the other tack, as heaving to does (Luce 1866, ch. XXVI). Needs a yard
+    # or a square sail; "back" alone is refused.
+    synonyms: [lay aback, brace aback]
+    object: yards
+    level: 1
+  sheet home:
+    # Level 0 on a sail: its sheets hauled home and belayed (a square sail),
+    # or hauled flat aft (a fore-and-aft sail).
+    synonyms: [sheet home the, haul home the sheets of, haul aft the sheets of]
+    object: sail
+    level: 0
   steer:
     synonyms: [course, helm, steer for, head]
     object: heading
@@ -78,11 +109,48 @@ verbs:
     object: points
     level: 1
   bear away:
-    synonyms: [keep away, bear up, keep her off, keep her away, keep off, bear off, up helm]
+    synonyms: [keep away, bear up, keep her off, keep her away, keep off, bear off]
     object: points
     level: 1
   keep her full:
-    synonyms: [full and by, keep her full and by, sail her full and by, steer full and by]
+    # The conning words for sailing by the wind (Luce 1866, ch. XXIV,
+    # 'Conning'): "nothing off" and "no higher" keep her full and by, and
+    # "luff and touch her" is the same order given from the other side, as
+    # close as she will lie with the sails just full. The log echoes the word.
+    synonyms: [full and by, keep her full and by, sail her full and by, steer full and by,
+               bring her by the wind, steer by the wind, keep her by the wind, by the wind,
+               bring her to the wind, haul her wind, haul the wind, keep her a good full,
+               a good full and by, nothing off, no higher, luff and touch her]
+    object: none
+    level: 1
+  # Conning words to the helmsman (Luce 1866, ch. XXIV 'Conning'; Falconer,
+  # *Helm*). "Steady" holds the heading she has; "meet her" checks her swing
+  # and holds her there; "right the helm" puts the rudder amidships and
+  # leaves it; "helm a-lee" and "helm a-weather" put the rudder hard over to
+  # bring her up to the wind or pay her off, and leave it there until the
+  # next helm order.
+  steady:
+    synonyms: [steady as she goes, steady so, very well thus, thus, keep her so, keep her thus,
+               steady as you go]
+    object: none
+    level: 1
+  meet her:
+    synonyms: [meet her with the helm, check her]
+    object: none
+    level: 1
+  right the helm:
+    synonyms: [helm amidships, rudder amidships, midships, amidships, right the rudder,
+               helm midships]
+    object: none
+    level: 1
+  helm a-lee:
+    synonyms: [hard a-lee, helm's a-lee, put the helm down, put the helm a-lee, down with the helm,
+               hard down, helm down, down helm]
+    object: none
+    level: 1
+  helm a-weather:
+    synonyms: [hard up, hard a-weather, helm's a-weather, put the helm up, put the helm a-weather,
+               up with the helm, helm up, up helm]
     object: none
     level: 1
   tack ship:
@@ -90,7 +158,9 @@ verbs:
     object: none
     level: 1
   wear ship:
-    synonyms: [wear, bear up and wear, wear round]
+    # "Gybe" is the later word for wearing a fore-and-aft vessel; the log
+    # says so when it is used.
+    synonyms: [wear, bear up and wear, wear round, gybe, jibe, gybe her, wear her round]
     object: none
     level: 1
   heave to:
@@ -100,6 +170,12 @@ verbs:
   fill away:
     synonyms: [fill, fill and stand on, let draw]
     object: none
+    level: 1
+  scandalise:
+    # Dropping the peak of a gaff sail to spill the wind. The physics has no
+    # such state yet, so the order is always refused with `refusals` below.
+    synonyms: [scandalize, drop the peak of, scandalise the peak of]
+    object: sail
     level: 1
   # Group evolutions: verb phrases with no object, expanded from the list below.
   set plain sail:
@@ -160,6 +236,8 @@ evolutions:
     square: shake_out_square
     gaff: shake_out_gaff
   brace: brace
+  square: brace
+  back: brace
   tack ship: tack
   wear ship: wear
   heave to: heave_to
@@ -169,10 +247,28 @@ refusals:
   furl: "A {class} sail is not furled on its spar; take it in instead."
   reef: "The {name} has no reef bands; it is set whole or not at all."
   shake out: "The {name} has no reef bands; there is nothing to shake out."
+  scandalise: "The {name} cannot be scandalised: the physics has no state for a gaff sail with its peak dropped yet, only set, reefed or taken in. Ease the sheet, reef it or take it in instead."
+
+# How each class of sail is taken in, in the period word (Luce 1866, ch.
+# XXIII; Luce 1884, ch. XXXIV). A take-in synonym listed here is refused for
+# a sail whose class does not list it, with the first word that does. A
+# `course` is a square sail on a lower yard. Synonyms not listed here at
+# all ("take in", "douse", "hand") suit any sail.
+take_in_words:
+  course: [haul up, clew up]
+  square: [clew up]
+  gaff: [brail up, brail in, haul up, lower]
+  jibheaded: [haul down]
+  studding: [take in, haul down]
+  lug: [lower]
+  lateen: [lower]
+  sprit: [lower]
 
 # ---------------------------------------------------------------------------
 # Brace modes: the target brace angle for each word (spec §8.2). `limit`
-# means the yard's own brace_limit. Degrees here; radians inside.
+# means the yard's own brace_limit; `aback` the limit for the other tack
+# (the sail pressed against the mast); `wind` the best angle for the present
+# apparent wind, as `trim the yards` finds it. Degrees here; radians inside.
 # ---------------------------------------------------------------------------
 brace_modes:
   sharp up: limit
@@ -180,6 +276,30 @@ brace_modes:
   in: 15
   square: 0
   by the lifts: 0
+  full: limit
+  aback: aback
+  sharp aback: aback
+  abox: aback
+  to the wind: wind
+
+# Modifiers a verb phrase carries in itself: "close reef" is "reef ...
+# close", "haul aft" is "haul ... home", and "brace round" with nothing else
+# said braces for the tack the wind is on. Keys are `Order.modifiers` keys.
+phrase_modifiers:
+  brace round: {round: true}
+  close reef: {close: true}
+  shake out the reefs in: {close: true}
+  shake the reefs out of: {close: true}
+  double reef: {reefs: 2}
+  single reef: {reefs: 1}
+  treble reef: {reefs: 3}
+  haul aft: {home: true}
+  haul home: {home: true}
+  haul flat: {home: true}
+
+# Words after a line's name that mean "all the way in": "haul the jib sheet
+# aft", "haul the topsail sheets home".
+haul_home: [home, aft, flat, flat aft, chock home, right home, hard in, flat in]
 
 # ---------------------------------------------------------------------------
 # Sides. `port` is accepted and echoed as larboard. `weather` and `lee`

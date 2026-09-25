@@ -49,6 +49,7 @@ def _modifiers_for(spec_object: str, verb: str, vocab: Vocabulary, sided: bool) 
     """Modifier phrases that may follow a complete noun for this verb."""
     out: list[str] = []
     if verb == "brace":
+        # "square" and "back" say how in the verb itself, so they take no mode
         out += list(vocab.brace_modes)
         out += [f"{m} on the starboard tack" for m in ("sharp up", "up", "in", "square")]
         out += [f"{m} on the larboard tack" for m in ("sharp up", "up", "in", "square")]
@@ -56,6 +57,8 @@ def _modifiers_for(spec_object: str, verb: str, vocab: Vocabulary, sided: bool) 
         out += ["one reef", "two reefs", "three reefs", "close"]
     elif verb == "shake out":
         out += ["one reef", "two reefs", "all reefs"]
+    elif verb == "haul":
+        out += ["home", "aft", "a fathom", "two fathoms", "a little", "handsomely", "roundly"]
     elif spec_object == "line":
         out += ["a fathom", "two fathoms", "a little", "handsomely", "roundly"]
     if sided:
@@ -86,10 +89,12 @@ def _noun_candidates(ship: Any, spec_object: str, verb: str) -> list[tuple[str, 
         if getattr(part, "side", None):
             fam = resolve.family_name(ship, pid)
             families.setdefault((fam, kinds_of[pid]), []).append(pid)
-    for (fam, _kind), ids in families.items():
+    for (fam, kind), ids in families.items():
         put(fam, ids)
         put(f"weather {fam}", ids)
         put(f"lee {fam}", ids)
+        if kind == "line":
+            put(resolve.pluralise(fam), ids)  # "main braces": both sides
     for name, members in ship.groups.items():
         put(name, list(members))
     for alias, target in ship.aliases.items():
@@ -174,7 +179,7 @@ def suggestions(ship: Any, text: str, limit: int = 12) -> list[str]:
         return out[:limit]
 
     nouns = _noun_candidates(ship, spec.object, verb)
-    if verb == "brace" and not rest:
+    if verb == "brace" and not rest and normalise(matched) != "lay":
         for m in _modifiers_for(spec.object, verb, vocab, False):
             offer(prefix + m)
     article_taken = normalise(matched).split()[-1] == "the"  # "take in the" is a verb phrase

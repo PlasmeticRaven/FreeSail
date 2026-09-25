@@ -483,6 +483,10 @@ Without crew these are scripted sequences that manipulate helm and yards on a ti
 
 ---
 
+### 8.6 The living grammar
+
+The verb table in §8.2 was the milestone 1 target. After the Sailing Master's Primer (`docs/primer/`) was written against it, the parser was extended (package 15) with the period orders the primer reached for: `square`, `back` and `lay ... aback`, `trim`, `brace round` and `brace ... to the wind`, class-bound take-in words (`haul up`, `brail up`, `clew up`, `haul down`, `lower`), `sheet home` and the `home`/`aft` modifiers, the conning words as helm orders (`steady`, `meet her`, `right the helm`, `hard a-lee`, `helm a-weather`, `nothing off`, `no higher`, `bring her by the wind`), compound objects joined by `and`, `close`/`double`/`single reef`, plural sided lines, `gybe` as a synonym of `wear ship`, and half-point helm orders. From here on the authoritative description of what parses is `data/vocabulary.yaml` together with the primer, whose every order block is run through the parser by `tests/test_primer.py`; this section is not maintained verb by verb.
+
 ## 9. The console (M0) and the browser client (M2)
 
 ### 9.1 Console

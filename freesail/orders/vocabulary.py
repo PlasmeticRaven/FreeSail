@@ -36,7 +36,7 @@ class Vocabulary:
     phrase_to_verb: dict[str, str]  # every verb phrase and synonym -> canonical name
     evolutions: dict[str, Any]  # verb -> {sail class -> evolution id} or verb -> id
     refusals: dict[str, str]
-    brace_modes: dict[str, float | str]  # phrase -> degrees or "limit"
+    brace_modes: dict[str, float | str]  # phrase -> degrees, or "limit" | "aback" | "wind"
     sides: dict[str, str]  # word -> starboard | larboard | weather | lee
     both_sides: tuple[str, ...]
     manner: tuple[str, ...]
@@ -50,6 +50,17 @@ class Vocabulary:
     group_evolutions: dict[str, list[str]]
     source: str = ""
     verb_phrases: list[str] = field(default_factory=list)  # longest first, for matching
+    # modifiers a verb phrase carries in itself: "close reef" -> {close: True}
+    phrase_modifiers: dict[str, dict[str, Any]] = field(default_factory=dict)
+    # words after a line's name meaning "all the way in": "haul the jib sheet aft"
+    haul_home: tuple[str, ...] = ()
+    # the take-in phrases that suit each class of sail (the first is the proper word)
+    take_in_words: dict[str, tuple[str, ...]] = field(default_factory=dict)
+
+    @property
+    def class_bound_take_in_phrases(self) -> frozenset[str]:
+        """The take-in synonyms that suit only some sails ('clew up', 'haul down')."""
+        return frozenset(p for phrases in self.take_in_words.values() for p in phrases)
 
     @property
     def verb_names(self) -> list[str]:
@@ -125,7 +136,15 @@ def load_vocabulary(path: str | Path | None = None) -> Vocabulary:
 
     brace_modes: dict[str, float | str] = {}
     for phrase, target in (data.get("brace_modes") or {}).items():
-        brace_modes[key(phrase)] = "limit" if target == "limit" else float(target)
+        if isinstance(target, str):
+            if target not in ("limit", "aback", "wind"):
+                raise ValueError(
+                    f"{p}: brace mode '{phrase}' is '{target}'; "
+                    f"say degrees, 'limit', 'aback' or 'wind'."
+                )
+            brace_modes[key(phrase)] = target
+        else:
+            brace_modes[key(phrase)] = float(target)
 
     group_evolutions = {
         key(name): [str(o) for o in (orders or [])]
@@ -152,4 +171,12 @@ def load_vocabulary(path: str | Path | None = None) -> Vocabulary:
         source=str(p),
     )
     vocab.verb_phrases = sorted(phrase_to_verb, key=lambda s: (-len(s.split()), -len(s), s))
+    for phrase, mods in (data.get("phrase_modifiers") or {}).items():
+        k = key(phrase)
+        if k not in phrase_to_verb:
+            raise ValueError(f"{p}: phrase_modifiers lists '{phrase}', which is not a verb phrase.")
+        vocab.phrase_modifiers[k] = dict(mods or {})
+    vocab.haul_home = _tuple(data.get("haul_home"))
+    for cls, phrases in (data.get("take_in_words") or {}).items():
+        vocab.take_in_words[str(cls)] = _tuple(phrases)
     return vocab
