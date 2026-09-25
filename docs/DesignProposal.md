@@ -267,7 +267,7 @@ The evolution catalogue is the level 1 vocabulary and the single largest body of
 - Darcy Lever, *The Young Sea Officer's Sheet Anchor* (1808). Squarely in period, illustrated, and organised around rigging and evolutions.
 - William Falconer, *An Universal Dictionary of the Marine* (1815 Burney edition). The glossary source for part names and aliases.
 
-Where the sources are added to the repository (proposed: `docs/references/`), each evolution's data file cites the chapter and section it was drawn from, so that a human or an LLM officer can read the same passage the game encodes.
+The sources are in the repository under `docs/references/` (OCR text from Internet Archive scans, with provenance in its README) and `docs/references/LuceChapterMap.md` maps Luce's chapters to the game systems they feed. Each evolution's data file cites the chapter and section it was drawn from, so that a human or an LLM officer can read the same passage the game encodes.
 
 Initial catalogue target for the first playable milestone: around 40 evolutions covering setting and taking in every sail type on a ship-rigged vessel, reefing, tacking, wearing, boxhauling, heaving to, anchoring and weighing, and studding sail handling. Combat, boats, jury rigs, and the obscure kit come in later milestones.
 
