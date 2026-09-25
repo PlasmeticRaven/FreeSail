@@ -43,6 +43,7 @@ spars:
 - id: fore.mast
   class: mast
   x_m: 7.8
+  rake_deg: 11.3
   height_m: 18.7
   rating_kn: 293.7
 # fore topmast 36 ft with its pole (Fincham: hounded the beam, pole half of that), hounds 16 ft above the lower cap. Provisional (truth 9), see gen_ships.py. Rating: fore.topsail, fore.topgallant, flying_jib in 40 kn -> 55.9 kN.
@@ -61,6 +62,7 @@ spars:
 - id: main.mast
   class: mast
   x_m: -2.6
+  rake_deg: 11.3
   height_m: 19.7
   rating_kn: 163.2
 # main topmast 36 ft, hounded the beam with a pole half as long (Fincham), a pole for the gaff topsail, which comes in early. Provisional (truth 9), see gen_ships.py. Rating: main.gaff_topsail in 22 kn -> 5.2 kN.

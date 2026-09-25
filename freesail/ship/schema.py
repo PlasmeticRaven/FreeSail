@@ -199,6 +199,7 @@ class SparSpec:
     steps_on: str | None = None  # the spar this mast stands on (topmast on lower mast)
     side: str | None = None  # studding sail booms
     brace_limit_deg: float | None = None  # yards
+    rake_deg: float | None = None  # masts: positive rakes aft, negative forward (a polacre's fore)
     rating_kn: float | None = None
 
     @property
@@ -354,6 +355,7 @@ def _parse_spar(s: Any, i: int, source: str) -> SparSpec:
         steps_on=_str(s, "steps_on", where, source, required=False),
         side=side,
         brace_limit_deg=_num(s, "brace_limit_deg", where, source, required=False),
+        rake_deg=_num(s, "rake_deg", where, source, required=False),
         rating_kn=_num(s, "rating_kn", where, source, required=False),
     )
 
@@ -448,6 +450,16 @@ def validate(spec: ShipSpec) -> None:
             )
         if s.cls == "studdingsail_boom" and s.side is None:
             raise ShipFileError(f"{src}: studding sail boom '{s.id}' needs a 'side'.")
+        if s.rake_deg is not None:
+            if s.cls not in ("mast", "topmast", "topgallant_mast", "royal_mast"):
+                raise ShipFileError(
+                    f"{src}: spar '{s.id}' is a {s.cls}; only a mast takes 'rake_deg'."
+                )
+            if not -30.0 <= s.rake_deg <= 30.0:
+                raise ShipFileError(
+                    f"{src}: spar '{s.id}' has rake_deg = {s.rake_deg:g}; a mast rakes between "
+                    f"-30 (forward) and 30 (aft) degrees."
+                )
         if s.rating_kn is None:
             s.rating_kn = DEFAULT_SPAR_RATING_KN[s.cls]
             missing_ratings.setdefault(("spar", s.cls, s.rating_kn), []).append(s.id)

@@ -53,6 +53,7 @@ class Spar(Part):
     parent: str | None = None
     side: str | None = None
     brace_limit: float = 0.0  # radians, for yards
+    rake: float = 0.0  # radians, for masts: positive aft, negative forward
     brace_angle: float = 0.0  # radians; 0 square, +ve = braced up for the starboard tack
     sent_down: bool = False  # struck below (topgallant masts in a gale)
 
@@ -68,6 +69,7 @@ class Spar(Part):
             parent=s.parent,
             side=s.side,
             brace_limit=units.deg_to_rad(s.brace_limit_deg or 0.0),
+            rake=units.deg_to_rad(s.rake_deg or 0.0),
         )
 
     @property

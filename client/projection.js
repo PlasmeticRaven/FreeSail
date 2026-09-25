@@ -179,17 +179,24 @@
       var H = spec.height_m || 0;
       var r = { id: id, cls: spec.class, spec: spec, parent: parent, state: sparState(id), side: spec.side };
       if (spec.class === "mast" || (MAST_CLASSES[spec.class] && !parent)) {
+        // a lower mast: its rake (positive aft) carries every point on it aft as it rises
         r.x = spec.x_m || 0;
+        r.rake = spec.rake || 0;
+        var slope = -Math.tan(r.rake);
+        r.xAt = function (z) { return (spec.x_m || 0) + slope * (z - deck); };
         r.a = v(r.x, 0, deck);
-        r.b = v(r.x, 0, deck + H);
+        r.b = v(r.xAt(deck + H), 0, deck + H);
         r.head = r.b;
         r.foot = r.a;
       } else if (MAST_CLASSES[spec.class]) {
-        r.x = parent.x;
+        // an upper mast continues the line of the one below
+        r.rake = parent.rake || 0;
+        r.xAt = parent.xAt || function () { return parent.x; };
         var footZ = parent.head[2];
+        r.x = r.xAt(footZ);
         r.foot = v(r.x, 0, footZ);
-        r.head = v(r.x, 0, footZ + H);
-        r.a = v(r.x, 0, footZ - DOUBLING * H); // the doubling: drawn, not a position
+        r.head = v(r.xAt(footZ + H), 0, footZ + H);
+        r.a = v(r.xAt(footZ - DOUBLING * H), 0, footZ - DOUBLING * H); // the doubling: drawn, not a position
         r.b = r.head;
       } else if (spec.class === "bowsprit") {
         r.x = spec.x_m || 0;
@@ -207,7 +214,7 @@
         r.tip = r.b;
       } else if (YARD_CLASSES[spec.class]) {
         var th = braceAngle(spec);
-        r.x = parent ? parent.x : spec.x_m || 0;
+        r.x = parent ? (parent.xAt ? parent.xAt(deck + H) : parent.x) : spec.x_m || 0;
         r.centre = v(r.x, 0, deck + H);
         r.arm = [Math.sin(th), Math.cos(th), 0]; // direction of the starboard yardarm
         r.half = L / 2;
@@ -221,13 +228,13 @@
         r.b = add(r.centre, mul(r.arm, r.half)); // starboard arm
         r.normal = [Math.cos(th), -Math.sin(th), 0];
       } else if (spec.class === "gaff") {
-        r.x = parent ? parent.x : spec.x_m || 0;
+        r.x = parent ? (parent.xAt ? parent.xAt(deck + H) : parent.x) : spec.x_m || 0;
         var gDir = sheetDirection(sheetAngleOf(id), tack);
         r.a = v(r.x, 0, deck + H); // the throat, at the mast
         r.b = add(r.a, add(mul(gDir, L * Math.cos(GAFF_PEAK_ANGLE)), v(0, 0, L * Math.sin(GAFF_PEAK_ANGLE))));
         r.dir = gDir;
       } else if (spec.class === "boom") {
-        r.x = parent ? parent.x : spec.x_m || 0;
+        r.x = parent ? (parent.xAt ? parent.xAt(deck + H) : parent.x) : spec.x_m || 0;
         var bDir = sheetDirection(sheetAngleOf(id), tack);
         r.a = v(r.x, 0, deck + H);
         r.b = add(r.a, mul(bDir, L));

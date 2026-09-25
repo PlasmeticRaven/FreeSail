@@ -155,6 +155,7 @@ def _spar_entry(s: Spar) -> dict[str, Any]:
         "side": s.side,
         "brace_angle": s.brace_angle,
         "brace_limit": s.brace_limit,
+        "rake": s.rake,
         "rating_kn": s.rating_kn,
     }
 

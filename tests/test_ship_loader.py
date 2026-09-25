@@ -263,3 +263,30 @@ def test_frigate_particulars_stay_in_period():
     assert 40.0 <= main_truck <= 48.0  # metres above the deck; she is 43.6 m on the gundeck
     assert 20.0 <= ship.spars["main.mast"].height_m <= 24.0  # a 74 ft lower mast above deck
     assert 23.5 <= ship.spars["main.yard"].length_m <= 25.7  # 78 to 84 ft
+
+
+def test_mast_rake_is_read_and_bounded():
+    import copy
+
+    d = copy.deepcopy(MINIMAL)
+    d["spars"][0]["rake_deg"] = 4.5
+    ship = ship_from_dict(d, "raked")
+    assert ship.spars["mast"].rake == pytest.approx(0.0785, abs=1e-3)
+    d["spars"][0]["rake_deg"] = -6.0  # a polacre's forward-raking fore mast is allowed
+    assert ship_from_dict(d, "raked").spars["mast"].rake < 0
+    d["spars"][0]["rake_deg"] = 45.0
+    with pytest.raises(ShipFileError, match="rakes between"):
+        ship_from_dict(d, "raked")
+    d["spars"][0]["rake_deg"] = 2.0
+    d["spars"][2]["rake_deg"] = 2.0  # a yard does not rake
+    with pytest.raises(ShipFileError, match="only a mast"):
+        ship_from_dict(d, "raked")
+
+
+def test_reference_ships_carry_their_rake():
+    frigate = load_ship("data/ships/frigate-36.yaml")
+    rakes = {m: frigate.spars[f"{m}.mast"].rake for m in ("fore", "main", "mizzen")}
+    assert rakes["fore"] < rakes["main"] < rakes["mizzen"]
+    schooner = load_ship("data/ships/topsail-schooner.yaml")
+    assert schooner.spars["fore.mast"].rake == pytest.approx(schooner.spars["main.mast"].rake)
+    assert schooner.spars["main.mast"].rake > frigate.spars["mizzen.mast"].rake
