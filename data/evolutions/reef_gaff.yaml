@@ -1,0 +1,29 @@
+# Reef a gaff sail: tend the throat and peak halyards, settle the sail down,
+# haul out the reef earing along the boom and tie the points, then hoist
+# again. `params.reefs` is how many reefs to take at once (default one).
+id: reef_gaff
+verb: reef
+applies_to: {class: gaff}
+params: {reefs: 1}
+preconditions:
+  - {check: sail.state == set, reason: "The {sail} is {state}; it must be set to be reefed."}
+  - {check: sail.reef_bands > 0, reason: "The {sail} has no reef bands."}
+  - {check: sail.reefs < sail.reef_bands, reason: "The {sail} is close reefed already."}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s gaff or mast is wrecked"}
+steps:
+  - do: settle
+    duration_s: 45
+    log: "Settled the {sail} halyards."
+  - do: reef
+    duration_s: 180
+    sets: {sail.reefs: "min(sail.reefs + params.reefs, sail.reef_bands)"}
+    log: "Hauled out the reef earing of the {sail} and tied the points."
+  - do: hoist
+    duration_s: 60
+    via: halyard_of(sail)
+on_start: {log: "Hands to reef the {sail}."}
+on_complete: {log: "Reefed the {sail}; now {state}.", kind: sail.reefed, severity: notable}
+on_fail: {log: "Could not reef the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 10, rating: able, stations: [afterguard]}
+source: "Luce 1866, ch. XXVII Reefing, 'In reefing a spanker', 'Boom Mainsail'; Luce 1884, ch. XXXIV Handling Fore-and-Afters"

@@ -1,0 +1,33 @@
+# Set a gaff sail (spanker, driver, a schooner's fore or main). Cast off the
+# gaskets or clear away the brails, then hoist by the throat and peak
+# halyards, or haul out along a standing gaff by the outhaul, and trim the
+# sheet. About three and a half minutes.
+id: set_gaff
+verb: set
+applies_to: {class: gaff}
+preconditions:
+  - {check: sail.state != set, reason: "The {sail} is set already."}
+  - {check: sail.state != blown_out, reason: "The {sail} is blown out; a new one must be bent."}
+requires:
+  - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s gaff or mast is wrecked"}
+  - {check: "not wrecked(spar_of_role(sail, boom))", reason: "the {sail}'s boom is wrecked"}
+steps:
+  - do: clear_away
+    duration_s: 60
+    if: sail.state in [furled, in_the_gear]
+    sets: {sail.state: loosed}
+    log: "Cast off the gaskets and cleared away the brails of the {sail}."
+  - do: hoist
+    duration_s: 120
+    via: halyard_of(sail)
+    sets: {sail.state: set}
+  - do: haul_out
+    duration_s: 30
+    if: sail.state != set
+    sets: {sail.state: set}
+on_start: {log: "Hands to the {sail} halyards and outhaul."}
+on_complete: {log: "Set the {sail}.", kind: sail.set, severity: notable}
+on_fail: {log: "Could not set the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 10, rating: ordinary, stations: [afterguard]}
+source: "Luce 1866, ch. XXIII At Sea, 'The Spanker' (setting); Luce 1884, ch. XXXIV Handling Fore-and-Afters"

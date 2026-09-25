@@ -1,0 +1,26 @@
+# Furl a square sail. Normally ordered after it has been taken in, but a
+# sail that is still set is clewed up first so that "furl the topsail" does
+# what a captain means by it. The topmen lay out on the yard, pass the
+# gaskets and make a harbour furl of it.
+id: furl_square
+verb: furl
+applies_to: {class: square}
+preconditions:
+  - {check: sail.state != furled, reason: "The {sail} is furled already."}
+  - {check: sail.state != blown_out, reason: "The {sail} is blown out; there is nothing left to furl."}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
+steps:
+  - do: clew_up
+    duration_s: 60
+    if: sail.state in [set, sheeted, loosed]
+    sets: {sail.state: in_the_gear}
+    log: "Clewed up the {sail}."
+  - do: furl
+    duration_s: 150
+    sets: {sail.state: furled}
+on_start: {log: "Lay aloft and furl the {sail}."}
+on_complete: {log: "Furled the {sail}.", kind: sail.furled, severity: notable}
+on_fail: {log: "Could not furl the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 12, rating: ordinary, stations: [topmen]}
+source: "Luce 1866, ch. XX In Charge of the Deck, 'To Furl Sails'; ch. XXIII 'To take in and furl the mizzen-topsail in a gale'"

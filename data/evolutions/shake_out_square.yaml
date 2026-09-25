@@ -1,0 +1,28 @@
+# Shake a reef out of a square sail: haul the reef tackles taut and settle the
+# halyards a little, untoggle or untie the points from the slings outward,
+# ease down the earings, then hoist away. `params.reefs` is how many to shake
+# out at once (default one).
+id: shake_out_square
+verb: shake_out
+applies_to: {class: square}
+params: {reefs: 1}
+preconditions:
+  - {check: sail.state == set, reason: "The {sail} is {state}; set it before shaking out a reef."}
+  - {check: sail.reefs > 0, reason: "The {sail} has no reef in it."}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
+steps:
+  - do: settle_halyards
+    duration_s: 45
+    log: "Hauled taut the {sail} reef tackles and settled the halyards."
+  - do: shake_out
+    duration_s: 120
+    sets: {sail.reefs: "max(sail.reefs - params.reefs, 0)"}
+  - do: hoist
+    duration_s: 90
+    via: halyard_of(yard_of(sail))
+on_start: {log: "Hands aloft to shake a reef out of the {sail}."}
+on_complete: {log: "Shook the reef out of the {sail}; now {state}.", kind: sail.reef_shaken_out, severity: notable}
+on_fail: {log: "Could not shake out the reef in the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 12, rating: ordinary, stations: [topmen, afterguard]}
+source: "Luce 1866, ch. XXVII Reefing, 'To shake out a Reef', 'To turn out Reefs'"

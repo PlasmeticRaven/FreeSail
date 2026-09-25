@@ -1,0 +1,24 @@
+# Furl (stow) a jib-headed sail: haul it down if it is still up, then lay out
+# on the boom or stay and stow it. Not required for M2 but completes the
+# `furl_<class>` set.
+id: furl_jibheaded
+verb: furl
+applies_to: {class: jibheaded}
+preconditions:
+  - {check: sail.state != furled, reason: "The {sail} is stowed already."}
+  - {check: sail.state != blown_out, reason: "The {sail} is blown out; there is nothing left to stow."}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s stay or mast is carried away"}
+steps:
+  - do: haul_down
+    duration_s: 45
+    if: sail.state in [set, loosed]
+    sets: {sail.state: in_the_gear}
+  - do: stow
+    duration_s: 90
+    sets: {sail.state: furled}
+on_start: {log: "Lay out and stow the {sail}."}
+on_complete: {log: "Stowed the {sail}.", kind: sail.furled, severity: notable}
+on_fail: {log: "Could not stow the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 4, rating: ordinary, stations: [forecastle]}
+source: "Luce 1866, ch. XXIII At Sea, 'To set a Head Sail' ('Lay out and stow the jib')"

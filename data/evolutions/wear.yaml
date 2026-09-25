@@ -1,0 +1,22 @@
+# Wear ship (spec §8.5, scripted). The helm is put up and she is run off
+# before the wind, the after yards braced in as she falls off and the head
+# yards squared once the wind is abaft the beam; with the wind aft the helm
+# is ordered to the new close-hauled course and all yards braced sharp up as
+# she comes to. The yards follow the wind at brace_rate_deg_s. Six to twelve
+# minutes for a frigate is the truth to hit; the time is the physics' to make.
+id: wear
+verb: wear
+applies_to: {class: ship}
+script: wear
+preconditions:
+  - {check: dyn.speed >= knots(0.5), reason: "She has no way on her to wear: {speed} through the water."}
+timing:
+  brace_rate_deg_s: 1.0  # how fast the yards follow the wind round
+  wear_timeout_s: 900    # give up after this long
+  wear_estimate_s: 480   # what the state snapshot shows as remaining at the start
+  steady_deg: 5          # within this of the new course counts as steady
+on_start: {log: "Stations for wearing ship."}
+on_complete: {log: "Wore ship; braced sharp up on the {new_tack} tack, heading {new_course}.", kind: ship.wore, severity: notable}
+on_fail: {log: "Could not wear: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: all, rating: ordinary, stations: [all hands]}
+source: "Luce 1866, ch. XXIV Working to Windward, 'Wearing', 'Second Method'; Lever 1808, 'Veering or Wearing'"

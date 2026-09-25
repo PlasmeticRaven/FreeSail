@@ -1,0 +1,632 @@
+"""The evolution runner: starts evolutions, walks their steps tick by tick, logs.
+
+How it fits together
+--------------------
+
+``Runner(ship)`` makes one runner for a ship and registers it as
+``ship.extra["evolutions"]`` so the Orders layer can find it. The World's
+stepper calls ``runner.step(ship, dt, wind)`` once per tick, *before* the
+physics, so that any sail set or yard braced this tick is felt by the
+physics in the same tick.
+
+``start(ship, evolution_id, subject_id, params)`` looks the evolution up in
+the registry, finds the subject (a sail, a yard, or the ship itself for a
+manoeuvre), checks that the evolution applies to that kind of part and
+that its preconditions hold, and then either begins it at once or, if
+another evolution is already at work on the same parts, queues it to
+follow. A failed precondition raises ``OrderError`` with the reason in
+words, exactly as the file gives it, so the order is rejected in the log
+with a sentence a sailor would say.
+
+Each tick, every running evolution advances through its current step.
+A step's nominal ``duration_s`` is stretched by the *weather factor*:
+1.0 in light airs on an even keel, rising to 2.0 in thirty knots of wind
+with the ship heeled twenty-five degrees (spec §8.4). While a step runs,
+its ``ramp`` targets move smoothly from where they were to where the step
+sends them (a yard being braced round). When it ends, its ``sets`` are
+applied (a sail's state becomes ``loosed``), its ``log`` line is noted if
+it has one, and the next step begins after the ``requires`` conditions are
+checked again. The last step's end completes the evolution and writes the
+file's ``on_complete`` line to the log under its own kind (``sail.set``,
+``yard.braced``...). A ``requires`` condition that stops holding mid-way,
+or a ``via`` line found parted, fails the evolution with ``on_fail``.
+
+Two evolutions are *serialised* when they would touch the same part: the
+runner records which parts each running evolution holds (its subject, and
+every object whose attribute a step sets or ramps) and a newcomer that
+overlaps waits until those are released. Preconditions of a queued
+evolution are checked when it actually begins, because the earlier one
+may have changed the state it needs (set the topsail, then reef it).
+
+Scripted manoeuvres (tack, wear, heave to, fill away) have no step list;
+their file names a script in ``scripts.py`` that drives the helm targets
+and the yards on a timeline and watches the ship's heading and speed to
+decide how it ended. The runner treats a script like a single long step.
+
+Nothing here is random. Given the same ship, wind and orders the same
+ticks produce the same log.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import TYPE_CHECKING, Any
+
+from freesail import units
+from freesail.evolutions import expr, registry
+from freesail.evolutions.scripts import SCRIPTS, Script
+from freesail.ship.graph import Ship
+from freesail.ship.parts import Line, LineState, Part, Sail, Spar
+from freesail.ship.schema import YARD_LIKE_CLASSES
+from freesail.ship.stub import OrderError
+
+if TYPE_CHECKING:
+    from freesail.physics.wind import Wind
+
+# ---------------------------------------------------------------------------
+# The weather factor (spec §8.4)
+# ---------------------------------------------------------------------------
+
+PROGRESS_EPSILON = 1e-9  # so that ninety ticks of 1/90 count as a whole step
+LIGHT_AIRS_KN = 4.0  # up to here the crew works at the nominal pace
+HARD_WIND_KN = 30.0  # here the wind alone adds half again to every duration
+HARD_HEEL_DEG = 25.0  # and this much heel adds the other half
+
+
+def weather_factor(wind_speed_ms: float, heel_rad: float) -> float:
+    """How much longer everything takes because of wind and heel.
+
+    1.0 in light airs on an even keel; 1.5 in thirty knots upright, or in a
+    calm heeled twenty-five degrees; 2.0 with both. Never less than 1.0.
+    """
+    kn = units.ms_to_knots(wind_speed_ms)
+    wind_part = _clamp((kn - LIGHT_AIRS_KN) / (HARD_WIND_KN - LIGHT_AIRS_KN), 0.0, 1.0)
+    heel_part = _clamp(abs(units.rad_to_deg(heel_rad)) / HARD_HEEL_DEG, 0.0, 1.0)
+    return 1.0 + 0.5 * wind_part + 0.5 * heel_part
+
+
+def _clamp(x: float, lo: float, hi: float) -> float:
+    return lo if x < lo else hi if x > hi else x
+
+
+# ---------------------------------------------------------------------------
+# Names for the log
+# ---------------------------------------------------------------------------
+
+_SIDES = ("starboard", "larboard")
+
+
+def part_name(ship: Ship, part_id: str) -> str:
+    """A sailor's name for a part id: 'fore.topsail' -> 'fore topsail',
+    'fore.topmast.studdingsail.starboard' -> 'starboard fore topmast studdingsail'.
+    The ship file's first plain alias for the part wins ('spanker', 'foresail')."""
+    for alias, target in ship.aliases.items():
+        if target == part_id and not alias.startswith("the "):
+            return alias
+    words = part_id.replace("_", " ").split(".")
+    if len(words) > 1 and words[-1] in _SIDES:
+        words = [words[-1], *words[:-1]]
+    return " ".join(words)
+
+
+class _SafeDict(dict):
+    def __missing__(self, key: str) -> str:
+        return "{" + key + "}"
+
+
+# ---------------------------------------------------------------------------
+# A running (or waiting) evolution
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class Instance:
+    evo: registry.Evolution
+    subject: Part | Ship
+    subject_id: str
+    params: dict[str, Any]
+    holds: set[str] = field(default_factory=set)
+    waiting: bool = True
+    step_index: int = -1
+    progress: float = 0.0  # 0..1 through the current step
+    ramp_start: dict[str, float] = field(default_factory=dict)
+    ramp_target: dict[str, float] = field(default_factory=dict)
+    script: Script | None = None
+    order: int = 0
+
+    @property
+    def step(self) -> registry.Step | None:
+        if 0 <= self.step_index < len(self.evo.steps):
+            return self.evo.steps[self.step_index]
+        return None
+
+    @property
+    def step_name(self) -> str:
+        if self.waiting:
+            return "waiting"
+        if self.script is not None:
+            return self.script.phase
+        step = self.step
+        return step.do if step else "done"
+
+
+# ---------------------------------------------------------------------------
+# The runner
+# ---------------------------------------------------------------------------
+
+
+class Runner:
+    """Runs evolutions for one ship. See the module docstring."""
+
+    SHIP_SUBJECTS = ("ship", "her", "the ship")
+
+    def __init__(self, ship: Ship):
+        self.ship = ship
+        self.instances: list[Instance] = []
+        self._counter = 0
+        self._last_factor = 1.0
+        ship.extra["evolutions"] = self
+
+    # -- the contract --------------------------------------------------------
+
+    def start(
+        self,
+        ship: Ship,
+        evolution_id: str,
+        subject_id: str,
+        params: dict[str, Any] | None = None,
+    ) -> str:
+        """Begin an evolution, or queue it behind one already at work on the same
+        parts. Returns the log sentence. Raises OrderError with the reason if
+        the evolution does not apply or a precondition fails."""
+        evo = registry.get(evolution_id)
+        if evo is None:
+            raise OrderError(f"There is no such evolution as '{evolution_id}'.")
+        subject, sid = self._resolve_subject(ship, subject_id)
+        self._check_applies(evo, subject, sid, ship)
+        merged = dict(evo.params)
+        merged.update(params or {})
+        inst = Instance(evo=evo, subject=subject, subject_id=sid, params=merged)
+        self._counter += 1
+        inst.order = self._counter
+        if evo.script is not None:
+            script_cls = SCRIPTS.get(evo.script)
+            if script_cls is None:
+                raise OrderError(f"'{evolution_id}' names an unknown script '{evo.script}'.")
+            inst.script = script_cls(ship, merged, evo.timing)
+        inst.holds = self._holds(ship, inst)
+        blockers = [
+            other for other in self.instances if other.holds & inst.holds and other is not inst
+        ]
+        if blockers:
+            # The subject is busy: the newcomer waits its turn. Its preconditions
+            # are checked when it begins, since the earlier work may satisfy them.
+            self.instances.append(inst)
+            first = blockers[0]
+            return (
+                f"'{self._describe(inst).capitalize()}' will follow "
+                f"'{self._describe(first)}', which the hands are still at."
+            )
+        # Free to begin now: a failing precondition rejects the order outright.
+        reason = self._failing_condition(ship, inst, evo.preconditions + evo.requires)
+        if reason is not None:
+            raise OrderError(reason)
+        self.instances.append(inst)
+        self._begin(ship, inst)
+        return self._format(inst, evo.on_start.log)
+
+    def step(self, ship: Ship, dt: float, wind: Wind) -> None:
+        """Advance every running evolution by one tick, then start any that were
+        waiting and are now free. Call once per tick, before the physics."""
+        self._last_factor = weather_factor(wind.effective_speed, ship.dyn.heel)
+        for inst in list(self.instances):
+            if inst.waiting:
+                continue
+            if inst.script is not None:
+                self._tick_script(ship, inst, dt, wind)
+            else:
+                self._tick_steps(ship, inst, dt)
+        self._start_waiting(ship)
+
+    def in_progress(self) -> list[dict[str, Any]]:
+        """What is going on, for the state snapshot."""
+        out = []
+        for inst in self.instances:
+            out.append(
+                {
+                    "id": inst.evo.id,
+                    "subject": inst.subject_id,
+                    "step": inst.step_name,
+                    "remaining_s": self._remaining_s(inst),
+                    "waiting": inst.waiting,
+                }
+            )
+        return out
+
+    # -- subjects ------------------------------------------------------------
+
+    def _resolve_subject(self, ship: Ship, subject_id: str | None) -> tuple[Part | Ship, str]:
+        if subject_id is None or subject_id in self.SHIP_SUBJECTS or subject_id == ship.name:
+            return ship, ship.name
+        part = ship.parts.get(subject_id)
+        if part is None:
+            target = ship.aliases.get(subject_id)
+            part = ship.parts.get(target) if target else None
+        if part is None:
+            raise OrderError(f"There is no part called '{subject_id}' in {ship.name}.")
+        return part, part.id
+
+    @staticmethod
+    def _check_applies(evo: registry.Evolution, subject: Part | Ship, sid: str, ship: Ship) -> None:
+        wanted = str(evo.applies_to.get("class"))
+        if wanted == "ship":
+            if isinstance(subject, Ship):
+                return
+            raise OrderError(
+                f"'{evo.verb}' is an order for the ship, not for the {part_name(ship, sid)}."
+            )
+        if isinstance(subject, Ship):
+            raise OrderError(f"'{evo.verb}' needs a part to work on; say which.")
+        kind = (
+            "sail" if isinstance(subject, Sail) else "line" if isinstance(subject, Line) else "spar"
+        )
+        if wanted == "yard":
+            if isinstance(subject, Spar) and subject.cls in YARD_LIKE_CLASSES:
+                return
+            what = subject.cls.replace("_", " ") + ("" if kind == "spar" else f" {kind}")
+            raise OrderError(
+                f"The {part_name(ship, sid)} is a {what}, not a yard; it cannot be {evo.verb}d."
+            )
+        if subject.cls == wanted:
+            return
+        raise OrderError(
+            f"The {part_name(ship, sid)} is a {subject.cls} {kind}; "
+            f"'{evo.id}' is for a {wanted} sail."
+        )
+
+    # -- the expression environment -------------------------------------------
+
+    def _env(self, ship: Ship, inst: Instance) -> expr.Env:
+        subject = inst.subject
+        names: dict[str, Any] = {
+            "ship": ship,
+            "dyn": ship.dyn,
+            "subject": subject,
+            "params": inst.params,
+        }
+        if isinstance(subject, Sail):
+            names["sail"] = subject
+        elif isinstance(subject, Spar):
+            names["spar"] = subject
+            if subject.cls in YARD_LIKE_CLASSES:
+                names["yard"] = subject
+        elif isinstance(subject, Line):
+            names["line"] = subject
+
+        def wrecked(x: Any) -> bool:
+            if x is None:
+                return False
+            if isinstance(x, Sail):
+                return x.wrecked or wrecked(ship.spar_chain(x))
+            if isinstance(x, Spar):
+                return x.wrecked or x.sent_down
+            if isinstance(x, Line):
+                return x.state is LineState.PARTED
+            return any(wrecked(item) for item in x)
+
+        def tack_sign(side: Any) -> float:
+            if side in (None, "", "none"):
+                side = ship.dyn.tack
+            if side == "starboard":
+                return 1.0
+            if side in ("larboard", "port"):
+                return -1.0
+            raise expr.ExpressionError(f"'{side}' is not a side; say starboard or larboard.")
+
+        def close_hauled() -> bool:
+            awa = abs(ship.dyn.apparent_wind_angle)
+            target = close_hauled_apparent_angle(ship)
+            return abs(awa - target) <= units.deg_to_rad(10.0)
+
+        def any_set(sails: Any) -> bool:
+            return any(getattr(s, "is_set", False) for s in (sails or []))
+
+        functions = {
+            "yard_of": ship.yard_of,
+            "sail_of": ship.sail_of,
+            "halyard_of": ship.halyard_of,
+            "spar_chain": ship.spar_chain,
+            "spar_of_role": ship.spar_of_role,
+            "mast_of": ship.mast_of,
+            "parent_of": ship.parent_of,
+            "sails_on": ship.sails_on,
+            "sails_using": ship.sails_using,
+            "braces_of": ship.braces_of,
+            "sheets_of": ship.sheets_of,
+            "lines_of": ship.lines_of,
+            "line_of": ship.line_of,
+            "wrecked": wrecked,
+            "deg": units.deg_to_rad,
+            "knots": units.knots_to_ms,
+            "abs": abs,
+            "min": min,
+            "max": max,
+            "clamp": _clamp,
+            "tack_sign": tack_sign,
+            "close_hauled": close_hauled,
+            "any_set": any_set,
+        }
+        return expr.Env(names, functions)
+
+    def _failing_condition(
+        self, ship: Ship, inst: Instance, conditions: list[registry.Condition]
+    ) -> str | None:
+        """The reason (in words) of the first condition that does not hold, else None."""
+        env = self._env(ship, inst)
+        for cond in conditions:
+            try:
+                ok = expr.evaluate(cond.tree, env)
+            except expr.ExpressionError as e:
+                return f"{inst.evo.id}: the check '{cond.text}' could not be read ({e})"
+            if not ok:
+                return self._format(inst, cond.reason)
+        if inst.script is not None:
+            return inst.script.check(self._format_context(inst))
+        return None
+
+    # -- holds: which parts an evolution occupies ------------------------------
+
+    def _holds(self, ship: Ship, inst: Instance) -> set[str]:
+        held = {inst.subject_id}
+        if inst.script is not None:
+            held |= inst.script.holds()
+            return held
+        env = self._env(ship, inst)
+        for step in inst.evo.steps:
+            for obj_tree, _attr, _value in list(step.sets.values()) + list(step.ramp.values()):
+                try:
+                    obj = expr.evaluate(obj_tree, env)
+                except expr.ExpressionError:
+                    continue
+                pid = getattr(obj, "id", None)
+                if isinstance(pid, str):
+                    held.add(pid)
+                elif obj is ship:
+                    held.add(ship.name)
+        return held
+
+    # -- beginning ---------------------------------------------------------------
+
+    def _begin(self, ship: Ship, inst: Instance) -> None:
+        inst.waiting = False
+        inst.step_index = -1
+        if inst.script is not None:
+            inst.script.begin(self._format_context(inst))
+            self._note(ship, inst, inst.evo.on_start)
+            return
+        self._note(ship, inst, inst.evo.on_start)
+        self._enter_next_step(ship, inst)
+
+    def _start_waiting(self, ship: Ship) -> None:
+        # Start waiting evolutions in the order they were given, when free.
+        for inst in sorted(self.instances, key=lambda i: i.order):
+            if not inst.waiting:
+                continue
+            busy = any(
+                other is not inst and other.order < inst.order and other.holds & inst.holds
+                for other in self.instances
+            )
+            if busy:
+                continue
+            reason = self._failing_condition(ship, inst, inst.evo.preconditions + inst.evo.requires)
+            if reason is not None:
+                self._fail(ship, inst, reason)
+                continue
+            self._begin(ship, inst)
+
+    # -- stepping through a step list -----------------------------------------------
+
+    def _enter_next_step(self, ship: Ship, inst: Instance) -> None:
+        """Move to the next runnable step, or complete if there is none."""
+        env = self._env(ship, inst)
+        while True:
+            inst.step_index += 1
+            inst.progress = 0.0
+            inst.ramp_start.clear()
+            inst.ramp_target.clear()
+            step = inst.step
+            if step is None:
+                self._complete(ship, inst)
+                return
+            reason = self._failing_condition(ship, inst, inst.evo.requires)
+            if reason is not None:
+                self._fail(ship, inst, reason)
+                return
+            try:
+                if step.condition is not None and not expr.evaluate(step.condition, env):
+                    continue
+                if step.via is not None:
+                    line = expr.evaluate(step.via, env)
+                    if line is None:
+                        continue  # this ship has no such line (a course has no halyard)
+                    if getattr(line, "state", None) is LineState.PARTED:
+                        self._fail(ship, inst, f"the {part_name(ship, line.id)} is parted")
+                        return
+                for key, (obj_tree, attr, value_tree) in step.ramp.items():
+                    obj = expr.evaluate(obj_tree, env)
+                    inst.ramp_start[key] = float(getattr(obj, attr))
+                    inst.ramp_target[key] = float(expr.evaluate(value_tree, env))
+            except (expr.ExpressionError, TypeError, ValueError) as e:
+                self._fail(ship, inst, f"the step '{step.do}' could not be read ({e})")
+                return
+            if step.duration_s <= 0:
+                self._finish_step(ship, inst)
+                if inst not in self.instances:
+                    return
+                continue
+            return
+
+    def _tick_steps(self, ship: Ship, inst: Instance, dt: float) -> None:
+        step = inst.step
+        if step is None:
+            return
+        inst.progress = min(1.0, inst.progress + dt / (step.duration_s * self._last_factor))
+        if inst.progress >= 1.0 - PROGRESS_EPSILON:
+            inst.progress = 1.0
+        self._apply_ramp(ship, inst, inst.progress)
+        if inst.progress >= 1.0:
+            self._finish_step(ship, inst)
+            if inst in self.instances:
+                self._enter_next_step(ship, inst)
+
+    def _apply_ramp(self, ship: Ship, inst: Instance, fraction: float) -> None:
+        step = inst.step
+        if step is None or not step.ramp:
+            return
+        env = self._env(ship, inst)
+        for key, (obj_tree, attr, _value) in step.ramp.items():
+            obj = expr.evaluate(obj_tree, env)
+            start, target = inst.ramp_start[key], inst.ramp_target[key]
+            setattr(obj, attr, start + (target - start) * fraction)
+
+    def _finish_step(self, ship: Ship, inst: Instance) -> None:
+        step = inst.step
+        if step is None:
+            return
+        env = self._env(ship, inst)
+        try:
+            self._apply_ramp(ship, inst, 1.0)
+            for _key, (obj_tree, attr, value_tree) in step.sets.items():
+                obj = expr.evaluate(obj_tree, env)
+                _assign(obj, attr, expr.evaluate(value_tree, env))
+        except (expr.ExpressionError, TypeError, ValueError) as e:
+            self._fail(ship, inst, f"the step '{step.do}' could not be applied ({e})")
+            return
+        if step.log:
+            ship.note("routine", "evolution.step", self._format(inst, step.log), inst.subject_id)
+
+    # -- scripts ------------------------------------------------------------------
+
+    def _tick_script(self, ship: Ship, inst: Instance, dt: float, wind: Wind) -> None:
+        assert inst.script is not None
+        inst.script.tick(dt, wind, self._last_factor)
+        if inst.script.status == "done":
+            self._complete(ship, inst)
+        elif inst.script.status == "failed":
+            self._fail(ship, inst, inst.script.reason or "she would not answer")
+
+    # -- ending -----------------------------------------------------------------------
+
+    def _complete(self, ship: Ship, inst: Instance) -> None:
+        self._remove(inst)
+        self._note(ship, inst, inst.evo.on_complete)
+
+    def _fail(self, ship: Ship, inst: Instance, reason: str) -> None:
+        self._remove(inst)
+        self._note(ship, inst, inst.evo.on_fail, reason=reason)
+
+    def _remove(self, inst: Instance) -> None:
+        if inst in self.instances:
+            self.instances.remove(inst)
+
+    # -- log text ----------------------------------------------------------------------
+
+    def _note(
+        self, ship: Ship, inst: Instance, outcome: registry.Outcome, reason: str = ""
+    ) -> None:
+        text = self._format(inst, outcome.log, reason=reason)
+        data: dict[str, Any] = {"evolution": inst.evo.id, "subject": inst.subject_id}
+        if reason:
+            data["reason"] = reason
+        if inst.script is not None:
+            data.update(inst.script.data())
+        ship.note(outcome.severity, outcome.kind, text, inst.subject_id, data)
+
+    def _format_context(self, inst: Instance) -> dict[str, Any]:
+        ship = self.ship
+        subject = inst.subject
+        name = ship.name if isinstance(subject, Ship) else part_name(ship, inst.subject_id)
+        ctx: dict[str, Any] = {
+            "id": inst.evo.id,
+            "verb": inst.evo.verb,
+            "subject": name,
+            "ship": ship.name,
+            "sail": name,
+            "yard": name,
+            "spar": name,
+            "line": name,
+            "tack": ship.dyn.tack,
+            "heading": units.format_heading(ship.dyn.heading),
+            "speed": units.format_speed(ship.dyn.speed),
+        }
+        if isinstance(subject, Sail):
+            ctx["state"] = subject.describe_state()
+            ctx["reefs"] = subject.reefs
+            ctx["reef_bands"] = subject.reef_bands
+        if isinstance(subject, Spar):
+            ctx["brace_deg"] = f"{abs(units.rad_to_deg(subject.brace_angle)):.0f}"
+        for key, value in inst.params.items():
+            ctx.setdefault(key, value)
+        if inst.script is not None:
+            ctx.update(inst.script.words())
+        return ctx
+
+    def _format(self, inst: Instance, template: str, reason: str = "") -> str:
+        ctx = _SafeDict(self._format_context(inst))
+        ctx["reason"] = reason
+        return template.format_map(ctx)
+
+    def _describe(self, inst: Instance) -> str:
+        subject = inst.subject
+        name = (
+            inst.subject_id if isinstance(subject, Ship) else part_name(self.ship, inst.subject_id)
+        )
+        verb = inst.evo.verb.replace("_", " ")
+        if isinstance(subject, Ship):
+            return f"{verb} ship" if verb in ("tack", "wear") else verb
+        return f"{verb} the {name}"
+
+    def _remaining_s(self, inst: Instance) -> float:
+        if inst.script is not None:
+            return round(inst.script.remaining_s(), 1)
+        if inst.waiting:
+            return round(inst.evo.nominal_duration_s * self._last_factor, 1)
+        step = inst.step
+        if step is None:
+            return 0.0
+        this = (1.0 - inst.progress) * step.duration_s
+        later = sum(s.duration_s for s in inst.evo.steps[inst.step_index + 1 :])
+        return round((this + later) * self._last_factor, 1)
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+
+def close_hauled_apparent_angle(ship: Ship) -> float:
+    """The apparent wind angle at which this ship sails close-hauled: the luff
+    angle package 4 exposes as ship.extra['luff_angle'] (default 45 degrees)
+    plus the five-degree margin the helm keeps (package 5's FULL_AND_BY rule)."""
+    luff = float(ship.extra.get("luff_angle", units.deg_to_rad(45.0)))
+    return luff + units.deg_to_rad(5.0)
+
+
+def _assign(obj: Any, attr: str, value: Any) -> None:
+    """Set an attribute, converting the value to the type already there:
+    text becomes the matching enum member, numbers stay numbers."""
+    if attr.startswith("_") or not hasattr(obj, attr):
+        raise expr.ExpressionError(f"{type(obj).__name__} has no attribute '{attr}' to set.")
+    current = getattr(obj, attr)
+    if isinstance(current, Enum) and not isinstance(value, Enum):
+        try:
+            value = type(current)(value)
+        except ValueError:
+            options = ", ".join(m.value for m in type(current))
+            raise expr.ExpressionError(f"'{value}' is not one of: {options}.") from None
+    elif isinstance(current, bool):
+        value = bool(value)
+    elif isinstance(current, int) and not isinstance(current, bool) and isinstance(value, float):
+        value = int(round(value))
+    setattr(obj, attr, value)

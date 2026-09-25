@@ -1,0 +1,19 @@
+# Take in a jib-headed sail: let go the halyards and haul down on the
+# downhaul, easing the sheet as it comes. The sail lies along its stay or
+# boom; stowing it is furl_jibheaded.
+id: take_in_jibheaded
+verb: take_in
+applies_to: {class: jibheaded}
+preconditions:
+  - {check: "sail.state in [set, loosed]", reason: "The {sail} is {state}; there is nothing to take in."}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s stay or mast is carried away"}
+steps:
+  - do: haul_down
+    duration_s: 45
+    sets: {sail.state: in_the_gear}
+on_start: {log: "Man the {sail} downhaul."}
+on_complete: {log: "Hauled down the {sail}.", kind: sail.taken_in, severity: notable}
+on_fail: {log: "Could not haul down the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 4, rating: ordinary, stations: [forecastle]}
+source: "Luce 1866, ch. XXIII At Sea, 'To set a Head Sail' (to take it in)"

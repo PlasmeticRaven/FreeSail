@@ -1,0 +1,23 @@
+# Heave to (M2 simplified, scripted): the yards on the aftermost mast that
+# carries them are braced aback over brace_s while the others stay full, and
+# the helm is put a-lee (helm_deg of rudder toward the wind). On a frigate that
+# is the mizzen topsail to the mast; on a topsail schooner the fore topsail.
+# The physics does the rest (truth 12). The backed yards are remembered in
+# ship.extra["hove_to"] so that fill_away can undo it.
+#
+# Parameter `tack` (starboard or larboard): the tack to heave to on. She must
+# already be on it in M2; otherwise tack or wear first.
+id: heave_to
+verb: heave_to
+applies_to: {class: ship}
+script: heave_to
+params: {tack: null}
+preconditions: []
+timing:
+  brace_s: 45     # to lay the after yards aback
+  helm_deg: 15    # rudder toward the wind for "helm a-lee"
+on_start: {log: "Hands to the after braces; heave to."}
+on_complete: {log: "Hove to, {backed} to the mast, helm a-lee.", kind: ship.hove_to, severity: notable}
+on_fail: {log: "Could not heave to: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 12, rating: ordinary, stations: [afterguard]}
+source: "Luce 1866, ch. XXVI Emergencies, 'To heave to' (mizzen topsail aback), 'To heave to with the fore topsail to the mast'"

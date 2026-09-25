@@ -1,0 +1,19 @@
+# Take in a gaff sail: let go the outhaul and brail it up (a spanker with a
+# standing gaff), or settle the throat and peak halyards and lower it onto
+# the boom (a schooner's main). Either way it is left in the gear, not stowed.
+id: take_in_gaff
+verb: take_in
+applies_to: {class: gaff}
+preconditions:
+  - {check: "sail.state in [set, loosed]", reason: "The {sail} is {state}; there is nothing to take in."}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s gaff or mast is wrecked"}
+steps:
+  - do: brail_up
+    duration_s: 90
+    sets: {sail.state: in_the_gear}
+on_start: {log: "Hands to the {sail} brails and halyards."}
+on_complete: {log: "Took in the {sail}.", kind: sail.taken_in, severity: notable}
+on_fail: {log: "Could not take in the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 8, rating: ordinary, stations: [afterguard]}
+source: "Luce 1866, ch. XXIII At Sea, 'The Spanker' (taking in); Luce 1884, ch. XXXIV Handling Fore-and-Afters"

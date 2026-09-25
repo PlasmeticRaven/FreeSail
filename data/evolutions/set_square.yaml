@@ -1,0 +1,39 @@
+# Set a square sail from furled or from the gear. The topmen lay aloft and
+# loose it, the sheets are hauled home, and then the yard is hoisted by its
+# halyard (topsails, topgallants, royals) or, for a course whose yard does
+# not hoist, the tack is hauled aboard and the sheet aft. A working watch's
+# pace: about four and a half minutes for a topsail, three for a course.
+# Luce (ch. XVI) records a French crew single-reefing topsails at exercise in
+# under two and a half minutes, so these are not fast times.
+id: set_square
+verb: set
+applies_to: {class: square}
+preconditions:
+  - {check: sail.state != set, reason: "The {sail} is set already."}
+  - {check: sail.state != blown_out, reason: "The {sail} is blown out of the bolt-ropes; a new one must be bent."}
+requires:
+  - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
+steps:
+  - do: loose
+    duration_s: 90
+    if: sail.state in [furled, in_the_gear]
+    sets: {sail.state: loosed}
+    log: "Laid aloft and loosed the {sail}."
+  - do: sheet_home
+    duration_s: 60
+    if: sail.state == loosed
+    sets: {sail.state: sheeted}
+  - do: hoist
+    duration_s: 120
+    via: halyard_of(yard_of(sail))
+    sets: {sail.state: set}
+  - do: haul_aboard
+    duration_s: 30
+    if: sail.state != set
+    sets: {sail.state: set}
+on_start: {log: "Hands aloft to loose the {sail}."}
+on_complete: {log: "Set the {sail}.", kind: sail.set, severity: notable}
+on_fail: {log: "Could not set the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 12, rating: ordinary, stations: [topmen, afterguard]}
+source: "Luce 1866, ch. XXIII At Sea, 'To set a Topsail', 'To set a Top-gallant sail', 'To set a Foresail'; Lever 1808, 'Setting the Topsails'"
