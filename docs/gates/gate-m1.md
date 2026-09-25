@@ -30,7 +30,7 @@ pip install -e ".[dev]"
 ```
 python -m pytest
 ```
-*A line reading `NNN passed in ...s` where NNN is in the high four hundreds. Any `failed` is a fault; note the test's name.*
+*A line reading `NNN passed in ...s` where NNN is about 440. Any `failed` is a fault; note the test's name.*
 
 ## Checklist
 
