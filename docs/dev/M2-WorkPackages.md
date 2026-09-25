@@ -71,6 +71,23 @@ A period order the owner reached for at the gate: `trim sails`, `trim the yards`
 
 The owner asked for suggestions while typing, to bridge the primer and play. The grammar is data, so this is cheap: a completer that offers, at each point in a half-typed order, the verbs and synonyms that could start it, then the nouns this ship has (parts, aliases, groups, with contractions), then the modifiers the verb accepts, drawn from `data/vocabulary.yaml` and the ship's noun table (`orders/resolve.py`). Console first (prompt_toolkit completer; lead), then the same suggestions in the browser command line from a `/api/vocabulary` route that returns the tables (package 11 integration or a follow-up). Suggestions never invent an order the parser would refuse.
 
+## Package 15: vocabulary gaps from the primer (`freesail/orders/`, `data/vocabulary.yaml`, ship aliases)
+
+The primer (package 12) tried to show period orders and listed those the parser refused. Make these parse, in the period sense, without breaking the 220-order table:
+
+- `square the yards`; `brace the yards to the wind` (as `trim the yards`); `brace round the yards` needing no mode when a tack is implied.
+- `haul up the mainsail` / `the courses` / `the spanker`, `brail up the spanker`, `clew up the topsails`: synonyms of `take in` for the sails they suit (Luce's "Up mainsail and spanker").
+- `back the main topsail`, `lay the main topsail aback`, `brace the main topsail yard aback`: brace that yard for the *other* tack (aback), as heave-to does.
+- `haul aft the spanker sheet`, `haul the jib sheet aft`, `sheet home the fore topsail`, `haul home the topsail sheets`: `aft` and `home` as modifiers meaning haul fully in.
+- Conning words as helm orders: `steady`, `steady as she goes` (hold the present heading); `nothing off`, `no higher` (full and by / hold); `meet her` (ease the rudder); `right the helm` (rudder amidships); `hard a-lee`, `helm's a-lee`, `hard up`, `helm a-weather` (rudder hard over toward or away from the wind, RUDDER mode); `bring her by the wind`, `steer by the wind` (as `keep her full`); `luff and touch her`.
+- Compound objects with `and`: `set the topsails and topgallants`, `brace the fore and main yards square`.
+- `close reef the topsails`, `double reef the topsails`, `single reef`, `shake out the reefs`, `take in one reef in the topsails` (currently parsed as take in the topsails).
+- Plural sided line families: `haul the fore topsail sheets, both sides`.
+- `main sheet` and `main bowline` on the frigate as aliases for the main course's (data, in `tools/gen_ships.py`, regenerated); `fore tack` disambiguation hint.
+- `lower the mainsail` (take in a gaff sail), `scandalise the mainsail` (drop the peak: a state the physics does not have; refuse with a sentence saying so), `gybe` / `wear` on the schooner (wear is the period word; accept `gybe` as a synonym with a note).
+- Fix: `come up half a point` logs "a point"; the `half` count is dropped.
+- Update `data/vocabulary.yaml` and the primer's blocks where an order it marked as refused now parses; keep `tests/test_primer.py` green; add each new form to `tests/test_orders.py`.
+
 ## Integration and gate
 
 The lead merges 8, 9, 11, 12 and 13, adds `ship.extra["rng"]` in the session composer, runs 10, then writes `docs/gates/gate-m2.md` and cuts the release.
