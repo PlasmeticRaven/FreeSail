@@ -19,4 +19,5 @@ In the console, driver commands (`hold`, `go`, `time 30`, `tick 600`, `state`, `
 - `docs/DesignProposal.md`: the current design proposal (v0.2).
 - `docs/TechnicalSpec-M0-M2.md`: technical specification for the first three milestones.
 - `docs/references/`: public-domain seamanship texts and a chapter map from Luce to game systems.
+- `docs/gates/`: the milestone gate process and one gate report per milestone, written for a non-programmer to check live.
 - `docs/InitialDesignBrainstorm.txt`: the original brainstorm the proposal responds to.

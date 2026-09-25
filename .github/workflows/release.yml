@@ -1,0 +1,45 @@
+name: gate release
+
+# Pushing a tag named gate-m0, gate-m1, ... creates a GitHub release whose
+# notes are the matching gate report in docs/gates/, with the project zip
+# attached. The release is the self-contained package for the owner's live
+# check of that milestone (see docs/gates/README.md).
+
+on:
+  push:
+    tags:
+      - "gate-*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run the checks the gate relies on
+        run: |
+          pip install -e ".[dev]"
+          ruff check .
+          python -m pytest
+      - name: Find the gate report
+        id: report
+        run: |
+          f="docs/gates/${GITHUB_REF_NAME}.md"
+          test -f "$f" || { echo "missing $f"; exit 1; }
+          echo "path=$f" >> "$GITHUB_OUTPUT"
+      - name: Build the gate zip
+        run: |
+          git archive --format=zip --prefix="FreeSail-${GITHUB_REF_NAME}/" \
+            -o "FreeSail-${GITHUB_REF_NAME}.zip" "$GITHUB_REF_NAME"
+      - name: Create the release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Gate ${{ github.ref_name }}"
+          body_path: ${{ steps.report.outputs.path }}
+          files: FreeSail-${{ github.ref_name }}.zip
+          prerelease: true

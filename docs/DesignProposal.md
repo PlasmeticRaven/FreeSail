@@ -496,7 +496,7 @@ Later additions the model should not preclude: careening and heaving down, fire,
 
 ## 11. Roadmap
 
-Each milestone ends in something you can run. Dates are deliberately absent; order is what matters.
+Each milestone ends in something you can run, and in a **gate**: a report written for a non-programmer with a live checklist, packaged as a GitHub release for download, and passed by the owner before the next milestone starts (`docs/gates/README.md`). Dates are deliberately absent; order is what matters.
 
 **M0. Skeleton and log.** Repository layout, ticked core, event log, seeded determinism, save/replay. A "ship" that is a point moving on a plane with a wind. A console that prints the log. *Proves: the architecture ticks and replays.*
 
