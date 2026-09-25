@@ -78,6 +78,8 @@ class World:
             speed=units.knots_to_ms(self.scenario.ship_speed_kn),
         )
         self.journal: list[JournalEntry] = []
+        if getattr(self.ship, "extra", None) is not None:
+            self.ship.extra["rng"] = self.rng  # named streams for strain and later systems
         self._last_logged_wind_direction = self.wind.direction_from
         self.record(
             Severity.NOTABLE,
