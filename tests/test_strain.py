@@ -534,10 +534,13 @@ def test_sent_down_spars_carry_no_load():
 # ---------------------------------------------------------------------------
 
 
-def sailing_world(path, group, knots, seed=1, brace_deg=40.0, awa_true_deg=90.0, gusty=False):
+def sailing_world(path, group, knots, seed=1, brace_deg=58.0, awa_true_deg=90.0, gusty=False):
     """A world with the ship on a reach (wind on the larboard beam) under the
     named group of sails, with the strain stream wired as the session
-    composer will wire it."""
+    composer will wire it. The yards are braced sharp up: with package 10's
+    curves (no lift under ten degrees of attack, the peak at thirty-five) a
+    beam reach wants the yards nearly sharp up, and at the 40 degrees this
+    helper used before the sails all but shiver and load nothing."""
     scenario = Scenario(
         wind_from_deg=90.0,
         wind_speed_kn=knots,

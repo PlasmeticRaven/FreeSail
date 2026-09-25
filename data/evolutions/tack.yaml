@@ -22,7 +22,9 @@ timing:
   stays_timeout_s: 180   # longer than this without coming through and she has missed stays
   min_speed_kn: 0.8      # below this before coming through and she has missed stays
   steady_deg: 5          # within this of the new course counts as steady
-  steady_timeout_s: 120  # or after this long on the new course order
+  steady_timeout_s: 300  # or after this long on the new course order (package 10: at 120 s
+                         # the frigate was called tacked while still gathering way nine
+                         # degrees off her course; she is steady in about five and a half)
 on_start: {log: "All hands about ship."}
 on_complete: {log: "Tacked; braced up on the {new_tack} tack, heading {new_course}.", kind: ship.tacked, severity: notable}
 on_fail: {log: "Missed stays: {reason}. Squared the yards and fell off on the {old_tack} tack.", kind: ship.missed_stays, severity: urgent}

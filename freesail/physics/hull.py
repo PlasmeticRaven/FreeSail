@@ -31,17 +31,17 @@ from freesail.ship.parts import HelmMode, Hull
 # Tuning constants (package 10 adjusts these against the known truths, §7.6)
 # ---------------------------------------------------------------------------
 
-C_F = 0.008  # resistance coefficient on the wetted surface: friction, form and a coppered hull's roughness
+C_F = 0.008  # resistance coefficient on the wetted surface: friction, form and copper roughness
 C_LAT = 1.0  # cross-flow drag of the lateral plane when the hull slides sideways (v |v|)
 C_LAT_LIFT = 1.0  # keel lift per radian of leeway at speed (u v); the keel's "grip" when moving
 C_YAW = 2.0  # quadratic yaw damping of the lateral plane when the ship swings fast (r |r|)
 C_YAW_LIN = 2.5  # linear yaw damping when moving ahead (u r): a moving hull resists swinging
-C_R = 2.0  # rudder lift per radian of helm; rudder side force = q * A_rudder * C_R * delta
+C_R = 2.5  # rudder lift per radian of helm; rudder side force = q * A_rudder * C_R * delta
 RUDDER_X_FRACTION = 0.5  # the rudder hangs this fraction of the waterline length abaft amidships
 RUDDER_SMALL_SPEED2 = 0.01  # m^2/s^2 added to u^2 so the rudder keeps a whisper of effect at rest
 HEEL_DRAG_PER_RAD = 3.0  # extra resistance per radian of heel beyond HEEL_DRAG_ONSET (dragging)
-HEEL_DRAG_ONSET = math.radians(12.0)  # heel at which the lee side starts dragging and speed falls
-HEEL_KEEL_LEVER_FRACTION = 0.5  # the keel's reaction acts this fraction of the draught below water
+HEEL_DRAG_ONSET = math.radians(20.0)  # heel at which the lee rail drags and speed falls
+HEEL_KEEL_LEVER_FRACTION = 0.8  # the keel's reaction acts this fraction of the draught below water
 HEEL_TIME_CONSTANT = 4.0  # seconds for the heel to settle to its balance (quasi-static heel)
 BEAM_ENDS_HEEL = math.radians(40.0)  # heel at which the log cries "on her beam ends"
 ADDED_MASS_SURGE = 0.05  # water carried along ahead, as a fraction of displacement
@@ -57,7 +57,9 @@ HELM_KI = 0.03  # helmsman: per second; how quickly he learns the helm she carri
 HELM_KI_WINDOW = math.radians(10.0)  # he only learns the helm once within this much of the course
 HELM_KI_LEAK_S = 60.0  # seconds; outside that window, or without way, what he learned fades
 HELM_STEERAGE_SPEED = 0.75  # m/s (1.5 kn); under this the rudder bites too little to learn from
-HELM_STUCK_RATE = math.radians(0.1)  # rad/s; swinging slower than this while off course, he adds helm
+HELM_STUCK_RATE = math.radians(
+    0.1
+)  # rad/s; swinging slower than this, he learns the helm she carries
 FULL_AND_BY_MARGIN = math.radians(8.0)  # sailed this much fuller than the sails' luffing angle
 FULL_AND_BY_DEFAULT_LUFF = math.radians(45.0)  # luffing angle when package 4 has not said
 WEATHER_HELM_TIME_CONSTANT = 30.0  # seconds; the weather-helm reading averages the rudder
@@ -275,9 +277,10 @@ def steer(ship: Ship, dt: float) -> float:
     else:
         err = heading_error(ship, st)
         assert err is not None
-        near = abs(err) < HELM_KI_WINDOW
-        stuck = abs(d.r) < HELM_STUCK_RATE  # held off her course and not swinging
-        if (near or stuck) and d.u > HELM_STEERAGE_SPEED:
+        # he learns the standing helm only when she is not swinging (on her
+        # course, or held off it) and has steerage way; while she turns, what
+        # the wheel is doing is not the helm she carries
+        if abs(d.r) < HELM_STUCK_RATE and d.u > HELM_STEERAGE_SPEED:
             learn = max(-HELM_KI_WINDOW, min(HELM_KI_WINDOW, err))
             st.helm_integral += HELM_KI * learn * dt
             st.helm_integral = max(-max_angle, min(max_angle, st.helm_integral))

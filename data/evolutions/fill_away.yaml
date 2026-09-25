@@ -1,13 +1,22 @@
-# Fill away after lying to (scripted): right the helm, order the close-hauled
-# course on the present tack, and brace the backed yards round full over
-# brace_s. Undoes heave_to; needs ship.extra["hove_to"] to be present.
+# Fill away after lying to (scripted): keep the helm a-lee while she has
+# sternway (and put it up once she has headway) until her head is fill_off_deg
+# off the true wind, far enough for the backed sails to fill when braced, then
+# brace the backed yards round full over brace_s and order the close-hauled
+# course on the present tack. Lying to as heave_to leaves her (five points
+# off) she is braced at once; braced full from closer than that she would only
+# be taken aback (package 10, truth 12). Undoes heave_to; needs
+# ship.extra["hove_to"] to be present. The courses, driver and topgallant that
+# heave_to hauled up are left for the captain to set again.
 id: fill_away
 verb: fill_away
 applies_to: {class: ship}
 script: fill_away
 preconditions: []
 timing:
-  brace_s: 45     # to brace the backed yards round full
+  brace_s: 45              # to brace the backed yards round full
+  helm_deg: 20             # rudder used to throw her head off
+  fill_off_deg: 55         # her head this far off the true wind before bracing full
+  fall_off_timeout_s: 180  # brace full anyway after this long
 on_start: {log: "Fill away; man the after braces."}
 on_complete: {log: "Filled away; braced full and steering {new_course}.", kind: ship.filled_away, severity: notable}
 on_fail: {log: "Could not fill away: {reason}.", kind: evolution.failed, severity: notable}

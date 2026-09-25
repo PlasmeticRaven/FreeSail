@@ -39,105 +39,105 @@ hull:
     max_angle_deg: 35
     rate_deg_s: 4.0
 spars:
-# fore mast 72 ft heel to head (Fincham: 0.95 of the main), 61 ft above the deck, raking 1 in 5 like the main (Chapelle p. 82); stationed 0.30 of LWL before the middle (Fincham). Provisional (truth 9), see gen_ships.py. Rating: fore.topsail, fore.topgallant, fore.sail, fore.staysail, jib, flying_jib in 55 kn -> 293.7 kN.
+# fore mast 72 ft heel to head (Fincham: 0.95 of the main), 61 ft above the deck, raking 1 in 5 like the main (Chapelle p. 82); stationed 0.30 of LWL before the middle (Fincham). Provisional (truth 9), see gen_ships.py. Rating: fore.topsail, fore.topgallant, fore.sail, fore.staysail, jib, flying_jib in 55 kn -> 240.9 kN.
 - id: fore.mast
   class: mast
   x_m: 7.8
   rake_deg: 11.3
   height_m: 18.7
-  rating_kn: 293.7
-# fore topmast 36 ft with its pole (Fincham: hounded the beam, pole half of that), hounds 16 ft above the lower cap. Provisional (truth 9), see gen_ships.py. Rating: fore.topsail, fore.topgallant, flying_jib in 40 kn -> 55.9 kN.
+  rating_kn: 240.9
+# fore topmast 36 ft with its pole (Fincham: hounded the beam, pole half of that), hounds 16 ft above the lower cap. Provisional (truth 9), see gen_ships.py. Rating: fore.topsail, fore.topgallant, flying_jib in 40 kn -> 47.1 kN.
 - id: fore.topmast
   class: topmast
   steps_on: fore.mast
   height_m: 4.8
-  rating_kn: 55.9
-# fore topgallant 'mast': the 12 ft pole of the topmast, on which the topgallant sets (Fincham). Provisional (truth 9), see gen_ships.py. Rating: fore.topgallant in 25 kn -> 4.5 kN.
+  rating_kn: 47.1
+# fore topgallant 'mast': the 12 ft pole of the topmast, on which the topgallant sets (Fincham). Provisional (truth 9), see gen_ships.py. Rating: fore.topgallant in 25 kn -> 3.8 kN.
 - id: fore.topgallant_mast
   class: topgallant_mast
   steps_on: fore.topmast
   height_m: 3.7
-  rating_kn: 4.5
-# main mast 76 ft heel to head: hounded 2.8 x the beam plus a head 0.35 of the topmast (Fincham, Chapelle p. 161; Marestier's schooners 3.08 to 3.23 x the beam, p. 114), 65 ft above the deck, raking 1 in 5; stationed 0.10 of LWL abaft the middle. Provisional (truth 9), see gen_ships.py. Rating: main.sail, main.gaff_topsail in 55 kn -> 163.2 kN.
+  rating_kn: 3.8
+# main mast 76 ft heel to head: hounded 2.8 x the beam plus a head 0.35 of the topmast (Fincham, Chapelle p. 161; Marestier's schooners 3.08 to 3.23 x the beam, p. 114), 65 ft above the deck, raking 1 in 5; stationed 0.10 of LWL abaft the middle. Provisional (truth 9), see gen_ships.py. Rating: main.sail, main.gaff_topsail in 55 kn -> 130.7 kN.
 - id: main.mast
   class: mast
   x_m: -2.6
   rake_deg: 11.3
   height_m: 19.7
-  rating_kn: 163.2
-# main topmast 36 ft, hounded the beam with a pole half as long (Fincham), a pole for the gaff topsail, which comes in early. Provisional (truth 9), see gen_ships.py. Rating: main.gaff_topsail in 22 kn -> 5.2 kN.
+  rating_kn: 130.7
+# main topmast 36 ft, hounded the beam with a pole half as long (Fincham), a pole for the gaff topsail, which comes in early. Provisional (truth 9), see gen_ships.py. Rating: main.gaff_topsail in 22 kn -> 4.3 kN.
 - id: main.topmast
   class: topmast
   steps_on: main.mast
   height_m: 8.4
-  rating_kn: 5.2
-# fore topsail yard 36 ft, 0.75 of a 48 ft fore yard that is 0.57 of LWL (Fincham; Sea Lark's fore yard was 0.69, Chapelle p. 42).{prov} Rating: fore.topsail in 40 kn -> 31.7 kN.
+  rating_kn: 4.3
+# fore topsail yard 36 ft, 0.75 of a 48 ft fore yard that is 0.57 of LWL (Fincham; Sea Lark's fore yard was 0.69, Chapelle p. 42).{prov} Rating: fore.topsail in 40 kn -> 26.9 kN.
 - id: fore.topsail.yard
   class: yard
   'on': fore.topmast
   length_m: 11.1
   height_m: 23.1
   brace_limit_deg: 58
-  rating_kn: 31.7
-# fore topgallant yard 23 ft, 0.48 of the fore yard (Fincham). Provisional (truth 9), see gen_ships.py. Rating: fore.topgallant in 25 kn -> 4.5 kN.
+  rating_kn: 26.9
+# fore topgallant yard 23 ft, 0.48 of the fore yard (Fincham). Provisional (truth 9), see gen_ships.py. Rating: fore.topgallant in 25 kn -> 3.8 kN.
 - id: fore.topgallant.yard
   class: yard
   'on': fore.topgallant_mast
   length_m: 7.1
   height_m: 26.6
   brace_limit_deg: 60
-  rating_kn: 4.5
-# fore gaff 24 ft, 0.85 of the main gaff (Fincham; Sea Lark's 24 ft, Chapelle p. 42); the foresail is loose-footed and overlaps the main (Luce 1884 ch. XXXIV: a boom foresail sets worse on a wind). Rating: fore.sail in 45 kn -> 64.6 kN.
+  rating_kn: 3.8
+# fore gaff 24 ft, 0.85 of the main gaff (Fincham; Sea Lark's 24 ft, Chapelle p. 42); the foresail is loose-footed and overlaps the main (Luce 1884 ch. XXXIV: a boom foresail sets worse on a wind). Rating: fore.sail in 45 kn -> 51.4 kN.
 - id: fore.gaff
   class: gaff
   'on': fore.mast
   length_m: 7.4
   height_m: 15.2
-  rating_kn: 64.6
-# main gaff 29 ft, 0.48 of the boom (Fincham; Sea Lark's 28 ft), its nock 0.045 of the hounded mast below the hounds. Rating: main.sail in 45 kn -> 87.4 kN.
+  rating_kn: 51.4
+# main gaff 29 ft, 0.48 of the boom (Fincham; Sea Lark's 28 ft), its nock 0.045 of the hounded mast below the hounds. Rating: main.sail in 45 kn -> 69.6 kN.
 - id: main.gaff
   class: gaff
   'on': main.mast
   length_m: 8.7
   height_m: 16.2
-  rating_kn: 87.4
-# main boom 59 ft, 0.70 of LWL (Fincham; Sea Lark's 0.71, Chapelle p. 42), well over the taffrail. Rating: the sails named in the script in 45 kn -> 87.4 kN (the engine's graph loads nothing on it).
+  rating_kn: 69.6
+# main boom 59 ft, 0.70 of LWL (Fincham; Sea Lark's 0.71, Chapelle p. 42), well over the taffrail. Rating: the sails named in the script in 45 kn -> 69.6 kN (the engine's graph loads nothing on it).
 - id: main.boom
   class: boom
   'on': main.mast
   length_m: 18.1
   height_m: 1.5
-  rating_kn: 87.4
-# bowsprit 12 ft outboard, 0.14 of LWL (Fincham gives 0.12 for the Royal Navy's; Grecian's 'was probably rather short', Chapelle p. 93), steeved low. Rating: the sails named in the script in 55 kn -> 115.7 kN (the engine's graph loads nothing on it).
+  rating_kn: 69.6
+# bowsprit 12 ft outboard, 0.14 of LWL (Fincham gives 0.12 for the Royal Navy's; Grecian's 'was probably rather short', Chapelle p. 93), steeved low. Rating: the sails named in the script in 55 kn -> 94.8 kN (the engine's graph loads nothing on it).
 - id: bowsprit
   class: bowsprit
   x_m: 12.9
   length_m: 3.6
   height_m: 3.0
-  rating_kn: 115.7
-# jib-boom 24 ft outboard: the jib tacks 36 ft before the stem, 0.42 of LWL (Fincham 0.41 to 0.46). Provisional (truth 9), see gen_ships.py. Rating: the sails named in the script in 30 kn -> 7.2 kN (the engine's graph loads nothing on it).
+  rating_kn: 94.8
+# jib-boom 24 ft outboard: the jib tacks 36 ft before the stem, 0.42 of LWL (Fincham 0.41 to 0.46). Provisional (truth 9), see gen_ships.py. Rating: the sails named in the script in 30 kn -> 5.9 kN (the engine's graph loads nothing on it).
 - id: jib_boom
   class: jib_boom
   'on': bowsprit
   length_m: 7.3
   height_m: 4.0
-  rating_kn: 7.2
-# fore topmast studding-sail boom, half the topsail yard, at the fore yard's height; rated for its sail in 18 kn. Provisional (truth 9), see gen_ships.py. Rating: fore.topmast.studdingsail.starboard in 18 kn -> 2.1 kN.
+  rating_kn: 5.9
+# fore topmast studding-sail boom, half the topsail yard, at the fore yard's height; rated for its sail in 18 kn. Provisional (truth 9), see gen_ships.py. Rating: fore.topmast.studdingsail.starboard in 18 kn -> 2.2 kN.
 - id: fore.topmast.studdingsail_boom.starboard
   class: studdingsail_boom
   'on': fore.topsail.yard
   side: starboard
   length_m: 5.5
   height_m: 15.5
-  rating_kn: 2.1
-# Rating: fore.topmast.studdingsail.larboard in 18 kn -> 2.1 kN.
+  rating_kn: 2.2
+# Rating: fore.topmast.studdingsail.larboard in 18 kn -> 2.2 kN.
 - id: fore.topmast.studdingsail_boom.larboard
   class: studdingsail_boom
   'on': fore.topsail.yard
   side: larboard
   length_m: 5.5
   height_m: 15.5
-  rating_kn: 2.1
+  rating_kn: 2.2
 sails:
 # fore topsail 85 m2 between its yard and the fore yardarms, 25 ft deep ('the extreme beam, nearly', Fincham); x carried aft by the rake.
 - id: fore.topsail

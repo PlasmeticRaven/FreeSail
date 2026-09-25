@@ -11,7 +11,9 @@ script: wear
 preconditions:
   - {check: dyn.speed >= knots(0.5), reason: "She has no way on her to wear: {speed} through the water."}
 timing:
-  brace_rate_deg_s: 1.0  # how fast the yards follow the wind round
+  brace_rate_deg_s: 0.35 # how fast the yards follow the wind round: the watch braces the after
+                         # yards, then the head yards, in stages as she comes round (package 10:
+                         # at 1.0 the frigate wore in three minutes; Luce gives six to twelve)
   wear_timeout_s: 900    # give up after this long
   wear_estimate_s: 480   # what the state snapshot shows as remaining at the start
   steady_deg: 5          # within this of the new course counts as steady

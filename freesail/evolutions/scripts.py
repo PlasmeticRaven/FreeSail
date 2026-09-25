@@ -129,6 +129,62 @@ def yards_to_back(ship: Ship) -> list[Spar]:
     return [y for y in working_yards(ship) if ship.mast_of(y) is chosen]
 
 
+def after_gaff_sails(ship: Ship) -> list:
+    """The driver: gaff sails set on the aftermost lower mast (the spanker of a
+    ship; a schooner's mainsail). Hove to with the main topsail aback it is
+    brailed up, else it brings her head to wind and she gathers sternway
+    (Luce 1866 ch. XXVI: 'regulate by easing off, or hauling aft, the spanker
+    and jib sheets'; package 10 found the frigate with the spanker set lies 40
+    degrees off with two knots of sternway, brailed up 55 to 60 degrees off
+    with almost none). A schooner keeps her mainsail: it is her driving sail,
+    not a driver, and without it she pays off broad and forereaches under her
+    foresail and jibs (the period way for a fore-and-after is a jib sheet to
+    windward, which the sail model cannot yet do)."""
+    masts = [sp for sp in ship.spars.values() if sp.cls == "mast" and not sp.wrecked]
+    if len(masts) < 3:
+        return []
+    aftermost = min(masts, key=lambda m: m.x_m)
+    return [
+        sl
+        for sl in ship.sails.values()
+        if sl.cls == "gaff" and sl.is_set and ship.mast_of(sl) is aftermost
+    ]
+
+
+def light_sails_forward_of(ship: Ship, backed: list[Spar]) -> list:
+    """The topgallants and royals set on the masts forward of the backed
+    yards' mast: the light head sails. Hove to they are clewed up (Luce 1866
+    ch. XXVI: 'settle down the top-gallant sails and royals, or clew them
+    up'); left set, the fore topgallant drives her ahead at a knot and a half
+    and lies her a point too broad (package 10, truth 12)."""
+    masts = [ship.mast_of(y) for y in backed]
+    if not masts or any(m is None for m in masts):
+        return []
+    x_backed = max(m.x_m for m in masts)
+    out = []
+    for sl in ship.sails.values():
+        if not (sl.is_set and sl.cls == "square"):
+            continue
+        yard = ship.yard_of(sl)
+        above = ship.parent_of(yard) if yard is not None else None
+        mast = ship.mast_of(sl)
+        if (
+            above is not None
+            and above.cls in ("topgallant_mast", "royal_mast")
+            and mast is not None
+            and mast.x_m > x_backed
+        ):
+            out.append(sl)
+    return out
+
+
+def names_of_sails(ship: Ship, sails: list) -> str:
+    """'the spanker', or 'the foresail and the mainsail', for the log."""
+    from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+    return " and ".join(f"the {part_name(ship, sl.id)}" for sl in sails) if sails else "the sail"
+
+
 def lowest_square_sails(ship: Ship) -> list:
     """The courses: square sails on yards that hang directly on a lower mast."""
     out = []
@@ -552,8 +608,20 @@ class HeaveToScript(Script):
         courses = [sl for sl in lowest_square_sails(self.ship) if sl.is_set]
         for sl in courses:
             sl.state = SailState.IN_THE_GEAR
-        if courses:
+        drivers = after_gaff_sails(self.ship)
+        for sl in drivers:
+            sl.state = SailState.IN_THE_GEAR
+        if courses and drivers:
+            self.note(f"Hauled up the courses; brailed up {names_of_sails(self.ship, drivers)}.")
+        elif courses:
             self.note("Hauled up the courses.")
+        elif drivers:
+            self.note(f"Brailed up {names_of_sails(self.ship, drivers)}.")
+        light = light_sails_forward_of(self.ship, self.yards)
+        for sl in light:
+            sl.state = SailState.IN_THE_GEAR
+        if light:
+            self.note(f"Clewed up {names_of_sails(self.ship, light)}.")
         self.note(f"Braced the {sail_name_on(self.ship, self.yards)} aback; helm a-lee.")
 
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
@@ -571,9 +639,20 @@ class HeaveToScript(Script):
 
 
 class FillAwayScript(Script):
-    """Fill away after lying to (Luce 1866 ch. XXVI 'To fill away'): right the
-    helm, order the close-hauled course on the present tack, and brace the
-    backed yards round full."""
+    """Fill away after lying to (Luce 1866 ch. XXVI 'To fill away, after lying
+    to with the main topsail to the mast': 'Right the helm, haul aft the head
+    sheets ... As she falls off, brace up the after yards ... and trim to the
+    course'). Hove to she lies close to the wind with little way or some
+    sternway; braced full from there she is only taken aback. So first she is
+    let fall off: the helm is kept a-lee while she has sternway (the rudder
+    then throws her head off) and put up once she gathers headway, until her
+    head is ``fill_off_deg`` off the true wind (far enough for the backed
+    sails to fill when braced) or ``fall_off_timeout_s`` has passed. Lying
+    hove to as heave_to leaves her, five points off, she needs no falling
+    off and is braced at once. Then the backed yards are braced round
+    full over ``brace_s`` and the helm ordered to the close-hauled course on the
+    present tack. The courses and driver that heaving to hauled up stay as they
+    are: setting them again is the captain's order."""
 
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
@@ -595,30 +674,54 @@ class FillAwayScript(Script):
         dyn = self.ship.dyn
         ch = close_hauled_true_angle(self.ship)
         self.new_course = units.wrap_2pi(estimated_wind_from(self.ship) - self.sign * ch)
-        dyn.helm_mode = HelmMode.HEADING
-        dyn.target_heading = self.new_course
-        dyn.target_rudder = 0.0
+        dyn.helm_mode = HelmMode.RUDDER
+        dyn.target_rudder = self.sign * units.deg_to_rad(self.timing_value("helm_deg", 20.0))
         dyn.steady = False
-        self.swing = YardSwing(
-            self.yards,
-            [self.sign * y.brace_limit for y in self.yards],
-            self.timing_value("brace_s", 45.0),
+        self.phase = "fall_off"
+        self.note(
+            "Hauled aft the head sheets; kept the helm a-lee to let her fall off.", "helm.order"
         )
-        self.phase = "brace_full"
-        self.note("Righted the helm; hauled aft the head sheets.", "helm.order")
 
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
         self.t += dt
+        dyn = self.ship.dyn
         ch = close_hauled_true_angle(self.ship)
         self.new_course = units.wrap_2pi(wind.direction_from - self.sign * ch)
-        self.ship.dyn.target_heading = self.new_course
+        if self.phase == "fall_off":
+            helm = units.deg_to_rad(self.timing_value("helm_deg", 20.0))
+            # with sternway the rudder works the other way: the helm a-lee throws
+            # her head off; with headway it is the helm up that does it
+            dyn.target_rudder = self.sign * helm if dyn.u < 0.0 else -self.sign * helm
+            wanted = units.deg_to_rad(self.timing_value("fill_off_deg", 55.0))
+            fallen_off = abs(wind_rel(self.ship, wind)) >= wanted
+            if fallen_off or self.t >= self.timing_value("fall_off_timeout_s", 180.0):
+                self.phase = "brace_full"
+                what = sail_name_on(self.ship, self.yards)
+                if self.t > 1.0:
+                    self.note(f"Fallen off; braced the {what} full.")
+                else:
+                    self.note(f"Braced the {what} full.")
+                self.swing = YardSwing(
+                    self.yards,
+                    [self.sign * y.brace_limit for y in self.yards],
+                    self.timing_value("brace_s", 45.0),
+                )
+                dyn.helm_mode = HelmMode.HEADING
+                dyn.target_heading = self.new_course
+                dyn.target_rudder = 0.0
+                dyn.steady = False
+            return
+        dyn.target_heading = self.new_course
         assert self.swing is not None
         if self.swing.advance(dt, factor):
             self.ship.extra.pop("hove_to", None)
             self.finish()
 
     def remaining_s(self) -> float:
-        return self.swing.remaining_s() if self.swing else self.timing_value("brace_s", 45.0)
+        brace_s = self.timing_value("brace_s", 45.0)
+        if self.phase == "fall_off":
+            return max(0.0, self.timing_value("fall_off_timeout_s", 180.0) - self.t) + brace_s
+        return self.swing.remaining_s() if self.swing else brace_s
 
     def words(self) -> dict[str, Any]:
         return {"new_course": units.format_heading(self.new_course)}

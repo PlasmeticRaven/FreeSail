@@ -40,7 +40,7 @@ from freesail import units
 from freesail.api.session import make_world
 from freesail.core.world import Scenario
 
-BEST_ALPHA_DEG = 28.0  # angle of attack at the square class's peak lift (data/sail_classes.yaml)
+BEST_ALPHA_DEG = 35.0  # angle of attack at the square class's peak lift (data/sail_classes.yaml)
 
 
 def best_trim(ship) -> None:

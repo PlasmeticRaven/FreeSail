@@ -1,8 +1,13 @@
-# Heave to (M2 simplified, scripted): the yards on the aftermost mast that
-# carries them are braced aback over brace_s while the others stay full, and
-# the helm is put a-lee (helm_deg of rudder toward the wind). On a frigate that
-# is the mizzen topsail to the mast; on a topsail schooner the fore topsail.
-# The physics does the rest (truth 12). The backed yards are remembered in
+# Heave to (M2 simplified, scripted): the courses are hauled up, the driver
+# (spanker) brailed up and the light sails forward of the backed mast clewed
+# up (Luce: "settle down the top-gallant sails"); the yards on the mast
+# carrying the most square sail are braced aback over brace_s while the
+# others stay full, and the helm is put a-lee (helm_deg of rudder toward the
+# wind). On a frigate that is the main topsail to the mast; on a topsail
+# schooner the fore topsail (her mainsail is left set: it is her driving sail,
+# and the sail model has no jib sheet to windward yet, so she forereaches).
+# The physics does the rest (truth 12: the frigate lies 55 to 60 degrees off
+# the wind at about a knot). The backed yards are remembered in
 # ship.extra["hove_to"] so that fill_away can undo it.
 #
 # Parameter `tack` (starboard or larboard): the tack to heave to on. She must

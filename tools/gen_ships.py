@@ -106,12 +106,15 @@ ROPE_KN_PER_SQ_IN = round(1044.9 * 4.44822 / 1000.0 / 3.0, 4)  # 1.5493
 
 # The engine's force coefficient at the peak of each class's curve (data/sail_classes.yaml,
 # |(C_L, C_D)| at the best angle). Package 10: if the curves change, change these and rerun.
-PEAK_COEFF = {"square": 1.45, "studding": 1.17, "gaff": 1.62, "jibheaded": 1.61}
+PEAK_COEFF = {"square": 1.23, "studding": 1.25, "gaff": 1.29, "jibheaded": 1.32}
 
 # Sustained load / static peak-coefficient load, measured with tools/measure_loads.py on the
 # frigate on a beam reach with the yards trimmed to the wind: 0.9 at 35 knots under all
 # sail, 0.7 at 20 knots under plain sail (heel takes area away, the ship's own way adds
-# apparent wind, the trim is a little off the peak).
+# apparent wind, the trim is a little off the peak). Re-measured by package 10 with its
+# curves (run the tool with PYTHONPATH=.): at 20 knots under plain sail the topgallant
+# yards sit at 0.72 of rating on the frigate and 0.70 on the schooner; at 35 knots under
+# all sail the royals and topgallants go within twelve minutes (truth 9).
 SUSTAINED_FRACTION = 0.85
 
 # Wind (knots, true, at 10 m) in which a spar is expected to stand with all its sail set.
@@ -416,7 +419,7 @@ def frigate(out_dir="data/ships"):
             "draught_m": draught,
             "displacement_kg": displacement,
             "gm_m": 1.3,
-            "clr_x_m": 3.5,
+            "clr_x_m": 3.0,
             "lateral_area_m2": round(lwl * draught * 0.85, -1),
             "hull_speed_kn": 13.0,
             "deck_height_m": deck_height,
@@ -433,10 +436,12 @@ def frigate(out_dir="data/ships"):
             "gm_m": "4 ft 3 in: judgement, typical of an 18-pounder frigate (3.5 to 5 ft).",
             "clr_x_m": "Geometric centre of the lateral plane about 1.0 m abaft midships "
             "(drag of the keel, deadwood aft); the centre of pressure with way on lies a "
-            "lead of about 11 per cent of LWL ahead of it (judgement): +3.5 m. With this "
-            "sail plan (centre of effort +3.0 m under plain sail) she carries 0.2 deg of "
-            "weather helm close-hauled and 0.7 reaching in 15 kn; at the +2.5 m of M1 "
-            "integration she carries 1.3 deg of lee helm. Package 10 checks truths 6 and 12.",
+            "lead of about 10 per cent of LWL ahead of it (judgement): +3.0 m. Package 8 "
+            "set +3.5; package 10 moved it 0.5 m aft after the raked masts carried the "
+            "sail centres aft (docs/dev/TuningNotes.md): with the tuned curves she then "
+            "carries about 1 deg of weather helm close-hauled and 2 on a beam reach in "
+            "15 kn (truth 6), and gets under way from rest without rounding up into "
+            "the wind (truth 17); at +3.5 she rounded up to 33 deg off with sternway.",
             "lateral_area_m2": "LWL x draught x 0.85 for the fullness of the profile.",
             "hull_speed_kn": "The best speed of 18-pounder frigates in sailing-quality "
             "reports is 12 to 13 knots (Winfield); the derived 1.34 sqrt(LWL ft) = 15.7 is "

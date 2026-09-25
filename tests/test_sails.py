@@ -87,7 +87,7 @@ def test_curves_interpolate_and_fold():
     sq = SAIL_CLASSES["square"]
     assert sq.coefficients(0.0) == (0.0, pytest.approx(0.10))
     cl, cd = sq.coefficients(math.radians(35))
-    assert cl == pytest.approx(1.12) and 0.4 < cd < 0.5
+    assert cl == pytest.approx(1.12) and 0.45 <= cd <= 0.55
     assert sq.coefficients(math.radians(10))[0] == 0.0  # a square sail shakes under ten degrees
     # halfway between two table points is the mean of their values
     cl_mid, _ = sq.coefficients(math.radians(17.5))
