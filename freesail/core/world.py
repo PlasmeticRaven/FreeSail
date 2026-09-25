@@ -161,8 +161,12 @@ class World:
                 data={"direction_from": self.wind.direction_from, "shift": shift},
             )
             self._last_logged_wind_direction = self.wind.direction_from
-        for severity, kind, text in self.ship.step(1.0, self.wind):
-            self.record(severity, kind, text)
+        for note in self.ship.step(1.0, self.wind):
+            if len(note) == 3:
+                self.record(*note)
+            else:
+                severity, kind, text, subject, data = note
+                self.record(severity, kind, text, subject=subject, data=data)
         bells = self.clock.bells()
         if bells is not None:
             self.record(
@@ -204,7 +208,7 @@ class World:
             "engine": ENGINE_VERSION,
             "seed": self.seed,
             "scenario": self.scenario.to_dict(),
-            "ship_ref": {"type": "point"},
+            "ship_ref": self.ship.save_ref(),
             "end_tick": self.clock.tick,
             "journal": [list(entry) for entry in self.journal],
         }
