@@ -362,6 +362,14 @@ def frigate():
             if m == "main" and level == "lower":
                 continue
             b.group(f"{m} {level} studdingsails", [f"{m}.{level}.studdingsail.{s}" for s in SIDES])
+    # WP15: the courses' lines by their period names (Falconer: main-sheet,
+    # main-tack, main-bowline; fore-sheet, fore-tack, fore-bowline). Each is
+    # a group of the two sided lines, and the singular alias to it is read
+    # by the orders parser as a sided family ("haul the weather main sheet").
+    for m in ("fore", "main"):
+        for cls in ("sheet", "tack", "bowline"):
+            b.group(f"{m} {cls}s", [f"{m}.course.{cls}.{s}" for s in SIDES])
+            b.alias(f"{m} {cls}", f"{m} {cls}s")
     b.dump(
         "data/ships/frigate-36.yaml",
         "# Draft reference ship: a 36-gun frigate, ship-rigged. Generated for M1; WP8 verifies\n"

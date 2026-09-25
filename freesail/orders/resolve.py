@@ -14,10 +14,21 @@ every phrase a captain might say to the parts it names:
   main") name `main.sail.sheet`, and "spanker peak halyard" names the
   peak halyard of the spanker's gaff;
 - **families**: a sided part's name without its side ("main brace" names
-  both main braces; the side word picks one);
+  both main braces; the side word picks one), and the **plural** of a sided
+  line's family ("main braces", "fore topsail sheets"), which means both
+  sides unless a side word says otherwise;
 - **shorthands**: the tail of an id ("topsail" for every `*.topsail`),
   which is unambiguous on a schooner with one topsail and rejected with the
-  candidates on a frigate with three.
+  candidates on a frigate with three; a plural shorthand ("topsail sheets")
+  names all of them;
+- an alias that points at a group of exactly one starboard and one larboard
+  line ("main sheet" for the main course's sheets) is entered as a family,
+  so that it asks for its side like any other sided line.
+
+Compound objects join nouns with "and": "the topsails and topgallants", "the
+jib and the spanker", and, distributed, "the fore and main yards" (the fore
+yards and the main yards). `compound_span` reads them; the grammar and
+`resolve` both use it so that they agree on where the object ends.
 
 Sides: `starboard`, `larboard` (`port` is accepted and echoed as larboard),
 `weather` and `lee`, which resolve from the ship's current tack at the
@@ -56,6 +67,7 @@ class Noun:
     kind: str  # "part" | "group" | "family" | "shorthand"
     name: str  # what to call the match in a sentence: "main brace", "topsails"
     rank: int = _GENERATED
+    plural: bool = False  # "main braces": both sides unless a side word says otherwise
 
 
 @dataclass
@@ -88,7 +100,8 @@ class NounTable:
             merged = [i for i in existing.ids] + [i for i in noun.ids if i not in existing.ids]
             if merged != existing.ids:
                 kind = existing.kind if existing.kind == noun.kind else "shorthand"
-                self.entries[k] = Noun(merged, kind, existing.name, existing.rank)
+                plural = existing.plural and noun.plural
+                self.entries[k] = Noun(merged, kind, existing.name, existing.rank, plural)
 
     @property
     def names(self) -> list[str]:
@@ -209,6 +222,22 @@ def _side_spellings(side: str) -> tuple[str, ...]:
     return ("larboard", "port") if side == "larboard" else ("starboard",)
 
 
+def pluralise(phrase: str) -> str:
+    """'main brace' -> 'main braces'; a word already plural is left alone."""
+    words = phrase.split()
+    if not words or words[-1].endswith("s"):
+        return phrase
+    return " ".join(words[:-1] + [words[-1] + "s"])
+
+
+def singularise(phrase: str) -> str | None:
+    """'main yards' -> 'main yard', or None when the last word is not plural."""
+    words = phrase.split()
+    if not words or not words[-1].endswith("s") or len(words[-1]) < 3:
+        return None
+    return " ".join(words[:-1] + [words[-1][:-1]])
+
+
 def _enter(
     table: NounTable,
     ship: Ship,
@@ -227,10 +256,15 @@ def _enter(
     side = part_side(ship, part_id)
     fam = " ".join(_family_words(ship, part_id, vocab))
     shown = f"{side} {fam}" if side else fam
+    # A sided line's names take a plural that means both sides: "main braces".
+    plural_line = side is not None and isinstance(ship.parts[part_id], Line)
     for v, phrase in enumerate(_variants(words, vocab)):
         plain = v == 0
         if kind == "shorthand":
             table.add(phrase, Noun([part_id], "shorthand", " ".join(words), rank), suggest=plain)
+            if plural_line:
+                many = pluralise(" ".join(words))
+                table.add(pluralise(phrase), Noun([part_id], "shorthand", many, rank, True), False)
             continue
         if side:
             for sw in _side_spellings(side):
@@ -239,6 +273,10 @@ def _enter(
                 )
                 table.add(f"{phrase} {sw}", Noun([part_id], "part", shown, rank), suggest=False)
             table.add(phrase, Noun([part_id], "family", fam, rank), suggest=plain)
+            if plural_line:
+                table.add(
+                    pluralise(phrase), Noun([part_id], "family", pluralise(fam), rank, True), False
+                )
         else:
             table.add(phrase, Noun([part_id], "part", fam, rank), suggest=plain)
 
@@ -281,6 +319,20 @@ def build_noun_table(ship: Ship, vocab: Vocabulary | None = None) -> NounTable:
     for aname, target in ship.aliases.items():
         words = strip_article(key(aname).split())
         shown = " ".join(words)
+        pair = _sided_pair(ship, target)
+        if pair is not None:
+            # "main sheet" for the main course's two sheets: a family, asking
+            # for its side; "starboard main sheet" and "main sheets" follow.
+            for v, phrase in enumerate(_variants(words, vocab)):
+                table.add(phrase, Noun(list(pair.values()), "family", shown, _EXPLICIT), v == 0)
+                many = Noun(list(pair.values()), "family", pluralise(shown), _EXPLICIT, True)
+                table.add(pluralise(phrase), many)
+                for side, pid in pair.items():
+                    part_noun = Noun([pid], "part", f"{side} {shown}", _EXPLICIT)
+                    for sw in _side_spellings(side):
+                        table.add(f"{sw} {phrase}", part_noun, suggest=False)
+                        table.add(f"{phrase} {sw}", part_noun, suggest=False)
+            continue
         if target in ship.groups:
             noun = Noun(list(ship.groups[target]), "group", shown, _EXPLICIT)
         else:
@@ -294,6 +346,94 @@ def build_noun_table(ship: Ship, vocab: Vocabulary | None = None) -> NounTable:
             for line_id, tail in _lines_under(ship, target):
                 _enter(table, ship, line_id, words + words_of(tail), vocab)
     return table
+
+
+def _sided_pair(ship: Ship, group: str) -> dict[str, str] | None:
+    """{'starboard': id, 'larboard': id} when a group is one line each side of a family."""
+    members = ship.groups.get(group)
+    if not members or len(members) != 2:
+        return None
+    pair: dict[str, str] = {}
+    for pid in members:
+        part = ship.parts.get(pid)
+        side = part_side(ship, pid) if part is not None else None
+        if not isinstance(part, Line) or side is None or side in pair:
+            return None
+        pair[side] = pid
+    if len(pair) != 2 or len({family_name(ship, i) for i in pair.values()}) != 1:
+        return None
+    return pair
+
+
+def compound_span(table: NounTable, words: list[str]) -> tuple[int, list[str]] | None:
+    """The nouns at the start of `words`, joined by 'and': (words used, the phrases).
+
+    The longest single noun is taken first; if 'and' follows, another noun
+    is read after it ("topsails and topgallants", "the jib and the
+    spanker"). When no noun starts the words, the part before the first
+    'and' is distributed over the part after it: "fore and main yards" is
+    the fore yards and the main yards, "fore and main topsails" the fore
+    topsail and the main topsail. On the right-hand side a plural is also
+    tried in the singular ("main topsails" for "main topsail"). Returns None
+    when no noun is found at all.
+    """
+    for n in range(len(words), 0, -1):
+        phrase = " ".join(words[:n])
+        if table.lookup(phrase) is None:
+            continue
+        used, phrases = n, [phrase]
+        more = _after_and(table, words[n:])
+        if more is not None:
+            used += more[0]
+            phrases += more[1]
+        return used, phrases
+    # distribution: "fore and main yards"
+    if "and" not in words[1:]:
+        return None
+    i = words.index("and", 1)
+    left = words[:i]
+    tail = strip_article(words[i + 1 :])
+    right = _right_side(table, tail)
+    if right is None:
+        return None
+    r_used, r_phrases = right
+    r_words = r_phrases[0].split()
+    for k in range(1, len(r_words)):
+        cand = " ".join(left + r_words[-k:])
+        if table.lookup(cand) is not None:
+            used = i + 1 + (len(words) - i - 1 - len(tail)) + r_used
+            return used, [cand] + r_phrases
+    return None
+
+
+def _after_and(table: NounTable, rest: list[str]) -> tuple[int, list[str]] | None:
+    """A further noun after a leading 'and', with the words consumed including it."""
+    if len(rest) < 2 or rest[0] != "and":
+        return None
+    tail = strip_article(rest[1:])
+    more = _right_side(table, tail)
+    if more is None:
+        return None
+    return 1 + (len(rest) - 1 - len(tail)) + more[0], more[1]
+
+
+def _right_side(table: NounTable, words: list[str]) -> tuple[int, list[str]] | None:
+    """A noun (or chain) at the start of words, trying a plural in the singular too."""
+    for n in range(len(words), 0, -1):
+        phrase = " ".join(words[:n])
+        singular = singularise(phrase)
+        found = phrase if table.lookup(phrase) is not None else None
+        if found is None and singular is not None and table.lookup(singular) is not None:
+            found = singular
+        if found is None:
+            continue
+        used, phrases = n, [found]
+        more = _after_and(table, words[n:])
+        if more is not None:
+            used += more[0]
+            phrases += more[1]
+        return used, phrases
+    return None
 
 
 def _lines_under(ship: Ship, part_id: str) -> list[tuple[str, list[str]]]:
@@ -381,10 +521,16 @@ def resolve(ship: Ship, phrase: str, side_word: str | None, verb: str) -> Resolu
     table = noun_table(ship)
     noun = table.lookup(phrase)
     if noun is None:
-        raise errors.unknown_noun(phrase, verb, table.names)
+        words = phrase.split()
+        span = compound_span(table, words) if "and" in words else None
+        if span is None or span[0] != len(words):
+            raise errors.unknown_noun(phrase, verb, table.names)
+        return _resolve_compound(ship, phrase, span[1], side_word, verb)
     side = resolve_side(ship, side_word)
     ids = list(noun.ids)
     sided = [i for i in ids if part_side(ship, i)]
+    if side is None and noun.plural and len(sided) > 1:
+        side = "both"  # "the main braces": both, unless a side word says which
 
     if side is not None:
         if not sided:
@@ -423,6 +569,22 @@ def resolve(ship: Ship, phrase: str, side_word: str | None, verb: str) -> Resolu
             )
         raise errors.ambiguous_noun(" ".join(phrase.split()), families, verb)
     return Resolution(ids, noun.kind, noun.name, None, None)
+
+
+def _resolve_compound(
+    ship: Ship, phrase: str, phrases: list[str], side_word: str | None, verb: str
+) -> Resolution:
+    """'the topsails and topgallants': each noun resolved on its own, the parts joined."""
+    ids: list[str] = []
+    names: list[str] = []
+    side: str | None = None
+    for p in phrases:
+        res = resolve(ship, p, side_word, verb)
+        ids.extend(i for i in res.ids if i not in ids)
+        names.append(res.name)
+        side = side or res.side
+    kind = "group" if len(ids) > 1 else "part"
+    return Resolution(ids, kind, errors.join_names(names, "and", limit=len(names)), side, side_word)
 
 
 # ---------------------------------------------------------------------------

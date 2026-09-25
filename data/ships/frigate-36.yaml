@@ -1387,6 +1387,24 @@ groups:
   main topgallant studdingsails:
   - main.topgallant.studdingsail.starboard
   - main.topgallant.studdingsail.larboard
+  fore sheets:
+  - fore.course.sheet.starboard
+  - fore.course.sheet.larboard
+  fore tacks:
+  - fore.course.tack.starboard
+  - fore.course.tack.larboard
+  fore bowlines:
+  - fore.course.bowline.starboard
+  - fore.course.bowline.larboard
+  main sheets:
+  - main.course.sheet.starboard
+  - main.course.sheet.larboard
+  main tacks:
+  - main.course.tack.starboard
+  - main.course.tack.larboard
+  main bowlines:
+  - main.course.bowline.starboard
+  - main.course.bowline.larboard
 aliases:
   spanker: mizzen.spanker
   driver: mizzen.spanker
@@ -1402,3 +1420,9 @@ aliases:
   stuns'ls: studdingsails
   studding sails: studdingsails
   kites: studdingsails
+  fore sheet: fore sheets
+  fore tack: fore tacks
+  fore bowline: fore bowlines
+  main sheet: main sheets
+  main tack: main tacks
+  main bowline: main bowlines
