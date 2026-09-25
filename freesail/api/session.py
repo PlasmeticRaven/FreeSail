@@ -19,6 +19,7 @@ from freesail.ship.loader import load_ship
 def attach_systems(ship: Ship) -> Ship:
     """Give a bare Ship its evolution runner, physics stepper and order handler."""
     from freesail.evolutions.runner import Runner
+    from freesail.evolutions.trim import tend_sheets
     from freesail.orders import handle as handle_order
     from freesail.physics import integrate
 
@@ -26,6 +27,7 @@ def attach_systems(ship: Ship) -> Ship:
 
     def stepper(s: Ship, dt: float, wind: Any) -> None:
         runner.step(s, dt, wind)
+        tend_sheets(s, dt)
         integrate.step(s, dt, wind)
 
     ship.stepper = stepper

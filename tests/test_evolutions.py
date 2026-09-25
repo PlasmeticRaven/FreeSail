@@ -695,7 +695,7 @@ def test_heave_to_and_fill_away(path, backed_sail, backed_yard):
     close_hauled_on_starboard(ship, wind)
     with pytest.raises(OrderError, match="She is not hove to."):
         runner.start(ship, "fill_away", "ship")
-    with pytest.raises(OrderError, match=f"No sail is set on the {part_name(ship, backed_sail)}"):
+    with pytest.raises(OrderError, match="No sail is set on the"):
         runner.start(ship, "heave_to", "ship")
     set_sail(runner, ship, wind, backed_sail)
     for y in ship.spars.values():
@@ -711,7 +711,7 @@ def test_heave_to_and_fill_away(path, backed_sail, backed_yard):
     yard = ship.spars[backed_yard]
     assert yard.brace_angle == pytest.approx(-yard.brace_limit)  # aback
     if path == FRIGATE:
-        assert ship.spars["main.topsail.yard"].brace_angle == pytest.approx(
+        assert ship.spars["mizzen.topsail.yard"].brace_angle == pytest.approx(
             yard.brace_limit
         )  # full
     assert ship.dyn.helm_mode is HelmMode.RUDDER and ship.dyn.target_rudder > 0

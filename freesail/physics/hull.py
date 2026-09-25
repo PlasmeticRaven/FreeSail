@@ -50,6 +50,7 @@ RADIUS_OF_GYRATION = 0.25  # yaw radius of gyration as a fraction of waterline l
 ADDED_INERTIA_YAW = 0.5  # water swung with the hull, as a fraction of the dry yaw inertia
 SWAY_CLAMP_SLOPE = 0.6  # |v| may not exceed SWAY_CLAMP_SLOPE * |u| + SWAY_CLAMP_OFFSET
 SWAY_CLAMP_OFFSET = 0.5  # m/s; keeps sway sane at low speed (spec §7.4)
+STERNWAY_SHIFT_SPEED = 0.15  # m/s of sternway beyond which the helmsman shifts the helm
 HELM_KP = 1.0  # helmsman: radians of rudder per radian of heading error
 HELM_KD = 8.0  # helmsman: seconds; rudder eased against the rate of swing to meet her
 HELM_KI = 0.03  # helmsman: per second; how quickly he learns the helm she carries
@@ -272,6 +273,11 @@ def steer(ship: Ship, dt: float) -> float:
             st.helm_integral += HELM_KI * err * dt
             st.helm_integral = max(-max_angle, min(max_angle, st.helm_integral))
         wanted = HELM_KP * err - HELM_KD * d.r + st.helm_integral
+        if d.u < -STERNWAY_SHIFT_SPEED:
+            # she is making sternway: the rudder acts the other way, so the
+            # helmsman shifts the helm (and forgets the standing helm meanwhile)
+            st.helm_integral = 0.0
+            wanted = -(HELM_KP * err - HELM_KD * d.r)
         wanted = max(-max_angle, min(max_angle, wanted))
     rate = units.deg_to_rad(spec.rate_deg_s) * dt
     move = max(-rate, min(rate, wanted - d.rudder))

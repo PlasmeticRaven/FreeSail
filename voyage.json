@@ -18,7 +18,7 @@
     "type": "file",
     "path": "data/ships/frigate-36.yaml"
   },
-  "end_tick": 4060,
+  "end_tick": 4660,
   "journal": [
     [
       0,
@@ -61,7 +61,7 @@
       "heave to"
     ],
     [
-      3760,
+      4060,
       "captain",
       "fill away"
     ]

@@ -1,6 +1,6 @@
 # Set a jib-headed sail (jib, flying jib, fore topmast staysail, a schooner's
 # gaff topsail): clear it away, let go the downhaul, hoist away, and trim the
-# sheet. Quick work: under two minutes.
+# sheet, trimmed to the point of sail (the sheet angle is set from the apparent wind). Quick work: under two minutes.
 id: set_jibheaded
 verb: set
 applies_to: {class: jibheaded}
@@ -18,11 +18,11 @@ steps:
   - do: hoist
     duration_s: 60
     via: halyard_of(sail)
-    sets: {sail.state: set}
+    sets: {sail.state: set, sail.sheet_angle: "clamp(abs(dyn.apparent_wind_angle) - deg(28), deg(5), deg(60))"}
   - do: trim_sheet
     duration_s: 15
     if: sail.state != set
-    sets: {sail.state: set}
+    sets: {sail.state: set, sail.sheet_angle: "clamp(abs(dyn.apparent_wind_angle) - deg(28), deg(5), deg(60))"}
 on_start: {log: "Clear away the {sail}; man the halyards."}
 on_complete: {log: "Set the {sail}.", kind: sail.set, severity: notable}
 on_fail: {log: "Could not set the {sail}: {reason}.", kind: evolution.failed, severity: notable}
