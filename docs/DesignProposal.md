@@ -46,6 +46,8 @@ When you get tired of trimming sails by hand, you write a standing order: "when 
 
 At any point, you can hand a station to a language model: "Mr. Pellew, you have the deck" gives an LLM the same order channel you have, scoped to the authority of that station.
 
+**Idle play.** The same machinery supports a slower, comfier way to play: write the standing orders for a passage, set the compression high, and leave the ship to sail herself while you do something else, glancing at the ship view now and then and reading the rolled-up log when you come back. With a director (§7.6) aboard, the log you come back to has a story in it. The client is designed with this in mind: routine summarises well at high compression, notable and urgent lines stand out, and the ship view is pleasant to glance at rather than demanding of attention.
+
 ### 2.2 The control ladder
 
 This is the core of the design, so it is worth stating carefully. There are four levels, and they are strictly layered: each level is implemented in terms of the level below, and a player can drop down a level at any time.
