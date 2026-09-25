@@ -12,7 +12,11 @@ Requires Python 3.11 or newer.
 python -m pip install -e ".[dev]"
 python -m pytest              # the test suite
 python -m freesail.ui.console data/ships/frigate-36.yaml --wind 0,15 --heading 293
+python -m pip install -e ".[dev,server]"     # once, for the browser client
+python -m freesail.ui.server data/ships/frigate-36.yaml --wind 0,15 --heading 293
 ```
+
+The server prints an address (normally `http://localhost:8000`); open it in a browser for the log, instruments, ship view and map. The command line at the foot of the log takes the same orders and driver commands as the console. Add `?facing=45` to the address, or press `]` and `[`, to look at the ship from another bearing.
 
 In the console, driver commands (`hold`, `go`, `time 30`, `tick 600`, `state`, `log`, `save file.json`, `replay file.json`, `quit`) control the clock and the session. Anything else is an order to the ship in the Orders language: `set plain sail`, `brace sharp up on the starboard tack`, `reef the topsails, one reef`, `haul the weather main brace`, `steer west by north`, `tack ship`, `wear ship`. Two draft ships are in `data/ships/`: a 36-gun frigate and a topsail schooner. Without a ship file the console runs the milestone 0 point ship (`steer`, `speed`, `stop`).
 
