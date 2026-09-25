@@ -2,7 +2,7 @@
 
 A ticked, text-first sailing simulation of a late-age-of-sail ship, controlled through layered orders (from hauling a single line to standing orders and scripts), with language models able to watch, crew, or captain through the same channel a human uses.
 
-Status: milestone 1 built (ship files, sail and hull physics, the Orders language, nominal-duration evolutions). See `docs/TechnicalSpec-M0-M2.md` §11 for the milestone plan and `docs/gates/` for the gate reports.
+Status: milestone 2 built (verified reference ships, strain and carrying away, physics tuned to seventeen known truths, the browser client with a projected ship view, the Sailing Master's Primer, completion as you type). See `docs/TechnicalSpec-M0-M2.md` §11 for the milestone plan and `docs/gates/` for the gate reports.
 
 ## Running it
 
