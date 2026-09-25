@@ -30,7 +30,7 @@ py -m pip install -e ".[dev,server]"
 ```
 py -m pytest
 ```
-*Takes two or three minutes now: the truths sail real voyages. Ends `696 passed, 2 xfailed` (the two xfailed are the recorded exceptions; a `failed` is a fault).*
+*Takes two or three minutes now: the truths sail real voyages. Ends `697 passed, 2 xfailed` (the two xfailed are the recorded exceptions; a `failed` is a fault).*
 
 ## Checklist
 
