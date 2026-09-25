@@ -20,6 +20,7 @@ import math
 from freesail import units
 from freesail.physics import hull as hp
 from freesail.physics.sails import compute_sail_forces
+from freesail.physics.strain import apply_strain
 from freesail.physics.wind import Wind
 from freesail.ship.graph import Ship
 from freesail.ship.parts import HelmMode
@@ -39,6 +40,7 @@ def step(ship: Ship, dt: float, wind: Wind) -> None:
             ship, st, h, forces.thrust_n, forces.side_n, forces.heel_moment_nm, forces.yaw_moment_nm
         )
         st.last_thrust_n = forces.thrust_n
+    apply_strain(ship, dt)  # package 9: wear and carrying away, once per tick (spec §7.5)
     _update_readings(ship)
     _log_notes(ship, st, dt)
 
