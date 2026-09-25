@@ -1,6 +1,12 @@
 # Gate M1: A ship that sails by orders
 
-**Verdict:** Pending.
+**Verdict:** Passed (owner, 2026-09-25). Items 1 to 8 and 10 to 13 passed exactly as described on both ships; the owner went on to find and set the schooner's gaff topsail and steer east.
+
+**Item 9 observation (seed 7):** after 900 ticks hove to, apparent wind 51° on the starboard bow at 11.3 knots, helm +15°, speed 2.4 knots, leeway −163° (sternway), heel −6°. Identical to the build session's run; recorded in the tuning notes for package 10.
+
+**Owner's notes for follow-up:**
+- Documentation that teaches how to sail in the 19th-century manner, terminology included, is wanted (for the owner too). Historical terminology and peculiarities are the right call even at the cost of learning them. Becomes the *Sailing Master's Primer*, started in milestone 2.
+- The owner reached for `trim sails` and it did not exist. A period `trim` order (trim the yards to the wind; trim the sheets) is added to the milestone 2 vocabulary work.
 
 **Download:** the release page for `gate-m1` at https://github.com/PlasmeticRaven/FreeSail/releases/tag/gate-m1, or the plain zip of the snapshot branch at https://github.com/PlasmeticRaven/FreeSail/archive/refs/heads/gates/m1.zip.
 
