@@ -30,7 +30,7 @@ Each line is marked by its severity in the first column:
 | Mark | Severity | What it is |
 |---|---|---|
 | (blank) | routine | orders as given, hands sent to a job, steps of an evolution, small changes of leeway, gusts, bells |
-| `*` | notable | an evolution completed (*Set the fore topsail*, *Tacked*), a sail taken aback, a large wind shift |
+| `*` | notable | an evolution completed (*Set the fore topsail*, *Tacked*), a sail taken aback, a large wind shift, a spar or rope under dangerous strain |
 | `!` | urgent | anything carried away, missing stays, the ship taken aback and stopped |
 
 The entries you will see most:
@@ -46,9 +46,10 @@ The entries you will see most:
 * Morning watch (04:21)  Main course taken aback.
   Morning watch (04:22)  Main course filled again.
 ! Morning watch (05:09)  Taken aback: the sails pressed against the masts and she lost her way.
+* Morning watch (04:52)  Main topmast bending like a whip; she will carry it away if sail is not shortened.
 ```
 
-*Order:* is the ship accepting what you said, in the words you said it. *Order not carried out* is a refusal, and its sentence always says what was understood and what was not; the refusal is logged and nothing else happens. *Steady on* is the helmsman reporting the course made good. A sail *taken aback* has the wind on its forward side; the ship *Taken aback* has lost her way to it.
+*Order:* is the ship accepting what you said, in the words you said it. *Order not carried out* is a refusal, and its sentence always says what was understood and what was not; the refusal is logged and nothing else happens. *Steady on* is the helmsman reporting the course made good. A sail *taken aback* has the wind on its forward side; the ship *Taken aback* has lost her way to it. A spar *working* or *bending like a whip* is loaded past its rating and may carry away if you do not shorten sail (package 9): in this book's breeze that line comes only in a gust with everything set.
 
 Every entry also carries a machine-readable kind (`order.accepted`, `sail.set`, `ship.tacked`, `wind.gust` and so on) and data in SI units, which the browser client and, later, standing orders read (`docs/TechnicalSpec-M0-M2.md` §5).
 
@@ -94,10 +95,10 @@ Nothing in the game is random except through a seeded stream: the same seed, the
 
 ```
 > save voyage.json
-Saved to voyage.json at tick 4660.
+Saved to voyage.json at tick 4380.
 > replay voyage.json
-Replaying voyage.json to tick 4660...
-Replayed. Log digest 67a280d7f8549dea. Clock held.
+Replaying voyage.json to tick 4380...
+Replayed. Log digest 07d5978d56b0eb4c. Clock held.
 ```
 
 ## Starting a voyage

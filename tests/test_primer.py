@@ -11,7 +11,8 @@ string is::
   (data/ships/topsail-schooner.yaml).
 - ``<preset>`` is the state the ship starts the block in: ``furled`` (the
   default: nothing set, yards square), ``plain-sail`` (the ship file's
-  ``plain sail`` group set and the yards braced sharp up), ``all-sail``
+  ``plain sail`` group set, the yards braced sharp up and the fore-and-aft
+  sheets trimmed to the wind at 40° apparent, as setting them does), ``all-sail``
   (the ``all sail`` group set, studding sails and all) or ``reefed``
   (plain sail with one reef in every sail that has reef bands).
 - ``<tack>`` is ``starboard`` (the default) or ``larboard``: which side the
@@ -55,6 +56,7 @@ from typing import Any
 import pytest
 
 from freesail import orders
+from freesail.evolutions.trim import wanted_sheet_angle
 from freesail.orders.errors import OrderError
 from freesail.ship.graph import Ship
 from freesail.ship.loader import load_spec
@@ -131,6 +133,20 @@ class InstantRunner:
                 if yard.is_yard:
                     yard.brace_angle = -yard.brace_angle
         elif evo == "heave_to":
+            # As the real script does: the courses hauled up and, on a ship
+            # with yards on more than one mast, the driver brailed up.
+            masts_with_yards = {
+                ship.mast_of(y).id for y in ship.spars.values() if y.is_yard and ship.mast_of(y)
+            }
+            for sail in ship.sails.values():
+                if not sail.is_set:
+                    continue
+                yard = ship.yard_of(sail)
+                parent = ship.parent_of(yard) if yard is not None else None
+                if sail.cls == "square" and parent is not None and parent.cls == "mast":
+                    sail.state = SailState.IN_THE_GEAR
+                elif sail.cls == "gaff" and len(masts_with_yards) > 1:
+                    sail.state = SailState.IN_THE_GEAR
             ship.extra["hove_to"] = {"yards": [], "sign": 1.0}
         elif evo == "fill_away":
             ship.extra.pop("hove_to", None)
@@ -146,7 +162,11 @@ def make_ship(which: str, preset: str, tack: str) -> Ship:
         return ship
     group = "all sail" if preset == "all-sail" else "plain sail"
     for sail_id in ship.groups[group]:
-        ship.sails[sail_id].state = SailState.SET
+        sail = ship.sails[sail_id]
+        sail.state = SailState.SET
+        if sail.is_fore_and_aft:
+            # as setting the sail does: the sheet trimmed to the apparent wind
+            sail.sheet_angle = wanted_sheet_angle(sail.cls, ship.dyn.apparent_wind_angle)
     for yard in ship.spars.values():
         if yard.is_yard:
             yard.brace_angle = sign * yard.brace_limit
