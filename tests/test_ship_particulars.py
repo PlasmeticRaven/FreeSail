@@ -50,7 +50,7 @@ def truck_height(ship, mast):
         if not above:
             break
         top = above[0].id
-    return sum(s.height_m for s in ship.spar_chain(top)) + ship.spars[top].height_m
+    return sum(s.height_m for s in ship.spar_chain(top))  # the chain includes the top itself
 
 
 # ---------------------------------------------------------------------------

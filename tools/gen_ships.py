@@ -69,7 +69,7 @@ Steel's 1794 tables, so they are judgements against the owner may check.
 Spar ratings cannot come from a rope table. They are set by the rule that
 a spar is expected to stand with all the sail it carries (studding sails
 excepted) set in the strongest wind in which period practice would still
-have that sail on her: royals to 20 knots, topgallants to 22, topsails and
+have that sail on her: royals to 20 knots, topgallants to 25, topsails and
 topmasts to 40 (a whole gale, reefed), lower masts and yards to 55. The
 rating is the sustained load the engine puts on the spar in that wind,
 computed here as the static force at the class's peak coefficient times
@@ -118,7 +118,7 @@ SUSTAINED_FRACTION = 0.85
 DESIGN_WIND_KN = {
     "lower": 55.0,  # lower masts and yards, bowsprit: a storm, and they carry courses reefed
     "topsail": 40.0,  # topmasts and topsail yards: a whole gale under close-reefed topsails
-    "topgallant": 22.0,  # topgallant masts and yards: a strong breeze is their limit
+    "topgallant": 25.0,  # topgallant masts and yards: a strong breeze is their limit
     "royal": 20.0,  # royal masts and yards: royals come in when it freshens
     "jib_boom": 30.0,  # the jib is a stout sail, the boom less so
     "flying_jib_boom": 22.0,  # a light spar for a light sail
@@ -1046,10 +1046,9 @@ SPANKER_CENTRE = 9.8
 
 
 def schooner(out_dir="data/ships"):
-    # Design winds: as the frigate's, except that her topgallant gear is rated for 25 knots
-    # (she heels and flies so in the untuned physics that 22 left it strained under plain
-    # sail in 20) and the gaff-topsail pole for 22 (that sail comes in early).
-    dw = dict(DESIGN_WIND_KN, topgallant=25.0, gaff_topsail=22.0)
+    # Design winds: as the frigate's, plus the gaff-topsail pole at 22 (that sail comes in
+    # early)
+    dw = dict(DESIGN_WIND_KN, gaff_topsail=22.0)
     # -- hull: Kemp's Lynx of 1812 (Chapelle, The Baltimore Clipper, 1930) ------------------
     # Chapelle pp. 82-83 and fig. 17, the Admiralty draught of H.M. schooner Musquidobit,
     # late the Baltimore privateer Lynx (Thomas Kemp, Fell's Point, 1812), taken off at
@@ -1094,7 +1093,7 @@ def schooner(out_dir="data/ships"):
             "draught_m": draught,
             "displacement_kg": displacement,
             "gm_m": 1.0,
-            "clr_x_m": -0.4,
+            "clr_x_m": 0.5,
             "lateral_area_m2": round(lwl * draught * 0.78, -1),
             "hull_speed_kn": 11.5,
             "deck_height_m": deck_height,
@@ -1111,8 +1110,12 @@ def schooner(out_dir="data/ships"):
             "gm_m": "3 ft 3 in: judgement; tender (Chapelle p. 104: schooners capsized when "
             "overpressed with sail), heavily ballasted.",
             "clr_x_m": "Rankine (Chapelle p. 159): the middle of the sail base lies 0.05 to "
-            "0.0625 of the base ahead of the centre of lateral area. Kept at -0.4 m: the "
-            "helm the engine gives with this plan is checked in tools/gen_ships.py's report.",
+            "0.0625 of the base (1.6 to 1.7 x LWL) ahead of the centre of lateral area, so "
+            "the geometric centre is about 1.4 m abaft this plan's centre of effort (+1.0 m "
+            "under plain sail). The engine wants its centre of pressure further forward, as "
+            "on the frigate: at +0.5 m she is balanced close-hauled in 15 kn and carries 5 "
+            "deg of weather helm on a beam reach; at -0.4 m (the M1 value) she carried 4 deg "
+            "of lee helm close-hauled. Judgement; package 10 checks truths 2 and 6.",
             "lateral_area_m2": "LWL x draught x 0.78 for a profile that is deep aft only.",
             "hull_speed_kn": "The type's recorded best is 11 to 12 knots; the derived "
             "1.34 sqrt(LWL ft) = 12.4 is too generous. Package 10 may tune within 11 to 12.",
