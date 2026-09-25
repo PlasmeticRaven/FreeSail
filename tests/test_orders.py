@@ -53,6 +53,7 @@ def make(which: str, tack: str = "starboard", refuse: dict[str, str] | None = No
     runner = FakeRunner(refuse)
     ship.extra["evolutions"] = runner
     ship.dyn.apparent_wind_angle = math.radians(40 if tack == "starboard" else -40)
+    ship.dyn.apparent_wind_speed = 8.0  # "to the wind" needs a wind to brace to
     return ship, runner
 
 
@@ -204,7 +205,7 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (F, "reef the fore topsail two reefs", ok(evo="reef_square", params={"reefs": 2})),
     (F, "reef the fore topsail, 2 reefs", ok(evo="reef_square", params={"reefs": 2})),
     (F, "reef the fore topsail, close", ok(evo="reef_square", params={"close": True})),
-    (F, "close reef the fore topsail", no()),  # 'close' is a modifier, not a verb
+    (F, "close reef the fore topsail", ok(evo="reef_square", params={"close": True})),
     (F, "reef the fore topsail four reefs", no(["3 reef bands", "only 3 more"])),
     (F, "take a reef in the spanker", ok(evo="reef_gaff", subjects=["mizzen.spanker"])),
     (F, "reef the jib", no(["no reef bands"])),
@@ -235,7 +236,7 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (
         F,
         "brace the main yard in on the larboard tack",
-        ok(evo="brace", subjects=["main.yard"], params={"target_deg": -15.0}),
+        ok(evo="brace", subjects=["main.yard"], params={"target_deg": 15.0, "tack": "larboard"}),
     ),
     (F, "brace the after yards up on the larboard tack", ok(evo="brace", count=8)),
     (F, "brace the head yards square", ok(evo="brace", count=4)),
@@ -291,7 +292,7 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (F, "haul the spanker peak halyard", no(["already hauled home"])),
     (F, "ease the spanker peak halyard", ok(kind="line.eased", text=["mizzen gaff peak halyard"])),
     (F, "ease the mainsail sheet, lee", ok(kind="line.eased", text=["main course sheet"])),
-    (F, "ease the main sheet", no(["no such part as the main sheet"], UnknownNounError)),
+    (F, "ease the main sheet", no(["Which main sheet", "weather or the lee"])),
     (F, "haul down the jib", no(["already furled"])),  # a take-in synonym
     # -- helm -----------------------------------------------------------------
     (F, "steer south-west by west", ok(kind="helm.order", text=["SW by W (236°)"])),
@@ -413,6 +414,189 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (S, "shorten sail", ok(evo="reef_square", count=1, text=["Shorten sail"])),
     (S, "set the cro'jack", no(["no such part"], UnknownNounError)),
     (S, "splice the mainbrace", no(["not an order this ship understands"])),
+    # -- package 15: the period forms the primer reached for ------------------
+    # squaring, bracing round, to the wind, aback
+    (
+        F,
+        "square the yards",
+        ok(evo="brace", count=12, params={"target_deg": 0.0}, text=["Squared"]),
+    ),
+    (F, "square the after yards", ok(evo="brace", count=8, params={"mode": "square"})),
+    (F, "square the yards sharp up", no(["says how already"])),
+    (F, "lay the head yards square", ok(evo="brace", count=4, params={"target_deg": 0.0})),
+    (
+        F,
+        "brace round the yards",
+        ok(evo="brace", count=12, params={"mode": "sharp up", "tack": "starboard"}, text=["round"]),
+    ),
+    (F, "brace round the yards on the larboard tack", ok(evo="brace", params={"tack": "larboard"})),
+    (F, "brace round the yards square", ok(evo="brace", params={"target_deg": 0.0})),
+    (
+        F,
+        "brace the yards to the wind",
+        ok(evo="brace", count=12, params={"mode": "to the wind"}, text=["12 yards to the wind"]),
+    ),
+    (
+        F,
+        "brace the head yards to the wind",
+        ok(evo="brace", count=4, text=["head yards to the wind"]),
+    ),
+    (
+        F,
+        "back the main topsail",
+        ok(
+            evo="brace",
+            subjects=["main.topsail.yard"],
+            params={"mode": "aback", "tack": "larboard"},
+            text=["Laid the main topsail yard aback"],
+        ),
+    ),
+    (F, "lay the main topsail aback", ok(evo="brace", subjects=["main.topsail.yard"])),
+    (F, "brace the main topsail yard aback", ok(evo="brace", params={"tack": "larboard"})),
+    (F, "brace the head yards sharp aback", ok(evo="brace", count=4, params={"tack": "larboard"})),
+    (F, "back", no(["Back what?"])),
+    (F, "back the spanker", no(["gaff sail", "no yard"])),
+    (S, "square the yards", ok(evo="brace", count=2, params={"target_deg": 0.0})),
+    (S, "back the topsail", ok(evo="brace", subjects=["fore.topsail.yard"])),
+    # the words for taking in, and the sails they suit
+    (F, "haul up the mainsail", no(["already furled"])),
+    (F, "haul up the courses", no(["already furled"])),
+    (F, "haul up the spanker", no(["already furled"])),
+    (F, "brail up the spanker", no(["already furled"])),
+    (F, "clew up the topsails", no(["already furled"])),
+    (F, "clew up the spanker", no(["brailed up, not clewed up", "brail up the mizzen spanker"])),
+    (F, "haul up the topsails", no(["clewed up, not hauled up"])),
+    (F, "haul down the spanker", no(["brailed up, not hauled down"])),
+    (F, "lower the mainsail", no(["hauled up, not lowered"])),
+    (S, "lower the mainsail", no(["already furled"])),
+    (S, "haul up the mainsail", no(["already furled"])),
+    (S, "brail up the foresail", no(["already furled"])),
+    (S, "clew up the mainsail", no(["brailed up, not clewed up"])),
+    (F, "scandalise the spanker", no(["cannot be scandalised", "no state"])),
+    (S, "scandalise the mainsail", no(["cannot be scandalised"])),
+    (S, "scandalize the main", no(["cannot be scandalised"])),
+    (F, "scandalise the fore topsail", no(["no peak to drop"])),
+    (S, "gybe", ok(evo="wear", subjects=["ship"], text=["Gybe", "wear ship"])),
+    (S, "jibe", ok(evo="wear", subjects=["ship"])),
+    (F, "gybe", ok(evo="wear", subjects=["ship"])),
+    # sheets: aft, home, sheet home, plural families, the frigate's main sheet
+    (F, "haul aft the spanker sheet", no(["already hard in"])),
+    (F, "haul the jib sheet aft", no(["Which jib sheet"])),
+    (F, "haul the lee jib sheet aft", no(["already hard in"])),
+    (F, "sheet home the fore topsail", no(["sheeted home already"])),
+    (F, "haul home the topsail sheets", no(["Nothing done", "already hauled home"])),
+    (F, "ease the fore topsail sheets home", no(["'home' and 'aft' belong with 'haul'"])),
+    (
+        F,
+        "ease the fore topsail sheets, both sides",
+        ok(kind="line.eased", text=["starboard fore topsail sheet", "larboard fore topsail sheet"]),
+    ),
+    (
+        F,
+        "ease the fore topsail sheets",
+        ok(kind="line.eased", text=["starboard fore topsail sheet", "larboard fore topsail sheet"]),
+    ),
+    (F, "ease the topsail sheets", ok(kind="line.eased", text=["mizzen topsail sheet"])),
+    (
+        F,
+        "ease the weather fore topsail sheets",
+        ok(kind="line.eased", text=["starboard (weather) fore topsail sheet"]),
+    ),
+    (F, "let go the braces", ok(kind="line.let_go", text=["ran free"])),
+    (F, "haul the fore topsail sheets, both sides", no(["already hauled home"])),
+    (
+        F,
+        "ease the weather main sheet",
+        ok(kind="line.eased", text=["starboard (weather) main course sheet", "nine-tenths"]),
+    ),
+    (
+        F,
+        "ease the main sheets",
+        ok(kind="line.eased", text=["starboard main course sheet", "larboard main course sheet"]),
+    ),
+    (F, "haul the fore tack", no(["Which fore tack"])),
+    (F, "ease the lee fore tack", ok(kind="line.eased", text=["larboard (lee) fore course tack"])),
+    (F, "ease the main bowline, weather", ok(kind="line.eased", text=["main course bowline"])),
+    (
+        F,
+        "ease the fore sheet, lee",
+        ok(kind="line.eased", text=["larboard (lee) fore course sheet"]),
+    ),
+    # the conning words
+    (F, "steady", ok(kind="helm.order", text=["steady"], data={"helm_mode": "heading"})),
+    (F, "steady as she goes", ok(kind="helm.order", text=["steady as she goes", "steady on"])),
+    (F, "very well thus", ok(kind="helm.order", text=["steady on"])),
+    (F, "nothing off", ok(kind="helm.order", text=["nothing off", "full and by"])),
+    (
+        F,
+        "no higher",
+        ok(kind="helm.order", text=["full and by"], data={"helm_mode": "full_and_by"}),
+    ),
+    (F, "meet her", ok(kind="helm.order", text=["meet her", "steady on"])),
+    (
+        F,
+        "right the helm",
+        ok(kind="helm.order", text=["rudder amidships"], data={"helm_mode": "rudder"}),
+    ),
+    (F, "helm amidships", ok(kind="helm.order", text=["amidships"])),
+    (
+        F,
+        "hard a-lee",
+        ok(
+            kind="helm.order",
+            text=["hard a-lee", "to windward", "starboard"],
+            data={"helm_mode": "rudder"},
+        ),
+    ),
+    (F, "helm's a-lee", ok(kind="helm.order", text=["helm's a-lee", "coming up to the wind"])),
+    (F, "hard up", ok(kind="helm.order", text=["hard up", "to leeward", "larboard", "paying off"])),
+    (F, "helm a-weather", ok(kind="helm.order", text=["helm a-weather"])),
+    (F, "up helm", ok(kind="helm.order", text=["paying off"])),
+    (F, "down helm", ok(kind="helm.order", text=["coming up to the wind"])),
+    (F, "bring her by the wind", ok(kind="helm.order", text=["full and by"])),
+    (F, "steer by the wind", ok(kind="helm.order", text=["full and by"])),
+    (F, "luff and touch her", ok(kind="helm.order", text=["luff and touch her", "full and by"])),
+    (F, "come up half a point", ok(kind="helm.order", text=["come up half a point"])),
+    (F, "bear away a point and a half", ok(kind="helm.order", text=["a point and a half"])),
+    (
+        F,
+        "steer two and a half points to starboard",
+        ok(kind="helm.order", text=["two and a half points to starboard"]),
+    ),
+    (F, "steady two points", no(["takes no heading or points"])),
+    # compound objects
+    (F, "set the topsails and topgallants", ok(evo="set_square", count=6)),
+    (F, "set the jib and the spanker", ok(count=2, subjects=["jib", "mizzen.spanker"])),
+    (
+        F,
+        "brace the fore and main yards square",
+        ok(evo="brace", count=8, params={"target_deg": 0.0}),
+    ),
+    (
+        F,
+        "set the fore and main topsails",
+        ok(evo="set_square", subjects=["fore.topsail", "main.topsail"]),
+    ),
+    (
+        F,
+        "haul the weather fore and main braces",
+        ok(
+            kind="line.hauled",
+            text=["starboard (weather) fore brace", "starboard (weather) main brace"],
+        ),
+    ),
+    (S, "set the jib and the spanker", no(["no such part as the spanker"], UnknownNounError)),
+    (S, "set the fore and main sails", ok(evo="set_gaff", subjects=["fore.sail", "main.sail"])),
+    # reefs by the verb
+    (F, "close reef the topsails", ok(evo="reef_square", count=3, params={"close": True})),
+    (F, "double reef the topsails", ok(evo="reef_square", count=3, params={"reefs": 2})),
+    (F, "single reef the fore topsail", ok(evo="reef_square", params={"reefs": 1})),
+    (F, "treble reef the fore topsail", ok(evo="reef_square", params={"reefs": 3})),
+    (F, "double reef the fore topsail, one reef", no(["says how already"])),
+    (F, "take in one reef in the topsails", ok(evo="reef_square", count=3, params={"reefs": 1})),
+    (F, "take in two reefs in the fore topsail", ok(evo="reef_square", params={"reefs": 2})),
+    (F, "shake out the reefs in the topsails", no(["no reef in the fore topsail"])),
+    (F, "furl the topsails two reefs", no(["reefs belongs with"])),
 ]
 
 
@@ -732,11 +916,17 @@ def test_brace_targets_are_signed_by_the_tack_and_limited_by_the_yard():
         ship.spars["fore.yard"].brace_limit
     )
     runner.started.clear()
+    # brace.yaml reads target_deg unsigned and takes the sign from the tack;
+    # target_angle carries the signed value for anything that wants it
     orders.handle(ship, "brace the fore yards sharp up on the larboard tack")
-    assert all(p["target_deg"] < 0 for _, _, p in runner.started)
+    assert all(p["target_deg"] > 0 and p["tack"] == "larboard" for _, _, p in runner.started)
+    assert all(p["target_angle"] < 0 for _, _, p in runner.started)
     runner.started.clear()
     orders.handle(ship, "brace the fore yards up on the larboard tack")
-    assert all(p["target_deg"] == -30.0 for _, _, p in runner.started)
+    assert all(p["target_deg"] == 30.0 and p["tack"] == "larboard" for _, _, p in runner.started)
+    assert all(
+        p["target_angle"] == pytest.approx(-units.deg_to_rad(30)) for _, _, p in runner.started
+    )
     runner.started.clear()
     # no tack given: the current one (starboard here)
     orders.handle(ship, "brace the main yard in")
@@ -761,6 +951,225 @@ def test_brace_skips_a_wrecked_or_sent_down_yard():
     _, log, data = orders.handle(ship, "brace the fore yards square")
     assert [s for _, s, _ in runner.started] == ["fore.yard", "fore.topsail.yard"]
     assert "fore royal yard is sent down" in log and "carried away" in log
+
+
+def test_back_braces_the_yard_for_the_other_tack():
+    """Aback is sharp up for the other tack, as heave to does (scripts.py)."""
+    ship, runner = make("frigate", tack="starboard")
+    ship.sails["main.topsail"].state = SailState.SET
+    _, log, data = orders.handle(ship, "back the main topsail")
+    yard = ship.spars["main.topsail.yard"]
+    assert runner.started == [
+        (
+            "brace",
+            "main.topsail.yard",
+            {
+                "target_deg": round(math.degrees(yard.brace_limit), 2),
+                "target_angle": pytest.approx(-yard.brace_limit),
+                "mode": "aback",
+                "tack": "larboard",
+            },
+        )
+    ]
+    assert "the main topsail to the mast" in log and data["tack"] == "larboard"
+    notes = ship.drain_notes()
+    assert notes[-1][1] == "yard.laid_aback"
+    assert notes[-1][2] == (
+        "Laid the main topsail yard aback, braced up for the larboard tack; "
+        "the main topsail to the mast."
+    )
+    ship, runner = make("frigate", tack="larboard")
+    orders.handle(ship, "lay the main topsail aback")
+    assert runner.started[0][2]["target_angle"] == pytest.approx(yard.brace_limit)
+    # a tack said is the tack laid aback from
+    ship, runner = make("frigate", tack="larboard")
+    orders.handle(ship, "brace the head yards aback on the larboard tack")
+    assert all(p["tack"] == "starboard" and p["target_angle"] > 0 for _, _, p in runner.started)
+
+
+def test_brace_to_the_wind_trims_only_the_yards_named():
+    ship, runner = make("frigate", tack="starboard")
+    kind, log, data = orders.handle(ship, "brace the head yards to the wind")
+    assert kind == "evolution.started"
+    assert {s for _, s, _ in runner.started} == set(ship.groups["head yards"])
+    assert all(p["mode"] == "to the wind" and p["target_angle"] > 0 for _, _, p in runner.started)
+    assert data["trimmed_sheets"] == [] and data["mode"] == "to the wind"
+
+
+def test_plural_sided_lines_mean_both_sides_unless_a_side_is_said():
+    ship, _ = make("frigate", tack="larboard")
+    _, log, data = orders.handle(ship, "ease the fore topsail sheets")
+    assert data["subjects"] == ["fore.topsail.sheet.starboard", "fore.topsail.sheet.larboard"]
+    assert data["side"] == "both"
+    _, log, data = orders.handle(ship, "ease the lee fore topsail sheets")
+    assert data["subjects"] == ["fore.topsail.sheet.starboard"]
+    _, log, data = orders.handle(ship, "ease the topsail sheets")
+    assert len(data["subjects"]) == 6  # every topsail sheet on three masts
+    # the frigate's main sheet is the main course's, a sided family
+    _, log, data = orders.handle(ship, "ease the weather main sheet")
+    assert data["subjects"] == ["main.course.sheet.larboard"]
+    assert "larboard (weather) main course sheet" in log
+    with pytest.raises(OrderError, match="Which main sheet"):
+        orders.handle(ship, "haul the main sheet")
+
+
+def test_a_line_order_works_the_lines_it_can_and_reports_the_rest():
+    ship, _ = make("frigate")
+    ship.lines["fore.topsail.sheet.starboard"].hauled = 0.5
+    kind, log, data = orders.handle(ship, "haul home the fore topsail sheets")
+    assert kind == "line.hauled"
+    assert data["subjects"] == ["fore.topsail.sheet.starboard"]
+    assert ship.lines["fore.topsail.sheet.starboard"].hauled == 1.0
+    assert "Hauled the starboard fore topsail sheet home" in log
+    assert "Not done: the larboard fore topsail sheet is already hauled home" in log
+
+
+def test_haul_aft_and_home_take_the_line_all_the_way():
+    ship, _ = make("frigate")
+    spanker = ship.sails["mizzen.spanker"]
+    orders.handle(ship, "ease the spanker sheet three fathoms")
+    assert spanker.sheet_angle == pytest.approx(units.deg_to_rad(15))
+    _, log, _ = orders.handle(ship, "haul aft the spanker sheet")
+    assert spanker.sheet_angle == 0.0 and "flat aft" in log and "amidships" in log
+    orders.handle(ship, "ease the spanker sheet")
+    orders.handle(ship, "haul the spanker sheet aft")
+    assert spanker.sheet_angle == 0.0
+    halyard = ship.lines["fore.topsail.yard.halyard"]
+    orders.handle(ship, "ease the fore topsail halyard four fathoms")
+    assert halyard.hauled == pytest.approx(0.6)
+    orders.handle(ship, "haul the fore topsail halyard home")
+    assert halyard.hauled == 1.0
+    yard = ship.spars["main.yard"]
+    orders.handle(ship, "haul the larboard main brace home")
+    assert yard.brace_angle == pytest.approx(yard.brace_limit)
+
+
+def test_sheet_home_hauls_every_sheet_of_the_sail():
+    ship, _ = make("frigate")
+    for side in ("starboard", "larboard"):
+        ship.lines[f"fore.topsail.sheet.{side}"].hauled = 0.3
+    ship.lines["fore.topsail.sheet.larboard"].state = LineState.FREE
+    kind, log, data = orders.handle(ship, "sheet home the fore topsail")
+    assert kind == "line.hauled" and log == "Sheeted home the fore topsail."
+    for side in ("starboard", "larboard"):
+        line = ship.lines[f"fore.topsail.sheet.{side}"]
+        assert line.hauled == 1.0 and line.state is LineState.BELAYED
+    with pytest.raises(OrderError, match="sheeted home already"):
+        orders.handle(ship, "sheet home the fore topsail")
+    # a fore-and-aft sail: the sheet hauled flat aft
+    spanker = ship.sails["mizzen.spanker"]
+    spanker.sheet_angle = units.deg_to_rad(20)
+    _, log, _ = orders.handle(ship, "sheet home the spanker")
+    assert spanker.sheet_angle == 0.0 and "flat aft" in log
+    with pytest.raises(OrderError, match="You sheet home sails"):
+        orders.handle(ship, "sheet home the fore topsail sheet, starboard")
+
+
+def test_take_in_words_start_the_take_in_when_they_suit_the_sail():
+    ship, runner = make("frigate")
+    for sid in ("main.course", "mizzen.spanker", "fore.topsail", "jib"):
+        ship.sails[sid].state = SailState.SET
+    orders.handle(ship, "haul up the mainsail")
+    orders.handle(ship, "brail up the spanker")
+    orders.handle(ship, "clew up the fore topsail")
+    orders.handle(ship, "haul down the jib")
+    assert [(e, s) for e, s, _ in runner.started] == [
+        ("take_in_square", "main.course"),
+        ("take_in_gaff", "mizzen.spanker"),
+        ("take_in_square", "fore.topsail"),
+        ("take_in_jibheaded", "jib"),
+    ]
+    ship, runner = make("schooner")
+    ship.sails["main.sail"].state = SailState.SET
+    _, log, _ = orders.handle(ship, "lower the mainsail")
+    assert runner.started == [("take_in_gaff", "main.sail", {})]
+    with pytest.raises(OrderError, match="cannot be scandalised"):
+        orders.handle(ship, "scandalise the mainsail")
+    assert len(runner.started) == 1
+
+
+def test_take_in_with_a_count_of_reefs_is_a_reef():
+    ship, runner = make("frigate")
+    ship.sails["fore.topsail"].state = SailState.SET
+    orders.handle(ship, "take in one reef in the fore topsail")
+    orders.handle(ship, "take in two reefs in the fore topsail")
+    assert runner.started == [
+        ("reef_square", "fore.topsail", {"reefs": 1}),
+        ("reef_square", "fore.topsail", {"reefs": 2}),
+    ]
+    o = parse(ship, "take in one reef in the topsails")
+    assert o.verb == "reef" and o.modifiers == {"reefs": 1}
+
+
+def test_shake_out_the_reefs_takes_them_all():
+    ship, runner = make("frigate")
+    sail = ship.sails["fore.topsail"]
+    sail.state = SailState.SET
+    sail.reefs = 2
+    orders.handle(ship, "shake out the reefs in the fore topsail")
+    assert runner.started[-1] == ("shake_out_square", "fore.topsail", {"reefs": 2, "close": True})
+    orders.handle(ship, "shake the reefs out of the fore topsail")
+    assert runner.started[-1][2] == {"reefs": 2, "close": True}
+    orders.handle(ship, "shake out the reef in the fore topsail")
+    assert runner.started[-1][2] == {"reefs": 1}
+
+
+def test_compound_objects_join_their_parts():
+    ship, runner = make("frigate")
+    orders.handle(ship, "set the topsails and topgallants")
+    assert [s for _, s, _ in runner.started] == ship.groups["topsails"] + ship.groups["topgallants"]
+    runner.started.clear()
+    _, log, data = orders.handle(ship, "brace the fore and main yards square")
+    assert {s for _, s, _ in runner.started} == set(
+        ship.groups["fore yards"] + ship.groups["main yards"]
+    )
+    assert data["object"] == "fore yards and main yards"
+    o = parse(ship, "set the fore and main topsails")
+    assert o.object == "fore and main topsails"
+    with pytest.raises(UnknownNounError, match="no such part as the spanker"):
+        orders.handle(make("schooner")[0], "set the jib and the spanker")
+
+
+def test_half_points_are_kept():
+    ship, _ = make("frigate", tack="starboard")
+    ship.dyn.heading = units.deg_to_rad(90)
+    ship.dyn.target_heading = ship.dyn.heading
+    _, log, data = orders.handle(ship, "come up half a point")
+    assert data["points"] == 0.5 and "come up half a point" in log
+    assert ship.dyn.target_heading == pytest.approx(units.deg_to_rad(90 + 5.625))
+    orders.handle(ship, "bear away a point and a half")
+    assert ship.dyn.target_heading == pytest.approx(units.deg_to_rad(90 + 5.625 - 16.875))
+    orders.handle(ship, "steer two and a half points to starboard")
+    assert ship.dyn.target_heading == pytest.approx(units.deg_to_rad(90 - 11.25 + 28.125))
+    assert parse(ship, "come up a half point").modifiers["points"] == 0.5
+
+
+def test_conning_words_set_the_helm_modes():
+    ship, _ = make("frigate", tack="starboard")
+    ship.dyn.heading = units.deg_to_rad(293)
+    orders.handle(ship, "hard a-lee")
+    assert ship.dyn.helm_mode is HelmMode.RUDDER
+    assert ship.dyn.target_rudder == pytest.approx(
+        units.deg_to_rad(35)
+    )  # to starboard: to windward
+    orders.handle(ship, "hard up")
+    assert ship.dyn.target_rudder == pytest.approx(units.deg_to_rad(-35))
+    orders.handle(ship, "right the helm")
+    assert ship.dyn.helm_mode is HelmMode.RUDDER and ship.dyn.target_rudder == 0.0
+    ship.dyn.heading = units.deg_to_rad(300)
+    _, log, _ = orders.handle(ship, "steady")
+    assert ship.dyn.helm_mode is HelmMode.HEADING
+    assert ship.dyn.target_heading == pytest.approx(units.deg_to_rad(300))
+    assert ship.dyn.steady is False and "NW by W (300°)" in log
+    ship.dyn.heading = units.deg_to_rad(310)
+    orders.handle(ship, "meet her")
+    assert ship.dyn.target_heading == pytest.approx(units.deg_to_rad(310))
+    orders.handle(ship, "nothing off")
+    assert ship.dyn.helm_mode is HelmMode.FULL_AND_BY
+    # on the larboard tack a-lee is to larboard
+    ship, _ = make("frigate", tack="larboard")
+    orders.handle(ship, "helm's a-lee")
+    assert ship.dyn.target_rudder == pytest.approx(units.deg_to_rad(-35))
 
 
 def test_ship_evolutions_use_the_ship_as_subject():

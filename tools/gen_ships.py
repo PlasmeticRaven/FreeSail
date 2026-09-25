@@ -1014,6 +1014,14 @@ def frigate(out_dir="data/ships"):
             b.group(
                 f"{name} {level} studdingsails", [f"{name}.{level}.studdingsail.{s}" for s in SIDES]
             )
+    # WP15: the courses' lines by their period names (Falconer: main-sheet,
+    # main-tack, main-bowline; fore-sheet, fore-tack, fore-bowline). Each is
+    # a group of the two sided lines, and the singular alias to it is read
+    # by the orders parser as a sided family ("haul the weather main sheet").
+    for name in ("fore", "main"):
+        for cls in ("sheet", "tack", "bowline"):
+            b.group(f"{name} {cls}s", [f"{name}.course.{cls}.{s}" for s in SIDES])
+            b.alias(f"{name} {cls}", f"{name} {cls}s")
     b.dump(
         os.path.join(out_dir, "frigate-36.yaml"),
         "# Reference ship: Amazon, a 36-gun 18-pounder frigate of the Amazon class (Rule, 1795).\n"

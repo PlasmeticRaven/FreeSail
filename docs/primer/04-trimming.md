@@ -15,6 +15,8 @@ The braces swing a yard round in the horizontal (Falconer, *Brace*). The order n
 
 "On the starboard tack" or "on the larboard tack" says which yardarm goes forward: braced up for the starboard tack the starboard yardarm points forward and the larboard aft, so that the sail faces a wind from starboard. Leave it out and the yards are braced for the tack she is on. Without an object every yard is braced; name a yard, a mast's yards, the *head yards* or the *after yards* to brace some.
 
+Three more forms are Luce's. **Square the yards** (or *lay the head yards square*) is `brace square`. **Brace round** with nothing else said swings the yards sharp up for the tack the wind is now on, which is what it means after a tack or a wear. **Brace the yards to the wind** braces each yard named to the best angle for the present apparent wind, as `trim the yards` (below) does for all of them.
+
 ```orders frigate
 brace sharp up on the starboard tack
 brace the yards square
@@ -24,6 +26,13 @@ brace the main yard in on the larboard tack
 brace the fore topsail sharp up
 brace round the cro'jack yard square
 brace by the lifts
+square the yards
+square the after yards
+lay the head yards square
+brace round the yards
+brace round the head yards on the larboard tack
+brace the yards to the wind
+brace the fore and main yards to the wind
 # rejected: brace the fore yards
 # rejected: brace the mizzen gaff sharp up
 # rejected: brace the spanker square
@@ -41,7 +50,30 @@ Bracing takes the braces' hands three quarters of a minute per yard, and every y
 * Morning watch (04:06)  Braced the fore royal yard; 62° from square.
 ```
 
-The refusals: "Brace them how? Say 'sharp up', 'up', 'in' or 'square'"; "The mizzen gaff is a gaff, not a yard; the gaff sail on it is not braced; it is trimmed with its sheet and vangs"; "The spanker is a gaff sail; it has no yard to brace. Trim it with its sheet."
+The refusals: "Brace them how? Say 'sharp up', 'up', 'in', 'square', 'aback' or 'to the wind'"; "The mizzen gaff is a gaff, not a yard; the gaff sail on it is not braced; it is trimmed with its sheet and vangs"; "The spanker is a gaff sail; it has no yard to brace. Trim it with its sheet."
+
+### Laying a yard aback
+
+A yard braced for the *other* tack has its sail pressed back against the mast, *aback*: no drive, and the ship checked or pushed astern. That is how she is hove to (chapter 5), and it is a thing you may order for one yard at a time: **back the main topsail**, *lay the main topsail aback*, *brace the main topsail yard aback*, *brace the head yards sharp aback* (Luce 1866, ch. XXIV, 'Box Hauling'; ch. XXVI, 'To heave to'). Name the yard or the square sail on it; a tack said is the tack she is taken aback *from*.
+
+```orders frigate plain-sail
+back the main topsail
+lay the main topsail aback
+brace the main topsail yard aback
+brace the head yards sharp aback
+# rejected: back
+# rejected: back the spanker
+```
+
+```
+  Morning watch (04:21)  Order: back the main topsail.
+  Morning watch (04:21)  Man the main topsail yard braces.
+  Morning watch (04:21)  Laid the main topsail yard aback, braced up for the larboard tack; the main topsail to the mast.
+* Morning watch (04:21)  Main topsail taken aback.
+* Morning watch (04:22)  Braced the main topsail yard; 58° from square.
+```
+
+To fill it again, `brace the main topsail sharp up` for the tack she is on. The refusals: "Back what? Name a yard or a square sail, such as the main topsail"; the spanker "is a gaff sail; it has no yard to brace."
 
 ### How sharp, and which yards sharper
 
@@ -77,13 +109,28 @@ ease the spanker sheet a fathom
 ease the spanker sheet two fathoms
 haul the spanker sheet
 haul in the spanker sheet handsomely
+haul aft the spanker sheet
+# rejected: haul the spanker sheet aft
 ease the jib sheet, lee
+haul the jib sheet aft, lee
 ease the fore topmast staysail sheet, lee
 ```
 
-"The mizzen spanker sheet is already hard in" is the first refusal: the sheet was hauled flat when the sail was set. The second line puts the boom 5° off the centreline, the third 15°, the fourth back to 10°.
+"The mizzen spanker sheet is already hard in" is the first refusal: the sheet was hauled flat when the sail was set. The second line puts the boom 5° off the centreline, the third 15°, the fourth back to 10°. **Haul aft** (or *aft* after the sheet's name) hauls it all the way: "Hauled the mizzen spanker sheet flat aft; the mizzen spanker now amidships", and a sheet already flat is refused a second time.
 
-A square sail's sheets, tacks and bowlines are hauled home when it is set and stay there; ease one and the log counts it off in tenths ("Eased the larboard (lee) main course sheet; now nine-tenths hauled"). Their trim is the yard's business.
+A square sail's sheets, tacks and bowlines are hauled home when it is set and stay there; ease one and the log counts it off in tenths ("Eased the larboard (lee) main course sheet; now nine-tenths hauled"). **Sheet home** the sail, or **haul home** its sheets, and they are hauled home again and belayed; the plural names both sheets at once. Their trim is the yard's business.
+
+```orders frigate plain-sail
+ease the fore topsail sheets
+ease the lee main sheet two fathoms
+sheet home the fore topsail
+haul the main sheet home, lee
+ease the topsail sheets
+haul home the topsail sheets
+# rejected: sheet home the fore topsail
+```
+
+The last refusal: "The fore topsail is sheeted home already."
 
 Between your orders **the watch on deck tends the fore-and-aft sheets for you**: each set jib, staysail and gaff sail is sheeted to the apparent wind as she comes up or falls off, at about a degree a second (`freesail/evolutions/trim.py`). Square sails are never touched without an order. So after a tack the spanker and jib will find their trim by themselves, but the yards will sit where the tack left them until you brace.
 
@@ -97,7 +144,7 @@ trim the sheets
 trim sails
 ```
 
-`trim the yards` is what Luce means by "trim the yards, haul taut the lifts and braces" after a tack or a wear; `trim the sheets` is "trim aft the head sheets"; `trim sails` is both. Until the order lands, this block is not checked by the test and the orders above are refused as unknown; use `brace` and the sheets by hand.
+`trim the yards` is what Luce means by "trim the yards, haul taut the lifts and braces" after a tack or a wear; `trim the sheets` is "trim aft the head sheets"; `trim sails` is both. `brace the yards to the wind` is `trim the yards` by another name, and takes the yards you name.
 
 ## Weather helm and lee helm
 
@@ -126,6 +173,7 @@ ease the spanker sheet two fathoms
 set the flying jib
 reef the mizzen topsail, one reef
 haul down the flying jib
+haul aft the spanker sheet
 brace the after yards sharp up on the starboard tack
 ```
 

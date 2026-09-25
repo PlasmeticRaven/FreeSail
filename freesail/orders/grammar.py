@@ -2,27 +2,36 @@
 
     order       := verb_phrase [ object ] { modifier } [ "," side ]
     object      := [ "the" ] [ side_word ] noun [ side_word ]
-    modifier    := "sharp up" | "square" | "in" | "up"
+    modifier    := "sharp up" | "square" | "in" | "up" | "aback" | "to the wind"
                  | "on the" tack_word "tack"
-                 | count "reef" | count "reefs" | "close"
+                 | count "reef" | count "reefs" | "close" | "reefs"
                  | "a fathom" | count "fathoms" | "a little" | "handsomely" | "roundly"
+                 | "home" | "aft"
                  | "to" heading | heading
     heading     := number ["degrees"] | compass-point
                  | count "point"/"points" ("up" | "off" | "to starboard" | "to larboard")
+    count       := number | "half" ["a"] | "a half" | number "and a half"
+    object      := [ "the" ] [ side_word ] noun { "and" [ "the" ] noun } [ side_word ]
 
 How the parser reads a line:
 
 1. It lower-cases the text, turns hyphens into spaces and drops punctuation
    other than commas and apostrophes.
 2. It matches the longest verb phrase at the start ("take in", "keep her
-   full", "brace"), including synonyms from `vocabulary.yaml`.
+   full", "brace"), including synonyms from `vocabulary.yaml`. A phrase may
+   carry a modifier in itself ("close reef", "haul aft"; `phrase_modifiers`
+   in the vocabulary), which is merged with the ones said after it.
 3. For a verb that takes a thing, it finds the longest run of words after
    the verb that is a noun of this ship ("fore topsail", "main brace",
    "royals"), with an optional "the" before it and an optional side word
    before or after it ("weather main brace", "main brace, starboard").
+   Nouns joined by "and" make a compound object ("the topsails and
+   topgallants", "the fore and main yards"; `resolve.compound_span`).
 4. Everything left is modifiers, read left to right. A word that is neither
    a modifier nor part of the noun is an error naming the word and the
    nearest words that would have been understood.
+5. "Take in" with a number of reefs ("take in one reef in the topsails") is
+   a reef, not a taking in.
 
 The parser does not decide what the order *means* for the ship; that is
 `verbs.py`. It only produces an `Order`.
@@ -36,7 +45,7 @@ from typing import Any
 from freesail import units
 from freesail.orders import errors
 from freesail.orders.errors import OrderError
-from freesail.orders.resolve import noun_table
+from freesail.orders.resolve import compound_span, noun_table
 from freesail.orders.vocabulary import (
     VerbSpec,
     Vocabulary,
@@ -52,16 +61,18 @@ class Order:
     """A parsed order. `modifiers` holds whatever qualifiers were given.
 
     Modifier keys that may appear:
-      brace_mode   "sharp up" | "up" | "in" | "square" | "by the lifts"
+      brace_mode   "sharp up" | "up" | "in" | "square" | "by the lifts" | "aback" | "to the wind"
+      round        True                             "brace round" with no mode said
       tack         "starboard" | "larboard"        from "on the X tack"
       reefs        int                              "two reefs"
       close        True                             "close reefed"
       fathoms      float                            "a fathom", "two fathoms"
       a_little     True
+      home         True                             "haul aft", "haul ... home"
       manner       "handsomely" | "roundly" | ...
       heading      float, radians clockwise from north (absolute)
       heading_text what was said for it, for the log
-      points       float                            "two points"
+      points       float                            "two points", "half a point"
       direction    "up" | "off" | "starboard" | "larboard"
     """
 
@@ -119,6 +130,14 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
                 f"Two sides were given ('{side_word}' and '{side_from_mods}'); say one."
             )
         side_word = side_from_mods
+    for k, v in vocab.phrase_modifiers.get(verb_phrase, {}).items():
+        if k in mods and mods[k] != v:
+            raise OrderError(
+                f"'{verb_phrase}' says how already; '{_said(k, mods[k])}' contradicts it."
+            )
+        mods[k] = v
+    if verb == "take in" and ("reefs" in mods or "close" in mods):
+        verb = "reef"  # "take in one reef in the topsails" is a reef, not a taking in
     return Order(
         text=norm.replace(" , ", ", "),
         verb=verb,
@@ -134,11 +153,23 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
 # ---------------------------------------------------------------------------
 
 
+def _said(key: str, value: Any) -> str:
+    """The words a modifier stands for, for a sentence about it."""
+    if key == "reefs":
+        return f"{value:g} reef{'s' if value != 1 else ''}"
+    if key == "close":
+        return "close"
+    if key == "home":
+        return "home"
+    return str(value)
+
+
 def _match_verb(words: list[str], vocab: Vocabulary) -> tuple[str, str]:
     """The longest verb phrase at the start of the words, and its canonical verb."""
+    keyed = [w.replace("'", "") for w in words]  # "helm's a-lee" is the phrase "helms a lee"
     for phrase in vocab.verb_phrases:
         pw = phrase.split()
-        if words[: len(pw)] == pw:
+        if keyed[: len(pw)] == pw:
             return phrase, vocab.phrase_to_verb[phrase]
     raise errors.unknown_verb(" ".join(words), vocab.verb_names)
 
@@ -219,25 +250,33 @@ def _noun_at(
     if not ws:
         return None
     stop = _first_modifier_index(ws, vocab)
-    for n in range(len(ws), 0, -1):
-        phrase = " ".join(ws[:n])
-        noun = table.lookup(phrase)
-        if noun is None:
-            continue
-        rest = ws[n:]
-        if rest and _side_of_word(rest[0], vocab) and not (len(rest) > 1 and rest[1] == "tack"):
-            if side_word is not None and _side_of_word(rest[0], vocab) != side_word:
-                raise OrderError(f"Two sides were given ('{side_word}' and '{rest[0]}'); say one.")
-            side_word = _side_of_word(rest[0], vocab)
-            rest = rest[1:]
-        if rest and n < stop:
-            # The noun matched short and a word that is no modifier follows:
-            # "gaff topsail" on a ship with a gaff but no gaff topsail. The
-            # captain meant the longer phrase, and the ship has no such part;
-            # the suggestions will show the nearest names it does have.
-            raise errors.unknown_noun(" ".join(ws[:stop]), verb, table.names)
-        return phrase, side_word, rest
-    return None
+    span = compound_span(table, ws)
+    if span is None:
+        return None
+    n = span[0]
+    phrase = " ".join(ws[:n])  # as said; resolve() reads the compound again
+    rest = ws[n:]
+    if rest and _side_of_word(rest[0], vocab) and not (len(rest) > 1 and rest[1] == "tack"):
+        if side_word is not None and _side_of_word(rest[0], vocab) != side_word:
+            raise OrderError(f"Two sides were given ('{side_word}' and '{rest[0]}'); say one.")
+        side_word = _side_of_word(rest[0], vocab)
+        rest = rest[1:]
+    if rest and rest[0] == "and" and len(rest) > 1:
+        # "the jib and the spanker" on a ship with no spanker: the part after
+        # 'and' is the one that is missing.
+        after = strip_article(rest[1:])
+        raise errors.unknown_noun(
+            " ".join(after[: _first_modifier_index(after, vocab) or len(after)]),
+            verb,
+            table.names,
+        )
+    if rest and n < stop:
+        # The noun matched short and a word that is no modifier follows:
+        # "gaff topsail" on a ship with a gaff but no gaff topsail. The
+        # captain meant the longer phrase, and the ship has no such part;
+        # the suggestions will show the nearest names it does have.
+        raise errors.unknown_noun(" ".join(ws[:stop]), verb, table.names)
+    return phrase, side_word, rest
 
 
 def _examples(ship: Ship, kind: str) -> str:
@@ -273,6 +312,7 @@ def _modifier_words(vocab: Vocabulary) -> set[str]:
         vocab.a_little,
         vocab.reef_close,
         vocab.tack_phrase,
+        vocab.haul_home,
     ):
         for phrase in seq:
             out.update(phrase.split())
@@ -306,6 +346,31 @@ def _count(word: str, vocab: Vocabulary) -> float | None:
     except ValueError:
         pass
     return vocab.numbers.get(word)
+
+
+def _count_at(words: list[str], i: int, vocab: Vocabulary) -> tuple[float, int] | None:
+    """A count starting at words[i], with halves: (value, words used) or None.
+
+    "two", "half a" (point), "a half" (point), "two and a half" (points).
+    "A point and a half" is read by the caller after the unit.
+    """
+    w = words[i]
+    nxt = words[i + 1] if i + 1 < len(words) else ""
+    if w == "half":
+        return 0.5, 2 if nxt in ("a", "an") else 1
+    c = _count(w, vocab)
+    if c is None:
+        return None
+    if w in ("a", "an") and nxt == "half":
+        return 0.5, 2
+    if words[i + 1 : i + 4] == ["and", "a", "half"]:
+        return c + 0.5, 4
+    return c, 1
+
+
+def _and_a_half(words: list[str], j: int) -> int:
+    """3 when 'and a half' starts at words[j], else 0."""
+    return 3 if words[j : j + 3] == ["and", "a", "half"] else 0
 
 
 def _starts_with(words: list[str], i: int, phrase: str) -> bool:
@@ -361,6 +426,13 @@ def _parse_modifiers(
             i += len(bm.split())
             continue
 
+        # "home", "aft", "flat aft": all the way in
+        hh = _longest_at(words, i, vocab.haul_home)
+        if hh:
+            mods["home"] = True
+            i += len(hh.split())
+            continue
+
         # "close", "close reefed"
         rc = _longest_at(words, i, vocab.reef_close)
         if rc:
@@ -379,21 +451,23 @@ def _parse_modifiers(
             i += 1
             continue
 
-        # counted things: "two reefs", "a fathom", "three points to starboard"
-        c = _count(w, vocab)
-        if c is not None and i + 1 < n:
-            unit = words[i + 1]
+        # counted things: "two reefs", "a fathom", "three points to starboard",
+        # "half a point", "a point and a half"
+        counted = _count_at(words, i, vocab)
+        c, used = counted if counted else (None, 0)
+        if c is not None and i + used < n:
+            unit = words[i + used]
             if unit in ("reef", "reefs"):
                 mods["reefs"] = int(c)
-                i += 2
+                i += used + 1
                 continue
             if unit in ("fathom", "fathoms"):
-                mods["fathoms"] = c
-                i += 2
+                mods["fathoms"] = c + 0.5 * bool(_and_a_half(words, i + used + 1))
+                i += used + 1 + _and_a_half(words, i + used + 1)
                 continue
             if unit in ("point", "points"):
-                mods["points"] = c
-                i += 2
+                mods["points"] = c + 0.5 * bool(_and_a_half(words, i + used + 1))
+                i += used + 1 + _and_a_half(words, i + used + 1)
                 d = _longest_at(words, i, vocab.point_directions)
                 if d:
                     mods["direction"] = vocab.point_directions[d]
@@ -402,9 +476,13 @@ def _parse_modifiers(
             if unit in ("degrees", "degree"):
                 mods["heading"] = units.wrap_2pi(units.deg_to_rad(c))
                 mods["heading_text"] = f"{c:g} degrees"
-                i += 2
+                i += used + 1
                 continue
-        if w in ("reef", "reefs") and "reefs" not in mods:
+        if w == "reefs" and "reefs" not in mods:
+            mods["close"] = True  # "shake out the reefs": all of them
+            i += 1
+            continue
+        if w == "reef" and "reefs" not in mods:
             mods["reefs"] = 1  # "reef the topsail, reef" is odd, but harmless
             i += 1
             continue
@@ -421,10 +499,10 @@ def _parse_modifiers(
             i += skip_to + used
             continue
 
-        # a bare number: "come up two" (but not a stray "a")
+        # a bare number: "come up two", "come up half" (but not a stray "a")
         if c is not None and w not in ("a", "an"):
             mods["points"] = c
-            i += 1
+            i += used
             continue
 
         # a side word on its own (after a comma, usually)
