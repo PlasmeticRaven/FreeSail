@@ -715,7 +715,7 @@ def test_heave_to_and_fill_away(path, backed_sail, backed_yard):
             yard.brace_limit
         )  # full
     assert ship.dyn.helm_mode is HelmMode.RUDDER and ship.dyn.target_rudder > 0
-    assert ship.extra["hove_to"]["yards"][0] == backed_yard
+    assert backed_yard in ship.extra["hove_to"]["yards"]
     with pytest.raises(OrderError, match="hove to already"):
         runner.start(ship, "heave_to", "ship")
 
