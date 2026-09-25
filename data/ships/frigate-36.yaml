@@ -42,6 +42,7 @@ spars:
 - id: fore.mast
   class: mast
   x_m: 14.0
+  rake_deg: 1.5
   height_m: 19.8
   rating_kn: 544.9
 # fore topmast: 47 ft (Luce: 3/5 of the main mast), 34 ft of it above the lower cap. Provisional (truth 9), see gen_ships.py. Rating: fore.topsail, fore.topgallant, fore.royal, fore.topmast_staysail, jib, flying_jib in 40 kn -> 227.1 kN.
@@ -98,6 +99,7 @@ spars:
 - id: main.mast
   class: mast
   x_m: -2.0
+  rake_deg: 2.5
   height_m: 22.5
   rating_kn: 508.4
 # main topmast: 53 ft (Luce: 3/5 of the main mast), 38 ft of it above the lower cap. Provisional (truth 9), see gen_ships.py. Rating: main.topsail, main.topgallant, main.royal, main.topmast_staysail in 40 kn -> 191.4 kN.
@@ -154,6 +156,7 @@ spars:
 - id: mizzen.mast
   class: mast
   x_m: -16.0
+  rake_deg: 4.5
   height_m: 19.5
   rating_kn: 260.3
 # mizzen topmast: 38 ft (Luce: 3/5 of the main mast), 25 ft of it above the lower cap. Provisional (truth 9), see gen_ships.py. Rating: mizzen.topsail, mizzen.topgallant, mizzen.royal in 40 kn -> 78.3 kN.
@@ -328,7 +331,7 @@ sails:
   yard: fore.yard
   area_m2: 181
   reef_bands: 1
-  x_m: 14.0
+  x_m: 13.7
   centre_height_m: 12.8
   cloth_rating_kn: 162.9
 # fore topsail: 209 m2 between its yard and the yardarms below (head 0.82 of the yard); cloth 0.90 kN/m2.
@@ -337,7 +340,7 @@ sails:
   yard: fore.topsail.yard
   area_m2: 209
   reef_bands: 3
-  x_m: 14.0
+  x_m: 13.4
   centre_height_m: 23.3
   cloth_rating_kn: 188.1
 # fore topgallant: 73 m2 between its yard and the yardarms below (head 0.89 of the yard); cloth 0.30 kN/m2.
@@ -346,7 +349,7 @@ sails:
   yard: fore.topgallant.yard
   area_m2: 73
   reef_bands: 0
-  x_m: 14.0
+  x_m: 13.2
   centre_height_m: 32.6
   cloth_rating_kn: 21.9
 # fore royal: 35 m2 between its yard and the yardarms below (head 0.89 of the yard); cloth 0.25 kN/m2.
@@ -355,7 +358,7 @@ sails:
   yard: fore.royal.yard
   area_m2: 35
   reef_bands: 0
-  x_m: 14.0
+  x_m: 13.1
   centre_height_m: 37.9
   cloth_rating_kn: 8.8
 # main course: 223 m2 between its yard and the yardarms below (head 0.90 of the yard); cloth 0.90 kN/m2.
@@ -364,7 +367,7 @@ sails:
   yard: main.yard
   area_m2: 223
   reef_bands: 1
-  x_m: -2.0
+  x_m: -2.6
   centre_height_m: 14.6
   cloth_rating_kn: 200.7
 # main topsail: 257 m2 between its yard and the yardarms below (head 0.82 of the yard); cloth 0.90 kN/m2.
@@ -373,7 +376,7 @@ sails:
   yard: main.topsail.yard
   area_m2: 257
   reef_bands: 3
-  x_m: -2.0
+  x_m: -3.1
   centre_height_m: 26.2
   cloth_rating_kn: 231.3
 # main topgallant: 90 m2 between its yard and the yardarms below (head 0.89 of the yard); cloth 0.30 kN/m2.
@@ -382,7 +385,7 @@ sails:
   yard: main.topgallant.yard
   area_m2: 90
   reef_bands: 0
-  x_m: -2.0
+  x_m: -3.5
   centre_height_m: 36.5
   cloth_rating_kn: 27.0
 # main royal: 44 m2 between its yard and the yardarms below (head 0.89 of the yard); cloth 0.25 kN/m2.
@@ -391,7 +394,7 @@ sails:
   yard: main.royal.yard
   area_m2: 44
   reef_bands: 0
-  x_m: -2.0
+  x_m: -3.8
   centre_height_m: 42.4
   cloth_rating_kn: 11.0
 # mizzen topsail: 133 m2 between its yard and the yardarms below (head 0.82 of the yard); cloth 0.90 kN/m2.
@@ -400,7 +403,7 @@ sails:
   yard: mizzen.topsail.yard
   area_m2: 133
   reef_bands: 3
-  x_m: -16.0
+  x_m: -17.6
   centre_height_m: 21.9
   cloth_rating_kn: 119.7
 # mizzen topgallant: 46 m2 between its yard and the yardarms below (head 0.89 of the yard); cloth 0.30 kN/m2.
@@ -409,7 +412,7 @@ sails:
   yard: mizzen.topgallant.yard
   area_m2: 46
   reef_bands: 0
-  x_m: -16.0
+  x_m: -18.2
   centre_height_m: 29.3
   cloth_rating_kn: 13.8
 # mizzen royal: 22 m2 between its yard and the yardarms below (head 0.89 of the yard); cloth 0.25 kN/m2.
@@ -418,7 +421,7 @@ sails:
   yard: mizzen.royal.yard
   area_m2: 22
   reef_bands: 0
-  x_m: -16.0
+  x_m: -18.5
   centre_height_m: 33.5
   cloth_rating_kn: 5.5
 # spanker (driver) 167 m2: foot 0.9 of the boom, head 0.9 of the gaff, hoist from boom to jaws, gaff peaked 40 degrees; centre 0.4 of the boom abaft the mast.
@@ -429,7 +432,7 @@ sails:
   boom: mizzen.boom
   area_m2: 167
   reef_bands: 2
-  x_m: -21.0
+  x_m: -21.6
   centre_height_m: 9.8
   cloth_rating_kn: 116.9
 # fore topmast staysail 75 m2 (judgement from the stay's run: luff along the stay, foot to the boom end).
@@ -471,7 +474,7 @@ sails:
   yard: fore.yard
   side: starboard
   area_m2: 72
-  x_m: 14.0
+  x_m: 13.7
   centre_height_m: 12.8
   cloth_rating_kn: 14.4
 - id: fore.lower.studdingsail.larboard
@@ -480,7 +483,7 @@ sails:
   yard: fore.yard
   side: larboard
   area_m2: 72
-  x_m: 14.0
+  x_m: 13.7
   centre_height_m: 12.8
   cloth_rating_kn: 14.4
 # fore topmast studding sail 83 m2: 0.4 of the yard wide, as deep as the sail beside it (judgement).
@@ -490,7 +493,7 @@ sails:
   yard: fore.topsail.yard
   side: starboard
   area_m2: 83
-  x_m: 14.0
+  x_m: 13.4
   centre_height_m: 23.3
   cloth_rating_kn: 16.6
 - id: fore.topmast.studdingsail.larboard
@@ -499,7 +502,7 @@ sails:
   yard: fore.topsail.yard
   side: larboard
   area_m2: 83
-  x_m: 14.0
+  x_m: 13.4
   centre_height_m: 23.3
   cloth_rating_kn: 16.6
 # fore topgallant studding sail 25 m2: 0.4 of the yard wide, as deep as the sail beside it (judgement).
@@ -509,7 +512,7 @@ sails:
   yard: fore.topgallant.yard
   side: starboard
   area_m2: 25
-  x_m: 14.0
+  x_m: 13.2
   centre_height_m: 32.6
   cloth_rating_kn: 5.0
 - id: fore.topgallant.studdingsail.larboard
@@ -518,7 +521,7 @@ sails:
   yard: fore.topgallant.yard
   side: larboard
   area_m2: 25
-  x_m: 14.0
+  x_m: 13.2
   centre_height_m: 32.6
   cloth_rating_kn: 5.0
 # main topmast studding sail 102 m2: 0.4 of the yard wide, as deep as the sail beside it (judgement).
@@ -528,7 +531,7 @@ sails:
   yard: main.topsail.yard
   side: starboard
   area_m2: 102
-  x_m: -2.0
+  x_m: -3.1
   centre_height_m: 26.2
   cloth_rating_kn: 20.4
 - id: main.topmast.studdingsail.larboard
@@ -537,7 +540,7 @@ sails:
   yard: main.topsail.yard
   side: larboard
   area_m2: 102
-  x_m: -2.0
+  x_m: -3.1
   centre_height_m: 26.2
   cloth_rating_kn: 20.4
 # main topgallant studding sail 31 m2: 0.4 of the yard wide, as deep as the sail beside it (judgement).
@@ -547,7 +550,7 @@ sails:
   yard: main.topgallant.yard
   side: starboard
   area_m2: 31
-  x_m: -2.0
+  x_m: -3.5
   centre_height_m: 36.5
   cloth_rating_kn: 6.2
 - id: main.topgallant.studdingsail.larboard
@@ -556,7 +559,7 @@ sails:
   yard: main.topgallant.yard
   side: larboard
   area_m2: 31
-  x_m: -2.0
+  x_m: -3.5
   centre_height_m: 36.5
   cloth_rating_kn: 6.2
 lines:

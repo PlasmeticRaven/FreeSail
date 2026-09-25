@@ -90,6 +90,7 @@ sharp up, Fincham 19; the limits here are 55 to 62 degrees from square
 from __future__ import annotations
 
 import copy
+import math
 import os
 import re
 import sys
@@ -590,6 +591,7 @@ def frigate(out_dir="data/ships"):
             f"{name}.mast",
             "mast",
             x_m=x,
+            rake_deg=FRIGATE_RAKE_DEG[name],
             height_m=ft(g["above"]),
             rating_kn=design_kn(carried["lower"], DESIGN_WIND_KN["lower"]),
             note=f"{name} lower mast: {main_len * mast_ratio[name]:.0f} ft heel to head "
@@ -655,7 +657,7 @@ def frigate(out_dir="data/ships"):
                 yard=yard,
                 area_m2=area,
                 reef_bands=reef,
-                x_m=x,
+                x_m=raked_x(x, FRIGATE_RAKE_DEG[name], centre),
                 centre_height_m=centre,
                 cloth_rating_kn=round(CLOTH_KN_PER_M2[level] * area, 1),
                 note=f"{name} {level}: {area} m2 between its yard and the yardarms below "
@@ -737,7 +739,7 @@ def frigate(out_dir="data/ships"):
         boom=boom,
         area_m2=SPANKER_AREA,
         reef_bands=2,
-        x_m=-21.0,
+        x_m=raked_x(-21.0, FRIGATE_RAKE_DEG["mizzen"], SPANKER_CENTRE),
         centre_height_m=SPANKER_CENTRE,
         cloth_rating_kn=round(CLOTH_KN_PER_M2["gaff"] * SPANKER_AREA, 1),
         note=f"spanker (driver) {SPANKER_AREA} m2: foot 0.9 of the boom, head 0.9 of the gaff, "
@@ -916,7 +918,7 @@ def frigate(out_dir="data/ships"):
                     yard=parent_yard,
                     side=side,
                     area_m2=area,
-                    x_m=x,
+                    x_m=raked_x(x, FRIGATE_RAKE_DEG[name], centre),
                     centre_height_m=centre,
                     cloth_rating_kn=round(CLOTH_KN_PER_M2["studding"] * area, 1),
                     note=(
@@ -1036,6 +1038,21 @@ def frigate(out_dir="data/ships"):
 
 
 # spanker geometry, shared by the mast rating and the sail (feet: boom 44, gaff 35, hoist 41)
+# Mast rake, degrees aft of the vertical, as the file's rake_deg. A judgement for a
+# 1790s frigate: the fore nearly upright, the main a little more, the mizzen most
+# (Lever 1808 "Masts"; Steel's establishments give the rake in inches per foot, not
+# in the references). Sail centres are carried aft with the mast as they rise.
+FRIGATE_RAKE_DEG = {"fore": 1.5, "main": 2.5, "mizzen": 4.5}
+FRIGATE_DECK_M = 1.8  # deck_height_m of the frigate's hull block, for the rake offset
+
+
+def raked_x(mast_x_m, rake_deg, centre_height_m, deck_m=FRIGATE_DECK_M):
+    """x of a sail centre hung on a raked mast: carried aft by tan(rake) per metre of hoist."""
+    return round(
+        mast_x_m - math.tan(math.radians(rake_deg)) * max(centre_height_m - deck_m, 0.0), 1
+    )
+
+
 SPANKER_AREA = 167
 SPANKER_CENTRE = 9.8
 
@@ -1234,6 +1251,7 @@ def schooner(out_dir="data/ships"):
         "fore.mast",
         "mast",
         x_m=fore_x,
+        rake_deg=round(math.degrees(math.atan(rake)), 1),
         height_m=ft(fore_above),
         rating_kn=design_kn(
             [
@@ -1272,6 +1290,7 @@ def schooner(out_dir="data/ships"):
         "main.mast",
         "mast",
         x_m=main_x,
+        rake_deg=round(math.degrees(math.atan(rake)), 1),
         height_m=ft(main_above),
         rating_kn=design_kn(
             [(main_area, main_centre, "gaff"), (gt_area, gt_centre, "jibheaded")],
