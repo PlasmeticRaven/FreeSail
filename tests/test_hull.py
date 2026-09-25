@@ -392,11 +392,13 @@ def test_step_is_deterministic(frigate, monkeypatch):
     assert state_a == other.dyn.state()
 
 
-def test_both_reference_ships_run_with_the_stub_sails(frigate, schooner):
-    """The shipped stub gives no drive; the ships must simply sit there sanely."""
+def test_both_reference_ships_run_under_bare_poles(frigate, schooner):
+    """With every sail furled, the real sail physics gives only windage: the ships
+    drift slowly and sanely, and the apparent wind is filled in."""
     for ship in (frigate, schooner):
         run(ship, 60)
-        assert ship.dyn.speed < 0.01
-        assert abs(ship.dyn.apparent_wind_angle) > 0.0  # the stub fills the apparent wind
+        assert ship.dyn.speed < units.knots_to_ms(2.0)
+        assert math.isfinite(ship.dyn.x) and math.isfinite(ship.dyn.heading)
+        assert abs(ship.dyn.apparent_wind_angle) > 0.0
         assert ship.dyn.apparent_wind_speed > 0.0
         assert "hull" in ship.extra
