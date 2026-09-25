@@ -2,7 +2,7 @@
 
 Public-domain seamanship sources kept in the repository so that ship data, the evolution catalogue and the in-game reference library can cite them by chapter and section, and so that LLM officers can be pointed at the same passage a human would read.
 
-All four are optical-character-recognition (OCR) text dumps from Internet Archive scans. They are readable and searchable but not clean: expect occasional garbled words, stray characters from the scanner's language detection, and broken tables. Use them for research and citation, and check anything numeric against the page image (the PDF link in each item) before it becomes a game constant.
+All five are optical-character-recognition (OCR) text dumps from Internet Archive scans. They are readable and searchable but not clean: expect occasional garbled words, stray characters from the scanner's language detection, and broken tables. Use them for research and citation, and check anything numeric against the page image (the PDF link in each item) before it becomes a game constant.
 
 | File | Work | Source item | Notes |
 |---|---|---|---|
