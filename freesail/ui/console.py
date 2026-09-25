@@ -42,6 +42,8 @@ class Console:
         self.running = False
         self.out = out
         self._rolled_up = 0
+        self.lock = threading.RLock()  # the clock thread and the prompt share the world
+        self._stop = threading.Event()
         self._attach()
 
     # -- log printing --------------------------------------------------------
@@ -131,6 +133,7 @@ class Console:
     # -- main loop -----------------------------------------------------------
 
     def loop(self, lines: queue.Queue[str]) -> None:
+        """Piped or scripted input: one thread, lines from a queue, ticks between."""
         period = 0.1
         owed = 0.0
         while True:
@@ -140,12 +143,49 @@ class Console:
                         return
             except queue.Empty:
                 pass
-            if self.running:
-                owed += self.compression * period
-                n = int(owed)
-                owed -= n
-                self.world.run(n)
+            owed = self._tick_owed(owed, period)
             time.sleep(period)
+
+    def _tick_owed(self, owed: float, period: float) -> float:
+        if self.running:
+            owed += self.compression * period
+            n = int(owed)
+            owed -= n
+            with self.lock:
+                self.world.run(n)
+        return owed
+
+    def _clock_thread(self) -> None:
+        period = 0.1
+        owed = 0.0
+        while not self._stop.is_set():
+            owed = self._tick_owed(owed, period)
+            time.sleep(period)
+
+    def run_interactive(self) -> None:
+        """A real terminal: the clock runs in a thread; the prompt owns the screen.
+
+        prompt_toolkit's patch_stdout redraws the half-typed order underneath
+        every log line that arrives, so nothing you are typing is swallowed.
+        """
+        from prompt_toolkit import PromptSession
+        from prompt_toolkit.patch_stdout import patch_stdout
+
+        session: PromptSession[str] = PromptSession()
+        ticker = threading.Thread(target=self._clock_thread, daemon=True)
+        with patch_stdout(raw=True):
+            ticker.start()
+            try:
+                while True:
+                    try:
+                        line = session.prompt("> ")
+                    except (EOFError, KeyboardInterrupt):
+                        break
+                    with self.lock:
+                        if not self.handle_line(line):
+                            break
+            finally:
+                self._stop.set()
 
 
 def _stdin_reader(q: queue.Queue[str]) -> None:
@@ -179,9 +219,12 @@ def main(argv: list[str] | None = None) -> int:
         f"FreeSail console. Seed {world.seed}. {units.time_stamp(world.clock.ship_time)}. "
         "Type 'help' for driver commands, 'go' to start the clock."
     )
-    q: queue.Queue[str] = queue.Queue()
-    threading.Thread(target=_stdin_reader, args=(q,), daemon=True).start()
-    console.loop(q)
+    if sys.stdin.isatty():
+        console.run_interactive()
+    else:
+        q: queue.Queue[str] = queue.Queue()
+        threading.Thread(target=_stdin_reader, args=(q,), daemon=True).start()
+        console.loop(q)
     return 0
 
 
