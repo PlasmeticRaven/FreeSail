@@ -446,18 +446,29 @@ TABLE: list[tuple[str, str, ok | no]] = [
         "back the main topsail",
         ok(
             evo="brace",
-            subjects=["main.topsail.yard"],
+            subjects=["main.yard", "main.topsail.yard", "main.topgallant.yard", "main.royal.yard"],
             params={"mode": "aback", "tack": "larboard"},
-            text=["Laid the main topsail yard aback"],
+            text=["Laid the main yard, main topsail yard", "aback"],
         ),
     ),
-    (F, "lay the main topsail aback", ok(evo="brace", subjects=["main.topsail.yard"])),
+    (
+        F,
+        "lay the main topsail aback",
+        ok(
+            evo="brace",
+            subjects=["main.yard", "main.topsail.yard", "main.topgallant.yard", "main.royal.yard"],
+        ),
+    ),
     (F, "brace the main topsail yard aback", ok(evo="brace", params={"tack": "larboard"})),
     (F, "brace the head yards sharp aback", ok(evo="brace", count=4, params={"tack": "larboard"})),
     (F, "back", no(["Back what?"])),
     (F, "back the spanker", no(["gaff sail", "no yard"])),
     (S, "square the yards", ok(evo="brace", count=2, params={"target_deg": 0.0})),
-    (S, "back the topsail", ok(evo="brace", subjects=["fore.topsail.yard"])),
+    (
+        S,
+        "back the topsail",
+        ok(evo="brace", subjects=["fore.topsail.yard", "fore.topgallant.yard"]),
+    ),
     # the words for taking in, and the sails they suit
     (F, "haul up the mainsail", no(["already furled"])),
     (F, "haul up the courses", no(["already furled"])),
@@ -953,34 +964,29 @@ def test_brace_skips_a_wrecked_or_sent_down_yard():
     assert "fore royal yard is sent down" in log and "carried away" in log
 
 
-def test_back_braces_the_yard_for_the_other_tack():
-    """Aback is sharp up for the other tack, as heave to does (scripts.py)."""
+def test_back_braces_the_whole_mast_for_the_other_tack():
+    """Aback is sharp up for the other tack, as heave to does (scripts.py), and a
+    yard is laid aback with the rest of its mast's yards: braced against the
+    yards above and below, its sail would foul theirs."""
     ship, runner = make("frigate", tack="starboard")
     ship.sails["main.topsail"].state = SailState.SET
     _, log, data = orders.handle(ship, "back the main topsail")
     yard = ship.spars["main.topsail.yard"]
-    assert runner.started == [
-        (
-            "brace",
-            "main.topsail.yard",
-            {
-                "target_deg": round(math.degrees(yard.brace_limit), 2),
-                "target_angle": pytest.approx(-yard.brace_limit),
-                "mode": "aback",
-                "tack": "larboard",
-            },
-        )
-    ]
+    main_yards = {"main.yard", "main.topsail.yard", "main.topgallant.yard", "main.royal.yard"}
+    assert {s for _, s, _ in runner.started} == main_yards
+    for _, sid, params in runner.started:
+        assert params["mode"] == "aback" and params["tack"] == "larboard"
+        assert params["target_angle"] == pytest.approx(-ship.spars[sid].brace_limit)
+    topsail = next(p for _, sid, p in runner.started if sid == "main.topsail.yard")
+    assert topsail["target_deg"] == round(math.degrees(yard.brace_limit), 2)
     assert "the main topsail to the mast" in log and data["tack"] == "larboard"
     notes = ship.drain_notes()
     assert notes[-1][1] == "yard.laid_aback"
-    assert notes[-1][2] == (
-        "Laid the main topsail yard aback, braced up for the larboard tack; "
-        "the main topsail to the mast."
-    )
+    assert notes[-1][2].startswith("Laid the main yard, main topsail yard")
+    assert notes[-1][2].endswith("braced up for the larboard tack; the main topsail to the mast.")
     ship, runner = make("frigate", tack="larboard")
     orders.handle(ship, "lay the main topsail aback")
-    assert runner.started[0][2]["target_angle"] == pytest.approx(yard.brace_limit)
+    assert all(p["target_angle"] > 0 for _, _, p in runner.started)
     # a tack said is the tack laid aback from
     ship, runner = make("frigate", tack="larboard")
     orders.handle(ship, "brace the head yards aback on the larboard tack")

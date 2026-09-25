@@ -50,7 +50,7 @@ py -m freesail.ui.console data/ships/frigate-36.yaml --seed 7 --wind 0,15 --head
 
 - [ ] **4. Tack, six minutes, honest speed.** Type `tack ship`, `tick 480`, `state`. Expect `Tacked; braced up on the larboard tack, heading ENE (68°)` about six minutes after the order, then a state of about `4.4 kn`, `51° on the larboard bow`.
 
-- [ ] **5. Back the main topsail.** Type `reef the topsails, one reef`, `tick 400`, then `back the main topsail`, `tick 200`, `state`. Expect `Laid the main topsail yard aback, braced up for the starboard tack; the main topsail to the mast.` and her speed a little down. Then `brace the main yards full` and `tick 120` to let her draw again.
+- [ ] **5. Back the main topsail.** Type `reef the topsails, one reef`, `tick 400`, then `back the main topsail`, `tick 200`, `state`. Expect `Laid the main yard, main topsail yard, main topgallant yard and main royal yard aback, braced up for the starboard tack; the main course, main topsail and main topgallant to the mast.` (a yard is laid aback with the rest of its mast's yards, since braced against the yards above and below its sail would foul theirs), the main sails `taken aback`, and her way falling off to about a knot with the helm hard over as she comes up. Then `brace the main yards full` and `tick 120` to let her draw again.
 
 - [ ] **6. Wear, nine minutes.** Type `wear ship`, `tick 700`, `state`. Expect `Wore ship; braced sharp up on the starboard tack, heading WNW (292°)` about eight minutes after the order, and a state near `5.3 kn`.
 

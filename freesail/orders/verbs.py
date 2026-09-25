@@ -404,6 +404,23 @@ def _brace(
     aback = vocab.brace_modes[mode] == "aback"
     if aback:
         tack = resolve.other_side(tack)  # laid aback: braced up for the other tack
+        # A yard is laid aback with the rest of its mast's yards: braced the other
+        # way from the yards above and below, its sail would foul theirs. "Back the
+        # main topsail" is the period way of saying "brace the main yards aback".
+        masts = []
+        for y in yards:
+            m = ship.mast_of(y)
+            if m is not None and m not in masts:
+                masts.append(m)
+        yards = [
+            y
+            for y in ship.spars.values()
+            if y.is_yard and ship.mast_of(y) in masts and y.id not in skip
+        ]
+        object_name = errors.join_names(
+            [f"{resolve.display_name(ship, m.id).replace(' mast', '')} yards" for m in masts],
+            "and",
+        )
     sign = 1.0 if tack == "starboard" else -1.0
 
     runner = runner_of(ship)

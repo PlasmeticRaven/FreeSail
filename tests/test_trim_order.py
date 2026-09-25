@@ -110,3 +110,19 @@ def test_trim_targets_follow_the_lift_peak():
     expected = min(math.pi / 2 - max(chord, 0.0), yard.brace_limit)
     got = {s: p["target_angle"] for _, s, p in runner.started}["fore.topsail.yard"]
     assert got == pytest.approx(expected)
+
+
+def test_backing_a_topsail_lays_the_whole_masts_yards_aback():
+    """'Back the main topsail' braces every yard on the main mast the other way:
+    one yard braced against the yards above and below would foul their sails."""
+    ship, runner = frigate(41.0)  # starboard tack
+    handle(ship, "back the main topsail")
+    subjects = {s for _, s, _ in runner.started}
+    main_yards = {
+        y.id for y in ship.spars.values() if y.is_yard and ship.mast_of(y).id == "main.mast"
+    }
+    assert subjects == main_yards
+    assert all(
+        p["tack"] == "larboard" for _, _, p in runner.started
+    )  # aback from the starboard tack
+    assert not any(s.startswith("fore.") for s in subjects)
