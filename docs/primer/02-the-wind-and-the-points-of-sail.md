@@ -1,0 +1,116 @@
+# 2. The wind and the points of sail
+
+## The true wind
+
+Sailors name a wind by where it comes from: a north wind blows from the north (Falconer, *Wind*). The log says so at the start of every voyage and whenever it changes:
+
+```
+* Morning watch, 8 bells (04:00)  Open water. Wind N, 15 knots, a moderate breeze. Heading WNW (293°).
+  Morning watch (04:47)  A gust: 17 knots.
+```
+
+The strength words follow the old scale of breezes: *light airs*, *a light breeze*, *a gentle breeze*, *a moderate breeze*, and so on up to a gale (Luce 1866, ch. XXVIII Storms, 'Table of force and velocity of wind'). The wind wanders a little and gusts; with the same seed it wanders the same way every time (chapter 6).
+
+## The apparent wind
+
+The wind you feel on deck is the true wind combined with the ship's own motion. A ship making 8 knots across a 15-knot wind feels it stronger and further ahead; running before it she feels it lighter. The sails know only the apparent wind, and so it is the apparent wind that `state` reports, as an angle from the bow and the side it is on:
+
+```
+Amazon: heading WNW (293°), speed 8.0 kn, leeway -3°, heel -7°
+Apparent wind 40° on the starboard bow, 16.6 kn; helm -2°
+```
+
+Here the true wind is north, 67° from her heading of 293°, but she feels it at 40° and 16.6 knots. This difference is the whole reason a square-rigger cannot point higher: see below.
+
+## The tack
+
+"A ship is said to be on the starboard or larboard tack, when she is close-hauled, with the wind upon the starboard or larboard side" (Falconer, *Tack*). The game uses it at every point of sail: **the tack is the side the wind is on**. Wind on the starboard bow, starboard tack. *Weather* is that side; *lee* is the other (Falconer, *Lee*). Every *weather* and *lee* in an order is resolved from the tack she is on when you give it, and the log tells you which rope that turned out to be:
+
+```
+  Morning watch (04:21)  Order: haul the weather main brace.
+  Morning watch (04:21)  Hauled the starboard (weather) main brace; the main yard now braced 50° for the starboard tack.
+```
+
+## The compass
+
+Thirty-two points of 11¼° each, named as Falconer names them: north, north by east, north-north-east, north-east by north, north-east, and so round (Lever, figure 396: "which should be diligently got by rote"). The log gives both the point and the degrees: `WNW (293°)`. You may steer by either, and the parser takes the long names, the short ones and the old contractions:
+
+```orders frigate
+steer west-north-west
+steer WNW
+steer nor'west by west
+steer 293
+steer 293 degrees
+steer two points to starboard
+steer three points off
+# rejected: steer two points
+```
+
+"Two points" alone is refused with "Steer how many points which way? Say 'up', 'off', 'to starboard' or 'to larboard'." *Up* is toward the wind, *off* away from it.
+
+## The points of sail
+
+Counting from the wind round to dead astern (Lever, figures 397 and 398; Falconer, *Close-hauled*, *Large*):
+
+| Wind from the bow | Name | What it means |
+|---|---|---|
+| under six points | (she cannot lie there) | the sails shake or are taken aback |
+| six points (67°) | **close-hauled**, *by the wind*, *on a wind*, *on a bowline* | as near the wind as a square-rigged ship will lie |
+| seven points | *one point free* | eased off a point; faster, and further from the wind |
+| eight points (90°) | **wind abeam**, *on the beam* | the wind blows on the ends of the beams |
+| nine to thirteen points | **the wind large**, *on the quarter*, *quartering* | "when it crosses the line of a ship's course in a favourable direction, particularly on the beam or quarter" |
+| sixteen points (180°) | **before the wind**, *running*, *wind aft*, *dead aft* | the yards square; the after sails blanket the head sails |
+
+Sailing with the wind on the beam or abaft it is *sailing large* or, from the quarter, *reaching* in the later word; *going free* is anything not close-hauled. Sailing so far off that the wind comes on the same side as the boom is *by the lee*, which is a fault, not a point of sail.
+
+### Why six points
+
+Falconer: "In this manner of sailing the keel commonly makes an angle of six points with the line of the wind; but sloops, and some other small vessels, are said to sail almost a point nearer." Lever: "A square rigged Ship, when close-hauled, can lie no nearer to the Wind than six Points... In practice the Yard is braced up sharper, to make the Sail stand to the most advantage."
+
+The reason is in two numbers the ship file gives every yard. A yard cannot be braced past its **brace limit**, about 55° from square for the lower yards and a little more aloft, because the shrouds are in the way; so its sail can lie no nearer than 35° to the keel. A sail needs the wind some 20° to 25° off its own surface to fill, so the apparent wind can come no nearer than about 40° from the bow before the weather leech lifts. And because she is moving, the apparent wind is always ahead of the true: 40° apparent at 8 knots in a 15-knot breeze is about 67° true, which is six points. The game does not assume the six points; it comes out of the yards, the sails and the speed. A fore-and-aft sail sheets much nearer the centreline, which is why the schooner in chapter 7 lies half a point nearer.
+
+Add to that the **leeway**: "All vessels, however, are supposed to make nearly a point of lee-way, when close-hauled" (Falconer). The log reports it as it changes and `state` shows it:
+
+```
+  Morning watch (04:12)  Leeway 4° to larboard.
+```
+
+A leeway of 140° or more means she is going astern (*sternway*), which you will see when hove to.
+
+### Full and by
+
+Close-hauled, the helmsman keeps her *full and by*: by the wind, but with the sails full. Luce's conning words for it are *No higher!*, *Nothing off!*, *Keep her a good full and by!*, *Very well thus* (Luce 1866, ch. XXIV Working to Windward, 'Conning'). In Orders the helm verbs are:
+
+```orders frigate
+keep her full
+full and by
+come up a point
+luff
+come up two points
+bear away
+bear away two points
+keep her off two points
+steer full and by
+```
+
+`keep her full` (or `full and by`) hands the helmsman the standing task: he steers as close as she will lie with the sails drawing, and follows the wind as it shifts. `come up` (*luff*) and `bear away` (*keep away*, *bear up*, *up helm*) move the ordered course by a point, or the number of points you give, and put her on a fixed compass course from then on; say `keep her full` again to go back to sailing by the wind. Falconer, *Luff*: "the order from the pilot to the steersman to put the helm towards the lee-side of the ship, in order to make the ship sail nearer the direction of the wind."
+
+## What `state` reports
+
+```
+Morning watch (04:21)
+Wind N, 14 knots, a moderate breeze
+Amazon: heading WNW (293°), speed 8.0 kn, leeway -3°, heel -7°
+Apparent wind 40° on the starboard bow, 16.6 kn; helm -2°
+Sail set: fore.course, fore.topsail, fore.topgallant, main.course, main.topsail, main.topgallant, mizzen.topsail, mizzen.topgallant, mizzen.spanker, fore.topmast_staysail, jib
+```
+
+Line by line:
+
+1. The ship's time (chapter 6).
+2. The true wind, where from and how strong.
+3. Her **heading** (where the bow points, as a point and in degrees true), **speed** through the water in knots, **leeway** and **heel** in degrees. Leeway and heel are signed: **positive is to starboard, negative to larboard.** On the starboard tack she heels away from the wind to larboard and is pushed to larboard, so both are negative; after a tack both change sign.
+4. The **apparent wind**, angle from the bow and side, and its speed; and the **helm**, the rudder angle, positive when put to starboard. Chapter 4 says how to read the helm.
+5. The sails that are set, by their ids.
+
+Nothing in `state` is hidden from the physics or the physics from it: these are the readings a standing order will one day test against (`docs/DesignProposal.md` §4.3).
