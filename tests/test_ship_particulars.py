@@ -10,7 +10,6 @@ source of both files; the last test regenerates them and compares.
 
 from __future__ import annotations
 
-import filecmp
 import math
 import subprocess
 import sys
@@ -287,7 +286,9 @@ def test_generator_reproduces_the_committed_files(tmp_path):
     for committed in (FRIGATE, SCHOONER):
         made = out / committed.name
         assert made.exists()
-        assert filecmp.cmp(made, committed, shallow=False), (
+        # Compare as text so that a Windows checkout with CRLF endings
+        # (or a generator run there) is not a difference.
+        assert made.read_text() == committed.read_text(), (
             f"{committed.name} differs from what tools/gen_ships.py writes; "
             "edit the generator and rerun it"
         )

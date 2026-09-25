@@ -316,7 +316,7 @@ class Builder:
             if m and m.group(1) in self.hull_notes:
                 out.append("  # " + self.hull_notes[m.group(1)])
             out.append(line)
-        with open(path, "w") as f:
+        with open(path, "w", newline="\n") as f:  # LF on every platform
             f.write(header + "\n".join(out) + "\n")
 
 
