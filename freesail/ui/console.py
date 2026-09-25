@@ -124,7 +124,9 @@ class Console:
         self.running = False
         self._detach()
         self._print(f"Replaying {path} to tick {data['end_tick']}...")
-        self.world = replay_mod.replay(data)
+        from freesail.api.session import ship_factory
+
+        self.world = replay_mod.replay(data, ship_factory)
         self._attach()
         self._print(f"Replayed. Log digest {self.world.log.digest()[:16]}. Clock held.")
         for s in self.world.summary_lines():
@@ -196,21 +198,29 @@ def _stdin_reader(q: queue.Queue[str]) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="FreeSail console")
-    ap.add_argument("ship", nargs="?", help="ship file (ignored in M0; the ship is a point)")
+    ap.add_argument("ship", nargs="?", help="ship file, e.g. data/ships/frigate-36.yaml")
     ap.add_argument("--seed", type=int, default=1805)
     ap.add_argument("--time", type=float, default=1.0, help="compression, game s per real s")
     ap.add_argument("--load", help="save file to replay and continue from")
     ap.add_argument("--wind", help="wind as 'FROM_DEG,KNOTS', e.g. 225,15")
+    ap.add_argument("--heading", type=float, help="starting heading in degrees")
     args = ap.parse_args(argv)
 
+    from freesail.api.session import make_world, ship_factory
+
     if args.load:
-        world = replay_mod.replay(replay_mod.load_file(args.load))
+        world = replay_mod.replay(replay_mod.load_file(args.load), ship_factory)
     else:
         scenario = Scenario()
         if args.wind:
             d, s = args.wind.split(",")
             scenario.wind_from_deg, scenario.wind_speed_kn = float(d), float(s)
-        world = World(seed=args.seed, scenario=scenario)
+        if args.heading is not None:
+            scenario.ship_heading_deg = args.heading
+        if args.ship:
+            world = make_world(args.seed, args.ship, scenario)
+        else:
+            world = World(seed=args.seed, scenario=scenario)
 
     console = Console(world, compression=args.time)
     for e in world.log.all():
