@@ -1388,3 +1388,11 @@ def test_the_resolved_side_is_in_the_event_data_for_replay():
     assert event.kind == "line.hauled"
     assert event.data["side"] == "larboard"
     assert event.data["subjects"] == ["main.yard.brace.larboard"]
+
+
+def test_decimal_headings_survive_normalisation():
+    ship, _ = make("frigate")
+    _, text, data = orders.handle(ship, "steer 280.0")
+    assert "280" in text and abs(units.rad_to_deg(ship.dyn.target_heading) - 280.0) < 1e-6
+    _, text, data = orders.handle(ship, "steer 280.5")
+    assert abs(units.rad_to_deg(ship.dyn.target_heading) - 280.5) < 1e-6

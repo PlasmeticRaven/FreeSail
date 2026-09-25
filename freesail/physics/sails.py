@@ -225,6 +225,8 @@ def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
 
     thrust = side = heel_m = yaw_m = windage = 0.0
     luff_angle: float | None = None
+    luff_sum = 0.0
+    luff_area = 0.0
 
     for sail in driving:
         cls = SAIL_CLASSES[sail.cls]
@@ -248,8 +250,14 @@ def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
         heel_m += f_stb * sail.centre_height_m
         yaw_m += f_stb * (sail.x_m - hull.clr_x_m) - f_fwd * y
 
+        # the ship's luff angle is the area-weighted mean of her driving sails':
+        # a schooner sails by her fore-and-aft canvas with the square topsail
+        # shaking, so the topsail must not set the rule for the whole rig
         sail_luff = _chord_angle(ship, sail) + cls.luff_angle
-        luff_angle = sail_luff if luff_angle is None else max(luff_angle, sail_luff)
+        luff_weight = max(sail.area_effective_m2, 1e-6)
+        luff_sum += sail_luff * luff_weight
+        luff_area += luff_weight
+        luff_angle = luff_sum / luff_area
 
     driving_ids = {s.id for s in driving}
     for sail in ship.sails.values():

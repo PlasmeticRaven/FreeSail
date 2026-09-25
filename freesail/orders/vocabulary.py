@@ -73,6 +73,7 @@ class Vocabulary:
 # ---------------------------------------------------------------------------
 
 _PUNCT = re.compile(r"[^\w\s,'°]")
+_DECIMAL = re.compile(r"(\d)\.(\d)")
 
 
 def normalise(text: str) -> str:
@@ -83,7 +84,9 @@ def normalise(text: str) -> str:
     """
     t = text.lower().replace("’", "'").replace("‘", "'")
     t = t.replace("-", " ").replace("_", " ").replace("/", " ")
-    t = _PUNCT.sub(" ", t)
+    # keep the point inside a number such as "280.5" through the punctuation sweep
+    t = _DECIMAL.sub(lambda m: m.group(1) + "qdotq" + m.group(2), t)
+    t = _PUNCT.sub(" ", t).replace("qdotq", ".")
     t = t.replace(",", " , ")
     return " ".join(t.split())
 
