@@ -41,6 +41,14 @@ verbs:
     synonyms: [brace round]
     object: yards
     level: 1
+  trim:
+    # "Trim sails!" braces every yard to the wind and tends the sheets; the
+    # narrower forms do one or the other (Luce 1866 ch. XXIV "To Trim Yards").
+    synonyms: [trim sails, trim sail, trim the sails, trim the sails to the wind,
+               trim the yards, trim yards, trim the yards to the wind, trim the yards and sheets,
+               trim the sheets, trim sheets, trim the sheets and yards]
+    object: none
+    level: 1
   haul:
     synonyms: [haul on, haul in, haul taut, round in]
     object: line

@@ -55,6 +55,8 @@ def execute(
     spec = vocab.verbs[order.verb]
     if order.verb == "brace":
         return _brace(ship, order, vocab, skip)
+    if order.verb == "trim":
+        return _trim(ship, order, vocab, skip)
     if spec.object == "sail":
         return _sail_evolution(ship, order, vocab, skip)
     if spec.object == "line":
@@ -359,6 +361,95 @@ def _brace(
         "failed_subjects": failed_ids,
     }
     return "evolution.started", text, data
+
+
+def _trim(
+    ship: Ship, order: Order, vocab: Vocabulary, skip: frozenset[str] = frozenset()
+) -> Result:
+    """'Trim sails': brace every yard to the present apparent wind and tend the
+    fore-and-aft sheets. 'Trim the yards' and 'trim the sheets' do one or the
+    other. The best angle of attack for a yard is where its sail's lift curve
+    peaks (data/sail_classes.yaml); an empty yard is trimmed as a square sail
+    would be, so the whole rig swings together."""
+    from freesail.evolutions.trim import wanted_sheet_angle
+    from freesail.physics.sails import SAIL_CLASSES
+
+    _no_stray_modifiers(order, {"manner"})
+    phrase = order.verb_phrase
+    do_yards = "sheet" not in phrase
+    do_sheets = "yard" not in phrase
+    d = ship.dyn
+    if d.apparent_wind_speed < 0.5:
+        raise OrderError("There is no wind to trim to.")
+    awa = abs(d.apparent_wind_angle)
+    sign = 1.0 if d.tack == "starboard" else -1.0
+
+    started: list[dict[str, Any]] = []
+    failed: list[str] = []
+    failed_ids: list[str] = []
+    if do_yards:
+        runner = runner_of(ship)
+        yards = [y for y in ship.spars.values() if y.is_yard and y.id not in skip]
+        for yard in yards:
+            name = resolve.the(ship, yard.id)
+            if yard.wrecked or yard.sent_down:
+                failed.append(f"{name} is {'carried away' if yard.wrecked else 'sent down'}")
+                failed_ids.append(yard.id)
+                continue
+            sail = ship.sail_of(yard)
+            cls = SAIL_CLASSES.get(sail.cls if sail else "square") or SAIL_CLASSES["square"]
+            best_alpha = cls.alpha[max(range(len(cls.lift)), key=lambda i: cls.lift[i])]
+            chord = min(max(awa - best_alpha, 0.0), math.pi / 2)
+            target = math.copysign(min(math.pi / 2 - chord, yard.brace_limit), sign)
+            params = {
+                "target_deg": round(units.rad_to_deg(target), 2),
+                "target_angle": target,
+                "mode": "to the wind",
+                "tack": d.tack,
+            }
+            try:
+                runner.start(ship, vocab.evolutions["brace"], yard.id, params)
+            except OrderError as e:
+                failed.append(f"{name}: {e}")
+                failed_ids.append(yard.id)
+                continue
+            started.append({"evolution": "brace", "subject": yard.id, "params": params})
+
+    trimmed: list[str] = []
+    if do_sheets:
+        for sail in ship.sails.values():
+            if sail.is_set and sail.is_fore_and_aft and sail.cls in ("gaff", "jibheaded"):
+                sail.sheet_angle = wanted_sheet_angle(sail.cls, d.apparent_wind_angle)
+                trimmed.append(resolve.the(ship, sail.id))
+
+    if not started and not trimmed:
+        if failed:
+            raise OrderError(f"Nothing done: {errors.sentence_list(failed)}.")
+        raise OrderError("Nothing to trim: no sail is set." if do_sheets else "No yards to trim.")
+
+    parts: list[str] = []
+    if started:
+        parts.append(
+            f"Braced {len(started)} yard{'s' if len(started) != 1 else ''} to the wind, "
+            f"{units.rad_to_deg(awa):.0f}° on the {d.tack} bow"
+        )
+    if trimmed:
+        parts.append(f"trimmed the sheets of {errors.sentence_list(trimmed)}")
+    text = "; ".join(parts)
+    text = text[0].upper() + text[1:] + "."
+    if failed:
+        text += f" Not {errors.sentence_list(failed)}."
+    data = {
+        "verb": "trim",
+        "level": 1,
+        "subjects": [s["subject"] for s in started],
+        "evolutions": started,
+        "trimmed_sheets": trimmed,
+        "failed": failed,
+        "failed_subjects": failed_ids,
+    }
+    kind = "evolution.started" if started and not trimmed else "sail.trimmed"
+    return kind, text, data
 
 
 def _yard_for(ship: Ship, pid: str) -> Spar:
