@@ -12,7 +12,7 @@ This is the working agreement for packages 4 to 7 of `docs/TechnicalSpec-M0-M2.m
 - `data/ships/frigate-36.yaml` and `data/ships/topsail-schooner.yaml`: draft reference ships. Use them in tests. Do not edit them; if one needs a change, say so in your report.
 - `tests/test_ship_loader.py::MINIMAL`: a small valid ship dictionary handy for unit tests.
 
-Sign conventions (from `Dynamics` and the spec §4): heading clockwise from north; `v` and `r` positive to starboard; `rudder` positive turns the ship to starboard; `apparent_wind_angle` positive when the wind is on the starboard bow; `heel` positive to starboard; yard `brace_angle` positive when the larboard yardarm is forward (yards braced up on the starboard tack, wind from starboard); `sheet_angle` is the unsigned angle of a fore-and-aft sail's chord from the centreline, with the sail always assumed to lie on the lee side.
+Sign conventions (from `Dynamics` and the spec §4): heading clockwise from north; `v` and `r` positive to starboard; `rudder` positive turns the ship to starboard; `apparent_wind_angle` positive when the wind is on the starboard bow; `heel` positive to starboard; yard `brace_angle` positive when the yard is braced up for the starboard tack (wind from starboard): starboard yardarm forward, larboard yardarm aft, so on the starboard tack hauling the larboard (lee) brace increases it; `sheet_angle` is the unsigned angle of a fore-and-aft sail's chord from the centreline, with the sail always assumed to lie on the lee side.
 
 If a convention here is unworkable, report it; do not silently choose another.
 

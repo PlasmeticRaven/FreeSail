@@ -50,14 +50,14 @@ spars:
   'on': fore.topmast
   length_m: 11.0
   height_m: 19.5
-  brace_limit_deg: 42
+  brace_limit_deg: 58
   rating_kn: 45
 - id: fore.topgallant.yard
   class: yard
   'on': fore.topgallant_mast
   length_m: 8.0
   height_m: 24.5
-  brace_limit_deg: 44
+  brace_limit_deg: 60
   rating_kn: 22
 - id: fore.gaff
   class: gaff

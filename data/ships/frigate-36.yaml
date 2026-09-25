@@ -44,28 +44,28 @@ spars:
   'on': fore.mast
   length_m: 22.0
   height_m: 18.7
-  brace_limit_deg: 38
+  brace_limit_deg: 55
   rating_kn: 120
 - id: fore.topsail.yard
   class: yard
   'on': fore.topmast
   length_m: 17.0
   height_m: 34.6
-  brace_limit_deg: 42
+  brace_limit_deg: 58
   rating_kn: 90
 - id: fore.topgallant.yard
   class: yard
   'on': fore.topgallant_mast
   length_m: 12.0
   height_m: 43.2
-  brace_limit_deg: 44
+  brace_limit_deg: 60
   rating_kn: 40
 - id: fore.royal.yard
   class: yard
   'on': fore.royal_mast
   length_m: 8.0
   height_m: 48.5
-  brace_limit_deg: 45
+  brace_limit_deg: 62
   rating_kn: 18
 - id: main.mast
   class: mast
@@ -92,28 +92,28 @@ spars:
   'on': main.mast
   length_m: 25.0
   height_m: 21.2
-  brace_limit_deg: 38
+  brace_limit_deg: 55
   rating_kn: 120
 - id: main.topsail.yard
   class: yard
   'on': main.topmast
   length_m: 19.0
   height_m: 39.0
-  brace_limit_deg: 42
+  brace_limit_deg: 58
   rating_kn: 90
 - id: main.topgallant.yard
   class: yard
   'on': main.topgallant_mast
   length_m: 13.0
   height_m: 48.6
-  brace_limit_deg: 44
+  brace_limit_deg: 60
   rating_kn: 40
 - id: main.royal.yard
   class: yard
   'on': main.royal_mast
   length_m: 9.0
   height_m: 54.5
-  brace_limit_deg: 45
+  brace_limit_deg: 62
   rating_kn: 18
 - id: mizzen.mast
   class: mast
@@ -140,28 +140,28 @@ spars:
   'on': mizzen.topmast
   length_m: 13.0
   height_m: 29.8
-  brace_limit_deg: 42
+  brace_limit_deg: 58
   rating_kn: 90
 - id: mizzen.topgallant.yard
   class: yard
   'on': mizzen.topgallant_mast
   length_m: 9.0
   height_m: 37.3
-  brace_limit_deg: 44
+  brace_limit_deg: 60
   rating_kn: 40
 - id: mizzen.royal.yard
   class: yard
   'on': mizzen.royal_mast
   length_m: 6.0
   height_m: 41.6
-  brace_limit_deg: 45
+  brace_limit_deg: 62
   rating_kn: 18
 - id: mizzen.crossjack.yard
   class: yard
   'on': mizzen.mast
   length_m: 18.0
   height_m: 16.0
-  brace_limit_deg: 38
+  brace_limit_deg: 55
   rating_kn: 80
 - id: mizzen.gaff
   class: gaff

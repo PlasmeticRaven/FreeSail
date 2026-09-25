@@ -53,7 +53,7 @@ class Spar(Part):
     parent: str | None = None
     side: str | None = None
     brace_limit: float = 0.0  # radians, for yards
-    brace_angle: float = 0.0  # radians; 0 square, +ve = larboard yardarm forward
+    brace_angle: float = 0.0  # radians; 0 square, +ve = braced up for the starboard tack
     sent_down: bool = False  # struck below (topgallant masts in a gale)
 
     @classmethod
@@ -196,7 +196,7 @@ class Dynamics:
     # readings refreshed by physics each tick
     speed: float = 0.0  # through the water, m/s
     leeway: float = 0.0  # radians, +ve = set to starboard
-    weather_helm: float = 0.0  # steady rudder angle needed, radians
+    weather_helm: float = 0.0  # radians, positive when she wants to round up (weather helm)
     apparent_wind_angle: float = 0.0  # radians, +ve on the starboard bow
     apparent_wind_speed: float = 0.0
 
