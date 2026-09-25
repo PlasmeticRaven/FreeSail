@@ -66,14 +66,17 @@ brace the head yards sharp aback
 ```
 
 ```
-  Morning watch (04:21)  Order: back the main topsail.
-  Morning watch (04:21)  Man the main topsail yard braces.
-  Morning watch (04:21)  Laid the main topsail yard aback, braced up for the larboard tack; the main topsail to the mast.
-* Morning watch (04:21)  Main topsail taken aback.
-* Morning watch (04:22)  Braced the main topsail yard; 58° from square.
+  Morning watch (04:10)  Order: back the main topsail.
+  Morning watch (04:10)  Man the main yard braces.
+  Morning watch (04:10)  Man the main topsail yard braces.
+  Morning watch (04:10)  Laid the main yard, main topsail yard, main topgallant yard and main royal yard aback, braced up for the larboard tack; the main course, main topsail and main topgallant to the mast.
+* Morning watch (04:10)  Main course taken aback.
+* Morning watch (04:10)  Main topsail taken aback.
+* Morning watch (04:10)  Main topgallant taken aback.
+! Morning watch (04:10)  Taken aback: the sails pressed against the masts and she lost her way.
 ```
 
-To fill it again, `brace the main topsail sharp up` for the tack she is on. The refusals: "Back what? Name a yard or a square sail, such as the main topsail"; the spanker "is a gaff sail; it has no yard to brace."
+Note that the order names one sail but the whole mast's yards come round together. That is the period sense of "back the main topsail": a single yard braced against the yards above and below it would foul their sails, so the main yards are laid aback as a set and the sails on them go to the mast. With the main aback and nothing else done she loses her way and rounds up with the helm hard over; to stop her properly, `heave to` (chapter 5) also hauls up the course and puts the helm a-lee. To fill again, `brace the main yards full` for the tack she is on. The refusals: "Back what? Name a yard or a square sail, such as the main topsail"; the spanker "is a gaff sail; it has no yard to brace."
 
 ### How sharp, and which yards sharper
 
