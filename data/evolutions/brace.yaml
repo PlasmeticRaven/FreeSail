@@ -1,0 +1,30 @@
+# Brace a yard round to a given angle from square. The yard swings over the
+# step's duration (a ramp), so the physics feels the change progressively.
+#
+# Parameters:
+#   target_deg  the angle from square to brace to, in degrees, unsigned;
+#               capped at the yard's brace_limit ("sharp up" = pass 90).
+#               The verb table: sharp up = the limit, up = 30, in = 15, square = 0.
+#   tack        which tack to brace for: starboard or larboard. Left null,
+#               the ship's present tack. brace_angle is positive when braced
+#               up for the starboard tack (wind from starboard, starboard
+#               yardarm forward) and negative for the larboard tack.
+id: brace
+verb: brace
+applies_to: {class: yard}
+params: {target_deg: 30, tack: null}
+preconditions:
+  - {check: not yard.sent_down, reason: "The {yard} is sent down."}
+  - {check: not yard.wrecked, reason: "The {yard} is wrecked."}
+requires:
+  - {check: not wrecked(spar_chain(yard)), reason: "the {yard}'s mast is wrecked or sent down"}
+steps:
+  - do: brace
+    duration_s: 45
+    ramp:
+      yard.brace_angle: tack_sign(params.tack) * clamp(deg(params.target_deg), 0, yard.brace_limit)
+on_start: {log: "Man the {yard} braces."}
+on_complete: {log: "Braced the {yard}; {brace_deg}° from square.", kind: yard.braced, severity: notable}
+on_fail: {log: "Could not brace the {yard}: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 8, rating: landsman, stations: [afterguard, waisters]}
+source: "Luce 1866, ch. XXIV Working to Windward, 'To Trim Yards', 'Table of best angles of yard with keel'; ch. XXV 'Bracing Yards'"

@@ -1,0 +1,23 @@
+# Take in a square sail: clew it up, then settle the yard down on the cap if
+# it hoists. The sail is left hanging in the gear; furling it is a separate
+# evolution (furl_square), as the verb table has it.
+id: take_in_square
+verb: take_in
+applies_to: {class: square}
+preconditions:
+  - {check: "sail.state in [set, sheeted, loosed]", reason: "The {sail} is {state}; there is nothing to take in."}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
+steps:
+  - do: clew_up
+    duration_s: 60
+    sets: {sail.state: in_the_gear}
+    log: "Clewed up the {sail}."
+  - do: settle_halyards
+    duration_s: 45
+    via: halyard_of(yard_of(sail))
+on_start: {log: "Hands to the {sail} clewlines and buntlines."}
+on_complete: {log: "Took in the {sail}; hanging in the gear.", kind: sail.taken_in, severity: notable}
+on_fail: {log: "Could not take in the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 10, rating: ordinary, stations: [afterguard, waisters]}
+source: "Luce 1866, ch. XXIII At Sea, 'To take in a Topsail', 'To take in a Top-gallant sail', 'To take in a Course'"

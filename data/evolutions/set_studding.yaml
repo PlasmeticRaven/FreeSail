@@ -1,0 +1,34 @@
+# Set a studding sail. The sail is got out and made up, the halyards and tack
+# bent on, the boom rigged out, and the sail hoisted and its tack hauled out
+# to the boom end. It needs the sail on its yard to be set, since it extends
+# that sail's foot or head. About four minutes.
+id: set_studding
+verb: set
+applies_to: {class: studding}
+preconditions:
+  - {check: sail.state != set, reason: "The {sail} is set already."}
+  - {check: sail.state != blown_out, reason: "The {sail} is blown out; a new one must be bent."}
+  - {check: sail_of(yard_of(sail)).is_set, reason: "The {sail} cannot be set until the sail on its yard is set."}
+requires:
+  - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
+  - {check: "not wrecked(spar_of_role(sail, boom))", reason: "the {sail}'s boom is carried away"}
+steps:
+  - do: bend_on
+    duration_s: 90
+    if: sail.state in [furled, in_the_gear]
+    sets: {sail.state: loosed}
+    log: "Got the {sail} out and bent on the halyards and tack."
+  - do: rig_out_and_hoist
+    duration_s: 120
+    via: halyard_of(sail)
+    sets: {sail.state: set}
+  - do: haul_out
+    duration_s: 30
+    if: sail.state != set
+    sets: {sail.state: set}
+on_start: {log: "Stand by to set the {sail}."}
+on_complete: {log: "Set the {sail}.", kind: sail.set, severity: notable}
+on_fail: {log: "Could not set the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 8, rating: able, stations: [topmen, forecastle]}
+source: "Luce 1866, ch. XXIII At Sea, 'The Topmast Studding-sail', 'To set a lower Studding-sail'; ch. XI Sails, 'Studding-sails'"

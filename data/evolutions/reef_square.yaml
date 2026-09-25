@@ -1,0 +1,32 @@
+# Reef a square sail. The halyards are settled and the yard clewed down on
+# the cap, the reef tackles hauled out, the topmen lay out and pass the
+# earings and tie the points, then the yard is hoisted again "a taut leech".
+# `params.reefs` is how many reefs to take at once (default one); a close
+# reef is asked for by passing more reefs than the sail has bands, since the
+# count is capped at the bands. About five minutes for one reef.
+id: reef_square
+verb: reef
+applies_to: {class: square}
+params: {reefs: 1}
+preconditions:
+  - {check: sail.state == set, reason: "The {sail} is {state}; it must be set to be reefed."}
+  - {check: sail.reef_bands > 0, reason: "The {sail} has no reef bands."}
+  - {check: sail.reefs < sail.reef_bands, reason: "The {sail} is close reefed already."}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
+steps:
+  - do: clew_down
+    duration_s: 60
+    log: "Settled the {sail} halyards and clewed down; hauled out the reef tackles."
+  - do: reef
+    duration_s: 150
+    sets: {sail.reefs: "min(sail.reefs + params.reefs, sail.reef_bands)"}
+    log: "Laid out and passed the earings of the {sail}."
+  - do: hoist
+    duration_s: 90
+    via: halyard_of(yard_of(sail))
+on_start: {log: "All hands reef the {sail}."}
+on_complete: {log: "Reefed the {sail}; now {state}.", kind: sail.reefed, severity: notable}
+on_fail: {log: "Could not reef the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 16, rating: able, stations: [topmen, afterguard]}
+source: "Luce 1866, ch. XXVII Reefing, 'Reefing and Hoisting'; Lever 1808, 'Reefing Topsails'"

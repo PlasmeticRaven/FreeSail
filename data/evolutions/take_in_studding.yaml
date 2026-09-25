@@ -1,0 +1,24 @@
+# Take in a studding sail: lower away the halyards, haul down on the downhaul
+# and sheet, rig in the boom, then make the sail up and stow it in the top or
+# along the rigging. Studding sails are always made up when taken in, so the
+# sail ends furled rather than in the gear.
+id: take_in_studding
+verb: take_in
+applies_to: {class: studding}
+preconditions:
+  - {check: "sail.state in [set, loosed]", reason: "The {sail} is {state}; there is nothing to take in."}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
+steps:
+  - do: lower_and_haul_down
+    duration_s: 90
+    sets: {sail.state: in_the_gear}
+    log: "Lowered away and rigged in the {sail}."
+  - do: make_up
+    duration_s: 60
+    sets: {sail.state: furled}
+on_start: {log: "Stand by to take in the {sail}."}
+on_complete: {log: "Took in the {sail} and made it up.", kind: sail.taken_in, severity: notable}
+on_fail: {log: "Could not take in the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 8, rating: ordinary, stations: [topmen, forecastle]}
+source: "Luce 1866, ch. XXIII At Sea, 'To take in the topmast studding sail', 'To take in [the lower studding-sail]'"

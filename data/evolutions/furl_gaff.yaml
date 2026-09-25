@@ -1,0 +1,25 @@
+# Furl a gaff sail: brail it up or lower it if it is still drawing, then pass
+# the gaskets along the gaff or the boom. Not in the required list for M2,
+# but the verb table's `furl` needs a `furl_<class>` for every class.
+id: furl_gaff
+verb: furl
+applies_to: {class: gaff}
+preconditions:
+  - {check: sail.state != furled, reason: "The {sail} is furled already."}
+  - {check: sail.state != blown_out, reason: "The {sail} is blown out; there is nothing left to furl."}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s gaff or mast is wrecked"}
+steps:
+  - do: brail_up
+    duration_s: 90
+    if: sail.state in [set, loosed]
+    sets: {sail.state: in_the_gear}
+    log: "Brailed up the {sail}."
+  - do: furl
+    duration_s: 120
+    sets: {sail.state: furled}
+on_start: {log: "Hands to furl the {sail}."}
+on_complete: {log: "Furled the {sail}.", kind: sail.furled, severity: notable}
+on_fail: {log: "Could not furl the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 8, rating: ordinary, stations: [afterguard]}
+source: "Luce 1866, ch. XX In Charge of the Deck, 'To Furl Sails'; ch. XXIII 'The Spanker'"

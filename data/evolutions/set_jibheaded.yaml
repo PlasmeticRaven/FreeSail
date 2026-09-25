@@ -1,0 +1,30 @@
+# Set a jib-headed sail (jib, flying jib, fore topmast staysail, a schooner's
+# gaff topsail): clear it away, let go the downhaul, hoist away, and trim the
+# sheet. Quick work: under two minutes.
+id: set_jibheaded
+verb: set
+applies_to: {class: jibheaded}
+preconditions:
+  - {check: sail.state != set, reason: "The {sail} is set already."}
+  - {check: sail.state != blown_out, reason: "The {sail} is blown out; a new one must be bent."}
+requires:
+  - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s stay or mast is carried away"}
+steps:
+  - do: clear_away
+    duration_s: 30
+    if: sail.state in [furled, in_the_gear]
+    sets: {sail.state: loosed}
+  - do: hoist
+    duration_s: 60
+    via: halyard_of(sail)
+    sets: {sail.state: set}
+  - do: trim_sheet
+    duration_s: 15
+    if: sail.state != set
+    sets: {sail.state: set}
+on_start: {log: "Clear away the {sail}; man the halyards."}
+on_complete: {log: "Set the {sail}.", kind: sail.set, severity: notable}
+on_fail: {log: "Could not set the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 6, rating: ordinary, stations: [forecastle]}
+source: "Luce 1866, ch. XXIII At Sea, 'To set a Head Sail'"
