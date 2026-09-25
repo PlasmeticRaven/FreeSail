@@ -47,7 +47,7 @@ jobs:
           python-version: "3.11"
       - name: Run the checks the gate relies on
         run: |
-          pip install -e ".[dev]"
+          pip install -e ".[dev,server]"
           ruff check .
           python -m pytest
       - name: Build the gate zip
