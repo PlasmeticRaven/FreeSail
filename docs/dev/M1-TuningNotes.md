@@ -33,4 +33,6 @@ What is wrong and where to look:
 
 **Also changed at integration (M1):** the helmsman shifts the helm when she gathers sternway (she could be trapped in irons otherwise); gaff and jib-headed sails are trimmed to the apparent wind when set and a slow automatic sheet-tending step keeps them drawing between orders (`evolutions/trim.py`, to be replaced by crew work in M3). Heave to lies her at about 50° off the wind but with sternway of 2 kn or so, and fill away from that state is rough (she comes up too close and hangs aback); both need the resistance and balance work above, and fill away may need to bear away deliberately before bracing full.
 
+**Getting under way (found after gate M1):** from rest at 293° with the wind north, `set plain sail` then `brace sharp up` at once rounds her up into the wind before she has steerage way and leaves her in irons at about 325° with sternway; the helm is hard over one way then the other as the sternway rule flips it. Setting the fore topsail first and waiting six minutes avoids it. Now truth 17 for package 10.
+
 Method for package 10: encode the truths table as tests first, then tune one constant at a time, recording each change and its effect here.
