@@ -131,7 +131,9 @@ def _notice_helm_orders(ship: Ship, st: hp.HullState) -> None:
 def _update_readings(ship: Ship) -> None:
     d = ship.dyn
     d.speed = math.hypot(d.u, d.v)
-    d.leeway = math.atan2(d.v, d.u) if d.speed >= hp.LEEWAY_MIN_SPEED else 0.0
+    # leeway means something only when she has way on: a ship drifting broadside
+    # under bare poles has no course to make leeway from
+    d.leeway = math.atan2(d.v, d.u) if abs(d.u) >= hp.LEEWAY_MIN_SPEED else 0.0
 
 
 def _log_notes(ship: Ship, st: hp.HullState, dt: float) -> None:
@@ -161,9 +163,12 @@ def _log_notes(ship: Ship, st: hp.HullState, dt: float) -> None:
                 data={"heading": d.heading, "rudder": d.rudder, "weather_helm": d.weather_helm},
             )
 
-    # ship.aback: thrust astern for 10 s with sail set
+    # ship.aback: thrust astern for 10 s with sail set, unless she is deliberately
+    # in stays (a whole-ship evolution such as a tack or a heave-to is in progress)
     sail_set = any(s.is_set for s in ship.sails.values())
-    if sail_set and st.last_thrust_n < 0:
+    runner = ship.extra.get("evolutions")
+    in_stays = bool(runner) and any(e.get("subject") == "ship" for e in runner.in_progress())
+    if sail_set and st.last_thrust_n < 0 and not in_stays:
         st.seconds_aback += dt
     else:
         st.seconds_aback = 0.0

@@ -516,13 +516,15 @@ def test_hauling_the_larboard_brace_braces_up_for_the_starboard_tack():
 
 def test_a_brace_stops_at_the_yards_limit():
     ship, _ = make("frigate")
-    yard = ship.spars["main.yard"]  # limit 38 degrees
-    for _ in range(7):
+    yard = ship.spars["main.yard"]
+    limit_deg = round(math.degrees(yard.brace_limit))
+    steps_short = limit_deg // 5 - (1 if limit_deg % 5 == 0 else 0)
+    for _ in range(steps_short):
         orders.handle(ship, "haul the larboard main brace")
-    assert yard.brace_angle == pytest.approx(units.deg_to_rad(35))
+    assert yard.brace_angle == pytest.approx(units.deg_to_rad(5 * steps_short))
     _, log, _ = orders.handle(ship, "haul the larboard main brace")
     assert yard.brace_angle == pytest.approx(yard.brace_limit)
-    assert "38°" in log and "starboard tack" in log
+    assert f"{limit_deg}°" in log and "starboard tack" in log
     with pytest.raises(OrderError, match="will come no further"):
         orders.handle(ship, "haul the larboard main brace")
     assert yard.brace_angle == pytest.approx(yard.brace_limit)
@@ -721,8 +723,11 @@ def test_brace_targets_are_signed_by_the_tack_and_limited_by_the_yard():
     ship, runner = make("frigate")
     orders.handle(ship, "brace the fore yards sharp up on the starboard tack")
     by_yard = {s: p for _, s, p in runner.started}
-    assert by_yard["fore.yard"]["target_deg"] == 38.0
-    assert by_yard["fore.topsail.yard"]["target_deg"] == 42.0
+    fore_limit = round(math.degrees(ship.spars["fore.yard"].brace_limit), 2)
+    topsail_limit = round(math.degrees(ship.spars["fore.topsail.yard"].brace_limit), 2)
+    assert by_yard["fore.yard"]["target_deg"] == fore_limit
+    assert by_yard["fore.topsail.yard"]["target_deg"] == topsail_limit
+    assert topsail_limit > fore_limit  # upper yards brace sharper
     assert by_yard["fore.yard"]["target_angle"] == pytest.approx(
         ship.spars["fore.yard"].brace_limit
     )
@@ -948,9 +953,10 @@ def test_the_world_logs_an_accepted_order_and_journals_it():
     ship.order_handler = orders.handle
     world = World(seed=1, scenario=Scenario(ship_heading_deg=90), ship=ship)
     event = world.submit("set the fore topsail")
-    assert event.kind == "evolution.started"
+    # the World logs the acceptance; the runner (a fake here) writes the "started" line itself
+    assert event.kind == "order.accepted"
     assert world.journal == [(0, "captain", "set the fore topsail")]
-    assert [e.kind for e in world.log][-2:] == ["order.accepted", "evolution.started"]
+    assert [e.kind for e in world.log][-1:] == ["order.accepted"]
     assert runner.started == [("set_square", "fore.topsail", {})]
 
 

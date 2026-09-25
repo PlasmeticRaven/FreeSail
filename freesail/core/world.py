@@ -128,13 +128,16 @@ class World:
                 data={"order": text, "reason": str(e)},
             )
         self.journal.append((self.clock.tick, actor, text))
-        self.record(
+        accepted = self.record(
             Severity.ROUTINE,
             "order.accepted",
             f"Order: {text}.",
             actor=actor,
             data={"order": text},
         )
+        if kind == "evolution.started" and not data.get("failed"):
+            # the evolution runner writes its own "started" line; avoid saying it twice
+            return accepted
         return self.record(Severity.ROUTINE, kind, log_text, actor=actor, data=data)
 
     # -- time ----------------------------------------------------------------
