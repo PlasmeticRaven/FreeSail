@@ -1,0 +1,285 @@
+# The vocabulary of Orders, the imperative dialect (spec §8).
+#
+# Everything here is data the parser reads at start-up. A new verb, a new
+# synonym or a new contraction is added here, not in the code. Ship-specific
+# nouns (part ids, aliases, groups) live in the ship file; this file holds
+# what is true of every ship.
+
+# ---------------------------------------------------------------------------
+# Verbs. `object` says what kind of thing the verb works on:
+#   sail      a sail or a group of sails (level 1, starts an evolution per sail)
+#   yards     a yard, a group of yards, or nothing (meaning every yard)
+#   line      one running line (level 0, acts on the part at once)
+#   heading   a compass heading, degrees, or a number of points
+#   points    an optional number of points (default one)
+#   none      nothing after the verb but modifiers
+#   driver    a console command that reached the ship by mistake
+# `level` is the control ladder level of docs/DesignProposal.md §2.2.
+# ---------------------------------------------------------------------------
+verbs:
+  set:
+    synonyms: [make sail on, loose and set, hoist, loose]
+    object: sail
+    level: 1
+  take in:
+    synonyms: [clew up, haul down, take in the, douse, hand]
+    object: sail
+    level: 1
+  furl:
+    synonyms: []
+    object: sail
+    level: 1
+  reef:
+    synonyms: [take a reef in, take in a reef in]
+    object: sail
+    level: 1
+  shake out:
+    synonyms: [shake out the reef in, shake the reef out of, shake the reefs out of]
+    object: sail
+    level: 1
+  brace:
+    synonyms: [brace round]
+    object: yards
+    level: 1
+  haul:
+    synonyms: [haul on, haul in, haul taut, round in]
+    object: line
+    level: 0
+  ease:
+    synonyms: [ease off, ease away, slack, slack away, slacken, start]
+    object: line
+    level: 0
+  check:
+    synonyms: []
+    object: line
+    level: 0
+  let go:
+    synonyms: [cast off, let fly, let run]
+    object: line
+    level: 0
+  belay:
+    synonyms: [make fast, avast hauling on, avast]
+    object: line
+    level: 0
+  steer:
+    synonyms: [course, helm, steer for, head]
+    object: heading
+    level: 1
+  come up:
+    synonyms: [luff, luff up, come up to the wind, come to the wind, keep her up, keep your luff]
+    object: points
+    level: 1
+  bear away:
+    synonyms: [keep away, bear up, keep her off, keep her away, keep off, bear off, up helm]
+    object: points
+    level: 1
+  keep her full:
+    synonyms: [full and by, keep her full and by, sail her full and by, steer full and by]
+    object: none
+    level: 1
+  tack ship:
+    synonyms: [ready about, go about, about ship, tack, put her about, stays]
+    object: none
+    level: 1
+  wear ship:
+    synonyms: [wear, bear up and wear, wear round]
+    object: none
+    level: 1
+  heave to:
+    synonyms: [heave her to, lie to, bring her to]
+    object: none
+    level: 1
+  fill away:
+    synonyms: [fill, fill and stand on, let draw]
+    object: none
+    level: 1
+  # Group evolutions: verb phrases with no object, expanded from the list below.
+  set plain sail:
+    synonyms: [make plain sail, make sail]
+    object: none
+    level: 1
+  make all sail:
+    synonyms: [set all sail, crowd sail, crack on]
+    object: none
+    level: 1
+  shorten sail:
+    synonyms: [take in sail, reduce sail, snug her down]
+    object: none
+    level: 1
+  # Console and client control. If one of these reaches the ship, the
+  # captain typed it at the wrong prompt; say so.
+  hold:
+    synonyms: [pause, stop the clock]
+    object: driver
+    level: driver
+  go:
+    synonyms: [resume, run]
+    object: driver
+    level: driver
+  time:
+    synonyms: [tick, speed up, slow down]
+    object: driver
+    level: driver
+
+# ---------------------------------------------------------------------------
+# Which evolution a level 1 sail verb starts, by sail class (spec §8.4).
+# A class missing from a verb's list means the verb has no meaning for that
+# class, and the order is rejected with the sentence in `refusals`.
+# ---------------------------------------------------------------------------
+evolutions:
+  set:
+    square: set_square
+    gaff: set_gaff
+    jibheaded: set_jibheaded
+    studding: set_studding
+    lug: set_lug
+    lateen: set_lateen
+    sprit: set_sprit
+  take in:
+    square: take_in_square
+    gaff: take_in_gaff
+    jibheaded: take_in_jibheaded
+    studding: take_in_studding
+    lug: take_in_lug
+    lateen: take_in_lateen
+    sprit: take_in_sprit
+  furl:
+    square: furl_square
+  reef:
+    square: reef_square
+    gaff: reef_gaff
+  shake out:
+    square: shake_out_square
+    gaff: shake_out_gaff
+  brace: brace
+  tack ship: tack
+  wear ship: wear
+  heave to: heave_to
+  fill away: fill_away
+
+refusals:
+  furl: "A {class} sail is not furled on its spar; take it in instead."
+  reef: "The {name} has no reef bands; it is set whole or not at all."
+  shake out: "The {name} has no reef bands; there is nothing to shake out."
+
+# ---------------------------------------------------------------------------
+# Brace modes: the target brace angle for each word (spec §8.2). `limit`
+# means the yard's own brace_limit. Degrees here; radians inside.
+# ---------------------------------------------------------------------------
+brace_modes:
+  sharp up: limit
+  up: 30
+  in: 15
+  square: 0
+  by the lifts: 0
+
+# ---------------------------------------------------------------------------
+# Sides. `port` is accepted and echoed as larboard. `weather` and `lee`
+# resolve from the current tack when the order is parsed.
+# ---------------------------------------------------------------------------
+sides:
+  starboard: starboard
+  stbd: starboard
+  larboard: larboard
+  port: larboard
+  weather: weather
+  windward: weather
+  lee: lee
+  leeward: lee
+both_sides: [both sides, both, either side, on both sides]
+
+# ---------------------------------------------------------------------------
+# Other modifier words.
+# ---------------------------------------------------------------------------
+manner: [handsomely, roundly, cheerly, smartly, together]
+a_little: [a little, a trifle, a bit]
+reef_close: [close, close reefed, close reef, close reefs, all reefs]
+tack_phrase: ["on the", "on", "to the"]   # "on the starboard tack", "to the starboard tack"
+point_directions:
+  "up": "up"
+  "off": "off"
+  to starboard: starboard
+  to larboard: larboard
+  to port: larboard
+  to windward: up
+  to leeward: "off"
+
+# ---------------------------------------------------------------------------
+# Numbers as words. Digits are also accepted.
+# ---------------------------------------------------------------------------
+numbers:
+  a: 1
+  an: 1
+  one: 1
+  two: 2
+  three: 3
+  four: 4
+  five: 5
+  six: 6
+  seven: 7
+  eight: 8
+  nine: 9
+  ten: 10
+  eleven: 11
+  twelve: 12
+  sixteen: 16
+  half: 0.5
+
+# ---------------------------------------------------------------------------
+# Generated-name rules (spec §6.5). A part id such as `fore.topsail.yard`
+# becomes the phrase "fore topsail yard" (dots and underscores to spaces);
+# then every word with an entry below also takes each of its alternatives,
+# so "fore tops'l yard" and "fore topsl yard" are names too. Apostrophes are
+# optional when matching, so the plain spellings need not be listed.
+# ---------------------------------------------------------------------------
+contractions:
+  topsail: [tops'l, topsl, top sail]
+  topgallant: [t'gallant, t'gan's'l, tgallant, topgallant sail, top gallant]
+  topgallants: [t'gallants, t'gan's'ls, topgallant sails]
+  royal: [royal sail]
+  studdingsail: [stuns'l, stunsail, studding sail, stun'sail]
+  studdingsails: [stuns'ls, stunsails, studding sails, kites]
+  crossjack: [cro'jack, crojack]
+  staysail: [stays'l, staysl, stay sail]
+  staysails: [stays'ls, stay sails]
+  forecourse: [fore course]
+  course: [course]
+  gaff_topsail: [gaff tops'l]
+  spanker: [driver]
+  halyard: [halliard, haulyard]
+  # sides inside a name
+  larboard: [port]
+  fore: [fore]
+  mizzen: [mizen, mizzen]
+  jib: [jib]
+
+# Segment words that are dropped when they sit between others in a line's
+# name: `main.yard.brace.starboard` is "the main brace", not "the main yard
+# brace" (though that is accepted too).
+droppable_inner_words: [yard]
+
+# ---------------------------------------------------------------------------
+# Group evolutions: verb phrases that expand to a list of ordinary orders,
+# given in the order a ship of the period would do them (Luce 1866, ch.
+# XXIII). Each order is handled as if the captain had given it; an order
+# whose object this ship does not have is passed over, so one list serves
+# every rig. Orders that fail for another reason (a sail already set) are
+# reported in the log line and the rest are still carried out.
+# ---------------------------------------------------------------------------
+group_evolutions:
+  set plain sail:
+    - set the plain sail
+  make all sail:
+    - set the plain sail
+    - set the royals
+    - set the flying jib
+    - set the staysails
+    - set the gaff topsail
+    - set the studdingsails, both sides
+  shorten sail:
+    - take in the studdingsails
+    - take in the royals
+    - take in the flying jib
+    - take in the topgallants
+    - take in the gaff topsail
+    - reef the topsails, one reef
