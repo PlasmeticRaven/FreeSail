@@ -3,18 +3,22 @@
 Three kinds of verb live here:
 
 - **Level 1 sail and yard verbs** (`set`, `take in`, `furl`, `reef`, `shake
-  out`, `brace`) and the **whole-ship evolutions** (`tack ship`, `wear ship`,
-  `heave to`, `fill away`) start an evolution through the runner kept in
-  `ship.extra["evolutions"]` (package 7). The verb and the sail's class pick
-  the evolution id from `vocabulary.yaml` (`set` + `square` = `set_square`).
-  A group object starts one evolution per member; if some fail, the rest
-  still start and the failures are reported in the log text.
-- **Level 0 line verbs** (`haul`, `ease`, `check`, `let go`, `belay`) act on
-  the part at once: a brace shifts its yard's angle by five degrees, a sheet
-  of a fore-and-aft sail shifts the sail's sheet angle by five degrees, a
-  halyard (or any other line) shifts its hoist by a tenth.
+  out`, `brace`, `square`, `back`, `trim`) and the **whole-ship evolutions**
+  (`tack ship`, `wear ship`, `heave to`, `fill away`) start an evolution
+  through the runner kept in `ship.extra["evolutions"]` (package 7). The
+  verb and the sail's class pick the evolution id from `vocabulary.yaml`
+  (`set` + `square` = `set_square`). A group object starts one evolution per
+  member; if some fail, the rest still start and the failures are reported
+  in the log text. `scandalise` is in the table only to be refused.
+- **Level 0 line verbs** (`haul`, `ease`, `check`, `let go`, `belay`, and
+  `sheet home` on a sail) act on the part at once: a brace shifts its yard's
+  angle by five degrees, a sheet of a fore-and-aft sail shifts the sail's
+  sheet angle by five degrees, a halyard (or any other line) shifts its
+  hoist by a tenth; `home` or `aft` takes it all the way.
 - **Helm verbs** (`steer`, `come up`, `bear away`, `keep her full`) set the
-  helm targets in `ship.dyn` for the helmsman in the physics to follow.
+  helm targets in `ship.dyn` for the helmsman in the physics to follow; the
+  **conning words** (`steady`, `meet her`, `right the helm`, `helm a-lee`,
+  `helm a-weather`) speak to the wheel itself.
 
 Each returns `(kind, log_text, data)` for the World to log, or raises
 `OrderError` with a sentence saying why the order was not carried out.
@@ -421,10 +425,9 @@ def _brace(
         target = yard.brace_limit if isinstance(target_deg, str) else units.deg_to_rad(target_deg)
         target = math.copysign(min(abs(target), yard.brace_limit), sign) if target else 0.0
         params = {
-            "target_deg": round(
-                units.rad_to_deg(target), 2
-            ),  # signed: + = larboard yardarm forward
-            "target_angle": target,  # the same in radians
+            # unsigned, as data/evolutions/brace.yaml reads it; `tack` gives the sign
+            "target_deg": round(abs(units.rad_to_deg(target)), 2),
+            "target_angle": target,  # signed radians: + = braced up for the starboard tack
             "mode": mode,
             "tack": tack,
         }
@@ -438,6 +441,10 @@ def _brace(
     if not started:
         raise OrderError(f"Nothing done: {errors.sentence_list(failed)}.")
     text = _summarise(ship, "brace", object_name, started, texts, failed)
+    # The sentence for the log. The World drops an evolution order's own text
+    # when the runner has logged its start, so it goes in as a note, which
+    # the next tick writes to the log after the runner's "Man the braces".
+    note: str | None = None
     if aback:
         backed = errors.join_names(
             [resolve.display_name(ship, s["subject"]) for s in started], "and"
@@ -449,13 +456,20 @@ def _brace(
         pressed = (
             f"the {errors.join_names(set_names, 'and')} to the mast"
             if set_names
-            else "no sail set on them to press against the mast"
+            else f"nothing set on {'it' if len(started) == 1 else 'them'} to press against the mast"
         )
-        text = f"Laid the {backed} aback, braced up for the {tack} tack; {pressed}. " + text
+        note = f"Laid the {backed} aback, braced up for the {tack} tack; {pressed}."
+        ship.note(
+            "routine", "yard.laid_aback", note, data={"subjects": [s["subject"] for s in started]}
+        )
     elif order.modifiers.get("round") and order.modifiers.get("brace_mode") is None:
-        text = f"Braced round for the {tack} tack. " + text
+        note = f"Braced round for the {tack} tack."
+        ship.note("routine", "yard.braced_round", note, data={"tack": tack})
     elif verb == "square":
-        text = f"Squared the {object_name}. " + text
+        note = f"Squared the {object_name}."
+        ship.note("routine", "yard.squared", note, data={"object": object_name})
+    if note:
+        text = f"{note} {text}"
     data = {
         "verb": "brace",
         "level": 1,

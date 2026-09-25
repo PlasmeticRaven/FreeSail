@@ -11,6 +11,8 @@ Some rules that will save you refusals:
 - A name that fits only one part is enough: `set the topsail` names the fore topsail on the schooner, which has one, and is refused on the frigate, which has three.
 - A sided part (a brace, a sheet of a jib, a studding sail) needs its side: *starboard*, *larboard*, *weather*, *lee*, or *both sides*. The side may come before the noun or after a comma. *Weather* and *lee* are worked out from the tack she is on at the moment you speak.
 - The name of a sail names the lines of that sail and of its yard: "fore topsail sheet", "main brace" (for `main.yard.brace`), "spanker peak halyard".
+- The plural of a sided line means both sides: "the fore topsail sheets", "the main braces"; with a side word it means that side ("the lee fore topsail sheets" is the one lee sheet). A plural shorthand names all of them: "the topsail sheets" is six lines on the frigate.
+- Two things may be named with *and*: "the topsails and topgallants", "the jib and the spanker", and, distributed, "the fore and main yards" for the fore yards and the main yards.
 
 ```orders frigate
 set the fore tops'l
@@ -18,6 +20,10 @@ set the main t'gallant
 haul the weather main brace
 ease the jib sheet, lee
 let go the fore topsail sheet, port
+ease the fore topsail sheets
+ease the lee fore topsail sheets
+set the topsails and topgallants
+brace the fore and main yards square
 # rejected: set the topsail
 # rejected: haul the main brace
 # rejected: set the fore topsail yard
@@ -89,6 +95,8 @@ Every square sail and its yard carry the same set of lines, and the parser knows
 | **buntline** | no | hauls the middle (the *bunt*) up to the yard |
 | **reef tackles** | yes | topsails and courses: haul the reef band out to the yardarm for reefing |
 
+The courses' sheets, tacks and bowlines go by the old short names as well (Falconer, *Main-sheet*, *Tack*, *Bowline*): "the main sheet" on a ship-rigged vessel is the main course's sheet, and asks for its side like any sided line; "the fore tack", "the main bowline" likewise. The plural, "the main sheets", is both.
+
 Standing rigging, the **stays**, **shrouds** and **backstays** that hold the masts up, and the **bobstay** and **martingale** under the bowsprit, is named too, but the parser will not let you haul on it: "The starboard main shrouds are standing rigging; set up with deadeyes and lanyards, not hauled."
 
 ```orders frigate
@@ -97,11 +105,15 @@ haul the lee main brace
 ease the weather fore topsail brace a fathom
 let go the fore course tack, weather
 belay the main topsail halyard
+ease the weather main sheet
+ease the lee fore tack
+ease the main sheets
 # rejected: haul the main shrouds, starboard
 # rejected: haul the fore topsail
+# rejected: haul the fore tack
 ```
 
-The last refusal is instructive: "You haul lines; the fore topsail is a sail. Name one of its lines: the fore topsail sheet, the fore topsail clewline, ..." The ship tells you what she has.
+The second refusal is instructive: "You haul lines; the fore topsail is a sail. Name one of its lines: the fore topsail sheet, the fore topsail clewline, ..." The ship tells you what she has. The last is the sided line without its side: "Which fore tack: the starboard, the larboard (the weather or the lee), or both sides?"
 
 ### The lines of a gaff sail and a jib
 
