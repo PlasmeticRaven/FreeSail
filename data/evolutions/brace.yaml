@@ -2,7 +2,8 @@
 # step's duration (a ramp), so the physics feels the change progressively.
 #
 # Parameters:
-#   target_deg  the angle from square to brace to, in degrees, unsigned;
+#   target_deg  the angle from square to brace to, in degrees; the sign is
+#               ignored (the tack gives it), so a verb may pass it signed;
 #               capped at the yard's brace_limit ("sharp up" = pass 90).
 #               The verb table: sharp up = the limit, up = 30, in = 15, square = 0.
 #   tack        which tack to brace for: starboard or larboard. Left null,
@@ -22,7 +23,7 @@ steps:
   - do: brace
     duration_s: 45
     ramp:
-      yard.brace_angle: tack_sign(params.tack) * clamp(deg(params.target_deg), 0, yard.brace_limit)
+      yard.brace_angle: tack_sign(params.tack) * clamp(abs(deg(params.target_deg)), 0, yard.brace_limit)
 on_start: {log: "Man the {yard} braces."}
 on_complete: {log: "Braced the {yard}; {brace_deg}° from square.", kind: yard.braced, severity: notable}
 on_fail: {log: "Could not brace the {yard}: {reason}.", kind: evolution.failed, severity: notable}

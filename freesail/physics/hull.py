@@ -55,6 +55,8 @@ HELM_KP = 1.0  # helmsman: radians of rudder per radian of heading error
 HELM_KD = 8.0  # helmsman: seconds; rudder eased against the rate of swing to meet her
 HELM_KI = 0.03  # helmsman: per second; how quickly he learns the helm she carries
 HELM_KI_WINDOW = math.radians(10.0)  # he only learns the helm once within this much of the course
+HELM_KI_LEAK_S = 60.0  # seconds; outside that window, or without way, what he learned fades
+HELM_STEERAGE_SPEED = 0.75  # m/s (1.5 kn); under this the rudder bites too little to learn from
 FULL_AND_BY_MARGIN = math.radians(5.0)  # sailed this much fuller than the sails' luffing angle
 FULL_AND_BY_DEFAULT_LUFF = math.radians(45.0)  # luffing angle when package 4 has not said
 WEATHER_HELM_TIME_CONSTANT = 30.0  # seconds; the weather-helm reading averages the rudder
@@ -257,7 +259,10 @@ def steer(ship: Ship, dt: float) -> float:
     In RUDDER mode he puts the wheel where ordered and holds it. Otherwise he
     meets her: helm in proportion to how far she is off her course, eased as
     she swings so as not to overshoot, plus whatever standing helm he has
-    learned she needs to hold a straight course (the weather or lee helm). The
+    learned she needs to hold a straight course (the weather or lee helm). He
+    learns that helm only near the course and with steerage way on; off the
+    course or without way it fades over HELM_KI_LEAK_S, so a helm learned while
+    she was rounding up with no way does not hold her off her course later. The
     wheel moves no faster than the rudder's rate and no further than its stop.
     """
     d = ship.dyn
@@ -269,9 +274,13 @@ def steer(ship: Ship, dt: float) -> float:
     else:
         err = heading_error(ship, st)
         assert err is not None
-        if abs(err) < HELM_KI_WINDOW:
+        if abs(err) < HELM_KI_WINDOW and d.u > HELM_STEERAGE_SPEED:
             st.helm_integral += HELM_KI * err * dt
             st.helm_integral = max(-max_angle, min(max_angle, st.helm_integral))
+        else:
+            # off her course, or without steerage way, the standing helm he
+            # learned means nothing: let it fade rather than hold her off
+            st.helm_integral *= math.exp(-dt / HELM_KI_LEAK_S)
         wanted = HELM_KP * err - HELM_KD * d.r + st.helm_integral
         if d.u < -STERNWAY_SHIFT_SPEED:
             # she is making sternway: the rudder acts the other way, so the

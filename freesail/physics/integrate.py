@@ -166,13 +166,18 @@ def _log_notes(ship: Ship, st: hp.HullState, dt: float) -> None:
             )
 
     # ship.aback: thrust astern for 10 s with sail set, unless she is deliberately
-    # in stays (a whole-ship evolution such as a tack or a heave-to is in progress)
-    sail_set = any(s.is_set for s in ship.sails.values())
+    # in stays (a whole-ship evolution such as a tack or a heave-to is in progress).
+    # Sails pressed against the masts means a square sail backed, or nothing set
+    # drawing at all; the windage of canvas still being set while the jibs draw
+    # is not being taken aback (truth 17: getting under way).
+    set_sails = [s for s in ship.sails.values() if s.is_set]
+    sail_set = bool(set_sails)
+    pressed = any(s.backed for s in set_sails) or not any(s.thrust_kn > 0 for s in set_sails)
     runner = ship.extra.get("evolutions")
     in_stays = "hove_to" in ship.extra or (
         bool(runner) and any(e.get("subject") in ("ship", ship.name) for e in runner.in_progress())
     )
-    if sail_set and st.last_thrust_n < 0 and not in_stays:
+    if sail_set and pressed and st.last_thrust_n < 0 and not in_stays:
         st.seconds_aback += dt
     else:
         st.seconds_aback = 0.0
