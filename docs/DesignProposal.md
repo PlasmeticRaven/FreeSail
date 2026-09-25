@@ -535,8 +535,12 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
 9. **LLM integration.** Bespoke to this project; QudBridge is a fallback reference only (§7.2).
 10. **Rigs.** Raised from a late addition to pillar 2. Two reference rigs built together in M2; the data model covers the list in §9 from the outset.
 
+### Closed after v0.2 review
+
+11. **Second reference rig.** Topsail schooner, confirmed. A cutter is the intended third vessel, and a small lateen-rigged vessel a fourth, chosen to handle as differently as possible from the ship-rigged reference.
+12. **The language's name.** Orders.
+13. **Next document.** The M0 to M2 technical specification: `docs/TechnicalSpec-M0-M2.md`.
+
 ### Still open
 
-1. **Second reference rig.** I have proposed a topsail schooner for coverage. A cutter (one mast, huge gaff mainsail, running bowsprit, period privateering favourite) is the alternative if you would rather the second ship be small and fast to build.
-2. **The language's name.** "Orders" is a placeholder. It may be the right answer.
-3. **What to write next.** The proposal is now stable enough to build against. The natural next document is the M0–M2 technical specification: the event and tick model, the part-graph file format, and the Orders grammar in full. That can be written, or M0 can simply be started and the specification grown alongside it.
+Nothing at the proposal level. Open items now live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.
