@@ -57,6 +57,7 @@ HELM_KI = 0.03  # helmsman: per second; how quickly he learns the helm she carri
 HELM_KI_WINDOW = math.radians(10.0)  # he only learns the helm once within this much of the course
 HELM_KI_LEAK_S = 60.0  # seconds; outside that window, or without way, what he learned fades
 HELM_STEERAGE_SPEED = 0.75  # m/s (1.5 kn); under this the rudder bites too little to learn from
+HELM_STUCK_RATE = math.radians(0.1)  # rad/s; swinging slower than this while off course, he adds helm
 FULL_AND_BY_MARGIN = math.radians(8.0)  # sailed this much fuller than the sails' luffing angle
 FULL_AND_BY_DEFAULT_LUFF = math.radians(45.0)  # luffing angle when package 4 has not said
 WEATHER_HELM_TIME_CONSTANT = 30.0  # seconds; the weather-helm reading averages the rudder
@@ -274,8 +275,11 @@ def steer(ship: Ship, dt: float) -> float:
     else:
         err = heading_error(ship, st)
         assert err is not None
-        if abs(err) < HELM_KI_WINDOW and d.u > HELM_STEERAGE_SPEED:
-            st.helm_integral += HELM_KI * err * dt
+        near = abs(err) < HELM_KI_WINDOW
+        stuck = abs(d.r) < HELM_STUCK_RATE  # held off her course and not swinging
+        if (near or stuck) and d.u > HELM_STEERAGE_SPEED:
+            learn = max(-HELM_KI_WINDOW, min(HELM_KI_WINDOW, err))
+            st.helm_integral += HELM_KI * learn * dt
             st.helm_integral = max(-max_angle, min(max_angle, st.helm_integral))
         else:
             # off her course, or without steerage way, the standing helm he

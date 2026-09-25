@@ -292,7 +292,8 @@ def test_full_and_by_uses_the_luff_angle_package_4_exposes(schooner, monkeypatch
     schooner.dyn.steady = False
     run(schooner, 600, wind)
     awa, _ = hp.apparent_wind(schooner, wind)
-    assert abs(awa) == pytest.approx(math.radians(40.0), abs=math.radians(3.0))
+    wanted = math.radians(35.0) + hp.FULL_AND_BY_MARGIN
+    assert abs(awa) == pytest.approx(wanted, abs=math.radians(3.0))
 
 
 # -- notes: aback and leeway ---------------------------------------------------

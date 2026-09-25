@@ -81,17 +81,21 @@ def test_every_sail_class_has_a_curve():
 
 
 def test_curves_interpolate_and_fold():
+    # the values here are the package 10 tuning (docs/dev/TuningNotes.md): the
+    # foot of every curve is dead below about ten degrees, and the peaks are
+    # those of coarse flax sails, not aerofoils
     sq = SAIL_CLASSES["square"]
     assert sq.coefficients(0.0) == (0.0, pytest.approx(0.10))
-    cl, cd = sq.coefficients(math.radians(28))
-    assert cl == pytest.approx(1.4) and 0.3 < cd < 0.4
+    cl, cd = sq.coefficients(math.radians(35))
+    assert cl == pytest.approx(1.12) and 0.4 < cd < 0.5
+    assert sq.coefficients(math.radians(10))[0] == 0.0  # a square sail shakes under ten degrees
     # halfway between two table points is the mean of their values
-    cl_mid, _ = sq.coefficients(math.radians(11.5))
-    assert cl_mid == pytest.approx((0.1 + 0.7) / 2)
+    cl_mid, _ = sq.coefficients(math.radians(17.5))
+    assert cl_mid == pytest.approx((0.12 + 0.42) / 2)
     # negative and over-range angles are folded
-    assert sq.coefficients(-math.radians(28)) == sq.coefficients(math.radians(28))
+    assert sq.coefficients(-math.radians(35)) == sq.coefficients(math.radians(35))
     assert sq.coefficients(math.radians(120))[0] == 0.0
-    assert SAIL_CLASSES["gaff"].coefficients(math.radians(25))[0] == pytest.approx(1.6)
+    assert SAIL_CLASSES["gaff"].coefficients(math.radians(30))[0] == pytest.approx(1.25)
 
 
 # ---------------------------------------------------------------------------
