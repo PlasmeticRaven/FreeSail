@@ -13,7 +13,7 @@ A gate has four parts:
    - a short **guide** to any technical idea the checklist relies on that is not self-explanatory (what a seed is, what a digest is, and so on);
    - what is deliberately *not* in this milestone, so it is not reported as a fault;
    - what to report back.
-2. **A GitHub release**, created automatically when a tag named `gate-mN` is pushed. The release carries the gate report as its notes and a zip of everything needed to run it. Download the zip from the release page; there is no need to use git.
+2. **A GitHub release**, created automatically by the `gate release` workflow when a branch named `gates/mN` is created at the gate commit (or when someone presses *Run workflow* on that workflow in the *Actions* tab and types the gate name). The workflow tags the commit `gate-mN` and publishes a release carrying the gate report as its notes and a zip of everything needed to run it. Download the zip from the release page; there is no need to use git.
 3. **The automated checks** (`pytest`, `ruff`) passing on GitHub's own machine for the tagged commit, visible under the repository's *Actions* tab. This is the programmer's half of the gate; it runs before the report is trusted.
 4. **The owner's verdict**, recorded at the top of the gate report as *Pending*, *Passed*, or *Passed with notes*, with the notes. The next milestone does not start until the verdict is in.
 
@@ -31,4 +31,8 @@ Because the gate is meant to be runnable by anyone with a computer. The zip is e
 
 ## Naming
 
-Tags: `gate-m0`, `gate-m1`, ... Reports: `docs/gates/gate-m0.md`, ... A milestone that needs a second try gets `gate-m1-2`, with a second report explaining what changed.
+Reports: `docs/gates/gate-m0.md`, `gate-m1.md`, ... Snapshot branches: `gates/m0`, `gates/m1`, ... Release tags, made by the workflow: `gate-m0`, `gate-m1`, ... A milestone that needs a second try gets `m1-2`, with a second report explaining what changed.
+
+## If the release does not appear
+
+The snapshot branch is itself a complete download: on GitHub, open the branch `gates/mN`, press the green *Code* button and choose *Download ZIP*. It is the same project the release would have packaged.

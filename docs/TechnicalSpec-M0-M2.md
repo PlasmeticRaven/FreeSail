@@ -585,7 +585,7 @@ Every milestone ends with a human-checked gate; the next one does not start unti
 
 1. The milestone's acceptance list passes locally and on GitHub Actions (`.github/workflows/ci.yml`).
 2. A **gate report** is written for a non-programmer at `docs/gates/gate-mN.md`: headline claims, setup with expected output at each step, a live checklist with exact input and expected output per item, a guide to any technical idea the checklist relies on, what is deliberately absent, and what to report back.
-3. The commit is tagged `gate-mN` and the tag pushed. The `gate release` workflow (`.github/workflows/release.yml`) re-runs the checks and creates a GitHub release with the report as its notes and a zip of the whole project attached. If the workflow cannot run, the tag's own zip link is the same package.
+3. A snapshot branch `gates/mN` is created at the gate commit. The `gate release` workflow (`.github/workflows/release.yml`) re-runs the checks, tags the commit `gate-mN`, and creates a GitHub release with the report as its notes and a zip of the whole project attached. If the workflow cannot run, the snapshot branch's own *Download ZIP* is the same package.
 4. The owner runs the checklist from the zip and gives a verdict, recorded at the top of the report.
 
 Gate reports are part of the milestone's work package, not an afterthought: the report for milestone N is written before the tag, by whoever integrates the milestone.

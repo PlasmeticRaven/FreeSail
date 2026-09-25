@@ -1,14 +1,25 @@
 name: gate release
 
-# Pushing a tag named gate-m0, gate-m1, ... creates a GitHub release whose
-# notes are the matching gate report in docs/gates/, with the project zip
-# attached. The release is the self-contained package for the owner's live
-# check of that milestone (see docs/gates/README.md).
+# A gate is packaged as a GitHub release. It is triggered in one of two ways:
+#
+# 1. A branch named gates/mN is created at the gate commit (this is how the
+#    build session does it: its credentials can push branches but not tags).
+# 2. Someone presses "Run workflow" on this workflow in the Actions tab and
+#    types the gate name, e.g. m0, to package the current commit of a branch.
+#
+# Either way the workflow re-runs the checks, tags the commit gate-mN, and
+# creates a release whose notes are docs/gates/gate-mN.md with a zip of the
+# whole project attached. See docs/gates/README.md.
 
 on:
   push:
-    tags:
-      - "gate-*"
+    branches:
+      - "gates/**"
+  workflow_dispatch:
+    inputs:
+      gate:
+        description: "Gate name, e.g. m0"
+        required: true
 
 permissions:
   contents: write
@@ -18,6 +29,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Work out the gate name
+        id: gate
+        run: |
+          if [ -n "${{ github.event.inputs.gate }}" ]; then
+            gate="${{ github.event.inputs.gate }}"
+          else
+            gate="${GITHUB_REF_NAME#gates/}"
+          fi
+          echo "name=$gate" >> "$GITHUB_OUTPUT"
+          echo "tag=gate-$gate" >> "$GITHUB_OUTPUT"
+          f="docs/gates/gate-$gate.md"
+          test -f "$f" || { echo "missing $f"; exit 1; }
+          echo "report=$f" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -26,20 +50,16 @@ jobs:
           pip install -e ".[dev]"
           ruff check .
           python -m pytest
-      - name: Find the gate report
-        id: report
-        run: |
-          f="docs/gates/${GITHUB_REF_NAME}.md"
-          test -f "$f" || { echo "missing $f"; exit 1; }
-          echo "path=$f" >> "$GITHUB_OUTPUT"
       - name: Build the gate zip
         run: |
-          git archive --format=zip --prefix="FreeSail-${GITHUB_REF_NAME}/" \
-            -o "FreeSail-${GITHUB_REF_NAME}.zip" "$GITHUB_REF_NAME"
+          git archive --format=zip --prefix="FreeSail-${{ steps.gate.outputs.tag }}/" \
+            -o "FreeSail-${{ steps.gate.outputs.tag }}.zip" "$GITHUB_SHA"
       - name: Create the release
         uses: softprops/action-gh-release@v2
         with:
-          name: "Gate ${{ github.ref_name }}"
-          body_path: ${{ steps.report.outputs.path }}
-          files: FreeSail-${{ github.ref_name }}.zip
+          tag_name: ${{ steps.gate.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: "Gate ${{ steps.gate.outputs.name }}"
+          body_path: ${{ steps.gate.outputs.report }}
+          files: FreeSail-${{ steps.gate.outputs.tag }}.zip
           prerelease: true

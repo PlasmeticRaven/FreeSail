@@ -2,7 +2,7 @@
 
 **Verdict:** Pending.
 
-**Download:** the release page for `gate-m0` at https://github.com/PlasmeticRaven/FreeSail/releases/tag/gate-m0, or the plain zip of the tagged project at https://github.com/PlasmeticRaven/FreeSail/archive/refs/tags/gate-m0.zip. Either contains everything below.
+**Download:** the release page for `gate-m0` at https://github.com/PlasmeticRaven/FreeSail/releases/tag/gate-m0, or the plain zip of the snapshot branch at https://github.com/PlasmeticRaven/FreeSail/archive/refs/heads/gates/m0.zip. Either contains everything below.
 
 ## Headline
 
