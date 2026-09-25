@@ -261,6 +261,14 @@ The evolution catalogue is the level 1 vocabulary and the single largest body of
 - let a keen player add an evolution without touching the engine;
 - let an LLM read the catalogue as documentation, which is how it learns what it can order.
 
+**Sources.** The catalogue will be built against period and near-period seamanship texts rather than from memory. Primary candidates:
+
+- Stephen B. Luce, *Text-Book of Seamanship* (1891 revision by Aaron Ward), online at https://maritime.org/doc/luce/index.php. Later than our period and containing steam material, but the most systematically catalogued account of parts, rigging and "working ship" evolutions, with the deck orders given in sequence. Steam chapters are ignored; practices that post-date 1820 are checked against the two sources below before adoption.
+- Darcy Lever, *The Young Sea Officer's Sheet Anchor* (1808). Squarely in period, illustrated, and organised around rigging and evolutions.
+- William Falconer, *An Universal Dictionary of the Marine* (1815 Burney edition). The glossary source for part names and aliases.
+
+Where the sources are added to the repository (proposed: `docs/references/`), each evolution's data file cites the chapter and section it was drawn from, so that a human or an LLM officer can read the same passage the game encodes.
+
 Initial catalogue target for the first playable milestone: around 40 evolutions covering setting and taking in every sail type on a ship-rigged vessel, reefing, tacking, wearing, boxhauling, heaving to, anchoring and weighing, and studding sail handling. Combat, boats, jury rigs, and the obscure kit come in later milestones.
 
 ### 4.5 Safety of player code
