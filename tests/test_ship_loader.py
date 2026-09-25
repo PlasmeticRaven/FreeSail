@@ -247,3 +247,19 @@ def test_schooner_is_mostly_fore_and_aft():
     fa = sum(s.area_m2 for s in ship.sails.values() if s.is_fore_and_aft)
     sq = sum(s.area_m2 for s in ship.sails.values() if s.cls == "square")
     assert fa > sq
+
+
+def test_frigate_particulars_stay_in_period():
+    """Package 8: the frigate is a 36-gun 18-pounder of 1795 (the full set of checks is in
+    tests/test_ship_particulars.py; these are the three an edit is most likely to break)."""
+    ship = load_ship("data/ships/frigate-36.yaml")
+    plain = sum(ship.sails[i].area_m2 for i in ship.groups["plain sail"])
+    assert 1_300 <= plain <= 1_860  # about 17,000 sq ft of plain sail
+    assert 1_100_000 <= ship.hull.spec.displacement_kg <= 1_450_000  # 1.2 to 1.5 x 933 bm
+    main_truck = (
+        sum(s.height_m for s in ship.spar_chain("main.royal_mast"))
+        + ship.spars["main.royal_mast"].height_m
+    )
+    assert 40.0 <= main_truck <= 48.0  # metres above the deck; she is 43.6 m on the gundeck
+    assert 20.0 <= ship.spars["main.mast"].height_m <= 24.0  # a 74 ft lower mast above deck
+    assert 23.5 <= ship.spars["main.yard"].length_m <= 25.7  # 78 to 84 ft
