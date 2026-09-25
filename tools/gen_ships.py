@@ -13,9 +13,13 @@ How the numbers are made
 ------------------------
 
 Hull particulars are taken from published dimensions (the frigate: the
-Amazon class of 1795; the schooner: a Fell's Point vessel of the type) and
-converted: gundeck and keel length to a load waterline, burthen to a
-displacement, the "depth in hold" to a draught.
+Amazon class of 1795; the schooner: Kemp's Lynx of 1812, from the Admiralty
+draught Chapelle reproduces in The Baltimore Clipper, 1930) and converted:
+gundeck and keel length to a load waterline, burthen to a displacement, the
+"depth in hold" to a draught. The schooner's rig, whose spar dimensions
+Chapelle could not find, is reconstructed as he prescribes: by Fincham's
+masting rules, checked against the spar tables he prints (Sea Lark 1812,
+Spider 1835) and Marestier's measured schooners of 1820.
 
 Spar lengths follow the proportional rules that the period's own masting
 texts give. The chain of rules used for the frigate is Luce 1866, ch. VII
@@ -65,7 +69,7 @@ Steel's 1794 tables, so they are judgements against the owner may check.
 Spar ratings cannot come from a rope table. They are set by the rule that
 a spar is expected to stand with all the sail it carries (studding sails
 excepted) set in the strongest wind in which period practice would still
-have that sail on her: royals to 20 knots, topgallants to 22, topsails and
+have that sail on her: royals to 20 knots, topgallants to 25, topsails and
 topmasts to 40 (a whole gale, reefed), lower masts and yards to 55. The
 rating is the sustained load the engine puts on the spar in that wind,
 computed here as the static force at the class's peak coefficient times
@@ -114,7 +118,7 @@ SUSTAINED_FRACTION = 0.85
 DESIGN_WIND_KN = {
     "lower": 55.0,  # lower masts and yards, bowsprit: a storm, and they carry courses reefed
     "topsail": 40.0,  # topmasts and topsail yards: a whole gale under close-reefed topsails
-    "topgallant": 22.0,  # topgallant masts and yards: a strong breeze is their limit
+    "topgallant": 25.0,  # topgallant masts and yards: a strong breeze is their limit
     "royal": 20.0,  # royal masts and yards: royals come in when it freshens
     "jib_boom": 30.0,  # the jib is a stout sail, the boom less so
     "flying_jib_boom": 22.0,  # a light spar for a light sail
@@ -1042,114 +1046,187 @@ SPANKER_CENTRE = 9.8
 
 
 def schooner(out_dir="data/ships"):
-    # Design winds: as the frigate's, except that her topgallant gear is rated for 25 knots
-    # (she heels and flies so in the untuned physics that 22 left it strained under plain
-    # sail in 20) and the gaff-topsail pole for 22 (that sail comes in early).
-    dw = dict(DESIGN_WIND_KN, topgallant=25.0, gaff_topsail=22.0)
-    # -- hull ------------------------------------------------------------------------------
-    # Type proportions after Chapelle (The Baltimore Clipper, 1930; The Search for Speed
-    # under Sail, 1967), anchored on a documented Fell's Point hull: Lynx, Thomas Kemp, 1812
-    # (97 ft 7 in on deck, keel 73 ft 1 in, beam 24 ft 0 in, depth 10 ft 3 in, 224 tons
-    # burthen; Winfield, via HMS Musquidobit), and on the Pride of Baltimore
-    # reconstructions of the type (90 and 100 ft on deck, 129 and 185 long tons, 866 and
-    # 838 m2 of sail). Speedwell is 95 ft on deck, 24 ft beam.
-    lod_ft = 95.0
-    lwl_ft = 84.0  # judgement: raked stem and stern take a tenth off the deck length
+    # Design winds: as the frigate's, plus the gaff-topsail pole at 22 (that sail comes in
+    # early)
+    dw = dict(DESIGN_WIND_KN, gaff_topsail=22.0)
+    # -- hull: Kemp's Lynx of 1812 (Chapelle, The Baltimore Clipper, 1930) ------------------
+    # Chapelle pp. 82-83 and fig. 17, the Admiralty draught of H.M. schooner Musquidobit,
+    # late the Baltimore privateer Lynx (Thomas Kemp, Fell's Point, 1812), taken off at
+    # Portsmouth 10 May 1816: length on deck 94 ft 7 in; keel for tonnage 73 ft 1 1/4 in;
+    # breadth extreme 24 ft 0 in, moulded 23 ft 8 in; depth of hold 10 ft 3 in; 223 91/94
+    # tons; deadrise about 30 degrees, a great deal of drag to the keel, very raking stem
+    # and sternpost, both masts raking alike, seven ports a side. "The only thing lacking
+    # ... is the spar dimensions, which unfortunately are not to be found" (p. 82), so the
+    # rig is reconstructed the way Chapelle does it for Grecian (p. 94): by Fincham's
+    # masting rules as he gives them (pp. 159-162), checked against the spar tables he
+    # prints (Sea Lark, an American schooner of 1812, pp. 41-42; H.M. schooner Spider,
+    # pp. 165-167) and Marestier's measured Baltimore schooners of 1820 (pp. 113-115:
+    # mainmast 3.08 to 3.23 x the beam). Speedwell is built to Lynx's draught; the file
+    # keeps her name and her date of about 1804, the yard and the type being the same.
+    lod_ft = 94.6
+    keel_ft = 73.1
     beam_ft = 24.0
-    draught_ft = 9.75  # judgement: 7 ft forward, 12 ft 6 in aft with the type's great drag
+    depth_ft = 10.25
+    lwl_ft = 85.0  # judgement: between the 73 ft keel and the 94.6 ft deck, with those ends
+    # Draught: Marestier's Mammoth (p. 113) drew 0.35 of her beam forward and 0.56 aft; on
+    # 24 ft of beam that is 8 ft 5 in and 13 ft 4 in, mean 10 ft 11 in.
+    draught_ft = round((0.348 + 0.557) / 2.0 * beam_ft, 1)
     lwl, beam, draught = ft(lwl_ft), ft(beam_ft), ft(draught_ft)
-    displacement = round(lwl * beam * draught * 0.31 * 1025.0, -3)
-    deck_height = 1.2
+    # Displacement: Cb 0.33 on LWL x beam x mean draught (30 degrees of deadrise, slack
+    # bilges). Spider, 183 tons burthen and "not at all extreme", weighed 204 tons 3 cwt
+    # fully equipped (p. 166); a sharper hull of 224 tons burthen comes to about 210 t.
+    displacement = round(lwl * beam * draught * 0.33 * 1025.0, -3)
+    deck_height = 0.9  # Spider's port sills 3 ft 5 in above water, sills 10 in above deck
+    rake = 0.2  # both masts rake alike (p. 82); Fincham: main 1 in 6 to 1 in 4 (p. 160)
 
     b = Builder(
         "Speedwell",
         "topsail-schooner",
-        "A Baltimore-built topsail schooner of about 1804: 95 ft on deck, 24 ft beam, "
-        "raked masts, a fore topsail and topgallant over a loose-footed foresail. Proportions "
-        "after Chapelle, anchored on Kemp's Lynx of 1812; rope by Luce ch. IV; see "
-        "tools/gen_ships.py for every rule and judgement.",
+        "A Baltimore-built topsail schooner of about 1804, built to the draught of Kemp's "
+        "Lynx of 1812 (Chapelle 1930, pp. 82-83): 94 ft 7 in on deck, 24 ft beam, 224 tons, "
+        "masts raking 1 in 5, a fore topsail and topgallant over a loose-footed foresail. "
+        "Rig by Fincham's rules as Chapelle gives them (pp. 159-162) checked against his "
+        "spar tables; rope by Luce ch. IV; see tools/gen_ships.py for every rule.",
         {
             "length_waterline_m": lwl,
             "beam_m": beam,
             "draught_m": draught,
             "displacement_kg": displacement,
             "gm_m": 1.0,
-            "clr_x_m": -0.4,
+            "clr_x_m": 0.5,
             "lateral_area_m2": round(lwl * draught * 0.78, -1),
             "hull_speed_kn": 11.5,
             "deck_height_m": deck_height,
             "rudder": {"area_m2": 2.0, "max_angle_deg": 35, "rate_deg_s": 4.0},
         },
         {
-            "length_waterline_m": f"{lwl_ft:.0f} ft on a {lod_ft:.0f} ft deck (judgement; Lynx "
-            "1812 was 97 ft 7 in on deck on a 73 ft keel).",
-            "beam_m": "24 ft, as Lynx; the type's length-to-beam is about 4.",
-            "draught_m": "9 ft 9 in mean: 7 ft forward, 12 ft 6 in aft (judgement; the "
-            "type's drag).",
-            "displacement_kg": "LWL x beam x draught x Cb 0.31 x 1025: about 180 t (judgement; "
-            "Pride of Baltimore II, 100 ft on deck, is 185 long tons).",
-            "gm_m": "3 ft 3 in: judgement; a sharp, heavily ballasted hull, tender but not crank.",
-            "clr_x_m": "Geometric centre of a lateral plane deep aft and cut away forward is "
-            "about 2.0 m abaft midships; with a lead of 6 per cent of LWL (judgement): -0.4 m.",
+            "length_waterline_m": f"{lwl_ft:.0f} ft: judgement between Lynx's {keel_ft:.0f} ft "
+            f"keel and {lod_ft:.1f} ft deck (Chapelle p. 82), her stem and post raking hard.",
+            "beam_m": "24 ft 0 in extreme, 23 ft 8 in moulded (Chapelle p. 82).",
+            "draught_m": f"{draught_ft:.1f} ft mean: Marestier's draughts of 0.35 and 0.56 of "
+            "the beam forward and aft (Chapelle p. 113) on Lynx's beam.",
+            "displacement_kg": "LWL x beam x draught x Cb 0.33 x 1025, about 210 t; Spider "
+            f"(183 tons burthen) weighed 204 t equipped (p. 166); depth of hold {depth_ft} ft.",
+            "gm_m": "3 ft 3 in: judgement; tender (Chapelle p. 104: schooners capsized when "
+            "overpressed with sail), heavily ballasted.",
+            "clr_x_m": "Rankine (Chapelle p. 159): the middle of the sail base lies 0.05 to "
+            "0.0625 of the base (1.6 to 1.7 x LWL) ahead of the centre of lateral area, so "
+            "the geometric centre is about 1.4 m abaft this plan's centre of effort (+1.0 m "
+            "under plain sail). The engine wants its centre of pressure further forward, as "
+            "on the frigate: at +0.5 m she is balanced close-hauled in 15 kn and carries 5 "
+            "deg of weather helm on a beam reach; at -0.4 m (the M1 value) she carried 4 deg "
+            "of lee helm close-hauled. Judgement; package 10 checks truths 2 and 6.",
             "lateral_area_m2": "LWL x draught x 0.78 for a profile that is deep aft only.",
             "hull_speed_kn": "The type's recorded best is 11 to 12 knots; the derived "
-            "1.34 sqrt(LWL ft) = 12.3 is too generous. Package 10 may tune within 11 to 12.",
-            "deck_height_m": "Low freeboard, about 4 ft at midships.",
+            "1.34 sqrt(LWL ft) = 12.4 is too generous. Package 10 may tune within 11 to 12.",
+            "deck_height_m": "Port sills 3 ft 5 in above the water and 10 in above the deck "
+            "(Spider's specification, Chapelle pp. 166-167): a low-sided vessel.",
             "rudder": "A deep narrow blade, about 11 ft by 2 ft.",
         },
     )
 
-    # -- spars (feet; judgement after Chapelle's typical sail plans of the type) -------------
-    fore_above, fore_total = 58.0, 60.5  # steps on the keelson 2.5 ft below the deck
-    main_above, main_total = 62.0, 64.5
-    fore_head, main_head = fore_total / 6.0, main_total / 6.0
-    fore_top = 32.0  # fore topmast, with a fidded topgallant above it
-    fore_top_hoist = fore_top - fore_head
-    fore_top_head = fore_top / 6.0
-    fore_tg = 16.0
-    fore_tg_hoist = fore_tg - fore_top_head
-    fore_tg_head = fore_tg / 6.0
-    main_top = 30.0  # a pole topmast for the gaff topsail
+    # -- spars in feet by Fincham's rules for two-masted schooners (Chapelle pp. 160-161),
+    # taken at the upper end of each range because "the resultant rig is perhaps a little
+    # small for American vessels" (p. 159); the American checks are noted beside each.
+    main_hounded = 2.8 * beam_ft  # mainmast heel to hounds = 2.6 to 2.8 x extreme breadth
+    topmast_hounded = 1.0 * beam_ft  # topmasts hounded = 0.83 to 1.0 x breadth
+    pole = 0.5 * topmast_hounded  # pole heads of topmasts = 0.5 x hounded length
+    main_head = 0.35 * topmast_hounded  # heads of lower masts = 0.3 to 0.4 x topmasts
+    main_total = main_hounded + main_head  # 75.6 ft: Marestier 3.08 to 3.23 x beam = 74-78
+    step_to_deck = depth_ft + 0.75  # steps on the keelson
+    main_above = main_total - step_to_deck
+    fore_hounded = 0.95 * main_hounded  # foremast = 0.9 to 0.97 x mainmast
+    fore_head = main_head
+    fore_total = fore_hounded + fore_head
+    fore_above = fore_total - step_to_deck
+    # the fore topmast heels at the trestletrees, so its hounds stand this much above the
+    # lower cap; the topgallant sets on its pole (the fore.topgallant_mast part)
+    fore_top = topmast_hounded + pole
+    fore_top_hoist = topmast_hounded - fore_head
+    fore_tg = pole
+    fore_tg_hoist = pole
+    main_top = topmast_hounded + pole  # a pole topmast for the gaff topsail
     main_top_hoist = main_top - main_head
-    fore_yard, topsail_yard, tg_yard = 41.0, 36.0, 24.0  # 1.7, 1.5 and 1.0 x the beam
+    fore_yard = 0.57 * lwl_ft  # fore yard = 0.48 to 0.57 x LWL (Sea Lark carried 0.69)
+    topsail_yard = 0.75 * fore_yard  # fore-topsail yard = 0.7 to 0.75 x fore yard
+    tg_yard = 0.48 * fore_yard  # fore-topgallant yard = 0.42 to 0.48 x fore yard
     # (the fore yard is a bare spread yard for the topsail's foot; it is not a part here)
-    main_boom, main_gaff, fore_gaff = 51.0, 28.0, 24.0  # boom 0.54 of the deck length
-    bowsprit_out, jib_boom_out = 22.0, 18.0
+    main_boom = 0.70 * lwl_ft  # main boom = 0.66 to 0.7 x LWL (Sea Lark 0.71)
+    main_gaff = 0.48 * main_boom  # main gaff = 0.44 to 0.53 x boom (Sea Lark 28 ft)
+    fore_gaff = 0.85 * main_gaff  # fore gaff = 0.73 to 1.0 x main gaff (Sea Lark 24 ft)
+    # head: bowsprit outboard 0.12 x LWL, jib-boom 0.4 x LWL, the tack of the jib 0.41 to
+    # 0.46 x LWL before the stem; a little more bowsprit for the low American steeve
+    bowsprit_out = 0.14 * lwl_ft
+    jib_boom_out = 0.28 * lwl_ft
     fore_yard_h = fore_above - fore_head - 2.0
-    topsail_h = fore_above + fore_top_hoist - fore_top_head
-    tg_h = fore_above + fore_top_hoist + fore_tg_hoist - fore_tg_head
-    fore_x, main_x = 7.5, -3.0
+    topsail_h = fore_above + fore_top_hoist - 1.0
+    tg_h = fore_above + fore_top_hoist + pole - 1.5
+    # stations: foremast 0.28 to 0.34 x LWL before the middle, mainmast 0.05 to 0.11 abaft
+    fore_x = round(0.30 * lwl * 1.0, 1)
+    main_x = -round(0.10 * lwl, 1)
+
+    def raked(mast_x_m, z_above_deck_ft):
+        """x of a point on a raked mast, metres: the rake carries it aft as it rises."""
+        return mast_x_m - rake * z_above_deck_ft * FT
 
     def trapezoid(head_ft, foot_ft, depth_ft):
         return round((head_ft + foot_ft) / 2.0 * depth_ft * FT * FT)
 
-    ts_depth = topsail_h - fore_yard_h
+    ts_depth = topsail_h - fore_yard_h  # "depth of fore-topsail = extreme beam, nearly"
     ts_area = trapezoid(0.82 * topsail_yard, 0.9 * fore_yard, ts_depth)
-    ts_centre = round(deck_height + (fore_yard_h + 0.5 * ts_depth) * FT, 1)
+    ts_z = fore_yard_h + 0.5 * ts_depth
+    ts_centre = round(deck_height + ts_z * FT, 1)
     tg_depth = tg_h - topsail_h
     tg_area = trapezoid(0.89 * tg_yard, 0.9 * topsail_yard, tg_depth)
-    tg_centre = round(deck_height + (topsail_h + 0.5 * tg_depth) * FT, 1)
-    # gaff sails: foot 0.92 of the boom (the foresail loose-footed, sheeting abaft the main
-    # mast), head 0.92 of the gaff, hoist from tack to jaws, plus the peaked triangle
-    main_hoist = (main_above - main_head - 2.0) - 5.0
+    tg_z = topsail_h + 0.5 * tg_depth
+    tg_centre = round(deck_height + tg_z * FT, 1)
+    # gaff sails (Fincham, p. 160): foot of the mainsail from clew to mast (0.92 of the
+    # boom), head 0.5 to 0.6 of the foot; the nock 0.045 of the hounded length below the
+    # hounds; gaffs inclined 25 to 30 degrees; foot of the foresail 0.7 to 0.85 of the
+    # mainsail's, its head 0.75 to 1.0 of the mainsail's
+    gaff_rise = 0.51  # tan 27 degrees
+    main_foot = 0.92 * main_boom
+    main_head_ft = 0.92 * main_gaff
+    main_nock = main_above - main_head - 0.045 * main_hounded
+    main_hoist = main_nock - 5.0
     main_area = round(
         (
-            (0.92 * main_boom + 0.92 * main_gaff) / 2.0 * main_hoist
-            + 0.5 * 0.92 * main_gaff * 0.6 * main_gaff
+            (main_foot + main_head_ft) / 2.0 * main_hoist
+            + 0.5 * main_head_ft * gaff_rise * main_head_ft
         )
         * FT
         * FT
     )
-    main_centre = round(deck_height + (5.0 + 0.45 * main_hoist) * FT, 1)
-    fore_hoist = (fore_above - fore_head - 2.0) - 6.0
+    main_z = 5.0 + 0.45 * main_hoist
+    main_centre = round(deck_height + main_z * FT, 1)
+    fore_foot = 0.8 * main_foot  # loose-footed, sheeting abaft the main mast
+    fore_head_ft = 0.92 * fore_gaff
+    fore_nock = fore_above - fore_head - 0.045 * fore_hounded
+    fore_hoist = fore_nock - 6.0
     fore_area = round(
-        ((36.0 + 0.92 * fore_gaff) / 2.0 * fore_hoist + 0.5 * 0.92 * fore_gaff * 0.6 * fore_gaff)
+        (
+            (fore_foot + fore_head_ft) / 2.0 * fore_hoist
+            + 0.5 * fore_head_ft * gaff_rise * fore_head_ft
+        )
         * FT
         * FT
     )
-    fore_centre = round(deck_height + (6.0 + 0.45 * fore_hoist) * FT, 1)
-    gt_area = 35
-    gt_centre = round(deck_height + (main_above + 0.4 * main_top_hoist) * FT, 1)
+    fore_z = 6.0 + 0.45 * fore_hoist
+    fore_centre = round(deck_height + fore_z * FT, 1)
+    # gaff topsail: luff up the pole topmast, foot along the gaff (Spider's, p. 167, was
+    # 498 sq ft on a 27 ft gaff)
+    gt_area = round(0.6 * main_head_ft * main_top_hoist * FT * FT)
+    gt_z = main_above + 0.4 * main_top_hoist
+    gt_centre = round(deck_height + gt_z * FT, 1)
+    # headsails (Fincham: foot of the jib 0.32 to 0.35 x LWL; Spider's staysail was the
+    # larger sail of the two, 690 to 592 sq ft): a triangle with a little round
+    stem_x = lwl / 2.0
+    jib_tack_x = stem_x + ft(bowsprit_out) + ft(jib_boom_out)
+    jib_foot = 0.35 * lwl_ft
+    jib_area = round(0.5 * jib_foot * (fore_above - fore_head - 8.0) * 1.15 * FT * FT)
+    stay_foot = 0.4 * lwl_ft
+    stay_area = round(0.5 * stay_foot * (fore_above - fore_head - 8.0) * 1.1 * FT * FT)
+    flying_area = round(0.5 * jib_area)
     stuns_area = round(0.4 * topsail_yard * ts_depth * FT * FT)
     prov = " Provisional (truth 9), see gen_ships.py."
 
@@ -1166,9 +1243,9 @@ def schooner(out_dir="data/ships"):
             ],
             dw["lower"],
         ),
-        note=f"fore mast {fore_total:.0f} ft, {fore_above:.0f} ft above the deck, raked "
-        "(judgement, Chapelle); rated for foresail, topsail and topgallant in "
-        f"{dw['lower']:.0f} kn.{prov}",
+        note=f"fore mast {fore_total:.0f} ft heel to head (Fincham: 0.95 of the main), "
+        f"{fore_above:.0f} ft above the deck, raking 1 in 5 like the main (Chapelle p. 82); "
+        f"stationed 0.30 of LWL before the middle (Fincham).{prov}",
     )
     fore_topmast = b.spar(
         "fore.topmast",
@@ -1179,7 +1256,8 @@ def schooner(out_dir="data/ships"):
             [(ts_area, ts_centre, "square"), (tg_area, tg_centre, "square")],
             dw["topsail"],
         ),
-        note=f"fore topmast {fore_top:.0f} ft, {fore_top_hoist:.0f} ft above the cap.{prov}",
+        note=f"fore topmast {fore_top:.0f} ft with its pole (Fincham: hounded the beam, "
+        f"pole half of that), hounds {fore_top_hoist:.0f} ft above the lower cap.{prov}",
     )
     fore_tgm = b.spar(
         "fore.topgallant_mast",
@@ -1187,8 +1265,8 @@ def schooner(out_dir="data/ships"):
         steps_on=fore_topmast,
         height_m=ft(fore_tg_hoist),
         rating_kn=design_kn([(tg_area, tg_centre, "square")], dw["topgallant"]),
-        note=f"fore topgallant mast {fore_tg:.0f} ft, {fore_tg_hoist:.0f} ft above the topmast "
-        f"head.{prov}",
+        note=f"fore topgallant 'mast': the {fore_tg:.0f} ft pole of the topmast, on which the "
+        f"topgallant sets (Fincham).{prov}",
     )
     main = b.spar(
         "main.mast",
@@ -1199,8 +1277,10 @@ def schooner(out_dir="data/ships"):
             [(main_area, main_centre, "gaff"), (gt_area, gt_centre, "jibheaded")],
             dw["lower"],
         ),
-        note=f"main mast {main_total:.0f} ft, {main_above:.0f} ft above the deck (judgement, "
-        f"Chapelle: main truck about the deck length above the water).{prov}",
+        note=f"main mast {main_total:.0f} ft heel to head: hounded 2.8 x the beam plus a head "
+        "0.35 of the topmast (Fincham, Chapelle p. 161; Marestier's schooners 3.08 to 3.23 x "
+        f"the beam, p. 114), {main_above:.0f} ft above the deck, raking 1 in 5; stationed "
+        f"0.10 of LWL abaft the middle.{prov}",
     )
     main_topmast = b.spar(
         "main.topmast",
@@ -1208,8 +1288,8 @@ def schooner(out_dir="data/ships"):
         steps_on=main,
         height_m=ft(main_top_hoist),
         rating_kn=design_kn([(gt_area, gt_centre, "jibheaded")], dw["gaff_topsail"]),
-        note=f"main topmast {main_top:.0f} ft, a pole for the gaff topsail, which comes in "
-        f"early.{prov}",
+        note=f"main topmast {main_top:.0f} ft, hounded the beam with a pole half as long "
+        f"(Fincham), a pole for the gaff topsail, which comes in early.{prov}",
     )
     ty = b.spar(
         "fore.topsail.yard",
@@ -1222,8 +1302,8 @@ def schooner(out_dir="data/ships"):
             [(ts_area, ts_centre, "square"), (tg_area, tg_centre, "square")],
             dw["topsail"],
         ),
-        note=f"fore topsail yard {topsail_yard:.0f} ft (1.5 x the beam, judgement); rated in "
-        f"{dw['topsail']:.0f} kn.{prov}",
+        note=f"fore topsail yard {topsail_yard:.0f} ft, 0.75 of a {fore_yard:.0f} ft fore yard "
+        "that is 0.57 of LWL (Fincham; Sea Lark's fore yard was 0.69, Chapelle p. 42).{prov}",
     )
     ts = b.sail(
         "fore.topsail",
@@ -1231,10 +1311,11 @@ def schooner(out_dir="data/ships"):
         yard=ty,
         area_m2=ts_area,
         reef_bands=2,
-        x_m=fore_x,
+        x_m=round(raked(fore_x, ts_z), 1),
         centre_height_m=ts_centre,
         cloth_rating_kn=round(CLOTH_KN_PER_M2["topsail"] * ts_area, 1),
-        note=f"fore topsail {ts_area} m2 between its yard and the fore yardarms.",
+        note=f"fore topsail {ts_area} m2 between its yard and the fore yardarms, "
+        f"{ts_depth:.0f} ft deep ('the extreme beam, nearly', Fincham); x carried aft by the rake.",
     )
     square_sail_lines(
         b,
@@ -1260,15 +1341,14 @@ def schooner(out_dir="data/ships"):
         height_m=ft(tg_h),
         brace_limit_deg=60,
         rating_kn=design_kn([(tg_area, tg_centre, "square")], dw["topgallant"]),
-        note=f"fore topgallant yard {tg_yard:.0f} ft (the beam, judgement); rated in "
-        f"{dw['topgallant']:.0f} kn.{prov}",
+        note=f"fore topgallant yard {tg_yard:.0f} ft, 0.48 of the fore yard (Fincham).{prov}",
     )
     tgs = b.sail(
         "fore.topgallant",
         "square",
         yard=tgy,
         area_m2=tg_area,
-        x_m=fore_x,
+        x_m=round(raked(fore_x, tg_z), 1),
         centre_height_m=tg_centre,
         cloth_rating_kn=round(CLOTH_KN_PER_M2["topgallant"] * tg_area, 1),
         note=f"fore topgallant {tg_area} m2; light canvas.",
@@ -1293,11 +1373,11 @@ def schooner(out_dir="data/ships"):
         "gaff",
         on=fore,
         length_m=ft(fore_gaff),
-        height_m=ft(fore_above - fore_head - 2.0),
+        height_m=ft(fore_nock),
         rating_kn=design_kn([(fore_area, fore_centre, "gaff")], dw["gaff"]),
-        note=f"fore gaff {fore_gaff:.0f} ft; the foresail is loose-footed and overlaps the main "
-        "(Luce 1884 ch. XXXIV: a boom foresail sets worse on a wind). Rated in "
-        f"{dw['gaff']:.0f} kn.",
+        note=f"fore gaff {fore_gaff:.0f} ft, 0.85 of the main gaff (Fincham; Sea Lark's 24 ft, "
+        "Chapelle p. 42); the foresail is loose-footed and overlaps the main (Luce 1884 "
+        "ch. XXXIV: a boom foresail sets worse on a wind).",
     )
     foresail = b.sail(
         "fore.sail",
@@ -1306,11 +1386,12 @@ def schooner(out_dir="data/ships"):
         gaff=fgaff,
         area_m2=fore_area,
         reef_bands=2,
-        x_m=3.5,
+        x_m=round(raked(fore_x, fore_z) - 0.4 * fore_foot * FT, 1),
         centre_height_m=fore_centre,
         cloth_rating_kn=round(CLOTH_KN_PER_M2["gaff"] * fore_area, 1),
-        note=f"foresail {fore_area} m2: foot 36 ft sheeting abaft the main mast, head on the gaff, "
-        f"hoist {fore_hoist:.0f} ft.",
+        note=f"foresail {fore_area} m2: foot {fore_foot:.0f} ft (0.8 of the mainsail's, "
+        f"Fincham) sheeting abaft the main mast, head on the gaff, hoist {fore_hoist:.0f} ft, "
+        "gaff peaked 27 degrees; centre 0.4 of the foot abaft the raked mast.",
     )
     b.line("fore.gaff.throat_halyard", "throat_halyard", fgaff, rating=rope_kn(3.0, 4))
     b.line("fore.gaff.peak_halyard", "peak_halyard", fgaff, rating=rope_kn(3.0, 4))
@@ -1321,9 +1402,10 @@ def schooner(out_dir="data/ships"):
         "gaff",
         on=main,
         length_m=ft(main_gaff),
-        height_m=ft(main_above - main_head - 2.0),
+        height_m=ft(main_nock),
         rating_kn=design_kn([(main_area, main_centre, "gaff")], dw["gaff"]),
-        note=f"main gaff {main_gaff:.0f} ft, 0.55 of the boom; rated in {dw['gaff']:.0f} kn.",
+        note=f"main gaff {main_gaff:.0f} ft, 0.48 of the boom (Fincham; Sea Lark's 28 ft), "
+        "its nock 0.045 of the hounded mast below the hounds.",
     )
     mboom = b.spar(
         "main.boom",
@@ -1332,8 +1414,8 @@ def schooner(out_dir="data/ships"):
         length_m=ft(main_boom),
         height_m=1.5,
         rating_kn=design_kn([(main_area, main_centre, "gaff")], dw["gaff"]),
-        note=f"main boom {main_boom:.0f} ft, 0.54 of the deck length, well over the taffrail "
-        "(Chapelle).",
+        note=f"main boom {main_boom:.0f} ft, 0.70 of LWL (Fincham; Sea Lark's 0.71, Chapelle "
+        "p. 42), well over the taffrail.",
     )
     mainsail = b.sail(
         "main.sail",
@@ -1343,11 +1425,13 @@ def schooner(out_dir="data/ships"):
         boom=mboom,
         area_m2=main_area,
         reef_bands=3,
-        x_m=-9.0,
+        x_m=round(raked(main_x, main_z) - 0.4 * main_foot * FT, 1),
         centre_height_m=main_centre,
         cloth_rating_kn=round(CLOTH_KN_PER_M2["gaff"] * main_area, 1),
-        note=f"mainsail {main_area} m2: foot 0.92 of the boom, head 0.92 of the gaff, hoist "
-        f"{main_hoist:.0f} ft, gaff peaked; centre 0.4 of the boom abaft the mast.",
+        note=f"mainsail {main_area} m2: foot {main_foot:.0f} ft from clew to mast, head 0.92 of "
+        f"the gaff, hoist {main_hoist:.0f} ft to a nock {main_nock:.0f} ft above the deck "
+        "(Fincham: 2 to 2.4 x the beam above water), gaff peaked 27 degrees; Spider's, on a "
+        "23 ft beam, was 1982 sq ft (Chapelle p. 167).",
     )
     b.line("main.gaff.throat_halyard", "throat_halyard", mgaff, rating=rope_kn(3.5, 4))
     b.line("main.gaff.peak_halyard", "peak_halyard", mgaff, rating=rope_kn(3.0, 5))
@@ -1365,7 +1449,7 @@ def schooner(out_dir="data/ships"):
         "jibheaded",
         mast=main_topmast,
         area_m2=gt_area,
-        x_m=-6.0,
+        x_m=round(raked(main_x, gt_z) - 0.3 * main_head_ft * FT, 1),
         centre_height_m=gt_centre,
         cloth_rating_kn=round(CLOTH_KN_PER_M2["jibheaded"] * gt_area, 1),
         note=f"main gaff topsail {gt_area} m2, luff on the topmast, foot along the gaff "
@@ -1375,20 +1459,29 @@ def schooner(out_dir="data/ships"):
     b.line("main.gaff_topsail.sheet", "sheet", gt, rating=rope_kn(2.5))
     b.line("main.gaff_topsail.tack", "tack", gt, rating=rope_kn(2.5))
     # head
+    # the staysail tacks at the stem head, the jib and the jib topsail (flying jib) at the
+    # jib-boom end (Fincham: tack of the jib 0.41 to 0.46 x LWL before the stem)
     heads = [
-        ("fore.staysail", "fore.stay", 45, 11.0, 6.5),
-        ("jib", "jib.stay", 75, 16.0, 8.0),
-        ("flying_jib", "flying_jib.stay", 40, 20.0, 10.0),
+        ("fore.staysail", "fore.stay", stay_area, round(stem_x - 0.35 * stay_foot * FT, 1), 6.0),
+        ("jib", "jib.stay", jib_area, round(jib_tack_x - 0.35 * jib_foot * FT, 1), 7.5),
+        (
+            "flying_jib",
+            "flying_jib.stay",
+            flying_area,
+            round(jib_tack_x - 0.25 * jib_foot * FT, 1),
+            10.0,
+        ),
     ]
     head_loads = {sid: (area, h, "jibheaded") for sid, _, area, _, h in heads}
     bowsprit = b.spar(
         "bowsprit",
         "bowsprit",
-        x_m=13.0,
+        x_m=round(stem_x, 1),
         length_m=ft(bowsprit_out),
         height_m=3.0,
         rating_kn=design_kn(list(head_loads.values()), dw["lower"]),
-        note=f"bowsprit {bowsprit_out:.0f} ft outboard, steeved low (judgement, Chapelle).",
+        note=f"bowsprit {bowsprit_out:.0f} ft outboard, 0.14 of LWL (Fincham gives 0.12 for the "
+        "Royal Navy's; Grecian's 'was probably rather short', Chapelle p. 93), steeved low.",
     )
     jib_boom = b.spar(
         "jib_boom",
@@ -1397,7 +1490,9 @@ def schooner(out_dir="data/ships"):
         length_m=ft(jib_boom_out),
         height_m=4.0,
         rating_kn=design_kn([head_loads["flying_jib"]], dw["jib_boom"]),
-        note=f"jib-boom {jib_boom_out:.0f} ft outboard.{prov}",
+        note=f"jib-boom {jib_boom_out:.0f} ft outboard: the jib tacks "
+        f"{bowsprit_out + jib_boom_out:.0f} ft before the stem, 0.42 of LWL (Fincham 0.41 to "
+        f"0.46).{prov}",
     )
     b.line(
         "fore.stay",
@@ -1525,13 +1620,14 @@ def schooner(out_dir="data/ships"):
     b.alias("topgallant sails", "topgallants")
     b.dump(
         os.path.join(out_dir, "topsail-schooner.yaml"),
-        "# Reference ship: Speedwell, a Baltimore-built topsail schooner of about 1804.\n"
-        "# Generated by tools/gen_ships.py; edit that script and rerun, do not edit this file.\n"
-        "# Hull and spars: the type's proportions after Chapelle, anchored on Kemp's Lynx of\n"
-        "# 1812 (Winfield) and the Pride of Baltimore reconstructions. Rope: Luce 1866 ch. IV.\n"
-        "# Rig details: Luce 1884 ch. XXXIV 'Handling fore-and-afters'. Spar and cloth ratings\n"
-        "# are provisional, set for truth 9 with the M1 sail curves; see the script.\n"
-        "# Units: metres, m2, kg, kN. Comments mark each judgement.\n",
+        "# Reference ship: Speedwell, a Baltimore-built topsail schooner of about 1804, to the\n"
+        "# draught of Kemp's Lynx of 1812 (H.M. schooner Musquidobit; Chapelle, The Baltimore\n"
+        "# Clipper, 1930, pp. 82-83, fig. 17). Generated by tools/gen_ships.py; edit that script\n"
+        "# and rerun, do not edit this file. Rig: Fincham's masting rules as Chapelle gives them\n"
+        "# (pp. 159-162), checked against his spar tables (Sea Lark pp. 41-42, Spider pp.\n"
+        "# 165-167) and Marestier's schooners (pp. 113-115). Rope: Luce 1866 ch. IV. Rig details:\n"
+        "# Luce 1884 ch. XXXIV. Spar and cloth ratings are provisional, set for truth 9 with the\n"
+        "# M1 sail curves; see the script. Units: metres, m2, kg, kN. Comments mark judgements.\n",
     )
 
 

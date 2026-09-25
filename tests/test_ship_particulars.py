@@ -50,7 +50,7 @@ def truck_height(ship, mast):
         if not above:
             break
         top = above[0].id
-    return sum(s.height_m for s in ship.spar_chain(top)) + ship.spars[top].height_m
+    return sum(s.height_m for s in ship.spar_chain(top))  # the chain includes the top itself
 
 
 # ---------------------------------------------------------------------------
@@ -182,32 +182,50 @@ def test_frigate_head_stays_lead_from_the_right_mastheads(frigate):
 # ---------------------------------------------------------------------------
 
 
-def test_schooner_hull_is_a_baltimore_schooner(schooner):
+def test_schooner_hull_is_lynx_of_1812(schooner):
+    """Kemp's Lynx (H.M. schooner Musquidobit), Chapelle 1930 pp. 82-83: 94 ft 7 in on
+    deck, 73 ft 1 in keel, 24 ft 0 in beam, 10 ft 3 in depth, 223 91/94 tons."""
     h = schooner.hull.spec
-    assert 24.0 <= h.length_waterline_m <= 29.0  # 80 to 95 ft on the water, 90 to 100 on deck
-    assert 6.7 <= h.beam_m <= 7.9  # 22 to 26 ft
-    assert 3.5 <= h.length_waterline_m / h.beam_m <= 4.5  # the type's length to beam
-    assert 2.6 <= h.draught_m <= 3.6  # a deep heel, 11 to 13 ft aft
-    assert 130_000 <= h.displacement_kg <= 230_000
+    # the load line lies between the keel and the deck of a hull with raking ends
+    assert units.feet_to_m(73.1) < h.length_waterline_m < units.feet_to_m(94.6)
+    assert 7.1 <= h.beam_m <= 7.5  # 24 ft 0 in extreme
+    assert 3.3 <= h.length_waterline_m / h.beam_m <= 3.9  # Lynx and Grecian are 3.95 on deck
+    assert 2.9 <= h.draught_m <= 3.8  # Marestier's 0.35 / 0.56 of the beam: 8 ft 5 in / 13 ft 4 in
+    assert 170_000 <= h.displacement_kg <= 250_000  # 0.85 to 1.1 x 224 tons burthen
     assert 0.8 <= h.gm_m <= 1.3
     assert 10.5 <= h.hull_speed_kn <= 12.5
     assert -1.5 <= h.clr_x_m <= 1.0
+    assert h.deck_height_m < 1.3  # a low-sided vessel: port sills 3 ft 5 in above water
 
 
-def test_schooner_sail_plan_is_in_period(schooner):
+def test_schooner_sail_plan_follows_fincham(schooner):
+    """Fincham's rules for two-masted schooners as Chapelle gives them (pp. 160-161), at
+    the upper end of each range for an American vessel. Ranges widened from the first
+    draft (plain sail 420-650 m2) because Chapelle's Spider carried 6,499 sq ft on an
+    80 ft deck and a Baltimore-built 75-footer 8,854 (p. 167): 95 ft of Lynx wants
+    6,500 to 8,000 sq ft of plain sail."""
     plain = area_of(schooner, "plain sail")
-    assert 420 <= plain <= 650
-    assert 550 <= area_of(schooner, "all sail") <= 850  # the Prides carry 840 to 870
+    assert 600 <= plain <= 750
+    assert 700 <= area_of(schooner, "all sail") <= 900  # the Prides carry 840 to 870
     areas = {s.id: s.area_m2 for s in schooner.sails.values()}
     assert (
         areas["main.sail"] > areas["fore.sail"] > areas["fore.topsail"] > areas["fore.topgallant"]
     )
     sp = schooner.spars
+    beam = schooner.hull.spec.beam_m
+    lwl = schooner.hull.spec.length_waterline_m
     assert sp["main.mast"].height_m > sp["fore.mast"].height_m  # the main is the taller stick
-    assert 17.0 <= sp["fore.mast"].height_m <= 20.0
-    assert 14.0 <= sp["main.boom"].length_m <= 17.5  # over the taffrail
+    # mainmast heel to hounds 2.6 to 2.8 x the beam, less the 11 ft to the deck, plus head
+    assert 2.4 * beam <= sp["main.mast"].height_m + units.feet_to_m(11.0) <= 3.3 * beam
+    assert 17.5 <= sp["fore.mast"].height_m <= 20.5
+    assert 0.62 * lwl <= sp["main.boom"].length_m <= 0.74 * lwl  # 0.66 to 0.7 x LWL
+    assert 0.44 <= sp["main.gaff"].length_m / sp["main.boom"].length_m <= 0.53
+    assert 0.32 * lwl <= sp["fore.topsail.yard"].length_m <= 0.44 * lwl  # 0.7-0.75 x fore yard
     assert 27.0 <= truck_height(schooner, "main.mast") <= 33.0
     assert 26.0 <= truck_height(schooner, "fore.mast") <= 32.0
+    # the sails sit abaft their raked masts, the mainsail well abaft its
+    assert schooner.sails["main.sail"].x_m < sp["main.mast"].x_m - 5.0
+    assert schooner.sails["fore.topsail"].x_m < sp["fore.mast"].x_m
     assert schooner.spec.warnings == []
 
 
