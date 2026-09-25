@@ -336,12 +336,22 @@ Combat is another set of evolutions and parts, not a separate system:
 
 - **The log.** Primary. Ship's-log style, with severity levels and filtering (routine, notable, urgent). Time-compression rolls up routine. Every entry is a link to the state that produced it.
 - **The map.** Top-down. Coast, depth, wind arrows, your estimated position and track, sightings with bearing and range uncertainty, other ships at the fidelity your lookouts can actually see.
-- **The ship view.** A side-on schematic of the ship's sail plan, generated from the ship data: every sail drawn in its current state, spars coloured by condition, a heel indicator. Fixed presentation, but it is a *true* picture of the part graph, so when a studding sail boom carries away it vanishes from the drawing. The M2 version is a single profile. The intended endpoint (added after v0.2) is a **2.5D ship view** with a *comfy, 90s vibe*: not a high-definition display of the physics, but enough to give visual interest and a sense of what is happening beyond the log:
-  - a small set of **aspects** (profile, bow and stern quarters, ahead and astern) so the ship visibly turns as she tacks or wears, chosen by her heading relative to the viewer's fixed vantage or to the wind;
-  - **movement**: a gentle roll and pitch with the sea state, sails that fill and shiver, a wake that lengthens with speed;
-  - **backgrounds** by conditions and locale: time of day, cloud and squall, sea state, open sea or coast or harbour, palette-swapped rather than painted anew;
-  - a low-fidelity illustrated style (limited palette, flat shapes, the feel of a mid-90s adventure or strategy game) that suits schematic truth better than realism would.
-  Because every frame is composed from the part graph, the view stays rig-agnostic: a lugger and a frigate use the same renderer with different parts. This is the natural halfway house to the long-term 3D dream and may well make it unnecessary.
+- **The ship view.** A side-on picture of the ship generated from the ship data, so it is always a *true* picture of the part graph: when a studding sail boom carries away it vanishes from the drawing. The M2 version is a single schematic profile. The intended endpoint is a **2.5D ship view** with the principles below (owner's notes, after v0.2), aimed at the comfort and vibe of a mid-90s adventure game such as *Monkey Island*: comfortable, legible, realistic in proportion and colour, only slightly stylised in rendering.
+  1. **Side view, legible small, complete.** Zoomed out enough for perspective; ship, sea and background all visible; every part of the ship is *represented*, with running rigging drawn at a level of detail that suits the window (fine lines that brighten when worked or hovered) rather than all 200 ropes at once.
+  2. **Facings.** At least 8 and ideally 16 facings so that turning is visible and the ship's state and heading can be read without text.
+  3. **Life.** Subtle movement: roll and pitch with the sea state, sails that belly and shiver by their real strain, canned small motions on parts under load; crew abstracted or depicted at their stations from the crew data once it exists (M3+), scaled to the window.
+  4. **Backgrounds.** Pre-made layered renderings for locales (open sea, coasts, landmarks, harbours), keyed to the map and open to expansion by adding files.
+  5. **Weather, time and condition.** Rain, storm, fog, lightning; time-of-day lighting; lamps lit as they were actually used (binnacle, stern lantern), with room for the warm night lighting of the reference games.
+  6. **Art direction by hand.** Tone, lighting and weather passes are judged by a person, not generated wholesale.
+  7. **Positioning.** The log is boring but correct, precise, and the ground truth. The viewer gives the player's actions a context that is not purely text and shows what actually happened, for feedback and enjoyment: a little realistic toy that delights when used correctly and gives a reason to learn the intricacies behind it. It never invents state; everything it animates is driven by simulation data.
+
+  **Technical approach (decided at M1, to shape the M2 profile).** Facings and rig-agnosticism together rule out hand-drawing the *whole ship* per facing: sixteen facings times every sail-state combination times every rig is not an art budget. Instead the view is a **hybrid**:
+  - The **hull** is hand-made art: one set of facings per hull class (nine unique with mirroring for sixteen), painted in the house style. Hulls are few and are where painterly art earns its keep.
+  - The **rig and sails** are drawn procedurally from a simple **3D skeleton**: every spar has a position and orientation in ship coordinates (from the ship file's `x_m`, `height_m`, `length_m`, brace and sheet angles), sails are quads or curves hung between their spars, and the skeleton is projected orthographically at the current facing and heel. Facings are then continuous and free, any rig works, and every part is where it really is. The style comes from the renderer: flat fills, limited palette, weighted outlines, a little texture.
+  - **Backgrounds** are layered paintings (sky, distant land, sea) with parallax; **weather and time** are compositing passes over the whole frame (colour grading per hour and condition, rain and fog overlays, a lightning flash, emissive lamps at night). A 2D WebGL library in the browser client is the likely home for these passes; the M2 profile starts in SVG.
+  - The M2 profile is built as this skeleton projected at a fixed beam-on facing, so that adding facings later is a parameter, not a rewrite.
+
+  The 3D dream (§8.1) is largely absorbed by this: a projected skeleton in a painted world is the halfway house that may make it unnecessary.
 - **The deck (later).** A top-down deck plan showing where hands are and what they are doing. Very useful for understanding why the tack was slow.
 - **Instruments.** Wind, heading, speed, heel, the glass, the well, the clock. Scripts can register custom readouts here, which is the modest answer to "customisable with code": the core views are fixed, the instrument panel is extensible.
 
@@ -569,7 +579,7 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
 
 14. **The director role.** Added after v0.2 as §7.6: an omniscient LLM agent acting through journaled world orders and plausible causes only, visible after the fact, scheduled after parity. The M5 world-order channel is designed with it in mind.
 
-15. **The ship view.** The M2 profile is the first frame of a 2.5D ship view with a few aspects, gentle movement, condition and locale backgrounds, and a comfy 90s illustrated style (§6.1), scheduled for M8.
+15. **The ship view.** The M2 profile is the first frame of a 2.5D ship view with facings, life, painted backgrounds, weather and time passes, and a Monkey-Island-comfortable style (§6.1, seven principles). Technical approach: hand-made hull facings plus a procedurally projected rig skeleton, so facings are continuous and any rig works. The M2 profile is built as that skeleton at a fixed facing.
 
 ### Still open
 
