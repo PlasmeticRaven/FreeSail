@@ -101,22 +101,27 @@ The refusal: braced sharp up on the starboard tack, the main yard "is already br
 
 ## Tending the sheets
 
-A fore-and-aft sail is trimmed by its sheet: hauled in for the wind ahead, eased off as it draws aft (Falconer, *Sheet*). The game measures a gaff sail's or jib's trim as the angle of its foot from the centreline, and each haul or ease moves it five degrees:
+A fore-and-aft sail is trimmed by its sheet: hauled in for the wind ahead, eased off as it draws aft (Falconer, *Sheet*). The game measures a gaff sail's or jib's trim as the angle of its foot from the centreline, and each haul or ease moves it five degrees. When a sail is set its sheet is trimmed to the apparent wind at once, and there is a floor a boom on its horse cannot come inside: 18° for a gaff sail, 15° for a jib or staysail. Close-hauled at 49° apparent the spanker is sheeted to 24°, and `haul the spanker sheet` brings it to 19°:
+
+```
+  Morning watch (04:15)  Order: haul the spanker sheet.
+  Morning watch (04:15)  Hauled the mizzen spanker sheet; the mizzen spanker now 19° off the centreline.
+```
 
 ```orders frigate plain-sail
-# rejected: haul the spanker sheet
+haul the spanker sheet
 ease the spanker sheet a fathom
 ease the spanker sheet two fathoms
-haul the spanker sheet
 haul in the spanker sheet handsomely
 haul aft the spanker sheet
+# rejected: haul the spanker sheet
 # rejected: haul the spanker sheet aft
 ease the jib sheet, lee
 haul the jib sheet aft, lee
 ease the fore topmast staysail sheet, lee
 ```
 
-"The mizzen spanker sheet is already hard in" is the first refusal: the sheet was hauled flat when the sail was set. The second line puts the boom 5° off the centreline, the third 15°, the fourth back to 10°. **Haul aft** (or *aft* after the sheet's name) hauls it all the way: "Hauled the mizzen spanker sheet flat aft; the mizzen spanker now amidships", and a sheet already flat is refused a second time.
+Each `ease` lets the boom off five degrees and each `haul` brings it in five; the block starts with the spanker sheeted at its 18° floor for a wind at 40° apparent, so the first haul takes it to 13°, the two eases to 28°, and the next haul to 23°. **Haul aft** (or *aft* after the sheet's name) hauls it all the way: "Hauled the mizzen spanker sheet flat aft; the mizzen spanker now amidships". Then come the two refusals: "The mizzen spanker sheet is already hard in", and a sheet already flat aft is refused a second time.
 
 A square sail's sheets, tacks and bowlines are hauled home when it is set and stay there; ease one and the log counts it off in tenths ("Eased the larboard (lee) main course sheet; now nine-tenths hauled"). **Sheet home** the sail, or **haul home** its sheets, and they are hauled home again and belayed; the plural names both sheets at once. Their trim is the yard's business.
 
@@ -132,7 +137,7 @@ haul home the topsail sheets
 
 The last refusal: "The fore topsail is sheeted home already."
 
-Between your orders **the watch on deck tends the fore-and-aft sheets for you**: each set jib, staysail and gaff sail is sheeted to the apparent wind as she comes up or falls off, at about a degree a second (`freesail/evolutions/trim.py`). Square sails are never touched without an order. So after a tack the spanker and jib will find their trim by themselves, but the yards will sit where the tack left them until you brace.
+Between your orders **the watch on deck tends the fore-and-aft sheets for you**: each set jib, staysail and gaff sail is sheeted to the apparent wind as she comes up or falls off, at about a degree a second (`freesail/evolutions/trim.py`), and never inside the floors above. Square sails are never touched without an order. So after a tack the spanker and jib will find their trim by themselves, but the yards will sit where the tack left them until you brace or `trim`. It also means a sheet you haul by hand is eased again within the minute: hauled to 19° at 04:15, the spanker was back at 24° when `ease the spanker sheet a fathom` a minute later put it at 29°. Sheet orders by hand are for the moment, and for the crew work of milestone 3, which will make the watch do only what it is told.
 
 ## The `trim` order
 
@@ -159,7 +164,7 @@ A ship whose after sails press harder than her head sails wants to come up into 
 | starboard (wind from starboard) | helm negative | helm positive |
 | larboard | helm positive | helm negative |
 
-The frigate under plain sail close-hauled on the starboard tack shows `helm -2°`: a touch of weather helm, which is right. The schooner in the same breeze shows `helm +5°` on the starboard tack: a lee helm, which is a fault of her present tuning (her centre of lateral resistance is under review in package 8 and 10) and worth watching when you sail her.
+The frigate under plain sail close-hauled on the starboard tack shows `helm -1°`: a touch of weather helm, which is right (package 10 measured +0.9° of weather helm close-hauled, +1.9° on a beam reach, +5.0° with the headsails in and −2.1° of lee helm with the spanker in, which is truth 6 of `docs/dev/TuningNotes.md`). The schooner in the same breeze shows `helm -4°` on the starboard tack, a firmer weather helm, and hers wanders a few degrees either way as the gusts come.
 
 ### What to do about it
 

@@ -13,14 +13,14 @@ The strength words follow the old scale of breezes: *light airs*, *a light breez
 
 ## The apparent wind
 
-The wind you feel on deck is the true wind combined with the ship's own motion. A ship making 8 knots across a 15-knot wind feels it stronger and further ahead; running before it she feels it lighter. The sails know only the apparent wind, and so it is the apparent wind that `state` reports, as an angle from the bow and the side it is on:
+The wind you feel on deck is the true wind combined with the ship's own motion. A ship making 5 knots to windward in a 15-knot breeze feels it a little stronger and a good deal further ahead; running before it she feels it lighter. The sails know only the apparent wind, and so it is the apparent wind that `state` reports, as an angle from the bow and the side it is on:
 
 ```
-Amazon: heading WNW (293°), speed 8.0 kn, leeway -3°, heel -7°
-Apparent wind 40° on the starboard bow, 16.6 kn; helm -2°
+Amazon: heading WNW (293°), speed 4.6 kn, leeway -4°, heel -3°
+Apparent wind 49° on the starboard bow, 14.4 kn; helm -1°
 ```
 
-Here the true wind is north, 67° from her heading of 293°, but she feels it at 40° and 16.6 knots. This difference is the whole reason a square-rigger cannot point higher: see below.
+Here the true wind is north, 67° from her heading of 293°, but she feels it at 49°; on a beam reach at 8 knots she would feel a 15-knot wind at 59° and 18 knots. This difference is the whole reason a square-rigger cannot point higher: see below.
 
 ## The tack
 
@@ -67,7 +67,7 @@ Sailing with the wind on the beam or abaft it is *sailing large* or, from the qu
 
 Falconer: "In this manner of sailing the keel commonly makes an angle of six points with the line of the wind; but sloops, and some other small vessels, are said to sail almost a point nearer." Lever: "A square rigged Ship, when close-hauled, can lie no nearer to the Wind than six Points... In practice the Yard is braced up sharper, to make the Sail stand to the most advantage."
 
-The reason is in two numbers the ship file gives every yard. A yard cannot be braced past its **brace limit**, about 55° from square for the lower yards and a little more aloft, because the shrouds are in the way; so its sail can lie no nearer than 35° to the keel. A sail needs the wind some 20° to 25° off its own surface to fill, so the apparent wind can come no nearer than about 40° from the bow before the weather leech lifts. And because she is moving, the apparent wind is always ahead of the true: 40° apparent at 8 knots in a 15-knot breeze is about 67° true, which is six points. The game does not assume the six points; it comes out of the yards, the sails and the speed. A fore-and-aft sail sheets much nearer the centreline, which is why the schooner in chapter 7 lies half a point nearer.
+The reason is in two numbers the ship file gives every yard. A yard cannot be braced past its **brace limit**, about 55° from square for the lower yards and a little more aloft, because the shrouds are in the way; so its sail can lie no nearer than 35° to the keel. A coarse flax sail needs the wind some 15° to 20° off its own surface before it draws at all, so the apparent wind can come no nearer than about 45° from the bow before the weather leech lifts and the sails go dead. And because she is moving, the apparent wind is always ahead of the true: 49° apparent at 5 knots in a 15-knot breeze is about 67° true, which is six points. Her best course to windward, the one that makes the most ground against the wind, is a degree or two either side of it at about 5 knots; she will hold three knots to 58° off, but only on her jibs and spanker, with the square sails shaking. The game does not assume the six points; it comes out of the yards, the sails and the speed. A fore-and-aft sail sheets much nearer the centreline, which is why the schooner in chapter 7 lies half a point nearer.
 
 Add to that the **leeway**: "All vessels, however, are supposed to make nearly a point of lee-way, when close-hauled" (Falconer). The log reports it as it changes and `state` shows it:
 
@@ -99,7 +99,7 @@ luff and touch her
 bring her by the wind
 ```
 
-`keep her full` (or `full and by`, *bring her by the wind*, *steer by the wind*) hands the helmsman the standing task: he steers as close as she will lie with the sails drawing, and follows the wind as it shifts. Luce's *Nothing off!*, *No higher!* and *Luff and touch her!* are the same order given from either side of it, and the log echoes the word you used: "Helm ordered: no higher; keep her full and by." `come up` (*luff*) and `bear away` (*keep away*, *bear up*) move the ordered course by a point, or the number of points you give (halves are taken: *half a point*, *a point and a half*), and put her on a fixed compass course from then on; say `keep her full` again to go back to sailing by the wind. Falconer, *Luff*: "the order from the pilot to the steersman to put the helm towards the lee-side of the ship, in order to make the ship sail nearer the direction of the wind."
+`keep her full` (or `full and by`, *bring her by the wind*, *steer by the wind*) hands the helmsman the standing task: he steers as close as she will lie with the sails drawing, and follows the wind as it shifts. On the frigate that is about 58° apparent, 70° true, at five and a half knots; a good full, a few degrees off the closest she can point, because the sails draw better there. Luce's *Nothing off!*, *No higher!* and *Luff and touch her!* are the same order given from either side of it, and the log echoes the word you used: "Helm ordered: no higher; keep her full and by." `come up` (*luff*) and `bear away` (*keep away*, *bear up*) move the ordered course by a point, or the number of points you give (halves are taken: *half a point*, *a point and a half*), and put her on a fixed compass course from then on; say `keep her full` again to go back to sailing by the wind. Falconer, *Luff*: "the order from the pilot to the steersman to put the helm towards the lee-side of the ship, in order to make the ship sail nearer the direction of the wind."
 
 ### Conning the helm
 
@@ -133,8 +133,8 @@ down helm
 ```
 Morning watch (04:21)
 Wind N, 14 knots, a moderate breeze
-Amazon: heading WNW (293°), speed 8.0 kn, leeway -3°, heel -7°
-Apparent wind 40° on the starboard bow, 16.6 kn; helm -2°
+Amazon: heading WNW (293°), speed 4.6 kn, leeway -4°, heel -3°
+Apparent wind 49° on the starboard bow, 14.4 kn; helm -1°
 Sail set: fore.course, fore.topsail, fore.topgallant, main.course, main.topsail, main.topgallant, mizzen.topsail, mizzen.topgallant, mizzen.spanker, fore.topmast_staysail, jib
 ```
 

@@ -21,9 +21,9 @@ set the fore topsail
 
 Lines are orders to type, one per line. A line beginning `# rejected:` is an order the ship refuses, shown so that you learn the refusal. A line such as `tick 300` or `state` is a console command, not an order to the ship; chapter 6 lists them. The word after `orders` names the ship the block is for, and a word after that (`plain-sail`, `all-sail`, `reefed`, `larboard`) says what state she is in when the block begins. A test in the repository (`tests/test_primer.py`) runs every such block through the parser and fails if the book and the ship disagree, so what is printed here is what she understands.
 
-Blocks tagged `orders-pending` show an order that is being added and is not yet in the vocabulary.
+A block tagged `orders-pending` (there are none at present) shows an order that is being added and is not yet in the vocabulary; the test skips it until the verb exists.
 
-What the log will say is shown in plain code blocks, copied from a run with seed 7 and a north wind of 15 knots, so that your log matches this book line for line until the first gust.
+What the log will say is shown in plain code blocks, copied from a run with seed 7 and a north wind of 15 knots with the physics as tuned by package 10 (`docs/dev/TuningNotes.md`), so that your log matches this book line for line until the first gust.
 
 ## The chapters
 
