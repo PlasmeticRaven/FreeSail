@@ -1,6 +1,8 @@
 # Gate M0: Skeleton and log
 
-**Verdict:** Pending.
+**Verdict:** Passed with notes (owner, 2026-09-25). All ten items passed.
+
+**Owner's note:** while typing an order, a log line arrived and the partly typed text was pulled into the printed output. Filed as console issue 1 for milestone 1: the console must redraw the input line after printing log lines.
 
 **Download:** the release page for `gate-m0` at https://github.com/PlasmeticRaven/FreeSail/releases/tag/gate-m0, or the plain zip of the snapshot branch at https://github.com/PlasmeticRaven/FreeSail/archive/refs/heads/gates/m0.zip. Either contains everything below.
 
