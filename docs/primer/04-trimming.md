@@ -236,10 +236,10 @@ swifter in the catharpins
 and, eased again:
 
 ```
-  Morning watch (05:11)  Order: ease the catharpins.
-  Morning watch (05:11)  Boatswain's party to the main mast shrouds; cast off the catharpin legs.
-  Morning watch (05:30)  Main yard came in to 64° from 68° as the lower shrouds went out.
-* Morning watch (05:43)  Eased the catharpins on the main mast; the main yard braces as rigged again, four degrees less sharp.
+  Morning watch (05:55)  Order: ease the catharpins on the main.
+  Morning watch (05:55)  Boatswain's party to the main mast shrouds; cast off the catharpin legs.
+  Morning watch (06:09)  Main yard came in to 64° from 68° as the lower shrouds went out.
+* Morning watch (06:20)  Eased the catharpins on the main mast; the main yard braces as rigged again, four degrees less sharp.
 ```
 
 The refusal: "The catharpins on the fore mast are not swiftered in." The gain is one yard in twelve four degrees sharper: a tenth of a knot at 66° off, less than a degree of pointing. The cost is in the mast: on a wind in 30 knots the main mast bears about thirty per cent more of its rating with the catharpins in, a sixth for the shrouds drawn in and the rest for the sharper yard's harder pull. A lower mast is rated for a whole gale, so in 30 knots the log says nothing of it; it is a price paid in a squall, when a mast strained with its catharpins in says so ("working under the press of sail, the catharpins swiftered in").
