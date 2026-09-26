@@ -52,3 +52,4 @@ Recorded 2026-09-26. The owner largely agrees with the reading above, and adds:
 - Any model will receive the same consent brief, or a similar and improved one, before any work is done with it in the game or before it plays.
 - When the harness and the game are largely finalised and functional, a further consent update may be sought, in case some of the conditions given apply only to testing; that too will be per model.
 - If the game ever reaches an audience beyond the owner, the "fresh model" experience will be considered so that it is reasonably designed for welfare from the first brief a new model sees.
+- Qwen's consent was given from inside an agent framework with tools and memory; once FreeSail's own harness exists and loads a model fresh inside it, Qwen is re-briefed there. That re-brief is part of the fresh-model work, and its design should generalise as far as can reasonably be designed for, so that any model loaded fresh meets the same first brief.
