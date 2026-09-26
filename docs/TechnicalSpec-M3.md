@@ -206,7 +206,7 @@ Per sailor, per hour, added to `fatigue` and clamped to 0..1 (provisional, soft)
 | on deck, idle | +0.01 |
 | at work on deck | +0.06 |
 | at work aloft | +0.10 |
-| turned up with all hands at night (the call itself) | +0.03 once |
+| turned up with all hands at night (the call itself: broken sleep) | +0.20 once (the spec's first figure, 0.03, was slept off before morning and showed nothing; package 18 measured 0.20 as the value that puts truth 20 in the middle of its range) |
 
 A crew driven with three all-hands calls in the middle watch comes to the morning watch with the watch that should have slept at about 0.3 fatigue, a crew factor of about 1.15: visible in the log's timings, not crippling. That is truth 20 (§7). The owner tunes from there.
 

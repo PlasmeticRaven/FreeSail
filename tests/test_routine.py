@@ -12,7 +12,6 @@ from freesail.core.clock import Clock
 from freesail.core.rng import Rng
 from freesail.core.world import Scenario
 from freesail.crew import bill
-from freesail.crew import routine as routine_module
 from freesail.crew.model import TOPS, Crew, Station, Watch
 from freesail.crew.muster import muster
 from freesail.crew.routine import (
@@ -472,25 +471,16 @@ def test_a_quiet_night_leaves_the_watch_below_fresh():
     ]
 
 
-def test_three_calls_in_the_middle_watch_with_the_specs_table():
+def test_three_calls_in_the_middle_watch_leave_the_morning_watch_tired():
+    """Truth 20's mechanism. The spec's first night-call cost, 0.03, was slept off by
+    four in the morning (mean 0.000, term 1.00); the constant is 0.20 so that a night
+    of three calls costs about a sixth of the morning's pace (docs/dev/TuningNotes.md)."""
     peaks = []
     crew, notes = _night(CALLS, peaks)
     kinds = [n[1] for _, n in notes]
     assert kinds.count("crew.all_hands") == 3 and kinds.count("crew.piped_down") == 3
-    # after each evolution the watch that should have slept is tired by a few hundredths...
-    assert peaks == pytest.approx([0.0409, 0.0409, 0.0409], abs=5e-4)
-    # ...and has slept it off by the morning watch: the fatigue term of the crew factor is
-    # 1.0, not truth 20's 1.10 to 1.25 (the gate report carries this; see the next test)
-    morning = _mean(crew.by_watch[Watch.STARBOARD])
-    assert morning == pytest.approx(0.0, abs=1e-5)
-    assert 1 + FATIGUE_WEIGHT * morning == pytest.approx(1.0, abs=1e-5)
-
-
-def test_which_constant_would_bring_truth_20_in(monkeypatch):
-    # Not a change: a measurement. The one-off cost of a night call at about 0.2 instead of
-    # the spec's 0.03 gives the tired watch 0.34 and a fatigue term of 1.17 at 04:00.
-    monkeypatch.setattr(routine_module, "FATIGUE_ALL_HANDS_AT_NIGHT", 0.2)
-    crew, _ = _night(CALLS)
+    # each call costs the hands turned out of their sleep the one-off, plus the work
+    assert peaks[0] == pytest.approx(FATIGUE_ALL_HANDS_AT_NIGHT + 0.0109, abs=5e-4)
     morning = _mean(crew.by_watch[Watch.STARBOARD])
     assert morning == pytest.approx(0.3405, abs=5e-4)
     assert 1.10 <= 1 + FATIGUE_WEIGHT * morning <= 1.25
@@ -514,10 +504,15 @@ def test_same_crew_same_clock_same_calls_same_notes_and_fatigues():
 
 
 def _crewed_world(path: Path, start: datetime):
+    # make_world attaches the muster and the routine (session.py, spec M3 §2.4)
     world = make_world(7, path, Scenario(start_time=start))
-    crew = world.ship.extra["crew"]
-    # the lead's line in session.py (make_world), made here by hand
-    world.ship.extra["routine"] = Routine(crew, world.clock)
+    assert isinstance(world.ship.extra["routine"], Routine)
+    return world
+
+
+def _world_without_a_routine(path: Path, start: datetime):
+    world = make_world(7, path, Scenario(start_time=start))
+    world.ship.extra.pop("routine")
     return world
 
 
@@ -553,7 +548,7 @@ def test_a_crewed_world_through_a_day():
 
 def test_the_routine_touches_nothing_the_physics_reads():
     start = DAY.replace(hour=7, minute=55)
-    worlds = [make_world(7, FRIGATE, Scenario(start_time=start)), _crewed_world(FRIGATE, start)]
+    worlds = [_world_without_a_routine(FRIGATE, start), _crewed_world(FRIGATE, start)]
     for w in worlds:
         w.submit("set the fore topsail")
         w.run(600)

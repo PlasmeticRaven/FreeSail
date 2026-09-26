@@ -54,7 +54,7 @@ FATIGUE_ON_DECK_IDLE = 0.01  # on deck, not at work
 FATIGUE_AT_WORK_ON_DECK = 0.06  # at work on deck: hauling, the capstan, the braces
 FATIGUE_AT_WORK_ALOFT = 0.10  # at work aloft: loosing, furling, reefing
 # Once, for a hand turned up out of his sleep by a call for all hands at night.
-FATIGUE_ALL_HANDS_AT_NIGHT = 0.03
+FATIGUE_ALL_HANDS_AT_NIGHT = 0.20  # broken sleep costs more than the work; truth 20 (TuningNotes)
 
 # Night, for sleep and for the cost of a call: from the end of the second dog watch to the
 # start of the morning watch. Hours of ship's time.

@@ -53,9 +53,11 @@ def make_world(seed: int, ship_path: str | Path, scenario: Scenario | None = Non
     ship = world.ship
     if getattr(ship, "spec", None) is not None and ship.spec.crew is not None:
         from freesail.crew import muster
+        from freesail.crew.routine import Routine
 
         # The muster is a function of the seed, like everything else (spec M3 §2.4).
         ship.extra["crew"] = muster(ship.spec.crew, world.rng.stream("muster"), ship_name=ship.name)
+        ship.extra["routine"] = Routine(ship.extra["crew"], world.clock)
     return world
 
 
