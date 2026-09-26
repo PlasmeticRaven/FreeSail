@@ -93,7 +93,10 @@ def test_both_ship_files_carry_a_crew_section():
         "master-at-arms",
     ]
     assert frigate.crew.idlers_by_trade["master-at-arms's party"] == 3
-    assert frigate.crew.stores.water_tons == 100 and frigate.crew.stores.spare_sails == 3
+    # milestone 3b: the stores list the sail room's sails (spec 3b §6.3), and `spare_sails` is
+    # the count of them, derived: Luce's allowance for a frigate, 21 sails
+    assert frigate.crew.stores.water_tons == 100 and frigate.crew.stores.spare_sails == 21
+    assert len(frigate.crew.stores.sails) == 21
     assert schooner.crew.complement == 40 and schooner.crew.names == "american"
     assert schooner.crew.stations["marines"] == 0 and schooner.crew.stations["main_top"] == 0
     assert [p.post for p in schooner.crew.posts] == ["master", "mate", "boatswain"]

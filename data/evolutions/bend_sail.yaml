@@ -1,19 +1,24 @@
-# Bend a sail to a bare yard (scripted, BendScript in scripts.py): a made-up
-# sail is roused up from the sail room, swayed aloft and bent. It uses one
-# spare sail: the count comes from the ship file's `crew.stores.spare_sails`
-# when the ship has a crew section, else three, and is kept in
-# ship.extra["spare_sails"]. With none left the order is refused. The new sail
-# is left furled on its yard, to be set by order.
+# Bend a sail to a bare yard, gaff or stay (scripted, BendScript in scripts.py):
+# a sail is roused up from the sail room, swayed aloft and bent. Milestone 3b
+# (spec 3b §6.3): the sail room holds sails, each made for one sail of the ship
+# with its canvas number and condition (the ship file's `crew.stores.sails`, or
+# for a file with only a count that many made-up sails for any yard). The best
+# of the kind is bent, or the one the order names (params `canvas_no`, `heavy`),
+# and brings its canvas and condition to the part. With none left the order is
+# refused; so is bending a sail in the place of another still bent (the storm
+# mizzen while the spanker is bent, spec 3b §6.4). The new sail is left furled,
+# to be set by order.
 #
 # Luce's sequence (sail-burtons and buntlines manned, "Sway aloft! ... Haul
 # out! Lay out! And bring to!", robands and head earings passed, the gear
 # bent) is two phases here:
 #   send_up  on deck: roused up from the sail room and swayed aloft
 #   bend     aloft: hauled out along the yard and bent, the gear shifted to it
-# Only square sails in this milestone, as for unbend_sail.
+# Any sail class (milestone 3b: storm canvas and the occasional sails are
+# jib-headed, gaff and studding-class sails that start in the sail room).
 id: bend_sail
 verb: bend
-applies_to: {class: square}
+applies_to: {class: sail}
 script: bend
 params: {aloft: [bend]}
 preconditions:
@@ -23,8 +28,8 @@ requires:
 timing:
   send_up_s: 120   # rouse up and sway aloft (judgement)
   bend_s: 240      # haul out, bring to, bend the gear (judgement)
-on_start: {log: "Bend sail! Rouse up a new {sail} from the sail room."}
-on_complete: {log: "Bent a new {sail} and furled it; {spare_sails} left in the sail room.", kind: sail.bent, severity: notable}
+on_start: {log: "Bend sail! Rouse up the {sail} from the sail room."}
+on_complete: {log: "Bent the {sail} ({canvas}) and furled it; {spare_sails} left in the sail room.", kind: sail.bent, severity: notable}
 on_fail: {log: "Could not bend the {sail}: {reason}", kind: evolution.failed, severity: notable}
 # crew: the loosers aloft, "the balance of the men in each part of the ship go below and
 # rouse up the sails" (Luce 1884, ch. XX Port Drills, 'Bending Sail'); the part of the

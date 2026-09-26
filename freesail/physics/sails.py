@@ -67,6 +67,7 @@ from typing import TYPE_CHECKING
 import yaml
 
 from freesail import units
+from freesail.physics.strain import baggy_luff  # package 22: the worn-canvas luff term
 from freesail.ship.parts import Sail, SailState, Spar
 
 if TYPE_CHECKING:
@@ -264,6 +265,11 @@ def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
         # a schooner sails by her fore-and-aft canvas with the square topsail
         # shaking, so the topsail must not set the rule for the whole rig
         sail_luff = _chord_angle(ship, sail) + cls.luff_angle
+        # -- package 22 (spec 3b §6.2): worn canvas is baggier and lies less close to the
+        # wind; its luff angle rises by BAGGY_LUFF_DEG * (1 - condition / 100). The one
+        # canvas term in this module; the constant and the rule are in physics/strain.py.
+        sail_luff += baggy_luff(sail)
+        # -- end package 22
         luff_weight = max(sail.area_effective_m2, 1e-6)
         luff_sum += sail_luff * luff_weight
         luff_area += luff_weight

@@ -3,6 +3,16 @@
 Specs (schema.py) say what a part *is*. Parts here say what state it is *in*:
 set or furled, braced to what angle, how loaded, how worn. Physics reads
 these; evolutions and level-0 orders change them.
+
+Milestone 3b (docs/TechnicalSpec-M3b.md §6) makes canvas a thing. A sail is
+made of canvas of a number (`Sail.canvas_no`, 1 the heaviest) whose strength
+Luce's Appendix E gives, and it has a condition that wears with use; a worn
+sail bears less than a new one (`Sail.effective_cloth_rating_kn`), and the
+strain model judges it against that. The sail room (`SailRoom`, reached by
+`sail_room(ship)`) holds the sails that are not bent: the second sail of a
+kind, the heavy-weather sails, the storm canvas and the occasional sails,
+each with its canvas number and condition. Bending draws a sail from it and
+unbending returns one to it; nothing mends canvas until milestone 8.
 """
 
 from __future__ import annotations
@@ -14,6 +24,62 @@ from typing import Any
 
 from freesail import units
 from freesail.ship.schema import HullSpec, LineSpec, SailSpec, SparSpec
+
+# ---------------------------------------------------------------------------
+# Canvas (spec 3b §6.1 and §6.2)
+# ---------------------------------------------------------------------------
+
+# The strength of flax canvas by number: the pounds a strip one inch wide bears, cut
+# crosswise of the cloth. Luce 1884, App. E pp. 610-611, read from the page image
+# (docs/references/Tables.md §2). Nos. 8 and 9 were tested on strips an inch and a quarter
+# wide; their printed 300 and 280 lb are reduced to the inch here, as Tables.md does.
+CANVAS_CROSSWISE_LB_PER_IN: dict[int, float] = {
+    1: 470.0,
+    2: 420.0,
+    3: 370.0,
+    4: 340.0,
+    5: 320.0,
+    6: 300.0,
+    7: 280.0,
+    8: 300.0 / 1.25,  # 240
+    9: 280.0 / 1.25,  # 224
+}
+
+# The number the cloth ratings are anchored on: courses and topsails are of No. 2 (Luce
+# 1884 ch. X p. 171, Tables.md §1; Steel 1794 vol. I, 'Main-course', 'Main-topsail').
+WORKING_CANVAS_NO = 2
+
+# The cloth rating of No. 2 canvas, kN per m2 of sail: the rating milestone 2 gave courses
+# and topsails (tools/gen_ships.py, the 'course' and 'topsail' rows of CLOTH_KN_PER_M2 as
+# it was), kept so that every sail of No. 2 keeps its rating exactly (spec 3b §6.1). Every
+# other number scales from it by the strengths above.
+CLOTH_KN_PER_M2_NO2 = 0.9
+
+# What worn canvas keeps: a sail at condition 0 bears this share of its new rating, a new
+# one all of it, in a straight line between (spec 3b §6.2: the effective rating is
+# cloth_rating * (0.4 + 0.6 * condition / 100)).
+WORN_CLOTH_STRENGTH = 0.4
+
+# Made-up sails in the sail room of a ship whose file lists none (milestone 3, package 19:
+# the count the M3 sail scripts used when the ship file gives no stores; judgement).
+DEFAULT_SPARE_SAILS = 3
+
+
+def canvas_strength(canvas_no: int) -> float:
+    """The crosswise strength of this canvas relative to No. 2 (1.12 for No. 1, 0.57 for No. 8)."""
+    return CANVAS_CROSSWISE_LB_PER_IN[canvas_no] / CANVAS_CROSSWISE_LB_PER_IN[WORKING_CANVAS_NO]
+
+
+def cloth_rating_for(area_m2: float, canvas_no: int) -> float:
+    """A sail's cloth rating, kN, from its area and canvas (spec 3b §6.1): No. 2 canvas at
+    CLOTH_KN_PER_M2_NO2 a square metre, other numbers in proportion to their strength."""
+    return round(CLOTH_KN_PER_M2_NO2 * canvas_strength(canvas_no) * area_m2, 1)
+
+
+def worn_cloth_fraction(condition: float) -> float:
+    """The share of its new strength a sail of this condition (0..100) still bears."""
+    c = min(max(condition, 0.0), 100.0) / 100.0
+    return WORN_CLOTH_STRENGTH + (1.0 - WORN_CLOTH_STRENGTH) * c
 
 
 class SailState(StrEnum):
@@ -89,6 +155,8 @@ class Sail(Part):
     side: str | None = None
     roles: dict[str, str] = field(default_factory=dict)
     cloth_rating_kn: float = 0.0
+    canvas_no: int | None = None  # the canvas of the sail now bent (spec 3b §6.1)
+    in_place_of: str | None = None  # the sail this one is bent instead of (spec 3b §6.4)
     state: SailState = SailState.FURLED
     reefs: int = 0
     sheet_angle: float = 0.0  # radians from the centreline; fore-and-aft sails
@@ -113,7 +181,36 @@ class Sail(Part):
             side=s.side,
             roles=dict(s.roles),
             cloth_rating_kn=cloth,
+            canvas_no=s.canvas_no,
+            in_place_of=s.in_place_of,
+            # storm canvas and the occasional sails start the voyage in the sail room
+            state=SailState.FURLED if s.bent else SailState.UNBENT,
         )
+
+    @property
+    def effective_cloth_rating_kn(self) -> float:
+        """What the cloth bears now (spec 3b §6.2): its rating times the share a sail of
+        its condition keeps, from 0.4 worn out to all of it new."""
+        return self.rating_kn * worn_cloth_fraction(self.condition)
+
+    @property
+    def strain_ratio(self) -> float:
+        """Load over the effective cloth rating: a worn sail strains sooner than a new one
+        and blows out at BLOW_OUT_RATIO of what it bears now (spec 3b §6.2)."""
+        effective = self.effective_cloth_rating_kn
+        return self.load_kn / effective if effective > 0 else 0.0
+
+    def bend_canvas(self, canvas_no: int | None, condition: float) -> None:
+        """Bend a sail of this canvas and condition to the part: the cloth rating follows the
+        number by Luce's strengths (a heavy No. 1 topsail in place of the No. 2 bears 1.12 of
+        it), and the condition is the new sail's."""
+        if canvas_no is not None and self.canvas_no is not None and canvas_no != self.canvas_no:
+            factor = canvas_strength(canvas_no) / canvas_strength(self.canvas_no)
+            self.cloth_rating_kn *= factor
+            self.rating_kn *= factor
+        if canvas_no is not None:
+            self.canvas_no = canvas_no
+        self.condition = min(max(condition, 0.0), 100.0)
 
     @property
     def is_set(self) -> bool:
@@ -145,6 +242,249 @@ class Line(Part):
     @property
     def is_standing(self) -> bool:
         return self.cls in {"stay", "shroud", "backstay"}
+
+
+# ---------------------------------------------------------------------------
+# The sail room (spec 3b §6.3)
+# ---------------------------------------------------------------------------
+
+# Words for a sail's condition in the log and the muster (judgement: a sail that has done a
+# few weeks' duty is still "new" to a purser; below half its cloth is thin).
+CONDITION_WORDS: tuple[tuple[float, str], ...] = (
+    (95.0, "new"),
+    (75.0, "sound"),
+    (50.0, "worn"),
+    (25.0, "much worn"),
+    (0.0, "worn out"),
+)
+
+# The ship file's groups that name the sail room's own canvas (tools/gen_ships.py).
+STORM_GROUP = "storm canvas"
+OCCASIONAL_GROUP = "occasional sails"
+
+
+def condition_words(condition: float) -> str:
+    for floor, words in CONDITION_WORDS:
+        if condition >= floor:
+            return words
+    return CONDITION_WORDS[-1][1]
+
+
+@dataclass
+class SpareSail:
+    """A sail in the sail room: made for one sail of the ship (`kind`, the sail's id), of a
+    canvas number, and worn to a condition. A `kind` of None is a made-up sail the
+    sailmaker fits to any yard: the room of a ship whose file lists no sails."""
+
+    kind: str | None
+    canvas_no: int | None = None
+    condition: float = 100.0
+
+
+@dataclass
+class SailRoom:
+    """The sails that are not bent. `names` gives a sailor's name for each sail of the ship,
+    `working` each sail's canvas number as the ship file makes it, and `category` which
+    kinds are storm canvas or the occasional light-weather sails, for the muster."""
+
+    sails: list[SpareSail]
+    names: dict[str, str] = field(default_factory=dict)
+    working: dict[str, int | None] = field(default_factory=dict)
+    category: dict[str, str] = field(default_factory=dict)
+
+    def __len__(self) -> int:
+        return len(self.sails)
+
+    def fitting(self, kind: str) -> list[SpareSail]:
+        """The sails in the room that can be bent in the place of sail `kind`."""
+        return [s for s in self.sails if s.kind == kind or s.kind is None]
+
+    def number_of(self, spare: SpareSail, kind: str) -> int | None:
+        """The canvas number of a spare as bent to `kind` (a made-up sail is of its number)."""
+        return spare.canvas_no if spare.canvas_no is not None else self.working.get(kind)
+
+    def choose(
+        self, kind: str, canvas_no: int | None = None, heavy: bool = False
+    ) -> SpareSail | None:
+        """The sail to bend in the place of `kind`: of the number named if one is, else the
+        heaviest heavy-weather sail if `heavy`, else the best of the working number, else the
+        best there is. "Best" is the highest condition; the heavy-weather sails are kept for
+        a blow and come up for fine weather only when nothing else is left."""
+        fits = self.fitting(kind)
+        working = self.working.get(kind)
+        if canvas_no is not None:
+            fits = [s for s in fits if self.number_of(s, kind) == canvas_no]
+        elif heavy:
+            if working is None:
+                return None
+            fits = [s for s in fits if (self.number_of(s, kind) or working) < working]
+            fits.sort(key=lambda s: self.number_of(s, kind) or working)  # heaviest first
+        else:
+            same = [s for s in fits if self.number_of(s, kind) in (working, None)]
+            fits = same or fits
+        if not fits:
+            return None
+        return max(fits, key=lambda s: s.condition)  # the first of equals: stable
+
+    def take(self, spare: SpareSail) -> None:
+        for i, s in enumerate(self.sails):
+            if s is spare:
+                del self.sails[i]
+                return
+        raise ValueError("that sail is not in the sail room")
+
+    def stow(self, spare: SpareSail) -> None:
+        self.sails.append(spare)
+
+    # -- words ---------------------------------------------------------------
+
+    def name(self, kind: str | None) -> str:
+        if kind is None:
+            return "made-up sail"
+        return self.names.get(kind, kind.replace("_", " ").replace(".", " "))
+
+    def describe(self, spare: SpareSail, kind: str | None = None) -> str:
+        """'the fore topsail, No. 1 canvas, new' (for the log and the inventory)."""
+        kind = spare.kind or kind
+        no = self.number_of(spare, kind) if kind else spare.canvas_no
+        what = f"the {self.name(kind)}"
+        if no is not None:
+            what += f", No. {no} canvas"
+        return f"{what}, {condition_words(spare.condition)}"
+
+    def _kind_of(self, spare: SpareSail) -> str:
+        """'storm', 'occasional', 'heavy', 'working' or 'made-up'."""
+        if spare.kind is None:
+            return "made-up"
+        cat = self.category.get(spare.kind)
+        if cat:
+            return cat
+        working = self.working.get(spare.kind)
+        if working is not None and spare.canvas_no is not None and spare.canvas_no < working:
+            return "heavy"
+        return "working"
+
+    def _names(self, spares: list[SpareSail]) -> str:
+        names = [self.name(s.kind) for s in spares]
+        if len(names) <= 1:
+            return "".join(names)
+        return ", ".join(names[:-1]) + " and " + names[-1]
+
+    def muster_line(self) -> str:
+        """One line for the muster: what the sail room holds, by kind of canvas."""
+        n = len(self.sails)
+        if n == 0:
+            return "Sail room: empty; there is no spare canvas aboard."
+        by: dict[str, list[SpareSail]] = {}
+        for s in self.sails:
+            by.setdefault(self._kind_of(s), []).append(s)
+        parts: list[str] = []
+        if by.get("working"):
+            k = len(by["working"])
+            parts.append(f"{k} spare{'s' if k != 1 else ''} of the working canvas")
+        if by.get("made-up"):
+            k = len(by["made-up"])
+            parts.append(f"{k} made-up sail{'s' if k != 1 else ''}")
+        if by.get("heavy"):
+            parts.append(f"for heavy weather the {self._names(by['heavy'])}")
+        if by.get("storm"):
+            parts.append(f"the storm canvas ({self._names(by['storm'])})")
+        if by.get("occasional"):
+            parts.append(f"for light fair winds the {self._names(by['occasional'])}")
+        line = f"Sail room: {n} sail{'s' if n != 1 else ''}, " + "; ".join(parts)
+        worst = min(self.sails, key=lambda s: s.condition)
+        if worst.condition < CONDITION_WORDS[0][0]:
+            line += (
+                f"; the most worn, the {self.name(worst.kind)}, {condition_words(worst.condition)}"
+            )
+        return line + "."
+
+    def inventory_lines(self) -> list[str]:
+        """The `the sail room` query: every sail in the room, by kind of canvas."""
+        if not self.sails:
+            return ["The sail room is empty; there is no spare canvas aboard."]
+        n = len(self.sails)
+        lines = [f"The sail room holds {n} sail{'s' if n != 1 else ''}."]
+        heads = (
+            ("working", "Spares of the working canvas"),
+            ("made-up", "Made-up sails, for any yard"),
+            ("heavy", "For heavy weather"),
+            ("storm", "Storm canvas"),
+            ("occasional", "For light fair winds"),
+        )
+        by: dict[str, list[SpareSail]] = {}
+        for s in self.sails:
+            by.setdefault(self._kind_of(s), []).append(s)
+        for key, head in heads:
+            spares = by.get(key)
+            if spares:
+                lines.append(f"{head}: " + "; ".join(self.describe(s)[4:] for s in spares) + ".")
+        return lines
+
+
+def _sailor_name(ship: Any, part_id: str) -> str:
+    """A sailor's name for a part: the ship file's first plain alias, else the id in words
+    with the side first (as evolutions.runner.part_name, which this module cannot import)."""
+    for alias, target in getattr(ship, "aliases", {}).items():
+        if target == part_id and not alias.startswith("the "):
+            return alias
+    words = part_id.replace("_", " ").split(".")
+    if len(words) > 1 and words[-1] in ("starboard", "larboard"):
+        words = [words[-1], *words[:-1]]
+    return " ".join(words)
+
+
+def _stores_of(ship: Any) -> Any:
+    crew = getattr(getattr(ship, "spec", None), "crew", None)
+    return getattr(crew, "stores", None) if crew is not None else None
+
+
+def sail_room(ship: Any) -> SailRoom:
+    """The ship's sail room, kept in `ship.extra["sail_room"]`.
+
+    Made on first use from the ship file's `crew.stores.sails` list (spec 3b §6.3); a ship
+    whose file gives only a count (`spare_sails`, milestone 3) has that many made-up sails
+    that fit any yard, and a ship with no stores DEFAULT_SPARE_SAILS of them. The stores are
+    read defensively: they may be a StoresSpec, a mapping or any object with the fields.
+    `ship.extra["spare_sails"]` is kept as the count, for anything that reads it; the ship's
+    crew, when mustered, is given the room for its muster line."""
+    room = ship.extra.get("sail_room")
+    if not isinstance(room, SailRoom):
+        stores = _stores_of(ship)
+        get = stores.get if isinstance(stores, dict) else lambda k: getattr(stores, k, None)
+        listed = get("sails") if stores is not None else None
+        if listed is not None:
+            spares = [
+                SpareSail(
+                    kind=str(e["kind"] if isinstance(e, dict) else e.kind),
+                    canvas_no=e.get("canvas_no") if isinstance(e, dict) else e.canvas_no,
+                    condition=float(
+                        e.get("condition", 100.0) if isinstance(e, dict) else e.condition
+                    ),
+                )
+                for e in listed
+            ]
+        else:
+            count = get("spare_sails") if stores is not None else None
+            ok = isinstance(count, int | float) and not isinstance(count, bool) and count >= 0
+            spares = [
+                SpareSail(kind=None) for _ in range(int(count) if ok else DEFAULT_SPARE_SAILS)
+            ]
+        groups = getattr(ship, "groups", {}) or {}
+        category = {sid: "storm" for sid in groups.get(STORM_GROUP, [])}
+        category.update({sid: "occasional" for sid in groups.get(OCCASIONAL_GROUP, [])})
+        room = SailRoom(
+            sails=spares,
+            names={sid: _sailor_name(ship, sid) for sid in ship.sails},
+            working={sid: s.canvas_no for sid, s in ship.sails.items()},
+            category=category,
+        )
+        ship.extra["sail_room"] = room
+    ship.extra["spare_sails"] = len(room)
+    crew = ship.extra.get("crew")
+    if crew is not None and getattr(crew, "sail_room", None) is not room:
+        crew.sail_room = room
+    return room
 
 
 @dataclass

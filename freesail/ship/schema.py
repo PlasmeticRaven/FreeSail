@@ -12,6 +12,14 @@ what each class requires.
 An optional `crew:` section (docs/TechnicalSpec-M3.md §2.3) establishes the
 ship's company: complement, stations, ratings, posts, idlers by trade and
 stores. It is parsed into a `CrewSpec`; a file without it has `crew = None`.
+
+Milestone 3b (docs/TechnicalSpec-M3b.md §6) adds canvas: a sail may give its
+`canvas_no` (the number of the canvas it is made of, 1 the heaviest), say
+that it starts the voyage in the sail room (`bent: false`: storm canvas and
+the occasional sails), and name the sail it is bent `in_place_of` (a storm
+mizzen for the spanker). The stores may list the sail room's contents
+(`sails:`, each with the sail it is made for, its canvas number and its
+condition); the old `spare_sails` count is then derived from the list.
 """
 
 from __future__ import annotations
@@ -58,7 +66,9 @@ SAIL_ROLE_REQUIREMENTS: dict[str, dict[str, frozenset[str]]] = {
     "lug": {"yard": frozenset({"lug_yard"})},
     "lateen": {"yard": frozenset({"lateen_yard"})},
     "sprit": {"mast": frozenset({"mast"}), "sprit": frozenset({"sprit"})},
-    "studding": {"boom": frozenset({"studdingsail_boom"})},
+    # a studding-class sail is spread by a studding sail boom, or (a water sail) laced under
+    # a gaff sail's own boom (spec 3b §6.4; Steel 1794 vol. I, 'Sloop's water-sail')
+    "studding": {"boom": frozenset({"studdingsail_boom", "boom"})},
 }
 SAIL_OPTIONAL_ROLES: dict[str, dict[str, frozenset[str]]] = {
     "gaff": {"boom": frozenset({"boom"})},
@@ -121,6 +131,16 @@ LINE_TARGET_KINDS: dict[str, frozenset[str]] = {
 }
 
 SIDES = frozenset({"starboard", "larboard"})
+
+# Spars a fore-and-aft sail is spread on. A ringtail boom run out on one of these, and the
+# ringtail or water sail it spreads, lie in the gaff sail's plane and have no fixed side
+# (spec 3b §6.4; Kipping 1847, 'Ringtail Sails': it "sets like a topmast studding sail,
+# outside of the after-leech of the main-trysail").
+FORE_AND_AFT_SPAR_CLASSES = frozenset({"boom", "gaff"})
+
+# The canvas numbers the engine knows the strength of: Luce 1884 App. E pp. 610-611
+# (docs/references/Tables.md §2) tabulates Nos. 1 to 9, No. 1 the heaviest.
+CANVAS_NUMBERS = range(1, 10)
 
 # Default load ratings (kN) by class, used with a warning when a file omits one.
 DEFAULT_SPAR_RATING_KN: dict[str, float] = {
@@ -199,7 +219,15 @@ IDLER_TRADES = (
 )
 
 # The ship's stores (spec §2.3): numbers only in milestone 3.
-STORE_KEYS = ("water_tons", "provisions_days", "spare_sails", "spare_spars", "cordage_fathoms")
+STORE_KEYS = (
+    "water_tons",
+    "provisions_days",
+    "spare_sails",
+    "spare_spars",
+    "cordage_fathoms",
+    "sails",  # milestone 3b: the sail room's contents, one entry a sail (spec 3b §6.3)
+)
+SPARE_SAIL_KEYS = ("kind", "canvas_no", "condition")
 
 
 class ShipFileError(ValueError):
@@ -262,6 +290,9 @@ class SailSpec:
     side: str | None = None  # studding sails
     roles: dict[str, str] = field(default_factory=dict)  # yard/mast/gaff/boom/stay/sprit
     cloth_rating_kn: float | None = None
+    canvas_no: int | None = None  # the canvas it is made of, 1 the heaviest (spec 3b §6.1)
+    bent: bool = True  # false: the sail starts the voyage in the sail room (spec 3b §6.4)
+    in_place_of: str | None = None  # the sail it is bent instead of (a storm mizzen: spanker)
 
 
 @dataclass
@@ -282,12 +313,23 @@ class PostSpec:
 
 
 @dataclass
+class SpareSailSpec:
+    """A sail in the sail room (spec 3b §6.3): the sail it is made for, the canvas it is
+    made of, and how worn it is."""
+
+    kind: str  # the id of the sail it is made for: "fore.topsail"
+    canvas_no: int | None = None  # None: the same number as the sail it is made for
+    condition: float = 100.0  # 0..100, as Sail.condition
+
+
+@dataclass
 class StoresSpec:
     water_tons: float = 0.0
     provisions_days: float = 0.0
-    spare_sails: int = 0
+    spare_sails: int = 0  # with a `sails` list, derived: the number of sails in it
     spare_spars: int = 0
     cordage_fathoms: float = 0.0
+    sails: list[SpareSailSpec] | None = None  # the sail room, when the file lists it
 
 
 @dataclass
@@ -458,6 +500,12 @@ def _parse_sail(s: Any, i: int, source: str) -> SailSpec:
     reef = s.get("reef_bands", 0)
     if isinstance(reef, bool) or not isinstance(reef, int) or reef < 0:
         raise ShipFileError(f"{source}: {where} has reef_bands = {reef!r}; use a whole number.")
+    bent = s.get("bent", True)
+    if not isinstance(bent, bool):
+        raise ShipFileError(
+            f"{source}: {where} has bent = {bent!r}; say true (bent to its spar) or false "
+            f"(in the sail room)."
+        )
     return SailSpec(
         id=sid,
         cls=cls,
@@ -468,7 +516,22 @@ def _parse_sail(s: Any, i: int, source: str) -> SailSpec:
         side=side,
         roles=roles,
         cloth_rating_kn=_num(s, "cloth_rating_kn", where, source, required=False),
+        canvas_no=_canvas_no(s.get("canvas_no"), where, source),
+        bent=bent,
+        in_place_of=_str(s, "in_place_of", where, source, required=False),
     )
+
+
+def _canvas_no(v: Any, where: str, source: str) -> int | None:
+    """A canvas number from 1 (the heaviest) to 9, or None when the file gives none."""
+    if v is None:
+        return None
+    if isinstance(v, bool) or not isinstance(v, int) or v not in CANVAS_NUMBERS:
+        raise ShipFileError(
+            f"{source}: {where} has canvas_no = {v!r}; canvas is numbered 1 (the heaviest) "
+            f"to {CANVAS_NUMBERS[-1]} (Luce 1884, App. E)."
+        )
+    return v
 
 
 def _parse_line(ln: Any, i: int, source: str) -> LineSpec:
@@ -528,7 +591,7 @@ def validate(spec: ShipSpec) -> None:
             raise ShipFileError(
                 f"{src}: spar '{s.id}' is on '{parent}', but there is no spar with that id."
             )
-        if s.cls == "studdingsail_boom" and s.side is None:
+        if s.cls == "studdingsail_boom" and s.side is None and not _on_fore_and_aft(s, spars):
             raise ShipFileError(f"{src}: studding sail boom '{s.id}' needs a 'side'.")
         if s.rake_deg is not None:
             if s.cls not in ("mast", "topmast", "topgallant_mast", "royal_mast"):
@@ -574,7 +637,18 @@ def validate(spec: ShipSpec) -> None:
                     f"{src}: sail '{sl.id}' is class '{sl.cls}' and does not take a '{role}'."
                 )
         if sl.cls == "studding" and sl.side is None:
-            raise ShipFileError(f"{src}: studding sail '{sl.id}' needs a 'side'.")
+            boom = spars.get(sl.roles.get("boom", ""))
+            if boom is None or not (
+                boom.cls in FORE_AND_AFT_SPAR_CLASSES or _on_fore_and_aft(boom, spars)
+            ):
+                raise ShipFileError(f"{src}: studding sail '{sl.id}' needs a 'side'.")
+        if sl.in_place_of is not None:
+            other = sails.get(sl.in_place_of)
+            if other is None or other is sl:
+                raise ShipFileError(
+                    f"{src}: sail '{sl.id}' is bent in place of '{sl.in_place_of}', which is not "
+                    f"another sail in the ship."
+                )
         if sl.cls == "jibheaded" and "stay" not in sl.roles and "mast" not in sl.roles:
             raise ShipFileError(
                 f"{src}: sail '{sl.id}' is jib-headed but names neither a 'stay' to hank to "
@@ -627,6 +701,22 @@ def validate(spec: ShipSpec) -> None:
                 f"{src}: alias '{a}' points at '{target}', which is not a part or a group."
             )
 
+    # the sail room: every sail in it is made for a sail of this ship
+    room = spec.crew.stores.sails if spec.crew is not None else None
+    for spare in room or []:
+        if spare.kind not in sails:
+            raise ShipFileError(
+                f"{src}: the sail room holds a sail made for '{spare.kind}', which is not a sail "
+                f"in the ship."
+            )
+
+
+def _on_fore_and_aft(spar: SparSpec, spars: dict[str, SparSpec]) -> bool:
+    """A spar that stands on a gaff sail's boom or gaff (a ringtail boom), which lies in the
+    sail's plane and has no side of its own."""
+    parent = spars.get(spar.parent) if spar.parent else None
+    return parent is not None and parent.cls in FORE_AND_AFT_SPAR_CLASSES
+
 
 def _check_sail_role(
     spec: ShipSpec,
@@ -678,6 +768,38 @@ def _known(name: Any, known: tuple[str, ...], what: str, source: str) -> str:
             f"knows. Known: {', '.join(known)}."
         )
     return name
+
+
+def _parse_sail_room(raw: Any, source: str) -> list[SpareSailSpec]:
+    """The stores' `sails:` list (spec 3b §6.3): each entry a sail in the sail room."""
+    if not isinstance(raw, list):
+        raise ShipFileError(f"{source}: the sail room ('stores.sails') is not a list of sails.")
+    out: list[SpareSailSpec] = []
+    for i, e in enumerate(raw):
+        where = f"sail #{i + 1} in the sail room"
+        if not isinstance(e, dict) or not str(e.get("kind") or "").strip():
+            raise ShipFileError(f"{source}: {where} does not say which sail it is made for.")
+        for key in e:
+            if key not in SPARE_SAIL_KEYS:
+                raise ShipFileError(f"{source}: {where} has '{key}', which it does not take.")
+        condition = e.get("condition", 100.0)
+        if (
+            isinstance(condition, bool)
+            or not isinstance(condition, int | float)
+            or not 0.0 <= condition <= 100.0
+        ):
+            raise ShipFileError(
+                f"{source}: {where} has condition = {condition!r}; a sail's condition runs from "
+                f"0 (worn out) to 100 (new)."
+            )
+        out.append(
+            SpareSailSpec(
+                kind=str(e["kind"]).strip(),
+                canvas_no=_canvas_no(e.get("canvas_no"), where, source),
+                condition=float(condition),
+            )
+        )
+    return out
 
 
 def _parse_crew(c: Any, source: str) -> CrewSpec:
@@ -781,7 +903,9 @@ def _parse_crew(c: Any, source: str) -> CrewSpec:
     stores = StoresSpec()
     for k, v in raw_stores.items():
         name = _known(k, STORE_KEYS, "the store", source)
-        if name in ("spare_sails", "spare_spars"):
+        if name == "sails":
+            stores.sails = _parse_sail_room(v, source)
+        elif name in ("spare_sails", "spare_spars"):
             setattr(stores, name, _count(v, f"the {name.replace('_', ' ')}", source))
         else:
             if isinstance(v, bool) or not isinstance(v, int | float) or v < 0:
@@ -789,6 +913,13 @@ def _parse_crew(c: Any, source: str) -> CrewSpec:
                     f"{source}: the store '{name}' is {v!r}; it must be a number, not negative."
                 )
             setattr(stores, name, float(v))
+    if stores.sails is not None:
+        if "spare_sails" in raw_stores and stores.spare_sails != len(stores.sails):
+            raise ShipFileError(
+                f"{source}: the stores give {stores.spare_sails} spare sails but the sail room "
+                f"lists {len(stores.sails)}; give the list alone, and the count follows from it."
+            )
+        stores.spare_sails = len(stores.sails)
 
     return CrewSpec(
         complement=complement,
