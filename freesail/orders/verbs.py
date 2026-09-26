@@ -1100,6 +1100,8 @@ def _line_hint(ship: Ship, part: Any) -> str:
                     names.append(fam)
     if not names:
         return ""
+    # the bowline last: it is hauled only on a wind, and the hint shows the first few
+    names.sort(key=lambda n: n.endswith("bowline"))
     return "Name one of its lines: " + errors.join_names(f"the {n}" for n in names) + "."
 
 
