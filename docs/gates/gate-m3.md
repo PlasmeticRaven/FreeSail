@@ -1,6 +1,11 @@
 # Gate M3: The crew
 
-**Verdict:** Pending.
+**Verdict:** Passed (owner, 2026-09-26). The checklist checked out on both ships and in the browser.
+
+**Owner's notes for follow-up (all scheduled for milestone 3b, rig geometry and canvas):**
+- **Studding sails close-hauled.** Item 4 sets studding sails with the yards braced sharp up and then tacks with them set. The owner asked whether they should fill so high, or be usable at all while tacking. They should not: Luce (1866 ch. XXIII; 1884 ch. XXIII) has the weather topmast, topgallant and royal studding sails set "with the wind one point free, or forming an angle of seven points with the keel", the lower studding sail "only ... with the wind abaft the beam", both sides only with the wind aft and the yards square, and all of them in light or moderate weather; and they are taken in before going about. The game's `set_studding` has no wind precondition and the sail curve gives lift regardless. Spec M3 §9 item 12.
+- **Goose-winging in the view.** Drawn as half the sail on the weather side; the owner asks for the true picture, the lee clew hauled up to the yard and the weather clew left set. The projection can draw it: item 13.
+- **Sent-down masts and the view's scale.** The view rescaled to the parts that remained, so the masts coming down read less than they should. Keep the ship's scale fixed to her full rig: item 14.
 
 ## Headline
 
