@@ -1,0 +1,43 @@
+# Ease the catharpins on one lower mast (milestone 3b, spec 3b §3): the counter to
+# swiftering them in. The catharpin legs' seizings are cast off aloft, the swifter
+# eased on deck and unrove, and the lower shrouds stand out to their chains again, so
+# the mast is stayed athwartships as rigged and the lower yard braces no sharper than
+# the rigging allows (Steel 1794, vol. I, CATHARPINS; Lever 1808, fig. 182, read in
+# reverse; no period text describes the easing itself).
+#
+# The subject is the lower mast. The last step clears `swiftered_in`; the lower yard's
+# brace limit falls back to the ship file's, and a yard braced sharper than that comes
+# in to it as the shrouds go out (`parts.sync_catharpins`, which the log reports).
+#
+# Parameter, from the order: `gain`, what the lower yard loses, in words, with the
+# semicolon that joins it ("; the main yard braces as rigged again").
+#
+# The steps' times are judgement: about twenty minutes a mast, as for swiftering in
+# (spec 3b §3); no period timing found.
+id: ease_catharpins
+verb: ease_the_catharpins_on
+applies_to: {class: mast}
+params: {gain: ""}
+preconditions:
+  - {check: spar.swiftered_in, reason: "The catharpins on the {spar} are not swiftered in."}
+  - {check: not spar.wrecked, reason: "The {spar} is carried away."}
+requires:
+  - {check: not wrecked(spar), reason: "the {spar} is carried away"}
+steps:
+  - do: cast_off_legs
+    duration_s: 480        # the catharpin legs' seizings cast off at the futtock stave
+    aloft: true
+  - do: ease_swifter
+    duration_s: 240        # the swifter eased away across the deck, the shrouds going out
+    sets: {spar.swiftered_in: "false"}
+  - do: unreeve
+    duration_s: 480        # the swifter unrove, the tail-blocks and spars sent down
+    aloft: true
+on_start: {log: "Boatswain's party to the {spar} shrouds; cast off the catharpin legs."}
+on_complete: {log: "Eased the catharpins on the {spar}{gain}.", kind: rigging.eased, severity: notable}
+on_fail: {log: "Could not ease the catharpins on the {spar}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: as for swiftering in (the forecastlemen, with the carpenter's crew on deck by day;
+# Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship').
+# Eight hands, judgement; the aloft steps take only hands who go aloft (crew/hands.py).
+crew: {hands: 8, rating: ordinary, stations: [forecastle, idlers]}
+source: "Steel 1794, vol. I, glossary 'CATHARPINS', 'Catharpin-legs', 'Futtock staves'; Lever 1808 (1827 printing), fig. 182 'Catharpins'; Fincham 1843, art. 102 and note"

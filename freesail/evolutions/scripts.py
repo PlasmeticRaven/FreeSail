@@ -46,9 +46,10 @@ import math
 from typing import TYPE_CHECKING, Any
 
 from freesail import units
+from freesail.evolutions import trim as yard_trim
 from freesail.ship import parts
 from freesail.ship.graph import Ship
-from freesail.ship.parts import HelmMode, Sail, SailState, Spar
+from freesail.ship.parts import HelmMode, LineState, Sail, SailState, Spar, sync_catharpins
 from freesail.ship.schema import YARD_LIKE_CLASSES
 
 if TYPE_CHECKING:
@@ -60,6 +61,59 @@ POINT = units.POINT
 # ---------------------------------------------------------------------------
 # Shared helpers
 # ---------------------------------------------------------------------------
+
+
+def sharp_up_targets(ship: Ship, head: list[Spar], after: list[Spar]) -> dict[str, float]:
+    """Each yard's unsigned angle braced sharp up on a wind, the after yards
+    `trim.AFTER_YARDS_SHARPER_DEG` sharper than the head yards where the limits
+    allow (spec 3b §2.2, Fincham art. 94; `trim.stagger`): the tack's final trim."""
+    sync_catharpins(ship)
+    targets, _ = yard_trim.stagger(ship, {y.id: y.brace_limit for y in head + after})
+    return targets
+
+
+def bowlines_hauled(ship: Ship) -> list[str]:
+    """The sails whose bowline is hauled out now, in the ship's order (spec 3b §4)."""
+    out: list[str] = []
+    for line in ship.lines.values():
+        if line.bowline_hauled and line.of not in out:
+            out.append(line.of)
+    return out
+
+
+def let_go_bowlines(ship: Ship) -> bool:
+    """Let go every bowline hauled out, as the yards are swung (Luce 1884, ch. XXIV,
+    'Tacking': "The lee braces and the bowlines are let go"). True if any was."""
+    any_hauled = False
+    for line in ship.lines.values():
+        if line.bowline_hauled:
+            line.state = LineState.FREE
+            line.hauled = 0.0
+            any_hauled = True
+    return any_hauled
+
+
+def steady_out_bowlines(ship: Ship, sail_ids: list[str], sign: float) -> bool:
+    """Haul out the weather bowline, for the tack `sign` gives (+1 starboard), of each
+    sail named that is drawing: "Haul taut the lifts and weather braces! Steady out the
+    bo'lines!" (Luce 1884, ch. XXIV, 'Tacking', 'Wearing'). True if any was hauled."""
+    side = "starboard" if sign > 0 else "larboard"
+    any_hauled = False
+    for sid in sail_ids:
+        sail = ship.sails.get(sid)
+        if (
+            sail is None
+            or sail.wrecked
+            or sail.state not in (SailState.SET, SailState.GOOSE_WINGED)
+        ):
+            continue
+        line = ship.line_of(sail, "bowline", side)
+        if line is None or line.state is LineState.PARTED:
+            continue
+        line.state = LineState.BELAYED
+        line.hauled = 1.0
+        any_hauled = True
+    return any_hauled
 
 
 def close_hauled_true_angle(ship: Ship) -> float:
@@ -369,6 +423,7 @@ class TackScript(Script):
         self.old_heading = ship.dyn.heading
         self.new_course = ship.dyn.heading
         self.t_steady = 0.0
+        self.bowlined: list[str] = []  # sails whose bowlines were hauled out before going about
 
     def holds(self) -> set[str]:
         return {self.ship.name} | {y.id for y in self.head + self.after}
@@ -376,6 +431,7 @@ class TackScript(Script):
     def begin(self, words: dict[str, Any]) -> None:
         dyn = self.ship.dyn
         self.sign = 1.0 if dyn.tack == "starboard" else -1.0
+        self.bowlined = bowlines_hauled(self.ship)
         self.old_heading = dyn.heading
         dyn.helm_mode = HelmMode.HEADING
         dyn.target_heading = units.wrap_2pi(dyn.heading + self.sign * 12 * POINT)
@@ -401,7 +457,12 @@ class TackScript(Script):
         if self.phase == "helm_down":
             if abs(rel) <= POINT or self.through:
                 self.phase = "mainsail_haul"
-                self.note("Rise tacks and sheets. Mainsail haul.")
+                # "The lee braces and the bowlines are let go, and the yards swung
+                # around briskly by the weather braces" (Luce 1884, ch. XXIV, 'Tacking')
+                if let_go_bowlines(self.ship):
+                    self.note("Rise tacks and sheets. Mainsail haul; let go the bowlines.")
+                else:
+                    self.note("Rise tacks and sheets. Mainsail haul.")
                 self.swing = YardSwing(
                     self.after, [-self.sign * y.brace_limit for y in self.after], brace_s
                 )
@@ -410,8 +471,11 @@ class TackScript(Script):
             if self.swing.advance(dt, factor) and self.through:
                 self.phase = "let_go_and_haul"
                 self.note("Let go and haul.")
+                # the head yards to the final trim: the after yards stand sharper
+                # (spec 3b §2.2, Fincham art. 94)
+                sharp = sharp_up_targets(self.ship, self.head, self.after)
                 self.swing = YardSwing(
-                    self.head, [-self.sign * y.brace_limit for y in self.head], brace_s
+                    self.head, [-self.sign * sharp[y.id] for y in self.head], brace_s
                 )
                 self.new_course = units.wrap_2pi(wind.direction_from + self.sign * ch)
                 dyn.target_heading = self.new_course
@@ -421,6 +485,8 @@ class TackScript(Script):
             if self.swing.advance(dt, factor):
                 self.phase = "steady"
                 self.t_steady = 0.0
+                if steady_out_bowlines(self.ship, self.bowlined, -self.sign):
+                    self.note("Haul taut the lifts and weather braces. Steady out the bowlines.")
         elif self.phase == "steady":
             self.t_steady += dt
             self.new_course = units.wrap_2pi(wind.direction_from + self.sign * ch)
@@ -487,6 +553,7 @@ class WearScript(Script):
         self.head, self.after = head_and_after_yards(ship)
         self.sign = 1.0 if ship.dyn.tack == "starboard" else -1.0
         self.new_course = ship.dyn.heading
+        self.bowlined: list[str] = []  # sails whose bowlines were hauled out before wearing
 
     def holds(self) -> set[str]:
         return {self.ship.name} | {y.id for y in self.head + self.after}
@@ -498,7 +565,17 @@ class WearScript(Script):
         dyn.target_heading = units.wrap_2pi(estimated_wind_from(self.ship) + math.pi)
         dyn.steady = False
         self.phase = "bear_away"
-        self.note("Stand by to wear ship. Up helm; brace in the after yards.", "helm.order")
+        # "Put the helm up! Clear away the bo'lines! and as she falls off, BRACE IN THE
+        # AFTER YARDS!" (Luce 1884, ch. XXIV, 'Wearing')
+        self.bowlined = bowlines_hauled(self.ship)
+        if let_go_bowlines(self.ship):
+            self.note(
+                "Stand by to wear ship. Up helm; clear away the bowlines; brace in the after "
+                "yards.",
+                "helm.order",
+            )
+        else:
+            self.note("Stand by to wear ship. Up helm; brace in the after yards.", "helm.order")
 
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
         self.t += dt
@@ -528,6 +605,8 @@ class WearScript(Script):
             steady = error <= units.deg_to_rad(self.timing_value("steady_deg", 5.0))
             # The after yards go sharp up at once to bring her to; the head yards
             # follow the wind, keeping their sails full, until she is by the wind.
+            # (All yards end at their limits, as at milestone 2: spec 3b §2.2 asks
+            # the after yards' trim of the tack's final trim and the orders only.)
             after_done = move_toward(
                 self.after, [sharp_up * y.brace_limit for y in self.after], max_step
             )
@@ -539,6 +618,10 @@ class WearScript(Script):
                 follow_wind(self.head, rel, ch, max_step)
                 head_done = False
             if steady and after_done and head_done:
+                # "When by the wind, right the helm, trim the yards, Haul taut the lifts
+                # and weather braces! Steady out the bowlines!" (Luce 1884, 'Wearing')
+                if steady_out_bowlines(self.ship, self.bowlined, sharp_up):
+                    self.note("Haul taut the lifts and weather braces. Steady out the bowlines.")
                 self.finish()
 
     def remaining_s(self) -> float:

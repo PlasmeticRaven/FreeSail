@@ -128,9 +128,19 @@ class Spar(Part):
     brace_angle: float = 0.0  # radians; 0 square, +ve = braced up for the starboard tack
     sent_down: bool = False  # struck below (topgallant masts in a gale)
     rigged_out: bool = True  # studding sail booms: run out along the yard, ready for the sail
+    # Milestone 3b (spec 3b §3). `brace_limit` above is the limit the rigging allows
+    # now, and every reader reads it; `rigged_brace_limit` is the ship file's, with the
+    # lower rigging as rigged. They differ only for a lower yard whose mast has its
+    # catharpins swiftered in (see `sync_catharpins`).
+    rigged_brace_limit: float = 0.0  # radians, for yards: the ship file's brace_limit_deg
+    swiftered_in: bool = False  # lower masts: the catharpins swiftered in
+    # Lower masts: the strain model's allowance for the catharpins, set by strain.py each
+    # tick while they are swiftered in; 1.0 when the lower rigging stands as rigged.
+    rating_factor: float = 1.0
 
     @classmethod
     def from_spec(cls, s: SparSpec) -> Spar:
+        limit = units.deg_to_rad(s.brace_limit_deg or 0.0)
         return cls(
             id=s.id,
             cls=s.cls,
@@ -140,13 +150,19 @@ class Spar(Part):
             length_m=s.length_m or 0.0,
             parent=s.parent,
             side=s.side,
-            brace_limit=units.deg_to_rad(s.brace_limit_deg or 0.0),
+            brace_limit=limit,
             rake=units.deg_to_rad(s.rake_deg or 0.0),
+            rigged_brace_limit=limit,
         )
 
     @property
     def is_yard(self) -> bool:
         return self.cls in {"yard", "lug_yard", "lateen_yard"}
+
+    @property
+    def strain_ratio(self) -> float:
+        rating = self.rating_kn * self.rating_factor
+        return self.load_kn / rating if rating > 0 else 0.0
 
 
 @dataclass
@@ -240,11 +256,72 @@ class Line(Part):
 
     @classmethod
     def from_spec(cls, ln: LineSpec) -> Line:
-        return cls(id=ln.id, cls=ln.cls, rating_kn=ln.rating_kn or 0.0, of=ln.of, side=ln.side)
+        line = cls(id=ln.id, cls=ln.cls, rating_kn=ln.rating_kn or 0.0, of=ln.of, side=ln.side)
+        if line.cls == "bowline":
+            # Rove, with its fall clear on deck, but not hauled out: a bowline is hauled
+            # on a wind by hands and let go again when the yards come in (spec 3b §4).
+            line.state = LineState.FREE
+        return line
 
     @property
     def is_standing(self) -> bool:
         return self.cls in {"stay", "shroud", "backstay"}
+
+    @property
+    def bowline_hauled(self) -> bool:
+        """A bowline hauled out and belayed, holding its sail's leech taut forward (spec
+        3b §4). Eased, let go, slacked or parted, it holds nothing."""
+        return (
+            self.cls == "bowline" and self.state is LineState.BELAYED and self.hauled >= 1.0 - 1e-9
+        )
+
+
+# ---------------------------------------------------------------------------
+# Catharpins (spec 3b §3)
+# ---------------------------------------------------------------------------
+
+# Swiftering in the catharpins draws the lower shrouds in below the top, so that the
+# lower yard can be braced sharper before its lee yardarm and its sail come against
+# the lee rigging: Steel 1794, vol. I, CATHARPINS ("Short ropes, to keep the lower
+# shrouds in tight, after they are braced in by swifter, and to afford room to brace
+# the yards sharp"); Lever 1808, fig. 182 (the shrouds "bowsed in" by a swifter and the
+# legs seized); Fincham 1843, art. 102 (Hardy's short ship, by "such measures as would
+# allow the yards to be braced sharper up", lay a point closer). How much sharper no
+# source says: four degrees is judgement, less than the short ship's gain over the long
+# ships in art. 102, which her other measures shared. The topmast rigging is not
+# touched, so only the lower yard gains.
+CATHARPIN_GAIN_DEG = 4.0
+
+
+def lower_yards(ship: Any, mast: Spar) -> list[Spar]:
+    """The yards slung on a lower mast itself: a ship's course yard, the crossjack.
+    A topsail schooner's masts have none (her topsail yard is on the fore topmast)."""
+    return [y for y in ship.spars.values() if y.parent == mast.id and y.is_yard]
+
+
+def sync_catharpins(ship: Any) -> list[tuple[Spar, float]]:
+    """Make every lower yard's brace limit agree with its mast's catharpins.
+
+    The mast's `swiftered_in` is the state; its lower yards' `brace_limit` follows it,
+    `CATHARPIN_GAIN_DEG` beyond the ship file's while swiftered in. A yard braced
+    sharper than the limit it is left with (the catharpins eased with the yard sharp
+    up) comes in to it, as the shrouds going out bear it in. Returns the yards that
+    came in, each with the angle it came in from, for the log. Idempotent: the strain
+    model calls it every tick, and whatever reads a limit may call it first."""
+    came_in: list[tuple[Spar, float]] = []
+    gain = units.deg_to_rad(CATHARPIN_GAIN_DEG)
+    for mast in ship.spars.values():
+        if mast.cls != "mast":
+            continue
+        for yard in lower_yards(ship, mast):
+            if yard.rigged_brace_limit <= 0.0:
+                continue  # the file gives this yard no limit; nothing to gain or keep
+            limit = yard.rigged_brace_limit + (gain if mast.swiftered_in else 0.0)
+            yard.brace_limit = limit
+            if abs(yard.brace_angle) > limit + 1e-9:
+                came_in.append((yard, yard.brace_angle))
+                yard.brace_angle = math.copysign(limit, yard.brace_angle)
+    return came_in
 
 
 # ---------------------------------------------------------------------------

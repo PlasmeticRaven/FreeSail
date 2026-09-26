@@ -49,21 +49,40 @@ verbs:
     # "lay" is Luce's word for the same act ("Lay the head yards square!",
     # "lay the main topsail aback"). "brace round" with no mode braces sharp
     # up for the tack the wind is on (`phrase_modifiers`).
-    synonyms: [brace round, lay]
+    # Milestone 3b: sharp up on a wind the after yards stand sharper than the
+    # head yards (Fincham 1843, art. 94); braced up "with the head yards
+    # sharper" it is the reverse, for a ship griping with much way on (art. 96:
+    # "brace the head-yards sharper than the after-yards"). The words are part
+    # of the verb phrase (`phrase_modifiers`), so say them without a comma.
+    synonyms: [brace round, lay, brace sharp up with the head yards sharper,
+               brace sharp up head yards sharper, brace up with the head yards sharper,
+               brace the yards sharp up with the head yards sharper,
+               brace round with the head yards sharper]
     object: yards
     level: 1
   trim:
     # "Trim sails!" braces every yard to the wind and tends the sheets; the
     # narrower forms do one or the other (Luce 1866 ch. XXIV "To Trim Yards").
+    # On a wind the after yards are trimmed sharper than the head yards, or,
+    # "with the head yards sharper", the reverse (Fincham 1843, arts. 94, 96).
     synonyms: [trim sails, trim sail, trim the sails, trim the sails to the wind,
                trim the yards, trim yards, trim the yards to the wind, trim the yards and sheets,
-               trim the sheets, trim sheets, trim the sheets and yards]
+               trim the sheets, trim sheets, trim the sheets and yards,
+               trim sails with the head yards sharper, trim sails head yards sharper,
+               trim the sails with the head yards sharper,
+               trim the yards with the head yards sharper, trim the yards head yards sharper]
     object: none
     level: 1
   haul:
     # "haul aft", "haul home" and "haul flat" haul the line all the way in
     # (`phrase_modifiers`); so does "aft" or "home" after the line's name.
-    synonyms: [haul on, haul in, haul taut, round in, haul aft, haul home, haul flat]
+    # A bowline is hauled out by hands (milestone 3b, spec 3b §4): "haul the
+    # weather bowlines", "haul the fore bowline" (the weather one, unless a side
+    # is said) start an evolution for each; "steady out the bowlines" is Luce's
+    # order for it when braced up (Luce 1884, ch. XXIV, 'Tacking': "Haul taut
+    # the lifts and weather braces! Steady out the bo'lines!").
+    synonyms: [haul on, haul in, haul taut, round in, haul aft, haul home, haul flat, steady out,
+               haul out]
     object: line
     level: 0
   ease:
@@ -75,7 +94,10 @@ verbs:
     object: line
     level: 0
   let go:
-    synonyms: [cast off, let fly, let run]
+    # "Clear away the bowlines!" is Luce's word for letting them go before the
+    # yards are swung (Luce 1884, ch. XXIV, 'Wearing': "Put the helm up! Clear
+    # away the bo'lines!").
+    synonyms: [cast off, let fly, let run, clear away]
     object: line
     level: 0
   belay:
@@ -246,6 +268,36 @@ verbs:
                send up the topmasts]
     object: none
     level: 1
+  # The lower rigging (milestone 3b, spec 3b §3). Swiftering in the catharpins
+  # bowses the lower shrouds in to the catharpin legs so that the lower yard
+  # braces sharper (Steel 1794, vol. I, CATHARPINS, "to afford room to brace the
+  # yards sharp"; Lever 1808, fig. 182: shrouds "catharpined in"); easing them
+  # sets the shrouds out again. Without a mast named, every lower mast; with one
+  # ("on the main", "the fore catharpins"), that mast only. The verb handler
+  # reads the mast from the phrase, so every form is listed here.
+  swifter in the catharpins:
+    synonyms: [swifter in the catharpins on the fore, swifter in the catharpins on the main,
+               swifter in the catharpins on the mizzen, swifter in the catharpins on the mizen,
+               swifter in the catharpins on the fore mast, swifter in the catharpins on the main mast,
+               swifter in the catharpins on the mizzen mast,
+               swifter in the fore catharpins, swifter in the main catharpins,
+               swifter in the mizzen catharpins, swifter in the mizen catharpins,
+               swifter in catharpins, swifter the catharpins, catharpin in the shrouds,
+               catharpin in the lower shrouds, catharpin in the fore shrouds,
+               catharpin in the main shrouds, catharpin in the mizzen shrouds]
+    object: none
+    level: 1
+  ease the catharpins:
+    synonyms: [ease the catharpins on the fore, ease the catharpins on the main,
+               ease the catharpins on the mizzen, ease the catharpins on the mizen,
+               ease the catharpins on the fore mast, ease the catharpins on the main mast,
+               ease the catharpins on the mizzen mast,
+               ease the fore catharpins, ease the main catharpins, ease the mizzen catharpins,
+               ease the mizen catharpins, ease catharpins, ease off the catharpins,
+               cast off the catharpins, cast off the catharpins on the fore,
+               cast off the catharpins on the main, cast off the catharpins on the mizzen]
+    object: none
+    level: 1
   # Handling the ship (Luce 1884, ch. XXIV, XXIX; Appendix I).
   box haul:
     # "box-haul" reads as "box haul".
@@ -413,6 +465,12 @@ evolutions:
   back and fill: back_and_fill
   loose sails to dry: loose_sails_to_dry
   furl all: furl_all
+  # milestone 3b: the catharpins (one evolution per lower mast) and the bowlines
+  # (one per bowline hauled out; letting go and easing one is done at the pin)
+  swifter in the catharpins: swifter_in_catharpins
+  ease the catharpins: ease_catharpins
+  haul:
+    bowline: haul_bowline
 
 refusals:
   furl: "A {class} sail is not furled on its spar; take it in instead."
@@ -471,6 +529,17 @@ phrase_modifiers:
   haul aft: {home: true}
   haul home: {home: true}
   haul flat: {home: true}
+  # milestone 3b: the head yards braced sharper than the after yards (Fincham art. 96)
+  brace sharp up with the head yards sharper: {brace_mode: sharp up, head_sharper: true}
+  brace sharp up head yards sharper: {brace_mode: sharp up, head_sharper: true}
+  brace up with the head yards sharper: {brace_mode: sharp up, head_sharper: true}
+  brace the yards sharp up with the head yards sharper: {brace_mode: sharp up, head_sharper: true}
+  brace round with the head yards sharper: {round: true, head_sharper: true}
+  trim sails with the head yards sharper: {head_sharper: true}
+  trim sails head yards sharper: {head_sharper: true}
+  trim the sails with the head yards sharper: {head_sharper: true}
+  trim the yards with the head yards sharper: {head_sharper: true}
+  trim the yards head yards sharper: {head_sharper: true}
 
 # Words after a line's name that mean "all the way in": "haul the jib sheet
 # aft", "haul the topsail sheets home".

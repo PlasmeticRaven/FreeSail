@@ -68,7 +68,7 @@ import yaml
 
 from freesail import units
 from freesail.physics.strain import baggy_luff  # package 22: the worn-canvas luff term
-from freesail.ship.parts import Sail, SailState, Spar
+from freesail.ship.parts import Line, LineState, Sail, SailState, Spar
 
 if TYPE_CHECKING:
     from freesail.physics.wind import Wind
@@ -108,6 +108,28 @@ SQUARE_FAMILY = frozenset({"square", "studding"})
 GOOSE_WINGED_AREA_FRACTION = 0.5
 GOOSE_WINGED_SHIFT = 0.25  # of the yard's length, toward the weather yardarm
 
+# Bowlines (milestone 3b, spec 3b §4). A course or topsail whose weather bowline is
+# hauled out, while its yard is braced up for that side, has its weather leech held taut
+# forward: a flatter sail at the luff, which draws a few degrees nearer the wind before
+# it lifts. Fincham 1843, art. 98: "the flatter the sails the sharper they may be
+# braced"; Luce 1884, ch. XXIII, 'To Set a Close-Reefed Topsail': "haul taut the
+# weather-brace and haul the bowline". The size of it is judgement (spec 3b §4): the
+# class's lift curve is read BOWLINE_LUFF_GAIN_DEG further on at and below its luff
+# angle, the shift tapering to nothing at the curve's peak, so the sail's luff angle is
+# that much lower and a full sail draws as before.
+BOWLINE_LUFF_GAIN_DEG = 4.0
+# ... and its drag near the luff a little lower, the leech not shaking: a tenth at and
+# below the luff angle, tapering likewise (judgement, spec 3b §4 "a little lower").
+BOWLINE_DRAG_REDUCTION = 0.10
+# A bowline cannot be kept hauled off the wind: with its yard braced in within this of
+# square it is slacked (spec 3b §4, judgement; Luce 1884, ch. XXIV, 'Wearing': "Clear
+# away the bo'lines! ... BRACE IN THE AFTER YARDS!").
+BOWLINE_SLACK_ANGLE_DEG = 40.0
+# The pull a hauled bowline takes, as a fraction of its sail's force: it holds the
+# weather leech forward against a part of what the sheet and braces bear (judgement:
+# well below a brace's 0.3, spec §7.5).
+BOWLINE_LOAD_FRACTION = 0.1
+
 
 # ---------------------------------------------------------------------------
 # Sail classes: the tables
@@ -127,10 +149,26 @@ class SailClass:
     furled_windage: float
     notes: str = ""
 
-    def coefficients(self, alpha: float) -> tuple[float, float]:
-        """(C_L, C_D) at an angle of attack in radians, folded to 0..pi/2."""
+    def coefficients(self, alpha: float, luff_gain: float = 0.0) -> tuple[float, float]:
+        """(C_L, C_D) at an angle of attack in radians, folded to 0..pi/2.
+
+        `luff_gain` (radians) is a flatter sail's: a bowline hauled (spec 3b §4). The
+        lift is read that much further on at and below the luff angle, the shift
+        tapering to nothing at the curve's peak, and the drag there is a little less.
+        """
         a = min(max(abs(alpha), 0.0), math.pi / 2)
-        return _interp(self.alpha, self.lift, a), _interp(self.alpha, self.drag, a)
+        c_l, c_d = _interp(self.alpha, self.lift, a), _interp(self.alpha, self.drag, a)
+        peak = self.peak_alpha
+        if luff_gain <= 0.0 or a >= peak:
+            return c_l, c_d
+        taper = 1.0 if a <= self.luff_angle else (peak - a) / (peak - self.luff_angle)
+        c_l = _interp(self.alpha, self.lift, a + luff_gain * taper)
+        return c_l, c_d * (1.0 - BOWLINE_DRAG_REDUCTION * taper)
+
+    @property
+    def peak_alpha(self) -> float:
+        """The angle of attack at which the class's lift is greatest."""
+        return self.alpha[max(range(len(self.lift)), key=lambda i: self.lift[i])]
 
 
 def _interp(xs: tuple[float, ...], ys: tuple[float, ...], x: float) -> float:
@@ -228,6 +266,7 @@ def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
     dyn.apparent_wind_speed = deck.speed
 
     heel_cos = max(math.cos(dyn.heel), 0.0)
+    _tend_bowlines(ship)
     driving = [s for s in ship.sails.values() if _is_driving(ship, s)]
     flows = {s.id: _apparent(ship, wind, s.centre_height_m) for s in driving}
     blankets = _blanket_factors(ship, driving, flows)
@@ -245,7 +284,9 @@ def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
         if sail.state is SailState.GOOSE_WINGED:
             area *= GOOSE_WINGED_AREA_FRACTION
         chord, drive_normal = _chord(ship, sail, flow.awa)
-        f_fwd, f_stb, backed = _plate_force(flow, area, chord, drive_normal, cls, sail)
+        bowline = hauled_weather_bowline(ship, sail)
+        gain = units.deg_to_rad(BOWLINE_LUFF_GAIN_DEG) if bowline is not None else 0.0
+        f_fwd, f_stb, backed = _plate_force(flow, area, chord, drive_normal, cls, sail, gain)
         force = math.hypot(f_fwd, f_stb)
 
         _record_backed(ship, sail, backed)
@@ -254,6 +295,8 @@ def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
         sail.thrust_kn = f_fwd / 1000.0
         sail.side_force_kn = f_stb / 1000.0
         _apply_loads(ship, sail, force / 1000.0)
+        if bowline is not None:
+            bowline.load_kn += BOWLINE_LOAD_FRACTION * force / 1000.0
 
         y = _lateral_offset(ship, sail, flow.awa)
         thrust += f_fwd
@@ -264,7 +307,7 @@ def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
         # the ship's luff angle is the area-weighted mean of her driving sails':
         # a schooner sails by her fore-and-aft canvas with the square topsail
         # shaking, so the topsail must not set the rule for the whole rig
-        sail_luff = _chord_angle(ship, sail) + cls.luff_angle
+        sail_luff = _chord_angle(ship, sail) + cls.luff_angle - gain
         # -- package 22 (spec 3b §6.2): worn canvas is baggier and lies less close to the
         # wind; its luff angle rises by BAGGY_LUFF_DEG * (1 - condition / 100). The one
         # canvas term in this module; the constant and the rule are in physics/strain.py.
@@ -394,12 +437,14 @@ def _plate_force(
     drive_normal: tuple[float, float],
     cls: SailClass,
     sail: Sail,
+    luff_gain: float = 0.0,
 ) -> tuple[float, float, bool]:
     """Lift and drag on one sail, resolved into (forward, starboard) newtons.
 
     The sail is a plate along `chord`. Drag acts along the apparent wind;
     lift across it, toward the sail's lee side. Returns the force and whether
-    a square sail is backed.
+    a square sail is backed. `luff_gain` is a hauled bowline's (see
+    `SailClass.coefficients`); it helps only a sail drawing on its after face.
     """
     d = (flow.fwd, flow.stb)
     c = (math.cos(chord), math.sin(chord))
@@ -409,7 +454,7 @@ def _plate_force(
     sin_i = min(max(n[0] * d[0] + n[1] * d[1], 0.0), 1.0)
     alpha = math.asin(sin_i)
     on_drive_face = drive_normal[0] * d[0] + drive_normal[1] * d[1] >= 0.0
-    c_l, c_d = cls.coefficients(alpha)
+    c_l, c_d = cls.coefficients(alpha, luff_gain if on_drive_face else 0.0)
     backed = False
     if not on_drive_face:
         if sail.cls in SQUARE_FAMILY:
@@ -427,6 +472,65 @@ def _plate_force(
     f_fwd = q_a * (c_d * d[0] + c_l * l_fwd)
     f_stb = q_a * (c_d * d[1] + c_l * l_stb)
     return f_fwd, f_stb, backed
+
+
+# ---------------------------------------------------------------------------
+# Bowlines (spec 3b §4)
+# ---------------------------------------------------------------------------
+
+
+def _bowlines(ship: Ship) -> tuple[Line, ...]:
+    """Every bowline aboard, in the ship file's order (kept, since lines are fixed)."""
+    cached = ship.extra.get("sails.bowlines")
+    if not isinstance(cached, tuple):
+        cached = tuple(ln for ln in ship.lines.values() if ln.cls == "bowline")
+        ship.extra["sails.bowlines"] = cached
+    return cached
+
+
+def hauled_weather_bowline(ship: Ship, sail: Sail) -> Line | None:
+    """The bowline doing its work on this sail, or None: hauled out, on the side the
+    sail's yard is braced up for, with the yard braced up at least
+    BOWLINE_SLACK_ANGLE_DEG from square. A hauled lee bowline holds nothing."""
+    if not ship.lines_of(sail, "bowline"):
+        return None
+    yard = ship.yard_of(sail)
+    if yard is None or abs(yard.brace_angle) < units.deg_to_rad(BOWLINE_SLACK_ANGLE_DEG):
+        return None
+    side = "starboard" if yard.brace_angle > 0 else "larboard"
+    line = ship.line_of(sail, "bowline", side)
+    return line if line is not None and line.bowline_hauled else None
+
+
+def _tend_bowlines(ship: Ship) -> None:
+    """Slack a hauled bowline whose sail is no longer drawing, or whose yard has been
+    braced in within BOWLINE_SLACK_ANGLE_DEG of square: it will not stand off the
+    wind. The second is logged; a sail taken in overhauls its bowline with the rest
+    of its gear."""
+    slack_at = units.deg_to_rad(BOWLINE_SLACK_ANGLE_DEG)
+    for line in _bowlines(ship):
+        if not line.bowline_hauled:
+            continue
+        sail = ship.parts.get(line.of)
+        if not isinstance(sail, Sail):
+            continue
+        yard = ship.yard_of(sail)
+        drawing = _is_driving(ship, sail)
+        braced_in = yard is not None and abs(yard.brace_angle) < slack_at
+        if drawing and not braced_in:
+            continue
+        line.state = LineState.FREE
+        line.hauled = 0.0
+        if drawing and yard is not None:
+            from freesail.evolutions.runner import part_name  # local import, as scripts.py does
+
+            ship.note(
+                "routine",
+                "line.slacked",
+                f"Let go the {part_name(ship, line.id)} as the {part_name(ship, yard.id)} "
+                "came in; a bowline will not stand off the wind.",
+                subject=line.id,
+            )
 
 
 def _record_backed(ship: Ship, sail: Sail, backed: bool) -> None:
