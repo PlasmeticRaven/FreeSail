@@ -48,6 +48,36 @@ put her about
 
 After a tack the yards are braced sharp up for the new tack by the evolution, but nothing else is trimmed: the jib and spanker sheets find their own trim (chapter 4) and your helm order is the new close-hauled course. Say `keep her full` if you want the helmsman sailing by the wind rather than by compass.
 
+### In studding-sails first, and the bowlines
+
+Luce's tacking and wearing begin with the studding sails in (Luce 1866 and 1884, ch. XXIII and XXIV; `docs/references/RigGeometryNotes.md` §5), for a studding sail and its boom cannot come round against the lee rigging with the yards, and his words for taking them in with all hands are "Stand by to take in the stun'sails ...! Haul taut! IN STUN'SAILS ... Rig in and get alongside the booms" (Luce 1884, ch. XXVII, 'Going large under all sail, to round to under single reefs'). So when any studding sail is set or any boom is out, `tack ship` and `wear ship` take them in and rig the booms in before anything else, with all hands, and then go about. On a wind the bowlines are let go as the helm goes down, at *Mainsail haul*, and steadied out again on the new tack when the yards are braced up (`let go the bowlines`, `steady out the bowlines`; chapter 4). A studding sail the watch was still setting is belayed, not set.
+
+```orders frigate plain-sail
+rig out the studdingsails, weather
+set the studdingsails, weather
+haul the weather bowlines
+tack ship
+```
+
+The frigate close-hauled in a 10-knot breeze, her weather bowlines hauled and her weather studding sails set (shaking in their gear, for she is too near the wind for them), is put about:
+
+```
+  Morning watch (04:33)  Order: tack ship.
+* Morning watch (04:33)  All hands! (to tack ship)
+* Morning watch (04:33)  Belayed setting the starboard main topgallant studdingsail: all hands about ship.
+  Morning watch (04:33)  Stand by to take in the studding-sails. Haul taut! In studding-sails!
+  Morning watch (04:33)  All hands about ship.
+  Morning watch (04:34)  All hands on deck.
+  Morning watch (04:35)  In studding-sails; rigged in and got alongside the booms.
+  Morning watch (04:35)  Ready about. Helm's a-lee; eased off the head sheets.
+  Morning watch (04:37)  Rise tacks and sheets. Mainsail haul; let go the bowlines.
+  Morning watch (04:37)  Let go and haul.
+  Morning watch (04:38)  Haul taut the lifts and weather braces. Steady out the bowlines.
+* Morning watch (04:40)  Tacked; braced up on the larboard tack, heading ENE (67°).
+```
+
+Two minutes for the studding sails and booms, five more for the tack. Wearing is the same: from a broad reach with ten studding sails set, the wear begins "Stand by to take in the studding-sails. Haul taut! In studding-sails!" and "In studding-sails; rigged in and got alongside the booms." two minutes later, before "Stand by to wear ship". With none set and every boom in, both evolutions begin at *Ready about* and *Stand by to wear ship* as before.
+
 ### Missing stays
 
 If her way falls below eight tenths of a knot before her head comes through, or she hangs head to wind for three minutes, she has missed stays. In a 15-knot breeze under plain sail she has way to spare; in seven knots she makes 2.2 knots close-hauled, and the same order fails: Luce: "In vessels which are dull in stays and go off slowly after coming up head to wind, and particularly in a light breeze..." (Luce 1866, ch. XXIV, 'Missing Stays'); Lever's figures 497 to 500 show her boxed off by the sea and falling back. In the game the evolution fails with an urgent line:

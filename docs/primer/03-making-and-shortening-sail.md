@@ -30,7 +30,7 @@ and the log answers with one line per sail as the hands go to work, and one, mar
 * Morning watch (04:11)  Set the main topsail.
 ```
 
-`make all sail` (*crowd sail*, *crack on*) sets plain sail and then the royals, flying jib, staysails, gaff topsail and studding sails both sides, passing over anything the ship has not got. `shorten sail` (*take in sail*, *snug her down*) takes in the studding sails, royals, flying jib, topgallants and gaff topsail and puts one reef in the topsails. These three are lists of ordinary orders in `data/vocabulary.yaml`; anything they cannot do is reported in the same log line after "Not done:".
+`make all sail` (*crowd sail*, *crack on*) sets plain sail and then the royals, flying jib, staysails, gaff topsail and studding sails both sides, passing over anything the ship has not got or cannot yet set: the studding sails go up only on booms already rigged out (below). `shorten sail` (*take in sail*, *snug her down*) takes in the studding sails, royals, flying jib, topgallants and gaff topsail and puts one reef in the topsails. These three are lists of ordinary orders in `data/vocabulary.yaml`; anything they cannot do is reported in the same log line after "Not done:".
 
 ## The order of setting
 
@@ -107,7 +107,7 @@ Each evolution is a data file in `data/evolutions/` with the steps a working wat
 
 A course's yard does not hoist: its tack is hauled aboard and its sheet aft instead. A gaff sail (`set_gaff.yaml`): "Hands to the spanker halyards and outhaul", "Cast off the gaskets and cleared away the brails", "Set the spanker". A jib (`set_jibheaded.yaml`): "Clear away the jib; man the halyards", "Set the jib". A studding sail (`set_studding.yaml`): "Stand by to set the...", "Got the ... out and bent on the halyards and tack", "Set the ...".
 
-Every step has a fixed time in this milestone (about four and a half minutes for a topsail, three for a course or a spanker, under two for a jib, four for a studding sail, five for a reef), scaled up to double in a strong breeze and a heavy heel. **The crew's part in these timings is not yet modelled**: it makes no difference who is aboard or how many hands are on deck, and every sail of a group is worked at once, as if the ship had hands for all of them. Milestone 3 replaces the fixed times with crew-derived ones (`docs/TechnicalSpec-M0-M2.md` §8.4).
+Every step has its time (about four and a half minutes for a topsail, three for a course or a spanker, under two for a jib, four for a studding sail, five for a reef), scaled up to double in a strong breeze and a heavy heel, and taken with the hands the file asks for. Short-handed, the work goes slower and the log says so; with too few it waits for hands, and all hands called do it at the file's pace (chapter 6).
 
 ## Reefing
 
@@ -158,19 +158,22 @@ shake out a reef in the mainsail
 
 ## Studding sails
 
-Studding sails need the sail on their yard set (a fore topmast studding sail extends the fore topsail) and a steady breeze abaft the beam; they are the first thing to come in when it freshens (Luce 1866, ch. XXIII, 'The Topmast Studding-sail'; Lever, 'Studding Sails'). Set them on the weather side, the lee side, or both:
+Studding sails extend a sail beyond its yardarms (a fore topmast studding sail extends the fore topsail, so the topsail must be set), and they are for a steady, moderate breeze from abaft the beam; they are the first thing to come in when it freshens (Luce 1866, ch. XXIII, 'The Topmast Studding-sail'; Lever, 'Studding Sails'). Each has its boom, run out along the yard by an in-and-out jigger before the sail can go up: "Set taut! Rig out! Hoist away!" (Luce 1884, ch. XXIII At Sea, 'The Topmast Studding-sail'). Every boom starts rigged in, as at sea, so **rig out first, then set**: a `set` given to a studding sail whose boom is still in is refused with what must be done first ("The starboard fore topmast studdingsail boom is rigged in; rig it out first."). Set them on the weather side, the lee side, or both; before the wind, with the yards square, both:
 
 ```orders frigate plain-sail
+brace the yards square
+rig out the studdingsails, both sides
 set the fore topmast studdingsails
 set the studdingsails, lee
 set the fore lower studdingsail, weather
 # rejected: set the fore topmast studdingsail
 take in the studdingsails
+rig in the studdingsails, both sides
 ```
 
-A studding sail comes in made up and stowed, so `take in` is enough; there is no `furl` for it.
+The refusal: a studding sail wants its side ("Which fore topmast studdingsail: the starboard, the larboard (the weather or the lee), or both sides?"). The test that runs this book finishes each order the moment it is given and does not look at the booms, so the refusal of a `set` before `rig out` is shown here in words rather than in the block; the console gives it.
 
-Each studding sail has its boom, run out along the yard by an in-and-out jigger before the sail can go up: "Set taut! Rig out! Hoist away!" (Luce 1884, ch. XXIII At Sea, 'The Topmast Studding-sail'). `rig out` and `rig in` take the boom or the studding sail it carries; a boom cannot be rigged in with its sail set, and a sail cannot be set on a boom rigged in ("The starboard fore topmast studdingsail boom is rigged in; rig it out first"). Every boom starts rigged in, as at sea. With the yards braced up more than 45 degrees the lee boom will not go out past the lee rigging ("The fore topsail yard is braced too sharp for the boom to go out."), nor is a yard braced sharper with its lee boom out ("Rig in the studdingsail boom before bracing the fore topsail yard sharper."); the weather boom goes out, for the weather studding sails that Luce sets a point free.
+A studding sail comes in made up and stowed, so `take in` is enough; there is no `furl` for it. `rig out` and `rig in` take the boom or the studding sail it carries; a boom cannot be rigged in with its sail set. With the yards braced up more than 45 degrees the lee boom will not go out past the lee rigging ("The fore topsail yard is braced too sharp for the boom to go out."), nor is a yard braced sharper with its lee boom out ("Rig in the studdingsail boom before bracing the fore topsail yard sharper."); the weather boom goes out, for the weather studding sails that Luce sets a point free. These two are the only rules: the rigging is a thing the physics cannot yet collide with.
 
 ```orders frigate plain-sail
 rig out the starboard fore topmast studdingsail boom
@@ -180,6 +183,52 @@ rig out the weather fore topmast studdingsail
 # rejected: rig out the lee fore topmast studdingsail
 # rejected: rig out the fore topsail
 ```
+
+### How close they may be carried
+
+Luce: the weather topmast and topgallant studding sails may be set "with the wind one point free, or forming an angle of seven points with the keel", the lower studding sail "only ... with the wind abaft the beam" (Luce 1866, ch. XXIII; Luce 1884, ch. XXIII). The game refuses none of it. The wind does: forward of its angle a studding sail's lift falls away over a point and it shakes in its gear, the snatching comes on its boom, and kept so the boom carries away. The frigate in 13 knots of wind with her five weather studding sails drawing at nine points, brought up to six:
+
+```
+  Morning watch (04:38)  Order: steer 292.
+* Morning watch (04:38)  Starboard fore lower studdingsail shaking in its gear; she is too near the wind to carry it.
+* Morning watch (04:38)  Starboard fore lower studdingsail boom whipping as the starboard fore lower studdingsail flogs; she is too near the wind for it.
+* Morning watch (04:39)  Starboard fore topmast studdingsail shaking in its gear; she is too near the wind to carry it.
+  ...
+* Morning watch (04:39)  Starboard fore topmast studdingsail boom whipping as the starboard fore topmast studdingsail flogs; she is too near the wind for it.
+! Morning watch (04:40)  Starboard main topmast studdingsail boom carried away; the starboard main topmast studdingsail hanging to leeward.
+! Morning watch (04:41)  Starboard fore topmast studdingsail boom carried away; the starboard fore topmast studdingsail hanging to leeward.
+  Morning watch (04:43)  Order: steer 259.
+  Morning watch (04:44)  Starboard fore topgallant studdingsail drawing again.
+  Morning watch (04:44)  Starboard main topgallant studdingsail drawing again.
+  Morning watch (04:44)  Starboard fore lower studdingsail drawing again.
+```
+
+Two booms gone in three minutes; borne away to nine points again, the three still aloft draw. In 12 knots every boom whips and none goes in ten minutes; in 15 they go within minutes. A studding sail shaking in its gear also wears three times as fast as one drawing (below). Going about takes them in and the booms in before anything else (chapter 5).
+
+## The ringtail, the save-alls and the water sail
+
+Three more light sails for a fair wind and smooth water, each in the sail room until wanted and each a studding sail to the physics, with the same stall and the same boom (Luce 1884, ch. XXIII: "a ring-tail, which sets abaft the spanker; a save-all, under the lower studding-sail boom"; `docs/references/RigGeometryNotes.md` §8):
+
+- the frigate's **ringtail**, a narrow sail bordering the spanker's after leech, its head on a short yard hoisted to the gaff end and its foot hauled out on a **ringtail boom** run out on the driver boom (Kipping: it "sets like a topmast studding sail, outside of the after-leech of the main-trysail"); No. 5 canvas;
+- the frigate's two **save-alls**, one under each fore lower studding sail boom, No. 7;
+- the schooner's **ringtail** on her main boom (Steel's "sloop's ringtail sail ... occasionally hoisted abaft the mainsail in calm weather") and her **water sail** under the main boom (Steel's "sloop's water-sail"), No. 5 and No. 7.
+
+They start unbent, so the order is bend, rig out the boom, set:
+
+```orders frigate
+# rejected: set the ringtail
+bend the ringtail
+rig out the ringtail boom
+bend the save-alls
+```
+
+```orders schooner
+bend the ringtail
+bend the water sail
+rig out the ringtail boom
+```
+
+The refusal: "The ringtail is unbent; there is no sail on the yard. Bend one first." Once bent, `set the ringtail` (and `set the water sail`, `set the save-alls`) as for any studding sail. The schooner running before 15 knots under plain sail makes 5.5 knots; with the ringtail set, 5.7, and 6.1 against 5.9 with the wind on the quarter. The ringtail boom lies along the driver boom and never fouls a brace.
 
 ## Goose-winging
 
@@ -195,8 +244,6 @@ goose wing the main topsail
 
 A sail blown out of its bolt-ropes gives nothing and cannot be set again: it must be **shifted**, the rags unbent and sent down and a new sail sent up from the sail room and bent to the yard (Luce 1884, ch. XXXII Shifting Sails and Spars, 'To Shift a Topsail': "Lay out! Furl and unbend! ... Send up the new sail ... Bring to and bend the sail"). `unbend` and `bend` do the two halves alone (ch. XX Port Drills, 'To Unbend Sail', 'Bending Sail'). The new sail is left furled on its yard; setting it is your next order. A sail must be taken in before it is unbent or shifted. Any sail can be bent and unbent, square, gaff, jib-headed or studding.
 
-The ship carries made-up sails in the sail room, listed in her ship file with their canvas and condition (`the sail room` prints them), and bending one takes it from the room. A sound sail unbent goes back to the sail room for the sailmaker, the rags of a blown-out one do not, and with none left the order is refused: "There is no spare sail left in the sail room to bend in place of the main royal; the sailmaker must make one first."
-
 ```orders frigate
 unbend the fore royal
 bend the fore royal
@@ -210,11 +257,85 @@ unbend the spanker
   Morning watch, 8 bells (04:00)  Order: shift the fore royal.
   Morning watch (04:00)  Stand by to shift the fore royal! Aloft topmen; lay out, furl and unbend.
   Morning watch (04:03)  Unbent the fore royal and lowered it down on deck.
-  Morning watch (04:06)  Swayed aloft the new fore royal.
-* Morning watch (04:11)  Shifted the fore royal; the new sail bent and furled, 3 spare sails left in the sail room.
+  Morning watch (04:06)  Swayed aloft the fore royal (No. 8 canvas, new).
+* Morning watch (04:11)  Shifted the fore royal; the fore royal bent (No. 8 canvas, new) and furled, 21 spare sails left in the sail room.
 ```
 
-Eleven minutes in a 15-knot breeze. The old royal was sound, so it went down to the sail room and the count still stands at three; had it been blown out, it would stand at two.
+Eleven minutes in a 15-knot breeze. The old royal was sound, so it went down to the sail room and the count still stands at twenty-one; had it been blown out, its rags would have been condemned and the count would stand at twenty.
+
+## Canvas and its condition
+
+Sailcloth was woven in numbers, No. 1 the heaviest and strongest, No. 8 or 9 the lightest, and each sail was made of the number its work wanted. Luce's table of a frigate's suit (1884, ch. X, p. 171) makes the courses, topsails and spanker of No. 2 and every storm sail of No. 1; Steel (1794) and Kipping (1847) give the navy's older numbers for the lighter sails, which the frigate's file follows (`docs/references/RigGeometryNotes.md` §4). Every sail in the ship files has its number, and the strength of the cloth follows Luce's Appendix E, which tested an inch strip of each: No. 1 bore 470 lb, No. 2 420, a No. 8 royal little more than half of that (`docs/references/Tables.md`).
+
+| The frigate's sails | Canvas |
+|---|---|
+| courses, fore and main topsails, spanker | No. 2 |
+| mizzen topsail | No. 4 |
+| topgallants (the mizzen's No. 7) | No. 6 |
+| royals | No. 8 |
+| jib, flying jib | No. 6, No. 7 |
+| studding sails (topgallant No. 7) | No. 6 |
+| storm canvas | No. 1 |
+
+Canvas wears. A sail set and drawing wears slowly, three times as fast when it is aback or shaking, and not at all furled or in the sail room. Worn cloth bears less: a sail at half its condition bears seventy per cent of what it bore new, and it is baggier, so it lies less close to the wind. Nothing in the ship repairs canvas yet (the sailmaker's mending comes with milestone 8), so the only remedies are the old ones: shift a worn sail for a better one, and keep the best canvas for a blow. The words for a sail's condition are *new*, *sound*, *worn*, *much worn* and *worn out*.
+
+What that means in a gale: in the 35-knot gale of gate M2, all sail made and braced up, a new royal holds until its yard and mast carry away; a royal of half its condition blows out of its bolt-ropes first, and the spar is saved for a new sail (`docs/dev/TuningNotes.md`, truth 27). The console cannot yet bend a worn sail by order: canvas wears by the hour, and a scenario is too short to wear it.
+
+## The sail room
+
+The sail room holds the spare canvas: on the frigate, Luce's allowance for a ship of her class, a second of each working sail in its working number, a heavy-weather foresail and fore and main topsails of No. 1 canvas, the storm canvas and the occasional sails; on the schooner a second foresail, fore topsail and jib, a storm trysail and storm jib, a ringtail and a water sail. `the sail room` at the prompt lists them, and `muster` ends with a line for them:
+
+```
+The sail room holds 21 sails.
+Spares of the working canvas: mainsail, No. 2 canvas, new; mizzen topsail, No. 4 canvas, new; fore topgallant, No. 6 canvas, new; ...
+For heavy weather: foresail, No. 1 canvas, new; fore topsail, No. 1 canvas, new; main topsail, No. 1 canvas, new.
+Storm canvas: fore storm staysail, No. 1 canvas, new; mizzen storm staysail, No. 1 canvas, new; storm mizzen, No. 1 canvas, new.
+For light fair winds: ringtail, No. 5 canvas, new; starboard fore save all, No. 7 canvas, new; larboard fore save all, No. 7 canvas, new.
+```
+
+`shift` and `bend` take the best spare of the sail's working number, or the one you name: **for the heavy one** takes the No. 1, and a number takes that number. The sail unbent goes back to the room with its condition. Bending more than the room holds is refused ("There is no spare sail left in the sail room to bend in place of the main royal; the sailmaker must make one first."), and so is a number the room has not got ("There is no main topsail of No. 3 canvas in the sail room; it holds ...").
+
+```orders frigate
+shift the fore topsail for the heavy one
+unbend the main topsail
+bend the No. 1 main topsail
+shift the fore royal
+```
+
+```
+  Morning watch (04:15)  Order: shift the fore topsail for the heavy one.
+  Morning watch (04:15)  Stand by to shift the fore topsail! Aloft topmen; lay out, furl and unbend.
+  Morning watch (04:18)  Unbent the fore topsail and lowered it down on deck.
+  Morning watch (04:21)  Swayed aloft the fore topsail (No. 1 canvas, new).
+* Morning watch (04:26)  Shifted the fore topsail; the fore topsail bent (No. 1 canvas, new) and furled, 21 spare sails left in the sail room.
+```
+
+## Storm canvas
+
+For a storm the ship bends sails that are hers for nothing else: on the frigate a **fore storm staysail** on the fore stay, a **mizzen storm staysail** on the mizzen stay, and a **storm mizzen**, a small sail bent in the spanker's place; on the schooner a **storm trysail** on the main and a **storm jib**. All are No. 1 canvas and live in the sail room until bent (Luce 1884, ch. X, "Storm-Sails are made of the strongest canvas"). The storm staysails are bent where they stand; the storm mizzen needs the spanker unbent first, which `shift the spanker for the storm mizzen` does in one order, and `shift the storm mizzen for the spanker` undoes it.
+
+```orders frigate
+# rejected: set the fore storm staysail
+bend the fore storm staysail
+bend the mizzen storm staysail
+shift the spanker for the storm mizzen
+```
+
+```orders schooner
+bend the storm trysail
+bend the storm jib
+```
+
+The refusal: "The fore storm staysail is unbent; there is no sail on the yard. Bend one first." Once bent, each is set and taken in like any staysail: `set the fore storm staysail`, `set the storm mizzen`, `haul down the mizzen storm staysail`.
+
+```
+  Morning watch (04:35)  Order: bend the fore storm staysail.
+  Morning watch (04:35)  Bend sail! Rouse up the fore storm staysail from the sail room.
+  Morning watch (04:37)  Roused up the fore storm staysail from the sail room (No. 1 canvas, new) and swayed it aloft.
+* Morning watch (04:42)  Bent the fore storm staysail (No. 1 canvas, new) and furled it; 20 spare sails left in the sail room.
+```
+
+Luce's ship lies to in a gale "under close-reefed main topsail, fore storm staysail, and probably single reefed trysail" (Luce 1884, ch. XXIX In a Gale), and that is what `lie a-try` does once the main topsail is set, close-reefed as the weather wants (chapter 5): the other square sails and the jibs are taken in, the staysails stand, and she comes up to about four points with the helm a little a-lee. In a 45-knot storm with the topgallant masts sent down and the storm staysails set, nothing carries away in an hour. **What the game does not yet do** is let her lie quietly: she goes astern at four knots and more where a ship of the period drifted bodily to leeward at a knot or two, a question for the physics that the owner is judging (`docs/dev/TuningNotes.md`, truth 28).
 
 ## Light spars in a blow
 
