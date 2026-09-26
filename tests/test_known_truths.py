@@ -33,6 +33,14 @@ set to work by orders, all hands called and piped down by orders, and the
 watch changing at the bells. Every scenario begins from rest with the sails
 furled (`from_rest`), as a voyage does. The absolute times of truth 18 are a
 third strict expected failure, with the reason in the test; its ratio passes.
+
+Truths 24 to 33 are milestone 3b's, rig geometry and canvas
+(docs/TechnicalSpec-M3b.md §9), each citing its source. Where the built game
+and a truth's number disagree, the behaviour the game has is asserted as a
+passing test with the measured value in its docstring, and the spec's number
+is a strict expected failure marked as the owner's ruling, naming the measured
+value and the constant that would move it (truths 24, 26, 28 and 31). Nothing
+was tuned to meet them; the values are in docs/dev/TuningNotes.md.
 """
 
 from __future__ import annotations
@@ -87,10 +95,10 @@ def tack_for(heading_deg: float) -> str:
     return "starboard" if 180.0 < heading_deg % 360.0 < 360.0 else "larboard"
 
 
-def run(world, ticks: int, trim_every: int = 0) -> None:
+def run(world, ticks: int, trim_every: int = 0, trim: str = "trim sails") -> None:
     for i in range(ticks):
         if trim_every and i % trim_every == 0:
-            world.submit("trim sails")
+            world.submit(trim)
         world.tick()
 
 
@@ -139,14 +147,25 @@ def polar(ship, knots_=15.0, angles=POLAR_ANGLES) -> dict[int, dict]:
     return out
 
 
-def pointing_sweep(ship, start_off=80, stop_off=44) -> list[dict]:
-    """Steer up two degrees at a time until she can no longer hold three knots."""
+def pointing_sweep(
+    ship, start_off=80, stop_off=44, rig=None, orders=(), wait=0, trim="trim sails"
+) -> list[dict]:
+    """Steer up two degrees at a time until she can no longer hold three knots.
+
+    Milestone 3b: once plain sail is set, `rig(world)` may alter the ship and `orders`
+    be given, with `wait` seconds more to carry them out; `trim` is the order the watch
+    trims with. With none of these it is milestone 2's sweep to the tick."""
     world = under_plain_sail(ship, 360.0 - start_off)  # starboard tack
+    if rig is not None:
+        rig(world)
+    for text in orders:
+        world.submit(text)
+    run(world, wait, trim_every=120, trim=trim)
     rows = []
     off = start_off
     while off >= stop_off:
         world.submit(f"steer {360 - off}")
-        run(world, 300, trim_every=100)
+        run(world, 300, trim_every=100, trim=trim)
         rows.append(reading(world))
         if knots(world) < 3.0 or world.ship.dyn.u < 0:
             break
@@ -469,8 +488,16 @@ def test_truth_13_a_gaff_sail_wants_squaring_off_before_the_wind():
     assert 0.0 < at_45 < at_70
 
 
-def studding_sail_gain(heading_deg: float, sides: str = "both sides", count: int = 10) -> float:
-    world = under_plain_sail(FRIGATE, heading_deg, knots_=10.0)
+def studding_sail_gain(
+    heading_deg: float,
+    sides: str = "both sides",
+    count: int = 10,
+    knots_: float = 10.0,
+    in_knots: bool = False,
+) -> float:
+    """Per cent more speed with the studding sails set than under plain sail (or, with
+    `in_knots`, knots more; milestone 3b's truth 30)."""
+    world = under_plain_sail(FRIGATE, heading_deg, knots_=knots_)
     plain = knots(world)
     # milestone 3b: the booms start rigged in and are rigged out first (spec 3b §7)
     world.submit(f"rig out the studdingsails, {sides}")
@@ -480,6 +507,8 @@ def studding_sail_gain(heading_deg: float, sides: str = "both sides", count: int
     world.submit(f"set the studdingsails, {sides}")  # those that waited for the sail beside them
     run(world, 900, trim_every=120)
     assert sum(1 for s in world.ship.sails.values() if s.cls == "studding" and s.is_set) == count
+    if in_knots:
+        return knots(world) - plain
     return 100.0 * (knots(world) / plain - 1.0)
 
 
@@ -749,10 +778,14 @@ def test_truth_22_same_seed_same_muster_same_log_and_a_replay_reproduces_it():
     assert copy.ship.extra["crew"].describe(copy.clock) == muster
 
 
-def gale(send_down: bool):
+def gale(send_down: bool, royal_condition: float | None = None):
     """Gate M2 item 9 (35 knots, all sail made and braced up) and, at the start of the
-    second ten minutes, the topgallant masts sent down, or not."""
+    second ten minutes, the topgallant masts sent down, or not. Milestone 3b: the royals
+    may be bent worn, at `royal_condition` (truth 27)."""
     world = from_rest(FRIGATE, heading_deg=270.0, knots_=35.0)
+    if royal_condition is not None:
+        for sid in world.ship.groups["royals"]:
+            world.ship.sails[sid].condition = royal_condition
     world.submit("make all sail")
     world.submit("brace up on the starboard tack")
     run(world, 600)
@@ -774,3 +807,478 @@ def test_truth_23_sending_down_the_topgallant_masts_in_time_saves_the_royals():
     assert [e.text for e in world.log if e.kind in (*CARRIED_AWAY, "line.parted")] == []
     assert events(world, "spar.sent_down")
     assert all(world.ship.spars[m].sent_down for m in ("fore.royal.yard", "main.topgallant_mast"))
+
+
+# ---------------------------------------------------------------------------
+# Milestone 3b: rig geometry and canvas (spec 3b §9), truths 24 to 33
+# ---------------------------------------------------------------------------
+
+POINT = 11.25  # degrees in a point of the compass
+SIX_POINTS = 6 * POINT
+
+
+def speed_at(rows: list[dict], off: float) -> float:
+    """Her speed `off` degrees off the true wind, read from a sweep (linear between rows)."""
+    for a, b in zip(rows, rows[1:], strict=False):
+        if a["off"] >= off >= b["off"]:
+            f = (a["off"] - off) / (a["off"] - b["off"])
+            return a["speed"] + f * (b["speed"] - a["speed"])
+    raise AssertionError(f"the sweep does not reach {off} deg off the wind")
+
+
+def off_at(rows: list[dict], speed: float) -> float:
+    """The closest heading, in degrees off the true wind, at which the sweep still makes
+    `speed` (linear between the last row at or above it and the first below)."""
+    for a, b in zip(rows, rows[1:], strict=False):
+        if a["speed"] >= speed > b["speed"]:
+            f = (a["speed"] - speed) / (a["speed"] - b["speed"])
+            return a["off"] + f * (b["off"] - a["off"])
+    raise AssertionError(f"the sweep never falls to {speed:.2f} kn")
+
+
+def after_yards_no_sharper(world) -> None:
+    """The frigate's after yards rigged to brace no sharper than the head yard at their
+    level, as milestone 3's files had it: `trim sails` then braces the masts alike."""
+    ship = world.ship
+    head = {}
+    for yid in ship.groups["head yards"]:
+        head[ship.parent_of(ship.spars[yid]).cls] = ship.spars[yid].rigged_brace_limit
+    for yid in ship.groups["after yards"]:
+        yard = ship.spars[yid]
+        limit = min(yard.rigged_brace_limit, head[ship.parent_of(yard).cls])
+        yard.rigged_brace_limit = yard.brace_limit = limit
+
+
+@pytest.fixture(scope="module")
+def frigate_yards_alike_sweep():
+    return pointing_sweep(FRIGATE, stop_off=60, rig=after_yards_no_sharper, wait=240)
+
+
+@pytest.fixture(scope="module")
+def frigate_head_yards_sharper_sweep():
+    return pointing_sweep(
+        FRIGATE, stop_off=62, wait=240, trim="trim sails with the head yards sharper"
+    )
+
+
+@pytest.fixture(scope="module")
+def frigate_bowlines_sweep():
+    return pointing_sweep(FRIGATE, orders=["haul the weather bowlines"], wait=300)
+
+
+@pytest.fixture(scope="module")
+def frigate_catharpins_sweep():
+    return pointing_sweep(
+        FRIGATE, stop_off=58, orders=["swifter in the catharpins on the main"], wait=2400
+    )
+
+
+# 24: the after yards sharper than the head yards
+
+
+def test_truth_24_the_after_yards_braced_sharper_gain_a_little(
+    frigate_sweep, frigate_yards_alike_sweep, frigate_head_yards_sharper_sweep
+):
+    """Fincham 1843, art. 94: "the after-yards are braced sharper up than the fore-yards",
+    so that the sails "just touch at the same time"; art. 96, the reverse for a griping
+    ship. As built `trim sails` braces each after yard as much sharper as its rigging allows
+    (Fincham art. 102's limits put the main yard two degrees beyond the fore; the spec's
+    three is AFTER_YARDS_SHARPER_DEG, evolutions/trim.py). Compared at 66 deg off, her best
+    course to windward (truth 1), with the after yards rigged to brace no sharper than the
+    head yards, and with `trim sails with the head yards sharper`.
+
+    Measured at seed 7 in 15 knots: 5.21 kn as built, 5.04 alike, 4.78 with the head yards
+    sharper; as built she makes 5.04 kn about 0.9 deg closer than alike. The spec's quarter
+    knot or quarter point is the xfail below, for the owner."""
+    as_built = speed_at(frigate_sweep, 66.0)
+    alike = speed_at(frigate_yards_alike_sweep, 66.0)
+    head_sharper = speed_at(frigate_head_yards_sharper_sweep, 66.0)
+    assert 0.05 <= as_built - alike < 0.25, f"{as_built:.2f} kn against {alike:.2f} alike"
+    assert head_sharper < alike - 0.1, f"head yards sharper {head_sharper:.2f} kn"
+    closer = 66.0 - off_at(frigate_sweep, alike)
+    assert 0.0 < closer < POINT / 4, f"{closer:.1f} deg closer at {alike:.2f} kn"
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "Owner's ruling (spec 3b §9, truth 24). With the after yards braced sharper as their "
+        "rigging allows (the main yard two degrees beyond the fore) she makes 5.21 kn at 66 "
+        "deg off in 15 knots against 5.04 with every yard alike, +0.17 kn, and makes 5.04 "
+        "about 0.9 deg closer: under a quarter knot and a quarter point. The sail model has "
+        "no headed stream (every sail meets the same apparent wind), which is Fincham's "
+        "reason for the practice; see trim.EASE_HEAD_YARDS and docs/dev/TuningNotes.md."
+    ),
+)
+def test_truth_24_a_quarter_point_closer_or_a_quarter_knot_more(
+    frigate_sweep, frigate_yards_alike_sweep
+):
+    alike = speed_at(frigate_yards_alike_sweep, 66.0)
+    gain = speed_at(frigate_sweep, 66.0) - alike
+    closer = 66.0 - off_at(frigate_sweep, alike)
+    assert gain >= 0.25 or closer >= POINT / 4, f"+{gain:.2f} kn, {closer:.1f} deg closer"
+
+
+# 25: full and by, not pinched
+
+
+def made_good_to_windward(off_deg: float, knots_: float = 8.0, minutes: int = 30):
+    """Close-hauled on the starboard tack `off_deg` off a light wind, the yards trimmed
+    every two minutes: (knots made good to windward over the ground, mean speed through
+    the water) over `minutes` once settled. The wind is from the north: northing."""
+    world = under_plain_sail(FRIGATE, 360.0 - SIX_POINTS, knots_=knots_)
+    world.submit(f"steer {360.0 - off_deg}")
+    run(world, 600, trim_every=120)
+    y0, t0 = world.ship.dyn.y, world.clock.tick
+    speeds = []
+    for i in range(minutes * 60):
+        if i % 120 == 0:
+            world.submit("trim sails")
+        world.tick()
+        speeds.append(knots(world))
+    hours = (world.clock.tick - t0) / 3600.0
+    return (world.ship.dyn.y - y0) / 1852.0 / hours, sum(speeds) / len(speeds)
+
+
+def test_truth_25_pinched_to_five_points_she_makes_less_to_windward_than_kept_full():
+    """Fincham 1843, art. 99: keeping the sails "just lifting" is proper only with five or
+    six knots of way; with less, keep them full. In 8 knots of wind the frigate makes three
+    knots at six points (2.95 at seed 7); pinched to five she falls to 1.75 and her leeway
+    doubles (4.2 to 8.2 deg), so she makes 0.75 kn good to windward over the ground against
+    0.92 kept full."""
+    full, full_speed = made_good_to_windward(SIX_POINTS)
+    pinched, pinched_speed = made_good_to_windward(5 * POINT)
+    assert 2.5 <= full_speed <= 3.5, f"{full_speed:.2f} kn at six points"
+    assert pinched_speed < full_speed - 0.5
+    assert 0.0 < pinched < full - 0.1, f"{pinched:.2f} kn made good pinched, {full:.2f} full"
+
+
+# 26: the bowlines
+
+
+def test_truth_26_the_weather_bowlines_hauled_point_her_closer(
+    frigate_sweep, frigate_bowlines_sweep
+):
+    """Fincham 1843, art. 98: "the flatter the sails the sharper they may be braced";
+    Luce 1884, ch. XXIII: "haul taut the weather brace and haul the bowline". `haul the
+    weather bowlines` steadies out the courses' and topsails' weather bowlines (five on the
+    frigate), each bringing its sail's luff angle BOWLINE_LUFF_GAIN_DEG closer
+    (physics/sails.py). At seed 7 in 15 knots: 5.76 kn at 66 deg off against 5.21 without
+    (+0.55), and the 5.21 kn she made there she now makes about 3.3 deg closer; the
+    closest heading holding three knots goes from 56 to 52 deg. The spec's half a point is
+    the xfail below."""
+    same = speed_at(frigate_sweep, 66.0)
+    gain = speed_at(frigate_bowlines_sweep, 66.0) - same
+    closer = 66.0 - off_at(frigate_bowlines_sweep, same)
+    assert gain >= 0.3, f"+{gain:.2f} kn at 66 deg"
+    assert POINT / 4 <= closer < POINT / 2, f"{closer:.1f} deg closer at {same:.2f} kn"
+    _, closest = best_sustained_course(frigate_sweep)
+    _, closest_hauled = best_sustained_course(frigate_bowlines_sweep)
+    assert closest_hauled <= closest - 2.0
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "Owner's ruling (spec 3b §9, truth 26). The weather bowlines of the courses and "
+        "topsails hauled, she makes the speed she made at 66 deg off (5.21 kn in 15 knots) "
+        "about 3.3 deg closer, and +0.55 kn at the same heading: nearer a third of a point "
+        "than half. BOWLINE_LUFF_GAIN_DEG = 4 (physics/sails.py) moves it; the topgallants, "
+        "staysails and spanker have no bowline and draw as before. See "
+        "docs/dev/TuningNotes.md."
+    ),
+)
+def test_truth_26_about_half_a_point(frigate_sweep, frigate_bowlines_sweep):
+    same = speed_at(frigate_sweep, 66.0)
+    closer = 66.0 - off_at(frigate_bowlines_sweep, same)
+    assert closer >= 0.4 * POINT, f"{closer:.1f} deg closer"
+
+
+# 27: worn canvas in the gale
+
+
+def royals_first(world) -> dict[str, str]:
+    """What befell each royal first: 'blown_out', or 'yard' (its yard or mast went)."""
+    royals = world.ship.groups["royals"]
+    first: dict[str, str] = {}
+    for e in world.log:
+        if e.kind == "sail.blown_out" and e.subject in royals:
+            first.setdefault(e.subject, "blown_out")
+        elif e.kind == "spar.carried_away":
+            for sid in royals:
+                if sid in e.data.get("wrecked", []):
+                    first.setdefault(sid, "yard")
+    return first
+
+
+def test_truth_27_a_worn_royal_blows_out_before_its_yard_goes_and_a_new_one_does_not():
+    """Spec 3b §6.2 and §6.5, on Luce 1884 App. E's strengths (docs/references/Tables.md):
+    the effective cloth rating is 0.4 + 0.6 * condition / 100 of the new, so a royal at
+    condition 50 bears seventy per cent. In the gate M2 gale (truth 23's scenario: 35 knots,
+    all sail made and braced up) the worn royals blow out of their bolt-ropes; new, the
+    same royals hold until their yards and masts carry away, as at milestone 2. The game
+    has no way yet to age a sail in a scenario's time, so the worn royals are bent worn
+    (their condition set before the first order); the mechanism is tests/test_canvas.py's."""
+    worn = gale(send_down=False, royal_condition=50.0)
+    royals = worn.ship.groups["royals"]
+    assert royals_first(worn) == {sid: "blown_out" for sid in royals}
+    blown = [e for e in worn.log if e.kind == "sail.blown_out"]
+    assert all(e.severity.value == "urgent" for e in blown)
+    new = gale(send_down=False)
+    assert royals_first(new) == {sid: "yard" for sid in royals}
+    assert not [e for e in new.log if e.kind == "sail.blown_out" and e.subject in royals]
+
+
+# 28: storm canvas, lying a-try
+
+
+def lying_a_try(knots_: float = 45.0):
+    """The frigate in a storm from rest, all hands up: the topgallant masts sent down and
+    the storm staysails bent (Luce 1884, ch. XXIX, 'Reducing Sail to a Gale'), the yards
+    braced up, the topsails set and close-reefed, the storm staysails set, then `lie a-try`,
+    and the fore and mizzen topsails it hands furled. Returns the world and, for the hour
+    after, her speeds and headings off the wind."""
+    world = from_rest(FRIGATE, knots_=knots_)
+    world.submit("call all hands")
+    run(world, 90)
+    for text in (
+        "send down the topgallant masts",
+        "bend the fore storm staysail",
+        "bend the mizzen storm staysail",
+        "brace sharp up on the starboard tack",
+    ):
+        world.submit(text)
+    until_idle(world, 3600)
+    world.submit("set the topsails")
+    until_idle(world, 3600)
+    world.submit("close reef the topsails")
+    until_idle(world, 3600)
+    world.submit("set the fore storm staysail")
+    world.submit("set the mizzen storm staysail")
+    until_idle(world, 1800)
+    world.submit("lie a-try")
+    until_idle(world, 1800)
+    world.submit("furl the fore topsail")
+    world.submit("furl the mizzen topsail")
+    until_idle(world, 1800)
+    hour = {"speed": [], "off": [], "start": world.clock.tick}
+    for _ in range(3600):
+        world.tick()
+        hour["speed"].append(knots(world))
+        hour["off"].append(off_wind(world))
+    return world, hour
+
+
+@pytest.fixture(scope="module")
+def frigate_lying_a_try():
+    return lying_a_try()
+
+
+def test_truth_28_lying_a_try_in_a_storm_nothing_carries_away(frigate_lying_a_try):
+    """Luce 1884, ch. XXIX In a Gale: "The ship is now 'lying to' under close-reefed main
+    topsail, fore storm staysail" (the `lie_a_try` evolution); the storm staysails are No. 1
+    canvas from the sail room (spec 3b §6.4). In 45 knots at seed 7 she lies 45 to 46 deg
+    off the wind, steady, and nothing carries away, blows out or parts in the hour. She
+    goes astern at 4.4 knots doing it: that half of the truth is the xfail below."""
+    world, hour = frigate_lying_a_try
+    set_ = {s.id for s in world.ship.sails.values() if s.is_set}
+    assert set_ == {"main.topsail", "fore.storm_staysail", "mizzen.storm_staysail"}
+    topsail = world.ship.sails["main.topsail"]
+    assert topsail.reefs == topsail.reef_bands
+    lying = events(world, "ship.hove_to")
+    assert lying and lying[-1].text.startswith("Lying a-try under the main topsail")
+    assert [e.text for e in world.log if e.kind in (*CARRIED_AWAY, "line.parted")] == []
+    assert 40.0 <= min(hour["off"]) and max(hour["off"]) <= 60.0
+    assert max(hour["off"]) - min(hour["off"]) <= 15.0
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "Owner's ruling (spec 3b §9, truth 28). Lying a-try in 45 knots under the close-"
+        "reefed main topsail and the storm staysails, the topgallant masts down and the fore "
+        "and mizzen topsails furled, she goes astern at 4.4 to 5.1 kn 45 deg off the wind, "
+        "3.6 nm to leeward in the hour. Under bare poles before any sail is set she already "
+        "goes astern at 5.6 kn: the rig's windage in 45 knots is more than the hull resists, "
+        "the hull's resistance astern is its resistance ahead (physics/hull.py), and nothing "
+        "lets her fall off into the trough. In 30 knots the same gives 2.9 kn astern. See "
+        "docs/dev/TuningNotes.md."
+    ),
+)
+def test_truth_28_lying_a_try_under_a_knot_and_a_half(frigate_lying_a_try):
+    _, hour = frigate_lying_a_try
+    assert max(hour["speed"]) < 1.5, f"{max(hour['speed']):.1f} kn"
+
+
+# 29: studding sails too close
+
+
+def test_truth_29_studding_sails_flog_and_strain_at_six_points_and_draw_at_nine():
+    """Luce 1866 and 1884, ch. XXIII: the weather topmast and topgallant studding sails
+    "with the wind one point free, or forming an angle of seven points with the keel", the
+    lower "only ... with the wind abaft the beam". The frigate sets her five weather
+    studding sails at nine points in 12 knots of wind and they draw; brought up to six
+    they shake in their gear and every boom whips (a strain line each, the booms at 1.4 to
+    1.5 of their rating); borne away to nine again after ten minutes they draw, and nothing
+    has gone. Twelve knots because it is the least wind in which every boom's strain shows
+    (package 23: in 10 knots one boom warns; in 13 two booms carry away within seven
+    minutes, which is the gate's scene, not the truth's)."""
+    from test_studding import NINE_POINTS, weather_studding_sails_at_nine_points
+
+    world = weather_studding_sails_at_nine_points(FRIGATE, 12.0)
+    set_ = [s for s in world.ship.sails.values() if s.cls == "studding" and s.is_set]
+    assert len(set_) == 5 and all(s.side == "starboard" for s in set_)
+    assert all(s.thrust_kn > 0.0 and not s.shivering for s in set_)
+    start = world.clock.tick
+    world.submit(f"steer {360.0 - SIX_POINTS}")
+    for _ in range(10):
+        world.submit("trim sails")
+        run(world, 60)
+    shaking = {e.subject for e in events(world, "sail.shivering", start)}
+    assert shaking == {s.id for s in set_}
+    whipping = [e for e in events(world, "strain.warning", start) if "whipping as the" in e.text]
+    assert len({e.subject for e in whipping}) == 5
+    assert all(e.text.endswith("she is too near the wind for it.") for e in whipping)
+    assert all(s.shivering and s.thrust_kn < 0.0 for s in set_)
+    borne_away = world.clock.tick
+    world.submit(f"steer {360.0 - NINE_POINTS}")
+    for _ in range(5):
+        world.submit("trim sails")
+        run(world, 60)
+    drawing = {e.subject for e in events(world, "sail.drawing", borne_away)}
+    assert drawing == {s.id for s in set_}
+    assert all(s.thrust_kn > 0.0 and not s.shivering for s in set_)
+    assert [e for e in world.log if e.kind in CARRIED_AWAY and e.tick > start] == []
+
+
+# 30: studding sails running
+
+
+def test_truth_30_studding_sails_both_sides_running_gain_most_of_a_knot():
+    """Luce 1866, ch. XXIII: studding sails are set "to increase the speed of a vessel",
+    both sides with the wind aft. The frigate running before 15 knots, all ten set: 5.88 kn
+    to 6.61 at seed 7, +0.73 (+0.79 with the wind on the quarter, 165 deg). The spec reads
+    Luce as "about a knot"; the band here is the measured one, and the gap is the owner's to
+    judge (docs/dev/TuningNotes.md)."""
+    gain = studding_sail_gain(180.0, knots_=15.0, in_knots=True)
+    assert 0.6 <= gain <= 1.2, f"+{gain:.2f} kn"
+
+
+# 31: the catharpins
+
+
+def test_truth_31_the_catharpins_brace_the_main_yard_four_degrees_sharper_and_rate_it_down():
+    """Fincham 1843, art. 102 (Hardy's short ship, braced sharper by measures taken);
+    Lever 1808, fig. 182 (the shrouds "catharpined in"); Steel 1794, 'Catharpins'. On a wind
+    in 30 knots under plain sail the main yard goes from 64 deg from square to 68
+    (CATHARPIN_GAIN_DEG), `trim sails` names the after yards six degrees sharper, and the
+    main mast's strain ratio rises from 0.178 to 0.229 (x1.29): its rating is taken at 0.883
+    (CATHARPIN_RATING_FACTOR 0.85 on the athwartships part of the pull) and the sharper yard
+    pulls 14 per cent harder. A lower mast is rated for 55 knots, so at 0.23 no warning
+    line comes, and none is pretended."""
+    world = under_plain_sail(FRIGATE, 360.0 - SIX_POINTS, knots_=30.0)
+    ship = world.ship
+    mast, yard = ship.spars["main.mast"], ship.spars["main.yard"]
+    before_angle = abs(yard.brace_angle)
+    before_ratio = mast.strain_ratio
+    assert mast.rating_factor == 1.0
+    start = world.clock.tick
+    world.submit("swifter in the catharpins on the main")
+    until_idle(world, 4000)
+    assert mast.swiftered_in
+    run(world, 600, trim_every=120)
+    assert math.degrees(abs(yard.brace_angle) - before_angle) == pytest.approx(4.0, abs=0.01)
+    texts = [e.text for e in world.log if e.tick > start]
+    assert (
+        "Swiftered in the catharpins on the main mast; the main yard will brace four "
+        "degrees sharper." in texts
+    )
+    assert any("the after yards six degrees sharper" in t for t in texts)
+    assert 0.85 <= mast.rating_factor <= 0.9
+    rise = mast.strain_ratio / before_ratio
+    assert 1.0 / 0.9 <= rise <= 1.5, f"strain ratio {before_ratio:.3f} to {mast.strain_ratio:.3f}"
+    assert mast.strain_ratio < 0.5
+    assert not [e for e in world.log if e.kind == "strain.warning" and e.subject == mast.id]
+
+
+def test_truth_31_with_the_catharpins_in_she_lies_a_little_closer(
+    frigate_sweep, frigate_catharpins_sweep
+):
+    """Fincham 1843, art. 102: the short ship, "by bracing her main-yard from 17 to 21 [deg
+    from the keel] ... could sometimes lie within 5 points". In 15 knots with the main
+    catharpins in (the main yard 68 deg from square, the fore 62) she makes 5.34 kn at 66
+    deg off against 5.21 as built, and the 5.21 about 0.7 deg closer. The spec's quarter
+    point is the xfail below."""
+    same = speed_at(frigate_sweep, 66.0)
+    assert speed_at(frigate_catharpins_sweep, 66.0) > same + 0.05
+    assert 66.0 - off_at(frigate_catharpins_sweep, same) > 0.0
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "Owner's ruling (spec 3b §9, truth 31). With the main catharpins swiftered in she "
+        "makes 5.34 kn at 66 deg off in 15 knots against 5.21, and the 5.21 only about 0.7 "
+        "deg closer, not a quarter point: one yard of twelve braced four degrees sharper, and "
+        "no headed stream to reward the after yards (trim.EASE_HEAD_YARDS). "
+        "CATHARPIN_GAIN_DEG = 4 (ship/parts.py) moves it; Hardy's other measures are the "
+        "spec's open item 5. See docs/dev/TuningNotes.md."
+    ),
+)
+def test_truth_31_a_quarter_point_closer(frigate_sweep, frigate_catharpins_sweep):
+    same = speed_at(frigate_sweep, 66.0)
+    assert 66.0 - off_at(frigate_catharpins_sweep, same) >= POINT / 4
+
+
+# 32: pointing by ship
+
+
+def closest_holding_two_thirds(sweep: list[dict], beam_reach_kn: float) -> float:
+    """The closest heading of a sweep, in degrees off the true wind, at which she still
+    makes more than two thirds of her speed with the wind abeam."""
+    return min(r["off"] for r in sweep if r["speed"] > 2.0 * beam_reach_kn / 3.0)
+
+
+def test_truth_32_the_frigate_lies_about_six_points_and_the_schooner_about_five(
+    frigate_sweep, schooner_sweep, frigate_polar, schooner_polar
+):
+    """Fincham 1843, art. 102: Hardy's long ships "could seldom lie within six points of the
+    wind"; a topsail schooner nearer five (Chapelle; docs/references/RigGeometryNotes.md).
+    Measured as the spec says: the closest heading at which speed holds above two thirds of
+    her beam-reach speed, under plain sail in 15 knots with the yards trimmed. At seed 7 the
+    frigate 68 deg (8.0 kn abeam, 5.56 there), six points; the schooner 56 deg (7.9 kn
+    abeam, 5.52 there), five points."""
+    frigate = closest_holding_two_thirds(frigate_sweep, frigate_polar[90]["speed"])
+    schooner = closest_holding_two_thirds(schooner_sweep, schooner_polar[90]["speed"])
+    assert 5.5 * POINT <= frigate <= 6.5 * POINT, f"frigate {frigate:.0f} deg"
+    assert 4.5 * POINT <= schooner <= 5.5 * POINT, f"schooner {schooner:.0f} deg"
+    assert schooner <= frigate - POINT / 2
+
+
+# 33: adjacent yards
+
+
+def test_truth_33_one_yard_braced_away_from_its_neighbours_is_refused_and_the_mast_is_not():
+    """Spec 3b §5 (spec M0-M2 §12 item 8): the clearance between two yards on a mast with a
+    sail set on them is computed from their lengths, with a floor of ten degrees. Close-
+    hauled under plain sail, the main topsail yard alone cannot be squared, and the refusal
+    says why; the main yards together are squared."""
+    from freesail.orders.verbs import adjacent_yard_max_diff
+
+    world = close_hauled_on_starboard(FRIGATE)
+    ship = world.ship
+    lower, upper = ship.spars["main.yard"], ship.spars["main.topsail.yard"]
+    apart = round(math.degrees(abs(lower.brace_angle)))
+    most = round(math.degrees(adjacent_yard_max_diff(lower, upper)))
+    refused = world.submit("brace the main topsail yard square")
+    assert refused.kind == "order.rejected"
+    assert refused.data["reason"] == (
+        "The main topsail yard cannot be braced so far from the main yard while the main "
+        f"topsail is set ({apart}° apart, {most}° at most); brace the main yards together, "
+        "or clew up the main topsail."
+    )
+    accepted = world.submit("brace the main yards square")
+    assert accepted.kind != "order.rejected"
+    run(world, 240)
+    for yid in ship.groups["main yards"]:
+        assert ship.spars[yid].brace_angle == pytest.approx(0.0, abs=1e-6), yid
