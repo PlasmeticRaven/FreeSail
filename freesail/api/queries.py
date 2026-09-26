@@ -1,8 +1,12 @@
 """Read-only state queries for views and agents: the snapshot and the ship graph.
 
 `snapshot(world)` is the state a view redraws from (spec §9.4): the clock,
-the hull's motion, the wind, every sail, spar and line, and the evolutions
-in progress. `ship_graph(ship)` is what a view *builds* from once: every
+the hull's motion, the wind, every sail, spar and line, the evolutions in
+progress, and the watch (`crew`, spec M3 §5.2; None for a ship without a
+crew). The crew's lines for the console's `state` and its `muster` are here
+too (`watch_lines`, `sail_set_line`, `muster_lines`).
+
+`ship_graph(ship)` is what a view *builds* from once: every
 spar with its class, position and dimensions, every sail with its roles
 and area, the hull's dimensions, groups and aliases. Both are plain
 dictionaries of SI numbers; the client converts for display.
@@ -17,9 +21,11 @@ from typing import Any
 
 from freesail import units
 from freesail.core.world import World
+from freesail.crew import bill
+from freesail.crew.model import Crew, Sailor, Station, Watch
 from freesail.physics.sails import SAIL_CLASSES
 from freesail.ship.graph import Ship
-from freesail.ship.parts import Line, Sail, Spar
+from freesail.ship.parts import Line, Sail, SailState, Spar
 
 
 def _spar_state(s: Spar) -> str:
@@ -84,6 +90,7 @@ def snapshot(world: World) -> dict[str, Any]:
         out["spars"] = []
         out["lines"] = []
         out["evolutions_in_progress"] = []
+        out["crew"] = None
         return out
 
     d = ship.dyn
@@ -141,6 +148,7 @@ def snapshot(world: World) -> dict[str, Any]:
     ]
     runner = ship.extra.get("evolutions")
     out["evolutions_in_progress"] = list(runner.in_progress()) if runner is not None else []
+    out["crew"] = crew_state(world)
     return out
 
 
@@ -209,3 +217,137 @@ def ship_graph(ship: Ship) -> dict[str, Any]:
         "groups": {g: list(m) for g, m in ship.groups.items()},
         "aliases": dict(ship.aliases),
     }
+
+
+# ---------------------------------------------------------------------------
+# The ship's company (spec M3 §5.2)
+# ---------------------------------------------------------------------------
+
+# Fatigue means are given to three places: finer than the eye can use, coarse enough that a
+# snapshot does not change every tick for a hand standing idle.
+FATIGUE_DECIMALS = 3
+
+
+def _crew(world: World) -> Crew | None:
+    extra = getattr(world.ship, "extra", None) or {}
+    crew = extra.get("crew")
+    return crew if isinstance(crew, Crew) else None
+
+
+def _mean_fatigue(sailors: list[Sailor]) -> float:
+    if not sailors:
+        return 0.0
+    return round(sum(s.fatigue for s in sailors) / len(sailors), FATIGUE_DECIMALS)
+
+
+def _at_work(world: World) -> list[dict[str, Any]]:
+    """The work that holds hands now, in the order it was given: evolution, subject, hands."""
+    runner = (getattr(world.ship, "extra", None) or {}).get("evolutions")
+    if runner is None:
+        return []
+    return [
+        {"evolution": e["id"], "subject": e["subject"], "hands": e["hands"]}
+        for e in runner.in_progress()
+        if e.get("hands")
+    ]
+
+
+def crew_state(world: World) -> dict[str, Any] | None:
+    """The watch for the snapshot: who has the deck, how many are there and at what, and
+    how tired the deck and the watch below are. None when the ship has no crew."""
+    crew = _crew(world)
+    if crew is None:
+        return None
+    when = world.clock
+    deck = bill.on_deck(crew, when)
+    below = bill.below(crew, when)
+    turned = sorted(
+        {s.watch.value for s in crew.sailors if s.turned_up and s.watch is not Watch.NONE}
+    )
+    return {
+        "watch_on_deck": bill.watch_on_deck(crew, when).value,
+        "on_deck": len(deck),
+        "idle": sum(1 for s in deck if s.at is None),
+        "at_work": _at_work(world),
+        "all_hands": crew.all_hands_called,
+        "fatigue_mean_on_deck": _mean_fatigue(deck),
+        "fatigue_mean_below": _mean_fatigue(below),
+        "idlers_up": bill.idlers_up(when),
+        "turned_up": turned,
+    }
+
+
+def _work_words(world: World, entry: dict[str, Any]) -> str:
+    """'12 at the fore topsail', '180 tacking ship'."""
+    from freesail.evolutions.runner import gerund, part_name
+
+    ship = world.ship
+    n = entry["hands"]
+    if entry["subject"] in ship.parts:
+        return f"{n} at the {part_name(ship, entry['subject'])}"
+    verb = entry["evolution"].replace("_", " ")
+    first, _, rest = verb.partition(" ")
+    rest = rest or ("ship" if first in ("tack", "wear") else "")
+    return f"{n} {gerund(first)} {rest}".rstrip()
+
+
+def watch_lines(world: World) -> list[str]:
+    """The console's `state` lines for the crew (spec M3 §5.2): the watch on deck, and
+    'All hands called' when they are. Empty for a ship without a crew."""
+    crew = _crew(world)
+    if crew is None:
+        return []
+    state = crew_state(world)
+    assert state is not None
+    work = state["at_work"]
+    busy = sum(w["hands"] for w in work)
+    line = f"Watch on deck: {state['watch_on_deck']}, {state['on_deck']} hands, "
+    if work:
+        line += f"{busy} at work ({', '.join(_work_words(world, w) for w in work)})"
+    else:
+        line += "none at work"
+    extras: list[str] = []
+    others = [w for w in state["turned_up"] if w != state["watch_on_deck"]]
+    if others and not crew.all_hands_called:
+        extras.append(f"the {' and '.join(others)} watch turned up")
+    if crew.by_station[Station.IDLERS]:
+        extras.append("idlers up" if state["idlers_up"] else "idlers below")
+    line += "".join(f"; {e}" for e in extras) + "."
+    lines = [line]
+    routine = (getattr(world.ship, "extra", None) or {}).get("routine")
+    if crew.all_hands_called:
+        by = " by the captain's order" if crew.all_hands_called_by_order else ""
+        lines.append(f"All hands called{by}.")
+    elif getattr(routine, "calling", False):
+        lines.append("All hands called; the watch below coming up.")
+    return lines
+
+
+def sail_set_line(ship: Any) -> str:
+    """'Sail set: ...' with the states milestone 3 added: a goose-winged sail is listed
+    with the set ones and says so; unbent sails and the spars sent down follow."""
+    drawing = [
+        s.id + (" (goose-winged)" if s.state is SailState.GOOSE_WINGED else "")
+        for s in ship.sails.values()
+        if s.is_set or (s.state is SailState.GOOSE_WINGED and not s.wrecked)
+    ]
+    line = "Sail set: " + (", ".join(drawing) if drawing else "none")
+    unbent = [s.id for s in ship.sails.values() if s.state is SailState.UNBENT]
+    if unbent:
+        line += "; unbent: " + ", ".join(unbent)
+    down = [
+        s.id
+        for s in ship.spars.values()
+        if s.sent_down and not (s.parent and ship.spars[s.parent].sent_down)
+    ]
+    if down:
+        line += "; sent down: " + ", ".join(down)
+    return line
+
+
+def muster_lines(world: World) -> list[str]:
+    """The muster (spec M3 §5.1): the watch bill station by station, and the posts."""
+    crew = _crew(world)
+    if crew is None:
+        return ["There is no ship's company mustered in this ship."]
+    return crew.describe(world.clock)

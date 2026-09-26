@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from freesail.evolutions.runner import gerund
 from freesail.orders import errors, verbs
 from freesail.orders.errors import (
     AmbiguousNounError,
@@ -72,6 +73,10 @@ def _group_evolution(
     texts: list[str] = []
     failed: list[str] = []
     ordered: set[str] = set()  # subjects already given an order by an earlier line
+    # the work in words, for the one line the runner writes if the group must wait for
+    # hands: "setting plain sail"
+    first, _, rest = order.verb.partition(" ")
+    group = f"{gerund(first)} {rest}".strip()
     for line in vocab.group_evolutions[order.verb]:
         try:
             sub = parse(ship, line, vocab)
@@ -85,8 +90,10 @@ def _group_evolution(
                 f"The group evolution '{order.verb}' lists '{line}', which is itself a group "
                 f"evolution; vocabulary.yaml must list plain orders."
             )
+        if "hands_from" in order.modifiers:
+            sub.modifiers["hands_from"] = order.modifiers["hands_from"]
         try:
-            kind, text, data = verbs.execute(ship, sub, vocab, frozenset(ordered))
+            kind, text, data = verbs.execute(ship, sub, vocab, frozenset(ordered), group)
         except (UnknownNounError, NothingToDoError):
             continue
         except OrderError as e:

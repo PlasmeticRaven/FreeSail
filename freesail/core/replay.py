@@ -35,7 +35,13 @@ def build_world(data: dict[str, Any], ship_factory: ShipFactory | None = None) -
     """Construct the world at tick 0 from a save, without running it."""
     scenario = Scenario.from_dict(data["scenario"])
     ship = ship_factory(data["ship_ref"], scenario) if ship_factory else None
-    return World(seed=data["seed"], scenario=scenario, ship=ship)
+    world = World(seed=data["seed"], scenario=scenario, ship=ship)
+    # Systems that need the World itself (the crew, mustered from its seed and kept by its
+    # clock) are attached now, before the first order, as `make_world` attaches them.
+    on_world = (getattr(ship, "extra", None) or {}).pop("on_world", None)
+    if on_world is not None:
+        on_world(world)
+    return world
 
 
 def replay(

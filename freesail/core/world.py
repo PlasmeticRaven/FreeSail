@@ -206,11 +206,23 @@ class World:
         }
 
     def summary_lines(self) -> list[str]:
+        """The console's `state`: the clock, the wind, the ship's own lines and, with a
+        crew, the watch (spec M3 §5.2). The ship's 'Sail set' line is written afresh so
+        that it shows the milestone 3 states (goose-winged, unbent, spars sent down)."""
+        from freesail.api import queries
+
+        ship_lines = list(self.ship.summary_lines())
+        if hasattr(self.ship, "sails"):
+            ship_lines = [
+                queries.sail_set_line(self.ship) if ln.startswith("Sail set:") else ln
+                for ln in ship_lines
+            ]
         return [
             self.clock.stamp(),
             f"Wind {self.wind.describe()}, "
             f"{units.describe_wind_strength(self.wind.effective_speed)}",
-            *self.ship.summary_lines(),
+            *ship_lines,
+            *queries.watch_lines(self),
         ]
 
     # -- save ----------------------------------------------------------------

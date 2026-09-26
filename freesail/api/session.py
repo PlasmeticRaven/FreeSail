@@ -50,6 +50,12 @@ def make_ship(path: str | Path, scenario: Scenario | None = None) -> Ship:
 def make_world(seed: int, ship_path: str | Path, scenario: Scenario | None = None) -> World:
     scenario = scenario or Scenario()
     world = World(seed=seed, scenario=scenario, ship=make_ship(ship_path, scenario))
+    attach_crew(world)
+    return world
+
+
+def attach_crew(world: World) -> World:
+    """Muster the ship's company and attach the watch routine, if the ship file has a crew."""
     ship = world.ship
     if getattr(ship, "spec", None) is not None and ship.spec.crew is not None:
         from freesail.crew import muster
@@ -64,7 +70,14 @@ def make_world(seed: int, ship_path: str | Path, scenario: Scenario | None = Non
 
 
 def ship_factory(ship_ref: dict[str, Any], scenario: Scenario) -> Any:
-    """For replay: rebuild the ship a save refers to. Point ships return None (the default)."""
+    """For replay: rebuild the ship a save refers to. Point ships return None (the default).
+
+    The crew is mustered from the World's seed, which the ship does not know yet; the
+    replay calls `attach_crew` once the World exists (``ship.extra["on_world"]``), so a
+    replayed voyage has the same company as the one saved (spec M3 §2.4).
+    """
     if ship_ref.get("type") == "file":
-        return make_ship(ship_ref["path"], scenario)
+        ship = make_ship(ship_ref["path"], scenario)
+        ship.extra["on_world"] = attach_crew
+        return ship
     return None

@@ -217,6 +217,9 @@ class Runner:
         self.instances: list[Instance] = []
         self._counter = 0
         self._last_factor = 1.0
+        # Groups of evolutions from one order ("setting plain sail") that have said once
+        # that they must wait for hands (package 20): the rest of the group waits quietly.
+        self._groups_waiting: set[str] = set()
         # The ship's clock, for the watch bill: the composer sets it to the World's clock.
         # None reads the bill at DEFAULT_WATCH_TIME.
         self.clock: Any | None = None
@@ -282,6 +285,9 @@ class Runner:
         self._last_factor = weather_factor(wind.effective_speed, ship.dyn.heel)
         crew = self._crew(ship)
         if crew is not None:
+            calls = ship.extra.get("watch_calls")  # a watch turned up by an order (package 20)
+            if calls:
+                calls[:] = [c for c in calls if c.tick(self.clock or DEFAULT_WATCH_TIME)]
             self._top_up_all_hands(crew)
         for inst in list(self.instances):
             if inst.waiting or inst.paused:
@@ -615,6 +621,9 @@ class Runner:
     def _remove(self, ship: Ship, inst: Instance) -> None:
         if inst in self.instances:
             self.instances.remove(inst)
+        group = inst.params.get("group")
+        if group and not any(i.params.get("group") == group for i in self.instances):
+            self._groups_waiting.discard(group)
         crew = self._crew(ship)
         if crew is not None and inst.assignment is not None:
             hands.release(crew, inst.inst_id)
@@ -630,6 +639,13 @@ class Runner:
     def _on_deck(self, crew: Crew) -> list:
         when = self.clock if self.clock is not None else DEFAULT_WATCH_TIME
         return bill.on_deck(crew, when)
+
+    def _pool(self, crew: Crew, inst: Instance) -> list:
+        """The hands on deck an instance may draw on: the watch or station its order named
+        (``params["hands_from"]``, package 20), else all of them."""
+        pick = inst.params.get("hands_from")
+        deck = self._on_deck(crew)
+        return [s for s in deck if pick in (s.watch.value, s.station.value)] if pick else deck
 
     @staticmethod
     def _aloft(inst: Instance) -> bool:
@@ -675,7 +691,7 @@ class Runner:
             self._top_up_all_hands(crew)  # the ship's whole attention: see §3.4
         got = hands.request(
             crew,
-            self._on_deck(crew),
+            self._pool(crew, inst),
             inst.inst_id,
             want,
             self._subject_mast(ship, inst),
@@ -685,9 +701,20 @@ class Runner:
             inst.waiting = True
             inst.waiting_for = WAITING_FOR_HANDS
             if not inst.wait_line:
-                inst.wait_line = self._waiting_line(ship, inst, got)
+                # Of a group from one order, the first to wait says so for all, notable;
+                # the rest say it routine (package 20). An order given singly is notable.
+                group = inst.params.get("group")
+                severity = "notable"
+                if group and group in self._groups_waiting:
+                    severity = "routine"
+                    inst.wait_line = self._waiting_line(ship, inst, got)
+                elif group:
+                    self._groups_waiting.add(group)
+                    inst.wait_line = self._group_waiting_line(ship, inst, group)
+                else:
+                    inst.wait_line = self._waiting_line(ship, inst, got)
                 data = self._hands_data(inst, got)
-                ship.note("notable", "evolution.waiting", inst.wait_line, inst.subject_id, data)
+                ship.note(severity, "evolution.waiting", inst.wait_line, inst.subject_id, data)
             return False
         inst.assignment = got
         inst.all_hands = want.all_hands
@@ -721,6 +748,15 @@ class Runner:
                 else f"there are but {number_words(spare)} to spare"
             )
         return f"Not hands enough on deck to {self._describe(inst)}; {rest}."
+
+    def _group_waiting_line(self, ship: Ship, inst: Instance, group: str) -> str:
+        """'Setting plain sail: not hands enough for all at once; the watch takes the sails
+        in turn.'"""
+        crew = self._crew(ship)
+        who = "the hands take" if crew is not None and crew.all_hands_called else "the watch takes"
+        what = "the sails" if isinstance(inst.subject, Sail) else "them"
+        head = group[:1].upper() + group[1:]
+        return f"{head}: not hands enough for all at once; {who} {what} in turn."
 
     @staticmethod
     def _hands_data(inst: Instance, got: hands.Assignment) -> dict[str, Any]:
@@ -772,7 +808,7 @@ class Runner:
             return
         got = hands.request(
             crew,
-            self._on_deck(crew),
+            self._pool(crew, inst),
             inst.inst_id,
             self._want(inst),
             self._subject_mast(ship, inst),

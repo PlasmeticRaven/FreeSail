@@ -289,6 +289,37 @@ verbs:
     synonyms: [scandalize, drop the peak of, scandalise the peak of]
     object: sail
     level: 1
+  # Milestone 3 (package 20): the crew orders (spec M3 §5.1). They reach the
+  # watch routine at once, not through the evolution runner: a call for all
+  # hands must not queue behind the very tack it is meant to help.
+  call all hands:
+    # "All hands!" is the boatswain's call at the hatchways (Luce 1884,
+    # ch. XX, 'Organization': the watch below "called" and "turned up").
+    synonyms: [all hands, all hands on deck, call all hands on deck, turn the hands up,
+               turn up all hands, turn up the hands, turn all hands up]
+    object: none
+    level: 1
+  pipe down:
+    # "... clear up the decks and pipe down" ends every all-hands evolution in
+    # Luce (ch. XXIII, XXIV); the watch below goes below.
+    synonyms: [pipe the watch below, pipe the hands down, pipe down the hands,
+               send the watch below, pipe down all hands]
+    object: none
+    level: 1
+  relieve the watch:
+    # An early watch change (Luce 1884, 'The Officer of the Deck': "relieve
+    # the watch" and have the watch on deck mustered).
+    synonyms: [relieve the deck, change the watch]
+    object: none
+    level: 1
+  # A query, not an order: the console answers it with the watch bill, as it
+  # answers `state`, and it is never journaled. Should it reach the ship (the
+  # browser's command line), the ship says it is the console's.
+  muster:
+    synonyms: [muster the crew, muster the hands, muster the ship's company, muster the watch,
+               muster the watch bill]
+    object: driver
+    level: driver
   # Group evolutions: verb phrases with no object, expanded from the list below.
   set plain sail:
     synonyms: [make plain sail, make sail]
@@ -555,3 +586,33 @@ group_evolutions:
     - take in the topgallants
     - take in the gaff topsail
     - reef the topsails, one reef
+
+# ---------------------------------------------------------------------------
+# Hands selectors (spec M3 §5.1): which hands an order sets to work, said as
+# "send the larboard watch aloft to furl the main course", "send the fore
+# topmen to loose the fore topsail", or "... with the starboard watch" after
+# any order that sets men to work. The request is filled from those hands
+# only; a watch that is below is turned up for it. Each phrase names a watch
+# (starboard, larboard) or a station of the ship file (fore_top, afterguard...).
+# The names are the watch bill's (Luce 1884, ch. XX, 'Watch, Quarter and
+# Station Bills').
+# ---------------------------------------------------------------------------
+hands_selectors:
+  starboard watch: starboard
+  larboard watch: larboard
+  port watch: larboard
+  forecastlemen: forecastle
+  forecastle men: forecastle
+  fore topmen: fore_top
+  foretopmen: fore_top
+  main topmen: main_top
+  maintopmen: main_top
+  mizzen topmen: mizzen_top
+  mizen topmen: mizzen_top
+  afterguard: afterguard
+  afterguards: afterguard
+  waisters: waisters
+  marines: marines
+  idlers: idlers
+# Words between "send the ... " and the order: "aloft to", "forward to", "to".
+send_directions: [aloft, up aloft, up, forward, aft, on deck, into the tops, into the rigging]
