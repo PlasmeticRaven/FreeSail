@@ -6,8 +6,12 @@
 # the swinging boom, topped up and guyed out forward instead (ch. XX, 'To Rig
 # Out and In Lower Booms'); the game makes no difference.
 #
-# The boom's state is the spar's `rigged_out`; every boom starts rigged out,
-# as milestone 2 had them.
+# The boom's state is the spar's `rigged_out`. Milestone 3b (spec 3b §7): every
+# boom starts rigged in, as at sea, and the ship files say so (tools/gen_ships.py);
+# `set` on a studding sail whose boom is in answers with set_studding's reason. The
+# lee boom will not go out past the lee rigging on a yard braced beyond 45 degrees
+# (freesail/orders/verbs.py, BOOM_FOUL_BRACE_DEG): the model has no spar collision
+# to find it, so the order is refused in words there.
 id: rig_out_studdingsail_boom
 verb: rig_out
 applies_to: {class: studdingsail_boom}

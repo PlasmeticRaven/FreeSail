@@ -51,7 +51,7 @@ Every evolution asks for so many hands of a rating from its stations (setting a 
 
 ## All hands and piping down
 
-**All hands!** turns the watch below out of their hammocks. They come up over a minute and a half, a third at once and the rest by the ladders, and the log marks it notable. Tacking, wearing and reefing topsails are all-hands work and call them by themselves: the work the watch had in hand is **belayed** while she goes about (*Belayed setting the starboard fore topmast studdingsail: all hands about ship.*) and taken up again after, and when the tack is done the hands are **piped down** and the watch below goes below. Called by the captain, all hands stay up until he pipes them down himself. `pipe down` is refused while the hands are still about ship. A call at night costs the watch below their sleep, and the morning watch is slower for it.
+**All hands!** turns the watch below out of their hammocks. They come up over a minute and a half, a third at once and the rest by the ladders, and the log marks it notable. Tacking, wearing and reefing topsails are all-hands work and call them by themselves: the work the watch had in hand is **belayed** while she goes about (*Belayed setting the fore topgallant: all hands about ship.*) and taken up again after, and when the tack is done the hands are **piped down** and the watch below goes below. Called by the captain, all hands stay up until he pipes them down himself. `pipe down` is refused while the hands are still about ship. A call at night costs the watch below their sleep, and the morning watch is slower for it.
 
 ```orders frigate
 call all hands

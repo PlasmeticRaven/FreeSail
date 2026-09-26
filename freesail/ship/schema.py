@@ -273,6 +273,8 @@ class SparSpec:
     brace_limit_deg: float | None = None  # yards
     rake_deg: float | None = None  # masts: positive rakes aft, negative forward (a polacre's fore)
     rating_kn: float | None = None
+    # studding sail booms: rigged out at the start or not (spec 3b §7); None takes the default
+    rigged_out: bool | None = None
 
     @property
     def parent(self) -> str | None:
@@ -479,7 +481,26 @@ def _parse_spar(s: Any, i: int, source: str) -> SparSpec:
         brace_limit_deg=_num(s, "brace_limit_deg", where, source, required=False),
         rake_deg=_num(s, "rake_deg", where, source, required=False),
         rating_kn=_num(s, "rating_kn", where, source, required=False),
+        rigged_out=_rigged_out(s, cls, where, source),
     )
+
+
+def _rigged_out(s: dict, cls: str, where: str, source: str) -> bool | None:
+    """A studding sail boom's starting state (spec 3b §7), if the file gives one."""
+    value = s.get("rigged_out")
+    if value is None:
+        return None
+    if not isinstance(value, bool):
+        raise ShipFileError(
+            f"{source}: {where} has rigged_out = {value!r}; say true (run out along its yard) "
+            "or false (rigged in)."
+        )
+    if cls != "studdingsail_boom":
+        raise ShipFileError(
+            f"{source}: {where} is a {cls.replace('_', ' ')}; only a studding sail boom is "
+            "rigged out or in."
+        )
+    return value
 
 
 def _parse_sail(s: Any, i: int, source: str) -> SailSpec:

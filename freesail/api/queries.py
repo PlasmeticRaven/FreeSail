@@ -121,6 +121,7 @@ def snapshot(world: World) -> dict[str, Any]:
             "side": s.side_force_kn,
             "strain_ratio": s.strain_ratio,
             "backed": s.backed,
+            "shivering": s.shivering,  # a studding sail too near the wind (spec 3b §7)
             "sheet_angle": s.sheet_angle,
         }
         for s in ship.sails.values()
@@ -133,6 +134,7 @@ def snapshot(world: World) -> dict[str, Any]:
             "condition": s.condition,
             "strain_ratio": s.strain_ratio,
             "brace_angle": s.brace_angle,
+            "rigged_out": s.rigged_out,  # studding sail booms (spec 3b §7); true for the rest
         }
         for s in ship.spars.values()
     ]
@@ -165,6 +167,7 @@ def _spar_entry(s: Spar) -> dict[str, Any]:
         "brace_limit": s.brace_limit,
         "rake": s.rake,
         "rating_kn": s.rating_kn,
+        "rigged_out": s.rigged_out,  # studding sail booms (spec 3b §7); true for the rest
     }
 
 
@@ -187,7 +190,15 @@ def _sail_entry(s: Sail) -> dict[str, Any]:
 
 
 def _line_entry(ln: Line) -> dict[str, Any]:
-    return {"id": ln.id, "class": ln.cls, "of": ln.of, "side": ln.side, "state": ln.state.value}
+    # `hauled`: a bowline's hauled out or not (spec 3b §4), drawn faintly when it is (§8)
+    return {
+        "id": ln.id,
+        "class": ln.cls,
+        "of": ln.of,
+        "side": ln.side,
+        "state": ln.state.value,
+        "hauled": ln.hauled,
+    }
 
 
 def ship_graph(ship: Ship) -> dict[str, Any]:

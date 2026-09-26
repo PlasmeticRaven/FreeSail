@@ -116,6 +116,83 @@ def steady_out_bowlines(ship: Ship, sail_ids: list[str], sign: float) -> bool:
     return any_hauled
 
 
+# The studding sails in before going about (milestone 3b, spec 3b §7). Luce's tacking and
+# wearing begin with them in (RigGeometryNotes §5), and his words for taking them in with
+# all hands are "Stand by to take in the stun'sails ...! Haul taut! IN STUN'SAILS ... Rig in
+# and get alongside the booms ... make up and stow away the studding-sails" (Luce 1884,
+# ch. XXVII, 'Going large under all sail, to round to under single reefs'; ch. XXXIV,
+# 'Having a leading wind, to run in and anchor': "Haul taut! IN STUDDING-SAILS"). The time:
+# the watch's own evolutions', all at once with all hands: lowered away and hauled down (90
+# s, data/evolutions/take_in_studding.yaml) and the booms rigged in (40 s,
+# rig_in_studdingsail_boom.yaml); the sails are made up while she goes about.
+STUDDING_IN_S = 90.0 + 40.0
+BOOMS_IN_S = 40.0  # the booms alone, their sails already in (rig_in_studdingsail_boom.yaml)
+_STUDDING_ALOFT = (
+    SailState.SET,
+    SailState.GOOSE_WINGED,
+    SailState.SHEETED,
+    SailState.LOOSED,
+    SailState.IN_THE_GEAR,
+)
+
+
+def studding_work(ship: Ship) -> tuple[list[Sail], list[Spar]]:
+    """The studding sails aloft (set, or on their way up or down) and the booms rigged
+    out: what a tack or a wear takes in first. Both empty: nothing to do."""
+    sails = [
+        s
+        for s in ship.sails.values()
+        if s.cls == "studding" and not s.wrecked and s.state in _STUDDING_ALOFT
+    ]
+    booms = [
+        b
+        for b in ship.spars.values()
+        if b.cls in parts.RIGGED_IN_CLASSES and b.rigged_out and not b.wrecked
+    ]
+    return sails, booms
+
+
+class StuddingSailsIn:
+    """The first all-hands work of a tack or a wear when studding sails are set or their
+    booms out: in studding-sails and rig in the booms, then the manoeuvre proper."""
+
+    def __init__(self, ship: Ship):
+        self.ship = ship
+        self.sails, self.booms = studding_work(ship)
+        self.duration_s = STUDDING_IN_S if self.sails else BOOMS_IN_S
+        self.progress = 0.0
+
+    @property
+    def needed(self) -> bool:
+        return bool(self.sails or self.booms)
+
+    def begin_words(self) -> str:
+        if self.sails:
+            return "Stand by to take in the studding-sails. Haul taut! In studding-sails!"
+        return "Rig in and get alongside the studding-sail booms."
+
+    def advance(self, dt: float, factor: float) -> bool:
+        """Work on; True when the sails are in and made up and the booms rigged in."""
+        self.progress = min(1.0, self.progress + dt / (self.duration_s * factor))
+        if self.progress < 1.0 - 1e-9:
+            return False
+        for sail in self.sails:
+            if not sail.wrecked and sail.state in _STUDDING_ALOFT:
+                sail.state = SailState.FURLED  # made up and stowed as she goes about
+        for boom in self.booms:
+            if not boom.wrecked:
+                boom.rigged_out = False
+        return True
+
+    def end_words(self) -> str:
+        if self.sails:
+            return "In studding-sails; rigged in and got alongside the booms."
+        return "Rigged in the studding-sail booms."
+
+    def remaining_s(self) -> float:
+        return (1.0 - self.progress) * self.duration_s
+
+
 def close_hauled_true_angle(ship: Ship) -> float:
     """The angle off the true wind at which this ship sails close-hauled."""
     return float(ship.extra.get("close_hauled_angle", 6 * POINT))
@@ -424,11 +501,23 @@ class TackScript(Script):
         self.new_course = ship.dyn.heading
         self.t_steady = 0.0
         self.bowlined: list[str] = []  # sails whose bowlines were hauled out before going about
+        self.studding: StuddingSailsIn | None = None
 
     def holds(self) -> set[str]:
         return {self.ship.name} | {y.id for y in self.head + self.after}
 
     def begin(self, words: dict[str, Any]) -> None:
+        # the studding sails first, if any are set or their booms out (spec 3b §7)
+        studding = StuddingSailsIn(self.ship)
+        if studding.needed:
+            self.studding = studding
+            self.phase = "in_studding_sails"
+            self.note(studding.begin_words())
+            return
+        self._ready_about()
+
+    def _ready_about(self) -> None:
+        self.t = 0.0  # the stays are timed from "ready about"
         dyn = self.ship.dyn
         self.sign = 1.0 if dyn.tack == "starboard" else -1.0
         self.bowlined = bowlines_hauled(self.ship)
@@ -440,6 +529,12 @@ class TackScript(Script):
         self.note("Ready about. Helm's a-lee; eased off the head sheets.", "helm.order")
 
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        if self.phase == "in_studding_sails":
+            assert self.studding is not None
+            if self.studding.advance(dt, factor):
+                self.note(self.studding.end_words())
+                self._ready_about()
+            return
         self.t += dt
         dyn = self.ship.dyn
         rel = wind_rel(self.ship, wind)
@@ -508,6 +603,8 @@ class TackScript(Script):
 
     def remaining_s(self) -> float:
         brace_s = self.timing_value("brace_s", 45.0)
+        if self.phase == "in_studding_sails" and self.studding is not None:
+            return self.studding.remaining_s() + 60.0 + 2 * brace_s + 30.0
         if self.phase == "helm_down":
             return 60.0 + 2 * brace_s + 30.0
         if self.phase == "mainsail_haul" and self.swing is not None:
@@ -554,11 +651,23 @@ class WearScript(Script):
         self.sign = 1.0 if ship.dyn.tack == "starboard" else -1.0
         self.new_course = ship.dyn.heading
         self.bowlined: list[str] = []  # sails whose bowlines were hauled out before wearing
+        self.studding: StuddingSailsIn | None = None
 
     def holds(self) -> set[str]:
         return {self.ship.name} | {y.id for y in self.head + self.after}
 
     def begin(self, words: dict[str, Any]) -> None:
+        # the studding sails first, if any are set or their booms out (spec 3b §7)
+        studding = StuddingSailsIn(self.ship)
+        if studding.needed:
+            self.studding = studding
+            self.phase = "in_studding_sails"
+            self.note(studding.begin_words())
+            return
+        self._up_helm()
+
+    def _up_helm(self) -> None:
+        self.t = 0.0  # the wear is timed from "up helm"
         dyn = self.ship.dyn
         self.sign = 1.0 if dyn.tack == "starboard" else -1.0
         dyn.helm_mode = HelmMode.HEADING
@@ -578,6 +687,12 @@ class WearScript(Script):
             self.note("Stand by to wear ship. Up helm; brace in the after yards.", "helm.order")
 
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        if self.phase == "in_studding_sails":
+            assert self.studding is not None
+            if self.studding.advance(dt, factor):
+                self.note(self.studding.end_words())
+                self._up_helm()
+            return
         self.t += dt
         dyn = self.ship.dyn
         rel = wind_rel(self.ship, wind)
@@ -625,7 +740,8 @@ class WearScript(Script):
                 self.finish()
 
     def remaining_s(self) -> float:
-        return max(0.0, self.timing_value("wear_estimate_s", 480.0) - self.t)
+        first = self.studding.remaining_s() if self.studding is not None else 0.0
+        return first + max(0.0, self.timing_value("wear_estimate_s", 480.0) - self.t)
 
     def words(self) -> dict[str, Any]:
         old = "starboard" if self.sign > 0 else "larboard"

@@ -33,6 +33,18 @@ How a sail is worked out (spec §7.1 to §7.3)
    simply collapses and gives no lift (heaving to with a jib held to weather
    needs a sail state this package does not have; see the report).
 
+Studding sails and the wind (milestone 3b, spec 3b §7)
+------------------------------------------------------
+A studding sail draws on its yard's brace like the sail beside it, but only with
+the wind free: forward of Luce's angle for its level (the studding class's stall
+in `data/sail_classes.yaml`, counted off the bow as the known truths count points
+of sail) its lift falls away over a point, it shakes in its gear with a loose
+sail's windage, and it flogs as the strain model counts flogging: worn at the
+flogging rate, its snatching doubled on its yard and its boom (`_apply_shaking`),
+so the boom strains and, kept so, carries away. Nothing refuses it. A studding
+sail with no side (the ringtail, the water sail) lies in its gaff sail's plane on
+the lee side, at that sail's sheet angle.
+
 Windage
 -------
 Furled sails, sails hanging in the gear, bare spars and wrecks all catch
@@ -60,14 +72,18 @@ from __future__ import annotations
 
 import bisect
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import yaml
 
 from freesail import units
-from freesail.physics.strain import baggy_luff  # package 22: the worn-canvas luff term
+from freesail.physics.strain import (  # package 22: the worn-canvas luff term
+    FLOGGING_DRAG_COEFFICIENT,
+    FLOGGING_LOAD_MULTIPLIER,
+    baggy_luff,
+)
 from freesail.ship.parts import Line, LineState, Sail, SailState, Spar
 
 if TYPE_CHECKING:
@@ -148,6 +164,11 @@ class SailClass:
     reef_factor: float
     furled_windage: float
     notes: str = ""
+    # The stall (milestone 3b, the studding class only): the wind's angle off the bow
+    # (radians, by level: "lower", "upper") forward of which the sail shivers, and the band
+    # over which its lift falls to nothing. Empty for a class that has none.
+    stall_wind: dict[str, float] = field(default_factory=dict)
+    stall_band: float = 0.0
 
     def coefficients(self, alpha: float, luff_gain: float = 0.0) -> tuple[float, float]:
         """(C_L, C_D) at an angle of attack in radians, folded to 0..pi/2.
@@ -189,6 +210,7 @@ def _load_tables(path: Path = DATA_PATH) -> tuple[dict[str, SailClass], dict]:
         lift, drag = tuple(map(float, c["lift"])), tuple(map(float, c["drag"]))
         if not (len(alpha) == len(lift) == len(drag)) or list(alpha) != sorted(alpha):
             raise ValueError(f"{path}: class '{name}' tables are ragged or not ascending.")
+        stall = c.get("stall") or {}
         classes[name] = SailClass(
             name=name,
             alpha=alpha,
@@ -198,6 +220,11 @@ def _load_tables(path: Path = DATA_PATH) -> tuple[dict[str, SailClass], dict]:
             reef_factor=float(c["reef_factor"]),
             furled_windage=float(c["furled_windage"]),
             notes=str(c.get("notes", "")).strip(),
+            stall_wind={
+                level: units.deg_to_rad(float(deg))
+                for level, deg in (stall.get("wind_deg") or {}).items()
+            },
+            stall_band=units.deg_to_rad(float(stall.get("band_deg", 0.0))),
         )
     return classes, raw["windage"]
 
@@ -212,6 +239,29 @@ WINDAGE_BY_STATE: dict[SailState, float] = {
 SPAR_AREA_FACTOR = float(WINDAGE["spar_area_factor"])
 SPAR_DRAG_COEFFICIENT = float(WINDAGE["spar_drag_coefficient"])
 WRECK_MULTIPLIER = float(WINDAGE["wreck_multiplier"])
+
+# Studding sails and the wind (milestone 3b, spec 3b §7): the studding class's stall, as
+# data/sail_classes.yaml gives it, with Luce's angles cited there. Degrees off the bow of
+# the true wind, by level: "lower" for the lower studding sails and the sails that take
+# their figure (the ringtail, the water sail, the save-alls), "upper" for the topmast and
+# topgallant studding sails.
+STUDDING_MIN_WIND_DEG = {
+    level: units.rad_to_deg(a) for level, a in SAIL_CLASSES["studding"].stall_wind.items()
+}
+STUDDING_STALL_BAND_DEG = units.rad_to_deg(SAIL_CLASSES["studding"].stall_band)
+# A shivering studding sail flogs as the strain model's parted-sheet sail does (strain.py,
+# FLOGGING_DRAG_COEFFICIENT and FLOGGING_LOAD_MULTIPLIER: the cloth's drag, doubled by the
+# snatching, on its yard and the spars beneath), but with all its cloth: held at its head,
+# tack and sheet, the whole sail shakes in its gear, where a sail whose sheet has parted
+# streams from its yard with a fifth of its cloth working (FLOGGING_AREA_FRACTION). Every
+# snatch comes on the boom end through the tack. Judgement: the figure that makes a boom
+# rated for its drawing sail in 18 knots (tools/gen_ships.py) strain when its sail shakes
+# in a moderate breeze, as studding sail booms were sprung when a ship came up with them
+# set (spec 3b §7).
+SHIVERING_AREA_FRACTION = 1.0
+# The flag and the log line do not flicker at the limit: a shivering sail is logged drawing
+# again only when the wind is this far abaft its limit (judgement: the helmsman's yaw).
+SHIVERING_HYSTERESIS_DEG = 1.0
 
 
 # ---------------------------------------------------------------------------
@@ -267,6 +317,7 @@ def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
 
     heel_cos = max(math.cos(dyn.heel), 0.0)
     _tend_bowlines(ship)
+    true_off = true_wind_off_bow(ship, wind)
     driving = [s for s in ship.sails.values() if _is_driving(ship, s)]
     flows = {s.id: _apparent(ship, wind, s.centre_height_m) for s in driving}
     blankets = _blanket_factors(ship, driving, flows)
@@ -286,15 +337,28 @@ def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
         chord, drive_normal = _chord(ship, sail, flow.awa)
         bowline = hauled_weather_bowline(ship, sail)
         gain = units.deg_to_rad(BOWLINE_LUFF_GAIN_DEG) if bowline is not None else 0.0
-        f_fwd, f_stb, backed = _plate_force(flow, area, chord, drive_normal, cls, sail, gain)
+        f_fwd, f_stb, backed = _plate_force(
+            flow, area, chord, drive_normal, cls, sail, gain, square_faced=not _in_gaff_plane(sail)
+        )
+        # the studding sails' stall (spec 3b §7): forward of Luce's angle the sail shakes in
+        # its gear; its lift falls away over a point and it flogs, a loose sail's windage
+        stall = studding_stall(ship, sail, true_off)
+        if stall > 0.0:
+            shake = WINDAGE_BY_STATE[SailState.LOOSED] * area * flow.q
+            f_fwd = (1.0 - stall) * f_fwd + stall * shake * flow.fwd
+            f_stb = (1.0 - stall) * f_stb + stall * shake * flow.stb
+            backed = False  # shaking, not aback
         force = math.hypot(f_fwd, f_stb)
 
         _record_backed(ship, sail, backed)
+        _record_shivering(ship, sail, stall, true_off)
         sail.area_effective_m2 = area
         sail.force_kn = force / 1000.0
         sail.thrust_kn = f_fwd / 1000.0
         sail.side_force_kn = f_stb / 1000.0
         _apply_loads(ship, sail, force / 1000.0)
+        if stall > 0.0:
+            _apply_shaking(ship, sail, stall * flow.q * area * SHIVERING_AREA_FRACTION)
         if bowline is not None:
             bowline.load_kn += BOWLINE_LOAD_FRACTION * force / 1000.0
 
@@ -323,6 +387,7 @@ def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
         if sail.id in driving_ids:
             continue
         sail.backed = False  # a sail that is not drawing cannot be aback
+        sail.shivering = False  # nor shake in its gear
         sail.area_effective_m2 = sail.force_kn = sail.thrust_kn = sail.side_force_kn = 0.0
         area = _sail_windage_area(ship, sail)
         if area > 0:
@@ -395,16 +460,132 @@ def _is_driving(ship: Ship, sail: Sail) -> bool:
 
 
 def _trim_yard(ship: Ship, sail: Sail) -> Spar | None:
-    """The yard whose brace sets this sail's angle: its own, or a stuns'l's parent yard."""
+    """The yard whose brace sets this sail's angle: its own, or a stuns'l's parent yard.
+    A studding sail with no side (the ringtail, the water sail) has none: it lies in its
+    gaff sail's plane (`_gaff_host`)."""
     yard = ship.yard_of(sail)
-    if yard is None and sail.cls == "studding":
+    if yard is None and sail.cls == "studding" and not _in_gaff_plane(sail):
         boom = ship.spar_of_role(sail, "boom")
         yard = ship.parent_of(boom) if boom is not None else None
     return yard
 
 
+# ---------------------------------------------------------------------------
+# Studding sails and the wind (spec 3b §7)
+# ---------------------------------------------------------------------------
+
+
+def _in_gaff_plane(sail: Sail) -> bool:
+    """A studding-class sail with no side: the ringtail abaft a gaff sail's leech, the
+    water sail under its boom (spec 3b §6.4). It extends the gaff sail, not a yard."""
+    return sail.cls == "studding" and sail.side is None
+
+
+def _gaff_host(ship: Ship, sail: Sail) -> Sail | None:
+    """The gaff sail whose plane a sideless studding sail lies in: the one on the boom its
+    own boom rigs out on (the ringtail's), or the boom it is spread under (the water
+    sail's). The one set, if any is (a storm trysail may be bent in the mainsail's place)."""
+    boom = ship.spar_of_role(sail, "boom")
+    if boom is not None and boom.cls == "studdingsail_boom":
+        boom = ship.parent_of(boom)
+    if boom is None:
+        return None
+    hosts = [
+        s
+        for s in ship.sails.values()
+        if s is not sail and s.is_fore_and_aft and s.roles.get("boom") == boom.id
+    ]
+    return next((s for s in hosts if s.is_set), hosts[0] if hosts else None)
+
+
+def true_wind_off_bow(ship: Ship, wind: Wind) -> float:
+    """The true wind's angle off the bow, radians 0..pi, unsigned: the angle Luce and the
+    known truths count points of sail by ("six points", "one point free")."""
+    vx, vy = wind.vector_at_height(10.0)
+    psi = ship.dyn.heading
+    t_fwd = vx * math.sin(psi) + vy * math.cos(psi)
+    t_stb = vx * math.cos(psi) - vy * math.sin(psi)
+    if math.hypot(t_fwd, t_stb) < 1e-9:
+        return math.pi  # no wind: nothing forward of any limit
+    return abs(math.atan2(-t_stb, -t_fwd))
+
+
+def studding_level(ship: Ship, sail: Sail) -> str:
+    """'lower' or 'upper' for the stall's angle (spec 3b §7): a studding sail beside a lower
+    yard's sail is a lower one, beside a topsail or topgallant an upper one; a sail with no
+    yard (the ringtail, the water sail) takes the lower's figure, as do the save-alls."""
+    yard = ship.yard_of(sail)
+    parent = ship.parent_of(yard) if yard is not None else None
+    return "upper" if parent is not None and parent.cls != "mast" else "lower"
+
+
+def studding_stall(ship: Ship, sail: Sail, off_bow: float) -> float:
+    """How far a studding sail is stalled, 0 (drawing) to 1 (all shaking), with the true
+    wind `off_bow` radians off the bow: nothing abaft its level's angle, all of it a point
+    (the band) forward of it, in a straight line between. Any other class: 0."""
+    if sail.cls != "studding":
+        return 0.0
+    cls = SAIL_CLASSES["studding"]
+    limit = cls.stall_wind.get(studding_level(ship, sail))
+    if limit is None or off_bow >= limit:
+        return 0.0
+    if cls.stall_band <= 0.0:
+        return 1.0
+    return min((limit - off_bow) / cls.stall_band, 1.0)
+
+
+def _record_shivering(ship: Ship, sail: Sail, stall: float, off_bow: float) -> None:
+    """Keep `sail.shivering` and log it as it starts and stops. It starts the moment the
+    wind is forward of the sail's angle and stops SHIVERING_HYSTERESIS_DEG abaft it."""
+    if sail.cls != "studding":
+        return
+    if stall > 0.0:
+        shivering = True
+    elif sail.shivering:
+        limit = SAIL_CLASSES["studding"].stall_wind.get(studding_level(ship, sail), 0.0)
+        shivering = off_bow < limit + units.deg_to_rad(SHIVERING_HYSTERESIS_DEG)
+    else:
+        shivering = False
+    if shivering == sail.shivering:
+        return
+    sail.shivering = shivering
+    from freesail.evolutions.runner import part_name  # local import, as scripts.py does
+
+    name = part_name(ship, sail.id)
+    name = name[:1].upper() + name[1:]
+    if shivering:
+        ship.note(
+            "notable",
+            "sail.shivering",
+            f"{name} shaking in its gear; she is too near the wind to carry it.",
+            subject=sail.id,
+        )
+    else:
+        ship.note("routine", "sail.drawing", f"{name} drawing again.", subject=sail.id)
+
+
+def _apply_shaking(ship: Ship, sail: Sail, drag_area_q: float) -> None:
+    """The snatching of a shivering studding sail (spec 3b §7), as the strain model loads a
+    sail whose sheet has parted (strain.py, `_load_flogging`): the cloth's flogging drag,
+    `drag_area_q` (newtons per unit drag coefficient) times FLOGGING_DRAG_COEFFICIENT, on
+    the cloth, and doubled by FLOGGING_LOAD_MULTIPLIER on the yard, the spars beneath it
+    and the boom whose end the tack is hauled out to."""
+    flog_kn = drag_area_q * FLOGGING_DRAG_COEFFICIENT / 1000.0
+    sail.load_kn += flog_kn
+    spars = list(ship.spar_chain(sail))
+    boom = ship.spar_of_role(sail, "boom")
+    if boom is not None and boom not in spars:
+        spars.append(boom)
+    for spar in spars:
+        if not (spar.wrecked or spar.sent_down):
+            spar.load_kn += FLOGGING_LOAD_MULTIPLIER * flog_kn
+
+
 def _chord_angle(ship: Ship, sail: Sail) -> float:
     """Unsigned angle of the sail's chord from the centreline, radians."""
+    if _in_gaff_plane(sail):
+        host = _gaff_host(ship, sail)
+        return min(abs(host.sheet_angle), math.pi / 2) if host is not None else 0.0
     if sail.cls in SQUARE_FAMILY:
         yard = _trim_yard(ship, sail)
         brace = yard.brace_angle if yard is not None else 0.0
@@ -417,15 +598,17 @@ def _chord(ship: Ship, sail: Sail, awa: float) -> tuple[float, tuple[float, floa
 
     The drive normal is the unit vector the air moves along when the sail is
     drawing as intended: forward through a square sail (wind on its after
-    face), to leeward through a fore-and-aft sail (wind on its weather face).
+    face), to leeward through a fore-and-aft sail (wind on its weather face). A
+    studding sail with no side lies in its gaff sail's plane on the lee side, at that
+    sail's sheet angle.
     """
-    if sail.cls in SQUARE_FAMILY:
+    if sail.cls in SQUARE_FAMILY and not _in_gaff_plane(sail):
         yard = _trim_yard(ship, sail)
         b = yard.brace_angle if yard is not None else 0.0
         # yard square: chord athwartships (pi/2); braced +b: starboard arm forward
         return math.pi / 2 - b, (math.cos(b), -math.sin(b))
     tack = 1.0 if awa >= 0 else -1.0  # sail lies on the lee side
-    gamma = tack * min(abs(sail.sheet_angle), math.pi / 2)
+    gamma = tack * _chord_angle(ship, sail)
     # normal pointing to leeward: the -tack side
     return gamma, (tack * math.sin(gamma), -tack * math.cos(gamma))
 
@@ -438,6 +621,7 @@ def _plate_force(
     cls: SailClass,
     sail: Sail,
     luff_gain: float = 0.0,
+    square_faced: bool = True,
 ) -> tuple[float, float, bool]:
     """Lift and drag on one sail, resolved into (forward, starboard) newtons.
 
@@ -445,6 +629,8 @@ def _plate_force(
     lift across it, toward the sail's lee side. Returns the force and whether
     a square sail is backed. `luff_gain` is a hauled bowline's (see
     `SailClass.coefficients`); it helps only a sail drawing on its after face.
+    `square_faced` false takes a studding-class sail lying in a gaff sail's plane
+    (the ringtail, the water sail) as fore-and-aft: wind on its lee face, it collapses.
     """
     d = (flow.fwd, flow.stb)
     c = (math.cos(chord), math.sin(chord))
@@ -457,7 +643,7 @@ def _plate_force(
     c_l, c_d = cls.coefficients(alpha, luff_gain if on_drive_face else 0.0)
     backed = False
     if not on_drive_face:
-        if sail.cls in SQUARE_FAMILY:
+        if sail.cls in SQUARE_FAMILY and square_faced:
             backed = alpha > cls.luff_angle  # wind on the fore face and filling it
         else:
             c_l, c_d = 0.0, cls.coefficients(0.0)[1]  # cloth collapses and flogs
@@ -561,6 +747,14 @@ def _lateral_offset(ship: Ship, sail: Sail, awa: float) -> float:
         yard = _trim_yard(ship, sail)
         reach = GOOSE_WINGED_SHIFT * (yard.length_m if yard is not None else 0.0)
         return reach if awa >= 0 else -reach
+    if _in_gaff_plane(sail):
+        # in the gaff sail's plane on the lee side (spec 3b §6.4): as far out as its centre
+        # lies abaft the mast along the boom, swung out by the sheet
+        host = _gaff_host(ship, sail)
+        mast = ship.mast_of(ship.spar_of_role(sail, "boom")) if host is not None else None
+        along = max(mast.x_m - sail.x_m, 0.0) if mast is not None else 0.0
+        lee = -1.0 if awa >= 0 else 1.0
+        return lee * along * math.sin(_chord_angle(ship, sail))
     if sail.cls == "studding":
         boom = ship.spar_of_role(sail, "boom")
         yard = _trim_yard(ship, sail)

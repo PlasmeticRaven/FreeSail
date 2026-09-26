@@ -510,6 +510,10 @@ def test_every_new_sail_loads_bends_sets_and_takes_in(path):
                 beside = ship.sail_of(ship.parent_of(boom))  # a ringtail: the gaff sail
             assert beside.state is not SailState.UNBENT
             work(runner, ship, wind, f"set_{beside.cls}", beside.id)
+            if not boom.rigged_out:  # a studding sail boom starts rigged in (spec 3b §7)
+                with pytest.raises(OrderError, match="boom is rigged in; rig it out first"):
+                    runner.start(ship, "set_studding", sid)
+                work(runner, ship, wind, "rig_out_studdingsail_boom", boom.id)
         work(runner, ship, wind, f"set_{sail.cls}", sid)
         assert sail.is_set, sid
         work(runner, ship, wind, f"take_in_{sail.cls}", sid)
@@ -532,6 +536,8 @@ def test_the_ringtail_and_water_sail_draw_running():
     for sid in ("ringtail", "water_sail"):
         runner.start(w.ship, "bend_sail", sid, {"sail": sid})
     w.run(900)
+    w.submit("rig out the ringtail boom")  # it starts rigged in (spec 3b §7); the main boom is out
+    w.run(120)
     w.submit("set the ringtail")
     w.submit("set the water sail")
     w.run(900)

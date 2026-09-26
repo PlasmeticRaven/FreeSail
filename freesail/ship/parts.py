@@ -118,6 +118,12 @@ class Part:
         return self.load_kn / self.rating_kn if self.rating_kn > 0 else 0.0
 
 
+# The spar classes that are rigged in and out (spec 3b §7): the studding sail booms, the
+# ringtail's among them. A gaff sail's `boom` is not: the water sail spread under the main
+# boom has nothing to rig out.
+RIGGED_IN_CLASSES = frozenset({"studdingsail_boom"})
+
+
 @dataclass
 class Spar(Part):
     x_m: float = 0.0
@@ -129,7 +135,12 @@ class Spar(Part):
     rake: float = 0.0  # radians, for masts: positive aft, negative forward
     brace_angle: float = 0.0  # radians; 0 square, +ve = braced up for the starboard tack
     sent_down: bool = False  # struck below (topgallant masts in a gale)
-    rigged_out: bool = True  # studding sail booms: run out along the yard, ready for the sail
+    # Studding sail booms (milestone 3b, spec 3b §7): run out along the yard, ready for the
+    # sail. A boom starts rigged in, as at sea: it is rigged out only to set its sail (Luce
+    # 1884, ch. XXIII: "Set taut! Rig out! Hoist away!"; RigGeometryNotes §5). Only the
+    # classes in RIGGED_IN_CLASSES take this default from the ship file; a gaff sail's
+    # boom is never rigged in, and reads as out (`from_spec`).
+    rigged_out: bool = False
     # Milestone 3b (spec 3b §3). `brace_limit` above is the limit the rigging allows
     # now, and every reader reads it; `rigged_brace_limit` is the ship file's, with the
     # lower rigging as rigged. They differ only for a lower yard whose mast has its
@@ -155,6 +166,11 @@ class Spar(Part):
             brace_limit=limit,
             rake=units.deg_to_rad(s.rake_deg or 0.0),
             rigged_brace_limit=limit,
+            # the ship file's starting state where it gives one; otherwise a studding sail
+            # boom (the ringtail's among them) starts rigged in and every other spar reads out
+            rigged_out=(
+                s.rigged_out if s.rigged_out is not None else s.cls not in RIGGED_IN_CLASSES
+            ),
         )
 
     @property
@@ -183,6 +199,9 @@ class Sail(Part):
     sheet_angle: float = 0.0  # radians from the centreline; fore-and-aft sails
     # physics outputs, refreshed each substep
     backed: bool = False
+    # A studding sail with the wind forward of its limit (spec 3b §7): lift going or gone,
+    # the cloth shaking in its gear; flogging as the strain model counts it (sails.py).
+    shivering: bool = False
     force_kn: float = 0.0
     thrust_kn: float = 0.0
     side_force_kn: float = 0.0
