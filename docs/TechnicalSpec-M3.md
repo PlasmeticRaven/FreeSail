@@ -315,3 +315,17 @@ Nothing in this table changes the milestone 3 packages beyond the fields in §2.
 13. **Goose-winging drawn true** (gate M3, owner). The view draws a goose-winged sail as half the sail on the weather side. The true picture is the lee clew hauled up to the yard and the weather clew sheeted home: the sail as a triangle from the weather clew to the yard, its foot rising to the lee yardarm's bunt. The projection has the yard's ends and the clews' positions, so it is a change of shape, not of data. Milestone 3b, with the view items.
 14. **The view's scale when spars come down** (gate M3, owner). The view fits the ship to the panel from the parts present, so sending down the topgallant masts shrank the gap they left. Fix the scale to the ship's full rig (the tallest mast in the ship file, sent down or not) so that a mast coming down leaves the sky it used to fill. Milestone 3b.
 
+## 11. Rulings at the close of gate M3 (owner, 2026-09-26), for milestone 3b
+
+- **Truth 18:** approved on the current tuning, the ratio as the truth. **The night's price** (0.20 a call) stands for now; a harsher penalty may follow tuning.
+- **Rig geometry data:** research first. Channel breadths, shroud spreads and the like come from new or reviewed sources (period treatises, plans, model photographs the owner can help read), named per value; and building the reference base this way is a standing principle, not a one-off.
+- **Costly and skilful practices:** bowlines are in from the start ("we'd be hard pressed without them"), with slacking the lee rigging and setting it up as the pair with a cost.
+- **Storm canvas:** as proposed; the schooner's storm trysail and storm jib as judgement.
+- **Suits:** three is the historical standard, but best and second should fall out of canvas condition under use rather than be types of their own; see the convergence below.
+- **Pointing truths:** the frigate about six points and the schooner nearer five as targets for now; tuning values are never immutable, and the physics, once robust, judges alongside the record.
+- **The 3b gate:** short, with the human verification step kept.
+- **Adjacent yards:** in 3b, checked against duplication with the aback and studding sail rules.
+- **Principle for all of 3b:** the historical record is the truth to compare against, but the engine should meet it through the physics and the parts wherever it can, and hard-coded rules only where the model has nothing to stand on.
+
+**Convergence on suits.** A sail is a part with a canvas number and a condition, and the sail room holds sails, not suits. "Best" and "second" are what the purser's book calls the newer and the more worn of two sails of a kind, so with wear modelled they fall out of use: the sail bent in fine weather wears, the one in the sail room does not, and shifting before a blow is the player choosing the sounder one. Storm sails are different parts, not a condition. So 3b builds canvas number, condition and wear, and the sail-room inventory, and no suit type.
+
