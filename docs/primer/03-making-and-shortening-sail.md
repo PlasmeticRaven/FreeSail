@@ -170,13 +170,14 @@ take in the studdingsails
 
 A studding sail comes in made up and stowed, so `take in` is enough; there is no `furl` for it.
 
-Each studding sail has its boom, run out along the yard by an in-and-out jigger before the sail can go up: "Set taut! Rig out! Hoist away!" (Luce 1884, ch. XXIII At Sea, 'The Topmast Studding-sail'). `rig out` and `rig in` take the boom or the studding sail it carries; a boom cannot be rigged in with its sail set, and a sail cannot be set on a boom rigged in ("The starboard fore topmast studdingsail boom is rigged in; rig it out first"). Every boom starts rigged out, as the booms were before they had orders of their own.
+Each studding sail has its boom, run out along the yard by an in-and-out jigger before the sail can go up: "Set taut! Rig out! Hoist away!" (Luce 1884, ch. XXIII At Sea, 'The Topmast Studding-sail'). `rig out` and `rig in` take the boom or the studding sail it carries; a boom cannot be rigged in with its sail set, and a sail cannot be set on a boom rigged in ("The starboard fore topmast studdingsail boom is rigged in; rig it out first"). Every boom starts rigged in, as at sea. With the yards braced up more than 45 degrees the lee boom will not go out past the lee rigging ("The fore topsail yard is braced too sharp for the boom to go out."), nor is a yard braced sharper with its lee boom out ("Rig in the studdingsail boom before bracing the fore topsail yard sharper."); the weather boom goes out, for the weather studding sails that Luce sets a point free.
 
 ```orders frigate plain-sail
-rig in the starboard fore topmast studdingsail boom
 rig out the starboard fore topmast studdingsail boom
+rig in the starboard fore topmast studdingsail boom
 rig in the fore topmast studdingsails, both sides
-rig out the lee fore topmast studdingsail
+rig out the weather fore topmast studdingsail
+# rejected: rig out the lee fore topmast studdingsail
 # rejected: rig out the fore topsail
 ```
 

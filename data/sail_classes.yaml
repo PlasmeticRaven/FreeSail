@@ -120,15 +120,35 @@ classes:
     luff_angle_deg: 18
     reef_factor: 0.0
     furled_windage: 0.0
+    # Milestone 3b (spec 3b §7): the stall. A studding sail set flying beyond the yardarm,
+    # held only at its head, tack and sheet, cannot be flattened as the sail on the yard is:
+    # with the wind drawn too far forward it shakes in its gear whatever the brace. Luce 1866
+    # ch. XXIII (line 26509) and 1884 ch. XXIII (line 28668): "The weather topmast and
+    # topgallant studding-sails may be set with the wind one point free, or forming an angle
+    # of seven points with the keel. The lower studding-sail can only be used to advantage
+    # with the wind abaft the beam." The angles are the wind's off the bow, counted as Luce
+    # counts close-hauled ("one point free" is a point off the six-point close-hauled
+    # course), that is the true wind, as the known truths count points of sail: see
+    # physics/sails.py, `studding_stall`. Forward of its angle the sail shivers and flogs
+    # (the strain model's flogging: sails.py), its lift falling to nothing a point further
+    # forward (band_deg, judgement: a sailor reckons the wind in points, and within a point
+    # of its limit the weather leech lifts before the whole sail shakes).
+    stall:
+      wind_deg:
+        lower: 90.0    # "abaft the beam": eight points (Luce, as above)
+        upper: 78.75   # topmast and topgallant: seven points (Luce, as above)
+      band_deg: 11.25  # one point
     notes: >
       Light extra sails boomed out beyond the yardarms in fair weather. They
       hang from their parent yard's angle, so they trim as it does. Light
       cloth set flat in clear air beyond the yardarms: the peak is tuned
       above the square sail's (package 10, truth 14: the frigate's studding
       sails add 15 per cent on a broad reach in ten knots; the lee side's
-      are blanketed by the weather side's), and they drag more. Nothing
-      useful close-hauled. They are stowed inboard when not set, so no
-      windage.
+      are blanketed by the weather side's), and they drag more. Forward of
+      Luce's angles they shiver and flog (the stall above): nothing useful
+      close-hauled. They are stowed inboard when not set, so no windage.
+      The ringtail, water sail and save-alls are of this class; the first
+      two, having no side, lie in their gaff sail's plane on the lee side.
 
 # Windage: what the wind pushes on that is not a drawing sail (spec §7.5 and
 # the SailForces contract). Fractions of a sail's area by state, except that

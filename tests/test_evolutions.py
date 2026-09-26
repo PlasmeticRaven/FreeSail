@@ -306,6 +306,12 @@ def test_every_sail_runs_its_evolutions_to_completion(path):
             with pytest.raises(OrderError, match="until the sail on its yard is set"):
                 runner.start(ship, "set_studding", sail.id)
             set_sail(runner, ship, wind, on_yard.id)
+        boom = ship.spar_of_role(sail, "boom")
+        if not boom.rigged_out:  # milestone 3b: the booms start rigged in (spec 3b §7)
+            with pytest.raises(OrderError, match="boom is rigged in; rig it out first"):
+                runner.start(ship, "set_studding", sail.id)
+            runner.start(ship, "rig_out_studdingsail_boom", boom.id)
+            run(runner, ship, wind)
         runner.start(ship, "set_studding", sail.id)
         _, notes = run(runner, ship, wind)
         assert sail.state is SailState.SET and "sail.set" in kinds(notes)

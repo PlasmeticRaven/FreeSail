@@ -396,6 +396,12 @@ class Builder:
     def spar(self, id, cls, note=None, **kw):
         d = {"id": id, "class": cls}
         d.update({k: v for k, v in kw.items() if v is not None})
+        if cls == "studdingsail_boom":
+            # Milestone 3b (spec 3b §7): every studding sail boom, the ringtail's among them,
+            # starts the voyage rigged in, as at sea; it is rigged out to set its sail (Luce
+            # 1884 ch. XXIII, 'The Topmast Studding-sail': "Set taut! Rig out! Hoist away!";
+            # RigGeometryNotes §5). A gaff sail's boom is not rigged in and carries no state.
+            d["rigged_out"] = False
         self.doc["spars"].append(d)
         if note:
             self.notes[id] = note

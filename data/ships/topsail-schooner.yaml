@@ -131,6 +131,7 @@ spars:
   length_m: 5.5
   height_m: 15.5
   rating_kn: 2.2
+  rigged_out: false
 # Rating: fore.topmast.studdingsail.larboard in 18 kn -> 2.2 kN.
 - id: fore.topmast.studdingsail_boom.larboard
   class: studdingsail_boom
@@ -139,6 +140,7 @@ spars:
   length_m: 5.5
   height_m: 15.5
   rating_kn: 2.2
+  rigged_out: false
 # ringtail boom 19 ft, run out on the main boom (Kipping; Steel: 'lashed occasionally to the outer end of the main-sail-boom'): the ringtail's foot and a third that bears on the boom (judgement); rated for its sail in 18 kn, as a studding sail boom. Provisional (truth 9), see gen_ships.py. Rating: ringtail in 18 kn -> 3.9 kN.
 - id: ringtail_boom
   class: studdingsail_boom
@@ -146,6 +148,7 @@ spars:
   length_m: 5.7
   height_m: 1.5
   rating_kn: 3.9
+  rigged_out: false
 sails:
 # fore topsail 85 m2 between its yard and the fore yardarms, 25 ft deep ('the extreme beam, nearly', Fincham); x carried aft by the rake. Canvas No. 2 (as the frigate's topsails (Steel 1794 vol. I, Sail-making, 'Fore-topsail': No. 2 or 3; Luce 1884 ch. X p. 171 (Tables.md §1): No. 2); Steel's 'Sloop's topsail', No. 6 or 7, is a cutter's light flying topsail, not the schooner's reefing topsail (judgement)); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
 - id: fore.topsail

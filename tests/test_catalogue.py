@@ -257,20 +257,19 @@ def test_rigging_a_boom_in_and_out_gates_the_studding_sail():
     ship, runner, wind = bare(FRIGATE)
     boom = ship.spars["fore.topmast.studdingsail_boom.starboard"]
     sail = "fore.topmast.studdingsail.starboard"
-    assert boom.rigged_out  # as milestone 2 had them
+    assert not boom.rigged_out  # milestone 3b: the booms start rigged in (spec 3b §7)
     runner.start(ship, "set_square", "fore.topsail")
     run(runner, ship, wind)
-    with pytest.raises(OrderError, match="rigged out already"):
-        runner.start(ship, "rig_out_studdingsail_boom", boom.id)
-    runner.start(ship, "rig_in_studdingsail_boom", boom.id)
-    notes = run(runner, ship, wind)
-    assert not boom.rigged_out
-    assert "Rigged in the starboard fore topmast studdingsail boom." in texts(notes)
+    with pytest.raises(OrderError, match="rigged in already"):
+        runner.start(ship, "rig_in_studdingsail_boom", boom.id)
     with pytest.raises(OrderError, match="boom is rigged in; rig it out first"):
         runner.start(ship, "set_studding", sail)
     runner.start(ship, "rig_out_studdingsail_boom", boom.id)
-    run(runner, ship, wind)
+    notes = run(runner, ship, wind)
     assert boom.rigged_out
+    assert "Rigged out the starboard fore topmast studdingsail boom." in texts(notes)
+    with pytest.raises(OrderError, match="rigged out already"):
+        runner.start(ship, "rig_out_studdingsail_boom", boom.id)
     runner.start(ship, "set_studding", sail)
     run(runner, ship, wind)
     assert ship.sails[sail].is_set
@@ -281,9 +280,10 @@ def test_rigging_a_boom_in_and_out_gates_the_studding_sail():
 @pytest.mark.parametrize("path", [FRIGATE, SCHOONER])
 def test_rig_orders_take_the_boom_or_its_sail(path):
     ship = make_ship(path)
-    orders.handle(ship, "rig in the starboard fore topmast studdingsail boom")
-    assert evolution_ids(ship) == ["rig_in_studdingsail_boom"]
-    orders.handle(ship, "rig in the larboard fore topmast studdingsail")
+    # milestone 3b: the booms start rigged in (spec 3b §7), so they are rigged out here
+    orders.handle(ship, "rig out the starboard fore topmast studdingsail boom")
+    assert evolution_ids(ship) == ["rig_out_studdingsail_boom"]
+    orders.handle(ship, "rig out the larboard fore topmast studdingsail")
     assert [i.subject_id for i in ship.extra["evolutions"].instances] == [
         "fore.topmast.studdingsail_boom.starboard",
         "fore.topmast.studdingsail_boom.larboard",

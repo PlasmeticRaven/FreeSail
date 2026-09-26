@@ -3,6 +3,11 @@
 # to the boom end. It needs the sail on its yard to be set, since it extends
 # that sail's foot or head. About four minutes.
 #
+# Milestone 3b (package 23, spec 3b §7): nothing here refuses a studding sail on a
+# wind. Forward of Luce's angle it shakes in its gear and flogs through the physics
+# (data/sail_classes.yaml, the studding class's stall); and its boom starts rigged in,
+# so the last precondition is the answer to `set` until it is rigged out.
+#
 # Milestone 3b (package 22, spec 3b §6.4): the ringtail and the water sail are
 # studding-class sails with no yard; each extends the gaff sail on whose boom
 # its own boom rigs (the ringtail, "outside of the after-leech of the

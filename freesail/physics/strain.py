@@ -54,7 +54,11 @@ Canvas wears (milestone 3b, spec 3b §6.2)
 A sail's `condition` also falls with use, whatever the strain: by
 `CLOTH_WEAR_PER_HOUR_SET` points an hour while it is set and drawing, three
 times that while it flogs (sheet parted) or is aback, and not at all while
-it is furled, hanging in its gear or in the sail room. A sail is judged
+it is furled, hanging in its gear or in the sail room. A studding sail set
+with the wind forward of Luce's angle (spec 3b §7) shivers in its gear and
+counts as flogging: it wears at the flogging rate, and `physics/sails.py`
+puts its snatching on its yard and boom with this module's flogging
+constants, so its boom strains and, kept so, carries away. A sail is judged
 against its *effective* cloth rating, `cloth * (0.4 + 0.6 * condition /
 100)` (`Sail.effective_cloth_rating_kn`), so a worn sail strains, wears and
 blows out (at `BLOW_OUT_RATIO` of what it bears now) before a new one would:
@@ -221,7 +225,9 @@ def cloth_wear_per_hour(ship: Ship, sail: Sail, st: StrainState | None = None) -
         return 0.0
     if any(sp.wrecked or sp.sent_down for sp in ship.spar_chain(sail)):
         return 0.0  # set on a spar that is down: as good as furled
-    if sail.backed:
+    if sail.backed or sail.shivering:
+        # aback, or a studding sail shaking in its gear with the wind too far forward: it
+        # flogs as a sail with its sheet parted does (spec 3b §7; physics/sails.py)
         return CLOTH_WEAR_PER_HOUR_SET * CLOTH_WEAR_FLOGGING_FACTOR
     return CLOTH_WEAR_PER_HOUR_SET
 
@@ -305,6 +311,15 @@ def _warn(ship: Ship, st: StrainState, part: Part, ratio: float) -> None:
         )
         if part.swiftered_in:
             text = text[:-1] + ", the catharpins swiftered in."
+        shaking = [
+            s
+            for s in ship.sails.values()
+            if s.shivering and s.roles.get("boom") == part.id and part.cls == "studdingsail_boom"
+        ]
+        if shaking:  # the log says why (spec 3b §7)
+            text = f"{name} whipping as the {_name(ship, shaking[0].id, False)} flogs; " + (
+                "she will carry it away." if dire else "she is too near the wind for it."
+            )
     elif isinstance(part, Line):
         text = (
             f"{name} stranding; it will not hold much longer."

@@ -444,29 +444,33 @@ def close_hauled_frigate(crewed_setup: bool = True):
     return w
 
 
-def test_tack_ship_belays_the_studdingsails_and_they_resume_after():
+def test_tack_ship_belays_the_topgallant_being_set_and_it_resumes_after():
+    """Milestone 3b (spec 3b §7, spec M3 §9 item 12): told with a sail the watch may
+    legitimately be setting close-hauled, the fore topgallant; studding sails are taken in
+    before going about (tests/test_studding.py)."""
     w = close_hauled_frigate()
     crew = w.ship.extra["crew"]
     routine = FakeRoutine(crew)
-    w.ship.extra["routine"] = routine
     runner = runner_of(w)
-    stun = "fore.topmast.studdingsail.starboard"
-    w.submit("set the starboard fore topmast studdingsail")
+    stun = "fore.topgallant"
+    w.submit("take in the fore topgallant")
+    tick_until_idle(w)
+    w.ship.extra["routine"] = routine
+    w.submit("set the fore topgallant")
     w.run(60)
     before = runner.in_progress()[0]
-    assert before["hands"] == 8 and before["step"] == "bend_on"
+    assert before["id"] == "set_square" and before["hands"] > 0
+    assert before["step"] not in ("waiting", "paused", "done")
     n0 = len(w.log)
     w.submit("tack ship")
     assert routine.calls == [("call_all_hands", "to tack ship")]
     snap = {s["id"]: s for s in runner.in_progress()}
-    assert snap["set_studding"]["paused"] is True and snap["set_studding"]["step"] == "paused"
-    assert snap["set_studding"]["hands"] == 0
+    assert snap["set_square"]["paused"] is True and snap["set_square"]["step"] == "paused"
+    assert snap["set_square"]["hands"] == 0
     held = runner.instances[0].progress
     w.tick()
     belay = [e for e in log_after(w, n0) if e.kind == "evolution.belayed"]
-    assert [e.text for e in belay] == [
-        "Belayed setting the starboard fore topmast studdingsail: all hands about ship."
-    ]
+    assert [e.text for e in belay] == ["Belayed setting the fore topgallant: all hands about ship."]
     assert belay[0].severity.value == "notable"
     tack = next(i for i in runner.instances if i.evo.id == "tack")
     assert tack.assignment.got == len(bill.on_deck(crew, w.clock))  # everyone on deck
@@ -554,9 +558,17 @@ COMPAT_CASES: dict[str, tuple[list[str], str]] = {
     "set_jibheaded": ([], "set the jib"),
     "take_in_jibheaded": (["set the jib"], "haul down the jib"),
     "furl_jibheaded": (["set the jib", "haul down the jib"], "runner: furl_jibheaded jib"),
-    "set_studding": (["set the fore topsail"], "set the starboard fore topmast studdingsail"),
+    # milestone 3b: the booms start rigged in (spec 3b §7); rigging one out is make-ready
+    "set_studding": (
+        ["set the fore topsail", "rig out the starboard fore topmast studdingsail boom"],
+        "set the starboard fore topmast studdingsail",
+    ),
     "take_in_studding": (
-        ["set the fore topsail", "set the starboard fore topmast studdingsail"],
+        [
+            "set the fore topsail",
+            "rig out the starboard fore topmast studdingsail boom",
+            "set the starboard fore topmast studdingsail",
+        ],
         "take in the starboard fore topmast studdingsail",
     ),
     "brace": ([], "brace the main yard in"),

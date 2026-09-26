@@ -469,14 +469,17 @@ def test_truth_13_a_gaff_sail_wants_squaring_off_before_the_wind():
     assert 0.0 < at_45 < at_70
 
 
-def studding_sail_gain(heading_deg: float) -> float:
+def studding_sail_gain(heading_deg: float, sides: str = "both sides", count: int = 10) -> float:
     world = under_plain_sail(FRIGATE, heading_deg, knots_=10.0)
     plain = knots(world)
-    world.submit("set the studdingsails, both sides")
+    # milestone 3b: the booms start rigged in and are rigged out first (spec 3b §7)
+    world.submit(f"rig out the studdingsails, {sides}")
+    run(world, 300, trim_every=120)
+    world.submit(f"set the studdingsails, {sides}")
     run(world, 600, trim_every=120)
-    world.submit("set the studdingsails, both sides")  # those that waited for the sail beside them
+    world.submit(f"set the studdingsails, {sides}")  # those that waited for the sail beside them
     run(world, 900, trim_every=120)
-    assert sum(1 for s in world.ship.sails.values() if s.cls == "studding" and s.is_set) == 10
+    assert sum(1 for s in world.ship.sails.values() if s.cls == "studding" and s.is_set) == count
     return 100.0 * (knots(world) / plain - 1.0)
 
 
@@ -484,15 +487,11 @@ def test_truth_14_studding_sails_help_on_a_broad_reach():
     assert 15.0 <= studding_sail_gain(135.0) <= 30.0
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Milestone 3b, until package 23: with Fincham's sharper brace limits the studding "
-    "sails draw close-hauled (a 13 per cent gain at six points, measured at integration); "
-    "the studding class's stall forward of Luce's angle (spec 3b §7) is package 23's, and "
-    "this half of truth 14 comes back with it.",
-)
 def test_truth_14_studding_sails_do_not_help_close_hauled():
-    assert studding_sail_gain(67.5) < 5.0
+    # Milestone 3b (spec 3b §7): with the yards braced up the lee booms will not go out past
+    # the lee rigging, so the weather studding sails are set; forward of Luce's angles they
+    # shake in their gear and hold her back (the studding class's stall, physics/sails.py).
+    assert studding_sail_gain(67.5, "weather", 5) < 5.0
 
 
 # ---------------------------------------------------------------------------
@@ -642,9 +641,13 @@ def test_truth_18_the_watch_and_all_hands_take_the_spec_times(frigate_plain_sail
     assert 12.0 <= all_hands <= 20.0, f"all hands took {all_hands:.1f} min"
 
 
-def test_truth_19_a_tack_belays_the_studdingsails_and_they_resume_after():
+def test_truth_19_a_tack_belays_the_royals_being_set_and_they_resume_after():
+    # Milestone 3b (spec 3b §7; spec M3 §9 item 12): told with sails the watch may
+    # legitimately be setting on a wind, the royals, the light sails above the frigate's
+    # plain sail. Studding sails are taken in before going about (Luce), which the tack now
+    # does first (tests/test_studding.py).
     world = close_hauled_on_starboard(FRIGATE)
-    world.submit("set the studdingsails, both sides")
+    world.submit("set the royals")
     run(world, 60)
     start = world.clock.tick
     world.submit("tack ship")
@@ -652,13 +655,13 @@ def test_truth_19_a_tack_belays_the_studdingsails_and_they_resume_after():
     assert [e.kind for e in done] == ["ship.tacked"]
     assert 300 <= seconds <= 420, f"tacked in {seconds} s"
     belayed = events(world, "evolution.belayed", after=start - 1)
-    assert belayed and all("studdingsail" in e.text for e in belayed)
+    assert belayed and all("royal" in e.text for e in belayed)
     assert all(e.text.endswith("all hands about ship.") for e in belayed)
     tacked_at = done[0].tick
     assert not [e for e in events(world, "sail.set", after=start) if e.tick <= tacked_at]
     run(world, 900)
-    resumed = [e for e in events(world, "sail.set", after=tacked_at) if "studdingsail" in e.text]
-    assert len(resumed) == len(belayed), "not every belayed studdingsail was set after"
+    resumed = [e for e in events(world, "sail.set", after=tacked_at) if "royal" in e.text]
+    assert len(resumed) == len(belayed), "not every belayed royal was set after"
 
 
 def morning_crew_factor(calls: bool) -> tuple[float, float]:

@@ -118,6 +118,14 @@ HEAD_YARDS_SHARPER = "head_sharper"
 # Adjacent yards (spec 3b §5): however near two yards' lengths, the small trims of
 # §2.2 always pass. Spec 3b §5's floor.
 ADJACENT_YARD_FLOOR_DEG = 10.0
+# Studding sail booms and the lee rigging (spec 3b §7). A boom rigged out on a yard braced
+# up runs out beyond the yardarm that is braced aft, the lee one, and past this angle from
+# square it lies against the lee topmast rigging and backstays. Judgement (spec 3b §7): the
+# model has no spar collision to find it, and no source gives the angle; half a right angle,
+# where the lee yardarm has come aft of the shrouds' spread. The weather boom points forward
+# and is not fouled: Luce's weather studding sails are set a point free, with the yards
+# braced up (Luce 1866 ch. XXIII, line 26509). The one hard rule of the studding sails.
+BOOM_FOUL_BRACE_DEG = 45.0
 # Sail verbs whose evolution is a script that works on the sail it is given
 # (`params["sail"]`), and which make sense for a sail that is blown out.
 SAIL_SCRIPT_VERBS = ("bend", "unbend", "shift")
@@ -462,7 +470,7 @@ def _summarise(
         body = f"Hands to {verb} the {object_name}: {errors.join_names(names, 'and')}."
         body = body.replace(" and 1 more", " and one more")
     if failed:
-        body += " Not done: " + "; ".join(failed) + "."
+        body += " Not done: " + "; ".join(f.rstrip(".") for f in failed) + "."
     return body
 
 
@@ -562,8 +570,9 @@ def _brace(
             ship, targets, bool(order.modifiers.get(HEAD_YARDS_SHARPER))
         )
     signed = yard_trim.signed(targets, sign)
-    # Checked last, after the whole-mast aback rule above, so nothing is refused twice.
-    too_far = _adjacent_refusals(ship, signed)
+    # Checked last, after the whole-mast aback rule above, so nothing is refused twice: a
+    # yard whose lee studding sail boom is out first (spec 3b §7), then the adjacent yards.
+    too_far = _yard_refusals(ship, signed)
     workable = [y for y in workable if y.id not in too_far]
     extra, call = _hands_params(
         ship,
@@ -719,7 +728,7 @@ def _trim(
         if on_a_wind:
             targets, staggered = yard_trim.stagger(ship, targets, head_sharper)
         signed = yard_trim.signed(targets, sign)
-        too_far = _adjacent_refusals(ship, signed)
+        too_far = _yard_refusals(ship, signed)
         extra, call = _hands_params(
             ship,
             order,
@@ -833,6 +842,83 @@ def _pending_braces(ship: Ship) -> dict[str, float]:
         if getattr(evo, "id", None) == "brace" and "target_angle" in params:
             out[inst.subject_id] = float(params["target_angle"])
     return out
+
+
+def _yard_refusals(ship: Ship, proposed: dict[str, float]) -> dict[str, str]:
+    """Yards an order may not brace where it would, each with the one reason: first a
+    studding sail boom out on the yardarm that would go aft beyond BOOM_FOUL_BRACE_DEG
+    (spec 3b §7), then the adjacent-yards rule (spec 3b §5) for the rest, which judges
+    the yards refused as lying where they are. So nothing is refused twice."""
+    booms = _boom_refusals(ship, proposed)
+    rest = {yid: a for yid, a in proposed.items() if yid not in booms}
+    return {**booms, **_adjacent_refusals(ship, rest)}
+
+
+def _lee_side(angle: float) -> str | None:
+    """The side whose yardarm goes aft with the yard at this signed brace angle."""
+    if abs(angle) < 1e-9:
+        return None
+    return "larboard" if angle > 0 else "starboard"  # + : starboard yardarm forward
+
+
+def _pending_rig_outs(ship: Ship) -> set[str]:
+    """The booms already ordered out: a rig-out evolution in hand or waiting."""
+    runner = ship.extra.get("evolutions")
+    return {
+        inst.subject_id
+        for inst in getattr(runner, "instances", None) or []
+        if getattr(getattr(inst, "evo", None), "id", None) == "rig_out_studdingsail_boom"
+    }
+
+
+def _booms_out(ship: Ship, yard: Spar) -> list[Spar]:
+    """The studding sail booms rigged out (or ordered out) on this yard."""
+    going = _pending_rig_outs(ship)
+    return [
+        b
+        for b in ship.spars.values()
+        if b.cls == "studdingsail_boom"
+        and b.parent == yard.id
+        and not b.wrecked
+        and (b.rigged_out or b.id in going)
+    ]
+
+
+def _boom_refusals(ship: Ship, proposed: dict[str, float]) -> dict[str, str]:
+    """Yards this order would brace beyond BOOM_FOUL_BRACE_DEG from square with the
+    studding sail boom on the yardarm going aft rigged out: the boom would lie against
+    the lee rigging (spec 3b §7). Bracing no sharper than a yard lies is never refused."""
+    foul = units.deg_to_rad(BOOM_FOUL_BRACE_DEG)
+    out: dict[str, str] = {}
+    for yid, target in proposed.items():
+        yard = ship.spars[yid]
+        if abs(target) <= foul + 1e-6:
+            continue
+        now = yard.brace_angle
+        if now * target > 0 and abs(target) <= abs(now) + 1e-6:
+            continue  # coming in, or holding, on the same side
+        lee = _lee_side(target)
+        if any(b.side == lee for b in _booms_out(ship, yard)):
+            out[yid] = (
+                f"Rig in the studdingsail boom before bracing the "
+                f"{resolve.display_name(ship, yid)} sharper."
+            )
+    return out
+
+
+def boom_fouled_by_brace(ship: Ship, boom: Spar) -> str | None:
+    """Why this studding sail boom cannot be rigged out now, or None: its yard braced (or
+    ordered braced) beyond BOOM_FOUL_BRACE_DEG with this boom's yardarm the one aft
+    (spec 3b §7)."""
+    yard = ship.parent_of(boom)
+    if yard is None or not yard.is_yard:
+        return None  # the ringtail boom runs out on the spanker's boom
+    angle = _pending_braces(ship).get(yard.id, yard.brace_angle)
+    if abs(angle) <= units.deg_to_rad(BOOM_FOUL_BRACE_DEG) + 1e-6:
+        return None
+    if boom.side != _lee_side(angle):
+        return None
+    return f"The {resolve.display_name(ship, yard.id)} is braced too sharp for the boom to go out."
 
 
 def _adjacent_refusals(ship: Ship, proposed: dict[str, float]) -> dict[str, str]:
@@ -1166,7 +1252,7 @@ def _haul_or_ease(
                 f"{resolve.the(ship, target.id)[0].upper()}{resolve.the(ship, target.id)[1:]} is "
                 f"already braced {where} that way; it will come no further."
             )
-        too_far = _adjacent_refusals(ship, {target.id: new}).get(target.id)
+        too_far = _yard_refusals(ship, {target.id: new}).get(target.id)
         if too_far is not None:
             raise OrderError(too_far)
         target.brace_angle = new
@@ -1588,13 +1674,25 @@ def _boom_evolution(
     failed: list[str] = []
     failed_ids: list[str] = []
     evo = mapping["studdingsail_boom"]
+    # a lee boom will not go out past the lee rigging (spec 3b §7); one out already is
+    # left to the evolution's own reason
+    fouled: dict[str, str] = {}
+    if verb == "rig out":
+        for boom in booms:
+            why = None if boom.rigged_out else boom_fouled_by_brace(ship, boom)
+            if why is not None:
+                fouled[boom.id] = why
     extra, call = _hands_params(
         ship,
         order,
-        [evo] * len(booms),
+        [evo] * len([b for b in booms if b.id not in fouled]),
         _group_label(verb, res.name, group) if len(booms) > 1 else None,
     )
     for boom in booms:
+        if boom.id in fouled:
+            failed.append(f"{resolve.the(ship, boom.id)}: {fouled[boom.id]}")
+            failed_ids.append(boom.id)
+            continue
         try:
             texts.append(runner.start(ship, evo, boom.id, dict(extra)))
         except OrderError as e:
