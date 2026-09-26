@@ -49,7 +49,16 @@ def make_ship(path: str | Path, scenario: Scenario | None = None) -> Ship:
 
 def make_world(seed: int, ship_path: str | Path, scenario: Scenario | None = None) -> World:
     scenario = scenario or Scenario()
-    return World(seed=seed, scenario=scenario, ship=make_ship(ship_path, scenario))
+    world = World(seed=seed, scenario=scenario, ship=make_ship(ship_path, scenario))
+    ship = world.ship
+    if getattr(ship, "spec", None) is not None and ship.spec.crew is not None:
+        from freesail.crew import muster
+        from freesail.crew.routine import Routine
+
+        # The muster is a function of the seed, like everything else (spec M3 §2.4).
+        ship.extra["crew"] = muster(ship.spec.crew, world.rng.stream("muster"), ship_name=ship.name)
+        ship.extra["routine"] = Routine(ship.extra["crew"], world.clock)
+    return world
 
 
 def ship_factory(ship_ref: dict[str, Any], scenario: Scenario) -> Any:

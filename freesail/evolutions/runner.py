@@ -43,6 +43,24 @@ their file names a script in ``scripts.py`` that drives the helm targets
 and the yards on a timeline and watches the ship's heading and speed to
 decide how it ended. The runner treats a script like a single long step.
 
+Hands (milestone 3, spec M3 §3). When the ship carries a crew
+(``ship.extra["crew"]``, mustered by ``make_world``), an evolution asks for
+the hands its file's ``crew:`` line names when it begins, and holds them
+until it ends (``crew/hands.py``). With enough hands it runs at the file's
+pace; short but workable, it begins and goes slower in proportion, with a
+routine line in the log; with fewer than half, it waits for hands, says so
+once, and is tried again every tick. Every step's time, and every script's
+pace, is multiplied by the *crew factor* of the hands actually at work
+(numbers, rating and fatigue). An evolution whose file says ``hands: all``
+is a call for all hands: it turns the watch below up through the routine,
+belays the step-list work in hand (which holds its progress and resumes,
+hands permitting, when the all-hands work is done), and pipes down when it
+ends unless the captain called all hands himself. Who is on deck is the
+watch bill's question (``crew/bill.py``), asked at ``Runner.clock``; the
+composer sets that to the World's clock, and without it the bill is read at
+``DEFAULT_WATCH_TIME``. A ship without a crew takes the milestone 2
+behaviour exactly: every request is met and the crew factor is 1.0.
+
 Nothing here is random. Given the same ship, wind and orders the same
 ticks produce the same log.
 """
@@ -50,10 +68,13 @@ ticks produce the same log.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING, Any
 
 from freesail import units
+from freesail.crew import bill, hands
+from freesail.crew.model import Crew, number_words
 from freesail.evolutions import expr, registry
 from freesail.evolutions.scripts import SCRIPTS, Script
 from freesail.ship.graph import Ship
@@ -88,6 +109,22 @@ def weather_factor(wind_speed_ms: float, heel_rad: float) -> float:
 
 def _clamp(x: float, lo: float, hi: float) -> float:
     return lo if x < lo else hi if x > hi else x
+
+
+# ---------------------------------------------------------------------------
+# Hands (spec M3 §3)
+# ---------------------------------------------------------------------------
+
+# When no clock has been given the runner (a ship stepped without a World, as in many
+# tests), the watch bill is read at this time: the default scenario's start, four in the
+# morning, the starboard watch on deck and the idlers below.
+DEFAULT_WATCH_TIME = datetime(1805, 6, 1, 4, 0, 0)
+
+# What a waiting instance waits for, besides its turn at a part another evolution holds.
+WAITING_FOR_HANDS = "hands"
+
+# How many pieces of other work a log line names before it says "at other work".
+MAX_WORK_NAMED = 3
 
 
 # ---------------------------------------------------------------------------
@@ -134,6 +171,18 @@ class Instance:
     ramp_target: dict[str, float] = field(default_factory=dict)
     script: Script | None = None
     order: int = 0
+    waiting_for: str | None = None  # "hands" while it waits for hands; else None
+    paused: bool = False  # belayed while all hands are at other work (spec M3 §3.4)
+    want: hands.CrewRequest | None = None  # the file's crew line, read when there is a crew
+    assignment: hands.Assignment | None = None  # the hands it holds
+    all_hands: bool = False  # began as a call for all hands
+    short_logged: bool = False
+    wait_line: str = ""  # the line it said when it first had to wait for hands
+
+    @property
+    def inst_id(self) -> str:
+        """The name the sailors it holds carry in ``Sailor.at``."""
+        return f"{self.evo.id}#{self.order}"
 
     @property
     def step(self) -> registry.Step | None:
@@ -145,6 +194,8 @@ class Instance:
     def step_name(self) -> str:
         if self.waiting:
             return "waiting"
+        if self.paused:
+            return "paused"
         if self.script is not None:
             return self.script.phase
         step = self.step
@@ -166,6 +217,9 @@ class Runner:
         self.instances: list[Instance] = []
         self._counter = 0
         self._last_factor = 1.0
+        # The ship's clock, for the watch bill: the composer sets it to the World's clock.
+        # None reads the bill at DEFAULT_WATCH_TIME.
+        self.clock: Any | None = None
         ship.extra["evolutions"] = self
 
     # -- the contract --------------------------------------------------------
@@ -196,6 +250,11 @@ class Runner:
                 raise OrderError(f"'{evolution_id}' names an unknown script '{evo.script}'.")
             inst.script = script_cls(ship, merged, evo.timing)
         inst.holds = self._holds(ship, inst)
+        if self._crew(ship) is not None:
+            try:
+                inst.want = hands.CrewRequest.from_mapping(evo.crew)
+            except hands.CrewRequestError as e:
+                raise OrderError(f"{evolution_id}: {e}") from None
         blockers = [
             other for other in self.instances if other.holds & inst.holds and other is not inst
         ]
@@ -213,15 +272,19 @@ class Runner:
         if reason is not None:
             raise OrderError(reason)
         self.instances.append(inst)
-        self._begin(ship, inst)
+        if not self._begin(ship, inst):
+            return inst.wait_line
         return self._format(inst, evo.on_start.log)
 
     def step(self, ship: Ship, dt: float, wind: Wind) -> None:
         """Advance every running evolution by one tick, then start any that were
         waiting and are now free. Call once per tick, before the physics."""
         self._last_factor = weather_factor(wind.effective_speed, ship.dyn.heel)
+        crew = self._crew(ship)
+        if crew is not None:
+            self._top_up_all_hands(crew)
         for inst in list(self.instances):
-            if inst.waiting:
+            if inst.waiting or inst.paused:
                 continue
             if inst.script is not None:
                 self._tick_script(ship, inst, dt, wind)
@@ -240,6 +303,9 @@ class Runner:
                     "step": inst.step_name,
                     "remaining_s": self._remaining_s(inst),
                     "waiting": inst.waiting,
+                    "waiting_for": inst.waiting_for,
+                    "paused": inst.paused,
+                    "hands": inst.assignment.got if inst.assignment is not None else 0,
                 }
             )
         return out
@@ -398,19 +464,30 @@ class Runner:
 
     # -- beginning ---------------------------------------------------------------
 
-    def _begin(self, ship: Ship, inst: Instance) -> None:
+    def _begin(self, ship: Ship, inst: Instance) -> bool:
+        """Begin an instance whose parts are free. With a crew, it must get its hands
+        first; without enough it waits for them and this returns False."""
+        crew = self._crew(ship)
+        if crew is not None and not self._take_hands(ship, inst, crew):
+            return False
         inst.waiting = False
+        inst.waiting_for = None
         inst.step_index = -1
         if inst.script is not None:
             inst.script.begin(self._format_context(inst))
             self._note(ship, inst, inst.evo.on_start)
-            return
+            return True
         self._note(ship, inst, inst.evo.on_start)
         self._enter_next_step(ship, inst)
+        return True
 
     def _start_waiting(self, ship: Ship) -> None:
         # Start waiting evolutions in the order they were given, when free.
+        crew = self._crew(ship)
         for inst in sorted(self.instances, key=lambda i: i.order):
+            if inst.paused and crew is not None:
+                self._try_resume(ship, inst, crew)
+                continue
             if not inst.waiting:
                 continue
             busy = any(
@@ -471,7 +548,8 @@ class Runner:
         step = inst.step
         if step is None:
             return
-        inst.progress = min(1.0, inst.progress + dt / (step.duration_s * self._last_factor))
+        pace = step.duration_s * self._last_factor * self._crew_factor(inst, step.aloft)
+        inst.progress = min(1.0, inst.progress + dt / pace)
         if inst.progress >= 1.0 - PROGRESS_EPSILON:
             inst.progress = 1.0
         self._apply_ramp(ship, inst, inst.progress)
@@ -510,7 +588,7 @@ class Runner:
 
     def _tick_script(self, ship: Ship, inst: Instance, dt: float, wind: Wind) -> None:
         assert inst.script is not None
-        inst.script.tick(dt, wind, self._last_factor)
+        inst.script.tick(dt, wind, self._last_factor * self._crew_factor(inst, False))
         if inst.script.status == "done":
             self._complete(ship, inst)
         elif inst.script.status == "failed":
@@ -519,16 +597,197 @@ class Runner:
     # -- ending -----------------------------------------------------------------------
 
     def _complete(self, ship: Ship, inst: Instance) -> None:
-        self._remove(inst)
+        self._remove(ship, inst)
         self._note(ship, inst, inst.evo.on_complete)
+        self._after_all_hands(ship, inst)
 
     def _fail(self, ship: Ship, inst: Instance, reason: str) -> None:
-        self._remove(inst)
+        self._remove(ship, inst)
         self._note(ship, inst, inst.evo.on_fail, reason=reason)
+        self._after_all_hands(ship, inst)
 
-    def _remove(self, inst: Instance) -> None:
+    def _remove(self, ship: Ship, inst: Instance) -> None:
         if inst in self.instances:
             self.instances.remove(inst)
+        crew = self._crew(ship)
+        if crew is not None and inst.assignment is not None:
+            hands.release(crew, inst.inst_id)
+            inst.assignment = None
+
+    # -- hands (spec M3 §3) ----------------------------------------------------------
+
+    @staticmethod
+    def _crew(ship: Ship) -> Crew | None:
+        crew = ship.extra.get("crew")
+        return crew if isinstance(crew, Crew) else None
+
+    def _on_deck(self, crew: Crew) -> list:
+        when = self.clock if self.clock is not None else DEFAULT_WATCH_TIME
+        return bill.on_deck(crew, when)
+
+    @staticmethod
+    def _aloft(inst: Instance) -> bool:
+        """Whether any of the work is aloft: then only hands who go aloft are taken."""
+        return any(step.aloft for step in inst.evo.steps)
+
+    def _want(self, inst: Instance) -> hands.CrewRequest:
+        if inst.want is None:
+            inst.want = hands.CrewRequest.from_mapping(inst.evo.crew)
+        return inst.want
+
+    def _subject_mast(self, ship: Ship, inst: Instance) -> str | None:
+        """The mast the subject stands on ('fore', 'main', 'mizzen'), for the topmen."""
+        if isinstance(inst.subject, Ship):
+            return None
+        try:
+            mast = ship.mast_of(inst.subject)
+        except (KeyError, AttributeError, TypeError):
+            return None
+        return mast.id.split(".")[0] if mast is not None else None
+
+    def _crew_factor(self, inst: Instance, aloft: bool) -> float:
+        if inst.assignment is None or inst.want is None:
+            return 1.0
+        return hands.crew_factor(inst.assignment, inst.want, aloft)
+
+    def _all_hands_at_work(self, but: Instance | None = None) -> list[Instance]:
+        return [
+            i
+            for i in self.instances
+            if i.all_hands and not i.waiting and not i.paused and i is not but
+        ]
+
+    def _take_hands(self, ship: Ship, inst: Instance, crew: Crew) -> bool:
+        """Ask for the instance's hands (spec M3 §3.1, §3.2). True if it may begin."""
+        want = self._want(inst)
+        if want.all_hands:
+            self._call_all_hands(ship, inst, crew)
+        else:
+            self._top_up_all_hands(crew)  # the ship's whole attention: see §3.4
+        got = hands.request(
+            crew,
+            self._on_deck(crew),
+            inst.inst_id,
+            want,
+            self._subject_mast(ship, inst),
+            aloft=self._aloft(inst),
+        )
+        if got.outcome == hands.TOO_FEW:
+            inst.waiting = True
+            inst.waiting_for = WAITING_FOR_HANDS
+            if not inst.wait_line:
+                inst.wait_line = self._waiting_line(ship, inst, got)
+                data = self._hands_data(inst, got)
+                ship.note("notable", "evolution.waiting", inst.wait_line, inst.subject_id, data)
+            return False
+        inst.assignment = got
+        inst.all_hands = want.all_hands
+        if got.outcome == hands.SHORT:
+            self._note_short(ship, inst, got)
+        return True
+
+    def _note_short(self, ship: Ship, inst: Instance, got: hands.Assignment) -> None:
+        if inst.short_logged:
+            return
+        inst.short_logged = True
+        others = self._other_work(inst)
+        rest = f"the rest are {others}" if others else "there are no more on deck"
+        n = got.got
+        men = "hand" if n == 1 else "hands"
+        text = f"Only {number_words(n)} {men} to {self._target(inst)}; {rest}."
+        data = self._hands_data(inst, got)
+        ship.note("routine", "evolution.short_handed", text, inst.subject_id, data)
+
+    def _waiting_line(self, ship: Ship, inst: Instance, got: hands.Assignment) -> str:
+        others = self._other_work(inst)
+        crew = self._crew(ship)
+        if others:
+            called = crew is not None and crew.all_hands_called
+            rest = f"{'the hands are' if called else 'the watch is'} {others}"
+        else:
+            spare = got.available
+            rest = (
+                "there are none to spare"
+                if spare == 0
+                else f"there are but {number_words(spare)} to spare"
+            )
+        return f"Not hands enough on deck to {self._describe(inst)}; {rest}."
+
+    @staticmethod
+    def _hands_data(inst: Instance, got: hands.Assignment) -> dict[str, Any]:
+        return {
+            "evolution": inst.evo.id,
+            "subject": inst.subject_id,
+            "hands_wanted": got.wanted,
+            "hands_got": got.got if got.outcome != hands.TOO_FEW else got.available,
+        }
+
+    def _top_up_all_hands(self, crew: Crew) -> None:
+        """Hands who have come on deck since an all-hands evolution began join it."""
+        running = self._all_hands_at_work()
+        if not running:
+            return
+        deck = self._on_deck(crew)
+        for inst in sorted(running, key=lambda i: i.order):
+            if inst.assignment is not None:
+                hands.top_up(inst.assignment, deck, aloft=self._aloft(inst))
+
+    def _call_all_hands(self, ship: Ship, inst: Instance, crew: Crew) -> None:
+        """An all-hands evolution turns the hands up and belays the work in hand (§3.4)."""
+        routine = ship.extra.get("routine")
+        call = getattr(routine, "call_all_hands", None)
+        if call is not None and not crew.all_hands_called:
+            call(f"to {self._describe(inst)}")
+        reason = self._format(inst, inst.evo.on_start.log).strip().rstrip(".!")
+        reason = reason[:1].lower() + reason[1:]
+        for other in sorted(self.instances, key=lambda i: i.order):
+            if other is inst or other.waiting or other.paused or other.script is not None:
+                continue
+            if other.all_hands:
+                continue  # two all-hands evolutions serialise by their holds, as before
+            other.paused = True
+            hands.release(crew, other.inst_id)
+            other.assignment = None
+            ship.note(
+                "notable",
+                "evolution.belayed",
+                f"Belayed {self._doing(other)}: {reason}.",
+                other.subject_id,
+                {"evolution": other.evo.id, "subject": other.subject_id, "for": inst.evo.id},
+            )
+
+    def _try_resume(self, ship: Ship, inst: Instance, crew: Crew) -> None:
+        """A belayed instance takes up its work again when all hands are done, if it can
+        have its hands; until then it stays belayed, its progress held."""
+        if self._all_hands_at_work():
+            return
+        got = hands.request(
+            crew,
+            self._on_deck(crew),
+            inst.inst_id,
+            self._want(inst),
+            self._subject_mast(ship, inst),
+            aloft=self._aloft(inst),
+        )
+        if got.outcome == hands.TOO_FEW:
+            return
+        inst.paused = False
+        inst.assignment = got
+        if got.outcome == hands.SHORT:
+            self._note_short(ship, inst, got)
+
+    def _after_all_hands(self, ship: Ship, inst: Instance) -> None:
+        """When the last all-hands evolution ends, pipe down, unless the captain called
+        all hands himself (spec M3 §3.2, §4.2)."""
+        crew = self._crew(ship)
+        if crew is None or not inst.all_hands or self._all_hands_at_work(but=inst):
+            return
+        if crew.all_hands_called_by_order:
+            return
+        routine = ship.extra.get("routine")
+        pipe_down = getattr(routine, "pipe_down", None)
+        if pipe_down is not None:
+            pipe_down()
 
     # -- log text ----------------------------------------------------------------------
 
@@ -577,6 +836,41 @@ class Runner:
         ctx["reason"] = reason
         return template.format_map(ctx)
 
+    def _target(self, inst: Instance) -> str:
+        """What the hands are sent to: 'the fore topsail', or 'tack ship'."""
+        if isinstance(inst.subject, Ship):
+            return self._describe(inst)
+        return f"the {part_name(self.ship, inst.subject_id)}"
+
+    def _doing(self, inst: Instance) -> str:
+        """The work in hand: 'setting the fore topsail', 'tacking ship'."""
+        first, _, rest = self._describe(inst).partition(" ")
+        return f"{gerund(first)} {rest}".strip()
+
+    def _other_work(self, inst: Instance) -> str:
+        """The other work that has hands, for the log: 'setting the main topsail and the
+        jib, and bracing the fore topsail yard'."""
+        groups: dict[str, list[str]] = {}
+        named = 0
+        more = False
+        for other in sorted(self.instances, key=lambda i: i.order):
+            if other is inst or other.assignment is None or not other.assignment.hands:
+                continue
+            if named >= MAX_WORK_NAMED:
+                more = True
+                break
+            doing = self._doing(other)
+            verb, sep, what = doing.partition(" the ")
+            key, item = (verb, "the " + what) if sep else (doing, "")
+            groups.setdefault(key, [])
+            if item:
+                groups[key].append(item)
+            named += 1
+        phrases = [f"{verb} {_and(items)}".strip() for verb, items in groups.items()]
+        if more:
+            phrases.append("at other work")
+        return _and(phrases, comma=True)
+
     def _describe(self, inst: Instance) -> str:
         subject = inst.subject
         name = (
@@ -597,12 +891,42 @@ class Runner:
             return 0.0
         this = (1.0 - inst.progress) * step.duration_s
         later = sum(s.duration_s for s in inst.evo.steps[inst.step_index + 1 :])
-        return round((this + later) * self._last_factor, 1)
+        crew = self._crew_factor(inst, step.aloft)
+        return round((this + later) * self._last_factor * crew, 1)
 
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+
+def gerund(verb: str) -> str:
+    """'set' -> 'setting', 'take' -> 'taking', 'furl' -> 'furling', 'heave' -> 'heaving'."""
+    v = verb.lower()
+    vowels = "aeiou"
+    if not v or v.endswith("ing"):
+        return v
+    if v.endswith("ie"):
+        return v[:-2] + "ying"
+    if v.endswith("e") and not v.endswith(("ee", "ye", "oe")):
+        return v[:-1] + "ing"
+    if (
+        len(v) >= 3
+        and v[-1] not in vowels + "wxy"
+        and v[-2] in vowels
+        and v[-3] not in vowels
+        and sum(1 for c in v if c in vowels) == 1
+    ):
+        return v + v[-1] + "ing"
+    return v + "ing"
+
+
+def _and(items: list[str], comma: bool = False) -> str:
+    """'a', 'a and b', 'a, b and c' ('a, b, and c' with comma=True, for long phrases)."""
+    if len(items) <= 1:
+        return "".join(items)
+    last = ", and " if comma and len(items) > 2 else " and "
+    return ", ".join(items[:-1]) + last + items[-1]
 
 
 def close_hauled_apparent_angle(ship: Ship) -> float:

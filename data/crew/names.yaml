@@ -1,0 +1,89 @@
+# Names for the muster, 1795 to 1815. Read by freesail/crew/muster.py; a ship file's
+# `crew.names` says which list its company is drawn from.
+#
+# english: a King's ship's company. Parish-register given names of the later eighteenth
+#   century (the common dozen recur, as they did: William, John, Thomas, James), with the
+#   West Country well represented among the surnames (Penrose, Pengelly, Tozer), and a
+#   share of Welsh (Rees, Pugh, Llewellyn), Scots (Macleod, Munro, Angus) and Irish
+#   (Donovan, Brennan, Cornelius) as a frigate's books show them.
+# american: a Baltimore privateer's crew. Chesapeake and New England names, with the
+#   Dutch and German families of Maryland and Pennsylvania (Hendrick, Conrad, Stryker,
+#   Shriver, Koontz), the Old Testament given names of the period, and the surnames some
+#   free black seamen of the Chesapeake and New England carried (Cuffee, Fortune).
+#
+# A muster book abbreviates the common given names ("Wm.", "Jno.", "Thos."); the muster
+# does so by the table in freesail/crew/muster.py, the same way every time.
+
+english:
+  given: [
+    William, John, Thomas, James, George, Joseph, Richard, Robert, Charles, Henry,
+    Samuel, Edward, Benjamin, Daniel, Francis, Peter, Matthew, Isaac, Stephen, Philip,
+    Nicholas, Michael, Andrew, Christopher, Jonathan, Abraham, Jacob, Walter, Hugh, Ralph,
+    Roger, Timothy, Joshua, Nathaniel, Anthony, Lawrence, Jeremiah, Zachariah, Moses, Edmund,
+    Alexander, Archibald, Duncan, Angus, Evan, Owen, Griffith, Rees, Llewellyn, Patrick,
+    Dennis, Cornelius, Terence, Bartholomew, Simon, Luke, Mark, Aaron, Adam, Gilbert,
+    Humphrey, Jasper, Josiah, Lewis, Martin, Silas, Solomon, Frederick, Toby, Giles,
+  ]
+  surnames: [
+    Smith, Jones, Williams, Taylor, Brown, Davies, Evans, Wilson, Thomas, Johnson,
+    Roberts, Robinson, Thompson, Wright, Walker, White, Edwards, Hughes, Green, Hall,
+    Lewis, Harris, Clarke, Jackson, Wood, Turner, Martin, Cooper, Hill, Ward,
+    Morris, Moore, King, Baker, Harrison, Morgan, Allen, James, Scott, Phillips,
+    Watson, Parker, Price, Bennett, Young, Griffiths, Mitchell, Kelly, Cook, Carter,
+    Richardson, Bailey, Collins, Bell, Shaw, Murphy, Miller, Cox, Richards, Marshall,
+    Anderson, Simpson, Ellis, Adams, Wilkinson, Foster, Chapman, Powell, Webb, Rogers,
+    Gray, Mason, Hunt, Campbell, Matthews, Owen, Palmer, Holmes, Mills, Barnes,
+    Knight, Lloyd, Butler, Russell, Barker, Fisher, Stevens, Jenkins, Murray, Dixon,
+    Harvey, Graham, Pearson, Fletcher, Walsh, Gibson, Howard, Andrews, Stewart, Elliott,
+    Reynolds, Saunders, Payne, Fox, Ford, Pearce, Day, Brooks, West, Lawrence,
+    Cole, Atkinson, Bradley, Spencer, Dawson, Ball, Burton, Watts, Rose, Booth,
+    Perry, Ryan, Grant, Wells, Armstrong, Francis, Rees, Hayes, Hart, Hudson,
+    Newman, Webster, Hunter, Gregory, Carr, Lowe, Page, Marsh, Dunn, Parsons,
+    Berry, Stone, Reid, Hawkins, Harding, Porter, Newton, Oliver, Reed, Bird,
+    Gardner, Dean, Lane, Bates, Parry, Burgess, Bishop, Walton, Nicholson, Shepherd,
+    Cross, Freeman, Warren, Sutton, Yates, Hodgson, Curtis, Hopkins, Harper, Coleman,
+    Watkins, Moss, Chambers, Griffin, Sharp, Wheeler, Potter, Osborne, Gordon, Wallace,
+    Rowe, Pritchard, Gilbert, Willis, Higgins, Hammond, Arnold, Barber, Slater, Frost,
+    Lambert, Blake, Goodwin, Barton, Baxter, Nash, Jennings, Holt, Kemp, Poole,
+    Bond, Tucker, Heath, Middleton, Lawson, Banks, Jarvis, Gibbs, Hoskins, Penrose,
+    Pengelly, Trevithick, Polglase, Tregarthen, Nance, Rowse, Pascoe, Chegwidden, Pugh, Bowen,
+    Vaughan, Prosser, Llewellyn, Macleod, Mackenzie, Fraser, Munro, Sinclair, Gunn, Ross,
+    Duncan, Donovan, Brennan, Hogan, Mahony, Flanagan, Doyle, Byrne, Sullivan, Tapping,
+    Pope, Dyer, Tozer, Coombe, Squire, Gale, Loveday, Venning, Scobell, Jago,
+  ]
+
+american:
+  given: [
+    John, William, James, Thomas, George, Joseph, Samuel, Benjamin, Daniel, Richard,
+    Robert, Charles, Henry, Edward, Nathaniel, Jonathan, Joshua, Isaac, Jacob, Abraham,
+    Ebenezer, Elijah, Elisha, Enoch, Amos, Caleb, Eli, Gideon, Hezekiah, Jedediah,
+    Levi, Obadiah, Reuben, Seth, Zebulon, Asa, Nehemiah, Joel, Absalom, Jesse,
+    Noah, Micajah, Uriah, Josiah, Silas, Moses, Aaron, Peter, Philip, Stephen,
+    Matthew, Andrew, Francis, Patrick, Hendrick, Johannes, Conrad, Frederick, Christian, Casper,
+    Michael, Adam, Jeremiah, Zachariah, Ezekiel, Isaiah, Ephraim, Ichabod, Jabez, Lemuel,
+  ]
+  surnames: [
+    Smith, Brown, Johnson, Williams, Jones, Davis, Miller, Wilson, Taylor, Clark,
+    White, Moore, Thompson, Allen, Walker, Wright, Hall, Young, King, Scott,
+    Green, Baker, Adams, Nelson, Hill, Campbell, Mitchell, Roberts, Carter, Phillips,
+    Evans, Turner, Parker, Collins, Edwards, Stewart, Morris, Murphy, Cook, Rogers,
+    Morgan, Cooper, Peterson, Reed, Bailey, Bell, Kelly, Howard, Ward, Cox,
+    Richardson, Wood, Watson, Brooks, Bennett, Gray, James, Hughes, Price, Sanders,
+    Myers, Long, Ross, Foster, Powell, Jenkins, Perry, Russell, Sullivan, Butler,
+    Barnes, Fisher, Henderson, Coleman, Simmons, Patterson, Jordan, Reynolds, Hamilton, Graham,
+    Wallace, Woods, Cole, West, Owens, Marshall, Ellis, Harrison, Gibson, McDonald,
+    Wells, Hunt, Stone, Hawkins, Dunn, Spencer, Gardner, Stephens, Payne, Pierce,
+    Berry, Matthews, Arnold, Wagner, Willis, Ray, Watkins, Kirby, Carroll, Duncan,
+    Snyder, Hart, Cunningham, Bradley, Lane, Andrews, Ennis, Harper, Fox, Riley,
+    Armstrong, Carpenter, Weaver, Greene, Lawrence, Elliott, Chapman, Lynch, Nash, Pratt,
+    Howland, Coffin, Starbuck, Folger, Hussey, Macy, Gardiner, Chase, Swain, Cushing,
+    Doane, Snow, Crowell, Nickerson, Hallett, Winslow, Bradford, Alden, Brewster, Endicott,
+    Derby, Crowninshield, Dorsey, Ridgely, Tilghman, Warfield, Gist, Chew, Hammond, Stansbury,
+    Gittings, Boyle, Wilmot, Stricker, Sterett, Barney, Hollins, Purviance, McKim, Buchanan,
+    Van Dyke, Ten Eyck, Brinckerhoff, Onderdonk, Hoogland, Van Horn, Bogart, Voorhees, Rapalje,
+    Stryker, De Witt, Cuyler, Van Wyck, Hoffman, Keller, Shaffer, Zimmerman, Kuhn, Shriver, Hager,
+    Wolf, Stauffer, Hess, Bowers, Koontz, Steiner, Gephart, Fahnestock, Hartzell, Ruppert,
+    Leister, Schley, Diffenderffer, Tyson, Hopkins, Ellicott, Pennington, Slade, Fowler, Tucker,
+    Dennis, Pinkney, Fortune, Freeman, Lecompte, Cuffee, Paul, Wheeler, Dashiell, Travers,
+    Skinner, Cannon, Hooper, Kemp, Hurd,
+  ]

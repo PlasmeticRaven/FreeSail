@@ -1787,3 +1787,78 @@ aliases:
   main sheet: main sheets
   main tack: main tacks
   main bowline: main bowlines
+crew:
+  # Winfield: the Amazon class establishment, 264 men.
+  complement: 264
+  # A King's ship: the english list in data/crew/names.yaml.
+  names: english
+  stations:
+    # Hands per station, both watches together. Forecastlemen: the head, anchors and headsails; the best older seamen (Luce 1884 ch. XX). 28: judgement (spec M3 2.3).
+    forecastle: 28
+    # Fore topmen: judgement (spec M3 2.3); Luce: the smartest of the young seamen.
+    fore_top: 24
+    # Main topmen: judgement (spec M3 2.3), the largest top.
+    main_top: 30
+    # Mizzen topmen: judgement (spec M3 2.3).
+    mizzen_top: 14
+    # Afterguard, the boys included (spec M3 9 item 6: boys count as landsmen): judgement (spec M3 2.3).
+    afterguard: 50
+    # Waisters: judgement. The spec's 48 less the twelve posts, so that stations and posts make the 264 of the establishment (the spec's figures made 276); the waist is the station whose numbers no yard or gear fixes.
+    waisters: 36
+    # Marines: judgement (spec M3 2.3), a sergeant's party for a frigate; they stand watch and work as afterguard, never aloft (Luce 1884 ch. XX).
+    marines: 40
+    # Idlers: the trades below (Luce 1884 ch. XX: they stand no night watches).
+    idlers: 30
+  ratings:
+    # Share of the seamen (not marines, idlers or officers) by rating: judgement (spec M3 2.3), a wartime frigate's books (Falconer, ORDINARY: able and ordinary as rated on the navy books). Able: 0.30.
+    able: 0.3
+    # Ordinary: 0.40, judgement.
+    ordinary: 0.4
+    # Landsmen: 0.30, judgement.
+    landsman: 0.3
+  posts:
+  # Station holders by post (spec M3 2.3): the commissioned officers, then the standing and warrant officers (Falconer, ORDINARY and CARPENTER). Names are drawn at muster unless a post gives one.
+  - post: captain
+  - post: first lieutenant
+  - post: second lieutenant
+  - post: third lieutenant
+  - post: master
+  - post: boatswain
+  - post: gunner
+  - post: carpenter
+  - post: purser
+  - post: surgeon
+  - post: sailmaker
+  - post: master-at-arms
+  idlers_by_trade:
+    # How the idlers are made up; they must sum to the idlers. Judgement for a frigate of 264 (spec M3 2.3). The carpenter's mates and crew: 6.
+    carpenter's crew: 6
+    # The sailmaker's mate and crew: 3.
+    sailmaker's crew: 3
+    # The cooper, for the casks: 1.
+    cooper: 1
+    # The armourer, at the forge: 1.
+    armourer: 1
+    # The ship's cook and his mate: 2.
+    cook: 2
+    # Purser's, captain's and gunroom stewards: 3.
+    steward: 3
+    # Officers' servants: 8.
+    servant: 8
+    # The surgeon's mates: 2.
+    surgeon's mate: 2
+    # The captain's clerk: 1.
+    clerk: 1
+    # The ship's corporals: 3.
+    master-at-arms's party: 3
+  stores:
+    # Numbers only in milestone 3 (spec M3 10 says which milestone consumes each). Water: 100 tons in iron-hooped casks (spec M3 2.3 after Winfield, about four months at the frigates' allowance; at a gallon a man a day it is some twelve weeks for 264).
+    water_tons: 100
+    # Provisions: four months at full allowance for the complement (judgement).
+    provisions_days: 120
+    # Made-up sails in the sail room, consumed by shifting a blown-out sail (judgement).
+    spare_sails: 3
+    # Spare topmasts and yards in the waist and on the booms (judgement).
+    spare_spars: 4
+    # Spare rope in the boatswain's store (judgement).
+    cordage_fathoms: 600

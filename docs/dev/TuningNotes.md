@@ -234,3 +234,8 @@ work of milestone 3.
 - In 30 kn on a beam reach under plain sail she heels 20° and the log
   warns of the topgallant yards within two minutes; in 35 kn under all sail
   the royals go at eleven minutes.
+
+## Milestone 3: the crew
+
+- **Night call cost (`FATIGUE_ALL_HANDS_AT_NIGHT`)**, 0.03 → 0.20. The spec's table let the watch that was turned up three times in the middle watch sleep the cost off by four in the morning (mean fatigue 0.000, crew factor 1.00 against truth 20's 1.10 to 1.25). Package 18 measured: 0.15 gives 1.10, 0.20 gives 1.17, 0.25 gives 1.25, with the scenario frigate from 20:00, calls at 01:00, 02:00 and 03:00 of ten minutes each with the topmen aloft a third of the time. Set to 0.20; the owner judges at the gate whether a night of three calls costing a sixth of the morning's pace is right.
+

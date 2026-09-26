@@ -172,6 +172,15 @@ class World:
             else:
                 severity, kind, text, subject, data = note
                 self.record(severity, kind, text, subject=subject, data=data)
+        # the watch routine (spec M3 §4): watch changes, all hands, fatigue and rest
+        routine = (getattr(self.ship, "extra", None) or {}).get("routine")
+        if routine is not None:
+            for note in routine.tick(self.ship, 1.0):
+                if len(note) == 3:
+                    self.record(*note)
+                else:
+                    severity, kind, text, subject, data = note
+                    self.record(severity, kind, text, subject=subject, data=data)
         bells = self.clock.bells()
         if bells is not None:
             self.record(
