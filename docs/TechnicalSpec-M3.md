@@ -88,7 +88,7 @@ crew:
     main_top: 30
     mizzen_top: 14
     afterguard: 50           # includes the boys
-    waisters: 48
+    waisters: 36             # so that stations and the twelve posts make the 264
     marines: 40
     idlers: 30
   ratings:                   # share of the seamen (not marines, idlers, officers) by rating
@@ -173,7 +173,7 @@ fatigue  = 1 + FATIGUE_WEIGHT * mean over H of h.fatigue    # FATIGUE_WEIGHT = 0
 crew_factor = numbers * skill * fatigue
 ```
 
-`reference_skill(r)` is the skill of a fresh sailor of rating `r`, so a request for ordinary seamen filled by ordinary seamen gives skill 1.0; filled by able seamen 0.75; by landsmen about 1.7. The step's rate is `dt / (duration_s * weather_factor * crew_factor)`, one line changed in `Runner._tick_steps`, and scripts receive `weather_factor * crew_factor` where they receive the weather factor today.
+`reference_skill(r)` is the skill of a fresh sailor of rating `r`, so a request for ordinary seamen filled by ordinary seamen gives skill 1.0; filled by able seamen 0.75; by landsmen about 1.7. The skill term reads each hand's **rating** through the table (`crew.model.RATING_SKILL`), not the hand's individual skill with its seeded spread, so that a request filled at its own rating gives exactly 1.0 and the compatibility rule (§1) holds to the tick; individual skill is kept for later refinements. The step's rate is `dt / (duration_s * weather_factor * crew_factor)`, one line changed in `Runner._tick_steps`, and scripts receive `weather_factor * crew_factor` where they receive the weather factor today.
 
 Whether a step is aloft or on deck is a per-step flag `aloft: true` in the evolution file (loosing, furling, reefing, sending spars up and down), default deck. Package 19 sets it while it rewrites the catalogue; package 17 reads it and defaults to deck when absent.
 

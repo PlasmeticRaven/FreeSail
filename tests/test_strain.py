@@ -592,7 +592,7 @@ def test_the_log_is_deterministic_with_gear_carrying_away():
     assert carried_away(a)
     assert a.log.digest() == b.log.digest()
     assert a.state() == b.state()
-    assert a.rng.stream_names() == ["strain", "wind"]
+    assert a.rng.stream_names() == ["muster", "strain", "wind"]
 
 
 def test_ratio_of_the_weakest_part_on_the_reference_ships():
