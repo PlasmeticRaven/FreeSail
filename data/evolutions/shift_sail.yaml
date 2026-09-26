@@ -1,11 +1,13 @@
 # Shift a sail (scripted, ShiftScript in scripts.py): unbend the old one and
-# bend a new one in its place, the one repair of milestone 8 brought forward
+# bend another in its place, the one repair of milestone 8 brought forward
 # because it is the heaviest crew work the ship does and it lets a gale's
-# blown-out sails be made good. It uses one spare sail (see bend_sail for where
-# the count comes from) and is refused with none left; a sound old sail goes
-# down to the sail room for the sailmaker and counts as a spare again, the rags
-# of a blown-out one do not. The sail must not be drawing: a blown-out, furled
-# or hauled-up sail is shifted where it hangs.
+# blown-out sails be made good. The sail bent is the best of the kind in the
+# sail room, or the one the order names (spec 3b §6.3: params `canvas_no`,
+# `heavy`, or `for` another sail bent in this one's place, "shift the spanker
+# for the storm mizzen"); it is refused with none left. A sound old sail goes
+# down to the sail room with its canvas and condition, the rags of a blown-out
+# one do not. The sail must not be drawing: a blown-out, furled or hauled-up
+# sail is shifted where it hangs.
 #
 # Luce's 'To shift a topsail' ("Lay out! Furl and unbend! ... Lower the sail
 # down to leeward by the buntlines. Send up the new sail ... Bring to and bend
@@ -14,10 +16,10 @@
 #   send_up  on deck: the old sail lowered down to leeward, the new swayed up
 #   bend     aloft: brought to and bent, the gear shifted to it
 # The new sail is left furled; letting it fall and setting it is the captain's
-# next order. Only square sails in this milestone, as for unbend_sail.
+# next order. Any sail class, as for unbend_sail.
 id: shift_sail
 verb: shift
-applies_to: {class: square}
+applies_to: {class: sail}
 script: shift
 params: {aloft: [unbend, bend]}
 preconditions:
@@ -30,7 +32,7 @@ timing:
   send_up_s: 150   # lower the old down to leeward, sway the new aloft (judgement)
   bend_s: 240      # bring to and bend, the gear shifted (judgement)
 on_start: {log: "Stand by to shift the {sail}! Aloft topmen; lay out, furl and unbend."}
-on_complete: {log: "Shifted the {sail}; the new sail bent and furled, {spare_sails} left in the sail room.", kind: sail.shifted, severity: notable}
+on_complete: {log: "Shifted the {sail}; the {bent} bent ({canvas}) and furled, {spare_sails} left in the sail room.", kind: sail.shifted, severity: notable}
 on_fail: {log: "Could not shift the {sail}: {reason}", kind: evolution.failed, severity: notable}
 # crew: the men of the sail's part of the ship, aloft and at the burtons and buntlines
 # ("Shifting topsail yards: topsail-yard, unbend and bend topsail", Luce 1884, ch. XVIII

@@ -266,6 +266,10 @@ def test_every_sail_runs_its_evolutions_to_completion(path):
         cls = sail.cls
         if cls == "studding":
             continue  # after the square sails below
+        if sail.state is SailState.UNBENT:
+            # milestone 3b: storm canvas starts in the sail room and is bent before it is
+            # set; tests/test_canvas.py bends and sets every one of them
+            continue
         assert sail.state is SailState.FURLED
         text = runner.start(ship, f"set_{cls}", sail.id)
         assert part_name(ship, sail.id) in text
@@ -295,8 +299,8 @@ def test_every_sail_runs_its_evolutions_to_completion(path):
         assert "sail.furled" in kinds(notes)
     # Studding sails need the sail on their yard set first.
     for sail in ship.sails.values():
-        if sail.cls != "studding":
-            continue
+        if sail.cls != "studding" or sail.state is SailState.UNBENT:
+            continue  # milestone 3b: ringtail, save-alls, water sail: tests/test_canvas.py
         on_yard = ship.sail_of(ship.yard_of(sail))
         if not on_yard.is_set:
             with pytest.raises(OrderError, match="until the sail on its yard is set"):

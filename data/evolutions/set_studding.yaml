@@ -2,13 +2,20 @@
 # bent on, the boom rigged out, and the sail hoisted and its tack hauled out
 # to the boom end. It needs the sail on its yard to be set, since it extends
 # that sail's foot or head. About four minutes.
+#
+# Milestone 3b (package 22, spec 3b §6.4): the ringtail and the water sail are
+# studding-class sails with no yard; each extends the gaff sail on whose boom
+# its own boom rigs (the ringtail, "outside of the after-leech of the
+# main-trysail", Kipping 1847) or under whose boom it is spread (the water sail,
+# Steel 1794), and needs that sail set.
 id: set_studding
 verb: set
 applies_to: {class: studding}
 preconditions:
   - {check: sail.state != set, reason: "The {sail} is set already."}
   - {check: sail.state != blown_out, reason: "The {sail} is blown out; a new one must be bent."}
-  - {check: sail_of(yard_of(sail)).is_set, reason: "The {sail} cannot be set until the sail on its yard is set."}
+  - {check: "yard_of(sail) == none or sail_of(yard_of(sail)).is_set", reason: "The {sail} cannot be set until the sail on its yard is set."}
+  - {check: "yard_of(sail) != none or any_set(sails_using(spar_of_role(sail, boom))) or any_set(sails_using(parent_of(spar_of_role(sail, boom))))", reason: "The {sail} cannot be set until the sail it extends is set."}
   - {check: "spar_of_role(sail, boom) == none or spar_of_role(sail, boom).rigged_out", reason: "The {sail} boom is rigged in; rig it out first."}
 requires:
   - {check: not sail.wrecked, reason: "the {sail} is wrecked"}

@@ -31,7 +31,7 @@ from freesail.evolutions.scripts import SCRIPTS, spare_sails
 from freesail.physics.sails import _lateral_offset, compute_sail_forces
 from freesail.physics.wind import Wind, WindParams
 from freesail.ship.loader import load_ship
-from freesail.ship.parts import SailState
+from freesail.ship.parts import SailState, SpareSail, sail_room
 from freesail.ship.stub import OrderError
 
 FRIGATE = "data/ships/frigate-36.yaml"
@@ -360,18 +360,20 @@ def test_a_goose_winged_sail_draws_half_its_area_out_to_windward():
 
 def test_unbend_and_bend_keep_the_count_of_spare_sails():
     ship, runner, wind = bare(FRIGATE)
-    assert spare_sails(ship) == 3  # no crew section in the ship file: the default
+    # milestone 3b: the sail room holds the frigate's allowance from her file (spec 3b
+    # §6.3), 21 sails, where milestone 3 had a count of three
+    assert spare_sails(ship) == 21
     runner.start(ship, "unbend_sail", "fore.royal")
     notes = run(runner, ship, wind)
     assert ship.sails["fore.royal"].state is SailState.UNBENT
-    assert spare_sails(ship) == 4  # a sound sail goes down to the sail room
-    assert "Unbent the fore royal; 4 spare sails in the sail room." in texts(notes)
+    assert spare_sails(ship) == 22  # a sound sail goes down to the sail room
+    assert "Unbent the fore royal; 22 spare sails in the sail room." in texts(notes)
     with pytest.raises(OrderError, match="unbent; bend a sail to the yard first"):
         runner.start(ship, "set_square", "fore.royal")
     runner.start(ship, "bend_sail", "fore.royal", {"sail": "fore.royal"})
     notes = run(runner, ship, wind)
     assert ship.sails["fore.royal"].state is SailState.FURLED
-    assert spare_sails(ship) == 3
+    assert spare_sails(ship) == 21
     assert "sail.bent" in kinds(notes)
     with pytest.raises(OrderError, match="bent already"):
         runner.start(ship, "bend_sail", "fore.royal")
@@ -381,7 +383,8 @@ def test_shift_sail_uses_a_spare_and_refuses_when_none_are_left():
     ship, runner, wind = bare(FRIGATE)
     ship.sails["fore.royal"].state = SailState.BLOWN_OUT
     ship.sails["main.royal"].state = SailState.BLOWN_OUT
-    ship.extra["spare_sails"] = 1
+    # milestone 3b: the sail room holds sails, not a count; leave one fore royal in it
+    sail_room(ship).sails[:] = [SpareSail(kind="fore.royal", canvas_no=8)]
     runner.start(ship, "shift_sail", "fore.royal")
     notes = run(runner, ship, wind)
     assert ship.sails["fore.royal"].state is SailState.FURLED
@@ -584,7 +587,13 @@ def test_loose_sails_to_dry_and_furl_all():
     assert "Loosed 15 sails to dry." in texts(notes)
     runner.start(ship, "furl_all", "ship")
     notes = run(runner, ship, wind)
-    assert all(s.state is SailState.FURLED for s in ship.sails.values())
+    # every sail bent is furled; storm canvas and the occasional sails (milestone 3b) stay
+    # in the sail room, unbent
+    assert all(
+        s.state is SailState.FURLED
+        for s in ship.sails.values()
+        if s.id not in ship.groups["storm canvas"] + ship.groups["occasional sails"]
+    )
     assert "sail.furled" in kinds(notes)
     with pytest.raises(OrderError, match="Every sail is furled already"):
         runner.start(ship, "furl_all", "ship")

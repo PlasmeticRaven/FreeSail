@@ -227,17 +227,29 @@ def test_reference_ships_load(path):
         if sail.cls == "square":
             assert len(ship.braces_of(ship.yard_of(sail))) == 2, sail.id
             assert len(ship.sheets_of(sail)) == 2, sail.id
-    # studding sails know their side and their parent yard
+    # studding sails on a yard know their side and their parent yard. Milestone 3b (package
+    # 22): the ringtail and the water sail are studding-class sails on a gaff sail's boom,
+    # lying in that sail's plane, and have no side (spec 3b §6.4).
     for sail in ship.sails.values():
-        if sail.cls == "studding":
+        if sail.cls == "studding" and sail.roles.get("yard"):
             assert sail.side in {"starboard", "larboard"}
             assert ship.spar_of_role(sail, "boom").side == sail.side
+        elif sail.cls == "studding":
+            boom = ship.spar_of_role(sail, "boom")
+            assert sail.side is None and boom.side is None
+            assert boom.cls == "boom" or ship.parent_of(boom).cls == "boom"
 
 
 def test_frigate_has_the_cool_obscure_kit():
     ship = load_ship("data/ships/frigate-36.yaml")
+    # the studding sails proper (the "studdingsails" group); milestone 3b added three more
+    # studding-class sails, the ringtail and two save-alls, kept in the sail room (spec 3b §6.4)
     stuns = [s for s in ship.sails.values() if s.cls == "studding"]
-    assert len(stuns) == 10  # fore lower, fore/main topmast, fore/main topgallant, both sides
+    assert len(ship.groups["studdingsails"]) == 10  # fore lower, fore/main topmast and topgallant
+    assert len(stuns) == 13
+    assert set(ship.groups["occasional sails"]) == {s.id for s in stuns} - set(
+        ship.groups["studdingsails"]
+    )
     assert "mizzen.spanker" in ship.sails
     assert ship.aliases["driver"] == "mizzen.spanker"
 

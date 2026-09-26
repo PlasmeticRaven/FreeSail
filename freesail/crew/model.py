@@ -271,6 +271,9 @@ class Crew:
             )
         for s in officers:
             lines.append(_post_line(s))
+        room = getattr(self, "sail_room", None)  # spec 3b §6.3: given by parts.sail_room(ship)
+        if room is not None:
+            lines.append(room.muster_line())
         return lines
 
     def _station_line(self, station: Station, men: list[Sailor], deck: set[str]) -> str:

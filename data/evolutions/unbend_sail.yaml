@@ -1,19 +1,20 @@
-# Unbend a square sail from its yard and send it down (scripted, UnbendScript
-# in scripts.py; the script keeps the count of spare sails, which a step list
+# Unbend a sail from its yard, gaff or stay and send it down (scripted,
+# UnbendScript in scripts.py; the script keeps the sail room, which a step list
 # cannot). The sail must not be drawing; one that is furled, in the gear or
 # blown out is unbent where it hangs. A sound sail goes down to the sail room
-# and counts as a spare; the rags of a blown-out one are condemned. The yard is
-# left bare (`unbent`) until a sail is bent to it.
+# with its canvas number and condition (spec 3b §6.3); the rags of a blown-out
+# one are condemned. The yard is left bare (`unbent`) until a sail is bent to it.
 #
 # Luce's port routine ("Trice up! Lay out and unbend! ... Ease away! Lower
 # together!") is two phases here:
 #   unbend  aloft: gaskets adrift, robands cut, head earings singled
 #   lower   on deck: eased away and lowered by the buntlines, stowed below
-# Only square sails in this milestone: the runner matches one sail class per
-# file (see the package 19 report).
+# Any sail class (milestone 3b): the file answers for every class, which the
+# runner allows with `class: sail`; the orders reach it for the classes the
+# vocabulary maps.
 id: unbend_sail
 verb: unbend
-applies_to: {class: square}
+applies_to: {class: sail}
 script: unbend
 params: {aloft: [unbend]}
 timing:

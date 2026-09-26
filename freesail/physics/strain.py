@@ -49,6 +49,20 @@ What carrying away does
 Spars that are `sent_down` carry no load and are never judged; nor are
 wrecked parts and parted lines. Their `load_kn` is held at zero.
 
+Canvas wears (milestone 3b, spec 3b §6.2)
+-----------------------------------------
+A sail's `condition` also falls with use, whatever the strain: by
+`CLOTH_WEAR_PER_HOUR_SET` points an hour while it is set and drawing, three
+times that while it flogs (sheet parted) or is aback, and not at all while
+it is furled, hanging in its gear or in the sail room. A sail is judged
+against its *effective* cloth rating, `cloth * (0.4 + 0.6 * condition /
+100)` (`Sail.effective_cloth_rating_kn`), so a worn sail strains, wears and
+blows out (at `BLOW_OUT_RATIO` of what it bears now) before a new one would:
+the same squall that a new sail rides out blows an old one out of the
+bolt-ropes. A worn sail is also baggier and lies less close to the wind:
+`baggy_luff(sail)` is added to its luff angle where the sail forces are
+computed. Nothing mends canvas in milestone 3b.
+
 State this module keeps between ticks lives in `ship.extra["strain"]`
 (`StrainState`): elapsed time, when each part was last warned about, which
 sails are flogging and which yards have swung, and a record of everything
@@ -78,7 +92,7 @@ DECAY_POINTS_PER_MINUTE = 2.0  # condition lost per minute per unit of ratio abo
 DECAY_RATIO = 1.0  # above this the part wears and the log is warned
 CARRY_AWAY_RATIO = 1.5  # above this the part may carry away at any substep
 CARRY_AWAY_COEFFICIENT = 0.002  # p per substep = this * (ratio - CARRY_AWAY_RATIO)^2
-BLOW_OUT_RATIO = 1.8  # a set sail blows out for certain above this of its cloth rating
+BLOW_OUT_RATIO = 1.8  # a set sail blows out for certain above this of its effective rating
 WARNING_INTERVAL_S = 600.0  # one strain.warning per part per ten minutes
 SUBSTEP_S = 0.25  # the physics substep (spec §3.1); the probability is per substep
 
@@ -92,7 +106,20 @@ FLOGGING_LOAD_MULTIPLIER = 2.0
 # it fouls the lee rigging at this angle from square.
 SWUNG_YARD_MAX = units.deg_to_rad(80.0)
 
+# Canvas wear with use. Points of condition (0..100) an hour while a sail is set and
+# drawing (spec 3b §6.2, a judgement there): 1.2 points a day set day and night, so a sail
+# never taken in would be worn out in about twelve weeks; the sailmaker's mending that
+# kept real canvas going longer is milestone 8.
+CLOTH_WEAR_PER_HOUR_SET = 0.05
+# A sail flogging (its sheet parted) or aback wears this many times faster (spec 3b §6.2).
+CLOTH_WEAR_FLOGGING_FACTOR = 3.0
+# A worn sail is baggier: its luff angle rises by this many degrees times (1 - condition /
+# 100), six degrees for a sail worn out (spec 3b §6.2; Fincham 1843 art. 98, "the flatter
+# the sails the sharper they may be braced").
+BAGGY_LUFF_DEG = 6.0
+
 HALYARD_CLASSES = frozenset({"halyard", "throat_halyard", "peak_halyard"})
+_DRAWING = frozenset({SailState.SET, SailState.GOOSE_WINGED})
 ALOFT_STATES = frozenset(
     {SailState.SET, SailState.GOOSE_WINGED, SailState.SHEETED, SailState.LOOSED}
 )
@@ -151,6 +178,7 @@ def apply_strain(ship: Ship, dt: float, rng_stream: random.Random | None = None)
     st.elapsed_s += dt
     stream = _stream(ship, rng_stream)
     _tend_wrecks(ship, st)
+    _wear_canvas(ship, st, dt)
     for part in list(ship.parts.values()):  # insertion order: deterministic
         if _out_of_action(part):
             part.load_kn = 0.0
@@ -165,6 +193,40 @@ def apply_strain(ship: Ship, dt: float, rng_stream: random.Random | None = None)
             _carry_away(ship, st, part, ratio)
         else:
             _warn(ship, st, part, ratio)
+
+
+def cloth_wear_per_hour(ship: Ship, sail: Sail, st: StrainState | None = None) -> float:
+    """Points of condition this sail loses an hour by use alone (spec 3b §6.2): three times
+    CLOTH_WEAR_PER_HOUR_SET while it flogs or is aback, CLOTH_WEAR_PER_HOUR_SET while it is
+    set and drawing, nothing while it is furled, in its gear, unbent or wrecked."""
+    if sail.wrecked:
+        return 0.0
+    st = st if st is not None else strain_state(ship)
+    if sail.id in st.flogging and sail.state is SailState.LOOSED:
+        return CLOTH_WEAR_PER_HOUR_SET * CLOTH_WEAR_FLOGGING_FACTOR
+    if sail.state not in _DRAWING:
+        return 0.0
+    if any(sp.wrecked or sp.sent_down for sp in ship.spar_chain(sail)):
+        return 0.0  # set on a spar that is down: as good as furled
+    if sail.backed:
+        return CLOTH_WEAR_PER_HOUR_SET * CLOTH_WEAR_FLOGGING_FACTOR
+    return CLOTH_WEAR_PER_HOUR_SET
+
+
+def baggy_luff(sail: Sail) -> float:
+    """Radians a worn sail's luff angle rises by (spec 3b §6.2): BAGGY_LUFF_DEG times the
+    share of its condition it has lost; nothing for a new sail."""
+    lost = 1.0 - min(max(sail.condition, 0.0), 100.0) / 100.0
+    return units.deg_to_rad(BAGGY_LUFF_DEG * lost)
+
+
+def _wear_canvas(ship: Ship, st: StrainState, dt: float) -> None:
+    """Wear every sail by its use this tick. Only use: the strain decay above the rating is
+    applied with every other part's in `apply_strain`."""
+    for sail in ship.sails.values():
+        rate = cloth_wear_per_hour(ship, sail, st)
+        if rate > 0.0:
+            sail.condition = max(0.0, sail.condition - rate * dt / 3600.0)
 
 
 def failure_probability(ratio: float, dt: float = 1.0) -> float:
@@ -244,12 +306,15 @@ def _warn(ship: Ship, st: StrainState, part: Part, ratio: float) -> None:
 
 
 def _data(part: Part, ratio: float) -> dict[str, Any]:
-    return {
+    data = {
         "ratio": ratio,
         "load_kn": part.load_kn,
         "rating_kn": part.rating_kn,
         "condition": part.condition,
     }
+    if isinstance(part, Sail):  # what the cloth bears at its condition (spec 3b §6.2)
+        data["effective_rating_kn"] = part.effective_cloth_rating_kn
+    return data
 
 
 # ---------------------------------------------------------------------------
@@ -327,8 +392,15 @@ def _sails_hoisted_by(ship: Ship, halyard: Line) -> list[Sail]:
     if isinstance(target, Sail):
         return [target]
     if isinstance(target, Spar):
-        sail = ship.sail_of(target)
-        return [sail] if sail is not None else []
+        # every sail bent to the yard or gaff, not only the first the graph lists: a storm
+        # trysail shares the main gaff with the mainsail it is bent in place of (spec 3b
+        # §6.4). The studding sails that name the yard hang from their own halyards.
+        return [
+            s
+            for s in ship.sails.values()
+            if s.cls != "studding"
+            and target.id in (s.roles.get(r) for r in ("yard", "gaff", "sprit", "boom"))
+        ]
     return []
 
 

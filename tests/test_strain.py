@@ -15,10 +15,15 @@ from freesail.core.world import Scenario
 from freesail.evolutions import Runner
 from freesail.physics import strain as S
 from freesail.physics.sails import compute_sail_forces
-from freesail.physics.strain import apply_strain, failure_probability, strain_state
+from freesail.physics.strain import (
+    CLOTH_WEAR_PER_HOUR_SET,
+    apply_strain,
+    failure_probability,
+    strain_state,
+)
 from freesail.physics.wind import Wind, WindParams
 from freesail.ship.loader import load_ship, ship_from_dict
-from freesail.ship.parts import LineState, SailState
+from freesail.ship.parts import LineState, Sail, SailState
 from freesail.ship.stub import OrderError
 from tests.test_ship_loader import MINIMAL
 
@@ -510,7 +515,10 @@ def test_sail_below_one_point_eight_only_wears_without_a_stream():
     load(sail, 1.7)
     tick(ship, 60)
     assert sail.state is SailState.SET
-    assert sail.condition == pytest.approx(100.0 - 1.4)
+    # 2 * (1.7 - 1) points a minute; milestone 3b judges the sail against its effective
+    # rating (spec 3b §6.2), which falls as the cloth wears, so the ratio creeps up and it
+    # wears a little faster than 1.4 in the minute (and by use, 0.05 an hour)
+    assert 100.0 - 1.45 < sail.condition < 100.0 - 1.4
 
 
 def test_sent_down_spars_carry_no_load():
@@ -565,7 +573,13 @@ def test_nothing_carries_away_in_twenty_knots_under_plain_sail(path):
     world.run(20 * 60)
     assert carried_away(world) == []
     assert world.log.of_kind("strain.warning") == []
-    assert all(p.condition == 100.0 for p in world.ship.parts.values())
+    # nothing strained; the sails set wear by use alone (milestone 3b, spec 3b §6.2)
+    worn_by_use = CLOTH_WEAR_PER_HOUR_SET * 20 / 60
+    for p in world.ship.parts.values():
+        if isinstance(p, Sail) and p.state is SailState.SET:
+            assert 100.0 - worn_by_use - 1e-9 <= p.condition < 100.0, p.id
+        else:
+            assert p.condition == 100.0, p.id
 
 
 def test_something_carries_away_in_thirty_five_knots_under_all_sail():

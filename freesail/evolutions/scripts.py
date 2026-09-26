@@ -46,6 +46,7 @@ import math
 from typing import TYPE_CHECKING, Any
 
 from freesail import units
+from freesail.ship import parts
 from freesail.ship.graph import Ship
 from freesail.ship.parts import HelmMode, Sail, SailState, Spar
 from freesail.ship.schema import YARD_LIKE_CLASSES
@@ -746,7 +747,7 @@ class FillAwayScript(Script):
 MAST_CLASSES = frozenset({"mast", "topmast", "topgallant_mast", "royal_mast"})
 DRAWING = frozenset({SailState.SET, SailState.SHEETED, SailState.GOOSE_WINGED})
 HANGING = frozenset({SailState.LOOSED, SailState.IN_THE_GEAR})
-DEFAULT_SPARE_SAILS = 3  # made-up sails in the sail room when the ship file gives no stores
+DEFAULT_SPARE_SAILS = parts.DEFAULT_SPARE_SAILS  # made-up sails when the file gives no stores
 
 
 def _names(ship: Ship, parts: list) -> str:
@@ -819,27 +820,13 @@ def mast_inventory(ship: Ship) -> str:
 
 
 def spare_sails(ship: Ship) -> int:
-    """The made-up sails left in the sail room.
+    """The sails in the sail room, counted (spec M3 §6; spec 3b §6.3 keeps the count).
 
-    Kept in ``ship.extra["spare_sails"]``. On first use it is taken from the
-    ship file's crew section (``ship.spec.crew.stores.spare_sails``, spec M3
-    §2.3) when the ship has one, else DEFAULT_SPARE_SAILS. The crew section is
-    read defensively: it may be absent, and ``stores`` may be a mapping or an
-    object with a ``spare_sails`` attribute."""
-    held = ship.extra.get("spare_sails")
-    if isinstance(held, int) and not isinstance(held, bool):
-        return held
-    count = DEFAULT_SPARE_SAILS
-    crew = getattr(getattr(ship, "spec", None), "crew", None)
-    stores = getattr(crew, "stores", None) if crew is not None else None
-    if isinstance(stores, dict):
-        value = stores.get("spare_sails")
-    else:
-        value = getattr(stores, "spare_sails", None)
-    if isinstance(value, int | float) and not isinstance(value, bool) and value >= 0:
-        count = int(value)
-    ship.extra["spare_sails"] = count
-    return count
+    The room itself is `parts.sail_room(ship)`: the ship file's list of sails
+    (`crew.stores.sails`), or for a file that gives only `spare_sails` that many
+    made-up sails that fit any yard, else DEFAULT_SPARE_SAILS of them. The count
+    is also kept in ``ship.extra["spare_sails"]`` for anything that reads it."""
+    return len(parts.sail_room(ship))
 
 
 def _subject_sail(ship: Ship, params: dict[str, Any], words: dict[str, Any] | None):
@@ -1248,16 +1235,54 @@ class SwayUpScript(PhasedScript):
 # ---------------------------------------------------------------------------
 # Bending, unbending and shifting a sail
 # ---------------------------------------------------------------------------
+#
+# Milestone 3b (package 22, spec 3b §6.3): the sail room holds sails, not a count. A sail
+# unbent goes down to it with its canvas number and condition; bending draws the best
+# spare of the kind (`parts.SailRoom.choose`), or the one the order names:
+#   params["canvas_no"]  a number: "bend the No. 1 fore topsail"
+#   params["heavy"]      true: "shift the fore topsail for the heavy one"
+#   params["for"]        another sail's id (or name) bent in the subject's place:
+#                        "shift the spanker for the storm mizzen"
+# A sail bent in place of another (`Sail.in_place_of`: the storm mizzen for the spanker, a
+# schooner's storm trysail for her mainsail, her storm jib for the jib) is bent only when
+# the other is unbent: the one refusal spec 3b §6.4 names.
+
+
+def _sail_named(ship: Ship, value: Any) -> Sail | None:
+    """A sail by id, alias or a sailor's name for it."""
+    from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+    if not isinstance(value, str) or not value:
+        return None
+    if value in ship.sails:
+        return ship.sails[value]
+    target = ship.aliases.get(value)
+    if target in ship.sails:
+        return ship.sails[target]
+    for sail in ship.sails.values():
+        if part_name(ship, sail.id) == value:
+            return sail
+    return None
+
+
+def _in_each_others_place(a: Sail, b: Sail) -> bool:
+    return a.in_place_of == b.id or b.in_place_of == a.id
 
 
 class _SailWork(PhasedScript):
     """A script on one sail, the evolution's subject. The verbs pass the sail's
     id as `params["sail"]`; without it the sail is found from the runner's
-    words. Holds nothing beyond the sail, which the runner holds for it."""
+    words. Holds nothing beyond the sail, which the runner holds for it.
+
+    `target` is the sail that is bent (the subject, or the one a shift names
+    with `params["for"]`) and `spare` the sail chosen for it from the sail
+    room, chosen at the check so that a refusal comes at once."""
 
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
         self.sail = _subject_sail(ship, params, None)
+        self.target: Sail | None = None
+        self.spare: parts.SpareSail | None = None
 
     def holds(self) -> set[str]:
         return set()
@@ -1271,39 +1296,111 @@ class _SailWork(PhasedScript):
             return f"The {self._name()}'s yard or mast is wrecked or sent down."
         return None
 
-    def _name(self) -> str:
+    def _name(self, sail: Sail | None = None) -> str:
         from freesail.evolutions.runner import part_name  # local import to avoid a cycle
 
-        return part_name(self.ship, self.sail.id) if self.sail is not None else "sail"
+        sail = sail if sail is not None else self.sail
+        return part_name(self.ship, sail.id) if sail is not None else "sail"
 
-    def _no_spare(self) -> str | None:
-        if spare_sails(self.ship) <= 0:
-            return (
-                f"There is no spare sail left in the sail room to bend in place of the "
-                f"{self._name()}; the sailmaker must make one first."
-            )
+    def room(self) -> parts.SailRoom:
+        return parts.sail_room(self.ship)
+
+    def _rival(self, sail: Sail, but: Sail | None = None) -> Sail | None:
+        """A bent sail that holds this one's place (spec 3b §6.4), other than `but`."""
+        for other in self.ship.sails.values():
+            if other is sail or other is but or other.state is SailState.UNBENT:
+                continue
+            if _in_each_others_place(sail, other):
+                return other
         return None
 
-    def _draw_spare(self) -> None:
-        self.ship.extra["spare_sails"] = max(0, spare_sails(self.ship) - 1)
+    def _choose(self, target: Sail) -> str | None:
+        """Choose the sail to bend to `target` from the room, or say why there is none."""
+        room = self.room()
+        name = self._name(target)
+        raw_no = self.params.get("canvas_no")
+        canvas_no = int(raw_no) if isinstance(raw_no, int | float) and raw_no else None
+        heavy = bool(self.params.get("heavy"))
+        self.spare = room.choose(target.id, canvas_no=canvas_no, heavy=heavy)
+        if self.spare is not None:
+            return None
+        fits = room.fitting(target.id)
+        if not fits:
+            return (
+                f"There is no spare sail left in the sail room to bend in place of the "
+                f"{name}; the sailmaker must make one first."
+            )
+        there = "; ".join(room.describe(s, target.id)[4:] for s in fits)
+        if canvas_no is not None:
+            return (
+                f"There is no {name} of No. {canvas_no} canvas in the sail room; it holds {there}."
+            )
+        return f"There is no heavy-weather {name} in the sail room; it holds {there}."
+
+    def _draw(self) -> bool:
+        """Take the chosen sail out of the room (choosing again if another evolution has
+        taken it meanwhile). False, with the evolution failed, when there is none left."""
+        room = self.room()
+        if self.spare is None or not any(s is self.spare for s in room.sails):
+            reason = self._choose(self.target)
+            if reason:
+                self.fail(reason)
+                return False
+        room.take(self.spare)
+        self.ship.extra["spare_sails"] = len(room)
+        return True
+
+    def _stow(self, sail: Sail) -> None:
+        """The unbent sail goes down to the sail room with its canvas and condition."""
+        room = self.room()
+        room.stow(parts.SpareSail(kind=sail.id, canvas_no=sail.canvas_no, condition=sail.condition))
+        self.ship.extra["spare_sails"] = len(room)
+
+    def _bend_spare(self) -> None:
+        target = self.target
+        target.state = SailState.FURLED
+        target.reefs = 0
+        spare = self.spare
+        target.bend_canvas(
+            spare.canvas_no if spare is not None else None,
+            spare.condition if spare is not None else 100.0,
+        )
+
+    def _spare_words(self) -> str:
+        """'No. 1 canvas, new' for the sail chosen."""
+        if self.spare is None or self.target is None:
+            return "new"
+        room = self.room()
+        no = room.number_of(self.spare, self.target.id)
+        cond = parts.condition_words(self.spare.condition)
+        return f"No. {no} canvas, {cond}" if no is not None else cond
 
     def words(self) -> dict[str, Any]:
         n = spare_sails(self.ship)
-        return {"spare_sails": f"{n} spare sail{'s' if n != 1 else ''}"}
+        return {
+            "spare_sails": f"{n} spare sail{'s' if n != 1 else ''}",
+            "bent": self._name(self.target or self.sail),
+            "canvas": self._spare_words(),
+        }
 
     def data(self) -> dict[str, Any]:
         d = super().data()
         d["spare_sails"] = spare_sails(self.ship)
+        if self.target is not None:
+            d["bent"] = self.target.id
+        if self.spare is not None:
+            d["canvas_no"] = self.spare.canvas_no
+            d["condition"] = self.spare.condition
         return d
 
 
 class UnbendScript(_SailWork):
-    """Unbend a square sail from its yard and send it down (Luce 1884, ch. XX 'To
+    """Unbend a sail from its yard, gaff or stay and send it down (Luce 1884, ch. XX 'To
     unbend sail': "Trice up! Lay out and unbend! ... Ease away! Lower
     together!"). Phases ``unbend`` (aloft: cast off the robands and head
     earings) and ``lower`` (on deck: lower it down by the buntlines and stow
-    it). A sound sail goes back to the sail room and counts as a spare; a
-    blown-out one is condemned and does not."""
+    it). A sound sail goes back to the sail room with its canvas number and
+    condition; a blown-out one is condemned and does not."""
 
     DEFAULTS = {"unbend": 180.0, "lower": 90.0}
 
@@ -1327,19 +1424,20 @@ class UnbendScript(_SailWork):
             self.sail.state = SailState.UNBENT
             self.sail.reefs = 0
             if sound:
-                self.ship.extra["spare_sails"] = spare_sails(self.ship) + 1
+                self._stow(self.sail)
                 self.note(f"Lowered the {self._name()} on deck and stowed it in the sail room.")
             else:
                 self.note(f"Lowered the {self._name()} down on deck; the rags are condemned.")
 
 
 class BendScript(_SailWork):
-    """Bend a new sail from the sail room to a bare yard (Luce 1884, ch. XX
-    'Bending sail': "Sway aloft! ... Haul out! Lay out! And bring to!").
+    """Bend a sail from the sail room to a bare yard, gaff or stay (Luce 1884, ch.
+    XX 'Bending sail': "Sway aloft! ... Haul out! Lay out! And bring to!").
     Phases ``send_up`` (on deck: rouse the sail up from the sail room and sway
-    it aloft; one spare sail is used) and ``bend`` (aloft: haul out the head,
-    pass the robands and head earings, bend the gear). The sail is left furled
-    on its yard, to be set by order."""
+    it aloft) and ``bend`` (aloft: haul out the head, pass the robands and head
+    earings, bend the gear). The sail bent is the best of its kind in the room
+    or the one the order names, and brings its canvas number and condition to
+    the part. It is left furled, to be set by order."""
 
     DEFAULTS = {"send_up": 120.0, "bend": 240.0}
 
@@ -1350,31 +1448,43 @@ class BendScript(_SailWork):
         if self.sail.state is not SailState.UNBENT:
             return (
                 f"The {self._name()} is bent already ({self.sail.describe_state()}); "
-                f"to change it for a new one, shift it."
+                f"to change it for another, shift it."
             )
-        return self._no_spare()
+        rival = self._rival(self.sail)
+        if rival is not None:
+            return (
+                f"The {self._name(rival)} is bent in the {self._name()}'s place; unbend it first, "
+                f"or shift the {self._name(rival)} for the {self._name()}."
+            )
+        self.target = self.sail
+        return self._choose(self.sail)
 
     def begin(self, words: dict[str, Any]) -> None:
         self.start_phases(["send_up", "bend"])
 
     def end_phase(self, name: str) -> None:
         if name == "send_up":
-            self._draw_spare()
-            self.note(f"Roused up a new {self._name()} from the sail room and swayed it aloft.")
+            if self._draw():
+                self.note(
+                    f"Roused up the {self._name()} from the sail room ({self._spare_words()}) "
+                    f"and swayed it aloft."
+                )
         elif name == "bend":
-            self.sail.state = SailState.FURLED
-            self.sail.reefs = 0
-            self.sail.condition = 100.0
+            self._bend_spare()
 
 
 class ShiftScript(_SailWork):
-    """Shift a sail: unbend the old one and bend a new one in its place (Luce
+    """Shift a sail: unbend the old one and bend another in its place (Luce
     1884, ch. XXXII 'To shift a topsail': "Lay out! Furl and unbend! ... Lower
     the sail down to leeward by the buntlines. Send up the new sail ... Bring
     to and bend the sail"). Phases ``unbend`` (aloft), ``send_up`` (on deck:
-    the old sail down, the new one up; one spare sail is used) and ``bend``
-    (aloft). The new sail is left furled; Luce lets fall and sets it at once,
-    which here is the captain's next order."""
+    the old sail down to the sail room, unless it is in rags, and the new one
+    up) and ``bend`` (aloft). The new sail is the best of the kind in the room,
+    or the one the order names: a number, the heavy one, or another sail bent
+    in this one's place ("shift the spanker for the storm mizzen", Luce 1884
+    ch. XXVII: "the storm mizzen is a substitute for the spanker"). It is left
+    furled; Luce lets fall and sets it at once, which here is the captain's
+    next order."""
 
     DEFAULTS = {"unbend": 180.0, "send_up": 150.0, "bend": 240.0}
 
@@ -1387,7 +1497,27 @@ class ShiftScript(_SailWork):
             return f"The {self._name()} is unbent; there is nothing to shift. Bend a new one."
         if sail.state in DRAWING:
             return f"The {self._name()} is set; take it in before shifting it."
-        return self._no_spare()
+        target = sail
+        wanted = self.params.get("for")
+        if wanted:
+            target = _sail_named(self.ship, wanted)
+            if target is None:
+                return f"There is no sail called the {wanted} to shift the {self._name()} for."
+            if not _in_each_others_place(sail, target):
+                return (
+                    f"The {self._name(target)} is not bent in the {self._name()}'s place; "
+                    f"shift the {self._name()} for another of its kind."
+                )
+            if target.state is not SailState.UNBENT:
+                return f"The {self._name(target)} is bent already."
+            rival = self._rival(target, but=sail)
+            if rival is not None:
+                return (
+                    f"The {self._name(rival)} is bent in the {self._name(target)}'s place; "
+                    f"unbend it first."
+                )
+        self.target = target
+        return self._choose(target)
 
     def begin(self, words: dict[str, Any]) -> None:
         self.start_phases(["unbend", "send_up", "bend"])
@@ -1399,14 +1529,15 @@ class ShiftScript(_SailWork):
             self.sail.reefs = 0
             self.note(f"Unbent the {self._name()} and lowered it down on deck.")
         elif name == "send_up":
-            self._draw_spare()
+            # draw the new sail first, so the old one going down is not sent straight back up
+            if not self._draw():
+                return
             if getattr(self, "old_state", None) is not SailState.BLOWN_OUT:
                 # the old sail is sound: it goes down to the sail room for the sailmaker
-                self.ship.extra["spare_sails"] = spare_sails(self.ship) + 1
-            self.note(f"Swayed aloft the new {self._name()}.")
+                self._stow(self.sail)
+            self.note(f"Swayed aloft the {self._name(self.target)} ({self._spare_words()}).")
         elif name == "bend":
-            self.sail.state = SailState.FURLED
-            self.sail.condition = 100.0
+            self._bend_spare()
 
 
 # ---------------------------------------------------------------------------
