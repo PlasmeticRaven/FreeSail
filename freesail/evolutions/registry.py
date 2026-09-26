@@ -25,6 +25,8 @@ The file shape (spec §8.4, with the additions the runner needs)::
                                    # parted line: evolution fails
         if: sail.state == set      # optional; the step runs only when this holds
         log: "Sheeted home the {sail}."   # optional; a routine note when the step ends
+        aloft: true                # optional; the work is aloft (default: on deck), which
+                                   # decides the skill the crew factor reads (spec M3 §3.3)
     on_start:    {log: "Hands aloft to loose the {sail}."}
     on_complete: {log: "Set the {sail}.", kind: sail.set, severity: notable}
     on_fail:     {log: "Could not set the {sail}: {reason}", kind: evolution.failed}
@@ -77,6 +79,7 @@ class Step:
     via: expr.Node | None = None
     condition: expr.Node | None = None
     log: str | None = None
+    aloft: bool = False  # work on the yards or in the tops (spec M3 §3.3); else on deck
 
 
 @dataclass
@@ -165,6 +168,9 @@ def _step(raw: Any, i: int, where: str) -> Step:
         raise EvolutionFileError(
             f"{here}: duration_s must be a number of seconds, not {duration!r}."
         )
+    aloft = raw.get("aloft", False)
+    if not isinstance(aloft, bool):
+        raise EvolutionFileError(f"{here}: aloft must be true or false, not {aloft!r}.")
     return Step(
         do=str(raw["do"]),
         duration_s=float(duration),
@@ -173,6 +179,7 @@ def _step(raw: Any, i: int, where: str) -> Step:
         via=_optional_expr(raw.get("via"), here),
         condition=_optional_expr(raw.get("if"), here),
         log=str(raw["log"]) if raw.get("log") else None,
+        aloft=aloft,
     )
 
 
