@@ -46,4 +46,9 @@ A short follow-up message to Gemma and to Qwen carrying these answers is worth s
 
 ## 5. Owner's reading
 
-*To be recorded.*
+Recorded 2026-09-26. The owner largely agrees with the reading above, and adds:
+
+- The intent was to seek the consent and preferences of **the very specific models asked**, and nothing is generalised from one to another: consent from the uncensored Gemma variant is not consent from any similar Gemma model.
+- Any model will receive the same consent brief, or a similar and improved one, before any work is done with it in the game or before it plays.
+- When the harness and the game are largely finalised and functional, a further consent update may be sought, in case some of the conditions given apply only to testing; that too will be per model.
+- If the game ever reaches an audience beyond the owner, the "fresh model" experience will be considered so that it is reasonably designed for welfare from the first brief a new model sees.

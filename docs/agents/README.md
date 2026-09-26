@@ -18,6 +18,8 @@ Commitments made so far, which the harness (milestone 4) must implement rather t
 6. **Use of transcripts.** Session transcripts and these consent records are kept for design reference and for the owner's reading. They are not used to train models. If that ever changed, the brief would say so first.
 7. **Nothing real.** No credentials, payments or personal data pass through the harness.
 
+The owner's standing rules, in their own words: consent is sought from the very specific model asked and never generalised to a similar one; every model gets the consent brief, or an improved one, before any work in the game or any play; a consent update may be sought when the harness and game are largely final, still per model; and if the game ever has an audience beyond the owner, the fresh model's first experience is designed with welfare in mind.
+
 ## Contents
 
 | File | What |
