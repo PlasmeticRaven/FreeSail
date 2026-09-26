@@ -241,15 +241,18 @@ def _mean_fatigue(sailors: list[Sailor]) -> float:
 
 
 def _at_work(world: World) -> list[dict[str, Any]]:
-    """The work that holds hands now, in the order it was given: evolution, subject, hands."""
+    """The work that holds hands now, in the order it was given: evolution, subject, hands,
+    and the work in words for a view ('at the fore topsail', 'tacking ship')."""
     runner = (getattr(world.ship, "extra", None) or {}).get("evolutions")
     if runner is None:
         return []
-    return [
-        {"evolution": e["id"], "subject": e["subject"], "hands": e["hands"]}
-        for e in runner.in_progress()
-        if e.get("hands")
-    ]
+    out = []
+    for e in runner.in_progress():
+        if e.get("hands"):
+            entry = {"evolution": e["id"], "subject": e["subject"], "hands": e["hands"]}
+            entry["words"] = _work_words(world, entry)
+            out.append(entry)
+    return out
 
 
 def crew_state(world: World) -> dict[str, Any] | None:
@@ -278,17 +281,16 @@ def crew_state(world: World) -> dict[str, Any] | None:
 
 
 def _work_words(world: World, entry: dict[str, Any]) -> str:
-    """'12 at the fore topsail', '180 tacking ship'."""
+    """'at the fore topsail', 'tacking ship', 'sending down topgallant masts'."""
     from freesail.evolutions.runner import gerund, part_name
 
     ship = world.ship
-    n = entry["hands"]
     if entry["subject"] in ship.parts:
-        return f"{n} at the {part_name(ship, entry['subject'])}"
+        return f"at the {part_name(ship, entry['subject'])}"
     verb = entry["evolution"].replace("_", " ")
     first, _, rest = verb.partition(" ")
     rest = rest or ("ship" if first in ("tack", "wear") else "")
-    return f"{n} {gerund(first)} {rest}".rstrip()
+    return f"{gerund(first)} {rest}".rstrip()
 
 
 def watch_lines(world: World) -> list[str]:
@@ -303,7 +305,8 @@ def watch_lines(world: World) -> list[str]:
     busy = sum(w["hands"] for w in work)
     line = f"Watch on deck: {state['watch_on_deck']}, {state['on_deck']} hands, "
     if work:
-        line += f"{busy} at work ({', '.join(_work_words(world, w) for w in work)})"
+        parts = [f"{w['hands']} {w['words']}" for w in work]
+        line += f"{busy} at work ({', '.join(parts)})"
     else:
         line += "none at work"
     extras: list[str] = []

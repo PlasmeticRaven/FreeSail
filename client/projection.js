@@ -47,6 +47,8 @@
   var YARD_CLASSES = { yard: 1, lug_yard: 1, lateen_yard: 1 };
   var FURLED_ISH = { furled: 1 };
   var GATHERED = { in_the_gear: 1, loosed: 1 };
+  // States in which a sail draws and bellies: set, and goose-winged (half of it set).
+  var DRAWING = { set: 1, goose_winged: 1 };
 
   // -- vectors ----------------------------------------------------------------
 
@@ -356,9 +358,21 @@
 
     // -- sails -------------------------------------------------------------------
 
+    /** A spar sent down (the topgallant masts in a gale), or stepped on one: it is on
+     *  deck, and it and everything on it are drawn no more than a wrecked spar's
+     *  dependents are. */
+    function sentDown(r) {
+      for (var cur = r; cur; cur = cur.parent) {
+        if (cur.state === "sent_down") return true;
+      }
+      return false;
+    }
+    var lineOf = indexBy(graph.lines, "id");
+
     var figures = [];
     graph.spars.forEach(function (s) {
       var r = spars[s.id];
+      if (sentDown(r)) return;
       figures.push({
         kind: "spar",
         id: s.id,
@@ -386,10 +400,10 @@
       var width = len(sub(B, A));
       // control points sit at twice the offset: a quadratic curve peaks halfway to its control
       var belly = [0, 0, 0];
-      if (dyn.state === "set") belly = mul(bellyDirection(normal, wind), 2 * BELLY * Math.min(depth, width));
+      if (DRAWING[dyn.state]) belly = mul(bellyDirection(normal, wind), 2 * BELLY * Math.min(depth, width));
       var sag = mul(v(0, 0, -1), 2 * FOOT_SAG * depth);
       var midBC = add(lerp(B, C, 0.5), belly);
-      var midCD = add(add(lerp(C, D, 0.5), belly), dyn.state === "set" ? sag : [0, 0, 0]);
+      var midCD = add(add(lerp(C, D, 0.5), belly), DRAWING[dyn.state] ? sag : [0, 0, 0]);
       var midDA = add(lerp(D, A, 0.5), belly);
       return [[A], [lerp(A, B, 0.5), B], [midBC, C], [midCD, D], [midDA, A]];
     }
@@ -482,6 +496,13 @@
       var dyn = sailDyn(spec);
       var roles = spec.roles || {};
       var cls = spec.class;
+      if (dyn.state === "unbent") return; // nothing on the yard: the sail is in the sail room
+      var onDeck = Object.keys(roles).some(function (role) {
+        var target = roles[role];
+        var sp = spars[target] || (lineOf[target] ? spars[lineOf[target].of] : null);
+        return sp ? sentDown(sp) : false;
+      });
+      if (onDeck) return; // sent down with its spar
       if (cls === "square" || cls === "lug" || cls === "lateen") {
         var Y = spars[roles.yard];
         if (!Y || !Y.arm) return;
@@ -489,6 +510,12 @@
         var depth = (spec.area_m2 / Math.max(L, 1)) * reefFraction(spec, dyn);
         var down = v(0, 0, -depth);
         var corners = [Y.a, Y.b, add(Y.b, down), add(Y.a, down)];
+        if (dyn.state === "goose_winged") {
+          // the lee clew hauled up to the yard: only the weather half hangs and draws
+          // (physics/sails.py: half the area, its centre toward the weather yardarm)
+          var mid = Y.centre;
+          corners = tack === "starboard" ? [mid, Y.b, add(Y.b, down), add(mid, down)] : [Y.a, mid, add(mid, down), add(Y.a, down)];
+        }
         figures.push(sailFigure(spec, dyn, corners, Y.normal, Y, depth));
       } else if (cls === "gaff" || cls === "sprit") {
         var M = spars[roles.mast];
@@ -634,7 +661,7 @@
       var state = (snapLines[ln.id] || {}).state || ln.state || "belayed";
       if (ln.class === "brace") {
         var Y = spars[ln.of];
-        if (!Y || !Y.arm) return;
+        if (!Y || !Y.arm || sentDown(Y)) return;
         var ss = sideSign(ln.side);
         var from = ss > 0 ? Y.b : Y.a;
         var m = mastAftOf(Y.x);
@@ -644,6 +671,7 @@
       } else if (ln.class === "sheet") {
         var sf = sailFigById[ln.of];
         if (!sf || sf.state === "furled" || !sf.corners) return;
+        if (sf.state === "goose_winged" && ln.side === (tack === "starboard" ? "larboard" : "starboard")) return; // the lee clew is up
         var pts;
         if (sf.corners.length === 4 && (sf.cls === "square" || sf.cls === "lug" || sf.cls === "lateen")) {
           var s2 = sideSign(ln.side);

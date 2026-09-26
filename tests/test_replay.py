@@ -47,3 +47,57 @@ def test_bad_format_is_rejected(tmp_path):
         assert "format" in str(e)
     else:
         raise AssertionError("expected ValueError")
+
+
+# ---------------------------------------------------------------------------
+# A crewed voyage (spec M3 §2.4): the muster is rebuilt from the seed on replay
+# ---------------------------------------------------------------------------
+
+FRIGATE = "data/ships/frigate-36.yaml"
+
+
+def crewed_voyage() -> World:
+    """The frigate from rest at twenty to eight: plain sail, all hands and a tack, piped
+    down, and the watch changed at eight bells."""
+    from datetime import datetime
+
+    from freesail.api.session import make_world
+
+    scenario = Scenario(
+        start_time=datetime(1805, 6, 1, 7, 40),
+        wind_from_deg=0.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=293.0,
+    )
+    w = make_world(7, FRIGATE, scenario)
+    w.submit("set plain sail")
+    w.submit("brace sharp up on the starboard tack")
+    w.run(600)
+    w.submit("trim sails")
+    w.run(300)
+    w.submit("call all hands")
+    w.submit("tack ship")
+    w.run(600)
+    w.submit("pipe down")
+    w.run(120)
+    return w
+
+
+def test_a_crewed_voyage_replays_to_the_same_log_and_the_same_muster(tmp_path):
+    from freesail.api.session import ship_factory
+
+    original = crewed_voyage()
+    kinds = [e.kind for e in original.log]
+    for kind in ("crew.all_hands", "ship.tacked", "crew.piped_down", "watch.relieved"):
+        assert kind in kinds, kind
+    assert "order.rejected" not in kinds
+    path = replay.save_to_file(original, tmp_path / "crewed.json")
+    copy = replay.replay(replay.load_file(path), ship_factory)
+    assert copy.log.digest() == original.log.digest()
+    assert copy.ship.extra["crew"].describe(copy.clock) == original.ship.extra["crew"].describe(
+        original.clock
+    )
+    assert [s.fatigue for s in copy.ship.extra["crew"].sailors] == [
+        s.fatigue for s in original.ship.extra["crew"].sailors
+    ]

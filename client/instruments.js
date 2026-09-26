@@ -32,13 +32,15 @@
     set("i-tick", "tick " + snap.tick);
 
     var setSails = snap.sails.filter(function (x) {
-      return x.state === "set";
+      return x.state === "set" || x.state === "goose_winged";
     });
-    set("i-sails", setSails.length ? setSails.map(function (x) { return U.partName(x.id) + (x.reefs ? " (" + x.reefs + (x.reefs > 1 ? " reefs)" : " reef)") : ""); }).join(", ") : "none");
+    set("i-sails", setSails.length ? setSails.map(function (x) { return U.partName(x.id) + (x.state === "goose_winged" ? " (goose-winged)" : "") + (x.reefs ? " (" + x.reefs + (x.reefs > 1 ? " reefs)" : " reef)") : ""); }).join(", ") : "none");
     var strain = snap.sails.concat(snap.spars).filter(function (x) {
       return x.strain_ratio > 1.0;
     });
     set("i-strain", strain.length ? strain.map(function (x) { return U.partName(x.id) + " " + x.strain_ratio.toFixed(2); }).join(", ") : "none above rating");
+
+    renderCrew(snap.crew);
 
     var evoList = document.getElementById("i-evolutions");
     if (evoList) {
@@ -53,10 +55,47 @@
       evos.forEach(function (e) {
         var li2 = document.createElement("li");
         var subject = e.subject ? U.partName(e.subject) : "";
-        li2.textContent = e.id.replace(/_/g, " ") + (subject ? ": " + subject : "") + " · " + e.step.replace(/_/g, " ") + (e.waiting ? " (waiting)" : ", " + Math.round(e.remaining_s) + " s to go");
+        var how;
+        if (e.waiting) how = e.waiting_for === "hands" ? " (waiting for hands)" : " (waiting)";
+        else if (e.paused) how = " (belayed)";
+        else how = ", " + Math.round(e.remaining_s) + " s to go";
+        var men = e.hands ? " · " + e.hands + (e.hands === 1 ? " hand" : " hands") : "";
+        li2.textContent = e.id.replace(/_/g, " ") + (subject ? ": " + subject : "") + " · " + e.step.replace(/_/g, " ") + how + men;
         evoList.appendChild(li2);
       });
     }
+  }
+
+  /** The watch on deck and the hands at work (spec M3 §5.2). */
+  function renderCrew(c) {
+    if (!c) {
+      set("i-watch", "no ship's company mustered");
+      set("i-hands", "");
+      return;
+    }
+    var watch = c.all_hands ? "all hands; the " + c.watch_on_deck + " watch has the deck" : c.watch_on_deck + " watch";
+    var up = (c.turned_up || []).filter(function (w) {
+      return w !== c.watch_on_deck;
+    });
+    if (up.length && !c.all_hands) watch += ", the " + up.join(" and ") + " turned up";
+    watch += ", " + c.on_deck + " on deck";
+    if (c.idlers_up !== undefined) watch += c.idlers_up ? "; idlers up" : "; idlers below";
+    set("i-watch", watch);
+    var work = c.at_work || [];
+    var busy = work.reduce(function (n, w) {
+      return n + w.hands;
+    }, 0);
+    var hands = work.length
+      ? busy + " at work (" + work.map(function (w) { return w.hands + " " + (w.words || "at " + w.evolution.replace(/_/g, " ")); }).join(", ") + "), " + c.idle + " idle"
+      : "none at work, " + c.idle + " idle";
+    set("i-hands", hands + "; " + fatigueWords(c.fatigue_mean_on_deck) + " on deck, " + fatigueWords(c.fatigue_mean_below) + " below");
+  }
+
+  // The muster's words for fatigue (crew/model.py FATIGUE_FRESH_BELOW, FATIGUE_TIRED_BELOW).
+  function fatigueWords(f) {
+    if (f < 0.2) return "fresh";
+    if (f < 0.5) return "tired";
+    return "worn out";
   }
 
   root.Instruments = { render: render };

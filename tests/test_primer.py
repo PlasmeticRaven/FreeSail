@@ -25,7 +25,7 @@ Inside a block:
 - a line beginning ``# rejected:`` is an order the chapter says the ship
   refuses; the test asserts that it raises ``OrderError``;
 - a line whose first word is a console driver command (``tick``,
-  ``state``, ``hold``, ``go``, ``time``, ``log``, ``save``, ``replay``,
+  ``state``, ``muster``, ``hold``, ``go``, ``time``, ``log``, ``save``, ``replay``,
   ``help``, ``quit``) is skipped: it goes to the console, not the ship;
 - any other line is an order the chapter says the ship accepts; the test
   asserts that ``handle`` returns without raising.
@@ -50,12 +50,17 @@ from __future__ import annotations
 import math
 import re
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 import pytest
 
 from freesail import orders
+from freesail.core.clock import Clock
+from freesail.core.rng import Rng
+from freesail.crew import muster
+from freesail.crew.routine import Routine
 from freesail.evolutions.trim import wanted_sheet_angle
 from freesail.orders.errors import OrderError
 from freesail.ship.graph import Ship
@@ -83,8 +88,11 @@ CHAPTERS = [
 ]
 
 DRIVER_COMMANDS = frozenset(
-    {"hold", "go", "time", "tick", "state", "log", "save", "replay", "help", "quit", "exit"}
+    {"hold", "go", "time", "tick", "state", "muster", "log", "save", "replay", "help"}
+    | {"quit", "exit"}
 )
+# The blocks' ships keep the forenoon watch: the idlers are up (package 20).
+PRIMER_TIME = datetime(1805, 6, 1, 10, 0)
 PRESETS = ("furled", "plain-sail", "all-sail", "reefed")
 TACKS = ("starboard", "larboard")
 
@@ -159,6 +167,11 @@ class InstantRunner:
 def make_ship(which: str, preset: str, tack: str) -> Ship:
     ship = Ship(SPECS[which])
     ship.extra["evolutions"] = InstantRunner()
+    if ship.spec.crew is not None:
+        # the ship's company and the watch routine, as make_world attaches them, so that
+        # chapter 6's crew orders have hands to call (package 20)
+        ship.extra["crew"] = muster(ship.spec.crew, Rng(7).stream("muster"), ship_name=ship.name)
+        ship.extra["routine"] = Routine(ship.extra["crew"], Clock(PRIMER_TIME))
     sign = 1.0 if tack == "starboard" else -1.0
     ship.dyn.apparent_wind_angle = sign * math.radians(40.0)
     ship.dyn.apparent_wind_speed = 8.0
