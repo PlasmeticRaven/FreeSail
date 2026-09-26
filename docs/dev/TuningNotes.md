@@ -240,3 +240,37 @@ work of milestone 3.
 - **Night call cost (`FATIGUE_ALL_HANDS_AT_NIGHT`)**, 0.03 → 0.20. The spec's table let the watch that was turned up three times in the middle watch sleep the cost off by four in the morning (mean fatigue 0.000, crew factor 1.00 against truth 20's 1.10 to 1.25). Package 18 measured: 0.15 gives 1.10, 0.20 gives 1.17, 0.25 gives 1.25, with the scenario frigate from 20:00, calls at 01:00, 02:00 and 03:00 of ten minutes each with the topmen aloft a third of the time. Set to 0.20; the owner judges at the gate whether a night of three calls costing a sixth of the morning's pace is right.
 - **Fresh dead band (`FATIGUE_FRESH`)**, new at 0.05. With packages 17 and 18 together, the watch on deck gathered a hundredth of fatigue an hour standing idle and every compatibility run came out a tick long. Under 0.05 a hand now works at the file's pace. Truth 20's morning term becomes 1.145 at mean fatigue 0.34 (was 1.17), still inside 1.10 to 1.25.
 
+
+### Package 20: truths 18 to 23, measured
+
+Every scenario below is in `tests/test_known_truths.py`, seed 7, steady wind (gustiness and variability 0), the crew mustered by `make_world`, and every sail furled at the start unless the truth says otherwise. No constant was changed to meet them.
+
+| # | Truth | Target | Measured | Passes |
+|---|---|---|---|---|
+| 18 | Plain sail from furled: the watch, and all hands called first | 25 to 40 min; 12 to 20 min | frigate: the watch 16.4 min, all hands 5.6 min after the order (7.1 min after the call); the schooner 15.6 and 8.9 | the ratio (watch at least twice all hands) yes; the absolute times no (strict xfail) |
+| 19 | A tack ordered while the studdingsails go up pauses them; the tack takes its M2 time; they resume | 5 to 7 min; paused and resumed | the ten studdingsail evolutions belayed at once ("Belayed setting the starboard fore lower studdingsail: all hands about ship."); tacked in 357 s, as in milestone 2; none set before she was round, all ten set after | yes |
+| 20 | Three all-hands calls in the middle watch: the morning watch's crew factor | 1.10 to 1.25; rested 1.0 | 1.128 (mean fatigue of the hands at the fore topsail 0.305); rested 1.000; the topsail took 12.8% longer | yes |
+| 21 | The schooner's watch cannot set the fore topsail, foresail and mainsail at once | the third waits, and says so; not with all hands | the watch: the foresail short-handed (five hands), the mainsail waits ("Not hands enough on deck to set the mainsail; the watch is setting the fore topsail and the foresail."); all hands: no wait, all three set in 338 s | yes |
+| 22 | Same seed, same muster, same log; a replay reproduces it | equal | equal digests and musters through plain sail, all hands, a tack, a pipe-down and the eight bells watch change; the replay equal too (`ship_factory` now musters the crew once the World exists) | yes |
+| 23 | Sending down the topgallant masts in the gate M2 gale at the start of the second ten minutes saves the royals | nothing carries away | without: the mizzen, fore and main royal yards at 830, 831 and 836 s; with: nothing carried away or parted in forty minutes, the masts down 25 min after the order | yes |
+
+**Truth 18, the times.** The spec's times assume slower work than the milestone 2 files give. With the watch on deck the frigate has 111 hands and eleven sails want 102, so all but two begin at once and the watch is barely short; the time is the slowest sail's (the mizzen topgallant, seven hands for twelve) plus the files' own durations, which are frozen (spec M3 §1). All hands take 5.6 minutes, which is Luce's "in a few minutes" for a smart ship better than the spec's 12 to 20. Meeting the spec would mean lengthening `duration_s` in `set_square.yaml`, `set_gaff.yaml` and `set_jibheaded.yaml` (milestone 2's, frozen) or cutting the watch's hands; I changed neither. The ratio, which is the milestone's claim, holds at 2.9 to 1 on the frigate and 1.7 to 1 on the schooner (whose watch of seventeen is short for everything).
+
+**Truth 20, through orders.** From half past midnight: `call all hands` at one, two and three, `pipe down` ten minutes after each; at 04:01 `set the fore topsail` with the morning watch (the larboard, the watch that was turned out). Package 18's `FATIGUE_ALL_HANDS_AT_NIGHT` of 0.20 gives 1.128 here (1.145 in package 18's scenario, which had the topmen aloft a third of each call).
+
+### Milestone 2 truths with the crew aboard (checked by package 20)
+
+The compatibility rule holds one evolution at a time; group orders now compete for hands, so the truths that set plain sail from rest moved. Re-measured on the integrated branch after package 20 (package 17's figures, measured before package 19's crew lines landed, in brackets):
+
+- **Truth 8**, heel and topgallant strain in 30 knots: heel 20.2°; the first topgallant warning comes 163 s *before* the last sail of plain sail is set (164 s), because the watch sets the topgallants before the slow mizzen topgallant. The test's "within five minutes of all set" holds.
+- **Truth 9**, carrying away in 35 knots under all sail: first loss at 798 s, the fore topgallant mast (834 s; 689 s in milestone 2), then the main and mizzen royal masts at 828 and 854 s. Inside twenty minutes.
+- **Truth 13**, gaff thrust on a run: 1.761 kN at 45° and 2.963 kN at 70°, as package 17 measured.
+- **Truth 17**, getting under way: never closer than 63.3° to the wind (63.1°), settled close-hauled at 361 s (346 s), no sternway, no aback.
+
+### Found on the way (package 20)
+
+- **Group orders and the notable line.** `set plain sail` on the schooner wrote a notable "Not hands enough" line for every sail that waited. Now the first of a group writes one notable line for all ("Setting plain sail: not hands enough for all at once; the watch takes the sails in turn.") and the rest routine; an order given singly keeps its notable line. The group is named in `verbs.py` and reaches the runner as `params["group"]`.
+- **Close reef** took one reef: `reefs` is now every band still out.
+- **The runner's all-hands lines.** An all-hands evolution called `routine.call_all_hands` and, at its end, `routine.pipe_down`, but dropped the notes they return, so a tack's "All hands! (to tack ship)" and the pipe-down after it never reached the log. The runner now records them.
+- **Box-hauling after `trim sails`.** From close-hauled at 4.9 kn with the yards trimmed by `trim sails`, `box haul` fails ("she would not come round") in the console's gusty 15 knots; after `keep her full`, as package 19's test does it, she box-hauls in 495 s. Recorded for the script's owner; the gate uses `keep her full`.
+- **A blown-out sail in the gale.** In the gate M2 gale with seed 7 no sail blows out: the royals go with their yards and masts, so the fore royal is wrecked, not blown out, and `shift the fore royal` is refused ("The fore royal is wrecked."). Shifting is shown on a sound sail at the gate; a blown-out one needs a gale that loads the canvas past its rating before the spar, which the strain ratings do not give at any wind from 25 to 35 knots on the three headings tried.
