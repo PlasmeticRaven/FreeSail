@@ -5,7 +5,7 @@ id: take_in_square
 verb: take_in
 applies_to: {class: square}
 preconditions:
-  - {check: "sail.state in [set, sheeted, loosed]", reason: "The {sail} is {state}; there is nothing to take in."}
+  - {check: "sail.state in [set, sheeted, loosed, goose_winged]", reason: "The {sail} is {state}; there is nothing to take in."}
 requires:
   - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
 steps:
@@ -19,5 +19,11 @@ steps:
 on_start: {log: "Hands to the {sail} clewlines and buntlines."}
 on_complete: {log: "Took in the {sail}; hanging in the gear.", kind: sail.taken_in, severity: notable}
 on_fail: {log: "Could not take in the {sail}: {reason}.", kind: evolution.failed, severity: notable}
-crew: {hands: 10, rating: ordinary, stations: [afterguard, waisters]}
+# crew (package 19): "Shortening sail: man the clewlines" is in the topman's billet,
+# with the afterguard and waisters at the sheets and halyards (Luce 1884, ch. XVIII Organization, 'Station Billet').
+# hands: milestone 2's number, kept: package 17's tests were built on these numbers.
+# It is more than one watch of the schooner has at this rating (six ordinary, seven
+# able, two landsmen on deck at the least), so there the request is made up with
+# better hands and goes a little faster than milestone 2; the frigate's watch fills it.
+crew: {hands: 10, rating: ordinary, stations: [topmen, afterguard, waisters]}
 source: "Luce 1866, ch. XXIII At Sea, 'To take in a Topsail', 'To take in a Top-gallant sail', 'To take in a Course'"

@@ -20,5 +20,8 @@ steps:
 on_start: {log: "Lay out and stow the {sail}."}
 on_complete: {log: "Stowed the {sail}.", kind: sail.furled, severity: notable}
 on_fail: {log: "Could not stow the {sail}: {reason}.", kind: evolution.failed, severity: notable}
-crew: {hands: 4, rating: ordinary, stations: [forecastle]}
+# crew (package 19): forecastlemen "bend and unbend, loose and furl the head-sails";
+# the main topmast staysail is the fore-topmen's, a schooner's gaff topsail the
+# main's (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship').
+crew: {hands: 4, rating: ordinary, stations: [forecastle, topmen]}
 source: "Luce 1866, ch. XXIII At Sea, 'To set a Head Sail' ('Lay out and stow the jib')"

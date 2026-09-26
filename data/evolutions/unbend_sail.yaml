@@ -1,0 +1,32 @@
+# Unbend a square sail from its yard and send it down (scripted, UnbendScript
+# in scripts.py; the script keeps the count of spare sails, which a step list
+# cannot). The sail must not be drawing; one that is furled, in the gear or
+# blown out is unbent where it hangs. A sound sail goes down to the sail room
+# and counts as a spare; the rags of a blown-out one are condemned. The yard is
+# left bare (`unbent`) until a sail is bent to it.
+#
+# Luce's port routine ("Trice up! Lay out and unbend! ... Ease away! Lower
+# together!") is two phases here:
+#   unbend  aloft: gaskets adrift, robands cut, head earings singled
+#   lower   on deck: eased away and lowered by the buntlines, stowed below
+# Only square sails in this milestone: the runner matches one sail class per
+# file (see the package 19 report).
+id: unbend_sail
+verb: unbend
+applies_to: {class: square}
+script: unbend
+params: {aloft: [unbend]}
+timing:
+  unbend_s: 180   # lay out and unbend (judgement)
+  lower_s: 90     # ease away and lower together, stow in the sail room (judgement)
+on_start: {log: "Trice up! Lay out and unbend the {sail}."}
+on_complete: {log: "Unbent the {sail}; {spare_sails} in the sail room.", kind: sail.unbent, severity: notable}
+on_fail: {log: "Could not unbend the {sail}: {reason}", kind: evolution.failed, severity: notable}
+# crew: "Bend, unbend, loose, reef, and furl fore-top sail, top-gallant sail, and royal"
+# are the fore-topmen's, the foresail the forecastlemen's, the mainsail the afterguard's
+# (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship').
+# hands: sized to one watch of the schooner at this rating (six ordinary, seven able
+# on deck at the least), which the frigate's watch fills with hands to spare;
+# a full working party would be about sixteen (judgement).
+crew: {hands: 6, rating: ordinary, stations: [topmen, forecastle, afterguard]}
+source: "Luce 1884, ch. XX Port Drills, 'To Unbend Sail' (\"Trice up! Lay out and unbend! ... Ease away! Lower together!\"); Luce 1866, ch. XX 'To Unbend Sail'"

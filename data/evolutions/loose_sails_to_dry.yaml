@@ -1,0 +1,27 @@
+# Loose sails to dry (scripted, LooseToDryScript in scripts.py): after rain the
+# furled sails are loosed to hang in their gear and dry, "Topgallant-sails
+# and royals hang down, their clews hauled up snug. The head sails are spread
+# on the booms, heads of fore and aft sails hauled about half-way out"
+# (Luce 1884, ch. XX, 'To loose sail to the buntlines'). Every furled sail on a
+# standing spar is loosed, except the studding sails, which are stowed below.
+# One phase, `loose`, aloft. The sails hang `loosed` (no drive, a little
+# windage) until they are set or furled again (`furl all`).
+# Refused when it blows harder than max_wind_kn across the deck: a harbour or
+# a fine-weather order.
+id: loose_sails_to_dry
+verb: loose_sails_to_dry
+applies_to: {class: ship}
+script: loose_to_dry
+params: {aloft: [loose]}
+preconditions: []
+timing:
+  loose_s: 180       # aloft sail loosers, trice up, lay out, loose, let fall (judgement)
+  max_wind_kn: 20    # no loosing to dry in more wind than this (judgement)
+on_start: {log: "Loose sails to dry! Aloft sail loosers."}
+on_complete: {log: "Loosed {count} sails to dry.", kind: sail.loosed, severity: notable}
+on_fail: {log: "Could not loose sails to dry: {reason}", kind: evolution.failed, severity: notable}
+# hands: all. Every man has a station for "Loosing sail" in his billet (Luce 1884,
+# ch. XVIII, 'Station Billet'), and a watch of the schooner is six ordinary seamen: the
+# whole ship's canvas is all hands' work. Order it by day.
+crew: {hands: all, rating: ordinary, stations: [all hands]}
+source: "Luce 1884, ch. XX Port Drills, 'To Loose Sail to the Buntlines' (\"Loose sail! ... Let fall!\"); ch. XIX Duties of Midshipmen (\"except when sails are loosed to dry\"); Luce 1866, ch. XX 'To Loose Sail (Port Routine)'"

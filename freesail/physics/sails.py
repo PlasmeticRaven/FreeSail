@@ -99,6 +99,14 @@ WIND_EYE_HEIGHT_M = 1.5
 MAST_CLASSES = frozenset({"mast", "topmast", "topgallant_mast", "royal_mast"})
 SQUARE_FAMILY = frozenset({"square", "studding"})
 
+# A goose-winged course or topsail (package 19, spec M3 §6): the lee clew is
+# hauled up and only the weather half of the sail draws (Luce 1884, ch. XXIV,
+# 'Wearing in a Gale': "haul aboard the weather clew of the foresail ... A
+# foresail in this state is 'goose-winged'"). Half the working area, its
+# centre a quarter of the yard's length out toward the side still set.
+GOOSE_WINGED_AREA_FRACTION = 0.5
+GOOSE_WINGED_SHIFT = 0.25  # of the yard's length, toward the weather yardarm
+
 
 # ---------------------------------------------------------------------------
 # Sail classes: the tables
@@ -233,6 +241,8 @@ def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
         flow = flows[sail.id]
         reefs = min(max(sail.reefs, 0), sail.reef_bands)
         area = sail.area_m2 * max(1.0 - cls.reef_factor * reefs, 0.0) * heel_cos * blankets[sail.id]
+        if sail.state is SailState.GOOSE_WINGED:
+            area *= GOOSE_WINGED_AREA_FRACTION
         chord, drive_normal = _chord(ship, sail, flow.awa)
         f_fwd, f_stb, backed = _plate_force(flow, area, chord, drive_normal, cls, sail)
         force = math.hypot(f_fwd, f_stb)
@@ -331,7 +341,8 @@ def _chain_intact(ship: Ship, sail: Sail) -> bool:
 
 
 def _is_driving(ship: Ship, sail: Sail) -> bool:
-    return sail.is_set and sail.cls in SAIL_CLASSES and _chain_intact(ship, sail)
+    drawing = sail.is_set or (sail.state is SailState.GOOSE_WINGED and not sail.wrecked)
+    return drawing and sail.cls in SAIL_CLASSES and _chain_intact(ship, sail)
 
 
 def _trim_yard(ship: Ship, sail: Sail) -> Spar | None:
@@ -435,6 +446,11 @@ def _name(part_id: str) -> str:
 
 def _lateral_offset(ship: Ship, sail: Sail, awa: float) -> float:
     """Metres to starboard of the centreline of the sail's centre of effort."""
+    if sail.state is SailState.GOOSE_WINGED:
+        # the weather clew is the one left set: the centre moves out to windward
+        yard = _trim_yard(ship, sail)
+        reach = GOOSE_WINGED_SHIFT * (yard.length_m if yard is not None else 0.0)
+        return reach if awa >= 0 else -reach
     if sail.cls == "studding":
         boom = ship.spar_of_role(sail, "boom")
         yard = _trim_yard(ship, sail)
@@ -553,7 +569,8 @@ def _sail_windage_area(ship: Ship, sail: Sail) -> float:
         return sail.area_m2 * cls.furled_windage * WRECK_MULTIPLIER
     if sail.state is SailState.FURLED:
         return sail.area_m2 * cls.furled_windage
-    if sail.state is SailState.SET:  # set on a spar that is sent down: as good as furled
+    if sail.state in (SailState.SET, SailState.GOOSE_WINGED):
+        # set on a spar that is sent down: as good as furled
         return sail.area_m2 * cls.furled_windage
     return sail.area_m2 * WINDAGE_BY_STATE.get(sail.state, 0.0)
 

@@ -301,7 +301,8 @@ def test_only_set_sails_drive():
         ship.sails["topsail"].state = state
         compute_sail_forces(ship, wind)
         driving = ship.sails["topsail"].thrust_kn > 0
-        assert driving == (state is SailState.SET), state
+        # a goose-winged sail draws with half its cloth (spec M3 §6, package 19)
+        assert driving == (state in (SailState.SET, SailState.GOOSE_WINGED)), state
 
 
 def test_wrecked_or_sent_down_spar_stops_its_sail():

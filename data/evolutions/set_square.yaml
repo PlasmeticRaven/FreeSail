@@ -11,6 +11,7 @@ applies_to: {class: square}
 preconditions:
   - {check: sail.state != set, reason: "The {sail} is set already."}
   - {check: sail.state != blown_out, reason: "The {sail} is blown out of the bolt-ropes; a new one must be bent."}
+  - {check: sail.state != unbent, reason: "The {sail} is unbent; bend a sail to the yard first."}
 requires:
   - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
   - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
@@ -20,6 +21,7 @@ steps:
     if: sail.state in [furled, in_the_gear]
     sets: {sail.state: loosed}
     log: "Laid aloft and loosed the {sail}."
+    aloft: true
   - do: sheet_home
     duration_s: 60
     if: sail.state == loosed
@@ -35,5 +37,12 @@ steps:
 on_start: {log: "Hands aloft to loose the {sail}."}
 on_complete: {log: "Set the {sail}.", kind: sail.set, severity: notable}
 on_fail: {log: "Could not set the {sail}: {reason}.", kind: evolution.failed, severity: notable}
-crew: {hands: 12, rating: ordinary, stations: [topmen, afterguard]}
+# crew (package 19): "Making sail: loose topsail, then on deck to halliards" (the
+# topman's station billet); the forecastlemen loose the foresail, the afterguard the
+# mainsail (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship').
+# hands: milestone 2's number, kept: package 17's tests were built on these numbers.
+# It is more than one watch of the schooner has at this rating (six ordinary, seven
+# able, two landsmen on deck at the least), so there the request is made up with
+# better hands and goes a little faster than milestone 2; the frigate's watch fills it.
+crew: {hands: 12, rating: ordinary, stations: [topmen, forecastle, afterguard]}
 source: "Luce 1866, ch. XXIII At Sea, 'To set a Topsail', 'To set a Top-gallant sail', 'To set a Foresail'; Lever 1808, 'Setting the Topsails'"

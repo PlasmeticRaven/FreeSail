@@ -1,0 +1,29 @@
+# Wear short round (scripted, BoxHaulScript with luff_first 0): Luce's other
+# form of box-hauling, "in any sudden emergency": no luffing up into the wind
+# first. The mainsail and spanker are hauled up, the helm put hard up, the
+# after yards squared and the head yards braced abox at once; "the moment she
+# loses her headway, shift the helm for sternboard", and from there she is
+# handled as in box-hauling. She loses more ground than by box-hauling, for
+# "a vessel with good headway on will run ahead some distance after the sails
+# are all thrown flat aback". The phases are those of boxhaul.yaml without
+# the luff.
+id: wear_short_round
+verb: wear_short_round
+applies_to: {class: ship}
+script: boxhaul
+preconditions: []
+timing:
+  helm_deg: 25
+  luff_first: 0           # helm hard up at once
+  brace_s: 45
+  brace_rate_deg_s: 1.0
+  steady_deg: 5
+  box_timeout_s: 900
+  box_estimate_s: 360
+on_start: {log: "Hard up! Stand by to wear short round."}
+on_complete: {log: "Wore short round; braced sharp up on the {new_tack} tack, heading {new_course}.", kind: ship.wore, severity: notable}
+on_fail: {log: "Could not wear her short round: {reason}.", kind: evolution.failed, severity: notable}
+# crew: all hands, as for box-hauling (Luce 1884, ch. XXIV, 'Box-hauling', 'To Wear Short
+# Round').
+crew: {hands: all, rating: ordinary, stations: [all hands]}
+source: "Luce 1884, ch. XXIV Working to Windward, 'To Wear Short Round' (\"put the helm hard up, square the after yards, and brace abox the head yards\"); Luce 1866, ch. XXIV 'To Wear short round'; Lever 1808, 'Missing Stays, Waring Short Round, Box-hauling'"

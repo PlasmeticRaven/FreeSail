@@ -1,0 +1,42 @@
+# Shift a sail (scripted, ShiftScript in scripts.py): unbend the old one and
+# bend a new one in its place, the one repair of milestone 8 brought forward
+# because it is the heaviest crew work the ship does and it lets a gale's
+# blown-out sails be made good. It uses one spare sail (see bend_sail for where
+# the count comes from) and is refused with none left; a sound old sail goes
+# down to the sail room for the sailmaker and counts as a spare again, the rags
+# of a blown-out one do not. The sail must not be drawing: a blown-out, furled
+# or hauled-up sail is shifted where it hangs.
+#
+# Luce's 'To shift a topsail' ("Lay out! Furl and unbend! ... Lower the sail
+# down to leeward by the buntlines. Send up the new sail ... Bring to and bend
+# the sail ... Let fall! Sheet home!") is three phases here:
+#   unbend   aloft: the old sail furled and unbent
+#   send_up  on deck: the old sail lowered down to leeward, the new swayed up
+#   bend     aloft: brought to and bent, the gear shifted to it
+# The new sail is left furled; letting it fall and setting it is the captain's
+# next order. Only square sails in this milestone, as for unbend_sail.
+id: shift_sail
+verb: shift
+applies_to: {class: square}
+script: shift
+params: {aloft: [unbend, bend]}
+preconditions:
+  - {check: sail.state != unbent, reason: "The {sail} is unbent; there is nothing to shift. Bend a new one."}
+  - {check: "sail.state not in [set, sheeted, goose_winged]", reason: "The {sail} is set; take it in before shifting it."}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
+timing:
+  unbend_s: 180    # lay out, furl and unbend (judgement)
+  send_up_s: 150   # lower the old down to leeward, sway the new aloft (judgement)
+  bend_s: 240      # bring to and bend, the gear shifted (judgement)
+on_start: {log: "Stand by to shift the {sail}! Aloft topmen; lay out, furl and unbend."}
+on_complete: {log: "Shifted the {sail}; the new sail bent and furled, {spare_sails} left in the sail room.", kind: sail.shifted, severity: notable}
+on_fail: {log: "Could not shift the {sail}: {reason}", kind: evolution.failed, severity: notable}
+# crew: the men of the sail's part of the ship, aloft and at the burtons and buntlines
+# ("Shifting topsail yards: topsail-yard, unbend and bend topsail", Luce 1884, ch. XVIII
+# Organization, 'Station Billet'); more than to bend or unbend alone, and able men.
+# hands: sized to one watch of the schooner at this rating (six ordinary, seven able
+# on deck at the least), which the frigate's watch fills with hands to spare;
+# a full working party would be about twenty (judgement).
+crew: {hands: 7, rating: able, stations: [topmen, forecastle, afterguard]}
+source: "Luce 1884, ch. XXXII Shifting Sails and Spars, 'Splitting Sails', 'To Shift a Topsail (by the wind, under all plain sail)', 'To Shift a Course'; Luce 1866, ch. XXXII Shifting Sails and Spars, 'Splitting Sails', 'Main Topsail (Gale)', 'Topgallant Sail or Royal'"

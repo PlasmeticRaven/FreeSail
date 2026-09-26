@@ -1,0 +1,48 @@
+# Goose-wing a course or a topsail: the lee clew hauled up to the yard by the
+# clew garnet (or clewline) and buntline, the weather clew left set, so that
+# half the sail draws and its centre lies out to windward (Luce 1884, ch.
+# XXIV: "man the weather fore tack, overhaul the gear, ease down the
+# clew-garnet, and haul aboard the weather clew of the foresail; which will
+# increase her headway, and with her helm still a-weather, will serve to pay
+# her off. A foresail in this state is 'goose-winged'"). Used to pay her off
+# when wearing in a gale, and to carry a rag of sail when scudding. Falconer's
+# 'goose-wings' are the other way about (both clews set and the bunt furled to the
+# yard, "only used in a great storm to scud before the wind"); the game follows Luce,
+# as the spec does.
+#
+# From a set sail the lee clew is hauled up; from a sail hauled up in the gear
+# (Luce's case) the weather clew is hauled aboard. Either way the sail ends
+# `goose_winged`, which the physics reads (physics/sails.py): half the area,
+# the centre a quarter of the yard's length to the weather side. `set` hauls
+# the other clew aboard again; `take in` hauls it all up.
+id: goose_wing
+verb: goose_wing
+applies_to: {class: square}
+preconditions:
+  - {check: "parent_of(yard_of(sail)).cls in [mast, topmast]", reason: "Only a course or a topsail is goose-winged; the {sail} is neither."}
+  - {check: "sail.state in [set, in_the_gear, loosed]", reason: "The {sail} is {state}; it must be set, or hauled up in its gear, to be goose-winged."}
+requires:
+  - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
+steps:
+  - do: haul_up_lee_clew
+    duration_s: 45
+    if: sail.state == set
+    sets: {sail.state: goose_winged}
+    log: "Hauled up the lee clew of the {sail} by the clew garnet and buntline."
+  - do: haul_aboard_weather_clew
+    duration_s: 45
+    if: sail.state != goose_winged
+    sets: {sail.state: goose_winged}
+    log: "Overhauled the gear and hauled aboard the weather clew of the {sail}."
+on_start: {log: "Stand by to goose-wing the {sail}!"}
+on_complete: {log: "Goose-winged the {sail}; the weather clew set, the lee clew hauled up.", kind: sail.goose_winged, severity: notable}
+on_fail: {log: "Could not goose-wing the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: deck work at the tack, clew garnet and buntlines of the sail's part of the ship:
+# the forecastlemen at the foresail, the afterguard at the mainsail, the waisters hauling
+# (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship').
+# hands: sized to one watch of the schooner at this rating (six ordinary, seven able
+# on deck at the least), which the frigate's watch fills with hands to spare;
+# a full party at the tack and clew garnet would be about eight (judgement).
+crew: {hands: 6, rating: ordinary, stations: [forecastle, afterguard, waisters]}
+source: "Luce 1884, ch. XXIV Working to Windward, 'To Wear in a Gale under a Close-Reefed Main Topsail, Fore, Main, and Mizzen Storm Staysails' (\"A foresail in this state is 'goose-winged'\"); Luce 1866, ch. XXIV 'Wearing', 'Ditto in a Gale'; Falconer, GOOSE-WINGS of a sail"

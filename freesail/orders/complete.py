@@ -160,7 +160,8 @@ def suggestions(ship: Any, text: str, limit: int = 12) -> list[str]:
             )
         for c in DRIVER_COMMANDS:
             offer(c)
-        return sorted(out, key=lambda s: (len(s), s))[:limit]
+        # the verbs' own names before their synonyms, then the shortest first
+        return sorted(out, key=lambda s: (normalise(s) not in vocab.verbs, len(s), s))[:limit]
 
     verb = vocab.phrase_to_verb[normalise(matched)]
     spec = vocab.verbs[verb]

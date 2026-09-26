@@ -159,8 +159,12 @@ verbs:
     level: 1
   wear ship:
     # "Gybe" is the later word for wearing a fore-and-aft vessel; the log
-    # says so when it is used.
-    synonyms: [wear, bear up and wear, wear round, gybe, jibe, gybe her, wear her round]
+    # says so when it is used. "Wear under bare poles" is the same evolution
+    # with no sail set (Luce 1884, ch. XXIV, 'To Wear under Bare Poles': "Man
+    # the weather fore rigging ... put the helm a-weather and work the yards
+    # as usual"); it is refused while any sail is set.
+    synonyms: [wear, bear up and wear, wear round, gybe, jibe, gybe her, wear her round,
+               wear under bare poles, wear her under bare poles]
     object: none
     level: 1
   heave to:
@@ -169,6 +173,114 @@ verbs:
     level: 1
   fill away:
     synonyms: [fill, fill and stand on, let draw]
+    object: none
+    level: 1
+  # Milestone 3 (package 19): the catalogue to forty. Sail work first.
+  bend:
+    # A new sail from the sail room bent to a bare yard (Luce 1884, ch. XX
+    # 'Bending sail'). Uses a spare sail.
+    synonyms: [bend on, bend a new]
+    object: sail
+    level: 1
+  unbend:
+    # Unbent from the yard and sent down (Luce 1884, ch. XX 'To unbend sail').
+    synonyms: [unbend and send down]
+    object: sail
+    level: 1
+  shift:
+    # The old sail unbent and a new one bent (Luce 1884, ch. XXXII 'Shifting
+    # Sails and Spars'). Uses a spare sail.
+    synonyms: [shift the sail, change]
+    object: sail
+    level: 1
+  goose wing:
+    # One clew hauled up, the other set (Luce 1884, ch. XXIV: "A foresail in
+    # this state is 'goose-winged'"). "goose-wing" reads as "goose wing".
+    synonyms: [goosewing]
+    object: sail
+    level: 1
+  rig out:
+    # A studding sail boom (Luce 1884, ch. XXIII: "Set taut! Rig out! Hoist
+    # away!"). The object is the boom or the studding sail it carries; the
+    # grammar reads it as it reads a sail.
+    synonyms: [run out]
+    object: sail
+    level: 1
+  rig in:
+    synonyms: []
+    object: sail
+    level: 1
+  # Spars aloft (Luce 1884, ch. XX, 'Sending up and down topgallant-masts';
+  # ch. XXIX, 'Preparations for a Gale'). The whole order is the verb: every
+  # mast of that kind the ship has.
+  send down the topgallant masts:
+    synonyms: [send down topgallant masts, send down the topgallant mast, down topgallant masts,
+               send down the topgallant masts and yards, send down the topgallant yards and masts,
+               strike the topgallant masts, strike topgallant masts, strike the topgallant mast]
+    object: none
+    level: 1
+  sway up the topgallant masts:
+    synonyms: [sway up topgallant masts, sway up the topgallant mast, up topgallant masts,
+               send up the topgallant masts, send up topgallant masts, send up the topgallant mast,
+               sway up and fid the topgallant masts, fid the topgallant masts]
+    object: none
+    level: 1
+  send down the topgallant yards:
+    synonyms: [send down topgallant yards, send down the light yards,
+               send down the topgallant and royal yards, down topgallant and royal yards,
+               send down topgallant and royal yards]
+    object: none
+    level: 1
+  cross the topgallant yards:
+    synonyms: [cross topgallant yards, cross the light yards, cross the topgallant and royal yards,
+               cross topgallant and royal yards, send up the topgallant yards,
+               sway up the topgallant yards]
+    object: none
+    level: 1
+  strike the topmasts:
+    synonyms: [strike topmasts, strike the topmast, house the topmasts, house topmasts]
+    object: none
+    level: 1
+  fid the topmasts:
+    synonyms: [fid topmasts, fid the topmast, sway up the topmasts, sway up and fid the topmasts,
+               send up the topmasts]
+    object: none
+    level: 1
+  # Handling the ship (Luce 1884, ch. XXIV, XXIX; Appendix I).
+  box haul:
+    # "box-haul" reads as "box haul".
+    synonyms: [boxhaul, box haul her, box haul the ship, boxhaul her, boxhaul the ship]
+    object: none
+    level: 1
+  wear short round:
+    synonyms: [wear her short round, ware short round]
+    object: none
+    level: 1
+  lie a try:
+    # "lie a-try" reads as "lie a try". Lying to under the close-reefed main
+    # topsail is the same thing said in full ("lie to" alone is heave to).
+    synonyms: [lie a try under the main topsail, lie to under the main topsail,
+               lie to under the close reefed main topsail, lie to under a close reefed main topsail,
+               bring her to under the main topsail]
+    object: none
+    level: 1
+  scud:
+    synonyms: [scud before it, scud before the wind, scud before the gale, run before it,
+               run before the gale, bear up and scud]
+    object: none
+    level: 1
+  back and fill:
+    synonyms: [back and fill her]
+    object: none
+    level: 1
+  loose sails to dry:
+    synonyms: [loose the sails to dry, loose sail to dry, loose all sail to dry,
+               loose the sail to dry, loose all sails to dry]
+    object: none
+    level: 1
+  furl all:
+    # "Furl sail!" is Luce's call for furling everything (ch. XX 'To furl sail').
+    synonyms: [furl all sails, furl all sail, furl everything, furl sails, furl sail]
     object: none
     level: 1
   scandalise:
@@ -242,11 +354,43 @@ evolutions:
   wear ship: wear
   heave to: heave_to
   fill away: fill_away
+  bend:
+    square: bend_sail
+  unbend:
+    square: unbend_sail
+  shift:
+    square: shift_sail
+  goose wing:
+    square: goose_wing
+  # rig out and rig in take a studding sail boom, or the studding sail on it
+  rig out:
+    studdingsail_boom: rig_out_studdingsail_boom
+    studding: rig_out_studdingsail_boom
+  rig in:
+    studdingsail_boom: rig_in_studdingsail_boom
+    studding: rig_in_studdingsail_boom
+  send down the topgallant masts: send_down_topgallant_masts
+  sway up the topgallant masts: sway_up_topgallant_masts
+  send down the topgallant yards: send_down_topgallant_yards
+  cross the topgallant yards: cross_topgallant_yards
+  strike the topmasts: strike_topmasts
+  fid the topmasts: fid_topmasts
+  box haul: boxhaul
+  wear short round: wear_short_round
+  lie a try: lie_a_try
+  scud: scud
+  back and fill: back_and_fill
+  loose sails to dry: loose_sails_to_dry
+  furl all: furl_all
 
 refusals:
   furl: "A {class} sail is not furled on its spar; take it in instead."
   reef: "The {name} has no reef bands; it is set whole or not at all."
   shake out: "The {name} has no reef bands; there is nothing to shake out."
+  bend: "The {name} is a {class} sail; in this milestone only a square sail is bent to and unbent from its yard."
+  unbend: "The {name} is a {class} sail; in this milestone only a square sail is bent to and unbent from its yard."
+  shift: "The {name} is a {class} sail; in this milestone only a square sail is shifted. Take it in instead."
+  goose wing: "The {name} is a {class} sail; it has no clews to goose-wing. Only a course or a topsail is goose-winged."
   scandalise: "The {name} cannot be scandalised: the physics has no state for a gaff sail with its peak dropped yet, only set, reefed or taken in. Ease the sheet, reef it or take it in instead."
 
 # How each class of sail is taken in, in the period word (Luce 1866, ch.

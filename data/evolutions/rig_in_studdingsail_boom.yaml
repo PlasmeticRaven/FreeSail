@@ -1,0 +1,24 @@
+# Rig in a studding sail boom: shift the in-and-out jigger to the slings of
+# the yard and haul the boom in along the yard, clamping it in its irons
+# (Luce 1884, ch. XXIII: "Lower away! Haul down! Rig in!"). Split from
+# take_in_studding. A boom cannot be rigged in with its studding sail set.
+id: rig_in_studdingsail_boom
+verb: rig_in
+applies_to: {class: studdingsail_boom}
+preconditions:
+  - {check: spar.rigged_out, reason: "The {spar} is rigged in already."}
+  - {check: not any_set(sails_using(spar)), reason: "The {spar} has its studding sail set; take it in first."}
+requires:
+  - {check: not wrecked(spar_chain(spar)), reason: "the {spar}'s yard is wrecked or sent down"}
+steps:
+  - do: rig_in
+    duration_s: 40
+    aloft: true             # the hand on the yard casts off the heel lashing
+    sets: {spar.rigged_out: "false"}
+on_start: {log: "Man the in-and-out jigger; rig in the {spar}."}
+on_complete: {log: "Rigged in the {spar}.", kind: spar.rigged_in, severity: routine}
+on_fail: {log: "Could not rig in the {spar}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: as for rigging it out (Luce 1884, ch. XXIII At Sea, 'To take in the Topmast
+# Studding-sail': "Man the downhaul, deck-sheet, in-and-out jigger").
+crew: {hands: 4, rating: ordinary, stations: [forecastle, topmen]}
+source: "Luce 1884, ch. XXIII At Sea, 'To Take it In' (the topgallant studding-sail: \"Lower away! Haul down! Rig in!\"), 'To take in the Topmast Studding-sail', 'In-and-out Jigger'"

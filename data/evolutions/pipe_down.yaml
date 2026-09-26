@@ -1,0 +1,20 @@
+# Pipe down (spec M3 §4.2 and §6): the work done, "clear up the decks and pipe
+# down"; the watch below goes below again and the watch whose turn it is keeps
+# the deck. Sending the hands below is the watch routine's (crew/routine.py,
+# package 18); this file makes the pipe an evolution with its short delay and
+# its log line, so that it journals and replays like any other order. The
+# order that starts it ("pipe down", "pipe the watch below") is package 20's,
+# and it refuses while an all-hands evolution is still at work.
+#
+# No hands are asked for: the pipe is the routine's, not work for the watch.
+id: pipe_down
+verb: pipe_down
+applies_to: {class: ship}
+steps:
+  - do: pipe_down
+    duration_s: 30
+on_start: {log: "Clear up the decks and pipe down."}
+on_complete: {log: "Piped down.", kind: crew.piped_down, severity: routine}
+on_fail: {log: "Could not pipe down: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 0}
+source: "Luce 1884, ch. XX Port Drills, 'To Square Yards' (\"the decks being cleared up, he is directed to PIPE DOWN!\"); ch. XXIV Working to Windward, 'To Tack Ship under Double-Reefed Topsails' (\"clear up the decks and pipe down\")"

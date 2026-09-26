@@ -23,6 +23,8 @@ class SailState(StrEnum):
     SHEETED = "sheeted"  # sheets home but not hoisted (topsails) / not fully drawing
     SET = "set"  # drawing
     BLOWN_OUT = "blown_out"  # cloth gone
+    UNBENT = "unbent"  # no sail on the yard: unbent and sent down to the sail room
+    GOOSE_WINGED = "goose_winged"  # a course or topsail with the lee clew hauled up, half drawing
 
 
 class LineState(StrEnum):
@@ -56,6 +58,7 @@ class Spar(Part):
     rake: float = 0.0  # radians, for masts: positive aft, negative forward
     brace_angle: float = 0.0  # radians; 0 square, +ve = braced up for the starboard tack
     sent_down: bool = False  # struck below (topgallant masts in a gale)
+    rigged_out: bool = True  # studding sail booms: run out along the yard, ready for the sail
 
     @classmethod
     def from_spec(cls, s: SparSpec) -> Spar:

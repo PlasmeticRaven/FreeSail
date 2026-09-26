@@ -1,0 +1,42 @@
+# Strike the topmasts (scripted, SendDownScript on the topmasts): lower each
+# topmast down its lower mast until its head is near the lower cap, with the
+# topsail yard on the cap, the topmast studding sail booms, and the stays of
+# the topmast (with the jib and fore topmast staysail hanked to them). Done in
+# a hurricane or when a ship lies long at anchor in bad weather; the struck
+# spars carry no load and give no windage.
+#
+# Only with the spars above already sent down: a topmast cannot be struck with
+# its topgallant mast standing ("send down the topgallant masts" first). And
+# not with sail set on it: the topsails and the head sails on its stays are
+# the captain's to take in first, so the order is refused, naming them.
+#
+# Luce's sequence (top tackles hooked, the topsail yard lowered on the cap,
+# rigging slacked, the mast swayed, unfidded and lowered) is compressed to two
+# phases, both aloft:
+#   yards  the topsail yard lowered on the cap, booms rigged in and sent down
+#   mast   top tackles manned, swayed, the fid drawn, the mast lowered away
+id: strike_topmasts
+verb: strike_topmasts
+applies_to: {class: ship}
+script: send_down
+params:
+  mast: topmast
+  poles: []
+  with_masts: true
+  clear_away: false
+  what: topmasts
+  verb_words: strike
+  doing: striking the topmasts
+  first: send down the topgallant masts
+  aloft: [yards, mast]
+timing:
+  yards_s: 240   # topsail yards lowered on the caps, booms in (judgement)
+  mast_s: 900    # top tackles, swayed, unfidded and lowered (judgement)
+on_start: {log: "Strike topmasts! Hook the top tackles."}
+on_complete: {log: "Struck {sent}.", kind: spar.sent_down, severity: notable}
+on_fail: {log: "Could not strike the topmasts: {reason}.", kind: evolution.failed, severity: notable}
+# crew: a heavy evolution for all hands: the topmen in the tops "fid and unfid mast", the
+# rest at the top tackles (Luce 1884, ch. XVIII Organization, 'Station Billet': "Strike
+# and fid topmasts: fid and unfid mast").
+crew: {hands: all, rating: able, stations: [all hands]}
+source: "Luce 1884, ch. XVIII Organization, 'Station Billet' (\"Strike and fid topmasts\"); ch. XXIV Working to Windward, 'To Wear under Bare Poles' (\"send down the yards on the mizzen, also the mizzen topmast and topgallant masts\"); Luce 1866, ch. XXXIV 'Housing Topmasts'"

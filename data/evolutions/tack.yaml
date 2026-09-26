@@ -28,5 +28,7 @@ timing:
 on_start: {log: "All hands about ship."}
 on_complete: {log: "Tacked; braced up on the {new_tack} tack, heading {new_course}.", kind: ship.tacked, severity: notable}
 on_fail: {log: "Missed stays: {reason}. Squared the yards and fell off on the {old_tack} tack.", kind: ship.missed_stays, severity: urgent}
+# crew (package 19): checked; "Tacking and wearing: weather main-topsail and upper
+# braces" is in every topman's billet: all hands (Luce 1884, ch. XVIII Organization, 'Station Billet').
 crew: {hands: all, rating: ordinary, stations: [all hands]}
 source: "Luce 1866, ch. XXIV Working to Windward, 'Tacking', 'Missing Stays'; Lever 1808, 'Tacking Expeditiously'"

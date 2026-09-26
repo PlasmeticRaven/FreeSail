@@ -1,0 +1,25 @@
+# Furl all sail (scripted, FurlAllScript in scripts.py): hand and furl every
+# sail in the ship, as on coming to anchor, after loosing to dry, or in a
+# hurricane ("furl all square sails", Luce 1884, ch. XXIX).
+#   clew_up  on deck: whatever is drawing is clewed up, hauled up, hauled down
+#            or brailed (left out when nothing is set)
+#   furl     aloft: "Furl away!" Everything hanging in its gear is furled or
+#            stowed; the studding sails are made up and sent below
+# Sails on spars that are sent down or carried away are left as they are.
+id: furl_all
+verb: furl_all
+applies_to: {class: ship}
+script: furl_all
+params: {aloft: [furl]}
+preconditions: []
+timing:
+  clew_up_s: 90    # hands to the clewlines, buntlines, brails and downhauls (judgement)
+  furl_s: 240      # lay aloft, lay out, furl away, lay down from aloft (judgement)
+on_start: {log: "Furl sail! Aloft topmen; lay out and furl."}
+on_complete: {log: "Furled all sail; {count} sails furled and stowed.", kind: sail.furled, severity: notable}
+on_fail: {log: "Could not furl all sail: {reason}", kind: evolution.failed, severity: notable}
+# hands: all. "Furling sail" and "Shortening sail and coming to anchor" are stations in
+# every man's billet (Luce 1884, ch. XVIII, 'Station Billet'); the whole ship's canvas
+# is all hands' work.
+crew: {hands: all, rating: ordinary, stations: [all hands]}
+source: "Luce 1884, ch. XX Port Drills, 'To Furl Sail' (\"Furl sail! ... Lay out! ... Furl away!\"), 'Remarks on Furling'; ch. XXIX In a Gale, 'Preparations for a Gale' (\"furl all square sails\"); Luce 1866, ch. XX 'To Furl Sail (Port Routine)'"
