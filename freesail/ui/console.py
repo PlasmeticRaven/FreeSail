@@ -8,6 +8,7 @@ Driver commands (not ship orders, not journaled):
     time N          set compression to N game seconds per real second
     tick N          advance N ticks, then hold
     state           print a summary of the ship and the weather
+    muster          muster the crew: the watch bill, station by station
     log [N]         print the last N log entries (default 20)
     save PATH       write a save file
     replay PATH     rebuild a world from a save and continue from it
@@ -26,6 +27,7 @@ import threading
 import time
 
 from freesail import units
+from freesail.api import queries
 from freesail.core import replay as replay_mod
 from freesail.core.events import Event, Severity
 from freesail.core.world import Scenario, World
@@ -100,6 +102,10 @@ class Console:
         elif cmd == "state":
             for s in self.world.summary_lines():
                 self._print(s)
+        elif self._is_muster(line):
+            # a query, like `state`: printed, never journaled (spec M3 §5.1)
+            for s in queries.muster_lines(self.world):
+                self._print(s)
         elif cmd == "log":
             n = int(args[0]) if args else 20
             for e in self.world.log.tail(n):
@@ -118,6 +124,14 @@ class Console:
         else:
             self.world.submit(line)
         return True
+
+    @staticmethod
+    def _is_muster(line: str) -> bool:
+        """'muster', 'muster the crew' and the vocabulary's other words for it."""
+        from freesail.orders.vocabulary import key, load_vocabulary
+
+        vocab = load_vocabulary()
+        return vocab.phrase_to_verb.get(key(line)) == "muster"
 
     def _replay(self, path: str) -> None:
         data = replay_mod.load_file(path)

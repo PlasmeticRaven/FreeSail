@@ -1,6 +1,8 @@
 """The grammar of an order (spec §8.1): from text to an `Order`.
 
-    order       := verb_phrase [ object ] { modifier } [ "," side ]
+    order       := verb_phrase [ object ] { modifier } [ "," side ] [ "with" [ "the" ] hands ]
+                 | "send" [ "the" ] hands [ direction ] "to" order
+    hands       := a watch or a station ("larboard watch", "fore topmen"; `hands_selectors`)
     object      := [ "the" ] [ side_word ] noun [ side_word ]
     modifier    := "sharp up" | "square" | "in" | "up" | "aback" | "to the wind"
                  | "on the" tack_word "tack"
@@ -16,7 +18,9 @@
 How the parser reads a line:
 
 1. It lower-cases the text, turns hyphens into spaces and drops punctuation
-   other than commas and apostrophes.
+   other than commas and apostrophes. A hands selector ("send the larboard
+   watch aloft to ...", "... with the fore topmen") is taken out first and
+   carried as the modifier `hands_from`.
 2. It matches the longest verb phrase at the start ("take in", "keep her
    full", "brace"), including synonyms from `vocabulary.yaml`. A phrase may
    carry a modifier in itself ("close reef", "haul aft"; `phrase_modifiers`
@@ -74,6 +78,9 @@ class Order:
       heading_text what was said for it, for the log
       points       float                            "two points", "half a point"
       direction    "up" | "off" | "starboard" | "larboard"
+      hands_from   "starboard" | "larboard" | a station ("fore_top", "afterguard"...)
+                   from "send the larboard watch aloft to ..." or "... with the fore
+                   topmen": the hands the work is given to (spec M3 §5.1)
     """
 
     text: str  # the normalised order
@@ -98,6 +105,10 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
     vocab = vocab or load_vocabulary()
     norm = normalise(text).replace("°", " degrees ")
     norm = " ".join(norm.split())
+    if not norm or norm == ",":
+        raise OrderError("No order given.")
+    tokens, hands_from = _take_hands_selector(norm.split(), vocab)
+    norm = " ".join(tokens)
     if not norm or norm == ",":
         raise OrderError("No order given.")
     segments = [seg.split() for seg in norm.split(" , ")]
@@ -138,6 +149,8 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         mods[k] = v
     if verb == "take in" and ("reefs" in mods or "close" in mods):
         verb = "reef"  # "take in one reef in the topsails" is a reef, not a taking in
+    if hands_from is not None:
+        mods["hands_from"] = hands_from
     return Order(
         text=norm.replace(" , ", ", "),
         verb=verb,
@@ -146,6 +159,61 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         side_word=side_word,
         modifiers=mods,
     )
+
+
+# ---------------------------------------------------------------------------
+# Hands selector
+# ---------------------------------------------------------------------------
+
+
+def _take_hands_selector(words: list[str], vocab: Vocabulary) -> tuple[list[str], str | None]:
+    """Take a hands selector out of the words (spec M3 §5.1): the words left, and the
+    watch or station named ("larboard", "fore_top"), or None.
+
+    Two forms: "send the larboard watch aloft to furl the main course" (the order is
+    what follows "to") and "... with the starboard watch" anywhere after the verb,
+    with the comma before it if there is one. "Meet her with the helm" is left alone:
+    the helm is not a watch.
+    """
+    selectors = vocab.hands_selectors
+    chosen: str | None = None
+    said: str | None = None
+    if words and words[0] == "send":
+        i = 2 if len(words) > 1 and words[1] == "the" else 1
+        phrase = _longest_at(words, i, selectors)
+        if phrase:
+            j = i + len(phrase.split())
+            direction = _longest_at(words, j, vocab.send_directions)
+            if direction:
+                j += len(direction.split())
+            if j + 1 >= len(words) or words[j] != "to":
+                raise OrderError(
+                    f"Send the {phrase} to do what? Say 'send the {phrase} aloft to loose the "
+                    f"fore topsail', or give the order and add 'with the {phrase}'."
+                )
+            chosen, said = selectors[phrase], phrase
+            words = words[j + 1 :]
+    i = 1
+    while i < len(words):
+        if words[i] != "with":
+            i += 1
+            continue
+        k = i + 2 if i + 1 < len(words) and words[i + 1] == "the" else i + 1
+        phrase = _longest_at(words, k, selectors)
+        if not phrase:
+            i += 1
+            continue
+        if chosen is not None:
+            raise OrderError(
+                f"Two sets of hands were named (the {said} and the {phrase}); say one."
+            )
+        chosen, said = selectors[phrase], phrase
+        start = i - 1 if words[i - 1] == "," else i
+        words = words[:start] + words[k + len(phrase.split()) :]
+        i = start
+    while words and words[-1] == ",":
+        words = words[:-1]
+    return words, chosen
 
 
 # ---------------------------------------------------------------------------

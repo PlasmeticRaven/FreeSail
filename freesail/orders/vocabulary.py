@@ -56,6 +56,10 @@ class Vocabulary:
     haul_home: tuple[str, ...] = ()
     # the take-in phrases that suit each class of sail (the first is the proper word)
     take_in_words: dict[str, tuple[str, ...]] = field(default_factory=dict)
+    # hands selectors: "larboard watch" -> "larboard", "fore topmen" -> "fore_top"
+    hands_selectors: dict[str, str] = field(default_factory=dict)
+    # the words between "send the larboard watch" and "to": "aloft", "forward"
+    send_directions: tuple[str, ...] = ()
 
     @property
     def class_bound_take_in_phrases(self) -> frozenset[str]:
@@ -182,4 +186,8 @@ def load_vocabulary(path: str | Path | None = None) -> Vocabulary:
     vocab.haul_home = _tuple(data.get("haul_home"))
     for cls, phrases in (data.get("take_in_words") or {}).items():
         vocab.take_in_words[str(cls)] = _tuple(phrases)
+    vocab.hands_selectors = {
+        key(phrase): str(value) for phrase, value in (data.get("hands_selectors") or {}).items()
+    }
+    vocab.send_directions = _tuple(data.get("send_directions"))
     return vocab

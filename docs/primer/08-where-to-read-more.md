@@ -39,7 +39,26 @@ Every file in `data/evolutions/` ends with a `source:` line. Read the passage an
 | `heave_to` | `heave to` | Luce 1866, ch. XXVI Emergencies, 'To heave to' (mizzen topsail aback), 'To heave to with the fore topsail to the mast' |
 | `fill_away` | `fill away` | Luce 1866, ch. XXVI, 'To fill away, after lying to with the main topsail to the mast' |
 
-The evolutions not yet written, with where they will come from (`docs/references/LuceChapterMap.md`, "Suggested first forty evolutions"): box-hauling and club-hauling (Luce 1866, ch. XXIV, 'Box Hauling', 'Club Hauling'; Lever, 'Missing Stays, Waring Short Round, Box-hauling'), boxing off and chapelling (ch. XXV Wind Baffling), scudding and lying to in a gale (ch. XXIX In a Gale), anchoring and weighing (ch. XIV, XV, XXI, XXXIV), the watch and station bills (ch. XVI Organisation), parting rigging and losing masts (ch. XXX, XXXI).
+Milestone 3 brought the catalogue to thirty-nine, most of it from Luce 1884:
+
+| Evolution | Order | Source |
+|---|---|---|
+| `boxhaul` | `box haul` | Luce 1884, ch. XXIV, 'Box-hauling'; Luce 1866, ch. XXIV 'Box Hauling'; Lever, 'Missing Stays, Waring Short Round, Box-hauling' |
+| `wear_short_round` | `wear short round` | Luce 1884, ch. XXIV, 'To Wear Short Round'; Luce 1866, ch. XXIV |
+| `lie_a_try` | `lie a-try` | Luce 1884, ch. XXIX In a Gale, 'Reducing Sail to a Gale', 'Lying to'; Falconer, *Trying* |
+| `scud` | `scud` | Luce 1884, ch. XXIX, 'To Scud', 'Remarks on Scudding'; Falconer, *Scudding* |
+| `back_and_fill` | `back and fill` | Luce 1884, Appendix I In a Tideway, 'Backing and Filling' |
+| `send_down_topgallant_masts`, `sway_up_topgallant_masts` | `send down the topgallant masts` | Luce 1884, ch. XX Port Drills, 'To Send Down Topgallant-Masts'; ch. XXIX, 'Preparations for a Gale' |
+| `send_down_topgallant_yards`, `cross_topgallant_yards` | `send down the topgallant yards` | Luce 1884, ch. XXIX, 'To Send Down Royal Yards'; ch. XX, 'To Cross Topgallant and Royal Yards' |
+| `strike_topmasts`, `fid_topmasts` | `strike the topmasts` | Luce 1884, ch. XVIII, 'Station Billet' ("Strike and fid topmasts"); Luce 1866, ch. XXXIV 'Housing Topmasts' |
+| `rig_out_studdingsail_boom`, `rig_in_studdingsail_boom` | `rig out the fore topmast studdingsail boom` | Luce 1884, ch. XXIII, 'The Topmast Studding-sail' ("Set taut! Rig out! Hoist away!") |
+| `unbend_sail`, `bend_sail`, `shift_sail` | `shift the fore royal` | Luce 1884, ch. XX, 'To Unbend Sail', 'Bending Sail'; ch. XXXII Shifting Sails and Spars |
+| `goose_wing` | `goose-wing the foresail` | Luce 1884, ch. XXIV, 'To Wear in a Gale ...' ("A foresail in this state is 'goose-winged'") |
+| `loose_sails_to_dry`, `furl_all` | `loose sails to dry`, `furl all` | Luce 1884, ch. XX Port Drills, 'To Loose Sail to the Buntlines', 'To Furl Sail' |
+
+The crew orders are not evolutions: `call all hands`, `pipe down` and `relieve the watch` reach the watch routine at once (Luce 1884, ch. XVIII Organization and ch. XX; the watch, quarter and station bills), and `muster` is the console's reading of the watch bill.
+
+The evolutions not yet written, with where they will come from (`docs/references/LuceChapterMap.md`, "Suggested first forty evolutions"): club-hauling (Luce 1866, ch. XXIV, 'Club Hauling'), boxing off and chapelling (ch. XXV Wind Baffling), anchoring and weighing (ch. XIV, XV, XXI, XXXIV), parting rigging and losing masts (ch. XXX, XXXI).
 
 ## The words, by chapter of this book
 
@@ -53,7 +72,7 @@ The evolutions not yet written, with where they will come from (`docs/references
 
 **Chapter 5, going about.** Falconer: *Tack* (to tack), *Veering*, *Wearing*, *Lying-to*, *Aback*. Luce 1866, ch. XXIV, 'Tacking', 'To Haul of All', 'Missing Stays', 'Club Hauling', 'Wearing', 'Box Hauling', 'To Wear short round', 'Half Boards'; ch. XXV, 'Taken Aback'; ch. XXVI, 'To Heave to'. Lever, 'Tacking Expeditiously', 'Veering or Waring, Taken A-back', 'Lying to under different sails, Waring', 'Missing Stays, Waring short round, Box-hauling', 'Heaving to, Sounding', 'Sounding, Box and Club-hauling'. Luce 1884, ch. XXXIV Handling Fore-and-Afters (the schooner: 'To Wear', and tacking a sloop).
 
-**Chapter 6, the watch.** Falconer: *Watch*, *Watch-glasses*, *Log*, *Log-board*. Luce 1866, ch. XVI Organisation, 'The Watch Bill', 'Calling the Watch'; ch. III The Log; Luce 1884, App. G Routine.
+**Chapter 6, the watch.** Falconer: *Watch*, *Watch-glasses*, *Log*, *Log-board*. Luce 1866, ch. XVI Organisation, 'The Watch Bill', 'Calling the Watch'; ch. III The Log; Luce 1884, ch. XVIII Organization ('Duties of Men in Different Parts of the Ship', the station bill), ch. XX (the watch, quarter and station bills; "the marines of a ship are divided between the two watches"), 'The Officer of the Deck' (relieving and mustering the watch), App. G Routine.
 
 ## The game's own documents
 

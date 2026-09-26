@@ -35,6 +35,7 @@ import math
 from typing import Any
 
 from freesail import units
+from freesail.orders import crew as crew_orders
 from freesail.orders import errors, resolve
 from freesail.orders.errors import OrderError
 from freesail.orders.grammar import Order
@@ -52,26 +53,36 @@ Result = tuple[str, str, dict[str, Any]]
 
 
 def execute(
-    ship: Ship, order: Order, vocab: Vocabulary | None = None, skip: frozenset[str] = frozenset()
+    ship: Ship,
+    order: Order,
+    vocab: Vocabulary | None = None,
+    skip: frozenset[str] = frozenset(),
+    group: str | None = None,
 ) -> Result:
     """Carry out a parsed order. Group evolutions are expanded in `orders.handle`, not here.
 
     `skip` names parts to pass over in silence: the group expander uses it
     so that a sail listed twice ("set the plain sail", then "set the
     staysails") is set once. If nothing is left, NothingToDoError is raised.
+    `group` is the work in words when the order is one line of a group
+    evolution ("setting plain sail"); the runner writes one line for the
+    group when the first of its evolutions must wait for hands.
     """
     vocab = vocab or load_vocabulary()
     spec = vocab.verbs[order.verb]
+    if order.verb in crew_orders.CREW_VERBS:
+        _no_stray_modifiers(order, set())
+        return crew_orders.CREW_VERBS[order.verb](ship, order)
     if order.verb in BRACE_VERBS:
-        return _brace(ship, order, vocab, skip)
+        return _brace(ship, order, vocab, skip, group)
     if order.verb == "trim":
-        return _trim(ship, order, vocab, skip)
+        return _trim(ship, order, vocab, skip, group=group)
     if order.verb == "sheet home":
         return _sheet_home(ship, order, vocab)
     if order.verb in BOOM_VERBS:
-        return _boom_evolution(ship, order, vocab, skip)
+        return _boom_evolution(ship, order, vocab, skip, group)
     if spec.object == "sail":
-        return _sail_evolution(ship, order, vocab, skip)
+        return _sail_evolution(ship, order, vocab, skip, group)
     if spec.object == "line":
         return _line_action(ship, order, vocab)
     if spec.object in ("heading", "points") or order.verb in HELM_VERBS:
@@ -131,9 +142,50 @@ def _no_stray_modifiers(order: Order, allowed: set[str]) -> None:
         "heading": "a heading belongs with 'steer'",
         "points": "a number of points belongs with 'steer', 'come up' or 'bear away'",
         "direction": "a direction belongs with 'steer'",
+        "hands_from": (
+            "a watch or a station is sent to work on a sail, a yard or the ship, not to this"
+        ),
     }
     reasons = [words.get(k, f"'{k}' does not go with '{order.verb}'") for k in stray]
     raise OrderError(f"'{order.verb}' was understood, but {errors.join_names(reasons, 'and')}.")
+
+
+# Groups said without 'the' in the group line: "setting plain sail".
+UNCOUNTED_GROUPS = ("plain sail", "all sail")
+
+
+def _group_label(verb: str, object_name: str, group: str | None) -> str:
+    """The work in words for the runner's one line when a group must wait for hands:
+    'setting plain sail', 'setting the topsails', 'bracing the yards'."""
+    if group:
+        return group
+    from freesail.evolutions.runner import gerund
+
+    first, _, rest = verb.partition(" ")
+    doing = f"{gerund(first)} {rest}".strip()
+    what = object_name if object_name in UNCOUNTED_GROUPS else f"the {object_name}"
+    return f"{doing} {what}"
+
+
+def _hands_params(
+    ship: Ship, order: Order, evolution_ids: list[str], group: str | None
+) -> tuple[dict[str, Any], crew_orders.WatchCall | None]:
+    """The params every evolution of this order carries for the hands: the group
+    label when there are several, and the hands selector (turning a watch up)."""
+    params, call = crew_orders.take_hands_from(ship, order, evolution_ids)
+    if group is not None and len(evolution_ids) > 1 and crew_orders.crew_of(ship) is not None:
+        params["group"] = group  # without a crew nothing waits for hands: milestone 2's params
+    return params, call
+
+
+def _settle_call(ship: Ship, call: crew_orders.WatchCall | None, started: bool) -> None:
+    """A watch turned up for this order keeps coming if the order stands, else goes below."""
+    if call is None:
+        return
+    if started:
+        crew_orders.commit(ship, call)
+    else:
+        call.cancel()
 
 
 # ---------------------------------------------------------------------------
@@ -142,10 +194,15 @@ def _no_stray_modifiers(order: Order, allowed: set[str]) -> None:
 
 
 def _sail_evolution(
-    ship: Ship, order: Order, vocab: Vocabulary, skip: frozenset[str] = frozenset()
+    ship: Ship,
+    order: Order,
+    vocab: Vocabulary,
+    skip: frozenset[str] = frozenset(),
+    group: str | None = None,
 ) -> Result:
     verb = order.verb
     allowed = {"reefs", "close", "manner"} if verb in ("reef", "shake out") else {"manner"}
+    allowed.add("hands_from")
     _no_stray_modifiers(order, allowed)
     res = resolve.resolve(ship, order.object or "", order.side_word, verb)
     mapping: dict[str, str] = vocab.evolutions.get(verb, {})
@@ -180,6 +237,14 @@ def _sail_evolution(
             raise OrderError(reasons[0][0].upper() + reasons[0][1:].rstrip(".") + ".")
         raise OrderError(f"Nothing done: {errors.sentence_list(reasons)}.")
     runner = runner_of(ship)
+    to_start = [sail for sail in sails if not checks[sail.id]]
+    extra, call = _hands_params(
+        ship,
+        order,
+        [mapping[sail.cls] for sail in to_start],
+        _group_label(verb, res.name, group) if len(to_start) > 1 else None,
+    )
+    params.update(extra)
     for sail in sails:
         reason = checks[sail.id]
         if reason:
@@ -192,6 +257,8 @@ def _sail_evolution(
             p["sail"] = sail.id
         if verb == "shake out" and order.modifiers.get("close"):
             p["reefs"] = sail.reefs
+        if verb == "reef" and order.modifiers.get("close"):
+            p["reefs"] = sail.reef_bands - sail.reefs  # every band still out: close reefed
         try:
             texts.append(runner.start(ship, evo, sail.id, p))
         except OrderError as e:
@@ -199,6 +266,7 @@ def _sail_evolution(
             failed_ids.append(sail.id)
             continue
         started.append({"evolution": evo, "subject": sail.id, "params": p})
+    _settle_call(ship, call, bool(started))
 
     if not started:
         if len(failed) == 1:
@@ -374,7 +442,11 @@ def _summarise(
 
 
 def _brace(
-    ship: Ship, order: Order, vocab: Vocabulary, skip: frozenset[str] = frozenset()
+    ship: Ship,
+    order: Order,
+    vocab: Vocabulary,
+    skip: frozenset[str] = frozenset(),
+    group: str | None = None,
 ) -> Result:
     """'Brace', 'square' and 'back'. The mode says the angle: sharp up, up, in
     and square as the table gives them; 'aback' (and the verb 'back') sharp
@@ -382,7 +454,7 @@ def _brace(
     does; 'to the wind' the best angle for the present apparent wind, as
     'trim the yards' finds it. 'Brace round' with no mode said braces sharp
     up for the tack the wind is on."""
-    _no_stray_modifiers(order, {"brace_mode", "tack", "manner", "round"})
+    _no_stray_modifiers(order, {"brace_mode", "tack", "manner", "round", "hands_from"})
     verb = order.verb
     mode = order.modifiers.get("brace_mode")
     tack = order.modifiers.get("tack")
@@ -413,7 +485,7 @@ def _brace(
     if not yards:
         raise OrderError("This ship has no yards to brace.")
     if vocab.brace_modes[mode] == "wind":
-        return _trim(ship, order, vocab, skip, yards=yards, object_name=object_name)
+        return _trim(ship, order, vocab, skip, yards=yards, object_name=object_name, group=group)
 
     tack = tack or ship.dyn.tack
     aback = vocab.brace_modes[mode] == "aback"
@@ -443,6 +515,13 @@ def _brace(
     texts: list[str] = []
     failed: list[str] = []
     failed_ids: list[str] = []
+    workable = [y for y in yards if not (y.wrecked or y.sent_down)]
+    extra, call = _hands_params(
+        ship,
+        order,
+        [vocab.evolutions["brace"]] * len(workable),
+        _group_label("brace", object_name, group) if len(workable) > 1 else None,
+    )
     for yard in yards:
         name = resolve.the(ship, yard.id)
         if yard.wrecked:
@@ -462,6 +541,7 @@ def _brace(
             "target_angle": target,  # signed radians: + = braced up for the starboard tack
             "mode": mode,
             "tack": tack,
+            **extra,
         }
         try:
             texts.append(runner.start(ship, vocab.evolutions["brace"], yard.id, params))
@@ -470,6 +550,7 @@ def _brace(
             failed_ids.append(yard.id)
             continue
         started.append({"evolution": "brace", "subject": yard.id, "params": params})
+    _settle_call(ship, call, bool(started))
     if not started:
         raise OrderError(f"Nothing done: {errors.sentence_list(failed)}.")
     text = _summarise(ship, "brace", object_name, started, texts, failed)
@@ -523,6 +604,7 @@ def _trim(
     skip: frozenset[str] = frozenset(),
     yards: list[Spar] | None = None,
     object_name: str = "yards",
+    group: str | None = None,
 ) -> Result:
     """'Trim sails': brace every yard to the present apparent wind and tend the
     fore-and-aft sheets. 'Trim the yards' and 'trim the sheets' do one or the
@@ -534,7 +616,7 @@ def _trim(
     from freesail.physics.sails import SAIL_CLASSES
 
     if order.verb == "trim":
-        _no_stray_modifiers(order, {"manner"})
+        _no_stray_modifiers(order, {"manner", "hands_from"})
         phrase = order.verb_phrase
         do_yards = "sheet" not in phrase
         do_sheets = "yard" not in phrase
@@ -553,6 +635,13 @@ def _trim(
         runner = runner_of(ship)
         if yards is None:
             yards = [y for y in ship.spars.values() if y.is_yard and y.id not in skip]
+        workable = [y for y in yards if not (y.wrecked or y.sent_down)]
+        extra, call = _hands_params(
+            ship,
+            order,
+            [vocab.evolutions["brace"]] * len(workable),
+            _group_label("brace", object_name, group) if len(workable) > 1 else None,
+        )
         for yard in yards:
             name = resolve.the(ship, yard.id)
             if yard.wrecked or yard.sent_down:
@@ -569,6 +658,7 @@ def _trim(
                 "target_angle": target,
                 "mode": "to the wind",
                 "tack": d.tack,
+                **extra,
             }
             try:
                 runner.start(ship, vocab.evolutions["brace"], yard.id, params)
@@ -577,6 +667,7 @@ def _trim(
                 failed_ids.append(yard.id)
                 continue
             started.append({"evolution": "brace", "subject": yard.id, "params": params})
+        _settle_call(ship, call, bool(started))
 
     trimmed: list[str] = []
     if do_sheets:
@@ -1085,13 +1176,17 @@ def _points_words(points: float) -> str:
 
 
 def _boom_evolution(
-    ship: Ship, order: Order, vocab: Vocabulary, skip: frozenset[str] = frozenset()
+    ship: Ship,
+    order: Order,
+    vocab: Vocabulary,
+    skip: frozenset[str] = frozenset(),
+    group: str | None = None,
 ) -> Result:
     """'Rig out' and 'rig in' a studding sail boom. The object is the boom
     ('the starboard fore topmast studdingsail boom') or the studding sail it
     carries ('the fore topmast studdingsails, both sides'); either way the
     evolution works on the boom (Luce 1884, ch. XXIII: "Rig out! Hoist away!")."""
-    _no_stray_modifiers(order, {"manner"})
+    _no_stray_modifiers(order, {"manner", "hands_from"})
     verb = order.verb
     res = resolve.resolve(ship, order.object or "", order.side_word, verb)
     mapping: dict[str, str] = vocab.evolutions.get(verb, {})
@@ -1121,14 +1216,21 @@ def _boom_evolution(
     failed: list[str] = []
     failed_ids: list[str] = []
     evo = mapping["studdingsail_boom"]
+    extra, call = _hands_params(
+        ship,
+        order,
+        [evo] * len(booms),
+        _group_label(verb, res.name, group) if len(booms) > 1 else None,
+    )
     for boom in booms:
         try:
-            texts.append(runner.start(ship, evo, boom.id, {}))
+            texts.append(runner.start(ship, evo, boom.id, dict(extra)))
         except OrderError as e:
             failed.append(f"{resolve.the(ship, boom.id)}: {e}")
             failed_ids.append(boom.id)
             continue
-        started.append({"evolution": evo, "subject": boom.id, "params": {}})
+        started.append({"evolution": evo, "subject": boom.id, "params": dict(extra)})
+    _settle_call(ship, call, bool(started))
     if not started:
         if len(failed) == 1:
             reason = failed[0].split(": ", 1)[-1]
@@ -1155,7 +1257,7 @@ def _boom_evolution(
 
 
 def _ship_evolution(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
-    _no_stray_modifiers(order, {"tack", "manner"})
+    _no_stray_modifiers(order, {"tack", "manner", "hands_from"})
     evo = vocab.evolutions[order.verb]
     params: dict[str, Any] = {}
     bare_poles = "bare poles" in order.verb_phrase
@@ -1189,7 +1291,14 @@ def _ship_evolution(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
             )
         params["tack"] = order.modifiers["tack"]
     runner = runner_of(ship)
-    text = runner.start(ship, evo, SHIP_SUBJECT, params)
+    extra, call = crew_orders.take_hands_from(ship, order, [evo])
+    params.update(extra)
+    try:
+        text = runner.start(ship, evo, SHIP_SUBJECT, params)
+    except OrderError:
+        _settle_call(ship, call, False)
+        raise
+    _settle_call(ship, call, True)
     if order.verb_phrase.split()[0] in ("gybe", "jibe"):
         # The later word for wearing a fore-and-aft vessel: the boom comes
         # over as the wind crosses the stern. The period word is wear.
