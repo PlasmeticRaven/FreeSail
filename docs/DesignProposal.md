@@ -577,7 +577,7 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
 
 ### Closed after v0.2 review
 
-11. **Second reference rig.** Topsail schooner, confirmed. A cutter is the intended third vessel, and a small lateen-rigged vessel a fourth, chosen to handle as differently as possible from the ship-rigged reference.
+11. **Second reference rig.** Topsail schooner, confirmed. **Revised 2026-09-26 (owner):** the third vessel is to be a very small single-masted one, a Mediterranean **tartane** (a lateen mainsail on one raking mast, one or two jibs on a long bowsprit, and often a small mizzen right aft; the owner's reference is a Roux-school watercolour of one under sail with a boat in tow), chosen for how differently it handles from anything square-rigged. Then a **bilander** (two masts; the fore square-rigged; the main carrying a trapezoidal lateen or settee mainsail on a long yard slung to the mainmast, with square topsails above it; the owner's references are an eighteenth-century watercolour titled "A Bilander" and a line drawing of one), which exercises a lateen and square sails on one hull together. The cutter stays on the list after them. All of them belong to the milestone that builds the vessel library and its method (milestone 8, or earlier if the generator's rig rules mature first); nothing in milestone 3b depends on them. The owner holds the reference images; they are not in the repository.
 12. **The language's name.** Orders.
 13. **Next document.** The M0 to M2 technical specification: `docs/TechnicalSpec-M0-M2.md`.
 
