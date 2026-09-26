@@ -782,7 +782,7 @@ class Runner:
         routine = ship.extra.get("routine")
         call = getattr(routine, "call_all_hands", None)
         if call is not None and not crew.all_hands_called:
-            call(f"to {self._describe(inst)}")
+            _record(ship, call(f"to {self._describe(inst)}"))  # the routine returns its line
         reason = self._format(inst, inst.evo.on_start.log).strip().rstrip(".!")
         reason = reason[:1].lower() + reason[1:]
         for other in sorted(self.instances, key=lambda i: i.order):
@@ -839,7 +839,7 @@ class Runner:
         routine = ship.extra.get("routine")
         pipe_down = getattr(routine, "pipe_down", None)
         if pipe_down is not None:
-            pipe_down()
+            _record(ship, pipe_down())
 
     # -- log text ----------------------------------------------------------------------
 
@@ -972,6 +972,13 @@ def gerund(verb: str) -> str:
     ):
         return v + v[-1] + "ing"
     return v + "ing"
+
+
+def _record(ship: Ship, note: Any) -> None:
+    """Log a note the watch routine returned to its caller ("All hands! (to tack ship)",
+    "Piped down; ..."): the routine leaves the recording to whoever called it."""
+    if isinstance(note, tuple) and len(note) == 5:
+        ship.note(*note)
 
 
 def _and(items: list[str], comma: bool = False) -> str:
