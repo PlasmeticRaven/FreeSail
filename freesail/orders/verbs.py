@@ -121,6 +121,8 @@ ADJACENT_YARD_FLOOR_DEG = 10.0
 # Sail verbs whose evolution is a script that works on the sail it is given
 # (`params["sail"]`), and which make sense for a sail that is blown out.
 SAIL_SCRIPT_VERBS = ("bend", "unbend", "shift")
+# The grammar's words for which sail the sail room gives (spec 3b §6.3), passed to the script.
+CANVAS_PARAMS = ("canvas_no", "heavy", "for")
 # The helm verbs with no heading or points after them: the conning words.
 HELM_VERBS = (
     "keep her full",
@@ -227,6 +229,8 @@ def _sail_evolution(
     verb = order.verb
     allowed = {"reefs", "close", "manner"} if verb in ("reef", "shake out") else {"manner"}
     allowed.add("hands_from")
+    if verb in SAIL_SCRIPT_VERBS:
+        allowed |= set(CANVAS_PARAMS)  # which sail from the sail room (spec 3b §6.3)
     _no_stray_modifiers(order, allowed)
     res = resolve.resolve(ship, order.object or "", order.side_word, verb)
     mapping: dict[str, str] = vocab.evolutions.get(verb, {})
@@ -312,6 +316,8 @@ def _sail_evolution(
 
 def _sail_params(order: Order) -> dict[str, Any]:
     params: dict[str, Any] = {}
+    if order.verb in SAIL_SCRIPT_VERBS:
+        params.update({k: order.modifiers[k] for k in CANVAS_PARAMS if k in order.modifiers})
     if order.verb in ("reef", "shake out"):
         params["reefs"] = int(order.modifiers.get("reefs", 1))
         if order.modifiers.get("close"):

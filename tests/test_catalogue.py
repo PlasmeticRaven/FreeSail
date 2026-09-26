@@ -416,7 +416,8 @@ def test_sail_orders_for_bending_on_both_ships():
     ship.sails["main.course"].state = SailState.SET
     orders.handle(ship, "goose-wing the main course")
     assert evolution_ids(ship)[1:] == ["unbend_sail", "goose_wing"]
-    with pytest.raises(OrderError, match="only a square sail is bent"):
+    # milestone 3b: any sail is bent from the sail room; the jib is bent already
+    with pytest.raises(OrderError, match=r"The jib is bent already \(furled\)"):
         orders.handle(ship, "bend the jib")
     with pytest.raises(OrderError, match="no clews to goose-wing"):
         orders.handle(ship, "goose wing the spanker")

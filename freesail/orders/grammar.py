@@ -81,6 +81,9 @@ class Order:
       hands_from   "starboard" | "larboard" | a station ("fore_top", "afterguard"...)
                    from "send the larboard watch aloft to ..." or "... with the fore
                    topmen": the hands the work is given to (spec M3 §5.1)
+      canvas_no    int                              "bend the No. 1 fore topsail"
+      heavy        True                             "shift the fore topsail for the heavy one"
+      for          a sail's name                    "shift the spanker for the storm mizzen"
     """
 
     text: str  # the normalised order
@@ -125,6 +128,9 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
             f"the ship takes orders such as 'set the topsails' or 'steer south-west'."
         )
     rest = words[len(verb_phrase.split()) :]
+    canvas: dict[str, Any] = {}
+    if verb in CANVAS_VERBS:
+        rest, canvas = _take_canvas_words(rest)
 
     obj: str | None = None
     side_word: str | None = None
@@ -151,6 +157,7 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         verb = "reef"  # "take in one reef in the topsails" is a reef, not a taking in
     if hands_from is not None:
         mods["hands_from"] = hands_from
+    mods.update(canvas)
     return Order(
         text=norm.replace(" , ", ", "),
         verb=verb,
@@ -159,6 +166,71 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         side_word=side_word,
         modifiers=mods,
     )
+
+
+# ---------------------------------------------------------------------------
+# Canvas: which sail from the sail room (spec 3b §6.3)
+# ---------------------------------------------------------------------------
+
+CANVAS_VERBS = ("bend", "shift")
+_CANVAS_NUMBER_WORDS = {
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+}
+
+
+def _canvas_number(words: list[str], i: int) -> int | None:
+    """'no 1', 'number 1', 'number one' at `i` (the point of "No. 1" is gone by now)."""
+    if i + 1 < len(words) and words[i] in ("no", "number"):
+        w = words[i + 1]
+        n = int(w) if w.isdigit() else _CANVAS_NUMBER_WORDS.get(w)
+        if n is not None and 1 <= n <= 9:
+            return n
+    return None
+
+
+def _take_canvas_words(words: list[str]) -> tuple[list[str], dict[str, Any]]:
+    """Take out the words that say which sail to bend (spec 3b §6.3): 'the No. 1 fore
+    topsail', 'the heavy fore topsail', '... for the heavy one', '... for the No. 2', 'the
+    spanker for the storm mizzen'. Returns the words left for the object and the modifiers
+    `canvas_no`, `heavy` or `for` (a sail's name, which the shift script resolves)."""
+    mods: dict[str, Any] = {}
+    out = list(words)
+    if "for" in out:
+        i = out.index("for")
+        after = strip_article(out[i + 1 :])
+        if after[:1] in (["a"], ["an"]):
+            after = after[1:]
+        out = out[:i]
+        if after[-1:] == ["one"] and len(after) > 1:
+            after = after[:-1]  # "the heavy one", "the No. 1 one"
+        number = _canvas_number(after, 0)
+        if number is not None and len(after) == 2:
+            mods["canvas_no"] = number
+        elif after in (["heavy"], ["heavy", "weather"]):
+            mods["heavy"] = True
+        elif after in (["new"], ["another"], ["spare"], ["new", "spare"]):
+            pass  # the best in the sail room, as with no words at all
+        elif after:
+            mods["for"] = " ".join(after)
+        else:
+            raise OrderError("For what? Name the sail to bend in its place, or say the heavy one.")
+    lead = 1 if out[:1] == ["the"] else 0
+    number = _canvas_number(out, lead)
+    if number is not None:
+        mods["canvas_no"] = number
+        del out[lead : lead + 2]
+    elif out[lead : lead + 1] == ["heavy"]:
+        mods["heavy"] = True
+        del out[lead : lead + (2 if out[lead + 1 : lead + 2] == ["weather"] else 1)]
+    return out, mods
 
 
 # ---------------------------------------------------------------------------

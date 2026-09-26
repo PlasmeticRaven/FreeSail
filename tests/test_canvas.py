@@ -134,16 +134,16 @@ def test_no_2_canvas_is_the_anchor_of_the_derivation(path):
     course and topsail rating, 0.9 kN/m2; package 22 found that number was the engine's
     untuned default under which no canvas ever blew out, while milestone 2's *tuned*
     light-sail ratings divided by Luce App. E's strengths put No. 2 at 0.36 to 0.44. The
-    lead set the anchor to 0.36 at integration (TuningNotes, milestone 3b). Milestone 2's
-    values are kept here as the record of what changed: every No. 2 sail is now 0.36/0.9
-    of its old rating."""
-    assert CLOTH_KN_PER_M2_NO2 == 0.36
+    lead set the anchor to 0.32 at integration (TuningNotes, milestone 3b). Milestone 2's
+    values are kept here as the record of what changed: every No. 2 sail is now 0.32/0.9
+    of its old rating (0.32/0.9)."""
+    assert CLOTH_KN_PER_M2_NO2 == 0.32
     ship = load_ship(path)
     for sid, old_rating in M2_NO2_RATINGS[path].items():
         sail = ship.sails[sid]
         assert sail.canvas_no == 2, sid
         assert sail.cloth_rating_kn == cloth_rating_for(sail.area_m2, 2), sid
-        assert sail.cloth_rating_kn == pytest.approx(old_rating * 0.36 / 0.9, abs=0.15), sid
+        assert sail.cloth_rating_kn == pytest.approx(old_rating * 0.32 / 0.9, abs=0.15), sid
 
 
 @pytest.mark.parametrize("path", SHIPS)
@@ -263,8 +263,9 @@ def test_a_worn_sail_is_baggier_and_lies_less_close():
 ROYALS = ("fore.royal", "main.royal", "mizzen.royal")
 # The No. 2 rating at which truth 27 holds, measured (docs in the package 22 report): the
 # worn royals blow out and the new ones keep their cloth with CLOTH_KN_PER_M2_NO2 between
-# about 0.30 and 0.36 kN/m2. The ship files carry 0.36 since integration (see below).
-TRUTH_27_NO2_KN_PER_M2 = 0.36
+# about 0.30 and 0.36 kN/m2 on the M2 square curve, 0.30 to 0.32 on the 3b curve; the ship
+# files carry 0.32 since integration (see below).
+TRUTH_27_NO2_KN_PER_M2 = 0.32
 
 
 def gale_royals(condition: float, no2_kn_per_m2: float = CLOTH_KN_PER_M2_NO2):
@@ -317,7 +318,7 @@ def test_worn_canvas_goes_before_its_spar_and_new_canvas_holds_until_the_spar_go
 def test_truth_27_with_the_ship_files_ratings():
     """Truth 27 through the physics alone, with the ship files' own ratings: a new royal
     loses its yard first in the gate M2 gale; a royal at condition 50 blows out before it.
-    Held once the anchor moved from 0.9 to 0.36 (see the anchor test above)."""
+    Held once the anchor moved from 0.9 to 0.32 (see the anchor test above)."""
     assert gale_royals(100.0) == {r: "yard" for r in ROYALS}
     assert gale_royals(50.0) == {r: "blown_out" for r in ROYALS}
 

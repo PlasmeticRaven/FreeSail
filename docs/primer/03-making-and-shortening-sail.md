@@ -192,17 +192,17 @@ goose wing the main topsail
 
 ## Bending, unbending and shifting sails
 
-A sail blown out of its bolt-ropes gives nothing and cannot be set again: it must be **shifted**, the rags unbent and sent down and a new sail sent up from the sail room and bent to the yard (Luce 1884, ch. XXXII Shifting Sails and Spars, 'To Shift a Topsail': "Lay out! Furl and unbend! ... Send up the new sail ... Bring to and bend the sail"). `unbend` and `bend` do the two halves alone (ch. XX Port Drills, 'To Unbend Sail', 'Bending Sail'). The new sail is left furled on its yard; setting it is your next order. A sail must be taken in before it is unbent or shifted, and only square sails are bent and unbent in this milestone.
+A sail blown out of its bolt-ropes gives nothing and cannot be set again: it must be **shifted**, the rags unbent and sent down and a new sail sent up from the sail room and bent to the yard (Luce 1884, ch. XXXII Shifting Sails and Spars, 'To Shift a Topsail': "Lay out! Furl and unbend! ... Send up the new sail ... Bring to and bend the sail"). `unbend` and `bend` do the two halves alone (ch. XX Port Drills, 'To Unbend Sail', 'Bending Sail'). The new sail is left furled on its yard; setting it is your next order. A sail must be taken in before it is unbent or shifted. Any sail can be bent and unbent, square, gaff, jib-headed or studding.
 
-The ship carries a few made-up sails in the sail room, three unless her ship file says otherwise, and bending one uses one; the log keeps the count. A sound sail unbent goes back to the sail room for the sailmaker, the rags of a blown-out one do not, and with none left the order is refused: "There is no spare sail left in the sail room to bend in place of the main royal; the sailmaker must make one first."
+The ship carries made-up sails in the sail room, listed in her ship file with their canvas and condition (`the sail room` prints them), and bending one takes it from the room. A sound sail unbent goes back to the sail room for the sailmaker, the rags of a blown-out one do not, and with none left the order is refused: "There is no spare sail left in the sail room to bend in place of the main royal; the sailmaker must make one first."
 
 ```orders frigate
 unbend the fore royal
 bend the fore royal
 shift the main topsail
 bend a new mizzen royal
-# rejected: bend the jib
-# rejected: unbend the spanker
+bend the jib
+unbend the spanker
 ```
 
 ```

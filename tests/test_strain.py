@@ -401,7 +401,9 @@ def test_parted_brace_lets_the_yard_swing_to_the_wind():
     assert yard.brace_angle == pytest.approx(math.pi / 2 - abs(awa))
     assert yard.brace_angle > 0
     compute_sail_forces(ship, wind)
-    assert abs(sail.thrust_kn) < 0.1 * drawing_thrust
+    # under a seventh of what it drew (a tenth before the 3b curve moved the peak, which
+    # lowered the drawing thrust at this fixed brace more than the swung sail's)
+    assert abs(sail.thrust_kn) < 0.15 * drawing_thrust
     # it keeps following the wind, on either tack, and cannot go past the rigging
     ship.dyn.apparent_wind_angle = -math.radians(30)
     apply_strain(ship, 1.0)

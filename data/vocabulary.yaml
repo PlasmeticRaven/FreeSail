@@ -437,12 +437,23 @@ evolutions:
   wear ship: wear
   heave to: heave_to
   fill away: fill_away
+  # milestone 3b (spec 3b §6.3 and §6.4): any sail the ship's two rigs carry is bent from
+  # and unbent to the sail room, storm canvas and the occasional sails among them
   bend:
     square: bend_sail
+    gaff: bend_sail
+    jibheaded: bend_sail
+    studding: bend_sail
   unbend:
     square: unbend_sail
+    gaff: unbend_sail
+    jibheaded: unbend_sail
+    studding: unbend_sail
   shift:
     square: shift_sail
+    gaff: shift_sail
+    jibheaded: shift_sail
+    studding: shift_sail
   goose wing:
     square: goose_wing
   # rig out and rig in take a studding sail boom, or the studding sail on it
@@ -476,9 +487,9 @@ refusals:
   furl: "A {class} sail is not furled on its spar; take it in instead."
   reef: "The {name} has no reef bands; it is set whole or not at all."
   shake out: "The {name} has no reef bands; there is nothing to shake out."
-  bend: "The {name} is a {class} sail; in this milestone only a square sail is bent to and unbent from its yard."
-  unbend: "The {name} is a {class} sail; in this milestone only a square sail is bent to and unbent from its yard."
-  shift: "The {name} is a {class} sail; in this milestone only a square sail is shifted. Take it in instead."
+  bend: "The {name} is a {class} sail; no rig in this milestone bends one."
+  unbend: "The {name} is a {class} sail; no rig in this milestone bends one."
+  shift: "The {name} is a {class} sail; no rig in this milestone bends one. Take it in instead."
   goose wing: "The {name} is a {class} sail; it has no clews to goose-wing. Only a course or a topsail is goose-winged."
   scandalise: "The {name} cannot be scandalised: the physics has no state for a gaff sail with its peak dropped yet, only set, reefed or taken in. Ease the sheet, reef it or take it in instead."
 

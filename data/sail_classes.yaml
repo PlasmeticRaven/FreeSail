@@ -33,7 +33,13 @@
 
 classes:
   square:
-    alpha_deg: [0, 10, 15, 20, 25, 30, 35, 45, 60, 75, 90]
+    # Milestone 3b: the curve's foot and peak moved five degrees up the angle of attack
+    # (was 0, 10, 15, 20, 25, 30, 35, 45 ...; peak 1.12 at 35). Fincham's measured brace
+    # limits (art. 102) let the yards lie sharper than milestone 2's, and on the old curve
+    # the frigate held three knots at 52 off the wind, which Fincham's long ships never
+    # did ("seldom within six points"). A square sail set at a small angle to the wind
+    # luffs before it draws; this is the tuning that meets the record (TuningNotes, 3b).
+    alpha_deg: [0, 15, 20, 25, 30, 35, 40, 45, 60, 75, 90]
     lift: [0.0, 0.0, 0.12, 0.42, 0.78, 1.02, 1.12, 1.02, 0.72, 0.40, 0.0]
     drag: [0.10, 0.12, 0.15, 0.22, 0.30, 0.40, 0.50, 0.68, 0.95, 1.14, 1.20]
     luff_angle_deg: 18

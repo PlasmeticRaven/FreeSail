@@ -64,37 +64,37 @@ spars:
   steps_on: fore.topgallant_mast
   height_m: 3.6
   rating_kn: 3.2
-# fore course yard 72 ft, 10/11 of the mast (Luce; Falconer: 0.575 of the gundeck). Provisional (truth 9), see gen_ships.py. Rating: fore.course in 55 kn -> 98 kN.
+# fore course yard 72 ft, 10/11 of the mast (Luce; Falconer: 0.575 of the gundeck); braces 62 deg from square (Fincham 1843 art. 102, the long ships' upper value). Provisional (truth 9), see gen_ships.py. Rating: fore.course in 55 kn -> 98 kN.
 - id: fore.yard
   class: yard
   'on': fore.mast
   length_m: 21.9
   height_m: 15.2
-  brace_limit_deg: 55
+  brace_limit_deg: 62
   rating_kn: 98.0
-# fore topsail yard 54 ft, 3/4 of the lower yard (Luce). Provisional (truth 9), see gen_ships.py. Rating: fore.topsail in 40 kn -> 68.3 kN.
+# fore topsail yard 54 ft, 3/4 of the lower yard (Luce); braces 64 deg from square (Fincham 1843 art. 102, the long ships' upper value, two degrees a level aloft). Provisional (truth 9), see gen_ships.py. Rating: fore.topsail in 40 kn -> 68.3 kN.
 - id: fore.topsail.yard
   class: yard
   'on': fore.topmast
   length_m: 16.4
   height_m: 27.8
-  brace_limit_deg: 58
+  brace_limit_deg: 64
   rating_kn: 68.3
-# fore topgallant yard 35 ft, 9/14 of the topsail yard (Luce). Provisional (truth 9), see gen_ships.py. Rating: fore.topgallant in 25 kn -> 10 kN.
+# fore topgallant yard 35 ft, 9/14 of the topsail yard (Luce); braces 66 deg from square (Fincham 1843 art. 102, the long ships' upper value, two degrees a level aloft). Provisional (truth 9), see gen_ships.py. Rating: fore.topgallant in 25 kn -> 10 kN.
 - id: fore.topgallant.yard
   class: yard
   'on': fore.topgallant_mast
   length_m: 10.5
   height_m: 33.8
-  brace_limit_deg: 60
+  brace_limit_deg: 66
   rating_kn: 10.0
-# fore royal yard 23 ft, 2/3 of the topgallant yard (judgement; Luce's 9/20 is the later small royal). Provisional (truth 9), see gen_ships.py. Rating: fore.royal in 20 kn -> 3.2 kN.
+# fore royal yard 23 ft, 2/3 of the topgallant yard (judgement; Luce's 9/20 is the later small royal); braces 68 deg from square (Fincham 1843 art. 102, the long ships' upper value, two degrees a level aloft). Provisional (truth 9), see gen_ships.py. Rating: fore.royal in 20 kn -> 3.2 kN.
 - id: fore.royal.yard
   class: yard
   'on': fore.royal_mast
   length_m: 7.0
   height_m: 38.3
-  brace_limit_deg: 62
+  brace_limit_deg: 68
   rating_kn: 3.2
 # main lower mast: 88 ft heel to head (Luce: (LWL + breadth)/2), 74 ft above the deck. Provisional (truth 9), see gen_ships.py. Rating: main.course, main.topsail, main.topgallant, main.royal, main.topmast_staysail in 55 kn -> 429.5 kN.
 - id: main.mast
@@ -121,37 +121,37 @@ spars:
   steps_on: main.topgallant_mast
   height_m: 4.0
   rating_kn: 4.1
-# main course yard 80 ft, 10/11 of the mast (Luce; Falconer: 0.575 of the gundeck). Provisional (truth 9), see gen_ships.py. Rating: main.course in 55 kn -> 124.2 kN.
+# main course yard 80 ft, 10/11 of the mast (Luce; Falconer: 0.575 of the gundeck); braces 64 deg from square (Fincham 1843 art. 102, the long ships' upper value). Provisional (truth 9), see gen_ships.py. Rating: main.course in 55 kn -> 124.2 kN.
 - id: main.yard
   class: yard
   'on': main.mast
   length_m: 24.3
   height_m: 17.4
-  brace_limit_deg: 55
+  brace_limit_deg: 64
   rating_kn: 124.2
-# main topsail yard 60 ft, 3/4 of the lower yard (Luce). Provisional (truth 9), see gen_ships.py. Rating: main.topsail in 40 kn -> 86.1 kN.
+# main topsail yard 60 ft, 3/4 of the lower yard (Luce); braces 66 deg from square (Fincham 1843 art. 102, the long ships' upper value, two degrees a level aloft). Provisional (truth 9), see gen_ships.py. Rating: main.topsail in 40 kn -> 86.1 kN.
 - id: main.topsail.yard
   class: yard
   'on': main.topmast
   length_m: 18.2
   height_m: 31.4
-  brace_limit_deg: 58
+  brace_limit_deg: 66
   rating_kn: 86.1
-# main topgallant yard 38 ft, 9/14 of the topsail yard (Luce). Provisional (truth 9), see gen_ships.py. Rating: main.topgallant in 25 kn -> 12.7 kN.
+# main topgallant yard 38 ft, 9/14 of the topsail yard (Luce); braces 68 deg from square (Fincham 1843 art. 102, the long ships' upper value, two degrees a level aloft). Provisional (truth 9), see gen_ships.py. Rating: main.topgallant in 25 kn -> 12.7 kN.
 - id: main.topgallant.yard
   class: yard
   'on': main.topgallant_mast
   length_m: 11.7
   height_m: 38.0
-  brace_limit_deg: 60
+  brace_limit_deg: 68
   rating_kn: 12.7
-# main royal yard 26 ft, 2/3 of the topgallant yard (judgement; Luce's 9/20 is the later small royal). Provisional (truth 9), see gen_ships.py. Rating: main.royal in 20 kn -> 4.1 kN.
+# main royal yard 26 ft, 2/3 of the topgallant yard (judgement; Luce's 9/20 is the later small royal); braces 70 deg from square (Fincham 1843 art. 102, the long ships' upper value, two degrees a level aloft). Provisional (truth 9), see gen_ships.py. Rating: main.royal in 20 kn -> 4.1 kN.
 - id: main.royal.yard
   class: yard
   'on': main.royal_mast
   length_m: 7.8
   height_m: 43.1
-  brace_limit_deg: 62
+  brace_limit_deg: 70
   rating_kn: 4.1
 # mizzen lower mast: 76 ft heel to head (Luce: 13/15 of the main), 64 ft above the deck. Provisional (truth 9), see gen_ships.py. Rating: mizzen.topsail, mizzen.topgallant, mizzen.royal, mizzen.spanker in 55 kn -> 215 kN.
 - id: mizzen.mast
@@ -178,37 +178,37 @@ spars:
   steps_on: mizzen.topgallant_mast
   height_m: 2.9
   rating_kn: 1.9
-# mizzen topsail yard 43 ft, 3/4 of the lower yard (Luce). Provisional (truth 9), see gen_ships.py. Rating: mizzen.topsail in 40 kn -> 42.9 kN.
+# mizzen topsail yard 43 ft, 3/4 of the lower yard (Luce); braces 62 deg from square (Fincham 1843 art. 102, the long ships' upper value, two degrees a level aloft). Provisional (truth 9), see gen_ships.py. Rating: mizzen.topsail in 40 kn -> 42.9 kN.
 - id: mizzen.topsail.yard
   class: yard
   'on': mizzen.topmast
   length_m: 13.0
   height_m: 25.1
-  brace_limit_deg: 58
+  brace_limit_deg: 62
   rating_kn: 42.9
-# mizzen topgallant yard 27 ft, 9/14 of the topsail yard (Luce). Provisional (truth 9), see gen_ships.py. Rating: mizzen.topgallant in 25 kn -> 6.2 kN.
+# mizzen topgallant yard 27 ft, 9/14 of the topsail yard (Luce); braces 64 deg from square (Fincham 1843 art. 102, the long ships' upper value, two degrees a level aloft). Provisional (truth 9), see gen_ships.py. Rating: mizzen.topgallant in 25 kn -> 6.2 kN.
 - id: mizzen.topgallant.yard
   class: yard
   'on': mizzen.topgallant_mast
   length_m: 8.4
   height_m: 29.9
-  brace_limit_deg: 60
+  brace_limit_deg: 64
   rating_kn: 6.2
-# mizzen royal yard 18 ft, 2/3 of the topgallant yard (judgement; Luce's 9/20 is the later small royal). Provisional (truth 9), see gen_ships.py. Rating: mizzen.royal in 20 kn -> 1.9 kN.
+# mizzen royal yard 18 ft, 2/3 of the topgallant yard (judgement; Luce's 9/20 is the later small royal); braces 66 deg from square (Fincham 1843 art. 102, the long ships' upper value, two degrees a level aloft). Provisional (truth 9), see gen_ships.py. Rating: mizzen.royal in 20 kn -> 1.9 kN.
 - id: mizzen.royal.yard
   class: yard
   'on': mizzen.royal_mast
   length_m: 5.6
   height_m: 33.4
-  brace_limit_deg: 62
+  brace_limit_deg: 66
   rating_kn: 1.9
-# crossjack yard 57 ft, 5/7 of the main yard (Luce; Falconer: equal to the fore topsail yard); crosses no sail, spreads the mizzen topsail's foot. Rating: the sails named in the script in 55 kn -> 81 kN (the engine's graph loads nothing on it).
+# crossjack yard 57 ft, 5/7 of the main yard (Luce; Falconer: equal to the fore topsail yard); crosses no sail, spreads the mizzen topsail's foot; braces 60 deg from square (Fincham 1843 art. 102: the long ships' lower yards 61 to 67 from square; the mizzen's shrouds stand closer, judgement, spec 3b §2.1). Rating: the sails named in the script in 55 kn -> 81 kN (the engine's graph loads nothing on it).
 - id: mizzen.crossjack.yard
   class: yard
   'on': mizzen.mast
   length_m: 17.4
   height_m: 15.0
-  brace_limit_deg: 55
+  brace_limit_deg: 60
   rating_kn: 81.0
 # spanker gaff 35 ft, 4/5 of the boom (Luce). Rating: mizzen.spanker in 45 kn -> 59.8 kN.
 - id: mizzen.gaff
@@ -333,7 +333,7 @@ spars:
   height_m: 2.4
   rating_kn: 4.0
 sails:
-# fore course: 181 m2 between its yard and the yardarms below (head 0.90 of the yard). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Fore-course': No. 1 or 2; Luce 1884 ch. X p. 171 (Tables.md §1): the working foresail of No. 2, the heavy one of No. 1 (in the sail room)); cloth 0.360 kN/m2, 1.00 of No. 2 by Luce App. E.
+# fore course: 181 m2 between its yard and the yardarms below (head 0.90 of the yard). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Fore-course': No. 1 or 2; Luce 1884 ch. X p. 171 (Tables.md §1): the working foresail of No. 2, the heavy one of No. 1 (in the sail room)); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
 - id: fore.course
   class: square
   yard: fore.yard
@@ -342,8 +342,8 @@ sails:
   x_m: 13.7
   centre_height_m: 12.8
   canvas_no: 2
-  cloth_rating_kn: 65.2
-# fore topsail: 209 m2 between its yard and the yardarms below (head 0.82 of the yard). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Fore-topsail': No. 2 or 3; Luce 1884 ch. X p. 171 (Tables.md §1): the working topsail of No. 2, the heavy one of No. 1 (in the sail room)); cloth 0.360 kN/m2, 1.00 of No. 2 by Luce App. E.
+  cloth_rating_kn: 57.9
+# fore topsail: 209 m2 between its yard and the yardarms below (head 0.82 of the yard). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Fore-topsail': No. 2 or 3; Luce 1884 ch. X p. 171 (Tables.md §1): the working topsail of No. 2, the heavy one of No. 1 (in the sail room)); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
 - id: fore.topsail
   class: square
   yard: fore.topsail.yard
@@ -352,8 +352,8 @@ sails:
   x_m: 13.4
   centre_height_m: 23.3
   canvas_no: 2
-  cloth_rating_kn: 75.2
-# fore topgallant: 73 m2 between its yard and the yardarms below (head 0.89 of the yard). Canvas No. 6 (Steel 1794 vol. I, Sail-making, 'Fore-topgallant-sail': No. 6 or 7; Kipping 1847 (1898 printing), Sails and Sailmaking: 'In the royal navy the topgallant-sails are made of No. 6'; Luce 1884 ch. X p. 171 (Tables.md §1) gives No. 4 for the Trenton's); cloth 0.257 kN/m2, 0.71 of No. 2 by Luce App. E.
+  cloth_rating_kn: 66.9
+# fore topgallant: 73 m2 between its yard and the yardarms below (head 0.89 of the yard). Canvas No. 6 (Steel 1794 vol. I, Sail-making, 'Fore-topgallant-sail': No. 6 or 7; Kipping 1847 (1898 printing), Sails and Sailmaking: 'In the royal navy the topgallant-sails are made of No. 6'; Luce 1884 ch. X p. 171 (Tables.md §1) gives No. 4 for the Trenton's); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
 - id: fore.topgallant
   class: square
   yard: fore.topgallant.yard
@@ -362,8 +362,8 @@ sails:
   x_m: 13.2
   centre_height_m: 32.6
   canvas_no: 6
-  cloth_rating_kn: 18.8
-# fore royal: 35 m2 between its yard and the yardarms below (head 0.89 of the yard). Canvas No. 8 (Steel 1794 vol. I, Sail-making, 'Fore-royal-sail': No. 8; Luce 1884 ch. X p. 171 (Tables.md §1): No. 8); cloth 0.206 kN/m2, 0.57 of No. 2 by Luce App. E.
+  cloth_rating_kn: 16.7
+# fore royal: 35 m2 between its yard and the yardarms below (head 0.89 of the yard). Canvas No. 8 (Steel 1794 vol. I, Sail-making, 'Fore-royal-sail': No. 8; Luce 1884 ch. X p. 171 (Tables.md §1): No. 8); cloth 0.183 kN/m2, 0.57 of No. 2 by Luce App. E.
 - id: fore.royal
   class: square
   yard: fore.royal.yard
@@ -372,8 +372,8 @@ sails:
   x_m: 13.1
   centre_height_m: 37.9
   canvas_no: 8
-  cloth_rating_kn: 7.2
-# main course: 223 m2 between its yard and the yardarms below (head 0.90 of the yard). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Main-course': No. 1 or 2; Luce 1884 ch. X p. 171 (Tables.md §1): No. 2); cloth 0.360 kN/m2, 1.00 of No. 2 by Luce App. E.
+  cloth_rating_kn: 6.4
+# main course: 223 m2 between its yard and the yardarms below (head 0.90 of the yard). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Main-course': No. 1 or 2; Luce 1884 ch. X p. 171 (Tables.md §1): No. 2); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
 - id: main.course
   class: square
   yard: main.yard
@@ -382,8 +382,8 @@ sails:
   x_m: -2.6
   centre_height_m: 14.6
   canvas_no: 2
-  cloth_rating_kn: 80.3
-# main topsail: 257 m2 between its yard and the yardarms below (head 0.82 of the yard). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Main-topsail': No. 2 or 3; Luce 1884 ch. X p. 171 (Tables.md §1): the working topsail of No. 2, the heavy one of No. 1 (in the sail room)); cloth 0.360 kN/m2, 1.00 of No. 2 by Luce App. E.
+  cloth_rating_kn: 71.4
+# main topsail: 257 m2 between its yard and the yardarms below (head 0.82 of the yard). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Main-topsail': No. 2 or 3; Luce 1884 ch. X p. 171 (Tables.md §1): the working topsail of No. 2, the heavy one of No. 1 (in the sail room)); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
 - id: main.topsail
   class: square
   yard: main.topsail.yard
@@ -392,8 +392,8 @@ sails:
   x_m: -3.1
   centre_height_m: 26.2
   canvas_no: 2
-  cloth_rating_kn: 92.5
-# main topgallant: 90 m2 between its yard and the yardarms below (head 0.89 of the yard). Canvas No. 6 (Steel 1794 vol. I, Sail-making, 'Main-topgallant-sail': No. 6 or 7; Kipping 1847 (1898 printing), Sails and Sailmaking: No. 6 in the royal navy; Luce 1884 ch. X p. 171 (Tables.md §1) gives No. 4); cloth 0.257 kN/m2, 0.71 of No. 2 by Luce App. E.
+  cloth_rating_kn: 82.2
+# main topgallant: 90 m2 between its yard and the yardarms below (head 0.89 of the yard). Canvas No. 6 (Steel 1794 vol. I, Sail-making, 'Main-topgallant-sail': No. 6 or 7; Kipping 1847 (1898 printing), Sails and Sailmaking: No. 6 in the royal navy; Luce 1884 ch. X p. 171 (Tables.md §1) gives No. 4); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
 - id: main.topgallant
   class: square
   yard: main.topgallant.yard
@@ -402,8 +402,8 @@ sails:
   x_m: -3.5
   centre_height_m: 36.5
   canvas_no: 6
-  cloth_rating_kn: 23.1
-# main royal: 44 m2 between its yard and the yardarms below (head 0.89 of the yard). Canvas No. 8 (Steel 1794 vol. I, Sail-making, 'Main-royal-sail': No. 8; Luce 1884 ch. X p. 171 (Tables.md §1): No. 8); cloth 0.206 kN/m2, 0.57 of No. 2 by Luce App. E.
+  cloth_rating_kn: 20.6
+# main royal: 44 m2 between its yard and the yardarms below (head 0.89 of the yard). Canvas No. 8 (Steel 1794 vol. I, Sail-making, 'Main-royal-sail': No. 8; Luce 1884 ch. X p. 171 (Tables.md §1): No. 8); cloth 0.183 kN/m2, 0.57 of No. 2 by Luce App. E.
 - id: main.royal
   class: square
   yard: main.royal.yard
@@ -412,8 +412,8 @@ sails:
   x_m: -3.8
   centre_height_m: 42.4
   canvas_no: 8
-  cloth_rating_kn: 9.1
-# mizzen topsail: 133 m2 between its yard and the yardarms below (head 0.82 of the yard). Canvas No. 4 (Steel 1794 vol. I, Sail-making, 'Mizen-topsail': No. 4, 5 or 6, the heaviest taken; Luce 1884 ch. X p. 171 (Tables.md §1) gives No. 3 for the Trenton's); cloth 0.291 kN/m2, 0.81 of No. 2 by Luce App. E.
+  cloth_rating_kn: 8.0
+# mizzen topsail: 133 m2 between its yard and the yardarms below (head 0.82 of the yard). Canvas No. 4 (Steel 1794 vol. I, Sail-making, 'Mizen-topsail': No. 4, 5 or 6, the heaviest taken; Luce 1884 ch. X p. 171 (Tables.md §1) gives No. 3 for the Trenton's); cloth 0.259 kN/m2, 0.81 of No. 2 by Luce App. E.
 - id: mizzen.topsail
   class: square
   yard: mizzen.topsail.yard
@@ -422,8 +422,8 @@ sails:
   x_m: -17.6
   centre_height_m: 21.9
   canvas_no: 4
-  cloth_rating_kn: 38.8
-# mizzen topgallant: 46 m2 between its yard and the yardarms below (head 0.89 of the yard). Canvas No. 7 (Steel 1794 vol. I, Sail-making, 'Mizen-topgallant-sail': No. 7 or 8; Luce 1884 ch. X p. 171 (Tables.md §1) gives No. 6); cloth 0.240 kN/m2, 0.67 of No. 2 by Luce App. E.
+  cloth_rating_kn: 34.5
+# mizzen topgallant: 46 m2 between its yard and the yardarms below (head 0.89 of the yard). Canvas No. 7 (Steel 1794 vol. I, Sail-making, 'Mizen-topgallant-sail': No. 7 or 8; Luce 1884 ch. X p. 171 (Tables.md §1) gives No. 6); cloth 0.213 kN/m2, 0.67 of No. 2 by Luce App. E.
 - id: mizzen.topgallant
   class: square
   yard: mizzen.topgallant.yard
@@ -432,8 +432,8 @@ sails:
   x_m: -18.2
   centre_height_m: 29.3
   canvas_no: 7
-  cloth_rating_kn: 11.0
-# mizzen royal: 22 m2 between its yard and the yardarms below (head 0.89 of the yard). Canvas No. 8 (Steel 1794 vol. I, Sail-making, 'Mizen-royal-sail': No. 8, the lightest of his numbers (Lever 1808, 'Sails': 'decreases gradually to No. 8'); Luce 1884 ch. X p. 171 (Tables.md §1) gives No. 9); cloth 0.206 kN/m2, 0.57 of No. 2 by Luce App. E.
+  cloth_rating_kn: 9.8
+# mizzen royal: 22 m2 between its yard and the yardarms below (head 0.89 of the yard). Canvas No. 8 (Steel 1794 vol. I, Sail-making, 'Mizen-royal-sail': No. 8, the lightest of his numbers (Lever 1808, 'Sails': 'decreases gradually to No. 8'); Luce 1884 ch. X p. 171 (Tables.md §1) gives No. 9); cloth 0.183 kN/m2, 0.57 of No. 2 by Luce App. E.
 - id: mizzen.royal
   class: square
   yard: mizzen.royal.yard
@@ -442,8 +442,8 @@ sails:
   x_m: -18.5
   centre_height_m: 33.5
   canvas_no: 8
-  cloth_rating_kn: 4.5
-# spanker (driver) 167 m2: foot 0.9 of the boom, head 0.9 of the gaff, hoist from boom to jaws, gaff peaked 40 degrees; centre 0.4 of the boom abaft the mast. Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Mizen-course' (the gaff mizzen of 1794): No. 2 or 3; Luce 1884 ch. X p. 171 (Tables.md §1): the spanker of No. 2); cloth 0.360 kN/m2, 1.00 of No. 2 by Luce App. E.
+  cloth_rating_kn: 4.0
+# spanker (driver) 167 m2: foot 0.9 of the boom, head 0.9 of the gaff, hoist from boom to jaws, gaff peaked 40 degrees; centre 0.4 of the boom abaft the mast. Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Mizen-course' (the gaff mizzen of 1794): No. 2 or 3; Luce 1884 ch. X p. 171 (Tables.md §1): the spanker of No. 2); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
 - id: mizzen.spanker
   class: gaff
   mast: mizzen.mast
@@ -454,8 +454,8 @@ sails:
   x_m: -21.6
   centre_height_m: 9.8
   canvas_no: 2
-  cloth_rating_kn: 60.1
-# fore topmast staysail 75 m2 (judgement from the stay's run: luff along the stay, foot to the boom end). Canvas No. 6 (Steel 1794 vol. I, Sail-making, 'Fore topmast staysail': No. 5, 6 or 7 (the OCR reads '6, 6, or 7'); Kipping 1847 (1898 printing), Sails and Sailmaking: 'in the royal navy it is made of No. 6'); cloth 0.257 kN/m2, 0.71 of No. 2 by Luce App. E.
+  cloth_rating_kn: 53.4
+# fore topmast staysail 75 m2 (judgement from the stay's run: luff along the stay, foot to the boom end). Canvas No. 6 (Steel 1794 vol. I, Sail-making, 'Fore topmast staysail': No. 5, 6 or 7 (the OCR reads '6, 6, or 7'); Kipping 1847 (1898 printing), Sails and Sailmaking: 'in the royal navy it is made of No. 6'); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
 - id: fore.topmast_staysail
   class: jibheaded
   stay: fore.topmast.stay
@@ -463,8 +463,8 @@ sails:
   x_m: 24.0
   centre_height_m: 10.0
   canvas_no: 6
-  cloth_rating_kn: 19.3
-# jib 130 m2 (judgement from the stay's run: luff along the stay, foot to the boom end). Canvas No. 6 (Steel 1794 vol. I, Sail-making, 'Jib' ('the foremost sail of a ship'): No. 6 or 7; Kipping 1847 (1898 printing), Sails and Sailmaking, 'Outer jib', on the stay from the jib-boom end to the fore topmast, as this one: No. 6. Luce 1884 ch. X p. 171 (Tables.md §1) gives No. 2, the jib of 1884 being the working headsail); cloth 0.257 kN/m2, 0.71 of No. 2 by Luce App. E.
+  cloth_rating_kn: 17.1
+# jib 130 m2 (judgement from the stay's run: luff along the stay, foot to the boom end). Canvas No. 6 (Steel 1794 vol. I, Sail-making, 'Jib' ('the foremost sail of a ship'): No. 6 or 7; Kipping 1847 (1898 printing), Sails and Sailmaking, 'Outer jib', on the stay from the jib-boom end to the fore topmast, as this one: No. 6. Luce 1884 ch. X p. 171 (Tables.md §1) gives No. 2, the jib of 1884 being the working headsail); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
 - id: jib
   class: jibheaded
   stay: jib.stay
@@ -472,8 +472,8 @@ sails:
   x_m: 31.0
   centre_height_m: 12.0
   canvas_no: 6
-  cloth_rating_kn: 33.4
-# flying jib 70 m2 (judgement from the stay's run: luff along the stay, foot to the boom end). Canvas No. 7 (judgement: Steel's jib range (No. 6 or 7) at its lighter end, the flying jib setting outside and above the jib; Luce 1884 ch. X p. 171 (Tables.md §1) makes his three numbers lighter than the jib); cloth 0.240 kN/m2, 0.67 of No. 2 by Luce App. E.
+  cloth_rating_kn: 29.7
+# flying jib 70 m2 (judgement from the stay's run: luff along the stay, foot to the boom end). Canvas No. 7 (judgement: Steel's jib range (No. 6 or 7) at its lighter end, the flying jib setting outside and above the jib; Luce 1884 ch. X p. 171 (Tables.md §1) makes his three numbers lighter than the jib); cloth 0.213 kN/m2, 0.67 of No. 2 by Luce App. E.
 - id: flying_jib
   class: jibheaded
   stay: flying_jib.stay
@@ -481,8 +481,8 @@ sails:
   x_m: 37.0
   centre_height_m: 14.0
   canvas_no: 7
-  cloth_rating_kn: 16.8
-# main topmast staysail 80 m2 (judgement). Canvas No. 5 (Steel 1794 vol. I, Sail-making, 'Main topmast staysail': No. 5 or 6; Kipping 1847 (1898 printing), Sails and Sailmaking: No. 6 in the royal navy); cloth 0.274 kN/m2, 0.76 of No. 2 by Luce App. E.
+  cloth_rating_kn: 14.9
+# main topmast staysail 80 m2 (judgement). Canvas No. 5 (Steel 1794 vol. I, Sail-making, 'Main topmast staysail': No. 5 or 6; Kipping 1847 (1898 printing), Sails and Sailmaking: No. 6 in the royal navy); cloth 0.244 kN/m2, 0.76 of No. 2 by Luce App. E.
 - id: main.topmast_staysail
   class: jibheaded
   stay: main.topmast.stay
@@ -490,8 +490,8 @@ sails:
   x_m: 6.0
   centre_height_m: 18.0
   canvas_no: 5
-  cloth_rating_kn: 21.9
-# fore lower studding sail 72 m2: 0.4 of the yard wide, as deep as the sail beside it (judgement). Canvas No. 6 (Kipping 1847 (1898 printing), Sails and Sailmaking, 'On Studding-sails': 'Under frigates of the second class to frigates of the sixth class inclusive, the lower and top studding-sails are made of No. 6'; Steel 1794 vol. I, Sail-making, 'Lower Fore Studdingsails': No. 6 or 7); cloth 0.257 kN/m2, 0.71 of No. 2 by Luce App. E.
+  cloth_rating_kn: 19.5
+# fore lower studding sail 72 m2: 0.4 of the yard wide, as deep as the sail beside it (judgement). Canvas No. 6 (Kipping 1847 (1898 printing), Sails and Sailmaking, 'On Studding-sails': 'Under frigates of the second class to frigates of the sixth class inclusive, the lower and top studding-sails are made of No. 6'; Steel 1794 vol. I, Sail-making, 'Lower Fore Studdingsails': No. 6 or 7); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
 - id: fore.lower.studdingsail.starboard
   class: studding
   boom: fore.lower.studdingsail_boom.starboard
@@ -501,7 +501,7 @@ sails:
   x_m: 13.7
   centre_height_m: 12.8
   canvas_no: 6
-  cloth_rating_kn: 18.5
+  cloth_rating_kn: 16.5
 - id: fore.lower.studdingsail.larboard
   class: studding
   boom: fore.lower.studdingsail_boom.larboard
@@ -511,8 +511,8 @@ sails:
   x_m: 13.7
   centre_height_m: 12.8
   canvas_no: 6
-  cloth_rating_kn: 18.5
-# fore topmast studding sail 83 m2: 0.4 of the yard wide, as deep as the sail beside it (judgement). Canvas No. 6 (Kipping 1847 (1898 printing), Sails and Sailmaking: frigates' top studding-sails No. 6; Steel 1794 vol. I, Sail-making, 'Fore Topmast Studdingsails': No. 6 or 7); cloth 0.257 kN/m2, 0.71 of No. 2 by Luce App. E.
+  cloth_rating_kn: 16.5
+# fore topmast studding sail 83 m2: 0.4 of the yard wide, as deep as the sail beside it (judgement). Canvas No. 6 (Kipping 1847 (1898 printing), Sails and Sailmaking: frigates' top studding-sails No. 6; Steel 1794 vol. I, Sail-making, 'Fore Topmast Studdingsails': No. 6 or 7); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
 - id: fore.topmast.studdingsail.starboard
   class: studding
   boom: fore.topmast.studdingsail_boom.starboard
@@ -522,7 +522,7 @@ sails:
   x_m: 13.4
   centre_height_m: 23.3
   canvas_no: 6
-  cloth_rating_kn: 21.3
+  cloth_rating_kn: 19.0
 - id: fore.topmast.studdingsail.larboard
   class: studding
   boom: fore.topmast.studdingsail_boom.larboard
@@ -532,8 +532,8 @@ sails:
   x_m: 13.4
   centre_height_m: 23.3
   canvas_no: 6
-  cloth_rating_kn: 21.3
-# fore topgallant studding sail 25 m2: 0.4 of the yard wide, as deep as the sail beside it (judgement). Canvas No. 7 (Kipping 1847 (1898 printing), Sails and Sailmaking: frigates' topgallant studding-sails 'No. 7 or No. 8'; Steel 1794 vol. I, Sail-making: No. 7 or 8); cloth 0.240 kN/m2, 0.67 of No. 2 by Luce App. E.
+  cloth_rating_kn: 19.0
+# fore topgallant studding sail 25 m2: 0.4 of the yard wide, as deep as the sail beside it (judgement). Canvas No. 7 (Kipping 1847 (1898 printing), Sails and Sailmaking: frigates' topgallant studding-sails 'No. 7 or No. 8'; Steel 1794 vol. I, Sail-making: No. 7 or 8); cloth 0.213 kN/m2, 0.67 of No. 2 by Luce App. E.
 - id: fore.topgallant.studdingsail.starboard
   class: studding
   boom: fore.topgallant.studdingsail_boom.starboard
@@ -543,7 +543,7 @@ sails:
   x_m: 13.2
   centre_height_m: 32.6
   canvas_no: 7
-  cloth_rating_kn: 6.0
+  cloth_rating_kn: 5.3
 - id: fore.topgallant.studdingsail.larboard
   class: studding
   boom: fore.topgallant.studdingsail_boom.larboard
@@ -553,8 +553,8 @@ sails:
   x_m: 13.2
   centre_height_m: 32.6
   canvas_no: 7
-  cloth_rating_kn: 6.0
-# main topmast studding sail 102 m2: 0.4 of the yard wide, as deep as the sail beside it (judgement). Canvas No. 6 (Kipping 1847 (1898 printing), Sails and Sailmaking: frigates' top studding-sails No. 6; Steel 1794 vol. I, Sail-making, 'Fore Topmast Studdingsails': No. 6 or 7); cloth 0.257 kN/m2, 0.71 of No. 2 by Luce App. E.
+  cloth_rating_kn: 5.3
+# main topmast studding sail 102 m2: 0.4 of the yard wide, as deep as the sail beside it (judgement). Canvas No. 6 (Kipping 1847 (1898 printing), Sails and Sailmaking: frigates' top studding-sails No. 6; Steel 1794 vol. I, Sail-making, 'Fore Topmast Studdingsails': No. 6 or 7); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
 - id: main.topmast.studdingsail.starboard
   class: studding
   boom: main.topmast.studdingsail_boom.starboard
@@ -564,7 +564,7 @@ sails:
   x_m: -3.1
   centre_height_m: 26.2
   canvas_no: 6
-  cloth_rating_kn: 26.2
+  cloth_rating_kn: 23.3
 - id: main.topmast.studdingsail.larboard
   class: studding
   boom: main.topmast.studdingsail_boom.larboard
@@ -574,8 +574,8 @@ sails:
   x_m: -3.1
   centre_height_m: 26.2
   canvas_no: 6
-  cloth_rating_kn: 26.2
-# main topgallant studding sail 31 m2: 0.4 of the yard wide, as deep as the sail beside it (judgement). Canvas No. 7 (Kipping 1847 (1898 printing), Sails and Sailmaking: frigates' topgallant studding-sails 'No. 7 or No. 8'; Steel 1794 vol. I, Sail-making: No. 7 or 8); cloth 0.240 kN/m2, 0.67 of No. 2 by Luce App. E.
+  cloth_rating_kn: 23.3
+# main topgallant studding sail 31 m2: 0.4 of the yard wide, as deep as the sail beside it (judgement). Canvas No. 7 (Kipping 1847 (1898 printing), Sails and Sailmaking: frigates' topgallant studding-sails 'No. 7 or No. 8'; Steel 1794 vol. I, Sail-making: No. 7 or 8); cloth 0.213 kN/m2, 0.67 of No. 2 by Luce App. E.
 - id: main.topgallant.studdingsail.starboard
   class: studding
   boom: main.topgallant.studdingsail_boom.starboard
@@ -585,7 +585,7 @@ sails:
   x_m: -3.5
   centre_height_m: 36.5
   canvas_no: 7
-  cloth_rating_kn: 7.4
+  cloth_rating_kn: 6.6
 - id: main.topgallant.studdingsail.larboard
   class: studding
   boom: main.topgallant.studdingsail_boom.larboard
@@ -595,8 +595,8 @@ sails:
   x_m: -3.5
   centre_height_m: 36.5
   canvas_no: 7
-  cloth_rating_kn: 7.4
-# fore storm staysail 51 m2 on the fore stay (Luce 1884 ch. X): Kipping's fore staysail, a right-angled triangle, foot 36 ft (half the fore course's head cloths and two), leech 30 ft (the course's depth); the clew just before the fore mast and the foot 5 ft above the deck (judgement); in the sail room. Canvas No. 1 (Luce 1884 ch. X p. 171 (Tables.md §1): every storm sail of No. 1; Luce 1884 ch. X, 'Storm-Sails are made of the strongest canvas'); cloth 0.403 kN/m2, 1.12 of No. 2 by Luce App. E.
+  cloth_rating_kn: 6.6
+# fore storm staysail 51 m2 on the fore stay (Luce 1884 ch. X): Kipping's fore staysail, a right-angled triangle, foot 36 ft (half the fore course's head cloths and two), leech 30 ft (the course's depth); the clew just before the fore mast and the foot 5 ft above the deck (judgement); in the sail room. Canvas No. 1 (Luce 1884 ch. X p. 171 (Tables.md §1): every storm sail of No. 1; Luce 1884 ch. X, 'Storm-Sails are made of the strongest canvas'); cloth 0.358 kN/m2, 1.12 of No. 2 by Luce App. E.
 - id: fore.storm_staysail
   class: jibheaded
   stay: fore.stay
@@ -604,9 +604,9 @@ sails:
   x_m: 18.7
   centre_height_m: 6.4
   canvas_no: 1
-  cloth_rating_kn: 20.5
+  cloth_rating_kn: 18.3
   bent: false
-# mizzen storm staysail 36 m2 on the mizzen stay (Luce 1884 ch. X; the Trenton's allowance has one, Luce p. 171): tack at the main mast collar, head 0.6 up the stay, clew 7 ft above the deck (Steel's mizzen staysail; 0.6 judgement); in the sail room. Canvas No. 1 (Luce 1884 ch. X p. 171 (Tables.md §1): every storm sail of No. 1; Luce 1884 ch. X, 'Storm-Sails are made of the strongest canvas'); cloth 0.403 kN/m2, 1.12 of No. 2 by Luce App. E.
+# mizzen storm staysail 36 m2 on the mizzen stay (Luce 1884 ch. X; the Trenton's allowance has one, Luce p. 171): tack at the main mast collar, head 0.6 up the stay, clew 7 ft above the deck (Steel's mizzen staysail; 0.6 judgement); in the sail room. Canvas No. 1 (Luce 1884 ch. X p. 171 (Tables.md §1): every storm sail of No. 1; Luce 1884 ch. X, 'Storm-Sails are made of the strongest canvas'); cloth 0.358 kN/m2, 1.12 of No. 2 by Luce App. E.
 - id: mizzen.storm_staysail
   class: jibheaded
   stay: mizzen.stay
@@ -614,9 +614,9 @@ sails:
   x_m: -7.6
   centre_height_m: 7.3
   canvas_no: 1
-  cloth_rating_kn: 14.5
+  cloth_rating_kn: 12.9
   bent: false
-# storm mizzen 35 m2, triangular (Luce 1884 ch. X; Steel 1794 'Storm mizen'): luff 38 ft on its vertical stay (0.8 of the mast head's height above the tack, judgement), foot 20 ft towards the taffrail (judgement); bent in place of the spanker; in the sail room. Canvas No. 1 (Luce 1884 ch. X p. 171 (Tables.md §1): every storm sail of No. 1; Luce 1884 ch. X, 'Storm-Sails are made of the strongest canvas'); cloth 0.403 kN/m2, 1.12 of No. 2 by Luce App. E.
+# storm mizzen 35 m2, triangular (Luce 1884 ch. X; Steel 1794 'Storm mizen'): luff 38 ft on its vertical stay (0.8 of the mast head's height above the tack, judgement), foot 20 ft towards the taffrail (judgement); bent in place of the spanker; in the sail room. Canvas No. 1 (Luce 1884 ch. X p. 171 (Tables.md §1): every storm sail of No. 1; Luce 1884 ch. X, 'Storm-Sails are made of the strongest canvas'); cloth 0.358 kN/m2, 1.12 of No. 2 by Luce App. E.
 - id: storm_mizzen
   class: jibheaded
   stay: storm_mizzen.stay
@@ -624,10 +624,10 @@ sails:
   x_m: -18.0
   centre_height_m: 6.9
   canvas_no: 1
-  cloth_rating_kn: 14.1
+  cloth_rating_kn: 12.5
   bent: false
   in_place_of: mizzen.spanker
-# ringtail 68 m2 (Kipping, Luce 1884): 61 ft deep, the depth of the spanker's after leech it borders (as Falconer's schooner's), 5 cloths in the head and 7 in the foot (Kipping's brig's); a studding-class sail with no side, lying in the spanker's plane; in the sail room. Canvas No. 5 (Kipping 1847 (1898 printing), Sails and Sailmaking, 'Ringtail Sails' (a brig's): No. 5 or 6; Steel 1794 vol. I, Sail-making, 'Sloop's ringtail sail': No. 5 or 8); cloth 0.274 kN/m2, 0.76 of No. 2 by Luce App. E.
+# ringtail 68 m2 (Kipping, Luce 1884): 61 ft deep, the depth of the spanker's after leech it borders (as Falconer's schooner's), 5 cloths in the head and 7 in the foot (Kipping's brig's); a studding-class sail with no side, lying in the spanker's plane; in the sail room. Canvas No. 5 (Kipping 1847 (1898 printing), Sails and Sailmaking, 'Ringtail Sails' (a brig's): No. 5 or 6; Steel 1794 vol. I, Sail-making, 'Sloop's ringtail sail': No. 5 or 8); cloth 0.244 kN/m2, 0.76 of No. 2 by Luce App. E.
 - id: ringtail
   class: studding
   boom: ringtail_boom
@@ -635,9 +635,9 @@ sails:
   x_m: -31.0
   centre_height_m: 12.6
   canvas_no: 5
-  cloth_rating_kn: 18.7
+  cloth_rating_kn: 16.6
   bent: false
-# save-all 15 m2 under the fore lower studding sail boom (Luce 1884): head along 0.6 of the boom, down to half a metre off the water (judgement); in the sail room. Canvas No. 7 (judgement: no source gives a ship's save-all; Steel 1794 vol. I, Sail-making, 'Sloop's water-sail', No. 7, 'Some ships have a water-sail, similar to a sloop's'); cloth 0.240 kN/m2, 0.67 of No. 2 by Luce App. E.
+# save-all 15 m2 under the fore lower studding sail boom (Luce 1884): head along 0.6 of the boom, down to half a metre off the water (judgement); in the sail room. Canvas No. 7 (judgement: no source gives a ship's save-all; Steel 1794 vol. I, Sail-making, 'Sloop's water-sail', No. 7, 'Some ships have a water-sail, similar to a sloop's'); cloth 0.213 kN/m2, 0.67 of No. 2 by Luce App. E.
 - id: fore.save_all.starboard
   class: studding
   boom: fore.lower.studdingsail_boom.starboard
@@ -647,7 +647,7 @@ sails:
   x_m: 14.0
   centre_height_m: 1.6
   canvas_no: 7
-  cloth_rating_kn: 3.6
+  cloth_rating_kn: 3.2
   bent: false
 - id: fore.save_all.larboard
   class: studding
@@ -658,7 +658,7 @@ sails:
   x_m: 14.0
   centre_height_m: 1.6
   canvas_no: 7
-  cloth_rating_kn: 3.6
+  cloth_rating_kn: 3.2
   bent: false
 lines:
 - id: fore.yard.brace.starboard
@@ -715,6 +715,7 @@ lines:
   of: fore.course
   side: larboard
   rating_kn: 81.4
+# fore.course bowline, one a side with its bridles: hauls the weather leech forward on a wind (Luce 1884 ch. IX, 'Bowlines'; ch. X, 'two bowline-cringles and one bridle on each leech'; Kipping, Sails and Sailmaking, the 1847 text); a lighter rope than the sheet, 3.75 in (judgement), rated by Luce 1866 ch. IV.
 - id: fore.course.bowline.starboard
   class: bowline
   of: fore.course
@@ -783,6 +784,17 @@ lines:
   class: buntline
   of: fore.topsail
   rating_kn: 7.8
+# fore.topsail bowline, one a side with its bridles: hauls the weather leech forward on a wind (Luce 1884 ch. IX, 'Bowlines'; ch. X, 'two bowline-cringles and one bridle on each leech'; Kipping, Sails and Sailmaking, the 1847 text); a lighter rope than the sheet, 3.25 in (judgement), rated by Luce 1866 ch. IV.
+- id: fore.topsail.bowline.starboard
+  class: bowline
+  of: fore.topsail
+  side: starboard
+  rating_kn: 16.4
+- id: fore.topsail.bowline.larboard
+  class: bowline
+  of: fore.topsail
+  side: larboard
+  rating_kn: 16.4
 - id: fore.topsail.reef_tackle.starboard
   class: reef_tackle
   of: fore.topsail
@@ -964,6 +976,7 @@ lines:
   of: main.course
   side: larboard
   rating_kn: 99.2
+# main.course bowline, one a side with its bridles: hauls the weather leech forward on a wind (Luce 1884 ch. IX, 'Bowlines'; ch. X, 'two bowline-cringles and one bridle on each leech'; Kipping, Sails and Sailmaking, the 1847 text); a lighter rope than the sheet, 4.0 in (judgement), rated by Luce 1866 ch. IV.
 - id: main.course.bowline.starboard
   class: bowline
   of: main.course
@@ -1032,6 +1045,17 @@ lines:
   class: buntline
   of: main.topsail
   rating_kn: 9.7
+# main.topsail bowline, one a side with its bridles: hauls the weather leech forward on a wind (Luce 1884 ch. IX, 'Bowlines'; ch. X, 'two bowline-cringles and one bridle on each leech'; Kipping, Sails and Sailmaking, the 1847 text); a lighter rope than the sheet, 3.5 in (judgement), rated by Luce 1866 ch. IV.
+- id: main.topsail.bowline.starboard
+  class: bowline
+  of: main.topsail
+  side: starboard
+  rating_kn: 19.0
+- id: main.topsail.bowline.larboard
+  class: bowline
+  of: main.topsail
+  side: larboard
+  rating_kn: 19.0
 - id: main.topsail.reef_tackle.starboard
   class: reef_tackle
   of: main.topsail
@@ -1207,6 +1231,17 @@ lines:
   class: buntline
   of: mizzen.topsail
   rating_kn: 6.2
+# mizzen.topsail bowline, one a side with its bridles: hauls the weather leech forward on a wind (Luce 1884 ch. IX, 'Bowlines'; ch. X, 'two bowline-cringles and one bridle on each leech'; Kipping, Sails and Sailmaking, the 1847 text); a lighter rope than the sheet, 2.75 in (judgement), rated by Luce 1866 ch. IV.
+- id: mizzen.topsail.bowline.starboard
+  class: bowline
+  of: mizzen.topsail
+  side: starboard
+  rating_kn: 11.7
+- id: mizzen.topsail.bowline.larboard
+  class: bowline
+  of: mizzen.topsail
+  side: larboard
+  rating_kn: 11.7
 - id: mizzen.topsail.reef_tackle.starboard
   class: reef_tackle
   of: mizzen.topsail
@@ -1964,6 +1999,15 @@ groups:
   main bowlines:
   - main.course.bowline.starboard
   - main.course.bowline.larboard
+  fore topsail bowlines:
+  - fore.topsail.bowline.starboard
+  - fore.topsail.bowline.larboard
+  main topsail bowlines:
+  - main.topsail.bowline.starboard
+  - main.topsail.bowline.larboard
+  mizzen topsail bowlines:
+  - mizzen.topsail.bowline.starboard
+  - mizzen.topsail.bowline.larboard
 aliases:
   spanker: mizzen.spanker
   driver: mizzen.spanker
@@ -1994,6 +2038,9 @@ aliases:
   main sheet: main sheets
   main tack: main tacks
   main bowline: main bowlines
+  fore top bowline: fore topsail bowlines
+  main top bowline: main topsail bowlines
+  mizzen top bowline: mizzen topsail bowlines
 crew:
   # Winfield: the Amazon class establishment, 264 men.
   complement: 264

@@ -417,8 +417,8 @@ def test_a_hauled_bowline_flattens_the_luff_and_eases_the_drag():
         assert sq.coefficients(a, gain)[1] == pytest.approx(
             (1 - sail_physics.BOWLINE_DRAG_REDUCTION) * sq.coefficients(a)[1]
         )
-    # ... and a full sail draws as before
-    for deg in (35.0, 45.0, 60.0):
+    # ... and a full sail draws as before (from the curve's peak, 40 degrees since 3b)
+    for deg in (40.0, 45.0, 60.0):
         a = units.deg_to_rad(deg)
         assert sq.coefficients(a, gain) == sq.coefficients(a)
 

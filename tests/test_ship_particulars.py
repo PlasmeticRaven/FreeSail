@@ -117,7 +117,9 @@ def test_frigate_spars_follow_the_masting_rules(frigate):
     # brace limits kept from integration: 28 to 35 degrees of yard to keel sharp up
     for s in sp.values():
         if s.is_yard:
-            assert 55.0 <= math.degrees(s.brace_limit) <= 62.0
+            # Fincham 1843 art. 102: the long ships' lower yards 61 to 67 from square, two
+            # degrees a level aloft (spec 3b §2.1); the crossjack 60
+            assert 58.0 <= math.degrees(s.brace_limit) <= 70.0
 
 
 def test_frigate_sail_centres_rise_with_their_yards(frigate):

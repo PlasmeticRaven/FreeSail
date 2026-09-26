@@ -715,9 +715,9 @@ def test_heave_to_and_fill_away(path, backed_sail, backed_yard):
     yard = ship.spars[backed_yard]
     assert yard.brace_angle == pytest.approx(-yard.brace_limit)  # aback
     if path == FRIGATE:
-        assert ship.spars["mizzen.topsail.yard"].brace_angle == pytest.approx(
-            yard.brace_limit
-        )  # full
+        # full, at its own limit (since milestone 3b the limits differ by mast and level)
+        mizzen = ship.spars["mizzen.topsail.yard"]
+        assert mizzen.brace_angle == pytest.approx(mizzen.brace_limit)
     assert ship.dyn.helm_mode is HelmMode.RUDDER and ship.dyn.target_rudder > 0
     assert backed_yard in ship.extra["hove_to"]["yards"]
     with pytest.raises(OrderError, match="hove to already"):

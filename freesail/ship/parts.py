@@ -54,9 +54,11 @@ WORKING_CANVAS_NO = 2
 # it was), kept so that every sail of No. 2 keeps its rating exactly (spec 3b §6.1). Every
 # other number scales from it by the strengths above.
 # No. 2 canvas. Milestone 2's tuned light-sail ratings divided by Luce App. E's strengths put
-# No. 2 at 0.36 to 0.44 kN/m2; truth 27 (a worn royal blows out before its yard) holds from
-# 0.30 to 0.36. Set at 3b integration; the first draft's 0.9 was an untuned default (TuningNotes).
-CLOTH_KN_PER_M2_NO2 = 0.36
+# No. 2 at 0.36 to 0.44 kN/m2; truth 27 (a worn royal blows out before its yard, a new one
+# loses the yard) held from 0.30 to 0.36 on the milestone 2 square curve and from 0.30 to
+# 0.32 on the 3b curve (its peak five degrees later). Set at 3b integration to 0.32; the first
+# draft's 0.9 was an untuned default (TuningNotes).
+CLOTH_KN_PER_M2_NO2 = 0.32
 
 # What worn canvas keeps: a sail at condition 0 bears this share of its new rating, a new
 # one all of it, in a straight line between (spec 3b §6.2: the effective rating is

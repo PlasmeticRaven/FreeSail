@@ -249,6 +249,7 @@ class Ship:
                     "id": ln.id,
                     "class": ln.cls,
                     "state": ln.state.value,
+                    "hauled": getattr(ln, "bowline_hauled", False),  # milestone 3b, for the view
                     "strain_ratio": ln.strain_ratio,
                 }
                 for ln in self.lines.values()

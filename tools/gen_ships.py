@@ -564,10 +564,12 @@ class Builder:
             f.write(header + "\n".join(out) + "\n")
 
 
-def square_sail_lines(b, sail, yard, sizes, hoisting, course=False, reef=False):
+def square_sail_lines(b, sail, yard, sizes, hoisting, course=False, reef=False, bowline=False):
     """The essential running rigging of a square sail and its yard, rated from rope sizes.
 
     `sizes` maps a line class to a rope circumference in inches (halyard: the tye).
+    Courses and topsails (`course`, `bowline`) carry a bowline a side, its bridles
+    taken as one part (spec 3b §4).
     """
     r = {cls: rope_kn(c) for cls, c in sizes.items()}
     if hoisting:
@@ -579,7 +581,18 @@ def square_sail_lines(b, sail, yard, sizes, hoisting, course=False, reef=False):
     b.line(f"{sail}.buntline", "buntline", sail, rating=r["buntline"])
     if course:
         b.sided(f"{sail}.tack", "tack", sail, rating=r["tack"])
-        b.sided(f"{sail}.bowline", "bowline", sail, rating=r["bowline"])
+    if course or bowline:
+        b.sided(
+            f"{sail}.bowline",
+            "bowline",
+            sail,
+            rating=r["bowline"],
+            note=f"{sail} bowline, one a side with its bridles: hauls the weather leech "
+            "forward on a wind (Luce 1884 ch. IX, 'Bowlines'; ch. X, 'two bowline-cringles "
+            "and one bridle on each leech'; Kipping, Sails and Sailmaking, the 1847 text); a "
+            f"lighter rope than the sheet, {sizes['bowline']} in (judgement), rated by Luce "
+            "1866 ch. IV.",
+        )
     if reef:
         b.sided(f"{sail}.reef_tackle", "reef_tackle", sail, rating=r["reef_tackle"])
 
@@ -610,6 +623,9 @@ FRIGATE_ROPE = {
         "clewline": 3.5,
         "buntline": 2.5,
         "reef_tackle": 3.5,
+        # the topsail bowline: the clewline's size, as the course's bowline is its
+        # clewline's (judgement; spec 3b §4, "a topsail sheet's lighter rope")
+        "bowline": 3.5,
     },
     "topgallant": {
         "halyard": 3.0,
@@ -787,10 +803,18 @@ def frigate(out_dir="data/ships"):
             "topgallant": round(0.4 * g["tg_yard"] * (g["tg_h"] - g["topsail_h"]) * FT * FT),
         }
 
+    # Brace limits, degrees from square (spec 3b §2.1). Fincham 1843 art. 102: Hardy's
+    # squadron of 1827 measured the long, fine 28-gun ships "bracing their main-yard from
+    # 23 deg to 29 deg, and their fore-yards from 26 deg to 30 deg" from the keel (61 to
+    # 67 and 60 to 64 from square); they "seldom" lay within six points. A long frigate
+    # of 1795, coppered and well found, takes the long ships' upper values for her lower
+    # yards: main 64, fore 62, the crossjack 60 (its shrouds, on the mizzen, stand
+    # closer). Each yard above its lower yard braces two degrees more, the shrouds
+    # converging aloft (judgement, as before).
     plans = {
-        "fore": [("course", 55), ("topsail", 58), ("topgallant", 60), ("royal", 62)],
-        "main": [("course", 55), ("topsail", 58), ("topgallant", 60), ("royal", 62)],
-        "mizzen": [("topsail", 58), ("topgallant", 60), ("royal", 62)],
+        "fore": [("course", 62), ("topsail", 64), ("topgallant", 66), ("royal", 68)],
+        "main": [("course", 64), ("topsail", 66), ("topgallant", 68), ("royal", 70)],
+        "mizzen": [("topsail", 62), ("topgallant", 64), ("royal", 66)],
     }
     yards_by_level = {"course": [], "topsail": [], "topgallant": [], "royal": []}
     sails_by_level = {"course": [], "topsail": [], "topgallant": [], "royal": []}
@@ -897,7 +921,9 @@ def frigate(out_dir="data/ships"):
                 rating_kn=design_kn(
                     carried[level_of_spar[level]], DESIGN_WIND_KN[level_of_spar[level]]
                 ),
-                note=f"{name} {level} yard {g[yard_lengths[level]]:.0f} ft, {rule}.{prov}",
+                note=f"{name} {level} yard {g[yard_lengths[level]]:.0f} ft, {rule}; braces "
+                f"{limit} deg from square (Fincham 1843 art. 102, the long ships' upper "
+                f"value{'' if level == 'course' else ', two degrees a level aloft'}).{prov}",
             )
             reef = {"course": 1, "topsail": 3, "topgallant": 0, "royal": 0}[level]
             canvas = FRIGATE_CANVAS[sail_id]
@@ -925,6 +951,7 @@ def frigate(out_dir="data/ships"):
                 hoisting=(level != "course"),
                 course=(level == "course"),
                 reef=(reef > 0),
+                bowline=(level == "topsail"),
             )
             yards_by_level[level].append(yard)
             sails_by_level[level].append(sail)
@@ -947,13 +974,15 @@ def frigate(out_dir="data/ships"):
         on="mizzen.mast",
         length_m=ft(g["yard"]),
         height_m=ft(g["yard_h"]),
-        brace_limit_deg=55,
+        brace_limit_deg=60,
         rating_kn=design_kn(
             [(areas["mizzen"]["topsail"][0], areas["mizzen"]["topsail"][1], "square")],
             DESIGN_WIND_KN["lower"],
         ),
         note=f"crossjack yard {g['yard']:.0f} ft, 5/7 of the main yard (Luce; Falconer: equal "
-        "to the fore topsail yard); crosses no sail, spreads the mizzen topsail's foot.",
+        "to the fore topsail yard); crosses no sail, spreads the mizzen topsail's foot; "
+        "braces 60 deg from square (Fincham 1843 art. 102: the long ships' lower yards 61 to "
+        "67 from square; the mizzen's shrouds stand closer, judgement, spec 3b §2.1).",
     )
     b.sided(
         "mizzen.crossjack.yard.brace",
@@ -1500,6 +1529,11 @@ def frigate(out_dir="data/ships"):
         for cls in ("sheet", "tack", "bowline"):
             b.group(f"{name} {cls}s", [f"{name}.course.{cls}.{s}" for s in SIDES])
             b.alias(f"{name} {cls}", f"{name} {cls}s")
+    # milestone 3b: the topsails' bowlines, and Luce's name for them (1884 ch. IX,
+    # 'Top-Bowlines'), read as sided families like the courses' above
+    for name in ("fore", "main", "mizzen"):
+        b.group(f"{name} topsail bowlines", [f"{name}.topsail.bowline.{s}" for s in SIDES])
+        b.alias(f"{name} top bowline", f"{name} topsail bowlines")
     frigate_crew(b)
     b.dump(
         os.path.join(out_dir, "frigate-36.yaml"),
@@ -1800,7 +1834,9 @@ def schooner(out_dir="data/ships"):
             dw["topsail"],
         ),
         note=f"fore topsail yard {topsail_yard:.0f} ft, 0.75 of a {fore_yard:.0f} ft fore yard "
-        "that is 0.57 of LWL (Fincham; Sea Lark's fore yard was 0.69, Chapelle p. 42).{prov}",
+        "that is 0.57 of LWL (Fincham; Sea Lark's fore yard was 0.69, Chapelle p. 42); braces "
+        "58 deg from square as before (Chapelle is silent on bracing; Fincham 1843 art. 102's "
+        f"figures are for ships' lower yards; judgement, spec 3b §2.1).{prov}",
     )
     ts = b.sail(
         "fore.topsail",
@@ -1828,9 +1864,11 @@ def schooner(out_dir="data/ships"):
             "clewline": 2.5,
             "buntline": 2.0,
             "reef_tackle": 2.5,
+            "bowline": 2.5,  # the clewline's size (judgement; spec 3b §4)
         },
         hoisting=True,
         reef=True,
+        bowline=True,
     )
     tgy = b.spar(
         "fore.topgallant.yard",
@@ -1840,7 +1878,8 @@ def schooner(out_dir="data/ships"):
         height_m=ft(tg_h),
         brace_limit_deg=60,
         rating_kn=design_kn([(tg_area, tg_centre, "square")], dw["topgallant"]),
-        note=f"fore topgallant yard {tg_yard:.0f} ft, 0.48 of the fore yard (Fincham).{prov}",
+        note=f"fore topgallant yard {tg_yard:.0f} ft, 0.48 of the fore yard (Fincham); braces "
+        f"60 deg from square, two more than the topsail yard (judgement, as before).{prov}",
     )
     tgs = b.sail(
         "fore.topgallant",
@@ -2272,6 +2311,11 @@ def schooner(out_dir="data/ships"):
     b.group("storm canvas", storm)
     b.group("occasional sails", occasional)
     # the ids read as a sailor says them: storm trysail, storm jib, ringtail, water sail
+    # milestone 3b: her one square sail's bowlines; with no course on the fore, "the fore
+    # bowline" is the fore topsail's, and Luce's "top-bowline" (1884 ch. IX) likewise
+    b.group("fore bowlines", ["fore.topsail.bowline.starboard", "fore.topsail.bowline.larboard"])
+    b.alias("fore bowline", "fore bowlines")
+    b.alias("fore top bowline", "fore bowlines")
     schooner_crew(b)
     b.dump(
         os.path.join(out_dir, "topsail-schooner.yaml"),

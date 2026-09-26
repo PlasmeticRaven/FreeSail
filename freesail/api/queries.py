@@ -25,7 +25,7 @@ from freesail.crew import bill
 from freesail.crew.model import Crew, Sailor, Station, Watch
 from freesail.physics.sails import SAIL_CLASSES
 from freesail.ship.graph import Ship
-from freesail.ship.parts import Line, Sail, SailState, Spar
+from freesail.ship.parts import Line, Sail, SailState, Spar, sail_room
 
 
 def _spar_state(s: Spar) -> str:
@@ -353,4 +353,10 @@ def muster_lines(world: World) -> list[str]:
     crew = _crew(world)
     if crew is None:
         return ["There is no ship's company mustered in this ship."]
+    sail_room(world.ship)  # gives the crew its sail room for the muster's line (spec 3b §6.3)
     return crew.describe(world.clock)
+
+
+def sail_room_lines(world: World) -> list[str]:
+    """The `the sail room` query (spec 3b §6.3): every sail in it, by kind of canvas."""
+    return sail_room(world.ship).inventory_lines()

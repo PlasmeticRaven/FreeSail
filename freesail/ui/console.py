@@ -9,6 +9,7 @@ Driver commands (not ship orders, not journaled):
     tick N          advance N ticks, then hold
     state           print a summary of the ship and the weather
     muster          muster the crew: the watch bill, station by station
+    the sail room   what the sail room holds: each sail, its canvas and condition
     log [N]         print the last N log entries (default 20)
     save PATH       write a save file
     replay PATH     rebuild a world from a save and continue from it
@@ -105,6 +106,10 @@ class Console:
         elif self._is_muster(line):
             # a query, like `state`: printed, never journaled (spec M3 §5.1)
             for s in queries.muster_lines(self.world):
+                self._print(s)
+        elif " ".join(line.lower().split()) in ("the sail room", "sail room"):
+            # a query too (spec 3b §6.3): what is in the sail room, never journaled
+            for s in queries.sail_room_lines(self.world):
                 self._print(s)
         elif cmd == "log":
             n = int(args[0]) if args else 20
