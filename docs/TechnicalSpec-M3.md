@@ -301,3 +301,6 @@ The organising idea is that the **standing officers are reporters with a domain*
 | Deferred | Discipline and the master-at-arms as mechanics, the chaplain, the schoolmaster, midshipmen as characters: LLM and narrative material when stations exist; morale stays one number until short allowance or boarding needs more. | |
 
 Nothing in this table changes the milestone 3 packages beyond the fields in §2.1 and §2.3.
+7. **The schooner and the milestone 2 files.** The twenty milestone 2 evolution files keep their frigate-sized requests (a topsail wants twelve ordinary topmen). The schooner's watch is about fifteen hands with a fore top of three, so on her these requests are made up from other stations and ratings and run a little faster (able forecastlemen) or slower (landsmen at a reef). The compatibility rule is defined on the frigate; truth 21 depends on the schooner being short. A per-ship scaling of requests (hands as a share of the watch, or a `crew:` override in the ship file) is the clean answer when it matters; recorded at integration from package 19's report.
+8. **Studding sail booms start rigged out.** `Spar.rigged_out` defaults to true so that milestone 2's `set the studdingsails` still works from a fresh ship; a ship at sea would have them rigged in. The ship file should say, and the generator should write, the state a ship starts in.
+
