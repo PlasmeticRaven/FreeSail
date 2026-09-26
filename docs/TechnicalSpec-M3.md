@@ -47,8 +47,12 @@ class Sailor:
     fatigue: float     # 0..1: 0 fresh, 1 done in
     fit: bool          # False when sick or hurt; not built here beyond the flag
     post: str | None   # a station holder's post: "captain", "master", "boatswain", "first lieutenant"...
+    trade: str | None  # an idler's trade: "carpenter's crew", "sailmaker's crew", "cooper", "armourer",
+                       # "cook", "steward", "servant", "surgeon's mate", "clerk", "master-at-arms"; None for seamen
     at: str | None     # the evolution instance holding this sailor, else None
 ```
+
+`trade` is data only in milestone 3: the idlers are mustered by trade so that later milestones find the carpenter's crew and the cooks where the ship's books would have them (§10). Nothing reads it yet except `muster`.
 
 Skills come from rating with a small seeded spread, so that two able seamen are not identical but the crew's means are fixed by the file. Reference skill for the factor is the *ordinary* seaman at 0.6; able 0.8, landsman 0.35, marine 0.4 on deck and 0 aloft, idler 0.3 on deck and 0 aloft, petty officers 0.9. Numbers are provisional and tuned by package 17 against the compatibility rule.
 
@@ -102,13 +106,30 @@ crew:
     - {post: carpenter}
     - {post: purser}
     - {post: surgeon}
-  stores:
-    spare_sails: 3           # bolts of canvas as made-up sails, for shifting a blown-out sail
+    - {post: sailmaker}
+    - {post: master-at-arms}
+  idlers_by_trade:           # how the idlers line above is made up; must sum to it
+    carpenter's crew: 6
+    sailmaker's crew: 3
+    cooper: 1
+    armourer: 1
+    cook: 2
+    steward: 3
+    servant: 8
+    surgeon's mate: 2
+    clerk: 1
+    master-at-arms's party: 3   # the ship's corporals
+  stores:                    # numbers only in milestone 3; the milestones that consume them are in §10
+    water_tons: 100          # Winfield gives iron-hooped casks for about four months at full allowance
+    provisions_days: 120     # at full allowance for the complement
+    spare_sails: 3           # made-up sails in the sail room, consumed by shifting a blown-out sail (§6)
+    spare_spars: 4           # spare topmasts and yards in the waist and booms
+    cordage_fathoms: 600     # spare rope in the boatswain's store
 ```
 
 The stations must sum with the posts to the complement; the loader says so if they do not. Topmen are drawn from able and ordinary seamen first (Luce: "the smartest of the young seamen"), waisters from landsmen first, the afterguard from what is left, so the ratings line and the stations line together fix each station's quality.
 
-The schooner (a privateer's complement of about forty, Chapelle; judgement): forecastle 10, fore top 6, afterguard 11, waisters 6, idlers 4, posts master, mate, boatswain; no marines; `names: american`.
+The schooner (a privateer's complement of about forty, Chapelle; judgement): forecastle 10, fore top 6, afterguard 11, waisters 6, idlers 4 (cook, steward, carpenter's crew 1, sailmaker's crew 1), posts master, mate, boatswain; no marines; `names: american`; stores to match a small vessel on a short cruise (water for six weeks).
 
 Names come from `data/crew/names.yaml`: two lists (`english`, `american`) of period given names and surnames, drawn with the seeded stream. The same seed gives the same muster.
 
@@ -263,3 +284,20 @@ For the owner, on both ships, seed 7: muster the crew and read the bill; watch t
 4. **Meals, sleep below by day, sickness, punishment**: not modelled; fatigue is the only condition.
 5. **Level-0 line orders costing hands**: with the deck view.
 6. **Boys** are counted in the afterguard with landsman skill; a `boy` rating is trivial to add when it matters (powder monkeys, M7).
+
+## 10. The crew who do not sail: placement in later milestones
+
+Decided at the milestone 3 planning review (owner, 2026-09-26), so that the muster built now carries the fields the later work needs and nothing more. The sources divide the question: Falconer (1780) gives the *establishment*, which posts exist and what each is charged with; Luce (1884) gives the *routine*, when in the day each thing is done. Neither covers the British establishment of 1793 to 1815 exactly; the Admiralty *Regulations and Instructions* (1806 edition) should join `docs/references/` before the victualling work starts.
+
+The organising idea is that the **standing officers are reporters with a domain**: each owns a set of readings, a set of evolutions and a set of hands (the carpenter: the hull and spars, sounding the well, plugs, fishes and jury spars, the carpenter's crew; the purser: water and provisions, serving out, slops, the steward and cooks; the boatswain: rigging and cordage, chafe, setting up; the sailmaker: canvas; the gunner: powder and shot). This is the authority boundary an LLM station needs (proposal §7.1): a model given the carpenter can report and mend and cannot trim a sail, and the watcher's "the carpenter reports two feet in the well" is a report from a post, not a narrator's invention.
+
+| Milestone | What is built | Source to read first |
+|---|---|---|
+| **M3** (this chapter) | Idlers mustered by trade; posts include purser, surgeon, sailmaker, master-at-arms; `stores:` numbers in the ship file. Only spare sails are consumed. | Falconer, CARPENTER, ORDINARY (the standing officers), STEWARD; Luce ch. XX |
+| **M4** (standing orders and the watcher) | The routine of the day as starter standing orders (hammocks up, meals, serving out water, the idlers' work); daily consumption of water and provisions as bookkeeping with readings (`the water` in days) for standing orders to test and the watcher to report; the standing officers' reports as log lines from posts. | Luce ch. XX "Routine", the serving-out passages; Falconer, PURSER |
+| **M5** (the world) | Short allowance and its effect on fatigue and a first morale number; spoilage and casks stove in weather (director material, proposal §7.6); watering and victualling at ports; the purser's dealings with the market. | Luce on stowage of provisions (wet under dry, oldest first); port data |
+| **M7** (powder) | The surgeon and surgeon's mates with casualties; the gunner's domain; powder monkeys (a `boy` rating). | Falconer, GUNNER, SURGEON |
+| **M8** (mending) | The trades' evolutions against the condition model: caulking, plugging shot holes, fishing a sprung spar, jury masts (carpenter); setting up rigging, chafe, worming and serving (boatswain); repairing and making sails (sailmaker); casks (cooper). | Falconer, CARPENTER; Luce ch. XXX to XXXII |
+| Deferred | Discipline and the master-at-arms as mechanics, the chaplain, the schoolmaster, midshipmen as characters: LLM and narrative material when stations exist; morale stays one number until short allowance or boarding needs more. | |
+
+Nothing in this table changes the milestone 3 packages beyond the fields in §2.1 and §2.3.
