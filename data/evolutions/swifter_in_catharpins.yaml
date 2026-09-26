@@ -1,0 +1,53 @@
+# Swifter in the catharpins on one lower mast (milestone 3b, spec 3b §3). A spar
+# is lashed across the lower shrouds on each side some six feet below the futtock
+# staves, a block lashed round each shroud and the spar, and the swifter rove
+# through the blocks from side to side and led across the deck; it is "bowsed
+# tight till the shrouds come into the length of the catharpin legs, which are
+# seized at each end, round the futtock-stave and shroud" (Steel 1794, vol. I,
+# 'Futtock staves'; Lever 1808, fig. 182). The shrouds drawn in, the lower yard
+# braces sharper before its lee yardarm fouls them ("to afford room to brace the
+# yards sharp", Steel, CATHARPINS), and the mast is the less well stayed
+# athwartships until they are eased.
+#
+# The subject is the lower mast; the order gives one of these for each mast
+# (`swifter in the catharpins on the main`, or every lower mast). The last step
+# sets `swiftered_in` on the mast; the lower yard's brace limit follows it
+# (`parts.sync_catharpins`, CATHARPIN_GAIN_DEG) and the strain model rates the
+# mast down athwartships while it stays in (strain.py, CATHARPIN_RATING_FACTOR).
+#
+# Parameter, from the order: `gain`, what the lower yard gains, in words, with the
+# semicolon that joins it ("; the main yard will brace four degrees sharper").
+#
+# The steps' times are judgement: about twenty minutes a mast (spec 3b §3); no
+# period timing found.
+id: swifter_in_catharpins
+verb: swifter_in_the_catharpins_on
+applies_to: {class: mast}
+params: {gain: ""}
+preconditions:
+  - {check: not spar.swiftered_in, reason: "The catharpins on the {spar} are swiftered in already."}
+  - {check: not spar.wrecked, reason: "The {spar} is carried away."}
+requires:
+  - {check: not wrecked(spar), reason: "the {spar} is carried away"}
+steps:
+  - do: reeve_swifter
+    duration_s: 360        # spars lashed across the shrouds, tail-blocks on, the swifter rove
+    aloft: true
+  - do: bowse_in
+    duration_s: 240        # the fall manned across the deck and the shrouds bowsed in
+  - do: seize_legs
+    duration_s: 600        # the catharpin legs seized to the shrouds and the futtock stave
+    aloft: true
+    sets: {spar.swiftered_in: "true"}
+on_start: {log: "Boatswain's party to the {spar} shrouds; reeve the swifter."}
+on_complete: {log: "Swiftered in the catharpins on the {spar}{gain}.", kind: rigging.swiftered_in, severity: notable}
+on_fail: {log: "Could not swifter in the catharpins on the {spar}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the boatswain's work (spec 3b §3): the forecastlemen, the best older seamen,
+# with the carpenter's crew (idlers) at the fall on deck by day (Luce 1884, ch. XVIII
+# Organization, 'Duties of Men in Different Parts of the Ship'). Eight hands is
+# judgement: two or three aloft seizing, the rest on the swifter. Because the reeving and
+# the seizing are aloft, the request takes only hands who go aloft (crew/hands.py), so
+# the idlers named here are passed over and the forecastlemen do it, with seamen of the
+# other stations if they are short.
+crew: {hands: 8, rating: ordinary, stations: [forecastle, idlers]}
+source: "Steel 1794, vol. I, glossary 'CATHARPINS', 'Catharpin-legs', 'Futtock staves'; Lever 1808 (1827 printing), fig. 182 'Catharpins'; Fincham 1843, art. 102 and note"

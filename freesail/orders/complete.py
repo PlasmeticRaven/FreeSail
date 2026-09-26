@@ -196,6 +196,13 @@ def suggestions(ship: Any, text: str, limit: int = 12) -> list[str]:
     spec = vocab.verbs[verb]
     rest = typed[len(normalise(matched)) :].strip()
     prefix = matched + " "
+    if rest:
+        # a longer verb phrase that the words so far begin: milestone 3b's orders carry
+        # their mast or their trim in the phrase ("swifter in the catharpins on the
+        # main", "trim sails with the head yards sharper")
+        for phrase in vocab.verb_phrases:
+            if len(phrase) > len(matched) and _starts(phrase, typed):
+                offer(phrase)
 
     if spec.object in ("heading", "points"):
         for name in _compass_names():

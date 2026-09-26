@@ -1,0 +1,36 @@
+# Haul out a bowline (milestone 3b, spec 3b §4): the weather bowline of a
+# course or topsail braced up on a wind, hauled taut forward so that the weather
+# leech stands flat and the sail lies closer without lifting. "Haul taut the
+# weather-brace and haul the bowline" (Luce 1884, ch. XXIII, 'To Set a
+# Close-Reefed Topsail'); "Steady out the bo'lines!" when braced up after going
+# about (Luce 1884, ch. XXIV, 'Tacking'). The fore bowlines lead to the
+# forecastle, the main's to the fore fife-rail by a whip and runner, the top
+# bowlines to the forecastle and the deck (Luce 1884, ch. IX Rigging Ship, 'Bowlines').
+#
+# The subject is the bowline itself. The orders give one of these for each
+# bowline hauled ("haul the weather bowlines", "steady out the bowlines", "haul
+# the fore bowline"); letting one go or easing it is done at the pin, at once.
+# The physics reads the bowline's state (`Line.bowline_hauled`): the sail's
+# luff angle comes down while it is hauled and the yard braced up for its side,
+# and it is slacked of itself when the yard is braced in (sails.py).
+#
+# The minute is judgement: a few hands at a fall already led along, hauled
+# taut and belayed; no period timing found.
+id: haul_bowline
+verb: steady_out
+applies_to: {class: bowline}
+preconditions:
+  - {check: "line.state != parted", reason: "The {line} is parted; it must be spliced or rove afresh."}
+steps:
+  - do: haul
+    duration_s: 60
+    sets: {line.hauled: 1.0, line.state: belayed}
+on_start: {log: "Man the {line}."}
+on_complete: {log: "Steadied out the {line}.", kind: line.hauled, severity: routine}
+on_fail: {log: "Could not haul the {line}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: four hands to a bowline (spec 3b §4, judgement), on deck; the fore bowlines are
+# the forecastlemen's and the after ones the afterguard's (Luce 1884, ch. XVIII
+# Organization, 'Duties of Men in Different Parts of the Ship': the forecastlemen work
+# the head, the afterguard the gear abaft).
+crew: {hands: 4, rating: ordinary, stations: [forecastle, afterguard]}
+source: "Luce 1884, ch. XXIII At Sea, 'To Set a Close-Reefed Topsail' (\"haul taut the weather-brace and haul the bowline\"); ch. XXIV Working to Windward, 'Tacking' (\"Steady out the bo'lines!\"); ch. IX Rigging Ship, 'Bowlines'; Fincham 1843, art. 98 (\"the flatter the sails the sharper they may be braced\")"

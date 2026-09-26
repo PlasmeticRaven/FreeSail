@@ -68,7 +68,7 @@ from typing import Any
 
 from freesail import units
 from freesail.ship.graph import Ship
-from freesail.ship.parts import Line, LineState, Part, Sail, SailState, Spar
+from freesail.ship.parts import Line, LineState, Part, Sail, SailState, Spar, sync_catharpins
 
 # ---------------------------------------------------------------------------
 # The rule (spec §7.5)
@@ -89,8 +89,21 @@ FLOGGING_DRAG_COEFFICIENT = 1.2
 FLOGGING_LOAD_MULTIPLIER = 2.0
 
 # A yard whose brace has parted swings to lie along the apparent wind, until
-# it fouls the lee rigging at this angle from square.
+# it fouls the lee rigging at this angle from square. A lower yard whose mast has
+# its catharpins swiftered in swings the catharpins' gain further before it fouls
+# the shrouds drawn in (milestone 3b: every reader of the rigging's limit).
 SWUNG_YARD_MAX = units.deg_to_rad(80.0)
+
+# The catharpins swiftered in (milestone 3b, spec 3b §3): the lower shrouds drawn in
+# below the top stay the mast less well athwartships, so its rating against the
+# athwartships part of its load falls by this factor until they are eased. The
+# direction is Lever's and Fincham's (the shrouds bowsed in toward the mast, art. 102
+# note: "the shrouds ... will seldom allow the yards ... to be braced sufficiently
+# sharp"); the figure is judgement, the gate's to judge. The fore-and-aft part of the
+# load (stays and backstays) is judged against the rating as before, so a mast pressed
+# on a wind, whose load is nearly all athwartships, is judged about a sixth harder,
+# and one running before it hardly at all.
+CATHARPIN_RATING_FACTOR = 0.85
 
 HALYARD_CLASSES = frozenset({"halyard", "throat_halyard", "peak_halyard"})
 ALOFT_STATES = frozenset(
@@ -150,6 +163,7 @@ def apply_strain(ship: Ship, dt: float, rng_stream: random.Random | None = None)
     st = strain_state(ship)
     st.elapsed_s += dt
     stream = _stream(ship, rng_stream)
+    _tend_catharpins(ship)
     _tend_wrecks(ship, st)
     for part in list(ship.parts.values()):  # insertion order: deterministic
         if _out_of_action(part):
@@ -228,6 +242,8 @@ def _warn(ship: Ship, st: StrainState, part: Part, ratio: float) -> None:
             if dire
             else f"{name} working under the press of sail."
         )
+        if part.swiftered_in:
+            text = text[:-1] + ", the catharpins swiftered in."
     elif isinstance(part, Line):
         text = (
             f"{name} stranding; it will not hold much longer."
@@ -244,12 +260,16 @@ def _warn(ship: Ship, st: StrainState, part: Part, ratio: float) -> None:
 
 
 def _data(part: Part, ratio: float) -> dict[str, Any]:
-    return {
+    data = {
         "ratio": ratio,
         "load_kn": part.load_kn,
         "rating_kn": part.rating_kn,
         "condition": part.condition,
     }
+    factor = getattr(part, "rating_factor", 1.0)
+    if factor != 1.0:
+        data["rating_factor"] = factor  # the catharpins swiftered in (spec 3b §3)
+    return data
 
 
 # ---------------------------------------------------------------------------
@@ -316,6 +336,9 @@ def _part_line(ship: Ship, st: StrainState, line: Line, ratio: float) -> None:
             if affected
             else f"{name} parted."
         )
+    elif line.cls == "bowline" and isinstance(target, Sail):
+        # it holds nothing now (parts.Line.bowline_hauled): the leech lifts (spec 3b §4)
+        text = f"{name} parted; the {_name(ship, target.id, False)} lifting at the weather leech."
     else:
         text = f"{name} parted."
     data["affected"] = affected
@@ -391,6 +414,34 @@ def _tend_wrecks(ship: Ship, st: StrainState) -> None:
         _swing_yard(ship, yard)
 
 
+def _tend_catharpins(ship: Ship) -> None:
+    """Keep the lower yards' limits with their masts' catharpins, and rate each lower
+    mast for them: `rating_factor` is 1.0 as rigged; swiftered in, the athwartships
+    part of the mast's load is judged against CATHARPIN_RATING_FACTOR of its rating."""
+    for yard, was in sync_catharpins(ship):
+        ship.note(
+            "routine",
+            "yard.braced",
+            f"{_name(ship, yard.id)} came in to {abs(units.rad_to_deg(yard.brace_angle)):.0f}° "
+            f"from {abs(units.rad_to_deg(was)):.0f}° as the lower shrouds went out.",
+            subject=yard.id,
+        )
+    for mast in ship.spars.values():
+        if mast.cls != "mast":
+            continue
+        if not mast.swiftered_in:
+            mast.rating_factor = 1.0
+            continue
+        athwart = total = 0.0
+        for sail in ship.sails.values():
+            if sail.force_kn > 0.0 and ship.mast_of(sail) is mast:
+                athwart += abs(sail.side_force_kn)
+                total += sail.force_kn
+        s = min(athwart / total, 1.0) if total > 0.0 else 1.0
+        c2 = 1.0 - s * s
+        mast.rating_factor = 1.0 / math.sqrt(c2 + (s / CATHARPIN_RATING_FACTOR) ** 2)
+
+
 def _load_flogging(ship: Ship, sail: Sail) -> None:
     """A sail whose sheet has parted snatches at its yard with a fifth of its
     cloth, and the load on the yard and the spars beneath is doubled."""
@@ -410,7 +461,9 @@ def _swing_yard(ship: Ship, yard: Spar) -> None:
     sail on it luffs and gives no thrust."""
     awa = ship.dyn.apparent_wind_angle
     chord = min(abs(awa), math.pi - abs(awa))  # the chord's angle from the keel
-    angle = min(math.pi / 2 - chord, SWUNG_YARD_MAX)
+    # the catharpins' gain on a lower yard, if its mast has them swiftered in
+    gain = max(yard.brace_limit - yard.rigged_brace_limit, 0.0)
+    angle = min(math.pi / 2 - chord, SWUNG_YARD_MAX + gain)
     yard.brace_angle = math.copysign(angle, awa) if awa != 0.0 else angle
 
 
