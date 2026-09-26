@@ -129,16 +129,21 @@ def test_luce_appendix_e_strengths_relative_to_no_2():
 
 
 @pytest.mark.parametrize("path", SHIPS)
-def test_no_2_canvas_keeps_the_milestone_2_ratings_exactly(path):
-    """The derivation's identity: CLOTH_KN_PER_M2_NO2 is milestone 2's rating for courses
-    and topsails, so every sail of No. 2 keeps its rating to the decimal."""
-    assert CLOTH_KN_PER_M2_NO2 == 0.9
+def test_no_2_canvas_is_the_anchor_of_the_derivation(path):
+    """The derivation's anchor. Spec 3b §6.1 first anchored No. 2 canvas to milestone 2's
+    course and topsail rating, 0.9 kN/m2; package 22 found that number was the engine's
+    untuned default under which no canvas ever blew out, while milestone 2's *tuned*
+    light-sail ratings divided by Luce App. E's strengths put No. 2 at 0.36 to 0.44. The
+    lead set the anchor to 0.36 at integration (TuningNotes, milestone 3b). Milestone 2's
+    values are kept here as the record of what changed: every No. 2 sail is now 0.36/0.9
+    of its old rating."""
+    assert CLOTH_KN_PER_M2_NO2 == 0.36
     ship = load_ship(path)
-    for sid, rating in M2_NO2_RATINGS[path].items():
+    for sid, old_rating in M2_NO2_RATINGS[path].items():
         sail = ship.sails[sid]
         assert sail.canvas_no == 2, sid
-        assert sail.cloth_rating_kn == rating, sid
-        assert cloth_rating_for(sail.area_m2, 2) == round(0.9 * sail.area_m2, 1) == rating
+        assert sail.cloth_rating_kn == cloth_rating_for(sail.area_m2, 2), sid
+        assert sail.cloth_rating_kn == pytest.approx(old_rating * 0.36 / 0.9, abs=0.15), sid
 
 
 @pytest.mark.parametrize("path", SHIPS)
@@ -146,7 +151,7 @@ def test_every_sail_has_a_canvas_number_and_its_rating_follows_luce(path):
     ship = load_ship(path)
     for sail in ship.sails.values():
         assert sail.canvas_no in range(1, 10), sail.id
-        expected = round(0.9 * canvas_strength(sail.canvas_no) * sail.area_m2, 1)
+        expected = round(CLOTH_KN_PER_M2_NO2 * canvas_strength(sail.canvas_no) * sail.area_m2, 1)
         assert sail.cloth_rating_kn == expected == sail.rating_kn, sail.id
 
 
@@ -258,7 +263,7 @@ def test_a_worn_sail_is_baggier_and_lies_less_close():
 ROYALS = ("fore.royal", "main.royal", "mizzen.royal")
 # The No. 2 rating at which truth 27 holds, measured (docs in the package 22 report): the
 # worn royals blow out and the new ones keep their cloth with CLOTH_KN_PER_M2_NO2 between
-# about 0.30 and 0.36 kN/m2. The ship files keep spec 3b §6.1's 0.9; see the xfail below.
+# about 0.30 and 0.36 kN/m2. The ship files carry 0.36 since integration (see below).
 TRUTH_27_NO2_KN_PER_M2 = 0.36
 
 
@@ -309,14 +314,10 @@ def test_worn_canvas_goes_before_its_spar_and_new_canvas_holds_until_the_spar_go
     assert gale_royals(50.0, TRUTH_27_NO2_KN_PER_M2) == {r: "blown_out" for r in ROYALS}
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Truth 27 with the ship files' ratings: CLOTH_KN_PER_M2_NO2 = 0.9 (spec 3b §6.1's "
-    "identity with milestone 2's untuned course and topsail rating) makes a No. 8 royal bear "
-    "0.514 kN/m2; at condition 50 its cloth peaks at 0.84 of its effective rating in the gale "
-    "and its yard goes first. The constant near 0.36 brings the truth; the owner's ruling.",
-)
 def test_truth_27_with_the_ship_files_ratings():
+    """Truth 27 through the physics alone, with the ship files' own ratings: a new royal
+    loses its yard first in the gate M2 gale; a royal at condition 50 blows out before it.
+    Held once the anchor moved from 0.9 to 0.36 (see the anchor test above)."""
     assert gale_royals(100.0) == {r: "yard" for r in ROYALS}
     assert gale_royals(50.0) == {r: "blown_out" for r in ROYALS}
 
