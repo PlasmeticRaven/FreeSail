@@ -1,6 +1,13 @@
 # Gate M2: Two rigs, honest numbers, a window on the ship
 
-**Verdict:** Pending.
+**Verdict:** Passed (owner, 2026-09-26). Items 1 to 17 matched the stated expectations on both ships and in the browser.
+
+**One test note (Windows):** the owner's `pytest` run showed one failure, the generator-reproduces-the-files test. Cause: the generator wrote CRLF line endings on Windows and the test compared bytes against the committed LF files; the ship data was identical. Fixed on the development branch after the gate was cut (the generator writes LF everywhere and the test compares text); the gate zip is unchanged.
+
+**Owner's notes for follow-up:**
+- **Ship view, sail ordering.** Sails sometimes draw over sails they should be behind (a staysail between two masts drawn over the square sails forward of it), mostly consistent, and at some facings only. Recorded as an open item for the view's next pass.
+- **Ship view, backed sails.** Filling and backed sails are mostly distinguishable; down the line a backed sail should read as pressed against the mast. Not urgent; a benchmark for the 2.5D pass.
+- **Pointing.** Reading the primer's chapter 2 raised the question of what actually governs how close a given ship can point (sail cut and canvas, hull and lateral plane, spar and rigging geometry, rake) and how period practices with a cost, such as slacking the lee rigging to brace sharper at the risk of the mast, could be simulated and their consequences shown. Wanted eventually; recorded as a named future package (spec §12 item 11).
 
 **Download:** the release page for `gate-m2` at https://github.com/PlasmeticRaven/FreeSail/releases/tag/gate-m2, or the plain zip of the snapshot branch at https://github.com/PlasmeticRaven/FreeSail/archive/refs/heads/gates/m2.zip.
 
