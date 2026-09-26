@@ -980,14 +980,19 @@ class _Rig:
                 ],
             )
 
-    def held(self) -> set[str]:
-        """What a send-down or sway-up holds against other evolutions: the masts
-        and the sails on them (a sail being set waits, and is not set on a yard
-        going down). Not the yards: a brace on one is harmless, and one ordered
-        after it is down is refused."""
+    def held(self, sails: bool = True) -> set[str]:
+        """What a send-down or sway-up holds against other evolutions: the masts,
+        and the sails on them unless ``sails`` is false. Held, a sail being set
+        is finished first and one ordered meanwhile waits; an all-hands evolution
+        holds the masts alone, for it belays the sail work in hand instead of
+        waiting for it (spec M3 §3.4), and what was belayed is refused when it
+        takes up again on a spar sent down. Not the yards: a brace on one is
+        harmless, and one ordered after it is down is refused."""
         out: set[str] = set()
         for head in self.heads:
-            out |= {p.id for p in self.group[head.id] + self.sails[head.id]}
+            out |= {p.id for p in self.group[head.id]}
+            if sails:
+                out |= {p.id for p in self.sails[head.id]}
         return out
 
 
@@ -1025,7 +1030,7 @@ class SendDownScript(PhasedScript):
         self.sent: list[Spar] = []
 
     def holds(self) -> set[str]:
-        return {self.ship.name} | self.rig.held()
+        return {self.ship.name} | self.rig.held(bool(self.params.get("hold_sails", True)))
 
     def _what(self) -> str:
         return str(self.params.get("what") or self.mast_cls.replace("_", " ") + "s")
@@ -1162,7 +1167,7 @@ class SwayUpScript(PhasedScript):
         self.crossed: list[Spar] = []
 
     def holds(self) -> set[str]:
-        return {self.ship.name} | self.rig.held()
+        return {self.ship.name} | self.rig.held(bool(self.params.get("hold_sails", True)))
 
     def _what(self) -> str:
         return str(self.params.get("what") or self.mast_cls.replace("_", " ") + "s")

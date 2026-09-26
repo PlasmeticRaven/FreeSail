@@ -18,9 +18,8 @@ timing:
 on_start: {log: "Furl sail! Aloft topmen; lay out and furl."}
 on_complete: {log: "Furled all sail; {count} sails furled and stowed.", kind: sail.furled, severity: notable}
 on_fail: {log: "Could not furl all sail: {reason}", kind: evolution.failed, severity: notable}
-# crew: every part of the ship furls its own sails: the topmen the topsails and light
-# sails, the forecastlemen the foresail and head sails, the afterguard the mainsail and
-# spanker (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the
-# Ship'). A large party, not an all-hands call.
-crew: {hands: 60, rating: ordinary, stations: [topmen, forecastle, afterguard]}
+# hands: all. "Furling sail" and "Shortening sail and coming to anchor" are stations in
+# every man's billet (Luce 1884, ch. XVIII, 'Station Billet'); the whole ship's canvas
+# is all hands' work.
+crew: {hands: all, rating: ordinary, stations: [all hands]}
 source: "Luce 1884, ch. XX Port Drills, 'To Furl Sail' (\"Furl sail! ... Lay out! ... Furl away!\"), 'Remarks on Furling'; ch. XXIX In a Gale, 'Preparations for a Gale' (\"furl all square sails\"); Luce 1866, ch. XX 'To Furl Sail (Port Routine)'"

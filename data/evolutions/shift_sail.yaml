@@ -35,5 +35,8 @@ on_fail: {log: "Could not shift the {sail}: {reason}", kind: evolution.failed, s
 # crew: the men of the sail's part of the ship, aloft and at the burtons and buntlines
 # ("Shifting topsail yards: topsail-yard, unbend and bend topsail", Luce 1884, ch. XVIII
 # Organization, 'Station Billet'); more than to bend or unbend alone, and able men.
-crew: {hands: 20, rating: able, stations: [topmen, forecastle, afterguard]}
+# hands: sized to one watch of the schooner at this rating (six ordinary, seven able
+# on deck at the least), which the frigate's watch fills with hands to spare;
+# a full working party would be about twenty (judgement).
+crew: {hands: 7, rating: able, stations: [topmen, forecastle, afterguard]}
 source: "Luce 1884, ch. XXXII Shifting Sails and Spars, 'Splitting Sails', 'To Shift a Topsail (by the wind, under all plain sail)', 'To Shift a Course'; Luce 1866, ch. XXXII Shifting Sails and Spars, 'Splitting Sails', 'Main Topsail (Gale)', 'Topgallant Sail or Royal'"

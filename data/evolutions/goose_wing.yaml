@@ -41,5 +41,8 @@ on_fail: {log: "Could not goose-wing the {sail}: {reason}.", kind: evolution.fai
 # crew: deck work at the tack, clew garnet and buntlines of the sail's part of the ship:
 # the forecastlemen at the foresail, the afterguard at the mainsail, the waisters hauling
 # (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship').
-crew: {hands: 8, rating: ordinary, stations: [forecastle, afterguard, waisters]}
+# hands: sized to one watch of the schooner at this rating (six ordinary, seven able
+# on deck at the least), which the frigate's watch fills with hands to spare;
+# a full party at the tack and clew garnet would be about eight (judgement).
+crew: {hands: 6, rating: ordinary, stations: [forecastle, afterguard, waisters]}
 source: "Luce 1884, ch. XXIV Working to Windward, 'To Wear in a Gale under a Close-Reefed Main Topsail, Fore, Main, and Mizzen Storm Staysails' (\"A foresail in this state is 'goose-winged'\"); Luce 1866, ch. XXIV 'Wearing', 'Ditto in a Gale'; Falconer, GOOSE-WINGS of a sail"

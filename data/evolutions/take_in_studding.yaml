@@ -23,5 +23,9 @@ on_fail: {log: "Could not take in the {sail}: {reason}.", kind: evolution.failed
 # crew (package 19): the forecastlemen take in the lower and topmast studding-sails,
 # the topmen the topgallant ones (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship'; Luce 1884, ch. XXIII At Sea, 'To take in
 # the Topmast Studding-sail').
+# hands: milestone 2's number, kept: package 17's tests were built on these numbers.
+# It is more than one watch of the schooner has at this rating (six ordinary, seven
+# able, two landsmen on deck at the least), so there the request is made up with
+# better hands and goes a little faster than milestone 2; the frigate's watch fills it.
 crew: {hands: 8, rating: ordinary, stations: [forecastle, topmen]}
 source: "Luce 1866, ch. XXIII At Sea, 'To take in the topmast studding sail', 'To take in [the lower studding-sail]'"

@@ -28,5 +28,8 @@ on_complete: {log: "Scudding before it, the wind on the {quarter} quarter, steer
 on_fail: {log: "Could not bear up: {reason}.", kind: evolution.failed, severity: notable}
 # crew: the watch at the braces and the spanker brails: afterguard, marines and waisters
 # (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship').
-crew: {hands: 16, rating: ordinary, stations: [afterguard, waisters, marines]}
+# hands: sized to one watch of the schooner at this rating (six ordinary, seven able
+# on deck at the least), which the frigate's watch fills with hands to spare;
+# a full party at the braces would be about sixteen (judgement).
+crew: {hands: 6, rating: ordinary, stations: [afterguard, waisters, marines]}
 source: "Luce 1884, ch. XXIX In a Gale, 'To Scud' (\"The best sails for scudding ... are a close-reefed main topsail, and single or double-reefed foresail\"), 'Remarks on Scudding', 'Brought by the Lee'; Luce 1866, ch. XXIX 'To Scudd', 'Remarks on Scudding'; Falconer, SCUDDING"

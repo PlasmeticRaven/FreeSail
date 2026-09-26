@@ -13,7 +13,6 @@ requires:
 steps:
   - do: clear_away
     duration_s: 30
-    aloft: true             # the loosers lay out on the jib-boom
     if: sail.state in [furled, in_the_gear]
     sets: {sail.state: loosed}
   - do: hoist

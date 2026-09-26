@@ -162,7 +162,8 @@ def test_crew_request_reads_the_files_crew_line():
 def test_every_evolution_file_has_a_crew_line_the_pool_can_read():
     for eid, evo in EVOLUTIONS.items():
         want = CrewRequest.from_mapping(evo.crew)
-        assert want.all_hands or want.hands > 0, eid
+        # the routine's two (call_all_hands, pipe_down) ask for none: the lead's package 19 brief
+        assert want.all_hands or want.hands > 0 or eid in ("call_all_hands", "pipe_down"), eid
 
 
 def test_topmen_are_the_subjects_own_top_first():

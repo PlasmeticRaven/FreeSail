@@ -40,5 +40,9 @@ on_fail: {log: "Could not set the {sail}: {reason}.", kind: evolution.failed, se
 # crew (package 19): "Making sail: loose topsail, then on deck to halliards" (the
 # topman's station billet); the forecastlemen loose the foresail, the afterguard the
 # mainsail (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship').
+# hands: milestone 2's number, kept: package 17's tests were built on these numbers.
+# It is more than one watch of the schooner has at this rating (six ordinary, seven
+# able, two landsmen on deck at the least), so there the request is made up with
+# better hands and goes a little faster than milestone 2; the frigate's watch fills it.
 crew: {hands: 12, rating: ordinary, stations: [topmen, forecastle, afterguard]}
 source: "Luce 1866, ch. XXIII At Sea, 'To set a Topsail', 'To set a Top-gallant sail', 'To set a Foresail'; Lever 1808, 'Setting the Topsails'"

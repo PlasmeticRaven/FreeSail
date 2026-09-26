@@ -24,5 +24,9 @@ on_complete: {log: "Furled the {sail}.", kind: sail.furled, severity: notable}
 on_fail: {log: "Could not furl the {sail}: {reason}.", kind: evolution.failed, severity: notable}
 # crew (package 19): the afterguard furl the spanker and the mizzen topmen "loose and
 # furl the peak of the spanker" (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship'); topmen are those of the sail's own mast.
+# hands: milestone 2's number, kept: package 17's tests were built on these numbers.
+# It is more than one watch of the schooner has at this rating (six ordinary, seven
+# able, two landsmen on deck at the least), so there the request is made up with
+# better hands and goes a little faster than milestone 2; the frigate's watch fills it.
 crew: {hands: 8, rating: ordinary, stations: [afterguard, topmen]}
 source: "Luce 1866, ch. XX In Charge of the Deck, 'To Furl Sails'; ch. XXIII 'The Spanker'"

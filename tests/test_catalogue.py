@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import math
 import random
+from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -24,6 +25,7 @@ import yaml
 from freesail import orders, units
 from freesail.api.session import make_ship, make_world
 from freesail.core.world import Scenario
+from freesail.crew import bill, hands
 from freesail.evolutions import EVOLUTIONS, Runner
 from freesail.evolutions.scripts import SCRIPTS, spare_sails
 from freesail.physics.sails import _lateral_offset, compute_sail_forces
@@ -100,15 +102,14 @@ M2_TIMINGS = {
     },
 }
 
-# Steps that are work aloft in the milestone 2 files (spec M3 §3.3).
+# Steps that are work aloft in the milestone 2 files (spec M3 §3.3). Work on the jib-boom
+# is not counted aloft: it moved truths 12 and 17 through the crew factor.
 ALOFT_STEPS = {
     "set_square": {"loose"},
     "furl_square": {"furl"},
     "reef_square": {"reef"},
     "shake_out_square": {"shake_out"},
     "furl_gaff": {"furl"},
-    "set_jibheaded": {"clear_away"},
-    "furl_jibheaded": {"stow"},
 }
 
 
@@ -219,6 +220,29 @@ def test_aloft_flags_are_on_the_steps_aloft():
         evo = EVOLUTIONS[eid]
         for phase in evo.params.get("aloft") or []:
             assert f"{phase}_s" in evo.timing, (eid, phase)
+
+
+@pytest.mark.parametrize("path", [FRIGATE, SCHOONER])
+def test_the_new_crew_lines_fit_one_watch_of_either_ship(path):
+    """Each new evolution that asks for the watch gets every hand it asks for at the
+    rating it asks for, from either watch, by day or by night, on either ship: so it
+    runs at its file's pace (the compatibility rule for the new files)."""
+    w = make_world(7, path, Scenario())
+    crew = w.ship.extra["crew"]
+    for hour in (1, 4, 9, 13, 21):
+        deck = bill.on_deck(crew, datetime(1805, 6, 1, hour, 0, 0))
+        for eid in NEW:
+            evo = EVOLUTIONS[eid]
+            want = hands.CrewRequest.from_mapping(evo.crew)
+            if want.all_hands or want.wants_none:
+                continue
+            aloft = any(step.aloft for step in evo.steps)
+            for mast in (None, "fore", "main", "mizzen"):
+                for sailor in crew.sailors:
+                    sailor.at = None
+                got = hands.request(crew, deck, "x", want, mast, aloft=aloft)
+                assert got.outcome == hands.ENOUGH, (path, hour, eid, got.got, got.wanted)
+                assert hands.crew_factor(got, want, aloft) == 1.0, (path, hour, eid)
 
 
 # ---------------------------------------------------------------------------
@@ -727,3 +751,11 @@ def test_sending_down_the_topgallant_masts_at_once_loses_nothing_in_thirty_minut
     assert [e.text for e in w.log if e.kind in LOST] == []
     assert w.ship.spars["fore.royal.yard"].sent_down
     assert not w.ship.sails["fore.royal"].is_set
+    # all hands: the sail work in hand was belayed, and the royals refused after
+    belayed = [e for e in w.log if e.kind == "evolution.belayed"]
+    assert any("fore topgallant" in e.text for e in belayed)
+    assert any(
+        e.kind == "evolution.failed" and e.text.startswith("Could not set the fore royal")
+        for e in w.log
+    )
+    assert events(w, "spar.sent_down")

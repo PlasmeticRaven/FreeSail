@@ -16,6 +16,7 @@ params:
   mast: topgallant_mast
   poles: [royal_mast]
   with_masts: true
+  hold_sails: false   # all hands: the sail work in hand is belayed, not waited for
   what: topgallant masts
   below: fid the topmasts
   aloft: [mast, yards]
@@ -25,8 +26,7 @@ timing:
 on_start: {log: "Up topgallant masts! Man the topgallant mast-ropes."}
 on_complete: {log: "Swayed up and fidded {swayed}; the yards crossed.", kind: spar.swayed_up, severity: notable}
 on_fail: {log: "Could not sway up the topgallant masts: {reason}.", kind: evolution.failed, severity: notable}
-# crew: as for sending them down (Luce 1884, ch. XX Port Drills, 'To Send Up Topgallant
-# Masts and Topgallant and Royal Yards': "Men go to their stations for sending up
-# topgallant masts").
-crew: {hands: 24, rating: able, stations: [topmen, forecastle]}
+# hands: all, as for sending them down (Luce's colour evolution, 'Up topgallant masts
+# and topgallant and royal yards!').
+crew: {hands: all, rating: able, stations: [all hands]}
 source: "Luce 1884, ch. XX Port Drills, 'To Send Up Topgallant-Masts', 'To Send Up Topgallant Masts and Topgallant and Royal Yards' (\"Sway aloft and fid ... Sway across! Bend the gear!\")"

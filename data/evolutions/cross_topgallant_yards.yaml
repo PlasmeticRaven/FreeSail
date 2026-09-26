@@ -24,5 +24,8 @@ on_complete: {log: "Crossed {swayed}.", kind: spar.swayed_up, severity: notable}
 on_fail: {log: "Could not cross the light yards: {reason}.", kind: evolution.failed, severity: notable}
 # crew: the topgallant and royal yardmen aloft, the topmen at the yard-ropes (Luce 1884,
 # ch. XX Port Drills, 'To Cross Topgallant and Royal Yards').
-crew: {hands: 16, rating: able, stations: [topmen]}
+# hands: sized to one watch of the schooner at this rating (six ordinary, seven able
+# on deck at the least), which the frigate's watch fills with hands to spare;
+# a full working party would be about sixteen (judgement).
+crew: {hands: 7, rating: able, stations: [topmen, forecastle]}
 source: "Luce 1884, ch. XX Port Drills, 'To Cross Topgallant and Royal Yards' (\"Sway aloft! ... Sway across! Bend the gear!\"); Luce 1866, ch. XX 'To Cross Topgallant and Royal Yards'"

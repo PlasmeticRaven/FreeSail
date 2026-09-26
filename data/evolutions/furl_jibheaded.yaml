@@ -16,7 +16,6 @@ steps:
     sets: {sail.state: in_the_gear}
   - do: stow
     duration_s: 90
-    aloft: true             # laid out on the jib-boom
     sets: {sail.state: furled}
 on_start: {log: "Lay out and stow the {sail}."}
 on_complete: {log: "Stowed the {sail}.", kind: sail.furled, severity: notable}

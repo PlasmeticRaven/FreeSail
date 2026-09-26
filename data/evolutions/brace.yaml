@@ -30,5 +30,9 @@ on_fail: {log: "Could not brace the {yard}: {reason}.", kind: evolution.failed, 
 # crew (package 19): the after braces are the afterguard's and the heavy hauling the
 # waisters'; the marines' "work on deck is generally the same as that of the
 # afterguard" (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship').
+# hands: milestone 2's number, kept: package 17's tests were built on these numbers.
+# It is more than one watch of the schooner has at this rating (six ordinary, seven
+# able, two landsmen on deck at the least), so there the request is made up with
+# better hands and goes a little faster than milestone 2; the frigate's watch fills it.
 crew: {hands: 8, rating: landsman, stations: [afterguard, waisters, marines]}
 source: "Luce 1866, ch. XXIV Working to Windward, 'To Trim Yards', 'Table of best angles of yard with keel'; ch. XXV 'Bracing Yards'"

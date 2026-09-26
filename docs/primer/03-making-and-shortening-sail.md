@@ -217,7 +217,7 @@ Eleven minutes in a 15-knot breeze. The old royal was sound, so it went down to 
 
 ## Light spars in a blow
 
-"It is recommended to send down top-gallant masts in a heavy gale, when the vessel has much top-hamper, as it eases her considerably" (Luce 1884, ch. XXIX In a Gale). `send down the topgallant masts` clews up whatever is still drawing on them, sends the topgallant and royal yards down on deck with the sails furled on them, and unfids and lowers the masts; the spars sent down carry no strain and catch no wind, and nothing on them can be set until `sway up the topgallant masts` has them aloft and crossed again. In a 35-knot gale under all sail that is the difference between the royals carrying away and nothing going at all: ordered as the sails go up, it waits for the royals to be set and has them clewed up again before the second ten minutes. `send down the topgallant yards` sends down the light yards alone and `cross the topgallant yards` crosses them again. One level lower, `strike the topmasts` lowers each topmast with its topsail yard on the cap, and `fid the topmasts` sways them up; a topmast is struck only with its topgallant mast already down and no sail set on it.
+"It is recommended to send down top-gallant masts in a heavy gale, when the vessel has much top-hamper, as it eases her considerably" (Luce 1884, ch. XXIX In a Gale). `send down the topgallant masts` clews up whatever is still drawing on them, sends the topgallant and royal yards down on deck with the sails furled on them, and unfids and lowers the masts; the spars sent down carry no strain and catch no wind, and nothing on them can be set until `sway up the topgallant masts` has them aloft and crossed again. It is work for all hands: the watch below is turned up, and whatever sail work the watch had in hand is belayed until it is done. In a 35-knot gale that is the difference between the royals carrying away and nothing going at all: ordered with `make all sail`, it takes the hands off the light sails before the royals are set, and when the work in hand is taken up again the royals are refused, their yards being on deck. `send down the topgallant yards` sends down the light yards alone and `cross the topgallant yards` crosses them again. One level lower, `strike the topmasts` lowers each topmast with its topsail yard on the cap, and `fid the topmasts` sways them up; a topmast is struck only with its topgallant mast already down and no sail set on it.
 
 ```orders frigate plain-sail
 send down the topgallant yards
@@ -229,20 +229,26 @@ fid the topmasts
 ```
 
 ```
+  Morning watch, 8 bells (04:00)  Order: make all sail.
+  Morning watch, 8 bells (04:00)  Order: brace up on the starboard tack.
   Morning watch, 8 bells (04:00)  Order: send down the topgallant masts.
-  Morning watch (04:07)  Clew up the fore topgallant, the fore royal, the flying jib, the main topgallant, the main royal, the mizzen topgallant and the mizzen royal; stand by to send down.
-  Morning watch (04:07)  Down topgallant masts! Topgallant and royal yardmen in the tops.
-  Morning watch (04:09)  Clewed up the fore topgallant, the fore royal, the flying jib, the main topgallant, the main royal, the mizzen topgallant and the mizzen royal; hands aloft to send down.
-  Morning watch (04:18)  Sent down on deck the fore topgallant yard, the fore royal yard, the main topgallant yard, the main royal yard, the mizzen topgallant yard and the mizzen royal yard, with their studding sail booms.
-  Morning watch (04:32)  Unfidded and lowered away the fore topgallant mast, the main topgallant mast and the mizzen topgallant mast.
-* Morning watch (04:32)  Sent down the fore topgallant mast, the main topgallant mast and the mizzen topgallant mast; the upper spars on deck.
+  ...
+* Morning watch (04:00)  Belayed setting the fore topgallant: down topgallant masts! Topgallant and royal yardmen in the tops.
+  ...
+  Morning watch (04:00)  Down topgallant masts! Topgallant and royal yardmen in the tops.
+  Morning watch (04:01)  All hands on deck.
+  Morning watch (04:07)  Sent down on deck the fore topgallant yard, the fore royal yard, the main topgallant yard, the main royal yard, the mizzen topgallant yard and the mizzen royal yard, with their studding sail booms.
+* Morning watch (04:07)  Could not set the fore royal: the fore royal's yard or mast is wrecked or sent down.
+  ...
+  Morning watch (04:18)  Unfidded and lowered away the fore topgallant mast, the main topgallant mast and the mizzen topgallant mast.
+* Morning watch (04:18)  Sent down the fore topgallant mast, the main topgallant mast and the mizzen topgallant mast; the upper spars on deck.
 ```
 
-That is the frigate in 35 knots with all sail just made, the order given with the others: half an hour of work at the weather's pace. Order `strike the topmasts` with the topgallant masts aloft and it is refused ("Send down the topgallant masts first: the fore topgallant mast, the main topgallant mast and the mizzen topgallant mast are still aloft."); with sail set on the topmasts, it names every sail and asks for them to be taken in first.
+That is the frigate in 35 knots, the order given with `make all sail`: eighteen minutes of all hands' work at the weather's pace, and she lies with no canvas set while it is done, until the sail work belayed is taken up again. Given once the light sails are drawing, it clews them up first. Order `strike the topmasts` with the topgallant masts aloft and it is refused ("Send down the topgallant masts first: the fore topgallant mast, the main topgallant mast and the mizzen topgallant mast are still aloft."); with sail set on the topmasts, it names every sail and asks for them to be taken in first.
 
 ## Loosing to dry and furling everything
 
-After rain the furled sails are loosed to hang in their gear and dry: "Loose sail! ... Let fall!", the topsails and courses hanging by their buntlines, the topgallant sails and royals down, the head sails spread on the booms (Luce 1884, ch. XX Port Drills, 'To Loose Sail to the Buntlines'). Every furled sail but the studding sails is loosed; it is refused when it blows more than 20 knots across the deck. `furl all` (Luce's call is *Furl sail!*) clews up what is drawing and furls or stows everything in the ship.
+After rain the furled sails are loosed to hang in their gear and dry: "Loose sail! ... Let fall!", the topsails and courses hanging by their buntlines, the topgallant sails and royals down, the head sails spread on the booms (Luce 1884, ch. XX Port Drills, 'To Loose Sail to the Buntlines'). Every furled sail but the studding sails is loosed; it is refused when it blows more than 20 knots across the deck. `furl all` (Luce's call is *Furl sail!*) clews up what is drawing and furls or stows everything in the ship. Both are all hands' work, for every man has a station for loosing and for furling sail in his billet (Luce 1884, ch. XVIII, 'Station Billet'): order them by day, or the watch below loses its sleep.
 
 ```orders frigate
 loose sails to dry

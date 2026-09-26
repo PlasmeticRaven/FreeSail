@@ -29,5 +29,8 @@ on_fail: {log: "Could not bend the {sail}: {reason}", kind: evolution.failed, se
 # crew: the loosers aloft, "the balance of the men in each part of the ship go below and
 # rouse up the sails" (Luce 1884, ch. XX Port Drills, 'Bending Sail'); the part of the
 # ship is the sail's own, as for unbending.
-crew: {hands: 16, rating: ordinary, stations: [topmen, forecastle, afterguard]}
+# hands: sized to one watch of the schooner at this rating (six ordinary, seven able
+# on deck at the least), which the frigate's watch fills with hands to spare;
+# a full working party would be about sixteen (judgement).
+crew: {hands: 6, rating: ordinary, stations: [topmen, forecastle, afterguard]}
 source: "Luce 1884, ch. XX Port Drills, 'Bending Sail' (\"Sway aloft! ... Haul out! Lay out! And bring to!\"), 'Preparations for Bending'; Luce 1866, ch. XX 'Bending Sail', 'Bend Sail (Port Routine)'"

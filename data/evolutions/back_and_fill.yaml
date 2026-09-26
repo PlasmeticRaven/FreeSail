@@ -30,5 +30,8 @@ on_complete: {log: "Backed and filled; lying to with the {backed} to the mast.",
 on_fail: {log: "Could not back and fill: {reason}.", kind: evolution.failed, severity: notable}
 # crew: the main braces, again and again: afterguard, marines and waisters (Luce 1884,
 # ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship').
-crew: {hands: 16, rating: ordinary, stations: [afterguard, marines, waisters]}
+# hands: sized to one watch of the schooner at this rating (six ordinary, seven able
+# on deck at the least), which the frigate's watch fills with hands to spare;
+# a full party at the main braces would be about sixteen (judgement).
+crew: {hands: 6, rating: ordinary, stations: [afterguard, marines, waisters]}
 source: "Luce 1884, Appendix I In a Tideway, 'Backing and Filling' (\"by backing, filling, or shivering the main yard\"); Luce 1866, ch. XXII In a Tideway, 'Backing and Filling'"

@@ -25,5 +25,8 @@ on_fail: {log: "Could not unbend the {sail}: {reason}", kind: evolution.failed, 
 # crew: "Bend, unbend, loose, reef, and furl fore-top sail, top-gallant sail, and royal"
 # are the fore-topmen's, the foresail the forecastlemen's, the mainsail the afterguard's
 # (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship').
-crew: {hands: 16, rating: ordinary, stations: [topmen, forecastle, afterguard]}
+# hands: sized to one watch of the schooner at this rating (six ordinary, seven able
+# on deck at the least), which the frigate's watch fills with hands to spare;
+# a full working party would be about sixteen (judgement).
+crew: {hands: 6, rating: ordinary, stations: [topmen, forecastle, afterguard]}
 source: "Luce 1884, ch. XX Port Drills, 'To Unbend Sail' (\"Trice up! Lay out and unbend! ... Ease away! Lower together!\"); Luce 1866, ch. XX 'To Unbend Sail'"
