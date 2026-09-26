@@ -1,0 +1,34 @@
+# Back and fill (scripted, BackAndFillScript in scripts.py): the tideway
+# handling of Luce's Plate A, "keeping the yards counter-braced as in lying
+# to, shooting ahead, or backing astern to avoid danger ... by backing,
+# filling, or shivering the main yard". The yards of the mast with the most
+# square sail (the main on the frigate, the fore on the schooner) are laid
+# aback and her way is checked, then braced full and she forereaches, `cycles`
+# times, each board held hold_s after a brace of brace_s. As for heave_to, the
+# courses are hauled up, the spanker brailed up and the light sails forward
+# clewed up first, or she flies up into the wind and through it when backed.
+#   back  the yards laid aback, the helm a-lee (helm_deg): her way checked
+#   fill  the yards braced full, the helm amidships: she forereaches
+# The frigate in twelve knots swings between a knot and three, five points off
+# the wind, and never quite gathers sternway: she keeps her place.
+# She ends with the yards aback, lying to as heave_to leaves her, so `fill
+# away` stands her on and `back and fill` again takes up where she is.
+# There are no tides until milestone 5, so what the manoeuvre keeps her is her
+# place, not a channel: the tideway half of Luce's handling is left out.
+id: back_and_fill
+verb: back_and_fill
+applies_to: {class: ship}
+script: back_and_fill
+preconditions: []
+timing:
+  cycles: 2       # back and fill this many times, then lie to aback
+  brace_s: 45     # to swing the yards aback or full
+  hold_s: 90      # each board held this long once braced (judgement)
+  helm_deg: 15    # the helm a-lee while aback, as for heave_to
+on_start: {log: "Man the main braces; back and fill."}
+on_complete: {log: "Backed and filled; lying to with the {backed} to the mast.", kind: ship.hove_to, severity: notable}
+on_fail: {log: "Could not back and fill: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the main braces, again and again: afterguard, marines and waisters (Luce 1884,
+# ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship').
+crew: {hands: 16, rating: ordinary, stations: [afterguard, marines, waisters]}
+source: "Luce 1884, Appendix I In a Tideway, 'Backing and Filling' (\"by backing, filling, or shivering the main yard\"); Luce 1866, ch. XXII In a Tideway, 'Backing and Filling'"

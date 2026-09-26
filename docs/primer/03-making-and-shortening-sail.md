@@ -170,9 +170,94 @@ take in the studdingsails
 
 A studding sail comes in made up and stowed, so `take in` is enough; there is no `furl` for it.
 
+Each studding sail has its boom, run out along the yard by an in-and-out jigger before the sail can go up: "Set taut! Rig out! Hoist away!" (Luce 1884, ch. XXIII At Sea, 'The Topmast Studding-sail'). `rig out` and `rig in` take the boom or the studding sail it carries; a boom cannot be rigged in with its sail set, and a sail cannot be set on a boom rigged in ("The starboard fore topmast studdingsail boom is rigged in; rig it out first"). Every boom starts rigged out, as the booms were before they had orders of their own.
+
+```orders frigate plain-sail
+rig in the starboard fore topmast studdingsail boom
+rig out the starboard fore topmast studdingsail boom
+rig in the fore topmast studdingsails, both sides
+rig out the lee fore topmast studdingsail
+# rejected: rig out the fore topsail
+```
+
+## Goose-winging
+
+A course or a topsail with its lee clew hauled up to the yard and its weather clew still set is *goose-winged*: half the sail draws, and its centre lies out to windward, so it pays her head off. Luce uses it to help a ship off the wind in wearing in a gale: "haul aboard the weather clew of the foresail; which will increase her headway, and with her helm still a-weather, will serve to pay her off. A foresail in this state is 'goose-winged'" (Luce 1884, ch. XXIV, 'To Wear in a Gale'). From a set sail the lee clew is hauled up; from a sail hanging in its gear the weather clew is hauled aboard. `set` hauls the other clew aboard again and `take in` hauls both up. (Falconer's *goose-wings* are the other way about, both clews set and the bunt furled, "only used in a great storm to scud before the wind".)
+
+```orders frigate plain-sail
+goose-wing the foresail
+goose wing the main topsail
+# rejected: goose-wing the spanker
+```
+
+## Bending, unbending and shifting sails
+
+A sail blown out of its bolt-ropes gives nothing and cannot be set again: it must be **shifted**, the rags unbent and sent down and a new sail sent up from the sail room and bent to the yard (Luce 1884, ch. XXXII Shifting Sails and Spars, 'To Shift a Topsail': "Lay out! Furl and unbend! ... Send up the new sail ... Bring to and bend the sail"). `unbend` and `bend` do the two halves alone (ch. XX Port Drills, 'To Unbend Sail', 'Bending Sail'). The new sail is left furled on its yard; setting it is your next order. A sail must be taken in before it is unbent or shifted, and only square sails are bent and unbent in this milestone.
+
+The ship carries a few made-up sails in the sail room, three unless her ship file says otherwise, and bending one uses one; the log keeps the count. A sound sail unbent goes back to the sail room for the sailmaker, the rags of a blown-out one do not, and with none left the order is refused: "There is no spare sail left in the sail room to bend in place of the main royal; the sailmaker must make one first."
+
+```orders frigate
+unbend the fore royal
+bend the fore royal
+shift the main topsail
+bend a new mizzen royal
+# rejected: bend the jib
+# rejected: unbend the spanker
+```
+
+```
+  Morning watch, 8 bells (04:00)  Order: shift the fore royal.
+  Morning watch (04:00)  Stand by to shift the fore royal! Aloft topmen; lay out, furl and unbend.
+  Morning watch (04:03)  Unbent the fore royal and lowered it down on deck.
+  Morning watch (04:06)  Swayed aloft the new fore royal.
+* Morning watch (04:11)  Shifted the fore royal; the new sail bent and furled, 3 spare sails left in the sail room.
+```
+
+Eleven minutes in a 15-knot breeze. The old royal was sound, so it went down to the sail room and the count still stands at three; had it been blown out, it would stand at two.
+
+## Light spars in a blow
+
+"It is recommended to send down top-gallant masts in a heavy gale, when the vessel has much top-hamper, as it eases her considerably" (Luce 1884, ch. XXIX In a Gale). `send down the topgallant masts` clews up whatever is still drawing on them, sends the topgallant and royal yards down on deck with the sails furled on them, and unfids and lowers the masts; the spars sent down carry no strain and catch no wind, and nothing on them can be set until `sway up the topgallant masts` has them aloft and crossed again. In a 35-knot gale under all sail that is the difference between the royals carrying away and nothing going at all: ordered as the sails go up, it waits for the royals to be set and has them clewed up again before the second ten minutes. `send down the topgallant yards` sends down the light yards alone and `cross the topgallant yards` crosses them again. One level lower, `strike the topmasts` lowers each topmast with its topsail yard on the cap, and `fid the topmasts` sways them up; a topmast is struck only with its topgallant mast already down and no sail set on it.
+
+```orders frigate plain-sail
+send down the topgallant yards
+cross the topgallant yards
+send down the topgallant masts
+sway up the topgallant masts
+strike the topmasts
+fid the topmasts
+```
+
+```
+  Morning watch, 8 bells (04:00)  Order: send down the topgallant masts.
+  Morning watch (04:07)  Clew up the fore topgallant, the fore royal, the flying jib, the main topgallant, the main royal, the mizzen topgallant and the mizzen royal; stand by to send down.
+  Morning watch (04:07)  Down topgallant masts! Topgallant and royal yardmen in the tops.
+  Morning watch (04:09)  Clewed up the fore topgallant, the fore royal, the flying jib, the main topgallant, the main royal, the mizzen topgallant and the mizzen royal; hands aloft to send down.
+  Morning watch (04:18)  Sent down on deck the fore topgallant yard, the fore royal yard, the main topgallant yard, the main royal yard, the mizzen topgallant yard and the mizzen royal yard, with their studding sail booms.
+  Morning watch (04:32)  Unfidded and lowered away the fore topgallant mast, the main topgallant mast and the mizzen topgallant mast.
+* Morning watch (04:32)  Sent down the fore topgallant mast, the main topgallant mast and the mizzen topgallant mast; the upper spars on deck.
+```
+
+That is the frigate in 35 knots with all sail just made, the order given with the others: half an hour of work at the weather's pace. Order `strike the topmasts` with the topgallant masts aloft and it is refused ("Send down the topgallant masts first: the fore topgallant mast, the main topgallant mast and the mizzen topgallant mast are still aloft."); with sail set on the topmasts, it names every sail and asks for them to be taken in first.
+
+## Loosing to dry and furling everything
+
+After rain the furled sails are loosed to hang in their gear and dry: "Loose sail! ... Let fall!", the topsails and courses hanging by their buntlines, the topgallant sails and royals down, the head sails spread on the booms (Luce 1884, ch. XX Port Drills, 'To Loose Sail to the Buntlines'). Every furled sail but the studding sails is loosed; it is refused when it blows more than 20 knots across the deck. `furl all` (Luce's call is *Furl sail!*) clews up what is drawing and furls or stows everything in the ship.
+
+```orders frigate
+loose sails to dry
+loose the sails to dry
+```
+
+With every sail already furled, as the ship starts, `furl all` is refused: "Every sail is furled already."
+
+```orders frigate
+# rejected: furl all
+```
+
 ## The schooner
 
-Her sails are named in chapter 1; the verbs are the same. Her gaff sails are not furled on a yard but brailed up or lowered onto the boom, so `furl` is refused for them ("A gaff sail is not furled on its spar; take it in instead") and `lower the mainsail` is taken in its place; her square topsail behaves exactly as the frigate's do (Luce 1884, ch. XXXIV Handling Fore-and-Afters). What she cannot do is **scandalise** a sail, dropping the peak of the mainsail to spill the wind, as Luce does before wearing her: the physics has no state for a gaff sail with its peak down, and the order says so.
+Her sails are named in chapter 1; the verbs are the same. Her gaff sails are not furled on a yard but brailed up or lowered onto the boom, so `furl` is refused for them ("A gaff sail is not furled on its spar; take it in instead") and `lower the mainsail` is taken in its place; her square topsail behaves exactly as the frigate's do (Luce 1884, ch. XXXIV Handling Fore-and-Afters). What she cannot do is **scandalise** a sail, dropping the peak of the mainsail to spill the wind, as Luce does before wearing her: the physics has no state for a gaff sail with its peak down, and the order says so. She has one topgallant mast, on the fore, and sends it down and sways it up with the frigate's words; she has no lower studding sails, so their booms are not hers to rig out.
 
 ```orders schooner
 set the foresail
@@ -186,6 +271,8 @@ set the flying jib
 take in the gaff topsail
 take in the topgallant
 furl the topgallant
+send down the topgallant mast
+sway up the topgallant mast
 haul down the flying jib
 lower the mainsail
 brail up the foresail

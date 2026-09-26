@@ -1,0 +1,40 @@
+# Lie a-try (scripted, LieATryScript in scripts.py): lie to in a gale under a
+# close-reefed topsail and the staysails, "the ship now lying
+# to under close-reefed main topsail, fore storm staysail, and probably single
+# reefed trysail" (Luce 1884, ch. XXIX). The topsail is that of the mast with
+# the most square sail: the main topsail on the frigate, the fore topsail on
+# the schooner. It must be set; how many reefs are in it is the captain's
+# order before this one.
+#   hand_sails  every other square sail is hauled up or clewed up, the studding
+#               sails taken in, the jibs hauled down (the ship file's `jibs`
+#               group) and the spanker brailed up; the staysails stand (hand_s)
+#   brace       the topsail yards braced sharp up for the tack she is on and
+#               the helm put a little a-lee (helm_deg); she comes up to about
+#               five points off the wind and lies there, drifting to leeward
+# Luce's fore storm staysail is the fore topmast staysail here. His "probably
+# single reefed trysail" has no counterpart: the frigate's spanker is far
+# bigger, and set it brings her head to the wind with sternway (package 10
+# found the same for heave_to), so it is brailed up; a schooner keeps her gaff
+# sails. Luce's reducing of sail to a gale is a long sequence of reefs and
+# furls; the game hands the sails in one phase and leaves them in the gear.
+# In thirty knots with the topgallant masts sent down the frigate lies five
+# points off with a knot and a half of headway; with them aloft their windage
+# gives her a knot or two of sternway. She is left lying to
+# (ship.extra["hove_to"]), so `fill away` ends it, and `heave to` is refused
+# meanwhile.
+id: lie_a_try
+verb: lie_a_try
+applies_to: {class: ship}
+script: lie_a_try
+preconditions: []
+timing:
+  hand_s: 180    # haul up, clew up and haul down the rest of the canvas (judgement)
+  brace_s: 45    # the topsail yard braced sharp up
+  helm_deg: 5    # the helm a-lee, a little
+on_start: {log: "All hands! Shorten sail and bring her to under the {topsail}."}
+on_complete: {log: "Lying a-try under the {topsail} and the staysails, helm a-lee.", kind: ship.hove_to, severity: notable}
+on_fail: {log: "Could not bring her to: {reason}.", kind: evolution.failed, severity: notable}
+# crew: reducing sail to a gale and bringing her to is all hands' work (Luce 1884, ch. XXIX
+# In a Gale, 'Reducing Sail to a Gale'; ch. XXIII, 'blowy weather').
+crew: {hands: all, rating: ordinary, stations: [all hands]}
+source: "Luce 1884, ch. XXIX In a Gale, 'Reducing Sail to a Gale' (\"The ship is now 'lying to' under close-reefed main topsail, fore storm staysail, and probably single reefed trysail\"), 'Lying to'; Luce 1866, ch. XXIX 'To Lie to'; Falconer, TRYING (\"a ship may lie by the wind under a whole main-sail, a whole fore-sail, or a whole mizen\")"

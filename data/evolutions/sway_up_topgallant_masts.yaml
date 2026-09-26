@@ -1,0 +1,32 @@
+# Sway up the topgallant masts (scripted, SwayUpScript in scripts.py): undo
+# send_down_topgallant_masts. The masts are swayed aloft and fidded with their
+# royal poles, the rigging set up, and the topgallant and royal yards crossed
+# again, square, with their sails furled on them ready to be set by order.
+#
+# Luce's colour evolution ("Up topgallant masts and topgallant and royal
+# yards!") is compressed to two phases, both aloft:
+#   mast   mast-ropes manned, swayed aloft and fidded, rigging set up
+#   yards  the yards swayed out of the chains, aloft and across, gear bent
+# Refused while the topmast below is struck ("fid the topmasts" first).
+id: sway_up_topgallant_masts
+verb: sway_up_topgallant_masts
+applies_to: {class: ship}
+script: sway_up
+params:
+  mast: topgallant_mast
+  poles: [royal_mast]
+  with_masts: true
+  what: topgallant masts
+  below: fid the topmasts
+  aloft: [mast, yards]
+timing:
+  mast_s: 480    # swayed aloft, fidded, rigging set up (judgement)
+  yards_s: 360   # topgallant and royal yards crossed and the gear bent (judgement)
+on_start: {log: "Up topgallant masts! Man the topgallant mast-ropes."}
+on_complete: {log: "Swayed up and fidded {swayed}; the yards crossed.", kind: spar.swayed_up, severity: notable}
+on_fail: {log: "Could not sway up the topgallant masts: {reason}.", kind: evolution.failed, severity: notable}
+# crew: as for sending them down (Luce 1884, ch. XX Port Drills, 'To Send Up Topgallant
+# Masts and Topgallant and Royal Yards': "Men go to their stations for sending up
+# topgallant masts").
+crew: {hands: 24, rating: able, stations: [topmen, forecastle]}
+source: "Luce 1884, ch. XX Port Drills, 'To Send Up Topgallant-Masts', 'To Send Up Topgallant Masts and Topgallant and Royal Yards' (\"Sway aloft and fid ... Sway across! Bend the gear!\")"

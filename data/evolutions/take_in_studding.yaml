@@ -20,5 +20,8 @@ steps:
 on_start: {log: "Stand by to take in the {sail}."}
 on_complete: {log: "Took in the {sail} and made it up.", kind: sail.taken_in, severity: notable}
 on_fail: {log: "Could not take in the {sail}: {reason}.", kind: evolution.failed, severity: notable}
-crew: {hands: 8, rating: ordinary, stations: [topmen, forecastle]}
+# crew (package 19): the forecastlemen take in the lower and topmast studding-sails,
+# the topmen the topgallant ones (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship'; Luce 1884, ch. XXIII At Sea, 'To take in
+# the Topmast Studding-sail').
+crew: {hands: 8, rating: ordinary, stations: [forecastle, topmen]}
 source: "Luce 1866, ch. XXIII At Sea, 'To take in the topmast studding sail', 'To take in [the lower studding-sail]'"

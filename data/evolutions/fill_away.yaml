@@ -20,5 +20,7 @@ timing:
 on_start: {log: "Fill away; man the after braces."}
 on_complete: {log: "Filled away; braced full and steering {new_course}.", kind: ship.filled_away, severity: notable}
 on_fail: {log: "Could not fill away: {reason}.", kind: evolution.failed, severity: notable}
-crew: {hands: 12, rating: ordinary, stations: [afterguard]}
+# crew (package 19): the after braces; the marines "divide at the gear of main and
+# mizzen top-sails" (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship', 'Idlers, Firemen, Marines').
+crew: {hands: 12, rating: ordinary, stations: [afterguard, marines]}
 source: "Luce 1866, ch. XXVI Emergencies, 'To fill away, after lying to with the main topsail to the mast'"

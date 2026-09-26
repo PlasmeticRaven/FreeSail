@@ -10,6 +10,11 @@ Three kinds of verb live here:
   (`set` + `square` = `set_square`). A group object starts one evolution per
   member; if some fail, the rest still start and the failures are reported
   in the log text. `scandalise` is in the table only to be refused.
+  Milestone 3 adds the sail verbs `bend`, `unbend`, `shift` and `goose wing`
+  on the same path, `rig out` and `rig in` for a studding sail boom (or the
+  studding sail it carries), and whole-ship orders (`send down the topgallant
+  masts`, `strike the topmasts`, `box haul`, `lie a try`, `scud`, `back and
+  fill`, `loose sails to dry`, `furl all` and the rest) on the tack's path.
 - **Level 0 line verbs** (`haul`, `ease`, `check`, `let go`, `belay`, and
   `sheet home` on a sail) act on the part at once: a brace shifts its yard's
   angle by five degrees, a sheet of a fore-and-aft sail shifts the sail's
@@ -63,6 +68,8 @@ def execute(
         return _trim(ship, order, vocab, skip)
     if order.verb == "sheet home":
         return _sheet_home(ship, order, vocab)
+    if order.verb in BOOM_VERBS:
+        return _boom_evolution(ship, order, vocab, skip)
     if spec.object == "sail":
         return _sail_evolution(ship, order, vocab, skip)
     if spec.object == "line":
@@ -75,6 +82,10 @@ def execute(
 
 
 BRACE_VERBS = ("brace", "square", "back")  # "square the yards", "back the main topsail"
+BOOM_VERBS = ("rig out", "rig in")  # a studding sail boom, or the studding sail on it
+# Sail verbs whose evolution is a script that works on the sail it is given
+# (`params["sail"]`), and which make sense for a sail that is blown out.
+SAIL_SCRIPT_VERBS = ("bend", "unbend", "shift")
 # The helm verbs with no heading or points after them: the conning words.
 HELM_VERBS = (
     "keep her full",
@@ -177,6 +188,8 @@ def _sail_evolution(
             continue
         evo = mapping[sail.cls]
         p = dict(params)
+        if verb in SAIL_SCRIPT_VERBS:
+            p["sail"] = sail.id
         if verb == "shake out" and order.modifiers.get("close"):
             p["reefs"] = sail.reefs
         try:
@@ -226,8 +239,10 @@ def _sail_check(
     name = resolve.the(ship, sail.id)
     if sail.wrecked:
         return f"{name} is wrecked"
-    if sail.state is SailState.BLOWN_OUT:
-        return f"{name} is blown out; there is no sail to {verb}"
+    if sail.state is SailState.BLOWN_OUT and verb not in SAIL_SCRIPT_VERBS:
+        return f"{name} is blown out and there is no sail to {verb}; shift it for a new one"
+    if sail.state is SailState.UNBENT and verb not in SAIL_SCRIPT_VERBS:
+        return f"{name} is unbent; there is no sail on the yard. Bend one first"
     if verb == "scandalise":
         if sail.cls != "gaff":
             return f"{name} is a {sail.cls} sail; it has no peak to drop"
@@ -1065,7 +1080,77 @@ def _points_words(points: float) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Whole-ship evolutions: tack, wear, heave to, fill away
+# Level 1: studding sail booms
+# ---------------------------------------------------------------------------
+
+
+def _boom_evolution(
+    ship: Ship, order: Order, vocab: Vocabulary, skip: frozenset[str] = frozenset()
+) -> Result:
+    """'Rig out' and 'rig in' a studding sail boom. The object is the boom
+    ('the starboard fore topmast studdingsail boom') or the studding sail it
+    carries ('the fore topmast studdingsails, both sides'); either way the
+    evolution works on the boom (Luce 1884, ch. XXIII: "Rig out! Hoist away!")."""
+    _no_stray_modifiers(order, {"manner"})
+    verb = order.verb
+    res = resolve.resolve(ship, order.object or "", order.side_word, verb)
+    mapping: dict[str, str] = vocab.evolutions.get(verb, {})
+    booms: list[Spar] = []
+    for pid in res.ids:
+        part = ship.parts[pid]
+        boom: Spar | None = None
+        if isinstance(part, Spar) and part.cls == "studdingsail_boom":
+            boom = part
+        elif isinstance(part, Sail) and part.cls == "studding":
+            boom = ship.spar_of_role(part, "boom")
+        if boom is None:
+            raise errors.wrong_kind(
+                verb,
+                resolve.display_name(ship, pid),
+                _what(ship, part),
+                "studding sail booms",
+                "",
+            )
+        if boom.id not in skip and boom not in booms:
+            booms.append(boom)
+    if not booms:
+        raise errors.NothingToDoError(f"Every boom of the {res.name} was already ordered.")
+    runner = runner_of(ship)
+    started: list[dict[str, Any]] = []
+    texts: list[str] = []
+    failed: list[str] = []
+    failed_ids: list[str] = []
+    evo = mapping["studdingsail_boom"]
+    for boom in booms:
+        try:
+            texts.append(runner.start(ship, evo, boom.id, {}))
+        except OrderError as e:
+            failed.append(f"{resolve.the(ship, boom.id)}: {e}")
+            failed_ids.append(boom.id)
+            continue
+        started.append({"evolution": evo, "subject": boom.id, "params": {}})
+    if not started:
+        if len(failed) == 1:
+            reason = failed[0].split(": ", 1)[-1]
+            raise OrderError(reason[0].upper() + reason[1:].rstrip(".") + ".")
+        raise OrderError(f"Nothing done: {errors.sentence_list(failed)}.")
+    text = _summarise(ship, verb, res.name, started, texts, failed)
+    data = {
+        "verb": verb,
+        "level": 1,
+        "object": res.name,
+        "side": res.side,
+        "subjects": [s["subject"] for s in started],
+        "evolutions": started,
+        "failed": failed,
+        "failed_subjects": failed_ids,
+    }
+    return "evolution.started", text, data
+
+
+# ---------------------------------------------------------------------------
+# Whole-ship evolutions: tack, wear, heave to, fill away, and the milestone 3
+# catalogue (send down the topgallant masts, box haul, lie a-try, scud ...)
 # ---------------------------------------------------------------------------
 
 
@@ -1073,6 +1158,29 @@ def _ship_evolution(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
     _no_stray_modifiers(order, {"tack", "manner"})
     evo = vocab.evolutions[order.verb]
     params: dict[str, Any] = {}
+    bare_poles = "bare poles" in order.verb_phrase
+    if bare_poles:
+        drawing = [
+            sl
+            for sl in ship.sails.values()
+            if sl.is_set or sl.state in (SailState.SHEETED, SailState.GOOSE_WINGED)
+        ]
+        if drawing:
+            names = errors.join_names([resolve.display_name(ship, sl.id) for sl in drawing], "and")
+            raise OrderError(
+                f"She has sail set ({names}); take it in to wear under bare poles, "
+                f"or say 'wear ship'."
+            )
+        params["bare_poles"] = True
+    if evo == "furl_all":
+        loose = [
+            sl
+            for sl in ship.sails.values()
+            if sl.state not in (SailState.FURLED, SailState.UNBENT, SailState.BLOWN_OUT)
+            and not sl.wrecked
+        ]
+        if not loose:
+            raise OrderError("Every sail is furled already.")
     if "tack" in order.modifiers:
         if order.verb != "heave to":
             raise OrderError(
@@ -1089,6 +1197,8 @@ def _ship_evolution(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
             "Gybe, that is, wear ship (the period word); the boom will come over as the "
             "wind crosses her stern. " + text
         )
+    if bare_poles:
+        text = "Under bare poles: hands in the weather fore rigging for a sail. " + text
     data = {
         "verb": order.verb,
         "level": 1,

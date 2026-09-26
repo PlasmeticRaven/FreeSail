@@ -1,0 +1,28 @@
+# Cross the topgallant and royal yards (scripted, SwayUpScript with
+# `with_masts: false`): sway the light yards aloft and across again on masts
+# that are standing, the sails furled on them to be set by order.
+#
+# Luce's sequence ("Man the yard-ropes! Sway out of the chains! ... Sway
+# aloft! ... Tend the lifts and braces! Sway across! Bend the gear!") is one
+# phase here, `yards`, aloft. Refused while the topgallant masts are on deck
+# ("sway up the topgallant masts" crosses the yards as well).
+id: cross_topgallant_yards
+verb: cross_topgallant_yards
+applies_to: {class: ship}
+script: sway_up
+params:
+  mast: topgallant_mast
+  poles: [royal_mast]
+  with_masts: false
+  what: topgallant and royal yards
+  verb_words: cross
+  aloft: [yards]
+timing:
+  yards_s: 360   # swayed out of the chains, aloft and across, gear bent (judgement)
+on_start: {log: "Stand by to cross topgallant and royal yards! Man the yard-ropes."}
+on_complete: {log: "Crossed {swayed}.", kind: spar.swayed_up, severity: notable}
+on_fail: {log: "Could not cross the light yards: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the topgallant and royal yardmen aloft, the topmen at the yard-ropes (Luce 1884,
+# ch. XX Port Drills, 'To Cross Topgallant and Royal Yards').
+crew: {hands: 16, rating: able, stations: [topmen]}
+source: "Luce 1884, ch. XX Port Drills, 'To Cross Topgallant and Royal Yards' (\"Sway aloft! ... Sway across! Bend the gear!\"); Luce 1866, ch. XX 'To Cross Topgallant and Royal Yards'"

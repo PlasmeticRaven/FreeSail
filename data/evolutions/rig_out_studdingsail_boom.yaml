@@ -1,0 +1,32 @@
+# Rig out a studding sail boom: run it out along its yard by the in-and-out
+# jigger and secure the heel, ready for the studding sail (Luce 1884, ch.
+# XXIII: "Set taut! Rig out! Hoist away! When the boom is sufficiently out
+# (which will be known by the mark on it), the heel is secured"). Split from
+# set_studding, which now needs the boom out. A lower studding sail boom is
+# the swinging boom, topped up and guyed out forward instead (ch. XX, 'To Rig
+# Out and In Lower Booms'); the game makes no difference.
+#
+# The boom's state is the spar's `rigged_out`; every boom starts rigged out,
+# as milestone 2 had them.
+id: rig_out_studdingsail_boom
+verb: rig_out
+applies_to: {class: studdingsail_boom}
+preconditions:
+  - {check: not spar.rigged_out, reason: "The {spar} is rigged out already."}
+  - {check: not spar.wrecked, reason: "The {spar} is carried away."}
+requires:
+  - {check: not wrecked(spar_chain(spar)), reason: "the {spar}'s yard is wrecked or sent down"}
+steps:
+  - do: rig_out
+    duration_s: 45
+    aloft: true             # a hand on the yard toggles the heel and secures it
+    sets: {spar.rigged_out: "true"}
+on_start: {log: "Man the in-and-out jigger; rig out the {spar}."}
+on_complete: {log: "Rigged out the {spar}.", kind: spar.rigged_out, severity: routine}
+on_fail: {log: "Could not rig out the {spar}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: "one of the quarter-watch repairs to the topsail yard" to toggle the heel, the rest
+# on deck at the jigger; forecastlemen for the lower and topmast booms, topmen for the
+# topgallant (Luce 1884, ch. XXIII At Sea, 'The Topgallant Studding-sail'; ch. XVIII
+# Organization, 'Duties of Men in Different Parts of the Ship').
+crew: {hands: 4, rating: ordinary, stations: [forecastle, topmen]}
+source: "Luce 1884, ch. XXIII At Sea, 'The Topgallant Studding-sail', 'The Topmast Studding-sail' (\"Set taut! Rig out! Hoist away!\"), 'In-and-out Jigger'; ch. XX Port Drills, 'To Rig Out and In Lower Booms'"

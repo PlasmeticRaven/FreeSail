@@ -17,9 +17,12 @@ steps:
     log: "Brailed up the {sail}."
   - do: furl
     duration_s: 120
+    aloft: true
     sets: {sail.state: furled}
 on_start: {log: "Hands to furl the {sail}."}
 on_complete: {log: "Furled the {sail}.", kind: sail.furled, severity: notable}
 on_fail: {log: "Could not furl the {sail}: {reason}.", kind: evolution.failed, severity: notable}
-crew: {hands: 8, rating: ordinary, stations: [afterguard]}
+# crew (package 19): the afterguard furl the spanker and the mizzen topmen "loose and
+# furl the peak of the spanker" (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship'); topmen are those of the sail's own mast.
+crew: {hands: 8, rating: ordinary, stations: [afterguard, topmen]}
 source: "Luce 1866, ch. XX In Charge of the Deck, 'To Furl Sails'; ch. XXIII 'The Spanker'"

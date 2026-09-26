@@ -20,6 +20,7 @@ steps:
     log: "Settled the {sail} halyards and clewed down; hauled out the reef tackles."
   - do: reef
     duration_s: 150
+    aloft: true
     sets: {sail.reefs: "min(sail.reefs + params.reefs, sail.reef_bands)"}
     log: "Laid out and passed the earings of the {sail}."
   - do: hoist
@@ -28,5 +29,9 @@ steps:
 on_start: {log: "All hands reef the {sail}."}
 on_complete: {log: "Reefed the {sail}; now {state}.", kind: sail.reefed, severity: notable}
 on_fail: {log: "Could not reef the {sail}: {reason}.", kind: evolution.failed, severity: notable}
-crew: {hands: 16, rating: able, stations: [topmen, afterguard]}
+# crew (package 19): reefing topsails is an all-hands evolution, as the log line says:
+# every topman's station billet has "Reefing topsails: topsail buntlines, reef topsail,
+# on deck to halliards" (Luce 1884, ch. XVIII Organization, 'Station Billet'); spec M3 §3.4 counts it among the
+# all-hands evolutions.
+crew: {hands: all, rating: able, stations: [all hands]}
 source: "Luce 1866, ch. XXVII Reefing, 'Reefing and Hoisting'; Lever 1808, 'Reefing Topsails'"

@@ -1,0 +1,49 @@
+# Send down the topgallant masts (scripted, SendDownScript in scripts.py): the
+# answer to a gale for a ship with much top-hamper, "as it eases her
+# considerably" (Luce 1884, ch. XXIX). Every topgallant mast that is aloft
+# comes down with its royal pole and everything on them: the topgallant and
+# royal yards, the topgallant studding sail booms, and the sails bent or
+# hanked to them (the topgallants, the royals, the flying jib).
+#
+# Luce's sequence is longer than the game's states: the royal yards are got
+# ready and sent down first, then the topgallant yards, then the mast-ropes
+# are rove, the topgallant and royal rigging slacked up, the flying jib-boom
+# rigged in, the mast swayed, unfidded and lowered away. It is compressed to
+# three phases:
+#   clear_away  anything still drawing on those spars is clewed up (deck work;
+#               left out when nothing is set)
+#   yards       the light yards sent down on deck, the sails furled on them
+#               (aloft)
+#   mast        swayed and unfidded, the masts lowered and landed (aloft)
+# Everything sent down is marked `sent_down`: the strain model puts no load on
+# it, the physics gives it no windage, and none of its sails can be set until
+# `sway up the topgallant masts` crosses them again.
+#
+# The durations are judgement: Luce gives none for this at sea. Port drills
+# of a smart ship did it in minutes; at sea, with the ship labouring, about a
+# quarter of an hour of work before the weather factor.
+id: send_down_topgallant_masts
+verb: send_down_topgallant_masts
+applies_to: {class: ship}
+script: send_down
+params:
+  mast: topgallant_mast
+  poles: [royal_mast]
+  with_masts: true
+  clear_away: true
+  what: topgallant masts
+  aloft: [yards, mast]
+timing:
+  clear_away_s: 60   # clew up what is still set on the light yards
+  yards_s: 300       # royal and topgallant yards sent down, sails furled on them
+  mast_s: 420        # mast-ropes rove, swayed, unfidded and lowered away
+on_start: {log: "Down topgallant masts! Topgallant and royal yardmen in the tops."}
+on_complete: {log: "Sent down {sent}; the upper spars on deck.", kind: spar.sent_down, severity: notable}
+on_fail: {log: "Could not send down the topgallant masts: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the topgallant and royal yardmen of every top aloft, the rest of the topmen and
+# the forecastlemen on deck at the mast-ropes, yard-ropes and flying jib-boom heel-rope
+# (Luce 1884, ch. XX Port Drills, 'To Send Down Topgallant-Masts'; ch. XVIII
+# Organization, 'Station Billet': "Up and down topgallant-masts: in top, come up and set
+# up rigging").
+crew: {hands: 24, rating: able, stations: [topmen, forecastle]}
+source: "Luce 1884, ch. XX Port Drills, 'To Send Down Topgallant and Royal Yards and Topgallant Masts', 'To Send Down Topgallant-Masts'; ch. XXIX In a Gale, 'Preparations for a Gale' (\"send down top-gallant masts in a heavy gale ... as it eases her considerably\"); Luce 1866, ch. XXIX 'Down Topgallant Masts'"

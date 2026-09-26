@@ -15,5 +15,6 @@ steps:
 on_start: {log: "Hands to the {sail} brails and halyards."}
 on_complete: {log: "Took in the {sail}.", kind: sail.taken_in, severity: notable}
 on_fail: {log: "Could not take in the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+# crew (package 19): checked; the afterguard man the spanker brails (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship').
 crew: {hands: 8, rating: ordinary, stations: [afterguard]}
 source: "Luce 1866, ch. XXIII At Sea, 'The Spanker' (taking in); Luce 1884, ch. XXXIV Handling Fore-and-Afters"

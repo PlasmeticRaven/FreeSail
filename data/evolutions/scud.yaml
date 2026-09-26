@@ -1,0 +1,32 @@
+# Scud (scripted, ScudScript in scripts.py): bear up and run before a gale.
+# "In sailing with the wind aft, it is greatly disarmed of its force, and a
+# vessel may carry safely some sail, when, if on the wind, she would be
+# reduced to bare poles" (Luce 1884, ch. XXIX).
+#   bear_up  "Up helm!" The driver is brailed up so that she will pay off (a
+#            ship "will not bear up" with her after sail set), and every yard
+#            is braced in to the wind as she goes off (brace_rate_deg_s). She
+#            is steered with the wind quarter_deg on the weather quarter rather
+#            than dead aft, where a yaw would bring her by the lee.
+# She is scudding when steady on that course with the yards trimmed, or after
+# scud_timeout_s; the helmsman keeps the course from then on, and a new helm
+# order ends it. Which sails she scuds under (Luce: "a close-reefed main
+# topsail, and single or double-reefed foresail ... the fore topmast staysail
+# should always be set") is the captain's order before this one.
+id: scud
+verb: scud
+applies_to: {class: ship}
+script: scud
+preconditions: []
+timing:
+  quarter_deg: 15         # the wind this far on the weather quarter from dead aft
+  brace_rate_deg_s: 0.5   # the yards braced in as she goes off
+  steady_deg: 5           # within this of the course counts as steady
+  scud_timeout_s: 600     # call her scudding after this long regardless
+  scud_estimate_s: 180    # what the state snapshot shows as remaining at the start
+on_start: {log: "Up helm; stand by the braces. Bear up and scud."}
+on_complete: {log: "Scudding before it, the wind on the {quarter} quarter, steering {course}.", kind: ship.scudding, severity: notable}
+on_fail: {log: "Could not bear up: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the watch at the braces and the spanker brails: afterguard, marines and waisters
+# (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship').
+crew: {hands: 16, rating: ordinary, stations: [afterguard, waisters, marines]}
+source: "Luce 1884, ch. XXIX In a Gale, 'To Scud' (\"The best sails for scudding ... are a close-reefed main topsail, and single or double-reefed foresail\"), 'Remarks on Scudding', 'Brought by the Lee'; Luce 1866, ch. XXIX 'To Scudd', 'Remarks on Scudding'; Falconer, SCUDDING"

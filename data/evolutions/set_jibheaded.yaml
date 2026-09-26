@@ -13,6 +13,7 @@ requires:
 steps:
   - do: clear_away
     duration_s: 30
+    aloft: true             # the loosers lay out on the jib-boom
     if: sail.state in [furled, in_the_gear]
     sets: {sail.state: loosed}
   - do: hoist
@@ -26,5 +27,8 @@ steps:
 on_start: {log: "Clear away the {sail}; man the halyards."}
 on_complete: {log: "Set the {sail}.", kind: sail.set, severity: notable}
 on_fail: {log: "Could not set the {sail}: {reason}.", kind: evolution.failed, severity: notable}
-crew: {hands: 6, rating: ordinary, stations: [forecastle]}
+# crew (package 19): forecastlemen loose and set the head-sails; the main topmast
+# staysail is the fore-topmen's, a schooner's gaff topsail the main topmen's
+# (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship').
+crew: {hands: 6, rating: ordinary, stations: [forecastle, topmen]}
 source: "Luce 1866, ch. XXIII At Sea, 'To set a Head Sail'"

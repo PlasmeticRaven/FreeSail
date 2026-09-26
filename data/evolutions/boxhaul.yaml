@@ -1,0 +1,40 @@
+# Box-haul (scripted, BoxHaulScript in scripts.py): a wear made short by
+# bracing the head yards abox, for a ship that will not stay and has no room
+# to wear in the ordinary way. The script gives the helm and the braces their
+# orders and watches her head against the wind; the turning is the physics':
+#   luff      "Put the helm down! ... Up mainsail and spanker!" She flies up
+#             toward the wind and loses her way (until under stop_kn, or her
+#             head is within a point of the wind, or luff_timeout_s).
+#   box       "Square away the after yards! Brace abox the head yards!" over
+#             brace_s; "the helm is right for sternboard" and is left a-lee.
+#   fall_off  she gathers sternway, her head falling off; the after yards are
+#             braced in to keep them lifting, the head yards squared once the
+#             wind is abaft the beam, and the helm shifted as soon as the head
+#             sails give her headway.
+#   come_to   wind across the stern: the mainsail and spanker set again, the
+#             after yards sharp up, the head yards braced up as she comes to on
+#             the new tack, as at the end of a wear.
+# She has box-hauled when steady on the new close-hauled course; after
+# box_timeout_s she has not, and the evolution fails. Luce's head sheets and
+# bowlines are not modelled and are left out.
+id: boxhaul
+verb: boxhaul
+applies_to: {class: ship}
+script: boxhaul
+preconditions: []
+timing:
+  helm_deg: 25            # rudder for "helm a-lee" and for the shifted helm
+  stop_kn: 1.0            # she has lost her way when her headway is below this
+  luff_timeout_s: 120     # box off anyway after this long luffing
+  luff_first: 1           # 1: luff up first (box-hauling); 0: helm up at once (wearing short round)
+  brace_s: 45             # to square the after yards and lay the head yards abox
+  brace_rate_deg_s: 1.0   # how fast the yards follow the wind as she falls off and comes to
+  steady_deg: 5           # within this of the new course counts as steady
+  box_timeout_s: 900      # give up after this long
+  box_estimate_s: 360     # what the state snapshot shows as remaining at the start
+on_start: {log: "Stations for stays; stand by to box-haul."}
+on_complete: {log: "Box-hauled; braced sharp up on the {new_tack} tack, heading {new_course}.", kind: ship.box_hauled, severity: notable}
+on_fail: {log: "Could not box-haul her: {reason}.", kind: evolution.failed, severity: notable}
+# crew: "Station the men as for stays": all hands (Luce 1884, ch. XXIV, 'Box-hauling').
+crew: {hands: all, rating: ordinary, stations: [all hands]}
+source: "Luce 1884, ch. XXIV Working to Windward, 'Box-hauling' (\"Square away the after yards! Brace abox the head yards!\"); Luce 1866, ch. XXIV 'Box Hauling'; Lever 1808, 'Missing Stays, Waring Short Round, Box-hauling'"

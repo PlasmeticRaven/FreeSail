@@ -1,0 +1,33 @@
+# Bend a sail to a bare yard (scripted, BendScript in scripts.py): a made-up
+# sail is roused up from the sail room, swayed aloft and bent. It uses one
+# spare sail: the count comes from the ship file's `crew.stores.spare_sails`
+# when the ship has a crew section, else three, and is kept in
+# ship.extra["spare_sails"]. With none left the order is refused. The new sail
+# is left furled on its yard, to be set by order.
+#
+# Luce's sequence (sail-burtons and buntlines manned, "Sway aloft! ... Haul
+# out! Lay out! And bring to!", robands and head earings passed, the gear
+# bent) is two phases here:
+#   send_up  on deck: roused up from the sail room and swayed aloft
+#   bend     aloft: hauled out along the yard and bent, the gear shifted to it
+# Only square sails in this milestone, as for unbend_sail.
+id: bend_sail
+verb: bend
+applies_to: {class: square}
+script: bend
+params: {aloft: [bend]}
+preconditions:
+  - {check: sail.state == unbent, reason: "The {sail} is bent already ({state}); to change it for a new one, shift it."}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
+timing:
+  send_up_s: 120   # rouse up and sway aloft (judgement)
+  bend_s: 240      # haul out, bring to, bend the gear (judgement)
+on_start: {log: "Bend sail! Rouse up a new {sail} from the sail room."}
+on_complete: {log: "Bent a new {sail} and furled it; {spare_sails} left in the sail room.", kind: sail.bent, severity: notable}
+on_fail: {log: "Could not bend the {sail}: {reason}", kind: evolution.failed, severity: notable}
+# crew: the loosers aloft, "the balance of the men in each part of the ship go below and
+# rouse up the sails" (Luce 1884, ch. XX Port Drills, 'Bending Sail'); the part of the
+# ship is the sail's own, as for unbending.
+crew: {hands: 16, rating: ordinary, stations: [topmen, forecastle, afterguard]}
+source: "Luce 1884, ch. XX Port Drills, 'Bending Sail' (\"Sway aloft! ... Haul out! Lay out! And bring to!\"), 'Preparations for Bending'; Luce 1866, ch. XX 'Bending Sail', 'Bend Sail (Port Routine)'"

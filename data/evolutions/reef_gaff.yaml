@@ -25,5 +25,7 @@ steps:
 on_start: {log: "Hands to reef the {sail}."}
 on_complete: {log: "Reefed the {sail}; now {state}.", kind: sail.reefed, severity: notable}
 on_fail: {log: "Could not reef the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+# crew (package 19): checked; the afterguard "bend, unbend, loose, reef, furl" the
+# spanker and main trysail (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship').
 crew: {hands: 10, rating: able, stations: [afterguard]}
 source: "Luce 1866, ch. XXVII Reefing, 'In reefing a spanker', 'Boom Mainsail'; Luce 1884, ch. XXXIV Handling Fore-and-Afters"

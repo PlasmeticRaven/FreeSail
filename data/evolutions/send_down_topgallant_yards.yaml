@@ -1,0 +1,35 @@
+# Send down the topgallant and royal yards (scripted, SendDownScript with
+# `with_masts: false`): the light yards only, the masts left standing. The
+# first thing done when it comes on to blow (Luce 1884, ch. XXIX: "To send
+# down royal yards ... Sending down topgallant yards"), and the station
+# billet's "Up and down topgallant and royal yards".
+#
+# Luce sends the royal yards down first, then the topgallant yards, each
+# "to windward and abaft"; the game does them together in two phases:
+#   clear_away  anything still drawing on them is clewed up (deck work; left
+#               out when nothing is set)
+#   yards       the yards sent down on deck, their sails furled on them (aloft)
+# The flying jib, hanked to the topgallant mast's stay, stands.
+id: send_down_topgallant_yards
+verb: send_down_topgallant_yards
+applies_to: {class: ship}
+script: send_down
+params:
+  mast: topgallant_mast
+  poles: [royal_mast]
+  with_masts: false
+  clear_away: true
+  what: topgallant and royal yards
+  aloft: [yards]
+timing:
+  clear_away_s: 60   # clew up what is still set on the light yards
+  yards_s: 300       # royal yards, then topgallant yards, sent down on deck (judgement)
+on_start: {log: "Get the topgallant and royal yards ready for coming down!"}
+on_complete: {log: "Sent down {sent}.", kind: spar.sent_down, severity: notable}
+on_fail: {log: "Could not send down the light yards: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the topgallant and royal yardmen aloft, the topmen on deck at the yard-ropes and
+# tripping-lines (Luce 1884, ch. XXIX In a Gale, 'To Send Down Royal Yards': "the royal
+# yardmen lay aloft and unbend royal gear ... the topmen on deck take off the royal
+# halliards").
+crew: {hands: 16, rating: able, stations: [topmen]}
+source: "Luce 1884, ch. XXIX In a Gale, 'To Send Down Royal Yards', 'Sending Down Topgallant Yards'; ch. XX Port Drills, 'To Send Down Topgallant and Royal Yards'"

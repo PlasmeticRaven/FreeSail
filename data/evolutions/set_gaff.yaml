@@ -29,5 +29,7 @@ steps:
 on_start: {log: "Hands to the {sail} halyards and outhaul."}
 on_complete: {log: "Set the {sail}.", kind: sail.set, severity: notable}
 on_fail: {log: "Could not set the {sail}: {reason}.", kind: evolution.failed, severity: notable}
-crew: {hands: 10, rating: ordinary, stations: [afterguard]}
+# crew (package 19): the afterguard man the spanker gear; the topmen of the sail's mast
+# loose the peak (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship').
+crew: {hands: 10, rating: ordinary, stations: [afterguard, topmen]}
 source: "Luce 1866, ch. XXIII At Sea, 'The Spanker' (setting); Luce 1884, ch. XXXIV Handling Fore-and-Afters"

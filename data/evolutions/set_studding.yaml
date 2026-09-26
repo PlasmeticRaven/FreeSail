@@ -9,6 +9,7 @@ preconditions:
   - {check: sail.state != set, reason: "The {sail} is set already."}
   - {check: sail.state != blown_out, reason: "The {sail} is blown out; a new one must be bent."}
   - {check: sail_of(yard_of(sail)).is_set, reason: "The {sail} cannot be set until the sail on its yard is set."}
+  - {check: "spar_of_role(sail, boom) == none or spar_of_role(sail, boom).rigged_out", reason: "The {sail} boom is rigged in; rig it out first."}
 requires:
   - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
   - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
@@ -30,5 +31,8 @@ steps:
 on_start: {log: "Stand by to set the {sail}."}
 on_complete: {log: "Set the {sail}.", kind: sail.set, severity: notable}
 on_fail: {log: "Could not set the {sail}: {reason}.", kind: evolution.failed, severity: notable}
-crew: {hands: 8, rating: able, stations: [topmen, forecastle]}
+# crew (package 19): forecastlemen set the lower and topmast studding-sails, the topmen
+# "set and take in" the topgallant studding-sails (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship'; Luce 1884, ch. XXIII
+# At Sea, 'The Topgallant Studding-sail').
+crew: {hands: 8, rating: able, stations: [forecastle, topmen]}
 source: "Luce 1866, ch. XXIII At Sea, 'The Topmast Studding-sail', 'To set a lower Studding-sail'; ch. XI Sails, 'Studding-sails'"

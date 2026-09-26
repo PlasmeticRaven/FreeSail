@@ -27,5 +27,8 @@ steps:
 on_start: {log: "Man the {yard} braces."}
 on_complete: {log: "Braced the {yard}; {brace_deg}° from square.", kind: yard.braced, severity: notable}
 on_fail: {log: "Could not brace the {yard}: {reason}.", kind: evolution.failed, severity: notable}
-crew: {hands: 8, rating: landsman, stations: [afterguard, waisters]}
+# crew (package 19): the after braces are the afterguard's and the heavy hauling the
+# waisters'; the marines' "work on deck is generally the same as that of the
+# afterguard" (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship').
+crew: {hands: 8, rating: landsman, stations: [afterguard, waisters, marines]}
 source: "Luce 1866, ch. XXIV Working to Windward, 'To Trim Yards', 'Table of best angles of yard with keel'; ch. XXV 'Bracing Yards'"
