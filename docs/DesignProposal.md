@@ -591,6 +591,12 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
 
 18. **Stand by is an action.** An agent may answer "no orders" with a wake condition (a bell, a sighting, a reading crossing a value). Silence is then a decision the log records, and the welfare detector never mistakes a ship hove to for a model in a loop. Also the natural form of the officer of the watch's night orders.
 
+19. **Brace limits are measured, not derived.** Milestone 3b re-sourced every yard's brace limit to Fincham's 1843 record of Hardy's 1827 experimental squadron (long ships' main yards 23° to 29° from the keel) rather than deriving it from channel breadths, which no text in hand gives. The square sail's lift curve moved five degrees up the angle of attack at the same time, so that the frigate still lies six points with the sharper yards, as Fincham says such ships did. The geometric derivation is future research (`docs/references/RigGeometryNotes.md` §1, §7).
+
+20. **Canvas has a number and a condition; suits are not a type.** Every sail's cloth rating derives from its canvas number by Luce's Appendix E strengths, anchored so that No. 2 canvas bears 0.32 kN per square metre, the figure milestone 2's tuned light sails imply and the one at which a worn royal blows out before its yard while a new one loses the yard (truth 27). The sail room holds sails, not suits; "best" and "second" are what wear makes of two sails of a kind. Storm canvas and the light-weather sails are parts. The first draft's anchor was the engine's untuned default and is recorded as such in the tuning notes.
+
+21. **Practices with a price come as pairs, in the period's own form.** Swiftering in the catharpins gains bracing on that mast's lower yard and rates the mast down athwartships until eased; bowlines hauled flatten the sail and cost hands at every brace; the after yards go sharper than the head yards on a wind (Fincham art. 94). Each is data with its source, and each is undone by its counter.
+
 ### Still open
 
 Nothing at the proposal level. Open items now live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.
