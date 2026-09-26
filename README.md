@@ -2,7 +2,7 @@
 
 A ticked, text-first sailing simulation of a late-age-of-sail ship, controlled through layered orders (from hauling a single line to standing orders and scripts), with language models able to watch, crew, or captain through the same channel a human uses.
 
-Status: milestone 3 built, the crew (a mustered ship's company in two watches with idlers and marines, every evolution drawing its hands from the watch on deck and taking as long as those hands need, all hands called and piped down, the watch changing at the bells, fatigue, the catalogue of evolutions to thirty-nine, twenty-three known truths). Milestone 2 (verified reference ships, strain and carrying away, the browser client with a projected ship view, the Sailing Master's Primer) was passed at its gate. See `docs/TechnicalSpec-M3.md` for the crew, `docs/TechnicalSpec-M0-M2.md` §11 for the milestone plan and `docs/gates/` for the gate reports.
+Status: milestone 3b built, rig geometry and canvas (brace limits from Fincham's measured angles, the after yards braced sharper than the head yards, bowlines and catharpins with their prices, the adjacent-yard clearance, canvas numbers and condition with wear, the sail room, storm canvas, the ringtail, save-alls and water sail, studding sails that stall and flog through the physics with their booms rigged in, and thirty-three known truths); its gate is pending (`docs/gates/gate-m3b.md`). Milestone 3 (the crew: a mustered ship's company in two watches, every evolution drawing its hands from the watch on deck, all hands called and piped down, fatigue) and milestone 2 (verified reference ships, strain and carrying away, the browser client, the Sailing Master's Primer) were passed at their gates. See `docs/TechnicalSpec-M3b.md` for rig geometry and canvas, `docs/TechnicalSpec-M3.md` for the crew, `docs/TechnicalSpec-M0-M2.md` §11 for the milestone plan and `docs/gates/` for the gate reports.
 
 ## Running it
 
@@ -24,6 +24,7 @@ In the console, driver commands (`hold`, `go`, `time 30`, `tick 600`, `state`, `
 - `docs/DesignProposal.md`: the current design proposal (v0.2).
 - `docs/TechnicalSpec-M0-M2.md`: technical specification for the first three milestones.
 - `docs/TechnicalSpec-M3.md`: technical specification for milestone 3, the crew.
+- `docs/TechnicalSpec-M3b.md`: technical specification for milestone 3b, rig geometry and canvas.
 - `docs/primer/`: the Sailing Master's Primer, the period words and orders in eight short chapters.
 - `docs/references/`: public-domain seamanship texts and a chapter map from Luce to game systems.
 - `docs/gates/`: the milestone gate process and one gate report per milestone, written for a non-programmer to check live.
