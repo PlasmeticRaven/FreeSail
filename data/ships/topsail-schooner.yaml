@@ -631,3 +631,51 @@ aliases:
   kites: studdingsails
   head sails: headsails
   topgallant sails: topgallants
+crew:
+  # A privateer's complement of about forty (Chapelle, The Baltimore Clipper; judgement, spec M3 2.3).
+  complement: 40
+  # A Baltimore crew: the american list in data/crew/names.yaml.
+  names: american
+  stations:
+    # Hands per station, both watches together; a schooner has no main or mizzen top and carries no marines. Forecastlemen: 10, judgement (spec M3 2.3).
+    forecastle: 10
+    # Fore topmen, for the topsail and topgallant: 6, judgement (spec M3 2.3).
+    fore_top: 6
+    # Afterguard, at the main sheet and the gaff sails: 11, judgement (spec M3 2.3).
+    afterguard: 11
+    # Waisters: 6, judgement (spec M3 2.3).
+    waisters: 6
+    # Idlers: the trades below (spec M3 2.3).
+    idlers: 4
+  ratings:
+    # Share of the seamen by rating: judgement. A privateer shipped prime seamen where she could, and more able hands than a King's ship. Able: 0.45.
+    able: 0.45
+    # Ordinary: 0.40, judgement.
+    ordinary: 0.4
+    # Landsmen: 0.15, judgement.
+    landsman: 0.15
+  posts:
+  # Station holders by post (spec M3 2.3); names are drawn at muster.
+  - post: master
+  - post: mate
+  - post: boatswain
+  idlers_by_trade:
+    # How the idlers are made up (spec M3 2.3). The cook: 1, judgement.
+    cook: 1
+    # A steward: 1, judgement.
+    steward: 1
+    # A carpenter: 1, judgement.
+    carpenter's crew: 1
+    # A sailmaker: 1, judgement.
+    sailmaker's crew: 1
+  stores:
+    # Stores for a short cruise (spec M3 2.3). Water for six weeks: 40 men at a gallon a day is about 7.5 tons (judgement).
+    water_tons: 8
+    # Provisions: two months (judgement).
+    provisions_days: 60
+    # One made-up sail in the sail locker (judgement).
+    spare_sails: 1
+    # A spare topmast and a spare yard (judgement).
+    spare_spars: 2
+    # Spare rope (judgement).
+    cordage_fathoms: 150

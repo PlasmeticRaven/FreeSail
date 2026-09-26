@@ -8,6 +8,10 @@ with an error written as a sentence naming the file and the part.
 
 Nothing here knows about any particular rig. It knows about part classes and
 what each class requires.
+
+An optional `crew:` section (docs/TechnicalSpec-M3.md §2.3) establishes the
+ship's company: complement, stations, ratings, posts, idlers by trade and
+stores. It is parsed into a `CrewSpec`; a file without it has `crew = None`.
 """
 
 from __future__ import annotations
@@ -158,6 +162,46 @@ DEFAULT_LINE_RATING_KN: dict[str, float] = {
 }
 
 
+# ---------------------------------------------------------------------------
+# The crew section (docs/TechnicalSpec-M3.md §2.3)
+# ---------------------------------------------------------------------------
+
+# The stations of a ship's company, in the order the watch bill lists them. The first six
+# are the seamen's stations; the ratings line divides the seamen among them.
+CREW_STATIONS = (
+    "forecastle",
+    "fore_top",
+    "main_top",
+    "mizzen_top",
+    "afterguard",
+    "waisters",
+    "marines",
+    "idlers",
+)
+SEAMAN_STATIONS = CREW_STATIONS[:6]
+
+# The ratings a ship file may share its seamen among, best first.
+SEAMAN_RATINGS = ("able", "ordinary", "landsman")
+RATINGS_SUM_TOLERANCE = 1e-6  # the shares must add up to one within this
+
+# The idlers' trades (spec §2.1): what the `idlers_by_trade` mapping may name.
+IDLER_TRADES = (
+    "carpenter's crew",
+    "sailmaker's crew",
+    "cooper",
+    "armourer",
+    "cook",
+    "steward",
+    "servant",
+    "surgeon's mate",
+    "clerk",
+    "master-at-arms's party",
+)
+
+# The ship's stores (spec §2.3): numbers only in milestone 3.
+STORE_KEYS = ("water_tons", "provisions_days", "spare_sails", "spare_spars", "cordage_fathoms")
+
+
 class ShipFileError(ValueError):
     """A ship file the engine cannot accept. The message is a sentence."""
 
@@ -230,6 +274,40 @@ class LineSpec:
 
 
 @dataclass
+class PostSpec:
+    """A station holder: the post, and a name when the file gives one."""
+
+    post: str
+    name: str | None = None
+
+
+@dataclass
+class StoresSpec:
+    water_tons: float = 0.0
+    provisions_days: float = 0.0
+    spare_sails: int = 0
+    spare_spars: int = 0
+    cordage_fathoms: float = 0.0
+
+
+@dataclass
+class CrewSpec:
+    """The ship's company as the ship file establishes it (spec M3 §2.3)."""
+
+    complement: int
+    names: str  # which list in data/crew/names.yaml
+    stations: dict[str, int]  # every station in CREW_STATIONS order; absent ones are 0
+    ratings: dict[str, float]  # share of the seamen by rating, SEAMAN_RATINGS order
+    posts: list[PostSpec]
+    idlers_by_trade: dict[str, int]  # in the file's order
+    stores: StoresSpec = field(default_factory=StoresSpec)
+
+    @property
+    def seamen(self) -> int:
+        return sum(self.stations[s] for s in SEAMAN_STATIONS)
+
+
+@dataclass
 class ShipSpec:
     name: str
     rig: str
@@ -242,6 +320,7 @@ class ShipSpec:
     era_notes: str = ""
     source: str = "<memory>"
     warnings: list[str] = field(default_factory=list)
+    crew: CrewSpec | None = None  # None: no crew, and the runner has unlimited hands
 
 
 # ---------------------------------------------------------------------------
@@ -302,6 +381,7 @@ def parse_ship(data: dict[str, Any], source: str = "<memory>") -> ShipSpec:
         era_notes=era_notes,
         source=source,
         warnings=warnings,
+        crew=_parse_crew(data["crew"], source) if data.get("crew") is not None else None,
     )
     validate(spec)
     return spec
@@ -576,3 +656,146 @@ def _check_sail_role(
             f"{src}: sail '{sl.id}' names '{target}' as its {role}, but that is a {sp.cls}; "
             f"expected {' or '.join(sorted(allowed))}."
         )
+
+
+# ---------------------------------------------------------------------------
+# The crew section
+# ---------------------------------------------------------------------------
+
+
+def _count(v: Any, what: str, source: str) -> int:
+    """A whole number of men (or casks, or sails), not negative."""
+    if isinstance(v, bool) or not isinstance(v, int) or v < 0:
+        raise ShipFileError(f"{source}: {what} is {v!r}; it must be a whole number, not negative.")
+    return v
+
+
+def _known(name: Any, known: tuple[str, ...], what: str, source: str) -> str:
+    name = str(name)
+    if name not in known:
+        raise ShipFileError(
+            f"{source}: the crew section names {what} '{name}', which is not one the engine "
+            f"knows. Known: {', '.join(known)}."
+        )
+    return name
+
+
+def _parse_crew(c: Any, source: str) -> CrewSpec:
+    """Parse and check the ship file's `crew:` section (spec M3 §2.3)."""
+    if not isinstance(c, dict):
+        raise ShipFileError(f"{source}: 'crew' is not a mapping.")
+    for key in c:
+        if key not in (
+            "complement",
+            "names",
+            "stations",
+            "ratings",
+            "posts",
+            "idlers_by_trade",
+            "stores",
+        ):
+            raise ShipFileError(f"{source}: the crew section has '{key}', which it does not take.")
+
+    if c.get("complement") is None:
+        raise ShipFileError(f"{source}: the crew section is missing 'complement'.")
+    complement = _count(c["complement"], "the crew's complement", source)
+    if complement == 0:
+        raise ShipFileError(f"{source}: the crew's complement is 0; a ship needs hands.")
+
+    names = str(c.get("names") or "").strip()
+    if not names:
+        raise ShipFileError(
+            f"{source}: the crew section is missing 'names', the list the company is drawn from."
+        )
+
+    raw_stations = c.get("stations")
+    if not isinstance(raw_stations, dict) or not raw_stations:
+        raise ShipFileError(f"{source}: the crew section is missing 'stations'.")
+    stations = {s: 0 for s in CREW_STATIONS}
+    for k, v in raw_stations.items():
+        name = _known(k, CREW_STATIONS, "the station", source)
+        stations[name] = _count(v, f"the {name} station's number", source)
+
+    seamen = sum(stations[s] for s in SEAMAN_STATIONS)
+    raw_ratings = c.get("ratings") or {}
+    if not isinstance(raw_ratings, dict):
+        raise ShipFileError(f"{source}: the crew's 'ratings' is not a mapping.")
+    if seamen and not raw_ratings:
+        raise ShipFileError(
+            f"{source}: the crew section has {seamen} seamen but no 'ratings' to rate them by."
+        )
+    ratings = {r: 0.0 for r in SEAMAN_RATINGS}
+    for k, v in raw_ratings.items():
+        name = _known(k, SEAMAN_RATINGS, "the rating", source)
+        if isinstance(v, bool) or not isinstance(v, int | float) or not 0.0 <= v <= 1.0:
+            raise ShipFileError(
+                f"{source}: the {name} rating's share is {v!r}; a share is a number from 0 to 1."
+            )
+        ratings[name] = float(v)
+    if raw_ratings:
+        total = sum(ratings.values())
+        if abs(total - 1.0) > RATINGS_SUM_TOLERANCE:
+            raise ShipFileError(
+                f"{source}: the crew's ratings add up to {total:g}; they are shares of the "
+                f"seamen and must add up to one."
+            )
+
+    raw_posts = c.get("posts") or []
+    if not isinstance(raw_posts, list):
+        raise ShipFileError(f"{source}: the crew's 'posts' is not a list.")
+    posts: list[PostSpec] = []
+    for i, p in enumerate(raw_posts):
+        if not isinstance(p, dict) or not str(p.get("post") or "").strip():
+            raise ShipFileError(
+                f"{source}: post #{i + 1} in the crew section does not say which post it is."
+            )
+        name = p.get("name")
+        posts.append(
+            PostSpec(post=str(p["post"]).strip(), name=str(name).strip() if name else None)
+        )
+
+    on_stations = sum(stations.values())
+    if on_stations + len(posts) != complement:
+        raise ShipFileError(
+            f"{source}: the crew's stations hold {on_stations} and the posts {len(posts)}, "
+            f"which make {on_stations + len(posts)}; the complement is {complement}. "
+            f"The stations and the posts together must make up the complement."
+        )
+
+    raw_trades = c.get("idlers_by_trade") or {}
+    if not isinstance(raw_trades, dict):
+        raise ShipFileError(f"{source}: the crew's 'idlers_by_trade' is not a mapping.")
+    trades: dict[str, int] = {}
+    for k, v in raw_trades.items():
+        name = _known(k, IDLER_TRADES, "the trade", source)
+        trades[name] = _count(v, f"the number of the {name}", source)
+    if sum(trades.values()) != stations["idlers"]:
+        raise ShipFileError(
+            f"{source}: the crew has {stations['idlers']} idlers, but 'idlers_by_trade' makes "
+            f"{sum(trades.values())}; the trades must make up the idlers."
+        )
+
+    raw_stores = c.get("stores") or {}
+    if not isinstance(raw_stores, dict):
+        raise ShipFileError(f"{source}: the crew's 'stores' is not a mapping.")
+    stores = StoresSpec()
+    for k, v in raw_stores.items():
+        name = _known(k, STORE_KEYS, "the store", source)
+        if name in ("spare_sails", "spare_spars"):
+            setattr(stores, name, _count(v, f"the {name.replace('_', ' ')}", source))
+        else:
+            if isinstance(v, bool) or not isinstance(v, int | float) or v < 0:
+                raise ShipFileError(
+                    f"{source}: the store '{name}' is {v!r}; it must be a number, not negative."
+                )
+            setattr(stores, name, float(v))
+
+    return CrewSpec(
+        complement=complement,
+        names=names,
+        stations=stations,
+        ratings=ratings,
+        posts=posts,
+        idlers_by_trade=trades,
+        stores=stores,
+    )

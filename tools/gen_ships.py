@@ -97,6 +97,12 @@ import sys
 
 import yaml
 
+# The rating pass loads the doc through the engine's own loader; run as a script from a
+# checkout that is not installed, the repository root must be importable.
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+
 SIDES = ("starboard", "larboard")
 FT = 0.3048
 
@@ -211,6 +217,7 @@ class Builder:
         }
         self.notes: dict[str, str] = {}
         self.hull_notes: dict[str, str] = dict(hull_notes or {})
+        self.crew_notes: dict[tuple[str, ...], str] = {}
 
     def spar(self, id, cls, note=None, **kw):
         d = {"id": id, "class": cls}
@@ -250,6 +257,24 @@ class Builder:
 
     def alias(self, name, target):
         self.doc["aliases"][name] = target
+
+    def crew(self, entries):
+        """The `crew:` section (spec M3 §2.3) from (path, value, note) entries.
+
+        A path is ("complement",), ("stations", "forecastle"), ("posts", "captain") and so
+        on; the note is written above the value's line in the file, like the hull's.
+        """
+        crew: dict = {}
+        for path, value, note in entries:
+            if path[0] == "posts":
+                crew.setdefault("posts", []).append({"post": path[1]})
+            elif len(path) == 1:
+                crew[path[0]] = value
+            else:
+                crew.setdefault(path[0], {})[path[1]] = value
+            if note:
+                self.crew_notes[tuple(path)] = note
+        self.doc["crew"] = crew
 
     def rate_spars(self):
         """Second pass: rate every spar from what the engine's graph hangs on it.
@@ -304,11 +329,28 @@ class Builder:
         text = yaml.safe_dump(self.doc, sort_keys=False, allow_unicode=True, width=100)
         out = []
         in_hull = False
+        in_crew = False
+        crew_key = ""
         for line in text.splitlines():
             if line.startswith("hull:"):
                 in_hull = True
             elif in_hull and not line.startswith("  "):
                 in_hull = False
+            if line.startswith("crew:"):
+                in_crew = True
+            elif in_crew and not line.startswith("  "):
+                in_crew = False
+            if in_crew:
+                note = None
+                if m := re.match(r"^  - post: (.+)$", line):
+                    note = self.crew_notes.get(("posts", m.group(1)))
+                elif m := re.match(r"^  (\w+):", line):
+                    crew_key = m.group(1)
+                    note = self.crew_notes.get((crew_key,))
+                elif m := re.match(r"^    ([^:]+):", line):
+                    note = self.crew_notes.get((crew_key, m.group(1)))
+                if note:
+                    out.append(" " * (len(line) - len(line.lstrip())) + "# " + note)
             m = re.match(r"^- id: (\S+)$", line)
             if m and m.group(1) in self.notes:
                 out.append("# " + self.notes[m.group(1)])
@@ -1029,6 +1071,7 @@ def frigate(out_dir="data/ships"):
         for cls in ("sheet", "tack", "bowline"):
             b.group(f"{name} {cls}s", [f"{name}.course.{cls}.{s}" for s in SIDES])
             b.alias(f"{name} {cls}", f"{name} {cls}s")
+    frigate_crew(b)
     b.dump(
         os.path.join(out_dir, "frigate-36.yaml"),
         "# Reference ship: Amazon, a 36-gun 18-pounder frigate of the Amazon class (Rule, 1795).\n"
@@ -1642,6 +1685,7 @@ def schooner(out_dir="data/ships"):
     b.alias("kites", "studdingsails")
     b.alias("head sails", "headsails")
     b.alias("topgallant sails", "topgallants")
+    schooner_crew(b)
     b.dump(
         os.path.join(out_dir, "topsail-schooner.yaml"),
         "# Reference ship: Speedwell, a Baltimore-built topsail schooner of about 1804, to the\n"
@@ -1652,6 +1696,219 @@ def schooner(out_dir="data/ships"):
         "# 165-167) and Marestier's schooners (pp. 113-115). Rope: Luce 1866 ch. IV. Rig details:\n"
         "# Luce 1884 ch. XXXIV. Spar and cloth ratings are provisional, set for truth 9 with the\n"
         "# M1 sail curves; see the script. Units: metres, m2, kg, kN. Comments mark judgements.\n",
+    )
+
+
+# ---------------------------------------------------------------------------
+# The ship's company (spec M3 §2.3)
+# ---------------------------------------------------------------------------
+#
+# Stations follow Luce 1884 ch. XX (Watch, Quarter and Station Bills): forecastlemen are
+# "able seamen ... together with a few ordinary seamen"; the tops "seamen, ordinary seamen,
+# active, able-bodied men"; the afterguard "comparatively few seamen ... the balance being
+# landsmen"; the marines "divided between the two watches, and their work on deck is
+# generally the same as that of the afterguard"; idlers "stand no night watches". The
+# standing officers are Falconer's (1780, ORDINARY: "the gunner, boatswain, carpenter,
+# deputy-purser and cook"; CARPENTER). The stations and the posts together make the
+# complement; the loader checks it.
+
+FRIGATE_POSTS = (
+    "captain",
+    "first lieutenant",
+    "second lieutenant",
+    "third lieutenant",
+    "master",
+    "boatswain",
+    "gunner",
+    "carpenter",
+    "purser",
+    "surgeon",
+    "sailmaker",
+    "master-at-arms",
+)
+
+
+def frigate_crew(b):
+    posts_note = (
+        "Station holders by post (spec M3 2.3): the commissioned officers, then the standing "
+        "and warrant officers (Falconer, ORDINARY and CARPENTER). Names are drawn at muster "
+        "unless a post gives one."
+    )
+    b.crew(
+        [
+            (("complement",), 264, "Winfield: the Amazon class establishment, 264 men."),
+            (("names",), "english", "A King's ship: the english list in data/crew/names.yaml."),
+            (
+                ("stations", "forecastle"),
+                28,
+                "Hands per station, both watches together. Forecastlemen: the head, anchors "
+                "and headsails; the best older seamen (Luce 1884 ch. XX). 28: judgement "
+                "(spec M3 2.3).",
+            ),
+            (
+                ("stations", "fore_top"),
+                24,
+                "Fore topmen: judgement (spec M3 2.3); Luce: the smartest of the young seamen.",
+            ),
+            (
+                ("stations", "main_top"),
+                30,
+                "Main topmen: judgement (spec M3 2.3), the largest top.",
+            ),
+            (("stations", "mizzen_top"), 14, "Mizzen topmen: judgement (spec M3 2.3)."),
+            (
+                ("stations", "afterguard"),
+                50,
+                "Afterguard, the boys included (spec M3 9 item 6: boys count as landsmen): "
+                "judgement (spec M3 2.3).",
+            ),
+            (
+                ("stations", "waisters"),
+                36,
+                "Waisters: judgement. The spec's 48 less the twelve posts, so that stations and "
+                "posts make the 264 of the establishment (the spec's figures made 276); the "
+                "waist is the station whose numbers no yard or gear fixes.",
+            ),
+            (
+                ("stations", "marines"),
+                40,
+                "Marines: judgement (spec M3 2.3), a sergeant's party for a frigate; they "
+                "stand watch and work as afterguard, never aloft (Luce 1884 ch. XX).",
+            ),
+            (
+                ("stations", "idlers"),
+                30,
+                "Idlers: the trades below (Luce 1884 ch. XX: they stand no night watches).",
+            ),
+            (
+                ("ratings", "able"),
+                0.30,
+                "Share of the seamen (not marines, idlers or officers) by rating: judgement "
+                "(spec M3 2.3), a wartime frigate's books (Falconer, ORDINARY: able and "
+                "ordinary as rated on the navy books). Able: 0.30.",
+            ),
+            (("ratings", "ordinary"), 0.40, "Ordinary: 0.40, judgement."),
+            (("ratings", "landsman"), 0.30, "Landsmen: 0.30, judgement."),
+        ]
+        + [
+            (("posts", post), None, posts_note if i == 0 else None)
+            for i, post in enumerate(FRIGATE_POSTS)
+        ]
+        + [
+            (
+                ("idlers_by_trade", "carpenter's crew"),
+                6,
+                "How the idlers are made up; they must sum to the idlers. Judgement for a "
+                "frigate of 264 (spec M3 2.3). The carpenter's mates and crew: 6.",
+            ),
+            (("idlers_by_trade", "sailmaker's crew"), 3, "The sailmaker's mate and crew: 3."),
+            (("idlers_by_trade", "cooper"), 1, "The cooper, for the casks: 1."),
+            (("idlers_by_trade", "armourer"), 1, "The armourer, at the forge: 1."),
+            (("idlers_by_trade", "cook"), 2, "The ship's cook and his mate: 2."),
+            (("idlers_by_trade", "steward"), 3, "Purser's, captain's and gunroom stewards: 3."),
+            (("idlers_by_trade", "servant"), 8, "Officers' servants: 8."),
+            (("idlers_by_trade", "surgeon's mate"), 2, "The surgeon's mates: 2."),
+            (("idlers_by_trade", "clerk"), 1, "The captain's clerk: 1."),
+            (("idlers_by_trade", "master-at-arms's party"), 3, "The ship's corporals: 3."),
+            (
+                ("stores", "water_tons"),
+                100,
+                "Numbers only in milestone 3 (spec M3 10 says which milestone consumes each). "
+                "Water: 100 tons in iron-hooped casks (spec M3 2.3 after Winfield, about four "
+                "months at the frigates' allowance; at a gallon a man a day it is some twelve "
+                "weeks for 264).",
+            ),
+            (
+                ("stores", "provisions_days"),
+                120,
+                "Provisions: four months at full allowance for the complement (judgement).",
+            ),
+            (
+                ("stores", "spare_sails"),
+                3,
+                "Made-up sails in the sail room, consumed by shifting a blown-out sail "
+                "(judgement).",
+            ),
+            (
+                ("stores", "spare_spars"),
+                4,
+                "Spare topmasts and yards in the waist and on the booms (judgement).",
+            ),
+            (
+                ("stores", "cordage_fathoms"),
+                600,
+                "Spare rope in the boatswain's store (judgement).",
+            ),
+        ]
+    )
+
+
+def schooner_crew(b):
+    b.crew(
+        [
+            (
+                ("complement",),
+                40,
+                "A privateer's complement of about forty (Chapelle, The Baltimore Clipper; "
+                "judgement, spec M3 2.3).",
+            ),
+            (
+                ("names",),
+                "american",
+                "A Baltimore crew: the american list in data/crew/names.yaml.",
+            ),
+            (
+                ("stations", "forecastle"),
+                10,
+                "Hands per station, both watches together; a schooner has no main or mizzen top "
+                "and carries no marines. Forecastlemen: 10, judgement (spec M3 2.3).",
+            ),
+            (
+                ("stations", "fore_top"),
+                6,
+                "Fore topmen, for the topsail and topgallant: 6, judgement (spec M3 2.3).",
+            ),
+            (
+                ("stations", "afterguard"),
+                11,
+                "Afterguard, at the main sheet and the gaff sails: 11, judgement (spec M3 2.3).",
+            ),
+            (("stations", "waisters"), 6, "Waisters: 6, judgement (spec M3 2.3)."),
+            (("stations", "idlers"), 4, "Idlers: the trades below (spec M3 2.3)."),
+            (
+                ("ratings", "able"),
+                0.45,
+                "Share of the seamen by rating: judgement. A privateer shipped prime seamen "
+                "where she could, and more able hands than a King's ship. Able: 0.45.",
+            ),
+            (("ratings", "ordinary"), 0.40, "Ordinary: 0.40, judgement."),
+            (("ratings", "landsman"), 0.15, "Landsmen: 0.15, judgement."),
+            (
+                ("posts", "master"),
+                None,
+                "Station holders by post (spec M3 2.3); names are drawn at muster.",
+            ),
+            (("posts", "mate"), None, None),
+            (("posts", "boatswain"), None, None),
+            (
+                ("idlers_by_trade", "cook"),
+                1,
+                "How the idlers are made up (spec M3 2.3). The cook: 1, judgement.",
+            ),
+            (("idlers_by_trade", "steward"), 1, "A steward: 1, judgement."),
+            (("idlers_by_trade", "carpenter's crew"), 1, "A carpenter: 1, judgement."),
+            (("idlers_by_trade", "sailmaker's crew"), 1, "A sailmaker: 1, judgement."),
+            (
+                ("stores", "water_tons"),
+                8,
+                "Stores for a short cruise (spec M3 2.3). Water for six weeks: 40 men at a "
+                "gallon a day is about 7.5 tons (judgement).",
+            ),
+            (("stores", "provisions_days"), 60, "Provisions: two months (judgement)."),
+            (("stores", "spare_sails"), 1, "One made-up sail in the sail locker (judgement)."),
+            (("stores", "spare_spars"), 2, "A spare topmast and a spare yard (judgement)."),
+            (("stores", "cordage_fathoms"), 150, "Spare rope (judgement)."),
+        ]
     )
 
 
