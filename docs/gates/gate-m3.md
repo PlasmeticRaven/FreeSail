@@ -28,7 +28,7 @@ py -m pip install -e ".[dev,server]"
 ```
 py -m pytest
 ```
-*Takes about six minutes now: the truths sail real voyages with the crew aboard. Ends `COUNT_LINE` (the three xfailed are recorded exceptions: the two of milestone 2 and the absolute times of truth 18; a `failed` is a fault).*
+*Takes about eight minutes now: the truths sail real voyages with the crew aboard. Ends `886 passed, 3 xfailed` (the three xfailed are recorded exceptions: the two of milestone 2 and the absolute times of truth 18; a `failed` is a fault).*
 
 ## Checklist
 
