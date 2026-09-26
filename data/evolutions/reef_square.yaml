@@ -39,5 +39,7 @@ on_fail: {log: "Could not reef the {sail}: {reason}.", kind: evolution.failed, s
 # It is more than one watch of the schooner has at this rating (six ordinary, seven
 # able, two landsmen on deck at the least), so there the request is made up with
 # better hands and goes a little faster than milestone 2; the frigate's watch fills it.
-crew: {hands: 16, rating: able, stations: [topmen, afterguard]}
+# All hands to reef topsails: Luce 1884 ch. XVIII station billet, and the owner's decision at the
+# milestone 3 review (the watch on deck for plain sail handling; all hands for tack, wear and reefing).
+crew: {hands: all, rating: able, stations: [all hands]}
 source: "Luce 1866, ch. XXVII Reefing, 'Reefing and Hoisting'; Lever 1808, 'Reefing Topsails'"

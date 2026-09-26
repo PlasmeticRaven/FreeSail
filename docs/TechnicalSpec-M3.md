@@ -244,7 +244,7 @@ Twenty files exist. Milestone 3 brings the catalogue to at least forty, every fi
 
 | Evolution | Notes |
 |---|---|
-| `call_all_hands`, `pipe_down` | the routine's two orders as evolutions with a delay and a log line, so that they journal and replay like everything else |
+| ~~`call_all_hands`, `pipe_down`~~ | Struck at integration: as evolutions they would queue behind the very tack they are meant to help (a ship-level evolution holds the ship). They are orders that reach the routine directly (§5.1); orders are journaled, so they replay like everything else |
 | `send_down_topgallant_masts`, `sway_up_topgallant_masts` | `sent_down` on the spar and its dependents; the strain model already ignores sent-down spars; a real answer to a gale, which the gate M2 gale had no way to give |
 | `strike_topmasts`, `fid_topmasts` | the same one level down; only with the yards above already sent down |
 | `rig_out_studdingsail_boom`, `rig_in_studdingsail_boom` | split from `set_studding`, which then requires the boom out; the boom's state is a spar attribute |
@@ -255,7 +255,7 @@ Twenty files exist. Milestone 3 brings the catalogue to at least forty, every fi
 | `wear_under_bare_poles` | a parameter of `wear`, not a file, but the primer names it |
 | `loose_sails_to_dry`, `furl_all` | routine work that costs hands and shows the muster at work |
 
-The count reaches forty with the pairs counted as two. Every new file passes the registry's validation, has a primer sentence (chapter 3 or 5) and an entry in `tests/test_evolutions.py` that runs it on the ship that has the parts.
+The count reaches thirty-nine files with the pairs counted as two (forty-one were written; the two routine orders above were struck), plus `wear_short_round` and the topgallant yards' pair that package 19 added from Luce. Every new file passes the registry's validation, has a primer sentence (chapter 3 or 5) and an entry in `tests/test_evolutions.py` that runs it on the ship that has the parts.
 
 ## 7. Truths for milestone 3 (`tests/test_known_truths.py`)
 

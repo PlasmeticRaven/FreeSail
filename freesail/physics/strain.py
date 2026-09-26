@@ -93,7 +93,9 @@ FLOGGING_LOAD_MULTIPLIER = 2.0
 SWUNG_YARD_MAX = units.deg_to_rad(80.0)
 
 HALYARD_CLASSES = frozenset({"halyard", "throat_halyard", "peak_halyard"})
-ALOFT_STATES = frozenset({SailState.SET, SailState.SHEETED, SailState.LOOSED})
+ALOFT_STATES = frozenset(
+    {SailState.SET, SailState.GOOSE_WINGED, SailState.SHEETED, SailState.LOOSED}
+)
 _SIDES = ("starboard", "larboard")
 
 
@@ -199,7 +201,7 @@ def _out_of_action(part: Part) -> bool:
     if isinstance(part, Line):
         return part.state is LineState.PARTED
     if isinstance(part, Sail):
-        return part.state is not SailState.SET
+        return part.state not in (SailState.SET, SailState.GOOSE_WINGED)
     return False
 
 

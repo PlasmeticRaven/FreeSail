@@ -39,8 +39,6 @@ SCHOONER = "data/ships/topsail-schooner.yaml"
 EVOLUTION_DIR = Path(__file__).resolve().parents[1] / "data" / "evolutions"
 
 NEW = [
-    "call_all_hands",
-    "pipe_down",
     "send_down_topgallant_masts",
     "sway_up_topgallant_masts",
     "send_down_topgallant_yards",
@@ -183,7 +181,7 @@ def off_wind(w) -> float:
 
 
 def test_the_catalogue_reaches_forty_and_every_file_loads():
-    assert len(EVOLUTIONS) >= 40
+    assert len(EVOLUTIONS) >= 39  # forty-one less the two routine orders (spec M3 §6)
     for eid in NEW:
         evo = EVOLUTIONS[eid]
         assert "Luce" in evo.source, eid
@@ -248,19 +246,6 @@ def test_the_new_crew_lines_fit_one_watch_of_either_ship(path):
 # ---------------------------------------------------------------------------
 # The routine's two
 # ---------------------------------------------------------------------------
-
-
-def test_call_all_hands_and_pipe_down_journal_with_a_delay():
-    ship, runner, wind = bare(FRIGATE)
-    text = runner.start(ship, "call_all_hands", "ship", {"why": "to shorten sail"})
-    assert text == "All hands! (to shorten sail)"
-    notes = run(runner, ship, wind)
-    assert "crew.all_hands_up" in kinds(notes)
-    assert EVOLUTIONS["call_all_hands"].nominal_duration_s == 90
-    runner.start(ship, "pipe_down", "ship")
-    notes = run(runner, ship, wind)
-    assert "Piped down." in texts(notes)
-    assert EVOLUTIONS["pipe_down"].crew == {"hands": 0}
 
 
 # ---------------------------------------------------------------------------

@@ -116,6 +116,10 @@ class InstantRunner:
             ship.sails[subject].state = SailState.FURLED
         elif evo.startswith("take_in_"):
             ship.sails[subject].state = SailState.IN_THE_GEAR
+        elif evo == "furl_all":
+            for sail in ship.sails.values():
+                if sail.state is not SailState.UNBENT:
+                    sail.state = SailState.FURLED
         elif evo.startswith("furl_"):
             ship.sails[subject].state = SailState.FURLED
         elif evo.startswith("reef_"):

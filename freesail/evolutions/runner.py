@@ -337,6 +337,8 @@ class Runner:
         kind = (
             "sail" if isinstance(subject, Sail) else "line" if isinstance(subject, Line) else "spar"
         )
+        if wanted == "sail" and isinstance(subject, Sail):
+            return  # any sail: bending, unbending and shifting (package 19)
         if wanted == "yard":
             if isinstance(subject, Spar) and subject.cls in YARD_LIKE_CLASSES:
                 return
@@ -588,7 +590,11 @@ class Runner:
 
     def _tick_script(self, ship: Ship, inst: Instance, dt: float, wind: Wind) -> None:
         assert inst.script is not None
-        inst.script.tick(dt, wind, self._last_factor * self._crew_factor(inst, False))
+        inst.script.tick(
+            dt,
+            wind,
+            self._last_factor * self._crew_factor(inst, getattr(inst.script, "aloft", False)),
+        )
         if inst.script.status == "done":
             self._complete(ship, inst)
         elif inst.script.status == "failed":
@@ -627,7 +633,10 @@ class Runner:
 
     @staticmethod
     def _aloft(inst: Instance) -> bool:
-        """Whether any of the work is aloft: then only hands who go aloft are taken."""
+        """Whether any of the work is aloft: then only hands who go aloft are taken. A
+        script names its aloft phases in ``params.aloft`` (package 19)."""
+        if inst.script is not None:
+            return bool(inst.params.get("aloft"))
         return any(step.aloft for step in inst.evo.steps)
 
     def _want(self, inst: Instance) -> hands.CrewRequest:
@@ -771,6 +780,13 @@ class Runner:
         )
         if got.outcome == hands.TOO_FEW:
             return
+        # The world moved while the work lay belayed: a hoist half done must not finish
+        # on a yard that has since been sent down (package 19's finding).
+        reason = self._failing_condition(ship, inst, inst.evo.requires)
+        if reason is not None:
+            hands.release(crew, inst.inst_id)
+            self._fail(ship, inst, reason)
+            return
         inst.paused = False
         inst.assignment = got
         if got.outcome == hands.SHORT:
@@ -794,6 +810,7 @@ class Runner:
     def _note(
         self, ship: Ship, inst: Instance, outcome: registry.Outcome, reason: str = ""
     ) -> None:
+        reason = reason.rstrip(".")  # the templates end "{reason}." themselves
         text = self._format(inst, outcome.log, reason=reason)
         data: dict[str, Any] = {"evolution": inst.evo.id, "subject": inst.subject_id}
         if reason:
