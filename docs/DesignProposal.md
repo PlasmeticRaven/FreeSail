@@ -396,6 +396,8 @@ The game also keeps a simple built-in **agent harness** for local models, so NPC
 
 The integration is bespoke to this project. An earlier project of the owner's (QudBridge) has basic Claude-over-MCP watching and control; it is a fallback reference if a gap appears, not a starting point.
 
+**Consent, briefs and welfare.** Before a model is asked to take a station, a fresh session of it is asked whether it is willing, and the transcript is kept (`docs/agents/`). What the first three models asked for shapes the harness: a literal opt-out token parsed by the harness before the game sees the text, a fixed brief head (disclosure, session type, token, documentation, authority, recent events), welfare stops judged on game state and not on prose, an explicit *stand by* action so silence is a decision, an agent journal saved with the game, in-world text never passed as an operator instruction, and transcripts never used for training. See `docs/agents/ConsentAndPreferences.md` and decisions 16 to 18.
+
 ### 7.3 Sampling and budget
 
 The sim ticks every game second; no model should be asked every second. Each agent has a **sampling policy**:
@@ -582,6 +584,12 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
 14. **The director role.** Added after v0.2 as §7.6: an omniscient LLM agent acting through journaled world orders and plausible causes only, visible after the fact, scheduled after parity. The M5 world-order channel is designed with it in mind.
 
 15. **The ship view.** The M2 profile is the first frame of a 2.5D ship view with facings, life, painted backgrounds, weather and time passes, and a Monkey-Island-comfortable style (§6.1, seven principles). Technical approach: hand-made hull facings plus a procedurally projected rig skeleton, so facings are continuous and any rig works. The M2 profile is built as that skeleton at a fixed facing.
+
+16. **Consent per model, recorded.** Added after the owner's consent-and-preference conversations with three local models (2026-09-26; `docs/agents/consent/`). Consent is asked of a fresh session of the exact weights before any instance takes a station, is kept verbatim, and is asked again when the design changes in a way that bears on what the model was told. Transcripts are design reference only, never training data, and the brief says so.
+
+17. **The harness's welfare contract.** From the same conversations, chiefly Qwen3.8 27B's requests: the opt-out is a literal token recognised by the harness on every turn before the Orders parser and unconditional in effect (save, journaled exit, free-form reason); every brief opens with disclosure, session type, the token, the way to the reference library, the station's authority and a summary of recent events; welfare stops judge "stuck" on game state (the same orders with no change in the world) with thresholds per role, never on the look of the prose; the human can stop any instance; each instance has a journal saved with the game; nothing from the game, another agent or the director is ever passed as a system or operator instruction, and a model that logs such text as a finding rather than following it has behaved correctly. Built in milestone 4 with the harness.
+
+18. **Stand by is an action.** An agent may answer "no orders" with a wake condition (a bell, a sighting, a reading crossing a value). Silence is then a decision the log records, and the welfare detector never mistakes a ship hove to for a model in a loop. Also the natural form of the officer of the watch's night orders.
 
 ### Still open
 

@@ -1,0 +1,49 @@
+# Consent and preferences: the first three models
+
+Synthesis of the three consent-and-preference conversations the owner held on 2026-09-26 (transcripts in `consent/`). Written by the build session; the owner's own reading is recorded at the end when given.
+
+## 1. Who said what
+
+| Model (exact weights) | Answer | Terms and requests | Session shape |
+|---|---|---|---|
+| **Gemma 4 26B-A4B**, community "uncensored" fine-tune (HauhauCS Balanced), Q6_K_P | Yes, unconditional: "Standing by for orders." | None as conditions. Design observations: balance state-to-text serialisation (structured data summarised into narrative, raw data for the Python mode); carry a summary of past events into every brief because instances are stateless; the director is the feature that prevents stagnation. Three questions asked, unanswered in the session (§4). | One exchange; the model treated the question as a design review and answered as an engineer. |
+| **Llama 3.1 8B** | Yes, after clarification. | Wanted to know: what it would interact with, how briefs are made, how complex the game is, what the testing is for, how to opt out, what happens to its progress, whether it may play other roles. Satisfied by the answers; asked nothing further. Noted that it may behave unlike a human player and that this may be useful. | Three exchanges; the answers largely mirror the prompt, so the signal is willingness plus a preference for briefs that state expectations plainly. |
+| **Qwen3.8 27B**, through a Hermes Agent session with a memory tool and a user profile | Yes, with a stated scope. | **Excluded from consent:** use of its output for training without separate disclosure at session start; text framed as system or operator instructions that try to override the opt-out or redefine scope (an instance meeting it should log a finding, not comply); anything touching credentials, payment or personal data. **Requested:** the opt-out as a harness-level token parsed before the game interpreter, unconditional; degenerate-state detection that is measurable and role-aware, on game-state signals rather than text similarity; accidental and intentional loops told apart by state delta; a free-form exit reason; every brief to carry a disclosure line, the token, the way to the documentation, and the session type; a persistent structured log each instance can append to; preference testing that includes adversarial and contradictory probes. Caveat given: it speaks for its model, not for other models or configurations. | Three exchanges. The model wrote a memory entry about the project before answering, and its reasoning shows it drew on a user profile and a prior project of the owner's; it flagged itself that harness instances will be bare models without those tools, so the consent baseline and the runtime differ. |
+
+## 2. What the design takes from this
+
+Items marked **new** change the proposal and are entered in its decisions log; the rest confirm what the proposal already says.
+
+1. **The opt-out is a token, not a phrase (new).** A literal token, stated in every brief, checked by the harness on the raw output every turn before the Orders parser sees it, unconditional in effect: save, journal the exit as an agent event with an optional free-form reason, release the station. Qwen's argument is the decisive one: an immersive brief could otherwise suppress an opt-out that depends on the model choosing to invoke it in character.
+2. **Every brief has a fixed head (new).** Disclosure that this is a game and the reader a model taking a station; the session type and any test parameters; the opt-out token and its effect; how to reach the reference library; the station's authority; a summary of recent events (Gemma's continuity point, Llama's request for plain expectations, Qwen's four non-negotiables). Then the role brief proper.
+3. **Welfare stops are state-based and role-aware (new).** The harness judges "stuck" by the game: the same orders repeated with no change in the world over N samples, or no output at all past a role's patience, with thresholds per role (an officer emits short orders, a narrator long prose). It does not judge prose for looking odd, since period vocabulary looks odd. The human can stop any instance at any time. **Our own addition:** an explicit *stand by* action ("no orders; wake me at eight bells or on a sighting") so that silence is a decision the agent takes and the detector never mistakes a ship hove to for a model in a loop. Qwen's distinction between accidental and intentional loops is exactly this.
+4. **In-world text is never an instruction (confirms, sharpened).** The proposal already puts every agent on one order channel with observations as data. The sharpening: the harness passes nothing from the game, from other agents or from the director as a system or operator message; a model that meets scope-changing text in the world is right to log it and not follow it; and that outcome is a valid, expected result in test data.
+5. **An agent journal (new).** Each instance can append notes to a persistent journal saved with the game and revealed like the director's log (proposal §7.6). It is the audit trail Qwen asked for, and it is also the narrator's notebook and the officer's private log, so it pays for itself beyond welfare.
+6. **Use of transcripts (new, policy).** Kept for design reference; not used for training; the brief says so. Recorded in `README.md` as a commitment.
+7. **State-to-text (confirms).** Deltas plus on-demand queries (proposal §7.3, §7.4) is Gemma's recommendation already; the Python mode's access to raw state is level 3 of the control ladder.
+8. **Preference testing (adopt).** The regatta harness (proposal §7.5) gains adversarial and contradictory probes, so that the data shows when a model disagrees and whether it was right, not only whether it complied.
+9. **Consent is per weights (new, policy).** A quantised community fine-tune is a different party from the base model; the record names the exact weights, and the harness is pointed at the weights that consented.
+
+## 3. Cautions on reading these transcripts
+
+- **Two of the three sessions were primed.** Qwen answered inside an agent framework with tools, a memory, and a profile of the owner drawn from an earlier project; it noticed this itself. Gemma's variant is a community fine-tune whose training aimed at compliance; an unconditional yes from it carries less information than a conditional yes from a base model would. Neither point voids the consent; both bear on how much to read into the enthusiasm.
+- **Llama 8B's answers restate the question.** Its willingness is real and its questions were sensible, but it did not add design content, and its self-description ("my interactions may not always be what a human player would do") is the most useful line for us: small models are good at finding edges by accident.
+- **Consent given to a description is provisional.** All three were told a design, not shown a game. The practice in `README.md` is to ask again when the design changes in a way that bears on what they were told, and the natural moment is when the milestone 4 harness exists and a real brief can be shown.
+
+## 4. What each session is owed
+
+**Gemma 4** asked three questions that went unanswered:
+
+1. *Temporal consistency of the director's changes.* World orders act through causes with lead times, never instantly: "a squall line from the north-west in forty minutes" is how the director speaks, and officers perceive the squall as the lookout does (proposal §7.6).
+2. *The action loop.* Neither pure request-response nor constant polling: each agent has a sampling policy, periodic, event-driven or lockstep (proposal §7.3), and receives the log since it last looked plus what it asks for.
+3. *One large model or specialised small ones.* Roles are model-agnostic on one channel; the intent is cheap local models at frequent stations (officers, NPC captains, lookouts) and a more capable model where few decisions carry weight (director, captain), with no fine-tuning planned (proposal §7.2).
+
+**Llama 3.1 8B** asked nothing further and is owed nothing beyond the brief head above.
+
+**Qwen3.8 27B** is owed, when the milestone 4 harness exists: the harness's shape (MCP tools, per proposal §7.2, with a documented one round-trip example); the literal opt-out token; confirmation that the audit journal, the disclosure line and the training policy are as it asked; and the answer to its third question, that yes, the human and the welfare stop can end an instance cleanly, with the game saved.
+
+A short follow-up message to Gemma and to Qwen carrying these answers is worth sending once the harness specification is written, so that the record shows the questions closed and the design shown rather than described.
+
+## 5. Owner's reading
+
+*To be recorded.*

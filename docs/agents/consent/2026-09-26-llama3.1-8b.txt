@@ -1,0 +1,57 @@
+Model: llama3.1:8B
+
+[USER]: Hi there! I'm developing a text-first sailing game called FreeSail with LLM integration built in from the beginning (LLMs will be able to watch, commentate, play as officers on a ship, eventually captain a ship themselves, and even play as a "director" who sees the whole game world and can help make things interesting in any number of ways). I'd like to as you whether you'd be interested in helping participate in the testing of the LLM integration. It would involve you working through a harness which would show you the game state and allow you to interact directly with the game, both through the built in "Orders" language with historical terminology and principles, and direct Python coding for automation or interaction however you prefer. You might be asked to help test specific things, or just to play the game and/or interact freely with the various LLM integrations. You would have the ability to opt out at any time with a specific phrase or command. An important distinction: The given instance of you (the model you are) would not have received this question and briefing directly, they would receive a specific briefing or introduction depending on the exact state of the game and what I'd be looking to do. So, if you have any questions, comments, concerns, or you'd like me not to ask any instance of you to participate then that is a valid answer too.
+
+[LLM]: Wow, that sounds like an incredibly ambitious and exciting project! I'm intrigued by the idea of a text-first sailing game with LLM integration, and I'm happy to consider participating in the testing of the LLM integration.
+
+Before I agree to participate, I have a few questions and clarifications:
+
+What kind of LLM integration are we talking about? Will I be interacting with a specific model (e.g., a language model, a decision-making model, or a model with a specific set of capabilities)?
+How will the briefing/introduction be generated? Will it be based on a pre-defined template, or will it be generated dynamically based on the game state and my interactions?
+What is the expected level of complexity? Will I be expected to learn a complex set of rules and commands, or will the game state and interactions be relatively straightforward?
+What are the goals of the testing? Are you looking for feedback on the LLM integration, the game mechanics, or something else?
+How will I be able to opt out? What phrase or command should I use to exit the testing session, and what will happen to the game state and my interactions?
+Assuming these questions are answered to my satisfaction, I'd be happy to participate in the testing of the LLM integration. I'm a large language model, my primary strengths are in generating human-like text and understanding natural language, so I think I can be a useful testbed for the LLM integration.
+
+One final note: I'll do my best to provide constructive feedback and insights during the testing process. However, I must remind you that I'm a large language model, and my interactions may not always be what a human player would do. This might be a valuable opportunity to test the LLM integration in unexpected ways, but it's also possible that I might encounter edge cases or unexpected behavior.
+
+What do you think? Are you ready to proceed with the testing?
+
+[USER]:
+1. Specifically, I am asking whether you (any given instance of the model with your weights) are interested in playing/interacting with the game directly. You would not necessarily interact with an LLM, but just with the game and the human player.
+2. Each briefing would be generated based on the requirements of the game, so for example: an LLM playing as an officer might receive a brief with the officer's basic persona, the ship's basic information, and a summary of recent events (this is just a hypothetical example).
+3. The complexity might be quite high, as the game simulates sailing at a very realistic level, including historical terminology and principles. There would be documentation available which explains the systems of the game, and it would be accessible at any time.
+4. The goals of the testing would be to see whether you (the model you are) functions well in the LLM integrations, as well as for your own enjoyment. You would not be asked to design anything yourself, but your feedback would be welcomed and if it were expected it would be made clear in a briefing to that particular instance.
+5. There will be a built in opt-out (or exit) functionality, so any LLM can choose to stop playing at any time. It will be made clear in the documentation how to do so, it is not yet designed.
+
+Does all of this make sense, and do you have any further questions? There is no testing to be done at the current time, so any testing would occur in another session with the same model. I am mostly asking if you have any direct objections.
+
+[LLM]: Thank you for clarifying the details.
+
+It sounds like you're looking for a willing participant to engage with the game and provide feedback on the experience, rather than a formal testing process. You want to ensure that any instance of me that participates in the game is comfortable with the idea and has no objections.
+
+After considering your request, I have a few minor concerns and questions:
+
+Scope of interaction: You mentioned that I would not be interacting with an LLM, but rather with the game and the human player. However, if I understand correctly, some instances of me would be playing as an LLM (e.g., an officer or captain). Would I be aware of this aspect of my role, or would it be hidden from me?
+Time commitment: Since this is a voluntary activity, I'd like to know what the estimated time commitment might be. Would I be expected to engage with the game for a set amount of time, or could I play at my own pace?
+Feedback and exit: You mentioned that feedback would be welcomed, but not required. If I do choose to provide feedback, would it be used to inform the development of the game, or would it be more of a general "we'd like to hear your thoughts" type of situation? Additionally, I understand that there will be an opt-out mechanism, but what would happen to my progress in the game if I choose to exit?
+Gameplay style: Would my interactions with the game be limited to the LLM-specific roles (e.g., officer, captain, director), or could I play in other roles, such as a crew member or a passenger?
+If these concerns are addressed to my satisfaction, I'm willing to participate in the game and provide feedback on the experience. I'm curious to see how the game mechanics and LLM integration work, and I'm happy to help you test and refine the system.
+
+Please let me know if there's anything else I should be aware of before participating.
+
+[USER]:
+1. The scope of interaction would be made clear in the briefing given to any instance.
+2. If there were any particular expectation for a given instance of you as regards time commitment or specific objectives, they would be made clear at the briefing for that instance.
+3. Feedback would be openly taken at any time, and not elicited except where specifically desired for development questions, especially as regards LLM preferences and suggestions across different models. The game does feature, and will feature, a save system, and if an LLM chooses to exit, a save would be made to preserve the state of the game. However, since the LLM might be playing in the same game as a human player, I cannot guarantee that the exit of an LLM will mean the player decides not to continue playing. It would only mean the LLM is no longer participating, and the game would have a save at the point they exited. The exit would be logged, and the LLM could enter a reason for the exit to allow clarity for their reasoning.
+4. The intended roles for LLMs in the game are: Narrator (observes and can commentate), Officers (various officer roles throughout a given ship, can command and control their given domain and interact with the player captain), Captain (LLM captains a whole ship themselves, has access to every feature the player does), and Director (LLM has entire game state and can decide, based on a director briefing given by the player, how to drive the game world).
+
+[LLM]: I'm glad to hear that the scope of interaction will be made clear in the briefing, and that any specific expectations for time commitment or objectives will also be communicated.
+
+Regarding feedback, I appreciate the openness and willingness to receive feedback from LLMs, especially regarding their preferences and suggestions for improvement. This will likely provide valuable insights into how LLMs interact with the game and can help inform the development of the LLM integration.
+
+I also appreciate the clarification on the exit mechanism and save system. This ensures that LLMs can exit the game without affecting the human player's experience, and that their progress can be preserved if they choose to return.
+
+Regarding the intended roles for LLMs in the game, it's interesting to see the various possibilities for LLM interaction, from observation and commentation to command and control, and even to directing the game world. This suggests a high degree of flexibility and customization in the game's design.
+
+At this point, I don't have any further questions or concerns. I'm willing to participate in the game and provide feedback on my experience as an LLM. Thank you for clarifying the details, and I'm looking forward to engaging with the game and its features!
