@@ -166,7 +166,7 @@ def test_the_frigates_canvas_by_the_period_rule():
     assert no["fore.topgallant.studdingsail.starboard"] == 7
     # storm canvas 1 (Luce p. 171); the ringtail 5 (Kipping), the save-alls 7
     assert {no[s] for s in ship.groups["storm canvas"]} == {1}
-    assert no["mizzen.ringtail"] == 5 and no["fore.save_all.larboard"] == 7
+    assert no["ringtail"] == 5 and no["fore.save_all.larboard"] == 7
 
 
 def test_the_schooners_canvas_by_the_same_heights():
@@ -175,8 +175,8 @@ def test_the_schooners_canvas_by_the_same_heights():
     assert no["fore.topsail"] == 2 and no["fore.topgallant"] == 6
     assert no["fore.sail"] == no["main.sail"] == no["jib"] == no["fore.staysail"] == 2
     assert no["flying_jib"] == 6 and no["main.gaff_topsail"] == 8
-    assert no["main.storm_trysail"] == no["storm_jib"] == 1
-    assert no["main.ringtail"] == 5 and no["main.water_sail"] == 7
+    assert no["storm_trysail"] == no["storm_jib"] == 1
+    assert no["ringtail"] == 5 and no["water_sail"] == 7
 
 
 # ---------------------------------------------------------------------------
@@ -349,9 +349,7 @@ def test_the_schooners_sail_room():
     ship = load_ship(SCHOONER)
     kinds_in = [s.kind for s in sail_room(ship).sails]
     assert kinds_in[:3] == ["fore.sail", "fore.topsail", "jib"]
-    assert set(kinds_in[3:]) == {"main.storm_trysail", "storm_jib", "main.ringtail"} | {
-        "main.water_sail"
-    }
+    assert set(kinds_in[3:]) == {"storm_trysail", "storm_jib", "ringtail"} | {"water_sail"}
 
 
 def test_a_ship_file_with_only_a_count_has_made_up_sails():
@@ -452,18 +450,18 @@ def test_the_storm_mizzen_needs_the_spanker_unbent():
     with pytest.raises(
         OrderError, match=r"The spanker is bent in the storm mizzen's place; unbend"
     ):
-        runner.start(ship, "bend_sail", "mizzen.storm_mizzen", {"sail": "mizzen.storm_mizzen"})
+        runner.start(ship, "bend_sail", "storm_mizzen", {"sail": "storm_mizzen"})
     notes = work(runner, ship, wind, "shift_sail", "mizzen.spanker", **{"for": "storm mizzen"})
     assert ship.sails["mizzen.spanker"].state is SailState.UNBENT
-    assert ship.sails["mizzen.storm_mizzen"].state is SailState.FURLED
-    assert ship.sails["mizzen.storm_mizzen"].canvas_no == 1
+    assert ship.sails["storm_mizzen"].state is SailState.FURLED
+    assert ship.sails["storm_mizzen"].canvas_no == 1
     assert "mizzen.spanker" in [s.kind for s in sail_room(ship).sails]
     assert any("the storm mizzen bent (No. 1 canvas, new)" in t for t in texts(notes))
     with pytest.raises(OrderError, match="The storm mizzen is bent in the spanker's place"):
         runner.start(ship, "bend_sail", "mizzen.spanker", {"sail": "mizzen.spanker"})
     with pytest.raises(OrderError, match="not bent in the jib's place"):
-        runner.start(ship, "shift_sail", "jib", {"sail": "jib", "for": "mizzen.storm_mizzen"})
-    work(runner, ship, wind, "shift_sail", "mizzen.storm_mizzen", **{"for": "mizzen.spanker"})
+        runner.start(ship, "shift_sail", "jib", {"sail": "jib", "for": "storm_mizzen"})
+    work(runner, ship, wind, "shift_sail", "storm_mizzen", **{"for": "mizzen.spanker"})
     assert ship.sails["mizzen.spanker"].state is SailState.FURLED
 
 
@@ -529,13 +527,13 @@ def test_the_ringtail_and_water_sail_draw_running():
     runner = w.ship.extra["evolutions"]
     w.submit("set the mainsail")
     w.run(400)
-    for sid in ("main.ringtail", "main.water_sail"):
+    for sid in ("ringtail", "water_sail"):
         runner.start(w.ship, "bend_sail", sid, {"sail": sid})
     w.run(900)
     w.submit("set the ringtail")
     w.submit("set the water sail")
     w.run(900)
-    for sid in ("main.ringtail", "main.water_sail"):
+    for sid in ("ringtail", "water_sail"):
         sail = w.ship.sails[sid]
         assert sail.is_set, sid
         assert sail.thrust_kn > 0.0, sid
@@ -575,7 +573,7 @@ def test_the_loader_refuses_bad_canvas_in_words():
     with pytest.raises(ShipFileError, match="give the list alone"):
         ship_from_dict(doc)
     doc = frigate_doc()
-    storm = next(s for s in doc["sails"] if s["id"] == "mizzen.storm_mizzen")
+    storm = next(s for s in doc["sails"] if s["id"] == "storm_mizzen")
     storm["in_place_of"] = "mizzen.spinnaker"
     with pytest.raises(ShipFileError, match="in place of 'mizzen.spinnaker'"):
         ship_from_dict(doc)
@@ -612,7 +610,7 @@ def test_the_same_seed_gives_the_same_log_with_canvas_work():
     a, b = voyage(), voyage()
     assert a == b
     assert a[1]["main.topsail"] < 100.0  # worn by use
-    assert a[1]["mizzen.storm_mizzen"] < 100.0
+    assert a[1]["storm_mizzen"] < 100.0
     assert ("mizzen.spanker", pytest.approx(a[1]["mizzen.spanker"])) in [
         (k, pytest.approx(c)) for k, c in a[2]
     ]

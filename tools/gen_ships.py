@@ -1277,7 +1277,7 @@ def frigate(out_dir="data/ships"):
     # taffarel by a sheet". Spec 3b §6.4 drew it as a gaff sail; the sources that name it make
     # it jib-headed, so it is one here, and it is bent in place of the spanker.
     b.line(
-        "mizzen.storm_mizzen.stay",
+        "storm_mizzen.stay",
         "stay",
         "mizzen.mast",
         rating=rope_kn(5.0),
@@ -1288,9 +1288,9 @@ def frigate(out_dir="data/ships"):
     sm_foot = 0.45 * boom_ft  # judgement: "towards the taffarel", 0.45 of the spanker boom
     sm_area = round(0.5 * sm_luff * sm_foot * FT * FT)
     sm = b.sail(
-        "mizzen.storm_mizzen",
+        "storm_mizzen",
         "jibheaded",
-        stay="mizzen.storm_mizzen.stay",
+        stay="storm_mizzen.stay",
         area_m2=sm_area,
         x_m=round(mast_x["mizzen"] - sm_foot / 3.0 * FT, 1),
         centre_height_m=round(deck_height + (4.0 + sm_luff / 3.0) * FT, 1),
@@ -1303,9 +1303,9 @@ def frigate(out_dir="data/ships"):
         f"above the tack, judgement), foot {sm_foot:.0f} ft towards the taffrail (judgement); "
         "bent in place of the spanker; in the sail room." + canvas_note(storm_canvas),
     )
-    b.line("mizzen.storm_mizzen.halyard", "halyard", sm, rating=rope_kn(3.0, 2))
-    b.line("mizzen.storm_mizzen.sheet", "sheet", sm, rating=rope_kn(3.5, 3))
-    b.line("mizzen.storm_mizzen.downhaul", "downhaul", sm, rating=rope_kn(2.5))
+    b.line("storm_mizzen.halyard", "halyard", sm, rating=rope_kn(3.0, 2))
+    b.line("storm_mizzen.sheet", "sheet", sm, rating=rope_kn(3.5, 3))
+    b.line("storm_mizzen.downhaul", "downhaul", sm, rating=rope_kn(2.5))
     storm = [fss, mss, sm]
 
     # the ringtail, abaft the spanker (Luce 1884 ch. XXIII, 'Other Sails': "a ring-tail, which
@@ -1323,7 +1323,7 @@ def frigate(out_dir="data/ships"):
     rt_boom_ft = rt_foot * 4.0 / 3.0  # judgement: the foot and a third bearing on the boom
     rt_centre = round(deck_height + 2.4 + 0.45 * rt_depth * FT, 1)
     rt_boom = b.spar(
-        "mizzen.ringtail_boom",
+        "ringtail_boom",
         "studdingsail_boom",
         on="mizzen.boom",
         length_m=ft(rt_boom_ft),
@@ -1337,7 +1337,7 @@ def frigate(out_dir="data/ships"):
     )
     rt_canvas = FRIGATE_CANVAS["ringtail"]
     rt = b.sail(
-        "mizzen.ringtail",
+        "ringtail",
         "studding",
         boom=rt_boom,
         area_m2=rt_area,
@@ -1357,9 +1357,9 @@ def frigate(out_dir="data/ships"):
     )
     # halyard to the gaff end, tack (the outhaul on the ringtail boom) and sheet; sizes as the
     # topmast studding sails' (judgement)
-    b.line("mizzen.ringtail.halyard", "halyard", rt, rating=rope_kn(2.5))
-    b.line("mizzen.ringtail.tack", "tack", rt, rating=rope_kn(2.5))
-    b.line("mizzen.ringtail.sheet", "sheet", rt, rating=rope_kn(2.0))
+    b.line("ringtail.halyard", "halyard", rt, rating=rope_kn(2.5))
+    b.line("ringtail.tack", "tack", rt, rating=rope_kn(2.5))
+    b.line("ringtail.sheet", "sheet", rt, rating=rope_kn(2.0))
     occasional = [rt]
     # a save-all under each lower studding sail boom (Luce 1884 ch. XXIII, 'Other Sails': "a
     # save-all, under the lower studding-sail boom ... never met with in the service now",
@@ -1482,12 +1482,8 @@ def frigate(out_dir="data/ships"):
     b.group("storm staysails", storm[:2])
     b.group("occasional sails", occasional)
     b.group("save-alls", save_alls)
-    b.alias("storm mizzen", "mizzen.storm_mizzen")
-    b.alias("ringtail", "mizzen.ringtail")
-    b.alias("ring-tail", "mizzen.ringtail")
-    b.alias("ringtail boom", "mizzen.ringtail_boom")
-    for side in SIDES:
-        b.alias(f"{side} save-all", f"fore.save_all.{side}")
+    # the ids read as a sailor says them (storm mizzen, ringtail); the save-alls by their
+    # side, "the starboard save-all", as a sided family like the courses' sheets
     b.alias("save-all", "save-alls")
     for name in ("fore", "main"):
         for level in ("lower", "topmast", "topgallant"):
@@ -2124,7 +2120,7 @@ def schooner(out_dir="data/ships"):
     st_area = round((st_head + st_foot) / 2.0 * (st_luff + st_leech) / 2.0 * FT * FT)
     st_z = 5.0 + 0.45 * st_luff
     st = b.sail(
-        "main.storm_trysail",
+        "storm_trysail",
         "gaff",
         mast=main,
         gaff=mgaff,
@@ -2144,8 +2140,8 @@ def schooner(out_dir="data/ships"):
         "bent to the main gaff and boom in place of the mainsail; in the sail room."
         + canvas_note(storm_canvas),
     )
-    b.line("main.storm_trysail.sheet", "sheet", st, rating=rope_kn(4.0, 3))
-    b.line("main.storm_trysail.outhaul", "outhaul", st, rating=rope_kn(2.5))
+    b.line("storm_trysail.sheet", "sheet", st, rating=rope_kn(4.0, 3))
+    b.line("storm_trysail.outhaul", "outhaul", st, rating=rope_kn(2.5))
     # the storm jib: Steel 1794 vol. I, the sloop's jibs: "two-thirds of the size of the first
     # jib, and is used in stormy weather, in lieu of a larger one"; hanked to the jib stay in
     # place of the jib, its centre as much lower as its size is smaller (judgement)
@@ -2185,7 +2181,7 @@ def schooner(out_dir="data/ships"):
     rt_centre = round(deck_height + rt_z * FT, 1)
     rt_boom_ft = rt_foot * 4.0 / 3.0  # judgement: the foot and a third bearing on the boom
     rt_boom = b.spar(
-        "main.ringtail_boom",
+        "ringtail_boom",
         "studdingsail_boom",
         on=mboom,
         length_m=ft(rt_boom_ft),
@@ -2198,7 +2194,7 @@ def schooner(out_dir="data/ships"):
     )
     rt_canvas = SCHOONER_CANVAS["ringtail"]
     rt = b.sail(
-        "main.ringtail",
+        "ringtail",
         "studding",
         boom=rt_boom,
         area_m2=rt_area,
@@ -2211,9 +2207,9 @@ def schooner(out_dir="data/ships"):
         "(Falconer), 5 cloths in the head and 7 in the foot (Kipping); a studding-class sail "
         "with no side, lying in the mainsail's plane; in the sail room." + canvas_note(rt_canvas),
     )
-    b.line("main.ringtail.halyard", "halyard", rt, rating=rope_kn(2.0))
-    b.line("main.ringtail.tack", "tack", rt, rating=rope_kn(2.0))
-    b.line("main.ringtail.sheet", "sheet", rt, rating=rope_kn(1.75))
+    b.line("ringtail.halyard", "halyard", rt, rating=rope_kn(2.0))
+    b.line("ringtail.tack", "tack", rt, rating=rope_kn(2.0))
+    b.line("ringtail.sheet", "sheet", rt, rating=rope_kn(1.75))
     # the water sail under the main boom: Steel 1794 vol. I, 'Sloop's water-sail': "cut square
     # on the head ... occasionally spread under the boom of the main-sail in fair winds ... The
     # depth of this sail is from one-half to three-fourths of the length of the boom, and it is
@@ -2224,7 +2220,7 @@ def schooner(out_dir="data/ships"):
     ws_area = round(0.6 * main_boom * FT * ws_depth)
     ws_canvas = SCHOONER_CANVAS["water sail"]
     ws = b.sail(
-        "main.water_sail",
+        "water_sail",
         "studding",
         boom=mboom,
         area_m2=ws_area,
@@ -2239,9 +2235,9 @@ def schooner(out_dir="data/ships"):
         + canvas_note(ws_canvas),
     )
     # sizes judgement: Steel gives the water sail's bolt-rope 1.5 in
-    b.line("main.water_sail.halyard", "halyard", ws, rating=rope_kn(1.75))
-    b.line("main.water_sail.tack", "tack", ws, rating=rope_kn(1.75))
-    b.line("main.water_sail.sheet", "sheet", ws, rating=rope_kn(1.5))
+    b.line("water_sail.halyard", "halyard", ws, rating=rope_kn(1.75))
+    b.line("water_sail.tack", "tack", ws, rating=rope_kn(1.75))
+    b.line("water_sail.sheet", "sheet", ws, rating=rope_kn(1.5))
     occasional = [rt, ws]
 
     b.group("topsails", [ts])
@@ -2275,12 +2271,7 @@ def schooner(out_dir="data/ships"):
     # milestone 3b: the sail room's own canvas (spec 3b §6.4), as in the frigate
     b.group("storm canvas", storm)
     b.group("occasional sails", occasional)
-    b.alias("storm trysail", "main.storm_trysail")
-    b.alias("trysail", "main.storm_trysail")
-    b.alias("ringtail", "main.ringtail")
-    b.alias("ring-tail", "main.ringtail")
-    b.alias("ringtail boom", "main.ringtail_boom")
-    b.alias("water sail", "main.water_sail")
+    # the ids read as a sailor says them: storm trysail, storm jib, ringtail, water sail
     schooner_crew(b)
     b.dump(
         os.path.join(out_dir, "topsail-schooner.yaml"),
@@ -2456,10 +2447,8 @@ def frigate_crew(b):
         "fore.topmast_staysail",
     ]
     heavy = ["fore.course", "fore.topsail", "main.topsail"]
-    storm = ["fore.storm_staysail", "mizzen.storm_staysail", "mizzen.storm_mizzen"]
-    occasional = [("mizzen.ringtail", "ringtail")] + [
-        (f"fore.save_all.{s}", "save-all") for s in SIDES
-    ]
+    storm = ["fore.storm_staysail", "mizzen.storm_staysail", "storm_mizzen"]
+    occasional = [("ringtail", "ringtail")] + [(f"fore.save_all.{s}", "save-all") for s in SIDES]
 
     def first(notes, i):
         return notes if i == 0 else None
@@ -2578,17 +2567,17 @@ def schooner_crew(b):
             ("fore.topsail", SCHOONER_CANVAS["fore.topsail"][0], None),
             ("jib", SCHOONER_CANVAS["jib"][0], None),
             (
-                "main.storm_trysail",
+                "storm_trysail",
                 SCHOONER_CANVAS["storm trysail"][0],
                 "Storm canvas, one of each (spec 3b §6.4, judgement).",
             ),
             ("storm_jib", SCHOONER_CANVAS["storm jib"][0], None),
             (
-                "main.ringtail",
+                "ringtail",
                 SCHOONER_CANVAS["ringtail"][0],
                 "The occasional sails, one each (spec 3b §6.4).",
             ),
-            ("main.water_sail", SCHOONER_CANVAS["water sail"][0], None),
+            ("water_sail", SCHOONER_CANVAS["water sail"][0], None),
         ],
     )
 

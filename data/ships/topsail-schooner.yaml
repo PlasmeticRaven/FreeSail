@@ -139,8 +139,8 @@ spars:
   length_m: 5.5
   height_m: 15.5
   rating_kn: 2.2
-# ringtail boom 19 ft, run out on the main boom (Kipping; Steel: 'lashed occasionally to the outer end of the main-sail-boom'): the ringtail's foot and a third that bears on the boom (judgement); rated for its sail in 18 kn, as a studding sail boom. Provisional (truth 9), see gen_ships.py. Rating: main.ringtail in 18 kn -> 3.9 kN.
-- id: main.ringtail_boom
+# ringtail boom 19 ft, run out on the main boom (Kipping; Steel: 'lashed occasionally to the outer end of the main-sail-boom'): the ringtail's foot and a third that bears on the boom (judgement); rated for its sail in 18 kn, as a studding sail boom. Provisional (truth 9), see gen_ships.py. Rating: ringtail in 18 kn -> 3.9 kN.
+- id: ringtail_boom
   class: studdingsail_boom
   'on': main.boom
   length_m: 5.7
@@ -247,7 +247,7 @@ sails:
   canvas_no: 6
   cloth_rating_kn: 21.9
 # storm trysail 85 m2 (Steel's sloop's storm mainsail): head 11 ft (two-fifths of the mainsail's), foot 32 ft (three times the head), luff 41 ft (0.85 of the mainsail's, judgement within Steel's three-fourths to the whole), after leech an eighth deeper; three reef bands (Steel: three or four); bent to the main gaff and boom in place of the mainsail; in the sail room. Canvas No. 1 (Steel 1794 vol. I, Sail-making, 'Sloop's trysail, or storm mainsail': No. 1 or 2; Luce 1884 ch. X p. 171 (Tables.md §1): storm sails of No. 1); cloth 1.007 kN/m2, 1.12 of No. 2 by Luce App. E.
-- id: main.storm_trysail
+- id: storm_trysail
   class: gaff
   mast: main.mast
   gaff: main.gaff
@@ -272,9 +272,9 @@ sails:
   bent: false
   in_place_of: jib
 # ringtail 69 m2: 62 ft deep, the mainsail's after leech (Falconer), 5 cloths in the head and 7 in the foot (Kipping); a studding-class sail with no side, lying in the mainsail's plane; in the sail room. Canvas No. 5 (Steel 1794 vol. I, Sail-making, 'Sloop's ringtail sail': No. 5 or 8; Kipping 1847 (1898 printing), Sails and Sailmaking, a brig's: No. 5 or 6); cloth 0.686 kN/m2, 0.76 of No. 2 by Luce App. E.
-- id: main.ringtail
+- id: ringtail
   class: studding
-  boom: main.ringtail_boom
+  boom: ringtail_boom
   area_m2: 69
   x_m: -23.4
   centre_height_m: 10.8
@@ -282,7 +282,7 @@ sails:
   cloth_rating_kn: 47.3
   bent: false
 # water sail 21 m2 under the main boom (Steel's sloop's): head along 0.6 of the boom, down to half a metre off the water (judgement, see the script); a studding-class sail laced under the boom, with no side; in the sail room. Canvas No. 7 (Steel 1794 vol. I, Sail-making, 'Sloop's water-sail': No. 7); cloth 0.600 kN/m2, 0.67 of No. 2 by Luce App. E.
-- id: main.water_sail
+- id: water_sail
   class: studding
   boom: main.boom
   area_m2: 21
@@ -618,13 +618,13 @@ lines:
   class: downhaul
   of: fore.topmast.studdingsail.larboard
   rating_kn: 3.5
-- id: main.storm_trysail.sheet
+- id: storm_trysail.sheet
   class: sheet
-  of: main.storm_trysail
+  of: storm_trysail
   rating_kn: 74.4
-- id: main.storm_trysail.outhaul
+- id: storm_trysail.outhaul
   class: outhaul
-  of: main.storm_trysail
+  of: storm_trysail
   rating_kn: 9.7
 - id: storm_jib.halyard
   class: halyard
@@ -644,29 +644,29 @@ lines:
   class: downhaul
   of: storm_jib
   rating_kn: 9.7
-- id: main.ringtail.halyard
+- id: ringtail.halyard
   class: halyard
-  of: main.ringtail
+  of: ringtail
   rating_kn: 6.2
-- id: main.ringtail.tack
+- id: ringtail.tack
   class: tack
-  of: main.ringtail
+  of: ringtail
   rating_kn: 6.2
-- id: main.ringtail.sheet
+- id: ringtail.sheet
   class: sheet
-  of: main.ringtail
+  of: ringtail
   rating_kn: 4.7
-- id: main.water_sail.halyard
+- id: water_sail.halyard
   class: halyard
-  of: main.water_sail
+  of: water_sail
   rating_kn: 4.7
-- id: main.water_sail.tack
+- id: water_sail.tack
   class: tack
-  of: main.water_sail
+  of: water_sail
   rating_kn: 4.7
-- id: main.water_sail.sheet
+- id: water_sail.sheet
   class: sheet
-  of: main.water_sail
+  of: water_sail
   rating_kn: 3.5
 groups:
   topsails:
@@ -732,11 +732,11 @@ groups:
   topgallant yards:
   - fore.topgallant.yard
   storm canvas:
-  - main.storm_trysail
+  - storm_trysail
   - storm_jib
   occasional sails:
-  - main.ringtail
-  - main.water_sail
+  - ringtail
+  - water_sail
 aliases:
   foresail: fore.sail
   the fore: fore.sail
@@ -750,12 +750,6 @@ aliases:
   kites: studdingsails
   head sails: headsails
   topgallant sails: topgallants
-  storm trysail: main.storm_trysail
-  trysail: main.storm_trysail
-  ringtail: main.ringtail
-  ring-tail: main.ringtail
-  ringtail boom: main.ringtail_boom
-  water sail: main.water_sail
 crew:
   # A privateer's complement of about forty (Chapelle, The Baltimore Clipper; judgement, spec M3 2.3).
   complement: 40
@@ -815,16 +809,16 @@ crew:
       canvas_no: 2
       condition: 100
     # Storm canvas, one of each (spec 3b §6.4, judgement).
-    - kind: main.storm_trysail
+    - kind: storm_trysail
       canvas_no: 1
       condition: 100
     - kind: storm_jib
       canvas_no: 1
       condition: 100
     # The occasional sails, one each (spec 3b §6.4).
-    - kind: main.ringtail
+    - kind: ringtail
       canvas_no: 5
       condition: 100
-    - kind: main.water_sail
+    - kind: water_sail
       canvas_no: 7
       condition: 100

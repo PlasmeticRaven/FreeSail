@@ -325,8 +325,8 @@ spars:
   length_m: 5.9
   height_m: 31.4
   rating_kn: 2.3
-# ringtail boom 19 ft, run out on the driver boom (Kipping's sliding gunter-boom; Steel 1794 vol. I, 'Ringtail-boom': 'lashed occasionally to the outer end of the main-sail-boom'): the ringtail's foot and a third that bears on the boom (judgement); rated for its sail in 18 kn, as a studding sail boom. Provisional (truth 9), see gen_ships.py. Rating: mizzen.ringtail in 18 kn -> 4 kN.
-- id: mizzen.ringtail_boom
+# ringtail boom 19 ft, run out on the driver boom (Kipping's sliding gunter-boom; Steel 1794 vol. I, 'Ringtail-boom': 'lashed occasionally to the outer end of the main-sail-boom'): the ringtail's foot and a third that bears on the boom (judgement); rated for its sail in 18 kn, as a studding sail boom. Provisional (truth 9), see gen_ships.py. Rating: ringtail in 18 kn -> 4 kN.
+- id: ringtail_boom
   class: studdingsail_boom
   'on': mizzen.boom
   length_m: 5.7
@@ -617,9 +617,9 @@ sails:
   cloth_rating_kn: 36.3
   bent: false
 # storm mizzen 35 m2, triangular (Luce 1884 ch. X; Steel 1794 'Storm mizen'): luff 38 ft on its vertical stay (0.8 of the mast head's height above the tack, judgement), foot 20 ft towards the taffrail (judgement); bent in place of the spanker; in the sail room. Canvas No. 1 (Luce 1884 ch. X p. 171 (Tables.md §1): every storm sail of No. 1; Luce 1884 ch. X, 'Storm-Sails are made of the strongest canvas'); cloth 1.007 kN/m2, 1.12 of No. 2 by Luce App. E.
-- id: mizzen.storm_mizzen
+- id: storm_mizzen
   class: jibheaded
-  stay: mizzen.storm_mizzen.stay
+  stay: storm_mizzen.stay
   area_m2: 35
   x_m: -18.0
   centre_height_m: 6.9
@@ -628,9 +628,9 @@ sails:
   bent: false
   in_place_of: mizzen.spanker
 # ringtail 68 m2 (Kipping, Luce 1884): 61 ft deep, the depth of the spanker's after leech it borders (as Falconer's schooner's), 5 cloths in the head and 7 in the foot (Kipping's brig's); a studding-class sail with no side, lying in the spanker's plane; in the sail room. Canvas No. 5 (Kipping 1847 (1898 printing), Sails and Sailmaking, 'Ringtail Sails' (a brig's): No. 5 or 6; Steel 1794 vol. I, Sail-making, 'Sloop's ringtail sail': No. 5 or 8); cloth 0.686 kN/m2, 0.76 of No. 2 by Luce App. E.
-- id: mizzen.ringtail
+- id: ringtail
   class: studding
-  boom: mizzen.ringtail_boom
+  boom: ringtail_boom
   area_m2: 68
   x_m: -31.0
   centre_height_m: 12.6
@@ -1681,33 +1681,33 @@ lines:
   of: mizzen.storm_staysail
   rating_kn: 9.7
 # the storm mizzen's vertical stay under the mizzen's after trestle-tree (Luce 1884 ch. X); 5 in: judgement, as the jib stay.
-- id: mizzen.storm_mizzen.stay
+- id: storm_mizzen.stay
   class: stay
   of: mizzen.mast
   rating_kn: 38.7
-- id: mizzen.storm_mizzen.halyard
+- id: storm_mizzen.halyard
   class: halyard
-  of: mizzen.storm_mizzen
+  of: storm_mizzen
   rating_kn: 27.9
-- id: mizzen.storm_mizzen.sheet
+- id: storm_mizzen.sheet
   class: sheet
-  of: mizzen.storm_mizzen
+  of: storm_mizzen
   rating_kn: 56.9
-- id: mizzen.storm_mizzen.downhaul
+- id: storm_mizzen.downhaul
   class: downhaul
-  of: mizzen.storm_mizzen
+  of: storm_mizzen
   rating_kn: 9.7
-- id: mizzen.ringtail.halyard
+- id: ringtail.halyard
   class: halyard
-  of: mizzen.ringtail
+  of: ringtail
   rating_kn: 9.7
-- id: mizzen.ringtail.tack
+- id: ringtail.tack
   class: tack
-  of: mizzen.ringtail
+  of: ringtail
   rating_kn: 9.7
-- id: mizzen.ringtail.sheet
+- id: ringtail.sheet
   class: sheet
-  of: mizzen.ringtail
+  of: ringtail
   rating_kn: 6.2
 - id: fore.save_all.starboard.halyard
   class: halyard
@@ -1920,12 +1920,12 @@ groups:
   storm canvas:
   - fore.storm_staysail
   - mizzen.storm_staysail
-  - mizzen.storm_mizzen
+  - storm_mizzen
   storm staysails:
   - fore.storm_staysail
   - mizzen.storm_staysail
   occasional sails:
-  - mizzen.ringtail
+  - ringtail
   - fore.save_all.starboard
   - fore.save_all.larboard
   save-alls:
@@ -1987,12 +1987,6 @@ aliases:
   head sails: headsails
   topgallant sails: topgallants
   upper yards: topgallant yards
-  storm mizzen: mizzen.storm_mizzen
-  ringtail: mizzen.ringtail
-  ring-tail: mizzen.ringtail
-  ringtail boom: mizzen.ringtail_boom
-  starboard save-all: fore.save_all.starboard
-  larboard save-all: fore.save_all.larboard
   save-all: save-alls
   fore sheet: fore sheets
   fore tack: fore tacks
@@ -2129,11 +2123,11 @@ crew:
     - kind: mizzen.storm_staysail
       canvas_no: 1
       condition: 100
-    - kind: mizzen.storm_mizzen
+    - kind: storm_mizzen
       canvas_no: 1
       condition: 100
     # The occasional sails, one each (spec 3b §6.4).
-    - kind: mizzen.ringtail
+    - kind: ringtail
       canvas_no: 5
       condition: 100
     - kind: fore.save_all.starboard
