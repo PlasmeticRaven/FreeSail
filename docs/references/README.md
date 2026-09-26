@@ -29,4 +29,4 @@ source: "Luce 1866, ch. XXIV Working to Windward, 'Tacking'"
 
 `LuceChapterMap.md` in this folder maps the chapters to the game systems they feed.
 
-`RigGeometryNotes.md` is the research synthesis for milestone 3b (brace angles, catharpins, bowlines, canvas, studding sails), with the passages cited by line. `Tables.md` holds the tables the OCR lost, read from page images: Luce's sail allowance with canvas numbers (ch. X p. 171), the strength of flax canvas by number (App. E), and the Admiralty's daily allowance of provisions (1806, Sect. IX ch. I).
+`images/` holds reference pictures of vessels with their provenance (a tartane and two bilanders). `RigGeometryNotes.md` is the research synthesis for milestone 3b (brace angles, catharpins, bowlines, canvas, studding sails), with the passages cited by line. `Tables.md` holds the tables the OCR lost, read from page images: Luce's sail allowance with canvas numbers (ch. X p. 171), the strength of flax canvas by number (App. E), and the Admiralty's daily allowance of provisions (1806, Sect. IX ch. I).
