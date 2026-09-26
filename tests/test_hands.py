@@ -266,8 +266,10 @@ def test_crew_factor_for_the_rating_table():
     assert factor_for(LAND, ORD) == pytest.approx(0.6 / 0.35)  # about 1.7
     assert 1.65 < factor_for(LAND, ORD) < 1.75
     assert factor_for(ABLE, ABLE) == 1.0 and factor_for(LAND, LAND) == 1.0
-    assert factor_for(ORD, ORD, fatigue=0.3) == pytest.approx(1.15)
-    assert factor_for(ORD, ORD, fatigue=1.0) == pytest.approx(1.0 + hands.FATIGUE_WEIGHT)
+    assert factor_for(ORD, ORD, fatigue=0.3) == pytest.approx(1.125)  # 0.05 of it is 'fresh'
+    assert factor_for(ORD, ORD, fatigue=1.0) == pytest.approx(
+        1.0 + hands.FATIGUE_WEIGHT * (1.0 - hands.FATIGUE_FRESH)
+    )
     assert factor_for(ORD, ORD, n=8, hands=12) == pytest.approx(1.5)  # twelve hands' work by eight
     assert factor_for(ORD, ORD, n=16, hands=12) == 1.0  # never faster for extra hands
     assert factor_for(ORD, ORD, aloft=True) == 1.0
@@ -290,7 +292,7 @@ def test_all_hands_go_at_the_files_pace_less_only_fatigue():
     assert crew_factor(got, want, aloft=False) == 1.0
     for s in crew.sailors:
         s.fatigue = 0.3
-    assert crew_factor(got, want, aloft=False) == pytest.approx(1.15)
+    assert crew_factor(got, want, aloft=False) == pytest.approx(1.125)
     late = sailor(13, Rating.ABLE, Station.FORECASTLE, Watch.LARBOARD)
     assert hands.top_up(got, [*crew.sailors, late]) == 1
     assert late.at == "tack#1" and got.got == 13
@@ -418,6 +420,9 @@ class FakeRoutine:
 
     def pipe_down(self) -> None:
         self.calls.append(("pipe_down", None))
+
+    def tick(self, ship: Any, dt: float) -> list:
+        return []  # the world ticks the routine; the fake has no watches to keep
         self.crew.all_hands_called = False
 
 
@@ -588,7 +593,13 @@ def run_alone(eid: str, crewed: bool) -> tuple[int, list[str], int]:
     assert not snap[0]["waiting"], snap
     at_it = snap[0]["hands"]
     ticks = tick_until_idle(w)
-    kinds = [e.kind for e in log_after(w, n0) if e.kind != "clock.bell"]
+    # the clock's bells and the routine's own lines (watch reliefs, all hands coming up)
+    # are not the evolution's doing
+    kinds = [
+        e.kind
+        for e in log_after(w, n0)
+        if e.kind != "clock.bell" and not e.kind.startswith(("crew.", "watch."))
+    ]
     return ticks, kinds, at_it
 
 

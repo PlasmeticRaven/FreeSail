@@ -238,4 +238,5 @@ work of milestone 3.
 ## Milestone 3: the crew
 
 - **Night call cost (`FATIGUE_ALL_HANDS_AT_NIGHT`)**, 0.03 → 0.20. The spec's table let the watch that was turned up three times in the middle watch sleep the cost off by four in the morning (mean fatigue 0.000, crew factor 1.00 against truth 20's 1.10 to 1.25). Package 18 measured: 0.15 gives 1.10, 0.20 gives 1.17, 0.25 gives 1.25, with the scenario frigate from 20:00, calls at 01:00, 02:00 and 03:00 of ten minutes each with the topmen aloft a third of the time. Set to 0.20; the owner judges at the gate whether a night of three calls costing a sixth of the morning's pace is right.
+- **Fresh dead band (`FATIGUE_FRESH`)**, new at 0.05. With packages 17 and 18 together, the watch on deck gathered a hundredth of fatigue an hour standing idle and every compatibility run came out a tick long. Under 0.05 a hand now works at the file's pace. Truth 20's morning term becomes 1.145 at mean fatigue 0.34 (was 1.17), still inside 1.10 to 1.25.
 

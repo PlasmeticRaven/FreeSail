@@ -35,6 +35,10 @@ from freesail.crew.model import RATING_SKILL, TOPS, Crew, Rating, Sailor, Statio
 # The crew factor (spec M3 §3.3). A hand done in (fatigue 1) works half again as slowly;
 # soft, per the owner, and tuned from here.
 FATIGUE_WEIGHT = 0.5
+# Below this a hand is fresh and works at the file's pace: the watch on deck gathers a
+# hundredth of fatigue an hour merely standing there, and without a dead band that would
+# lengthen every job by a tick within the hour (the compatibility rule, spec M3 §1).
+FATIGUE_FRESH = 0.05
 
 # A hand whose table skill for the work is nought is never assigned to it (marines and
 # idlers aloft); should one be, his skill is read as this, so that nothing divides by nought.
@@ -283,7 +287,7 @@ def crew_factor(assignment: Assignment, want: CrewRequest, aloft: bool) -> float
 
         numbers  = max(1, wanted / got)             # never faster for extra hands
         skill    = mean of reference_skill(rating wanted) / reference_skill(hand's rating)
-        fatigue  = 1 + FATIGUE_WEIGHT * mean fatigue
+        fatigue  = 1 + FATIGUE_WEIGHT * max(0, mean fatigue - FATIGUE_FRESH)
         factor   = numbers * skill * fatigue
 
     The skill term reads each hand's rating through `RATING_SKILL`, not his own skill with
@@ -297,7 +301,8 @@ def crew_factor(assignment: Assignment, want: CrewRequest, aloft: bool) -> float
     hands = assignment.hands
     if not hands:
         return 1.0
-    fatigue = 1.0 + FATIGUE_WEIGHT * (sum(s.fatigue for s in hands) / len(hands))
+    mean_fatigue = sum(s.fatigue for s in hands) / len(hands)
+    fatigue = 1.0 + FATIGUE_WEIGHT * max(0.0, mean_fatigue - FATIGUE_FRESH)
     if want.all_hands or assignment.all_hands:
         return fatigue
     numbers = max(1.0, assignment.wanted / len(hands))

@@ -58,6 +58,8 @@ def make_world(seed: int, ship_path: str | Path, scenario: Scenario | None = Non
         # The muster is a function of the seed, like everything else (spec M3 §2.4).
         ship.extra["crew"] = muster(ship.spec.crew, world.rng.stream("muster"), ship_name=ship.name)
         ship.extra["routine"] = Routine(ship.extra["crew"], world.clock)
+        # The watch bill reads the ship's time (spec M3 §3).
+        ship.extra["evolutions"].clock = world.clock
     return world
 
 

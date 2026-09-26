@@ -169,7 +169,7 @@ For an instance with assigned hands `H`, wanting `n` hands at rating `r`:
 ```
 numbers  = max(1, n / len(H))                          # never faster for extra hands in M3
 skill    = mean over H of (reference_skill(r) / skill(h))   # skill for the work: aloft for topmen steps, deck otherwise
-fatigue  = 1 + FATIGUE_WEIGHT * mean over H of h.fatigue    # FATIGUE_WEIGHT = 0.5 to start (soft, per the owner)
+fatigue  = 1 + FATIGUE_WEIGHT * max(0, mean over H of h.fatigue - FATIGUE_FRESH)   # 0.5 and 0.05: soft, per the owner; under 0.05 a hand is fresh
 crew_factor = numbers * skill * fatigue
 ```
 
