@@ -127,6 +127,11 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
             f"'{verb_phrase}' is a console command, not an order to the ship; "
             f"the ship takes orders such as 'set the topsails' or 'steer south-west'."
         )
+    if spec.level == "2":
+        raise OrderError(
+            f"'{verb_phrase}' is a sentence of the standing dialect, not a plain order: "
+            f'standing order "night routine": at sunset then take in the royals.'
+        )
     rest = words[len(verb_phrase.split()) :]
     canvas: dict[str, Any] = {}
     if verb in CANVAS_VERBS:

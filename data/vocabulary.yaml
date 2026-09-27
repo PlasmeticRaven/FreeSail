@@ -385,6 +385,42 @@ verbs:
     synonyms: [take in sail, reduce sail, snug her down]
     object: none
     level: 1
+  # The standing dialect (milestone 4, spec M4 §3): level 2 of the control ladder.
+  # `standing order "name": <trigger> [, if <condition>] then <order> [; <order>]` and
+  # the book's orders. `orders.handle` hands these to `freesail.standing.grammar` before
+  # the imperative parser sees them; they are listed here so that completion, the
+  # spelling hints and the verb table know the words.
+  standing order:
+    synonyms: []
+    object: standing
+    level: 2
+  standing orders:
+    synonyms: [the standing orders, list the standing orders, show the standing orders]
+    object: standing
+    level: 2
+  show standing order:
+    synonyms: [show the standing order]
+    object: standing
+    level: 2
+  belay standing order:
+    synonyms: [belay the standing order, cancel standing order, cancel the standing order]
+    object: standing
+    level: 2
+  resume standing order:
+    synonyms: [resume the standing order]
+    object: standing
+    level: 2
+  belay all standing orders:
+    synonyms: [belay the standing orders, belay every standing order, cancel all standing orders]
+    object: standing
+    level: 2
+  # Reading a file of standing orders is the driver's business (it reads the disk): the
+  # console and the server take `read the standing orders from <file>`, and the ship,
+  # should it reach her, says so.
+  read the standing orders from:
+    synonyms: [load the standing orders from, read standing orders from]
+    object: driver
+    level: driver
   # Console and client control. If one of these reaches the ship, the
   # captain typed it at the wrong prompt; say so.
   hold:

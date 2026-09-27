@@ -52,7 +52,16 @@ __all__ = [
 
 
 def handle(ship: Ship, text: str) -> tuple[str, str, dict[str, Any]]:
-    """Carry out one order. Matches `Ship.order_handler`; raises OrderError."""
+    """Carry out one order. Matches `Ship.order_handler`; raises OrderError.
+
+    A sentence of the standing dialect (`standing order "x": ...` and the book's orders,
+    spec M4 §3) is handed to `freesail.standing.grammar`, which reads the trigger and the
+    condition and parses the orders after `then` with this grammar at give time.
+    """
+    from freesail.standing import grammar as standing
+
+    if standing.recognises(text):
+        return standing.handle(ship, text)
     vocab = load_vocabulary()
     order = parse(ship, text, vocab)
     if order.verb in vocab.group_evolutions:

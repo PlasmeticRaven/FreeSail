@@ -31,10 +31,36 @@ DRIVER_COMMANDS = (
     "log",
     "save ",
     "replay ",
+    "read the standing orders from ",
     "help",
     "quit",
 )
 POINT_SHIP_ORDERS = ("steer ", "speed ", "stop")
+
+# The standing dialect (spec M4 §3): the sentences, then the words of a trigger and a
+# condition, then the imperative orders after `then`.
+STANDING_SENTENCES = (
+    'standing order "',
+    "standing orders",
+    'show standing order "',
+    'belay standing order "',
+    'resume standing order "',
+    "belay all standing orders",
+)
+TRIGGER_WORDS = ("when ", "at ", "every ")
+COMPARISON_WORDS = {
+    "speed": ("exceeds ", "is over ", "is under ", "is below "),
+    "direction": ("backs ", "veers ", "is from the "),
+    "angle_on_bow": ("is forward of ", "is abaft ", "is abaft the beam", "is forward of the beam"),
+    "compass": ("is east of ", "is west of ", "is "),
+    "angle": ("exceeds ", "is over ", "is under "),
+    "watch": ("is the ", "is not the "),
+    "bells": ("is eight bells", "is four bells"),
+    "daylight": ("is night", "is day", "is not night"),
+    "sail": ("is shaking", "is aback", "is set", "is furled", "is blown out", "is not set"),
+    "strain": ("exceeds the rating", "is straining"),
+    "hands": ("are worn out", "are tired", "are fresh", "exceeds "),
+}
 
 
 @lru_cache(maxsize=1)
@@ -171,6 +197,11 @@ def suggestions(ship: Any, text: str, limit: int = 12) -> list[str]:
     if typed.startswith("send") and not typed.startswith("send down"):
         return _send(ship, text, typed, limit)
 
+    # the standing dialect: its sentences, then a trigger, a reading, a comparison, and
+    # the plain orders after "then"
+    if typed.startswith("standing order ") and not typed.startswith("standing orders"):
+        return _standing(ship, text, typed, limit)
+
     # which verb phrase, if any, has been typed in full?
     matched: str | None = None
     for phrase in vocab.verb_phrases:  # longest first
@@ -187,10 +218,12 @@ def suggestions(ship: Any, text: str, limit: int = 12) -> list[str]:
                 else phrase
             )
         offer("send the ")
-        for c in DRIVER_COMMANDS:
+        for c in STANDING_SENTENCES + DRIVER_COMMANDS:
             offer(c)
         # the verbs' own names before their synonyms, then the shortest first
-        return sorted(out, key=lambda s: (normalise(s) not in vocab.verbs, len(s), s))[:limit]
+        return sorted(out, key=lambda s: (normalise(s.rstrip('"')) not in vocab.verbs, len(s), s))[
+            :limit
+        ]
 
     verb = vocab.phrase_to_verb[normalise(matched)]
     spec = vocab.verbs[verb]
@@ -260,6 +293,77 @@ def _sets_hands_to_work(order: str) -> bool:
                 verb in vocab.group_evolutions or isinstance(vocab.evolutions.get(verb), str)
             )
     return False
+
+
+def _standing(ship: Any, text: str, typed: str, limit: int) -> list[str]:
+    """Completions inside `standing order "name": <trigger> [, if ...] then <orders>`."""
+    from freesail.api import readings as R
+
+    raw = " ".join(text.split())
+    quotes = [i for i, ch in enumerate(raw) if ch in "\"'“”‘’"]
+    if len(quotes) < 2:
+        return []  # the name is the player's to type
+    after = raw[quotes[1] + 1 :]
+    if ":" not in after:
+        return [raw[: quotes[1] + 1] + ": "] if not after.strip() else []
+    head = raw[: raw.index(":", quotes[1]) + 1] + " "
+    body = after[after.index(":") + 1 :].lstrip()
+    lower = body.lower()
+    out: list[str] = []
+
+    def offer(c: str) -> None:
+        cand = head + c
+        if normalise(cand).startswith(typed) and normalise(cand) != typed and cand not in out:
+            out.append(cand)
+
+    if " then " in f" {lower} " or lower.endswith(" then") or lower == "then":
+        k = lower.rfind("then")
+        before, inner = body[: k + 4], body[k + 4 :]
+        if ";" in inner:
+            before, inner = before + inner[: inner.rindex(";") + 1], inner[inner.rindex(";") + 1 :]
+        inner = inner.lstrip()
+        lead = head + before + " "
+        orders = suggestions(ship, inner + (" " if text.endswith(" ") and inner else ""), limit)
+        return [lead + o for o in orders if not o.startswith(STANDING_SENTENCES)][:limit]
+    if not body:
+        for t in TRIGGER_WORDS:
+            offer(t)
+        return out[:limit]
+    words = lower.split()
+    if words[0] == "at":
+        for e in R.EVENTS:
+            offer(f"at {e} then ")
+        return out[:limit]
+    if words[0] == "every":
+        for i in ("glass", "hour", "watch", "20 minutes"):
+            offer(f"every {i} then ")
+        return out[:limit]
+    # when ..., or ", if ...": the reading, then its comparisons, then "for" or "then"
+    prefix = body
+    tail = lower.split(" and ")[-1].split(" if ")[-1]
+    tail = tail[5:] if tail.startswith("when ") else tail
+    readings = [w for w in R.REGISTRY.words() if "<" not in w]
+    if hasattr(ship, "sails"):
+        readings += [f"the {resolve.display_name(ship, s)}" for s in ship.sails]
+    matched = next((w for w in readings if tail.startswith(w + " ") or tail == w), None)
+    if matched is None:
+        stem = body[: len(body) - len(tail)] if tail else body
+        for w in readings:
+            offer(stem + w + " ")
+        return out[:limit]
+    rows = R.REGISTRY.by_words(matched) or [R.REGISTRY.get("sail"), R.REGISTRY.get("strain")]
+    said = tail[len(matched) :].strip()
+    stem = body[: len(body) - len(tail) + len(matched)] + " "
+    if not said or not any(
+        said.startswith(c.strip()) for r in rows for c in COMPARISON_WORDS.get(r.kind, ())
+    ):
+        for r in rows:
+            for c in COMPARISON_WORDS.get(r.kind, ()):
+                offer(stem + c)
+        return out[:limit]
+    for ending in (" then ", " and ", " for 2 minutes then "):
+        offer(prefix.rstrip() + ending)
+    return out[:limit]
 
 
 def _send(ship: Any, text: str, typed: str, limit: int) -> list[str]:

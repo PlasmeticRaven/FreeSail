@@ -19,10 +19,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from freesail import units
+from freesail.api import readings
 from freesail.core.world import World
 from freesail.crew import bill
-from freesail.crew.model import Crew, Sailor, Station, Watch
+from freesail.crew.model import Crew, Station, Watch
 from freesail.physics.sails import SAIL_CLASSES
 from freesail.ship.graph import Ship
 from freesail.ship.parts import Line, Sail, SailState, Spar, sail_room
@@ -40,30 +40,25 @@ def _sail_state(s: Sail) -> str:
     return "wrecked" if s.wrecked else s.state.value
 
 
-def _bell(world: World) -> dict[str, Any]:
-    """The last bell struck: watch name, bells, and whether it is striking now."""
-    t = world.clock.ship_time
-    start_hour, watch = units.watch_of(t)
-    half_hours = (t.hour - start_hour) * 2 + t.minute // 30
-    if half_hours == 0:
-        bells = 4 if watch == "Last dog watch" else 8
-    else:
-        bells = half_hours
-    return {"watch": watch, "bells": bells, "striking": units.bells_at(t) is not None}
-
-
 def snapshot(world: World) -> dict[str, Any]:
-    """The state a view redraws from. SI units; see spec §9.4."""
+    """The state a view redraws from. SI units; see spec §9.4.
+
+    The instrument values (the wind, the apparent wind, the heading, the speed, the
+    leeway, the heel, the helm, the bell, each sail's state and every part's strain)
+    come through the readings registry (`World.readings`, spec M4 §2), the same view a
+    standing order tests and an agent asks for. The shape the client sees is unchanged.
+    """
     ship = world.ship
     wind = world.wind
+    r = world.readings
     out: dict[str, Any] = {
         "tick": world.clock.tick,
         "ship_time": world.clock.ship_time.isoformat(),
         "stamp": world.clock.stamp(),
-        "bell": _bell(world),
+        "bell": dict(r["time"]),
         "wind": {
-            "true_from": wind.direction_from,
-            "true_speed": wind.effective_speed,
+            "true_from": r["true_wind_from"],
+            "true_speed": r["true_wind_speed"],
             "mean_speed": wind.speed,
             "gust_factor": wind.gust_factor,
         },
@@ -74,18 +69,18 @@ def snapshot(world: World) -> dict[str, Any]:
             "name": st.get("name", "point"),
             "x": st.get("x", 0.0),
             "y": st.get("y", 0.0),
-            "heading": st.get("heading", 0.0),
-            "speed_through_water": st.get("speed", 0.0),
-            "leeway": 0.0,
-            "heel": 0.0,
-            "rudder": 0.0,
+            "heading": r["heading"],
+            "speed_through_water": r["speed"],
+            "leeway": r["leeway"],
+            "heel": r["heel"],
+            "rudder": r["helm"],
             "weather_helm": 0.0,
             "tack": "starboard",
             "helm_mode": "heading",
-            "target_heading": st.get("heading", 0.0),
+            "target_heading": r["course"],
         }
-        out["wind"]["apparent_angle"] = 0.0
-        out["wind"]["apparent_speed"] = wind.effective_speed
+        out["wind"]["apparent_angle"] = r["apparent_wind_angle"]
+        out["wind"]["apparent_speed"] = r["apparent_wind_speed"]
         out["sails"] = []
         out["spars"] = []
         out["lines"] = []
@@ -98,28 +93,28 @@ def snapshot(world: World) -> dict[str, Any]:
         "name": ship.name,
         "x": d.x,
         "y": d.y,
-        "heading": d.heading,
-        "speed_through_water": d.speed,
-        "leeway": d.leeway,
-        "heel": d.heel,
-        "rudder": d.rudder,
+        "heading": r["heading"],
+        "speed_through_water": r["speed"],
+        "leeway": r["leeway"],
+        "heel": r["heel"],
+        "rudder": r["helm"],
         "weather_helm": d.weather_helm,
         "tack": d.tack,
         "helm_mode": d.helm_mode.value,
         "target_heading": d.target_heading,
     }
-    out["wind"]["apparent_angle"] = d.apparent_wind_angle
-    out["wind"]["apparent_speed"] = d.apparent_wind_speed
+    out["wind"]["apparent_angle"] = r["apparent_wind_angle"]
+    out["wind"]["apparent_speed"] = r["apparent_wind_speed"]
     out["sails"] = [
         {
             "id": s.id,
             "class": s.cls,
-            "state": _sail_state(s),
+            "state": r.value("sail", s.id)["state"],
             "reefs": s.reefs,
             "area_effective": s.area_effective_m2,
             "thrust": s.thrust_kn,
             "side": s.side_force_kn,
-            "strain_ratio": s.strain_ratio,
+            "strain_ratio": r.value("strain", s.id),
             "backed": s.backed,
             "shivering": s.shivering,  # a studding sail too near the wind (spec 3b §7)
             "sheet_angle": s.sheet_angle,
@@ -132,7 +127,7 @@ def snapshot(world: World) -> dict[str, Any]:
             "class": s.cls,
             "state": _spar_state(s),
             "condition": s.condition,
-            "strain_ratio": s.strain_ratio,
+            "strain_ratio": r.value("strain", s.id),
             "brace_angle": s.brace_angle,
             "rigged_out": s.rigged_out,  # studding sail booms (spec 3b §7); true for the rest
         }
@@ -143,7 +138,7 @@ def snapshot(world: World) -> dict[str, Any]:
             "id": ln.id,
             "class": ln.cls,
             "state": ln.state.value,
-            "strain_ratio": ln.strain_ratio,
+            "strain_ratio": r.value("strain", ln.id),
             "hauled": ln.hauled,
         }
         for ln in ship.lines.values()
@@ -235,20 +230,15 @@ def ship_graph(ship: Ship) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 # Fatigue means are given to three places: finer than the eye can use, coarse enough that a
-# snapshot does not change every tick for a hand standing idle.
-FATIGUE_DECIMALS = 3
+# snapshot does not change every tick for a hand standing idle. The constant lives with the
+# readings (spec M4 §2), which the `hands on deck` reading and this snapshot share.
+FATIGUE_DECIMALS = readings.FATIGUE_DECIMALS
 
 
 def _crew(world: World) -> Crew | None:
     extra = getattr(world.ship, "extra", None) or {}
     crew = extra.get("crew")
     return crew if isinstance(crew, Crew) else None
-
-
-def _mean_fatigue(sailors: list[Sailor]) -> float:
-    if not sailors:
-        return 0.0
-    return round(sum(s.fatigue for s in sailors) / len(sailors), FATIGUE_DECIMALS)
 
 
 def _at_work(world: World) -> list[dict[str, Any]]:
@@ -274,18 +264,18 @@ def crew_state(world: World) -> dict[str, Any] | None:
         return None
     when = world.clock
     deck = bill.on_deck(crew, when)
-    below = bill.below(crew, when)
     turned = sorted(
         {s.watch.value for s in crew.sailors if s.turned_up and s.watch is not Watch.NONE}
     )
+    r = world.readings  # the hands' count and fatigue are readings (spec M4 §2)
     return {
         "watch_on_deck": bill.watch_on_deck(crew, when).value,
-        "on_deck": len(deck),
+        "on_deck": r["hands_on_deck"]["count"],
         "idle": sum(1 for s in deck if s.at is None),
         "at_work": _at_work(world),
         "all_hands": crew.all_hands_called,
-        "fatigue_mean_on_deck": _mean_fatigue(deck),
-        "fatigue_mean_below": _mean_fatigue(below),
+        "fatigue_mean_on_deck": r["hands_on_deck"]["fatigue"],
+        "fatigue_mean_below": r["watch_below"]["fatigue"],
         "idlers_up": bill.idlers_up(when),
         "turned_up": turned,
     }
