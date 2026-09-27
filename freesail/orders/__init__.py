@@ -56,12 +56,18 @@ def handle(ship: Ship, text: str) -> tuple[str, str, dict[str, Any]]:
 
     A sentence of the standing dialect (`standing order "x": ...` and the book's orders,
     spec M4 §3) is handed to `freesail.standing.grammar`, which reads the trigger and the
-    condition and parses the orders after `then` with this grammar at give time.
+    condition and parses the orders after `then` with this grammar at give time. A
+    sentence to an agent's station (spec M4 §12) is handed to `freesail.orders.stations`.
     """
+    from freesail.orders import stations
     from freesail.standing import grammar as standing
 
     if standing.recognises(text):
         return standing.handle(ship, text)
+    if stations.recognises(text, ship):
+        # a sentence to an agent's station (spec M4 §12): `ask the watcher ...`, `stand
+        # down the watcher`, `resume the watcher`, `show the watcher's journal`
+        return stations.handle(ship, text)
     vocab = load_vocabulary()
     order = parse(ship, text, vocab)
     if order.verb in vocab.group_evolutions:

@@ -131,6 +131,8 @@ main {
 .entry.kind-order-accepted, .entry.kind-order-rejected { color: var(--ink); }
 .entry.kind-order-rejected { font-style: italic; }
 .entry.kind-client-note { font-style: italic; }
+.entry .station { font-weight: 600; }
+.entry.kind-agent-note, .entry.kind-agent-said { font-style: italic; }
 .entry.rollup { display: block; color: var(--routine); }
 .entry.rollup summary { cursor: pointer; font-style: italic; }
 .entry.rollup > div { padding-left: 2ch; }

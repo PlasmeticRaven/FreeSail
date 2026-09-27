@@ -60,6 +60,27 @@ JournalEntry = tuple[int, str, str]  # (tick, actor, order text)
 # writes it and the World knows a firing by it.
 STANDING_ACTOR_PREFIX = "standing order "
 
+# The log kinds an agent's harness writes (spec M4 §11, §12), listed in one place. Every
+# one is written by `freesail.agents.harness` (or by a tool it runs) with the actor
+# "the <station>", and the text of a note or an answer opens with the station's mark,
+# "[watcher] ...", inline in the log (owner's ruling).
+AGENT_LOG_KINDS: tuple[str, ...] = (
+    "agent.stationed",  # an agent took a station; its policy in words
+    "agent.note",  # the free text of a reply: the watcher's narration, routine
+    "agent.said",  # an `answer` to an `ask`, notable
+    "agent.asked",  # the captain's `ask the <station> ...` (an order, journaled)
+    "agent.stand_down",  # the captain's `stand down the <station>` (an order, journaled)
+    "agent.resume",  # the captain's `resume the <station>` (an order, journaled)
+    "agent.refused",  # a tool call the station's authority does not allow
+    "agent.stood_by",  # `stand_by(until=...)`: sampling suspended until the event or the bells
+    "agent.resumed",  # sampling taken up again, after standing by or a pause
+    "agent.nudged",  # the welfare detector fired once: the model told what was seen
+    "agent.paused",  # the pattern went on: sampling paused, the human asked
+    "agent.stopped",  # stood down: by the captain, or unattended past the bound
+    "agent.opted_out",  # the token seen, or `opt_out` called
+)
+# `show the <station>'s journal` is answered as `query.journal`, a query like `state`.
+
 
 class World:
     WIND_SHIFT_LOG_THRESHOLD = 2 * units.POINT
@@ -108,6 +129,17 @@ class World:
         self.standing = Runtime(self)
         if getattr(self.ship, "extra", None) is not None:
             self.ship.extra["standing"] = self.standing
+        # The agents at their stations (spec M4 §11), by station name, in the order they
+        # were stationed: each is a `freesail.agents.harness.Harness`, called after the
+        # standing orders on every tick (`on_tick`) and after every order (`on_order`, for
+        # `ask`). The orders module reaches them through `ship.extra["agents"]` as it
+        # reaches the book. Journals outlive their agents (a released station's journal
+        # is still shown and saved), so they are kept apart, by station name.
+        self.agents: dict[str, Any] = {}
+        self.agent_journals: dict[str, Any] = {}
+        if getattr(self.ship, "extra", None) is not None:
+            self.ship.extra["agents"] = self.agents
+            self.ship.extra["agent_journals"] = self.agent_journals
         self.record(
             Severity.NOTABLE,
             "world.start",
@@ -228,8 +260,17 @@ class World:
         )
         if kind == "evolution.started" and not data.get("failed"):
             # the evolution runner writes its own "started" line; avoid saying it twice
+            self._after_order()
             return accepted
-        return self.record(Severity.ROUTINE, kind, log_text, actor=actor, data=data)
+        event = self.record(Severity.ROUTINE, kind, log_text, actor=actor, data=data)
+        self._after_order()
+        return event
+
+    def _after_order(self) -> None:
+        """An order was carried out and logged: the agents may act on it now (a question
+        put by `ask` is answered on the tick it was asked, spec M4 §12)."""
+        for agent in list(self.agents.values()):
+            agent.on_order()
 
     # -- time ----------------------------------------------------------------
 
@@ -283,6 +324,9 @@ class World:
         self._tick_sun()
         # the standing orders (spec M4 §4): last, on the tick's settled readings
         self.standing.tick()
+        # the agents (spec M4 §11): after the book, so a sample carries the tick whole
+        for agent in list(self.agents.values()):
+            agent.on_tick()
 
     def run(self, ticks: int) -> None:
         for _ in range(ticks):
@@ -336,4 +380,8 @@ class World:
             # the book of standing orders (spec M4 §3): the orders' text and state, for the
             # reader; a replay re-enters them from the journal
             "standing_orders": self.standing.book.save(),
+            # the agents (spec M4 §11): each station, its policy, its transcript (the
+            # model's replies, which a replay plays back) and its journal
+            "agents": [agent.save() for agent in self.agents.values()],
+            "agent_journals": {name: j.save() for name, j in self.agent_journals.items()},
         }

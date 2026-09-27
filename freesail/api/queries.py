@@ -86,6 +86,7 @@ def snapshot(world: World) -> dict[str, Any]:
         out["lines"] = []
         out["evolutions_in_progress"] = []
         out["crew"] = None
+        out["agents"] = agents_state(world)
         return out
 
     d = ship.dyn
@@ -146,7 +147,14 @@ def snapshot(world: World) -> dict[str, Any]:
     runner = ship.extra.get("evolutions")
     out["evolutions_in_progress"] = list(runner.in_progress()) if runner is not None else []
     out["crew"] = crew_state(world)
+    out["agents"] = agents_state(world)
     return out
+
+
+def agents_state(world: World) -> list[dict[str, Any]]:
+    """The agents at their stations (spec M4 §11): station, state, last sampled, and the
+    question a pause puts to the human. Empty when none is stationed."""
+    return [agent.snapshot() for agent in world.agents.values()]
 
 
 def _spar_entry(s: Spar) -> dict[str, Any]:

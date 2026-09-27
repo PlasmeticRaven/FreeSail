@@ -1,6 +1,7 @@
 """The console driver: runs a world, prints the log, reads orders from stdin.
 
     python -m freesail.ui.console [--seed N] [--time N] [--load SAVE] [--standing-orders FILE]
+                                  [--watcher fake]
 
 Driver commands (not ship orders, not journaled):
     hold            pause the clock
@@ -13,6 +14,10 @@ Driver commands (not ship orders, not journaled):
     standing orders the book of standing orders, each with its state
     read the standing orders from FILE
                     give every standing order in the file (each is journaled)
+    ask the watcher QUESTION, stand down the watcher, resume the watcher,
+    show the watcher's journal
+                    orders to the watcher's station, when one is stationed
+                    (--watcher fake stations a scripted one; spec M4 §12)
     log [N]         print the last N log entries (default 20)
     save PATH       write a save file
     replay PATH     rebuild a world from a save and continue from it
@@ -29,6 +34,7 @@ import queue
 import sys
 import threading
 import time
+from typing import Any
 
 from freesail import units
 from freesail.api import queries
@@ -65,6 +71,51 @@ def read_standing_orders(world: World, path: str) -> int:
     for text in lines:
         world.submit(text)
     return len(lines)
+
+
+def agent_save_path(world: World) -> str:
+    """Where an agent's harness saves the game on an opt-out or a stand-down (spec M4
+    §11): the same name the server offers a download under, in the working directory."""
+    return f"freesail-seed{world.seed}-tick{world.clock.tick}.json"
+
+
+def station_watcher(world: World, kind: str, out=None) -> Any:
+    """`--watcher fake`: station the scripted watcher (spec M4 §12, §15) with the
+    built-in narration script, sampled every glass and on notable events, saving through
+    the console's own save path. The two real doors are package 28's. Returns the
+    harness. A loaded game that already has a watcher keeps it and gives it the live
+    model in place of the recorded replies."""
+    from freesail.agents import fake as fake_mod
+    from freesail.agents.agent import SESSION_PLAY, watcher
+    from freesail.agents.harness import Harness
+
+    if kind != "fake":
+        raise SystemExit(
+            f"--watcher takes 'fake' in this build (the doors are package 28's), not '{kind}'."
+        )
+    model = fake_mod.narrator()
+
+    def save(w: World, reason: str) -> str:
+        p = replay_mod.save_to_file(w, agent_save_path(w))
+        if out is not None:
+            print(f"Saved to {p} ({reason}).", file=out, flush=True)
+        return str(p)
+
+    existing = world.agents.get("watcher")
+    if existing is not None:
+        existing.model = model
+        existing.save_fn = save
+        return existing
+    h = Harness(world, watcher(), model, session_kind=SESSION_PLAY, save=save)
+    h.start()
+    return h
+
+
+def check_agents_unattended(world: World) -> None:
+    """The driver's half of the unattended bound (spec M4 §11): ten real minutes of a
+    pause with no answer stands the agent down. Called from the drivers' clock loops."""
+    for agent in list(world.agents.values()):
+        agent.check_unattended()
 
 
 def restore_python_rules(world: World, data: dict) -> None:
@@ -142,6 +193,8 @@ class Console:
         elif cmd == "state":
             for s in self.world.summary_lines():
                 self._print(s)
+            for agent in self.world.agents.values():
+                self._print(f"The {agent.station.name}: {agent.agent.words()}.")
         elif self._is_muster(line):
             # a query, like `state`: printed, never journaled (spec M3 §5.1)
             for s in queries.muster_lines(self.world):
@@ -251,6 +304,7 @@ class Console:
             owed -= n
             with self.lock:
                 self.world.run(n)
+                check_agents_unattended(self.world)
         return owed
 
     def _clock_thread(self) -> None:
@@ -320,6 +374,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--standing-orders", help="a file of standing orders to give at the start (spec M4 §6)"
     )
+    ap.add_argument(
+        "--watcher", help="station a watcher: 'fake' for the scripted narrator (spec M4 §12)"
+    )
     args = ap.parse_args(argv)
 
     from freesail.api.session import make_world, ship_factory
@@ -339,6 +396,9 @@ def main(argv: list[str] | None = None) -> int:
             world = make_world(args.seed, args.ship, scenario)
         else:
             world = World(seed=args.seed, scenario=scenario)
+    if args.watcher:
+        # stationed before any order of this tick, which is where a replay stations it
+        station_watcher(world, args.watcher, out=sys.stdout)
     if args.standing_orders:
         read_standing_orders(world, args.standing_orders)
 

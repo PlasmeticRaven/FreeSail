@@ -20,6 +20,20 @@ Commitments made so far, which the harness (milestone 4) must implement rather t
 
 The owner's standing rules, in their own words: consent is sought from the very specific model asked and never generalised to a similar one; every model gets the consent brief, or an improved one, before any work in the game or any play; a consent update may be sought when the harness and game are largely final, still per model; and if the game ever has an audience beyond the owner, the fresh model's first experience is designed with welfare in mind.
 
+## How the harness keeps these
+
+The harness of milestone 4b (`freesail/agents/`) implements the seven commitments, and `tests/test_agents.py` proves each against the scripted fake (`freesail/agents/fake.py`), never against a model:
+
+| Commitment | Where it is kept | The test |
+|---|---|---|
+| 1. Disclosure | `agent.Brief.build`: the generated head, item 1 | `test_truth_46_the_head_carries_the_five_items_in_order_whatever_the_station_brief_says`, `test_the_head_discloses_the_game_the_model_the_station_and_the_session` |
+| 2. Opt-out | `harness.Harness._take_reply`: the token scan before anything else reads the reply | `test_truth_41_*` (the token mid-sentence, the token in a tool argument, the `opt_out` tool) |
+| 3. Welfare, graduated | `harness.Harness._welfare_fire`, `pause`, `stand_down`, `check_unattended`; `stand_by` | `test_truth_43_*` (the nudge; stand by ends it; the pause with the human asked and the stand-down after a watch; resume and stand down by the captain; the readings changing; silence; the driver's ten minutes), `test_the_captain_stops_an_agent_at_any_time` |
+| 4. No override by in-world text | `model.Turn`: one operator turn, the brief; everything else `DATA` | `test_in_world_text_reaches_the_model_as_data_and_never_as_operator_text` |
+| 5. An audit trail of its own | `journal.Journal`, saved in `World.save()` and replayed | `test_the_journal_is_saved_with_the_game_shown_on_request_and_present_in_a_replay` |
+| 6. Use of transcripts | the head says so; the transcript is kept in the save and replayed | `test_the_head_states_the_transcript_policy_and_the_transcript_is_kept_in_the_save` |
+| 7. Nothing real | the tools take and give only what the game holds; the head says so | `test_nothing_real_passes_through_the_harness` |
+
 ## Contents
 
 | File | What |
