@@ -1120,6 +1120,13 @@ def test_the_reply_syntax_reads_text_and_tool_calls():
     )
     assert r.raw is not None and OPT_OUT_TOKEN not in r.surface()
     assert repl_mod.parse_reply("").is_silent
+    # a person's slip: the tool's name without the '>' is still the call (the owner's
+    # first practice run typed `answer text="Yes."` and was shown it back as text)
+    slip = repl_mod.parse_reply('answer text="Yes."')
+    assert slip.calls == (ToolCall("answer", {"text": "Yes."}),) and slip.text == ""
+    # but a sentence that happens to begin with a tool's name is text
+    prose = repl_mod.parse_reply("state of the sails looks fine")
+    assert prose.calls == () and prose.text == "state of the sails looks fine"
 
 
 def test_the_repl_model_prints_the_brief_once_and_each_sample_and_reads_replies():

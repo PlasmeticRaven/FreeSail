@@ -69,7 +69,15 @@ from freesail.agents.model import MODEL, OPERATOR, Reply, ToolCall, Turn
 from freesail.core import replay as replay_mod
 from freesail.core.world import Scenario, World
 
-__all__ = ["REPL_RUNTIME", "Repl", "REPLY_SYNTAX", "parse_reply", "render_turn", "main"]
+__all__ = [
+    "REPL_RUNTIME",
+    "REPLY_HINT",
+    "Repl",
+    "REPLY_SYNTAX",
+    "parse_reply",
+    "render_turn",
+    "main",
+]
 
 # The runtime a consent record names for this door.
 REPL_RUNTIME = "the REPL door of FreeSail's harness (text at a terminal, one reply a turn)"
@@ -81,7 +89,17 @@ EXIT_NO_CONSENT = 5  # no yes on record: the run stops
 REPLY_SYNTAX = (
     "Replies are typed as text; a tool call goes on its own line beginning with '>' "
     "and the tool's name, then its arguments as name=value with a value in quotes when "
-    'it has spaces: > submit_order text="set the jib". A blank line ends the reply.'
+    'it has spaces: > submit_order text="set the jib" (a line that begins with a tool\'s '
+    "name and carries only name=value words is taken as the call even without the '>'). "
+    "Nothing is sent until a blank line: type the reply, then press return on an empty "
+    "line to send it."
+)
+
+# Printed before every reply is read, so that a person at the terminal is never left to
+# guess the two rules (the owner's first practice run, 2026-09-27, stumbled on both).
+REPLY_HINT = (
+    "Type your reply, then a blank line to send it. A tool call is a line beginning "
+    'with >, such as > answer text="yes" or > readings.'
 )
 
 STATIONS = {"watcher": watcher}
@@ -147,14 +165,28 @@ def _quote(v: Any) -> str:
     return shlex.quote(s) if (" " in s or not s) else s
 
 
+def _looks_like_a_call(line: str) -> bool:
+    """A line that names a tool and carries only name=value words after it is a tool
+    call without the '>' (a person's slip the door forgives; `answer text="Yes."`)."""
+    from freesail.agents.tools import TOOLS
+
+    try:
+        words = shlex.split(line)
+    except ValueError:
+        words = line.split()
+    if not words or words[0] not in TOOLS:
+        return False
+    return all("=" in w for w in words[1:])
+
+
 def parse_reply(text: str) -> Reply:
     """The reply syntax of the module docstring: text lines, and `> tool k=v` lines."""
     lines: list[str] = []
     calls: list[ToolCall] = []
     for raw in text.splitlines():
         line = raw.rstrip("\n")
-        if line.lstrip().startswith(">"):
-            body = line.lstrip()[1:].strip()
+        if line.lstrip().startswith(">") or _looks_like_a_call(line.strip()):
+            body = line.lstrip().lstrip(">").strip()
             if not body:
                 continue
             try:
@@ -198,6 +230,7 @@ class Repl:
         self.show_new(turns)
         if self.closed:
             return None
+        print(REPLY_HINT, file=self.out, flush=True)
         print(self.prompt, end="", file=self.out, flush=True)
         lines: list[str] = []
         while True:

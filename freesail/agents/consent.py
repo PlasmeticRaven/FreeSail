@@ -109,10 +109,11 @@ DOOR_TEXT = {
         "nothing is decided until you call answer."
     ),
     "repl": (
-        "This conversation is at a terminal, one reply a turn. You answer with the answer "
-        'tool, the only tool here, on a line of its own: > answer text="...". Anything else '
-        "you write is shown to me, and I reply before you answer; nothing is decided until "
-        "you call answer."
+        "This conversation is at a terminal, one reply a turn: type, then send with a blank "
+        "line. You answer with the answer tool, the only tool here, on a line of its own: "
+        '> answer text="yes, ..." (the > may be left off when the line begins with the '
+        "tool's name). Anything else you write is shown to me, and I reply before you "
+        "answer; nothing is decided until you call answer."
     ),
     "mcp": (
         "Through Claude Desktop the harness sees only tool calls, not the text of the chat. "
