@@ -12,3 +12,6 @@ saves/
 .DS_Store
 Thumbs.db
 .claude/
+# the harness's saves on an opt-out or a stand-down, written in the working directory
+freesail-seed*-tick*.json
+day.json
