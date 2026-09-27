@@ -1,8 +1,9 @@
 """The agent model, the tools, the harness loop, the watcher and `ask` (spec M4 §11, §12,
 §15, §16), every one proven against the scripted fake and never against a model.
 
-Truths 41 to 46 are here (package 28 moves them into `test_known_truths.py` if the style
-fits), and each commitment of `docs/agents/README.md` has its test:
+Truths 41 to 46 are here, beside the helpers they share (`tests/test_known_truths.py`
+points to them, as it does for truths 39 and 40; truth 47, the consent step, is there),
+and each commitment of `docs/agents/README.md` has its test:
 
 1. disclosure: `test_truth_46_...`,
    `test_the_head_discloses_the_game_the_model_the_station_and_the_session`
@@ -1143,7 +1144,7 @@ def test_the_repl_turn_mode_drives_a_game_one_process_at_a_time(tmp_path):
     save = tmp_path / "state.json"
     sample = tmp_path / "next.txt"
     replyf = tmp_path / "reply.txt"
-    common = ["--seed", "7", "--station", "watcher", "--every", "60", "--turn"]
+    common = ["--seed", "7", "--station", "watcher", "--every", "60", "--turn", "--human"]
     common += ["--save", str(save), "--sample", str(sample)]
     # turn 1: a new world; the brief and the first sample come back, the game is saved
     assert repl_mod.main(common) == 0

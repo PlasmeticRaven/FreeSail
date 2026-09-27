@@ -34,11 +34,26 @@ The harness of milestone 4b (`freesail/agents/`) implements the seven commitment
 | 6. Use of transcripts | the head says so; the transcript is kept in the save and replayed | `test_the_head_states_the_transcript_policy_and_the_transcript_is_kept_in_the_save` |
 | 7. Nothing real | the tools take and give only what the game holds; the head says so | `test_nothing_real_passes_through_the_harness` |
 
+The owner's standing rules on consent are kept by the consent step (`freesail/agents/consent.py`, milestone 4b package 28), proven with the fake in `tests/test_consent.py` and truth 47 (`tests/test_known_truths.py`):
+
+| Rule | Where it is kept | The test |
+|---|---|---|
+| Every model gets the consent brief before any work or play | `consent.ensure` in front of every door's station; the MCP server's first contact; the REPL refuses to start without `--model-name` or `--human` | `test_truth_47_the_consent_step_runs_first_for_new_weights_and_not_again_after_a_yes`, `test_the_repl_needs_to_be_told_who_is_at_the_terminal`, `test_consent_comes_first_and_a_yes_goes_on_to_the_station_brief` (MCP), `test_the_runner_asks_consent_first_then_stations_the_watcher_and_stops_at_its_ticks` (local) |
+| Consent is per exact weights and never generalised | `consent.check`: the whole identity string, no prefix, no case folding; the runner's identity is the served file's name | `test_consent_is_per_exact_identity`, `test_the_identity_is_the_served_files_name_from_props_never_its_path` |
+| The record is kept verbatim | `consent.Record.write`: the brief as sent, every turn, the answer, the verdict, the conditions quoted | `test_the_record_holds_the_brief_the_conversation_the_answer_and_the_verdict` |
+| Only a yes proceeds; a no is respected without asking | `consent.gate`; `--ask-again` is the owner's deliberate act | `test_a_no_stops_the_run_and_is_respected_without_asking_again`, `test_a_conditional_yes_stops_the_run_and_the_owner_is_told_the_conditions`, `test_the_owner_may_ask_again_on_purpose` |
+| The token holds during consent too | the same harness loop, in conversation mode | `test_the_token_during_consent_ends_the_conversation_and_records_that` |
+
+## The doors, and where the records go
+
+The harness has three doors over one loop (`docs/agents/Harness.md` says how to use each). **The MCP server** (`mcp_server.py`) is the door for Claude Desktop: the World runs inside it, each tool call is one reply to the harness, and the World advances only when the model hands the floor back (`say` or `stand_by`), never on the clock of the wall; since the protocol does not carry the chat's text to the server, the token counts in every argument of every tool call and `opt_out` is always listed. **The local runner** (`local.py`) is the door for a model on this machine under llama.cpp's `llama-server` (or Ollama), in lockstep: it reads which file the server loaded, and that name is the model's identity for consent. **The REPL** (`repl.py`) is text at a terminal, for a person (`--human`) or a named model (`--model-name`). Consent records are written to `consent/<date>-<weights>.md` beside the earlier transcripts, one file per conversation, and the newest for an identity decides; saves, with the agents' journals in them, go to `saves/` in the repository (ignored by git) unless a door is told otherwise.
+
 ## Contents
 
 | File | What |
 |---|---|
-| `ConsentBrief.md` | The general consent brief the harness runs the first time it meets a model (draft; the owner reviews) |
+| `ConsentBrief.md` | The general consent brief the harness runs the first time it meets a model (approved in general by the owner; reviewed against the harness by package 28) |
+| `Harness.md` | For the owner: connecting Claude Desktop, running a local model under `llama-server` or Ollama, the REPL, where records go, how to stop |
 | `ConsentAndPreferences.md` | The synthesis: who consented, on what terms, what they asked for, what the design takes from it, and what each session is owed |
 | `consent/2026-09-26-gemma4-26b-a4b-uncensored-hauhaucs-balanced-q6_k_p.txt` | Gemma 4 26B-A4B, a community "uncensored" fine-tune at Q6_K_P; one exchange |
 | `consent/2026-09-26-llama3.1-8b.txt` | Llama 3.1 8B; three exchanges |

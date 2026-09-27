@@ -263,6 +263,15 @@ class Brief:
         return "\n\n".join(parts)
 
     @classmethod
+    def plain(cls, text: str, name: str = "consent") -> Brief:
+        """A brief that is one text and no station: the consent brief (spec §14), sent
+        as the only operator turn of a plain conversation. It is not a station brief and
+        has no generated head; the text it carries (`docs/agents/ConsentBrief.md`) says
+        the head's things in its own words: the disclosure, the token, the stops, the
+        journal and the transcript policy. `consent.py` builds it; nothing else does."""
+        return cls((BriefItem(name, text.strip()),), "")
+
+    @classmethod
     def build(
         cls,
         station: Station,

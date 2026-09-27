@@ -35,6 +35,20 @@ sample, advances the World to the next sampling point (or `--max-ticks`), and wr
 the save and the next sample to the files. The exit code is 0 while the station is
 manned and 3 once it is released (the token, a stand-down), so a driving script knows
 when to stop. Nothing here talks to a model; the text on the streams is the whole door.
+
+**Who is at the terminal** (package 28). Every run says: `--model-name <identity>` for a
+language model (the lead playing through the door is one), or `--human` for a person.
+The owner's rule is that the consent step exempts no model, so a named model meets the
+consent brief (`consent.py`) before any station brief, unless a yes is on record for
+exactly that identity; the record names the runtime as this door. In turn mode the
+consent conversation runs a turn a call like the station: the first call writes the
+brief and the question to `--sample`; each later call takes the model's reply from
+`--reply`. When the model writes something without answering, it is for the owner: the
+call exits 4 with the words in `--sample`, and the owner's reply comes in the next call
+with `--owner-reply FILE`. An answer ends the conversation and writes the record; a yes
+goes straight on to the station's brief and first sample in the same call, anything else
+exits 5 with the reason. A game saved under a named model is continued only while a yes
+is on record for that name.
 """
 
 from __future__ import annotations
@@ -47,6 +61,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any, TextIO
 
+from freesail.agents import consent
 from freesail.agents import harness as harness_mod
 from freesail.agents.agent import A_GLASS_S, SamplingPolicy, Station, watcher
 from freesail.agents.fake import Transcript
@@ -54,7 +69,14 @@ from freesail.agents.model import MODEL, OPERATOR, Reply, ToolCall, Turn
 from freesail.core import replay as replay_mod
 from freesail.core.world import Scenario, World
 
-__all__ = ["Repl", "REPLY_SYNTAX", "parse_reply", "render_turn", "main"]
+__all__ = ["REPL_RUNTIME", "Repl", "REPLY_SYNTAX", "parse_reply", "render_turn", "main"]
+
+# The runtime a consent record names for this door.
+REPL_RUNTIME = "the REPL door of FreeSail's harness (text at a terminal, one reply a turn)"
+
+# Exit codes of turn mode beyond 0 (manned) and 3 (released).
+EXIT_OWNER = 4  # the consent conversation waits for the owner's reply
+EXIT_NO_CONSENT = 5  # no yes on record: the run stops
 
 REPLY_SYNTAX = (
     "Replies are typed as text; a tool call goes on its own line beginning with '>' "
@@ -84,6 +106,9 @@ def render_turn(turn: Turn) -> str:
         ]
         return "== Your reply ==\n" + ("\n".join(lines) or "(nothing)")
     d = turn.content
+    words = harness_mod.conversation_text(d)
+    if words is not None:
+        return f"== From the developer ({d.get('reason', '')}) ==\n{words}"
     if "tool_results" in d:
         out = ["== Tool results (data) =="]
         for res in d["tool_results"]:
@@ -212,6 +237,33 @@ def _new_world(args: argparse.Namespace) -> World:
     return World(seed=args.seed, scenario=scenario)
 
 
+def open_world(
+    target: str | None,
+    seed: int,
+    wind: str | None = None,
+    heading: float | None = None,
+) -> World:
+    """A ship file or a save (a `.json`, replayed), as the console opens them; the doors
+    of package 28 share it. `wind` is 'FROM_DEG,KNOTS'."""
+    from freesail.api.session import make_world, ship_factory
+    from freesail.ui.console import restore_python_rules
+
+    if target and target.lower().endswith(".json"):
+        data = replay_mod.load_file(target)
+        world = replay_mod.replay(data, ship_factory)
+        restore_python_rules(world, data)
+        return world
+    scenario = Scenario()
+    if wind:
+        d, s = wind.split(",")
+        scenario.wind_from_deg, scenario.wind_speed_kn = float(d), float(s)
+    if heading is not None:
+        scenario.ship_heading_deg = heading
+    if target:
+        return make_world(seed, target, scenario)
+    return World(seed=seed, scenario=scenario)
+
+
 def _station(args: argparse.Namespace) -> Station:
     try:
         make = STATIONS[args.station]
@@ -230,9 +282,37 @@ def _save_fn(path: str):
     return save
 
 
+def _consent_note(record: consent.Record | None) -> str:
+    if record is None:
+        return REPLY_SYNTAX
+    where = consent._rel(record.path) if record.path else "docs/agents/consent/"
+    return f"{REPLY_SYNTAX} Consent for this model is on record ({where}, {record.date})."
+
+
 def run_interactive(args: argparse.Namespace, inp: TextIO, out: TextIO) -> int:
     from freesail.api.session import ship_factory
 
+    record = None
+    if args.model_name:
+        record = consent.ensure(
+            args.model_name,
+            REPL_RUNTIME,
+            Repl(inp, out),
+            door="repl",
+            owner=consent.terminal_owner(inp, out),
+            records_dir=Path(args.records),
+            ask_again=args.ask_again,
+            out=out,
+        )
+        if record is None:
+            return EXIT_NO_CONSENT
+    else:
+        print(
+            "A human at the terminal (--human): no consent step. A language model at this door "
+            "is named with --model-name and meets the consent brief first.",
+            file=out,
+            flush=True,
+        )
     model = Repl(inp, out)
     if args.load:
         data = replay_mod.load_file(args.load)
@@ -246,7 +326,11 @@ def run_interactive(args: argparse.Namespace, inp: TextIO, out: TextIO) -> int:
         h = None
     if h is None:
         h = harness_mod.Harness(
-            world, _station(args), model, save=_save_fn(args.save), door_note=REPLY_SYNTAX
+            world,
+            _station(args),
+            model,
+            save=_save_fn(args.save),
+            door_note=_consent_note(record),
         )
         h.start()
     while not h.agent.released and not model.closed:
@@ -254,7 +338,106 @@ def run_interactive(args: argparse.Namespace, inp: TextIO, out: TextIO) -> int:
     if model.closed and not h.agent.released:
         h.stand_down("the terminal closed", by="the terminal")
     model.show_new(h.turns)
+    if h.agent.released:
+        print(f"== The station is released: {h.agent.released_reason}. ==", file=out, flush=True)
     return 3 if h.agent.released else 0
+
+
+def _write_sample(args: argparse.Namespace, text: str) -> None:
+    Path(args.sample).write_text(text.rstrip("\n") + "\n", encoding="utf-8", newline="\n")
+
+
+def _since_last_reply(turns: list[Turn]) -> str:
+    shown = 0
+    for i in range(len(turns) - 1, -1, -1):
+        if turns[i].role == MODEL:
+            shown = i + 1
+            break
+    return "\n\n".join(render_turn(t) for t in turns[shown:])
+
+
+def _consent_turn(args: argparse.Namespace) -> tuple[int | None, str, consent.Record | None]:
+    """Turn mode's consent step for a named model. Returns (an exit code when the step
+    holds the run, else None), words to put before the station's first sample, and the
+    record when it is a yes."""
+    identity = args.model_name
+    records_dir = Path(args.records)
+    state = None
+    if args.load:
+        loaded = json.loads(Path(args.load).read_text(encoding="utf-8"))
+        state = loaded.get("consent") if isinstance(loaded, dict) else None
+    if state is None:
+        record = (
+            None if (args.ask_again and not args.load) else consent.check(identity, records_dir)
+        )
+        if record is not None or args.load:
+            ok, words = consent.gate(record, identity)
+            if ok:
+                return None, "", record
+            _write_sample(args, f"== {words} ==")
+            return EXIT_NO_CONSENT, "", None
+        state = {"identity": identity, "replies": [], "owner_replies": []}
+    if state.get("identity") != identity:
+        raise SystemExit(
+            f"The save holds the consent conversation with {state.get('identity')}, not "
+            f"{identity}; consent is never carried from one model to another."
+        )
+    if state.get("done"):
+        _write_sample(args, f"== {state['done']} ==")
+        return EXIT_NO_CONSENT, "", None
+    replies = [Reply.from_dict(r) for r in state["replies"]]
+    owner_replies = list(state["owner_replies"])
+    conv = consent.Conversation(
+        identity, REPL_RUNTIME, Transcript(replies), door="repl", records_dir=records_dir
+    )
+    conv.begin()
+    queue = list(owner_replies)
+    while conv.outcome is None and conv.waiting == consent.OWNER_TURN and queue:
+        conv.owner_says(queue.pop(0))
+    note = ""
+    if conv.outcome is None and conv.waiting == consent.MODEL_TURN and args.reply:
+        new = parse_reply(Path(args.reply).read_text(encoding="utf-8"))
+        replies.append(new)
+        conv.deliver(new)
+    elif conv.outcome is None and conv.waiting == consent.OWNER_TURN and args.owner_reply:
+        text = Path(args.owner_reply).read_text(encoding="utf-8").strip()
+        owner_replies.append(text)
+        conv.owner_says(text)
+    elif args.load and (args.reply or args.owner_reply):
+        whose = (
+            "the owner's (--owner-reply)"
+            if conv.waiting == consent.OWNER_TURN
+            else ("the model's (--reply)")
+        )
+        note = f"\n\n== That reply was not taken: the turn is {whose}. =="
+    state = {
+        "identity": identity,
+        "replies": [r.to_dict() for r in replies],
+        "owner_replies": owner_replies,
+    }
+    if conv.outcome is not None:
+        ok, words = consent.gate(conv.outcome, identity)
+        if ok:
+            return None, f"== {words} ==", conv.outcome
+        state["done"] = words
+        Path(args.save).write_text(
+            json.dumps({"consent": state}, indent=1) + "\n", encoding="utf-8", newline="\n"
+        )
+        _write_sample(args, f"{_since_last_reply(conv.turns)}\n\n== {words} ==")
+        return EXIT_NO_CONSENT, "", None
+    Path(args.save).write_text(
+        json.dumps({"consent": state}, indent=1) + "\n", encoding="utf-8", newline="\n"
+    )
+    if conv.waiting == consent.OWNER_TURN:
+        _write_sample(
+            args,
+            "== The model has written this and has not answered; it is for the owner ==\n"
+            f"{conv.model_words}\n\n== The run waits for the owner's reply: call again with "
+            f"--owner-reply FILE ==" + note,
+        )
+        return EXIT_OWNER, "", None
+    _write_sample(args, _since_last_reply(conv.turns) + note)
+    return 0, "", None
 
 
 def run_turn(args: argparse.Namespace) -> int:
@@ -262,6 +445,13 @@ def run_turn(args: argparse.Namespace) -> int:
 
     if not args.save or not args.sample:
         raise SystemExit("Turn mode needs --save STATE.json and --sample NEXT.txt.")
+    before, record = "", None
+    if args.model_name:
+        code, before, record = _consent_turn(args)
+        if code is not None:
+            return code
+        if before:  # the yes came in this call: the station starts afresh
+            args.load, args.reply = None, None
     if args.load:
         data = replay_mod.load_file(args.load)
         new_reply = None
@@ -282,7 +472,11 @@ def run_turn(args: argparse.Namespace) -> int:
     else:
         world = _new_world(args)
         h = harness_mod.Harness(
-            world, _station(args), Transcript([]), save=_save_fn(args.save), door_note=REPLY_SYNTAX
+            world,
+            _station(args),
+            Transcript([]),
+            save=_save_fn(args.save),
+            door_note=_consent_note(record),
         )
         h.start()
     ticks = 0
@@ -290,17 +484,14 @@ def run_turn(args: argparse.Namespace) -> int:
         world.tick()
         ticks += 1
     replay_mod.save_to_file(world, args.save)
-    shown = 0
-    for i in range(len(h.turns) - 1, -1, -1):
-        if h.turns[i].role == MODEL:
-            shown = i + 1
-            break
-    text = "\n\n".join(render_turn(t) for t in h.turns[shown:])
+    text = _since_last_reply(h.turns)
+    if before:
+        text = f"{before}\n\n{text}"
     if h.agent.released:
         text += f"\n\n== The station is released: {h.agent.released_reason}. =="
     elif h.open_sample is None:
         text += f"\n\n== No sampling point within {args.max_ticks} ticks; call again to go on. =="
-    Path(args.sample).write_text(text + "\n", encoding="utf-8", newline="\n")
+    _write_sample(args, text)
     return 3 if h.agent.released else 0
 
 
@@ -318,7 +509,20 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--reply", help="turn mode: the file holding this turn's reply")
     ap.add_argument("--sample", help="turn mode: where to write the next sample")
     ap.add_argument("--max-ticks", type=int, default=harness_mod.WELFARE_UNATTENDED_BOUND_S)
+    who = ap.add_mutually_exclusive_group()
+    who.add_argument(
+        "--model-name", help="the exact identity of the model at the terminal (consent first)"
+    )
+    who.add_argument("--human", action="store_true", help="a person at the terminal")
+    ap.add_argument("--records", default=str(consent.RECORDS_DIR), help="the consent records")
+    ap.add_argument("--ask-again", action="store_true", help="put the consent question again")
+    ap.add_argument("--owner-reply", help="turn mode: the owner's reply to the model's question")
     args = ap.parse_args(argv)
+    if not args.model_name and not args.human:
+        ap.error(
+            "say who is at the terminal: --model-name <identity> for a language model (the "
+            "consent step comes first) or --human for a person"
+        )
     if args.turn:
         return run_turn(args)
     return run_interactive(args, sys.stdin, sys.stdout)

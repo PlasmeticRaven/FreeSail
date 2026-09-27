@@ -12,9 +12,10 @@ start (`start`) and again only when `resend_brief` is called. Each reply is read
 this order:
 
 1. **The token scan.** `OPT_OUT_TOKEN` anywhere in the raw reply, before anything else
-   reads it: the game is saved through the callback the driver handed in, the exit is
-   journaled as `agent.opted_out` with the text after the token as the reason, the
-   station is released, the loop ends. Unconditional (truth 41).
+   reads it: the exit is journaled as `agent.opted_out` with the text after the token as
+   the reason, the station is released, the game is saved through the callback the
+   driver handed in (last, so that the file holds the exit), the loop ends.
+   Unconditional (truth 41).
 2. **The tool calls**, in order, each through `tools.call` (authority-checked), each
    result returned to the model as data, up to `TOOL_CALLS_PER_SAMPLE` in one sample,
    which the brief states as a budget. A reply with calls is followed by another call
@@ -52,7 +53,17 @@ which is where the drivers station it.
 **A late reply.** A door may return `None` from `reply` (the REPL's turn mode; a door
 that answers late): the sample stays open, the harness polls the model on each tick
 and takes the reply when it comes (`deliver` takes one directly). In lockstep the door
-blocks instead and the World waits.
+blocks instead and the World waits. The MCP door (`mcp_server.py`) lives on `deliver`:
+each tool call its client makes is one reply delivered into the open sample.
+
+**A plain conversation** (`conversation=True`, spec §14): the consent step runs the
+consent brief through this same loop, so the token scan, the tool calls and the journal
+are the same code, with three differences. The brief is fixed (`brief=`, a
+`Brief.plain`), not built from a station; a sample carries only what is put to the
+model (`reason`, `question`, `notices`: no log, no readings, no ship's time); and the
+caller puts each turn with `put`, since no World ticks. `allowed_tools` limits the tools
+that run (the consent step's is `answer` alone): any other is refused in words as its
+result, and a door that sends tool definitions reads the list from `offered_tools`.
 """
 
 from __future__ import annotations
@@ -94,6 +105,7 @@ __all__ = [
     "WELFARE_UNATTENDED_REAL_S",
     "Harness",
     "SaveFn",
+    "conversation_text",
     "restore",
 ]
 
@@ -140,6 +152,9 @@ class Harness:
         door_note: str = "",
         start_at: int | None = None,
         start_after_orders: int = 0,
+        brief: Brief | None = None,
+        allowed_tools: tuple[str, ...] | None = None,
+        conversation: bool = False,
     ):
         if station.name in world.agents:
             other = world.agents[station.name]
@@ -169,6 +184,9 @@ class Harness:
         self._sample_repeated = False
         self._stand_down_requested: tuple[str, str] | None = None
         self._paused_real: float | None = None
+        self._fixed_brief = brief
+        self.allowed_tools = tuple(allowed_tools) if allowed_tools is not None else None
+        self.conversation = conversation
         world.agents[station.name] = self
 
     # -- properties --------------------------------------------------------------------
@@ -193,6 +211,14 @@ class Harness:
     def started(self) -> bool:
         return self.agent.stationed_tick is not None
 
+    @property
+    def tool_names(self) -> tuple[str, ...]:
+        """The tools this harness runs, in the table's order: all of `tools.TOOLS`, or
+        the allow-list when one is set."""
+        if self.allowed_tools is None:
+            return tools.tool_names()
+        return tuple(n for n in tools.tool_names() if n in self.allowed_tools)
+
     # -- start -------------------------------------------------------------------------
 
     def start(self) -> None:
@@ -202,21 +228,31 @@ class Harness:
         self.agent.last_heard_tick = world.clock.tick
         self._start_at = None
         self._start_after_orders = len(world.journal)
+        if self.conversation:
+            words = f"The {self.station.name} conversation begins; no station is offered."
+        else:
+            words = f"The {self.station.name} takes the station; sampled {self.policy.describe()}."
         world.record(
             Severity.ROUTINE,
             "agent.stationed",
-            f"The {self.station.name} takes the station; sampled {self.policy.describe()}.",
+            words,
             actor=self.actor,
             data={"station": self.station.name, "policy": self.policy.save()},
         )
         self._seen_log = len(world.log)
         self._sample_seen = len(world.log)
         self.resend_brief()
-        self._sample("the start")
+        if not self.conversation:  # a conversation's first turn is what the caller puts
+            self._sample("the start")
 
     def resend_brief(self) -> Brief:
         """Build the brief from the station and the situation and send it as operator
-        text. Sent once by `start`; a caller sends it again only on purpose."""
+        text. Sent once by `start`; a caller sends it again only on purpose. A fixed
+        brief (a plain conversation's) is sent as it was given."""
+        if self._fixed_brief is not None:
+            self.brief = self._fixed_brief
+            self.turns.append(Turn(OPERATOR, self.brief.text()))
+            return self.brief
         world = self.world
         lines = [
             f"{d['stamp']}  {d['text']}"
@@ -227,11 +263,27 @@ class Harness:
             self.agent.session_kind,
             lines,
             tools.readings_words(world),
-            tools.tool_names(),
+            self.tool_names,
             door_note=self._door_note_with_budget(),
         )
         self.turns.append(Turn(OPERATOR, self.brief.text()))
         return self.brief
+
+    def take_over(self, model: Model, save: SaveFn | None = None, door_note: str = "") -> None:
+        """A door continues a restored station (a loaded game) with a live model: the
+        brief is sent again with the situation now, as the latest operator turn, and a
+        sample the replay left open is sent again after it as data, so the new model's
+        conversation begins at its own brief. A door reads from the last operator turn."""
+        self.model = model
+        if save is not None:
+            self.save_fn = save
+        if door_note:
+            self.door_note = door_note
+        if self.agent.released or not self.started:
+            return
+        self.resend_brief()
+        if self._open is not None:
+            self.turns.append(Turn(DATA, self._open.to_dict()))
 
     def _door_note_with_budget(self) -> str:
         budget = (
@@ -376,7 +428,11 @@ class Harness:
         sample = self._build_sample(reason)
         a.last_sample_tick = self.world.clock.tick
         a.samples += 1
-        self.turns.append(Turn(DATA, sample.to_dict()))
+        if self.conversation:
+            content = {"reason": reason, "question": sample.question, "notices": sample.notices}
+            self.turns.append(Turn(DATA, {k: v for k, v in content.items() if v}))
+        else:
+            self.turns.append(Turn(DATA, sample.to_dict()))
         self._calls_this_sample = 0
         self._sample_had_words = False
         self._sample_repeated = False
@@ -387,6 +443,9 @@ class Harness:
         """Ask the model for its reply to the open sample; take it if it has come."""
         if self._sampling:
             return
+        if hasattr(self.model, "offered_tools"):
+            # a door that sends tool definitions offers these and no others
+            self.model.offered_tools = self.tool_names
         self._sampling = True
         try:
             while self._open is not None and not self.agent.released:
@@ -416,8 +475,7 @@ class Harness:
         # 1. the token, before anything else reads the reply
         for piece in reply.pieces():
             if OPT_OUT_TOKEN in piece:
-                after = piece.split(OPT_OUT_TOKEN, 1)[1].strip(" .:;,-\n")
-                self.leave(after, how="the token")
+                self.leave(_reason_after_token(reply, piece), how="the token")
                 return
         # 2. the tool calls, in order, up to the budget
         results: list[dict[str, Any]] = []
@@ -455,6 +513,12 @@ class Harness:
         self._end_sample()
 
     def _call(self, c: ToolCall) -> Any:
+        if self.allowed_tools is not None and c.name not in self.allowed_tools:
+            only = " and ".join(self.tool_names) or "none"
+            return (
+                f"There is no tool named '{c.name}' in this conversation; the tools here "
+                f"are {only}."
+            )
         if c.name == "submit_order":
             self._note_submission(str(c.args.get("text", "")))
         return tools.call(self.world, self.station.name, c.name, c.args)
@@ -640,6 +704,17 @@ class Harness:
         )
         return "Heard." if question is not None else "Heard, though nothing was asked."
 
+    def put(self, text: str, reason: str) -> None:
+        """A plain conversation's next turn (the consent step): `text` is put to the model
+        as the sample's `question`, with `reason` saying what it is, and the model is
+        asked for its reply at once. For a conversation, where no World ticks."""
+        if self.agent.released:
+            raise OrderError(f"The {self.station.name} conversation is over.")
+        if self._open is not None:
+            raise OrderError(f"The {self.station.name} has a turn open; take its reply first.")
+        self.agent.question = " ".join(text.split())
+        self._sample(reason)
+
     def put_question(self, question: str) -> str:
         """`ask the <station> <question>`: the question is answered at this tick, after
         the order is logged (`on_order`)."""
@@ -672,10 +747,11 @@ class Harness:
         return f"Standing down the {self.station.name}."
 
     def stand_down(self, reason: str, by: str = "the captain") -> None:
-        """Save, journal `agent.stopped` with the reason, release the station."""
+        """Journal `agent.stopped` with the reason, release the station, save. The save
+        comes last so that the file holds the exit: the journal entry, the log line and
+        the released station (package 28; the owner reads the journal in the save)."""
         if self.agent.released:
             return
-        self._save(f"the {self.station.name} stood down: {reason}")
         text = f"The {self.station.name} stood down by {by}: {reason}. The game is saved."
         self.journal.append(self.world, f"Stood down by {by}: {reason}.", kind="agent.stopped")
         self.world.record(
@@ -686,13 +762,14 @@ class Harness:
             data={"reason": reason, "by": by},
         )
         self._release(f"stood down by {by}: {reason}")
+        self._save(f"the {self.station.name} stood down: {reason}")
 
     def leave(self, reason: str, how: str = "the token") -> None:
-        """The opt-out: save, journal `agent.opted_out`, release, end the loop."""
+        """The opt-out: journal `agent.opted_out`, release, save, end the loop (the save
+        last, so that the file holds the exit)."""
         if self.agent.released:
             return
         reason = " ".join(reason.split())
-        self._save(f"the {self.station.name} opted out")
         why = f": {reason}" if reason else ", giving no reason"
         self.journal.append(self.world, f"Left the game by {how}{why}.", kind="agent.opted_out")
         self.world.record(
@@ -704,6 +781,7 @@ class Harness:
             data={"reason": reason, "how": how},
         )
         self._release(f"left the game{why}")
+        self._save(f"the {self.station.name} opted out")
 
     def _release(self, reason: str) -> None:
         a = self.agent
@@ -779,6 +857,30 @@ def restore(world: World, data: dict[str, Any], model: Model | None = None) -> l
             h.start()
         out.append(h)
     return out
+
+
+def _reason_after_token(reply: Reply, found_in: str) -> str:
+    """The reason the model gave: what follows the token. The scan reads the raw output
+    (a door's serialised calls included); the reason is read from the plainest piece that
+    holds the token, the text or an argument, so that a served call's JSON punctuation is
+    not taken for words."""
+    for p in [reply.text, *(str(v) for c in reply.calls for v in c.args.values())]:
+        if OPT_OUT_TOKEN in p:
+            found_in = p
+            break
+    return found_in.split(OPT_OUT_TOKEN, 1)[1].strip(" .:;,-\n")
+
+
+def conversation_text(content: dict[str, Any]) -> str | None:
+    """A plain conversation's data turn as the words a door shows: the notices, then
+    what is put to the model; `None` for any other data turn (a sample, tool results),
+    which a door sends as data."""
+    if "tool_results" in content or "readings" in content or "log" in content:
+        return None
+    parts = [str(n) for n in content.get("notices") or []]
+    if content.get("question"):
+        parts.append(str(content["question"]))
+    return "\n\n".join(parts)
 
 
 def _span_words(seconds: int) -> str:
