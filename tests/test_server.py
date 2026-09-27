@@ -303,3 +303,48 @@ def test_websocket_streams_events_and_snapshots(client):
                 seen = True
                 break
         assert seen
+
+
+# -- saving from the browser session ---------------------------------------------------
+
+
+def test_save_from_the_order_box_and_the_driver(tmp_path):
+    """`save PATH` typed in the order box writes the same file the console's `save`
+    writes, says so in the log, and is not journaled (a replay must not re-save); the
+    driver action and the download route give the same save."""
+    world = world_for(SHIPS[0])
+    driver = Driver(world)
+    app = create_app(driver)
+    with TestClient(app) as client:
+        client.post("/api/order", json={"text": "set the jib"})
+        client.post("/api/driver", json={"action": "tick", "value": 5})
+        journal_before = list(world.journal)
+
+        target = tmp_path / "voyage.json"
+        r = client.post("/api/order", json={"text": f"save {target}"})
+        assert r.status_code == 200
+        assert r.json()["kind"] == "driver.saved"
+        assert "tick 5" in r.json()["text"]
+        assert target.exists()
+        assert world.journal == journal_before
+
+        saved = json.loads(target.read_text())
+        assert saved["seed"] == world.seed
+        assert saved["journal"][-1][2] == "set the jib"
+
+        second = tmp_path / "again.json"
+        r = client.post("/api/driver", json={"action": "save", "value": str(second)})
+        assert r.status_code == 200
+        assert json.loads(second.read_text())["journal"] == saved["journal"]
+
+        r = client.get("/api/save")
+        assert r.status_code == 200
+        assert r.headers["content-disposition"].startswith("attachment;")
+        assert r.json()["journal"] == saved["journal"]
+
+        r = client.post("/api/order", json={"text": "save"})
+        assert r.json()["kind"] == "driver.refused"
+        r = client.post(
+            "/api/order", json={"text": f"save {tmp_path / 'no' / 'such' / 'dir' / 'x.json'}"}
+        )
+        assert r.json()["kind"] == "driver.refused"

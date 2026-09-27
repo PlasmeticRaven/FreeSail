@@ -12,11 +12,15 @@ Routes (spec §9.2):
     GET  /api/ship      the ship graph, for drawing (queries.ship_graph)
     GET  /api/state     the current snapshot (queries.snapshot) plus the driver
     GET  /api/log       the log, optionally ?since=TICK and ?limit=N
+    GET  /api/save      the save file (seed, scenario, journal) as a download,
+                        the same file `save PATH` writes; the browser can keep it
     POST /api/order     {"text": "..."} -> the accepted or rejected event
     POST /api/driver    {"action": "hold"|"go"|"time"|"tick", "value": N}
                         or {"action": "standing_orders", "value": FILE} to read a file
                         of standing orders (also `read the standing orders from FILE`
-                        on the command line, as in the console)
+                        on the command line, as in the console), or
+                        {"action": "save", "value": PATH} to write a save file on the
+                        server's disk (also `save PATH` on the command line)
     WS   /ws            every log event as it happens, and a snapshot every
                         tick at 1x, every 10 ticks at 10x, every 60 at 60x and up
 
@@ -46,6 +50,7 @@ from fastapi.staticfiles import StaticFiles
 
 from freesail import units
 from freesail.api import queries
+from freesail.core import replay as replay_mod
 from freesail.core.events import Event
 from freesail.core.world import Scenario, World
 from freesail.ui.console import read_standing_orders, read_standing_orders_path
@@ -63,6 +68,15 @@ def snapshot_interval(compression: float) -> int:
     if compression >= 10:
         return 10
     return 1
+
+
+def save_path(line: str) -> str | None:
+    """The path named by `save <path>`, or None. The console's own `save` is the same
+    word; here it is read out of the order box so the browser session can save too."""
+    words = line.split()
+    if not words or words[0].lower() != "save":
+        return None
+    return " ".join(words[1:]).strip().strip("\"'")
 
 
 class Driver:
@@ -152,6 +166,10 @@ class Driver:
                 # the driver's command, as in the console (spec M4 §3): reading the disk
                 # is the driver's business; each order in the file is journaled
                 return self._read_standing_orders(path)
+            path = save_path(text)
+            if path is not None:
+                # `save PATH`, as in the console: writing the disk is the driver's too
+                return self._save(path)
             e = self.world.submit(text)
             self.emit_snapshot()
             return e
@@ -159,6 +177,39 @@ class Driver:
     def read_standing_orders(self, path: str) -> Event:
         with self.lock:
             return self._read_standing_orders(path)
+
+    def save(self, path: str) -> Event:
+        with self.lock:
+            return self._save(path)
+
+    def _save(self, path: str) -> Event:
+        """Write the save file and say so in the log (not journaled: a save is the
+        driver's act, not an order, and a replay must not re-save)."""
+        if not path:
+            return self.world.record(
+                "routine",
+                "driver.refused",
+                "Say 'save somewhere.json'.",
+                actor="driver",
+                data={"path": path},
+            )
+        try:
+            p = replay_mod.save_to_file(self.world, path)
+        except OSError as e:
+            return self.world.record(
+                "routine",
+                "driver.refused",
+                f"Could not write {path}: {e.strerror or e}.",
+                actor="driver",
+                data={"path": path},
+            )
+        return self.world.record(
+            "notable",
+            "driver.saved",
+            f"Saved to {p} at tick {self.world.clock.tick}.",
+            actor="driver",
+            data={"path": str(p), "tick": self.world.clock.tick},
+        )
 
     def _read_standing_orders(self, path: str) -> Event:
         try:
@@ -269,6 +320,14 @@ def create_app(driver: Driver, client_dir: Path = CLIENT_DIR) -> FastAPI:
             events = events[-max(1, min(limit, 5000)) :]
             return JSONResponse([event_dict(e) for e in events])
 
+    @app.get("/api/save")
+    def api_save() -> JSONResponse:
+        with driver.lock:
+            data = driver.world.save()
+            tick = driver.world.clock.tick
+        name = f"freesail-seed{data['seed']}-tick{tick}.json"
+        return JSONResponse(data, headers={"Content-Disposition": f'attachment; filename="{name}"'})
+
     @app.post("/api/order")
     def api_order(body: dict[str, Any]) -> JSONResponse:
         text = str(body.get("text") or "").strip()
@@ -291,10 +350,15 @@ def create_app(driver: Driver, client_dir: Path = CLIENT_DIR) -> FastAPI:
                 driver.tick(int(value if value is not None else 1))
             elif action == "standing_orders":
                 driver.read_standing_orders(str(value or ""))
+            elif action == "save":
+                driver.save(str(value or ""))
             else:
                 raise HTTPException(
                     status_code=400,
-                    detail="Say hold, go, time N, tick N or standing_orders FILE to the driver.",
+                    detail=(
+                        "Say hold, go, time N, tick N, standing_orders FILE or save PATH "
+                        "to the driver."
+                    ),
                 )
         except (TypeError, ValueError):
             raise HTTPException(status_code=400, detail=f"'{value}' is not a number.") from None
