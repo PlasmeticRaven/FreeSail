@@ -16,6 +16,7 @@ from freesail import units
 from freesail.core.clock import Clock
 from freesail.core.events import Event, Log, Severity
 from freesail.core.rng import Rng
+from freesail.core.sun import DAY, DEFAULT_LATITUDE_DEG, Sun
 from freesail.physics.wind import Wind, WindParams
 from freesail.ship.stub import OrderError, PointShip
 
@@ -37,6 +38,9 @@ class Scenario:
     ship_y: float = 0.0
     ship_heading_deg: float = 0.0
     ship_speed_kn: float = 0.0
+    # The sun's latitude (spec M4 §5): 50 N, the Channel. Saved and restored with the rest;
+    # a save from before the sun loads with the default.
+    latitude_deg: float = DEFAULT_LATITUDE_DEG
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
@@ -85,6 +89,15 @@ class World:
         if getattr(self.ship, "extra", None) is not None:
             self.ship.extra["rng"] = self.rng  # named streams for strain and later systems
         self._last_logged_wind_direction = self.wind.direction_from
+        # The sun (spec M4 §5): `daylight` is read from it through the registry, and the
+        # World raises `sun.rise` and `sun.set` on the tick the phase crosses into and out
+        # of day. The phase at the start is read and not announced: a sunrise that fell
+        # before or at tick 0 (the default scenario opens at 04:00 on 1 June at 50 N, four
+        # minutes after sunrise) is not an event of this log, so the first event is the
+        # first crossing after the start, and a rule given at the start cannot fire on a
+        # sun that rose before the book was opened.
+        self.sun = Sun(self.scenario.latitude_deg)
+        self._daylight = self.daylight
         # The readings (spec M4 §2): one view per tick and per order, read by the standing
         # orders, the snapshot and the agents alike.
         self._readings_key: tuple[int, int] | None = None
@@ -127,6 +140,37 @@ class World:
                 data=data or {},
             )
         )
+
+    # -- the sun -------------------------------------------------------------
+
+    @property
+    def ship_x(self) -> float:
+        """Metres east of the start: the ship's own easting, whatever ship she is."""
+        dyn = getattr(self.ship, "dyn", None)
+        if dyn is not None:
+            return float(dyn.x)
+        return float(getattr(self.ship, "x", 0.0))
+
+    @property
+    def daylight(self) -> str:
+        """'day', 'twilight' or 'night' now, from the sun at the ship's latitude and her
+        easting (`freesail.core.sun`). The registry's `daylight` row reads this."""
+        return self.sun.phase(self.clock.ship_time, self.ship_x)
+
+    def sun_times(self) -> Any:
+        """Today's dawn, sunrise, sunset and dusk by the clock (`sun.SunTimes`)."""
+        return self.sun.times(self.clock.ship_time, self.ship_x)
+
+    def _tick_sun(self) -> None:
+        phase = self.daylight
+        was = self._daylight
+        if phase == was:
+            return
+        self._daylight = phase
+        if was == DAY and phase != DAY:
+            self.record(Severity.NOTABLE, "sun.set", "Sunset.", data={"daylight": phase})
+        elif phase == DAY and was != DAY:
+            self.record(Severity.NOTABLE, "sun.rise", "Sunrise.", data={"daylight": phase})
 
     # -- readings ------------------------------------------------------------
 
@@ -234,6 +278,9 @@ class World:
                 f"{units.format_bells(bells).capitalize()}.",
                 data={"bells": bells},
             )
+        # the sun (spec M4 §5): sunrise and sunset, before the book so that `at sunset`
+        # fires on the sun's own tick
+        self._tick_sun()
         # the standing orders (spec M4 §4): last, on the tick's settled readings
         self.standing.tick()
 
@@ -264,10 +311,12 @@ class World:
                 queries.sail_set_line(self.ship) if ln.startswith("Sail set:") else ln
                 for ln in ship_lines
             ]
+        daylight = str(self.readings["daylight"]).capitalize()  # through the registry
         return [
             self.clock.stamp(),
             f"Wind {self.wind.describe()}, "
             f"{units.describe_wind_strength(self.wind.effective_speed)}",
+            f"{daylight}. {self.sun_times().describe()}",
             *ship_lines,
             *queries.watch_lines(self),
         ]

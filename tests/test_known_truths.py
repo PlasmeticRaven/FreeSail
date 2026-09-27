@@ -41,6 +41,17 @@ passing test with the measured value in its docstring, and the spec's number
 is a strict expected failure marked as the owner's ruling, naming the measured
 value and the constant that would move it (truths 24, 26, 28 and 31). Nothing
 was tuned to meet them; the values are in docs/dev/TuningNotes.md.
+
+Truths 34 to 40 are milestone 4a's, standing orders (docs/TechnicalSpec-M4.md §8).
+Truths 34 to 38 are here: the frigate under the starter routines, the sun at 50 N on
+1 June 1805, and where a truth needs the wind to change under way it is blown by setting
+the wind model's base speed (steady wind: the model then holds it), which is the one
+mechanism the M2 wind has for a wind that rises. Truth 39 (a passage under the starter
+routines replays with the same firings) is the standing voyage of tests/test_replay.py;
+truth 40 (a Python rule and its dialect twin give one log) is tests/test_python_api.py.
+Truth 37's storm staysail is a strict expected failure naming the gap: the shift
+evolution refuses a sail that is set, so the routine's second order is refused in words
+while the first and third are carried out (docs/dev/TuningNotes.md, milestone 4a).
 """
 
 from __future__ import annotations
@@ -1282,3 +1293,362 @@ def test_truth_33_one_yard_braced_away_from_its_neighbours_is_refused_and_the_ma
     run(world, 240)
     for yid in ship.groups["main yards"]:
         assert ship.spars[yid].brace_angle == pytest.approx(0.0, abs=1e-6), yid
+
+
+# ---------------------------------------------------------------------------
+# Milestone 4a: standing orders (spec M4 §8), truths 34 to 38
+# ---------------------------------------------------------------------------
+
+NIGHT_ROUTINE = (
+    'standing order "night routine": at sunset then take in the studdingsails; take in the royals'
+)
+MORNING_SAIL = (
+    'standing order "morning sail": at sunrise, if the true wind is under 20 knots '
+    "then set the royals"
+)
+SHORTEN_SAIL = (
+    'standing order "shorten sail for weather": when the true wind exceeds 30 knots for '
+    "2 minutes then take in the studdingsails; take in the royals; reef the topsails, one reef"
+)
+KEEP_HER_FULL = (
+    'standing order "keep her full": when the apparent wind is forward of 55 degrees '
+    "then bear away one point"
+)
+HEAVY_WEATHER = (
+    'standing order "heavy weather": when the true wind exceeds 40 knots for 5 minutes then '
+    "send down the topgallant masts; shift the fore topmast staysail for the fore storm "
+    "staysail; close reef the topsails"
+)
+# the sun at 50 N on 1 June 1805 (freesail/core/sun.py against the USNO almanac, tests/test_sun.py)
+SUNRISE = "03:56"
+SUNSET = "19:59"
+STANDING_DWELL_S = 300  # freesail/standing/rules.py
+
+
+def blow(world, knots_: float) -> None:
+    """Set the steady wind's speed under way: the model's base speed, which with
+    gustiness and variability at zero it holds exactly from the next tick."""
+    world.wind.base_speed = world.wind.speed = units.knots_to_ms(knots_)
+
+
+def by_order(world, name: str) -> list[tuple[int, str]]:
+    """The orders a standing order gave that the ship carried out, with their ticks."""
+    actor = f"standing order '{name}'"
+    return [(e.tick, e.text) for e in world.log if e.kind == "order.accepted" and e.actor == actor]
+
+
+def refused_by_order(world, name: str) -> list[tuple[int, str]]:
+    actor = f"standing order '{name}'"
+    return [(e.tick, e.text) for e in world.log if e.kind == "order.rejected" and e.actor == actor]
+
+
+def stamp(world, tick: int) -> str:
+    from datetime import timedelta
+
+    return (world.clock.start + timedelta(seconds=tick)).strftime("%H:%M")
+
+
+def sail_states(world) -> dict[str, str]:
+    return {s.id: s.state.value for s in world.ship.sails.values()}
+
+
+def running_under_all_sail(start: datetime, knots_: float = 15.0):
+    """The frigate before the wind under all sail, studding sails both sides (the light
+    sails the night routine takes in), from rest at `start`."""
+    world = from_rest(FRIGATE, heading_deg=180.0, knots_=knots_, start=start)
+    world.submit("make all sail")
+    run(world, 600)
+    world.submit("rig out the studdingsails, both sides")
+    run(world, 300)
+    world.submit("set the studdingsails, both sides")
+    run(world, 600)
+    return world
+
+
+# 34: the night routine and the morning sail
+
+
+def test_truth_34_at_sunset_the_night_routine_takes_in_the_light_sails_and_nothing_else():
+    """Spec M4 §8, truth 34. Running before the wind under all sail at 19:20 on 1 June,
+    six studding sails and the royals drawing. At sunset (19:59 by the sun model) the
+    night routine gives two orders and no more; when the hands are done, the studding
+    sails and the royals are in and every other sail is as it was."""
+    world = running_under_all_sail(datetime(1805, 6, 1, 19, 20))
+    world.submit(NIGHT_ROUTINE)
+    before = sail_states(world)
+    studding = {sid for sid in world.ship.groups["studdingsails"] if before[sid] == "set"}
+    royals = set(world.ship.groups["royals"])
+    assert len(studding) >= 6 and all(before[r] == "set" for r in royals)
+    run(world, 2700)  # to 20:30
+    fired = by_order(world, "night routine")
+    assert [text for _, text in fired] == [
+        "By standing order 'night routine': taking in the studdingsails.",
+        "By standing order 'night routine': taking in the royals.",
+    ]
+    sunset = events(world, "sun.set")
+    assert len(sunset) == 1 and fired[0][0] == sunset[0].tick
+    assert stamp(world, fired[0][0]) == SUNSET
+    assert refused_by_order(world, "night routine") == []
+    after = sail_states(world)
+    changed = {sid for sid in before if before[sid] != after[sid]}
+    assert changed == studding | royals, changed ^ (studding | royals)
+    assert all(after[sid] == "furled" for sid in studding)
+    assert all(after[sid] in ("in_the_gear", "furled") for sid in royals)
+
+
+@pytest.mark.parametrize("knots_,set_again", [(15.0, True), (25.0, False)])
+def test_truth_34_at_sunrise_the_royals_are_set_again_only_under_twenty_knots(
+    knots_: float, set_again: bool
+):
+    """Spec M4 §8, truth 34, the morning half. Plain sail before the wind at 03:20; at
+    sunrise (03:56) the morning sail sets the royals in 15 knots; in 25 the order is not
+    carried out and the log says which reading failed."""
+    world = from_rest(FRIGATE, heading_deg=180.0, knots_=knots_, start=datetime(1805, 6, 1, 3, 20))
+    world.submit("set plain sail")
+    run(world, 600)
+    world.submit(MORNING_SAIL)
+    run(world, 2400)  # to 04:10; the royals set at 04:01 when the order is carried out
+    sunrise = events(world, "sun.rise")
+    assert len(sunrise) == 1 and stamp(world, sunrise[0].tick) == SUNRISE
+    fired = by_order(world, "morning sail")
+    held = [e for e in world.log if e.kind == "standing.held"]
+    royals = world.ship.groups["royals"]
+    if set_again:
+        assert fired == [(sunrise[0].tick, "By standing order 'morning sail': setting the royals.")]
+        assert held == []
+        assert all(world.ship.sails[r].is_set for r in royals)
+    else:
+        assert fired == []
+        assert [e.text for e in held] == [
+            "Standing order 'morning sail' at sunrise: not carried out; the true wind is "
+            "25 knots, not under 20 knots."
+        ]
+        assert not any(world.ship.sails[r].is_set for r in royals)
+
+
+# 35: shorten sail for weather, once, and not on a gust
+
+
+def test_truth_35_shorten_sail_fires_once_after_two_minutes_over_thirty_and_not_on_a_gust():
+    """Spec M4 §8, truth 35. Under all sail before the wind in 15 knots at ten in the
+    forenoon. A gust to 32 knots that lasts two minutes less a second and falls away does
+    not fire it; 32 knots held two minutes does, once, and the wind staying over thirty
+    does not fire it again; under thirty for a second less than the dwell (300 s) and up
+    again does not; under thirty for the dwell and up again for two minutes does."""
+    world = running_under_all_sail(datetime(1805, 6, 1, 10, 0))
+    world.submit(SHORTEN_SAIL)
+    name = "shorten sail for weather"
+    blow(world, 32.0)
+    run(world, 119)
+    blow(world, 20.0)
+    run(world, 60)
+    assert by_order(world, name) == [], "a two-minute gust that falls away"
+    t0 = world.clock.tick
+    blow(world, 32.0)
+    run(world, 121)
+    fired = by_order(world, name)
+    assert [t - t0 for t, _ in fired] == [120, 120, 120], "three orders on the one tick"
+    assert [text for _, text in fired] == [
+        f"By standing order '{name}': taking in the studdingsails.",
+        f"By standing order '{name}': taking in the royals.",
+        f"By standing order '{name}': reefing the topsails, one reef.",
+    ]
+    rule = world.standing.book.get(name)
+    assert rule.fired == 1
+    run(world, 600)
+    assert rule.fired == 1, "the wind still over thirty: no second firing"
+    blow(world, 20.0)
+    run(world, STANDING_DWELL_S - 1)
+    blow(world, 32.0)
+    run(world, 200)
+    assert rule.fired == 1, "a second short of the dwell: not re-armed"
+    blow(world, 20.0)
+    run(world, 1200)  # the dwell, and the hands done with the reef
+    blow(world, 32.0)
+    run(world, 121)
+    assert rule.fired == 2
+    # the routine's two minutes are long for studding sails before the wind in 32 knots:
+    # every boom whips on the first second of the blow and one carries away on the
+    # second, before the routine can fire (docs/dev/TuningNotes.md, milestone 4a)
+    lost = events(world, "spar.carried_away")
+    assert lost and lost[0].subject == "fore.topgallant.studdingsail_boom.larboard"
+    assert all("studdingsail_boom" in (e.subject or "") for e in lost), "booms, nothing else"
+
+
+# 36: keep her full
+
+
+def close_hauled_frigate(heading_deg: float, gust: float = 0.0, var: float = 0.0):
+    scenario = Scenario(
+        wind_from_deg=WIND_FROM,
+        wind_speed_kn=15.0,
+        gustiness=gust,
+        variability=var,
+        ship_heading_deg=heading_deg,
+        ship_speed_kn=4.0,
+    )
+    world = make_world(SEED, FRIGATE, scenario)
+    world.submit("set plain sail")
+    world.submit("brace sharp up on the starboard tack")
+    run(world, 900)
+    run(world, 300, trim_every=120)
+    return world
+
+
+def test_truth_36_keep_her_full_bears_away_a_point_forward_of_fifty_five_and_stops():
+    """Spec M4 §8, truth 36. Close-hauled at 293 (67 degrees off the true wind, the
+    apparent wind 48 on the bow) the rule fires at once and bears away one point, to 282;
+    at 270 (the apparent wind 58) it does not fire in an hour, and when the wind backs a
+    point and heads her it fires once."""
+    pinched = close_hauled_frigate(293.0)
+    assert reading(pinched)["awa"] < 55.0
+    pinched.submit(KEEP_HER_FULL)
+    run(pinched, 3600, trim_every=300)
+    fired = by_order(pinched, "keep her full")
+    assert [text for _, text in fired] == [
+        "By standing order 'keep her full': bearing away one point."
+    ]
+    helm = [e.text for e in pinched.log if e.kind == "helm.order"]
+    assert helm[-1] == "Helm ordered: bear away a point; steer W by N (282°)."
+    full = close_hauled_frigate(270.0)
+    assert reading(full)["awa"] > 55.0
+    full.submit(KEEP_HER_FULL)
+    run(full, 3600, trim_every=300)
+    assert by_order(full, "keep her full") == [], "abaft the threshold: it does not fire"
+    full.wind.direction_from = units.wrap_2pi(full.wind.direction_from - units.POINT)  # heads her
+    run(full, 600, trim_every=300)
+    assert len(by_order(full, "keep her full")) == 1
+
+
+def test_truth_36_over_an_hour_of_a_wandering_wind_it_fires_no_more_than_four_times():
+    """Spec M4 §8, truth 36. The frigate at 285 (the apparent wind 51 on the bow) in the
+    M2 wind at full gustiness and variability, seed 7, an hour: it fires at once, once
+    more when the wind heads her, and no more (measured: twice; at 275, on the threshold,
+    in the console's gustiness, once). The edge and the dwell are the guards."""
+    world = close_hauled_frigate(285.0, gust=1.0, var=1.0)
+    world.submit(KEEP_HER_FULL)
+    run(world, 3600, trim_every=300)
+    fired = by_order(world, "keep her full")
+    assert 1 <= len(fired) <= 4, [t for t, _ in fired]
+    gaps = [t2 - t1 for (t1, _), (t2, _) in zip(fired, fired[1:], strict=False)]
+    assert all(gap >= STANDING_DWELL_S for gap in gaps)
+
+
+# 37: heavy weather
+
+
+def rising_gale(top_knots: float = 45.0, minutes: int = 30):
+    """Plain sail on a wind with the topgallants taken in, the wind rising from 20 knots
+    to `top_knots` over `minutes`, the yards trimmed every ten minutes as it rises, then
+    an hour at the top."""
+    world = close_hauled_frigate(282.0)
+    blow(world, 20.0)
+    world.submit("take in the topgallants")
+    run(world, 300)
+    world.submit(HEAVY_WEATHER)
+    t0 = world.clock.tick
+    for i in range(minutes * 60):
+        blow(world, 20.0 + (top_knots - 20.0) * (i + 1) / (minutes * 60))
+        if i % 600 == 0:
+            world.submit("trim sails")
+        world.tick()
+    run(world, 3600)
+    return world, t0
+
+
+@pytest.fixture(scope="module")
+def frigate_rising_gale():
+    return rising_gale()
+
+
+def test_truth_37_the_heavy_weather_routine_fires_in_order_with_all_hands(frigate_rising_gale):
+    """Spec M4 §8, truth 37. The wind rising from 20 to 45 knots over half an hour
+    passes forty at 24 minutes; five minutes on, the routine gives its three orders on
+    one tick in the order written: the topgallant masts sent down (all hands called by
+    the work, and down twenty minutes later), the shift of the fore topmast staysail, and
+    the topsails close-reefed (three reefs each when the hands are free). The shift is
+    refused in words: see the next test."""
+    world, t0 = frigate_rising_gale
+    name = "heavy weather"
+    over_forty = t0 + 1440  # 20 + 25 * t / 1800 > 40 from t = 1440
+    fired = by_order(world, name)
+    assert [t for t, _ in fired] == [over_forty + 300, over_forty + 300]
+    assert [text for _, text in fired] == [
+        f"By standing order '{name}': sending down the topgallant masts.",
+        f"By standing order '{name}': close reefing the topsails.",
+    ]
+    refused = refused_by_order(world, name)
+    assert len(refused) == 1 and refused[0][0] == over_forty + 300
+    assert "('shift the fore topmast staysail for the fore storm staysail')" in refused[0][1]
+    lines = [
+        e.text
+        for e in world.log
+        if e.tick == over_forty + 300 and e.actor == f"standing order '{name}'"
+    ]
+    assert "sending down" in lines[0] and "shift" in lines[1] and "close reefing" in lines[2]
+    all_hands = events(world, "crew.all_hands", after=over_forty)
+    assert all_hands and all_hands[0].tick == over_forty + 301
+    assert all_hands[0].text == "All hands! (to send down topgallant masts)"
+    assert events(world, "spar.sent_down", after=over_forty)
+    assert all(world.ship.spars[m].sent_down for m in world.ship.groups["topgallant masts"])
+    assert all(world.ship.sails[t].reefs == 3 for t in world.ship.groups["topsails"])
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="spec M4 §8 truth 37: the routine 'shifts to the storm staysail', but the shift "
+    "evolution refuses a sail that is set ('take it in before shifting it', "
+    "evolutions/scripts.py), and at 44 knots the fore topmast staysail blows out before "
+    "the five minutes are up; the routine's second order is refused in words. For the "
+    "lead: a shift that takes the sail in first, or a routine that says so.",
+)
+def test_truth_37_the_storm_staysail_is_set_by_the_routine(frigate_rising_gale):
+    world, _ = frigate_rising_gale
+    assert world.ship.sails["fore.storm_staysail"].is_set
+
+
+# 38: the conflict rule between an officer's order and the captain's
+
+
+MASTERS_ROYALS = 'standing order "royals at sunset" by the master: at sunset then set the royals'
+
+
+def sunset_frigate():
+    world = from_rest(FRIGATE, heading_deg=180.0, start=datetime(1805, 6, 1, 19, 40))
+    world.submit("set plain sail")
+    world.submit("set the royals")
+    run(world, 600)
+    return world
+
+
+def test_truth_38_the_captains_standing_order_stands_and_the_masters_is_countermanded():
+    """Spec M4 §8, truth 38. The master's order to set the royals at sunset and the
+    captain's night routine that takes them in fire on the same tick. With the captain's
+    in the book first, his is given and the master's is not; the log says so. With the
+    master's first, his order goes and the captain's follows it, and the log says the
+    same."""
+    line = (
+        "Standing order 'royals at sunset' (the master) countermanded by 'night routine' "
+        "(the captain)."
+    )
+    captains_first = sunset_frigate()
+    captains_first.submit(NIGHT_ROUTINE)
+    captains_first.submit(MASTERS_ROYALS)
+    run(captains_first, 1500)
+    assert [e.text for e in captains_first.log if e.kind == "standing.countermanded"] == [line]
+    assert by_order(captains_first, "royals at sunset") == []
+    assert [text for _, text in by_order(captains_first, "night routine")] == [
+        "By standing order 'night routine': taking in the royals."
+    ]
+    book = captains_first.standing.book
+    assert book.get("royals at sunset").fired == 0 and book.get("royals at sunset").conflicts == 1
+    royals = captains_first.ship.groups["royals"]
+    assert not any(captains_first.ship.sails[r].is_set for r in royals)
+    masters_first = sunset_frigate()
+    masters_first.submit(MASTERS_ROYALS)
+    masters_first.submit(NIGHT_ROUTINE)
+    run(masters_first, 1500)
+    assert [e.text for e in masters_first.log if e.kind == "standing.countermanded"] == [line]
+    assert [text for _, text in by_order(masters_first, "night routine")] == [
+        "By standing order 'night routine': taking in the royals."
+    ]

@@ -305,3 +305,62 @@ Apparent wind 44° on the larboard bow, 16.8 kn; helm +2°
 ```
 
 Four things to notice. Bearing away from 68° to east she goes from 7.8 to 8.5 knots, the apparent wind draws aft from 44° to 57°, and the watch eased the sheets for you: your `ease the main sheet a fathom` found the boom already 32° off and took it to 37°. The 25-knot gust with her gaff topsail still set loads her main topmast past its rating, and the log says so (chapter 6): shorten sail or lose the spar. The schooner does not lie to: with only one small square sail to lay aback against two big gaff sails she keeps four knots of way with her head coming up to four points off, which is not hove to; a schooner is properly hove to by hauling a head sheet to windward, an evolution the game has not got (chapter 5). And the last line is the ship refusing a sail she has not got, and suggesting the ones she has.
+
+## Standing orders: the ship keeps herself
+
+A standing order is an order like any other, given at the prompt and journaled, with a trigger in front of it: *when* a reading holds (for a while, if you say so), *at* an event, or *every* interval. When it fires, the log says which order fired and what it did, and nothing happens that the log does not explain. The words a condition may test are the ship's own readings, the same ones `state` shows: the true wind, the apparent wind, the heading, the speed, the heel, the watch, daylight, a sail by name, the strain, the hands on deck. Six starter routines come with the game in `data/standing_orders/starter.orders`; here they are, given one at a time on the frigate before the wind (`--heading 180`, so the studding sails will draw), with the book's own orders after them:
+
+```orders frigate all-sail
+standing order "night routine": at sunset then take in the studdingsails; take in the royals
+standing order "morning sail": at sunrise, if the true wind is under 20 knots then set the royals
+standing order "shorten sail for weather": when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; reef the topsails, one reef
+standing order "keep her full": when the apparent wind is forward of 55 degrees then bear away one point
+standing order "heavy weather": when the true wind exceeds 40 knots for 5 minutes then send down the topgallant masts; shift the fore topmast staysail for the fore storm staysail; close reef the topsails
+# rejected: standing order "sound the well": every glass then sound the well
+standing orders
+show standing order "keep her full"
+belay standing order "keep her full"
+resume standing order "keep her full"
+belay all standing orders
+# rejected: standing order "night routine": at sunset then take in the royals
+# rejected: standing order "x": when the glass is falling then shorten sail
+# rejected: standing order "x": at sunset then set the royls
+```
+
+The well one is refused until the ship has a well to sound (milestone 5), and the refusal says so; a second order of a name already in the book is refused; a misspelt sail is refused when the order is given, not on the night it fires. The whole file loads in one line at the prompt, `read the standing orders from data/standing_orders/starter.orders`, or at the start with `--standing-orders data/standing_orders/starter.orders`; each line is given as an order, and the refused one does not stop the rest.
+
+To see one fire, sail her to sunset. At seed 7 with the wind north 15 knots and her head south, under all sail with the studding sails set as chapter 3 sets them (`make all sail`, then `rig out the studdingsails, both sides` and `set the studdingsails, both sides`), give the night routine and `tick 56000`; `state` on the way says where the sun stands:
+
+```
+Day. Sunrise 03:56, sunset 19:58; civil twilight from 03:13 and until 20:41.
+Amazon: heading S (180°), speed 6.5 kn, leeway 0°, heel 0°
+...
+* Last dog watch (19:59)  Sunset.
+* Last dog watch (19:59)  By standing order 'night routine': taking in the studdingsails.
+* Last dog watch (19:59)  By standing order 'night routine': taking in the royals.
+```
+
+The "By standing order" line is notable and stands in for the "Order:" line a captain's order gets; what follows it is the hands' ordinary work. `standing orders` afterwards reads `"night routine" (the captain): at sunset then take in the studdingsails; take in the royals. Standing; fired once, last at Last dog watch (19:59).` An order the ship cannot carry out when it fires is refused in the log's words too: `Standing order 'morning sail' at sunrise: not carried out; the true wind is 25 knots, not under 20 knots.` for a failed `if`, and `Standing order 'x': order not carried out ('take in the royals'): Nothing done: the fore royal is already furled; ...` for an order the ship refuses.
+
+Three guards keep a standing order from thrashing. A duration debounces: `for 2 minutes` means the wind has been over thirty for two minutes of ship's time together, so the console's gusts, which last seconds, never fire it. A `when` order fires once, on the edge, and not again until its condition has been false for five minutes and the work it started has ended; `keep her full` bears away a point and then waits. And two orders that lay hands on the same part within those five minutes are settled by rank: the captain's stands over the master's, and the log says `Standing order 'royals' (the master) countermanded by 'royals in' (the captain).`; two of the captain's own give the later the day, with a plain note.
+
+The same rules can be written in Python, for a script rather than the prompt, and they are the same rules: the decorators build the same order, enter it in the same book, and the log reads the same to the letter. Bind a world first; the body runs once as the rule is entered and may only call `order(...)` with the words you would have typed.
+
+```python
+from freesail.standing import bind, when, at, order
+
+bind(world)
+
+@at("sunset", name="night routine")
+def night_routine():
+    order("take in the studdingsails")
+    order("take in the royals")
+
+@when("the true wind exceeds 30 knots", for_minutes=2, name="shorten sail for weather")
+def shorten_sail():
+    order("take in the studdingsails")
+    order("take in the royals")
+    order("reef the topsails, one reef")
+```
+
+A saved game lists a Python rule by its name and its source; loaded without the script that defined it, the rule is in the book, belayed, and `resume` says why it will not run.

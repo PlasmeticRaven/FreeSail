@@ -1,0 +1,55 @@
+# FreeSail: the starter routines (spec M4 §3 and §6).
+#
+# Six standing orders in the standing dialect, one a line; a line beginning # is a
+# comment, and a sentence may run on to indented lines. Load them at the prompt with
+#     read the standing orders from data/standing_orders/starter.orders
+# or at the start with
+#     py -m freesail.ui.console data/ships/frigate-36.yaml --standing-orders data/standing_orders/starter.orders
+# Each line is given as the captain's order, journaled, and replays; one the ship refuses
+# is logged as refused and the rest still load.
+
+# The night routine. The light sails come in for the dark hours: Luce's routine of the day
+# has the topgallant yards sent down at sunset (Luce 1866, ch. XXXII, port routine, art.
+# XXVI: "At sunset, hoist boats and send down top-gallant yards") and hammocks piped down
+# at sunset at sea (the same, daily routine at sea, dog watch, art. IV); before a squall
+# "furl the topgallant sails and royals, and stow the light sails" (Luce 1884, ch. XXV).
+# At sea, with the yards kept across, the game's version takes in the studding sails and
+# the royals (judgement: the light sails a watch cannot see to handle in the dark).
+standing order "night routine": at sunset then take in the studdingsails; take in the royals
+
+# The morning sail. The reverse of the night routine at daylight (Luce 1866, ch. XXXII,
+# port routine: "At early daylight ... call all hands", and the yards crossed again), if
+# the breeze allows: under 20 knots is the wind in which truth 9 (tests/test_known_truths.py)
+# and the strain tables carry every sail without a strain line; over it the royals stay in.
+standing order "morning sail": at sunrise, if the true wind is under 20 knots then set the royals
+
+# Shortening sail for weather. Thirty knots is where the strain truths begin to bite: in
+# 35 knots the royals and topgallants carry away within twenty minutes under all sail
+# (truth 9), and docs/dev/TuningNotes.md records the light sails' ratings tuned to that;
+# two minutes is the duration that lets a gust pass (spec §3's debounce; the M2 wind's
+# gusts last five to thirty seconds, physics/wind.py).
+standing order "shorten sail for weather": when the true wind exceeds 30 knots for 2 minutes
+    then take in the studdingsails; take in the royals; reef the topsails, one reef
+
+# Keeping her full. Fifty-five degrees of apparent wind is a little forward of where the
+# frigate's sails just fill: on a wind she carries the apparent wind at 48 to 52 degrees
+# (truth 1's sweeps and the primer's first passage), and the pointing truths (25, 26, 32)
+# put her closest holding way near 52 to 56 degrees off the true wind. Forward of 55
+# apparent she is pinching, and a point off brings her back to a good full.
+standing order "keep her full": when the apparent wind is forward of 55 degrees then bear away one point
+
+# Heavy weather. Forty knots is a gale (units.describe_wind_strength); in 45 knots the
+# storm canvas of truth 28 has the topgallant masts sent down, the storm staysails bent and
+# the topsails close-reefed, and nothing carries away in an hour. Five minutes is the
+# duration that tells a gale from a squall (spec §3; judgement).
+standing order "heavy weather": when the true wind exceeds 40 knots for 5 minutes
+    then send down the topgallant masts;
+    shift the fore topmast staysail for the fore storm staysail;
+    close reef the topsails
+
+# Sounding the well every glass is the pump routine of Luce's day ("Pump the ship out",
+# Luce 1866, ch. XXXII, daily routine at sea, morning watch art. III and dog watch art.
+# III). The ship has no well until milestone 5 (spec M4 §2), so this line is refused at
+# load with "The ship has no well to sound yet"; it is kept here so that the book is
+# complete when the well arrives, and to show that a refused line does not stop the rest.
+standing order "sound the well": every glass then sound the well

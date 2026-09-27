@@ -67,6 +67,14 @@ def read_standing_orders(world: World, path: str) -> int:
     return len(lines)
 
 
+def restore_python_rules(world: World, data: dict) -> None:
+    """A save's standing orders written in Python (spec M4 §4) have no journal line to
+    replay them by; list them in the loaded book, belayed, with the sentence."""
+    from freesail.standing import restore_absent
+
+    restore_absent(world, data.get("standing_orders", []))
+
+
 class Console:
     ROLLUP_ABOVE = 10  # compression above which routine entries are rolled up per bell
 
@@ -215,6 +223,7 @@ class Console:
 
         self.world = replay_mod.replay(data, ship_factory)
         self._attach()
+        restore_python_rules(self.world, data)  # attached, so its lines are printed
         self._print(f"Replayed. Log digest {self.world.log.digest()[:16]}. Clock held.")
         for s in self.world.summary_lines():
             self._print(s)
@@ -316,7 +325,9 @@ def main(argv: list[str] | None = None) -> int:
     from freesail.api.session import make_world, ship_factory
 
     if args.load:
-        world = replay_mod.replay(replay_mod.load_file(args.load), ship_factory)
+        data = replay_mod.load_file(args.load)
+        world = replay_mod.replay(data, ship_factory)
+        restore_python_rules(world, data)
     else:
         scenario = Scenario()
         if args.wind:
