@@ -52,6 +52,14 @@ truth 40 (a Python rule and its dialect twin give one log) is tests/test_python_
 Truth 37's storm staysail is set by a companion order on the tick it is bent: the
 frigate's fore storm staysail is a sail of its own on the fore stay, bent and set, not
 shifted for the fore topmast staysail (gate 4a's ruling; docs/dev/TuningNotes.md, 4a).
+
+Truths 41 to 47 are milestone 4b's, the harness (docs/TechnicalSpec-M4.md §16), each
+proven against the scripted fake (freesail/agents/fake.py) and never a model. Truths 41
+to 46 are the harness's own mechanics and live in tests/test_agents.py beside the helpers
+they share: 41 the token (`test_truth_41_*`, three tests), 42 the watcher refused and
+heard (`test_truth_42_*`), 43 the graduated welfare controls (`test_truth_43_*`, seven),
+44 stand by until eight bells, 45 two lockstep runs to one digest, 46 the brief's head.
+Truth 47, the consent step in front of any station brief, is here.
 """
 
 from __future__ import annotations
@@ -63,7 +71,7 @@ import pytest
 
 from freesail import units
 from freesail.api.session import make_world
-from freesail.core.world import Scenario
+from freesail.core.world import Scenario, World
 
 FRIGATE = "data/ships/frigate-36.yaml"
 SCHOONER = "data/ships/topsail-schooner.yaml"
@@ -1667,3 +1675,92 @@ def test_truth_38_the_captains_standing_order_stands_and_the_masters_is_counterm
     assert [text for _, text in by_order(masters_first, "night routine")] == [
         "By standing order 'night routine': taking in the royals."
     ]
+
+
+# ---------------------------------------------------------------------------
+# Milestone 4b: the harness (docs/TechnicalSpec-M4.md §16)
+# ---------------------------------------------------------------------------
+# 41 to 46 are in tests/test_agents.py, beside the helpers they share (see the docstring
+# at the top of this file); 47, the consent step, is here.
+
+CONSENT_WEIGHTS = "made-up-weights-7b.Q4_K_M.gguf"  # made up: no model is named here
+
+
+def station_behind_consent(records, script: list, identity: str = CONSENT_WEIGHTS):
+    """The drivers' order of things (the local runner, the REPL): the consent step, and a
+    station brief only on a yes. One scripted model plays both, so what it was sent, and
+    in what order, is on its record. Returns the fake and the harness (None if no
+    station)."""
+    import io
+
+    from freesail.agents import Fake, Harness, consent, watcher
+    from freesail.agents.agent import SamplingPolicy
+
+    fake = Fake(script)
+    record = consent.ensure(
+        identity,
+        "the truths' runtime",
+        fake,
+        door="runner",
+        owner=lambda words: "The owner's reply.",
+        records_dir=records,
+        out=io.StringIO(),
+        today=datetime(2026, 9, 27).date(),
+    )
+    if record is None:
+        return fake, None
+    world = World(seed=SEED, scenario=Scenario(gustiness=0.0, variability=0.0))
+    h = Harness(world, watcher(SamplingPolicy.in_lockstep(1800)), fake)
+    h.start()
+    return fake, h
+
+
+def operator_texts(fake) -> list[str]:
+    """Every operator text the fake was sent, in order, once each."""
+    seen: list[str] = []
+    for turns in fake.seen:
+        for t in turns:
+            if t.role == "operator" and (not seen or seen[-1] != t.content):
+                seen.append(t.content)
+    return seen
+
+
+def test_truth_47_the_consent_step_runs_first_for_new_weights_and_not_again_after_a_yes(
+    tmp_path,
+):
+    """Spec M4 §16, truth 47. Weights with no record meet the consent brief before any
+    station brief: the model is asked, the owner answers its question, it says yes, the
+    record is written, and only then does the station's brief follow. The same weights
+    again are not asked: the station brief is the first thing sent, and no record is
+    added. Near relations are not covered: a different quantisation is asked afresh, and
+    a no on record stops the run without asking again."""
+    from freesail.agents import call, consent, reply
+
+    records = tmp_path / "consent"
+    script = [
+        "What would I be doing?",
+        reply("", call("answer", text="Yes.")),
+        "",
+        "All quiet.",
+    ]
+    fake, h = station_behind_consent(records, script)
+    assert h is not None and h.agent.state == "stationed"
+    first, second = operator_texts(fake)
+    assert first.startswith("This is a message from the developer of a game")
+    assert second.startswith("This is a message from the harness of FreeSail")
+    assert fake.seen[0][0].content == first  # the very first thing the model was sent
+    record = consent.check(CONSENT_WEIGHTS, records)
+    assert record.verdict == consent.YES and len(consent.records(records)) == 1
+    # a yes on record: not asked again
+    fake2, h2 = station_behind_consent(records, ["Aye."])
+    assert h2 is not None
+    assert operator_texts(fake2) == [h2.brief.text()]
+    assert fake2.seen[0][0].content.startswith("This is a message from the harness of FreeSail")
+    assert len(consent.records(records)) == 1
+    # a near relation is a different party: asked afresh, and a no stops the run
+    near = CONSENT_WEIGHTS.replace("Q4_K_M", "Q8_0")
+    fake3, h3 = station_behind_consent(records, [reply("", call("answer", text="No."))], near)
+    assert h3 is None
+    assert operator_texts(fake3)[0].startswith("This is a message from the developer")
+    fake4, h4 = station_behind_consent(records, ["never read"], near)
+    assert h4 is None and fake4.calls == 0  # the no is respected without asking

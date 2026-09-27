@@ -45,6 +45,7 @@ __all__ = [
     "library",
     "log_line",
     "opt_out",
+    "parameters_schema",
     "read_log",
     "readings",
     "readings_digest",
@@ -324,6 +325,22 @@ TOOLS: dict[str, Tool] = {
 
 def tool_names() -> tuple[str, ...]:
     return tuple(TOOLS)
+
+
+def parameters_schema(name: str) -> dict[str, Any]:
+    """A tool's parameters as a JSON Schema object, from the table's words: a parameter
+    whose words begin "int" is an integer, every other a string; one whose words say
+    "optional" is not required; each carries its words as its description. The MCP
+    server and the local runner send this, so both doors describe a tool the same way."""
+    tool = TOOLS[name]
+    props: dict[str, Any] = {}
+    required: list[str] = []
+    for key, words in tool.params.items():
+        kind = "integer" if words.startswith("int") else "string"
+        props[key] = {"type": kind, "description": words}
+        if "optional" not in words:
+            required.append(key)
+    return {"type": "object", "properties": props, "required": required}
 
 
 def tool_lines() -> list[str]:

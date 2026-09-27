@@ -11,9 +11,15 @@
 - `fake.py`: the scripted model the tests prove the harness with.
 - `journal.py`: the agent's own journal, saved with the game.
 - `repl.py`: the in-process door for a human or a lead at a terminal, and its turn mode.
+- `consent.py`: the consent step in front of every station brief (spec §14): the consent
+  brief as a plain conversation through the same harness, the record, the gate.
+- `mcp_server.py`: the door for Claude Desktop, an MCP server over stdio (needs the
+  `agents` extra; not imported here).
+- `local.py`: the door for a model under `llama-server` or Ollama, an OpenAI-compatible
+  chat-completions client (needs the `agents` extra; not imported here).
 
-Package 28 adds the MCP server and the local runner as two more doors over `model.py`
-and `tools.TOOLS`, and the consent step in front of the station brief.
+The harness and the consent step import nothing of any vendor; only the two doors do.
+`docs/agents/Harness.md` says how the owner uses each door.
 """
 
 from __future__ import annotations
