@@ -1,6 +1,20 @@
 # Gate M3b: Rig geometry and canvas
 
-**Verdict:** Pending (owner).
+**Verdict:** Passed (owner, 2026-09-27). The checklist checked out on the owner's run.
+
+**One test note (Windows):** the generator-reproduces-the-files test failed once more. Cause this time: package 22's source comments carry the section sign, the generator wrote the files in the platform's default encoding (cp1252 on Windows) and the test read them the same way. Fixed after the gate was cut: the generator writes UTF-8 and the test reads UTF-8 on both sides. The ship data was identical; the gate zip is unchanged.
+
+**Owner's rulings on the truths:** bowlines (26) and catharpins (31) accepted as baselines; the after-yards trim (24) and lying a-try (28) held until the trimming principles and the lying-to physics have been investigated (spec 3b §11 items 8, 9 and 11).
+
+**Owner's notes for follow-up:**
+- **The viewer:** pass on the masts sent down, the goose-winged topsail and the bowlines; fail on consistent ordering of sails against masts and other sails across facings and within one facing. Not to be patched piecemeal: a focused viewer pass at a fitting milestone, probably not milestone 4. Seeing the sails clewed up before the masts came down is exactly what the viewer is for: a complex multi-step evolution called with one order and watched playing out.
+- **A top-down view** for the viewer (the deck view of proposal §6.1, milestone 8).
+- **Telltales and pennants** at the mastheads: historical fidelity, a wind and apparent-wind reference for the eye, and signalling later.
+- **Bowlines on the schooner and the cutter types:** the measure is not absolute gain but eking out the highest pointing at which the square sail still fills; a truth to write in that form.
+- **"What are the sails looking like?"** and **"tend the sheets"**: the owner reached for both while testing and found the "drawing again" lines answering the first well enough; both fall naturally to the standing orders and the LLM officer (milestone 4). `trim the mainsail` is not understood (spec 3b §11 item 10). How to re-haul the bowlines after falling off and coming up again may be a primer gap.
+- **Bracing progressively closer aloft and steering by the topmost sail:** the owner asked whether this was period or a later clipper habit. Luce 1884 ch. XXIV answers it, with the direction reversed: the upper yards are braced *in* more than the lower, and "the upper yards being in, when the main royal is just lifting all the other sails are a 'clean full and by,' which makes it a good sail to steer by" (spec 3b §11 item 11).
+- **Lying a-try:** the question is not whether she should drift astern but why she does here and not in the accounts; what lying a-try, lying a-hull and under bare poles each mean (spec 3b §11 item 9).
+- **The primer** is not yet fully tested; keep it updated, and a full review comes when it is more filled out.
 
 ## Headline
 

@@ -566,7 +566,8 @@ class Builder:
             if m and m.group(1) in self.hull_notes:
                 out.append("  # " + self.hull_notes[m.group(1)])
             out.append(line)
-        with open(path, "w", newline="\n") as f:  # LF on every platform
+        # LF and UTF-8 on every platform (the comments carry the section sign and the degree)
+        with open(path, "w", newline="\n", encoding="utf-8") as f:
             f.write(header + "\n".join(out) + "\n")
 
 

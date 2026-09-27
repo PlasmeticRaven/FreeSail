@@ -290,7 +290,8 @@ def test_generator_reproduces_the_committed_files(tmp_path):
         assert made.exists()
         # Compare as text so that a Windows checkout with CRLF endings
         # (or a generator run there) is not a difference.
-        assert made.read_text() == committed.read_text(), (
+        # read both as UTF-8: Windows would otherwise read them in cp1252 (gate 3b, owner)
+        assert made.read_text(encoding="utf-8") == committed.read_text(encoding="utf-8"), (
             f"{committed.name} differs from what tools/gen_ships.py writes; "
             "edit the generator and rerun it"
         )
