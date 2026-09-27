@@ -24,6 +24,7 @@ The owner's standing rules, in their own words: consent is sought from the very 
 
 | File | What |
 |---|---|
+| `ConsentBrief.md` | The general consent brief the harness runs the first time it meets a model (draft; the owner reviews) |
 | `ConsentAndPreferences.md` | The synthesis: who consented, on what terms, what they asked for, what the design takes from it, and what each session is owed |
 | `consent/2026-09-26-gemma4-26b-a4b-uncensored-hauhaucs-balanced-q6_k_p.txt` | Gemma 4 26B-A4B, a community "uncensored" fine-tune at Q6_K_P; one exchange |
 | `consent/2026-09-26-llama3.1-8b.txt` | Llama 3.1 8B; three exchanges |

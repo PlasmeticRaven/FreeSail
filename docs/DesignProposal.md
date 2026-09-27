@@ -544,7 +544,7 @@ Each milestone ends in something you can run, and in a **gate**: a report writte
 
 **M3. Crew.** Individual sailors, watches, the task system, the first 40 evolutions with realistic timings. Tacking and wearing as competing for hands. *Proves: orders take time and skill; the game has decisions.*
 
-**M4. Standing orders and the watcher.** The standing dialect; starter routines; the MCP tool interface; a narrator agent on a local model and on Claude via the desktop app. *Proves: automation and LLM watching; first real playtest of "the ship sails itself".*
+**M4. Standing orders and the watcher**, in three short gates (owner's decision at the close of 3b): **4a** the standing dialect with its readings registry, starter routines and a thin Python API that compiles to the same rules; **4b** the harness with two front doors (an MCP server for Claude Desktop, a local runner for llama.cpp), the fixed brief head, the `FREESAIL-OPT-OUT` token, welfare stops, the journal, the consent step, and the watcher as the first station, answering `ask`; **4c** a day's passage under standing orders through a scripted weather timeline at time compression with log roll-up, saved and replayed, and the owner's first playtest on a form. *Proves: automation and LLM watching; first real playtest of "the ship sails itself".* Specification: `docs/TechnicalSpec-M4.md`.
 
 **M5. A world.** Weather systems, a small map with coast and depth, tides, dead-reckoning navigation, two ports with markets, a dozen NPC ships with LOD. *Proves: emergent play; a passage is a game.*
 
