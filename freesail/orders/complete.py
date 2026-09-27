@@ -47,6 +47,13 @@ STANDING_SENTENCES = (
     'resume standing order "',
     "belay all standing orders",
 )
+# The station sentences (spec M4 §12), offered whole.
+STATION_SENTENCES = (
+    "ask the watcher ",
+    "stand down the watcher",
+    "resume the watcher",
+    "show the watcher's journal",
+)
 TRIGGER_WORDS = ("when ", "at ", "every ")
 COMPARISON_WORDS = {
     "speed": ("exceeds ", "is over ", "is under ", "is below "),
@@ -218,7 +225,7 @@ def suggestions(ship: Any, text: str, limit: int = 12) -> list[str]:
                 else phrase
             )
         offer("send the ")
-        for c in STANDING_SENTENCES + DRIVER_COMMANDS:
+        for c in STANDING_SENTENCES + STATION_SENTENCES + DRIVER_COMMANDS:
             offer(c)
         # the verbs' own names before their synonyms, then the shortest first
         return sorted(out, key=lambda s: (normalise(s.rstrip('"')) not in vocab.verbs, len(s), s))[

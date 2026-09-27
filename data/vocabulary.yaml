@@ -425,6 +425,27 @@ verbs:
     synonyms: [belay the standing orders, belay every standing order, cancel all standing orders]
     object: standing
     level: 2
+  # The station sentences (milestone 4b, spec M4 §12): what the captain says to an
+  # agent's station. `orders.handle` hands them to `freesail.orders.stations` before the
+  # imperative parser sees them; they are listed here so that completion, the spelling
+  # hints and the verb table know the words. `ask`, `stand down` and `resume` are
+  # orders (journaled); the journal is a query like `state`.
+  ask the watcher:
+    synonyms: [ask watcher]
+    object: station
+    level: 2
+  stand down the watcher:
+    synonyms: [stand the watcher down]
+    object: station
+    level: 2
+  resume the watcher:
+    synonyms: [continue the watcher]
+    object: station
+    level: 2
+  show the watcher's journal:
+    synonyms: [the watcher's journal, show the watcher journal, show the journal of the watcher]
+    object: station
+    level: 2
   # Reading a file of standing orders is the driver's business (it reads the disk): the
   # console and the server take `read the standing orders from <file>`, and the ship,
   # should it reach her, says so.

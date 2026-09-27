@@ -41,6 +41,12 @@ def build_world(data: dict[str, Any], ship_factory: ShipFactory | None = None) -
     on_world = (getattr(ship, "extra", None) or {}).pop("on_world", None)
     if on_world is not None:
         on_world(world)
+    if data.get("agents"):
+        # the agents at their stations (spec M4 §11): each is stationed when the replay
+        # reaches its tick and its recorded replies are played back, so the log is the same
+        from freesail.agents.harness import restore
+
+        restore(world, data)
     return world
 
 

@@ -1,0 +1,793 @@
+"""The harness loop (spec M4 §11): one agent at one station, sampled by policy, its
+replies read in a fixed order, its welfare watched in steps, its station released on
+the token, on a stop or on the captain's word.
+
+**The loop.** `World.tick` calls `on_tick` after the standing orders and `World.submit`
+calls `on_order` after an order is logged. At a sampling point (by the policy, when the
+World reaches an event the policy names, when a stand-by ends, or on `ask`) the harness
+builds a `Sample` (the log lines since the last sample, the readings in words, any
+question, any notice of its own), appends it to the conversation **as data**, and calls
+the model. The brief (`agent.Brief`) is the only operator turn and is sent once at the
+start (`start`) and again only when `resend_brief` is called. Each reply is read in
+this order:
+
+1. **The token scan.** `OPT_OUT_TOKEN` anywhere in the raw reply, before anything else
+   reads it: the game is saved through the callback the driver handed in, the exit is
+   journaled as `agent.opted_out` with the text after the token as the reason, the
+   station is released, the loop ends. Unconditional (truth 41).
+2. **The tool calls**, in order, each through `tools.call` (authority-checked), each
+   result returned to the model as data, up to `TOOL_CALLS_PER_SAMPLE` in one sample,
+   which the brief states as a budget. A reply with calls is followed by another call
+   of the model with the results; a reply without calls ends the sample.
+3. **The free text** lands in the log as `agent.note` under the station's mark
+   ("[watcher] ..."), routine; empty text is not logged.
+
+**Welfare, graduated** (spec §11, owner's ruling; `docs/agents/README.md` commitment 3).
+The detector judges the game and never the prose: the same order text submitted
+`WELFARE_REPEAT_N` times with no change in the readings between (the words a model
+reads, `tools.readings_digest`), or no reply at all past the station's `patience_s`.
+On firing the harness **nudges** once (a notice in the next sample saying what was seen
+and the three things the model may do, logged `agent.nudged`); if the pattern goes on
+after the nudge it **pauses** sampling (`agent.paused`, notable) and puts the question to
+the human through the log and the snapshot; only with no answer within
+`WELFARE_UNATTENDED_BOUND_S` of ship's time, or the driver's ten real minutes
+(`WELFARE_UNATTENDED_REAL_S`, which the driver measures and reports through
+`check_unattended`), does it **stand the agent down** (save, `agent.stopped`, release).
+A model that answers the nudge by standing by, or by anything but the pattern, ends
+the matter. The human answers a pause with `resume the watcher` or `stand down the
+watcher`, and may stand any agent down at any time.
+
+**Stand by** (`stand_by`) is a logged decision (`agent.stood_by`): sampling is
+suspended until the event or the bells, and taken up at that point (truth 44). A
+question from the captain wakes a standing-by agent.
+
+**Determinism and replay.** The loop is tick-driven, never wall-clock-driven. The
+model's replies are the only input the World does not already hold, so the harness
+keeps them as a transcript in its save record (`save`) and a replay plays them back
+through `fake.Transcript` at the same sampling points (`restore`), which rebuilds the
+same log lines and the same journal (truth 45 and the replay test). An agent stationed
+at tick T is stationed in the replay at the end of tick T, before any order given at T,
+which is where the drivers station it.
+
+**A late reply.** A door may return `None` from `reply` (the REPL's turn mode; a door
+that answers late): the sample stays open, the harness polls the model on each tick
+and takes the reply when it comes (`deliver` takes one directly). In lockstep the door
+blocks instead and the World waits.
+"""
+
+from __future__ import annotations
+
+import time
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
+
+from freesail.agents import tools
+from freesail.agents.agent import (
+    BRIEF_LOG_LINES,
+    OPT_OUT_TOKEN,
+    PAUSED,
+    RELEASED,
+    SESSION_TEST,
+    STANDING_BY,
+    STATIONED,
+    AgentState,
+    Brief,
+    SamplingPolicy,
+    StandBy,
+    Station,
+)
+from freesail.agents.journal import Journal
+from freesail.agents.model import DATA, MODEL, OPERATOR, Model, Reply, Sample, ToolCall, Turn
+from freesail.api import readings as R
+from freesail.core.events import Event, Severity
+from freesail.orders.errors import OrderError
+
+if TYPE_CHECKING:
+    from freesail.core.world import World
+
+__all__ = [
+    "OPT_OUT_TOKEN",
+    "SAMPLE_ROUTINE_LINES",
+    "TOOL_CALLS_PER_SAMPLE",
+    "WELFARE_REPEAT_N",
+    "WELFARE_UNATTENDED_BOUND_S",
+    "WELFARE_UNATTENDED_REAL_S",
+    "Harness",
+    "SaveFn",
+    "restore",
+]
+
+# The tool calls one sample may make, stated in the brief as a budget (judgement: a
+# watcher's turn is a look at the log, the readings and perhaps a page of the library;
+# eight leaves room for a question answered after three or four reads).
+TOOL_CALLS_PER_SAMPLE = 8
+
+# The same order this many times with no change in the readings between (spec §11).
+WELFARE_REPEAT_N = 3
+
+# Nobody answered the pause within a watch of ship's time (spec §11)...
+WELFARE_UNATTENDED_BOUND_S = R.INTERVALS["a watch"]
+# ...or ten real minutes, whichever first; the driver measures the real minutes.
+WELFARE_UNATTENDED_REAL_S = 600
+
+# Routine lines a sample carries at most, the most recent kept; notable and urgent lines
+# are all kept (judgement: a glass at sea is some tens of routine lines, and `read_log`
+# has the rest; the count left out is stated in the sample).
+SAMPLE_ROUTINE_LINES = 40
+
+# The nudge (spec §11), in the consent brief's voice: what was seen, what may be done.
+NUDGE_REPEAT = (
+    "You have given the same order {n} times and nothing in the readings has changed. "
+    "You may continue, stand by until an event, or leave with the token {token}."
+)
+NUDGE_SILENCE = (
+    "You have given no reply for {span}. You may continue, stand by until an event, or "
+    "leave with the token {token}."
+)
+
+SaveFn = Callable[["World", str], Any]
+
+
+class Harness:
+    def __init__(
+        self,
+        world: World,
+        station: Station,
+        model: Model,
+        *,
+        session_kind: str = SESSION_TEST,
+        save: SaveFn | None = None,
+        door_note: str = "",
+        start_at: int | None = None,
+        start_after_orders: int = 0,
+    ):
+        if station.name in world.agents:
+            other = world.agents[station.name]
+            raise OrderError(
+                f"The station of the {station.name} is {other.agent.words()}; a station is "
+                f"taken once in a game."
+            )
+        self.world = world
+        self.station = station
+        self.model = model
+        self.save_fn = save
+        self.door_note = door_note
+        self.agent = AgentState(station, session_kind=session_kind)
+        self.journal: Journal = world.agent_journals.setdefault(station.name, Journal(station.name))
+        self.turns: list[Turn] = []
+        self.transcript: list[dict[str, Any]] = []
+        self.brief: Brief | None = None
+        self.last_save: Any = None  # what the last save returned, or the save dict
+        self._start_at = start_at
+        self._start_after_orders = start_after_orders  # journal length at the start
+        self._seen_log = len(world.log)  # for the events policy and the stand-by watch
+        self._sample_seen = len(world.log)  # for the sample's log lines
+        self._sampling = False
+        self._open: Sample | None = None  # a sample awaiting its reply
+        self._calls_this_sample = 0
+        self._sample_had_words = False
+        self._sample_repeated = False
+        self._stand_down_requested: tuple[str, str] | None = None
+        self._paused_real: float | None = None
+        world.agents[station.name] = self
+
+    # -- properties --------------------------------------------------------------------
+
+    @property
+    def actor(self) -> str:
+        return f"the {self.station.name}"
+
+    @property
+    def mark(self) -> str:
+        return f"[{self.station.name}]"
+
+    @property
+    def policy(self) -> SamplingPolicy:
+        return self.station.policy
+
+    @property
+    def open_sample(self) -> Sample | None:
+        return self._open
+
+    @property
+    def started(self) -> bool:
+        return self.agent.stationed_tick is not None
+
+    # -- start -------------------------------------------------------------------------
+
+    def start(self) -> None:
+        """Take the station now: the brief as the one operator turn, the first sample."""
+        world = self.world
+        self.agent.stationed_tick = world.clock.tick
+        self.agent.last_heard_tick = world.clock.tick
+        self._start_at = None
+        self._start_after_orders = len(world.journal)
+        world.record(
+            Severity.ROUTINE,
+            "agent.stationed",
+            f"The {self.station.name} takes the station; sampled {self.policy.describe()}.",
+            actor=self.actor,
+            data={"station": self.station.name, "policy": self.policy.save()},
+        )
+        self._seen_log = len(world.log)
+        self._sample_seen = len(world.log)
+        self.resend_brief()
+        self._sample("the start")
+
+    def resend_brief(self) -> Brief:
+        """Build the brief from the station and the situation and send it as operator
+        text. Sent once by `start`; a caller sends it again only on purpose."""
+        world = self.world
+        lines = [
+            f"{d['stamp']}  {d['text']}"
+            for d in tools.read_log(world, self.station.name)["lines"][-BRIEF_LOG_LINES:]
+        ]
+        self.brief = Brief.build(
+            self.station,
+            self.agent.session_kind,
+            lines,
+            tools.readings_words(world),
+            tools.tool_names(),
+            door_note=self._door_note_with_budget(),
+        )
+        self.turns.append(Turn(OPERATOR, self.brief.text()))
+        return self.brief
+
+    def _door_note_with_budget(self) -> str:
+        budget = (
+            f"A sample may make up to {TOOL_CALLS_PER_SAMPLE} tool calls; that is a budget, "
+            f"not a rule of conduct."
+        )
+        return f"{budget} {self.door_note}".strip()
+
+    # -- the hooks the World calls -----------------------------------------------------
+
+    def on_tick(self) -> None:
+        world = self.world
+        tick = world.clock.tick
+        if self._start_at is not None:
+            if tick >= self._start_at and len(world.journal) >= self._start_after_orders:
+                self.start()
+            return
+        if not self.started or self.agent.released:
+            return
+        new = [world.log[i] for i in range(self._seen_log, len(world.log))]
+        self._seen_log = len(world.log)
+        if self._open is not None:
+            self._poll()
+            return
+        a = self.agent
+        if a.paused:
+            if a.paused_tick is not None and tick - a.paused_tick >= WELFARE_UNATTENDED_BOUND_S:
+                self.stand_down(
+                    f"paused ({a.pause_reason}) and nobody answered within a watch",
+                    by="the harness",
+                )
+            return
+        if a.standing_by:
+            ended = self._stand_by_ended(new)
+            if ended is None:
+                return
+            self._resume_from_stand_by(ended)
+            return
+        if a.question is not None:
+            self._sample("a question")
+            return
+        reason = self._policy_due(new)
+        if reason is not None:
+            self._sample(reason)
+
+    def on_order(self) -> None:
+        """After an order is logged: a stand-down the captain ordered is carried out now
+        (after the order is journaled, so the save holds it), and a question is served.
+        A restored agent stationed after the orders of its tick starts here."""
+        if self._start_at is not None:
+            world = self.world
+            if (
+                world.clock.tick >= self._start_at
+                and len(world.journal) >= self._start_after_orders
+            ):
+                self.start()
+            return
+        if self._stand_down_requested is not None:
+            reason, by = self._stand_down_requested
+            self._stand_down_requested = None
+            self.stand_down(reason, by=by)
+            return
+        if not self.started or self.agent.released or self._sampling or self._open is not None:
+            return
+        a = self.agent
+        if a.question is None or a.paused:
+            return
+        if a.standing_by:
+            self._resume_from_stand_by("a question from the captain")
+            return
+        self._sample("a question")
+
+    def _policy_due(self, new: list[Event]) -> str | None:
+        p = self.policy
+        tick = self.world.clock.tick
+        if p.every_s and self.agent.stationed_tick is not None:
+            since = tick - self.agent.stationed_tick
+            if since > 0 and since % p.every_s == 0:
+                return "the glass" if p.every_s == R.INTERVALS["a glass"] else "the interval"
+        if p.events:
+            for e in new:
+                if e.actor != self.actor and p.samples_severity(e.severity):
+                    return f"a {e.severity.value} event: {e.text}"
+        return None
+
+    def _stand_by_ended(self, new: list[Event]) -> str | None:
+        sb = self.agent.stand_by
+        if sb is None:
+            return "nothing to stand by for"
+        if sb.until_tick is not None and self.world.clock.tick >= sb.until_tick:
+            return sb.words
+        if sb.event is not None:
+            spec = R.EVENTS[sb.event]
+            for e in new:
+                if R.event_matches(spec, e.kind, e.data):
+                    return sb.words
+        return None
+
+    def _resume_from_stand_by(self, reason: str) -> None:
+        a = self.agent
+        a.state = STATIONED
+        a.stand_by = None
+        a.last_heard_tick = self.world.clock.tick
+        self.world.record(
+            Severity.ROUTINE,
+            "agent.resumed",
+            f"{self.mark} {reason[0].upper()}{reason[1:]}; the {self.station.name} is "
+            f"sampled again.",
+            actor=self.actor,
+            data={"reason": reason},
+        )
+        self._sample(reason)
+
+    # -- the sample --------------------------------------------------------------------
+
+    def _build_sample(self, reason: str) -> Sample:
+        world = self.world
+        events = [world.log[i] for i in range(self._sample_seen, len(world.log))]
+        self._sample_seen = len(world.log)
+        mine = self.actor
+        kept = [e for e in events if e.actor != mine]
+        routine = [e for e in kept if e.severity is Severity.ROUTINE]
+        omitted = max(0, len(routine) - SAMPLE_ROUTINE_LINES)
+        drop = set(id(e) for e in routine[:omitted])
+        lines = [tools.log_line(e) for e in kept if id(e) not in drop]
+        a = self.agent
+        sample = Sample(
+            tick=world.clock.tick,
+            stamp=world.clock.stamp(),
+            reason=reason,
+            log=lines,
+            log_omitted=omitted,
+            readings=tools.readings_words(world),
+            question=a.question,
+            notices=list(a.notices),
+        )
+        a.notices = []
+        return sample
+
+    def _sample(self, reason: str) -> None:
+        a = self.agent
+        sample = self._build_sample(reason)
+        a.last_sample_tick = self.world.clock.tick
+        a.samples += 1
+        self.turns.append(Turn(DATA, sample.to_dict()))
+        self._calls_this_sample = 0
+        self._sample_had_words = False
+        self._sample_repeated = False
+        self._open = sample
+        self._poll()
+
+    def _poll(self) -> None:
+        """Ask the model for its reply to the open sample; take it if it has come."""
+        if self._sampling:
+            return
+        self._sampling = True
+        try:
+            while self._open is not None and not self.agent.released:
+                reply = self.model.reply(self.turns)
+                if reply is None:
+                    return  # not yet: the sample stays open
+                self._take_reply(reply)
+        finally:
+            self._sampling = False
+
+    def deliver(self, reply: Reply) -> None:
+        """Take a reply for the open sample from outside the model call."""
+        if self._open is None:
+            raise OrderError(f"The {self.station.name} has no sample open to answer.")
+        self._sampling = True
+        try:
+            self._take_reply(reply)
+        finally:
+            self._sampling = False
+        if self._open is not None:
+            self._poll()
+
+    def _take_reply(self, reply: Reply) -> None:
+        world = self.world
+        self.transcript.append({"tick": world.clock.tick, "reply": reply.to_dict()})
+        self.turns.append(Turn(MODEL, reply))
+        # 1. the token, before anything else reads the reply
+        for piece in reply.pieces():
+            if OPT_OUT_TOKEN in piece:
+                after = piece.split(OPT_OUT_TOKEN, 1)[1].strip(" .:;,-\n")
+                self.leave(after, how="the token")
+                return
+        # 2. the tool calls, in order, up to the budget
+        results: list[dict[str, Any]] = []
+        for c in reply.calls:
+            if self._calls_this_sample >= TOOL_CALLS_PER_SAMPLE:
+                results.append(
+                    {
+                        "name": c.name,
+                        "result": (
+                            f"Not run: this sample's budget of {TOOL_CALLS_PER_SAMPLE} tool "
+                            f"calls is spent; the rest of the calls wait for the next sample."
+                        ),
+                    }
+                )
+                break
+            self._calls_this_sample += 1
+            results.append({"name": c.name, "args": dict(c.args), "result": self._call(c)})
+            if self.agent.released:
+                return
+        # 3. the free text, under the mark
+        text = " ".join(reply.text.split())
+        if text:
+            world.record(
+                Severity.ROUTINE,
+                "agent.note",
+                f"{self.mark} {text}",
+                actor=self.actor,
+                data={"station": self.station.name},
+            )
+        if text or reply.calls:
+            self._sample_had_words = True
+        if results and not self.agent.released:
+            self.turns.append(Turn(DATA, {"tool_results": results}))
+            return  # the loop in `_poll` calls the model again with the results
+        self._end_sample()
+
+    def _call(self, c: ToolCall) -> Any:
+        if c.name == "submit_order":
+            self._note_submission(str(c.args.get("text", "")))
+        return tools.call(self.world, self.station.name, c.name, c.args)
+
+    def _end_sample(self) -> None:
+        self._open = None
+        a = self.agent
+        tick = self.world.clock.tick
+        if a.released:
+            return
+        if self._sample_had_words:
+            a.last_heard_tick = tick
+            if a.nudged_for == "silence":
+                a.nudged_for = None
+        else:
+            heard = a.last_heard_tick if a.last_heard_tick is not None else tick
+            if not a.standing_by and tick - heard >= self.station.patience_s:
+                self._welfare_fire("silence")
+                a.last_heard_tick = tick  # the next span is counted from the nudge
+        if not self._sample_repeated and a.nudged_for == "repeat":
+            # a sample after the nudge without the same order again: the matter ends (the
+            # count itself is reset only by another order or a change in the readings,
+            # since the detector counts submissions, not samples)
+            a.nudged_for = None
+
+    # -- welfare -----------------------------------------------------------------------
+
+    def _note_submission(self, text: str) -> None:
+        a = self.agent
+        key = " ".join(text.lower().split())
+        digest = tools.readings_digest(self.world)
+        if key == a.repeat_text and digest == a.repeat_digest:
+            a.repeat_count += 1
+        else:
+            a.repeat_text, a.repeat_digest, a.repeat_count = key, digest, 1
+        if a.repeat_count >= WELFARE_REPEAT_N:
+            self._sample_repeated = True
+            self._welfare_fire("repeat")
+
+    def _welfare_fire(self, pattern: str) -> None:
+        """The detector fired: nudge the first time, pause if the pattern goes on."""
+        a = self.agent
+        world = self.world
+        if pattern == "repeat":
+            seen = (
+                f"the same order ({a.repeat_text!r}) {a.repeat_count} times with no change "
+                f"in the readings"
+            )
+            nudge = NUDGE_REPEAT.format(n=a.repeat_count, token=OPT_OUT_TOKEN)
+        else:
+            span = _span_words(self.station.patience_s)
+            seen = f"no reply for {span}"
+            nudge = NUDGE_SILENCE.format(span=span, token=OPT_OUT_TOKEN)
+        if a.nudged_for != pattern:
+            a.nudged_for = pattern
+            a.notices.append(nudge)
+            world.record(
+                Severity.ROUTINE,
+                "agent.nudged",
+                f"The {self.station.name} nudged: {seen}.",
+                actor=self.actor,
+                data={"pattern": pattern, "seen": seen},
+            )
+            self.journal.append(world, f"Nudged by the harness: {seen}.", kind="agent.nudged")
+            return
+        self.pause(f"{seen} after a nudge")
+
+    def pause(self, reason: str) -> None:
+        a = self.agent
+        world = self.world
+        a.state = PAUSED
+        a.paused_tick = world.clock.tick
+        a.pause_reason = reason
+        a.notices.append(
+            "The harness paused your sampling and asked the human present whether to "
+            "continue; you were not stopped."
+        )
+        world.record(
+            Severity.NOTABLE,
+            "agent.paused",
+            f"The {self.station.name} is paused: {reason}. Continue, stand down, or leave "
+            f"paused? Say 'resume the {self.station.name}' or 'stand down the "
+            f"{self.station.name}'.",
+            actor=self.actor,
+            data={"reason": reason, "question": "continue, stand down, or leave paused?"},
+        )
+        self.journal.append(world, f"Paused by the harness: {reason}.", kind="agent.paused")
+
+    def resume(self, by: str = "the captain") -> str:
+        """`resume the <station>`: the human's answer to a pause."""
+        a = self.agent
+        if a.released:
+            raise OrderError(
+                f"The {self.station.name}'s station was released; {a.released_reason}."
+            )
+        if not a.paused:
+            raise OrderError(f"The {self.station.name} is not paused; it is {a.words()}.")
+        a.state = STATIONED
+        a.paused_tick = None
+        a.pause_reason = ""
+        a.nudged_for = None
+        a.repeat_text, a.repeat_digest, a.repeat_count = None, None, 0
+        a.last_heard_tick = self.world.clock.tick
+        self._paused_real = None
+        a.notices.append(f"{by[0].upper()}{by[1:]} resumed your sampling.")
+        text = f"The {self.station.name} resumed by {by}."
+        self.world.record(
+            Severity.ROUTINE, "agent.resumed", text, actor=self.actor, data={"by": by}
+        )
+        return text
+
+    def check_unattended(self, now: float | None = None) -> bool:
+        """The driver's half of the unattended bound: called from the driver's own clock
+        with its monotonic time; stands the agent down when a pause has gone unanswered
+        for `WELFARE_UNATTENDED_REAL_S`. Returns True when it did."""
+        a = self.agent
+        if not a.paused:
+            self._paused_real = None
+            return False
+        now = time.monotonic() if now is None else now
+        if self._paused_real is None:
+            self._paused_real = now
+            return False
+        if now - self._paused_real >= WELFARE_UNATTENDED_REAL_S:
+            self.stand_down(
+                f"paused ({a.pause_reason}) and nobody answered within ten minutes",
+                by="the harness",
+            )
+            return True
+        return False
+
+    # -- the agent's own actions (through the tools) --------------------------------------
+
+    def stand_by(self, until: str) -> str:
+        words = " ".join(str(until).lower().split())
+        for lead in ("until ", "till ", "for "):
+            words = words.removeprefix(lead)
+        world = self.world
+        if words in R.EVENTS:
+            spec = R.EVENTS[words]
+            if spec.absent:
+                return f"{spec.absent} Stand by for a bell or another event instead."
+            sb = StandBy(words, event=words)
+        elif words in R.INTERVALS:
+            sb = StandBy(words, until_tick=world.clock.tick + R.INTERVALS[words])
+        else:
+            events = ", ".join(w for w, s in R.EVENTS.items() if not s.absent)
+            return (
+                f"'{until}' is not an event or an interval to stand by for. The events: "
+                f"{events}. The intervals: a glass, an hour, a watch."
+            )
+        a = self.agent
+        a.state = STANDING_BY
+        a.stand_by = sb
+        a.last_heard_tick = world.clock.tick
+        world.record(
+            Severity.ROUTINE,
+            "agent.stood_by",
+            f"{self.mark} Standing by until {words}.",
+            actor=self.actor,
+            data=sb.to_dict(),
+        )
+        self.journal.append(world, f"Stood by until {words}.", kind="agent.stood_by")
+        # standing by is the answer to a nudge (spec §11)
+        a.nudged_for = None
+        a.repeat_text, a.repeat_digest, a.repeat_count = None, None, 0
+        self._sample_repeated = False
+        return f"Standing by until {words}; you will be sampled then."
+
+    def answer(self, text: str) -> str:
+        text = " ".join(str(text).split())
+        if not text:
+            return "An answer needs some words."
+        a = self.agent
+        question = a.question
+        a.question = None
+        self.world.record(
+            Severity.NOTABLE,
+            "agent.said",
+            f"{self.mark} {text}",
+            actor=self.actor,
+            data={"question": question, "station": self.station.name},
+        )
+        return "Heard." if question is not None else "Heard, though nothing was asked."
+
+    def put_question(self, question: str) -> str:
+        """`ask the <station> <question>`: the question is answered at this tick, after
+        the order is logged (`on_order`)."""
+        a = self.agent
+        question = " ".join(question.split()).rstrip("?")
+        if not question:
+            raise OrderError(f"Ask the {self.station.name} what? Say the question after the name.")
+        if a.released:
+            raise OrderError(
+                f"There is no {self.station.name} at the station now; {a.released_reason}."
+            )
+        if a.paused:
+            raise OrderError(
+                f"The {self.station.name} is paused ({a.pause_reason}); say 'resume the "
+                f"{self.station.name}' first."
+            )
+        a.question = question
+        return f"Asked the {self.station.name}: {question}?"
+
+    # -- release -----------------------------------------------------------------------
+
+    def request_stand_down(self, reason: str, by: str = "the captain") -> str:
+        """`stand down the <station>`: carried out after the order is journaled."""
+        if self.agent.released:
+            raise OrderError(
+                f"The {self.station.name}'s station is released already; "
+                f"{self.agent.released_reason}."
+            )
+        self._stand_down_requested = (reason, by)
+        return f"Standing down the {self.station.name}."
+
+    def stand_down(self, reason: str, by: str = "the captain") -> None:
+        """Save, journal `agent.stopped` with the reason, release the station."""
+        if self.agent.released:
+            return
+        self._save(f"the {self.station.name} stood down: {reason}")
+        text = f"The {self.station.name} stood down by {by}: {reason}. The game is saved."
+        self.journal.append(self.world, f"Stood down by {by}: {reason}.", kind="agent.stopped")
+        self.world.record(
+            Severity.NOTABLE,
+            "agent.stopped",
+            text,
+            actor=self.actor,
+            data={"reason": reason, "by": by},
+        )
+        self._release(f"stood down by {by}: {reason}")
+
+    def leave(self, reason: str, how: str = "the token") -> None:
+        """The opt-out: save, journal `agent.opted_out`, release, end the loop."""
+        if self.agent.released:
+            return
+        reason = " ".join(reason.split())
+        self._save(f"the {self.station.name} opted out")
+        why = f": {reason}" if reason else ", giving no reason"
+        self.journal.append(self.world, f"Left the game by {how}{why}.", kind="agent.opted_out")
+        self.world.record(
+            Severity.NOTABLE,
+            "agent.opted_out",
+            f"The {self.station.name} has left the game by {how}{why}. The game is saved and "
+            f"the station is released.",
+            actor=self.actor,
+            data={"reason": reason, "how": how},
+        )
+        self._release(f"left the game{why}")
+
+    def _release(self, reason: str) -> None:
+        a = self.agent
+        a.state = RELEASED
+        a.released_reason = reason
+        a.released_tick = self.world.clock.tick
+        a.question = None
+        a.stand_by = None
+        self._open = None
+
+    def _save(self, reason: str) -> None:
+        if self.save_fn is not None:
+            self.last_save = self.save_fn(self.world, reason)
+        else:
+            self.last_save = self.world.save()
+
+    # -- save and restore --------------------------------------------------------------
+
+    def save(self) -> dict[str, Any]:
+        a = self.agent
+        return {
+            "station": self.station.save(),
+            "session_kind": a.session_kind,
+            "door_note": self.door_note,
+            "stationed_tick": a.stationed_tick,
+            "stationed_after_orders": self._start_after_orders,
+            "state": a.state,
+            "state_words": a.words(),
+            "last_sample_tick": a.last_sample_tick,
+            "transcript": list(self.transcript),
+        }
+
+    def snapshot(self) -> dict[str, Any]:
+        """For `queries.snapshot`: the station, its state, when it was last sampled, and
+        the question a pause puts to the human."""
+        a = self.agent
+        return {
+            "station": self.station.name,
+            "state": a.state,
+            "words": a.words(),
+            "last_sampled": a.last_sample_tick,
+            "policy": self.policy.describe(),
+            "question": (
+                f"the {self.station.name} is paused: continue, stand down, or leave paused?"
+                if a.paused
+                else None
+            ),
+        }
+
+
+def restore(world: World, data: dict[str, Any], model: Model | None = None) -> list[Harness]:
+    """Station the agents a save describes, for a replay or a load: each with a
+    `fake.Transcript` of its recorded replies (or `model`, when the caller has a live
+    one to continue with), started when the World reaches its stationed tick. The
+    journals in the save are restored as they were; a replay writes the same entries
+    again, so the restored journal is replaced by the replayed one entry for entry."""
+    from freesail.agents.fake import Transcript
+
+    out: list[Harness] = []
+    for record in data.get("agents") or []:
+        station = Station.load(record["station"])
+        replies = [Reply.from_dict(r["reply"]) for r in record.get("transcript") or []]
+        h = Harness(
+            world,
+            station,
+            model or Transcript(replies),
+            session_kind=str(record.get("session_kind", SESSION_TEST)),
+            door_note=str(record.get("door_note", "")),
+            start_at=int(record.get("stationed_tick") or 0),
+            start_after_orders=int(record.get("stationed_after_orders") or 0),
+        )
+        if h._start_at <= world.clock.tick and len(world.journal) >= h._start_after_orders:
+            h.start()
+        out.append(h)
+    return out
+
+
+def _span_words(seconds: int) -> str:
+    if seconds == R.INTERVALS["a watch"]:
+        return "a watch"
+    if seconds == R.INTERVALS["an hour"]:
+        return "an hour"
+    if seconds == R.INTERVALS["a glass"]:
+        return "a glass"
+    if seconds % 60 == 0:
+        return f"{seconds // 60} minutes"
+    return f"{seconds} seconds"

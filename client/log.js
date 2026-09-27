@@ -85,7 +85,18 @@
     stamp.title = e.ship_time.replace("T", " ") + " (tick " + e.tick + ")";
     var text = document.createElement("span");
     text.className = "text";
-    text.textContent = e.text;
+    // an agent's line opens with its station's mark, "[watcher] ...", inline (spec M4
+    // §12, owner's ruling); the mark gets its own span so a style can pick it out
+    var who = e.kind && e.kind.indexOf("agent.") === 0 ? /^\[([^\]]+)\]\s*/.exec(e.text) : null;
+    if (who) {
+      var station = document.createElement("span");
+      station.className = "station";
+      station.textContent = "[" + who[1] + "]";
+      text.appendChild(station);
+      text.appendChild(document.createTextNode(" " + e.text.slice(who[0].length)));
+    } else {
+      text.textContent = e.text;
+    }
     div.appendChild(mark);
     div.appendChild(stamp);
     div.appendChild(text);

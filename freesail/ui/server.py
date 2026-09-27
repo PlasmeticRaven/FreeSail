@@ -1,7 +1,7 @@
 """The local web server: a FastAPI app around one world, and the browser client.
 
     python -m freesail.ui.server data/ships/frigate-36.yaml [--seed N] [--wind FROM,KN]
-                                 [--heading DEG] [--time N] [--port 8000]
+                                 [--heading DEG] [--time N] [--port 8000] [--watcher fake]
 
 then open http://localhost:8000.
 
@@ -53,7 +53,12 @@ from freesail.api import queries
 from freesail.core import replay as replay_mod
 from freesail.core.events import Event
 from freesail.core.world import Scenario, World
-from freesail.ui.console import read_standing_orders, read_standing_orders_path
+from freesail.ui.console import (
+    check_agents_unattended,
+    read_standing_orders,
+    read_standing_orders_path,
+    station_watcher,
+)
 
 CLIENT_DIR = Path(__file__).resolve().parents[2] / "client"
 
@@ -251,6 +256,7 @@ class Driver:
                 with self.lock:
                     if self.running:
                         self._run_ticks(n)
+                        check_agents_unattended(self.world)
         return owed
 
     def _clock_thread(self) -> None:
@@ -460,11 +466,16 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--standing-orders", help="a file of standing orders to give at the start (spec M4 §6)"
     )
+    ap.add_argument(
+        "--watcher", help="station a watcher: 'fake' for the scripted narrator (spec M4 §12)"
+    )
     args = ap.parse_args(argv)
 
     import uvicorn
 
     world = build_world(args)
+    if args.watcher:
+        station_watcher(world, args.watcher, out=sys.stdout)
     if args.standing_orders:
         read_standing_orders(world, args.standing_orders)
     driver = Driver(world, compression=args.time)
