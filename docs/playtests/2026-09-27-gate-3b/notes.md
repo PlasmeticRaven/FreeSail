@@ -104,3 +104,8 @@ note that only its head should follow the gaff's angle (spec 3b open item 15).
    orders`, `state`) rather than refuse them as console commands.
 5. No leeway line under a speed floor.
 6. The ringtail's head follows the gaff (open item 15, already recorded).
+7. **The agent doors are judged by a layman's first run** (owner's note at gate 4b, 2026-09-27):
+   the owner's errors and misunderstandings at the harness, the doors and the setup
+   documents are design notes about the doors, not about the owner. First case: the
+   practice consent conversation at the REPL stumbled on the blank line that sends a
+   reply and on the `>` before a tool call; both were fixed in the door the same day.
