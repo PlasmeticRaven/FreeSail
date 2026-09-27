@@ -30,7 +30,7 @@ py -m pip install -e ".[dev,server]"
 ```
 py -m pytest
 ```
-*Takes about twelve minutes. Ends `1253 passed, 8 xfailed`. The eight expected failures are the seven earlier rulings (truth 3 for the schooner, truth 11's ground, truth 18's times, and truths 24, 26, 28 and 31) and one of this milestone marked for your ruling (truth 37's storm staysail, item 5). A `failed` is a fault.*
+*Takes about twelve minutes. Ends `1254 passed, 8 xfailed`. The eight expected failures are the seven earlier rulings (truth 3 for the schooner, truth 11's ground, truth 18's times, and truths 24, 26, 28 and 31) and one of this milestone marked for your ruling (truth 37's storm staysail, item 5). A `failed` is a fault.*
 
 ## Checklist
 
