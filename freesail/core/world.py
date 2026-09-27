@@ -52,6 +52,10 @@ class Scenario:
 
 JournalEntry = tuple[int, str, str]  # (tick, actor, order text)
 
+# The actor a standing order's firing carries (spec M4 §4); `freesail.standing.runtime`
+# writes it and the World knows a firing by it.
+STANDING_ACTOR_PREFIX = "standing order "
+
 
 class World:
     WIND_SHIFT_LOG_THRESHOLD = 2 * units.POINT
@@ -81,6 +85,16 @@ class World:
         if getattr(self.ship, "extra", None) is not None:
             self.ship.extra["rng"] = self.rng  # named streams for strain and later systems
         self._last_logged_wind_direction = self.wind.direction_from
+        # The readings (spec M4 §2): one view per tick and per order, read by the standing
+        # orders, the snapshot and the agents alike.
+        self._readings_key: tuple[int, int] | None = None
+        self._readings_view: Any = None
+        # The standing orders' runtime and book (spec M4 §3, §4), evaluated last in `tick`.
+        from freesail.standing.runtime import Runtime
+
+        self.standing = Runtime(self)
+        if getattr(self.ship, "extra", None) is not None:
+            self.ship.extra["standing"] = self.standing
         self.record(
             Severity.NOTABLE,
             "world.start",
@@ -114,26 +128,57 @@ class World:
             )
         )
 
+    # -- readings ------------------------------------------------------------
+
+    @property
+    def readings(self) -> Any:
+        """The readings registry's view of this world now (`freesail.api.readings`).
+
+        Cached per tick and per order: the key is the tick and the log's length, since an
+        order can change a line's state at once and every order writes a log line. The
+        standing orders' runtime takes one view for a whole pass; the snapshot and an
+        agent's `readings()` read the same one.
+        """
+        from freesail.api.readings import REGISTRY
+
+        key = (self.clock.tick, len(self.log))
+        if self._readings_key != key:
+            self._readings_view = REGISTRY.at(self)
+            self._readings_key = key
+        return self._readings_view
+
     # -- orders --------------------------------------------------------------
 
-    def submit(self, text: str, actor: str = "captain") -> Event:
-        """Apply an order now, at the current tick. Journal it if accepted."""
+    def submit(self, text: str, actor: str = "captain", said: str | None = None) -> Event:
+        """Apply an order now, at the current tick. Journal it if accepted.
+
+        A standing order's firing comes with the actor "standing order 'x'" (spec M4 §4):
+        it is logged as "By standing order 'x': ..." (`said`, notable) and not journaled,
+        since firings are a deterministic function of the seed and the journal. A query
+        (a kind beginning `query.`, such as the book's listing) is answered in the log
+        and not journaled either.
+        """
         text = " ".join(text.split())
+        standing = actor.startswith(STANDING_ACTOR_PREFIX)
         try:
             kind, log_text, data = self.ship.handle_order(text)
         except OrderError as e:
+            head = f"{actor[0].upper()}{actor[1:]}: order" if standing else "Order"
             return self.record(
                 Severity.ROUTINE,
                 "order.rejected",
-                f"Order not carried out ({text!r}): {e}",
+                f"{head} not carried out ({text!r}): {e}",
                 actor=actor,
                 data={"order": text, "reason": str(e)},
             )
-        self.journal.append((self.clock.tick, actor, text))
+        if kind.startswith("query."):
+            return self.record(Severity.ROUTINE, kind, log_text, actor=actor, data=data)
+        if not standing:
+            self.journal.append((self.clock.tick, actor, text))
         accepted = self.record(
-            Severity.ROUTINE,
+            Severity.NOTABLE if standing else Severity.ROUTINE,
             "order.accepted",
-            f"Order: {text}.",
+            f"{said}." if said else f"Order: {text}.",
             actor=actor,
             data={"order": text},
         )
@@ -189,6 +234,8 @@ class World:
                 f"{units.format_bells(bells).capitalize()}.",
                 data={"bells": bells},
             )
+        # the standing orders (spec M4 §4): last, on the tick's settled readings
+        self.standing.tick()
 
     def run(self, ticks: int) -> None:
         for _ in range(ticks):
@@ -237,4 +284,7 @@ class World:
             "ship_ref": self.ship.save_ref(),
             "end_tick": self.clock.tick,
             "journal": [list(entry) for entry in self.journal],
+            # the book of standing orders (spec M4 §3): the orders' text and state, for the
+            # reader; a replay re-enters them from the journal
+            "standing_orders": self.standing.book.save(),
         }

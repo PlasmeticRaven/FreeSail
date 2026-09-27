@@ -1,6 +1,6 @@
 """The console driver: runs a world, prints the log, reads orders from stdin.
 
-    python -m freesail.ui.console [--seed N] [--time N] [--load SAVE]
+    python -m freesail.ui.console [--seed N] [--time N] [--load SAVE] [--standing-orders FILE]
 
 Driver commands (not ship orders, not journaled):
     hold            pause the clock
@@ -10,6 +10,9 @@ Driver commands (not ship orders, not journaled):
     state           print a summary of the ship and the weather
     muster          muster the crew: the watch bill, station by station
     the sail room   what the sail room holds: each sail, its canvas and condition
+    standing orders the book of standing orders, each with its state
+    read the standing orders from FILE
+                    give every standing order in the file (each is journaled)
     log [N]         print the last N log entries (default 20)
     save PATH       write a save file
     replay PATH     rebuild a world from a save and continue from it
@@ -32,8 +35,36 @@ from freesail.api import queries
 from freesail.core import replay as replay_mod
 from freesail.core.events import Event, Severity
 from freesail.core.world import Scenario, World
+from freesail.ship.stub import OrderError
 
 HELP = __doc__.split("Driver commands")[1] if __doc__ else ""
+
+READ_STANDING_ORDERS = ("read the standing orders from", "load the standing orders from")
+
+
+def read_standing_orders_path(line: str) -> str | None:
+    """The file named by `read the standing orders from <file>`, or None."""
+    lower = " ".join(line.lower().split())
+    for head in READ_STANDING_ORDERS:
+        if lower.startswith(head + " "):
+            return " ".join(line.split())[len(head) + 1 :].strip().strip("\"'")
+        if lower == head:
+            return ""
+    return None
+
+
+def read_standing_orders(world: World, path: str) -> int:
+    """Give every standing order in a file to the world (spec M4 §3, §6). Each line is
+    submitted as the captain's order, so each is journaled and replays; the log says what
+    became of it. Returns how many were given. Shared by the console and the server."""
+    from freesail.standing.book import read_orders_file
+
+    if not path:
+        raise OSError(2, "Say which file", path)
+    lines = read_orders_file(path)
+    for text in lines:
+        world.submit(text)
+    return len(lines)
 
 
 class Console:
@@ -111,6 +142,14 @@ class Console:
             # a query too (spec 3b §6.3): what is in the sail room, never journaled
             for s in queries.sail_room_lines(self.world):
                 self._print(s)
+        elif self._is_read_standing_orders(line):
+            # the driver's business, since it reads the disk (spec M4 §3): each line of
+            # the file is given as an order, journaled, and printed by the log
+            self._read_standing_orders(line)
+        elif self._is_book_query(line):
+            # the book (spec M4 §3): a query like `state`, printed, never journaled
+            for s in self._book_lines(line):
+                self._print(s)
         elif cmd == "log":
             n = int(args[0]) if args else 20
             for e in self.world.log.tail(n):
@@ -137,6 +176,35 @@ class Console:
 
         vocab = load_vocabulary()
         return vocab.phrase_to_verb.get(key(line)) == "muster"
+
+    @staticmethod
+    def _is_read_standing_orders(line: str) -> bool:
+        return read_standing_orders_path(line) is not None
+
+    def _read_standing_orders(self, line: str) -> None:
+        path = read_standing_orders_path(line) or ""
+        try:
+            n = read_standing_orders(self.world, path)
+        except OSError as e:
+            self._print(f"Could not read {path}: {e.strerror or e}.")
+            return
+        self._print(f"Read {n} standing order{'s' if n != 1 else ''} from {path}.")
+
+    @staticmethod
+    def _is_book_query(line: str) -> bool:
+        from freesail.standing.grammar import recognises
+
+        return recognises(line) in ("standing orders", "show standing order")
+
+    def _book_lines(self, line: str) -> list[str]:
+        from freesail.standing.grammar import parse_book_command
+
+        try:
+            command = parse_book_command(line)
+            _, text, _ = self.world.standing.book.carry_out(command)
+        except OrderError as e:
+            return [str(e)]
+        return text.split("\n")
 
     def _replay(self, path: str) -> None:
         data = replay_mod.load_file(path)
@@ -240,6 +308,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--load", help="save file to replay and continue from")
     ap.add_argument("--wind", help="wind as 'FROM_DEG,KNOTS', e.g. 225,15")
     ap.add_argument("--heading", type=float, help="starting heading in degrees")
+    ap.add_argument(
+        "--standing-orders", help="a file of standing orders to give at the start (spec M4 §6)"
+    )
     args = ap.parse_args(argv)
 
     from freesail.api.session import make_world, ship_factory
@@ -257,6 +328,8 @@ def main(argv: list[str] | None = None) -> int:
             world = make_world(args.seed, args.ship, scenario)
         else:
             world = World(seed=args.seed, scenario=scenario)
+    if args.standing_orders:
+        read_standing_orders(world, args.standing_orders)
 
     console = Console(world, compression=args.time)
     for e in world.log.all():

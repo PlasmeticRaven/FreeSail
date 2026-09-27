@@ -14,6 +14,9 @@ Routes (spec §9.2):
     GET  /api/log       the log, optionally ?since=TICK and ?limit=N
     POST /api/order     {"text": "..."} -> the accepted or rejected event
     POST /api/driver    {"action": "hold"|"go"|"time"|"tick", "value": N}
+                        or {"action": "standing_orders", "value": FILE} to read a file
+                        of standing orders (also `read the standing orders from FILE`
+                        on the command line, as in the console)
     WS   /ws            every log event as it happens, and a snapshot every
                         tick at 1x, every 10 ticks at 10x, every 60 at 60x and up
 
@@ -45,6 +48,7 @@ from freesail import units
 from freesail.api import queries
 from freesail.core.events import Event
 from freesail.core.world import Scenario, World
+from freesail.ui.console import read_standing_orders, read_standing_orders_path
 
 CLIENT_DIR = Path(__file__).resolve().parents[2] / "client"
 
@@ -143,9 +147,39 @@ class Driver:
 
     def submit(self, text: str) -> Event:
         with self.lock:
+            path = read_standing_orders_path(text)
+            if path is not None:
+                # the driver's command, as in the console (spec M4 §3): reading the disk
+                # is the driver's business; each order in the file is journaled
+                return self._read_standing_orders(path)
             e = self.world.submit(text)
             self.emit_snapshot()
             return e
+
+    def read_standing_orders(self, path: str) -> Event:
+        with self.lock:
+            return self._read_standing_orders(path)
+
+    def _read_standing_orders(self, path: str) -> Event:
+        try:
+            n = read_standing_orders(self.world, path)
+        except OSError as e:
+            return self.world.record(
+                "routine",
+                "driver.refused",
+                f"Could not read {path or 'the standing orders'}: {e.strerror or e}.",
+                actor="driver",
+                data={"path": path},
+            )
+        finally:
+            self.emit_snapshot()
+        return self.world.record(
+            "routine",
+            "driver.standing_orders",
+            f"Read {n} standing order{'s' if n != 1 else ''} from {path}.",
+            actor="driver",
+            data={"path": path, "count": n},
+        )
 
     # -- the clock ----------------------------------------------------------
 
@@ -255,9 +289,12 @@ def create_app(driver: Driver, client_dir: Path = CLIENT_DIR) -> FastAPI:
                 driver.set_compression(float(value))
             elif action == "tick":
                 driver.tick(int(value if value is not None else 1))
+            elif action == "standing_orders":
+                driver.read_standing_orders(str(value or ""))
             else:
                 raise HTTPException(
-                    status_code=400, detail="Say hold, go, time N or tick N to the driver."
+                    status_code=400,
+                    detail="Say hold, go, time N, tick N or standing_orders FILE to the driver.",
                 )
         except (TypeError, ValueError):
             raise HTTPException(status_code=400, detail=f"'{value}' is not a number.") from None
@@ -356,11 +393,16 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--heading", type=float, help="starting heading in degrees")
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=8000)
+    ap.add_argument(
+        "--standing-orders", help="a file of standing orders to give at the start (spec M4 §6)"
+    )
     args = ap.parse_args(argv)
 
     import uvicorn
 
     world = build_world(args)
+    if args.standing_orders:
+        read_standing_orders(world, args.standing_orders)
     driver = Driver(world, compression=args.time)
     app = create_app(driver)
     print(f"FreeSail server. Seed {world.seed}. Open http://{args.host}:{args.port}/")
