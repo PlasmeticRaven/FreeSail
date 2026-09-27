@@ -143,6 +143,19 @@ The last refusal: "The fore topsail is sheeted home already."
 
 Between your orders **the watch on deck tends the fore-and-aft sheets for you**: each set jib, staysail and gaff sail is sheeted to the apparent wind as she comes up or falls off, at about a degree a second (`freesail/evolutions/trim.py`), and never inside the floors above. Square sails are never touched without an order. So after a tack the spanker and jib will find their trim by themselves, but the yards will sit where the tack left them until you brace or `trim`. It also means a sheet you haul by hand is eased again within the minute: hauled to 19° at 04:15, the spanker was back at 24° when `ease the spanker sheet a fathom` a minute later put it at 29°. Sheet orders by hand are for the moment, and for the crew work of milestone 3, which will make the watch do only what it is told.
 
+## Trimming one sail, and tending the sheets
+
+**Trim the** *sail* trims that sail alone: a fore-and-aft sail by its sheet, at once, and a square sail by its yard, braced to the wind as `trim sails` would brace it; a group of sails ("trim the topsails") or a yard by name ("trim the fore yard") does the same for each. **Tend the sheets** is every fore-and-aft sheet and no brace, which is what a watch on deck does between orders. A sail that is not set has nothing to trim, and the refusal says so.
+
+```orders frigate plain-sail
+trim the fore topsail
+trim the mainsail
+trim the jib
+trim the topsails
+tend the sheets
+# rejected: trim the fore royal
+```
+
 ## The `trim` order
 
 Package 13 adds the order the owner reached for at the gate. It braces every yard that has sail set to the best angle for the present apparent wind, each as its own `brace` evolution, the after yards a little sharper than the head yards on a wind (*Pointing*, below), and sheets the fore-and-aft sails at once:
@@ -211,7 +224,21 @@ haul the fore bowline
   Morning watch (04:36)  Steadied out the starboard mizzen topsail bowline.
 ```
 
-The refusals: bowlines not yet hauled cannot be let go ("Nothing done: the starboard fore course bowline is already running free; ..."), and "The larboard fore course bowline is on the lee side of the fore yard, which is braced up for the starboard tack; it is the weather leech that is hauled out." One bowline is hauled by naming it; "the fore bowline" is the foresail's weather one. This is the largest gain the frigate has: in 15 knots, 5.8 knots at 66° off against 5.2, and the same 5.2 about three degrees closer; the closest she holds three knots goes from 56° to 52°. The schooner gains next to nothing by hers, for she points with her fore-and-aft sails. The price is hands at every brace: going about lets the bowlines go and steadies them out again on the new tack (chapter 5), and bracing in slacks them.
+The refusals: bowlines not yet hauled cannot be let go ("Nothing done: the starboard fore course bowline is already running free; ..."), and "The larboard fore course bowline is on the lee side of the fore yard, which is braced up for the starboard tack; it is the weather leech that is hauled out." One bowline is hauled by naming it; "the fore bowline" is the foresail's weather one.
+
+**When to steady them out again.** Hauled bowlines stand while she is kept within four points of the wind; if she is borne away to a broad reach and the yards trimmed, they come in past forty degrees from square and the hands let the bowlines go, and the log says so for each ("Let go the starboard fore course bowline as the fore yard came in; a bowline will not stand off the wind."). When she is brought by the wind again and the yards braced up, the bowlines want hauling afresh, and the order for it is **steady out the bowlines**; given while they still stand it is refused ("... is hauled out already").
+
+```orders frigate plain-sail
+haul the weather bowlines
+bear away eight points
+trim sails
+come up eight points
+trim sails
+```
+
+```orders frigate plain-sail
+steady out the bowlines
+``` This is the largest gain the frigate has: in 15 knots, 5.8 knots at 66° off against 5.2, and the same 5.2 about three degrees closer; the closest she holds three knots goes from 56° to 52°. The schooner gains next to nothing by hers, for she points with her fore-and-aft sails. The price is hands at every brace: going about lets the bowlines go and steadies them out again on the new tack (chapter 5), and bracing in slacks them.
 
 ### The catharpins
 

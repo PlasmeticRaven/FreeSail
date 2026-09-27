@@ -116,6 +116,9 @@ class Book:
     def resume(self, rule: Rule) -> Result:
         if not rule.belayed:
             raise OrderError(f"Standing order '{rule.name}' is standing; it was not belayed.")
+        if rule.trigger.kind == "absent":
+            # a Python rule loaded without its file (package 26, `python_api.restore_absent`)
+            raise OrderError(f"Standing order '{rule.name}' {rule.trigger.text}.")
         rule.belayed = False
         if self.runtime is not None:
             self.runtime.arm(rule)

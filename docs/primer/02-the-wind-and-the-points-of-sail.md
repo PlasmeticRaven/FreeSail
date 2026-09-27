@@ -91,6 +91,11 @@ come up half a point
 bear away
 bear away two points
 bear away a point and a half
+fall off
+off the wind
+steer off the wind
+bear off the wind
+# rejected: by and large
 keep her off two points
 steer full and by
 nothing off
@@ -99,7 +104,7 @@ luff and touch her
 bring her by the wind
 ```
 
-`keep her full` (or `full and by`, *bring her by the wind*, *steer by the wind*) hands the helmsman the standing task: he steers as close as she will lie with the sails drawing, and follows the wind as it shifts. On the frigate that is about 58° apparent, 70° true, at five and a half knots; a good full, a few degrees off the closest she can point, because the sails draw better there. Luce's *Nothing off!*, *No higher!* and *Luff and touch her!* are the same order given from either side of it, and the log echoes the word you used: "Helm ordered: no higher; keep her full and by." `come up` (*luff*) and `bear away` (*keep away*, *bear up*) move the ordered course by a point, or the number of points you give (halves are taken: *half a point*, *a point and a half*), and put her on a fixed compass course from then on; say `keep her full` again to go back to sailing by the wind. Falconer, *Luff*: "the order from the pilot to the steersman to put the helm towards the lee-side of the ship, in order to make the ship sail nearer the direction of the wind."
+`keep her full` (or `full and by`, *bring her by the wind*, *steer by the wind*) hands the helmsman the standing task: he steers as close as she will lie with the sails drawing, and follows the wind as it shifts. On the frigate that is about 58° apparent, 70° true, at five and a half knots; a good full, a few degrees off the closest she can point, because the sails draw better there. Luce's *Nothing off!*, *No higher!* and *Luff and touch her!* are the same order given from either side of it, and the log echoes the word you used: "Helm ordered: no higher; keep her full and by." `come up` (*luff*) and `bear away` (*keep away*, *bear up*, *bear off*, *fall off*, *off the wind*, *steer off the wind*, *bear off the wind*) move the ordered course by a point, or the number of points you give (halves are taken: *half a point*, *a point and a half*), and put her on a fixed compass course from then on; say `keep her full` again to go back to sailing by the wind. *By and large* is not a helm order but a description of how she sails, and the ship refuses it. Falconer, *Luff*: "the order from the pilot to the steersman to put the helm towards the lee-side of the ship, in order to make the ship sail nearer the direction of the wind."
 
 ### Conning the helm
 

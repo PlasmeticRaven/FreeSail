@@ -296,6 +296,13 @@ def _watch(world: Any, _: str | None) -> str:
     return world.clock.watch().lower()
 
 
+def _daylight(world: Any, _: str | None) -> str | None:
+    """'day', 'twilight' or 'night' from the sun model (`freesail.core.sun`, spec §5),
+    read through the World so that the standing orders, the snapshot and the agents see
+    one sun; a world without one (a bare stub) reads None."""
+    return getattr(world, "daylight", None)
+
+
 def _bells(world: Any, _: str | None) -> dict[str, Any]:
     """The last bell struck: watch name, bells, and whether it is striking now (the
     snapshot's `bell` block; spec §9.4)."""
@@ -474,12 +481,15 @@ REGISTRY.add(Reading("heel", ("the heel",), "angle", "degrees", _heel))
 REGISTRY.add(Reading("helm", ("the helm",), "angle", "degrees", _helm))
 REGISTRY.add(Reading("watch", ("the watch",), "watch", "", _watch))
 REGISTRY.add(Reading("time", ("the time",), "bells", "", _bells))
-# The sun is package 26's (spec §5): until it registers `daylight` with a getter, the
-# word is known and refused with the sentence.
-REGISTRY.add_absent(
-    "daylight",
-    ("daylight",),
-    "The ship has no sun yet; daylight comes with the sun model.",
+REGISTRY.add(
+    Reading(
+        "daylight",
+        ("daylight",),
+        "daylight",
+        "",
+        _daylight,
+        description="day, twilight or night, from the sun at the ship's latitude",
+    )
 )
 REGISTRY.add(
     Reading(

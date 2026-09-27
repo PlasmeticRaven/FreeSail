@@ -688,12 +688,20 @@ def _trim(
     from freesail.evolutions.trim import wanted_sheet_angle
     from freesail.physics.sails import SAIL_CLASSES
 
+    named_sheets: list[Sail] | None = None  # "trim the jib": that sail's sheet only
     if order.verb == "trim":
         _no_stray_modifiers(order, {"manner", "hands_from", HEAD_YARDS_SHARPER})
         # "trim sails with the head yards sharper" trims yards and sheets alike
         phrase = order.verb_phrase.split(" with the ")[0].replace(" head yards sharper", "")
         do_yards = "sheet" not in phrase
         do_sheets = "yard" not in phrase
+        if order.object is not None:
+            # "trim the <sail>" (spec M4 §7): that sail's sheet, and its yard's brace if it
+            # is square; "trim the topsails" and "trim the fore yard" likewise
+            res = resolve.resolve(ship, order.object, order.side_word, "trim")
+            yards, named_sheets = _trim_targets(ship, res)
+            do_yards, do_sheets = bool(yards), bool(named_sheets)
+            object_name = res.name
     else:
         do_yards, do_sheets = True, False  # "brace ... to the wind"
     head_sharper = bool(order.modifiers.get(HEAD_YARDS_SHARPER))
@@ -764,7 +772,7 @@ def _trim(
 
     trimmed: list[str] = []
     if do_sheets:
-        for sail in ship.sails.values():
+        for sail in named_sheets if named_sheets is not None else ship.sails.values():
             if sail.is_set and sail.is_fore_and_aft and sail.cls in ("gaff", "jibheaded"):
                 sail.sheet_angle = wanted_sheet_angle(sail.cls, d.apparent_wind_angle)
                 trimmed.append(resolve.the(ship, sail.id))
@@ -789,7 +797,8 @@ def _trim(
             + (f", {how}" if how else "")
         )
     if trimmed:
-        parts.append(f"trimmed the sheets of {errors.sentence_list(trimmed)}")
+        sheets = "sheet" if len(trimmed) == 1 and named_sheets is not None else "sheets"
+        parts.append(f"trimmed the {sheets} of {errors.sentence_list(trimmed)}")
     text = "; ".join(parts)
     text = text[0].upper() + text[1:] + "."
     refused = [f for f, i in zip(failed, failed_ids, strict=True) if i in too_far]
@@ -811,6 +820,46 @@ def _trim(
         data.update({"object": object_name, "mode": "to the wind", "tack": d.tack})
     kind = "evolution.started" if started and not trimmed else "sail.trimmed"
     return kind, text, data
+
+
+def _trim_targets(ship: Ship, res: resolve.Resolution) -> tuple[list[Spar], list[Sail]]:
+    """What "trim the <sail>" lays hands on (spec M4 §7): for a square sail (or a
+    studding sail) the yard it hangs from, braced to the wind; for a fore-and-aft sail
+    its sheet; for a yard named outright, the yard. A sail not set has nothing to trim
+    and is refused in words; a mixed group ("the topsails") is taken as it comes."""
+    yards: list[Spar] = []
+    sheets: list[Sail] = []
+    not_set: list[str] = []
+    for pid in res.ids:
+        part = ship.parts[pid]
+        name = resolve.the(ship, pid)
+        if isinstance(part, Spar):
+            if not part.is_yard:
+                raise OrderError(
+                    f"{name[0].upper()}{name[1:]} is not a yard; trim a sail or a yard."
+                )
+            if part not in yards:
+                yards.append(part)
+            continue
+        if not isinstance(part, Sail):
+            raise OrderError(f"{name[0].upper()}{name[1:]} is not a sail; trim a sail or a yard.")
+        if not part.is_set:
+            not_set.append(f"{name} is {part.describe_state()}")
+            continue
+        if part.is_fore_and_aft:
+            sheets.append(part)
+            continue
+        yard = ship.yard_of(part)
+        if yard is None:
+            raise OrderError(f"{name[0].upper()}{name[1:]} has no yard to brace.")
+        if yard not in yards:
+            yards.append(yard)
+    if not yards and not sheets:
+        # nothing named is set: "the headsails" with every headsail furled, or one sail
+        if len(not_set) == 1:
+            raise OrderError(f"{not_set[0][0].upper()}{not_set[0][1:]}; there is no sail to trim.")
+        raise OrderError(f"Nothing to trim: {errors.sentence_list(not_set)}.")
+    return yards, sheets
 
 
 def adjacent_yard_max_diff(lower: Spar, upper: Spar) -> float:

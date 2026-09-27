@@ -65,13 +65,19 @@ verbs:
     # narrower forms do one or the other (Luce 1866 ch. XXIV "To Trim Yards").
     # On a wind the after yards are trimmed sharper than the head yards, or,
     # "with the head yards sharper", the reverse (Fincham 1843, arts. 94, 96).
+    # Milestone 4 (spec M4 §7): "trim the <sail>" tends that sail's sheet and braces
+    # its yard to the wind if it is square; "trim the topsails" and "trim the fore
+    # yard" likewise; "tend the sheets" is every fore-and-aft sheet and no brace. The
+    # object is `yards` so that, as with "brace", nothing after the verb means the
+    # whole ship and a sail or a yard may be named.
     synonyms: [trim sails, trim sail, trim the sails, trim the sails to the wind,
                trim the yards, trim yards, trim the yards to the wind, trim the yards and sheets,
-               trim the sheets, trim sheets, trim the sheets and yards,
+               trim the sheets, trim sheets, trim the sheets and yards, tend the sheets,
+               tend sheets, tend the sheets and braces,
                trim sails with the head yards sharper, trim sails head yards sharper,
                trim the sails with the head yards sharper,
                trim the yards with the head yards sharper, trim the yards head yards sharper]
-    object: none
+    object: yards
     level: 1
   haul:
     # "haul aft", "haul home" and "haul flat" haul the line all the way in
@@ -131,7 +137,12 @@ verbs:
     object: points
     level: 1
   bear away:
-    synonyms: [keep away, bear up, keep her off, keep her away, keep off, bear off]
+    # "Fall off", "off the wind", "steer off the wind" and "bear off the wind" from the
+    # owner's first playtest (milestone 4): the words reached for before "bear off" was
+    # found. "By and large" is a description of how she sails, not a helm order, and
+    # stays refused.
+    synonyms: [keep away, bear up, keep her off, keep her away, keep off, bear off,
+               fall off, off the wind, steer off the wind, bear off the wind]
     object: points
     level: 1
   keep her full:

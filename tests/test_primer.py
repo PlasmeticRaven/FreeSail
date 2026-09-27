@@ -59,6 +59,7 @@ import pytest
 from freesail import orders
 from freesail.core.clock import Clock
 from freesail.core.rng import Rng
+from freesail.core.world import Scenario, World
 from freesail.crew import muster
 from freesail.crew.routine import Routine
 from freesail.evolutions.trim import wanted_sheet_angle
@@ -167,6 +168,10 @@ class InstantRunner:
 def make_ship(which: str, preset: str, tack: str) -> Ship:
     ship = Ship(SPECS[which])
     ship.extra["evolutions"] = InstantRunner()
+    # a World around the ship, so that chapter 7's standing orders have a book to be
+    # entered in (spec M4 §3: `standing order "x": ...` needs the runtime the World
+    # attaches); the blocks never tick it
+    World(seed=7, scenario=Scenario(start_time=PRIMER_TIME), ship=ship)
     if ship.spec.crew is not None:
         # the ship's company and the watch routine, as make_world attaches them, so that
         # chapter 6's crew orders have hands to call (package 20)

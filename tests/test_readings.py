@@ -80,9 +80,12 @@ def test_absent_readings_carry_their_sentences():
     assert R.REGISTRY.get("glass").absent == (
         "The ship has no glass yet; that reading comes with the world."
     )
-    assert R.REGISTRY.get("daylight").is_absent, "the sun is package 26's"
     w = World(seed=1)
     assert w.readings["glass"] is None
+    # the sun arrived with package 26: daylight is a reading, not an absence
+    row = R.REGISTRY.get("daylight")
+    assert not row.is_absent and row.kind == "daylight"
+    assert w.readings["daylight"] == "day", "04:00 on 1 June at 50 N is four minutes past sunrise"
 
 
 def test_events_and_intervals_of_the_spec():
