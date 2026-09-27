@@ -14,6 +14,7 @@ gate 4a:  wave 1  25 readings, the standing dialect, the runtime, the book
           wave 2  26 the sun, starter routines, the Python API, the new orders, truths 34 to 40, gate 4a
 gate 4b:  wave 3  27 the agent model, tools, harness, fake model, the watcher and ask
           wave 4  28 the MCP server, the local runner, consent, documentation, truths 41 to 47, gate 4b
+          wave 4b 28b the doors as clients of the running game (after the owner's first session)
 gate 4c:  wave 5  29 the weather script, compression and roll-up, the day, the playtest form, truths 48 to 51, gate 4c
 ```
 
@@ -57,6 +58,18 @@ Spec §13, §14, §17. Starts when 27 has landed.
 - The consent step of §14: the brief, the plain conversation with `answer` as the only tool, the record written under `docs/agents/consent/`, the gate on a yes, the stop on anything else. Tested with the fake.
 - `docs/agents/Harness.md` for the owner, with `py`: the Claude Desktop configuration JSON, the `llama-server` command line for a GGUF on a 4090 (context, GPU layers, `--jinja` for tool calling, a fixed seed), the runner's flags, and the Ollama note.
 - `docs/gates/gate-m4b.md`, nine items per §17.
+
+## Package 28b: the doors as clients of the running game (`freesail/agents/remote.py` new: the server-side model whose reply arrives by the API, and the client half the doors share; `freesail/ui/server.py` and `freesail/ui/console.py` for the agent routes (the console on `--agents-port`), `--lockstep`, the station's state in the snapshot and `state`; `freesail/agents/harness.py` for live sampling (a sample folded into the open one); `freesail/agents/mcp_server.py` and `local.py` rewritten as clients; `.mcp.json` at the repository root for Claude Code; `client/instruments.js` and `log.js` for the station's state and the pause question; `docs/agents/Harness.md` rewritten around "start your game, then connect"; `docs/gates/gate-m4b.md` rewritten to spec §17 as revised; `tests/test_agent_api.py` new, `tests/test_mcp_server.py` and `tests/test_local_runner.py` reworked, `tests/test_agents.py` for live sampling and replay; `README.md`)
+
+Spec §13 as revised, §17. Starts when the owner has said the word (2026-09-27, said). Opus.
+
+- **The agent API** on both drivers exactly as §13 lists it: station (with the consent gate run in the game process and the records under the repository's `docs/agents/consent/`, the directory overridable for tests), a long-poll for turns that waits on a condition and never holds the World's lock, a reply that returns the tool results at once, a release. The harness gains a `RemoteModel` whose `reply()` returns `None` until a reply is delivered by the API (the seam package 27 left: `None` means "not yet"). Tested with FastAPI's `TestClient` and the fake: a whole session through the routes (station, brief, samples, an ask, a stand-by, the token in an argument, a release), the consent gate through the routes with a temporary records directory, and a game with a remote agent replayed to the same digest.
+- **Live sampling**: a sampling point reached while the floor is the model's folds into the open sample; the model's next turn carries everything since its last reply; the World never waits unless `--lockstep`. Tested in-process with the fake made to answer late.
+- **The MCP bridge** rewritten as a client: no World, `--game` and `--model-name`, one tool call = one reply, `say` and `stand_by` hand the floor back and wait for the next sample with `--wait`; the brief first; a `.mcp.json` at the repository root pointing at the same command, so Claude Code opened on the repository sees the server. Tested with the SDK's in-process client against a game on `TestClient` (no network, no model); one child-process test over stdio as before.
+- **The local runner** rewritten as a client of the game and the endpoint; `httpx.MockTransport` for both sides in tests; identity from `/props` as before.
+- **The viewer and the console** show the station's state and the pause question; the captain's station orders are already in the order language.
+- **`Harness.md` and `gate-m4b.md`** rewritten: start the game in the browser, then connect; the Claude Desktop snippet, the Claude Code `.mcp.json` and how to open the repository in Claude Code in the Desktop app, the `llama-server` command line and the runner's, the Ollama note; ten gate items per §17 with the fake first where the fake can show it.
+- **What does not change**: the harness's contract, the tools, the consent brief's terms (the runtime line of future records names the game and the door), truths 41 to 47. If anything in the brief must change, say so; the owner rules whether the models with a yes on record are re-briefed.
 
 ## Package 29: the weather script, compression and roll-up, the day, the playtest form, truths 48 to 51, gate 4c (`freesail/world/` new: `weather_script.py`; `freesail/core/world.py` and `physics/wind.py` for the script driving the wind; `freesail/core/events.py` or `log` for the roll-up view; `freesail/ui/console.py` and `server.py` for `speed N` to 300 and the roll-up; `client/log.js`; `docs/playtests/README.md`; `tests/test_weather_script.py`, `tests/test_rollup.py`, `tests/test_known_truths.py` truths 48 to 51; `docs/gates/gate-m4c.md`; `README.md`)
 

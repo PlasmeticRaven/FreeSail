@@ -1,6 +1,6 @@
 # Gate M4b: The harness and the watcher
 
-**Verdict:** to be given by the owner.
+**Verdict:** Not passed on this build (owner, 2026-09-27); to be re-cut after package 28b. Part A passed on the owner's run (the proofs, the scripted watcher, the practice consent at the REPL, which found two snags in the door's prompting, fixed the same day). Part B was begun with a Sonnet 5 session through Claude Desktop: consent recorded (`docs/agents/consent/2026-09-27-sonnet-5.md`), the watcher narrated and answered an `ask`, an order was refused with its authority, the opt-out tool ended the session with a save (`docs/playtests/2026-09-27-gate-4b-sonnet-watcher/`). The owner then found the door's shape unplayable: the World ran inside the MCP server, so the game could be seen only through the tool calls' readouts in the chat and the captain's orders went through a prompt menu. That was the lead's error in spec §13, not the package's; §13 is revised and package 28b turns the doors into clients of the running game, played in the browser or console as before. The items below are the first draft's and stand as its record; the re-cut gate follows spec §17 as revised.
 
 ## Headline
 
