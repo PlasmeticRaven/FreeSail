@@ -1580,6 +1580,8 @@ class _SailWork(PhasedScript):
             "spare_sails": f"{n} spare sail{'s' if n != 1 else ''}",
             "bent": self._name(self.target or self.sail),
             "canvas": self._spare_words(),
+            # how a shift leaves the new sail: set in a drawing sail's place, else furled
+            "left": "set" if getattr(self, "was_drawing", False) else "furled",
         }
 
     def data(self) -> dict[str, Any]:
@@ -1673,19 +1675,30 @@ class BendScript(_SailWork):
 
 
 class ShiftScript(_SailWork):
-    """Shift a sail: unbend the old one and bend another in its place (Luce
-    1884, ch. XXXII 'To shift a topsail': "Lay out! Furl and unbend! ... Lower
-    the sail down to leeward by the buntlines. Send up the new sail ... Bring
-    to and bend the sail"). Phases ``unbend`` (aloft), ``send_up`` (on deck:
-    the old sail down to the sail room, unless it is in rags, and the new one
-    up) and ``bend`` (aloft). The new sail is the best of the kind in the room,
+    """Shift a sail: take it in if it is drawing, unbend it and bend another in
+    its place, and set the new one if the old was drawing. Luce's shift begins
+    with the sail set: 'To shift a topsail (by the wind, under all plain sail)'
+    opens "Clew up! ... Settle away the topsail halliards ... Lay out! Furl
+    and unbend! ... Lower the sail down to leeward by the buntlines. Send up
+    the new sail ... Bring to and bend the sail ... Let fall! Sheet home!"
+    (Luce 1866, ch. XXXII Shifting Sails and Spars), and 'To shift a jib'
+    opens "Haul the sail down". So the phases are ``take_in`` (on deck, only
+    for a drawing sail), ``unbend`` (aloft), ``send_up`` (on deck: the old sail
+    down to the sail room, unless it is in rags, and the new one up), ``bend``
+    (aloft) and ``set`` (only when the old sail was drawing; a furled or
+    hauled-up sail is shifted where it hangs and the new one left furled, as
+    the port drill has it). The new sail is the best of the kind in the room,
     or the one the order names: a number, the heavy one, or another sail bent
     in this one's place ("shift the spanker for the storm mizzen", Luce 1884
-    ch. XXVII: "the storm mizzen is a substitute for the spanker"). It is left
-    furled; Luce lets fall and sets it at once, which here is the captain's
-    next order."""
+    ch. XXVII: "the storm mizzen is a substitute for the spanker"). Gate 4a's
+    ruling (2026-09-27): shifting a sail is the whole of taking in and
+    replacing it, so a set sail is not refused."""
 
-    DEFAULTS = {"unbend": 180.0, "send_up": 150.0, "bend": 240.0}
+    # take_in: the take-in evolutions' steps run 45 s (a head sail's downhaul) to
+    # 105 s (a course clewed up and hauled up); 90 s is the gaff sail's, taken as the
+    # middle. set: the set evolutions' hoist or sheet-home-and-hoist steps, 75 s to
+    # 150 s; 120 s. Both judgement from data/evolutions/take_in_*.yaml, set_*.yaml.
+    DEFAULTS = {"take_in": 90.0, "unbend": 180.0, "send_up": 150.0, "bend": 240.0, "set": 120.0}
 
     def check(self, words: dict[str, Any]) -> str | None:
         reason = self._find(words)
@@ -1694,8 +1707,7 @@ class ShiftScript(_SailWork):
         sail = self.sail
         if sail.state is SailState.UNBENT:
             return f"The {self._name()} is unbent; there is nothing to shift. Bend a new one."
-        if sail.state in DRAWING:
-            return f"The {self._name()} is set; take it in before shifting it."
+        self.was_drawing = sail.state in DRAWING
         target = sail
         wanted = self.params.get("for")
         if wanted:
@@ -1719,14 +1731,36 @@ class ShiftScript(_SailWork):
         return self._choose(target)
 
     def begin(self, words: dict[str, Any]) -> None:
-        self.start_phases(["unbend", "send_up", "bend"])
+        drawing = getattr(self, "was_drawing", False)
+        phases = ["unbend", "send_up", "bend"]
+        if drawing:
+            phases = ["take_in", *phases, "set"]
+        self.start_phases(phases)
 
     def end_phase(self, name: str) -> None:
-        if name == "unbend":
+        if name == "take_in":
+            # the sail hauled up in its gear or hauled down its stay, the hands standing
+            # by to unbend it; the same state the take-in evolutions leave
             self.old_state = self.sail.state
+            self.sail.state = SailState.IN_THE_GEAR
+            verb = "Hauled down" if self.sail.cls == "jibheaded" else "Clewed up"
+            self.note(f"{verb} the {self._name()} to shift it.")
+        elif name == "unbend":
+            if getattr(self, "old_state", None) is None:
+                self.old_state = self.sail.state
             self.sail.state = SailState.UNBENT
             self.sail.reefs = 0
             self.note(f"Unbent the {self._name()} and lowered it down on deck.")
+        elif name == "set":
+            # the new sail let fall and set in the old one's place (Luce: "Let fall!
+            # Sheet home!"); its sheet and yard stand as the old sail's did
+            self.target.state = SailState.SET
+            self.ship.note(
+                "notable",
+                "sail.set",
+                f"Set the {self._name(self.target)} in the {self._name()}'s place.",
+                self.target.id,
+            )
         elif name == "send_up":
             # draw the new sail first, so the old one going down is not sent straight back up
             if not self._draw():

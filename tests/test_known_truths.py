@@ -49,9 +49,9 @@ the wind model's base speed (steady wind: the model then holds it), which is the
 mechanism the M2 wind has for a wind that rises. Truth 39 (a passage under the starter
 routines replays with the same firings) is the standing voyage of tests/test_replay.py;
 truth 40 (a Python rule and its dialect twin give one log) is tests/test_python_api.py.
-Truth 37's storm staysail is a strict expected failure naming the gap: the shift
-evolution refuses a sail that is set, so the routine's second order is refused in words
-while the first and third are carried out (docs/dev/TuningNotes.md, milestone 4a).
+Truth 37's storm staysail is set by a companion order on the tick it is bent: the
+frigate's fore storm staysail is a sail of its own on the fore stay, bent and set, not
+shifted for the fore topmast staysail (gate 4a's ruling; docs/dev/TuningNotes.md, 4a).
 """
 
 from __future__ import annotations
@@ -1316,8 +1316,17 @@ KEEP_HER_FULL = (
 )
 HEAVY_WEATHER = (
     'standing order "heavy weather": when the true wind exceeds 40 knots for 5 minutes then '
-    "send down the topgallant masts; shift the fore topmast staysail for the fore storm "
+    "send down the topgallant masts; take in the fore topmast staysail; bend the fore storm "
     "staysail; close reef the topsails"
+)
+# The frigate's fore storm staysail sets on the fore stay, its own stay, beside the fore
+# topmast staysail's (Luce 1884 ch. XXIX 'Reducing Sail to a Gale'; spec 3b §6), so it is
+# bent and set as a sail of its own, not shifted for the other; and a firing's orders go on
+# one tick, so the setting waits for the bending in a companion order that tests the sail's
+# state (gate 4a's ruling, 2026-09-27).
+STORM_STAYSAIL = (
+    'standing order "storm staysail": when the fore storm staysail is furled and the true '
+    "wind exceeds 40 knots then set the fore storm staysail"
 )
 # the sun at 50 N on 1 June 1805 (freesail/core/sun.py against the USNO almanac, tests/test_sun.py)
 SUNRISE = "03:56"
@@ -1546,6 +1555,7 @@ def rising_gale(top_knots: float = 45.0, minutes: int = 30):
     world.submit("take in the topgallants")
     run(world, 300)
     world.submit(HEAVY_WEATHER)
+    world.submit(STORM_STAYSAIL)
     t0 = world.clock.tick
     for i in range(minutes * 60):
         blow(world, 20.0 + (top_knots - 20.0) * (i + 1) / (minutes * 60))
@@ -1563,29 +1573,33 @@ def frigate_rising_gale():
 
 def test_truth_37_the_heavy_weather_routine_fires_in_order_with_all_hands(frigate_rising_gale):
     """Spec M4 §8, truth 37. The wind rising from 20 to 45 knots over half an hour
-    passes forty at 24 minutes; five minutes on, the routine gives its three orders on
+    passes forty at 24 minutes; five minutes on, the routine gives its four orders on
     one tick in the order written: the topgallant masts sent down (all hands called by
-    the work, and down twenty minutes later), the shift of the fore topmast staysail, and
-    the topsails close-reefed (three reefs each when the hands are free). The shift is
-    refused in words: see the next test."""
+    the work, and down twenty minutes later), the fore topmast staysail taken in (in this
+    gale it blew out at 43 knots a minute before, so the order is refused in words), the
+    fore storm staysail bent, and the topsails close-reefed (three reefs each when the
+    hands are free). The storm staysail is set by the companion order: see the next test."""
     world, t0 = frigate_rising_gale
     name = "heavy weather"
     over_forty = t0 + 1440  # 20 + 25 * t / 1800 > 40 from t = 1440
     fired = by_order(world, name)
-    assert [t for t, _ in fired] == [over_forty + 300, over_forty + 300]
+    assert [t for t, _ in fired] == [over_forty + 300] * 3
     assert [text for _, text in fired] == [
         f"By standing order '{name}': sending down the topgallant masts.",
+        f"By standing order '{name}': bending the fore storm staysail.",
         f"By standing order '{name}': close reefing the topsails.",
     ]
     refused = refused_by_order(world, name)
     assert len(refused) == 1 and refused[0][0] == over_forty + 300
-    assert "('shift the fore topmast staysail for the fore storm staysail')" in refused[0][1]
+    assert "('take in the fore topmast staysail')" in refused[0][1]
+    assert "blown out" in refused[0][1]
     lines = [
         e.text
         for e in world.log
         if e.tick == over_forty + 300 and e.actor == f"standing order '{name}'"
     ]
-    assert "sending down" in lines[0] and "shift" in lines[1] and "close reefing" in lines[2]
+    assert "sending down" in lines[0] and "take in" in lines[1]
+    assert "bending" in lines[2] and "close reefing" in lines[3]
     all_hands = events(world, "crew.all_hands", after=over_forty)
     assert all_hands and all_hands[0].tick == over_forty + 301
     assert all_hands[0].text == "All hands! (to send down topgallant masts)"
@@ -1594,16 +1608,17 @@ def test_truth_37_the_heavy_weather_routine_fires_in_order_with_all_hands(frigat
     assert all(world.ship.sails[t].reefs == 3 for t in world.ship.groups["topsails"])
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="spec M4 §8 truth 37: the routine 'shifts to the storm staysail', but the shift "
-    "evolution refuses a sail that is set ('take it in before shifting it', "
-    "evolutions/scripts.py), and at 44 knots the fore topmast staysail blows out before "
-    "the five minutes are up; the routine's second order is refused in words. For the "
-    "lead: a shift that takes the sail in first, or a routine that says so.",
-)
-def test_truth_37_the_storm_staysail_is_set_by_the_routine(frigate_rising_gale):
-    world, _ = frigate_rising_gale
+def test_truth_37_the_storm_staysail_is_set_by_the_companion_order(frigate_rising_gale):
+    """The companion order fires once, on the tick the storm staysail is bent and furled
+    (the bending takes the hands about twelve minutes from the sail room), and the sail
+    is set and drawing by the end of the hour."""
+    world, t0 = frigate_rising_gale
+    over_forty = t0 + 1440
+    fired = by_order(world, "storm staysail")
+    assert len(fired) == 1
+    assert fired[0][1] == "By standing order 'storm staysail': setting the fore storm staysail."
+    bent = [e for e in world.log if e.kind == "sail.bent" and e.subject == "fore.storm_staysail"]
+    assert bent and bent[0].tick == fired[0][0] and bent[0].tick > over_forty + 300
     assert world.ship.sails["fore.storm_staysail"].is_set
 
 

@@ -242,7 +242,7 @@ goose wing the main topsail
 
 ## Bending, unbending and shifting sails
 
-A sail blown out of its bolt-ropes gives nothing and cannot be set again: it must be **shifted**, the rags unbent and sent down and a new sail sent up from the sail room and bent to the yard (Luce 1884, ch. XXXII Shifting Sails and Spars, 'To Shift a Topsail': "Lay out! Furl and unbend! ... Send up the new sail ... Bring to and bend the sail"). `unbend` and `bend` do the two halves alone (ch. XX Port Drills, 'To Unbend Sail', 'Bending Sail'). The new sail is left furled on its yard; setting it is your next order. A sail must be taken in before it is unbent or shifted. Any sail can be bent and unbent, square, gaff, jib-headed or studding.
+A sail blown out of its bolt-ropes gives nothing and cannot be set again: it must be **shifted**, the rags unbent and sent down and a new sail sent up from the sail room and bent to the yard (Luce 1884, ch. XXXII Shifting Sails and Spars, 'To Shift a Topsail': "Lay out! Furl and unbend! ... Send up the new sail ... Bring to and bend the sail"). `unbend` and `bend` do the two halves alone (ch. XX Port Drills, 'To Unbend Sail', 'Bending Sail'). A sail must be taken in before it is unbent; a *shift* of a drawing sail takes it in itself and sets the new sail in its place when the work is done, as Luce's shift of a topsail by the wind opens "Clew up!" and ends "Let fall! Sheet home!"; a furled or hauled-up sail is shifted where it hangs and the new one left furled, setting it your next order. Any sail can be bent and unbent, square, gaff, jib-headed or studding.
 
 ```orders frigate
 unbend the fore royal

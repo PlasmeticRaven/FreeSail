@@ -70,7 +70,8 @@ standing order "night routine": at sunset then take in the studdingsails; take i
 standing order "morning sail": at sunrise, if the true wind is under 20 knots then set the royals
 standing order "shorten sail for weather": when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; reef the topsails, one reef
 standing order "keep her full": when the apparent wind is forward of 55 degrees then bear away one point
-standing order "heavy weather": when the true wind exceeds 40 knots for 5 minutes then send down the topgallant masts; shift the fore topmast staysail for the fore storm staysail; close reef the topsails
+standing order "heavy weather": when the true wind exceeds 40 knots for 5 minutes then send down the topgallant masts; take in the fore topmast staysail; bend the fore storm staysail; close reef the topsails
+standing order "storm staysail": when the fore storm staysail is furled and the true wind exceeds 40 knots then set the fore storm staysail
 standing order "sound the well": every glass then sound the well        # refused until milestone 5: "the ship has no well to sound yet"
 ```
 
@@ -122,7 +123,7 @@ The six orders in §3 as text files with a comment naming the source of each rul
 | 34 | At sunset the night routine takes in the studding sails and the royals and touches nothing else; at sunrise with the wind under twenty the royals are set again; with the wind over twenty they are not, and the log says the condition failed |
 | 35 | Shorten sail for weather fires once when the wind has exceeded thirty knots for two minutes, and not on a two-minute gust to thirty-two that falls away, and not again until the wind has been under thirty for the dwell |
 | 36 | Keep her full bears away a point when the apparent wind is forward of fifty-five degrees and stops when it is not; over an hour of a wind that wanders about the threshold it fires no more than four times |
-| 37 | The heavy-weather routine sends down the topgallant masts, shifts to the storm staysail and close-reefs the topsails when the wind has held over forty for five minutes, in that order, all hands called by the work |
+| 37 | The heavy-weather routine sends down the topgallant masts, takes in the fore topmast staysail, bends the fore storm staysail and close-reefs the topsails when the wind has held over forty for five minutes, in that order, all hands called by the work; its companion sets the storm staysail on the tick it is bent (revised at gate 4a: the frigate's storm staysail sets on its own stay, so it is bent and set, not shifted; the first draft's `shift ... for ...` was the lead's error) |
 | 38 | An officer's standing order and the captain's that conflict on the same part: the captain's stands, the officer's is logged as countermanded |
 | 39 | A day under the starter routines replays to the same digest, with the same firings at the same ticks |
 | 40 | A Python rule and its dialect twin produce identical logs |

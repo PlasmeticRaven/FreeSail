@@ -597,6 +597,8 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
 
 21. **Practices with a price come as pairs, in the period's own form.** Swiftering in the catharpins gains bracing on that mast's lower yard and rates the mast down athwartships until eased; bowlines hauled flatten the sail and cost hands at every brace; the after yards go sharper than the head yards on a wind (Fincham art. 94). Each is data with its source, and each is undone by its counter.
 
+22. **Standing orders are one engine, and they wait on states.** Gate 4a (2026-09-27). The dialect and the Python API build the same rule, enter the same book and fire through the same `submit`; a Python rule's body runs once as it is entered and is saved as its source. A firing's orders go on one tick, so a routine that must wait for work to finish says so as a second order on the state the work leaves (`when the fore storm staysail is furled ... then set the fore storm staysail`), not as a pause in the runtime. Rulings: `keep her full` at fifty-five degrees apparent stands as the starter routine; head canvas that warns at thirty knots and splits at forty-three is reasonable; an evolution named for a whole practice does the whole of it (a shift takes a drawing sail in and sets the new one), which is the rule of decision 21 read the other way.
+
 ### Still open
 
 Nothing at the proposal level. Open items now live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.

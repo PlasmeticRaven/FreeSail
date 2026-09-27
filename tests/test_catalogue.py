@@ -393,9 +393,17 @@ def test_shift_sail_uses_a_spare_and_refuses_when_none_are_left():
     assert any("0 spare sails left" in t for t in texts(notes))
     with pytest.raises(OrderError, match="There is no spare sail left in the sail room"):
         runner.start(ship, "shift_sail", "main.royal")
-    with pytest.raises(OrderError, match="set; take it in before shifting it"):
-        ship.sails["mizzen.royal"].state = SailState.SET
-        runner.start(ship, "shift_sail", "mizzen.royal")
+    # A drawing sail is not refused: the shift takes it in first and sets the new one in
+    # its place (gate 4a's ruling; Luce 1866 ch. XXXII 'To shift a topsail' opens "Clew
+    # up!" and ends "Let fall! Sheet home!").
+    sail_room(ship).sails[:] = [SpareSail(kind="mizzen.royal", canvas_no=8)]
+    ship.sails["mizzen.royal"].state = SailState.SET
+    runner.start(ship, "shift_sail", "mizzen.royal")
+    notes = run(runner, ship, wind)
+    assert ship.sails["mizzen.royal"].state is SailState.SET
+    assert any("Clewed up the mizzen royal to shift it" in t for t in texts(notes))
+    assert any("Set the mizzen royal in the mizzen royal's place" in t for t in texts(notes))
+    assert any("and set, 1 spare sail left" in t for t in texts(notes))  # the sound old sail stowed
 
 
 def test_spare_sails_come_from_the_crew_section_when_the_ship_has_one():

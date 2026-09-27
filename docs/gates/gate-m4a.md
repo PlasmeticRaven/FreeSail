@@ -1,6 +1,13 @@
 # Gate M4a: Standing orders
 
-**Verdict:** pending.
+**Verdict:** Passed (owner, 2026-09-27). Items 1 to 8 checked out on the owner's run.
+
+**Owner's rulings:**
+- **Truth 37, the storm staysail.** The owner asked whether shifting a sail is not the whole process of taking it in and replacing it. It is, by Luce (1866 ch. XXXII: 'To shift a topsail (by the wind, under all plain sail)' opens "Clew up!" and ends "Let fall! Sheet home!"; 'To shift a jib' opens "Haul the sail down"), so the shift evolution now takes a drawing sail in first and sets the new one in its place; the package's refusal is gone. Separately, the routine's own sentence was the lead's error in the specification: the frigate's fore storm staysail sets on the fore stay, its own, beside the fore topmast staysail's, so it is bent and set, not shifted for the other. The starter routine now reads `take in the fore topmast staysail; bend the fore storm staysail`, with a companion order that sets the storm staysail on the tick it is bent (`when the fore storm staysail is furled and the true wind exceeds 40 knots`), which is how a standing order waits: on a state. Truth 37 passes in both halves after the gate; the expected failures are back to seven. Item 5's transcript above is the gate build's and stands as the record of what the owner saw; after the change the starter file holds seven orders, of which six enter (items 2, 3 and 7 read one more).
+- **Head canvas in a gale.** Reasonable as it stands. The jib warns at thirty knots and splits at forty-three, sixteen minutes later in a gale that rises faster than any real one (`docs/dev/TuningNotes.md`, "Head canvas in a gale"); a captain who wants the head sails saved writes the line at thirty.
+- **`keep her full`.** Fifty-five degrees apparent stands as the standard routine.
+
+**Log voice:** the "By standing order" and the refusal lines accepted.
 
 ## Headline
 

@@ -41,11 +41,24 @@ standing order "keep her full": when the apparent wind is forward of 55 degrees 
 # Heavy weather. Forty knots is a gale (units.describe_wind_strength); in 45 knots the
 # storm canvas of truth 28 has the topgallant masts sent down, the storm staysails bent and
 # the topsails close-reefed, and nothing carries away in an hour. Five minutes is the
-# duration that tells a gale from a squall (spec §3; judgement).
+# duration that tells a gale from a squall (spec §3; judgement). The fore storm staysail
+# sets on the fore stay beside the fore topmast staysail's (Luce 1884 ch. XXIX 'Reducing
+# Sail to a Gale'), so it is bent from the sail room and set as a sail of its own; the
+# setting waits for the bending in the companion order below. In a gale that rises faster
+# than the head sails are shortened the fore topmast staysail may have blown out before
+# this fires (it goes at about 43 knots under plain sail on a wind); the order is then
+# refused in words and the rest go on.
 standing order "heavy weather": when the true wind exceeds 40 knots for 5 minutes
     then send down the topgallant masts;
-    shift the fore topmast staysail for the fore storm staysail;
+    take in the fore topmast staysail;
+    bend the fore storm staysail;
     close reef the topsails
+
+# The storm staysail, set when it is bent: a standing order may test a sail's state, and
+# "bent and furled" is what the bending leaves. Edge-triggered, so it fires once as the
+# sail comes to be furled with the gale still blowing.
+standing order "storm staysail": when the fore storm staysail is furled and the true wind exceeds 40 knots
+    then set the fore storm staysail
 
 # Sounding the well every glass is the pump routine of Luce's day ("Pump the ship out",
 # Luce 1866, ch. XXXII, daily routine at sea, morning watch art. III and dog watch art.
