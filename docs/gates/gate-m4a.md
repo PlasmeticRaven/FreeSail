@@ -110,12 +110,22 @@ She lies head south with the wind dead aft, so the studding sails will draw.
 
 - [ ] **7. A day under the starter routines, saved and replayed.** `py -m freesail.ui.console data/ships/frigate-36.yaml --seed 7 --wind 0,15 --heading 180 --standing-orders data/standing_orders/starter.orders`. The five orders enter and the well's is refused before the prompt. Type `make all sail`, `tick 600`, `rig out the studdingsails, both sides`, `tick 300`, `set the studdingsails, both sides`, `tick 56700` (to 20:00; about two minutes). Expect the sunset and the night routine's two lines at 19:59 as in item 1, and nothing from the other routines (the wind never reached thirty, and running she is never pinched). `save day.json`: `Saved to day.json at tick 57600.` `replay day.json`: `Replaying day.json to tick 57600...` (about two minutes more) and `Replayed. Log digest d82a69017b59b63d. Clock held.`, then `state` as before the save, `Twilight.` and about `7.0 kn`. `standing orders`: the five, the night routine `fired once, last at Last dog watch (19:59)`. The firings were not in the save; the replay re-fired them from the seed and the journal. One line the replay does not carry is the well's refusal at the start: a refused order is not journaled (as at every gate since M0), so the replayed log is one line shorter than the one you watched, though the ship, the book and every firing are the same. Type `quit`.
 
-- [ ] **8. The Python twin.** Paste this at the terminal (not in the console) as one line:
+- [ ] **8. The Python twin.** At the terminal (not in the console):
 
   ```
-  py -c "from datetime import datetime; from freesail.api.session import make_world; from freesail.core.world import Scenario; from freesail.standing import bind, at, order; s = lambda: Scenario(start_time=datetime(1805, 6, 1, 19, 40), wind_from_deg=0, wind_speed_kn=15, ship_heading_deg=180); d = make_world(7, 'data/ships/frigate-36.yaml', s()); p = make_world(7, 'data/ships/frigate-36.yaml', s()); [w.submit('make all sail') for w in (d, p)]; d.submit('standing order \"night routine\": at sunset then take in the studdingsails; take in the royals'); bind(p); at('sunset', name='night routine')(lambda: (order('take in the studdingsails'), order('take in the royals'))); d.run(1500); p.run(1500); print(*[e.line() for e in p.log if e.actor.startswith('standing')], sep=chr(10)); print('same log after the order:', [(e.tick, e.text) for e in d.log if e.tick > 0] == [(e.tick, e.text) for e in p.log if e.tick > 0]); print(p.submit('show standing order \"night routine\"').text)"
+  py tools/python_twin.py
   ```
-  Two frigates from seed 7 at 19:40, one given the night routine at the prompt, the other the same rule in Python (`@at("sunset")` with two `order(...)` calls; here as a one-line lambda). *Prints the Python rule's firing at 19:59 (`By standing order 'night routine': taking in the royals.`, after a line saying the studding sails were already in, since this frigate has no booms out), then `same log after the order: True`: every event after the tick the rules were given is the same text at the same tick in both logs. The last lines read `Standing order "night routine", given by the captain (python): at sunset then ... Standing; fired once, last at Last dog watch (19:59).`* Truth 40 does this with the studding sails set and compares 63 events.
+  The script builds two frigates from seed 7 at 19:40, head south with the wind north, and both make all sail. One is given the night routine at the prompt, in the dialect; the other is given the same rule in Python, through the API:
+
+  ```python
+  bind(python)
+
+  @at("sunset", name="night routine")
+  def night_routine():
+      order("take in the studdingsails")
+      order("take in the royals")
+  ```
+  Both run twenty-five minutes through sunset. *Prints the Python rule's firing at 19:59 (`By standing order 'night routine': taking in the royals.`, after a line saying the studding sails were already in, since this frigate has no booms out), then `same log after the order: True`: every event after the tick the rules were given is the same text at the same tick in both logs. The last lines read `Standing order "night routine", given by the captain (python): at sunset then ... Standing; fired once, last at Last dog watch (19:59).`* The script is `tools/python_twin.py`, short enough to read; truth 40 does the same with the studding sails set and compares 63 events.
 
 ## Guide
 
