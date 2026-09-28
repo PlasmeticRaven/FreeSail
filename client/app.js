@@ -95,12 +95,15 @@
         $("ship-name").textContent = data.ship ? data.ship.name + " (" + data.ship.rig + ")" : "point ship";
         log.clear();
         state.driver = data.snapshot.driver || state.driver;
+        // the log as the server shows it now: rolled up at 60x and above (spec M4 §20)
         data.log.forEach(function (e) {
-          log.add(e, null);
+          log.add(e);
         });
         onSnapshot(data.snapshot);
       } else if (data.type === "event") {
-        log.add(data.event, state.driver);
+        log.add(data.event);
+      } else if (data.type === "rollup") {
+        log.addRollup(data.rollup);
       } else if (data.type === "snapshot") {
         onSnapshot(data.snapshot);
       }
@@ -121,7 +124,8 @@
     return post("/api/driver", { action: action, value: value });
   }
 
-  var DRIVER_WORDS = { hold: 1, go: 1, time: 1, tick: 1 };
+  // `speed N` and `time N` are the same (spec M4 §20: up to 300, the server clamps)
+  var DRIVER_WORDS = { hold: 1, go: 1, speed: 1, time: 1, tick: 1 };
 
   function submitLine(text) {
     text = text.trim();
@@ -136,7 +140,7 @@
         note("Say '" + head + " 30'.");
         return;
       }
-      driver(head, value);
+      driver(head === "speed" ? "time" : head, value);
       return;
     }
     post("/api/order", { text: text });

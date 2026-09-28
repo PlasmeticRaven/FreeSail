@@ -48,10 +48,14 @@ def test_save_and_replay_from_console(tmp_path):
 
 
 def test_rollup_at_high_compression():
+    """At 60x the routine lines of each hour roll up into one line at the hour's end
+    (spec M4 §20; package 29 replaced the per-bell count above 10x with the hourly
+    roll-up, tests/test_rollup.py)."""
     con, out = make_console()
     con.handle_line("time 60")
     con.handle_line("go")
-    con.world.run(1800)  # to the first bell; routine entries should roll up
+    con.world.run(3600)  # 04:00 to 05:00: the hour closes at the 05:00 bell
     text = out.getvalue()
-    assert "1 bell" in text
-    assert "routine entries" in text or "Steady" not in text
+    assert "1 bell" not in text  # rolled up, not printed
+    assert "= Morning watch (04:00-05:00)" in text
+    assert "routine entries." in text

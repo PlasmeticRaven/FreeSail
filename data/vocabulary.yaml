@@ -440,6 +440,12 @@ verbs:
     synonyms: [ask watcher]
     object: station
     level: 2
+  # Words to a station with no answer owed (package 29, the owner's ruling, 2026-09-28):
+  # "The captain to the watcher: ..." in the log, and the words in the next sample.
+  tell the watcher:
+    synonyms: [tell watcher, say to the watcher]
+    object: station
+    level: 2
   stand down the watcher:
     synonyms: [stand the watcher down]
     object: station

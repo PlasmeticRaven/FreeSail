@@ -3,6 +3,11 @@
 This is the M0 to M2 wind (spec §7.1). Moving weather systems arrive in M5 and
 will replace the random walk with something that has a reason; the interface
 (`direction_from`, `speed_at_height`, `vector_at_height`) stays.
+
+A scenario's weather script (spec M4 §19, `freesail.world.weather_script`) moves the
+**base** the wind wanders about (`follow`): the direction's walk and the speed's
+mean-reverting wander are kept as offsets from the base, and the gusts multiply the
+result, exactly as they do about a fixed base. Without a script nothing here changes.
 """
 
 from __future__ import annotations
@@ -48,11 +53,26 @@ class Wind:
         self.params = params
         self._stream = stream
         self.direction_from = units.wrap_2pi(params.direction_from)
+        self.base_direction = self.direction_from  # moved only by `follow`
         self.base_speed = max(params.speed, self.MIN_SPEED)
         self.speed = self.base_speed
         self.gust_factor = 1.0
         self.gust_remaining = 0.0
         self.gust_started = False  # set True on the tick a gust begins
+
+    # -- the weather script (spec M4 §19) ------------------------------------
+
+    def follow(self, direction_from: float, speed: float) -> None:
+        """Move the base wind to the script's, before `step`: the wind turns by what the
+        base turned (the short way round) and its speed changes by what the base's did,
+        so the wander about the base and any gust ride on the scripted wind as they ride
+        on a fixed one. Draws nothing from the stream."""
+        turn = units.wrap_pi(direction_from - self.base_direction)
+        self.base_direction = units.wrap_2pi(direction_from)
+        self.direction_from = units.wrap_2pi(self.direction_from + turn)
+        base = max(speed, self.MIN_SPEED)
+        self.speed = max(self.MIN_SPEED, self.speed + (base - self.base_speed))
+        self.base_speed = base
 
     # -- per-tick update -----------------------------------------------------
 

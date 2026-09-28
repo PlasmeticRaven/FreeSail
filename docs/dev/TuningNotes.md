@@ -368,3 +368,57 @@ Steady wind, `make_world`, unless the console is named (the console's wind gusts
 - **A Python rule's source.** `inspect.getsource` reads a function defined in a file; one typed at `py -c` or the REPL saves as `python: <module>.<name>`.
 - **Runtime cost** (package 25's measurement): the frigate under five rules ticks at about 457 a second against 503 bare on the build machine; a whole day at the prompt is about three and a half minutes of `tick`.
 
+
+## Milestone 4c: the ship sails herself
+
+Package 29 (spec M4 §18 to §23): the weather script, compression to 300 with the hourly roll-up, auto-slow on alarm, the day saved and replayed, the performance budget. Truths 48 to 51 in `tests/test_known_truths.py`.
+
+### Package 29: the gate's day at seed 7, measured
+
+`data/scenarios/gate-4c-day.yaml`: the frigate from 04:00 on 1 June 1805 at 50 N, heading 135 (south-east), the M2 wind's gustiness and wander at 0.3, plain sail and the royals ordered at four; the starter routines and the captain's four for the passage (`data/scenarios/gate-4c-day.orders`). The script: W 17 knots at 04:00, 18 at 14:00, 19 at 19:30; veering to WNW and 29 by 22:00, NW 36 by midnight, 45 at 01:00 and held to 03:00; easing to 26 at 05:00 and 18 at 07:00. Run to 09:00 on 2 June (104,400 ticks):
+
+| Ship's time | Tick | What |
+|---|---|---|
+| 19:50:52 | 57052 | Sunset (by the sun at her easting); the night routine takes in the royals on the same tick |
+| 21:43:57 | 63837 | "shorten sail for weather" reefs the topsails once; the captain's "topgallants" takes them in |
+| 21:58:39 | 64719 | Wind veered to WNW, a moderate gale |
+| 22:16:13, 22:56:28 | 65773, 68188 | "shorten sail for weather" again (the wind back under thirty for the dwell between): two reefs more |
+| 23:55:46 | 71746 | Wind veered to NW |
+| 00:14:25 | 72865 | The captain's "gale canvas": the jib, the spanker and the mainsail in |
+| 00:38:56 | 74336 | "heavy weather": the topgallant masts sent down, the fore topmast staysail taken in, the storm staysail bent; the close reef refused (three reefs in already). The script's forty knots plus five minutes is 00:32 |
+| 01:15:02 | 76502 | "storm staysail" sets the fore storm staysail as it is bent |
+| 03:22:54 | 84174 | "heavy weather" again (the wind under forty for the dwell and over it again): all four orders refused in words, everything done already |
+| 03:41:30 | 85290 | Sunrise ("morning sail" holds: the wind is 45 knots) |
+| 05:55:04 | 93304 | The captain's "make sail after the gale": storm staysail in, topgallant masts up, reefs out, plain sail |
+| 06:34:10 | 95650 | The captain's "topgallants again" |
+
+Nothing blown out, carried away or parted; 79 strain warnings over the day (notable), none urgent. 479 log lines; digest `f2191f3328f1914d` at 09:00 on 2 June. At seeds 1 and 2 the same day loses nothing either; the heavy-weather routine fires at 00:08 and 00:27 (the wind's wander about the scripted base, some four knots at variability 0.3, moves the forty-knot crossing by twenty minutes either way).
+
+**Without the captain's four,** under the starter routines alone, the day lost canvas (the first runs, heading south with the wind on the beam then the quarter): two topgallants blew out and the fore topgallant yard carried away at 35 knots in the first watch, and the mainsail, the spanker and the jib blew out at 45 in the middle watch. The starter's "shorten sail for weather" takes in the studding sails and royals and reefs once, and nothing in the starter book takes in the topgallants or the courses before forty. Heading south-east the gale comes aft and she scuds; heading south she reached across it. Truth 48 is asserted with the captain's four, and the gate report says so.
+
+**The roll-up at 300x (truth 50):** 30 roll-ups for the 29 hours and the hour begun at 09:00 (the last "so far"); 284 routine lines summed in them; 195 lines kept as they are (172 notable, 23 routine lines of the captain's and the driver's, the book read at four). An hour at sea under standing orders rolls up to a line like "All hands up 5 times, piped down 4 times, the hands at their work (18 steps), standing orders 'shorten sail for weather' and 'topgallants' found nothing to do 5 times; 34 routine entries."
+
+### Package 29: the performance budget, measured
+
+Spec §20: `TICKS_PER_SECOND_HEADLESS = 3000` for the frigate under standing orders on the owner's machine. The build machine is a 2.1 GHz cloud Xeon on Python 3.11; the assumed ratio to the owner's 4090 desktop is 2.0 a core (`OWNER_TO_BUILD_RATIO`, judgement from single-thread benchmarks of the two classes of processor, to be measured at the gate), so the budget asks 1,500 here.
+
+- **Before** (the head of package 28d): 420 ticks a second, best of seven runs of 500, the frigate under plain sail and the starter routines at 08:00 in 18 knots (package 25 measured 457 with five rules and 503 bare).
+- **After**: 1,000 (best of seven, alone); 800 to 900 through the whole gate's day with its gale. On the owner's machine at the assumed ratio, 1,600 to 2,000. **The budget is not met**; truth 51 asserts the build machine's floor, `BUILD_MACHINE_FLOOR = 500` (half the measured 1,000, `BUILD_MACHINE_MARGIN = 0.5`, so four workers sharing the cores do not fail it and a return to 420 does). The lead sets the budget with the owner.
+
+**Where the time went** (cProfile over 2,000 ticks, before): 97 per cent in the physics, `integrate.step`, of which `compute_sail_forces` (four substeps a tick) was 88 per cent. In it: the ship graph's role queries (`spar_chain`, `parent_of`, `mast_of`, `lines_of`, answered afresh 750,000 times) about a third; the apparent wind at each sail's and spar's height (57 heights a substep, each asking the wind for its speed, vector and the heading's sines) 15 per cent; the spar windage loop, the load paths, the blanketing pairs and the strain loop over 310 parts the rest. The standing orders' runtime was under one per cent with seven rules armed (9 microseconds a tick); `action_parts` re-parsing at firing is not on the path. The crew's routine is 3 per cent.
+
+**What was made faster**, every number the same to the last bit (every digest the tests assert, and three voyages of the frigate and the schooner compared state and digest before and after):
+
+1. The graph's role queries are memoised on the ship (`ship/graph.py`): its shape is fixed once loaded; callers get fresh lists.
+2. The apparent wind is worked once a height a substep (`sails._FlowField`), the wind's direction, gust and the heading's sines read once, the shear factor kept by height, the arithmetic `Wind.vector_at_height`'s step for step; windage reads only what it needs (no angle).
+3. The rig as the wind meets it is read once a tick for its four substeps (`sails._Rig`, `hold_rig`/`release_rig` in `integrate.step`): which sails draw, their reefed areas and chords, the idle canvas and spars with their windage areas, heights and levers. Nothing in these changes between substeps (the evolutions and the sheets move before them, the strain model after); a bowline is read afresh.
+4. Each sail's load path (spars, sheets, halyards, braces, stay) is kept per ship; the blanketing loop reads local values; the strain loop classes each part once per ship and skips the unloaded.
+
+Next, if the owner wants 3,000: the same exactness forbids reordering the sums, so the remaining ~200 microseconds a substep are Python's own; the ways on are fewer substeps in steady conditions (numbers change, a truth run), `numpy` over the sails (numbers change in the last bits), or a compiled core for `compute_sail_forces`. Each is a ruling, not a tuning.
+
+### Found on the way (package 29)
+
+- **A refused order and a query replay now.** Package 26 noted that a refused order was not journaled and so a day that read the starter file replayed to a log one line shorter (the well's refusal). The spec's "save at any tick; replay reproduces the digest" wants the log the player watched, so a save now holds `inputs`: every order in the order given, refused and queries too, and every line a driver writes (a save, a file read, the compression eased). A replay gives them again; the journal is kept as it was. A save without `inputs` replays its journal as before.
+- **Auto-slow's floor is 1x** (`ALARM_SPEED`, `freesail/ui/console.py`; spec M4 open item 8 (b) offers 1 or 10). An urgent line is a sail blown out, a spar carried away or a line parted, and the next often follows within seconds of ship's time: the first run of the day blew out two topgallants and carried away the fore topgallant yard eleven seconds later. At 1x the player has the ship's own pace to see it and answer; at 10x those eleven seconds are one real second. The line in the log: "Compression eased to 1x: <the urgent line's words>." The client shows it beside the clock until the player sets the speed again.
+- **Gusts in a gale.** The M2 wind's gust factor is 1.1 to 1.5 whatever the base (`physics/wind.py`), so in the day's 45 knots a gust reaches 67 knots, logged as "A gust: 67 knots". A sailor would call that high for a gale's gusts (gusts of a third over the mean are more usual); recorded for milestone 5's weather, which replaces the random wind.
+- **The veer's log lines.** A scripted turn of exactly four points logs its second "Wind veered" a tick late or not at all when the interpolation leaves the turn a hair short of two points since the first line (the threshold is `>=`); a real day's wander carries it past. The tests turn five points.

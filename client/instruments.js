@@ -42,9 +42,14 @@
     set("i-course", mode);
     var d = snap.driver || {};
     var clock = (d.running ? "running" : "held") + " at " + (d.compression || 1) + "x";
+    // auto-slow on an alarm (spec M4 open item 8): the speed it came down from and the
+    // urgent line, until the player sets the speed again
+    if (d.eased) clock += "; eased from " + d.eased.from + "x on an alarm: " + d.eased.line;
     // --lockstep: the clock waits while a model's door has the floor (spec M4 §13)
     if (d.lockstep) clock += d.waiting_for ? ", waiting for " + d.waiting_for : ", in lockstep";
     set("i-clock", clock);
+    var clockEl = document.getElementById("i-clock");
+    if (clockEl) clockEl.classList.toggle("eased", !!d.eased);
     set("i-tick", "tick " + snap.tick);
 
     var setSails = snap.sails.filter(function (x) {

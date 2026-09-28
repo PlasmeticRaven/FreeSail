@@ -3,8 +3,13 @@
     python -m freesail.ui.server data/ships/frigate-36.yaml [--seed N] [--wind FROM,KN]
                                  [--heading DEG] [--time N] [--port 8000] [--watcher fake]
                                  [--lockstep] [--consent-records DIR] [--saves DIR]
+    python -m freesail.ui.server --scenario data/scenarios/gate-4c-day.yaml [...]
+    python -m freesail.ui.server --load SAVE [...]
 
-then open http://localhost:8000.
+then open http://localhost:8000. `--scenario FILE` starts from a scenario file (its
+ship, start, weather script, seed, standing orders and first orders; spec M4 §19);
+`--load SAVE` replays a save to its last tick and goes on from there, as the console's
+`--load` does (spec M4 §21).
 
 Routes (spec §9.2):
 
@@ -12,18 +17,24 @@ Routes (spec §9.2):
     GET  /client/...    the client's scripts and styles
     GET  /api/ship      the ship graph, for drawing (queries.ship_graph)
     GET  /api/state     the current snapshot (queries.snapshot) plus the driver
-    GET  /api/log       the log, optionally ?since=TICK and ?limit=N
+    GET  /api/log       the log, optionally ?since=TICK, ?until=TICK and ?limit=N: the
+                        store, every line (a roll-up's lines are asked for by its ticks)
     GET  /api/save      the save file (seed, scenario, journal) as a download,
                         the same file `save PATH` writes; the browser can keep it
     POST /api/order     {"text": "..."} -> the accepted or rejected event
-    POST /api/driver    {"action": "hold"|"go"|"time"|"tick", "value": N}
+    POST /api/driver    {"action": "hold"|"go"|"speed"|"time"|"tick", "value": N}
+                        (speed and time are the same: compression up to 300)
                         or {"action": "standing_orders", "value": FILE} to read a file
                         of standing orders (also `read the standing orders from FILE`
                         on the command line, as in the console), or
                         {"action": "save", "value": PATH} to write a save file on the
                         server's disk (also `save PATH` on the command line)
     WS   /ws            every log event as it happens, and a snapshot every
-                        tick at 1x, every 10 ticks at 10x, every 60 at 60x and up
+                        tick at 1x, every 10 ticks at 10x, every 60 at 60x and up;
+                        at 60x and up the log is rolled up (spec M4 §20): the notable
+                        and urgent lines and the captain's come as events, and each
+                        hour's routine lines as one {"type": "rollup"} message
+                        (`events.RollupView`, the console's and the samples' view)
 
 The agent API (spec M4 §13 as revised, package 28b; `agent_routes`, which the console
 hosts too on `--agents-port`): a language model's door is a client of this game.
@@ -76,12 +87,18 @@ from fastapi.staticfiles import StaticFiles
 from freesail import units
 from freesail.api import queries
 from freesail.core import replay as replay_mod
-from freesail.core.events import Event
-from freesail.core.world import Scenario, World
+from freesail.core.events import Event, Rollup, RollupView, Severity, Shown, rolls_up
+from freesail.core.events import rollup as rolled
+from freesail.core.world import World
 from freesail.ui.console import (
+    ALARM_SPEED,
+    SPEED_WORDS,
     check_agents_unattended,
+    clamp_compression,
+    eased_words,
     read_standing_orders,
     read_standing_orders_path,
+    start_world,
     station_watcher,
 )
 
@@ -119,8 +136,13 @@ class Driver:
 
     def __init__(self, world: World, compression: float = 1.0, lockstep: bool = False):
         self.world = world
-        self.compression = compression
+        self.compression = clamp_compression(compression)
+        self.world.compression = self.compression
         self.lockstep = lockstep
+        self._view = RollupView()  # the roll-up (spec M4 §20), the console's rule
+        self._alarm: Event | None = None  # an urgent line seen while running fast
+        # the last auto-slow (spec M4 open item 8), shown until the player sets the speed
+        self.eased: dict[str, Any] | None = None
         self.desk: Any = None  # the agent API's stations (`agent_routes`), when mounted
         self.running = False
         self.lock = threading.RLock()
@@ -146,7 +168,21 @@ class Driver:
             fn(message)
 
     def _on_event(self, e: Event) -> None:
-        self._emit({"type": "event", "event": event_dict(e)})
+        if (
+            e.severity is Severity.URGENT
+            and self.running
+            and self.compression > ALARM_SPEED
+            and self._alarm is None
+        ):
+            self._alarm = e  # eased once the tick is over (`_run_ticks`)
+        for x in self._view.feed(e, self.compression):
+            self._emit_shown(x)
+
+    def _emit_shown(self, x: Shown) -> None:
+        if isinstance(x, Rollup):
+            self._emit({"type": "rollup", "rollup": x.to_dict()})
+        else:
+            self._emit({"type": "event", "event": event_dict(x)})
 
     # -- state --------------------------------------------------------------
 
@@ -156,6 +192,8 @@ class Driver:
             "compression": self.compression,
             "snapshot_every": snapshot_interval(self.compression),
         }
+        if self.eased is not None:  # the clock was eased on an alarm (open item 8)
+            out["eased"] = dict(self.eased)
         if self.lockstep:  # the clock waits for a door that has the floor
             out["lockstep"] = True
             out["waiting_for"] = self.held_for()
@@ -193,9 +231,46 @@ class Driver:
             self.emit_snapshot()
 
     def set_compression(self, value: float) -> None:
+        """`speed N` (or `time N`), up to 300 (spec M4 §20). The player's choice clears
+        the auto-slow notice; an hour the roll-up holds is let go when the speed comes
+        down below its threshold."""
         with self.lock:
-            self.compression = max(0.1, float(value))
+            self._set_compression(value)
+            self.eased = None
             self.emit_snapshot()
+
+    def _set_compression(self, value: float) -> None:
+        self.compression = clamp_compression(value)
+        self.world.compression = self.compression
+        if self._view.holding and not rolls_up(self.compression):
+            for x in self._view.flush():
+                self._emit_shown(x)
+
+    def _ease(self) -> None:
+        """Auto-slow (spec M4 open item 8): an urgent line while the clock ran faster
+        than ALARM_SPEED eases it to that, the log says so (a driver's line, which a replay
+        writes again), and the client shows the notice until the player sets the speed."""
+        e, self._alarm = self._alarm, None
+        if e is None or self.compression <= ALARM_SPEED:
+            return
+        was = self.compression
+        self._set_compression(ALARM_SPEED)
+        self.eased = {"from": was, "to": ALARM_SPEED, "line": e.text, "tick": e.tick}
+        self.world.record_driver(
+            "notable",
+            "driver.eased",
+            eased_words(e),
+            data={"from": was, "to": ALARM_SPEED, "tick": e.tick, "kind": e.kind},
+        )
+        self.emit_snapshot()
+
+    def shown_log(self, n: int = 500) -> list[dict[str, Any]]:
+        """The last `n` lines of the store as the client shows them now: rolled up at the
+        driver's compression, the hour still open left for the live view to close."""
+        return [
+            x.to_dict() if isinstance(x, Rollup) else event_dict(x)
+            for x in rolled(self.world.log.tail(n), self.compression)
+        ]
 
     def tick(self, n: int) -> None:
         """Advance n ticks now, then hold."""
@@ -231,28 +306,28 @@ class Driver:
         """Write the save file and say so in the log (not journaled: a save is the
         driver's act, not an order, and a replay must not re-save)."""
         if not path:
-            return self.world.record(
+            return self.world.record_driver(
                 "routine",
                 "driver.refused",
                 "Say 'save somewhere.json'.",
-                actor="driver",
                 data={"path": path},
             )
         try:
             p = replay_mod.save_to_file(self.world, path)
         except OSError as e:
-            return self.world.record(
+            return self.world.record_driver(
                 "routine",
                 "driver.refused",
                 f"Could not write {path}: {e.strerror or e}.",
-                actor="driver",
                 data={"path": path},
             )
-        return self.world.record(
+        # the digest of the log the save holds (this line comes after it), so a replay of
+        # the file can be checked against it (spec M4 §21)
+        return self.world.record_driver(
             "notable",
             "driver.saved",
-            f"Saved to {p} at tick {self.world.clock.tick}.",
-            actor="driver",
+            f"Saved to {p} at tick {self.world.clock.tick}; the log's digest is "
+            f"{self.world.log.digest()[:16]}.",
             data={"path": str(p), "tick": self.world.clock.tick},
         )
 
@@ -260,20 +335,18 @@ class Driver:
         try:
             n = read_standing_orders(self.world, path)
         except OSError as e:
-            return self.world.record(
+            return self.world.record_driver(
                 "routine",
                 "driver.refused",
                 f"Could not read {path or 'the standing orders'}: {e.strerror or e}.",
-                actor="driver",
                 data={"path": path},
             )
         finally:
             self.emit_snapshot()
-        return self.world.record(
+        return self.world.record_driver(
             "routine",
             "driver.standing_orders",
             f"Read {n} standing order{'s' if n != 1 else ''} from {path}.",
-            actor="driver",
             data={"path": path, "count": n},
         )
 
@@ -286,6 +359,9 @@ class Driver:
                 break  # lockstep: the World waits for the door that has the floor
             self.world.tick()
             self._ticks_since_snapshot += 1
+            if self._alarm is not None:
+                self._ease()  # auto-slow: the rest of this batch is not run
+                break
             if self._ticks_since_snapshot >= every:
                 self.emit_snapshot()
 
@@ -433,9 +509,13 @@ def create_app(
         return JSONResponse(driver.snapshot())
 
     @app.get("/api/log")
-    def api_log(since: int | None = None, limit: int = 200) -> JSONResponse:
+    def api_log(
+        since: int | None = None, until: int | None = None, limit: int = 200
+    ) -> JSONResponse:
         with driver.lock:
             events = driver.world.log.since(since) if since is not None else driver.world.log.all()
+            if until is not None:
+                events = [e for e in events if e.tick <= until]
             events = events[-max(1, min(limit, 5000)) :]
             return JSONResponse([event_dict(e) for e in events])
 
@@ -463,7 +543,7 @@ def create_app(
                 driver.hold()
             elif action == "go":
                 driver.go()
-            elif action == "time":
+            elif action in SPEED_WORDS:
                 driver.set_compression(float(value))
             elif action == "tick":
                 driver.tick(int(value if value is not None else 1))
@@ -475,7 +555,7 @@ def create_app(
                 raise HTTPException(
                     status_code=400,
                     detail=(
-                        "Say hold, go, time N, tick N, standing_orders FILE or save PATH "
+                        "Say hold, go, speed N, tick N, standing_orders FILE or save PATH "
                         "to the driver."
                     ),
                 )
@@ -498,7 +578,7 @@ def create_app(
                 "type": "hello",
                 "ship": queries.ship_graph(ship) if hasattr(ship, "spars") else None,
                 "snapshot": driver.snapshot(),
-                "log": [event_dict(e) for e in driver.world.log.tail(500)],
+                "log": driver.shown_log(500),
             }
             driver.add_listener(listener)
         try:
@@ -538,7 +618,7 @@ async def _receive_orders(
                     driver.hold()
                 elif action == "go":
                     driver.go()
-                elif action == "time":
+                elif action in SPEED_WORDS:
                     driver.set_compression(float(value))
                 elif action == "tick":
                     await asyncio.to_thread(driver.tick, int(value or 1))
@@ -565,24 +645,25 @@ def say_to_terminal(text: str) -> None:
 
 
 def build_world(args: argparse.Namespace) -> World:
-    from freesail.api.session import make_world
-
-    scenario = Scenario()
-    if args.wind:
-        d, s = args.wind.split(",")
-        scenario.wind_from_deg, scenario.wind_speed_kn = float(d), float(s)
-    if args.heading is not None:
-        scenario.ship_heading_deg = args.heading
-    if args.ship:
-        return make_world(args.seed, args.ship, scenario)
-    return World(seed=args.seed, scenario=scenario)
+    """The server's World from its command line, as the console's (`console.start_world`):
+    a save replayed (`--load`), a scenario file (`--scenario`, its orders given later by
+    `main`), or the ship, seed, wind and heading."""
+    world, _ = start_world(args)
+    return world
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="FreeSail local server")
     ap.add_argument("ship", nargs="?", help="ship file, e.g. data/ships/frigate-36.yaml")
-    ap.add_argument("--seed", type=int, default=1805)
-    ap.add_argument("--time", type=float, default=1.0, help="compression, game s per real s")
+    ap.add_argument("--seed", type=int, help="the seed (default a scenario's, else 1805)")
+    ap.add_argument(
+        "--time", "--speed", type=float, default=1.0, help="compression, game s per real s"
+    )
+    ap.add_argument("--load", help="save file to replay and continue from (spec M4 §21)")
+    ap.add_argument(
+        "--scenario",
+        help="a scenario file: ship, start, weather script, orders (spec M4 §19)",
+    )
     ap.add_argument("--wind", help="wind as 'FROM_DEG,KNOTS', e.g. 225,15")
     ap.add_argument("--heading", type=float, help="starting heading in degrees")
     ap.add_argument("--host", default="127.0.0.1")
@@ -607,11 +688,22 @@ def main(argv: list[str] | None = None) -> int:
 
     import uvicorn
 
-    world = build_world(args)
+    world, scenario_file = start_world(args)
     if args.watcher:
         station_watcher(world, args.watcher, out=sys.stdout)
+    if scenario_file is not None:
+        from freesail.world.scenarios import begin
+
+        for line in scenario_file.lines():
+            print(line)
+        begin(world, scenario_file)
     if args.standing_orders:
         read_standing_orders(world, args.standing_orders)
+    if args.load:
+        print(
+            f"Loaded {args.load}: replayed to tick {world.clock.tick}, "
+            f"{world.clock.stamp()}; the log's digest is {world.log.digest()[:16]}."
+        )
     driver = Driver(world, compression=args.time, lockstep=args.lockstep)
     app = create_app(
         driver,

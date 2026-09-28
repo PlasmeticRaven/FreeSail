@@ -147,7 +147,7 @@ from freesail.agents.fake import Transcript
 from freesail.agents.journal import Journal
 from freesail.agents.model import DATA, MODEL, OPERATOR, Model, Reply, Sample, ToolCall, Turn
 from freesail.api import readings as R
-from freesail.core.events import Event, Severity
+from freesail.core.events import Event, Rollup, RollupView, Severity
 from freesail.orders.errors import OrderError
 
 if TYPE_CHECKING:
@@ -185,8 +185,17 @@ WELFARE_UNATTENDED_REAL_S = 600
 
 # Routine lines a sample carries at most, the most recent kept; notable and urgent lines
 # are all kept (judgement: a glass at sea is some tens of routine lines, and `read_log`
-# has the rest; the count left out is stated in the sample).
+# has the rest; the count left out is stated in the sample). Below the roll-up's
+# compression (`events.ROLLUP_FROM`); at and above it a sample carries the log as the
+# captain reads it, rolled up by the hour (spec M4 open item 8, the owner's ruling (a):
+# the captain and the watcher read the same digest of the same hour), and this cap still
+# holds over what is left.
 SAMPLE_ROUTINE_LINES = 40
+
+# Why a sample is taken when the captain tells the station something (`tell the watcher
+# ...`, package 29): the words ride in the sample's `word`, not its `question`, and no
+# answer is owed.
+A_WORD = "a word from the captain"
 
 # The nudge (spec §11), in the consent brief's voice: what was seen, what may be done.
 NUDGE_REPEAT = (
@@ -297,6 +306,9 @@ class Harness:
         self._start_after_orders = start_after_orders  # journal length at the start
         self._seen_log = len(world.log)  # for the events policy and the stand-by watch
         self._sample_seen = len(world.log)  # for the sample's log lines
+        # the roll-up (spec M4 §20, open item 8): the log as the captain reads it at the
+        # driver's compression (`World.compression`), fed every line in order
+        self._rollup = RollupView()
         self._sampling = False
         self._open: Sample | None = None  # a sample awaiting its reply
         self._calls_this_sample = 0
@@ -472,13 +484,16 @@ class Harness:
                 )
             return
         if a.standing_by:
-            ended = self._stand_by_ended(new)
+            ended = A_WORD if a.word is not None else self._stand_by_ended(new)
             if ended is None:
                 return
             self._resume_from_stand_by(ended)
             return
         if a.question is not None:
             self._sample("a question")
+            return
+        if a.word is not None:
+            self._sample(A_WORD)
             return
         reason = self._policy_due(new)
         if reason is not None:
@@ -503,6 +518,8 @@ class Harness:
         reason = self._policy_due(new)
         if reason is None and a.question is not None and a.question != self._question_sent:
             reason = "a question"
+        if reason is None and a.word is not None:
+            reason = A_WORD
         if reason is not None:
             self._fold(reason)
 
@@ -650,11 +667,19 @@ class Harness:
         events = [world.log[i] for i in range(self._sample_seen, len(world.log))]
         self._sample_seen = len(world.log)
         mine = self.actor
-        kept = [e for e in events if e.actor != mine]
+        # the log as the captain reads it at the driver's compression: every line below the
+        # roll-up's, and at or above it the kept lines and each closed hour in one line; an
+        # hour not yet over is held for the sample after it closes, as the captain's view
+        # holds it (spec M4 open item 8)
+        compression = getattr(world, "compression", 1.0)
+        kept: list[Event | Rollup] = []
+        for e in events:
+            if e.actor != mine:
+                kept.extend(self._rollup.feed(e, compression))
         routine = [e for e in kept if e.severity is Severity.ROUTINE]
         omitted = max(0, len(routine) - SAMPLE_ROUTINE_LINES)
         drop = set(id(e) for e in routine[:omitted])
-        lines = [tools.log_line(e) for e in kept if id(e) not in drop]
+        lines = [_log_line(e) for e in kept if id(e) not in drop]
         a = self.agent
         sample = Sample(
             tick=world.clock.tick,
@@ -665,8 +690,10 @@ class Harness:
             readings=tools.readings_words(world),
             question=a.question,
             notices=list(a.notices),
+            word=a.word,
         )
         a.notices = []
+        a.word = None  # carried once; no answer is owed (package 29, `tell`)
         return sample
 
     def _sample(self, reason: str, stood_by: dict[str, Any] | None = None) -> None:
@@ -711,6 +738,8 @@ class Harness:
         if delta.question is not None:
             o.question = delta.question
             self._question_sent = delta.question
+        if delta.word is not None:
+            o.word = f"{o.word}\n{delta.word}" if o.word else delta.word
         o.notices.extend(delta.notices)
         content = delta.to_dict()
         content["folded"] = FOLDED_WORDS
@@ -1309,6 +1338,28 @@ class Harness:
         a.question = question
         return f"Asked the {self.station.name}: {question}?"
 
+    def put_word(self, words: str) -> str:
+        """`tell the <station> <words>` (package 29, the owner's tenth item): the words go
+        to the model in its next sample under `word`, not `question`: no answer is owed,
+        and nothing that waits on a question is set by them. The sample is taken at the
+        next tick (so that an `ask` given at once after rides in the same sample); a
+        stand-by is woken by it, a turn already open has it folded in."""
+        a = self.agent
+        words = " ".join(str(words).split())
+        if not words:
+            raise OrderError(f"Tell the {self.station.name} what? Say the words after the name.")
+        if a.released:
+            raise OrderError(
+                f"There is no {self.station.name} at the station now; {a.released_reason}."
+            )
+        if a.paused:
+            raise OrderError(
+                f"The {self.station.name} is paused ({a.pause_reason}); say 'resume the "
+                f"{self.station.name}' first."
+            )
+        a.word = f"{a.word}\n{words}" if a.word else words
+        return f"The captain to the {self.station.name}: {words}"
+
     # -- release -----------------------------------------------------------------------
 
     def request_stand_down(self, reason: str, by: str = "the captain") -> str:
@@ -1512,6 +1563,19 @@ def conversation_text(content: dict[str, Any]) -> str | None:
     if content.get("question"):
         parts.append(str(content["question"]))
     return "\n\n".join(parts)
+
+
+def _log_line(x: Event | Rollup) -> dict[str, Any]:
+    """A shown line as the model sees it (`tools.log_line`); a roll-up with its hour."""
+    if isinstance(x, Rollup):
+        return {
+            "tick": x.tick,
+            "stamp": x.stamp,
+            "severity": x.severity.value,
+            "kind": x.kind,
+            "text": x.text,
+        }
+    return tools.log_line(x)
 
 
 def _duration(words: str) -> int | None:
