@@ -264,7 +264,8 @@ def test_the_head_situation_reads_the_log_and_the_readings_through_the_tools():
 # ---------------------------------------------------------------------------
 
 
-def test_the_tools_are_the_nine_of_the_spec_with_a_description_each():
+def test_the_tools_are_the_nine_of_the_spec_and_shelve_with_a_description_each():
+    """The nine of spec §11, and the tenth, `shelve`, of package 28d (the shelf)."""
     assert tuple(TOOLS) == (
         "read_log",
         "readings",
@@ -275,6 +276,7 @@ def test_the_tools_are_the_nine_of_the_spec_with_a_description_each():
         "journal",
         "opt_out",
         "answer",
+        "shelve",
     )
     for t in TOOLS.values():
         assert t.description.endswith(".") and len(t.description) > 40
@@ -334,11 +336,19 @@ def test_library_serves_the_primer_the_catalogue_the_grammar_the_ship_and_the_bo
     for topic in ("primer", "catalogue", "grammar", "the ship", "standing orders", "tools"):
         assert topic in contents
     assert "primer 2: the wind and the points of sail" in contents
-    assert lib("primer 2").startswith("# ") and "apparent" in lib("primer 2").lower()
+    # a chapter is its sections with their sizes; the whole is there on request
+    assert lib("primer 2").startswith("primer 2: The wind and the points of sail.")
+    assert "The apparent wind, about" in lib("primer 2")
+    whole = tools.call(world, "watcher", "library", {"topic": "primer 2", "section": "all"})
+    assert "# 2. The wind and the points of sail" in whole and "apparent" in whole.lower()
     assert lib("primer the wind and the points of sail") == lib("primer 2")
     assert "  tack: 'tack'" in lib("catalogue")
-    assert "set" in lib("grammar") and "standing dialect" in lib("grammar")
-    assert "fore topsail" in lib("the ship") and world.ship.name in lib("the ship")
+    assert "the standing dialect" in lib("grammar")
+    grammar = tools.call(world, "watcher", "library", {"topic": "grammar", "section": "all"})
+    assert "set" in grammar and "standing dialect" in grammar
+    assert "fore mast" in lib("the ship") and world.ship.name in lib("the ship")
+    fore = tools.call(world, "watcher", "library", {"topic": "the ship", "section": "fore"})
+    assert "fore topsail" in fore
     assert "night routine" in lib("standing orders")
     assert "submit_order:" in lib("tools")
     assert "no topic 'the moon'" in lib("the moon")
@@ -355,7 +365,7 @@ def test_the_grammar_page_holds_the_standing_dialect_in_full():
     from freesail.standing.book import read_orders_file
 
     world = frigate_world()
-    page = tools.call(world, "watcher", "library", {"topic": "grammar"})
+    page = tools.call(world, "watcher", "library", {"topic": "grammar", "section": "all"})
     dialect = page[page.index("The standing dialect:") :]
     assert 'standing order "<name>" [by the <officer>]: <trigger> [, if <condition>] then' in page
     for words in (
@@ -1536,6 +1546,32 @@ def test_the_repl_turn_mode_drives_a_game_one_process_at_a_time(tmp_path):
     assert "[watcher] The wind is fair." in lines(copy, "agent.note")
 
 
+def test_at_the_repl_a_book_is_read_by_its_handle_and_shelving_says_the_reader_keeps_it(tmp_path):
+    """Package 28d at the REPL door: the page comes with its handle; the door prints each
+    turn once, so `shelve` says plainly that what was printed stays with the reader; the
+    door is named in the save, so a replay says the same."""
+    save = tmp_path / "state.json"
+    sample = tmp_path / "next.txt"
+    replyf = tmp_path / "reply.txt"
+    common = ["--seed", "7", "--station", "watcher", "--every", "60", "--turn", "--human"]
+    common += ["--save", str(save), "--sample", str(sample)]
+    assert repl_mod.main(common) == 0
+    assert "shelve notes a book as put back" in sample.read_text(encoding="utf-8")
+    replyf.write_text('> library topic="primer 3" section=reefing\n', encoding="utf-8")
+    assert repl_mod.main(common + ["--load", str(save), "--reply", str(replyf)]) == 0
+    page = sample.read_text(encoding="utf-8")
+    assert "library: primer 3, reefing, opened 04:00; book 1\n## Reefing" in page
+    replyf.write_text("> shelve\n", encoding="utf-8")
+    assert repl_mod.main(common + ["--load", str(save), "--reply", str(replyf)]) == 0
+    shelved = sample.read_text(encoding="utf-8")
+    assert "shelve: Shelved: book 1 (primer 3, reefing). The game will not show" in shelved
+    assert "This door's client keeps its own copy of the conversation" in shelved
+    data = replay.load_file(save)
+    assert data["agents"][0]["door"] == "repl"
+    copy = replay.replay(data)
+    assert [b.state for b in copy.agents["watcher"].books] == ["shelved"]
+
+
 # ---------------------------------------------------------------------------
 # Small pieces
 # ---------------------------------------------------------------------------
@@ -1554,3 +1590,321 @@ def test_sampling_policy_words_refuse_an_unknown_interval():
     with pytest.raises(ValueError, match="not an interval"):
         SamplingPolicy.periodic("a fortnight")
     assert SamplingPolicy.periodic("an hour").every_s == 3600
+
+
+# ---------------------------------------------------------------------------
+# The shelf (package 28d): sizes and sections, books with handles, shelving, the
+# shelf-life, and replay
+# ---------------------------------------------------------------------------
+
+
+def lib(world: World, **args: Any) -> str:
+    return tools.call(world, "watcher", "library", args)
+
+
+def results_in(turns) -> list[Any]:
+    """Every tool result in a conversation, in order."""
+    return [
+        r["result"]
+        for t in turns
+        if t.role == DATA and "tool_results" in t.content
+        for r in t.content["tool_results"]
+    ]
+
+
+def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served():
+    """Every size is the text served at `CHARS_PER_TOKEN` characters a token, the one rule:
+    a chapter's is what section='all' serves after its line, a topic's what it serves
+    whole; the lead's measure of chapter 3 (about 7,650 tokens) is the rule's."""
+    world = frigate_world()
+    contents = lib(world)
+    assert tools.CHARS_PER_TOKEN == 4 and tools.tokens("abcde") == 2
+    assert "measured at about 4 characters a token" in contents
+    for n, name in tools._primer_chapters():
+        whole = lib(world, topic=f"primer {n}", section="all")
+        body = whole.split("\n\n", 1)[1]
+        size = tools.size_words(tools.tokens(body))
+        assert f"    primer {n}: {name}, {size} in " in contents
+        assert whole.startswith(f"primer {n}: ") and f"the whole chapter: {size}." in whole
+    three = (ROOT / "docs/primer/03-making-and-shortening-sail.md").read_text(encoding="utf-8")
+    assert tools.size_words(tools.tokens(three)) == "about 7,650 tokens"
+    grammar = lib(world, topic="grammar", section="all").split("\n\n", 1)[1]
+    assert f"{tools.size_words(tools.tokens(grammar))} whole, in 3 parts" in contents
+    ship = lib(world, topic="the ship", section="all").split("\n\n", 1)[1]
+    assert f"{tools.size_words(tools.tokens(ship))} whole, in 5 parts" in contents
+    tool_page = lib(world, topic="tools")
+    assert f"what each takes, {tools.size_words(tools.tokens(tool_page))}" in contents
+    assert "42 evolutions; the list about" in contents
+
+
+def test_a_chapter_lists_its_sections_with_sizes_and_serves_one_by_a_word_or_its_number():
+    world = point_world()
+    listing = lib(world, topic="primer 3")
+    reefing = lib(world, topic="primer 3", section="reefing")
+    assert reefing.startswith("## Reefing\n") and "\n## Studding sails" not in reefing
+    assert f"  4. Reefing, {tools.size_words(tools.tokens(reefing))}" in listing
+    assert "    5.1 How close they may be carried, about" in listing  # a subsection, indented
+    assert "## " not in listing and "Falconer" not in listing  # headings, not the text
+    assert tools.tokens(listing) < 300 < tools.tokens(reefing)
+    # by a distinctive word, case-insensitively; by its number; a hyphen as a space
+    assert lib(world, topic="primer 3", section="REEFING") == reefing
+    assert lib(world, topic="primer 3", section="4") == reefing
+    assert lib(world, topic="primer 3", section="goose-wing").startswith("## Goose-winging")
+    # a section with its subsections, or one of them alone
+    studding = lib(world, topic="primer 3", section="studding")
+    assert studding.startswith("## Studding sails") and "### How close" in studding
+    assert lib(world, topic="primer 3", section="5.1").startswith("### How close")
+    # a word that names two says so, with the sizes; one that names none lists them all
+    two = lib(world, topic="primer 4", section="sheets")
+    assert two.startswith("'sheets' names 2 sections of primer 4: 2. Tending the sheets (about")
+    none = lib(world, topic="primer 3", section="anchors")
+    assert none.startswith("primer 3 has no section 'anchors'. Its sections: 1. Plain sail;")
+    # a heading in a code fence is no heading (the primer's '# rejected:' examples)
+    assert "rejected" not in listing
+    # the whole chapter, with its size first
+    whole = lib(world, topic="primer 3", section="all")
+    assert whole.startswith("primer 3: Making and shortening sail, the whole chapter: about ")
+    assert whole.endswith(
+        (ROOT / "docs/primer/03-making-and-shortening-sail.md").read_text(encoding="utf-8")
+    )
+    # the primer itself: its introduction in sections, and the chapters with their sizes
+    primer = lib(world, topic="primer")
+    assert "  primer 3: making and shortening sail, about 7,650 tokens" in primer
+    assert lib(world, topic="primer", section="where to start").startswith("## Where to start")
+
+
+def test_find_returns_the_matching_paragraphs_each_with_its_chapter_and_section():
+    world = frigate_world()
+    found = lib(world, topic="primer", find="goose-wing")
+    assert found.startswith("'goose-wing' in the primer: ")
+    assert "[primer 3, goose-winging]\nA course or a topsail with its lee clew" in found
+    assert "goose-wing the foresail" in found  # the examples' fence is one paragraph
+    # in one chapter only
+    in_five = lib(world, topic="primer 5", find="missing stays")
+    assert "[primer 5, " in in_five and "[primer 3, " not in in_five
+    # the catalogue by evolution, the grammar by its parts
+    cat = lib(world, topic="catalogue", find="earings")
+    assert "[the catalogue, reef_square]" in cat
+    gram = lib(world, topic="grammar", find="strike standing order")
+    assert "[the grammar, the book's orders]\n  strike standing order" in gram
+    # the whole library, with no topic; more than the limit are named by place
+    everywhere = lib(world, find="bowline")
+    assert f"; the first {tools.FIND_LIMIT} here." in everywhere
+    assert everywhere.count("\n[") == tools.FIND_LIMIT
+    assert "more, not shown: " in everywhere and "the catalogue, haul_bowline (" in everywhere
+    assert lib(world, find="mizzen staysail sheet anchor").startswith("Nothing in the library")
+
+
+def test_the_catalogue_is_served_by_evolution_and_the_ship_by_mast():
+    world = frigate_world()
+    cat = lib(world, topic="catalogue")
+    tack = lib(world, topic="catalogue", section="tack")
+    size = tools.size_words(tools.tokens(tack))
+    assert f"  tack: 'tack', class ship, scripted; the ship's own time, {size}" in cat
+    assert tack.startswith("tack: 'tack', class ship, scripted")
+    assert "Source: Luce 1866, ch. XXIV Working to Windward" in tack
+    assert "Missed stays" in tack and "Source" not in cat  # the sources are in the sections
+    assert lib(world, topic="catalogue", section="wear").startswith(
+        "wear: "
+    )  # not wear_short_round
+    ship = lib(world, topic="the ship")
+    for mast in ("fore mast", "main mast", "mizzen mast", "bowsprit", "groups and aliases"):
+        assert f". {mast}, about" in ship
+    fore = lib(world, topic="the ship", section="fore")
+    assert fore.startswith("The fore mast: ")
+    assert "fore topsail yard" in fore and "fore topsail" in fore and "fore topsail sheet" in fore
+    assert "main topsail" not in fore
+    assert "Groups:" in lib(world, topic="the ship", section="groups")
+    point = lib(point_world(), topic="the ship")
+    assert "a point ship with no parts" in point
+
+
+def test_every_read_has_a_handle_counting_up_per_agent_and_a_long_log_read_is_a_book():
+    world = point_world()
+    world.run(3 * 3600)
+    for k in range(30):  # a log long enough to be a book
+        world.record(Severity.NOTABLE, "test.line", f"A sail sighted, the {k}th of the morning.")
+    h, fake, _ = stationed(
+        world,
+        [
+            reply(
+                "",
+                call("library", topic="primer 3", section="reefing"),
+                call("read_log", since_tick=0),
+                call("read_log", since_tick=world.clock.tick, severity="urgent"),
+                call("library"),
+            ),
+            "Read.",
+        ],
+    )
+    got = results_in(h.turns)
+    assert got[0].startswith("primer 3, reefing, opened 07:00; book 1\n## Reefing")
+    assert list(got[1])[0] == "book" and got[1]["book"] == (
+        "the log from tick 0, opened 07:00; book 2"
+    )
+    assert tools.tokens(json.dumps({k: v for k, v in got[1].items() if k != "book"})) > (
+        harness_mod.BOOK_SIZE_TOKENS
+    )
+    assert "book" not in got[2]  # a short read of the log is no book
+    assert got[3].startswith("the contents, opened 07:00; book 3\nThe library holds")
+    assert [(b.number, b.title, b.state) for b in h.books] == [
+        (1, "primer 3, reefing", "open"),
+        (2, "the log from tick 0", "open"),
+        (3, "the contents", "open"),
+    ]
+    # a refusal in words is not a book
+    assert tools.book_of("library", {}, "library does not take colour; ...") is None
+
+
+def test_shelve_leaves_only_the_line_from_the_next_request_on_and_any_book_reopens():
+    world = point_world()
+    h, fake, _ = stationed(
+        world,
+        [
+            reply("", call("library", topic="primer 3", section="reefing")),
+            reply("", call("library", topic="primer 3", section="goose")),
+            reply("", call("library", topic="grammar")),
+            reply("", call("shelve", book="book 1")),
+            "Shelved one.",  # the fifth call: the page is gone from what it is sent
+            reply("", call("shelve", book="primer 3")),  # the second turn: by topic
+            "Aye.",
+            reply("", call("shelve")),  # every open book
+            "Aye.",
+            reply("", call("shelve", book="book 9"), call("shelve", book="book 1")),
+            "Aye.",
+            reply("", call("library", topic="primer 3", section="reefing")),
+            "Read again.",
+        ],
+    )
+    reefing = lib(world, topic="primer 3", section="reefing")
+    before = results_in(fake.seen[3])
+    assert before[0] == f"primer 3, reefing, opened 04:00; book 1\n{reefing}"
+    after = results_in(fake.seen[4])
+    stub = (
+        "You read primer 3, reefing, at 04:00; shelved (book 1). "
+        "library(topic='primer 3', section='reefing') opens it again."
+    )
+    assert after[0] == stub and "## Reefing" not in json.dumps([t.to_dict() for t in fake.seen[4]])
+    assert after[3].startswith("Shelved: book 1 (primer 3, reefing). From your next request on, ")
+    assert "your journal is the place for what you took from them" in after[3]
+    # the turn object the model was sent before is left as it was
+    assert results_in(fake.seen[3])[0].startswith("primer 3, reefing, opened")
+    world.run(EVERY)
+    by_topic = results_in(h.turns)[-1]
+    assert by_topic.startswith("Shelved: book 2 (primer 3, goose-winging).")
+    assert results_in(h.turns)[1].startswith("You read primer 3, goose-winging, at 04:00; shelved")
+    world.run(EVERY)
+    assert results_in(h.turns)[-1].startswith("Shelved: book 3 (the grammar).")
+    world.run(EVERY)
+    nine, one = results_in(h.turns)[-2:]
+    assert nine == "There is no book 9; no book is open."
+    assert one == "Book 1 (primer 3, reefing) is on the shelf already."
+    world.run(EVERY)
+    again = results_in(h.turns)[-1]
+    assert again == f"primer 3, reefing, opened 04:40; book 4\n{reefing}"  # the promise kept
+    assert [b.state for b in h.books] == ["shelved", "shelved", "shelved", "open"]
+    assert h.revision == 3
+    assert tools.call(world, "watcher", "shelve", {"book": "the moon"}) == (
+        "No open book is called 'the moon'; the open books: book 4 (primer 3, reefing)."
+    )
+
+
+def test_a_book_shelved_in_the_reply_that_read_it_never_reaches_the_next_request():
+    world = point_world()
+    h, fake, _ = stationed(
+        world,
+        [reply("", call("library", topic="primer 3", section="reefing"), call("shelve")), "Ok."],
+    )
+    got = results_in(fake.seen[1])
+    assert got[0].startswith("You read primer 3, reefing, at 04:00; shelved (book 1).")
+    assert got[1].startswith("Shelved: book 1 (primer 3, reefing).")
+
+
+def test_a_book_left_open_goes_back_after_the_shelf_life_and_the_next_sample_says_so():
+    world = point_world()
+    h, fake, _ = stationed(
+        world,
+        [reply("", call("library", topic="primer 3", section="reefing")), "One."],
+        when_done=Reply("Nothing new."),
+    )
+    assert harness_mod.SHELF_LIFE_TURNS == 3
+    # read in the first turn; open through three more of the model's turns, and put back
+    # as the third of them ends
+    for turn in range(1, 3):
+        world.run(EVERY)
+        assert h.books[0].state == "open", turn
+    assert results_in(fake.seen[-1])[0].startswith("primer 3, reefing, opened 04:00; book 1")
+    world.run(EVERY)
+    assert h.turns_ended == 4 and h.books[0].state == "went back"
+    assert results_in(fake.seen[-1])[0].startswith("primer 3, reefing, opened 04:00; book 1")
+    world.run(EVERY)  # the next sample carries the stub and the notice
+    last_sample = [t.content for t in fake.seen[-1] if t.role == DATA][-1]
+    assert h.books[0].state == "went back"
+    assert results_in(fake.seen[-1])[0] == (
+        "You read primer 3, reefing, at 04:00; it went back on the shelf after three of your "
+        "turns (book 1). library(topic='primer 3', section='reefing') opens it again."
+    )
+    assert last_sample["notices"] == [
+        "Book 1 (primer 3, reefing) went back on the shelf after three of your turns: your "
+        "conversation holds its line and not its pages. library(topic='primer 3', "
+        "section='reefing') opens it again, under a new number."
+    ]
+
+
+def test_the_brief_and_the_tools_say_what_shelving_does_the_number_and_the_journal():
+    world = point_world()
+    h, _, _ = stationed(world, ["Aye."])
+    doc = h.brief.head[2].text
+    for words in (
+        "what each topic costs in tokens",
+        "'primer 3, reefing, opened 04:10; book 7'",
+        "shelve(book='book 7') puts that book back",
+        "goes back by itself after three more of your turns",
+        "The library is always there: any book opens again at any time",
+        "Your journal is where to keep what you took from a page.",
+    ):
+        assert words in doc, words
+    assert "shelve" in doc.split("The tools you have are: ", 1)[1]
+    shelve_words = TOOLS["shelve"].description
+    assert "after three more of your turns" in shelve_words and "journal" in shelve_words
+    assert "always there to read" in TOOLS["library"].description
+    # nothing tells a model the reference goes away
+    for t in TOOLS.values():
+        for words in ("gone for good", "cannot be read again", "no longer available"):
+            assert words not in t.description
+
+
+def test_a_game_with_books_and_shelves_replays_to_the_same_turns_and_books():
+    """Replay is untouched: a shelve is a reply in the transcript and the shelf-life counts
+    the model's turns, so a replay numbers, shelves and puts back at the same points; a
+    read and a shelve out of turn are recorded as acts and made again."""
+    world = point_world()
+    h, fake, _ = stationed(
+        world,
+        [
+            reply("", call("library", topic="primer 3", section="reefing")),
+            reply("", call("library", topic="grammar", section="triggers")),
+            reply("", call("shelve", book="book 1")),
+            "Done.",
+            call("stand_by", until="a glass"),
+        ],
+        when_done=Reply("Quiet."),
+    )
+    world.run(EVERY)  # the stand-by
+    assert h.agent.standing_by
+    aside = h.aside(ToolCall("library", {"topic": "catalogue", "section": "tack"}))
+    assert aside.startswith("the catalogue, tack, opened 04:10; book 3\ntack: 'tack'")
+    assert h.aside(ToolCall("shelve", {"book": "book 3"})).startswith(
+        "Book 3 (the catalogue, tack) was read while the game had the floor"
+    )
+    world.run(5 * EVERY)
+    assert [b.state for b in h.books] == ["shelved", "went back", "aside"]
+    data = json.loads(json.dumps(world.save()))
+    copy = replay.replay(data)
+    twin = copy.agents["watcher"]
+    assert copy.log.digest() == world.log.digest()
+    assert [(b.number, b.title, b.state) for b in twin.books] == [
+        (b.number, b.title, b.state) for b in h.books
+    ]
+    assert [t.to_dict() for t in twin.turns] == [t.to_dict() for t in h.turns]
+    assert twin.revision == h.revision and twin.transcript == h.transcript

@@ -193,7 +193,8 @@ def test_each_tool_runs_in_the_game_through_the_bridge_with_the_authority_check(
     assert "agent.stationed" in [ln["kind"] for ln in json.loads(got["read_log"])["lines"]]
     assert "true_wind_speed" in json.loads(got["readings"])
     assert "The watcher: stationed." in got["state"]
-    assert got["library"].startswith("The library holds:")
+    # every read is a book with a handle (package 28d)
+    assert got["library"].startswith("the contents, opened 04:00; book 1\nThe library holds")
     assert got["submit_order"] == "The watcher has no authority to give orders."
     assert g.lines("agent.refused") == [
         "The watcher has no authority to give orders. 'steer north' not carried out."
@@ -207,6 +208,55 @@ def test_each_tool_runs_in_the_game_through_the_bridge_with_the_authority_check(
     assert h.journal.entries[0].text == "A fair wind and nothing to report."
     assert h.journal.entries[-1].kind == "agent.opted_out"
     assert h.model_name == WEIGHTS and h.door == "mcp"
+
+
+def test_shelve_over_mcp_says_the_client_keeps_its_own_conversation(tmp_path):
+    """Package 28d: over MCP the model's conversation is the client's, so `shelve` notes
+    the book and says plainly that the game cannot take its pages out of the chat; what
+    the bridge shows again (the brief, re-rendered from the turns it keeps) shows the
+    book as its line, read again from the game when the stream's revision moves; a read
+    and a shelve out of turn (standing by) are answered too, the read a book with a
+    handle and the game keeping no copy of it; the reference reopens on request."""
+    g = Game(tmp_path)
+    yes_on_record(tmp_path / "consent")
+    b = g.bridge(wait=0.2)  # the stand-by comes back "Still waiting" at once
+
+    async def script(c):
+        got = {}
+        got["first"] = text(await c.call_tool("readings", {}))
+        got["page"] = text(await c.call_tool("library", {"topic": "primer 3", "section": "4"}))
+        got["shelve"] = text(await c.call_tool("shelve", {"book": "book 1"}))
+        got["brief"] = (await c.read_resource("freesail://brief")).contents[0].text
+        got["again"] = text(await c.call_tool("library", {"topic": "primer 3", "section": "4"}))
+        got["stood"] = text(await c.call_tool("stand_by", {"until": "a glass"}))
+        return got
+
+    async def aside(c):
+        got = {}
+        got["read"] = text(await c.call_tool("library", {"topic": "catalogue", "section": "tack"}))
+        got["shelve"] = text(await c.call_tool("shelve", {"book": "book 3"}))
+        return got
+
+    got = session(b, script)
+    h = g.harness
+    assert got["page"].startswith("primer 3, reefing, opened 04:00; book 1\n## Reefing")
+    assert got["shelve"].startswith("Shelved: book 1 (primer 3, reefing). The game will not show")
+    assert "This door's client keeps its own copy of the conversation" in got["shelve"]
+    assert "your journal is the place for what you took from them" in got["shelve"]
+    # what the bridge shows again is the game's copy, the book as its line
+    assert "You read primer 3, reefing, at 04:00; shelved (book 1)." in got["brief"]
+    assert "## Reefing" not in got["brief"]
+    assert got["again"].startswith("primer 3, reefing, opened 04:00; book 2\n## Reefing")
+    assert [bk.state for bk in h.books] == ["shelved", "open"]
+    assert h.agent.standing_by
+    # out of turn, while it stands by: a read is a book with a handle; a shelve of it says
+    # the game keeps no copy
+    got = session(b, aside)
+    assert got["read"].startswith("the catalogue, tack, opened 04:00; book 3\ntack: 'tack'")
+    assert got["shelve"].startswith("Book 3 (the catalogue, tack) was read while the game had")
+    assert "Your client keeps its own copy of the conversation." in got["shelve"]
+    acts = [e.get("door") for e in h.transcript if "door" in e]
+    assert acts == ["read", "shelve"]
 
 
 def test_the_library_is_served_as_resources_and_the_brief_as_a_resource_and_a_prompt(tmp_path):
@@ -229,7 +279,9 @@ def test_the_library_is_served_as_resources_and_the_brief_as_a_resource_and_a_pr
     for slug in M.RESOURCE_TOPICS:
         assert f"freesail://library/{slug}" in listed
     assert contents == tools.library(g.world, "watcher", "contents")
-    assert chapter == tools.library(g.world, "watcher", "primer 1")
+    # a resource is the topic whole, attached by the client's user, and not a book
+    assert chapter == tools.library(g.world, "watcher", "primer 1", section="all")
+    assert "# 1. The ship" in chapter
     assert "This is a message from the harness of FreeSail" in brief
     assert sorted(prompts) == ["brief", "keep_watch"]  # the captain prompt is gone
     assert prompt.messages[0].content.text == brief

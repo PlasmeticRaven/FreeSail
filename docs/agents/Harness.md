@@ -20,7 +20,7 @@ The first two are clients of the running game: they own no game of their own, an
 py -m pip install -e ".[dev,server,agents]"
 ```
 
-It ends with `Successfully installed ...`. The `server` part is the browser game; the `agents` part brings the Python MCP SDK (the bridge Claude talks to) and `httpx` (what the doors speak to the game and to a model server with). Check it with `py -m pytest tests/test_agent_api.py tests/test_mcp_server.py tests/test_local_runner.py`, which proves every door against a scripted model, a fake model server and the game's own app, with no model and no network.
+It ends with `Successfully installed ...`. The `server` part is the browser game; the `agents` part brings the Python MCP SDK (the bridge Claude talks to), `httpx` (what the doors speak to the game and to a model server with) and `gguf` (llama.cpp's reader of a model file's header, for the context budget in section 5). Check it with `py -m pytest tests/test_agent_api.py tests/test_mcp_server.py tests/test_local_runner.py`, which proves every door against a scripted model, a fake model server and the game's own app, with no model and no network.
 
 ## 2. Start your game
 
@@ -123,7 +123,7 @@ llama-server.exe -m C:/models/YOUR-MODEL.gguf --ctx-size 16384 --n-gpu-layers 99
 ```
 
 - `-m` the GGUF file. Its name is what the consent record is kept under (the name only, never its folder), so the same weights under another file name are asked again, and a different quantisation is a different model.
-- `--ctx-size 16384` the context. The watcher's brief is about 1,150 tokens, the tool definitions about 900, the consent brief about 1,500, and each glass's turn about 450 (measured on the frigate at seed 7; four characters to a token), so 16,384 holds the brief and some twenty glasses before the runner starts leaving out the oldest turns; 8,192 holds about eight. A turn that grew while the model was thinking (things added to it) is longer. If the model does not fit in the card's 24 GB with it, lower this first.
+- `--ctx-size 16384` the context. The watcher's brief is about 1,630 tokens, the tool definitions about 1,270, the consent brief about 1,480, and each glass's turn about 450 (measured on the frigate at seed 7 for package 28d, the shelf; four characters to a token), and the runner keeps the reply budget of 4,096 free (below), so 16,384 holds the brief and some twenty glasses before the runner starts leaving out the oldest turns; 8,192 holds two or three. A library read now costs what it serves (a section of the primer is a few hundred tokens, a whole chapter up to about 7,650), and a book the model shelves costs its one line from then on. A turn that grew while the model was thinking (things added to it) is longer. If the model does not fit in the card's 24 GB with it, lower this first.
 - `--n-gpu-layers 99` puts every layer on the card (any number above the model's layer count means all of them). If the card runs out of memory, lower it: the rest run on the processor, more slowly.
 - `--parallel 1` one conversation at a time, so the whole context is the watcher's (the server divides the context among its slots).
 - `--jinja` uses the model's own chat template, which is what makes tool calling work. Without it the model cannot call `readings`, `answer` or any tool.
@@ -147,6 +147,26 @@ Other flags: `--session test` (the brief says it is a test session rather than p
 **The reply budget and the timeout.** Every request to the model server carries a reply budget, `max_tokens`, 4,096 tokens unless `--max-reply` says otherwise (the owner's ruling, 2026-09-28: generous, so that a long answer, a journal note or a thinking model's reasoning is never cut; a runaway is still stopped within about a minute and a half on a 4090). A request that has not answered in three minutes is given up: the runner prints `The model server did not answer within 180 s; the sample is left open. (1 of 3; asking again)`, reads the game again (anything that happened meanwhile, your question included, is added to the model's open turn) and asks again. Three failures in a row stand the watcher down with the reason, and the game saves.
 
 **The context check.** Before it asks the game for the station, the runner asks the model server what context it gives the model (`/props` for llama-server; `/api/ps`, or the model's `num_ctx` from `/api/show`, for Ollama) and measures what the watcher needs (the brief and the tool definitions, counted at four characters a token, a turn, and the reply budget). If the context is smaller it stops before anything is asked, saying both numbers and how to raise it; otherwise it prints `The context is enough: ...`. If the server does not say (an Ollama model not yet loaded), it says so, and `--ctx` is your word for it.
+
+**The context budget, measured.** How large a `--ctx-size` your card holds depends on the model: its weights, and its cache of keys and values, which grows with every token of the context. `tools/context_budget.py` reads the model file's header and works it out:
+
+```
+py tools/context_budget.py C:/models/YOUR-MODEL.gguf --vram 24 --headroom 1.5
+```
+
+It prints the model's layers, key-value heads and head width, the weights' size (the file on disk), the cache a token at f16 (llama-server's default) and at q8_0 (`--cache-type-k q8_0 --cache-type-v q8_0`, about half, which llama.cpp gives the value cache only with flash attention, `-fa`), and the largest `--ctx-size` that fits: the card's memory (`--vram`, in GiB; a 4090 is 24) less the weights and less a headroom you set (`--headroom`, 1.5 GiB by default, for the CUDA context, llama.cpp's working buffers and the desktop). The formula is in the script's opening words with its sources: two tensors a layer, times the key-value heads, times the head width, times two bytes at f16. A model with a sliding window (some of its layers attend only to the last few thousand tokens) keeps those layers' cache small unless llama-server is started with `--swa-full`; the script prints the figure with every layer at the whole context (an upper bound) and, where the header says which layers slide, the figure with those at their window, which is the one to go by. Where the header gives the window but not the layers, it says so, and `--swa-every N` (every N-th layer attends to the whole context, from the model's card) gives it. If the weights and the headroom alone do not fit, it says so with the numbers.
+
+The table, one row for each model with a consent record, filled from the script (and the last column from use):
+
+| Model (the consent record's name) | Layers, KV heads, head width | Weights | Cache a token, f16 / q8_0 | Largest `--ctx-size`, f16 / q8_0 | Observed in use |
+|---|---|---|---|---|---|
+| | | | | | |
+| | | | | | |
+| | | | | | |
+
+**The check.** The owner's observed range for the 26B and 27B models on the 4090 is **80k to 110k tokens** of context in practice (2026-09-28, anecdotal, from Hermes Agent sessions). The script's figures are to be checked against it: a figure far below the range probably means the sessions ran with a q8_0 cache or a sliding window the script was not told of, and one far above it that the headroom is too small; say which in the last column.
+
+**The shelf: what the model keeps in its context.** The library is served in pieces with their sizes, so a local model reads what it needs and not a chapter at a time: `library()` lists the topics and what each costs, `library(topic='primer 3')` a chapter's sections with theirs, `section='reefing'` one section, `find='goose-wing'` the paragraphs that match. Every read is a *book* with a number (`primer 3, reefing, opened 04:10; book 7`), and the model puts it back with `shelve`: from its next request the runner sends that result as its one line (`You read primer 3, reefing, at 04:10; shelved (book 7). library(...) opens it again.`), so the pages are really gone from the model's context. A book left open goes back by itself after three more of the model's turns, and the next turn says so. Nothing leaves the library: any book opens again on request, and the brief tells the model its journal is where to keep what it took from a page.
 
 If the model server is not running, the runner says `Could not reach the model server at http://127.0.0.1:8080: the connection was refused ...` and stops. If the game is not running, it says `Could not reach the game at http://localhost:8000 ...` and stops. If the model server fails in the middle of a watch, the runner prints why and releases the station, and the game saves.
 
@@ -206,6 +226,7 @@ Either game takes `--lockstep`: then the clock **holds while the model has its t
 ## 12. What the harness does not do
 
 - **Over MCP the chat is invisible to the game.** The token counts only in tool calls; the consent record holds what the game saw; the bridge cannot tell which model the chat uses (you name it).
+- **Over MCP (and at the REPL) shelving cannot take pages back.** The conversation is the client's (or what the terminal printed), so `shelve` notes the book, the game never shows its pages again, and the result says plainly that the client keeps its own copy. Claude's own window keeps itself; the journal carries the habit.
 - **Reasoning is not scanned.** A model server that returns a thinking model's reasoning apart from its reply (llama-server's default) keeps it out of the token scan: thinking about the token does not use it, writing it does. The consent brief says so, and the consent record keeps the reasoning verbatim in a section of its own. If the server is set to put the reasoning inside the reply instead, it is scanned with the reply.
 - **The game does not wait** for a model unless you start it with `--lockstep`. A slow model's turn grows while it thinks; nothing is lost, and the watcher is judged by ship's time, not by how long it takes to type.
 - **Every stop replays.** The model's replies are kept with the moment each came (the tick and how many of your orders came before it), and so are the stops that come from outside (a door closing, the token sent out of turn, the ten real minutes): a replay of the save makes them at the same moments and gives the same log.

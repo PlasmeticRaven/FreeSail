@@ -22,6 +22,14 @@ player reads. This module has the two halves of that:
   read up to, and every answer says the index to ask from next. The cursor makes a poll
   idempotent (a lost answer is asked for again); the consent conversation's turns come
   first in the same stream, then the station's, so the cursor runs on across the step.
+  **A turn may change after it was served** (package 28d, the shelf): a book the model
+  shelves, or one the shelf-life puts back, is served from then on as its stub, in its
+  own place in the stream. Every answer carries the stream's `revision` (the harness's
+  count of such changes); a door that rebuilds its messages from the stream (the local
+  runner; the MCP bridge for what it shows again) reads its turns again from where it
+  began when the revision has moved (`GameClient.reread`), and otherwise reads on from
+  its cursor as before, so the cursor stays idempotent for unchanged turns and no turn
+  moves.
   **The long poll** waits for turns past the cursor, or for the station to be released,
   on the seat's condition, re-checking at `POLL_RECHECK_S`, for at most
   `TURNS_WAIT_MAX_S`; it never holds the World's lock while it waits, so the game runs
@@ -30,7 +38,9 @@ player reads. This module has the two halves of that:
   **A reply out of turn** (the floor is the game's: the model stands by, is paused, or
   its turn has not come): the token is looked for in it as in every reply and leaves at
   once; the read-only tools run and are answered (they change nothing, so nothing is
-  recorded); `opt_out` leaves; words with no call are the model's own word
+  recorded, save that a read which is a book gets its handle and is recorded as an act,
+  so a replay numbers the books the same; `shelve` runs out of turn too, recorded the
+  same way); `opt_out` leaves; words with no call are the model's own word
   (`Harness.own_word`, package 28c): logged under the mark, ending a stand-by as its
   own decision, and its turn opens now (refused while paused); anything else is refused
   in words. A leave, the own word and a door's release out of turn are recorded as
@@ -75,6 +85,7 @@ if TYPE_CHECKING:
 __all__ = [
     "DOORS",
     "POLL_RECHECK_S",
+    "ASIDE_TOOLS",
     "READ_ONLY_TOOLS",
     "TURNS_WAIT_MAX_S",
     "Desk",
@@ -99,8 +110,11 @@ TURNS_WAIT_MAX_S = 120.0
 # look is a few list lengths).
 POLL_RECHECK_S = 0.25
 
-# The tools that run out of turn: they read and change nothing (`tools.py`).
+# The tools that run out of turn: they read and change nothing in the game (`tools.py`).
 READ_ONLY_TOOLS: tuple[str, ...] = ("read_log", "readings", "state", "library")
+
+# ...and with them, out of turn, `shelve`, which changes only what the model is shown.
+ASIDE_TOOLS: tuple[str, ...] = (*READ_ONLY_TOOLS, "shelve")
 
 # The doors the API serves, in the words a consent record's runtime and a stand-down use.
 DOORS: dict[str, tuple[str, str]] = {
@@ -548,15 +562,9 @@ class Desk:
             if was is not None:
                 words += f", and your stand-by (until {was}) ended at your own word"
             return {"out_of_turn": True, "spoke": True, "words": f"{words}; your turn is open."}
-        if reply.calls and all(c.name in READ_ONLY_TOOLS for c in reply.calls):
-            world = seat.world
+        if reply.calls and all(c.name in ASIDE_TOOLS for c in reply.calls):
             results = [
-                {
-                    "name": c.name,
-                    "args": dict(c.args),
-                    "result": tools.call(world, seat.station, c.name, c.args),
-                }
-                for c in reply.calls
+                {"name": c.name, "args": dict(c.args), "result": h.aside(c)} for c in reply.calls
             ]
             return {"out_of_turn": True, "results": results, "words": self.no_floor_words(seat)}
         lost = " Your words were not logged." if reply.text.strip() else ""
@@ -572,7 +580,7 @@ class Desk:
             return (
                 f"Your turns are paused: {a.pause_reason}. The captain has been asked whether "
                 "to continue; you were not stopped. You may still read (read_log, readings, "
-                "state, library), or leave with the token."
+                "state, library) and shelve a book, or leave with the token."
             )
         if a.standing_by and a.stand_by is not None:
             return (
@@ -648,11 +656,13 @@ class Desk:
             self.changed()
             return self._answer(seat, len(seat.stream()))
 
-    def library(self, name: str, topic: str) -> str:
-        """`GET /api/agents/<station>/library?topic=...`: a page of the reference library,
-        as the library tool gives it, read without a turn (it changes nothing)."""
+    def library(self, name: str, topic: str, section: str = "", find: str = "") -> str:
+        """`GET /api/agents/<station>/library?topic=...&section=...&find=...`: a page of
+        the reference library as the library tool gives it, read without a turn (it
+        changes nothing, and it is not a book: the MCP bridge's resources, which the
+        client's user attaches, read it)."""
         with self.lock:
-            return tools.library(self.world(), name, topic or "contents")
+            return str(tools.library(self.world(), name, topic or "contents", section, find))
 
     # -- what the drivers and the viewer show ------------------------------------------
 
@@ -759,6 +769,9 @@ class Desk:
             "released": seat.released,
             "tools": list(offered),
             "words": seat.words,
+            # the count of turns changed after they were served (a book shelved): a door
+            # that keeps the turns reads them again when it moves (package 28d)
+            "revision": h.revision if h is not None else 0,
         }
         if h is not None:
             a = h.agent
@@ -847,6 +860,12 @@ class GameClient:
         self.http = http or httpx.Client(base_url=self.base, transport=transport, timeout=timeout)
         self.cursor = 0
         self.last: dict[str, Any] = {}
+        # where this door began reading the stream, and the revision its copy of the
+        # turns up to the cursor reflects; `stale` when an answer says the stream has
+        # changed since (a book shelved), and `reread` mends it (package 28d)
+        self.origin = 0
+        self.revision = 0
+        self.stale = False
 
     def _request(self, method: str, path: str, **kw: Any) -> dict[str, Any]:
         import httpx
@@ -875,8 +894,21 @@ class GameClient:
     def _took(self, answer: dict[str, Any]) -> dict[str, Any]:
         if "next" in answer:
             self.cursor = int(answer["next"])
+        if int(answer.get("revision") or 0) != self.revision:
+            self.stale = True
         self.last = answer
         return answer
+
+    def reread(self) -> list[dict[str, Any]]:
+        """The turns from where this door began up to its cursor, as they are served now
+        (a turn it had read has changed: a book shelved, `revision` moved); the cursor
+        does not move, so what lies past it is read on as before. A door replaces its
+        copy with these."""
+        params = {"since": self.origin, "wait": 0}
+        answer = self._request("GET", f"/api/agents/{self.name}/turns", params=params)
+        self.revision = int(answer.get("revision") or 0)
+        self.stale = False
+        return list(answer.get("turns") or [])[: max(0, self.cursor - self.origin)]
 
     def station(
         self,
@@ -898,7 +930,11 @@ class GameClient:
         }
         # the answer carries the turns from where this door starts reading (the start, or
         # the brief sent again when it attaches) and the index to read on from
-        return self._took(self._request("POST", f"/api/agents/{self.name}", json=body))
+        answer = self._took(self._request("POST", f"/api/agents/{self.name}", json=body))
+        self.origin = int(answer.get("since") or 0)
+        self.revision = int(answer.get("revision") or 0)
+        self.stale = False
+        return answer
 
     def turns(self, wait: float = 0.0) -> dict[str, Any]:
         """The turns past the cursor, waiting up to `wait` real seconds for them."""
@@ -924,9 +960,10 @@ class GameClient:
         path = f"/api/agents/{self.name}/release"
         return self._took(self._request("POST", path, json={"reason": reason}))
 
-    def library(self, topic: str) -> str:
+    def library(self, topic: str, section: str = "", find: str = "") -> str:
         path = f"/api/agents/{self.name}/library"
-        answer = self._request("GET", path, params={"topic": topic})
+        params = {"topic": topic, "section": section, "find": find}
+        answer = self._request("GET", path, params=params)
         return str(answer.get("text", ""))
 
     def close(self) -> None:
