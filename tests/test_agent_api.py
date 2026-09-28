@@ -322,9 +322,15 @@ def test_the_long_poll_waits_without_holding_the_worlds_lock(tmp_path):
     g.reply("Aye.")
     got: dict[str, Any] = {}
 
+    # The wait is long and the bound loose on purpose: a poll that held the lock would
+    # make the tick wait out the whole poll (POLL_S), while a poll that does not returns
+    # as soon as the glass opens the turn; the bound only has to tell those apart, on a
+    # loaded four-core runner where ticking a glass of the frigate can take six seconds.
+    POLL_S, BOUND_S = 30, 20
+
     def poll() -> None:
         t0 = time.monotonic()
-        got["answer"] = g.turns(wait=10)
+        got["answer"] = g.turns(wait=POLL_S)
         got["took"] = time.monotonic() - t0
 
     t = threading.Thread(target=poll)
@@ -334,10 +340,10 @@ def test_the_long_poll_waits_without_holding_the_worlds_lock(tmp_path):
     t0 = time.monotonic()
     g.driver.tick(A_GLASS_S)  # would block on the lock if the poll held it
     ticked = time.monotonic() - t0
-    t.join(timeout=10)
+    t.join(timeout=POLL_S)
     assert not t.is_alive()
     assert reasons(got["answer"]) == ["the glass"]
-    assert got["took"] < 5 and ticked < 5
+    assert got["took"] < BOUND_S and ticked < BOUND_S
     # an empty answer after the wait, and the wait is capped
     t0 = time.monotonic()
     assert g.turns(wait=0.3)["turns"] == []
