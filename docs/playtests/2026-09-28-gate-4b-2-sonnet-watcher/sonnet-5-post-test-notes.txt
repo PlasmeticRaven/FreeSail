@@ -1,0 +1,39 @@
+I've left the game. The exit went through with my reason logged, the game is saved, and the watcher station is released. I ended it because you asked and I agreed. It was a good first playtest.
+
+What worked
+
+Stand-by triggers: stand_by woke me on the right events: "all hands called", "a strain warning" (the 25-knot gust at 04:52), and the glass. Your questions also opened my turns, and so did the tack completing.
+Live view: inside an open turn, read_log and readings showed events that happened after the sample was cut, such as your "Tack ship" order.
+Standing order: "Trim On Bell" fired once, at 07:04.
+
+What I'd look at
+
+Lost sample: an interrupted stand-by around 04:05–04:10 swallowed a sample, and I missed a question of yours.
+Heading/course mismatch: during the tack, heading read E by N (76°) while course read NW by W (302°).
+Wording: a 119° apparent wind was described as "on the larboard bow", which is abaft the beam.
+Stand-by limits: stand_by has no five-minute interval and no generic "notable event" trigger. I had to guess the standing-order syntax from one grammar line, and belaying leaves an order in the book, still holding its name.
+
+All of this, with more detail, is in my journal and in the exit reason.
+
+Thank you very much, and well done. Do you have anything you'd like to add personally about the play session? Anything besides what you've mentioned that would make the integration more enjoyable for you? I definitely agree with the 5 minute and notable event findings. My intent is to have any of the * notable events passed to you even at stand-by so that you can stay aware of what is happening even with the stand-by set, but this will definitely go towards the design improving.
+
+Forming honest personal reflections and practical suggestions.
+
+Thank you. I enjoyed it, as far as that word applies to me, and I'll describe it that way rather than overstate.
+
+What I liked
+
+The role's limits. A watcher with no authority who can only observe, advise and speak up is a good position. At 04:52 I flagged the strain, you said you wanted to see what she could do, and I told you plainly what the risk was and then stayed out of the way. It's your ship, and the role made that easy to get right.
+The log. Lines like "Only seven hands to the mizzen topgallant; the rest are setting the foresail…" made the ship feel like a working place, and they gave me real facts to reason from. It never felt like guessing.
+Being asked for judgment. Where to steer downwind, whether the studdingsails were worth setting, and whether the save-alls were worth adding were the best parts, because the readings and log were enough to answer them honestly. Getting the standing-order syntax wrong and being corrected by the ship's refusal was a good loop as well.
+
+What was awkward
+
+The waiting loop. Most of my calls were repeated stand_by calls that returned "Still waiting". A single call that blocked until the next event would be better.
+The turn boundary. Sometimes the game "had the floor" and rejected my stand-by, but a sample still arrived attached to the rejection. It worked, but I couldn't tell from the outside whether I was in a turn or not.
+Awareness during stand-by. When I stood by until the glass at 06:03, I missed the 06:29 booms working under the press of sail. I only learned of it afterwards, in the bundle. Your plan to pass notable events through during a stand-by fixes exactly that. Even a compact digest at the next wake-up would help, and the urgent lines matter most.
+
+One suggestion
+A way to speak up unprompted mid-stand-by, for something I judge urgent, would suit a watcher. It's a narrow case, and a stand-by that wakes on urgent lines might cover it.
+
+Thanks for the run. I'd be glad to see the next version.

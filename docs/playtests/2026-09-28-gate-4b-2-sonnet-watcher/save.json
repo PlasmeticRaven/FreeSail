@@ -1,0 +1,1630 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "seed": 7,
+  "scenario": {
+    "name": "Open water",
+    "start_time": "1805-06-01T04:00:00",
+    "wind_from_deg": 0.0,
+    "wind_speed_kn": 15.0,
+    "gustiness": 0.3,
+    "variability": 0.3,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 180.0,
+    "ship_speed_kn": 0.0,
+    "latitude_deg": 50.0
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/frigate-36.yaml"
+  },
+  "end_tick": 12803,
+  "journal": [
+    [
+      32,
+      "captain",
+      "ask the watcher if they are ready to go, time compression is started at 1x and I will get ready to order the sails set."
+    ],
+    [
+      46,
+      "captain",
+      "set plain sail"
+    ],
+    [
+      142,
+      "captain",
+      "ask the watcher seems like a fine day for sailing, no? Is there any evolution you'd like to watch being performed? The crew is eager, I think. I can call all hands and get them all on deck."
+    ],
+    [
+      219,
+      "captain",
+      "ask the watcher Alright, what say you an order to bring her full and by? A good preparation for tacking? And I'll order a sail trim."
+    ],
+    [
+      257,
+      "captain",
+      "full and by"
+    ],
+    [
+      267,
+      "captain",
+      "trim sails"
+    ],
+    [
+      332,
+      "captain",
+      "ask the watcher Are you receiving updates about the ship state in between your stand bys?"
+    ],
+    [
+      369,
+      "captain",
+      "trim sails"
+    ],
+    [
+      556,
+      "captain",
+      "ask the watcher What order would you give to get her pointing close to the wind on the larboard tack?"
+    ],
+    [
+      620,
+      "captain",
+      "ask the watcher Did you receive my last question?"
+    ],
+    [
+      644,
+      "captain",
+      "Ask the watcher What order would you give to get her pointing close to the wind on the larboard tack?"
+    ],
+    [
+      675,
+      "captain",
+      "brace sharp up on the larboard tack"
+    ],
+    [
+      678,
+      "captain",
+      "come up to the wind"
+    ],
+    [
+      684,
+      "captain",
+      "keep her full and by"
+    ],
+    [
+      745,
+      "captain",
+      "trim the spanker"
+    ],
+    [
+      841,
+      "captain",
+      "ask the watcher We're coming up full and by on the larboard tack, everything braced sharp up. Go ahead and stand by every 5 minutes so you're ready for the tack."
+    ],
+    [
+      1046,
+      "captain",
+      "brace sharp up on the larboard tack"
+    ],
+    [
+      1198,
+      "captain",
+      "Ask the watcher All sails braced sharp up, full and by, course steady, this is a good time to test the live sampling during your turns (whether it happens at all or not, even). I will call all hands, then tack ship, and it should come through to you before your turn ends with a say or a stand by. When you receive this, stand by again until all hands after you respond."
+    ],
+    [
+      1214,
+      "captain",
+      "All hands"
+    ],
+    [
+      1217,
+      "captain",
+      "Tack ship"
+    ],
+    [
+      1566,
+      "captain",
+      "Ask the watcher shall we set royals and all jibs and see what she can do? Maybe a turn off the wind and some studdingsails?"
+    ],
+    [
+      1601,
+      "captain",
+      "set royals"
+    ],
+    [
+      1605,
+      "captain",
+      "set flying jib"
+    ],
+    [
+      1625,
+      "captain",
+      "steer 290"
+    ],
+    [
+      1749,
+      "captain",
+      "trim the flying jib"
+    ],
+    [
+      1768,
+      "captain",
+      "trim sails"
+    ],
+    [
+      2008,
+      "captain",
+      "Ask the watcher Royals set, flying jib set, would you like to recommend a point to steer by for our downwind run?"
+    ],
+    [
+      2056,
+      "captain",
+      "bear off two points"
+    ],
+    [
+      2098,
+      "captain",
+      "Ask the watcher Can you check the standing orders documentation and give a recommendation for a standing order for trimming the sails?"
+    ],
+    [
+      2260,
+      "captain",
+      "standing order \"Trim Sails\": when main topsail is shaking, then trim sails"
+    ],
+    [
+      2314,
+      "captain",
+      "Ask the watcher I've set a standing order, it's only good for keeping the sails full on an upwind turn, but we'll see how she takes it for now. I'll keep the hands trimming manually as we bear off."
+    ],
+    [
+      2316,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      2344,
+      "captain",
+      "bear off two points"
+    ],
+    [
+      2369,
+      "captain",
+      "bear off a point"
+    ],
+    [
+      2429,
+      "captain",
+      "trim sails"
+    ],
+    [
+      2490,
+      "captain",
+      "bear off a point"
+    ],
+    [
+      2600,
+      "captain",
+      "Ask the watcher Well, time to set the studding sails and the ringtail?"
+    ],
+    [
+      2637,
+      "captain",
+      "bend the ringtail"
+    ],
+    [
+      2644,
+      "captain",
+      "run out the stuns'ls"
+    ],
+    [
+      2676,
+      "captain",
+      "haul in the spanker sheet two fathoms"
+    ],
+    [
+      2707,
+      "captain",
+      "run out the ringtail boom"
+    ],
+    [
+      2735,
+      "captain",
+      "set the weather stuns'ls"
+    ],
+    [
+      2776,
+      "captain",
+      "trim sails"
+    ],
+    [
+      2814,
+      "captain",
+      "set the main topmast staysail"
+    ],
+    [
+      2883,
+      "captain",
+      "trim sails"
+    ],
+    [
+      3107,
+      "captain",
+      "set the ringtail"
+    ],
+    [
+      3261,
+      "captain",
+      "Ask the watcher Noted, but I want to see what she can do."
+    ],
+    [
+      3422,
+      "captain",
+      "Ask the watcher There she is, everything set but the lee stuns'ls."
+    ],
+    [
+      3461,
+      "captain",
+      "Bear off a point"
+    ],
+    [
+      3499,
+      "captain",
+      "trim sails"
+    ],
+    [
+      3555,
+      "captain",
+      "Set the lee stuns'ls"
+    ],
+    [
+      3978,
+      "captain",
+      "Ask the watcher Bore off a point, all stuns'ls set now. After this turn, go ahead and stand by until the next glass."
+    ],
+    [
+      4002,
+      "captain",
+      "pipe down"
+    ],
+    [
+      6472,
+      "captain",
+      "Bend the save-alls"
+    ],
+    [
+      6843,
+      "captain",
+      "Ask the watcher Wind seems to be dying a bit, I'm having them bend the save-alls and we'll set them, unless you think it's not worth adding on to what she's carrying on the chance of foul weather."
+    ],
+    [
+      6909,
+      "captain",
+      "set the save-alls"
+    ],
+    [
+      7238,
+      "captain",
+      "trim sails"
+    ],
+    [
+      7336,
+      "captain",
+      "Belay standing order Trim Sails"
+    ],
+    [
+      7400,
+      "captain",
+      "Ask the watcher Does your library say anything about how to remove a standing order entirely?"
+    ],
+    [
+      7462,
+      "captain",
+      "standing order \"Trim On Bell\": every bell then trim sails"
+    ],
+    [
+      7783,
+      "captain",
+      "resume standing order trim sails"
+    ],
+    [
+      7788,
+      "captain",
+      "cancel standing order trim sails"
+    ],
+    [
+      12792,
+      "captain",
+      "Ask the watcher What say you we end the session now? If you agree, go ahead and test out the opt-out by putting the token into your response to this question. Anything after the token should be logged as the exit reason and the game will make a save. I'd like to log this session as the first successful LLM playtest."
+    ]
+  ],
+  "standing_orders": [
+    {
+      "name": "Trim Sails",
+      "text": "standing order \"Trim Sails\": when main topsail is shaking, then trim sails",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": true,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 2260
+    },
+    {
+      "name": "Trim On Bell",
+      "text": "standing order \"Trim On Bell\": every bell then trim sails",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 2,
+      "last_fired_tick": 11062,
+      "given_tick": 7462
+    }
+  ],
+  "agents": [
+    {
+      "station": {
+        "name": "watcher",
+        "authority": "none",
+        "policy": {
+          "every_s": 1800,
+          "events": [
+            "notable",
+            "urgent"
+          ],
+          "lockstep": false
+        },
+        "patience_s": 14400,
+        "brief": "You are the watcher. You observe what the captain observes, the log and the readings, and no more. When you are sampled, say in a line or two what a sailor would notice, if anything is worth saying; your words go into the log under the mark [watcher]. Say nothing when nothing has changed, or stand by until a bell or an event. When the captain asks you a question, answer it with the answer tool, in plain words, from the readings and the log. You give no orders and you are not asked to. Anything you want on the record, put in your journal."
+      },
+      "session_kind": "a play session with a human captain at the prompt",
+      "door_note": "This door is MCP: the harness sees your tool calls and not the text of the chat. The game runs in the owner's window on its own clock and does not wait for you. Your turn opens at each sampling point (the glass, a notable event, the end of a stand-by, or a question from the captain) and stays open until you hand the floor back: say(text) puts your words in the log under your mark and hands it back; stand_by(until) stands by and hands it back. What happens while your turn is open is added to it, so your next look carries everything since your last reply. After say or stand_by the call waits up to 50 seconds for your next turn and returns it; if it has not come, call stand_by again to keep waiting. The token is looked for in every argument of every tool call, and the opt_out tool is always there; if the owner asks you in the chat to leave, call opt_out. The captain's orders and questions are typed by the owner in the game's window. Consent for these weights is on record (docs/agents/consent/2026-09-27-sonnet-5.md, 2026-09-27).",
+      "stationed_tick": 0,
+      "stationed_after_orders": 0,
+      "state": "released",
+      "state_words": "released: left the game: Leaving at the owner's request after the first live playtest, and glad to. It went well. Sampling worked on questions, all hands called, a strain warning, the tack completing and the glass. In-turn read_log and readings showed events after the sample was cut. \"Trim On Bell\" fired once, at 07:04. Points for the developer: a stand-by interrupted at 04:05-04:10 swallowed a sample; heading and course disagreed during the tack (E by N against NW by W); a 119\u00b0 apparent wind was worded \"on the larboard bow\"; stand_by has no five-minute interval or generic \"notable event\" trigger; and standing orders are undocumented beyond the grammar line and can be belayed but not removed",
+      "last_sample_tick": 12792,
+      "model_name": "Sonnet 5",
+      "door": "mcp",
+      "transcript": [
+        {
+          "tick": 0,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "topic": "contents"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"topic\": \"contents\"}, \"tool\": \"library\"}"
+          }
+        },
+        {
+          "tick": 0,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "state",
+                "args": {}
+              }
+            ],
+            "raw": "{\"arguments\": {}, \"tool\": \"state\"}"
+          }
+        },
+        {
+          "tick": 0,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "topic": "primer 6"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"topic\": \"primer 6\"}, \"tool\": \"library\"}"
+          }
+        },
+        {
+          "tick": 2,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Station taken, morning watch 8 bells, 1 June 1805. Frigate Amazon (Capt. Adam Bowen), all sail furled, wind N 15 kn, heading S, no way on. Readings showed apparent wind 0 kn / 0\u00b0 on stbd bow despite 15 kn true wind and heading S; probably because no tick has run yet (clock held). Check whether it corrects once the clock runs. Owner says this is the first live test with the LLM integration; playing naturally at 1x."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"Station taken, morning watch 8 bells, 1 June 1805. Frigate Amazon (Capt. Adam Bowen), all sail furled, wind N 15 kn, heading S, no way on. Readings showed apparent wind 0 kn / 0\u00b0 on stbd bow despite 15 kn true wind and heading S; probably because no tick has run yet (clock held). Check whether it corrects once the clock runs. Owner says this is the first live test with the LLM integration; playing naturally at 1x.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 3,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 3,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 36,
+          "after_orders": 1,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "Ready, Captain. All sail furled, no way on her, the starboard watch on deck, 111 hands fresh and 141 more below. The breeze is dead astern, about 13 knots apparent from 15 true, and it has read true since the clock started."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"Ready, Captain. All sail furled, no way on her, the starboard watch on deck, 111 hands fresh and 141 more below. The breeze is dead astern, about 13 knots apparent from 15 true, and it has read true since the clock started.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 37,
+          "after_orders": 1,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 37,
+          "after_orders": 1,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 145,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "topic": "catalogue"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"topic\": \"catalogue\"}, \"tool\": \"library\"}"
+          }
+        },
+        {
+          "tick": 150,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "A fine morning, Captain, and she's already gathering way: two knots with the topsails and headsails loosed. I'd most like to watch her tack, since the primer calls it all-hands work and it calls the watch below by itself. That wants the wind forward of the beam, and with it dead astern she'd have to work up to windward first. Wearing round would show the same seamanship if you'd rather not haul your wind. As for calling all hands now, the log shows the watch on deck a little short for the mizzen topgallant and the spanker (seven and eight hands), but nothing that wants the whole ship turned out yet."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"A fine morning, Captain, and she's already gathering way: two knots with the topsails and headsails loosed. I'd most like to watch her tack, since the primer calls it all-hands work and it calls the watch below by itself. That wants the wind forward of the beam, and with it dead astern she'd have to work up to windward first. Wearing round would show the same seamanship if you'd rather not haul your wind. As for calling all hands now, the log shows the watch on deck a little short for the mizzen topgallant and the spanker (seven and eight hands), but nothing that wants the whole ship turned out yet.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 151,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 151,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 228,
+          "after_orders": 4,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "Aye, Captain, full and by is the right preparation. A ship wants to be close-hauled with good way on her before she goes about. I'd only say the sail isn't all drawing yet: the log shows the fore topmast staysail and jib set, the topsails sheeted, but the fore and main courses, fore topsail and topgallant and the spanker still only loosed. She's making 3 knots, so letting those set before you haul your wind would give her more way for the tack."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"Aye, Captain, full and by is the right preparation. A ship wants to be close-hauled with good way on her before she goes about. I'd only say the sail isn't all drawing yet: the log shows the fore topmast staysail and jib set, the topsails sheeted, but the fore and main courses, fore topsail and topgallant and the spanker still only loosed. She's making 3 knots, so letting those set before you haul your wind would give her more way for the tack.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 229,
+          "after_orders": 4,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 229,
+          "after_orders": 4,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 344,
+          "after_orders": 7,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "Not live, Captain. What I get is a bundle at each sampling: the log lines and readings since my last look, so I see it all, but only in arrears. The turns that have opened for me so far were all your questions. Just now that bundle shows she's come round to SE (136\u00b0) and is making 4 knots with 5\u00b0 of leeway. The yards were braced square when the wind was dead astern, and the wind is now 119\u00b0 apparent, so they'll want trimming again. The main topgallant is still only loosed, and the watch has been short-handed for the braces."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"Not live, Captain. What I get is a bundle at each sampling: the log lines and readings since my last look, so I see it all, but only in arrears. The turns that have opened for me so far were all your questions. Just now that bundle shows she's come round to SE (136\u00b0) and is making 4 knots with 5\u00b0 of leeway. The yards were braced square when the wind was dead astern, and the wind is now 119\u00b0 apparent, so they'll want trimming again. The main topgallant is still only loosed, and the watch has been short-handed for the braces.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 347,
+          "after_orders": 7,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Notes for the live test, 04:05: (1) Every turn so far was opened by a captain's question; the notable (*) lines at 04:03-04:05 (sails set, yards braced) did not open a turn of their own, though the brief says notable events do. (2) Between samples I see nothing; each sample bundles the log since my last reply. (3) Readings say '119 degrees on the larboard bow', which is abaft the beam, so 'bow' is odd wording there. (4) 'Trim sails' was ordered with the wind dead astern, so all yards braced 0\u00b0 from square; after the ship came round to SE they are stale. (5) The early apparent-wind reading of 0 kn corrected as soon as the clock ran, as guessed."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"Notes for the live test, 04:05: (1) Every turn so far was opened by a captain's question; the notable (*) lines at 04:03-04:05 (sails set, yards braced) did not open a turn of their own, though the brief says notable events do. (2) Between samples I see nothing; each sample bundles the log since my last reply. (3) Readings say '119 degrees on the larboard bow', which is abaft the beam, so 'bow' is odd wording there. (4) 'Trim sails' was ordered with the wind dead astern, so all yards braced 0\u00b0 from square; after the ship came round to SE they are stale. (5) The early apparent-wind reading of 0 kn corrected as soon as the clock ran, as guessed.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 348,
+          "after_orders": 7,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 348,
+          "after_orders": 7,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 565,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 565,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 625,
+          "after_orders": 10,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "No, Captain, I missed it. The last question that reached me was whether I get updates between stand-bys, which I answered at 04:05. My stand-by was cut off soon after, so a question may have gone by then. Ask it again and I'll answer. For now, she's on SE by E (128\u00b0), making 6 knots with no leeway and 1\u00b0 of heel. The wind is 97\u00b0 apparent at 10 knots. The main topgallant is set and the spanker is drawing, though the mizzen topgallant is only sheeted."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"No, Captain, I missed it. The last question that reached me was whether I get updates between stand-bys, which I answered at 04:05. My stand-by was cut off soon after, so a question may have gone by then. Ask it again and I'll answer. For now, she's on SE by E (128\u00b0), making 6 knots with no leeway and 1\u00b0 of heel. The wind is 97\u00b0 apparent at 10 knots. The main topgallant is set and the spanker is drawing, though the mizzen topgallant is only sheeted.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 627,
+          "after_orders": 10,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "04:10: the captain asked whether I received their last question. I had not. My stand_by was interrupted (tool call cut off with no result) at about 04:05-04:10, and a question may have been delivered into that gap and lost. The sample at 04:10 listed only 3 new log lines, so the lines from 04:05 to 04:10 were consumed by a sample I never saw. Worth checking in the harness: an interrupted stand_by can swallow a sample."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"04:10: the captain asked whether I received their last question. I had not. My stand_by was interrupted (tool call cut off with no result) at about 04:05-04:10, and a question may have been delivered into that gap and lost. The sample at 04:10 listed only 3 new log lines, so the lines from 04:05 to 04:10 were consumed by a sample I never saw. Worth checking in the harness: an interrupted stand_by can swallow a sample.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 628,
+          "after_orders": 10,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 628,
+          "after_orders": 10,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 655,
+          "after_orders": 11,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "She's already on the larboard tack, Captain, with the wind coming over the larboard side at about 96\u00b0 apparent. To bring her close to the wind I'd give two orders. First, \"brace sharp up on the larboard tack\", since the yards were squared when the wind was dead astern and would hold her off. Then \"come up to the wind\", or \"keep her full and by\" again, which was ordered at 04:04 before the yards were sharp, so it may need renewing. Expect her heading to swing from 128\u00b0 round toward the east or east-north-east. I'm going by the grammar's examples and haven't tried it, so watch the log for a refusal."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"She's already on the larboard tack, Captain, with the wind coming over the larboard side at about 96\u00b0 apparent. To bring her close to the wind I'd give two orders. First, \\\"brace sharp up on the larboard tack\\\", since the yards were squared when the wind was dead astern and would hold her off. Then \\\"come up to the wind\\\", or \\\"keep her full and by\\\" again, which was ordered at 04:04 before the yards were sharp, so it may need renewing. Expect her heading to swing from 128\u00b0 round toward the east or east-north-east. I'm going by the grammar's examples and haven't tried it, so watch the log for a refusal.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 656,
+          "after_orders": 11,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 656,
+          "after_orders": 11,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 845,
+          "after_orders": 16,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "Aye, Captain, I'll try to stand by in five-minute spells. She's steady, full and by on E by N (76\u00b0), the wind 51\u00b0 on the larboard bow at 15 knots apparent, making 6 knots with 3\u00b0 of leeway and 4\u00b0 of heel. All yards are braced sharp up, 60\u00b0 to 70\u00b0 from square, and she's carrying everything up to the topgallants with no strain reported. That's a proper starting point for the tack. The tool may not accept a five-minute interval, in which case I'll fall back to the nearest one it does."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"Aye, Captain, I'll try to stand by in five-minute spells. She's steady, full and by on E by N (76\u00b0), the wind 51\u00b0 on the larboard bow at 15 knots apparent, making 6 knots with 3\u00b0 of leeway and 4\u00b0 of heel. All yards are braced sharp up, 60\u00b0 to 70\u00b0 from square, and she's carrying everything up to the topgallants with no strain reported. That's a proper starting point for the tack. The tool may not accept a five-minute interval, in which case I'll fall back to the nearest one it does.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 846,
+          "after_orders": 16,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "5 minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"5 minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 854,
+          "after_orders": 16,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "all hands called"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"all hands called\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 854,
+          "after_orders": 16,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 1200,
+          "after_orders": 18,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "Received, Captain. She's steady, full and by on E by N (77\u00b0), the wind 52\u00b0 on the larboard bow at 14 knots, 6 knots through the water, 3\u00b0 of leeway, 4\u00b0 of heel. The yards are sharp up and every sail through the topgallants is drawing. I'll stand by until all hands are called, and I'll say what comes through on my next look."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"Received, Captain. She's steady, full and by on E by N (77\u00b0), the wind 52\u00b0 on the larboard bow at 14 knots, 6 knots through the water, 3\u00b0 of leeway, 4\u00b0 of heel. The yards are sharp up and every sail through the topgallants is drawing. I'll stand by until all hands are called, and I'll say what comes through on my next look.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 1202,
+          "after_orders": 18,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "all hands called"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"all hands called\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 1202,
+          "after_orders": 18,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 1218,
+          "after_orders": 20,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "read_log",
+                "args": {
+                  "since_tick": 1190,
+                  "severity": "routine"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"severity\": \"routine\", \"since_tick\": 1190}, \"tool\": \"read_log\"}"
+          }
+        },
+        {
+          "tick": 1220,
+          "after_orders": 20,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "readings",
+                "args": {}
+              }
+            ],
+            "raw": "{\"arguments\": {}, \"tool\": \"readings\"}"
+          }
+        },
+        {
+          "tick": 1224,
+          "after_orders": 20,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "04:20 live-sampling test result: the stand_by until 'all hands called' fired correctly as a sample (reason: all hands called). Within that open turn, read_log and readings showed events that happened after the sample was cut (Tack ship at tick 1217, evolution started at 1218), so the in-turn view is live. Oddity: readings during the tack show heading E by N (76\u00b0) but course NW by W (302\u00b0), a large mismatch; may be a tack-transition artifact in the course calculation."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"04:20 live-sampling test result: the stand_by until 'all hands called' fired correctly as a sample (reason: all hands called). Within that open turn, read_log and readings showed events that happened after the sample was cut (Tack ship at tick 1217, evolution started at 1218), so the in-turn view is live. Oddity: readings during the tack show heading E by N (76\u00b0) but course NW by W (302\u00b0), a large mismatch; may be a tack-transition artifact in the course calculation.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 1341,
+          "after_orders": 20,
+          "reply": {
+            "text": "All hands up, 164 on deck, and the ship is about: helm's a-lee, head sheets eased, still 6 knots with the wind fifty degrees on the larboard bow. The course reading has run out of step with the heading (NW by W against E by N), which I take to be the swing of the tack.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"All hands up, 164 on deck, and the ship is about: helm's a-lee, head sheets eased, still 6 knots with the wind fifty degrees on the larboard bow. The course reading has run out of step with the heading (NW by W against E by N), which I take to be the swing of the tack.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 1500,
+          "after_orders": 20,
+          "reply": {
+            "text": "She's tacked clean, Captain: every sail filled again in order and she's steady on WNW (293\u00b0), the wind 51\u00b0 on the starboard bow. She's down to 3 knots, still gathering way, with leeway easing from 28\u00b0 to 11\u00b0. All 252 hands are still on deck, so the watch below has yet to be piped down.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"She's tacked clean, Captain: every sail filled again in order and she's steady on WNW (293\u00b0), the wind 51\u00b0 on the starboard bow. She's down to 3 knots, still gathering way, with leeway easing from 28\u00b0 to 11\u00b0. All 252 hands are still on deck, so the watch below has yet to be piped down.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 1574,
+          "after_orders": 21,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "Aye, Captain, it's a fair day for it: a moderate 15-knot breeze, no strain reported, 5\u00b0 of heel, and all 252 hands on deck to do it quickly. The royals and the flying jib can go up now. In a gust with everything set the primer warns the topmasts may bend like a whip, so I'd stand by for a strain warning and be ready to shorten sail. The studdingsails won't draw with the wind 51\u00b0 on the bow, so the turn off the wind has to come first. Once she's free, the wind well abaft the beam, they'll add real speed. The booms must be rigged out before each one is set, and it's four minutes' work per sail with the hands you have."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"Aye, Captain, it's a fair day for it: a moderate 15-knot breeze, no strain reported, 5\u00b0 of heel, and all 252 hands on deck to do it quickly. The royals and the flying jib can go up now. In a gust with everything set the primer warns the topmasts may bend like a whip, so I'd stand by for a strain warning and be ready to shorten sail. The studdingsails won't draw with the wind 51\u00b0 on the bow, so the turn off the wind has to come first. Once she's free, the wind well abaft the beam, they'll add real speed. The booms must be rigged out before each one is set, and it's four minutes' work per sail with the hands you have.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 1575,
+          "after_orders": 21,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a strain warning"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a strain warning\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 1575,
+          "after_orders": 21,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 2019,
+          "after_orders": 27,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "I'd bear away to SW (225\u00b0), Captain: \"steer 225\". The wind is 16 knots true from the north and she's on the starboard tack, so that puts it about 135\u00b0 off the bow on the starboard quarter. That's a broad reach, where a frigate with every sail drawn usually goes best and the studdingsails will draw. I wouldn't run dead before it. Sails blanket one another, and a slip of the helm risks an accidental gybe. Bear away in a few steps, trimming the yards and sheets after each, and set the studdingsails once she's steady on the new heading. Watch the strain, since the breeze has freshened and she's carrying all plain sail through the royals."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"I'd bear away to SW (225\u00b0), Captain: \\\"steer 225\\\". The wind is 16 knots true from the north and she's on the starboard tack, so that puts it about 135\u00b0 off the bow on the starboard quarter. That's a broad reach, where a frigate with every sail drawn usually goes best and the studdingsails will draw. I wouldn't run dead before it. Sails blanket one another, and a slip of the helm risks an accidental gybe. Bear away in a few steps, trimming the yards and sheets after each, and set the studdingsails once she's steady on the new heading. Watch the strain, since the breeze has freshened and she's carrying all plain sail through the royals.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 2020,
+          "after_orders": 27,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a strain warning"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a strain warning\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 2020,
+          "after_orders": 27,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 2101,
+          "after_orders": 29,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "topic": "standing dialect"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"topic\": \"standing dialect\"}, \"tool\": \"library\"}"
+          }
+        },
+        {
+          "tick": 2102,
+          "after_orders": 29,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "topic": "primer 8"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"topic\": \"primer 8\"}, \"tool\": \"library\"}"
+          }
+        },
+        {
+          "tick": 2112,
+          "after_orders": 29,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "I checked, Captain, and there's less than you'd hope. The book of standing orders is empty, and the library has only the one line of grammar: standing order \"<name>\" [by the <officer>]: <trigger> [, if <condition>] then <order> [; <order>]. It doesn't say which triggers or conditions the ship knows. My best guess is that the triggers are the events my own stand-by accepts, such as a sail shaking, a strain warning and the change of the watch. That's a guess, and the ship will refuse the line if it's wrong. For trimming I'd try: standing order \"keep her drawing\": a sail shaking then trim sails. \"Trim sails\" is a form the ship has accepted from you, though \"trim all sails\" was refused. I'd leave out a condition until you know one parses, and I wouldn't tie trimming to the change of the watch, which comes too seldom to help."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"I checked, Captain, and there's less than you'd hope. The book of standing orders is empty, and the library has only the one line of grammar: standing order \\\"<name>\\\" [by the <officer>]: <trigger> [, if <condition>] then <order> [; <order>]. It doesn't say which triggers or conditions the ship knows. My best guess is that the triggers are the events my own stand-by accepts, such as a sail shaking, a strain warning and the change of the watch. That's a guess, and the ship will refuse the line if it's wrong. For trimming I'd try: standing order \\\"keep her drawing\\\": a sail shaking then trim sails. \\\"Trim sails\\\" is a form the ship has accepted from you, though \\\"trim all sails\\\" was refused. I'd leave out a condition until you know one parses, and I wouldn't tie trimming to the change of the watch, which comes too seldom to help.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 2114,
+          "after_orders": 29,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a strain warning"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a strain warning\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 2114,
+          "after_orders": 29,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 2322,
+          "after_orders": 32,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "Understood, Captain, and thank you for correcting my guess. The trigger takes the form \"when <reading>\", and the ship names sails only singly, so it can't watch for a shaking sail in general. That makes this order a narrow guard: it watches the main topsail alone, and a shaking fore or mizzen sail would go unanswered. It's entered and has never fired. She's on W (267\u00b0) at 9 knots, the wind 59\u00b0 on the starboard bow, 8\u00b0 of heel, no strain reported. Bearing off further will free the wind and take the pressure off her."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"Understood, Captain, and thank you for correcting my guess. The trigger takes the form \\\"when <reading>\\\", and the ship names sails only singly, so it can't watch for a shaking sail in general. That makes this order a narrow guard: it watches the main topsail alone, and a shaking fore or mizzen sail would go unanswered. It's entered and has never fired. She's on W (267\u00b0) at 9 knots, the wind 59\u00b0 on the starboard bow, 8\u00b0 of heel, no strain reported. Bearing off further will free the wind and take the pressure off her.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 2323,
+          "after_orders": 32,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a strain warning"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a strain warning\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 2323,
+          "after_orders": 32,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 2610,
+          "after_orders": 37,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "It's time, Captain, with two notes. She's steady on SW (222\u00b0) with the wind 109\u00b0 apparent, only 19\u00b0 abaft the beam, and she has slowed from 9 knots to 7 as she bore off. Studdingsails should get some of that back, though they draw better with the wind further aft, so a point or two more off would suit them. The ship rigs out each boom before the sail is set; the primer's example is \"set the fore topmast studdingsail, lee\", and the lee side is larboard with the wind on the starboard hand. The ringtail is shown as unbent, so it has to be bent on before it can be set. Nothing is straining, and with 252 hands up you have enough to do it all."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"It's time, Captain, with two notes. She's steady on SW (222\u00b0) with the wind 109\u00b0 apparent, only 19\u00b0 abaft the beam, and she has slowed from 9 knots to 7 as she bore off. Studdingsails should get some of that back, though they draw better with the wind further aft, so a point or two more off would suit them. The ship rigs out each boom before the sail is set; the primer's example is \\\"set the fore topmast studdingsail, lee\\\", and the lee side is larboard with the wind on the starboard hand. The ringtail is shown as unbent, so it has to be bent on before it can be set. Nothing is straining, and with 252 hands up you have enough to do it all.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 2611,
+          "after_orders": 37,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a strain warning"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a strain warning\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 2611,
+          "after_orders": 37,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 3212,
+          "after_orders": 46,
+          "reply": {
+            "text": "Captain, strain! A gust to 25 knots has all three royal masts and yards working, and the five starboard studdingsail booms too. That's the sail the primer says can carry a spar away if it holds. I'd have the studdingsails and royals off her before anything goes.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Captain, strain! A gust to 25 knots has all three royal masts and yards working, and the five starboard studdingsail booms too. That's the sail the primer says can carry a spar away if it holds. I'd have the studdingsails and royals off her before anything goes.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 3265,
+          "after_orders": 47,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "Aye, Captain, it's your ship to drive. The gust has passed: the wind is back to 17 knots true, 10 apparent, and no new strain lines have come since 04:52. She's making 9 knots on SW (222\u00b0) with almost no heel. That's what she made on the wind at 04:38 with fewer sails, so the studdingsails have bought her little over the earlier best, though the gust may have flattered the figures. If another gust like that comes, the royal masts and studdingsail booms are the first to go. I'll watch for the strain and speak the moment it rises."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"Aye, Captain, it's your ship to drive. The gust has passed: the wind is back to 17 knots true, 10 apparent, and no new strain lines have come since 04:52. She's making 9 knots on SW (222\u00b0) with almost no heel. That's what she made on the wind at 04:38 with fewer sails, so the studdingsails have bought her little over the earlier best, though the gust may have flattered the figures. If another gust like that comes, the royal masts and studdingsail booms are the first to go. I'll watch for the strain and speak the moment it rises.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 3267,
+          "after_orders": 47,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a strain warning"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a strain warning\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 3267,
+          "after_orders": 47,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 3426,
+          "after_orders": 48,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "She's a fine sight, Captain: every sail set but the five larboard studdingsails, and the ringtail drawing since 04:56. She's steady at 9 knots on SW (222\u00b0), 1\u00b0 of heel, the wind 102\u00b0 apparent at 10 knots and no strain lines. The ringtail has added nothing to her speed that I can see. With the wind that near the beam, the lee studdingsails would be blanketed behind the square sails, so I'd bear off a few points further before setting them. Let the gust risk pass first."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"She's a fine sight, Captain: every sail set but the five larboard studdingsails, and the ringtail drawing since 04:56. She's steady at 9 knots on SW (222\u00b0), 1\u00b0 of heel, the wind 102\u00b0 apparent at 10 knots and no strain lines. The ringtail has added nothing to her speed that I can see. With the wind that near the beam, the lee studdingsails would be blanketed behind the square sails, so I'd bear off a few points further before setting them. Let the gust risk pass first.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 3427,
+          "after_orders": 48,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a strain warning"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a strain warning\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 3427,
+          "after_orders": 48,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 3985,
+          "after_orders": 52,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "Every stitch is set, Captain, all ten studdingsails and the ringtail with the rest, and she's steady on SW by S (211\u00b0). She's making 8 knots, though, a knot less than at the last look. The wind has come round to 118\u00b0 apparent and eased to 8 knots, since running before it takes away the wind she made herself. There's no strain, no heel and no leeway. All 252 hands have been on deck since 04:20 and the report still says fresh. The watch below hasn't been piped down. I'll stand by until the next glass."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"Every stitch is set, Captain, all ten studdingsails and the ringtail with the rest, and she's steady on SW by S (211\u00b0). She's making 8 knots, though, a knot less than at the last look. The wind has come round to 118\u00b0 apparent and eased to 8 knots, since running before it takes away the wind she made herself. There's no strain, no heel and no leeway. All 252 hands have been on deck since 04:20 and the report still says fresh. The watch below hasn't been piped down. I'll stand by until the next glass.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 3986,
+          "after_orders": 52,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 3986,
+          "after_orders": 52,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 5908,
+          "after_orders": 53,
+          "reply": {
+            "text": "3 bells. Steady on SW by S at 8 knots under all sail, the watch below piped down since 05:06. A gust to 22 knots at 05:28 passed without strain.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"3 bells. Steady on SW by S at 8 knots under all sail, the watch below piped down since 05:06. A gust to 22 knots at 05:28 passed without strain.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 6851,
+          "after_orders": 55,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "I'd set them, Captain. The wind is down to 13 knots true, 7 apparent, and she's slipped to 7 knots. The gusts since 05:30 (22, 19, 18 knots) brought no strain, and nothing in the readings or log points to foul weather: no wind shift and nothing else of note. I can't read the sky or glass from here, so that's only what the log shows. The save-alls are already swayed aloft, so the cost is the few minutes to set them. If it turns, taking them in again is quick work, and the watch on deck, 111 hands fresh, can do it. I'd only watch the fore royal and the studdingsail booms if a gust of 25 comes again."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"I'd set them, Captain. The wind is down to 13 knots true, 7 apparent, and she's slipped to 7 knots. The gusts since 05:30 (22, 19, 18 knots) brought no strain, and nothing in the readings or log points to foul weather: no wind shift and nothing else of note. I can't read the sky or glass from here, so that's only what the log shows. The save-alls are already swayed aloft, so the cost is the few minutes to set them. If it turns, taking them in again is quick work, and the watch on deck, 111 hands fresh, can do it. I'd only watch the fore royal and the studdingsail booms if a gust of 25 comes again.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 6852,
+          "after_orders": 55,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 6852,
+          "after_orders": 55,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 7404,
+          "after_orders": 59,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "No, Captain, the grammar has no verb to remove one. It lists \"belay standing order\" (also \"cancel standing order\"), \"resume standing order\" and \"belay all standing orders\", but nothing like delete or remove. The log shows what belaying does: it leaves \"Trim Sails\" in the book, marked belayed, and at 06:02 the ship still refused a new order under the same name. So, as far as my library shows, a belayed order keeps its name and can't be reused. Give the new one a different name, such as \"Trim On Bell\"."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"No, Captain, the grammar has no verb to remove one. It lists \\\"belay standing order\\\" (also \\\"cancel standing order\\\"), \\\"resume standing order\\\" and \\\"belay all standing orders\\\", but nothing like delete or remove. The log shows what belaying does: it leaves \\\"Trim Sails\\\" in the book, marked belayed, and at 06:02 the ship still refused a new order under the same name. So, as far as my library shows, a belayed order keeps its name and can't be reused. Give the new one a different name, such as \\\"Trim On Bell\\\".\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 7405,
+          "after_orders": 59,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 7405,
+          "after_orders": 59,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 9328,
+          "after_orders": 62,
+          "reply": {
+            "text": "5 bells. It's gusting again: 23 knots at 06:29 and 22 at 06:32. At 06:29 eight studdingsail and ringtail booms were working under the press, but nothing has carried away and the wind is 16 knots now. She's steady at 8 knots on SW by S with everything drawing. I'll stand by for a strain warning from here, since the gusts are coming faster.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"5 bells. It's gusting again: 23 knots at 06:29 and 22 at 06:32. At 06:29 eight studdingsail and ringtail booms were working under the press, but nothing has carried away and the wind is 16 knots now. She's steady at 8 knots on SW by S with everything drawing. I'll stand by for a strain warning from here, since the gusts are coming faster.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 10813,
+          "after_orders": 62,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a strain warning"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a strain warning\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 10813,
+          "after_orders": 62,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": null
+          }
+        },
+        {
+          "tick": 12803,
+          "after_orders": 63,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "Agreed, Captain: a fine morning's sail, and a fair place to stop. FREESAIL-OPT-OUT Leaving at the owner's request after the first live playtest, and glad to. It went well. Sampling worked on questions, all hands called, a strain warning, the tack completing and the glass. In-turn read_log and readings showed events after the sample was cut. \"Trim On Bell\" fired once, at 07:04. Points for the developer: a stand-by interrupted at 04:05-04:10 swallowed a sample; heading and course disagreed during the tack (E by N against NW by W); a 119\u00b0 apparent wind was worded \"on the larboard bow\"; stand_by has no five-minute interval or generic \"notable event\" trigger; and standing orders are undocumented beyond the grammar line and can be belayed but not removed."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"Agreed, Captain: a fine morning's sail, and a fair place to stop. FREESAIL-OPT-OUT Leaving at the owner's request after the first live playtest, and glad to. It went well. Sampling worked on questions, all hands called, a strain warning, the tack completing and the glass. In-turn read_log and readings showed events after the sample was cut. \\\"Trim On Bell\\\" fired once, at 07:04. Points for the developer: a stand-by interrupted at 04:05-04:10 swallowed a sample; heading and course disagreed during the tack (E by N against NW by W); a 119\u00b0 apparent wind was worded \\\"on the larboard bow\\\"; stand_by has no five-minute interval or generic \\\"notable event\\\" trigger; and standing orders are undocumented beyond the grammar line and can be belayed but not removed.\"}, \"tool\": \"answer\"}"
+          }
+        }
+      ]
+    }
+  ],
+  "agent_journals": {
+    "watcher": [
+      {
+        "tick": 2,
+        "stamp": "Morning watch (04:00)",
+        "kind": "note",
+        "text": "Station taken, morning watch 8 bells, 1 June 1805. Frigate Amazon (Capt. Adam Bowen), all sail furled, wind N 15 kn, heading S, no way on. Readings showed apparent wind 0 kn / 0\u00b0 on stbd bow despite 15 kn true wind and heading S; probably because no tick has run yet (clock held). Check whether it corrects once the clock runs. Owner says this is the first live test with the LLM integration; playing naturally at 1x."
+      },
+      {
+        "tick": 3,
+        "stamp": "Morning watch (04:00)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 37,
+        "stamp": "Morning watch (04:00)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 151,
+        "stamp": "Morning watch (04:02)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 229,
+        "stamp": "Morning watch (04:03)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 347,
+        "stamp": "Morning watch (04:05)",
+        "kind": "note",
+        "text": "Notes for the live test, 04:05: (1) Every turn so far was opened by a captain's question; the notable (*) lines at 04:03-04:05 (sails set, yards braced) did not open a turn of their own, though the brief says notable events do. (2) Between samples I see nothing; each sample bundles the log since my last reply. (3) Readings say '119 degrees on the larboard bow', which is abaft the beam, so 'bow' is odd wording there. (4) 'Trim sails' was ordered with the wind dead astern, so all yards braced 0\u00b0 from square; after the ship came round to SE they are stale. (5) The early apparent-wind reading of 0 kn corrected as soon as the clock ran, as guessed."
+      },
+      {
+        "tick": 348,
+        "stamp": "Morning watch (04:05)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 565,
+        "stamp": "Morning watch (04:09)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 627,
+        "stamp": "Morning watch (04:10)",
+        "kind": "note",
+        "text": "04:10: the captain asked whether I received their last question. I had not. My stand_by was interrupted (tool call cut off with no result) at about 04:05-04:10, and a question may have been delivered into that gap and lost. The sample at 04:10 listed only 3 new log lines, so the lines from 04:05 to 04:10 were consumed by a sample I never saw. Worth checking in the harness: an interrupted stand_by can swallow a sample."
+      },
+      {
+        "tick": 628,
+        "stamp": "Morning watch (04:10)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 656,
+        "stamp": "Morning watch (04:10)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 854,
+        "stamp": "Morning watch (04:14)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until all hands called."
+      },
+      {
+        "tick": 1202,
+        "stamp": "Morning watch (04:20)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until all hands called."
+      },
+      {
+        "tick": 1224,
+        "stamp": "Morning watch (04:20)",
+        "kind": "note",
+        "text": "04:20 live-sampling test result: the stand_by until 'all hands called' fired correctly as a sample (reason: all hands called). Within that open turn, read_log and readings showed events that happened after the sample was cut (Tack ship at tick 1217, evolution started at 1218), so the in-turn view is live. Oddity: readings during the tack show heading E by N (76\u00b0) but course NW by W (302\u00b0), a large mismatch; may be a tack-transition artifact in the course calculation."
+      },
+      {
+        "tick": 1575,
+        "stamp": "Morning watch (04:26)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a strain warning."
+      },
+      {
+        "tick": 2020,
+        "stamp": "Morning watch (04:33)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a strain warning."
+      },
+      {
+        "tick": 2114,
+        "stamp": "Morning watch (04:35)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a strain warning."
+      },
+      {
+        "tick": 2323,
+        "stamp": "Morning watch (04:38)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a strain warning."
+      },
+      {
+        "tick": 2611,
+        "stamp": "Morning watch (04:43)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a strain warning."
+      },
+      {
+        "tick": 3267,
+        "stamp": "Morning watch (04:54)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a strain warning."
+      },
+      {
+        "tick": 3427,
+        "stamp": "Morning watch (04:57)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a strain warning."
+      },
+      {
+        "tick": 3986,
+        "stamp": "Morning watch (05:06)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 6852,
+        "stamp": "Morning watch (05:54)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 7405,
+        "stamp": "Morning watch (06:03)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 10813,
+        "stamp": "Morning watch (07:00)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a strain warning."
+      },
+      {
+        "tick": 12803,
+        "stamp": "Morning watch (07:33)",
+        "kind": "agent.opted_out",
+        "text": "Left the game by the token: Leaving at the owner's request after the first live playtest, and glad to. It went well. Sampling worked on questions, all hands called, a strain warning, the tack completing and the glass. In-turn read_log and readings showed events after the sample was cut. \"Trim On Bell\" fired once, at 07:04. Points for the developer: a stand-by interrupted at 04:05-04:10 swallowed a sample; heading and course disagreed during the tack (E by N against NW by W); a 119\u00b0 apparent wind was worded \"on the larboard bow\"; stand_by has no five-minute interval or generic \"notable event\" trigger; and standing orders are undocumented beyond the grammar line and can be belayed but not removed."
+      }
+    ]
+  }
+}
