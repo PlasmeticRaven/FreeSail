@@ -1098,6 +1098,58 @@ def test_the_book_is_saved_with_the_game_and_restored_by_replay(tmp_path):
     assert fresh.standing.book.get("bells").fired == 1
 
 
+def test_strike_takes_an_order_out_of_the_book_and_belay_keeps_it(tmp_path):
+    """Package 28c (playtest 3: the captain tried `cancel standing order`, and belaying
+    left the order in the book under its name). `strike standing order "x"`, or `cancel`
+    or `remove`, takes it out: journaled as an order, logged, no longer listed or fired,
+    its name free again; a belayed order stays in the book as it is. A replay strikes it
+    at the same point."""
+    w = frigate()
+    w.submit("set plain sail")
+    w.submit('standing order "glass": every glass then trim sails')
+    w.submit(KEEP_FULL)
+    w.submit(NIGHT)
+    w.submit('belay standing order "keep her full"')
+    assert w.standing.book.names == ["glass", "keep her full", "night routine"]
+    assert w.standing.book.get("keep her full").belayed  # belayed, and still in the book
+    w.run(100)
+    e = w.submit('strike standing order "glass"')
+    assert e.kind == "standing.struck"
+    assert e.text == "Standing order 'glass' struck from the book."
+    assert w.submit('cancel standing order "keep her full"').text == (
+        "Standing order 'keep her full' struck from the book."
+    )
+    assert w.submit("remove the standing order 'night routine'").kind == "standing.struck"
+    assert w.standing.book.names == []
+    w.run(1800)
+    assert firings(w, "glass") == []  # struck before its glass came
+    # the name is free again
+    assert w.submit('standing order "glass": every glass then trim sails').kind == (
+        "standing.given"
+    )
+    assert [t for _, _, t in w.journal][-4:] == [
+        'strike standing order "glass"',
+        'cancel standing order "keep her full"',
+        "remove the standing order 'night routine'",
+        'standing order "glass": every glass then trim sails',
+    ]
+    w.run(1800)
+    assert firings(w, "glass")  # given again, it keeps its glass
+    path = replay.save_to_file(w, tmp_path / "struck.json")
+    copy = replay.replay(replay.load_file(path), ship_factory)
+    assert copy.standing.book.names == ["glass"]
+    assert copy.standing.book.save() == w.standing.book.save()
+    assert copy.log.digest() == w.log.digest()
+    # the book's words for it (queries and refusals are logged, not journaled, so they
+    # are asked of another game)
+    other = frigate()
+    other.submit(NIGHT)
+    other.submit('strike standing order "night routine"')
+    assert other.submit("standing orders").text == "There are no standing orders in the book."
+    assert "the book is empty" in other.submit('strike standing order "glass"').text
+    assert 'strike standing order "' in complete.STANDING_SENTENCES
+
+
 # ---------------------------------------------------------------------------
 # The drivers: `read the standing orders from <file>`, the book as a query
 # ---------------------------------------------------------------------------

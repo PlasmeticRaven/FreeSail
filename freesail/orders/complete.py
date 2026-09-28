@@ -46,6 +46,7 @@ STANDING_SENTENCES = (
     'belay standing order "',
     'resume standing order "',
     "belay all standing orders",
+    'strike standing order "',
 )
 # The station sentences (spec M4 §12), offered whole.
 STATION_SENTENCES = (

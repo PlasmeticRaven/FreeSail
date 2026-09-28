@@ -81,7 +81,7 @@ def log_line(e: Any) -> dict[str, Any]:
 
 
 def readings_words(world: World) -> dict[str, Any]:
-    """Every reading the registry has, in words (`readings.describe_value`), by id, plus
+    """Every reading the registry has, in words (`readings.reading_words`), by id, plus
     each sail's state under `sails` by the sail's ordinary name. This is what the
     `readings` tool returns and what every sample carries."""
     view = world.readings
@@ -89,7 +89,7 @@ def readings_words(world: World) -> dict[str, Any]:
     for row in R.REGISTRY:
         if row.is_absent or row.parametric is not None:
             continue
-        out[row.id] = R.describe_value(row, view.value(row.id))
+        out[row.id] = view.words(row.id)
     ship = world.ship
     sails = getattr(ship, "sails", None)
     if sails:
@@ -290,11 +290,15 @@ TOOLS: dict[str, Tool] = {
         ),
         Tool(
             "stand_by",
-            "Stand by until an event or a bell: you are not sampled until then, and the "
-            "decision is written in the log. `until` is an event's words as the standing "
-            "dialect knows them ('eight bells', 'sunset', 'the change of the watch', 'a "
-            "sail blown out') or an interval ('a glass', 'an hour', 'a watch').",
-            {"until": "string: the event or interval"},
+            "Stand by until an event, a bell or an interval: you are not sampled until "
+            "then, and the decision is written in the log. `until` is an event's words as "
+            "the standing dialect knows them ('eight bells', 'sunset', 'the change of the "
+            "watch', 'a strain warning', 'a sail blown out'), an interval ('a glass', 'an "
+            "hour', 'a watch', '5 minutes', 'ten minutes'), 'a notable event' or 'an urgent "
+            "event'. An urgent line in the log ends any stand-by and wakes you, its line "
+            "named as the reason; the notable lines logged while you stood by come with the "
+            "sample that wakes you, counted and listed.",
+            {"until": "string: the event, the interval, 'a notable event' or 'an urgent event'"},
             stand_by,
         ),
         Tool(
@@ -437,7 +441,6 @@ def _catalogue() -> str:
 
 def _grammar() -> str:
     from freesail.orders.vocabulary import load_vocabulary
-    from freesail.standing import grammar as standing
 
     vocab = load_vocabulary()
     lines = [
@@ -446,20 +449,91 @@ def _grammar() -> str:
         "south-west by west', 'reef the topsails, one reef'. The verbs and their synonyms:"
     ]
     for name, spec in vocab.verbs.items():
-        if spec.level == "driver":
-            continue
+        if spec.level == "driver" or spec.object == "standing":
+            continue  # the standing dialect's sentences are below, with their grammar
         syn = f" (also: {', '.join(spec.synonyms)})" if spec.synonyms else ""
         lines.append(f"  {name}{syn}")
-    doc = (standing.__doc__ or "").strip().split("\n\n")
     lines.append("")
-    lines.append("The standing dialect (standing orders, given by the captain):")
-    lines.extend(doc[:2])
+    lines.extend(standing_dialect_lines(vocab))
     lines.append("")
     lines.append(
         "The station sentences the captain uses: 'ask the watcher <question>', 'stand down "
         "the watcher', 'resume the watcher', \"show the watcher's journal\"."
     )
     return "\n".join(lines)
+
+
+STARTER_ORDERS = ROOT / "data" / "standing_orders" / "starter.orders"
+
+
+def standing_dialect_lines(vocab: Any = None) -> list[str]:
+    """The standing dialect in full, for the library's grammar page (package 28c: the
+    watcher of playtest 3 "had to guess the standing-order syntax from one grammar
+    line"): the sentence, the triggers with every event and interval the registry
+    knows, the readings a condition may name and how each is compared, the durations,
+    the starter routines as examples (read from the file, so they stay the file's), and
+    the book's verbs with their synonyms."""
+    from freesail.orders.vocabulary import load_vocabulary
+    from freesail.standing.book import read_orders_file
+
+    vocab = vocab or load_vocabulary()
+    events = ", ".join(w for w, s in R.EVENTS.items() if not s.absent)
+    later = ", ".join(w for w, s in R.EVENTS.items() if s.absent)
+    readings = []
+    for row in R.REGISTRY:
+        if row.is_absent:
+            continue
+        words = " or ".join(f"'{w}'" for w in row.words)
+        readings.append(f"    {words}: {R.KINDS[row.kind]}")
+    absent = ", ".join(f"'{row.words[0]}'" for row in R.REGISTRY if row.is_absent)
+    out = [
+        "The standing dialect: standing orders, which the captain gives like any order and "
+        "the ship keeps by herself. One line:",
+        '  standing order "<name>" [by the <officer>]: <trigger> [, if <condition>] then '
+        "<order> [; <order> ...]",
+        "The name is in quotes. The orders after 'then' are ordinary orders of the language "
+        "above, separated by semicolons, and are checked when the standing order is given. "
+        "'by the <officer>' is for an officer's order; the captain's is the default, and "
+        "the senior's stands when two conflict on the same part.",
+        "Triggers:",
+        "  when <condition> [for <duration>]: fires once when the condition comes to hold "
+        "(for that long, if a duration is given), and not again until it has been false "
+        "for five minutes and the work it started is done",
+        f"  at <event>: once each time the event happens. The events: {events}; later, when "
+        f"the world has them: {later}",
+        "  every <interval>: on the interval, never queuing more than one: a glass, a bell, "
+        "half an hour, an hour, a watch, or a number of minutes ('every 10 minutes')",
+        "Conditions: a reading and a comparison, joined by 'and' (no 'or'): 'the true wind "
+        "exceeds 30 knots and the fore royal is set'. The readings, and how each is "
+        "compared:",
+        *readings,
+        "    'the <sail>' is any sail by the ship's own name ('the fore royal is shaking'); "
+        "'the <part>' any spar or line ('the fore royal yard is straining')",
+        f"  Not yet in the ship, named so a condition can be refused in words: {absent}.",
+        "Durations, after 'for': a number of minutes or seconds ('for 2 minutes', 'for "
+        "30 seconds', 'for five minutes'), a glass, a bell, half an hour, an hour, a watch.",
+        "Examples, the starter routines (data/standing_orders/starter.orders):",
+    ]
+    for line in read_orders_file(STARTER_ORDERS):
+        note = "   (refused until the ship has a well to sound)" if "sound the well" in line else ""
+        out.append(f"  {line}{note}")
+    book = []
+    for name, spec in vocab.verbs.items():
+        if spec.object != "standing" or name == "standing order":
+            continue
+        syn = f" (also: {', '.join(spec.synonyms)})" if spec.synonyms else ""
+        takes = "" if name in ("standing orders", "belay all standing orders") else ' "<name>"'
+        book.append(f"  {name}{takes}{syn}")
+    out += [
+        "The book's orders:",
+        *book,
+        "  read the standing orders from <file>: at the console or the browser game, loads a "
+        "file of standing orders one a line (the game's driver reads the disk, so it is "
+        "not an order the ship hears)",
+        "Belaying an order keeps it in the book, idle, until 'resume standing order'; "
+        "striking it takes it out of the book, and its name may be given again.",
+    ]
+    return out
 
 
 def _ship_names(world: World) -> str:

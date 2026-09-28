@@ -206,10 +206,13 @@ def _log_notes(ship: Ship, st: hp.HullState, dt: float) -> None:
     else:
         st.beam_ends_noted = False
 
-    # leeway: a routine line when it changes by more than a degree, at most once a minute
+    # leeway: a routine line when it changes by more than a degree, at most once a minute,
+    # and only with way on (hull.WAY_ON_KN of headway): gathering way from rest or making
+    # sternway, leeway is not a reading (playtest 1: "Leeway 145°" from a standing start)
     st.seconds_since_leeway_note += dt
     if (
-        abs(d.leeway - st.last_noted_leeway) > hp.LEEWAY_NOTE_THRESHOLD
+        d.u >= units.knots_to_ms(hp.WAY_ON_KN)
+        and abs(d.leeway - st.last_noted_leeway) > hp.LEEWAY_NOTE_THRESHOLD
         and st.seconds_since_leeway_note >= hp.LEEWAY_NOTE_INTERVAL
     ):
         st.last_noted_leeway = d.leeway

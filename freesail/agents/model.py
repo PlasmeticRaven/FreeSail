@@ -116,9 +116,15 @@ class Sample:
     readings: dict[str, Any] = field(default_factory=dict)
     question: str | None = None
     notices: list[str] = field(default_factory=list)
+    # the sample that ends a stand-by: since when, until what, and the notable lines
+    # logged while the model stood by, counted and listed (package 28c); absent otherwise
+    stood_by: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+        d = asdict(self)
+        if d.get("stood_by") is None:
+            d.pop("stood_by", None)
+        return d
 
 
 @dataclass(frozen=True)

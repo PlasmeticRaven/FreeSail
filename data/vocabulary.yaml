@@ -414,7 +414,13 @@ verbs:
     object: standing
     level: 2
   belay standing order:
-    synonyms: [belay the standing order, cancel standing order, cancel the standing order]
+    synonyms: [belay the standing order]
+    object: standing
+    level: 2
+  # Striking takes an order out of the book; belaying keeps it there, idle (package 28c:
+  # the captain of playtest 3 said `cancel standing order` and meant this).
+  strike standing order:
+    synonyms: [strike the standing order, cancel standing order, cancel the standing order, remove standing order, remove the standing order]
     object: standing
     level: 2
   resume standing order:

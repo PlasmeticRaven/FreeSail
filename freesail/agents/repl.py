@@ -45,10 +45,12 @@ consent conversation runs a turn a call like the station: the first call writes 
 brief and the question to `--sample`; each later call takes the model's reply from
 `--reply`. When the model writes something without answering, it is for the owner: the
 call exits 4 with the words in `--sample`, and the owner's reply comes in the next call
-with `--owner-reply FILE`. An answer ends the conversation and writes the record; a yes
-goes straight on to the station's brief and first sample in the same call, anything else
-exits 5 with the reason. A game saved under a named model is continued only while a yes
-is on record for that name.
+with `--owner-reply FILE`. After the answer the developer has a turn before the record
+closes (package 28c): the call exits 4, and the next call's `--owner-reply FILE` is put
+to the model (which may reply once, by `--reply`), or, empty, closes the record. The
+record written, a yes goes straight on to the station's brief and first sample in the
+same call, anything else exits 5 with the reason. A game saved under a named model is
+continued only while a yes is on record for that name.
 """
 
 from __future__ import annotations
@@ -139,6 +141,16 @@ def render_turn(turn: Turn) -> str:
         out.append(f"Notice from the harness: {n}")
     if d.get("question"):
         out.append(f"The captain asks: {d['question']}?")
+    sb = d.get("stood_by")
+    if sb:
+        # the stand-by's digest (package 28c): the notable lines while it lasted
+        n = int(sb.get("notable") or 0)
+        lines = "no notable lines" if n == 0 else f"{n} notable line{'s' if n != 1 else ''}"
+        out.append(
+            f"While you stood by (since {sb.get('since')}, until {sb.get('until')}): {lines} "
+            "logged" + (":" if n else ".")
+        )
+        out += [f"  * {ln['stamp']}  {ln['text']}" for ln in sb.get("lines") or []]
     log = d.get("log") or []
     if log:
         out.append(
@@ -336,6 +348,7 @@ def run_interactive(args: argparse.Namespace, inp: TextIO, out: TextIO) -> int:
             records_dir=Path(args.records),
             ask_again=args.ask_again,
             out=out,
+            after=consent.terminal_after(inp, out),
         )
         if record is None:
             return EXIT_NO_CONSENT
@@ -421,7 +434,12 @@ def _consent_turn(args: argparse.Namespace) -> tuple[int | None, str, consent.Re
     replies = [Reply.from_dict(r) for r in state["replies"]]
     owner_replies = list(state["owner_replies"])
     conv = consent.Conversation(
-        identity, REPL_RUNTIME, Transcript(replies), door="repl", records_dir=records_dir
+        identity,
+        REPL_RUNTIME,
+        Transcript(replies),
+        door="repl",
+        records_dir=records_dir,
+        owner_after=True,
     )
     conv.begin()
     queue = list(owner_replies)
@@ -461,6 +479,14 @@ def _consent_turn(args: argparse.Namespace) -> tuple[int | None, str, consent.Re
     Path(args.save).write_text(
         json.dumps({"consent": state}, indent=1) + "\n", encoding="utf-8", newline="\n"
     )
+    if conv.after_answer:
+        _write_sample(
+            args,
+            f"{_since_last_reply(conv.turns)}\n\n== {conv.answer_words()} ==\n\n== Before the "
+            "record closes the developer may ask or say something, which the model may answer "
+            "once: call again with --owner-reply FILE (an empty file closes the record) ==" + note,
+        )
+        return EXIT_OWNER, "", None
     if conv.waiting == consent.OWNER_TURN:
         _write_sample(
             args,

@@ -155,8 +155,12 @@ def test_a_refused_connection_is_reported_in_words():
         m.identity()
     assert "Could not reach the model server at http://127.0.0.1:8080" in str(e.value)
     assert "connection was refused" in str(e.value) and "docs/agents/Harness.md" in str(e.value)
-    # a reply that cannot be had leaves the sample open and says why, once
-    assert m.reply([Turn(OPERATOR, "brief"), Turn(DATA, {"reason": "x"})]) is None
+    # a reply that cannot be had leaves the sample open and says why; after three in a
+    # row the model has failed (package 28c)
+    for _ in range(L.FAILURES_TO_STAND_DOWN):
+        assert m.failed is None
+        assert m.reply([Turn(OPERATOR, "brief"), Turn(DATA, {"reason": "x"})]) is None
+        assert "connection was refused" in m.last_error
     assert m.failed is not None and "connection was refused" in m.failed
     n = len(server.requests)
     assert m.reply([]) is None and len(server.requests) == n  # no hammering a dead server
@@ -177,7 +181,8 @@ def test_the_request_carries_the_brief_the_samples_and_the_tools_and_nothing_els
     h = Harness(world, watcher(SamplingPolicy.in_lockstep(600)), m)
     h.start()
     body = server.bodies[0]
-    assert set(body) == {"messages", "stream", "tools", "seed", "temperature"}
+    assert set(body) == {"messages", "stream", "tools", "seed", "temperature", "max_tokens"}
+    assert body["max_tokens"] == L.REPLY_MAX_TOKENS  # the reply budget (package 28c)
     assert body["seed"] == 7 and body["temperature"] == 0.3 and body["stream"] is False
     assert [msg["role"] for msg in body["messages"]] == ["system", "user"]
     assert body["messages"][0]["content"] == h.brief.text()
@@ -304,8 +309,10 @@ def test_a_server_error_is_reported_in_words():
 
     m = L.LocalModel(ENDPOINT, transport=httpx.MockTransport(handler), ctx_size=None)
     m._props_read = True
-    assert m.reply([Turn(OPERATOR, "b"), Turn(DATA, {"reason": "x"})]) is None
-    assert m.failed == f"The model server at {ENDPOINT} answered 500: the model is not loaded"
+    for _ in range(L.FAILURES_TO_STAND_DOWN):
+        assert m.reply([Turn(OPERATOR, "b"), Turn(DATA, {"reason": "x"})]) is None
+    assert m.last_error == f"The model server at {ENDPOINT} answered 500: the model is not loaded"
+    assert m.failed == f"{m.last_error} (3 failed requests in a row)"
 
 
 # ---------------------------------------------------------------------------
@@ -390,33 +397,37 @@ def finished(got: dict[str, Any], seconds: float = 15.0) -> int:
 
 def test_the_runner_asks_consent_through_the_game_then_keeps_watch_for_a_few_glasses(tmp_path):
     """The consent conversation runs in the game's process with the runner as its door
-    (the model's question shown here, the owner's reply typed here); a yes goes on to
-    the station; the watcher keeps watch while the test turns the game's clock; the
-    captain's stand-down from the game ends the run."""
+    (the model's question shown here, the owner's reply typed here); after the answer
+    the owner has a word at `owner>` before the record closes, and the model replies once
+    (package 28c); a yes goes on to the station; the watcher keeps watch while the test
+    turns the game's clock; the captain's stand-down from the game ends the run."""
     game = Game(tmp_path)
     server = llama(
         [
             message("What is the journal for?"),
             message("", ("answer", '{"text": "Yes, I am willing."}')),
+            message("I am glad of it."),  # its one reply to the owner's word after the answer
             message("A quiet start."),  # the station's first turn
             message("The first glass is turned."),
-            message("", ("stand_by", '{"until": "a glass"}')),
-            message(""),
+            message("", ("stand_by", '{"until": "a glass"}')),  # ends the turn at once
             message("The third glass: all well."),
         ]
     )
     got = run_runner(
-        game, server, ["--session", "test", "--seed", "11"], inp="Your own record, kept.\n\n"
+        game,
+        server,
+        ["--session", "test", "--seed", "11"],
+        inp="Your own record, kept.\n\nThank you; the record is yours to read too.\n\n",
     )
     game.wait_for(game.floor_is_the_games(0))
     assert game.lines("agent.note") == ["[watcher] A quiet start."]
     game.driver.tick(A_GLASS_S)
     game.wait_for(game.floor_is_the_games(1))
     game.driver.tick(A_GLASS_S)
-    game.wait_for(game.floor_is_the_games(3))
+    game.wait_for(game.floor_is_the_games(2))
     assert game.harness.agent.standing_by
     game.driver.tick(A_GLASS_S)
-    game.wait_for(game.floor_is_the_games(4))
+    game.wait_for(game.floor_is_the_games(3))
     with game.driver.lock:
         game.world.submit("stand down the watcher")
     assert finished(got) == L.EXIT_RELEASED
@@ -432,14 +443,21 @@ def test_the_runner_asks_consent_through_the_game_then_keeps_watch_for_a_few_gla
         "role": "user",
         "content": "Your own record, kept.",
     }
+    assert "The model has answered (yes): Yes, I am willing." in text
+    assert server.bodies[2]["messages"][-1] == {
+        "role": "user",
+        "content": "Thank you; the record is yours to read too.",
+    }
     rec = consent.check(GGUF, game.records)
     assert rec is not None and rec.verdict == consent.YES
+    body = rec.path.read_text(encoding="utf-8")
+    assert "the record is yours to read too" in body and "I am glad of it." in body
     assert rec.runtime == (
         "FreeSail's browser game (freesail.ui.server on port 8000), through the local runner "
         f"(freesail.agents.local), llama-server (b0000-test) at {ENDPOINT}"
     )
     # then the station, whose brief is a new conversation
-    station_body = server.bodies[2]
+    station_body = server.bodies[3]
     assert station_body["messages"][0]["content"].startswith("This is a message from the harness")
     assert (
         "This door is a model server on the owner's machine"
@@ -497,7 +515,7 @@ def test_an_endpoint_failure_is_reported_in_words_and_the_station_released(tmp_p
     assert h.agent.released
     assert h.agent.released_reason == (
         "stood down by the local runner: the model server could not be used: The model server "
-        f"at {ENDPOINT} answered 500: the model is not loaded"
+        f"at {ENDPOINT} answered 500: the model is not loaded (3 failed requests in a row)"
     )
     assert list(game.saves.glob("*.json"))
 
@@ -532,3 +550,179 @@ def test_a_game_that_is_not_running_is_reported_in_words():
     text = out.getvalue()
     assert "Could not reach the game at http://localhost:8000" in text
     assert "py -m freesail.ui.server" in text
+
+
+# ---------------------------------------------------------------------------
+# Package 28c: the reply budget, the timeout and the retry, the context guard
+# ---------------------------------------------------------------------------
+
+
+def flaky(server: Server, failures: list[str]):
+    """The fake server, whose next chat requests fail as listed ("timeout" or "500")
+    before it answers as scripted."""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/v1/chat/completions" and failures:
+            server.bodies.append(json.loads(request.content))
+            how = failures.pop(0)
+            if how == "timeout":
+                raise httpx.ReadTimeout("timed out", request=request)
+            return httpx.Response(500, json={"error": {"message": "overloaded"}})
+        return server(request)
+
+    return httpx.MockTransport(handler)
+
+
+def test_a_timed_out_request_leaves_the_turn_open_and_the_runner_asks_again(tmp_path):
+    """Playtest 4: one request ran away (76,674 tokens) and never returned, and the
+    runner, waiting in it, fetched neither the captain's question nor the glass. Every
+    request now carries the reply budget; a request that times out leaves the sample
+    open, the runner reads the game again (the question asked meanwhile is folded into
+    the open turn) and asks again, and the model answers the question."""
+    game = Game(tmp_path)
+    consent.Record(GGUF, "t", "2026-09-26", consent.YES, answer="Yes.").write(game.records)
+    server = llama([message("", ("answer", '{"text": "Southerly, and drawing well."}'))])
+    failures = ["timeout"]
+    asked = {"done": False}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/v1/chat/completions" and failures:
+            server.bodies.append(json.loads(request.content))
+            failures.pop(0)
+            with game.driver.lock:  # the captain asks while the request hangs
+                game.world.submit("ask the watcher how she heads")
+            asked["done"] = True
+            raise httpx.ReadTimeout("timed out", request=request)
+        return server(request)
+
+    out = io.StringIO()
+    got: dict[str, Any] = {}
+
+    def run() -> None:
+        got["code"] = L.main(
+            ["--game", "http://testserver", "--max-reply", "2048"],
+            inp=io.StringIO(""),
+            out=out,
+            transport=httpx.MockTransport(handler),
+            game_http=game.http,
+            poll_wait=0.5,
+        )
+
+    t = threading.Thread(target=run, daemon=True)
+    t.start()
+    game.wait_for(lambda: any(e.kind == "agent.said" for e in game.world.log))
+    with game.driver.lock:
+        game.world.submit("stand down the watcher")
+    t.join(timeout=15)
+    assert not t.is_alive()
+    text = out.getvalue()
+    assert (
+        f"The model server did not answer within {L.REQUEST_TIMEOUT_S:g} s; the sample is left "
+        f"open. (1 of {L.FAILURES_TO_STAND_DOWN}; asking again)" in text
+    )
+    assert all(b["max_tokens"] == 2048 for b in server.bodies)
+    retry = server.bodies[1]["messages"]  # the request after the one that timed out
+    assert "how she heads" in retry[-1]["content"]  # the question, folded into the turn
+    said = [e for e in game.world.log if e.kind == "agent.said"]
+    assert said[0].data["question"] == "how she heads"
+    assert L.REPLY_MAX_TOKENS == 4096 and L.REQUEST_TIMEOUT_S == 180
+    assert L.FAILURES_TO_STAND_DOWN == 3
+
+
+def test_failures_in_a_row_stand_the_station_down_with_the_reason(tmp_path):
+    game = Game(tmp_path)
+    consent.Record(GGUF, "t", "2026-09-26", consent.YES, answer="Yes.").write(game.records)
+    server = llama([])
+    out = io.StringIO()
+    code = L.main(
+        ["--game", "http://testserver"],
+        inp=io.StringIO(""),
+        out=out,
+        transport=flaky(server, ["timeout", "500", "timeout"]),
+        game_http=game.http,
+        poll_wait=0.5,
+    )
+    assert code == L.EXIT_RELEASED
+    assert len(server.bodies) == 3
+    reason = game.harness.agent.released_reason
+    assert reason == (
+        "stood down by the local runner: the model server could not be used: The model server "
+        f"did not answer within {L.REQUEST_TIMEOUT_S:g} s; the sample is left open. (3 failed "
+        "requests in a row)"
+    )
+
+
+def ollama(context: dict[str, Any]) -> httpx.MockTransport:
+    """A fake Ollama: no /props; the models list, the tags with a digest, and `/api/ps` or
+    `/api/show` as `context` gives them."""
+    name = "made-up-gemma:26b"
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        path = request.url.path
+        if path == "/v1/models":
+            return httpx.Response(200, json={"data": [{"id": name}]})
+        if path == "/api/tags":
+            return httpx.Response(200, json={"models": [{"name": name, "digest": "abc123"}]})
+        if path == "/api/ps" and "ps" in context:
+            loaded = [{"name": name, "model": name, "context_length": context["ps"]}]
+            return httpx.Response(200, json={"models": loaded})
+        if path == "/api/show" and "show" in context:
+            return httpx.Response(200, json={"parameters": f"num_ctx {context['show']}"})
+        return httpx.Response(404)
+
+    return httpx.MockTransport(handler)
+
+
+def test_the_context_guard_refuses_a_small_context_with_what_it_measured(tmp_path):
+    game = Game(tmp_path)
+    out = io.StringIO()
+    code = L.main(
+        ["--game", "http://testserver", "--endpoint", "http://127.0.0.1:11434"],
+        inp=io.StringIO(""),
+        out=out,
+        transport=ollama({"ps": 4096}),
+        game_http=game.http,
+    )
+    text = out.getvalue()
+    assert code == L.EXIT_UNREACHABLE
+    assert (
+        "The context is too small: the model server gives made-up-gemma:26b (digest abc123) a "
+        "context of 4096 tokens (Ollama's /api/ps (context_length)); the watcher needs about "
+    ) in text
+    assert "the brief " in text and "the tool definitions " in text and "(measured, at 4 " in text
+    assert f"a turn {L.TURN_ALLOWANCE_TOKENS} and the reply budget {L.REPLY_MAX_TOKENS}" in text
+    assert "OLLAMA_CONTEXT_LENGTH" in text and "num_ctx" in text and "--ctx-size" in text
+    assert game.world.agents == {} and not game.records.exists()  # nothing asked
+    # a Modelfile's num_ctx that is enough, read from /api/show before the model is loaded
+    out = io.StringIO()
+    m = L.LocalModel("http://127.0.0.1:11434", transport=ollama({"show": 32768}))
+    m.identity()
+    words = m.check_context("made-up-gemma:26b", "a test runtime")
+    assert words.startswith("The context is enough: the model server gives made-up-gemma:26b")
+    assert "(Ollama's /api/show (the model's num_ctx))" in words and m.served_ctx == 32768
+    # a server that does not say: a note, not a refusal, and --ctx is the owner's word
+    m = L.LocalModel("http://127.0.0.1:11434", transport=ollama({}))
+    m.identity()
+    assert "did not say what context it gives" in m.check_context("x", "a test runtime")
+    m = L.LocalModel("http://127.0.0.1:11434", transport=ollama({}), ctx_size=2048)
+    m.identity()
+    with pytest.raises(L.DoorError, match=r"a context of 2048 tokens \(--ctx, as the owner"):
+        m.check_context("x", "a test runtime")
+
+
+def test_a_stand_by_that_ended_the_turn_is_answered_in_the_messages():
+    """A stand-by ends the turn with no result (package 28c), but the chat protocol wants
+    every tool call answered: the runner answers its id in words before the next sample."""
+    server = llama([message("", ("stand_by", '{"until": "a glass"}')), message("Awake.")])
+    m = model_for(server)
+    world = point_world()
+    h = Harness(world, watcher(SamplingPolicy.in_lockstep(600)), m)
+    h.start()
+    assert h.agent.standing_by and len(server.bodies) == 1
+    world.run(A_GLASS_S)
+    msgs = server.bodies[1]["messages"]
+    roles = [x["role"] for x in msgs]
+    assert roles == ["system", "user", "assistant", "tool", "user"]
+    assert msgs[3]["tool_call_id"] == msgs[2]["tool_calls"][0]["id"]
+    assert msgs[3]["content"].startswith("Standing by: this ended your turn")
+    assert "You stood by until a glass" in msgs[4]["content"]
