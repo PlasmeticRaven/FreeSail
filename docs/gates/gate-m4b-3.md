@@ -1,6 +1,6 @@
-# Gate M4b-2: The harness and the watcher, re-cut with the doors as clients of the game
+# Gate M4b-3: The harness and the watcher, third build: the doors as clients, the playtest findings, the shelf
 
-**Verdict:** pending. This is the re-cut of gate 4b after package 28b; the first attempt's record is in `gate-m4b.md` and the `gate-m4b` release.
+**Verdict:** pending. This is the third build of gate 4b: package 28b (the doors as clients of the running game), 28c (the findings of playtests 3 and 4: the lost sample, urgent wakes a stand-by, the held call with progress, a stand-by that ends the turn, the reply budget, the consent follow-up, `strike`) and 28d (the shelf: sizes and sections in the library, `shelve`, the shelf-life, the context budget script). The first attempt's record is in `gate-m4b.md` and the `gate-m4b` release; the second build, `gate-m4b-2`, was run by the owner with Sonnet 5 (playtest 3) and Gemma 26B (playtest 4), whose findings this build carries.
 
 **The first attempt:** Not passed on this build (owner, 2026-09-27); to be re-cut after package 28b. Part A passed on the owner's run (the proofs, the scripted watcher, the practice consent at the REPL, which found two snags in the door's prompting, fixed the same day). Part B was begun with a Sonnet 5 session through Claude Desktop: consent recorded (`docs/agents/consent/2026-09-27-sonnet-5.md`), the watcher narrated and answered an `ask`, an order was refused with its authority, the opt-out tool ended the session with a save (`docs/playtests/2026-09-27-gate-4b-sonnet-watcher/`). The owner then found the door's shape unplayable: the World ran inside the MCP server, so the game could be seen only through the tool calls' readouts in the chat and the captain's orders went through a prompt menu. That was the lead's error in spec §13, not the package's; §13 is revised and package 28b turns the doors into clients of the running game, played in the browser or console as before. The items below are the first draft's and stand as its record; the re-cut gate follows spec §17 as revised.
 
@@ -17,7 +17,7 @@ Milestone 4b claims (spec M4 §10): *a language model can sit at a station on th
 
 ## What you need
 
-- Python 3.11 or newer (`py`), and the gate zip extracted to a fresh folder (below, `<the folder you extracted the gate zip into>`, for example `D:/Projects/FreeSail/FreeSail-gate-m4b-2`).
+- Python 3.11 or newer (`py`), and the gate zip extracted to a fresh folder (below, `<the folder you extracted the gate zip into>`, for example `D:/Projects/FreeSail/FreeSail-gate-m4b-3`).
 - For Part B: Claude Desktop, signed in. For Part C: Claude Code in the Desktop app.
 - For Part D: llama.cpp's `llama-server` for Windows with CUDA (`docs/agents/Harness.md` §5 says where), a GGUF of a model you would like at the station, and the Qwen3.8 27B GGUF for item 10.
 
@@ -33,7 +33,7 @@ py -m pip install -e ".[dev,server,agents]"
 ```
 py -m pytest
 ```
-*Takes about fourteen minutes. Ends `1386 passed, 7 xfailed`. The seven expected failures are the earlier rulings (truth 3 for the schooner, truth 11's ground, truth 18's times, and truths 24, 26, 28 and 31). A `failed` is a fault.*
+*Takes about fourteen minutes. Ends `1433 passed, 7 xfailed`. The seven expected failures are the earlier rulings (truth 3 for the schooner, truth 11's ground, truth 18's times, and truths 24, 26, 28 and 31). A `failed` is a fault.*
 
 **Where things are for this gate.** Every item is played in the browser window with the game started first: `py -m freesail.ui.server data/ships/frigate-36.yaml --seed 7 --wind 0,15 --heading 180`, then open `http://127.0.0.1:8000/`. Keep that terminal in sight: the game prints its lines about the model there (`FreeSail: ...`). A station is taken once in a game, so where an item says *a fresh game*, stop the game (Ctrl-C in its terminal) and start it again with the same command. The configurations for Claude Desktop and Claude Code are in `docs/agents/Harness.md` §3 and §4; the path in Claude Desktop's configuration is this gate's folder and changes with every gate.
 
@@ -43,7 +43,7 @@ The ten items of spec §17 as revised, with the scripted watcher first where it 
 
 ### Part A: the scripted watcher first (no model is asked)
 
-- [ ] **A1. The proofs.** `py -m pytest tests/test_agents.py tests/test_consent.py tests/test_agent_api.py tests/test_mcp_server.py tests/test_local_runner.py` *Ends `153 passed`.* These drive the game's agent API with the test as the door; the MCP bridge through the MCP SDK's own client against the game's app (and once as a child process over its standard streams, as Claude Desktop starts it, against the game on a local port the test opens and closes); the local runner against a fake `llama-server` and the game's app; the consent step with the scripted fake; the harness's new rule that the game does not wait (a turn that grows while the model thinks), and a game with a late-answering model replayed to the same log. No model, no network beyond this machine.
+- [ ] **A1. The proofs.** `py -m pytest tests/test_agents.py tests/test_consent.py tests/test_agent_api.py tests/test_mcp_server.py tests/test_local_runner.py` *Ends `166 passed`.* These drive the game's agent API with the test as the door; the MCP bridge through the MCP SDK's own client against the game's app (and once as a child process over its standard streams, as Claude Desktop starts it, against the game on a local port the test opens and closes); the local runner against a fake `llama-server` and the game's app; the consent step with the scripted fake; the harness's new rule that the game does not wait (a turn that grows while the model thinks), and a game with a late-answering model replayed to the same log. No model, no network beyond this machine.
 
 - [ ] **A2. The scripted watcher in the browser (items 3, 4, 6 and 9 with the fake).** Start the game with the scripted watcher:
 
