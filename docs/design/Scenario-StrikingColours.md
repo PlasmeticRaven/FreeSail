@@ -78,3 +78,15 @@ by rule (with gunnery), and the M7b director are in the plan. Beyond them:
 **Not a gap:** the mixed crew. Two stations on two ships through two doors is what the
 agent API of package 28b allows in shape; the director as a third station with a world
 channel is milestone 7b's.
+
+## The director as the world's voice (owner, 2026-09-28)
+
+A court martial can be a real proceeding: the director sits as the court, its questions
+arrive as in-world data through the speech channel of gap 1, the player answers in their
+own words, and the verdict is a world order journaled like any other, so the log shows
+afterwards who spoke and why. The same channel lets the director voice the world's people
+when no model holds their station: an enemy captain, a port admiral, a purser's clerk, a
+prisoner's guard. The discipline is the existing one: the director never speaks in the
+operator's voice; everything it causes is a journaled cause visible after the fact; and
+every person it may voice is defined by authority and channel before any model is put
+there. Scope grows from the baselines, not before them.
