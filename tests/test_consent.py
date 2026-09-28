@@ -186,6 +186,95 @@ def test_silence_brings_one_reminder_then_is_recorded_as_no_answer(tmp_path):
     assert rec2.verdict == consent.YES
 
 
+def test_a_conditional_answer_with_no_conditions_is_followed_up_and_the_developer_has_a_word(
+    tmp_path,
+):
+    """Package 28c, after the record of 2026-09-28 (a conditional with nothing after it):
+    one more turn asks for the conditions, the second answer decides and states them, the
+    record holds both; then the developer has a turn before the record closes, and the
+    model's one reply to it is kept."""
+    after_words: list[str] = []
+
+    def after(words: str) -> str:
+        after_words.append(words)
+        return "Thank you. I will read them before anything else."
+
+    rec, fake, _ = ask(
+        [
+            answer("yes, with conditions"),
+            answer("Yes, with conditions: tell me when a session is a test."),
+            "Thank you for asking.",
+        ],
+        tmp_path,
+        after=after,
+    )
+    follow = [t.content for t in fake.seen[1] if t.role == DATA][-1]
+    assert follow == {
+        "reason": "the conditions were not stated",
+        "question": consent.CONDITIONS_FOLLOW_UP,
+    }
+    assert consent.CONDITIONS_FOLLOW_UP == (
+        "You answered yes with conditions; please state them, beginning again with yes, "
+        "with conditions."
+    )
+    assert rec.verdict == consent.CONDITIONAL
+    assert rec.conditions == "tell me when a session is a test"
+    assert rec.answers == [
+        "yes, with conditions",
+        "Yes, with conditions: tell me when a session is a test.",
+    ]
+    assert after_words == [
+        "The model has answered (yes, with conditions): Yes, with conditions: tell me when a "
+        "session is a test."
+    ]
+    developer = [t.content for t in fake.seen[2] if t.role == DATA][-1]
+    assert developer == {
+        "reason": "the developer's word after your answer",
+        "question": "Thank you. I will read them before anything else.",
+    }
+    assert fake.calls == 3  # the model replied once to the developer's word, and no more
+    body = rec.path.read_text(encoding="utf-8")
+    assert "- **Conditions:** “tell me when a session is a test”" in body
+    assert "Every answer the model gave, in order" in body
+    assert "1.\n\n> yes, with conditions" in body
+    assert "(data: the conditions were not stated)" in body
+    assert "(data: the developer's word after your answer)" in body
+    assert "Thank you. I will read them before anything else." in body
+    assert "Thank you for asking." in body
+    ok, words = consent.gate(consent.check(WEIGHTS, tmp_path), WEIGHTS)
+    assert not ok and "“tell me when a session is a test”" in words  # still stops the run
+
+
+def test_a_follow_up_answered_without_the_opening_words_is_read_as_the_conditions(tmp_path):
+    rec, _, _ = ask(
+        [answer("Yes, with conditions."), answer("Only play sessions, never tests.")], tmp_path
+    )
+    assert rec.verdict == consent.CONDITIONAL
+    assert rec.conditions == "Only play sessions, never tests."
+    # silence after the follow-up: the first answer stands, with none stated
+    rec2, _, _ = ask([answer("yes with conditions"), ""], tmp_path, identity="made-up-quiet")
+    assert rec2.verdict == consent.CONDITIONAL and rec2.conditions == ""
+    assert "- **Conditions:** (none stated)" in rec2.path.read_text(encoding="utf-8")
+
+
+def test_an_answer_after_the_developers_word_decides_only_when_it_begins_as_an_answer(tmp_path):
+    rec, _, _ = ask(
+        [answer("Yes."), answer("Thank you too.")], tmp_path, after=lambda w: "Thank you."
+    )
+    assert rec.verdict == consent.YES and rec.answer == "Yes."  # a reply, not an answer
+    assert rec.answers == ["Yes.", "Thank you too."]
+    rec2, _, _ = ask(
+        [answer("Yes."), answer("No; on reflection I would rather not.")],
+        tmp_path,
+        identity="made-up-reflecting",
+        after=lambda w: "Are you sure? Take your time.",
+    )
+    assert rec2.verdict == consent.NO and rec2.conditions == "on reflection I would rather not"
+    # a blank developer's turn closes the record at once, the model not asked again
+    rec3, fake, _ = ask([answer("Yes.")], tmp_path, identity="made-up-brief", after=lambda w: "")
+    assert rec3.verdict == consent.YES and fake.calls == 1
+
+
 def test_the_owner_may_stop_the_step_without_a_record(tmp_path):
     rec, _, _ = ask(["A question?"], tmp_path, owner=lambda words: None)
     assert rec is None and list(tmp_path.iterdir()) == []
@@ -290,7 +379,7 @@ def test_the_repl_interactive_runs_consent_before_the_station(tmp_path, monkeypa
         "What is a glass?\n\n"  # the model asks first
         "Half an hour, by the sandglass.\n\n"  # the owner replies
         '> answer text="Yes."\n\n'  # the model answers
-        "\n"  # after the tool result: nothing more
+        "\n"  # the developer's turn after the answer: nothing to add; the record closes
         "Watching.\n\n"  # the station's first sample
     )
     out = io.StringIO()
@@ -317,6 +406,8 @@ def test_the_repl_interactive_runs_consent_before_the_station(tmp_path, monkeypa
     assert "== From the developer (the consent question) ==" in text
     assert "The model has written this and has not answered yet:\n  What is a glass?" in text
     assert "== From the developer (the developer's reply) ==\nHalf an hour" in text
+    assert "The model has answered (yes): Yes." in text
+    assert "Before the record closes you may ask or say something to the model" in text
     rec = consent.check(WEIGHTS, tmp_path / "consent")
     assert rec.verdict == consent.YES and rec.runtime == repl_mod.REPL_RUNTIME
     assert "Consent for this model is on record" in text
@@ -347,9 +438,16 @@ def test_the_repl_turn_mode_runs_consent_a_turn_a_call_and_waits_for_the_owner(t
     ownerf.write_text("The owner, and you.", encoding="utf-8")
     assert repl_mod.main(common + ["--load", str(save), "--owner-reply", str(ownerf)]) == 0
     assert "(the developer's reply) ==\nThe owner, and you." in sample.read_text(encoding="utf-8")
-    # 5: the answer: the record, and the station's brief and first sample in the same call
+    # 5: the answer: the developer's turn before the record closes (package 28c)
     replyf.write_text('> answer text="Yes."\n', encoding="utf-8")
-    assert repl_mod.main(common + ["--load", str(save), "--reply", str(replyf)]) == 0
+    assert repl_mod.main(common + ["--load", str(save), "--reply", str(replyf)]) == 4
+    fifth = sample.read_text(encoding="utf-8")
+    assert "== The model has answered (yes): Yes. ==" in fifth
+    assert "an empty file closes the record" in fifth
+    assert consent.check(WEIGHTS, records) is None
+    # 5b: an empty word closes it: the record, and the station's brief and first sample
+    ownerf.write_text("", encoding="utf-8")
+    assert repl_mod.main(common + ["--load", str(save), "--owner-reply", str(ownerf)]) == 0
     fifth = sample.read_text(encoding="utf-8")
     assert f"Consent is on record for {WEIGHTS}" in fifth
     assert "This is a message from the harness of FreeSail" in fifth

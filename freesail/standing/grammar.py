@@ -27,8 +27,9 @@ by the reading's kind. `parse_condition` is the seam package 26's Python API use
 condition given as dialect text, parsed alone.
 
 The book's sentences (`standing orders`, `show standing order "x"`, `belay standing
-order "x"`, `resume standing order "x"`, `belay all standing orders`) are recognised
-here too and carried out by the book (`book.py`) through `handle`.
+order "x"`, `resume standing order "x"`, `belay all standing orders`, `strike standing
+order "x"`) are recognised here too and carried out by the book (`book.py`) through
+`handle`.
 """
 
 from __future__ import annotations
@@ -67,6 +68,7 @@ __all__ = [
 # read as "belay" a line, nor "standing orders" as "standing order".
 BOOK_VERBS: tuple[str, ...] = (
     "belay all standing orders",
+    "strike standing order",
     "resume standing order",
     "belay standing order",
     "show standing order",

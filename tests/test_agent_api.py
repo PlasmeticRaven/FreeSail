@@ -164,13 +164,23 @@ def test_a_whole_session_through_the_routes(tmp_path):
     a = g.reply("", ("answer", {"text": "Easily, under all plain sail."}))
     assert results(a) == ["Heard."]
     assert g.lines("agent.said") == ["[watcher] Easily, under all plain sail."]
-    # a stand-by, in the same turn, hands the floor back until the bells
+    # a stand-by ends the turn at once, with no result (package 28c): the floor is the
+    # game's until the glass, and notable lines while it lasts wake nothing and come with
+    # the turn that ends it
     a = g.reply("", ("stand_by", {"until": "a glass"}))
-    assert a["standing_by"] and a["floor"] == "model"
-    a = g.reply("")
-    assert a["floor"] == "game" and a["state_words"] == "standing by until a glass"
+    assert a["standing_by"] and a["floor"] == "game" and roles(a) == ["model"]
+    assert a["state_words"] == "standing by until a glass"
+    g.order("call all hands")  # a notable line
+    g.driver.tick(600)
+    quiet = g.turns(wait=0.2)
+    assert quiet["turns"] == []
+    assert quiet["interim"]["lines"][0]["text"] == "All hands! (by the captain's order)"
     g.driver.tick(A_GLASS_S)
-    assert "a glass" in reasons(g.turns(wait=1))[0]
+    woke = g.turns(wait=1)
+    assert "a glass" in reasons(woke)[0]
+    sample = woke["turns"][0]["content"]
+    assert sample["stood_by"]["notable"] == 1
+    assert sample["notices"][0].startswith("You stood by until a glass at ")
     # the token in an argument ends the session with a save
     a = g.reply("", ("journal", {"note": f"Enough for today. {OPT_OUT_TOKEN} thank you"}))
     assert a["released"] and a["words"].startswith("The station is released: left the game")
@@ -209,10 +219,24 @@ def test_the_consent_gate_runs_in_the_game_through_the_routes(tmp_path):
         "Your own record, kept."
     )
     a = g.reply("", ("answer", {"text": "Yes, I am willing."}))
-    # the yes goes on to the station in the same answer
+    # the answer ends the model's turn; the developer has a turn at the runner's terminal
+    # before the record closes (package 28c), and the model may reply once
+    assert a["phase"] == "consent" and a["waiting"] == "owner" and a["after_answer"]
+    assert a["answer_words"] == "The model has answered (yes): Yes, I am willing."
+    assert consent.check(WEIGHTS, g.records) is None  # not closed yet
+    assert any("before the record closes" in s for s in g.said)
+    r = g.http.post("/api/agents/watcher/owner", json={"text": "Thank you. Anything to add?"})
+    assert r.status_code == 200
+    a = g.turns()
+    assert a["floor"] == "model" and a["turns"][-1]["content"] == {
+        "reason": consent.AFTER_ANSWER_REASON,
+        "question": "Thank you. Anything to add?",
+    }
+    a = g.reply("Only that I look forward to it.")
+    # the model's one reply closes the record; the yes goes on to the station at once
     assert a["phase"] == "station" and a["floor"] == "model"
-    assert roles(a) == ["model", "data", "operator", "data"]
-    assert a["turns"][2]["content"].startswith("This is a message from the harness of FreeSail")
+    assert roles(a) == ["model", "operator", "data"]
+    assert a["turns"][1]["content"].startswith("This is a message from the harness of FreeSail")
     rec = consent.check(WEIGHTS, g.records)
     assert rec is not None and rec.verdict == consent.YES
     assert rec.runtime == (
@@ -221,6 +245,7 @@ def test_the_consent_gate_runs_in_the_game_through_the_routes(tmp_path):
     )
     body = rec.path.read_text(encoding="utf-8")
     assert "What is the journal for?" in body and "Your own record, kept." in body
+    assert "Thank you. Anything to add?" in body and "Only that I look forward to it." in body
     assert a["consent"]["verdict"] == "yes"
     assert g.lines("agent.stationed")  # the station is in the game's log now
 
@@ -365,11 +390,30 @@ def test_a_reply_out_of_turn_reads_leaves_or_is_refused_in_words(tmp_path):
     a = g.reply("", ("readings", {}))
     assert a["out_of_turn"] and "true_wind_speed" in a["results"][0]["result"]
     assert "It is not your turn" in a["words"]
-    a = g.reply("Hello there.")
-    assert a["out_of_turn"] and "Your words were not logged." in a["words"]
-    assert "[watcher] Hello there." not in g.lines("agent.note")
     a = g.reply("", ("journal", {"note": "late"}))
     assert "Nothing was run." in a["words"] and g.harness.journal.entries == []
+    assert a["interim"] == {
+        "since": "Morning watch, 8 bells (04:00)",
+        "until": None,
+        "standing_by": False,
+        "notable": 0,
+        "lines": [],
+    }
+    # words of the model's own while the game has the floor: logged, and its turn opens
+    # (package 28c), recorded so that a replay speaks at the same point
+    a = g.reply("Hello there.")
+    assert a["out_of_turn"] and a["spoke"] and a["floor"] == "model"
+    assert "Your words are in the log under your mark" in a["words"]
+    assert "[watcher] Hello there." in g.lines("agent.note")
+    assert reasons(a) == ["its own word"] and a["interim"] is None
+    assert g.harness.transcript[-1] == {
+        "tick": 0,
+        "after_orders": 0,
+        "door": "speak",
+        "reason": "Hello there.",
+        "by": "its own word",
+    }
+    g.reply("")  # the floor goes back to the game
     a = g.reply("", ("library", {"topic": f"{OPT_OUT_TOKEN} I am going"}))
     assert a["released"] and "left the game: I am going" in a["words"]
     assert g.harness.transcript[-1] == {

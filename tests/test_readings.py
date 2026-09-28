@@ -5,6 +5,7 @@ own numbers, the absent ones' sentences, the per-tick cache, and parity with the
 from __future__ import annotations
 
 import math
+import random
 from pathlib import Path
 
 import pytest
@@ -286,3 +287,104 @@ def test_describe_value_speaks_the_nautical_units():
     assert R.describe_value(R.REGISTRY.get("heel"), math.radians(-12)) == "12 degrees"
     assert R.describe_value(R.REGISTRY.get("watch"), "middle watch") == "the middle watch"
     assert R.describe_value(R.REGISTRY.get("glass"), None) == "not to be had"
+
+
+# -- package 28c: the readings' words (playtests 1 and 3) --------------------------------
+
+
+def test_the_apparent_wind_is_named_by_the_points_of_sail():
+    """Playtest 3: 119 degrees apparent read "on the larboard bow", which is abaft the
+    beam. The words follow the primer's chapter 2: the bow, the beam, the quarter abaft
+    the beam, astern (`units.wind_bearing_words`, half a point either side of each)."""
+    row = R.REGISTRY.get("apparent_wind_angle")
+    said = {d: R.describe_value(row, math.radians(d)) for d in (-50, 84, 90, -119, 165, 180)}
+    assert said == {
+        -50: "50 degrees on the larboard bow",
+        84: "84 degrees on the starboard bow",
+        90: "90 degrees on the starboard beam",
+        -119: "119 degrees on the larboard quarter, abaft the beam",
+        165: "165 degrees astern, a little on the starboard quarter",
+        180: "180 degrees right astern",
+    }
+    # the band edges are the primer's points: seven and a half, eight and a half, fourteen
+    # and a half, fifteen and a half
+    assert units.wind_bearing_words(units.points_to_rad(7.49)).endswith("bow")
+    assert units.wind_bearing_words(units.points_to_rad(7.51)).endswith("beam")
+    assert units.wind_bearing_words(units.points_to_rad(8.51)).startswith("on the starboard q")
+    assert units.wind_bearing_words(units.points_to_rad(14.51)).startswith("astern")
+    assert units.wind_bearing_words(units.points_to_rad(15.51)) == "right astern"
+
+
+def test_course_and_leeway_are_not_readings_with_no_way_on():
+    """Playtest 1's "Leeway 145°" from a standing start and playtest 3's course NW by W
+    with the heading E by N in stays: under `READING_SPEED_FLOOR_KN` of headway the
+    course and the leeway read None, and in words say why."""
+    from freesail.agents import tools
+
+    assert R.READING_SPEED_FLOOR_KN == 0.5
+    w = make_world(7, SHIPS[0], Scenario(wind_from_deg=0.0, ship_heading_deg=180.0))
+    d = w.ship.dyn
+    assert d.u == 0.0
+    r = w.readings
+    assert r["course"] is None and r["leeway"] is None
+    words = tools.readings_words(w)
+    assert words["course"] == words["leeway"] == R.NO_WAY_WORDS
+    assert R.NO_WAY_WORDS == "no way on; course and leeway not meaningful"
+    assert queries.snapshot(w)["ship"]["leeway"] is None  # the instrument says no way on
+    # sternway, as hove to: said so
+    d.u, d.v, d.leeway = -0.6, 0.2, math.radians(160.0)
+    w.record("routine", "test.bump", "a new view")
+    assert w.readings["leeway"] is None
+    assert tools.readings_words(w)["leeway"] == R.STERNWAY_WORDS
+    # with way on, the physics' own numbers again
+    world = world_for(SHIPS[0])
+    assert world.ship.dyn.u > units.knots_to_ms(R.READING_SPEED_FLOOR_KN)
+    assert world.readings["leeway"] == world.ship.dyn.leeway
+    assert tools.readings_words(world)["course"] == units.format_heading(world.readings["course"])
+
+
+def test_the_log_writes_no_leeway_line_without_way_on(monkeypatch):
+    """The log's leeway line keeps the same floor: a ship driven astern with a side force
+    (the physics' leeway then near 180 degrees) writes no leeway line; driven ahead, it
+    does."""
+    from freesail.physics import integrate
+    from freesail.physics.sails import SailForces
+    from freesail.physics.wind import Wind, WindParams
+    from freesail.ship.loader import load_ship
+
+    wind = Wind(WindParams.from_nautical(225.0, 15.0), random.Random(0))  # never stepped
+
+    def leeway_lines(ship, seconds, thrust, side):
+        forces = SailForces(thrust, side, 0.0, 0.0, 0.0)
+        monkeypatch.setattr(integrate, "compute_sail_forces", lambda s, w: forces)
+        notes = []
+        for _ in range(seconds):
+            integrate.step(ship, 1.0, wind)
+            notes.extend(ship.drain_notes())
+        return [n for n in notes if n[1] == "ship.leeway"]
+
+    ship = load_ship(SHIPS[0])
+    ship.dyn.u = -1.0
+    astern = leeway_lines(ship, 120, -20_000.0, 30_000.0)
+    assert ship.dyn.u < 0 and abs(ship.dyn.leeway) > math.radians(90)
+    assert astern == []
+    ship = load_ship(SHIPS[0])
+    ship.dyn.u = 4.0
+    assert leeway_lines(ship, 300, 30_000.0, 40_000.0)
+
+
+def test_the_apparent_wind_is_read_before_the_clock_has_run():
+    """Playtest 3: at 04:00, before the first tick, the apparent wind read 0 knots in a
+    15-knot breeze. It is the sails model's own function over the ship as she lies, read
+    without writing anything; the first tick gives the same."""
+    w = make_world(7, SHIPS[0], Scenario(wind_from_deg=0.0, ship_heading_deg=180.0))
+    assert w.clock.tick == 0 and w.ship.dyn.apparent_wind_speed == 0.0
+    before = (w.readings["apparent_wind_angle"], w.readings["apparent_wind_speed"])
+    assert units.ms_to_knots(before[1]) > 10
+    assert R.describe_value(R.REGISTRY.get("apparent_wind_angle"), before[0]).endswith(
+        "right astern"
+    )
+    assert w.ship.dyn.apparent_wind_speed == 0.0  # nothing written
+    w.tick()
+    assert w.readings["apparent_wind_speed"] == pytest.approx(before[1], rel=0.05)
+    assert w.readings["apparent_wind_angle"] == w.ship.dyn.apparent_wind_angle

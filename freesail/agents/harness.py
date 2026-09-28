@@ -38,9 +38,25 @@ A model that answers the nudge by standing by, or by anything but the pattern, e
 the matter. The human answers a pause with `resume the watcher` or `stand down the
 watcher`, and may stand any agent down at any time.
 
-**Stand by** (`stand_by`) is a logged decision (`agent.stood_by`): sampling is
-suspended until the event or the bells, and taken up at that point (truth 44). A
-question from the captain wakes a standing-by agent.
+**Stand by** (`stand_by`) is a logged decision (`agent.stood_by`), and it ends the
+model's turn at once, at every door: no result is returned and the model is not asked
+again until the stand-by ends (package 28c; playtest 4's turn that never closed, the
+model standing by thirteen times in answer to "Standing by"). Sampling is
+suspended until the event, the bells, the interval ('a glass', '5 minutes') or a line of
+a severity ('a notable event', 'an urgent event'), and taken up at that point (truth
+44). A question from the captain wakes a standing-by agent, and so does any urgent line
+in the log, whatever the stand-by was for, with the line named as the reason (package
+28c; the owner's ruling: urgent wakes; notable is bundled and shown). The sample that
+ends a stand-by carries the notable lines logged while it lasted, counted and listed
+(`Sample.stood_by`), besides the log lines as ever; while it lasts, `interim` gives a
+door the same digest so far. A stand-by is a decision not to be sampled, not a decision
+to be blind.
+
+**The model's own word** (`own_word`, through `door_act`): a door that hands the floor
+back and waits (the MCP bridge's `say`) may speak while the game has the floor. The
+words go in the log under the mark, a stand-by ends as the model's own decision (logged
+and journaled), and the model is sampled at once; recorded like the other acts from
+outside the loop, so a replay makes it at the same point.
 
 **Determinism and replay.** The loop is tick-driven, never wall-clock-driven. The
 model's replies are the only input the World does not already hold, so the harness
@@ -152,6 +168,17 @@ NUDGE_SILENCE = (
     "leave with the token {token}."
 )
 
+# The words a stand-by takes for a severity: any line of it or above from anyone but the
+# agent ends the stand-by (package 28c).
+STAND_BY_SEVERITIES = {
+    "a notable event": "notable",
+    "notable event": "notable",
+    "a notable line": "notable",
+    "an urgent event": "urgent",
+    "urgent event": "urgent",
+    "an urgent line": "urgent",
+}
+
 # What a fold says to the model (a data turn's `folded` key), plain and exact.
 FOLDED_WORDS = (
     "Added to your open turn: what has happened since, while you had the floor. Your turn "
@@ -209,6 +236,13 @@ class Harness:
         self.allowed_tools = tuple(allowed_tools) if allowed_tools is not None else None
         self.conversation = conversation
         self._question_sent: str | None = None  # the question the open sample carries
+        # a stand-by taken ends the model's turn (package 28c); a save recorded before
+        # that rule replays by the old one, its recorded replies after a stand-by kept
+        self.stand_by_ends_turn = True
+        self._stood_at: tuple[str, str] | None = None  # (the stand-by's words, its stamp)
+        # where the present wait began (the log's length and the stamp): the stand-by's
+        # start, or the end of the last sample, for the stand-by digest and `interim`
+        self._wait_from: tuple[int, str] = (len(world.log), world.clock.stamp())
         # who is at the station, for the save and the drivers (set by the agent API)
         self.model_name = ""
         self.door = ""
@@ -311,6 +345,7 @@ class Harness:
             self.door_note = door_note
         if self.agent.released or not self.started:
             return
+        self.stand_by_ends_turn = True  # a live model plays by the rule of its time
         self.resend_brief()
         if self._open is not None:
             self.turns.append(Turn(DATA, self._open.to_dict()))
@@ -444,6 +479,11 @@ class Harness:
         sb = self.agent.stand_by
         if sb is None:
             return "nothing to stand by for"
+        others = [e for e in new if e.actor != self.actor]
+        # an urgent line wakes a stand-by whatever it was for, and is named
+        for e in others:
+            if e.severity is Severity.URGENT:
+                return f"an urgent event: {e.text}"
         if sb.until_tick is not None and self.world.clock.tick >= sb.until_tick:
             return sb.words
         if sb.event is not None:
@@ -451,22 +491,75 @@ class Harness:
             for e in new:
                 if R.event_matches(spec, e.kind, e.data):
                     return sb.words
+        if sb.severity is not None:
+            floor = Severity(sb.severity).rank
+            for e in others:
+                if e.severity.rank >= floor:
+                    return f"a {e.severity.value} event: {e.text}"
         return None
+
+    def _notable_since(self, start: int) -> list[dict[str, Any]]:
+        """The notable lines logged since `start` by anyone but the agent, as `read_log`
+        gives them (urgent lines end a stand-by, so the digest is of the notable)."""
+        world = self.world
+        return [
+            tools.log_line(world.log[i])
+            for i in range(start, len(world.log))
+            if world.log[i].actor != self.actor and world.log[i].severity is Severity.NOTABLE
+        ]
+
+    def _stood_by_digest(self, reason: str = "") -> dict[str, Any] | None:
+        """For the sample that ends a stand-by: since when, until what, and the notable
+        lines logged while it lasted, counted and listed; and, first among its notices,
+        that the model stood by, since the stand-by ended its turn with no result."""
+        sb = self.agent.stand_by
+        if sb is None:
+            return None
+        if self._stood_at is not None:
+            words, at = self._stood_at
+            self.agent.notices.insert(
+                0,
+                f"You stood by until {words} at {at}; it is now {self.world.clock.stamp()}: "
+                f"{reason or words}.",
+            )
+        start, stamp = self._wait_from
+        lines = self._notable_since(start)
+        return {"since": stamp, "until": sb.words, "notable": len(lines), "lines": lines}
+
+    def interim(self) -> dict[str, Any] | None:
+        """While the game has the floor (standing by, or waiting for the next sampling
+        point after a reply): since when, until what, and the notable lines logged since
+        the wait began, for a door to show a model that asked again (package 28c: a
+        stand-by is a decision not to be sampled, not a decision to be blind). None while
+        the model's turn is open, paused, released or not yet started."""
+        a = self.agent
+        if not self.started or a.released or a.paused or self._open is not None:
+            return None
+        start, stamp = self._wait_from
+        lines = self._notable_since(start)
+        return {
+            "since": stamp,
+            "until": a.stand_by.words if a.standing_by and a.stand_by is not None else None,
+            "standing_by": a.standing_by,
+            "notable": len(lines),
+            "lines": lines,
+        }
 
     def _resume_from_stand_by(self, reason: str) -> None:
         a = self.agent
+        digest = self._stood_by_digest(reason.rstrip(".!"))
         a.state = STATIONED
         a.stand_by = None
         a.last_heard_tick = self.world.clock.tick
         self.world.record(
             Severity.ROUTINE,
             "agent.resumed",
-            f"{self.mark} {reason[0].upper()}{reason[1:]}; the {self.station.name} is "
-            f"sampled again.",
+            f"{self.mark} {reason[0].upper()}{reason[1:].rstrip('.!')}; the "
+            f"{self.station.name} is sampled again.",
             actor=self.actor,
             data={"reason": reason},
         )
-        self._sample(reason)
+        self._sample(reason, stood_by=digest)
 
     # -- the sample --------------------------------------------------------------------
 
@@ -494,9 +587,10 @@ class Harness:
         a.notices = []
         return sample
 
-    def _sample(self, reason: str) -> None:
+    def _sample(self, reason: str, stood_by: dict[str, Any] | None = None) -> None:
         a = self.agent
         sample = self._build_sample(reason)
+        sample.stood_by = stood_by
         a.last_sample_tick = self.world.clock.tick
         a.samples += 1
         if self.conversation:
@@ -582,6 +676,7 @@ class Harness:
                 return
         # 2. the tool calls, in order, up to the budget
         results: list[dict[str, Any]] = []
+        stood = False
         for c in reply.calls:
             if self._calls_this_sample >= TOOL_CALLS_PER_SAMPLE:
                 results.append(
@@ -595,9 +690,23 @@ class Harness:
                 )
                 break
             self._calls_this_sample += 1
+            was_standing_by = self.agent.standing_by
             results.append({"name": c.name, "args": dict(c.args), "result": self._call(c)})
             if self.agent.released:
-                return
+                return  # the token or opt_out: the turn and the station end here
+            if (
+                self.stand_by_ends_turn
+                and c.name == "stand_by"
+                and self.agent.standing_by
+                and not was_standing_by
+            ):
+                # a stand-by taken ends the turn at once, at every door (package 28c,
+                # playtest 4: the result "Standing by until a glass" and the model asked
+                # again, which stood by again, thirteen times in a turn that never closed):
+                # no result is returned, the model is not called again, and the calls after
+                # it are not run; the sample that ends the stand-by says it stood by
+                stood = True
+                break
         # 3. the free text, under the mark
         text = " ".join(reply.text.split())
         if text:
@@ -610,8 +719,19 @@ class Harness:
             )
         if text or reply.calls:
             self._sample_had_words = True
+        if stood:
+            self._end_sample()
+            return
         if results and not self.agent.released:
             self.turns.append(Turn(DATA, {"tool_results": results}))
+            if self.conversation and any(
+                r.get("name") == "answer" and "args" in r for r in results
+            ):
+                # a plain conversation's turn ends with its answer, at every door alike:
+                # what follows (a follow-up, the developer's word, the record) is the
+                # caller's, and a rebuilt conversation meets the same turns (package 28c)
+                self._end_sample()
+                return
             return  # the loop in `_poll` calls the model again with the results
         self._end_sample()
 
@@ -632,6 +752,8 @@ class Harness:
         tick = self.world.clock.tick
         if a.released:
             return
+        if not a.standing_by:  # a stand-by in this turn set the start already
+            self._wait_from = (len(self.world.log), self.world.clock.stamp())
         if self._sample_had_words:
             a.last_heard_tick = tick
             if a.nudged_for == "silence":
@@ -760,7 +882,8 @@ class Harness:
         token sent out of turn, the driver's ten real minutes. It is recorded in the
         transcript at this tick and count of orders, so that a replay makes it again at
         the same point (`Playback`), and then made: `act` is "leave" (the opt-out, `by`
-        saying how) or "stand_down" (`by` saying who)."""
+        saying how), "stand_down" (`by` saying who) or "speak" (the model's own word
+        while the game has the floor, `reason` its words; `own_word`)."""
         if self.agent.released:
             return
         world = self.world
@@ -775,6 +898,8 @@ class Harness:
         )
         if act == "leave":
             self.leave(reason, how=by)
+        elif act == "speak":
+            self.own_word(reason)
         else:
             self.stand_down(reason, by=by)
 
@@ -792,7 +917,7 @@ class Harness:
     # -- the agent's own actions (through the tools) --------------------------------------
 
     def stand_by(self, until: str) -> str:
-        words = " ".join(str(until).lower().split())
+        words = " ".join(str(until).lower().split()).strip(" .!?")
         for lead in ("until ", "till ", "for "):
             words = words.removeprefix(lead)
         world = self.world
@@ -801,14 +926,21 @@ class Harness:
             if spec.absent:
                 return f"{spec.absent} Stand by for a bell or another event instead."
             sb = StandBy(words, event=words)
+        elif words in STAND_BY_SEVERITIES:
+            sb = StandBy(words, severity=STAND_BY_SEVERITIES[words])
         elif words in R.INTERVALS:
             sb = StandBy(words, until_tick=world.clock.tick + R.INTERVALS[words])
         else:
-            events = ", ".join(w for w, s in R.EVENTS.items() if not s.absent)
-            return (
-                f"'{until}' is not an event or an interval to stand by for. The events: "
-                f"{events}. The intervals: a glass, an hour, a watch."
-            )
+            seconds = _duration(words)
+            if seconds is None:
+                events = ", ".join(w for w, s in R.EVENTS.items() if not s.absent)
+                return (
+                    f"'{until}' is not an event or an interval to stand by for. The events: "
+                    f"{events}; or 'a notable event', 'an urgent event'. The intervals: a "
+                    f"glass, an hour, a watch, or minutes ('5 minutes', 'ten minutes')."
+                )
+            words = f"{words} {'has' if seconds <= 60 else 'have'} passed"
+            sb = StandBy(words, until_tick=world.clock.tick + seconds)
         a = self.agent
         a.state = STANDING_BY
         a.stand_by = sb
@@ -820,6 +952,8 @@ class Harness:
             actor=self.actor,
             data=sb.to_dict(),
         )
+        self._wait_from = (len(world.log), world.clock.stamp())
+        self._stood_at = (words, world.clock.stamp())
         self.journal.append(world, f"Stood by until {words}.", kind="agent.stood_by")
         # standing by is the answer to a nudge (spec §11)
         a.nudged_for = None
@@ -842,6 +976,52 @@ class Harness:
             data={"question": question, "station": self.station.name},
         )
         return "Heard." if question is not None else "Heard, though nothing was asked."
+
+    def own_word(self, text: str) -> None:
+        """The model speaks while the game has the floor (through `door_act`, so that a
+        replay speaks at the same point): its words go in the log under the mark; a
+        stand-by ends as its own decision, logged and journaled; and it is sampled now,
+        the sample carrying the stand-by's digest. Refused silently when there is no
+        floor to take (a turn open, paused, released): the doors check first."""
+        a = self.agent
+        world = self.world
+        if a.released or a.paused or self._open is not None or not self.started:
+            return
+        text = " ".join(str(text).split())
+        if text:
+            world.record(
+                Severity.ROUTINE,
+                "agent.note",
+                f"{self.mark} {text}",
+                actor=self.actor,
+                data={"station": self.station.name, "own_word": True},
+            )
+        a.last_heard_tick = world.clock.tick
+        digest = None
+        if a.standing_by and a.stand_by is not None:
+            digest = self._stood_by_digest("your own word")
+            until = a.stand_by.words
+            a.state = STATIONED
+            a.stand_by = None
+            world.record(
+                Severity.ROUTINE,
+                "agent.resumed",
+                f"{self.mark} The {self.station.name} ends its stand-by (until {until}) at its "
+                f"own word; it is sampled again.",
+                actor=self.actor,
+                data={"reason": "its own word", "until": until},
+            )
+            self.journal.append(
+                world, f"Ended the stand-by until {until} at my own word.", kind="agent.resumed"
+            )
+        self._sample("its own word", stood_by=digest)
+
+    def close_turn(self) -> None:
+        """A plain conversation's caller ends the model's open turn (a door that answers
+        late, after an `answer` call whose result it has) so that the next thing can be
+        put: the consent step's follow-up, or the developer's turn after the answer."""
+        if self.conversation and self._open is not None and not self.agent.released:
+            self._end_sample()
 
     def put(self, text: str, reason: str) -> None:
         """A plain conversation's next turn (the consent step): `text` is put to the model
@@ -952,6 +1132,7 @@ class Harness:
             "last_sample_tick": a.last_sample_tick,
             "model_name": self.model_name,
             "door": self.door,
+            "stand_by_ends_turn": self.stand_by_ends_turn,
             "transcript": list(self.transcript),
         }
 
@@ -1038,6 +1219,7 @@ def restore(world: World, data: dict[str, Any], model: Model | None = None) -> l
         )
         h.model_name = str(record.get("model_name") or "")
         h.door = str(record.get("door") or "")
+        h.stand_by_ends_turn = bool(record.get("stand_by_ends_turn", model is not None))
         if h._start_at <= world.clock.tick and len(world.journal) >= h._start_after_orders:
             h.start()
         out.append(h)
@@ -1066,6 +1248,18 @@ def conversation_text(content: dict[str, Any]) -> str | None:
     if content.get("question"):
         parts.append(str(content["question"]))
     return "\n\n".join(parts)
+
+
+def _duration(words: str) -> int | None:
+    """An interval in the dialect's duration words ('5 minutes', 'ten minutes', 'two
+    hours', 'half an hour'; `standing.grammar.parse_duration`), in seconds, or None."""
+    from freesail.orders.vocabulary import normalise
+    from freesail.standing.grammar import parse_duration
+
+    try:
+        return parse_duration(normalise(words).split())
+    except OrderError:
+        return None
 
 
 def _span_words(seconds: int) -> str:
