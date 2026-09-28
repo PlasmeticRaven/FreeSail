@@ -59,7 +59,7 @@ Other flags of the game: `--lockstep` (section 8), `--consent-records DIR` (wher
 }
 ```
 
-- `PYTHONPATH` is the gate folder, for example `"D:/Projects/FreeSail/FreeSail-gate-m4b"`, so that the bridge Claude Desktop starts is this gate's. Change it with every gate.
+- `PYTHONPATH` is the gate folder, for example `"D:/Projects/FreeSail/FreeSail-gate-m4b-2"`, so that the bridge Claude Desktop starts is this gate's. Change it with every gate.
 - `--game` is the game's address as it printed it. The bridge holds no game of its own; start the game first.
 - `--model-name` is the model you have chosen in Claude Desktop's model menu, written exactly as the menu shows it. The protocol tells the bridge the name of the application but not which model is answering, so the name you give here is what the consent record is kept under. **If you switch models in the menu, change this name and restart Claude Desktop**: the bridge cannot see the switch, and consent is per model.
 - `PYTHONUTF8` makes the bridge's messages safe for any character a model writes.
