@@ -116,15 +116,19 @@ REPLY_MAX_TOKENS = 4096
 # Tokens kept free for the reply in the context budget: the reply budget itself.
 REPLY_RESERVE_TOKENS = REPLY_MAX_TOKENS
 
-# How long one request may take, in real seconds (judgement: the reply budget at some
-# fifty tokens a second on a 4090 is about eighty seconds, and reading a long brief the
-# first time some tens more; three minutes is well under the watcher's patience, a
-# watch of ship's time, even at 60x, where a watch is four real minutes).
-REQUEST_TIMEOUT_S = 180.0
+# How long one request may take, in real seconds. The reply budget, not the clock, is
+# what bounds a reply; the timeout is for a server that has hung. Playtest 6 (Qwen3.8
+# 27B through Ollama, 2026-09-28) showed 180 s cutting off honest replies: a thinking
+# model composing a long note runs to the 4,096-token budget, which a 27B model at four
+# bits on a 4090 generates at some twenty to thirty tokens a second, three minutes or
+# more, after reading a prompt of some fifteen thousand tokens. Ten minutes leaves room
+# for that and still ends a hung server well inside the watcher's patience (a watch of
+# ship's time). `--request-timeout` changes it.
+REQUEST_TIMEOUT_S = 600.0
 
 # Failures in a row after which the runner stands the station down (judgement: one
 # failure is a slow or runaway request, which the budget and the timeout end; three in a
-# row, nine minutes at most, is a server that cannot serve).
+# row, half an hour at most, is a server that cannot serve).
 FAILURES_TO_STAND_DOWN = 3
 
 # Tokens allowed for one turn in the context guard (judgement: a glass's turn on the
@@ -706,6 +710,12 @@ def main(
         default=REPLY_MAX_TOKENS,
         help=f"the most tokens one reply may run to (default {REPLY_MAX_TOKENS})",
     )
+    ap.add_argument(
+        "--request-timeout",
+        type=float,
+        default=REQUEST_TIMEOUT_S,
+        help=f"real seconds one request may take (default {REQUEST_TIMEOUT_S:g})",
+    )
     ap.add_argument("--station", default="watcher", choices=["watcher"])
     ap.add_argument("--session", choices=("play", "test"), default="play")
     ap.add_argument("--ask-again", action="store_true", help="put the consent question again")
@@ -720,6 +730,7 @@ def main(
         transport=transport,
         on_reply=echo_reply(out),
         max_reply=args.max_reply,
+        timeout=args.request_timeout,
     )
     try:
         identity = model.identity()

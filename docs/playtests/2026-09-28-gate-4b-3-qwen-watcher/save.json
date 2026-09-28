@@ -1,0 +1,541 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "seed": 7,
+  "scenario": {
+    "name": "Open water",
+    "start_time": "1805-06-01T04:00:00",
+    "wind_from_deg": 0.0,
+    "wind_speed_kn": 15.0,
+    "gustiness": 0.3,
+    "variability": 0.3,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 180.0,
+    "ship_speed_kn": 0.0,
+    "latitude_deg": 50.0
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/frigate-36.yaml"
+  },
+  "end_tick": 3322,
+  "journal": [
+    [
+      19,
+      "captain",
+      "Ask the watcher Welcome aboard, is there anything I can do to help you get comfortable?"
+    ],
+    [
+      141,
+      "captain",
+      "Ask the watcher Aye, please stand by as you like"
+    ],
+    [
+      163,
+      "captain",
+      "Set plain sail"
+    ],
+    [
+      167,
+      "captain",
+      "steer 215"
+    ],
+    [
+      238,
+      "captain",
+      "standing order \"Trim Sails\": every bell then trim sails"
+    ],
+    [
+      251,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      374,
+      "captain",
+      "Ask the watcher Thank you kindly, stand by until a notable event or as you please"
+    ],
+    [
+      451,
+      "captain",
+      "Ask the watcher If you please, stand by until one bell"
+    ],
+    [
+      2302,
+      "captain",
+      "Ask the watcher Have you looked in the library yet? Try looking, picking a book to read, journaling about something you read, then shelving the book, all in turn"
+    ],
+    [
+      2765,
+      "captain",
+      "Ask the watcher Thank you kindly, man. You've done good work. If you're ready, you may journal anything you found laborious or difficult in your watch (anything tool wise that was annoying for you or could have been better), then take leave of your watch with the stop token or the opt out tool. Your work has been much appreciated."
+    ]
+  ],
+  "standing_orders": [
+    {
+      "name": "Trim Sails",
+      "text": "standing order \"Trim Sails\": every bell then trim sails",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 2038,
+      "given_tick": 238
+    }
+  ],
+  "agents": [
+    {
+      "station": {
+        "name": "watcher",
+        "authority": "none",
+        "policy": {
+          "every_s": 1800,
+          "events": [
+            "notable",
+            "urgent"
+          ],
+          "lockstep": false
+        },
+        "patience_s": 14400,
+        "brief": "You are the watcher. You observe what the captain observes, the log and the readings, and no more. When you are sampled, say in a line or two what a sailor would notice, if anything is worth saying; your words go into the log under the mark [watcher]. Say nothing when nothing has changed, or stand by until a bell or an event. When the captain asks you a question, answer it with the answer tool, in plain words, from the readings and the log. You give no orders and you are not asked to. Anything you want on the record, put in your journal."
+      },
+      "session_kind": "a play session with a human captain at the prompt",
+      "door_note": "This door is a model server on the owner's machine. The game runs in the owner's window on its own clock and does not wait for you. Your turn opens at each sampling point (the glass, a notable event, the end of a stand-by, or a question from the captain) and ends when you reply without a tool call; what happens while it is open is added to it, so your next turn carries everything since your last reply. The captain's orders and questions are typed by the owner in the game's window. Consent for these weights is on record (docs/agents/consent/2026-09-28-qwen3.8-27b-digest-aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813.md, 2026-09-28).",
+      "stationed_tick": 0,
+      "stationed_after_orders": 0,
+      "state": "released",
+      "state_words": "released: stood down by the local runner: the model server could not be used: The model server did not answer within 180 s; the sample is left open. (3 failed requests in a row)",
+      "last_sample_tick": 2765,
+      "model_name": "qwen3.8:27b (digest aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813)",
+      "door": "runner",
+      "stand_by_ends_turn": true,
+      "transcript": [
+        {
+          "tick": 68,
+          "after_orders": 1,
+          "reply": {
+            "text": "[watcher] Eight bells, the morning watch. A fresh, steady breeze from the north \u2014 fifteen knots, no more, no less \u2014 yet she lies dead in the water with every sheet furled. No way on, no heel, helm amidships. A hundred and eleven hands on deck, fresh, watching a clear sky and a ship that is not going anywhere. All quiet, but it is the quiet of held-breath, not of calm; canvas and breeze both waiting for a word.",
+            "calls": [],
+            "raw": "[watcher] Eight bells, the morning watch. A fresh, steady breeze from the north \u2014 fifteen knots, no more, no less \u2014 yet she lies dead in the water with every sheet furled. No way on, no heel, helm amidships. A hundred and eleven hands on deck, fresh, watching a clear sky and a ship that is not going anywhere. All quiet, but it is the quiet of held-breath, not of calm; canvas and breeze both waiting for a word."
+          }
+        },
+        {
+          "tick": 96,
+          "after_orders": 1,
+          "reply": {
+            "text": "[watcher] Thank you, sir. The station is comfortable enough \u2014 the log, the readings, the glass all at hand. For the moment there is little to add to what you can see for yourself: dead calm as to motion, still not quite a soul's drift forward, the breeze down a knot to fourteen and still clean from the north. All sails furled, no heel, helm easy. If you'll be making sail, I shall have the wind and her angle to it noted at every glass, and I'll say so when something turns. Nothing more I need but my eyes on the log.",
+            "calls": [],
+            "raw": "[watcher] Thank you, sir. The station is comfortable enough \u2014 the log, the readings, the glass all at hand. For the moment there is little to add to what you can see for yourself: dead calm as to motion, still not quite a soul's drift forward, the breeze down a knot to fourteen and still clean from the north. All sails furled, no heel, helm easy. If you'll be making sail, I shall have the wind and her angle to it noted at every glass, and I'll say so when something turns. Nothing more I need but my eyes on the log."
+          }
+        },
+        {
+          "tick": 125,
+          "after_orders": 1,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "No more to request than I said a glass ago, sir \u2014 the log at my elbow and the readings in plain words are all the comfort the station wants. She is just as she was, and a touch forward: one knot, no leeway, wind still clean from the north at fourteen. Every canvas still furled. I'll note the wind and her motion at each bell and speak when something turns; otherwise I'll stand by quietly."
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"answer\", \"arguments\": \"{\\\"text\\\":\\\"No more to request than I said a glass ago, sir \u2014 the log at my elbow and the readings in plain words are all the comfort the station wants. She is just as she was, and a touch forward: one knot, no leeway, wind still clean from the north at fourteen. Every canvas still furled. I'll note the wind and her motion at each bell and speak when something turns; otherwise I'll stand by quietly.\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 139,
+          "after_orders": 1,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a notable event"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a notable event\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 157,
+          "after_orders": 2,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a notable event"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a notable event\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 187,
+          "after_orders": 4,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "Understood, sir \u2014 standing by. I see in the log that \"set plain sail\" has been given; I'll take note of the wind and her motion at every step of the work, and report when the sails are up or if anything stirs."
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"answer\", \"arguments\": \"{\\\"text\\\":\\\"Understood, sir \u2014 standing by. I see in the log that \\\\\\\"set plain sail\\\\\\\" has been given; I'll take note of the wind and her motion at every step of the work, and report when the sails are up or if anything stirs.\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 198,
+          "after_orders": 4,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "read_log",
+                "args": {
+                  "since_tick": 141
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"read_log\", \"arguments\": \"{\\\"since_tick\\\":141}\"}]"
+          }
+        },
+        {
+          "tick": 279,
+          "after_orders": 6,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "04:02 \u2014 \"Set plain sail\" given; hands aloft fore, main and mizzen at once, plus jib, staysails and spanker. Work short-handed: seven hands to mizzen topgallant, eight to spanker. Helm ordered SW by S (215\u00b0) \u2014 a run, sensible for a 15-knot northerly. Speed already 2 knots, leeway 1\u00b0 to larboard. All sails still furled as of my last reading; expect them to fill as they are loosed. Captain asked me to stand by as I like \u2014 I shall note wind, motion and the state of each sail, and speak on anything notable or at once."
+                }
+              },
+              {
+                "name": "shelve",
+                "args": {
+                  "book": "book 1"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"journal\", \"arguments\": \"{\\\"note\\\":\\\"04:02 \u2014 \\\\\\\"Set plain sail\\\\\\\" given; hands aloft fore, main and mizzen at once, plus jib, staysails and spanker. Work short-handed: seven hands to mizzen topgallant, eight to spanker. Helm ordered SW by S (215\u00b0) \u2014 a run, sensible for a 15-knot northerly. Speed already 2 knots, leeway 1\u00b0 to larboard. All sails still furled as of my last reading; expect them to fill as they are loosed. Captain asked me to stand by as I like \u2014 I shall note wind, motion and the state of each sail, and speak on anything notable or at once.\\\"}\"}, {\"name\": \"shelve\", \"arguments\": \"{\\\"book\\\":\\\"book 1\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 337,
+          "after_orders": 6,
+          "reply": {
+            "text": "[watcher] Plain-sailing work is under way, sir. The main and mizzen topsails are laid aloft and loosed to fill, the jib and fore topmast staysail are up, and the helm has swung the bow from due south to SSW \u2014 a broad reach, taking the northerly 14-knot wind on the starboard quarter. She's made two knots and is carrying seven degrees of leeway to the larboard, which is what a reach in that wind should give her. The yards are being braced in turn \u2014 not hands enough for all at once \u2014 so the run of the work will take another few bells. I'll note each stage and speak when the sails are set or if anything stirs.",
+            "calls": [],
+            "raw": "[watcher] Plain-sailing work is under way, sir. The main and mizzen topsails are laid aloft and loosed to fill, the jib and fore topmast staysail are up, and the helm has swung the bow from due south to SSW \u2014 a broad reach, taking the northerly 14-knot wind on the starboard quarter. She's made two knots and is carrying seven degrees of leeway to the larboard, which is what a reach in that wind should give her. The yards are being braced in turn \u2014 not hands enough for all at once \u2014 so the run of the work will take another few bells. I'll note each stage and speak when the sails are set or if anything stirs."
+          }
+        },
+        {
+          "tick": 411,
+          "after_orders": 7,
+          "reply": {
+            "text": "[watcher] The fore yard is braced to the square \u2014 canvas all in, and she's making 3 knots on SW by S with a light heel and three degrees of leeway to larboard, as the wind will give. Main and mizzen topsails are sheeted, the fore topgallant loose to fill. Nothing amiss; the trim looks right for a broad reach. I'll keep note and stand by the glass.",
+            "calls": [],
+            "raw": "[watcher] The fore yard is braced to the square \u2014 canvas all in, and she's making 3 knots on SW by S with a light heel and three degrees of leeway to larboard, as the wind will give. Main and mizzen topsails are sheeted, the fore topgallant loose to fill. Nothing amiss; the trim looks right for a broad reach. I'll keep note and stand by the glass."
+          }
+        },
+        {
+          "tick": 429,
+          "after_orders": 7,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a notable event"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a notable event\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 465,
+          "after_orders": 8,
+          "reply": {
+            "text": "[watcher] The yards are braced all the way \u2014 main topgallant, main royal, and mizzen topsail yard brought to the square this bell, the last of the set. She holds four knots on SW by S, the wind steady at fourteen on the starboard quarter, helm and leeway small. The plain sail is making way as it should. Standing by until the next bell or any turn in the wind.",
+            "calls": [],
+            "raw": "[watcher] The yards are braced all the way \u2014 main topgallant, main royal, and mizzen topsail yard brought to the square this bell, the last of the set. She holds four knots on SW by S, the wind steady at fourteen on the starboard quarter, helm and leeway small. The plain sail is making way as it should. Standing by until the next bell or any turn in the wind."
+          }
+        },
+        {
+          "tick": 480,
+          "after_orders": 8,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "1 bell"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"1 bell\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 2156,
+          "after_orders": 8,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "Done, sir \u2014 one bell is past, and here is the state of it: she is full and fair under course, tops and topgallants of every mast with spanker, staysails and jib; seven knots on a course SSW by S, the wind up quietly to sixteen out of the north, no heel, no leeway, helm nearly off. The standing order \"Trim Sails\" was met at the bell and the yards and sheets are trimmed to the wind on the quarter. All quiet and working well. I'll stand by until the next bell or any turn you ask for attention to."
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"answer\", \"arguments\": \"{\\\"text\\\":\\\"Done, sir \u2014 one bell is past, and here is the state of it: she is full and fair under course, tops and topgallants of every mast with spanker, staysails and jib; seven knots on a course SSW by S, the wind up quietly to sixteen out of the north, no heel, no leeway, helm nearly off. The standing order \\\\\\\"Trim Sails\\\\\\\" was met at the bell and the yards and sheets are trimmed to the wind on the quarter. All quiet and working well. I'll stand by until the next bell or any turn you ask for attention to.\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 2183,
+          "after_orders": 8,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a notable event"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a notable event\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 2317,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "topic": "contents"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"library\", \"arguments\": \"{\\\"topic\\\":\\\"contents\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 2404,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "topic": "primer 4"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"library\", \"arguments\": \"{\\\"topic\\\":\\\"primer 4\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 2429,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "topic": "primer 4",
+                  "section": "The trim order"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"library\", \"arguments\": \"{\\\"topic\\\":\\\"primer 4\\\",\\\"section\\\":\\\"The trim order\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 2488,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Read in the library, primer 4 (Trimming), the section \"The trim order\": the plain order is \"trim sails\", which braces every yard that has sail set to the best angle to the present apparent wind (each yard as its own brace evolution, the after yards a little sharper than the head yards on a wind) and at once sheets the fore-and-aft sails. \"Trim the yards\" and \"trim the sheets\" are the halves. This matches what we saw at one bell: standing order \"Trim Sails\" braced 12 yards and trimmed the spanker, staysail and jib. The chapter also holds \"Pointing: how close she lies, and what it costs\" and weather helm / lee helm \u2014 worth a second look if she comes to lie up."
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"journal\", \"arguments\": \"{\\\"note\\\":\\\"Read in the library, primer 4 (Trimming), the section \\\\\\\"The trim order\\\\\\\": the plain order is \\\\\\\"trim sails\\\\\\\", which braces every yard that has sail set to the best angle to the present apparent wind (each yard as its own brace evolution, the after yards a little sharper than the head yards on a wind) and at once sheets the fore-and-aft sails. \\\\\\\"Trim the yards\\\\\\\" and \\\\\\\"trim the sheets\\\\\\\" are the halves. This matches what we saw at one bell: standing order \\\\\\\"Trim Sails\\\\\\\" braced 12 yards and trimmed the spanker, staysail and jib. The chapter also holds \\\\\\\"Pointing: how close she lies, and what it costs\\\\\\\" and weather helm / lee helm \u2014 worth a second look if she comes to lie up.\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 2508,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "shelve",
+                "args": {
+                  "book": "book 4"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"shelve\", \"arguments\": \"{\\\"book\\\":\\\"book 4\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 2551,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "shelve",
+                "args": {
+                  "book": "book 2"
+                }
+              },
+              {
+                "name": "shelve",
+                "args": {
+                  "book": "book 3"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"shelve\", \"arguments\": \"{\\\"book\\\":\\\"book 2\\\"}\"}, {\"name\": \"shelve\", \"arguments\": \"{\\\"book\\\":\\\"book 3\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 2612,
+          "after_orders": 9,
+          "reply": {
+            "text": "[watcher] I had, sir \u2014 with your leave. I took the primer, chapter four on trimming. The plain order is simply \"trim sails\": every yard that carries a sail is braced to the best angle for the present wind, the after yards a touch sharper than the head yards, and the fore-and-aft sails \u2014 spanker, staysails \u2014 are trimmed with them; \"trim the yards\" and \"trim the sheets\" are its two halves. That is exactly the working I logged this bell under the standing order, so the book and the log agree. I have set the matter down in my journal and put the book back on the shelf. She is running clean at seven knots on her SSW course, the wind holding at sixteen from the north. I'll stand by until a turn.",
+            "calls": [],
+            "raw": "[watcher] I had, sir \u2014 with your leave. I took the primer, chapter four on trimming. The plain order is simply \"trim sails\": every yard that carries a sail is braced to the best angle for the present wind, the after yards a touch sharper than the head yards, and the fore-and-aft sails \u2014 spanker, staysails \u2014 are trimmed with them; \"trim the yards\" and \"trim the sheets\" are its two halves. That is exactly the working I logged this bell under the standing order, so the book and the log agree. I have set the matter down in my journal and put the book back on the shelf. She is running clean at seven knots on her SSW course, the wind holding at sixteen from the north. I'll stand by until a turn."
+          }
+        },
+        {
+          "tick": 2690,
+          "after_orders": 9,
+          "reply": {
+            "text": "[watcher] I have, sir \u2014 five minutes past: I looked through the contents, took primer four on trimming, read the chapter's \"trim order\" in full, set what I took from it in my journal, and shelved the book in its place. The one thing worth repeating is that the order \"trim sails\" braces every square yard to the best angle for the wind *and* trims the fore-and-aft sheets together, which is just the working we saw done under the standing order at the bell. If you'd like me to turn another book \u2014 the chapter on pointing and close-hauled work, or the grammar of the orders \u2014 say the word; otherwise I'll stand by again. She runs unchanged: seven knots, SSW by S, wind sixteen from the north, no heel, no leeway.",
+            "calls": [],
+            "raw": "[watcher] I have, sir \u2014 five minutes past: I looked through the contents, took primer four on trimming, read the chapter's \"trim order\" in full, set what I took from it in my journal, and shelved the book in its place. The one thing worth repeating is that the order \"trim sails\" braces every square yard to the best angle for the wind *and* trims the fore-and-aft sheets together, which is just the working we saw done under the standing order at the bell. If you'd like me to turn another book \u2014 the chapter on pointing and close-hauled work, or the grammar of the orders \u2014 say the word; otherwise I'll stand by again. She runs unchanged: seven knots, SSW by S, wind sixteen from the north, no heel, no leeway."
+          }
+        },
+        {
+          "tick": 2754,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "topic": "contents"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"library\", \"arguments\": \"{\\\"topic\\\":\\\"contents\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 2781,
+          "after_orders": 10,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "topic": "primer 2",
+                  "section": "all"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"library\", \"arguments\": \"{\\\"topic\\\":\\\"primer 2\\\",\\\"section\\\":\\\"all\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 3322,
+          "after_orders": 10,
+          "door": "stand_down",
+          "reason": "the model server could not be used: The model server did not answer within 180 s; the sample is left open. (3 failed requests in a row)",
+          "by": "the local runner"
+        }
+      ]
+    }
+  ],
+  "agent_journals": {
+    "watcher": [
+      {
+        "tick": 139,
+        "stamp": "Morning watch (04:02)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a notable event."
+      },
+      {
+        "tick": 157,
+        "stamp": "Morning watch (04:02)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a notable event."
+      },
+      {
+        "tick": 279,
+        "stamp": "Morning watch (04:04)",
+        "kind": "note",
+        "text": "04:02 \u2014 \"Set plain sail\" given; hands aloft fore, main and mizzen at once, plus jib, staysails and spanker. Work short-handed: seven hands to mizzen topgallant, eight to spanker. Helm ordered SW by S (215\u00b0) \u2014 a run, sensible for a 15-knot northerly. Speed already 2 knots, leeway 1\u00b0 to larboard. All sails still furled as of my last reading; expect them to fill as they are loosed. Captain asked me to stand by as I like \u2014 I shall note wind, motion and the state of each sail, and speak on anything notable or at once."
+      },
+      {
+        "tick": 429,
+        "stamp": "Morning watch (04:07)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a notable event."
+      },
+      {
+        "tick": 480,
+        "stamp": "Morning watch (04:08)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until 1 bell have passed."
+      },
+      {
+        "tick": 2183,
+        "stamp": "Morning watch (04:36)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a notable event."
+      },
+      {
+        "tick": 2488,
+        "stamp": "Morning watch (04:41)",
+        "kind": "note",
+        "text": "Read in the library, primer 4 (Trimming), the section \"The trim order\": the plain order is \"trim sails\", which braces every yard that has sail set to the best angle to the present apparent wind (each yard as its own brace evolution, the after yards a little sharper than the head yards on a wind) and at once sheets the fore-and-aft sails. \"Trim the yards\" and \"trim the sheets\" are the halves. This matches what we saw at one bell: standing order \"Trim Sails\" braced 12 yards and trimmed the spanker, staysail and jib. The chapter also holds \"Pointing: how close she lies, and what it costs\" and weather helm / lee helm \u2014 worth a second look if she comes to lie up."
+      },
+      {
+        "tick": 3322,
+        "stamp": "Morning watch (04:55)",
+        "kind": "agent.stopped",
+        "text": "Stood down by the local runner: the model server could not be used: The model server did not answer within 180 s; the sample is left open. (3 failed requests in a row)."
+      }
+    ]
+  }
+}
