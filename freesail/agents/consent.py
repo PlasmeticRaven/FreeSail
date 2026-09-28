@@ -116,12 +116,13 @@ DOOR_TEXT = {
         "answer; nothing is decided until you call answer."
     ),
     "mcp": (
-        "Through Claude Desktop the harness sees only tool calls, not the text of the chat. "
-        "You answer with the answer tool; anything you write in the chat reaches me directly "
-        "but not the harness, so it is in the record only if I add it. The tools that run "
-        "here are answer and opt_out; the others are refused until you have answered. If you "
-        "answer yes, the station brief is the result of the next tool call, in this chat or "
-        "in a new one I start."
+        "Through an MCP client (Claude Desktop, or Claude Code opened on the game's folder) "
+        "the harness sees only tool calls, not the text of the chat. You answer with the "
+        "answer tool; anything you write in the chat reaches me directly but not the harness, "
+        "so it is in the record only if I add it. The tools that run here are answer and "
+        "opt_out; the others are refused until you have answered. If you answer yes, the "
+        "station brief comes back in the answer's own result, and any later chat that starts "
+        "with the brief prompt reads it again."
     ),
 }
 
