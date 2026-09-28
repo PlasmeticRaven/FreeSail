@@ -1,19 +1,21 @@
-"""The local runner (spec M4 §13): a door for a model served on this machine through an
-OpenAI-compatible chat-completions endpoint with tool calling, which is what llama.cpp's
-`llama-server` serves (and Ollama, on its own port).
+"""The local runner (spec M4 §13 as revised; package 28b): a door for a model served on
+this machine through an OpenAI-compatible chat-completions endpoint with tool calling,
+which is what llama.cpp's `llama-server` serves (and Ollama, on its own port). It is a
+client of the running game and of the endpoint, and builds no World.
 
-    python -m freesail.agents.local <ship or save> --endpoint URL [--model NAME]
-        [--seed N] [--sampling-seed N] [--temperature T] [--ctx-size N]
-        [--station watcher] [--session play|test] [--ticks N]
-        [--wind FROM,KN] [--heading DEG] [--standing-orders FILE]
-        [--save PATH] [--records DIR] [--ask-again]
+    python -m freesail.agents.local --game http://localhost:8000 --endpoint http://localhost:8080
+        [--model NAME] [--seed N] [--temperature T] [--ctx N] [--station watcher]
+        [--session play|test] [--ask-again]
 
-reads the served model's identity (`LocalModel.identity`), runs the consent step for it
-(`consent.py`) unless a yes is on record, and then stations the watcher in lockstep
-against the endpoint: the World waits at each sampling point while the model answers.
-With `--ticks N` it runs that many seconds of ship's time and stands the watcher down;
-without, it opens the console (`freesail.ui.console.Console`) so the owner is the
-captain at the prompt (`tick 1800`, `ask the watcher ...`, `stand down the watcher`).
+It reads the served model's identity (`LocalModel.identity`), stations it through the
+game's agent API with that identity (`remote.GameClient`; the game runs the consent gate:
+the consent conversation for weights with no record, the station brief after a yes,
+refused in words otherwise), then loops: poll the game for turns, send the endpoint the
+conversation when the floor is the model's, deliver its reply to the game, until the
+station is released or Ctrl-C, which releases it. What the model writes without
+answering in the consent conversation is shown at this terminal and the owner's reply
+typed here goes back to it (`owner>`), as with package 28's runner. The owner plays the
+game in its own window meanwhile; the watcher's lines are in its log.
 
 **The wire.** `LocalModel.reply(turns)` translates package 27's turns into the messages
 array: the latest operator turn (the brief) is the `system` message; a data turn that
@@ -50,15 +52,14 @@ import argparse
 import json
 import sys
 from collections.abc import Callable, Sequence
-from pathlib import Path
 from typing import Any
 
 import httpx
 
 from freesail.agents import consent
-from freesail.agents.agent import A_GLASS_S, SESSION_PLAY, SESSION_TEST, SamplingPolicy, watcher
-from freesail.agents.harness import Harness, conversation_text
+from freesail.agents.harness import conversation_text
 from freesail.agents.model import DATA, MODEL, OPERATOR, Reply, ToolCall, Turn
+from freesail.agents.remote import GameClient, GameError, turn_from_dict
 from freesail.agents.tools import TOOLS, parameters_schema, tool_names
 
 __all__ = [
@@ -446,12 +447,33 @@ def _error_words(r: httpx.Response) -> str:
 
 
 # ---------------------------------------------------------------------------
-# The command
+# The command: a client of the game and of the endpoint
 # ---------------------------------------------------------------------------
 
-ROOT = Path(__file__).resolve().parents[2]
-SAVES_DIR = ROOT / "saves"
-STATIONS = {"watcher": watcher}
+# The browser game's address as its driver prints it (`freesail.ui.server --port 8000`).
+DEFAULT_GAME = "http://localhost:8000"
+
+# How long one poll of the game waits for the model's next turn, in real seconds
+# (judgement: long enough that an idle runner asks the game a few times a minute, short
+# enough that Ctrl-C between polls is prompt; the game answers at once when a turn opens).
+POLL_WAIT_S = 30.0
+
+# The door's words in the brief (the head's documentation item), plain and exact.
+RUNNER_NOTE = (
+    "This door is a model server on the owner's machine. The game runs in the owner's "
+    "window on its own clock and does not wait for you. Your turn opens at each sampling "
+    "point (the glass, a notable event, the end of a stand-by, or a question from the "
+    "captain) and ends when you reply without a tool call; what happens while it is open "
+    "is added to it, so your next turn carries everything since your last reply. The "
+    "captain's orders and questions are typed by the owner in the game's window."
+)
+
+# Exit codes: 0 is not used by a run that was stationed (it ends released); 2 the game or
+# the model server could not be used; 3 the station was released; 5 no station, because
+# consent is not a yes on record (as the REPL and package 28's runner).
+EXIT_UNREACHABLE = 2
+EXIT_RELEASED = 3
+EXIT_NO_CONSENT = 5
 
 
 def echo_reply(out) -> Callable[[Reply], None]:
@@ -465,170 +487,145 @@ def echo_reply(out) -> Callable[[Reply], None]:
     return show
 
 
-def save_to(path: Path | None, out=None) -> Callable[[Any, str], str]:
-    """The harness's save callback: the given path, or `saves/` under the repository
-    (ignored by git) named by seed and tick."""
-    from freesail.core import replay as replay_mod
-
-    def save(world: Any, reason: str) -> str:
-        p = path or SAVES_DIR / f"freesail-seed{world.seed}-tick{world.clock.tick}.json"
-        Path(p).parent.mkdir(parents=True, exist_ok=True)
-        written = replay_mod.save_to_file(world, p)
-        if out is not None:
-            print(f"Saved to {written} ({reason}).", file=out, flush=True)
-        return str(written)
-
-    return save
-
-
-def main(argv: list[str] | None = None, *, inp=None, out=None, transport=None) -> int:
+def main(
+    argv: list[str] | None = None,
+    *,
+    inp=None,
+    out=None,
+    transport=None,
+    game_transport=None,
+    game_http=None,
+    poll_wait: float = POLL_WAIT_S,
+) -> int:
+    """The runner's command. `transport` is the model server's (tests: a fake
+    `llama-server`), `game_transport` or `game_http` the game's (tests: the game's app)."""
     inp = inp or sys.stdin
     out = out or sys.stdout
-    ap = argparse.ArgumentParser(description="FreeSail: the local runner for a served model")
-    ap.add_argument("target", nargs="?", help="a ship file (data/ships/...) or a save (.json)")
-    ap.add_argument("--endpoint", default=DEFAULT_ENDPOINT, help="the server's address")
+    ap = argparse.ArgumentParser(description="FreeSail: the local runner, a client of the game")
+    ap.add_argument(
+        "--game",
+        default=DEFAULT_GAME,
+        help=f"the running game's address (default {DEFAULT_GAME}, the browser game)",
+    )
+    ap.add_argument("--endpoint", default=DEFAULT_ENDPOINT, help="the model server's address")
     ap.add_argument("--model", default="", help="the model's name, where the server serves several")
-    ap.add_argument("--seed", type=int, default=1805, help="the game's seed")
-    ap.add_argument("--sampling-seed", type=int, help="the model's sampling seed (default: --seed)")
+    ap.add_argument("--seed", type=int, help="the model's sampling seed (default: the server's)")
     ap.add_argument(
         "--temperature", type=float, help="the model's temperature (default: the server's)"
     )
     ap.add_argument(
-        "--ctx-size", type=int, help="the context to budget against (default: the server's)"
+        "--ctx",
+        "--ctx-size",
+        dest="ctx",
+        type=int,
+        help="the context to budget against (default: the server's)",
     )
-    ap.add_argument("--station", default="watcher")
+    ap.add_argument("--station", default="watcher", choices=["watcher"])
     ap.add_argument("--session", choices=("play", "test"), default="play")
-    ap.add_argument("--ticks", type=int, help="run this many seconds of ship's time, then stop")
-    ap.add_argument("--wind", help="wind as 'FROM_DEG,KNOTS'")
-    ap.add_argument("--heading", type=float)
-    ap.add_argument("--standing-orders", help="a file of standing orders to give at the start")
-    ap.add_argument("--save", help="where the game is saved (default: saves/ in the repository)")
-    ap.add_argument("--records", default=str(consent.RECORDS_DIR), help="the consent records")
     ap.add_argument("--ask-again", action="store_true", help="put the consent question again")
     args = ap.parse_args(argv)
 
-    if args.station not in STATIONS:
-        print(f"No station '{args.station}'; the stations: {', '.join(STATIONS)}.", file=out)
-        return 2
     model = LocalModel(
         args.endpoint,
         model=args.model,
-        seed=args.sampling_seed if args.sampling_seed is not None else args.seed,
+        seed=args.seed,
         temperature=args.temperature,
-        ctx_size=args.ctx_size,
+        ctx_size=args.ctx,
         transport=transport,
         on_reply=echo_reply(out),
     )
     try:
         identity = model.identity()
-        runtime = f"FreeSail's local runner, {model.server_words()}"
+        server = model.server_words()
     except DoorError as e:
         print(str(e), file=out, flush=True)
-        return 2
-    record = consent.ensure(
-        identity,
-        runtime,
-        model,
-        door="runner",
-        owner=consent.terminal_owner(inp, out),
-        records_dir=Path(args.records),
-        ask_again=args.ask_again,
-        out=out,
-    )
-    if record is None:
-        return 5
-    model.on_reply = None  # at the station the log shows what the model says
-    return run_station(args, model, record, out, inp)
-
-
-def run_station(args: argparse.Namespace, model: LocalModel, record: Any, out, inp) -> int:
-    from freesail.agents.repl import open_world
-    from freesail.ui.console import Console, read_standing_orders
-
-    world = open_world(args.target, args.seed, args.wind, args.heading)
-    save = save_to(Path(args.save) if args.save else None, out)
-    note = f"Consent for these weights is on record ({consent._rel(record.path)}, {record.date})."
-    session = SESSION_PLAY if args.session == "play" else SESSION_TEST
-    policy = SamplingPolicy.in_lockstep(A_GLASS_S, "notable", "urgent")
-    existing = world.agents.get(args.station)
-    if existing is not None:
-        if existing.agent.released:
-            print(
-                f"The save's {args.station} was released ({existing.agent.released_reason}); a "
-                "station is taken once in a game. Start from the ship file or another save.",
-                file=out,
-            )
-            return 2
-        h = existing
-        h.take_over(model, save=save, door_note=note)
-    else:
-        h = Harness(
-            world,
-            STATIONS[args.station](policy),
-            model,
-            session_kind=session,
-            save=save,
-            door_note=note,
-        )
-        h.start()
-    if args.standing_orders:
-        read_standing_orders(world, args.standing_orders)
-
-    def check() -> bool:
-        if model.failed is not None and not h.agent.released:
-            print(model.failed, file=out, flush=True)
-            h.stand_down("the model server could not be used", by="the runner")
-        return h.agent.released
-
-    if args.ticks is not None:
-        for e in world.log.all():
-            print(e.line(), file=out)
-        world.log.subscribe(lambda e: print(e.line(), file=out, flush=True))
-        try:
-            for _ in range(args.ticks):
-                world.tick()
-                if check():
-                    break
-        except KeyboardInterrupt:
-            print("Stopped at the owner's word (Ctrl-C).", file=out, flush=True)
-        if not h.agent.released:
-            h.stand_down("the run's ticks are spent", by="the runner")
-        return 3 if h.agent.released else 0
-
-    class RunnerConsole(Console):
-        def _tick_owed(self, owed: float, period: float) -> float:
-            owed = super()._tick_owed(owed, period)
-            with self.lock:
-                check()
-            return owed
-
-        def handle_line(self, line: str) -> bool:
-            going = super().handle_line(line)
-            check()
-            return going
-
-    console = RunnerConsole(world, compression=1.0, out=out)
-    for e in world.log.all():
-        console._print(e.line())
-    console._print(
-        f"FreeSail local runner. The {args.station} is {record.identity}, in lockstep: the World "
-        "waits while it answers. Type 'tick 1800' for a glass, 'ask the watcher ...', "
-        "'stand down the watcher', 'help', or 'quit'."
-    )
+        return EXIT_UNREACHABLE
+    print(f"The model server serves {identity}.", file=out, flush=True)
+    game = GameClient(args.game, args.station, transport=game_transport, http=game_http)
     try:
-        if inp is sys.stdin and sys.stdin.isatty():
-            console.run_interactive()
-        else:
-            for line in inp:
-                with console.lock:
-                    if not console.handle_line(line):
-                        break
+        first = game.station(
+            identity,
+            "runner",
+            door_note=RUNNER_NOTE,
+            session_kind=args.session,
+            client=server,
+            ask_again=args.ask_again,
+        )
+    except GameError as e:
+        print(e.words, file=out, flush=True)
+        return EXIT_NO_CONSENT if e.status == 403 else EXIT_UNREACHABLE
+    print(first.get("words") or f"The {args.station} is stationed.", file=out, flush=True)
+    return run(game, model, first, inp=inp, out=out, poll_wait=poll_wait)
+
+
+def run(
+    game: GameClient,
+    model: LocalModel,
+    first: dict[str, Any],
+    *,
+    inp: Any,
+    out: Any,
+    poll_wait: float = POLL_WAIT_S,
+) -> int:
+    """The loop: poll the game for turns, send the endpoint the conversation when the
+    floor is the model's, deliver its reply, until the station is released or Ctrl-C
+    (which releases it). The owner answers what the model writes in the consent
+    conversation at this terminal, as with package 28's runner."""
+    owner = consent.terminal_owner(inp, out)
+    turns: list[Turn] = []
+    a = first
+
+    def took(answer: dict[str, Any]) -> dict[str, Any]:
+        new = [turn_from_dict(t) for t in answer.get("turns") or []]
+        for t in new:
+            if t.role == DATA and "readings" in t.content:
+                how = "added to the open turn" if t.content.get("folded") else "a turn"
+                print(
+                    f"== {t.content.get('stamp')}: {how}, {t.content.get('reason')} ==",
+                    file=out,
+                    flush=True,
+                )
+        turns.extend(new)
+        return answer
+
+    took(a)
+    try:
+        while True:
+            if a.get("released"):
+                print(a.get("words") or "The station is released.", file=out, flush=True)
+                return EXIT_NO_CONSENT if a.get("phase") == "stopped" else EXIT_RELEASED
+            if a.get("waiting") == "owner":
+                words = owner(str(a.get("model_words") or ""))
+                if not words or not words.strip():
+                    a = game.owner("")
+                    continue
+                game.owner(words)
+                a = took(game.turns(wait=0))
+                continue
+            if a.get("floor") == "model":
+                offered = tuple(a.get("tools") or ())
+                model.offered_tools = offered or None
+                r = model.reply(turns)
+                if r is None:
+                    why = model.failed or "the model server gave no reply"
+                    print(why, file=out, flush=True)
+                    a = game.release(f"the model server could not be used: {why}")
+                    print(a.get("words") or "", file=out, flush=True)
+                    return EXIT_RELEASED
+                a = took(game.reply(r))
+                continue
+            a = took(game.turns(wait=poll_wait))
     except KeyboardInterrupt:
-        console._print("Stopped at the owner's word (Ctrl-C).")
-    with console.lock:
-        if not h.agent.released:
-            h.stand_down("the runner was closed", by="the owner")
-    return 3 if h.agent.released else 0
+        print("Stopped at the owner's word (Ctrl-C).", file=out, flush=True)
+        try:
+            a = game.release("Ctrl-C at the local runner")
+            print(a.get("words") or "", file=out, flush=True)
+        except GameError as e:
+            print(e.words, file=out, flush=True)
+        return EXIT_RELEASED
+    except GameError as e:
+        print(e.words, file=out, flush=True)
+        return EXIT_UNREACHABLE
 
 
 if __name__ == "__main__":

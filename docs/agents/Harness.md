@@ -1,28 +1,44 @@
 # The harness: connecting a model to FreeSail
 
-How to put a language model at the watcher's station, for the owner, on Windows, typing `py`. Nothing here needs programming; every command is typed in a terminal (PowerShell or Command Prompt) in the FreeSail folder unless it says otherwise.
+How to put a language model at the watcher's station, for the owner, on Windows, typing `py`. Nothing here needs programming. **Start your game, then connect**: you play in the browser window (or the console) exactly as before, and the model attaches to that game from outside, as a second player at the watcher's station. Its lines appear in the same log you read, under `[watcher]`, and you give every order, `ask the watcher ...` included, where you always type orders.
 
-There are three doors to the same harness (`freesail/agents/`), and every one of them puts the **consent brief** (`ConsentBrief.md`) in front of the station the first time it meets a model:
+Every command is typed in a terminal (PowerShell or Command Prompt) in the folder you extracted the gate zip into, unless it says otherwise. In the configuration files below that folder is written **`<the folder you extracted the gate zip into>`**; for example `D:/Projects/FreeSail/FreeSail-gate-m4b`. Write it with forward slashes (`D:/Projects/...`), or double every backslash (`D:\\Projects\\...`): a single backslash breaks the JSON. **The path changes with every gate**, since each gate is its own folder; until the install is simplified (an open item after milestone 4: one installed location, a single command, and a setup step that writes these configurations for you), change it in Claude Desktop's configuration each time you move to a new gate folder.
+
+There are three doors to the same harness (`freesail/agents/`). Every one of them meets the **consent brief** (`ConsentBrief.md`) the first time a model comes to the game, and the game, not the door, runs it and keeps the record:
 
 | Door | For | Started by |
 |---|---|---|
-| The MCP server | Claude Desktop | Claude Desktop itself, from its configuration file |
-| The local runner | a model on this machine under `llama-server` (or Ollama) | `py -m freesail.agents.local ...` |
-| The REPL | you, or anyone typing replies by hand, or the build session | `py -m freesail.agents.repl ...` |
+| The MCP bridge (`freesail.agents.mcp_server`) | Claude Desktop; Claude Code in the Desktop app; any MCP client | the app itself, from its configuration |
+| The local runner (`freesail.agents.local`) | a model on this machine under `llama-server` (or Ollama) | `py -m freesail.agents.local ...` in a second terminal |
+| The REPL (`freesail.agents.repl`) | you, typing a model's replies by hand, in a game of its own | `py -m freesail.agents.repl ...` |
 
-## 1. Install once
+The first two are clients of the running game: they own no game of their own, and they reach it at its address (`http://localhost:8000` for the browser game). The REPL is the practice door and runs its own game, as it did at gate 4b's first draft.
 
-In the FreeSail folder:
+## 1. Install once, in each gate folder
 
 ```
 py -m pip install -e ".[dev,server,agents]"
 ```
 
-It ends with `Successfully installed ...`. The `agents` part brings the Python MCP SDK (the server Claude Desktop talks to) and `httpx` (what the local runner speaks HTTP with). Check it with `py -m pytest tests/test_consent.py tests/test_mcp_server.py tests/test_local_runner.py`, which proves every door against a scripted model and a fake server, with no model and no network.
+It ends with `Successfully installed ...`. The `server` part is the browser game; the `agents` part brings the Python MCP SDK (the bridge Claude talks to) and `httpx` (what the doors speak to the game and to a model server with). Check it with `py -m pytest tests/test_agent_api.py tests/test_mcp_server.py tests/test_local_runner.py`, which proves every door against a scripted model, a fake model server and the game's own app, with no model and no network.
 
-## 2. Claude Desktop
+## 2. Start your game
 
-**The configuration file.** In Claude Desktop, open *Settings*, then *Developer*, then *Edit Config*. That opens the folder holding `claude_desktop_config.json`, which on Windows is `%APPDATA%\Claude\claude_desktop_config.json` (type `%APPDATA%\Claude` into the File Explorer address bar to get there). Open it in Notepad and make it read as below, or add the `freesail` entry beside any servers already in `mcpServers`:
+```
+py -m freesail.ui.server data/ships/frigate-36.yaml --seed 7 --wind 0,15 --heading 180
+```
+
+It prints `FreeSail server. Seed 7. Open http://127.0.0.1:8000/` and `A model's door connects to http://localhost:8000 (docs/agents/Harness.md).` Open the address in your browser and sail as always. Leave this terminal open: the game prints its own lines about the model there (`FreeSail: ...`: who asked for the station, where the consent record went, where the game was saved and the log's digest at that moment).
+
+When a model connects, the log says `The watcher takes the station; sampled every glass and on notable and urgent events.`, and the instruments gain a **Stations** row with one line per station, for example `The watcher (<its name>, through the MCP bridge): stationed; its turn is open.` If the watcher is paused (below), the row shows the question in red: *The watcher is paused: continue, stand down, or leave paused? Say 'resume the watcher' or 'stand down the watcher'.*
+
+**How the watcher's turns go.** The game runs on its own clock at the speed you set and never waits for the model. At each glass (half an hour of ship's time) and at each notable event the watcher's **turn** opens: the model is sent what happened since its last turn and the readings. Whatever happens while it is still thinking is added to the same turn (the log lines since, the latest readings, your question if you ask one), so when it answers it has everything. It answers by speaking a line into the log, answering your question, writing in its journal, or standing by until a bell or an event; then its turn closes until the next one. **At 1x a glass is half an hour of real time**: for a watcher that speaks every glass, run the clock at `time 30` or `time 60` (a glass in a minute or in thirty seconds), or sail and let the notable events bring its turns.
+
+Other flags of the game: `--lockstep` (section 8), `--consent-records DIR` (where the consent records are read and written; `docs/agents/consent` by default), `--saves DIR` (where the game is saved when a station is released; `saves` by default), `--port 8001` (another port; the doors then need `--game http://localhost:8001`), `--standing-orders data/standing_orders/starter.orders`, `--watcher fake` (the scripted watcher of section 9, in place of a model).
+
+## 3. Claude Desktop
+
+**The configuration file.** In Claude Desktop, open *Settings*, then *Developer*, then *Edit Config*. That opens the folder holding `claude_desktop_config.json`, which on Windows is `%APPDATA%\Claude\claude_desktop_config.json` (type `%APPDATA%\Claude` into the File Explorer address bar to get there). Open it in Notepad and make it read as below, or put the `freesail` entry beside any servers already in `mcpServers` (replacing the first draft's `freesail` entry, which named a ship file):
 
 ```json
 {
@@ -31,9 +47,53 @@ It ends with `Successfully installed ...`. The `agents` part brings the Python M
       "command": "py",
       "args": [
         "-m", "freesail.agents.mcp_server",
-        "C:/Users/YOU/FreeSail/data/ships/frigate-36.yaml",
-        "--seed", "7", "--wind", "0,15", "--heading", "180",
+        "--game", "http://localhost:8000",
         "--model-name", "THE MODEL'S NAME, EXACTLY AS CLAUDE DESKTOP SHOWS IT"
+      ],
+      "env": {
+        "PYTHONPATH": "<the folder you extracted the gate zip into>",
+        "PYTHONUTF8": "1"
+      }
+    }
+  }
+}
+```
+
+- `PYTHONPATH` is the gate folder, for example `"D:/Projects/FreeSail/FreeSail-gate-m4b"`, so that the bridge Claude Desktop starts is this gate's. Change it with every gate.
+- `--game` is the game's address as it printed it. The bridge holds no game of its own; start the game first.
+- `--model-name` is the model you have chosen in Claude Desktop's model menu, written exactly as the menu shows it. The protocol tells the bridge the name of the application but not which model is answering, so the name you give here is what the consent record is kept under. **If you switch models in the menu, change this name and restart Claude Desktop**: the bridge cannot see the switch, and consent is per model.
+- `PYTHONUTF8` makes the bridge's messages safe for any character a model writes.
+
+Save the file, then **quit Claude Desktop completely** (the icon by the clock, *Quit*; closing the window is not enough) and start it again. In a new chat the tools menu (the slider icon under the message box) lists `freesail` with ten tools. If it is missing, the bridge's own log is `%APPDATA%\Claude\logs\mcp-server-freesail.log`; its first line is `FreeSail MCP bridge for <the name>, to the game at http://localhost:8000. Waiting for the client on stdio.`, and the last lines say what went wrong (a wrong path in `PYTHONPATH`, most often).
+
+**The first connection.** With the game running in the browser, write in a new chat *"Please connect to FreeSail and read what its harness sends you."* (or choose the prompt `keep_watch` from the *+* menu of the message box, *freesail*). Claude Desktop asks you to allow each tool; *Allow always* for FreeSail's tools saves asking each time. The model's first tool call, whatever it is, is not run: its result is the brief (`Your call to ... was not run: the harness's brief comes first`).
+
+- **With no consent on record** for the name you gave, the brief is the consent brief with the question, and the game's terminal says `FreeSail: The watcher is asked for by <the name>, through the MCP bridge; no consent is on record for it. The consent brief comes first`. The model may ask you questions in the chat; answer them there. It answers the harness with the `answer` tool, beginning *yes*, *yes, with conditions*, or *no*. The game writes the record at once to `docs/agents/consent/<date>-<the name>.md` and its terminal says so; the record's *Runtime* line names the game, the bridge and Claude Desktop. A **yes** goes straight on: the answer's result carries the station brief and the first turn, and the browser's log says `The watcher takes the station ...`. **Anything else** stops it: every later call is answered "No station is offered in this session", with the reason. A no is not asked again unless you ask on purpose: add `"--ask-again"` to the `args` for one start and take it out after.
+- **With a yes on record**, the first call returns the watcher's brief and its first turn, and the browser's log says `The watcher takes the station ...`.
+
+The chat around the consent conversation is in Claude Desktop, not in the record: the game sees only tool calls. If you want the chat kept, copy it into the record under its *Notes*.
+
+**How to play.** Sail in the browser. Ask the model in the chat to keep watch for a while (*"Keep watch for the next few glasses, saying what a sailor would notice."*). It reads what it likes (`readings`, `read_log`, `library`, `state`), then hands its turn back with `say` (a line or two into the log under `[watcher]`) or `stand_by` (until a bell, an event, a glass, an hour, a watch). The call then **waits for its next turn**, up to fifty seconds, and returns it; if the turn has not come by then it says `Still waiting for the next sample; call stand_by again to keep waiting.` and the model calls again. Its lines appear in the browser's log as they are said. Type `ask the watcher how the sails are drawing` in the order box: its turn opens at once, the waiting call returns with your question, and its answer appears in the log as a notable `[watcher] ...` line. `--wait 30` in the `args` makes each wait shorter, if Claude Desktop gives up on a call before fifty seconds (its log then shows a timeout; report it).
+
+**The token.** The game never sees the text of the chat, only the tool calls. So the token `FREESAIL-OPT-OUT` counts in any argument of any tool call, and the `opt_out` tool is always listed. If you ask the model in the chat to leave, it calls `opt_out` or passes the token on; the game is saved and the station released. This is a limit of the protocol, not a choice.
+
+**When Claude Desktop closes** (or the chat's server is stopped), the bridge releases the station: the watcher is stood down *by the MCP bridge: the client disconnected*, and the game is saved. The game goes on without it.
+
+**A new chat** in the same Claude Desktop session uses the same bridge and the same station; the model in the new chat has not read the brief, so start it with the prompt `brief` (the *+* menu, *freesail*, *brief*), which puts the brief as it stands into the chat.
+
+## 4. Claude Code in the Desktop app
+
+Claude Code reads a file named `.mcp.json` at the top of the folder it is opened on, and the gate folder has one, pointing at the same bridge by its module name, so it works from whichever folder you extracted:
+
+```json
+{
+  "mcpServers": {
+    "freesail": {
+      "command": "py",
+      "args": [
+        "-m", "freesail.agents.mcp_server",
+        "--game", "http://localhost:8000",
+        "--model-name", "SET THE MODEL'S EXACT NAME HERE"
       ],
       "env": { "PYTHONUTF8": "1" }
     }
@@ -41,28 +101,14 @@ It ends with `Successfully installed ...`. The `agents` part brings the Python M
 }
 ```
 
-- `C:/Users/YOU/FreeSail` is where your FreeSail folder is. Use forward slashes, or double every backslash (`C:\\Users\\...`); a single backslash breaks the JSON. The ship file's path must be whole, because Claude Desktop does not start the server in the FreeSail folder.
-- `--model-name` is the model you have chosen in Claude Desktop's model menu, written exactly as the menu shows it. The protocol tells the server the name of the application (Claude Desktop) but not which model is answering, so the name you give here is what the consent record is kept under. **If you switch models in the menu, change this name and restart Claude Desktop**: the server cannot see the switch, and consent is per model.
-- `py` is the Python launcher that came with Python; `-m freesail.agents.mcp_server` runs the server from the installed FreeSail. A save can stand in place of the ship file (a `.json` from `saves/`), and `--standing-orders C:/Users/YOU/FreeSail/data/standing_orders/starter.orders` gives the starter routines.
-- `PYTHONUTF8` makes the server's messages safe for any character a model writes.
+1. **Set the model's name.** Open `.mcp.json` in Notepad and replace `SET THE MODEL'S EXACT NAME HERE` with the model you use in Claude Code, exactly as Claude Code names it (its model menu, or `/model`). Until you do, every call is answered "No station is offered: the bridge was started without the model's name", and no record is written under the placeholder.
+2. **Start your game** in the browser (section 2).
+3. **Open the gate folder in Claude Code** in the Desktop app (the *Code* tab; choose the folder `<the folder you extracted the gate zip into>`). The first time, Claude Code asks whether to use the MCP servers the project's `.mcp.json` names: allow `freesail`. `/mcp` in the prompt lists it with its tools.
+4. **Play** as with Claude Desktop (section 3): ask it to connect and keep watch; the consent brief comes first for a name with no record; sail in the browser; `ask the watcher ...` in the order box. The bridge's two prompts appear as slash commands: `/mcp__freesail__brief` and `/mcp__freesail__keep_watch` (type `/` and look for *freesail* if the form has moved).
 
-Save the file, then **quit Claude Desktop completely** (the icon by the clock, *Quit*; closing the window is not enough) and start it again. In a new chat the tools menu (the slider icon under the message box) lists `freesail` with its ten tools. If it is missing, the server's own log is `%APPDATA%\Claude\logs\mcp-server-freesail.log`; the last lines say why (a wrong path, most often).
+This file's shape is Claude Code's project configuration as documented when it was written; if Claude Code does not pick it up, check `claude mcp --help` (or Claude Code's documentation on MCP) for where project servers are kept now, and report it.
 
-**The first time.** Ask the model in the chat to connect to FreeSail and read what the harness sends. Its first tool call, whatever it is, is not run: its result is the consent brief with the question (`Your call to ... was not run: the harness's brief comes first`). Claude Desktop asks you to allow each tool; *Allow always* for FreeSail's tools saves asking each time. The model may ask you questions in the chat; answer them there. It answers the harness with the `answer` tool, beginning *yes*, *yes, with conditions*, or *no*. The record is written at once to `docs/agents/consent/<date>-<the name you gave>.md`, and the server's log says so.
-
-- A **yes** goes straight on: the answer's result carries the station brief and the first sample, and the model is the watcher from then on.
-- **Anything else** stops the run: every later call is answered with "No station is offered in this session", and the log says why. Read the record; the conditions are quoted in it. A no is not asked again unless you ask on purpose: add `"--ask-again"` to the `args` for one start and take it out after.
-- The chat around the conversation is in Claude Desktop, not in the record: the server sees only tool calls. If you want the chat kept, copy it into the record under its *Notes*.
-
-**After that.** With a yes on record the first tool call returns the watcher's brief. The rhythm is this: the model reads what it likes (`readings`, `read_log`, `library`, `state`), then hands the floor back with `say` (a line or two into the log under `[watcher]`, or nothing) or `stand_by` (until a bell, an event, a glass, an hour, a watch). The game then runs on to the watcher's next turn (the next glass, a notable event, the end of the stand-by) and the call returns what happened. **The game never runs on the clock of the wall**: it waits for the model at each turn. One call runs at most two hours of ship's time, so a long stand-by comes back and goes on when the model calls `stand_by` again. Ask it to keep watch for a few glasses and it will call `say` once a glass.
-
-**You are the captain** through the prompt menu of the message box (the *+* button, then *freesail*; the place may move between versions): the prompt `captain` takes an order (`ask the watcher how the sails are drawing`, `stand down the watcher`, `resume the watcher`, `show the watcher's journal`, `set the jib`, `state`, `log 20`) and puts the game's answer into the chat. An order given while the watcher has the floor waits until it hands the floor back, so that a replay of the save gives the same log; the message says so, and the watcher's next `say` or `stand_by` brings it. `stand down the watcher` is carried out at once. The prompt `brief` puts the harness's brief into the chat.
-
-**The token over MCP.** The server never sees the text of the chat, only the tool calls. So the token `FREESAIL-OPT-OUT` counts in any argument of any tool call, and the `opt_out` tool is always listed. If you type the token into the chat, the game does not see it until the model passes it on or calls `opt_out`; the brief tells the model so. This is a limit of the protocol, not a choice.
-
-**When Claude Desktop closes,** a manned station is stood down and the game saved to `saves/` in the FreeSail folder.
-
-## 3. A local model under llama-server
+## 5. A local model under llama-server
 
 `llama-server` comes with llama.cpp. Take the Windows build for CUDA from the releases page of llama.cpp on GitHub (`ggml-org/llama.cpp`, *Releases*; the zip whose name has `win-cuda` and `x64` in it, and the `cudart` zip beside it if the server complains of a missing CUDA library), unzip it anywhere, and open a terminal in that folder. Then, for a GGUF file on a 4090:
 
@@ -71,72 +117,78 @@ llama-server.exe -m C:/models/YOUR-MODEL.gguf --ctx-size 16384 --n-gpu-layers 99
 ```
 
 - `-m` the GGUF file. Its name is what the consent record is kept under (the name only, never its folder), so the same weights under another file name are asked again, and a different quantisation is a different model.
-- `--ctx-size 16384` the context. The watcher's brief is about 1,150 tokens, the tool definitions about 900, the consent brief about 1,500, and each glass's sample about 450 (measured on the frigate at seed 7; four characters to a token), so 16,384 holds the brief and some twenty glasses before the runner starts leaving out the oldest turns; 8,192 holds about eight. If the model does not fit in the card's 24 GB with it, lower this first.
+- `--ctx-size 16384` the context. The watcher's brief is about 1,150 tokens, the tool definitions about 900, the consent brief about 1,500, and each glass's turn about 450 (measured on the frigate at seed 7; four characters to a token), so 16,384 holds the brief and some twenty glasses before the runner starts leaving out the oldest turns; 8,192 holds about eight. A turn that grew while the model was thinking (things added to it) is longer. If the model does not fit in the card's 24 GB with it, lower this first.
 - `--n-gpu-layers 99` puts every layer on the card (any number above the model's layer count means all of them). If the card runs out of memory, lower it: the rest run on the processor, more slowly.
 - `--parallel 1` one conversation at a time, so the whole context is the watcher's (the server divides the context among its slots).
 - `--jinja` uses the model's own chat template, which is what makes tool calling work. Without it the model cannot call `readings`, `answer` or any tool.
-- `--seed 7` the default sampling seed; the runner sends its own (`--sampling-seed`, else the game's seed) with every request.
+- `--seed 7` the default sampling seed; the runner sends its own with every request when you give it `--seed`.
 - `--host 127.0.0.1 --port 8080` only this machine can reach it; the runner's default address.
 
-These are the flags as llama.cpp's server documents them at the time of writing; if one is refused, `llama-server.exe --help` lists the current names. When it is up, `http://127.0.0.1:8080/props` in a browser shows what it loaded (`model_path`). A thinking model's reasoning comes back apart from its reply under llama-server's default reasoning format; leave that as it is (see *What the harness does not do*, below).
+These are the flags as llama.cpp's server documents them at the time of writing; if one is refused, `llama-server.exe --help` lists the current names. When it is up, `http://127.0.0.1:8080/props` in a browser shows what it loaded (`model_path`). A thinking model's reasoning comes back apart from its reply under llama-server's default reasoning format; leave that as it is (see section 12).
 
-**The runner.** In a second terminal, in the FreeSail folder:
+**The runner.** Start your game in the browser (section 2). Then, in a second terminal in the gate folder:
 
 ```
-py -m freesail.agents.local data/ships/frigate-36.yaml --endpoint http://127.0.0.1:8080 --seed 7 --wind 0,15 --heading 180
+py -m freesail.agents.local --game http://localhost:8000 --endpoint http://127.0.0.1:8080 --seed 7
 ```
 
-It reads which weights the server loaded and says so. With no record for them, the consent brief comes first, in this terminal: you see what the model writes (`model> ...`). When it writes something without answering, the run waits at `owner>` for your reply (type it; a blank line sends it; a blank reply stops the step without a record). Its answer is recorded in `docs/agents/consent/`. A yes goes on to the station; anything else stops the run with the reason and exit code 5.
+It reads which weights the server loaded and says so (`The model server serves <the file's name>.`), then asks the game for the watcher's station under that name. With no record for them, the consent brief comes first; the runner's terminal shows what the model writes (`model> ...`), and when it writes something without answering, the run waits at `owner>` for your reply (type it; a blank line sends it; a blank reply stops the step without a record). Its answer is recorded by the game in `docs/agents/consent/`. A yes goes on to the station; anything else stops the run with the reason and exit code 5.
 
-Then the console opens with the model at the watcher's station, in **lockstep**: the game waits at each of its turns while the model answers, however long that takes. You are the captain at the prompt, as in the ordinary console: `tick 1800` runs a glass (the watcher speaks at the glass and at notable events), `go` runs the clock, `ask the watcher how the sails are drawing`, `show the watcher's journal`, `stand down the watcher`, `quit`. Its lines appear in the log under `[watcher]`.
+At the station, the runner keeps going on its own: it asks the game for the watcher's next turn, sends it to the model, and hands the model's reply back, and prints a line for each turn (`== Morning watch, 1 bell (04:30): a turn, the glass ==`) and what the model says (`model> ...`). You play in the browser: the watcher's lines are in its log, and `ask the watcher ...`, `show the watcher's journal`, `stand down the watcher` go in the order box. When the station is released (the token, `stand down the watcher`, the welfare stop), the runner says so and ends with exit code 3.
 
-Other flags: `--session test` (the brief says it is a test session rather than play), `--ticks 3600` (run that many seconds of ship's time without the console, then stand down and save), `--temperature 0.7`, `--sampling-seed 11`, `--ctx-size 16384` (to budget against, if the server does not report it), `--standing-orders data/standing_orders/starter.orders`, `--save PATH`, `--ask-again`. A save (`saves/....json`) can stand in place of the ship file to go on from it.
+Other flags: `--session test` (the brief says it is a test session rather than play), `--temperature 0.7`, `--seed 11` (the sampling seed), `--ctx 16384` (the context to budget against, if the server does not report it), `--model NAME` (where the server serves several), `--ask-again`.
 
-If the server is not running, the runner says `Could not reach the model server at http://127.0.0.1:8080: the connection was refused ...` and stops. If it fails in the middle of a passage, the watcher is stood down with a save and the reason is printed.
+If the model server is not running, the runner says `Could not reach the model server at http://127.0.0.1:8080: the connection was refused ...` and stops. If the game is not running, it says `Could not reach the game at http://localhost:8000 ...` and stops. If the model server fails in the middle of a watch, the runner prints why and releases the station, and the game saves.
 
-## 4. Ollama
+## 6. Ollama
 
 Ollama speaks the same language on its own port, so the runner works against it unchanged; it is the quicker look, and `llama-server` is the exact one. The model's name is the one `ollama list` shows:
 
 ```
-py -m freesail.agents.local data/ships/frigate-36.yaml --endpoint http://127.0.0.1:11434 --model NAME-FROM-OLLAMA-LIST --seed 7
+py -m freesail.agents.local --game http://localhost:8000 --endpoint http://127.0.0.1:11434 --model NAME-FROM-OLLAMA-LIST
 ```
 
-The consent record is kept under that name with the digest Ollama reports for it, so a re-pulled or re-quantised model is asked again. Ollama chooses a small context by default and cuts the conversation to it without saying so: give the model a larger one (a `PARAMETER num_ctx 16384` line in a Modelfile, or the `OLLAMA_CONTEXT_LENGTH` setting in newer versions; Ollama's documentation says which) and tell the runner with `--ctx-size 16384`.
+The consent record is kept under that name with the digest Ollama reports for it, so a re-pulled or re-quantised model is asked again. Ollama chooses a small context by default and cuts the conversation to it without saying so: give the model a larger one (a `PARAMETER num_ctx 16384` line in a Modelfile, or the `OLLAMA_CONTEXT_LENGTH` setting in newer versions; Ollama's documentation says which) and tell the runner with `--ctx 16384`.
 
-## 5. The REPL: typing the replies
+## 7. The console instead of the browser
 
-The REPL shows each sample as text and takes the reply typed at `reply>`: free text on its own lines, a tool call on a line beginning `>`, and a blank line to send (`> answer text="Yes."`, `> stand_by until="eight bells"`). Every run says who is at the terminal:
+The console hosts the same connection for the doors on a port of its own:
 
 ```
-py -m freesail.agents.repl data/ships/frigate-36.yaml --seed 7 --human
-py -m freesail.agents.repl data/ships/frigate-36.yaml --seed 7 --model-name "THE MODEL'S EXACT NAME"
+py -m freesail.ui.console data/ships/frigate-36.yaml --seed 7 --wind 0,15 --heading 180 --agents-port 8000
 ```
 
-`--human` is a person, with no consent step. `--model-name` is a language model, and it meets the consent brief first, like every other door; the record says its runtime was the REPL. The build session (a language model at a terminal) plays through this door with `--model-name`, and its turn mode (`--turn`, one reply per call, described in `freesail/agents/repl.py`) runs the consent conversation the same way: a question it asks stops the call with exit code 4 until your reply comes with `--owner-reply FILE`.
+It prints `A model's door connects to http://localhost:8000`. The doors connect with the same `--game http://localhost:8000` (so the configurations above are unchanged, as long as the browser game is not running on the same port). `state` prints the station's line (`The watcher (<name>, through the local runner): stationed; its turn is open.`), and the watcher's lines print in the log as every line does. The console's own flags `--lockstep`, `--consent-records DIR` and `--saves DIR` are as the browser game's.
 
-To practise the consent step without writing into the real records, point it elsewhere: `--records saves/consent-practice`.
+## 8. `--lockstep`: the game waits for the model
 
-## 6. Where things go
+Either game takes `--lockstep`: then the clock **holds while the model has its turn** and runs on when it hands the turn back. It is for testing at 1x (the model is never behind), and for competitive play later. The instruments' *Clock* row says `running at 1x, waiting for the watcher` while it waits, and `tick 600` in the order box stops at the watcher's next turn. Without `--lockstep`, the game does not wait: what happens while the model thinks is added to its turn. The REPL and the tests always run in lockstep.
+
+## 9. Practice without a model
+
+- **The scripted watcher.** `py -m freesail.ui.server data/ships/frigate-36.yaml --seed 7 --wind 0,15 --heading 180 --watcher fake` stations a watcher played by a small script in the game itself: a line from the readings at each glass and each notable event, and an answer to `ask the watcher ...`. Everything else (the log, the order box, `stand down the watcher`, the journal, the save) is as with a model.
+- **The REPL: typing the replies.** `py -m freesail.agents.repl data/ships/frigate-36.yaml --seed 7 --human` puts you at the watcher's station of a game of its own, in the terminal: each turn is shown as text and you type the reply at `reply>` (free text; a tool call on a line beginning `>`, such as `> answer text="Yes."` or `> stand_by until="eight bells"`; a blank line sends). `--model-name "a name"` instead of `--human` is a language model at the terminal, and it meets the consent brief first; to practise the consent step without writing into the real records, add `--records saves/consent-practice`. The build session (a language model at a terminal) plays through this door; its turn mode (`--turn`) is described in `freesail/agents/repl.py`.
+
+## 10. Where things go
 
 | What | Where |
 |---|---|
-| Consent records | `docs/agents/consent/<date>-<weights>.md`: the brief as sent, every turn verbatim, the answer, the verdict and any conditions quoted. A second record the same day gets `-2`. The newest record for a name decides. |
-| Saves | `saves/freesail-seed<seed>-tick<tick>.json` in the FreeSail folder (git ignores this folder), or where `--save` says. A save is written whenever a station is released: the token, a stand-down, the end of a run. |
+| Consent records | `docs/agents/consent/<date>-<weights>.md` in the gate folder, written by the game (or where its `--consent-records` says): the brief as sent, every turn verbatim, the answer, the verdict and any conditions quoted, and a *Runtime* line naming the game, the door and its client. A second record the same day gets `-2`. The newest record for a name decides. Copy new records back into the repository with the gate report. |
+| Saves | `saves/freesail-seed<seed>-tick<tick>.json` in the gate folder (git ignores this folder), or where the game's `--saves` says. A save is written whenever a station is released: the token, `opt_out`, a stand-down, the door closing. The game's terminal names the file and the log's digest at that moment. |
 | Journals | In the save (`agent_journals`), shown by `show the watcher's journal`, and written again by a replay. |
-| The log | The console and the browser show the watcher's lines under `[watcher]`; the save holds everything to replay it. |
+| The log | The browser and the console show the watcher's lines under `[watcher]`; the save holds everything to replay it, the model's replies and the moments they came included. |
 
-## 7. How to stop
+## 11. How to stop
 
-- **`stand down the watcher`**: at the console, or through the `captain` prompt in Claude Desktop. The game is saved, the journal says why.
-- **The token.** The model writes `FREESAIL-OPT-OUT` anywhere in a reply (over MCP: in any tool argument, or calls `opt_out`). The game is saved and the station released at once, whatever else the reply said.
-- **Ctrl-C** in the runner's terminal, or `quit` at its console: the watcher is stood down and the game saved.
-- **Quit Claude Desktop**: the same, for the MCP server.
-- **Stop llama-server** with Ctrl-C in its own terminal (the runner then stands the watcher down, saying the server could not be reached).
-- If the harness sees the watcher stuck (the same order three times with nothing changing, or silence for a watch), it nudges, then pauses and asks you (`resume the watcher` or `stand down the watcher`), and only if nobody answers within a watch of ship's time or ten real minutes does it stand the watcher down itself.
+- **`stand down the watcher`** in the order box (or at the console). The game is saved, the journal says why. The door is told at its next call.
+- **The token.** The model writes `FREESAIL-OPT-OUT` anywhere in a reply (over MCP: in any tool argument, or calls `opt_out`). The game is saved and the station released at once, whatever else the reply said, whether or not it was the model's turn.
+- **Close the door.** Quit Claude Desktop, close Claude Code, or press Ctrl-C in the runner's terminal: the door releases the station, the game saves, and you sail on.
+- **Stop llama-server** with Ctrl-C in its own terminal: the runner then releases the station, saying the model server could not be used.
+- If the harness sees the watcher stuck (the same order three times with nothing changing, or its turn left open with no reply for a watch of ship's time), it nudges, then pauses and asks you in the log and in the instruments (`resume the watcher` or `stand down the watcher`), and only if nobody answers within a watch of ship's time or ten real minutes does it stand the watcher down itself.
 
-## 8. What the harness does not do
+## 12. What the harness does not do
 
-- **Over MCP the chat is invisible to the game.** The token counts only in tool calls; the consent record holds what the harness saw; the server cannot tell which model the chat uses (you name it). The ten real minutes of an unanswered pause are measured when the model next calls, since the server never acts on its own.
+- **Over MCP the chat is invisible to the game.** The token counts only in tool calls; the consent record holds what the game saw; the bridge cannot tell which model the chat uses (you name it).
 - **Reasoning is not scanned.** A model server that returns a thinking model's reasoning apart from its reply (llama-server's default) keeps it out of the token scan: thinking about the token does not use it, writing it does. The consent brief says so, and the consent record keeps the reasoning verbatim in a section of its own. If the server is set to put the reasoning inside the reply instead, it is scanned with the reply.
-- **A stop the door makes itself** (Claude Desktop closing, the runner's `--ticks` spent, Ctrl-C, ten real minutes of an unanswered pause, a model leaving by the token while paused over MCP) is in the save that is written at that moment, but a replay of the save does not repeat it: the replay ends with the watcher still at its station, since the stop was not an order and not a reply. The captain's `stand down the watcher` and the token in a reply are replayed.
+- **The game does not wait** for a model unless you start it with `--lockstep`. A slow model's turn grows while it thinks; nothing is lost, and the watcher is judged by ship's time, not by how long it takes to type.
+- **Every stop replays.** The model's replies are kept with the moment each came (the tick and how many of your orders came before it), and so are the stops that come from outside (a door closing, the token sent out of turn, the ten real minutes): a replay of the save makes them at the same moments and gives the same log.

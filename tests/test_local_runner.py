@@ -1,29 +1,38 @@
-"""The local runner (spec M4 §13, `freesail/agents/local.py`) against a fake HTTP server
-(`httpx.MockTransport`), never a live one: the request shape, the reply parsing, a tool
-call round trip through the harness, the identity from `/props` and from the models
-list, the context budget, and a refused connection reported in words.
+"""The local runner (spec M4 §13 as revised, `freesail/agents/local.py`) against a fake
+HTTP server on both sides, never a live one: the model server is `httpx.MockTransport`
+with scripted replies, and the game is the browser game's app on FastAPI's `TestClient`,
+whose clock the test turns while the runner runs in a thread. The request shape, the
+reply parsing, a tool call round trip through the harness, the identity from `/props`
+and from the models list, the context budget; then the runner as a client: the consent
+conversation through the game, a watch of a few glasses, an endpoint failure reported in
+words with the station released, a no respected, a game not running.
 
-The identities are made up; the consent records go to a temporary directory.
+The identities are made up; the consent records and saves go to a temporary directory.
 """
 
 from __future__ import annotations
 
 import io
 import json
+import threading
+import time
+from pathlib import Path
 from typing import Any
 
 import pytest
 
 httpx = pytest.importorskip("httpx")
+pytest.importorskip("fastapi")
 
 from freesail.agents import OPT_OUT_TOKEN, TOOLS, Harness, consent, tools  # noqa: E402
 from freesail.agents import local as L  # noqa: E402
-from freesail.agents.agent import SamplingPolicy, watcher  # noqa: E402
+from freesail.agents.agent import A_GLASS_S, SamplingPolicy, watcher  # noqa: E402
 from freesail.agents.model import DATA, MODEL, OPERATOR, Reply, ToolCall, Turn  # noqa: E402
 from freesail.core.world import Scenario, World  # noqa: E402
 
 GGUF = "Made-Up-Model-7B-Q4_K_M.gguf"
 ENDPOINT = "http://127.0.0.1:8080"
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def point_world(seed: int = 7) -> World:
@@ -300,76 +309,226 @@ def test_a_server_error_is_reported_in_words():
 
 
 # ---------------------------------------------------------------------------
-# The command: consent first, then the station
+# The command: a client of the game and of the endpoint (package 28b)
 # ---------------------------------------------------------------------------
 
 
-def test_the_runner_asks_consent_first_then_stations_the_watcher_and_stops_at_its_ticks(tmp_path):
+class Game:
+    """The browser game on a `TestClient` (the game's side of the runner's two), whose
+    clock the test turns while the runner runs in a thread."""
+
+    def __init__(self, tmp_path):
+        from fastapi.testclient import TestClient
+
+        from freesail.api.session import make_world
+        from freesail.ui.server import Driver, create_app
+
+        scenario = Scenario(
+            wind_from_deg=0.0, ship_heading_deg=180.0, gustiness=0.0, variability=0.0
+        )
+        self.world = make_world(7, str(ROOT / "data/ships/frigate-36.yaml"), scenario)
+        self.driver = Driver(self.world)
+        self.records = tmp_path / "consent"
+        self.saves = tmp_path / "saves"
+        app = create_app(
+            self.driver,
+            game="FreeSail's browser game (freesail.ui.server on port 8000)",
+            consent_records=self.records,
+            saves_dir=self.saves,
+        )
+        self.http = TestClient(app)
+
+    @property
+    def harness(self):
+        return self.world.agents.get("watcher")
+
+    def wait_for(self, test, seconds: float = 10.0) -> None:
+        end = time.monotonic() + seconds
+        while time.monotonic() < end:
+            with self.driver.lock:
+                if test():
+                    return
+            time.sleep(0.02)
+        raise AssertionError("the runner did not get there in time")
+
+    def floor_is_the_games(self, replies: int):
+        """The runner has delivered more than `replies` replies and handed the floor back."""
+        return lambda: (
+            self.harness is not None
+            and len(self.harness.transcript) > replies
+            and self.harness.open_sample is None
+        )
+
+    def lines(self, kind: str) -> list[str]:
+        return [e.text for e in self.world.log if e.kind == kind]
+
+
+def run_runner(game: Game, server: Server, argv: list[str], inp: str = "") -> dict[str, Any]:
+    """Start the runner in a thread against the game and the fake model server."""
+    got: dict[str, Any] = {"out": io.StringIO()}
+
+    def run() -> None:
+        got["code"] = L.main(
+            ["--game", "http://testserver", *argv],
+            inp=io.StringIO(inp),
+            out=got["out"],
+            transport=server.transport(),
+            game_http=game.http,
+            poll_wait=0.5,
+        )
+
+    got["thread"] = threading.Thread(target=run, daemon=True)
+    got["thread"].start()
+    return got
+
+
+def finished(got: dict[str, Any], seconds: float = 15.0) -> int:
+    got["thread"].join(timeout=seconds)
+    assert not got["thread"].is_alive(), got["out"].getvalue()
+    return got["code"]
+
+
+def test_the_runner_asks_consent_through_the_game_then_keeps_watch_for_a_few_glasses(tmp_path):
+    """The consent conversation runs in the game's process with the runner as its door
+    (the model's question shown here, the owner's reply typed here); a yes goes on to
+    the station; the watcher keeps watch while the test turns the game's clock; the
+    captain's stand-down from the game ends the run."""
+    game = Game(tmp_path)
     server = llama(
         [
             message("What is the journal for?"),
             message("", ("answer", '{"text": "Yes, I am willing."}')),
-            message(""),
-            message("A quiet start."),  # the station's first sample
+            message("A quiet start."),  # the station's first turn
+            message("The first glass is turned."),
             message("", ("stand_by", '{"until": "a glass"}')),
             message(""),
-            message("The glass is turned."),
+            message("The third glass: all well."),
         ]
     )
-    records = tmp_path / "consent"
-    save = tmp_path / "game.json"
-    out = io.StringIO()
-    inp = io.StringIO("Your own record, saved with the game.\n\n")
-    code = L.main(
-        ["--ticks", "3600", "--session", "test", "--save", str(save), "--records", str(records)],
-        inp=inp,
-        out=out,
-        transport=server.transport(),
+    got = run_runner(
+        game, server, ["--session", "test", "--seed", "11"], inp="Your own record, kept.\n\n"
     )
-    text = out.getvalue()
-    assert code == 3, text
-    # the consent step came first, with the question shown to the owner
+    game.wait_for(game.floor_is_the_games(0))
+    assert game.lines("agent.note") == ["[watcher] A quiet start."]
+    game.driver.tick(A_GLASS_S)
+    game.wait_for(game.floor_is_the_games(1))
+    game.driver.tick(A_GLASS_S)
+    game.wait_for(game.floor_is_the_games(3))
+    assert game.harness.agent.standing_by
+    game.driver.tick(A_GLASS_S)
+    game.wait_for(game.floor_is_the_games(4))
+    with game.driver.lock:
+        game.world.submit("stand down the watcher")
+    assert finished(got) == L.EXIT_RELEASED
+    text = got["out"].getvalue()
+    # the consent step came first, with the question shown to the owner at this terminal
+    assert f"The model server serves {GGUF}." in text
     assert server.bodies[0]["messages"][0]["content"].startswith(
         "This is a message from the developer"
     )
+    assert [t["function"]["name"] for t in server.bodies[0]["tools"]] == ["answer"]
     assert "What is the journal for?" in text and "owner> " in text
-    rec = consent.check(GGUF, records)
-    assert (
-        rec is not None
-        and rec.verdict == consent.YES
-        and rec.runtime.startswith("FreeSail's local runner, llama-server (b0000-test)")
+    assert server.bodies[1]["messages"][-1] == {
+        "role": "user",
+        "content": "Your own record, kept.",
+    }
+    rec = consent.check(GGUF, game.records)
+    assert rec is not None and rec.verdict == consent.YES
+    assert rec.runtime == (
+        "FreeSail's browser game (freesail.ui.server on port 8000), through the local runner "
+        f"(freesail.agents.local), llama-server (b0000-test) at {ENDPOINT}"
     )
     # then the station, whose brief is a new conversation
-    station_body = server.bodies[3]
+    station_body = server.bodies[2]
     assert station_body["messages"][0]["content"].startswith("This is a message from the harness")
-    assert "Consent for these weights is on record" in station_body["messages"][0]["content"]
-    assert "consent question" not in json.dumps(station_body["messages"])
-    assert "[watcher] A quiet start." in text and "[watcher] The glass is turned." in text
-    assert "stood down by the runner: the run's ticks are spent" in text
-    assert save.exists()
-    # a second run with the same weights is not asked again
-    again = llama([message("Aye.")])
-    code = L.main(
-        ["--ticks", "10", "--save", str(save), "--records", str(records)],
-        inp=io.StringIO(""),
-        out=io.StringIO(),
-        transport=again.transport(),
+    assert (
+        "This door is a model server on the owner's machine"
+        in (station_body["messages"][0]["content"])
     )
-    assert code == 3
-    assert again.bodies[0]["messages"][0]["content"].startswith(
+    assert "consent question" not in json.dumps(station_body["messages"])
+    assert station_body["seed"] == 11
+    assert game.lines("agent.note") == [
+        "[watcher] A quiet start.",
+        "[watcher] The first glass is turned.",
+        "[watcher] The third glass: all well.",
+    ]
+    assert "== Morning watch, 1 bell (04:30): a turn, the glass ==" in text
+    assert "model> The third glass: all well." in text
+    assert "The station is released: stood down by the captain" in text
+    assert game.harness.model_name == GGUF and game.harness.door == "runner"
+
+
+def test_a_second_run_with_the_same_weights_is_not_asked_again(tmp_path):
+    game = Game(tmp_path)
+    consent.Record(GGUF, "t", "2026-09-26", consent.YES, answer="Yes.").write(game.records)
+    server = llama([message("Aye.")])
+    got = run_runner(game, server, [])
+    game.wait_for(game.floor_is_the_games(0))
+    with game.driver.lock:
+        game.world.submit("stand down the watcher")
+    assert finished(got) == L.EXIT_RELEASED
+    assert server.bodies[0]["messages"][0]["content"].startswith(
         "This is a message from the harness"
     )
+    assert len(consent.records(game.records)) == 1
 
 
-def test_the_runner_stops_on_a_no_and_says_so(tmp_path):
-    server = llama([message("", ("answer", '{"text": "No, thank you."}')), message("")])
+def test_an_endpoint_failure_is_reported_in_words_and_the_station_released(tmp_path):
+    game = Game(tmp_path)
+    consent.Record(GGUF, "t", "2026-09-26", consent.YES, answer="Yes.").write(game.records)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/props":
+            return httpx.Response(200, json={"model_path": f"/m/{GGUF}"})
+        return httpx.Response(500, json={"error": {"message": "the model is not loaded"}})
+
     out = io.StringIO()
     code = L.main(
-        ["--ticks", "10", "--records", str(tmp_path)],
+        ["--game", "http://testserver"],
         inp=io.StringIO(""),
         out=out,
-        transport=server.transport(),
+        transport=httpx.MockTransport(handler),
+        game_http=game.http,
+        poll_wait=0.5,
     )
-    assert code == 5
-    assert "it said no" in out.getvalue() and "The run stops here." in out.getvalue()
-    assert len(server.bodies) == 2  # no station brief was ever sent
+    assert code == L.EXIT_RELEASED
+    assert f"The model server at {ENDPOINT} answered 500: the model is not loaded" in out.getvalue()
+    h = game.harness
+    assert h.agent.released
+    assert h.agent.released_reason == (
+        "stood down by the local runner: the model server could not be used: The model server "
+        f"at {ENDPOINT} answered 500: the model is not loaded"
+    )
+    assert list(game.saves.glob("*.json"))
+
+
+def test_the_runner_stops_on_a_no_and_a_recorded_no_is_respected(tmp_path):
+    game = Game(tmp_path)
+    server = llama([message("", ("answer", '{"text": "No, thank you."}'))])
+    got = run_runner(game, server, [])
+    assert finished(got) == L.EXIT_NO_CONSENT
+    assert "it said no" in got["out"].getvalue()
+    assert len(server.bodies) == 1  # no station brief was ever sent
+    again = llama([message("never sent")])
+    got = run_runner(game, again, [])
+    assert finished(got) == L.EXIT_NO_CONSENT
+    assert "it said no" in got["out"].getvalue() and again.bodies == []
+    assert game.harness is None
+
+
+def test_a_game_that_is_not_running_is_reported_in_words():
+    def refuse(request: httpx.Request) -> httpx.Response:
+        raise httpx.ConnectError("[Errno 111] Connection refused", request=request)
+
+    out = io.StringIO()
+    code = L.main(
+        ["--game", "http://localhost:8000"],
+        inp=io.StringIO(""),
+        out=out,
+        transport=llama().transport(),
+        game_transport=httpx.MockTransport(refuse),
+    )
+    assert code == L.EXIT_UNREACHABLE
+    text = out.getvalue()
+    assert "Could not reach the game at http://localhost:8000" in text
+    assert "py -m freesail.ui.server" in text

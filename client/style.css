@@ -190,6 +190,9 @@ main {
 .instruments dd.wrap { white-space: normal; }
 .instruments .muted { color: var(--ink-soft); }
 .evolutions { margin: 0; padding-left: 16px; }
+.instruments .stations .station-line.state-paused { color: var(--urgent); }
+.instruments .stations .station-line.state-released { color: var(--ink-soft); }
+.instruments .stations .station-question { color: var(--urgent); font-weight: 600; }
 .evolutions li.none { list-style: none; margin-left: -16px; color: var(--ink-soft); }
 
 /* the map */

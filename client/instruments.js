@@ -28,7 +28,10 @@
     var mode = s.helm_mode === "heading" ? "steering " + U.formatHeading(s.target_heading) : s.helm_mode === "full_and_by" ? "full and by" : "helm held";
     set("i-course", mode);
     var d = snap.driver || {};
-    set("i-clock", (d.running ? "running" : "held") + " at " + (d.compression || 1) + "x");
+    var clock = (d.running ? "running" : "held") + " at " + (d.compression || 1) + "x";
+    // --lockstep: the clock waits while a model's door has the floor (spec M4 §13)
+    if (d.lockstep) clock += d.waiting_for ? ", waiting for " + d.waiting_for : ", in lockstep";
+    set("i-clock", clock);
     set("i-tick", "tick " + snap.tick);
 
     var setSails = snap.sails.filter(function (x) {
@@ -41,6 +44,7 @@
     set("i-strain", strain.length ? strain.map(function (x) { return U.partName(x.id) + " " + x.strain_ratio.toFixed(2); }).join(", ") : "none above rating");
 
     renderCrew(snap.crew);
+    renderStations(snap.agents);
 
     var evoList = document.getElementById("i-evolutions");
     if (evoList) {
@@ -89,6 +93,46 @@
       ? busy + " at work (" + work.map(function (w) { return w.hands + " " + (w.words || "at " + w.evolution.replace(/_/g, " ")); }).join(", ") + "), " + c.idle + " idle"
       : "none at work, " + c.idle + " idle";
     set("i-hands", hands + "; " + fatigueWords(c.fatigue_mean_on_deck) + " on deck, " + fatigueWords(c.fatigue_mean_below) + " below");
+  }
+
+  /** The stations (spec M4 §13 as revised): each agent's line, as the console's `state`
+   * prints it (stationed, standing by until X, paused, released, its turn open), and the
+   * question a pause puts to the captain, which is answered in the order box. The rows
+   * are made here, after the instruments, so the page needs no row until a station is
+   * manned. */
+  function renderStations(stations) {
+    var dl = document.querySelector("#instruments-panel .instruments");
+    if (!dl) return;
+    var dt = document.getElementById("i-stations-term");
+    var dd = document.getElementById("i-stations");
+    if (!stations || !stations.length) {
+      if (dt) dt.remove();
+      if (dd) dd.remove();
+      return;
+    }
+    if (!dd) {
+      dt = document.createElement("dt");
+      dt.id = "i-stations-term";
+      dt.textContent = "Stations";
+      dd = document.createElement("dd");
+      dd.id = "i-stations";
+      dd.className = "wrap stations";
+      dl.appendChild(dt);
+      dl.appendChild(dd);
+    }
+    dd.innerHTML = "";
+    stations.forEach(function (s) {
+      var line = document.createElement("div");
+      line.className = "station-line state-" + String(s.state || "").replace(/\s+/g, "-");
+      line.textContent = s.line || "The " + s.station + ": " + s.words + ".";
+      dd.appendChild(line);
+      if (s.question) {
+        var q = document.createElement("div");
+        q.className = "station-question";
+        q.textContent = s.question.charAt(0).toUpperCase() + s.question.slice(1) + " Say 'resume the " + s.station + "' or 'stand down the " + s.station + "'.";
+        dd.appendChild(q);
+      }
+    });
   }
 
   // The muster's words for fatigue (crew/model.py FATIGUE_FRESH_BELOW, FATIGUE_TIRED_BELOW).

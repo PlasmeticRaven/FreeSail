@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "freesail": {
+      "command": "py",
+      "args": [
+        "-m",
+        "freesail.agents.mcp_server",
+        "--game",
+        "http://localhost:8000",
+        "--model-name",
+        "SET THE MODEL'S EXACT NAME HERE"
+      ],
+      "env": {
+        "PYTHONUTF8": "1"
+      }
+    }
+  }
+}
