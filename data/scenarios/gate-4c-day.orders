@@ -1,15 +1,16 @@
 # FreeSail: the captain's orders for the gate's day (spec M4 §18, §19; package 29).
 #
 # The starter routines (data/standing_orders/starter.orders) are the ship's standing book;
-# these four are the captain's additions for this passage, read after them by the scenario
+# these three are the captain's additions for this passage, read after them by the scenario
 # (data/scenarios/gate-4c-day.yaml). Without them the day loses canvas: under the starter
-# routines alone the frigate carried her topgallants into the rising wind and blew two of
-# them out and carried away the fore topgallant yard at 35 knots in the first watch, and
-# blew out the mainsail, the spanker and the jib at 45 in the middle watch (package 29's
-# first run of the day, seed 7; docs/dev/TuningNotes.md, M4c). The starter's "shorten sail
-# for weather" takes in the studding sails and the royals and reefs the topsails once at
-# thirty knots; the topgallants, the courses and the head and after sails are left to the
-# captain, and these are the captain's.
+# routines alone the frigate blew out the mainsail, the spanker and the jib at 45 knots
+# running before the gale in the middle watch (package 29's first runs of the day, seed 7;
+# docs/dev/TuningNotes.md, M4c; in those runs the starter book also carried her topgallants
+# into the rising wind and lost two of them at 35 knots, which the owner's ruling at gate
+# 4c moved into the starter's "shorten sail for weather"). The starter's shortening of sail
+# takes in the studding sails, the royals and the topgallants and reefs the topsails once
+# at thirty knots; the courses and the head and after sails are left to the captain, and
+# these are the captain's.
 #
 # The sail each strength of wind allows is Beaufort's (his scale of 1806 as the Admiralty
 # adopted it in 1838 gives, for each force, the canvas "a well-conditioned man-of-war"
@@ -18,11 +19,6 @@
 # and a whole gale (41 to 55 knots), close-reefed topsails and a reefed foresail, which is
 # a ship scudding. The thresholds are the starter routines' own where they can be (thirty
 # and forty knots, the strain truths), and judgement between.
-
-# The topgallants in at thirty knots, with the starter's shortening of sail (Beaufort's
-# force 7; truth 9: in 35 knots the royals and topgallants carry away within twenty minutes
-# under all sail). The same two minutes as the starter's, so a gust passes.
-standing order "topgallants": when the true wind exceeds 30 knots for 2 minutes then take in the topgallants
 
 # Gale canvas: scudding before the gale under the topsails and the foresail. The jib is of no
 # use dead before the wind and the spanker makes her gripe and yaw; the mainsail comes in so

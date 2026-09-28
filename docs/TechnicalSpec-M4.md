@@ -68,7 +68,7 @@ Examples, which are also the starter routines' text:
 ```
 standing order "night routine": at sunset then take in the studdingsails; take in the royals
 standing order "morning sail": at sunrise, if the true wind is under 20 knots then set the royals
-standing order "shorten sail for weather": when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; reef the topsails, one reef
+standing order "shorten sail for weather": when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; take in the topgallants; reef the topsails, one reef
 standing order "keep her full": when the apparent wind is forward of 55 degrees then bear away one point
 standing order "heavy weather": when the true wind exceeds 40 knots for 5 minutes then send down the topgallant masts; take in the fore topmast staysail; bend the fore storm staysail; close reef the topsails
 standing order "storm staysail": when the fore storm staysail is furled and the true wind exceeds 40 knots then set the fore storm staysail

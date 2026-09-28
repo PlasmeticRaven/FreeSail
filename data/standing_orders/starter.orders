@@ -27,9 +27,14 @@ standing order "morning sail": at sunrise, if the true wind is under 20 knots th
 # 35 knots the royals and topgallants carry away within twenty minutes under all sail
 # (truth 9), and docs/dev/TuningNotes.md records the light sails' ratings tuned to that;
 # two minutes is the duration that lets a gust pass (spec §3's debounce; the M2 wind's
-# gusts last five to thirty seconds, physics/wind.py).
+# gusts last five to thirty seconds, physics/wind.py). The topgallants come in with the
+# royals (owner's ruling at gate 4c, 2026-09-28, from package 29's first runs of the gate's
+# day, in which the frigate carried her topgallants into the rising wind and blew two out
+# at 35 knots): Luce's order of shortening sail as it freshens is royals, topgallants,
+# then the reefs, and Beaufort's force 7 (28 to 33 knots) carries "double-reefed topsails
+# and jib", the topgallant sails in.
 standing order "shorten sail for weather": when the true wind exceeds 30 knots for 2 minutes
-    then take in the studdingsails; take in the royals; reef the topsails, one reef
+    then take in the studdingsails; take in the royals; take in the topgallants; reef the topsails, one reef
 
 # Keeping her full. Fifty-five degrees of apparent wind is a little forward of where the
 # frigate's sails just fill: on a wind she carries the apparent wind at 48 to 52 degrees

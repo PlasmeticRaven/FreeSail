@@ -375,26 +375,26 @@ Package 29 (spec M4 §18 to §23): the weather script, compression to 300 with t
 
 ### Package 29: the gate's day at seed 7, measured
 
-`data/scenarios/gate-4c-day.yaml`: the frigate from 04:00 on 1 June 1805 at 50 N, heading 135 (south-east), the M2 wind's gustiness and wander at 0.3, plain sail and the royals ordered at four; the starter routines and the captain's four for the passage (`data/scenarios/gate-4c-day.orders`). The script: W 17 knots at 04:00, 18 at 14:00, 19 at 19:30; veering to WNW and 29 by 22:00, NW 36 by midnight, 45 at 01:00 and held to 03:00; easing to 26 at 05:00 and 18 at 07:00. Run to 09:00 on 2 June (104,400 ticks):
+`data/scenarios/gate-4c-day.yaml`: the frigate from 04:00 on 1 June 1805 at 50 N, heading 135 (south-east), the M2 wind's gustiness and wander at 0.3, plain sail and the royals ordered at four; the starter routines and the captain's three for the passage (four in the first measurement, before the topgallants moved into the starter book) (`data/scenarios/gate-4c-day.orders`). The script: W 17 knots at 04:00, 18 at 14:00, 19 at 19:30; veering to WNW and 29 by 22:00, NW 36 by midnight, 45 at 01:00 and held to 03:00; easing to 26 at 05:00 and 18 at 07:00. Run to 09:00 on 2 June (104,400 ticks):
 
 | Ship's time | Tick | What |
 |---|---|---|
 | 19:50:52 | 57052 | Sunset (by the sun at her easting); the night routine takes in the royals on the same tick |
-| 21:43:57 | 63837 | "shorten sail for weather" reefs the topsails once; the captain's "topgallants" takes them in |
+| 21:43:57 | 63837 | "shorten sail for weather": the topgallants in and the topsails reefed once (the topgallants moved into this line by the owner's ruling at gate 4c; the first measurement had them as a captain's order firing on the same tick) |
 | 21:58:39 | 64719 | Wind veered to WNW, a moderate gale |
-| 22:16:13, 22:56:28 | 65773, 68188 | "shorten sail for weather" again (the wind back under thirty for the dwell between): two reefs more |
+| 22:56:28 | 68188 | "shorten sail for weather" again (the wind back under thirty for the dwell between): a second reef (the first measurement had a firing at 22:16 too, three reefs by midnight) |
 | 23:55:46 | 71746 | Wind veered to NW |
 | 00:14:25 | 72865 | The captain's "gale canvas": the jib, the spanker and the mainsail in |
-| 00:38:56 | 74336 | "heavy weather": the topgallant masts sent down, the fore topmast staysail taken in, the storm staysail bent; the close reef refused (three reefs in already). The script's forty knots plus five minutes is 00:32 |
+| 00:38:56 | 74336 | "heavy weather": the topgallant masts sent down, the fore topmast staysail taken in, the storm staysail bent, the topsails close-reefed (two reefs were in; the first measurement had three and the close reef refused). The script's forty knots plus five minutes is 00:32 |
 | 01:15:02 | 76502 | "storm staysail" sets the fore storm staysail as it is bent |
 | 03:22:54 | 84174 | "heavy weather" again (the wind under forty for the dwell and over it again): all four orders refused in words, everything done already |
 | 03:41:30 | 85290 | Sunrise ("morning sail" holds: the wind is 45 knots) |
 | 05:55:04 | 93304 | The captain's "make sail after the gale": storm staysail in, topgallant masts up, reefs out, plain sail |
 | 06:34:10 | 95650 | The captain's "topgallants again" |
 
-Nothing blown out, carried away or parted; 79 strain warnings over the day (notable), none urgent. 479 log lines; digest `f2191f3328f1914d` at 09:00 on 2 June. At seeds 1 and 2 the same day loses nothing either; the heavy-weather routine fires at 00:08 and 00:27 (the wind's wander about the scripted base, some four knots at variability 0.3, moves the forty-knot crossing by twenty minutes either way).
+Nothing blown out, carried away or parted; 79 strain warnings over the day (notable), none urgent. 480 log lines; digest `70a0be9b664f382c` at 09:00 on 2 June (the first measurement, with the topgallants a captain's order: 479 lines, `f2191f3328f1914d`). At seeds 1 and 2 the same day loses nothing either; the heavy-weather routine fires at 00:08 and 00:27 (the wind's wander about the scripted base, some four knots at variability 0.3, moves the forty-knot crossing by twenty minutes either way).
 
-**Without the captain's four,** under the starter routines alone, the day lost canvas (the first runs, heading south with the wind on the beam then the quarter): two topgallants blew out and the fore topgallant yard carried away at 35 knots in the first watch, and the mainsail, the spanker and the jib blew out at 45 in the middle watch. The starter's "shorten sail for weather" takes in the studding sails and royals and reefs once, and nothing in the starter book takes in the topgallants or the courses before forty. Heading south-east the gale comes aft and she scuds; heading south she reached across it. Truth 48 is asserted with the captain's four, and the gate report says so.
+**Without the captain's orders** (four in the first measurement, three since the owner's ruling moved the topgallants into the starter book), under the starter routines alone, the day lost canvas (the first runs, heading south with the wind on the beam then the quarter): two topgallants blew out and the fore topgallant yard carried away at 35 knots in the first watch, and the mainsail, the spanker and the jib blew out at 45 in the middle watch. The starter's "shorten sail for weather" takes in the studding sails and royals and reefs once, and nothing in the starter book takes in the topgallants or the courses before forty. Heading south-east the gale comes aft and she scuds; heading south she reached across it. Truth 48 is asserted with the captain's four, and the gate report says so.
 
 **The roll-up at 300x (truth 50):** 30 roll-ups for the 29 hours and the hour begun at 09:00 (the last "so far"); 284 routine lines summed in them; 195 lines kept as they are (172 notable, 23 routine lines of the captain's and the driver's, the book read at four). An hour at sea under standing orders rolls up to a line like "All hands up 5 times, piped down 4 times, the hands at their work (18 steps), standing orders 'shorten sail for weather' and 'topgallants' found nothing to do 5 times; 34 routine entries."
 

@@ -63,7 +63,7 @@ Truth 47, the consent step in front of any station brief, is here.
 
 Truths 48 to 51 are milestone 4c's, the ship sailing herself (docs/TechnicalSpec-M4.md
 §23): the gate's day from its scenario file (data/scenarios/gate-4c-day.yaml, the weather
-script with it) under the starter routines and the captain's four for the passage (48),
+script with it) under the starter routines and the captain's three for the passage (48),
 saved at several ticks and replayed (49), its log at 300x through the roll-up (50), and
 the frigate's ticks a second against the build machine's floor (51; the spec's budget is
 not met on the build machine and the lead sets it with the owner, docs/dev/TuningNotes.md).
@@ -1782,7 +1782,7 @@ def test_truth_47_the_consent_step_runs_first_for_new_weights_and_not_again_afte
 # The gate's day is data/scenarios/gate-4c-day.yaml: the frigate at 04:00 on 1 June 1805,
 # 50 N, heading south-east, the weather script of spec §19 (a fresh breeze from the west at
 # dawn, veering north-west and rising to a gale in the middle watch, easing at the next
-# dawn), the starter routines and the captain's four for the passage
+# dawn), the starter routines and the captain's three for the passage
 # (data/scenarios/gate-4c-day.orders), plain sail and the royals ordered at four. Seed 7,
 # the file's. Measured values are named here and recorded in docs/dev/TuningNotes.md, M4c.
 
@@ -1795,11 +1795,13 @@ SECOND_FORENOON = 28 * 3600  # 08:00 on 2 June
 GATE_DAY_SAVES = (1800, 16 * 3600, 21 * 3600)
 LOST = ("sail.blown_out", "spar.carried_away", "line.parted")
 
-# Measured at seed 7 (package 29): sunset at 19:50 by the sun at her easting, and the night
-# routine's order on its tick; the heavy-weather routine at 00:38:56 in the middle watch,
-# its four orders on one tick (three carried out, the close reef refused: three reefs were
-# in already); the captain's "make sail after the gale" at 05:55 and the
-# topgallants set again at 06:34; plain sail from about 07:00.
+# Measured at seed 7 (package 29, and again with the topgallants in the starter's
+# shortening line, the owner's ruling at gate 4c; the ticks did not move): sunset at 19:50
+# by the sun at her easting, and the night routine's order on its tick; the heavy-weather
+# routine at 00:38:56 in the middle watch, its four orders on one tick and all carried out
+# (two reefs were in; the first measurement had three and the close reef refused); the
+# captain's "make sail after the gale" at 05:55 and the topgallants set again at 06:34;
+# plain sail from about 07:00.
 GATE_DAY_SUNSET_TICK = 57052
 GATE_DAY_HEAVY_WEATHER_TICK = 74336
 GATE_DAY_TOPGALLANTS_AGAIN_TICK = 95650
@@ -1840,18 +1842,19 @@ def test_truth_48_the_gates_day_under_the_standing_orders(gate_day):
     """Spec M4 §23, truth 48: "Through the gate's day under the starter routines the ship
     loses nothing, the night routine and the heavy-weather routine fire in the log at the
     times the weather script implies, and she is back under plain sail by the second
-    forenoon." Under the starter routines and the captain's four for the passage (without
-    them she blows out two topgallants and carries away the fore topgallant yard at 35
-    knots, and blows out the mainsail, spanker and jib at 45; package 29's first runs).
+    forenoon." Under the starter routines (the topgallants in with the royals at thirty,
+    the owner's ruling at gate 4c) and the captain's three for the passage (without them
+    she blows out the mainsail, spanker and jib at 45 running before the gale; package
+    29's first runs).
 
     - Nothing lost: no sail blown out, no spar carried away, no line parted, no part
       wrecked, through a gale of 45 knots.
     - The night routine at sunset, 19:50, taking in the royals (the studding sails were
       never set, and it says so); the script's wind is still a fresh breeze then.
-    - The heavy-weather routine in the middle watch, its orders on one tick, within a
-      quarter of an hour of the script's forty knots plus the five minutes (the wind's
-      wander about the scripted base is some four knots, physics/wind.py; measured
-      00:38:56 against 00:32 implied).
+    - The heavy-weather routine in the middle watch, its four orders on one tick and all
+      carried out, within a quarter of an hour of the script's forty knots plus the five
+      minutes (the wind's wander about the scripted base is some four knots,
+      physics/wind.py; measured 00:38:56 against 00:32 implied).
     - Plain sail by eight bells in the second forenoon (08:00 on 2 June): every sail of the
       ship's "plain sail" set, no reef in, the topgallant masts up, the storm staysail in.
     """
@@ -1871,14 +1874,21 @@ def test_truth_48_the_gates_day_under_the_standing_orders(gate_day):
     assert units.describe_wind_strength(wind) == "a fresh breeze"
 
     heavy = by_order(world, "heavy weather")
-    # three orders carried out; the fourth, close reef the topsails, is refused in words:
-    # the starter's "shorten sail for weather" had put three reefs in already, one a firing
-    assert [t for t, _ in heavy] == [GATE_DAY_HEAVY_WEATHER_TICK] * 3
+    # all four orders carried out on the one tick: the masts down, the fore topmast staysail
+    # in, the storm staysail bent, the topsails close-reefed (the starter's "shorten sail for
+    # weather" had fired twice by then, two reefs in; with the topgallants in its line it
+    # fires twice in this day where the first measurement, with the topgallants a separate
+    # order of the captain's, had it fire three times and the close reef refused)
+    assert [t for t, _ in heavy] == [GATE_DAY_HEAVY_WEATHER_TICK] * 4
+    assert [text.split(": ")[1] for _, text in heavy] == [
+        "sending down the topgallant masts.",
+        "taking in the fore topmast staysail.",
+        "bending the fore storm staysail.",
+        "close reefing the topsails.",
+    ]
     # (and at 03:22, the wind under forty for the dwell and over it again, the routine fires
     # once more and all four are refused in words: everything is done already)
-    refused = [x for x in refused_by_order(world, "heavy weather") if x[0] == heavy[0][0]]
-    assert len(refused) == 1
-    assert "close reef the topsails" in refused[0][1] and "already close reefed" in refused[0][1]
+    assert [x for x in refused_by_order(world, "heavy weather") if x[0] == heavy[0][0]] == []
     fired = world.clock.start + timedelta(seconds=heavy[0][0])
     assert units.watch_of(fired)[1] == "Middle watch"
     implied = script_implies(sf, 40.0, datetime(1805, 6, 1, 20, 0)) + timedelta(minutes=5)

@@ -44,7 +44,7 @@ weather:
   # in (the starter's; truth 34).
   - {at: 1805-06-01T19:30, from_deg: 270, knots: 19}
   # After dark the wind veers two points to west-north-west and rises to a moderate gale:
-  # thirty knots (the starter's "shorten sail for weather", the captain's "topgallants")
+  # thirty knots (the starter's "shorten sail for weather", the topgallants in with it)
   # about 22:10, in the first watch.
   - {at: 1805-06-01T22:00, from_deg: 292.5, knots: 29}
   # Two points more to north-west and a fresh gale by midnight: the captain's "gale
