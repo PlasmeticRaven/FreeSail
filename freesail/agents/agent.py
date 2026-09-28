@@ -26,12 +26,15 @@ from freesail.core.events import Severity
 __all__ = [
     "A_GLASS_S",
     "A_WATCH_S",
+    "BOOK_SIZE_TOKENS",
     "BRIEF_LOG_LINES",
     "HEAD_ORDER",
     "OPT_OUT_TOKEN",
     "SESSION_PLAY",
     "SESSION_SOLO",
     "SESSION_TEST",
+    "SHELF_LIFE_TURNS",
+    "SHELF_WORDS",
     "STAND_BY_WORDS",
     "STATION_NAMES",
     "WATCHER_BRIEF",
@@ -248,6 +251,43 @@ STAND_BY_WORDS = (
     "and listed."
 )
 
+# The shelf (package 28d; spec M4 open item 9, the owner and the lead, 2026-09-28): a
+# library read is a book taken off the shelf, and the reader puts it back.
+#
+# A book left open goes back on the shelf by itself after this many of the model's own
+# turns after the one it was read in (judgement, the owner's fallback: long enough to
+# use a page over a glass or two of questions, short enough that a local model's context
+# is not held by a chapter it glanced at an hour ago).
+SHELF_LIFE_TURNS = 3
+
+# A `read_log` result longer than this many tokens is a book too, with a handle (a
+# judgement: a glass of quiet sailing is some tens of lines, about 450 tokens as a sample
+# carries them, docs/agents/Harness.md; a read of more than that is a page worth
+# putting back). Measured at `tools.CHARS_PER_TOKEN`.
+BOOK_SIZE_TOKENS = 600
+
+NUMBER_WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six"}
+
+
+def number_words(n: int) -> str:
+    return NUMBER_WORDS.get(n, str(n))
+
+
+# What the shelf does, in the brief's documentation item and the `shelve` tool's
+# description: plain and exact, the number stated.
+SHELF_WORDS = (
+    "Every library read, and a read_log longer than about "
+    f"{BOOK_SIZE_TOKENS} tokens, is a book: its result opens with a line that names it, "
+    "when it was opened and its number ('primer 3, reefing, opened 04:10; book 7'). "
+    "shelve(book='book 7') puts that book back; a topic's name ('primer 3') puts back every "
+    "open book of it; shelve() with nothing puts back every open book. From then on your "
+    "conversation holds the book's line and not its pages. A book you leave open goes back "
+    f"by itself after {number_words(SHELF_LIFE_TURNS)} more of your turns, and the next "
+    "sample says so. The library is always there: any book opens again at any time with "
+    "the same call, under a new number. Your journal is where to keep what you took from "
+    "a page."
+)
+
 # The five items of the head, in the order the spec fixes (§11). `Brief.build` writes
 # them in this order and nothing else writes them.
 HEAD_ORDER: tuple[str, ...] = ("disclosure", "opt_out", "documentation", "authority", "situation")
@@ -320,7 +360,11 @@ class Brief:
                 "through the library tool: library(topic='contents') lists what it holds "
                 "(the primer of period seamanship, the catalogue of evolutions, the grammar "
                 "of the order language, this ship's own names and groups, the book of "
-                "standing orders). The tools you have are: "
+                "standing orders) and what each topic costs in tokens; a topic lists its "
+                "sections with their sizes, and a section, a whole chapter or a search "
+                "(find) is served on request. "
+                + SHELF_WORDS
+                + " The tools you have are: "
                 + ", ".join(tool_names)
                 + ". Each sample you receive is data from the game: the new log lines, the "
                 "readings in words, any question the captain has put to you, and any notice "

@@ -85,6 +85,29 @@ not. Silence is judged on ship's time as before: a floor held with no reply for 
 station's patience brings the nudge as a fold, and a second span the pause, which
 takes the floor back.
 
+**The shelf** (package 28d; spec M4 open item 9). A library read is a book taken off the
+shelf, and the reader puts it back. Every library page, and a `read_log` longer than
+`BOOK_SIZE_TOKENS`, is a **book** (`tools.book_of`): its result opens with a handle line
+("primer 3, reefing, opened 04:10; book 7"), the number counting up per agent. `shelve`
+(a handle, a topic's words, or nothing for every open book) puts books back: the book's
+result in the conversation is replaced by its stub ("You read primer 3, reefing, at 04:10;
+shelved (book 7). library(...) opens it again."), so from the model's next request on
+only the line remains. A book left open goes back by itself after `SHELF_LIFE_TURNS` of
+the model's turns after the one it was read in, the stub in its place and a notice in
+the next sample. The model's turns are counted where a sample ends (`_end_sample`), so a
+replay shelves at the same points; a shelve is a tool call in a reply, so the
+transcript holds it. A shelved turn is served as its stub from then on: the
+conversation is changed in place and `revision` counts the changes, which the agent API
+carries so that a door rebuilding its messages from the game's turns knows to read them
+again (`remote.Desk`). A door whose client keeps its own conversation (MCP; the REPL,
+whose turns are printed once) is told so plainly by `shelve` and by the notice: the
+game will not show the pages again, but it cannot take them out of the client's
+conversation. Reads out of turn (a door's read-only call while the game has the floor)
+are books too, recorded as acts (`door_act`: "read", "shelve") so a replay numbers and
+shelves the same; the game keeps no copy of such a read's pages, so there is nothing to
+stub. Nothing here makes the reference less reachable: every book opens again on
+request, under a new number (`docs/design/Papers-and-Books.md`).
+
 **A plain conversation** (`conversation=True`, spec §14): the consent step runs the
 consent brief through this same loop, so the token scan, the tool calls and the journal
 are the same code, with three differences. The brief is fixed (`brief=`, a
@@ -99,15 +122,18 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 from freesail.agents import tools
 from freesail.agents.agent import (
+    BOOK_SIZE_TOKENS,
     BRIEF_LOG_LINES,
     OPT_OUT_TOKEN,
     PAUSED,
     RELEASED,
     SESSION_TEST,
+    SHELF_LIFE_TURNS,
     STANDING_BY,
     STATIONED,
     AgentState,
@@ -115,6 +141,7 @@ from freesail.agents.agent import (
     SamplingPolicy,
     StandBy,
     Station,
+    number_words,
 )
 from freesail.agents.fake import Transcript
 from freesail.agents.journal import Journal
@@ -127,7 +154,10 @@ if TYPE_CHECKING:
     from freesail.core.world import World
 
 __all__ = [
+    "BOOK_SIZE_TOKENS",
     "OPT_OUT_TOKEN",
+    "SHELF_LIFE_TURNS",
+    "Book",
     "Playback",
     "SAMPLE_ROUTINE_LINES",
     "TOOL_CALLS_PER_SAMPLE",
@@ -186,6 +216,48 @@ FOLDED_WORDS = (
 )
 
 SaveFn = Callable[["World", str], Any]
+
+# The doors whose client keeps the model's conversation itself, so that a shelved book's
+# pages stay in it: the MCP client's chat, and the REPL, which prints each turn once.
+DOORS_THAT_KEEP_THEIR_OWN = ("mcp", "repl")
+
+# A book's states: open in the conversation; shelved by the model; gone back by the
+# shelf-life; left behind by a brief sent again (the door's conversation starts at the
+# brief, so it is no longer in it); unseen (its result never reached the model, a
+# stand-by having ended the turn); read aside (out of turn: the game keeps no copy).
+OPEN, SHELVED, WENT_BACK, LEFT_BEHIND, UNSEEN, ASIDE = (
+    "open",
+    "shelved",
+    "went back",
+    "left behind",
+    "unseen",
+    "aside",
+)
+
+
+@dataclass
+class Book:
+    """A read the model took off the shelf: its number (counting up per agent), the words
+    that name it, the call that reads it again, the ship's clock when it was opened, the
+    model's turn it was opened in (turns ended before it), and where its result stands
+    in the conversation (the turn's index and the result's) once it is there."""
+
+    number: int
+    title: str
+    reopen: str
+    opened: str
+    turn: int
+    state: str = OPEN
+    slot: int | None = None  # the result's index among its reply's tool results
+    at: int | None = None  # the index of the tool-results turn in `Harness.turns`
+
+    @property
+    def handle(self) -> str:
+        return f"{self.title}, opened {self.opened}; book {self.number}"
+
+    @property
+    def named(self) -> str:
+        return f"book {self.number} ({self.title})"
 
 
 class Harness:
@@ -246,6 +318,13 @@ class Harness:
         # who is at the station, for the save and the drivers (set by the agent API)
         self.model_name = ""
         self.door = ""
+        # the shelf (package 28d): the books read, the model's turns ended so far (the
+        # shelf-life counts them), the books opened in the reply being taken, and the
+        # count of changes to turns already served (a door reads the turns again on it)
+        self.books: list[Book] = []
+        self.turns_ended = 0
+        self._new_books: list[Book] = []
+        self.revision = 0
         world.agents[station.name] = self
 
     # -- properties --------------------------------------------------------------------
@@ -317,6 +396,9 @@ class Harness:
             self.brief = self._fixed_brief
             self.turns.append(Turn(OPERATOR, self.brief.text()))
             return self.brief
+        for b in self.books:
+            if b.state == OPEN:
+                b.state = LEFT_BEHIND  # a door's conversation begins at the brief
         world = self.world
         lines = [
             f"{d['stamp']}  {d['text']}"
@@ -676,6 +758,7 @@ class Harness:
                 return
         # 2. the tool calls, in order, up to the budget
         results: list[dict[str, Any]] = []
+        self._new_books = []
         stood = False
         for c in reply.calls:
             if self._calls_this_sample >= TOOL_CALLS_PER_SAMPLE:
@@ -692,6 +775,8 @@ class Harness:
             self._calls_this_sample += 1
             was_standing_by = self.agent.standing_by
             results.append({"name": c.name, "args": dict(c.args), "result": self._call(c)})
+            if self._new_books and self._new_books[-1].slot is None:
+                self._new_books[-1].slot = len(results) - 1
             if self.agent.released:
                 return  # the token or opt_out: the turn and the station end here
             if (
@@ -720,10 +805,14 @@ class Harness:
         if text or reply.calls:
             self._sample_had_words = True
         if stood:
+            for b in self._new_books:
+                b.state = UNSEEN  # its result never reached the model
+            self._new_books = []
             self._end_sample()
             return
         if results and not self.agent.released:
             self.turns.append(Turn(DATA, {"tool_results": results}))
+            self._place_books(len(self.turns) - 1)
             if self.conversation and any(
                 r.get("name") == "answer" and "args" in r for r in results
             ):
@@ -744,7 +833,13 @@ class Harness:
             )
         if c.name == "submit_order":
             self._note_submission(str(c.args.get("text", "")))
-        return tools.call(self.world, self.station.name, c.name, c.args)
+        result = tools.call(self.world, self.station.name, c.name, c.args)
+        found = tools.book_of(c.name, c.args, result) if c.name in tools.BOOK_TOOLS else None
+        if found is None:
+            return result
+        book = self._open_book(*found)
+        self._new_books.append(book)
+        return _with_handle(result, book)
 
     def _end_sample(self) -> None:
         self._open = None
@@ -768,6 +863,158 @@ class Harness:
             # count itself is reset only by another order or a change in the readings,
             # since the detector counts submissions, not samples)
             a.nudged_for = None
+        self._shelf_life()
+
+    # -- the shelf (package 28d) ----------------------------------------------------------
+
+    @property
+    def keeps_its_own(self) -> bool:
+        """The door's client keeps the model's conversation itself (MCP, the REPL)."""
+        return self.door in DOORS_THAT_KEEP_THEIR_OWN
+
+    def open_books(self) -> list[Book]:
+        return [b for b in self.books if b.state == OPEN]
+
+    def _open_book(self, title: str, reopen: str) -> Book:
+        book = Book(
+            len(self.books) + 1,
+            title,
+            reopen,
+            self.world.clock.ship_time.strftime("%H:%M"),
+            self.turns_ended,
+        )
+        self.books.append(book)
+        return book
+
+    def _place_books(self, at: int) -> None:
+        """The books opened in the reply just taken now stand in the conversation, at the
+        tool-results turn `at`; one shelved in the same reply is stubbed at once."""
+        for b in self._new_books:
+            b.at = at
+            if b.state in (SHELVED, WENT_BACK):
+                self._stub(b)
+        self._new_books = []
+
+    def _stub(self, b: Book) -> None:
+        """The book's result in the conversation replaced by its line, a new turn in the
+        old one's place (the old turn object is left as it was, for whoever holds it)."""
+        if b.at is None or b.slot is None:
+            return
+        turn = self.turns[b.at]
+        results = list(turn.content["tool_results"])
+        entry = dict(results[b.slot])
+        how = (
+            f"it went back on the shelf after {number_words(SHELF_LIFE_TURNS)} of your turns"
+            if b.state == WENT_BACK
+            else "shelved"
+        )
+        entry["result"] = (
+            f"You read {b.title}, at {b.opened}; {how} (book {b.number}). "
+            f"{b.reopen} opens it again."
+        )
+        results[b.slot] = entry
+        self.turns[b.at] = Turn(DATA, {**turn.content, "tool_results": results})
+        self.revision += 1
+
+    def _shelf_life(self) -> None:
+        """At the end of each of the model's turns: a book open for `SHELF_LIFE_TURNS`
+        turns after the one it was read in goes back, and the next sample says so."""
+        self.turns_ended += 1
+        for b in self.books:
+            if b.state != OPEN or b.at is None:
+                continue
+            if self.turns_ended - b.turn > SHELF_LIFE_TURNS:
+                b.state = WENT_BACK
+                self._stub(b)
+                self.agent.notices.append(self._went_back_words(b))
+
+    def _went_back_words(self, b: Book) -> str:
+        n = number_words(SHELF_LIFE_TURNS)
+        again = f"{b.reopen} opens it again, under a new number."
+        if self.keeps_its_own:
+            return (
+                f"Book {b.number} ({b.title}) went back on the shelf after {n} of your turns: "
+                "the game will not show its pages to you again, though your client keeps its "
+                f"own copy of the conversation. {again}"
+            )
+        return (
+            f"Book {b.number} ({b.title}) went back on the shelf after {n} of your turns: "
+            f"your conversation holds its line and not its pages. {again}"
+        )
+
+    def shelve(self, words: str = "") -> str:
+        """`shelve(book)`: a handle ("book 7", "7"), a topic's words ("primer 3", which
+        puts back every open book whose name holds them), or nothing for every open book.
+        The shelved books' results are replaced by their lines at once, so the model's
+        next request carries the lines only."""
+        key = " ".join(str(words or "").lower().split()).strip(" .'\"")
+        open_now = self.open_books()
+        if key in ("", "all", "every book", "all books", "everything"):
+            chosen = open_now
+            if not chosen:
+                return "No book is open; nothing was shelved."
+        else:
+            number = key.removeprefix("book").strip().lstrip("#")
+            if number.isdigit():
+                b = next((x for x in self.books if x.number == int(number)), None)
+                if b is None:
+                    return f"There is no book {number}; {self._open_words(open_now)}"
+                if b.state == ASIDE:
+                    return self._aside_words(b)
+                if b.state != OPEN:
+                    return f"Book {b.number} ({b.title}) is on the shelf already."
+                chosen = [b]
+            else:
+                chosen = [b for b in open_now if key in b.title.lower()]
+                if not chosen:
+                    return f"No open book is called '{words}'; {self._open_words(open_now)}"
+        for b in chosen:
+            b.state = SHELVED
+            self._stub(b)  # a book opened in this same reply is stubbed when it is placed
+        names = "; ".join(b.named for b in chosen)
+        if self.keeps_its_own:
+            return (
+                f"Shelved: {names}. The game will not show those pages to you again. This "
+                "door's client keeps its own copy of the conversation, so the game cannot take "
+                "the pages out of it; your journal is the place for what you took from them. "
+                "Any book opens again with its call, under a new number."
+            )
+        return (
+            f"Shelved: {names}. From your next request on, your conversation holds each "
+            "book's line and not its pages; your journal is the place for what you took from "
+            "them. Any book opens again with its call, under a new number."
+        )
+
+    def _open_words(self, open_now: list[Book]) -> str:
+        if not open_now:
+            return "no book is open."
+        return "the open books: " + "; ".join(b.named for b in open_now) + "."
+
+    def _aside_words(self, b: Book) -> str:
+        client = (
+            " Your client keeps its own copy of the conversation." if self.keeps_its_own else ""
+        )
+        return (
+            f"Book {b.number} ({b.title}) was read while the game had the floor, so the game "
+            f"keeps no copy of its pages and there is nothing of it to shelve.{client}"
+        )
+
+    def aside(self, c: ToolCall) -> Any:
+        """A read-only tool, or `shelve`, called while the game has the floor (a door's
+        call out of turn, `remote.Desk`). A read that is a book gets a handle, and the
+        read and a shelve are recorded as acts from outside the loop, so a replay numbers
+        and shelves the same (`door_act`)."""
+        if c.name == "shelve":
+            unknown = [k for k in c.args if k != "book"]
+            if unknown:
+                return tools.call(self.world, self.station.name, c.name, c.args)
+            return self.door_act("shelve", str(c.args.get("book") or ""), "out of turn")
+        result = tools.call(self.world, self.station.name, c.name, c.args)
+        found = tools.book_of(c.name, c.args, result) if c.name in tools.BOOK_TOOLS else None
+        if found is None:
+            return result
+        book = self.door_act("read", *found)
+        return result if book is None else _with_handle(result, book)
 
     # -- welfare -----------------------------------------------------------------------
 
@@ -876,16 +1123,18 @@ class Harness:
             return True
         return False
 
-    def door_act(self, act: str, reason: str, by: str) -> None:
+    def door_act(self, act: str, reason: str, by: str) -> Any:
         """A stop that comes from outside the loop, which a replay could not otherwise
         know of: a door's release (the door closed, the client went away, Ctrl-C), the
         token sent out of turn, the driver's ten real minutes. It is recorded in the
         transcript at this tick and count of orders, so that a replay makes it again at
         the same point (`Playback`), and then made: `act` is "leave" (the opt-out, `by`
         saying how), "stand_down" (`by` saying who) or "speak" (the model's own word
-        while the game has the floor, `reason` its words; `own_word`)."""
+        while the game has the floor, `reason` its words; `own_word`), "read" (a book
+        read out of turn: `reason` its title, `by` the call that reads it again; returns
+        the book) or "shelve" (out of turn: `reason` the words; returns the answer)."""
         if self.agent.released:
-            return
+            return None
         world = self.world
         self.transcript.append(
             {
@@ -900,8 +1149,15 @@ class Harness:
             self.leave(reason, how=by)
         elif act == "speak":
             self.own_word(reason)
+        elif act == "read":
+            book = self._open_book(reason, by)
+            book.state = ASIDE
+            return book
+        elif act == "shelve":
+            return self.shelve(reason)
         else:
             self.stand_down(reason, by=by)
+        return None
 
     def _play_door_acts(self) -> None:
         """A replay makes the recorded stops from outside the loop at their points."""
@@ -1236,6 +1492,14 @@ def _reason_after_token(reply: Reply, found_in: str) -> str:
             found_in = p
             break
     return found_in.split(OPT_OUT_TOKEN, 1)[1].strip(" .:;,-\n")
+
+
+def _with_handle(result: Any, book: Book) -> Any:
+    """A book's result with its handle first: a page's line above its text, a log read's
+    `book` key first among its keys."""
+    if isinstance(result, dict):
+        return {"book": book.handle, **result}
+    return f"{book.handle}\n{result}"
 
 
 def conversation_text(content: dict[str, Any]) -> str | None:

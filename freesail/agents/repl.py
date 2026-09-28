@@ -327,11 +327,22 @@ def _save_fn(path: str):
     return save
 
 
+# The shelf at this door (package 28d): each turn is printed once and stays with the
+# reader, so shelving cannot take pages back; the brief says so plainly.
+SHELF_NOTE = (
+    "This door prints each turn once, and what it has printed stays with you: shelve notes "
+    "a book as put back and the game will not show its pages again, but it cannot take "
+    "them back from you."
+)
+
+
 def _consent_note(record: consent.Record | None) -> str:
     if record is None:
-        return REPLY_SYNTAX
+        return f"{REPLY_SYNTAX} {SHELF_NOTE}"
     where = consent._rel(record.path) if record.path else "docs/agents/consent/"
-    return f"{REPLY_SYNTAX} Consent for this model is on record ({where}, {record.date})."
+    return (
+        f"{REPLY_SYNTAX} {SHELF_NOTE} Consent for this model is on record ({where}, {record.date})."
+    )
 
 
 def run_interactive(args: argparse.Namespace, inp: TextIO, out: TextIO) -> int:
@@ -378,6 +389,7 @@ def run_interactive(args: argparse.Namespace, inp: TextIO, out: TextIO) -> int:
             save=_save_fn(args.save),
             door_note=_consent_note(record),
         )
+        h.door = "repl"  # the terminal keeps what it printed (the shelf's words)
         h.start()
     while not h.agent.released and not model.closed:
         world.tick()
@@ -537,6 +549,7 @@ def run_turn(args: argparse.Namespace) -> int:
             save=_save_fn(args.save),
             door_note=_consent_note(record),
         )
+        h.door = "repl"  # the reader keeps what each call wrote (the shelf's words)
         h.start()
     ticks = 0
     while h.open_sample is None and not h.agent.released and ticks < args.max_ticks:

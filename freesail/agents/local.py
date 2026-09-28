@@ -55,7 +55,16 @@ budget; and says so when it cannot learn it.
 known (`--ctx-size`, else the server's `n_ctx` from `/props`), the oldest turns are left
 out of the request, whole exchanges at a time, so that the system message and the latest
 turns fit with `REPLY_RESERVE_TOKENS` to spare; a brief that alone does not fit stops the
-run with the numbers. Tokens are estimated at `CHARS_PER_TOKEN` characters each.
+run with the numbers. Tokens are estimated at `CHARS_PER_TOKEN` characters each (the
+harness's one rule, `tools.CHARS_PER_TOKEN`, which the library's sizes use too).
+
+**The shelf** (package 28d). The runner keeps the game's turns as the game serves them
+and builds each request's messages from them afresh, so a book the model shelved (or
+the shelf-life put back) goes out as its line and not its pages from the next request
+on: an answer whose `revision` has moved since the runner's copy was read has the
+runner read its turns again from where it began (`GameClient.reread`) before it asks
+the model; otherwise it reads on from its cursor. The pages are really gone from what
+the model is sent.
 
 **Nothing real passes through.** The request carries the brief, the samples and the tool
 results, the model's own earlier replies, the sampling settings and nothing else: no
@@ -80,7 +89,7 @@ from freesail.agents import consent
 from freesail.agents.harness import conversation_text
 from freesail.agents.model import DATA, MODEL, OPERATOR, Reply, ToolCall, Turn
 from freesail.agents.remote import GameClient, GameError, turn_from_dict
-from freesail.agents.tools import TOOLS, parameters_schema, tool_names
+from freesail.agents.tools import CHARS_PER_TOKEN, TOOLS, parameters_schema, tool_names
 
 __all__ = [
     "CHARS_PER_TOKEN",
@@ -95,9 +104,8 @@ __all__ = [
 # llama-server's default address (its --host 127.0.0.1 and --port 8080, per its README).
 DEFAULT_ENDPOINT = "http://127.0.0.1:8080"
 
-# About four characters of English to a token (judgement: the usual rule of thumb for
-# BPE vocabularies; the budget errs early rather than late by keeping a reserve).
-CHARS_PER_TOKEN = 4
+# `CHARS_PER_TOKEN` (four characters to a token) is the harness's one rule for measuring
+# text, named in `tools.py`; the budget errs early rather than late by keeping a reserve.
 
 # The most tokens one reply may run to, sent as `max_tokens` with every request (the
 # owner's ruling, 2026-09-28: generous on purpose, so that a long answer, a journal note
@@ -768,6 +776,10 @@ def run(
                     flush=True,
                 )
         turns.extend(new)
+        if game.stale:
+            # a turn already read has changed (a book shelved): the copy is read again,
+            # and the next request is built from the turns as the game serves them now
+            turns[:] = [turn_from_dict(t) for t in game.reread()]
         return answer
 
     took(a)

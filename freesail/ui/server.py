@@ -40,7 +40,8 @@ hosts too on `--agents-port`): a language model's door is a client of this game.
     POST /api/agents/{station}/owner    {text}: the owner's reply to what the model
                                         wrote in the consent conversation
     POST /api/agents/{station}/release  {reason}: the door is going; stood down, saved
-    GET  /api/agents/{station}/library  ?topic=...: a page of the reference library
+    GET  /api/agents/{station}/library  ?topic=...&section=...&find=...: a page of the
+                                        reference library
     GET  /api/agents                    the stations and their states (the snapshot's
                                         `agents` is the same list)
 
@@ -376,8 +377,10 @@ def agent_routes(lock: Any, world: Callable[[], World], **desk_options: Any) -> 
         return call(desk.release, station, str(body.get("reason") or ""))
 
     @router.get("/api/agents/{station}/library")
-    def api_library(station: str, topic: str = "contents") -> JSONResponse:
-        return JSONResponse({"text": desk.library(station, topic)})
+    def api_library(
+        station: str, topic: str = "contents", section: str = "", find: str = ""
+    ) -> JSONResponse:
+        return JSONResponse({"text": desk.library(station, topic, section, find)})
 
     router.desk = desk  # type: ignore[attr-defined]
     return router

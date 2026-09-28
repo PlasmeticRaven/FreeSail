@@ -13,22 +13,40 @@ it checks the station's authority (`submit_order` from a station with none is re
 in words and the refusal is logged as `agent.refused`, truth 42), checks the arguments,
 and runs the function.
 
-The tools that act on the agent itself (`stand_by`, `journal`, `opt_out`, `answer`)
-reach its harness through `world.agents[station]`, which is the same object the World
-ticks; the harness's own methods do the work, so a door and the harness cannot disagree.
+The tools that act on the agent itself (`stand_by`, `journal`, `opt_out`, `answer`,
+`shelve`) reach its harness through `world.agents[station]`, which is the same object the
+World ticks; the harness's own methods do the work, so a door and the harness cannot
+disagree.
+
+**The shelf** (package 28d; spec M4 open item 9, the context work for local models). The
+library is served in pieces with their sizes, so that a model with a small context reads
+what it needs and not a chapter at a time: `library()` lists the topics with what each
+costs; a topic with sections (a primer chapter, the primer's own introduction, the
+catalogue by evolution, the grammar by part, the ship by mast) lists its sections with
+theirs; `section=` serves one (matched by a word of its heading, case-insensitively, or by
+its number), `section='all'` the whole with its size first; `find=` returns the matching
+paragraphs, each with where it is. Sizes are measured from the text served, at
+`CHARS_PER_TOKEN` characters a token, the one rule the harness measures text by (the local
+runner's budget uses it too). A library page is a `Page`: its text, with the words that
+name it and the call that reads it again, from which the harness makes a *book* with a
+handle (`harness.Harness`); `shelve` puts a book back. The reference is a promise, not a
+possession (`docs/design/Papers-and-Books.md`): every page is always there to be read
+again.
 """
 
 from __future__ import annotations
 
+import functools
 import hashlib
 import json
+import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from freesail import units
-from freesail.agents.agent import OPT_OUT_TOKEN
+from freesail.agents.agent import OPT_OUT_TOKEN, SHELF_LIFE_TURNS, number_words
 from freesail.api import readings as R
 from freesail.core.events import Severity
 
@@ -36,10 +54,15 @@ if TYPE_CHECKING:
     from freesail.core.world import World
 
 __all__ = [
+    "BOOK_TOOLS",
+    "CHARS_PER_TOKEN",
+    "FIND_LIMIT",
     "READ_LOG_LIMIT",
     "TOOLS",
+    "Page",
     "Tool",
     "answer",
+    "book_of",
     "call",
     "journal",
     "library",
@@ -50,9 +73,12 @@ __all__ = [
     "readings",
     "readings_digest",
     "readings_words",
+    "shelve",
+    "size_words",
     "stand_by",
     "state",
     "submit_order",
+    "tokens",
     "tool_names",
 ]
 
@@ -62,6 +88,33 @@ PRIMER_DIR = ROOT / "docs" / "primer"
 # The most lines `read_log` returns at once (judgement: a glass of busy sailing is under
 # a hundred lines; a model wanting more asks again with a later `since_tick`).
 READ_LOG_LIMIT = 200
+
+# About four characters of English to a token (judgement: the usual rule of thumb for
+# BPE vocabularies). The one rule the harness measures text by: the library's sizes, a
+# book's size (`agent.BOOK_SIZE_TOKENS`) and the local runner's context budget.
+CHARS_PER_TOKEN = 4
+
+# The most paragraphs a `find` returns whole; the rest are named by where they are, with
+# a count (judgement: eight paragraphs of the primer are some hundreds of tokens to a
+# thousand, a page a small context can take; the places of the rest say where to read).
+FIND_LIMIT = 8
+
+# The tools whose results may be books (the harness gives each a handle): every library
+# read, and a read_log longer than `agent.BOOK_SIZE_TOKENS`.
+BOOK_TOOLS: tuple[str, ...] = ("library", "read_log")
+
+
+def tokens(text: str) -> int:
+    """What a text costs, at `CHARS_PER_TOKEN` characters a token, rounded up."""
+    return -(-len(text) // CHARS_PER_TOKEN)
+
+
+def size_words(n: int) -> str:
+    """A size in tokens, in words: "about 7,650 tokens" (to the ten from a hundred up,
+    since the rule is an estimate)."""
+    if n >= 100:
+        n = int(round(n, -1))
+    return f"about {n:,} token{'' if n == 1 else 's'}"
 
 
 # ---------------------------------------------------------------------------
@@ -158,36 +211,49 @@ LIBRARY_TOPICS = (
 )
 
 
-def library(world: World, station: str, topic: str = "contents") -> str:
-    key = " ".join(str(topic or "contents").lower().split())
-    if key in ("", "contents", "index"):
-        chapters = "\n".join(f"  primer {n}: {title}" for n, title in _primer_chapters())
-        return (
-            "The library holds:\n"
-            "  primer: the Sailing Master's Primer, by chapter number or name:\n"
-            f"{chapters}\n"
-            "  catalogue: the catalogue of evolutions the ship can perform\n"
-            "  grammar: the order language, the standing dialect and the station sentences\n"
-            "  the ship: this ship's parts by their names, her groups and aliases\n"
-            "  standing orders: the book of standing orders as it stands\n"
-            "  tools: the tools you have and what each takes"
-        )
-    if key.startswith("primer"):
-        return _primer(key.removeprefix("primer").strip())
-    if key in ("catalogue", "evolutions", "the catalogue"):
-        return _catalogue()
-    if key in ("grammar", "orders", "the grammar", "the order language"):
-        return _grammar()
-    if key in ("the ship", "ship", "names", "parts"):
-        return _ship_names(world)
-    if key in ("standing orders", "the book", "book", "the standing orders"):
-        return "\n".join(world.standing.book.lines())
-    if key in ("tools", "the tools"):
-        return "\n".join(tool_lines())
-    for n, title in _primer_chapters():
-        if key == title.lower() or key == n:
-            return _primer(n)
-    return f"The library has no topic '{topic}'; library(topic='contents') lists what it holds."
+class Page(str):
+    """A page of the library as served: its text, `title` the words that name it in a
+    book's handle ("primer 3, reefing") and `reopen` the call that reads it again."""
+
+    title: str
+    reopen: str
+
+    def __new__(cls, text: str, title: str, reopen: str) -> Page:
+        page = super().__new__(cls, text)
+        page.title = title
+        page.reopen = reopen
+        return page
+
+
+def library(
+    world: World, station: str, topic: str = "contents", section: str = "", find: str = ""
+) -> Page:
+    key = " ".join(str(topic or "contents").lower().split()).strip("'\"")
+    section = " ".join(str(section or "").split()).strip("'\"")
+    find = " ".join(str(find or "").split()).strip("'\"")
+    if key in ("", "contents", "index", "the library", "library"):
+        if find:
+            return _find(_every_topic(world), find, "the library", "")
+        return Page(_contents(world), "the contents", "library(topic='contents')")
+    top = _topic(world, key)
+    if isinstance(top, str):
+        return Page(top, f"the library, '{key}'", "library(topic='contents')")
+    if find:
+        return _find([top], find, top.name, top.key)
+    if top.sections and section:
+        return _section_page(top, section)
+    if top.sections:
+        return Page(_listing(top), top.name, _reopen(top.key))
+    return Page(top.whole, top.name, _reopen(top.key))
+
+
+def _reopen(key: str, section: str = "", find: str = "") -> str:
+    args = [f"topic='{key}'"] if key else []
+    if section:
+        args.append(f"section='{section}'")
+    if find:
+        args.append(f"find='{find}'")
+    return f"library({', '.join(args)})"
 
 
 def submit_order(world: World, station: str, text: str) -> str:
@@ -218,6 +284,10 @@ def opt_out(world: World, station: str, reason: str = "") -> str:
 
 def answer(world: World, station: str, text: str) -> str:
     return _harness(world, station).answer(str(text))
+
+
+def shelve(world: World, station: str, book: str = "") -> str:
+    return _harness(world, station).shelve(str(book or ""))
 
 
 def _harness(world: World, station: str) -> Any:
@@ -273,10 +343,18 @@ TOOLS: dict[str, Tool] = {
         ),
         Tool(
             "library",
-            "The reference library: library(topic='contents') lists the topics; 'primer 2' "
-            "or a chapter's name for a primer chapter; 'catalogue', 'grammar', 'the ship', "
-            "'standing orders', 'tools'.",
-            {"topic": "string, optional: which topic (default 'contents')"},
+            "The reference library, always there to read. library() lists its topics and "
+            "what each costs in tokens; topic='primer 3' lists a chapter's sections with "
+            "their sizes (the catalogue its evolutions, the grammar its parts, 'the ship' her "
+            "masts); section='reefing' (a word of its heading, or its number) serves one, "
+            "section='all' the whole; find='goose-wing' returns the matching paragraphs, "
+            "each with where it is, in a topic or the whole library. Every read is a book "
+            "with a number, which shelve puts back.",
+            {
+                "topic": "string, optional: which topic (default 'contents')",
+                "section": "string, optional: a word of a section's heading, its number, or 'all'",
+                "find": "string, optional: words to look for",
+            },
             library,
         ),
         Tool(
@@ -322,6 +400,17 @@ TOOLS: dict[str, Tool] = {
             "log as said by your station.",
             {"text": "string: the answer"},
             answer,
+        ),
+        Tool(
+            "shelve",
+            "Put a book back on the shelf: book='book 7' for one, a topic's name ('primer "
+            "3') for its open books, nothing for every open book. From then on your "
+            "conversation holds the book's line and not its pages. A book left open goes back "
+            f"by itself after {number_words(SHELF_LIFE_TURNS)} more of your turns. Any book "
+            "opens again on request, under a new number; keep what you took from a page in "
+            "your journal.",
+            {"book": "string, optional: 'book 7', a topic's name, or nothing for all"},
+            shelve,
         ),
     )
 }
@@ -393,9 +482,167 @@ def call(world: World, station: str, name: str, args: dict[str, Any] | None = No
         return f"{tool.name} could not run with those arguments: {e}"
 
 
+def book_of(name: str, args: dict[str, Any], result: Any) -> tuple[str, str] | None:
+    """Whether a tool's result is a book, and if so the words that name it and the call
+    that reads it again: every library page, and a `read_log` whose result is longer
+    than `agent.BOOK_SIZE_TOKENS` (measured as served, as JSON). None otherwise (a
+    refusal in words is not a book)."""
+    from freesail.agents.agent import BOOK_SIZE_TOKENS
+
+    if name == "library" and isinstance(result, Page):
+        return result.title, result.reopen
+    if name == "read_log" and isinstance(result, dict) and "lines" in result:
+        if tokens(json.dumps(result, ensure_ascii=False)) <= BOOK_SIZE_TOKENS:
+            return None
+        since = int(args.get("since_tick") or 0)
+        sev = str(args.get("severity") or "routine").lower()
+        title = f"the log from tick {since}" + ("" if sev == "routine" else f", {sev} and above")
+        again = f"read_log(since_tick={since}" + (
+            ")" if sev == "routine" else f", severity='{sev}')"
+        )
+        return title, again
+    return None
+
+
 # ---------------------------------------------------------------------------
-# The library's pages
+# The library's pages: topics, their sections and sizes, and find
 # ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class Section:
+    """A section of a topic. `number` as the listing gives it ("4", "4.2"; "" for a
+    page's opening words before its first heading), `heading` its words, `text` what
+    `section=` serves (its heading and everything under it, its subsections included),
+    `own` its text without its subsections (what `find` reads, so that a paragraph is
+    found once), `line` the listing's words where they are more than the heading (an
+    evolution's verb and time), `by_line` when `find` matches lines, not paragraphs."""
+
+    number: str
+    heading: str
+    text: str
+    own: str
+    line: str = ""
+    by_line: bool = False
+
+    @property
+    def level(self) -> int:
+        return self.number.count(".") + 1 if self.number else 1
+
+    def label(self) -> str:
+        if self.line:
+            return self.line
+        if not self.number:
+            return self.heading
+        return f"{self.number}{'' if '.' in self.number else '.'} {self.heading}"
+
+
+@dataclass(frozen=True)
+class Topic:
+    """A topic: `key` as a call names it ("primer 3"), `name` as a handle names it ("the
+    catalogue"), `title` the listing's first words, `whole` what `section='all'` serves,
+    `sections` in order, `extra` lines the listing adds after them (the primer's
+    chapters), `whole_words` what the whole is called."""
+
+    key: str
+    name: str
+    title: str
+    whole: str
+    sections: tuple[Section, ...] = ()
+    extra: tuple[str, ...] = ()
+    whole_words: str = "the whole"
+
+
+HEADING = re.compile(r"^(#{1,3}) +(.+?)\s*$")
+ALL_WORDS = ("all", "whole", "the whole", "everything", "the whole chapter")
+
+
+def _plain(words: str) -> str:
+    """A heading's words without the markdown marks."""
+    return " ".join(re.sub(r"[*`]", "", words).split())
+
+
+def _norm(text: str) -> str:
+    """For matching: lower case, a hyphen or an underscore as a space, an apostrophe
+    dropped (a quotation mark would otherwise hide a word's start), other marks gone."""
+    text = text.lower().replace("-", " ").replace("_", " ").replace("'", "").replace("\u2019", "")
+    return " ".join(re.sub(r"[^\w\s]", " ", text).split())
+
+
+def _lower_first(words: str) -> str:
+    return words[:1].lower() + words[1:]
+
+
+def _md_sections(text: str) -> tuple[str, tuple[Section, ...]]:
+    """A markdown page's title (its `#` heading) and its sections: the opening words, each
+    `##` section with its `###` subsections numbered under it. Lines in a code fence are
+    never headings (the primer's `# rejected:` examples)."""
+    lines = text.splitlines(keepends=True)
+    heads: list[tuple[int, int, str]] = []
+    fence = False
+    for i, line in enumerate(lines):
+        if line.lstrip().startswith("```"):
+            fence = not fence
+            continue
+        m = None if fence else HEADING.match(line.rstrip("\n"))
+        if m:
+            heads.append((i, len(m.group(1)), _plain(m.group(2))))
+    title, body_from = "", 0
+    if heads and heads[0][1] == 1:
+        title, body_from = heads[0][2], heads[0][0] + 1
+    subs = [h for h in heads if h[1] >= 2]
+    sections: list[Section] = []
+    first = subs[0][0] if subs else len(lines)
+    opening = "".join(lines[body_from:first]).strip("\n")
+    if opening.strip():
+        sections.append(Section("", "introduction", opening, opening))
+    n = m = 0
+    for j, (i, level, words) in enumerate(subs):
+        following = subs[j + 1 :]
+        next_any = following[0][0] if following else len(lines)
+        if level == 2 or n == 0:
+            n, m = n + 1, 0
+            number = str(n)
+            end = next((k for k, lv, _ in following if lv <= 2), len(lines))
+        else:
+            m += 1
+            number = f"{n}.{m}"
+            end = next_any
+        body = "".join(lines[i:end]).strip("\n")
+        own = "".join(lines[i:next_any]).strip("\n")
+        sections.append(Section(number, words, body, own))
+    return title, tuple(sections)
+
+
+@functools.lru_cache(maxsize=32)
+def _md_page(path: str, mtime_ns: int) -> tuple[str, str, tuple[Section, ...]]:
+    text = Path(path).read_text(encoding="utf-8")
+    return (text, *_md_sections(text))
+
+
+def _page_of(path: Path) -> tuple[str, str, tuple[Section, ...]]:
+    return _md_page(str(path), path.stat().st_mtime_ns)
+
+
+def _paragraphs(text: str) -> list[str]:
+    """Blocks between blank lines, a code fence kept whole; a heading alone is not one."""
+    out: list[str] = []
+    cur: list[str] = []
+    fence = False
+    for line in text.splitlines():
+        if line.lstrip().startswith("```"):
+            fence = not fence
+            cur.append(line)
+            continue
+        if not fence and not line.strip():
+            if cur:
+                out.append("\n".join(cur))
+            cur = []
+            continue
+        cur.append(line)
+    if cur:
+        out.append("\n".join(cur))
+    return [p for p in out if not (HEADING.match(p) and "\n" not in p)]
 
 
 def _primer_chapters() -> list[tuple[str, str]]:
@@ -407,43 +654,205 @@ def _primer_chapters() -> list[tuple[str, str]]:
     return out
 
 
-def _primer(which: str) -> str:
-    which = which.strip().lower().strip("'\"")
+def _chapter_of(which: str, loose: bool = True) -> str | None:
+    """A primer chapter's number from its number or its name ("3", "chapter 3", "making
+    and shortening sail"; a part of the name when `loose`)."""
+    which = which.strip().strip("'\"").removeprefix("chapter ").strip()
     chapters = _primer_chapters()
-    if not which or which in ("readme", "contents"):
-        return (PRIMER_DIR / "README.md").read_text(encoding="utf-8")
     for n, title in chapters:
-        if which in (n, n.zfill(2), title.lower(), f"chapter {n}"):
-            path = next(PRIMER_DIR.glob(f"{n.zfill(2)}-*.md"))
-            return path.read_text(encoding="utf-8")
-    for n, title in chapters:
-        if which in title.lower():
-            path = next(PRIMER_DIR.glob(f"{n.zfill(2)}-*.md"))
-            return path.read_text(encoding="utf-8")
-    names = "; ".join(f"{n}: {t}" for n, t in chapters)
+        if which in (n, n.zfill(2), title.lower()):
+            return n
+    if loose and which:
+        for n, title in chapters:
+            if which in title.lower():
+                return n
+    return None
+
+
+def _chapter_topic(n: str) -> Topic:
+    path = next(PRIMER_DIR.glob(f"{n.zfill(2)}-*.md"))
+    text, title, sections = _page_of(path)
+    title = re.sub(r"^\d+\.\s*", "", title)
+    return Topic(
+        f"primer {n}",
+        f"primer {n}",
+        f"primer {n}: {title}",
+        text,
+        sections,
+        whole_words="the whole chapter",
+    )
+
+
+def _primer_topic() -> Topic:
+    """The primer's own page (its README) in sections, with its chapters and their sizes."""
+    text, title, sections = _page_of(PRIMER_DIR / "README.md")
+    extra = ["Its chapters, each whole (library(topic='primer 3') lists a chapter's sections):"]
+    for n, name in _primer_chapters():
+        ch = _chapter_topic(n)
+        extra.append(f"  primer {n}: {name}, {size_words(tokens(ch.whole))}")
+    return Topic(
+        "primer",
+        "the primer",
+        f"the primer: {title}",
+        text,
+        sections,
+        tuple(extra),
+        whole_words="its introduction whole",
+    )
+
+
+def _primer_all() -> list[Topic]:
+    return [_primer_topic(), *(_chapter_topic(n) for n, _ in _primer_chapters())]
+
+
+def _primer(which: str) -> str:
+    """A primer chapter whole, by its number or its name (the MCP resource's page)."""
+    n = _chapter_of(which)
+    if n is None:
+        return _no_chapter(which)
+    return _chapter_topic(n).whole
+
+
+def _no_chapter(which: str) -> str:
+    names = "; ".join(f"{n}: {t}" for n, t in _primer_chapters())
     return f"The primer has no chapter '{which}'. Its chapters: {names}."
 
 
-def _catalogue() -> str:
+def _duration_words(seconds: float) -> str:
+    if seconds < 60:
+        return f"{seconds:g} seconds"
+    minutes = seconds / 60
+    return "a minute" if minutes == 1 else f"{minutes:g} minutes"
+
+
+def _file_notes(path: str) -> str:
+    """The comment an evolution's file opens with, as prose: what the evolution is, in
+    the words of whoever wrote the file, with its sources."""
+    try:
+        lines = Path(path).read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return ""
+    paras: list[list[str]] = [[]]
+    for line in lines:
+        if not line.startswith("#"):
+            break
+        body = line.lstrip("#")
+        words = body.strip()
+        if not words:
+            if paras[-1]:
+                paras.append([])
+        elif body.startswith("  ") and paras[-1]:
+            paras[-1].append("\n" + words)  # an indented line keeps its own line
+        else:
+            paras[-1].append(words)
+    return "\n\n".join(" ".join(p).replace(" \n", "\n") for p in paras if p)
+
+
+def _evolution_line(ev: Any) -> str:
+    applies = ", ".join(f"{k} {v}" for k, v in ev.applies_to.items()) or "the ship"
+    minutes = round(ev.nominal_duration_s / 60)
+    if ev.nominal_duration_s < 60:
+        about = "under a minute"
+    else:
+        about = "about a minute" if minutes == 1 else f"about {minutes} minutes"
+    if ev.script:
+        about = "scripted; the ship's own time"
+    return f"{ev.id}: '{ev.verb}', {applies}, {about}"
+
+
+def _evolution_text(ev: Any) -> str:
+    """One evolution in full: its line, the notes of its file, when it is refused, its
+    steps, its hands, what it logs, its source. Words in braces are filled in by the
+    game ({sail} is the sail's name)."""
+    parts = [_evolution_line(ev) + "."]
+    notes = _file_notes(ev.path)
+    if notes:
+        parts.append(notes)
+
+    def reasons(conds: list[Any]) -> str:
+        return "; ".join(_lower_first(c.reason.strip().rstrip(".")) for c in conds)
+
+    if ev.preconditions:
+        parts.append(f"It is refused when: {reasons(ev.preconditions)}.")
+    if ev.requires:
+        parts.append(f"It stops when: {reasons(ev.requires)}.")
+    if ev.steps:
+        steps = []
+        for st in ev.steps:
+            words = f"{st.do.replace('_', ' ')}, {_duration_words(st.duration_s)}"
+            if st.aloft:
+                words += ", aloft"
+            if st.log:
+                words += f' ("{st.log}")'
+            steps.append(words)
+        parts.append("Its steps: " + "; ".join(steps) + ".")
+    if ev.timing:
+        parts.append("Its timing: " + ", ".join(f"{k} {v:g}" for k, v in ev.timing.items()) + ".")
+    if ev.crew:
+        crew = []
+        for k, v in ev.crew.items():
+            crew.append(f"{k} {', '.join(map(str, v)) if isinstance(v, list) else v}")
+        parts.append("Hands: " + "; ".join(crew) + ".")
+    logs = [
+        (w, o.log)
+        for w, o in (("at the start", ev.on_start), ("when done", ev.on_complete))
+        + (("if it fails", ev.on_fail),)
+        if o is not None and o.log
+    ]
+    if logs:
+        parts.append("Logged " + "; ".join(f'{w}: "{t}"' for w, t in logs) + ".")
+    if ev.source:
+        parts.append(f"Source: {ev.source}.")
+    text = "\n\n".join(parts)
+    if "{" in text:
+        text += "\n\n(Words in braces are filled in by the game: {sail} is the sail's name.)"
+    return text
+
+
+@functools.lru_cache(maxsize=1)
+def _catalogue_topic() -> Topic:
     from freesail.evolutions.registry import load_directory
 
-    lines = ["The catalogue of evolutions (id: verb, what it applies to, about how long):"]
-    for ev in load_directory().values():
-        applies = ", ".join(f"{k} {v}" for k, v in ev.applies_to.items()) or "the ship"
-        minutes = ev.nominal_duration_s / 60
-        about = f"about {minutes:.0f} minutes" if minutes >= 1 else "under a minute"
-        if ev.script:
-            about = "scripted; the ship's own time"
-        source = f" Source: {ev.source}." if ev.source else ""
-        lines.append(f"  {ev.id}: '{ev.verb}', {applies}, {about}.{source}")
-    return "\n".join(lines)
+    sections = []
+    for i, ev in enumerate(load_directory().values(), 1):
+        text = _evolution_text(ev)
+        sections.append(Section(str(i), ev.id, text, text, line=_evolution_line(ev)))
+    whole = "The catalogue of evolutions, each in full.\n\n" + "\n\n".join(s.text for s in sections)
+    return Topic(
+        "catalogue",
+        "the catalogue",
+        "the catalogue of evolutions the ship can perform (id: verb, what it applies to, "
+        "about how long)",
+        whole,
+        tuple(sections),
+        whole_words="every evolution in full",
+    )
 
 
-def _grammar() -> str:
+def _catalogue() -> str:
+    """The catalogue's list, as `library(topic='catalogue')` serves it."""
+    return _listing(_catalogue_topic())
+
+
+def _split_lines(lines: list[str], marks: list[tuple[str, str]]) -> list[tuple[str, list[str]]]:
+    """Lines cut where a line begins with one of `marks` (prefix, heading): the part
+    before the first mark under "", then each marked part under its heading."""
+    out: list[tuple[str, list[str]]] = [("", [])]
+    for line in lines:
+        for prefix, heading in marks:
+            if line.startswith(prefix):
+                out.append((heading, []))
+                break
+        out[-1][1].append(line)
+    return out
+
+
+@functools.lru_cache(maxsize=1)
+def _grammar_topic() -> Topic:
     from freesail.orders.vocabulary import load_vocabulary
 
     vocab = load_vocabulary()
-    lines = [
+    order = [
         "The order language: one line, a verb and what it acts on, as a captain would say "
         "it: 'set the fore topsail', 'brace sharp up on the starboard tack', 'steer "
         "south-west by west', 'reef the topsails, one reef'. The verbs and their synonyms:"
@@ -452,13 +861,321 @@ def _grammar() -> str:
         if spec.level == "driver" or spec.object == "standing":
             continue  # the standing dialect's sentences are below, with their grammar
         syn = f" (also: {', '.join(spec.synonyms)})" if spec.synonyms else ""
-        lines.append(f"  {name}{syn}")
-    lines.append("")
-    lines.extend(standing_dialect_lines(vocab))
-    lines.append("")
-    lines.append(
+        order.append(f"  {name}{syn}")
+    dialect = standing_dialect_lines(vocab)
+    station = [
         "The station sentences the captain uses: 'ask the watcher <question>', 'stand down "
         "the watcher', 'resume the watcher', \"show the watcher's journal\"."
+    ]
+    whole = "\n".join([*order, "", *dialect, "", *station])
+    parts = _split_lines(
+        dialect,
+        [
+            ("Triggers:", "triggers"),
+            ("Conditions:", "conditions and the readings"),
+            ("Durations,", "durations"),
+            ("Examples,", "examples, the starter routines"),
+            ("The book's orders:", "the book's orders"),
+        ],
+    )
+    sections = [
+        Section("1", "the order language", "\n".join(order), "\n".join(order), by_line=True),
+        Section(
+            "2", "the standing dialect", "\n".join(dialect), "\n".join(parts[0][1]), by_line=True
+        ),
+    ]
+    for k, (heading, chunk) in enumerate(parts[1:], 1):
+        text = "\n".join(chunk)
+        sections.append(Section(f"2.{k}", heading, text, text, by_line=True))
+    sections.append(
+        Section("3", "the station sentences", "\n".join(station), "\n".join(station), by_line=True)
+    )
+    return Topic(
+        "grammar",
+        "the grammar",
+        "the grammar: the order language, the standing dialect and the station sentences",
+        whole,
+        tuple(sections),
+    )
+
+
+def _grammar() -> str:
+    """The grammar whole, as `library(topic='grammar', section='all')` serves it after
+    its size."""
+    return _grammar_topic().whole
+
+
+def _ship_topic(world: World) -> Topic:
+    """This ship's parts by their names, by part of the rig: each lower mast (and the
+    bowsprit) with the spars that stand on it, the sails they carry and their lines;
+    then her groups and aliases."""
+    ship = world.ship
+    if not hasattr(ship, "parts"):
+        text = f"{ship.name}: a point ship with no parts; she takes steer, speed and stop."
+        return Topic("the ship", "the ship", text, text)
+    from freesail.orders.resolve import display_name
+
+    roots = [sid for sid, sp in ship.spars.items() if not sp.parent]
+    by_root: dict[str, dict[str, set[str]]] = {}
+    for kind, items in (("Spars", ship.spars), ("Sails", ship.sails), ("Lines", ship.lines)):
+        for pid in items:
+            try:
+                root = ship.mast_of(pid)
+            except (KeyError, AttributeError, TypeError):
+                root = None
+            where = root.id if root is not None else ""
+            by_root.setdefault(where, {}).setdefault(kind, set()).add(display_name(ship, pid))
+    order = [r for r in roots if r in by_root] + ([""] if "" in by_root else [])
+    sections: list[Section] = []
+    for k, rid in enumerate(order, 1):
+        heading = display_name(ship, rid) if rid else "elsewhere"
+        kinds = by_root[rid]
+        counts = ", ".join(
+            f"{len(kinds[kd])} {kd.lower() if len(kinds[kd]) != 1 else kd.lower()[:-1]}"
+            for kd in ("Spars", "Sails", "Lines")
+            if kd in kinds
+        )
+        lines = [f"The {heading}: {counts}."]
+        for kd in ("Spars", "Sails", "Lines"):
+            if kd in kinds:
+                lines.append(f"  {kd}: {', '.join(sorted(kinds[kd]))}.")
+        text = "\n".join(lines)
+        sections.append(Section(str(k), heading, text, text, by_line=True))
+    extra: list[str] = []
+    if ship.groups:
+        extra.append(
+            "  Groups: "
+            + "; ".join(
+                f"{g} ({', '.join(display_name(ship, m) for m in members)})"
+                for g, members in ship.groups.items()
+            )
+            + "."
+        )
+    if ship.aliases:
+        extra.append(
+            "  Aliases: "
+            + ", ".join(f"{a} for {display_name(ship, t)}" for a, t in ship.aliases.items())
+            + "."
+        )
+    if extra:
+        text = "\n".join(
+            ["Her groups and aliases, the names that stand for several parts:", *extra]
+        )
+        sections.append(
+            Section(str(len(order) + 1), "groups and aliases", text, text, by_line=True)
+        )
+    whole = "\n\n".join(
+        [f"{ship.name}: her parts by their names, by mast.", *(s.text for s in sections)]
+    )
+    return Topic(
+        "the ship",
+        "the ship",
+        f"the ship, {ship.name}: her parts by their names, by mast, and her groups and aliases",
+        whole,
+        tuple(sections),
+    )
+
+
+def _ship_names(world: World) -> str:
+    return _ship_topic(world).whole
+
+
+def _topic(world: World, key: str) -> Topic | str:
+    """The topic a call names, or the refusal in words."""
+    if key.startswith("primer"):
+        which = key.removeprefix("primer").strip()
+        if which in ("", "readme", "contents", "introduction"):
+            return _primer_topic()
+        n = _chapter_of(which)
+        return _chapter_topic(n) if n is not None else _no_chapter(which)
+    if key in ("catalogue", "evolutions", "the catalogue", "the evolutions"):
+        return _catalogue_topic()
+    if key in ("grammar", "orders", "the grammar", "the order language"):
+        return _grammar_topic()
+    if key in ("the ship", "ship", "names", "parts"):
+        return _ship_topic(world)
+    if key in ("standing orders", "the book", "book", "the standing orders"):
+        text = "\n".join(world.standing.book.lines())
+        return Topic("standing orders", "the standing orders", text, text)
+    if key in ("tools", "the tools"):
+        text = "\n".join(tool_lines())
+        return Topic("tools", "the tools", text, text)
+    n = _chapter_of(key, loose=False)  # a chapter's name alone
+    if n is not None:
+        return _chapter_topic(n)
+    return f"The library has no topic '{key}'; library(topic='contents') lists what it holds."
+
+
+def _every_topic(world: World) -> list[Topic]:
+    out: list[Topic] = [*_primer_all(), _catalogue_topic(), _grammar_topic(), _ship_topic(world)]
+    for key in ("standing orders", "tools"):
+        top = _topic(world, key)
+        assert isinstance(top, Topic)
+        out.append(top)
+    return out
+
+
+def _listing(top: Topic) -> str:
+    """A topic's sections with what each costs, and how to ask for one."""
+    whole = f"{top.whole_words[:1].upper()}{top.whole_words[1:]}"
+    out = [f"{top.title}. {whole}, {size_words(tokens(top.whole))} (section='all')."]
+    out.append("Its sections, with what each costs:")
+    for sec in top.sections:
+        out.append(f"{'  ' * sec.level}{sec.label()}, {size_words(tokens(sec.text))}")
+    out.extend(top.extra)
+    out.append(
+        f"One section: library(topic='{top.key}', section='<a word of its heading, or its "
+        "number>'); the whole: section='all'; a search: find='<words>'."
+    )
+    return "\n".join(out)
+
+
+def _match(sections: tuple[Section, ...], q: str) -> list[Section]:
+    """The sections `q` names: by number ("4", "4.2"); else by heading, exactly, or by
+    words each beginning a word of the heading, case-insensitively ("reef" for
+    "Reefing"). A section and its own subsections found together are the section."""
+    raw = q.strip().rstrip(".")
+    if re.fullmatch(r"\d+(\.\d+)?", raw):
+        return [s for s in sections if s.number == raw]
+    qn = _norm(q)
+    if not qn:
+        return []
+    exact = [s for s in sections if _norm(s.heading) == qn]
+    if exact:
+        return exact[:1]
+    words = qn.split()
+    found = [
+        s
+        for s in sections
+        if all(any(h.startswith(w) for h in _norm(s.heading).split()) for w in words)
+    ]
+    tops = [s for s in found if s.level == 1]
+    if len(found) > 1 and len(tops) == 1 and tops[0].number:
+        head = tops[0]
+        if all(s is head or s.number.startswith(head.number + ".") for s in found):
+            return [head]
+    return found
+
+
+def _section_page(top: Topic, q: str) -> Page:
+    if q.lower() in ALL_WORDS:
+        size = size_words(tokens(top.whole))
+        return Page(
+            f"{top.title}, {top.whole_words}: {size}.\n\n{top.whole}",
+            f"{top.name}, {top.whole_words}",
+            _reopen(top.key, "all"),
+        )
+    found = _match(top.sections, q)
+    if len(found) == 1:
+        sec = found[0]
+        again = q if "'" not in q else sec.number or sec.heading
+        return Page(sec.text, f"{top.name}, {_lower_first(sec.heading)}", _reopen(top.key, again))
+    if found:
+        named = "; ".join(f"{s.label()} ({size_words(tokens(s.text))})" for s in found)
+        text = (
+            f"'{q}' names {len(found)} sections of {top.name}: {named}. Say which, by more "
+            "of its heading or by its number."
+        )
+    else:
+        named = "; ".join(s.heading if s.line else s.label() for s in top.sections)
+        text = (
+            f"{top.name} has no section '{q}'. Its sections: {named}. section='all' serves "
+            "the whole."
+        )
+    return Page(text, f"{top.name}, '{q}'", _reopen(top.key))
+
+
+def _find(topics: list[Topic], q: str, where: str, key: str) -> Page:
+    """The paragraphs of `topics` in which the words `q` stand (each word of `q` at the
+    start of a word, in order, case-insensitively; a hyphen as a space), each with its
+    place; the first `FIND_LIMIT` whole and the places of the rest."""
+    if key == "primer":
+        topics = _primer_all()
+    qn = _norm(q)
+    hits: list[tuple[str, str]] = []
+    for top in topics:
+        secs = top.sections or (Section("", "", top.whole, top.whole, by_line=True),)
+        for sec in secs:
+            place = f"{top.name}, {_lower_first(sec.heading)}" if sec.heading else top.name
+            paras = (
+                [ln for ln in sec.own.splitlines() if ln.strip()]
+                if sec.by_line
+                else (_paragraphs(sec.own))
+            )
+            for p in paras:
+                if qn and f" {qn}" in f" {_norm(p)}":
+                    hits.append((place, p))
+    title = f"{where}, find '{q}'"
+    again = _reopen(key, find=q)
+    if not hits:
+        return Page(
+            f"Nothing in {where} matches '{q}'. Fewer words, or another form of them, may "
+            "find it; library(topic='contents') lists what the library holds.",
+            title,
+            again,
+        )
+    shown, rest = hits[:FIND_LIMIT], hits[FIND_LIMIT:]
+    n = len(hits)
+    head = f"'{q}' in {where}: {n} {'paragraph matches' if n == 1 else 'paragraphs match'}"
+    head += f"; the first {FIND_LIMIT} here." if rest else "."
+    out = [head, *(f"[{place}]\n{p}" for place, p in shown)]
+    if rest:
+        counts: dict[str, int] = {}
+        for place, _ in rest:
+            counts[place] = counts.get(place, 0) + 1
+        out.append(
+            f"And {len(rest)} more, not shown: "
+            + "; ".join(f"{place} ({c})" for place, c in counts.items())
+            + ". Read a section whole, or look for more exact words."
+        )
+    return Page("\n\n".join(out), title, again)
+
+
+def _contents(world: World) -> str:
+    intro = size_words(tokens(_primer_topic().whole))
+    lines = [
+        "The library holds these topics, always there to read. Each size is what reading "
+        f"it costs, measured at about {CHARS_PER_TOKEN} characters a token.",
+        f"  primer: the Sailing Master's Primer; its introduction {intro}. Its chapters, "
+        "each whole:",
+    ]
+    for n, name in _primer_chapters():
+        ch = _chapter_topic(n)
+        k = sum(1 for s in ch.sections if s.number and "." not in s.number)
+        lines.append(f"    primer {n}: {name}, {size_words(tokens(ch.whole))} in {k} sections")
+    cat = _catalogue_topic()
+    sizes = [tokens(s.text) for s in cat.sections]
+    lines.append(
+        f"  catalogue: the catalogue of evolutions the ship can perform: {len(sizes)} "
+        f"evolutions; the list {size_words(tokens(_listing(cat)))}, each evolution "
+        f"{size_words(min(sizes)).removesuffix(' tokens')} to "
+        f"{size_words(max(sizes)).removeprefix('about ')}"
+    )
+    gram = _grammar_topic()
+    lines.append(
+        "  grammar: the order language, the standing dialect and the station sentences: "
+        f"{size_words(tokens(gram.whole))} whole, in "
+        f"{sum(1 for s in gram.sections if s.level == 1)} parts"
+    )
+    ship = _ship_topic(world)
+    parts = sum(1 for s in ship.sections if s.level == 1)
+    lines.append(
+        "  the ship: this ship's parts by their names, by mast, with her groups and aliases: "
+        f"{size_words(tokens(ship.whole))} whole" + (f", in {parts} parts" if parts else "")
+    )
+    book = "\n".join(world.standing.book.lines())
+    lines.append(
+        f"  standing orders: the book of standing orders as it stands, {size_words(tokens(book))}"
+    )
+    lines.append(
+        "  tools: the tools you have and what each takes, "
+        f"{size_words(tokens(chr(10).join(tool_lines())))}"
+    )
+    lines.append(
+        "A topic with sections lists them with their sizes (library(topic='primer 3')); "
+        "section='reefing' serves one, by a word of its heading or its number, and "
+        "section='all' the whole. find='goose-wing' returns the paragraphs that match, each "
+        "with where it is, in a topic or, with no topic, in the whole library."
     )
     return "\n".join(lines)
 
@@ -534,31 +1251,3 @@ def standing_dialect_lines(vocab: Any = None) -> list[str]:
         "striking it takes it out of the book, and its name may be given again.",
     ]
     return out
-
-
-def _ship_names(world: World) -> str:
-    ship = world.ship
-    if not hasattr(ship, "parts"):
-        return f"{ship.name}: a point ship with no parts; she takes steer, speed and stop."
-    from freesail.orders.resolve import display_name
-
-    lines = [f"{ship.name}: her parts by their names."]
-    for kind, items in (("Spars", ship.spars), ("Sails", ship.sails), ("Lines", ship.lines)):
-        names = sorted({display_name(ship, pid) for pid in items})
-        lines.append(f"  {kind}: {', '.join(names)}.")
-    if ship.groups:
-        lines.append(
-            "  Groups: "
-            + "; ".join(
-                f"{g} ({', '.join(display_name(ship, m) for m in members)})"
-                for g, members in ship.groups.items()
-            )
-            + "."
-        )
-    if ship.aliases:
-        lines.append(
-            "  Aliases: "
-            + ", ".join(f"{a} for {display_name(ship, t)}" for a, t in ship.aliases.items())
-            + "."
-        )
-    return "\n".join(lines)

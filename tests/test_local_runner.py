@@ -726,3 +726,55 @@ def test_a_stand_by_that_ended_the_turn_is_answered_in_the_messages():
     assert msgs[3]["tool_call_id"] == msgs[2]["tool_calls"][0]["id"]
     assert msgs[3]["content"].startswith("Standing by: this ended your turn")
     assert "You stood by until a glass" in msgs[4]["content"]
+
+
+def tool_contents(body: dict[str, Any]) -> list[str]:
+    return [m["content"] for m in body["messages"] if m["role"] == "tool"]
+
+
+def test_a_shelved_book_is_its_line_in_the_runners_next_request(tmp_path):
+    """Package 28d: the runner keeps the game's turns and builds every request from them.
+    A book the model reads is sent whole while it is open, across turns; the model
+    shelves it, the stream's revision moves, the runner reads its turns again, and the
+    next request carries the book's line and not its pages: they are really gone from
+    what the model is sent."""
+    game = Game(tmp_path)
+    consent.Record(GGUF, "t", "2026-09-26", consent.YES, answer="Yes.").write(game.records)
+    server = llama(
+        [
+            message("", ("library", '{"topic": "primer 3", "section": "reefing"}')),
+            message("Read the reefing."),
+            message("", ("shelve", '{"book": "book 1"}')),  # the glass's turn
+            message("Shelved it."),
+        ]
+    )
+    got = run_runner(game, server, [])
+    game.wait_for(game.floor_is_the_games(1))
+    game.driver.tick(A_GLASS_S)
+    game.wait_for(game.floor_is_the_games(3))
+    with game.driver.lock:
+        game.world.submit("stand down the watcher")
+        revision = game.harness.revision
+    assert finished(got) == L.EXIT_RELEASED
+    page = tools.library(game.world, "watcher", "primer 3", "reefing")
+    assert tool_contents(server.bodies[1]) == [f"primer 3, reefing, opened 04:00; book 1\n{page}"]
+    assert tool_contents(server.bodies[2])[0].startswith("primer 3, reefing, opened 04:00")
+    last = server.bodies[3]
+    assert tool_contents(last)[0] == (
+        "You read primer 3, reefing, at 04:00; shelved (book 1). "
+        "library(topic='primer 3', section='reefing') opens it again."
+    )
+    assert tool_contents(last)[1].startswith("Shelved: book 1 (primer 3, reefing). From your ")
+    assert "## Reefing" not in json.dumps(last["messages"])
+    assert revision == 1
+    # the conversation is otherwise the same, turn for turn
+    assert [m["role"] for m in last["messages"]] == [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "assistant",
+        "user",
+        "assistant",
+        "tool",
+    ]

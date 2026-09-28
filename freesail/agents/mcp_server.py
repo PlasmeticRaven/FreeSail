@@ -82,6 +82,16 @@ count is one the model has not read.
 argument of every tool call, and `opt_out` is always listed. Out of turn too: the game
 looks for it in a call that comes when the floor is not the model's.
 
+**The shelf** (package 28d). The model's conversation lives in the MCP client, not in
+the game, so `shelve` cannot take a book's pages out of it: the game notes the book as
+shelved, says so plainly in the result (the client keeps its own conversation; the
+journal is where to keep what was taken from the page), and never shows those pages
+again. What the bridge shows again (the brief as a prompt or a resource, re-rendered
+from the turns it has kept) is kept as the game serves it: an answer whose `revision`
+has moved has the bridge read its turns again (`GameClient.reread`), so a shelved book
+is shown again as its line. The door's words in the brief say the same. The library's
+resources, which the client's user attaches, serve each topic whole and are not books.
+
 **The captain** is the owner, in the game's own window: orders, `ask the watcher ...`,
 `stand down the watcher`, `resume the watcher`, `show the watcher's journal` are typed
 where every order is typed. When the client disconnects, the station is released with a
@@ -200,7 +210,10 @@ def door_note(wait: float) -> str:
         "the first line of each result says whose turn it is. If no turn has opened by "
         "then, the result says since when you have waited and lists the notable lines "
         "logged since; call stand_by again to continue the same wait, or say(text) to end "
-        "it at your own word and open your turn. The token is looked for in every argument "
+        "it at your own word and open your turn. Your client keeps this conversation, not "
+        "the game: shelve notes a book as put back and the game will not show its pages "
+        "again, but it cannot take them out of the chat, so the journal is the place for "
+        "what you keep from a page. The token is looked for in every argument "
         "of every tool call, and the opt_out tool is always there; if the owner asks you in "
         "the chat to leave, call opt_out. The captain's orders and questions are typed by "
         "the owner in the game's window."
@@ -444,6 +457,10 @@ class Bridge:
     def _take(self, a: dict[str, Any]) -> list[Turn]:
         new = [turn_from_dict(t) for t in a.get("turns") or []]
         self.seen.extend(new)
+        if self.game.stale:
+            # a turn already kept has changed (a book shelved): what the bridge shows again
+            # is shown as the game serves it now; the indices do not move (package 28d)
+            self.seen = [turn_from_dict(t) for t in self.game.reread()]
         if a.get("phase") and self.phase != STOPPED:
             self.phase = str(a["phase"])
         return new
@@ -491,10 +508,12 @@ class Bridge:
             words = self.contact(self.client)
             return words or self.brief_text()
 
-    def library(self, topic: str) -> str:
+    def library(self, topic: str, section: str = "all") -> str:
+        """A resource's page: the topic whole (a resource is attached by the client's
+        user, and is not a book)."""
         with self.lock:
             try:
-                return self.game.library(topic)
+                return self.game.library(topic, section)
             except GameError as e:
                 return f"The library could not be read: {e.words}"
 
@@ -529,17 +548,17 @@ class Bridge:
             self.lock.release()
 
     def _aside(self, name: str, args: dict[str, Any]) -> str | None:
-        """A read-only tool while another call holds the bridge: delivered to the game
+        """A read-only tool (or shelve) while another call holds the bridge: delivered to the game
         without moving the cursor, so the waiting call's poll reads every turn as before
         (a read in the model's open turn is its reply, as any call is). None when the
         call is not one to answer aside (not read-only, the token in it, no station yet,
         the brief not yet read)."""
-        from freesail.agents.remote import READ_ONLY_TOOLS
+        from freesail.agents.remote import ASIDE_TOOLS
 
         args = {k: v for k, v in (args or {}).items() if v is not None}
         raw = json.dumps({"tool": name, "arguments": args}, ensure_ascii=False, sort_keys=True)
         if (
-            name not in READ_ONLY_TOOLS
+            name not in ASIDE_TOOLS
             or OPT_OUT_TOKEN in raw
             or self.phase != STATION
             or not self.briefed
@@ -984,7 +1003,7 @@ def build_server(bridge: Bridge) -> MCPServer:
 
     def page_of(topic: str) -> Callable[[], str]:
         def page() -> str:
-            return bridge.library(topic)
+            return bridge.library(topic, "" if topic == "contents" else "all")
 
         return page
 
@@ -1003,7 +1022,7 @@ def build_server(bridge: Bridge) -> MCPServer:
         mime_type="text/plain",
     )
     def primer_chapter(chapter: str) -> str:
-        return bridge.library(f"primer {chapter}")
+        return bridge.library(f"primer {chapter}", "all")
 
     @srv.prompt(
         name="brief",
