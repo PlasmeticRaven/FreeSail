@@ -1,21 +1,41 @@
 name: checks
 
+# The checks on every push of code. Kept cheap on purpose (2026-09-28: the first form
+# of this file ran the whole suite twice, on two Pythons, on every push, documentation
+# included, and used up the account's free Actions minutes in a day):
+#   - a push that changes only documentation runs nothing;
+#   - one Python (3.11, the owner's);
+#   - the suite runs on all the runner's cores (pytest-xdist);
+#   - a newer push to the same branch cancels the run of the older one.
+# The gate release workflow runs the same checks on the gate commit.
+
 on:
   push:
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+      - ".gitignore"
+      - ".mcp.json"
   pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+      - ".gitignore"
+      - ".mcp.json"
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python: ["3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python }}
+          python-version: "3.11"
       - run: pip install -e ".[dev,server]"
       - run: ruff check .
       - run: ruff format --check .
-      - run: python -m pytest
+      - run: python -m pytest -n auto

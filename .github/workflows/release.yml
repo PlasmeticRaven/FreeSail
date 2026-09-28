@@ -49,7 +49,7 @@ jobs:
         run: |
           pip install -e ".[dev,server]"
           ruff check .
-          python -m pytest
+          python -m pytest -n auto
       - name: Build the gate zip
         run: |
           git archive --format=zip --prefix="FreeSail-${{ steps.gate.outputs.tag }}/" \

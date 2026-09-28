@@ -13,7 +13,7 @@ dependencies = [
 
 [project.optional-dependencies]
 # The tests exercise both doors of the harness, so `dev` brings `agents` with it.
-dev = ["pytest>=8.0", "ruff==0.15.8", "freesail[agents]"]
+dev = ["pytest>=8.0", "pytest-xdist>=3.5", "ruff==0.15.8", "freesail[agents]"]
 server = ["fastapi>=0.110", "uvicorn[standard]>=0.29"]
 # The two doors of the agent harness (docs/agents/Harness.md): the Python MCP SDK for the
 # MCP server (its version 2, where the server class is MCPServer, once FastMCP), and httpx
