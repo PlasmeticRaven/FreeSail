@@ -621,6 +621,64 @@ def test_a_wait_cut_off_with_no_turn_in_it_is_only_noted_and_the_next_call_runs(
     )
 
 
+def test_a_turn_that_opened_with_no_call_waiting_comes_first_and_the_call_is_not_run(
+    tmp_path,
+):
+    """Playtest 3's lost sample by the other road: the model's last call had returned
+    (the ceiling reached, "Still waiting"), and the captain's question opened its turn
+    while no call was waiting. The model's next call, a `stand_by`, is not delivered as
+    the reply to a turn it never read: the turn comes first, its first line saying whose
+    turn it is, and the call is not run."""
+    g = Game(tmp_path)
+    yes_on_record(tmp_path / "consent")
+    b = g.bridge(wait=0.3, slice_s=0.1)
+    b.call("state", {})
+    waited = b.call("say", {"text": "All quiet."})
+    assert waited.startswith("The game has the floor;")
+    g.http.post("/api/order", json={"text": "ask the watcher whether the jib draws"})
+    first = b.call("stand_by", {"until": "a glass"})
+    assert first.startswith(
+        "Your turn is open: sample at Morning watch, 8 bells (04:00) (a question).\n"
+        "Your call to stand_by was not run: this turn opened after your last result, and it "
+        "comes first. Read it, then call again."
+    )
+    assert first.count("The captain asks: whether the jib draws?") == 1
+    h = g.harness
+    assert not h.agent.standing_by
+    assert b.call("answer", {"text": "It draws well."}) == "Heard."
+    said = [e for e in g.world.log if e.kind == "agent.said"]
+    assert [e.data["question"] for e in said] == ["whether the jib draws"]
+    calls = [c["name"] for e in h.transcript for c in e.get("reply", {}).get("calls", [])]
+    assert "stand_by" not in calls
+
+
+def test_what_is_folded_into_the_open_turn_goes_with_the_next_result(tmp_path):
+    """A notable line while the model's turn is open is folded into it (the harness's
+    rule); over MCP the fold comes with the result of the model's next call, a read, and
+    one that came after it and before the `say` (the captain's question) comes with the
+    say's result as past: the say still hands the floor back, and its first line says the
+    game has it."""
+    g = Game(tmp_path)
+    yes_on_record(tmp_path / "consent")
+    b = g.bridge(wait=0.3, slice_s=0.1)
+    b.call("state", {})
+    g.http.post("/api/order", json={"text": "call all hands"})
+    g.driver.tick(1)
+    read = b.call("readings", {})
+    assert "Added to your open turn" in read and "All hands!" in read
+    assert read.count("Added to your open turn") == 1
+    g.http.post("/api/order", json={"text": "ask the watcher how she heads"})
+    said = b.call("say", {"text": "Hands are up."})
+    assert said.startswith("The game has the floor;"), said[:200]
+    assert (
+        "Before your reply reached the game, this was added to the turn you were answering "
+        "(it is past now):"
+    ) in said
+    assert "The captain asks: how she heads?" in said
+    assert "Your turn is open" not in said
+    assert "[watcher] Hands are up." in g.lines("agent.note")
+
+
 def test_a_continued_stand_by_shows_since_when_and_the_notable_lines_and_a_say_ends_it(
     tmp_path,
 ):

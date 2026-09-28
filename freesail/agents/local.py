@@ -46,8 +46,10 @@ happened meanwhile is folded into the open turn) and asks again; only
 gives the model (llama-server's `/props` `n_ctx`; Ollama's `/api/ps` `context_length`
 for a loaded model, else the `num_ctx` of `/api/show`), falling back to `--ctx`, and
 refuses in words, with what it measured, when that is smaller than the consent brief
-(measured, the longer of the two briefs), the tool definitions (measured), one turn
-(`TURN_ALLOWANCE_TOKENS`) and the reply budget; and says so when it cannot learn it.
+(measured as this door sends it; it is the longer of the two briefs: about 6,000
+characters against the watcher's 5,200 on the frigate at seed 7, measured for package
+28c), the tool definitions (measured), one turn (`TURN_ALLOWANCE_TOKENS`) and the reply
+budget; and says so when it cannot learn it.
 
 **The budget.** The conversation grows a sample at a time. When the context size is
 known (`--ctx-size`, else the server's `n_ctx` from `/props`), the oldest turns are left
@@ -312,7 +314,7 @@ class LocalModel:
     def check_context(self, identity: str, runtime: str) -> str:
         """The context guard, before stationing (package 28c): what the watcher needs,
         measured at `CHARS_PER_TOKEN`: the consent brief as this door sends it (the
-        longer of the two briefs), the tool definitions, one turn
+        longer of the two briefs; the module docstring), the tool definitions, one turn
         (`TURN_ALLOWANCE_TOKENS`) and the reply budget. Raises `DoorError` in words, with
         the numbers, when the context the server gives (or `--ctx`) is smaller; returns a
         line for the owner otherwise, saying what it measured or that it could not ask."""

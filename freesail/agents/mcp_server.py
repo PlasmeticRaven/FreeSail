@@ -68,6 +68,16 @@ a result the client received or in the next call's result, once. (The one gap is
 client that gives up without telling the server, which MCP's cancellation rule forbids;
 a client that times out sends `notifications/cancelled`.)
 
+Two more roads to the same loss are closed the same way. A turn that opened while no call
+was waiting (the last call had come back "Still waiting" and the model had gone on in
+the chat) is fetched before the model's next call is delivered, and returned first, the
+call not run (`_unread_turn`). And the answer to a delivered reply carries the turns from
+the cursor, which may hold a fold made before the reply arrived: a fold goes with the
+result of the call in the open turn (`_with_folds`), or, when the call handed the floor
+back, with its result as past, never read as a turn that has opened (`_hand_back`). The
+bridge counts what its results have carried (`_shown`), so a sample or a fold past that
+count is one the model has not read.
+
 **The token.** The chat's text never reaches the game, so the token counts in every
 argument of every tool call, and `opt_out` is always listed. Out of turn too: the game
 looks for it in a call that comes when the floor is not the model's.
@@ -328,6 +338,10 @@ class Bridge:
         self.client: tuple[str, str] | None = None
         self.briefed = False
         self.seen: list[Turn] = []  # every turn the game has sent, in order
+        # how many of `seen` have gone into a result (or into one kept for the next call
+        # when the client cut it off): a sample or a fold past it is one the model has not
+        # read, and it goes into the next result before anything is run blind
+        self._shown = 0
         self.stopped_words = ""
         # the calls in flight and the results the client never received
         self._book = threading.Lock()
@@ -469,6 +483,7 @@ class Bridge:
             if words:
                 return words
             self.briefed = True
+            self._shown = len(self.seen)
             return self.brief_text()
 
     def brief_resource(self) -> str:
@@ -563,8 +578,13 @@ class Bridge:
             note = _lost_note(lost)
         first = self._brief_first(name, token)
         if first is not None:
+            self._shown = len(self.seen)
             return first + note, True
         try:
+            if self.phase == STATION and name != "opt_out" and not token:
+                unread = self._unread_turn(name)
+                if unread is not None:
+                    return unread + note, True
             if self.phase == STATION and name in ("say", "stand_by") and not token:
                 text, brought = self._hand_back(name, args, raw, call_id, progress)
             else:
@@ -572,7 +592,38 @@ class Bridge:
         except GameError as e:
             self.tell_owner(f"FreeSail: {e.words}")
             return f"The game did not take the call: {e.words}{note}", True
+        self._shown = len(self.seen)
         return text + note, brought
+
+    def _unread(self, upto: int | None = None) -> list[Turn]:
+        """The samples and folds the game has sent that no result has carried yet."""
+        end = len(self.seen) if upto is None else upto
+        return [t for t in self.seen[self._shown : end] if _is_sample(t)]
+
+    def _unread_turn(self, name: str) -> str | None:
+        """Before a call is delivered at the station: a turn of the model's that opened
+        with no call waiting for it (the last call had returned, or was cut off with
+        nothing in it) is returned first, and the call is not run, so the model never
+        answers a turn it has not read (package 28c, playtest 3's lost sample: the
+        captain's question answered by a stand-by). Folds alone go with the call's own
+        result. None when there is nothing unread to put first."""
+        a = self.game.turns(wait=0)
+        self._take(a)
+        unread = self._unread()
+        if not any(not t.content.get("folded") for t in unread):
+            return None
+        self._shown = len(self.seen)
+        did = (
+            f"Your call to {name} was not run: this turn opened after your last result, and "
+            "it comes first. Read it, then call again."
+        )
+        if a.get("floor") != "model":
+            first = unread[0].content
+            return (
+                f"A turn of yours opened at {first.get('stamp')} ({first.get('reason')}) and has "
+                f"closed since; the game has the floor.\n{did}\n\n{self._render(unread)}"
+            )
+        return self._turn_open(unread, did)
 
     def _brief_first(self, name: str, token: bool) -> str | None:
         if self.briefed or name == "opt_out" or token:
@@ -609,7 +660,13 @@ class Bridge:
             return self._outcome(a)
         if before == CONSENT:
             return self._consent_result(a)
-        return self._result(a)
+        return self._with_folds(self._result(a))
+
+    def _with_folds(self, result: str) -> str:
+        """A call's result in the model's open turn, with what was added to the turn since
+        the model last read it (the harness's fold), so that nothing it sent goes unread."""
+        folds = self._unread()
+        return f"{result}\n\n{self._render(folds)}" if folds else result
 
     def _result(self, a: dict[str, Any]) -> str:
         for t in reversed([turn_from_dict(x) for x in a.get("turns") or []]):
@@ -674,6 +731,7 @@ class Bridge:
         """`say` and `stand_by`: the reply that hands the floor back (or, while the game
         has the floor, the model's own word, or the same wait continued), then the wait
         for the next turn. The result's first line says whose turn it is."""
+        mark = len(self.seen)
         if name == "say":
             text = " ".join(str(args.get("text") or "").split())
             a, new = self._send(Reply(text=text, raw=raw))
@@ -695,7 +753,7 @@ class Bridge:
             if a.get("out_of_turn"):
                 did = self._continued(a, args)
             elif not a.get("standing_by"):
-                return self._result(a), True  # not a stand-by the game knows: turn stays open
+                return self._with_folds(self._result(a)), True  # not a stand-by: turn stays open
             else:
                 # a stand-by taken ends the turn in the game, with no result (package 28c)
                 until = (a.get("interim") or {}).get("until") or args.get("until")
@@ -703,6 +761,16 @@ class Bridge:
                 if a.get("floor") == "model":  # a game that still waits for the turn's end
                     a, more = self._send(Reply())
                     new += more
+        # what came before the model's own reply in the answer belongs to the turn it was
+        # answering (a fold it had not read: shown, as past); what came after is new
+        at = next((i for i, t in enumerate(new) if t.role == MODEL), None)
+        past = self._unread(mark) + ([t for t in new[:at] if _is_sample(t)] if at else [])
+        if past:
+            did += (
+                "\n\nBefore your reply reached the game, this was added to the turn you were "
+                "answering (it is past now):\n\n" + self._render(past)
+            )
+        new = new[at + 1 :] if at is not None else new
         opened = [t for t in new if _is_sample(t)]
         if opened:
             return self._turn_open(opened, did), True
@@ -716,7 +784,7 @@ class Bridge:
             shown = self._render(got)
             return f"{did}\n\n{shown}\n\n{a.get('words') or ''}".strip(), True
         floor = "The game has the floor; the next sample follows when your turn opens."
-        return f"{floor}\n{did}\n\n{still_waiting(a.get('interim'), waited)}", False
+        return f"{floor}\n{did}\n\n{still_waiting(a.get('interim'), waited)}", bool(past)
 
     @staticmethod
     def _continued(a: dict[str, Any], args: dict[str, Any]) -> str:
