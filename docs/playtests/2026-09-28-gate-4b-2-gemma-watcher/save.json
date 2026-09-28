@@ -1,0 +1,498 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "seed": 7,
+  "scenario": {
+    "name": "Open water",
+    "start_time": "1805-06-01T04:00:00",
+    "wind_from_deg": 225.0,
+    "wind_speed_kn": 15.0,
+    "gustiness": 0.3,
+    "variability": 0.3,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 0.0,
+    "ship_speed_kn": 0.0,
+    "latitude_deg": 50.0
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/frigate-36.yaml"
+  },
+  "end_tick": 9169,
+  "journal": [
+    [
+      29,
+      "captain",
+      "Ask the watcher Welcome aboard. Make yourself at home. Go ahead and take the watch until the next bell, if you please."
+    ],
+    [
+      61,
+      "captain",
+      "set plain sail"
+    ],
+    [
+      76,
+      "captain",
+      "trim sails"
+    ],
+    [
+      100,
+      "captain",
+      "standing order \"Trim Sails\": every bell then trim sails"
+    ],
+    [
+      149,
+      "captain",
+      "all hands"
+    ],
+    [
+      283,
+      "captain",
+      "bear up a point"
+    ],
+    [
+      287,
+      "captain",
+      "come up a point"
+    ],
+    [
+      293,
+      "captain",
+      "come up a point"
+    ],
+    [
+      330,
+      "captain",
+      "Ask the watcher How are the sails filling?"
+    ],
+    [
+      1476,
+      "captain",
+      "Ask the watcher Shall we make ready to bring the ship about and head south? Give me your recommendation on tacking or wearing, if you please."
+    ],
+    [
+      2208,
+      "captain",
+      "Ask the watcher Did you hear my last word to you?"
+    ]
+  ],
+  "standing_orders": [
+    {
+      "name": "Trim Sails",
+      "text": "standing order \"Trim Sails\": every bell then trim sails",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 5,
+      "last_fired_tick": 9100,
+      "given_tick": 100
+    }
+  ],
+  "agents": [
+    {
+      "station": {
+        "name": "watcher",
+        "authority": "none",
+        "policy": {
+          "every_s": 1800,
+          "events": [
+            "notable",
+            "urgent"
+          ],
+          "lockstep": false
+        },
+        "patience_s": 14400,
+        "brief": "You are the watcher. You observe what the captain observes, the log and the readings, and no more. When you are sampled, say in a line or two what a sailor would notice, if anything is worth saying; your words go into the log under the mark [watcher]. Say nothing when nothing has changed, or stand by until a bell or an event. When the captain asks you a question, answer it with the answer tool, in plain words, from the readings and the log. You give no orders and you are not asked to. Anything you want on the record, put in your journal."
+      },
+      "session_kind": "a play session with a human captain at the prompt",
+      "door_note": "This door is a model server on the owner's machine. The game runs in the owner's window on its own clock and does not wait for you. Your turn opens at each sampling point (the glass, a notable event, the end of a stand-by, or a question from the captain) and ends when you reply without a tool call; what happens while it is open is added to it, so your next turn carries everything since your last reply. The captain's orders and questions are typed by the owner in the game's window. Consent for these weights is on record (docs/agents/consent/2026-09-28-gemma4-26b-a4b-uncensored-hauhaucs-balanced-q4_k_m.md, 2026-09-28).",
+      "stationed_tick": 0,
+      "stationed_after_orders": 0,
+      "state": "released",
+      "state_words": "released: stood down by the local runner: the model server could not be used: The model server at http://127.0.0.1:11434 did not answer: timed out.",
+      "last_sample_tick": 9160,
+      "model_name": "Gemma4-26B-A4B-Uncensored-HauhauCS-Balanced:Q4_K_M",
+      "door": "runner",
+      "transcript": [
+        {
+          "tick": 0,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a glass\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 0,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": ""
+          }
+        },
+        {
+          "tick": 31,
+          "after_orders": 1,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "Thank you, Captain. Standing by."
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"answer\", \"arguments\": \"{\\\"text\\\":\\\"Thank you, Captain. Standing by.\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 33,
+          "after_orders": 1,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "the first bell of the morning watch"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"the first bell of the morning watch\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 36,
+          "after_orders": 1,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "one bell"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"one bell\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 38,
+          "after_orders": 1,
+          "reply": {
+            "text": "",
+            "calls": [],
+            "raw": ""
+          }
+        },
+        {
+          "tick": 343,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "The sails are set and drawing well, Captain."
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"answer\", \"arguments\": \"{\\\"text\\\":\\\"The sails are set and drawing well, Captain.\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 352,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a glass\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 354,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a glass\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 358,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a glass\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 404,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a glass\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 412,
+          "after_orders": 9,
+          "reply": {
+            "text": "The fore topsail is set, and she's drawing even more.",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "The fore topsail is set, and she's drawing even more.\n\n[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a glass\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 424,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a glass\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 425,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a glass\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 425,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a glass\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 426,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a glass\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 427,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a glass\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 427,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a glass\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 428,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a glass\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 428,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a glass\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 9169,
+          "after_orders": 11,
+          "door": "stand_down",
+          "reason": "the model server could not be used: The model server at http://127.0.0.1:11434 did not answer: timed out.",
+          "by": "the local runner"
+        }
+      ]
+    }
+  ],
+  "agent_journals": {
+    "watcher": [
+      {
+        "tick": 0,
+        "stamp": "Morning watch, 8 bells (04:00)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 36,
+        "stamp": "Morning watch (04:00)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until one bell."
+      },
+      {
+        "tick": 352,
+        "stamp": "Morning watch (04:05)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 354,
+        "stamp": "Morning watch (04:05)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 358,
+        "stamp": "Morning watch (04:05)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 404,
+        "stamp": "Morning watch (04:06)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 412,
+        "stamp": "Morning watch (04:06)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 424,
+        "stamp": "Morning watch (04:07)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 425,
+        "stamp": "Morning watch (04:07)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 9169,
+        "stamp": "Morning watch (06:32)",
+        "kind": "agent.stopped",
+        "text": "Stood down by the local runner: the model server could not be used: The model server at http://127.0.0.1:11434 did not answer: timed out.."
+      }
+    ]
+  }
+}
