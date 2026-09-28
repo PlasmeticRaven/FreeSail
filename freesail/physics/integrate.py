@@ -19,7 +19,7 @@ import math
 
 from freesail import units
 from freesail.physics import hull as hp
-from freesail.physics.sails import compute_sail_forces
+from freesail.physics.sails import compute_sail_forces, hold_rig, release_rig
 from freesail.physics.strain import apply_strain
 from freesail.physics.wind import Wind
 from freesail.ship.graph import Ship
@@ -33,13 +33,25 @@ def step(ship: Ship, dt: float, wind: Wind) -> None:
     st = hp.hull_state(ship)
     _notice_helm_orders(ship, st)
     h = dt / SUBSTEPS
-    for _ in range(SUBSTEPS):
-        forces = compute_sail_forces(ship, wind)
-        st.awa, st.aws = hp.apparent_wind(ship, wind)
-        _substep(
-            ship, st, h, forces.thrust_n, forces.side_n, forces.heel_moment_nm, forces.yaw_moment_nm
-        )
-        st.last_thrust_n = forces.thrust_n
+    # the rig is read once for the four substeps (package 29's profile; `sails._Rig` says
+    # why nothing it holds can change between them)
+    hold_rig(ship)
+    try:
+        for _ in range(SUBSTEPS):
+            forces = compute_sail_forces(ship, wind)
+            st.awa, st.aws = hp.apparent_wind(ship, wind)
+            _substep(
+                ship,
+                st,
+                h,
+                forces.thrust_n,
+                forces.side_n,
+                forces.heel_moment_nm,
+                forces.yaw_moment_nm,
+            )
+            st.last_thrust_n = forces.thrust_n
+    finally:
+        release_rig(ship)
     apply_strain(ship, dt)  # package 9: wear and carrying away, once per tick (spec §7.5)
     _update_readings(ship)
     _log_notes(ship, st, dt)

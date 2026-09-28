@@ -366,3 +366,7 @@ def shorten_sail():
 ```
 
 A saved game lists a Python rule by its name and its source; loaded without the script that defined it, the rule is in the book, belayed, and `resume` says why it will not run.
+
+## A day of it, and a word with the watcher
+
+`data/scenarios/gate-4c-day.yaml` is a whole day under standing orders, the wind scripted to veer and rise to a gale in the middle watch and ease at the next dawn: start it with `--scenario data/scenarios/gate-4c-day.yaml` on the console or the browser server, and run it at `speed 60` or `speed 300`, where the log rolls up each hour's routine lines into one line (marked `=`) and keeps every notable and urgent line as it is; an urgent line eases the clock to 1x and says so. With a watcher at its station, `ask the watcher how the sails are drawing` puts a question it answers in the log, and `tell the watcher we make for Falmouth` (or `say to the watcher ...`) gives it a word it hears and owes no answer to.

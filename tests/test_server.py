@@ -348,3 +348,69 @@ def test_save_from_the_order_box_and_the_driver(tmp_path):
             "/api/order", json={"text": f"save {tmp_path / 'no' / 'such' / 'dir' / 'x.json'}"}
         )
         assert r.json()["kind"] == "driver.refused"
+
+
+# -- package 29: --load and --scenario on the server (spec M4 §19, §21) -----------------
+
+
+def server_args(**kw):
+    import argparse
+
+    base = {"ship": None, "seed": None, "wind": None, "heading": None, "load": None}
+    base["scenario"] = None
+    base.update(kw)
+    return argparse.Namespace(**base)
+
+
+def test_the_server_loads_a_save_and_goes_on(tmp_path):
+    """`--load SAVE` on the server, as the console has had since M0 (the lead's promise at
+    gate 4a): the save is replayed to its last tick, the digest is the saved game's, and
+    the game goes on from there."""
+    from freesail.core import replay
+    from freesail.ui.server import build_world
+
+    world = world_for(SHIPS[0])
+    world.submit("set plain sail")
+    world.run(120)
+    world.submit("splice the mainbrace")  # refused, and replayed as refused (package 29)
+    world.run(60)
+    path = replay.save_to_file(world, tmp_path / "day.json")
+    loaded = build_world(server_args(load=str(path)))
+    assert loaded.clock.tick == 180
+    assert loaded.log.digest() == world.log.digest()
+    driver = Driver(loaded)
+    with TestClient(create_app(driver)) as client:
+        assert client.get("/api/state").json()["tick"] == 180
+        client.post("/api/order", json={"text": "set the royals"})
+        client.post("/api/driver", json={"action": "tick", "value": 30})
+        assert client.get("/api/state").json()["tick"] == 210
+    world.submit("set the royals")
+    world.run(30)
+    assert loaded.log.digest() == world.log.digest(), "the loaded game goes on as the original"
+
+
+def test_the_server_starts_from_a_scenario_file():
+    from freesail.ui.server import build_world
+
+    world = build_world(server_args(scenario="data/scenarios/gate-4c-day.yaml"))
+    assert world.seed == 7 and world.weather is not None
+    assert world.scenario.name == "The gate's day"
+    other = build_world(server_args(scenario="data/scenarios/gate-4c-day.yaml", seed=3))
+    assert other.seed == 3
+
+
+def test_a_save_on_the_server_replays_with_its_line(tmp_path):
+    """The server's `save PATH` line is a driver's line (`World.record_driver`): a later
+    save replays it where it was, and a refusal too, so the digests agree after a save."""
+    from freesail.api.session import ship_factory
+    from freesail.core import replay
+
+    world = world_for(SHIPS[0])
+    driver = Driver(world)
+    e = driver.save(str(tmp_path / "one.json"))
+    assert e.kind == "driver.saved" and "the log's digest is" in e.text
+    world.run(30)
+    assert driver.submit("state of the tide").kind == "order.rejected"
+    world.run(30)
+    copy = replay.replay(world.save(), ship_factory)
+    assert copy.log.digest() == world.log.digest()

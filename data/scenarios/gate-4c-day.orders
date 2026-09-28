@@ -1,0 +1,52 @@
+# FreeSail: the captain's orders for the gate's day (spec M4 §18, §19; package 29).
+#
+# The starter routines (data/standing_orders/starter.orders) are the ship's standing book;
+# these four are the captain's additions for this passage, read after them by the scenario
+# (data/scenarios/gate-4c-day.yaml). Without them the day loses canvas: under the starter
+# routines alone the frigate carried her topgallants into the rising wind and blew two of
+# them out and carried away the fore topgallant yard at 35 knots in the first watch, and
+# blew out the mainsail, the spanker and the jib at 45 in the middle watch (package 29's
+# first run of the day, seed 7; docs/dev/TuningNotes.md, M4c). The starter's "shorten sail
+# for weather" takes in the studding sails and the royals and reefs the topsails once at
+# thirty knots; the topgallants, the courses and the head and after sails are left to the
+# captain, and these are the captain's.
+#
+# The sail each strength of wind allows is Beaufort's (his scale of 1806 as the Admiralty
+# adopted it in 1838 gives, for each force, the canvas "a well-conditioned man-of-war"
+# could carry): at force 7, a moderate gale (28 to 33 knots, units.describe_wind_strength),
+# double-reefed topsails and the jib, the topgallant sails in; at force 9 and 10, a strong
+# and a whole gale (41 to 55 knots), close-reefed topsails and a reefed foresail, which is
+# a ship scudding. The thresholds are the starter routines' own where they can be (thirty
+# and forty knots, the strain truths), and judgement between.
+
+# The topgallants in at thirty knots, with the starter's shortening of sail (Beaufort's
+# force 7; truth 9: in 35 knots the royals and topgallants carry away within twenty minutes
+# under all sail). The same two minutes as the starter's, so a gust passes.
+standing order "topgallants": when the true wind exceeds 30 knots for 2 minutes then take in the topgallants
+
+# Gale canvas: scudding before the gale under the topsails and the foresail. The jib is of no
+# use dead before the wind and the spanker makes her gripe and yaw; the mainsail comes in so
+# the foresail lifts her head (judgement from the scudding canvas above). Thirty-six knots,
+# between the starter's thirty and forty, is judgement: in the first run the mainsail, the
+# spanker and the jib stood to 45 knots on the quarter, and the gale canvas is set well
+# before the heavy-weather routine sends the topgallant masts down at forty. Five minutes
+# tells a gale from a squall, as the heavy-weather routine's.
+standing order "gale canvas": when the true wind exceeds 36 knots for 5 minutes
+    then take in the jib; take in the spanker; take in the mainsail
+
+# Making sail after the gale: when the storm staysail is still set and the wind has been
+# under twenty-five knots (a strong breeze, below the thirty of shortening sail) for half an
+# hour, the storm staysail comes in, the topgallant masts go up, the reefs come out and the
+# plain sail is set again. The storm staysail's being set is what says there was a gale.
+standing order "make sail after the gale": when the fore storm staysail is set and the true wind is under 25 knots for 30 minutes
+    then take in the fore storm staysail; sway up the topgallant masts; shake out the reefs in the topsails; set plain sail
+
+# The topgallants again once their masts are up: the plain sail of the order above cannot
+# set a topgallant whose mast is still on deck. The masts go up before the reefs come out
+# (swaying up takes all hands and belays the sail work in hand, data/evolutions/
+# sway_up_topgallant_masts.yaml), so a fore topsail set with its reefs out and no topgallant
+# over it, in under twenty-two knots (a fresh breeze at most, Beaufort's force 5 carrying
+# topgallants) for ten minutes, is the moment. Ten minutes is judgement: longer than the
+# three between the topsail and the topgallant when plain sail is made from the furl.
+standing order "topgallants again": when the fore topsail is set and the fore topsail is not reefed and the fore topgallant is not set and the true wind is under 22 knots for 10 minutes
+    then set the topgallants

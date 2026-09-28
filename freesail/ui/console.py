@@ -1,8 +1,19 @@
 """The console driver: runs a world, prints the log, reads orders from stdin.
 
-    python -m freesail.ui.console [--seed N] [--time N] [--load SAVE] [--standing-orders FILE]
+    python -m freesail.ui.console [ship] [--seed N] [--time N] [--load SAVE]
+                                  [--scenario FILE] [--standing-orders FILE]
                                   [--watcher fake] [--agents-port N] [--lockstep]
                                   [--consent-records DIR] [--saves DIR]
+
+`--scenario FILE` starts from a scenario file (`freesail.world.scenarios`,
+`data/scenarios/gate-4c-day.yaml`): its ship, start, latitude and weather script, its
+seed unless `--seed` is given, its standing orders and first orders.
+
+Compression runs to `MAX_COMPRESSION` (300, spec M4 §20). At `events.ROLLUP_FROM` (60)
+and above the log is rolled up: notable and urgent lines and the captain's own as they
+are, each hour's routine lines in one line marked `=` (`events.RollupView`, the same view
+the server and a model's samples use). An urgent line while the clock runs faster than
+`ALARM_SPEED` eases it to that speed and says so in the log (spec M4 open item 8).
 
 `--agents-port N` hosts the agent API (the routes of `freesail.ui.server.agent_routes`,
 spec M4 §13 as revised) on that port, in a thread on the console's own lock, so that a
@@ -12,7 +23,8 @@ browser's. `--lockstep` holds the clock while a door has the floor.
 Driver commands (not ship orders, not journaled):
     hold            pause the clock
     go              run the clock
-    time N          set compression to N game seconds per real second
+    speed N         set compression to N game seconds per real second, up to 300
+    time N          the same as speed N
     tick N          advance N ticks, then hold
     state           print a summary of the ship and the weather
     muster          muster the crew: the watch bill, station by station
@@ -45,13 +57,40 @@ from typing import Any
 from freesail import units
 from freesail.api import queries
 from freesail.core import replay as replay_mod
-from freesail.core.events import Event, Severity
+from freesail.core.events import Event, RollupView, Severity, Shown
 from freesail.core.world import Scenario, World
 from freesail.ship.stub import OrderError
 
 HELP = __doc__.split("Driver commands")[1] if __doc__ else ""
 
 READ_STANDING_ORDERS = ("read the standing orders from", "load the standing orders from")
+
+# The fastest the clock runs, game seconds a real second (spec M4 §20: "The server and
+# console take `speed N` up to 300"): a day in under five minutes.
+MAX_COMPRESSION = 300.0
+# The slowest, so that `speed 0` still moves.
+MIN_COMPRESSION = 0.1
+# Auto-slow on alarm (spec M4 open item 8, the owner's ruling (b)): an urgent line while the
+# clock runs faster than this eases it to this, and the log says so; the player speeds up
+# again when ready. One, not ten (judgement, named in docs/dev/TuningNotes.md, M4c): an
+# urgent line is a sail blown out, a spar carried away, a line parted, and the next one often
+# follows within seconds of ship's time (package 29's first run of the gate's day: two
+# topgallants blew out and the fore topgallant yard carried away eleven seconds later), so
+# the player needs the ship's own pace to see it and answer; at ten that is one real second.
+ALARM_SPEED = 1.0
+
+# The words for the driver's speed, the console's `time` and the owner's `speed`.
+SPEED_WORDS = ("speed", "time")
+
+
+def clamp_compression(value: float) -> float:
+    """A compression the drivers run at: between MIN_COMPRESSION and MAX_COMPRESSION."""
+    return min(MAX_COMPRESSION, max(MIN_COMPRESSION, float(value)))
+
+
+def eased_words(e: Event) -> str:
+    """The log's line for auto-slow: 'Compression eased to 1x: <the urgent line's words>'."""
+    return f"Compression eased to {ALARM_SPEED:g}x: {e.text}"
 
 
 def read_standing_orders_path(line: str) -> str | None:
@@ -138,18 +177,18 @@ def restore_python_rules(world: World, data: dict) -> None:
 
 
 class Console:
-    ROLLUP_ABOVE = 10  # compression above which routine entries are rolled up per bell
-
     def __init__(
         self, world: World, compression: float = 1.0, out=sys.stdout, lockstep: bool = False
     ):
         self.world = world
-        self.compression = compression
+        self.compression = clamp_compression(compression)
+        self.world.compression = self.compression
         self.lockstep = lockstep
         self.desk: Any = None  # the agent API's stations, with --agents-port
         self.running = False
         self.out = out
-        self._rolled_up = 0
+        self._view = RollupView()  # the roll-up (spec M4 §20)
+        self._alarm: Event | None = None  # an urgent line seen while running fast
         self.lock = threading.RLock()  # the clock thread and the prompt share the world
         self._stop = threading.Event()
         self._attach()
@@ -158,19 +197,48 @@ class Console:
 
     def _attach(self) -> None:
         self.world.log.subscribe(self._on_event)
+        self.world.compression = self.compression
 
     def _detach(self) -> None:
         self.world.log.unsubscribe(self._on_event)
 
     def _on_event(self, e: Event) -> None:
-        rolling = self.running and self.compression > self.ROLLUP_ABOVE
-        if rolling and e.severity is Severity.ROUTINE and e.kind != "clock.bell":
-            self._rolled_up += 1
+        if (
+            e.severity is Severity.URGENT
+            and self.running
+            and self.compression > ALARM_SPEED
+            and self._alarm is None
+        ):
+            self._alarm = e  # eased once the tick is over (`_run`)
+        for x in self._view.feed(e, self.compression):
+            self._show(x)
+
+    def _show(self, x: Shown) -> None:
+        self._print(x.line())
+
+    def set_compression(self, value: float) -> None:
+        """`speed N` (or `time N`): the roll-up lets go of an hour it holds when the speed
+        comes down below its threshold, so nothing held is left unsaid."""
+        self.compression = clamp_compression(value)
+        self.world.compression = self.compression
+        if self._view.holding and not _rolls_up(self.compression):
+            for x in self._view.flush():
+                self._show(x)
+
+    def _ease(self) -> None:
+        """Auto-slow (spec M4 open item 8): the compression eased to ALARM_SPEED, and the
+        log says so, as a driver's line a replay writes again (`World.record_driver`)."""
+        e, self._alarm = self._alarm, None
+        if e is None or self.compression <= ALARM_SPEED:
             return
-        if e.kind == "clock.bell" and self._rolled_up:
-            self._print(f"  ({self._rolled_up} routine entries)")
-            self._rolled_up = 0
-        self._print(e.line())
+        was = self.compression
+        self.set_compression(ALARM_SPEED)
+        self.world.record_driver(
+            Severity.NOTABLE,
+            "driver.eased",
+            eased_words(e),
+            data={"from": was, "to": ALARM_SPEED, "tick": e.tick, "kind": e.kind},
+        )
 
     def _print(self, text: str) -> None:
         print(text, file=self.out, flush=True)
@@ -194,12 +262,14 @@ class Console:
         elif cmd == "go":
             self.running = True
             self._print(f"Clock running at {self.compression:g}x.")
-        elif cmd == "time":
+        elif cmd in SPEED_WORDS:
             try:
-                self.compression = max(0.1, float(args[0]))
-                self._print(f"Compression {self.compression:g}x.")
+                wanted = float(args[0])
+                self.set_compression(wanted)
+                most = " (the most there is)" if wanted > MAX_COMPRESSION else ""
+                self._print(f"Compression {self.compression:g}x{most}.")
             except (IndexError, ValueError):
-                self._print("Say 'time 30' for thirty game seconds per real second.")
+                self._print(f"Say '{cmd} 30' for thirty game seconds per real second.")
         elif cmd == "tick":
             n = int(args[0]) if args else 1
             self.running = False
@@ -299,6 +369,7 @@ class Console:
         data = replay_mod.load_file(path)
         self.running = False
         self._detach()
+        self._view = RollupView()
         self._print(f"Replaying {path} to tick {data['end_tick']}...")
         from freesail.api.session import ship_factory
 
@@ -335,12 +406,15 @@ class Console:
             return self.desk.holding()
 
     def _run(self, n: int) -> int:
-        """Run up to n ticks; in lockstep, stop where a door has the floor. Returns how
-        many ran."""
+        """Run up to n ticks; in lockstep, stop where a door has the floor; on an alarm,
+        stop and ease the compression. Returns how many ran."""
         for k in range(n):
             if self.held_for() is not None:
                 return k
             self.world.tick()
+            if self._alarm is not None:
+                self._ease()
+                return k + 1
         return n
 
     def _tick_owed(self, owed: float, period: float) -> float:
@@ -434,6 +508,50 @@ class Console:
                 self._stop.set()
 
 
+def _rolls_up(compression: float) -> bool:
+    from freesail.core.events import rolls_up
+
+    return rolls_up(compression)
+
+
+def start_world(args: argparse.Namespace) -> tuple[World, Any]:
+    """The World a driver starts with, from its command line (shared with the server):
+    `--load SAVE` replays a save to its last tick; `--scenario FILE` builds the scenario's
+    world (the orders it names are given by the caller, after the watcher is stationed);
+    otherwise the ship, the seed, `--wind` and `--heading`. Returns the World and the
+    scenario file read, if any."""
+    from freesail.api.session import make_world, ship_factory
+
+    if getattr(args, "load", None):
+        data = replay_mod.load_file(args.load)
+        world = replay_mod.replay(data, ship_factory)
+        restore_python_rules(world, data)
+        return world, None
+    if getattr(args, "scenario", None):
+        from freesail.world.scenarios import load_scenario, make_scenario_world
+
+        sf = load_scenario(args.scenario)
+        if args.wind:
+            raise SystemExit("--wind and --scenario: the scenario's weather script is the wind.")
+        if args.heading is not None:
+            sf.scenario.ship_heading_deg = args.heading
+        return make_scenario_world(sf, seed=args.seed, ship=args.ship), sf
+    seed = args.seed if args.seed is not None else DEFAULT_SEED
+    scenario = Scenario()
+    if args.wind:
+        d, s = args.wind.split(",")
+        scenario.wind_from_deg, scenario.wind_speed_kn = float(d), float(s)
+    if args.heading is not None:
+        scenario.ship_heading_deg = args.heading
+    if args.ship:
+        return make_world(seed, args.ship, scenario), None
+    return World(seed=seed, scenario=scenario), None
+
+
+# The seed without a scenario or `--seed` (the drivers' default since M0).
+DEFAULT_SEED = 1805
+
+
 def _stdin_reader(q: queue.Queue[str]) -> None:
     for line in sys.stdin:
         q.put(line)
@@ -443,9 +561,15 @@ def _stdin_reader(q: queue.Queue[str]) -> None:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="FreeSail console")
     ap.add_argument("ship", nargs="?", help="ship file, e.g. data/ships/frigate-36.yaml")
-    ap.add_argument("--seed", type=int, default=1805)
-    ap.add_argument("--time", type=float, default=1.0, help="compression, game s per real s")
+    ap.add_argument("--seed", type=int, help="the seed (default a scenario's, else 1805)")
+    ap.add_argument(
+        "--time", "--speed", type=float, default=1.0, help="compression, game s per real s"
+    )
     ap.add_argument("--load", help="save file to replay and continue from")
+    ap.add_argument(
+        "--scenario",
+        help="a scenario file: ship, start, weather script, orders (spec M4 §19)",
+    )
     ap.add_argument("--wind", help="wind as 'FROM_DEG,KNOTS', e.g. 225,15")
     ap.add_argument("--heading", type=float, help="starting heading in degrees")
     ap.add_argument(
@@ -471,30 +595,21 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--saves", help="where a released station saves the game (default saves/)")
     args = ap.parse_args(argv)
 
-    from freesail.api.session import make_world, ship_factory
-
-    if args.load:
-        data = replay_mod.load_file(args.load)
-        world = replay_mod.replay(data, ship_factory)
-        restore_python_rules(world, data)
-    else:
-        scenario = Scenario()
-        if args.wind:
-            d, s = args.wind.split(",")
-            scenario.wind_from_deg, scenario.wind_speed_kn = float(d), float(s)
-        if args.heading is not None:
-            scenario.ship_heading_deg = args.heading
-        if args.ship:
-            world = make_world(args.seed, args.ship, scenario)
-        else:
-            world = World(seed=args.seed, scenario=scenario)
+    world, scenario_file = start_world(args)
     if args.watcher:
         # stationed before any order of this tick, which is where a replay stations it
         station_watcher(world, args.watcher, out=sys.stdout)
+    if scenario_file is not None:
+        from freesail.world.scenarios import begin
+
+        begin(world, scenario_file)
     if args.standing_orders:
         read_standing_orders(world, args.standing_orders)
 
     console = Console(world, compression=args.time, lockstep=args.lockstep)
+    if scenario_file is not None:
+        for line in scenario_file.lines():
+            console._print(line)
     for e in world.log.all():
         console._print(e.line())
     console._print(

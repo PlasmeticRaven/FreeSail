@@ -196,10 +196,19 @@ def apply_strain(ship: Ship, dt: float, rng_stream: random.Random | None = None)
     _tend_catharpins(ship)
     _tend_wrecks(ship, st)
     _wear_canvas(ship, st, dt)
-    for part in list(ship.parts.values()):  # insertion order: deterministic
-        if _out_of_action(part):
+    for part, kind in _parts_by_kind(ship):  # insertion order: deterministic
+        # `_out_of_action`, with each part's class looked up once per ship (package 29's
+        # profile: three hundred parts a tick)
+        if (
+            part.wrecked
+            or (kind is Spar and part.sent_down)
+            or (kind is Line and part.state is LineState.PARTED)
+            or (kind is Sail and part.state not in _DRAWING)
+        ):
             part.load_kn = 0.0
             continue
+        if part.load_kn <= 0.0:
+            continue  # a ratio of nothing (every `strain_ratio` is load over a rating)
         ratio = part.strain_ratio
         if ratio <= DECAY_RATIO:
             continue
@@ -284,6 +293,19 @@ def _out_of_action(part: Part) -> bool:
     if isinstance(part, Sail):
         return part.state not in (SailState.SET, SailState.GOOSE_WINGED)
     return False
+
+
+def _parts_by_kind(ship: Ship) -> tuple[tuple[Part, type | None], ...]:
+    """Every part in the ship's order with the class `_out_of_action` tests it as (Spar,
+    Line, Sail, or None): the parts are fixed once the ship is loaded, so this is kept."""
+    kinds = ship.extra.get("strain.parts_by_kind")
+    if not isinstance(kinds, tuple):
+        kinds = tuple(
+            (part, next((k for k in (Spar, Line, Sail) if isinstance(part, k)), None))
+            for part in ship.parts.values()
+        )
+        ship.extra["strain.parts_by_kind"] = kinds
+    return kinds
 
 
 def _fails(part: Part, ratio: float, dt: float, stream: random.Random | None) -> bool:

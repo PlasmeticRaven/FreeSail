@@ -1,14 +1,19 @@
-/* log.js: the log panel. Severity-coloured lines, a filter, and the roll-up of
- * routine entries per bell while the clock runs above 10x, as the console does. */
+/* log.js: the log panel. Severity-coloured lines, a filter, and the roll-up.
+ *
+ * The roll-up (spec M4 §20) is the server's view, not the client's: at 60x and above the
+ * server sends notable and urgent lines and the captain's own as events, and each hour's
+ * routine lines as one roll-up (freesail/core/events.py RollupView, the same view the
+ * console prints and a model's samples carry). A roll-up opens to show its lines, asked
+ * of the store by their ticks (/api/log?since=&until=), so nothing is lost by it. */
 (function (root) {
   "use strict";
-  var ROLLUP_ABOVE = 10;
   var RANK = { routine: 0, notable: 1, urgent: 2 };
+  // The actors whose routine lines the roll-up keeps as they are (events.KEPT_ACTORS).
+  var KEPT_ACTORS = { captain: 1, driver: 1 };
 
   function LogPanel(listEl) {
     this.list = listEl;
     this.filter = "routine";
-    this.rolled = [];
     this.count = 0;
     this.maxLines = 2000;
   }
@@ -21,36 +26,58 @@
 
   LogPanel.prototype.clear = function () {
     this.list.innerHTML = "";
-    this.rolled = [];
     this.count = 0;
   };
 
-  /** Add an event. `driver` is the driver state the roll-up depends on. */
-  LogPanel.prototype.add = function (e, driver) {
-    var rolling = driver && driver.running && driver.compression > ROLLUP_ABOVE;
-    if (rolling && e.severity === "routine" && e.kind !== "clock.bell") {
-      this.rolled.push(e);
-      return;
-    }
-    if (e.kind === "clock.bell" && this.rolled.length) this.flushRollup();
-    this.append(e);
+  /** Add a line the server sent: an event, or a roll-up (kind "log.rollup"). */
+  LogPanel.prototype.add = function (e) {
+    if (e.kind === "log.rollup") this.addRollup(e);
+    else this.append(e);
   };
 
-  LogPanel.prototype.flushRollup = function () {
-    if (!this.rolled.length) return;
-    var n = this.rolled.length;
+  /** An hour's routine lines in one line, which opens to show them. */
+  LogPanel.prototype.addRollup = function (r) {
     var details = document.createElement("details");
     details.className = "entry rollup routine";
+    details.setAttribute("data-rank", 0);
+    details.setAttribute("data-tick", r.tick);
     var summary = document.createElement("summary");
-    summary.textContent = "(" + n + " routine " + (n === 1 ? "entry" : "entries") + ")";
+    var mark = document.createElement("span");
+    mark.className = "mark";
+    mark.textContent = "=";
+    var stamp = document.createElement("span");
+    stamp.className = "stamp";
+    stamp.textContent = r.stamp || "";
+    var text = document.createElement("span");
+    text.className = "text";
+    text.textContent = r.text;
+    summary.appendChild(mark);
+    summary.appendChild(stamp);
+    summary.appendChild(text);
     details.appendChild(summary);
     var inner = document.createElement("div");
-    this.rolled.forEach(function (e) {
-      inner.appendChild(lineFor(e));
-    });
+    inner.className = "rollup-lines";
     details.appendChild(inner);
-    this.rolled = [];
+    var data = r.data || {};
+    details.addEventListener("toggle", function () {
+      if (!details.open || inner.getAttribute("data-loaded")) return;
+      inner.setAttribute("data-loaded", "1");
+      var url = "/api/log?since=" + (Number(data.first_tick) - 1) + "&until=" + Number(data.last_tick) + "&limit=5000";
+      fetch(url)
+        .then(function (res) {
+          return res.json();
+        })
+        .then(function (events) {
+          events.forEach(function (e) {
+            if (e.severity === "routine" && !KEPT_ACTORS[e.actor]) inner.appendChild(lineFor(e));
+          });
+        })
+        .catch(function () {
+          inner.removeAttribute("data-loaded");
+        });
+    });
     this.list.appendChild(details);
+    this.count += 1;
     this.trim();
     this.scrollToEnd();
   };
@@ -78,7 +105,7 @@
     div.setAttribute("data-tick", e.tick);
     var mark = document.createElement("span");
     mark.className = "mark";
-    mark.textContent = e.severity === "urgent" ? "!" : e.severity === "notable" ? "*" : " ";
+    mark.textContent = e.severity === "urgent" ? "!" : e.severity === "notable" ? "*" : " ";
     var stamp = document.createElement("span");
     stamp.className = "stamp";
     stamp.textContent = e.stamp || root.Units.clockOf(e.ship_time);

@@ -58,6 +58,13 @@ class Ship:
         self._lines_of: dict[str, list[str]] = {}
         for ln in self.lines.values():
             self._lines_of.setdefault(ln.of, []).append(ln.id)
+        # Memos of the role queries the physics asks every substep (package 29's profile:
+        # `spar_chain`, `lines_of` and `mast_of` were a third of a tick). The graph's shape
+        # (parents, roles, what a line is of) is fixed once the ship is loaded: states
+        # change, parts never move in the graph. Each memo holds the answer as built by the
+        # query itself; callers get a fresh list, so nothing they do reaches the memo.
+        self._chain_memo: dict[str, tuple[Spar, ...]] = {}
+        self._lines_memo: dict[tuple[str, str | None], tuple[Line, ...]] = {}
 
     # -- queries: sails and spars -------------------------------------------
 
@@ -94,7 +101,7 @@ class Ship:
         return self.spars[sid] if sid and sid in self.spars else None
 
     def parent_of(self, spar: str | Spar) -> Spar | None:
-        sp = self._spar(spar)
+        sp = spar if isinstance(spar, Spar) else self._spar(spar)
         return self.spars[sp.parent] if sp.parent else None
 
     def spar_chain(self, part: str | Part) -> list[Spar]:
@@ -103,6 +110,14 @@ class Ship:
         For a sail: its principal spar, then that spar's parents. For a spar:
         itself, then its parents. For a line: the chain of what it is of.
         """
+        key = part if isinstance(part, str) else part.id
+        chain = self._chain_memo.get(key)
+        if chain is None:
+            chain = tuple(self._build_spar_chain(part))
+            self._chain_memo[key] = chain
+        return list(chain)
+
+    def _build_spar_chain(self, part: str | Part) -> list[Spar]:
         p = self._part(part)
         if isinstance(p, Sail):
             start = self._principal_spar(p)
@@ -149,17 +164,26 @@ class Ship:
 
     def mast_of(self, part: str | Part) -> Spar | None:
         """The lower mast (or bowsprit) at the root of this part's spar chain."""
-        chain = self.spar_chain(part)
+        key = part if isinstance(part, str) else part.id
+        chain = self._chain_memo.get(key)
+        if chain is None:
+            self.spar_chain(part)
+            chain = self._chain_memo[key]
         return chain[-1] if chain else None
 
     # -- queries: lines -------------------------------------------------------
 
     def lines_of(self, part: str | Part, cls: str | None = None) -> list[Line]:
-        p = self._part(part)
-        out = [self.lines[i] for i in self._lines_of.get(p.id, [])]
-        if cls:
-            out = [ln for ln in out if ln.cls == cls]
-        return out
+        key = (part if isinstance(part, str) else part.id, cls)
+        found = self._lines_memo.get(key)
+        if found is None:
+            p = self._part(part)
+            out = [self.lines[i] for i in self._lines_of.get(p.id, [])]
+            if cls:
+                out = [ln for ln in out if ln.cls == cls]
+            found = tuple(out)
+            self._lines_memo[key] = found
+        return list(found)
 
     def line_of(self, part: str | Part, cls: str, side: str | None = None) -> Line | None:
         for ln in self.lines_of(part, cls):

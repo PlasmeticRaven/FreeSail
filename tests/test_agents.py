@@ -1340,6 +1340,7 @@ def test_the_agent_log_kinds_are_listed_in_one_place_and_used():
     world = frigate_world()
     Harness(world, watcher(SamplingPolicy.in_lockstep(A_GLASS_S)), narrator()).start()
     world.submit("ask the watcher how she lies")
+    world.submit("tell the watcher we make for Falmouth")  # package 29
     used |= set(kinds(world))
     assert used == set(AGENT_LOG_KINDS)
     for kind in AGENT_LOG_KINDS:

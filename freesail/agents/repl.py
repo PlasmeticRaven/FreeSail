@@ -141,6 +141,8 @@ def render_turn(turn: Turn) -> str:
         out.append(f"Notice from the harness: {n}")
     if d.get("question"):
         out.append(f"The captain asks: {d['question']}?")
+    if d.get("word"):
+        out.append(f"The captain tells you: {d['word']}")
     sb = d.get("stood_by")
     if sb:
         # the stand-by's digest (package 28c): the notable lines while it lasted

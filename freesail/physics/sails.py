@@ -71,6 +71,7 @@ fields on parts are kilonewtons, as `parts.py` defines them.
 from __future__ import annotations
 
 import bisect
+import functools
 import math
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -186,9 +187,10 @@ class SailClass:
         c_l = _interp(self.alpha, self.lift, a + luff_gain * taper)
         return c_l, c_d * (1.0 - BOWLINE_DRAG_REDUCTION * taper)
 
-    @property
+    @functools.cached_property
     def peak_alpha(self) -> float:
-        """The angle of attack at which the class's lift is greatest."""
+        """The angle of attack at which the class's lift is greatest (kept: the tables
+        are fixed once loaded, and it is read for every drawing sail every substep)."""
         return self.alpha[max(range(len(self.lift)), key=lambda i: self.lift[i])]
 
 
@@ -310,39 +312,44 @@ def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
     _reset_loads(ship)
     dyn = ship.dyn
     hull = ship.hull.spec
+    field = _FlowField(ship, wind)
 
-    deck = _apparent(ship, wind, hull.deck_height_m + WIND_EYE_HEIGHT_M)
+    deck = field.at(hull.deck_height_m + WIND_EYE_HEIGHT_M)
     dyn.apparent_wind_angle = deck.awa
     dyn.apparent_wind_speed = deck.speed
 
     heel_cos = max(math.cos(dyn.heel), 0.0)
     _tend_bowlines(ship)
     true_off = true_wind_off_bow(ship, wind)
-    driving = [s for s in ship.sails.values() if _is_driving(ship, s)]
-    flows = {s.id: _apparent(ship, wind, s.centre_height_m) for s in driving}
-    blankets = _blanket_factors(ship, driving, flows)
+    rig = _rig(ship)
+    driving = rig.driving
+    flows = {s.id: field.at(s.centre_height_m) for s in driving}
+    blankets, offsets = _blanket_factors_and_offsets(ship, rig, flows)
 
     thrust = side = heel_m = yaw_m = windage = 0.0
     luff_angle: float | None = None
     luff_sum = 0.0
     luff_area = 0.0
 
-    for sail in driving:
-        cls = SAIL_CLASSES[sail.cls]
+    for d in rig.drawing:
+        sail = d.sail
+        cls = d.cls
         flow = flows[sail.id]
-        reefs = min(max(sail.reefs, 0), sail.reef_bands)
-        area = sail.area_m2 * max(1.0 - cls.reef_factor * reefs, 0.0) * heel_cos * blankets[sail.id]
-        if sail.state is SailState.GOOSE_WINGED:
+        area = d.area * heel_cos * blankets[sail.id]
+        if d.goose_winged:
             area *= GOOSE_WINGED_AREA_FRACTION
-        chord, drive_normal = _chord(ship, sail, flow.awa)
-        bowline = hauled_weather_bowline(ship, sail)
+        if d.square_chord is not None:
+            chord, drive_normal = d.square_chord
+        else:
+            chord, drive_normal = _chord_on_lee(d.chord_angle, flow.awa)
+        bowline = hauled_weather_bowline(ship, sail) if d.has_bowlines else None
         gain = units.deg_to_rad(BOWLINE_LUFF_GAIN_DEG) if bowline is not None else 0.0
         f_fwd, f_stb, backed = _plate_force(
-            flow, area, chord, drive_normal, cls, sail, gain, square_faced=not _in_gaff_plane(sail)
+            flow, area, chord, drive_normal, cls, sail, gain, square_faced=d.square_faced
         )
         # the studding sails' stall (spec 3b §7): forward of Luce's angle the sail shakes in
         # its gear; its lift falls away over a point and it flogs, a loose sail's windage
-        stall = studding_stall(ship, sail, true_off)
+        stall = studding_stall(ship, sail, true_off) if d.studding else 0.0
         if stall > 0.0:
             shake = WINDAGE_BY_STATE[SailState.LOOSED] * area * flow.q
             f_fwd = (1.0 - stall) * f_fwd + stall * shake * flow.fwd
@@ -351,7 +358,8 @@ def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
         force = math.hypot(f_fwd, f_stb)
 
         _record_backed(ship, sail, backed)
-        _record_shivering(ship, sail, stall, true_off)
+        if d.studding:
+            _record_shivering(ship, sail, stall, true_off)
         sail.area_effective_m2 = area
         sail.force_kn = force / 1000.0
         sail.thrust_kn = f_fwd / 1000.0
@@ -362,7 +370,7 @@ def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
         if bowline is not None:
             bowline.load_kn += BOWLINE_LOAD_FRACTION * force / 1000.0
 
-        y = _lateral_offset(ship, sail, flow.awa)
+        y = offsets[sail.id]
         thrust += f_fwd
         side += f_stb
         heel_m += f_stb * sail.centre_height_m
@@ -371,46 +379,39 @@ def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
         # the ship's luff angle is the area-weighted mean of her driving sails':
         # a schooner sails by her fore-and-aft canvas with the square topsail
         # shaking, so the topsail must not set the rule for the whole rig
-        sail_luff = _chord_angle(ship, sail) + cls.luff_angle - gain
+        sail_luff = d.chord_angle + cls.luff_angle - gain
         # -- package 22 (spec 3b §6.2): worn canvas is baggier and lies less close to the
         # wind; its luff angle rises by BAGGY_LUFF_DEG * (1 - condition / 100). The one
         # canvas term in this module; the constant and the rule are in physics/strain.py.
-        sail_luff += baggy_luff(sail)
+        sail_luff += d.baggy_luff
         # -- end package 22
         luff_weight = max(sail.area_effective_m2, 1e-6)
         luff_sum += sail_luff * luff_weight
         luff_area += luff_weight
         luff_angle = luff_sum / luff_area
 
-    driving_ids = {s.id for s in driving}
-    for sail in ship.sails.values():
-        if sail.id in driving_ids:
-            continue
+    for sail in rig.idle:
         sail.backed = False  # a sail that is not drawing cannot be aback
         sail.shivering = False  # nor shake in its gear
         sail.area_effective_m2 = sail.force_kn = sail.thrust_kn = sail.side_force_kn = 0.0
-        area = _sail_windage_area(ship, sail)
-        if area > 0:
-            flow = _apparent(ship, wind, sail.centre_height_m)
-            d = flow.q * area
-            windage += d
-            thrust += d * flow.fwd
-            side += d * flow.stb
-            heel_m += d * flow.stb * sail.centre_height_m
-            yaw_m += d * flow.stb * (sail.x_m - hull.clr_x_m)
-
-    for spar in ship.spars.values():
-        area = _spar_windage_area(spar)
-        if area <= 0:
-            continue
-        height = _spar_centre_height(ship, spar)
-        flow = _apparent(ship, wind, height)
-        d = flow.q * area * SPAR_DRAG_COEFFICIENT
+    terms = field.drag_terms(rig.windage_heights)
+    for area, height, lever, i in rig.idle_windage:
+        q, fwd, stb = terms[i]
+        d = q * area
         windage += d
-        thrust += d * flow.fwd
-        side += d * flow.stb
-        heel_m += d * flow.stb * height
-        yaw_m += d * flow.stb * (_spar_x(ship, spar) - hull.clr_x_m)
+        thrust += d * fwd
+        side += d * stb
+        heel_m += d * stb * height
+        yaw_m += d * stb * lever
+
+    for area, height, lever, i in rig.spar_windage:
+        q, fwd, stb = terms[i]
+        d = q * area * SPAR_DRAG_COEFFICIENT
+        windage += d
+        thrust += d * fwd
+        side += d * stb
+        heel_m += d * stb * height
+        yaw_m += d * stb * lever
 
     if luff_angle is None:
         ship.extra.pop("luff_angle", None)
@@ -427,8 +428,277 @@ def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
 
 
 # ---------------------------------------------------------------------------
+# The rig as the wind meets it this tick (package 29: the performance budget)
+# ---------------------------------------------------------------------------
+
+# The key under which `integrate.step` keeps one tick's `_Rig` in `ship.extra` for its four
+# substeps (`hold_rig`, `release_rig`).
+RIG_KEY = "sails.rig"
+
+
+@dataclass
+class _Drawing:
+    """One driving sail's figures that hold for the whole tick: its class, its area after
+    reefing (before heel and blanketing), its chord's angle to the centreline, a square
+    sail's chord and drive normal (on its yard's brace), and its worn canvas's luff."""
+
+    sail: Sail
+    cls: SailClass
+    area: float
+    goose_winged: bool
+    square_faced: bool
+    studding: bool
+    chord_angle: float
+    square_chord: tuple[float, tuple[float, float]] | None
+    baggy_luff: float
+    height: float  # the cloth's height, for the blanketing shadow
+    has_bowlines: bool  # any bowline at all (`hauled_weather_bowline` is None without one)
+
+
+@dataclass
+class _Rig:
+    """What the wind meets this tick: the sails drawing (`driving`, with their `drawing`
+    figures), the sails not drawing (`idle`) and those of them that catch wind with their
+    windage areas, the spars that catch wind with their areas, heights and levers, and the
+    blanketing shadow's reach.
+
+    Package 29's profile (spec M4 §20): nothing in these changes between the four substeps
+    of a tick. Sails are set and furled, braces and sheets moved, spars sent down by the
+    evolutions and the sheet tending before the substeps, and worn, blown out and carried
+    away by the strain model after them; the substeps move only the hull and the helm, and
+    slack a bowline (`_tend_bowlines`, which the forces read afresh each substep). So
+    `integrate.step` holds one `_Rig` for its four substeps, and every number is the one
+    the per-substep reading gave (the replay digests say so). A caller outside the
+    integrator gets a fresh one each call."""
+
+    driving: list[Sail]
+    drawing: list[_Drawing]
+    idle: list[Sail]
+    idle_windage: list[tuple[float, float, float, int]]  # area, height, lever, height's slot
+    spar_windage: list[tuple[float, float, float, int]]  # the same, for the spars
+    windage_heights: list[float]  # the heights the windage reads, each once
+    reach: float
+
+
+def hold_rig(ship: Ship) -> None:
+    """From now until `release_rig`, the rig is read once and kept (`integrate.step`)."""
+    ship.extra[RIG_KEY] = None
+
+
+def release_rig(ship: Ship) -> None:
+    ship.extra.pop(RIG_KEY, None)
+
+
+def _rig(ship: Ship) -> _Rig:
+    if RIG_KEY not in ship.extra:
+        return _read_rig(ship)
+    rig = ship.extra[RIG_KEY]
+    if rig is None:
+        rig = _read_rig(ship)
+        ship.extra[RIG_KEY] = rig
+    return rig
+
+
+def _read_rig(ship: Ship) -> _Rig:
+    driving = [s for s in ship.sails.values() if _is_driving(ship, s)]
+    drawing = []
+    for sail in driving:
+        cls = SAIL_CLASSES[sail.cls]
+        reefs = min(max(sail.reefs, 0), sail.reef_bands)
+        square_faced = not _in_gaff_plane(sail)
+        square_chord = None
+        if sail.cls in SQUARE_FAMILY and square_faced:
+            yard = _trim_yard(ship, sail)
+            b = yard.brace_angle if yard is not None else 0.0
+            # yard square: chord athwartships (pi/2); braced +b: starboard arm forward
+            square_chord = (math.pi / 2 - b, (math.cos(b), -math.sin(b)))
+        drawing.append(
+            _Drawing(
+                sail=sail,
+                cls=cls,
+                area=sail.area_m2 * max(1.0 - cls.reef_factor * reefs, 0.0),
+                goose_winged=sail.state is SailState.GOOSE_WINGED,
+                square_faced=square_faced,
+                studding=sail.cls == "studding",
+                chord_angle=_chord_angle(ship, sail),
+                square_chord=square_chord,
+                baggy_luff=baggy_luff(sail),
+                height=_sail_height(ship, sail),
+                has_bowlines=bool(ship.lines_of(sail, "bowline")),
+            )
+        )
+    driving_ids = {s.id for s in driving}
+    idle = [s for s in ship.sails.values() if s.id not in driving_ids]
+    heights: list[float] = []
+    slots: dict[float, int] = {}
+
+    def slot(height: float) -> int:
+        i = slots.get(height)
+        if i is None:
+            i = slots[height] = len(heights)
+            heights.append(height)
+        return i
+
+    clr_x = ship.hull.spec.clr_x_m
+    idle_windage = []
+    for sail in idle:
+        area = _sail_windage_area(ship, sail)
+        if area > 0:
+            h = sail.centre_height_m
+            idle_windage.append((area, h, sail.x_m - clr_x, slot(h)))
+    spar_windage = []
+    for spar, height, lever in _spar_places(ship):
+        area = _spar_windage_area(spar)
+        if area > 0:
+            spar_windage.append((area, height, lever, slot(height)))
+    return _Rig(
+        driving=driving,
+        drawing=drawing,
+        idle=idle,
+        idle_windage=idle_windage,
+        spar_windage=spar_windage,
+        windage_heights=heights,
+        reach=_blanket_reach(ship),
+    )
+
+
+def _blanket_reach(ship: Ship) -> float:
+    """How far downwind a sail's shadow reaches: BLANKET_RANGE_MAST_HEIGHTS of the tallest
+    lower mast (fixed by the ship file, so kept per ship)."""
+    reach = ship.extra.get("sails.blanket_reach")
+    if not isinstance(reach, float):
+        mast_height = max(
+            (s.height_m for s in ship.spars.values() if s.cls == "mast"), default=20.0
+        )
+        reach = BLANKET_RANGE_MAST_HEIGHTS * mast_height
+        ship.extra["sails.blanket_reach"] = reach
+    return reach
+
+
+def _chord_on_lee(chord_angle: float, awa: float) -> tuple[float, tuple[float, float]]:
+    """`_chord` for a sail that lies on the lee side, from its chord's unsigned angle."""
+    tack = 1.0 if awa >= 0 else -1.0  # sail lies on the lee side
+    gamma = tack * chord_angle
+    # normal pointing to leeward: the -tack side
+    return gamma, (tack * math.sin(gamma), -tack * math.cos(gamma))
+
+
+def _blanket_factors_and_offsets(
+    ship: Ship, rig: _Rig, flows: dict[str, _Flow]
+) -> tuple[dict[str, float], dict[str, float]]:
+    """`_blanket_factors` over the rig's figures, and each driving sail's lateral offset
+    (`_lateral_offset`), which the yaw moment reads again."""
+    reach = rig.reach
+    pos = {}
+    height = {}
+    offsets = {}
+    for d in rig.drawing:
+        s = d.sail
+        y = _lateral_offset(ship, s, flows[s.id].awa)
+        offsets[s.id] = y
+        pos[s.id] = (s.x_m, y, s.centre_height_m)
+        height[s.id] = d.height
+    return _shadows(rig.driving, flows, pos, height, reach), offsets
+
+
+# ---------------------------------------------------------------------------
 # The wind a sail feels
 # ---------------------------------------------------------------------------
+
+
+class _FlowField:
+    """The apparent wind at any height for one substep, each height worked out once.
+
+    Package 29's profile (the performance budget, spec M4 §20): the sails, the furled
+    canvas and the bare spars ask for the wind at some sixty heights a substep, many of
+    them the same, and each asked the wind for its speed, its vector and the heading's
+    sines afresh. Here the wind's direction and gust, the heading's sine and cosine and
+    the ship's motion are read once, and each height's flow is kept for the substep. The
+    arithmetic is `Wind.vector_at_height` and `_apparent` step for step, in the same order,
+    so every number is the same to the last bit (the replay digests say so). A wind that
+    is not the plain `Wind` (a test's own) is asked through its methods as before.
+    """
+
+    __slots__ = ("wind", "plain", "eff", "sin_t", "cos_t", "sin_h", "cos_h", "u", "v", "memo")
+
+    def __init__(self, ship: Ship, wind: Wind) -> None:
+        from freesail.physics.wind import Wind as PlainWind
+
+        self.wind = wind
+        self.plain = type(wind) is PlainWind
+        psi = ship.dyn.heading
+        self.sin_h, self.cos_h = math.sin(psi), math.cos(psi)
+        self.u, self.v = ship.dyn.u, ship.dyn.v
+        self.eff = self.sin_t = self.cos_t = 0.0
+        if self.plain:
+            self.eff = wind.effective_speed
+            toward = wind.direction_from + math.pi  # units.wind_vector
+            self.sin_t, self.cos_t = math.sin(toward), math.cos(toward)
+        self.memo: dict[float, _Flow] = {}
+
+    def air(self, height: float) -> tuple[float, float, float]:
+        """(speed, forward, starboard) of the air past the ship at a height, m/s."""
+        if self.plain:
+            speed = self.eff * _shear(self.wind, height)
+            vx, vy = speed * self.sin_t, speed * self.cos_t
+        else:
+            vx, vy = self.wind.vector_at_height(height)
+        sin_h, cos_h = self.sin_h, self.cos_h
+        a_fwd = vx * sin_h + vy * cos_h - self.u
+        a_stb = vx * cos_h - vy * sin_h - self.v
+        return math.hypot(a_fwd, a_stb), a_fwd, a_stb
+
+    def at(self, height: float) -> _Flow:
+        flow = self.memo.get(height)
+        if flow is not None:
+            return flow
+        speed, a_fwd, a_stb = self.air(height)
+        if speed < 1e-9:
+            flow = _Flow(0.0, -1.0, 0.0, 0.0)
+        else:
+            flow = _Flow(speed, a_fwd / speed, a_stb / speed, math.atan2(-a_stb, -a_fwd))
+        self.memo[height] = flow
+        return flow
+
+    def drag_terms(self, heights: list[float]) -> list[tuple[float, float, float]]:
+        """(q, fwd, stb) at each height: what windage reads, which needs no angle. The
+        same numbers as `at(height)`'s `q`, `fwd` and `stb`, worked in one loop."""
+        out = []
+        half_rho = 0.5 * units.RHO_AIR  # _Flow.q, left to right
+        if not self.plain:
+            airs = [self.air(height) for height in heights]
+        else:
+            eff, sin_t, cos_t = self.eff, self.sin_t, self.cos_t
+            sin_h, cos_h, u, v = self.sin_h, self.cos_h, self.u, self.v
+            airs = []
+            for height in heights:
+                wind_speed = eff * _shear(self.wind, height)
+                vx, vy = wind_speed * sin_t, wind_speed * cos_t
+                a_fwd = vx * sin_h + vy * cos_h - u
+                a_stb = vx * cos_h - vy * sin_h - v
+                airs.append((math.hypot(a_fwd, a_stb), a_fwd, a_stb))
+        for speed, a_fwd, a_stb in airs:
+            if speed < 1e-9:
+                out.append((half_rho * 0.0 * 0.0, -1.0, 0.0))
+            else:
+                out.append((half_rho * speed * speed, a_fwd / speed, a_stb / speed))
+        return out
+
+
+# `Wind.speed_at_height`'s shear factor, (h / REFERENCE_HEIGHT) ** SHEAR_EXPONENT, kept by
+# height: the same power of the same numbers is the same number, and a ship's parts stand
+# at a few dozen heights (package 29's profile).
+_SHEAR_FACTORS: dict[tuple[float, float, float], float] = {}
+
+
+def _shear(wind: Wind, height: float) -> float:
+    h = max(height, 1.0)
+    key = (h, wind.REFERENCE_HEIGHT, wind.SHEAR_EXPONENT)
+    k = _SHEAR_FACTORS.get(key)
+    if k is None:
+        k = (h / wind.REFERENCE_HEIGHT) ** wind.SHEAR_EXPONENT
+        _SHEAR_FACTORS[key] = k
+    return k
 
 
 def _apparent(ship: Ship, wind: Wind, height: float) -> _Flow:
@@ -795,27 +1065,40 @@ def _blanket_factors(ship: Ship, driving: list[Sail], flows: dict[str, _Flow]) -
         s.id: (s.x_m, _lateral_offset(ship, s, flows[s.id].awa), s.centre_height_m) for s in driving
     }
     height = {s.id: _sail_height(ship, s) for s in driving}
+    return _shadows(driving, flows, pos, height, reach)
+
+
+def _shadows(
+    driving: list[Sail],
+    flows: dict[str, _Flow],
+    pos: dict[str, tuple[float, float, float]],
+    height: dict[str, float],
+    reach: float,
+) -> dict[str, float]:
+    """The blanketing rule of `_blanket_factors`, given each sail's place and height.
+
+    Every pair of driving sails is looked at each substep, so the loop reads plain local
+    values (package 29's profile); the arithmetic and the tests are the rule's, in order."""
     out: dict[str, float] = {}
-    for b in driving:
+    places = [(a, *pos[a.id], height[a.id], a.cls in SQUARE_FAMILY) for a in driving]
+    for b, xb, yb, zb, hb, b_square in places:
         flow = flows[b.id]
-        xb, yb, zb = pos[b.id]
+        fwd, stb = flow.fwd, flow.stb
+        b_running = b_square and abs(flow.awa) >= RUNNING_AWA
         shadow = 0.0
-        for a in driving:
+        for a, xa, ya, za, ha, a_square in places:
             if a is b:
                 continue
-            xa, ya, za = pos[a.id]
             dx, dy = xb - xa, yb - ya
-            along = dx * flow.fwd + dy * flow.stb  # positive: b is downwind of a
-            across = abs(-dx * flow.stb + dy * flow.fwd)
+            along = dx * fwd + dy * stb  # positive: b is downwind of a
             if not (0.0 < along <= reach):
                 continue
-            if across > 0.5 * height[a.id]:
+            across = abs(-dx * stb + dy * fwd)
+            if across > 0.5 * ha:
                 continue
-            if abs(za - zb) > 0.5 * (height[a.id] + height[b.id]):
+            if abs(za - zb) > 0.5 * (ha + hb):
                 continue
-            running = (
-                a.cls in SQUARE_FAMILY and b.cls in SQUARE_FAMILY and abs(flow.awa) >= RUNNING_AWA
-            )
+            running = a_square and b_running
             shadow = max(shadow, BLANKET_RUNNING if running else BLANKET_OTHER)
         out[b.id] = 1.0 - shadow
     return out
@@ -831,32 +1114,63 @@ def _reset_loads(ship: Ship) -> None:
         part.load_kn = 0.0
 
 
+@dataclass(frozen=True)
+class _LoadPath:
+    """Who carries a sail's pull, from the graph (fixed once the ship is loaded): its spars
+    nearest first and a studding sail's boom, its sheets, halyards and braces, its stay."""
+
+    spars: tuple[Spar, ...]
+    sheets: tuple[Line, ...]
+    halyards: tuple[Line, ...]
+    braces: tuple[Line, ...]
+    stay: Line | None
+
+
+def _load_path(ship: Ship, sail: Sail) -> _LoadPath:
+    """The sail's load path, worked out once per ship and kept (package 29's profile)."""
+    paths = ship.extra.get("sails.load_paths")
+    if not isinstance(paths, dict):
+        paths = {}
+        ship.extra["sails.load_paths"] = paths
+    path = paths.get(sail.id)
+    if path is None:
+        chain = ship.spar_chain(sail)
+        spars = list(chain)  # each spar carries everything above it
+        if sail.cls == "studding":
+            # the graph's chain starts at the parent yard; the boom carries it too
+            boom = ship.spar_of_role(sail, "boom")
+            if boom is not None and boom not in chain:
+                spars.append(boom)
+        halyards = [ln for ln in ship.lines_of(sail) if ln.cls in HALYARD_CLASSES]
+        if chain:
+            halyards += [ln for ln in ship.lines_of(chain[0]) if ln.cls in HALYARD_CLASSES]
+        yard = ship.yard_of(sail)
+        stay = sail.roles.get("stay")
+        path = _LoadPath(
+            spars=tuple(spars),
+            sheets=tuple(ship.sheets_of(sail)),
+            halyards=tuple(halyards),
+            braces=tuple(ship.braces_of(yard)) if yard is not None else (),
+            stay=ship.lines[stay] if stay in ship.lines else None,
+        )
+        paths[sail.id] = path
+    return path
+
+
 def _apply_loads(ship: Ship, sail: Sail, force_kn: float) -> None:
     """Put a sail's pull on its cloth, its spars and its running rigging."""
     sail.load_kn = force_kn
-    chain = ship.spar_chain(sail)
-    for spar in chain:  # each spar carries everything above it
+    path = _load_path(ship, sail)
+    for spar in path.spars:
         spar.load_kn += force_kn
-    if (
-        sail.cls == "studding"
-    ):  # the graph's chain starts at the parent yard; the boom carries it too
-        boom = ship.spar_of_role(sail, "boom")
-        if boom is not None and boom not in chain:
-            boom.load_kn += force_kn
-    for ln in ship.sheets_of(sail):
+    for ln in path.sheets:
         ln.load_kn += SHEET_LOAD_FRACTION * force_kn
-    halyards = [ln for ln in ship.lines_of(sail) if ln.cls in HALYARD_CLASSES]
-    if chain:
-        halyards += [ln for ln in ship.lines_of(chain[0]) if ln.cls in HALYARD_CLASSES]
-    for ln in halyards:
+    for ln in path.halyards:
         ln.load_kn += HALYARD_LOAD_FRACTION * force_kn
-    yard = ship.yard_of(sail)
-    if yard is not None:
-        for ln in ship.braces_of(yard):
-            ln.load_kn += BRACE_LOAD_FRACTION * force_kn
-    stay = sail.roles.get("stay")
-    if stay in ship.lines:
-        ship.lines[stay].load_kn += STAY_LOAD_FRACTION * force_kn
+    for ln in path.braces:
+        ln.load_kn += BRACE_LOAD_FRACTION * force_kn
+    if path.stay is not None:
+        path.stay.load_kn += STAY_LOAD_FRACTION * force_kn
 
 
 # ---------------------------------------------------------------------------
@@ -901,3 +1215,18 @@ def _spar_x(ship: Ship, spar: Spar) -> float:
         return spar.x_m
     root = ship.mast_of(spar)
     return root.x_m if root is not None else spar.x_m
+
+
+def _spar_places(ship: Ship) -> tuple[tuple[Spar, float, float], ...]:
+    """Each spar with the height of its middle and its lever about the centre of lateral
+    resistance (`_spar_x` less `clr_x_m`), in the ship file's order: fixed by the graph
+    and the ship file, so worked out once per ship and kept (package 29's profile)."""
+    places = ship.extra.get("sails.spar_places")
+    if not isinstance(places, tuple):
+        clr = ship.hull.spec.clr_x_m
+        places = tuple(
+            (spar, _spar_centre_height(ship, spar), _spar_x(ship, spar) - clr)
+            for spar in ship.spars.values()
+        )
+        ship.extra["sails.spar_places"] = places
+    return places

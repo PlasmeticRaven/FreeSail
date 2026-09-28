@@ -4,6 +4,11 @@ A save is not a snapshot. It is the seed, the scenario, a reference to the
 ship, and the list of (tick, actor, order). Replaying it re-runs the
 simulation and must produce an identical log; `tests/test_replay.py` holds
 the engine to that.
+
+Since package 29 a save also holds its `inputs` (`World.inputs`): every order in the
+order it was given, refused and queries too, and the lines a driver wrote, so that a
+replay at any tick of a played day reproduces the log a player watched, refusals and all.
+A save without them replays its journal, as before.
 """
 
 from __future__ import annotations
@@ -59,17 +64,27 @@ def replay(
     re-submitting journaled orders at their ticks."""
     world = build_world(data, ship_factory)
     end = data["end_tick"] if until_tick is None else min(until_tick, data["end_tick"])
-    journal = [(int(t), str(a), str(o)) for t, a, o in data["journal"]]
+    inputs = data.get("inputs")
+    if inputs is None:
+        inputs = [{"tick": t, "actor": a, "order": o} for t, a, o in data["journal"]]
     i = 0
     while True:
-        while i < len(journal) and journal[i][0] == world.clock.tick:
-            _, actor, text = journal[i]
-            world.submit(text, actor=actor)
+        while i < len(inputs) and int(inputs[i]["tick"]) == world.clock.tick:
+            _give(world, inputs[i])
             i += 1
         if world.clock.tick >= end:
             break
         world.tick()
     return world
+
+
+def _give(world: World, entry: dict[str, Any]) -> None:
+    """One input again: an order to the ship, or a driver's line to the log."""
+    if "order" in entry:
+        world.submit(str(entry["order"]), actor=str(entry["actor"]))
+        return
+    line = entry["line"]
+    world.record_driver(line["severity"], line["kind"], line["text"], line.get("data"))
 
 
 def replay_world(world: World, ship_factory: ShipFactory | None = None) -> World:

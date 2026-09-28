@@ -1,6 +1,8 @@
 """The station sentences (spec M4 §11, §12): what the captain says to an agent's station.
 
     ask the watcher how the sails are drawing     an order, journaled: the watcher answers
+    tell the watcher we make for Falmouth         an order, journaled: no answer is owed
+                                                  (`say to the watcher ...` the same)
     stand down the watcher                        an order, journaled: released with a save
     resume the watcher                            an order, journaled: the answer to a pause
     show the watcher's journal                    a query, like `state`: never journaled
@@ -24,9 +26,11 @@ from freesail.orders.vocabulary import normalise
 __all__ = ["STATION_VERBS", "handle", "recognises"]
 
 # The canonical verbs, as `data/vocabulary.yaml` lists them with `object: station`.
-STATION_VERBS: tuple[str, ...] = ("ask", "stand down", "resume", "show the journal of")
+STATION_VERBS: tuple[str, ...] = ("ask", "tell", "stand down", "resume", "show the journal of")
 
 _ASK = re.compile(r"^ask (?:the )?(?P<who>.+?)(?:(?:\s*[,:]\s*|\s+)(?P<q>.+))?$")
+# `tell the watcher ...` and `say to the watcher ...` (package 29): words with no answer owed
+_TELL = re.compile(r"^(?:tell|say to) (?:the )?(?P<who>.+?)(?:(?:\s*[,:]\s*|\s+)(?P<q>.+))?$")
 _STAND_DOWN = re.compile(
     r"^(?:stand down (?:the )?(?P<who>.+?)|stand (?:the )?(?P<who2>.+?) down)\s*$"
 )
@@ -64,12 +68,13 @@ def recognises(text: str, ship: Any = None) -> str | None:
         ("stand down", _STAND_DOWN),
         ("resume", _RESUME),
         ("ask", _ASK),
+        ("tell", _TELL),
     ):
         m = pattern.match(norm)
         if m is None:
             continue
         who = m.group("who") or m.groupdict().get("who2") or ""
-        if verb == "ask":
+        if verb in ("ask", "tell"):
             # "ask the watcher how ..." : the station is the head of `who` + `q`
             whole = f"{who} {m.group('q') or ''}"
             if _station_in(whole, ship) is not None:
@@ -80,12 +85,15 @@ def recognises(text: str, ship: Any = None) -> str | None:
     return None
 
 
-def _split_ask(text: str, ship: Any) -> tuple[str, str]:
+def _split_ask(text: str, ship: Any, verb: str = "ask") -> tuple[str, str]:
     norm = " ".join(text.split())
-    m = re.match(r"^ask\s+(?:the\s+)?(?P<rest>.+)$", norm, re.I)
+    head = r"(?:tell|say\s+to)" if verb == "tell" else "ask"
+    m = re.match(rf"^{head}\s+(?:the\s+)?(?P<rest>.+)$", norm, re.I)
     rest = m.group("rest") if m else norm
     station = _station_in(normalise(rest), ship)
     if station is None:
+        if verb == "tell":
+            raise OrderError("Tell whom? Say 'tell the watcher <words>'.")
         raise OrderError("Ask whom? Say 'ask the watcher <question>'.")
     # the question is what follows the station's name in the text as said
     n = len(station.split())
@@ -110,6 +118,10 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
             agent.put_question(question),
             {"station": station, "question": question},
         )
+    if verb == "tell":
+        station, words = _split_ask(text, ship, verb="tell")
+        agent = _manned(agents, station)
+        return "agent.told", agent.put_word(words), {"station": station, "words": words}
     if verb == "show the journal of":
         m = _JOURNAL.match(norm)
         assert m is not None

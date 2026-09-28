@@ -1,0 +1,76 @@
+# FreeSail: the gate's day (spec M4 §18, §19; package 29).
+#
+# A day's passage under standing orders through a changing wind: a fresh breeze from the
+# west at dawn, veering north-west and rising to a gale in the middle watch, easing at the
+# next dawn (spec §19). Given to either driver with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/gate-4c-day.yaml --watcher fake
+#     py -m freesail.ui.console --scenario data/scenarios/gate-4c-day.yaml
+# The script, the ship's start and the latitude go into the game's Scenario, so a save
+# holds them and a replay follows the same wind (freesail/world/scenarios.py).
+
+name: The gate's day
+# The seed the drivers use unless --seed is given: seed 7, as every gate since M3.
+seed: 7
+# Dawn on 1 June 1805: the sun rose at 03:56 (freesail/core/sun.py at 50 N, truth 34), and
+# at four the morning watch has the deck.
+start: 1805-06-01T04:00
+latitude_deg: 50.0
+ship:
+  file: data/ships/frigate-36.yaml
+  # South-east, the wind three points abaft the starboard beam at the start and right
+  # astern when it has veered to north-west: she scuds before the gale rather than
+  # reaching across it. On a reach (south, the first try) the same gale blew out the
+  # mainsail, spanker and jib at 45 knots; before the wind the apparent wind is the true
+  # less her own ten knots (package 29's runs, docs/dev/TuningNotes.md, M4c).
+  heading_deg: 135
+wind:
+  # The M2 wind's gustiness and wander, as the console's default (spec §19: "with the
+  # gustiness the wind model already has"); physics/wind.py.
+  gustiness: 0.3
+  variability: 0.3
+
+# The weather script (freesail/world/weather_script.py): the wind turns and freshens in a
+# straight line from each waypoint to the next. Strengths are Beaufort's as
+# units.describe_wind_strength names them: a fresh breeze 17 to 21 knots, a strong breeze
+# 22 to 27, a moderate gale 28 to 33, a fresh gale 34 to 40, a strong gale 41 to 47.
+weather:
+  # Dawn: a fresh breeze from the west, seventeen knots. Plain sail and the royals draw
+  # all day (the starter's "morning sail" sets the royals under twenty knots).
+  - {at: 1805-06-01T04:00, from_deg: 270, knots: 17}
+  # A fresh breeze still through the afternoon.
+  - {at: 1805-06-01T14:00, from_deg: 270, knots: 18}
+  # Nineteen knots at seven bells in the last dog watch, still under twenty, so the royals
+  # are aloft at sunset (19:49 by the sun at her easting) and the night routine takes them
+  # in (the starter's; truth 34).
+  - {at: 1805-06-01T19:30, from_deg: 270, knots: 19}
+  # After dark the wind veers two points to west-north-west and rises to a moderate gale:
+  # thirty knots (the starter's "shorten sail for weather", the captain's "topgallants")
+  # about 22:10, in the first watch.
+  - {at: 1805-06-01T22:00, from_deg: 292.5, knots: 29}
+  # Two points more to north-west and a fresh gale by midnight: the captain's "gale
+  # canvas" at thirty-six knots as the first watch ends.
+  - {at: 1805-06-02T00:00, from_deg: 315, knots: 36}
+  # A strong gale in the middle watch: forty knots (the starter's "heavy weather") at
+  # 00:27, so the heavy-weather routine fires in the middle watch, five minutes on.
+  - {at: 1805-06-02T01:00, from_deg: 315, knots: 45}
+  # The height of it: 45 knots, truth 28's storm and truth 37's gale.
+  - {at: 1805-06-02T03:00, from_deg: 315, knots: 45}
+  # Easing at the next dawn (civil dawn about 03:00, sunrise 03:40): a strong breeze by five.
+  - {at: 1805-06-02T05:00, from_deg: 315, knots: 26}
+  # A fresh breeze again by seven: the captain's "make sail after the gale" and
+  # "topgallants again" bring her back to plain sail in the morning watch.
+  - {at: 1805-06-02T07:00, from_deg: 315, knots: 18}
+
+# The standing orders read at the start, in order, each journaled as the captain's order:
+# the ship's standing book (the starter routines, gate 4a) and the captain's four for this
+# passage (their sources are in the file).
+standing_orders:
+  - data/standing_orders/starter.orders
+  - data/scenarios/gate-4c-day.orders
+
+# The captain's first orders, at four: make plain sail from the furl, and the royals over
+# it in a fresh breeze under twenty knots (what the starter's "morning sail" would have
+# done at sunrise, four minutes before the day begins).
+orders:
+  - set plain sail
+  - set the royals

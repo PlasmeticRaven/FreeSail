@@ -8,7 +8,7 @@ and `save`. Determinism: same seed, same scenario, same ship, same
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from typing import Any
 
@@ -41,6 +41,12 @@ class Scenario:
     # The sun's latitude (spec M4 §5): 50 N, the Channel. Saved and restored with the rest;
     # a save from before the sun loads with the default.
     latitude_deg: float = DEFAULT_LATITUDE_DEG
+    # The weather script (spec M4 §19, `freesail.world.weather_script`): waypoints as plain
+    # dictionaries ({"at": ISO time, "from_deg": degrees, "knots": knots}), saved with the
+    # scenario and so followed again by a replay. Empty: the fixed wind above. With a
+    # script, the wind at the start is the script's and `wind_from_deg` and
+    # `wind_speed_kn` are not read. A save from before the script loads with none.
+    weather: list[dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
@@ -56,6 +62,16 @@ class Scenario:
 
 JournalEntry = tuple[int, str, str]  # (tick, actor, order text)
 
+# What came into the World from outside between ticks, in the order it came (package 29,
+# spec M4 §21: "save at any tick ... replay reproduces the digest"): every order given by
+# anyone but a standing order, whether the ship carried it out, refused it or answered it
+# as a query, and every line a driver wrote into the log (a save, a file of standing
+# orders read, the compression eased on an alarm). `journal` keeps the orders carried out,
+# as it always has; `inputs` is what a replay gives again, so that a refusal, a query and a
+# driver's line are in the replayed log where they were in the original. Entries are
+# {"tick", "actor", "order"} or {"tick", "line": {severity, kind, text, actor, data}}.
+InputEntry = dict[str, Any]
+
 # The actor a standing order's firing carries (spec M4 §4); `freesail.standing.runtime`
 # writes it and the World knows a firing by it.
 STANDING_ACTOR_PREFIX = "standing order "
@@ -69,6 +85,7 @@ AGENT_LOG_KINDS: tuple[str, ...] = (
     "agent.note",  # the free text of a reply: the watcher's narration, routine
     "agent.said",  # an `answer` to an `ask`, notable
     "agent.asked",  # the captain's `ask the <station> ...` (an order, journaled)
+    "agent.told",  # the captain's `tell the <station> ...` (an order, journaled), notable
     "agent.stand_down",  # the captain's `stand down the <station>` (an order, journaled)
     "agent.resume",  # the captain's `resume the <station>` (an order, journaled)
     "agent.refused",  # a tool call the station's authority does not allow
@@ -81,6 +98,10 @@ AGENT_LOG_KINDS: tuple[str, ...] = (
 )
 # `show the <station>'s journal` is answered as `query.journal`, a query like `state`.
 
+# The kinds of an order's own line that are notable rather than routine: the captain's word
+# to a station (package 29, the owner's ruling: a `tell` is seen in the log at any speed).
+NOTABLE_ORDER_KINDS = frozenset({"agent.told"})
+
 
 class World:
     WIND_SHIFT_LOG_THRESHOLD = 2 * units.POINT
@@ -91,15 +112,21 @@ class World:
         self.clock = Clock(self.scenario.start_time)
         self.rng = Rng(self.seed)
         self.log = Log()
-        self.wind = Wind(
-            WindParams.from_nautical(
-                self.scenario.wind_from_deg,
-                self.scenario.wind_speed_kn,
-                self.scenario.gustiness,
-                self.scenario.variability,
-            ),
-            self.rng.stream("wind"),
+        # The weather script (spec M4 §19): the base wind at every tick, from the scenario.
+        self.weather: Any = None
+        wind_params = WindParams.from_nautical(
+            self.scenario.wind_from_deg,
+            self.scenario.wind_speed_kn,
+            self.scenario.gustiness,
+            self.scenario.variability,
         )
+        if self.scenario.weather:
+            from freesail.world.weather_script import WeatherScript
+
+            self.weather = WeatherScript.from_list(self.scenario.weather)
+            direction, speed = self.weather.at(self.scenario.start_time)
+            wind_params.direction_from, wind_params.speed = direction, speed
+        self.wind = Wind(wind_params, self.rng.stream("wind"))
         self.ship = ship or PointShip(
             x=self.scenario.ship_x,
             y=self.scenario.ship_y,
@@ -107,6 +134,11 @@ class World:
             speed=units.knots_to_ms(self.scenario.ship_speed_kn),
         )
         self.journal: list[JournalEntry] = []
+        self.inputs: list[InputEntry] = []
+        # The compression the driver runs the clock at (game seconds a real second). The
+        # World never reads it: the log's views do (the roll-up in an agent's samples, spec
+        # M4 §20 and open item 8), and the driver sets it. Not saved, not in the digest.
+        self.compression: float = 1.0
         if getattr(self.ship, "extra", None) is not None:
             self.ship.extra["rng"] = self.rng  # named streams for strain and later systems
         self._last_logged_wind_direction = self.wind.direction_from
@@ -236,6 +268,8 @@ class World:
         """
         text = " ".join(text.split())
         standing = actor.startswith(STANDING_ACTOR_PREFIX)
+        if not standing:
+            self.inputs.append({"tick": self.clock.tick, "actor": actor, "order": text})
         try:
             kind, log_text, data = self.ship.handle_order(text)
         except OrderError as e:
@@ -262,9 +296,25 @@ class World:
             # the evolution runner writes its own "started" line; avoid saying it twice
             self._after_order()
             return accepted
-        event = self.record(Severity.ROUTINE, kind, log_text, actor=actor, data=data)
+        severity = Severity.NOTABLE if kind in NOTABLE_ORDER_KINDS else Severity.ROUTINE
+        event = self.record(severity, kind, log_text, actor=actor, data=data)
         self._after_order()
         return event
+
+    def record_driver(
+        self,
+        severity: Severity | str,
+        kind: str,
+        text: str,
+        data: dict[str, Any] | None = None,
+    ) -> Event:
+        """A line a driver writes into the log between ticks (a save, a file read, the
+        compression eased on an alarm), with the actor "driver". Kept in `inputs`, so a
+        replay writes it again at the same point and the digests agree."""
+        sev = severity if isinstance(severity, Severity) else Severity(severity)
+        line = {"severity": sev.value, "kind": kind, "text": text, "data": dict(data or {})}
+        self.inputs.append({"tick": self.clock.tick, "line": line})
+        return self.record(sev, kind, text, actor="driver", data=dict(data or {}))
 
     def _after_order(self) -> None:
         """An order was carried out and logged: the agents may act on it now (a question
@@ -277,6 +327,8 @@ class World:
     def tick(self) -> None:
         """Advance the world by one game second."""
         self.clock.advance()
+        if self.weather is not None:
+            self.wind.follow(*self.weather.at(self.clock.ship_time))
         self.wind.step(1.0)
         if self.wind.gust_started:
             self.record(
@@ -377,6 +429,9 @@ class World:
             "ship_ref": self.ship.save_ref(),
             "end_tick": self.clock.tick,
             "journal": [list(entry) for entry in self.journal],
+            # every order and driver's line in the order they came, which a replay gives
+            # again (package 29); a save without it replays its journal
+            "inputs": [dict(entry) for entry in self.inputs],
             # the book of standing orders (spec M4 §3): the orders' text and state, for the
             # reader; a replay re-enters them from the journal
             "standing_orders": self.standing.book.save(),
