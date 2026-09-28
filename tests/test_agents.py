@@ -873,6 +873,127 @@ def test_restore_gives_a_loaded_game_its_watcher_back_and_a_live_model_can_conti
 
 
 # ---------------------------------------------------------------------------
+# Live sampling: a door that answers late (spec M4 §13 as revised, package 28b)
+# ---------------------------------------------------------------------------
+
+
+class Late:
+    """A door that answers late, as the agent API's `RemoteModel` does: `reply` returns
+    None ("not yet"), and the test delivers the model's reply when it chooses."""
+
+    def __init__(self) -> None:
+        self.asked = 0
+
+    def reply(self, turns) -> None:
+        self.asked += 1
+        return None
+
+
+def late(world: World, st: Station | None = None) -> Harness:
+    h = Harness(world, st or station(), Late(), save=lambda w, why: None)
+    h.start()
+    return h
+
+
+def test_live_sampling_folds_what_happens_while_the_model_has_the_floor():
+    """A sampling point reached while the model holds the floor opens no second sample:
+    it is folded into the open one, so the model's next turn carries everything since
+    its last reply, and the World never waits."""
+    world = frigate_world()
+    h = late(world)
+    begun = len(world.log)
+    assert h.floor == "model" and h.open_sample.reason == "the start"
+    world.submit("set plain sail")  # notable lines while the turn is open
+    world.run(EVERY)  # the interval comes round: folded, not a second sample
+    world.submit("ask the watcher how she goes")
+    assert world.clock.tick == EVERY and h.agent.samples == 1
+    since_reply = h.turns[1:]  # the brief, then no model turn yet
+    assert all(t.role == DATA for t in since_reply)
+    folded = [t.content for t in since_reply if t.content.get("folded")]
+    assert since_reply[0].content["reason"] == "the start" and len(folded) >= 2
+    assert all(d["folded"] == harness_mod.FOLDED_WORDS for d in folded)
+    assert folded[-1]["reason"] == "a question" and folded[-1]["question"] == "how she goes"
+    o = h.open_sample
+    assert o.reason.startswith("the start; then ") and o.reason.endswith("; then a question")
+    assert "the interval" in o.reason or "the glass" in o.reason
+    assert o.tick == EVERY and o.readings == tools.readings_words(world)
+    assert o.question == "how she goes"
+    # every notable line since the start is in the merged turn (the routine ones are
+    # capped, the most recent kept, as in any sample)
+    texts = {ln["text"] for ln in o.log}
+    since = [world.log[i] for i in range(begun, len(world.log))]
+    notable = [e.text for e in since if e.severity is not Severity.ROUTINE and e.actor != h.actor]
+    assert notable and all(t in texts for t in notable)
+    # the reply, when it comes, answers the question and hands the floor back
+    h.deliver(reply("", call("answer", text="Under all plain sail.")))
+    assert h.floor == "model"  # a reply with calls: the results go back, the turn stays open
+    h.deliver(Reply())
+    assert h.floor == "game" and h.open_sample is None
+    (said,) = [e for e in world.log if e.kind == "agent.said"]
+    assert (
+        said.text == "[watcher] Under all plain sail." and said.data["question"] == "how she goes"
+    )
+    world.run(EVERY)  # the next turn opens (at a notable line or the interval) and waits
+    assert h.open_sample is not None and h.open_sample.tick == 2 * EVERY
+    assert h.agent.samples == 2
+
+
+def test_a_floor_held_silent_for_the_patience_brings_the_nudge_then_the_pause():
+    world = point_world()
+    h = late(world, station(every=EVERY, patience=PATIENCE))
+    world.run(PATIENCE - 1)
+    assert "agent.nudged" not in kinds(world)
+    world.run(1)
+    (nudged,) = [e for e in world.log if e.kind == "agent.nudged"]
+    assert nudged.tick == PATIENCE and nudged.text == "The watcher nudged: no reply for a glass."
+    last = h.turns[-1].content
+    assert last["reason"] == "no reply" and last["folded"]
+    assert last["notices"][0].startswith("You have given no reply for a glass.")
+    assert h.floor == "model"
+    world.run(PATIENCE)
+    assert h.agent.paused and h.floor == "game" and h.open_sample is None
+    assert h.agent.pause_reason == "no reply for a glass after a nudge"
+    with pytest.raises(OrderError, match="no sample open"):
+        h.deliver(Reply(text="Too late."))
+
+
+def test_a_live_game_with_late_replies_replays_to_the_same_digest():
+    """Replies delivered between ticks, some after an order of their tick, a fold, a
+    question, and a door's release: the save replays them at the same points."""
+    world = frigate_world()
+    world.submit("set plain sail")
+    h = late(world)
+    world.run(250)
+    h.deliver(reply("", call("readings")))
+    world.run(500)
+    world.submit("steer south by west")
+    h.deliver(Reply(text="She answers her helm."))  # after the order of this tick
+    world.run(900)
+    world.submit("ask the watcher how the wind is")
+    world.run(30)
+    h.deliver(reply("", call("answer", text="Steady from the north.")))
+    h.deliver(reply("", call("journal", note="asked about the wind")))
+    h.deliver(Reply())
+    world.run(400)
+    h.door_act("stand_down", "the client disconnected", "the MCP bridge")
+    world.run(10)
+    assert [e["after_orders"] for e in h.transcript[:2]] == [1, 2]
+    assert h.transcript[-1]["door"] == "stand_down"
+    data = json.loads(json.dumps(world.save()))
+    copy = replay.replay(data, ship_factory)
+    ch = copy.agents["watcher"]
+    assert isinstance(ch.model, harness_mod.Playback) and ch.model.spent
+    assert copy.log.digest() == world.log.digest()
+    assert ch.transcript == h.transcript
+    assert (
+        ch.agent.words()
+        == h.agent.words()
+        == ("released: stood down by the MCP bridge: the client disconnected")
+    )
+    assert copy.agent_journals["watcher"].save() == h.journal.save()
+
+
+# ---------------------------------------------------------------------------
 # Sampling policies, the budget, the snapshot
 # ---------------------------------------------------------------------------
 

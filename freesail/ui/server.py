@@ -2,6 +2,7 @@
 
     python -m freesail.ui.server data/ships/frigate-36.yaml [--seed N] [--wind FROM,KN]
                                  [--heading DEG] [--time N] [--port 8000] [--watcher fake]
+                                 [--lockstep] [--consent-records DIR] [--saves DIR]
 
 then open http://localhost:8000.
 
@@ -24,6 +25,29 @@ Routes (spec §9.2):
     WS   /ws            every log event as it happens, and a snapshot every
                         tick at 1x, every 10 ticks at 10x, every 60 at 60x and up
 
+The agent API (spec M4 §13 as revised, package 28b; `agent_routes`, which the console
+hosts too on `--agents-port`): a language model's door is a client of this game.
+
+    POST /api/agents/{station}          {model_name, door, door_note?, session_kind?,
+                                        client?, ask_again?}: station an agent, the
+                                        consent gate first (the consent conversation,
+                                        the station brief, or refused in words)
+    GET  /api/agents/{station}/turns    ?since=N&wait=S: the turns from N on, as soon as
+                                        there are any, or none after S real seconds
+    POST /api/agents/{station}/reply    {text, calls: [{name, args}], raw, since?}: one
+                                        reply through the harness; the turns it made
+                                        and whose the floor is
+    POST /api/agents/{station}/owner    {text}: the owner's reply to what the model
+                                        wrote in the consent conversation
+    POST /api/agents/{station}/release  {reason}: the door is going; stood down, saved
+    GET  /api/agents/{station}/library  ?topic=...: a page of the reference library
+    GET  /api/agents                    the stations and their states (the snapshot's
+                                        `agents` is the same list)
+
+`--lockstep` holds the clock while a door has the floor (a sample open for it), for
+testing at 1x and for competitive play; without it the game runs at its compression and
+a door's late reply finds its turn grown by what happened meanwhile (the harness's fold).
+
 The driver mirrors the console: the clock runs in a background thread that
 ticks the world `compression` times per real second, and every use of the
 world from a request goes through the same lock. Websocket clients are fed
@@ -44,7 +68,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -92,9 +116,11 @@ class Driver:
     thread produced them; the websocket layer makes that safe.
     """
 
-    def __init__(self, world: World, compression: float = 1.0):
+    def __init__(self, world: World, compression: float = 1.0, lockstep: bool = False):
         self.world = world
         self.compression = compression
+        self.lockstep = lockstep
+        self.desk: Any = None  # the agent API's stations (`agent_routes`), when mounted
         self.running = False
         self.lock = threading.RLock()
         self._listeners: list[Listener] = []
@@ -124,15 +150,28 @@ class Driver:
     # -- state --------------------------------------------------------------
 
     def state(self) -> dict[str, Any]:
-        return {
+        out: dict[str, Any] = {
             "running": self.running,
             "compression": self.compression,
             "snapshot_every": snapshot_interval(self.compression),
         }
+        if self.lockstep:  # the clock waits for a door that has the floor
+            out["lockstep"] = True
+            out["waiting_for"] = self.held_for()
+        return out
+
+    def held_for(self) -> str | None:
+        """In lockstep, the station whose door has the floor, which the clock waits for."""
+        if not self.lockstep or self.desk is None:
+            return None
+        with self.lock:
+            return self.desk.holding()
 
     def snapshot(self) -> dict[str, Any]:
         with self.lock:
             snap = queries.snapshot(self.world)
+            if self.desk is not None:
+                snap["agents"] = self.desk.stations()
             snap["driver"] = self.state()
             return snap
 
@@ -242,6 +281,8 @@ class Driver:
     def _run_ticks(self, n: int) -> None:
         every = snapshot_interval(self.compression)
         for _ in range(n):
+            if self.held_for() is not None:
+                break  # lockstep: the World waits for the door that has the floor
             self.world.tick()
             self._ticks_since_snapshot += 1
             if self._ticks_since_snapshot >= every:
@@ -291,7 +332,66 @@ def event_dict(e: Event) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
-def create_app(driver: Driver, client_dir: Path = CLIENT_DIR) -> FastAPI:
+def agent_routes(lock: Any, world: Callable[[], World], **desk_options: Any) -> APIRouter:
+    """The agent API's routes (spec M4 §13 as revised), given the driver's lock and a
+    way to reach its World now; the browser server mounts them on its own port and the
+    console on `--agents-port`. The stations are a `remote.Desk` (`router.desk`), built
+    from `desk_options` (`game`, `records_dir`, `saves_dir`, `lockstep`, `say`,
+    `changed`, `today`). The routes are plain functions, so a long poll waits on a worker
+    thread and never on the event loop, and never holds the lock while it waits."""
+    from freesail.agents.remote import Desk, DeskError
+
+    desk = Desk(lock, world, **desk_options)
+    router = APIRouter()
+
+    def call(fn: Callable[..., Any], *args: Any) -> JSONResponse:
+        try:
+            return JSONResponse(fn(*args))
+        except DeskError as e:
+            raise HTTPException(status_code=e.status, detail=e.words) from None
+
+    @router.get("/api/agents")
+    def api_agents() -> JSONResponse:
+        with lock:
+            return JSONResponse({"stations": desk.stations()})
+
+    @router.post("/api/agents/{station}")
+    def api_station(station: str, body: dict[str, Any]) -> JSONResponse:
+        return call(desk.station, station, body)
+
+    @router.get("/api/agents/{station}/turns")
+    def api_turns(station: str, since: int = 0, wait: float = 0.0) -> JSONResponse:
+        return call(desk.turns, station, since, wait)
+
+    @router.post("/api/agents/{station}/reply")
+    def api_reply(station: str, body: dict[str, Any]) -> JSONResponse:
+        return call(desk.reply, station, body)
+
+    @router.post("/api/agents/{station}/owner")
+    def api_owner(station: str, body: dict[str, Any]) -> JSONResponse:
+        return call(desk.owner, station, str(body.get("text") or ""))
+
+    @router.post("/api/agents/{station}/release")
+    def api_release(station: str, body: dict[str, Any]) -> JSONResponse:
+        return call(desk.release, station, str(body.get("reason") or ""))
+
+    @router.get("/api/agents/{station}/library")
+    def api_library(station: str, topic: str = "contents") -> JSONResponse:
+        return JSONResponse({"text": desk.library(station, topic)})
+
+    router.desk = desk  # type: ignore[attr-defined]
+    return router
+
+
+def create_app(
+    driver: Driver,
+    client_dir: Path = CLIENT_DIR,
+    *,
+    game: str = "FreeSail's browser game (freesail.ui.server)",
+    consent_records: Path | str | None = None,
+    saves_dir: Path | str | None = None,
+    say: Callable[[str], None] | None = None,
+) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         driver.start()
@@ -302,6 +402,16 @@ def create_app(driver: Driver, client_dir: Path = CLIENT_DIR) -> FastAPI:
 
     app = FastAPI(title="FreeSail", lifespan=lifespan)
     app.state.driver = driver
+    options: dict[str, Any] = {"game": game, "lockstep": driver.lockstep, "say": say}
+    if consent_records is not None:
+        options["records_dir"] = consent_records
+    if saves_dir is not None:
+        options["saves_dir"] = saves_dir
+    router = agent_routes(
+        driver.lock, lambda: driver.world, changed=driver.emit_snapshot, **options
+    )
+    driver.desk = router.desk  # type: ignore[attr-defined]
+    app.include_router(router)
 
     @app.get("/")
     def index() -> FileResponse:
@@ -440,6 +550,17 @@ async def _receive_orders(
 # ---------------------------------------------------------------------------
 
 
+def say_to_terminal(text: str) -> None:
+    """The game's lines about a model's station, on the server's terminal. A model's
+    words may hold characters a Windows code page cannot write; they are replaced
+    rather than fail the request that carried them."""
+    try:
+        print(text, flush=True)
+    except UnicodeEncodeError:
+        enc = getattr(sys.stdout, "encoding", None) or "ascii"
+        print(text.encode(enc, "replace").decode(enc), flush=True)
+
+
 def build_world(args: argparse.Namespace) -> World:
     from freesail.api.session import make_world
 
@@ -469,6 +590,16 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--watcher", help="station a watcher: 'fake' for the scripted narrator (spec M4 §12)"
     )
+    ap.add_argument(
+        "--lockstep",
+        action="store_true",
+        help="hold the clock while a model's door has the floor (spec M4 §13)",
+    )
+    ap.add_argument(
+        "--consent-records",
+        help="where the consent records are read and written (default docs/agents/consent)",
+    )
+    ap.add_argument("--saves", help="where a released station saves the game (default saves/)")
     args = ap.parse_args(argv)
 
     import uvicorn
@@ -478,9 +609,19 @@ def main(argv: list[str] | None = None) -> int:
         station_watcher(world, args.watcher, out=sys.stdout)
     if args.standing_orders:
         read_standing_orders(world, args.standing_orders)
-    driver = Driver(world, compression=args.time)
-    app = create_app(driver)
+    driver = Driver(world, compression=args.time, lockstep=args.lockstep)
+    app = create_app(
+        driver,
+        game=f"FreeSail's browser game (freesail.ui.server on port {args.port})",
+        consent_records=args.consent_records,
+        saves_dir=args.saves,
+        say=say_to_terminal,
+    )
     print(f"FreeSail server. Seed {world.seed}. Open http://{args.host}:{args.port}/")
+    print(
+        f"A model's door connects to http://localhost:{args.port} (docs/agents/Harness.md)"
+        + ("; the clock waits for it (--lockstep)." if args.lockstep else ".")
+    )
     uvicorn.run(app, host=args.host, port=args.port, log_level="warning")
     return 0
 

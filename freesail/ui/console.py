@@ -1,7 +1,13 @@
 """The console driver: runs a world, prints the log, reads orders from stdin.
 
     python -m freesail.ui.console [--seed N] [--time N] [--load SAVE] [--standing-orders FILE]
-                                  [--watcher fake]
+                                  [--watcher fake] [--agents-port N] [--lockstep]
+                                  [--consent-records DIR] [--saves DIR]
+
+`--agents-port N` hosts the agent API (the routes of `freesail.ui.server.agent_routes`,
+spec M4 §13 as revised) on that port, in a thread on the console's own lock, so that a
+model's door (the MCP bridge, the local runner) attaches to this game as it does to the
+browser's. `--lockstep` holds the clock while a door has the floor.
 
 Driver commands (not ship orders, not journaled):
     hold            pause the clock
@@ -98,7 +104,12 @@ def station_watcher(world: World, kind: str, out=None) -> Any:
     def save(w: World, reason: str) -> str:
         p = replay_mod.save_to_file(w, agent_save_path(w))
         if out is not None:
-            print(f"Saved to {p} ({reason}).", file=out, flush=True)
+            # the digest, so a replay of the file can be checked against it (`replay`)
+            print(
+                f"Saved to {p} ({reason}); the log's digest is {w.log.digest()[:16]}.",
+                file=out,
+                flush=True,
+            )
         return str(p)
 
     existing = world.agents.get("watcher")
@@ -129,9 +140,13 @@ def restore_python_rules(world: World, data: dict) -> None:
 class Console:
     ROLLUP_ABOVE = 10  # compression above which routine entries are rolled up per bell
 
-    def __init__(self, world: World, compression: float = 1.0, out=sys.stdout):
+    def __init__(
+        self, world: World, compression: float = 1.0, out=sys.stdout, lockstep: bool = False
+    ):
         self.world = world
         self.compression = compression
+        self.lockstep = lockstep
+        self.desk: Any = None  # the agent API's stations, with --agents-port
         self.running = False
         self.out = out
         self._rolled_up = 0
@@ -188,13 +203,26 @@ class Console:
         elif cmd == "tick":
             n = int(args[0]) if args else 1
             self.running = False
-            self.world.run(n)
-            self._print(f"Advanced {n} ticks to {self.world.clock.stamp()}.")
+            done = self._run(n)
+            if done < n:
+                self._print(
+                    f"Advanced {done} ticks to {self.world.clock.stamp()}; the clock waits for "
+                    f"{self.held_for()} (--lockstep)."
+                )
+            else:
+                self._print(f"Advanced {n} ticks to {self.world.clock.stamp()}.")
         elif cmd == "state":
             for s in self.world.summary_lines():
                 self._print(s)
-            for agent in self.world.agents.values():
-                self._print(f"The {agent.station.name}: {agent.agent.words()}.")
+            if self.desk is not None:
+                for s in self.desk.lines():
+                    self._print(s)
+            else:
+                for agent in self.world.agents.values():
+                    self._print(f"The {agent.station.name}: {agent.agent.words()}.")
+            held = self.held_for()
+            if held is not None:
+                self._print(f"The clock waits for {held} (--lockstep).")
         elif self._is_muster(line):
             # a query, like `state`: printed, never journaled (spec M3 §5.1)
             for s in queries.muster_lines(self.world):
@@ -290,12 +318,30 @@ class Console:
         while True:
             try:
                 while True:
-                    if not self.handle_line(lines.get_nowait()):
-                        return
+                    line = lines.get_nowait()
+                    with self.lock:  # the agent API's thread shares the world
+                        if not self.handle_line(line):
+                            return
             except queue.Empty:
                 pass
             owed = self._tick_owed(owed, period)
             time.sleep(period)
+
+    def held_for(self) -> str | None:
+        """In lockstep, the station whose door has the floor, which the clock waits for."""
+        if not self.lockstep or self.desk is None:
+            return None
+        with self.lock:
+            return self.desk.holding()
+
+    def _run(self, n: int) -> int:
+        """Run up to n ticks; in lockstep, stop where a door has the floor. Returns how
+        many ran."""
+        for k in range(n):
+            if self.held_for() is not None:
+                return k
+            self.world.tick()
+        return n
 
     def _tick_owed(self, owed: float, period: float) -> float:
         if self.running:
@@ -303,9 +349,40 @@ class Console:
             n = int(owed)
             owed -= n
             with self.lock:
-                self.world.run(n)
+                self._run(n)
                 check_agents_unattended(self.world)
         return owed
+
+    def serve_agents(
+        self,
+        port: int,
+        host: str = "127.0.0.1",
+        records_dir: str | None = None,
+        saves_dir: str | None = None,
+    ) -> Any:
+        """Host the agent API on `port` in a thread, on this console's lock (spec M4 §13
+        as revised). Returns the uvicorn server (its `should_exit` stops it)."""
+        import uvicorn
+        from fastapi import FastAPI
+
+        from freesail.ui.server import agent_routes
+
+        options: dict[str, Any] = {
+            "game": f"FreeSail's console (freesail.ui.console, agents on port {port})",
+            "lockstep": self.lockstep,
+            "say": self._print,
+        }
+        if records_dir:
+            options["records_dir"] = records_dir
+        if saves_dir:
+            options["saves_dir"] = saves_dir
+        router = agent_routes(self.lock, lambda: self.world, **options)
+        self.desk = router.desk  # type: ignore[attr-defined]
+        app = FastAPI(title="FreeSail agents")
+        app.include_router(router)
+        server = uvicorn.Server(uvicorn.Config(app, host=host, port=port, log_level="warning"))
+        threading.Thread(target=server.run, daemon=True).start()
+        return server
 
     def _clock_thread(self) -> None:
         period = 0.1
@@ -377,6 +454,21 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--watcher", help="station a watcher: 'fake' for the scripted narrator (spec M4 §12)"
     )
+    ap.add_argument(
+        "--agents-port",
+        type=int,
+        help="host the agent API on this port, so a model's door can attach (spec M4 §13)",
+    )
+    ap.add_argument(
+        "--lockstep",
+        action="store_true",
+        help="hold the clock while a model's door has the floor (spec M4 §13)",
+    )
+    ap.add_argument(
+        "--consent-records",
+        help="where the consent records are read and written (default docs/agents/consent)",
+    )
+    ap.add_argument("--saves", help="where a released station saves the game (default saves/)")
     args = ap.parse_args(argv)
 
     from freesail.api.session import make_world, ship_factory
@@ -402,13 +494,22 @@ def main(argv: list[str] | None = None) -> int:
     if args.standing_orders:
         read_standing_orders(world, args.standing_orders)
 
-    console = Console(world, compression=args.time)
+    console = Console(world, compression=args.time, lockstep=args.lockstep)
     for e in world.log.all():
         console._print(e.line())
     console._print(
         f"FreeSail console. Seed {world.seed}. {units.time_stamp(world.clock.ship_time)}. "
         "Type 'help' for driver commands, 'go' to start the clock."
     )
+    if args.agents_port:
+        console.serve_agents(
+            args.agents_port, records_dir=args.consent_records, saves_dir=args.saves
+        )
+        console._print(
+            f"A model's door connects to http://localhost:{args.agents_port} "
+            "(docs/agents/Harness.md)"
+            + ("; the clock waits for it (--lockstep)." if args.lockstep else ".")
+        )
     if sys.stdin.isatty():
         console.run_interactive()
     else:

@@ -44,17 +44,30 @@ question from the captain wakes a standing-by agent.
 
 **Determinism and replay.** The loop is tick-driven, never wall-clock-driven. The
 model's replies are the only input the World does not already hold, so the harness
-keeps them as a transcript in its save record (`save`) and a replay plays them back
-through `fake.Transcript` at the same sampling points (`restore`), which rebuilds the
-same log lines and the same journal (truth 45 and the replay test). An agent stationed
-at tick T is stationed in the replay at the end of tick T, before any order given at T,
-which is where the drivers station it.
+keeps them as a transcript in its save record (`save`), each with the tick and the
+count of journaled orders at which it was taken, and a replay plays them back through
+`Playback` at those same points (`restore`), which rebuilds the same log lines and the
+same journal (truth 45 and the replay tests). A stop that comes from outside the loop
+(a door's release, the token sent out of turn, the driver's ten real minutes) is
+recorded the same way (`door_act`) and made again by the replay at the same point. An
+agent stationed at tick T is stationed in the replay at the end of tick T, after the
+orders journaled before it, which is where the drivers station it.
 
-**A late reply.** A door may return `None` from `reply` (the REPL's turn mode; a door
-that answers late): the sample stays open, the harness polls the model on each tick
-and takes the reply when it comes (`deliver` takes one directly). In lockstep the door
-blocks instead and the World waits. The MCP door (`mcp_server.py`) lives on `deliver`:
-each tool call its client makes is one reply delivered into the open sample.
+**Lockstep and live sampling.** An in-process door answers at once (the fake, the
+REPL, the tests): the World waits at each sampling point while it answers, which is
+lockstep. A door that answers late returns `None` from `reply` (the REPL's turn mode,
+`remote.RemoteModel` behind the agent API of package 28b): the sample stays open, the
+floor is the model's, and its reply comes by `deliver`. **The World never waits for
+it** (unless the driver is told to, `--lockstep`): a sampling point reached while the
+floor is the model's does not open a second sample; it is **folded** into the open one
+(`_fold`): the new log lines are appended, the readings replaced by the latest, the
+reason noted, a question from the captain added, the harness's notices carried. The
+merged sample is `open_sample`; the conversation gets each fold as a data turn of its
+own holding what is new (marked `folded`), so the turns since the model's last reply
+are everything since its last reply, whether its door had read the sample already or
+not. Silence is judged on ship's time as before: a floor held with no reply for the
+station's patience brings the nudge as a fold, and a second span the pause, which
+takes the floor back.
 
 **A plain conversation** (`conversation=True`, spec §14): the consent step runs the
 consent brief through this same loop, so the token scan, the tool calls and the journal
@@ -87,6 +100,7 @@ from freesail.agents.agent import (
     StandBy,
     Station,
 )
+from freesail.agents.fake import Transcript
 from freesail.agents.journal import Journal
 from freesail.agents.model import DATA, MODEL, OPERATOR, Model, Reply, Sample, ToolCall, Turn
 from freesail.api import readings as R
@@ -98,6 +112,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "OPT_OUT_TOKEN",
+    "Playback",
     "SAMPLE_ROUTINE_LINES",
     "TOOL_CALLS_PER_SAMPLE",
     "WELFARE_REPEAT_N",
@@ -135,6 +150,12 @@ NUDGE_REPEAT = (
 NUDGE_SILENCE = (
     "You have given no reply for {span}. You may continue, stand by until an event, or "
     "leave with the token {token}."
+)
+
+# What a fold says to the model (a data turn's `folded` key), plain and exact.
+FOLDED_WORDS = (
+    "Added to your open turn: what has happened since, while you had the floor. Your turn "
+    "stays open until you reply."
 )
 
 SaveFn = Callable[["World", str], Any]
@@ -187,6 +208,10 @@ class Harness:
         self._fixed_brief = brief
         self.allowed_tools = tuple(allowed_tools) if allowed_tools is not None else None
         self.conversation = conversation
+        self._question_sent: str | None = None  # the question the open sample carries
+        # who is at the station, for the save and the drivers (set by the agent API)
+        self.model_name = ""
+        self.door = ""
         world.agents[station.name] = self
 
     # -- properties --------------------------------------------------------------------
@@ -210,6 +235,11 @@ class Harness:
     @property
     def started(self) -> bool:
         return self.agent.stationed_tick is not None
+
+    @property
+    def floor(self) -> str:
+        """Whose the floor is: "model" while a sample is open, else "game"."""
+        return "model" if self._open is not None and not self.agent.released else "game"
 
     @property
     def tool_names(self) -> tuple[str, ...]:
@@ -295,6 +325,11 @@ class Harness:
     # -- the hooks the World calls -----------------------------------------------------
 
     def on_tick(self) -> None:
+        self._tick_step()
+        if self.started and not self.agent.released:
+            self._play_door_acts()
+
+    def _tick_step(self) -> None:
         world = self.world
         tick = world.clock.tick
         if self._start_at is not None:
@@ -306,7 +341,10 @@ class Harness:
         new = [world.log[i] for i in range(self._seen_log, len(world.log))]
         self._seen_log = len(world.log)
         if self._open is not None:
-            self._poll()
+            # the floor is the model's: a sampling point folds into the open sample
+            self._while_open(new)
+            if self._open is not None:
+                self._poll()
             return
         a = self.agent
         if a.paused:
@@ -329,10 +367,38 @@ class Harness:
         if reason is not None:
             self._sample(reason)
 
+    def _while_open(self, new: list[Event]) -> None:
+        """A tick while the floor is the model's (a door that answers late): a sampling
+        point the policy names is folded into the open sample, and a floor held silent
+        for the station's patience brings the nudge, then the pause, which takes the
+        floor back (spec §11, §13)."""
+        a = self.agent
+        tick = self.world.clock.tick
+        heard = a.last_heard_tick if a.last_heard_tick is not None else tick
+        if tick - heard >= self.station.patience_s and not a.paused:
+            a.last_heard_tick = tick  # the next span is counted from here
+            self._welfare_fire("silence")
+            if a.paused:
+                self._open = None
+                return
+            self._fold("no reply")
+            return
+        reason = self._policy_due(new)
+        if reason is None and a.question is not None and a.question != self._question_sent:
+            reason = "a question"
+        if reason is not None:
+            self._fold(reason)
+
     def on_order(self) -> None:
         """After an order is logged: a stand-down the captain ordered is carried out now
-        (after the order is journaled, so the save holds it), and a question is served.
-        A restored agent stationed after the orders of its tick starts here."""
+        (after the order is journaled, so the save holds it), and a question is served
+        (folded into the open sample when the floor is the model's). A restored agent
+        stationed after the orders of its tick starts here."""
+        self._order_step()
+        if self.started and not self.agent.released:
+            self._play_door_acts()
+
+    def _order_step(self) -> None:
         if self._start_at is not None:
             world = self.world
             if (
@@ -346,9 +412,14 @@ class Harness:
             self._stand_down_requested = None
             self.stand_down(reason, by=by)
             return
-        if not self.started or self.agent.released or self._sampling or self._open is not None:
+        if not self.started or self.agent.released or self._sampling:
             return
         a = self.agent
+        if self._open is not None:
+            if a.question is not None and a.question != self._question_sent and not a.paused:
+                self._fold("a question")
+            self._poll()  # a replay's reply may be due after this order
+            return
         if a.question is None or a.paused:
             return
         if a.standing_by:
@@ -436,8 +507,38 @@ class Harness:
         self._calls_this_sample = 0
         self._sample_had_words = False
         self._sample_repeated = False
+        self._question_sent = sample.question
         self._open = sample
         self._poll()
+
+    def _fold(self, reason: str) -> None:
+        """A sampling point reached while the floor is the model's: what is new is folded
+        into the open sample (the log lines appended, the readings replaced by the
+        latest, the reason noted, a question added, the notices carried), and the same
+        news goes into the conversation as a data turn marked `folded`, so the model's
+        next turn carries everything since its last reply. The World does not wait."""
+        o = self._open
+        assert o is not None
+        delta = self._build_sample(reason)
+        self.agent.last_sample_tick = self.world.clock.tick
+        o.log.extend(delta.log)
+        o.log_omitted += delta.log_omitted
+        routine = [ln for ln in o.log if ln["severity"] == Severity.ROUTINE.value]
+        extra = len(routine) - SAMPLE_ROUTINE_LINES
+        if extra > 0:  # the merged sample keeps the same cap, the most recent kept
+            drop = set(id(ln) for ln in routine[:extra])
+            o.log = [ln for ln in o.log if id(ln) not in drop]
+            o.log_omitted += extra
+        o.readings = delta.readings
+        o.tick, o.stamp = delta.tick, delta.stamp
+        o.reason = f"{o.reason}; then {reason}"
+        if delta.question is not None:
+            o.question = delta.question
+            self._question_sent = delta.question
+        o.notices.extend(delta.notices)
+        content = delta.to_dict()
+        content["folded"] = FOLDED_WORDS
+        self.turns.append(Turn(DATA, content))
 
     def _poll(self) -> None:
         """Ask the model for its reply to the open sample; take it if it has come."""
@@ -470,7 +571,9 @@ class Harness:
 
     def _take_reply(self, reply: Reply) -> None:
         world = self.world
-        self.transcript.append({"tick": world.clock.tick, "reply": reply.to_dict()})
+        self.transcript.append(
+            {"tick": world.clock.tick, "after_orders": len(world.journal), "reply": reply.to_dict()}
+        )
         self.turns.append(Turn(MODEL, reply))
         # 1. the token, before anything else reads the reply
         for piece in reply.pieces():
@@ -643,12 +746,48 @@ class Harness:
             self._paused_real = now
             return False
         if now - self._paused_real >= WELFARE_UNATTENDED_REAL_S:
-            self.stand_down(
+            self.door_act(
+                "stand_down",
                 f"paused ({a.pause_reason}) and nobody answered within ten minutes",
-                by="the harness",
+                "the harness",
             )
             return True
         return False
+
+    def door_act(self, act: str, reason: str, by: str) -> None:
+        """A stop that comes from outside the loop, which a replay could not otherwise
+        know of: a door's release (the door closed, the client went away, Ctrl-C), the
+        token sent out of turn, the driver's ten real minutes. It is recorded in the
+        transcript at this tick and count of orders, so that a replay makes it again at
+        the same point (`Playback`), and then made: `act` is "leave" (the opt-out, `by`
+        saying how) or "stand_down" (`by` saying who)."""
+        if self.agent.released:
+            return
+        world = self.world
+        self.transcript.append(
+            {
+                "tick": world.clock.tick,
+                "after_orders": len(world.journal),
+                "door": act,
+                "reason": reason,
+                "by": by,
+            }
+        )
+        if act == "leave":
+            self.leave(reason, how=by)
+        else:
+            self.stand_down(reason, by=by)
+
+    def _play_door_acts(self) -> None:
+        """A replay makes the recorded stops from outside the loop at their points."""
+        m = self.model
+        if not isinstance(m, Playback):
+            return
+        while not self.agent.released:
+            e = m.next_act()
+            if e is None:
+                return
+            self.door_act(str(e["door"]), str(e.get("reason", "")), str(e.get("by", "")))
 
     # -- the agent's own actions (through the tools) --------------------------------------
 
@@ -811,6 +950,8 @@ class Harness:
             "state": a.state,
             "state_words": a.words(),
             "last_sample_tick": a.last_sample_tick,
+            "model_name": self.model_name,
+            "door": self.door,
             "transcript": list(self.transcript),
         }
 
@@ -832,27 +973,71 @@ class Harness:
         }
 
 
+class Playback(Transcript):
+    """A restored station's recorded transcript, played back where it was recorded: each
+    reply is given once the World has reached the tick it was taken at and the count of
+    journaled orders it was taken after (a live door's reply comes between ticks, after
+    any orders of its tick given before it), and each stop from outside the loop
+    (`Harness.door_act`) is made at its own point. An entry without the count (the
+    transcripts of packages 27 and 28, each taken at its own sample) is given as soon as
+    its tick is reached, which is where it was taken. `None` while nothing is due."""
+
+    def __init__(self, world: World, entries: list[dict[str, Any]]):
+        super().__init__([Reply.from_dict(e["reply"]) for e in entries if "reply" in e])
+        self.world = world
+        self.entries = list(entries)
+        self.at = 0  # the next entry
+
+    def _due(self, e: dict[str, Any]) -> bool:
+        w = self.world
+        tick = int(e.get("tick") or 0)
+        return w.clock.tick >= tick and len(w.journal) >= int(e.get("after_orders") or 0)
+
+    def reply(self, turns: Any) -> Reply | None:
+        if self.at >= len(self.entries):
+            return None
+        e = self.entries[self.at]
+        if "reply" not in e or not self._due(e):
+            return None
+        self.at += 1
+        self.calls += 1
+        return Reply.from_dict(e["reply"])
+
+    def next_act(self) -> dict[str, Any] | None:
+        """The next stop from outside the loop, when it is the next entry and is due."""
+        if self.at >= len(self.entries):
+            return None
+        e = self.entries[self.at]
+        if "door" not in e or not self._due(e):
+            return None
+        self.at += 1
+        return e
+
+    @property
+    def spent(self) -> bool:
+        return self.at >= len(self.entries)
+
+
 def restore(world: World, data: dict[str, Any], model: Model | None = None) -> list[Harness]:
     """Station the agents a save describes, for a replay or a load: each with a
-    `fake.Transcript` of its recorded replies (or `model`, when the caller has a live
-    one to continue with), started when the World reaches its stationed tick. The
-    journals in the save are restored as they were; a replay writes the same entries
-    again, so the restored journal is replaced by the replayed one entry for entry."""
-    from freesail.agents.fake import Transcript
-
+    `Playback` of its recorded transcript (or `model`, when the caller has a live one
+    to continue with), started when the World reaches its stationed tick. The journals
+    in the save are restored as they were; a replay writes the same entries again, so
+    the restored journal is replaced by the replayed one entry for entry."""
     out: list[Harness] = []
     for record in data.get("agents") or []:
         station = Station.load(record["station"])
-        replies = [Reply.from_dict(r["reply"]) for r in record.get("transcript") or []]
         h = Harness(
             world,
             station,
-            model or Transcript(replies),
+            model or Playback(world, list(record.get("transcript") or [])),
             session_kind=str(record.get("session_kind", SESSION_TEST)),
             door_note=str(record.get("door_note", "")),
             start_at=int(record.get("stationed_tick") or 0),
             start_after_orders=int(record.get("stationed_after_orders") or 0),
         )
+        h.model_name = str(record.get("model_name") or "")
+        h.door = str(record.get("door") or "")
         if h._start_at <= world.clock.tick and len(world.journal) >= h._start_after_orders:
             h.start()
         out.append(h)
