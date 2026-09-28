@@ -51,3 +51,14 @@ speed (or simply long: ten minutes, with `--request-timeout` to change it), so t
 budget, not the clock, is what bounds a reply; a timeout then means a hung server, as
 intended. A small note: the journal's stand-by line for an interval reads "Stood by until
 1 bell have passed" (the interval's words need the singular).
+
+## The owner's reading (2026-09-28)
+
+"Qwen is just asking for an officer role, or maybe even the captain of a cutter or post
+ship. Stern stuff, there, for a local model." The habits shown here (reading the point
+of sail from the readings, seeing a standing order fire and describing its work, a
+watch-keeper's journal, standing by when there is nothing to say) are an officer of the
+watch's; the station kept only the authority from it. Milestone 6's officers, with a
+domain and levels of authority within it, should start from this record as the first
+evidence that a local model can hold the lower levels; a cutter's command later is the
+right ladder (spec M4 open item 10).
