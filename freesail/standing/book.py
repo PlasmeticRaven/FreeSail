@@ -1,4 +1,8 @@
-"""The book of standing orders (spec M4 §3): list, show, belay, resume, belay all.
+"""The book of standing orders (spec M4 §3): list, show, belay, resume, belay all, and
+strike (package 28c, the captain's `cancel standing order` of playtest 3).
+
+**Belay and strike.** Belaying an order keeps it in the book, standing idle, to be
+resumed; striking it takes it out of the book altogether, and its name is free again.
 
 The book holds the rules in the order they were given, which is the order the runtime
 evaluates them in and the order they are listed. A rule is entered by the dialect
@@ -105,6 +109,8 @@ class Book:
             return self.belay(rule)
         if verb == "resume standing order":
             return self.resume(rule)
+        if verb == "strike standing order":
+            return self.strike(rule)
         raise OrderError(f"'{verb}' is not one of the book's orders.")
 
     def belay(self, rule: Rule) -> Result:
@@ -123,6 +129,18 @@ class Book:
         if self.runtime is not None:
             self.runtime.arm(rule)
         return "standing.resumed", f"Standing order '{rule.name}' resumed.", {"name": rule.name}
+
+    def strike(self, rule: Rule) -> Result:
+        """Take the order out of the book: it is no longer listed, evaluated or saved,
+        and its name may be given again. Journaled as an order like the rest of the book's
+        orders, so a replay strikes it at the same tick. A belayed order is struck as it
+        stands; belaying is the way to keep one idle."""
+        self.rules.remove(rule)
+        return (
+            "standing.struck",
+            f"Standing order '{rule.name}' struck from the book.",
+            {"name": rule.name, "was_belayed": rule.belayed},
+        )
 
     def belay_all(self) -> Result:
         standing = [r for r in self.rules if not r.belayed]

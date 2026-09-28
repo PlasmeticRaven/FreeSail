@@ -793,7 +793,8 @@ def _trim(
         )
         how = yard_trim.difference_words(staggered)
         parts.append(
-            f"Braced {which} to the wind, {units.rad_to_deg(awa):.0f}° on the {d.tack} bow"
+            f"Braced {which} to the wind, {units.rad_to_deg(awa):.0f}° "
+            f"{units.wind_bearing_words(awa if d.tack == 'starboard' else -awa)}"
             + (f", {how}" if how else "")
         )
     if trimmed:

@@ -182,7 +182,9 @@ class Clause:
         reading = R.REGISTRY.get(self.reading)
         values = self._values(view)
         if len(values) == 1:
-            said = R.describe_value(reading, values[0])
+            # the reading's own words for a value it withholds on purpose (the course and
+            # the leeway with no way on, package 28c)
+            said = view.words(self.reading, self.params[0] if self.params else None)
         else:
             said = ", ".join(R.describe_value(reading, v) for v in values)
         verb = "are" if len(values) > 1 or reading.kind == "hands" else "is"

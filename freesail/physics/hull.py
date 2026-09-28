@@ -69,6 +69,10 @@ ABACK_SECONDS = 10.0  # net thrust astern for this long with sail set is "taken 
 LEEWAY_NOTE_THRESHOLD = math.radians(1.0)  # leeway must change by this much to be noted
 LEEWAY_NOTE_INTERVAL = 60.0  # seconds; at most one leeway note per minute
 LEEWAY_MIN_SPEED = 0.25  # m/s; below this leeway is meaningless and read as zero
+# Knots of headway under which the log writes no leeway line and the readings give no
+# course or leeway (package 28c, playtests 1 and 3; judgement: half a knot, about the
+# LEEWAY_MIN_SPEED above, as a sailor's "no way on"; `readings.READING_SPEED_FLOOR_KN`)
+WAY_ON_KN = 0.5
 
 
 # ---------------------------------------------------------------------------

@@ -218,6 +218,36 @@ def format_heading(angle: float) -> str:
     return f"{point_name(angle)} ({deg:.0f}°)"
 
 
+# Where a wind on the ship lies, in the points of sail of the primer's chapter 2 (Lever,
+# figures 397 and 398; Falconer, *Large*): forward of the beam it is on the bow; at eight
+# points, on the beam; from nine to fourteen points, abaft the beam, on the quarter; from
+# fifteen, astern. Each band runs to half a point either side of its points (judgement:
+# the nearest point names it, as a sailor would), and the last half point either side of
+# dead aft is right astern.
+BOW_UNDER_POINTS = 7.5
+BEAM_UNDER_POINTS = 8.5
+QUARTER_UNDER_POINTS = 14.5
+RIGHT_ASTERN_FROM_POINTS = 15.5
+
+
+def wind_bearing_words(angle: float) -> str:
+    """Where a wind at `angle` radians off the bow (positive on the starboard side) lies,
+    in words: 'on the larboard bow', 'on the starboard beam', 'on the larboard quarter,
+    abaft the beam', 'astern, a little on the starboard quarter', 'right astern'."""
+    a = wrap_pi(angle)
+    side = "starboard" if a >= 0 else "larboard"
+    points = abs(a) / POINT
+    if points < BOW_UNDER_POINTS:
+        return f"on the {side} bow"
+    if points < BEAM_UNDER_POINTS:
+        return f"on the {side} beam"
+    if points < QUARTER_UNDER_POINTS:
+        return f"on the {side} quarter, abaft the beam"
+    if points < RIGHT_ASTERN_FROM_POINTS:
+        return f"astern, a little on the {side} quarter"
+    return "right astern"
+
+
 # ---------------------------------------------------------------------------
 # Watches and bells
 # ---------------------------------------------------------------------------

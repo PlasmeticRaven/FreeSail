@@ -43,6 +43,8 @@ CLIENT = Implementation(name="test-client", version="0.0")
 ROOT = Path(__file__).resolve().parents[1]
 FRIGATE = str(ROOT / "data/ships/frigate-36.yaml")
 GAME_WORDS = "FreeSail's browser game (freesail.ui.server on port 8000)"
+STAMPS = ["Morning watch, 1 bell (04:30)", "Morning watch, 2 bells (05:00)"]
+STAMPS.append("Morning watch, 3 bells (05:30)")
 
 
 def frigate_world(seed: int = 7) -> World:
@@ -240,7 +242,12 @@ def test_the_instructions_and_the_door_note_say_what_this_door_is():
     assert "captain" not in M.INSTRUCTIONS
     note = M.door_note(50)
     assert "every argument of every tool call" in note and "opt_out" in note
-    assert "does not wait for you" in note and "waits up to 50 seconds" in note
+    assert "does not wait for you" in note
+    assert "held open until your next turn and returns it, for up to 50 seconds" in note
+    assert "for up to 60 minutes" in M.door_note(M.DEFAULT_WAIT_S)
+    # the ceiling: an hour by default, the owner's observation of 2026-09-28; at most a watch
+    assert M.DEFAULT_WAIT_S == 3600 and M.WAIT_CEILING_MAX_S == 14400
+    assert M.PROGRESS_EVERY_S == 15 and M.WAIT_SLICE_S == 2
 
 
 # ---------------------------------------------------------------------------
@@ -347,7 +354,9 @@ def test_a_scripted_passage_of_three_glasses_with_the_clock_turned_by_the_game(t
     assert g.world.clock.tick == 3 * A_GLASS_S
     assert g.lines("agent.note") == [f"[watcher] Glass {k}: all well." for k in (1, 2, 3)]
     for k in range(3):
-        assert out[2 + k].startswith("Said, under your mark.")
+        first, second = out[2 + k].split("\n")[:2]
+        assert first == f"Your turn is open: sample at {STAMPS[k]} (the glass)."
+        assert second == "Said, under your mark."
         assert "reason: the glass" in out[2 + k]
 
 
@@ -365,13 +374,18 @@ def test_a_say_that_waits_in_vain_returns_the_sentence_and_never_hangs(tmp_path)
         return said, waited, again
 
     said, waited, again = session(b, script)
-    assert said == f"Said, under your mark.\n\n{M.STILL_WAITING}"
-    assert M.STILL_WAITING == (
-        "Still waiting for the next sample; call stand_by again to keep waiting."
-    )
+    lines = said.split("\n")
+    assert lines[0] == "The game has the floor; the next sample follows when your turn opens."
+    assert lines[1] == "Said, under your mark."
+    assert lines[3].startswith("Still waiting: this call waited 0 seconds and no turn opened.")
+    assert "The game has had the floor since Morning watch, 8 bells (04:00)" in said
+    assert said.endswith("No notable lines have been logged since then.")
     assert waited < 5
-    # stand_by when the floor is the game's is not a reply: it goes on waiting
-    assert again.startswith("It is not your turn") and again.endswith(M.STILL_WAITING)
+    # stand_by when the floor is the game's is not a reply: the same wait goes on, and the
+    # result says so without a refusal
+    assert again.startswith("The game has the floor;")
+    assert "Your turn has not come yet; this call continues the wait for it." in again
+    assert "Still waiting" in again and "It is not your turn" not in again
     assert g.world.clock.tick == 0 and not g.harness.agent.standing_by
 
 
@@ -402,8 +416,10 @@ def test_the_captain_asks_from_the_game_and_the_answer_is_heard(tmp_path):
         return turn, answer
 
     turn, answer = session(b, script)
-    assert turn.startswith("Nothing said.")
-    assert "The captain asks: how the wind is?" in turn and "reason: a question" in turn
+    assert turn.startswith(
+        "Your turn is open: sample at Morning watch, 8 bells (04:00) (a question).\nNothing said."
+    )
+    assert turn.count("The captain asks: how the wind is?") == 1 and "reason: a question" in turn
     assert g.world.clock.tick == 0  # the question came on the same tick
     assert answer == "Heard."
     said = [e for e in g.world.log if e.kind == "agent.said"]
@@ -423,7 +439,11 @@ def test_the_token_in_an_argument_ends_the_session_with_a_save_in_turn_or_out(tm
         return stood, left
 
     stood, left = session(b, script)
-    assert stood.startswith("Standing by until sunset") and stood.endswith(M.STILL_WAITING)
+    assert stood.startswith(
+        "The game has the floor; the next sample follows when your turn opens.\n"
+        "Standing by until sunset; you will be sampled then."
+    )
+    assert "You have been standing by since Morning watch, 8 bells (04:00), until sunset" in stood
     assert left.startswith("The station is released: left the game: enough")
     h = g.harness
     assert h.journal.entries[-1].text == "Left the game by the token: enough."
@@ -478,7 +498,7 @@ def test_a_game_with_an_mcp_watcher_replays_from_its_save_to_the_same_log(tmp_pa
         g.advance_when_the_floor_is_the_games(A_GLASS_S, len(g.harness.transcript))
         await c.call_tool("say", {"text": "Aye."})
         await c.call_tool("submit_order", {"text": "steer east"})
-        g.advance_when_the_floor_is_the_games(A_GLASS_S, len(g.harness.transcript) + 1)
+        g.advance_when_the_floor_is_the_games(A_GLASS_S, len(g.harness.transcript))
         await c.call_tool("stand_by", {"until": "a glass"})
         await c.call_tool("say", {"text": "A glass gone."})
 
@@ -491,6 +511,318 @@ def test_a_game_with_an_mcp_watcher_replays_from_its_save_to_the_same_log(tmp_pa
     assert [e.text for e in copy.agent_journals["watcher"].entries] == [
         e.text for e in g.harness.journal.entries
     ]
+
+
+# ---------------------------------------------------------------------------
+# Package 28c: no turn lost to a call the client cut off; the wait and its digest
+# ---------------------------------------------------------------------------
+
+
+def ask_later(g: Game, question: str, after: float) -> threading.Thread:
+    """The captain asks from the game's window `after` real seconds from now."""
+
+    def run() -> None:
+        time.sleep(after)
+        g.http.post("/api/order", json={"text": f"ask the watcher {question}"})
+
+    t = threading.Thread(target=run, daemon=True)
+    t.start()
+    return t
+
+
+def test_a_call_the_client_cuts_off_loses_no_turn_and_the_model_sees_it_once(tmp_path):
+    """Playtest 3's lost sample, through the SDK with a real cancellation: the client
+    gives up on a `say` (its timeout sends `notifications/cancelled`) while the bridge
+    waits; the captain's question opens the model's turn after that, and the bridge's
+    poll takes it. The next call (a `stand_by`, as the model made in the playtest) is
+    not delivered to the game as the reply to a turn the model never saw: it returns the
+    cut-off call's result first, the question in it once, and is not run. The model then
+    answers the question it has read."""
+    g = Game(tmp_path)
+    yes_on_record(tmp_path / "consent")
+    b = g.bridge(wait=10, slice_s=5.0)
+
+    async def script(c):
+        await c.call_tool("state", {})  # the brief, with the first turn open
+        ask_later(g, "whether the jib draws", after=0.8)
+        with pytest.raises(Exception):  # noqa: B017 (the SDK's timeout error)
+            await c.call_tool("say", {"text": "All quiet."}, read_timeout_seconds=0.3)
+        deadline = time.monotonic() + 10
+        while not b._lost and time.monotonic() < deadline:
+            await anyio.sleep(0.05)  # the cut-off call finishes on its thread
+        first = text(await c.call_tool("stand_by", {"until": "a glass"}))
+        second = text(await c.call_tool("answer", {"text": "It draws well."}))
+        return first, second
+
+    first, second = session(b, script)
+    assert first.startswith(
+        "Your call to stand_by was not run: your last call was cut off by the client before "
+        "its result reached you, and that result comes first."
+    )
+    assert "== The result of your call to say, cut off after 0 seconds; it was run ==" in first
+    assert "Your turn is open: sample at Morning watch, 8 bells (04:00) (a question)." in first
+    assert first.count("The captain asks: whether the jib draws?") == 1
+    assert first.count("== Sample at") == 1
+    assert second == "Heard."
+    h = g.harness
+    assert not h.agent.standing_by  # the stand_by was not run
+    said = [e for e in g.world.log if e.kind == "agent.said"]
+    assert [e.data["question"] for e in said] == ["whether the jib draws"]
+    assert "[watcher] All quiet." in g.lines("agent.note")  # the cut-off say was run
+    calls = [c["name"] for e in h.transcript for c in e.get("reply", {}).get("calls", [])]
+    assert "stand_by" not in calls
+
+
+def test_a_result_cut_off_after_it_was_made_goes_to_the_next_call(tmp_path):
+    """The other order of events, on the bridge alone: the call finishes with the next
+    turn in its result, and only then is it known to be cut off. The next call returns
+    it first; the call after that runs."""
+    g = Game(tmp_path)
+    yes_on_record(tmp_path / "consent")
+    b = g.bridge(wait=5)
+    b.call("state", {})
+    g.advance_when_the_floor_is_the_games(A_GLASS_S, len(g.harness.transcript))
+    cid = b.begin_call()
+    lost = b.call("say", {"text": "Aye."}, call_id=cid)
+    assert lost.startswith("Your turn is open: sample at Morning watch, 1 bell (04:30)")
+    b.cut_off(cid)  # the client never received it
+    cid = b.begin_call()
+    nxt = b.call("say", {"text": "Still here."}, call_id=cid)
+    b.delivered(cid)
+    assert nxt.startswith("Your call to say was not run") and lost in nxt
+    assert "[watcher] Still here." not in g.lines("agent.note")
+    cid = b.begin_call()
+    g.advance_when_the_floor_is_the_games(A_GLASS_S, len(g.harness.transcript))
+    after = b.call("say", {"text": "Still here."}, call_id=cid)
+    b.delivered(cid)
+    assert after.startswith("Your turn is open: sample at Morning watch, 2 bells (05:00)")
+    assert "[watcher] Still here." in g.lines("agent.note")
+    assert not b._lost and not b._done
+
+
+def test_a_wait_cut_off_with_no_turn_in_it_is_only_noted_and_the_next_call_runs(tmp_path):
+    g = Game(tmp_path)
+    yes_on_record(tmp_path / "consent")
+    b = g.bridge(wait=1.0, slice_s=0.2)
+    b.call("state", {})
+    cid = b.begin_call()
+    got: dict[str, str] = {}
+    t = threading.Thread(target=lambda: got.update(r=b.call("say", {}, call_id=cid)))
+    t.start()
+    time.sleep(0.3)
+    b.cut_off(cid)  # the client gave up; the wait stops within a slice
+    t.join(timeout=5)
+    assert not t.is_alive() and got["r"].startswith("The game has the floor")
+    nxt = b.call("stand_by", {"until": "a glass"}, call_id=b.begin_call())
+    assert "this call continues the wait" in nxt  # it ran
+    assert nxt.endswith(
+        "no turn had opened in it, so nothing was lost. If the client cuts every call about "
+        "that long, the owner may start the bridge with --wait 50.)"
+    )
+
+
+def test_a_turn_that_opened_with_no_call_waiting_comes_first_and_the_call_is_not_run(
+    tmp_path,
+):
+    """Playtest 3's lost sample by the other road: the model's last call had returned
+    (the ceiling reached, "Still waiting"), and the captain's question opened its turn
+    while no call was waiting. The model's next call, a `stand_by`, is not delivered as
+    the reply to a turn it never read: the turn comes first, its first line saying whose
+    turn it is, and the call is not run."""
+    g = Game(tmp_path)
+    yes_on_record(tmp_path / "consent")
+    b = g.bridge(wait=0.3, slice_s=0.1)
+    b.call("state", {})
+    waited = b.call("say", {"text": "All quiet."})
+    assert waited.startswith("The game has the floor;")
+    g.http.post("/api/order", json={"text": "ask the watcher whether the jib draws"})
+    first = b.call("stand_by", {"until": "a glass"})
+    assert first.startswith(
+        "Your turn is open: sample at Morning watch, 8 bells (04:00) (a question).\n"
+        "Your call to stand_by was not run: this turn opened after your last result, and it "
+        "comes first. Read it, then call again."
+    )
+    assert first.count("The captain asks: whether the jib draws?") == 1
+    h = g.harness
+    assert not h.agent.standing_by
+    assert b.call("answer", {"text": "It draws well."}) == "Heard."
+    said = [e for e in g.world.log if e.kind == "agent.said"]
+    assert [e.data["question"] for e in said] == ["whether the jib draws"]
+    calls = [c["name"] for e in h.transcript for c in e.get("reply", {}).get("calls", [])]
+    assert "stand_by" not in calls
+
+
+def test_what_is_folded_into_the_open_turn_goes_with_the_next_result(tmp_path):
+    """A notable line while the model's turn is open is folded into it (the harness's
+    rule); over MCP the fold comes with the result of the model's next call, a read, and
+    one that came after it and before the `say` (the captain's question) comes with the
+    say's result as past: the say still hands the floor back, and its first line says the
+    game has it."""
+    g = Game(tmp_path)
+    yes_on_record(tmp_path / "consent")
+    b = g.bridge(wait=0.3, slice_s=0.1)
+    b.call("state", {})
+    g.http.post("/api/order", json={"text": "call all hands"})
+    g.driver.tick(1)
+    read = b.call("readings", {})
+    assert "Added to your open turn" in read and "All hands!" in read
+    assert read.count("Added to your open turn") == 1
+    g.http.post("/api/order", json={"text": "ask the watcher how she heads"})
+    said = b.call("say", {"text": "Hands are up."})
+    assert said.startswith("The game has the floor;"), said[:200]
+    assert (
+        "Before your reply reached the game, this was added to the turn you were answering "
+        "(it is past now):"
+    ) in said
+    assert "The captain asks: how she heads?" in said
+    assert "Your turn is open" not in said
+    assert "[watcher] Hands are up." in g.lines("agent.note")
+
+
+def test_a_continued_stand_by_shows_since_when_and_the_notable_lines_and_a_say_ends_it(
+    tmp_path,
+):
+    """The owner's ruling on item 3: a stand-by is a decision not to be sampled, not a
+    decision to be blind. A `stand_by` called again while standing by says since when,
+    how long it waited, and lists the notable lines logged since, in the log's words; the
+    model may then speak instead, which ends the stand-by as its own decision and opens
+    its turn, the wake-up sample carrying the digest. The game replays to the same log."""
+    g = Game(tmp_path)
+    yes_on_record(tmp_path / "consent")
+    b = g.bridge(wait=0.4, slice_s=0.2)
+
+    async def script(c):
+        await c.call_tool("state", {})
+        out = [text(await c.call_tool("stand_by", {"until": "a glass"}))]
+        with g.driver.lock:
+            g.world.submit("call all hands")  # a notable line, while it stands by
+        g.driver.tick(120)
+        out.append(text(await c.call_tool("stand_by", {"until": "a glass"})))
+        out.append(text(await c.call_tool("say", {"text": "All hands up: I will watch."})))
+        out.append(text(await c.call_tool("say", {})))
+        return out
+
+    first, again, spoke, back = session(b, script)
+    assert first.startswith(
+        "The game has the floor; the next sample follows when your turn opens.\n"
+        "Standing by until a glass; you will be sampled then.\n\nStill waiting: this call "
+        "waited 0 seconds and no turn opened. You have been standing by since Morning watch, "
+        "8 bells (04:00), until a glass"
+    )
+    assert first.endswith("No notable lines have been logged since then.")
+    assert "You are standing by already, until a glass; this call continues that wait." in again
+    assert again.endswith(
+        "Notable lines logged since then (1):\n"
+        "  * Morning watch (04:00)  All hands! (by the captain's order)"
+    )
+    assert spoke.startswith(
+        "Your turn is open: sample at Morning watch (04:02) (its own word).\n"
+        "Said, under your mark, while the game had the floor. Your words are in the log "
+        "under your mark, and your stand-by (until a glass) ended at your own word"
+    )
+    assert "While you stood by (since Morning watch, 8 bells (04:00), until a glass): 1 " in spoke
+    assert "[watcher] All hands up: I will watch." in g.lines("agent.note")
+    assert back.startswith("The game has the floor;")
+    h = g.harness
+    assert h.journal.entries[-1].text == "Ended the stand-by until a glass at my own word."
+    b.close()
+    copy = replay.replay(json.loads(json.dumps(g.world.save())), ship_factory)
+    assert copy.log.digest() == g.world.log.digest()
+
+
+def test_a_read_beside_a_held_call_is_answered_at_once(tmp_path):
+    """A call held open for the next turn holds the bridge; a read-only tool called
+    beside it (a client that runs the model's calls in parallel) is answered at once and
+    moves nothing the held call reads, which then returns its turn whole."""
+    g = Game(tmp_path)
+    yes_on_record(tmp_path / "consent")
+    b = g.bridge(wait=30, slice_s=0.2)
+
+    async def script(c):
+        await c.call_tool("state", {})
+        out: dict[str, Any] = {}
+
+        async def held() -> None:
+            out["held"] = text(await c.call_tool("stand_by", {"until": "a glass"}))
+
+        async with anyio.create_task_group() as tg:
+            tg.start_soon(held)
+            await anyio.sleep(0.6)
+            t0 = time.monotonic()
+            out["read"] = text(await c.call_tool("readings", {}))
+            out["took"] = time.monotonic() - t0
+            await anyio.to_thread.run_sync(g.driver.tick, A_GLASS_S)
+        return out
+
+    out = session(b, script)
+    assert out["took"] < 2 and "true_wind_speed" in json.loads(out["read"])
+    assert out["held"].startswith(
+        "Your turn is open: sample at Morning watch, 1 bell (04:30) (a glass)."
+    )
+    assert out["held"].count("== Sample at") == 1
+
+
+def test_a_held_call_sends_progress_until_the_turn_opens(tmp_path):
+    """Package 28c: `stand_by` holds the call open until the stand-by ends, sending
+    progress notifications while it waits (the SDK's progress on a tool call; standard
+    clients reset their request timeout on each), then returns the turn. What a live
+    client does with the notifications (Claude Desktop's timeout) is the owner's to see."""
+    g = Game(tmp_path)
+    yes_on_record(tmp_path / "consent")
+    b = g.bridge(wait=30, slice_s=0.2, progress_every=0.3)
+    seen: list[tuple[float, str | None]] = []
+
+    async def on_progress(progress: float, total: float | None, message: str | None) -> None:
+        seen.append((progress, message))
+
+    def glass_later() -> None:
+        time.sleep(1.5)
+        g.driver.tick(A_GLASS_S)
+
+    async def script(c):
+        await c.call_tool("state", {})
+        threading.Thread(target=glass_later, daemon=True).start()
+        return text(
+            await c.call_tool("stand_by", {"until": "a glass"}, progress_callback=on_progress)
+        )
+
+    out = session(b, script)
+    assert out.startswith("Your turn is open: sample at Morning watch, 1 bell (04:30) (a glass).")
+    assert len(seen) >= 2
+    assert [p for p, _ in seen] == sorted(p for p, _ in seen)
+    assert seen[0][1].startswith("Waiting for the next turn: 0 seconds so far")
+    assert "standing by until a glass" in seen[0][1]
+
+
+def test_a_conditional_answer_with_none_stated_is_followed_up_over_mcp(tmp_path):
+    """Package 28c, item 6, at the MCP door: the follow-up comes back in the answer's own
+    result; the second answer decides; the result tells the owner the record is written
+    and that they may write in the chat (the chat is not the harness's)."""
+    g = Game(tmp_path)
+    b = g.bridge()
+
+    async def script(c):
+        await c.call_tool("readings", {})  # the consent brief
+        first = text(await c.call_tool("answer", {"text": "yes, with conditions"}))
+        second = text(
+            await c.call_tool("answer", {"text": "Yes, with conditions: say when it is a test."})
+        )
+        return first, second
+
+    first, second = session(b, script)
+    assert first.startswith("Heard.")
+    assert (
+        f"== From the developer (the conditions were not stated) ==\n"
+        f"{consent.CONDITIONS_FOLLOW_UP}" in first
+    )
+    assert consent.TOLD[consent.CONDITIONAL] in second
+    assert "For the owner: the consent record is written (" in second
+    assert "You may write to the model here in the chat" in second
+    assert "No station is offered" in second
+    rec = consent.check(WEIGHTS, tmp_path / "consent")
+    assert rec.verdict == consent.CONDITIONAL and rec.conditions == "say when it is a test"
+    body = rec.path.read_text(encoding="utf-8")
+    assert "> yes, with conditions" in body and "Every answer the model gave" in body
 
 
 # ---------------------------------------------------------------------------

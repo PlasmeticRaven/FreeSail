@@ -75,7 +75,9 @@ Add to that the **leeway**: "All vessels, however, are supposed to make nearly a
   Morning watch (04:12)  Leeway 4° to larboard.
 ```
 
-A leeway of 140° or more means she is going astern (*sternway*), which you will see when hove to.
+Leeway means something only when she has way on. Under half a knot of headway, gathering way from rest, in stays, or going astern (*sternway*, which you will see when hove to), the log writes no leeway line and the readings say "no way on; course and leeway not meaningful" (or "making sternway; ...") instead of a number.
+
+The apparent wind is named by where it lies, in the points of sail above: forward of seven and a half points it is *on the bow*; about eight points, *on the beam*; from nine to fourteen points, *on the quarter*, abaft the beam; beyond that, *astern*.
 
 ### Full and by
 

@@ -322,12 +322,14 @@ show standing order "keep her full"
 belay standing order "keep her full"
 resume standing order "keep her full"
 belay all standing orders
+strike standing order "heavy weather"
+# rejected: show standing order "heavy weather"
 # rejected: standing order "night routine": at sunset then take in the royals
 # rejected: standing order "x": when the glass is falling then shorten sail
 # rejected: standing order "x": at sunset then set the royls
 ```
 
-The well one is refused until the ship has a well to sound (milestone 5), and the refusal says so; a second order of a name already in the book is refused; a misspelt sail is refused when the order is given, not on the night it fires. The whole file loads in one line at the prompt, `read the standing orders from data/standing_orders/starter.orders`, or at the start with `--standing-orders data/standing_orders/starter.orders`; each line is given as an order, and the refused one does not stop the rest.
+Belaying an order keeps it in the book, idle, until you resume it; striking it (`strike standing order "x"`, or `cancel` or `remove`) takes it out of the book altogether, and its name may be given again. The well one is refused until the ship has a well to sound (milestone 5), and the refusal says so; a second order of a name already in the book is refused; a misspelt sail is refused when the order is given, not on the night it fires. The whole file loads in one line at the prompt, `read the standing orders from data/standing_orders/starter.orders`, or at the start with `--standing-orders data/standing_orders/starter.orders`; each line is given as an order, and the refused one does not stop the rest.
 
 To see one fire, sail her to sunset. At seed 7 with the wind north 15 knots and her head south, under all sail with the studding sails set as chapter 3 sets them (`make all sail`, then `rig out the studdingsails, both sides` and `set the studdingsails, both sides`), give the night routine and `tick 56000`; `state` on the way says where the sun stands:
 

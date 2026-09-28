@@ -34,6 +34,7 @@ from typing import TYPE_CHECKING, Any
 from freesail import units
 from freesail.crew import bill
 from freesail.crew.model import Crew, fatigue_words
+from freesail.physics.hull import WAY_ON_KN
 from freesail.physics.strain import DECAY_RATIO
 from freesail.ship.parts import Dynamics, HelmMode, Line, Sail, SailState, Spar
 
@@ -45,6 +46,9 @@ __all__ = [
     "FATIGUE_DECIMALS",
     "INTERVALS",
     "KINDS",
+    "NO_WAY_WORDS",
+    "READING_SPEED_FLOOR_KN",
+    "STERNWAY_WORDS",
     "REGISTRY",
     "Reading",
     "ReadingsView",
@@ -53,6 +57,7 @@ __all__ = [
     "STRAINING_RATIO",
     "WATCH_NAMES",
     "event_matches",
+    "reading_words",
     "sail_reading",
 ]
 
@@ -104,6 +109,18 @@ SAIL_STATE_WORDS: tuple[str, ...] = (
 
 WATCH_NAMES: tuple[str, ...] = tuple(name.lower() for _, _, name in units.WATCHES)
 
+# Under this much headway the course she makes and her leeway are not readings at all
+# (playtest 1: "Leeway 145°" from a standing start; playtest 3: the course NW by W with
+# the heading E by N, in stays). Judgement: half a knot, the same floor as the hull's
+# `LEEWAY_MIN_SPEED` (physics/hull.py, 0.25 m/s), below which the physics reads leeway as
+# nil (physics/hull.py WAY_ON_KN, the one number); the primer's chapter 2 says leeway has
+# no meaning without way on. Headway is the
+# speed ahead through the water (`Dynamics.u`), so a ship making sternway reads so too.
+# The log's leeway line keeps the same floor (`physics/integrate.py`).
+READING_SPEED_FLOOR_KN = WAY_ON_KN
+NO_WAY_WORDS = "no way on; course and leeway not meaningful"
+STERNWAY_WORDS = "making sternway; course and leeway not meaningful"
+
 DAYLIGHT_WORDS: tuple[str, ...] = ("day", "twilight", "night")
 
 FATIGUE_WORDS: tuple[str, ...] = ("fresh", "tired", "worn out")
@@ -129,6 +146,9 @@ class Reading:
     parametric: str | None = None  # "sail" or "part": the row is read with a part's id
     absent: str | None = None
     description: str = ""
+    # the words for a value of None that the reading gives on purpose (the course with
+    # no way on), read over the World; None: `describe_value`'s "not to be had"
+    none_words: Callable[[Any], str | None] | None = None
 
     @property
     def is_absent(self) -> bool:
@@ -231,6 +251,10 @@ class ReadingsView:
         """Every non-parametric reading's value, by id, in registration order."""
         return {r.id: self.value(r.id) for r in self._registry if r.parametric is None}
 
+    def words(self, id: str, param: str | None = None) -> str:
+        """A reading in words, as an agent reads it (`reading_words`)."""
+        return reading_words(self._registry.get(id), self.value(id, param), self._world)
+
 
 # ---------------------------------------------------------------------------
 # Getters over the World. Each reads the physics' own number and nothing else.
@@ -249,26 +273,73 @@ def _true_wind_from(world: Any, _: str | None) -> float:
     return world.wind.direction_from  # radians, where it comes from
 
 
+def _before_the_clock(world: Any) -> bool:
+    """No tick has run: the physics has not yet written the ship's apparent wind, and the
+    dynamics still hold their zeros (playtest 3: 0 knots of apparent wind in a 15-knot
+    breeze at 04:00, corrected once the clock ran)."""
+    return world.clock.tick == 0
+
+
+def _apparent_now(world: Any) -> tuple[float, float]:
+    """The apparent wind on deck as the sails model computes it each substep, where the
+    helmsman's eye is (`sails._apparent` at the deck height and WIND_EYE_HEIGHT_M): the
+    same function over the same state, read without writing anything, for a ship that
+    has not yet had a tick."""
+    from freesail.physics import sails as sails_mod
+
+    ship = world.ship
+    flow = sails_mod._apparent(
+        ship, world.wind, ship.hull.spec.deck_height_m + sails_mod.WIND_EYE_HEIGHT_M
+    )
+    return flow.awa, flow.speed
+
+
 def _apparent_wind_angle(world: Any, _: str | None) -> float:
     d = _dyn(world)
-    return d.apparent_wind_angle if d is not None else 0.0  # signed radians, + starboard
+    if d is None:
+        return 0.0
+    if _before_the_clock(world):
+        return _apparent_now(world)[0]
+    return d.apparent_wind_angle  # signed radians, + starboard
 
 
 def _apparent_wind_speed(world: Any, _: str | None) -> float:
     d = _dyn(world)
-    return d.apparent_wind_speed if d is not None else world.wind.effective_speed
+    if d is None:
+        return world.wind.effective_speed
+    if _before_the_clock(world):
+        return _apparent_now(world)[1]
+    return d.apparent_wind_speed
 
 
 def _heading(world: Any, _: str | None) -> float:
     return world.ship.heading
 
 
-def _course(world: Any, _: str | None) -> float:
+def _no_way(world: Any) -> bool:
+    """Headway under `READING_SPEED_FLOOR_KN` (a ship with dynamics only; the point ship
+    of the early milestones has no leeway and its course is the one ordered)."""
+    d = _dyn(world)
+    return d is not None and d.u < units.knots_to_ms(READING_SPEED_FLOOR_KN)
+
+
+def _no_way_words(world: Any) -> str | None:
+    d = _dyn(world)
+    if d is None or not _no_way(world):
+        return None
+    return STERNWAY_WORDS if d.u <= -units.knots_to_ms(READING_SPEED_FLOOR_KN) else NO_WAY_WORDS
+
+
+def _course(world: Any, _: str | None) -> float | None:
     """The course ordered: the helm's target when steering a heading, else the heading
-    she has (full and by, or a rudder order, has no course but the one she makes)."""
+    she has (full and by, or a rudder order, has no course but the one she makes). None
+    with no way on (`READING_SPEED_FLOOR_KN`): in stays, or gathering way from rest, the
+    course is not meaningful and the words say so."""
     d = _dyn(world)
     if d is None:
         return getattr(world.ship, "target_heading", world.ship.heading)
+    if _no_way(world):
+        return None
     return d.target_heading if d.helm_mode is HelmMode.HEADING else d.heading
 
 
@@ -277,9 +348,14 @@ def _speed(world: Any, _: str | None) -> float:
     return d.speed if d is not None else world.ship.speed
 
 
-def _leeway(world: Any, _: str | None) -> float:
+def _leeway(world: Any, _: str | None) -> float | None:
+    """The physics' leeway; None with no way on (`READING_SPEED_FLOOR_KN`)."""
     d = _dyn(world)
-    return d.leeway if d is not None else 0.0
+    if d is None:
+        return 0.0
+    if _no_way(world):
+        return None
+    return d.leeway
 
 
 def _heel(world: Any, _: str | None) -> float:
@@ -474,9 +550,29 @@ REGISTRY.add(
     )
 )
 REGISTRY.add(Reading("heading", ("the heading",), "compass", "", _heading))
-REGISTRY.add(Reading("course", ("the course",), "compass", "", _course))
+REGISTRY.add(
+    Reading(
+        "course",
+        ("the course",),
+        "compass",
+        "",
+        _course,
+        description="the course ordered, or the heading she makes; none with no way on",
+        none_words=_no_way_words,
+    )
+)
 REGISTRY.add(Reading("speed", ("the speed",), "speed", "knots", _speed))
-REGISTRY.add(Reading("leeway", ("the leeway",), "angle", "degrees", _leeway))
+REGISTRY.add(
+    Reading(
+        "leeway",
+        ("the leeway",),
+        "angle",
+        "degrees",
+        _leeway,
+        description="the leeway she makes; none with no way on",
+        none_words=_no_way_words,
+    )
+)
 REGISTRY.add(Reading("heel", ("the heel",), "angle", "degrees", _heel))
 REGISTRY.add(Reading("helm", ("the helm",), "angle", "degrees", _helm))
 REGISTRY.add(Reading("watch", ("the watch",), "watch", "", _watch))
@@ -639,6 +735,17 @@ def apparent_side(angle: float) -> str:
     return "starboard" if angle >= 0 else "larboard"
 
 
+def reading_words(reading: Reading, value: Any, world: Any = None) -> str:
+    """A reading's value in words for an agent: `describe_value`, or, for a value of
+    None the reading gives on purpose, its own words (the course and the leeway with no
+    way on: `NO_WAY_WORDS`)."""
+    if value is None and reading.none_words is not None and world is not None:
+        words = reading.none_words(world)
+        if words:
+            return words
+    return describe_value(reading, value)
+
+
 def describe_value(reading: Reading, value: Any) -> str:
     """A reading's value in words, for the log's 'the true wind is 24 knots'."""
     if value is None:
@@ -649,7 +756,9 @@ def describe_value(reading: Reading, value: Any) -> str:
     if kind == "direction":
         return f"from {units.point_name(value)}"
     if kind == "angle_on_bow":
-        return f"{units.rad_to_deg(abs(value)):.0f} degrees on the {apparent_side(value)} bow"
+        # the points of sail of the primer's chapter 2: on the bow, on the beam, abaft
+        # the beam on the quarter, astern (`units.wind_bearing_words`)
+        return f"{units.rad_to_deg(abs(value)):.0f} degrees {units.wind_bearing_words(value)}"
     if kind == "compass":
         return units.format_heading(value)
     if kind == "angle":

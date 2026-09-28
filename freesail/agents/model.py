@@ -116,9 +116,20 @@ class Sample:
     readings: dict[str, Any] = field(default_factory=dict)
     question: str | None = None
     notices: list[str] = field(default_factory=list)
+    # the sample that ends a stand-by: since when, until what, and the notable lines
+    # logged while the model stood by, counted and listed (package 28c); absent otherwise
+    stood_by: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+        d = asdict(self)
+        if d.get("stood_by") is None:
+            d.pop("stood_by", None)
+        # the harness's notices first after the stamp and the reason (the first of them,
+        # after a stand-by, says that the model stood by: package 28c), then the question
+        # and the stand-by's digest, then the log and the readings; a door that sends the
+        # sample as JSON sends it in this order
+        first = ("tick", "stamp", "reason", "notices", "question", "stood_by")
+        return {k: d[k] for k in first if k in d} | {k: v for k, v in d.items() if k not in first}
 
 
 @dataclass(frozen=True)

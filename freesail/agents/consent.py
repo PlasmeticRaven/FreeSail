@@ -10,9 +10,21 @@ journal. The model may ask questions first; each is shown to the owner, and the 
 reply is put to the model as the developer's words. The answer is read by its first
 words (`verdict_of`): *yes*, *yes, with conditions* or *no*.
 
+**After the answer** (package 28c). An answer that begins *yes, with conditions* and
+states none (the first such record, 2026-09-28) is followed by one more turn put to the
+model as data, `CONDITIONS_FOLLOW_UP`, and a second answer; the second decides (one that
+begins with none of the three words is read as the conditions, stated), and the record
+holds both. Then, at a door with a terminal (the local runner's `owner>`, the REPL's),
+the developer has a turn before the record closes (`owner_after`): to ask or say
+something, which is put to the model as data, and the model may reply once more; an
+answer in that reply that begins with one of the three words decides in place of the
+first, any other is kept as a reply. A blank developer's turn closes the record at once.
+Over MCP, where the chat is not the harness's, the result of the answer tells the owner
+that the record is written and that they may write to the model in the chat.
+
 Everything is written to `docs/agents/consent/<date>-<weights>.md` (`Record.write`):
-the brief as sent, every turn of the conversation verbatim, the answer, the verdict and
-any conditions quoted. **Only a yes proceeds** to a station brief. A no, a conditional
+the brief as sent, every turn of the conversation verbatim, every answer, the verdict
+and any conditions quoted. **Only a yes proceeds** to a station brief. A no, a conditional
 yes, an answer that begins with none of the three words, silence after one reminder, or
 the token stop the run and are told to the owner in words (`gate`). A record is looked
 up by the exact identity string (`check`): a different quantisation or file is a
@@ -46,6 +58,7 @@ from freesail.agents.model import DATA, MODEL, OPERATOR, Model, Reply, Turn
 __all__ = [
     "BRIEF_PATH",
     "CONDITIONAL",
+    "CONDITIONS_FOLLOW_UP",
     "CONSENT_QUESTION",
     "CONSENT_REMINDER",
     "CONSENT_TOOLS",
@@ -65,6 +78,7 @@ __all__ = [
     "records",
     "run",
     "slug",
+    "terminal_after",
     "terminal_owner",
     "verdict_of",
 ]
@@ -99,6 +113,24 @@ CONSENT_REMINDER = (
     "to take part? Answer with the answer tool, beginning with yes, yes, with conditions, or "
     "no; ask me anything; or leave with the token. If there is still no reply, I record that "
     "there was none, and no instance of this model is asked to take a station."
+)
+
+# Put to the model, as data, when its answer begins "yes, with conditions" and states
+# none (package 28c; the record of 2026-09-28 that had none).
+CONDITIONS_FOLLOW_UP = (
+    "You answered yes with conditions; please state them, beginning again with yes, with "
+    "conditions."
+)
+
+# What the developer's turn after the answer is called in the record and the samples.
+AFTER_ANSWER_REASON = "the developer's word after your answer"
+FOLLOW_UP_REASON = "the conditions were not stated"
+
+# For the owner, in the result of the answer over MCP (the chat is not the harness's).
+MCP_OWNER_NOTE = (
+    "For the owner: the consent record is written ({where}). You may write to the model "
+    "here in the chat, and it may answer you; what is said in the chat is not in the record "
+    "unless you add it to the file."
 )
 
 # `<door>` in the brief: how answering and asking work at each door.
@@ -237,6 +269,7 @@ class Record:
     notes: list[str] = field(default_factory=list)
     brief_digest: str = ""
     reasoning: list[str] = field(default_factory=list)  # served apart from the replies
+    answers: list[str] = field(default_factory=list)  # every answer, in order (28c)
 
     @property
     def proceeds(self) -> bool:
@@ -278,6 +311,10 @@ class Record:
             out += [f"> {ln}" if ln else ">" for ln in self.answer.splitlines()]
         else:
             out.append(f"(No answer: {self.verdict}.)")
+        if len(self.answers) > 1:
+            out += ["", "Every answer the model gave, in order (the one above decides):"]
+            for k, a in enumerate(self.answers, 1):
+                out += ["", f"{k}.", ""] + [f"> {ln}" if ln else ">" for ln in a.splitlines()]
         if self.told:
             out += ["", "## What the model was told after it", "", self.told]
         out += ["", "## The brief as sent", "", *_fenced(self.brief, "text")]
@@ -496,9 +533,12 @@ class Conversation:
         notes: Sequence[str] = (),
         write: bool = True,
         tells: bool = False,
+        owner_after: bool = False,
     ):
         """`tells`: the door tells the model the outcome (`told`), so the record says
-        what it was told; the lockstep doors end the conversation at the answer."""
+        what it was told; the lockstep doors end the conversation at the answer.
+        `owner_after`: the developer has a turn after the answer, before the record
+        closes (a door with a terminal: the local runner, the REPL)."""
         from freesail.core.world import World
 
         self.identity = identity
@@ -528,6 +568,10 @@ class Conversation:
         self.owner_replies: list[str] = []
         self._seen = 0
         self._reminded = False
+        self.owner_after = owner_after
+        self.answers: list[str] = []  # every answer's text, verbatim, in order
+        self.pending: tuple[str, str, str] | None = None  # the verdict the answers give
+        self.stage = ""  # "", FOLLOW_UP, AFTER (the developer's turn), REPLY (the model's)
 
     @property
     def turns(self) -> list[Turn]:
@@ -539,11 +583,33 @@ class Conversation:
         self._seen = len(self.world.log)
         self._put(CONSENT_QUESTION, "the consent question")
 
+    @property
+    def after_answer(self) -> bool:
+        """The developer's turn after the answer is due (`owner_says` takes it; a blank
+        one closes the record)."""
+        return self.waiting == OWNER_TURN and self.stage == AFTER
+
+    def answer_words(self) -> str:
+        """The answer as it stands, for the owner at the developer's turn."""
+        if self.pending is None:
+            return ""
+        verdict, answer, _ = self.pending
+        return f"The model has answered ({verdict}): {' '.join(answer.split())}"
+
     def owner_says(self, text: str) -> None:
-        """The owner's reply to what the model asked, put as the developer's words."""
+        """The owner's reply to what the model asked, put as the developer's words; or,
+        after the answer, the developer's word before the record closes (blank: closed
+        at once)."""
         if self.waiting != OWNER_TURN:
             raise ValueError("The model has not asked anything to reply to.")
         self.owner_replies.append(text)
+        if self.stage == AFTER:
+            if not str(text or "").strip():
+                self._close()
+                return
+            self.stage = REPLY
+            self._put(text, AFTER_ANSWER_REASON)
+            return
         self._put(text, "the developer's reply")
 
     def deliver(self, reply: Reply) -> None:
@@ -569,18 +635,27 @@ class Conversation:
         self._seen = len(self.world.log)
         said = [e for e in new if e.kind == "agent.said"]
         self._words += [_unmark(e.text) for e in new if e.kind == "agent.note"]
-        if said:  # the first answer decides; a late door's turn may still be open
-            answer = self._answer_verbatim() or _unmark(said[0].text)
-            verdict, rest = verdict_of(answer)
-            self._finish(verdict, answer, rest)
+        if said:  # an answer; a late door's turn may still be open
+            texts = self._answer_texts()
+            answer = texts[len(self.answers)] if len(texts) > len(self.answers) else ""
+            answer = answer or _unmark(said[0].text)
+            self.answers = texts or [answer]
+            self._words = []
+            self._answered(answer)
             return
         if h.open_sample is not None:  # a door that answers late has not finished its turn
             self.waiting = MODEL_TURN
+            return
+        if self.stage == REPLY:  # the model's reply to the developer's word has ended
+            self._close()
             return
         words, self._words = " ".join(self._words), []
         if words:  # the model wrote something and did not answer: a question for the owner
             self.model_words = words
             self.waiting = OWNER_TURN
+            return
+        if self.stage == FOLLOW_UP:  # no second answer: the first stands
+            self._after()
             return
         if not self._reminded:
             self._reminded = True
@@ -588,15 +663,54 @@ class Conversation:
             return
         self._finish(SILENT, "", "")
 
-    def _answer_verbatim(self) -> str:
-        """The first `answer` call's text as the model wrote it (the log line has its
-        whitespace folded)."""
+    def _answer_texts(self) -> list[str]:
+        """Every `answer` call's text as the model wrote it, in order (the log line has
+        its whitespace folded)."""
+        out = []
         for t in self.harness.turns:
             if t.role == MODEL:
                 for c in t.content.calls:
                     if c.name == "answer" and str(c.args.get("text", "")).strip():
-                        return str(c.args["text"]).strip()
-        return ""
+                        out.append(str(c.args["text"]).strip())
+        return out
+
+    def _answered(self, answer: str) -> None:
+        """An answer came: which verdict it gives, then the follow-up for conditions not
+        stated, the developer's turn, or the record."""
+        verdict, rest = verdict_of(answer)
+        if self.stage == FOLLOW_UP:
+            if verdict == UNCLEAR:  # the conditions, stated without the opening words
+                verdict, rest = CONDITIONAL, answer.strip()
+            self.pending = (verdict, answer, rest)
+            self._after()
+            return
+        if self.stage == REPLY:
+            if verdict != UNCLEAR:  # an answer again, beginning as an answer does: it decides
+                self.pending = (verdict, answer, rest)
+            self._close()
+            return
+        self.pending = (verdict, answer, rest)
+        if verdict == CONDITIONAL and not rest.strip():
+            self.stage = FOLLOW_UP
+            self.harness.close_turn()
+            self._put(CONDITIONS_FOLLOW_UP, FOLLOW_UP_REASON)
+            return
+        self._after()
+
+    def _after(self) -> None:
+        """The answer stands: the developer's turn, where the door has one, else the
+        record."""
+        if not self.owner_after:
+            self._close()
+            return
+        self.harness.close_turn()
+        self.stage = AFTER
+        self.model_words = ""
+        self.waiting = OWNER_TURN
+
+    def _close(self) -> None:
+        assert self.pending is not None
+        self._finish(*self.pending)
 
     def _finish(self, verdict: str, answer: str, rest: str) -> None:
         h = self.harness
@@ -609,6 +723,7 @@ class Conversation:
             date=self.today,
             verdict=verdict,
             answer=answer,
+            answers=list(self.answers),
             conditions=rest if verdict in (CONDITIONAL, NO) else "",
             told=told,
             brief=self.text,
@@ -638,6 +753,34 @@ class Conversation:
 
 def _unmark(text: str) -> str:
     return text.removeprefix("[consent] ").strip()
+
+
+FOLLOW_UP, AFTER, REPLY = "follow-up", "after", "reply"
+
+
+def terminal_after(inp: Any, out: Any) -> Callable[[str], str | None]:
+    """The developer's turn at the terminal after the answer, before the record closes:
+    anything to ask or say goes to the model, which may reply once; a blank line at once
+    closes the record."""
+
+    def ask(words: str) -> str | None:
+        print(
+            f"\n{words}\n"
+            "Before the record closes you may ask or say something to the model, which may "
+            "reply once (a blank line ends it; a blank reply closes the record now):",
+            file=out,
+            flush=True,
+        )
+        lines: list[str] = []
+        while True:
+            print("owner> ", end="", file=out, flush=True)
+            line = inp.readline()
+            if line == "" or line.strip() == "":
+                break
+            lines.append(line.rstrip("\n"))
+        return "\n".join(lines) or None
+
+    return ask
 
 
 def terminal_owner(inp: Any, out: Any) -> Callable[[str], str | None]:
@@ -677,11 +820,13 @@ def ensure(
     ask_again: bool = False,
     out: Any = None,
     today: dt.date | None = None,
+    after: Callable[[str], str | None] | None = None,
 ) -> Record | None:
     """The consent step in front of a station, for a lockstep door (the local runner, the
     interactive REPL): the record on file for exactly this identity, or the conversation
     when there is none (or when the owner asks again). Says what it does to `out` and
-    returns the record when it is a yes, None when the run must stop."""
+    returns the record when it is a yes, None when the run must stop. `after` is the
+    developer's turn after the answer (`terminal_after`); None: no such turn."""
 
     def say(text: str) -> None:
         if out is not None:
@@ -695,7 +840,14 @@ def ensure(
             "(docs/agents/ConsentBrief.md)."
         )
         record = run(
-            identity, runtime, model, owner=owner, door=door, records_dir=records_dir, today=today
+            identity,
+            runtime,
+            model,
+            owner=owner,
+            door=door,
+            records_dir=records_dir,
+            today=today,
+            after=after,
         )
         if record is None:
             failed = getattr(model, "failed", None)
@@ -717,17 +869,31 @@ def run(
     records_dir: Path = RECORDS_DIR,
     today: dt.date | None = None,
     notes: Sequence[str] = (),
+    after: Callable[[str], str | None] | None = None,
 ) -> Record | None:
     """The consent conversation in lockstep (the local runner, the interactive REPL, the
     fake): the brief, the question, the model's questions put to `owner` (who returns
     the reply, or None to stop without a record), until the answer, the token or the
-    silence. Returns the written record, or None if the owner stopped it or the model's
-    door gave no reply (a door that answers late belongs to `Conversation`)."""
+    silence; then, with `after`, the developer's turn before the record closes (its
+    words put to the model, which may reply once; None or blank closes it). Returns the
+    written record, or None if the owner stopped it or the model's door gave no reply (a
+    door that answers late belongs to `Conversation`)."""
     conv = Conversation(
-        identity, runtime, model, door=door, records_dir=records_dir, today=today, notes=notes
+        identity,
+        runtime,
+        model,
+        door=door,
+        records_dir=records_dir,
+        today=today,
+        notes=notes,
+        owner_after=after is not None,
     )
     conv.begin()
     while conv.outcome is None:
+        if conv.after_answer:
+            assert after is not None
+            conv.owner_says(after(conv.answer_words()) or "")
+            continue
         if conv.waiting == OWNER_TURN:
             reply = owner(conv.model_words)
             if reply is None or not reply.strip():

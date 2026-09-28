@@ -263,8 +263,9 @@ class Ship:
             f"{self.name}: heading {units.format_heading(d.heading)}, "
             f"speed {units.format_speed(d.speed)}, leeway {units.rad_to_deg(d.leeway):.0f}°, "
             f"heel {units.rad_to_deg(d.heel):.0f}°",
-            f"Apparent wind {units.rad_to_deg(abs(d.apparent_wind_angle)):.0f}° on the "
-            f"{d.tack} bow, {units.format_speed(d.apparent_wind_speed)}; "
+            f"Apparent wind {units.rad_to_deg(abs(d.apparent_wind_angle)):.0f}° "
+            f"{units.wind_bearing_words(d.apparent_wind_angle)}, "
+            f"{units.format_speed(d.apparent_wind_speed)}; "
             f"helm {units.rad_to_deg(d.rudder):+.0f}°",
             "Sail set: " + (", ".join(set_sails) if set_sails else "none"),
         ]

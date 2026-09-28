@@ -8,6 +8,18 @@
     if (e) e.textContent = text;
   }
 
+  // Where the apparent wind lies, in the primer's points of sail (freesail/units.py
+  // wind_bearing_words, the same bands): the bow, the beam, the quarter, astern.
+  function windBearing(awa) {
+    var side = awa >= 0 ? "starboard" : "larboard";
+    var points = Math.abs(U.deg(awa)) / 11.25;
+    if (points < 7.5) return "on the " + side + " bow";
+    if (points < 8.5) return "on the " + side + " beam";
+    if (points < 14.5) return "on the " + side + " quarter, abaft the beam";
+    if (points < 15.5) return "astern, a little on the " + side + " quarter";
+    return "right astern";
+  }
+
   function render(snap) {
     var s = snap.ship;
     var w = snap.wind;
@@ -15,12 +27,13 @@
     set("i-bell", snap.bell ? U.formatBells(snap.bell.bells) + " of the " + snap.bell.watch.toLowerCase() : "");
     set("i-heading", U.formatHeading(s.heading));
     set("i-speed", U.formatKnots(s.speed_through_water));
-    set("i-leeway", U.formatSigned(s.leeway, "to starboard", "to larboard"));
+    // no leeway with no way on (freesail/api/readings.py READING_SPEED_FLOOR_KN)
+    set("i-leeway", s.leeway === null || s.leeway === undefined ? "no way on" : U.formatSigned(s.leeway, "to starboard", "to larboard"));
     set("i-heel", U.formatSigned(s.heel, "to starboard", "to larboard"));
     set("i-true-wind", U.pointName(w.true_from) + ", " + U.formatKnots(w.true_speed, 0));
     set("i-wind-words", U.windStrength(w.true_speed) + (w.gust_factor > 1.05 ? ", gusting" : ""));
     var awa = w.apparent_angle;
-    set("i-apparent", Math.round(Math.abs(U.deg(awa))) + "° on the " + (awa >= 0 ? "starboard" : "larboard") + " bow, " + U.formatKnots(w.apparent_speed, 0));
+    set("i-apparent", Math.round(Math.abs(U.deg(awa))) + "° " + windBearing(awa) + ", " + U.formatKnots(w.apparent_speed, 0));
     set("i-tack", s.tack + " tack");
     set("i-helm", U.formatSigned(s.rudder, "a-starboard", "a-larboard"));
     var wh = s.weather_helm;

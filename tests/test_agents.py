@@ -65,6 +65,7 @@ from freesail.agents.agent import (
     WATCHER_BRIEF,
 )
 from freesail.agents.model import DATA, OPERATOR
+from freesail.agents.remote import RemoteModel
 from freesail.api import queries
 from freesail.api import readings as R
 from freesail.api.session import make_world, ship_factory
@@ -176,6 +177,28 @@ def test_truth_46_the_head_carries_the_five_items_in_order_whatever_the_station_
         # the one operator turn of the session is the brief, head first
         operator = [t for t in fake.seen[0] if t.role == OPERATOR]
         assert len(operator) == 1 and operator[0].content == whole
+
+
+def test_the_documentation_item_explains_folding_and_standing_by():
+    """Package 28c: the head's documentation item says that sampling points fold into an
+    open turn (playtest 3 read it as notable lines not opening turns), and what standing
+    by takes and does; the stand_by tool's description says the same."""
+    world = point_world()
+    h, _, _ = stationed(world, ["Aye."])
+    doc = h.brief.head[2].text
+    assert (
+        "While your turn is open, new sampling points do not open new turns: what they bring "
+        "is bundled into your open sample, and your next sample carries everything since "
+        "your last reply." in doc
+    )
+    assert agent_mod.STAND_BY_WORDS in doc
+    for words in ("'5 minutes'", "'a notable event'", "'an urgent event'", "urgent line"):
+        assert words in agent_mod.STAND_BY_WORDS
+    described = TOOLS["stand_by"].description
+    for words in ("'5 minutes'", "'ten minutes'", "'a notable event'", "'an urgent event'"):
+        assert words in described
+    assert "An urgent line in the log ends any stand-by" in described
+    assert "counted and listed" in described
 
 
 def test_the_head_discloses_the_game_the_model_the_station_and_the_session():
@@ -320,6 +343,57 @@ def test_library_serves_the_primer_the_catalogue_the_grammar_the_ship_and_the_bo
     assert "submit_order:" in lib("tools")
     assert "no topic 'the moon'" in lib("the moon")
     assert lib("contents") == tools.call(world, "watcher", "library")
+
+
+def test_the_grammar_page_holds_the_standing_dialect_in_full():
+    """Package 28c (playtest 3: the watcher "had to guess the standing-order syntax from
+    one grammar line"): the library's grammar topic gives the sentence, the triggers
+    with every event and interval, the readings and their comparisons, the durations, the
+    starter routines as examples, the book's orders (strike among them) and what belaying
+    does against striking. Every example given as it stands is taken by the ship, the
+    well's refused as the page says."""
+    from freesail.standing.book import read_orders_file
+
+    world = frigate_world()
+    page = tools.call(world, "watcher", "library", {"topic": "grammar"})
+    dialect = page[page.index("The standing dialect:") :]
+    assert 'standing order "<name>" [by the <officer>]: <trigger> [, if <condition>] then' in page
+    for words in (
+        "when <condition> [for <duration>]",
+        "at <event>",
+        "every <interval>",
+        "joined by 'and' (no 'or')",
+        "'for 2 minutes'",
+    ):
+        assert words in dialect, words
+    for words in R.EVENTS:
+        assert words in dialect, words
+    for row in R.REGISTRY:
+        assert f"'{row.words[0]}'" in dialect, row.id
+    for verb in (
+        'show standing order "<name>"',
+        'belay standing order "<name>"',
+        'resume standing order "<name>"',
+        "belay all standing orders",
+        'strike standing order "<name>" (also: strike the standing order, cancel standing order',
+        "read the standing orders from <file>",
+    ):
+        assert verb in dialect, verb
+    assert (
+        "Belaying an order keeps it in the book, idle, until 'resume standing order'; "
+        "striking it takes it out of the book, and its name may be given again." in dialect
+    )
+    lines = read_orders_file(ROOT / "data/standing_orders/starter.orders")
+    assert len(lines) == 7
+    for line in lines:
+        assert f"  {line}" in dialect
+        e = world.submit(line)
+        if "sound the well" in line:
+            assert e.kind == "order.rejected"
+        else:
+            assert e.kind == "standing.given", e.text
+    # the standing sentences are listed once, with the dialect, not among the verbs above it
+    assert page.count("strike standing order") == 1
 
 
 def test_call_refuses_an_unknown_tool_and_a_bad_argument_in_words():
@@ -488,7 +562,8 @@ def test_truth_43_the_same_order_three_times_with_no_change_brings_the_nudge():
 
 def test_truth_43_a_model_that_answers_the_nudge_by_standing_by_is_not_stopped():
     world = point_world()
-    script = [REPEAT, "", REPEAT, "", REPEAT, "", call("stand_by", until="a glass"), "", "Back."]
+    # a stand-by ends the turn (package 28c): no reply after it is asked for
+    script = [REPEAT, "", REPEAT, "", REPEAT, "", call("stand_by", until="a glass"), "Back."]
     h, fake, saves = stationed(world, script)
     world.run(3 * EVERY)
     assert "agent.nudged" in kinds(world)
@@ -647,7 +722,7 @@ def test_the_captain_stops_an_agent_at_any_time():
 
 def test_truth_44_stand_by_until_eight_bells_suspends_sampling_until_eight_bells_and_logs_it():
     world = point_world()  # 04:00; eight bells next at 08:00, tick 14400
-    h, fake, _ = stationed(world, ["Watching.", call("stand_by", until="eight bells"), "", "Up."])
+    h, fake, _ = stationed(world, ["Watching.", call("stand_by", until="eight bells"), "Up."])
     world.run(EVERY)
     stood = [e for e in world.log if e.kind == "agent.stood_by"]
     assert len(stood) == 1 and stood[0].tick == EVERY
@@ -680,6 +755,153 @@ def test_stand_by_takes_an_event_or_an_interval_and_refuses_the_rest_in_words():
     assert h.stand_by("a sighting").startswith("There is nothing to sight yet")
     assert h.stand_by("teatime").startswith("'teatime' is not an event or an interval")
     assert "eight bells" in h.stand_by("teatime")
+
+
+def test_stand_by_takes_a_severity_and_minutes_in_the_dialects_words():
+    """Package 28c (playtest 3: "no five-minute interval and no generic notable event or
+    urgent event trigger")."""
+    world = point_world()
+    h, fake, _ = stationed(world, ["Aye."])
+    assert h.stand_by("5 minutes").startswith("Standing by until 5 minutes have passed")
+    assert h.agent.stand_by.until_tick == 300
+    h.agent.state = "stationed"
+    assert h.stand_by("ten minutes").startswith("Standing by until ten minutes have passed")
+    assert h.agent.stand_by.until_tick == 600
+    h.agent.state = "stationed"
+    assert h.stand_by("an urgent event") == (
+        "Standing by until an urgent event; you will be sampled then."
+    )
+    assert h.agent.stand_by.severity == "urgent" and h.agent.stand_by.event is None
+    h.agent.state = "stationed"
+    h.stand_by("until a notable event.")
+    assert h.agent.stand_by.severity == "notable"
+    refused = h.stand_by("teatime")
+    assert "'a notable event', 'an urgent event'" in refused and "'5 minutes'" in refused
+
+
+def test_an_urgent_line_wakes_any_stand_by_and_the_notable_ones_come_bundled_and_listed():
+    """The owner's ruling (package 28c): urgent wakes; notable is bundled and shown. A
+    stand-by until eight bells is ended by an urgent line with the line as its reason;
+    the sample that wakes the watcher counts and lists the notable lines logged while
+    it stood by (playtest 3: the booms working at 06:29 missed until the next bundle)."""
+    world = point_world()
+    h, fake, _ = stationed(world, [call("stand_by", until="eight bells"), "Up."])
+    assert h.agent.standing_by
+    world.run(100)
+    world.record(Severity.NOTABLE, "test.booms", "The booms are working under the press of sail.")
+    world.record(Severity.ROUTINE, "test.routine", "A routine line.")
+    world.run(100)
+    calls = fake.calls
+    assert h.agent.standing_by and fake.calls == calls  # notable does not wake it
+    interim = h.interim()
+    assert interim["standing_by"] and interim["until"] == "eight bells" and interim["notable"] == 1
+    assert interim["lines"][0]["text"] == "The booms are working under the press of sail."
+    world.record(Severity.URGENT, "test.carried", "The fore topgallant mast carried away.")
+    world.run(1)
+    assert not h.agent.standing_by and fake.calls == calls + 1
+    woke = data_turns(fake)[-1]
+    assert woke["reason"] == "an urgent event: The fore topgallant mast carried away."
+    assert woke["stood_by"] == {
+        "since": "Morning watch, 8 bells (04:00)",
+        "until": "eight bells",
+        "notable": 1,
+        "lines": [interim["lines"][0]],
+    }
+    texts = [ln["text"] for ln in woke["log"]]
+    assert "A routine line." in texts and "The fore topgallant mast carried away." in texts
+    assert lines(world, "agent.resumed") == [
+        "[watcher] An urgent event: The fore topgallant mast carried away; the watcher is "
+        "sampled again."
+    ]
+    shown = repl_mod.render_turn(fake.seen[-1][-1])
+    assert (
+        "While you stood by (since Morning watch, 8 bells (04:00), until eight bells): 1 "
+        "notable line logged:\n  * Morning watch (04:01)  The booms are working" in shown
+    )
+    # a stand-by until a notable event ends at the next notable line, named
+    world2 = point_world()
+    h2, fake2, _ = stationed(world2, [call("stand_by", until="a notable event"), "Up."])
+    world2.run(50)
+    world2.record(Severity.NOTABLE, "test.n", "A sail on the horizon, says the lookout.")
+    world2.run(1)
+    assert data_turns(fake2)[-1]["reason"] == (
+        "a notable event: A sail on the horizon, says the lookout."
+    )
+
+
+def test_the_models_own_word_ends_a_stand_by_and_replays(tmp_path):
+    """While the game has the floor, the model's own words (the MCP bridge's `say`) go
+    in the log, end a stand-by as its own decision, logged and journaled, and open its
+    turn; recorded as an act from outside the loop, the replay makes it at the same point."""
+    world = frigate_world()
+    h = Harness(world, watcher(), RemoteModel(), save=None)
+    h.start()
+    h.deliver(Reply(calls=(ToolCall("stand_by", {"until": "a glass"}),)))
+    assert h.agent.standing_by and h.open_sample is None
+    world.submit("call all hands")
+    world.run(60)
+    assert h.interim()["lines"][0]["text"] == "All hands! (by the captain's order)"
+    h.door_act("speak", "All hands are up; the booms want watching.", "its own word")
+    assert not h.agent.standing_by and h.open_sample is not None
+    assert h.open_sample.reason == "its own word"
+    assert h.open_sample.stood_by["notable"] == 1
+    assert "[watcher] All hands are up; the booms want watching." in lines(world, "agent.note")
+    assert lines(world, "agent.resumed")[-1] == (
+        "[watcher] The watcher ends its stand-by (until a glass) at its own word; it is "
+        "sampled again."
+    )
+    assert h.journal.entries[-1].text == "Ended the stand-by until a glass at my own word."
+    h.deliver(Reply(text="Aye."))
+    world.run(30)
+    copy = replay.replay(json.loads(json.dumps(world.save())), ship_factory)
+    assert copy.log.digest() == world.log.digest()
+
+
+def test_a_stand_by_ends_the_turn_so_a_second_one_is_never_asked_for():
+    """Package 28c, playtest 4's mechanism: the harness returned "Standing by until a
+    glass" as a tool result and asked the model again (a turn ended only on a reply with
+    no call), and a small model stood by again, thirteen times in a turn that never
+    closed. Now a stand-by taken ends the turn: no result, no second call; the calls after
+    it in the same reply are not run; the next sample comes at the stand-by's end and
+    says first that the model stood by."""
+    world = point_world()
+    script = [
+        reply("", call("readings"), call("stand_by", until="a glass"), call("journal", note="x"))
+    ]
+    script += [call("stand_by", until="a glass")] * 12 + ["Awake."]
+    h, fake, _ = stationed(world, script)
+    assert fake.calls == 1 and h.open_sample is None and h.agent.standing_by
+    assert not any("tool_results" in t.content for t in h.turns if t.role == DATA)
+    assert h.journal.entries[-1].text == "Stood by until a glass."  # the note not run
+    world.run(A_GLASS_S - 1)
+    assert fake.calls == 1  # never asked again while it stands by
+    world.run(1)
+    assert fake.calls == 2  # the glass: one sample, one stand-by again, and the turn ends
+    woke = data_turns(fake)[-1]
+    assert woke["reason"] == "a glass"
+    assert woke["notices"][0] == (
+        "You stood by until a glass at Morning watch, 8 bells (04:00); it is now Morning "
+        "watch, 1 bell (04:30): a glass."
+    )
+    world.run(3 * A_GLASS_S)
+    assert fake.calls == 5  # one reply a turn: thirteen in a row cannot happen
+    stood = [e.tick for e in world.log if e.kind == "agent.stood_by"]
+    assert stood == [0, A_GLASS_S, 2 * A_GLASS_S, 3 * A_GLASS_S, 4 * A_GLASS_S]
+
+
+def test_a_save_from_before_the_rule_replays_by_the_old_one():
+    """A save recorded when a stand-by did not end the turn (its record has no
+    `stand_by_ends_turn`) replays with the replies it recorded after each stand-by."""
+    world = point_world()
+    h = Harness(world, station(), Fake([call("stand_by", until="a glass"), "", "Up."]))
+    h.stand_by_ends_turn = False  # the rule before package 28c
+    h.start()
+    world.run(A_GLASS_S + 60)
+    assert "[watcher] Up." in lines(world, "agent.note")
+    data = json.loads(json.dumps(world.save()))
+    assert data["agents"][0].pop("stand_by_ends_turn") is False
+    copy = replay.replay(data, ship_factory)
+    assert copy.log.digest() == world.log.digest()
 
 
 def test_a_question_from_the_captain_wakes_a_standing_by_watcher():
@@ -1251,18 +1473,24 @@ def test_the_reply_syntax_reads_text_and_tool_calls():
 
 
 def test_the_repl_model_prints_the_brief_once_and_each_sample_and_reads_replies():
-    inp = io.StringIO('Watching.\n\n> stand_by until="a glass"\n\n\nAwake.\n\n')
+    inp = io.StringIO('Watching.\n\n> stand_by until="a glass"\n\nAwake.\n\n')
     out = io.StringIO()
     world = point_world()
     model = repl_mod.Repl(inp, out)
     h = Harness(world, station(), model, door_note=repl_mod.REPLY_SYNTAX)
     h.start()
     world.run(EVERY)  # the second sample: stand by
-    world.run(A_GLASS_S)  # the glass ends: a sample, an empty reply; then the next
+    world.run(A_GLASS_S)  # the glass ends the stand-by: a sample, and its reply
     text = out.getvalue()
     assert text.count("== The brief (operator text; the only operator message) ==") == 1
     assert text.count("== Sample at") >= 3
-    assert "== Tool results (data) ==" in text and "Standing by until a glass" in text
+    # the stand-by ended its turn with no result; the sample that ends it says so first
+    assert "== Tool results (data) ==" not in text
+    assert (
+        "(data from the game; reason: a glass) ==\nNotice from the harness: You stood by "
+        "until a glass at Morning watch (04:10); it is now Morning watch (04:40): "
+        "a glass." in text
+    )
     assert "Replies are typed as text" in h.brief.head[2].text
     assert "[watcher] Watching." in lines(world, "agent.note")
     assert "[watcher] Awake." in lines(world, "agent.note")

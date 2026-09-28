@@ -30,8 +30,14 @@ player reads. This module has the two halves of that:
   **A reply out of turn** (the floor is the game's: the model stands by, is paused, or
   its turn has not come): the token is looked for in it as in every reply and leaves at
   once; the read-only tools run and are answered (they change nothing, so nothing is
-  recorded); `opt_out` leaves; anything else is refused in words. A leave out of turn
-  and a door's release are recorded as `Harness.door_act`, so a replay makes them too.
+  recorded); `opt_out` leaves; words with no call are the model's own word
+  (`Harness.own_word`, package 28c): logged under the mark, ending a stand-by as its
+  own decision, and its turn opens now (refused while paused); anything else is refused
+  in words. A leave, the own word and a door's release out of turn are recorded as
+  `Harness.door_act`, so a replay makes them too. While the game has the floor, every
+  answer carries `interim` (`Harness.interim`): since when the model has waited, until
+  what, and the notable lines logged since, so a door can show a model that asks again
+  what it would otherwise not see until its turn.
 
 **The door's half** (`GameClient`, over httpx, imported only when a door makes one):
 station, poll the turns, send a reply, send the owner's word, release. Both doors, the
@@ -341,6 +347,9 @@ class Desk:
             allowed_tools=CONSENT_TOOLS_AT[seat.door],
             notes=notes,
             tells=seat.door == "mcp",
+            # the developer's turn after the answer, at the door's terminal (the runner's
+            # owner> prompt); over MCP the chat is the owner's, and the result says so
+            owner_after=seat.door == "runner",
         )
         seat.phase = CONSENT
         why = "the owner asks again" if ask_again else "no consent is on record for it"
@@ -476,6 +485,11 @@ class Desk:
         conv.deliver(reply)
         if conv.outcome is not None:
             self._after_consent(seat)
+        elif conv.after_answer:
+            self.say(
+                f"FreeSail: {conv.answer_words()}. The owner may ask or say something before "
+                "the record closes, at the door's terminal."
+            )
         elif conv.waiting == consent.OWNER_TURN:
             self.say(
                 f"FreeSail: the model at the {seat.station} wrote, and has not answered yet: "
@@ -493,6 +507,8 @@ class Desk:
         told = conv.told
         if rec.verdict == consent.LEFT:
             told = "You have left the conversation; it is recorded, and no station is offered."
+        if seat.door == "mcp" and rec.path is not None:
+            told = f"{told} {consent.MCP_OWNER_NOTE.format(where=consent._rel(rec.path))}".strip()
         if told:
             seat.archive.append(Turn(DATA, {"reason": "the answer is recorded", "notices": [told]}))
         seat.words = words
@@ -523,6 +539,15 @@ class Desk:
             why = " ".join(str(leave.args.get("reason", "")).split())
             h.door_act("leave", why, "the opt_out tool")
             return {"out_of_turn": True, "words": self.released_words(seat)}
+        if reply.text.strip() and not reply.calls and not a.paused:
+            # the model's own word: logged, a stand-by ended by its own decision, and its
+            # turn opens now (recorded, so a replay speaks at the same point)
+            was = a.stand_by.words if a.standing_by and a.stand_by is not None else None
+            h.door_act("speak", reply.text, "its own word")
+            words = "Your words are in the log under your mark"
+            if was is not None:
+                words += f", and your stand-by (until {was}) ended at your own word"
+            return {"out_of_turn": True, "spoke": True, "words": f"{words}; your turn is open."}
         if reply.calls and all(c.name in READ_ONLY_TOOLS for c in reply.calls):
             world = seat.world
             results = [
@@ -551,12 +576,14 @@ class Desk:
             )
         if a.standing_by and a.stand_by is not None:
             return (
-                f"You are standing by until {a.stand_by.words}; your turn comes then, or when "
-                "the captain asks you something."
+                f"You are standing by until {a.stand_by.words}; your turn comes then, at an "
+                "urgent line, or when the captain asks you something. Words of your own end "
+                "the stand-by now."
             )
         return (
             "It is not your turn: the game has the floor until your next turn (the glass, a "
-            "notable event, the end of a stand-by, or a question from the captain)."
+            "notable event, the end of a stand-by, or a question from the captain). Words of "
+            "your own open it now."
         )
 
     def released_words(self, seat: Seat) -> str:
@@ -573,14 +600,19 @@ class Desk:
     def owner(self, name: str, text: str) -> dict[str, Any]:
         """`POST /api/agents/<station>/owner` with `{text}`: the owner's reply to what the
         model wrote in the consent conversation, put to it as the developer's words; a
-        blank reply stops the step without a record."""
+        blank reply stops the step without a record. After the answer, the developer's
+        word before the record closes; a blank one closes it at once."""
         with self.lock:
             seat = self._seat(name)
             conv = seat.conv
             if seat.phase != CONSENT or conv is None or conv.waiting != consent.OWNER_TURN:
                 raise DeskError(409, "Nothing the model wrote is waiting for the owner's reply.")
             before = len(seat.stream())
-            if not str(text or "").strip():
+            if conv.after_answer:
+                conv.owner_says(str(text or ""))
+                if conv.outcome is not None:
+                    self._after_consent(seat)
+            elif not str(text or "").strip():
                 seat.phase = STOPPED
                 seat.conv = None
                 seat.words = (
@@ -666,7 +698,10 @@ class Desk:
             if seat.phase == CONSENT and seat.conv is not None:
                 waiting = seat.conv.waiting
                 words = "in the consent conversation" + (
-                    "; the owner has the next word, at the door's terminal"
+                    "; answered, and the owner may say something before the record closes, at "
+                    "the door's terminal"
+                    if seat.conv.after_answer
+                    else "; the owner has the next word, at the door's terminal"
                     if waiting == consent.OWNER_TURN
                     else "; waiting for the model"
                 )
@@ -730,11 +765,15 @@ class Desk:
             out["state"] = a.state
             out["state_words"] = a.words()
             out["standing_by"] = a.standing_by
+            out["interim"] = h.interim()
             if a.released:
                 out["words"] = self.released_words(seat)
         if conv is not None:
             out["waiting"] = "owner" if conv.waiting == consent.OWNER_TURN else "model"
             out["model_words"] = conv.model_words if conv.waiting == consent.OWNER_TURN else ""
+            out["after_answer"] = conv.after_answer
+            if conv.after_answer:
+                out["answer_words"] = conv.answer_words()
         if seat.record is not None and seat.record.path is not None:
             out["consent"] = {
                 "verdict": seat.record.verdict,
@@ -867,10 +906,14 @@ class GameClient:
         path = f"/api/agents/{self.name}/turns"
         return self._took(self._request("GET", path, params=params))
 
-    def reply(self, reply: Reply) -> dict[str, Any]:
+    def reply(self, reply: Reply, advance: bool = True) -> dict[str, Any]:
+        """Deliver a reply; the answer carries the turns from the cursor. `advance=False`
+        leaves the cursor where it is (a read made beside a call that is waiting, whose
+        own poll reads the turns on from there)."""
         body = reply.to_dict() | {"since": self.cursor}
         path = f"/api/agents/{self.name}/reply"
-        return self._took(self._request("POST", path, json=body))
+        answer = self._request("POST", path, json=body)
+        return self._took(answer) if advance else answer
 
     def owner(self, text: str) -> dict[str, Any]:
         path = f"/api/agents/{self.name}/owner"

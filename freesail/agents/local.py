@@ -14,8 +14,10 @@ refused in words otherwise), then loops: poll the game for turns, send the endpo
 conversation when the floor is the model's, deliver its reply to the game, until the
 station is released or Ctrl-C, which releases it. What the model writes without
 answering in the consent conversation is shown at this terminal and the owner's reply
-typed here goes back to it (`owner>`), as with package 28's runner. The owner plays the
-game in its own window meanwhile; the watcher's lines are in its log.
+typed here goes back to it (`owner>`), as with package 28's runner; after the model
+answers, the owner has a turn here too before the record closes (package 28c): anything
+typed goes to the model, which may reply once, and a blank line closes the record. The
+owner plays the game in its own window meanwhile; the watcher's lines are in its log.
 
 **The wire.** `LocalModel.reply(turns)` translates package 27's turns into the messages
 array: the latest operator turn (the brief) is the `system` message; a data turn that
@@ -30,6 +32,24 @@ and the tool calls serialised, so the token scan reads everything the model *sai
 thinking model's reasoning, where the server returns it apart (`reasoning_content`), is
 not in `raw`: thinking about the token does not use it, writing it does (the consent
 brief says so). The response messages are kept whole in `exchanges`, reasoning and all.
+
+**The reply budget and the timeout** (package 28c, playtest 4: one request ran away to
+76,674 tokens and never returned, and the runner, waiting in it, fetched neither the
+captain's question nor the glass). Every request carries `max_tokens` (`--max-reply`,
+`REPLY_MAX_TOKENS` by default), so a model that falls into a loop stops within the
+budget; every request has `REQUEST_TIMEOUT_S`. A request that fails (a timeout, an
+error) leaves the sample open: the runner says so, reads the game's turns again (what
+happened meanwhile is folded into the open turn) and asks again; only
+`FAILURES_TO_STAND_DOWN` failures in a row stand the station down, with the reason.
+
+**The context guard.** Before stationing, the runner asks the server what context it
+gives the model (llama-server's `/props` `n_ctx`; Ollama's `/api/ps` `context_length`
+for a loaded model, else the `num_ctx` of `/api/show`), falling back to `--ctx`, and
+refuses in words, with what it measured, when that is smaller than the consent brief
+(measured as this door sends it; it is the longer of the two briefs: about 6,000
+characters against the watcher's 5,200 on the frigate at seed 7, measured for package
+28c), the tool definitions (measured), one turn (`TURN_ALLOWANCE_TOKENS`) and the reply
+budget; and says so when it cannot learn it.
 
 **The budget.** The conversation grows a sample at a time. When the context size is
 known (`--ctx-size`, else the server's `n_ctx` from `/props`), the oldest turns are left
@@ -79,13 +99,30 @@ DEFAULT_ENDPOINT = "http://127.0.0.1:8080"
 # BPE vocabularies; the budget errs early rather than late by keeping a reserve).
 CHARS_PER_TOKEN = 4
 
-# Tokens kept free for the reply (judgement: a watcher's turn is a line or two and a few
-# tool calls, a few hundred tokens; a thinking model's reasoning takes more).
-REPLY_RESERVE_TOKENS = 2048
+# The most tokens one reply may run to, sent as `max_tokens` with every request (the
+# owner's ruling, 2026-09-28: generous on purpose, so that a long answer, a journal note
+# or a thinking model's reasoning is never cut, while a runaway generation is bounded
+# within about a minute and a half on a 4090). `--max-reply` changes it.
+REPLY_MAX_TOKENS = 4096
 
-# How long one request may take (judgement: a large model on a 4090 reading a long brief
-# for the first time can take a minute or more; ten minutes is the unattended bound).
-REQUEST_TIMEOUT_S = 600.0
+# Tokens kept free for the reply in the context budget: the reply budget itself.
+REPLY_RESERVE_TOKENS = REPLY_MAX_TOKENS
+
+# How long one request may take, in real seconds (judgement: the reply budget at some
+# fifty tokens a second on a 4090 is about eighty seconds, and reading a long brief the
+# first time some tens more; three minutes is well under the watcher's patience, a
+# watch of ship's time, even at 60x, where a watch is four real minutes).
+REQUEST_TIMEOUT_S = 180.0
+
+# Failures in a row after which the runner stands the station down (judgement: one
+# failure is a slow or runaway request, which the budget and the timeout end; three in a
+# row, nine minutes at most, is a server that cannot serve).
+FAILURES_TO_STAND_DOWN = 3
+
+# Tokens allowed for one turn in the context guard (judgement: a glass's turn on the
+# frigate at seed 7 measured about 450 tokens, docs/agents/Harness.md §5; a turn that
+# grew while the model thought is longer).
+TURN_ALLOWANCE_TOKENS = 600
 
 # Keys a server might give the loaded file's hash under. llama-server's /props gives the
 # path and not a hash, as far as its README says; these are read if a server gives one.
@@ -114,6 +151,7 @@ class LocalModel:
         transport: httpx.BaseTransport | None = None,
         timeout: float = REQUEST_TIMEOUT_S,
         on_reply: Callable[[Reply], None] | None = None,
+        max_reply: int = REPLY_MAX_TOKENS,
     ):
         base = endpoint.strip().rstrip("/")
         base = base.removesuffix("/v1")
@@ -122,6 +160,12 @@ class LocalModel:
         self.seed = seed
         self.temperature = temperature
         self.ctx_size = ctx_size
+        self.max_reply = int(max_reply)
+        self.timeout = float(timeout)
+        self.failures = 0  # failed requests in a row
+        self.last_error: str | None = None  # the last failure, in words
+        self.served_ctx: int | None = None  # the context the server gives, when learned
+        self._served_name = ""  # the name the server knows the model by
         self.on_reply = on_reply
         self.client = httpx.Client(base_url=base, transport=transport, timeout=timeout)
         self.offered_tools: tuple[str, ...] | None = None  # set by the harness
@@ -183,6 +227,7 @@ class LocalModel:
             path = p.get("model_path") or (p.get("default_generation_settings") or {}).get("model")
             if path:
                 name = _basename(str(path))
+                self._served_name = name
                 digest = next((str(p[k]) for k in IDENTITY_HASH_KEYS if p.get(k)), "")
                 return f"{name} (sha256 {digest})" if digest else name
         r = self._get("/v1/models")
@@ -213,6 +258,7 @@ class LocalModel:
                 f"({', '.join(ids) or 'none'}) and says none is loaded; name one with --model."
             )
         name = _basename(name) if ("/" in name or "\\" in name) else name
+        self._served_name = name
         digest = self._ollama_digest(name)
         return f"{name} (digest {digest})" if digest else name
 
@@ -232,7 +278,86 @@ class LocalModel:
                 return str(m["digest"]).removeprefix("sha256:")
         return ""
 
+    def served_context(self) -> tuple[int, str] | None:
+        """The context the server gives this model, and where that was read: llama-
+        server's `/props` (`n_ctx`), or Ollama's `/api/ps` (`context_length`, for a model
+        it has loaded) or `/api/show` (the model's `num_ctx` parameter). None when the
+        server does not say (an Ollama model not yet loaded, with no `num_ctx` of its own,
+        runs with Ollama's default)."""
+        try:
+            p = self.props()
+        except DoorError:
+            p = None
+        n = ((p or {}).get("default_generation_settings") or {}).get("n_ctx")
+        if n:
+            return int(n), "llama-server's /props (n_ctx)"
+        name = self._served_name or self.model
+        if not name:
+            return None
+        try:
+            r = self.client.get("/api/ps")
+            if r.status_code == 200:
+                for m in r.json().get("models") or []:
+                    if name in (m.get("name"), m.get("model")) and m.get("context_length"):
+                        return int(m["context_length"]), "Ollama's /api/ps (context_length)"
+            r = self.client.post("/api/show", json={"model": name})
+            if r.status_code == 200:
+                params = str(r.json().get("parameters") or "")
+                for line in params.splitlines():
+                    words = line.split()
+                    if len(words) == 2 and words[0] == "num_ctx" and words[1].isdigit():
+                        return int(words[1]), "Ollama's /api/show (the model's num_ctx)"
+        except (httpx.HTTPError, ValueError, AttributeError):
+            return None
+        return None
+
+    def check_context(self, identity: str, runtime: str) -> str:
+        """The context guard, before stationing (package 28c): what the watcher needs,
+        measured at `CHARS_PER_TOKEN`: the consent brief as this door sends it (the
+        longer of the two briefs; the module docstring), the tool definitions, one turn
+        (`TURN_ALLOWANCE_TOKENS`) and the reply budget. Raises `DoorError` in words, with
+        the numbers, when the context the server gives (or `--ctx`) is smaller; returns a
+        line for the owner otherwise, saying what it measured or that it could not ask."""
+        brief = consent.brief_text(identity, runtime, "runner")
+        brief_cost = len(json.dumps({"role": "system", "content": brief})) // CHARS_PER_TOKEN + 1
+        tools_cost = len(json.dumps(self.tools_schema())) // CHARS_PER_TOKEN
+        need = brief_cost + tools_cost + TURN_ALLOWANCE_TOKENS + self.max_reply
+        served = self.served_context()
+        if served is not None:
+            self.served_ctx = served[0]
+            got, where = served
+        elif self.ctx_size:
+            got, where = int(self.ctx_size), "--ctx, as the owner gave it"
+        else:
+            return (
+                f"The model server did not say what context it gives {identity}, and no --ctx "
+                f"was given; the watcher needs about {need} tokens (the brief {brief_cost}, "
+                f"the tool definitions {tools_cost}, a turn {TURN_ALLOWANCE_TOKENS}, the reply "
+                f"budget {self.max_reply}). Ollama's own default is small unless "
+                "OLLAMA_CONTEXT_LENGTH or the Modelfile's num_ctx says more: check with "
+                "`ollama ps` once the model is loaded, and state it with --ctx."
+            )
+        words = (
+            f"the model server gives {identity} a context of {got} tokens ({where}); the "
+            f"watcher needs about {need}: the brief {brief_cost} tokens and the tool "
+            f"definitions {tools_cost} (measured, at {CHARS_PER_TOKEN} characters a token), "
+            f"a turn {TURN_ALLOWANCE_TOKENS} and the reply budget {self.max_reply}"
+        )
+        if got < need:
+            raise DoorError(
+                f"The context is too small: {words}. Raise it: for Ollama, set "
+                "OLLAMA_CONTEXT_LENGTH (for example 16384) before `ollama serve`, or a "
+                "`PARAMETER num_ctx 16384` line in the model's Modelfile; for llama-server, "
+                "--ctx-size 16384; or lower the reply budget with --max-reply "
+                "(docs/agents/Harness.md)."
+            )
+        return f"The context is enough: {words}."
+
     def context_size(self) -> int | None:
+        if self.ctx_size and self.served_ctx:
+            return min(int(self.ctx_size), self.served_ctx)
+        if self.served_ctx:
+            return self.served_ctx
         if self.ctx_size:
             return self.ctx_size
         try:
@@ -267,11 +392,30 @@ class LocalModel:
                 start = i
         out: list[dict[str, Any]] = []
         last_ids: list[str] = []
+        last_calls: tuple[ToolCall, ...] = ()
+
+        def answer_the_ids() -> None:
+            # a turn that ended on a stand-by has no results (package 28c); the protocol
+            # wants every call answered, so the ids are answered in words
+            nonlocal last_ids
+            for cid, c in zip(last_ids, last_calls, strict=False):
+                content = (
+                    "Standing by: this ended your turn, and the next message is the sample "
+                    "that ended the stand-by."
+                    if c.name == "stand_by"
+                    else "Not run: a stand-by earlier in the reply ended your turn."
+                )
+                out.append({"role": "tool", "tool_call_id": cid, "content": content})
+            last_ids = []
+
         for i, t in enumerate(turns[start:], start):
             if t.role == OPERATOR:
+                answer_the_ids()
                 out.append({"role": "system", "content": str(t.content)})
             elif t.role == MODEL:
+                answer_the_ids()
                 r: Reply = t.content
+                last_calls = r.calls
                 last_ids = [f"call_{i}_{k}" for k in range(len(r.calls))]
                 msg: dict[str, Any] = {"role": "assistant", "content": r.text or ""}
                 if r.calls:
@@ -305,6 +449,7 @@ class LocalModel:
                         out.append({"role": "tool", "tool_call_id": cid, "content": content})
                     last_ids = []
                     continue
+                answer_the_ids()
                 words = conversation_text(d)
                 if words is not None:
                     out.append({"role": "user", "content": words})
@@ -319,13 +464,13 @@ class LocalModel:
             return messages
         cost = [len(json.dumps(m, ensure_ascii=False)) // CHARS_PER_TOKEN + 1 for m in messages]
         tools_cost = len(json.dumps(self.tools_schema())) // CHARS_PER_TOKEN
-        room = ctx - REPLY_RESERVE_TOKENS - tools_cost
+        room = ctx - self.max_reply - tools_cost
         head = messages[0] if messages[0]["role"] == "system" else None
         head_cost = cost[0] if head is not None else 0
         if head_cost > room:
             raise DoorError(
                 f"The brief is about {head_cost} tokens and the context is {ctx} tokens, of "
-                f"which {REPLY_RESERVE_TOKENS} are kept for the reply and {tools_cost} for the "
+                f"which {self.max_reply} are kept for the reply and {tools_cost} for the "
                 "tool definitions; start the server with a larger --ctx-size "
                 "(docs/agents/Harness.md)."
             )
@@ -343,14 +488,18 @@ class LocalModel:
         if first >= len(body):
             raise DoorError(
                 f"The brief and the latest sample do not fit a context of {ctx} tokens with "
-                f"{REPLY_RESERVE_TOKENS} kept for the reply; start the server with a larger "
+                f"{self.max_reply} kept for the reply; start the server with a larger "
                 "--ctx-size (docs/agents/Harness.md)."
             )
         self.dropped_turns = first
         return ([head] if head is not None else []) + body[first:]
 
     def request_body(self, turns: Sequence[Turn]) -> dict[str, Any]:
-        body: dict[str, Any] = {"messages": self.messages(turns), "stream": False}
+        body: dict[str, Any] = {
+            "messages": self.messages(turns),
+            "stream": False,
+            "max_tokens": self.max_reply,  # the reply budget: a runaway stops here
+        }
         if self.model:
             body["model"] = self.model
         tools = self.tools_schema()
@@ -396,34 +545,54 @@ class LocalModel:
             raw += ("\n" if raw else "") + json.dumps(served, ensure_ascii=False)
         return Reply(text=content.strip(), calls=tuple(calls), raw=raw)
 
+    def _failure(self, words: str, final: bool = False) -> None:
+        """A request failed: the sample stays open. `failed` is set, which stands the
+        station down, only after `FAILURES_TO_STAND_DOWN` in a row, or at once for a
+        failure no retry mends (`final`: the conversation does not fit the context)."""
+        self.failures += 1
+        self.last_error = words
+        if final or self.failures >= FAILURES_TO_STAND_DOWN:
+            n = self.failures
+            self.failed = words if final else f"{words} ({n} failed requests in a row)"
+
     def reply(self, turns: Sequence[Turn]) -> Reply | None:
-        """One request, one reply. A failure sets `failed` with the words and returns
-        None (the sample stays open), and every later call returns None at once, so the
-        World never waits on a dead server; the drivers stand the station down on it."""
+        """One request, one reply. A failure returns None (the sample stays open) with
+        the words in `last_error`, and the caller asks again; `failed` is set after
+        `FAILURES_TO_STAND_DOWN` failures in a row, and then every later call returns None
+        at once, so the World never waits on a dead server; the drivers stand the station
+        down on it."""
         if self.failed is not None:
             return None
         try:
             body = self.request_body(turns)
             r = self.client.post("/v1/chat/completions", json=body)
         except DoorError as e:
-            self.failed = str(e)
+            self._failure(str(e), final=True)
+            return None
+        except httpx.TimeoutException:
+            self._failure(
+                f"The model server did not answer within {self.timeout:g} s; the sample is "
+                "left open."
+            )
             return None
         except httpx.ConnectError as e:
-            self.failed = self._refused(e)
+            self._failure(self._refused(e))
             return None
         except httpx.HTTPError as e:
-            self.failed = f"The model server at {self.base} did not answer: {e}."
+            self._failure(f"The model server at {self.base} did not answer: {e}.")
             return None
         if r.status_code != 200:
-            self.failed = (
+            self._failure(
                 f"The model server at {self.base} answered {r.status_code}: {_error_words(r)}"
             )
             return None
         try:
             message = r.json()["choices"][0]["message"]
         except (ValueError, KeyError, IndexError, TypeError):
-            self.failed = f"The model server at {self.base} sent a reply the runner cannot read."
+            self._failure(f"The model server at {self.base} sent a reply the runner cannot read.")
             return None
+        self.failures = 0
+        self.last_error = None
         self.exchanges.append(message)
         reply = self.parse(message)
         if self.on_reply is not None:
@@ -452,6 +621,9 @@ def _error_words(r: httpx.Response) -> str:
 
 # The browser game's address as its driver prints it (`freesail.ui.server --port 8000`).
 DEFAULT_GAME = "http://localhost:8000"
+
+# This door in a consent record's runtime line (`remote.DOORS`), for the context guard.
+DOOR_WORDS = "the local runner (freesail.agents.local)"
 
 # How long one poll of the game waits for the model's next turn, in real seconds
 # (judgement: long enough that an idle runner asks the game a few times a minute, short
@@ -520,6 +692,12 @@ def main(
         type=int,
         help="the context to budget against (default: the server's)",
     )
+    ap.add_argument(
+        "--max-reply",
+        type=int,
+        default=REPLY_MAX_TOKENS,
+        help=f"the most tokens one reply may run to (default {REPLY_MAX_TOKENS})",
+    )
     ap.add_argument("--station", default="watcher", choices=["watcher"])
     ap.add_argument("--session", choices=("play", "test"), default="play")
     ap.add_argument("--ask-again", action="store_true", help="put the consent question again")
@@ -533,14 +711,17 @@ def main(
         ctx_size=args.ctx,
         transport=transport,
         on_reply=echo_reply(out),
+        max_reply=args.max_reply,
     )
     try:
         identity = model.identity()
         server = model.server_words()
+        print(f"The model server serves {identity}.", file=out, flush=True)
+        runtime = f"FreeSail's game at {args.game}, through {DOOR_WORDS}, {server}"
+        print(model.check_context(identity, runtime), file=out, flush=True)
     except DoorError as e:
         print(str(e), file=out, flush=True)
         return EXIT_UNREACHABLE
-    print(f"The model server serves {identity}.", file=out, flush=True)
     game = GameClient(args.game, args.station, transport=game_transport, http=game_http)
     try:
         first = game.station(
@@ -572,6 +753,7 @@ def run(
     (which releases it). The owner answers what the model writes in the consent
     conversation at this terminal, as with package 28's runner."""
     owner = consent.terminal_owner(inp, out)
+    after = consent.terminal_after(inp, out)
     turns: list[Turn] = []
     a = first
 
@@ -594,6 +776,13 @@ def run(
             if a.get("released"):
                 print(a.get("words") or "The station is released.", file=out, flush=True)
                 return EXIT_NO_CONSENT if a.get("phase") == "stopped" else EXIT_RELEASED
+            if a.get("waiting") == "owner" and a.get("after_answer"):
+                # the developer's turn after the answer: a word to the model, or blank to
+                # close the record
+                words = after(str(a.get("answer_words") or ""))
+                game.owner(words or "")
+                a = took(game.turns(wait=0))
+                continue
             if a.get("waiting") == "owner":
                 words = owner(str(a.get("model_words") or ""))
                 if not words or not words.strip():
@@ -606,6 +795,13 @@ def run(
                 offered = tuple(a.get("tools") or ())
                 model.offered_tools = offered or None
                 r = model.reply(turns)
+                if r is None and model.failed is None and model.last_error:
+                    # the sample stays open: read the game again (what happened meanwhile
+                    # is folded into the turn) and ask again (package 28c)
+                    n = f"{model.failures} of {FAILURES_TO_STAND_DOWN}"
+                    print(f"{model.last_error} ({n}; asking again)", file=out, flush=True)
+                    a = took(game.turns(wait=0))
+                    continue
                 if r is None:
                     why = model.failed or "the model server gave no reply"
                     print(why, file=out, flush=True)
