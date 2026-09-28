@@ -625,7 +625,7 @@ def test_a_timed_out_request_leaves_the_turn_open_and_the_runner_asks_again(tmp_
     assert "how she heads" in retry[-1]["content"]  # the question, folded into the turn
     said = [e for e in game.world.log if e.kind == "agent.said"]
     assert said[0].data["question"] == "how she heads"
-    assert L.REPLY_MAX_TOKENS == 4096 and L.REQUEST_TIMEOUT_S == 180
+    assert L.REPLY_MAX_TOKENS == 4096 and L.REQUEST_TIMEOUT_S == 600  # playtest 6: ten minutes
     assert L.FAILURES_TO_STAND_DOWN == 3
 
 
