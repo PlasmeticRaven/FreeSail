@@ -22,19 +22,24 @@ plain yes.
 - The standing order "Trim Sails" (every bell) fired five times meanwhile; the ship
   sailed on.
 
-## The likely cause
+## The cause
 
-Ollama loads a model with a small default context window unless told otherwise; the
-brief is about 1,150 tokens and the tool definitions 900, so the window overflows within
-a few turns and Ollama drops the oldest text, which is the brief. Repetition and runaway
-generation follow. `Harness.md` mentioned raising Ollama's context; nothing enforced it.
-To confirm on the owner's machine: `ollama ps` (the loaded context size) and the server
-log (`%LOCALAPPDATA%\Ollama\server.log`, "truncating input prompt").
+Not the context window: the owner's Ollama runs every model with a 262,144-token
+context, and the server log shows the model loaded with it. The evidence points at
+unbounded generation: Ollama's default reply length is unlimited, the runner set no reply
+budget on its requests, and a model that has slipped into a repetition loop (the thirteen
+identical `stand_by` calls suggest it was entering one) generates the same fragment
+without end; with so large a window nothing stops it for hours. The server log's last
+request from the runner (`%LOCALAPPDATA%\Ollama\server.log`) should show it still open,
+or an output token count far beyond the earlier requests'. The loop before it was the
+harness's doing: after a tool call the harness returns the result and calls the model
+again until it replies without one, and a small model answers "standing by" by standing
+by again.
 
 ## Follow-ups (package 28c, item 9)
 
-A successful `stand_by` ends the turn at once on every door; the runner puts a reply
-budget and a per-request timeout on every call and retries at the next sample rather
-than standing down on one timeout; the runner refuses to station a model whose loaded
-context is smaller than the brief and tools need, and says how to raise it; `Harness.md`
-says all of it.
+In order of weight: the runner puts a reply budget and a per-request timeout on every
+call and retries at the next sample rather than standing down on one timeout; a
+successful `stand_by` ends the turn at once on every door; the runner refuses to station
+a model whose loaded context is smaller than the brief and tools need (a guard for
+default installs, not this one); `Harness.md` says all of it.
