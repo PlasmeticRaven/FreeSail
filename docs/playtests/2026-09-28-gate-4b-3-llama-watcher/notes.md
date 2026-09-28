@@ -2,8 +2,11 @@
 
 A short run (167 ticks of ship's time) to see whether an 8-billion-parameter model can
 hold the watcher's station on the third build. `save.json` is the game as the owner's
-`stand down the watcher` saved it. The owner's verdict: too small to handle the game
-comfortably; **no design change is to be made from this record** (owner, 2026-09-28).
+`stand down the watcher` saved it. The owner stopped the run early on seeing the brief
+parroted in the log, taking it for a model that could not cope; the transcript shows it
+was still working through the request between those lines, slowly and with errors. The
+owner's verdict, softened on that reading: too small to handle the station comfortably;
+**no design change is to be made from this record** (owner, 2026-09-28).
 
 ## What the build did
 
@@ -25,6 +28,14 @@ request, and the stand-down saved the game with its reason.
   evolutions, about 500 tokens each") before opening the catalogue and the ship's names
   at the very end; it treated the listing as the book.
 - **Could not hold a three-step intent** (read, journal, shelve) across a turn.
+
+## An observation for the viewer (not a change to this build)
+
+From the browser the owner could see only the model's words, which were nonsense, while
+its work (reading the contents, trying to journal, opening the catalogue) was invisible;
+the Stations row says "turn open" and no more. A captain should be able to see that the
+watcher is at the bookshelf or writing in its journal without reading the calls: the
+station's last act in the Stations row, or a routine log line when a book is opened.
 
 ## What it means
 
