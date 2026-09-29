@@ -178,11 +178,11 @@ def _named(
     ship: Ship, runner: Any, work: list[Instance], text: str, vocab: Vocabulary
 ) -> tuple[list[Instance], str]:
     """The work in hand or waiting that `text` names, and the words as read. Tried in
-    turn, the first reading that understands the words deciding: the work as the log
-    names it ('reefing the mainsail') or as the order gave it ('reef the mainsail');
-    an order, its gerund made a verb ('reefing the mainsail, one reef'); a kind of work
-    and its subject ('the reef in the mainsail'); a part ('the mainsail', every job on
-    it)."""
+    turn, the first reading that understands the words deciding: the work exactly as the
+    log names it ('reefing the mainsail'); an order, as it was given or with a gerund at
+    its head made its verb again ('reef the mainsail, one reef with the idlers',
+    'reefing the mainsail'); a kind of work and its subject ('the reef in the mainsail');
+    a part ('the mainsail', every job on it)."""
     norm = " ".join(normalise(text).replace(" , ", " ").split())
     exact = [i for i in work if norm == normalise(runner.doing(i))]
     if exact:
