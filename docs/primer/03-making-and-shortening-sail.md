@@ -381,6 +381,46 @@ fid the topmasts
 
 That is the frigate in 35 knots, the order given with `make all sail`: eighteen minutes of all hands' work at the weather's pace, and she lies with no canvas set while it is done, until the sail work belayed is taken up again. Given once the light sails are drawing, it clews them up first. Order `strike the topmasts` with the topgallant masts aloft and it is refused ("Send down the topgallant masts first: the fore topgallant mast, the main topgallant mast and the mizzen topgallant mast are still aloft."); with sail set on the topmasts, it names every sail and asks for them to be taken in first.
 
+## Clearing a wreck and shifting a spar
+
+A spar that carries away takes with it everything that stands on it or hangs from it: a studding-sail boom its studding sail, a topmast the topgallant mast and the yards above it and every sail on them. The wreck hangs to leeward and drags, and nothing in it can be set, taken in or braced; the log says what went ("Larboard fore topmast studdingsail boom carried away; the larboard fore topmast studdingsail hanging to leeward."). "No explicit rule can be given for sending down broken spars. The first thing to be attended to is their being steadied and prevented from falling on deck or tearing the sails" (Luce 1884, ch. XXXI Carrying Away Masts and Spars).
+
+**`cut away`** the wreck, naming any part of it: `cut away the larboard fore topmast stuns'l`, `clear away the wreck of the fore topmast`, `clear away the larboard fore topmast studdingsail boom`, or `clear the wreck` for every wreck aboard. Cutting away is the old word for clearing a ship of what is gone ("the mizen-mast must instantly be cut away", Falconer 1780, *Veering*). The hands steady the wreck with burtons and tripping-lines, cut the robands and earings of each sail in it and lower it on deck ("Cut adrift the clewlines from the clews, cut robands and head earings, and lower", Luce, 'Topgallant Yard Carried Away'), and send the remains of the spars down after it ("Send the wreck down ... Send the stump down next", 'Main Topmast Carried Away'). What can be saved is saved: a sail that is whole goes to the sail room, the rags of one blown out go over the side. A lower mast or the bowsprit carries away at the deck and its wreck lies in the water, so it is cut adrift with everything on it, as Luce's ship does when "a mast goes over the side, first, get clear of the wreck". The log names what was saved and what went over the side. A sail blown out of its bolt-ropes on spars that stand is cut away the same way, its rags over the side.
+
+`unbend` takes a sail out of a wreck where it hangs, to the sail room if it is whole, and `send down the <spar>` sends a spar's wreck down on deck: the same work as cutting it away, refused for a wreck that is over the side. A sound spar is not sent down by itself; the refusal names the order that sends it down with its fellows ("The fore topgallant mast stands sound; the topgallant masts go down together: 'send down the topgallant masts'.").
+
+Cleared, the spar is still gone. The ship remembers it until a spare is put in its place: a studding sail is not bent to a boom that carried away, nor its boom rigged out, and the refusal says why ("The larboard fore topmast studdingsail boom is carried away; shift it for a spare first."). **`shift the <spar>`** (or `... for a spare`) sends a spare of its class up from the booms, the spare spars stowed amidships ("the spare topmasts, yards, &c. stowed on the boat skids", Steel 1794), and rigs it as the old one was (Luce 1884, ch. XXXII Shifting Sails and Spars, 'To Shift a Topmast Studding-sail Boom', 'To Shift a Topsail Yard', 'To Shift a Topmast'); then the sail that belongs on it can be bent again. A spar that went with another waits for that one ("The fore topsail yard went with the fore topmast; shift the fore topmast first."). The frigate carries Luce's spares (1866, ch. XVII, 'Stowing Booms'): two topmasts, two stump topgallant masts, the fore and main topsail yards, four topmast studding-sail booms, a jib-boom and a flying jib-boom; the schooner a topmast, a topsail yard and two studding-sail booms. With none of the class aboard the shift is refused: "No spare studding-sail boom aboard; the dockyard must supply one." `the booms` (or `the spare spars`) at the prompt says what is left, as `the sail room` does for canvas.
+
+```orders frigate
+the booms
+the spare spars
+# rejected: cut away the fore topsail yard
+# rejected: clear the wreck
+# rejected: shift the fore topmast
+# rejected: send down the fore topgallant mast
+```
+
+With nothing carried away every one of these is refused in words: "The fore topsail yard stands sound; there is no wreck to cut away.", "There is no wreck aboard to clear: every spar stands and no sail hangs in rags.", "The fore topmast is sound; only a spar carried away is shifted for a spare." The schooner of the tenth playtest, in 19 knots with a boom gone:
+
+```
+! Morning watch (04:00)  Larboard fore topmast studdingsail boom carried away; the larboard fore topmast studdingsail hanging to leeward.
+  Morning watch (04:00)  Order: cut away the larboard fore topmast stuns'l.
+  Morning watch (04:00)  Clear away the wreck of the larboard fore topmast studdingsail boom! Hands aloft with burtons and tripping-lines.
+  Morning watch (04:01)  Steadied the wreck of the larboard fore topmast studdingsail boom with burtons and tripping-lines.
+  Morning watch (04:04)  Cut the robands and earings; lowered the larboard fore topmast studdingsail on deck for the sail room.
+  Morning watch (04:06)  Sent down on deck the remains of the larboard fore topmast studdingsail boom; the gear that went with it unrove and cleared.
+* Morning watch (04:06)  Cleared the wreck of the larboard fore topmast studdingsail boom: its remains sent down on deck; the larboard fore topmast studdingsail saved to the sail room; nothing went over the side. The booms hold 2 spare studding-sail booms.
+  Morning watch (04:06)  Order: shift the larboard fore topmast studdingsail boom for a spare.
+  Morning watch (04:07)  Got the spare studding-sail boom out of the booms and put its gear on it.
+  Morning watch (04:10)  Landed the new larboard fore topmast studdingsail boom in its irons and clamped it.
+  Morning watch (04:12)  Rove the larboard fore topmast studdingsail boom's gear and set up the rigging.
+* Morning watch (04:12)  Shifted the larboard fore topmast studdingsail boom for a spare, 1 spare studding-sail boom left on the booms; the larboard fore topmast studdingsail may be bent to it again.
+  Morning watch (04:12)  Order: bend the larboard fore topmast studdingsail.
+* Morning watch (04:19)  Bent the larboard fore topmast studdingsail (No. 6 canvas, new) and furled it; 7 spare sails left in the sail room.
+```
+
+Twenty minutes from the carry-away to a studding sail ready to set again. A boom is the lightest of it: the wreck of a topmast, with the yards and the sails above it, takes the better part of an hour to clear in a fresh breeze, and a new topmast six times a boom's work to send up, each at the pace the weather and the hands allow. The spars that went with it are shifted one by one, the topmast first.
+
 ## Loosing to dry and furling everything
 
 After rain the furled sails are loosed to hang in their gear and dry: "Loose sail! ... Let fall!", the topsails and courses hanging by their buntlines, the topgallant sails and royals down, the head sails spread on the booms (Luce 1884, ch. XX Port Drills, 'To Loose Sail to the Buntlines'). Every furled sail but the studding sails is loosed; it is refused when it blows more than 20 knots across the deck. `furl all` (Luce's call is *Furl sail!*) clews up what is drawing and furls or stows everything in the ship. Both are all hands' work, for every man has a station for loosing and for furling sail in his billet (Luce 1884, ch. XVIII, 'Station Billet'): order them by day, or the watch below loses its sleep.

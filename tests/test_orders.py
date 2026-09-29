@@ -1598,10 +1598,8 @@ def test_shift_of_a_spar_starts_shift_spar_and_the_runner_refuses_in_its_words()
     ship, runner = wrecked()
     orders.handle(ship, "shift the larboard fore topmast studdingsail boom for a spare")
     assert runner.started == [("shift_spar", BOOM, {"part": BOOM})]
-    ship, runner = make(
-        "schooner",
-        refuse={BOOM: "No spare studding-sail boom aboard; the dockyard must supply one."},
-    )
+    ship, runner = wrecked()
+    runner.refuse = {BOOM: "No spare studding-sail boom aboard; the dockyard must supply one."}
     with pytest.raises(OrderError) as refused:
         orders.handle(ship, "shift the larboard fore topmast studdingsail boom")
     assert str(refused.value) == "No spare studding-sail boom aboard; the dockyard must supply one."

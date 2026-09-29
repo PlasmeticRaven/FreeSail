@@ -2048,6 +2048,17 @@ def _shift_spar(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
         )
     res = resolve.resolve(ship, order.object or "", order.side_word, order.verb)
     spars = [ship.spars[pid] for pid in res.ids]
+    # what is plain from the part itself is refused before the runner is asked (as a
+    # sail's is, `_sail_check`); the runner's check says the rest (the wreck still
+    # hanging, the spar below it gone, no spare aboard)
+    sound = [s for s in spars if not s.wrecked]
+    if len(sound) == len(spars):
+        names = errors.join_names([resolve.display_name(ship, s.id) for s in sound], "and")
+        verb = "is" if len(sound) == 1 else "are"
+        raise OrderError(
+            f"The {names} {verb} sound; only a spar carried away is shifted for a spare."
+        )
+    spars = [s for s in spars if s.wrecked]
     runner = runner_of(ship)
     extra, call = _hands_params(
         ship,
