@@ -461,8 +461,12 @@ A dozen ships at **far detail**, a mix of the frigate, the schooner, the cutter 
 a **brig** (owner, 2026-09-29: `data/ships/brig.yaml`, two square-rigged masts with a gaff
 spanker from the frigate's classes of parts, sized between the cutter and the frigate so
 that the catalogue has a hierarchy of size to build on; the brig-sloop is the Navy's
-brig and the merchant brig the trade's, one file with two descriptions; the same rule as
-the cutter, no engine change and no truths until milestone 8): each a hull from the ship files, a nation, a captain with
+brig and the merchant brig the trade's, one file with two descriptions; a full complement of head
+sails, jib and flying jib and fore topmast staysail, and a main staysail and main topmast
+staysail between the masts, since a brig without her staysails is not a starting point;
+if the staysails prove troublesome that is a fault in the generator's rig rules to fix
+there, a bad sign for the vessel library and treated as such; the same rule as the cutter,
+no engine change and no truths until milestone 8): each a hull from the ship files, a nation, a captain with
 a goal (trade this route, patrol this station, run home) and a plan (waypoints and a
 speed from the wind by a polar drawn from her file), moved cheaply at the roll-up's cadence
 by the same wind and tide as the player. The **lookout** (§12) sights them by the horizon
