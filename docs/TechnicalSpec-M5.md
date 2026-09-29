@@ -86,6 +86,17 @@ the log a captain could keep.
 
 ## 4. Questions for the owner
 
+**Rulings of 2026-09-29.** 1: a real sea, and older coast and depth data where it can be
+had (dredging and shifting banks have changed the approaches), built so that the map can
+grow toward the whole Atlantic and, as a long-term dream, the world. 2: both, the
+schooner trading and the frigate cruising, from the same ports. 3: as recommended, but
+lunars are to be explored before they are ruled out. 4: to be explored before deciding.
+5: far detail with sightings for this milestone, to be revisited as it progresses. 6: the
+systems, with something more in depth explored first. 7: yes. 8: three gates. The
+explorations are the studies `docs/design/ChartData.md`, `Navigation1805.md`,
+`Tides1805.md` and `WeatherSystems.md`.
+
+
 1. **Where.** A real stretch of sea or an invented one? The gate's day already names
    Falmouth. The lead's recommendation is real: the Western Approaches and the western
    Channel, Falmouth to Ushant and Brest, about a hundred miles square, built from
