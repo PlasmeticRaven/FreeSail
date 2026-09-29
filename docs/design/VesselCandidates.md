@@ -42,7 +42,7 @@ second size; Speedy and Adder after her, for their scenarios. The hierarchy that
 Sherbourne about 80 tons, Alert and Speedy about 200, the schooner 224, Harpy about 340,
 the frigate 933.
 
-**The era.** The game's era is 1792 to 1825 (the owner, 2026-09-29), not 1805 alone; a vessel built early and serving in the middle of it, or one that well could have, is fair. The design proposal's §9 baseline reads "roughly 1793–1815, blended" and the consent brief "around 1793 to 1815"; both are narrower than the owner's statement and are noted for a ruling on the record.
+**The era.** The game's era is 1792 to 1825 (the owner, 2026-09-29), not 1805 alone; a vessel built early and serving in the middle of it, or one that well could have, is fair. The design proposal's §9 baseline reads "roughly 1793–1815, blended" and the consent brief "around 1793 to 1815"; both were narrower than the owner's statement and were amended the same day (decision 27): 1792 to 1825, a focus and not a wall, the early end admitting vessels built before that served in the window. The owner's first named exception beyond it is the brigantine *Dolphin* of 1836, for the vessel library when it comes; "never a hard rule on what we can do eventually".
 
 **The owner's choice (2026-09-29):** Sherbourne and Harpy as the initial two.
 

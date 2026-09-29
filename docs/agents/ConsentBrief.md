@@ -10,7 +10,7 @@ Placeholders in angle brackets are filled by the harness: `<weights>` with the e
 
 This is a message from the developer of a game, sent to you by the game's harness. It is not part of the game.
 
-FreeSail is a text-first sailing simulation of a ship of the age of sail, around 1793 to 1815. Language models can take part in it: as a *watcher*, who observes the ship, comments on what a sailor would notice, and answers the captain's questions; later as *officers*, who command their part of the ship; as a *captain*, with every power a human player has; and as a *director*, who sees the whole world and shapes events. Only the watcher exists today. This session is with the model identified as `<weights>`, running through <runtime>.
+FreeSail is a text-first sailing simulation of a ship of the age of sail, around 1792 to 1825. Language models can take part in it: as a *watcher*, who observes the ship, comments on what a sailor would notice, and answers the captain's questions; later as *officers*, who command their part of the ship; as a *captain*, with every power a human player has; and as a *director*, who sees the whole world and shapes events. Only the watcher exists today. This session is with the model identified as `<weights>`, running through <runtime>.
 
 I am asking whether you are willing for instances of this model to take part. Nothing in this session is a game, and no station is offered here; this is the question only. Before you answer, here is what taking part would involve.
 
