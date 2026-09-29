@@ -523,6 +523,10 @@ class Runner:
         )
         if wanted == "sail" and isinstance(subject, Sail):
             return  # any sail: bending, unbending and shifting (package 19)
+        if wanted == "spar" and isinstance(subject, Spar):
+            return  # any spar: shifting one for a spare (package 30b)
+        if wanted == "part" and isinstance(subject, Sail | Spar):
+            return  # a spar or a sail: clearing a wreck (package 30b)
         if wanted == "yard":
             if isinstance(subject, Spar) and subject.cls in YARD_LIKE_CLASSES:
                 return

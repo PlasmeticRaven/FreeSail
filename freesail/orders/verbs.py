@@ -36,6 +36,7 @@ from typing import Any
 
 from freesail import units
 from freesail.crew.model import number_words
+from freesail.evolutions import scripts
 from freesail.evolutions import trim as yard_trim
 from freesail.evolutions.runner import PartyTooSmall
 from freesail.orders import crew as crew_orders
@@ -99,6 +100,16 @@ def execute(
         return _boom_evolution(ship, order, vocab, skip, group)
     if order.verb in CATHARPIN_VERBS:
         return _catharpins(ship, order, vocab)
+    if spec.object == "query":
+        return _query(ship, order)
+    if spec.object == "wreck":
+        return _clear_wreck(ship, order, vocab)
+    if order.verb == "let go" and order.verb_phrase == "clear away" and _names_no_line(ship, order):
+        # "clear away the larboard studdingsail boom": a spar or a sail is cleared away as
+        # a wreck; a line is let go, as "clear away the bowlines" always was (package 30b)
+        return _clear_wreck(ship, order, vocab)
+    if order.verb == "shift" and _names_spars(ship, order):
+        return _shift_spar(ship, order, vocab)
     if spec.object == "sail":
         return _sail_evolution(ship, order, vocab, skip, group)
     if spec.object == "line":
@@ -355,8 +366,17 @@ def _sail_check(
     standing) and refuses with its own sentence.
     """
     name = resolve.the(ship, sail.id)
-    if sail.wrecked:
-        return f"{name} is wrecked"
+    if sail.wrecked and verb != "unbend":
+        # the refusal is the way out (package 30b): the wreck is cut away, or the sail cut
+        # out of it and unbent; the spar is shifted for a spare
+        root = scripts.wreck_root(ship, sail)
+        if root is None:
+            return f"{name} is wrecked"
+        spar = resolve.the(ship, root.id)
+        return (
+            f"{name} went with {spar} when it carried away; cut away the wreck, then shift "
+            f"{spar} for a spare"
+        )
     if sail.state is SailState.BLOWN_OUT and verb not in SAIL_SCRIPT_VERBS:
         return f"{name} is blown out and there is no sail to {verb}; shift it for a new one"
     if sail.state is SailState.UNBENT and verb not in SAIL_SCRIPT_VERBS:
@@ -1814,6 +1834,249 @@ def _boom_evolution(
     text = _summarise(ship, verb, res.name, started, texts, failed)
     data = {
         "verb": verb,
+        "level": 1,
+        "object": res.name,
+        "side": res.side,
+        "subjects": [s["subject"] for s in started],
+        "evolutions": started,
+        "failed": failed,
+        "failed_subjects": failed_ids,
+    }
+    return "evolution.started", text, data
+
+
+# ---------------------------------------------------------------------------
+# Wrecks and spare spars (package 30b): cut away, send down, shift a spar, the booms
+# ---------------------------------------------------------------------------
+
+CLEAR_WRECK = "clear_wreck"
+SHIFT_SPAR = "shift_spar"
+
+# A sound spar is sent down with its fellows, by the order that sends them all down.
+_SEND_DOWN_ORDERS = {
+    "topgallant_mast": "the topgallant masts go down together: 'send down the topgallant masts'",
+    "royal_mast": "the royal masts go down with the topgallant masts: 'send down the "
+    "topgallant masts'",
+    "topmast": "the topmasts are struck together: 'strike the topmasts'",
+    "studdingsail_boom": "a studding-sail boom is rigged in, not sent down: 'rig in the {name}'",
+}
+
+
+def _object_parts(ship: Ship, order: Order) -> list[Any]:
+    """The parts an order's object names, or none if it names nothing this ship has."""
+    if not order.object:
+        return []
+    try:
+        res = resolve.resolve(ship, order.object, order.side_word, order.verb)
+    except OrderError:
+        return []
+    return [ship.parts[pid] for pid in res.ids]
+
+
+def _names_no_line(ship: Ship, order: Order) -> bool:
+    """Whether the object is spars or sails, not lines: 'clear away' then clears a wreck."""
+    found = _object_parts(ship, order)
+    return bool(found) and not any(isinstance(p, Line) for p in found)
+
+
+def _names_spars(ship: Ship, order: Order) -> bool:
+    """Whether the object is spars alone: 'shift' then shifts a spar for a spare."""
+    found = _object_parts(ship, order)
+    return bool(found) and all(isinstance(p, Spar) for p in found)
+
+
+def _query(ship: Ship, order: Order) -> Result:
+    """'The booms' and 'the sail room': what the ship's stores hold, in the log and never
+    journaled (the World logs a `query.` kind as it is)."""
+    from freesail.ship.parts import booms, sail_room
+
+    if order.verb == "the booms":
+        return "query.booms", "\n".join(booms(ship).inventory_lines()), {}
+    return "query.sail_room", "\n".join(sail_room(ship).inventory_lines()), {}
+
+
+def _clear_wreck(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
+    """'Cut away the <part>', 'clear away the wreck of the <part>', 'clear the wreck', and
+    'send down the <spar>' of a spar carried away: one clear_wreck evolution for each wreck
+    the parts named are in (the whole wreck, whichever part of it is named), or for every
+    wreck aboard when nothing is named. A sound part is refused in words that say what is
+    done with it instead."""
+    _no_stray_modifiers(order, {"manner", "hands_from"})
+    send_down = order.verb == "send down"
+    said = order.verb_phrase
+    if not order.object:
+        if send_down:
+            raise OrderError(
+                "Send down what? Name the spar carried away ('send down the wreck of the fore "
+                "topgallant yard'), or send down sound spars together: 'send down the "
+                "topgallant masts', 'send down the topgallant yards'."
+            )
+        subjects = scripts.wrecks(ship)
+        if not subjects:
+            raise OrderError(
+                "There is no wreck aboard to clear: every spar stands and no sail hangs in rags."
+            )
+        name = "wrecks"
+    else:
+        res = resolve.resolve(ship, order.object, order.side_word, order.verb)
+        name = res.name
+        subjects = []
+        refused: list[str] = []
+        for pid in res.ids:
+            part = ship.parts[pid]
+            subject = _wreck_subject(ship, part, send_down)
+            if isinstance(subject, str):
+                refused.append(subject)
+            elif subject not in subjects:
+                subjects.append(subject)
+        if not subjects:
+            if len(refused) == 1:
+                raise OrderError(refused[0].rstrip(".") + ".")
+            raise OrderError(f"Nothing done: {errors.sentence_list(_lower(r) for r in refused)}.")
+    runner = runner_of(ship)
+    extra, call = _hands_params(
+        ship,
+        order,
+        [CLEAR_WRECK] * len(subjects),
+        "clearing the wreck" if len(subjects) > 1 else None,
+    )
+    started: list[dict[str, Any]] = []
+    texts: list[str] = []
+    failed: list[str] = []
+    failed_ids: list[str] = []
+    for subject in subjects:
+        p = dict(extra, part=subject.id)
+        if send_down:
+            p["send_down"] = True
+        try:
+            texts.append(runner.start(ship, CLEAR_WRECK, subject.id, p))
+        except OrderError as e:
+            failed.append(_refused(resolve.the(ship, subject.id), e))
+            failed_ids.append(subject.id)
+            continue
+        started.append({"evolution": CLEAR_WRECK, "subject": subject.id, "params": p})
+    _settle_call(ship, call, bool(started))
+    if not started:
+        if len(failed) == 1:
+            reason = failed[0].split(": ", 1)[-1]
+            raise OrderError(reason[0].upper() + reason[1:].rstrip(".") + ".")
+        raise OrderError(f"Nothing done: {errors.sentence_list(failed)}.")
+    text = _summarise(ship, "clear", name, started, texts, failed)
+    data = {
+        "verb": order.verb,
+        "said": said,
+        "level": 1,
+        "object": name,
+        "subjects": [s["subject"] for s in started],
+        "evolutions": started,
+        "failed": failed,
+        "failed_subjects": failed_ids,
+    }
+    return "evolution.started", text, data
+
+
+def _wreck_subject(ship: Ship, part: Any, send_down: bool) -> Any:
+    """The wreck a part named is in: the spar carried away (whichever part of its wreck
+    was named), a blown-out sail's rags, or the refusal in words (a string)."""
+    name = resolve.the(ship, part.id)
+    if isinstance(part, Line):
+        return (
+            f"{name[0].upper()}{name[1:]} is a line; a line is let go or cast off. Name the spar "
+            f"that carried away, or the sail"
+        )
+    root = scripts.wreck_root(ship, part)
+    if root is not None:
+        if root.sent_down:
+            spar = resolve.the(ship, root.id)
+            return f"The wreck of {spar} is cleared already; shift {spar} for a spare"
+        return root
+    if isinstance(part, Sail):
+        if part.state is SailState.BLOWN_OUT:
+            if send_down:
+                return f"{name[0].upper()}{name[1:]} is blown out; unbend it to send it down"
+            return part
+        if part.state is SailState.UNBENT:
+            return f"{name[0].upper()}{name[1:]} is unbent; there is nothing aloft to cut away"
+        if send_down:
+            short = name[4:]
+            return (
+                f"{name[0].upper()}{name[1:]} is not carried away; a sail is unbent and sent "
+                f"down with 'unbend the {short}'"
+            )
+        return (
+            f"{name[0].upper()}{name[1:]} is sound and {part.describe_state()}; there is no "
+            f"wreck to cut away"
+        )
+    if isinstance(part, Spar):
+        if part.sent_down:
+            return f"{name[0].upper()}{name[1:]} is sent down on deck already, and sound"
+        if send_down:
+            how = _SEND_DOWN_ORDERS.get(part.cls)
+            if (
+                part.is_yard
+                and part.parent
+                and ship.spars[part.parent].cls
+                in (
+                    "topgallant_mast",
+                    "royal_mast",
+                )
+            ):
+                how = "the light yards go down together: 'send down the topgallant yards'"
+            if how:
+                return f"{name[0].upper()}{name[1:]} stands sound; " + how.format(
+                    name=resolve.display_name(ship, part.id)
+                )
+            return (
+                f"{name[0].upper()}{name[1:]} stands sound; only a spar carried away is sent "
+                f"down by itself"
+            )
+        return f"{name[0].upper()}{name[1:]} stands sound; there is no wreck to cut away"
+    return f"{name[0].upper()}{name[1:]} is not a spar or a sail"
+
+
+def _shift_spar(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
+    """'Shift the <spar>' ('... for a spare'): a spar carried away, its wreck cleared,
+    replaced by a spare of its class from the booms (shift_spar.yaml). With none aboard,
+    or with the wreck still hanging, the runner's check refuses it in words."""
+    _no_stray_modifiers(order, {"manner", "hands_from"} | set(CANVAS_PARAMS))
+    if "canvas_no" in order.modifiers or "heavy" in order.modifiers:
+        raise OrderError("A spar has no canvas; say 'shift the <spar>', or '... for a spare'.")
+    if "for" in order.modifiers:
+        raise OrderError(
+            f"A spar is shifted for a spare of its class from the booms, not for the "
+            f"{order.modifiers['for']}; say 'shift the <spar> for a spare'."
+        )
+    res = resolve.resolve(ship, order.object or "", order.side_word, order.verb)
+    spars = [ship.spars[pid] for pid in res.ids]
+    runner = runner_of(ship)
+    extra, call = _hands_params(
+        ship,
+        order,
+        [SHIFT_SPAR] * len(spars),
+        _group_label("shift", res.name, None) if len(spars) > 1 else None,
+    )
+    started: list[dict[str, Any]] = []
+    texts: list[str] = []
+    failed: list[str] = []
+    failed_ids: list[str] = []
+    for spar in spars:
+        p = dict(extra, part=spar.id)
+        try:
+            texts.append(runner.start(ship, SHIFT_SPAR, spar.id, p))
+        except OrderError as e:
+            failed.append(_refused(resolve.the(ship, spar.id), e))
+            failed_ids.append(spar.id)
+            continue
+        started.append({"evolution": SHIFT_SPAR, "subject": spar.id, "params": p})
+    _settle_call(ship, call, bool(started))
+    if not started:
+        if len(failed) == 1:
+            reason = failed[0].split(": ", 1)[-1]
+            raise OrderError(reason[0].upper() + reason[1:].rstrip(".") + ".")
+        raise OrderError(f"Nothing done: {errors.sentence_list(failed)}.")
+    text = _summarise(ship, "shift", res.name, started, texts, failed)
+    data = {
+        "verb": order.verb,
         "level": 1,
         "object": res.name,
         "side": res.side,

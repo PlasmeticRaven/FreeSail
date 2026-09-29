@@ -1,0 +1,41 @@
+# Shift a spar carried away for a spare of its class from the booms (scripted,
+# ShiftSparScript in scripts.py; package 30b). The wreck must have been cleared
+# (clear_wreck.yaml) and the spar it stands on must stand; a spar that went with another
+# waits for that one. The spare comes from the ship's store of spare spars by class
+# (`parts.booms`, the ship file's `crew.stores.spare_spars`); with none of its class the
+# order is refused in words ("No spare studding-sail boom aboard; the dockyard must supply
+# one."). The spar stands whole again, the gear the wreck took is rove afresh where its
+# parts stand, and a sail that belongs on it is left in the sail room, to be bent by order.
+#
+# Luce's shifts (1884, ch. XXXII Shifting Sails and Spars) are these phases here:
+#   get_up  on deck: the spare got out of the booms and its gear put on it ("Suppose the
+#           new topmast to be stowed on the starboard side of the booms ... Launch it aft",
+#           'To Shift a Topmast'; "Shift the burton and yard purchase to the new yard",
+#           'To Shift a Topsail Yard')
+#   sway    aloft: swayed aloft and fidded, crossed, or landed in its irons ("Sway aloft!
+#           ... When the fid is entered, Launch!", 'To Shift a Topgallant Mast'; "land the
+#           boom in the starboard quarter-iron, clamping it", 'To Shift a Topmast
+#           Studding-sail Boom')
+#   rig     aloft: the gear rove and the rigging set up ("rig the end (tack and
+#           studding-sail halliard block)"; "stay the topmast and set up the rigging")
+# Each phase's time is the file's for a studding-sail boom, times the work in the spar
+# (scripts.SPAR_WORK: a topmast six times a boom's, judgement).
+id: shift_spar
+verb: shift
+applies_to: {class: spar}
+script: shift_spar
+params: {aloft: [sway, rig]}
+timing:
+  get_up_s: 60    # a boom got out of the booms and its tack and halliard blocks put on (judgement)
+  sway_s: 120     # swayed up by a whip on the lower lift and landed in its irons (judgement)
+  rig_s: 90       # the end rigged and the gear rove (judgement)
+on_start: {log: "Shift the {spar}! Get the spare out of the booms."}
+on_complete: {log: "Shifted the {spar} for a spare, {left}{after}.", kind: spar.shifted, severity: notable}
+on_fail: {log: "Could not shift the {spar}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the topmen of the mast and the forecastlemen or afterguard at the mast-rope, the
+# yard purchase and the burtons ("The forecastlemen and fore topmen prepare", Luce 1884,
+# ch. XXXII 'To Shift Jib-boom'; the station billet's "Shifting topsail yards", ch. XVIII).
+# hands: sized to one watch of the schooner at this rating (six ordinary, seven able on
+# deck at the least), which the frigate's watch fills with hands to spare (judgement).
+crew: {hands: 7, rating: able, stations: [topmen, forecastle, afterguard]}
+source: "Luce 1884, ch. XXXII Shifting Sails and Spars, 'To Shift a Topmast Studding-sail Boom', 'To Shift Jib-boom', 'To Shift a Topgallant Mast', 'To Shift a Topsail Yard', 'To Shift a Topmast'; ch. XXXI Carrying Away Masts and Spars, 'Main Topmast Carried Away' (\"proceed to send aloft a new topmast\"), 'Topsail Yard Carried Away or Sprung' (\"send up spare one\"); Luce 1866, ch. XVII Spare Spars"

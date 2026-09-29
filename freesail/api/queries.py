@@ -25,10 +25,12 @@ from freesail.crew import bill
 from freesail.crew.model import Crew, Station, Watch
 from freesail.physics.sails import SAIL_CLASSES
 from freesail.ship.graph import Ship
-from freesail.ship.parts import Line, Sail, SailState, Spar, sail_room
+from freesail.ship.parts import Line, Sail, SailState, Spar, booms, sail_room
 
 
 def _spar_state(s: Spar) -> str:
+    if s.wrecked and s.sent_down:
+        return "cleared"  # carried away, its wreck cleared: on deck or over the side (30b)
     if s.wrecked:
         return "wrecked"
     if s.sent_down:
@@ -369,3 +371,24 @@ def muster_lines(world: World) -> list[str]:
 def sail_room_lines(world: World) -> list[str]:
     """The `the sail room` query (spec 3b §6.3): every sail in it, by kind of canvas."""
     return sail_room(world.ship).inventory_lines()
+
+
+# The words of the `the booms` query (package 30b), as the console takes them; the ship
+# takes the same words through the vocabulary (`the booms`, object `query`).
+BOOMS_QUERIES = (
+    "the booms",
+    "booms",
+    "the spare spars",
+    "spare spars",
+    "show the booms",
+    "show the spare spars",
+)
+
+
+def booms_lines(world: World) -> list[str]:
+    """The `the booms` query (package 30b): the spare spars aboard, by class, in the form
+    of `the sail room`. A ship with no parts has none."""
+    ship = world.ship
+    if not hasattr(ship, "spars"):
+        return ["There are no booms in this ship."]
+    return booms(ship).inventory_lines()

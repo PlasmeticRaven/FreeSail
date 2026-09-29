@@ -10,7 +10,9 @@ The file shape (spec §8.4, with the additions the runner needs)::
 
     id: set_square                 # the evolution's id; the file name must match
     verb: set                      # the order verb it answers (for the vocabulary)
-    applies_to: {class: square}    # the subject's class: a sail class, "yard", or "ship"
+    applies_to: {class: square}    # the subject's class: a sail or spar class, "sail" (any
+                                   # sail), "yard", "spar" (any spar), "part" (a spar or a
+                                   # sail: clearing a wreck, package 30b), or "ship"
     params: {reefs: 1}             # optional; defaults for order parameters
     preconditions:                 # checked when the evolution starts
       - {check: sail.state != set, reason: "The {sail} is already set."}

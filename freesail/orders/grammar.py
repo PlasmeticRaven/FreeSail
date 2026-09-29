@@ -135,6 +135,15 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
             verb_phrase=verb_phrase,
             object=said or None,
         )
+    if spec.object == "query":
+        # a question of the ship's stores (package 30b): nothing more is said after it
+        extra = [w for w in [*rest, *(w for seg in segments[1:] for w in seg)] if w != ","]
+        if extra:
+            raise OrderError(
+                f"'{verb_phrase}' is a question and takes nothing after it; "
+                f"'{' '.join(extra)}' was not understood."
+            )
+        return Order(text=norm.replace(" , ", ", "), verb=verb, verb_phrase=verb_phrase)
     if spec.level == "driver":
         raise OrderError(
             f"'{verb_phrase}' is a console command, not an order to the ship; "
@@ -156,7 +165,7 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
 
     obj: str | None = None
     side_word: str | None = None
-    if spec.object in ("sail", "yards", "line"):
+    if spec.object in ("sail", "yards", "line", "wreck"):
         obj, side_word, rest = _match_object(ship, rest, vocab, verb, spec)
 
     tail = list(rest)
@@ -382,6 +391,8 @@ def _match_object(
         break
     if spec.object == "yards" and (not words or _looks_like_modifiers(words, vocab)):
         return None, None, words  # "brace sharp up": every yard
+    if spec.object == "wreck" and (not words or _looks_like_modifiers(words, vocab)):
+        return None, None, words  # "clear the wreck": every wreck aboard
     if not words:
         raise OrderError(f"{verb.capitalize()} what? {_examples(ship, spec.object)}")
     ws = _strip_side(words, vocab)[1]
