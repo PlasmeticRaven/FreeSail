@@ -1877,6 +1877,12 @@ LOST = ("sail.blown_out", "spar.carried_away", "line.parted")
 GATE_DAY_SUNSET_TICK = 57052
 GATE_DAY_HEAVY_WEATHER_TICK = 74336
 GATE_DAY_TOPGALLANTS_AGAIN_TICK = 95650
+# Package 29b (all hands a pool action; trim on a shift; the grouped lines): the three
+# ticks above did not move; "shorten sail for weather" fires three times, at 21:43:57,
+# 22:16:13 and 22:56:28 (twice in package 29's last measurement, at the first and the
+# third), and "trim on a shift" four times (20:42, 21:58, 22:57, 23:55) as the wind veers
+GATE_DAY_SHORTEN_SAIL_TICKS = [63837, 65773, 68188]
+GATE_DAY_TRIM_ON_A_SHIFT_TICKS = [60148, 64720, 68248, 71749]
 
 
 def the_gate_day(until: int = GATE_DAY_TICKS, saves: tuple[int, ...] = GATE_DAY_SAVES):
@@ -1946,26 +1952,35 @@ def test_truth_48_the_gates_day_under_the_standing_orders(gate_day):
     assert units.describe_wind_strength(wind) == "a fresh breeze"
 
     heavy = by_order(world, "heavy weather")
-    # all four orders carried out on the one tick: the masts down, the fore topmast staysail
-    # in, the storm staysail bent, the topsails close-reefed (the starter's "shorten sail for
-    # weather" had fired twice by then, two reefs in; with the topgallants in its line it
-    # fires twice in this day where the first measurement, with the topgallants a separate
-    # order of the captain's, had it fire three times and the close reef refused)
-    assert [t for t, _ in heavy] == [GATE_DAY_HEAVY_WEATHER_TICK] * 4
+    # its four orders on the one tick: the masts down, the fore topmast staysail in, the
+    # storm staysail bent, and the close reef refused in words because the topsails are
+    # close-reefed already. Package 29b: with all hands a pool action the reefs are done
+    # sooner and the starter's "shorten sail for weather" stands again sooner, so it fires
+    # three times in the first watch (21:43, 22:16, 22:56), three reefs in by 23:22, as the
+    # first measurement of package 29 had it; package 29 after the topgallants moved into
+    # its line had it fire twice and the close reef carried out (docs/dev/TuningNotes.md)
+    assert [t for t, _ in heavy] == [GATE_DAY_HEAVY_WEATHER_TICK] * 3
     assert [text.split(": ")[1] for _, text in heavy] == [
         "sending down the topgallant masts.",
         "taking in the fore topmast staysail.",
         "bending the fore storm staysail.",
-        "close reefing the topsails.",
     ]
+    refused = [x for x in refused_by_order(world, "heavy weather") if x[0] == heavy[0][0]]
+    assert len(refused) == 1 and "close reef the topsails" in refused[0][1]
+    assert "already close reefed" in refused[0][1]
+    shorten = sorted({t for t, _ in by_order(world, "shorten sail for weather")})
+    assert shorten == GATE_DAY_SHORTEN_SAIL_TICKS
+    assert all(world.ship.sails[s].reefs == 0 for s in world.ship.groups["topsails"])
     # (and at 03:22, the wind under forty for the dwell and over it again, the routine fires
     # once more and all four are refused in words: everything is done already)
-    assert [x for x in refused_by_order(world, "heavy weather") if x[0] == heavy[0][0]] == []
     fired = world.clock.start + timedelta(seconds=heavy[0][0])
     assert units.watch_of(fired)[1] == "Middle watch"
     implied = script_implies(sf, 40.0, datetime(1805, 6, 1, 20, 0)) + timedelta(minutes=5)
     assert abs((fired - implied).total_seconds()) <= 15 * 60, (fired, implied)
     assert not any(world.ship.spars[m].sent_down for m in world.ship.groups["topgallant masts"])
+
+    # the yards trimmed to the wind as it veered west to north-west (package 29b)
+    assert [t for t, _ in by_order(world, "trim on a shift")] == GATE_DAY_TRIM_ON_A_SHIFT_TICKS
 
     again = by_order(world, "topgallants again")
     assert again and again[0][0] == GATE_DAY_TOPGALLANTS_AGAIN_TICK < SECOND_FORENOON
