@@ -60,6 +60,11 @@
   var WATER_SAIL_FOOT_M = 0.5; // a save-all or water sail comes down to this height off the water (the ship files)
   var UNDER_BOOM_HEAD = 0.6; // and its head spreads along this much of its boom's outer end (the ship files)
   var CURVE_SAMPLES = 6; // points per curved edge when a sail is cut in two at a mast
+  // A stay with no run to another spar (the frigate's storm mizzen's, "hooked under the after
+  // trestle-tree, and set up on deck", Luce 1884 ch. X; "a horse, abaft and parallel to the
+  // mizen-mast", Steel 1794): it hangs parallel to its mast, this far abaft it (judgement:
+  // the after end of the trestle-trees), and the sail on it is placed from the ship file.
+  var STAY_ABAFT_M = 0.6;
 
   // -- vectors ----------------------------------------------------------------
 
@@ -448,12 +453,30 @@
       }
       return k;
     }
+    /** Whether a stay has no run forward to another spar: the sails hanked to it lie abaft
+     *  the mast it is of (the storm mizzen's vertical stay under the mizzen trestle-trees),
+     *  where every stay that runs forward carries its sails forward of its mast. */
+    function hangsAbaft(ln, sp) {
+      var on = (sailsBySpar[ln.id] || []).filter(function (s) {
+        return s.class === "jibheaded";
+      });
+      return on.length > 0 && on.every(function (s) {
+        return (s.x_m || 0) < (sp.x || 0);
+      });
+    }
+
     graph.lines.forEach(function (ln) {
       if (ln.class !== "stay") return;
       var sp = spars[ln.of];
       if (!sp) return;
       var mast = lowerMastOf(sp);
       if (!mast || !MAST_CLASSES[mast.cls]) return; // bobstays and martingales: not sail stays
+      if (hangsAbaft(ln, sp)) {
+        // parallel to the mast, under the after end of its trestle-trees, down to the deck
+        var aft = v(-STAY_ABAFT_M, 0, 0);
+        stayFoot[ln.id] = { head: add(sp.head, aft), foot: add(sp.foot, aft), abaft: true };
+        return;
+      }
       var level = mastLevel(sp);
       var idx = lowerMasts.indexOf(mast);
       var land;
@@ -474,10 +497,11 @@
 
     /** A spar sent down (the topgallant masts in a gale), or stepped on one: it is on
      *  deck, and it and everything on it are drawn no more than a wrecked spar's
-     *  dependents are. */
+     *  dependents are. A wreck cleared away (package 30b: "cleared") is on deck or over
+     *  the side, and is not drawn either. */
     function sentDown(r) {
       for (var cur = r; cur; cur = cur.parent) {
-        if (cur.state === "sent_down") return true;
+        if (cur.state === "sent_down" || cur.state === "cleared") return true;
       }
       return false;
     }
@@ -720,7 +744,27 @@
         var stay = roles.stay ? stayFoot[roles.stay] : null;
         var Mm = roles.mast ? spars[roles.mast] : null;
         var head, tackJ, clewJ, along, normalJ, sparFor;
-        if (stay) {
+        if (stay && stay.abaft) {
+          // a jib-headed sail on a stay with no run (the storm mizzen), from its file: a
+          // right-angled triangle whose luff stands up the stay from its tack and whose foot
+          // runs aft towards the taffrail ("the foot is extended towards the taffarel by a
+          // sheet", Steel 1794, 'Storm mizen'). The file's centre is the triangle's centroid,
+          // so the foot is three times its distance abaft the stay's foot, the luff is twice
+          // the area over the foot, and the tack lies a third of the luff below the centre.
+          var Sa = stay.head, Fa = stay.foot;
+          var upA = sub(Sa, Fa);
+          var footLen = Math.max(3 * (Fa[0] + STAY_ABAFT_M - (spec.x_m || 0)), 1);
+          var luffA = (2 * spec.area_m2) / footLen;
+          var tackZ = Math.max((spec.centre_height_m || 0) - luffA / 3, Fa[2] + 0.3);
+          var headZ = Math.min(tackZ + luffA, Sa[2]);
+          var rise = Math.max(upA[2], 0.1);
+          tackJ = add(Fa, mul(upA, (tackZ - Fa[2]) / rise));
+          head = add(Fa, mul(upA, (headZ - Fa[2]) / rise));
+          along = sheetDirection(dyn.sheet_angle, tack);
+          clewJ = add(tackJ, mul(along, footLen));
+          normalJ = cross(along, norm(upA));
+          sparFor = { a: tackJ, b: lerp(tackJ, head, 0.35) };
+        } else if (stay) {
           var S = stay.head, F = stay.foot;
           var up = sub(S, F);
           var f = JIB_LUFF_FRACTION * reefFraction(spec, dyn);

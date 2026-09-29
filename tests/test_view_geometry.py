@@ -13,6 +13,8 @@ fields the projection reads always run.
   view axis, a class tie-break, and a staysail that crosses a mast cut in two there.
 - Bowlines drawn faintly from the leech forward when hauled; the ringtail boom at the
   spanker's boom end.
+- Package 30b: the storm mizzen, a jib-headed sail on a stay with no run to another spar,
+  placed from its file's geometry; a wreck cleared away not drawn.
 """
 
 from __future__ import annotations
@@ -344,3 +346,101 @@ def test_the_ringtail_boom_is_at_the_gaff_sails_boom_end(tmp_path, path, gaff_bo
     assert cos == pytest.approx(1.0)  # run out along the boom
     assert rb[1] > 0.0  # to leeward (the wind on the larboard quarter)
     assert got["corners"][3] == pytest.approx(gb)  # the ringtail's inner clew at the boom end
+
+
+# ---------------------------------------------------------------------------
+# The storm mizzen (package 30b): a jib-headed sail on a stay with no run
+# ---------------------------------------------------------------------------
+
+
+def storm_mizzen_state(state: SailState = SailState.SET) -> dict:
+    """The frigate with the storm mizzen bent in the spanker's place and the mizzen storm
+    staysail set beside it, the wind on the larboard bow."""
+    ship = make_ship(FRIGATE)
+    ship.sails["mizzen.spanker"].state = SailState.UNBENT
+    for sid in ("storm_mizzen", "mizzen.storm_staysail"):
+        ship.sails[sid].state = state
+        ship.sails[sid].sheet_angle = math.radians(20.0)
+    return ship_state(ship)
+
+
+STORM_MIZZEN_BODY = """
+    const sk = P.buildSkeleton(d.graph, d.snap);
+    const f = id => sk.figures.filter(x => x.kind === 'sail' && x.id === id);
+    const sm = f('storm_mizzen');
+    return {n: sm.length, corners: sm.length ? sm[0].corners : null,
+            path: sm.length ? sm[0].path : null,
+            staysail: f('mizzen.storm_staysail').map(x => x.corners),
+            stay: sk.stays['storm_mizzen.stay'], mizzen: sk.spars['mizzen.mast'],
+            deck: d.graph.hull.deck_height_m};
+"""
+
+
+@needs_node
+def test_the_storm_mizzen_is_drawn_from_its_file_on_its_vertical_stay(tmp_path):
+    """The owner's report, playtest 10's finding 2: the storm mizzen's stay is of the
+    mizzen mast and runs to no other spar (Luce 1884 ch. X: "hooked under the after
+    trestle-tree, and set up on deck"), and the viewer drew it as a forestay, the sail lying
+    on the mizzen storm staysail. It is placed from its file: the luff up the stay abaft the
+    mast from a tack four feet above the deck, the foot aft towards the taffrail, the
+    triangle's area and centre the file's."""
+    ship = make_ship(FRIGATE)
+    spec = next(s for s in ship.spec.sails if s.id == "storm_mizzen")
+    mast_x = next(s for s in ship.spec.spars if s.id == "mizzen.mast").x_m
+    got = run_js(tmp_path, storm_mizzen_state(), STORM_MIZZEN_BODY)
+    assert got["n"] == 1  # drawn, whole: it crosses no mast
+    tack, head, clew = got["corners"]
+    stay = got["stay"]
+    mizzen_head = got["mizzen"]["head"]
+    # the stay hangs abaft the mizzen, parallel to it, from its head to the deck
+    assert stay["abaft"] is True
+    assert stay["head"][2] == pytest.approx(mizzen_head[2])
+    assert stay["foot"][2] == pytest.approx(got["deck"])
+    assert mast_x - 1.0 < stay["foot"][0] < mast_x
+    # the luff lies along the stay; the tack four feet above the deck (the generator's)
+    assert tack[1] == 0.0 and head[1] == 0.0
+    assert tack[2] == pytest.approx(got["deck"] + 4 * 0.3048, abs=0.05)
+    assert head[2] < mizzen_head[2]
+    assert abs(head[0] - tack[0]) < 2.0  # nearly upright, as the raked mast is
+    # the foot runs aft, to leeward (the wind on the larboard bow: to starboard)
+    assert clew[0] < tack[0] - 4.0 and clew[1] > 0.0 and clew[2] == pytest.approx(tack[2])
+    # the file's area and centre
+    area = 0.5 * math.dist(tack, head) * math.dist(tack, clew)
+    assert area == pytest.approx(spec.area_m2, rel=0.05)
+    centre = [(tack[i] + head[i] + clew[i]) / 3 for i in range(3)]
+    # a little abaft the file's centre: the stay stands abaft the mast, and the mast rakes aft
+    assert spec.x_m - 1.2 < centre[0] < spec.x_m
+    assert centre[2] == pytest.approx(spec.centre_height_m, abs=0.1)
+    # and not on the mizzen storm staysail, which runs forward on the mizzen stay
+    (mss,) = got["staysail"]
+    assert all(c[0] > mast_x for c in mss)
+
+
+@needs_node
+def test_the_storm_mizzen_furled_is_drawn_as_a_bundle_at_its_luff(tmp_path):
+    got = run_js(tmp_path, storm_mizzen_state(SailState.FURLED), STORM_MIZZEN_BODY)
+    assert got["n"] == 1
+    xs = [p[-1][0] for p in got["path"]]
+    assert max(xs) - min(xs) < 2.0  # gathered along the stay, not spread aft
+
+
+@needs_node
+def test_a_wreck_cleared_away_is_not_drawn(tmp_path):
+    """Package 30b: the snapshot calls a spar carried away whose wreck has been cleared
+    `cleared` (on deck or over the side); the viewer draws it, and what stood on it, no
+    more than a spar sent down."""
+    ship = make_ship(SCHOONER)
+    boom = ship.spars["fore.topmast.studdingsail_boom.larboard"]
+    boom.wrecked = boom.sent_down = True
+    data = ship_state(ship)
+    for s in data["snap"]["spars"]:
+        if s["id"] == boom.id:
+            s["state"] = "cleared"
+    got = run_js(
+        tmp_path,
+        data,
+        "return P.buildSkeleton(d.graph, d.snap).figures.filter(x => x.kind === 'spar')"
+        ".map(x => x.id);",
+    )
+    assert boom.id not in got and "fore.topmast.studdingsail_boom.starboard" in got
+    assert queries._spar_state(boom) == "cleared"
