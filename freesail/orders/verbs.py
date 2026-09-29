@@ -753,6 +753,12 @@ def _trim(
             [vocab.evolutions["brace"]] * len([y for y in workable if y.id not in too_far]),
             _group_label("brace", object_name, group) if len(workable) > 1 else None,
         )
+        # the trim's braces log one line when the last is done (package 29b, playtest 7:
+        # twelve lines as each began and twelve as each ended); this order's own line
+        # says what was ordered
+        new_group = getattr(runner, "new_log_group", None)
+        if len(workable) > 1 and new_group is not None:
+            extra = {**extra, "log_group": new_group()}
         for yard in yards:
             name = resolve.the(ship, yard.id)
             if yard.wrecked or yard.sent_down:
@@ -853,7 +859,10 @@ def _trim(
     }
     if order.verb != "trim":
         data.update({"object": object_name, "mode": "to the wind", "tack": d.tack})
-    kind = "evolution.started" if started and not trimmed else "sail.trimmed"
+    # an order whose braces log as one line logs its own line too (the runner writes no
+    # "Man the braces" for them)
+    grouped = any(x["params"].get("log_group") for x in started)
+    kind = "evolution.started" if started and not trimmed and not grouped else "sail.trimmed"
     return kind, text, data
 
 

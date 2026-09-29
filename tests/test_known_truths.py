@@ -153,6 +153,12 @@ def events(world, kind: str, after: int = 0):
     return [e for e in world.log if e.kind == kind and e.tick > after]
 
 
+def warned(e) -> list[str]:
+    """The parts a strain warning names: one, or those a grouped line names (package 29b:
+    the parts that strain the same way on one tick are one line)."""
+    return list((e.data or {}).get("parts") or [e.subject])
+
+
 def reading(world) -> dict:
     d = world.ship.dyn
     return {
@@ -331,7 +337,9 @@ def test_truth_8_heel_in_a_breeze_and_in_a_gale(frigate_polar):
     world = under_plain_sail(FRIGATE, 270.0, knots_=30.0)
     assert abs(math.degrees(world.ship.dyn.heel)) >= 20.0
     all_set = max(e.tick for e in events(world, "sail.set"))
-    warnings = [e for e in events(world, "strain.warning") if "topgallant" in (e.subject or "")]
+    warnings = [
+        e for e in events(world, "strain.warning") if any("topgallant" in p for p in warned(e))
+    ]
     assert warnings, "no strain warning on the topgallant gear"
     assert warnings[0].tick - all_set <= 300
 
@@ -1291,7 +1299,7 @@ def test_truth_31_the_catharpins_brace_the_main_yard_four_degrees_sharper_and_ra
     rise = mast.strain_ratio / before_ratio
     assert 1.0 / 0.9 <= rise <= 1.5, f"strain ratio {before_ratio:.3f} to {mast.strain_ratio:.3f}"
     assert mast.strain_ratio < 0.5
-    assert not [e for e in world.log if e.kind == "strain.warning" and e.subject == mast.id]
+    assert not [e for e in world.log if e.kind == "strain.warning" and mast.id in warned(e)]
 
 
 def test_truth_31_with_the_catharpins_in_she_lies_a_little_closer(

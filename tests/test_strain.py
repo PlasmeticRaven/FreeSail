@@ -142,11 +142,50 @@ def test_strain_warning_once_per_part_per_ten_minutes():
     load(yard, 1.3)
     notes = tick(ship, 1500)  # twenty-five minutes
     warnings = [n for n in notes if n[1] == "strain.warning"]
-    assert [n[3] for n in warnings] == ["mast", "topsail.yard"] * 3  # t = 1 s, 601 s, 1201 s
+    # the two strain the same way on the same tick: one line for both (package 29b),
+    # at t = 1 s, 601 s and 1201 s, its data the worst part's with every part named
+    assert [n[3] for n in warnings] == ["mast"] * 3
     assert all(n[0] == "notable" for n in warnings)
-    assert warnings[0][2] == "Mast working under the press of sail."
-    assert warnings[0][4]["ratio"] == pytest.approx(1.2)
-    assert warnings[1][2] == "Topsail yard working under the press of sail."
+    assert warnings[0][2] == "The mast and the topsail yard working under the press of sail."
+    assert warnings[0][4]["parts"] == ["mast", "topsail.yard"]
+    assert warnings[0][4]["ratio"] == pytest.approx(1.3)
+    assert warnings[0][4]["ratios"]["mast"] == pytest.approx(1.2)
+
+
+def test_a_part_alone_is_warned_in_its_own_line():
+    ship = minimal_ship()
+    load(ship.spars["mast"], 1.2)
+    notes = tick(ship, 1)
+    (warning,) = [n for n in notes if n[1] == "strain.warning"]
+    assert warning[2] == "Mast working under the press of sail." and warning[3] == "mast"
+    assert warning[4]["ratio"] == pytest.approx(1.2) and "parts" not in warning[4]
+
+
+def test_the_royals_straining_alike_in_a_gust_are_one_line():
+    """Playtest 7, finding 6: a gust logged six identical lines, one for each royal mast
+    and yard. The parts that strain the same way on one tick are named in one line."""
+    from freesail.physics.strain import _group_names
+
+    world = sailing_world(FRIGATE, "plain sail", 20.0)
+    ids = [
+        "fore.royal_mast",
+        "fore.royal.yard",
+        "main.royal_mast",
+        "main.royal.yard",
+        "mizzen.royal_mast",
+        "mizzen.royal.yard",
+    ]
+    assert _group_names(world.ship, ids) == "the fore, main and mizzen royal masts and yards"
+    assert _group_names(world.ship, ids[:2]) == "the fore royal mast and yard"
+    for pid in ids:
+        world.ship.parts[pid].load_kn = 1.6 * world.ship.parts[pid].rating_kn
+    notes = tick(world.ship, 1)
+    lines = [n for n in notes if n[1] == "strain.warning" and n[3] in ids]
+    assert [n[2] for n in lines] == [
+        "The fore, main and mizzen royal masts and yards bending like whips; she will carry "
+        "them away if sail is not shortened."
+    ]
+    assert lines[0][4]["parts"] == ids
 
 
 def test_warning_wording_grows_dire_over_one_and_a_half():

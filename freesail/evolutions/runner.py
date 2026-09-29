@@ -230,6 +230,12 @@ class Runner:
         # The ship's clock, for the watch bill: the composer sets it to the World's clock.
         # None reads the bill at DEFAULT_WATCH_TIME.
         self.clock: Any | None = None
+        # The braces of one trim, logged as one line when the last is done (package 29b,
+        # playtest 7's finding 6: a trim logged twelve lines twice): the key an order's
+        # evolutions carry in `params["log_group"]`, and the yards done so far with their
+        # angles from square.
+        self._log_groups: dict[str, list[tuple[str, float]]] = {}
+        self._log_group_count = 0
         ship.extra["evolutions"] = self
 
     # -- the contract --------------------------------------------------------
@@ -304,6 +310,11 @@ class Runner:
             else:
                 self._tick_steps(ship, inst, dt)
         self._start_waiting(ship)
+
+    def new_log_group(self) -> str:
+        """A key for the evolutions of one order that log as one line (a trim's braces)."""
+        self._log_group_count += 1
+        return f"group#{self._log_group_count}"
 
     def in_progress(self) -> list[dict[str, Any]]:
         """What is going on, for the state snapshot."""
@@ -492,7 +503,8 @@ class Runner:
             inst.script.begin(self._format_context(inst))
             self._note(ship, inst, inst.evo.on_start)
             return True
-        self._note(ship, inst, inst.evo.on_start)
+        if not inst.params.get("log_group"):  # the order's own line said it for the group
+            self._note(ship, inst, inst.evo.on_start)
         self._enter_next_step(ship, inst)
         return True
 
@@ -617,13 +629,46 @@ class Runner:
 
     def _complete(self, ship: Ship, inst: Instance) -> None:
         self._remove(ship, inst)
-        self._note(ship, inst, inst.evo.on_complete)
+        key = inst.params.get("log_group")
+        if key and isinstance(inst.subject, Spar):
+            deg = abs(units.rad_to_deg(inst.subject.brace_angle))
+            self._log_groups.setdefault(key, []).append((inst.subject_id, deg))
+            self._group_done(ship, inst, key)
+        else:
+            self._note(ship, inst, inst.evo.on_complete)
         self._after_all_hands(ship, inst)
 
     def _fail(self, ship: Ship, inst: Instance, reason: str) -> None:
         self._remove(ship, inst)
         self._note(ship, inst, inst.evo.on_fail, reason=reason)
+        key = inst.params.get("log_group")
+        if key:
+            self._group_done(ship, inst, key)
         self._after_all_hands(ship, inst)
+
+    def _group_done(self, ship: Ship, inst: Instance, key: str) -> None:
+        """The last of a trim's braces is done: one line for all of them, "Braced twelve
+        yards to the wind; 26° to 31° from square.", in the evolution's own kind and
+        severity, its data naming every yard and its angle (package 29b)."""
+        if any(i.params.get("log_group") == key for i in self.instances):
+            return
+        done = self._log_groups.pop(key, [])
+        if not done:
+            return
+        degs = [round(d) for _, d in done]
+        lo, hi = min(degs), max(degs)
+        angle = f"{lo}° from square" if lo == hi else f"{lo}° to {hi}° from square"
+        if len(done) == 1:
+            text = f"Braced the {part_name(ship, done[0][0])}; {angle}."
+        else:
+            text = f"Braced {number_words(len(done))} yards to the wind; {angle}."
+        outcome = inst.evo.on_complete
+        data = {
+            "evolution": inst.evo.id,
+            "subjects": [sid for sid, _ in done],
+            "brace_deg": {sid: round(d, 1) for sid, d in done},
+        }
+        ship.note(outcome.severity, outcome.kind, text, None, data)
 
     def _remove(self, ship: Ship, inst: Instance) -> None:
         if inst in self.instances:
