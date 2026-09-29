@@ -33,6 +33,12 @@ The file shape (spec §8.4, with the additions the runner needs)::
     crew: {hands: 12, rating: ordinary}   # authored now, used by the M3 task system
     source: "Luce 1866, ch. XXIII At Sea, 'To set a Topsail'"
 
+An all-hands manoeuvre (``crew: {hands: all}``: tack, wear, box-haul, lie a-try) also
+says ``belays: true``: "Ready about!" stops the sail work in hand, which holds its
+progress and resumes after (spec M3 §3.4). All-hands sail work (a reef, a furl, sending
+down the topgallant masts) leaves it out and belays nothing: the owner's ruling of
+2026-09-29 at gate 4c.
+
 A scripted manoeuvre (tack, wear, heave to, fill away) has no ``steps``;
 instead it names a Python script and gives that script its timings::
 
@@ -106,6 +112,7 @@ class Evolution:
     script: str | None = None
     timing: dict[str, float] = field(default_factory=dict)
     path: str = "<memory>"
+    belays: bool = False  # an all-hands manoeuvre stops the sail work in hand (spec M3 §3.4)
 
     @property
     def nominal_duration_s(self) -> float:
@@ -221,6 +228,15 @@ def parse_evolution(data: Any, path: str = "<memory>") -> Evolution:
     timing = data.get("timing") or {}
     if not isinstance(timing, dict):
         raise EvolutionFileError(f"{where}: 'timing' must be a mapping.")
+    crew = dict(data.get("crew") or {})
+    belays = data.get("belays", False)
+    if not isinstance(belays, bool):
+        raise EvolutionFileError(f"{where}: belays must be true or false, not {belays!r}.")
+    if belays and str(crew.get("hands", "")).strip().lower() != "all":
+        raise EvolutionFileError(
+            f"{where}: only an all-hands evolution belays the work in hand; "
+            "its crew line must say hands: all."
+        )
     return Evolution(
         id=eid,
         verb=str(data.get("verb") or eid),
@@ -244,11 +260,12 @@ def parse_evolution(data: Any, path: str = "<memory>") -> Evolution:
             "evolution.failed",
             "notable",
         ),
-        crew=dict(data.get("crew") or {}),
+        crew=crew,
         source=source,
         script=str(script) if script is not None else None,
         timing={str(k): float(v) for k, v in timing.items()},
         path=path,
+        belays=belays,
     )
 
 

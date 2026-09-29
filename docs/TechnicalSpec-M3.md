@@ -160,7 +160,7 @@ When an instance begins (`Runner._begin`) it calls `hands.request(crew, inst, wa
 - **Short but workable** (wanted/2 ≤ got < wanted): begin with what there is; the numbers factor is `wanted / got` (twelve hands' work done by eight takes half again as long). Log once, routine: "Only eight hands to the fore topsail; the rest are at the main."
 - **Too few** (got < wanted/2): the instance waits with `waiting = True` and a new `waiting_for = "hands"`, exactly as it waits today for a held part, and is retried each tick by `_start_waiting`. Log once, notable: "Not hands enough on deck to set the fore topsail; the watch is at the main topsail and the jib." The captain's remedies are to wait, to call all hands, or to belay something.
 
-The runner never calls all hands by itself. An evolution whose file says `hands: all` **is** a call for all hands: it turns the watch below up (routine §5.2), takes everyone, and when it ends the watch below is piped down again unless the captain has called all hands separately.
+The runner never calls all hands by itself. An evolution whose file says `hands: all` **is** a call for all hands: it turns the watch below up (routine §4.2), takes everyone not at other work and the rest as their work ends (§3.4), and when it ends the watch below is piped down again unless the captain has called all hands separately or another all-hands evolution is waiting its turn.
 
 ### 3.3 The crew factor
 
@@ -177,11 +177,17 @@ crew_factor = numbers * skill * fatigue
 
 Whether a step is aloft or on deck is a per-step flag `aloft: true` in the evolution file (loosing, furling, reefing, sending spars up and down), default deck. Package 19 sets it while it rewrites the catalogue; package 17 reads it and defaults to deck when absent.
 
-### 3.4 Pre-emption by all hands
+### 3.4 All hands: a pool action, and the manoeuvres that belay
 
-When an all-hands evolution begins (tack, wear, reef topsails, shorten sail in a squall), the ship's whole attention goes to it. Running step-list evolutions **pause**: their progress holds, their hands are taken, and they resume, hands permitting, when the all-hands evolution ends. Their log says so once: "Belayed setting the studdingsails: all hands about ship." A paused instance is neither waiting nor running; `Instance.paused: bool` and `in_progress()` report it.
+*Rewritten by the owner's ruling of 2026-09-29 at gate 4c* (playtest 7, finding 2: the starter's "shorten sail for weather" lists the topgallants before the reef, but the reef's call for all hands belayed the take-in, and the topgallants stood from 21:43 to 22:12 through a gust of 43 knots). The first version of this section had every all-hands evolution pause the work in hand; that is now the rule for manoeuvres only.
 
-Two all-hands evolutions serialise as today, by holds.
+**A call for all hands is a pool action**, separate in type from work orders, like piping down. It turns the watch below up and changes who is on deck; it does not otherwise meet the work in hand. Orders start in the order given (a standing order's in its book order) and keep the hands they got. An all-hands evolution takes the idle hands and everyone who comes up, and as earlier work finishes its hands join it (the per-tick top-up, `Runner._top_up_all_hands`); hands coming free join the all-hands work already going before any new work may have them. Work that cannot get hands waits and starts as hands come free. So a reef called while the topgallant men are aloft **begins short** and speeds up as they come down: its numbers term (§3.3) is the hands on deck fit for the work over the hands at it, 1.0 when it has the whole deck (as it always has when it is the only work, so the compatibility rule holds), and the log says once, routine, "Only ninety-eight hands to the fore topsail; the rest are taking in the fore topgallant, the main topgallant and the mizzen topgallant." The reason is the owner's: "Ready about!" stops the sail work in hand, but a reef or a furl with all hands takes in the topgallants and reefs the topsails under the one call, the topgallant men aloft while the rest lower the yards. Luce's station billet gives every topman his own station for reefing topsails ("Reefing topsails: topsail buntlines, reef topsail, on deck to halliards", Luce 1884, ch. XVIII, 'Station Billet'), and the order of shortening sail as the wind freshens is the royals, the topgallants, then the reefs (the starter book's sources, `data/standing_orders/starter.orders`).
+
+**A manoeuvre still belays the sail work in hand.** "Ready about!" stops it: a file whose evolution is a manoeuvre says `belays: true` beside its `hands: all` (tack, wear, box-haul, wear short round, lie a-try), and when it begins, running step-list evolutions **pause**: their progress holds, their hands are taken, and they resume, hands permitting, when the all-hands work is done. Their log says so once, notable: "Belayed setting the fore royal: all hands about ship." (`evolution.belayed`). A paused instance is neither waiting nor running; `Instance.paused` and `in_progress()` report it; a paused hoist whose yard was sent down meanwhile is refused when it takes up again. Truth 19 is this rule.
+
+**Sending down the topgallant masts** (and swaying them up) is all-hands sail work, not a manoeuvre, and the rest of the sail work in hand runs on; but it holds the masts and not the sails on them, and belays the sail work in hand on those sails, which it clears away: a royal is not set on a mast being struck (`Script.clears`). That is what saves the royals in truth 23.
+
+Two all-hands evolutions serialise as before: the second waits for hands until the first is done, and the hands are not piped down between them (§4.2).
 
 ## 4. The watch routine (`crew/routine.py`, package 18)
 
@@ -193,7 +199,7 @@ At every watch change the clock already knows (`Clock.watch()` changes value), t
 
 `routine.call_all_hands(reason)`: everyone fit comes on deck after a delay of `ALL_HANDS_DELAY_S = 90` seconds (hammocks, ladders), during which the pool grows tick by tick (a third at once, the rest over the delay, deterministically by id). Log, notable: "All hands! (to shorten sail)". While all hands are up, `all_hands_called = True`; watch changes do not send anyone below.
 
-`routine.pipe_down()`: the watch below goes below; log, routine: "Piped down; the starboard watch has the deck." Called by the order, and by the runner when the last all-hands evolution ends if the captain did not call all hands himself (§3.2).
+`routine.pipe_down()`: the watch below goes below; log, routine: "Piped down; the starboard watch has the deck." Called by the order, and by the runner when the last all-hands evolution ends if the captain did not call all hands himself (§3.2). One waiting its turn counts (package 29b): "reef the topsails" is three reefs taken one after another, and piping down between them turned the watch below up three times, each time at the price of broken sleep (§4.3).
 
 ### 4.3 Fatigue and rest
 

@@ -30,7 +30,8 @@ params:
   mast: topgallant_mast
   poles: [royal_mast]
   with_masts: true
-  hold_sails: false   # all hands: the sail work in hand is belayed, not waited for
+  hold_sails: false   # the sail work in hand on these masts is belayed, not waited for;
+                      # the rest runs on (spec M3 §3.4, the ruling of 2026-09-29)
   clear_away: true
   what: topgallant masts
   aloft: [yards, mast]
@@ -44,7 +45,9 @@ on_fail: {log: "Could not send down the topgallant masts: {reason}.", kind: evol
 # hands: all. Sending down the topgallant masts at sea in a gale is the whole ship's
 # work (Luce's port drill is a colour evolution for all hands; ch. XXIX, 'Preparations
 # for a Gale'); called in a blow while the watch is making sail, it takes the hands off
-# the light sails at once (spec M3 §3.4), which is what saves the royals. A full working
+# the light sails on these masts at once, which is what saves the royals, and leaves the
+# rest of the sail work in hand to finish (spec M3 §3.4, the owner's ruling of 2026-09-29
+# at gate 4c: all hands is a pool action; a mast being struck is not). A full working
 # party would be about twenty-four, mostly able topmen and forecastlemen (judgement).
 crew: {hands: all, rating: able, stations: [all hands]}
 source: "Luce 1884, ch. XX Port Drills, 'To Send Down Topgallant and Royal Yards and Topgallant Masts', 'To Send Down Topgallant-Masts'; ch. XXIX In a Gale, 'Preparations for a Gale' (\"send down top-gallant masts in a heavy gale ... as it eases her considerably\"); Luce 1866, ch. XXIX 'Down Topgallant Masts'"

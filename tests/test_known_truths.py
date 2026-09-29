@@ -722,6 +722,70 @@ def test_truth_19_a_tack_belays_the_royals_being_set_and_they_resume_after():
     assert len(resumed) == len(belayed), "not every belayed royal was set after"
 
 
+def test_shorten_sail_takes_in_the_topgallants_while_the_reef_is_taken_and_the_reef_speeds_up():
+    """Package 29b, the owner's ruling of 2026-09-29 at gate 4c (playtest 7, finding 2):
+    a call for all hands is a pool action. "Shorten sail for weather" as the starter book
+    has it fires in 32 knots with the frigate under plain sail by day: the topgallants
+    start first, in the book's order, with hands of the watch; the reef calls all hands
+    and begins short, with the idle hands and the watch below as it comes up; the
+    topgallants come in while the reef is being taken, not after it, and their hands join
+    it, which speeds it to the whole deck's pace. Nothing is belayed, and the hands are
+    piped down once, when the last topsail is reefed."""
+    from freesail.crew import hands
+
+    line = (
+        'standing order "shorten sail for weather": when the true wind exceeds 30 knots for '
+        "2 minutes then take in the studdingsails; take in the royals; take in the "
+        "topgallants; reef the topsails, one reef"
+    )
+    world = from_rest(FRIGATE, heading_deg=180.0, knots_=18.0, start=datetime(1805, 6, 1, 10))
+    world.submit("set plain sail")
+    until_idle(world, 3600)
+    run(world, 300)
+    runner = world.ship.extra["evolutions"]
+    assert all(world.ship.sails[s].is_set for s in world.ship.groups["topgallants"])
+    world.submit(line)
+    start = world.clock.tick
+    blow(world, 32.0)
+    factors: list[tuple[int, int, int, float]] = []  # tick, hands at it, the deck's, factor
+    for _ in range(1800):
+        world.tick()
+        reef = next((i for i in runner.instances if i.evo.id == "reef_square"), None)
+        if reef is not None and reef.subject_id == "fore.topsail" and not reef.waiting:
+            a = reef.assignment
+            factors.append(
+                (world.clock.tick, a.got, a.wanted, hands.crew_factor(a, reef.want, True))
+            )
+        if not runner.instances and factors:
+            break
+    fired = by_order(world, "shorten sail for weather")
+    assert [text.split(": ")[1] for _, text in fired] == [
+        "taking in the topgallants.",
+        "reefing the topsails, one reef.",
+    ]
+    began = factors[0][0]
+    taken_in = [e.tick for e in events(world, "sail.taken_in", after=start)]
+    reefed = [e.tick for e in events(world, "sail.reefed", after=start)]
+    assert len(taken_in) == 3 and len(reefed) == 3
+    # the topgallants in while the fore topsail is being reefed, not after it
+    assert began <= min(taken_in) and max(taken_in) < min(reefed)
+    assert events(world, "evolution.belayed", after=start) == []
+    # the reef begins short (part of the deck at the topgallants) and speeds up as the
+    # watch below comes up and the topgallant men come down, to the whole deck's pace
+    _, got0, deck0, first = factors[0]
+    assert got0 < deck0 and first > 1.1
+    shorts = [e for e in events(world, "evolution.short_handed", after=start)]
+    assert any("fore topsail" in e.text and "topgallant" in e.text for e in shorts)
+    assert [f for _, _, _, f in factors] == sorted((f for _, _, _, f in factors), reverse=True)
+    joined = next(t for t, got, deck, _ in factors if got == deck)
+    assert max(taken_in) <= joined < min(reefed)
+    assert factors[-1][3] == pytest.approx(1.0, abs=0.02)
+    # one call and one pipe-down for the three topsails
+    assert len(events(world, "crew.all_hands", after=start)) == 1
+    piped = events(world, "crew.piped_down", after=start)
+    assert [e.tick for e in piped] == [max(reefed)]
+
+
 def morning_crew_factor(calls: bool) -> tuple[float, float]:
     """From half past midnight: all hands called at one, two and three and piped down after
     ten minutes each (or no calls); at the morning watch the fore topsail is set. Returns

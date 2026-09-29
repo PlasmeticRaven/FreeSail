@@ -754,7 +754,8 @@ def test_sending_down_the_topgallant_masts_at_once_loses_nothing_in_thirty_minut
     assert [e.text for e in w.log if e.kind in LOST] == []
     assert w.ship.spars["fore.royal.yard"].sent_down
     assert not w.ship.sails["fore.royal"].is_set
-    # all hands: the sail work in hand was belayed, and the royals refused after
+    # the sail work in hand on the topgallant masts was belayed (the rest ran on: spec M3
+    # §3.4 as the owner ruled at gate 4c), and the royals refused after
     belayed = [e for e in w.log if e.kind == "evolution.belayed"]
     assert any("fore topgallant" in e.text for e in belayed)
     assert any(
