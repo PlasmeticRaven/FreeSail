@@ -91,6 +91,8 @@ set the foresail with the larboard watch
 # rejected: send the main topmen to loose the fore topsail
 ```
 
+A party too small for the work is refused at once, with the numbers, since waiting would not make it larger: by day, `reef the mainsail, one reef with the idlers` in the schooner is answered *The idlers are four; reefing the mainsail wants ten. Call all hands, or name the watch.* The watch on deck short of hands because some are at other work is another matter: the work waits for them (chapter 3), and they come.
+
 ## Relieving the watch
 
 `relieve the watch` changes the watch early: the other watch takes the deck until the clock's next watch change gives it back to the bill. It is for when all hands have upset the turn, or a watch has been kept long at hard work.

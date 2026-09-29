@@ -872,6 +872,12 @@ def _grammar_topic() -> Topic:
             continue  # the standing dialect's sentences are below, with their grammar
         syn = f" (also: {', '.join(spec.synonyms)})" if spec.synonyms else ""
         order.append(f"  {name}{syn}")
+    order.append(
+        "Belaying work: 'belay' said of a line is the line verb; said bare it "
+        "is 'belay that', the last order whose work is in hand or waiting; said of work it "
+        "belays that work, named as the log names it ('belay reefing the mainsail'), as it "
+        "was ordered, by its kind ('belay the reef') or by its sail ('belay the mainsail')."
+    )
     dialect = standing_dialect_lines(vocab)
     station = [
         "The station sentences the captain uses: 'ask the watcher <question>', 'stand down "
