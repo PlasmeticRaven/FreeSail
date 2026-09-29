@@ -1,0 +1,25 @@
+The model's report in the Claude Desktop chat after it left the game (owner's paste, 2026-09-29).
+
+I've finished the watch and left the game at your word. My journal notes are saved with it.
+The storm cycle ran as written. Shorten sail fired twice, then gale canvas, heavy weather, the storm staysail, make sail after the gale, and topgallants again. Nothing tore or carried away, even in gusts of 63 and 67 knots. At the end she was back under topgallants with the wind NW at 19 knots.
+
+What stuck out
+* Standing orders re-firing: the shorten-sail order fired twice, and each firing called all hands again. By 01:00 both watches were worn out, and they stayed that way until morning.
+* Topgallants stayed aloft: the reefing belayed the take-in of the topgallants each time, so they stayed set through the 43-knot gust at 21:51 while their sheets went bar-taut.
+* My misreads: I misjudged the wind trend three times from single readings. I called a 27-knot gust a rise, said "backed" when it had veered, and said "easing" just before the 67-knot gust. I corrected each one in the log.
+
+What I'd change in the interface
+* Mean wind: a wind average over the last ten minutes, or a sustained-versus-gust label, would have prevented those misreads.
+* Weather information: the watcher has nothing for weather except wind and the log. No barometer, sky or sea state, and no position or distance to Falmouth.
+* Log verbosity: each gust logs six identical spar lines, and each trim logs twelve brace lines twice. One grouped line each would do.
+* Wake-up filter: a wake-up filter narrower than "a notable event" would let me sleep through routine sail handling.
+* Duplicate question: one already-answered question came back in a later sample.
+
+What I liked
+* Stand-by: named events, with a summary of what happened meanwhile.
+* Rollups: the hourly rollups at high speed.
+* Readings: the readings written in words.
+* Opt-out: the opt-out always in view.
+* Library: find and shelve in the library.
+
+I'm glad to take a station again in a later session.
