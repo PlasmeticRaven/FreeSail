@@ -296,7 +296,9 @@ def test_readings_tool_reads_the_registry_and_nothing_else():
         if row.is_absent or row.parametric is not None:
             assert row.id not in got
         else:
-            assert got[row.id] == R.describe_value(row, view.value(row.id)), row.id
+            # the registry's words: a reading's own for a value it withholds on purpose
+            # (the course with no way on; the glass on a ship without one, package 30)
+            assert got[row.id] == R.reading_words(row, view.value(row.id), world), row.id
     sail_row = R.REGISTRY.get("sail")
     assert got["sails"]["fore topsail"] == R.describe_value(
         sail_row, view.value("sail", "fore.topsail")
