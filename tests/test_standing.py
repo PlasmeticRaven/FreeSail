@@ -482,8 +482,8 @@ TABLE: list[tuple[str, str, ok | no]] = [
     ),
     (
         F,
-        'standing order "x": when the glass is falling then shorten sail',
-        no(["The ship has no glass yet; that reading comes with the world."]),
+        'standing order "x": when the well is over three feet then heave to',
+        no(["The ship has no well to sound yet; that reading comes with the world."]),
     ),
     (
         F,
@@ -498,7 +498,8 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (
         F,
         'standing order "x": when the barometer falls then shorten sail',
-        no(["'the barometer falls' is not a reading the ship has", "the true wind"]),
+        # the glass is a reading since package 30 (spec M5 §5); 'falls' is not its word
+        no(["'the barometer' cannot be 'falls'", "is falling"]),
     ),
     (
         F,

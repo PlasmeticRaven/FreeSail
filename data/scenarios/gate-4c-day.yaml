@@ -1,12 +1,21 @@
-# FreeSail: the gate's day (spec M4 §18, §19; package 29).
+# FreeSail: the gate's day (spec M4 §18, §19; package 29; re-expressed as a weather system
+# by package 30, spec M5 §2).
 #
 # A day's passage under standing orders through a changing wind: a fresh breeze from the
 # west at dawn, veering north-west and rising to a gale in the middle watch, easing at the
 # next dawn (spec §19). Given to either driver with --scenario:
 #     py -m freesail.ui.server --scenario data/scenarios/gate-4c-day.yaml --watcher fake
 #     py -m freesail.ui.console --scenario data/scenarios/gate-4c-day.yaml
-# The script, the ship's start and the latitude go into the game's Scenario, so a save
-# holds them and a replay follows the same wind (freesail/world/scenarios.py).
+# The script, the systems, the ship's start and the latitude go into the game's Scenario,
+# so a save holds them and a replay follows the same wind (freesail/world/scenarios.py).
+#
+# The weather is given in both forms (spec M5 §2). The pinned `wind` waypoints are the
+# form every truth is measured on (truths 48 to 51 and their ticks do not move); the
+# `systems` are the same day with a cause: a low passing well north of Falmouth with the
+# ship in its warm sector, the cold front through at 22:00, the north-westerly gale in the
+# cold air behind and the ridge by dawn. With both given the pinned wind wins and the
+# systems supply only the sky and the glass; drop the `wind` list and the systems' surface
+# wind at the ship is the base wind (the day the gate 5a sails, and truth 52's test).
 
 name: The gate's day
 # The seed the drivers use unless --seed is given: seed 7, as every gate since M3.
@@ -23,43 +32,109 @@ ship:
   # mainsail, spanker and jib at 45 knots; before the wind the apparent wind is the true
   # less her own ten knots (package 29's runs, docs/dev/TuningNotes.md, M4c).
   heading_deg: 135
+  # The captain's own glass (spec M5 §5; W §1.7: an officer's possession in 1805, not the
+  # Admiralty's), so `the glass` and `the tendency` are readings aboard her.
+  glass: true
 wind:
   # The M2 wind's gustiness and wander, as the console's default (spec §19: "with the
   # gustiness the wind model already has"); physics/wind.py.
   gustiness: 0.3
   variability: 0.3
 
-# The weather script (freesail/world/weather_script.py): the wind turns and freshens in a
-# straight line from each waypoint to the next. Strengths are Beaufort's as
-# units.describe_wind_strength names them: a fresh breeze 17 to 21 knots, a strong breeze
-# 22 to 27, a moderate gale 28 to 33, a fresh gale 34 to 40, a strong gale 41 to 47.
 weather:
-  # Dawn: a fresh breeze from the west, seventeen knots. Plain sail and the royals draw
-  # all day (the starter's "morning sail" sets the royals under twenty knots).
-  - {at: 1805-06-01T04:00, from_deg: 270, knots: 17}
-  # A fresh breeze still through the afternoon.
-  - {at: 1805-06-01T14:00, from_deg: 270, knots: 18}
-  # Nineteen knots at seven bells in the last dog watch, still under twenty, so the royals
-  # are aloft at sunset (19:49 by the sun at her easting) and the night routine takes them
-  # in (the starter's; truth 34).
-  - {at: 1805-06-01T19:30, from_deg: 270, knots: 19}
-  # After dark the wind veers two points to west-north-west and rises to a moderate gale:
-  # thirty knots (the starter's "shorten sail for weather", the topgallants in with it)
-  # about 22:10, in the first watch.
-  - {at: 1805-06-01T22:00, from_deg: 292.5, knots: 29}
-  # Two points more to north-west and a fresh gale by midnight: the captain's "gale
-  # canvas" at thirty-six knots as the first watch ends.
-  - {at: 1805-06-02T00:00, from_deg: 315, knots: 36}
-  # A strong gale in the middle watch: forty knots (the starter's "heavy weather") at
-  # 00:27, so the heavy-weather routine fires in the middle watch, five minutes on.
-  - {at: 1805-06-02T01:00, from_deg: 315, knots: 45}
-  # The height of it: 45 knots, truth 28's storm and truth 37's gale.
-  - {at: 1805-06-02T03:00, from_deg: 315, knots: 45}
-  # Easing at the next dawn (civil dawn about 03:00, sunrise 03:40): a strong breeze by five.
-  - {at: 1805-06-02T05:00, from_deg: 315, knots: 26}
-  # A fresh breeze again by seven: the captain's "make sail after the gale" and
-  # "topgallants again" bring her back to plain sail in the morning watch.
-  - {at: 1805-06-02T07:00, from_deg: 315, knots: 18}
+  # The pinned wind (freesail/world/weather_script.py): the wind turns and freshens in a
+  # straight line from each waypoint to the next. Strengths are Beaufort's as
+  # units.describe_wind_strength names them: a fresh breeze 17 to 21 knots, a strong breeze
+  # 22 to 27, a moderate gale 28 to 33, a fresh gale 34 to 40, a strong gale 41 to 47.
+  wind:
+    # Dawn: a fresh breeze from the west, seventeen knots. Plain sail and the royals draw
+    # all day (the starter's "morning sail" sets the royals under twenty knots).
+    - {at: 1805-06-01T04:00, from_deg: 270, knots: 17}
+    # A fresh breeze still through the afternoon.
+    - {at: 1805-06-01T14:00, from_deg: 270, knots: 18}
+    # Nineteen knots at seven bells in the last dog watch, still under twenty, so the royals
+    # are aloft at sunset (19:49 by the sun at her easting) and the night routine takes them
+    # in (the starter's; truth 34).
+    - {at: 1805-06-01T19:30, from_deg: 270, knots: 19}
+    # After dark the wind veers two points to west-north-west and rises to a moderate gale:
+    # thirty knots (the starter's "shorten sail for weather", the topgallants in with it)
+    # about 22:10, in the first watch.
+    - {at: 1805-06-01T22:00, from_deg: 292.5, knots: 29}
+    # Two points more to north-west and a fresh gale by midnight: the captain's "gale
+    # canvas" at thirty-six knots as the first watch ends.
+    - {at: 1805-06-02T00:00, from_deg: 315, knots: 36}
+    # A strong gale in the middle watch: forty knots (the starter's "heavy weather") at
+    # 00:27, so the heavy-weather routine fires in the middle watch, five minutes on.
+    - {at: 1805-06-02T01:00, from_deg: 315, knots: 45}
+    # The height of it: 45 knots, truth 28's storm and truth 37's gale.
+    - {at: 1805-06-02T03:00, from_deg: 315, knots: 45}
+    # Easing at the next dawn (civil dawn about 03:00, sunrise 03:40): a strong breeze by five.
+    - {at: 1805-06-02T05:00, from_deg: 315, knots: 26}
+    # A fresh breeze again by seven: the captain's "make sail after the gale" and
+    # "topgallants again" bring her back to plain sail in the morning watch.
+    - {at: 1805-06-02T07:00, from_deg: 315, knots: 18}
+
+  # The same day as a system (freesail/world/weather.py; the study's §5: "a low passing well
+  # north of Falmouth with the ship already in its warm sector, the cold front through at
+  # 22:00, the north-westerly gale in the cold air behind and the ridge building by
+  # morning"). Positions are kilometres east and north of the ship's start off Falmouth.
+  # Fitted by package 30 against the pinned wind (docs/dev/TuningNotes.md, M5a): the
+  # systems give W by N at 17 to 19 knots through the day, the cold front's squalls at
+  # 22:00 with the wind veering to NNW and NW, 45 to 48 knots from midnight to three,
+  # easing to 18 by seven; the glass 29.98 at dawn, falling slowly all day to 29.50 at one
+  # in the morning and rising two tenths by dawn, fastest in the gale.
+  background:
+    # The mean flow the box sits on, from the Azores high to the Icelandic low: half a
+    # hectopascal in a hundred kilometres toward the south, a westerly of five knots.
+    {hpa: 1015, gradient_hpa_per_100km: 0.5, high_toward_deg: 190}
+  systems:
+    - name: the low
+      kind: low
+      radius_km: 420
+      # The fronts' bearings from the centre at the track's first waypoint (noon the day
+      # before; they turn cyclonically from there). The warm front passes the ship about
+      # eight in the evening of 31 May and lies 210 km to the east and south of her by
+      # four, turning away; the cold front, trailing to the north-west of the centre,
+      # turns through the ship's bearing at 22:00 on 1 June. Truth 52 sails the day from
+      # the previous noon to see the warm front come: the wind backing and the glass
+      # falling ahead of it, the veer at it, the steady warm sector, the cold front's
+      # squall and the rise behind.
+      fronts: {warm_deg: 207, cold_deg: 56}
+      track:
+        # Noon the day before: a shallow low far to the north-west, approaching.
+        - {at: 1805-05-31T12:00, x_km: 20, y_km: 920, hpa: 1004}
+        # Over the Irish Sea at dawn, 800 km to the north, shallow, moving slowly east.
+        - {at: 1805-06-01T04:00, x_km: 150, y_km: 800, hpa: 998}
+        - {at: 1805-06-01T14:00, x_km: 200, y_km: 780, hpa: 996}
+        # Deepening and coming south-east across northern England in the evening.
+        - {at: 1805-06-01T19:00, x_km: 250, y_km: 700, hpa: 990}
+        # The cold front through Falmouth at 22:00, the low over the Midlands at 980.
+        - {at: 1805-06-01T22:00, x_km: 330, y_km: 540, hpa: 980}
+        # Deepest at one in the morning, 400 km to the north-east: the strong gale in the
+        # cold air behind the front, the glass at its lowest.
+        - {at: 1805-06-02T01:00, x_km: 400, y_km: 400, hpa: 968}
+        - {at: 1805-06-02T03:00, x_km: 520, y_km: 370, hpa: 968}
+        # Filling and running away east over the North Sea by dawn.
+        - {at: 1805-06-02T05:00, x_km: 720, y_km: 320, hpa: 978}
+        - {at: 1805-06-02T07:00, x_km: 950, y_km: 280, hpa: 988}
+    - name: the old ridge
+      kind: high
+      radius_km: 800
+      # The high of the days before, over Biscay at the previous noon and gone east over
+      # France by the morning of the day: the glass a tenth and a half above the mean
+      # under it, sliding down all afternoon and evening as it goes and the low comes.
+      track:
+        - {at: 1805-05-31T12:00, x_km: 400, y_km: -500, hpa: 1022}
+        - {at: 1805-06-01T04:00, x_km: 1100, y_km: -700, hpa: 1020}
+        - {at: 1805-06-01T12:00, x_km: 1500, y_km: -800, hpa: 1018}
+    - name: the ridge
+      kind: high
+      radius_km: 900
+      # The ridge from the Atlantic behind the low: the glass rising fast from midnight,
+      # the wind easing and the sky clearing by the second forenoon.
+      track:
+        - {at: 1805-06-02T00:00, x_km: -1400, y_km: -200, hpa: 1024}
+        - {at: 1805-06-02T09:00, x_km: -800, y_km: -200, hpa: 1026}
 
 # The standing orders read at the start, in order, each journaled as the captain's order:
 # the ship's standing book (the starter routines, gate 4a) and the captain's four for this

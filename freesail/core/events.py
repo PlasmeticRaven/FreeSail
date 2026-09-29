@@ -396,6 +396,25 @@ def _phrases(by_kind: dict[str, list[Event]]) -> list[str]:
         out.append(f"the {station} {what} {_times(len(events))}")
     if "ship.leeway" in by_kind:
         out.append(_lower_first(take("ship.leeway")[-1].text.rstrip(".")))
+    # the weather by the hour (spec M5 §5): the hour's line with the glass's fall or rise,
+    # then what changed in the hour (rain set in, the sky overcast)
+    if "weather.hour" in by_kind:
+        d = take("weather.hour")[-1].data or {}
+        words = f"{d.get('sky', '')}, {d.get('weather', '')}".strip(", ")
+        glass = d.get("glass_in")
+        if glass is not None:
+            change = d.get("change_in")
+            moved = ""
+            if change is not None:
+                n = round(abs(change) * 100)
+                if n:
+                    amount = "a hundredth" if n == 1 else f"{n} hundredths"
+                    moved = f", {'up' if change > 0 else 'down'} {amount}"
+            words += f"; the glass {glass:.2f}{moved}"
+        out.append(words)
+    for kind in ("weather.change", "weather.sky"):
+        for e in take(kind, []):
+            out.append(_lower_first(e.text.rstrip(".")))
     if "wind.gust" in by_kind:
         gusts = take("wind.gust")
         speeds = [(int(m.group(1)), e) for e in gusts if (m := _GUST.search(e.text))]

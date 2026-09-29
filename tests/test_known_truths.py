@@ -74,7 +74,10 @@ script in tests/test_weather_script.py.
 from __future__ import annotations
 
 import math
+import re
+import sys
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import pytest
 
@@ -2083,3 +2086,279 @@ def test_truth_51_the_frigate_under_the_starter_routines_ticks_at_the_build_mach
         best = max(best, 1000 / (time.perf_counter() - t0))
     assert best >= BUILD_MACHINE_FLOOR, f"{best:.0f} ticks a second"
     assert TICKS_PER_SECOND_HEADLESS / OWNER_TO_BUILD_RATIO > BUILD_MACHINE_MEASURED
+
+
+# ---------------------------------------------------------------------------
+# Milestone 5a: weather systems, the glass and the sky (package 30; spec M5 §6)
+# ---------------------------------------------------------------------------
+#
+# The gate's day re-expressed as a system (data/scenarios/gate-4c-day.yaml, its `systems`
+# beside its pinned `wind`): a low passing well north of Falmouth with the ship in its
+# warm sector, the cold front through at 22:00, the north-westerly gale in the cold air
+# behind and the ridge by dawn. Truths 52, 54 and 57 sail it from noon the day before
+# (the warm front's approach, which the pinned day opens after) to the second forenoon,
+# in a point ship with the day's gustiness and wander, seed 7. The fitted numbers are in
+# docs/dev/TuningNotes.md, M5a.
+
+GATE_SYSTEMS_EVE = datetime(1805, 5, 31, 12, 0)
+GATE_SYSTEMS_END = datetime(1805, 6, 2, 9, 0)
+# The strong-breeze days a month the seeding gives against Ushant's 31-knot-gust days (W
+# §1.2): the station is on a cliff and reads high for the open sea, so the band is stated
+# as a fraction of it (judgement: from a fifth to the whole; the first pass sits near a
+# half in winter and a quarter in summer, docs/dev/TuningNotes.md).
+GALE_DAYS_BAND = (0.2, 1.0)
+# No line a player reads names these (truth 57): whole words, since "centreline" is a
+# ship's word and "hPa" a unit the author's view alone may use.
+FORBIDDEN_WORDS = re.compile(r"\b(front|centre|isobar|hPa)\b", re.IGNORECASE)
+
+
+def the_gate_day_as_a_system(
+    start: datetime = GATE_SYSTEMS_EVE, gustiness: float = 0.3, variability: float = 0.3
+) -> Scenario:
+    """The gate's day's systems without its pinned wind, from `start`."""
+    from freesail.world.scenarios import load_scenario
+
+    sc = load_scenario(GATE_DAY).scenario
+    return Scenario(
+        name="the gate's day as a system",
+        start_time=start,
+        gustiness=gustiness,
+        variability=variability,
+        latitude_deg=sc.latitude_deg,
+        ship_heading_deg=sc.ship_heading_deg,
+        systems=sc.systems,
+        background=sc.background,
+        glass=True,
+    )
+
+
+def sail_the_system(world: World, until: datetime) -> list[dict]:
+    """Hourly samples of the systems' wind (the base the wander rides on), the glass, the
+    sector and the tendency, read from the world."""
+    samples = []
+    while world.clock.ship_time < until:
+        run(world, 3600)
+        tendency = world.readings["tendency"]
+        samples.append(
+            {
+                "at": world.clock.ship_time,
+                "from_deg": units.rad_to_deg(world.wind.base_direction),
+                "knots": units.ms_to_knots(world.wind.base_speed),
+                "glass": world.readings["glass"],
+                "sector": world.conditions.sector,
+                "air": world.conditions.air_mass,
+                "tendency": tendency["words"] if tendency else None,
+            }
+        )
+    return samples
+
+
+@pytest.fixture(scope="module")
+def gate_system_day():
+    world = World(seed=7, scenario=the_gate_day_as_a_system())
+    samples = sail_the_system(world, GATE_SYSTEMS_END)
+    return world, samples
+
+
+def _turn(a: float, b: float) -> float:
+    """Degrees from direction a to b, the short way, veer positive."""
+    return units.rad_to_deg(units.wrap_pi(units.deg_to_rad(b) - units.deg_to_rad(a)))
+
+
+def test_truth_52_a_low_passing_north_backs_veers_holds_squalls_and_rises_in_that_order(
+    gate_system_day,
+):
+    """Spec M5 §6, truth 52: "A low passing north of the ship backs the wind and drops the
+    glass ahead of it, veers the wind at the warm front, holds steady in the warm sector,
+    veers it sharply with a squall at the cold front, and rises the glass fast behind, in
+    that order, in one day of the gate's scenario re-expressed as a system." Read from the
+    world: the base wind is the systems' surface wind at the ship, the glass the ship's
+    own, the sector the model's (the tests may read the truth; the captain never does).
+    Measured at seed 7 (docs/dev/TuningNotes.md, M5a): the warm front through about 22:15
+    on 31 May, the cold front at 22:00 on 1 June, the squalls in the middle watch."""
+    world, samples = gate_system_day
+    by_time = {s["at"]: s for s in samples}
+    ahead = [s for s in samples if s["sector"] == "ahead"]
+    warm = [s for s in samples if s["sector"] == "warm"]
+    behind = [s for s in samples if s["sector"] == "behind"]
+    assert ahead and warm and behind
+    assert ahead[-1]["at"] < warm[0]["at"] < behind[0]["at"]
+    # ahead of the warm front: the wind backs and the glass falls
+    assert _turn(ahead[0]["from_deg"], ahead[-1]["from_deg"]) <= -8.0
+    assert ahead[-1]["glass"] <= ahead[0]["glass"] - 0.05
+    # at the warm front: a veer of about two points
+    assert _turn(ahead[-1]["from_deg"], warm[0]["from_deg"]) >= 12.0
+    # the warm sector: steady in direction, the glass not falling fast, through the day
+    day = [s for s in warm if datetime(1805, 6, 1, 0, 0) <= s["at"] <= datetime(1805, 6, 1, 18, 0)]
+    assert len(day) >= 18
+    mean_dir = statistics_mean_direction([s["from_deg"] for s in day])
+    assert all(abs(_turn(mean_dir, s["from_deg"])) <= 12.0 for s in day)
+    assert all(s["tendency"] in ("steady", "falling") for s in day)
+    assert all(15.0 <= s["knots"] <= 24.0 for s in day)
+    # the cold front, at 22:00: a sharp veer, and a squall in the unstable air behind
+    before, after = by_time[datetime(1805, 6, 1, 21, 0)], by_time[datetime(1805, 6, 2, 0, 0)]
+    assert before["sector"] == "warm" and after["sector"] == "behind"
+    assert _turn(before["from_deg"], after["from_deg"]) >= 30.0
+    squalls = [
+        e
+        for e in events(world, "weather.squall")
+        if datetime(1805, 6, 1, 21, 30) <= e.ship_time <= datetime(1805, 6, 2, 4, 0)
+    ]
+    assert squalls and all(e.text.startswith("A squall") for e in squalls)
+    assert all(e.data["air_mass"] == "unstable" and e.severity is Severity.NOTABLE for e in squalls)
+    assert all(events(world, "weather.squall_over")), "each squall ends in the log"
+    # behind: the glass rises fast in the gale
+    one, four = by_time[datetime(1805, 6, 2, 1, 0)], by_time[datetime(1805, 6, 2, 4, 0)]
+    assert four["glass"] - one["glass"] >= 0.10 and four["tendency"] == "rising fast"
+    assert max(s["knots"] for s in behind) >= 40.0
+    assert ahead[-1]["at"] < warm[0]["at"] < squalls[0].ship_time < four["at"]
+
+
+def statistics_mean_direction(degrees: list[float]) -> float:
+    x = sum(math.sin(math.radians(d)) for d in degrees)
+    y = sum(math.cos(math.radians(d)) for d in degrees)
+    return math.degrees(math.atan2(x, y)) % 360.0
+
+
+def test_truth_53_a_thousand_months_of_the_climatology_give_the_studys_direction_shares():
+    """Spec M5 §6, truth 53: "A thousand simulated months of the climatology give westerly
+    days within five points of the 1750 to 1854 shares in every month, and easterly days
+    between a tenth in summer and a quarter in late winter." By the tool's own numbers
+    (tools/climatology_check.py, `run` and `table`), which the report prints; and the
+    strong-breeze days within GALE_DAYS_BAND of Ushant's counts (W §1.2)."""
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+    from climatology_check import CLIMATOLOGY_TOLERANCE_PCT, run as run_months, table
+
+    from freesail.world.weather import load_climatology
+
+    clim = load_climatology()
+    totals = run_months(1000, 7, clim)
+    for line in table(totals, clim):
+        print(line)
+    for m in range(1, 13):
+        t, c = clim.month(m), totals[m]
+        assert c.months >= 83 and c.days == c.months * 30
+        assert abs(c.share("W") - t.check["westerly_pct"]) <= CLIMATOLOGY_TOLERANCE_PCT, t.name
+        assert abs(c.share("E") - t.check["easterly_pct"]) <= CLIMATOLOGY_TOLERANCE_PCT, t.name
+        assert c.none_share <= 15.0, t.name
+        gale_days = c.per_month(c.strong_breeze_days)
+        ushant = t.check["ushant_gust31_days"]
+        assert GALE_DAYS_BAND[0] * ushant <= gale_days <= GALE_DAYS_BAND[1] * ushant, (
+            t.name,
+            gale_days,
+        )
+    summer = [totals[m].share("E") for m in (6, 7, 8)]
+    late_winter = [totals[m].share("E") for m in (1, 2, 3)]
+    assert all(10.0 <= e for e in summer) and all(e <= 25.0 for e in late_winter)
+    assert min(late_winter) > min(summer)
+
+
+def test_truth_54_a_gust_is_within_1_3_of_its_mean_in_any_air_mass_and_a_squall_is_named():
+    """Spec M5 §6, truth 54: "Over the open sea a gust exceeds its ten-minute mean by no
+    more than 1.3 outside a squall in any air mass, and a squall is logged by name when
+    it does more." The day as a system with the gustiness turned up so that every air mass
+    has gusts: the gust line's factor is the peak over the ten-minute mean (spec M5 §3)."""
+    world = World(seed=7, scenario=the_gate_day_as_a_system(gustiness=1.0))
+    sail_the_system(world, GATE_SYSTEMS_END)
+    gusts = events(world, "wind.gust")
+    by_air = {}
+    for e in gusts:
+        by_air.setdefault(e.data["air_mass"], []).append(e.data["factor"])
+    assert set(by_air) == {"warm", "neutral", "unstable"}
+    for air, factors in by_air.items():
+        assert len(factors) > 10 and max(factors) <= 1.30, air
+    squalls = events(world, "weather.squall")
+    assert squalls
+    for e in squalls:
+        assert e.text.startswith("A squall") and e.data["factor"] >= 1.30
+        assert e.data["knots"] >= 1.29 * e.data["mean_kn"], e.text
+        assert e.data["air_mass"] == "unstable"
+    assert (
+        max(e.data["knots"] for e in squalls) > 1.3 * max(e.data["mean_kn"] for e in squalls) * 0.9
+    )
+
+
+def test_truth_55_the_weather_replays_tick_for_tick_and_the_pinned_wind_wins():
+    """Spec M5 §6, truth 55: "The same seed and scenario replay the weather tick for tick,
+    systems, fronts and squalls included, and a scenario with a pinned `wind` gives the
+    pinned wind whatever the systems do." A January day from the climatology in two worlds
+    and by save and replay; the gate's day with its systems made twenty hectopascals
+    deeper, the wind the same to the bit."""
+    from freesail.api.session import ship_factory
+    from freesail.core import replay as replay_mod
+    from freesail.world.scenarios import load_scenario
+
+    january = Scenario(
+        name="January from the climatology",
+        start_time=datetime(1805, 1, 10, 4, 0),
+        climatology=True,
+        glass=True,
+        gustiness=0.5,
+    )
+    a, b = World(seed=7, scenario=january), World(seed=7, scenario=january)
+    for _ in range(12):
+        run(a, 3600)
+        run(b, 3600)
+        assert [(s.name, s.x_km, s.y_km, s.anomaly_hpa) for s in a.systems.systems] == [
+            (s.name, s.x_km, s.y_km, s.anomaly_hpa) for s in b.systems.systems
+        ]
+        assert a.wind.state() == b.wind.state() and a.readings["glass"] == b.readings["glass"]
+    assert a.log.digest() == b.log.digest() and a.systems.draws == b.systems.draws > 0
+    copy = replay_mod.replay(a.save(), ship_factory)
+    assert copy.log.digest() == a.log.digest()
+    assert [s.fronts_at(copy.clock.ship_time) for s in copy.systems.systems] == [
+        s.fronts_at(a.clock.ship_time) for s in a.systems.systems
+    ]
+    other = World(seed=8, scenario=january)
+    run(other, 12 * 3600)
+    assert other.log.digest() != a.log.digest()
+    # the pinned wind wins
+    sf = load_scenario(GATE_DAY)
+    pinned = World(seed=7, scenario=sf.scenario)
+    deeper = Scenario.from_dict(sf.scenario.to_dict())
+    for system in deeper.systems:
+        for point in system["track"]:
+            point["hpa"] -= 20.0 if system["kind"] == "low" else 0.0
+    changed = World(seed=7, scenario=deeper)
+    for _ in range(4):
+        run(pinned, 900)
+        run(changed, 900)
+        d, s = pinned.weather.at(pinned.clock.ship_time)
+        assert pinned.wind.base_direction == pytest.approx(d, abs=1e-12)
+        assert pinned.wind.base_speed == pytest.approx(s, rel=1e-12)
+        assert pinned.wind.state() == changed.wind.state()
+    assert pinned.readings["glass"] != changed.readings["glass"], "the systems still give the glass"
+    assert pinned.wind.air_mass is None and changed.wind.air_mass is None
+
+
+def test_truth_57_no_line_or_reading_names_a_front_a_centre_an_isobar_or_a_hectopascal(
+    gate_system_day,
+):
+    """Spec M5 §6, truth 57: "No line in the log or any reading contains 'front', 'centre',
+    'isobar' or 'hPa'; the glass is in inches everywhere a player reads." A grep over the
+    day as a system (45 hours of log), over three hours of the gate's day with both forms
+    in the frigate, over every reading's words on both, and over the registry's own
+    sentences. Whole words: the helm's "centreline" is a ship's word."""
+    from freesail.agents.tools import readings_words
+    from freesail.api import queries
+    from freesail.api import readings as R
+    from freesail.world.scenarios import load_scenario, make_scenario_world
+
+    world, _ = gate_system_day
+    frigate = make_scenario_world(load_scenario(GATE_DAY))
+    run(frigate, 3 * 3600)
+    for w in (world, frigate):
+        assert len(w.log) > 100
+        for e in w.log:
+            assert not FORBIDDEN_WORDS.search(e.text), e.text
+        for id, words in readings_words(w).items():
+            assert not FORBIDDEN_WORDS.search(str(words)), (id, words)
+        assert w.readings.words("glass").endswith(" inches")
+        assert 28.0 < queries.snapshot(w)["weather"]["glass_in"] < 31.0
+        for ln in w.summary_lines():
+            assert not FORBIDDEN_WORDS.search(ln), ln
+    for row in R.REGISTRY:
+        for text in (row.absent or "", row.description, " ".join(row.words)):
+            assert not FORBIDDEN_WORDS.search(text), row.id
+    for text in (R.NO_GLASS_WORDS, R.GLASS_UNWATCHED_WORDS, R.NO_WEATHER_WORDS):
+        assert not FORBIDDEN_WORDS.search(text)

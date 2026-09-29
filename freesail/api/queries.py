@@ -28,6 +28,46 @@ from freesail.ship.graph import Ship
 from freesail.ship.parts import Line, Sail, SailState, Spar, sail_room
 
 
+def weather_block(world: World) -> dict[str, Any]:
+    """The instruments' weather: the glass in inches, its tendency's words, the sky with
+    its signs, the weather and the visibility, each None where not to be had, with the
+    words the registry gives for that (`readings.reading_words`)."""
+    r = world.readings
+    tendency = r["tendency"]
+    sky = r["sky"]
+    visibility = r["visibility"]
+    return {
+        "glass_in": r["glass"],
+        "tendency": tendency["words"] if tendency else None,
+        "tendency_words": r.words("tendency"),
+        "glass_words": r.words("glass"),
+        "sky": sky["words"] if sky else None,
+        "signs": sky["signs"] if sky else None,
+        "weather": r["weather"],
+        "visibility": visibility["words"] if visibility else None,
+        "visibility_miles": visibility["miles"] if visibility else None,
+        "sky_words": r.words("sky"),
+    }
+
+
+def weather_lines(world: World) -> list[str]:
+    """The console's `state` line for the weather, when the scenario keeps one: 'The
+    glass 29.72, falling; overcast, drizzle; a few miles.'"""
+    if getattr(world, "conditions", None) is None:
+        return []
+    r = world.readings
+    parts = []
+    if r["glass"] is not None:
+        tendency = r["tendency"]
+        words = f", {tendency['words']}" if tendency else ""
+        parts.append(f"The glass {r['glass']:.2f}{words}")
+    else:
+        parts.append("No glass aboard")
+    parts.append(r.words("sky") + ", " + r.words("weather"))
+    parts.append(r.words("visibility"))
+    return ["; ".join(parts) + "."]
+
+
 def _spar_state(s: Spar) -> str:
     if s.wrecked:
         return "wrecked"
@@ -61,7 +101,11 @@ def snapshot(world: World) -> dict[str, Any]:
             "true_speed": r["true_wind_speed"],
             "mean_speed": wind.speed,
             "gust_factor": wind.gust_factor,
+            "squall": bool(getattr(wind, "in_squall", False)),
         },
+        # the weather's readings (spec M5 §5), through the registry: None where the ship
+        # has no glass or the scenario keeps no sky
+        "weather": weather_block(world),
     }
     if not isinstance(ship, Ship):
         st = ship.state()

@@ -11,7 +11,7 @@
                | veers <n> points or backs <n> points | shifts <n> points
                | is from <point> | is <state> | is not <state> | are <fatigue word>
                | is the <watch> | is <n> bells | is east of <point> | is straining
-               | exceeds the rating
+               | exceeds the rating | is under <n> inches | is falling fast | is overcast
     duration  := <n> minutes | <n> seconds | a glass | a bell | half an hour | an hour | ...
     interval  := glass | bell | hour | watch | <n> minutes | half an hour | ...
 
@@ -354,6 +354,24 @@ _HOW = {
     "strain": ("the strain", "against the rating: 'exceeds the rating', 'is straining'"),
     "hands": ("the hands", "by their number or their fatigue: 'are worn out'"),
     "gust": ("the wind against its mean", "as a gust, at the mean or a lull: 'is a lull'"),
+    "glass": ("the glass", "in inches: 'is under 29.5 inches'"),
+    "tendency": (
+        "the glass",
+        "by its tendency: is steady, is rising, is falling, is falling fast, is rising fast",
+    ),
+    "sky": (
+        "the sky",
+        "by its look: is clear, is overcast, is dark and gloomy, is threatening, is hazy, is thick",
+    ),
+    "weather": (
+        "the weather",
+        "by its kind: is fine, is rain, is drizzle, is passing showers, is squally, is thunder, "
+        "is fog",
+    ),
+    "visibility": (
+        "the visibility",
+        "by how far a sail is seen: is the horizon, is a few miles, is a mile, is a cable",
+    ),
 }
 
 
@@ -363,6 +381,12 @@ def _how_compared(candidates: list[R.Reading]) -> tuple[str, str]:
         return "a wind", "in knots or points, or as a gust, at the mean or a lull"
     if set(kinds) == {"speed", "direction"}:
         return "a wind", "in knots or points"
+    if set(kinds) == {"glass", "tendency"}:
+        return (
+            "the glass",
+            "in inches ('is under 29.5 inches') or by its tendency (is steady, is rising, is "
+            "falling, is falling fast)",
+        )
     if set(kinds) == {"sail", "strain"}:
         return (
             "a sail",
@@ -427,7 +451,7 @@ def _match_reading(tokens: list[str], i: int, ship: Any, vocab: Vocabulary) -> _
     raise OrderError(
         f"'{said}' is not a reading the ship has{hint} A condition names the true wind, the "
         f"apparent wind, the heading, the speed, the heel, the watch, the strain, the hands "
-        f"on deck, or a sail by name."
+        f"on deck, the glass, the sky, the weather, or a sail by name."
     )
 
 
@@ -463,6 +487,7 @@ _LT = (
 _SPEED_UNITS = ("knots", "knot", "kn")
 _ANGLE_UNITS = ("degrees", "degree")
 _COUNT_UNITS = ("hands", "men", "hand", "man")
+_GLASS_UNITS = ("inches", "inch")
 
 
 def _starts(tokens: list[str], i: int, phrase: str) -> int:
@@ -724,6 +749,24 @@ def _parse_comparison(
                 value = _GUST_SAID[word]
                 said = f"{'not ' if op == 'is_not' else ''}{value}"
                 return row, Comparison(op, value, said), n + k
+        # the weather's words (spec M5 §5): the glass's tendency, the sky, the weather, the
+        # visibility; a number after 'is' falls through to the inches below
+        for kind, table in (
+            ("tendency", _TENDENCY_SAID),
+            ("sky", _SKY_SAID),
+            ("weather", _WEATHER_SAID),
+            ("visibility", _VISIBILITY_SAID),
+        ):
+            row = _pick(cands, (kind,))
+            if row is None:
+                continue
+            word, k = _longest(tokens, j, table)
+            if word:
+                value = table[word]
+                said = f"{'not ' if op == 'is_not' else ''}{value}"
+                return row, Comparison(op, value, said), n + k
+            if kind != "tendency":
+                raise refuse()
         # a heading is a point
         row = _pick(cands, ("compass",))
         if row is not None and op == "is":
@@ -779,13 +822,28 @@ def _parse_comparison(
                 Comparison(op, float(value), f"{phrase.split()[-1]} {value:g}"),
                 n + used + 1,
             )
+        if unit in _GLASS_UNITS:
+            row = _pick(cands, ("glass",))
+            if row is None:
+                raise OrderError(f"'{match.phrase}' is compared in {_unit_of(cands)}, not inches.")
+            return (
+                row,
+                Comparison(op, float(value), f"{phrase.split()[-1]} {value:g} inches"),
+                n + used + 1,
+            )
         if unit and unit not in _STOP:
             raise OrderError(f"'{match.phrase}' is compared in {_unit_of(cands)}, not {unit}.")
         # no unit said: the reading's own
-        row = _pick(cands, ("speed", "angle", "strain", "hands"))
+        row = _pick(cands, ("speed", "angle", "strain", "hands", "glass"))
         if row is None:
             raise refuse()
-        unit_words = {"speed": " knots", "angle": " degrees", "strain": "", "hands": ""}[row.kind]
+        unit_words = {
+            "speed": " knots",
+            "angle": " degrees",
+            "strain": "",
+            "hands": "",
+            "glass": " inches",
+        }[row.kind]
         return (
             row,
             Comparison(op, float(value), f"{phrase.split()[-1]} {value:g}{unit_words}"),
@@ -828,8 +886,31 @@ _GUST_SAID: dict[str, str] = {
 }
 
 
+# The weather's words as said, and the reading's value for each (spec M5 §5): the period's
+# words for the glass, Beaufort's for the sky and the weather, the lookout's for how far.
+_TENDENCY_SAID: dict[str, str] = {w: w for w in R.TENDENCY_WORDS}
+_SKY_SAID: dict[str, str] = {w: w for w in R.SKY_WORDS}
+_SKY_SAID.update({"cloudy": "overcast", "gloomy": "dark and gloomy", "misty": "hazy"})
+_WEATHER_SAID: dict[str, str] = {w: w for w in R.WEATHER_WORDS}
+_WEATHER_SAID.update(
+    {
+        "raining": "rain",
+        "drizzling": "drizzle",
+        "showers": "passing showers",
+        "showery": "passing showers",
+        "squalls": "squally",
+        "foggy": "fog",
+        "fair": "fine",
+    }
+)
+_VISIBILITY_SAID: dict[str, str] = {w: w for w in R.VISIBILITY_WORDS}
+_VISIBILITY_SAID.update({"the horizon": "the horizon", "a cable's length": "a cable"})
+
+
 def _unit_of(cands: list[R.Reading]) -> str:
     kinds = {c.kind for c in cands}
+    if kinds & {"glass"}:
+        return "inches"
     if kinds & {"speed"}:
         return "knots"
     if kinds & {"angle"}:
