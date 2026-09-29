@@ -77,7 +77,8 @@ floor is the model's, and its reply comes by `deliver`. **The World never waits 
 it** (unless the driver is told to, `--lockstep`): a sampling point reached while the
 floor is the model's does not open a second sample; it is **folded** into the open one
 (`_fold`): the new log lines are appended, the readings replaced by the latest, the
-reason noted, a question from the captain added, the harness's notices carried. The
+reason noted, a new question from the captain added (one the open turn carries already
+is not put again: playtest 7's redelivered question), the harness's notices carried. The
 merged sample is `open_sample`; the conversation gets each fold as a data turn of its
 own holding what is new (marked `folded`), so the turns since the model's last reply
 are everything since its last reply, whether its door had read the sample already or
@@ -735,13 +736,20 @@ class Harness:
         o.readings = delta.readings
         o.tick, o.stamp = delta.tick, delta.stamp
         o.reason = f"{o.reason}; then {reason}"
-        if delta.question is not None:
+        # a question the open turn carries already is not put again: the fold holds what is
+        # new, and the captain's question, still unanswered while the turn is open, is not
+        # (playtest 7, finding 8: a fold made while the model was writing its answer carried
+        # the question again, and the model, having answered, read it as asked once more)
+        new_question = delta.question is not None and delta.question != self._question_sent
+        if new_question:
             o.question = delta.question
             self._question_sent = delta.question
         if delta.word is not None:
             o.word = f"{o.word}\n{delta.word}" if o.word else delta.word
         o.notices.extend(delta.notices)
         content = delta.to_dict()
+        if not new_question:
+            content["question"] = None
         content["folded"] = FOLDED_WORDS
         self.turns.append(Turn(DATA, content))
 

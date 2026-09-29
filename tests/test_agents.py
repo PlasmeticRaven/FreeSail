@@ -1170,6 +1170,43 @@ def test_live_sampling_folds_what_happens_while_the_model_has_the_floor():
     assert h.agent.samples == 2
 
 
+def test_a_fold_does_not_put_again_the_question_the_open_turn_carries():
+    """Playtest 7, finding 8 (package 29b): the captain asked at 05:55, the turn opened with
+    the question, and a notable line two ticks later was folded into the open turn while
+    the model wrote its answer; the fold carried the question again, the door showed it
+    with the answer's result, and the model read an answered question as asked once more.
+    A fold holds what is new: the question stays in the merged sample, and it goes into
+    the conversation once, in the turn that put it."""
+    world = frigate_world()
+    h = late(world)
+    h.deliver(Reply())  # the start's turn handed back: the floor is the game's
+    assert h.floor == "game"
+    world.submit("ask the watcher how she goes")
+    assert h.floor == "model" and h.open_sample.question == "how she goes"
+    asked_at = len(h.turns) - 1
+    assert h.turns[asked_at].content["question"] == "how she goes"
+    world.submit("set plain sail")  # notable lines while the model writes its answer
+    folds: list[dict[str, Any]] = []
+    while not folds and world.clock.tick < EVERY:
+        world.run(1)
+        folds = [t.content for t in h.turns[asked_at + 1 :] if t.content.get("folded")]
+    assert folds, "nothing was folded into the open turn"
+    assert all(f["question"] is None for f in folds)
+    assert h.open_sample.question == "how she goes"  # the merged turn still has it
+    h.deliver(reply("", call("answer", text="Under all plain sail.")))
+    h.deliver(Reply())
+    world.run(EVERY)  # later turns open and fold; none puts the answered question
+    put = [
+        i
+        for i, t in enumerate(h.turns)
+        if t.role == DATA and t.content.get("question") == "how she goes"
+    ]
+    assert put == [asked_at]
+    # a second question while the turn is open is new, and the fold puts it
+    world.submit("ask the watcher how she heads")
+    assert h.turns[-1].content["question"] == "how she heads"
+
+
 def test_a_floor_held_silent_for_the_patience_brings_the_nudge_then_the_pause():
     world = point_world()
     h = late(world, station(every=EVERY, patience=PATIENCE))
