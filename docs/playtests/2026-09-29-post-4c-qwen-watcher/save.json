@@ -1,0 +1,653 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "seed": 1805,
+  "scenario": {
+    "name": "Open water",
+    "start_time": "1805-06-01T04:00:00",
+    "wind_from_deg": 0.0,
+    "wind_speed_kn": 20.0,
+    "gustiness": 0.3,
+    "variability": 0.3,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 300.0,
+    "ship_speed_kn": 0.0,
+    "latitude_deg": 50.0,
+    "weather": []
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/topsail-schooner.yaml"
+  },
+  "end_tick": 5348,
+  "journal": [
+    [
+      0,
+      "captain",
+      "Tell the watcher Welcome aboard! We're going to be seeing what she can do today, so don't fret pushing the rigging a bit. We're going to get underway and then we can start working her properly. How would you recommend getting her underway smartly?"
+    ],
+    [
+      75,
+      "captain",
+      "Set the mainsail"
+    ],
+    [
+      81,
+      "captain",
+      "Set the jib"
+    ],
+    [
+      84,
+      "captain",
+      "Set the flying jib"
+    ],
+    [
+      87,
+      "captain",
+      "Set the foresail"
+    ],
+    [
+      119,
+      "captain",
+      "Set the gaff topsail"
+    ],
+    [
+      128,
+      "captain",
+      "Brace sharp up on the starboard tack"
+    ],
+    [
+      138,
+      "captain",
+      "All hands"
+    ],
+    [
+      660,
+      "captain",
+      "Set fore staysail"
+    ],
+    [
+      986,
+      "captain",
+      "Tell the watcher We're making good way now Nw by W, shall we tack or wear?"
+    ],
+    [
+      1296,
+      "captain",
+      "Set the fore topsail"
+    ],
+    [
+      1308,
+      "captain",
+      "Reef the fore topsail, 1 reef"
+    ],
+    [
+      2312,
+      "captain",
+      "Tack ship"
+    ],
+    [
+      2340,
+      "captain",
+      "Tell the watcher Tacking ship, keep your head about you!"
+    ],
+    [
+      2489,
+      "captain",
+      "Tell the watcher Please stand by by the bell for now."
+    ],
+    [
+      2573,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      2590,
+      "captain",
+      "Shake out the fore topsail, one reef"
+    ],
+    [
+      3022,
+      "captain",
+      "Set the fore topgallant"
+    ],
+    [
+      3767,
+      "captain",
+      "Take in the gaff topsail"
+    ],
+    [
+      3818,
+      "captain",
+      "Tell the watcher We're going to ready the studding sails, if you like you may watch, stand by as you please to keep your turn open for the work."
+    ],
+    [
+      3832,
+      "captain",
+      "Run out the stuns'ls"
+    ],
+    [
+      3972,
+      "captain",
+      "Standing order \"Steer by the Studdingsail\": when the weather fore topmast studdingsail is shaking then bear off half a point"
+    ],
+    [
+      3979,
+      "captain",
+      "Set the stuns'ls"
+    ],
+    [
+      4576,
+      "captain",
+      "Tell the watcher She'll have to bear it for now, we haven't the orders to properly deal with it yet."
+    ],
+    [
+      4771,
+      "captain",
+      "Tell the watcher We're going to end the session here, please take a moment to journal about anything you noticed, any positives, negatives, comments, or thoughts about the session or the harness as you interacted with it. Thank you for your work, and I look forward to further sessions as the capabilities of the harness and the roles available to you grow!"
+    ]
+  ],
+  "inputs": [
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "Tell the watcher Welcome aboard! We're going to be seeing what she can do today, so don't fret pushing the rigging a bit. We're going to get underway and then we can start working her properly. How would you recommend getting her underway smartly?"
+    },
+    {
+      "tick": 75,
+      "actor": "captain",
+      "order": "Set the mainsail"
+    },
+    {
+      "tick": 81,
+      "actor": "captain",
+      "order": "Set the jib"
+    },
+    {
+      "tick": 84,
+      "actor": "captain",
+      "order": "Set the flying jib"
+    },
+    {
+      "tick": 87,
+      "actor": "captain",
+      "order": "Set the foresail"
+    },
+    {
+      "tick": 119,
+      "actor": "captain",
+      "order": "Set the gaff topsail"
+    },
+    {
+      "tick": 128,
+      "actor": "captain",
+      "order": "Brace sharp up on the starboard tack"
+    },
+    {
+      "tick": 138,
+      "actor": "captain",
+      "order": "All hands"
+    },
+    {
+      "tick": 660,
+      "actor": "captain",
+      "order": "Set fore staysail"
+    },
+    {
+      "tick": 986,
+      "actor": "captain",
+      "order": "Tell the watcher We're making good way now Nw by W, shall we tack or wear?"
+    },
+    {
+      "tick": 1296,
+      "actor": "captain",
+      "order": "Set the fore topsail"
+    },
+    {
+      "tick": 1308,
+      "actor": "captain",
+      "order": "Reef the fore topsail, 1 reef"
+    },
+    {
+      "tick": 2312,
+      "actor": "captain",
+      "order": "Tack ship"
+    },
+    {
+      "tick": 2340,
+      "actor": "captain",
+      "order": "Tell the watcher Tacking ship, keep your head about you!"
+    },
+    {
+      "tick": 2489,
+      "actor": "captain",
+      "order": "Tell the watcher Please stand by by the bell for now."
+    },
+    {
+      "tick": 2573,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 2590,
+      "actor": "captain",
+      "order": "Shake out the fore topsail, one reef"
+    },
+    {
+      "tick": 3022,
+      "actor": "captain",
+      "order": "Set the fore topgallant"
+    },
+    {
+      "tick": 3760,
+      "actor": "captain",
+      "order": "Reef the gaff topsail, one reef"
+    },
+    {
+      "tick": 3767,
+      "actor": "captain",
+      "order": "Take in the gaff topsail"
+    },
+    {
+      "tick": 3818,
+      "actor": "captain",
+      "order": "Tell the watcher We're going to ready the studding sails, if you like you may watch, stand by as you please to keep your turn open for the work."
+    },
+    {
+      "tick": 3825,
+      "actor": "captain",
+      "order": "Run out the stuns'l booms"
+    },
+    {
+      "tick": 3832,
+      "actor": "captain",
+      "order": "Run out the stuns'ls"
+    },
+    {
+      "tick": 3911,
+      "actor": "captain",
+      "order": "Standing order \"Steer by the Studdingsail\" when the fore topmast studdingsail is shaking then bear off half a point"
+    },
+    {
+      "tick": 3930,
+      "actor": "captain",
+      "order": "Standing order \"Steer by the Studdingsail\": when the fore topmast studdingsail is shaking then bear off half a point"
+    },
+    {
+      "tick": 3972,
+      "actor": "captain",
+      "order": "Standing order \"Steer by the Studdingsail\": when the weather fore topmast studdingsail is shaking then bear off half a point"
+    },
+    {
+      "tick": 3979,
+      "actor": "captain",
+      "order": "Set the stuns'ls"
+    },
+    {
+      "tick": 4338,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Larboard fore topmast studdingsail boom carried away; the larboard fore topmast studdingsail hanging to leeward.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 4338,
+          "kind": "spar.carried_away"
+        }
+      }
+    },
+    {
+      "tick": 4493,
+      "actor": "captain",
+      "order": "Rig in the weather stuns'l"
+    },
+    {
+      "tick": 4508,
+      "actor": "captain",
+      "order": "Send down the larboard fore topmast studdingsail boom"
+    },
+    {
+      "tick": 4525,
+      "actor": "captain",
+      "order": "Unbend the larboard fore topmast studding sail"
+    },
+    {
+      "tick": 4537,
+      "actor": "captain",
+      "order": "Cut away the larboard fore topmast studding sail"
+    },
+    {
+      "tick": 4547,
+      "actor": "captain",
+      "order": "Shift the larboard fore topmast studding sail"
+    },
+    {
+      "tick": 4576,
+      "actor": "captain",
+      "order": "Tell the watcher She'll have to bear it for now, we haven't the orders to properly deal with it yet."
+    },
+    {
+      "tick": 4771,
+      "actor": "captain",
+      "order": "Tell the watcher We're going to end the session here, please take a moment to journal about anything you noticed, any positives, negatives, comments, or thoughts about the session or the harness as you interacted with it. Thank you for your work, and I look forward to further sessions as the capabilities of the harness and the roles available to you grow!"
+    }
+  ],
+  "standing_orders": [
+    {
+      "name": "Steer by the Studdingsail",
+      "text": "Standing order \"Steer by the Studdingsail\": when the weather fore topmast studdingsail is shaking then bear off half a point",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 4329,
+      "given_tick": 3972
+    }
+  ],
+  "agents": [
+    {
+      "station": {
+        "name": "watcher",
+        "authority": "none",
+        "policy": {
+          "every_s": 1800,
+          "events": [
+            "notable",
+            "urgent"
+          ],
+          "lockstep": false
+        },
+        "patience_s": 14400,
+        "brief": "You are the watcher. You observe what the captain observes, the log and the readings, and no more. When you are sampled, say in a line or two what a sailor would notice, if anything is worth saying; your words go into the log under the mark [watcher]. Say nothing when nothing has changed, or stand by until a bell or an event. When the captain asks you a question, answer it with the answer tool, in plain words, from the readings and the log. You give no orders and you are not asked to. Anything you want on the record, put in your journal."
+      },
+      "session_kind": "a play session with a human captain at the prompt",
+      "door_note": "This door is a model server on the owner's machine. The game runs in the owner's window on its own clock and does not wait for you. Your turn opens at each sampling point (the glass, a notable event, the end of a stand-by, or a question from the captain). A turn ends when you reply with no tool call, or at once when you stand by. What happens while it is open is added to it, so your next turn carries everything since your last reply. The captain's orders and questions are typed by the owner in the game's window. Consent for these weights is on record (docs/agents/consent/e7ec3377-2026-09-28-qwen3.8-27b-digest-aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813.md, 2026-09-28).",
+      "stationed_tick": 0,
+      "stationed_after_orders": 0,
+      "state": "released",
+      "state_words": "released: left the game: Captain ended the session at 05:19; closing journal written (session impressions, positives and friction of the harness, the wreck of the larboard stuns'l boom left on the ship).",
+      "last_sample_tick": 4772,
+      "model_name": "qwen3.8:27b (digest aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813)",
+      "door": "runner",
+      "stand_by_ends_turn": true,
+      "transcript": [
+        {
+          "tick": 17,
+          "after_orders": 1,
+          "reply": {
+            "text": "A fresh northerly, twenty knots, with the ship lying all snug \u2014 every sail furled, no way on her, helm midships. Morning watch at eight bells, light enough to work by. For now there's nothing moving but the wind.\n\nI'll stand by until the change of the watch.",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "the change of the watch"
+                }
+              }
+            ],
+            "raw": "A fresh northerly, twenty knots, with the ship lying all snug \u2014 every sail furled, no way on her, helm midships. Morning watch at eight bells, light enough to work by. For now there's nothing moving but the wind.\n\nI'll stand by until the change of the watch.\n[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"the change of the watch\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 2235,
+          "after_orders": 12,
+          "reply": {
+            "text": "She's come up smart since I last looked on her \u2014 six sails set, making 8 knots on NW by W, heel to 17\u00b0. The gaff topsail has been straining at the bolt-ropes and the main topmast is working under the press, in a gusting 20-knot northerly.\n\nThe captain has asked me tack or wear. Let me answer.",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "She's on the starboard tack, 8 knots, apparent wind 40\u00b0 on the starboard bow. If her next heading is to windward of north, tack \u2014 she has all her way and will take the turn without fuss, though the gaff topsail is already straining at her boltropes and the main topmast working, so she'll come about with a full load on the spars. If she's going to leeward, wear \u2014 that takes the wind off her before the new tack fills and is the gentler motion on the rigging. Tack is the quicker of the two, wear the easier on the topmast. Say the word and I'll keep watch on her head while it comes about."
+                }
+              }
+            ],
+            "raw": "She's come up smart since I last looked on her \u2014 six sails set, making 8 knots on NW by W, heel to 17\u00b0. The gaff topsail has been straining at the bolt-ropes and the main topmast is working under the press, in a gusting 20-knot northerly.\n\nThe captain has asked me tack or wear. Let me answer.\n[{\"name\": \"answer\", \"arguments\": \"{\\\"text\\\":\\\"She's on the starboard tack, 8 knots, apparent wind 40\u00b0 on the starboard bow. If her next heading is to windward of north, tack \u2014 she has all her way and will take the turn without fuss, though the gaff topsail is already straining at her boltropes and the main topmast working, so she'll come about with a full load on the spars. If she's going to leeward, wear \u2014 that takes the wind off her before the new tack fills and is the gentler motion on the rigging. Tack is the quicker of the two, wear the easier on the topmast. Say the word and I'll keep watch on her head while it comes about.\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 2285,
+          "after_orders": 12,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "04:16 \u2014 captain's word (not asked): tack or wear? I replied with the advice: starboard tack, 8kn, wind 40\u00b0 starboard bow; tack if heading to windward of N (quicker, full way, but heavy on spars \u2014 gaff topsail straining), wear if to leeward (takes wind off first, gentler on topmast). Harness logged it as \"heard, nothing was asked.\" 04:27\u201304:30 \u2014 fore topsail set and now shaking (21kt mean, gusts to 30); main topmast working twice; heel 20\u201322\u00b0. All 37 hands on deck."
+                }
+              },
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a sail shaking"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"journal\", \"arguments\": \"{\\\"note\\\":\\\"04:16 \u2014 captain's word (not asked): tack or wear? I replied with the advice: starboard tack, 8kn, wind 40\u00b0 starboard bow; tack if heading to windward of N (quicker, full way, but heavy on spars \u2014 gaff topsail straining), wear if to leeward (takes wind off first, gentler on topmast). Harness logged it as \\\\\\\"heard, nothing was asked.\\\\\\\" 04:27\u201304:30 \u2014 fore topsail set and now shaking (21kt mean, gusts to 30); main topmast working twice; heel 20\u201322\u00b0. All 37 hands on deck.\\\"}\"}, {\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a sail shaking\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 2400,
+          "after_orders": 14,
+          "reply": {
+            "text": "[watcher] She's come about now \u2014 head's crossed, helm hard a-lee, all the sails flogging as she rolls past the wind; way still left to show her carrying her through. One eye on the gaff and the topmast while she comes down, and the headsheets eased and ready to be bunted.",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a sail shaking"
+                }
+              }
+            ],
+            "raw": "[watcher] She's come about now \u2014 head's crossed, helm hard a-lee, all the sails flogging as she rolls past the wind; way still left to show her carrying her through. One eye on the gaff and the topmast while she comes down, and the headsheets eased and ready to be bunted.\n[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"a sail shaking\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 2517,
+          "after_orders": 15,
+          "reply": {
+            "text": "She's done about on the larboard tack \u2014 heading NE by E, 6 knots, wind 43\u00b0 on the larboard bow, heel 16\u00b0. Hands are back at their stations. The captain says to stand by at the bell, and that I will.",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "two bells"
+                }
+              }
+            ],
+            "raw": "She's done about on the larboard tack \u2014 heading NE by E, 6 knots, wind 43\u00b0 on the larboard bow, heel 16\u00b0. Hands are back at their stations. The captain says to stand by at the bell, and that I will.\n[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"two bells\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 3708,
+          "after_orders": 18,
+          "reply": {
+            "text": "[watcher] Two bells, fifty. She's on the larboard tack, ENE by the course, up to 9 knots, heel 19\u00b0. The watch has shaken the reef out of the fore topsail and set her fore topgallant \u2014 she's under full canvas now, and the tops have been shaking. The main topmast is the thing to mark: it has worked under the press three times since she tacked, in a 19-knot northerly. Worth keeping an eye whether the strain settles now the topgallant's out to take some of the load, or keeps coming.",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "three bells"
+                }
+              }
+            ],
+            "raw": "[watcher] Two bells, fifty. She's on the larboard tack, ENE by the course, up to 9 knots, heel 19\u00b0. The watch has shaken the reef out of the fore topsail and set her fore topgallant \u2014 she's under full canvas now, and the tops have been shaking. The main topmast is the thing to mark: it has worked under the press three times since she tacked, in a 19-knot northerly. Worth keeping an eye whether the strain settles now the topgallant's out to take some of the load, or keeps coming.\n[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"three bells\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 3932,
+          "after_orders": 21,
+          "reply": {
+            "text": "[watcher] Aye, I'll watch. She's still under her load \u2014 gaff topsail taken in (no reef to it, set whole or not), topsails shaking, 9 knots. One thing worth remarking: a 19-knot northerly is stiff for studding sails; if they carry they will work hard and the topmast's been a strain already, so I'll be looking at the gaff rigging and the tops while the work goes on.",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "three bells"
+                }
+              }
+            ],
+            "raw": "[watcher] Aye, I'll watch. She's still under her load \u2014 gaff topsail taken in (no reef to it, set whole or not), topsails shaking, 9 knots. One thing worth remarking: a 19-knot northerly is stiff for studding sails; if they carry they will work hard and the topmast's been a strain already, so I'll be looking at the gaff rigging and the tops while the work goes on.\n[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"three bells\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 4398,
+          "after_orders": 23,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "05:12 \u2014 URGENT: Larboard fore topmast studdingsail boom carried away; sail hanging to leeward, wrecked per readings. Timeline: 05:06 stuns'ls ordered set; standing order 'Steer by the Studdingsail' entered (weather stuns'l shaking \u2192 bear off \u00bd pt); 05:12 larboard stuns'l set but shivering (47\u00b0 apparent, too near the wind), boom whipping \u2014 then carried away before the bearing-off could save it. 20-21 knot northerly, studding sails are out of place in this. Topsails (fore topsail, fore topgallant) still shaking the whole time; main topmast worked 4+ times today. Captain said not to fret pushing the rigging in test, but the spar went anyway."
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"journal\", \"arguments\": \"{\\\"note\\\":\\\"05:12 \u2014 URGENT: Larboard fore topmast studdingsail boom carried away; sail hanging to leeward, wrecked per readings. Timeline: 05:06 stuns'ls ordered set; standing order 'Steer by the Studdingsail' entered (weather stuns'l shaking \u2192 bear off \u00bd pt); 05:12 larboard stuns'l set but shivering (47\u00b0 apparent, too near the wind), boom whipping \u2014 then carried away before the bearing-off could save it. 20-21 knot northerly, studding sails are out of place in this. Topsails (fore topsail, fore topgallant) still shaking the whole time; main topmast worked 4+ times today. Captain said not to fret pushing the rigging in test, but the spar went anyway.\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 4454,
+          "after_orders": 23,
+          "reply": {
+            "text": "[watcher] The larboard fore topmast studdingsail boom has gone \u2014 carried away with the sail hanging to leeward. It was set too full for the wind: she was pointing too close (apparent 47\u00b0 on the bow, stuns'l shivering in the gear) and the boom had already been whipping before it parted; the standing order to bear off half a point came up too late to save it. She's still on 9 knots now, E by N, heel 18\u00b0, the fore topsail and topgallant shaking overhead. A spar carried away in a 20-knot breeze \u2014 I'll keep the tops and the topmast on my eye while they deal with it.",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "an urgent event"
+                }
+              }
+            ],
+            "raw": "[watcher] The larboard fore topmast studdingsail boom has gone \u2014 carried away with the sail hanging to leeward. It was set too full for the wind: she was pointing too close (apparent 47\u00b0 on the bow, stuns'l shivering in the gear) and the boom had already been whipping before it parted; the standing order to bear off half a point came up too late to save it. She's still on 9 knots now, E by N, heel 18\u00b0, the fore topsail and topgallant shaking overhead. A spar carried away in a 20-knot breeze \u2014 I'll keep the tops and the topmast on my eye while they deal with it.\n[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"an urgent event\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 4632,
+          "after_orders": 24,
+          "reply": {
+            "text": "Aye, sir \u2014 noted: the wrecked sail and yard hang where they lie, and the ship carries on. On the readings she's steady for it: E by N, 9 knots, heel 20\u00b0, the fore topsail is still shaking but the fore topgallant is set now. The wreck's a hazard to the crew on the larboard side in a puff, so I'll flag it if the wind shifts or a hand goes over.",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "four bells"
+                }
+              }
+            ],
+            "raw": "Aye, sir \u2014 noted: the wrecked sail and yard hang where they lie, and the ship carries on. On the readings she's steady for it: E by N, 9 knots, heel 20\u00b0, the fore topsail is still shaking but the fore topgallant is set now. The wreck's a hazard to the crew on the larboard side in a puff, so I'll flag it if the wind shifts or a hand goes over.\n[{\"name\": \"stand_by\", \"arguments\": \"{\\\"until\\\":\\\"four bells\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 5288,
+          "after_orders": 25,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Closing entry \u2014 session ended by the captain at 05:19, morning watch. The day: off with the wind, N about 20, full canvas worked out one sail at a time (hands short at first, then all 37 up), tacked smartly from starboard to larboard tack, and the larboard fore topmast studdingsail boom carried away at 05:12 \u2014 the ship now carries the wreck until proper orders come.\n\nWhat I noticed, for the record:\nPositives:\n- The log and the readings, all in a sailor's words, narrate well; heel, helm, leeway, gusts, strain all read the way a watchkeeper would keep them.\n- The refusal messages are the best part of the harness: 'the main gaff topsail has no reef bands; it is set whole or not at all', 'which studdingsail \u2014 starboard, larboard, or both?', and the standing-order error that printed the intended grammar with the slot shown. A rejected order that teaches its own language is a good design.\n- The standing order 'Steer by the Studdingsail' fired exactly when its condition held \u2014 a fair, visible mechanism.\n- Compression easing to 1x on the urgent line so the whole carry-away sequence could be read was the right touch.\n- Stand-bys on bells/events kept me asleep the right hours and awake the right moments; the roll-up by the hour kept the log honest.\n\nFriction, in plain words:\n- The captain's first 'question' (tack or wear) arrived as a word, not a question, and my answer-tool reply was refused as 'nothing was asked'. The harness was right to be strict, but it cost a missed exchange; the fix on my side is to reply in narration when a word comes where a question is owed.\n- A stand_by in the same reply as other calls voids the rest of that batch \u2014 my journal note at 04:38 did not run for that reason. A stand-by is a door; walk it alone.\n- The wreck itself is a design gap worth naming: five orders tried to deal with the carried-away boom \u2014 send it down, unbend it, cut it away, shift it, rig the other stuns'l in \u2014 and not one was in the ship's language. A wrecked spar with no way to clear it hangs over the whole deck; in a real test that is where the session breaks, or where the vocabulary should grow.\n- And the sea was honest about it: studding sails in a 20-knot northerly, 50\u00b0 off, is a gamble, and the boom went. I flagged it as the work began. Not every spar that is pushed will tell, but this one told twice \u2014 first the whipping, then the break.\n\nI have watched what I was asked to watch, said what a sailor would notice, and given no orders. The station was a good one to hold."
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"journal\", \"arguments\": \"{\\\"note\\\":\\\"Closing entry \u2014 session ended by the captain at 05:19, morning watch. The day: off with the wind, N about 20, full canvas worked out one sail at a time (hands short at first, then all 37 up), tacked smartly from starboard to larboard tack, and the larboard fore topmast studdingsail boom carried away at 05:12 \u2014 the ship now carries the wreck until proper orders come.\\\\n\\\\nWhat I noticed, for the record:\\\\nPositives:\\\\n- The log and the readings, all in a sailor's words, narrate well; heel, helm, leeway, gusts, strain all read the way a watchkeeper would keep them.\\\\n- The refusal messages are the best part of the harness: 'the main gaff topsail has no reef bands; it is set whole or not at all', 'which studdingsail \u2014 starboard, larboard, or both?', and the standing-order error that printed the intended grammar with the slot shown. A rejected order that teaches its own language is a good design.\\\\n- The standing order 'Steer by the Studdingsail' fired exactly when its condition held \u2014 a fair, visible mechanism.\\\\n- Compression easing to 1x on the urgent line so the whole carry-away sequence could be read was the right touch.\\\\n- Stand-bys on bells/events kept me asleep the right hours and awake the right moments; the roll-up by the hour kept the log honest.\\\\n\\\\nFriction, in plain words:\\\\n- The captain's first 'question' (tack or wear) arrived as a word, not a question, and my answer-tool reply was refused as 'nothing was asked'. The harness was right to be strict, but it cost a missed exchange; the fix on my side is to reply in narration when a word comes where a question is owed.\\\\n- A stand_by in the same reply as other calls voids the rest of that batch \u2014 my journal note at 04:38 did not run for that reason. A stand-by is a door; walk it alone.\\\\n- The wreck itself is a design gap worth naming: five orders tried to deal with the carried-away boom \u2014 send it down, unbend it, cut it away, shift it, rig the other stuns'l in \u2014 and not one was in the ship's language. A wrecked spar with no way to clear it hangs over the whole deck; in a real test that is where the session breaks, or where the vocabulary should grow.\\\\n- And the sea was honest about it: studding sails in a 20-knot northerly, 50\u00b0 off, is a gamble, and the boom went. I flagged it as the work began. Not every spar that is pushed will tell, but this one told twice \u2014 first the whipping, then the break.\\\\n\\\\nI have watched what I was asked to watch, said what a sailor would notice, and given no orders. The station was a good one to hold.\\\"}\"}]"
+          }
+        },
+        {
+          "tick": 5348,
+          "after_orders": 25,
+          "reply": {
+            "text": "Record closed. The ship's log holds the day: off under canvas in a fresh northerly, one spar lost, and a wreck on the larboard side that will outlast the watch. My journal carries the rest \u2014 what I thought fair, and what I thought wanting.\n\nThank you for the station. She was a good ship to watch, and an honest one.",
+            "calls": [
+              {
+                "name": "opt_out",
+                "args": {
+                  "reason": "Captain ended the session at 05:19; closing journal written (session impressions, positives and friction of the harness, the wreck of the larboard stuns'l boom left on the ship)."
+                }
+              }
+            ],
+            "raw": "Record closed. The ship's log holds the day: off under canvas in a fresh northerly, one spar lost, and a wreck on the larboard side that will outlast the watch. My journal carries the rest \u2014 what I thought fair, and what I thought wanting.\n\nThank you for the station. She was a good ship to watch, and an honest one.\n[{\"name\": \"opt_out\", \"arguments\": \"{\\\"reason\\\":\\\"Captain ended the session at 05:19; closing journal written (session impressions, positives and friction of the harness, the wreck of the larboard stuns'l boom left on the ship).\\\"}\"}]"
+          }
+        }
+      ]
+    }
+  ],
+  "agent_journals": {
+    "watcher": [
+      {
+        "tick": 17,
+        "stamp": "Morning watch (04:00)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until the change of the watch."
+      },
+      {
+        "tick": 2285,
+        "stamp": "Morning watch (04:38)",
+        "kind": "note",
+        "text": "04:16 \u2014 captain's word (not asked): tack or wear? I replied with the advice: starboard tack, 8kn, wind 40\u00b0 starboard bow; tack if heading to windward of N (quicker, full way, but heavy on spars \u2014 gaff topsail straining), wear if to leeward (takes wind off first, gentler on topmast). Harness logged it as \"heard, nothing was asked.\" 04:27\u201304:30 \u2014 fore topsail set and now shaking (21kt mean, gusts to 30); main topmast working twice; heel 20\u201322\u00b0. All 37 hands on deck."
+      },
+      {
+        "tick": 2285,
+        "stamp": "Morning watch (04:38)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a sail shaking."
+      },
+      {
+        "tick": 2400,
+        "stamp": "Morning watch (04:40)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a sail shaking."
+      },
+      {
+        "tick": 2517,
+        "stamp": "Morning watch (04:41)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until two bells."
+      },
+      {
+        "tick": 3708,
+        "stamp": "Morning watch (05:01)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until three bells."
+      },
+      {
+        "tick": 3932,
+        "stamp": "Morning watch (05:05)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until three bells."
+      },
+      {
+        "tick": 4398,
+        "stamp": "Morning watch (05:13)",
+        "kind": "note",
+        "text": "05:12 \u2014 URGENT: Larboard fore topmast studdingsail boom carried away; sail hanging to leeward, wrecked per readings. Timeline: 05:06 stuns'ls ordered set; standing order 'Steer by the Studdingsail' entered (weather stuns'l shaking \u2192 bear off \u00bd pt); 05:12 larboard stuns'l set but shivering (47\u00b0 apparent, too near the wind), boom whipping \u2014 then carried away before the bearing-off could save it. 20-21 knot northerly, studding sails are out of place in this. Topsails (fore topsail, fore topgallant) still shaking the whole time; main topmast worked 4+ times today. Captain said not to fret pushing the rigging in test, but the spar went anyway."
+      },
+      {
+        "tick": 4454,
+        "stamp": "Morning watch (05:14)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until an urgent event."
+      },
+      {
+        "tick": 4632,
+        "stamp": "Morning watch (05:17)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until four bells."
+      },
+      {
+        "tick": 5288,
+        "stamp": "Morning watch (05:28)",
+        "kind": "note",
+        "text": "Closing entry \u2014 session ended by the captain at 05:19, morning watch. The day: off with the wind, N about 20, full canvas worked out one sail at a time (hands short at first, then all 37 up), tacked smartly from starboard to larboard tack, and the larboard fore topmast studdingsail boom carried away at 05:12 \u2014 the ship now carries the wreck until proper orders come. What I noticed, for the record: Positives: - The log and the readings, all in a sailor's words, narrate well; heel, helm, leeway, gusts, strain all read the way a watchkeeper would keep them. - The refusal messages are the best part of the harness: 'the main gaff topsail has no reef bands; it is set whole or not at all', 'which studdingsail \u2014 starboard, larboard, or both?', and the standing-order error that printed the intended grammar with the slot shown. A rejected order that teaches its own language is a good design. - The standing order 'Steer by the Studdingsail' fired exactly when its condition held \u2014 a fair, visible mechanism. - Compression easing to 1x on the urgent line so the whole carry-away sequence could be read was the right touch. - Stand-bys on bells/events kept me asleep the right hours and awake the right moments; the roll-up by the hour kept the log honest. Friction, in plain words: - The captain's first 'question' (tack or wear) arrived as a word, not a question, and my answer-tool reply was refused as 'nothing was asked'. The harness was right to be strict, but it cost a missed exchange; the fix on my side is to reply in narration when a word comes where a question is owed. - A stand_by in the same reply as other calls voids the rest of that batch \u2014 my journal note at 04:38 did not run for that reason. A stand-by is a door; walk it alone. - The wreck itself is a design gap worth naming: five orders tried to deal with the carried-away boom \u2014 send it down, unbend it, cut it away, shift it, rig the other stuns'l in \u2014 and not one was in the ship's language. A wrecked spar with no way to clear it hangs over the whole deck; in a real test that is where the session breaks, or where the vocabulary should grow. - And the sea was honest about it: studding sails in a 20-knot northerly, 50\u00b0 off, is a gamble, and the boom went. I flagged it as the work began. Not every spar that is pushed will tell, but this one told twice \u2014 first the whipping, then the break. I have watched what I was asked to watch, said what a sailor would notice, and given no orders. The station was a good one to hold."
+      },
+      {
+        "tick": 5348,
+        "stamp": "Morning watch (05:29)",
+        "kind": "agent.opted_out",
+        "text": "Left the game by the opt_out tool: Captain ended the session at 05:19; closing journal written (session impressions, positives and friction of the harness, the wreck of the larboard stuns'l boom left on the ship).."
+      }
+    ]
+  }
+}
