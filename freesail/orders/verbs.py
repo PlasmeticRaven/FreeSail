@@ -716,11 +716,21 @@ def _trim(
     failed_ids: list[str] = []
     staggered: float | None = None
     too_far: dict[str, str] = {}  # yards refused by the adjacent-yards rule, with the reason
+    folded: list[str] = []  # yards whose trim in hand, not yet begun, takes the new angle
+    busy: list[str] = []  # yards being braced to the wind now: that trim stands
     if do_yards:
         sync_catharpins(ship)  # the limits as the lower rigging stands now
         runner = runner_of(ship)
         if yards is None:
             yards = [y for y in ship.spars.values() if y.is_yard and y.id not in skip]
+        # a trim in hand is not stacked behind (package 29b: a standing order that trims on a
+        # shift, firing while the watch is at the braces): a yard still waiting its turn
+        # takes the new angle, and one being braced now is left to finish
+        in_hand = {
+            i.subject_id: i
+            for i in getattr(runner, "instances", ())
+            if i.evo.id == vocab.evolutions["brace"] and i.params.get("mode") == "to the wind"
+        }
         workable = [y for y in yards if not (y.wrecked or y.sent_down)]
         targets: dict[str, float] = {}
         on_a_wind = True  # every lower yard wants to go sharper than it can
@@ -761,6 +771,15 @@ def _trim(
                 "tack": d.tack,
                 **extra,
             }
+            waiting = in_hand.get(yard.id)
+            if waiting is not None:
+                if waiting.waiting and waiting.step_index < 0:
+                    for key in ("target_deg", "target_angle", "tack"):
+                        waiting.params[key] = params[key]
+                    folded.append(yard.id)
+                else:
+                    busy.append(yard.id)
+                continue
             try:
                 runner.start(ship, vocab.evolutions["brace"], yard.id, params)
             except OrderError as e:
@@ -777,12 +796,23 @@ def _trim(
                 sail.sheet_angle = wanted_sheet_angle(sail.cls, d.apparent_wind_angle)
                 trimmed.append(resolve.the(ship, sail.id))
 
+    in_hand_words = ""
+    if folded or busy:
+        n = len(folded) + len(busy)
+        in_hand_words = f"the {'yard is' if n == 1 else 'yards are'} being trimmed already" + (
+            f", {len(folded)} still to brace taking the new angle" if folded else ""
+        )
     if not started and not trimmed:
         if len(failed_ids) == 1 and failed_ids[0] in too_far:
             raise OrderError(too_far[failed_ids[0]])
-        if failed:
+        if in_hand_words and not folded:
+            raise OrderError(f"{in_hand_words[0].upper()}{in_hand_words[1:]}; the trim stands.")
+        if failed and not folded:
             raise OrderError(f"Nothing done: {errors.sentence_list(failed)}.")
-        raise OrderError("Nothing to trim: no sail is set." if do_sheets else "No yards to trim.")
+        if not folded:
+            raise OrderError(
+                "Nothing to trim: no sail is set." if do_sheets else "No yards to trim."
+            )
 
     parts: list[str] = []
     if started:
@@ -800,6 +830,8 @@ def _trim(
     if trimmed:
         sheets = "sheet" if len(trimmed) == 1 and named_sheets is not None else "sheets"
         parts.append(f"trimmed the {sheets} of {errors.sentence_list(trimmed)}")
+    if in_hand_words:
+        parts.append(in_hand_words)
     text = "; ".join(parts)
     text = text[0].upper() + text[1:] + "."
     refused = [f for f, i in zip(failed, failed_ids, strict=True) if i in too_far]
@@ -816,6 +848,8 @@ def _trim(
         "trimmed_sheets": trimmed,
         "failed": failed,
         "failed_subjects": failed_ids,
+        "folded": folded,
+        "in_hand": busy,
     }
     if order.verb != "trim":
         data.update({"object": object_name, "mode": "to the wind", "tack": d.tack})

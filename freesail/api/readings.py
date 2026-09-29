@@ -75,7 +75,7 @@ STRAINING_RATIO = DECAY_RATIO
 # 'shaking'; a wind is compared in knots or points.").
 KINDS: dict[str, str] = {
     "speed": "a speed in knots: exceeds, is over, is under, is below",
-    "direction": "a direction: backs or veers N points, is from a compass point",
+    "direction": "a direction: backs, veers or shifts N points, is from a compass point",
     "angle_on_bow": "an angle on the bow: is forward of or abaft N degrees or the beam",
     "compass": "a compass heading: is a point, is east of or west of a point",
     "angle": "an angle in degrees: exceeds, is over, is under, is below",

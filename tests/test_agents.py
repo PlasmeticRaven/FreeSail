@@ -394,7 +394,7 @@ def test_the_grammar_page_holds_the_standing_dialect_in_full():
         "striking it takes it out of the book, and its name may be given again." in dialect
     )
     lines = read_orders_file(ROOT / "data/standing_orders/starter.orders")
-    assert len(lines) == 7
+    assert len(lines) == 8
     for line in lines:
         assert f"  {line}" in dialect
         e = world.submit(line)

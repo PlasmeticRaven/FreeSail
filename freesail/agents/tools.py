@@ -1221,8 +1221,10 @@ def standing_dialect_lines(vocab: Any = None) -> list[str]:
         "  every <interval>: on the interval, never queuing more than one: a glass, a bell, "
         "half an hour, an hour, a watch, or a number of minutes ('every 10 minutes')",
         "Conditions: a reading and a comparison, joined by 'and' (no 'or'): 'the true wind "
-        "exceeds 30 knots and the fore royal is set'. The readings, and how each is "
-        "compared:",
+        "exceeds 30 knots and the fore royal is set'. The one 'or' is a wind's two ways of "
+        "turning, 'the true wind veers 1 point or backs 1 point' (or 'shifts 1 point'), "
+        "measured from the wind when the order stands and afresh after each firing. The "
+        "readings, and how each is compared:",
         *readings,
         "    'the <sail>' is any sail by the ship's own name ('the fore royal is shaking'); "
         "'the <part>' any spar or line ('the fore royal yard is straining')",

@@ -12,9 +12,11 @@ The three guards against thrashing (spec §3):
 - **A `when` order is edge-triggered with a dwell.** Having fired, it is disarmed until
   its condition has been false for `STANDING_DWELL_S` seconds together and every
   evolution its firing started has ended (asked of the runner), and then it must hold
-  for its duration again. An `at` order fires once per event; an `every` order fires on
-  its interval whether or not the last firing's work is done, but never queues a second
-  behind one still waiting for its parts.
+  for its duration again. A wind's shift it waits for ('veers a point') is spent when it
+  fires and measured afresh from the wind it fired on (package 29b). An `at` order
+  fires once per event; an `every` order fires on its interval whether or not the last
+  firing's work is done, but never queues a second behind one still waiting for its
+  parts.
 - **The conflict rule by rank.** When a rule would give an order on a part that another
   rule's firing within the dwell gave a contrary order on, the senior's stands and the
   log says so: "Standing order 'x' (the master) countermanded by 'y' (the captain)."
@@ -219,6 +221,12 @@ class Runtime:
                     rule.armed = False
                     rule.held_s = 0.0
                     rule.clear_s = 0.0
+                    # a shift fired on is spent: 'veers a point' is measured afresh from the
+                    # wind it fired on, so the rule stands again once the wind has held for
+                    # the dwell, and fires at the next point (package 29b; before, a wind
+                    # that veered and stayed kept the condition true and the rule never
+                    # stood again)
+                    rule.spend_shifts(view)
             else:
                 rule.held_s = 0.0
             return
@@ -229,7 +237,10 @@ class Runtime:
             rule.clear_s += TICK_SECONDS
         if rule.clear_s >= STANDING_DWELL_S and not self._still_working(rule):
             rule.armed = True
-            rule.reset_edge()
+            # the duration and the dwell start again; a wind's shift is still measured
+            # from the direction it fired on (`Rule.spend_shifts`)
+            rule.held_s = 0.0
+            rule.clear_s = 0.0
 
     # -- the runner's word on a firing's work ---------------------------------------------
 

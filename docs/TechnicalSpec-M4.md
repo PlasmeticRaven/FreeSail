@@ -59,6 +59,7 @@ condition := <reading> <comparison> [and <reading> <comparison> ...]     # conju
 comparison:= exceeds <n> <unit> | is over ... | is under ... | is below ...
            | is forward of <n> degrees | is abaft <n> degrees | is abaft the beam | is forward of the beam
            | backs <n> points | veers <n> points | is from <point> | is <state> | is not <state>
+           | veers <n> points or backs <n> points | shifts <n> points     # package 29b
            | are <fatigue word> | is the <watch>
 duration  := <n> minutes | a glass | ...
 ```
@@ -70,10 +71,13 @@ standing order "night routine": at sunset then take in the studdingsails; take i
 standing order "morning sail": at sunrise, if the true wind is under 20 knots then set the royals
 standing order "shorten sail for weather": when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; take in the topgallants; reef the topsails, one reef
 standing order "keep her full": when the apparent wind is forward of 55 degrees then bear away one point
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point then trim sails
 standing order "heavy weather": when the true wind exceeds 40 knots for 5 minutes then send down the topgallant masts; take in the fore topmast staysail; bend the fore storm staysail; close reef the topsails
 standing order "storm staysail": when the fore storm staysail is furled and the true wind exceeds 40 knots then set the fore storm staysail
 standing order "sound the well": every glass then sound the well        # refused until milestone 5: "the ship has no well to sound yet"
 ```
+
+The one `or` the dialect has is inside a comparison, not between clauses: `veers 1 point or backs 1 point` is the two ways the one reading turns, and `shifts 1 point` says the same. A wind's shift is measured from the direction when the order was given or resumed, and after a firing from the direction it fired on, so "trim on a shift" (package 29b, playtest 7's finding that the yards stayed braced for the old wind through a night's veer) fires at each point of a steady veer, at least the dwell apart. A trim ordered while the watch is still at the braces of another is not stacked behind it: a yard still waiting its turn takes the new angle, one being braced finishes, and the log says the yards are being trimmed already.
 
 The **book**: `standing orders` (list, with each order's state: standing, belayed, fired N times, last at), `show standing order "x"`, `belay standing order "x"`, `resume standing order "x"`, `belay all standing orders`, `strike standing order "x"` (removes it from the book, journaled; `cancel` and `remove` are synonyms; belaying keeps it, silent, under its name; added after playtest 3, 2026-09-28), `read the standing orders from <file>` (a driver command in the console and the server, not an order, since it reads the disk).
 

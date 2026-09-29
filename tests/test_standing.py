@@ -831,6 +831,36 @@ def test_backs_and_veers_measure_from_the_direction_when_armed(synthetic):
     assert firings(v, "veer") == [5]
 
 
+def test_a_shift_either_way_fires_and_is_measured_afresh_from_the_wind_it_fired_on(synthetic):
+    """Package 29b (the starter's "trim on a shift"): 'veers 1 point or backs 1 point' is
+    one comparison, the two ways the wind turns, and 'shifts 1 point' says the same. Once
+    fired, the shift is spent: the order stands again after the dwell and fires at the next
+    point from the wind it fired on, whichever way."""
+    for said in ("veers 1 point or backs 1 point", "backs 1 point or veers 1 point"):
+        clause = parse_condition(f"the true wind {said}").clauses[0]
+        assert clause.comparison.op == "shifts" and clause.comparison.value == (1.0, 1.0)
+    clause = parse_condition("the true wind shifts 2 points").clauses[0]
+    assert (clause.comparison.op, clause.comparison.value) == ("shifts", (2.0, 2.0))
+    clause = parse_condition("the true wind veers 2 points or backs a point").clauses[0]
+    assert clause.comparison.value == (2.0, 1.0)
+    direction = {"v": 0.0}
+    synthetic("true_wind_from", lambda w: direction["v"])
+    w = point_world()
+    rule_of("when the true wind veers 1 point or backs 1 point", w)
+    w.run(5)
+    direction["v"] = 0.9 * units.POINT
+    w.run(5)
+    assert firings(w) == []
+    direction["v"] = 1.01 * units.POINT  # veered a point
+    w.run(1)
+    assert firings(w) == [11]
+    w.run(STANDING_DWELL_S + 10)  # held there: it stands again, and does not fire
+    assert firings(w) == [11]
+    direction["v"] = units.wrap_2pi(0.0)  # backed a point from where it fired
+    w.run(1)
+    assert len(firings(w)) == 2
+
+
 def test_a_firing_is_logged_by_standing_order_and_never_journaled():
     w = point_world()
     rule_of("at eight bells", w, actions=["steer 90", "speed 5 knots"], name="bells")

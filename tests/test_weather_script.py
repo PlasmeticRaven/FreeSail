@@ -247,13 +247,14 @@ def test_the_gate_day_world_begins_with_its_book_and_its_first_orders():
         "morning sail",
         "shorten sail for weather",
         "keep her full",
+        "trim on a shift",
         "heavy weather",
         "storm staysail",
         "gale canvas",
         "make sail after the gale",
         "topgallants again",
     ]
-    assert n == 12  # seven lines of the starter file, three of the day's, two orders
+    assert n == 13  # eight lines of the starter file, three of the day's, two orders
     refused = [e.text for e in w.log if e.kind == "order.rejected"]
     assert len(refused) == 1 and "sound the well" in refused[0]
     assert [t for _, _, t in w.journal][-2:] == ["set plain sail", "set the royals"]
@@ -297,3 +298,90 @@ def test_a_scenario_world_replays_from_its_save(tmp_path):
     copy = replay.replay(data, ship_factory)
     assert copy.log.digest() == w.log.digest()
     assert math.isclose(copy.wind.direction_from, w.wind.direction_from)
+
+
+# -- trim on a shift (package 29b; playtest 7, finding 3) ----------------------------------
+
+TRIM_ON_A_SHIFT = (
+    'standing order "trim on a shift": when the true wind veers 1 point or backs 1 point '
+    "then trim sails"
+)
+
+
+def starter_line(name: str) -> str:
+    """A standing order of the starter book, as the file gives it (run-on lines joined)."""
+    text = open("data/standing_orders/starter.orders", encoding="utf-8").read()
+    for chunk in text.split("\n\n"):
+        body = " ".join(ln.strip() for ln in chunk.splitlines() if not ln.startswith("#"))
+        if body.startswith(f'standing order "{name}"'):
+            return body
+    raise AssertionError(f"no '{name}' in the starter book")
+
+
+def shift_world(weather: list[dict]) -> World:
+    """The frigate under plain sail before a gusty, wandering scripted wind, the gate's
+    day's gustiness and wander (0.3), with the starter's trim on a shift in the book."""
+    sc = Scenario(start_time=T0, gustiness=0.3, variability=0.3, ship_heading_deg=135.0)
+    sc.weather = weather
+    w = make_world(7, FRIGATE, sc)
+    w.submit("set plain sail")
+    w.run(1800)
+    assert starter_line("trim on a shift") == TRIM_ON_A_SHIFT
+    w.submit(TRIM_ON_A_SHIFT)
+    return w
+
+
+def trims(w: World) -> list:
+    return [
+        e
+        for e in w.log
+        if e.actor == "standing order 'trim on a shift'" and e.kind == "order.accepted"
+    ]
+
+
+def test_trim_on_a_shift_fires_at_each_point_of_a_steady_veer_and_not_on_the_gusts():
+    """An hour and a half of a steady westerly in 18 knots with the gate's gusts and
+    wander: the gusts come and go and the order never fires. Then the wind veers two
+    points in an hour, steadily: it fires when the wind has veered a point, stands again
+    five minutes after, and fires again at the second point, measured from the wind it
+    fired on the first time."""
+    w = shift_world(script((0, 270, 18), (2, 270, 18), (3, 292.5, 18), (5, 292.5, 18)))
+    w.run(2 * 3600 - w.clock.tick)
+    assert [e for e in w.log if e.kind == "wind.gust"], "the gusts blew"
+    assert trims(w) == []
+    w.run(3600 + 1800)
+    fired = trims(w)
+    assert len(fired) == 2
+    minutes = [(e.tick - 2 * 3600) / 60 for e in fired]
+    # two points in the hour: the first at half past, the second at the hour, each
+    # measured from the wind the last firing was made on (the wander moves them a little)
+    assert 27 <= minutes[0] <= 33, minutes
+    assert 57 <= minutes[1] <= 63, minutes
+    rule = w.standing.book.get("trim on a shift")
+    assert rule.fired == 2  # held at WNW for the last hour and a half: no third firing
+
+
+def test_trim_on_a_shift_while_a_trim_is_in_hand_is_folded_not_stacked():
+    """The captain trims; the wind veers a point while the watch is still at the braces
+    and the standing order fires: no yard gets a second brace behind the first, the yards
+    still to brace take the new angle, and the log says the yards are being trimmed."""
+    ten_s = 10 / 3600
+    w = shift_world(script((0, 270, 18), (1, 270, 18), (1 + ten_s, 283, 18), (3, 283, 18)))
+    runner = w.ship.extra["evolutions"]
+    w.run(3600 - 5 - w.clock.tick)
+    w.submit("trim sails")
+    most = 0
+    while not trims(w) and w.clock.tick < 3600 + 900:
+        w.tick()
+    assert trims(w), "the order did not fire"
+    for _ in range(600):
+        braces = [i for i in runner.instances if i.evo.id == "brace"]
+        by_yard = [i.subject_id for i in braces]
+        assert len(by_yard) == len(set(by_yard)), "a brace stacked behind another"
+        most = max(most, len(braces))
+        w.tick()
+    yards = [s for s in w.ship.spars.values() if s.is_yard]
+    assert most <= len(yards)
+    fired = trims(w)[0]
+    said = [e for e in w.log if e.tick == fired.tick and e.kind == "sail.trimmed"]
+    assert said and "being trimmed already" in said[-1].text, [e.text for e in said]
