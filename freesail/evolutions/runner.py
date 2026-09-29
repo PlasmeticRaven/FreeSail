@@ -699,13 +699,26 @@ class Runner:
         deck = self._on_deck(crew)
         return [s for s in deck if pick in (s.watch.value, s.station.value)] if pick else deck
 
-    @staticmethod
-    def _aloft(inst: Instance) -> bool:
+    def _aloft(self, inst: Instance) -> bool:
         """Whether any of the work is aloft: then only hands who go aloft are taken. A
-        script names its aloft phases in ``params.aloft`` (package 19)."""
+        script names its aloft phases in ``params.aloft`` (package 19). A step whose `if`
+        does not hold now is not counted (package 29b: a sail set from the gear wants no
+        hands aloft, its loosing skipped)."""
         if inst.script is not None:
             return bool(inst.params.get("aloft"))
-        return any(step.aloft for step in inst.evo.steps)
+        env: expr.Env | None = None
+        for step in inst.evo.steps:
+            if not step.aloft:
+                continue
+            if step.condition is None:
+                return True
+            env = env or self._env(self.ship, inst)
+            try:
+                if expr.evaluate(step.condition, env):
+                    return True
+            except expr.ExpressionError:
+                return True
+        return False
 
     def _want(self, inst: Instance) -> hands.CrewRequest:
         if inst.want is None:
@@ -923,7 +936,11 @@ class Runner:
         self, ship: Ship, inst: Instance, outcome: registry.Outcome, reason: str = ""
     ) -> None:
         reason = reason.rstrip(".")  # the templates end "{reason}." themselves
-        text = self._format(inst, outcome.log, reason=reason)
+        template = outcome.log
+        state = getattr(getattr(inst.subject, "state", None), "value", None)
+        if state in outcome.from_state:  # a sail set from the gear (package 29b)
+            template = outcome.from_state[state]
+        text = self._format(inst, template, reason=reason)
         data: dict[str, Any] = {"evolution": inst.evo.id, "subject": inst.subject_id}
         if reason:
             data["reason"] = reason
@@ -1019,7 +1036,20 @@ class Runner:
         if step is None:
             return 0.0
         this = (1.0 - inst.progress) * step.duration_s
-        later = sum(s.duration_s for s in inst.evo.steps[inst.step_index + 1 :])
+        rest = inst.evo.steps[inst.step_index + 1 :]
+        # of two alternatives (`Step.instead_of`), the one the sail's state now takes
+        env = self._env(self.ship, inst)
+        taken: set[str] = set()
+        for s in rest:
+            if s.instead_of is not None and s.condition is not None:
+                try:
+                    if expr.evaluate(s.condition, env):
+                        taken.add(s.instead_of)
+                        continue
+                except expr.ExpressionError:
+                    pass
+                taken.add(s.do)
+        later = sum(s.duration_s for s in rest if s.do not in taken)
         crew = self._crew_factor(inst, step.aloft)
         return round((this + later) * self._last_factor * crew, 1)
 

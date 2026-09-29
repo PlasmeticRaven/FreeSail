@@ -12,12 +12,22 @@ requires:
   - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
   - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s gaff or mast is wrecked"}
   - {check: "not wrecked(spar_of_role(sail, boom))", reason: "the {sail}'s boom is wrecked"}
+# From furled, the gaskets are cast off and the brails cleared away; brailed up in the
+# gear it is loose already, and the brails are let go (Luce 1866, ch. XXIII At Sea, 'The
+# Spanker', setting it; Luce 1884, ch. XXXIV Handling Fore-and-Afters). Fifteen seconds is
+# judgement; the owner's rule of package 29b, each state its own case.
 steps:
   - do: clear_away
     duration_s: 60
-    if: sail.state in [furled, in_the_gear]
+    if: sail.state == furled
     sets: {sail.state: loosed}
     log: "Cast off the gaskets and cleared away the brails of the {sail}."
+  - do: let_go_brails
+    instead_of: clear_away
+    duration_s: 15
+    if: sail.state == in_the_gear
+    sets: {sail.state: loosed}
+    log: "Let go the brails of the {sail}."
   - do: hoist
     duration_s: 120
     via: halyard_of(sail)

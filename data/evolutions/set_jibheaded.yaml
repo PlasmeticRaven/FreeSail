@@ -10,10 +10,19 @@ preconditions:
 requires:
   - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
   - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s stay or mast is carried away"}
+# From furled (stowed), it is cleared away; hauled down in the gear it lies loose on the
+# boom or the stay, and the downhaul is let go and the halyard manned (Luce 1866, ch.
+# XXIII At Sea, 'To set a Head Sail'). Ten seconds is judgement; the owner's rule of
+# package 29b, each state its own case.
 steps:
   - do: clear_away
     duration_s: 30
-    if: sail.state in [furled, in_the_gear]
+    if: sail.state == furled
+    sets: {sail.state: loosed}
+  - do: let_go_downhaul
+    instead_of: clear_away
+    duration_s: 10
+    if: sail.state == in_the_gear
     sets: {sail.state: loosed}
   - do: hoist
     duration_s: 60
@@ -23,7 +32,9 @@ steps:
     duration_s: 15
     if: sail.state != set
     sets: {sail.state: set, sail.sheet_angle: "clamp(abs(dyn.apparent_wind_angle) - deg(28), deg(15), deg(60))"}
-on_start: {log: "Clear away the {sail}; man the halyards."}
+on_start:
+  log: "Clear away the {sail}; man the halyards."
+  from: {in_the_gear: "Let go the {sail} downhaul; man the halyards."}
 on_complete: {log: "Set the {sail}.", kind: sail.set, severity: notable}
 on_fail: {log: "Could not set the {sail}: {reason}.", kind: evolution.failed, severity: notable}
 # crew (package 19): forecastlemen loose and set the head-sails; the main topmast

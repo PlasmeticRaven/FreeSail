@@ -15,13 +15,25 @@ preconditions:
 requires:
   - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
   - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
+# Each state the sail is set from is its own case (the owner, package 29b): furled, the
+# topmen lay aloft and loose it; hanging in the gear, clewed up or hauled up, it is loose
+# already, and setting it is deck work: let go the clewlines and buntlines and sheet home
+# (Luce 1866, ch. XXIII At Sea, 'To set a Topsail' after it has been clewed up, 'To set a
+# Course' after it has been hauled up). Twenty seconds to let go and overhaul the gear is
+# judgement, a quarter of the loosing; loosed and sheeted skip what is done, as before.
 steps:
   - do: loose
     duration_s: 90
-    if: sail.state in [furled, in_the_gear]
+    if: sail.state == furled
     sets: {sail.state: loosed}
     log: "Laid aloft and loosed the {sail}."
     aloft: true
+  - do: let_go_gear
+    instead_of: loose
+    duration_s: 20
+    if: sail.state == in_the_gear
+    sets: {sail.state: loosed}
+    log: "Let go the {sail} clewlines and buntlines."
   - do: sheet_home
     duration_s: 60
     if: sail.state == loosed
@@ -34,7 +46,9 @@ steps:
     duration_s: 30
     if: sail.state != set
     sets: {sail.state: set}
-on_start: {log: "Hands aloft to loose the {sail}."}
+on_start:
+  log: "Hands aloft to loose the {sail}."
+  from: {in_the_gear: "Man the {sail} sheets; let go the clewlines and buntlines."}
 on_complete: {log: "Set the {sail}.", kind: sail.set, severity: notable}
 on_fail: {log: "Could not set the {sail}: {reason}.", kind: evolution.failed, severity: notable}
 # crew (package 19): "Making sail: loose topsail, then on deck to halliards" (the

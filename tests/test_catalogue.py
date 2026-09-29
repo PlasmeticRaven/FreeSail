@@ -199,7 +199,8 @@ def test_milestone_2_timings_are_unchanged():
     for eid, want in M2_TIMINGS.items():
         evo = EVOLUTIONS[eid]
         if isinstance(want, list):
-            assert [s.duration_s for s in evo.steps] == want, eid
+            # the steps from the gear (package 29b) stand instead of one of these
+            assert [s.duration_s for s in evo.steps if s.instead_of is None] == want, eid
         else:
             assert evo.timing == want, eid
 

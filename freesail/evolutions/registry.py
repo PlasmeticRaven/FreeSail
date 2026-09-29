@@ -33,6 +33,12 @@ The file shape (spec §8.4, with the additions the runner needs)::
     crew: {hands: 12, rating: ordinary}   # authored now, used by the M3 task system
     source: "Luce 1866, ch. XXIII At Sea, 'To set a Topsail'"
 
+Each state a subject starts from may be its own case (package 29b, the owner's rule): a
+step may say ``instead_of: <do>`` when it stands, from another state, for a step of the
+same file (a sail set from the gear lets go its gear on deck instead of being loosed
+aloft), and the nominal duration counts the step it replaces; an outcome may give
+``from: {<state>: <log>}``, its line when the subject starts in that state.
+
 An all-hands manoeuvre (``crew: {hands: all}``: tack, wear, box-haul, lie a-try) also
 says ``belays: true``: "Ready about!" stops the sail work in hand, which holds its
 progress and resumes after (spec M3 §3.4). All-hands sail work (a reef, a furl, sending
@@ -86,6 +92,10 @@ class Step:
     condition: expr.Node | None = None
     log: str | None = None
     aloft: bool = False  # work on the yards or in the tops (spec M3 §3.3); else on deck
+    # the step this one stands in for from another state (a sail set from the gear lets go
+    # its gear instead of loosing it aloft; package 29b): the two are alternatives, and the
+    # nominal duration counts the one it replaces
+    instead_of: str | None = None
 
 
 @dataclass
@@ -93,6 +103,9 @@ class Outcome:
     log: str
     kind: str
     severity: str
+    # the log's words when the subject is in a given state at the start (``from:`` in the
+    # file, by state: a sail set from the gear is not loosed aloft; package 29b)
+    from_state: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass
@@ -116,7 +129,8 @@ class Evolution:
 
     @property
     def nominal_duration_s(self) -> float:
-        return sum(s.duration_s for s in self.steps)
+        """The steps' durations, an alternative (`Step.instead_of`) not counted."""
+        return sum(s.duration_s for s in self.steps if s.instead_of is None)
 
 
 # ---------------------------------------------------------------------------
@@ -187,6 +201,7 @@ def _step(raw: Any, i: int, where: str) -> Step:
         condition=_optional_expr(raw.get("if"), here),
         log=str(raw["log"]) if raw.get("log") else None,
         aloft=aloft,
+        instead_of=str(raw["instead_of"]) if raw.get("instead_of") else None,
     )
 
 
@@ -194,10 +209,14 @@ def _outcome(raw: Any, default_log: str, default_kind: str, default_severity: st
     raw = raw or {}
     if not isinstance(raw, dict):
         raise EvolutionFileError("on_start, on_complete and on_fail must be mappings.")
+    from_state = raw.get("from") or {}
+    if not isinstance(from_state, dict):
+        raise EvolutionFileError("An outcome's 'from' must map a state to its log line.")
     return Outcome(
         log=str(raw.get("log") or default_log),
         kind=str(raw.get("kind") or default_kind),
         severity=str(raw.get("severity") or default_severity),
+        from_state={str(k): str(v) for k, v in from_state.items()},
     )
 
 
@@ -222,6 +241,13 @@ def parse_evolution(data: Any, path: str = "<memory>") -> Evolution:
     if script is not None and steps_raw:
         raise EvolutionFileError(f"{where}: give 'steps' or a 'script', not both.")
     steps = [_step(s, i, where) for i, s in enumerate(steps_raw or [])]
+    names = {s.do for s in steps}
+    for s in steps:
+        if s.instead_of is not None and s.instead_of not in names:
+            raise EvolutionFileError(
+                f"{where}, step '{s.do}': it stands instead of '{s.instead_of}', which is not "
+                "a step of this file."
+            )
     params = data.get("params") or {}
     if not isinstance(params, dict):
         raise EvolutionFileError(f"{where}: 'params' must be a mapping of defaults.")
