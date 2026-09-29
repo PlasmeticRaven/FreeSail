@@ -155,8 +155,12 @@ class Clause:
             return (value == v) if op == "is" else (value != v)
         if kind == "bells":
             return (value["bells"] == v) if op == "is" else (value["bells"] != v)
-        if kind in ("daylight", "gust"):
+        if kind in ("daylight", "gust", "weather"):
             return (value == v) if op == "is" else (value != v)
+        if kind in ("tendency", "sky", "visibility"):
+            return (value["words"] == v) if op == "is" else (value["words"] != v)
+        if kind == "glass":
+            return value > v if op == "gt" else value < v
         if kind == "sail":
             return _sail_is(value, v) if op == "is" else not _sail_is(value, v)
         if kind == "strain":

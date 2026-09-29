@@ -1,4 +1,4 @@
-"""The World: owns the clock, the wind, the ship, the log and the order journal.
+"""The World: owns the clock, the wind, the weather, the ship, the log and the order journal.
 
 A World knows nothing about who is driving it. It offers exactly:
 load (construct), `submit` an order, `tick` once, read `log`, query `state`,
@@ -9,7 +9,7 @@ and `save`. Determinism: same seed, same scenario, same ship, same
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 from freesail import units
@@ -47,6 +47,22 @@ class Scenario:
     # script, the wind at the start is the script's and `wind_from_deg` and
     # `wind_speed_kn` are not read. A save from before the script loads with none.
     weather: list[dict[str, Any]] = field(default_factory=list)
+    # The weather systems (spec M5 §2, `freesail.world.weather`, package 30): scripted
+    # systems as plain dictionaries ({"name", "kind", "radius_km", "fronts", "track":
+    # [{"at", "x_km", "y_km", "hpa"}, ...]}), followed exactly and saved with the scenario;
+    # `climatology` seeds systems from the month's table instead when none is scripted.
+    # With systems and no `weather` script the systems' surface wind at the ship is the
+    # base wind; with both, the pinned script wins and the systems give only the sky and
+    # the glass. Neither: no sky, no glass, the wind as it was.
+    systems: list[dict[str, Any]] = field(default_factory=list)
+    climatology: bool = False
+    # The background under scripted systems: {"hpa": the mean pressure, "gradient_hpa_per_100km",
+    # "high_toward_deg"}; empty means 1015 hPa and no gradient (`weather.BACKGROUND_HPA`).
+    background: dict[str, Any] = field(default_factory=dict)
+    # Whether the ship carries a glass (spec M5 §5; W §1.7: the captain's own in 1805, rare
+    # in a small vessel); the scenario says, and without one the glass and its tendency
+    # are not to be had.
+    glass: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
@@ -127,6 +143,33 @@ class World:
             self.weather = WeatherScript.from_list(self.scenario.weather)
             direction, speed = self.weather.at(self.scenario.start_time)
             wind_params.direction_from, wind_params.speed = direction, speed
+        # The weather systems (spec M5 §2): scripted by the scenario or seeded from the
+        # month's climatology, from the world's own `weather` stream (never the wind's).
+        self.systems: Any = None
+        self.glass: Any = None
+        self.conditions: Any = None  # the sky and the weather at the ship, once a minute
+        self._last_conditions: Any = None
+        if self.scenario.systems or self.scenario.climatology:
+            from freesail.world.weather import Glass, Weather, load_climatology
+
+            self.systems = Weather(
+                self.scenario.start_time,
+                self.rng.stream("weather"),
+                seed=self.seed,
+                systems=self.scenario.systems,
+                climatology=load_climatology() if self.scenario.climatology else None,
+                background_hpa=self.scenario.background.get("hpa"),
+                gradient=(
+                    (
+                        float(self.scenario.background.get("gradient_hpa_per_100km", 0.0)),
+                        float(self.scenario.background.get("high_toward_deg", 0.0)),
+                    )
+                    if "gradient_hpa_per_100km" in self.scenario.background
+                    else None
+                ),
+            )
+            if self.scenario.glass:
+                self.glass = Glass(self.seed)
         self.wind = Wind(wind_params, self.rng.stream("wind"))
         # the true wind of the last ten minutes, for the mean wind reading (package 29b)
         self.wind_record = WindRecord()
@@ -144,6 +187,16 @@ class World:
         self.compression: float = 1.0
         if getattr(self.ship, "extra", None) is not None:
             self.ship.extra["rng"] = self.rng  # named streams for strain and later systems
+        if self.systems is not None:
+            self._observe_weather(first=True)
+            if self.weather is None:
+                # the systems' wind is the base: the wind starts on it (spec M5 §2)
+                direction, speed = self.systems.surface_wind_at(self.ship_x_km, self.ship_y_km)
+                self.wind = Wind(
+                    WindParams(direction, speed, wind_params.gustiness, wind_params.variability),
+                    self.rng.stream("wind"),
+                )
+                self.wind.air_mass = self.conditions.air_mass
         self._last_logged_wind_direction = self.wind.direction_from
         # The sun (spec M4 §5): `daylight` is read from it through the registry, and the
         # World raises `sun.rise` and `sun.set` on the tick the phase crosses into and out
@@ -219,6 +272,22 @@ class World:
         return float(getattr(self.ship, "x", 0.0))
 
     @property
+    def ship_y(self) -> float:
+        """Metres north of the start."""
+        dyn = getattr(self.ship, "dyn", None)
+        if dyn is not None:
+            return float(dyn.y)
+        return float(getattr(self.ship, "y", 0.0))
+
+    @property
+    def ship_x_km(self) -> float:
+        return self.ship_x / 1000.0
+
+    @property
+    def ship_y_km(self) -> float:
+        return self.ship_y / 1000.0
+
+    @property
     def daylight(self) -> str:
         """'day', 'twilight' or 'night' now, from the sun at the ship's latitude and her
         easting (`freesail.core.sun`). The registry's `daylight` row reads this."""
@@ -238,6 +307,105 @@ class World:
             self.record(Severity.NOTABLE, "sun.set", "Sunset.", data={"daylight": phase})
         elif phase == DAY and was != DAY:
             self.record(Severity.NOTABLE, "sun.rise", "Sunrise.", data={"daylight": phase})
+
+    # -- the weather (spec M5 §2, §3, §5) ------------------------------------------
+
+    def _observe_weather(self, first: bool = False) -> None:
+        """Once a minute: the sky and the weather at the ship from the systems, the glass
+        read into the ship's record, the wind's air mass set from the sector (when the
+        systems drive the wind)."""
+        t = self.clock.ship_time
+        self.conditions = self.systems.conditions_at(self.ship_x_km, self.ship_y_km, t)
+        if self.glass is not None:
+            self.glass.read(self.conditions.pressure_hpa, t)
+        if self.weather is None and not first:
+            self.wind.air_mass = self.conditions.air_mass
+        if first:
+            self._last_conditions = self.conditions
+            if self.glass is not None:
+                self.glass.mark_watch()  # the reference for the first change of the watch
+
+    def _tick_weather(self) -> None:
+        """The minute's weather lines: the sky and the weather when they change, the
+        hour's line with the glass, and at the watch's change the glass's fall or rise
+        since the watch before (spec M5 §5). No line names a front or a centre."""
+        from freesail.world.weather import WEATHER_LINES
+
+        self._observe_weather()
+        t = self.clock.ship_time
+        now, was = self.conditions, self._last_conditions
+        if was is not None and now.sky != was.sky:
+            signs = f", {now.signs}" if now.signs else ""
+            self.record(
+                Severity.ROUTINE,
+                "weather.sky",
+                f"The sky {now.sky}{signs}.",
+                data={"sky": now.sky, "signs": now.signs, "visibility": now.visibility},
+            )
+        if was is not None and now.weather != was.weather:
+            text = WEATHER_LINES.get((was.weather, now.weather)) or WEATHER_LINES[now.weather]
+            self.record(
+                Severity.NOTABLE if now.weather == "fog" else Severity.ROUTINE,
+                "weather.change",
+                text,
+                data={"weather": now.weather, "was": was.weather, "visibility": now.visibility},
+            )
+        self._last_conditions = now
+        if t.minute != 0:
+            return
+        hour = units.WATCHES
+        watch_change = any(t.hour == start for start, _, _ in hour)
+        signs = f", {now.signs}" if now.signs else ""
+        text = f"{now.sky.capitalize()}{signs}, {now.weather}"
+        data: dict[str, Any] = {
+            "sky": now.sky,
+            "signs": now.signs,
+            "weather": now.weather,
+            "visibility": now.visibility,
+        }
+        if self.glass is not None and self.glass.reading_in is not None:
+            reading = self.glass.reading_in
+            data["glass_in"] = reading
+            data["change_in"] = self.glass.change_over(1.0)
+            text += f"; the glass {reading:.2f}"
+            if watch_change:
+                change = self.glass.mark_watch()
+                data["since_watch_in"] = change
+                if change is not None:
+                    since = units.watch_of(t - timedelta(minutes=1))[1].lower()
+                    text += f", {_hundredths(change)} since the {since}"
+        self.record(Severity.ROUTINE, "weather.hour", text + ".", data=data)
+
+    def _log_squall(self) -> None:
+        """A squall (spec M5 §3): notable at its start, with its veer and its wind, and at
+        its end."""
+        wind = self.wind
+        kn = units.ms_to_knots(wind.effective_speed)
+        if wind.squall_started:
+            points = units.rad_to_points(wind.squall_veer)
+            n = round(points)
+            self.record(
+                Severity.NOTABLE,
+                "weather.squall",
+                f"A squall: the wind veers {'a point' if n == 1 else f'{n} points'} to "
+                f"{units.point_name(wind.direction_from)} and freshens to {kn:.0f} knots, "
+                f"with rain.",
+                data={
+                    "factor": wind.squall_factor,
+                    "veer_points": round(points, 2),
+                    "knots": round(kn),
+                    "mean_kn": round(units.ms_to_knots(self.wind_record.mean_speed() or 0.0), 1),
+                    "air_mass": wind.air_mass,
+                },
+            )
+        else:
+            self.record(
+                Severity.NOTABLE,
+                "weather.squall_over",
+                f"The squall passed; the wind {units.point_name(wind.direction_from)}, "
+                f"{kn:.0f} knots.",
+                data={"knots": round(kn)},
+            )
 
     # -- readings ------------------------------------------------------------
 
@@ -330,10 +498,21 @@ class World:
     def tick(self) -> None:
         """Advance the world by one game second."""
         self.clock.advance()
+        if self.systems is not None:
+            # the systems move every tick (microseconds: a bell and two segments a system);
+            # the sky and the glass are read once a minute (`_observe_weather`)
+            self.systems.advance(self.clock.ship_time)
+            if self.weather is None:
+                self.wind.follow(*self.systems.surface_wind_at(self.ship_x_km, self.ship_y_km))
         if self.weather is not None:
             self.wind.follow(*self.weather.at(self.clock.ship_time))
-        self.wind.step(1.0)
+        # the ten-minute mean, which the systems' regime draws its gusts and squalls as
+        # multiples of (spec M5 §3); the M2 regime reads nothing and stays as it was
+        mean = self.wind_record.mean_speed() if self.wind.air_mass is not None else None
+        self.wind.step(1.0, mean)
         self.wind_record.add(self.wind.effective_speed, self.wind.direction_from)
+        if self.wind.squall_started or self.wind.squall_ended:
+            self._log_squall()
         if self.wind.gust_started:
             mean = units.ms_to_knots(self.wind_record.mean_speed() or self.wind.speed)
             self.record(
@@ -341,10 +520,11 @@ class World:
                 "wind.gust",
                 f"A gust: {units.ms_to_knots(self.wind.effective_speed):.0f} knots, the mean "
                 f"{mean:.0f}.",
-                data={"factor": self.wind.gust_factor, "mean_kn": round(mean, 1)},
+                data={"factor": self.wind.gust_factor, "mean_kn": round(mean, 1)}
+                | ({"air_mass": self.wind.air_mass} if self.wind.air_mass else {}),
             )
         shift = units.wrap_pi(self.wind.direction_from - self._last_logged_wind_direction)
-        if abs(shift) >= self.WIND_SHIFT_LOG_THRESHOLD:
+        if abs(shift) >= self.WIND_SHIFT_LOG_THRESHOLD and not self.wind.in_squall:
             sense = "veered" if shift > 0 else "backed"
             self.record(
                 Severity.NOTABLE,
@@ -354,6 +534,8 @@ class World:
                 data={"direction_from": self.wind.direction_from, "shift": shift},
             )
             self._last_logged_wind_direction = self.wind.direction_from
+        if self.systems is not None and self.clock.ship_time.second == 0:
+            self._tick_weather()
         for note in self.ship.step(1.0, self.wind):
             if len(note) == 3:
                 self.record(*note)
@@ -419,6 +601,7 @@ class World:
             f"Wind {self.wind.describe()}, "
             f"{units.describe_wind_strength(self.wind.effective_speed)}",
             f"{daylight}. {self.sun_times().describe()}",
+            *queries.weather_lines(self),
             *ship_lines,
             *queries.watch_lines(self),
         ]
@@ -446,3 +629,21 @@ class World:
             "agents": [agent.save() for agent in self.agents.values()],
             "agent_journals": {name: j.save() for name, j in self.agent_journals.items()},
         }
+
+
+def _hundredths(change_in: float) -> str:
+    """'fallen three hundredths', 'risen a tenth', 'steady': a change of the glass in the
+    log's words (inches to the hundredth, as the vernier reads)."""
+    n = round(abs(change_in) * 100)
+    if n == 0:
+        return "steady"
+    verb = "risen" if change_in > 0 else "fallen"
+    if n == 1:
+        amount = "a hundredth"
+    elif n == 10:
+        amount = "a tenth"
+    elif n == 20:
+        amount = "two tenths"
+    else:
+        amount = f"{n} hundredths"
+    return f"{verb} {amount}"

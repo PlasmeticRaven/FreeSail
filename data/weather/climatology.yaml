@@ -1,0 +1,259 @@
+# FreeSail: the monthly climatology the weather systems are seeded from (spec M5 §2; the
+# study docs/design/WeatherSystems.md §1 and §5). Package 30's first pass.
+#
+# Every row is PROVISIONAL (spec M5 §33 item 1): the direction shares are the study's own
+# averaging of the Channel indices of Mellado-Cano et al. (S1, verified, CC-BY-4.0; the
+# 1750 to 1854 row for west and east, the 1795 to 1815 row for south and north, which
+# the longer row does not give) and the Ushant gust-day counts are Meteo-France's normals
+# (S4, verified); everything else is a judgement set so that the check passes, to be
+# replaced by the Channel Pilot's climatic tables when the owner has a printed copy (S2)
+# and by the CLIWOC extraction (W §1.5) if the first pass proves wrong. The number of lows
+# a month is the study's guess ("perhaps six to eight a month in winter and three to four
+# in summer", unverified). A low's speeds are the shipping forecast's classes (S9, 15 to 35
+# knots); central pressures "from 1000 hPa down to 950" (W §1.3). The track is the storm
+# track over the box, nearer the box in winter and north of it in summer (W §1). The high's
+# bearing is the season's: the Scandinavian high to the north and north-east in winter and
+# spring (the Channel easterly), the Azores ridge to the south-west in summer.
+#
+# Fields per month: background_hpa (the glass's mean; W §2b "about 1015, seasonal", a
+# judgement by month), gradient (the mean gradient the box sits on between the Azores high
+# and the Icelandic low, hPa per 100 km and the bearing toward high pressure: about 1 hPa
+# per 100 km in winter toward the south, which is the climatological westerly of W §1.1
+# itself, and half that in summer with the ridge to the south-west; a judgement from the
+# mean sea-level pressure charts, unverified against a table), lows_per_month, track_bearing_deg (the direction a low moves, mean
+# and spread), closest_approach_km (the track's distance from the box's centre, positive to
+# the north, mean and spread), speed_kn, central_hpa (mean, spread, floor), radius_km,
+# life_h, high (probability that one sits within reach; its bearing from the box; its
+# distance; its anomaly; its radius; its life), check (the direction shares in per cent, and
+# Ushant's days a month with a gust of 31 and of 54 knots or more).
+provisional: true
+source: docs/design/WeatherSystems.md sections 1.1, 1.2, 1.3, 5 (2026-09-29)
+months:
+  1:
+    name: January
+    background_hpa: 1013
+    gradient: {hpa_per_100km: 0.12, high_toward_deg: 185}
+    lows_per_month: 7
+    track_bearing_deg: {mean: 65, spread: 25}
+    closest_approach_km: {mean: 150, spread: 450}
+    speed_kn: {min: 15, max: 35}
+    central_hpa: {mean: 977, spread: 14, floor: 950}
+    radius_km: {min: 350, max: 600}
+    life_h: {min: 60, max: 110}
+    high:
+      probability: 0.85
+      bearing_deg: {mean: 350, spread: 110}
+      distance_km: {min: 300, max: 700}
+      anomaly_hpa: {min: 12, max: 25}
+      radius_km: {min: 800, max: 1200}
+      life_h: {min: 48, max: 144}
+    check: {westerly_pct: 29, easterly_pct: 22, southerly_pct: 25, northerly_pct: 17, ushant_gust31_days: 23.6, ushant_gust54_days: 4.5}
+  2:
+    name: February
+    background_hpa: 1014
+    gradient: {hpa_per_100km: 0.12, high_toward_deg: 185}
+    lows_per_month: 6.5
+    track_bearing_deg: {mean: 65, spread: 25}
+    closest_approach_km: {mean: 170, spread: 450}
+    speed_kn: {min: 15, max: 35}
+    central_hpa: {mean: 978, spread: 14, floor: 950}
+    radius_km: {min: 350, max: 600}
+    life_h: {min: 60, max: 110}
+    high:
+      probability: 0.85
+      bearing_deg: {mean: 10, spread: 110}
+      distance_km: {min: 300, max: 700}
+      anomaly_hpa: {min: 12, max: 25}
+      radius_km: {min: 800, max: 1200}
+      life_h: {min: 48, max: 144}
+    check: {westerly_pct: 34, easterly_pct: 17, southerly_pct: 24, northerly_pct: 18, ushant_gust31_days: 19.9, ushant_gust54_days: 3.7}
+  3:
+    name: March
+    background_hpa: 1015
+    gradient: {hpa_per_100km: 0.12, high_toward_deg: 190}
+    lows_per_month: 6
+    track_bearing_deg: {mean: 65, spread: 25}
+    closest_approach_km: {mean: 230, spread: 430}
+    speed_kn: {min: 15, max: 35}
+    central_hpa: {mean: 982, spread: 13, floor: 950}
+    radius_km: {min: 350, max: 600}
+    life_h: {min: 60, max: 110}
+    high:
+      probability: 0.85
+      bearing_deg: {mean: 345, spread: 110}
+      distance_km: {min: 300, max: 700}
+      anomaly_hpa: {min: 12, max: 25}
+      radius_km: {min: 800, max: 1200}
+      life_h: {min: 48, max: 144}
+    check: {westerly_pct: 31, easterly_pct: 23, southerly_pct: 19, northerly_pct: 16, ushant_gust31_days: 18.6, ushant_gust54_days: 2.0}
+  4:
+    name: April
+    background_hpa: 1015
+    gradient: {hpa_per_100km: 0.12, high_toward_deg: 235}
+    lows_per_month: 5
+    track_bearing_deg: {mean: 65, spread: 25}
+    closest_approach_km: {mean: 300, spread: 400}
+    speed_kn: {min: 15, max: 35}
+    central_hpa: {mean: 988, spread: 12, floor: 955}
+    radius_km: {min: 350, max: 600}
+    life_h: {min: 60, max: 110}
+    high:
+      probability: 0.85
+      bearing_deg: {mean: 325, spread: 110}
+      distance_km: {min: 300, max: 700}
+      anomaly_hpa: {min: 12, max: 25}
+      radius_km: {min: 800, max: 1200}
+      life_h: {min: 48, max: 144}
+    check: {westerly_pct: 30, easterly_pct: 23, southerly_pct: 23, northerly_pct: 25, ushant_gust31_days: 15.0, ushant_gust54_days: 0.9}
+  5:
+    name: May
+    background_hpa: 1016
+    gradient: {hpa_per_100km: 0.12, high_toward_deg: 235}
+    lows_per_month: 4
+    track_bearing_deg: {mean: 65, spread: 25}
+    closest_approach_km: {mean: 400, spread: 370}
+    speed_kn: {min: 15, max: 35}
+    central_hpa: {mean: 994, spread: 10, floor: 960}
+    radius_km: {min: 350, max: 600}
+    life_h: {min: 60, max: 110}
+    high:
+      probability: 0.85
+      bearing_deg: {mean: 0, spread: 110}
+      distance_km: {min: 300, max: 700}
+      anomaly_hpa: {min: 12, max: 25}
+      radius_km: {min: 800, max: 1200}
+      life_h: {min: 48, max: 144}
+    check: {westerly_pct: 28, easterly_pct: 23, southerly_pct: 29, northerly_pct: 21, ushant_gust31_days: 11.6, ushant_gust54_days: 0.6}
+  6:
+    name: June
+    background_hpa: 1017
+    gradient: {hpa_per_100km: 0.12, high_toward_deg: 215}
+    lows_per_month: 3.5
+    track_bearing_deg: {mean: 65, spread: 25}
+    closest_approach_km: {mean: 480, spread: 350}
+    speed_kn: {min: 15, max: 35}
+    central_hpa: {mean: 1000, spread: 8, floor: 970}
+    radius_km: {min: 350, max: 600}
+    life_h: {min: 60, max: 110}
+    high:
+      probability: 0.85
+      bearing_deg: {mean: 300, spread: 110}
+      distance_km: {min: 300, max: 700}
+      anomaly_hpa: {min: 12, max: 25}
+      radius_km: {min: 800, max: 1200}
+      life_h: {min: 48, max: 144}
+    check: {westerly_pct: 33, easterly_pct: 15, southerly_pct: 16, northerly_pct: 14, ushant_gust31_days: 7.0, ushant_gust54_days: 0.2}
+  7:
+    name: July
+    background_hpa: 1017
+    gradient: {hpa_per_100km: 0.15, high_toward_deg: 220}
+    lows_per_month: 3
+    track_bearing_deg: {mean: 65, spread: 25}
+    closest_approach_km: {mean: 500, spread: 350}
+    speed_kn: {min: 15, max: 35}
+    central_hpa: {mean: 1002, spread: 7, floor: 972}
+    radius_km: {min: 350, max: 600}
+    life_h: {min: 60, max: 110}
+    high:
+      probability: 0.85
+      bearing_deg: {mean: 240, spread: 110}
+      distance_km: {min: 300, max: 700}
+      anomaly_hpa: {min: 12, max: 25}
+      radius_km: {min: 800, max: 1200}
+      life_h: {min: 48, max: 144}
+    check: {westerly_pct: 44, easterly_pct: 11, southerly_pct: 27, northerly_pct: 15, ushant_gust31_days: 6.3, ushant_gust54_days: 0.1}
+  8:
+    name: August
+    background_hpa: 1016
+    gradient: {hpa_per_100km: 0.15, high_toward_deg: 215}
+    lows_per_month: 3.5
+    track_bearing_deg: {mean: 65, spread: 25}
+    closest_approach_km: {mean: 480, spread: 350}
+    speed_kn: {min: 15, max: 35}
+    central_hpa: {mean: 1000, spread: 8, floor: 970}
+    radius_km: {min: 350, max: 600}
+    life_h: {min: 60, max: 110}
+    high:
+      probability: 0.85
+      bearing_deg: {mean: 240, spread: 110}
+      distance_km: {min: 300, max: 700}
+      anomaly_hpa: {min: 12, max: 25}
+      radius_km: {min: 800, max: 1200}
+      life_h: {min: 48, max: 144}
+    check: {westerly_pct: 41, easterly_pct: 13, southerly_pct: 23, northerly_pct: 16, ushant_gust31_days: 6.0, ushant_gust54_days: 0.0}
+  9:
+    name: September
+    background_hpa: 1016
+    gradient: {hpa_per_100km: 0.12, high_toward_deg: 200}
+    lows_per_month: 4.5
+    track_bearing_deg: {mean: 65, spread: 25}
+    closest_approach_km: {mean: 380, spread: 370}
+    speed_kn: {min: 15, max: 35}
+    central_hpa: {mean: 994, spread: 10, floor: 960}
+    radius_km: {min: 350, max: 600}
+    life_h: {min: 60, max: 110}
+    high:
+      probability: 0.85
+      bearing_deg: {mean: 320, spread: 110}
+      distance_km: {min: 300, max: 700}
+      anomaly_hpa: {min: 12, max: 25}
+      radius_km: {min: 800, max: 1200}
+      life_h: {min: 48, max: 144}
+    check: {westerly_pct: 35, easterly_pct: 19, southerly_pct: 23, northerly_pct: 16, ushant_gust31_days: 9.0, ushant_gust54_days: 0.3}
+  10:
+    name: October
+    background_hpa: 1014
+    gradient: {hpa_per_100km: 0.12, high_toward_deg: 190}
+    lows_per_month: 5.5
+    track_bearing_deg: {mean: 65, spread: 25}
+    closest_approach_km: {mean: 280, spread: 400}
+    speed_kn: {min: 15, max: 35}
+    central_hpa: {mean: 988, spread: 12, floor: 955}
+    radius_km: {min: 350, max: 600}
+    life_h: {min: 60, max: 110}
+    high:
+      probability: 0.85
+      bearing_deg: {mean: 350, spread: 110}
+      distance_km: {min: 300, max: 700}
+      anomaly_hpa: {min: 12, max: 25}
+      radius_km: {min: 800, max: 1200}
+      life_h: {min: 48, max: 144}
+    check: {westerly_pct: 34, easterly_pct: 19, southerly_pct: 26, northerly_pct: 17, ushant_gust31_days: 16.0, ushant_gust54_days: 1.2}
+  11:
+    name: November
+    background_hpa: 1013
+    gradient: {hpa_per_100km: 0.12, high_toward_deg: 185}
+    lows_per_month: 6.5
+    track_bearing_deg: {mean: 65, spread: 25}
+    closest_approach_km: {mean: 200, spread: 450}
+    speed_kn: {min: 15, max: 35}
+    central_hpa: {mean: 982, spread: 13, floor: 950}
+    radius_km: {min: 350, max: 600}
+    life_h: {min: 60, max: 110}
+    high:
+      probability: 0.85
+      bearing_deg: {mean: 30, spread: 110}
+      distance_km: {min: 300, max: 700}
+      anomaly_hpa: {min: 12, max: 25}
+      radius_km: {min: 800, max: 1200}
+      life_h: {min: 48, max: 144}
+    check: {westerly_pct: 35, easterly_pct: 16, southerly_pct: 19, northerly_pct: 15, ushant_gust31_days: 21.3, ushant_gust54_days: 2.8}
+  12:
+    name: December
+    background_hpa: 1013
+    gradient: {hpa_per_100km: 0.12, high_toward_deg: 185}
+    lows_per_month: 7
+    track_bearing_deg: {mean: 65, spread: 25}
+    closest_approach_km: {mean: 150, spread: 450}
+    speed_kn: {min: 15, max: 35}
+    central_hpa: {mean: 977, spread: 14, floor: 950}
+    radius_km: {min: 350, max: 600}
+    life_h: {min: 60, max: 110}
+    high:
+      probability: 0.85
+      bearing_deg: {mean: 20, spread: 110}
+      distance_km: {min: 300, max: 700}
+      anomaly_hpa: {min: 12, max: 25}
+      radius_km: {min: 800, max: 1200}
+      life_h: {min: 48, max: 144}
+    check: {westerly_pct: 32, easterly_pct: 20, southerly_pct: 19, northerly_pct: 24, ushant_gust31_days: 22.8, ushant_gust54_days: 4.0}

@@ -31,7 +31,8 @@
     set("i-leeway", s.leeway === null || s.leeway === undefined ? "no way on" : U.formatSigned(s.leeway, "to starboard", "to larboard"));
     set("i-heel", U.formatSigned(s.heel, "to starboard", "to larboard"));
     set("i-true-wind", U.pointName(w.true_from) + ", " + U.formatKnots(w.true_speed, 0));
-    set("i-wind-words", U.windStrength(w.true_speed) + (w.gust_factor > 1.05 ? ", gusting" : ""));
+    set("i-wind-words", U.windStrength(w.true_speed) + (w.squall ? ", a squall" : w.gust_factor > 1.05 ? ", gusting" : ""));
+    renderWeather(snap.weather);
     var awa = w.apparent_angle;
     set("i-apparent", Math.round(Math.abs(U.deg(awa))) + "° " + windBearing(awa) + ", " + U.formatKnots(w.apparent_speed, 0));
     set("i-tack", s.tack + " tack");
@@ -85,6 +86,29 @@
         li2.textContent = e.id.replace(/_/g, " ") + (subject ? ": " + subject : "") + " · " + e.step.replace(/_/g, " ") + how + men;
         evoList.appendChild(li2);
       });
+    }
+  }
+
+  /** The glass and the sky (spec M5 §5): the registry's words, as the console says them.
+   * A ship with no glass says so; a scenario with no weather systems keeps no sky. */
+  function renderWeather(wx) {
+    if (!wx) {
+      set("i-glass", "");
+      set("i-tendency", "");
+      set("i-sky", "");
+      return;
+    }
+    if (wx.glass_in === null || wx.glass_in === undefined) {
+      set("i-glass", wx.glass_words || "no glass aboard");
+      set("i-tendency", "");
+    } else {
+      set("i-glass", wx.glass_in.toFixed(2) + " in");
+      set("i-tendency", wx.tendency ? wx.tendency : (wx.tendency_words || ""));
+    }
+    if (!wx.sky) {
+      set("i-sky", wx.sky_words || "no sky kept");
+    } else {
+      set("i-sky", wx.sky + (wx.signs ? ", " + wx.signs : "") + "; " + wx.weather + "; " + wx.visibility);
     }
   }
 

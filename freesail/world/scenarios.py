@@ -12,12 +12,28 @@ the captain's first orders:
       file: data/ships/frigate-36.yaml
       heading_deg: 180
       speed_kn: 0                    # optional, and x_m, y_m
+      glass: true                    # she carries a barometer (spec M5 §5; rare in a small vessel)
     wind:
       gustiness: 0.3                 # physics/wind.py's, as the M2 wind
       variability: 0.3
-    weather:                         # the script (freesail.world.weather_script)
-      - {at: 1805-06-01T04:00, from_deg: 270, knots: 18}
-      - ...
+    weather:                         # spec M5 §2: two forms
+      wind:                          # the pinned wind (freesail.world.weather_script)
+        - {at: 1805-06-01T04:00, from_deg: 270, knots: 18}
+        - ...
+      systems:                       # the systems (freesail.world.weather)
+        - name: the low
+          kind: low
+          radius_km: 450
+          fronts: {warm_deg: 140, cold_deg: 300}
+          track:
+            - {at: 1805-06-01T04:00, x_km: -300, y_km: 500, hpa: 990}
+            - ...
+      climatology: false             # or seed the month's from data/weather/climatology.yaml
+      background: {hpa: 1015, gradient_hpa_per_100km: 1.0, high_toward_deg: 190}   # optional
+
+A bare list under `weather` is the old form, the pinned wind alone. With both forms the
+pinned wind wins and the systems give only the sky and the glass; with systems alone the
+systems' surface wind at the ship is the base wind (spec M5 §2).
     standing_orders:                 # files read at the start, in order
       - data/standing_orders/starter.orders
     orders:                          # the captain's first orders, given at tick 0
@@ -40,6 +56,7 @@ from typing import Any
 import yaml
 
 from freesail.core.world import Scenario, World
+from freesail.world.weather import WeatherError, _system_from_dict
 from freesail.world.weather_script import WeatherScript
 
 # The seed a driver uses when neither the command line nor the file names one (the
@@ -67,11 +84,29 @@ class ScenarioFile:
         return WeatherScript.from_list(self.scenario.weather) if self.scenario.weather else None
 
     def lines(self) -> list[str]:
-        """What the driver prints when the scenario is loaded."""
+        """What the driver prints when the scenario is loaded (the author's view: the
+        systems by name, which no log line ever gives)."""
         out = [f"Scenario: {self.scenario.name} ({self.path})."]
         if self.script is not None:
             out += ["The weather: " + self.script.lines()[0]]
             out += ["  " + ln for ln in self.script.lines()[1:]]
+        sc = self.scenario
+        if sc.systems:
+            which = "the sky and the glass" if sc.weather else "the wind, the sky and the glass"
+            out.append(f"The systems ({which}):")
+            for d in sc.systems:
+                track = d.get("track") or []
+                first, last = track[0], track[-1]
+                out.append(
+                    f"  {d['name']} ({d.get('kind', 'low')}, radius "
+                    f"{d.get('radius_km', 500):g} km): "
+                    f"{first['hpa']:g} hPa at {first['at'][11:16]}, {last['hpa']:g} hPa at "
+                    f"{last['at'][11:16]}, {len(track)} waypoints."
+                )
+        elif sc.climatology:
+            out.append(f"The weather from the climatology for {sc.start_time.strftime('%B')}.")
+        if sc.glass:
+            out.append("She carries a glass.")
         return out
 
 
@@ -99,6 +134,7 @@ def load_scenario(path: str | Path) -> ScenarioFile:
         sc.latitude_deg = float(raw["latitude_deg"])
     ship = raw.get("ship") or {}
     wind = raw.get("wind") or {}
+    sc.glass = bool(ship.get("glass", raw.get("glass", False)))
     try:
         sc.ship_heading_deg = float(ship.get("heading_deg", sc.ship_heading_deg))
         sc.ship_speed_kn = float(ship.get("speed_kn", sc.ship_speed_kn))
@@ -111,6 +147,54 @@ def load_scenario(path: str | Path) -> ScenarioFile:
     except (TypeError, ValueError, AttributeError) as e:
         raise ScenarioError(f"{where}: {e}") from None
     weather = raw.get("weather") or []
+    systems: list[Any] = []
+    if isinstance(weather, dict):
+        # the M5 form: a mapping of the pinned `wind`, the `systems` and `climatology`
+        systems = list(weather.get("systems") or [])
+        sc.climatology = bool(weather.get("climatology", False))
+        background = weather.get("background") or {}
+        if not isinstance(background, dict):
+            raise ScenarioError(
+                f"{where}, weather background: hpa, gradient_hpa_per_100km, high_toward_deg."
+            )
+        try:
+            sc.background = {k: float(v) for k, v in background.items()}
+        except (TypeError, ValueError):
+            raise ScenarioError(f"{where}, weather background: numbers only.") from None
+        weather = weather.get("wind") or []
+    if not isinstance(weather, list):
+        raise ScenarioError(
+            f"{where}, weather: a list of wind waypoints, or a mapping of wind, systems and "
+            f"climatology."
+        )
+    given, systems = systems, []
+    for i, d in enumerate(given):
+        if not isinstance(d, dict):
+            raise ScenarioError(
+                f"{where}, systems {i + 1}: a system is a mapping (name, kind, radius_km, "
+                f"fronts, track)."
+            )
+        track = []
+        for j, w in enumerate(d.get("track") or []):
+            if not isinstance(w, dict):
+                raise ScenarioError(
+                    f"{where}, systems {i + 1}, waypoint {j + 1}: at, x_km, y_km, hpa."
+                )
+            track.append(
+                {
+                    **w,
+                    "at": _time(
+                        w.get("at"), f"{where}, systems {i + 1}, waypoint {j + 1}"
+                    ).isoformat(),
+                }
+            )
+        entry = {**d, "track": track}
+        try:
+            _system_from_dict(entry, sc.start_time)  # refused in words
+        except WeatherError as e:
+            raise ScenarioError(f"{where}: {e}") from None
+        systems.append(entry)
+    sc.systems = systems
     if weather:
         entries = []
         for i, w in enumerate(weather):

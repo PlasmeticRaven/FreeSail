@@ -80,15 +80,16 @@ def test_every_row_of_the_spec_is_registered():
 
 
 def test_absent_readings_carry_their_sentences():
-    for id, word in (("well", "well"), ("glass", "glass"), ("depth", "lead line")):
+    for id, word in (("well", "well"), ("depth", "lead line")):
         row = R.REGISTRY.get(id)
         assert row.is_absent and row.getter is None
         assert word in row.absent and "yet" in row.absent
-    assert R.REGISTRY.get("glass").absent == (
-        "The ship has no glass yet; that reading comes with the world."
-    )
+    # the glass arrived with package 30 (spec M5 §5): a reading, None on a ship without one
+    row = R.REGISTRY.get("glass")
+    assert not row.is_absent and row.kind == "glass"
     w = World(seed=1)
     assert w.readings["glass"] is None
+    assert w.readings.words("glass") == R.NO_GLASS_WORDS
     # the sun arrived with package 26: daylight is a reading, not an absence
     row = R.REGISTRY.get("daylight")
     assert not row.is_absent and row.kind == "daylight"

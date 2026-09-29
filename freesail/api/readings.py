@@ -37,6 +37,12 @@ from freesail.crew.model import Crew, fatigue_words
 from freesail.physics.hull import WAY_ON_KN
 from freesail.physics.strain import DECAY_RATIO
 from freesail.ship.parts import Dynamics, HelmMode, Line, Sail, SailState, Spar
+from freesail.world.weather import (
+    SKY_WORDS,
+    TENDENCY_WORDS,
+    VISIBILITY_WORDS,
+    WEATHER_WORDS,
+)
 
 if TYPE_CHECKING:
     from freesail.core.world import World
@@ -44,9 +50,16 @@ if TYPE_CHECKING:
 __all__ = [
     "EVENTS",
     "FATIGUE_DECIMALS",
+    "GLASS_UNWATCHED_WORDS",
     "INTERVALS",
     "KINDS",
+    "NO_GLASS_WORDS",
     "NO_WAY_WORDS",
+    "NO_WEATHER_WORDS",
+    "SKY_WORDS",
+    "TENDENCY_WORDS",
+    "VISIBILITY_WORDS",
+    "WEATHER_WORDS",
     "READING_SPEED_FLOOR_KN",
     "STERNWAY_WORDS",
     "REGISTRY",
@@ -86,6 +99,11 @@ KINDS: dict[str, str] = {
     "sail": "a sail's state: is set, is shaking, is aback, is furled, is blown out",
     "strain": "the strain: exceeds the rating, exceeds 1.2, is straining",
     "hands": "the hands: exceeds N, are fresh, are tired, are worn out",
+    "glass": "the glass in inches: exceeds, is over, is under, is below 29.5",
+    "tendency": "the glass's tendency: is steady, is rising, is falling, is falling fast",
+    "sky": "the sky: is clear, is overcast, is dark and gloomy, is threatening, is hazy",
+    "weather": "the weather: is fine, is rain, is drizzle, is squally, is fog",
+    "visibility": "the visibility: is the horizon, is a few miles, is a mile, is a cable",
     "absent": "not a reading the ship has yet",
 }
 
@@ -123,6 +141,14 @@ NO_WAY_WORDS = "no way on; course and leeway not meaningful"
 STERNWAY_WORDS = "making sternway; course and leeway not meaningful"
 
 DAYLIGHT_WORDS: tuple[str, ...] = ("day", "twilight", "night")
+
+# The weather's readings (spec M5 §5) when the ship cannot give them: a ship with no glass
+# has neither the glass nor its tendency (W §1.7: in 1805 a glass aboard is the captain's
+# own, and a small vessel may have none; the scenario says); the tendency wants an hour's
+# record; a scenario without weather systems keeps no sky. Lower-case, as NO_WAY_WORDS.
+NO_GLASS_WORDS = "the ship carries no glass"
+GLASS_UNWATCHED_WORDS = "the glass has not been watched an hour yet"
+NO_WEATHER_WORDS = "no weather is kept in this scenario; the sky comes with its systems"
 
 FATIGUE_WORDS: tuple[str, ...] = ("fresh", "tired", "worn out")
 
@@ -406,6 +432,59 @@ def _daylight(world: Any, _: str | None) -> str | None:
     return getattr(world, "daylight", None)
 
 
+def _glass_of(world: Any) -> Any:
+    return getattr(world, "glass", None)
+
+
+def _conditions_of(world: Any) -> Any:
+    return getattr(world, "conditions", None)
+
+
+def _glass(world: Any, _: str | None) -> float | None:
+    """The glass in inches to the hundredth, as the vernier reads, with the ship's own
+    reading noise (`world.weather.Glass`); None without a glass."""
+    glass = _glass_of(world)
+    return glass.reading_in if glass is not None else None
+
+
+def _tendency(world: Any, _: str | None) -> dict[str, Any] | None:
+    """The glass's change over the last three hours and the last hour, in inches, and the
+    period's words for it: steady, rising, falling, rising fast, falling fast; from the
+    ship's own record, so None without a glass or before an hour of record."""
+    glass = _glass_of(world)
+    return glass.tendency() if glass is not None else None
+
+
+def _no_glass_words(world: Any) -> str | None:
+    glass = _glass_of(world)
+    if glass is None:
+        return NO_GLASS_WORDS
+    return GLASS_UNWATCHED_WORDS
+
+
+def _sky(world: Any, _: str | None) -> dict[str, Any] | None:
+    """Beaufort's letters as words, with Luce's signs for the log's colour; from the
+    sector and the distance to the front (`world.weather.Weather.conditions_at`)."""
+    c = _conditions_of(world)
+    return {"words": c.sky, "signs": c.signs} if c is not None else None
+
+
+def _weather(world: Any, _: str | None) -> str | None:
+    c = _conditions_of(world)
+    return c.weather if c is not None else None
+
+
+def _visibility(world: Any, _: str | None) -> dict[str, Any] | None:
+    """How far a sail can be seen, in the lookout's terms, and the miles that means (the
+    number 5b's sighting reads)."""
+    c = _conditions_of(world)
+    return {"words": c.visibility, "miles": c.visibility_nm} if c is not None else None
+
+
+def _no_weather_words(world: Any) -> str | None:
+    return NO_WEATHER_WORDS if _conditions_of(world) is None else None
+
+
 def _bells(world: Any, _: str | None) -> dict[str, Any]:
     """The last bell struck: watch name, bells, and whether it is striking now (the
     snapshot's `bell` block; spec §9.4)."""
@@ -675,10 +754,64 @@ REGISTRY.add_absent(
     ("the well",),
     "The ship has no well to sound yet; that reading comes with the world.",
 )
-REGISTRY.add_absent(
-    "glass",
-    ("the glass",),
-    "The ship has no glass yet; that reading comes with the world.",
+# The weather's readings (spec M5 §5, package 30). `the glass` is two rows behind one
+# phrase, as the true wind is: its height in inches and its tendency in words; a ship
+# without a glass reads None for both, in NO_GLASS_WORDS, and the dialect's `when the
+# glass is falling fast then shorten sail` parses on any ship and fires on none without.
+REGISTRY.add(
+    Reading(
+        "glass",
+        ("the glass", "the barometer"),
+        "glass",
+        "inches",
+        _glass,
+        description="the glass in inches to the hundredth, with the ship's own reading noise",
+        none_words=_no_glass_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "tendency",
+        ("the glass", "the barometer", "the tendency"),
+        "tendency",
+        "",
+        _tendency,
+        description="the glass's change over three hours and one hour, in the period's words",
+        none_words=_no_glass_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "sky",
+        ("the sky",),
+        "sky",
+        "",
+        _sky,
+        description="the sky in Beaufort's words, with the signs Luce lists",
+        none_words=_no_weather_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "weather",
+        ("the weather",),
+        "weather",
+        "",
+        _weather,
+        description="the weather: fine, rain, drizzle, passing showers, squally, thunder, fog",
+        none_words=_no_weather_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "visibility",
+        ("the visibility",),
+        "visibility",
+        "",
+        _visibility,
+        description="how far a sail can be seen: the horizon, a few miles, a mile, a cable",
+        none_words=_no_weather_words,
+    )
 )
 REGISTRY.add_absent(
     "depth",
@@ -744,6 +877,8 @@ _event(EventSpec("a spar carrying away", "spar.carried_away"))
 _event(EventSpec("a sail blown out", "sail.blown_out"))
 _event(EventSpec("all hands called", "crew.all_hands"))
 _event(EventSpec("the watch piped down", "crew.piped_down"))
+# a squall (spec M5 §3): the wind's own event in unstable air, logged by name
+_event(EventSpec("a squall", "weather.squall"))
 _event(
     EventSpec(
         "a sighting",
@@ -838,6 +973,38 @@ def describe_value(reading: Reading, value: Any) -> str:
         return f"{value['count']} hands, {value['words']}"
     if kind == "gust":
         return str(value)
+    if kind == "glass":
+        return f"{value:.2f} inches"
+    if kind == "tendency":
+        return tendency_in_words(value)
+    if kind == "sky":
+        return f"{value['words']}, {value['signs']}" if value.get("signs") else str(value["words"])
+    if kind == "weather":
+        return str(value)
+    if kind == "visibility":
+        return str(value["words"])
     if isinstance(value, float):
         return f"{value:g}"
     return str(value)
+
+
+def _inches_words(change: float) -> str:
+    """'fallen three hundredths', 'risen a tenth': a change of the glass in words."""
+    n = round(abs(change) * 100)
+    if n == 0:
+        return "steady"
+    verb = "risen" if change > 0 else "fallen"
+    amount = {1: "a hundredth", 10: "a tenth", 20: "two tenths"}.get(n, f"{n} hundredths")
+    return f"{verb} {amount}"
+
+
+def tendency_in_words(value: dict[str, Any]) -> str:
+    """'falling; fallen five hundredths in three hours, two in the last hour'."""
+    words = str(value["words"])
+    three, one = value.get("three_hours_in"), value.get("one_hour_in")
+    parts = []
+    if three is not None:
+        parts.append(f"{_inches_words(three)} in three hours")
+    if one is not None:
+        parts.append(f"{_inches_words(one)} in the last hour")
+    return f"{words}; {', '.join(parts)}" if parts else words

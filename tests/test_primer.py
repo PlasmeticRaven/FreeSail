@@ -86,6 +86,7 @@ CHAPTERS = [
     "06-the-watch-and-the-log.md",
     "07-a-first-passage.md",
     "08-where-to-read-more.md",
+    "09-the-glass-and-the-sky.md",
 ]
 
 DRIVER_COMMANDS = frozenset(

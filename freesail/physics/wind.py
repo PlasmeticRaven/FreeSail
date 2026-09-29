@@ -1,13 +1,32 @@
-"""The true wind: a single field over the plane with slow variation and gusts.
+"""The true wind: a base with slow variation and gusts on top of it.
 
-This is the M0 to M2 wind (spec §7.1). Moving weather systems arrive in M5 and
-will replace the random walk with something that has a reason; the interface
-(`direction_from`, `speed_at_height`, `vector_at_height`) stays.
+The M0 to M2 wind (spec §7.1) is one field over the plane: a base direction and speed, the
+direction on a random walk, the speed on a mean-reverting wander, and gusts that multiply
+the result. The interface (`direction_from`, `speed_at_height`, `vector_at_height`)
+stays whatever moves the base.
 
-A scenario's weather script (spec M4 §19, `freesail.world.weather_script`) moves the
-**base** the wind wanders about (`follow`): the direction's walk and the speed's
-mean-reverting wander are kept as offsets from the base, and the gusts multiply the
-result, exactly as they do about a fixed base. Without a script nothing here changes.
+**The base has two sources.** A scenario's weather script (spec M4 §19,
+`freesail.world.weather_script`) pins it directly (`follow`); milestone 5's weather
+systems (spec M5 §2, `freesail.world.weather`) give it a cause: the surface wind at the
+ship, which the World hands to `follow` every tick with the sector's air mass. Without
+either, nothing here changes from the M2 wind.
+
+**Two regimes** (spec M5 §3; the study `docs/design/WeatherSystems.md` §4):
+
+- With no air mass (`air_mass` None: a fixed wind, or a wind pinned by the script), the M2
+  mechanism, draw for draw: the gust factor 1.1 to 1.5 whatever the mean and the
+  direction's unbounded walk. Every truth from 1 to 51 is measured on this regime, so it
+  does not move (package 30; the pinned `wind` form is the truths' fixture, and with
+  both forms in a scenario the pinned wind wins and the systems supply only the sky and
+  the glass).
+- With an air mass from the systems' sector, the gust factor is drawn by the air mass
+  (`GUST_FACTOR_RANGES`: a warm sector 1.10 to 1.20, neutral air 1.15 to 1.30, unstable
+  air behind a cold front 1.20 to 1.30) as a multiple of the ten-minute mean, which is how
+  the studies the ranges come from define it (the peak few-second gust over the eight- to
+  ten-minute mean, W §4, S29 to S31); the top of the unstable range, 1.30 to 1.45, is a
+  squall's, its own event of a few minutes with a veer of a point or two and rain
+  (`SQUALL_*`); and the direction's walk is mean-reverting about the base with a spread
+  by the air mass (`WANDER_SPREAD_DEG`). Speed wander is the same in both.
 """
 
 from __future__ import annotations
@@ -33,6 +52,44 @@ MEAN_WIND_WINDOW_S = 600
 # Never less than GUST_MARGIN_FLOOR_KN, so a light air's knot either way is not a gust.
 GUST_MARGIN = 0.1
 GUST_MARGIN_FLOOR_KN = 1.0
+
+# The gust factor by air mass (spec M5 §3; W §4): over the open sea the peak gust over the
+# ten-minute mean is about 1.2 to 1.25 and nearly flat with wind speed (Kramer 2013,
+# marine sites 1.21 to 1.23; Blaes et al. 2013, 1.23 with 61 per cent of factors between
+# 1.2 and 1.3; the Mariners Weather Log 2008 study, 1.25 near neutral; S29 to S31,
+# verified), rising as the air becomes less stable and falling toward 1.1 in the stable
+# warm sector; over the open sea a factor of 1.5 "is a squall, not a gust". The ranges are
+# the study's recommendation from those figures. The WMO table's 1.23 (S32) was not
+# reached and is not relied on.
+GUST_FACTOR_RANGES: dict[str, tuple[float, float]] = {
+    "warm": (1.10, 1.20),
+    "neutral": (1.15, 1.30),
+    "unstable": (1.20, 1.30),
+}
+# A squall (W §4): the top of the unstable range, 1.30 to 1.45 of the mean, for a few
+# minutes, veering the wind a point or two, with rain. How often: about one an hour in
+# the unstable air behind a cold front (judgement; the study gives no rate), and its
+# length three to eight minutes ("their own events lasting minutes").
+SQUALL_FACTOR_RANGE = (1.30, 1.45)
+SQUALL_VEER_POINTS = (1.0, 2.0)
+SQUALL_DURATION_S = (180.0, 480.0)
+SQUALL_RATE_PER_S = 1.0 / 3600.0
+
+# The direction's mean-reverting wander (spec M5 §3; W §4: "a spread of some 5 to 10
+# degrees in unstable air and less in stable"; the study's judgement, not a measured
+# figure): the stationary spread of the direction about the base at the default
+# variability, by air mass, and the time the wander takes to forget an offset
+# (judgement: twenty minutes, the scale of the eddies that turn a ten-minute mean).
+WANDER_SPREAD_DEG: dict[str, float] = {"warm": 3.0, "neutral": 5.0, "unstable": 8.0}
+WANDER_TIME_CONSTANT_S = 1200.0
+# The variability at which the spreads above hold (the scenario's default); a scenario's
+# variability scales them, and nought gives no wander, as every truth is measured.
+DEFAULT_VARIABILITY = 0.3
+
+# The M2 walk: 0.0002 radians per root second at variability 1, which is 0.69 degrees an
+# hour of standard deviation (W §4 corrects the old docstring's "about a point an hour":
+# a point would take days). Kept exactly for the regime without an air mass.
+M2_WALK_RAD_PER_SQRT_S = 0.0002
 
 
 @dataclass
@@ -68,58 +125,128 @@ class Wind:
     def __init__(self, params: WindParams, stream: random.Random):
         self.params = params
         self._stream = stream
-        self.direction_from = units.wrap_2pi(params.direction_from)
-        self.base_direction = self.direction_from  # moved only by `follow`
+        self._direction = units.wrap_2pi(params.direction_from)  # the wandered direction
+        self.base_direction = self._direction  # moved only by `follow`
         self.base_speed = max(params.speed, self.MIN_SPEED)
         self.speed = self.base_speed
         self.gust_factor = 1.0
         self.gust_remaining = 0.0
         self.gust_started = False  # set True on the tick a gust begins
+        # the systems' regime (spec M5 §3): the air mass at the ship, None without systems
+        self.air_mass: str | None = None
+        self._gust_peak = 0.0  # m/s: the gust's peak, a multiple of the ten-minute mean
+        self.squall_factor = 1.0
+        self.squall_veer = 0.0  # radians, added to the direction while the squall lasts
+        self.squall_remaining = 0.0
+        self.squall_started = False
+        self.squall_ended = False
+        self._squall_peak = 0.0
 
-    # -- the weather script (spec M4 §19) ------------------------------------
+    # -- the direction, with a squall's veer on it ------------------------------
+
+    @property
+    def direction_from(self) -> float:
+        """Where the wind comes from now, radians in [0, 2 pi): the wandered direction
+        plus a squall's veer while one lasts."""
+        if self.squall_remaining > 0.0:
+            return units.wrap_2pi(self._direction + self.squall_veer)
+        return self._direction
+
+    @direction_from.setter
+    def direction_from(self, value: float) -> None:
+        self._direction = units.wrap_2pi(value)
+
+    @property
+    def in_squall(self) -> bool:
+        return self.squall_remaining > 0.0
+
+    # -- the weather script and the systems (spec M4 §19, M5 §2) ------------------
 
     def follow(self, direction_from: float, speed: float) -> None:
-        """Move the base wind to the script's, before `step`: the wind turns by what the
-        base turned (the short way round) and its speed changes by what the base's did,
-        so the wander about the base and any gust ride on the scripted wind as they ride
-        on a fixed one. Draws nothing from the stream."""
+        """Move the base wind to the script's or the systems', before `step`: the wind
+        turns by what the base turned (the short way round) and its speed changes by what
+        the base's did, so the wander about the base and any gust ride on the moving base
+        as they ride on a fixed one. Draws nothing from the stream."""
         turn = units.wrap_pi(direction_from - self.base_direction)
         self.base_direction = units.wrap_2pi(direction_from)
-        self.direction_from = units.wrap_2pi(self.direction_from + turn)
+        self._direction = units.wrap_2pi(self._direction + turn)
         base = max(speed, self.MIN_SPEED)
         self.speed = max(self.MIN_SPEED, self.speed + (base - self.base_speed))
         self.base_speed = base
 
     # -- per-tick update -----------------------------------------------------
 
-    def step(self, dt: float = 1.0) -> None:
+    def step(self, dt: float = 1.0, mean_speed: float | None = None) -> None:
+        """One tick. `mean_speed` is the ten-minute mean (`WindRecord.mean_speed`), which
+        the systems' regime draws its gusts and squalls as multiples of; None (or the M2
+        regime) reads the instant's speed instead."""
         v = self.params.variability
         r = self._stream
-        # direction: random walk, radians; ~1 point per hour at variability 1
-        self.direction_from = units.wrap_2pi(
-            self.direction_from + r.gauss(0.0, 0.0002 * v * math.sqrt(dt))
-        )
+        air = self.air_mass
+        # direction
+        if air is None:
+            # the M2 walk, unbounded: 0.69 degrees an hour at variability 1
+            self._direction = units.wrap_2pi(
+                self._direction + r.gauss(0.0, M2_WALK_RAD_PER_SQRT_S * v * math.sqrt(dt))
+            )
+        else:
+            # mean-reverting about the base (Ornstein-Uhlenbeck), spread by the air mass
+            spread = units.deg_to_rad(WANDER_SPREAD_DEG[air]) * (v / DEFAULT_VARIABILITY)
+            tau = WANDER_TIME_CONSTANT_S
+            offset = units.wrap_pi(self._direction - self.base_direction)
+            offset += -offset * dt / tau + r.gauss(0.0, spread * math.sqrt(2.0 * dt / tau))
+            self._direction = units.wrap_2pi(self.base_direction + offset)
         # speed: mean-reverting walk about the base speed
         pull = (self.base_speed - self.speed) * 0.0005 * dt
         noise = r.gauss(0.0, 0.01 * v * self.base_speed * math.sqrt(dt))
         self.speed = max(self.MIN_SPEED, self.speed + pull + noise)
+        mean = mean_speed if (mean_speed is not None and air is not None) else self.speed
         # gusts
         self.gust_started = False
         if self.gust_remaining > 0:
             self.gust_remaining -= dt
             if self.gust_remaining <= 0:
                 self.gust_factor = 1.0
+                self._gust_peak = 0.0
         elif r.random() < self.params.gustiness * 0.002 * dt:
-            self.gust_factor = r.uniform(1.1, 1.5)
+            if air is None:
+                self.gust_factor = r.uniform(1.1, 1.5)
+            else:
+                self.gust_factor = r.uniform(*GUST_FACTOR_RANGES[air])
+                self._gust_peak = mean * self.gust_factor
             self.gust_remaining = r.uniform(5.0, 30.0)
             self.gust_started = True
+        # squalls: the systems' regime, unstable air only
+        self.squall_started = False
+        self.squall_ended = False
+        if self.squall_remaining > 0:
+            self.squall_remaining -= dt
+            if self.squall_remaining <= 0:
+                self.squall_remaining = 0.0
+                self.squall_factor = 1.0
+                self.squall_veer = 0.0
+                self._squall_peak = 0.0
+                self.squall_ended = True
+        elif air == "unstable" and r.random() < SQUALL_RATE_PER_S * dt:
+            self.squall_factor = r.uniform(*SQUALL_FACTOR_RANGE)
+            self.squall_veer = units.points_to_rad(r.uniform(*SQUALL_VEER_POINTS))
+            self.squall_remaining = r.uniform(*SQUALL_DURATION_S)
+            self._squall_peak = mean * self.squall_factor
+            self.squall_started = True
 
     # -- queries ------------------------------------------------------------
 
     @property
     def effective_speed(self) -> float:
-        """Speed at the reference height including any gust."""
-        return self.speed * self.gust_factor
+        """Speed at the reference height including any gust or squall."""
+        if self.air_mass is None:
+            return self.speed * self.gust_factor
+        peak = 0.0
+        if self.gust_remaining > 0.0:
+            peak = self._gust_peak
+        if self.squall_remaining > 0.0:
+            peak = max(peak, self._squall_peak)
+        return max(self.speed, peak)
 
     def speed_at_height(self, height: float) -> float:
         h = max(height, 1.0)
