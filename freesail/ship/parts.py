@@ -13,6 +13,10 @@ strain model judges it against that. The sail room (`SailRoom`, reached by
 kind, the heavy-weather sails, the storm canvas and the occasional sails,
 each with its canvas number and condition. Bending draws a sail from it and
 unbending returns one to it; nothing mends canvas until milestone 8.
+
+Package 30b (milestone 5) keeps the spare spars the same way: the booms (`Booms`, reached
+by `booms(ship)`) hold them by class, with the counts the ship file gives, and a spar that
+has carried away is shifted for a spare of its class from them.
 """
 
 from __future__ import annotations
@@ -586,6 +590,115 @@ def sail_room(ship: Any) -> SailRoom:
     if crew is not None and getattr(crew, "sail_room", None) is not room:
         crew.sail_room = room
     return room
+
+
+# ---------------------------------------------------------------------------
+# The booms: spare spars (package 30b)
+# ---------------------------------------------------------------------------
+
+# The spare spars were stowed amidships between the fore and main masts, on the boat skids,
+# and were called "the booms" there: "LASHING OF BOOMS, that is, the spare topmasts, yards,
+# &c. stowed on the boat skids" (Steel 1794, vol. I); Luce 1866, ch. XVII Spare Spars,
+# 'Stowing Booms between the fore and mainmast'. A spar that carries away is replaced by a
+# spare of its class (`shift the <spar>`, data/evolutions/shift_spar.yaml); the ship file
+# gives the store by class (`crew.stores.spare_spars`), with its source in the comment.
+
+# A spar class in words, for the log and the refusals.
+SPAR_CLASS_WORDS: dict[str, str] = {
+    "mast": "lower mast",
+    "topmast": "topmast",
+    "topgallant_mast": "topgallant mast",
+    "royal_mast": "royal mast",
+    "bowsprit": "bowsprit",
+    "jib_boom": "jib-boom",
+    "flying_jib_boom": "flying jib-boom",
+    "yard": "yard",
+    "gaff": "gaff",
+    "boom": "boom",
+    "studdingsail_boom": "studding-sail boom",
+    "lug_yard": "lug yard",
+    "lateen_yard": "lateen yard",
+    "sprit": "sprit",
+}
+
+
+def spar_class_words(cls: str | None, n: int = 1) -> str:
+    """'studding-sail boom', or 'studding-sail booms' for more than one; a spar of no class
+    (a file that gives only a count) is 'spar'."""
+    words = SPAR_CLASS_WORDS.get(cls or "", (cls or "spar").replace("_", " "))
+    return words if n == 1 else words + "s"
+
+
+@dataclass
+class Booms:
+    """The spare spars aboard, by class (`counts`, in the ship file's order), and `any`
+    spars of no class that the carpenter fits to any spar: the store of a ship whose file
+    gives only a count. Shifting a spar takes one of its class, else one of these."""
+
+    counts: dict[str, int] = field(default_factory=dict)
+    any: int = 0
+
+    def __len__(self) -> int:
+        return sum(self.counts.values()) + self.any
+
+    def have(self, cls: str) -> int:
+        """How many spares could replace a spar of this class."""
+        return self.counts.get(cls, 0) + self.any
+
+    def take(self, cls: str) -> None:
+        """Take a spare for a spar of this class: one of its class if there is one."""
+        if self.counts.get(cls, 0) > 0:
+            self.counts[cls] -= 1
+        elif self.any > 0:
+            self.any -= 1
+        else:
+            raise ValueError(f"there is no spare {spar_class_words(cls)} on the booms")
+
+    def _listed(self) -> str:
+        items = [f"{n} {spar_class_words(cls, n)}" for cls, n in self.counts.items() if n > 0]
+        if self.any:
+            items.append(f"{self.any} spar{'s' if self.any != 1 else ''} to fit any")
+        if len(items) <= 1:
+            return "".join(items)
+        return ", ".join(items[:-1]) + " and " + items[-1]
+
+    def muster_line(self) -> str:
+        n = len(self)
+        if n == 0:
+            return "The booms: no spare spar aboard."
+        return f"The booms: {n} spare spar{'s' if n != 1 else ''}, {self._listed()}."
+
+    def inventory_lines(self) -> list[str]:
+        """The `the booms` query: the spare spars by class, in the form of the sail room's."""
+        n = len(self)
+        if n == 0:
+            return ["The booms are bare; there is no spare spar aboard."]
+        return [f"The booms hold {n} spare spar{'s' if n != 1 else ''}: {self._listed()}."]
+
+
+def booms(ship: Any) -> Booms:
+    """The ship's spare spars, kept in `ship.extra["booms"]`: made on first use from the
+    ship file's `crew.stores.spare_spars` (by class, or a plain count of spars that fit
+    any), else none. `ship.extra["spare_spars"]` is kept as the count. Like the sail room,
+    the store is a function of the ship file and the orders given, so a replay rebuilds
+    it as the game had it."""
+    store = ship.extra.get("booms")
+    if not isinstance(store, Booms):
+        stores = _stores_of(ship)
+        get = stores.get if isinstance(stores, dict) else lambda k: getattr(stores, k, None)
+        by_class = get("spars") if stores is not None else None
+        if isinstance(by_class, dict):
+            store = Booms(counts={str(k): int(v) for k, v in by_class.items()})
+        else:
+            count = get("spare_spars") if stores is not None else None
+            if isinstance(count, dict):  # a raw mapping of stores, as a test may give
+                store = Booms(counts={str(k): int(v) for k, v in count.items()})
+            else:
+                ok = isinstance(count, int) and not isinstance(count, bool) and count >= 0
+                store = Booms(any=int(count) if ok else 0)
+        ship.extra["booms"] = store
+    ship.extra["spare_spars"] = len(store)
+    return store
 
 
 @dataclass

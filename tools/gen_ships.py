@@ -465,6 +465,16 @@ class Builder:
         for kind, _, text in entries:
             self.crew_notes[("sails", kind)] = text
 
+    def spare_spars(self, note, entries):
+        """The stores' `spare_spars` by class (package 30b) from (class, count, note) entries:
+        the booms, each class's note written above its line and `note` above the store's."""
+        stores = self.doc["crew"].setdefault("stores", {})
+        stores["spare_spars"] = {cls: n for cls, n, _ in entries}
+        self.crew_notes[("stores", "spare_spars")] = note
+        for cls, _, text in entries:
+            if text:
+                self.crew_notes[("spare_spars", cls)] = text
+
     def rate_spars(self):
         """Second pass: rate every spar from what the engine's graph hangs on it.
 
@@ -537,6 +547,7 @@ class Builder:
         in_hull = False
         in_crew = False
         crew_key = ""
+        store_key = ""
         for line in text.splitlines():
             if line.startswith("hull:"):
                 in_hull = True
@@ -555,7 +566,10 @@ class Builder:
                 elif m := re.match(r"^  (\w+):", line):
                     crew_key = m.group(1)
                     note = self.crew_notes.get((crew_key,))
-                elif m := re.match(r"^    ([^:]+):", line):
+                elif store_key == "spare_spars" and (m := re.match(r"^      (\w+): \d+$", line)):
+                    note = self.crew_notes.get(("spare_spars", m.group(1)))
+                elif m := re.match(r"^    (\w[^:]*):", line):
+                    store_key = m.group(1)
                     note = self.crew_notes.get((crew_key, m.group(1)))
                 if note:
                     out.append(" " * (len(line) - len(line.lstrip())) + "# " + note)
@@ -2462,17 +2476,48 @@ def frigate_crew(b):
                 120,
                 "Provisions: four months at full allowance for the complement (judgement).",
             ),
-            (
-                ("stores", "spare_spars"),
-                4,
-                "Spare topmasts and yards in the waist and on the booms (judgement).",
-            ),
+            (("stores", "spare_spars"), {}, None),  # the booms, by class: below
             (
                 ("stores", "cordage_fathoms"),
                 600,
                 "Spare rope in the boatswain's store (judgement).",
             ),
         ]
+    )
+    # The booms (package 30b): the spare spars Luce stows between the fore and main masts
+    # (1866, ch. XVII Spare Spars, 'Stowing Booms between the fore and mainmast', 'In two
+    # Piles'): to starboard the main topmast, a stump main topgallant mast, mast-fishes, a
+    # half-yard and the main topmast studding-sail booms; to port the fore topmast, a stump
+    # fore topgallant mast, a mast-fish, a half-yard, the fore topmast studding-sail booms and
+    # the flying jib-boom; the spare main and fore topsail yards in the chains or cranes on
+    # the quarters and the spare jib-boom amidships. Luce 1884 (ch. XI Purchasing Weights,
+    # 'Stowing Booms') stows the same: "spare spars for the main and mizzen" to starboard,
+    # "for the fore, and spare head-booms" to port, "spare topsail-yards in lumber-irons, or
+    # cranes on the quarters". The mast-fishes and half-yards are fishes and makings, not
+    # spars that replace one, and are left out; so is every spar Luce does not stow (a royal
+    # mast, a lower mast, a lower yard, the bowsprit): "Top-gallant and royal-yards and
+    # studding-sail booms are easily replaced" (1866), from spars the ship has not got here.
+    b.spare_spars(
+        "The booms: the spare spars by class (Luce 1866 ch. XVII, 'Stowing Booms'; Luce 1884 "
+        "ch. XI, 'Stowing Booms'; Steel 1794 vol. I, 'Lashing of Booms': \"the spare topmasts, "
+        'yards, &c. stowed on the boat skids"); see tools/gen_ships.py.',
+        [
+            ("topmast", 2, "The fore and main topmasts, one in each pile (Luce 1866)."),
+            (
+                "topgallant_mast",
+                2,
+                "A stump fore and a stump main topgallant mast, one in each pile (Luce 1866).",
+            ),
+            ("yard", 2, "The spare fore and main topsail yards, on the quarters (Luce 1866)."),
+            (
+                "studdingsail_boom",
+                4,
+                "The fore and main topmast studding-sail booms, a pair in each pile (Luce 1866; "
+                "the pair judgement).",
+            ),
+            ("jib_boom", 1, "The spare jib-boom, amidships (Luce 1866)."),
+            ("flying_jib_boom", 1, "The flying jib-boom, in the port pile (Luce 1866)."),
+        ],
     )
     # The sail room (spec 3b §6.3), from Luce's allowance for a frigate (1884 ch. X p. 171,
     # Tables.md §1): two of each working sail, the second in the sail room; of the two
@@ -2600,9 +2645,31 @@ def schooner_crew(b):
                 "gallon a day is about 7.5 tons (judgement).",
             ),
             (("stores", "provisions_days"), 60, "Provisions: two months (judgement)."),
-            (("stores", "spare_spars"), 2, "A spare topmast and a spare yard (judgement)."),
+            (("stores", "spare_spars"), {}, None),  # the booms, by class: below
             (("stores", "cordage_fathoms"), 150, "Spare rope (judgement)."),
         ]
+    )
+    # The booms (package 30b): a privateer on a short cruise carried fewer spares than
+    # Luce's frigate (1866, ch. XVII 'Stowing Booms', which the frigate's follow), and no
+    # source lists a schooner's. Judgement from Luce's list scaled to her rig: one topmast,
+    # which the upper spars of a two-masted vessel were made alike for, "in order that the
+    # spare spars and sails may answer to replace those of either mast" (Chapelle 1930,
+    # 'Masting Rules and Sail Plans', of the brig, after Fincham); a spare topsail yard, as
+    # Luce's frigate carries hers ("a vessel may be saved from a lee-shore, by having a
+    # topsail or lower yard to supply readily the place of one sprung", 1866); and one pair
+    # of topmast studding-sail booms, as each of Luce's piles carries.
+    b.spare_spars(
+        "The booms: the spare spars by class (judgement after Luce 1866 ch. XVII, 'Stowing "
+        "Booms', and Chapelle 1930, 'Masting Rules and Sail Plans'); see tools/gen_ships.py.",
+        [
+            ("topmast", 1, "One topmast, to answer either mast (judgement, after Chapelle)."),
+            ("yard", 1, "A spare topsail yard (judgement, after Luce 1866)."),
+            (
+                "studdingsail_boom",
+                2,
+                "A pair of topmast studding-sail booms (judgement, after Luce 1866).",
+            ),
+        ],
     )
     # The sail room (spec 3b §6.3): a second foresail, fore topsail and jib, the sails a
     # privateer on a short cruise could least do without (spec 3b §6.3, judgement), with her

@@ -2121,8 +2121,20 @@ crew:
     water_tons: 100
     # Provisions: four months at full allowance for the complement (judgement).
     provisions_days: 120
-    # Spare topmasts and yards in the waist and on the booms (judgement).
-    spare_spars: 4
+    # The booms: the spare spars by class (Luce 1866 ch. XVII, 'Stowing Booms'; Luce 1884 ch. XI, 'Stowing Booms'; Steel 1794 vol. I, 'Lashing of Booms': "the spare topmasts, yards, &c. stowed on the boat skids"); see tools/gen_ships.py.
+    spare_spars:
+      # The fore and main topmasts, one in each pile (Luce 1866).
+      topmast: 2
+      # A stump fore and a stump main topgallant mast, one in each pile (Luce 1866).
+      topgallant_mast: 2
+      # The spare fore and main topsail yards, on the quarters (Luce 1866).
+      yard: 2
+      # The fore and main topmast studding-sail booms, a pair in each pile (Luce 1866; the pair judgement).
+      studdingsail_boom: 4
+      # The spare jib-boom, amidships (Luce 1866).
+      jib_boom: 1
+      # The flying jib-boom, in the port pile (Luce 1866).
+      flying_jib_boom: 1
     # Spare rope in the boatswain's store (judgement).
     cordage_fathoms: 600
     # The sail room (spec 3b §6.3): Luce's allowance for a frigate (1884 ch. X p. 171), every sail new; see tools/gen_ships.py.

@@ -811,8 +811,14 @@ crew:
     water_tons: 8
     # Provisions: two months (judgement).
     provisions_days: 60
-    # A spare topmast and a spare yard (judgement).
-    spare_spars: 2
+    # The booms: the spare spars by class (judgement after Luce 1866 ch. XVII, 'Stowing Booms', and Chapelle 1930, 'Masting Rules and Sail Plans'); see tools/gen_ships.py.
+    spare_spars:
+      # One topmast, to answer either mast (judgement, after Chapelle).
+      topmast: 1
+      # A spare topsail yard (judgement, after Luce 1866).
+      yard: 1
+      # A pair of topmast studding-sail booms (judgement, after Luce 1866).
+      studdingsail_boom: 2
     # Spare rope (judgement).
     cordage_fathoms: 150
     # The sail room (spec 3b §6.3), every sail new; see tools/gen_ships.py.
