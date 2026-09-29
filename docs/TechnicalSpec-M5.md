@@ -44,7 +44,10 @@ The world-order channel exists, journaled, for scenarios now and the director la
 ## 3. The shape: three gates
 
 The M4 pattern, three short gates with a human check at each, each leaving a passage
-the owner can sail and a playtest form to fill.
+the owner can sail and a playtest form to fill. The owner's ruling (2026-09-29): this is a
+big milestone and the baseline for everything after it, so the heavy packages go to the
+strongest model available for the building (Fable), not the usual Opus, with the lead
+reviewing as before.
 
 **5a. The sea and the sky.** Weather that comes from somewhere: a small number of
 pressure systems moving over the area, each a centre and a gradient, giving the wind's
