@@ -159,6 +159,7 @@ __all__ = [
     "BOOK_SIZE_TOKENS",
     "OPT_OUT_TOKEN",
     "SHELF_LIFE_TURNS",
+    "ANSWER_UNASKED",
     "BUDGET_FREE_TOOLS",
     "Book",
     "Playback",
@@ -183,6 +184,20 @@ TOOL_CALLS_PER_SAMPLE = 8
 # reads, a journal note and a shelve, and the captain's answer came a sample late). `say`
 # is the MCP door's; it reaches the harness as a reply's text, which is never counted.
 BUDGET_FREE_TOOLS = ("answer", "say")
+
+# What `answer` returns when no question was pending (package 30b, playtest 10's finding 3:
+# "Heard, though nothing was asked" was read as the answer refused and lost). The words
+# reached the log, and the result says so.
+ANSWER_UNASKED = "Heard; your words are in the log, though no question was put."
+
+# The calls that ran before a stand-by in the same reply are named in one line of the
+# sample that ends the stand-by (package 30b, playtest 10's finding 4: a journal note
+# before a `stand_by` was believed not to have run, since a stand-by ends the turn and
+# returns no results). Each is named with its result, cut to this many characters; the
+# tools that read (a page, the log, the readings) are named without it, since the
+# sample carries the news and a book is opened again on request.
+RAN_RESULT_CHARS = 100
+READING_TOOLS = ("library", "read_log", "readings", "state")
 
 # A reply whose free text opens with a thinking tag, closed or not, is the model's
 # thinking leaked into its reply and not a line a sailor said (package 29c, playtest 9:
@@ -356,6 +371,8 @@ class Harness:
         # that rule replays by the old one, its recorded replies after a stand-by kept
         self.stand_by_ends_turn = True
         self._stood_at: tuple[str, str] | None = None  # (the stand-by's words, its stamp)
+        # the line naming the calls that ran before the stand-by in its reply (package 30b)
+        self._ran_before_stand_by: str | None = None
         # where the present wait began (the log's length and the stamp): the stand-by's
         # start, or the end of the last sample, for the stand-by digest and `interim`
         self._wait_from: tuple[int, str] = (len(world.log), world.clock.stamp())
@@ -653,6 +670,10 @@ class Harness:
                 f"You stood by until {words} at {at}; it is now {self.world.clock.stamp()}: "
                 f"{reason or words}.",
             )
+            if self._ran_before_stand_by:
+                # the calls before the stand-by in its reply ran (package 30b), in one line
+                self.agent.notices.insert(1, self._ran_before_stand_by)
+        self._ran_before_stand_by = None
         start, stamp = self._wait_from
         lines = self._notable_since(start)
         return {"since": stamp, "until": sb.words, "notable": len(lines), "lines": lines}
@@ -883,6 +904,8 @@ class Harness:
             for b in self._new_books:
                 b.state = UNSEEN  # its result never reached the model
             self._new_books = []
+            # what ran before it, said when the stand-by ends (package 30b)
+            self._ran_before_stand_by = _ran_before(results[:-1])
             self._end_sample()
             return
         if results and not self.agent.released:
@@ -1371,7 +1394,7 @@ class Harness:
             actor=self.actor,
             data={"question": question, "station": self.station.name},
         )
-        return "Heard." if question is not None else "Heard, though nothing was asked."
+        return "Heard." if question is not None else ANSWER_UNASKED
 
     def own_word(self, text: str) -> None:
         """The model speaks while the game has the floor (through `door_act`, so that a
@@ -1654,6 +1677,27 @@ def _reason_after_token(reply: Reply, found_in: str) -> str:
             found_in = p
             break
     return found_in.split(OPT_OUT_TOKEN, 1)[1].strip(" .:;,-\n")
+
+
+def _ran_before(results: list[dict[str, Any]]) -> str | None:
+    """One line naming the calls of a reply that ran before its stand-by, each with its
+    result cut short (a reading tool without it), for the sample that ends the stand-by
+    (package 30b); None when none ran. A call not run (over the budget) has no `args`."""
+    ran: list[str] = []
+    for r in results:
+        if "args" not in r:
+            continue
+        name = str(r["name"])
+        if name in READING_TOOLS:
+            ran.append(f"{name} (not shown here; call it again to see it)")
+            continue
+        text = " ".join(str(r.get("result", "")).split())
+        if len(text) > RAN_RESULT_CHARS:
+            text = text[: RAN_RESULT_CHARS - 3].rstrip() + "..."
+        ran.append(f"{name} ({text})" if text else name)
+    if not ran:
+        return None
+    return "Before you stood by, in the same reply, these ran: " + "; ".join(ran) + "."
 
 
 def _with_handle(result: Any, book: Book) -> Any:

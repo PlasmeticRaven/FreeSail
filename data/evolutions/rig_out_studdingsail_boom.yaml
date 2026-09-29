@@ -16,8 +16,8 @@ id: rig_out_studdingsail_boom
 verb: rig_out
 applies_to: {class: studdingsail_boom}
 preconditions:
+  - {check: not spar.wrecked, reason: "The {spar} is carried away; clear the wreck and shift it for a spare."}  # package 30b
   - {check: not spar.rigged_out, reason: "The {spar} is rigged out already."}
-  - {check: not spar.wrecked, reason: "The {spar} is carried away."}
 requires:
   - {check: not wrecked(spar_chain(spar)), reason: "the {spar}'s yard is wrecked or sent down"}
 steps:

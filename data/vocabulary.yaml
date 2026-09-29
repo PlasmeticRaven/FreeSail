@@ -14,6 +14,8 @@
 #   points    an optional number of points (default one)
 #   none      nothing after the verb but modifiers
 #   driver    a console command that reached the ship by mistake
+#   wreck     a spar or a sail in a wreck, or nothing (meaning every wreck aboard)
+#   query     nothing: a question answered in the log and never journaled
 # `level` is the control ladder level of docs/DesignProposal.md §2.2.
 # ---------------------------------------------------------------------------
 verbs:
@@ -222,9 +224,33 @@ verbs:
     level: 1
   shift:
     # The old sail unbent and a new one bent (Luce 1884, ch. XXXII 'Shifting
-    # Sails and Spars'). Uses a spare sail.
+    # Sails and Spars'). Uses a spare sail. Package 30b: said of a spar carried
+    # away, a spare of its class from the booms in its place ("shift the larboard
+    # fore topmast studdingsail boom", "... for a spare"; shift_spar.yaml).
     synonyms: [shift the sail, change]
     object: sail
+    level: 1
+  # Clearing a wreck (package 30b; playtest 10: a studding-sail boom carried away and
+  # every order to clear it refused). "Cut away" is the period's word for clearing a
+  # ship of spars and rigging that are gone ("the mizen-mast must instantly be cut away",
+  # Falconer 1780, *Veering*; "Clear away the wreck", Luce 1884, ch. XXXI). Said of any
+  # spar or sail in the wreck it clears the whole wreck (clear_wreck.yaml); said of
+  # nothing ("clear the wreck") it clears every wreck aboard, and a sail's rags. "Clear
+  # away <the part>" is the same order when the part is a spar or a sail, not a line.
+  cut away:
+    synonyms: [cut away the wreck of, clear away the wreck of, clear the wreck of,
+               cut away the wreck, clear away the wreck, clear the wreck, clear wreck,
+               clear away wreck, cut the wreck away, cut the wreck clear, cut adrift the wreck of,
+               cut adrift the wreck, cut adrift, cut clear the wreck of]
+    object: wreck
+    level: 1
+  send down:
+    # A spar carried away sent down by itself: the same work as clearing its wreck,
+    # which is refused for a lower mast or the bowsprit over the side. A sound spar is
+    # sent down with its fellows ("send down the topgallant masts", above), and the
+    # refusal says so.
+    synonyms: [send down the wreck of, send down the remains of, send down the stump of]
+    object: wreck
     level: 1
   goose wing:
     # One clew hauled up, the other set (Luce 1884, ch. XXIV: "A foresail in
@@ -414,6 +440,18 @@ verbs:
                muster the watch bill]
     object: driver
     level: driver
+  # Queries of the ship's stores (package 30b), answered in the log and never journaled:
+  # the console answers them itself, and the browser's command line through the ship.
+  # "The booms" is the period's name for the spare spars stowed amidships ("LASHING OF
+  # BOOMS, that is, the spare topmasts, yards, &c.", Steel 1794, vol. I).
+  the booms:
+    synonyms: [booms, the spare spars, spare spars, show the booms, show the spare spars]
+    object: query
+    level: 1
+  the sail room:
+    synonyms: [sail room, show the sail room]
+    object: query
+    level: 1
   # Group evolutions: verb phrases with no object, expanded from the list below.
   set plain sail:
     synonyms: [make plain sail, make sail]
@@ -565,6 +603,9 @@ evolutions:
     gaff: shift_sail
     jibheaded: shift_sail
     studding: shift_sail
+    spar: shift_spar  # package 30b: any spar carried away, for a spare of its class
+  cut away: clear_wreck
+  send down: clear_wreck
   goose wing:
     square: goose_wing
   # rig out and rig in take a studding sail boom, or the studding sail on it
@@ -820,5 +861,6 @@ work_nouns:
   bend: bend
   bending: bend
   shift: shift
+  wreck: cut away
 # Words between "send the ... " and the order: "aloft to", "forward to", "to".
 send_directions: [aloft, up aloft, up, forward, aft, on deck, into the tops, into the rigging]

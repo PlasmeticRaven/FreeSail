@@ -20,6 +20,12 @@ the occasional sails), and name the sail it is bent `in_place_of` (a storm
 mizzen for the spanker). The stores may list the sail room's contents
 (`sails:`, each with the sail it is made for, its canvas number and its
 condition); the old `spare_sails` count is then derived from the list.
+
+Package 30b (milestone 5) makes the spare spars a store by class: the stores'
+`spare_spars` may map a spar class to the number of spares of it on the booms
+(`{topmast: 2, studdingsail_boom: 4}`), and the count is then derived from it. A
+plain number is still taken: that many spars of no class, which the carpenter can
+fit to any spar.
 """
 
 from __future__ import annotations
@@ -329,9 +335,10 @@ class StoresSpec:
     water_tons: float = 0.0
     provisions_days: float = 0.0
     spare_sails: int = 0  # with a `sails` list, derived: the number of sails in it
-    spare_spars: int = 0
+    spare_spars: int = 0  # with a `spars` mapping, derived: the number of spares in it
     cordage_fathoms: float = 0.0
     sails: list[SpareSailSpec] | None = None  # the sail room, when the file lists it
+    spars: dict[str, int] | None = None  # the booms by spar class (package 30b), when given so
 
 
 @dataclass
@@ -781,6 +788,21 @@ def _count(v: Any, what: str, source: str) -> int:
     return v
 
 
+def _parse_spare_spars(raw: dict[Any, Any], source: str) -> dict[str, int]:
+    """The stores' `spare_spars` given by class (package 30b): each key a spar class, each
+    value the number of spares of it on the booms, in the file's order."""
+    out: dict[str, int] = {}
+    for k, v in raw.items():
+        cls = str(k).strip()
+        if cls not in SPAR_CLASSES:
+            raise ShipFileError(
+                f"{source}: the spare spars name the class '{cls}', which is not a spar class. "
+                f"Known: {', '.join(sorted(SPAR_CLASSES))}."
+            )
+        out[cls] = _count(v, f"the number of spare {cls.replace('_', ' ')}s", source)
+    return out
+
+
 def _known(name: Any, known: tuple[str, ...], what: str, source: str) -> str:
     name = str(name)
     if name not in known:
@@ -926,6 +948,9 @@ def _parse_crew(c: Any, source: str) -> CrewSpec:
         name = _known(k, STORE_KEYS, "the store", source)
         if name == "sails":
             stores.sails = _parse_sail_room(v, source)
+        elif name == "spare_spars" and isinstance(v, dict):
+            stores.spars = _parse_spare_spars(v, source)
+            stores.spare_spars = sum(stores.spars.values())
         elif name in ("spare_sails", "spare_spars"):
             setattr(stores, name, _count(v, f"the {name.replace('_', ' ')}", source))
         else:

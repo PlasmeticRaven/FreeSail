@@ -1462,3 +1462,176 @@ def test_belaying_with_no_runner_that_keeps_work_is_refused_in_words():
     ship.extra.pop("evolutions")
     with pytest.raises(OrderError, match="no evolution runner"):
         orders.handle(ship, "belay that")
+
+
+# ---------------------------------------------------------------------------
+# Package 30b: clearing a wreck, shifting a spar, the booms (playtest 10, finding 1)
+# ---------------------------------------------------------------------------
+
+BOOM = "fore.topmast.studdingsail_boom.larboard"
+STUNSL = "fore.topmast.studdingsail.larboard"
+
+
+def wrecked(which: str = "schooner", spar: str = BOOM):
+    """A ship with a spar carried away, as the strain model leaves it."""
+    from freesail.physics import strain
+
+    ship, runner = make(which)
+    ship.sails[STUNSL].state = SailState.SET
+    strain._wreck_spar(ship, strain.strain_state(ship), ship.spars[spar], 2.0)
+    ship.drain_notes()
+    return ship, runner
+
+
+@pytest.mark.parametrize(
+    ("text", "verb", "obj"),
+    [
+        (
+            "cut away the larboard fore topmast studdingsail boom",
+            "cut away",
+            "fore topmast studdingsail boom",
+        ),
+        ("cut away the larboard fore topmast stuns'l", "cut away", "fore topmast stuns'l"),
+        ("clear away the wreck of the fore topsail yard", "cut away", "fore topsail yard"),
+        ("clear the wreck of the fore topsail yard", "cut away", "fore topsail yard"),
+        ("cut adrift the wreck of the fore topmast", "cut away", "fore topmast"),
+        ("clear the wreck", "cut away", None),
+        ("clear away the wreck", "cut away", None),
+        ("cut away the wreck", "cut away", None),
+        ("send down the fore topsail yard", "send down", "fore topsail yard"),
+        ("send down the wreck of the fore topsail yard", "send down", "fore topsail yard"),
+        ("shift the fore topsail yard", "shift", "fore topsail yard"),
+        ("the booms", "the booms", None),
+        ("the spare spars", "the booms", None),
+        ("the sail room", "the sail room", None),
+        # a line cleared away is let go, as it always was
+        ("clear away the weather bowlines", "let go", "bowlines"),
+    ],
+)
+def test_the_words_for_a_wreck_and_the_booms_parse(text, verb, obj):
+    ship, _ = make("schooner")
+    order = parse(ship, text)
+    assert order.verb == verb
+    assert order.object == obj
+
+
+def test_the_playtests_five_orders_now_clear_the_wreck_or_say_how():
+    """Playtest 10: five orders to deal with the carried-away boom, all refused. Now the
+    wreck is cleared by `send down` of the boom, `cut away` of the sail and `clear away`
+    of the boom (each the whole wreck), the sail is unbent out of it, and `shift` of the
+    sail says what to do first."""
+    ship, runner = wrecked()
+    orders.handle(ship, "Send down the larboard fore topmast studdingsail boom")
+    orders.handle(ship, "Unbend the larboard fore topmast studding sail")
+    orders.handle(ship, "Cut away the larboard fore topmast studding sail")
+    orders.handle(ship, "Clear away the larboard fore topmast studdingsail boom")
+    assert runner.started == [
+        ("clear_wreck", BOOM, {"part": BOOM, "send_down": True}),
+        ("unbend_sail", STUNSL, {"sail": STUNSL}),
+        ("clear_wreck", BOOM, {"part": BOOM}),
+        ("clear_wreck", BOOM, {"part": BOOM}),
+    ]
+    with pytest.raises(OrderError) as refused:
+        orders.handle(ship, "Shift the larboard fore topmast studding sail")
+    assert str(refused.value) == (
+        "The larboard fore topmast studdingsail went with the larboard fore topmast "
+        "studdingsail boom when it carried away; cut away the wreck, then shift the larboard "
+        "fore topmast studdingsail boom for a spare."
+    )
+    with pytest.raises(OrderError, match="went with the larboard fore topmast studdingsail"):
+        orders.handle(ship, "set the larboard fore topmast studdingsail")
+
+
+def test_clear_the_wreck_clears_every_wreck_aboard_and_says_when_there_is_none():
+    ship, runner = make("schooner")
+    with pytest.raises(OrderError) as refused:
+        orders.handle(ship, "clear the wreck")
+    assert str(refused.value) == (
+        "There is no wreck aboard to clear: every spar stands and no sail hangs in rags."
+    )
+    ship, runner = wrecked()
+    ship.sails["fore.topsail"].state = SailState.BLOWN_OUT
+    orders.handle(ship, "clear the wreck")
+    assert [(e, s) for e, s, _ in runner.started] == [
+        ("clear_wreck", BOOM),
+        ("clear_wreck", "fore.topsail"),
+    ]
+
+
+@pytest.mark.parametrize(
+    ("text", "words"),
+    [
+        ("cut away the jib", "The jib is sound and furled; there is no wreck to cut away."),
+        (
+            "cut away the fore topsail yard",
+            "The fore topsail yard stands sound; there is no wreck to cut away.",
+        ),
+        (
+            "send down the fore topgallant mast",
+            "The fore topgallant mast stands sound; the topgallant masts go down together: "
+            "'send down the topgallant masts'.",
+        ),
+        (
+            "send down the starboard fore topmast studdingsail boom",
+            "The starboard fore topmast studdingsail boom stands sound; a studding-sail boom is "
+            "rigged in, not sent down: 'rig in the starboard fore topmast studdingsail boom'.",
+        ),
+        (
+            "send down the jib",
+            "The jib is not carried away; a sail is unbent and sent down with 'unbend the jib'.",
+        ),
+        ("send down", "Send down what?"),
+        ("shift the main boom for the heavy one", "A spar has no canvas"),
+        ("shift the main boom for the jib", "A spar is shifted for a spare of its class"),
+        ("the booms please", "'the booms' is a question and takes nothing after it"),
+    ],
+)
+def test_a_wreck_order_on_a_sound_part_is_refused_in_words_that_teach(text, words):
+    ship, runner = wrecked()
+    with pytest.raises(OrderError) as refused:
+        orders.handle(ship, text)
+    assert str(refused.value).startswith(words)
+    assert runner.started == []
+
+
+def test_shift_of_a_spar_starts_shift_spar_and_the_runner_refuses_in_its_words():
+    ship, runner = wrecked()
+    orders.handle(ship, "shift the larboard fore topmast studdingsail boom for a spare")
+    assert runner.started == [("shift_spar", BOOM, {"part": BOOM})]
+    ship, runner = wrecked()
+    runner.refuse = {BOOM: "No spare studding-sail boom aboard; the dockyard must supply one."}
+    with pytest.raises(OrderError) as refused:
+        orders.handle(ship, "shift the larboard fore topmast studdingsail boom")
+    assert str(refused.value) == "No spare studding-sail boom aboard; the dockyard must supply one."
+
+
+def test_the_booms_and_the_sail_room_are_queries_answered_by_the_ship():
+    """In the form of `the sail room` (spec 3b §6.3): the console answers them itself,
+    and the browser's command line through the ship, as a `query.` kind the World logs
+    and does not journal."""
+    ship, _ = make("frigate")
+    kind, text, _ = orders.handle(ship, "the booms")
+    assert kind == "query.booms"
+    assert text == (
+        "The booms hold 12 spare spars: 2 topmasts, 2 topgallant masts, 2 yards, 4 "
+        "studding-sail booms, 1 jib-boom and 1 flying jib-boom."
+    )
+    kind, text, _ = orders.handle(ship, "the sail room")
+    assert kind == "query.sail_room" and text.startswith("The sail room holds 21 sails.")
+    ship.order_handler = orders.handle
+    world = World(seed=1, scenario=Scenario(), ship=ship)
+    e = world.submit("the spare spars")
+    assert e.kind == "query.booms" and world.journal == []
+
+
+def test_completion_offers_the_wreck_and_the_spar_to_shift():
+    from freesail.orders import complete
+
+    ship, _ = wrecked()
+    offered = complete.suggestions(ship, "cut away the ", limit=20)
+    assert "cut away the larboard fore topmast studdingsail boom" in offered
+    assert "cut away the larboard fore topmast studdingsail" in offered
+    assert not any("starboard" in o or "jib" in o for o in offered)  # sound parts are not
+    offered = complete.suggestions(ship, "shift the larboard fore topmast studdingsail b")
+    assert offered == ["shift the larboard fore topmast studdingsail boom"]
+    assert complete.suggestions(ship, "the bo") == ["the booms"]

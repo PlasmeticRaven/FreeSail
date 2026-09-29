@@ -13,6 +13,7 @@ import random
 from collections.abc import Callable
 
 import pytest
+import yaml
 
 from freesail import units
 from freesail.evolutions import EVOLUTIONS, Runner, expr, part_name, registry, weather_factor
@@ -801,3 +802,321 @@ def test_same_orders_give_the_same_log():
         return notes + more
 
     assert play() == play()
+
+
+# ---------------------------------------------------------------------------
+# Package 30b: clearing a wreck, spare spars (playtest 10, findings 1 and 2)
+# ---------------------------------------------------------------------------
+
+LARBOARD_BOOM = "fore.topmast.studdingsail_boom.larboard"
+LARBOARD_STUNSL = "fore.topmast.studdingsail.larboard"
+
+
+def carried_away(ship, spar_id: str) -> None:
+    """Carry a spar away as the strain model does: it and everything on it wrecked."""
+    from freesail.physics import strain
+
+    strain._wreck_spar(ship, strain.strain_state(ship), ship.spars[spar_id], 2.0)
+    ship.drain_notes()
+
+
+def wrecked_schooner(sail_state: SailState = SailState.SET):
+    """The schooner of playtest 10: the larboard fore topmast studding-sail boom carried
+    away with its studding sail set on it, hanging to leeward."""
+    ship = load_ship(SCHOONER)
+    runner = Runner(ship)
+    ship.sails[LARBOARD_STUNSL].state = sail_state
+    ship.spars[LARBOARD_BOOM].rigged_out = True
+    carried_away(ship, LARBOARD_BOOM)
+    return ship, runner
+
+
+def clear(runner, ship, part: str, knots: float = 12.0, **params) -> list:
+    runner.start(ship, "clear_wreck", part, {"part": part, **params})
+    _, notes = run(runner, ship, make_wind(knots=knots), max_ticks=20000)
+    return notes
+
+
+def cleared_line(notes) -> str:
+    done = [n for n in notes if n[1] == "wreck.cleared"]
+    assert len(done) == 1
+    return done[0][2]
+
+
+def test_the_booms_hold_each_ship_files_spare_spars_by_class():
+    """Spare spars as a store by class (`parts.booms`), from the ship files the generator
+    writes: the frigate's after Luce 1866 ch. XVII 'Stowing Booms', the schooner's by
+    judgement after Luce and Chapelle; the store's comment names its source."""
+    from freesail.ship.parts import booms
+
+    frigate = booms(load_ship(FRIGATE))
+    assert frigate.counts == {
+        "topmast": 2,
+        "topgallant_mast": 2,
+        "yard": 2,
+        "studdingsail_boom": 4,
+        "jib_boom": 1,
+        "flying_jib_boom": 1,
+    }
+    schooner = booms(load_ship(SCHOONER))
+    assert schooner.counts == {"topmast": 1, "yard": 1, "studdingsail_boom": 2}
+    assert len(frigate) == 12 and len(schooner) == 4
+    for path in SHIPS:
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+        head = text[: text.index("    spare_spars:")].rsplit("\n", 2)[-2]
+        assert "Luce 1866 ch. XVII" in head and "'Stowing Booms'" in head
+    assert schooner.inventory_lines() == [
+        "The booms hold 4 spare spars: 1 topmast, 1 yard and 2 studding-sail booms."
+    ]
+
+
+def test_a_ship_file_gives_its_spare_spars_by_class_or_as_a_count():
+    from freesail.ship.loader import ship_from_dict
+    from freesail.ship.parts import booms
+    from freesail.ship.schema import ShipFileError
+
+    with open(SCHOONER, encoding="utf-8") as f:
+        doc = yaml.safe_load(f)
+    doc["crew"]["stores"]["spare_spars"] = 3
+    ship = ship_from_dict(doc)
+    assert ship.spec.crew.stores.spare_spars == 3 and ship.spec.crew.stores.spars is None
+    store = booms(ship)
+    assert len(store) == 3 and store.have("topmast") == 3  # spars the carpenter fits to any
+    doc["crew"]["stores"]["spare_spars"] = {"topmast": 1, "mizzen": 2}
+    with pytest.raises(ShipFileError, match="'mizzen', which is not a spar class"):
+        ship_from_dict(doc)
+
+
+def test_cutting_away_a_boom_saves_the_whole_sail_and_sends_the_remains_down():
+    """Playtest 10's wreck: cut away, the studding sail (whole) goes to the sail room and
+    the boom's remains on deck; the log says what was saved and that nothing went over
+    the side; the wreck no longer drags."""
+    from freesail.physics.sails import _sail_windage_area, _spar_windage_area
+    from freesail.ship.parts import sail_room
+
+    ship, runner = wrecked_schooner()
+    boom, sail = ship.spars[LARBOARD_BOOM], ship.sails[LARBOARD_STUNSL]
+    before = len(sail_room(ship))
+    assert _spar_windage_area(boom) > 0.0  # the wreck drags
+    notes = clear(runner, ship, LARBOARD_STUNSL)  # the sail named: the whole wreck is cleared
+    assert cleared_line(notes) == (
+        "Cleared the wreck of the larboard fore topmast studdingsail boom: its remains sent "
+        "down on deck; the larboard fore topmast studdingsail saved to the sail room; nothing "
+        "went over the side. The booms hold 2 spare studding-sail booms."
+    )
+    assert texts(notes)[0] == (
+        "Clear away the wreck of the larboard fore topmast studdingsail boom! Hands aloft "
+        "with burtons and tripping-lines."
+    )
+    assert boom.wrecked and boom.sent_down and not boom.rigged_out
+    assert sail.state is SailState.UNBENT and not sail.wrecked
+    room = sail_room(ship)
+    assert len(room) == before + 1 and room.sails[-1].kind == LARBOARD_STUNSL
+    assert _sail_windage_area(ship, sail) == 0.0 and _spar_windage_area(boom) == 0.0
+    data = [n for n in notes if n[1] == "wreck.cleared"][0][4]
+    assert data["saved"] == [LARBOARD_STUNSL] and data["over_the_side"] == []
+
+
+def test_the_part_graph_keeps_the_wreck_until_a_spare_replaces_the_spar():
+    """A boom gone means no studding sail on it: the sail is not bent nor its boom rigged
+    out until `shift` puts a spare in the boom's place, and the refusals say so."""
+    ship, runner = wrecked_schooner()
+    clear(runner, ship, LARBOARD_BOOM)
+    with pytest.raises(OrderError, match="boom is carried away; shift it for a spare first"):
+        runner.start(ship, "bend_sail", LARBOARD_STUNSL, {"sail": LARBOARD_STUNSL})
+    with pytest.raises(OrderError, match="is carried away"):
+        runner.start(ship, "rig_out_studdingsail_boom", LARBOARD_BOOM)
+    with pytest.raises(OrderError, match="cleared already; shift the larboard"):
+        runner.start(ship, "clear_wreck", LARBOARD_BOOM, {"part": LARBOARD_BOOM})
+
+
+def test_shifting_a_spar_takes_a_spare_of_its_class_and_its_sail_may_be_bent_again():
+    from freesail.ship.parts import booms
+
+    ship, runner = wrecked_schooner()
+    clear(runner, ship, LARBOARD_BOOM)
+    boom = ship.spars[LARBOARD_BOOM]
+    halyard = ship.lines[f"{LARBOARD_STUNSL}.halyard"]
+    assert halyard.wrecked  # the gear went with the wreck
+    runner.start(ship, "shift_spar", LARBOARD_BOOM, {"part": LARBOARD_BOOM})
+    ticks, notes = run(runner, ship, make_wind(knots=3.0))
+    # a boom's shift in light airs: got up 60 s, landed in its irons 120 s, rigged 90 s
+    assert ticks == pytest.approx(60 + 120 + 90, abs=3)
+    assert not boom.wrecked and not boom.sent_down and not boom.rigged_out
+    assert boom.condition == 100.0
+    assert not halyard.wrecked  # rove afresh
+    assert booms(ship).counts["studdingsail_boom"] == 1
+    assert texts(notes)[-1] == (
+        "Shifted the larboard fore topmast studdingsail boom for a spare, 1 spare "
+        "studding-sail boom left on the booms; the larboard fore topmast studdingsail may be "
+        "bent to it again."
+    )
+    assert kinds(notes)[-1] == "spar.shifted"
+    runner.start(ship, "bend_sail", LARBOARD_STUNSL, {"sail": LARBOARD_STUNSL})
+    run(runner, ship, make_wind(knots=3.0))
+    assert ship.sails[LARBOARD_STUNSL].state is SailState.FURLED
+    runner.start(ship, "rig_out_studdingsail_boom", LARBOARD_BOOM)
+    run(runner, ship, make_wind(knots=3.0))
+    assert boom.rigged_out
+
+
+def test_a_shift_is_refused_in_words_until_it_can_be_done():
+    from freesail.ship.parts import booms
+
+    ship, runner = wrecked_schooner()
+    # playtest 10's "rig in" of the boom carried away: the refusal names the way out
+    with pytest.raises(OrderError, match="carried away; clear the wreck and shift it for a"):
+        runner.start(ship, "rig_in_studdingsail_boom", LARBOARD_BOOM)
+    with pytest.raises(OrderError, match="still hangs aloft; cut it away first"):
+        runner.start(ship, "shift_spar", LARBOARD_BOOM, {"part": LARBOARD_BOOM})
+    with pytest.raises(OrderError, match="The main boom is sound; only a spar carried away"):
+        runner.start(ship, "shift_spar", "main.boom", {"part": "main.boom"})
+    clear(runner, ship, LARBOARD_BOOM)
+    booms(ship).counts["studdingsail_boom"] = 0
+    with pytest.raises(OrderError) as refused:
+        runner.start(ship, "shift_spar", LARBOARD_BOOM, {"part": LARBOARD_BOOM})
+    assert str(refused.value) == "No spare studding-sail boom aboard; the dockyard must supply one."
+
+
+def test_the_whole_wreck_is_cleared_whichever_part_of_it_is_named():
+    """A topmast carried away takes the spars above it and their sails: naming the royal
+    clears the topmast's wreck, every spar sent down and every whole sail saved; each
+    spar is then shifted in turn, the topmast first."""
+    ship = load_ship(FRIGATE)
+    runner = Runner(ship)
+    ship.sails["fore.topsail"].state = SailState.SET
+    carried_away(ship, "fore.topmast")
+    yard = {"part": "fore.topsail.yard"}
+    with pytest.raises(OrderError, match="fore topmast still hangs aloft; cut it away first"):
+        runner.start(ship, "shift_spar", "fore.topsail.yard", yard)
+    line = cleared_line(clear(runner, ship, "fore.royal"))
+    gone = [s for s in ship.spars.values() if s.wrecked]
+    assert {s.id for s in gone} >= {"fore.topmast", "fore.topsail.yard", "fore.royal.yard"}
+    assert all(s.sent_down for s in gone)
+    assert not any(s.wrecked for s in ship.sails.values())
+    assert ship.sails["fore.topsail"].state is SailState.UNBENT
+    assert line.startswith("Cleared the wreck of the fore topmast: its remains sent down")
+    assert "the fore topsail" in line and "nothing went over the side" in line
+    with pytest.raises(OrderError, match="went with the fore topmast; shift the fore topmast"):
+        runner.start(ship, "shift_spar", "fore.topsail.yard", yard)
+    runner.start(ship, "shift_spar", "fore.topmast", {"part": "fore.topmast"})
+    _, more = run(runner, ship, make_wind(knots=3.0))
+    assert "the fore topsail yard" in texts(more)[-1]
+    assert "carried away with it, are still to be shifted" in texts(more)[-1]
+    runner.start(ship, "shift_spar", "fore.topsail.yard", yard)
+    run(runner, ship, make_wind(knots=3.0))
+    runner.start(ship, "bend_sail", "fore.topsail", {"sail": "fore.topsail"})
+    run(runner, ship, make_wind(knots=3.0))
+    runner.start(ship, "set_square", "fore.topsail")
+    run(runner, ship, make_wind(knots=3.0))
+    assert ship.sails["fore.topsail"].is_set
+
+
+def test_the_rags_of_a_sail_blown_out_go_over_the_side():
+    from freesail.ship.parts import sail_room
+
+    ship, runner = wrecked_schooner(SailState.BLOWN_OUT)
+    before = len(sail_room(ship))
+    line = cleared_line(clear(runner, ship, LARBOARD_BOOM))
+    assert "the rags of the larboard fore topmast studdingsail over the side" in line
+    assert len(sail_room(ship)) == before
+    # a sail blown out on spars that stand: its rags alone are cut away
+    other = load_ship(SCHOONER)
+    r = Runner(other)
+    other.sails["fore.topsail"].state = SailState.BLOWN_OUT
+    line = cleared_line(clear(r, other, "fore.topsail"))
+    assert line == "Cleared the wreck of the fore topsail: its rags cut adrift and over the side."
+    assert other.sails["fore.topsail"].state is SailState.UNBENT
+
+
+def test_a_lower_mast_carried_away_is_cut_adrift_with_all_it_carries():
+    """The wreck of a lower mast lies in the water and is cut adrift (Luce 1884, ch. XXXI:
+    "When a mast goes over the side, first, get clear of the wreck"): its spars and its
+    sails are lost, and `send down` is refused for it in words."""
+    from freesail.ship.parts import sail_room
+
+    ship = load_ship(FRIGATE)
+    runner = Runner(ship)
+    ship.sails["mizzen.topsail"].state = SailState.SET
+    carried_away(ship, "mizzen.mast")
+    down = {"part": "mizzen.mast", "send_down": True}
+    with pytest.raises(OrderError, match="went over the side; its wreck cannot be sent down"):
+        runner.start(ship, "clear_wreck", "mizzen.mast", down)
+    with pytest.raises(OrderError, match="went over the side with the mizzen mast"):
+        runner.start(ship, "unbend_sail", "mizzen.topsail", {"sail": "mizzen.topsail"})
+    before = len(sail_room(ship))
+    notes = clear(runner, ship, "mizzen.mast")
+    assert any(t.startswith("Cut the lanyards and lashings") for t in texts(notes))
+    line = cleared_line(notes)
+    assert line.startswith("Cleared the wreck of the mizzen mast: cut adrift and over the side")
+    assert line.endswith("There is no spare lower mast aboard.")
+    assert len(sail_room(ship)) == before  # nothing saved
+    assert ship.sails["mizzen.topsail"].state is SailState.UNBENT
+    storm = ship.sails["storm_mizzen"]  # in the sail room all along
+    assert storm.state is SailState.UNBENT and not storm.wrecked
+    with pytest.raises(OrderError, match="No spare lower mast aboard"):
+        runner.start(ship, "shift_spar", "mizzen.mast", {"part": "mizzen.mast"})
+
+
+def test_unbend_cuts_a_wrecked_sail_out_of_the_wreck():
+    """`unbend` of a wrecked sail (every verb refused a wrecked part before): cut clear of
+    the wreck where it hangs, lowered and stowed; the boom's wreck is still to clear."""
+    from freesail.ship.parts import sail_room
+
+    ship, runner = wrecked_schooner()
+    before = len(sail_room(ship))
+    runner.start(ship, "unbend_sail", LARBOARD_STUNSL, {"sail": LARBOARD_STUNSL})
+    _, notes = run(runner, ship, make_wind(knots=12.0))
+    sail = ship.sails[LARBOARD_STUNSL]
+    assert sail.state is SailState.UNBENT and not sail.wrecked
+    assert len(sail_room(ship)) == before + 1
+    assert (
+        "Cut the larboard fore topmast studdingsail clear of the wreck, lowered it on deck "
+        "and stowed it in the sail room."
+    ) in texts(notes)
+    assert not ship.spars[LARBOARD_BOOM].sent_down  # the boom's wreck still hangs
+    line = cleared_line(clear(runner, ship, LARBOARD_BOOM))
+    assert line.startswith(
+        "Cleared the wreck of the larboard fore topmast studdingsail boom: its remains sent "
+        "down on deck; nothing went over the side."
+    )
+
+
+def test_clearing_a_wreck_takes_hands_and_time_and_the_weather_stretches_it():
+    """An evolution in the M3 form: its hands asked of the watch, its phases stretched by
+    the weather factor (spec §8.4) and the crew factor, as every evolution's are."""
+    from freesail.api.session import make_world
+
+    times = []
+    for knots in (3.0, 30.0):
+        ship, runner = wrecked_schooner()
+        runner.start(ship, "clear_wreck", LARBOARD_BOOM, {"part": LARBOARD_BOOM})
+        ticks, _ = run(runner, ship, make_wind(knots=knots))
+        times.append(ticks)
+    # steadied 60 s, the sail cut out 120 s, the boom's remains sent down 90 s
+    assert times[0] == pytest.approx(270, abs=3)
+    assert times[1] > 1.4 * times[0]
+    world = make_world(3, SCHOONER)
+    carried_away(world.ship, LARBOARD_BOOM)
+    world.submit("cut away the wreck of the larboard fore topmast studdingsail boom")
+    world.tick()
+    busy = world.ship.extra["evolutions"].in_progress()
+    assert busy and busy[0]["id"] == "clear_wreck" and busy[0]["hands"] >= 1
+
+
+def test_clearing_and_shifting_give_the_same_log_every_time():
+    from freesail.api.session import make_world
+
+    def play():
+        world = make_world(5, SCHOONER)
+        carried_away(world.ship, LARBOARD_BOOM)
+        world.submit("clear the wreck")
+        world.run(600)
+        world.submit("shift the larboard fore topmast studdingsail boom for a spare")
+        world.run(600)
+        return [(e.tick, e.kind, e.text) for e in world.log]
+
+    first = play()
+    assert any(k == "spar.shifted" for _, k, _ in first)
+    assert first == play()

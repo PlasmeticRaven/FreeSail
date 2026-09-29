@@ -1180,7 +1180,9 @@ def _apply_loads(ship: Ship, sail: Sail, force_kn: float) -> None:
 
 def _sail_windage_area(ship: Ship, sail: Sail) -> float:
     cls = SAIL_CLASSES.get(sail.cls)
-    if cls is None:
+    if cls is None or sail.state is SailState.UNBENT:
+        # unbent: in the sail room, or gone over the side with a wreck cleared away
+        # (package 30b), whatever became of the spars it was bent to
         return 0.0
     wrecked = sail.wrecked or any(sp.wrecked for sp in ship.spar_chain(sail))
     if wrecked:

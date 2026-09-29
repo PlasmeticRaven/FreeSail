@@ -29,6 +29,7 @@ Driver commands (not ship orders, not journaled):
     state           print a summary of the ship and the weather
     muster          muster the crew: the watch bill, station by station
     the sail room   what the sail room holds: each sail, its canvas and condition
+    the booms       the spare spars aboard, by class (also `the spare spars`)
     standing orders the book of standing orders, each with its state
     read the standing orders from FILE
                     give every standing order in the file (each is journaled)
@@ -300,6 +301,10 @@ class Console:
         elif " ".join(line.lower().split()) in ("the sail room", "sail room"):
             # a query too (spec 3b §6.3): what is in the sail room, never journaled
             for s in queries.sail_room_lines(self.world):
+                self._print(s)
+        elif " ".join(line.lower().split()) in queries.BOOMS_QUERIES:
+            # and the spare spars (package 30b), in the same form
+            for s in queries.booms_lines(self.world):
                 self._print(s)
         elif self._is_read_standing_orders(line):
             # the driver's business, since it reads the disk (spec M4 §3): each line of

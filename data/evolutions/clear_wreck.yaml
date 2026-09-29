@@ -1,0 +1,48 @@
+# Clear away the wreck of a spar carried away, or the rags of a sail blown out
+# (scripted, ClearWreckScript in scripts.py; package 30b, playtest 10's finding 1: a
+# studding-sail boom carried away and no order could clear it). The script keeps the
+# sail room and decides what goes where, which a step list cannot. It saves what can be
+# saved and cuts adrift what cannot: a sail that is whole goes down to the sail room, the
+# rags of one blown out go over the side, the remains of a spar and of every spar that
+# went with it are sent down on deck, and the wreck of a lower mast or the bowsprit, which
+# lies in the water, is cut adrift with all it carries. The spars stay carried away (the
+# part graph keeps the wreck's consequences) until `shift the <spar>` replaces each with a
+# spare (shift_spar.yaml).
+#
+# Luce's order of work when a spar goes (1884, ch. XXXI Carrying Away Masts and Spars)
+# is these phases here, each left out when it has nothing to do:
+#   secure      aloft: "The first thing to be attended to is their being steadied and
+#               prevented from falling on deck or tearing the sails": burtons and
+#               tripping-lines on the wreck
+#   sails       aloft: "Cut adrift the clewlines from the clews, cut robands and head
+#               earings, and lower" ('Topgallant Yard Carried Away'); each sail that is
+#               whole lowered on deck for the sail room, rags cut adrift
+#   send_down   on deck: "Send the wreck down ... Send the stump down next" ('Main Topmast
+#               Carried Away'); its time by the work in the spars (scripts.SPAR_WORK)
+#   cut_adrift  on deck: "Clear away the wreck ... Cut the rigging clear" ('Lower Mast
+#               Carried Away'); a lower mast or the bowsprit over the side
+# The subject may be the spar carried away or any spar or sail that went with it: the
+# whole wreck is cleared. `send down <the spar>` is the same work, refused for a wreck
+# that is over the side (params.send_down). Aground or in a seaway the times are what the
+# weather factor and the crew factor make them.
+id: clear_wreck
+verb: cut_away
+applies_to: {class: part}
+script: clear_wreck
+params: {aloft: [secure, sails]}
+timing:
+  secure_s: 60       # burtons and tripping-lines on the wreck (judgement)
+  sails_s: 120       # a sail cut out of the wreck and lowered, less than unbending one whole (180 s); each other sail half as much again (judgement)
+  send_down_s: 90    # a studding-sail boom's remains lowered on deck; more spars in proportion to their work (judgement)
+  cut_adrift_s: 60   # the lanyards and lashings cut at the chains (judgement)
+on_start: {log: "Clear away the wreck of the {wreck}! Hands aloft with burtons and tripping-lines."}
+on_complete: {log: "Cleared the wreck of the {wreck}: {account}.{spares}", kind: wreck.cleared, severity: notable}
+on_fail: {log: "Could not clear the wreck of the {wreck}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the men of the part of the ship the wreck is in, aloft with the burtons and on deck
+# at the tripping-lines ("Have the tripping-lines well attended, to keep the pieces of wreck
+# from tearing the topsail in their descent", Luce 1884, ch. XXXI 'Topgallant Yard Carried
+# Away'); able men, as for shifting a sail.
+# hands: sized to one watch of the schooner at this rating (six ordinary, seven able on
+# deck at the least), which the frigate's watch fills with hands to spare (judgement).
+crew: {hands: 7, rating: able, stations: [topmen, forecastle, afterguard]}
+source: "Luce 1884, ch. XXXI Carrying Away Masts and Spars, 'Main Topmast Carried Away', 'Topgallant Mast Carried Away', 'Topgallant Yard Carried Away', 'Lower Mast Carried Away or Sprung', 'Bowsprit Carried Away or Sprung', 'The Jib-boom is Carried Away'; Falconer 1780, *Veering* (\"the mizen-mast must instantly be cut away\") and the French glossary, *Couper* (\"to cut the cable, or cut away the masts\")"

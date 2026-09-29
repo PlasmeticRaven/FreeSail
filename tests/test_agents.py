@@ -1693,7 +1693,7 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     a chapter's is what section='all' serves after its line, a topic's what it serves
     whole; the lead's measure of chapter 3 (about 7,650 tokens; 7,690 since package 29b
     said what sending down the topgallant masts belays; 8,060 since package 29c's note on
-    belaying work) is the rule's."""
+    belaying work; 9,710 since package 30b's on clearing a wreck) is the rule's."""
     world = frigate_world()
     contents = lib(world)
     assert tools.CHARS_PER_TOKEN == 4 and tools.tokens("abcde") == 2
@@ -1705,14 +1705,14 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
         assert f"    primer {n}: {name}, {size} in " in contents
         assert whole.startswith(f"primer {n}: ") and f"the whole chapter: {size}." in whole
     three = (ROOT / "docs/primer/03-making-and-shortening-sail.md").read_text(encoding="utf-8")
-    assert tools.size_words(tools.tokens(three)) == "about 8,060 tokens"
+    assert tools.size_words(tools.tokens(three)) == "about 9,710 tokens"
     grammar = lib(world, topic="grammar", section="all").split("\n\n", 1)[1]
     assert f"{tools.size_words(tools.tokens(grammar))} whole, in 3 parts" in contents
     ship = lib(world, topic="the ship", section="all").split("\n\n", 1)[1]
     assert f"{tools.size_words(tools.tokens(ship))} whole, in 5 parts" in contents
     tool_page = lib(world, topic="tools")
     assert f"what each takes, {tools.size_words(tools.tokens(tool_page))}" in contents
-    assert "42 evolutions; the list about" in contents
+    assert "44 evolutions; the list about" in contents
 
 
 def test_a_chapter_lists_its_sections_with_sizes_and_serves_one_by_a_word_or_its_number():
@@ -1747,7 +1747,7 @@ def test_a_chapter_lists_its_sections_with_sizes_and_serves_one_by_a_word_or_its
     )
     # the primer itself: its introduction in sections, and the chapters with their sizes
     primer = lib(world, topic="primer")
-    assert "  primer 3: making and shortening sail, about 8,060 tokens" in primer
+    assert "  primer 3: making and shortening sail, about 9,710 tokens" in primer
     assert lib(world, topic="primer", section="where to start").startswith("## Where to start")
 
 
@@ -2124,3 +2124,57 @@ def test_an_empty_reply_at_an_urgent_event_counts_and_words_end_the_count():
     assert h.agent.empty_count == 1
     world.run(EVERY)  # words end it
     assert h.agent.empty_count == 0 and "agent.nudged" not in kinds(world)
+
+
+# ---------------------------------------------------------------------------
+# Package 30b: two result strings (playtest 10, findings 3 and 4)
+# ---------------------------------------------------------------------------
+
+
+def test_an_answer_with_no_question_pending_says_the_words_are_in_the_log():
+    """Playtest 10, finding 3: the model answered a `tell` with the `answer` tool, and the
+    result "Heard, though nothing was asked" read as its answer refused and lost. The words
+    are in the log, and the result says so."""
+    world = point_world()
+    h, fake, _ = stationed(world, [reply("", call("answer", text="Tack, I should say.")), ""])
+    said = [e for e in world.log if e.kind == "agent.said"]
+    assert [e.text for e in said] == ["[watcher] Tack, I should say."]
+    results = [t.content for t in h.turns if t.role == DATA and "tool_results" in t.content]
+    assert results[0]["tool_results"][0]["result"] == (
+        "Heard; your words are in the log, though no question was put."
+    )
+    assert harness_mod.ANSWER_UNASKED == results[0]["tool_results"][0]["result"]
+
+
+def test_the_sample_that_ends_a_stand_by_says_which_calls_before_it_ran():
+    """Playtest 10, finding 4: a journal note before a `stand_by` in the same reply ran,
+    but a stand-by ends the turn with no results (package 28c), and the model believed the
+    note lost. The sample that ends the stand-by says, in one line after the stand-by's
+    own, which calls before it ran: each with its result, a reading tool without."""
+    world = point_world()
+    script = [
+        reply(
+            "",
+            call("journal", note="The wind is backing."),
+            call("readings"),
+            call("stand_by", until="a glass"),
+        ),
+        "Awake.",
+    ]
+    h, fake, _ = stationed(world, script)
+    assert h.agent.standing_by
+    assert h.journal.entries[-2].text == "The wind is backing."  # it ran, before the stand-by
+    world.run(A_GLASS_S)
+    woke = data_turns(fake)[-1]
+    assert woke["notices"][0].startswith("You stood by until a glass at ")
+    assert woke["notices"][1] == (
+        "Before you stood by, in the same reply, these ran: journal (Noted in the journal.); "
+        "readings (not shown here; call it again to see it)."
+    )
+    # said once: the next stand-by, taken alone, says nothing of calls before it
+    h2, fake2, _ = stationed(
+        point_world(), [call("stand_by", until="a glass"), "Up."], st=station(name="lookout")
+    )
+    h2.world.run(A_GLASS_S)
+    notices = data_turns(fake2)[-1]["notices"]
+    assert not any(n.startswith("Before you stood by") for n in notices)

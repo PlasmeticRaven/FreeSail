@@ -20,6 +20,7 @@ from typing import Any
 from freesail import units
 from freesail.orders import resolve
 from freesail.orders.vocabulary import Vocabulary, load_vocabulary, normalise
+from freesail.ship.parts import Sail, SailState, Spar
 
 DRIVER_COMMANDS = (
     "hold",
@@ -131,7 +132,8 @@ def _noun_candidates(ship: Any, spec_object: str, verb: str) -> list[tuple[str, 
     groups and its aliases, then filtered by what the verb takes.
     """
     wanted = {"sail": {"sail"}, "line": {"line"}, "yards": {"yard", "sail"}}.get(spec_object)
-    if wanted is None:
+    wreck_words = spec_object == "wreck" or verb == "shift"
+    if wanted is None and not wreck_words:
         return []
     phrases: dict[str, list[str]] = {}
 
@@ -163,7 +165,12 @@ def _noun_candidates(ship: Any, spec_object: str, verb: str) -> list[tuple[str, 
         if not parts:
             continue
         kinds = {kinds_of[p.id] for p in parts}
-        if not kinds <= wanted:
+        if wreck_words and _wreck_offer(parts, spec_object):
+            # a wreck to clear, or a spar carried away to shift (package 30b): only the
+            # parts that are so, so that the offer is the way out of what is aboard now
+            out.append((phrase, False))
+            continue
+        if wanted is None or not kinds <= wanted:
             continue
         if spec_object == "yards" and kinds == {"sail"}:
             if not all(p.cls == "square" for p in parts):
@@ -175,6 +182,19 @@ def _noun_candidates(ship: Any, spec_object: str, verb: str) -> list[tuple[str, 
         )
         out.append((phrase, sided))
     return out
+
+
+def _wreck_offer(parts: list[Any], spec_object: str) -> bool:
+    """Whether these parts are a wreck to offer (package 30b): for `cut away` and `send
+    down`, spars and sails every one carried away and not yet cleared, or in rags; for
+    `shift`, spars every one carried away."""
+    if spec_object == "wreck":
+        return all(
+            (isinstance(p, Spar | Sail) and p.wrecked and not getattr(p, "sent_down", False))
+            or (isinstance(p, Sail) and p.state is SailState.BLOWN_OUT)
+            for p in parts
+        )
+    return all(isinstance(p, Spar) and p.wrecked for p in parts)
 
 
 def _starts(candidate: str, typed: str) -> bool:
@@ -222,7 +242,7 @@ def suggestions(ship: Any, text: str, limit: int = 12) -> list[str]:
             offer(
                 phrase + " "
                 if vocab.verbs[vocab.phrase_to_verb[normalise(phrase)]].object
-                not in ("none", "driver")
+                not in ("none", "driver", "query")
                 else phrase
             )
         offer("send the ")
@@ -245,7 +265,7 @@ def suggestions(ship: Any, text: str, limit: int = 12) -> list[str]:
                 work.append(c)
         if spec.object == "work":
             return work[:limit]
-    if rest or spec.object == "none":
+    if rest or spec.object in ("none", "query", "wreck"):
         # a longer verb phrase that the words so far begin: milestone 3b's orders carry
         # their mast or their trim in the phrase ("swifter in the catharpins on the
         # main", "trim sails with the head yards sharper"); a whole phrase may begin a
@@ -262,7 +282,7 @@ def suggestions(ship: Any, text: str, limit: int = 12) -> list[str]:
                 offer(prefix + f"{n} {side}")
         return out[:limit]
 
-    if spec.object == "none":
+    if spec.object in ("none", "query"):
         if verb in vocab.group_evolutions:
             for m in _with_hands(ship, vocab):
                 offer(prefix + m)
@@ -283,7 +303,7 @@ def suggestions(ship: Any, text: str, limit: int = 12) -> list[str]:
             head = normalise(prefix + form)
             if (typed == head and trailing) or typed.startswith((head + " ", head + ",")):
                 mods = _modifiers_for(spec.object, verb, vocab, sided)
-                if spec.object in ("sail", "yards"):
+                if spec.object in ("sail", "yards", "wreck"):
                     mods += _with_hands(ship, vocab)
                 for m in mods:
                     joiner = "" if m.startswith(",") else " "
@@ -321,7 +341,7 @@ def _sets_hands_to_work(order: str) -> bool:
         if typed == p or typed.startswith(p + " "):
             verb = vocab.phrase_to_verb[p]
             spec = vocab.verbs[verb]
-            if spec.object in ("sail", "yards"):
+            if spec.object in ("sail", "yards", "wreck"):
                 return True
             return spec.object == "none" and (
                 verb in vocab.group_evolutions or isinstance(vocab.evolutions.get(verb), str)

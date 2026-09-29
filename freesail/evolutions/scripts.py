@@ -1504,14 +1504,49 @@ class _SailWork(PhasedScript):
     def holds(self) -> set[str]:
         return set()
 
+    # Unbending takes a sail out of a wreck (package 30b); bending and shifting want its
+    # spars standing
+    WORKS_IN_A_WRECK = False
+
     def _find(self, words: dict[str, Any]) -> str | None:
         if self.sail is None:
             self.sail = _subject_sail(self.ship, self.params, words)
         if self.sail is None:
             return "Name the sail to work on."
-        if not _chain_standing(self.ship, self.sail):
+        ship, sail = self.ship, self.sail
+        root = wreck_root(ship, sail)
+        if root is not None and (sail.wrecked or not self.WORKS_IN_A_WRECK):
+            # the part graph keeps a wreck's consequences until a spare replaces the spar
+            # (package 30b): the refusal names the spar and the order that clears it
+            return self._wreck_refusal(root)
+        if not _chain_standing(ship, sail):
             return f"The {self._name()}'s yard or mast is wrecked or sent down."
         return None
+
+    def _wreck_refusal(self, root: Spar) -> str | None:
+        """Why this sail cannot be worked while a spar it needs is carried away, or None
+        when it can (a wrecked sail unbent where it hangs: package 30b)."""
+        from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+        ship, sail = self.ship, self.sail
+        spar = part_name(ship, root.id)
+        if not root.sent_down:  # the wreck still hangs
+            if root.cls in OVER_THE_SIDE_CLASSES:
+                return f"The {self._name()} went over the side with the {spar}; cut away the wreck."
+            if self.WORKS_IN_A_WRECK:
+                return None  # cut out of the wreck where it hangs and sent down
+            if sail.wrecked:
+                return (
+                    f"The {self._name()} hangs in the wreck of the {spar}; cut away the wreck, "
+                    f"then shift the {spar} for a spare."
+                )
+            return (
+                f"The wreck of the {spar} still hangs aloft; cut it away and shift the {spar} "
+                f"for a spare before the {self._name()} can be bent."
+            )
+        gone = gone_spar(ship, sail)
+        what = part_name(ship, gone.id) if gone is not None else spar
+        return f"The {what} is carried away; shift it for a spare first."
 
     def _name(self, sail: Sail | None = None) -> str:
         from freesail.evolutions.runner import part_name  # local import to avoid a cycle
@@ -1622,6 +1657,8 @@ class UnbendScript(_SailWork):
     condition; a blown-out one is condemned and does not."""
 
     DEFAULTS = {"unbend": 180.0, "lower": 90.0}
+    WORKS_IN_A_WRECK = True
+    from_wreck = False  # set as the work begins: the sail hung in a wreck
 
     def check(self, words: dict[str, Any]) -> str | None:
         reason = self._find(words)
@@ -1630,11 +1667,15 @@ class UnbendScript(_SailWork):
         sail = self.sail
         if sail.state is SailState.UNBENT:
             return f"The {self._name()} is unbent already; there is no sail on the yard."
-        if sail.state in DRAWING:
+        if sail.state in DRAWING and not sail.wrecked:
+            # a sail in a wreck hangs to leeward whatever it was doing: its robands and
+            # earings are cut where it hangs (Luce 1884, ch. XXXI, 'Topgallant Yard Carried
+            # Away': "Cut adrift the clewlines from the clews, cut robands and head earings")
             return f"The {self._name()} is set; take it in before unbending it."
         return None
 
     def begin(self, words: dict[str, Any]) -> None:
+        self.from_wreck = self.sail.wrecked
         self.start_phases(["unbend", "lower"])
 
     def end_phase(self, name: str) -> None:
@@ -1642,11 +1683,17 @@ class UnbendScript(_SailWork):
             sound = self.sail.state is not SailState.BLOWN_OUT
             self.sail.state = SailState.UNBENT
             self.sail.reefs = 0
+            self.sail.wrecked = False  # out of the wreck: on deck, in the sail room or gone
+            self.sail.load_kn = 0.0
+            cut = (
+                "Cut the {} clear of the wreck, lowered it" if self.from_wreck else "Lowered the {}"
+            )
+            head = cut.format(self._name())
             if sound:
                 self._stow(self.sail)
-                self.note(f"Lowered the {self._name()} on deck and stowed it in the sail room.")
+                self.note(f"{head} on deck and stowed it in the sail room.")
             else:
-                self.note(f"Lowered the {self._name()} down on deck; the rags are condemned.")
+                self.note(f"{head} down on deck; the rags are condemned.")
 
 
 class BendScript(_SailWork):
@@ -1789,6 +1836,516 @@ class ShiftScript(_SailWork):
             self.note(f"Swayed aloft the {self._name(self.target)} ({self._spare_words()}).")
         elif name == "bend":
             self._bend_spare()
+
+
+# ---------------------------------------------------------------------------
+# Wrecks: clearing away a spar carried away, and shifting it for a spare (package 30b)
+# ---------------------------------------------------------------------------
+#
+# A spar that carries away takes with it everything that stands on it, hangs from it or is
+# of it (`physics/strain.py`, `_wreck_spar`: all of it marked `wrecked`, hanging to leeward
+# and dragging). Clearing the wreck (`clear_wreck.yaml`) saves what can be saved and cuts
+# adrift what cannot: a sail that is whole goes down to the sail room, the rags of one
+# blown out go over the side, the spars' remains are sent down on deck, and a lower mast
+# or the bowsprit, which goes over the side, is cut adrift with all it carries (Luce 1884,
+# ch. XXXI Carrying Away Masts and Spars: "When a mast goes over the side, first, get clear
+# of the wreck"). The spars stay `wrecked`, now `sent_down` as well: on deck or gone, they
+# catch no wind and bear no load, and the part graph keeps the wreck's consequences (a boom
+# gone means no studding sail on it) until `shift the <spar>` (`shift_spar.yaml`) puts a
+# spare of its class in its place from the booms (`parts.booms`).
+
+# The spars whose wreck goes over the side and is cut adrift rather than sent down: a lower
+# mast or the bowsprit carries away at the deck or the knightheads, and the wreck lies in
+# the water (Luce 1884, ch. XXXI, 'Bowsprit Carried Away or Sprung': "Should the wreck be in
+# the water under the bows ... Clear away the wreck"; 'Lower Mast Carried Away or Sprung':
+# "Clear away the wreck ... Cut the rigging clear"). Every other spar's wreck hangs aloft
+# and is sent down ('Main Topmast Carried Away': "Send the wreck down ... Send the stump
+# down next"; 'Topgallant Mast Carried Away': "send down the wreck as convenient").
+OVER_THE_SIDE_CLASSES = frozenset({"mast", "bowsprit"})
+
+# The work in a spar, sending its wreck down or a spare aloft, relative to a studding-sail
+# boom's (judgement, from how much of Luce 1884 ch. XXXII each shift takes: 'To Shift a
+# Topmast Studding-sail Boom' a whip and a guy; 'To Shift a Topgallant Mast' the mast-rope
+# and the light yards; 'To Shift a Topsail Yard' the yard purchase, burtons and every piece
+# of its gear; 'To Shift a Topmast' the top pendants, the topgallant mast and the topsail
+# yard out of the way). A class not listed counts as a yard.
+SPAR_WORK: dict[str, float] = {
+    "studdingsail_boom": 1.0,
+    "flying_jib_boom": 1.5,
+    "royal_mast": 1.5,
+    "yard": 2.0,
+    "lug_yard": 2.0,
+    "lateen_yard": 2.0,
+    "gaff": 2.0,
+    "boom": 2.0,
+    "sprit": 2.0,
+    "jib_boom": 2.5,
+    "topgallant_mast": 2.5,
+    "topmast": 6.0,
+    "bowsprit": 8.0,
+    "mast": 10.0,
+}
+
+
+def spar_work(spar: Spar) -> float:
+    return SPAR_WORK.get(spar.cls, SPAR_WORK["yard"])
+
+
+def sail_spars(ship: Ship, sail: Sail) -> list[Spar]:
+    """Every spar a sail needs standing: the chain of its principal spar, and each spar it
+    names in a role (a studding sail's boom beside its yard, a gaff sail's boom) or whose
+    stay it is hanked to, with the chains of those."""
+    out = list(ship.spar_chain(sail))
+    for target in sail.roles.values():
+        if target in ship.spars:
+            chain = ship.spar_chain(target)
+        elif target in ship.lines:
+            chain = ship.spar_chain(ship.lines[target])
+        else:
+            continue
+        out.extend(sp for sp in chain if sp not in out)
+    return out
+
+
+def gone_spar(ship: Ship, sail: Sail) -> Spar | None:
+    """The first spar the sail needs that is carried away, or None."""
+    return next((sp for sp in sail_spars(ship, sail) if sp.wrecked), None)
+
+
+def wreck_root(ship: Ship, part: Any) -> Spar | None:
+    """The spar that carried away and took this part with it: for a spar carried away, the
+    lowest spar of its chain carried away with it; for a sail, that of the first spar it
+    needs that is carried away. None when nothing the part needs is carried away."""
+    if isinstance(part, Sail):
+        part = gone_spar(ship, part)
+    if not isinstance(part, Spar) or not part.wrecked:
+        return None
+    root = part
+    parent = ship.parent_of(root)
+    while parent is not None and parent.wrecked:
+        root, parent = parent, ship.parent_of(parent)
+    return root
+
+
+def wrecks(ship: Ship) -> list[Any]:
+    """Every wreck still to be cleared, in the ship file's order: each spar carried away
+    whose wreck still hangs (not yet sent down or cut adrift) and that stands on nothing
+    carried away, and each sail blown out on spars that stand (its rags)."""
+    out: list[Any] = [
+        sp
+        for sp in ship.spars.values()
+        if sp.wrecked and not sp.sent_down and wreck_root(ship, sp) is sp
+    ]
+    out += [
+        s
+        for s in ship.sails.values()
+        if s.state is SailState.BLOWN_OUT and not s.wrecked and gone_spar(ship, s) is None
+    ]
+    return out
+
+
+def regear(ship: Ship) -> list:
+    """Reeve afresh the gear of the parts that stand again (a spare shifted in a spar's
+    place): every line the wreck took whose part stands whole now is no longer wrecked.
+    The gear of a sail waits for every spar the sail needs."""
+    back = []
+    for ln in ship.lines.values():
+        if not ln.wrecked:
+            continue
+        target = ship.parts.get(ln.of)
+        if isinstance(target, Sail):
+            standing = not target.wrecked and gone_spar(ship, target) is None
+        elif isinstance(target, Spar):
+            standing = not any(sp.wrecked for sp in ship.spar_chain(target))
+        else:
+            standing = False
+        if standing:
+            ln.wrecked = False
+            ln.load_kn = 0.0
+            back.append(ln)
+    return back
+
+
+def _subject_part(ship: Ship, params: dict[str, Any], words: dict[str, Any] | None):
+    """The part a wreck script works on: `params["part"]` (the verbs pass it), or the
+    subject the runner names in its words."""
+    from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+    pid = params.get("part")
+    if isinstance(pid, str) and pid in ship.parts:
+        return ship.parts[pid]
+    name = (words or {}).get("subject")
+    for p in list(ship.spars.values()) + list(ship.sails.values()):
+        if part_name(ship, p.id) == name:
+            params["part"] = p.id
+            return p
+    return None
+
+
+def _joined(names: list[str]) -> str:
+    if len(names) <= 1:
+        return "".join(names)
+    return ", ".join(names[:-1]) + " and " + names[-1]
+
+
+class ClearWreckScript(PhasedScript):
+    """Clear away the wreck of a spar carried away, or the rags of a sail blown out
+    (Luce 1884, ch. XXXI Carrying Away Masts and Spars: "No explicit rule can be given for
+    sending down broken spars. The first thing to be attended to is their being steadied
+    and prevented from falling on deck or tearing the sails"; Falconer 1780, *Veering*:
+    "the mizen-mast must instantly be cut away"). The part named may be the spar carried
+    away, any spar or sail that went with it (the whole wreck is cleared), or a blown-out
+    sail on standing spars.
+
+    Phases, each left out when it has nothing to do:
+      secure      aloft: the wreck steadied with burtons and tripping-lines
+      sails       aloft: robands and earings cut, each sail that is whole lowered on deck
+                  for the sail room, the rags of one blown out cut adrift over the side
+                  ('Topgallant Yard Carried Away': "Cut adrift the clewlines from the
+                  clews, cut robands and head earings, and lower")
+      send_down   on deck: the spars' remains sent down ('Main Topmast Carried Away':
+                  "Send the wreck down ... Send the stump down next")
+      cut_adrift  on deck: the lanyards and lashings cut and the wreck of a lower mast or
+                  the bowsprit let go over the side with everything on it ('Lower Mast
+                  Carried Away': "Cut the rigging clear")
+    `params["send_down"]` (the order `send down <the spar>`) refuses a wreck that must be
+    cut adrift. The sails phase takes its time for the first sail and half as much again for
+    each other (the hands at several at once), the others by the work in the spars
+    (`SPAR_WORK`); all judgement."""
+
+    DEFAULTS = {"secure": 60.0, "sails": 120.0, "send_down": 90.0, "cut_adrift": 60.0}
+
+    def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
+        super().__init__(ship, params, timing)
+        self.part = _subject_part(ship, params, None)
+        self.root: Spar | None = None
+        self.rags: Sail | None = None  # a blown-out sail on standing spars: its rags alone
+        self.spars: list[Spar] = []
+        self.sails: list[Sail] = []  # aloft in the wreck
+        self.stowed: list[Sail] = []  # in the sail room, wrecked with the spars they need
+        self.saved: list[Sail] = []
+        self.lost: list[Sail] = []
+        self.over_side = False
+        if self.part is not None:
+            self._survey()
+
+    def _name(self, part: Any) -> str:
+        from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+        return part_name(self.ship, part.id)
+
+    def _survey(self) -> None:
+        ship, part = self.ship, self.part
+        self.root = wreck_root(ship, part)
+        self.rags = None
+        if self.root is None:
+            if isinstance(part, Sail) and part.state is SailState.BLOWN_OUT:
+                self.rags = part
+                self.sails = [part]
+            return
+        deps = ship.dependents(self.root)
+        self.spars = [self.root] + [d for d in deps if isinstance(d, Spar)]
+        wrecked = [d for d in deps if isinstance(d, Sail) and d.wrecked]
+        self.sails = [s for s in wrecked if s.state is not SailState.UNBENT]
+        self.stowed = [s for s in wrecked if s.state is SailState.UNBENT]
+        self.over_side = self.root.cls in OVER_THE_SIDE_CLASSES
+
+    def holds(self) -> set[str]:
+        return {p.id for p in self.spars + self.sails}
+
+    def check(self, words: dict[str, Any]) -> str | None:
+        ship = self.ship
+        if self.part is None:
+            self.part = _subject_part(ship, self.params, words)
+        part = self.part
+        if part is None:
+            return "Name the spar or the sail whose wreck is to be cleared."
+        self._survey()
+        name = self._name(part)
+        if self.root is None and self.rags is None:
+            if isinstance(part, Sail):
+                if part.state is SailState.UNBENT:
+                    return f"The {name} is unbent; there is nothing aloft to cut away."
+                return (
+                    f"The {name} is sound and {part.describe_state()}; there is no wreck to cut "
+                    f"away. To send it down, unbend it."
+                )
+            if isinstance(part, Spar) and part.sent_down:
+                return f"The {name} is sent down on deck, not carried away; there is no wreck."
+            return f"The {name} stands sound; there is no wreck to cut away."
+        if self.rags is not None:
+            if self.params.get("send_down"):
+                return f"The {name} is blown out; unbend it to send it down, or cut it away."
+            return None
+        root = self._name(self.root)
+        if self.root.sent_down:
+            return f"The wreck of the {root} is cleared already; shift the {root} for a spare."
+        if self.over_side and self.params.get("send_down"):
+            return (
+                f"The {root} went over the side; its wreck cannot be sent down. Cut away the wreck."
+            )
+        return None
+
+    def begin(self, words: dict[str, Any]) -> None:
+        self._survey()
+        phases = ["secure"]
+        if self.sails and not self.over_side:
+            phases.append("sails")
+        if self.spars:
+            phases.append("cut_adrift" if self.over_side else "send_down")
+        self.start_phases(phases)
+
+    def phase_s(self, name: str) -> float:
+        base = super().phase_s(name)
+        if name == "sails":
+            return base * (1.0 + 0.5 * max(0, len(self.sails) - 1))
+        if name == "send_down":
+            return base * max(1.0, sum(spar_work(s) for s in self.spars))
+        return base
+
+    def end_phase(self, name: str) -> None:
+        ship = self.ship
+        if name == "secure":
+            if self.rags is not None:
+                self.note(f"Hands aloft to cut the rags of the {self._name(self.rags)} adrift.")
+            else:
+                self.note(
+                    f"Steadied the wreck of the {self._name(self.root)} with burtons and "
+                    f"tripping-lines."
+                )
+        elif name == "sails":
+            for s in self.sails:
+                whole = s.state is not SailState.BLOWN_OUT
+                s.state = SailState.UNBENT
+                s.reefs = 0
+                s.wrecked = False
+                s.load_kn = 0.0
+                if whole:
+                    room = parts.sail_room(ship)
+                    spare = parts.SpareSail(kind=s.id, canvas_no=s.canvas_no, condition=s.condition)
+                    room.stow(spare)
+                    ship.extra["spare_sails"] = len(room)
+                    self.saved.append(s)
+                else:
+                    self.lost.append(s)
+            for s in self.stowed:
+                s.wrecked = False  # in the sail room all along
+            said = []
+            if self.saved:
+                said.append(f"lowered {self._the(self.saved)} on deck for the sail room")
+            if self.lost:
+                said.append(f"cut the rags of {self._the(self.lost)} adrift over the side")
+            self.note("Cut the robands and earings; " + "; ".join(said) + ".")
+        elif name in ("send_down", "cut_adrift"):
+            for sp in self.spars:
+                sp.sent_down = True  # on deck, or gone: no wind on it, no load
+                sp.brace_angle = 0.0
+                sp.load_kn = 0.0
+                if sp.cls in parts.RIGGED_IN_CLASSES:
+                    sp.rigged_out = False
+            if name == "cut_adrift":
+                for s in self.sails:
+                    s.state = SailState.UNBENT
+                    s.reefs = 0
+                    s.wrecked = False
+                    s.load_kn = 0.0
+                    self.lost.append(s)
+                for s in self.stowed:
+                    s.wrecked = False
+                self.note(
+                    f"Cut the lanyards and lashings; the wreck of the {self._name(self.root)} "
+                    f"went over the side{self._with()}."
+                )
+            else:
+                self.note(
+                    f"Sent down on deck the remains of the {self._name(self.root)}"
+                    f"{self._with()}; the gear that went with it unrove and cleared."
+                )
+
+    def _the(self, items: list) -> str:
+        """'the fore royal and the fore royal yard', for the log."""
+        return _joined([f"the {self._name(p)}" for p in items])
+
+    def _with(self) -> str:
+        return f", with {self._the(self.spars[1:])}" if len(self.spars) > 1 else ""
+
+    def _account(self) -> str:
+        """What was saved and what went over the side, for the log."""
+        if self.rags is not None:
+            return "its rags cut adrift and over the side"
+        if self.over_side:
+            gone = self.spars[1:] + self.lost
+            return "cut adrift and over the side" + (f" with {self._the(gone)}" if gone else "")
+        pieces = ["its remains sent down on deck" + self._with()]
+        if self.saved:
+            pieces.append(f"{self._the(self.saved)} saved to the sail room")
+        if self.lost:
+            pieces.append(f"the rags of {self._the(self.lost)} over the side")
+        else:
+            pieces.append("nothing went over the side")
+        return "; ".join(pieces)
+
+    def _spares(self) -> str:
+        """What the booms hold for the spar carried away, for the log."""
+        if self.root is None:
+            return ""
+        n = parts.booms(self.ship).have(self.root.cls)
+        words = parts.spar_class_words(self.root.cls, n if n else 1)
+        if n:
+            return f" The booms hold {n} spare {words}."
+        return f" There is no spare {words} aboard."
+
+    def words(self) -> dict[str, Any]:
+        part = self.root if self.root is not None else self.rags or self.part
+        return {
+            "wreck": self._name(part) if part is not None else "wreck",
+            "account": self._account() if (self.root or self.rags) else "",
+            "spares": self._spares(),
+        }
+
+    def data(self) -> dict[str, Any]:
+        d = super().data()
+        d["wreck"] = self.root.id if self.root is not None else None
+        d["spars"] = [s.id for s in self.spars]
+        d["saved"] = [s.id for s in self.saved]
+        d["over_the_side"] = [s.id for s in self.lost] + (
+            [s.id for s in self.spars] if self.over_side else []
+        )
+        return d
+
+
+class ShiftSparScript(PhasedScript):
+    """Shift a spar carried away for a spare of its class from the booms (Luce 1884, ch.
+    XXXII Shifting Sails and Spars, 'To Shift a Topmast Studding-sail Boom', 'To Shift a
+    Topgallant Mast', 'To Shift a Topsail Yard', 'To Shift a Topmast': "Send the stump
+    down next, and proceed to send aloft a new topmast", ch. XXXI). The wreck must be
+    cleared first, and the spar it stands on must stand. Phases:
+      get_up  on deck: the spare got out of the booms and its gear put on it
+      sway    aloft: swayed aloft and fidded, crossed, or landed in its irons
+      rig     aloft: the gear rove and the rigging set up
+    each taking its time by the work in the spar (`SPAR_WORK`). The spar stands again,
+    whole; the gear the wreck took is rove afresh where its parts stand (`regear`); a sail
+    that belongs on it is left in the sail room, to be bent by order."""
+
+    DEFAULTS = {"get_up": 60.0, "sway": 120.0, "rig": 90.0}
+
+    def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
+        super().__init__(ship, params, timing)
+        self.spar = _subject_part(ship, params, None)
+
+    def _name(self, part: Any) -> str:
+        from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+        return part_name(self.ship, part.id)
+
+    def holds(self) -> set[str]:
+        if not isinstance(self.spar, Spar):
+            return set()
+        return {self.spar.id} | {s.id for s in self.ship.sails_using(self.spar)}
+
+    def check(self, words: dict[str, Any]) -> str | None:
+        ship = self.ship
+        if self.spar is None:
+            self.spar = _subject_part(ship, self.params, words)
+        spar = self.spar
+        if not isinstance(spar, Spar):
+            return "Name the spar to shift for a spare."
+        name = self._name(spar)
+        if not spar.wrecked:
+            if spar.sent_down:
+                return (
+                    f"The {name} is sent down on deck, not carried away; there is nothing to shift."
+                )
+            return f"The {name} is sound; only a spar carried away is shifted for a spare."
+        root = wreck_root(ship, spar) or spar
+        if not root.sent_down:
+            return f"The wreck of the {self._name(root)} still hangs aloft; cut it away first."
+        if root is not spar:
+            first = self._name(root)
+            return f"The {name} went with the {first}; shift the {first} first."
+        parent = ship.parent_of(spar)
+        if parent is not None and parent.sent_down:
+            return f"The {self._name(parent)} is sent down; sway it up before shifting the {name}."
+        if parts.booms(ship).have(spar.cls) == 0:
+            return (
+                f"No spare {parts.spar_class_words(spar.cls)} aboard; the dockyard must supply one."
+            )
+        return None
+
+    def begin(self, words: dict[str, Any]) -> None:
+        self.start_phases(["get_up", "sway", "rig"])
+
+    def phase_s(self, name: str) -> float:
+        base = super().phase_s(name)
+        return base * spar_work(self.spar) if isinstance(self.spar, Spar) else base
+
+    def end_phase(self, name: str) -> None:
+        ship, spar = self.ship, self.spar
+        name_ = self._name(spar)
+        what = parts.spar_class_words(spar.cls)
+        if name == "get_up":
+            store = parts.booms(ship)
+            if store.have(spar.cls) == 0:  # taken by another shift meanwhile
+                self.fail(f"No spare {what} aboard; the dockyard must supply one")
+                return
+            store.take(spar.cls)
+            ship.extra["spare_spars"] = len(store)
+            self.note(f"Got the spare {what} out of the booms and put its gear on it.")
+        elif name == "sway":
+            spar.wrecked = False
+            spar.sent_down = False
+            spar.condition = 100.0
+            spar.load_kn = 0.0
+            spar.brace_angle = 0.0
+            if spar.cls in parts.RIGGED_IN_CLASSES:
+                spar.rigged_out = False  # landed in its irons, rigged in, ready to rig out
+            if spar.cls in MAST_CLASSES:
+                done = f"Swayed aloft and fidded the new {name_}"
+            elif spar.cls in YARD_LIKE_CLASSES:
+                done = f"Swayed aloft and crossed the new {name_}"
+            elif spar.cls in parts.RIGGED_IN_CLASSES:
+                done = f"Landed the new {name_} in its irons and clamped it"
+            elif spar.cls in ("jib_boom", "flying_jib_boom"):
+                done = f"Rigged out and pointed the new {name_}"
+            else:
+                done = f"Swayed up and shipped the new {name_}"
+            self.note(f"{done}.")
+        elif name == "rig":
+            regear(ship)
+            self.note(f"Rove the {name_}'s gear and set up the rigging.")
+
+    def words(self) -> dict[str, Any]:
+        ship, spar = self.ship, self.spar
+        if not isinstance(spar, Spar):
+            return {}
+        n = parts.booms(ship).have(spar.cls)
+        left = (
+            f"{n} spare {parts.spar_class_words(spar.cls, n)} left on the booms"
+            if n
+            else f"no spare {parts.spar_class_words(spar.cls)} left aboard"
+        )
+        after = []
+        unbent = [
+            s
+            for s in ship.sails_using(spar)
+            if s.state is SailState.UNBENT and gone_spar(ship, s) is None
+        ]
+        if unbent:
+            names = _joined([f"the {self._name(s)}" for s in unbent])
+            after.append(f"{names} may be bent to it again")
+        wanting = [d for d in ship.dependents(spar) if isinstance(d, Spar) and d.wrecked]
+        if wanting:
+            names = _joined([f"the {self._name(d)}" for d in wanting])
+            verb = "is" if len(wanting) == 1 else "are"
+            after.append(f"{names}, carried away with it, {verb} still to be shifted")
+        return {"left": left, "after": "; " + "; ".join(after) if after else ""}
+
+    def data(self) -> dict[str, Any]:
+        d = super().data()
+        if isinstance(self.spar, Spar):
+            d["spar"] = self.spar.id
+            d["spare_spars"] = len(parts.booms(self.ship))
+        return d
 
 
 # ---------------------------------------------------------------------------
@@ -2409,6 +2966,8 @@ SCRIPTS: dict[str, type[Script]] = {
     "unbend": UnbendScript,
     "bend": BendScript,
     "shift": ShiftScript,
+    "clear_wreck": ClearWreckScript,
+    "shift_spar": ShiftSparScript,
     "loose_to_dry": LooseToDryScript,
     "furl_all": FurlAllScript,
     "boxhaul": BoxHaulScript,
