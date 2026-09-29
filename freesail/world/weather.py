@@ -400,6 +400,7 @@ class System:
     cold_deg: float = 225.0
     occluded_at: datetime | None = None
     track: list[TrackPoint] = field(default_factory=list)
+    track_times: list[datetime] = field(default_factory=list)  # the track's times, for bisect
     scripted: bool = False
     gone: bool = False
 
@@ -490,6 +491,7 @@ def _system_from_dict(d: Mapping[str, Any], start: datetime) -> System:
         warm_deg=warm,
         cold_deg=cold,
         track=points,
+        track_times=[p.at for p in points],
         scripted=True,
     )
 
@@ -857,8 +859,7 @@ class Weather:
         self.now = when
         for s in self.systems:
             if s.scripted:
-                times = [p.at for p in s.track]
-                x, y, hpa = _track_at(s.track, times, when)
+                x, y, hpa = _track_at(s.track, s.track_times, when)
                 s.x_km, s.y_km = x, y
                 s.anomaly_hpa = hpa - self._background
                 continue
