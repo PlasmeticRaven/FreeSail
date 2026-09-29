@@ -156,10 +156,76 @@ already does; the dockyard (5c); the layering faults of the viewer (deferred).
 Deliverables: the code and tests, the primer's note on clearing wreck and shifting a
 spar, and a report for the lead naming the sources for the spare-spar counts.
 
-## Package 31: the sea and the ship's motion (outline; written when 30 has landed)
+## Package 31: the sea and the ship's motion, windage under bare poles, gate 5a (`freesail/world/sea.py` new; `freesail/physics/motion.py` new; `freesail/physics/integrate.py` and the hull's resistance and windage wherever they live, for the speed lost in a head sea and the windage under bare poles; `freesail/physics/strain.py` for the motion's load; `freesail/crew/hands.py` for the crew factor aloft in a seaway; `freesail/api/readings.py` for `the sea` and `the motion`; `freesail/core/world.py` for the sea's tick and the glass's pumping; `freesail/core/events.py` for the sea in the roll-up; `client/instruments.js`; `data/scenarios/gate-5a-day.yaml` new (the day under systems alone); `docs/primer/09-the-glass-and-the-sky.md` for the sea's words; `docs/gates/gate-m5a.md`; `docs/dev/TuningNotes.md`; `tests/test_sea.py` new, `tests/test_known_truths.py` truth 56 and the pace truth, `tests/test_strain.py`, `tests/test_hands.py`)
 
-Spec M5 §4, §5 (the sea's words), the M4 open item 7 (windage under bare poles), truth
-56, the gate 5a cut. Fable.
+Spec M5 §4, §5 (the sea's words), §6 truth 56, §7 gate 5a; `ThreeDimensions.md` (the
+seaway as reduced motions, never a physics engine); spec M4 §24 item 7 (windage under
+bare poles: the frigate makes three knots under bare poles in fifteen knots dead astern
+where a few tenths would be expected; to be measured against Luce on drift under bare
+poles and tuned). Fable. Written 2026-09-29 when package 30 landed; launched on the
+owner's approval.
+
+- **The sea state** (§4). A field at the ship (`Sea`): a significant wave height and a
+  period from the wind's recent history, a first-order lag on the ten-minute mean
+  (`SEA_BUILD_HOURS`, `SEA_DECAY_HOURS`, the period from the height by the open-sea
+  relation, each with a source in the tuning notes: the WMO or Bretschneider relations
+  for a fetch-unlimited sea at the wind's speed and duration, cited and marked where a
+  figure is a judgement); a swell with its own direction, height and period that a low
+  leaves behind (from the systems' history: the strongest wind of the last day and its
+  direction, decaying over a day); the combined sea in the period's words ("a smooth
+  sea", "a short chopping sea", "a heavy sea", "a long swell from the westward", "a
+  confused sea" when wind and swell cross), never the Douglas numbers. Ticked once a
+  simulated minute. Deterministic; saved and replayed.
+- **The motion** (§4). Three reduced quantities (`Motion`): the roll amplitude and
+  period from the sea on the beam against the ship's stability (the righting the hull
+  already has, or a stated proxy), pitch from the sea ahead, heave; each a number with a
+  time constant, no integration of a six-degree body. In words in `the motion` ("rolling
+  heavily", "pitching into it", "easy"). Nothing here moves the ship on the plane; it is
+  what the hands and the gear feel.
+- **The consequences** (§4), each one line where it lands: the crew factor aloft falls
+  with the roll (`hands.crew_factor`, a table by roll amplitude with a source; a reef in a
+  heavy sea takes half as long again, truth 56); the strain model reads the motion as an
+  extra load on spars and gear (a factor on the wind's load by the roll and pitch; the
+  strain truths' numbers must not move in a smooth sea); the hull loses speed in a head
+  sea by a small factor (added resistance, a judgement bounded by the sources and
+  recorded); the glass pumps by a hundredth or two in a seaway (`GLASS_NOISE_IN` scaled by
+  the motion); the lookout's horizon is what the height of eye and the swell allow (a
+  number 5b's sighting reads; inert until then); the noon sight's and the lunar's error
+  hooks (numbers 5b's sights read; inert until then).
+- **Windage under bare poles** (M4 open item 7). Measure the frigate under bare poles in
+  fifteen knots dead astern; compare with Luce on drift under bare poles and with the
+  hull and rig windage the sail model already carries; tune the hull's and the rig's
+  windage so the drift is a few tenths of a knot, with the reason in the tuning notes;
+  every truth that depends on speed under sail must not move (if one does, the windage
+  is in the wrong term).
+- **Readings and lines** (§5): `the sea` and `the motion` in the registry with their
+  words and absent patterns; the dialect reads them (`when the sea is heavy then ...`);
+  a log line when the sea's words change; the roll-up says the sea by the hour; the
+  instruments panel shows the sea; the console's `state` has it. The primer's chapter 9
+  gains the sea's words with their sources (Luce 1884 and the period logs' phrases).
+- **The gate's day under systems alone**: `data/scenarios/gate-5a-day.yaml`, the
+  re-expressed day of package 30 without the pinned `wind`, sailed by the starter
+  routines; its ticks and digest recorded as truth constants of their own (the M4
+  constants untouched); the pace truth for gate 5a measured on it (truth 51's floor).
+- **Gate 5a** (§7): `docs/gates/gate-m5a.md` in the form of the M4 gates, for the owner
+  to run on the console or the browser: the day under a system with the glass read at
+  every watch change and the sky at every bell; the squall in the middle watch; the sea's
+  words through the gale and the next forenoon; the watcher through the local runner
+  asked what the glass says; a January day and a July day from the climatology at seed 7
+  with the tool's table; the fake watcher's day replayed to the same digest; `--load` of
+  a save with a station, carried from gate 4c; the ruling asked of the owner on the
+  pinned form and the air-mass rule (spec §3 as built). Expected numbers from seed 7.
+- **Tests**: the sea's build and decay against the relations; the swell left by a
+  passing low; the words at each height; the motion's three numbers on the beam, ahead
+  and astern; each consequence in isolation (a reef in a smooth and a heavy sea; the
+  strain in a smooth sea unchanged; the head-sea loss); windage under bare poles before
+  and after; truth 56; the day under systems replayed; the pace.
+- **Report**: the final suite line; every constant with its source and whether it was
+  verified; the windage before and after with Luce's figure; what moved in the tuning
+  notes; the day-under-systems constants; anything you could not do and why.
+
+Not in 31: pitch and roll moving the ship on the plane, a six-degree body, wave-by-wave
+motion, the sea breeze and coastal fog, anything of the chart.
 
 ## Packages 32 to 36 (outline; written in turn)
 

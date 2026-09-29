@@ -75,7 +75,15 @@ and whenever a system leaves the box or its life ends, from a named stream of th
 seed (`rng` stream `weather`), separate from the wind's gusts; everything after the draw
 is arithmetic, so a day replays tick for tick. A test runs a thousand simulated months
 and requires the direction shares within `CLIMATOLOGY_TOLERANCE_PCT = 5` of the table and
-the gale days within a stated band of Ushant's counts (W §1.2).
+the gale days within a stated band of Ushant's counts (W §1.2). **As built (package 30):**
+the climatology carries, beside the study's table, a monthly background pressure and a
+mean gradient (without them the sea between systems was calm) and a broadly placed high;
+the file says `provisional: true`; the tool prints the thousand-month table beside the
+study's. Two known weak spots, recorded in the tuning notes: the north quarter runs four
+to eight points short (a north-westerly falls on the west quarter's edge), and
+strong-breeze days are about half of Ushant's in winter, Ushant reading high on its cliff.
+The glass does not check at the cold front, the pressure being a sum of bells; a frontal
+trough would give it (open item).
 
 **The scenario file** (W §5). `weather` grows a `systems` list: each a name, a kind, a
 radius, waypoints of position, central pressure and time, and for a low its fronts'
@@ -101,7 +109,13 @@ then gusts to about 55, and to 65 only in a squall the log names. The direction'
 walk becomes mean-reverting about the systems' wind with a spread of 5 to 10 degrees in
 unstable air and less in stable; its docstring's "a point an hour" is corrected. Speed
 wander stays at about a tenth of the mean. The M4c tuning note on the gust factor is
-closed by this section.
+closed by this section. **As built (package 30):** the air-mass rule, the squalls and the
+reverting wander run only when the wind has a cause (the systems); under a fixed or a
+pinned wind the milestone 2 draws are kept bit for bit, so that truths 48 to 51 and the
+gate's day in its pinned form do not move (the pinned gale still gusts to 67; under the
+systems it gusts to about 55, and to 61 in a named squall). Whether the pinned form should
+also take the air-mass rule, with a new digest for the M4 truths, is the owner's ruling at
+gate 5a. A gust's peak is the ten-minute mean times the factor, as the studies define it.
 
 ### 4. The sea state and the ship's motion (`freesail/world/sea.py`, `physics/motion.py`)
 
@@ -589,7 +603,10 @@ in (then 5b), double altitudes, the kedge, interiors beyond a name and a descrip
 6. A station for the lookout (decision 24's last line), when a small model is tried at it.
 7. The sail room in the browser (owner, playtest 8) waits for §22's places and papers;
    until then the console's query stands and the browser has none.
-8. The lead at a station (§29): the consent question put to the lead's own weights inside
+8. From package 30: a frontal trough so the glass checks at the cold front; the north
+   quarter's share; the pinned form and the air-mass rule (the gate 5a ruling); a
+   `gate-5a-day.yaml` with the day under systems alone, for the gate cut (package 31).
+9. The lead at a station (§29): the consent question put to the lead's own weights inside
    the harness before the gate, the record kept as any other; and, for M6, the owner's
    wish that the lead take an officer's or a captain's station once they exist.
 
