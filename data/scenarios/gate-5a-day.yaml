@@ -1,0 +1,71 @@
+# FreeSail: the gate's day under systems alone (spec M5 §4, §7; package 31; gate 5a).
+#
+# The same day as data/scenarios/gate-4c-day.yaml, without its pinned `wind`: the low
+# passing well north of Falmouth with the ship in its warm sector, the cold front through
+# at 22:00, the north-westerly gale in the cold air behind and the ridge by dawn; the
+# systems' surface wind at the ship is the base wind, with the gust factor by air mass,
+# squalls in the unstable air behind the front and the mean-reverting wander (spec M5 §3),
+# and the sea and the ship's motion raised by it (spec M5 §4). Given to either driver
+# with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/gate-5a-day.yaml --watcher fake
+#     py -m freesail.ui.console --scenario data/scenarios/gate-5a-day.yaml
+#
+# The pinned day (gate-4c-day.yaml) stays the fixture every truth from 48 to 51 is
+# measured on and does not move; this day has truth constants of its own
+# (tests/test_known_truths.py, "the day under systems alone"), measured at seed 7 and
+# recorded in docs/dev/TuningNotes.md, M5a. The systems, the fronts and the background are
+# package 30's fit (gate-4c-day.yaml has the fit's numbers and reasons).
+
+name: The gate's day under systems
+seed: 7
+start: 1805-06-01T04:00
+latitude_deg: 50.0
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 135
+  glass: true
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+weather:
+  background:
+    {hpa: 1015, gradient_hpa_per_100km: 0.5, high_toward_deg: 190}
+  systems:
+    - name: the low
+      kind: low
+      radius_km: 420
+      fronts: {warm_deg: 207, cold_deg: 56}
+      track:
+        - {at: 1805-05-31T12:00, x_km: 20, y_km: 920, hpa: 1004}
+        - {at: 1805-06-01T04:00, x_km: 150, y_km: 800, hpa: 998}
+        - {at: 1805-06-01T14:00, x_km: 200, y_km: 780, hpa: 996}
+        - {at: 1805-06-01T19:00, x_km: 250, y_km: 700, hpa: 990}
+        - {at: 1805-06-01T22:00, x_km: 330, y_km: 540, hpa: 980}
+        - {at: 1805-06-02T01:00, x_km: 400, y_km: 400, hpa: 968}
+        - {at: 1805-06-02T03:00, x_km: 520, y_km: 370, hpa: 968}
+        - {at: 1805-06-02T05:00, x_km: 720, y_km: 320, hpa: 978}
+        - {at: 1805-06-02T07:00, x_km: 950, y_km: 280, hpa: 988}
+    - name: the old ridge
+      kind: high
+      radius_km: 800
+      track:
+        - {at: 1805-05-31T12:00, x_km: 400, y_km: -500, hpa: 1022}
+        - {at: 1805-06-01T04:00, x_km: 1100, y_km: -700, hpa: 1020}
+        - {at: 1805-06-01T12:00, x_km: 1500, y_km: -800, hpa: 1018}
+    - name: the ridge
+      kind: high
+      radius_km: 900
+      track:
+        - {at: 1805-06-02T00:00, x_km: -1400, y_km: -200, hpa: 1024}
+        - {at: 1805-06-02T09:00, x_km: -800, y_km: -200, hpa: 1026}
+
+# The same standing orders as the pinned day: the starter routines and the captain's
+# three for the passage.
+standing_orders:
+  - data/standing_orders/starter.orders
+  - data/scenarios/gate-4c-day.orders
+
+orders:
+  - set plain sail
+  - set the royals
