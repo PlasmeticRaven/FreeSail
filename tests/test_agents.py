@@ -767,6 +767,40 @@ def test_stand_by_takes_an_event_or_an_interval_and_refuses_the_rest_in_words():
     assert "eight bells" in h.stand_by("teatime")
 
 
+def test_stand_by_until_a_strain_warning_wakes_on_the_strain_lines_whatever_their_words():
+    """Playtest 7, finding 7 (package 29b): the event is matched on the log's kind, so 'a
+    strain warning' wakes the watcher on 'bending like a whip' as on any strain line, the
+    grouped line of the royals included; the tool's description and the brief list the
+    event words and say so; 'strain warning' and 'the next strain warning' are the same."""
+    world = point_world()
+    h, fake, _ = stationed(world, [call("stand_by", until="a strain warning"), "Seen."])
+    assert h.agent.standing_by and h.agent.stand_by.event == "a strain warning"
+    calls = fake.calls
+    world.run(30)
+    assert fake.calls == calls
+    world.record(
+        Severity.NOTABLE,
+        "strain.warning",
+        "The fore, main and mizzen royal masts and yards bending like whips; she will carry "
+        "them away if sail is not shortened.",
+        data={"parts": ["fore.royal_mast"]},
+    )
+    world.run(1)
+    assert fake.calls == calls + 1
+    assert data_turns(fake)[-1]["reason"] == "a strain warning"
+    for said in ("strain warning", "the next strain warning", "strain warnings"):
+        h.agent.state = "stationed"
+        assert h.stand_by(said).startswith("Standing by until a strain warning")
+    description = TOOLS["stand_by"].description
+    for words in R.EVENTS:
+        if not R.EVENTS[words].absent:
+            assert f"'{words}'" in description, words
+            assert f"'{words}'" in agent_mod.STAND_BY_WORDS, words
+    assert "bending like a whip" in description and "bending like a whip" in (
+        agent_mod.STAND_BY_WORDS
+    )
+
+
 def test_stand_by_takes_a_severity_and_minutes_in_the_dialects_words():
     """Package 28c (playtest 3: "no five-minute interval and no generic notable event or
     urgent event trigger")."""

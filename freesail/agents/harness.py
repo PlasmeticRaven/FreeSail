@@ -1213,6 +1213,11 @@ class Harness:
         words = " ".join(str(until).lower().split()).strip(" .!?")
         for lead in ("until ", "till ", "for "):
             words = words.removeprefix(lead)
+        # 'strain warning', 'the next strain warning', 'strain warnings': the event's words
+        for said in (words, words.removeprefix("the next "), words.rstrip("s")):
+            for article in ("", "a ", "an "):
+                if words not in R.EVENTS and article + said in R.EVENTS:
+                    words = article + said
         world = self.world
         if words in R.EVENTS:
             spec = R.EVENTS[words]

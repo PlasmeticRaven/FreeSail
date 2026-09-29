@@ -133,6 +133,12 @@ def log_line(e: Any) -> dict[str, Any]:
     }
 
 
+# The events a stand-by may wait for, as the tool's description lists them (package 29b,
+# playtest 7's finding 7: the watcher did not try 'a strain warning' for the royals, since
+# the log's line read 'bending like a whip').
+STAND_BY_EVENTS = ", ".join(f"'{w}'" for w, spec in R.EVENTS.items() if not spec.absent)
+
+
 def readings_words(world: World) -> dict[str, Any]:
     """Every reading the registry has, in words (`readings.reading_words`), by id, plus
     each sail's state under `sails` by the sail's ordinary name. This is what the
@@ -370,12 +376,15 @@ TOOLS: dict[str, Tool] = {
             "stand_by",
             "Stand by until an event, a bell or an interval: you are not sampled until "
             "then, and the decision is written in the log. `until` is an event's words as "
-            "the standing dialect knows them ('eight bells', 'sunset', 'the change of the "
-            "watch', 'a strain warning', 'a sail blown out'), an interval ('a glass', 'an "
-            "hour', 'a watch', '5 minutes', 'ten minutes'), 'a notable event' or 'an urgent "
-            "event'. An urgent line in the log ends any stand-by and wakes you, its line "
-            "named as the reason; the notable lines logged while you stood by come with the "
-            "sample that wakes you, counted and listed.",
+            f"the standing dialect knows them ({STAND_BY_EVENTS}), an interval ('a glass', "
+            "'an hour', 'a watch', '5 minutes', 'ten minutes'), 'a notable event' or 'an "
+            "urgent event'. An event is matched on the kind of the log's line, not its "
+            "words: 'a strain warning' wakes you on every strain line whatever its prose "
+            "('working under the press of sail', 'bending like a whip', 'straining at the "
+            "bolt-ropes', 'bar-taut and surging on the pin'). An urgent line in the log ends "
+            "any stand-by and wakes you, its line named as the reason; the notable lines "
+            "logged while you stood by come with the sample that wakes you, counted and "
+            "listed.",
             {"until": "string: the event, the interval, 'a notable event' or 'an urgent event'"},
             stand_by,
         ),
