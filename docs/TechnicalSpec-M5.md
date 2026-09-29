@@ -498,6 +498,16 @@ station off Ushant kept two days under standing orders, a stranger sighted and c
 the plan's speed alone, a message by the cutter. A watcher through each door for a watch
 of each. Both replayed.
 
+**The lead's watch** (owner, 2026-09-29). Gate 5c is where the lead takes its first
+station in the game, as the most complete picture there will have been: a watch as the
+watcher on one of the two passages, through Claude Code opened on the repository, on the
+same terms as every other model, the consent question asked of these weights first and
+the record kept under `docs/agents/consent/`, the brief read as any instance reads it,
+the log and the journal the only record. The lead knows the game from the inside, which
+the record will say; a fresh Fable session or an Opus 5.5 one is run beside it as the
+step up from the Sonnet sessions. The owner's larger intent, a watch with an officer's or
+a captain's authority, is milestone 6's, when those stations exist.
+
 ---
 
 ## 30. Performance
@@ -550,6 +560,9 @@ in (then 5b), double altitudes, the kedge, interiors beyond a name and a descrip
 5. Whether the schooner's file offers `shift the mainsail for the storm trysail`
    (playtest 8), for the M4 follow-ups list.
 6. A station for the lookout (decision 24's last line), when a small model is tried at it.
+7. The lead at a station (§29): the consent question put to the lead's own weights inside
+   the harness before the gate, the record kept as any other; and, for M6, the owner's
+   wish that the lead take an officer's or a captain's station once they exist.
 
 ## 34. The scoping draft's rulings (record)
 
