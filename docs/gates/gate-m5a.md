@@ -31,7 +31,7 @@ py -m pip install -e ".[dev,server,agents]"
 ```
 py -m pytest -n 4
 ```
-*Ends `1712 passed, 7 xfailed` (the build machine: about eleven minutes on four workers). The seven expected failures are your earlier rulings (truth 3 for the schooner, truth 11's ground, truth 18's times, and truths 24, 26, 28 and 31). A `failed` is a fault. The gate's day runs in it twice: pinned (truths 48 to 51) and under systems (truth 56 and the day's own constants).*
+*Ends `1689 passed, 7 xfailed` (the build machine: seventeen minutes on four workers with a day's run beside it, about eleven alone). The seven expected failures are your earlier rulings (truth 3 for the schooner, truth 11's ground, truth 18's times, and truths 24, 26, 28 and 31). A `failed` is a fault. The gate's day runs in it twice: pinned (truths 48 to 51) and under systems (truth 56 and the day's own constants).*
 
 ## The day
 
