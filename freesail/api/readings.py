@@ -877,6 +877,8 @@ _event(EventSpec("a spar carrying away", "spar.carried_away"))
 _event(EventSpec("a sail blown out", "sail.blown_out"))
 _event(EventSpec("all hands called", "crew.all_hands"))
 _event(EventSpec("the watch piped down", "crew.piped_down"))
+# a squall (spec M5 §3): the wind's own event in unstable air, logged by name
+_event(EventSpec("a squall", "weather.squall"))
 _event(
     EventSpec(
         "a sighting",

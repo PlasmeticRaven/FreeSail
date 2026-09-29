@@ -448,3 +448,89 @@ Measured on the gate's day at seed 7, the mean fatigue of each watch every half 
 The finding is that the rates were not at fault; the repeated call was. With the runner's rule of package 29b (the hands are not piped down while another all-hands evolution waits its turn, spec M3 §4.2), each firing is one call: five calls in the day, three in the first watch (one for each of the three firings). The starboard watch now reaches 0.60 (worn out) at 23:00, holds there through its middle watch on deck, falls to 0.45 (tired) by six and 0.32 by eight, and comes up for the forenoon tired (0.33 at nine), to be fresh again after its next watch below. That is the model working as the sources have it: a watch that lost its sleep in the first watch keeps its own middle watch, and gets its rest only after it.
 
 No constant is moved. The one the sources point at is the end of the night: Luce's daily routine at sea has the watch below sleep through the morning watch until "At 6 bells, call all hands and pipe hammocks up" (Luce 1866, ch. XXXII, Daily Routine at Sea, Morning Watch, art. V), seven o'clock, where the game's night (`NIGHT_ENDS_HOUR`) ends at four. Moving it to seven was tried: the watch below would rest at the night's rate (0.12 an hour) until seven, but the same constant sets when a call costs broken sleep, and the compatibility rule (spec M3 §1: one evolution with the watch on deck takes milestone 2's time to the tick) then failed for the tack, the wear and the reef, which the default scenario starts at 04:00 with the watch below asleep. Splitting the night into the hours of sleep and the hours a call costs it is a structural change to the crew model, which this package does not make; it is recorded here for the owner. Truth 20 is unchanged (the morning watch's crew factor 1.128, measured at 04:01).
+
+## Milestone 5a: weather systems, the glass and the sky
+
+Package 30 (spec M5 §2, §3, §5; the study `docs/design/WeatherSystems.md`): pressure systems with fronts, seeded from a monthly climatology or scripted by the scenario; the surface wind at the ship as the base the wind's gusts and wander ride on; the glass, the tendency, the sky, the weather and the visibility as readings; the gust factor by air mass, squalls as events, the mean-reverting wander. Truths 52 to 55 and 57 in `tests/test_known_truths.py`; the mechanics in `tests/test_weather.py` and `tests/test_wind.py`.
+
+### The constants and their sources
+
+Every number from the study was checked against its "verified / not verified" list; those from an unverified figure, and the judgements the study does not make at all, are marked so here and in the code's comments.
+
+| Constant | Value | Source | Verified |
+|---|---|---|---|
+| `SURFACE_TURN_DEG`, `SURFACE_SCALE` (`world/weather.py`) | 15°, 0.7 | W §1.3 (S8, the textbook statement: 10 to 20 degrees, about two thirds); the spec fixes the middle of each | yes |
+| `GEOSTROPHIC_MS_PER_HPA_PER_100KM` | 7.2 m/s | W §1.3; checked here from the air density and the Coriolis parameter at 50 N (7.16) | yes |
+| `CORIOLIS_50N` | 1.117e-4 /s | 2 × 7.292e-5 × sin 50°; the gradient-wind cap is the textbook rule (Holton) | yes |
+| `WARM_FRONT_VEER_DEG`, `COLD_FRONT_VEER_DEG`, `COLD_FRONT_PRE_BACK_DEG` | 22.5°, 45°, 11.25° | W §1.3 (S7): "south to south-west" at the warm front, "veers sharply, west to north-west" at the cold, "backs a little" close ahead of it | yes, as the sequence; the points are the sequence read in points |
+| `FRONT_LENGTH_KM`, `WARM_FRONT_APPROACH_KM`, `WARM_FRONT_RAIN_KM`, `WARM_FRONT_GLOOM_KM`, `COLD_FRONT_BAND_KM`, `COLD_FRONT_SHOWERS_KM`, `COLD_FRONT_VEER_FADE_KM` | 1000, 300, 200, 120, 60, 400, 400 km | judgements from the Norwegian model's proportions (S7; the study gives the sequence and no distances) | no (judgement) |
+| `WARM_FRONT_TURN_DEG_PER_H`, `COLD_FRONT_TURN_DEG_PER_H` | 2, 6 °/h | judgement: a warm sector of a hundred degrees occludes in about a day (S7's life cycle) | no (judgement) |
+| `BOX_HALF_KM`, `SYSTEM_REACH_KM`, `UNDER_HIGH_RADII` | 250, 900 km, 1 | W §1 (the box); the reach a judgement (a low of 500 km is felt at twice its radius) | partly |
+| `HPA_PER_INCH` | 33.86 | W §3; the physical constant 33.8639 | yes |
+| `GLASS_NOISE_IN` | 0.005 in | W §3 "a hundredth or two" for a glass pumping in a seaway; half a hundredth for the reading alone, the seaway's pumping being package 31's | the figure yes, the split a judgement |
+| `TENDENCY_FAST_IN_PER_3H` | 0.10 in | W §1.7, "a fall of a tenth in three hours means much wind": sailing-school teaching whose period source the study could not find | **no** (unverified in the study; says so in the code) |
+| `TENDENCY_STEADY_IN_PER_3H`, `TENDENCY_MIN_RECORD_H`, `SKY_NOISE_HOURS` | 0.03 in, 1 h, 4 h | judgements | no (judgement) |
+| `VISIBILITY_NM` | horizon 12, a few miles 4, a mile 1, a cable 0.1 | judgement; the numbers 5b's sighting reads | no (judgement) |
+| `SKY_WORDS`, `WEATHER_WORDS` | Beaufort's letters as words | W §1.6 (S19) | yes |
+| `SKY_SIGNS` | a high dawn; hard-edged and oily-looking; small inky clouds; a light scud driving across; streaked and spotty clouds | Luce 1884, "The Weather, the Barometer, Laws of Storms", read in `docs/references/luce/` at line 32090 and on | yes |
+| `CALM_KN` (the climatology's count) | 1 kn | judgement: a log records light airs' direction | no (judgement) |
+| `GUST_FACTOR_RANGES` (`physics/wind.py`) | warm 1.10 to 1.20, neutral 1.15 to 1.30, unstable 1.20 to 1.30 | W §4 from S29 to S31 (Kramer 2013, Blaes 2013, MWL 2008: 1.21 to 1.25 over water, rising with instability); the spec's ranges, the unstable top given to squalls | the figures yes; the WMO 1.23 (S32) not reached and not relied on |
+| `SQUALL_FACTOR_RANGE`, `SQUALL_VEER_POINTS` | 1.30 to 1.45; 1 to 2 points | W §4 ("the top of the range reserved for squalls", "veering the wind a point or two") | the study's recommendation |
+| `SQUALL_RATE_PER_S`, `SQUALL_DURATION_S` | one an hour; 3 to 8 minutes | judgement ("their own events lasting minutes"; the study gives no rate) | no (judgement) |
+| `WANDER_SPREAD_DEG`, `WANDER_TIME_CONSTANT_S` | warm 3°, neutral 5°, unstable 8°; 20 min | W §4 "5 to 10 degrees in unstable air and less in stable" (the study's judgement); the time constant a judgement | no |
+| `M2_WALK_RAD_PER_SQRT_S` | 0.0002 | the M2 wind, unchanged; its docstring corrected (0.69° an hour at variability 1, not "a point an hour", W §4) | yes |
+| `CLIMATOLOGY_TOLERANCE_PCT` (`tools/climatology_check.py`) | 5 | spec M5 §2 | — |
+| `STRONG_BREEZE_KN`, `STRONG_GALE_KN` | 22, 41 kn | W §1.2: Ushant's 31- and 54-knot gusts at a gust factor of about 1.25 | yes (the counts); the conversion the study's |
+| `GALE_DAYS_BAND` (`tests/test_known_truths.py`) | 0.2 to 1.0 of Ushant's | judgement: the station is on a cliff and reads high for the open sea (W §1.2) | no (judgement) |
+
+`data/weather/climatology.yaml`, every row: the direction shares (W and E from the 1750 to 1854 row, S and N from the 1795 to 1815 row) and Ushant's gust-day counts are the study's (S1, S4, verified); the lows a month are the study's guess ("six to eight in winter, three to four in summer", unverified); the speeds and central pressures are W §1.3's classes (S9); the tracks, radii, lives, the highs' probability, bearing, distance, strength and life, the background pressure by month and the mean gradient are judgements set so that the check passes. The file says `provisional: true`, and spec M5 §33 item 1 stands: the *Channel Pilot*'s tables replace it when the owner has a printed copy.
+
+### The seeding, measured
+
+`tools/climatology_check.py --months 1000 --seed 7` (8 seconds), the wind read hourly at the box's centre, a day's prevailing quarter the plurality of its hours when it holds at least half:
+
+| Month | W | (table) | E | (table) | S | (table) | N | (table) | none | strong-breeze days | (Ushant 31-kn gusts) | strong-gale days | (Ushant 54-kn) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| January | 33.2 | 29 | 19.7 | 22 | 26.6 | 25 | 12.7 | 17 | 7.7 | 10.8 | 23.6 | 3.1 | 4.5 |
+| June | 36.5 | 33 | 19.7 | 15 | 23.1 | 16 | 13.7 | 14 | 7.0 | 2.2 | 7.0 | 0.1 | 0.2 |
+| October | 35.9 | 34 | 18.6 | 19 | 26.7 | 26 | 10.9 | 17 | 7.9 | 6.2 | 16.0 | 0.7 | 1.2 |
+
+All twelve months are within five points on W and E (truth 53); the easterly runs 13 to 15 in high summer and 20 to 21 in late winter. Three things the first pass shows and the second pass (the *Channel Pilot*, or the CLIWOC extraction of W §1.5) should settle: the north quarter is four to eight points short in most months (the lows' cold sectors give north-westerlies that fall on the W quarter's edge at 315°); the strong-breeze days are about half of Ushant's in winter and a quarter in summer, which a cliff-top station reading high for the open sea can explain in part but not whole, and deeper or more frequent winter lows would close it; and a day with no prevailing quarter is seven or eight per cent against the study's "some ten per cent", by a counting rule (plurality of at least half the hours, light airs under a knot excluded) that the study does not give.
+
+How it was arrived at: the bells alone left the field flat between lows (half of January's hours under five knots, six days in ten with no prevailing quarter); the mean flow the box sits on, between the Azores high and the Icelandic low, was added as a monthly gradient, which alone gave a westerly on eight days in ten; the shares of the table are nearly uniform across the four quarters, so the large-scale pattern is carried by a high present most of the time at a broad, seasonal bearing (the Azores ridge to the south-west in summer, the Scandinavian high to the north in winter and spring), with a light gradient (about a tenth of a hectopascal in a hundred kilometres) under it and the lows swinging the wind through S, W and N as they pass.
+
+### The gate's day as a system, fitted
+
+`data/scenarios/gate-4c-day.yaml`, the `systems` beside the pinned `wind`: the background 1015 hPa with half a hectopascal in a hundred kilometres toward the south (a westerly of five knots); "the low" of 420 km radius from the previous noon at (20, 920) km and 1004 hPa, at (150, 800) and 998 at four, (250, 700) and 990 at seven in the evening, (330, 540) and 980 at ten, (400, 400) and 968 at one in the morning, (520, 370) and 968 at three, (720, 320) and 978 at five, (950, 280) and 988 at seven; its fronts at 207° and 56° from the centre at the first waypoint; "the old ridge" over Biscay at the previous noon, 1022 hPa, gone east over France by the morning; "the ridge" from the Atlantic, 1024 to 1026 hPa, from midnight. Read hourly at the ship's start, beside the pinned wind:
+
+| Ship's time | The systems' wind | The pinned wind | Sector | The glass |
+|---|---|---|---|---|
+| 12:00, 31 May | W by S 14 kn | (before the day) | under the old ridge | 30.17 |
+| 15:00 to 22:00, 31 May | W by S to WSW, 15 to 16 kn, backing a point; rain from five | | ahead of the warm front | 30.14 falling to 30.07 |
+| 22:15, 31 May | veers two points to W | | the warm front | |
+| 04:00, 1 June | W 18 kn | W 17 kn | the warm sector, hazy, drizzle | 30.02 |
+| 14:00 | W by N 19 kn | W 18 kn | the warm sector | 29.97 |
+| 19:00 | W by N 26 kn | W 19 kn | the warm sector | 29.90 |
+| 22:00 | W by N 38 kn, veering to NNW; squally | WNW 29 kn | the cold front | 29.72 |
+| 00:00, 2 June | NW 45 kn | NW 36 kn | behind, unstable, passing showers | 29.57 |
+| 01:00 to 03:00 | NW 48 to 46 kn | NW 45 kn | behind | 29.50 to 29.65, rising fast |
+| 05:00 | NW 32 kn | NW 26 kn | behind, clear | 29.93 |
+| 07:00 | NW 18 kn | NW 18 kn | open sea, then the ridge | 30.10 |
+
+The systems' gale comes an hour or two before the pinned one and peaks three knots higher; the warm sector's wind is a point north of the pinned west (the surface turn on the bell's west-south-westerly, plus the mean flow); the glass falls slowly all day (five hundredths from four to two), faster in the evening, bottoms at one in the morning and rises two tenths by dawn, fastest in the gale, as the study asks. It does not "check" at the cold front: the pressure at the ship is the sum of bells, and the low is still deepening and approaching as the front passes; a trough along the front (which the study's option (b) allows for and this package did not build) would give the check. Recorded for the owner.
+
+Truth 52 at seed 7, the day from the previous noon in a point ship with the day's gustiness and wander: the wind backs 18° from three in the afternoon to ten at night ahead of the warm front while the glass falls from 30.14 to 30.07; veers 23° at the front, through by eleven; holds within a point of W by N through the day (steady or falling on the glass, never falling fast); veers 33° between nine and midnight with the cold front; the first squall at 22:17 in the first watch, notable, "A squall: the wind veers a point to N by W and freshens to 61 knots, with rain", the second at 23:01; the glass from 29.52 at one to 29.82 at four, "rising fast"; 266 log lines and 94 gusts in the 45 hours.
+
+### The M4c note on the gust factor, closed
+
+The note ("Gusts in a gale": 1.1 to 1.5 whatever the base, so a 45-knot gale gusted to 67) is closed by spec M5 §3: over the open sea the gust factor is 1.2 to 1.25 and nearly flat with wind speed (S29 to S31), so the answer is not to ease the factor with the mean but to draw it about the air mass, with the top of the unstable range given to squalls that the log names. Under the systems the 45-knot gale gusts to 55 at most outside a squall (1.30 of the ten-minute mean, and by construction of the ten-minute mean, which the studies define the factor over) and to 65 in one. The M2 draws are kept, bit for bit, when the wind has no air mass: a fixed wind or the pinned `wind` form, which is what every truth from 1 to 51 is measured on (`tests/test_wind.py`, the regression against the old step). This is a reading of the spec's "as every truth is measured": the brief asks that truths 48 to 51 not move, and a gust factor by air mass under the pinned wind would have moved them; so with both forms in a scenario the systems supply only the sky and the glass, as the spec says, and the pinned day still gusts to 67 in its gale. The lead may rule otherwise.
+
+### The pace, measured
+
+The gate's day from the scenario file, the frigate under the starter routines, a thousand ticks to settle and the best of three thousands (`tests/test_known_truths.py`, truth 51's measure), on the build machine with the suite running beside it: 817 ticks a second as milestone 4 ran it (the pinned wind, the systems dropped); 837 with both forms (the systems giving the sky and the glass: the systems advanced every tick and the conditions read once a minute); 781 under the systems alone (the surface wind at the ship every tick, some five microseconds a tick, and the ten-minute mean summed for the gusts). Truth 51's floor of 500 holds; the spec's "microseconds a tick" holds.
+
+### Found on the way (package 30)
+
+- **The curvature cap bites.** The cyclonic gradient wind at one radius from a 500-km low is three quarters of the geostrophic, so a 45-knot surface wind needs a low of about 965 hPa within 400 km, which is what a force-nine Channel gale comes with; the study's flat-isobar arithmetic (a gale at three to four hectopascals in a hundred kilometres) understates it by a quarter. The gate's day's low is 968 at its deepest.
+- **The mean flow.** The study's seeding table has the lows, the highs and the easterly share but not the mean gradient the box sits on; without it the sea between systems is calm and most days have no prevailing quarter. Added as a row of the climatology, marked as the judgement it is.
+- **The tendency's first hour.** A glass read once a minute has no tendency until it has an hour's record, and the reading says so ("the glass has not been watched an hour yet"); the watch's-change line says "since the morning watch" only when the day began in one.

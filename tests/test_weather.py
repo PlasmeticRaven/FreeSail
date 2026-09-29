@@ -385,7 +385,8 @@ def test_a_scenario_file_with_both_forms_and_the_old_list_form(tmp_path):
             "'x_km', 'y_km' and 'hpa'",
         ),
         (
-            "  - {name: x, kind: low, radius_km: -3, track: [{at: 1805-06-01T05:00, x_km: 0, y_km: 0, hpa: 990}]}\n",
+            "  - name: x\n    kind: low\n    radius_km: -3\n    track:\n"
+            "      - {at: 1805-06-01T05:00, x_km: 0, y_km: 0, hpa: 990}\n",
             "no radius",
         ),
     ],
