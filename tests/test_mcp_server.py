@@ -201,7 +201,7 @@ def test_each_tool_runs_in_the_game_through_the_bridge_with_the_authority_check(
     ]
     assert g.world.journal == []  # the ship never heard it
     assert got["journal"] == "Noted in the journal."
-    assert got["answer"] == "Heard, though nothing was asked."
+    assert got["answer"] == "Heard; your words are in the log, though no question was put."
     assert got["opt_out"].startswith("The station is released: left the game: the test is done")
     assert got["after"].startswith("The station is released")
     assert h.agent.released and list((tmp_path / "saves").glob("*.json"))

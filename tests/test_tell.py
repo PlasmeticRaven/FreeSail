@@ -14,7 +14,7 @@ import pytest
 
 from freesail.agents import Fake, Harness, Reply, SamplingPolicy, Station, call, reply
 from freesail.agents.agent import WATCHER_BRIEF, Authority
-from freesail.agents.harness import A_WORD
+from freesail.agents.harness import A_WORD, ANSWER_UNASKED
 from freesail.agents.model import DATA
 from freesail.agents.repl import render_turn
 from freesail.api.session import ship_factory
@@ -127,7 +127,7 @@ def test_a_stand_by_in_answer_to_a_word_ends_the_turn_at_once():
 
 def test_an_answer_given_anyway_is_logged_as_said():
     """Case 3: the model answers though nothing was asked: its words are heard in the log as
-    `agent.said`, and the tool says nothing was asked."""
+    `agent.said`, and the tool says the words are in the log though no question was put."""
     world = point_world()
     h, fake = stationed(world, ["Aye.", reply("", call("answer", text="Falmouth, aye.")), ""])
     world.run(60)
@@ -137,7 +137,7 @@ def test_an_answer_given_anyway_is_logged_as_said():
     assert [e.text for e in said] == ["[watcher] Falmouth, aye."]
     assert said[0].data["question"] is None
     results = [t.content for t in h.turns if t.role == DATA and "tool_results" in t.content]
-    assert results[-1]["tool_results"][0]["result"] == "Heard, though nothing was asked."
+    assert results[-1]["tool_results"][0]["result"] == ANSWER_UNASKED
 
 
 def test_a_tell_and_an_ask_at_once_ride_one_sample():
