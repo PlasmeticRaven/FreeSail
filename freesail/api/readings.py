@@ -35,8 +35,10 @@ from freesail import units
 from freesail.crew import bill
 from freesail.crew.model import Crew, fatigue_words
 from freesail.physics.hull import WAY_ON_KN
+from freesail.physics.motion import MOTION_STATE_WORDS
 from freesail.physics.strain import DECAY_RATIO
 from freesail.ship.parts import Dynamics, HelmMode, Line, Sail, SailState, Spar
+from freesail.world.sea import SEA_STATE_WORDS
 from freesail.world.weather import (
     SKY_WORDS,
     TENDENCY_WORDS,
@@ -53,9 +55,12 @@ __all__ = [
     "GLASS_UNWATCHED_WORDS",
     "INTERVALS",
     "KINDS",
+    "MOTION_STATE_WORDS",
     "NO_GLASS_WORDS",
+    "NO_SEA_WORDS",
     "NO_WAY_WORDS",
     "NO_WEATHER_WORDS",
+    "SEA_STATE_WORDS",
     "SKY_WORDS",
     "TENDENCY_WORDS",
     "VISIBILITY_WORDS",
@@ -104,6 +109,8 @@ KINDS: dict[str, str] = {
     "sky": "the sky: is clear, is overcast, is dark and gloomy, is threatening, is hazy",
     "weather": "the weather: is fine, is rain, is drizzle, is squally, is fog",
     "visibility": "the visibility: is the horizon, is a few miles, is a mile, is a cable",
+    "sea": "the sea: is smooth, is moderate, is short, is heavy, is very heavy, is confused",
+    "motion": "the motion: is easy, is rolling, is rolling heavily, is pitching, is labouring",
     "absent": "not a reading the ship has yet",
 }
 
@@ -149,6 +156,9 @@ DAYLIGHT_WORDS: tuple[str, ...] = ("day", "twilight", "night")
 NO_GLASS_WORDS = "the ship carries no glass"
 GLASS_UNWATCHED_WORDS = "the glass has not been watched an hour yet"
 NO_WEATHER_WORDS = "no weather is kept in this scenario; the sky comes with its systems"
+# The sea and the motion (spec M5 §4) are kept when the wind has a cause, or when the
+# scenario asks for them; a fixed or a pinned wind alone keeps no sea.
+NO_SEA_WORDS = "no sea is kept in this scenario; the sea comes with the wind's cause"
 
 FATIGUE_WORDS: tuple[str, ...] = ("fresh", "tired", "worn out")
 
@@ -485,6 +495,24 @@ def _no_weather_words(world: Any) -> str | None:
     return NO_WEATHER_WORDS if _conditions_of(world) is None else None
 
 
+def _sea(world: Any, _: str | None) -> dict[str, Any] | None:
+    """The sea in the period's words with the state word the dialect compares and the
+    numbers behind them (`world.sea.Sea.reading`); None where no sea is kept."""
+    sea = getattr(world, "sea", None)
+    return sea.reading().to_dict() if sea is not None else None
+
+
+def _motion(world: Any, _: str | None) -> dict[str, Any] | None:
+    """The ship's motion in words, with the roll, the pitch and the heave behind them
+    (`physics.motion.Motion.reading`); None where no sea is kept."""
+    motion = getattr(world, "motion", None)
+    return motion.reading().to_dict() if motion is not None else None
+
+
+def _no_sea_words(world: Any) -> str | None:
+    return NO_SEA_WORDS if getattr(world, "sea", None) is None else None
+
+
 def _bells(world: Any, _: str | None) -> dict[str, Any]:
     """The last bell struck: watch name, bells, and whether it is striking now (the
     snapshot's `bell` block; spec §9.4)."""
@@ -813,6 +841,33 @@ REGISTRY.add(
         none_words=_no_weather_words,
     )
 )
+# The sea and the motion (spec M5 §4, package 31): the period's words with a state word
+# the dialect compares (`when the sea is heavy then ...`), None in NO_SEA_WORDS where the
+# scenario keeps no sea.
+REGISTRY.add(
+    Reading(
+        "sea",
+        ("the sea",),
+        "sea",
+        "",
+        _sea,
+        description="the sea in the period's words: smooth, moderate, a short chopping sea, "
+        "heavy, a long swell, a confused sea",
+        none_words=_no_sea_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "motion",
+        ("the motion", "the ship's motion"),
+        "motion",
+        "",
+        _motion,
+        description="how she moves in it: easy, rolling, rolling heavily, pitching into it, "
+        "labouring heavily",
+        none_words=_no_sea_words,
+    )
+)
 REGISTRY.add_absent(
     "depth",
     ("the depth",),
@@ -981,7 +1036,7 @@ def describe_value(reading: Reading, value: Any) -> str:
         return f"{value['words']}, {value['signs']}" if value.get("signs") else str(value["words"])
     if kind == "weather":
         return str(value)
-    if kind == "visibility":
+    if kind in ("visibility", "sea", "motion"):
         return str(value["words"])
     if isinstance(value, float):
         return f"{value:g}"

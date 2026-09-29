@@ -33,6 +33,10 @@ def step(ship: Ship, dt: float, wind: Wind) -> None:
     st = hp.hull_state(ship)
     _notice_helm_orders(ship, st)
     h = dt / SUBSTEPS
+    # the seaway (spec M5 §4, `physics.motion`): the hull's added resistance in a head
+    # sea, a factor read once a tick; 1.0 without a sea
+    motion = ship.extra.get("motion")
+    st.sea_drag = motion.resistance_factor if motion is not None else 1.0
     # the rig is read once for the four substeps (package 29's profile; `sails._Rig` says
     # why nothing it holds can change between them)
     hold_rig(ship)
@@ -80,7 +84,7 @@ def _substep(
     # motion however hard the water pushes, which a plain explicit step would.
     m_u, m_v, i_z = hp.surge_mass(hull), hp.sway_mass(hull), hp.yaw_inertia(hull)
 
-    drag_u = _rate(hp.resistance(hull, d.u, d.heel), d.u)
+    drag_u = _rate(hp.resistance(hull, d.u, d.heel) * st.sea_drag, d.u)
     drag_v = _rate(hp.sway_damping(hull, d.u, d.v), d.v)
     drag_r = _rate(hp.yaw_damping(hull, d.u, d.r), d.r)
 

@@ -886,3 +886,33 @@ def test_a_named_party_that_cannot_man_the_job_is_refused_at_once():
     # a watch that can man it is taken as ever
     e = w.submit("reef the mainsail, one reef with the starboard watch")
     assert e.kind != "order.rejected"
+
+
+def test_the_crew_factor_aloft_falls_with_the_roll_in_a_seaway():
+    """Package 31 (spec M5 §4): the roll's table (`hands.seaway_factor`) multiplies the
+    crew factor, aloft above all; under its first row (a smooth sea, or no sea) it is
+    exactly 1.0, so the compatibility rule and every timed truth stand."""
+    assert factor_for(ORD, ORD, aloft=True) == 1.0
+    assert hands.seaway_factor(hands.SEAWAY_FACTOR_TABLE[0][0], True) == 1.0
+    men = [sailor(i, ORD, Station.AFTERGUARD) for i in range(12)]
+    want = CrewRequest(hands=12, rating=ORD, stations=("afterguard",))
+    got = hands.Assignment("x#1", wanted=12, hands=men)
+    for roll in (0.0, 2.0, 3.0):
+        assert crew_factor(got, want, aloft=True, roll_deg=roll) == 1.0
+    aloft = crew_factor(got, want, aloft=True, roll_deg=15.0)
+    deck = crew_factor(got, want, aloft=False, roll_deg=15.0)
+    assert aloft == hands.seaway_factor(15.0, True) > deck == hands.seaway_factor(15.0, False) > 1.0
+    for s in men:
+        s.fatigue = 0.3
+    assert crew_factor(got, want, aloft=True, roll_deg=15.0) == pytest.approx(1.125 * aloft)
+    # all hands too: the whole company's pace, less fatigue, times the seaway
+    crew = small_company()
+    call = CrewRequest.from_mapping({"hands": "all", "rating": "ordinary"})
+    all_hands = request(crew, crew.sailors, "tack#1", call, None)
+    assert crew_factor(all_hands, call, aloft=True, roll_deg=15.0) == pytest.approx(aloft)
+    # the runner reads the ship's motion: none aboard, the factor is 1.0
+    w = world(FRIGATE)
+    runner = w.ship.extra["evolutions"]
+    w.submit("set the fore topsail")
+    w.tick()
+    assert runner._roll_deg == 0.0

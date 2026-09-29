@@ -90,13 +90,24 @@
   }
 
   /** The glass and the sky (spec M5 §5): the registry's words, as the console says them.
-   * A ship with no glass says so; a scenario with no weather systems keeps no sky. */
+   * A ship with no glass says so; a scenario with no weather systems keeps no sky. The
+   * sea and the motion (spec M5 §4) likewise: the words, the sea's quarter after them. */
   function renderWeather(wx) {
     if (!wx) {
       set("i-glass", "");
       set("i-tendency", "");
       set("i-sky", "");
+      set("i-sea", "");
+      set("i-motion", "");
       return;
+    }
+    if (!wx.sea) {
+      set("i-sea", wx.sea_words || "no sea kept");
+      set("i-motion", "");
+    } else {
+      var from = wx.sea.indexOf("from") < 0 && wx.sea_from !== null && wx.sea_from !== undefined ? " from " + U.quarterWords(wx.sea_from) : "";
+      set("i-sea", wx.sea + from);
+      set("i-motion", wx.motion ? "; " + wx.motion : "");
     }
     if (wx.glass_in === null || wx.glass_in === undefined) {
       set("i-glass", wx.glass_words || "no glass aboard");

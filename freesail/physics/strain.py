@@ -196,6 +196,11 @@ def apply_strain(ship: Ship, dt: float, rng_stream: random.Random | None = None)
     _tend_catharpins(ship)
     _tend_wrecks(ship, st)
     _wear_canvas(ship, st, dt)
+    # the seaway (spec M5 §4, `physics.motion`): the ship's motion is an extra load on
+    # spars and gear, a factor on the wind's load by the roll and the pitch; exactly 1.0
+    # without a sea or in a smooth one, so the truths measured so do not move
+    motion = ship.extra.get("motion")
+    seaway = motion.load_factor if motion is not None else 1.0
     warnings: list[_Warning] = []
     for part, kind in _parts_by_kind(ship):  # insertion order: deterministic
         # `_out_of_action`, with each part's class looked up once per ship (package 29's
@@ -210,6 +215,8 @@ def apply_strain(ship: Ship, dt: float, rng_stream: random.Random | None = None)
             continue
         if part.load_kn <= 0.0:
             continue  # a ratio of nothing (every `strain_ratio` is load over a rating)
+        if seaway != 1.0 and kind is not Sail:
+            part.load_kn *= seaway  # the jerk of the masts on the spars and their gear
         ratio = part.strain_ratio
         if ratio <= DECAY_RATIO:
             continue

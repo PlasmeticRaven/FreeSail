@@ -97,6 +97,30 @@ def _sail_is(reading: dict[str, Any], word: str) -> bool:
     return state == word.replace(" ", "_")
 
 
+def _sea_is(reading: dict[str, Any], word: str) -> bool:
+    """The sea's state word (spec M5 §4; `world.sea.SeaReading`): 'heavy' holds for a
+    very heavy sea too, 'confused' is the swell across the wind."""
+    if word == "confused":
+        return bool(reading["confused"])
+    if word == "heavy":
+        return reading["state"] in ("heavy", "very heavy")
+    return reading["state"] == word
+
+
+def _motion_is(reading: dict[str, Any], word: str) -> bool:
+    """The motion's state word (`physics.motion.MotionReading`): 'rolling' holds for
+    rolling heavily too; 'rolling heavily' and 'pitching heavily' want the heavy word;
+    'heavy' is any heavy motion; 'labouring' is both together."""
+    state, heavy = reading["state"], bool(reading["heavy"])
+    if word == "heavy":
+        return heavy
+    if word.endswith(" heavily"):
+        return state == word[: -len(" heavily")] and heavy
+    if word == "labouring":
+        return state == "labouring"
+    return state == word
+
+
 @dataclass
 class Clause:
     """One reading compared once: 'the true wind exceeds 30 knots'."""
@@ -159,6 +183,9 @@ class Clause:
             return (value == v) if op == "is" else (value != v)
         if kind in ("tendency", "sky", "visibility"):
             return (value["words"] == v) if op == "is" else (value["words"] != v)
+        if kind in ("sea", "motion"):
+            holds = _sea_is(value, v) if kind == "sea" else _motion_is(value, v)
+            return holds if op == "is" else not holds
         if kind == "glass":
             return value > v if op == "gt" else value < v
         if kind == "sail":
