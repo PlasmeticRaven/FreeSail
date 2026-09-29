@@ -411,8 +411,10 @@ def _phrases(by_kind: dict[str, list[Event]]) -> list[str]:
                     amount = "a hundredth" if n == 1 else f"{n} hundredths"
                     moved = f", {'up' if change > 0 else 'down'} {amount}"
             words += f"; the glass {glass:.2f}{moved}"
+        if d.get("sea"):  # the sea by the hour (spec M5 §4)
+            words += f"; {d['sea']}, {d.get('motion', '')}".rstrip(", ")
         out.append(words)
-    for kind in ("weather.change", "weather.sky"):
+    for kind in ("weather.change", "weather.sky", "sea.change", "motion.change"):
         for e in take(kind, []):
             out.append(_lower_first(e.text.rstrip(".")))
     if "wind.gust" in by_kind:

@@ -666,3 +666,50 @@ def test_ratio_of_the_weakest_part_on_the_reference_ships():
             peak[p.id] = max(peak.get(p.id, 0.0), p.strain_ratio)
     assert peak["fore.topgallant_mast"] > 1.5
     assert peak["main.royal.yard"] > 1.5
+
+
+# ---------------------------------------------------------------------------
+# the seaway (package 31, spec M5 §4): the motion as an extra load on spars and gear
+# ---------------------------------------------------------------------------
+
+
+def test_the_motion_is_an_extra_load_on_spars_and_gear_and_nothing_without_a_sea():
+    """`apply_strain` reads `ship.extra["motion"]` (physics/motion.py) and multiplies the
+    wind's load on every spar and line by its `load_factor` before judging it; the canvas
+    is judged as before. Without a motion, or with one at rest (its dead band), the loads
+    are the sails model's own to the bit, so every truth measured without a sea stands."""
+    from freesail.physics.motion import Motion, Particulars
+
+    ship, wind = frigate_with_wind(["fore.topsail", "main.topsail"], knots=25.0)
+    loads = {p.id: p.load_kn for p in ship.parts.values() if p.load_kn > 0.0}
+    apply_strain(ship, 1.0)
+    assert {p.id: p.load_kn for p in ship.parts.values() if p.load_kn > 0.0} == loads
+    still = Motion(Particulars.of(ship))
+    ship.extra["motion"] = still
+    compute_sail_forces(ship, wind)
+    apply_strain(ship, 1.0)
+    assert {p.id: p.load_kn for p in ship.parts.values() if p.load_kn > 0.0} == loads
+    rolling = Motion(Particulars.of(ship))
+    rolling.roll_deg, rolling.pitch_deg = 20.0, 6.0
+    factor = rolling.load_factor
+    assert 1.1 < factor < 1.4
+    ship.extra["motion"] = rolling
+    compute_sail_forces(ship, wind)
+    apply_strain(ship, 1.0)
+    for p in ship.parts.values():
+        if p.id not in loads:
+            continue
+        if isinstance(p, Sail):
+            assert p.load_kn == pytest.approx(loads[p.id]), p.id
+        else:
+            assert p.load_kn == pytest.approx(loads[p.id] * factor), p.id
+    # a part strained by the motion alone is warned of, in the same words
+    ship.extra.pop("motion")
+    compute_sail_forces(ship, wind)
+    worst = max((p for p in ship.spars.values() if p.load_kn > 0), key=lambda p: p.strain_ratio)
+    worst.rating_kn = worst.load_kn * 1.05  # just under the rating on a smooth sea
+    assert tick(ship, 1) == []
+    ship.extra["motion"] = rolling
+    compute_sail_forces(ship, wind)
+    notes = tick(ship, 1)
+    assert [n[1] for n in notes] == ["strain.warning"] and worst.id in notes[0][3]

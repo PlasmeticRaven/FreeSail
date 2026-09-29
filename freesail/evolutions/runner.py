@@ -257,6 +257,7 @@ class Runner:
         self.instances: list[Instance] = []
         self._counter = 0
         self._last_factor = 1.0
+        self._roll_deg = 0.0  # the ship's roll this tick (spec M5 §4), for the crew factor
         # Groups of evolutions from one order ("setting plain sail") that have said once
         # that they must wait for hands (package 20): the rest of the group waits quietly.
         self._groups_waiting: set[str] = set()
@@ -335,6 +336,8 @@ class Runner:
         """Advance every running evolution by one tick, then start any that were
         waiting and are now free. Call once per tick, before the physics."""
         self._last_factor = weather_factor(wind.effective_speed, ship.dyn.heel)
+        motion = ship.extra.get("motion")
+        self._roll_deg = float(motion.roll_deg) if motion is not None else 0.0
         crew = self._crew(ship)
         if crew is not None:
             calls = ship.extra.get("watch_calls")  # a watch turned up by an order (package 20)
@@ -900,9 +903,12 @@ class Runner:
         return mast.id.split(".")[0] if mast is not None else None
 
     def _crew_factor(self, inst: Instance, aloft: bool) -> float:
+        # the ship's roll (spec M5 §4, `physics.motion`): the work aloft slows with it,
+        # with a crew or without; nothing without a sea
+        roll = self._roll_deg
         if inst.assignment is None or inst.want is None:
-            return 1.0
-        return hands.crew_factor(inst.assignment, inst.want, aloft)
+            return hands.seaway_factor(roll, aloft)
+        return hands.crew_factor(inst.assignment, inst.want, aloft, roll)
 
     def _all_hands_at_work(self, but: Instance | None = None) -> list[Instance]:
         return [

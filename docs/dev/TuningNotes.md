@@ -534,3 +534,89 @@ The gate's day from the scenario file, the frigate under the starter routines, a
 - **The curvature cap bites.** The cyclonic gradient wind at one radius from a 500-km low is three quarters of the geostrophic, so a 45-knot surface wind needs a low of about 965 hPa within 400 km, which is what a force-nine Channel gale comes with; the study's flat-isobar arithmetic (a gale at three to four hectopascals in a hundred kilometres) understates it by a quarter. The gate's day's low is 968 at its deepest.
 - **The mean flow.** The study's seeding table has the lows, the highs and the easterly share but not the mean gradient the box sits on; without it the sea between systems is calm and most days have no prevailing quarter. Added as a row of the climatology, marked as the judgement it is.
 - **The tendency's first hour.** A glass read once a minute has no tendency until it has an hour's record, and the reading says so ("the glass has not been watched an hour yet"); the watch's-change line says "since the morning watch" only when the day began in one.
+
+## Milestone 5a: the sea and the ship's motion
+
+Package 31 (spec M5 §4, §5, §6 truth 56, §7; `docs/design/ThreeDimensions.md`): the sea state as a field at the ship raised by the wind's ten-minute mean (`freesail/world/sea.py`), the ship's motion as three reduced quantities (`freesail/physics/motion.py`), the consequences each one line where it lands, the sea and the motion as readings, the day under systems alone (`data/scenarios/gate-5a-day.yaml`) and the windage under bare poles measured (M4 open item 7). Truth 56 and the day's constants in `tests/test_known_truths.py`; the mechanics in `tests/test_sea.py`, `test_strain.py`, `test_hands.py`.
+
+### The constants and their sources
+
+The wave-growth relations were not read from a page in this package: the Pierson-Moskowitz constants were worked here from the spectrum's published parameters, and every figure that rests on a text not in `docs/references/` says so. The period's words are Falconer's and Luce's, read in the repository's copies; the one phrase not found there is marked.
+
+| Constant | Value | Source | Verified |
+|---|---|---|---|
+| `SEA_FULL_M_PER_MS2` (`world/sea.py`) | 0.0247 m per (m/s)² | the fully developed sea of Pierson and Moskowitz 1964 as WMO-No. 702 reproduces it: Hs = 4 √m0 with m0 = α U⁴ / (4 β g²), α 8.1e-3, β 0.74, gives 0.0213 U19.5², and U19.5 = 1.076 U10 by the wind model's own shear (`Wind.SHEAR_EXPONENT`) | the derivation checked here; the sources not read (unverified against the page) |
+| `SEA_BUILD_HOURS`, `SEA_DECAY_HOURS` | 6 h, 4 h | a first-order lag; judgement bounded by the duration-limited growth of the Bretschneider and JONSWAP relations as textbooks give them (a sea of twenty knots fully developed in about ten hours, one of forty in a day and more) | no (judgement; the relations unverified here) |
+| `SEA_PERIOD_PER_ROOT_M`, `SWELL_PERIOD_PER_ROOT_M` | 4.0, 6.0 s per √m | the developed relation is 5.0 (Tp = 0.785 U10 with Hs = 0.0247 U10², the same spectrum); a growing sea is steeper (JONSWAP's young seas near 3.6); the wind sea between them at a steepness of one in twenty-five, the swell at one in fifty-seven | the 5.0 derived; the rest judgement |
+| `SWELL_DECAY_HOURS`, `SWELL_RECORD_HOURS` | 12 h, 48 h | the brief's "decaying over a day"; Falconer 1780, 'Swell' ("the fluctuating motion of the sea, which remains after the expiration of a storm"); the record two days so the swell goes by its decay | no (judgement) |
+| `CROSS_SEA_POINTS` | 5 points | judgement: beyond a cold front's veer of four, so the sea a front leaves is the same water turned | no (judgement) |
+| `SEA_START_SHARE` | 1 − 1/e | judgement: a scenario opens on the sea the wind would have raised in a build time | no (judgement) |
+| `SMOOTH_UNDER_M`, `MODERATE_UNDER_M`, `SHORT_UNDER_M`, `HEAVY_UNDER_M`, `SWELL_FROM_M`, `SWELL_DOMINANT_RATIO` | 0.5, 1.5, 2.5, 6 m; 1 m; 1.5 | judgement, laid beside the Douglas bands the words stand where; the game never says a number (W §3, S28) | no (judgement) |
+| the sea's words (`SEA_WORDS_SOURCES`) | a smooth sea, a short sea, a heavy sea, a great sea, a long swell, a heavy swell, a confused sea, a head sea | Falconer 1780, 'Sea', 'Swell', 'Trying'; Luce 1884, 'In a Gale', 'The Weather' | yes, read in `docs/references/`; "a short chopping sea" is the spec's phrase and 'chopping' is not in the repository's references (unverified) |
+| `ROLL_GYRATION_OF_BEAM` (`physics/motion.py`) | 0.40 of the beam | the naval architect's rule of thumb for the roll period, T = 2πk/√(gGM) with k 0.35 to 0.40 B (the "Weiss formula", T = 0.8 B/√GM); the frigate 8.2 s, the schooner 5.8 s | no (not read from a text here) |
+| `ROLL_DAMPING` | 0.20 | judgement: a bare hull's ratio is 0.05 to 0.15 in the textbooks, but a one-period model must carry the sea's spread of periods, so a magnification of two and a half at resonance; at five a moderate sea would roll her on her beam ends | no (judgement) |
+| `MOTION_GAIN` | 1.27 | the highest tenth of a train's waves are 1.27 times the significant height (the Rayleigh distribution): the roll a captain names | the standard result; unverified against a page here |
+| `ROLL_MAX_DEG`, `ROLL_OFF_BEAM_SHARE`, `PITCH_WAVE_LENGTHS`, `MOTION_TIME_CONSTANT_S` | 35°, 0.3, 2 lengths, 90 s | judgements: the cap; a ship rolls some with the sea astern; a ship pitches fully to waves twice her length and hardly to shorter; a dozen periods to build | no (judgement) |
+| `ROLL_EASY_DEG`, `ROLL_ROLLING_DEG`, `ROLL_HEAVY_DEG`, `PITCH_EASY_DEG`, `PITCH_HEAVY_DEG` | 3°, 6°, 12°; 2°, 7° | judgement: a frigate's lee ports near the water at twelve degrees, her lee guns under at twenty; the bowsprit into it at seven | no (judgement) |
+| the motion's words | easy; rolling easily, rolling, rolling heavily; pitching a little, pitching into it, pitching heavily into it (or, the sea under her stern); labouring heavily | Falconer 1780, 'Rolling', 'Sea-boat' ("without labouring heavily"), 'Sending' ("pitching precipitately into the hollow"); Luce 1884, 'In a Gale' ("labors much in a seaway", "if the pitching is hard and quick"), the boat chapter ("the ship is rolling heavily") | yes |
+| `STRAIN_ROLL_PER_DEG`, `STRAIN_PITCH_PER_DEG`, `STRAIN_DEAD_BAND_DEG`, `STRAIN_FACTOR_MAX` | 0.01, 0.015 per degree; 2°; 1.4 | Luce 1884, 'In a Gale' (in a seaway the jerk of the masts carries away braces and sheets or springs the yards; forcing her through a head sea strains every mast and yard) for the direction; the figures judgement, set so the day under systems costs canvas in the gale's squalls and no spar before it (below) | the direction yes; the figures no |
+| `HEAD_SEA_RESISTANCE_PER_M` | 0.10 per metre above a smooth sea, by cos² of the sea's angle on the bow | judgement bounded by the modern rules of thumb for involuntary speed loss in head seas (a tenth to a quarter for small ships at Beaufort six to seven); a three-metre head sea costs the frigate about a tenth of her speed | no (judgement; the rules unverified here) |
+| `GLASS_PUMP_PER_DEG`, `GLASS_PUMP_MAX_IN` (`world/weather.py`) | 0.15 per degree of roll and pitch; 0.02 in | W §3, "a hundredth or two" in a seaway (the figure the study verified); the rate a judgement (twenty degrees of motion reaches the two hundredths) | the figure yes; the rate no |
+| `SIGHT_ERROR_PER_DEG` | 0.1 per degree | N §5's "a quarter of a degree for a good master on a quiet day, a degree ... in a seaway": about three in a heavy seaway; read by nothing until 5b | no (judgement) |
+| `SEAWAY_FACTOR_TABLE` (`crew/hands.py`) | (3°, 1.0, 1.0), (6°, 1.15, 1.05), (9°, 1.4, 1.15), (12°, 1.6, 1.25), (16°, 1.9, 1.35), (25°, 2.2, 1.5): roll, aloft, on deck | judgement set to truth 56 (a reef half as long again in a heavy sea); Luce 1884, 'In a Gale' for the direction; no period source gives times | no (judgement) |
+| `MOTION_WORDS_HOLD_S` (`core/world.py`) | 300 s | judgement: a roll hovering about a word's threshold is not a line a minute | no (judgement) |
+| the lookout's horizon (`Sea.horizon_nm`) | 2.08 √(height of eye − half the sea's height) miles | spec M5 §11 (the refracted horizon of the navigation tables); the trough a judgement; inert until 5b | the figure the spec's |
+
+### The sea and the motion on the gate's day, measured
+
+The day under systems alone at seed 7 (`gate-5a-day.yaml`, the frigate under the same standing orders as the pinned day, heading south-east): the sea opens as a moderate sea of 1.2 m (the wind W by N 18 knots), a short chopping sea from 05:04, a heavy sea from 20:45 (2.5 m) as the wind passes a strong breeze, a very heavy sea from 01:51 in the gale (6 m; the peak 7.6 m at four, the wind having been 45 to 48 knots from midnight to three), going down to a heavy sea at 08:22 and still a heavy sea at nine (5.2 m) with the wind a fresh breeze since seven: the sea outlasts the gale by three hours in the log's words and the heavy sea lasts into the afternoon. The motion, scudding with the sea on the starboard quarter and then right astern: rolling and rolling easily through the day (six to eight degrees, the sea on the quarter), rolling heavily from 21:57 (twelve and more), labouring heavily on and off from 22:54 to midnight as the pitch passes seven, pitching heavily with the sea under her stern from 01:04 (the sea dead astern from the north-west), labouring again at 04:15 as the ridge's wind hauls, and pitching heavily still at nine. The glass pumps to a hundredth and a half in the gale.
+
+The model's roll at a glance (the frigate, her period 8.2 s): a fresh breeze's sea of 1.4 m on the beam, 6 degrees, "rolling easily"; a moderate gale's sea of 3.5 m, the resonant one, 23 degrees; the gale's sea of 7.6 m, 15 degrees on the beam and 5 with it astern; a day-long gale's sea of 10 m at 12.6 s, 13 degrees. The roll is greatest in the sea whose period is the ship's own and not in the highest sea, which is the driven oscillator's answer and the period's experience of a long swell.
+
+### The day under systems, its constants
+
+The same day as the pinned one but for the wind's cause: the systems' wind at the ship (W by N 18 through the day, a point north of the pinned west; the cold front's veer at 22:00; 45 to 48 knots from midnight to three; 18 by seven), the gust factor by air mass, squalls in the unstable air behind the front, the sea and the motion. Measured at seed 7, 29 hours, 493 lines, the digest `45eac662eaad0f17`:
+
+| Ship's time | Tick | What |
+|---|---|---|
+| 05:04 | 3840 | a short chopping sea getting up |
+| 19:50 | 57039 | sunset; the night routine takes in the royals |
+| 20:45 | 60300 | a heavy sea getting up |
+| 21:33 | 63200 | "shorten sail for weather": the topgallants in, one reef (the systems' wind passes thirty a quarter of an hour before the pinned one) |
+| 21:57 | 64620 | rolling heavily |
+| 23:11 | 69115 | "gale canvas": the jib, the spanker and the mainsail in |
+| 00:37 | 74245 | the heavy-weather routine, its four orders on one tick, the close reef carried out (one reef was in) |
+| 01:17 | 76673 | the first squall, 65 knots: the close-reefed mizzen topsail blows out, the main topsail's larboard brace and sheet part in the minute after |
+| 01:21 | 76914 | the fore storm staysail set |
+| 01:51 | 78660 | a very heavy sea getting up |
+| 08:14 | 101644 | "make sail after the gale" |
+| 08:22 | 102120 | a heavy sea, the sea going down |
+
+What the seaway costs, beside the pinned day's "nothing lost": the pinned day never blows a squall (its gusts are the M2 draws, 67 knots at most and short), and under the systems the squalls of the cold air are the top of the unstable range, 1.30 to 1.45 of the mean, so a 45-knot mean gusts to 65 (spec M5 §3 as built; the owner's ruling at gate 5a). Without the sea the same day blows out the mizzen topsail in the same squall; the sea's extra load on the gear (the strain factor at "pitching heavily", about 1.1) parts the main topsail's brace and sheet as well, and nothing else. With the strain factor at the first draft's figures (0.015 and 0.02 a degree, 1.6 at most) and the roll's first calibration (a damping of a tenth, the gain 1.67), the day lost the main royal mast at 19:47 in twenty knots and both topgallant yards at 21:33 while they were being taken in, which is not the day the sources describe for a ship shortening sail in time; the figures were eased to what stands, and the calibration of the roll to a fifth and 1.27, with the reasons in the table.
+
+The starter's "topgallants again" has not fired by nine (it fired at 08:46 without the sea): the reefs come out of the topsails more slowly in the swell (the roll's table), so the ten minutes with the fore topsail unreefed had not run.
+
+### Windage under bare poles, measured (M4 open item 7)
+
+The frigate under bare poles from rest, a steady wind, thirty minutes (`tests/test_sea.py`, the bare-poles test):
+
+| Wind | Running dead before it | Lying a-hull (the wind abeam, the helm a-lee) |
+|---|---|---|
+| 15 kn | 2.86 kn | 0.53 kn to leeward, bodily (she falls off five degrees and lies broadside) |
+| 30 kn | 5.65 kn | 1.33 kn |
+| 45 kn | 8.11 kn | 2.73 kn (her head falling to 68° off, a little sternway) |
+
+Before this package the same: 2.86 knots at fifteen dead astern. The rig's windage was not moved. The arithmetic: the furled sails present 77 m² (the classes' `furled_windage` of their areas, a rolled bundle on each yard) and the bare spars with their rigging 137 m² (`spar_area_factor` 0.025 of the length squared, a yard of 24 m twelve square metres), 214 m² at a drag coefficient of one; the hull above the water, which the model does not count, would add fifty more. At fifteen knots dead astern the push is 6 kN, and the hull's resistance (`C_F` 0.008, tuned at eight knots and quadratic below it) balances 6 kN at 2.9 knots. To make a few tenths of a knot the rig would have to present a thirtieth of that area, which no frigate's did, or the hull resist thirty times more at two knots, which would move every truth under sail; the brief's own rule, that a truth under sail moving means the windage is in the wrong term, is the reason nothing was moved.
+
+Against the sources: Luce 1884 gives no rate of drift under bare poles; his ship lying to in a gale ('In a Gale') is "drifting bodily to leeward", which is the a-hull column, and his Beaufort table ('The Weather') has a ship "going from one to two knots" in a light breeze under all sail. Steel 1794 (vol. II, 'Scudding under a fore sail, to come to an anchor', Bourdé de Villehuet's manoeuvre) has the foresail furled "at a great distance" from the berth because "the velocity of the ship will, by the violence of the wind, be but too much kept up", and the ship then runs "half a league, under bare poles, the wind being nearly aft": a mile and a half under bare poles before her way can be deadened, in a wind hard enough to anchor in. Falconer 1780, 'Scudding', has a ship "scudding under bare poles" when "the storm is excessive", flying "with amazing rapidity"; Lever 1808 has ships "lying to under bare Poles" and wearing under them. The sources describe a ship under bare poles with the wind aft as a ship with way on her, knots and not tenths, and a ship a-hull as one driven to leeward; the "few tenths" of the open item is the a-hull drift in a fresh breeze, which the model gives at half a knot. Recorded for the owner's ruling at gate 5a; if the lead rules that the running speed should fall, the honest term is the spars' shielding of one another with the wind on the axis, a fifth at most, which brings the fifteen-knot figure to about two and a half knots and no lower.
+
+### The pace, measured
+
+Truth 51's measure on the build machine with the suite running beside it, a thousand ticks to settle and the best of three thousands: the pinned day 884 ticks a second before this package (the code at the branch point) and 862 after (the sea is not kept under a pinned wind: the difference is the machine's); the day under systems 934 before (the file run on the branch point's code: no sea) and 843 after, the sea once a minute, the motion every tick (three exponentials), the strain's factor a multiply a part and the hull's a multiply a substep. Truth 51's floor of 500 holds on both; the spec's "microseconds a tick" holds.
+
+### Found on the way (package 31)
+
+- **The sea's direction.** A sea kept as a scalar with the wind's direction turns instantly with a front's veer; kept as a vector it lags, but then the old sea is counted twice against the swell record when the wind has turned across it. The wind sea is the vector's part along the wind now, the rest of the vector being what the swell record carries; a shift of the wind sees its sea die as the new one builds, and the swell is judged against the wind and not against the dying vector.
+- **The motion's words flicker.** A roll hovering about six degrees said "rolling" and "rolling easily" by turns every few minutes; the words now hold five minutes before the log says they changed (`MOTION_WORDS_HOLD_S`). The sea's words do not need it: the sea moves over hours.
+- **The head-sea factor in a smooth sea.** A smooth sea on the bow added a quarter of a per cent to the resistance and moved the loads at the seventh figure; the factor now counts the sea above a smooth one, so a scenario that keeps a smooth sea judges the same loads as one that keeps none.
+- **The squall's veer and the cross sea.** A squall's two-point veer, on top of a front's four, took the swell across the wind at the four-point threshold and the log said a confused sea for the squall's minutes and then the sea going down and getting up again; the threshold is five points, past a front's veer.

@@ -2363,3 +2363,189 @@ def test_truth_57_no_line_or_reading_names_a_front_a_centre_an_isobar_or_a_hecto
             assert not FORBIDDEN_WORDS.search(text), row.id
     for text in (R.NO_GLASS_WORDS, R.GLASS_UNWATCHED_WORDS, R.NO_WEATHER_WORDS):
         assert not FORBIDDEN_WORDS.search(text)
+
+
+# ---------------------------------------------------------------------------
+# Milestone 5a: the sea and the ship's motion (package 31; spec M5 §4, §6, §7)
+# ---------------------------------------------------------------------------
+#
+# The day under systems alone (data/scenarios/gate-5a-day.yaml): the pinned day's systems
+# without its `wind`, the surface wind at the ship the base, the gust factor by air mass,
+# squalls behind the cold front, and the sea and the motion raised by it; the same
+# standing orders. Its ticks and its digest are truth constants of their own, measured at
+# seed 7 (docs/dev/TuningNotes.md, M5a: the day under systems); the pinned day's
+# constants above do not move.
+
+GATE_5A_DAY = "data/scenarios/gate-5a-day.yaml"
+GATE_5A_DAY_TICKS = GATE_DAY_TICKS
+GATE_5A_DAY_SAVES = (16 * 3600, 21 * 3600)
+# Measured at seed 7: sunset and the night routine at 19:50; the starter's "shorten sail
+# for weather" once, at 21:33 (the systems' wind passes thirty a quarter of an hour before
+# the pinned one); the captain's "gale canvas" at 23:11; the heavy-weather routine at
+# 00:37, its four orders on one tick (the close reef carried out: one reef was in); the
+# storm staysail set at 01:21; the first squall of the middle watch at 01:17, 65 knots,
+# which blows out the close-reefed mizzen topsail and parts the main topsail's larboard
+# brace and sheet; "make sail after the gale" at 08:14; nothing else lost, no spar
+# carried away.
+GATE_5A_SUNSET_TICK = 57039
+GATE_5A_SHORTEN_SAIL_TICK = 63200
+GATE_5A_GALE_CANVAS_TICK = 69115
+GATE_5A_HEAVY_WEATHER_TICK = 74245
+GATE_5A_FIRST_SQUALL_TICK = 76673
+GATE_5A_MAKE_SAIL_TICK = 101644
+GATE_5A_LOST = [
+    "Mizzen topsail split and blew out of the bolt-ropes.",
+    "Larboard main topsail yard brace parted; the main topsail yard swung round to the wind.",
+    "Larboard main topsail sheet parted; the main topsail flogging itself to ribbons.",
+]
+# The sea's words through the day: a short chopping sea from 05:04, a heavy sea from
+# 20:45 as the gale comes on, a very heavy sea from 01:51, and going down to a heavy sea
+# at 08:22, hours after the wind eased (the ten-minute mean under a moderate gale from
+# about five).
+GATE_5A_SEA_TICKS = {
+    "A short chopping sea getting up.": 3840,
+    "A heavy sea getting up.": 60300,
+    "A very heavy sea getting up.": 78660,
+    "A heavy sea, the sea going down.": 102120,
+}
+GATE_5A_DAY_LINES = 493
+GATE_5A_DAY_DIGEST = "45eac662eaad0f17"
+
+
+def the_gate_day_under_systems(until: int = GATE_5A_DAY_TICKS, saves=GATE_5A_DAY_SAVES):
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario(GATE_5A_DAY)
+    world = make_scenario_world(sf)
+    begin(world, sf)
+    saved = {}
+    for t in sorted(saves):
+        run(world, t - world.clock.tick)
+        saved[t] = (world.save(), world.log.digest())
+    run(world, until - world.clock.tick)
+    return world, sf, saved
+
+
+@pytest.fixture(scope="module")
+def gate_5a_day():
+    return the_gate_day_under_systems()
+
+
+def test_truth_56_a_gale_of_a_day_raises_a_heavy_sea_the_reef_is_slower_in_and_that_outlasts_it(
+    gate_5a_day,
+):
+    """Spec M5 §6, truth 56: "A gale of a day raises a heavy sea that the frigate's reefing
+    takes half as long again in as in a smooth one, and the sea outlasts the wind by hours
+    in the log's words." The sea of a day's gale of forty knots (`world.sea.Sea`) is a
+    heavy sea in words; the frigate on a beam reach reefs her fore topsail in it, on her
+    beam, in 1.4 to 1.7 times the ticks she takes with no sea kept (a smooth sea is the
+    same to the tick, tests/test_sea.py); and on the day under systems the sea is a heavy
+    sea from the evening to the second forenoon, still heavy at nine with the wind a
+    fresh breeze since seven."""
+    from tests.test_sea import frigate_under_plain_sail, heavy_sea_aboard, reef_ticks, sea_of
+
+    gale = sea_of(24.0, 40.0)
+    assert gale.state in ("heavy", "very heavy") and gale.words.endswith("heavy sea")
+    quick = reef_ticks(frigate_under_plain_sail(sea=False))
+    heavy = heavy_sea_aboard(frigate_under_plain_sail(sea=True), knots=40.0)
+    assert heavy.sea.words == gale.words
+    slow = reef_ticks(heavy)
+    assert 1.4 <= slow / quick <= 1.7, (quick, slow)
+    # the sea outlasts the wind: on the day under systems
+    world, _, _ = gate_5a_day
+    seas = {e.text: e.tick for e in events(world, "sea.change")}
+    assert seas == GATE_5A_SEA_TICKS
+    hours = events(world, "weather.hour")
+    at = {e.ship_time: e for e in hours}
+    nine = at[datetime(1805, 6, 2, 9, 0)]
+    assert nine.data["sea"] == "a heavy sea" and "a heavy sea" in nine.text
+    # the gale was over by half past five (the last gust on a mean of a fresh gale or more,
+    # the gust lines carrying the ten-minute mean), the sea very heavy until 08:22 and
+    # heavy at nine with the mean wind a fresh breeze: it outlasts the gale by hours
+    means = {e.ship_time: e for e in world.log if e.kind == "wind.gust" and e.ship_time.day == 2}
+    last_gale = max(t for t, e in means.items() if e.data["mean_kn"] >= 34.0)
+    assert datetime(1805, 6, 2, 3, 0) < last_gale < datetime(1805, 6, 2, 5, 30)
+    going_down = GATE_5A_SEA_TICKS["A heavy sea, the sea going down."]
+    assert world.clock.start + timedelta(seconds=going_down) - last_gale >= timedelta(hours=3)
+    assert max(t for text, t in seas.items() if "heavy" in text) == going_down
+    assert world.readings["sea"]["state"] == "heavy"
+    assert units.ms_to_knots(world.wind_record.mean_speed()) < 22.0
+
+
+def test_the_day_under_systems_alone_at_seed_7_has_its_own_constants(gate_5a_day):
+    """The day under systems alone (gate 5a's day; spec M5 §7): the same standing orders
+    as the pinned day, the systems' wind at the ship, the sea and the motion kept. Its
+    ticks, what it loses in the squalls of the gale, its lines and its digest are the
+    constants above, measured at seed 7; the pinned day's (truths 48 to 51) do not move."""
+    world, sf, _ = gate_5a_day
+    assert world.seed == 7 and sf.scenario.weather == [] and sf.scenario.systems
+    assert world.sea is not None and world.motion is not None and world.weather is None
+    assert world.wind.air_mass is not None
+    assert [e.tick for e in events(world, "sun.set")] == [GATE_5A_SUNSET_TICK]
+    assert by_order(world, "night routine") == [
+        (GATE_5A_SUNSET_TICK, "By standing order 'night routine': taking in the royals.")
+    ]
+    assert sorted({t for t, _ in by_order(world, "shorten sail for weather")}) == [
+        GATE_5A_SHORTEN_SAIL_TICK
+    ]
+    assert sorted({t for t, _ in by_order(world, "gale canvas")}) == [GATE_5A_GALE_CANVAS_TICK]
+    heavy = by_order(world, "heavy weather")
+    assert [t for t, _ in heavy] == [GATE_5A_HEAVY_WEATHER_TICK] * 4
+    assert [text.split(": ")[1] for _, text in heavy] == [
+        "sending down the topgallant masts.",
+        "taking in the fore topmast staysail.",
+        "bending the fore storm staysail.",
+        "close reefing the topsails.",
+    ]
+    squalls = events(world, "weather.squall")
+    assert squalls and squalls[0].tick == GATE_5A_FIRST_SQUALL_TICK
+    assert "65 knots" in squalls[0].text and squalls[0].data["air_mass"] == "unstable"
+    assert [e.text for e in world.log if e.kind in LOST] == GATE_5A_LOST
+    assert [p.id for p in world.ship.parts.values() if p.wrecked] == []
+    assert min(t for t, _ in by_order(world, "make sail after the gale")) == GATE_5A_MAKE_SAIL_TICK
+    assert len(world.log) == GATE_5A_DAY_LINES
+    assert world.log.digest()[:16] == GATE_5A_DAY_DIGEST
+    # the motion's words through the gale, and no line names a number of the sea
+    motions = [e.text for e in events(world, "motion.change")]
+    assert "Rolling heavily." in motions and "Labouring heavily." in motions
+    assert "Pitching heavily, the sea under her stern." in motions
+    for e in world.log:
+        assert not FORBIDDEN_WORDS.search(e.text), e.text
+    for e in events(world, "sea.change") + events(world, "motion.change"):
+        assert not any(ch.isdigit() for ch in e.text), e.text
+
+
+def test_the_day_under_systems_saved_in_the_gale_replays_to_the_same_digest(gate_5a_day):
+    """Truth 49's form on the day under systems (spec M5 §7: "the fake watcher's day
+    replayed to the same digest"): saved at 20:00 and at 01:00 in the gale, each
+    replayed from its seed, scenario and inputs to the digest it had, the sea and the
+    motion raised again from the wind (nothing of them is saved)."""
+    from freesail.api.session import ship_factory
+    from freesail.core import replay as replay_mod
+
+    world, sf, saved = gate_5a_day
+    for tick in GATE_5A_DAY_SAVES:
+        data, digest = saved[tick]
+        assert data["end_tick"] == tick and data["scenario"]["sea"] is None
+        assert data["scenario"]["systems"] == sf.scenario.systems
+        copy = replay_mod.replay(data, ship_factory)
+        assert copy.clock.tick == tick and copy.log.digest() == digest, tick
+        assert copy.readings["sea"] is not None and copy.sea.words == copy.readings["sea"]["words"]
+
+
+def test_the_pace_on_the_day_under_systems_holds_truth_51s_floor():
+    """Spec M5 §30: a truth per gate measures the whole at the gate's scenario. Truth 51's
+    measure on the day under systems alone (the systems' wind every tick, the sea once a
+    minute, the motion every tick, the strain's and the hull's factors): a thousand ticks
+    to settle, the best of three thousands, at least BUILD_MACHINE_FLOOR. Measured on the
+    build machine: 843 ticks a second (862 on the pinned day the same run;
+    docs/dev/TuningNotes.md, M5a)."""
+    import time
+
+    world, _, _ = the_gate_day_under_systems(until=1000, saves=())
+    best = 0.0
+    for _ in range(3):
+        t0 = time.perf_counter()
+        world.run(1000)
+        best = max(best, 1000 / (time.perf_counter() - t0))
+    assert best >= BUILD_MACHINE_FLOOR, f"{best:.0f} ticks a second"

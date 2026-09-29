@@ -372,6 +372,15 @@ _HOW = {
         "the visibility",
         "by how far a sail is seen: is the horizon, is a few miles, is a mile, is a cable",
     ),
+    "sea": (
+        "the sea",
+        "by its state: is smooth, is moderate, is short, is heavy, is very heavy, is confused",
+    ),
+    "motion": (
+        "the motion",
+        "by how she moves: is easy, is rolling, is rolling heavily, is pitching, is "
+        "pitching heavily, is labouring",
+    ),
 }
 
 
@@ -451,7 +460,7 @@ def _match_reading(tokens: list[str], i: int, ship: Any, vocab: Vocabulary) -> _
     raise OrderError(
         f"'{said}' is not a reading the ship has{hint} A condition names the true wind, the "
         f"apparent wind, the heading, the speed, the heel, the watch, the strain, the hands "
-        f"on deck, the glass, the sky, the weather, or a sail by name."
+        f"on deck, the glass, the sky, the weather, the sea, the motion, or a sail by name."
     )
 
 
@@ -756,6 +765,8 @@ def _parse_comparison(
             ("sky", _SKY_SAID),
             ("weather", _WEATHER_SAID),
             ("visibility", _VISIBILITY_SAID),
+            ("sea", _SEA_SAID),
+            ("motion", _MOTION_SAID),
         ):
             row = _pick(cands, (kind,))
             if row is None:
@@ -905,6 +916,36 @@ _WEATHER_SAID.update(
 )
 _VISIBILITY_SAID: dict[str, str] = {w: w for w in R.VISIBILITY_WORDS}
 _VISIBILITY_SAID.update({"the horizon": "the horizon", "a cable's length": "a cable"})
+# The sea's and the motion's words (spec M5 §4): the state word each is compared by
+# (rules._sea_is, rules._motion_is), and the ways of saying it.
+_SEA_SAID: dict[str, str] = {w: w for w in R.SEA_STATE_WORDS}
+_SEA_SAID.update(
+    {
+        "chopping": "short",
+        "short and chopping": "short",
+        "a short chopping sea": "short",
+        "rough": "heavy",
+        "high": "very heavy",
+        "confused": "confused",
+        "cross": "confused",
+        "a cross sea": "confused",
+        "a confused sea": "confused",
+        "calm": "smooth",
+    }
+)
+_MOTION_SAID: dict[str, str] = {w: w for w in R.MOTION_STATE_WORDS}
+_MOTION_SAID.update(
+    {
+        "rolling heavily": "rolling heavily",
+        "pitching heavily": "pitching heavily",
+        "labouring heavily": "labouring",
+        "laboring": "labouring",
+        "laboring heavily": "labouring",
+        "heavy": "heavy",
+        "quiet": "easy",
+        "steady": "easy",
+    }
+)
 
 
 def _unit_of(cands: list[R.Reading]) -> str:

@@ -149,9 +149,11 @@ UNDER_HIGH_RADII = 1.0
 # The glass. One inch of mercury is 33.86 hPa (W §3; the physical constant, 33.8639).
 HPA_PER_INCH = 33.86
 # The ship's own reading noise: a marine glass pumps in a seaway by "a hundredth or two"
-# (W §3); half a hundredth here for the reading itself, the seaway's pumping being package
-# 31's. Deterministic from the seed and the minute; drawn from no stream.
+# (W §3); half a hundredth here for the reading itself, and the seaway's pumping (package
+# 31, `physics.motion.Motion.pumping`) scales it up to GLASS_PUMP_MAX_IN, the two
+# hundredths. Deterministic from the seed and the minute; drawn from no stream.
 GLASS_NOISE_IN = 0.005
+GLASS_PUMP_MAX_IN = 0.02
 # The tendency's words. "A fall of a tenth in three hours means much wind" is common
 # sailing-school teaching whose period source the study could not find (W §1.7,
 # unverified); it is the threshold of "falling fast" here and says so. Steady within
@@ -586,11 +588,14 @@ class Glass:
         self.read_at: datetime | None = None
         self._last_watch_reading: float | None = None
 
-    def read(self, pressure_hpa: float, when: datetime) -> float:
+    def read(self, pressure_hpa: float, when: datetime, pumping: float = 1.0) -> float:
         """Read the glass now: the model's pressure in inches plus the ship's noise, kept
-        in the record."""
+        in the record. `pumping` is the seaway's factor on the noise (spec M5 §4,
+        `physics.motion.Motion.pumping`): the mercury pumps by a hundredth or two in a
+        seaway (W §3), never more than GLASS_PUMP_MAX_IN."""
         minute = int(when.timestamp() // 60)
-        noise = (2.0 * _noise(self._seed, f"glass:{minute}") - 1.0) * GLASS_NOISE_IN
+        amplitude = min(GLASS_NOISE_IN * max(pumping, 1.0), GLASS_PUMP_MAX_IN)
+        noise = (2.0 * _noise(self._seed, f"glass:{minute}") - 1.0) * amplitude
         value = round(inches(pressure_hpa) + noise, 2)
         self.reading_in = value
         self.read_at = when

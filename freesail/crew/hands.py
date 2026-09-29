@@ -44,6 +44,39 @@ FATIGUE_FRESH = 0.05
 # idlers aloft); should one be, his skill is read as this, so that nothing divides by nought.
 SKILL_FLOOR = 0.1
 
+# The seaway (spec M5 §4, package 31): the crew factor aloft rises with the ship's roll
+# (`physics.motion.Motion.roll_deg`, the amplitude to each side in degrees), and the
+# deck's a little. A table interpolated by the roll: (roll, aloft, on deck). Judgement,
+# set so that a reef in a heavy sea takes half as long again (truth 56; Luce 1884, 'In a
+# Gale': "when a vessel labors much in a seaway ... the sails should never be hoisted up,
+# or the braces hauled, as taut as in a smooth sea", the work aloft being the hard part;
+# no period source gives times). Below the first row the work is at the file's pace, so
+# a smooth sea and no sea at all are the same, and every truth measured without a sea
+# stands.
+SEAWAY_FACTOR_TABLE: tuple[tuple[float, float, float], ...] = (
+    (3.0, 1.0, 1.0),
+    (6.0, 1.15, 1.05),
+    (9.0, 1.4, 1.15),
+    (12.0, 1.6, 1.25),
+    (16.0, 1.9, 1.35),
+    (25.0, 2.2, 1.5),
+)
+
+
+def seaway_factor(roll_deg: float, aloft: bool) -> float:
+    """How much longer the work takes for the ship's roll: 1.0 under SEAWAY_FACTOR_TABLE's
+    first row, the table's aloft or deck column between rows, its last row beyond."""
+    table = SEAWAY_FACTOR_TABLE
+    column = 1 if aloft else 2
+    if roll_deg <= table[0][0]:
+        return 1.0
+    for (r0, *f0), (r1, *f1) in zip(table, table[1:], strict=False):
+        if roll_deg <= r1:
+            f = (roll_deg - r0) / (r1 - r0)
+            return f0[column - 1] + f * (f1[column - 1] - f0[column - 1])
+    return table[-1][column]
+
+
 # Short-handed (spec M3 §3.2): with fewer than this share of the hands wanted the work
 # does not begin; with this share or more it begins, slower in proportion.
 SHORT_HANDED_SHARE = 0.5
@@ -295,13 +328,16 @@ def release(crew: Crew, inst_id: str) -> list[Sailor]:
     return freed
 
 
-def crew_factor(assignment: Assignment, want: CrewRequest, aloft: bool) -> float:
+def crew_factor(
+    assignment: Assignment, want: CrewRequest, aloft: bool, roll_deg: float = 0.0
+) -> float:
     """How much longer the work takes with these hands (spec M3 §3.3)::
 
         numbers  = max(1, wanted / got)             # never faster for extra hands
         skill    = mean of reference_skill(rating wanted) / reference_skill(hand's rating)
         fatigue  = 1 + FATIGUE_WEIGHT * max(0, mean fatigue - FATIGUE_FRESH)
-        factor   = numbers * skill * fatigue
+        seaway   = seaway_factor(roll_deg, aloft)   # spec M5 §4: the roll, aloft above all
+        factor   = numbers * skill * fatigue * seaway
 
     The skill term reads each hand's rating through `RATING_SKILL`, not his own skill with
     its seeded spread, so a request filled at its own rating gives exactly 1.0 (spec §3.3).
@@ -316,16 +352,17 @@ def crew_factor(assignment: Assignment, want: CrewRequest, aloft: bool) -> float
     men come down).
     """
     hands = assignment.hands
+    seaway = seaway_factor(roll_deg, aloft)
     if not hands:
-        return 1.0
+        return seaway
     mean_fatigue = sum(s.fatigue for s in hands) / len(hands)
     fatigue = 1.0 + FATIGUE_WEIGHT * max(0.0, mean_fatigue - FATIGUE_FRESH)
     if want.all_hands or assignment.all_hands:
-        return max(1.0, assignment.wanted / len(hands)) * fatigue
+        return max(1.0, assignment.wanted / len(hands)) * fatigue * seaway
     numbers = max(1.0, assignment.wanted / len(hands))
     reference = rating_skill(want.rating, aloft)
     if reference <= 0.0:
         reference = SKILL_FLOOR
     ratios = [reference / max(rating_skill(s.rating, aloft), SKILL_FLOOR) for s in hands]
     skill = sum(ratios) / len(ratios)
-    return numbers * skill * fatigue
+    return numbers * skill * fatigue * seaway

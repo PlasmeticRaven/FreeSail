@@ -97,6 +97,7 @@ class HullState:
     last_thrust_n: float = 0.0  # net thrust of the last substep, for the aback rule
     awa: float = 0.0  # deck-level apparent wind angle computed here, for the helm
     aws: float = 0.0  # deck-level apparent wind speed computed here
+    sea_drag: float = 1.0  # the head sea's factor on the resistance this tick (spec M5 §4)
     extra: dict = field(default_factory=dict)
 
 

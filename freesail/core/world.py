@@ -63,6 +63,13 @@ class Scenario:
     # in a small vessel); the scenario says, and without one the glass and its tendency
     # are not to be had.
     glass: bool = False
+    # The sea and the ship's motion (spec M5 §4, package 31; `freesail.world.sea`,
+    # `physics.motion`): kept when the wind has a cause (the systems drive it and no
+    # `weather` script pins it), as the sky is, or when the scenario says `sea: true`
+    # under a fixed or a pinned wind; `false` keeps none. None: the rule above. A fixed or
+    # a pinned wind alone keeps no sea, which is how every truth before this one is
+    # measured, so none of them moves. A save from before the sea loads with None.
+    sea: bool | None = None
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
@@ -91,6 +98,11 @@ InputEntry = dict[str, Any]
 # The actor a standing order's firing carries (spec M4 §4); `freesail.standing.runtime`
 # writes it and the World knows a firing by it.
 STANDING_ACTOR_PREFIX = "standing order "
+
+# The motion's words must hold this long before the log says they changed (spec M5 §4;
+# judgement: five minutes, so a roll hovering about "rolling" and "rolling easily" is
+# not a line a minute).
+MOTION_WORDS_HOLD_S = 300
 
 # The log kinds an agent's harness writes (spec M4 §11, §12), listed in one place. Every
 # one is written by `freesail.agents.harness` (or by a tool it runs) with the actor
@@ -149,6 +161,8 @@ class World:
         self.glass: Any = None
         self.conditions: Any = None  # the sky and the weather at the ship, once a minute
         self._last_conditions: Any = None
+        self.sea: Any = None  # the sea and the motion (spec M5 §4), made below
+        self.motion: Any = None
         if self.scenario.systems or self.scenario.climatology:
             from freesail.world.weather import Glass, Weather, load_climatology
 
@@ -198,6 +212,26 @@ class World:
                 )
                 self.wind.air_mass = self.conditions.air_mass
         self._last_logged_wind_direction = self.wind.direction_from
+        # The sea and the motion (spec M5 §4): the sea raised by the wind's ten-minute
+        # mean once a minute, the motion relaxed toward what it gives every tick; the
+        # ship's physics, strain and crew read the motion through `ship.extra["motion"]`.
+        self._last_sea_words: str | None = None
+        self._last_motion_words: str | None = None
+        self._motion_pending: tuple[str, int] | None = None
+        keeps_sea = self.scenario.sea
+        if keeps_sea is None:
+            keeps_sea = self.systems is not None and self.weather is None
+        if keeps_sea:
+            from freesail.physics.motion import Motion, Particulars
+            from freesail.world.sea import Sea
+
+            self.sea = Sea(self.clock.ship_time, self.wind.base_speed, self.wind.base_direction)
+            self.motion = Motion(Particulars.of(self.ship))
+            self._last_sea_words = self.sea.words
+            self._last_sea_height = self.sea.reading().height_m
+            self._last_motion_words = self.motion.words
+            if getattr(self.ship, "extra", None) is not None:
+                self.ship.extra["motion"] = self.motion
         # The sun (spec M4 §5): `daylight` is read from it through the registry, and the
         # World raises `sun.rise` and `sun.set` on the tick the phase crosses into and out
         # of day. The phase at the start is read and not announced: a sunrise that fell
@@ -317,7 +351,9 @@ class World:
         t = self.clock.ship_time
         self.conditions = self.systems.conditions_at(self.ship_x_km, self.ship_y_km, t)
         if self.glass is not None:
-            self.glass.read(self.conditions.pressure_hpa, t)
+            # the mercury pumps with the ship's motion (spec M5 §4)
+            pumping = self.motion.pumping if self.motion is not None else 1.0
+            self.glass.read(self.conditions.pressure_hpa, t, pumping)
         if self.weather is None and not first:
             self.wind.air_mass = self.conditions.air_mass
         if first:
@@ -374,7 +410,65 @@ class World:
                 if change is not None:
                     since = units.watch_of(t - timedelta(minutes=1))[1].lower()
                     text += f", {_hundredths(change)} since the {since}"
+        if self.sea is not None:
+            # the sea by the hour (spec M5 §4), for the roll-up
+            data["sea"] = self.sea.words
+            data["motion"] = self.motion.words
+            text += f"; {self.sea.words}, {self.motion.words}"
         self.record(Severity.ROUTINE, "weather.hour", text + ".", data=data)
+
+    # -- the sea and the motion (spec M5 §4) --------------------------------------
+
+    def _tick_sea(self) -> None:
+        """Once a minute: the sea raised by the wind's ten-minute mean, and a line when
+        its words change; the motion's words likewise."""
+        record = self.wind_record
+        mean = record.mean_speed()
+        mean_from = record.mean_from()
+        if mean is None or mean_from is None:
+            mean, mean_from = self.wind.base_speed, self.wind.base_direction
+        self.sea.tick(self.clock.ship_time, mean, mean_from)
+        words = self.sea.words
+        if words != self._last_sea_words:
+            reading = self.sea.reading()
+            rising = reading.height_m > self._last_sea_height
+            self.record(
+                Severity.ROUTINE,
+                "sea.change",
+                _sea_line(words, rising, reading.confused),
+                data={"sea": words, "state": reading.state, "height_m": round(reading.height_m, 2)},
+            )
+            self._last_sea_words = words
+        self._last_sea_height = self.sea.reading().height_m
+
+    def _tick_motion(self) -> None:
+        """Every tick: the motion toward what the sea gives on her heading; a line when
+        its words have changed and held for MOTION_WORDS_HOLD_S (a roll hovering about a
+        word's threshold is not a line every minute)."""
+        self.motion.tick(1.0, self.sea, self.ship.heading)
+        if self.clock.ship_time.second != 0:
+            return
+        words = self.motion.words
+        if words == self._last_motion_words:
+            self._motion_pending = None
+            return
+        if self._motion_pending is None or self._motion_pending[0] != words:
+            self._motion_pending = (words, self.clock.tick)
+        if self.clock.tick - self._motion_pending[1] >= MOTION_WORDS_HOLD_S:
+            self._motion_pending = None
+            reading = self.motion.reading()
+            self.record(
+                Severity.ROUTINE,
+                "motion.change",
+                _motion_line(words),
+                data={
+                    "motion": words,
+                    "state": reading.state,
+                    "roll_deg": round(reading.roll_deg, 1),
+                    "pitch_deg": round(reading.pitch_deg, 1),
+                },
+            )
+            self._last_motion_words = words
 
     def _log_squall(self) -> None:
         """A squall (spec M5 §3): notable at its start, with its veer and its wind, and at
@@ -536,6 +630,11 @@ class World:
             self._last_logged_wind_direction = self.wind.direction_from
         if self.systems is not None and self.clock.ship_time.second == 0:
             self._tick_weather()
+        if self.sea is not None:
+            # the sea once a minute, the motion every tick, before the ship feels them
+            if self.clock.ship_time.second == 0:
+                self._tick_sea()
+            self._tick_motion()
         for note in self.ship.step(1.0, self.wind):
             if len(note) == 3:
                 self.record(*note)
@@ -629,6 +728,22 @@ class World:
             "agents": [agent.save() for agent in self.agents.values()],
             "agent_journals": {name: j.save() for name, j in self.agent_journals.items()},
         }
+
+
+def _sea_line(words: str, rising: bool, confused: bool) -> str:
+    """The log's line when the sea's words change: 'A heavy sea getting up.', 'A short
+    chopping sea, the sea going down.', 'A confused sea, the swell from the westward.'"""
+    head = words[:1].upper() + words[1:]
+    if confused:
+        return f"{head}."
+    return f"{head} getting up." if rising else f"{head}, the sea going down."
+
+
+def _motion_line(words: str) -> str:
+    """'Rolling heavily.', 'Pitching into it.', 'She is easy.'"""
+    if words == "easy":
+        return "She is easy in it."
+    return words[:1].upper() + words[1:] + "."
 
 
 def _hundredths(change_in: float) -> str:

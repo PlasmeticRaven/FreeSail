@@ -36,6 +36,8 @@ def weather_block(world: World) -> dict[str, Any]:
     tendency = r["tendency"]
     sky = r["sky"]
     visibility = r["visibility"]
+    sea = r["sea"]
+    motion = r["motion"]
     return {
         "glass_in": r["glass"],
         "tendency": tendency["words"] if tendency else None,
@@ -47,25 +49,44 @@ def weather_block(world: World) -> dict[str, Any]:
         "visibility": visibility["words"] if visibility else None,
         "visibility_miles": visibility["miles"] if visibility else None,
         "sky_words": r.words("sky"),
+        # the sea and the motion (spec M5 §4): the words, and the numbers behind them
+        "sea": sea["words"] if sea else None,
+        "sea_from": sea["from"] if sea else None,
+        "sea_height_m": sea["height_m"] if sea else None,
+        "sea_words": r.words("sea"),
+        "motion": motion["words"] if motion else None,
+        "roll_deg": motion["roll_deg"] if motion else None,
+        "pitch_deg": motion["pitch_deg"] if motion else None,
     }
 
 
 def weather_lines(world: World) -> list[str]:
     """The console's `state` line for the weather, when the scenario keeps one: 'The
     glass 29.72, falling; overcast, drizzle; a few miles.'"""
-    if getattr(world, "conditions", None) is None:
-        return []
+    out = []
     r = world.readings
-    parts = []
-    if r["glass"] is not None:
-        tendency = r["tendency"]
-        words = f", {tendency['words']}" if tendency else ""
-        parts.append(f"The glass {r['glass']:.2f}{words}")
-    else:
-        parts.append("No glass aboard")
-    parts.append(r.words("sky") + ", " + r.words("weather"))
-    parts.append(r.words("visibility"))
-    return ["; ".join(parts) + "."]
+    if getattr(world, "conditions", None) is not None:
+        parts = []
+        if r["glass"] is not None:
+            tendency = r["tendency"]
+            words = f", {tendency['words']}" if tendency else ""
+            parts.append(f"The glass {r['glass']:.2f}{words}")
+        else:
+            parts.append("No glass aboard")
+        parts.append(r.words("sky") + ", " + r.words("weather"))
+        parts.append(r.words("visibility"))
+        out.append("; ".join(parts) + ".")
+    if getattr(world, "sea", None) is not None:
+        # the sea and the motion (spec M5 §4): 'A heavy sea from the north-westward;
+        # rolling heavily.'
+        from freesail.world.sea import quarter_words
+
+        sea = r["sea"]
+        words = sea["words"]
+        if "from" not in words:
+            words += f" from {quarter_words(sea['from'])}"
+        out.append(f"{words[:1].upper()}{words[1:]}; {r.words('motion')}.")
+    return out
 
 
 def _spar_state(s: Spar) -> str:

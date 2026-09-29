@@ -38,6 +38,12 @@
   function formatHeading(angle) {
     return pointName(angle) + " " + Math.round(deg(wrap2pi(angle))) + "°";
   }
+  // 'the westward', 'the north-westward': the nearest of eight quarters, as a log names
+  // where a sea or a swell comes from (freesail/world/sea.py quarter_words, the same bands).
+  var QUARTERS = ["the northward", "the north-eastward", "the eastward", "the south-eastward", "the southward", "the south-westward", "the westward", "the north-westward"];
+  function quarterWords(angle) {
+    return QUARTERS[Math.round(deg(wrap2pi(angle)) / 45) % 8];
+  }
   function formatKnots(ms, digits) {
     return knots(ms).toFixed(digits == null ? 1 : digits) + " kn";
   }
@@ -84,6 +90,7 @@
     rad: rad,
     knots: knots,
     pointName: pointName,
+    quarterWords: quarterWords,
     formatHeading: formatHeading,
     formatKnots: formatKnots,
     formatSigned: formatSigned,

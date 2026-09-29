@@ -30,10 +30,13 @@ the captain's first orders:
             - ...
       climatology: false             # or seed the month's from data/weather/climatology.yaml
       background: {hpa: 1015, gradient_hpa_per_100km: 1.0, high_toward_deg: 190}   # optional
+      sea: true                      # optional: keep the sea and the motion (spec M5 §4)
+                                     # under a pinned or a fixed wind too; false keeps none
 
 A bare list under `weather` is the old form, the pinned wind alone. With both forms the
 pinned wind wins and the systems give only the sky and the glass; with systems alone the
-systems' surface wind at the ship is the base wind (spec M5 §2).
+systems' surface wind at the ship is the base wind (spec M5 §2), and the sea and the
+ship's motion are kept with it (spec M5 §4; `sea` above overrides either way).
     standing_orders:                 # files read at the start, in order
       - data/standing_orders/starter.orders
     orders:                          # the captain's first orders, given at tick 0
@@ -107,6 +110,10 @@ class ScenarioFile:
             out.append(f"The weather from the climatology for {sc.start_time.strftime('%B')}.")
         if sc.glass:
             out.append("She carries a glass.")
+        keeps_sea = sc.sea if sc.sea is not None else bool(sc.systems or sc.climatology)
+        keeps_sea = keeps_sea and (sc.sea is not None or not sc.weather)
+        if keeps_sea:
+            out.append("The sea and the ship's motion are kept.")
         return out
 
 
@@ -152,6 +159,8 @@ def load_scenario(path: str | Path) -> ScenarioFile:
         # the M5 form: a mapping of the pinned `wind`, the `systems` and `climatology`
         systems = list(weather.get("systems") or [])
         sc.climatology = bool(weather.get("climatology", False))
+        if "sea" in weather and weather["sea"] is not None:
+            sc.sea = bool(weather["sea"])
         background = weather.get("background") or {}
         if not isinstance(background, dict):
             raise ScenarioError(
