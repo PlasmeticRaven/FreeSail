@@ -135,6 +135,25 @@ pumps by a hundredth or two; the noon sight's error and the lunar's grow with th
 (§14); the lookout's horizon is what the height of eye and the swell allow. The sea's
 words are a reading (§5) and the roll-up says the sea by the hour. The M4 open item 7
 (windage under bare poles) is measured in this package while the hull is touched.
+**As built (package 31):** the sea is kept only when the wind has a cause (the systems)
+or the scenario says `sea: true`, so a fixed or pinned wind keeps none and every M4
+constant stands; the wind sea is the vector's part along the present wind, the old sea
+becoming the swell's when the wind shifts; a cross sea more than five points off the
+wind is "confused". The motion is a driven oscillator at the ship's own roll period
+(8.2 s for the frigate, 5.8 s for the schooner), capped at 35 degrees, with pitch and
+heave from the wave's length against the ship's, all relaxed over ninety seconds. The
+consequences landed as one factor each: the crew factor aloft by a table on the roll,
+the strain's load on spars and lines (never canvas) by roll and pitch above a
+two-degree dead band, the hull's resistance in a head sea, the glass's pumping capped at
+two hundredths, and the sights' error inert for 5b. Windage under bare poles was
+measured and not tuned: running dead before fifteen knots the frigate makes 2.9 knots,
+lying a-hull she drifts half a knot, and Steel and Falconer both have a ship under bare
+poles keeping her way before the wind; the "few tenths" of the M4 item is the a-hull
+drift, and moving the run would move every truth under sail. It is the owner's ruling at
+gate 5a with two others (the pinned form and the air-mass rule; the squalls' cost in
+canvas on the day under systems). The wave-growth constants derive from the
+Pierson–Moskowitz form as WMO-702 gives it, worked but not read from the page, and say
+so.
 
 ### 5. Readings and log lines for 5a (`freesail/api/readings.py`)
 
@@ -607,10 +626,14 @@ in (then 5b), double altitudes, the kedge, interiors beyond a name and a descrip
 6. A station for the lookout (decision 24's last line), when a small model is tried at it.
 7. The sail room in the browser (owner, playtest 8) waits for §22's places and papers;
    until then the console's query stands and the browser has none.
-8. From package 30: a frontal trough so the glass checks at the cold front; the north
+8. From package 31: the wave-growth sources (Pierson–Moskowitz, Bretschneider, JONSWAP,
+   the Weiss and Rayleigh figures) to be read from a page; the head-sea resistance and the
+   roll damping as judgements; the day under systems loses the mizzen topsail to a
+   65-knot squall (the third gate 5a ruling).
+9. From package 30: a frontal trough so the glass checks at the cold front; the north
    quarter's share; the pinned form and the air-mass rule (the gate 5a ruling); a
    `gate-5a-day.yaml` with the day under systems alone, for the gate cut (package 31).
-9. The lead at a station (§29): the consent question put to the lead's own weights inside
+10. The lead at a station (§29): the consent question put to the lead's own weights inside
    the harness before the gate, the record kept as any other; and, for M6, the owner's
    wish that the lead take an officer's or a captain's station once they exist.
 
