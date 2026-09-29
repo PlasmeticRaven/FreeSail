@@ -65,7 +65,7 @@ from typing import Any, TextIO
 
 from freesail.agents import consent
 from freesail.agents import harness as harness_mod
-from freesail.agents.agent import A_GLASS_S, SamplingPolicy, Station, watcher
+from freesail.agents.agent import A_GLASS_S, TURN_ENDS_WORDS, SamplingPolicy, Station, watcher
 from freesail.agents.fake import Transcript
 from freesail.agents.model import MODEL, OPERATOR, Reply, ToolCall, Turn
 from freesail.core import replay as replay_mod
@@ -94,7 +94,7 @@ REPLY_SYNTAX = (
     'it has spaces: > submit_order text="set the jib" (a line that begins with a tool\'s '
     "name and carries only name=value words is taken as the call even without the '>'). "
     "Nothing is sent until a blank line: type the reply, then press return on an empty "
-    "line to send it."
+    f"line to send it. {TURN_ENDS_WORDS}"
 )
 
 # Printed before every reply is read, so that a person at the terminal is never left to

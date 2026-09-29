@@ -74,6 +74,8 @@ ticks produce the same log.
 
 from __future__ import annotations
 
+from collections.abc import Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
@@ -85,7 +87,7 @@ from freesail.crew.model import Crew, number_words
 from freesail.evolutions import expr, registry
 from freesail.evolutions.scripts import SCRIPTS, Script
 from freesail.ship.graph import Ship
-from freesail.ship.parts import Line, LineState, Part, Sail, Spar
+from freesail.ship.parts import Line, LineState, Part, Sail, SailState, Spar
 from freesail.ship.schema import YARD_LIKE_CLASSES
 from freesail.ship.stub import OrderError
 
@@ -132,6 +134,36 @@ WAITING_FOR_HANDS = "hands"
 
 # How many pieces of other work a log line names before it says "at other work".
 MAX_WORK_NAMED = 3
+
+# A party the captain names for the work (`hands_from`), in the log's words (package 29c).
+_WATCHES = ("starboard", "larboard")
+_PARTY_WORDS = {
+    "starboard": "starboard watch",
+    "larboard": "larboard watch",
+    "forecastle": "forecastlemen",
+    "fore_top": "fore topmen",
+    "main_top": "main topmen",
+    "mizzen_top": "mizzen topmen",
+}
+
+
+class PartyTooSmall(OrderError):
+    """A named party with fewer than half the hands the work wants (package 29c): the
+    sentence names the party, the work and both numbers, and stands alone in the order's
+    line."""
+
+
+# How a sail is left when its work is belayed, by its state (package 29c); a sail set
+# is left as `describe_state` says ("set", "set, 1 reef").
+_SAIL_LEFT = {
+    SailState.FURLED: "furled",
+    SailState.IN_THE_GEAR: "hanging in its gear",
+    SailState.LOOSED: "loosed and hanging from the yard",
+    SailState.SHEETED: "sheeted home and not hoisted",
+    SailState.GOOSE_WINGED: "goose-winged",
+    SailState.UNBENT: "unbent",
+    SailState.BLOWN_OUT: "blown out",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -185,6 +217,7 @@ class Instance:
     all_hands: bool = False  # began as a call for all hands
     short_logged: bool = False
     wait_line: str = ""  # the line it said when it first had to wait for hands
+    given: int | None = None  # the order that started it (`Runner.giving`), for `belay that`
 
     @property
     def inst_id(self) -> str:
@@ -236,6 +269,10 @@ class Runner:
         # angles from square.
         self._log_groups: dict[str, list[tuple[str, float]]] = {}
         self._log_group_count = 0
+        # The order being carried out (`giving`), so that every evolution it starts carries
+        # its number and `belay that` finds the last order's work (package 29c).
+        self._giving: int | None = None
+        self._given_count = 0
         ship.extra["evolutions"] = self
 
     # -- the contract --------------------------------------------------------
@@ -260,6 +297,7 @@ class Runner:
         inst = Instance(evo=evo, subject=subject, subject_id=sid, params=merged)
         self._counter += 1
         inst.order = self._counter
+        inst.given = self._giving
         if evo.script is not None:
             script_cls = SCRIPTS.get(evo.script)
             if script_cls is None:
@@ -271,6 +309,7 @@ class Runner:
                 inst.want = hands.CrewRequest.from_mapping(evo.crew)
             except hands.CrewRequestError as e:
                 raise OrderError(f"{evolution_id}: {e}") from None
+            self._check_party(ship, inst)
         blockers = [
             other for other in self.instances if other.holds & inst.holds and other is not inst
         ]
@@ -333,6 +372,127 @@ class Runner:
                 }
             )
         return out
+
+    # -- belaying work (package 29c) -------------------------------------------
+
+    @contextmanager
+    def giving(self, text: str = "") -> Iterator[int]:
+        """While an order is carried out (`orders.handle`), every evolution it starts is
+        marked with the order's number, so that `belay that` finds the last order's work
+        whether it started one evolution or a dozen."""
+        self._given_count += 1
+        outer, self._giving = self._giving, self._given_count
+        try:
+            yield self._given_count
+        finally:
+            self._giving = outer
+
+    def work(self) -> list[Instance]:
+        """The work in hand or waiting, in the order it was given: every evolution the
+        runner holds, running, waiting its turn or for hands, or belayed by a manoeuvre."""
+        return sorted(self.instances, key=lambda i: i.order)
+
+    def last_order_work(self) -> list[Instance]:
+        """The work of the last order given whose work is still in hand or waiting (`belay
+        that`): the newest evolution the runner holds, and every other that the same order
+        started. An evolution started without an order (a test's direct `start`) is an
+        order of its own."""
+        work = self.work()
+        if not work:
+            return []
+        last = work[-1]
+        if last.given is None:
+            return [last]
+        return [i for i in work if i.given == last.given]
+
+    def doing(self, inst: Instance) -> str:
+        """The work in words as the log names it: 'reefing the mainsail', 'tacking ship'."""
+        return self._doing(inst)
+
+    def belay(self, ship: Ship, insts: list[Instance]) -> list[dict[str, Any]]:
+        """Belay work in hand or waiting at the captain's word (`belay <the work>`, `belay
+        that`, `belay all work`; package 29c). Each is gone, not paused: its hands are
+        released and nothing of it resumes. What a finished step did stays done and a step
+        half done is left where it stands (a yard half braced round stays at its angle; a
+        sail half set is in the state its last finished step left it), since a step's
+        `sets` are applied only when it ends. An all-hands evolution belayed ends the call
+        as its end would (the hands piped down unless the captain called them). Returns,
+        for each, what was belayed and how it was left, for the order's one line. This is
+        not the manoeuvres' belay (decision 25; `_call_all_hands`), which holds the work's
+        progress to resume it and keeps its own line."""
+        out: list[dict[str, Any]] = []
+        for inst in sorted(insts, key=lambda i: i.order):
+            if inst not in self.instances:
+                continue
+            was = "waiting" if inst.waiting else "belayed" if inst.paused else "in hand"
+            entry: dict[str, Any] = {
+                "evolution": inst.evo.id,
+                "subject": inst.subject_id,
+                "doing": self._doing(inst),
+                "was": was,
+                "step": None if inst.waiting else inst.step_name,
+                "left": self._left_words(ship, inst),
+            }
+            if isinstance(inst.subject, Sail):
+                entry["state"] = inst.subject.state.value
+                entry["reefs"] = inst.subject.reefs
+            self._remove(ship, inst)
+            key = inst.params.get("log_group")
+            if key:
+                self._group_done(ship, inst, key)  # the braces of a trim already done
+            self._after_all_hands(ship, inst)
+            out.append(entry)
+        return out
+
+    def _left_words(self, ship: Ship, inst: Instance) -> str:
+        """How a piece of work is left when it is belayed, in words for the log."""
+        if inst.waiting:
+            why = "for hands" if inst.waiting_for == WAITING_FOR_HANDS else "its turn"
+            return f"not begun, it was waiting {why}"
+        subject = inst.subject
+        if isinstance(subject, Ship):
+            phase = inst.script.phase.replace("_", " ") if inst.script is not None else ""
+            at = f" at {phase}" if phase and phase not in ("ready", "done") else ""
+            return f"the helm and the yards left as they stand{at}"
+        name = part_name(ship, inst.subject_id)
+        if isinstance(subject, Sail):
+            return f"the {name} left {_SAIL_LEFT.get(subject.state, subject.describe_state())}"
+        if isinstance(subject, Spar) and subject.cls in YARD_LIKE_CLASSES:
+            deg = abs(units.rad_to_deg(subject.brace_angle))
+            return f"the {name} left {deg:.0f}° from square"
+        if isinstance(subject, Line):
+            return f"the {name} left {subject.state.value}"
+        return f"the {name} left as it stands"
+
+    def _check_party(self, ship: Ship, inst: Instance) -> None:
+        """An order that names its hands (`with the idlers`, `send the starboard watch
+        aloft to ...`) whose party has fewer than half the hands the work wants is refused
+        at once, in words with the numbers, since waiting would not bring them (playtest 8:
+        the schooner's few idlers held the mainsail's reef, and every later order on the
+        mainsail behind it, for the rest of the session). The general case, the watch on
+        deck short of hands, still waits (spec M3 §3.2): hands come free and come up."""
+        pick = inst.params.get("hands_from")
+        crew = self._crew(ship)
+        want = inst.want
+        if not pick or crew is None or want is None or want.all_hands or not want.hands:
+            return
+        aloft = self._aloft(inst)
+        wanted = min(int(want.hands), hands.company_can_give(crew, aloft))
+        party = [
+            s
+            for s in crew.sailors
+            if pick in (s.watch.value, s.station.value) and hands.can_work(s, aloft=False)
+        ]
+        able = [s for s in party if hands.can_work(s, aloft)]
+        if wanted <= 0 or len(able) >= wanted * hands.SHORT_HANDED_SHARE:
+            return
+        who = _PARTY_WORDS.get(pick, pick.replace("_", " "))
+        count = f"The {who} are {number_words(len(party))}"
+        if aloft and len(able) < len(party):
+            goes = "none of them goes" if not able else f"{number_words(len(able))} of them go"
+            count += f", and {goes} aloft"
+        remedy = "Call all hands." if pick in _WATCHES else "Call all hands, or name the watch."
+        raise PartyTooSmall(f"{count}; {self._doing(inst)} wants {number_words(wanted)}. {remedy}")
 
     # -- subjects ------------------------------------------------------------
 

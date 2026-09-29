@@ -158,7 +158,9 @@ When an instance begins (`Runner._begin`) it calls `hands.request(crew, inst, wa
 
 - **Enough** (got ≥ wanted): the crew factor for numbers is 1.0.
 - **Short but workable** (wanted/2 ≤ got < wanted): begin with what there is; the numbers factor is `wanted / got` (twelve hands' work done by eight takes half again as long). Log once, routine: "Only eight hands to the fore topsail; the rest are at the main."
-- **Too few** (got < wanted/2): the instance waits with `waiting = True` and a new `waiting_for = "hands"`, exactly as it waits today for a held part, and is retried each tick by `_start_waiting`. Log once, notable: "Not hands enough on deck to set the fore topsail; the watch is at the main topsail and the jib." The captain's remedies are to wait, to call all hands, or to belay something.
+- **Too few** (got < wanted/2): the instance waits with `waiting = True` and a new `waiting_for = "hands"`, exactly as it waits today for a held part, and is retried each tick by `_start_waiting`. Log once, notable: "Not hands enough on deck to set the fore topsail; the watch is at the main topsail and the jib." The captain's remedies are to wait, to call all hands, or to belay something (§5.4).
+
+**A named party that cannot man the job is refused at once** (the owner's finding at gate 4c, playtest 8, package 29c). The general case above waits because hands will come: the watch's work ends, the watch below is called. A party the captain names does not grow: an order that names its hands (`... with the idlers`, `send the starboard watch aloft to ...`, §5.1) whose party has fewer than half the hands the work wants, counting every fit member of it whether on deck or below and, for work aloft, only those who go aloft, is refused in words with the numbers and not queued: "The idlers are four; reefing the mainsail wants ten. Call all hands, or name the watch." (a watch named is told only to call all hands). The schooner's four idlers held her mainsail's reef, and every later order on the mainsail behind it, for the rest of the session in which this was found. Of an order on several sails, a sail the party cannot man is refused and the rest go ahead, as any refusal of one member does.
 
 The runner never calls all hands by itself. An evolution whose file says `hands: all` **is** a call for all hands: it turns the watch below up (routine §4.2), takes everyone not at other work and the rest as their work ends (§3.4), and when it ends the watch below is piped down again unless the captain has called all hands separately or another all-hands evolution is waiting its turn.
 
@@ -243,6 +245,20 @@ Errors in the parser's voice: "The larboard watch is below; say 'send the larboa
 ### 5.3 What does not change
 
 Level-0 line orders (`haul the weather main brace`) remain instantaneous and free of hands in milestone 3; they are the officer's fine adjustments, and giving them a cost belongs with the deck view. The helmsman is not a modelled sailor yet. Nothing in `physics/` changes except the sail states package 19 adds.
+
+### 5.4 Belaying work (package 29c, added at gate 4c)
+
+Until package 29c `belay` was a line verb and a standing order's verb only, so work waiting for hands could not be stopped, and the captain of playtest 8 tried eleven forms of "belay" and "cancel" on a reef that held his mainsail for the rest of the session. Three orders now stop work in hand or waiting (`freesail/orders/work.py`, `Runner.belay`):
+
+| Order | What it belays |
+|---|---|
+| `belay <the work>` (also `cancel ...`, `avast ...`, `belay the work on ...`) | the work named: as the log names it ("belay reefing the mainsail"), as the order gave it ("belay reef the mainsail, one reef"), by its kind ("belay the reef", "belay the reef in the mainsail"; the kinds are `work_nouns` in `data/vocabulary.yaml`) or by its subject ("belay the mainsail", every job whose subject that sail is) |
+| `belay that` (also a bare `belay` or `avast`, `belay that order`, `belay there`, `cancel that`) | the last order given whose work is still in hand or waiting: every evolution that order started (the runner marks each with the order's number while `orders.handle` carries it out), whether one or a dozen |
+| `belay all work` (also `belay all`, `belay all orders`, `cancel all orders`, `cancel all work`, `avast all`) | everything in hand or waiting, the ship left as she is |
+
+"Avast" is the period's word to stop any work ("the order to stop, or pause, in any exercise", Falconer 1780, *Avast*; "the command to stop, or cease, in any operation", Steel 1794, vol. II, *Avast!*); "belay that" is the sea's later use of the word for the same, and the one a captain reaches for; "cancel" is the landsman's and is taken too. Said of a line, "belay" is the line verb as before ("belay the main sheet"); words that read as neither work nor a line are left to the line verb, whose refusal names the nearest lines.
+
+Belayed work is **gone, not paused**: its hands are released and nothing of it resumes. What its finished steps did stays done, and a step half done is left where it stands, since a step's `sets` are applied only when it ends: a sail half set is in the state its last finished step left it (a topsail loosed aloft and not yet sheeted home hangs from the yard), a yard half braced round stays at its angle, a tack belayed in stays leaves the helm and the yards as they are. An all-hands evolution belayed ends the call as its end would, and the work a manoeuvre had belayed takes up again. The order's line, notable (`work.belayed`), says what was belayed and how it was left: "Belayed setting the fore topsail; the fore topsail left loosed and hanging from the yard." or, for several, each with its state in brackets. This is not the manoeuvres' belay of §3.4 (decision 25), which holds the work's progress to resume it and keeps its line ("Belayed setting the royals: all hands about ship."). Completion offers the work in hand after `belay` and `cancel`, as the log names it, then `belay that` and `belay all work`. A belay that names no work in hand is refused with the work in hand listed.
 
 ## 6. The catalogue to forty (package 19)
 

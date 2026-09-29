@@ -92,3 +92,32 @@ def test_point_ship_offers_its_three_orders():
     world = World(seed=1)
     s = suggestions(world.ship, "st")
     assert "steer " in s and "stop" in s and "state" in s
+
+
+def test_belay_offers_the_work_in_hand_first_then_the_lines():
+    """Package 29c: completion after 'belay' offers the work in hand or waiting as the
+    log names it, then 'belay that' and 'belay all work', then the lines as before."""
+    from freesail.api.session import make_world
+    from freesail.core.world import Scenario
+
+    w = make_world(7, "data/ships/topsail-schooner.yaml", Scenario())
+    for order in ("set the fore topsail", "set the foresail", "set the mainsail"):
+        w.submit(order)
+    s = suggestions(w.ship, "belay ")
+    assert s[:5] == [
+        "belay setting the fore topsail",
+        "belay setting the foresail",
+        "belay setting the mainsail",
+        "belay that",
+        "belay all work",
+    ]
+    assert any(x.startswith("belay the ") and "sheet" in x for x in s)  # the lines still
+    assert suggestions(w.ship, "belay setting the m") == ["belay setting the mainsail"]
+    assert suggestions(w.ship, "cancel ")[:3] == [
+        "cancel setting the fore topsail",
+        "cancel setting the foresail",
+        "cancel setting the mainsail",
+    ]
+    assert "belay all standing orders" in suggestions(w.ship, "belay all")
+    w.submit("belay all work")
+    assert not any("setting" in x for x in suggestions(w.ship, "belay "))

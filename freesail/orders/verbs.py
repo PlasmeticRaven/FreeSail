@@ -37,8 +37,9 @@ from typing import Any
 from freesail import units
 from freesail.crew.model import number_words
 from freesail.evolutions import trim as yard_trim
+from freesail.evolutions.runner import PartyTooSmall
 from freesail.orders import crew as crew_orders
-from freesail.orders import errors, resolve
+from freesail.orders import errors, resolve, work
 from freesail.orders.errors import OrderError
 from freesail.orders.grammar import Order
 from freesail.orders.vocabulary import Vocabulary, load_vocabulary
@@ -83,6 +84,8 @@ def execute(
     """
     vocab = vocab or load_vocabulary()
     spec = vocab.verbs[order.verb]
+    if order.verb in work.WORK_VERBS:
+        return work.execute(ship, order, vocab)  # belaying work (package 29c)
     if order.verb in crew_orders.CREW_VERBS:
         _no_stray_modifiers(order, set())
         return crew_orders.CREW_VERBS[order.verb](ship, order)
@@ -212,6 +215,15 @@ def _hands_params(
     return params, call
 
 
+def _refused(name: str, e: OrderError) -> str:
+    """One part's refusal for the order's line: 'the fore royal: the yard is sent down'.
+    A party too small for the work names the work itself, and stands alone (package
+    29c): 'The idlers are four; reefing the mainsail wants ten. ...'."""
+    if isinstance(e, PartyTooSmall):
+        return str(e)
+    return f"{name}: {e}"
+
+
 def _settle_call(ship: Ship, call: crew_orders.WatchCall | None, started: bool) -> None:
     """A watch turned up for this order keeps coming if the order stands, else goes below."""
     if call is None:
@@ -298,7 +310,7 @@ def _sail_evolution(
         try:
             texts.append(runner.start(ship, evo, sail.id, p))
         except OrderError as e:
-            failed.append(f"{resolve.the(ship, sail.id)}: {e}")
+            failed.append(_refused(resolve.the(ship, sail.id), e))
             failed_ids.append(sail.id)
             continue
         started.append({"evolution": evo, "subject": sail.id, "params": p})
@@ -606,7 +618,7 @@ def _brace(
         try:
             texts.append(runner.start(ship, vocab.evolutions["brace"], yard.id, params))
         except OrderError as e:
-            failed.append(f"{name}: {e}")
+            failed.append(_refused(name, e))
             failed_ids.append(yard.id)
             continue
         started.append({"evolution": "brace", "subject": yard.id, "params": params})
@@ -789,7 +801,7 @@ def _trim(
             try:
                 runner.start(ship, vocab.evolutions["brace"], yard.id, params)
             except OrderError as e:
-                failed.append(f"{name}: {e}")
+                failed.append(_refused(name, e))
                 failed_ids.append(yard.id)
                 continue
             started.append({"evolution": "brace", "subject": yard.id, "params": params})
@@ -1474,7 +1486,7 @@ def _haul_bowlines(
         try:
             texts.append(runner.start(ship, evo, ln.id, dict(extra)))
         except OrderError as e:
-            failed.append(f"{resolve.the(ship, ln.id)}: {e}")
+            failed.append(_refused(resolve.the(ship, ln.id), e))
             failed_ids.append(ln.id)
             continue
         started.append({"evolution": evo, "subject": ln.id, "params": dict(extra)})
@@ -1560,7 +1572,7 @@ def _catharpins(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
         try:
             texts.append(runner.start(ship, evo, mast.id, params))
         except OrderError as e:
-            failed.append(f"{resolve.the(ship, mast.id)}: {e}")
+            failed.append(_refused(resolve.the(ship, mast.id), e))
             failed_ids.append(mast.id)
             continue
         started.append({"evolution": evo, "subject": mast.id, "params": params})
@@ -1789,7 +1801,7 @@ def _boom_evolution(
         try:
             texts.append(runner.start(ship, evo, boom.id, dict(extra)))
         except OrderError as e:
-            failed.append(f"{resolve.the(ship, boom.id)}: {e}")
+            failed.append(_refused(resolve.the(ship, boom.id), e))
             failed_ids.append(boom.id)
             continue
         started.append({"evolution": evo, "subject": boom.id, "params": dict(extra)})

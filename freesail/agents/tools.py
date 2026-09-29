@@ -375,7 +375,8 @@ TOOLS: dict[str, Tool] = {
         Tool(
             "stand_by",
             "Stand by until an event, a bell or an interval: you are not sampled until "
-            "then, and the decision is written in the log. `until` is an event's words as "
+            "then, and the decision is written in the log. Standing by ends your turn at "
+            "once. `until` is an event's words as "
             f"the standing dialect knows them ({STAND_BY_EVENTS}), an interval ('a glass', "
             "'an hour', 'a watch', '5 minutes', 'ten minutes'), 'a notable event' or 'an "
             "urgent event'. An event is matched on the kind of the log's line, not its "
@@ -871,6 +872,12 @@ def _grammar_topic() -> Topic:
             continue  # the standing dialect's sentences are below, with their grammar
         syn = f" (also: {', '.join(spec.synonyms)})" if spec.synonyms else ""
         order.append(f"  {name}{syn}")
+    order.append(
+        "Belaying work: 'belay' said of a line is the line verb; said bare it "
+        "is 'belay that', the last order whose work is in hand or waiting; said of work it "
+        "belays that work, named as the log names it ('belay reefing the mainsail'), as it "
+        "was ordered, by its kind ('belay the reef') or by its sail ('belay the mainsail')."
+    )
     dialect = standing_dialect_lines(vocab)
     station = [
         "The station sentences the captain uses: 'ask the watcher <question>', 'stand down "

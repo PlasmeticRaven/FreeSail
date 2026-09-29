@@ -237,10 +237,19 @@ def suggestions(ship: Any, text: str, limit: int = 12) -> list[str]:
     spec = vocab.verbs[verb]
     rest = typed[len(normalise(matched)) :].strip()
     prefix = matched + " "
-    if rest:
+    # belaying work (package 29c): the work in hand, as the log names it, comes first
+    work: list[str] = []
+    if verb == "belay" or spec.object == "work":
+        for c in _work_offers(ship, prefix, verb == "belay"):
+            if _starts(c, typed) and normalise(c) != typed and c not in work:
+                work.append(c)
+        if spec.object == "work":
+            return work[:limit]
+    if rest or spec.object == "none":
         # a longer verb phrase that the words so far begin: milestone 3b's orders carry
         # their mast or their trim in the phrase ("swifter in the catharpins on the
-        # main", "trim sails with the head yards sharper")
+        # main", "trim sails with the head yards sharper"); a whole phrase may begin a
+        # longer one too ("belay all" of "belay all standing orders", package 29c)
         for phrase in vocab.verb_phrases:
             if len(phrase) > len(matched) and _starts(phrase, typed):
                 offer(phrase)
@@ -282,7 +291,24 @@ def suggestions(ship: Any, text: str, limit: int = 12) -> list[str]:
     # brace modes first, then the shorter, article-bearing forms
     modes = {prefix + m for m in _modifiers_for(spec.object, verb, vocab, False)}
     out.sort(key=lambda s: (s not in modes, not s.startswith(prefix + "the "), len(s), s))
-    return out[:limit]
+    return (work + [s for s in out if s not in work])[:limit]
+
+
+def _work_offers(ship: Any, prefix: str, bare_belay: bool) -> list[str]:
+    """'belay reefing the mainsail' for each piece of work in hand or waiting, as the log
+    names it; then, after a bare 'belay', 'belay that' and 'belay all work' (package
+    29c)."""
+    extra = getattr(ship, "extra", None) or {}
+    runner = extra.get("evolutions")
+    out: list[str] = []
+    if runner is not None and hasattr(runner, "work"):
+        for inst in runner.work():
+            c = prefix + runner.doing(inst)
+            if c not in out:
+                out.append(c)
+    if bare_belay and out:
+        out += ["belay that", "belay all work"]
+    return out
 
 
 def _sets_hands_to_work(order: str) -> bool:

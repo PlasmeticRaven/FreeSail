@@ -109,6 +109,19 @@ A course's yard does not hoist: its tack is hauled aboard and its sheet aft inst
 
 Every step has its time (about four and a half minutes for a topsail, three for a course or a spanker, under two for a jib, four for a studding sail, five for a reef), scaled up to double in a strong breeze and a heavy heel, and taken with the hands the file asks for. Short-handed, the work goes slower and the log says so; with too few it waits for hands, and all hands called do it at the file's pace (chapter 6).
 
+### Belaying work
+
+Work in hand, or waiting for hands, is stopped with `belay`. "Avast" is the period's word, "the order to stop, or pause, in any exercise" (Falconer, *Avast*); "belay that" is the sea's later way of saying it, and both are taken. Name the work as the log names it (`belay setting the mainsail`) or as you ordered it, by its kind (`belay the reef`) or by its sail (`belay the mainsail`, every job on it); `belay that`, or a bare `belay`, stops the last order whose work is still in hand or waiting, and `belay all work` everything. Belayed work is gone, not paused as "Ready about!" pauses it (chapter 6): its hands are free, and the steps finished stay done, so a topsail belayed after the topmen loosed it hangs from the yard until you set or furl it. Said of a line, `belay` is the line order it always was. The schooner's watch, told to set three sails at once:
+
+```
+* Morning watch (04:10)  Not hands enough on deck to set the mainsail; the watch is setting the fore topsail and the foresail.
+  Morning watch (04:10)  Order: belay setting the mainsail.
+* Morning watch (04:10)  Belayed setting the mainsail; not begun, it was waiting for hands.
+  Morning watch (04:11)  Laid aloft and loosed the fore topsail.
+  Morning watch (04:11)  Order: belay all work.
+* Morning watch (04:11)  Belayed all work, the ship left as she is: setting the fore topsail (the fore topsail left loosed and hanging from the yard) and setting the foresail (the foresail left furled).
+```
+
 ## Reefing
 
 "The intention of the reef is to reduce the surface of the sail in proportion to the increase of the wind; for which reason there are several reefs parallel to each other in the superior sails" (Falconer, *Reef*). The topsails have three reef bands; the courses one; the spanker two; the schooner's mainsail three and her foresail and topsail two. Royals, topgallants and head sails have none and cannot be reefed.

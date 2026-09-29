@@ -13,6 +13,7 @@ the runner the World's clock (the lead adds that line to `session.py`), so these
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any
 
 import pytest
@@ -705,3 +706,183 @@ def test_a_sail_set_from_the_gear_skips_the_stow_and_wants_no_hands_aloft(case):
     started = [e.text for e in gear_log if e.kind == "evolution.started"]
     assert started[0] == start_gear
     assert "Laid aloft and loosed" not in " ".join(e.text for e in gear_log)
+
+
+# ---------------------------------------------------------------------------
+# Belaying work, and a party too small refused at once (package 29c, playtest 8)
+# ---------------------------------------------------------------------------
+
+DAYTIME = datetime(1805, 6, 1, 10, 0, 0)  # the idlers are on deck by day
+
+
+def three_sails_on_the_schooner():
+    """The schooner's watch told to set three sails at once: the fore topsail and the
+    foresail begin, the mainsail waits for hands (as above)."""
+    w = world(SCHOONER)
+    for order in ("set the fore topsail", "set the foresail", "set the mainsail"):
+        w.submit(order)
+    snap = {s["subject"]: s for s in runner_of(w).in_progress()}
+    assert snap["main.sail"]["waiting_for"] == "hands"
+    return w
+
+
+def belayed_lines(w, n0: int) -> list:
+    return [e for e in log_after(w, n0) if e.kind == "work.belayed"]
+
+
+@pytest.mark.parametrize(
+    "said",
+    [
+        "belay setting the mainsail",  # as the log names it
+        "belay set the mainsail",  # as the order gave it
+        "belay the mainsail",  # by its sail: every job on it
+        "cancel setting the mainsail",
+        "avast setting the mainsail",
+        "belay the work on the mainsail",
+    ],
+)
+def test_belay_the_work_by_its_name_its_order_or_its_sail(said):
+    """Work waiting for hands is gone at the captain's word, and the sail it held is free
+    (playtest 8: the mainsail held for a session by a reef that waited for hands)."""
+    w = three_sails_on_the_schooner()
+    runner = runner_of(w)
+    n0 = len(w.log)
+    e = w.submit(said)
+    assert e.kind == "work.belayed" and e.severity.value == "notable"
+    assert e.text == "Belayed setting the mainsail; not begun, it was waiting for hands."
+    assert e.data["belayed"][0]["was"] == "waiting"
+    assert [s["subject"] for s in runner.in_progress()] == ["fore.topsail", "fore.sail"]
+    assert w.ship.sails["main.sail"].state is SailState.FURLED
+    assert [x.text for x in belayed_lines(w, n0)] == [e.text]
+    assert w.journal[-1][2] == said  # an order, journaled
+    tick_until_idle(w)
+    assert w.ship.sails["main.sail"].state is SailState.FURLED  # gone, not paused
+    assert "evolution.belayed" not in [x.kind for x in log_after(w, n0)]
+
+
+def test_a_sail_half_set_is_left_as_its_last_finished_step_left_it():
+    w = three_sails_on_the_schooner()
+    runner = runner_of(w)
+    crew = w.ship.extra["crew"]
+    top = w.ship.sails["fore.topsail"]
+    while top.state is SailState.FURLED:  # the topmen lay aloft and loose it
+        w.tick()
+    assert top.state is SailState.LOOSED
+    w.run(5)  # into the next step, which has not finished
+    e = w.submit("belay the fore topsail")
+    assert e.text == (
+        "Belayed setting the fore topsail; the fore topsail left loosed and hanging from the yard."
+    )
+    assert e.data["belayed"][0]["was"] == "in hand" and e.data["belayed"][0]["state"] == "loosed"
+    assert "fore.topsail" not in [s["subject"] for s in runner.in_progress()]
+    inst_ids = {i.inst_id for i in runner.instances}
+    assert all(s.at is None or s.at in inst_ids for s in crew.sailors)  # its hands released
+    tick_until_idle(w)
+    assert top.state is SailState.LOOSED  # nothing of it resumes
+    assert w.ship.sails["main.sail"].state is SailState.SET  # the mainsail had its hands
+
+
+def test_belay_that_is_the_last_order_whose_work_is_still_in_hand_or_waiting():
+    w = world(FRIGATE)
+    runner = runner_of(w)
+    w.submit("set the courses")
+    w.submit("set the topsails")  # one order, three evolutions
+    w.submit("set the jib")
+    while w.ship.sails["jib"].state is not SailState.SET:
+        w.tick()
+    # the jib is set and done: the last order with work in hand is the topsails'
+    topsails = ["fore.topsail", "main.topsail", "mizzen.topsail"]
+    courses = {"fore.course", "main.course"}
+    assert {s["subject"] for s in runner.in_progress()} == set(topsails) | courses
+    e = w.submit("belay that")
+    assert e.kind == "work.belayed"
+    assert e.text.startswith("Belayed setting the fore topsail (the fore topsail left ")
+    assert [b["subject"] for b in e.data["belayed"]] == topsails
+    assert {s["subject"] for s in runner.in_progress()} == courses
+    e = w.submit("belay")  # said bare, it is "belay that": now the courses
+    assert e.kind == "work.belayed" and {b["subject"] for b in e.data["belayed"]} == courses
+    e = w.submit("belay that")
+    assert e.kind == "order.rejected"
+    assert e.text.endswith("There is no work in hand or waiting to belay.")
+
+
+def test_belay_all_work_leaves_the_ship_as_she_is_and_keeps_the_line_verb():
+    w = three_sails_on_the_schooner()
+    w.run(30)
+    e = w.submit("cancel all orders")
+    assert e.kind == "work.belayed"
+    assert e.text.startswith("Belayed all work, the ship left as she is: setting the ")
+    assert "setting the mainsail (not begun, it was waiting for hands)" in e.text
+    assert runner_of(w).in_progress() == []
+    assert all(s.at is None for s in w.ship.extra["crew"].sailors)
+    # a line is still belayed at its pin
+    e = w.submit("belay the main sheet")
+    assert e.kind == "line.belay"
+    # the forms the captain of playtest 8 reached for (the save's inputs) are all taken
+    for said in ("Belay that", "Belay", "Belay all", "Belay all work", "Cancel all work"):
+        e = w.submit(said)
+        assert e.kind == "order.rejected", said
+        assert e.text.endswith("There is no work in hand or waiting to belay."), said
+
+
+def test_belaying_a_tack_is_not_the_tacks_belay_and_the_work_it_held_resumes():
+    """Decision 25's belay (all hands about ship) keeps its line and its hold; belaying the
+    tack at the captain's word lets the work it held take up again."""
+    w = close_hauled_frigate()
+    runner = runner_of(w)
+    w.submit("take in the fore topgallant")
+    tick_until_idle(w)
+    w.submit("set the fore topgallant")
+    w.run(60)
+    n0 = len(w.log)
+    w.submit("tack ship")
+    w.run(20)
+    held = [e.text for e in log_after(w, n0) if e.kind == "evolution.belayed"]
+    assert held == ["Belayed setting the fore topgallant: all hands about ship."]
+    e = w.submit("belay that")
+    assert e.kind == "work.belayed"
+    assert e.text.startswith("Belayed tacking ship; the helm and the yards left as they stand")
+    assert [s["id"] for s in runner.in_progress()] == ["set_square"]
+    tick_until_idle(w)
+    assert w.ship.sails["fore.topgallant"].state is SailState.SET
+
+
+def test_belaying_refuses_in_words_and_names_the_work_in_hand():
+    w = world(SCHOONER)
+    e = w.submit("belay the reef")
+    assert e.kind == "order.rejected"
+    assert e.text.endswith("There is no work in hand or waiting to belay.")
+    w.submit("set the jib")
+    e = w.submit("belay the reef in the mainsail")
+    assert e.kind == "order.rejected"
+    assert "Nothing in hand or waiting is reefing the mainsail." in e.text
+    assert e.text.endswith("The work in hand: setting the jib.")
+    e = w.submit("belay the work")
+    assert e.kind == "order.rejected"
+    assert e.text.split("): ", 1)[1].startswith("Belay which work?")
+
+
+def test_a_named_party_that_cannot_man_the_job_is_refused_at_once():
+    """Playtest 8: 'reef the mainsail, one reef with the idlers' waited for hands the
+    schooner's idlers could never give. A party with fewer than half the hands the work
+    wants is refused, with the numbers; the general case still waits (spec M3 §3.2)."""
+    w = world(SCHOONER, start_time=DAYTIME)
+    crew = w.ship.extra["crew"]
+    idlers = [s for s in crew.sailors if s.station is Station.IDLERS and s.fit]
+    assert len(idlers) == 4
+    w.submit("set the mainsail")
+    w.submit("set the jib")
+    tick_until_idle(w)
+    e = w.submit("reef the mainsail, one reef with the idlers")
+    assert e.kind == "order.rejected"
+    assert e.text == (
+        "Order not carried out ('reef the mainsail, one reef with the idlers'): The idlers "
+        "are four; reefing the mainsail wants ten. Call all hands, or name the watch."
+    )
+    assert runner_of(w).in_progress() == []  # not queued
+    # half the hands wanted is enough to begin, short-handed: the idlers take in the jib
+    assert w.submit("take in the jib with the idlers").kind != "order.rejected"
+    tick_until_idle(w)
+    # a watch that can man it is taken as ever
+    e = w.submit("reef the mainsail, one reef with the starboard watch")
+    assert e.kind != "order.rejected"
