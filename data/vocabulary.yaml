@@ -375,6 +375,37 @@ verbs:
     synonyms: [relieve the deck, change the watch]
     object: none
     level: 1
+  # Belaying work (package 29c, playtest 8: a reef waiting for hands the idlers could never
+  # give held the mainsail for the rest of a session, and eleven forms of "belay" and
+  # "cancel" were refused). The work is gone, not paused; what a finished step did stays
+  # done. The period's word to stop any operation is "avast" ("the order to stop, or
+  # pause, in any exercise": Falconer 1780, *Avast*; "the command to stop, or cease, in any
+  # operation": Steel 1794, vol. II, *Avast!*); "belay that" is the sea's later use of the
+  # word for the same, and the one a captain reaches for; "cancel" is the landsman's, and
+  # is taken too. `freesail/orders/work.py` reads the work named. A bare "belay" or
+  # "avast" is `belay that`, and either said of work belays it ("belay reefing the
+  # mainsail", "avast bracing"); said of a line, "belay" is still the line verb above.
+  belay the work:
+    # `belay <the work>`: the work as the log names it ("reefing the mainsail"), as the
+    # order gave it ("reef the mainsail"), by its kind (`work_nouns`: "the reef") or by its
+    # subject ("the mainsail": every job on that sail). Mostly said as "belay ...".
+    synonyms: [belay the work on, belay the work in, belay work on, belay the order to,
+               cancel, cancel the order to, cancel the work on, avast the work on]
+    object: work
+    level: 1
+  belay that:
+    # The last order given whose work is still in hand or waiting.
+    synonyms: [belay, belay that order, belay the last order, belay there, avast there,
+               avast that, cancel that, cancel that order, cancel the last order]
+    object: none
+    level: 1
+  belay all work:
+    # Everything in hand or waiting, the ship left as she is.
+    synonyms: [belay all, belay all orders, belay all the work, belay everything,
+               belay the lot, avast all, avast all work, cancel all orders, cancel all work,
+               cancel orders, cancel all, cancel everything]
+    object: none
+    level: 1
   # A query, not an order: the console answers it with the watch bill, as it
   # answers `state`, and it is never journaled. Should it reach the ship (the
   # browser's command line), the ship says it is the console's.
@@ -774,5 +805,20 @@ hands_selectors:
   waisters: waisters
   marines: marines
   idlers: idlers
+# Kinds of work by a noun, for `belay the reef` (package 29c): the noun and the verb
+# whose evolutions it names. "Belay the reef in the mainsail" names its sail too.
+work_nouns:
+  reef: reef
+  reefs: reef
+  reefing: reef
+  furl: furl
+  furling: furl
+  trim: trim
+  bracing: brace
+  tack: tack ship
+  wear: wear ship
+  bend: bend
+  bending: bend
+  shift: shift
 # Words between "send the ... " and the order: "aloft to", "forward to", "to".
 send_directions: [aloft, up aloft, up, forward, aft, on deck, into the tops, into the rigging]

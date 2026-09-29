@@ -47,7 +47,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from freesail import units
-from freesail.orders import errors
+from freesail.orders import errors, work
 from freesail.orders.errors import OrderError
 from freesail.orders.resolve import compound_span, noun_table
 from freesail.orders.vocabulary import (
@@ -121,7 +121,20 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
     words = segments[0]
 
     verb_phrase, verb = _match_verb(words, vocab)
+    rest = words[len(verb_phrase.split()) :]
+    if verb == "belay" and verb_phrase in work.STOP_WORDS:
+        # a bare "belay" or "avast", or one said of work, belays work (package 29c); said
+        # of a line it is the line verb, as it always was
+        verb = work.reading(ship, [*rest, *(w for seg in segments[1:] for w in seg)], vocab)
     spec = vocab.verbs[verb]
+    if spec.object == "work":
+        said = ", ".join(" ".join(seg) for seg in [rest, *segments[1:]] if seg)
+        return Order(
+            text=norm.replace(" , ", ", "),
+            verb=verb,
+            verb_phrase=verb_phrase,
+            object=said or None,
+        )
     if spec.level == "driver":
         raise OrderError(
             f"'{verb_phrase}' is a console command, not an order to the ship; "
@@ -137,7 +150,6 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
             f"'{verb_phrase}' is a sentence of the standing dialect, not a plain order: "
             f'standing order "night routine": at sunset then take in the royals.'
         )
-    rest = words[len(verb_phrase.split()) :]
     canvas: dict[str, Any] = {}
     if verb in CANVAS_VERBS:
         rest, canvas = _take_canvas_words(rest)

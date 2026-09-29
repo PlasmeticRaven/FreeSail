@@ -99,8 +99,9 @@ AGENT_LOG_KINDS: tuple[str, ...] = (
 # `show the <station>'s journal` is answered as `query.journal`, a query like `state`.
 
 # The kinds of an order's own line that are notable rather than routine: the captain's word
-# to a station (package 29, the owner's ruling: a `tell` is seen in the log at any speed).
-NOTABLE_ORDER_KINDS = frozenset({"agent.told"})
+# to a station (package 29, the owner's ruling: a `tell` is seen in the log at any speed),
+# and work belayed at his word, with how it was left (package 29c).
+NOTABLE_ORDER_KINDS = frozenset({"agent.told", "work.belayed"})
 
 
 class World:

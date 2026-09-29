@@ -70,6 +70,15 @@ def handle(ship: Ship, text: str) -> tuple[str, str, dict[str, Any]]:
         return stations.handle(ship, text)
     vocab = load_vocabulary()
     order = parse(ship, text, vocab)
+    runner = ship.extra.get("evolutions") if hasattr(ship, "extra") else None
+    giving = getattr(runner, "giving", None)
+    if giving is None:
+        return _carry_out(ship, order, vocab)
+    with giving(text):  # its evolutions carry the order's number, for `belay that`
+        return _carry_out(ship, order, vocab)
+
+
+def _carry_out(ship: Ship, order: Order, vocab: Vocabulary) -> tuple[str, str, dict[str, Any]]:
     if order.verb in vocab.group_evolutions:
         return _group_evolution(ship, order, vocab)
     return verbs.execute(ship, order, vocab)

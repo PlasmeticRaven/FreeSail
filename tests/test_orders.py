@@ -1402,3 +1402,63 @@ def test_decimal_headings_survive_normalisation():
     assert "280" in text and abs(units.rad_to_deg(ship.dyn.target_heading) - 280.0) < 1e-6
     _, text, data = orders.handle(ship, "steer 280.5")
     assert abs(units.rad_to_deg(ship.dyn.target_heading) - 280.5) < 1e-6
+
+
+# ---------------------------------------------------------------------------
+# Belaying work (package 29c): which verb a "belay" is
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "text, verb, obj",
+    [
+        # the bare word to stop is "belay that": the last order's work
+        ("belay", "belay that", None),
+        ("Belay!", "belay that", None),
+        ("avast", "belay that", None),
+        ("belay that", "belay that", None),
+        ("belay that order", "belay that", None),
+        ("cancel that", "belay that", None),
+        ("belay there", "belay that", None),
+        # everything in hand or waiting
+        ("belay all work", "belay all work", None),
+        ("belay all", "belay all work", None),
+        ("belay all orders", "belay all work", None),
+        ("cancel all orders", "belay all work", None),
+        ("cancel all work", "belay all work", None),
+        ("cancel orders", "belay all work", None),
+        ("avast all", "belay all work", None),
+        # the work by its name, its order, its kind or its sail
+        ("belay reefing the mainsail", "belay the work", "reefing the mainsail"),
+        ("belay reef the mainsail, one reef", "belay the work", "reef the mainsail, one reef"),
+        ("belay the reef", "belay the work", "the reef"),
+        ("belay the mainsail", "belay the work", "the mainsail"),
+        ("avast bracing", "belay the work", "bracing"),
+        ("cancel the reef in the mainsail", "belay the work", "the reef in the mainsail"),
+        ("belay the work on the jib", "belay the work", "the jib"),
+        # a line is still the line verb
+        ("belay the jib sheet", "belay", "jib sheet"),
+        ("belay the main sheet", "belay", "main sheet"),
+        ("make fast the jib sheet", "belay", "jib sheet"),
+    ],
+)
+def test_belay_is_read_as_work_or_as_a_line(text, verb, obj):
+    ship, _ = make("schooner")
+    order = parse(ship, text)
+    assert order.verb == verb
+    assert order.object == obj
+
+
+def test_a_belay_that_names_nothing_is_the_line_verbs_refusal():
+    """Words that read as neither work nor a line are left to the line verb, whose
+    refusal names the nearest lines."""
+    ship, _ = make("schooner")
+    with pytest.raises(UnknownNounError, match="did you mean the main sheet"):
+        parse(ship, "belay the mian sheet")
+
+
+def test_belaying_with_no_runner_that_keeps_work_is_refused_in_words():
+    ship, _ = make("frigate")
+    ship.extra.pop("evolutions")
+    with pytest.raises(OrderError, match="no evolution runner"):
+        orders.handle(ship, "belay that")

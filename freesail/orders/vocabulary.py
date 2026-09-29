@@ -26,7 +26,7 @@ class VerbSpec:
 
     name: str
     synonyms: tuple[str, ...]
-    object: str  # sail | yards | line | heading | points | none | driver
+    object: str  # sail | yards | line | heading | points | none | work | driver
     level: str  # "0", "1" or "driver"
 
 
@@ -60,6 +60,8 @@ class Vocabulary:
     hands_selectors: dict[str, str] = field(default_factory=dict)
     # the words between "send the larboard watch" and "to": "aloft", "forward"
     send_directions: tuple[str, ...] = ()
+    # kinds of work by a noun, for `belay the reef` (package 29c): "reef" -> "reef"
+    work_nouns: dict[str, str] = field(default_factory=dict)
 
     @property
     def class_bound_take_in_phrases(self) -> frozenset[str]:
@@ -190,4 +192,8 @@ def load_vocabulary(path: str | Path | None = None) -> Vocabulary:
         key(phrase): str(value) for phrase, value in (data.get("hands_selectors") or {}).items()
     }
     vocab.send_directions = _tuple(data.get("send_directions"))
+    for noun, verb in (data.get("work_nouns") or {}).items():
+        if key(verb) not in verbs:
+            raise ValueError(f"{p}: work_nouns gives '{noun}' the verb '{verb}', which is none.")
+        vocab.work_nouns[key(noun)] = key(verb)
     return vocab
