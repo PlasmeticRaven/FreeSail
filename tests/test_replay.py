@@ -89,7 +89,7 @@ STARTER = "data/standing_orders/starter.orders"
 
 def standing_voyage() -> World:
     """Truth 39 (spec M4 §8): the frigate before the wind under all sail, studding sails
-    both sides, from 19:30 on 1 June under the seven starter routines (spec §6; the well's
+    both sides, from 19:30 on 1 June under the starter routines (spec §6; the well's
     is refused at load and not journaled) and an `every` order, through sunset (19:59,
     when the night routine fires) to 20:20, `keep her full` belayed on the way. The
     firings are not journaled; only the orders that gave them are."""
@@ -143,7 +143,7 @@ def test_truth_39_a_passage_under_the_starter_routines_replays_with_the_same_fir
     ], "trim every ten minutes from 19:45; the night routine at sunset, 19:59"
     assert [e.tick for e in original.log if e.kind == "sun.set"] == [1742]
     assert all(not a.startswith("standing order") for _, a, _ in original.journal)
-    assert sum(1 for _, _, t in original.journal if t.startswith("standing order")) == 7
+    assert sum(1 for _, _, t in original.journal if t.startswith("standing order")) == 8
     assert "order.rejected" not in {e.kind for e in original.log}
     path = replay.save_to_file(original, tmp_path / "standing.json")
     data = replay.load_file(path)
@@ -152,6 +152,7 @@ def test_truth_39_a_passage_under_the_starter_routines_replays_with_the_same_fir
         "morning sail",
         "shorten sail for weather",
         "keep her full",
+        "trim on a shift",
         "heavy weather",
         "storm staysail",
         "trim",

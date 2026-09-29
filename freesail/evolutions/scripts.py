@@ -442,6 +442,11 @@ class Script:
     def holds(self) -> set[str]:
         return {self.ship.name}
 
+    def clears(self) -> set[str]:
+        """The parts whose work in hand this script belays when it begins, rather than
+        waiting for it or leaving it to run on (a send-down's sails: see `_Rig.held`)."""
+        return set()
+
     def check(self, words: dict[str, Any]) -> str | None:
         """An extra precondition in code. Returns the reason it fails, or None."""
         return None
@@ -1169,11 +1174,14 @@ class _Rig:
     def held(self, sails: bool = True) -> set[str]:
         """What a send-down or sway-up holds against other evolutions: the masts,
         and the sails on them unless ``sails`` is false. Held, a sail being set
-        is finished first and one ordered meanwhile waits; an all-hands evolution
-        holds the masts alone, for it belays the sail work in hand instead of
-        waiting for it (spec M3 §3.4), and what was belayed is refused when it
-        takes up again on a spar sent down. Not the yards: a brace on one is
-        harmless, and one ordered after it is down is refused."""
+        is finished first and one ordered meanwhile waits. Sending down the
+        topgallant masts holds the masts alone and belays the sail work in hand on
+        those masts' sails instead of waiting for it (`Script.clears`): the masts
+        come down, and a royal cannot be set on a mast being struck; what was
+        belayed is refused when it takes up again on a spar sent down. The rest of
+        the sail work in hand runs on: all hands is a pool action (the owner's
+        ruling of 2026-09-29 at gate 4c, spec M3 §3.4). Not the yards: a brace on
+        one is harmless, and one ordered after it is down is refused."""
         out: set[str] = set()
         for head in self.heads:
             out |= {p.id for p in self.group[head.id]}
@@ -1217,6 +1225,11 @@ class SendDownScript(PhasedScript):
 
     def holds(self) -> set[str]:
         return {self.ship.name} | self.rig.held(bool(self.params.get("hold_sails", True)))
+
+    def clears(self) -> set[str]:
+        if bool(self.params.get("hold_sails", True)):
+            return set()
+        return self.rig.held(sails=True) - self.rig.held(sails=False)
 
     def _what(self) -> str:
         return str(self.params.get("what") or self.mast_cls.replace("_", " ") + "s")
@@ -1354,6 +1367,11 @@ class SwayUpScript(PhasedScript):
 
     def holds(self) -> set[str]:
         return {self.ship.name} | self.rig.held(bool(self.params.get("hold_sails", True)))
+
+    def clears(self) -> set[str]:
+        if bool(self.params.get("hold_sails", True)):
+            return set()
+        return self.rig.held(sails=True) - self.rig.held(sails=False)
 
     def _what(self) -> str:
         return str(self.params.get("what") or self.mast_cls.replace("_", " ") + "s")

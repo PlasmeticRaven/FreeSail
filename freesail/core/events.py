@@ -145,6 +145,18 @@ ROLLUP_PERIOD_S = 3600
 # would read as lost).
 KEPT_ACTORS = frozenset({"captain", "driver"})
 
+# The stations' actors ("the watcher"; officers, a captain and a director later), each added
+# as its station is defined (`agents.agent.Station`), so a new station needs nothing here: a
+# station's own words are kept as the captain's are, never rolled up (the owner, package
+# 29b: at speed a watcher's `say` went into the hour's roll-up instead of showing at once).
+STATION_ACTORS: set[str] = set()
+
+
+def station_actor(name: str) -> str:
+    """The actor a station's lines carry in the log: 'the watcher'."""
+    return f"the {name}"
+
+
 ROLLUP_KIND = "log.rollup"
 
 
@@ -154,9 +166,9 @@ def rolls_up(compression: float) -> bool:
 
 
 def kept(e: Event) -> bool:
-    """A line the roll-up shows as it is: notable and urgent lines, and the captain's and
-    the driver's own."""
-    return e.severity is not Severity.ROUTINE or e.actor in KEPT_ACTORS
+    """A line the roll-up shows as it is: notable and urgent lines, the captain's and the
+    driver's own, and every station's (`STATION_ACTORS`)."""
+    return e.severity is not Severity.ROUTINE or e.actor in KEPT_ACTORS or e.actor in STATION_ACTORS
 
 
 @dataclass(frozen=True)
@@ -386,8 +398,14 @@ def _phrases(by_kind: dict[str, list[Event]]) -> list[str]:
         out.append(_lower_first(take("ship.leeway")[-1].text.rstrip(".")))
     if "wind.gust" in by_kind:
         gusts = take("wind.gust")
-        speeds = [int(m.group(1)) for e in gusts if (m := _GUST.search(e.text))]
-        top = f", the strongest {max(speeds)} knots" if speeds else ""
+        speeds = [(int(m.group(1)), e) for e in gusts if (m := _GUST.search(e.text))]
+        top = ""
+        if speeds:
+            knots, strongest = max(speeds, key=lambda x: x[0])
+            top = f", the strongest {knots} knots"
+            mean = (strongest.data or {}).get("mean_kn")
+            if mean is not None:  # the mean wind it blew over (package 29b)
+                top += f" on a mean of {mean:.0f}"
         out.append(f"{'a gust' if len(gusts) == 1 else f'{len(gusts)} gusts'}{top}")
     take("clock.bell", None)  # the bells are the hour itself
     rest = sum(len(v) for v in by_kind.values())

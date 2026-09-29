@@ -75,7 +75,8 @@ STRAINING_RATIO = DECAY_RATIO
 # 'shaking'; a wind is compared in knots or points.").
 KINDS: dict[str, str] = {
     "speed": "a speed in knots: exceeds, is over, is under, is below",
-    "direction": "a direction: backs or veers N points, is from a compass point",
+    "direction": "a direction: backs, veers or shifts N points, is from a compass point",
+    "gust": "the wind against its ten-minute mean: is a gust, is at the mean, is a lull",
     "angle_on_bow": "an angle on the bow: is forward of or abaft N degrees or the beam",
     "compass": "a compass heading: is a point, is east of or west of a point",
     "angle": "an angle in degrees: exceeds, is over, is under, is below",
@@ -271,6 +272,32 @@ def _true_wind_speed(world: Any, _: str | None) -> float:
 
 def _true_wind_from(world: Any, _: str | None) -> float:
     return world.wind.direction_from  # radians, where it comes from
+
+
+def _wind_record(world: Any) -> Any:
+    return getattr(world, "wind_record", None)
+
+
+def _mean_wind_speed(world: Any, _: str | None) -> float:
+    """The true wind's speed over the last ten minutes (`physics.wind.WindRecord`); the
+    instant's before the first tick."""
+    record = _wind_record(world)
+    mean = record.mean_speed() if record is not None else None
+    return world.wind.effective_speed if mean is None else mean
+
+
+def _mean_wind_from(world: Any, _: str | None) -> float:
+    record = _wind_record(world)
+    mean = record.mean_from() if record is not None else None
+    return world.wind.direction_from if mean is None else mean
+
+
+def _against_mean(world: Any, _: str | None) -> str:
+    """The instant's true wind against its ten-minute mean, in words: 'a gust above the
+    mean', 'at the mean' or 'a lull' (`physics.wind.against_mean`)."""
+    from freesail.physics.wind import against_mean
+
+    return against_mean(world.wind.effective_speed, _mean_wind_speed(world, None))
 
 
 def _before_the_clock(world: Any) -> bool:
@@ -529,6 +556,38 @@ REGISTRY.add(
         description="where the true wind comes from",
     )
 )
+# The mean wind (package 29b, playtest 7's finding 4), beside the instant's: a watcher
+# that reads a single gust as a rise of the wind has the ten minutes' mean and the label.
+REGISTRY.add(
+    Reading(
+        "mean_true_wind_speed",
+        ("the mean wind", "the mean true wind"),
+        "speed",
+        "knots",
+        _mean_wind_speed,
+        description="the true wind's speed over the last ten minutes, gusts and lulls in it",
+    )
+)
+REGISTRY.add(
+    Reading(
+        "mean_true_wind_from",
+        ("the mean wind", "the mean true wind"),
+        "direction",
+        "points",
+        _mean_wind_from,
+        description="where the true wind has come from over the last ten minutes",
+    )
+)
+REGISTRY.add(
+    Reading(
+        "true_wind_against_mean",
+        ("the true wind", "the wind"),
+        "gust",
+        "",
+        _against_mean,
+        description="the true wind now against its ten-minute mean: a gust, the mean, a lull",
+    )
+)
 REGISTRY.add(
     Reading(
         "apparent_wind_angle",
@@ -777,6 +836,8 @@ def describe_value(reading: Reading, value: Any) -> str:
         return f"{value:.2f} of the rating"
     if kind == "hands":
         return f"{value['count']} hands, {value['words']}"
+    if kind == "gust":
+        return str(value)
     if isinstance(value, float):
         return f"{value:g}"
     return str(value)

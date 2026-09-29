@@ -177,6 +177,21 @@ def test_registry_rejects_bad_files():
         registry.parse_evolution({**good, "steps": []})
     with pytest.raises(registry.EvolutionFileError, match="not both"):
         registry.parse_evolution({**good, "script": "tack"})
+    # package 29b: only an all-hands evolution belays the work in hand, and says so plainly
+    with pytest.raises(registry.EvolutionFileError, match="hands: all"):
+        registry.parse_evolution({**good, "belays": True, "crew": {"hands": 12}})
+    with pytest.raises(registry.EvolutionFileError, match="true or false"):
+        registry.parse_evolution({**good, "belays": "yes", "crew": {"hands": "all"}})
+    assert registry.parse_evolution({**good, "belays": True, "crew": {"hands": "all"}}).belays
+
+
+def test_only_the_manoeuvres_belay_the_work_in_hand():
+    """The owner's ruling of 2026-09-29 at gate 4c: a call for all hands is a pool action;
+    "Ready about!" and its kind stop the sail work in hand, a reef or a furl does not."""
+    all_hands = {e.id for e in EVOLUTIONS.values() if str(e.crew.get("hands")) == "all"}
+    belaying = {e.id for e in EVOLUTIONS.values() if e.belays}
+    assert belaying == {"tack", "wear", "boxhaul", "wear_short_round", "lie_a_try"}
+    assert {"reef_square", "furl_all", "send_down_topgallant_masts"} <= all_hands - belaying
 
 
 def test_nominal_durations_are_realistic():

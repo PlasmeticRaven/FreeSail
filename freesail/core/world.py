@@ -17,7 +17,7 @@ from freesail.core.clock import Clock
 from freesail.core.events import Event, Log, Severity
 from freesail.core.rng import Rng
 from freesail.core.sun import DAY, DEFAULT_LATITUDE_DEG, Sun
-from freesail.physics.wind import Wind, WindParams
+from freesail.physics.wind import Wind, WindParams, WindRecord
 from freesail.ship.stub import OrderError, PointShip
 
 ENGINE_VERSION = "0.0.1"
@@ -127,6 +127,8 @@ class World:
             direction, speed = self.weather.at(self.scenario.start_time)
             wind_params.direction_from, wind_params.speed = direction, speed
         self.wind = Wind(wind_params, self.rng.stream("wind"))
+        # the true wind of the last ten minutes, for the mean wind reading (package 29b)
+        self.wind_record = WindRecord()
         self.ship = ship or PointShip(
             x=self.scenario.ship_x,
             y=self.scenario.ship_y,
@@ -330,12 +332,15 @@ class World:
         if self.weather is not None:
             self.wind.follow(*self.weather.at(self.clock.ship_time))
         self.wind.step(1.0)
+        self.wind_record.add(self.wind.effective_speed, self.wind.direction_from)
         if self.wind.gust_started:
+            mean = units.ms_to_knots(self.wind_record.mean_speed() or self.wind.speed)
             self.record(
                 Severity.ROUTINE,
                 "wind.gust",
-                f"A gust: {units.ms_to_knots(self.wind.effective_speed):.0f} knots.",
-                data={"factor": self.wind.gust_factor},
+                f"A gust: {units.ms_to_knots(self.wind.effective_speed):.0f} knots, the mean "
+                f"{mean:.0f}.",
+                data={"factor": self.wind.gust_factor, "mean_kn": round(mean, 1)},
             )
         shift = units.wrap_pi(self.wind.direction_from - self._last_logged_wind_direction)
         if abs(shift) >= self.WIND_SHIFT_LOG_THRESHOLD:

@@ -126,3 +126,42 @@ def test_backing_a_topsail_lays_the_whole_masts_yards_aback():
         p["tack"] == "larboard" for _, _, p in runner.started
     )  # aback from the starboard tack
     assert not any(s.startswith("fore.") for s in subjects)
+
+
+def test_a_trims_braces_log_one_line_when_the_last_is_done():
+    """Playtest 7, finding 6 (package 29b): a trim logged twelve lines as its braces began
+    and twelve as they ended. Now the order's own line says what was ordered, the braces
+    begin without a line each, and one notable line says they are done, its data naming
+    every yard and its angle; a yard trimmed alone still has its own line."""
+    from freesail.api.session import make_world
+    from freesail.core.world import Scenario
+
+    w = make_world(
+        7,
+        "data/ships/frigate-36.yaml",
+        Scenario(wind_from_deg=0, ship_heading_deg=180, gustiness=0, variability=0),
+    )
+    w.submit("set plain sail")
+    w.run(2400)
+    w.wind.direction_from += 0.4
+    w.wind.base_direction += 0.4
+    w.run(5)
+    n0 = len(w.log)
+    w.submit("trim the yards")
+    w.run(900)
+    after = w.log.all()[n0:]
+    said = [e for e in after if e.kind == "sail.trimmed"]
+    assert said and said[0].text.startswith("Braced 12 yards to the wind")
+    assert not [e for e in after if e.text.startswith("Man the") and "braces" in e.text]
+    (braced,) = [e for e in after if e.kind == "yard.braced"]
+    assert braced.severity.value == "notable"
+    assert braced.text.startswith("Braced twelve yards to the wind; ")
+    assert braced.text.endswith(" from square.")
+    yards = [y.id for y in w.ship.spars.values() if y.is_yard]
+    assert sorted(braced.data["subjects"]) == sorted(yards)
+    assert set(braced.data["brace_deg"]) == set(yards)
+    n1 = len(w.log)
+    w.submit("trim the fore yard")
+    w.run(300)
+    alone = [e for e in w.log.all()[n1:] if e.kind == "yard.braced"]
+    assert [e.text.split(";")[0] for e in alone] == ["Braced the fore yard"]

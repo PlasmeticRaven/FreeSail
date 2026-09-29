@@ -183,7 +183,7 @@ class Assignment:
     """The hands an instance holds and how the request came out."""
 
     inst_id: str
-    wanted: int  # hands wanted, after clamping to the company; for all hands, those taken
+    wanted: int  # hands wanted, after clamping to the company; for all hands, the deck's
     hands: list[Sailor] = field(default_factory=list)
     outcome: str = ENOUGH  # ENOUGH, SHORT or TOO_FEW
     available: int = 0  # idle hands on deck that could have been taken, when TOO_FEW
@@ -237,12 +237,17 @@ def request(
     aloft can be taken. Enough or short but workable: the hands taken are marked
     ``at = inst_id``. Too few: nobody is taken, and the assignment says how many there were.
     """
+    on_deck = list(on_deck)
     idle = [s for s in on_deck if s.at is None and can_work(s, aloft)]
     if want.all_hands:
+        # A pool action (the owner's ruling of 2026-09-29 at gate 4c): the idle hands now,
+        # and the rest of the deck as its earlier work finishes (`top_up`). Wanted is every
+        # hand on deck fit for the work, so it begins short while some are at other work.
         for s in idle:
             s.at = inst_id
-        outcome = ENOUGH if idle else TOO_FEW
-        return Assignment(inst_id, len(idle), list(idle), outcome, len(idle), all_hands=True)
+        wanted = _deck_for(on_deck, aloft)
+        outcome = TOO_FEW if not idle else ENOUGH if len(idle) >= wanted else SHORT
+        return Assignment(inst_id, wanted, list(idle), outcome, len(idle), all_hands=True)
     wanted = min(int(want.hands or 0), company_can_give(crew, aloft))
     if wanted <= 0:
         return Assignment(inst_id, 0)
@@ -258,19 +263,27 @@ def request(
     return Assignment(inst_id, wanted, taken, outcome, len(taken))
 
 
+def _deck_for(on_deck: Iterable[Sailor], aloft: bool) -> int:
+    """How many hands on deck could be put to the work, idle or at other work."""
+    return sum(1 for s in on_deck if can_work(s, aloft))
+
+
 def top_up(assignment: Assignment, on_deck: Iterable[Sailor], aloft: bool = False) -> int:
     """An all-hands assignment takes every hand who has come on deck since (the watch
-    below comes up over a minute and a half, spec M3 §4.2). Returns how many joined."""
+    below comes up over a minute and a half, spec M3 §4.2) and every hand whose earlier
+    work has finished (the owner's ruling of 2026-09-29 at gate 4c). Returns how many
+    joined."""
     if not assignment.all_hands:
         return 0
+    on_deck = list(on_deck)
     joined = [s for s in on_deck if s.at is None and can_work(s, aloft)]
     for s in joined:
         s.at = assignment.inst_id
     assignment.hands.extend(joined)
     assignment.hands.sort(key=lambda s: s.id)
-    assignment.wanted = len(assignment.hands)
+    assignment.wanted = max(len(assignment.hands), _deck_for(on_deck, aloft))
     if assignment.hands:
-        assignment.outcome = ENOUGH
+        assignment.outcome = ENOUGH if assignment.got >= assignment.wanted else SHORT
     return len(joined)
 
 
@@ -294,9 +307,13 @@ def crew_factor(assignment: Assignment, want: CrewRequest, aloft: bool) -> float
     its seeded spread, so a request filled at its own rating gives exactly 1.0 (spec §3.3).
 
     An all-hands evolution (``hands: all``) takes the ship's company as it is: its file's
-    durations are the whole company's pace, so its numbers and skill terms are 1.0 and only
-    fatigue slows it (judgement; the spec's mean over a company of marines, idlers and
-    landsmen against the ordinary seaman would make every tack half again as long).
+    durations are the whole company's pace, so its skill term is 1.0 (judgement; the spec's
+    mean over a company of marines, idlers and landsmen against the ordinary seaman would
+    make every tack half again as long). Its numbers term is the hands on deck fit for the
+    work over the hands at it: 1.0 with the whole deck, as always when it is the only work;
+    more while some of the deck is still at earlier work, less as they join (the owner's
+    ruling of 2026-09-29 at gate 4c: a reef begins short and speeds up as the topgallant
+    men come down).
     """
     hands = assignment.hands
     if not hands:
@@ -304,7 +321,7 @@ def crew_factor(assignment: Assignment, want: CrewRequest, aloft: bool) -> float
     mean_fatigue = sum(s.fatigue for s in hands) / len(hands)
     fatigue = 1.0 + FATIGUE_WEIGHT * max(0.0, mean_fatigue - FATIGUE_FRESH)
     if want.all_hands or assignment.all_hands:
-        return fatigue
+        return max(1.0, assignment.wanted / len(hands)) * fatigue
     numbers = max(1.0, assignment.wanted / len(hands))
     reference = rating_skill(want.rating, aloft)
     if reference <= 0.0:

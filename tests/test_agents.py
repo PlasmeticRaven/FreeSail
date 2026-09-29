@@ -394,7 +394,7 @@ def test_the_grammar_page_holds_the_standing_dialect_in_full():
         "striking it takes it out of the book, and its name may be given again." in dialect
     )
     lines = read_orders_file(ROOT / "data/standing_orders/starter.orders")
-    assert len(lines) == 7
+    assert len(lines) == 8
     for line in lines:
         assert f"  {line}" in dialect
         e = world.submit(line)
@@ -765,6 +765,40 @@ def test_stand_by_takes_an_event_or_an_interval_and_refuses_the_rest_in_words():
     assert h.stand_by("a sighting").startswith("There is nothing to sight yet")
     assert h.stand_by("teatime").startswith("'teatime' is not an event or an interval")
     assert "eight bells" in h.stand_by("teatime")
+
+
+def test_stand_by_until_a_strain_warning_wakes_on_the_strain_lines_whatever_their_words():
+    """Playtest 7, finding 7 (package 29b): the event is matched on the log's kind, so 'a
+    strain warning' wakes the watcher on 'bending like a whip' as on any strain line, the
+    grouped line of the royals included; the tool's description and the brief list the
+    event words and say so; 'strain warning' and 'the next strain warning' are the same."""
+    world = point_world()
+    h, fake, _ = stationed(world, [call("stand_by", until="a strain warning"), "Seen."])
+    assert h.agent.standing_by and h.agent.stand_by.event == "a strain warning"
+    calls = fake.calls
+    world.run(30)
+    assert fake.calls == calls
+    world.record(
+        Severity.NOTABLE,
+        "strain.warning",
+        "The fore, main and mizzen royal masts and yards bending like whips; she will carry "
+        "them away if sail is not shortened.",
+        data={"parts": ["fore.royal_mast"]},
+    )
+    world.run(1)
+    assert fake.calls == calls + 1
+    assert data_turns(fake)[-1]["reason"] == "a strain warning"
+    for said in ("strain warning", "the next strain warning", "strain warnings"):
+        h.agent.state = "stationed"
+        assert h.stand_by(said).startswith("Standing by until a strain warning")
+    description = TOOLS["stand_by"].description
+    for words in R.EVENTS:
+        if not R.EVENTS[words].absent:
+            assert f"'{words}'" in description, words
+            assert f"'{words}'" in agent_mod.STAND_BY_WORDS, words
+    assert "bending like a whip" in description and "bending like a whip" in (
+        agent_mod.STAND_BY_WORDS
+    )
 
 
 def test_stand_by_takes_a_severity_and_minutes_in_the_dialects_words():
@@ -1168,6 +1202,43 @@ def test_live_sampling_folds_what_happens_while_the_model_has_the_floor():
     world.run(EVERY)  # the next turn opens (at a notable line or the interval) and waits
     assert h.open_sample is not None and h.open_sample.tick == 2 * EVERY
     assert h.agent.samples == 2
+
+
+def test_a_fold_does_not_put_again_the_question_the_open_turn_carries():
+    """Playtest 7, finding 8 (package 29b): the captain asked at 05:55, the turn opened with
+    the question, and a notable line two ticks later was folded into the open turn while
+    the model wrote its answer; the fold carried the question again, the door showed it
+    with the answer's result, and the model read an answered question as asked once more.
+    A fold holds what is new: the question stays in the merged sample, and it goes into
+    the conversation once, in the turn that put it."""
+    world = frigate_world()
+    h = late(world)
+    h.deliver(Reply())  # the start's turn handed back: the floor is the game's
+    assert h.floor == "game"
+    world.submit("ask the watcher how she goes")
+    assert h.floor == "model" and h.open_sample.question == "how she goes"
+    asked_at = len(h.turns) - 1
+    assert h.turns[asked_at].content["question"] == "how she goes"
+    world.submit("set plain sail")  # notable lines while the model writes its answer
+    folds: list[dict[str, Any]] = []
+    while not folds and world.clock.tick < EVERY:
+        world.run(1)
+        folds = [t.content for t in h.turns[asked_at + 1 :] if t.content.get("folded")]
+    assert folds, "nothing was folded into the open turn"
+    assert all(f["question"] is None for f in folds)
+    assert h.open_sample.question == "how she goes"  # the merged turn still has it
+    h.deliver(reply("", call("answer", text="Under all plain sail.")))
+    h.deliver(Reply())
+    world.run(EVERY)  # later turns open and fold; none puts the answered question
+    put = [
+        i
+        for i, t in enumerate(h.turns)
+        if t.role == DATA and t.content.get("question") == "how she goes"
+    ]
+    assert put == [asked_at]
+    # a second question while the turn is open is new, and the fold puts it
+    world.submit("ask the watcher how she heads")
+    assert h.turns[-1].content["question"] == "how she heads"
 
 
 def test_a_floor_held_silent_for_the_patience_brings_the_nudge_then_the_pause():
@@ -1616,7 +1687,8 @@ def results_in(turns) -> list[Any]:
 def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served():
     """Every size is the text served at `CHARS_PER_TOKEN` characters a token, the one rule:
     a chapter's is what section='all' serves after its line, a topic's what it serves
-    whole; the lead's measure of chapter 3 (about 7,650 tokens) is the rule's."""
+    whole; the lead's measure of chapter 3 (about 7,650 tokens; 7,690 since package 29b
+    said what sending down the topgallant masts belays) is the rule's."""
     world = frigate_world()
     contents = lib(world)
     assert tools.CHARS_PER_TOKEN == 4 and tools.tokens("abcde") == 2
@@ -1628,7 +1700,7 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
         assert f"    primer {n}: {name}, {size} in " in contents
         assert whole.startswith(f"primer {n}: ") and f"the whole chapter: {size}." in whole
     three = (ROOT / "docs/primer/03-making-and-shortening-sail.md").read_text(encoding="utf-8")
-    assert tools.size_words(tools.tokens(three)) == "about 7,650 tokens"
+    assert tools.size_words(tools.tokens(three)) == "about 7,690 tokens"
     grammar = lib(world, topic="grammar", section="all").split("\n\n", 1)[1]
     assert f"{tools.size_words(tools.tokens(grammar))} whole, in 3 parts" in contents
     ship = lib(world, topic="the ship", section="all").split("\n\n", 1)[1]
@@ -1670,7 +1742,7 @@ def test_a_chapter_lists_its_sections_with_sizes_and_serves_one_by_a_word_or_its
     )
     # the primer itself: its introduction in sections, and the chapters with their sizes
     primer = lib(world, topic="primer")
-    assert "  primer 3: making and shortening sail, about 7,650 tokens" in primer
+    assert "  primer 3: making and shortening sail, about 7,690 tokens" in primer
     assert lib(world, topic="primer", section="where to start").startswith("## Where to start")
 
 

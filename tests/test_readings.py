@@ -69,8 +69,14 @@ def test_every_row_of_the_spec_is_registered():
     ):
         assert phrase in words, phrase
     assert {r.kind for r in R.REGISTRY} <= set(R.KINDS)
-    # the true wind is two readings behind one phrase: its speed and its direction
-    assert [r.kind for r in R.REGISTRY.by_words("the true wind")] == ["speed", "direction"]
+    # the true wind is three readings behind one phrase: its speed, its direction, and
+    # (package 29b) the instant's against its ten-minute mean
+    assert [r.kind for r in R.REGISTRY.by_words("the true wind")] == [
+        "speed",
+        "direction",
+        "gust",
+    ]
+    assert [r.kind for r in R.REGISTRY.by_words("the mean wind")] == ["speed", "direction"]
 
 
 def test_absent_readings_carry_their_sentences():
@@ -388,3 +394,92 @@ def test_the_apparent_wind_is_read_before_the_clock_has_run():
     w.tick()
     assert w.readings["apparent_wind_speed"] == pytest.approx(before[1], rel=0.05)
     assert w.readings["apparent_wind_angle"] == w.ship.dyn.apparent_wind_angle
+
+
+# -- the mean wind (package 29b; playtest 7, finding 4) --------------------------------------
+
+
+def gusty_world(seed: int = 1) -> World:
+    return World(seed=seed, scenario=Scenario(wind_speed_kn=20.0, gustiness=1.0, variability=0.3))
+
+
+def test_the_mean_wind_is_the_last_ten_minutes_of_the_true_wind():
+    """The mean true wind beside the instant's: the plain mean of the last ten minutes'
+    speeds, and the direction of their mean vector; before the first tick, the instant's."""
+    from freesail.physics.wind import MEAN_WIND_WINDOW_S
+
+    w = gusty_world()
+    r = w.readings
+    assert r["mean_true_wind_speed"] == w.wind.effective_speed
+    assert r["mean_true_wind_from"] == w.wind.direction_from
+    speeds, dirs = [], []
+    for _ in range(MEAN_WIND_WINDOW_S + 300):
+        w.tick()
+        speeds.append(w.wind.effective_speed)
+        dirs.append(w.wind.direction_from)
+    assert MEAN_WIND_WINDOW_S == 600
+    last, last_dirs = speeds[-600:], dirs[-600:]
+    assert w.readings["mean_true_wind_speed"] == pytest.approx(sum(last) / len(last))
+    east = sum(s * math.sin(d) for s, d in zip(last, last_dirs, strict=True))
+    north = sum(s * math.cos(d) for s, d in zip(last, last_dirs, strict=True))
+    assert w.readings["mean_true_wind_from"] == pytest.approx(
+        units.wrap_2pi(math.atan2(east, north))
+    )
+    # the gusts blew, and the mean is steadier than the instant
+    assert max(last) > 1.1 * min(last)
+    assert [e for e in w.log if e.kind == "wind.gust"]
+
+
+def test_the_label_says_gust_above_the_mean_the_mean_or_a_lull_in_words():
+    from freesail.agents import tools
+
+    w = gusty_world()
+    seen = set()
+    for _ in range(3600):
+        w.tick()
+        label = w.readings["true_wind_against_mean"]
+        seen.add(label)
+        if w.wind.gust_factor >= 1.25 and w.wind_record.mean_speed() < w.wind.speed * 1.1:
+            assert label == "a gust above the mean"
+    assert {"a gust above the mean", "at the mean"} <= seen
+    w.wind.speed = w.wind.base_speed = w.wind.speed * 0.6  # the wind drops away
+    w.wind.gust_factor = 1.0
+    w.wind.gust_remaining = 0.0
+    w.tick()
+    assert w.readings["true_wind_against_mean"] == "a lull"
+    words = tools.readings_words(w)
+    # in the samples and the readings tool, beside the instant's reading
+    assert list(words)[:5] == [
+        "true_wind_speed",
+        "true_wind_from",
+        "mean_true_wind_speed",
+        "mean_true_wind_from",
+        "true_wind_against_mean",
+    ]
+    assert words["true_wind_against_mean"] == "a lull"
+    assert words["mean_true_wind_speed"].endswith(" knots")
+
+
+def test_the_gust_line_names_the_mean_and_the_dialect_reads_the_mean_and_the_label():
+    from freesail.standing.grammar import parse_condition
+
+    w = gusty_world()
+    w.run(1800)
+    gusts = [e for e in w.log if e.kind == "wind.gust"]
+    assert gusts and all(", the mean " in e.text for e in gusts)
+    assert all("mean_kn" in e.data for e in gusts)
+    c = parse_condition("the mean wind exceeds 30 knots and the true wind is not a gust")
+    assert [(x.reading, x.comparison.op) for x in c.clauses] == [
+        ("mean_true_wind_speed", "gt"),
+        ("true_wind_against_mean", "is_not"),
+    ]
+    for said, value in (
+        ("is a lull", "a lull"),
+        ("is a gust", "a gust above the mean"),
+        ("is at the mean", "at the mean"),
+    ):
+        clause = parse_condition(f"the true wind {said}").clauses[0]
+        assert (clause.reading, clause.comparison.value) == ("true_wind_against_mean", value)
+    # the true wind's speed is read as before
+    clause = parse_condition("the true wind is under 20 knots").clauses[0]
+    assert clause.reading == "true_wind_speed"

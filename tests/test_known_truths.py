@@ -153,6 +153,12 @@ def events(world, kind: str, after: int = 0):
     return [e for e in world.log if e.kind == kind and e.tick > after]
 
 
+def warned(e) -> list[str]:
+    """The parts a strain warning names: one, or those a grouped line names (package 29b:
+    the parts that strain the same way on one tick are one line)."""
+    return list((e.data or {}).get("parts") or [e.subject])
+
+
 def reading(world) -> dict:
     d = world.ship.dyn
     return {
@@ -331,7 +337,9 @@ def test_truth_8_heel_in_a_breeze_and_in_a_gale(frigate_polar):
     world = under_plain_sail(FRIGATE, 270.0, knots_=30.0)
     assert abs(math.degrees(world.ship.dyn.heel)) >= 20.0
     all_set = max(e.tick for e in events(world, "sail.set"))
-    warnings = [e for e in events(world, "strain.warning") if "topgallant" in (e.subject or "")]
+    warnings = [
+        e for e in events(world, "strain.warning") if any("topgallant" in p for p in warned(e))
+    ]
     assert warnings, "no strain warning on the topgallant gear"
     assert warnings[0].tick - all_set <= 300
 
@@ -720,6 +728,70 @@ def test_truth_19_a_tack_belays_the_royals_being_set_and_they_resume_after():
     run(world, 900)
     resumed = [e for e in events(world, "sail.set", after=tacked_at) if "royal" in e.text]
     assert len(resumed) == len(belayed), "not every belayed royal was set after"
+
+
+def test_shorten_sail_takes_in_the_topgallants_while_the_reef_is_taken_and_the_reef_speeds_up():
+    """Package 29b, the owner's ruling of 2026-09-29 at gate 4c (playtest 7, finding 2):
+    a call for all hands is a pool action. "Shorten sail for weather" as the starter book
+    has it fires in 32 knots with the frigate under plain sail by day: the topgallants
+    start first, in the book's order, with hands of the watch; the reef calls all hands
+    and begins short, with the idle hands and the watch below as it comes up; the
+    topgallants come in while the reef is being taken, not after it, and their hands join
+    it, which speeds it to the whole deck's pace. Nothing is belayed, and the hands are
+    piped down once, when the last topsail is reefed."""
+    from freesail.crew import hands
+
+    line = (
+        'standing order "shorten sail for weather": when the true wind exceeds 30 knots for '
+        "2 minutes then take in the studdingsails; take in the royals; take in the "
+        "topgallants; reef the topsails, one reef"
+    )
+    world = from_rest(FRIGATE, heading_deg=180.0, knots_=18.0, start=datetime(1805, 6, 1, 10))
+    world.submit("set plain sail")
+    until_idle(world, 3600)
+    run(world, 300)
+    runner = world.ship.extra["evolutions"]
+    assert all(world.ship.sails[s].is_set for s in world.ship.groups["topgallants"])
+    world.submit(line)
+    start = world.clock.tick
+    blow(world, 32.0)
+    factors: list[tuple[int, int, int, float]] = []  # tick, hands at it, the deck's, factor
+    for _ in range(1800):
+        world.tick()
+        reef = next((i for i in runner.instances if i.evo.id == "reef_square"), None)
+        if reef is not None and reef.subject_id == "fore.topsail" and not reef.waiting:
+            a = reef.assignment
+            factors.append(
+                (world.clock.tick, a.got, a.wanted, hands.crew_factor(a, reef.want, True))
+            )
+        if not runner.instances and factors:
+            break
+    fired = by_order(world, "shorten sail for weather")
+    assert [text.split(": ")[1] for _, text in fired] == [
+        "taking in the topgallants.",
+        "reefing the topsails, one reef.",
+    ]
+    began = factors[0][0]
+    taken_in = [e.tick for e in events(world, "sail.taken_in", after=start)]
+    reefed = [e.tick for e in events(world, "sail.reefed", after=start)]
+    assert len(taken_in) == 3 and len(reefed) == 3
+    # the topgallants in while the fore topsail is being reefed, not after it
+    assert began <= min(taken_in) and max(taken_in) < min(reefed)
+    assert events(world, "evolution.belayed", after=start) == []
+    # the reef begins short (part of the deck at the topgallants) and speeds up as the
+    # watch below comes up and the topgallant men come down, to the whole deck's pace
+    _, got0, deck0, first = factors[0]
+    assert got0 < deck0 and first > 1.1
+    shorts = [e for e in events(world, "evolution.short_handed", after=start)]
+    assert any("fore topsail" in e.text and "topgallant" in e.text for e in shorts)
+    assert [f for _, _, _, f in factors] == sorted((f for _, _, _, f in factors), reverse=True)
+    joined = next(t for t, got, deck, _ in factors if got == deck)
+    assert max(taken_in) <= joined < min(reefed)
+    assert factors[-1][3] == pytest.approx(1.0, abs=0.02)
+    # one call and one pipe-down for the three topsails
+    assert len(events(world, "crew.all_hands", after=start)) == 1
+    piped = events(world, "crew.piped_down", after=start)
+    assert [e.tick for e in piped] == [max(reefed)]
 
 
 def morning_crew_factor(calls: bool) -> tuple[float, float]:
@@ -1227,7 +1299,7 @@ def test_truth_31_the_catharpins_brace_the_main_yard_four_degrees_sharper_and_ra
     rise = mast.strain_ratio / before_ratio
     assert 1.0 / 0.9 <= rise <= 1.5, f"strain ratio {before_ratio:.3f} to {mast.strain_ratio:.3f}"
     assert mast.strain_ratio < 0.5
-    assert not [e for e in world.log if e.kind == "strain.warning" and e.subject == mast.id]
+    assert not [e for e in world.log if e.kind == "strain.warning" and mast.id in warned(e)]
 
 
 def test_truth_31_with_the_catharpins_in_she_lies_a_little_closer(
@@ -1805,6 +1877,12 @@ LOST = ("sail.blown_out", "spar.carried_away", "line.parted")
 GATE_DAY_SUNSET_TICK = 57052
 GATE_DAY_HEAVY_WEATHER_TICK = 74336
 GATE_DAY_TOPGALLANTS_AGAIN_TICK = 95650
+# Package 29b (all hands a pool action; trim on a shift; the grouped lines): the three
+# ticks above did not move; "shorten sail for weather" fires three times, at 21:43:57,
+# 22:16:13 and 22:56:28 (twice in package 29's last measurement, at the first and the
+# third), and "trim on a shift" four times (20:42, 21:58, 22:57, 23:55) as the wind veers
+GATE_DAY_SHORTEN_SAIL_TICKS = [63837, 65773, 68188]
+GATE_DAY_TRIM_ON_A_SHIFT_TICKS = [60148, 64720, 68248, 71749]
 
 
 def the_gate_day(until: int = GATE_DAY_TICKS, saves: tuple[int, ...] = GATE_DAY_SAVES):
@@ -1874,26 +1952,35 @@ def test_truth_48_the_gates_day_under_the_standing_orders(gate_day):
     assert units.describe_wind_strength(wind) == "a fresh breeze"
 
     heavy = by_order(world, "heavy weather")
-    # all four orders carried out on the one tick: the masts down, the fore topmast staysail
-    # in, the storm staysail bent, the topsails close-reefed (the starter's "shorten sail for
-    # weather" had fired twice by then, two reefs in; with the topgallants in its line it
-    # fires twice in this day where the first measurement, with the topgallants a separate
-    # order of the captain's, had it fire three times and the close reef refused)
-    assert [t for t, _ in heavy] == [GATE_DAY_HEAVY_WEATHER_TICK] * 4
+    # its four orders on the one tick: the masts down, the fore topmast staysail in, the
+    # storm staysail bent, and the close reef refused in words because the topsails are
+    # close-reefed already. Package 29b: with all hands a pool action the reefs are done
+    # sooner and the starter's "shorten sail for weather" stands again sooner, so it fires
+    # three times in the first watch (21:43, 22:16, 22:56), three reefs in by 23:22, as the
+    # first measurement of package 29 had it; package 29 after the topgallants moved into
+    # its line had it fire twice and the close reef carried out (docs/dev/TuningNotes.md)
+    assert [t for t, _ in heavy] == [GATE_DAY_HEAVY_WEATHER_TICK] * 3
     assert [text.split(": ")[1] for _, text in heavy] == [
         "sending down the topgallant masts.",
         "taking in the fore topmast staysail.",
         "bending the fore storm staysail.",
-        "close reefing the topsails.",
     ]
+    refused = [x for x in refused_by_order(world, "heavy weather") if x[0] == heavy[0][0]]
+    assert len(refused) == 1 and "close reef the topsails" in refused[0][1]
+    assert "already close reefed" in refused[0][1]
+    shorten = sorted({t for t, _ in by_order(world, "shorten sail for weather")})
+    assert shorten == GATE_DAY_SHORTEN_SAIL_TICKS
+    assert all(world.ship.sails[s].reefs == 0 for s in world.ship.groups["topsails"])
     # (and at 03:22, the wind under forty for the dwell and over it again, the routine fires
     # once more and all four are refused in words: everything is done already)
-    assert [x for x in refused_by_order(world, "heavy weather") if x[0] == heavy[0][0]] == []
     fired = world.clock.start + timedelta(seconds=heavy[0][0])
     assert units.watch_of(fired)[1] == "Middle watch"
     implied = script_implies(sf, 40.0, datetime(1805, 6, 1, 20, 0)) + timedelta(minutes=5)
     assert abs((fired - implied).total_seconds()) <= 15 * 60, (fired, implied)
     assert not any(world.ship.spars[m].sent_down for m in world.ship.groups["topgallant masts"])
+
+    # the yards trimmed to the wind as it veered west to north-west (package 29b)
+    assert [t for t, _ in by_order(world, "trim on a shift")] == GATE_DAY_TRIM_ON_A_SHIFT_TICKS
 
     again = by_order(world, "topgallants again")
     assert again and again[0][0] == GATE_DAY_TOPGALLANTS_AGAIN_TICK < SECOND_FORENOON
@@ -1937,7 +2024,7 @@ def test_truth_50_at_three_hundred_times_the_log_shows_hourly_rollups_and_every_
     that has routine lines has exactly one roll-up, closed at the hour, whose count is its
     routine lines; and nothing is dropped. Measured: 29 roll-ups for 29 hours, the day's
     routine lines summed in them (the counts in docs/dev/TuningNotes.md, M4c)."""
-    from freesail.core.events import KEPT_ACTORS, Event, Rollup, kept, rollup
+    from freesail.core.events import KEPT_ACTORS, STATION_ACTORS, Event, Rollup, kept, rollup
 
     world, _, _ = gate_day
     log = world.log.all()
@@ -1945,7 +2032,9 @@ def test_truth_50_at_three_hundred_times_the_log_shows_hourly_rollups_and_every_
     lines = [x for x in shown if isinstance(x, Event)]
     rolls = [x for x in shown if isinstance(x, Rollup)]
     assert lines == [e for e in log if kept(e)]
-    assert all(e.severity is not Severity.ROUTINE or e.actor in KEPT_ACTORS for e in lines)
+    assert all(
+        e.severity is not Severity.ROUTINE or e.actor in KEPT_ACTORS | STATION_ACTORS for e in lines
+    )
     hours = sorted({e.ship_time.replace(minute=0, second=0) for e in log if not kept(e)})
     assert [r.start for r in rolls] == hours
     assert len(rolls) == GATE_DAY_TICKS // 3600 + 1  # the last is the 09:00 bell's hour

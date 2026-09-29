@@ -21,7 +21,7 @@ from enum import Enum
 from typing import Any
 
 from freesail.api import readings as R
-from freesail.core.events import Severity
+from freesail.core.events import STATION_ACTORS, Severity, station_actor
 
 __all__ = [
     "A_GLASS_S",
@@ -192,9 +192,13 @@ class Station:
     patience_s: int
     brief: str
 
+    def __post_init__(self) -> None:
+        # the station's lines are kept as they are at any speed (package 29b)
+        STATION_ACTORS.add(station_actor(self.name))
+
     @property
     def title(self) -> str:
-        return f"the {self.name}"
+        return station_actor(self.name)
 
     def save(self) -> dict[str, Any]:
         return {
@@ -244,9 +248,12 @@ def watcher(policy: SamplingPolicy | None = None, patience_s: int = A_WATCH_S) -
 # `stand_by` tool's description (package 28c; the owner's ruling: urgent wakes; notable
 # is bundled and shown).
 STAND_BY_WORDS = (
-    "stand_by(until) takes an event ('eight bells', 'sunset', 'a strain warning'), an "
-    "interval ('a glass', 'an hour', '5 minutes', 'ten minutes'), 'a notable event' or 'an "
-    "urgent event'. An urgent line in the log wakes you whatever you stand by for, and the "
+    "stand_by(until) takes an event (one of "
+    + ", ".join(f"'{w}'" for w, spec in R.EVENTS.items() if not spec.absent)
+    + "), an interval ('a glass', 'an hour', '5 minutes', 'ten minutes'), 'a notable "
+    "event' or 'an urgent event'. An event is matched on the kind of the log's line, not "
+    "its words: 'a strain warning' wakes you on any strain line, 'bending like a whip' "
+    "included. An urgent line in the log wakes you whatever you stand by for, and the "
     "notable lines logged while you stood by come with the sample that wakes you, counted "
     "and listed."
 )

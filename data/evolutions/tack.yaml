@@ -31,4 +31,7 @@ on_fail: {log: "Missed stays: {reason}. Squared the yards and fell off on the {o
 # crew (package 19): checked; "Tacking and wearing: weather main-topsail and upper
 # braces" is in every topman's billet: all hands (Luce 1884, ch. XVIII Organization, 'Station Billet').
 crew: {hands: all, rating: ordinary, stations: [all hands]}
+# A manoeuvre: "Ready about!" stops the sail work in hand, which holds and resumes after
+# (spec M3 §3.4; the owner's ruling of 2026-09-29 at gate 4c). All-hands sail work does not.
+belays: true
 source: "Luce 1866, ch. XXIV Working to Windward, 'Tacking', 'Missing Stays'; Lever 1808, 'Tacking Expeditiously'"

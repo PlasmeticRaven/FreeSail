@@ -16,7 +16,8 @@ params:
   mast: topgallant_mast
   poles: [royal_mast]
   with_masts: true
-  hold_sails: false   # all hands: the sail work in hand is belayed, not waited for
+  hold_sails: false   # the sail work in hand on these masts is belayed, not waited for;
+                      # the rest runs on (spec M3 §3.4, the ruling of 2026-09-29)
   what: topgallant masts
   below: fid the topmasts
   aloft: [mast, yards]

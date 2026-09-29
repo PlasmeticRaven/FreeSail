@@ -626,3 +626,82 @@ def test_compatibility_one_evolution_with_the_watch_on_deck(eid):
     assert crewed_kinds == bare_kinds
     assert "evolution.short_handed" not in crewed_kinds
     assert "evolution.failed" not in crewed_kinds
+
+
+# ---------------------------------------------------------------------------
+# setting from the gear (package 29b, the owner's item 9)
+# ---------------------------------------------------------------------------
+
+# (the order's sail, its evolution, the stow step and the gear step in its file, the log's
+# start from furled and from the gear)
+FROM_THE_GEAR = [
+    (
+        "fore topsail",
+        "fore.topsail",
+        "set_square",
+        "loose",
+        "let_go_gear",
+        "Hands aloft to loose the fore topsail.",
+        "Man the fore topsail sheets; let go the clewlines and buntlines.",
+    ),
+    (
+        "spanker",
+        "mizzen.spanker",
+        "set_gaff",
+        "clear_away",
+        "let_go_brails",
+        "Hands to the spanker halyards and outhaul.",
+        "Hands to the spanker halyards and outhaul.",
+    ),
+    (
+        "jib",
+        "jib",
+        "set_jibheaded",
+        "clear_away",
+        "let_go_downhaul",
+        "Clear away the jib; man the halyards.",
+        "Let go the jib downhaul; man the halyards.",
+    ),
+]
+
+
+def _set_once(w, name: str, sid: str) -> tuple[int, list, bool, int]:
+    """Set the sail now; the ticks it took, the log since, whether its hands were taken
+    as for work aloft, and how many of them go aloft by their rating."""
+    runner = runner_of(w)
+    n0 = len(w.log)
+    w.submit(f"set the {name}")
+    inst = next(i for i in runner.instances if i.subject_id == sid)
+    aloft = runner._aloft(inst)
+    t = tick_until_idle(w)
+    return t, log_after(w, n0), aloft, inst.evo.id
+
+
+@pytest.mark.parametrize("case", FROM_THE_GEAR, ids=[c[2] for c in FROM_THE_GEAR])
+def test_a_sail_set_from_the_gear_skips_the_stow_and_wants_no_hands_aloft(case):
+    """Each state a sail is set from is its own case: from furled the file's stow step
+    runs (loosing aloft, clearing away); from in the gear a short deck step takes its
+    place, no hand is sent aloft for it, the later steps are the same, and the sail ends
+    set. The difference in time is the difference of the two steps at the weather's
+    pace; and the log says what is done."""
+    name, sid, eid, stow, gear, start_furled, start_gear = case
+    w = world(FRIGATE, heading=90.0)  # the wind on the beam, 15 knots
+    evo = registry.get(eid)
+    steps = {s.do: s for s in evo.steps}
+    assert steps[gear].aloft is False and steps[gear].duration_s < steps[stow].duration_s
+    furled_t, furled_log, _, _ = _set_once(w, name, sid)
+    assert w.ship.sails[sid].state is SailState.SET
+    w.submit(f"take in the {name}")
+    tick_until_idle(w)
+    assert w.ship.sails[sid].state is SailState.IN_THE_GEAR
+    factor = runner_of(w)._last_factor
+    gear_t, gear_log, aloft, _ = _set_once(w, name, sid)
+    assert w.ship.sails[sid].state is SailState.SET
+    assert not aloft, "hands were sent aloft for a sail already loose"
+    saved = (steps[stow].duration_s - steps[gear].duration_s) * factor
+    assert furled_t - gear_t == pytest.approx(saved, abs=3), (furled_t, gear_t)
+    started = [e.text for e in furled_log if e.kind == "evolution.started"]
+    assert started[0] == start_furled
+    started = [e.text for e in gear_log if e.kind == "evolution.started"]
+    assert started[0] == start_gear
+    assert "Laid aloft and loosed" not in " ".join(e.text for e in gear_log)

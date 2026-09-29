@@ -427,3 +427,51 @@ def test_the_slowest_speed_still_moves(value):
     con = Console(World(seed=3), out=io.StringIO())
     con.handle_line(f"speed {value}")
     assert con.compression == 0.1
+
+
+def test_the_strongest_gust_names_the_mean_it_blew_over():
+    """Package 29b: a gust line carries the ten-minute mean it blew over, and the hour's
+    roll-up names it beside the strongest."""
+    from freesail.core.events import summarise
+
+    gusts = [
+        ev(7, "wind.gust", "A gust: 24 knots, the mean 19."),
+        ev(9, "wind.gust", "A gust: 31 knots, the mean 22."),
+    ]
+    gusts[0].data["mean_kn"] = 19.0
+    gusts[1].data["mean_kn"] = 22.0
+    assert "2 gusts, the strongest 31 knots on a mean of 22" in summarise(gusts).text
+
+
+def test_a_stations_own_words_are_never_rolled_up():
+    """The owner, package 29b (playtest 7): at speed a watcher's `say` went into the hour's
+    roll-up instead of showing at once. A line whose actor is a station is kept as it is,
+    like the captain's own, whatever the station (taken from the stations as they are
+    defined, not a list here). At 300x, a fake watcher speaks in an otherwise routine hour:
+    its line is shown at once, in its place, and the hour's count leaves it out."""
+    from freesail.core.events import STATION_ACTORS, kept
+
+    world = World(seed=7, scenario=Scenario(gustiness=0.0, variability=0.0))
+    world.compression = 300
+    st = Station(
+        "watcher",
+        Authority.NONE,
+        SamplingPolicy.in_lockstep(1800, "urgent"),
+        14400,
+        WATCHER_BRIEF,
+    )
+    h = Harness(world, st, Fake(["The wind holds steady from the west."] * 4), save=None)
+    h.start()
+    world.run(3 * 3600)
+    said = [e for e in world.log if e.kind == "agent.note"]
+    assert said and all(e.severity is Severity.ROUTINE and e.actor == "the watcher" for e in said)
+    assert "the watcher" in STATION_ACTORS and all(kept(e) for e in said)
+    shown = rollup(world.log.all(), 300, so_far=True)
+    lines = [x for x in shown if isinstance(x, Event)]
+    rolls = [x for x in shown if isinstance(x, Rollup)]
+    assert all(e in lines for e in said)
+    assert rolls and sum(r.count for r in rolls) + len(lines) == len(world.log)
+    assert not any("spoke" in r.text for r in rolls)
+    # a station defined later (an officer) is kept the same way, with nothing added here
+    Station("second lieutenant", Authority.NONE, SamplingPolicy.periodic(1800), 14400, "x")
+    assert "the second lieutenant" in STATION_ACTORS

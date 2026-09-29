@@ -8,6 +8,7 @@
     comparison:= exceeds <n> <unit> | is over ... | is under ... | is below ...
                | is forward of <n> degrees | is abaft <n> degrees | is abaft the beam
                | is forward of the beam | backs <n> points | veers <n> points
+               | veers <n> points or backs <n> points | shifts <n> points
                | is from <point> | is <state> | is not <state> | are <fatigue word>
                | is the <watch> | is <n> bells | is east of <point> | is straining
                | exceeds the rating
@@ -44,6 +45,7 @@ from freesail.orders import errors, resolve
 from freesail.orders import grammar as imperative
 from freesail.orders.errors import OrderError
 from freesail.orders.vocabulary import Vocabulary, load_vocabulary, normalise, strip_article
+from freesail.physics.wind import GUST_WORDS
 from freesail.standing.rules import (
     RANKS,
     Clause,
@@ -334,7 +336,11 @@ _STOP = frozenset({"and", "for", "then", ","})
 # What each kind is compared with, for the refusal that names the word.
 _HOW = {
     "speed": ("a speed", "in knots"),
-    "direction": ("a wind", "in points ('backs two points') or 'is from' a compass point"),
+    "direction": (
+        "a wind",
+        "in points ('backs two points', 'veers 1 point or backs 1 point') or 'is from' a "
+        "compass point",
+    ),
     "angle_on_bow": (
         "the apparent wind",
         "in degrees on the bow: 'is forward of 55 degrees', 'is abaft the beam'",
@@ -347,11 +353,14 @@ _HOW = {
     "sail": ("a sail", "by its state: is set, is shaking, is aback, is furled, is blown out"),
     "strain": ("the strain", "against the rating: 'exceeds the rating', 'is straining'"),
     "hands": ("the hands", "by their number or their fatigue: 'are worn out'"),
+    "gust": ("the wind against its mean", "as a gust, at the mean or a lull: 'is a lull'"),
 }
 
 
 def _how_compared(candidates: list[R.Reading]) -> tuple[str, str]:
     kinds = [c.kind for c in candidates]
+    if set(kinds) == {"speed", "direction", "gust"}:
+        return "a wind", "in knots or points, or as a gust, at the mean or a lull"
     if set(kinds) == {"speed", "direction"}:
         return "a wind", "in knots or points"
     if set(kinds) == {"sail", "strain"}:
@@ -590,30 +599,34 @@ def _parse_comparison(
                 raise refuse()
             return row, Comparison("side", side, phrase[3:]), n
 
-    # -- the wind's direction: backs, veers, is from
+    # -- the wind's direction: backs, veers, shifts (either way), is from; and "veers one
+    #    point or backs one point", the one 'or' the dialect has: the two ways one reading
+    #    turns, which is a shift (package 29b, the starter's "trim on a shift")
     for verb in ("backs", "veers", "hauls", "shifts"):
         n = _starts(tokens, i, verb)
         if n:
             row = _pick(cands, ("direction",))
             if row is None:
                 raise refuse()
-            op = "backs" if verb == "backs" else "veers"
-            num = _number(tokens, i + n, vocab)
-            if num is None:
-                raise OrderError(f"'{match.phrase} {verb}' how many points?")
-            value, used = num
-            unit = tokens[i + n + used] if i + n + used < stop else ""
-            if unit not in ("point", "points"):
-                raise OrderError(f"A wind {verb} in points: '{match.phrase} {verb} two points'.")
-            used += 1
-            more = imperative._and_a_half(tokens, i + n + used)
-            value += 0.5 if more else 0.0
-            used += more
-            return (
-                row,
-                Comparison(op, float(value), f"{op} {imperative._said('points', value)} points"),
-                n + used,
-            )
+            op = {"backs": "backs", "shifts": "shifts"}.get(verb, "veers")
+            value, used = _points(tokens, i + n, match.phrase, verb, vocab)
+            said = _points_said(value)
+            if op == "shifts":
+                return (
+                    row,
+                    Comparison("shifts", (float(value), float(value)), f"shifts {said}"),
+                    n + used,
+                )
+            k = i + n + used
+            other = "veers" if op == "backs" else "backs"
+            if tokens[k : k + 2] == ["or", other]:
+                more, more_used = _points(tokens, k + 2, match.phrase, other, vocab)
+                veer, back = (
+                    (float(value), float(more)) if op == "veers" else (float(more), float(value))
+                )
+                text = f"{op} {said} or {other} {_points_said(more)}"
+                return row, Comparison("shifts", (veer, back), text), n + used + 2 + more_used
+            return row, Comparison(op, float(value), f"{op} {said}"), n + used
     n = _starts(tokens, i, "is from")
     if n:
         row = _pick(cands, ("direction",))
@@ -703,6 +716,14 @@ def _parse_comparison(
             if word:
                 return row, Comparison(op, word, f"{'not ' if op == 'is_not' else ''}{word}"), n + k
             break
+        # the true wind against its ten-minute mean (package 29b): a gust, the mean, a lull
+        row = _pick(cands, ("gust",))
+        if row is not None:
+            word, k = _longest(tokens, j, _GUST_SAID)
+            if word:
+                value = _GUST_SAID[word]
+                said = f"{'not ' if op == 'is_not' else ''}{value}"
+                return row, Comparison(op, value, said), n + k
         # a heading is a point
         row = _pick(cands, ("compass",))
         if row is not None and op == "is":
@@ -772,6 +793,39 @@ def _parse_comparison(
         )
 
     raise refuse()
+
+
+def _points(
+    tokens: list[str], i: int, phrase: str, verb: str, vocab: Vocabulary
+) -> tuple[float, int]:
+    """'two points', 'a point and a half' at tokens[i]: the number and the words used."""
+    num = _number(tokens, i, vocab)
+    if num is None:
+        raise OrderError(f"'{phrase} {verb}' how many points?")
+    value, used = num
+    unit = tokens[i + used] if i + used < len(tokens) else ""
+    if unit not in ("point", "points"):
+        raise OrderError(f"A wind {verb} in points: '{phrase} {verb} two points'.")
+    used += 1
+    more = imperative._and_a_half(tokens, i + used)
+    return (value + 0.5 if more else value), used + more
+
+
+def _points_said(value: float) -> str:
+    """ "2 points", "1 point", "1.5 points"."""
+    return f"{value:g} {'point' if value == 1 else 'points'}"
+
+
+# The words for the wind against its mean, as said, and the reading's value for each.
+_GUST_SAID: dict[str, str] = {
+    "a gust above the mean": GUST_WORDS[0],
+    "a gust above its mean": GUST_WORDS[0],
+    "a gust": GUST_WORDS[0],
+    "at the mean": GUST_WORDS[1],
+    "at its mean": GUST_WORDS[1],
+    "the mean": GUST_WORDS[1],
+    "a lull": GUST_WORDS[2],
+}
 
 
 def _unit_of(cands: list[R.Reading]) -> str:

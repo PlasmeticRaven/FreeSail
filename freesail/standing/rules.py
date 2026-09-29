@@ -76,8 +76,8 @@ class Comparison:
     """How a reading is compared: an operation, its value in the reading's nautical unit
     (or a word, or radians for a compass point), and the words as said."""
 
-    op: str  # gt | lt | backs | veers | from | forward_of | abaft | side | point | east_of |
-    #          west_of | is | is_not | straining
+    op: str  # gt | lt | backs | veers | shifts | from | forward_of | abaft | side | point |
+    #          east_of | west_of | is | is_not | straining
     value: Any
     text: str
 
@@ -131,6 +131,9 @@ class Clause:
                 memory[key] = value  # measured from the direction when the rule was armed
                 return False
             shift = units.wrap_pi(value - memory[key])
+            if op == "shifts":  # either way: (points veered, points backed)
+                veer, back = v
+                return shift >= units.points_to_rad(veer) or -shift >= units.points_to_rad(back)
             wanted = units.points_to_rad(v)
             return shift >= wanted if op == "veers" else -shift >= wanted
         if kind == "angle_on_bow":
@@ -152,7 +155,7 @@ class Clause:
             return (value == v) if op == "is" else (value != v)
         if kind == "bells":
             return (value["bells"] == v) if op == "is" else (value["bells"] != v)
-        if kind == "daylight":
+        if kind in ("daylight", "gust"):
             return (value == v) if op == "is" else (value != v)
         if kind == "sail":
             return _sail_is(value, v) if op == "is" else not _sail_is(value, v)
@@ -165,6 +168,15 @@ class Clause:
                 return value["count"] > v if op == "gt" else value["count"] < v
             return (value["words"] == v) if op == "is" else (value["words"] != v)
         return False
+
+    def spend_shift(self, view: R.ReadingsView, memory: dict[str, Any]) -> None:
+        """A wind's shift that fired the rule is spent: the next is measured from the
+        direction now (package 29b, "trim on a shift": a wind veering steadily through a
+        night is trimmed to point by point)."""
+        if self.comparison.op in ("backs", "veers", "shifts"):
+            value = self._values(view)[0]
+            if value is not None:
+                memory[f"{self.text}:reference"] = value
 
     def holds(self, view: R.ReadingsView, memory: dict[str, Any] | None = None) -> bool:
         memory = memory if memory is not None else {}
@@ -188,8 +200,11 @@ class Clause:
         else:
             said = ", ".join(R.describe_value(reading, v) for v in values)
         verb = "are" if len(values) > 1 or reading.kind == "hands" else "is"
-        if reading.kind == "direction" and self.comparison.op in ("backs", "veers"):
-            return f"{self.phrase} {verb} {said}, and has not {self.comparison.text}"
+        if reading.kind == "direction" and self.comparison.op in ("backs", "veers", "shifts"):
+            done = self.comparison.text
+            for now, then in (("backs", "backed"), ("veers", "veered"), ("shifts", "shifted")):
+                done = done.replace(now, then)
+            return f"{self.phrase} {verb} {said}, and has not {done}"
         return f"{self.phrase} {verb} {said}, not {self.comparison.text}"
 
 
@@ -314,8 +329,15 @@ class Rule:
         }
 
     def reset_edge(self) -> None:
-        """Forget the duration, the dwell and the clause references: a rule re-armed
-        measures 'backs two points' from the wind it sees now."""
+        """Forget the duration, the dwell and the clause references: a rule given or
+        resumed measures 'backs two points' from the wind it sees now."""
         self.held_s = 0.0
         self.clear_s = 0.0
         self.memory.clear()
+
+    def spend_shifts(self, view: R.ReadingsView) -> None:
+        """At a firing: every wind's shift the trigger waits for is measured afresh from
+        the direction now (`Clause.spend_shift`)."""
+        cond = self.trigger.condition
+        for clause in cond.clauses if cond is not None else ():
+            clause.spend_shift(view, self.memory)

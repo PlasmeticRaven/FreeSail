@@ -26,4 +26,7 @@ on_fail: {log: "Could not wear her short round: {reason}.", kind: evolution.fail
 # crew: all hands, as for box-hauling (Luce 1884, ch. XXIV, 'Box-hauling', 'To Wear Short
 # Round').
 crew: {hands: all, rating: ordinary, stations: [all hands]}
+# A manoeuvre: "Ready about!" stops the sail work in hand, which holds and resumes after
+# (spec M3 §3.4; the owner's ruling of 2026-09-29 at gate 4c). All-hands sail work does not.
+belays: true
 source: "Luce 1884, ch. XXIV Working to Windward, 'To Wear Short Round' (\"put the helm hard up, square the after yards, and brace abox the head yards\"); Luce 1866, ch. XXIV 'To Wear short round'; Lever 1808, 'Missing Stays, Waring Short Round, Box-hauling'"

@@ -301,6 +301,7 @@ STARTER_NAMES = [
     "morning sail",
     "shorten sail for weather",
     "keep her full",
+    "trim on a shift",
     "heavy weather",
     "storm staysail",
 ]
@@ -311,18 +312,18 @@ def test_the_starter_file_loads_in_the_console_with_the_well_refused_and_the_res
     con = Console(close_hauled_frigate(), out=out)
     assert con.handle_line(f"read the standing orders from {STARTER}")
     text = out.getvalue()
-    assert f"Read 7 standing orders from {STARTER}." in text
+    assert f"Read 8 standing orders from {STARTER}." in text
     assert con.world.standing.book.names == STARTER_NAMES
     refused = [e for e in con.world.log if e.kind == "order.rejected"]
     assert len(refused) == 1
     assert "In standing order 'sound the well', 'sound the well': The ship has no well" in (
         refused[0].text
     )
-    # the refused line is not journaled; the six that entered are
+    # the refused line is not journaled; the seven that entered are
     journaled = [t for _, _, t in con.world.journal if t.startswith("standing order")]
-    assert len(journaled) == 6 and all("sound the well" not in t for t in journaled)
+    assert len(journaled) == 7 and all("sound the well" not in t for t in journaled)
     con.handle_line("standing orders")
-    assert "Standing orders (6):" in out.getvalue()
+    assert "Standing orders (7):" in out.getvalue()
 
 
 def test_the_starter_file_loads_on_the_server_driver():
@@ -336,7 +337,7 @@ def test_the_starter_file_names_a_source_for_every_order():
     from pathlib import Path
 
     text = Path(STARTER).read_text(encoding="utf-8")
-    assert text.count('standing order "') == 7
+    assert text.count('standing order "') == 8
     for word in ("Luce 1866", "truth 9", "truth 28", "milestone 5", "judgement"):
         assert word in text, word
     assert "\r" not in text

@@ -196,6 +196,7 @@ def apply_strain(ship: Ship, dt: float, rng_stream: random.Random | None = None)
     _tend_catharpins(ship)
     _tend_wrecks(ship, st)
     _wear_canvas(ship, st, dt)
+    warnings: list[_Warning] = []
     for part, kind in _parts_by_kind(ship):  # insertion order: deterministic
         # `_out_of_action`, with each part's class looked up once per ship (package 29's
         # profile: three hundred parts a tick)
@@ -218,7 +219,8 @@ def apply_strain(ship: Ship, dt: float, rng_stream: random.Random | None = None)
         if _fails(part, ratio, dt, stream):
             _carry_away(ship, st, part, ratio)
         else:
-            _warn(ship, st, part, ratio)
+            _warn(ship, st, part, ratio, warnings)
+    _log_warnings(ship, warnings)
 
 
 def cloth_wear_per_hour(ship: Ship, sail: Sail, st: StrainState | None = None) -> float:
@@ -318,43 +320,137 @@ def _fails(part: Part, ratio: float, dt: float, stream: random.Random | None) ->
     return stream.random() < failure_probability(ratio, dt)
 
 
-def _warn(ship: Ship, st: StrainState, part: Part, ratio: float) -> None:
+@dataclass
+class _Warning:
+    """One part's warning this tick: its words for one part and for several, so that the
+    parts that strain the same way on the same tick are logged as one line."""
+
+    part: Part
+    ratio: float
+    one: str  # the words after the part's name, for it alone
+    many: str | None  # the same for several; None: this warning is never grouped
+
+
+def _warn(
+    ship: Ship, st: StrainState, part: Part, ratio: float, out: list[_Warning] | None = None
+) -> None:
     last = st.last_warning_s.get(part.id)
     if last is not None and st.elapsed_s - last < WARNING_INTERVAL_S:
         return
     st.last_warning_s[part.id] = st.elapsed_s
-    name = _name(ship, part.id)
     dire = ratio > CARRY_AWAY_RATIO
+    many: str | None
     if isinstance(part, Spar):
-        text = (
-            f"{name} bending like a whip; she will carry it away if sail is not shortened."
-            if dire
-            else f"{name} working under the press of sail."
-        )
+        if dire:
+            one = "bending like a whip; she will carry it away if sail is not shortened."
+            many = "bending like whips; she will carry them away if sail is not shortened."
+        else:
+            one = many = "working under the press of sail."
         if part.swiftered_in:
-            text = text[:-1] + ", the catharpins swiftered in."
+            one, many = (
+                one[:-1] + ", the catharpins swiftered in.",
+                many[:-1] + (", the catharpins swiftered in."),
+            )
         shaking = [
             s
             for s in ship.sails.values()
             if s.shivering and s.roles.get("boom") == part.id and part.cls == "studdingsail_boom"
         ]
         if shaking:  # the log says why (spec 3b §7)
-            text = f"{name} whipping as the {_name(ship, shaking[0].id, False)} flogs; " + (
+            one = f"whipping as the {_name(ship, shaking[0].id, False)} flogs; " + (
                 "she will carry it away." if dire else "she is too near the wind for it."
             )
+            many = None
     elif isinstance(part, Line):
-        text = (
-            f"{name} stranding; it will not hold much longer."
-            if dire
-            else f"{name} bar-taut and surging on the pin."
-        )
+        if dire:
+            one = "stranding; it will not hold much longer."
+            many = "stranding; they will not hold much longer."
+        else:
+            one = many = "bar-taut and surging on the pin."
     else:
-        text = (
-            f"{name} stretched drum-tight; it will not stand much more."
-            if dire
-            else f"{name} straining at the bolt-ropes."
-        )
-    ship.note("notable", "strain.warning", text, subject=part.id, data=_data(part, ratio))
+        if dire:
+            one = "stretched drum-tight; it will not stand much more."
+            many = "stretched drum-tight; they will not stand much more."
+        else:
+            one = many = "straining at the bolt-ropes."
+    warning = _Warning(part, ratio, one, many)
+    if out is None:
+        _log_warnings(ship, [warning])
+    else:
+        out.append(warning)
+
+
+def _log_warnings(ship: Ship, warnings: list[_Warning]) -> None:
+    """The tick's warnings in the log: the parts that strain the same way on the same tick
+    in one line ("The fore, main and mizzen royal masts and yards bending like whips; ..."),
+    each alone as ever (package 29b, playtest 7's finding 6: a gust logged six identical
+    lines, one for each royal mast and yard). A grouped line's subject is its first part and
+    its data the worst part's, with every part and its ratio under `parts` and `ratios`."""
+    groups: dict[tuple[str, str], list[_Warning]] = {}
+    order: list[tuple[str, str]] = []
+    for w in warnings:
+        key = (type(w.part).__name__, w.many if w.many is not None else f"#{w.part.id}")
+        if key not in groups:
+            groups[key] = []
+            order.append(key)
+        groups[key].append(w)
+    for key in order:
+        group = groups[key]
+        if len(group) == 1:
+            w = group[0]
+            text = f"{_name(ship, w.part.id)} {w.one}"
+            ship.note(
+                "notable", "strain.warning", text, subject=w.part.id, data=_data(w.part, w.ratio)
+            )
+            continue
+        worst = max(group, key=lambda w: w.ratio)
+        names = _group_names(ship, [w.part.id for w in group])
+        text = f"{names[:1].upper()}{names[1:]} {group[0].many}"
+        data = _data(worst.part, worst.ratio)
+        data["parts"] = [w.part.id for w in group]
+        data["ratios"] = {w.part.id: w.ratio for w in group}
+        ship.note("notable", "strain.warning", text, subject=group[0].part.id, data=data)
+
+
+_MAST_WORDS = ("fore", "main", "mizzen")
+
+
+def _group_names(ship: Ship, ids: list[str]) -> str:
+    """'the fore, main and mizzen royal masts and yards', from the parts' own names: the
+    parts that differ only by their mast are named once with the masts before them, and
+    those that share the masts and all but their last word are joined on it."""
+    by_rest: dict[str, list[str]] = {}
+    alone: list[str] = []
+    for pid in ids:
+        name = _name(ship, pid, False)
+        first, _, rest = name.partition(" ")
+        if first in _MAST_WORDS and rest:
+            by_rest.setdefault(rest, []).append(first)
+        else:
+            alone.append(name)
+    # the rests that share the same masts, together
+    by_masts: dict[tuple[str, ...], list[str]] = {}
+    for rest, masts in by_rest.items():
+        by_masts.setdefault(tuple(masts), []).append(rest)
+    phrases: list[str] = []
+    for masts, rests in by_masts.items():
+        plural = len(masts) > 1
+        heads = {r.rsplit(" ", 1)[0] if " " in r else "" for r in rests}
+        if len(rests) > 1 and len(heads) == 1 and "" not in heads:
+            head = heads.pop()
+            lasts = [r.rsplit(" ", 1)[1] + ("s" if plural else "") for r in rests]
+            what = f"{head} {_and(lasts)}"
+        else:
+            what = _and([r + ("s" if plural else "") for r in rests])
+        phrases.append(f"the {_and(list(masts))} {what}")
+    phrases += [f"the {n}" for n in alone]
+    return _and(phrases)
+
+
+def _and(items: list[str]) -> str:
+    if len(items) <= 1:
+        return "".join(items)
+    return ", ".join(items[:-1]) + " and " + items[-1]
 
 
 def _data(part: Part, ratio: float) -> dict[str, Any]:

@@ -33,6 +33,8 @@ A registry of the things a rule may test, an instrument may show, and an agent m
 | Reading (words) | Kind | Notes |
 |---|---|---|
 | `the true wind` | speed in knots; direction as points and degrees | `exceeds 30 knots`, `backs two points`, `is from the north-west` |
+| `the true wind` (against its mean) | a gust above the mean, at the mean, a lull | `is a lull`, `is not a gust`: the instant's speed against the ten-minute mean, a tenth of the mean (at least a knot) either way (package 29b) |
+| `the mean wind` | speed; direction | the true wind over the last ten minutes of ship's time, the mean of the speeds and the direction of the mean vector (package 29b, playtest 7's finding 4: single gusts were read as a rising wind); the gust line gives it too ("A gust: 28 knots, the mean 19."), and the hour's roll-up names it beside the strongest gust |
 | `the apparent wind` | angle on the bow, side; speed | `is forward of 55 degrees`, `is abaft the beam` |
 | `the heading`, `the course` | compass | `is east of ...` (rare; mostly for `at`) |
 | `the speed`, `the leeway`, `the heel`, `the helm` | number with unit | `exceeds 15 degrees` |
@@ -59,6 +61,7 @@ condition := <reading> <comparison> [and <reading> <comparison> ...]     # conju
 comparison:= exceeds <n> <unit> | is over ... | is under ... | is below ...
            | is forward of <n> degrees | is abaft <n> degrees | is abaft the beam | is forward of the beam
            | backs <n> points | veers <n> points | is from <point> | is <state> | is not <state>
+           | veers <n> points or backs <n> points | shifts <n> points     # package 29b
            | are <fatigue word> | is the <watch>
 duration  := <n> minutes | a glass | ...
 ```
@@ -70,10 +73,13 @@ standing order "night routine": at sunset then take in the studdingsails; take i
 standing order "morning sail": at sunrise, if the true wind is under 20 knots then set the royals
 standing order "shorten sail for weather": when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; take in the topgallants; reef the topsails, one reef
 standing order "keep her full": when the apparent wind is forward of 55 degrees then bear away one point
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point then trim sails
 standing order "heavy weather": when the true wind exceeds 40 knots for 5 minutes then send down the topgallant masts; take in the fore topmast staysail; bend the fore storm staysail; close reef the topsails
 standing order "storm staysail": when the fore storm staysail is furled and the true wind exceeds 40 knots then set the fore storm staysail
 standing order "sound the well": every glass then sound the well        # refused until milestone 5: "the ship has no well to sound yet"
 ```
+
+The one `or` the dialect has is inside a comparison, not between clauses: `veers 1 point or backs 1 point` is the two ways the one reading turns, and `shifts 1 point` says the same. A wind's shift is measured from the direction when the order was given or resumed, and after a firing from the direction it fired on, so "trim on a shift" (package 29b, playtest 7's finding that the yards stayed braced for the old wind through a night's veer) fires at each point of a steady veer, at least the dwell apart. A trim ordered while the watch is still at the braces of another is not stacked behind it: a yard still waiting its turn takes the new angle, one being braced finishes, and the log says the yards are being trimmed already.
 
 The **book**: `standing orders` (list, with each order's state: standing, belayed, fired N times, last at), `show standing order "x"`, `belay standing order "x"`, `resume standing order "x"`, `belay all standing orders`, `strike standing order "x"` (removes it from the book, journaled; `cancel` and `remove` are synonyms; belaying keeps it, silent, under its name; added after playtest 3, 2026-09-28), `read the standing orders from <file>` (a driver command in the console and the server, not an order, since it reads the disk).
 
@@ -209,7 +215,7 @@ A scenario timeline: a list of waypoints `(time, wind from, speed)` between whic
 
 ### 20. Time compression and the log
 
-The server and console take `speed N` up to 300. At sixty and above the log **rolls up** routine entries into hourly summaries ("Forenoon watch: braced round twice, took in the fore topgallant studdingsail, wind veered a point.") while notable and urgent lines stay as they are; the underlying events are all still in the log store, and the roll-up is a view. The performance budget: the frigate under standing orders at not less than `TICKS_PER_SECOND_HEADLESS = 3000` on the owner's machine, measured by a test on the build machine with a stated margin.
+The server and console take `speed N` up to 300. At sixty and above the log **rolls up** routine entries into hourly summaries ("Forenoon watch: braced round twice, took in the fore topgallant studdingsail, wind veered a point.") while notable and urgent lines stay as they are, and so do the captain's and the driver's own lines and every station's (a watcher's `say` shows at once at any speed: the owner, package 29b; the stations' actors are registered as each station is defined, `events.STATION_ACTORS`); the underlying events are all still in the log store, and the roll-up is a view. The performance budget: the frigate under standing orders at not less than `TICKS_PER_SECOND_HEADLESS = 3000` on the owner's machine, measured by a test on the build machine with a stated margin.
 
 ### 21. A day saved and replayed
 

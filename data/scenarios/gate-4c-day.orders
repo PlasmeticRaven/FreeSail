@@ -39,8 +39,8 @@ standing order "make sail after the gale": when the fore storm staysail is set a
 
 # The topgallants again once their masts are up: the plain sail of the order above cannot
 # set a topgallant whose mast is still on deck. The masts go up before the reefs come out
-# (swaying up takes all hands and belays the sail work in hand, data/evolutions/
-# sway_up_topgallant_masts.yaml), so a fore topsail set with its reefs out and no topgallant
+# (swaying up takes all hands, and the reefs wait for hands until it is done: spec M3
+# §3.4 as the owner ruled at gate 4c), so a fore topsail set with its reefs out and no topgallant
 # over it, in under twenty-two knots (a fresh breeze at most, Beaufort's force 5 carrying
 # topgallants) for ten minutes, is the moment. Ten minutes is judgement: longer than the
 # three between the topsail and the topgallant when plain sail is made from the furl.
