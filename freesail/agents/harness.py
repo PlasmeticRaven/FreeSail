@@ -121,6 +121,7 @@ result, and a door that sends tool definitions reads the list from `offered_tool
 
 from __future__ import annotations
 
+import re
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -158,6 +159,7 @@ __all__ = [
     "BOOK_SIZE_TOKENS",
     "OPT_OUT_TOKEN",
     "SHELF_LIFE_TURNS",
+    "BUDGET_FREE_TOOLS",
     "Book",
     "Playback",
     "SAMPLE_ROUTINE_LINES",
@@ -175,6 +177,20 @@ __all__ = [
 # watcher's turn is a look at the log, the readings and perhaps a page of the library;
 # eight leaves room for a question answered after three or four reads).
 TOOL_CALLS_PER_SAMPLE = 8
+
+# The tools the budget does not count, always run however many calls came before
+# (package 29c, playtest 8: the model's `answer` was its ninth call, after six library
+# reads, a journal note and a shelve, and the captain's answer came a sample late). `say`
+# is the MCP door's; it reaches the harness as a reply's text, which is never counted.
+BUDGET_FREE_TOOLS = ("answer", "say")
+
+# A reply whose free text opens with a thinking tag, closed or not, is the model's
+# thinking leaked into its reply and not a line a sailor said (package 29c, playtest 9:
+# 1,500 words opening `<thought` went into the log as one line). The tag only decides,
+# the owner's ruling: a long reply is not a fault on its own. The fault is journaled with
+# the first line, at most this many characters of it, and the reply's length.
+THOUGHT_TAG = re.compile(r"\s*<\s*(?:thinking|think|thought)\b", re.IGNORECASE)
+THOUGHT_FIRST_LINE_CHARS = 120
 
 # The same order this many times with no change in the readings between (spec §11).
 WELFARE_REPEAT_N = 3
@@ -206,6 +222,21 @@ NUDGE_REPEAT = (
 NUDGE_SILENCE = (
     "You have given no reply for {span}. You may continue, stand by until an event, or "
     "leave with the token {token}."
+)
+# An empty reply where an answer was owed (package 29c, playtest 9: four in a row at
+# samples with a question and events, nothing said and nothing counted): the sibling of
+# the same order repeated, counted the same way, three in a row bringing the nudge.
+NUDGE_EMPTY = (
+    "You have replied with nothing {n} times in a row when a question or an urgent event "
+    "was before you. You may answer, stand by until an event, or leave with the token "
+    "{token}."
+)
+# What the next sample tells the model of a reply taken as thinking (package 29c).
+THOUGHT_NOTICE = (
+    "Your last reply opened with a thinking tag ({tag}), so it was taken as your thinking "
+    "and nothing of it was said: it is not in the log. Words for the log go in a reply's "
+    "text without the tag, or in answer when the captain has asked; any tool calls in "
+    "that reply were run."
 )
 
 # The words a stand-by takes for a severity: any line of it or above from anyone but the
@@ -447,8 +478,8 @@ class Harness:
 
     def _door_note_with_budget(self) -> str:
         budget = (
-            f"A sample may make up to {TOOL_CALLS_PER_SAMPLE} tool calls; that is a budget, "
-            f"not a rule of conduct."
+            f"A sample may make up to {TOOL_CALLS_PER_SAMPLE} tool calls, not counting answer "
+            f"and say, which always run; that is a budget, not a rule of conduct."
         )
         return f"{budget} {self.door_note}".strip()
 
@@ -798,18 +829,22 @@ class Harness:
         self._new_books = []
         stood = False
         for c in reply.calls:
-            if self._calls_this_sample >= TOOL_CALLS_PER_SAMPLE:
+            counted = c.name not in BUDGET_FREE_TOOLS
+            if counted and self._calls_this_sample >= TOOL_CALLS_PER_SAMPLE:
+                # answer and say still run after this one (package 29c)
                 results.append(
                     {
                         "name": c.name,
                         "result": (
                             f"Not run: this sample's budget of {TOOL_CALLS_PER_SAMPLE} tool "
-                            f"calls is spent; the rest of the calls wait for the next sample."
+                            f"calls is spent; call it again in your next sample. answer and "
+                            f"say are not counted and always run."
                         ),
                     }
                 )
-                break
-            self._calls_this_sample += 1
+                continue
+            if counted:
+                self._calls_this_sample += 1
             was_standing_by = self.agent.standing_by
             results.append({"name": c.name, "args": dict(c.args), "result": self._call(c)})
             if self._new_books and self._new_books[-1].slot is None:
@@ -829,8 +864,11 @@ class Harness:
                 # it are not run; the sample that ends the stand-by says it stood by
                 stood = True
                 break
-        # 3. the free text, under the mark
+        # 3. the free text, under the mark; a leaked thought is not said (package 29c)
         text = " ".join(reply.text.split())
+        if text and THOUGHT_TAG.match(reply.text):
+            self._leaked_thought(reply.text)
+            text = ""
         if text:
             world.record(
                 Severity.ROUTINE,
@@ -879,11 +917,13 @@ class Harness:
         return _with_handle(result, book)
 
     def _end_sample(self) -> None:
+        owed = self._answer_owed(self._open)
         self._open = None
         a = self.agent
         tick = self.world.clock.tick
         if a.released:
             return
+        self._count_empty(owed)
         if not a.standing_by:  # a stand-by in this turn set the start already
             self._wait_from = (len(self.world.log), self.world.clock.stamp())
         if self._sample_had_words:
@@ -1055,6 +1095,60 @@ class Harness:
 
     # -- welfare -----------------------------------------------------------------------
 
+    def _leaked_thought(self, raw: str) -> None:
+        """A reply whose free text opens with a thinking tag: not written into the log;
+        journaled as a fault with its first line and its length; and the next sample tells
+        the model its reply was taken as thinking and nothing was said (package 29c)."""
+        body = raw.strip()
+        first = body.splitlines()[0] if body else ""
+        if len(first) > THOUGHT_FIRST_LINE_CHARS:
+            first = first[:THOUGHT_FIRST_LINE_CHARS].rstrip() + "..."
+        match = THOUGHT_TAG.match(raw)
+        tag = "<" + (match.group(0).strip().lstrip("<").strip() if match else "thought")
+        chars, words = len(body), len(body.split())
+        self.journal.append(
+            self.world,
+            f"A reply taken as thinking and not said: it opened with a thinking tag; its "
+            f"first line {first!r}; {chars:,} characters, {words:,} words.",
+            kind="agent.fault",
+        )
+        self.agent.notices.append(THOUGHT_NOTICE.format(tag=tag))
+
+    def _answer_owed(self, sample: Sample | None) -> str | None:
+        """What an open sample owes an answer to, in words, or None: the captain's
+        question, or an urgent line in its log (package 29c). A plain glass owes none."""
+        if sample is None or self.conversation:
+            return None
+        if sample.question is not None:
+            return "a question"
+        if any(ln.get("severity") == Severity.URGENT.value for ln in sample.log):
+            return "an urgent event"
+        return None
+
+    def _count_empty(self, owed: str | None) -> None:
+        """The sibling of the same order repeated (package 29c, playtest 9): a sample that
+        owed an answer and was given nothing (no tool call, and no words said) counts, each
+        journaled; `WELFARE_REPEAT_N` in a row bring the nudge, and one more after it the
+        pause, as the repeats do. A sample with words or a call ends the count and the
+        matter; an empty reply at a plain glass is silence decided on, and is not counted."""
+        a = self.agent
+        if self._sample_had_words:
+            a.empty_count = 0
+            if a.nudged_for == "empty":
+                a.nudged_for = None
+            return
+        if owed is None:
+            return
+        a.empty_count += 1
+        self.journal.append(
+            self.world,
+            f"An empty reply where an answer was owed ({owed}); "
+            f"{number_words(a.empty_count)} in a row.",
+            kind="agent.empty_reply",
+        )
+        if a.empty_count >= WELFARE_REPEAT_N:
+            self._welfare_fire("empty")
+
     def _note_submission(self, text: str) -> None:
         a = self.agent
         key = " ".join(text.lower().split())
@@ -1077,6 +1171,9 @@ class Harness:
                 f"in the readings"
             )
             nudge = NUDGE_REPEAT.format(n=a.repeat_count, token=OPT_OUT_TOKEN)
+        elif pattern == "empty":
+            seen = f"{number_words(a.empty_count)} empty replies in a row where an answer was owed"
+            nudge = NUDGE_EMPTY.format(n=number_words(a.empty_count), token=OPT_OUT_TOKEN)
         else:
             span = _span_words(self.station.patience_s)
             seen = f"no reply for {span}"
@@ -1130,6 +1227,7 @@ class Harness:
         a.pause_reason = ""
         a.nudged_for = None
         a.repeat_text, a.repeat_digest, a.repeat_count = None, None, 0
+        a.empty_count = 0
         a.last_heard_tick = self.world.clock.tick
         self._paused_real = None
         a.notices.append(f"{by[0].upper()}{by[1:]} resumed your sampling.")

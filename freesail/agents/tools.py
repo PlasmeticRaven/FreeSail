@@ -375,7 +375,8 @@ TOOLS: dict[str, Tool] = {
         Tool(
             "stand_by",
             "Stand by until an event, a bell or an interval: you are not sampled until "
-            "then, and the decision is written in the log. `until` is an event's words as "
+            "then, and the decision is written in the log. Standing by ends your turn at "
+            "once. `until` is an event's words as "
             f"the standing dialect knows them ({STAND_BY_EVENTS}), an interval ('a glass', "
             "'an hour', 'a watch', '5 minutes', 'ten minutes'), 'a notable event' or 'an "
             "urgent event'. An event is matched on the kind of the log's line, not its "

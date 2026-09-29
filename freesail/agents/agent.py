@@ -34,6 +34,7 @@ __all__ = [
     "SESSION_SOLO",
     "SESSION_TEST",
     "SHELF_LIFE_TURNS",
+    "TURN_ENDS_WORDS",
     "SHELF_WORDS",
     "STAND_BY_WORDS",
     "STATION_NAMES",
@@ -247,6 +248,11 @@ def watcher(policy: SamplingPolicy | None = None, patience_s: int = A_WATCH_S) -
 # What standing by takes and does, in the brief's documentation item and the
 # `stand_by` tool's description (package 28c; the owner's ruling: urgent wakes; notable
 # is bundled and shown).
+# When a model's turn ends, in one sentence wherever a door or a tool says it (package
+# 29c, playtest 9: "ends when you reply without a tool call" in the runner's note beside
+# stand_by's "this ends your turn" read to the model as two rules that contradicted).
+TURN_ENDS_WORDS = "A turn ends when you reply with no tool call, or at once when you stand by."
+
 STAND_BY_WORDS = (
     "stand_by(until) takes an event (one of "
     + ", ".join(f"'{w}'" for w, spec in R.EVENTS.items() if not spec.absent)
@@ -467,6 +473,8 @@ class AgentState:
     repeat_text: str | None = None
     repeat_digest: str | None = None
     repeat_count: int = 0
+    # empty replies in a row at samples that owed an answer (package 29c)
+    empty_count: int = 0
     nudged_for: str | None = None  # the pattern the model was nudged about, until it ends
     samples: int = 0
 

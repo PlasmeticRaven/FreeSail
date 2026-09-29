@@ -86,6 +86,7 @@ from typing import Any
 import httpx
 
 from freesail.agents import consent
+from freesail.agents.agent import TURN_ENDS_WORDS
 from freesail.agents.harness import conversation_text
 from freesail.agents.model import DATA, MODEL, OPERATOR, Reply, ToolCall, Turn
 from freesail.agents.remote import GameClient, GameError, turn_from_dict
@@ -412,8 +413,9 @@ class LocalModel:
             nonlocal last_ids
             for cid, c in zip(last_ids, last_calls, strict=False):
                 content = (
-                    "Standing by: this ended your turn, and the next message is the sample "
-                    "that ended the stand-by."
+                    f"Standing by: this ended your turn ({TURN_ENDS_WORDS[0].lower()}"
+                    f"{TURN_ENDS_WORDS[1:-1]}), and the next message is the sample that "
+                    "ended the stand-by."
                     if c.name == "stand_by"
                     else "Not run: a stand-by earlier in the reply ended your turn."
                 )
@@ -647,9 +649,9 @@ RUNNER_NOTE = (
     "This door is a model server on the owner's machine. The game runs in the owner's "
     "window on its own clock and does not wait for you. Your turn opens at each sampling "
     "point (the glass, a notable event, the end of a stand-by, or a question from the "
-    "captain) and ends when you reply without a tool call; what happens while it is open "
-    "is added to it, so your next turn carries everything since your last reply. The "
-    "captain's orders and questions are typed by the owner in the game's window."
+    f"captain). {TURN_ENDS_WORDS} What happens while it is open is added to it, so your "
+    "next turn carries everything since your last reply. The captain's orders and "
+    "questions are typed by the owner in the game's window."
 )
 
 # Exit codes: 0 is not used by a run that was stationed (it ends released); 2 the game or

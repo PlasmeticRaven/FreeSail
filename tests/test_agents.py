@@ -1370,10 +1370,12 @@ def test_the_tool_call_budget_is_stated_in_the_brief_and_kept():
     many = reply("", *[call("readings") for _ in range(TOOL_CALLS_PER_SAMPLE + 2)])
     h, fake, _ = stationed(world, [many, ""])
     assert f"up to {TOOL_CALLS_PER_SAMPLE} tool calls" in h.brief.head[2].text
+    assert "not counting answer and say, which always run" in h.brief.head[2].text
     results = [d for d in data_turns(fake) if "tool_results" in d][0]["tool_results"]
-    assert len(results) == TOOL_CALLS_PER_SAMPLE + 1
+    assert len(results) == TOOL_CALLS_PER_SAMPLE + 2  # each call over it answered alone
     assert all("stamp" in r["result"] for r in results[:TOOL_CALLS_PER_SAMPLE])
-    assert results[-1]["result"].startswith("Not run: this sample's budget")
+    over = results[TOOL_CALLS_PER_SAMPLE:]
+    assert all(r["result"].startswith("Not run: this sample's budget") for r in over)
     assert TOOL_CALLS_PER_SAMPLE == 8
 
 
@@ -1981,3 +1983,141 @@ def test_a_game_with_books_and_shelves_replays_to_the_same_turns_and_books():
     ]
     assert [t.to_dict() for t in twin.turns] == [t.to_dict() for t in h.turns]
     assert twin.revision == h.revision and twin.transcript == h.transcript
+
+
+# ---------------------------------------------------------------------------
+# Package 29c: the answer past the budget, the leaked thought, the empty reply
+# ---------------------------------------------------------------------------
+
+
+def test_answer_and_say_run_past_the_tool_budget():
+    """Playtest 8: the model's `answer` was its ninth call, after six library reads, a
+    journal note and a shelve, and was refused by the budget, so the captain's answer came
+    a sample late. `answer` (and `say`, the MCP door's) always run; the budget counts the
+    other tools, and a call over it is refused alone, the calls after it still read."""
+    world = frigate_world()
+
+    def busy_then_answer(last, turns):
+        if last.get("question"):
+            return reply(
+                "Reading first.",
+                *[call("readings") for _ in range(TOOL_CALLS_PER_SAMPLE)],
+                call("journal", note="Read the readings."),
+                call("answer", text="Shorten sail, sir."),
+            )
+        return Reply()
+
+    h, fake, _ = stationed(world, [busy_then_answer], loop=True)
+    assert harness_mod.BUDGET_FREE_TOOLS == ("answer", "say")
+    world.submit("ask the watcher whether we should shorten sail")
+    said = [e for e in world.log if e.kind == "agent.said"]
+    assert [e.text for e in said] == ["[watcher] Shorten sail, sir."]
+    assert said[0].tick == world.clock.tick  # in the same sample, not the next
+    assert h.agent.question is None
+    results = [d for d in data_turns(fake) if "tool_results" in d][-1]["tool_results"]
+    assert [r["name"] for r in results] == ["readings"] * 8 + ["journal", "answer"]
+    assert results[8]["result"].startswith("Not run: this sample's budget of 8 tool calls")
+    assert "answer and say are not counted" in results[8]["result"]
+    assert results[9]["result"] == "Heard."
+    assert [e.text for e in h.journal.entries if e.kind == "note"] == []  # not run
+    assert "[watcher] Reading first." in lines(world, "agent.note")
+
+
+THOUGHT = (
+    '<thought\nThe captain is asking "How is she looking now?".\nThe current readings show:\n'
+    + "- Speed: 10 knots\n" * 200
+)
+
+
+def test_a_leaked_thought_is_journaled_as_a_fault_and_not_said():
+    """Playtest 9: a reply opening `<thought` went into the log as one line of 1,500
+    words. A reply whose free text opens with a thinking tag, closed or not, is not said:
+    it is journaled as a fault with its first line and its length, the next sample tells
+    the model, and the tool calls in the same reply still run."""
+    world = point_world()
+    script = [reply(THOUGHT, call("journal", note="Looked about.")), "", "All well."]
+    h, fake, _ = stationed(world, script)
+    assert not any("<thought" in e.text for e in world.log)
+    assert lines(world, "agent.note") == []
+    kinds_ = [(e.kind, e.text) for e in h.journal.entries]
+    assert ("note", "Looked about.") in kinds_  # the call in the same reply ran
+    (fault,) = [e for e in h.journal.entries if e.kind == "agent.fault"]
+    assert fault.text == (
+        "A reply taken as thinking and not said: it opened with a thinking tag; its first "
+        f"line '<thought'; {len(THOUGHT.strip()):,} characters, "
+        f"{len(THOUGHT.split()):,} words."
+    )
+    assert fault.line().startswith("Morning watch, 8 bells (04:00)  (fault) A reply taken")
+    world.run(EVERY)
+    notices = data_turns(fake)[-1]["notices"]
+    assert notices == [harness_mod.THOUGHT_NOTICE.format(tag="<thought")]
+    assert "nothing of it was said" in notices[0]
+    assert lines(world, "agent.note") == ["[watcher] All well."]
+
+
+@pytest.mark.parametrize(
+    "text, said",
+    [
+        ("<think>I should greet him.</think> Good morning, sir.", False),
+        ("  <THINKING>\nhmm", False),
+        ("<thought>The wind backs.</thought>", False),
+        ("I think <thought> is a tag; the wind backs.", True),
+        ("<thoughts> are not a tag the harness knows.", True),
+        ("The wind is steady. " * 400, True),  # long is not a fault: the tag alone decides
+    ],
+)
+def test_the_thought_tag_alone_decides(text, said):
+    world = point_world()
+    h, fake, _ = stationed(world, [text])
+    assert bool(lines(world, "agent.note")) is said
+    assert any(e.kind == "agent.fault" for e in h.journal.entries) is not said
+
+
+def test_empty_replies_where_an_answer_is_owed_bring_the_nudge_then_the_pause():
+    """Playtest 9: four empty replies in a row at samples with a question, nothing said
+    and nothing counted. Three in a row at samples that owe an answer bring the nudge, a
+    fourth the pause, as the repeated order does; each is journaled. A leaked thought is
+    nothing said, and counts."""
+    world = frigate_world()
+    h, fake, saves = stationed(world, ["Watching.", "", reply(THOUGHT)], when_done=Reply())
+    world.run(EVERY)  # an empty reply at a plain glass is silence decided on: not counted
+    assert h.agent.empty_count == 0
+    assert not any(e.kind == "agent.empty_reply" for e in h.journal.entries)
+    world.submit("ask the watcher how she lies")  # answered with a thought: counted
+    assert h.agent.empty_count == 1
+    world.run(2)  # the question is put again each tick while it is owed
+    nudged = [e for e in world.log if e.kind == "agent.nudged"]
+    assert [e.text for e in nudged] == [
+        "The watcher nudged: three empty replies in a row where an answer was owed."
+    ]
+    empties = [e for e in h.journal.entries if e.kind == "agent.empty_reply"]
+    assert [e.text for e in empties] == [
+        f"An empty reply where an answer was owed (a question); {n} in a row."
+        for n in ("one", "two", "three")
+    ]
+    assert not h.agent.paused
+    world.run(1)
+    assert data_turns(fake)[-1]["notices"] == [
+        "You have replied with nothing three times in a row when a question or an urgent "
+        f"event was before you. You may answer, stand by until an event, or leave with the "
+        f"token {OPT_OUT_TOKEN}."
+    ]
+    assert h.agent.paused
+    assert h.agent.pause_reason == (
+        "four empty replies in a row where an answer was owed after a nudge"
+    )
+    assert saves == []
+
+
+def test_an_empty_reply_at_an_urgent_event_counts_and_words_end_the_count():
+    world = point_world()
+    h, fake, _ = stationed(world, ["Watching.", "", "", "Aye, she is taken aback."])
+    world.record(Severity.URGENT, "ship.aback", "Taken aback.")
+    world.run(1)  # the events policy samples on the urgent line; the reply is empty
+    assert h.agent.empty_count == 1
+    (entry,) = [e for e in h.journal.entries if e.kind == "agent.empty_reply"]
+    assert entry.text == "An empty reply where an answer was owed (an urgent event); one in a row."
+    world.run(EVERY)  # a plain glass, empty: neither counted nor ending the count
+    assert h.agent.empty_count == 1
+    world.run(EVERY)  # words end it
+    assert h.agent.empty_count == 0 and "agent.nudged" not in kinds(world)

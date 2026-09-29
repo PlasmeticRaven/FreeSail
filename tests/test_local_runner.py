@@ -778,3 +778,32 @@ def test_a_shelved_book_is_its_line_in_the_runners_next_request(tmp_path):
         "assistant",
         "tool",
     ]
+
+
+def test_the_door_note_says_when_a_turn_ends_in_one_rule():
+    """Playtest 9: "ends when you reply without a tool call" in the runner's note beside
+    stand_by's "this ends your turn" read to the model as two rules. One sentence says
+    both, and it is the same wherever a door or a tool says it (package 29c)."""
+    from freesail.agents.agent import TURN_ENDS_WORDS
+    from freesail.agents.repl import REPLY_SYNTAX
+
+    assert TURN_ENDS_WORDS == (
+        "A turn ends when you reply with no tool call, or at once when you stand by."
+    )
+    assert TURN_ENDS_WORDS in L.RUNNER_NOTE and TURN_ENDS_WORDS in REPLY_SYNTAX
+    assert "without a tool call" not in L.RUNNER_NOTE
+    assert "Standing by ends your turn at once." in TOOLS["stand_by"].description
+    # the note reaches the brief whole, and the stand-by's answer in the messages says it
+    server = llama([message("", ("stand_by", '{"until": "a glass"}')), message("Awake.")])
+    world = point_world()
+    h = Harness(world, watcher(SamplingPolicy.in_lockstep(600)), model_for(server))
+    h.door_note = L.RUNNER_NOTE
+    h.start()
+    assert TURN_ENDS_WORDS in h.brief.head[2].text
+    world.run(A_GLASS_S)
+    answered = tool_contents(server.bodies[1])[0]
+    assert answered == (
+        "Standing by: this ended your turn (a turn ends when you reply with no tool call, or "
+        "at once when you stand by), and the next message is the sample that ended the "
+        "stand-by."
+    )
