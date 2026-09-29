@@ -12,7 +12,11 @@ from freesail.ship.schema import ShipFileError, ShipSpec, parse_ship
 
 
 def load_spec(path: str | Path) -> ShipSpec:
-    path = Path(path)
+    # A ship's path is kept with forward slashes whatever the platform, so that a save or
+    # a scenario written on Windows replays on Linux and the other way about (gate 4c,
+    # 2026-09-29: the owner's saves carried "data\\ships\\frigate-36.yaml"); a path read
+    # back with backslashes is accepted the same way.
+    path = Path(str(path).replace("\\", "/"))
     try:
         text = path.read_text(encoding="utf-8")
     except FileNotFoundError:
@@ -21,7 +25,7 @@ def load_spec(path: str | Path) -> ShipSpec:
         data = yaml.safe_load(text)
     except yaml.YAMLError as e:
         raise ShipFileError(f"{path}: the file is not valid YAML ({e}).") from None
-    return parse_ship(data, source=str(path))
+    return parse_ship(data, source=path.as_posix())
 
 
 def spec_from_dict(data: dict[str, Any], source: str = "<memory>") -> ShipSpec:

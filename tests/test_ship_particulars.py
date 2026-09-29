@@ -295,3 +295,15 @@ def test_generator_reproduces_the_committed_files(tmp_path):
             f"{committed.name} differs from what tools/gen_ships.py writes; "
             "edit the generator and rerun it"
         )
+
+
+def test_a_ships_path_is_kept_with_forward_slashes_whatever_the_platform(tmp_path):
+    """A save or a scenario written on Windows replays on Linux and the other way about:
+    the ship's source path is stored with forward slashes, and a path read back with
+    backslashes (the owner's saves of gate 4b carried 'data\\\\ships\\\\frigate-36.yaml')
+    is accepted (gate 4c, 2026-09-29)."""
+    from freesail.ship.loader import load_ship
+
+    ship = load_ship("data\\ships\\frigate-36.yaml")
+    assert ship.save_ref() == {"type": "file", "path": "data/ships/frigate-36.yaml"}
+    assert load_ship("data/ships/frigate-36.yaml").save_ref() == ship.save_ref()
