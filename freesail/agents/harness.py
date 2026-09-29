@@ -344,7 +344,7 @@ class Harness:
 
     @property
     def actor(self) -> str:
-        return f"the {self.station.name}"
+        return self.station.title  # 'the watcher' (events.station_actor)
 
     @property
     def mark(self) -> str:

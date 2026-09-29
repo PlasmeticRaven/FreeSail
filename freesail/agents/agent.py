@@ -21,7 +21,7 @@ from enum import Enum
 from typing import Any
 
 from freesail.api import readings as R
-from freesail.core.events import Severity
+from freesail.core.events import STATION_ACTORS, Severity, station_actor
 
 __all__ = [
     "A_GLASS_S",
@@ -192,9 +192,13 @@ class Station:
     patience_s: int
     brief: str
 
+    def __post_init__(self) -> None:
+        # the station's lines are kept as they are at any speed (package 29b)
+        STATION_ACTORS.add(station_actor(self.name))
+
     @property
     def title(self) -> str:
-        return f"the {self.name}"
+        return station_actor(self.name)
 
     def save(self) -> dict[str, Any]:
         return {

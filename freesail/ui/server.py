@@ -87,7 +87,7 @@ from fastapi.staticfiles import StaticFiles
 from freesail import units
 from freesail.api import queries
 from freesail.core import replay as replay_mod
-from freesail.core.events import Event, Rollup, RollupView, Severity, Shown, rolls_up
+from freesail.core.events import Event, Rollup, RollupView, Severity, Shown, kept, rolls_up
 from freesail.core.events import rollup as rolled
 from freesail.core.world import World
 from freesail.ui.console import (
@@ -401,6 +401,7 @@ def event_dict(e: Event) -> dict[str, Any]:
     """An event for the wire: its dictionary plus the watch-and-bells stamp people read."""
     d = e.to_dict()
     d["stamp"] = units.time_stamp(e.ship_time)
+    d["kept"] = kept(e)  # shown as it is at any speed: the client's roll-up leaves it out
     return d
 
 

@@ -8,7 +8,8 @@
 (function (root) {
   "use strict";
   var RANK = { routine: 0, notable: 1, urgent: 2 };
-  // The actors whose routine lines the roll-up keeps as they are (events.KEPT_ACTORS).
+  // The actors whose routine lines the roll-up keeps as they are (events.KEPT_ACTORS); the
+  // server also marks every kept line (`kept`), a station's words among them (package 29b).
   var KEPT_ACTORS = { captain: 1, driver: 1 };
 
   function LogPanel(listEl) {
@@ -69,7 +70,7 @@
         })
         .then(function (events) {
           events.forEach(function (e) {
-            if (e.severity === "routine" && !KEPT_ACTORS[e.actor]) inner.appendChild(lineFor(e));
+            if (e.severity === "routine" && !e.kept && !KEPT_ACTORS[e.actor]) inner.appendChild(lineFor(e));
           });
         })
         .catch(function () {

@@ -2009,7 +2009,7 @@ def test_truth_50_at_three_hundred_times_the_log_shows_hourly_rollups_and_every_
     that has routine lines has exactly one roll-up, closed at the hour, whose count is its
     routine lines; and nothing is dropped. Measured: 29 roll-ups for 29 hours, the day's
     routine lines summed in them (the counts in docs/dev/TuningNotes.md, M4c)."""
-    from freesail.core.events import KEPT_ACTORS, Event, Rollup, kept, rollup
+    from freesail.core.events import KEPT_ACTORS, STATION_ACTORS, Event, Rollup, kept, rollup
 
     world, _, _ = gate_day
     log = world.log.all()
@@ -2017,7 +2017,9 @@ def test_truth_50_at_three_hundred_times_the_log_shows_hourly_rollups_and_every_
     lines = [x for x in shown if isinstance(x, Event)]
     rolls = [x for x in shown if isinstance(x, Rollup)]
     assert lines == [e for e in log if kept(e)]
-    assert all(e.severity is not Severity.ROUTINE or e.actor in KEPT_ACTORS for e in lines)
+    assert all(
+        e.severity is not Severity.ROUTINE or e.actor in KEPT_ACTORS | STATION_ACTORS for e in lines
+    )
     hours = sorted({e.ship_time.replace(minute=0, second=0) for e in log if not kept(e)})
     assert [r.start for r in rolls] == hours
     assert len(rolls) == GATE_DAY_TICKS // 3600 + 1  # the last is the 09:00 bell's hour

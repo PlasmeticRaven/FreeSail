@@ -215,7 +215,7 @@ A scenario timeline: a list of waypoints `(time, wind from, speed)` between whic
 
 ### 20. Time compression and the log
 
-The server and console take `speed N` up to 300. At sixty and above the log **rolls up** routine entries into hourly summaries ("Forenoon watch: braced round twice, took in the fore topgallant studdingsail, wind veered a point.") while notable and urgent lines stay as they are; the underlying events are all still in the log store, and the roll-up is a view. The performance budget: the frigate under standing orders at not less than `TICKS_PER_SECOND_HEADLESS = 3000` on the owner's machine, measured by a test on the build machine with a stated margin.
+The server and console take `speed N` up to 300. At sixty and above the log **rolls up** routine entries into hourly summaries ("Forenoon watch: braced round twice, took in the fore topgallant studdingsail, wind veered a point.") while notable and urgent lines stay as they are, and so do the captain's and the driver's own lines and every station's (a watcher's `say` shows at once at any speed: the owner, package 29b; the stations' actors are registered as each station is defined, `events.STATION_ACTORS`); the underlying events are all still in the log store, and the roll-up is a view. The performance budget: the frigate under standing orders at not less than `TICKS_PER_SECOND_HEADLESS = 3000` on the owner's machine, measured by a test on the build machine with a stated margin.
 
 ### 21. A day saved and replayed
 

@@ -128,7 +128,6 @@ def test_backing_a_topsail_lays_the_whole_masts_yards_aback():
     assert not any(s.startswith("fore.") for s in subjects)
 
 
-
 def test_a_trims_braces_log_one_line_when_the_last_is_done():
     """Playtest 7, finding 6 (package 29b): a trim logged twelve lines as its braces began
     and twelve as they ended. Now the order's own line says what was ordered, the braces
