@@ -33,6 +33,8 @@ A registry of the things a rule may test, an instrument may show, and an agent m
 | Reading (words) | Kind | Notes |
 |---|---|---|
 | `the true wind` | speed in knots; direction as points and degrees | `exceeds 30 knots`, `backs two points`, `is from the north-west` |
+| `the true wind` (against its mean) | a gust above the mean, at the mean, a lull | `is a lull`, `is not a gust`: the instant's speed against the ten-minute mean, a tenth of the mean (at least a knot) either way (package 29b) |
+| `the mean wind` | speed; direction | the true wind over the last ten minutes of ship's time, the mean of the speeds and the direction of the mean vector (package 29b, playtest 7's finding 4: single gusts were read as a rising wind); the gust line gives it too ("A gust: 28 knots, the mean 19."), and the hour's roll-up names it beside the strongest gust |
 | `the apparent wind` | angle on the bow, side; speed | `is forward of 55 degrees`, `is abaft the beam` |
 | `the heading`, `the course` | compass | `is east of ...` (rare; mostly for `at`) |
 | `the speed`, `the leeway`, `the heel`, `the helm` | number with unit | `exceeds 15 degrees` |

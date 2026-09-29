@@ -427,3 +427,17 @@ def test_the_slowest_speed_still_moves(value):
     con = Console(World(seed=3), out=io.StringIO())
     con.handle_line(f"speed {value}")
     assert con.compression == 0.1
+
+
+def test_the_strongest_gust_names_the_mean_it_blew_over():
+    """Package 29b: a gust line carries the ten-minute mean it blew over, and the hour's
+    roll-up names it beside the strongest."""
+    from freesail.core.events import summarise
+
+    gusts = [
+        ev(7, "wind.gust", "A gust: 24 knots, the mean 19."),
+        ev(9, "wind.gust", "A gust: 31 knots, the mean 22."),
+    ]
+    gusts[0].data["mean_kn"] = 19.0
+    gusts[1].data["mean_kn"] = 22.0
+    assert "2 gusts, the strongest 31 knots on a mean of 22" in summarise(gusts).text

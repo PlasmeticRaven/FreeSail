@@ -14,9 +14,25 @@ from __future__ import annotations
 
 import math
 import random
+from collections import deque
 from dataclasses import dataclass
 
 from freesail import units
+
+# The mean wind (package 29b, playtest 7's finding 4: a watcher read single gusts as
+# changes in the wind, and asked for a mean over the last ten minutes): the true wind
+# averaged over ten minutes of ship's time. Ten minutes is the averaging period of the
+# modern surface wind report (WMO-No. 8, Guide to Instruments and Methods of Observation,
+# the ten-minute mean; an anachronism in 1805, used here as a period, not as an
+# instrument), and long against the M2 wind's gusts of five to thirty seconds.
+MEAN_WIND_WINDOW_S = 600
+
+# A reading this share of the mean above it is a gust, as far below a lull, and between
+# them the wind is at its mean (judgement: the M2 wind's gusts are a tenth to a half again
+# the base, `Wind.step`, so every gust is at least this far above; a lull is the mirror).
+# Never less than GUST_MARGIN_FLOOR_KN, so a light air's knot either way is not a gust.
+GUST_MARGIN = 0.1
+GUST_MARGIN_FLOOR_KN = 1.0
 
 
 @dataclass
@@ -122,3 +138,51 @@ class Wind:
             "gust_factor": self.gust_factor,
             "effective_speed": self.effective_speed,
         }
+
+
+class WindRecord:
+    """The true wind of the last `MEAN_WIND_WINDOW_S` ticks, for the mean wind reading.
+
+    The World adds the wind once a tick, after it steps; nothing here draws randomness or
+    is saved, since a replay adds the same winds again. The mean speed is the plain mean
+    of the speeds; the mean direction is the direction of the mean wind vector, so a
+    wind that backed and veered about north averages to north and not to south."""
+
+    def __init__(self, window_s: int = MEAN_WIND_WINDOW_S):
+        self._speeds: deque[float] = deque(maxlen=window_s)
+        self._east: deque[float] = deque(maxlen=window_s)
+        self._north: deque[float] = deque(maxlen=window_s)
+
+    def add(self, speed: float, direction_from: float) -> None:
+        self._speeds.append(speed)
+        self._east.append(speed * math.sin(direction_from))
+        self._north.append(speed * math.cos(direction_from))
+
+    def __len__(self) -> int:
+        return len(self._speeds)
+
+    def mean_speed(self) -> float | None:
+        """Metres a second over the window; None before the first tick."""
+        if not self._speeds:
+            return None
+        return math.fsum(self._speeds) / len(self._speeds)
+
+    def mean_from(self) -> float | None:
+        """Radians, where the mean wind comes from; None before the first tick."""
+        if not self._speeds:
+            return None
+        return units.wrap_2pi(math.atan2(math.fsum(self._east), math.fsum(self._north)))
+
+
+def against_mean(speed: float, mean: float) -> str:
+    """'a gust above the mean', 'at the mean' or 'a lull', for a speed against its mean."""
+    margin = max(GUST_MARGIN * mean, units.knots_to_ms(GUST_MARGIN_FLOOR_KN))
+    if speed >= mean + margin:
+        return GUST_WORDS[0]
+    if speed <= mean - margin:
+        return GUST_WORDS[2]
+    return GUST_WORDS[1]
+
+
+# The label's words, as the readings give them and the dialect compares them.
+GUST_WORDS: tuple[str, ...] = ("a gust above the mean", "at the mean", "a lull")

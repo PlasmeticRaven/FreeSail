@@ -45,6 +45,7 @@ from freesail.orders import errors, resolve
 from freesail.orders import grammar as imperative
 from freesail.orders.errors import OrderError
 from freesail.orders.vocabulary import Vocabulary, load_vocabulary, normalise, strip_article
+from freesail.physics.wind import GUST_WORDS
 from freesail.standing.rules import (
     RANKS,
     Clause,
@@ -352,11 +353,14 @@ _HOW = {
     "sail": ("a sail", "by its state: is set, is shaking, is aback, is furled, is blown out"),
     "strain": ("the strain", "against the rating: 'exceeds the rating', 'is straining'"),
     "hands": ("the hands", "by their number or their fatigue: 'are worn out'"),
+    "gust": ("the wind against its mean", "as a gust, at the mean or a lull: 'is a lull'"),
 }
 
 
 def _how_compared(candidates: list[R.Reading]) -> tuple[str, str]:
     kinds = [c.kind for c in candidates]
+    if set(kinds) == {"speed", "direction", "gust"}:
+        return "a wind", "in knots or points, or as a gust, at the mean or a lull"
     if set(kinds) == {"speed", "direction"}:
         return "a wind", "in knots or points"
     if set(kinds) == {"sail", "strain"}:
@@ -712,6 +716,14 @@ def _parse_comparison(
             if word:
                 return row, Comparison(op, word, f"{'not ' if op == 'is_not' else ''}{word}"), n + k
             break
+        # the true wind against its ten-minute mean (package 29b): a gust, the mean, a lull
+        row = _pick(cands, ("gust",))
+        if row is not None:
+            word, k = _longest(tokens, j, _GUST_SAID)
+            if word:
+                value = _GUST_SAID[word]
+                said = f"{'not ' if op == 'is_not' else ''}{value}"
+                return row, Comparison(op, value, said), n + k
         # a heading is a point
         row = _pick(cands, ("compass",))
         if row is not None and op == "is":
@@ -802,6 +814,18 @@ def _points(
 def _points_said(value: float) -> str:
     """ "2 points", "1 point", "1.5 points"."""
     return f"{value:g} {'point' if value == 1 else 'points'}"
+
+
+# The words for the wind against its mean, as said, and the reading's value for each.
+_GUST_SAID: dict[str, str] = {
+    "a gust above the mean": GUST_WORDS[0],
+    "a gust above its mean": GUST_WORDS[0],
+    "a gust": GUST_WORDS[0],
+    "at the mean": GUST_WORDS[1],
+    "at its mean": GUST_WORDS[1],
+    "the mean": GUST_WORDS[1],
+    "a lull": GUST_WORDS[2],
+}
 
 
 def _unit_of(cands: list[R.Reading]) -> str:
