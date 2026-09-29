@@ -119,9 +119,12 @@ As spec M5 §31: 32 the chart data, the queries and the lookout (§9 to §12, tr
 Fable, the hand work reviewed by the lead against the sources); 33 the reckoning, the
 sights and the lunar, the captain's chart (§13 to §15, §17, truths 58 to 61; Fable); 34
 the tide, grounding and anchoring, gate 5b (§16, §18, truths 62 to 64 and 66; Fable);
-35 places, people, ports and nations (§22 to §24, truths 68 to 70; Opus); 36 other sail,
-the world-order channel, the two scenarios, gate 5c (§25 to §27, truths 67, 71, 72;
-Fable).
+35 places, people, ports and nations, with the cutter as a ship file for the pilot (§22 to
+§24, truths 68 to 70; Opus); 36 other sail, the world-order channel, the brig as a ship
+file, the two scenarios, gate 5c (§25 to §27, truths 67, 71, 72; Fable). The two new
+vessels are the first catalogue entries and the test of pillar 2 (owner, 2026-09-29): no
+engine change, the running bowsprit the one generator addition expected, every order that
+fails on either a fault in the grammar to fix there.
 
 ## Integration (the lead)
 
