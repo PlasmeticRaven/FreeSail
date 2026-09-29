@@ -50,6 +50,22 @@ is carried by them, not delivered to the player from nowhere.
   deck as places a person can be, and the boat alongside. No more than that until a later
   milestone names its inward goal.
 
+## A worked example: the sail room
+
+The owner's (2026-09-29, from playtest 8): the console has answered `the sail room` since
+milestone 3b, every spare sail by canvas and condition, as a query from nowhere; the
+browser never got it, and it should not get it in that form. By the principle the sail
+room is a place, and what is in it is known by visiting it (the captain goes below, or
+sends the sailmaker, and the log says what was found) or by reading the sailmaker's
+account, a paper kept aboard that the library holds by handle and that is only as current
+as its last entry. The same shape serves the cargo (the manifest, the hold), the stores
+(the purser's books), and every other catalogue of things aboard: a physical place, a
+person who keeps it, a document that records it, and a log line when either is
+consulted. That is the confluence of the physical library (`Papers-and-Books.md`), the
+interior spaces of milestone 5's inward minimum, and the documents a ship generates for
+her own reference, and it is where the browser's sail room comes from, held until the
+places exist.
+
 ## How to use it
 
 When a feature is proposed, ask which way it goes and name the order or reading (inward)

@@ -39,10 +39,14 @@ answered), the shelf used twice, `tell` used four times, one urgent wake-up, sta
    eight had closed the turn, and the answer went out only at the next sample, 04:21 ("the
    reply itself waits for the next sample, as the budget closed my turn"). `answer` and
    `say` should be allowed past the budget, or the budget should count reads only.
-3. **Refusals the model met**: `trim the foresail` (a trim in hand), `sail room` and `check
-   the sail room` (no such query; the library's "the ship" section has it), `send the
-   idlers down` (the idlers are sent below by the routine, not an order). Its own note: the
-   refusals "are kind and give a next word, which is the right design".
+3. **Refusals the captain met** (the owner's, corrected 2026-09-29; the model met only
+   `trim the foresail`, a trim in hand): `sail room` and `check the sail room`, which the
+   console has answered since 3b (spec 3b §6.3, every sail by canvas and condition) and the
+   browser never has; `send the idlers down`, tried to clear the stuck order. The owner
+   holds the sail room for the interior-space basics: seeing what is in it should take
+   visiting it, or reading the sailmaker's account (`docs/design/InwardAndOutward.md`).
+   The model's own note on the refusals it met: they "are kind and give a next word, which
+   is the right design".
 4. **The bend-a-storm-sail chain** is the least transparent thing in the ship, in the model's
    words: the working sail must be unbent first, and the sequence is many orders; it asks
    for `shift the mainsail for the storm trysail` on the schooner as the frigate's spanker

@@ -413,6 +413,11 @@ master's for the sights, §14), a position (a place) and a state (on deck, below
 ashore, sick, occupied by a task and until when). Orders move them where the period's
 orders did (`send for the master`, `pass the word for`); the log says who came and went.
 The crew of M3 stays counts and ratings; these are the few people the story names. The
+sail room and the hold are the first places below, each with its keeper (the sailmaker,
+the purser or the mate) and its paper (the sailmaker's account, the manifest), so that
+what is in them is known by visiting or by reading, and the console's old `the sail room`
+query becomes a paper the browser and the library serve alike
+(`InwardAndOutward.md`, the worked example). The
 harness's stations may later bind to a person (an officer at the master's place is M6);
 in 5c a person is data and a line.
 
@@ -560,7 +565,9 @@ in (then 5b), double altitudes, the kedge, interiors beyond a name and a descrip
 5. Whether the schooner's file offers `shift the mainsail for the storm trysail`
    (playtest 8), for the M4 follow-ups list.
 6. A station for the lookout (decision 24's last line), when a small model is tried at it.
-7. The lead at a station (§29): the consent question put to the lead's own weights inside
+7. The sail room in the browser (owner, playtest 8) waits for §22's places and papers;
+   until then the console's query stands and the browser has none.
+8. The lead at a station (§29): the consent question put to the lead's own weights inside
    the harness before the gate, the record kept as any other; and, for M6, the owner's
    wish that the lead take an officer's or a captain's station once they exist.
 
