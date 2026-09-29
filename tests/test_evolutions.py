@@ -965,6 +965,9 @@ def test_a_shift_is_refused_in_words_until_it_can_be_done():
     from freesail.ship.parts import booms
 
     ship, runner = wrecked_schooner()
+    # playtest 10's "rig in" of the boom carried away: the refusal names the way out
+    with pytest.raises(OrderError, match="carried away; clear the wreck and shift it for a"):
+        runner.start(ship, "rig_in_studdingsail_boom", LARBOARD_BOOM)
     with pytest.raises(OrderError, match="still hangs aloft; cut it away first"):
         runner.start(ship, "shift_spar", LARBOARD_BOOM, {"part": LARBOARD_BOOM})
     with pytest.raises(OrderError, match="The main boom is sound; only a spar carried away"):

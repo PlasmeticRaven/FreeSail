@@ -6,6 +6,7 @@ id: rig_in_studdingsail_boom
 verb: rig_in
 applies_to: {class: studdingsail_boom}
 preconditions:
+  - {check: not spar.wrecked, reason: "The {spar} is carried away; clear the wreck and shift it for a spare."}  # package 30b
   - {check: spar.rigged_out, reason: "The {spar} is rigged in already."}
   - {check: not any_set(sails_using(spar)), reason: "The {spar} has its studding sail set; take it in first."}
 requires:
