@@ -52,3 +52,21 @@ guide to what exists, but the game's files cite the draughts and the printed dim
 is from the lead's memory and must be read again from a source before it becomes a
 figure in a ship file; the generator's comments carry the citation, as the frigate's and
 the schooner's do.
+
+## The owner's wishlist for later (noted 2026-09-29, not for rushing)
+
+Named so they are on record for the vessel library and after; none belongs to a planned
+milestone yet, and every figure is the lead's memory, unverified.
+
+| Vessel | What she was (unverified) | Why she is interesting | Sources |
+|---|---|---|---|
+| **HMS Indefatigable, 1794** | A 64-gun ship of 1784 cut down (razeed) in 1794 to a heavy frigate of 44 guns, 24-pounders on the gun deck, about 1,380 tons and 160 ft; Pellew's ship, famous for the *Droits de l'Homme* action of January 1797 in the Bay of Biscay | The top of the size hierarchy above the 36: a razee's heavy scantlings and tall rig on a frigate's role, and the one ship the Western Approaches scenario most wants as a station ship off Ushant | Winfield; the RMG draughts (as built and as razeed); Pellew's biographies; the Vanguard kit |
+| **HMS Sphinx, 1775** | A 20-gun sixth-rate (post ship) of the Sphinx class, about 430 tons and 108 ft, nine-pounders; a ship-rigged three-master smaller than a frigate | Fills the gap between the brig-sloop and the 36 with a full ship rig at a small size, and is the kind of vessel a young post-captain got first; in service into the period | Winfield; the RMG draughts; the Vanguard kit |
+| **The Royal Yacht** (which one to be settled; the Vanguard kit is *Royal Caroline*, 1749, a ship-rigged yacht of about 230 tons) | The royal yachts of the century were ship-rigged, lavishly finished, fast for their size; *Royal Caroline* is the best documented, with a full set of draughts and a famous model | A vessel with no guns to speak of and every gilded thing the "cool obscure" pillar enjoys; a passage with a royal or an ambassador aboard is a scenario for the director | The RMG draughts and model; the Vanguard kit; Winfield for the later yachts |
+| **Duchess of Kingston, 1778** | A ship-rigged yacht built for the Duchess of Kingston, about 200 tons, later in naval service | A private yacht of the 1770s, and a story: the duchess's voyage to the Baltic and Russia | The RMG draught; the Vanguard kit |
+| **HM Brigantine Dolphin, 1836** | A brigantine of the anti-slavery squadron, about 320 tons, three masts? (no: two, the fore square-rigged, the main fore-and-aft; the term's later sense), fast, built for chasing slavers | Beyond the window (decision 27's first named exception): the brigantine rig itself, a fore-and-aft main with a square fore, which the engine's classes already cover; a West Africa scenario far off | The RMG draughts; the Vanguard kit |
+
+The hierarchy with these in it: Sherbourne about 80 tons; Alert, Speedy, the yachts and
+the schooner about 200 to 230; Harpy and Dolphin about 320 to 340; Sphinx about 430; the
+frigate 933; Indefatigable about 1,380. Each new size is a new test of the generator's
+rules, which is what the library is for.
