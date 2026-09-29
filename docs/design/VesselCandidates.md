@@ -1,0 +1,50 @@
+# Design note: candidates for the cutter and the brig
+
+From the owner's list of 2026-09-29, drawn mostly from the Vanguard Models kits, with the
+condition that each candidate be common enough to have information from several sources.
+The lead's assessment from memory, to be verified against the sources named before a
+file is generated (`tools/gen_ships.py`); every figure below is *unverified* until then
+and says so. The two vessels are the first entries of the vessel library and the test of
+pillar 2 (spec M5 §23, §25); the rest of the list is milestone 8's.
+
+## The size hierarchy the catalogue needs
+
+The two reference ships: the topsail schooner at 224 tons burthen (Chapelle 1930, 94 ft
+7 in on deck), the frigate at 933 tons (143 ft on the gun deck). The owner's wish is a
+hierarchy of size to build on, so the cutter and the brig should fall below and between
+those, not beside them.
+
+## The brig-sloop candidates
+
+| Candidate | What she was (unverified) | Sources | Fit |
+|---|---|---|---|
+| **HMS Harpy, 1796** | An 18-gun brig-sloop of the Diligence class (Henslow), about 330 to 340 tons, some 96 ft on the gun deck, 30 ft beam, sixteen 32-pounder carronades and two long sixes; in service through the war | Winfield, *British Warships in the Age of Sail 1793–1817* (the class's dimensions); the Admiralty draught at Royal Museums Greenwich; the Vanguard kit's plans derive from it | **The brig.** In period exactly, the working brig-sloop of 1805, sized between the schooner and the frigate, with the full head-sail and staysail complement the owner asked for as the type carried it. First choice. |
+| **HMS Speedy, 1782** and **HMS Flirt, 1782** | Sisters of one design (Thomas King, Dover): 14-gun brig-sloops of about 208 tons, 78 ft on deck, fourteen 4-pounders; Speedy the most famous small brig of the age under Cochrane in 1800 to 1801, captured 1801 | Winfield; Cochrane's *Autobiography of a Seaman*; the RMG draughts; the Vanguard kits of both | The older, smaller brig, at the schooner's size rather than between; a fine second brig for milestone 8 and a scenario of her own (Speedy against *El Gamo*). Not the base, because she does not fill the gap in the hierarchy and was not in service in 1805. |
+| **HMS Adder, 1797** | A gun-brig (Conquest or Acute class), about 160 tons, some 75 ft, twelve 18-pounder carronades, flat-floored, some of the class with Schank's sliding keels; Channel and Downs service | Winfield; the RMG draughts; the Vanguard kit | Not a sailing brig so much as a floating battery that could sail; at a cutter's size. Milestone 8, as the gun-brig type for the Channel's coast war (M7 wants her). |
+
+## The cutter candidates
+
+| Candidate | What she was (unverified) | Sources | Fit |
+|---|---|---|---|
+| **HMS Alert, 1777** | A 12-gun naval cutter of about 205 tons, later rigged as a sloop; captured by the French in 1778 | Peter Goodwin, *The Naval Cutter Alert, 1777* (Anatomy of the Ship, Conway 1991), with the lines, the spar dimensions and the sail plan complete; the RMG draughts; the Vanguard kit | **The armed cutter**, and the best-documented small vessel of the age because of the Anatomy volume: every spar and sail is in print. At 200 tons she is a warship's cutter, the schooner's size, not a pilot's boat. |
+| **HM Armed Cutter Sherbourne, 1763** | A small 8-gun cutter of about 78 tons, some 55 ft, of the revenue-cutter build | The RMG draught (the well-known Sherbourne plan); the Vanguard kit | **The pilot's cutter.** A pilot cutter or a revenue cutter of the Channel was of this size, forty to eighty tons; she is the bottom of the hierarchy and the one the ports need first (spec §23). Older than the period, but the type changed little. |
+| **HM Trial Cutter, 1790** | An experimental cutter with Schank's three sliding keels, about 60 ft | The RMG draughts; Schank's own papers; the Vanguard kit | A curiosity of the "cool obscure" kind, and the sliding keels are a hull feature the engine does not model. Milestone 8 or later, if at all. |
+| **HMS Bramble, 1822** | A 10-gun cutter of the 1820s, about 160 tons | The RMG draught; the Vanguard kit | Out of period by seventeen years; the cutter of 1822 is fuller and taller-rigged than 1805's. Not for the game's date. |
+
+## Recommendation
+
+Two files for milestone 5: **Sherbourne** as the cutter (the pilot's, package 35), and
+**Harpy** as the brig (package 36), with the brig-sloop and the merchant brig as her two
+descriptions at far detail. **Alert** as the third, an armed cutter at the schooner's size,
+when the vessel library opens in milestone 8, since the Anatomy volume makes her the
+cheapest well-sourced vessel there is and she tests the generator's cutter rules at a
+second size; Speedy and Adder after her, for their scenarios. The hierarchy that results:
+Sherbourne about 80 tons, Alert and Speedy about 200, the schooner 224, Harpy about 340,
+the frigate 933.
+
+Two cautions. The Vanguard kits are built from the Admiralty draughts and are a good
+guide to what exists, but the game's files cite the draughts and the printed dimensions
+(Winfield, Goodwin, Steel's tables for the spars), not the kits. And every number above
+is from the lead's memory and must be read again from a source before it becomes a
+figure in a ship file; the generator's comments carry the citation, as the frigate's and
+the schooner's do.
