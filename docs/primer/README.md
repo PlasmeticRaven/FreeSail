@@ -37,7 +37,7 @@ What the log will say is shown in plain code blocks, copied from a run with seed
 | 6 | [The watch and the log](06-the-watch-and-the-log.md) | Bells and watches, the marks in the log, the console commands, saving and replaying. |
 | 7 | [A first passage](07-a-first-passage.md) | A worked hour on each ship that you can type along with. |
 | 8 | [Where to read more](08-where-to-read-more.md) | The chapters of Luce, Lever and Falconer behind each evolution. |
-| 9 | [The glass and the sky](09-the-glass-and-the-sky.md) | The barometer and its tendency, Beaufort's words for the sky, the weather and the visibility as readings and as lines in the book; what a captain of 1805 knew of the weather and what he did not. |
+| 9 | [The glass and the sky](09-the-glass-and-the-sky.md) | The barometer and its tendency, Beaufort's words for the sky, the weather and the visibility as readings and as lines in the book; the sea in the period's words and the ship's motion in it, what the hands and the gear feel of a seaway; what a captain of 1805 knew of the weather and what he did not. |
 
 ## Where to start
 

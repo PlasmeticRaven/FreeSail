@@ -10,7 +10,7 @@ If the ship carries a barometer (the scenario file says, `glass: true` under `sh
 the glass is 29.72 inches
 ```
 
-A marine glass of the period is Nairne's pattern of about 1773, a stick barometer with its bore pinched to stop the mercury pumping with the ship's motion, hung in gimbals in the cabin; Cook carried one, and by 1805 an officer who wanted one bought it himself, since the Admiralty did not yet issue them. The reading you get carries the ship's own noise, half a hundredth either way; the seaway's pumping comes with the next package.
+A marine glass of the period is Nairne's pattern of about 1773, a stick barometer with its bore pinched to stop the mercury pumping with the ship's motion, hung in gimbals in the cabin; Cook carried one, and by 1805 an officer who wanted one bought it himself, since the Admiralty did not yet issue them. The reading you get carries the ship's own noise, half a hundredth either way, and in a seaway the mercury pumps with the ship's motion, a hundredth or two in a heavy sea (the section on the sea below).
 
 What the period read from the glass was not its height but its **tendency**, and so the game keeps a second reading, `the tendency`, from the ship's own record of the glass over the last three hours: steady, rising, falling, rising fast, falling fast, with the change in hundredths.
 
@@ -70,6 +70,57 @@ standing order "squall": at a squall then take in the royals
 ```
 
 The period shortened sail for a squall it saw coming, by the look of the cloud and the darkening of the water to windward, and made sail again as it passed; the sky's words and the weather's "squally" are what it saw.
+
+## The sea
+
+The wind raises a sea, and the sea outlasts the wind. When a scenario's wind has a cause (the systems of the section below, rather than the pinned wind of milestone 4), the game keeps the sea at the ship, raised by the wind of the last ten minutes and read once a minute, and `the sea` is a reading in the words the period's logs used, never in feet or metres and never in the numbers of the Douglas scale, which is 1921:
+
+```
+the sea is a short chopping sea
+the sea is a heavy sea
+the sea is a moderate sea and a long swell from the westward
+the sea is a heavy confused sea, the swell from the north-westward
+```
+
+The words are Falconer's and Luce's. Falconer's article *Sea* (1780) has the sailor's uses: "a heavy sea broke over our quarter", "there is a great sea in the offing"; "a long sea implies an uniform and steady motion of long and extensive waves; on the contrary, a short sea is when they run irregularly, broken, and interrupted, so as frequently to burst over a vessel's side or quarter"; and a ship "is said to head the sea, when her course is opposed to the setting or direction of the surges". His *Swell* is "the fluctuating motion of the sea, which remains after the expiration of a storm". Luce (1884, in the weather chapter) gives "a heavy swell or confused agitation of the sea not accounted for in any other way" among the signs of a coming gale, and "a smooth sea" and "a head sea" throughout his chapter on a gale. "A short chopping sea" is the phrase of the period's logs for a fresh breeze's young sea; it is not in the game's copies of the references, and the tuning notes say so.
+
+What the game does with the words: a smooth sea under half a metre of significant height, a moderate sea to a metre and a half, a short chopping sea to two and a half, a heavy sea to six, a very heavy sea above; a swell is named when it stands above the wind's own sea and comes from another quarter, a long swell or a heavy swell; and a swell that crosses the wind by more than five points makes a confused sea. The heights come from the open-sea relation of the wind's speed (a fresh breeze of a day raises a sea of about two metres, a strong gale of a night six or seven) with a lag of hours to build and of hours to go down, and the swell a gale leaves decays over a day. The numbers are in `docs/dev/TuningNotes.md` and nowhere a player reads.
+
+The log says the sea when its words change, and the hour's line carries it with the glass:
+
+```
+  Morning watch (05:04)  A short chopping sea getting up.
+  First watch (20:45)  A heavy sea getting up.
+  Middle watch, 3 bells (01:30)  Overcast, drizzle; the glass 29.71; a heavy sea, rolling heavily.
+  Forenoon watch (08:22)  A heavy sea, the sea going down.
+```
+
+## The ship's motion
+
+A ship in a sea rolls, pitches and heaves, and the game keeps the three as numbers with the period's words for them in `the motion`: *easy*; *rolling easily*, *rolling*, *rolling heavily*; *pitching a little*, *pitching into it*, *pitching heavily into it* (or, with the sea under her stern, *pitching heavily, the sea under her stern*); and *labouring heavily* when she does both. Falconer's *Rolling* is "the motion by which a ship rocks from side to side like a cradle, occasioned by the agitation of the waves", and his *Sea-boat* "a vessel that bears the sea firmly, without labouring heavily, or straining her masts and rigging"; Luce's chapter on a gale has a vessel that "labors much in a seaway" and a pitching that "is hard and quick".
+
+```
+the motion is rolling heavily
+the ship's motion is easy
+```
+
+The roll comes from the sea on the beam against the ship's stability: the frigate rolls at her own period of about eight seconds, and rolls most in the sea whose period is near her own, a moderate gale's sea, and less in a long swell however high; she rolls some with the sea on her quarter and little with it right ahead or astern. The pitch comes from the sea ahead or astern, and a ship does not pitch to a sea shorter than herself. Nothing in this moves the ship over the water: it is what the hands and the gear feel.
+
+What they feel, each in one place: the hands aloft work slower as she rolls, so a reef in a heavy sea takes half as long again as in a smooth one (Luce: "when a vessel labors much in a seaway ... the sails should never be hoisted up, or the braces hauled, as taut as in a smooth sea; for the jerk of the masts will either carry away the braces and sheets or spring the yards"); the spars and their gear are judged against their ratings with that jerk added, a fifth more at twenty degrees of roll, so the same canvas that stands in a smooth sea carries away in a heavy one; a head sea costs her speed ("by forcing her through a head sea, you strain every mast and yard, and injure the rigging", Luce again); and the glass pumps. The standing orders read both readings:
+
+```orders frigate
+standing order "heavy sea": when the sea is heavy then take in the topgallants
+standing order "labouring": when the motion is labouring heavily then reef the topsails, one reef
+standing order "easy again": when the sea is not heavy and the motion is easy then set the topgallants
+```
+
+The log says the motion when its words have changed and held for five minutes:
+
+```
+  First watch (21:57)  Rolling heavily.
+  First watch (22:54)  Labouring heavily.
+  Middle watch (01:04)  Pitching heavily, the sea under her stern.
+```
 
 ## What a captain of 1805 did not know
 
