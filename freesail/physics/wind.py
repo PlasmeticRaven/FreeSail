@@ -9,24 +9,22 @@ stays whatever moves the base.
 `freesail.world.weather_script`) pins it directly (`follow`); milestone 5's weather
 systems (spec M5 §2, `freesail.world.weather`) give it a cause: the surface wind at the
 ship, which the World hands to `follow` every tick with the sector's air mass. Without
-either, nothing here changes from the M2 wind.
+either the base is fixed.
 
-**Two regimes** (spec M5 §3; the study `docs/design/WeatherSystems.md` §4):
-
-- With no air mass (`air_mass` None: a fixed wind, or a wind pinned by the script), the M2
-  mechanism, draw for draw: the gust factor 1.1 to 1.5 whatever the mean and the
-  direction's unbounded walk. Every truth from 1 to 51 is measured on this regime, so it
-  does not move (package 30; the pinned `wind` form is the truths' fixture, and with
-  both forms in a scenario the pinned wind wins and the systems supply only the sky and
-  the glass).
-- With an air mass from the systems' sector, the gust factor is drawn by the air mass
-  (`GUST_FACTOR_RANGES`: a warm sector 1.10 to 1.20, neutral air 1.15 to 1.30, unstable
-  air behind a cold front 1.20 to 1.30) as a multiple of the ten-minute mean, which is how
-  the studies the ranges come from define it (the peak few-second gust over the eight- to
-  ten-minute mean, W §4, S29 to S31); the top of the unstable range, 1.30 to 1.45, is a
-  squall's, its own event of a few minutes with a veer of a point or two and rain
-  (`SQUALL_*`); and the direction's walk is mean-reverting about the base with a spread
-  by the air mass (`WANDER_SPREAD_DEG`). Speed wander is the same in both.
+**One rule, by the air mass** (spec M5 §3; the study `docs/design/WeatherSystems.md` §4;
+the owner's ruling at gate 5a, decision 28, package 31b): the gust factor is drawn by the
+air mass (`GUST_FACTOR_RANGES`: a warm sector 1.10 to 1.20, neutral air 1.15 to 1.30,
+unstable air behind a cold front 1.20 to 1.30) as a multiple of the ten-minute mean, which
+is how the studies the ranges come from define it (the peak few-second gust over the
+eight- to ten-minute mean, W §4, S29 to S31); the top of the unstable range, 1.30 to
+1.45, is a squall's, its own event of a few minutes with a veer of a point or two and rain
+(`SQUALL_*`); and the direction's walk is mean-reverting about the base with a spread by
+the air mass (`WANDER_SPREAD_DEG`). The air mass is the systems' sector when they drive
+the wind, and otherwise `DEFAULT_AIR_MASS`, neutral, unless the scenario says (a fixed
+wind's `air_mass`, or a pinned waypoint's). The milestone 2 draws (a gust factor of 1.1
+to 1.5 whatever the mean, an unbounded walk of the direction), which packages 30 and 31
+kept for a fixed or pinned wind so that the M4 truths did not move, are retired; those
+truths were re-measured under this rule (docs/dev/TuningNotes.md, M5a, package 31b).
 """
 
 from __future__ import annotations
@@ -47,9 +45,10 @@ from freesail import units
 MEAN_WIND_WINDOW_S = 600
 
 # A reading this share of the mean above it is a gust, as far below a lull, and between
-# them the wind is at its mean (judgement: the M2 wind's gusts are a tenth to a half again
-# the base, `Wind.step`, so every gust is at least this far above; a lull is the mirror).
-# Never less than GUST_MARGIN_FLOOR_KN, so a light air's knot either way is not a gust.
+# them the wind is at its mean (judgement: a gust is a tenth to three tenths again the
+# mean by the air mass, `Wind.step`, so every gust is at least this far above; a lull is
+# the mirror). Never less than GUST_MARGIN_FLOOR_KN, so a light air's knot either way is
+# not a gust.
 GUST_MARGIN = 0.1
 GUST_MARGIN_FLOOR_KN = 1.0
 
@@ -86,10 +85,13 @@ WANDER_TIME_CONSTANT_S = 1200.0
 # variability scales them, and nought gives no wander, as every truth is measured.
 DEFAULT_VARIABILITY = 0.3
 
-# The M2 walk: 0.0002 radians per root second at variability 1, which is 0.69 degrees an
-# hour of standard deviation (W §4 corrects the old docstring's "about a point an hour":
-# a point would take days). Kept exactly for the regime without an air mass.
-M2_WALK_RAD_PER_SQRT_S = 0.0002
+# The air mass a wind has when nothing gives it one (package 31b; the owner's ruling at
+# gate 5a): a fixed wind, or a wind pinned by a scenario's script whose waypoints say no
+# air, is in neutral air, gusting to 1.30 of its mean at most and never squalling. The
+# scenario may say otherwise (`Scenario.air_mass`; a waypoint's `air_mass`), and the
+# systems' sector says when they drive the wind. The names are `AIR_MASSES`.
+DEFAULT_AIR_MASS = "neutral"
+AIR_MASSES: tuple[str, ...] = ("warm", "neutral", "unstable")
 
 
 @dataclass
@@ -132,8 +134,9 @@ class Wind:
         self.gust_factor = 1.0
         self.gust_remaining = 0.0
         self.gust_started = False  # set True on the tick a gust begins
-        # the systems' regime (spec M5 §3): the air mass at the ship, None without systems
-        self.air_mass: str | None = None
+        # the air mass at the ship (spec M5 §3): the systems' sector when they drive the
+        # wind, else the scenario's, else neutral (package 31b)
+        self.air_mass: str = DEFAULT_AIR_MASS
         self._gust_peak = 0.0  # m/s: the gust's peak, a multiple of the ten-minute mean
         self.squall_factor = 1.0
         self.squall_veer = 0.0  # radians, added to the direction while the squall lasts
@@ -178,29 +181,23 @@ class Wind:
 
     def step(self, dt: float = 1.0, mean_speed: float | None = None) -> None:
         """One tick. `mean_speed` is the ten-minute mean (`WindRecord.mean_speed`), which
-        the systems' regime draws its gusts and squalls as multiples of; None (or the M2
-        regime) reads the instant's speed instead."""
+        the gusts and squalls are drawn as multiples of; None (the first tick, or a wind
+        stepped without a World) reads the instant's speed instead."""
         v = self.params.variability
         r = self._stream
-        air = self.air_mass
-        # direction
-        if air is None:
-            # the M2 walk, unbounded: 0.69 degrees an hour at variability 1
-            self._direction = units.wrap_2pi(
-                self._direction + r.gauss(0.0, M2_WALK_RAD_PER_SQRT_S * v * math.sqrt(dt))
-            )
-        else:
-            # mean-reverting about the base (Ornstein-Uhlenbeck), spread by the air mass
-            spread = units.deg_to_rad(WANDER_SPREAD_DEG[air]) * (v / DEFAULT_VARIABILITY)
-            tau = WANDER_TIME_CONSTANT_S
-            offset = units.wrap_pi(self._direction - self.base_direction)
-            offset += -offset * dt / tau + r.gauss(0.0, spread * math.sqrt(2.0 * dt / tau))
-            self._direction = units.wrap_2pi(self.base_direction + offset)
+        air = self.air_mass or DEFAULT_AIR_MASS
+        # direction: mean-reverting about the base (Ornstein-Uhlenbeck), spread by the air
+        # mass
+        spread = units.deg_to_rad(WANDER_SPREAD_DEG[air]) * (v / DEFAULT_VARIABILITY)
+        tau = WANDER_TIME_CONSTANT_S
+        offset = units.wrap_pi(self._direction - self.base_direction)
+        offset += -offset * dt / tau + r.gauss(0.0, spread * math.sqrt(2.0 * dt / tau))
+        self._direction = units.wrap_2pi(self.base_direction + offset)
         # speed: mean-reverting walk about the base speed
         pull = (self.base_speed - self.speed) * 0.0005 * dt
         noise = r.gauss(0.0, 0.01 * v * self.base_speed * math.sqrt(dt))
         self.speed = max(self.MIN_SPEED, self.speed + pull + noise)
-        mean = mean_speed if (mean_speed is not None and air is not None) else self.speed
+        mean = mean_speed if mean_speed is not None else self.speed
         # gusts
         self.gust_started = False
         if self.gust_remaining > 0:
@@ -209,14 +206,11 @@ class Wind:
                 self.gust_factor = 1.0
                 self._gust_peak = 0.0
         elif r.random() < self.params.gustiness * 0.002 * dt:
-            if air is None:
-                self.gust_factor = r.uniform(1.1, 1.5)
-            else:
-                self.gust_factor = r.uniform(*GUST_FACTOR_RANGES[air])
-                self._gust_peak = mean * self.gust_factor
+            self.gust_factor = r.uniform(*GUST_FACTOR_RANGES[air])
+            self._gust_peak = mean * self.gust_factor
             self.gust_remaining = r.uniform(5.0, 30.0)
             self.gust_started = True
-        # squalls: the systems' regime, unstable air only
+        # squalls: unstable air only
         self.squall_started = False
         self.squall_ended = False
         if self.squall_remaining > 0:
@@ -238,9 +232,8 @@ class Wind:
 
     @property
     def effective_speed(self) -> float:
-        """Speed at the reference height including any gust or squall."""
-        if self.air_mass is None:
-            return self.speed * self.gust_factor
+        """Speed at the reference height including any gust or squall: a gust's or a
+        squall's peak is a multiple of the ten-minute mean, never less than the instant."""
         peak = 0.0
         if self.gust_remaining > 0.0:
             peak = self._gust_peak

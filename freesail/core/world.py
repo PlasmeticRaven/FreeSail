@@ -17,7 +17,7 @@ from freesail.core.clock import Clock
 from freesail.core.events import Event, Log, Severity
 from freesail.core.rng import Rng
 from freesail.core.sun import DAY, DEFAULT_LATITUDE_DEG, Sun
-from freesail.physics.wind import Wind, WindParams, WindRecord
+from freesail.physics.wind import AIR_MASSES, Wind, WindParams, WindRecord
 from freesail.ship.stub import OrderError, PointShip
 
 ENGINE_VERSION = "0.0.1"
@@ -63,6 +63,12 @@ class Scenario:
     # in a small vessel); the scenario says, and without one the glass and its tendency
     # are not to be had.
     glass: bool = False
+    # The air mass under a fixed or a pinned wind (spec M5 §3 as revised by package 31b, the
+    # owner's ruling at gate 5a): "warm", "neutral" or "unstable", for the gust factor, the
+    # squalls and the wander (`physics.wind`). A pinned script's waypoint may say its own
+    # (`air_mass` beside its wind), which holds from that waypoint on; when the systems
+    # drive the wind their sector says. A save from before loads with neutral.
+    air_mass: str = "neutral"
     # The sea and the ship's motion (spec M5 §4, package 31; `freesail.world.sea`,
     # `physics.motion`): kept when the wind has a cause (the systems drive it and no
     # `weather` script pins it), as the sky is, or when the scenario says `sea: true`
@@ -185,6 +191,18 @@ class World:
             if self.scenario.glass:
                 self.glass = Glass(self.seed)
         self.wind = Wind(wind_params, self.rng.stream("wind"))
+        # the air mass of a fixed or a pinned wind (package 31b): the scenario's, or the
+        # script's waypoint's from the first that names one
+        if self.scenario.air_mass not in AIR_MASSES:
+            raise ValueError(
+                f"The scenario says the air is '{self.scenario.air_mass}'; say one of "
+                f"{', '.join(AIR_MASSES)}."
+            )
+        self.wind.air_mass = self.scenario.air_mass
+        if self.weather is not None:
+            self.wind.air_mass = self.weather.air_mass_at(
+                self.scenario.start_time, self.scenario.air_mass
+            )
         # the true wind of the last ten minutes, for the mean wind reading (package 29b)
         self.wind_record = WindRecord()
         self.ship = ship or PointShip(
@@ -600,10 +618,12 @@ class World:
                 self.wind.follow(*self.systems.surface_wind_at(self.ship_x_km, self.ship_y_km))
         if self.weather is not None:
             self.wind.follow(*self.weather.at(self.clock.ship_time))
-        # the ten-minute mean, which the systems' regime draws its gusts and squalls as
-        # multiples of (spec M5 §3); the M2 regime reads nothing and stays as it was
-        mean = self.wind_record.mean_speed() if self.wind.air_mass is not None else None
-        self.wind.step(1.0, mean)
+            self.wind.air_mass = self.weather.air_mass_at(
+                self.clock.ship_time, self.scenario.air_mass
+            )
+        # the ten-minute mean, which the gusts and squalls are drawn as multiples of (spec
+        # M5 §3; under every wind since package 31b)
+        self.wind.step(1.0, self.wind_record.mean_speed())
         self.wind_record.add(self.wind.effective_speed, self.wind.direction_from)
         if self.wind.squall_started or self.wind.squall_ended:
             self._log_squall()
@@ -614,8 +634,11 @@ class World:
                 "wind.gust",
                 f"A gust: {units.ms_to_knots(self.wind.effective_speed):.0f} knots, the mean "
                 f"{mean:.0f}.",
-                data={"factor": self.wind.gust_factor, "mean_kn": round(mean, 1)}
-                | ({"air_mass": self.wind.air_mass} if self.wind.air_mass else {}),
+                data={
+                    "factor": self.wind.gust_factor,
+                    "mean_kn": round(mean, 1),
+                    "air_mass": self.wind.air_mass,
+                },
             )
         shift = units.wrap_pi(self.wind.direction_from - self._last_logged_wind_direction)
         if abs(shift) >= self.WIND_SHIFT_LOG_THRESHOLD and not self.wind.in_squall:

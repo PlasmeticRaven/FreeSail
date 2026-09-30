@@ -344,7 +344,10 @@ def test_trim_on_a_shift_fires_at_each_point_of_a_steady_veer_and_not_on_the_gus
     wander: the gusts come and go and the order never fires. Then the wind veers two
     points in an hour, steadily: it fires when the wind has veered a point, stands again
     five minutes after, and fires again at the second point, measured from the wind it
-    fired on the first time."""
+    fired on the first time. Under the air-mass rule (package 31b) a pinned wind wanders
+    about its base by five degrees in neutral air, so the firings come some minutes
+    before or after the script's points (measured at seed 7: 13 and 60 minutes into the
+    veer, against 30 and 60 under the milestone 2 walk); the count is what holds."""
     w = shift_world(script((0, 270, 18), (2, 270, 18), (3, 292.5, 18), (5, 292.5, 18)))
     w.run(2 * 3600 - w.clock.tick)
     assert [e for e in w.log if e.kind == "wind.gust"], "the gusts blew"
@@ -353,10 +356,10 @@ def test_trim_on_a_shift_fires_at_each_point_of_a_steady_veer_and_not_on_the_gus
     fired = trims(w)
     assert len(fired) == 2
     minutes = [(e.tick - 2 * 3600) / 60 for e in fired]
-    # two points in the hour: the first at half past, the second at the hour, each
-    # measured from the wind the last firing was made on (the wander moves them a little)
-    assert 27 <= minutes[0] <= 33, minutes
-    assert 57 <= minutes[1] <= 63, minutes
+    # two points in the hour: the first about half past, the second about the hour, each
+    # measured from the wind the last firing was made on, the wander moving them
+    assert 5 <= minutes[0] <= 45, minutes
+    assert minutes[0] + 5 <= minutes[1] <= 75, minutes
     rule = w.standing.book.get("trim on a shift")
     assert rule.fired == 2  # held at WNW for the last hour and a half: no third firing
 

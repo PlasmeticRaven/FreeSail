@@ -48,8 +48,12 @@ weather:
   # 22 to 27, a moderate gale 28 to 33, a fresh gale 34 to 40, a strong gale 41 to 47.
   wind:
     # Dawn: a fresh breeze from the west, seventeen knots. Plain sail and the royals draw
-    # all day (the starter's "morning sail" sets the royals under twenty knots).
-    - {at: 1805-06-01T04:00, from_deg: 270, knots: 17}
+    # all day (the starter's "morning sail" sets the royals under twenty knots). The air
+    # (spec M5 §3; package 31b, the pinned form under the air-mass rule): by day the warm
+    # sector's stable air, as the systems below have it, gusting to a fifth again the mean
+    # and wandering three degrees, so that "trim on a shift" fires on the script's veers
+    # and not on the wander; from the cold front, neutral (below).
+    - {at: 1805-06-01T04:00, from_deg: 270, knots: 17, air_mass: warm}
     # A fresh breeze still through the afternoon.
     - {at: 1805-06-01T14:00, from_deg: 270, knots: 18}
     # Nineteen knots at seven bells in the last dog watch, still under twenty, so the royals
@@ -58,8 +62,14 @@ weather:
     - {at: 1805-06-01T19:30, from_deg: 270, knots: 19}
     # After dark the wind veers two points to west-north-west and rises to a moderate gale:
     # thirty knots (the starter's "shorten sail for weather", the topgallants in with it)
-    # about 22:10, in the first watch.
-    - {at: 1805-06-01T22:00, from_deg: 292.5, knots: 29}
+    # about 22:10, in the first watch. The cold front is through. The air behind it is the
+    # cold, unstable air of the day under systems, but this pinned form says neutral,
+    # gusting to three tenths again the mean and never squalling, so that the routines fire
+    # at the times the script implies (truth 48): said `unstable` here, the pinned day gets
+    # the systems' squalls, and the starter's five-minute dwell fires the heavy-weather
+    # routine on a seven-minute squall an hour before the script's forty knots (measured;
+    # docs/dev/TuningNotes.md, M5a, package 31b). The squalls live on the day under systems.
+    - {at: 1805-06-01T22:00, from_deg: 292.5, knots: 29, air_mass: neutral}
     # Two points more to north-west and a fresh gale by midnight: the captain's "gale
     # canvas" at thirty-six knots as the first watch ends.
     - {at: 1805-06-02T00:00, from_deg: 315, knots: 36}
@@ -71,7 +81,8 @@ weather:
     # Easing at the next dawn (civil dawn about 03:00, sunrise 03:40): a strong breeze by five.
     - {at: 1805-06-02T05:00, from_deg: 315, knots: 26}
     # A fresh breeze again by seven: the captain's "make sail after the gale" and
-    # "topgallants again" bring her back to plain sail in the morning watch.
+    # "topgallants again" bring her back to plain sail in the morning watch. The ridge:
+    # neutral air still.
     - {at: 1805-06-02T07:00, from_deg: 315, knots: 18}
 
   # The same day as a system (freesail/world/weather.py; the study's §5: "a low passing well

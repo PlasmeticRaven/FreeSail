@@ -11,7 +11,10 @@ What the script sets is the **base** wind, the one the wind model wanders about
 ride on the scripted base exactly as they ride on a fixed one (spec §19: "with the
 gustiness the wind model already has"). A turn the script makes is a turn of the true
 wind like any other, so the log's `Wind veered to ...` lines and the readings'
-`backs N points` and `veers N points` see it.
+`backs N points` and `veers N points` see it. The gusts, the squalls and the wander are
+drawn by the air mass (spec M5 §3; package 31b): neutral unless the scenario says, and a
+waypoint may say the air from its moment on (`air_mass: unstable` behind a cold front),
+read by `air_mass_at`.
 
 **Scenario data.** The script is part of the `Scenario` (its `weather`, a list of plain
 dictionaries), so it is saved with the game beside the seed, and a replay, which rebuilds
@@ -35,6 +38,7 @@ from datetime import datetime
 from typing import Any
 
 from freesail import units
+from freesail.physics.wind import AIR_MASSES, DEFAULT_AIR_MASS
 
 
 class ScriptError(ValueError):
@@ -44,14 +48,25 @@ class ScriptError(ValueError):
 @dataclass(frozen=True)
 class Waypoint:
     """The wind at one moment of the script: from `from_deg` (degrees true, where the wind
-    comes from) at `knots` (at the reference height of ten metres, as `WindParams`)."""
+    comes from) at `knots` (at the reference height of ten metres, as `WindParams`); and,
+    when the file says so, the air mass from this moment on (`air_mass`: warm, neutral or
+    unstable, spec M5 §3; package 31b), for the gust factor, the squalls and the wander.
+    A waypoint that says none leaves the air as the last one said, or the scenario's."""
 
     at: datetime
     from_deg: float
     knots: float
+    air_mass: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
-        return {"at": self.at.isoformat(), "from_deg": self.from_deg, "knots": self.knots}
+        d: dict[str, Any] = {
+            "at": self.at.isoformat(),
+            "from_deg": self.from_deg,
+            "knots": self.knots,
+        }
+        if self.air_mass is not None:
+            d["air_mass"] = self.air_mass
+        return d
 
     @classmethod
     def from_dict(cls, d: Mapping[str, Any]) -> Waypoint:
@@ -69,15 +84,25 @@ class Waypoint:
             ) from None
         if knots < 0:
             raise ScriptError(f"The waypoint at {at.isoformat()} has a wind of {knots} knots.")
-        return cls(at=at, from_deg=from_deg % 360.0, knots=knots)
+        air = d.get("air_mass")
+        if air is not None:
+            air = str(air).strip().lower()
+            if air not in AIR_MASSES:
+                raise ScriptError(
+                    f"The waypoint at {at.isoformat()} says the air is '{air}'; say one of "
+                    f"{', '.join(AIR_MASSES)}."
+                )
+        return cls(at=at, from_deg=from_deg % 360.0, knots=knots, air_mass=air)
 
     def describe(self) -> str:
-        """'W, 18 knots (a fresh breeze) at 04:00 on 1 June'."""
+        """'W, 18 knots (a fresh breeze) at 04:00 on 1 June', and ', the air unstable'
+        when the waypoint says so."""
         speed = units.knots_to_ms(self.knots)
+        air = f", the air {self.air_mass}" if self.air_mass else ""
         return (
             f"{units.point_name(units.deg_to_rad(self.from_deg))}, {self.knots:g} knots "
             f"({units.describe_wind_strength(speed)}) at {self.at.strftime('%H:%M')} "
-            f"on {self.at.day} {self.at.strftime('%B')}"
+            f"on {self.at.day} {self.at.strftime('%B')}{air}"
         )
 
 
@@ -120,6 +145,18 @@ class WeatherScript:
         direction = units.wrap_2pi(a_dir + f * turn)
         knots = a.knots + f * (b.knots - a.knots)
         return direction, units.knots_to_ms(knots)
+
+    def air_mass_at(self, when: datetime, default: str = DEFAULT_AIR_MASS) -> str:
+        """The air mass in force at `when` (package 31b): what the last waypoint at or
+        before it that names one says, else `default` (the scenario's). An air mass is
+        not interpolated: a front's change of air is a moment, and the waypoint marks it."""
+        air = default
+        for p in self.waypoints:
+            if p.at > when:
+                break
+            if p.air_mass is not None:
+                air = p.air_mass
+        return air
 
     def lines(self) -> list[str]:
         """The script in words, a line a waypoint, for the console and the gate report."""
