@@ -282,7 +282,8 @@ def test_refusals_are_the_dialects_and_come_at_registration(unbound):
         def dawn():
             order("set the royals")
 
-    with pytest.raises(OrderError, match="nothing to sight yet"):
+    # a sighting is an event since package 33a named it; the order after it is still parsed
+    with pytest.raises(OrderError, match="clear for action"):
 
         @at("a sighting", name="sighting")
         def sighting():

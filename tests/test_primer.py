@@ -90,6 +90,7 @@ CHAPTERS = [
     "07-a-first-passage.md",
     "08-where-to-read-more.md",
     "09-the-glass-and-the-sky.md",
+    "10-the-reckoning.md",
 ]
 
 DRIVER_COMMANDS = frozenset(
@@ -181,7 +182,18 @@ def make_ship(which: str, preset: str, tack: str) -> Ship:
     # a World around the ship, so that chapter 7's standing orders have a book to be
     # entered in (spec M4 §3: `standing order "x": ...` needs the runtime the World
     # attaches); the blocks never tick it
-    World(seed=7, scenario=Scenario(start_time=PRIMER_TIME), ship=ship)
+    # ...and on the sphere, ten miles south of the Lizard on the chart of the western
+    # Channel, so that chapter 10's navigation orders have a reckoning to keep and a
+    # mark in sight (package 33a; the reckoning refuses every order on the plane)
+    World(
+        seed=7,
+        scenario=Scenario(
+            start_time=PRIMER_TIME,
+            position={"lat_deg": 49.80, "lon_deg": -5.20},
+            region="channel-west",
+        ),
+        ship=ship,
+    )
     if ship.spec.crew is not None:
         # the ship's company and the watch routine, as make_world attaches them, so that
         # chapter 6's crew orders have hands to call (package 20)

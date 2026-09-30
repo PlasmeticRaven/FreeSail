@@ -40,12 +40,13 @@ import numpy as np
 import yaml
 
 from freesail import units
-from freesail.world.geo import Position, bearing_and_distance, horizon_nm
+from freesail.world.geo import Position, bearing_and_distance, destination, horizon_nm
 
 __all__ = [
     "AGROUND_HIGHEST_TIDE_M",
     "AGROUND_MARGIN_M",
     "CHARTS_DIR",
+    "CONTOUR_STEP_M",
     "Chart",
     "ChartError",
     "CoastReading",
@@ -76,6 +77,11 @@ AGROUND_MARGIN_M = 2.0
 DANGER_SEEN_NM = 3.0
 NIGHT_LAND_NM = 1.0
 TWILIGHT_FACTOR = 0.5
+
+# The step between the rings a cast's contour is searched on (package 33a, spec M5 §13):
+# half a mile, judgement (the level 2 cells are about a hundred metres; a cast is rare
+# and a search of a few thousand reads takes milliseconds).
+CONTOUR_STEP_M = 0.5 * units.NAUTICAL_MILE
 
 # Default heights above the sea for the horizon where a feature gives none (metres):
 # a headland a low cliff, a town its roofs, a rock its head at high water.
@@ -709,6 +715,57 @@ class Chart:
             return None
         where, water = worst
         return Grounding(water, draught_m, where, self.bottom_near(pos))
+
+    def contour_point(
+        self,
+        pos: Position,
+        depth_m: float,
+        tolerance_m: float,
+        radius_m: float,
+        ground: str = "",
+        ground_of: Any = None,
+        step_m: float = CONTOUR_STEP_M,
+    ) -> tuple[Position, float] | None:
+        """The depth contour a cast is matched to (spec M5 §13; package 33a): the nearest
+        point to `pos` within `radius_m` whose depth is within `tolerance_m` of the cast's
+        and whose ground, by `ground_of(point, depth)`, is the cast's `ground` (any
+        ground when either is empty); with the bearing across the contour there, toward
+        deeper water, from the depth's gradient. Searched on rings a `step_m` apart,
+        nearest first; None when no point of the chart within reach answers the cast.
+        The reckoning is moved onto this point and its doubt across the contour shrunk
+        (`reckoning.Reckoning.update_line`); the truth is never read here."""
+        if depth_m is None:
+            return None
+        rings = int(radius_m // step_m)
+        for k in range(rings + 1):
+            r = k * step_m
+            if r == 0.0:
+                candidates = [pos]
+            else:
+                n = max(8, int(round(2.0 * math.pi * r / step_m)))
+                candidates = [destination(pos, 360.0 * i / n, r) for i in range(n)]
+            for p in candidates:
+                d = self.depth_at(p)
+                if d is None or abs(d - depth_m) > tolerance_m:
+                    continue
+                if ground and ground_of is not None and ground_of(p, d) != ground:
+                    continue
+                return p, self._contour_normal(p, step_m)
+        return None
+
+    def _contour_normal(self, p: Position, step_m: float) -> float:
+        """The bearing across the contour at `p`, toward deeper water, from the depth's
+        gradient over a step either way; across the reckoning's course when flat."""
+        east = self.depth_at(p.advanced(step_m, 0.0))
+        west = self.depth_at(p.advanced(-step_m, 0.0))
+        north = self.depth_at(p.advanced(0.0, step_m))
+        south = self.depth_at(p.advanced(0.0, -step_m))
+        here = self.depth_at(p) or 0.0
+        gx = ((east if east is not None else here) - (west if west is not None else here)) / 2.0
+        gy = ((north if north is not None else here) - (south if south is not None else here)) / 2.0
+        if gx == 0.0 and gy == 0.0:
+            return 0.0
+        return math.degrees(math.atan2(gx, gy)) % 360.0
 
     def bottom_near(self, pos: Position, within_m: float = 3000.0) -> str:
         """The ground from the nearest bottom note within `within_m`, or ''."""

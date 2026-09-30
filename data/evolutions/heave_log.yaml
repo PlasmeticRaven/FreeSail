@@ -1,0 +1,30 @@
+# Heave the log (spec M5 §15; package 33a). "It is usual to heave the log once every
+# hour in ships of war and East-Indiamen; and in all other vessels, once in two hours"
+# (Falconer 1780, 'Log'): the mate of the watch heaves it, one man holds the reel and
+# another the glass; twelve to fifteen fathoms of stray line carry the chip clear of the
+# wake before the glass is turned, and the line is veered "as fast as the chip will take
+# it; for if it be left to turn the reel itself, it will come home and deceive you in
+# your reckoning" (Luce 1866, 'Log-line, Time-glasses'; Luce 1884, ch. I 'The Log',
+# 'Heaving the Log'). The World heaves it at the hour of itself (two-hourly in a vessel
+# that is not a ship of war) and by order; the read is not known until the log is in,
+# so the World writes the line ("Hove the log: six knots and a half.") when this
+# completes and does not print this file's own (`world.reckoning.LOG_HOVE_KIND`).
+#
+# The subject is `her`, the runner's alias for the ship that is not the manoeuvres'
+# `ship`, so the mate at the log does not hold her against a tack or a wear.
+id: heave_log
+verb: heave_log
+applies_to: {class: ship}
+params: {automatic: false}
+preconditions: []
+steps:
+  - do: heave
+    duration_s: 30   # the stray line out, the glass turned and run, the line nipped (Luce:
+                     # a 28-second glass; judgement for the stray line and the read)
+on_start: {log: "Hands to the log."}
+on_complete: {log: "The log is in.", kind: log.hove, severity: routine}
+on_fail: {log: "Could not heave the log: {reason}.", kind: evolution.failed, severity: routine}
+# crew: the mate of the watch and two hands, one at the reel and one at the glass
+# (Falconer 1780, 'Log'); the afterguard, the log being hove from the lee quarter.
+crew: {hands: 3, rating: ordinary, stations: [afterguard, quarterdeck]}
+source: "Falconer 1780, 'Log' (hourly in ships of war, two-hourly in others; the reel and the glass); Luce 1866, 'Log-line, Time-glasses' (the line veered as the chip takes it); Luce 1884, ch. I 'The Log', 'Heaving the Log'"

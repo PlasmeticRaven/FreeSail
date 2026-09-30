@@ -1,0 +1,20 @@
+# FreeSail: the captain's orders for the passage of gate 5b in thick weather (spec M5
+# §20; package 33a). The same book as the clear passage's for the soundings; no bearings
+# to be had; the course for Falmouth shaped by account when the run since noon says she
+# is off the Lizard (thirty miles: judgement from the noon's account, some forty miles
+# south of the Lizard by the reckoning), and the ship hove to at the first land seen,
+# which in a mile of fog is close aboard and where the reckoning's errors have put her.
+
+standing order "bring to for soundings": at noon then heave to
+standing order "soundings": when the speed is under 3 knots and the distance run since noon is under 5 miles then heave the deep-sea lead
+standing order "fill away after the cast": at a sounding, if the distance run since noon is under 5 miles then fill away
+standing order "stand on": at filled away then steer N
+
+# The landfall made wrong: by account she is off the Lizard at thirty miles since noon,
+# and the course for Falmouth is shaped from the reckoning.
+standing order "off the Lizard by account": when the distance run since noon exceeds 30 miles then shape a course for Falmouth
+
+# The lead going every glass once she believes herself closing the land; hove to at the
+# first land seen, and there she stays (the gate ends at the landfall).
+standing order "lead going": every glass, if the distance run since noon exceeds 30 miles and the land is not in sight then heave the lead
+standing order "the land": when the land is in sight then heave to

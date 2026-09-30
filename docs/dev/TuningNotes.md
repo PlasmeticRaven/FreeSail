@@ -785,3 +785,105 @@ Two forms of the pinned day were measured and not chosen, for the record. **Neut
 - **"Trim on a shift" and the wander.** Under the M2 walk the starter's point rule fired only on a scripted veer; under the air-mass rule it fires on the wander through a gale in neutral air (fourteen times on the pinned night, five on the day under systems, whose warm sector wanders three degrees). The rule reads the instant true wind; a rule on the ten-minute mean's direction, or a dwell on the veer, would quiet it. Left as measured for the owner.
 - **The five-minute dwell and a squall.** Above: a squall of a few minutes fills the starter's "for 5 minutes", which was written against gusts of half a minute.
 - **"Topgallants again" on the day under systems** now fires by nine (08:52): the reefs come out of the three topsails together in the swell, where package 31 had them one after another and the ten minutes unreefed had not run.
+
+## Milestone 5b: the reckoning, the noon sight, the captain's chart, the checkpoint save and the passage for gate 5b
+
+Package 33a (spec M5 §8, §13 to §16, §17's second half, §18, §20; the study `docs/design/Navigation.md`, N). The world keeps the truth and the master keeps his account: nothing below is read from the truth by the account, and the tests compare the two from the world. Every constant with its source, and whether the source was verified; the figures the study marks unverified say so here as well as in their comments.
+
+### The constants and their sources
+
+| Constant | Value | Source | Verified |
+|---|---|---|---|
+| `reckoning.LOG_LINE_SHORT_MIN`, `_MAX` | 3% to 8% short | Luce 1866, "Log-line, Time-glasses": marked short "by 3 or 4 feet" of a 47.6-foot knot so that a ship overruns her reckoning; N §3's table gives 3 to 8 | Luce read; the range the study's |
+| `reckoning.LOG_READ_KN` | a quarter knot either way | Falconer 1780, "Log": the knots, halves and quarters on the line; N §3 "read to a quarter knot" | the reference text |
+| `reckoning.LOG_READ_SIGMA_KN` | 0.25 knots an hour | the hour's run inferred from one heave | judgement on N §3 |
+| `reckoning.SPEED_BY_EYE_SIGMA_KN` | 1 knot | her way by eye, to the knot, before the first heave of a passage | judgement |
+| `reckoning.HOVE_TO_WAY_KN` | 2 knots | hove to and making less way than this by eye, the log-board notes the time and the master runs no distance for it; with more way on she is sailing whatever her yards say | judgement |
+| `reckoning.LOG_INTERVAL_H_SHIP_OF_WAR`, `_OTHER` | 1 h, 2 h | Falconer 1780, "Log": hourly in ships of war and East-Indiamen, once in two hours in all other vessels; a ship of war known by her marines | the reference text |
+| `reckoning.VARIATION_1805_DEG` | 24° W | the true variation of the western Channel in 1805, to be computed from gufm1 at the chart's build (spec M5 §13); the anchors N §3 gives (Falconer's "more than 20 degrees" at London in 1780; 21° 09′ W at Greenwich in 1773) and the London series in Jackson, Jonkers and Walker 2000 (23 to 24° W through the decade, Cornwall a degree more westerly) | **unverified**: the study marks the figure so, and the build tool does not yet compute it; the constant is provisional |
+| `reckoning.CHART_VARIATION_AGE_YEARS` | 10 years | the 1794 reissue of Mountaine and Dodson's chart (N §1), a decade old in 1805 | the study's chart |
+| `reckoning.VARIATION_DRIFT_DEG_PER_YEAR` | a quarter of a degree a year | N §3 | **unverified**: the study's figure, not sourced further; with the decade it makes the 2.5° the master allows wrong |
+| `reckoning.DEVIATION_MAX_DEG` | 3° either way, B and C of B sin H + C cos H | N §3: "a few degrees in a wooden ship with iron guns, more with iron stowed near the binnacle", not corrected in 1805 | **unverified**: the size of a wooden frigate's deviation is on the study's list |
+| `reckoning.STEERING_SIGMA_POINTS_SMOOTH`, `_SEAWAY` | a quarter and half a point | N §3: "half a point in a seaway, a quarter in smooth water"; the seaway is a heavy sea or worse in spec §4's words | judgement (the study's) |
+| `reckoning.LEEWAY_ALLOWED_WITHIN_POINTS` | 8 points of the true wind | Falconer 1780, "Lee-way": disregarded whenever the wind is large | judgement on "large" |
+| `reckoning.LEEWAY_ESTIMATE_ERROR_POINTS` | half a point either way, once per ship | N §3 | the study's figure |
+| `reckoning.LEEWAY_DOUBT_POINTS` | a quarter of a point across the course while allowed | half a point either way as a spread | judgement |
+| `reckoning.SET_DOUBT_EAST_KN`, `_NORTH_KN` | 0.2 and 0.03 knots, growing in a straight line | N §3's Channel streams east and west and Rennell's current; tuned so that four days of thick weather leave the ellipse of truth 58 (below) | judgement, tuned |
+| `reckoning.DEPARTURE_SIGMA_NM` | 1 mile | a bearing of a headland and its distance by estimation | judgement |
+| `reckoning.FIX_RUN_NM` | 2 miles | a line taken within this run of the last is crossed with it; after a longer run it replaces the account across it | judgement (a quarter of an hour's run) |
+| `reckoning.HAND_LEAD_FATHOMS`, `HAND_LEAD_MARKS` | 20 fathoms; 2, 3, 5, 7, 10, 13, 15, 17, 20 | Lever 1808, "The Hand-Lead"; Luce 1884, ch. I, marks 20 and on for the longer line | the reference texts |
+| `reckoning.DEEP_SEA_LEAD_FATHOMS` | 120 fathoms | one lead in the game for Luce's coasting and deep-sea leads | judgement |
+| `reckoning.DEEP_SEA_LEAD_MAX_KN` | 4 knots | Lever 1808: "for which it is usual previously to bring-to the ship", or with a light breeze hove from the spritsail yardarm | judgement on Lever's words |
+| `reckoning.LEAD_HAND_SIGMA_FATHOMS`, `_DEEP_` | a quarter fathom, a fathom | N §3, "depth to a fathom"; the leadsman's quarter | the study's figure; the quarter judgement |
+| `reckoning.SOUNDING_ACROSS_SIGMA_NM` | 3 miles | N §3: "a band a few miles wide along the depth contour" | judgement on "a few" |
+| `reckoning.CONTOUR_SEARCH_MIN_NM`, `CONTOUR_TOLERANCE_HAND_FATHOMS`, `_DEEP_` | 5 miles; 0.75 and 2.5 fathoms | the ring the cast's contour is searched on (at least this about the account) and the tolerances (the lead's error and the chart's) | judgement |
+| `reckoning.BEARING_SIGMA_DEG` | 1.5° | N §3: "a degree or two by compass" | the study's figure |
+| `reckoning.TRANSIT_SIGMA_NM` | a cable | spec §13: "a transit is exact" | judgement |
+| `reckoning.DISTANCE_BY_ESTIMATION_FRACTION` | a fifth of the distance, one sigma, drawn each bearing | the distance off by estimation that goes with a bearing (spec §12's words, "twelve miles by estimation"), a second line along the bearing: a bearing with its distance lays the ship on the chart as the period's master did | judgement |
+| `reckoning.DAYS_WORK_MINUTES` | 30 minutes | the traverse reduced from the log-board and the sight worked (Falconer 1780, "Log-board", "Traverse") | judgement |
+| `reckoning.TRACK_KEPT` | 168 hourly positions | a week of the track for the chart | judgement |
+| `chart.CONTOUR_STEP_M` | half a mile | the rings a cast's contour is searched on | judgement |
+| `sights.SEXTANT_SIGMA_NM`, `OCTANT_SIGMA_NM` | 1 and 2.5 minutes of altitude | N §3: "sextant to a minute, octant to two or three" | the study's figures |
+| `sights.HORIZON_SIGMA_NM` | 1.7 miles | N §3's "2 to 5 miles with a good horizon" taken as the whole error with the sextant, so the horizon's part makes two with the sextant's one | judgement |
+| `sights.HAZE_HORIZON_NM`, `HORIZON_SEA_NM_PER_M` | a mile in haze; half a mile a metre of sea | N §3, "the horizon in haze or swell two to five minutes", the five with the octant in a three-metre sea | judgement |
+| `sights.SIGHT_ON_DECK_MINUTES` | 15 minutes | the master on deck watching the sun rise to its greatest altitude | judgement |
+| `sights.SKY_HIDES_THE_SUN`, `WEATHER_HIDES_THE_SUN` | overcast, dark and gloomy, threatening, thick; rain, drizzle, fog, thunder | Beaufort's words as spec §5 gives them; hazy lets the sun through with a worse horizon | judgement on the words |
+| `sights.SKILL_REFERENCE` | 0.5 | a skilled master (0.9) reads his instrument at three fifths of its error, a poor one (0.5) at the whole | judgement |
+| `lookout.SHORE_CLOSE_NM` | 3 miles | the shore itself hailed close aboard when no headland of the chart is in sight, within the visibility and the night's mile; the same three miles a danger is made out at | judgement |
+| `sun.Sun.transit` | the sun's meridian passage from the equation of time and the ship's longitude | Meeus's approximation already in `core/sun.py` | arithmetic |
+
+The errors the master cannot know shift the account and not the ellipse (N §3; Apollo: "the ellipse drawn too small"): the line's marking, the chart's variation a decade stale, the deviation by heading and the leeway bias. The ellipse holds the doubts he does know he has: the read, the steering, the set he did not allow for, the leeway he allowed by eye. Seed 7's draws for the frigate: the log-line 7.98% short, the deviation B −0.048° and C −0.379°, the leeway bias +0.22 points, the variation error 2.5° (the chart's 21.5° against the world's 24°); the master's skill from the ship file's deck.
+
+### The ellipse after thick weather, measured (truth 58)
+
+The traverse alone, fed a day's run of 150 miles at six knots and a quarter for four days without a sight, the wind free (`tests/test_known_truths.py`, truth 58): the ellipse's length twice its standard deviation, as the words give it.
+
+| Course | after one day | two days | four days | then a clear noon |
+|---|---|---|---|---|
+| east (the Channel's own) | 10.1 × 3.9 miles | 19.6 × 5.5 | 38.8 × 8.6 | N-S 4.0 |
+| north-north-east (Finisterre for the Channel) | 10.1 × 3.9 | 19.6 × 5.5 | 38.9 × 7.9 | under 5 |
+| north | 10.1 × 3.9 | 19.6 × 5.5 | 38.9 × 7.8 | under 5 |
+
+Against N §3's 30 to 50 miles east and west and under ten north and south after four days: 39 by 8 to 9. The set doubt is what makes it: the read's and the steering's terms grow as the square root and would leave a dozen miles after four days; the biases grow in a straight line, and the two figures above were set so that the fourth day lands in the study's band (two days is twice one, four days four times, as the test asserts). The words at four days: "I would not trust the reckoning within thirty-nine miles east or west, nor eight miles north or south."
+
+### The checkpoint, measured
+
+The passage's world at three hours with the fake watcher standing by, the lead just ordered: saved with its checkpoint (`replay.save_to_file`, `checkpoint=True`) in the scratchpad's proof (`smoke_checkpoint.py`). The checkpoint loads in 0.06 s where the replay of the three hours takes 16.5 s on the build machine, and the three of them (the live world, the one loaded from the checkpoint, the one replayed) run the next watch to the same digest, the lead's cast and all. The test (`tests/test_checkpoint.py`) proves the same on a shorter run and checks the header (the seed, the end tick, the journal's and the inputs' lengths, the digest) against the save, so a checkpoint from another save or another build is refused and the replay used instead (`replay.load` says which it did; the drivers print "from its checkpoint at" or "replayed to"). What the pickle drops and the load rebinds: the chart (reopened by region), the readings' view, the log's subscribers, the ship's stepper and order handler, the harness's model and save hook (`session.rebind_hooks`); the unpickler admits only the game's own classes and the standard library's few it needs.
+
+### The passage for gate 5b, measured
+
+Seed 7, the day's weather pinned (`data/scenarios/gate-5b-passage.yaml`: a south-westerly of fifteen knots backing a little, the sky pinned clear over the old high; the high's own coastal fog off Ushant from dusk to eight in the morning would have refused the departure bearing). The frigate from off the Stiff at four in the morning of 10 June 1805, seventeen hours, 474 lines, digest `c160c0ef4b83d899`; the account against the truth read from the world by `tools/day_log.py --reckoning`, the ellipse's axes one sigma, east-west by north-south.
+
+| Tick | Time | Moment | Truth | Account | Error | Ellipse |
+|---|---|---|---|---|---|---|
+| 0 | 04:00 | the departure: "The light on Ushant bore SW by S, a mile by estimation" | 48° 30′ N, 5° 02′ W | 48° 30′ N, 5° 02′ W | 0.2 | 0.1 × 0.2 |
+| 7200 | 06:00 | the last bearing of Ushant, S by W, four leagues | 48° 41′ N, 5° 02′ W | 48° 41′ N, 5° 01′ W | 1.3 | 0.3 × 0.6 |
+| 28740 | 11:59 | "Noon. Latitude by observation 49° 25′ N; the reckoning was 49° 27′ N. Course made good since the departure N, 58 miles. Longitude by account 4° 57′ W." | 49° 22′ N, 5° 03′ W | 49° 25′ N, 4° 57′ W | 4.8 | 1.5 × 2.4 |
+| 28796 | 12:00 | hove to for the cast ("bring to for soundings") | | | | |
+| 29928 | 12:19 | "Fifty-three fathoms; fine grey sand with black specks" (the deep-sea lead) | 49° 22′ N, 5° 02′ W | 49° 25′ N, 4° 57′ W | 4.7 | 1.5 × 1.9 |
+| 29984 | 12:20 | filled away; "Shaped a course for Falmouth: N by W by account, 45 miles" | | | | |
+| 45000 | 16:30 | the landfall: "The Beast bearing NNW, distant four leagues"; the Lizard with it | 49° 46′ N, 5° 06′ W | 49° 52′ N, 5° 09′ W | 6.2 | 0.4 × 1.0 |
+| 45000 | 16:30 | "The Beast bore N by W, three leagues by estimation"; the course for Falmouth shaped again, N by E, 18 miles by account | 49° 46′ N, 5° 06′ W | 49° 51′ N, 5° 09′ W | 5.3 | 0.3 × 0.9 |
+| 46800 to 57600 | 17:00 to 20:00 | bearings every glass, the Beast, Black Head, Lowland Point, Manacle Point, St Anthony's Head; the lead going, no bottom at twenty fathoms | | | 5.2, 3.9, 2.6, 2.1, 1.6, 1.0, 0.2 | 0.4 × 0.8 to 0.1 × 0.2 |
+| 59400 | 20:30 | "St Anthony's Head bore W, two miles by estimation" | 50° 09′ N, 4° 58′ W | 50° 09′ N, 4° 58′ W | 0.0 | 0.2 × 0.1 |
+| 59495 | 20:31 | "By the mark seven; mud"; the Roads: hove to at 59552 | 50° 09′ N, 4° 58′ W | 50° 09′ N, 4° 58′ W | 0.0 | 0.2 × 0.1 |
+| 61200 | 21:00 | the end | 50° 09′ N, 4° 58′ W | 50° 09′ N, 4° 58′ W | 0.1 | 0.2 × 0.1 |
+
+What the numbers say. The account overruns the truth through the forenoon (the line 8 per cent short at seed 7, the read's quarter knots) and the noon sight puts the latitude right to two miles while the longitude by account stays six minutes east, which the ellipse's 1.5 miles east and west does not cover: the chart's stale variation and the deviation are the biases the master cannot see (N §3's "ellipse drawn too small"). The cast in the Channel Soundings finds the fifty-fathom contour running the way she is going and leaves the account where it was. The landfall is made six miles wrong, the account ahead of the ship, and the first bearing with its distance by estimation halves that; each glass's bearing of the next headland with its distance brings the account in, a mile by the Manacles, a cable off St Anthony's Head; the lead finds bottom only inside the Head. Seed 7's draws for the frigate: the log-line 7.98 per cent short, the deviation B −0.05° and C −0.38°, the leeway bias +0.22 points, the chart's variation 2.5° out.
+
+The thick passage (`gate-5b-passage-thick.yaml`, the sky pinned thick, fog, a mile; sixteen hours, 339 lines, digest `1d9de61e14be40ac`): no departure bearing (Ushant beyond the fog), "Noon. No sight; the sun was hid at noon in fog. Latitude by account 49° 27′ N" (truth 49° 22′ N, 5° 01′ W; error 5.6; ellipse 2.1 × 1.2), the cast "Fifty-one fathoms; fine grey sand with black specks" (error 5.5; ellipse 3.0 × 1.3), the course for Falmouth shaped at 16:40 when the run since noon passed thirty miles, the hand lead every glass finding no bottom at twenty fathoms with the error at ten miles, and the landfall at 19:07: "The land about Black Head close aboard on the starboard bow, bearing N, distant a mile", the account 50° 10′ N, 5° 05′ W against the truth 49° 59′ N, 5° 07′ W, 10.9 miles, ellipse 3.4 × 1.5, hove to at 19:08 (`when the land is in sight then heave to`). N §3's "'We should be seeing the Lizard by now'" is this line: she believed herself past the Lizard and inside the bay when she was still off Black Head.
+
+The schooner (`gate-5b-passage-schooner.yaml`, the octant, no glass, the log every two hours; fourteen hours, 320 lines, digest `8b852e793dc2f70d`): the departure bearing, the heaves at six, eight and ten, "Noon. Latitude by observation 49° 22′ N; the reckoning was 49° 29′ N" (truth 49° 22′ N, 5° 04′ W; error 3.7, the octant's; ellipse 1.9 × 2.8), the landfall at 15:49, the Lizard NNE four leagues, 6.6 miles wrong (ellipse 2.3 × 2.9), brought to 3.6 by the bearing and to a mile by four; "Quarter less eleven; fine sand" at 18:02 with the account on the truth. The schooner's cast at noon did not happen: see found on the way. The cutter and the brig through the same orders for six hours (`--ship`): the cutter 153 lines, digest `938bdbb4459ef1b2`, the log every two hours, the account 4.3 miles off at ten in the morning; the brig 184 lines, digest `54dece656ed09d91`, hourly (her marines), 3.6 miles off. No navigation order refused in any of the five.
+
+The pace on the passage (`test_the_pace_on_the_passage_holds_truth_51s_floor`): the traverse board every tick, the grounding check, the lookout once a minute, the log hourly; the best of three thousands held truth 51's floor on the build machine beside the sibling package's suite.
+
+### Found on the way (package 33a)
+
+- **The coastal fog refused the departure.** Under the old high the sector table lays advection fog off Ushant from dusk to eight in the morning (W §1.4), so the light at four was beyond a cable's visibility and "take a bearing of the light on Ushant" was refused with "Nothing is in sight". The clear passage now pins its sky (`weather: sky`) as the thick one does; and the sun is up at four at this latitude in June, so the tower is a mark by day and not a light.
+- **Before the first heave the account stood still.** A bearing at the departure stepped the board with no read yet, at no speed, and the two-hourly log left a schooner's account where she started for two hours. The master now runs her way by eye, to the knot, until the first read (`SPEED_BY_EYE_SIGMA_KN`).
+- **A bearing without its distance put the account on the wrong side of the mark.** Running in on a headland the bearings all lie along the track and correct nothing along it; the account, six miles ahead of the ship, was laid on Manacle Point's line six miles inland of it, and the course for Falmouth shaped from there led east of the Roads to the Nare. The period's master had the distance by estimation with the bearing and laid the ship on the chart from both; the distance is now a second line (`DISTANCE_BY_ESTIMATION_FRACTION`), and the passage above is the result.
+- **The schooner hove to and sailed on.** At noon the schooner hove to for the cast (fore topsail to the mast, helm a-lee) and fifty-four seconds later the starter's "keep her full" bore away a point, her sails filled again and she ran on at seven knots with `ship.extra["hove_to"]` still set: the deep-sea lead was never hove (she never came under four knots), "fill away after the cast" never fired, and the Roads' "heave to" in eleven fathoms was refused with "She is hove to already", so she stood on and took the ground off Black Head at 18:24. The heave-to script and the fill-away rule are package 32e's (`evolutions/scripts.py`); the board's count of hours hove to guards itself (`HOVE_TO_WAY_KN`: with more than two knots of way she is sailing whatever her yards say), and the schooner's pinned passage stops at fourteen hours, before the grounding. For the lead: either "keep her full" should hold while she is hove to, or bearing away should clear the state.
+- **The frigate's twenty minutes hove to overran the account by a mile.** The hour's read after the cast was applied to the whole interval, the twenty minutes with the main topsail to the mast included; the board now notes the time hove to and making no way and runs no distance for it.
+- **The starter's "landfall" rule fires at the start.** "When the land is in sight" is true off Ushant, so the course for Falmouth is shaped at the departure (N by account, 99 miles) as well as at the Lizard; harmless here, since north is the course, and the rule's wording is the scenario's.
+- **`sail.backed` lines while hove to in a seaway.** A ship hove to in a moderate sea logs the topsail backed and filled again by the minute; the physics' words, package 32e's area, left as they are.
+- **The variation is provisional.** `VARIATION_1805_DEG` is the package's recollection of gufm1 for the Lizard (about 24° W), not a computed value; the chart build does not run the field model. An azimuth to correct the chart's variation (N §3) is not built.

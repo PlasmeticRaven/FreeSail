@@ -379,6 +379,13 @@ _HOW = {
     "glass": ("the glass", "in inches: 'is under 29.5 inches'"),
     "sight": ("the land", "as in sight or not in sight"),
     "depth": ("the depth of water", "in fathoms: 'is under 10 fathoms'"),
+    "position": (
+        "a position by account",
+        "against a latitude or a longitude: 'is north of 49 30 N', 'is west of 6 W'",
+    ),
+    "distance": ("a distance", "in miles: 'exceeds 20 miles'"),
+    "ground": ("the ground", "by what the lead brings up: 'is sand', 'is not rock'"),
+    "person": ("a person", "by his place: 'is on deck', 'is below'"),
     "tendency": (
         "the glass",
         "by its tendency: is steady, is rising, is falling, is falling fast, is rising fast, "
@@ -531,6 +538,41 @@ _ANGLE_UNITS = ("degrees", "degree")
 _COUNT_UNITS = ("hands", "men", "hand", "man")
 _GLASS_UNITS = ("inches", "inch")
 _DEPTH_UNITS = ("fathoms", "fathom", "fm")
+_DISTANCE_UNITS = ("miles", "mile", "leagues", "league")
+
+
+def _lat_or_lon(
+    tokens: list[str], i: int, stop: int, latitude: bool
+) -> tuple[float, str, int] | None:
+    """'49 30 n', '49.5', '6 10 w' at tokens[i]: degrees (signed north and east), the
+    words said, and the tokens used; None when no number is there."""
+    j = i
+    if j >= stop:
+        return None
+    try:
+        value = float(tokens[j])
+    except ValueError:
+        return None
+    j += 1
+    if j < stop and tokens[j] in ("degrees", "degree"):
+        j += 1
+    if j < stop:
+        try:
+            minutes = float(tokens[j])
+            value += minutes / 60.0
+            j += 1
+        except ValueError:
+            pass
+    if j < stop and tokens[j] in ("minutes", "minute"):
+        j += 1
+    letters = ("n", "s") if latitude else ("e", "w")
+    if j < stop and tokens[j] in letters:
+        if tokens[j] in ("s", "w"):
+            value = -value
+        j += 1
+    elif not latitude:
+        value = -value  # the Channel: a bare longitude is west
+    return value, " ".join(tokens[i:j]), j - i
 
 
 def _starts(tokens: list[str], i: int, phrase: str) -> int:
@@ -607,6 +649,53 @@ def _parse_comparison(
             if row is None:
                 raise refuse()
             return row, Comparison("straining", R.STRAINING_RATIO, "straining"), n
+
+    # -- the reckoning's readings (package 33a): a position against a latitude or a
+    # longitude; the ground by its words; a person by his place
+    row = _pick(cands, ("position",))
+    if row is not None:
+        for phrase, op in (
+            ("is north of", "north_of"),
+            ("is south of", "south_of"),
+            ("is east of", "east_of"),
+            ("is west of", "west_of"),
+        ):
+            n = _starts(tokens, i, phrase)
+            if n:
+                parsed = _lat_or_lon(tokens, i + n, stop, op in ("north_of", "south_of"))
+                if parsed is None:
+                    what = "latitude" if op in ("north_of", "south_of") else "longitude"
+                    raise OrderError(
+                        f"'{match.phrase} {phrase[3:]}' what {what}? Say "
+                        f"'{phrase[3:]} {'49 30 N' if what == 'latitude' else '6 10 W'}'."
+                    )
+                value, said, used = parsed
+                return row, Comparison(op, value, f"{phrase[3:]} {said}"), n + used
+        raise refuse()
+    row = _pick(cands, ("ground",))
+    if row is not None:
+        for phrase, op in (("is not", "is_not"), ("is", "is")):
+            n = _starts(tokens, i, phrase)
+            if n:
+                words = tokens[i + n : stop]
+                if not words:
+                    raise OrderError(f"'{match.phrase} {phrase}' what ground? Say sand, mud, rock.")
+                ground = " ".join(words)
+                said = f"{'not ' if op == 'is_not' else ''}{ground}"
+                return row, Comparison(op, ground, said), n + len(words)
+        raise refuse()
+    row = _pick(cands, ("person",))
+    if row is not None:
+        for phrase, op, place in (
+            ("is on deck", "is", "on deck"),
+            ("is not on deck", "is_not", "on deck"),
+            ("is below", "is", "below"),
+            ("is not below", "is_not", "below"),
+        ):
+            n = _starts(tokens, i, phrase)
+            if n:
+                return row, Comparison(op, place, phrase[3:]), n
+        raise refuse()
 
     # -- the apparent wind: forward of, abaft, on the bow
     for phrase, op in (
@@ -895,10 +984,20 @@ def _parse_comparison(
                 Comparison(op, float(value), f"{phrase.split()[-1]} {value:g} fathoms"),
                 n + used + 1,
             )
+        if unit in _DISTANCE_UNITS:
+            row = _pick(cands, ("distance",))
+            if row is None:
+                raise OrderError(f"'{match.phrase}' is compared in {_unit_of(cands)}, not miles.")
+            miles = float(value) * (3.0 if unit.startswith("league") else 1.0)
+            return (
+                row,
+                Comparison(op, miles, f"{phrase.split()[-1]} {value:g} {unit}"),
+                n + used + 1,
+            )
         if unit and unit not in _STOP:
             raise OrderError(f"'{match.phrase}' is compared in {_unit_of(cands)}, not {unit}.")
         # no unit said: the reading's own
-        row = _pick(cands, ("speed", "angle", "strain", "hands", "glass", "depth"))
+        row = _pick(cands, ("speed", "angle", "strain", "hands", "glass", "depth", "distance"))
         if row is None:
             raise refuse()
         unit_words = {
@@ -908,6 +1007,7 @@ def _parse_comparison(
             "hands": "",
             "glass": " inches",
             "depth": " fathoms",
+            "distance": " miles",
         }[row.kind]
         return (
             row,
@@ -1017,6 +1117,8 @@ def _unit_of(cands: list[R.Reading]) -> str:
         return "inches"
     if kinds & {"depth"}:
         return "fathoms"
+    if kinds & {"distance"}:
+        return "miles"
     if kinds & {"speed"}:
         return "knots"
     if kinds & {"angle"}:

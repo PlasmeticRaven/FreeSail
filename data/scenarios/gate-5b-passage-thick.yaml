@@ -1,0 +1,55 @@
+# FreeSail: the passage for gate 5b in thick weather (spec M5 §20; package 33a): the
+# same passage as gate-5b-passage.yaml with the sky pinned thick, so that there is no
+# sight at noon, no departure bearing (Ushant is beyond a mile of fog at the start) and
+# no landfall until the land is a mile off, and the landfall is made wrong on purpose:
+# the captain stands on by account and shapes his course for Falmouth when the run since
+# noon says he is off the Lizard, and the land he raises is where the reckoning's
+# errors put him, not where he thinks (N §3: "'We should be seeing the Lizard by now'
+# is the ellipse's eastern end passing the Lizard's longitude while the ship is still at
+# its western end"). He heaves to at the first land seen. The reckoning's ellipse is
+# read at noon and at the landfall (`--reckoning`):
+#     py tools/day_log.py data/scenarios/gate-5b-passage-thick.yaml --hours 22 --reckoning
+#
+# The sky is pinned over the same high as the clear passage's (`weather: sky`, package
+# 33a: thick, fog, a mile), which the sector table would not give of itself over open
+# water (its fog is coastal, W §1.4, and lifts off Ushant by eight); the wind is the
+# same, and the clear passage pins its sky clear over the same high.
+
+name: The passage for gate 5b in thick weather, Ushant to Falmouth
+seed: 7
+start: 1805-06-10T04:00
+position: 48 30 N 5 02 W
+region: channel-west
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 357
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+weather:
+  wind:
+    - {at: 1805-06-10T04:00, from_deg: 225, knots: 15, air_mass: neutral}
+    - {at: 1805-06-10T16:00, from_deg: 235, knots: 14}
+    - {at: 1805-06-11T04:00, from_deg: 250, knots: 12}
+  background:
+    {hpa: 1018, gradient_hpa_per_100km: 0.4, high_toward_deg: 200}
+  systems:
+    - name: the old high over Biscay
+      kind: high
+      radius_km: 900
+      track:
+        - {at: 1805-06-09T12:00, x_km: 300, y_km: -500, hpa: 1024}
+        - {at: 1805-06-11T12:00, x_km: 500, y_km: -600, hpa: 1022}
+  sky: {sky: thick, weather: fog, visibility: a mile}
+  sea: true
+
+standing_orders:
+  - data/standing_orders/starter.orders
+  - data/scenarios/gate-5b-passage-thick.orders
+
+orders:
+  - set plain sail
+  - steer N

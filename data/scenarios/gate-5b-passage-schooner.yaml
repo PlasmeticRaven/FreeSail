@@ -1,0 +1,48 @@
+# FreeSail: the passage for gate 5b in the schooner (spec M5 §20; package 33a): the same
+# passage as gate-5b-passage.yaml, Ushant to Falmouth, in the topsail schooner with her
+# octant (the everyday instrument; N §1: the merchant master's kit) and no glass, the
+# log hove every two hours as in all vessels but ships of war (Falconer 1780, 'Log').
+# The same weather pinned, the same orders. The cutter and the brig are sailed through
+# the same orders with `--ship`:
+#     py tools/day_log.py data/scenarios/gate-5b-passage-schooner.yaml --ship data/ships/cutter.yaml --hours 6 --reckoning
+#     py tools/day_log.py data/scenarios/gate-5b-passage-schooner.yaml --ship data/ships/brig.yaml --hours 6 --reckoning
+
+name: The passage for gate 5b in the schooner, Ushant to Falmouth
+seed: 7
+start: 1805-06-10T04:00
+position: 48 30 N 5 02 W
+region: channel-west
+ship:
+  file: data/ships/topsail-schooner.yaml
+  heading_deg: 357
+  glass: false
+  instrument: octant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+weather:
+  wind:
+    - {at: 1805-06-10T04:00, from_deg: 225, knots: 15, air_mass: neutral}
+    - {at: 1805-06-10T16:00, from_deg: 235, knots: 14}
+    - {at: 1805-06-11T04:00, from_deg: 250, knots: 12}
+  background:
+    {hpa: 1018, gradient_hpa_per_100km: 0.4, high_toward_deg: 200}
+  systems:
+    - name: the old high over Biscay
+      kind: high
+      radius_km: 900
+      track:
+        - {at: 1805-06-09T12:00, x_km: 300, y_km: -500, hpa: 1024}
+        - {at: 1805-06-11T12:00, x_km: 500, y_km: -600, hpa: 1022}
+  sky: {sky: clear, weather: fine, visibility: the horizon}
+  sea: true
+
+standing_orders:
+  - data/standing_orders/starter.orders
+  - data/scenarios/gate-5b-passage.orders
+
+orders:
+  - set plain sail
+  - steer N
+  - take a bearing of the light on Ushant

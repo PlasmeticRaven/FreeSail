@@ -610,10 +610,11 @@ TABLE: list[tuple[str, str, ok | no]] = [
         'standing order "x": when the well is over three feet then heave to',
         no(["The ship has no well to sound yet; that reading comes with the world."]),
     ),
+    # the lead's cast (package 33a): `the depth` is the last cast's, in fathoms
     (
         F,
         'standing order "x": when the depth is under 10 fathoms then heave to',
-        no(["no lead line yet"]),
+        ok("when", "depth", "lt", 10.0, actions=1),
     ),
     (
         F,
@@ -653,7 +654,15 @@ TABLE: list[tuple[str, str, ok | no]] = [
         'standing order "x": at dawn then set the royals',
         no(["'at dawn' names no event", "sunrise"]),
     ),
-    (F, 'standing order "x": at a sighting then clear for action', no(["nothing to sight yet"])),
+    # the lookout's sighting is an event since package 33a named it (the line is package
+    # 32's); `clear for action` is still no order of the ship's
+    (
+        F,
+        'standing order "x": at a sighting then clear for action',
+        no(["'clear for action' is refused"]),
+    ),
+    (F, 'standing order "x": at a landfall then heave the lead', ok("at", event="a landfall")),
+    (F, 'standing order "x": at noon then work up the reckoning', ok("at", event="noon")),
     (
         F,
         'standing order "x": at sunset then set the royls',

@@ -475,6 +475,63 @@ verbs:
                show the spare cordage]
     object: query
     level: 1
+  # The navigation orders (spec M5 §15; package 33a; `freesail/orders/navigation.py`):
+  # what the captain says to the master. The object `navigation` takes the words after
+  # the verb as said (a mark, a place, a position, an allowance); the World's reckoning
+  # carries them out and refuses them in words on a ship with no position.
+  heave the log:
+    # By order; hourly of itself in a ship of war, two-hourly in others (Falconer 1780,
+    # 'Log'; the file heave_log.yaml).
+    synonyms: [heave log, heave the log line]
+    object: navigation
+    level: 1
+  heave the lead:
+    # The hand lead, from the chains, to twenty fathoms (Luce 1884, ch. I 'The Lead').
+    synonyms: [heave lead, sound with the hand lead, heave the hand lead, a cast of the lead,
+               get a cast of the lead, try the lead]
+    object: navigation
+    level: 1
+  heave the deep sea lead:
+    # The deep-sea lead, the line passed forward or the ship brought to (Lever 1808). The
+    # key is the phrase as the parser normalises it, the hyphen a space; the log says
+    # "deep-sea".
+    synonyms: [heave the deep-sea lead, heave the dipsey lead, strike soundings, try for soundings,
+               sound with the deep-sea lead, get a cast of the deep-sea lead, a cast of the deep-sea lead]
+    object: navigation
+    level: 1
+  take a bearing of:
+    # A mark in sight by name, or "the land" or "the light" (the nearest); refused in words
+    # when it is not in sight; a transit of the chart's when its marks are in one.
+    synonyms: [take the bearing of, take a bearing on, bearing of, take bearings of, get a bearing of]
+    object: navigation
+    level: 1
+  work up the reckoning:
+    synonyms: [work the reckoning, work up the dead reckoning, bring up the reckoning, the day's work]
+    object: navigation
+    level: 1
+  observe the sun:
+    # The noon sight by order, near noon; automatic at noon if the sky allows.
+    synonyms: [take the sun, take a sight of the sun, take the noon sight, take the sun's altitude,
+               observe the sun at noon, take a meridian altitude]
+    object: navigation
+    level: 1
+  set the reckoning to:
+    # The captain overrides the master (spec M5 §14).
+    synonyms: [set the reckoning at, correct the reckoning to, put the reckoning at]
+    object: navigation
+    level: 1
+  allow:
+    # `allow <n> knots of set to <direction>` in the traverse; `allow no set` clears it.
+    synonyms: [allow for]
+    object: navigation
+    level: 1
+  shape a course for:
+    # Reads the reckoning and the chart's places, never the truth; refused where the chart
+    # has no such place.
+    synonyms: [shape a course to, shape course for, lay a course for, set a course for,
+               steer for, make for]
+    object: navigation
+    level: 1
   # Group evolutions: verb phrases with no object, expanded from the list below.
   set plain sail:
     synonyms: [make plain sail, make sail]

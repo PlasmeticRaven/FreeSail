@@ -771,7 +771,9 @@ def test_stand_by_takes_an_event_or_an_interval_and_refuses_the_rest_in_words():
     assert h.stand_by("until sunset").startswith("Standing by until sunset")
     assert h.agent.stand_by.event == "sunset"
     h.agent.state = "stationed"
-    assert h.stand_by("a sighting").startswith("There is nothing to sight yet")
+    # the lookout's sighting is an event since package 33a named it (package 32's line)
+    assert h.stand_by("a sighting").startswith("Standing by until a sighting")
+    h.agent.state = "stationed"
     assert h.stand_by("teatime").startswith("'teatime' is not an event or an interval")
     assert "eight bells" in h.stand_by("teatime")
 
@@ -1727,7 +1729,7 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     assert f"{tools.size_words(tools.tokens(ship))} whole, in 5 parts" in contents
     tool_page = lib(world, topic="tools")
     assert f"what each takes, {tools.size_words(tools.tokens(tool_page))}" in contents
-    assert "47 evolutions; the list about" in contents  # the bowsprit's two and reeve_line
+    assert "50 evolutions; the list about" in contents  # the log and the two leads with 32b's
 
 
 def test_a_chapter_lists_its_sections_with_sizes_and_serves_one_by_a_word_or_its_number():

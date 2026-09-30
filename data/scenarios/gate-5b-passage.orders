@@ -1,0 +1,43 @@
+# FreeSail: the captain's orders for the passage of gate 5b (spec M5 §15, §20; package
+# 33a). The starter routines (data/standing_orders/starter.orders) are the ship's
+# standing book; these are the captain's for a passage Ushant to Falmouth by the
+# reckoning and the noon sight alone. The log is hove hourly of itself and the noon
+# sight taken of itself if the sky allows; what the captain adds is the master's work at
+# the land and the lead, in the dialect the book reads for nothing.
+
+# The departure: while the land is in sight astern, a bearing of it every glass, so that
+# the account is fixed off the Stiff before the land is lost (the Regulations' master
+# "to ascertain the latitude, longitude and variation of every headland he passes";
+# N §1). "The land" is the nearest land, or at night the nearest light.
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land
+
+# The Channel Soundings: at noon, when the sight is had and she is by account in the
+# fifty-fathom water south of the Lizard, she is brought to and the deep-sea lead hove
+# ("it is usual previously to bring-to the ship", Falconer 1780, 'Sounding'; Rennell's
+# procedure, "get the latitude, then expect soundings around lat. 49° 30' N, and run in
+# on the soundings", N §3). The lead wants under four knots of way on her; hove to she
+# has one or two. The run since noon has no meaning before the first noon (the reading
+# says so), so neither order fires on the morning's run from Ushant.
+standing order "bring to for soundings": at noon then heave to
+standing order "soundings": when the speed is under 3 knots and the distance run since noon is under 5 miles then heave the deep-sea lead
+
+# Once the cast is had she fills away, and when the fill-away has left the helm the
+# course for Falmouth is shaped afresh from the account as the day's work left it; the
+# sounding and the filling away are events the dialect names (spec M5 §15).
+standing order "fill away after the cast": at a sounding, if the distance run since noon is under 5 miles then fill away
+standing order "stand on": at filled away then shape a course for Falmouth
+
+# The landfall: the first land seen gives a bearing, and the course for Falmouth is
+# shaped from the reckoning (never the truth: spec §15's "shape a course for <place>").
+# The land is in sight from the start (Ushant astern), so this fires at the departure
+# too, which shapes the same course north by east; it fires again when the Lizard is
+# raised after the land has been out of sight.
+standing order "landfall": when the land is in sight then take a bearing of the land; shape a course for Falmouth
+
+# Running in: the hand lead every glass once the land is in sight and the run since
+# noon says she is closing the coast (Master, art. XXVI: "always sounding to inform
+# himself of the situation of the Ship"); she heaves to in twelve fathoms, which is the
+# outer road off Pendennis (Imray 1874: the outer road in 11 to 14 fathoms). Twenty miles
+# since noon is judgement: past the soundings and closing the land.
+standing order "lead going": every glass, if the land is in sight and the distance run since noon exceeds 20 miles then heave the lead
+standing order "the Roads": when the depth is under 12 fathoms then heave to

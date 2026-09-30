@@ -1,0 +1,46 @@
+# Heave the deep-sea lead (spec M5 §13, §15; package 33a): the homeward-bounder's fix in
+# the Channel Soundings. The deep-sea lead "is shaped like the hand lead; but is more
+# ponderous, weighing from twenty to thirty pounds" (Lever 1808, 'The Deep-Sea Lead'),
+# for which "it is usual previously to bring-to the ship" (Falconer 1780, 'Sounding'; N
+# §1); or, "if a Ship be going free with a light Breeze, Soundings may be got by passing
+# the Lead to Windward from the Quarter along the Waist to the Cat-head: or if that be
+# not sufficient, a Hand is sent out to the Spritsail Yard Arm, and another (carrying the
+# Bight of the Line) to the Jib Boom End. The Man heaves the Lead from him, and the Man
+# swings it forward: as the Ship advances, the Line being veered away from a Reel, a Hand
+# in the Mizen Chains gets the Soundings. The Bight of the Line is then put into a small
+# snatch Block made fast to the Mizen Shrouds, hauled in, and reeled up" (Lever 1808,
+# fig. 506). The lead is armed with tallow, which "brings up some of that substance which
+# lies on the surface, such as Sand, Coral, Shells, Oaze, &c. and by these (from repeated
+# trials being made and marked in the Charts), the bearings of certain Head-lands, Rocks,
+# Buoys, Sands, &c. are generally known" (Lever, 'arming the Lead').
+#
+# The cost in hands and time is this file's: a dozen hands along the weather side, and a
+# quarter of an hour with the line out and in. The World reads the depth and the ground
+# when this completes and says the line itself ("Forty-five fathoms; fine grey sand with
+# black specks."; `world.reckoning.LEAD_HOVE_KIND`); with more than four knots of way on
+# her the lead does not get bottom (the World's rule, `reckoning.DEEP_SEA_LEAD_MAX_KN`:
+# bring her to first, as Falconer has it). The subject is `her` (see heave_log.yaml).
+id: heave_deep_sea_lead
+verb: heave_deep_sea_lead
+applies_to: {class: ship}
+params: {deep: true}
+preconditions: []
+steps:
+  - do: pass_forward
+    duration_s: 240  # the line passed to windward along the waist to the cat-head, the
+                     # hands out on the spritsail yard and the jib-boom end (Lever; judgement)
+  - do: heave
+    duration_s: 300  # the lead hove and the line veered from the reel as she advances, the
+                     # hand in the mizzen chains getting the soundings; the arming brought up
+                     # (judgement: a hundred fathoms out and the lead on the bottom)
+  - do: haul_in
+    duration_s: 300  # the bight into the snatch block on the mizzen shrouds, the line
+                     # hauled in and reeled up, the arming read (Lever; judgement)
+on_start: {log: "Pass the deep-sea line forward; hands to the spritsail yard and the chains."}
+on_complete: {log: "The deep-sea lead is in.", kind: lead.hove, severity: routine}
+on_fail: {log: "Could not heave the deep-sea lead: {reason}.", kind: evolution.failed, severity: notable}
+# crew: a dozen hands along the side to pass the line and haul it in, the hand at the
+# spritsail yardarm, the one at the jib-boom end and the one in the chains among them
+# (Lever, fig. 506); the forecastlemen forward and the afterguard aft.
+crew: {hands: 12, rating: ordinary, stations: [forecastle, afterguard, waisters]}
+source: "Lever 1808, 'The Deep-Sea Lead' (twenty to thirty pounds), 'arming the Lead' and the passage on soundings with the line passed forward (fig. 506); Falconer 1780, 'Sounding' (bring-to for the deep-sea lead); Luce 1884, ch. I 'The Lead' (the coasting and deep-sea lines, the arming compared with the chart)"

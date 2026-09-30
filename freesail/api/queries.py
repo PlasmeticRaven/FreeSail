@@ -133,6 +133,35 @@ def chart_block(world: World) -> dict[str, Any] | None:
     }
 
 
+def reckoning_block(world: World) -> dict[str, Any] | None:
+    """The reckoning for the captain's chart (spec M5 §17; package 33a): what
+    `world.reckoning.Navigation.to_dict` gives, through the registry's own reading of the
+    position by account so that the chart and a rule read one account; None on the plane."""
+    nav = getattr(world, "navigation", None)
+    if nav is None:
+        return None
+    block = nav.to_dict()
+    reading = world.readings["reckoning"]
+    if reading is not None:
+        block["lat_deg"] = round(reading["lat_deg"], 5)
+        block["lon_deg"] = round(reading["lon_deg"], 5)
+        block["words"] = reading["words"]
+    return block
+
+
+def reckoning_lines(world: World) -> list[str]:
+    """The console's `state` lines for the reckoning (spec M5 §15): the position by
+    account with the master's doubt, and the last cast; nothing on the plane."""
+    r = world.readings
+    if getattr(world, "navigation", None) is None:
+        return []
+    where = r.words("reckoning")
+    out = [f"{where[:1].upper()}{where[1:]}. {r['reckoning_uncertainty']['words']}"]
+    if r["depth"] is not None:
+        out.append(f"The last cast: {r.words('depth')}; {r.words('ground')}.")
+    return out
+
+
 def _spar_state(s: Spar) -> str:
     if s.wrecked and s.sent_down:
         return "cleared"  # carried away, its wreck cleared: on deck or over the side (30b)
@@ -175,17 +204,22 @@ def snapshot(world: World) -> dict[str, Any]:
         "weather": weather_block(world),
         # the lookout's reading (spec M5 §12), None without a chart
         "lookout": r["in_sight"],
+        # the captain's chart (spec M5 §17, package 33a): the reckoned position brought up
+        # to now and its ellipse, the track by account, the noons, the bearings taken, the
+        # soundings with their ground, the master; None on the plane. The truth's position
+        # is not in the snapshot: it is in the save and the tests only
+        # (`world.reckoning.Navigation.to_dict`).
+        "reckoning": reckoning_block(world),
     }
-    # The truth's position, drawn by the browser's chart for now (spec M5 §17: package 33
-    # replaces it with the reckoning and takes it out of the snapshot); None on the plane.
-    pos = getattr(world, "position", None)
-    out["position"] = pos.to_dict() if pos is not None else None
+    # On the sphere the ship's plane metres from the start are the truth's track, and the
+    # chart is drawn about the reckoning; they leave the snapshot with the position.
+    on_the_sphere = getattr(world, "position", None) is not None
     if not isinstance(ship, Ship):
         st = ship.state()
         out["ship"] = {
             "name": st.get("name", "point"),
-            "x": st.get("x", 0.0),
-            "y": st.get("y", 0.0),
+            "x": None if on_the_sphere else st.get("x", 0.0),
+            "y": None if on_the_sphere else st.get("y", 0.0),
             "heading": r["heading"],
             "speed_through_water": r["speed"],
             "leeway": r["leeway"],
@@ -209,8 +243,8 @@ def snapshot(world: World) -> dict[str, Any]:
     d = ship.dyn
     out["ship"] = {
         "name": ship.name,
-        "x": d.x,
-        "y": d.y,
+        "x": None if on_the_sphere else d.x,
+        "y": None if on_the_sphere else d.y,
         "heading": r["heading"],
         "speed_through_water": r["speed"],
         "leeway": r["leeway"],

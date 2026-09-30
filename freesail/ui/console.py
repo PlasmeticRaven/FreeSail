@@ -531,9 +531,12 @@ def start_world(args: argparse.Namespace) -> tuple[World, Any]:
     from freesail.api.session import make_world, ship_factory
 
     if getattr(args, "load", None):
-        data = replay_mod.load_file(args.load)
-        world = replay_mod.replay(data, ship_factory)
-        restore_python_rules(world, data)
+        # from the checkpoint beside the save when it belongs to it (package 33a: seconds
+        # for a day's save), else by replaying the journal
+        world, how = replay_mod.load(args.load, ship_factory)
+        if how == "replay":
+            restore_python_rules(world, replay_mod.load_file(args.load))
+        world.loaded_from = how  # type: ignore[attr-defined]
         return world, None
     if getattr(args, "scenario", None):
         from freesail.world.scenarios import load_scenario, make_scenario_world

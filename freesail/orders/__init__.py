@@ -81,6 +81,11 @@ def handle(ship: Ship, text: str) -> tuple[str, str, dict[str, Any]]:
 def _carry_out(ship: Ship, order: Order, vocab: Vocabulary) -> tuple[str, str, dict[str, Any]]:
     if order.verb in vocab.group_evolutions:
         return _group_evolution(ship, order, vocab)
+    if vocab.verbs[order.verb].object == "navigation":
+        # what the captain says to the master (spec M5 §15, package 33a)
+        from freesail.orders import navigation
+
+        return navigation.execute(ship, order)
     return verbs.execute(ship, order, vocab)
 
 
