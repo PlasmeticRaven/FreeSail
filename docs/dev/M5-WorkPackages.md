@@ -35,6 +35,7 @@ gate 5a:  wave 1  30 weather systems, the glass and the sky, the scenario's syst
                   31b all hands in parallel, the rig's repairs, the pinned form under the air-mass rule (after gate 5a; playtest 11)
                   31c the watcher's watch: the sample's delta, the door's wait, weather events, tell/ask in the book (beside 31b)
 gate 5b:  wave 3  32 the chart data and the queries, the lookout
+                  32b the cutter and the brig as ship files, the orders' grammar across four ships (beside 32; pulled forward from 35 and 36, owner 2026-09-30)
           wave 4  33 the reckoning, the sights and the lunar, the captain's chart
           wave 5  34 the tide, grounding and anchoring, gate 5b
 gate 5c:  wave 6  35 places, people, ports and nations
@@ -43,7 +44,9 @@ gate 5c:  wave 6  35 places, people, ports and nations
 
 31 needs 30's wind (the sea reads its history). 32 needs nothing of 5a and may start
 beside 31 once 30 has landed. 33 needs 32's chart and 30's sky; 34 needs 33's moon. 35
-needs 32's places on the chart; 36 needs 35 and 30.
+needs 32's places on the chart; 36 needs 35 and 30. 32b needs nothing of 5a or 5b: it is
+data work on the generator and the ship files, and any engine change it finds is a fault
+reported, not a feature built.
 
 ## Package 30: weather systems, the glass and the sky (`freesail/world/weather.py` new; `data/weather/climatology.yaml` new; `freesail/physics/wind.py` for the surface wind as the base, the gust factor by air mass, squalls and the mean-reverting wander; `freesail/core/world.py` and `core/rng.py` for the `weather` stream and the tick; `freesail/world/weather_script.py` and `scenarios.py` for the scenario's `systems` list beside `wind`; `freesail/api/readings.py` for the glass, the tendency, the sky, the weather and the visibility; `freesail/standing/` only if a reading's kind is new to the dialect; `freesail/ui/console.py` and `server.py` and `client/instruments.js` for the glass on the instruments; `data/scenarios/gate-4c-day.yaml` re-expressed; `tools/climatology_check.py` new; `docs/primer/` a section on the glass and the sky; `docs/dev/TuningNotes.md`; `tests/test_weather.py` new, `tests/test_wind.py`, `tests/test_readings.py`, `tests/test_known_truths.py` truths 52 to 55 and 57)
 
@@ -416,17 +419,187 @@ chart; package 35's places sit on it.
 Not in 32: the reckoning and its instruments (33), the tide (34), anchoring's evolution
 (34), ports and people (35), sail in sight (36), the Atlantic committed.
 
+## Package 32b: the cutter and the brig as ship files, the orders' grammar across four ships (`tools/gen_ships.py` for a `cutter()` and a `brig()` builder with their crews, sail rooms and booms, and the running bowsprit as the one addition to the generator's rules; `data/ships/cutter.yaml` new and `data/ships/brig.yaml` new, generated and never hand-edited; `freesail/ship/schema.py` and `parts.py` only for the running bowsprit's flag if the file needs one; `data/evolutions/` for the bowsprit's two evolutions and `freesail/orders/verbs.py`, `data/vocabulary.yaml` for their verbs; `freesail/orders/*`, `freesail/evolutions/scripts.py`, `freesail/standing/*` and `client/projection.js` only where an order, a script, a standing order or the drawing fails on one of the new ships, each such fix a fault listed in the report; `tests/test_orders.py`, `test_standing.py`, `test_primer.py`, `test_catalogue.py`, `test_ship_loader.py`, `test_rig_geometry.py`, `test_view_geometry.py`, `test_canvas.py`, `test_hull.py` widened from two ships to four; `docs/primer/01-the-ship.md` a section for each vessel and `03-making-and-shortening-sail.md` for the running bowsprit; `docs/design/VesselCandidates.md` for the figures as read from a source; `README.md` run lines; `docs/dev/TuningNotes.md`)
+
+Spec M5 §23 (the cutter) and §25 (the brig), `docs/design/VesselCandidates.md` (the owner's
+choice and the figures as noted, every one to be read again from a source before it is a
+number in a file), the design proposal's pillar 2 (the vessel library: a new ship is a
+file, not an engine change). Pulled forward from packages 35 and 36 by the owner
+(2026-09-30) so that the catalogue's hierarchy of size, cutter 85 tons, schooner 224,
+brig 316, frigate 933, exists before the ports and the other sail need it. Fable.
+
+The rule that governs the package, from §23: **no engine change.** The two files are built
+by `tools/gen_ships.py` from documented particulars and period rules exactly as the
+frigate's and the schooner's are, with the citation beside every number and "judgement"
+beside every number that is one; the loader, the physics, the evolutions, the orders, the
+standing orders and the viewer read them as they read the two existing files. Any order,
+script or drawing that fails on either new ship is a fault in the grammar or in the
+generator's rig rules, fixed there (in the grammar so that it reads the file with no rig
+assumed; in the generator so that the file says what the grammar needs), never by a
+special case for the ship, and every such fix is listed in the report. The one generator
+addition the spec expects is the running bowsprit. If anything at all in `freesail/`
+outside `orders/`, `evolutions/scripts.py` and `standing/` must change to seat either ship,
+stop, and say what and why in the report before changing it: that is the finding pillar 2
+exists to make, and the lead decides.
+
+- **The sources.** The lead's figures in `VesselCandidates.md` are from memory and from
+  the owner's notes of the kits' manuals; read each again before it is a number. For
+  *Harpy*, Winfield's *British Warships in the Age of Sail 1793 to 1817* (the Diligence
+  class) if it can be reached, else the manual's figures marked as such: 316 tons burthen,
+  95 ft 0 in on the gun deck, 75 ft 1 5/8 in on the keel, 28 ft 1 1/2 in extreme breadth,
+  12 ft 0 1/2 in depth in hold, complement 121, sixteen 32-pounder carronades and two
+  6-pounder chase guns. For *Sherbourne*, Winfield's *1714 to 1792* volume or the RMG
+  draught's record if reachable, else the manual's: 85 tons burthen, 54 ft 6 in (say
+  whether on deck or on the keel, which the source will settle; the two differ by a
+  fifth), 19 ft breadth, complement 30, six 3-pounders and eight swivels. The spars from
+  the references already in the repository, which have what the two existing ships did
+  not need: **Fincham 1843** (`docs/references/fincham/`), "On Masting Cutters and
+  Schooners" with the table of proportions for masts, booms and bowsprits of cutters and
+  the tables of lengths of lower masts and topmasts for cutters of different lengths (the
+  OCR's pp. 66 to 71), and "On Masting Brigs" with the tables of masts, bowsprits,
+  jib-booms and flying jib-booms and of yards and booms for brigs of different lengths
+  (pp. 82 to 88), with the tables of diameters for both; and **Steel 1794** vol. I, the
+  rigging tables for "a cutter of 200 tons" and "brigs of 200 tons" and "brigs of 150
+  tons" for the rope sizes, scaled by the rule the frigate's rope follows, and his
+  sail-making chapter for the cutter's mainsail and trysail and the brig's sails
+  ("the sails of a brig with two masts are also similar to those on the main and fore
+  masts of a ship"). Luce's proportions are the check for the brig, as the frigate's
+  rules; Fincham's cutter tables are the primary source for the cutter, since neither
+  Luce nor Falconer masts a cutter. Every table read is cited by the OCR's page as the
+  schooner's builder cites Chapelle's.
+- **The cutter** (§23): one file, `data/ships/cutter.yaml`, her name *Sherbourne*, her
+  type `cutter`, described as the Channel's revenue cutter of 1763 whose type the pilot
+  cutters and the hired armed cutters of the war shared. The hull as the schooner's is
+  derived: a load waterline between the keel and the deck length, the breadth as given, a
+  draught from the type (a cutter drew deep aft, on the order of half her breadth; say
+  the rule), a displacement from a block coefficient the type's fullness justifies
+  (fuller than the schooner's 0.33; say which and why), a stiff `gm_m` (a cutter was
+  stiff and carried a great press of sail: the type's reputation is the judgement's
+  ground), a hull speed from `1.34 sqrt(LWL ft)` bounded by the type's records, a low
+  deck. One mast, lower mast and topmast (Steel: the cutter's topmast fidded above a
+  lower mast left eight-square at the deck), with the head of the lower mast, the hounds
+  and the cap as parts so that the topmast can be struck as the frigate's are; the gaff
+  mainsail on a long boom over the counter and its gaff, the boom's length by Fincham's
+  table; the square sail on its yard (Steel's "cross-jack" of the one-masted vessel, set
+  flying from the deck and not a standing yard: model it as the schooner's fore yard is,
+  or as a yard that is crossed and sent down, whichever the file can say without an
+  engine change, and say which); the square topsail on the topsail yard and the
+  topgallant above it, as the kit's model shows three yards; the fore staysail on the
+  forestay; the jib on its traveller on the running bowsprit; the gaff topsail if Fincham
+  or Steel gives the type one at her date, else not; the storm trysail and the storm jib;
+  reef bands on the mainsail (three, as the type's), the topsail (two) and the jib. Guns
+  as parts if the frigate's are; else in the description. The sail room and the booms
+  (package 30b's `spare_spars`) scaled to her: a spare topmast, a spare topsail yard, a
+  spare jib and mainsail, judgement said so. A crew of thirty by the schooner's stations
+  with no tops (forecastle, afterguard, waisters, idlers), `posts` master and mate and
+  boatswain, names english; ratings a revenue crew's, mostly able.
+- **The running bowsprit** (§23's one generator addition): a cutter's bowsprit ran in and
+  out on the deck through a gammoning iron and a fid, reefed in heavy weather to bring
+  the jib's tack inboard and rigged out for the full jib. In the file: the bowsprit spar
+  with a `running` flag and its housed and full outboard lengths; the jib's tack at the
+  full length. Two evolutions in `data/evolutions/`, `reef_bowsprit` (the verbs `reef the
+  bowsprit`, `run in the bowsprit`) and `rig_out_bowsprit` (`rig out the bowsprit`), that
+  set the outboard length and move the jib's tack, with the jib taken in first as a
+  precondition (a reefed bowsprit sets the smaller jib or the storm jib; the full jib
+  needs the full length), their crew and duration from Steel's or Lever's account of
+  the work if either gives one, judgement otherwise. If a step kind the runner does not
+  have is needed to move a spar's geometry, that is an engine change: stop and report it,
+  and leave the flag in the file with its meaning in the comment, so that the file is
+  right even if the evolution waits. The viewer draws the bowsprit at its current length
+  from the state, or at the full length with a note in the report if the state is not
+  in the drawing's data.
+- **The brig** (§25): one file, `data/ships/brig.yaml`, her name *Harpy*, her type `brig`,
+  described as the Diligence-class brig-sloop of 1796 (the merchant brig is her second
+  description at far detail, which is package 36's to write: this file is the sloop's).
+  The hull as the frigate's is derived (gun deck and keel to a waterline, burthen to a
+  displacement with a sloop's block, the hold to a draught, a frigate's `gm_m` scaled, a
+  hull speed from the waterline). Two masts, fore and main, each with a lower mast, a
+  topmast and a topgallant mast, and royal masts only if Fincham's or Steel's brig of her
+  size carries them by her date (say which; the kit's model shows three yards a mast);
+  courses, topsails and topgallants on both with the frigate's reef bands; the spanker on
+  its boom and gaff on the main; the head sails complete, fore topmast staysail on its
+  stay, jib on the jib-boom, flying jib on the flying jib-boom; the staysails between the
+  masts, the main staysail and the main topmast staysail, and the main topgallant
+  staysail if the sources give it; studding sails on the fore and main by the frigate's
+  rule (the lower, topmast and topgallant studding sails, the booms on the yards); the
+  storm canvas of a brig (a main storm staysail, a storm trysail on the main, a storm
+  fore staysail). Her guns as the frigate's are. The booms scaled from the frigate's list
+  (Luce's frigate carries two of each; a brig-sloop one topmast that answers either mast,
+  as Chapelle says of the brig, one topgallant mast, one topsail yard, a pair of booms),
+  and the sail room by the schooner's rule (a second of each sail she could least do
+  without, one of each storm sail). A crew of 121 by the frigate's stations in small
+  (forecastle, fore top, main top, afterguard, waisters, marines, idlers), `posts` the
+  sloop's (commander, lieutenant, master, boatswain, gunner, carpenter, purser, surgeon;
+  what the loader has of these), names english. If the staysails prove troublesome that
+  is a fault in the generator's rig rules to fix there, as §25 says, "a bad sign for the
+  vessel library and treated as such": fix it in the rule and say so.
+- **Balance and ratings.** Both ships are measured, not tuned: `tools/measure_loads.py`
+  run on each for the spar ratings under the generator's design winds (the cutter's
+  topgallant and square sail at the gaff topsail's 22 knots, since both come in early;
+  say the rule); `clr_x_m` set as the schooner's was, close-hauled in 15 knots with a
+  few degrees of weather helm on a beam reach, the numbers in the comment; each ship's
+  polar drawn by the same means the frigate's and the schooner's were (close-hauled
+  angle and speed in 15 knots, the beam reach, the run) and written in the report and in
+  `TuningNotes.md` beside the two existing ships', so that the hierarchy can be seen:
+  the cutter weatherly and quick for her size, the brig between the schooner and the
+  frigate. No truths: milestone 8 verifies both as reference ships (§23, §25).
+- **The grammar across four ships** (the test §23 names). Every test module that loads
+  the two ship files loads four; every test that runs an order on "both ships" runs it on
+  all four where the ship has the part, and asserts the refusal's words where she has
+  not; the catalogue test's "the orders reach the right evolution on both ships" becomes
+  four. Then the sweep: on each new ship, every verb of `data/vocabulary.yaml` with every
+  noun her file gives, and the primer's and the catalogue's sequences (`make sail`,
+  `shorten sail`, `plain sail`, `all plain sail`, `reef`, `shake out`, `furl`, `loose`,
+  `set`, `take in`, `clew up`, `haul up`, `brace`, `trim`, `tack`, `wear`, `boxhaul`, `wear
+  short round`, `heave to`, `lie a-try`, `scud`, `send down`, `sway up`, `cut away`, `clear
+  the wreck`, `shift the spar`, `reeve`, `all hands`, `pipe down`, `belay`, the sail-room
+  orders, every reading and every standing-order form of the starter file and the gate
+  days' orders). The known places to look, from the grammar as it stands: `the topsail`
+  on a one-masted ship (unambiguous with one; the grammar must not require a mast's
+  name it has no need of); the mast names `verbs.py` knows (`fore`, `main`, `mizzen`),
+  which the cutter's single mast must not need to give (Steel calls it the mast, or the
+  main mast; accept both); the plain-sail set and the heavy-weather routine built from
+  the file (a cutter's plain sail is mainsail, foresail, jib and topsail; a brig's the
+  frigate's less a mast); the manoeuvre scripts that back a head sail or a mizzen
+  (boxhauling and wearing short round on a ship with no mizzen the schooner already
+  exercises; on the cutter the head sail is the staysail and the after sail the
+  mainsail, which the scripts must find by class and place, not by name); lying a-try
+  under the storm canvas each ship has; the topmen's mast (`runner.py`'s "the mast the
+  subject stands on") on a ship with no tops; `client/projection.js` drawing a gaff
+  mainsail whose boom overhangs the counter, a running bowsprit, and the brig's
+  staysails between two masts; the sail room's and the booms' queries; `tools/day_log.py`
+  and the day's scenarios run under each ship (`--ship` if the tool lacks it). Every
+  failure fixed in the grammar or the generator, and every fix listed: that list is
+  the package's finding about pillar 2.
+- **The primer.** `01-the-ship.md` gains a section for each new vessel in the form of the
+  schooner's, forward to aft and deck upward, with her plain-sail set and her storm
+  canvas named, and an orders block the primer test runs on her; `03-making-and-
+  shortening-sail.md` a paragraph on reefing and rigging out a running bowsprit; the
+  `README.md` run lines name all four ships. `VesselCandidates.md` gets the figures as
+  read, beside the lead's, with the source and page.
+- **Report**: the final suite line; the sources read with pages, and every number that
+  is a judgement; the two ships' particulars as built (waterline, displacement, draught,
+  sail area by sail, complement); the polar figures for both beside the schooner's and
+  the frigate's; the list of orders, scripts, standing forms and drawings that failed on
+  each ship and where each was fixed; what the running bowsprit needed and whether its
+  evolutions run; anything that wanted an engine change and what you did instead;
+  anything you could not do and why.
+
+Not in 32b: the pilot's boarding and the port's cutter as a person's vessel (35), the brig
+at far detail and her merchant description (36), truths for either ship (milestone 8),
+*Alert*, *Speedy* and the wishlist (milestone 8), the lateen mizzen and the yacht.
+
 ## Packages 33 to 36 (outline; written in turn)
 
 As spec M5 §31: 33 the reckoning, the sights and the lunar, the captain's chart (§13 to
 §15, §17, truths 58 to 61; Fable); 34 the tide, grounding and anchoring, gate 5b (§16,
-§18, truths 62 to 64 and 66; Fable); 35 places, people, ports and nations, with the cutter
-as a ship file for the pilot (§22 to §24, truths 68 to 70; Opus); 36 other sail, the
-world-order channel, the brig as a ship file, the two scenarios, gate 5c (§25 to §27,
-truths 67, 71, 72; Fable). The two new
-vessels are the first catalogue entries and the test of pillar 2 (owner, 2026-09-29): no
-engine change, the running bowsprit the one generator addition expected, every order that
-fails on either a fault in the grammar to fix there.
+§18, truths 62 to 64 and 66; Fable); 35 places, people, ports and nations, the pilot
+boarding from the cutter of 32b (§22 to §24, truths 68 to 70; Fable, the owner's ruling of
+2026-09-30, the earlier outline's Opus struck); 36 other sail, the world-order channel,
+the brig of 32b at far detail with her merchant description, the two scenarios, gate 5c
+(§25 to §27, truths 67, 71, 72; Fable). The two new vessels' files are 32b's, pulled
+forward (owner, 2026-09-30) so that the catalogue's hierarchy exists before the ports and
+the other sail need it.
 
 ## Integration (the lead)
 

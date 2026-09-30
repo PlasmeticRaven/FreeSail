@@ -590,14 +590,18 @@ measures the whole at the gate's scenario, and the tuning notes carry the number
 - **32. The chart data and the queries** (5b §9 to §12; the build tool; the four patches
   and the feature list, which is reading and tracing; truth 65). Fable, with the hand work
   reviewed by the lead against the sources.
+- **32b. The cutter and the brig as ship files** (§23's cutter and §25's brig, pulled
+  forward from 35 and 36 by the owner, 2026-09-30: the generator's cutter and brig rules,
+  the two files, the running bowsprit, and the orders' grammar run across four ships; no
+  truths; no engine change, any found reported as a fault). Fable.
 - **33. The reckoning, the sights and the lunar** (5b §13 to §15, §17; the moon; truths
   58 to 61). Fable.
 - **34. The tide, grounding and anchoring** (5b §16, §18; truths 62 to 64, 66; gate 5b
   cut). Fable.
-- **35. Places, people, ports and nations** (5c §22 to §24; the cutter as a ship file;
-  truths 68 to 70). Opus.
-- **36. Other sail and the world-order channel** (5c §25 to §27; the brig as a ship
-  file; the two scenarios; truths 67, 71, 72; gate 5c cut). Fable.
+- **35. Places, people, ports and nations** (5c §22 to §24; the pilot boarding from 32b's
+  cutter; truths 68 to 70). Fable (the owner's ruling, 2026-09-30; the draft said Opus).
+- **36. Other sail and the world-order channel** (5c §25 to §27; 32b's brig at far detail
+  with her merchant description; the two scenarios; truths 67, 71, 72; gate 5c cut). Fable.
 
 Each package's brief is written in `docs/dev/M5-WorkPackages.md` when its predecessor
 has landed, in the form the M4 packages took.
