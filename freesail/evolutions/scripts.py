@@ -3652,6 +3652,7 @@ class TrimSheetScript(Script):
         self.target_angle = 0.0
         self.duration_s = 30.0
         self.progress = 0.0
+        self.last_set = 1.0
 
     def holds(self) -> set[str]:
         held: set[str] = set()
@@ -3676,16 +3677,10 @@ class TrimSheetScript(Script):
         assert sail is not None
         self.sail = sail
         geo = yard_trim.sheet_geometry(self.ship, sail)
-        angle = self.params.get("angle_deg")
-        if isinstance(angle, int | float):
-            wanted = units.deg_to_rad(float(angle))
-        else:
-            wanted = yard_trim.wanted_sheet_angle(sail.cls, self.ship.dyn.apparent_wind_angle)
-        self.target_angle = max(geo.floor, min(geo.ceiling, wanted))
+        self._aim(geo)
         side = self.params.get("side")
         side = side if side in ("weather", "lee", "starboard", "larboard") else None
         self.line = yard_trim.working_sheet(self.ship, sail, side)
-        self.target_hauled = geo.hauled_from_angle(self.target_angle)
         if self.line is not None:
             if self.line.state is LineState.FREE:
                 # a sheet let fly is taken up first: its scope is what it ran out to
@@ -3704,23 +3699,46 @@ class TrimSheetScript(Script):
         else:
             self.start_hauled = self.target_hauled
         yard_trim.refresh_reading(self.ship, sail)
+        self.last_set = self.line.hauled if self.line is not None else self.start_hauled
         per_m2 = self.timing_value("seconds_per_m2", 0.3)
         lo, hi = self.timing_value("min_s", 15.0), self.timing_value("max_s", 120.0)
         self.duration_s = max(lo, min(hi, per_m2 * sail.area_m2))
         self.progress = 0.0
         self.phase = "hauling" if self.target_hauled >= self.start_hauled else "easing"
 
+    def _aim(self, geo: yard_trim.SheetGeometry) -> None:
+        """The trim wanted: the angle ordered, or the trim for the apparent wind as it
+        stands now (the hands trim to the wind they feel, not the one at the order)."""
+        assert self.sail is not None
+        angle = self.params.get("angle_deg")
+        if isinstance(angle, int | float):
+            wanted = units.deg_to_rad(float(angle))
+        else:
+            wanted = yard_trim.wanted_sheet_angle(self.sail.cls, self.ship.dyn.apparent_wind_angle)
+        self.target_angle = max(geo.floor, min(geo.ceiling, wanted))
+        self.target_hauled = geo.hauled_from_angle(self.target_angle)
+
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
         self.t += dt
         if self.sail is None:
             self.fail("no sail to trim")
             return
+        if self.line is not None and (
+            self.line.state is not LineState.BELAYED or abs(self.line.hauled - self.last_set) > 1e-9
+        ):
+            # other hands have the sheet (a manoeuvre's, or an order at the pin): the
+            # party gives way, and the sheet stands where they put it
+            self.line = None
+            self.finish()
+            return
+        self._aim(yard_trim.sheet_geometry(self.ship, self.sail))
         self.progress = min(1.0, self.progress + dt / (self.duration_s * factor))
         if self.line is not None:
             self.line.hauled = self.start_hauled + (self.target_hauled - self.start_hauled) * (
                 self.progress
             )
             self.line.state = LineState.BELAYED
+            self.last_set = self.line.hauled
         yard_trim.refresh_reading(self.ship, self.sail)
         if self.progress >= 1.0 - 1e-9:
             if self.line is not None:
