@@ -4,7 +4,7 @@ stdio, on the Python MCP SDK's server class (`MCPServer`, which is what the SDK 
 `FastMCP` before its version 2). It is a client of the running game and owns no World.
 
     python -m freesail.agents.mcp_server --game http://localhost:8000 --model-name "<identity>"
-        [--station watcher] [--wait 3600] [--session play|test] [--ask-again]
+        [--station watcher] [--wait 200] [--session play|test] [--ask-again]
 
 The owner starts the game first, in the browser (`freesail.ui.server`) or the console
 with `--agents-port`, and plays it there; this bridge carries the model's tool calls to
@@ -36,14 +36,17 @@ stand-by, an urgent line, a question from the captain) and return it, its first 
 saying whose turn it is ("Your turn is open: sample at ..."). While a call is held the
 bridge sends MCP progress notifications every `PROGRESS_EVERY_S` (standard clients
 reset their request timeout on progress), each saying how long it has waited and what
-the game has logged of note, and it gives up at the ceiling (`--wait`, an hour by
-default): the result then says so ("Still waiting ..."), with since when the model has
-waited, until what, and the notable lines logged since, in the log's own words, so a
-stand-by is a decision not to be sampled and not a decision to be blind; calling
-`stand_by` again continues the same wait, and `say(text)` ends it at the model's own
-word and opens its turn. For a client that cuts long calls whatever the progress, the
-owner starts the bridge with `--wait 50` and the model waits in fifty-second calls,
-each with that digest (`docs/agents/Harness.md`). The game runs on its own clock
+the game has logged of note, and it gives up at the ceiling (`--wait`, `MCP_WAIT_S`,
+two hundred seconds by default, under the four minutes after which Claude Desktop cuts a
+call whatever the progress: package 31c, playtest 11's finding 2): the result then says
+so ("Still waiting ..."), with since when the model has waited, until what, and the
+notable lines logged since, in the log's own words, so a stand-by is a decision not to be
+sampled and not a decision to be blind; calling `stand_by` again continues the same
+wait, and `say(text)` ends it at the model's own word and opens its turn. A `stand_by`
+while the game has the floor and the model is not standing by is taken from then (so the
+bell it names, falling before the next turn, wakes it); one while it is standing by
+continues that wait. For a client that cuts shorter calls, `--wait 50` waits in
+fifty-second calls, each with that digest (`docs/agents/Harness.md`). The game runs on its own clock
 meanwhile: what happens while the model holds the floor is added to its open turn (the
 harness's fold), and the next call that reads it gets everything since its last reply.
 
@@ -130,6 +133,7 @@ __all__ = [
     "DEFAULT_GAME",
     "DEFAULT_WAIT_S",
     "INSTRUCTIONS",
+    "MCP_WAIT_S",
     "PROGRESS_EVERY_S",
     "SAY_DESCRIPTION",
     "STILL_WAITING",
@@ -146,13 +150,18 @@ __all__ = [
 DEFAULT_GAME = "http://localhost:8000"
 
 # How long `say` and `stand_by` hold the call open for the next turn, in real seconds:
-# the ceiling, not the usual wait, since the call returns as soon as the turn opens. An
-# hour: the owner has seen Claude Desktop hold live tool calls open for many minutes and
-# tens of minutes (the owner's observation, 2026-09-28), and at 1x a glass is thirty real
-# minutes, so a shorter ceiling costs the model empty calls. `--wait 50` is the setting
-# for a client that cuts long calls whatever the progress (package 28b's default, under
-# the SDKs' sixty-second request timeout).
-DEFAULT_WAIT_S = 3600.0
+# the ceiling, not the usual wait, since the call returns as soon as the turn opens. Two
+# hundred seconds (package 31c, playtest 11's finding 2): the Claude Desktop client cuts a
+# tool call at four real minutes whatever the progress notifications say (the watcher of
+# playtest 11, at 1x, its `stand_by` by a glass or an urgent event cut again and again; the
+# study of the owner's sessions), and a call cut off costs the model a result it must be
+# given again (`_lost_first`). Under the cut with forty seconds to spare, the call comes
+# back of itself with the honest digest of package 28c ("Still waiting ...": since when,
+# until what, the notable lines since), and the model calls `stand_by` again to go on
+# with the same wait. The package 28c ceiling of an hour was set before the cut was seen.
+# `--wait` overrides it (50 for a client that cuts at a minute, the SDKs' request timeout).
+MCP_WAIT_S = 200.0
+DEFAULT_WAIT_S = MCP_WAIT_S
 
 # The longest ceiling the bridge takes (judgement: a watch at 1x, four real hours, the
 # longest interval a stand-by names and the watcher's patience; past it a call held
@@ -190,8 +199,9 @@ SAY_SCHEMA = {
 
 
 def _seconds_words(seconds: float) -> str:
+    # in seconds up to five minutes, so that the door's wait reads as set ("200 seconds")
     s = int(round(seconds))
-    if s < 120:
+    if s < 300:
         return "a second" if s == 1 else f"{s} seconds"
     m = int(round(seconds / 60))
     return f"{m} minutes"
@@ -807,7 +817,14 @@ class Bridge:
 
     @staticmethod
     def _continued(a: dict[str, Any], args: dict[str, Any]) -> str:
-        """A `stand_by` while the game has the floor: the same wait goes on."""
+        """A `stand_by` while the game has the floor: taken from now when the model was not
+        standing by (package 31c: the bell it names is not skipped), or the same wait goes
+        on."""
+        results = a.get("results") or []
+        if results and a.get("stood_by"):
+            return f"{results[-1].get('result')} Taken while the game had the floor."
+        if results:  # refused in words (no such event)
+            return str(results[-1].get("result") or "")
         interim = a.get("interim")
         if interim is None:  # paused, or no station: the game's words
             return str(a.get("words") or "")
@@ -889,7 +906,7 @@ def _lost_note(lost: list[tuple[str, str, bool, float]]) -> str:
         f"\n\n(Your call to {tool} before this one was cut off by the client after "
         f"{_seconds_words(after)}, before its result reached you; no turn had opened in it, "
         "so nothing was lost. If the client cuts every call about that long, the owner may "
-        "start the bridge with --wait 50.)"
+        "start the bridge with a shorter --wait, 50 for a client that cuts at a minute.)"
     )
 
 
@@ -1060,8 +1077,8 @@ def main(argv: list[str] | None = None) -> int:
         default=DEFAULT_WAIT_S,
         help=(
             "the most real seconds say and stand_by hold a call open for the next turn "
-            f"(default {DEFAULT_WAIT_S:g}, at most {WAIT_CEILING_MAX_S:g}; 50 for a client "
-            "that cuts long calls)"
+            f"(default {DEFAULT_WAIT_S:g}, under Claude Desktop's four-minute cut; at most "
+            f"{WAIT_CEILING_MAX_S:g}; 50 for a client that cuts calls at a minute)"
         ),
     )
     ap.add_argument("--session", choices=("play", "test"), default="play")

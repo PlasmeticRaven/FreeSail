@@ -55,8 +55,11 @@ budget; and says so when it cannot learn it.
 known (`--ctx-size`, else the server's `n_ctx` from `/props`), the oldest turns are left
 out of the request, whole exchanges at a time, so that the system message and the latest
 turns fit with `REPLY_RESERVE_TOKENS` to spare; a brief that alone does not fit stops the
-run with the numbers. Tokens are estimated at `CHARS_PER_TOKEN` characters each (the
-harness's one rule, `tools.CHARS_PER_TOKEN`, which the library's sizes use too).
+run with the numbers. A sample after the first carries only the readings that changed
+(package 31c), so the first sample kept when older ones are left out is sent with every
+reading as the samples before it made them (`READINGS_WHOLE`): nothing is withheld.
+Tokens are estimated at `CHARS_PER_TOKEN` characters each (the harness's one rule,
+`tools.CHARS_PER_TOKEN`, which the library's sizes use too).
 
 **The shelf** (package 28d). The runner keeps the game's turns as the game serves them
 and builds each request's messages from them afresh, so a book the model shelved (or
@@ -113,6 +116,12 @@ DEFAULT_ENDPOINT = "http://127.0.0.1:8080"
 # or a thinking model's reasoning is never cut, while a runaway generation is bounded
 # within about a minute and a half on a 4090). `--max-reply` changes it.
 REPLY_MAX_TOKENS = 4096
+
+# What the first sample kept says of its readings when the budget has left the samples
+# before it out (package 31c): it carries every reading, as those samples had them.
+READINGS_WHOLE = (
+    "every reading as it stands: the samples before this one are left out for the context"
+)
 
 # Tokens kept free for the reply in the context budget: the reply budget itself.
 REPLY_RESERVE_TOKENS = REPLY_MAX_TOKENS
@@ -406,6 +415,10 @@ class LocalModel:
         out: list[dict[str, Any]] = []
         last_ids: list[str] = []
         last_calls: tuple[ToolCall, ...] = ()
+        # the readings as the samples so far make them, and for each message of a sample
+        # that carries only the changes, the same sample with every reading (package 31c)
+        picture: dict[str, Any] = {}
+        whole: dict[int, dict[str, Any]] = {}
 
         def answer_the_ids() -> None:
             # a turn that ended on a stand-by has no results (package 28c); the protocol
@@ -468,10 +481,17 @@ class LocalModel:
                 if words is not None:
                     out.append({"role": "user", "content": words})
                 else:
+                    if "readings" in d:
+                        picture.update(d.get("readings") or {})
+                        if d.get("readings_are"):
+                            all_of = {**d, "readings_are": READINGS_WHOLE}
+                            whole[len(out)] = all_of | {"readings": dict(picture)}
                     out.append({"role": "user", "content": json.dumps(d, ensure_ascii=False)})
-        return self._budget(out)
+        return self._budget(out, whole)
 
-    def _budget(self, messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def _budget(
+        self, messages: list[dict[str, Any]], whole: dict[int, dict[str, Any]] | None = None
+    ) -> list[dict[str, Any]]:
         self.dropped_turns = 0
         ctx = self.context_size()
         if not ctx or not messages:
@@ -490,21 +510,34 @@ class LocalModel:
             )
         body = messages[1:] if head is not None else messages
         body_cost = cost[1:] if head is not None else cost
+        offset = 1 if head is not None else 0
+        whole = dict(whole or {})
         total = head_cost + sum(body_cost)
         first = 0
-        while total > room and first < len(body):
-            # leave out the oldest whole exchange: up to the next user message
-            total -= body_cost[first]
-            first += 1
-            while first < len(body) and body[first]["role"] != "user":
+        while True:
+            while total > room and first < len(body):
+                # leave out the oldest whole exchange: up to the next user message
                 total -= body_cost[first]
                 first += 1
-        if first >= len(body):
-            raise DoorError(
-                f"The brief and the latest sample do not fit a context of {ctx} tokens with "
-                f"{self.max_reply} kept for the reply; start the server with a larger "
-                "--ctx-size (docs/agents/Harness.md)."
-            )
+                while first < len(body) and body[first]["role"] != "user":
+                    total -= body_cost[first]
+                    first += 1
+            if first >= len(body):
+                raise DoorError(
+                    f"The brief and the latest sample do not fit a context of {ctx} tokens "
+                    f"with {self.max_reply} kept for the reply; start the server with a "
+                    "larger --ctx-size (docs/agents/Harness.md)."
+                )
+            at = offset + first
+            if first == 0 or at not in whole:
+                break
+            # the samples before the first kept are left out: it carries every reading as
+            # they made them (package 31c), and if that does not fit, more goes
+            msg = {"role": "user", "content": json.dumps(whole.pop(at), ensure_ascii=False)}
+            c = len(json.dumps(msg, ensure_ascii=False)) // CHARS_PER_TOKEN + 1
+            total += c - body_cost[first]
+            body = [*body[:first], msg, *body[first + 1 :]]
+            body_cost = [*body_cost[:first], c, *body_cost[first + 1 :]]
         self.dropped_turns = first
         return ([head] if head is not None else []) + body[first:]
 

@@ -429,7 +429,10 @@ class Console:
             owed -= n
             with self.lock:
                 self._run(n)
-                check_agents_unattended(self.world)
+        with self.lock:
+            # the unattended bound on this driver's clock, running or not: ten real minutes
+            # of a pause unanswered, however fast the ship's clock runs (package 31c)
+            check_agents_unattended(self.world)
         return owed
 
     def serve_agents(

@@ -243,3 +243,117 @@ def test_the_vocabulary_knows_tell(words):
     vocab = load_vocabulary()
     verb = vocab.phrase_to_verb[words]
     assert vocab.verbs[verb].object == "station"
+
+
+# ---------------------------------------------------------------------------
+# A standing order tells and asks (package 31c; the owner's finding at gate 5a)
+# ---------------------------------------------------------------------------
+
+SEA = 'standing order "sea": every 10 minutes then tell the watcher the sea is getting up'
+
+
+def test_a_standing_order_tells_the_watcher_as_the_captain_would_and_the_log_names_it():
+    """The word is delivered as the captain's own is, under `word`, no answer owed; the
+    log line names the standing order as the speaker, in the name of the officer who gave
+    it; the firing's own line is as every firing's."""
+    world = point_world()
+    world.submit(SEA)
+    world.submit(
+        'standing order "glass" by the master: every 10 minutes then say to the watcher mind '
+        "the glass"
+    )
+    h, fake = stationed(world, ["Aye.", "Noted.", "Noted."], loop=True)
+    world.run(EVERY)
+    told = [e for e in world.log if e.kind == "agent.told"]
+    assert [(e.actor, e.text, e.severity) for e in told] == [
+        (
+            "standing order 'sea'",
+            "By standing order 'sea': the captain to the watcher: the sea is getting up",
+            Severity.NOTABLE,
+        ),
+        (
+            "standing order 'glass'",
+            "By standing order 'glass': the master to the watcher: mind the glass",
+            Severity.NOTABLE,
+        ),
+    ]
+    assert told[0].data == {
+        "station": "watcher",
+        "words": "the sea is getting up",
+        "by": "standing order 'sea'",
+    }
+    fired = [e.text for e in world.log if e.kind == "order.accepted"]
+    assert "By standing order 'sea': telling the watcher the sea is getting up." in fired
+    s = samples(fake)[-1]
+    assert s["reason"] == A_WORD and s["word"] == "the sea is getting up\nmind the glass"
+    assert s["question"] is None
+    assert world.journal[-2:] == [
+        (0, "captain", SEA),
+        (
+            0,
+            "captain",
+            'standing order "glass" by the master: every 10 minutes then say to the watcher '
+            "mind the glass",
+        ),
+    ], "the firings are not journaled; the orders that gave them are"
+    # the captain's own word is logged as it always was, in the same tick as a firing
+    world.run(EVERY - 1)
+    e = world.submit("tell the watcher all is well")
+    assert e.text == "The captain to the watcher: all is well" and "by" not in e.data
+
+
+def test_a_standing_order_asks_and_the_question_is_sampled_once():
+    """A standing order's `ask` is put as the captain's own is, answered at once; the
+    firing's line is notable, and the sample that carried the question has carried it, so
+    no second sample is taken for it (package 31c)."""
+    world = point_world()
+    world.submit('standing order "q": every 5 minutes then ask the watcher how the glass stands')
+
+    def answer_it(last, turns):
+        if last.get("question"):
+            return reply("", call("answer", text="Steady at thirty."))
+        return Reply()
+
+    h, fake = stationed(world, [answer_it], loop=True)
+    before = len(samples(fake))
+    world.run(EVERY - 1)  # the question at 300; the station's own interval at 600
+    asked = [e for e in world.log if e.kind == "agent.asked"]
+    assert [e.text for e in asked] == [
+        "By standing order 'q': the captain asks the watcher: how the glass stands?"
+    ]
+    new = samples(fake)[before:]
+    assert [s["reason"] for s in new] == ["a question"], [s["reason"] for s in new]
+    assert new[0]["question"] == "how the glass stands"
+    assert [e.text for e in world.log if e.kind == "agent.said"] == ["[watcher] Steady at thirty."]
+
+
+def test_a_standing_orders_word_to_a_station_nobody_mans_is_refused_when_it_fires():
+    """Given before the watcher takes the station (a book read at the start), the order
+    stands; a firing while nobody mans it is refused in words, as the captain's would be."""
+    world = point_world()
+    e = world.submit(SEA)
+    assert e.kind == "standing.given", e.text
+    world.run(EVERY)
+    (refused,) = [e for e in world.log if e.kind == "order.rejected"]
+    assert refused.actor == "standing order 'sea'"
+    assert "There is no watcher at the station; nobody has been stationed there." in refused.text
+    stationed(world, ["Aye.", "Noted."], loop=True)
+    world.run(EVERY)
+    assert [e.text for e in world.log if e.kind == "agent.told"] == [
+        "By standing order 'sea': the captain to the watcher: the sea is getting up"
+    ]
+
+
+def test_a_game_with_a_standing_orders_word_replays_to_the_same_digest(tmp_path):
+    world = point_world()
+    world.submit(SEA)
+    world.submit('standing order "q": every 20 minutes then ask the watcher how she goes')
+    stationed(world, ["Aye.", reply("", call("answer", text="Well.")), "Noted."], loop=True)
+    world.run(3 * EVERY)
+    data = replay.load_file(replay.save_to_file(world, tmp_path / "book.json"))
+    copy = replay.replay(data, ship_factory)
+    assert copy.log.digest() == world.log.digest()
+    assert [e.text for e in copy.log if e.kind == "agent.told"] == [
+        e.text for e in world.log if e.kind == "agent.told"
+    ]
+    assert len([e for e in copy.log if e.kind == "agent.told"]) == 3

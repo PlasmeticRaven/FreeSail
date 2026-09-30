@@ -31,12 +31,13 @@ from typing import Any
 
 import pytest
 
+from freesail import units
 from freesail.agents import (
     OPT_OUT_TOKEN,
     TOOL_CALLS_PER_SAMPLE,
     TOOLS,
     WELFARE_REPEAT_N,
-    WELFARE_UNATTENDED_BOUND_S,
+    WELFARE_UNATTENDED_REAL_S,
     Authority,
     Brief,
     Fake,
@@ -55,6 +56,7 @@ from freesail.agents import (
     watcher,
 )
 from freesail.agents import agent as agent_mod
+from freesail.agents import fake as fake_mod
 from freesail.agents import harness as harness_mod
 from freesail.agents import repl as repl_mod
 from freesail.agents.agent import (
@@ -236,7 +238,8 @@ def test_nothing_real_passes_through_the_harness():
         if "tool_results" in d:
             assert set(d) == {"tool_results"}
         else:
-            assert set(d) == {
+            # a sample after the first says its readings are the changes (package 31c)
+            assert set(d) - {"readings_are"} == {
                 "tick",
                 "stamp",
                 "reason",
@@ -604,23 +607,27 @@ def test_truth_43_repeating_after_the_nudge_pauses_with_the_human_asked_then_sta
     snap = queries.snapshot(world)["agents"][0]
     assert snap["state"] == "paused"
     assert snap["question"] == "the watcher is paused: continue, stand down, or leave paused?"
-    # sampling has stopped: the fake is not called while paused
+    # sampling has stopped: the fake is not called while paused, and no length of ship's
+    # time stands it down (package 31c, the owner's ruling of 2026-09-30: a watch of ship's
+    # time is under a minute of real time at 300x): a day unanswered, and it is paused still
     calls = fake.calls
-    world.run(WELFARE_UNATTENDED_BOUND_S - 1)
+    world.run(6 * A_WATCH_S)
     assert fake.calls == calls and h.agent.paused and saves == []
-    # nobody answered within a watch of ship's time: stood down, saved, journaled
-    world.run(1)
+    # nobody answered within ten real minutes on the driver's clock: stood down, saved,
+    # journaled
+    assert h.check_unattended(now=0.0) is False
+    assert h.check_unattended(now=float(WELFARE_UNATTENDED_REAL_S)) is True
     assert h.agent.released
     assert saves == [
         "the watcher stood down: paused (the same order ('wear ship') 4 times with "
-        "no change in the readings after a nudge) and nobody answered within a watch"
+        "no change in the readings after a nudge) and nobody answered within ten minutes"
     ]
     assert h.journal.entries[-1].kind == "agent.stopped"
     assert h.journal.entries[-1].text.startswith("Stood down by the harness: paused")
     stopped = [e for e in world.log if e.kind == "agent.stopped"]
     assert len(stopped) == 1 and stopped[0].severity is Severity.NOTABLE
     assert "The game is saved." in stopped[0].text
-    assert WELFARE_UNATTENDED_BOUND_S == A_WATCH_S
+    assert not hasattr(harness_mod, "WELFARE_UNATTENDED_BOUND_S")
 
 
 def test_truth_43_the_human_answers_a_pause_with_resume_or_stand_down():
@@ -1348,7 +1355,13 @@ def test_each_sample_carries_the_lines_since_the_last_one_and_the_readings():
     ticks = [ln["tick"] for ln in second["log"]]
     assert ticks and min(ticks) > 0 and max(ticks) <= EVERY
     assert not any(ln["text"].startswith("[watcher]") for ln in second["log"])
-    assert second["readings"] == tools.readings_words(world)
+    # the first sample carries every reading; the second those changed since (package 31c):
+    # on the point ship in a steady wind, the clock's
+    assert first["readings"] == data_turns(fake)[0]["readings"] and "readings_are" not in first
+    assert second["readings_are"] == harness_mod.READINGS_ARE
+    now = tools.readings_words(world)
+    assert second["readings"] == {k: v for k, v in now.items() if first["readings"][k] != v}
+    assert set(second["readings"]) <= {"time", "watch", "daylight"}
     assert second["question"] is None and second["notices"] == []
 
 
@@ -2178,3 +2191,580 @@ def test_the_sample_that_ends_a_stand_by_says_which_calls_before_it_ran():
     h2.world.run(A_GLASS_S)
     notices = data_turns(fake2)[-1]["notices"]
     assert not any(n.startswith("Before you stood by") for n in notices)
+
+
+# ---------------------------------------------------------------------------
+# Package 31c: the watcher's watch (playtest 11's findings 1 to 6 and 12, the owner's
+# note on candour, and the unattended bound in real minutes only)
+# ---------------------------------------------------------------------------
+
+# every word a sail's reading can be, longest first, to read a sail line back
+SAIL_WORDS = sorted(
+    {
+        "aback",
+        "shaking",
+        *(
+            s.replace("_", " ")
+            for s in (
+                "furled",
+                "in_the_gear",
+                "loosed",
+                "sheeted",
+                "set",
+                "blown_out",
+                "unbent",
+                "goose_winged",
+            )
+        ),
+    },
+    key=len,
+    reverse=True,
+)
+
+
+def rows_of_line(world: World, line: str) -> dict[str, str]:
+    """The sails' rows read back from the sail line with the ship's own groups (library,
+    'the ship'): the line says every sail's state, so nothing is lost."""
+    from freesail.orders.resolve import display_name
+
+    ship = world.ship
+    by_name = {display_name(ship, sid): sid for sid in ship.sails}
+    rows: dict[str, str] = {}
+    for part in line.split("; "):
+        state = next(w for w in SAIL_WORDS if part.endswith(" " + w))
+        said = part[: -len(state) - 1]
+        for item in said.replace(" and ", ", ").split(", "):
+            name = item.removeprefix("the ")
+            members = ship.groups.get(name) or [by_name[name]]
+            for sid in members:
+                assert display_name(ship, sid) not in rows, f"{sid} named twice in {line!r}"
+                rows[display_name(ship, sid)] = state
+    return rows
+
+
+def the_models_picture(world: World, turns) -> dict[str, Any]:
+    """The readings as the model has them from its samples: each sample's in turn, the sail
+    line read back into rows."""
+    picture = fake_mod.readings_so_far(turns)
+    if isinstance(picture.get("sails"), str):
+        picture["sails"] = rows_of_line(world, picture["sails"])
+    return picture
+
+
+def test_a_sample_after_the_first_carries_only_what_changed_and_the_sails_in_one_line():
+    """Playtest 11's finding 1 (spec M4 §24 item 9): every sample repeated all the readings,
+    thirty of them the sails' rows. The first sample carries every reading; each later one
+    those changed since, in the same words, with the sails in one line when any has
+    changed, and says so."""
+    world = frigate_world()
+    at_call: list[dict[str, Any]] = []
+
+    def look(last, turns):
+        if "readings" in last:
+            at_call.append(tools.readings_words(world))
+        return Reply()
+
+    h, fake, _ = stationed(world, [look], loop=True)
+    world.submit("make plain sail")
+    world.run(3 * EVERY)
+    samples = [d for d in data_turns(fake) if "readings" in d]
+    first, later = samples[0], samples[1:]
+    assert first["readings"] == at_call[0] and "readings_are" not in first
+    assert isinstance(first["readings"]["sails"], dict)
+    assert later and all(d["readings_are"] == harness_mod.READINGS_ARE for d in later)
+    before = at_call[0]
+    for d, now in zip(later, at_call[1:], strict=True):
+        changed = {k: v for k, v in now.items() if k != "sails" and before.get(k) != v}
+        assert {k: v for k, v in d["readings"].items() if k != "sails"} == changed
+        if now["sails"] != before["sails"]:
+            assert d["readings"]["sails"] == tools.sail_line(world, now["sails"])
+            assert rows_of_line(world, d["readings"]["sails"]) == now["sails"]
+        else:
+            assert "sails" not in d["readings"]
+        before = now
+    assert any(isinstance(d["readings"].get("sails"), str) for d in later)
+    # the order in which a door sends the sample: the note on the readings before them
+    keys = list(later[0])
+    assert keys.index("readings_are") == keys.index("readings") - 1
+    # as the REPL prints it and the MCP bridge shows it
+    shown = [t for t in h.turns if t.role == DATA and isinstance(t.content.get("readings"), dict)]
+    with_sails = next(t for t in shown if isinstance(t.content["readings"].get("sails"), str))
+    text = repl_mod.render_turn(with_sails)
+    assert f"Readings, {harness_mod.READINGS_ARE}:" in text
+    assert f"  sails: {with_sails.content['readings']['sails']}" in text
+    assert "Readings:" in repl_mod.render_turn(shown[0])
+
+
+def test_the_sail_line_names_the_ships_groups_and_says_every_sail():
+    world = frigate_world()
+    assert tools.sail_line(world) == (
+        "all sail furled; the storm canvas and the occasional sails unbent"
+    )
+    world.submit("make plain sail")
+    world.run(900)
+    world.submit("set the royals")
+    world.run(900)
+    line = tools.sail_line(world)
+    assert line.startswith("plain sail and the royals set; ")
+    assert rows_of_line(world, line) == tools.readings_words(world)["sails"]
+    assert tools.tokens(line) < 50 < tools.tokens(json.dumps(tools.readings_words(world)["sails"]))
+
+
+def test_what_the_captain_has_the_model_can_get_from_its_samples():
+    """The parity rule extended to the delta: nothing is withheld, only not repeated. At
+    every sample the readings as the model has them from its samples (the sail line read
+    back with the ship's groups) are the registry's now, every row; and the readings tool
+    gives them all at any time."""
+    world = frigate_world()
+    checked: list[int] = []
+
+    def look(last, turns):
+        if "readings" in last:
+            assert the_models_picture(world, turns) == tools.readings_words(world)
+            checked.append(world.clock.tick)
+        return Reply()
+
+    h, fake, _ = stationed(world, [look], loop=True)
+    world.submit("make plain sail")
+    world.run(2 * EVERY)
+    world.submit("set the royals")
+    world.run(EVERY)
+    world.submit("take in the royals")
+    world.submit("steer south-west")
+    world.run(3 * EVERY)
+    assert len(checked) >= 6
+    got = tools.call(world, "watcher", "readings")
+    assert {k: v for k, v in got.items() if k != "stamp"} == tools.readings_words(world)
+    assert isinstance(got["sails"], dict) and len(got["sails"]) == len(world.ship.sails)
+
+
+def test_samples_bundled_into_an_open_turn_share_one_copy_of_what_is_common():
+    """A door that answers late: each fold carries what changed since the turn before it,
+    so the bundled turns hold one copy of the readings between them; the merged sample
+    keeps every reading, and the turns read in order give the same."""
+    world = frigate_world()
+    h = late(world)
+    world.submit("make plain sail")
+    world.run(3 * EVERY)
+    turns = [t for t in h.turns if t.role == DATA]
+    folds = [t.content for t in turns if t.content.get("folded")]
+    assert len(folds) >= 3
+    picture: dict[str, Any] = {}
+    for t in turns:
+        before = dict(picture)
+        picture.update(t.content["readings"])
+        if t.content.get("folded"):
+            assert all(before.get(k) != v for k, v in t.content["readings"].items()), (
+                "a fold repeats nothing"
+            )
+    assert h.open_sample.readings == tools.readings_words(world)
+    assert the_models_picture(world, h.turns) == tools.readings_words(world)
+
+
+def test_a_door_that_leaves_out_old_turns_sends_the_first_kept_with_every_reading():
+    """The local runner's budget leaves out the oldest samples when the context is full;
+    the first sample it keeps then carries every reading as the samples before it made
+    them, so nothing is withheld."""
+    pytest.importorskip("httpx")
+    from freesail.agents.local import READINGS_WHOLE, LocalModel
+
+    world = frigate_world()
+    h, fake, _ = stationed(world, ["Aye."], loop=True)
+    world.submit("make plain sail")
+    world.run(6 * EVERY)
+    probe = LocalModel("http://127.0.0.1:9", ctx_size=10**7)
+    full = probe.messages(h.turns)
+    assert probe.dropped_turns == 0
+    costs = [len(json.dumps(m, ensure_ascii=False)) // 4 + 1 for m in full]
+    tools_cost = len(json.dumps(probe.tools_schema())) // 4
+    # room for the brief, the later half of the turns and some to spare: the earlier go
+    ctx = costs[0] + sum(costs[len(costs) // 2 :]) + 600 + probe.max_reply + tools_cost
+    model = LocalModel("http://127.0.0.1:9", ctx_size=ctx)
+    msgs = model.messages(h.turns)
+    assert model.dropped_turns > 0
+    kept = [json.loads(m["content"]) for m in msgs if m["role"] == "user"]
+    first = kept[0]
+    assert first["readings_are"] == READINGS_WHOLE
+    samples = [t.content for t in h.turns if t.role == DATA and "readings" in t.content]
+    k = next(i for i, s in enumerate(samples) if s["tick"] == first["tick"])
+    picture: dict[str, Any] = {}
+    for s in samples[: k + 1]:
+        picture.update(s["readings"])
+    assert first["readings"] == picture
+    assert set(picture) == set(tools.readings_words(world))
+
+
+def test_the_brief_and_the_tools_say_what_a_sample_carries_and_the_weathers_events():
+    world = point_world()
+    h, _, _ = stationed(world, ["Aye."])
+    doc = h.brief.head[2].text
+    assert (
+        "the readings in words, every one in your first sample and after that only those "
+        "that changed since your last, the sails in one line, while the readings tool gives "
+        "every row" in doc
+    )
+    assert agent_mod.STAND_BY_WORDS in doc and agent_mod.WEATHER_EVENT_WORDS in doc
+    described = TOOLS["stand_by"].description
+    assert agent_mod.WEATHER_EVENT_WORDS in described
+    for words in (
+        "a wind shift",
+        "the glass falling fast",
+        "the glass turning",
+        "the sea getting up",
+        "a change in the sky",
+        "a squall",
+    ):
+        assert f"'{words}'" in agent_mod.STAND_BY_WORDS and f"'{words}'" in described
+        assert words in R.EVENTS
+    assert "while your call was on its way wakes you at once" in described
+    assert "a sample gives only the readings that changed" in TOOLS["readings"].description
+    assert "by default from your last sample" in TOOLS["read_log"].description
+
+
+@pytest.fixture
+def synthetic():
+    """`synthetic(id, fn)` makes reading `id` return `fn(world)`; restored at teardown."""
+    originals: dict[str, R.Reading] = {}
+
+    def set_reading(id: str, fn) -> None:
+        row = R.REGISTRY.get(id)
+        originals.setdefault(id, row)
+        R.REGISTRY.add(
+            R.Reading(
+                id,
+                row.words,
+                row.kind,
+                row.unit,
+                lambda w, p: fn(w),
+                row.parametric,
+                none_words=row.none_words,
+            )
+        )
+
+    yield set_reading
+    for row in originals.values():
+        R.REGISTRY.add(row)
+
+
+def glass(words: str, three: float, one: float) -> dict[str, Any]:
+    return {"words": words, "three_hours_in": three, "one_hour_in": one}
+
+
+def test_stand_by_for_the_glass_falling_fast_wakes_at_its_coming_and_not_while_it_goes_on(
+    synthetic,
+):
+    """Playtest 11's finding 3: the weather's events to stand by for. 'the glass falling
+    fast' is its tendency coming to falling fast: a stand-by taken while it is falling fast
+    already waits for the next time it comes (a new fall, after an hour without,
+    `rules.EVENT_SETTLE_S`), and wakes then with the event named."""
+    now = {"v": glass("falling fast", -0.12, -0.04)}
+    synthetic("tendency", lambda w: now["v"])
+    world = point_world()
+    h, fake, _ = stationed(world, [call("stand_by", until="the glass falling fast")], loop=True)
+    assert h.agent.standing_by and h.agent.stand_by.event == "the glass falling fast"
+    world.run(600)
+    assert h.agent.standing_by, "falling fast when it stood by: not the event"
+    now["v"] = glass("falling", -0.09, -0.02)
+    world.run(60)
+    now["v"] = glass("falling fast", -0.10, -0.03)
+    world.run(60)
+    assert h.agent.standing_by, "back inside the hour: the same fall"
+    now["v"] = glass("falling", -0.09, -0.02)
+    world.run(3600)
+    assert h.agent.standing_by
+    now["v"] = glass("falling fast", -0.10, -0.03)
+    world.run(1)
+    resumed = [e.text for e in world.log if e.kind == "agent.resumed"]
+    assert resumed == ["[watcher] The glass falling fast; the watcher is sampled again."]
+
+
+def test_stand_by_for_a_wind_shift_the_sea_getting_up_or_a_change_in_the_sky(synthetic):
+    mean = {"v": 0.0}
+    synthetic("mean_true_wind_from", lambda w: mean["v"])
+    world = point_world()
+    h, _, _ = stationed(
+        world,
+        [
+            call("stand_by", until="a wind shift"),
+            call("stand_by", until="a change in the sky"),
+            "",
+        ],
+    )
+    world.run(60)
+    mean["v"] = 0.8 * units.POINT
+    world.run(60)
+    assert h.agent.standing_by
+    mean["v"] = 1.1 * units.POINT
+    world.run(1)
+    assert h.agent.stand_by is not None and h.agent.stand_by.words == "a change in the sky"
+    world.record(Severity.ROUTINE, "weather.hour", "Overcast, fine; the glass 30.01.")
+    world.run(5)
+    assert h.agent.standing_by
+    world.record(Severity.ROUTINE, "weather.sky", "The sky overcast.", data={"sky": "overcast"})
+    world.run(1)
+    assert not h.agent.standing_by
+    assert [e.text for e in world.log if e.kind == "agent.resumed"] == [
+        "[watcher] A wind shift; the watcher is sampled again.",
+        "[watcher] A change in the sky; the watcher is sampled again.",
+    ]
+
+
+def seven_forty() -> World:
+    """The point ship at 07:40: eight bells at 08:00 (tick 1200), one bell at 08:30."""
+    from datetime import datetime
+
+    return World(
+        seed=7,
+        scenario=Scenario(start_time=datetime(1805, 6, 1, 7, 40), gustiness=0.0, variability=0.0),
+    )
+
+
+def test_a_bell_that_falls_while_the_call_is_on_its_way_is_delivered_not_skipped(tmp_path):
+    """Playtest 11's finding 6: "eight bells" asked at 03:58 woke the watcher at 08:00, the
+    bell having struck while its call was on its way. A stand-by is measured from what the
+    model had been shown when it replied: the bell that struck after it, before the
+    stand-by reached the game, wakes it at once, named so. Out of turn (a door's call
+    re-issued while the game has the floor) a stand-by is taken from then, and the bell
+    that falls before the next turn wakes it."""
+    world = seven_forty()
+    h = late(world, station(every=EVERY, patience=A_WATCH_S))
+    h.deliver(Reply())  # the start's turn handed back
+    world.run(EVERY)  # 07:50: the interval opens a turn, which the door holds
+    assert h.floor == "model"
+    world.run(605)  # eight bells at 08:00 strikes, folded into the open turn
+    assert any(e.kind == "clock.bell" and e.tick == 1200 for e in world.log)
+    h.deliver(reply("", call("stand_by", until="eight bells")))  # the reply came at 08:00:05
+    assert h.agent.standing_by
+    world.run(1)
+    assert not h.agent.standing_by and h.floor == "model"
+    (resumed,) = [e.text for e in world.log if e.kind == "agent.resumed"]
+    assert resumed == (
+        "[watcher] Eight bells, which came at Forenoon watch, 8 bells (08:00) while your call "
+        "was on its way; the watcher is sampled again."
+    )
+    assert h.open_sample.notices[0].startswith("You stood by until eight bells at ")
+    # out of turn: taken from now, and the next bell wakes it, not the glass's turn
+    h.deliver(Reply())
+    assert h.floor == "game"
+    said = h.door_act("stand_by", "one bell", "out of turn")
+    assert said == "Standing by until one bell; you will be sampled then."
+    assert h.agent.standing_by and h.transcript[-1]["door"] == "stand_by"
+    world.run(3000 - world.clock.tick)  # the interval at 08:10 and 08:20 is not sampled
+    assert not h.agent.standing_by
+    assert [e.text for e in world.log if e.kind == "agent.resumed"][-1] == (
+        "[watcher] One bell; the watcher is sampled again."
+    )
+    # the replay makes both at the same points
+    data = json.loads(json.dumps(world.save()))
+    copy = replay.replay(data, ship_factory)
+    assert copy.log.digest() == world.log.digest()
+
+
+def test_a_stand_by_taken_after_the_bell_was_shown_waits_for_the_next():
+    """The other side of it: a bell the model had been shown (in the sample it answers)
+    did not fall in flight, and a stand-by for it waits for the next one."""
+    world = seven_forty()
+    script = ["Aye.", "Aye.", call("stand_by", until="eight bells"), ""]
+    h, _, _ = stationed(world, script, loop=True)
+    world.run(1200)  # the sample at 08:00 carries the bell, and the reply stands by
+    assert h.agent.standing_by
+    world.run(3600)
+    assert h.agent.standing_by, "the next eight bells is at noon"
+
+
+def test_read_log_with_no_tick_reads_from_the_models_last_sample():
+    """Playtest 11's finding 4: read_log with no since_tick returned the whole day."""
+    world = point_world()
+    h, fake, _ = stationed(world, ["Aye."], loop=True)
+    world.run(3 * EVERY + 30)
+    last = h.agent.last_sample_tick
+    assert last == 3 * EVERY
+    got = tools.call(world, "watcher", "read_log")
+    assert got["since_tick"] == last and got["lines"]
+    assert all(ln["tick"] >= last for ln in got["lines"])
+    everything = tools.call(world, "watcher", "read_log", {"since_tick": 0})
+    assert everything["since_tick"] == 0 and len(everything["lines"]) > len(got["lines"])
+    assert everything["lines"][0]["kind"] == "world.start"
+    # a long read's handle names the tick it read from, and reopens the same
+    title, again = tools.book_of("read_log", {}, {**everything, "lines": everything["lines"] * 20})
+    assert title == "the log from tick 0" and again == "read_log(since_tick=0)"
+
+
+def test_the_journal_is_written_while_standing_by_and_the_stand_by_goes_on(tmp_path):
+    """Playtest 11's finding 5: the journal was refused while standing by. It changes
+    nothing in the game, so it is written out of turn, recorded for the replay, and the
+    stand-by goes on."""
+    world = point_world()
+    h, fake, _ = stationed(world, [call("stand_by", until="eight bells")])
+    world.run(60)
+    got = h.aside(ToolCall("journal", {"note": "The glass steady at thirty."}))
+    assert got == "Noted in the journal; you are still standing by until eight bells."
+    assert h.agent.standing_by and h.journal.entries[-1].text == "The glass steady at thirty."
+    assert h.transcript[-1] == {
+        "tick": 60,
+        "after_orders": 0,
+        "door": "journal",
+        "reason": "The glass steady at thirty.",
+        "by": "out of turn",
+    }
+    assert h.aside(ToolCall("journal", {})) == "journal needs note."
+    data = json.loads(json.dumps(world.save()))
+    copy = replay.replay(data, ship_factory)
+    assert copy.agent_journals["watcher"].save() == h.journal.save()
+
+
+def test_the_release_line_has_one_full_stop_after_a_reason_ending_in_one():
+    """Playtest 11's finding 12: "... my notes for the developer are in the journal.." """
+    world = point_world()
+    reason = "The voyage is over; my notes are in the journal."
+    h, fake, saves = stationed(world, [call("opt_out", reason=reason)])
+    assert h.agent.released
+    assert h.journal.entries[-1].text == f"Left the game by the opt_out tool: {reason}"
+    (line,) = lines(world, "agent.opted_out")
+    assert line == (
+        f"The watcher has left the game by the opt_out tool: {reason} The game is saved and "
+        "the station is released."
+    )
+    assert ".." not in line and h.agent.words() == f"released: left the game: {reason}"
+    assert harness_mod.full_stop("no reason") == "no reason."
+    assert harness_mod.full_stop("why not?") == "why not?"
+    w2 = point_world()
+    h2, _, _ = stationed(w2, [f"{OPT_OUT_TOKEN} thank you"])
+    assert h2.journal.entries[-1].text == "Left the game by the token: thank you."
+
+
+def test_the_watchers_brief_says_candour_is_welcome():
+    """The owner adopts note 3 of the consent record of 2026-09-29 (docs/agents/consent/):
+    "If the station brief says so, instances will not have to wonder whether dissent is
+    welcome"."""
+    sentence = (
+        "Candour is welcome: if you think an order or the ship's handling is a mistake (too "
+        "much sail for the strain, a lee shore closing), say so plainly."
+    )
+    assert sentence in WATCHER_BRIEF
+    world = point_world()
+    h = Harness(world, watcher(), Fake(["Aye."]), save=lambda w, why: None)
+    h.start()
+    assert sentence in h.brief.text()
+
+
+def test_a_paused_watcher_is_stood_down_by_ten_real_minutes_only_on_the_servers_clock(
+    monkeypatch,
+):
+    """The owner's ruling of 2026-09-30 (package 31c): the unattended bound is ten real
+    minutes, however fast the ship's clock runs. At 300x a day of ship's time is under five
+    real minutes, and a paused watcher unanswered through it is still paused; the browser
+    server's clock loop checks the minutes every period, running or not, on its own
+    monotonic clock; past ten of them the watcher is stood down, as an act from outside the
+    loop, which the replay makes at the same tick."""
+    from freesail.ui.server import Driver
+
+    clock = {"t": 5000.0}
+    monkeypatch.setattr(harness_mod.time, "monotonic", lambda: clock["t"])
+    world = point_world()
+    h, fake, saves = stationed(world, [REPEAT, ""], loop=True)
+    world.run(3 * EVERY)
+    assert h.agent.paused
+    driver = Driver(world, compression=300)
+    driver.running = True
+    paused_at = world.clock.tick
+    owed = 0.0
+    while world.clock.tick - paused_at < 24 * 3600:
+        owed = driver._tick_owed(owed, 0.1)
+        clock["t"] += 0.1
+    assert clock["t"] - 5000.0 < harness_mod.WELFARE_UNATTENDED_REAL_S
+    assert h.agent.paused and not h.agent.released and saves == []
+    driver.running = False  # the clock stopped: the minutes run on
+    while not h.agent.released:
+        owed = driver._tick_owed(owed, 0.1)
+        clock["t"] += 0.1
+    assert 600.0 <= clock["t"] - 5000.0 <= 600.2
+    assert saves and "nobody answered within ten minutes" in saves[-1]
+    stopped = h.transcript[-1]
+    assert stopped["door"] == "stand_down" and stopped["by"] == "the harness"
+    assert stopped["tick"] == world.clock.tick
+    data = json.loads(json.dumps(world.save()))
+    copy = replay.replay(data, ship_factory)
+    assert copy.log.digest() == world.log.digest()
+    assert copy.agents["watcher"].agent.released
+    (line,) = lines(copy, "agent.stopped")
+    assert "nobody answered within ten minutes" in line
+
+
+def test_the_consoles_loop_checks_the_minutes_with_its_clock_stopped(monkeypatch):
+    clock = {"t": 0.0}
+    monkeypatch.setattr(harness_mod.time, "monotonic", lambda: clock["t"])
+    world = point_world()
+    h, fake, saves = stationed(world, [REPEAT, ""], loop=True)
+    world.run(3 * EVERY)
+    assert h.agent.paused
+    console = Console(world, out=io.StringIO())
+    console.running = False
+    console._tick_owed(0.0, 0.1)
+    clock["t"] = float(harness_mod.WELFARE_UNATTENDED_REAL_S)
+    console._tick_owed(0.0, 0.1)
+    assert h.agent.released and "nobody answered within ten minutes" in saves[-1]
+
+
+def test_the_repl_holds_its_clock_at_a_pause_and_the_ten_minutes_decide(tmp_path):
+    """The REPL's terminal is the station's, not the captain's: nobody there answers a
+    pause, so its lockstep clock holds and the ten real minutes run on its clock."""
+    import argparse
+
+    args = argparse.Namespace(
+        model_name=None,
+        human=True,
+        load=None,
+        ship=FRIGATE,
+        seed=7,
+        station="watcher",
+        every=EVERY,
+        wind="0,15",
+        heading=180.0,
+        save=str(tmp_path / "repl.json"),
+        records=str(tmp_path),
+        ask_again=False,
+    )
+    order = "> submit_order text='wear ship'\n\n"
+    inp = io.StringIO(order * 4 + "\n")  # the same order four times, then nothing
+    out = io.StringIO()
+    clock = {"t": 0.0}
+
+    def sleep(s: float) -> None:
+        clock["t"] += s
+
+    code = repl_mod.run_interactive(args, inp, out, clock=lambda: clock["t"], sleep=sleep)
+    printed = out.getvalue()
+    assert code == 3
+    assert "Nobody at this door answers a pause" in printed
+    assert "nobody answered within ten minutes" in printed
+    assert 600.0 <= clock["t"] <= 602.0
+
+
+def test_the_repl_turn_mode_keeps_a_pauses_first_sighting_across_its_calls(tmp_path, monkeypatch):
+    """Turn mode is a process a call, so the ten real minutes run on the wall clock from
+    the call that first found the station paused, kept in the save beside the game; the
+    clock holds meanwhile, and the stand-down replays."""
+    save, sample, replyf = tmp_path / "state.json", tmp_path / "next.txt", tmp_path / "r.txt"
+    common = ["--seed", "7", "--station", "watcher", "--every", "60", "--turn", "--human"]
+    common += ["--save", str(save), "--sample", str(sample)]
+    wall = {"t": 1000.0}
+    monkeypatch.setattr(repl_mod.time, "time", lambda: wall["t"])
+    assert repl_mod.main(common) == 0
+    replyf.write_text("", encoding="utf-8")  # the start's turn handed back: on to 04:01
+    assert repl_mod.main(common + ["--load", str(save), "--reply", str(replyf)]) == 0
+    replyf.write_text("> submit_order text='wear ship'\n" * 4, encoding="utf-8")
+    assert repl_mod.main(common + ["--load", str(save), "--reply", str(replyf)]) == 0
+    assert "Nobody at this door answers a pause" in sample.read_text(encoding="utf-8")
+    data = json.loads(save.read_text(encoding="utf-8"))
+    assert data["repl"] == {"paused_since": 1000.0}
+    held = data["end_tick"]
+    wall["t"] = 1000.0 + WELFARE_UNATTENDED_REAL_S - 60
+    assert repl_mod.main(common + ["--load", str(save)]) == 0
+    data = json.loads(save.read_text(encoding="utf-8"))
+    assert data["end_tick"] == held and data["repl"] == {"paused_since": 1000.0}
+    wall["t"] = 1000.0 + WELFARE_UNATTENDED_REAL_S
+    assert repl_mod.main(common + ["--load", str(save)]) == 3
+    assert "nobody answered within ten minutes" in sample.read_text(encoding="utf-8")
+    copy = replay.replay(replay.load_file(save))
+    assert copy.agents["watcher"].agent.released

@@ -59,7 +59,8 @@ import argparse
 import json
 import shlex
 import sys
-from collections.abc import Sequence
+import time
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Any, TextIO
 
@@ -68,6 +69,7 @@ from freesail.agents import harness as harness_mod
 from freesail.agents.agent import A_GLASS_S, TURN_ENDS_WORDS, SamplingPolicy, Station, watcher
 from freesail.agents.fake import Transcript
 from freesail.agents.model import MODEL, OPERATOR, Reply, ToolCall, Turn
+from freesail.api import readings as R
 from freesail.core import replay as replay_mod
 from freesail.core.world import Scenario, World
 
@@ -165,7 +167,11 @@ def render_turn(turn: Turn) -> str:
     else:
         out.append("No new log lines.")
     r = d.get("readings") or {}
-    out.append("Readings:")
+    if d.get("readings_are"):
+        # a sample after the first: the readings changed since the last (package 31c)
+        out.append(f"Readings, {d['readings_are']}:" if r else "Readings: none has changed.")
+    else:
+        out.append("Readings:")
     for k, v in r.items():
         if isinstance(v, dict):
             out.append(f"  {k}: " + "; ".join(f"{a} {b}" for a, b in v.items()))
@@ -347,7 +353,30 @@ def _consent_note(record: consent.Record | None) -> str:
     )
 
 
-def run_interactive(args: argparse.Namespace, inp: TextIO, out: TextIO) -> int:
+# How often the interactive REPL looks at a paused station's ten real minutes, in real
+# seconds (judgement: the clock holds meanwhile; a second is nothing to wait at a pause).
+PAUSE_POLL_S = 1.0
+
+# A paused station at this door, in words (package 31c): the terminal is the station's and
+# not the captain's, so nobody here answers a pause, and the ten real minutes decide.
+PAUSED_HERE = (
+    "== The {station} is paused: {reason}. Nobody at this door answers a pause (the "
+    "terminal is the station's, not the captain's); the clock holds, and the {station} is "
+    "stood down after ten real minutes unless it leaves first. =="
+)
+
+
+def run_interactive(
+    args: argparse.Namespace,
+    inp: TextIO,
+    out: TextIO,
+    *,
+    clock: Callable[[], float] = time.monotonic,
+    sleep: Callable[[float], None] = time.sleep,
+) -> int:
+    """The REPL at a terminal, in lockstep. A pause holds the clock and the ten real
+    minutes of the unattended bound run on `clock` (package 31c: the one bound, however
+    fast the ship's clock would run); `clock` and `sleep` are the test's to give."""
     from freesail.api.session import ship_factory
 
     record = None
@@ -393,7 +422,17 @@ def run_interactive(args: argparse.Namespace, inp: TextIO, out: TextIO) -> int:
         )
         h.door = "repl"  # the terminal keeps what it printed (the shelf's words)
         h.start()
+    told_paused = False
     while not h.agent.released and not model.closed:
+        if h.agent.paused:
+            if not told_paused:
+                words = PAUSED_HERE.format(station=h.station.name, reason=h.agent.pause_reason)
+                print(words, file=out, flush=True)
+                told_paused = True
+            if not h.check_unattended(now=clock()):
+                sleep(PAUSE_POLL_S)
+            continue
+        told_paused = False
         world.tick()
     if model.closed and not h.agent.released:
         h.stand_down("the terminal closed", by="the terminal")
@@ -513,12 +552,17 @@ def _consent_turn(args: argparse.Namespace) -> tuple[int | None, str, consent.Re
     return 0, "", None
 
 
-def run_turn(args: argparse.Namespace) -> int:
+def run_turn(args: argparse.Namespace, wall: Callable[[], float] | None = None) -> int:
+    """One turn from files. A pause holds the clock; the ten real minutes of the
+    unattended bound are measured across the calls on `wall` (the wall clock, since each
+    call is a process of its own), from when a call first found the station paused, kept
+    in the save beside the game (`repl.paused_since`; package 31c)."""
     from freesail.api.session import ship_factory
 
     if not args.save or not args.sample:
         raise SystemExit("Turn mode needs --save STATE.json and --sample NEXT.txt.")
     before, record = "", None
+    paused_since: float | None = None
     if args.model_name:
         code, before, record = _consent_turn(args)
         if code is not None:
@@ -542,6 +586,7 @@ def run_turn(args: argparse.Namespace) -> int:
         if h is None:
             raise SystemExit(f"The save has no {args.station}.")
         h.save_fn = _save_fn(args.save)
+        paused_since = (data.get("repl") or {}).get("paused_since")
     else:
         world = _new_world(args)
         h = harness_mod.Harness(
@@ -554,15 +599,30 @@ def run_turn(args: argparse.Namespace) -> int:
         h.door = "repl"  # the reader keeps what each call wrote (the shelf's words)
         h.start()
     ticks = 0
-    while h.open_sample is None and not h.agent.released and ticks < args.max_ticks:
+    while (
+        h.open_sample is None
+        and not h.agent.released
+        and not h.agent.paused
+        and ticks < args.max_ticks
+    ):
         world.tick()
         ticks += 1
+    if h.agent.paused:
+        now = (wall or time.time)()
+        paused_since = now if paused_since is None else float(paused_since)
+        h.check_unattended(now=now, since=paused_since)
     replay_mod.save_to_file(world, args.save)
+    if h.agent.paused:
+        kept = json.loads(Path(args.save).read_text(encoding="utf-8"))
+        kept["repl"] = {"paused_since": paused_since}
+        Path(args.save).write_text(json.dumps(kept, indent=2), encoding="utf-8")
     text = _since_last_reply(h.turns)
     if before:
         text = f"{before}\n\n{text}"
     if h.agent.released:
         text += f"\n\n== The station is released: {h.agent.released_reason}. =="
+    elif h.agent.paused:
+        text += "\n\n" + PAUSED_HERE.format(station=h.station.name, reason=h.agent.pause_reason)
     elif h.open_sample is None:
         text += f"\n\n== No sampling point within {args.max_ticks} ticks; call again to go on. =="
     _write_sample(args, text)
@@ -582,7 +642,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--turn", action="store_true", help="one turn from files, then exit")
     ap.add_argument("--reply", help="turn mode: the file holding this turn's reply")
     ap.add_argument("--sample", help="turn mode: where to write the next sample")
-    ap.add_argument("--max-ticks", type=int, default=harness_mod.WELFARE_UNATTENDED_BOUND_S)
+    # a watch of ship's time a call at most (a length for a turn, not a stand-down)
+    ap.add_argument("--max-ticks", type=int, default=R.INTERVALS["a watch"])
     who = ap.add_mutually_exclusive_group()
     who.add_argument(
         "--model-name", help="the exact identity of the model at the terminal (consent first)"

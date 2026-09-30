@@ -12,6 +12,15 @@ imperative parser sees it, as it hands the standing dialect to its grammar. The 
 are reached through `ship.extra["agents"]` (the World's `agents`, by station name) and
 the journals through `ship.extra["agent_journals"]`, which outlive their agents. A
 sentence to a station nobody mans is refused in words.
+
+**In a standing order** (package 31c; the owner's finding at gate 5a, `standing order
+"sea": when the sea is heavy then tell the watcher the sea is getting up`): `tell` and
+`ask` may follow `then`. The standing grammar resolves each at give time
+(`for_standing`) to a station aboard, or refuses it in words ("there is no lookout aboard
+yet"); at a firing it is delivered as the captain's own word or question would be, and
+the log names the standing order as the speaker: "By standing order 'sea': the captain to
+the watcher: the sea is getting up". The runtime says which order is firing
+(`standing.runtime.Runtime.firing`).
 """
 
 from __future__ import annotations
@@ -19,14 +28,22 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from freesail.agents.agent import STATION_NAMES
+from freesail.agents.agent import STATION_NAMES, STATIONS_ABOARD
 from freesail.orders.errors import OrderError
 from freesail.orders.vocabulary import normalise
 
-__all__ = ["STATION_VERBS", "handle", "recognises"]
+__all__ = ["STANDING_STATION_VERBS", "STATION_VERBS", "for_standing", "handle", "recognises"]
 
 # The canonical verbs, as `data/vocabulary.yaml` lists them with `object: station`.
 STATION_VERBS: tuple[str, ...] = ("ask", "tell", "stand down", "resume", "show the journal of")
+
+# The station verbs a standing order may give (package 31c): a word and a question. The
+# rest are the captain's own acts on a station, never a routine's.
+STANDING_STATION_VERBS: tuple[str, ...] = ("ask", "tell")
+
+# A sentence addressed to someone by a station verb, whoever is named: the head noun after
+# the article, for the refusal of a station the ship has not got
+_ADDRESSED = re.compile(r"^(?:ask|tell|say to) (?:the |a |an )?(?P<who>[\w'-]+)")
 
 _ASK = re.compile(r"^ask (?:the )?(?P<who>.+?)(?:(?:\s*[,:]\s*|\s+)(?P<q>.+))?$")
 # `tell the watcher ...` and `say to the watcher ...` (package 29): words with no answer owed
@@ -102,6 +119,63 @@ def _split_ask(text: str, ship: Any, verb: str = "ask") -> tuple[str, str]:
     return station, question
 
 
+def _aboard(ship: Any) -> tuple[str, ...]:
+    """The stations a standing order may address: those the game can man now, and any
+    this game has manned."""
+    extra = getattr(ship, "extra", None) or {}
+    names = list(STATIONS_ABOARD)
+    for name in list(extra.get("agents") or {}) + list(extra.get("agent_journals") or {}):
+        if name not in names:
+            names.append(name)
+    return tuple(names)
+
+
+def _not_aboard(who: str, ship: Any) -> str:
+    aboard = " or the ".join(_aboard(ship))
+    if who == "captain":
+        return f"a standing order speaks for the captain; it may tell or ask the {aboard}."
+    return f"there is no {who} aboard yet; a standing order may tell or ask the {aboard}."
+
+
+def for_standing(ship: Any, text: str) -> tuple[str, str, str] | None:
+    """A station sentence after 'then' in a standing order (package 31c), resolved when the
+    order is given: (the verb, the station, the words or the question) for `tell` or
+    `ask` to a station aboard, whether or not it is manned at that moment (a book read
+    before the watcher takes the station; a firing to a station nobody mans is refused in
+    words when it fires, as the captain's own would be). None when the text addresses no
+    station (an order of the ship). OrderError in words for a station not aboard, a
+    station verb a standing order does not give, or nothing to say."""
+    norm = normalise(text).replace(" , ", " ")
+    verb = recognises(text, ship)
+    if verb is None:
+        m = _ADDRESSED.match(norm)
+        if m is None:
+            return None
+        raise OrderError(_not_aboard(m.group("who"), ship))
+    if verb not in STANDING_STATION_VERBS:
+        raise OrderError(
+            f"'{norm}' is the captain's own to say to a station, not a standing order's; a "
+            "standing order may tell or ask one."
+        )
+    station, words = _split_ask(text, ship, verb=verb)
+    if station not in _aboard(ship):
+        raise OrderError(_not_aboard(station, ship))
+    if not words:
+        what = "the words" if verb == "tell" else "the question"
+        raise OrderError(f"{verb.capitalize()} the {station} what? Say {what} after the name.")
+    return verb, station, words
+
+
+def _speaker(ship: Any) -> tuple[str, str]:
+    """Who speaks a station sentence now: ("", "the captain") for the captain's own, or
+    ("standing order 'x'", its officer) while a standing order fires (package 31c)."""
+    runtime = (getattr(ship, "extra", None) or {}).get("standing")
+    firing = getattr(runtime, "firing", None)
+    if firing is None:
+        return "", "the captain"
+    return f"standing order '{firing.name}'", firing.officer
+
+
 def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
     verb = recognises(text, ship)
     extra = getattr(ship, "extra", None) or {}
@@ -110,18 +184,24 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
     if agents is None:
         raise OrderError("This world has no stations for agents; it was made without them.")
     norm = normalise(text).replace(" , ", " ")
+    by, officer = _speaker(ship)
+    said_by = {"by": by} if by else {}
     if verb == "ask":
         station, question = _split_ask(text, ship)
         agent = _manned(agents, station)
         return (
             "agent.asked",
-            agent.put_question(question),
-            {"station": station, "question": question},
+            agent.put_question(question, by=by, officer=officer),
+            {"station": station, "question": question, **said_by},
         )
     if verb == "tell":
         station, words = _split_ask(text, ship, verb="tell")
         agent = _manned(agents, station)
-        return "agent.told", agent.put_word(words), {"station": station, "words": words}
+        return (
+            "agent.told",
+            agent.put_word(words, by=by, officer=officer),
+            {"station": station, "words": words, **said_by},
+        )
     if verb == "show the journal of":
         m = _JOURNAL.match(norm)
         assert m is not None

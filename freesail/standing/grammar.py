@@ -12,6 +12,8 @@
                | is from <point> | is <state> | is not <state> | are <fatigue word>
                | is the <watch> | is <n> bells | is east of <point> | is straining
                | exceeds the rating | is under <n> inches | is falling fast | is overcast
+               | is turning (the glass) | gets up (the sea)
+    order     := an order of the ship | tell the <station> <words> | ask the <station> <question>
     duration  := <n> minutes | <n> seconds | a glass | a bell | half an hour | an hour | ...
     interval  := glass | bell | hour | watch | <n> minutes | half an hour | ...
 
@@ -20,7 +22,15 @@ it are the sentence's own punctuation, which the imperative grammar's normalisat
 drops), then the trigger and condition from the same normalised words the imperative
 grammar reads, with its number words and its noun table, and the orders after `then` by
 `orders.grammar.parse` itself, at give time, so that a misspelt sail is refused when the
-standing order is given and not when it fires. Every refusal names the word.
+standing order is given and not when it fires. Every refusal names the word. A word or a
+question to a station after `then` (`tell the watcher ...`, `ask the watcher ...`,
+package 31c) is resolved at give time by `orders.stations.for_standing` to a station
+aboard, or refused ("there is no lookout aboard yet"); its words are free text.
+
+An `at` of the weather's events that are the readings' changes ("at the glass falling
+fast", package 31c) is kept as a `when` of the event's condition (`rules.Trigger`), which
+fires at each coming to hold; `is turning` (the glass) and `gets up` (the sea) are the
+comparisons those events are written in, and the dialect has them for itself too.
 
 The readings a condition may name are the registry's (`freesail.api.readings`) and this
 ship's sails and parts by their ordinary names; the comparisons each admits are decided
@@ -239,12 +249,22 @@ def _parse_head(
 
 
 def _parse_actions(tail: str, ship: Any, vocab: Vocabulary, name: str) -> list[str]:
+    from freesail.orders import stations
+
     parts = [p.strip(" .") for p in tail.split(";")]
     actions = [" ".join(p.split()) for p in parts if p.strip()]
     if not actions:
         raise OrderError(f"Standing order '{name}' gives no order after 'then'.")
     absent = [r for r in R.REGISTRY if r.is_absent]
     for order in actions:
+        # a word or a question to a station (package 31c): resolved now to a station
+        # aboard, its words free text, and delivered as the captain's own when it fires
+        try:
+            addressed = stations.for_standing(ship, order)
+        except OrderError as e:
+            raise OrderError(f"In standing order '{name}', '{order}' is refused: {e}") from None
+        if addressed is not None:
+            continue
         norm = f" {normalise(order)} "
         for row in absent:
             if any(f" {w} " in norm for w in row.words):
@@ -357,7 +377,8 @@ _HOW = {
     "glass": ("the glass", "in inches: 'is under 29.5 inches'"),
     "tendency": (
         "the glass",
-        "by its tendency: is steady, is rising, is falling, is falling fast, is rising fast",
+        "by its tendency: is steady, is rising, is falling, is falling fast, is rising fast, "
+        "is turning",
     ),
     "sky": (
         "the sky",
@@ -374,7 +395,8 @@ _HOW = {
     ),
     "sea": (
         "the sea",
-        "by its state: is smooth, is moderate, is short, is heavy, is very heavy, is confused",
+        "by its state: is smooth, is moderate, is short, is heavy, is very heavy, is confused; "
+        "or 'gets up'",
     ),
     "motion": (
         "the motion",
@@ -394,7 +416,7 @@ def _how_compared(candidates: list[R.Reading]) -> tuple[str, str]:
         return (
             "the glass",
             "in inches ('is under 29.5 inches') or by its tendency (is steady, is rising, is "
-            "falling, is falling fast)",
+            "falling, is falling fast, is turning)",
         )
     if set(kinds) == {"sail", "strain"}:
         return (
@@ -661,6 +683,15 @@ def _parse_comparison(
                 text = f"{op} {said} or {other} {_points_said(more)}"
                 return row, Comparison("shifts", (veer, back), text), n + used + 2 + more_used
             return row, Comparison(op, float(value), f"{op} {said}"), n + used
+    # -- the sea getting up (package 31c): its state word higher than when the order stood,
+    #    and afresh after each firing, as a wind's shift is measured
+    for phrase in ("is getting up", "gets up"):
+        n = _starts(tokens, i, phrase)
+        if n:
+            row = _pick(cands, ("sea",))
+            if row is None:
+                raise refuse()
+            return row, Comparison("gets_up", None, "gets up"), n
     n = _starts(tokens, i, "is from")
     if n:
         row = _pick(cands, ("direction",))
@@ -900,6 +931,9 @@ _GUST_SAID: dict[str, str] = {
 # The weather's words as said, and the reading's value for each (spec M5 §5): the period's
 # words for the glass, Beaufort's for the sky and the weather, the lookout's for how far.
 _TENDENCY_SAID: dict[str, str] = {w: w for w in R.TENDENCY_WORDS}
+# the glass turning (package 31c): the last hour's change against the three hours'
+# (`rules.GLASS_TURN_IN`), not a word of the tendency itself
+_TENDENCY_SAID["turning"] = "turning"
 _SKY_SAID: dict[str, str] = {w: w for w in R.SKY_WORDS}
 _SKY_SAID.update({"cloudy": "overcast", "gloomy": "dark and gloomy", "misty": "hazy"})
 _WEATHER_SAID: dict[str, str] = {w: w for w in R.WEATHER_WORDS}

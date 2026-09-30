@@ -374,7 +374,11 @@ class Driver:
                 with self.lock:
                     if self.running:
                         self._run_ticks(n)
-                        check_agents_unattended(self.world)
+        with self.lock:
+            # the unattended bound on this driver's clock, every period, running or not:
+            # ten real minutes of a pause unanswered, however fast the ship's clock runs
+            # (package 31c; before, the check ran only on a period that ran ticks)
+            check_agents_unattended(self.world)
         return owed
 
     def _clock_thread(self) -> None:

@@ -153,6 +153,9 @@ class Runtime:
         self.book = Book(self)
         self._seen_log = len(world.log)
         self._firings: list[Firing] = []
+        # the rule whose orders are being given now, for a station sentence among them
+        # (`tell`/`ask the watcher`, package 31c): the log names the order as the speaker
+        self.firing: Rule | None = None
 
     # -- arming --------------------------------------------------------------------------
 
@@ -291,12 +294,16 @@ class Runtime:
             given.append(parts)
         runner = self._runner()
         before = len(runner.instances) if runner is not None else 0
-        for parts in given:
-            world.submit(
-                parts.text,
-                actor=actor,
-                said=f"By standing order '{rule.name}': {said_as_done(ship, parts.text)}",
-            )
+        self.firing = rule
+        try:
+            for parts in given:
+                world.submit(
+                    parts.text,
+                    actor=actor,
+                    said=f"By standing order '{rule.name}': {said_as_done(ship, parts.text)}",
+                )
+        finally:
+            self.firing = None
         firing.actions = given
         if runner is not None:
             rule.started = list(runner.instances[before:])

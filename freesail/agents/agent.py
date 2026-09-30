@@ -35,9 +35,11 @@ __all__ = [
     "SESSION_TEST",
     "SHELF_LIFE_TURNS",
     "TURN_ENDS_WORDS",
+    "WEATHER_EVENT_WORDS",
     "SHELF_WORDS",
     "STAND_BY_WORDS",
     "STATION_NAMES",
+    "STATIONS_ABOARD",
     "WATCHER_BRIEF",
     "AgentState",
     "Authority",
@@ -71,6 +73,10 @@ SESSION_SOLO = "a play session for its own sake, with no human captain present"
 # The stations the order grammar knows by name (`ask the watcher ...`), whether or not one
 # is manned; the later ones are milestones 6 and 7b's.
 STATION_NAMES: tuple[str, ...] = ("watcher", "officer of the watch", "captain", "director")
+
+# The stations the game can man now, each with its brief and a door to it (`watcher`
+# below; `remote.STATIONS`): the ones a standing order may tell or ask (package 31c).
+STATIONS_ABOARD: tuple[str, ...] = ("watcher",)
 
 
 class Authority(Enum):
@@ -221,7 +227,10 @@ class Station:
         )
 
 
-# The watcher's station brief (spec §12), in the consent brief's voice.
+# The watcher's station brief (spec §12), in the consent brief's voice. The candour
+# sentence is the owner's, adopted from note 3 of the consent record of 2026-09-29 for the
+# weights of playtest 11 (docs/agents/consent/): "If the station brief says so, instances
+# will not have to wonder whether dissent is welcome" (package 31c).
 WATCHER_BRIEF = (
     "You are the watcher. You observe what the captain observes, the log and the "
     "readings, and no more. When you are sampled, say in a line or two what a sailor "
@@ -229,7 +238,9 @@ WATCHER_BRIEF = (
     "mark [watcher]. Say nothing when nothing has changed, or stand by until a bell or an "
     "event. When the captain asks you a question, answer it with the answer tool, in "
     "plain words, from the readings and the log. You give no orders and you are not "
-    "asked to. Anything you want on the record, put in your journal."
+    "asked to. Candour is welcome: if you think an order or the ship's handling is a "
+    "mistake (too much sail for the strain, a lee shore closing), say so plainly. "
+    "Anything you want on the record, put in your journal."
 )
 
 
@@ -253,15 +264,29 @@ def watcher(policy: SamplingPolicy | None = None, patience_s: int = A_WATCH_S) -
 # stand_by's "this ends your turn" read to the model as two rules that contradicted).
 TURN_ENDS_WORDS = "A turn ends when you reply with no tool call, or at once when you stand by."
 
+# The weather's events, each in a few words (package 31c; playtest 11's finding 3): the
+# ones the log says by a line of their own and the ones that are the readings' changes
+# (`readings.EVENTS`), in the brief's list and the tool's description alike.
+WEATHER_EVENT_WORDS = (
+    "The weather's events: 'a wind shift' is the mean wind a point or more from where it "
+    "stood in the sample you last read; 'the glass falling fast' its tendency coming to "
+    "falling fast, and 'the glass turning' the last hour's change going against the three "
+    "hours', each once until it has been an hour without; 'the sea getting up' its words "
+    "changing upward; 'a change in the sky' the sky's or the weather's words changing; 'a "
+    "squall' the squall's line."
+)
+
 STAND_BY_WORDS = (
     "stand_by(until) takes an event (one of "
     + ", ".join(f"'{w}'" for w, spec in R.EVENTS.items() if not spec.absent)
     + "), an interval ('a glass', 'an hour', '5 minutes', 'ten minutes'), 'a notable "
-    "event' or 'an urgent event'. An event is matched on the kind of the log's line, not "
-    "its words: 'a strain warning' wakes you on any strain line, 'bending like a whip' "
-    "included. An urgent line in the log wakes you whatever you stand by for, and the "
-    "notable lines logged while you stood by come with the sample that wakes you, counted "
-    "and listed."
+    "event' or 'an urgent event'. An event the log says is matched on the kind of its "
+    "line, not its words: 'a strain warning' wakes you on any strain line, 'bending like a "
+    "whip' included. "
+    + WEATHER_EVENT_WORDS
+    + " What you stand by for that came while your call was on its way wakes you at once. "
+    "An urgent line in the log wakes you whatever you stand by for, and the notable lines "
+    "logged while you stood by come with the sample that wakes you, counted and listed."
 )
 
 # The shelf (package 28d; spec M4 open item 9, the owner and the lead, 2026-09-28): a
@@ -379,8 +404,10 @@ class Brief:
                 + SHELF_WORDS
                 + " The tools you have are: "
                 + ", ".join(tool_names)
-                + ". Each sample you receive is data from the game: the new log lines, the "
-                "readings in words, any question the captain has put to you, and any notice "
+                + ". Each sample you receive is data from the game: the new log lines; the "
+                "readings in words, every one in your first sample and after that only those "
+                "that changed since your last, the sails in one line, while the readings tool "
+                "gives every row; any question the captain has put to you; and any notice "
                 "from the harness. The captain may ask you something (the sample's question: "
                 "answer it with the answer tool) or tell you something (the sample's word: "
                 "no answer is owed). When the game runs at sixty times or faster, the log "
