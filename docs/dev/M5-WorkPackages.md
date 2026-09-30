@@ -39,7 +39,8 @@ gate 5b:  wave 3  32 the chart data and the queries, the lookout
                   32c the suite in two tiers, the days built once, a Windows job (beside 32; the owner's local session)
                   32d the freesail command, the settings file and the setup step (beside 32; the owner's local session)
           wave 4  33a the reckoning, the noon sight, the captain's chart, the checkpoint save, gate 5b
-                  (landed 2026-09-30: 31c, 32, 32b; 31b's report awaited)
+                  32e staying and sheets: the fore-and-aft rig at the small vessels' scale (spec open items 12 and 13; before gate 5b; written 2026-09-30 for the owner's word)
+                  (landed 2026-09-30: 31b, 31c, 32, 32b)
 gate 5c:  wave 5  33b the chronometer, the moon and the lunar (beside 34)
                   34 the tide, grounding and anchoring
           wave 6  35 places, people, ports and nations
@@ -736,6 +737,98 @@ gives the lead the lines that point from it to `docs/Setup.md`.
 8. **Report**: the suite's last line; the commands as they ran on the owner's machine
    (`freesail check`'s output pasted); the configuration files as written, with the model
    name blanked; what could not be done on the machine and why.
+
+## Package 32e: staying and sheets, the fore-and-aft rig at the small vessels' scale (`freesail/physics/hull.py` for the yaw that scales with the vessel and the rudder's lever; `freesail/evolutions/scripts.py` for `TackScript`'s recovery, its miss-stays rule and the squaring as a brace, and `heave_to`'s headsail; `freesail/evolutions/trim.py` retired into `data/evolutions/trim_fore_and_aft.yaml` new and `scripts.TrimScript`, or kept only as the geometry (angle from the sheet's length); `freesail/ship/parts.py` and `schema.py` for the sheet's length as the sail's trim and the headsail sheet held to windward; `freesail/physics/sails.py` for the sail's angle read from its sheet and the load carried back; `freesail/physics/strain.py` for the sheet's load; `freesail/orders/verbs.py` and `data/vocabulary.yaml` for `haul`, `ease a fathom`, `let fly`, `flat aft`, `to windward`; `data/evolutions/tack.yaml`, `heave_to.yaml`, `wear.yaml` for the timings by vessel; `tools/gen_ships.py` for the boom's horse or traveller and the sheet's scope on all four ships; `data/standing_orders/starter.orders` for the sheet-tending routine; `docs/primer/04-trimming.md` and `05-going-about.md`; `docs/TechnicalSpec-M0-M2.md` §7.4 and spec M5 open items 12 and 13; `docs/dev/TuningNotes.md`; `tests/test_hull.py`, `test_evolutions.py`, `test_catalogue.py`, `test_trim_order.py`, `test_known_truths.py` (truth 10's three siblings, a turning truth per ship, the pointing truths re-measured))
+
+Spec M5 open items 12 (the physics of staying) and 13 (sheets and trim), from the owner's
+playtest of 2026-09-30, package 32b's finding and the lead's probe the same day; the cold
+review's finding 3 (`tend_sheets`); spec M0 to M2 §12 item 2 (a turning truth from Luce
+1884 Appendix L). Fable. Before gate 5b, whose passage tacks the schooner up the Channel.
+Physics before rules; every constant its source or its confession; the pinned days
+re-measured with the reasons.
+
+- **Yaw that scales with the vessel** (item 12; `hull.py`). Today the rudder's force is
+  `q · A_rudder · C_R · δ` with `q` from the speed squared, the damping `C_YAW_LIN` and
+  `C_YAW` on the lateral plane, and the radius of gyration a quarter of the length, all
+  tuned on the frigate; the probe shows the cutter turning at a degree and a third a
+  second with the helm hard over at six knots, the schooner the same, both dying before
+  the wind. Derive the turn from the hull as the file gives it: the rudder's area and its
+  lever (already there), the lateral plane's damping scaled by its area and length as a
+  short deep hull differs from a long one (the standard form: linear damping ∝ area ×
+  length, quadratic ∝ area × length²), the yaw inertia from the displacement and a radius
+  of gyration by hull type if one source gives it, and the rudder's lift slope with the
+  aspect ratio of the blade the file describes. A **turning truth per ship** measured
+  against a source: the frigate's tactical diameter from Luce 1884 Appendix L (the
+  turning experiments; spec M0 to M2 §12 item 2, owed since milestone 2), the small
+  vessels' from the type's record (a cutter "spins on her heel"; a figure with a page, or
+  a judgement band said so). Truths 1 to 47 re-measured; a truth that moves says why.
+- **Staying, with Luce's recovery** (item 12; `TackScript`, `tack.yaml`). The miss-stays
+  rule reads the vessel: the way she must keep is a fraction of her close-hauled speed
+  and her length, not 0.8 knots for every hull, and "hung in stays" is measured from the
+  moment her way is gone, not from "helm's a-lee". When she hangs head to wind the script
+  does what the seamanship texts say before it gives up (Luce 1866 ch. XXIV 'Missing
+  Stays' and 'Boxing off'; Lever 1808): the helm kept over while she has way, reversed as
+  she gathers sternway, the head yards kept aback to box her head off on to the new tack
+  (a square-rigger) or the headsail sheets held to windward (a fore-and-aft vessel, and
+  the frigate's jibs too), the after yards to the new tack once she is through; only when
+  she has plainly fallen back on the old tack is it "missed stays", and then the yards
+  are squared **as a brace with hands and time** (`YardSwing`, as "mainsail haul" is),
+  never in a tick, and the helm put up as an order the helmsman carries out. The log says
+  each stage in the period's words. Truth 10 keeps the frigate's five to ten minutes; the
+  schooner's, the cutter's and the brig's tacks become truths beside it (a schooner about
+  in under two minutes in a working breeze, the cutter quicker, the brig as a ship in
+  little; each with its source or its band said), and the frigate's miss under three
+  knots stays a miss.
+- **The headsail sheet held to windward** (items 12 and 13; `parts.py`, `sails.py`,
+  `heave_to.yaml`). A jib-headed sail's sheet may be held to windward as a state of the
+  line (`to windward`), the sail then aback by the physics (its force reversed, its
+  centre forward giving the bow off), which is what a small vessel uses to tack in light
+  air and what heaving to properly needs ("the jib sheet to windward, the helm a-lee");
+  `heave_to` on the cutter and the schooner uses it instead of the topsail to the mast
+  where the file has no square sail to back, and the frigate's heave-to may add it. An
+  order `haul the jib sheet to windward` and its release.
+- **The sheet holds the trim** (item 13). One truth for a fore-and-aft sail's angle: the
+  sheet's length hauled, through the boom's geometry (the boom's length and the horse's
+  or traveller's breadth, which the generator writes for all four ships from the file's
+  spars; a loose-footed sail by its clew's travel), gives the sail's angle to the
+  centreline; `sheet_angle` becomes a reading of the line, never set on its own. Level 0
+  works the line with hands: `haul the main sheet`, `haul it flat aft`, `ease the main
+  sheet a fathom`, `let fly the main sheet`, `belay`; a sheet let fly has no load and the
+  sail flogs (as now), a sheet belayed carries the sail's load into the strain model by
+  its angle and length so that a main sheet can part in a gybe. `trim the <sail>` (to the
+  wind, or to a bearing) is an **evolution on the sheet**: the afterguard works the sheet
+  to the length the wanted angle needs, hauling a sheet that was let fly as part of it,
+  with hands and a duration from the sail's size (a sheet of the frigate's spanker is a
+  purchase and a party; the cutter's main sheet three men); the standing book's `trim`
+  and the manoeuvres' sheet work reach the same evolution. **The free tending is
+  retired**: `tend_sheets` goes, and the starter book gains a sheet-tending routine at a
+  cadence (each glass, or on a shift of a point, the afterguard's routine work) so that a
+  ship whose hands are all aloft has sheets that are not tended, which is true. The
+  helmsman's `full and by` was tuned on free tending (tuning notes, package 10, changes 4
+  and 6); re-measure the pointing truths and re-tune the helmsman's margin if they move,
+  saying which.
+- **The square rig's sheets** are not changed (tacks and sheets remain states, the yards'
+  braces the trim), except that a course's sheet let fly flogs the sail as now.
+- **Measured, not tuned**: the four ships' polars again after the change (the tuning
+  notes' tables), the turning circles, the tacks' times; the pinned days re-measured and
+  re-pinned with the reasons (the days hold no tack; the trim routine may move a line or
+  two).
+- **Tests**: the turning truths; the three new tack truths and the recovery's stages on
+  the frigate (hung, boxed off, through) and on the cutter (the jib to windward); the
+  miss under three knots still a miss, and the squaring a brace with a duration; the
+  sheet as the trim (haul, ease, let fly, trim after a let-fly hauls it back); the sheet's
+  load and parting; heaving to on the cutter and the schooner; the starter's tending
+  routine; the primer's samples.
+- **Report**: the suite's last line; every constant that moved with its source; the
+  turning circles and the tacks' times of the four ships beside their sources; the
+  pointing truths before and after; the recovery as the log says it, one transcript of
+  the frigate hung and boxed off; what could not be sourced and is a judgement; anything
+  not done.
+
+Not in 32e: a per-sail pointing from the sail's own geometry (item 12's last paragraph;
+after this lands, if the re-measured pointing wants it), the gybe as a manoeuvre with the
+boom coming over on a timeline (`Presentation.md`'s rig-motion item), the kedge, the
+sweeps.
 
 ## Packages 33a to 37 (outline; written in turn)
 
