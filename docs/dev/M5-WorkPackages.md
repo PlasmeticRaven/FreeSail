@@ -332,11 +332,31 @@ approval; runs beside 31b and touches none of its files.
    flight is delivered when the call returns, not skipped.
 6. **The release line's full stop** (finding 12): no second stop after a reason ending in
    one.
-7. **Tests** with the fake for each; `test_mcp_server.py` for the wait; `test_standing.py`
+7. **The unattended wait is counted in real minutes only** (the cold review's one bug,
+   `docs/design/ColdReview-2026-09-30.md` §2.4 item 1; the owner's ruling, 2026-09-30,
+   folded in here). Today a paused model is stood down when a watch of *ship's* time has
+   passed unanswered (`harness.py`, the tick path under `WELFARE_UNATTENDED_BOUND_S`),
+   which at 300x is under a minute of real time, and the browser server never calls the
+   driver's real-minutes check (`check_unattended` runs from the console's loop only).
+   The change: the ship's-time stand-down goes; the only bound is `WELFARE_UNATTENDED_REAL_S`
+   (ten real minutes) on the driver's monotonic clock, and every driver calls
+   `check_unattended` (the server's tick loop, the console as now, the REPL as fits its
+   lockstep); the stand-down stays an act from outside the loop (`door_act`) recorded at
+   its tick, so a replay makes it at the same moment as every other outside stop. The
+   pause itself is unchanged (a nudge, then the pause with the human asked). Words:
+   `ConsentBrief.md`'s "within a watch of ship's time or ten real minutes, whichever
+   comes first" becomes ten real minutes however fast the ship's clock runs (this changes
+   the brief's hash; say so in the report), `Harness.md` §11 likewise, the harness's
+   docstrings, and the REPL's `--max-ticks` default named from `R.INTERVALS` rather than
+   the retired constant. Tests: with the fake, a paused watcher through a day at 300x
+   with no answer is not stood down; the injected clock crossing ten minutes stands it
+   down; the server's loop calls the check (the app fixture, a fake monotonic clock);
+   the stand-down replays at its tick.
+8. **Tests** with the fake for each; `test_mcp_server.py` for the wait; `test_standing.py`
    for the station verbs; the parity test extended to the delta (what the captain has, the
    model can get).
-8. **Report**: the suite's last line; the sample sizes before and after on the gate's day;
-   the events' words as built; anything not done.
+9. **Report**: the suite's last line; the sample sizes before and after on the gate's day;
+   the events' words as built; the unattended bound's tests; anything not done.
 
 ## Package 32: the geographic frame, the chart data, the queries and the lookout (`freesail/world/geo.py` new; `freesail/world/chart.py` new; `freesail/world/lookout.py` new; `tools/build_charts.py` new; `data/charts/` new (`manifest.yaml`, `tiles/`, `coast/`, `features/`, `overrides/`); `freesail/core/world.py` and `freesail/world/scenarios.py` for the position and the chart region; `freesail/world/weather.py` for the coast-distance hook (the sea breeze and coastal fog it enables); `freesail/api/readings.py` for `what is in sight`, `the depth of water` (the chart's, distinct from the lead's cast which is 33's), `the land`; `freesail/api/queries.py` and `client/map.js` for the chart drawn under the track (the coast and the features, never the truth's soundings as a grid); `docs/references/` for the chart sources' licence texts and a `Charts.md`; `docs/dev/TuningNotes.md`; `tests/test_geo.py`, `tests/test_chart.py`, `tests/test_lookout.py` new, `tests/test_known_truths.py` truth 65)
 
