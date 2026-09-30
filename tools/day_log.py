@@ -4,7 +4,7 @@ of the day under systems matched every tick, every loss and the line count of th
 machine's and differed in the digest alone, so one line's text differs somewhere; this
 prints them all to find it).
 
-    py tools/day_log.py data/scenarios/gate-5a-day.yaml --hours 45 --out day-log.txt
+    py tools/day_log.py data/scenarios/gate-5a-day.yaml --hours 29 --out day-log.txt
 
 The scenario is run at its own seed under its standing orders, as the truths run it
 (tests/test_known_truths.py), for the hours given; each line is `tick  kind  text` and
@@ -29,7 +29,7 @@ from freesail.world.scenarios import begin, load_scenario, make_scenario_world  
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("scenario")
-    ap.add_argument("--hours", type=float, default=45.0)
+    ap.add_argument("--hours", type=float, default=29.0)
     ap.add_argument("--seed", type=int, default=None)
     ap.add_argument("--out", default="day-log.txt")
     args = ap.parse_args()
