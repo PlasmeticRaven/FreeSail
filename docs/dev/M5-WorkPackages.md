@@ -32,6 +32,8 @@ the owner's approval, not on the merge.
 gate 5a:  wave 1  30 weather systems, the glass and the sky, the scenario's systems, the gate's day as a system
                   30b clearing a wreck, spare spars, the storm mizzen in the viewer (beside 30; from playtest 10)
           wave 2  31 the sea and the ship's motion, windage under bare poles, gate 5a
+                  31b all hands in parallel, the rig's repairs, the pinned form under the air-mass rule (after gate 5a; playtest 11)
+                  31c the watcher's watch: the sample's delta, the door's wait, weather events, tell/ask in the book (beside 31b)
 gate 5b:  wave 3  32 the chart data and the queries, the lookout
           wave 4  33 the reckoning, the sights and the lunar, the captain's chart
           wave 5  34 the tide, grounding and anchoring, gate 5b
@@ -226,6 +228,103 @@ owner's approval.
 
 Not in 31: pitch and roll moving the ship on the plane, a six-degree body, wave-by-wave
 motion, the sea breeze and coastal fog, anything of the chart.
+
+## Package 31b: all hands manned in parallel, the ship's cost, the rig's repairs, the pinned form under the air-mass rule (`freesail/crew/hands.py` and `evolutions/runner.py` for the party bound and the parallel manning of a group; `data/evolutions/*.yaml` for each all-hands sail evolution's party (`reef_square`, `furl_all`, `loose_sails_to_dry`; the masts' and the manoeuvres' `hands: all` unchanged); `data/standing_orders/starter.orders` and `data/scenarios/gate-4c-day.orders` if the heavy-weather routine's order of work changes; `data/evolutions/reeve_line.yaml` new and `freesail/orders/verbs.py`, `data/vocabulary.yaml` for `reeve`/`splice`; `freesail/orders/verbs.py` for the brace line with yards sent down; `freesail/physics/wind.py`, `core/world.py`, `world/weather_script.py` for the pinned form under the air-mass rule; `docs/primer/03-making-and-shortening-sail.md`, `07-a-first-passage.md` and `09-the-glass-and-the-sky.md`; `docs/TechnicalSpec-M3.md` §3.2 and spec M5 §3; `docs/dev/TuningNotes.md`; `tests/test_hands.py`, `tests/test_known_truths.py` (truths 18, 19, 20, 48 to 51, 56 and the day-under-systems constants as they move), `tests/test_weather.py`, `tests/test_evolutions.py`)
+
+From gate 5a's rulings (decision 28) and playtest 11's findings 7 to 11 and 14
+(`docs/playtests/2026-09-29-gate-5a-opus-5.5-watcher/notes.md`). Fable. Written 2026-09-30;
+launched on the owner's approval. Runs beside 31c (the harness), which touches none of
+these files; before 32 if the owner prefers, since 32 does not depend on it.
+
+1. **All hands manned in parallel, with a bound on any one job** (finding 14; ruling 3).
+   Today an all-hands sail evolution takes every idle hand (package 29b's pool rule), so
+   "reef the topsails" put a hundred and fifty hands on the fore topsail while the main and
+   the mizzen waited in turn, and the crew factor's numbers term never rewards hands beyond
+   the party. The change: each all-hands *sail* evolution names its useful party per sail
+   (`crew: {hands: all, party: N}`; the reef of a frigate's topsail some forty aloft and on
+   the yard and the rest at the halyards and reef tackles on deck, from Luce 1884 ch. XXIII
+   'Reefing Topsails' and the watch bill's stations, the number with its source); a call
+   for all hands still turns the watch below up, and a group order's jobs are manned
+   together, each up to its party, in book order, the surplus to the next job and then to
+   whatever else waits for hands; more hands up to the party are faster (the numbers term
+   as it is), beyond it no faster. The manoeuvres and the masts (`hands: all` scripts)
+   keep taking everyone. Truth 18 (plain sail with all hands) and truth 19 do not move;
+   the gate's day under systems is re-measured (three topsails reefed together, the
+   close reefs likely in before the squall) and its constants re-pinned with the reasons;
+   truth 56's ratio holds by construction. Spec M3 §3.2 gains the rule in a paragraph.
+2. **The heavy-weather routine's order of work** (finding 10). With item 1 the close reef
+   and the send-down share the hands; measure whether the book's order (send down, take in,
+   bend, close reef) still leaves the topsails unreefed at the squall on the gate's day,
+   and if it does, put the close reef first in the starter book and say why in the primer
+   ("the order of an order's clauses is the order of the work" as a sentence in chapter 7).
+   The primer also gains one line on sails taken in staying in the gear (finding 11).
+3. **Parted running rigging is reeved afresh** (finding 7). `reeve a new <line>` (also
+   `reeve the <line> afresh`, `splice the <line>`) as an evolution with hands and time and a
+   source (Lever 1808 on reeving running rigging; Luce on splicing), the sail it serves
+   refused for setting or sheeting home while the line is parted (the inconsistency the
+   model saw, a sail sheeted with a parted sheet, closed), the spare cordage from stores
+   counted as the spare sails are. Refusals in words.
+4. **The brace line with yards sent down** (finding 8): "Braced six yards to the wind; the
+   topgallant and royal yards are on deck." and no "Not ..." list.
+5. **The primer must not narrate the gate's day** (finding 9): chapter 9's "Where the
+   weather comes from" rewritten around a typical passing low in general terms, with no
+   hour-by-hour of any scenario; the scenario's name in the log's first line stays.
+6. **The pinned form under the air-mass rule** (ruling 1). A fixed or pinned wind takes
+   the air-mass gust rule, the squalls and the reverting wander as the systems do, with a
+   neutral air mass unless the scenario says; the milestone 2 draws retire. Truths 48 to
+   51's constants and the day digest are re-measured and re-pinned with the reasons
+   (`GATE_DAY_*`, truth 50's counts), and every other truth's numbers checked: a truth that
+   moves by more than its own tolerance says why in the tuning notes. If it cannot be done
+   cleanly (a truth that depends on the old draws' shape), stop, say which, and leave both
+   forms with a note, as the owner allowed.
+7. **Tests**: the party bound and the parallel manning (three topsails together, the
+   surplus to a fourth job, no job over its party); the day under systems and the pinned
+   day re-measured; `reeve`; the brace line; the primer's chapter 9 free of the day's
+   hours (a test that greps for its times); the pinned form's gusts within 1.3 outside a
+   squall.
+8. **Report**: the suite's last line; every constant that moved, old and new, with its
+   reason; the day under systems' new cost in canvas and whether the close reefs were in
+   before the squall; the parties per evolution with their sources; anything not done.
+
+## Package 31c: the watcher's watch (`freesail/agents/harness.py` for the sample's delta, the weather events, `read_log`'s default, the journal while standing by, a bell during a call, the release line; `freesail/agents/tools.py` and `agent.py` for the events' words and the brief; `freesail/agents/mcp_server.py` for the wait under the client's limit; `freesail/api/readings.py` `EVENTS`; `freesail/standing/grammar.py`, `rules.py` and `freesail/orders/*` for `tell`/`ask the <station>` inside a standing order; `docs/agents/Harness.md`, `ConsentBrief.md` only if a sentence bears on it; `tests/test_agents.py`, `tests/test_mcp_server.py`, `tests/test_standing.py`, `tests/test_tell.py`)
+
+From playtest 11's findings 1 to 6 and 12 to 13 (`docs/playtests/2026-09-29-gate-5a-opus-5.5-watcher/notes.md`)
+and the owner's ruling of 2026-09-30. Opus. Written 2026-09-30; launched on the owner's
+approval; runs beside 31b and touches none of its files.
+
+1. **A sample carries only what changed** (finding 1; spec M4 §24 item 9). The first
+   sample of a station carries the full readings; every later one the readings that
+   changed since the model's last sample, in the same words, plus a compact sail line
+   ("plain sail and the royals set; all studdingsails furled; storm canvas unbent") in
+   place of the thirty sail rows, the full rows on request through the readings tool;
+   samples bundled into one open turn share one copy of what is common. The parity rule
+   holds: nothing is withheld that the captain has, only not repeated. Measured in the
+   report: the tokens of the gate's day's samples before and after.
+2. **The MCP door's wait fits under the client's limit** (finding 2). The bridge's held
+   call defaults to `MCP_WAIT_S = 200` (under the Claude Desktop client's four minutes, the
+   study of the owner's sessions), re-issued cleanly by the model with an honest interim
+   digest as 28c built it; `--wait` still overrides; `Harness.md` says why.
+3. **Weather events to stand by for** (finding 3): `a wind shift` (a point or more), `the
+   glass falling fast`, `the glass turning`, `the sea getting up` (its words changing
+   upward), `a change in the sky`, `a squall` (already there), in `EVENTS` with the log
+   kinds they match, in the tool's description and the brief's list; parity: the dialect
+   gets the same events for nothing where it lacks them.
+4. **Standing orders can `tell` and `ask` a station** (finding 13; the owner's first
+   note): the station verbs allowed after `then`, resolved at give time to a station that
+   exists or refused in words ("there is no lookout aboard yet"), delivered as a word or a
+   question as the captain's own would be, with the standing order named as the speaker
+   in the log line ("By standing order 'sea': the captain to the watcher: ...").
+5. **Three small gaps** (findings 4, 5, 6): `read_log` with no `since_tick` defaults to
+   the model's last sample; the journal is allowed while standing by (it changes nothing
+   in the game; the stand-by continues); a bell or event that falls while a call is in
+   flight is delivered when the call returns, not skipped.
+6. **The release line's full stop** (finding 12): no second stop after a reason ending in
+   one.
+7. **Tests** with the fake for each; `test_mcp_server.py` for the wait; `test_standing.py`
+   for the station verbs; the parity test extended to the delta (what the captain has, the
+   model can get).
+8. **Report**: the suite's last line; the sample sizes before and after on the gate's day;
+   the events' words as built; anything not done.
 
 ## Package 32: the geographic frame, the chart data, the queries and the lookout (`freesail/world/geo.py` new; `freesail/world/chart.py` new; `freesail/world/lookout.py` new; `tools/build_charts.py` new; `data/charts/` new (`manifest.yaml`, `tiles/`, `coast/`, `features/`, `overrides/`); `freesail/core/world.py` and `freesail/world/scenarios.py` for the position and the chart region; `freesail/world/weather.py` for the coast-distance hook (the sea breeze and coastal fog it enables); `freesail/api/readings.py` for `what is in sight`, `the depth of water` (the chart's, distinct from the lead's cast which is 33's), `the land`; `freesail/api/queries.py` and `client/map.js` for the chart drawn under the track (the coast and the features, never the truth's soundings as a grid); `docs/references/` for the chart sources' licence texts and a `Charts.md`; `docs/dev/TuningNotes.md`; `tests/test_geo.py`, `tests/test_chart.py`, `tests/test_lookout.py` new, `tests/test_known_truths.py` truth 65)
 
