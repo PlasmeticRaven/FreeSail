@@ -227,15 +227,104 @@ owner's approval.
 Not in 31: pitch and roll moving the ship on the plane, a six-degree body, wave-by-wave
 motion, the sea breeze and coastal fog, anything of the chart.
 
-## Packages 32 to 36 (outline; written in turn)
+## Package 32: the geographic frame, the chart data, the queries and the lookout (`freesail/world/geo.py` new; `freesail/world/chart.py` new; `freesail/world/lookout.py` new; `tools/build_charts.py` new; `data/charts/` new (`manifest.yaml`, `tiles/`, `coast/`, `features/`, `overrides/`); `freesail/core/world.py` and `freesail/world/scenarios.py` for the position and the chart region; `freesail/world/weather.py` for the coast-distance hook (the sea breeze and coastal fog it enables); `freesail/api/readings.py` for `what is in sight`, `the depth of water` (the chart's, distinct from the lead's cast which is 33's), `the land`; `freesail/api/queries.py` and `client/map.js` for the chart drawn under the track (the coast and the features, never the truth's soundings as a grid); `docs/references/` for the chart sources' licence texts and a `Charts.md`; `docs/dev/TuningNotes.md`; `tests/test_geo.py`, `tests/test_chart.py`, `tests/test_lookout.py` new, `tests/test_known_truths.py` truth 65)
 
-As spec M5 §31: 32 the chart data, the queries and the lookout (§9 to §12, truth 65;
-Fable, the hand work reviewed by the lead against the sources); 33 the reckoning, the
-sights and the lunar, the captain's chart (§13 to §15, §17, truths 58 to 61; Fable); 34
-the tide, grounding and anchoring, gate 5b (§16, §18, truths 62 to 64 and 66; Fable);
-35 places, people, ports and nations, with the cutter as a ship file for the pilot (§22 to
-§24, truths 68 to 70; Opus); 36 other sail, the world-order channel, the brig as a ship
-file, the two scenarios, gate 5c (§25 to §27, truths 67, 71, 72; Fable). The two new
+Spec M5 §9 to §12, §30; `ChartData.md` whole (§2 the sources and their licences, §3 the
+period surveys and how to read a sounding, §4 the pilots, §5 the data model, the levels,
+the disk, the build and the queries, §6 the recommendation, §7 the unverified list, which
+is binding: each item is checked from a browser when this package is built and the result
+recorded in the manifest or the study). Fable, with the hand work (the four period patches
+and the feature list) reviewed by the lead against the sources. Written 2026-09-30 when
+package 31 landed; launched on the owner's approval. Package 33 needs this package's
+chart; package 35's places sit on it.
+
+- **The geographic frame** (§9). Latitude and longitude as the world frame; the ship's
+  motion in metres in her local frame converted at the end of each tick; `Scenario.position`
+  in place of the bare latitude the sun used, which now reads the ship's; `ship_x`/`ship_y`
+  kept for the flat-plane tests and truths, a scenario with no chart region being the
+  plane it was (every M4 and 5a constant unchanged; a test). Distances in the log in
+  miles, leagues and cables; positions in degrees and minutes when the game says them at
+  all (the truth is never said to the captain; 33 gives him his reckoning).
+- **The chart data** (§10, C §5). The files as C §5.2: `manifest.yaml` (regions, levels,
+  every source with its licence text, attribution line, URL, retrieval date and checksum;
+  the build's version hash), `tiles/<level>/<lat>_<lon>.npz` (int16 decimetres relative to
+  chart datum, 512-cell tiles at the four levels 2.5′, 30″, 3″, 0.5″; a distance-to-shore
+  field and a per-tile minimum depth at the two finer levels), `coast/<region>.geojson`,
+  `features/<region>.yaml` (hazards, marks, lights with their dates, places, anchorages,
+  transits, bottom notes; each with the period name, the modern name, an extent or height,
+  a source citation in the references' form and a line the log can say),
+  `overrides/<region>/*.yaml` (period depth and shore patches: polygons with a depth or a
+  drying height in the sheet's own units and datum, the sheet, the control points and the
+  datum correction). The M5 region is 48 to 51 N, 7 to 3 W. The region's tiles and the
+  world level are committed (the region under 25 MB compressed, the world about 25 MB);
+  the Atlantic level is fetched by the tool and not committed. Runtime reads with `numpy`
+  and `pyyaml` only.
+- **The build** (`tools/build_charts.py`, C §5.4): fetch into a cache outside the
+  repository with URL, date and checksum, refusing any source whose licence is not in the
+  allowed list (public domain, CC BY, Licence Ouverte, OGL, LGPL, named per-source
+  permissions; never ODbL); resample (GDAL or rasterio may be used by the tool if
+  installed, never by the game); rasterise the overrides and splice the period shore;
+  derive the distance field, the per-tile minimum and a 0.25° feature index; write the
+  tiles, the coast, the manifest with the attribution block the game shows in its about
+  text, and a report. A test that every feature and override cites a source and every
+  source in the manifest has an allowed licence. The sources: EMODnet DTM 2024 (CC BY 4.0)
+  for the region's depth and coast; SHOM HOMONIM (Licence Ouverte) as the French
+  cross-check with its datum; GEBCO_2025 (public domain) for the world and Atlantic levels
+  and under everything; Histolitt (SHOM–IGN credit) for the French shoreline where needed;
+  no OpenStreetMap in the tiles; no UKHO survey bathymetry until its licence is read and
+  recorded. The licence texts under `docs/references/` with a `Charts.md` naming every
+  source and what was taken from it.
+- **The period patches and the feature list** (C §3, §4, §6), the hand work: four
+  overrides (Falmouth and the Helford; Plymouth Sound and Cawsand without the breakwater;
+  the Scillies; Brest, the Goulet and the Iroise) from the Hurd engravings of Mackenzie and
+  Spence, Bellin, and the *Pilote français*, the facts transcribed with the sheet cited and
+  the scans never committed; the feature list for the whole coast from Faden 1793,
+  Stephenson 1795, Imray 1848 and White 1835, with Serres 1801 for the views, in the
+  period's words, the lights dated so that 1805 sees St Agnes and not the Bishop. Each
+  entry a source. Where a scan cannot be read at the resolution a sounding needs, the
+  entry says what it rests on. The lead reviews this list against the sources before the
+  merge; write it so that review is possible (the citation on every line).
+- **The queries** (§11, C §5.5, `chart.py`): depth here (tile lookup, bilinear, the current
+  tile and its neighbours cached); aground (short-circuited by the per-tile minimum against
+  draught plus the highest tide plus a margin, otherwise the keel's cells at bow and stern
+  against draught and heel and a tide height the tide of package 34 will supply, 0 until
+  then: this package raises the `ship.aground` event and 34 gives it the tide and the
+  consequences); nearest coast (the distance field and its gradient, a name from the
+  index); in sight of what (once a game minute: the features within the horizon from the
+  masthead, 2.08 (√h_eye + √h_object) miles with heights in metres, by the index, then by
+  5a's visibility and daylight, then by the feature's own rules: a light at night by its
+  range and date, a mark by day). The coast-distance hook of package 30 wired, so the sea
+  breeze and coastal fog it left inert come alive by the study's rules (W §1.4), tested on
+  a summer afternoon off Falmouth.
+- **The lookout** (§12, `lookout.py`): the world's own voice at routine severity, notable
+  for a landfall or a danger: "The Lizard bearing N by E, distant four leagues." "A light
+  on the larboard bow." The lookout's words are what the sighting model gives, by compass
+  bearing and estimated distance (the estimate the period's, to the nearest league or
+  mile, not the truth); the reading `what is in sight` in the registry, the dialect reading
+  it (`when the land is in sight then ...`). In 5c the same model sights sail.
+- **The chart in the browser** (§17's first half; the reckoning half is 33's): `map.js`
+  draws the region's coast and the features under the track as the captain's chart will
+  (the truth's position still drawn for now, since the reckoning does not exist yet; 33
+  removes it). The truth tiles are never drawn as a depth grid.
+- **Truth 65** (the Bishop dark and St Agnes lit in 1805; a night landfall on Scilly from
+  the south-west sees St Agnes at its range and nothing else) and the pace truth for this
+  package (the queries per tick on the gate's day with the region loaded, floor 500).
+- **Report**: the final suite line; the manifest's sources with licences and what each
+  item of C §7 was found to be; the four patches' sheets and control points; the feature
+  list's count by kind and its sources; the disk of what is committed; the pace; anything
+  you could not do and why.
+
+Not in 32: the reckoning and its instruments (33), the tide (34), anchoring's evolution
+(34), ports and people (35), sail in sight (36), the Atlantic committed.
+
+## Packages 33 to 36 (outline; written in turn)
+
+As spec M5 §31: 33 the reckoning, the sights and the lunar, the captain's chart (§13 to
+§15, §17, truths 58 to 61; Fable); 34 the tide, grounding and anchoring, gate 5b (§16,
+§18, truths 62 to 64 and 66; Fable); 35 places, people, ports and nations, with the cutter
+as a ship file for the pilot (§22 to §24, truths 68 to 70; Opus); 36 other sail, the
+world-order channel, the brig as a ship file, the two scenarios, gate 5c (§25 to §27,
+truths 67, 71, 72; Fable). The two new
 vessels are the first catalogue entries and the test of pillar 2 (owner, 2026-09-29): no
 engine change, the running bowsprit the one generator addition expected, every order that
 fails on either a fault in the grammar to fix there.
