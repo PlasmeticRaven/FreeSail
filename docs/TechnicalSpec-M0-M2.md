@@ -75,7 +75,7 @@ tests/
   test_determinism.py, test_replay.py, test_loader.py, test_grammar.py,
   test_known_truths.py, fixtures/
 docs/
-pyproject.toml              Python 3.12, deps: pyyaml, numpy, fastapi, uvicorn, pytest, ruff
+pyproject.toml              Python 3.11 or newer (was written as 3.12; the project requires 3.11), deps: pyyaml, numpy, fastapi, uvicorn, pytest, ruff
 README.md
 ```
 
@@ -533,7 +533,7 @@ Numbers in the snapshot are SI; the client converts for display using a small ta
 
 ## 10. Tests and quality gates
 
-- `pytest` runs in under a minute for M0 to M2. Physics truths run ten-minute game scenarios at full speed, which is a few seconds each.
+- `pytest` runs in under a minute for M0 to M2. Physics truths run ten-minute game scenarios at full speed, which is a few seconds each. (By milestone 5a the whole suite is some 1,700 tests and runs in about eleven minutes alone or seventeen on four workers with a day's scenario beside it; the cold review of 2026-09-30 proposes two tiers.)
 - `ruff` for lint and format.
 - **Determinism** and **replay** tests run on every reference ship.
 - **Loader** tests: each reference ship loads; each validation rule has a failing fixture.

@@ -29,8 +29,11 @@ hull facings.
 3. **The rig's own geometry.** Booms fouling braces and studding sails against stays were
    handled in 3b with angles and got away with it. **Blanketing** cannot be: the foresail
    taking the wind out of the jibs when running, one ship lying in another's lee, the
-   lee sails of a ship close-hauled in the wind shadow of her weather ones. Not modelled
-   at all today.
+   lee sails of a ship close-hauled in the wind shadow of her weather ones. Modelled
+   crudely today (spec M0 to M2 §7.3, a shadow rule by position along the keel, since
+   milestone 2; truth 5 rests on it) and not by geometry, which is what this item is
+   about. (Corrected 2026-09-30 after the cold review; the first draft said "not modelled
+   at all".)
 4. **The view.** The deck view (gate 3b notes) and any fuller picture of the ship want
    the rig as a skeleton to project from.
 

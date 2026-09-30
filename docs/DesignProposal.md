@@ -2,7 +2,7 @@
 
 This document turns the initial brainstorm (`docs/InitialDesignBrainstorm.txt`) plus two rounds of follow-up answers into a single proposal. Version 0.2 folds in the answers to the v0.1 open questions; they are recorded in §12. It is written for a reader who is not a programmer. Where a term of art is unavoidable it is explained on first use. Where a choice genuinely forks the design, both branches are laid out as a *decision record* with a recommendation, so we can argue about the fork rather than the whole document.
 
-Everything here is a proposal. Nothing is built yet.
+Everything here is a proposal. It was written before anything was built; milestones 0 to 5a have since been built against it, and §12's decisions log records where the build changed it (the cold review of 2026-09-30, `docs/design/ColdReview-2026-09-30.md`, reads it whole against the code).
 
 ---
 
