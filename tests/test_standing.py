@@ -1111,6 +1111,20 @@ def test_a_firing_is_logged_by_standing_order_and_never_journaled():
     assert w.journal == []
 
 
+def test_a_cadences_firing_is_a_routine_line():
+    """A firing on a cadence (`every glass then ...`) is the watch's routine work: its line
+    is routine, kept in the log and the roll-up, and does not wake a watcher standing by
+    (the lead, 2026-09-30: package 32e's sheet-tending routine put fifty-seven notable
+    lines in a day). A `when` or an `at` firing stays notable."""
+    w = point_world()
+    rule_of("every 20 minutes", w, actions=["steer 90"], name="cadence")
+    rule_of("at eight bells", w, actions=["speed 5 knots"], name="bells")
+    w.run(1300)
+    by = {e.actor: e for e in w.log if e.kind == "order.accepted"}
+    assert by["standing order 'cadence'"].severity.value == "routine"
+    assert by["standing order 'bells'"].severity.value == "notable"
+
+
 def test_firing_is_deterministic(synthetic):
     """Two worlds, one seed, one journal, a synthetic wind that is a function of the tick:
     one log."""

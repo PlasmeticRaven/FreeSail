@@ -721,14 +721,20 @@ class World:
 
     # -- orders --------------------------------------------------------------
 
-    def submit(self, text: str, actor: str = "captain", said: str | None = None) -> Event:
+    def submit(
+        self, text: str, actor: str = "captain", said: str | None = None, routine: bool = False
+    ) -> Event:
         """Apply an order now, at the current tick. Journal it if accepted.
 
         A standing order's firing comes with the actor "standing order 'x'" (spec M4 §4):
         it is logged as "By standing order 'x': ..." (`said`, notable) and not journaled,
-        since firings are a deterministic function of the seed and the journal. A query
-        (a kind beginning `query.`, such as the book's listing) is answered in the log
-        and not journaled either.
+        since firings are a deterministic function of the seed and the journal. A firing
+        on a cadence (`every glass then trim the sheets`, `... sound the well`) is the
+        watch's routine work and its line is routine (`routine=True`, the standing runtime
+        for an `every` trigger; the lead, 2026-09-30, after package 32e's tending routine
+        put fifty-seven notable lines in a day): it stays in the log and the hourly roll-up
+        and does not wake a watcher standing by. A query (a kind beginning `query.`, such
+        as the book's listing) is answered in the log and not journaled either.
         """
         text = " ".join(text.split())
         standing = actor.startswith(STANDING_ACTOR_PREFIX)
@@ -750,7 +756,7 @@ class World:
         if not standing:
             self.journal.append((self.clock.tick, actor, text))
         accepted = self.record(
-            Severity.NOTABLE if standing else Severity.ROUTINE,
+            Severity.NOTABLE if standing and not routine else Severity.ROUTINE,
             "order.accepted",
             f"{said}." if said else f"Order: {text}.",
             actor=actor,

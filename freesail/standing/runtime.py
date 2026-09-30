@@ -301,6 +301,8 @@ class Runtime:
                     parts.text,
                     actor=actor,
                     said=f"By standing order '{rule.name}': {said_as_done(ship, parts.text)}",
+                    # a cadence's firing is the watch's routine work: a routine line
+                    routine=rule.trigger.kind == "every",
                 )
         finally:
             self.firing = None
