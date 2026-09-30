@@ -316,13 +316,14 @@ def test_the_gate_day_file_carries_both_forms_and_the_pinned_wind_wins():
     assert any("the sky and the glass" in ln for ln in sf.lines())
     w = make_scenario_world(sf)
     assert w.systems is not None and w.weather is not None and w.glass is not None
-    assert w.wind.air_mass == "neutral"
+    said = w.weather.air_mass_at(w.clock.ship_time)
+    assert w.wind.air_mass == said == "warm"  # the waypoint's, not the sector's
     for _ in range(4):
         w.run(900)
         d, s = w.weather.at(w.clock.ship_time)
         assert w.wind.base_direction == pytest.approx(d, abs=1e-9)
         assert w.wind.base_speed == pytest.approx(s, rel=1e-9)
-        assert w.wind.air_mass == "neutral"  # the sector is not read under the pinned wind
+        assert w.wind.air_mass == w.weather.air_mass_at(w.clock.ship_time)
     r = w.readings
     assert 29.5 < r["glass"] < 30.5 and r["sky"]["words"] in W.SKY_WORDS
     assert r["tendency"]["words"] in W.TENDENCY_WORDS
