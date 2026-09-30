@@ -394,7 +394,7 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (S, "ease the mainsail sheet two fathoms", ok(kind="line.eased", text=["22° off"])),
     (S, "ease the fore sheet, lee", ok(kind="line.eased", text=["larboard (lee) fore sail sheet"])),
     (S, "haul the fore sheet, lee", no(["already hard in"])),
-    (S, "haul the jib sheet", no(["Which jib sheet"])),
+    (S, "haul the jib sheet", no(["already hard in"])),  # the lee sheet (package 32e)
     (S, "haul the jib sheet, weather", no(["already hard in"])),
     (
         S,
@@ -687,7 +687,7 @@ TABLE: list[tuple[str, str, ok | no]] = [
         "ease the fore sheet, lee",
         ok(kind="line.eased", text=["larboard (lee) fore staysail sheet"]),
     ),
-    (C, "haul the jib sheet", no(["Which jib sheet"])),
+    (C, "haul the jib sheet", no(["already hard in"])),  # the lee sheet (package 32e)
     (C, "ease the jib sheet, weather", ok(kind="line.eased", text=["(weather) jib sheet"])),
     (C, "ease the main peak halyard", ok(kind="line.eased", text=["main gaff peak halyard"])),
     (C, "ease the throat halyard", ok(kind="line.eased", text=["main gaff throat halyard"])),

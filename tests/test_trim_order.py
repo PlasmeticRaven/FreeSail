@@ -75,7 +75,10 @@ def test_trim_the_sheets_works_each_sheet_by_an_evolution():
     assert all(p["angle_deg"] is None and "sail" in p for _, _, p in runner.started)
     assert kind == "sail.trimmed"
     assert set(data["trimmed_sheets"]) >= {"the mizzen spanker", "the jib"}
-    assert ship.sails["mizzen.spanker"].sheet_angle == pytest.approx(units.deg_to_rad(18))
+    from freesail.evolutions import trim
+
+    spanker = trim.read_sheet(ship, ship.sails["mizzen.spanker"])
+    assert spanker.angle == pytest.approx(units.deg_to_rad(18)) and not spanker.free
     assert "trimming the sheets of the mizzen spanker" in text.lower()
     # at their trim already, the sheets stand and the line says so
     from freesail.evolutions import trim

@@ -375,9 +375,23 @@ def set_sheet_angle(ship: Ship, sail: Sail, angle: float, side: str | None = Non
     """Work the sheet to the length this angle needs and belay it: the sail lies on
     `side` (the lee side unless said; 'weather' holds it to windward). Of a pair the
     other sheet is let go; a single sheet is held over when the side is not the lee.
-    Returns the angle the sheet gives (the class's floor at least, its ceiling at most)."""
+    With `side` 'either', or with no side said before the deck has read a wind, both
+    sheets of a pair are belayed alike and the sail lies to leeward of whatever wind
+    comes (`read_sheet`'s tie goes to the lee sheet): the state a sail is set in before
+    the first tick. Returns the angle the sheet gives (the class's floor at least, its
+    ceiling at most)."""
     geo = sheet_geometry(ship, sail)
     angle = max(geo.floor, min(geo.ceiling, angle))
+    no_reading = ship.dyn.apparent_wind_angle == 0.0 and ship.dyn.apparent_wind_speed == 0.0
+    if side == "either" or (side is None and no_reading):
+        hauled = geo.hauled_from_angle(angle)
+        for ln in ship.sheets_of(sail):
+            if ln.state is not LineState.PARTED:
+                ln.hauled = hauled
+                ln.state = LineState.BELAYED
+                ln.held_side = None
+        refresh_reading(ship, sail)
+        return angle
     line = working_sheet(ship, sail, side)
     if line is None:
         sail.sheet_angle = angle

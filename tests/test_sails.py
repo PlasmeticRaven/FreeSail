@@ -48,7 +48,7 @@ def set_sails(ship, ids, brace_deg=0.0, sheet_deg=None):
         for s in ship.sails.values():
             if s.is_fore_and_aft:
                 # package 32e: the sheet holds the trim; set through the line
-                set_sheet_angle(ship, s, math.radians(sheet_deg))
+                set_sheet_angle(ship, s, math.radians(sheet_deg), "either")
 
 
 def frigate_plain_sail(brace_deg=38.0, sheet_deg=25.0, speed_kn=0.0):

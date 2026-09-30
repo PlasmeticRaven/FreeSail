@@ -310,6 +310,7 @@ STARTER_NAMES = [
     "shorten sail for weather",
     "keep her full",
     "trim on a shift",
+    "tend the sheets",  # package 32e: the sheets tended every glass
     "heavy weather",
     "storm staysail",
 ]
@@ -327,11 +328,11 @@ def test_the_starter_file_loads_in_the_console_with_the_well_refused_and_the_res
     assert "In standing order 'sound the well', 'sound the well': The ship has no well" in (
         refused[0].text
     )
-    # the refused line is not journaled; the seven that entered are
+    # the refused line is not journaled; the eight that entered are (32e: the sheets)
     journaled = [t for _, _, t in con.world.journal if t.startswith("standing order")]
-    assert len(journaled) == 7 and all("sound the well" not in t for t in journaled)
+    assert len(journaled) == 8 and all("sound the well" not in t for t in journaled)
     con.handle_line("standing orders")
-    assert "Standing orders (7):" in out.getvalue()
+    assert "Standing orders (8):" in out.getvalue()
 
 
 def test_the_starter_file_loads_on_the_server_driver():

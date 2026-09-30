@@ -57,7 +57,7 @@ Advanced 300 ticks to Morning watch (04:13).
 Amazon: heading WNW (293°), speed 4.6 kn, leeway -4°, heel -3°
 Apparent wind 49° on the starboard bow, 14.4 kn; helm -1°
   Morning watch (04:13)  Order: trim sails.
-  Morning watch (04:13)  Braced twelve yards to the wind, 49° on the starboard bow; trimmed the sheets of the mizzen spanker; the fore topmast staysail; the jib.
+  Morning watch (04:13)  Braced twelve yards to the wind, 49° on the starboard bow; trimming the sheets of the mizzen spanker, the fore topmast staysail and the jib.
 * Morning watch (04:13)  Braced the fore yard; 55° from square.
   ...
 Advanced 120 ticks to Morning watch (04:15).
@@ -67,36 +67,36 @@ Apparent wind 49° on the starboard bow, 14.2 kn; helm -1°
 
 Close-hauled on the starboard tack at a little under five knots: 49° apparent is six points true (chapter 2), four degrees of leeway, three of heel to larboard, and a degree of weather helm (chapter 4). `trim sails` found every yard already at its limit, which is where the wind at 49° wants them, so nothing moved; it is the order to give after a tack or a shift of wind. This is the ship at her best point for working to windward, and the slowest she will go anywhere but dead before the wind.
 
-Feel a rope, watch the watch put it back, then go about:
+Feel a rope, see that it stays where you left it, then go about:
 
 ```orders frigate plain-sail
-haul the spanker sheet
+ease the spanker sheet
 tick 60
-ease the spanker sheet a fathom
+haul the spanker sheet
 tack ship
 tick 720
 state
 ```
 
 ```
-  Morning watch (04:15)  Hauled the mizzen spanker sheet; the mizzen spanker now 19° off the centreline.
+  Morning watch (04:15)  Eased the mizzen spanker sheet; the mizzen spanker now 29° off the centreline.
 Advanced 60 ticks to Morning watch (04:16).
-  Morning watch (04:16)  Eased the mizzen spanker sheet; the mizzen spanker now 29° off the centreline.
+  Morning watch (04:16)  Hauled the mizzen spanker sheet; the mizzen spanker now 24° off the centreline.
   Morning watch (04:16)  Order: tack ship.
-  Morning watch (04:16)  Ready about. Helm's a-lee; eased off the head sheets.
+  Morning watch (04:16)  Ready about. Helm's a-lee; let fly the head sheets; haul aft the spanker sheet.
   Morning watch (04:16)  All hands about ship.
 * Morning watch (04:16)  Fore course taken aback.
 * Morning watch (04:16)  Main course taken aback.
   Morning watch (04:17)  Rise tacks and sheets. Mainsail haul.
-  Morning watch (04:18)  Let go and haul.
-* Morning watch (04:21)  Tacked; braced up on the larboard tack, heading ENE (68°).
-  Morning watch (04:22)  Steady on ENE (68°).
+  Morning watch (04:18)  Let go and haul. Draw jib; trim aft the head sheets.
+* Morning watch (04:23)  Tacked; braced up on the larboard tack, heading ENE (68°).
+  Morning watch (04:23)  Steady on ENE (68°).
 Advanced 720 ticks to Morning watch (04:28).
-Amazon: heading ENE (67°), speed 5.1 kn, leeway 4°, heel 4°
+Amazon: heading ENE (67°), speed 4.6 kn, leeway 4°, heel 4°
 Apparent wind 49° on the larboard bow, 15.5 kn; helm +1°
 ```
 
-The spanker was sheeted to 24° for the wind; you hauled it to 19°, and in the minute before you eased it the watch had eased it back to 24° themselves, so your fathom took it to 29° (chapter 4). Chapter 5 reads the tack line by line: five minutes to *Tacked*, and twelve minutes after the order she is back at five knots on the other tack. Leeway, heel and helm have all changed sign: the lee side is now starboard.
+The spanker was sheeted to 24° for the wind by `trim sails`; you eased it a fathom of the fall to 29°, and a minute later it was still there, for nobody tends a sheet but hands sent to it (chapter 4); your haul took it back to 24°. Chapter 5 reads the tack line by line: seven minutes to *Tacked*, and twelve minutes after the order she is back near five knots on the other tack, her sheets trimmed by the tack for the wind she came to. Leeway, heel and helm have all changed sign: the lee side is now starboard.
 
 Haul a brace to feel it, wear her back onto the starboard tack, and, once she is round, take a reef in the topsails against the freshening breeze:
 

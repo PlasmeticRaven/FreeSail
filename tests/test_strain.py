@@ -84,7 +84,7 @@ def set_sails(ship, ids, brace_deg: float = 0.0, sheet_deg: float = 30.0) -> Non
 
     for s in ship.sails.values():
         if s.is_fore_and_aft:
-            set_sheet_angle(ship, s, math.radians(sheet_deg))  # through the line (32e)
+            set_sheet_angle(ship, s, math.radians(sheet_deg), "either")  # through the line
 
 
 def frigate_with_wind(sails, knots=15.0, brace_deg=45.0):
