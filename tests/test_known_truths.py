@@ -2486,7 +2486,7 @@ GATE_5A_SEA_TICKS = {
 # sheets found standing as trimmed most glasses) and the sheet evolutions the trims and
 # the manoeuvres start, and the digest moved with them (docs/dev/TuningNotes.md, 32e).
 GATE_5A_DAY_LINES = 616
-GATE_5A_DAY_DIGEST = "043501476a3cc7f3"
+GATE_5A_DAY_DIGEST = "d17cba7b900ed18d"  # a cadence's firing a routine line (the lead, 2026-09-30)
 
 
 def the_gate_day_under_systems(until: int = GATE_5A_DAY_TICKS, saves=GATE_5A_DAY_SAVES):
@@ -2781,39 +2781,43 @@ def test_the_primers_chapter_nine_does_not_narrate_the_gates_day(gate_5a_day):
 GATE_5B_PASSAGE = "data/scenarios/gate-5b-passage.yaml"
 GATE_5B_PASSAGE_SCHOONER = "data/scenarios/gate-5b-passage-schooner.yaml"
 GATE_5B_PASSAGE_THICK = "data/scenarios/gate-5b-passage-thick.yaml"
-GATE_5B_HOURS = 17  # 04:00 to 21:00: the Roads entered at half past eight in the evening
-GATE_5B_SCHOONER_HOURS = 14  # before she takes the ground (TuningNotes, found on the way)
+GATE_5B_HOURS = 17  # 04:00 to 21:00: the outer road at a quarter past eight, lying to after
+GATE_5B_SCHOONER_HOURS = 17  # the whole passage since package 32e's hove-to refusal held her
 GATE_5B_THICK_HOURS = 16
-# Measured at seed 7 (package 33a): the noon sight at the sun's noon (11:59 by the clock,
-# a minute before twelve on the start meridian), the frigate brought to and the deep-sea
-# lead's fifty-two fathoms at 12:18, the Lizard raised at 16:32 (the Beast and the Lizard
-# lights at four leagues: the landfall), the course shaped for Falmouth from the account,
-# the lead going in, eleven fathoms off St Anthony's Head at 20:02 and the ship hove to
-# in the Roads; the account 2.5 miles from the truth at noon, 7.8 at the landfall, within
-# a mile at the Roads. The thick passage: no sight, the same cast, and the land about
-# Black Head close aboard at 19:12 with the account 11.8 miles off (she believed herself
-# off Falmouth). The schooner: the sight with the octant, the Lizard at 15:49.
+# Measured at seed 7 (package 33a; re-measured by the lead on 2026-09-30 after package
+# 32e's yaw and sheets and the passage's amended book): the noon sight at the sun's noon
+# (11:59 by the clock, a minute before twelve on the start meridian), the frigate brought
+# to and the deep-sea lead's fifty-two fathoms at 12:18, the Lizard raised at 16:28 (the
+# Beast and the Lizard lights at four leagues: the landfall), the course shaped for
+# Falmouth from the account, the lead going in every ten minutes past the Manacles,
+# sixteen fathoms in the outer road at 20:11, where she wears and lies to on the
+# starboard tack, forereaching off the land (the anchor is package 34's); the account 4.8
+# miles from the truth at noon, 8.1 at the landfall, within a mile in the outer road. The
+# thick passage: no sight, the same cast, and the land about Black Head close aboard at
+# 19:08 with the account 10.9 miles off (she believed herself off Falmouth), standing off
+# to the southward. The schooner: the sight with the octant, the Lizard at 16:15, the
+# whole passage to the outer road as the frigate's.
 GATE_5B_NOON_TICK = 28740
-GATE_5B_CAST_TICK = 29928
-GATE_5B_LANDFALL_TICK = 45000
-GATE_5B_ROADS_TICK = 59495
-GATE_5B_LINES = 474
-GATE_5B_DIGEST = "c160c0ef4b83d899"
-GATE_5B_SCHOONER_LANDFALL_TICK = 42540
-GATE_5B_SCHOONER_LINES = 320
-GATE_5B_SCHOONER_DIGEST = "8b852e793dc2f70d"
-GATE_5B_THICK_LANDFALL_TICK = 54420
-GATE_5B_THICK_LINES = 339
-GATE_5B_THICK_DIGEST = "1d9de61e14be40ac"
+GATE_5B_CAST_TICK = 29883
+GATE_5B_LANDFALL_TICK = 44880
+GATE_5B_ROADS_TICK = 58294  # the outer road: the first cast under twenty fathoms
+GATE_5B_LINES = 837
+GATE_5B_DIGEST = "43fb9e16dab9670f"
+GATE_5B_SCHOONER_LANDFALL_TICK = 44100
+GATE_5B_SCHOONER_LINES = 907
+GATE_5B_SCHOONER_DIGEST = "e84617dfb1061ff7"
+GATE_5B_THICK_LANDFALL_TICK = 54480
+GATE_5B_THICK_LINES = 526
+GATE_5B_THICK_DIGEST = "c5e9917759d7bf6b"
 
 
 def the_landfall(log):
-    """The landfall of the passage: the land raised after the land of the departure was
-    lost (the lookout's first look off Ushant is a landfall too, at tick 0)."""
-    lost = [e.tick for e in log if e.kind == "lookout.lost"]
-    since = lost[0] if lost else 0
+    """The landfall of the passage: the land raised after the departure's (the lookout's
+    first look off Ushant is a landfall too, at tick 0; the lookout marks a landfall
+    itself, land raised after none was in sight, so the first `lookout.lost` need not
+    precede it: in fog the land close aboard is raised, stood off from and lost again)."""
     return [
-        e for e in log if e.kind == "lookout.sighting" and e.data.get("landfall") and e.tick > since
+        e for e in log if e.kind == "lookout.sighting" and e.data.get("landfall") and e.tick > 0
     ]
 
 
@@ -2937,8 +2941,8 @@ def test_the_passage_for_gate_5b_at_seed_7_has_its_own_constants(gate_5b_passage
     """The frigate's passage Ushant to Falmouth (spec M5 §20): the departure bearing off
     the Stiff, the log hove hourly, the noon sight, the Channel Soundings by the deep-sea
     lead with the ship brought to, the Lizard raised and bearings taken, the course for
-    Falmouth shaped from the account, the lead going in and the ship hove to in the
-    Roads; the account against the truth at each; the lines and the digest."""
+    Falmouth shaped from the account, the lead going in and the ship wearing at the outer
+    road to lie to off it; the account against the truth at each; the lines and the digest."""
     world, moments = gate_5b_passage
     log = world.log
     noon = [e for e in log if e.kind == "reckoning.noon"]
@@ -2949,8 +2953,9 @@ def test_the_passage_for_gate_5b_at_seed_7_has_its_own_constants(gate_5b_passage
     assert len(heaves) >= GATE_5B_HOURS - 2 and all(e.data["automatic"] for e in heaves[:3])
     casts = [e for e in log if e.kind == "sounding"]
     assert casts[0].tick == GATE_5B_CAST_TICK and casts[0].data["deep"]
-    assert casts[0].text == "Fifty-three fathoms; fine grey sand with black specks."
-    assert [e.tick for e in log if e.kind == "ship.hove_to"] == [28796, 59552]
+    assert casts[0].text == "Fifty-two fathoms; fine grey sand with black specks."
+    assert [e.tick for e in log if e.kind == "ship.hove_to"] == [28796, 58712]
+    assert [e.tick for e in log if e.kind == "ship.wore"] == [58653]  # the outer road
     landfall = the_landfall(log)
     assert landfall[0].tick == GATE_5B_LANDFALL_TICK and landfall[0].data["id"] == "the-beast"
     bearings = [e for e in log if e.kind == "bearing.taken"]
@@ -2958,7 +2963,7 @@ def test_the_passage_for_gate_5b_at_seed_7_has_its_own_constants(gate_5b_passage
     assert any(e.data["id"] == "the-beast" for e in bearings)
     courses = [e for e in log if e.kind == "helm.set"]
     assert any(e.text.startswith("Shaped a course for Falmouth") for e in courses)
-    roads = [e for e in log if e.actor == "standing order 'the Roads'"]
+    roads = [e for e in log if e.actor == "standing order 'the outer road'"]
     assert roads and roads[0].tick == GATE_5B_ROADS_TICK
     # the account against the truth (the author's view: the truth is in the world and
     # the tests only)
@@ -3004,7 +3009,9 @@ def test_the_passage_in_thick_weather_makes_its_landfall_wrong_on_the_reckoning(
     landfall = the_landfall(log)
     assert landfall[0].tick == GATE_5B_THICK_LANDFALL_TICK
     assert landfall[0].text.startswith("The land about Black Head close aboard")
-    assert [e for e in log if e.kind == "ship.hove_to"][-1].tick > landfall[0].tick
+    # at the land close aboard she stands off to the southward (the book's "the land")
+    off = [e for e in log if e.actor == "standing order 'the land'" and e.kind == "order.accepted"]
+    assert off and off[0].tick == landfall[0].tick and "steering s" in off[0].text
     kinds = {m[0]: m for m in moments}
     tick, _, _, truth, account = kinds["landfall"]
     assert 8.0 < _miles(truth, account) < 16.0  # the landfall made wrong
@@ -3024,7 +3031,7 @@ def test_the_schooner_sails_the_passage_with_her_octant_and_the_log_every_two_ho
     assert noon.tick == GATE_5B_NOON_TICK and noon.data["sight"]["instrument"] == "octant"
     landfall = the_landfall(log)
     assert landfall[0].tick == GATE_5B_SCHOONER_LANDFALL_TICK
-    assert landfall[0].data["id"] == "lizard-point"
+    assert landfall[0].data["id"] in ("lizard-point", "the-beast")  # the two at one look
     assert len(log) == GATE_5B_SCHOONER_LINES and log.digest()[:16] == GATE_5B_SCHOONER_DIGEST
 
 

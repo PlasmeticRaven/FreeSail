@@ -642,6 +642,11 @@ measures the whole at the gate's scenario, and the tuning notes carry the number
 Each package's brief is written in `docs/dev/M5-WorkPackages.md` when its predecessor
 has landed, in the form the M4 packages took.
 
+What was built for gate 5b, and how it stands against this chapter, is
+`docs/dev/M5-CloseOut-5b.md` (the close-out form of milestone 4, adopted from the cold
+review: the specification keeps the contract and points to the close-out rather than
+growing "as built" paragraphs).
+
 ## 32. What this milestone does not do
 
 Combat (M7), officers and captains as stations and the crewed promotion of other sail
@@ -682,6 +687,11 @@ in (then 5b), double altitudes, the kedge, interiors beyond a name and a descrip
 14. From package 33a: `VARIATION_1805_DEG` (24° W) is the study's unverified figure, the gufm1
    field model not computed by the chart build and no azimuth built; the landfall rule fires
    at the departure too (land in sight off Ushant), harmless.
+15. From the cut of gate 5b (`docs/dev/M5-CloseOut-5b.md`): the standing runtime's conflict
+   rule treats every ship-subject evolution as one part, so `heave the lead` and `wear ship`
+   are logged as contrary orders on the ship (routine lines; the lead still goes); and an
+   `at <event>, if <condition>` rule logs a routine "not carried out" line at every event
+   whose condition fails. Both for the standing runtime's next pass.
 
 ## 34. The scoping draft's rulings (record)
 
