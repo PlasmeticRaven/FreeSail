@@ -39,7 +39,7 @@ gate 5b:  wave 3  32 the chart data and the queries, the lookout
                   32c the suite in two tiers, the days built once, a Windows job (beside 32; the owner's local session)
                   32d the freesail command, the settings file and the setup step (beside 32; the owner's local session)
           wave 4  33a the reckoning, the noon sight, the captain's chart, the checkpoint save, gate 5b
-                  32e staying and sheets: the fore-and-aft rig at the small vessels' scale (spec open items 12 and 13; before gate 5b; written 2026-09-30 for the owner's word)
+                  32e staying and sheets: the fore-and-aft rig at the small vessels' scale (spec open items 12 and 13; before gate 5b; launched 2026-09-30)
                   (landed 2026-09-30: 31b, 31c, 32, 32b)
 gate 5c:  wave 5  33b the chronometer, the moon and the lunar (beside 34)
                   34 the tide, grounding and anchoring
@@ -830,12 +830,113 @@ after this lands, if the re-measured pointing wants it), the gybe as a manoeuvre
 boom coming over on a timeline (`Presentation.md`'s rig-motion item), the kedge, the
 sweeps.
 
-## Packages 33a to 37 (outline; written in turn)
+## Package 33a: the reckoning, the noon sight, the captain's chart, the checkpoint save, gate 5b (`freesail/world/reckoning.py` new; `freesail/world/sights.py` new for the noon latitude only (the chronometer and the lunar are 33b's); `freesail/core/sun.py` for the altitude at noon if it lacks one; `freesail/core/world.py` for the reckoning's hourly step, the automatic log and noon, the master as the first named person's skill and place (spec §22's minimum, no more), and the checkpoint; `freesail/core/replay.py` for the checkpoint's load and its proof; `freesail/ship/parts.py` and the systems' `to_dict`/`from_dict` where a checkpoint needs them; `freesail/world/lookout.py` for the bearing taken; `freesail/world/chart.py` for the depth contour a cast is matched to; `freesail/api/readings.py` for the 5b readings; `freesail/api/queries.py` and `client/map.js` for the captain's chart (the reckoned position and its ellipse, the track by account, the noon positions, the bearings, the soundings; the truth removed from the snapshot); `freesail/orders/verbs.py`, `data/vocabulary.yaml`, `data/evolutions/heave_log.yaml`, `heave_lead.yaml`, `heave_deep_sea_lead.yaml` new; `freesail/standing/*` only for a new reading kind; `data/scenarios/gate-5b-passage.yaml` new (Ushant to Falmouth); `data/ships/*.yaml` through `tools/gen_ships.py` for the log-line and the lead as fittings if the file wants them; `tools/day_log.py` for the passage; `docs/primer/` a chapter on the reckoning; `docs/gates/gate-m5b.md` (the lead writes it at the cut; the package supplies the expected numbers); `docs/dev/TuningNotes.md`; `tests/test_reckoning.py`, `test_sights.py`, `test_checkpoint.py` new, `tests/test_known_truths.py` truths 58 and 59 and the pace truth for the passage)
 
-As spec M5 §31 after decision 29 (owner, 2026-09-30): 33a the reckoning with the log-line
-and the lead, the noon sight, the captain's chart in the browser and a verified
-checkpoint save (§13, §14's noon latitude, §15, §17; truths 58 and 59; gate 5b cut;
-Fable); 33b the chronometer, the moon and the lunar (§14's rest; truths 60 and 61; Fable);
+Spec M5 §13, §14's noon latitude, §15, §17, §20 as revised by decision 29; `Navigation1805.md`
+§1, §3 (every error term and its source), §4(a) and §5; `InwardAndOutward.md` (the master
+as a person with a place and a skill is the inward minimum this package needs); the cold
+review's §6 item 6 (the checkpoint save). Fable. The gate 5b package: the passage by the
+reckoning and the noon sight alone, no chronometer, no lunar, no tide (33b and 34, in
+gate 5c's set). The two rules of the chapter govern it: **the world keeps the truth and
+the captain keeps his account**, no reading and no drawing ever gives the truth; and every
+number from the study is checked against its own unverified list before it is a constant.
+
+- **Two positions** (§13; `reckoning.py`). The truth is the physics' `Position` (package
+  32). The reckoning is a position with a two-by-two covariance, advanced each hour by the
+  logged run along the compass course corrected for the chart's variation and the
+  master's leeway allowance and set, grown by the error terms of N §3 as named constants
+  with their sources (the log-line's short-line bias 3 to 8 per cent and the quarter-knot
+  read; the chart's variation a decade old, the 1805 Channel value from the gufm1 field
+  model computed at build and recorded, about two points west; a deviation by heading
+  the navigator cannot know, a few degrees seeded per ship; steering a quarter to half a
+  point; leeway's estimate half a point out close-hauled; the tidal set not allowed for,
+  which until package 34 is the scenario's stated current, none by default), and updated
+  by each observation as a line or a point measurement in the simplest Kalman form,
+  twenty lines of arithmetic, deterministic under the seed (`rng` stream `reckoning`).
+  Tuned so that a day's run of 150 miles in thick weather leaves an ellipse of some 30 to
+  50 miles after four days without a sight, Chan et al.'s figures an upper bound and not
+  a target. The player never sees a matrix: `the reckoning's uncertainty` is the master's
+  words ("I would not trust the reckoning within twenty miles east or west, nor five
+  north or south"). The one rule: the player's errors come from the model's seeded draws;
+  the world's truth from the physics.
+- **Observations as lines and points** (§13). A sounding (`heave the lead` to twenty
+  fathoms with the hand lead, `heave the deep-sea lead` beyond it, which brings her to
+  or runs the line forward at a cost in hands and time, Luce and Lever for the work): the
+  reckoning moves onto the nearest point of the chart's depth contour consistent with the
+  ground (the chart's bottom notes, package 32) and the across-contour uncertainty
+  shrinks, along it stays. A bearing (`take a bearing of <mark>`, refused in words if it
+  is not in sight, the lookout's mark; a degree or two of error) is a line; two cross to
+  a point; a transit (the chart's) is exact. The noon latitude collapses north and south.
+  `work up the reckoning` on demand and automatic at noon (the day's work). `set the
+  reckoning to <lat> <long>` lets the captain override the master, as he could. `heave
+  the log` by order and automatic every hour in the frigate and every two in the
+  schooner (and the cutter and the brig by their type; say which), the reading to a
+  quarter knot with the line's bias. `shape a course for <place>` reads the reckoning
+  and the chart's places, refused where the chart has no such place.
+- **The noon sight** (§14's first sentence; `sights.py`, `sun.py`). Automatic at noon if
+  the sky allows (5a's sky and visibility), refused in cloud in the registry's words ("No
+  sight today; the sun was hid at noon"), with the octant's or the sextant's error (the
+  scenario says which instrument, the frigate a sextant, the schooner an octant) and the
+  horizon's (two to five miles with a good horizon, the sea's motion of 5a widening it,
+  the hook 31 left inert now read). `observe the sun` by order at noon. Double altitudes
+  are not built (§32).
+- **The master** (§14's last paragraph; §22's minimum). The first named person: a name
+  from the ship's list, a skill for the sights, a place (on deck, below) that the day's
+  work occupies. No more of §22 than that; package 35 builds people and places whole.
+- **Readings and log lines** (§15). `the reckoning` ("49° 52' N, 6° 10' W by account");
+  `the reckoning's uncertainty`; `the depth` and `the ground` from the last cast with its
+  age (the absent row of package 32 filled); `the bearing of <mark>` when in sight; `the
+  distance run since noon`; `the course made good`; `the latitude by observation`;
+  `what is in sight` as 32 built it. Each with its absent pattern. Log lines as N §4:
+  "Hove the log: six knots and a half." "By the mark seven; fine grey sand with black
+  specks." "Noon. Latitude by observation 49° 48' N; the reckoning was 49° 56'. Course
+  made good since yesterday ENE, 131 miles. Longitude by account 5° 40' W." The roll-up
+  keeps the noon line and the casts. The standing dialect reads the new rows for nothing
+  (`when the depth is under 40 fathoms then heave the lead every glass`).
+- **The captain's chart** (§17; `queries.py`, `map.js`). The snapshot carries the
+  reckoned position and its ellipse, the track by account, the noon positions, the
+  bearings taken and the soundings with their ground, and **no longer the truth**: package
+  32's `position` leaves the snapshot (the truth is in the save and the tests only). The
+  browser draws the ellipse faintly about the reckoned position, the track by account,
+  the marks of the noon and the casts; the coast and the features as 32 drew them. A
+  `--casual` display of the truth is a later display choice and is not built.
+- **The checkpoint save** (the cold review's item 6; `world.py`, `replay.py`). A save
+  stays a journal by definition; a checkpoint is a snapshot of the world's whole state
+  written beside the journal (the ship's parts and dynamics, the crew, the routine, the
+  runner's instances, the standing book, the weather and the sea, the reckoning, the
+  agents' journals and turns, the rng streams' states), loaded directly by `--load` in
+  seconds, and **proven by a test** that a world loaded from the checkpoint and a world
+  replayed to the same tick carry on to the same digest for a watch. The old save loads
+  as before. The day-long scenarios' `--load` at gate 5b uses it.
+- **The passage** (§20; `gate-5b-passage.yaml`): Ushant to Falmouth in the frigate and
+  in the schooner, neither with a chronometer, on the climatology's weather at seed 7 or
+  a pinned day (say which and why): a departure bearing off the Stiff, the log hove
+  hourly, a noon latitude, the Channel Soundings by the deep-sea lead, the Lizard sighted
+  and bearings taken, the Roads entered; the same passage in thick weather with no sights
+  and a landfall made wrong on purpose (the scenario's sky pinned thick). The cutter and
+  the brig sailed through the same orders (a short leg each). `tools/day_log.py` runs it.
+  The expected numbers for the gate report: the reckoning against the truth at each noon
+  and at the landfall, the ellipse's axes, the casts, the ticks of the notable moments,
+  the digests.
+- **Truths 58 and 59** (§19) and the pace truth for the passage (the queries and the
+  reckoning per tick on the passage, floor 500). Truths 60 to 64 and 66 are 33b's and
+  34's.
+- **The primer**: a chapter on the reckoning (the log-line, the lead and its arming,
+  the traverse, the noon sight, the day's work, what the master's words mean), with
+  orders blocks the primer test runs.
+- **Report**: the suite's last line; every constant with its source and whether the
+  study marked it unverified; the passage's expected numbers as above; the checkpoint's
+  proof and its load time against the replay's; the reckoning's ellipse after one, two
+  and four days of thick weather beside N §3's 30 to 50 miles; anything you could not do
+  and why.
+
+Not in 33a: the chronometer, the moon and the lunar (33b), the tide and the set it gives
+(34), grounding's consequences and anchoring (34), the port and the pilot (35), double
+altitudes, the kedge, the `--casual` display.
+
+## Packages 33b to 37 (outline; written in turn)
+
+As spec M5 §31 after decision 29 (owner, 2026-09-30): 33a above; 33b the chronometer, the moon and the lunar (§14's rest; truths 60 and 61; Fable);
 34 the tide, grounding and anchoring (§16, §18; truths 62 to 64 and 66; Fable); 35 places,
 people, ports and nations, the pilot boarding from the cutter of 32b (§22 to §24, truths
 68 to 70; Fable, the owner's ruling of 2026-09-30, the earlier outline's Opus struck); 36
