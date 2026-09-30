@@ -296,9 +296,11 @@ def test_the_instructions_and_the_door_note_say_what_this_door_is():
     assert "every argument of every tool call" in note and "opt_out" in note
     assert "does not wait for you" in note
     assert "held open until your next turn and returns it, for up to 50 seconds" in note
-    assert "for up to 60 minutes" in M.door_note(M.DEFAULT_WAIT_S)
-    # the ceiling: an hour by default, the owner's observation of 2026-09-28; at most a watch
-    assert M.DEFAULT_WAIT_S == 3600 and M.WAIT_CEILING_MAX_S == 14400
+    # under the Claude Desktop client's four-minute cut (package 31c, playtest 11)
+    assert M.DEFAULT_WAIT_S == M.MCP_WAIT_S == 200 < 240
+    assert "for up to 200 seconds" in M.door_note(M.DEFAULT_WAIT_S)
+    # the ceiling: at most a watch, whatever --wait says
+    assert M.WAIT_CEILING_MAX_S == 14400
     assert M.PROGRESS_EVERY_S == 15 and M.WAIT_SLICE_S == 2
 
 
@@ -433,12 +435,17 @@ def test_a_say_that_waits_in_vain_returns_the_sentence_and_never_hangs(tmp_path)
     assert "The game has had the floor since Morning watch, 8 bells (04:00)" in said
     assert said.endswith("No notable lines have been logged since then.")
     assert waited < 5
-    # stand_by when the floor is the game's is not a reply: the same wait goes on, and the
-    # result says so without a refusal
+    # stand_by when the floor is the game's and the model is not standing by is a stand-by
+    # taken from then (package 31c: the bell it names, falling before the next turn, is not
+    # skipped), recorded for the replay; the result says so without a refusal
     assert again.startswith("The game has the floor;")
-    assert "Your turn has not come yet; this call continues the wait for it." in again
+    assert (
+        "Standing by until a glass; you will be sampled then. Taken while the game had the "
+        "floor." in again
+    )
     assert "Still waiting" in again and "It is not your turn" not in again
-    assert g.world.clock.tick == 0 and not g.harness.agent.standing_by
+    assert g.world.clock.tick == 0 and g.harness.agent.standing_by
+    assert g.harness.transcript[-1]["door"] == "stand_by"
 
 
 def test_the_captain_asks_from_the_game_and_the_answer_is_heard(tmp_path):
@@ -666,10 +673,12 @@ def test_a_wait_cut_off_with_no_turn_in_it_is_only_noted_and_the_next_call_runs(
     t.join(timeout=5)
     assert not t.is_alive() and got["r"].startswith("The game has the floor")
     nxt = b.call("stand_by", {"until": "a glass"}, call_id=b.begin_call())
-    assert "this call continues the wait" in nxt  # it ran
+    # it ran: a stand-by taken while the game had the floor (package 31c)
+    assert "Standing by until a glass; you will be sampled then. Taken while the game" in nxt
     assert nxt.endswith(
         "no turn had opened in it, so nothing was lost. If the client cuts every call about "
-        "that long, the owner may start the bridge with --wait 50.)"
+        "that long, the owner may start the bridge with a shorter --wait, 50 for a client "
+        "that cuts at a minute.)"
     )
 
 
@@ -975,6 +984,23 @@ def test_the_command_line_needs_the_model_name(capsys):
     with pytest.raises(SystemExit):
         M.main([])
     assert "--model-name" in capsys.readouterr().err
+
+
+def test_the_held_call_waits_under_the_desktop_clients_cut_and_wait_overrides_it(capsys):
+    """Playtest 11's finding 2 (package 31c): Claude Desktop cuts a tool call at four real
+    minutes, so the bridge holds one for 200 seconds by default and comes back with the
+    honest digest before the cut; `--wait` still sets it, up to the ceiling."""
+    game = GameClient("http://testserver")
+    assert M.Bridge(game, WEIGHTS).wait == M.MCP_WAIT_S == 200.0 < 4 * 60
+    assert M.Bridge(game, WEIGHTS, wait=50).wait == 50
+    assert M.Bridge(game, WEIGHTS, wait=10**6).wait == M.WAIT_CEILING_MAX_S
+    with pytest.raises(SystemExit):
+        M.main(["--help"])
+    usage = " ".join(capsys.readouterr().out.split())
+    assert "(default 200, under Claude Desktop's four-minute cut;" in usage
+    assert M.still_waiting(None, 200.0).startswith(
+        "Still waiting: this call waited 200 seconds and no turn opened."
+    )
 
 
 def test_the_repository_mcp_json_points_claude_code_at_the_bridge(tmp_path):

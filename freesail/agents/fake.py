@@ -115,12 +115,23 @@ class Transcript:
         self.replies.extend(replies)
 
 
+def readings_so_far(turns: Sequence[Turn]) -> dict[str, Any]:
+    """The readings as the conversation has them: every sample's in turn, each after the
+    first holding only what changed (package 31c), the sails as the last sample that had
+    them gave them (the rows, or the one line)."""
+    out: dict[str, Any] = {}
+    for t in turns:
+        if t.role == DATA and isinstance(t.content, dict) and "readings" in t.content:
+            out.update(t.content.get("readings") or {})
+    return out
+
+
 def narrate(last: dict[str, Any], turns: Sequence[Turn]) -> Reply:
     """The built-in watcher's line: the readings in a sentence, and an answer to a
     question. After a tool result it says nothing more."""
     if "tool_results" in last:
         return Reply()
-    r = last.get("readings") or {}
+    r = readings_so_far(turns)
     question = last.get("question")
     reason = str(last.get("reason", ""))
     parts = []
@@ -143,6 +154,10 @@ def narrate(last: dict[str, Any], turns: Sequence[Turn]) -> Reply:
     calls: tuple[ToolCall, ...] = ()
     if question:
         sails = r.get("sails") or {}
+        if isinstance(sails, str):  # the sails in one line (package 31c)
+            answer = f"The sails: {sails}. {text}".rstrip()
+            calls = (ToolCall("answer", {"text": f"You asked {question}. {answer}".strip()}),)
+            return Reply(calls=calls)
         drawing = [n for n, s in sails.items() if s in ("set", "drawing", "goose winged")]
         shaking = [n for n, s in sails.items() if s in ("shaking", "aback")]
         if sails:

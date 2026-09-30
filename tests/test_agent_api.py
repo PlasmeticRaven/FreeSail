@@ -396,8 +396,15 @@ def test_a_reply_out_of_turn_reads_leaves_or_is_refused_in_words(tmp_path):
     a = g.reply("", ("readings", {}))
     assert a["out_of_turn"] and "true_wind_speed" in a["results"][0]["result"]
     assert "It is not your turn" in a["words"]
+    # the journal is written out of turn (package 31c): it changes nothing in the game
     a = g.reply("", ("journal", {"note": "late"}))
-    assert "Nothing was run." in a["words"] and g.harness.journal.entries == []
+    assert a["out_of_turn"] and [e.text for e in g.harness.journal.entries] == ["late"]
+    assert a["results"][0]["result"] == (
+        "Noted in the journal; the game still has the floor until your next turn."
+    )
+    assert g.harness.transcript[-1]["door"] == "journal"
+    a = g.reply("", ("submit_order", {"text": "set the royals"}))
+    assert "Nothing was run." in a["words"]
     assert a["interim"] == {
         "since": "Morning watch, 8 bells (04:00)",
         "until": None,

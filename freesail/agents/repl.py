@@ -165,7 +165,11 @@ def render_turn(turn: Turn) -> str:
     else:
         out.append("No new log lines.")
     r = d.get("readings") or {}
-    out.append("Readings:")
+    if d.get("readings_are"):
+        # a sample after the first: the readings changed since the last (package 31c)
+        out.append(f"Readings, {d['readings_are']}:" if r else "Readings: none has changed.")
+    else:
+        out.append("Readings:")
     for k, v in r.items():
         if isinstance(v, dict):
             out.append(f"  {k}: " + "; ".join(f"{a} {b}" for a, b in v.items()))

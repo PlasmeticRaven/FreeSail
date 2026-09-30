@@ -46,7 +46,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from freesail import units
-from freesail.agents.agent import OPT_OUT_TOKEN, SHELF_LIFE_TURNS, number_words
+from freesail.agents.agent import (
+    OPT_OUT_TOKEN,
+    SHELF_LIFE_TURNS,
+    WEATHER_EVENT_WORDS,
+    number_words,
+)
 from freesail.api import readings as R
 from freesail.core.events import Severity
 
@@ -161,6 +166,74 @@ def readings_words(world: World) -> dict[str, Any]:
     return out
 
 
+# The order the sail line names the states in (package 31c): what is wrong first, then
+# what draws, then what is stowed; a state not named here after these, as it comes.
+SAIL_LINE_ORDER: tuple[str, ...] = (
+    "aback",
+    "shaking",
+    "blown out",
+    "wrecked",
+    "set",
+    "goose winged",
+    "sheeted",
+    "loosed",
+    "in the gear",
+    "furled",
+    "unbent",
+)
+
+# The ship's groups the sail line prefers when both would do: the sail plans themselves
+# ("plain sail and the royals set", playtest 11's words).
+SAIL_PLANS: tuple[str, ...] = ("all sail", "plain sail")
+
+
+def sail_line(world: World, sails: dict[str, str] | None = None) -> str:
+    """Every sail's state in one line, in the readings' own words (package 31c; playtest
+    11's finding 1): "plain sail, the royals and the flying jib set; the studdingsails
+    furled; the storm canvas and the occasional sails unbent". For each state, the sails in
+    it are named by the ship's own groups where a whole group is in that state (the sail
+    plans first, then the largest), and one by one for the rest, so the line says every
+    sail's state and a reader who knows the ship's groups (library, 'the ship') reads the
+    rows back from it. `sails` is the readings' `sails` (a sail's name to its words); the
+    readings tool gives the rows."""
+    ship = world.ship
+    if sails is None:
+        sails = readings_words(world).get("sails") or {}
+    from freesail.orders.resolve import display_name
+
+    ids = {display_name(ship, sid): sid for sid in getattr(ship, "sails", {})}
+    by_state: dict[str, list[str]] = {}
+    for name, words in sails.items():
+        by_state.setdefault(str(words), []).append(ids.get(name, name))
+    groups = [
+        (g, tuple(members))
+        for g, members in (getattr(ship, "groups", None) or {}).items()
+        if len(members) >= 2 and all(m in ids.values() for m in members)
+    ]
+    order = [s for s in SAIL_LINE_ORDER if s in by_state]
+    order += [s for s in by_state if s not in order]
+    parts = []
+    for state in order:
+        left = list(by_state[state])
+        names: list[str] = []
+        while True:
+            fits = [(g, m) for g, m in groups if all(x in left for x in m)]
+            if not fits:
+                break
+            g, members = min(
+                fits, key=lambda gm: (gm[0] not in SAIL_PLANS, -len(gm[1]), groups.index(gm))
+            )
+            names.append(g if g.endswith(" sail") else f"the {g}")
+            left = [x for x in left if x not in members]
+        names += [f"the {display_name(ship, x)}" if x in ship.parts else x for x in left]
+        parts.append(f"{_and_list(names)} {state}")
+    return "; ".join(parts)
+
+
+def _and_list(names: list[str]) -> str:
+    return names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
+
+
 # The readings the welfare detector leaves out of its digest: the clock moves whether or
 # not the world answers an order, so a bell struck between two submissions of the same
 # order is not "a change in the readings" (spec §11; judgement).
@@ -185,12 +258,28 @@ def readings_digest(world: World) -> str:
 
 
 def read_log(
-    world: World, station: str, since_tick: int = 0, severity: str = "routine"
+    world: World, station: str, since_tick: int | None = None, severity: str = "routine"
 ) -> dict[str, Any]:
+    """The log from `since_tick` on, at `severity` or above. With no tick, from the
+    station's last sample (package 31c; playtest 11's finding 4: a read with no tick
+    returned the whole day): what came since the model last had its turn, the lines of
+    that turn's own tick included. The result says the tick it read from."""
     sev = Severity(str(severity or "routine").lower())
-    events = [e for e in world.log if e.tick >= int(since_tick) and e.severity.rank >= sev.rank]
+    since = _last_sampled(world, station) if since_tick is None else int(since_tick)
+    events = [e for e in world.log if e.tick >= since and e.severity.rank >= sev.rank]
     omitted = max(0, len(events) - READ_LOG_LIMIT)
-    return {"lines": [log_line(e) for e in events[-READ_LOG_LIMIT:]], "omitted": omitted}
+    return {
+        "since_tick": since,
+        "lines": [log_line(e) for e in events[-READ_LOG_LIMIT:]],
+        "omitted": omitted,
+    }
+
+
+def _last_sampled(world: World, station: str) -> int:
+    """The tick of the station's last sample (a fold into an open turn counts), or 0."""
+    harness = getattr(world, "agents", {}).get(station)
+    tick = harness.agent.last_sample_tick if harness is not None else None
+    return int(tick) if tick is not None else 0
 
 
 def readings(world: World, station: str) -> dict[str, Any]:
@@ -322,12 +411,14 @@ TOOLS: dict[str, Tool] = {
     for t in (
         Tool(
             "read_log",
-            "The ship's log from a tick onwards, at a severity or above: 'routine' is "
-            "everything, 'notable' what a sailor would remark on, 'urgent' what carried "
-            "away or went wrong. Returns the lines (tick, stamp, severity, kind, text) and "
-            "how many older ones were left out.",
+            "The ship's log from a tick onwards, by default from your last sample, at a "
+            "severity or above: 'routine' is everything, 'notable' what a sailor would "
+            "remark on, 'urgent' what carried away or went wrong. Returns the tick it read "
+            "from, the lines (tick, stamp, severity, kind, text) and how many older ones "
+            "were left out.",
             {
-                "since_tick": "int, optional: the first tick wanted (0 for the start)",
+                "since_tick": "int, optional: the first tick wanted (by default your last "
+                "sample's; 0 for the start of the log)",
                 "severity": "string, optional: routine, notable or urgent",
             },
             read_log,
@@ -336,7 +427,9 @@ TOOLS: dict[str, Tool] = {
             "readings",
             "Every reading the ship has now, in words: the true and apparent wind, the "
             "heading and course, the speed, leeway, heel and helm, the watch and the bells, "
-            "daylight, the strain, the hands, and each sail's state.",
+            "daylight, the strain, the hands, the glass, the sky and the sea, and each "
+            "sail's state by its name (a sample gives only the readings that changed, and "
+            "the sails in one line).",
             {},
             readings,
         ),
@@ -379,20 +472,22 @@ TOOLS: dict[str, Tool] = {
             "once. `until` is an event's words as "
             f"the standing dialect knows them ({STAND_BY_EVENTS}), an interval ('a glass', "
             "'an hour', 'a watch', '5 minutes', 'ten minutes'), 'a notable event' or 'an "
-            "urgent event'. An event is matched on the kind of the log's line, not its "
-            "words: 'a strain warning' wakes you on every strain line whatever its prose "
+            "urgent event'. An event the log says is matched on the kind of its line, not "
+            "its words: 'a strain warning' wakes you on every strain line whatever its prose "
             "('working under the press of sail', 'bending like a whip', 'straining at the "
-            "bolt-ropes', 'bar-taut and surging on the pin'). An urgent line in the log ends "
-            "any stand-by and wakes you, its line named as the reason; the notable lines "
-            "logged while you stood by come with the sample that wakes you, counted and "
-            "listed.",
+            f"bolt-ropes', 'bar-taut and surging on the pin'). {WEATHER_EVENT_WORDS} What "
+            "you stand by for that came while your call was on its way wakes you at once. "
+            "An urgent line in the log ends any stand-by and wakes you, its line named as "
+            "the reason; the notable lines logged while you stood by come with the sample "
+            "that wakes you, counted and listed.",
             {"until": "string: the event, the interval, 'a notable event' or 'an urgent event'"},
             stand_by,
         ),
         Tool(
             "journal",
             "Write a note in your own journal, which is saved with the game and shown on "
-            "request. It is your record; nothing acts on it.",
+            "request. It is your record; nothing acts on it. It may be written at any time, "
+            "a stand-by going on through it.",
             {"note": "string: the note"},
             journal,
         ),
@@ -504,7 +599,7 @@ def book_of(name: str, args: dict[str, Any], result: Any) -> tuple[str, str] | N
     if name == "read_log" and isinstance(result, dict) and "lines" in result:
         if tokens(json.dumps(result, ensure_ascii=False)) <= BOOK_SIZE_TOKENS:
             return None
-        since = int(args.get("since_tick") or 0)
+        since = int(result.get("since_tick") or args.get("since_tick") or 0)
         sev = str(args.get("severity") or "routine").lower()
         title = f"the log from tick {since}" + ("" if sev == "routine" else f", {sev} and above")
         again = f"read_log(since_tick={since}" + (
@@ -880,8 +975,10 @@ def _grammar_topic() -> Topic:
     )
     dialect = standing_dialect_lines(vocab)
     station = [
-        "The station sentences the captain uses: 'ask the watcher <question>', 'stand down "
-        "the watcher', 'resume the watcher', \"show the watcher's journal\"."
+        "The station sentences the captain uses: 'ask the watcher <question>', 'tell the "
+        "watcher <words>' (also: say to the watcher; no answer is owed), 'stand down the "
+        "watcher', 'resume the watcher', \"show the watcher's journal\". A standing order may "
+        "tell or ask too, after 'then'."
     ]
     whole = "\n".join([*order, "", *dialect, "", *station])
     parts = _split_lines(
@@ -1226,14 +1323,24 @@ def standing_dialect_lines(vocab: Any = None) -> list[str]:
         "<order> [; <order> ...]",
         "The name is in quotes. The orders after 'then' are ordinary orders of the language "
         "above, separated by semicolons, and are checked when the standing order is given. "
-        "'by the <officer>' is for an officer's order; the captain's is the default, and "
-        "the senior's stands when two conflict on the same part.",
+        "Among them 'tell the watcher <words>' and 'ask the watcher <question>' say a word "
+        "or put a question to a station aboard, as the captain's own would, and the log names "
+        "the standing order: \"By standing order 'sea': the captain to the watcher: the sea is "
+        "getting up\". 'by the <officer>' is for an officer's order; the captain's is the "
+        "default, and the senior's stands when two conflict on the same part.",
         "Triggers:",
         "  when <condition> [for <duration>]: fires once when the condition comes to hold "
         "(for that long, if a duration is given), and not again until it has been false "
         "for five minutes and the work it started is done",
         f"  at <event>: once each time the event happens. The events: {events}; later, when "
-        f"the world has them: {later}",
+        f"the world has them: {later}. The weather's that are its readings' changes are "
+        "measured from when the order stands, and afresh after each firing: 'a wind shift' "
+        "is the mean wind a point or more from where it stood; 'the glass falling fast' its "
+        "tendency coming to falling fast, and 'the glass turning' the last hour's change "
+        "going against the three hours' ('when the glass is turning'), each once until it "
+        "has been an hour without; 'the sea getting up' its "
+        "words changing upward ('when the sea gets up'); 'a change in the sky' is the sky's "
+        "or the weather's line in the log",
         "  every <interval>: on the interval, never queuing more than one: a glass, a bell, "
         "half an hour, an hour, a watch, or a number of minutes ('every 10 minutes')",
         "Conditions: a reading and a comparison, joined by 'and' (no 'or'): 'the true wind "

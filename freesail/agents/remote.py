@@ -76,7 +76,7 @@ from freesail.agents.agent import (
     SamplingPolicy,
     watcher,
 )
-from freesail.agents.harness import Harness, Playback, _reason_after_token
+from freesail.agents.harness import Harness, Playback, _reason_after_token, full_stop
 from freesail.agents.model import DATA, MODEL, OPERATOR, Reply, ToolCall, Turn
 
 if TYPE_CHECKING:
@@ -113,8 +113,10 @@ POLL_RECHECK_S = 0.25
 # The tools that run out of turn: they read and change nothing in the game (`tools.py`).
 READ_ONLY_TOOLS: tuple[str, ...] = ("read_log", "readings", "state", "library")
 
-# ...and with them, out of turn, `shelve`, which changes only what the model is shown.
-ASIDE_TOOLS: tuple[str, ...] = (*READ_ONLY_TOOLS, "shelve")
+# ...and with them, out of turn, `shelve`, which changes only what the model is shown, and
+# `journal`, which changes nothing in the game (package 31c; playtest 11's finding 5: the
+# journal refused while standing by). A stand-by goes on through either.
+ASIDE_TOOLS: tuple[str, ...] = (*READ_ONLY_TOOLS, "shelve", "journal")
 
 # The doors the API serves, in the words a consent record's runtime and a stand-down use.
 DOORS: dict[str, tuple[str, str]] = {
@@ -567,31 +569,65 @@ class Desk:
                 {"name": c.name, "args": dict(c.args), "result": h.aside(c)} for c in reply.calls
             ]
             return {"out_of_turn": True, "results": results, "words": self.no_floor_words(seat)}
+        stood = self._stand_by_out_of_turn(h, reply)
+        if stood is not None:
+            return stood
         lost = " Your words were not logged." if reply.text.strip() else ""
         ran = " Nothing was run." if reply.calls else ""
         return {"out_of_turn": True, "words": f"{self.no_floor_words(seat)}{lost}{ran}"}
+
+    def _stand_by_out_of_turn(self, h: Harness, reply: Reply) -> dict[str, Any] | None:
+        """A stand-by asked for while the game has the floor and the model is waiting for
+        its next turn (a door's call re-issued after its client cut the last one): taken
+        now, as a decision from outside the loop recorded for the replay, so that the bell
+        or the event it names, falling before the next turn, wakes it and is not skipped
+        (package 31c; playtest 11's finding 6: "eight bells" asked at 03:58 woke it at
+        08:00). None when the reply is not that one call, or the model is standing by
+        already (its wait goes on) or paused."""
+        a = h.agent
+        if len(reply.calls) != 1 or reply.text.strip() or a.paused or a.standing_by:
+            return None
+        c = reply.calls[0]
+        if c.name != "stand_by" or set(c.args) != {"until"}:
+            return None
+        result = h.door_act("stand_by", str(c.args.get("until") or ""), "out of turn")
+        return {
+            "out_of_turn": True,
+            "stood_by": a.standing_by,
+            "results": [{"name": c.name, "args": dict(c.args), "result": result}],
+            "words": self.no_floor_words_of(h),
+        }
 
     def no_floor_words(self, seat: Seat) -> str:
         h = seat.harness
         if h is None or h.agent.released:
             return self.released_words(seat)
+        return self.no_floor_words_of(h)
+
+    @staticmethod
+    def no_floor_words_of(h: Harness) -> str:
         a = h.agent
+        meanwhile = (
+            "You may read (read_log, readings, state, library), write in your journal and "
+            "shelve a book meanwhile."
+        )
         if a.paused:
             return (
                 f"Your turns are paused: {a.pause_reason}. The captain has been asked whether "
                 "to continue; you were not stopped. You may still read (read_log, readings, "
-                "state, library) and shelve a book, or leave with the token."
+                "state, library), write in your journal and shelve a book, or leave with the "
+                "token."
             )
         if a.standing_by and a.stand_by is not None:
             return (
                 f"You are standing by until {a.stand_by.words}; your turn comes then, at an "
                 "urgent line, or when the captain asks you something. Words of your own end "
-                "the stand-by now."
+                f"the stand-by now. {meanwhile}"
             )
         return (
             "It is not your turn: the game has the floor until your next turn (the glass, a "
             "notable event, the end of a stand-by, or a question from the captain). Words of "
-            "your own open it now."
+            f"your own open it now; stand_by(until) stands by from now. {meanwhile}"
         )
 
     def released_words(self, seat: Seat) -> str:
@@ -599,8 +635,8 @@ class Desk:
         if seat.phase == STOPPED or h is None:
             return seat.words or "No station is offered in this session."
         return (
-            f"The station is released: {h.agent.released_reason}. The game is saved; nothing "
-            "more is asked of you here."
+            f"The station is released: {full_stop(h.agent.released_reason)} The game is "
+            "saved; nothing more is asked of you here."
         )
 
     # -- the owner's word, the release --------------------------------------------------
