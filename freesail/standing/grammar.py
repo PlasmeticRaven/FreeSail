@@ -375,6 +375,8 @@ _HOW = {
     "hands": ("the hands", "by their number or their fatigue: 'are worn out'"),
     "gust": ("the wind against its mean", "as a gust, at the mean or a lull: 'is a lull'"),
     "glass": ("the glass", "in inches: 'is under 29.5 inches'"),
+    "sight": ("the land", "as in sight or not in sight"),
+    "depth": ("the depth of water", "in fathoms: 'is under 10 fathoms'"),
     "tendency": (
         "the glass",
         "by its tendency: is steady, is rising, is falling, is falling fast, is rising fast, "
@@ -519,6 +521,7 @@ _SPEED_UNITS = ("knots", "knot", "kn")
 _ANGLE_UNITS = ("degrees", "degree")
 _COUNT_UNITS = ("hands", "men", "hand", "man")
 _GLASS_UNITS = ("inches", "inch")
+_DEPTH_UNITS = ("fathoms", "fathom", "fm")
 
 
 def _starts(tokens: list[str], i: int, phrase: str) -> int:
@@ -798,6 +801,7 @@ def _parse_comparison(
             ("visibility", _VISIBILITY_SAID),
             ("sea", _SEA_SAID),
             ("motion", _MOTION_SAID),
+            ("sight", _SIGHT_SAID),
         ):
             row = _pick(cands, (kind,))
             if row is None:
@@ -873,10 +877,19 @@ def _parse_comparison(
                 Comparison(op, float(value), f"{phrase.split()[-1]} {value:g} inches"),
                 n + used + 1,
             )
+        if unit in _DEPTH_UNITS:
+            row = _pick(cands, ("depth",))
+            if row is None:
+                raise OrderError(f"'{match.phrase}' is compared in {_unit_of(cands)}, not fathoms.")
+            return (
+                row,
+                Comparison(op, float(value), f"{phrase.split()[-1]} {value:g} fathoms"),
+                n + used + 1,
+            )
         if unit and unit not in _STOP:
             raise OrderError(f"'{match.phrase}' is compared in {_unit_of(cands)}, not {unit}.")
         # no unit said: the reading's own
-        row = _pick(cands, ("speed", "angle", "strain", "hands", "glass"))
+        row = _pick(cands, ("speed", "angle", "strain", "hands", "glass", "depth"))
         if row is None:
             raise refuse()
         unit_words = {
@@ -885,6 +898,7 @@ def _parse_comparison(
             "strain": "",
             "hands": "",
             "glass": " inches",
+            "depth": " fathoms",
         }[row.kind]
         return (
             row,
@@ -967,6 +981,12 @@ _SEA_SAID.update(
         "calm": "smooth",
     }
 )
+# the land (package 32): in sight or not, the lookout's word
+_SIGHT_SAID: dict[str, str] = {
+    "in sight": "in sight",
+    "not in sight": "not in sight",
+    "out of sight": "not in sight",
+}
 _MOTION_SAID: dict[str, str] = {w: w for w in R.MOTION_STATE_WORDS}
 _MOTION_SAID.update(
     {
@@ -986,6 +1006,8 @@ def _unit_of(cands: list[R.Reading]) -> str:
     kinds = {c.kind for c in cands}
     if kinds & {"glass"}:
         return "inches"
+    if kinds & {"depth"}:
+        return "fathoms"
     if kinds & {"speed"}:
         return "knots"
     if kinds & {"angle"}:

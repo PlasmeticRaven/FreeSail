@@ -429,19 +429,25 @@ def test_the_readings_on_a_ship_with_a_chart_and_on_one_without():
     assert any(line.startswith("In sight:") for line in with_chart.summary_lines())
 
 
-def test_the_grammar_refuses_the_lands_new_kind_in_words_until_the_dialect_learns_it():
-    """The rows `the land`, `what is in sight` and `the depth of water` are registered with
-    the kinds `sight` and `depth`, which the standing grammar and the rules do not yet
-    compare (package 32 stays out of freesail/standing/, which package 31c has this wave;
-    the two hunks the dialect needs are in the package's report). Until then the grammar
-    refuses the line in words that name the reading, and never crashes."""
-    from freesail.orders.errors import OrderError
+def test_the_dialect_reads_the_land_and_the_depth_of_water():
+    """The rows `the land` and `the depth of water` (kinds `sight` and `depth`, package 32)
+    are the standing dialect's for nothing, as every reading is (spec M5 §15; the two hunks
+    the package's report named, applied by the lead at the merge after 31c landed): `when
+    the land is in sight`, `when the land is not in sight`, `when the depth of water is under
+    10 fathoms`, evaluated against the world's own readings."""
     from freesail.standing.grammar import parse_condition
 
-    ship = chart_world(50.12, -5.03).ship
-    for text in ("the land is in sight", "the depth of water is under 10 fathoms"):
-        with pytest.raises(OrderError):
-            parse_condition(text, ship)
+    inshore = chart_world(50.12, -5.03)  # Falmouth's mouth: land in sight, shallow water
+    offing = chart_world(49.0, -6.5)  # the Channel's mouth: nothing in sight, deep water
+    for text, near, far in (
+        ("the land is in sight", True, False),
+        ("the land is not in sight", False, True),
+        ("the depth of water is under 30 fathoms", True, False),
+        ("the depth of water exceeds 30 fathoms", False, True),
+    ):
+        c = parse_condition(text, inshore.ship)
+        assert c.holds(inshore.readings, {}) is near, text
+        assert c.holds(offing.readings, {}) is far, text
 
 
 def test_she_takes_the_ground_and_the_log_says_so_once_and_comes_off_again():

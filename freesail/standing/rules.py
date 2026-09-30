@@ -237,6 +237,13 @@ class Clause:
             return holds if op == "is" else not holds
         if kind == "glass":
             return value > v if op == "gt" else value < v
+        if kind == "sight":  # the land (package 32): the lookout's word, in sight or not
+            words = value["words"] if isinstance(value, dict) else str(value)
+            holds = (words == v) if v == "in sight" else (words != "in sight")
+            return holds if op == "is" else not holds
+        if kind == "depth":  # the depth of water by the chart, in fathoms
+            fm = units.m_to_fathoms(value)
+            return fm > v if op == "gt" else fm < v
         if kind == "sail":
             return _sail_is(value, v) if op == "is" else not _sail_is(value, v)
         if kind == "strain":
