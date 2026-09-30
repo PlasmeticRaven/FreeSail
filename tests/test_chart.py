@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import importlib.util
 import math
+import subprocess
 import sys
 import time
 from datetime import datetime
@@ -45,9 +46,9 @@ SCHOONER = "data/ships/topsail-schooner.yaml"
 REGION = "channel-west"
 
 # The brief's budget for the committed region (C §5.3; package 32): the region's tiles and
-# coast under 25 MB compressed; the world level about 25 MB.
+# coast under 25 MB compressed. The world and the Atlantic levels are the tool's and are
+# not committed (spec M5 §10).
 REGION_BUDGET_BYTES = 25 * 1024 * 1024
-WORLD_BUDGET_BYTES = 30 * 1024 * 1024
 
 LIZARD = Position(49.9594, -5.2067)
 OFF_THE_LIZARD = Position(49.90, -5.20)
@@ -182,13 +183,26 @@ def test_the_regions_tiles_are_present_committed_and_under_the_brief_size(manife
     total += (CHARTS / region["coast"]).stat().st_size
     total += (CHARTS / region["features"]).stat().st_size
     assert total < REGION_BUDGET_BYTES, f"{total / 1e6:.1f} MB"
-    world = manifest["world"]
-    assert world and world["level"] == 0 and len(world["tiles"]) >= 100
-    world_bytes = sum(
-        (CHARTS / "tiles" / "0" / f"{t['name']}.npz").stat().st_size for t in world["tiles"]
-    )
-    assert world_bytes < WORLD_BUDGET_BYTES, f"{world_bytes / 1e6:.1f} MB"
-    assert manifest["atlantic"] is None  # fetched by the tool, never committed
+    # the world and the Atlantic are built by the tool and never committed (spec M5 §10):
+    # the manifest says so, and no tile of theirs is in the repository's files
+    tool = build_tool()
+    for key, level, flag in (("world", 0, "--world"), ("atlantic", 1, "--atlantic")):
+        entry = manifest[key]
+        assert entry["level"] == level and entry["committed"] is False
+        assert flag in entry["built_by"]
+        for t in entry.get("tiles") or []:
+            # a tile the tool made here is named by its corner in whole seconds
+            s, w = int(t["south_sec"]), int(t["west_sec"])
+            assert t["name"] == tool.tile_name(s, w)
+            assert (s + 90 * 3600) % tool.tile_span_sec(level) == 0
+    tracked = subprocess.run(
+        ["git", "ls-files", "data/charts/tiles/0", "data/charts/tiles/1"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    ).stdout.split()
+    assert tracked == []
 
 
 # ---------------------------------------------------------------------------
@@ -252,12 +266,13 @@ def test_depth_here_off_the_lizard_in_carrick_roads_and_in_mid_channel(chart):
     mid = chart.depth_at(MID_CHANNEL)
     assert 70.0 < off < 90.0 and 8.0 < roads < 40.0 and 85.0 < mid < 100.0
     assert chart.depth_at(Position(50.153, -5.070)) < 0  # Falmouth town stands above the datum
-    # beyond the region the world level answers, coarsely; where its all-land tiles were
-    # dropped nothing answers
-    assert chart.depth_at(Position(45.0, -20.0)) > 3000.0  # the Atlantic, from level 0
-    assert chart._finest_level(Position(45.0, -20.0)).level == 0
-    assert chart.depth_at(Position(30.0, 85.0)) < 0  # Tibet: land, clipped at fifty metres
-    assert chart.depth_at(Position(30.0, 85.0)) == -50.0
+    # beyond the region nothing answers unless the tool's world level was built here (it
+    # is never committed): then it answers coarsely
+    atlantic = Position(45.0, -20.0)
+    if chart._finest_level(atlantic) is None:
+        assert chart.depth_at(atlantic) is None
+    else:
+        assert chart._finest_level(atlantic).level == 0 and chart.depth_at(atlantic) > 3000.0
     # the finest level answers first: the harbour patch under Carrick Roads
     assert chart._finest_level(CARRICK_ROADS).level == 3
     assert chart._finest_level(MID_CHANNEL).level == 2

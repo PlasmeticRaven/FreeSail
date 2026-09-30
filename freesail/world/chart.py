@@ -564,15 +564,20 @@ class Chart:
         listed: dict[int, set[str]] = {}
         for lv, tiles in (self.spec.get("tiles") or {}).items():
             listed[int(lv)] = {t["name"] for t in tiles}
+        # the world and the Atlantic are the tool's and not committed (spec M5 §10): only
+        # the tiles actually present under tiles/<level>/ count, and none is no level
         world = manifest.get("world")
         if world and world.get("tiles"):
-            listed[int(world["level"])] = {t["name"] for t in world["tiles"]}
+            folder = root / "tiles" / str(world["level"])
+            names = {t["name"] for t in world["tiles"] if (folder / f"{t['name']}.npz").exists()}
+            if names:
+                listed[int(world["level"])] = names
         atlantic = manifest.get("atlantic")
         if atlantic and atlantic.get("tiles"):
-            names = {t["name"] for t in atlantic["tiles"]}
             folder = root / "tiles" / str(atlantic["level"])
-            # the Atlantic is not committed: only the tiles actually present count
-            listed[int(atlantic["level"])] = {n for n in names if (folder / f"{n}.npz").exists()}
+            names = {t["name"] for t in atlantic["tiles"] if (folder / f"{t['name']}.npz").exists()}
+            if names:
+                listed[int(atlantic["level"])] = names
         for lv in sorted(listed, reverse=True):
             spec = level_specs.get(str(lv)) or {}
             self.levels.append(

@@ -1525,10 +1525,12 @@ class Build:
             },
             "nodata": NODATA,
             "regions": regions,
-            "world": gebco_levels.get("0"),
-            "atlantic": (
-                {**gebco_levels["1"], "committed": False} if "1" in gebco_levels else None
-            ),
+            # the world and the Atlantic are built by --world and --atlantic on the
+            # developer's machine and never committed (spec M5 §10): the manifest says so,
+            # lists their tiles only when this build made them, and the runtime reads
+            # only the tiles that are present
+            "world": _fetched_level(gebco_levels.get("0"), 0, WORLD, "--world"),
+            "atlantic": _fetched_level(gebco_levels.get("1"), 1, ATLANTIC, "--atlantic"),
             "sources": sources,
             "attribution": attribution,
             "notes": notes,
@@ -1542,6 +1544,30 @@ class Build:
             encoding="utf-8",
         )
         return path
+
+
+def _fetched_level(
+    built: dict[str, Any] | None, level: int, box: dict[str, float], flag: str
+) -> dict[str, Any]:
+    """The manifest's entry for a level the tool builds and the repository does not carry
+    (the world and the Atlantic, spec M5 §10): its box, the flag that builds it, `committed:
+    false`, and its tiles only when this build made them."""
+    entry: dict[str, Any] = {
+        "level": level,
+        "bounds": {k: v for k, v in box.items() if k != "level"},
+        "committed": False,
+        "built_by": f"python tools/build_charts.py {flag}",
+        "note": (
+            "built by the tool on the developer's machine and not committed; the runtime "
+            "reads the tiles that are present under tiles/<level>/ and nothing else"
+        ),
+    }
+    if built:
+        entry["tiles"] = built["tiles"]
+        entry["bytes"] = built["bytes"]
+    else:
+        entry["tiles"] = []
+    return entry
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -1580,10 +1606,12 @@ def main(argv: list[str] | None = None) -> int:
         # the world level as the last manifest lists it, its tiles checked present
         last = yaml.safe_load((CHARTS_DIR / "manifest.yaml").read_text(encoding="utf-8"))
         world = (last or {}).get("world")
-        if world:
-            for t in world["tiles"]:
-                if not (CHARTS_DIR / "tiles" / "0" / f"{t['name']}.npz").exists():
-                    raise SystemExit(f"--reuse-world: the tile {t['name']} is missing; run --world")
+        present = bool(world and world.get("tiles")) and all(
+            (CHARTS_DIR / "tiles" / "0" / f"{t['name']}.npz").exists() for t in world["tiles"]
+        )
+        if not present:
+            build.log("--reuse-world: the world level is not present; the manifest says so.")
+        else:
             gebco_levels["0"] = world
             for f in (last.get("sources") or {}).get("gebco_2025", {}).get("fetched", []):
                 if f.get("file", "").endswith("gebco_2025_geotiff.zip"):

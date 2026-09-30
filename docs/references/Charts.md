@@ -14,7 +14,7 @@ the page, and no scan is committed.
 
 | Source | Taken | Licence | Text |
 |---|---|---|---|
-| **GEBCO_2025 Grid** (GEBCO Compilation Group, 2025; doi:10.5285/37c52e96-24ea-67ce-e063-7086abc05f29) | Level 0, the world at 2.5′, from the eight global GeoTIFF tiles at CEDA decimated by ten (the block mean, the land clipped at fifty metres above the sea); level 1, the Atlantic at 30″, which the tool builds and does not commit; and the land under level 2 where EMODnet has nothing. Elevation relative to mean sea level. The region's own extract (47.65 to 51.35 N, 7.4 to 2.4 W at 15″) from GEBCO's grid subsetting application. | Public domain: "placed in the public domain and may be used free of charge", with the acknowledgement of the source, no suggestion of official status, and "should NOT be used for navigation". | `licences/gebco-terms-of-use.md` |
+| **GEBCO_2025 Grid** (GEBCO Compilation Group, 2025; doi:10.5285/37c52e96-24ea-67ce-e063-7086abc05f29) | Level 0, the world at 2.5′, from the eight global GeoTIFF tiles at CEDA decimated by ten (the block mean, the land clipped at fifty metres above the sea), and level 1, the Atlantic at 30″: both built by the tool (`--world`, `--atlantic`) on the developer's machine and not committed (spec M5 §10); and, in the committed tiles, the land under level 2 where EMODnet has nothing. Elevation relative to mean sea level. The region's own extract (47.65 to 51.35 N, 7.4 to 2.4 W at 15″) from GEBCO's grid subsetting application. | Public domain: "placed in the public domain and may be used free of charge", with the acknowledgement of the source, no suggestion of official status, and "should NOT be used for navigation". | `licences/gebco-terms-of-use.md` |
 | **EMODnet Bathymetry DTM 2024** (EMODnet Bathymetry Consortium, 2024; doi:10.12770/cf51df64-56f9-4a99-b1aa-36b8d7b743a1) | Level 2, the region at 3″, and level 3, the four harbour patches at 0.5″, sampled bilinearly from the 1/16′ grid; the coast, as the zero contour of the level-2 elevation; the per-tile shoalest sounding from the grid's own per-cell maximum. Elevation relative to lowest astronomical tide, which is the chart datum of levels 2 and 3. Fetched as classic netCDF subsets from EMODnet's ERDDAP service (`bathymetry_dtm_2024`). | Creative Commons Attribution 4.0 International, with the constraint DO NOT USE FOR NAVIGATION. | `licences/cc-by-4.0.txt` |
 | **SHOM MNT bathymétrique de façade Atlantique** (projet HOMONIM, 100 m) | Nothing in this build. The French cross-check the study asks for was not made: the grid is published as 7z archives and the build machine has no reader for them, and the rule that the tool adds no dependency beyond numpy and pyyaml holds. The manifest says so; the recipe is in `data/charts/unverified-checks.yaml`. | Licence Ouverte 2.0 (Etalab), as data.gouv.fr states. | `licences/licence-ouverte-2.0.md` |
 | **SHOM-IGN Histolitt coastline** (the French shoreline) | Nothing in this build: the data.gouv.fr record found is a regional republication with no licence stated, and SHOM's own diffusion is behind a form. The French shore is EMODnet's. | SHOM–IGN's own conditions, to be copied verbatim when fetched. | `licences/shom-ign-histolitt.md` |
@@ -69,10 +69,14 @@ stay unverified and are marked so where they are used.
 
 ## The recipe for the rest
 
-`python tools/build_charts.py --world` fetches the sources into `.cache/charts/` (or
-`--cache DIR`), builds the region and the world level, and writes the manifest;
-`--atlantic` builds level 1 into `tiles/1/`, which is not committed; `--reuse-world` keeps
-the world level as the last manifest lists it after a change of the hand-made files;
-`--skip-fetch` refuses the network. A new region is a recipe in `REGIONS`, a features
+`python tools/build_charts.py` fetches the region's sources into `.cache/charts/` (or
+`--cache DIR`), builds the region and writes the manifest; that is what the repository
+carries. The world and the Atlantic are built on the owner's machine and never committed
+(spec M5 §10): `--world` fetches GEBCO's global GeoTIFF zip (4.2 GB) and writes level 0
+into `tiles/0/` (150 tiles, 26.5 MB, twelve minutes), `--atlantic` level 1 into `tiles/1/`;
+git ignores both folders, the manifest lists their tiles only when the build made them,
+and the runtime reads whichever are present. `--reuse-world` keeps a built world level as
+the last manifest lists it after a change of the hand-made files; `--skip-fetch` refuses
+the network. A new region is a recipe in `REGIONS`, a features
 file and its overrides, and the same run (C §5.2: "adding a region later is adding tiles
 and a features file, nothing else").
