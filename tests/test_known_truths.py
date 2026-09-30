@@ -2549,3 +2549,105 @@ def test_the_pace_on_the_day_under_systems_holds_truth_51s_floor():
         world.run(1000)
         best = max(best, 1000 / (time.perf_counter() - t0))
     assert best >= BUILD_MACHINE_FLOOR, f"{best:.0f} ticks a second"
+
+
+# ---------------------------------------------------------------------------
+# Milestone 5b: the chart, the queries and the lookout (package 32; spec M5 §19)
+# ---------------------------------------------------------------------------
+
+CHART_REGION = "channel-west"
+# The Bishop and St Agnes light (data/charts/features/channel-west.yaml, from White 1835
+# and Trinity House): the light's range in 1805, fifteen miles, from White's "five leagues".
+BISHOP_ROCK = (49.8735, -6.4462)
+ST_AGNES_RANGE_NM = 15.0
+# Where the gate's day is sailed when the region is loaded for the pace truth: off
+# Falmouth, in the open water south of the Manacles (the day's fixture keeps no position,
+# so that its constants do not move; the pace truth adds one).
+OFF_FALMOUTH = {"lat_deg": 49.95, "lon_deg": -5.00}
+
+
+def test_truth_65_the_bishop_is_dark_and_st_agnes_lit_on_a_night_landfall_from_the_south_west():
+    """Spec M5 §19, truth 65: "The Bishop is dark and St Agnes is lit in 1805; a night
+    landfall on Scilly from the south-west sees St Agnes at its range and nothing else."
+    The frigate stands in toward the Bishop from the south-west at night in clear
+    weather: twenty miles off nothing is in sight; within the light's range the lookout
+    hails a light, and it is St Agnes (the reading names it; the lookout does not); the
+    Bishop, four miles nearer, shows nothing, being a bare rock in 1805 (its light is dated
+    1858, and the same landfall in 1860 sees two lights)."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position, bearing_and_distance, destination
+    from freesail.world.lookout import height_of_eye
+
+    chart = load_chart(CHART_REGION)
+    bishop = Position(*BISHOP_ROCK)
+    agnes = chart.feature("st-agnes-light")
+    assert agnes.lit_in(1805) and not chart.feature("bishop-rock-light").lit_in(1805)
+    assert chart.feature("bishop-rock-light").lit_in(1860)
+    night = datetime(1805, 6, 1, 23, 30)
+
+    def frigate_at(pos: Position):
+        sc = Scenario(
+            start_time=night,
+            wind_from_deg=225.0,
+            wind_speed_kn=10.0,
+            gustiness=0.0,
+            variability=0.0,
+            ship_heading_deg=45.0,
+            position=pos.to_dict(),
+            region=CHART_REGION,
+        )
+        return make_world(SEED, FRIGATE, sc)
+
+    far = frigate_at(destination(bishop, 225.0, 20 * units.NAUTICAL_MILE))
+    assert far.daylight == "night"
+    far.run(60)
+    assert far.lookout.sightings == [] and not [e for e in far.log if e.kind == "lookout.sighting"]
+    # within the light's range from the light itself, and still well short of the Bishop
+    near_pos = destination(agnes.position, 225.0, (ST_AGNES_RANGE_NM - 1.0) * units.NAUTICAL_MILE)
+    _, off_bishop = bearing_and_distance(near_pos, bishop)
+    assert off_bishop > 9 * units.NAUTICAL_MILE
+    near = frigate_at(near_pos)
+    near.run(60)
+    seen = near.lookout.sightings
+    assert [s.feature.id for s in seen] == ["st-agnes-light"] and seen[0].seen_as == "light"
+    eye = height_of_eye(near.ship)
+    assert seen[0].distance_m / units.NAUTICAL_MILE <= ST_AGNES_RANGE_NM
+    assert seen[0].distance_m / units.NAUTICAL_MILE <= 2.08 * (
+        math.sqrt(eye) + math.sqrt(agnes.height)
+    )
+    hails = [e for e in near.log if e.kind == "lookout.sighting"]
+    assert len(hails) == 1 and hails[0].severity is Severity.NOTABLE
+    assert hails[0].text.startswith("A light ") and hails[0].data["id"] == "st-agnes-light"
+    assert "Agnes" not in hails[0].text and "Bishop" not in hails[0].text
+    reading = near.readings["in_sight"]
+    assert reading["count"] == 1 and reading["items"][0]["id"] == "st-agnes-light"
+    # the same landfall in 1860 sees the Bishop's light too
+    later = chart.in_sight(near_pos, eye, None, "night", datetime(1860, 6, 1, 23, 30))
+    assert {s.feature.id for s in later} == {"st-agnes-light", "bishop-rock-light"}
+
+
+def test_the_pace_on_the_gates_day_with_the_region_loaded_holds_truth_51s_floor():
+    """Spec M5 §30 and package 32: the queries per tick with the region loaded (the
+    grounding check every tick, short-circuited by the tile's minimum at sea; the lookout
+    once a minute; the coast hook for the sea breeze and the fog) on the gate's day under
+    systems, given a position off Falmouth: a thousand ticks to settle, the best of three
+    thousands, at least BUILD_MACHINE_FLOOR. Measured on the build machine:
+    docs/dev/TuningNotes.md, package 32."""
+    import time
+
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario(GATE_5A_DAY)
+    sf.scenario.position = dict(OFF_FALMOUTH)
+    sf.scenario.latitude_deg = OFF_FALMOUTH["lat_deg"]
+    sf.scenario.region = CHART_REGION
+    world = make_scenario_world(sf)
+    assert world.chart is not None and world.lookout is not None and world.systems.coast is not None
+    begin(world, sf)
+    run(world, 1000)
+    best = 0.0
+    for _ in range(3):
+        t0 = time.perf_counter()
+        world.run(1000)
+        best = max(best, 1000 / (time.perf_counter() - t0))
+    assert best >= BUILD_MACHINE_FLOOR, f"{best:.0f} ticks a second"

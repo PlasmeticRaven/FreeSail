@@ -1,0 +1,42 @@
+# The Scilly Islands as 1805 had them (spec M5 §10; C §3.3, §5.2; package 32). A period
+# patch, hand-made and rasterised by tools/build_charts.py.
+#
+# What changed since 1805, verified in the study (C §3.3): the rock is unchanged and the
+# sand between the islands is not; one light, St Agnes (1680), and none on the Bishop (1858),
+# the Wolf (1870) or the Seven Stones (a light-vessel from 1841), which makes a night landfall
+# what it was. The lights are the features file's business (their dates are there, and
+# truth 65 reads them); this patch carries the one sounding of the sands the pilots give in
+# a form a polygon can hold.
+#
+# The sheet. Spence's survey of 1789 to 1792, engraved by Hurd in 1808 on the sheet with
+# Mackenzie's Lizard to St Agnes Head (RMG rmgc-object-540451), has no display image on the
+# museum's page and was not read; White 1835 (p. 17) says of it that "the chart of these
+# islands, constructed by Mr. Graeme Spence, appears to be minutely correct in every
+# particular which has fallen under my observation". The depth below is White's.
+
+region: channel-west
+name: scilly
+sheet: "Spence 1792, the Scilly Islands, on Hurd's sheet of 1808 with Mackenzie's coast of Cornwall (RMG rmgc-object-540451); not read (no display image)"
+source: "White 1835, 'Coast of England', pp. 13 to 17"
+units: feet
+datum: "low water (White's soundings of the bar are given at low water and by the hour of tide)"
+# Mean low water springs above the modern chart datum at St Mary's: 0.7 m from the modern
+# tide tables' MLWS there, from memory and unverified from the build network (C §7).
+datum_above_chart_datum_m: 0.7
+control_points:
+  - {name: "St Agnes lighthouse", lat_deg: 49.8933, lon_deg: -6.3453, note: "tower of 1680, unmoved"}
+  - {name: "Peninnis Head", lat_deg: 49.8985, lon_deg: -6.3050, note: "rock head, unmoved"}
+  - {name: "the daymark on St Martin's", lat_deg: 49.9660, lon_deg: -6.2780, note: "obelisk of 1683, unmoved"}
+  - {name: "the Bishop", lat_deg: 49.8735, lon_deg: -6.4462, note: "rock, unmoved"}
+  - {name: "Round Island", lat_deg: 49.9780, lon_deg: -6.3230, note: "rock, unmoved"}
+patches:
+  - name: "Crow Bar, three feet at low water"
+    kind: depth
+    depth: 3
+    polygon:
+      - [49.9395, -6.2965]
+      - [49.9395, -6.2870]
+      - [49.9345, -6.2870]
+      - [49.9345, -6.2965]
+    source: "White 1835, 'Coast of England', p. 15: at high water equinoctial tides 23 feet on Crow Bar, at low water 3 feet, more with westerly gales and less with those from the eastward"
+    note: "The bar across Crow Sound as White sounded it in the 1820s: three feet at low water. The sands move, and the modern grid's bar may differ by a fathom; the build prints the difference."

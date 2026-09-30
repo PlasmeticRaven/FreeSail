@@ -1,0 +1,1232 @@
+# The chart data's manifest (spec M5 §10; C §5.2), written by tools/build_charts.py.
+# Every source with its licence, attribution, URL, retrieval date and checksum; the
+# regions and their tiles; the attribution block the game shows in its about text.
+format: 1
+built: '2026-09-30'
+tool: tools/build_charts.py
+build_hash: b1ffd74fa02a545a
+levels:
+  '0':
+    cell_sec: 150.0
+    tile_cells: 512
+    unit_m: 2.0
+    use: the world's picture and coarse depth
+    datum: mean sea level
+  '1':
+    cell_sec: 30.0
+    tile_cells: 512
+    unit_m: 1.0
+    use: 'the Atlantic: passages and landfalls'
+    datum: mean sea level
+  '2':
+    cell_sec: 3.0
+    tile_cells: 512
+    unit_m: 0.1
+    use: 'a region: coast and approaches'
+    datum: lowest astronomical tide
+  '3':
+    cell_sec: 0.5
+    tile_cells: 512
+    unit_m: 0.1
+    use: harbour patches
+    datum: lowest astronomical tide
+nodata: -32768
+regions:
+  channel-west:
+    title: The western Channel and the Western Approaches, Falmouth to Ushant
+    bounds:
+      south: 48.0
+      north: 51.0
+      west: -7.0
+      east: -3.0
+    levels:
+    - 2
+    - 3
+    tiles:
+      '2':
+      - name: 172128_-25920
+        south_sec: 172128
+        west_sec: -25920
+        min_depth_m: 113.3
+        bytes: 191877
+      - name: 172128_-24384
+        south_sec: 172128
+        west_sec: -24384
+        min_depth_m: 29.8
+        bytes: 193701
+      - name: 172128_-22848
+        south_sec: 172128
+        west_sec: -22848
+        min_depth_m: 105.3
+        bytes: 158816
+      - name: 172128_-21312
+        south_sec: 172128
+        west_sec: -21312
+        min_depth_m: 96.8
+        bytes: 151128
+      - name: 172128_-19776
+        south_sec: 172128
+        west_sec: -19776
+        min_depth_m: 7.9
+        bytes: 199903
+      - name: 172128_-18240
+        south_sec: 172128
+        west_sec: -18240
+        min_depth_m: -44.9
+        bytes: 229980
+      - name: 172128_-16704
+        south_sec: 172128
+        west_sec: -16704
+        min_depth_m: -42.6
+        bytes: 161124
+      - name: 172128_-15168
+        south_sec: 172128
+        west_sec: -15168
+        min_depth_m: -9.8
+        bytes: 113065
+      - name: 172128_-13632
+        south_sec: 172128
+        west_sec: -13632
+        min_depth_m: 1.6
+        bytes: 95663
+      - name: 172128_-12096
+        south_sec: 172128
+        west_sec: -12096
+        min_depth_m: null
+        bytes: 97549
+      - name: 173664_-25920
+        south_sec: 173664
+        west_sec: -25920
+        min_depth_m: 119.3
+        bytes: 197169
+      - name: 173664_-24384
+        south_sec: 173664
+        west_sec: -24384
+        min_depth_m: 99.6
+        bytes: 185195
+      - name: 173664_-22848
+        south_sec: 173664
+        west_sec: -22848
+        min_depth_m: 107.7
+        bytes: 148433
+      - name: 173664_-21312
+        south_sec: 173664
+        west_sec: -21312
+        min_depth_m: 93.8
+        bytes: 165687
+      - name: 173664_-19776
+        south_sec: 173664
+        west_sec: -19776
+        min_depth_m: -30.2
+        bytes: 211520
+      - name: 173664_-18240
+        south_sec: 173664
+        west_sec: -18240
+        min_depth_m: -40.7
+        bytes: 241109
+      - name: 173664_-16704
+        south_sec: 173664
+        west_sec: -16704
+        min_depth_m: -31.8
+        bytes: 144484
+      - name: 173664_-15168
+        south_sec: 173664
+        west_sec: -15168
+        min_depth_m: -4.0
+        bytes: 101602
+      - name: 173664_-13632
+        south_sec: 173664
+        west_sec: -13632
+        min_depth_m: null
+        bytes: 97686
+      - name: 173664_-12096
+        south_sec: 173664
+        west_sec: -12096
+        min_depth_m: null
+        bytes: 94287
+      - name: 175200_-25920
+        south_sec: 175200
+        west_sec: -25920
+        min_depth_m: 111.1
+        bytes: 140969
+      - name: 175200_-24384
+        south_sec: 175200
+        west_sec: -24384
+        min_depth_m: 117.4
+        bytes: 126190
+      - name: 175200_-22848
+        south_sec: 175200
+        west_sec: -22848
+        min_depth_m: 106.8
+        bytes: 163487
+      - name: 175200_-21312
+        south_sec: 175200
+        west_sec: -21312
+        min_depth_m: 99.5
+        bytes: 157108
+      - name: 175200_-19776
+        south_sec: 175200
+        west_sec: -19776
+        min_depth_m: 85.2
+        bytes: 170068
+      - name: 175200_-18240
+        south_sec: 175200
+        west_sec: -18240
+        min_depth_m: 42.8
+        bytes: 181529
+      - name: 175200_-16704
+        south_sec: 175200
+        west_sec: -16704
+        min_depth_m: -15.7
+        bytes: 178122
+      - name: 175200_-15168
+        south_sec: 175200
+        west_sec: -15168
+        min_depth_m: -23.0
+        bytes: 202381
+      - name: 175200_-13632
+        south_sec: 175200
+        west_sec: -13632
+        min_depth_m: -20.0
+        bytes: 197971
+      - name: 175200_-12096
+        south_sec: 175200
+        west_sec: -12096
+        min_depth_m: -13.8
+        bytes: 168943
+      - name: 176736_-25920
+        south_sec: 176736
+        west_sec: -25920
+        min_depth_m: 105.0
+        bytes: 110372
+      - name: 176736_-24384
+        south_sec: 176736
+        west_sec: -24384
+        min_depth_m: 103.5
+        bytes: 94972
+      - name: 176736_-22848
+        south_sec: 176736
+        west_sec: -22848
+        min_depth_m: 101.3
+        bytes: 125817
+      - name: 176736_-21312
+        south_sec: 176736
+        west_sec: -21312
+        min_depth_m: 95.3
+        bytes: 154355
+      - name: 176736_-19776
+        south_sec: 176736
+        west_sec: -19776
+        min_depth_m: 86.4
+        bytes: 147325
+      - name: 176736_-18240
+        south_sec: 176736
+        west_sec: -18240
+        min_depth_m: 79.1
+        bytes: 149027
+      - name: 176736_-16704
+        south_sec: 176736
+        west_sec: -16704
+        min_depth_m: 72.5
+        bytes: 154684
+      - name: 176736_-15168
+        south_sec: 176736
+        west_sec: -15168
+        min_depth_m: 71.6
+        bytes: 159074
+      - name: 176736_-13632
+        south_sec: 176736
+        west_sec: -13632
+        min_depth_m: 28.9
+        bytes: 167887
+      - name: 176736_-12096
+        south_sec: 176736
+        west_sec: -12096
+        min_depth_m: 32.2
+        bytes: 154468
+      - name: 178272_-25920
+        south_sec: 178272
+        west_sec: -25920
+        min_depth_m: 79.4
+        bytes: 131602
+      - name: 178272_-24384
+        south_sec: 178272
+        west_sec: -24384
+        min_depth_m: -4.6
+        bytes: 151296
+      - name: 178272_-22848
+        south_sec: 178272
+        west_sec: -22848
+        min_depth_m: -3.6
+        bytes: 131797
+      - name: 178272_-21312
+        south_sec: 178272
+        west_sec: -21312
+        min_depth_m: 34.4
+        bytes: 105178
+      - name: 178272_-19776
+        south_sec: 178272
+        west_sec: -19776
+        min_depth_m: 18.7
+        bytes: 140198
+      - name: 178272_-18240
+        south_sec: 178272
+        west_sec: -18240
+        min_depth_m: 74.3
+        bytes: 151829
+      - name: 178272_-16704
+        south_sec: 178272
+        west_sec: -16704
+        min_depth_m: 68.1
+        bytes: 137520
+      - name: 178272_-15168
+        south_sec: 178272
+        west_sec: -15168
+        min_depth_m: 65.5
+        bytes: 150662
+      - name: 178272_-13632
+        south_sec: 178272
+        west_sec: -13632
+        min_depth_m: 59.3
+        bytes: 165267
+      - name: 178272_-12096
+        south_sec: 178272
+        west_sec: -12096
+        min_depth_m: 47.2
+        bytes: 168809
+      - name: 179808_-25920
+        south_sec: 179808
+        west_sec: -25920
+        min_depth_m: 91.8
+        bytes: 116264
+      - name: 179808_-24384
+        south_sec: 179808
+        west_sec: -24384
+        min_depth_m: -4.9
+        bytes: 147669
+      - name: 179808_-22848
+        south_sec: 179808
+        west_sec: -22848
+        min_depth_m: -4.4
+        bytes: 170839
+      - name: 179808_-21312
+        south_sec: 179808
+        west_sec: -21312
+        min_depth_m: -3.0
+        bytes: 181753
+      - name: 179808_-19776
+        south_sec: 179808
+        west_sec: -19776
+        min_depth_m: -5.8
+        bytes: 165392
+      - name: 179808_-18240
+        south_sec: 179808
+        west_sec: -18240
+        min_depth_m: -2.9
+        bytes: 155148
+      - name: 179808_-16704
+        south_sec: 179808
+        west_sec: -16704
+        min_depth_m: -3.6
+        bytes: 141730
+      - name: 179808_-15168
+        south_sec: 179808
+        west_sec: -15168
+        min_depth_m: -9.6
+        bytes: 176400
+      - name: 179808_-13632
+        south_sec: 179808
+        west_sec: -13632
+        min_depth_m: -1.4
+        bytes: 168601
+      - name: 179808_-12096
+        south_sec: 179808
+        west_sec: -12096
+        min_depth_m: 40.2
+        bytes: 159466
+      - name: 181344_-25920
+        south_sec: 181344
+        west_sec: -25920
+        min_depth_m: 93.2
+        bytes: 129568
+      - name: 181344_-24384
+        south_sec: 181344
+        west_sec: -24384
+        min_depth_m: 92.0
+        bytes: 134771
+      - name: 181344_-22848
+        south_sec: 181344
+        west_sec: -22848
+        min_depth_m: 67.6
+        bytes: 143474
+      - name: 181344_-21312
+        south_sec: 181344
+        west_sec: -21312
+        min_depth_m: 47.4
+        bytes: 153466
+      - name: 181344_-19776
+        south_sec: 181344
+        west_sec: -19776
+        min_depth_m: -1.2
+        bytes: 169353
+      - name: 181344_-18240
+        south_sec: 181344
+        west_sec: -18240
+        min_depth_m: -47.5
+        bytes: 149309
+      - name: 181344_-16704
+        south_sec: 181344
+        west_sec: -16704
+        min_depth_m: -4.0
+        bytes: 105131
+      - name: 181344_-15168
+        south_sec: 181344
+        west_sec: -15168
+        min_depth_m: -0.7
+        bytes: 106280
+      - name: 181344_-13632
+        south_sec: 181344
+        west_sec: -13632
+        min_depth_m: -4.2
+        bytes: 119347
+      - name: 181344_-12096
+        south_sec: 181344
+        west_sec: -12096
+        min_depth_m: -1.5
+        bytes: 115519
+      - name: 182880_-25920
+        south_sec: 182880
+        west_sec: -25920
+        min_depth_m: 86.0
+        bytes: 131702
+      - name: 182880_-24384
+        south_sec: 182880
+        west_sec: -24384
+        min_depth_m: 86.0
+        bytes: 151739
+      - name: 182880_-22848
+        south_sec: 182880
+        west_sec: -22848
+        min_depth_m: 84.3
+        bytes: 131415
+      - name: 182880_-21312
+        south_sec: 182880
+        west_sec: -21312
+        min_depth_m: 67.2
+        bytes: 102899
+      - name: 182880_-19776
+        south_sec: 182880
+        west_sec: -19776
+        min_depth_m: 57.4
+        bytes: 140622
+      - name: 182880_-18240
+        south_sec: 182880
+        west_sec: -18240
+        min_depth_m: 0.0
+        bytes: 168219
+      - name: 182880_-16704
+        south_sec: 182880
+        west_sec: -16704
+        min_depth_m: -2.1
+        bytes: 154138
+      - name: 182880_-15168
+        south_sec: 182880
+        west_sec: -15168
+        min_depth_m: -1.4
+        bytes: 109219
+      - name: 182880_-13632
+        south_sec: 182880
+        west_sec: -13632
+        min_depth_m: -1.5
+        bytes: 106052
+      - name: 182880_-12096
+        south_sec: 182880
+        west_sec: -12096
+        min_depth_m: -1.8
+        bytes: 102517
+      '3':
+      - name: 180064_-19008
+        south_sec: 180064
+        west_sec: -19008
+        min_depth_m: -1.9
+        bytes: 55692
+        harbour: falmouth-helford
+      - name: 180064_-18752
+        south_sec: 180064
+        west_sec: -18752
+        min_depth_m: null
+        bytes: 43287
+        harbour: falmouth-helford
+      - name: 180064_-18496
+        south_sec: 180064
+        west_sec: -18496
+        min_depth_m: -2.0
+        bytes: 61437
+        harbour: falmouth-helford
+      - name: 180064_-18240
+        south_sec: 180064
+        west_sec: -18240
+        min_depth_m: -1.8
+        bytes: 95124
+        harbour: falmouth-helford
+      - name: 180064_-17984
+        south_sec: 180064
+        west_sec: -17984
+        min_depth_m: 52.5
+        bytes: 56485
+        harbour: falmouth-helford
+      - name: 180064_-17728
+        south_sec: 180064
+        west_sec: -17728
+        min_depth_m: 62.4
+        bytes: 56433
+        harbour: falmouth-helford
+      - name: 180320_-19008
+        south_sec: 180320
+        west_sec: -19008
+        min_depth_m: null
+        bytes: 50117
+        harbour: falmouth-helford
+      - name: 180320_-18752
+        south_sec: 180320
+        west_sec: -18752
+        min_depth_m: -2.0
+        bytes: 53695
+        harbour: falmouth-helford
+      - name: 180320_-18496
+        south_sec: 180320
+        west_sec: -18496
+        min_depth_m: -3.5
+        bytes: 71578
+        harbour: falmouth-helford
+      - name: 180320_-18240
+        south_sec: 180320
+        west_sec: -18240
+        min_depth_m: -2.9
+        bytes: 94283
+        harbour: falmouth-helford
+      - name: 180320_-17984
+        south_sec: 180320
+        west_sec: -17984
+        min_depth_m: -1.0
+        bytes: 91229
+        harbour: falmouth-helford
+      - name: 180320_-17728
+        south_sec: 180320
+        west_sec: -17728
+        min_depth_m: 27.7
+        bytes: 76020
+        harbour: falmouth-helford
+      - name: 180576_-19008
+        south_sec: 180576
+        west_sec: -19008
+        min_depth_m: null
+        bytes: 49859
+        harbour: falmouth-helford
+      - name: 180576_-18752
+        south_sec: 180576
+        west_sec: -18752
+        min_depth_m: null
+        bytes: 48310
+        harbour: falmouth-helford
+      - name: 180576_-18496
+        south_sec: 180576
+        west_sec: -18496
+        min_depth_m: -1.4
+        bytes: 53504
+        harbour: falmouth-helford
+      - name: 180576_-18240
+        south_sec: 180576
+        west_sec: -18240
+        min_depth_m: -2.4
+        bytes: 81802
+        harbour: falmouth-helford
+      - name: 180576_-17984
+        south_sec: 180576
+        west_sec: -17984
+        min_depth_m: -1.8
+        bytes: 72255
+        harbour: falmouth-helford
+      - name: 180576_-17728
+        south_sec: 180576
+        west_sec: -17728
+        min_depth_m: -0.5
+        bytes: 90124
+        harbour: falmouth-helford
+      - name: 180832_-19008
+        south_sec: 180832
+        west_sec: -19008
+        min_depth_m: -22.6
+        bytes: 62967
+        harbour: falmouth-helford
+      - name: 180832_-18752
+        south_sec: 180832
+        west_sec: -18752
+        min_depth_m: null
+        bytes: 48387
+        harbour: falmouth-helford
+      - name: 180832_-18496
+        south_sec: 180832
+        west_sec: -18496
+        min_depth_m: null
+        bytes: 49619
+        harbour: falmouth-helford
+      - name: 180832_-18240
+        south_sec: 180832
+        west_sec: -18240
+        min_depth_m: 0.0
+        bytes: 56714
+        harbour: falmouth-helford
+      - name: 180832_-17984
+        south_sec: 180832
+        west_sec: -17984
+        min_depth_m: null
+        bytes: 52389
+        harbour: falmouth-helford
+      - name: 180832_-17728
+        south_sec: 180832
+        west_sec: -17728
+        min_depth_m: 0.1
+        bytes: 50336
+        harbour: falmouth-helford
+      - name: 180832_-15424
+        south_sec: 180832
+        west_sec: -15424
+        min_depth_m: 28.5
+        bytes: 57895
+        harbour: plymouth-cawsand
+      - name: 180832_-15168
+        south_sec: 180832
+        west_sec: -15168
+        min_depth_m: 24.9
+        bytes: 67930
+        harbour: plymouth-cawsand
+      - name: 180832_-14912
+        south_sec: 180832
+        west_sec: -14912
+        min_depth_m: 0.0
+        bytes: 74095
+        harbour: plymouth-cawsand
+      - name: 180832_-14656
+        south_sec: 180832
+        west_sec: -14656
+        min_depth_m: 0.0
+        bytes: 81898
+        harbour: plymouth-cawsand
+      - name: 181088_-15424
+        south_sec: 181088
+        west_sec: -15424
+        min_depth_m: -1.8
+        bytes: 83064
+        harbour: plymouth-cawsand
+      - name: 181088_-15168
+        south_sec: 181088
+        west_sec: -15168
+        min_depth_m: -2.9
+        bytes: 97300
+        harbour: plymouth-cawsand
+      - name: 181088_-14912
+        south_sec: 181088
+        west_sec: -14912
+        min_depth_m: -10.4
+        bytes: 79233
+        harbour: plymouth-cawsand
+      - name: 181088_-14656
+        south_sec: 181088
+        west_sec: -14656
+        min_depth_m: 0.1
+        bytes: 51600
+        harbour: plymouth-cawsand
+      - name: 181344_-15424
+        south_sec: 181344
+        west_sec: -15424
+        min_depth_m: 0.0
+        bytes: 56474
+        harbour: plymouth-cawsand
+      - name: 181344_-15168
+        south_sec: 181344
+        west_sec: -15168
+        min_depth_m: -1.8
+        bytes: 69381
+        harbour: plymouth-cawsand
+      - name: 181344_-14912
+        south_sec: 181344
+        west_sec: -14912
+        min_depth_m: null
+        bytes: 51474
+        harbour: plymouth-cawsand
+      - name: 181344_-14656
+        south_sec: 181344
+        west_sec: -14656
+        min_depth_m: null
+        bytes: 51238
+        harbour: plymouth-cawsand
+      - name: 179296_-23360
+        south_sec: 179296
+        west_sec: -23360
+        min_depth_m: 0.3
+        bytes: 86905
+        harbour: scilly
+      - name: 179296_-23104
+        south_sec: 179296
+        west_sec: -23104
+        min_depth_m: -4.0
+        bytes: 85924
+        harbour: scilly
+      - name: 179296_-22848
+        south_sec: 179296
+        west_sec: -22848
+        min_depth_m: 44.2
+        bytes: 82719
+        harbour: scilly
+      - name: 179296_-22592
+        south_sec: 179296
+        west_sec: -22592
+        min_depth_m: 66.7
+        bytes: 72925
+        harbour: scilly
+      - name: 179552_-23360
+        south_sec: 179552
+        west_sec: -23360
+        min_depth_m: -2.3
+        bytes: 103885
+        harbour: scilly
+      - name: 179552_-23104
+        south_sec: 179552
+        west_sec: -23104
+        min_depth_m: -4.9
+        bytes: 136395
+        harbour: scilly
+      - name: 179552_-22848
+        south_sec: 179552
+        west_sec: -22848
+        min_depth_m: -3.6
+        bytes: 109561
+        harbour: scilly
+      - name: 179552_-22592
+        south_sec: 179552
+        west_sec: -22592
+        min_depth_m: -4.5
+        bytes: 106089
+        harbour: scilly
+      - name: 179808_-23360
+        south_sec: 179808
+        west_sec: -23360
+        min_depth_m: 65.0
+        bytes: 74427
+        harbour: scilly
+      - name: 179808_-23104
+        south_sec: 179808
+        west_sec: -23104
+        min_depth_m: -5.0
+        bytes: 98676
+        harbour: scilly
+      - name: 179808_-22848
+        south_sec: 179808
+        west_sec: -22848
+        min_depth_m: -4.9
+        bytes: 102054
+        harbour: scilly
+      - name: 179808_-22592
+        south_sec: 179808
+        west_sec: -22592
+        min_depth_m: -4.5
+        bytes: 99375
+        harbour: scilly
+      - name: 173664_-17472
+        south_sec: 173664
+        west_sec: -17472
+        min_depth_m: 0.1
+        bytes: 98541
+        harbour: brest-iroise
+      - name: 173664_-17216
+        south_sec: 173664
+        west_sec: -17216
+        min_depth_m: -20.3
+        bytes: 93364
+        harbour: brest-iroise
+      - name: 173664_-16960
+        south_sec: 173664
+        west_sec: -16960
+        min_depth_m: -15.4
+        bytes: 102805
+        harbour: brest-iroise
+      - name: 173664_-16704
+        south_sec: 173664
+        west_sec: -16704
+        min_depth_m: -43.1
+        bytes: 93155
+        harbour: brest-iroise
+      - name: 173664_-16448
+        south_sec: 173664
+        west_sec: -16448
+        min_depth_m: -11.0
+        bytes: 68280
+        harbour: brest-iroise
+      - name: 173664_-16192
+        south_sec: 173664
+        west_sec: -16192
+        min_depth_m: -11.8
+        bytes: 66703
+        harbour: brest-iroise
+      - name: 173664_-15936
+        south_sec: 173664
+        west_sec: -15936
+        min_depth_m: -8.3
+        bytes: 75835
+        harbour: brest-iroise
+      - name: 173920_-17472
+        south_sec: 173920
+        west_sec: -17472
+        min_depth_m: -9.9
+        bytes: 109439
+        harbour: brest-iroise
+      - name: 173920_-17216
+        south_sec: 173920
+        west_sec: -17216
+        min_depth_m: -13.5
+        bytes: 72937
+        harbour: brest-iroise
+      - name: 173920_-16960
+        south_sec: 173920
+        west_sec: -16960
+        min_depth_m: -9.1
+        bytes: 74239
+        harbour: brest-iroise
+      - name: 173920_-16704
+        south_sec: 173920
+        west_sec: -16704
+        min_depth_m: -32.0
+        bytes: 80313
+        harbour: brest-iroise
+      - name: 173920_-16448
+        south_sec: 173920
+        west_sec: -16448
+        min_depth_m: -47.5
+        bytes: 101543
+        harbour: brest-iroise
+      - name: 173920_-16192
+        south_sec: 173920
+        west_sec: -16192
+        min_depth_m: -15.7
+        bytes: 104673
+        harbour: brest-iroise
+      - name: 173920_-15936
+        south_sec: 173920
+        west_sec: -15936
+        min_depth_m: -9.6
+        bytes: 70083
+        harbour: brest-iroise
+      - name: 174176_-17472
+        south_sec: 174176
+        west_sec: -17472
+        min_depth_m: -16.6
+        bytes: 103660
+        harbour: brest-iroise
+      - name: 174176_-17216
+        south_sec: 174176
+        west_sec: -17216
+        min_depth_m: -5.6
+        bytes: 49566
+        harbour: brest-iroise
+      - name: 174176_-16960
+        south_sec: 174176
+        west_sec: -16960
+        min_depth_m: null
+        bytes: 43959
+        harbour: brest-iroise
+      - name: 174176_-16704
+        south_sec: 174176
+        west_sec: -16704
+        min_depth_m: null
+        bytes: 42448
+        harbour: brest-iroise
+      - name: 174176_-16448
+        south_sec: 174176
+        west_sec: -16448
+        min_depth_m: 0.0
+        bytes: 41645
+        harbour: brest-iroise
+      - name: 174176_-16192
+        south_sec: 174176
+        west_sec: -16192
+        min_depth_m: -1.2
+        bytes: 47504
+        harbour: brest-iroise
+      - name: 174176_-15936
+        south_sec: 174176
+        west_sec: -15936
+        min_depth_m: -3.3
+        bytes: 59280
+        harbour: brest-iroise
+    coast: coast/channel-west.geojson
+    features: features/channel-west.yaml
+    index: features/channel-west.index.json
+    overrides:
+    - file: overrides/channel-west/brest-iroise.yaml
+      sheet: Bellin 1773, '5e carte particulière des costes de Bretagne' (Rumsey/Internet Archive), read
+        at the display size for the shore; the Pilote français 1822 not opened
+      source: Faden 1793, 'Le Petit Neptune François', 'Bay of Brest' p. 57, 'Camaret' p. 57, 'Tides and
+        Currents' p. 61
+      units: fathoms
+      datum: low water (Faden's soundings are the Dépôt's at low water of spring tides, given in his translation
+        in fathoms)
+      datum_above_chart_datum_m: 1.0
+      control_points:
+      - name: the Stiff (Ushant)
+        lat_deg: 48.4805
+        lon_deg: -5.0558
+        note: tower of 1699, unmoved
+      - name: Pointe Saint-Mathieu
+        lat_deg: 48.33
+        lon_deg: -4.7705
+        note: rock head and abbey, unmoved
+      - name: Pointe des Espagnols
+        lat_deg: 48.343
+        lon_deg: -4.541
+        note: rock head, unmoved
+      - name: the castle of Brest
+        lat_deg: 48.3825
+        lon_deg: -4.4945
+        note: castle, unmoved
+      - name: Toulinguet
+        lat_deg: 48.274
+        lon_deg: -4.639
+        note: rock, unmoved
+      - name: Le Four
+        lat_deg: 48.524
+        lon_deg: -4.802
+        note: rock, unmoved
+      - name: the Pierres Noires
+        lat_deg: 48.3033
+        lon_deg: -4.9063
+        note: rocks, unmoved
+      patches: 2
+    - file: overrides/channel-west/falmouth-helford.yaml
+      sheet: Dummer 1698, 'The harbour of Falmouth' (RMG P/34A(37)), seen at the museum's display size
+        for the shore's shape; Mackenzie's survey of 1774 to 1775 (UKHO Archive) not seen
+      source: White 1835, 'Coast of England', pp. 26 to 27; Imray 1874, 'Plymouth to Land's End', pp.
+        88 to 91
+      units: fathoms
+      datum: low water of spring tides (the British practice, Mackenzie 1774; White and Imray give their
+        depths at low water springs)
+      datum_above_chart_datum_m: 0.6
+      control_points:
+      - name: Pendennis Point
+        lat_deg: 50.1425
+        lon_deg: -5.044
+        note: rock head, unmoved
+      - name: St Anthony's Head
+        lat_deg: 50.1415
+        lon_deg: -5.0157
+        note: rock head, unmoved
+      - name: the Black Rock
+        lat_deg: 50.1402
+        lon_deg: -5.0302
+        note: drying rock, unmoved
+      - name: St Mawes castle
+        lat_deg: 50.156
+        lon_deg: -5.024
+        note: castle, unmoved
+      - name: Trefusis Point
+        lat_deg: 50.166
+        lon_deg: -5.045
+        note: point, unmoved
+      - name: Rosemullion Head
+        lat_deg: 50.108
+        lon_deg: -5.078
+        note: rock head, unmoved
+      patches: 2
+    - file: overrides/channel-west/plymouth-cawsand.yaml
+      sheet: Mackenzie 1773, 'A survey of the south coast of England from Plymouth to the Lizard', Hurd
+        1809 (RMG G223:2/42), seen at the museum's display size; soundings not legible
+      source: White 1835, 'Coast of England', pp. 31 to 35; Imray 1874, 'Start Point to Plymouth', pp.
+        78 to 85; the works' dates as C §3.3 verified them
+      units: fathoms
+      datum: 'low water of spring tides (Mackenzie junior''s plan of Fowey 1774 on the same sheet: ''The
+        Soundings are at low water Spring-tides''; Mackenzie senior, Treatise of Maritim Surveying 1774,
+        part 2: depths ''such only as are taken at low Water in ordinary Spring-tides'')'
+      datum_above_chart_datum_m: 0.8
+      control_points:
+      - name: Rame Head
+        lat_deg: 50.3155
+        lon_deg: -4.2245
+        note: rock head, unmoved
+      - name: Penlee Point
+        lat_deg: 50.3195
+        lon_deg: -4.19
+        note: rock head, unmoved
+      - name: the Mewstone
+        lat_deg: 50.3115
+        lon_deg: -4.109
+        note: islet, unmoved
+      - name: Drake's Island
+        lat_deg: 50.3577
+        lon_deg: -4.1548
+        note: islet, unmoved
+      - name: Maker church tower
+        lat_deg: 50.344
+        lon_deg: -4.187
+        note: tower, unmoved
+      - name: Mount Batten tower
+        lat_deg: 50.359
+        lon_deg: -4.129
+        note: tower, unmoved
+      patches: 2
+    - file: overrides/channel-west/scilly.yaml
+      sheet: Spence 1792, the Scilly Islands, on Hurd's sheet of 1808 with Mackenzie's coast of Cornwall
+        (RMG rmgc-object-540451); not read (no display image)
+      source: White 1835, 'Coast of England', pp. 13 to 17
+      units: feet
+      datum: low water (White's soundings of the bar are given at low water and by the hour of tide)
+      datum_above_chart_datum_m: 0.7
+      control_points:
+      - name: St Agnes lighthouse
+        lat_deg: 49.8933
+        lon_deg: -6.3453
+        note: tower of 1680, unmoved
+      - name: Peninnis Head
+        lat_deg: 49.8985
+        lon_deg: -6.305
+        note: rock head, unmoved
+      - name: the daymark on St Martin's
+        lat_deg: 49.966
+        lon_deg: -6.278
+        note: obelisk of 1683, unmoved
+      - name: the Bishop
+        lat_deg: 49.8735
+        lon_deg: -6.4462
+        note: rock, unmoved
+      - name: Round Island
+        lat_deg: 49.978
+        lon_deg: -6.323
+        note: rock, unmoved
+      patches: 1
+    harbours:
+      falmouth-helford:
+        south: 50.02
+        north: 50.27
+        west: -5.22
+        east: -4.9
+      plymouth-cawsand:
+        south: 50.28
+        north: 50.42
+        west: -4.28
+        east: -4.05
+      scilly:
+        south: 49.85
+        north: 49.99
+        west: -6.42
+        east: -6.22
+      brest-iroise:
+        south: 48.25
+        north: 48.42
+        west: -4.85
+        east: -4.4
+    feature_count: 200
+    features_by_kind:
+      anchorage: 17
+      bank: 4
+      beacon: 1
+      bottom: 9
+      castle: 6
+      church: 6
+      drying: 7
+      headland: 35
+      hill: 2
+      island: 22
+      ledge: 5
+      light: 12
+      mill: 1
+      place: 10
+      rock: 42
+      shoal: 6
+      tower: 1
+      town: 8
+      transit: 6
+world:
+  level: 0
+  bounds:
+    south: -90.0
+    north: 90.0
+    west: -180.0
+    east: 180.0
+  committed: false
+  built_by: python tools/build_charts.py --world
+  note: built by the tool on the developer's machine and not committed; the runtime reads the tiles that
+    are present under tiles/<level>/ and nothing else
+  tiles: []
+atlantic:
+  level: 1
+  bounds:
+    south: -60.0
+    north: 70.0
+    west: -100.0
+    east: 20.0
+  committed: false
+  built_by: python tools/build_charts.py --atlantic
+  note: built by the tool on the developer's machine and not committed; the runtime reads the tiles that
+    are present under tiles/<level>/ and nothing else
+  tiles: []
+sources:
+  gebco_2025:
+    name: GEBCO_2025 Grid
+    licence: public-domain
+    licence_name: public domain
+    licence_text: docs/references/licences/gebco-terms-of-use.md
+    attribution: GEBCO Compilation Group (2025) GEBCO 2025 Grid (doi:10.5285/37c52e96-24ea-67ce-e063-7086abc05f29)
+    datum: mean sea level
+    home: https://www.gebco.net/data-products/gridded-bathymetry-data/gebco2025-grid
+    used_for:
+    - level 0 (the world)
+    - level 1 (the Atlantic)
+    - the land under level 2
+    fetched:
+    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 47.65, ''north'':
+        51.35, ''west'': -7.4, ''east'': -2.4})'
+      retrieved: '2026-09-30'
+      sha256: 159fff2887ab22b07e9c02427c4c605b9ea424b05b90950545f57f5c6e09312b
+      bytes: 4874675
+      file: gebco_2025_s47.65_n51.35_w-7.40_e-2.40_ascii.zip
+    status: fetched
+  emodnet_dtm_2024:
+    name: EMODnet Bathymetry DTM 2024
+    licence: CC-BY-4.0
+    licence_name: Creative Commons Attribution 4.0 International
+    licence_text: docs/references/licences/cc-by-4.0.txt
+    attribution: 'EMODnet Bathymetry Consortium (2024): EMODnet Digital Bathymetry (DTM 2024), https://doi.org/10.12770/cf51df64-56f9-4a99-b1aa-36b8d7b743a1.
+      Do not use for navigation.'
+    datum: lowest astronomical tide
+    home: https://emodnet.ec.europa.eu/en/emodnet-bathymetry-dtm-2024-release
+    used_for:
+    - level 2 (the region's depth and coast)
+    - level 3 (the harbour patches)
+    fetched:
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation%5B(47.75):(51.25)%5D%5B(-7.3):(-2.5)%5D
+      retrieved: '2026-09-30'
+      sha256: 52588bb3e63769b18f8a2ae8127f67b352d0b837a379d1491fb59207b6804b84
+      bytes: 62032356
+      file: emodnet_dtm2024_elevation_47.75_51.25_-7.30_-2.50.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation_max%5B(47.75):(51.25)%5D%5B(-7.3):(-2.5)%5D
+      retrieved: '2026-09-30'
+      sha256: d34011e01e2061bac9bac92d37f14b86007f4a3be4ba565e0cb203fbf69df790
+      bytes: 62031996
+      file: emodnet_dtm2024_elevation_max_47.75_51.25_-7.30_-2.50.nc
+    status: fetched
+  shom_homonim:
+    name: SHOM MNT bathymétrique de façade Atlantique (projet HOMONIM), 100 m
+    licence: Licence-Ouverte-2.0
+    licence_name: Licence Ouverte / Open Licence 2.0 (Etalab)
+    licence_text: docs/references/licences/licence-ouverte-2.0.md
+    attribution: Shom, MNT bathymétrique de façade Atlantique (projet HOMONIM), Licence Ouverte 2.0
+    datum: lowest astronomical tide (the PBMA package) or mean sea level (the NM package)
+    home: https://www.data.gouv.fr/en/datasets/mnt-bathymetrique-de-facade-atlantique-projet-homonim-1
+    used_for:
+    - 'the French cross-check (not fetched in this build: see the manifest)'
+    fetched: []
+    status: not fetched in this build
+  histolitt:
+    name: SHOM-IGN Histolitt coastline
+    licence: SHOM-IGN-Histolitt
+    licence_name: SHOM-IGN Histolitt conditions (named per-source permission)
+    licence_text: docs/references/licences/shom-ign-histolitt.md
+    attribution: © IGN-Shom 2009
+    datum: highest astronomical tide (the shoreline)
+    home: https://www.data.gouv.fr/fr/datasets/shom-ign-trait-de-cote-histolitt-r
+    used_for:
+    - 'the French shoreline where needed (not fetched in this build: see the manifest)'
+    fetched: []
+    status: not fetched in this build
+attribution: 'Chart data built from open sources, not for navigation. GEBCO Compilation Group (2025) GEBCO
+  2025 Grid (doi:10.5285/37c52e96-24ea-67ce-e063-7086abc05f29) EMODnet Bathymetry Consortium (2024): EMODnet
+  Digital Bathymetry (DTM 2024), https://doi.org/10.12770/cf51df64-56f9-4a99-b1aa-36b8d7b743a1. Do not
+  use for navigation. The period features and patches are transcribed from the charts and pilots named
+  in data/charts/features and data/charts/overrides, whose scans are not distributed here.'
+notes:
+  checked_on: 2026-09-30
+  checked_from: the build machine's network, through its proxy (a browser was not to be had)
+  items:
+  - item: The Défense library's records (Heather 1807, Pilote français 1822, Channel Pilot 1859)
+    found: 'Still unverified. bibliotheques-numeriques.defense.gouv.fr reset every connection from the
+      build network again ("Recv failure: Connection reset by peer"). None of the three was opened; the
+      Brest patch rests on Faden 1793 and Bellin''s sheet, as it says.'
+  - item: Gallica's own catalogue
+    found: 'Still unverified from here: gallica.bnf.fr answered every request with an empty reply. Wikimedia
+      Commons, searched through its API, holds the public-domain copies the study names and more: ''New
+      chart of the Plymouth sound'' (ark btv1b53010480b), ''A chart of the harbour of Plymouth'' (ark
+      btv1b530102722), the Neptune François sheets of Brittany (arks btv1b530169146, btv1b53016935g and
+      others), and, of note for the Plymouth patch, ''A trigonometrical survey of Plymouth Sound, by William
+      Chapman, Master in the Royal Navy, 1809'' (RMG F0008, a TIFF on Commons): a survey of the Sound
+      three years before the breakwater, not read in this build and the first thing to read for the patch.'
+  - item: SHOM's two statements of the archive charts' licence
+    found: Unresolved. data.gouv.fr's record of 'Cartes Marines Anciennes (ARCHIVES)' (read through its
+      API) states the licence id fr-lo, the Licence Ouverte, and describes the series as JPEG 2000 scans
+      of charts published from 1822 on; SHOM's own catalogue records at services.data.shom.fr answered
+      403 and 404 to the paths tried. No image from the series is used or committed; the facts on a sheet
+      are read by hand.
+  - item: The UKHO bathymetry licence text
+    found: 'Not read in full. copyright.ukho.gov.uk (read) describes purpose-based licences: free online
+      licences for non-navigational, non-commercial and low-value commercial re-use, commercial licences
+      by agreement; its bathymetry-licence page path answered 404. The gov.uk guidance on the INSPIRE
+      portal and the MEDIN archive (read) says the UKHO makes its INSPIRE data sets available under the
+      Open Government Licence and gives access to the bathymetric surveys of its Data Archive Centre,
+      without stating those surveys'' licence on the page. No UKHO survey bathymetry is in the tiles;
+      EMODnet carries it.'
+  - item: GSHHG's tolerances
+    found: Still unverified. The GSHHG page (version 2.3.7, 15 June 2017, read) gives the five resolutions
+      as successive reductions of about 80 per cent and names no Douglas-Peucker tolerance; the LGPL since
+      2.2.2 is stated there. GSHHG is not used in this build (the world level's coast is GEBCO's own land
+      and sea).
+  - item: The GEBCO_2025 file size
+    found: 'Verified. GEBCO''s GEBCO_2025 page (read): the global grid is 43,200 rows by 86,400 columns
+      at 15 arc-seconds, 3,732,480,000 points, published August 2025, "provided as a single 7.5 GB file"
+      in netCDF, the TID grid as a 4 GB file. At CEDA the netCDF is 7,466,018,396 bytes (an HDF5 file)
+      and the eight-tile GeoTIFF zip 4,235,605,060 bytes, the tiles 933,255,948 bytes each uncompressed.
+      The study''s "about 4 GB compressed and 7 GB open" was GEBCO''s figure for 2026; for 2025 the netCDF
+      is 7.5 GB as is.'
+  - item: The datum offsets between spring low water and LAT at the four ports
+    found: Not read from the tide tables (the Admiralty tables are not open). NTSLF's page of chart datum
+      against ordnance datum (read) gives Devonport -3.22 m, Newlyn -3.05 m and St Mary's -2.91 m (local
+      OD), which is chart datum below ordnance datum, not the mean low water springs above chart datum
+      the overrides need. The four overrides carry figures from memory of the modern tables, 0.8 m at
+      Devonport, 0.6 m at Falmouth, 0.7 m at St Mary's and 1.0 m at Brest, each marked unverified in its
+      file; the study's "half a metre to a metre" holds. SHOM's reference-levels document (RAM) was not
+      reachable.
+  - item: Mackenzie's own datum statement
+    found: 'Verified from the text. Mackenzie senior, A Treatise of Maritim Surveying (1774), part II,
+      p. 15 (the Internet Archive''s ECCO scan, read): "the Depths of the Water proper to be inserted
+      in Draughts of the Sea-coast, seem to be such only as are taken at low Water in ordinary Spring-tides;
+      and not such as are found when the Tides are affected by extraordinary Causes: Ordinary Spring-tides
+      may be reckoned such as happen in moderate Weather, on the third Day after new or full Moon", with
+      his table of allowances by the hour of tide. Mackenzie junior''s plan of Fowey Harbour (1774) on
+      the Hurd sheet of 1809, seen at the museum''s display size: "The Soundings are at low water Spring-tides.
+      Tides rise 15 feet at springs. Neaps 7 or 8." and "Variation 22° 30'' W".'
+  - item: The brasse on each French sheet
+    found: Still unverified. Bellin's Brest sheet of 1773 was read at the archive's display size (1,536
+      pixels), where the legend's remarks are not legible; the full-resolution JPEG 2000 was cached and
+      not transcribed. The Brest patch uses Faden's translation, which gives fathoms, so no brasse is
+      converted; the tool carries BRASSE_M = 1.624 for a sheet that needs it, marked as the study's unverified
+      figure.
+  - item: The Seven Stones lightvessel's date
+    found: Still unverified as a year. Imray 1874 (p. 102) has the light-vessel on station by 1874; the
+      encyclopaedia's page returned no text from the build network. The features file dates it 1841 from
+      the study's "from the 1840s", says so, and in any case after 1805.
+  - item: Le Créac'h's date
+    found: 'Verified. The French encyclopaedia''s ''Phare du Créac''h'' (read 2026-09-30): built in 1863
+      on Ushant. The Stiff''s date, 1699 (Vauban''s two towers), is from the same source''s ''Phare du
+      Stiff'' page; Saint-Mathieu''s tower of 1835 from ''Phare de Saint-Mathieu''.'
+  found_on_the_way:
+  - The Internet Archive item the study calls Imray 1848 (sailingdirection00unse_0) is the 1874 edition
+    of part I (its title page; its variation note is dated 1873). It is cited as Imray 1874 throughout.
+  - EMODnet's DTM 2024 is served by an ERDDAP griddap service (erddap.emodnet.eu, dataset bathymetry_dtm_2024)
+    as classic netCDF subsets with the per-cell shoalest and deepest soundings beside the mean; the tool
+    reads those with numpy alone.
+  - GEBCO's grid subsetting application has a plain JSON queue API (POST /api/queue, GET /api/queue/status
+    and /api/queue/download), which the tool uses for the region's extract; the eight global GeoTIFF tiles
+    at CEDA are uncompressed inside their zip.
+  - 'SHOM''s HOMONIM 100 m grid is published as 7z archives (464 MB for the LAT-referenced package); the
+    build machine has no 7z reader and the runtime rule forbids adding one, so the French cross-check
+    was not made in this build. The recipe: extract the ArcGIS grid with 7-Zip and GDAL, and compare it
+    with EMODnet on the French side as the tool compares an override with the modern grid.'
+  - 'Histolitt: the data.gouv.fr record found is a regional republication whose licence field reads "notspecified";
+    SHOM''s own diffusion is behind a form. The French shore in the tiles and the coast is EMODnet''s.'

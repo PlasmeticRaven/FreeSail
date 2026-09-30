@@ -19,6 +19,7 @@ from freesail.core.rng import Rng
 from freesail.core.sun import DAY, DEFAULT_LATITUDE_DEG, Sun
 from freesail.physics.wind import Wind, WindParams, WindRecord
 from freesail.ship.stub import OrderError, PointShip
+from freesail.world.geo import Position
 
 ENGINE_VERSION = "0.0.1"
 SAVE_FORMAT = 1
@@ -41,6 +42,19 @@ class Scenario:
     # The sun's latitude (spec M4 §5): 50 N, the Channel. Saved and restored with the rest;
     # a save from before the sun loads with the default.
     latitude_deg: float = DEFAULT_LATITUDE_DEG
+    # The geographic frame (spec M5 §9, package 32; `freesail.world.geo`): where the ship
+    # starts, as {"lat_deg", "lon_deg"}, in place of the bare latitude the sun used. With a
+    # position the World keeps her latitude and longitude, advanced at the end of each tick
+    # from the tick's run in metres, and the sun reads the ship's latitude; `latitude_deg`
+    # is set from it at load. None: the endless plane of the earlier milestones, `ship_x`
+    # and `ship_y` metres from the start, every constant as it was. A save from before the
+    # frame loads with None.
+    position: dict[str, float] | None = None
+    # The chart region (spec M5 §10; `freesail.world.chart`): a region of data/charts/ by
+    # its name in the manifest, loaded when the scenario names one and the position lies
+    # in it; the depth, the coast, the features in sight and the grounding check read it.
+    # None: no chart, and the queries read None ("no chart of these waters").
+    region: str | None = None
     # The weather script (spec M4 §19, `freesail.world.weather_script`): waypoints as plain
     # dictionaries ({"at": ISO time, "from_deg": degrees, "knots": knots}), saved with the
     # scenario and so followed again by a replay. Empty: the fixed wind above. With a
@@ -141,6 +155,35 @@ class World:
         self.clock = Clock(self.scenario.start_time)
         self.rng = Rng(self.seed)
         self.log = Log()
+        # The geographic frame (spec M5 §9): with a `position` the ship's latitude and
+        # longitude are kept and advanced at the end of each tick from her run in metres
+        # (`freesail.world.geo`), and the sun reads her latitude; without one the plane is
+        # what it was and the sun reads the scenario's latitude.
+        self.origin: Position | None = (
+            Position.from_dict(self.scenario.position) if self.scenario.position else None
+        )
+        # The chart (spec M5 §10, §11) and the lookout (§12), when the scenario names a
+        # region: the depth under the keel, the grounding check every tick, the coast for
+        # the weather's sea breeze and fog, and what is in sight once a minute.
+        self.chart: Any = None
+        self.lookout: Any = None
+        self._aground: bool = False
+        if self.scenario.region:
+            from freesail.world.chart import load_chart
+            from freesail.world.lookout import Lookout
+
+            if self.origin is None:
+                raise ValueError(
+                    f"the scenario names the chart region '{self.scenario.region}' but "
+                    f"gives no position; a chart needs to know where she is."
+                )
+            self.chart = load_chart(self.scenario.region)
+            if not self.chart.contains(self.origin):
+                raise ValueError(
+                    f"the position {self.origin} lies outside the chart region "
+                    f"'{self.scenario.region}' ({self.chart.bounds_words()})."
+                )
+            self.lookout = Lookout(self.chart)
         # The weather script (spec M4 §19): the base wind at every tick, from the scenario.
         self.weather: Any = None
         wind_params = WindParams.from_nautical(
@@ -184,6 +227,9 @@ class World:
             )
             if self.scenario.glass:
                 self.glass = Glass(self.seed)
+            if self.chart is not None:
+                # the coast the sea breeze and the coastal fog read (spec M5 §11; W §1.4)
+                self.systems.coast = self._coast_of_plane
         self.wind = Wind(wind_params, self.rng.stream("wind"))
         # the true wind of the last ten minutes, for the mean wind reading (package 29b)
         self.wind_record = WindRecord()
@@ -239,7 +285,13 @@ class World:
         # minutes after sunrise) is not an event of this log, so the first event is the
         # first crossing after the start, and a rule given at the start cannot fire on a
         # sun that rose before the book was opened.
-        self.sun = Sun(self.scenario.latitude_deg)
+        # The ship's position on the sphere (spec M5 §9): the origin at the start, then
+        # advanced at the end of each tick from her run since the tick before.
+        self._position: Position | None = self.origin
+        self._geo_last: tuple[float, float] = (self.ship_x, self.ship_y)
+        self.sun = Sun(
+            self.origin.lat_deg if self.origin is not None else self.scenario.latitude_deg
+        )
         self._daylight = self.daylight
         # The readings (spec M4 §2): one view per tick and per order, read by the standing
         # orders, the snapshot and the agents alike.
@@ -269,6 +321,11 @@ class World:
             f"{units.describe_wind_strength(self.wind.effective_speed)}. "
             f"Heading {units.format_heading(self.ship.heading)}.",
         )
+        if self.lookout is not None:
+            # the lookout's first look, at the start (spec M5 §12): what is in sight is a
+            # reading from tick 0, and a landfall at the start is a line like any other
+            for severity, kind, text, data in self.lookout.look(self):
+                self.record(severity, kind, text, data=data)
 
     # -- logging -------------------------------------------------------------
 
@@ -322,14 +379,85 @@ class World:
         return self.ship_y / 1000.0
 
     @property
+    def position(self) -> Position | None:
+        """Where she is on the sphere (spec M5 §9): the truth, which no reading gives
+        (33's reckoning is the captain's account of it); None on the endless plane."""
+        return self._position
+
+    def _sun_now(self) -> Sun:
+        """The sun at the ship's latitude now: the scenario's on the plane, hers with a
+        position (the sun of spec M4 §5 "now reads the ship's", spec M5 §9)."""
+        pos = self._position
+        if pos is None or pos.lat_deg == self.sun.latitude_deg:
+            return self.sun
+        self.sun = Sun(pos.lat_deg)
+        return self.sun
+
+    @property
     def daylight(self) -> str:
         """'day', 'twilight' or 'night' now, from the sun at the ship's latitude and her
         easting (`freesail.core.sun`). The registry's `daylight` row reads this."""
-        return self.sun.phase(self.clock.ship_time, self.ship_x)
+        return self._sun_now().phase(self.clock.ship_time, self.ship_x)
 
     def sun_times(self) -> Any:
         """Today's dawn, sunrise, sunset and dusk by the clock (`sun.SunTimes`)."""
-        return self.sun.times(self.clock.ship_time, self.ship_x)
+        return self._sun_now().times(self.clock.ship_time, self.ship_x)
+
+    # -- the geographic frame and the chart (spec M5 §9 to §12) -----------------------
+
+    def _tick_geo(self) -> None:
+        """The tick's run in metres turned to latitude and longitude (C §5.1), at the end
+        of the tick; nothing on the plane."""
+        if self._position is None:
+            return
+        x, y = self.ship_x, self.ship_y
+        lx, ly = self._geo_last
+        if x != lx or y != ly:
+            self._position = self._position.advanced(x - lx, y - ly)
+            self._geo_last = (x, y)
+
+    def _coast_of_plane(self, x_km: float, y_km: float) -> tuple[float, float] | None:
+        """The weather's coast hook (spec M5 §11; W §1.4): for a point of the systems'
+        plane, the distance to the nearest coast in kilometres and the bearing toward it
+        in degrees, from the chart's distance field; None where the chart has no field."""
+        if self.chart is None or self.origin is None:
+            return None
+        pos = self.origin.advanced(x_km * 1000.0, y_km * 1000.0)
+        found = self.chart.coast_distance(pos)  # the field alone: microseconds, no name
+        if found is None:
+            return None
+        return found[0] / 1000.0, found[1]
+
+    def _tick_chart(self) -> None:
+        """Every tick the grounding check (spec M5 §11: short-circuited by the tile's
+        minimum depth against the draught, the highest tide and a margin; otherwise the
+        keel's cells at bow and stern); once a game minute the lookout (§12)."""
+        pos = self._position
+        if pos is None:
+            return
+        touched = self.chart.aground(
+            pos,
+            self.ship.heading,
+            _ship_length_m(self.ship),
+            _ship_draught_m(self.ship),
+            _ship_heel(self.ship),
+            tide_m=0.0,  # the tide of package 34 goes here
+        )
+        if touched is not None and not self._aground:
+            self._aground = True
+            self.record(
+                Severity.URGENT,
+                "ship.aground",
+                touched.words,
+                data=touched.to_dict()
+                | {"speed_kn": round(units.ms_to_knots(_ship_speed(self.ship)), 1)},
+            )
+        elif touched is None and self._aground:
+            self._aground = False
+            self.record(Severity.NOTABLE, "ship.afloat", "She is off, and afloat again.")
+        if self.lookout is not None and self.clock.ship_time.second == 0:
+            for severity, kind, text, data in self.lookout.look(self):
+                self.record(severity, kind, text, data=data)
 
     def _tick_sun(self) -> None:
         phase = self.daylight
@@ -641,6 +769,11 @@ class World:
             else:
                 severity, kind, text, subject, data = note
                 self.record(severity, kind, text, subject=subject, data=data)
+        # the geographic frame (spec M5 §9): the tick's run turned to latitude and
+        # longitude, then the chart's grounding check and the lookout (§11, §12)
+        self._tick_geo()
+        if self.chart is not None:
+            self._tick_chart()
         # the watch routine (spec M3 §4): watch changes, all hands, fatigue and rest
         routine = (getattr(self.ship, "extra", None) or {}).get("routine")
         if routine is not None:
@@ -674,13 +807,17 @@ class World:
     # -- queries -------------------------------------------------------------
 
     def state(self) -> dict[str, Any]:
-        return {
+        out = {
             "tick": self.clock.tick,
             "ship_time": self.clock.ship_time.isoformat(),
             "stamp": self.clock.stamp(),
             "wind": self.wind.state(),
             "ship": self.ship.state(),
         }
+        if self._position is not None:
+            # the truth's position, for the tests and the tools; never a reading
+            out["position"] = self._position.to_dict()
+        return out
 
     def summary_lines(self) -> list[str]:
         """The console's `state`: the clock, the wind, the ship's own lines and, with a
@@ -701,6 +838,7 @@ class World:
             f"{units.describe_wind_strength(self.wind.effective_speed)}",
             f"{daylight}. {self.sun_times().describe()}",
             *queries.weather_lines(self),
+            *queries.lookout_lines(self),
             *ship_lines,
             *queries.watch_lines(self),
         ]
@@ -728,6 +866,28 @@ class World:
             "agents": [agent.save() for agent in self.agents.values()],
             "agent_journals": {name: j.save() for name, j in self.agent_journals.items()},
         }
+
+
+def _ship_length_m(ship: Any) -> float:
+    """The waterline length, for the keel's cells at bow and stern; a point ship has
+    none and is checked at one cell."""
+    hull = getattr(ship, "hull", None)
+    return float(hull.spec.length_waterline_m) if hull is not None else 0.0
+
+
+def _ship_draught_m(ship: Any) -> float:
+    hull = getattr(ship, "hull", None)
+    return float(hull.spec.draught_m) if hull is not None else 0.0
+
+
+def _ship_heel(ship: Any) -> float:
+    dyn = getattr(ship, "dyn", None)
+    return float(dyn.heel) if dyn is not None else 0.0
+
+
+def _ship_speed(ship: Any) -> float:
+    dyn = getattr(ship, "dyn", None)
+    return float(dyn.speed) if dyn is not None else float(getattr(ship, "speed", 0.0))
 
 
 def _sea_line(words: str, rising: bool, confused: bool) -> str:

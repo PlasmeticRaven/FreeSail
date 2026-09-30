@@ -7,7 +7,11 @@ the captain's first orders:
     name: The gate's day
     seed: 7                          # the seed a driver uses unless --seed is given
     start: 1805-06-01T04:00          # ship's time at tick 0
-    latitude_deg: 50.0               # the sun's (spec M4 §5)
+    latitude_deg: 50.0               # the sun's (spec M4 §5), on the endless plane
+    position: 49 52 N 6 10 W         # or {lat_deg: 49.87, lon_deg: -6.17}: the geographic
+                                     # frame (spec M5 §9); the sun then reads the ship's
+    region: channel-west             # a chart region of data/charts/manifest.yaml (spec M5
+                                     # §10): the depth, the coast, the lookout's features
     ship:
       file: data/ships/frigate-36.yaml
       heading_deg: 180
@@ -59,6 +63,7 @@ from typing import Any
 import yaml
 
 from freesail.core.world import Scenario, World
+from freesail.world.geo import Position, format_position
 from freesail.world.weather import WeatherError, _system_from_dict
 from freesail.world.weather_script import WeatherScript
 
@@ -90,6 +95,10 @@ class ScenarioFile:
         """What the driver prints when the scenario is loaded (the author's view: the
         systems by name, which no log line ever gives)."""
         out = [f"Scenario: {self.scenario.name} ({self.path})."]
+        if self.scenario.position:
+            where = format_position(Position.from_dict(self.scenario.position))
+            chart = f", on the chart of {self.scenario.region}" if self.scenario.region else ""
+            out.append(f"She starts at {where}{chart}.")
         if self.script is not None:
             out += ["The weather: " + self.script.lines()[0]]
             out += ["  " + ln for ln in self.script.lines()[1:]]
@@ -139,6 +148,20 @@ def load_scenario(path: str | Path) -> ScenarioFile:
         sc.start_time = _time(raw["start"], f"{where}, start")
     if "latitude_deg" in raw:
         sc.latitude_deg = float(raw["latitude_deg"])
+    if raw.get("position") is not None:
+        # the geographic frame (spec M5 §9): the sun reads the ship's latitude from here
+        try:
+            position = Position.from_dict(raw["position"])
+        except (TypeError, ValueError) as e:
+            raise ScenarioError(f"{where}, position: {e}") from None
+        sc.position = position.to_dict()
+        sc.latitude_deg = position.lat_deg
+    if raw.get("region") is not None:
+        sc.region = str(raw["region"])
+        if sc.position is None:
+            raise ScenarioError(
+                f"{where}: the chart region '{sc.region}' needs a position (49 52 N 6 10 W)."
+            )
     ship = raw.get("ship") or {}
     wind = raw.get("wind") or {}
     sc.glass = bool(ship.get("glass", raw.get("glass", False)))

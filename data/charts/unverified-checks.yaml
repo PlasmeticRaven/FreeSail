@@ -1,0 +1,114 @@
+# The study's unverified list (docs/design/ChartData.md §7), each item checked from the
+# build network on 2026-09-30 when the chart data was built (package 32), and what it was
+# found to be. tools/build_charts.py copies this file into the manifest's `notes`. The
+# study's wording is quoted first, then the finding.
+
+checked_on: 2026-09-30
+checked_from: "the build machine's network, through its proxy (a browser was not to be had)"
+items:
+  - item: "The Défense library's records (Heather 1807, Pilote français 1822, Channel Pilot 1859)"
+    found: >-
+      Still unverified. bibliotheques-numeriques.defense.gouv.fr reset every connection from
+      the build network again ("Recv failure: Connection reset by peer"). None of the three
+      was opened; the Brest patch rests on Faden 1793 and Bellin's sheet, as it says.
+  - item: "Gallica's own catalogue"
+    found: >-
+      Still unverified from here: gallica.bnf.fr answered every request with an empty reply.
+      Wikimedia Commons, searched through its API, holds the public-domain copies the study
+      names and more: 'New chart of the Plymouth sound' (ark btv1b53010480b), 'A chart of the
+      harbour of Plymouth' (ark btv1b530102722), the Neptune François sheets of Brittany
+      (arks btv1b530169146, btv1b53016935g and others), and, of note for the Plymouth patch,
+      'A trigonometrical survey of Plymouth Sound, by William Chapman, Master in the Royal
+      Navy, 1809' (RMG F0008, a TIFF on Commons): a survey of the Sound three years before
+      the breakwater, not read in this build and the first thing to read for the patch.
+  - item: "SHOM's two statements of the archive charts' licence"
+    found: >-
+      Unresolved. data.gouv.fr's record of 'Cartes Marines Anciennes (ARCHIVES)' (read
+      through its API) states the licence id fr-lo, the Licence Ouverte, and describes the
+      series as JPEG 2000 scans of charts published from 1822 on; SHOM's own catalogue
+      records at services.data.shom.fr answered 403 and 404 to the paths tried. No image
+      from the series is used or committed; the facts on a sheet are read by hand.
+  - item: "The UKHO bathymetry licence text"
+    found: >-
+      Not read in full. copyright.ukho.gov.uk (read) describes purpose-based licences: free
+      online licences for non-navigational, non-commercial and low-value commercial re-use,
+      commercial licences by agreement; its bathymetry-licence page path answered 404. The
+      gov.uk guidance on the INSPIRE portal and the MEDIN archive (read) says the UKHO makes
+      its INSPIRE data sets available under the Open Government Licence and gives access to
+      the bathymetric surveys of its Data Archive Centre, without stating those surveys'
+      licence on the page. No UKHO survey bathymetry is in the tiles; EMODnet carries it.
+  - item: "GSHHG's tolerances"
+    found: >-
+      Still unverified. The GSHHG page (version 2.3.7, 15 June 2017, read) gives the five
+      resolutions as successive reductions of about 80 per cent and names no Douglas-Peucker
+      tolerance; the LGPL since 2.2.2 is stated there. GSHHG is not used in this build (the
+      world level's coast is GEBCO's own land and sea).
+  - item: "The GEBCO_2025 file size"
+    found: >-
+      Verified. GEBCO's GEBCO_2025 page (read): the global grid is 43,200 rows by 86,400
+      columns at 15 arc-seconds, 3,732,480,000 points, published August 2025, "provided as a
+      single 7.5 GB file" in netCDF, the TID grid as a 4 GB file. At CEDA the netCDF is
+      7,466,018,396 bytes (an HDF5 file) and the eight-tile GeoTIFF zip 4,235,605,060 bytes,
+      the tiles 933,255,948 bytes each uncompressed. The study's "about 4 GB compressed and
+      7 GB open" was GEBCO's figure for 2026; for 2025 the netCDF is 7.5 GB as is.
+  - item: "The datum offsets between spring low water and LAT at the four ports"
+    found: >-
+      Not read from the tide tables (the Admiralty tables are not open). NTSLF's page of
+      chart datum against ordnance datum (read) gives Devonport -3.22 m, Newlyn -3.05 m and
+      St Mary's -2.91 m (local OD), which is chart datum below ordnance datum, not the mean
+      low water springs above chart datum the overrides need. The four overrides carry
+      figures from memory of the modern tables, 0.8 m at Devonport, 0.6 m at Falmouth, 0.7 m
+      at St Mary's and 1.0 m at Brest, each marked unverified in its file; the study's "half
+      a metre to a metre" holds. SHOM's reference-levels document (RAM) was not reachable.
+  - item: "Mackenzie's own datum statement"
+    found: >-
+      Verified from the text. Mackenzie senior, A Treatise of Maritim Surveying (1774), part
+      II, p. 15 (the Internet Archive's ECCO scan, read): "the Depths of the Water proper to be
+      inserted in Draughts of the Sea-coast, seem to be such only as are taken at low Water
+      in ordinary Spring-tides; and not such as are found when the Tides are affected by
+      extraordinary Causes: Ordinary Spring-tides may be reckoned such as happen in moderate
+      Weather, on the third Day after new or full Moon", with his table of allowances by the
+      hour of tide. Mackenzie junior's plan of Fowey Harbour (1774) on the Hurd sheet of
+      1809, seen at the museum's display size: "The Soundings are at low water Spring-tides.
+      Tides rise 15 feet at springs. Neaps 7 or 8." and "Variation 22° 30' W".
+  - item: "The brasse on each French sheet"
+    found: >-
+      Still unverified. Bellin's Brest sheet of 1773 was read at the archive's display size
+      (1,536 pixels), where the legend's remarks are not legible; the full-resolution JPEG
+      2000 was cached and not transcribed. The Brest patch uses Faden's translation, which
+      gives fathoms, so no brasse is converted; the tool carries BRASSE_M = 1.624 for a sheet
+      that needs it, marked as the study's unverified figure.
+  - item: "The Seven Stones lightvessel's date"
+    found: >-
+      Still unverified as a year. Imray 1874 (p. 102) has the light-vessel on station by
+      1874; the encyclopaedia's page returned no text from the build network. The features
+      file dates it 1841 from the study's "from the 1840s", says so, and in any case after
+      1805.
+  - item: "Le Créac'h's date"
+    found: >-
+      Verified. The French encyclopaedia's 'Phare du Créac'h' (read 2026-09-30): built in
+      1863 on Ushant. The Stiff's date, 1699 (Vauban's two towers), is from the same source's
+      'Phare du Stiff' page; Saint-Mathieu's tower of 1835 from 'Phare de Saint-Mathieu'.
+found_on_the_way:
+  - >-
+    The Internet Archive item the study calls Imray 1848 (sailingdirection00unse_0) is the
+    1874 edition of part I (its title page; its variation note is dated 1873). It is cited
+    as Imray 1874 throughout.
+  - >-
+    EMODnet's DTM 2024 is served by an ERDDAP griddap service (erddap.emodnet.eu, dataset
+    bathymetry_dtm_2024) as classic netCDF subsets with the per-cell shoalest and deepest
+    soundings beside the mean; the tool reads those with numpy alone.
+  - >-
+    GEBCO's grid subsetting application has a plain JSON queue API (POST /api/queue, GET
+    /api/queue/status and /api/queue/download), which the tool uses for the region's
+    extract; the eight global GeoTIFF tiles at CEDA are uncompressed inside their zip.
+  - >-
+    SHOM's HOMONIM 100 m grid is published as 7z archives (464 MB for the LAT-referenced
+    package); the build machine has no 7z reader and the runtime rule forbids adding one,
+    so the French cross-check was not made in this build. The recipe: extract the ArcGIS
+    grid with 7-Zip and GDAL, and compare it with EMODnet on the French side as the tool
+    compares an override with the modern grid.
+  - >-
+    Histolitt: the data.gouv.fr record found is a regional republication whose licence
+    field reads "notspecified"; SHOM's own diffusion is behind a form. The French shore in
+    the tiles and the coast is EMODnet's.

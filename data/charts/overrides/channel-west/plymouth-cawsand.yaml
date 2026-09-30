@@ -1,0 +1,56 @@
+# Plymouth Sound and Cawsand Bay without the breakwater (spec M5 §10; C §3.3, §5.2;
+# package 32). A period patch, hand-made: the polygons below are rasterised over the modern
+# grid by tools/build_charts.py at levels 2 and 3, their depths turned to metres below chart
+# datum by the sheet's unit and datum.
+#
+# What changed since 1805, verified in the study (C §3.3): the breakwater's foundation stone
+# was laid on 8 August 1812 and the work completed in 1841; before it the Sound was open to
+# the southerly swell and Cawsand Bay was the fleet's anchorage, where the blockading
+# squadrons off Brest assembled; the dockyard water was the Hamoaze.
+#
+# The sheet. Mackenzie's survey of 1773 (Hurd's Admiralty engraving of 1809, National
+# Maritime Museum G223:2/42, https://www.rmg.co.uk/collections/objects/rmgc-object-544536)
+# is the period survey of the Sound. The museum's display image (1,077 by 1,280 pixels,
+# about 100 m a pixel over the main sheet) shows the Fowey inset legibly and the Sound not:
+# no sounding of the Sound was read from it. Its legend on the Fowey inset was read and is
+# the datum statement below. The depths of the patches rest on White 1835 and Imray 1874
+# as each says; the breakwater's position on the modern chart (its own works).
+
+region: channel-west
+name: plymouth-cawsand
+sheet: "Mackenzie 1773, 'A survey of the south coast of England from Plymouth to the Lizard', Hurd 1809 (RMG G223:2/42), seen at the museum's display size; soundings not legible"
+source: "White 1835, 'Coast of England', pp. 31 to 35; Imray 1874, 'Start Point to Plymouth', pp. 78 to 85; the works' dates as C §3.3 verified them"
+units: fathoms
+datum: "low water of spring tides (Mackenzie junior's plan of Fowey 1774 on the same sheet: 'The Soundings are at low water Spring-tides'; Mackenzie senior, Treatise of Maritim Surveying 1774, part 2: depths 'such only as are taken at low Water in ordinary Spring-tides')"
+# Mean low water springs stands above the modern chart datum (about LAT) by this much at
+# Devonport: 0.8 m from the modern tide tables' MLWS there, a figure from memory and
+# unverified from the build network (C §7); the study's "half a metre to a metre".
+datum_above_chart_datum_m: 0.8
+control_points:
+  - {name: "Rame Head", lat_deg: 50.3155, lon_deg: -4.2245, note: "rock head, unmoved"}
+  - {name: "Penlee Point", lat_deg: 50.3195, lon_deg: -4.1900, note: "rock head, unmoved"}
+  - {name: "the Mewstone", lat_deg: 50.3115, lon_deg: -4.1090, note: "islet, unmoved"}
+  - {name: "Drake's Island", lat_deg: 50.3577, lon_deg: -4.1548, note: "islet, unmoved"}
+  - {name: "Maker church tower", lat_deg: 50.3440, lon_deg: -4.1870, note: "tower, unmoved"}
+  - {name: "Mount Batten tower", lat_deg: 50.3590, lon_deg: -4.1290, note: "tower, unmoved"}
+patches:
+  - name: "the Sound without the breakwater"
+    kind: sea
+    depth: 6
+    polygon:
+      - [50.3356, -4.1600]
+      - [50.3356, -4.1370]
+      - [50.3334, -4.1370]
+      - [50.3334, -4.1600]
+    source: "White 1835, 'Coast of England', pp. 33 to 34: a good channel between the Panther and the Breakwater having from 6 to 7 fathoms; the anchorage's southern part 36 feet at low water great springs"
+    note: "The breakwater's footprint (its works of 1812 to 1841) returned to the water it was built in: six fathoms at low water springs, White's depth beside it. Rests on White's soundings about the work and the modern chart's outline of it, not on a sounding read from the sheet."
+  - name: "the Sound's eastern arm without the breakwater"
+    kind: sea
+    depth: 5
+    polygon:
+      - [50.3356, -4.1370]
+      - [50.3360, -4.1330]
+      - [50.3338, -4.1330]
+      - [50.3334, -4.1370]
+    source: "White 1835, 'Coast of England', p. 34: in the channel east of the Breakwater 4 1/2 and 5 fathoms within half a cable of its front"
+    note: "The breakwater's eastern end returned to White's four and a half to five fathoms."
