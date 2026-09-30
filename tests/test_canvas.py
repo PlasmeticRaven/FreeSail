@@ -42,7 +42,9 @@ from freesail.ship.stub import OrderError
 
 FRIGATE = "data/ships/frigate-36.yaml"
 SCHOONER = "data/ships/topsail-schooner.yaml"
-SHIPS = [FRIGATE, SCHOONER]
+CUTTER = "data/ships/cutter.yaml"  # package 32b: the four ships
+BRIG = "data/ships/brig.yaml"
+SHIPS = [FRIGATE, SCHOONER, CUTTER, BRIG]
 
 # The cloth ratings milestone 2 gave the sails of No. 2 canvas (the committed files before
 # package 22: CLOTH_KN_PER_M2 0.9 for courses and topsails). Spec 3b §6.1: No. 2 keeps them.
@@ -139,7 +141,7 @@ def test_no_2_canvas_is_the_anchor_of_the_derivation(path):
     of its old rating (0.32/0.9)."""
     assert CLOTH_KN_PER_M2_NO2 == 0.32
     ship = load_ship(path)
-    for sid, old_rating in M2_NO2_RATINGS[path].items():
+    for sid, old_rating in M2_NO2_RATINGS.get(path, {}).items():  # the two milestone 2 files
         sail = ship.sails[sid]
         assert sail.canvas_no == 2, sid
         assert sail.cloth_rating_kn == cloth_rating_for(sail.area_m2, 2), sid
@@ -354,6 +356,29 @@ def test_the_schooners_sail_room():
     assert set(kinds_in[3:]) == {"storm_trysail", "storm_jib", "ringtail"} | {"water_sail"}
 
 
+def test_the_cutters_and_the_brigs_sail_rooms():
+    """Package 32b: the cutter's spare jib and mainsail with her storm trysail and storm
+    jib; the brig's second of each sail she could least do without and one of each storm
+    sail, by the schooner's rule (spec M5 §23, §25)."""
+    cutter = load_ship(CUTTER)
+    kinds_in = [s.kind for s in sail_room(cutter).sails]
+    assert kinds_in == ["jib", "main.sail", "storm_trysail", "storm_jib"]
+    assert {s.canvas_no for s in sail_room(cutter).sails if s.kind.startswith("storm")} == {1}
+    brig = load_ship(BRIG)
+    kinds_in = [s.kind for s in sail_room(brig).sails]
+    assert kinds_in[:5] == [
+        "fore.topsail",
+        "main.topsail",
+        "fore.course",
+        "jib",
+        "fore.topmast_staysail",
+    ]
+    assert set(kinds_in[5:]) == set(brig.groups["storm canvas"])
+    for ship in (cutter, brig):
+        for s in sail_room(ship).sails:
+            assert s.condition == 100.0 and s.canvas_no == ship.sails[s.kind].canvas_no
+
+
 def test_a_ship_file_with_only_a_count_has_made_up_sails():
     ship = load_ship(FRIGATE)
     ship.spec = SimpleNamespace(crew=SimpleNamespace(stores={"spare_sails": 2}))
@@ -489,7 +514,7 @@ def test_every_new_sail_loads_bends_sets_and_takes_in(path):
 
     ship = make_ship(path)  # with the orders, which refuse to set a sail still below
     runner, wind = ship.extra["evolutions"], make_wind()
-    new = ship.groups["storm canvas"] + ship.groups["occasional sails"]
+    new = ship.groups["storm canvas"] + ship.groups.get("occasional sails", [])
     assert new
     for sid in new:
         sail = ship.sails[sid]
@@ -549,8 +574,9 @@ def test_the_ringtail_and_water_sail_draw_running():
 
 def test_new_parts_do_not_change_the_ratings_of_the_old_spars():
     """The rating pass leaves the sail room's canvas out: every spar the files had keeps
-    its rating (the ringtail booms are rated for their ringtails, as studding sail booms)."""
-    for path in SHIPS:
+    its rating (the ringtail booms are rated for their ringtails, as studding sail booms).
+    The two milestone 2 files; the cutter and the brig (package 32b) carry no ringtail."""
+    for path in (FRIGATE, SCHOONER):
         doc = yaml.safe_load(open(path, encoding="utf-8"))
         ratings = {s["id"]: s["rating_kn"] for s in doc["spars"]}
         booms = [sid for sid in ratings if sid.endswith("ringtail_boom")]

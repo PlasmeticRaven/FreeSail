@@ -279,8 +279,15 @@ class SparSpec:
     brace_limit_deg: float | None = None  # yards
     rake_deg: float | None = None  # masts: positive rakes aft, negative forward (a polacre's fore)
     rating_kn: float | None = None
-    # studding sail booms: rigged out at the start or not (spec 3b §7); None takes the default
+    # studding sail booms: rigged out at the start or not (spec 3b §7); None takes the default.
+    # Package 32b: a running bowsprit takes it too (true: run out to its full length, false:
+    # reefed to its housed length).
     rigged_out: bool | None = None
+    # Package 32b (spec M5 §23): a cutter's running bowsprit, which runs in and out on the
+    # deck through the gammoning iron and is fidded at its reefs. `running` marks it;
+    # `housed_length_m` is its outboard length reefed, `length_m` its full outboard length.
+    running: bool | None = None
+    housed_length_m: float | None = None
 
     @property
     def parent(self) -> str | None:
@@ -476,6 +483,7 @@ def _parse_spar(s: Any, i: int, source: str) -> SparSpec:
     side = _str(s, "side", where, source, required=False)
     if side is not None and side not in SIDES:
         raise ShipFileError(f"{source}: {where} has side '{side}'; use starboard or larboard.")
+    running = _running(s, cls, where, source)
     return SparSpec(
         id=sid,
         cls=cls,
@@ -488,12 +496,15 @@ def _parse_spar(s: Any, i: int, source: str) -> SparSpec:
         brace_limit_deg=_num(s, "brace_limit_deg", where, source, required=False),
         rake_deg=_num(s, "rake_deg", where, source, required=False),
         rating_kn=_num(s, "rating_kn", where, source, required=False),
-        rigged_out=_rigged_out(s, cls, where, source),
+        rigged_out=_rigged_out(s, cls, where, source, running=bool(running)),
+        running=running,
+        housed_length_m=_housed_length(s, cls, where, source, running=bool(running)),
     )
 
 
-def _rigged_out(s: dict, cls: str, where: str, source: str) -> bool | None:
-    """A studding sail boom's starting state (spec 3b §7), if the file gives one."""
+def _rigged_out(s: dict, cls: str, where: str, source: str, running: bool = False) -> bool | None:
+    """A studding sail boom's starting state (spec 3b §7), if the file gives one; a running
+    bowsprit's too (package 32b: out to its full length, or reefed)."""
     value = s.get("rigged_out")
     if value is None:
         return None
@@ -502,10 +513,51 @@ def _rigged_out(s: dict, cls: str, where: str, source: str) -> bool | None:
             f"{source}: {where} has rigged_out = {value!r}; say true (run out along its yard) "
             "or false (rigged in)."
         )
-    if cls != "studdingsail_boom":
+    if cls != "studdingsail_boom" and not running:
         raise ShipFileError(
-            f"{source}: {where} is a {cls.replace('_', ' ')}; only a studding sail boom is "
-            "rigged out or in."
+            f"{source}: {where} is a {cls.replace('_', ' ')}; only a studding sail boom or a "
+            "running bowsprit is rigged out or in."
+        )
+    return value
+
+
+def _running(s: dict, cls: str, where: str, source: str) -> bool | None:
+    """Whether a bowsprit runs in and out (package 32b), if the file says."""
+    value = s.get("running")
+    if value is None:
+        return None
+    if not isinstance(value, bool):
+        raise ShipFileError(
+            f"{source}: {where} has running = {value!r}; say true (a running bowsprit, reefed "
+            "and rigged out on deck) or leave it out."
+        )
+    if cls != "bowsprit":
+        raise ShipFileError(
+            f"{source}: {where} is a {cls.replace('_', ' ')}; only a bowsprit runs in and out."
+        )
+    return value
+
+
+def _housed_length(s: dict, cls: str, where: str, source: str, running: bool) -> float | None:
+    """A running bowsprit's outboard length when reefed (package 32b)."""
+    value = _num(s, "housed_length_m", where, source, required=False)
+    if value is None:
+        if running:
+            raise ShipFileError(
+                f"{source}: {where} is a running bowsprit but gives no 'housed_length_m', its "
+                "outboard length when reefed."
+            )
+        return None
+    if not running:
+        raise ShipFileError(
+            f"{source}: {where} has 'housed_length_m' but is not a running bowsprit "
+            "(say running: true on a bowsprit)."
+        )
+    full = _num(s, "length_m", where, source, required=False)
+    if full is None or not 0.0 < value < full:
+        raise ShipFileError(
+            f"{source}: {where} has housed_length_m = {value:g}; a reefed bowsprit is shorter "
+            f"than its full outboard length_m ({full!r}) and longer than nothing."
         )
     return value
 

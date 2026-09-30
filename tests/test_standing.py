@@ -40,10 +40,12 @@ ROOT = Path(__file__).resolve().parents[1]
 SHIP_FILES = {
     "frigate": ROOT / "data" / "ships" / "frigate-36.yaml",
     "schooner": ROOT / "data" / "ships" / "topsail-schooner.yaml",
+    "cutter": ROOT / "data" / "ships" / "cutter.yaml",
+    "brig": ROOT / "data" / "ships" / "brig.yaml",
 }
 SPECS = {name: load_spec(path) for name, path in SHIP_FILES.items()}
 FRIGATE = str(SHIP_FILES["frigate"])
-F, S = "frigate", "schooner"
+F, S, C, B = "frigate", "schooner", "cutter", "brig"
 
 # the six starter routines of spec §3, which are also the primer's sentences
 NIGHT = (
@@ -438,6 +440,129 @@ TABLE: list[tuple[str, str, ok | no]] = [
         'standing order "x": at sunset then take in the royals',
         no(["'take in the royals' is refused", "no such part"]),
     ),
+    # -- package 32b: the cutter, whose starter routines name parts she lacks ------------------
+    (C, NIGHT, no(["'take in the studdingsails' is refused", "no such part as the studdingsails"])),
+    (C, MORNING, no(["'set the royals' is refused", "no such part as the royals"])),
+    (C, SHORTEN, no(["'take in the studdingsails' is refused"])),
+    (C, KEEP_FULL, ok("when", "apparent_wind_angle", "forward_of", 55.0, actions=1)),
+    (
+        C,
+        HEAVY,
+        no(["'shift the fore topmast staysail for the fore storm staysail' is refused"]),
+    ),
+    (C, WELL, no(["no well to sound yet"])),
+    (
+        C,
+        'standing order "night": at sunset then take in the gaff topsail; take in the topgallant',
+        ok("at", event="sunset", actions=2),
+    ),
+    (
+        C,
+        'standing order "morning": at sunrise, if the true wind is under 20 knots '
+        "then set the topgallant",
+        ok("at", event="sunrise", actions=1, if_reading="true_wind_speed"),
+    ),
+    (
+        C,
+        'standing order "reef": when the true wind exceeds 25 knots for 2 minutes '
+        "then reef the mainsail, two reefs; reef the topsail",
+        ok("when", "true_wind_speed", "gt", 25.0, duration=120, actions=2),
+    ),
+    (
+        C,
+        'standing order "bowsprit": when the true wind exceeds 35 knots for 5 minutes then '
+        "take in the jib; reef the bowsprit; shift the jib for the storm jib",
+        ok("when", "true_wind_speed", "gt", 35.0, duration=300, actions=3),
+    ),
+    (
+        C,
+        'standing order "heavy": when the true wind exceeds 40 knots for 5 minutes then send '
+        "down the topgallant mast; shift the mainsail for the storm trysail; run in the bowsprit",
+        ok("when", "true_wind_speed", "gt", 40.0, duration=300, actions=3),
+    ),
+    (
+        C,
+        'standing order "out": when the true wind is under 20 knots for 10 minutes then '
+        "rig out the bowsprit; set the jib",
+        ok("when", "true_wind_speed", "lt", 20.0, duration=600, actions=2),
+    ),
+    (
+        C,
+        'standing order "j": when the jib is aback then fill away',
+        ok("when", "sail", "is", "aback", params=("jib",)),
+    ),
+    (
+        C,
+        'standing order "main": when the mainsail is shaking then trim sails',
+        ok("when", "sail", "is", "shaking", params=("main.sail",)),
+    ),
+    (
+        C,
+        'standing order "fore": when the foresail is shaking then trim sails',
+        ok("when", "sail", "is", "shaking", params=("fore.staysail",)),
+    ),
+    (
+        C,
+        'standing order "sq": when the square sail is aback then trim sails',
+        ok("when", "sail", "is", "aback", params=("square_sail",)),
+    ),
+    (
+        C,
+        'standing order "x": when the fore topsail is shaking then trim sails',
+        no(["'the fore topsail is shaking' is not a reading the ship has"]),
+    ),
+    (
+        C,
+        'standing order "x": when the spanker is shaking then trim sails',
+        no(["is not a reading the ship has"]),
+    ),
+    (C, 'standing order "g": every glass then trim sails', ok("every", interval=1800)),
+    (
+        C,
+        'standing order "x": when the true wind exceeds 30 knots then shorten sail',
+        ok("when", "true_wind_speed", "gt", 30.0, actions=1),
+    ),
+    # -- package 32b: the brig, on whom the starter routines all read -----------------------------
+    (B, NIGHT, ok("at", event="sunset", actions=2)),
+    (B, MORNING, ok("at", event="sunrise", actions=1, if_reading="true_wind_speed")),
+    (B, SHORTEN, ok("when", "true_wind_speed", "gt", 30.0, duration=120, actions=3)),
+    (B, KEEP_FULL, ok("when", "apparent_wind_angle", "forward_of", 55.0, actions=1)),
+    (B, HEAVY, ok("when", "true_wind_speed", "gt", 40.0, duration=300, actions=3)),
+    (B, WELL, no(["no well to sound yet"])),
+    (
+        B,
+        'standing order "reef": when the true wind exceeds 25 knots for 2 minutes '
+        "then reef the topsails, one reef; reef the spanker, one reef",
+        ok("when", "true_wind_speed", "gt", 25.0, duration=120, actions=2),
+    ),
+    (
+        B,
+        'standing order "heavy": when the true wind exceeds 40 knots for 5 minutes then send '
+        "down the topgallant masts; shift the fore topmast staysail for the fore storm staysail; "
+        "shift the spanker for the storm trysail; close reef the topsails",
+        ok("when", "true_wind_speed", "gt", 40.0, duration=300, actions=4),
+    ),
+    (
+        B,
+        'standing order "sp": when the spanker is shaking then trim sails',
+        ok("when", "sail", "is", "shaking", params=("main.spanker",)),
+    ),
+    (
+        B,
+        'standing order "x": when the fore topsail is shaking then trim sails',
+        ok("when", "sail", "is", "shaking", params=("fore.topsail",)),
+    ),
+    (
+        B,
+        'standing order "x": when the mizzen topsail is shaking then trim sails',
+        no(["is not a reading the ship has", "did you mean the main topsail"]),
+    ),
+    (
+        B,
+        'standing order "x": at sunset then take in the gaff topsail',
+        no(["'take in the gaff topsail' is refused", "no such part"]),
+    ),
+    (B, 'standing order "g": every glass then trim sails', ok("every", interval=1800)),
     # -- refusals, each naming the word ------------------------------------------------------------
     (
         F,

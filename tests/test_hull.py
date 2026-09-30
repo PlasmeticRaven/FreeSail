@@ -23,6 +23,8 @@ from tests.test_ship_loader import MINIMAL
 
 FRIGATE = "data/ships/frigate-36.yaml"
 SCHOONER = "data/ships/topsail-schooner.yaml"
+CUTTER = "data/ships/cutter.yaml"  # package 32b: the four ships
+BRIG = "data/ships/brig.yaml"
 
 
 def steady_wind(from_deg: float = 225.0, knots: float = 15.0) -> Wind:
@@ -58,6 +60,16 @@ def frigate():
 @pytest.fixture
 def schooner():
     return load_ship(SCHOONER)
+
+
+@pytest.fixture
+def cutter():
+    return load_ship(CUTTER)
+
+
+@pytest.fixture
+def brig():
+    return load_ship(BRIG)
 
 
 # -- surge ----------------------------------------------------------------
@@ -393,10 +405,11 @@ def test_step_is_deterministic(frigate, monkeypatch):
     assert state_a == other.dyn.state()
 
 
-def test_both_reference_ships_run_under_bare_poles(frigate, schooner):
+def test_all_four_ships_run_under_bare_poles(frigate, schooner, cutter, brig):
     """With every sail furled, the real sail physics gives only windage: the ships
-    drift slowly and sanely, and the apparent wind is filled in."""
-    for ship in (frigate, schooner):
+    drift slowly and sanely, and the apparent wind is filled in (package 32b: the
+    cutter and the brig as the two reference ships)."""
+    for ship in (frigate, schooner, cutter, brig):
         run(ship, 60)
         assert ship.dyn.speed < units.knots_to_ms(2.0)
         assert math.isfinite(ship.dyn.x) and math.isfinite(ship.dyn.heading)

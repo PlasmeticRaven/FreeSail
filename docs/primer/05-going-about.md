@@ -106,9 +106,9 @@ The log:
 
 ```
   Morning watch (04:28)  Order: wear ship.
-  Morning watch (04:28)  Stand by to wear ship. Up helm; brace in the after yards.
+  Morning watch (04:28)  Stand by to wear ship. Up helm; brail up the spanker; brace in the after yards.
   Morning watch (04:28)  Stations for wearing ship.
-  Morning watch (04:29)  Wind aft. Squared the head yards; hauled out and braced up.
+  Morning watch (04:29)  Wind aft. Squared the head yards; hauled out and braced up. Haul out the spanker!
 * Morning watch (04:30)  Fore topgallant taken aback.
 * Morning watch (04:30)  Main course taken aback.
   Morning watch (04:32)  Main topsail filled again.

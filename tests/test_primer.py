@@ -7,8 +7,9 @@ string is::
 
     ```orders <ship> [<preset>] [<tack>]
 
-- ``<ship>`` is ``frigate`` (data/ships/frigate-36.yaml) or ``schooner``
-  (data/ships/topsail-schooner.yaml).
+- ``<ship>`` is ``frigate`` (data/ships/frigate-36.yaml), ``schooner``
+  (data/ships/topsail-schooner.yaml), ``cutter`` (data/ships/cutter.yaml) or
+  ``brig`` (data/ships/brig.yaml).
 - ``<preset>`` is the state the ship starts the block in: ``furled`` (the
   default: nothing set, yards square), ``plain-sail`` (the ship file's
   ``plain sail`` group set, the yards braced sharp up and the fore-and-aft
@@ -73,6 +74,8 @@ PRIMER = ROOT / "docs" / "primer"
 SHIP_FILES = {
     "frigate": ROOT / "data" / "ships" / "frigate-36.yaml",
     "schooner": ROOT / "data" / "ships" / "topsail-schooner.yaml",
+    "cutter": ROOT / "data" / "ships" / "cutter.yaml",
+    "brig": ROOT / "data" / "ships" / "brig.yaml",
 }
 SPECS = {name: load_spec(path) for name, path in SHIP_FILES.items()}
 

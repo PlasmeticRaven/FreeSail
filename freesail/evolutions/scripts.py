@@ -272,10 +272,19 @@ def after_gaff_sails(ship: Ship) -> list:
     not a driver, and without it she pays off broad and forereaches under her
     foresail and jibs (the period way for a fore-and-after is a jib sheet to
     windward, which the sail model cannot yet do)."""
-    masts = [sp for sp in ship.spars.values() if sp.cls == "mast" and not sp.wrecked]
-    if len(masts) < 3:
+    # Package 32b: the driver is found by place, not by counting masts. It is the gaff
+    # sail on the aftermost lower mast when that mast carries square yards and another
+    # mast forward of it does too (a ship's mizzen, a brig's main, whose spanker brought
+    # the brig head to wind with sternway hove to, as the frigate's did before package
+    # 10); a vessel whose yards are all on one mast, the schooner's fore or the cutter's
+    # one mast, keeps her gaff sail, which is her driving sail.
+    with_yards = _masts_with_yards(ship)
+    if len(with_yards) < 2:
         return []
-    aftermost = min(masts, key=lambda m: m.x_m)
+    aftermost = min(with_yards, key=lambda m: m.x_m)
+    lower = [sp for sp in ship.spars.values() if sp.cls == "mast" and not sp.wrecked]
+    if not lower or min(lower, key=lambda m: m.x_m) is not aftermost:
+        return []
     return [
         sl
         for sl in ship.sails.values()
@@ -657,9 +666,11 @@ class WearScript(Script):
         self.new_course = ship.dyn.heading
         self.bowlined: list[str] = []  # sails whose bowlines were hauled out before wearing
         self.studding: StuddingSailsIn | None = None
+        self.brailed: list = []  # the driver brailed up at "up helm" (package 32b)
 
     def holds(self) -> set[str]:
-        return {self.ship.name} | {y.id for y in self.head + self.after}
+        held = {self.ship.name} | {y.id for y in self.head + self.after}
+        return held | {s.id for s in after_gaff_sails(self.ship)}
 
     def begin(self, words: dict[str, Any]) -> None:
         # the studding sails first, if any are set or their booms out (spec 3b §7)
@@ -680,16 +691,38 @@ class WearScript(Script):
         dyn.steady = False
         self.phase = "bear_away"
         # "Put the helm up! Clear away the bo'lines! and as she falls off, BRACE IN THE
-        # AFTER YARDS!" (Luce 1884, ch. XXIV, 'Wearing')
+        # AFTER YARDS!" (Luce 1884, ch. XXIV, 'Wearing'), the spanker brailed up as the
+        # helm goes up ("Brail up the spanker!", the same) and hauled out again as she comes
+        # to. Package 32b: the brig, whose spanker is a fifth of her plain sail, would not
+        # pay off with it set and came to on the new tack past close-hauled into the wind;
+        # the driver is found by place (`after_gaff_sails`), so a fore-and-after keeps hers.
+        self.brailed = after_gaff_sails(self.ship)
+        for sl in self.brailed:
+            sl.state = SailState.IN_THE_GEAR
+        brail = f"; brail up {names_of_sails(self.ship, self.brailed)}" if self.brailed else ""
         self.bowlined = bowlines_hauled(self.ship)
         if let_go_bowlines(self.ship):
             self.note(
-                "Stand by to wear ship. Up helm; clear away the bowlines; brace in the after "
-                "yards.",
+                f"Stand by to wear ship. Up helm; clear away the bowlines{brail}; brace in the "
+                "after yards.",
                 "helm.order",
             )
         else:
-            self.note("Stand by to wear ship. Up helm; brace in the after yards.", "helm.order")
+            self.note(
+                f"Stand by to wear ship. Up helm{brail}; brace in the after yards.", "helm.order"
+            )
+
+    def _haul_out(self) -> str:
+        """Haul out the driver brailed up at 'up helm', as she comes to; the words."""
+        from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+        words = []
+        for sl in self.brailed:
+            if sl.state is SailState.IN_THE_GEAR and _chain_standing(self.ship, sl):
+                sl.state = SailState.SET
+                words.append(f"Haul out the {part_name(self.ship, sl.id)}!")
+        self.brailed = []
+        return (" " + " ".join(words)) if words else ""
 
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
         if self.phase == "in_studding_sails":
@@ -723,6 +756,11 @@ class WearScript(Script):
             sharp_up = -self.sign  # braced sharp up for the new tack
             error = abs(units.wrap_pi(dyn.heading - self.new_course))
             steady = error <= units.deg_to_rad(self.timing_value("steady_deg", 5.0))
+            # The driver brailed up at "up helm" is hauled out as she comes to, once she is
+            # by the wind: hauled out with the wind aft, the brig's (a fifth of her plain
+            # sail) rounded her up through the wind before the helm could meet her.
+            if steady and self.brailed:
+                self.note("By the wind." + self._haul_out())
             # The after yards go sharp up at once to bring her to; the head yards
             # follow the wind, keeping their sails full, until she is by the wind.
             # (All yards end at their limits, as at milestone 2: spec 3b §2.2 asks

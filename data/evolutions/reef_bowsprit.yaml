@@ -1,0 +1,49 @@
+# Reef the running bowsprit (package 32b; spec M5 §23): a cutter's bowsprit runs in and
+# out on the deck through the gammoning iron and is fidded at its reefs, the fid-holes
+# in its heel. Reefed, it is run in to bring the jib's tack inboard for heavy weather,
+# when the smaller jib or the storm jib sets on the traveller in the full jib's place;
+# rigged out to its full length for the full jib (rig_out_bowsprit.yaml). Steel 1794
+# vol. I names the gear: the HEEL-ROPE, "to haul out the bowsprits of cutters, &c.",
+# and cutters' bowsprits "lie nearly in an horizontal direction"; Lever 1808 the
+# traveller the jib's tack rides on. The spar is the ship file's `running` bowsprit,
+# whose `housed_length_m` is its outboard length reefed and `length_m` its full length;
+# `rigged_out` says which it stands at, and the runner's ramp moves the length between
+# them (no engine change: the file's flag and two numbers, and this step's ramp).
+#
+# Refused unless the bowsprit runs (a ship's is gammoned fast to the stem), and until
+# every sail whose tack rides it (the ship file's `halyard_spar` link: the jib) is
+# hauled down; the storm jib, whose tack lies at the reefed end, is not linked and may
+# stand. Luce, Steel and Lever give no account of the work's time or hands; judgement:
+# six forecastlemen, eight minutes in all, cast off, run in and set up.
+id: reef_bowsprit
+verb: reef
+applies_to: {class: bowsprit}
+preconditions:
+  - {check: spar.running, reason: "The {spar} is gammoned fast to the stem; only a cutter's running bowsprit reefs."}
+  - {check: not spar.wrecked, reason: "The {spar} is carried away; clear the wreck and shift it for a spare."}
+  - {check: spar.rigged_out, reason: "The {spar} is reefed already."}
+  - {check: not any_set(sails_on(spar)), reason: "A head sail is set with its tack on the {spar}; haul it down first."}
+requires:
+  - {check: not spar.wrecked, reason: "the {spar} is carried away"}
+steps:
+  - do: cast_off
+    duration_s: 120
+    log: "Cast off the bobstay and the bowsprit shrouds; drew the fid."
+  - do: heel_rope
+    duration_s: 0
+    via: line_of(spar, outhaul)   # the heel-rope: parted, nothing moves it; a file with none skips this
+  - do: run_in
+    duration_s: 240
+    ramp: {spar.length_m: spar.housed_length_m}
+    sets: {spar.rigged_out: "false"}
+    log: "Ran in the {spar} to its reef by the heel-rope and fidded it."
+  - do: set_up
+    duration_s: 120
+    log: "Set up the bobstay and the bowsprit shrouds afresh; the traveller run in to the end."
+on_start: {log: "Reef the {spar}! Hands to the heel-rope; cast off the bobstay."}
+on_complete: {log: "Reefed the {spar}; the jib's tack comes inboard with it, and the storm jib or a smaller jib sets on the traveller now.", kind: spar.reefed, severity: notable}
+on_fail: {log: "Could not reef the {spar}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the forecastlemen, whose station the head is (Luce 1884, ch. XVIII Organization,
+# 'Duties of Men in Different Parts of the Ship'); the number judgement.
+crew: {hands: 6, rating: able, stations: [forecastle]}
+source: "Steel 1794 vol. I, HEEL-ROPE (\"to haul out the bowsprits of cutters, &c.\") and 'Bowsprit' (cutters' bowsprits \"lie nearly in an horizontal direction\"); Lever 1808, 'The Jib' (the traveller); Fincham 1843 art. 87 (the bowsprit \"housed\"); Falconer 1780, CUTTER"

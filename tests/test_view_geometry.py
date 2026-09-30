@@ -36,6 +36,8 @@ ROOT = Path(__file__).resolve().parents[1]
 PROJECTION = ROOT / "client" / "projection.js"
 FRIGATE = "data/ships/frigate-36.yaml"
 SCHOONER = "data/ships/topsail-schooner.yaml"
+CUTTER = "data/ships/cutter.yaml"  # package 32b: the four ships
+BRIG = "data/ships/brig.yaml"
 NODE = shutil.which("node")
 needs_node = pytest.mark.skipif(NODE is None, reason="Node is not installed")
 
@@ -99,13 +101,15 @@ def ship_state(ship, awa=WIND_ON_THE_LARBOARD_BOW, tack="larboard") -> dict:
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("path", [FRIGATE, SCHOONER])
+@pytest.mark.parametrize("path", [FRIGATE, SCHOONER, CUTTER, BRIG])
 def test_the_graph_and_snapshot_carry_what_the_view_reads(path):
     world = make_world(7, path, Scenario(wind_from_deg=0.0, wind_speed_kn=10.0))
     graph = queries.ship_graph(world.ship)
     snap = queries.snapshot(world)
     booms = [s for s in graph["spars"] if s["class"] == "studdingsail_boom"]
-    assert booms and all(s["rigged_out"] is False for s in booms)  # rigged in at the start
+    if path != CUTTER:  # the cutter carries no studding sails (package 32b)
+        assert booms
+    assert all(s["rigged_out"] is False for s in booms)  # rigged in at the start
     assert all(s["rigged_out"] is True for s in graph["spars"] if s["class"] == "boom")
     assert all("rigged_out" in s for s in snap["spars"])
     bowlines = [ln for ln in graph["lines"] if ln["class"] == "bowline"]
@@ -425,6 +429,75 @@ def test_the_storm_mizzen_furled_is_drawn_as_a_bundle_at_its_luff(tmp_path):
 
 
 @needs_node
+@needs_node
+def test_the_cutter_is_drawn_from_her_file(tmp_path):
+    """Package 32b: the viewer needs no art for a new hull. The cutter's gaff mainsail's
+    boom overhangs the counter, her jib runs to the running bowsprit's end and her three
+    yards hang on the one mast, every figure from the file's parts."""
+    ship = make_ship(CUTTER)
+    for sid in ship.groups["plain sail"]:
+        ship.sails[sid].state = SailState.SET
+    data = ship_state(ship)
+    got = run_js(
+        tmp_path,
+        data,
+        "const sk = P.buildSkeleton(d.graph, d.snap);"
+        "const spars = {}; sk.figures.filter(x => x.kind === 'spar')"
+        ".forEach(x => spars[x.id] = x.pts);"
+        "const sails = {}; sk.figures.filter(x => x.kind === 'sail')"
+        ".forEach(x => sails[x.id] = x.corners);"
+        "return {spars: spars, sails: sails, hull: sk.hull};",
+    )
+    stern = -got["hull"]["length_waterline_m"] / 2.0
+    boom = got["spars"]["main.boom"]
+    assert boom[1][0] < stern  # the boom's end abaft the sternpost
+    assert got["sails"]["main.sail"][2][0] < stern  # and the mainsail's clew with it
+    bowsprit = got["spars"]["bowsprit"]
+    tip = bowsprit[1]
+    assert tip[0] > got["hull"]["length_waterline_m"] / 2.0 + 8.0  # a long bowsprit
+    tack = got["sails"]["jib"][0]
+    assert abs(tack[0] - tip[0]) < 1.5 and abs(tack[2] - tip[2]) < 1.5  # the jib's tack at its end
+    yards = {
+        sid: got["spars"][sid] for sid in ("square_sail.yard", "topsail.yard", "topgallant.yard")
+    }
+    heights = [(y[0][2] + y[1][2]) / 2.0 for y in yards.values()]
+    assert heights == sorted(heights)  # square sail, topsail, topgallant, in order aloft
+    assert len({round((y[0][0] + y[1][0]) / 2.0, 0) for y in yards.values()}) <= 2  # one mast
+
+
+@needs_node
+def test_the_brigs_staysails_are_drawn_between_her_masts(tmp_path):
+    """Package 32b: the brig's main staysail, main topmast staysail and main topgallant
+    staysail hang on stays from the main mast's heads to the fore mast, between the masts,
+    and the viewer cuts none of them at a mast it does not cross."""
+    ship = make_ship(BRIG)
+    for sid in ("main.staysail", "main.topmast_staysail", "main.topgallant_staysail"):
+        ship.sails[sid].state = SailState.SET
+    data = ship_state(ship)
+    got = run_js(
+        tmp_path,
+        data,
+        "const sk = P.buildSkeleton(d.graph, d.snap);"
+        "const out = {}; sk.figures.filter(x => x.kind === 'sail')"
+        ".forEach(x => out[x.id] = x.corners);"
+        "const spars = {}; sk.figures.filter(x => x.kind === 'spar')"
+        ".forEach(x => spars[x.id] = x.pts);"
+        "return {sails: out, spars: spars};",
+    )
+    fore_x = got["spars"]["fore.mast"][0][0]
+    main_x = got["spars"]["main.mast"][0][0]
+    for sid in ("main.staysail", "main.topmast_staysail", "main.topgallant_staysail"):
+        corners = got["sails"][sid]
+        assert corners, sid
+        for p in corners:
+            assert main_x - 1.0 <= p[0] <= fore_x + 1.0, (sid, p)
+    heights = [
+        got["sails"][sid][1][2]
+        for sid in ("main.staysail", "main.topmast_staysail", "main.topgallant_staysail")
+    ]
+    assert heights == sorted(heights)  # each head above the last
+
+
 def test_a_wreck_cleared_away_is_not_drawn(tmp_path):
     """Package 30b: the snapshot calls a spar carried away whose wreck has been cleared
     `cleared` (on deck or over the side); the viewer draws it, and what stood on it, no

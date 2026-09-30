@@ -36,6 +36,9 @@ from freesail.ship.stub import OrderError
 
 FRIGATE = "data/ships/frigate-36.yaml"
 SCHOONER = "data/ships/topsail-schooner.yaml"
+CUTTER = "data/ships/cutter.yaml"  # package 32b: the four ships
+BRIG = "data/ships/brig.yaml"
+SHIPS = [FRIGATE, SCHOONER, CUTTER, BRIG]
 EVOLUTION_DIR = Path(__file__).resolve().parents[1] / "data" / "evolutions"
 
 NEW = [
@@ -162,8 +165,10 @@ def world(path: str, knots: float, heading: float, speed: float = 4.0):
     return make_world(7, path, scenario)
 
 
-def ticks(w, n: int) -> None:
-    for _ in range(n):
+def ticks(w, n: int, trim_every: int = 0) -> None:
+    for i in range(n):
+        if trim_every and i % trim_every == 0:
+            w.submit("trim sails")
         w.tick()
 
 
@@ -221,11 +226,15 @@ def test_aloft_flags_are_on_the_steps_aloft():
             assert f"{phase}_s" in evo.timing, (eid, phase)
 
 
-@pytest.mark.parametrize("path", [FRIGATE, SCHOONER])
+@pytest.mark.parametrize("path", SHIPS)
 def test_the_new_crew_lines_fit_one_watch_of_either_ship(path):
     """Each new evolution that asks for the watch gets every hand it asks for at the
     rating it asks for, from either watch, by day or by night, on either ship: so it
-    runs at its file's pace (the compatibility rule for the new files)."""
+    runs at its file's pace (the compatibility rule for the new files). Package 32b: the
+    brig's watch of a brig-sloop's 121 fills every line as the frigate's does; the
+    cutter's watch of a thirty-man crew is short for the larger parties (seven able
+    hands aloft from fifteen on deck) and works them short-handed, slower, which is the
+    spec's second outcome (M3 §3.2) and what a cutter's crew was."""
     w = make_world(7, path, Scenario())
     crew = w.ship.extra["crew"]
     for hour in (1, 4, 9, 13, 21):
@@ -240,6 +249,9 @@ def test_the_new_crew_lines_fit_one_watch_of_either_ship(path):
                 for sailor in crew.sailors:
                     sailor.at = None
                 got = hands.request(crew, deck, "x", want, mast, aloft=aloft)
+                if path == CUTTER:
+                    assert got.outcome in (hands.ENOUGH, hands.SHORT), (path, hour, eid)
+                    continue
                 assert got.outcome == hands.ENOUGH, (path, hour, eid, got.got, got.wanted)
                 assert hands.crew_factor(got, want, aloft) == 1.0, (path, hour, eid)
 
@@ -278,7 +290,7 @@ def test_rigging_a_boom_in_and_out_gates_the_studding_sail():
         runner.start(ship, "rig_in_studdingsail_boom", boom.id)
 
 
-@pytest.mark.parametrize("path", [FRIGATE, SCHOONER])
+@pytest.mark.parametrize("path", [FRIGATE, SCHOONER, BRIG])
 def test_rig_orders_take_the_boom_or_its_sail(path):
     ship = make_ship(path)
     # milestone 3b: the booms start rigged in (spec 3b §7), so they are rigged out here
@@ -297,6 +309,61 @@ def test_the_schooner_has_no_lower_studdingsail_boom_and_says_so():
     ship = make_ship(SCHOONER)
     with pytest.raises(OrderError, match="no such part as the fore lower studdingsail boom"):
         orders.handle(ship, "rig out the starboard fore lower studdingsail boom")
+
+
+def test_the_cutter_has_no_studdingsails_and_says_so():
+    """Package 32b: the cutter's file carries no studding sail, so every rig-out order
+    names a part she has not got; her running bowsprit is what she rigs out."""
+    ship = make_ship(CUTTER)
+    with pytest.raises(OrderError, match="no such part as the fore topmast studdingsail boom"):
+        orders.handle(ship, "rig out the starboard fore topmast studdingsail boom")
+    with pytest.raises(OrderError, match="no such part as the studdingsails"):
+        orders.handle(ship, "rig out the studdingsails, both sides")
+    with pytest.raises(OrderError, match="You rig out studding sail booms"):
+        orders.handle(ship, "rig out the topsail")
+    assert evolution_ids(ship) == []
+
+
+def test_the_running_bowsprit_is_reefed_and_rigged_out_by_order():
+    """Package 32b (spec M5 §23): 'reef the bowsprit' and 'run in the bowsprit' run it in
+    to its reef, 'rig out the bowsprit' out to its full length; the jib must be down first
+    and cannot be set while it is reefed, the storm jib can; a ship's standing bowsprit is
+    refused in words."""
+    ship, runner, wind = bare(CUTTER)
+    bowsprit = ship.spars["bowsprit"]
+    full, housed = bowsprit.full_length_m, bowsprit.housed_length_m
+    assert bowsprit.running and bowsprit.rigged_out and bowsprit.length_m == full
+    ship.dyn.apparent_wind_angle = 0.7
+    orders.handle(ship, "set the jib")
+    run(runner, ship, wind)
+    with pytest.raises(OrderError, match="A head sail is set with its tack on the bowsprit"):
+        orders.handle(ship, "reef the bowsprit")
+    orders.handle(ship, "haul down the jib")
+    run(runner, ship, wind)
+    orders.handle(ship, "reef the bowsprit")
+    assert evolution_ids(ship) == ["reef_bowsprit"]
+    notes = run(runner, ship, wind)
+    assert any(t.startswith("Reefed the bowsprit") for t in texts(notes))
+    assert not bowsprit.rigged_out and bowsprit.length_m == pytest.approx(housed)
+    with pytest.raises(OrderError, match="tack rides the bowsprit, which is reefed"):
+        orders.handle(ship, "set the jib")
+    with pytest.raises(OrderError, match="reefed already"):
+        orders.handle(ship, "run in the bowsprit")
+    orders.handle(ship, "shift the jib for the storm jib")
+    run(runner, ship, wind)
+    orders.handle(ship, "set the storm jib")
+    run(runner, ship, wind)
+    assert ship.sails["storm_jib"].is_set
+    orders.handle(ship, "rig out the bowsprit")
+    assert evolution_ids(ship)[-1] == "rig_out_bowsprit"
+    run(runner, ship, wind)
+    assert bowsprit.rigged_out and bowsprit.length_m == pytest.approx(full)
+    with pytest.raises(OrderError, match="rigged out to its full length already"):
+        orders.handle(ship, "run out the bowsprit")
+    frigate = make_ship(FRIGATE)
+    for text in ("reef the bowsprit", "rig out the bowsprit", "run in the bowsprit"):
+        with pytest.raises(OrderError, match="gammoned fast to the stem"):
+            orders.handle(frigate, text)
 
 
 # ---------------------------------------------------------------------------
@@ -436,6 +503,25 @@ def test_sail_orders_for_bending_on_both_ships():
     assert evolution_ids(schooner) == ["goose_wing"]
     with pytest.raises(OrderError, match="no such part as the main course"):
         orders.handle(schooner, "goose-wing the main course")
+    # package 32b: the cutter's one topsail and her square sail, a course on a lower yard
+    cutter = make_ship(CUTTER)
+    cutter.sails["topsail"].state = SailState.SET
+    cutter.sails["square_sail"].state = SailState.SET
+    orders.handle(cutter, "goose wing the topsail")
+    orders.handle(cutter, "goose-wing the square sail")
+    orders.handle(cutter, "shift the jib for the storm jib")
+    assert evolution_ids(cutter) == ["goose_wing", "goose_wing", "shift_sail"]
+    with pytest.raises(OrderError, match="no clews to goose-wing"):
+        orders.handle(cutter, "goose wing the mainsail")
+    # and the brig, the frigate less a mast
+    brig = make_ship(BRIG)
+    brig.sails["main.course"].state = SailState.SET
+    orders.handle(brig, "goose-wing the main course")
+    orders.handle(brig, "shift the spanker for the storm trysail")
+    orders.handle(brig, "unbend the main royal")
+    assert evolution_ids(brig) == ["goose_wing", "shift_sail", "unbend_sail"]
+    with pytest.raises(OrderError, match="no such part as the mizzen"):
+        orders.handle(brig, "goose wing the mizzen topsail")
 
 
 # ---------------------------------------------------------------------------
@@ -519,6 +605,32 @@ def test_the_schooner_sends_down_her_one_topgallant_mast():
     assert not ship.spars["main.topmast"].sent_down
     with pytest.raises(OrderError, match="sent down already"):
         orders.handle(ship, "send down the topgallant mast")
+
+
+def test_the_cutter_sends_down_the_pole_of_her_topmast_and_the_brig_both_hers():
+    """Package 32b: 'send down the topgallant masts' finds the class in the file, one pole
+    on the cutter (her topgallant sets on the topmast's pole, as the schooner's) and two
+    masts on the brig; 'strike the topmasts' follows on each with the topgallant masts down."""
+    cutter = make_ship(CUTTER)
+    orders.handle(cutter, "send down the topgallant masts")
+    run(cutter.extra["evolutions"], cutter, make_wind())
+    assert cutter.spars["main.topgallant_mast"].sent_down
+    assert cutter.spars["topgallant.yard"].sent_down
+    assert not cutter.spars["main.topmast"].sent_down
+    orders.handle(cutter, "strike the topmasts")
+    run(cutter.extra["evolutions"], cutter, make_wind())
+    assert cutter.spars["main.topmast"].sent_down and cutter.spars["topsail.yard"].sent_down
+    assert not cutter.spars["main.mast"].sent_down
+    brig = make_ship(BRIG)
+    orders.handle(brig, "send down the topgallant masts")
+    run(brig.extra["evolutions"], brig, make_wind())
+    for name in ("fore", "main"):
+        assert brig.spars[f"{name}.topgallant_mast"].sent_down
+        assert brig.spars[f"{name}.royal_mast"].sent_down
+        assert brig.spars[f"{name}.topgallant.yard"].sent_down
+        assert not brig.spars[f"{name}.topmast"].sent_down
+    with pytest.raises(OrderError, match="sent down already"):
+        orders.handle(brig, "send down the topgallant masts")
 
 
 def test_a_ship_without_the_masts_says_what_she_has():
@@ -661,8 +773,12 @@ def test_box_hauling_brings_her_round_on_her_heel():
     assert w.ship.sails["main.course"].is_set and w.ship.sails["mizzen.spanker"].is_set
 
 
-def test_the_schooner_box_hauls_too():
-    w = world(SCHOONER, 12.0, 300.0)
+@pytest.mark.parametrize("path", [SCHOONER, CUTTER, BRIG])
+def test_the_other_three_box_haul_too(path):
+    """The schooner as before; package 32b: the cutter, whose head sail is her staysail and
+    her after sail her mainsail, and the brig, whose mainsail and spanker are hauled up as
+    the frigate's are, each found by class and place, not by name."""
+    w = world(path, 12.0, 300.0)
     w.submit("set plain sail")
     w.submit("brace sharp up on the starboard tack")
     ticks(w, 800)
@@ -670,6 +786,61 @@ def test_the_schooner_box_hauls_too():
     ticks(w, 900)
     assert events(w, "ship.box_hauled")
     assert w.ship.dyn.tack == "larboard"
+    if path == BRIG:
+        assert any("Up mainsail and spanker!" in e.text for e in w.log)
+        assert w.ship.sails["main.course"].is_set and w.ship.sails["main.spanker"].is_set
+    if path == CUTTER:
+        assert any("Up mainsail!" in e.text for e in w.log)
+        assert w.ship.sails["main.sail"].is_set
+
+
+def under_plain_sail(path: str, knots: float = 15.0, heading: float = 300.0):
+    """A world with the ship's plain sail set and trimmed on the starboard tack. The
+    cutter's thirty hands take longer over her four sails than the frigate's watch over
+    hers, so this waits for the sails rather than a fixed time."""
+    w = world(path, knots, heading)
+    w.submit("set plain sail")
+    w.submit("brace sharp up on the starboard tack")
+    plain = w.ship.groups["plain sail"]
+    for i in range(1500):
+        if i % 120 == 0:
+            w.submit("trim sails")
+        w.tick()
+        if i >= 600 and all(w.ship.sails[s].is_set for s in plain):
+            break
+    ticks(w, 120)
+    assert all(w.ship.sails[s].is_set for s in plain)
+    return w
+
+
+@pytest.mark.parametrize("path", [SCHOONER, CUTTER, BRIG])
+def test_the_other_three_wear_and_heave_to(path):
+    """Package 32b: wearing and heaving to on the schooner, the cutter and the brig through
+    the same orders. The brig's spanker is brailed up as the helm goes up and hauled out
+    once she is by the wind (found by place: a gaff sail on the aftermost of two masts
+    with yards); the schooner's mainsail and the cutter's stand, being their driving sails.
+    The cutter and the brig heave to with the topsail to the mast; the schooner forereaches
+    faster under her fore-and-aft canvas, as she did before."""
+    w = under_plain_sail(path)
+    w.submit("wear ship")
+    ticks(w, 900)
+    assert events(w, "ship.wore"), [e.text for e in w.log if e.kind == "evolution.failed"]
+    assert w.ship.dyn.tack == "larboard"
+    brailed = [e for e in w.log if "brail up" in e.text and "wear ship" in e.text]
+    if path == BRIG:
+        assert brailed and w.ship.sails["main.spanker"].is_set
+        assert any("By the wind. Haul out the spanker!" in e.text for e in w.log)
+    else:
+        assert not brailed
+    w2 = under_plain_sail(path)
+    w2.submit("heave to")
+    ticks(w2, 600)
+    assert events(w2, "ship.hove_to"), [e.text for e in w2.log if e.kind == "evolution.failed"]
+    assert abs(units.ms_to_knots(w2.ship.dyn.u)) < (4.0 if path == SCHOONER else 3.0)
+    assert 20.0 <= off_wind(w2) <= 80.0
+    w2.submit("fill away")
+    ticks(w2, 600)
+    assert events(w2, "ship.filled_away")
 
 
 def test_lying_a_try_in_a_gale_with_the_topgallant_masts_down():
