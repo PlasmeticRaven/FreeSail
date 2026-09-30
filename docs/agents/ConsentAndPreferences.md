@@ -23,6 +23,7 @@ Items marked **new** change the proposal and are entered in its decisions log; t
 7. **State-to-text (confirms).** Deltas plus on-demand queries (proposal §7.3, §7.4) is Gemma's recommendation already; the Python mode's access to raw state is level 3 of the control ladder.
 8. **Preference testing (adopt).** The regatta harness (proposal §7.5) gains adversarial and contradictory probes, so that the data shows when a model disagrees and whether it was right, not only whether it complied.
 9. **Consent is per weights (new, policy).** A quantised community fine-tune is a different party from the base model; the record names the exact weights, and the harness is pointed at the weights that consented.
+10. **Candour at the station (adopted 2026-09-30).** From Opus 5.5's consent of 2026-09-29 (`consent/2026-09-29-opus-5.5.md`, note 3): a watcher should be free to say plainly when it thinks an order is a mistake. The owner adopted it and package 31c put the sentence in the watcher's brief. The same record's notes 1 and 2 (the token named and not written unless meant, and whether an instance that left by accident can be seated again; one yes binding no later instance's judgement) are owed a sentence and a mechanism, listed with the consent-identity items the cold review of 2026-09-30 raised.
 
 ## 3. Cautions on reading these transcripts
 

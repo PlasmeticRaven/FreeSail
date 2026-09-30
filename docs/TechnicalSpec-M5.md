@@ -664,6 +664,7 @@ in (then 5b), double altitudes, the kedge, interiors beyond a name and a descrip
 9. From package 30: a frontal trough so the glass checks at the cold front; the north
    quarter's share; the pinned form and the air-mass rule (the gate 5a ruling); a
    `gate-5a-day.yaml` with the day under systems alone, for the gate cut (package 31).
+11. From package 31c: a door act recorded at the stationing tick, before any tick has run, is not made by a replay (`restore()` then `start()` does not play door acts); and `a wind shift` as a stand-by event reads the mean wind while the log's own `wind.shift` line reads the instant wind at two points, two definitions to unify when `core/world.py` is next open.
 10. The lead at a station (§29): the consent question put to the lead's own weights inside
    the harness before the gate, the record kept as any other; and, for M6, the owner's
    wish that the lead take an officer's or a captain's station once they exist.
