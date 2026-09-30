@@ -4,7 +4,7 @@
 format: 1
 built: '2026-09-30'
 tool: tools/build_charts.py
-build_hash: 62245242fde23e8c
+build_hash: dd42112bd85cf3a6
 levels:
   '0':
     cell_sec: 150.0
@@ -1819,12 +1819,11 @@ sources:
     - level 1 (the Atlantic)
     - the land under level 2
     fetched:
-    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 47.65, ''north'':
-        51.35, ''west'': -7.3999999999999995, ''east'': -2.4})'
+    - url: https://download.gebco.net/api/queue/download/GEBCO_30_Sep_2026_8dd500e3baa2
       retrieved: '2026-09-30'
-      sha256: 53112cfbceb9eb973de5e1715137d5c003fdd4e4d995188ee19a69c34da2daf0
+      sha256: 159fff2887ab22b07e9c02427c4c605b9ea424b05b90950545f57f5c6e09312b
       bytes: 4874675
-      file: gebco_2025_s47.65_n51.35_w-7.3999999999999995_e-2.4_ascii.zip
+      file: gebco_2025_s47.65_n51.35_w-7.40_e-2.40_ascii.zip
     - url: https://dap.ceda.ac.uk/bodc/gebco/global/gebco_2025/ice_surface_elevation/geotiff/gebco_2025_geotiff.zip
       retrieved: '2026-09-30'
       sha256: 55d6c08b99a859cdf97dff07a2d41a2be5e52fec518606156450abf056a8e8eb

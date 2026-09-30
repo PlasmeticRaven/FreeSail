@@ -255,7 +255,11 @@ def fetch_gebco_extract(box: dict[str, float], cache: Path, skip: bool, log: Any
     """GEBCO's area extract in ESRI ASCII from the subsetting app's queue API (read from
     the app's client script: POST /api/queue with a basket, poll /api/queue/status, GET
     /api/queue/download)."""
-    name = f"gebco_2025_s{box['south']}_n{box['north']}_w{box['west']}_e{box['east']}_ascii.zip"
+    box = {k: round(float(v), 2) for k, v in box.items()}
+    name = (
+        f"gebco_2025_s{box['south']:.2f}_n{box['north']:.2f}_w{box['west']:.2f}"
+        f"_e{box['east']:.2f}_ascii.zip"
+    )
     path = cache / "gebco" / name
     url = f"{GEBCO_APP}/api/queue (gebco_2025_global, ascii, {box})"
     if path.exists() and path.stat().st_size > 0:
