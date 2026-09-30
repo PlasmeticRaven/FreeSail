@@ -23,5 +23,11 @@ on_fail: {log: "Could not loose sails to dry: {reason}", kind: evolution.failed,
 # hands: all. Every man has a station for "Loosing sail" in his billet (Luce 1884,
 # ch. XVIII, 'Station Billet'), and a watch of the schooner is six ordinary seamen: the
 # whole ship's canvas is all hands' work. Order it by day.
-crew: {hands: all, rating: ordinary, stations: [all hands]}
+# party (package 31b): the sail loosers, who lay aloft, trice up, lay out and let fall
+# ("Aloft sail loosers! ... Let fall!", Luce 1884, ch. XX Port Drills, 'To Loose Sail to
+# the Buntlines'): the frigate's three tops (68), her forecastlemen on the fore yard and
+# the head sails (28) and her afterguard on the main yard and the spanker (50), 146 by
+# the ship file's stations; the waisters tend the gear on deck and are not counted. It
+# holds every sail, so nothing else runs beside it; a smaller ship's deck clamps it.
+crew: {hands: all, party: 146, rating: ordinary, stations: [all hands]}
 source: "Luce 1884, ch. XX Port Drills, 'To Loose Sail to the Buntlines' (\"Loose sail! ... Let fall!\"); ch. XIX Duties of Midshipmen (\"except when sails are loosed to dry\"); Luce 1866, ch. XX 'To Loose Sail (Port Routine)'"

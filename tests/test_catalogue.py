@@ -38,6 +38,10 @@ FRIGATE = "data/ships/frigate-36.yaml"
 SCHOONER = "data/ships/topsail-schooner.yaml"
 EVOLUTION_DIR = Path(__file__).resolve().parents[1] / "data" / "evolutions"
 
+# The all-hands sail evolutions, each with a party in its crew line (package 31b): the
+# manoeuvres and the masts take everyone.
+ALL_HANDS_SAIL_WORK = ("reef_square", "furl_all", "loose_sails_to_dry")
+
 NEW = [
     "send_down_topgallant_masts",
     "sway_up_topgallant_masts",
@@ -192,7 +196,16 @@ def test_the_catalogue_reaches_forty_and_every_file_loads():
         hands = evo.crew["hands"]
         assert hands == "all" or isinstance(hands, int), eid
         if hands == "all":
-            assert evo.crew.get("stations") == ["all hands"], eid
+            # everyone may be taken; an all-hands sail evolution puts the subject's own
+            # top first and names its party (package 31b), a manoeuvre or the masts neither
+            assert evo.crew.get("stations", [])[-1:] == ["all hands"], eid
+            party = evo.crew.get("party")
+            if eid in ALL_HANDS_SAIL_WORK:
+                assert isinstance(party, int) and party > 0, f"{eid} names no party"
+            else:
+                assert party is None, f"{eid} takes everyone and names no party"
+        else:
+            assert "party" not in evo.crew, eid
 
 
 def test_milestone_2_timings_are_unchanged():

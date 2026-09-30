@@ -21,5 +21,12 @@ on_fail: {log: "Could not furl all sail: {reason}", kind: evolution.failed, seve
 # hands: all. "Furling sail" and "Shortening sail and coming to anchor" are stations in
 # every man's billet (Luce 1884, ch. XVIII, 'Station Billet'); the whole ship's canvas
 # is all hands' work.
-crew: {hands: all, rating: ordinary, stations: [all hands]}
+# party (package 31b): every yard and every lower sail is manned at once, so the party is
+# every seaman who goes aloft: the frigate's three tops (68), her forecastlemen on the
+# fore yard and the head sails (28), her afterguard on the main yard and the spanker (50)
+# and her waisters at the clewlines and buntlines (36), 182 by the ship file's stations;
+# the marines and the idlers never go aloft (Luce 1884, ch. XX). It holds every sail, so
+# no other sail work runs beside it, and the bound is the deck's own size; a smaller
+# ship's deck clamps it.
+crew: {hands: all, party: 182, rating: ordinary, stations: [all hands]}
 source: "Luce 1884, ch. XX Port Drills, 'To Furl Sail' (\"Furl sail! ... Lay out! ... Furl away!\"), 'Remarks on Furling'; ch. XXIX In a Gale, 'Preparations for a Gale' (\"furl all square sails\"); Luce 1866, ch. XX 'To Furl Sail (Port Routine)'"

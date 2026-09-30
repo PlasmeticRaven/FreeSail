@@ -22,7 +22,7 @@ from freesail.api.session import make_world
 from freesail.core.world import Scenario
 from freesail.crew import bill, hands
 from freesail.crew.hands import CrewRequest, CrewRequestError, crew_factor, release, request
-from freesail.crew.model import Crew, Rating, Sailor, Station, Watch
+from freesail.crew.model import Crew, Rating, Sailor, Station, Watch, number_words
 from freesail.evolutions import EVOLUTIONS, registry
 from freesail.evolutions.runner import DEFAULT_WATCH_TIME, Runner, gerund
 from freesail.ship.parts import SailState
@@ -916,3 +916,140 @@ def test_the_crew_factor_aloft_falls_with_the_roll_in_a_seaway():
     w.submit("set the fore topsail")
     w.tick()
     assert runner._roll_deg == 0.0
+
+
+# ---------------------------------------------------------------------------
+# all hands manned in parallel, with a bound on any one job (package 31b; spec M3 §3.2)
+# ---------------------------------------------------------------------------
+
+
+def test_a_party_bounds_an_all_hands_request_and_the_top_up():
+    """A file's ``party: N`` beside ``hands: all`` takes N of the idle hands, the
+    subject's own top and the rating wanted first, and leaves the rest idle; the top-up
+    joins hands only up to the party; wanted is the party, so the numbers term is 1.0 at
+    it and no less beyond it."""
+    crew = small_company()
+    want = CrewRequest.from_mapping(
+        {"hands": "all", "party": 4, "rating": "ordinary", "stations": ["topmen", "all hands"]}
+    )
+    assert want.all_hands and want.party == 4
+    got = request(crew, crew.sailors, "reef#1", want, "main")
+    assert got.all_hands and got.party == 4 and got.wanted == 4 and got.got == 4
+    assert got.outcome == hands.ENOUGH
+    # the main top's ordinary seaman and the fore top's are in the party: the tops first
+    assert "s010" in ids(got.hands) and "s011" in ids(got.hands)
+    assert sum(1 for s in crew.sailors if s.at is None) == 8  # the surplus stays idle
+    assert crew_factor(got, want, aloft=False) == 1.0
+    late = sailor(13, Rating.ORDINARY, Station.MAIN_TOP, Watch.LARBOARD)
+    assert hands.top_up(got, [*crew.sailors, late], want=want, subject_mast="main") == 0
+    assert late.at is None and got.got == 4
+    # a hand released: the top-up fills the party again, and no further
+    got.hands.pop().at = None
+    assert got.got == 3 and crew_factor(got, want, aloft=False) == pytest.approx(4 / 3)
+    assert hands.top_up(got, [*crew.sailors, late], want=want, subject_mast="main") == 1
+    assert got.got == 4 and got.wanted == 4
+    # more hands than the party are never faster
+    over = hands.Assignment("x", wanted=4, hands=got.hands + [late], all_hands=True, party=4)
+    assert crew_factor(over, want, aloft=False) == 1.0
+    # without a party everyone is taken, as before
+    release(crew, "reef#1")
+    everyone = CrewRequest.from_mapping({"hands": "all", "rating": "ordinary"})
+    assert request(crew, crew.sailors, "tack#1", everyone, None).got == 12
+
+
+def test_a_party_is_a_number_beside_hands_all_and_nothing_else():
+    with pytest.raises(CrewRequestError, match="a party is a number of hands"):
+        CrewRequest.from_mapping({"hands": "all", "party": 0})
+    with pytest.raises(CrewRequestError, match="a party is a number of hands"):
+        CrewRequest.from_mapping({"hands": "all", "party": "forty"})
+    with pytest.raises(CrewRequestError, match="beside 12 hands"):
+        CrewRequest.from_mapping({"hands": 12, "party": 40})
+    for eid in ("reef_square", "furl_all", "loose_sails_to_dry"):
+        want = CrewRequest.from_mapping(EVOLUTIONS[eid].crew)
+        assert want.all_hands and want.party is not None and want.party > 0, eid
+    for eid in ("tack", "wear", "send_down_topgallant_masts", "strike_topmasts"):
+        assert CrewRequest.from_mapping(EVOLUTIONS[eid].crew).party is None, eid
+
+
+def test_three_topsails_are_reefed_together_each_up_to_its_party_and_the_surplus_goes_on():
+    """Playtest 11's finding 14 and the owner's ruling (decision 28): "reef the topsails"
+    on the frigate begins all three reefs on the one tick, forty hands each (the file's
+    party), never more on any tick as the watch below comes up, and the surplus mans a
+    fourth job given behind them; the three end together, in the time one took alone."""
+    w = world(FRIGATE, heading=90.0, speed_kn=4.0)
+    crew = w.ship.extra["crew"]
+    runner = runner_of(w)
+    w.submit("set plain sail")
+    tick_until_idle(w)
+    party = CrewRequest.from_mapping(EVOLUTIONS["reef_square"].crew).party
+    assert party == 40
+    n0 = len(w.log)
+    t0 = w.clock.tick
+    w.submit("reef the topsails, one reef")
+    w.submit("take in the jib")
+    snap = {s["subject"]: s for s in runner.in_progress()}
+    topsails = ["fore.topsail", "main.topsail", "mizzen.topsail"]
+    assert all(snap[s]["hands"] == party and not snap[s]["waiting"] for s in topsails)
+    assert snap["jib"]["hands"] > 0 and not snap["jib"]["waiting"]  # the surplus
+    most = 0
+    while runner.in_progress():
+        w.tick()
+        for s in runner.in_progress():
+            if s["id"] == "reef_square":
+                most = max(most, s["hands"])
+        assert w.clock.tick - t0 < 1200
+    assert most == party  # never a hand over the party, though all hands came up
+    reefed = [e for e in log_after(w, n0) if e.kind == "sail.reefed"]
+    assert [e.subject for e in reefed] == topsails
+    assert len({e.tick for e in reefed}) == 1  # together
+    assert not [e for e in log_after(w, n0) if e.kind == "evolution.waiting"]
+    assert [e.kind for e in log_after(w, n0)].count("crew.all_hands") == 1
+    assert [e.kind for e in log_after(w, n0)].count("crew.piped_down") == 1
+    assert all(s.at is None for s in crew.sailors)
+    together = reefed[0].tick - t0
+    # one topsail alone with all hands takes the same time (the party is at the file's pace)
+    w2 = world(FRIGATE, heading=90.0, speed_kn=4.0)
+    w2.submit("set plain sail")
+    tick_until_idle(w2)
+    t1 = w2.clock.tick
+    w2.submit("reef the fore topsail, one reef")
+    tick_until_idle(w2)
+    alone = next(e.tick for e in w2.log if e.kind == "sail.reefed") - t1
+    assert abs(together - alone) <= 2
+
+
+def test_a_reef_short_of_its_party_begins_short_and_fills_as_hands_come_free():
+    """The third topsail of "reef the topsails" given while the watch is setting the
+    royals: the first two take their parties from the deck and the third of the watch
+    below who come up at the call, the third begins with what is left and says so once,
+    routine, and fills to its party as the rest come up; the manoeuvres keep taking
+    everyone (truth 19's tack), and the masts do too."""
+    w = world(FRIGATE, heading=90.0, speed_kn=4.0)
+    crew = w.ship.extra["crew"]
+    runner = runner_of(w)
+    w.submit("set plain sail")
+    tick_until_idle(w)
+    deck_aloft = [s for s in bill.on_deck(crew, w.clock) if hands.can_work(s, aloft=True)]
+    assert 80 <= len(deck_aloft) < 120  # one watch: two parties and part of a third
+    n0 = len(w.log)
+    w.submit("set the royals")
+    w.submit("reef the topsails, one reef")
+    snap = {s["subject"]: s for s in runner.in_progress()}
+    assert snap["fore.topsail"]["hands"] == snap["main.topsail"]["hands"] == 40
+    third = snap["mizzen.topsail"]["hands"]
+    assert 0 < third < 40 and not snap["mizzen.topsail"]["waiting"]
+    w.run(120)  # the watch below comes up over a minute and a half
+    snap = {s["subject"]: s for s in runner.in_progress()}
+    assert snap["mizzen.topsail"]["hands"] == 40
+    assert all(snap[r]["hands"] == 12 for r in ("fore.royal", "main.royal", "mizzen.royal"))
+    short = [e for e in log_after(w, n0) if e.kind == "evolution.short_handed"]
+    assert len(short) == 1 and short[0].text.startswith(
+        f"Only {number_words(third)} hands to the mizzen topsail; the rest are setting"
+    )
+    tick_until_idle(w)
+    # the masts take everyone who goes aloft
+    w.submit("send down the topgallant masts")
+    w.run(120)
+    (masts,) = runner.in_progress()
+    assert masts["id"] == "send_down_topgallant_masts"
+    assert masts["hands"] == sum(1 for s in bill.on_deck(crew, w.clock) if hands.can_work(s, True))
