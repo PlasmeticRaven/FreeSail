@@ -40,4 +40,12 @@ standing order "landfall": when the land is in sight then take a bearing of the 
 # outer road off Pendennis (Imray 1874: the outer road in 11 to 14 fathoms). Twenty miles
 # since noon is judgement: past the soundings and closing the land.
 standing order "lead going": every glass, if the land is in sight and the distance run since noon exceeds 20 miles then heave the lead
+
+# Closing the land the lead goes oftener: every ten minutes once she is within the
+# thirty-five miles since noon that put her off the Manacles, so that the first bottom
+# found is not already the Roads' banks (the lead, 2026-09-30: with the lead every glass
+# the first cast under twenty fathoms was five and a half, and she took the ground hove to
+# in it; Luce 1884 ch. XXV, the lead "kept going" when standing in). The outer road off
+# Pendennis lies in eleven to fourteen fathoms (Imray 1874); she heaves to at twelve.
+standing order "lead going in": every 10 minutes, if the land is in sight and the distance run since noon exceeds 35 miles then heave the lead
 standing order "the Roads": when the depth is under 12 fathoms then heave to

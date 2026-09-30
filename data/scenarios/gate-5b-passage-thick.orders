@@ -14,7 +14,10 @@ standing order "stand on": at filled away then steer N
 # and the course for Falmouth is shaped from the reckoning.
 standing order "off the Lizard by account": when the distance run since noon exceeds 30 miles then shape a course for Falmouth
 
-# The lead going every glass once she believes herself closing the land; hove to at the
-# first land seen, and there she stays (the gate ends at the landfall).
+# The lead going every glass once she believes herself closing the land, and at the
+# first land seen, close aboard in a mile of fog, she stands off to the southward: a lee
+# shore in thick weather is hauled off from, not lain to under (Luce 1866 ch. XXIV; the
+# lead, 2026-09-30: hove to a mile off Black Head she forereached on to it in twelve
+# minutes). The gate ends with her standing off, the account eleven miles wrong.
 standing order "lead going": every glass, if the distance run since noon exceeds 30 miles and the land is not in sight then heave the lead
-standing order "the land": when the land is in sight then heave to
+standing order "the land": when the land is in sight then steer S
