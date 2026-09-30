@@ -37,7 +37,7 @@ from freesail.agents.fake import Fake, Transcript, call, narrator, reply, say
 from freesail.agents.harness import (
     TOOL_CALLS_PER_SAMPLE,
     WELFARE_REPEAT_N,
-    WELFARE_UNATTENDED_BOUND_S,
+    WELFARE_UNATTENDED_REAL_S,
     Harness,
     restore,
 )
@@ -50,7 +50,7 @@ __all__ = [
     "TOOLS",
     "TOOL_CALLS_PER_SAMPLE",
     "WELFARE_REPEAT_N",
-    "WELFARE_UNATTENDED_BOUND_S",
+    "WELFARE_UNATTENDED_REAL_S",
     "AgentState",
     "Authority",
     "Brief",

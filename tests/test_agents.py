@@ -37,7 +37,7 @@ from freesail.agents import (
     TOOL_CALLS_PER_SAMPLE,
     TOOLS,
     WELFARE_REPEAT_N,
-    WELFARE_UNATTENDED_BOUND_S,
+    WELFARE_UNATTENDED_REAL_S,
     Authority,
     Brief,
     Fake,
@@ -607,23 +607,27 @@ def test_truth_43_repeating_after_the_nudge_pauses_with_the_human_asked_then_sta
     snap = queries.snapshot(world)["agents"][0]
     assert snap["state"] == "paused"
     assert snap["question"] == "the watcher is paused: continue, stand down, or leave paused?"
-    # sampling has stopped: the fake is not called while paused
+    # sampling has stopped: the fake is not called while paused, and no length of ship's
+    # time stands it down (package 31c, the owner's ruling of 2026-09-30: a watch of ship's
+    # time is under a minute of real time at 300x): a day unanswered, and it is paused still
     calls = fake.calls
-    world.run(WELFARE_UNATTENDED_BOUND_S - 1)
+    world.run(6 * A_WATCH_S)
     assert fake.calls == calls and h.agent.paused and saves == []
-    # nobody answered within a watch of ship's time: stood down, saved, journaled
-    world.run(1)
+    # nobody answered within ten real minutes on the driver's clock: stood down, saved,
+    # journaled
+    assert h.check_unattended(now=0.0) is False
+    assert h.check_unattended(now=float(WELFARE_UNATTENDED_REAL_S)) is True
     assert h.agent.released
     assert saves == [
         "the watcher stood down: paused (the same order ('wear ship') 4 times with "
-        "no change in the readings after a nudge) and nobody answered within a watch"
+        "no change in the readings after a nudge) and nobody answered within ten minutes"
     ]
     assert h.journal.entries[-1].kind == "agent.stopped"
     assert h.journal.entries[-1].text.startswith("Stood down by the harness: paused")
     stopped = [e for e in world.log if e.kind == "agent.stopped"]
     assert len(stopped) == 1 and stopped[0].severity is Severity.NOTABLE
     assert "The game is saved." in stopped[0].text
-    assert WELFARE_UNATTENDED_BOUND_S == A_WATCH_S
+    assert not hasattr(harness_mod, "WELFARE_UNATTENDED_BOUND_S")
 
 
 def test_truth_43_the_human_answers_a_pause_with_resume_or_stand_down():
@@ -2642,3 +2646,125 @@ def test_the_watchers_brief_says_candour_is_welcome():
     h = Harness(world, watcher(), Fake(["Aye."]), save=lambda w, why: None)
     h.start()
     assert sentence in h.brief.text()
+
+
+def test_a_paused_watcher_is_stood_down_by_ten_real_minutes_only_on_the_servers_clock(
+    monkeypatch,
+):
+    """The owner's ruling of 2026-09-30 (package 31c): the unattended bound is ten real
+    minutes, however fast the ship's clock runs. At 300x a day of ship's time is under five
+    real minutes, and a paused watcher unanswered through it is still paused; the browser
+    server's clock loop checks the minutes every period, running or not, on its own
+    monotonic clock; past ten of them the watcher is stood down, as an act from outside the
+    loop, which the replay makes at the same tick."""
+    from freesail.ui.server import Driver
+
+    clock = {"t": 5000.0}
+    monkeypatch.setattr(harness_mod.time, "monotonic", lambda: clock["t"])
+    world = point_world()
+    h, fake, saves = stationed(world, [REPEAT, ""], loop=True)
+    world.run(3 * EVERY)
+    assert h.agent.paused
+    driver = Driver(world, compression=300)
+    driver.running = True
+    paused_at = world.clock.tick
+    owed = 0.0
+    while world.clock.tick - paused_at < 24 * 3600:
+        owed = driver._tick_owed(owed, 0.1)
+        clock["t"] += 0.1
+    assert clock["t"] - 5000.0 < harness_mod.WELFARE_UNATTENDED_REAL_S
+    assert h.agent.paused and not h.agent.released and saves == []
+    driver.running = False  # the clock stopped: the minutes run on
+    while not h.agent.released:
+        owed = driver._tick_owed(owed, 0.1)
+        clock["t"] += 0.1
+    assert 600.0 <= clock["t"] - 5000.0 <= 600.2
+    assert saves and "nobody answered within ten minutes" in saves[-1]
+    stopped = h.transcript[-1]
+    assert stopped["door"] == "stand_down" and stopped["by"] == "the harness"
+    assert stopped["tick"] == world.clock.tick
+    data = json.loads(json.dumps(world.save()))
+    copy = replay.replay(data, ship_factory)
+    assert copy.log.digest() == world.log.digest()
+    assert copy.agents["watcher"].agent.released
+    (line,) = lines(copy, "agent.stopped")
+    assert "nobody answered within ten minutes" in line
+
+
+def test_the_consoles_loop_checks_the_minutes_with_its_clock_stopped(monkeypatch):
+    clock = {"t": 0.0}
+    monkeypatch.setattr(harness_mod.time, "monotonic", lambda: clock["t"])
+    world = point_world()
+    h, fake, saves = stationed(world, [REPEAT, ""], loop=True)
+    world.run(3 * EVERY)
+    assert h.agent.paused
+    console = Console(world, out=io.StringIO())
+    console.running = False
+    console._tick_owed(0.0, 0.1)
+    clock["t"] = float(harness_mod.WELFARE_UNATTENDED_REAL_S)
+    console._tick_owed(0.0, 0.1)
+    assert h.agent.released and "nobody answered within ten minutes" in saves[-1]
+
+
+def test_the_repl_holds_its_clock_at_a_pause_and_the_ten_minutes_decide(tmp_path):
+    """The REPL's terminal is the station's, not the captain's: nobody there answers a
+    pause, so its lockstep clock holds and the ten real minutes run on its clock."""
+    import argparse
+
+    args = argparse.Namespace(
+        model_name=None,
+        human=True,
+        load=None,
+        ship=FRIGATE,
+        seed=7,
+        station="watcher",
+        every=EVERY,
+        wind="0,15",
+        heading=180.0,
+        save=str(tmp_path / "repl.json"),
+        records=str(tmp_path),
+        ask_again=False,
+    )
+    order = "> submit_order text='wear ship'\n\n"
+    inp = io.StringIO(order * 4 + "\n")  # the same order four times, then nothing
+    out = io.StringIO()
+    clock = {"t": 0.0}
+
+    def sleep(s: float) -> None:
+        clock["t"] += s
+
+    code = repl_mod.run_interactive(args, inp, out, clock=lambda: clock["t"], sleep=sleep)
+    printed = out.getvalue()
+    assert code == 3
+    assert "Nobody at this door answers a pause" in printed
+    assert "nobody answered within ten minutes" in printed
+    assert 600.0 <= clock["t"] <= 602.0
+
+
+def test_the_repl_turn_mode_keeps_a_pauses_first_sighting_across_its_calls(tmp_path, monkeypatch):
+    """Turn mode is a process a call, so the ten real minutes run on the wall clock from
+    the call that first found the station paused, kept in the save beside the game; the
+    clock holds meanwhile, and the stand-down replays."""
+    save, sample, replyf = tmp_path / "state.json", tmp_path / "next.txt", tmp_path / "r.txt"
+    common = ["--seed", "7", "--station", "watcher", "--every", "60", "--turn", "--human"]
+    common += ["--save", str(save), "--sample", str(sample)]
+    wall = {"t": 1000.0}
+    monkeypatch.setattr(repl_mod.time, "time", lambda: wall["t"])
+    assert repl_mod.main(common) == 0
+    replyf.write_text("", encoding="utf-8")  # the start's turn handed back: on to 04:01
+    assert repl_mod.main(common + ["--load", str(save), "--reply", str(replyf)]) == 0
+    replyf.write_text("> submit_order text='wear ship'\n" * 4, encoding="utf-8")
+    assert repl_mod.main(common + ["--load", str(save), "--reply", str(replyf)]) == 0
+    assert "Nobody at this door answers a pause" in sample.read_text(encoding="utf-8")
+    data = json.loads(save.read_text(encoding="utf-8"))
+    assert data["repl"] == {"paused_since": 1000.0}
+    held = data["end_tick"]
+    wall["t"] = 1000.0 + WELFARE_UNATTENDED_REAL_S - 60
+    assert repl_mod.main(common + ["--load", str(save)]) == 0
+    data = json.loads(save.read_text(encoding="utf-8"))
+    assert data["end_tick"] == held and data["repl"] == {"paused_since": 1000.0}
+    wall["t"] = 1000.0 + WELFARE_UNATTENDED_REAL_S
+    assert repl_mod.main(common + ["--load", str(save)]) == 3
+    assert "nobody answered within ten minutes" in sample.read_text(encoding="utf-8")
+    copy = replay.replay(replay.load_file(save))
+    assert copy.agents["watcher"].agent.released

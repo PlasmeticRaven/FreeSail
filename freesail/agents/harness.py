@@ -30,10 +30,14 @@ reads, `tools.readings_digest`), or no reply at all past the station's `patience
 On firing the harness **nudges** once (a notice in the next sample saying what was seen
 and the three things the model may do, logged `agent.nudged`); if the pattern goes on
 after the nudge it **pauses** sampling (`agent.paused`, notable) and puts the question to
-the human through the log and the snapshot; only with no answer within
-`WELFARE_UNATTENDED_BOUND_S` of ship's time, or the driver's ten real minutes
-(`WELFARE_UNATTENDED_REAL_S`, which the driver measures and reports through
-`check_unattended`), does it **stand the agent down** (save, `agent.stopped`, release).
+the human through the log and the snapshot; only with no answer within ten real minutes
+(`WELFARE_UNATTENDED_REAL_S`), however fast the ship's clock runs, does it **stand the
+agent down** (save, `agent.stopped`, release). The minutes are the driver's, on its own
+monotonic clock, which every driver reports through `check_unattended`: the browser
+server's clock loop and the console's, running or stopped, and the REPL's. (Until package
+31c a watch of ship's time stood the agent down too, whichever came first; at 300x a watch
+is under a minute of real time, so the human never had the ten minutes the consent brief
+promises: the owner's ruling of 2026-09-30.)
 A model that answers the nudge by standing by, or by anything but the pattern, ends
 the matter. The human answers a pause with `resume the watcher` or `stand down the
 watcher`, and may stand any agent down at any time.
@@ -230,9 +234,10 @@ THOUGHT_FIRST_LINE_CHARS = 120
 # The same order this many times with no change in the readings between (spec §11).
 WELFARE_REPEAT_N = 3
 
-# Nobody answered the pause within a watch of ship's time (spec §11)...
-WELFARE_UNATTENDED_BOUND_S = R.INTERVALS["a watch"]
-# ...or ten real minutes, whichever first; the driver measures the real minutes.
+# Nobody answered the pause within ten real minutes, however fast the ship's clock runs
+# (spec §11; the owner's ruling of 2026-09-30, package 31c: the watch of ship's time that
+# came first at a high compression is retired); the driver measures the minutes on its own
+# clock and reports them through `check_unattended`.
 WELFARE_UNATTENDED_REAL_S = 600
 
 # Routine lines a sample carries at most, the most recent kept; notable and urgent lines
@@ -580,11 +585,7 @@ class Harness:
             return
         a = self.agent
         if a.paused:
-            if a.paused_tick is not None and tick - a.paused_tick >= WELFARE_UNATTENDED_BOUND_S:
-                self.stand_down(
-                    f"paused ({a.pause_reason}) and nobody answered within a watch",
-                    by="the harness",
-                )
+            # the human's answer, or the driver's ten real minutes (`check_unattended`)
             return
         if a.standing_by:
             ended = A_WORD if a.word is not None else self._stand_by_ended(new)
@@ -1422,15 +1423,22 @@ class Harness:
         )
         return text
 
-    def check_unattended(self, now: float | None = None) -> bool:
-        """The driver's half of the unattended bound: called from the driver's own clock
-        with its monotonic time; stands the agent down when a pause has gone unanswered
-        for `WELFARE_UNATTENDED_REAL_S`. Returns True when it did."""
+    def check_unattended(self, now: float | None = None, since: float | None = None) -> bool:
+        """The unattended bound, the only one (package 31c): called from the driver's own
+        clock with its monotonic time (`now`, for a test's clock or a driver's own); stands
+        the agent down when a pause has gone unanswered for `WELFARE_UNATTENDED_REAL_S`
+        of real time, however fast the ship's clock runs, as an act from outside the loop
+        recorded at its tick (`door_act`), so a replay makes it there. The pause is first
+        seen at the first call after it, or at `since` on the same clock, for a driver
+        that saw it before this harness was built (the REPL's turn mode, a process a turn).
+        Returns True when it stood the agent down."""
         a = self.agent
         if not a.paused:
             self._paused_real = None
             return False
         now = time.monotonic() if now is None else now
+        if since is not None:
+            self._paused_real = since
         if self._paused_real is None:
             self._paused_real = now
             return False
