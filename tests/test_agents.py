@@ -1729,7 +1729,7 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     assert f"{tools.size_words(tools.tokens(ship))} whole, in 5 parts" in contents
     tool_page = lib(world, topic="tools")
     assert f"what each takes, {tools.size_words(tools.tokens(tool_page))}" in contents
-    assert "47 evolutions; the list about" in contents  # the bowsprit's two and reeve_line
+    assert "50 evolutions; the list about" in contents  # the log and the two leads with 32b's
 
 
 def test_a_chapter_lists_its_sections_with_sizes_and_serves_one_by_a_word_or_its_number():
