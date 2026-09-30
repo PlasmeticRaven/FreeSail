@@ -56,6 +56,7 @@ __all__ = [
     "INTERVALS",
     "KINDS",
     "MOTION_STATE_WORDS",
+    "NO_CHART_WORDS",
     "NO_GLASS_WORDS",
     "NO_SEA_WORDS",
     "NO_WAY_WORDS",
@@ -111,6 +112,8 @@ KINDS: dict[str, str] = {
     "visibility": "the visibility: is the horizon, is a few miles, is a mile, is a cable",
     "sea": "the sea: is smooth, is moderate, is short, is heavy, is very heavy, is confused",
     "motion": "the motion: is easy, is rolling, is rolling heavily, is pitching, is labouring",
+    "sight": "what the lookout sees: is in sight, is not in sight",
+    "depth": "a depth in fathoms: exceeds, is over, is under, is below 10 fathoms",
     "absent": "not a reading the ship has yet",
 }
 
@@ -513,6 +516,47 @@ def _no_sea_words(world: Any) -> str | None:
     return NO_SEA_WORDS if getattr(world, "sea", None) is None else None
 
 
+# The chart's readings (spec M5 §11, §12; package 32): what the lookout sees, whether the
+# land is among it, and the depth of water by the chart; a world without a chart region
+# reads None for all three, in NO_CHART_WORDS.
+NO_CHART_WORDS = "No chart of these waters: the world has no coast here yet."
+
+
+def _lookout_of(world: Any) -> Any:
+    return getattr(world, "lookout", None)
+
+
+def _in_sight(world: Any, _: str | None) -> dict[str, Any] | None:
+    """The last look's sightings in the lookout's words (`world.lookout.Lookout.reading`):
+    the count, the words and each item with its bearing and estimated distance; None
+    without a chart."""
+    lookout = _lookout_of(world)
+    return lookout.reading(float(world.ship.heading)) if lookout is not None else None
+
+
+def _land(world: Any, _: str | None) -> dict[str, Any] | None:
+    """Whether any land (a headland, an island, a mark, a light, a danger) is in sight,
+    with the nearest; None without a chart."""
+    lookout = _lookout_of(world)
+    return lookout.land(float(world.ship.heading)) if lookout is not None else None
+
+
+def _depth_of_water(world: Any, _: str | None) -> float | None:
+    """The depth of water by the chart at the ship's position, in metres at the datum
+    (the tide of package 34 goes on top): the world's own number, which the lead of
+    package 33 casts for with its error and its age; None without a chart or where the
+    chart has nothing."""
+    chart = getattr(world, "chart", None)
+    pos = getattr(world, "position", None)
+    if chart is None or pos is None:
+        return None
+    return chart.depth_at(pos)
+
+
+def _no_chart_words(world: Any) -> str | None:
+    return NO_CHART_WORDS if getattr(world, "chart", None) is None else None
+
+
 def _bells(world: Any, _: str | None) -> dict[str, Any]:
     """The last bell struck: watch name, bells, and whether it is striking now (the
     snapshot's `bell` block; spec §9.4)."""
@@ -868,6 +912,42 @@ REGISTRY.add(
         none_words=_no_sea_words,
     )
 )
+# The chart's readings (spec M5 §11, §12; package 32): the lookout's sightings, the land,
+# and the depth of water by the chart (distinct from `the depth` of the lead's last cast,
+# which package 33 raises). None in NO_CHART_WORDS where the scenario names no region.
+REGISTRY.add(
+    Reading(
+        "in_sight",
+        ("what is in sight", "the sightings"),
+        "sight",
+        "",
+        _in_sight,
+        description="what the lookout has in sight, by compass bearing and estimated distance",
+        none_words=_no_chart_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "land",
+        ("the land",),
+        "sight",
+        "",
+        _land,
+        description="whether any land, mark or light is in sight, and the nearest",
+        none_words=_no_chart_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "depth_of_water",
+        ("the depth of water", "the water"),
+        "depth",
+        "fathoms",
+        _depth_of_water,
+        description="the depth of water by the chart at the datum, in fathoms",
+        none_words=_no_chart_words,
+    )
+)
 REGISTRY.add_absent(
     "depth",
     ("the depth",),
@@ -1038,6 +1118,13 @@ def describe_value(reading: Reading, value: Any) -> str:
         return str(value)
     if kind in ("visibility", "sea", "motion"):
         return str(value["words"])
+    if kind == "sight":
+        return str(value["words"])
+    if kind == "depth":
+        # the chart's depth in the lead's terms: fathoms to the half (a mark or a deep)
+        from freesail.world.chart import fathoms_words
+
+        return fathoms_words(value)
     if isinstance(value, float):
         return f"{value:g}"
     return str(value)

@@ -89,6 +89,50 @@ def weather_lines(world: World) -> list[str]:
     return out
 
 
+def lookout_lines(world: World) -> list[str]:
+    """The console's `state` line for the lookout (spec M5 §12), when the scenario has a
+    chart: 'In sight: the Lizard bearing N by E, distant four leagues.' or 'Nothing in
+    sight.'; nothing without a chart."""
+    r = world.readings
+    if getattr(world, "lookout", None) is None:
+        return []
+    sight = r["in_sight"]
+    if not sight or not sight["count"]:
+        return ["Nothing in sight."]
+    return [f"In sight: {sight['words']}."]
+
+
+def chart_block(world: World) -> dict[str, Any] | None:
+    """The captain's chart for the browser (spec M5 §17, the first half; package 32):
+    the region, its bounds, the coast as polylines of [lon, lat], the features with
+    their kind, name and position (a light with its dates), and the attribution the
+    game shows. Built once and fetched once (`/api/chart`); None without a chart. The
+    truth's depth tiles are never in it."""
+    chart = getattr(world, "chart", None)
+    if chart is None:
+        return None
+    south, north, west, east = chart.bounds
+    return {
+        "region": chart.region,
+        "title": chart.spec.get("title", chart.region),
+        "bounds": {"south": south, "north": north, "west": west, "east": east},
+        "coast": chart.coast_lines(),
+        "features": [
+            {
+                "id": f.id,
+                "kind": f.kind,
+                "name": f.name,
+                "lat_deg": f.lat_deg,
+                "lon_deg": f.lon_deg,
+                **({"lit": dict(f.lit)} if f.lit else {}),
+                **({"marks": list(f.marks), "bearing_deg": f.bearing_deg} if f.marks else {}),
+            }
+            for f in chart.features.values()
+        ],
+        "attribution": chart.attribution(),
+    }
+
+
 def _spar_state(s: Spar) -> str:
     if s.wrecked and s.sent_down:
         return "cleared"  # carried away, its wreck cleared: on deck or over the side (30b)
@@ -129,7 +173,13 @@ def snapshot(world: World) -> dict[str, Any]:
         # the weather's readings (spec M5 §5), through the registry: None where the ship
         # has no glass or the scenario keeps no sky
         "weather": weather_block(world),
+        # the lookout's reading (spec M5 §12), None without a chart
+        "lookout": r["in_sight"],
     }
+    # The truth's position, drawn by the browser's chart for now (spec M5 §17: package 33
+    # replaces it with the reckoning and takes it out of the snapshot); None on the plane.
+    pos = getattr(world, "position", None)
+    out["position"] = pos.to_dict() if pos is not None else None
     if not isinstance(ship, Ship):
         st = ship.state()
         out["ship"] = {

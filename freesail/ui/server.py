@@ -509,6 +509,16 @@ def create_app(
     def api_state() -> JSONResponse:
         return JSONResponse(driver.snapshot())
 
+    @app.get("/api/chart")
+    def api_chart() -> JSONResponse:
+        """The captain's chart for the browser (spec M5 §17, the first half; package 32):
+        the coast and the features of the world's chart region, fetched once."""
+        with driver.lock:
+            chart = queries.chart_block(driver.world)
+        if chart is None:
+            raise HTTPException(status_code=404, detail="This world has no chart region.")
+        return JSONResponse(chart)
+
     @app.get("/api/log")
     def api_log(
         since: int | None = None, until: int | None = None, limit: int = 200
