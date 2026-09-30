@@ -22,8 +22,9 @@ import math
 
 import pytest
 
-from freesail import units
+from freesail import orders, units
 from freesail.evolutions import trim
+from freesail.orders.errors import OrderError
 from freesail.physics import hull as hp
 from freesail.ship.loader import load_ship
 from freesail.ship.parts import LineState
@@ -394,3 +395,64 @@ def test_the_starter_book_tends_the_sheets_every_glass():
     world.run(1800)
     later = [e for e in world.log if e.actor == "standing order 'tend the sheets'"]
     assert any("stand as trimmed" in e.text for e in later[1:])
+
+
+# ---------------------------------------------------------------------------
+# Hove to, she keeps her state until she fills away
+# ---------------------------------------------------------------------------
+
+
+def test_a_course_order_is_refused_while_she_lies_hove_to():
+    """Package 33a found the starter book's "keep her full" bearing the schooner away
+    from her noon sight with her yards still aback in the record, so that no cast was made
+    and a later "heave to" was refused. A course order (by heading, by points, full and
+    by) is refused while she lies to, from the deck or from the book, which logs the
+    refusal once and stands disarmed; the bare helm and the conning words are the deck's;
+    `fill away` gives her back her course."""
+    world = under_plain_sail(SCHOONER, 292.5, ticks=600)
+    ship = world.ship
+    start = world.clock.tick
+    world.submit("heave to")
+    world.run(100)
+    assert "hove_to" in ship.extra
+    world.submit(
+        'standing order "keep her full": when the apparent wind is forward of 55 degrees '
+        "then bear away one point"
+    )
+    world.run(500)
+    assert "hove_to" in ship.extra and knots(world) < 3.5
+    rejected = [
+        e for e in world.log if e.tick > start and e.actor == "standing order 'keep her full'"
+    ]
+    assert len(rejected) == 1 and rejected[0].kind == "order.rejected"
+    assert "She is hove to; fill away before giving her a course." in rejected[0].text
+    for words in ("bear away one point", "keep her full", "steer south"):
+        with pytest.raises(OrderError, match="fill away before giving her a course"):
+            orders.handle(ship, words)
+    e = world.submit("hard a-weather")
+    assert e.text.startswith("Helm ordered: hard a-weather")
+    world.submit("fill away")
+    done, _ = until(world, ("ship.filled_away",), 600)
+    assert done and "hove_to" not in ship.extra
+    world.submit("steer south")
+    assert ship.dyn.helm_mode.value == "heading"
+
+
+def test_a_sails_aback_line_waits_out_a_seas_period():
+    """The physics reads a sail aback or filled every substep; the log says so only when
+    the reading has held `BACKED_DWELL_S` (33a's finding: hove to in a seaway the lines
+    came at every pitch). Read without a `dt` it records at once."""
+    from freesail.physics import sails as sail_physics
+
+    assert sail_physics.BACKED_DWELL_S == 10.0
+    world = under_plain_sail(FRIGATE, 292.5, ticks=600)
+    ship = world.ship
+    sail = ship.sails["main.topsail"]
+    assert not sail.backed
+    sail_physics._record_backed(ship, sail, True, 1.0)
+    assert not sail.backed  # a second's reading: not yet
+    for _ in range(9):
+        sail_physics._record_backed(ship, sail, True, 1.0)
+    assert sail.backed
+    sail_physics._record_backed(ship, sail, False, 0.0)
+    assert not sail.backed  # no dt: at once

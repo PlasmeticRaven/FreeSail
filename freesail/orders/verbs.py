@@ -1908,6 +1908,17 @@ def _helm(ship: Ship, order: Order) -> Result:
         raise OrderError(
             f"'{order.verb_phrase}' takes no heading or points; it is the whole order."
         )
+    if "hove_to" in ship.extra and (
+        verb in ("keep her full", "steer") or ("points" in mods and verb not in HELM_VERBS)
+    ):
+        # A ship hove to has her helm a-lee by the manoeuvre and her yards set against
+        # each other; a course is given her by filling away, not by the helm alone.
+        # Package 33a found the starter book's "keep her full" bearing the schooner away
+        # from her noon sight, her yards still aback in the record, so that a later
+        # "heave to" was refused and no cast was made (package 32e): the helm orders
+        # that give a course are refused while she lies to; the conning words and the
+        # bare helm ("hard a-weather") are the deck's to give.
+        raise OrderError("She is hove to; fill away before giving her a course.")
 
     if verb == "keep her full":
         dyn.helm_mode = HelmMode.FULL_AND_BY

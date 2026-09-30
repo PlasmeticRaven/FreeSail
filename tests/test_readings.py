@@ -366,7 +366,7 @@ def test_the_log_writes_no_leeway_line_without_way_on(monkeypatch):
 
     def leeway_lines(ship, seconds, thrust, side):
         forces = SailForces(thrust, side, 0.0, 0.0, 0.0)
-        monkeypatch.setattr(integrate, "compute_sail_forces", lambda s, w: forces)
+        monkeypatch.setattr(integrate, "compute_sail_forces", lambda s, w, *a: forces)
         notes = []
         for _ in range(seconds):
             integrate.step(ship, 1.0, wind)

@@ -314,7 +314,15 @@ class _Flow:
 # ---------------------------------------------------------------------------
 
 
-def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
+# A sail's "taken aback" and "filled again" are recorded when the physics has read it
+# so for this long: in a seaway the wind on a sail set near the eye, hove to, crosses its
+# face with every pitch, and the lines came at every roll (package 33a's finding, package
+# 32e). Ten seconds, longer than a hull's pitching period (the frigate's about eight,
+# spec M5 §4): judgement. Read without a `dt` (the tests' direct calls) it records at once.
+BACKED_DWELL_S = 10.0
+
+
+def compute_sail_forces(ship: Ship, wind: Wind, dt: float = 0.0) -> SailForces:
     """Forces from every sail and everything else the wind pushes on.
 
     Writes each sail's `backed`, `force_kn`, `thrust_kn`, `side_force_kn`,
@@ -385,7 +393,7 @@ def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
             backed = False  # shaking, not aback
         force = math.hypot(f_fwd, f_stb)
 
-        _record_backed(ship, sail, backed)
+        _record_backed(ship, sail, backed, dt)
         if d.studding:
             _record_shivering(ship, sail, stall, true_off)
         elif d.side_sign != 0.0:
@@ -1041,9 +1049,19 @@ def _tend_bowlines(ship: Ship) -> None:
             )
 
 
-def _record_backed(ship: Ship, sail: Sail, backed: bool) -> None:
+def _record_backed(ship: Ship, sail: Sail, backed: bool, dt: float = 0.0) -> None:
+    timers = ship.extra.get("sails.backed_for")
+    if not isinstance(timers, dict):
+        timers = ship.extra["sails.backed_for"] = {}
     if backed == sail.backed:
+        timers.pop(sail.id, None)
         return
+    if dt > 0.0:
+        held = timers.get(sail.id, 0.0) + dt
+        if held < BACKED_DWELL_S:
+            timers[sail.id] = held
+            return
+    timers.pop(sail.id, None)
     sail.backed = backed
     name = _name(sail.id)
     if backed:

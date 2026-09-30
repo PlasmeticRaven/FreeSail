@@ -42,7 +42,7 @@ def step(ship: Ship, dt: float, wind: Wind) -> None:
     hold_rig(ship)
     try:
         for _ in range(SUBSTEPS):
-            forces = compute_sail_forces(ship, wind)
+            forces = compute_sail_forces(ship, wind, h)
             st.awa, st.aws = hp.apparent_wind(ship, wind)
             _substep(
                 ship,
