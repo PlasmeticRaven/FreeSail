@@ -36,15 +36,24 @@ gate 5a:  wave 1  30 weather systems, the glass and the sky, the scenario's syst
                   31c the watcher's watch: the sample's delta, the door's wait, weather events, tell/ask in the book (beside 31b)
 gate 5b:  wave 3  32 the chart data and the queries, the lookout
                   32b the cutter and the brig as ship files, the orders' grammar across four ships (beside 32; pulled forward from 35 and 36, owner 2026-09-30)
-          wave 4  33 the reckoning, the sights and the lunar, the captain's chart
-          wave 5  34 the tide, grounding and anchoring, gate 5b
-gate 5c:  wave 6  35 places, people, ports and nations
-          wave 7  36 other sail, the world-order channel, the two scenarios, gate 5c
+                  32c the suite in two tiers, the days built once, a Windows job (beside 32; the owner's local session)
+                  32d the freesail command, the settings file and the setup step (beside 32; the owner's local session)
+          wave 4  33a the reckoning, the noon sight, the captain's chart, the checkpoint save, gate 5b
+gate 5c:  wave 5  33b the chronometer, the moon and the lunar (beside 34)
+                  34 the tide, grounding and anchoring
+          wave 6  35 places, people, ports and nations
+          wave 7  36 other sail, the world-order channel, the two scenarios, gate 5c cut
+          wave 8  37 the officer of the watch; the lead's watch; the 5c verdict
 ```
 
 31 needs 30's wind (the sea reads its history). 32 needs nothing of 5a and may start
-beside 31 once 30 has landed. 33 needs 32's chart and 30's sky; 34 needs 33's moon. 35
-needs 32's places on the chart; 36 needs 35 and 30. 32b needs nothing of 5a or 5b: it is
+beside 31 once 30 has landed. 33a needs 32's chart and 30's sky; 33b needs 33a's
+reckoning; 34 needs 33b's moon. 35 needs 32's places on the chart; 36 needs 35 and 30; 37
+needs 36, since the officer is built with the world in place (owner, 2026-09-30). **Gates
+lag the work** (owner, 2026-09-30, decision 29): a package is written as its predecessor
+lands and launched on the owner's word whether or not the previous gate has been run; a
+gate is cut when its last package lands, for the owner to run when they can, and its
+rulings feed a follow-up package as 5a's fed 31b. 32b needs nothing of 5a or 5b: it is
 data work on the generator and the ship files, and any engine change it finds is a fault
 reported, not a feature built.
 
@@ -547,8 +556,18 @@ exists to make, and the lead decides.
   angle, plain sail, 15 knots), so that the hierarchy can be seen: the cutter weatherly
   and quick for her size, closer to the wind than the schooner's five points as spec M0
   to M2 §12 item 11 expects of a cutter, the brig between the schooner and the frigate.
-  These are expectations to report against, not truths: milestone 8 verifies both as
-  reference ships (§23, §25).
+  Four **hierarchy truths** go with the files (owner, 2026-09-30, from the cold review:
+  a ship with no truth is a ship whose pointing and speed are whatever the rules made of
+  a new size, and these are the only check that the generator's rules hold at eighty-five
+  tons): truth 73, the cutter lies closer to the wind than the schooner in fifteen knots
+  under plain sail, by at least half a point; truth 74, the brig lies further off than the
+  schooner and within half a point of the frigate (or the ordering the sources support,
+  the choice explained); truths 75 and 76, the cutter's and the brig's speed on a beam
+  reach in fifteen knots under plain sail each within a band the package sets from the
+  type's records, the source named and the band marked provisional where it is a
+  judgement. In `tests/test_known_truths.py` after 31b has merged (the lead says when),
+  else in `tests/test_ships_hierarchy.py` for the lead to fold in; spec M5 §19. Milestone
+  8's verification of each as a reference ship is a separate matter (§23, §25).
 - **The grammar across four ships** (the test §23 names). Every test module that loads
   the two ship files loads four; every test that runs an order on "both ships" runs it on
   all four where the ship has the part, and asserts the refusal's words where she has
@@ -590,7 +609,8 @@ exists to make, and the lead decides.
   is a judgement; the two ships' particulars as built (waterline, displacement, draught,
   sail area by sail, complement); the polar figures for both beside the schooner's and
   the frigate's; the list of orders, scripts, standing forms and drawings that failed on
-  each ship and where each was fixed; what the running bowsprit needed and whether its
+  each ship and where each was fixed; the four hierarchy truths' measured values and
+  their bands with the sources; what the running bowsprit needed and whether its
   evolutions run; anything that wanted an engine change and what you did instead;
   anything you could not do and why.
 
@@ -599,17 +619,121 @@ at far detail and her merchant description (36), truths for either ship (milesto
 *Alert*, *Speedy* and the wishlist (milestone 8), the tartane and the bilander of decision
 11 (milestone 8, unchanged by this package), the lateen mizzen and the yacht.
 
-## Packages 33 to 36 (outline; written in turn)
+## Package 32c: the suite in two tiers, the days built once, a Windows job (`tests/conftest.py` new; `pyproject.toml` for the markers and the options; `.github/workflows/ci.yml` and `release.yml`; `docs/gates/README.md` and `README.md` for the two ways to run the tests; `docs/dev/TuningNotes.md` for the timings)
 
-As spec M5 §31: 33 the reckoning, the sights and the lunar, the captain's chart (§13 to
-§15, §17, truths 58 to 61; Fable); 34 the tide, grounding and anchoring, gate 5b (§16,
-§18, truths 62 to 64 and 66; Fable); 35 places, people, ports and nations, the pilot
-boarding from the cutter of 32b (§22 to §24, truths 68 to 70; Fable, the owner's ruling of
-2026-09-30, the earlier outline's Opus struck); 36 other sail, the world-order channel,
-the brig of 32b at far detail with her merchant description, the two scenarios, gate 5c
-(§25 to §27, truths 67, 71, 72; Fable). The two new vessels' files are 32b's, pulled
-forward (owner, 2026-09-30) so that the catalogue's hierarchy exists before the ports and
-the other sail need it.
+From the cold review of 2026-09-30 (`docs/design/ColdReview-2026-09-30.md` §2.1 "The test
+suite has become an integration suite" and §6 item 1), approved by the owner the same
+day. Opus, **run by the owner in a local Claude Code session on the Windows machine** so
+that the timings are the owner's machine's. No design change; no test moves between
+files and no test's body changes (package 31b is editing `tests/test_known_truths.py`
+at the same time, so that file is not to be touched at all).
+
+1. **Two tiers.** A `slow` marker for the tests that sail a day or replay one (the
+   pinned days in `test_known_truths.py`, the replay days in `test_replay.py` and
+   `test_sea.py`, and any test over a threshold the builder sets from `--durations` and
+   names in the report), applied from `tests/conftest.py` by node id or by the fixtures a
+   test uses (`item.fixturenames`), never by editing the test files. `pytest` alone runs
+   the fast tier and ends with one line saying how many slow tests it left out and how to
+   run them; `pytest --slow` runs everything. The fast tier's target is under three
+   minutes on the owner's machine on all its cores.
+2. **The days built once.** With xdist's default distribution a module-scoped day fixture
+   is built on every worker that draws one of its tests, so `-n 4` can sail the same day
+   four times. Group the tests that share a module-scoped day fixture on to one worker
+   (`xdist_group` marks applied in the same hook, with `--dist loadgroup`), so each day is
+   built once a run and the rest of the suite still spreads. Measure the whole suite's
+   wall clock at `-n auto` before and after on the owner's machine and on the build
+   machine's figures in the review (eleven minutes alone, seventeen on four workers) and
+   choose the distribution that is faster; say which and why.
+3. **A Windows job.** `ci.yml` runs the fast tier on `ubuntu-latest` and on
+   `windows-latest` (Python 3.11, `PYTHONUTF8=1`), on every code push as now, both under
+   the same concurrency group; `release.yml` runs the whole suite (`--slow`) on Linux as it
+   does, with the grouping. The Actions minutes are the owner's: keep the Windows job to
+   the fast tier and say in the report what a push now costs in minutes.
+4. **Docs.** `README.md`'s test line and `docs/gates/README.md` say the two tiers; the
+   timings before and after go in `docs/dev/TuningNotes.md` under a heading for this
+   package.
+5. **Report**: the fast tier's and the slow tier's counts and wall clocks on the owner's
+   machine (`-n auto`), before and after the grouping; the tests marked slow and the rule
+   that marked them; the CI cost per push; anything not done.
+
+## Package 32d: the `freesail` command, the settings file and the setup step (`freesail/cli.py` new, `freesail/__main__.py` new; `pyproject.toml` for `[project.scripts]`; `docs/Setup.md` new; `README.md`'s "Running it"; `tests/test_cli.py` new)
+
+Spec M4 §24 open item 6 (the owner's note at gate 4b, 2026-09-27) and the cold review's
+§6 item 9, approved by the owner 2026-09-30. Opus, **run by the owner in a local Claude
+Code session on the Windows machine**, since the whole package is about that machine's
+paths, launcher and configuration files. No change to any door, the server, the console
+or the harness: the command wraps their `main(argv)` functions and passes arguments
+through. `docs/agents/Harness.md` is not edited here (package 31c holds it); the report
+gives the lead the lines that point from it to `docs/Setup.md`.
+
+1. **The command.** `freesail` (installed by `pip install -e` as a console script) and
+   `py -m freesail` (the same `main`) with subcommands: `play` (the browser game,
+   `freesail.ui.server`), `console` (`freesail.ui.console`), `local` and `repl` (the two
+   doors), `bridge` (`freesail.agents.mcp_server`, for the configuration files to name),
+   `setup`, `install` and `check`. Each pass-through subcommand takes the defaults it
+   lacks from the settings (the ship, the seed, the records directory) and passes
+   everything else to the module's `main` unchanged, so `freesail play --wind 0,15` is
+   `py -m freesail.ui.server <the settings' ship> --wind 0,15`.
+2. **The settings file.** The things the owner sets once: the default ship file, the seed,
+   the ports (the game's and the agents'), the model names for each door, the records
+   directory, the installed game folder. TOML, read with the standard library's `tomllib`
+   and written by a small writer of flat tables (no new dependency), kept outside the game
+   folder so a gate does not lose it: `%APPDATA%\FreeSail\settings.toml` on Windows,
+   `$XDG_CONFIG_HOME/freesail/settings.toml` or `~/.config/freesail/settings.toml`
+   elsewhere; overridable by `FREESAIL_SETTINGS` for the tests. `freesail setup` with no
+   argument asks for each value with the current one as the default and writes the file.
+3. **The setup step.** `freesail setup desktop` writes or merges the `freesail` entry into
+   Claude Desktop's `claude_desktop_config.json` (`%APPDATA%\Claude\` on Windows; the
+   macOS and Linux paths for completeness; overridable by `FREESAIL_DESKTOP_CONFIG`),
+   naming the Python that is running, the bridge module, the game's address and the model
+   name from the settings, and leaving every other server in the file alone; it prints
+   what it wrote and reminds the owner to restart Claude Desktop. `freesail setup
+   claude-code` writes `.mcp.json` in the game folder the same way. Both refuse in words
+   if the model name is not set, since consent is kept under it (`Harness.md` §3, §4).
+4. **Install and update in place.** `freesail install <zip or folder>` puts a gate into
+   the one installed location (from the settings, default `%LOCALAPPDATA%\FreeSail\game`
+   on Windows, `~/.local/share/freesail/game` elsewhere), keeping `saves/` and
+   `docs/agents/consent/` from the previous install (the consent records the owner's
+   sessions wrote there are not in the zip), runs `pip install -e ".[dev,server,agents]"`
+   in it, and then re-runs both setup steps so that the configuration files name the same
+   path they always did. The zip is the release's (`FreeSail-gate-<name>/` at its top).
+   The first install may be run from inside an extracted gate folder to adopt it.
+5. **`freesail check`** prints the state a support question needs: the Python and its
+   path, the package's version and location, the settings file and its values, whether
+   each configuration file exists and names this install, whether the game answers at its
+   port, and the records directory. No network beyond localhost.
+6. **Docs.** `docs/Setup.md` for the owner: install once, `freesail setup`, `freesail
+   setup desktop`, `freesail setup claude-code`, `freesail play`, updating to the next
+   gate with `freesail install`, and what to do if `freesail` is not on the path (`py -m
+   freesail`). `README.md`'s "Running it" gains the command beside the module lines, which
+   stay.
+7. **Tests** (`tests/test_cli.py`, no network, temporary directories throughout, the
+   environment overrides above): the parser and the pass-through arguments; the settings
+   round trip; `setup desktop` creating a file and merging into one with another server;
+   `setup claude-code`; `install` from a small zip into a temporary location preserving
+   `saves/` and the consent records; `check`'s output with nothing running.
+8. **Report**: the suite's last line; the commands as they ran on the owner's machine
+   (`freesail check`'s output pasted); the configuration files as written, with the model
+   name blanked; what could not be done on the machine and why.
+
+## Packages 33a to 37 (outline; written in turn)
+
+As spec M5 §31 after decision 29 (owner, 2026-09-30): 33a the reckoning with the log-line
+and the lead, the noon sight, the captain's chart in the browser and a verified
+checkpoint save (§13, §14's noon latitude, §15, §17; truths 58 and 59; gate 5b cut;
+Fable); 33b the chronometer, the moon and the lunar (§14's rest; truths 60 and 61; Fable);
+34 the tide, grounding and anchoring (§16, §18; truths 62 to 64 and 66; Fable); 35 places,
+people, ports and nations, the pilot boarding from the cutter of 32b (§22 to §24, truths
+68 to 70; Fable, the owner's ruling of 2026-09-30, the earlier outline's Opus struck); 36
+other sail, the world-order channel, the brig of 32b at far detail with her merchant
+description, the two scenarios, gate 5c cut (§25 to §27, truths 67, 71, 72; Fable); 37 the
+officer of the watch (per-order authority from the vocabulary's verb levels, a domain, the
+standing conflict rule as the welfare detector for a station with authority, `hand over
+the deck`, the station brief, the fake proving each; written when 36 lands so that it is
+built with the world in place; Fable), after which the lead takes the officer's watch on
+one of the two passages and gate 5c's verdict is given on that watch and the owner's
+together (§29). The two new vessels' files are 32b's, pulled forward (owner, 2026-09-30)
+so that the catalogue's hierarchy exists before the ports and the other sail need it.
 
 ## Integration (the lead)
 

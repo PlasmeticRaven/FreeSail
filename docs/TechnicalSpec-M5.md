@@ -412,17 +412,26 @@ makes. The port's mooring is 5c's.
 | 64 | The captain's tide worked from Moore's rule and an 1805 establishment differs from the world's tide by less than an hour on the day of full moon and by up to an hour at the quarters |
 | 65 | The Bishop is dark and St Agnes is lit in 1805; a night landfall on Scilly from the south-west sees St Agnes at its range and nothing else |
 | 66 | Standing on by account across the reckoning's ellipse toward the Manacles in thick weather grounds the schooner on the ebb at the speed the log gives; the same passage with the lead going hourly does not |
+| 73 | In fifteen knots under plain sail the cutter lies closer to the wind than the schooner by at least half a point (package 32b; the hierarchy of the generator's rules across sizes; spec M0 to M2 §12 item 11) |
+| 74 | The brig lies further off the wind than the schooner and within half a point of the frigate, or the ordering the sources support, said which (package 32b) |
+| 75 | The cutter on a beam reach in fifteen knots under plain sail makes a speed within the band the package sets from the type's records, the source named (package 32b; provisional where a judgement) |
+| 76 | The brig likewise (package 32b) |
 
 ### 20. Gate 5b (outline)
 
-The passage Ushant to Falmouth in the frigate with a chronometer and the schooner
-without: a departure bearing off the Stiff, the log hove hourly, a noon latitude, a lunar
-tried and refused and tried again, the Channel Soundings by the deep-sea lead, the Lizard
-sighted and bearings taken, the Roads entered on the flood with the Black Rock showing, an
-anchor let go in Carrick Roads. The same passage in thick weather with no sights, the
-reckoning's ellipse read at each noon, and a landfall made wrong on purpose. The chart in
-the browser with the ellipse and the track by account. A tool that prints the chart data's
-manifest and attribution. Expected numbers from seed 7 and the day's weather pinned.
+Revised 2026-09-30 (decision 29): the chronometer, the lunar, the tide, grounding and
+anchoring moved to gate 5c's set, so that this gate proves the passage by the reckoning
+and the noon sight alone. The passage Ushant to Falmouth in the frigate and in the
+schooner, neither with a chronometer: a departure bearing off the Stiff, the log hove
+hourly, a noon latitude, the Channel Soundings by the deep-sea lead, the Lizard sighted
+and bearings taken, the Roads entered and the ship brought up (anchoring's evolution is
+34's; the gate ends at the Roads). The same passage in thick weather with no sights, the
+reckoning's ellipse read at each noon, and a landfall made wrong on purpose. The cutter
+and the brig sailed through the same orders as the two reference ships. The chart in the
+browser with the ellipse and the track by account. A tool that prints the chart data's
+manifest and attribution. A saved day loaded from its checkpoint in seconds and carrying
+on to the replay's digest. `--load` and the two climatology days carried from gate 5a.
+Expected numbers from seed 7 and the day's weather pinned.
 
 ---
 
@@ -477,8 +486,9 @@ mast with a gaff mainsail, a square topsail, a running
 bowsprit and jibs), the first of the vessel library's catalogue entries and the test the
 proposal names for pillar 2: adding her changes nothing in the engine, and the one
 generator addition expected, the running bowsprit, is recorded as such. She is sailable
-enough to exist at near detail and honest at far; she carries no truths of her own until
-milestone 8 verifies her as a reference ship. The orders' grammar must read her file as
+enough to exist at near detail and honest at far; she carries the hierarchy truths of
+§19 (73 and 75, from package 32b, owner 2026-09-30) and no verification of her own until
+milestone 8 makes her a reference ship. The orders' grammar must read her file as
 it reads the schooner's, with no rig assumed: that is the generalisability the vessel
 library will stand on, and any order that fails on her is a fault in the grammar, not in
 the file.
@@ -503,7 +513,7 @@ sails, jib and flying jib and fore topmast staysail, and a main staysail and mai
 staysail between the masts, since a brig without her staysails is not a starting point;
 if the staysails prove troublesome that is a fault in the generator's rig rules to fix
 there, a bad sign for the vessel library and treated as such; the same rule as the cutter,
-no engine change and no truths until milestone 8): each a hull from the ship files, a nation, a captain with
+no engine change, the hierarchy truths 74 and 76 of §19 and no verification until milestone 8): each a hull from the ship files, a nation, a captain with
 a goal (trade this route, patrol this station, run home) and a plan (waypoints and a
 speed from the wind by a polar drawn from her file), moved cheaply at the roll-up's cadence
 by the same wind and tide as the player. The **lookout** (§12) sights them by the horizon
@@ -561,15 +571,25 @@ station off Ushant kept two days under standing orders, a stranger sighted and c
 the plan's speed alone, a message by the cutter. A watcher through each door for a watch
 of each. Both replayed.
 
-**The lead's watch** (owner, 2026-09-29). Gate 5c is where the lead takes its first
-station in the game, as the most complete picture there will have been: a watch as the
-watcher on one of the two passages, through Claude Code opened on the repository, on the
-same terms as every other model, the consent question asked of these weights first and
-the record kept under `docs/agents/consent/`, the brief read as any instance reads it,
-the log and the journal the only record. The lead knows the game from the inside, which
-the record will say; a fresh Fable session or an Opus 5.5 one is run beside it as the
-step up from the Sonnet sessions. The owner's larger intent, a watch with an officer's or
-a captain's authority, is milestone 6's, when those stations exist.
+**Joined to this gate** (decision 29, 2026-09-30): the chronometer, the moon and the
+lunar (package 33b), the tide, grounding and anchoring (package 34), with their truths 60
+to 64 and 66, since 5c's ports need the tide's window and the anchorage, and the passage
+of 5b did not need the lunar to be a game.
+
+**The lead's watch, as an officer's** (owner, 2026-09-29, revised 2026-09-30). The
+officer of the watch is built after every other element of 5c is in place (package 37),
+so that it is built with the world already there: per-order authority from the
+vocabulary's verb levels, a domain (sail handling; no course changes, no all hands unless
+the brief allows), the standing conflict rule reused as the welfare detector for a
+station whose orders change the readings, `hand over the deck`, a station brief, the fake
+proving each. Then the lead takes its first station in the game, the officer's watch on
+one of the two passages, through Claude Code opened on the repository, on the same terms
+as every other model: the consent question asked of these weights first and the record
+kept under `docs/agents/consent/`, the brief read as any instance reads it, the log and
+the journal the only record. The lead knows the game from the inside, which the record
+will say; a fresh Fable session or an Opus 5.5 one is run beside it. **Gate 5c's verdict
+waits on that watch**: it is given on the lead's officer's watch and the owner's own
+playthrough together. A captain's station is milestone 6's.
 
 ---
 
@@ -592,16 +612,23 @@ measures the whole at the gate's scenario, and the tuning notes carry the number
   reviewed by the lead against the sources.
 - **32b. The cutter and the brig as ship files** (§23's cutter and §25's brig, pulled
   forward from 35 and 36 by the owner, 2026-09-30: the generator's cutter and brig rules,
-  the two files, the running bowsprit, and the orders' grammar run across four ships; no
-  truths; no engine change, any found reported as a fault). Fable.
-- **33. The reckoning, the sights and the lunar** (5b §13 to §15, §17; the moon; truths
-  58 to 61). Fable.
-- **34. The tide, grounding and anchoring** (5b §16, §18; truths 62 to 64, 66; gate 5b
-  cut). Fable.
+  the two files, the running bowsprit, and the orders' grammar run across four ships; the
+  hierarchy truths 73 to 76; no engine change, any found reported as a fault). Fable.
+- **32c. The suite in two tiers, the days built once, a Windows job** and **32d. The
+  `freesail` command, the settings file and the setup step** (the cold review's items 1
+  and 9; spec M4 §24 item 6). Opus, in the owner's local sessions on the Windows machine.
+- **33a. The reckoning, the noon sight, the captain's chart, the checkpoint save** (5b
+  §13, §14's noon latitude, §15, §17; truths 58 and 59; gate 5b cut). Fable.
+- **33b. The chronometer, the moon and the lunar** (5b §14's rest; truths 60 and 61; in
+  gate 5c's set by decision 29). Fable.
+- **34. The tide, grounding and anchoring** (5b §16, §18; truths 62 to 64, 66; in gate
+  5c's set by decision 29). Fable.
 - **35. Places, people, ports and nations** (5c §22 to §24; the pilot boarding from 32b's
   cutter; truths 68 to 70). Fable (the owner's ruling, 2026-09-30; the draft said Opus).
 - **36. Other sail and the world-order channel** (5c §25 to §27; 32b's brig at far detail
   with her merchant description; the two scenarios; truths 67, 71, 72; gate 5c cut). Fable.
+- **37. The officer of the watch** (§29; written when 36 lands; the lead's watch follows
+  it and gate 5c's verdict waits on that watch). Fable.
 
 Each package's brief is written in `docs/dev/M5-WorkPackages.md` when its predecessor
 has landed, in the form the M4 packages took.

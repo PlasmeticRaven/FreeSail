@@ -585,7 +585,7 @@ Package 8 is data work grounded in Luce, Lever and Falconer and can start as soo
 
 ### 11.4 Milestone gates
 
-Every milestone ends with a human-checked gate; the next one does not start until the owner has passed it. The process is in `docs/gates/README.md`. In short:
+Every milestone ends with a human-checked gate. The process is in `docs/gates/README.md`. (Until milestone 5 the next milestone did not start until the owner had passed the gate; from 2026-09-30, decision 29, gates lag the work: the next packages are written and launched on the owner's word as their predecessors land, a gate is cut when its last package lands, and its rulings feed a follow-up package.) In short:
 
 1. The milestone's acceptance list passes locally and on GitHub Actions (`.github/workflows/ci.yml`).
 2. A **gate report** is written for a non-programmer at `docs/gates/gate-mN.md`: headline claims, setup with expected output at each step, a live checklist with exact input and expected output per item, a guide to any technical idea the checklist relies on, what is deliberately absent, and what to report back.
