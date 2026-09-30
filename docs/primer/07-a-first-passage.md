@@ -85,18 +85,18 @@ Advanced 60 ticks to Morning watch (04:16).
   Morning watch (04:16)  Order: tack ship.
   Morning watch (04:16)  Ready about. Helm's a-lee; ease off the head sheets; haul aft the spanker sheet.
   Morning watch (04:16)  All hands about ship.
-* Morning watch (04:16)  Fore course taken aback.
-* Morning watch (04:16)  Main course taken aback.
+* Morning watch (04:17)  Fore course taken aback.
+* Morning watch (04:17)  Main course taken aback.
   Morning watch (04:17)  Rise tacks and sheets. Mainsail haul.
   Morning watch (04:18)  Let go and haul. Draw jib; trim aft the head sheets.
-* Morning watch (04:23)  Tacked; braced up on the larboard tack, heading ENE (68°).
-  Morning watch (04:23)  Steady on ENE (68°).
+* Morning watch (04:22)  Tacked; braced up on the larboard tack, heading ENE (68°).
+  Morning watch (04:22)  Steady on ENE (68°).
 Advanced 720 ticks to Morning watch (04:28).
-Amazon: heading ENE (67°), speed 4.6 kn, leeway 4°, heel 4°
-Apparent wind 49° on the larboard bow, 15.5 kn; helm +1°
+Amazon: heading ENE (68°), speed 5.5 kn, leeway 4°, heel 4°
+Apparent wind 48° on the larboard bow, 15.9 kn; helm +0°
 ```
 
-The spanker was sheeted to 24° for the wind by `trim sails`; you eased it a fathom of the fall to 29°, and a minute later it was still there, for nobody tends a sheet but hands sent to it (chapter 4); your haul took it back to 24°. Chapter 5 reads the tack line by line: seven minutes to *Tacked*, and twelve minutes after the order she is back near five knots on the other tack, her sheets trimmed by the tack for the wind she came to. Leeway, heel and helm have all changed sign: the lee side is now starboard.
+The spanker was sheeted to 24° for the wind by `trim sails`; you eased it a fathom of the fall to 29°, and a minute later it was still there, for nobody tends a sheet but hands sent to it (chapter 4); your haul took it back to 24°. Chapter 5 reads the tack line by line: five and a half minutes to *Tacked*, and seven minutes after the order she is back at five knots on the other tack, her sheets trimmed by the tack for the wind she came to. Leeway, heel and helm have all changed sign: the lee side is now starboard.
 
 Haul a brace to feel it, wear her back onto the starboard tack, and, once she is round, take a reef in the topsails against the freshening breeze:
 
