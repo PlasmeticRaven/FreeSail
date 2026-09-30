@@ -38,8 +38,9 @@ the sky in Beaufort's words with Luce's signs, the weather and the visibility in
 lookout's terms; the veer at a front is a veer of the wind like any other, and the
 scenario author and the director alone see the systems by name (W §3).
 
-The sea breeze and coastal fog are hooks on a distance to the coast that 5b's chart
-supplies (`coast_distance_km`); until then they are inert.
+The sea breeze and coastal fog (W §1.4) read the coast through the World's hook
+(`Weather.coast`, package 32): the chart's distance and bearing to the nearest shore. With
+no chart there is no coast, and both are inert, as they were before the chart.
 """
 
 from __future__ import annotations
@@ -244,6 +245,50 @@ SECTORS: tuple[str, ...] = ("ahead", "warm", "behind", "high", "open")
 # The wind under which a day has no prevailing quarter, for the climatology's count
 # (judgement: light airs).
 CALM_KN = 1.0
+
+# The sea breeze (W §1.4; Simpson 1994 [S11], the study's summary: "a summer, daylight,
+# fine-weather wind of some 10 knots at most, onshore, strongest in mid-afternoon, felt a
+# few miles to sea and dying at dusk"; package 32). The study gives the ten knots and the
+# shape in words; the numbers below that put the words on the clock are judgements, said
+# so in docs/dev/TuningNotes.md: the season May to September, the onset at ten in the
+# forenoon and the end at eight in the evening (a June dusk), the peak between them at
+# three; full strength within five kilometres of the shore and gone at fifteen ("a few
+# miles"); free under a gradient wind of five knots and killed by one of twenty.
+SEA_BREEZE_MAX_KN = 10.0
+SEA_BREEZE_MONTHS = frozenset({5, 6, 7, 8, 9})
+SEA_BREEZE_ONSET_H = 10.0
+SEA_BREEZE_END_H = 20.0
+SEA_BREEZE_FULL_KM = 5.0
+SEA_BREEZE_REACH_KM = 15.0
+SEA_BREEZE_GRADIENT_FREE_KN = 5.0
+SEA_BREEZE_GRADIENT_CAP_KN = 20.0
+
+# Coastal fog (W §1.4; the ship observations of [S10]: fog west of the United Kingdom in
+# nearly 4% of observations in June to August and under 2% in December to February;
+# advection fog near the coasts in a stable warm sector or under a high with a slack
+# gradient, lifted by a fresh wind). The monthly chance is [S10]'s two figures drawn
+# through the year (the months between are the study's shape, unverified in W, and a
+# judgement here); the factor is the judgement that the observations' fog falls in the
+# hours that meet the conditions, about a sixth of all hours, so the conditional chance
+# in a sky block is six times the monthly share; the reach and the wind cap are
+# judgements from "near the coasts" and "a fresh wind lifts it". All in TuningNotes.
+FOG_CHANCE_BY_MONTH: tuple[float, ...] = (
+    0.015,
+    0.015,
+    0.02,
+    0.03,
+    0.035,
+    0.04,
+    0.04,
+    0.04,
+    0.03,
+    0.025,
+    0.02,
+    0.015,
+)
+FOG_CONDITIONAL_FACTOR = 6.0
+FOG_COAST_KM = 30.0
+FOG_MAX_WIND_KN = 12.0
 
 
 def inches(hpa: float) -> float:
@@ -1119,25 +1164,90 @@ class Weather:
             sec.sector, sec.air_mass, sky, signs, weather, vis, self.pressure_at(x_km, y_km)
         )
 
-    # -- the hooks for 5b: inert until a coast is known ------------------------
+    # -- the coast's hooks (spec M5 §11; package 32): the sea breeze and the fog -------
+
+    # `coast` is the World's hook (package 32): a callable of a point of the plane
+    # (km east, km north of the origin) giving the distance to the nearest coast in
+    # kilometres and the bearing toward it in degrees, from the chart's distance field,
+    # or None where the chart has no field. None (no chart): no coast, no breeze, no fog,
+    # and every scenario of the earlier milestones is what it was.
+    coast: Any = None
 
     def coast_distance_km(self, x_km: float, y_km: float) -> float | None:
-        """The distance to the nearest coast, which 5b's chart will supply (spec §11); None
-        until then, and the sea breeze and the coastal fog below read None as "no coast"."""
-        return None
+        """The distance to the nearest coast (spec §11), from the chart through the
+        World's hook; None where no coast is known."""
+        found = self._coast(x_km, y_km)
+        return found[0] if found is not None else None
+
+    def _coast(self, x_km: float, y_km: float) -> tuple[float, float] | None:
+        if self.coast is None:
+            return None
+        return self.coast(x_km, y_km)
 
     def sea_breeze(self, x_km: float, y_km: float, when: datetime) -> tuple[float, float]:
-        """The sea breeze's velocity (m/s east, north) to add to the surface wind: a
-        summer, daylight, fine-weather onshore wind of some ten knots at most, felt a few
-        miles to sea (W §1.4, Simpson 1994). Inert: no coast, no breeze."""
-        if self.coast_distance_km(x_km, y_km) is None:
+        """The sea breeze's velocity (m/s east, north) to add to the surface wind (W §1.4,
+        Simpson 1994): a summer, daylight, fine-weather onshore wind of some ten knots at
+        most, strongest in mid-afternoon, felt a few miles to sea and dying at dusk. The
+        onshore direction is the bearing to the nearest coast; the strength is the
+        product of the season's, the hour's, the distance's and the gradient's factors
+        (`SEA_BREEZE_*`), and it blows only in fine weather away from a low's fronts."""
+        found = self._coast(x_km, y_km)
+        if found is None:
             return 0.0, 0.0
-        return 0.0, 0.0  # 5b: the onshore term by the hour and the gradient
+        distance_km, bearing_deg = found
+        if distance_km >= SEA_BREEZE_REACH_KM or when.month not in SEA_BREEZE_MONTHS:
+            return 0.0, 0.0
+        hour = when.hour + when.minute / 60.0
+        if not SEA_BREEZE_ONSET_H < hour < SEA_BREEZE_END_H:
+            return 0.0, 0.0
+        sector = self.sector_at(x_km, y_km, when)
+        fine = sector.sector in ("high", "open") or (
+            sector.sector == "behind"
+            and sector.to_cold_km is not None
+            and sector.to_cold_km > COLD_FRONT_SHOWERS_KM
+        )
+        if not fine:
+            return 0.0, 0.0
+        # the hour's hump, from onset to dusk, its peak in mid-afternoon
+        span = SEA_BREEZE_END_H - SEA_BREEZE_ONSET_H
+        diurnal = math.sin(math.pi * (hour - SEA_BREEZE_ONSET_H) / span)
+        # felt a few miles to sea: full inshore, gone at the reach
+        reach = (
+            1.0
+            if distance_km <= SEA_BREEZE_FULL_KM
+            else ((SEA_BREEZE_REACH_KM - distance_km) / (SEA_BREEZE_REACH_KM - SEA_BREEZE_FULL_KM))
+        )
+        # a strong gradient wind overrides it
+        gx, gy = self.geostrophic_at(x_km, y_km)
+        gradient_kn = units.ms_to_knots(math.hypot(gx, gy) * SURFACE_SCALE)
+        if gradient_kn >= SEA_BREEZE_GRADIENT_CAP_KN:
+            return 0.0, 0.0
+        damping = 1.0 - max(0.0, gradient_kn - SEA_BREEZE_GRADIENT_FREE_KN) / (
+            SEA_BREEZE_GRADIENT_CAP_KN - SEA_BREEZE_GRADIENT_FREE_KN
+        )
+        speed = units.knots_to_ms(SEA_BREEZE_MAX_KN) * diurnal * reach * damping
+        if speed <= 0.0:
+            return 0.0, 0.0
+        toward = math.radians(bearing_deg)
+        return speed * math.sin(toward), speed * math.cos(toward)
 
     def coastal_fog(self, x_km: float, y_km: float, when: datetime) -> bool:
-        """Advection fog near the coasts and the cold patches in a stable warm sector or
-        under a high with a slack gradient (W §1.4). Inert: no coast, no fog."""
-        return self.coast_distance_km(x_km, y_km) is not None and False
+        """Advection fog (W §1.4): near the coasts, in a stable warm sector or under a
+        high, with a slack wind (a fresh wind lifts it to low cloud), most often in late
+        spring and early summer. Decided once a sky block (`SKY_NOISE_HOURS`) by the
+        month's chance from the seed, so a day replays and two hours differ."""
+        found = self._coast(x_km, y_km)
+        if found is None or found[0] > FOG_COAST_KM:
+            return False
+        sector = self.sector_at(x_km, y_km, when)
+        if sector.sector not in ("warm", "high"):
+            return False
+        gx, gy = self.geostrophic_at(x_km, y_km)
+        if units.ms_to_knots(math.hypot(gx, gy) * SURFACE_SCALE) > FOG_MAX_WIND_KN:
+            return False
+        block = int(_seconds(when) // 3600) // SKY_NOISE_HOURS
+        chance = FOG_CHANCE_BY_MONTH[when.month - 1] * FOG_CONDITIONAL_FACTOR
+        return _noise(self.seed, f"fog:{block}") < chance
 
 
 # ---------------------------------------------------------------------------
