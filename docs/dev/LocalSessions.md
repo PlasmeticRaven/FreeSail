@@ -8,8 +8,48 @@ branch from the lead's branch and pushes it; the lead merges it with `--no-ff`, 
 suite and records the package as any other.
 
 The owner's part: open the repository folder in Claude Code (the Desktop app's Code
-tab), choose the model (Opus for these two), paste the prompt, and when the session
-reports, paste its report to the lead.
+tab), choose the model, paste the prompt (or tell the session to read this file on the
+lead's branch and follow it), and when the session reports, paste its report to the
+lead. The lead's cloud session cannot reach the owner's machine, so this file is the
+message.
+
+## How a local session works in the repository, so that nothing interrupts the lead
+
+The lead runs in a cloud session on the branch `claude/dreamy-darwin-d77nty`, where
+every package lands; builders work in worktrees of it and the lead merges each as it
+reports. A local session is another builder, on the owner's machine, and keeps to the
+same rules:
+
+1. `git fetch origin claude/dreamy-darwin-d77nty`, then one branch per package from the
+   head of the lead's branch at the moment you start: `git checkout -b package/32c
+   origin/claude/dreamy-darwin-d77nty`, and later `git checkout -b package/32d
+   origin/claude/dreamy-darwin-d77nty`.
+2. Never push to `claude/dreamy-darwin-d77nty`, to `main`, or to any `gates/**` branch.
+   Push only your own branches (`git push -u origin package/32c`), when the package is
+   done; pushing earlier as a backup is fine. Never rebase or force-push anything; never
+   merge into the lead's branch; never open a pull request. The lead merges each of your
+   branches with `--no-ff`, runs the suite and pushes.
+3. The lead's branch moves while you work (four packages are landing on it). Do not chase
+   it. If you genuinely need something that landed there, merge it into your branch
+   (`git merge origin/claude/dreamy-darwin-d77nty`), never rebase.
+4. Two files are held by other packages and are not edited by a local session at all:
+   `tests/test_known_truths.py` (package 31b) and `docs/agents/Harness.md` (package 31c;
+   32d gives the lead the lines to add to it in its report).
+5. Commit as you go with clear messages; end each commit message with the attribution
+   lines your session gives you. No model identifier anywhere in the repository's files
+   (code, data, docs, comments); the attribution lines in commit messages are the one
+   place.
+6. Report in the order the package's brief sets, to the owner, who relays it to the lead.
+   Anything in a brief that turns out wrong on this machine goes in the report rather
+   than being worked around silently.
+
+Getting ready, once: `py -m pip install -e ".[dev,server,agents]"` in the clone; `py -m
+ruff check .` and `py -m ruff format --check .` clean; then the whole suite once as it
+is, `py -m pytest -n auto`, keeping its wall clock and its last line (on the lead's
+branch it ends "1689 passed, 7 xfailed"; the seven are the owner's rulings and stay).
+That run is 32c's "before" figure on this machine. If a test trips on encoding, set
+`PYTHONUTF8=1` in the shell, as gate 5a found. Build 32c first (it is smaller and its
+"before" is the run you have just made), then 32d.
 
 ## Package 32c: the suite in two tiers, the days built once, a Windows job
 
