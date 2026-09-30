@@ -462,3 +462,20 @@ brail up the foresail
 ```
 
 The refusal: "The main sail cannot be scandalised: the physics has no state for a gaff sail with its peak dropped yet, only set, reefed or taken in. Ease the sheet, reef it or take it in instead."
+
+## The cutter's running bowsprit
+
+A cutter's bowsprit is not gammoned fast to the stem as a ship's is: it runs in and out along the deck through the gammoning and a fid, and shortening it is the first thing done for weather. "The bowsprit of a cutter may be run in and out... it is reefed by running it in and shifting the fid" (Fincham 1843, art. 86; Luce 1884, ch. XXXIV, Handling Fore-and-Afters: the cutter "reefs her bowsprit"). The jib's tack rides the bowsprit end, so the jib comes in first, and while the bowsprit is reefed she carries her storm jib, cut to the shorter hoist, or no jib at all. **Reef the bowsprit** (or *run in the bowsprit*, *rig in the bowsprit*) casts off the heel rope, runs the spar in to its housed length and sets it up again, four minutes' work for six of the forecastle men; **rig out the bowsprit** (*run out the bowsprit*) hauls it out to its full length by the heel rope. With the bowsprit reefed, `set the jib` is refused ("The jib's tack rides the bowsprit, which is reefed; rig out the bowsprit first, or set the storm jib"); with the jib set, `reef the bowsprit` is refused until it is hauled down.
+
+```orders cutter plain-sail
+haul down the jib
+reef the bowsprit
+rig out the bowsprit
+```
+
+```orders cutter
+shift the jib for the storm jib
+run in the bowsprit
+```
+
+Both refusals, and the brig's ("The bowsprit is gammoned fast to the stem; only a cutter's running bowsprit reefs"), are the evolution's own, given when the hands are called, not the parser's: the words parse on any ship and the runner answers for the spar. Her other spars come down as the schooner's do: `strike the topmast` for her one topmast (it is struck with its pole, the topgallant yard and all), `send down the topgallant mast` for the pole alone.

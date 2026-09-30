@@ -620,3 +620,46 @@ Truth 51's measure on the build machine with the suite running beside it, a thou
 - **The motion's words flicker.** A roll hovering about six degrees said "rolling" and "rolling easily" by turns every few minutes; the words now hold five minutes before the log says they changed (`MOTION_WORDS_HOLD_S`). The sea's words do not need it: the sea moves over hours.
 - **The head-sea factor in a smooth sea.** A smooth sea on the bow added a quarter of a per cent to the resistance and moved the loads at the seventh figure; the factor now counts the sea above a smooth one, so a scenario that keeps a smooth sea judges the same loads as one that keeps none.
 - **The squall's veer and the cross sea.** A squall's two-point veer, on top of a front's four, took the swell across the wind at the four-point threshold and the log said a confused sea for the squall's minutes and then the sea going down and getting up again; the threshold is five points, past a front's veer.
+
+## Milestone 5: the cutter and the brig
+
+### Package 32b: where the four ships stand
+
+The cutter Sherbourne (`data/ships/cutter.yaml`, 85 tons, one mast, a running bowsprit) and the brig Harpy (`data/ships/brig.yaml`, 316 tons, the frigate less a mast), measured as the known truths measure the frigate and the schooner: plain sail in 15 knots of true wind, the yards trimmed to the wind, settled twenty minutes on each heading (`tools/measure_loads.py` for the loads; the polar and the pointing sweep of `tests/test_known_truths.py`). The frigate's and the schooner's rows were measured again on the same build, so the four are one table.
+
+Polars, plain sail, 15 kn, yards trimmed (speed in knots):
+
+| off the true wind | 50 | 60 | 70 | 80 | 90 | 100 | 110 | 120 | 130 | 140 | 150 | 160 | 170 | 180 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| frigate | 1.9 | 4.0 | 5.9 | 7.3 | 8.0 | 7.7 | 7.7 | 7.5 | 7.3 | 6.9 | 6.6 | 6.3 | 5.9 | 5.9 |
+| schooner | 4.4 | 6.2 | 7.0 | 7.5 | 7.9 | 7.9 | 7.7 | 7.4 | 6.9 | 6.4 | 5.9 | 5.7 | 5.5 | 5.5 |
+| cutter | 4.0 | 5.8 | 6.5 | 7.1 | 7.3 | 7.2 | 7.1 | 6.9 | 6.5 | 6.1 | 5.7 | 5.5 | 5.5 | 5.4 |
+| brig | 0.9 | 4.0 | 5.7 | 7.0 | 7.7 | 7.6 | 7.5 | 7.4 | 7.1 | 6.7 | 6.3 | 6.1 | 5.9 | 5.7 |
+
+The same, heel and weather helm in degrees at the beam reach (90°) and close-hauled at the best course: frigate 5.9° heel, helm 1.8° at 90°; schooner 8.9°, 5.2°; cutter 6.7°, 6.8°; brig 7.8°, 1.3°. The cutter's helm runs from 0° at 60° off to 12° at 120°, the schooner's from 0° to 8°, the brig's 5° at 60° falling to 1° at 100°: the cutter carries her weather helm off the wind as her mainsail's centre moves aft with the sheet, the brig's spanker is balanced by her head sails on every point.
+
+The centre of lateral resistance was set as the schooner's was: from the weather helm close-hauled and abeam, moving `clr_x_m` until the helm was a degree or two to weather close-hauled and stayed to weather on a reach. The cutter's at −0.2 m gave 1.0° close-hauled and 7.4° abeam; at −0.4 m (the file) 0.2° and 6.8°. The brig's at 1.5 m gave 7.3° and 3.1°, at 2.3 m 9.6° and 4.5° (moving the centre forward increases the weather helm); at 0.5 m (the file) 5.3° and 1.3°.
+
+| # | Truth | Target | Measured | Passes |
+|---|---|---|---|---|
+| 73 | A cutter lies closer than a topsail schooner | best course half a point closer than the schooner's | cutter 58° (holds 3 kn to 46°); schooner 58° (to 44°): the same to the degree | no (strict xfail) |
+| 74 | A brig lies as a ship does | 60° to 72°, within half a point of the frigate, less close than the schooner | brig 64° (holds 3 kn to 54°); frigate 64° (to 56°); schooner 58° | yes |
+| 75 | The cutter's beam reach | 6 to 8 kn in 15, slower than the frigate, under 10° of heel | 7.3 kn; frigate 8.0; heel 6.7° | yes |
+| 76 | The brig's beam reach | 7 to 9 kn in 15, within a knot of the frigate, her fastest point | 7.7 kn; frigate 8.0; fastest at 90° | yes |
+
+The bands of 75 and 76 are judgement: the sources give no polars for either, only the rig's reputation and the hull speeds (the cutter's 9.5 kn on 50 ft of water-line, the brig's 11.5 on 88), and the bands are drawn a knot either side of what a hull of the size makes in fifteen knots on the frigate's and the schooner's scale.
+
+**Truth 73, why it fails.** How close a ship lies is set by the lift curves of the sail classes and the trim floors in `freesail/physics/sails.py`, which the four ships share, not by anything in a ship file: the cutter's mainsail is a `gaff` sail as the schooner's is, her jib a `jibheaded` sail as the schooner's, and her one square topsail trims to the same floor. Her great mainsail and long boom give her the area (270 m² of plain sail on 106 t, against the schooner's 608 on 211) and her balance, and the sweep shows it in the speed she holds close to the wind (4.0 kn at 50° off where the frigate makes 1.9 and the brig 0.9), but not a higher-pointing sail. Meeting it wants a per-rig or per-sail pointing factor (a cutter's flat-cut mainsail, her bowsprit's length giving the jib a longer foot), which is a physics change outside this package; the truth is recorded as a strict xfail with the measured values in its reason, in `tests/test_ships_hierarchy.py`.
+
+**Loads.** In 20 knots abeam under plain sail nothing on either ship is within half of its rating but the brig's topgallant yards (0.71) and the cutter's topsail (0.45, the cloth); in 35 knots under all sail the cutter's gaff topsail goes (1.21 of its rating) and her topsail stands at 0.94, and the brig's topgallant yards (1.64) and topgallant masts (1.26, 1.18), main topgallant staysail (1.21) and flying jib (1.06) go, as the frigate's light spars do (truth 9). The cutter's square-sail yard reaches its rating exactly (1.00) in 22 knots at 110° off under all sail: it is rated for its sail in the design wind, as every yard is, and the square sail is a sail for going free in a moderate breeze.
+
+**Manoeuvres.** The cutter wears in 512 s and heaves to with her topsail to the mast (2.3 kn of headway at 45° off after five minutes: a cutter forereaches under her mainsail); the brig wears in 596 s once the spanker is brailed up as the helm goes up and hauled out when she is by the wind (see below), box-hauls, and heaves to with the main topsail aback, lying about 76° off the wind and forereaching at 2.4 kn where the frigate lies 60° off at 1.2: her main is her after mast and the backed topsail is on it, so she lies broader than a ship whose backed sail is amidships. None of the cutter, the schooner or the brig tacks in the real physics: each loses her way before her head comes through (the engine has no jib-sheet-to-windward state and the minimum of 0.8 kn is not enough for a small vessel's sternboard), so truth 10 stays the frigate's; the three box-haul and wear instead. Recorded, not fixed: it is in the physics of staying, not in the grammar.
+
+### Found on the way (package 32b)
+
+- **The driver was found by counting masts.** `after_gaff_sails` kept the driver on a vessel of fewer than three masts, so the brig heaving to came head to wind with sternway under her 162 m² spanker, and wearing she would not pay off. The driver is now found by place: the gaff sail on the aftermost lower mast when that mast carries square yards and another mast forward of it does too. The schooner's mainsail and the cutter's, on a vessel whose yards are all on one mast, stand as their driving sails.
+- **Wearing, the driver hauled out too soon.** With the spanker hauled out as the wind came aft, the brig rounded up through the wind on the new tack before the helm could meet her (1.7 kn, then sternway at 40° off); it is now hauled out once she is by the wind, "By the wind. Haul out the spanker!", as Luce's sequence has it. The frigate, whose spanker is now brailed up and hauled out the same way, wears in 519 s from the same start (557 s before; truth 11's band is 6 to 12 minutes and it still passes) with the two lines added to her log.
+- **`reef` of a bowsprit.** "Reef the bowsprit" went to the sail reef, which asked for a sail; it now goes with `rig out` and `rig in` to the boom evolutions, which look the spar's class up in the vocabulary's table (`reef_bowsprit`, `rig_out_bowsprit`); the frigate's and the brig's standing bowsprits are refused by the evolution ("gammoned fast to the stem").
+- **A standing order's sail name.** "When the fore topsail is shaking" on the cutter, who has no fore topsail but whose foresail answers to "the fore", read as "the fore" compared "topsail shaking" and refused in those words; a part's name must now be followed by its comparison, so the unknown name is refused as unknown with the nearest suggested.
+- **The log's names for the cutter's square sails.** An alias "the crossjack" for the square sail and "the main topsail" for the topsail made the log say "the crossjack" and "main topsail" for sails a cutter's people call the square sail and the topsail; an alias that begins with "the " is a name the parser takes and the log does not use, and the generator writes them so.
+- **Thirty hands.** The cutter's watch is short for the larger parties (a whole watch to furl the mainsail), and the crew orders say so ("SHORT") rather than refuse; her topmen fall back to the deck stations, having no tops.

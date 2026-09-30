@@ -1,25 +1,45 @@
-"""Generate the two reference ship files from documented particulars and period rules.
+"""Generate the four reference ship files from documented particulars and period rules.
 
 Run from the repository root:  python tools/gen_ships.py [output directory]
 
-This script is the source of `data/ships/frigate-36.yaml` and
-`data/ships/topsail-schooner.yaml`. Do not hand-edit those files: change the
-numbers or rules here and regenerate, so that the files, the rules that
-produced them and the citations stay together (`git diff` must be empty after
-a run). Every number that is a judgement rather than a citation is marked
-"judgement" in the comment the script writes next to it.
+This script is the source of `data/ships/frigate-36.yaml`,
+`data/ships/topsail-schooner.yaml`, `data/ships/cutter.yaml` and
+`data/ships/brig.yaml`. Do not hand-edit those files: change the numbers or
+rules here and regenerate, so that the files, the rules that produced them and
+the citations stay together (`git diff` must be empty after a run). Every
+number that is a judgement rather than a citation is marked "judgement" in the
+comment the script writes next to it.
 
 How the numbers are made
 ------------------------
 
 Hull particulars are taken from published dimensions (the frigate: the
 Amazon class of 1795; the schooner: Kemp's Lynx of 1812, from the Admiralty
-draught Chapelle reproduces in The Baltimore Clipper, 1930) and converted:
-gundeck and keel length to a load waterline, burthen to a displacement, the
-"depth in hold" to a draught. The schooner's rig, whose spar dimensions
-Chapelle could not find, is reconstructed as he prescribes: by Fincham's
-masting rules, checked against the spar tables he prints (Sea Lark 1812,
-Spider 1835) and Marestier's measured schooners of 1820.
+draught Chapelle reproduces in The Baltimore Clipper, 1930; the cutter:
+Sherbourne of 1763, 85 tons, 54 ft 6 in by 19 ft; the brig: Harpy of 1796,
+316 tons, 95 ft on the gun deck, 75 ft 1 5/8 in of keel, 28 ft 1 1/2 in of
+beam, 12 ft 0 1/2 in of hold, both from the printed dimensions noted in
+docs/design/VesselCandidates.md) and converted: gundeck and keel length to a
+load waterline, burthen to a displacement, the "depth in hold" to a draught.
+The schooner's rig, whose spar dimensions Chapelle could not find, is
+reconstructed as he prescribes: by Fincham's masting rules, checked against
+the spar tables he prints (Sea Lark 1812, Spider 1835) and Marestier's
+measured schooners of 1820. The cutter's rig (package 32b) is Fincham 1843
+p. 67, the second revenue cruiser's column of his cutter table (main mast
+hounded 2.6 x the beam, boom 0.87 of the length, gaff 0.64 of the boom,
+bowsprit 0.79 of the length, square-sail yard 0.84, the topsail and
+topgallant yards 0.70 and 0.44 of it) with arts. 86 and 87 (pp. 35 to 36) for
+the mast's place and the sails' proportions and his footnote on the 85-ton
+cutter's canvas (mainsail 1566, foresail 367, second jib 541 sq ft); her sails
+are cut by Steel 1794 (the cutter's mainsail p. 120, the sloop's square sail,
+topsail and topgallant pp. 124 to 126, the smack's foresail and jib, the storm
+jib p. 190), and her bowsprit runs in and out (a `running` bowsprit with a
+`housed_length_m`, the one addition the two ships needed of the file format).
+The brig's rig is Fincham 1843 p. 88, the first brig of war (100 x 30.5 ft)
+scaled to Harpy, with pp. 82 to 83 for the placing of her masts and Steel's
+brig's mainsail (p. 119, No. 5 or 6 canvas, three reef bands) for the boom
+mainsail; her head sails, staysails, studding sails and storm canvas follow
+the frigate's rules at her size.
 
 Spar lengths follow the proportional rules that the period's own masting
 texts give. The chain of rules used for the frigate is Luce 1866, ch. VII

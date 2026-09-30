@@ -135,6 +135,12 @@ class InstantRunner:
                     sail.state = SailState.FURLED
         elif evo.startswith("furl_"):
             ship.sails[subject].state = SailState.FURLED
+        elif evo in ("reef_bowsprit", "rig_out_bowsprit"):
+            # the cutter's running bowsprit (package 32b): run in to its housed length
+            # or out to its full one, as the evolutions' end states have it
+            spar = ship.spars[subject]
+            spar.rigged_out = evo == "rig_out_bowsprit"
+            spar.length_m = spar.full_length_m if spar.rigged_out else spar.housed_length_m
         elif evo.startswith("reef_"):
             sail = ship.sails[subject]
             n = sail.reef_bands if p.get("close") else int(p.get("reefs", 1))

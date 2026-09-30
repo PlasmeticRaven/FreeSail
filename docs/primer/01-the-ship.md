@@ -193,6 +193,70 @@ brace the yards square
 
 The last: "The main gaff is a gaff, not a yard; the gaff sail on it is not braced; it is trimmed with its sheet and vangs." Chapter 4 says how.
 
+## The cutter *Sherbourne*: a revenue cutter of 85 tons
+
+One mast, **the main** (*the mast* will do: there is no other), a lower mast with a topmast and a short topgallant pole above it, no tops, and a **running bowsprit** that is run in and out along the deck through the gammoning rather than fixed to the stem (Fincham 1843, art. 86; Luce 1884, ch. XXXIV, for the cutter's rig). The working sails are the great boom mainsail, the foresail and the jib; three square sails cross the one mast for going free.
+
+| Part | What it is |
+|---|---|
+| **mainsail** (*the main*, `main.sail`) | gaff sail on the main gaff and main boom, the boom reaching well over the taffrail; four reef bands (Steel 1794) |
+| **foresail** (*the fore*, *the staysail*, `fore.staysail`) | a staysail on the fore stay, not a gaff sail: a cutter's foresail is her staysail |
+| **jib** | on the jib stay, its tack at the bowsprit end, so it comes and goes with the bowsprit |
+| **gaff topsail** | jib-headed, above the mainsail on the topmast |
+| **square sail** (*the crossjack*, `square_sail`) | on the square-sail yard under the mast head, set only off the wind |
+| **topsail** (*the main topsail*) | square, on the topsail yard on the topmast; one reef band |
+| **topgallant** | square, on the topgallant yard on the pole |
+| **storm trysail**, **storm jib** | in the sail room, bent in the mainsail's and the jib's places for a storm |
+
+She has no flying jib, no royals, no studding sails and no spanker: **plain sail** is the mainsail, the foresail, the jib and the topsail; **all sail** adds the gaff topsail, the square sail and the topgallant, which are her **light sails**. Her three yards are **the yards** (or *the main yards*); she has no head or after yards to brace apart. The bowsprit has a **heel rope** to run it out with, and chapter 3 says how it is reefed.
+
+```orders cutter
+set the mainsail
+set the foresail
+set the jib
+set the topsail
+set the square sail
+set the gaff topsail
+reef the mainsail, two reefs
+ease the main sheet a fathom
+ease the fore sheet, lee
+haul the weather topsail brace
+brace the yards square
+strike the topmast
+# rejected: set the spanker
+# rejected: set the fore topsail
+# rejected: set the studdingsails
+# rejected: brace the head yards square
+```
+
+The refusals name what she has instead: "There is no such part as the fore topsail in this ship; did you mean the foresail, the gaff topsail or the topsails?"
+
+## The brig *Harpy*: a brig-sloop of 316 tons
+
+The frigate less a mast: **fore** and **main**, each a lower mast, topmast, topgallant mast and royal pole, three yards and a royal yard on each, tops on both, a bowsprit with a jib-boom and a flying jib-boom, and a gaff and boom on the main for the **spanker** (*the driver*, *the boom mainsail*, *the trysail*: a brig's is all four), which is the largest sail she has. Everything in the frigate's table that is not the mizzen's is hers, at her size: the courses, topsails, topgallants and royals, the fore topmast staysail, jib and flying jib, the main staysail, main topmast staysail (*the middle staysail*) and main topgallant staysail, ten studding sails, and the storm staysails and storm trysail in the sail room. The **head yards** are the fore's and the **after yards** the main's, so *square the after yards* and *back the main topsail* work as they do on the frigate; there is no crossjack, no mizzen and nothing of the mizzen's to name.
+
+```orders brig
+set the fore topsail
+set the topsails
+set the courses
+set the royals
+set the spanker
+ease the spanker sheet
+brail up the driver
+set the middle staysail
+set the fore topmast studdingsail, larboard
+square the after yards
+back the main topsail
+brace the fore and main yards square
+haul the weather main brace
+send down the topgallant masts
+# rejected: set the mizzen topsail
+# rejected: set the crossjack
+# rejected: brace the mizzen yards square
+```
+
+The refusal: "There is no such part as the mizzen yards in this ship; did you mean the main yards, the head yards or the fore yards?" Her bowsprit is gammoned fast to the stem, so *reef the bowsprit* is refused on her ("only a cutter's running bowsprit reefs").
+
 ## What you cannot yet name
 
-There is no anchor, cable, boat, gun, pump or log-line in either file yet, and no crew; `let go the best bower` is refused with "There is no such part as the best bower in this ship." Those come with later milestones (`docs/DesignProposal.md` §11). The masts can be named but not sent down.
+There is no anchor, cable, boat, gun, pump or log-line in any of the four files yet, and no crew; `let go the best bower` is refused with "There is no such part as the best bower in this ship." Those come with later milestones (`docs/DesignProposal.md` §11). The masts can be named but not sent down.
