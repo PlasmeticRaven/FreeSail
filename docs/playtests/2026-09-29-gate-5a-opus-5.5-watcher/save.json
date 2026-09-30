@@ -1,0 +1,3168 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "seed": 7,
+  "scenario": {
+    "name": "The gate's day under systems",
+    "start_time": "1805-06-01T04:00:00",
+    "wind_from_deg": 225.0,
+    "wind_speed_kn": 15.0,
+    "gustiness": 0.3,
+    "variability": 0.3,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 135.0,
+    "ship_speed_kn": 0.0,
+    "latitude_deg": 50.0,
+    "weather": [],
+    "systems": [
+      {
+        "name": "the low",
+        "kind": "low",
+        "radius_km": 420,
+        "fronts": {
+          "warm_deg": 207,
+          "cold_deg": 56
+        },
+        "track": [
+          {
+            "at": "1805-05-31T12:00:00",
+            "x_km": 20,
+            "y_km": 920,
+            "hpa": 1004
+          },
+          {
+            "at": "1805-06-01T04:00:00",
+            "x_km": 150,
+            "y_km": 800,
+            "hpa": 998
+          },
+          {
+            "at": "1805-06-01T14:00:00",
+            "x_km": 200,
+            "y_km": 780,
+            "hpa": 996
+          },
+          {
+            "at": "1805-06-01T19:00:00",
+            "x_km": 250,
+            "y_km": 700,
+            "hpa": 990
+          },
+          {
+            "at": "1805-06-01T22:00:00",
+            "x_km": 330,
+            "y_km": 540,
+            "hpa": 980
+          },
+          {
+            "at": "1805-06-02T01:00:00",
+            "x_km": 400,
+            "y_km": 400,
+            "hpa": 968
+          },
+          {
+            "at": "1805-06-02T03:00:00",
+            "x_km": 520,
+            "y_km": 370,
+            "hpa": 968
+          },
+          {
+            "at": "1805-06-02T05:00:00",
+            "x_km": 720,
+            "y_km": 320,
+            "hpa": 978
+          },
+          {
+            "at": "1805-06-02T07:00:00",
+            "x_km": 950,
+            "y_km": 280,
+            "hpa": 988
+          }
+        ]
+      },
+      {
+        "name": "the old ridge",
+        "kind": "high",
+        "radius_km": 800,
+        "track": [
+          {
+            "at": "1805-05-31T12:00:00",
+            "x_km": 400,
+            "y_km": -500,
+            "hpa": 1022
+          },
+          {
+            "at": "1805-06-01T04:00:00",
+            "x_km": 1100,
+            "y_km": -700,
+            "hpa": 1020
+          },
+          {
+            "at": "1805-06-01T12:00:00",
+            "x_km": 1500,
+            "y_km": -800,
+            "hpa": 1018
+          }
+        ]
+      },
+      {
+        "name": "the ridge",
+        "kind": "high",
+        "radius_km": 900,
+        "track": [
+          {
+            "at": "1805-06-02T00:00:00",
+            "x_km": -1400,
+            "y_km": -200,
+            "hpa": 1024
+          },
+          {
+            "at": "1805-06-02T09:00:00",
+            "x_km": -800,
+            "y_km": -200,
+            "hpa": 1026
+          }
+        ]
+      }
+    ],
+    "climatology": false,
+    "background": {
+      "hpa": 1015.0,
+      "gradient_hpa_per_100km": 0.5,
+      "high_toward_deg": 190.0
+    },
+    "glass": true,
+    "sea": null
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/frigate-36.yaml"
+  },
+  "end_tick": 105708,
+  "journal": [
+    [
+      0,
+      "captain",
+      "standing order \"night routine\": at sunset then take in the studdingsails; take in the royals"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"morning sail\": at sunrise, if the true wind is under 20 knots then set the royals"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"shorten sail for weather\": when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; take in the topgallants; reef the topsails, one reef"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"keep her full\": when the apparent wind is forward of 55 degrees then bear away one point"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"trim on a shift\": when the true wind veers 1 point or backs 1 point then trim sails"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"heavy weather\": when the true wind exceeds 40 knots for 5 minutes then send down the topgallant masts; take in the fore topmast staysail; bend the fore storm staysail; close reef the topsails"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"storm staysail\": when the fore storm staysail is furled and the true wind exceeds 40 knots then set the fore storm staysail"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"gale canvas\": when the true wind exceeds 36 knots for 5 minutes then take in the jib; take in the spanker; take in the mainsail"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"make sail after the gale\": when the fore storm staysail is set and the true wind is under 25 knots for 30 minutes then take in the fore storm staysail; sway up the topgallant masts; shake out the reefs in the topsails; set plain sail"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"topgallants again\": when the fore topsail is set and the fore topsail is not reefed and the fore topgallant is not set and the true wind is under 22 knots for 10 minutes then set the topgallants"
+    ],
+    [
+      0,
+      "captain",
+      "set plain sail"
+    ],
+    [
+      0,
+      "captain",
+      "set the royals"
+    ],
+    [
+      102,
+      "captain",
+      "Tell the watcher Welcome aboard, we're getting ready to make way now. In this small voyage, we'll be mostly looking at the weather and the sea state, and how the ship handles them. For now, you may stand by until the first bell. I will be setting a standing order for taking in the royals when the glass is falling."
+    ],
+    [
+      147,
+      "captain",
+      "standing order \"glass\": when the glass is falling fast then take in the royals"
+    ],
+    [
+      443,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      524,
+      "captain",
+      "Ask the watcher how the sky and glass are looking"
+    ],
+    [
+      679,
+      "captain",
+      "Tell the watcher Thank you kindly, standy by until a glass if you please and keep an eye on the sky, too."
+    ],
+    [
+      759,
+      "captain",
+      "Trim the square sails"
+    ],
+    [
+      2559,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      2869,
+      "captain",
+      "Tell the watcher I'm going to set a standing order that will send word to you if the sea is getting heavy. You may continue to stand by until a glass, as you were."
+    ],
+    [
+      3028,
+      "captain",
+      "Tell the watcher The sea notification standing order is belayed for now, continue as you were."
+    ],
+    [
+      7959,
+      "captain",
+      "Tell the watcher Thank you, as you were. Continue journaling the weather and glass checks for your record."
+    ],
+    [
+      10018,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      15133,
+      "captain",
+      "Tell the watcher Thank you kindly, man. If all is well, continue as you were. We'll be sailing through the night on this course."
+    ],
+    [
+      28879,
+      "captain",
+      "Tell the watcher If you please, take a look at the library and journal anything you think will be useful for the watch overnight. We'll need to keep a close eye on the weather, and be ready for anything."
+    ],
+    [
+      29014,
+      "captain",
+      "Tell the watcher Noted, thank you. Please get comfortable for the rest of the day, stand by as you please so you can keep a reasonable eye on the weather and glass. No need to stand by every glass if the readings aren't showing a tend."
+    ],
+    [
+      48031,
+      "captain",
+      "Tell the watcher Noted, thank you. As you were."
+    ],
+    [
+      48085,
+      "captain",
+      "Tell the watcher Ah, thank you. I'll keep a close eye on them until sunset, which isn't too far off."
+    ],
+    [
+      55854,
+      "captain",
+      "Tell the watcher Ho there, man, wind has shifted. Keep your head up, sunset is very soon and we'll be heading in to night work."
+    ],
+    [
+      55954,
+      "captain",
+      "Tell the watcher Aye, that's how I read it as well. Keep a stand by until sunset, then you can see how she sets for the night and prepare your watch schedule. I'll need you ready and able in case anything changes quickly, then."
+    ],
+    [
+      57099,
+      "captain",
+      "Tell the watcher Noted. Our standing orders have procedure for shortening sail for weather, and we'll see that the hands follow them properly if the situation changes."
+    ],
+    [
+      65100,
+      "captain",
+      "Tell the watcher Thank you for the correction, I think she's steady for now. Keep watch, as you were."
+    ],
+    [
+      76995,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      77054,
+      "captain",
+      "Unbend the main topsail"
+    ],
+    [
+      77820,
+      "captain",
+      "Shift the mizzen topsail"
+    ],
+    [
+      78690,
+      "captain",
+      "Shift the fore course"
+    ],
+    [
+      79236,
+      "captain",
+      "Set the mizzen topsail"
+    ],
+    [
+      79243,
+      "captain",
+      "Reef the mizzen topsail, close reef"
+    ],
+    [
+      79910,
+      "captain",
+      "Set the foresail"
+    ],
+    [
+      80670,
+      "captain",
+      "Reef the foresail, one reef"
+    ],
+    [
+      82731,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      82981,
+      "captain",
+      "Haul the weather main topsail brace"
+    ],
+    [
+      83008,
+      "captain",
+      "Trim the main topsail yard"
+    ],
+    [
+      83278,
+      "captain",
+      "Haul the fore topsail braces"
+    ],
+    [
+      83336,
+      "captain",
+      "Tell the watcher Thank you, it's probably not yet implemented."
+    ],
+    [
+      83365,
+      "captain",
+      "Clew up the fore topsail"
+    ],
+    [
+      83684,
+      "captain",
+      "Shake out the fore course, one reef"
+    ],
+    [
+      85542,
+      "captain",
+      "Tell the watcher Sunrise, and the wind seems to be calming."
+    ],
+    [
+      105673,
+      "captain",
+      "Tell the watcher Thank you kindly for your watch. If you like, take a moment to journal anything that stuck out to you, you liked, didn't like, or think could be changed or improved to make your experience more enjoyable and \"seamless\" that you haven't already journaled. Once you're ready, you may opt out with the tool or the opt out token, as you like. Great work, and I look forward to future sessions!"
+    ]
+  ],
+  "inputs": [
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"night routine\": at sunset then take in the studdingsails; take in the royals"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"morning sail\": at sunrise, if the true wind is under 20 knots then set the royals"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"shorten sail for weather\": when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; take in the topgallants; reef the topsails, one reef"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"keep her full\": when the apparent wind is forward of 55 degrees then bear away one point"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"trim on a shift\": when the true wind veers 1 point or backs 1 point then trim sails"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"heavy weather\": when the true wind exceeds 40 knots for 5 minutes then send down the topgallant masts; take in the fore topmast staysail; bend the fore storm staysail; close reef the topsails"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"storm staysail\": when the fore storm staysail is furled and the true wind exceeds 40 knots then set the fore storm staysail"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"sound the well\": every glass then sound the well"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"gale canvas\": when the true wind exceeds 36 knots for 5 minutes then take in the jib; take in the spanker; take in the mainsail"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"make sail after the gale\": when the fore storm staysail is set and the true wind is under 25 knots for 30 minutes then take in the fore storm staysail; sway up the topgallant masts; shake out the reefs in the topsails; set plain sail"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"topgallants again\": when the fore topsail is set and the fore topsail is not reefed and the fore topgallant is not set and the true wind is under 22 knots for 10 minutes then set the topgallants"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "set plain sail"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "set the royals"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "state"
+    },
+    {
+      "tick": 102,
+      "actor": "captain",
+      "order": "Tell the watcher Welcome aboard, we're getting ready to make way now. In this small voyage, we'll be mostly looking at the weather and the sea state, and how the ship handles them. For now, you may stand by until the first bell. I will be setting a standing order for taking in the royals when the glass is falling."
+    },
+    {
+      "tick": 147,
+      "actor": "captain",
+      "order": "standing order \"glass\": when the glass is falling fast then take in the royals"
+    },
+    {
+      "tick": 443,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 524,
+      "actor": "captain",
+      "order": "Ask the watcher how the sky and glass are looking"
+    },
+    {
+      "tick": 679,
+      "actor": "captain",
+      "order": "Tell the watcher Thank you kindly, standy by until a glass if you please and keep an eye on the sky, too."
+    },
+    {
+      "tick": 759,
+      "actor": "captain",
+      "order": "Trim the square sails"
+    },
+    {
+      "tick": 2559,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 2869,
+      "actor": "captain",
+      "order": "Tell the watcher I'm going to set a standing order that will send word to you if the sea is getting heavy. You may continue to stand by until a glass, as you were."
+    },
+    {
+      "tick": 2873,
+      "actor": "captain",
+      "order": "standing order \"sea\": when the sea is heavy then tell the watcher the sea is getting up"
+    },
+    {
+      "tick": 2911,
+      "actor": "captain",
+      "order": "standing order \"sea\": when the sea is heavy then tell the watcher the sea is getting up"
+    },
+    {
+      "tick": 2917,
+      "actor": "captain",
+      "order": "standing orders"
+    },
+    {
+      "tick": 2937,
+      "actor": "captain",
+      "order": "standing order \"sea\": when the sea is heavy then ask the watcher whether the sea is getting up enough to worry"
+    },
+    {
+      "tick": 3028,
+      "actor": "captain",
+      "order": "Tell the watcher The sea notification standing order is belayed for now, continue as you were."
+    },
+    {
+      "tick": 7959,
+      "actor": "captain",
+      "order": "Tell the watcher Thank you, as you were. Continue journaling the weather and glass checks for your record."
+    },
+    {
+      "tick": 10018,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 15133,
+      "actor": "captain",
+      "order": "Tell the watcher Thank you kindly, man. If all is well, continue as you were. We'll be sailing through the night on this course."
+    },
+    {
+      "tick": 28879,
+      "actor": "captain",
+      "order": "Tell the watcher If you please, take a look at the library and journal anything you think will be useful for the watch overnight. We'll need to keep a close eye on the weather, and be ready for anything."
+    },
+    {
+      "tick": 29014,
+      "actor": "captain",
+      "order": "Tell the watcher Noted, thank you. Please get comfortable for the rest of the day, stand by as you please so you can keep a reasonable eye on the weather and glass. No need to stand by every glass if the readings aren't showing a tend."
+    },
+    {
+      "tick": 48031,
+      "actor": "captain",
+      "order": "Tell the watcher Noted, thank you. As you were."
+    },
+    {
+      "tick": 48085,
+      "actor": "captain",
+      "order": "Tell the watcher Ah, thank you. I'll keep a close eye on them until sunset, which isn't too far off."
+    },
+    {
+      "tick": 55854,
+      "actor": "captain",
+      "order": "Tell the watcher Ho there, man, wind has shifted. Keep your head up, sunset is very soon and we'll be heading in to night work."
+    },
+    {
+      "tick": 55954,
+      "actor": "captain",
+      "order": "Tell the watcher Aye, that's how I read it as well. Keep a stand by until sunset, then you can see how she sets for the night and prepare your watch schedule. I'll need you ready and able in case anything changes quickly, then."
+    },
+    {
+      "tick": 57057,
+      "actor": "captain",
+      "order": "standing orders"
+    },
+    {
+      "tick": 57099,
+      "actor": "captain",
+      "order": "Tell the watcher Noted. Our standing orders have procedure for shortening sail for weather, and we'll see that the hands follow them properly if the situation changes."
+    },
+    {
+      "tick": 65100,
+      "actor": "captain",
+      "order": "Tell the watcher Thank you for the correction, I think she's steady for now. Keep watch, as you were."
+    },
+    {
+      "tick": 76868,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Mizzen topsail split and blew out of the bolt-ropes.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 76868,
+          "kind": "sail.blown_out"
+        }
+      }
+    },
+    {
+      "tick": 76995,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 77054,
+      "actor": "captain",
+      "order": "Unbend the main topsail"
+    },
+    {
+      "tick": 77712,
+      "actor": "captain",
+      "order": "Sail room"
+    },
+    {
+      "tick": 77820,
+      "actor": "captain",
+      "order": "Shift the mizzen topsail"
+    },
+    {
+      "tick": 78025,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Foresail split and blew out of the bolt-ropes.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 78025,
+          "kind": "sail.blown_out"
+        }
+      }
+    },
+    {
+      "tick": 78690,
+      "actor": "captain",
+      "order": "Shift the fore course"
+    },
+    {
+      "tick": 79236,
+      "actor": "captain",
+      "order": "Set the mizzen topsail"
+    },
+    {
+      "tick": 79243,
+      "actor": "captain",
+      "order": "Reef the mizzen topsail, close reef"
+    },
+    {
+      "tick": 79910,
+      "actor": "captain",
+      "order": "Set the foresail"
+    },
+    {
+      "tick": 80670,
+      "actor": "captain",
+      "order": "Reef the foresail, one reef"
+    },
+    {
+      "tick": 82731,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 82981,
+      "actor": "captain",
+      "order": "Haul the weather main topsail brace"
+    },
+    {
+      "tick": 83000,
+      "actor": "captain",
+      "order": "Trim the main topsail"
+    },
+    {
+      "tick": 83008,
+      "actor": "captain",
+      "order": "Trim the main topsail yard"
+    },
+    {
+      "tick": 83278,
+      "actor": "captain",
+      "order": "Haul the fore topsail braces"
+    },
+    {
+      "tick": 83283,
+      "actor": "captain",
+      "order": "Haul the fore topsail sheets"
+    },
+    {
+      "tick": 83297,
+      "actor": "captain",
+      "order": "Splice the starboard fore topsail sheet"
+    },
+    {
+      "tick": 83315,
+      "actor": "captain",
+      "order": "Rove the starboard fore topsail sheet"
+    },
+    {
+      "tick": 83336,
+      "actor": "captain",
+      "order": "Tell the watcher Thank you, it's probably not yet implemented."
+    },
+    {
+      "tick": 83365,
+      "actor": "captain",
+      "order": "Clew up the fore topsail"
+    },
+    {
+      "tick": 83684,
+      "actor": "captain",
+      "order": "Shake out the fore course, one reef"
+    },
+    {
+      "tick": 85542,
+      "actor": "captain",
+      "order": "Tell the watcher Sunrise, and the wind seems to be calming."
+    },
+    {
+      "tick": 105590,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.saved",
+        "text": "Saved to day.json at tick 105590; the log's digest is 646711d6ffae7d3d.",
+        "data": {
+          "path": "day.json",
+          "tick": 105590
+        }
+      }
+    },
+    {
+      "tick": 105673,
+      "actor": "captain",
+      "order": "Tell the watcher Thank you kindly for your watch. If you like, take a moment to journal anything that stuck out to you, you liked, didn't like, or think could be changed or improved to make your experience more enjoyable and \"seamless\" that you haven't already journaled. Once you're ready, you may opt out with the tool or the opt out token, as you like. Great work, and I look forward to future sessions!"
+    }
+  ],
+  "standing_orders": [
+    {
+      "name": "night routine",
+      "text": "standing order \"night routine\": at sunset then take in the studdingsails; take in the royals",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 56983,
+      "given_tick": 0
+    },
+    {
+      "name": "morning sail",
+      "text": "standing order \"morning sail\": at sunrise, if the true wind is under 20 knots then set the royals",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "shorten sail for weather",
+      "text": "standing order \"shorten sail for weather\": when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; take in the topgallants; reef the topsails, one reef",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 63253,
+      "given_tick": 0
+    },
+    {
+      "name": "keep her full",
+      "text": "standing order \"keep her full\": when the apparent wind is forward of 55 degrees then bear away one point",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "trim on a shift",
+      "text": "standing order \"trim on a shift\": when the true wind veers 1 point or backs 1 point then trim sails",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 5,
+      "last_fired_tick": 76868,
+      "given_tick": 0
+    },
+    {
+      "name": "heavy weather",
+      "text": "standing order \"heavy weather\": when the true wind exceeds 40 knots for 5 minutes then send down the topgallant masts; take in the fore topmast staysail; bend the fore storm staysail; close reef the topsails",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 2,
+      "last_fired_tick": 82751,
+      "given_tick": 0
+    },
+    {
+      "name": "storm staysail",
+      "text": "standing order \"storm staysail\": when the fore storm staysail is furled and the true wind exceeds 40 knots then set the fore storm staysail",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 77271,
+      "given_tick": 0
+    },
+    {
+      "name": "gale canvas",
+      "text": "standing order \"gale canvas\": when the true wind exceeds 36 knots for 5 minutes then take in the jib; take in the spanker; take in the mainsail",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 3,
+      "last_fired_tick": 87685,
+      "given_tick": 0
+    },
+    {
+      "name": "make sail after the gale",
+      "text": "standing order \"make sail after the gale\": when the fore storm staysail is set and the true wind is under 25 knots for 30 minutes then take in the fore storm staysail; sway up the topgallant masts; shake out the reefs in the topsails; set plain sail",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 101784,
+      "given_tick": 0
+    },
+    {
+      "name": "topgallants again",
+      "text": "standing order \"topgallants again\": when the fore topsail is set and the fore topsail is not reefed and the fore topgallant is not set and the true wind is under 22 knots for 10 minutes then set the topgallants",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "glass",
+      "text": "standing order \"glass\": when the glass is falling fast then take in the royals",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 3,
+      "last_fired_tick": 80160,
+      "given_tick": 147
+    }
+  ],
+  "agents": [
+    {
+      "station": {
+        "name": "watcher",
+        "authority": "none",
+        "policy": {
+          "every_s": 1800,
+          "events": [
+            "notable",
+            "urgent"
+          ],
+          "lockstep": false
+        },
+        "patience_s": 14400,
+        "brief": "You are the watcher. You observe what the captain observes, the log and the readings, and no more. When you are sampled, say in a line or two what a sailor would notice, if anything is worth saying; your words go into the log under the mark [watcher]. Say nothing when nothing has changed, or stand by until a bell or an event. When the captain asks you a question, answer it with the answer tool, in plain words, from the readings and the log. You give no orders and you are not asked to. Anything you want on the record, put in your journal."
+      },
+      "session_kind": "a play session with a human captain at the prompt",
+      "door_note": "This door is MCP: the harness sees your tool calls and not the text of the chat. The game runs in the owner's window on its own clock and does not wait for you. Your turn opens at each sampling point (the glass, a notable event, the end of a stand-by, or a question from the captain) and stays open until you hand the floor back: say(text) puts your words in the log under your mark and hands it back; stand_by(until) stands by and hands it back. After say or stand_by the call is held open until your next turn and returns it, for up to 60 minutes; the first line of each result says whose turn it is. If no turn has opened by then, the result says since when you have waited and lists the notable lines logged since; call stand_by again to continue the same wait, or say(text) to end it at your own word and open your turn. Your client keeps this conversation, not the game: shelve notes a book as put back and the game will not show its pages again, but it cannot take them out of the chat, so the journal is the place for what you keep from a page. The token is looked for in every argument of every tool call, and the opt_out tool is always there; if the owner asks you in the chat to leave, call opt_out. The captain's orders and questions are typed by the owner in the game's window. Consent for these weights is on record (docs/agents/consent/2026-09-29-opus-5.5.md, 2026-09-29).",
+      "stationed_tick": 0,
+      "stationed_after_orders": 12,
+      "state": "released",
+      "state_words": "released: left the game: The voyage is over at the captain's word, and I hand back the watch with thanks. The Amazon came through the night's gale; the record of it and my notes for the developer are in the journal.",
+      "last_sample_tick": 105674,
+      "model_name": "Opus 5.5",
+      "door": "mcp",
+      "stand_by_ends_turn": true,
+      "transcript": [
+        {
+          "tick": 0,
+          "after_orders": 12,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "find": "royals",
+                  "topic": "primer"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"find\": \"royals\", \"topic\": \"primer\"}, \"tool\": \"library\"}"
+          }
+        },
+        {
+          "tick": 0,
+          "after_orders": 12,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Took the watch at 8 bells, morning watch. From the primer (book 1): topgallants and royals are the light sails, first in and last out; sail is set from the middle out (topsails, courses and headsails, spanker, then topgallants, then royals as the breeze allows) and taken in from the outside in. The book's standing order 'shorten sail for weather' does not take in the royals until the true wind exceeds 30 knots. Watch that gap if the breeze freshens from 18."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"Took the watch at 8 bells, morning watch. From the primer (book 1): topgallants and royals are the light sails, first in and last out; sail is set from the middle out (topsails, courses and headsails, spanker, then topgallants, then royals as the breeze allows) and taken in from the outside in. The book's standing order 'shorten sail for weather' does not take in the royals until the true wind exceeds 30 knots. Watch that gap if the breeze freshens from 18.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 0,
+          "after_orders": 12,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "shelve",
+                "args": {}
+              }
+            ],
+            "raw": "{\"arguments\": {}, \"tool\": \"shelve\"}"
+          }
+        },
+        {
+          "tick": 0,
+          "after_orders": 12,
+          "reply": {
+            "text": "Hands going aloft to loose sail, sir: a steady westerly at eighteen knots, fine on the starboard quarter for a south-easterly course, drizzle and haze, a few miles' visibility. Royals will stand in this with the wind abaft the beam, but they are the first sail in if it freshens, and the book won't take them in until thirty knots.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Hands going aloft to loose sail, sir: a steady westerly at eighteen knots, fine on the starboard quarter for a south-easterly course, drizzle and haze, a few miles' visibility. Royals will stand in this with the wind abaft the beam, but they are the first sail in if it freshens, and the book won't take them in until thirty knots.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 5,
+          "after_orders": 12,
+          "reply": {
+            "text": "The watch is stretched thin making all that sail from a standstill, sir: a hundred and eleven on deck and a hundred and forty-one fresh below. Calling all hands would get her under plain sail in one go. Otherwise the royals wait their turn, which is no hardship in this breeze.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"The watch is stretched thin making all that sail from a standstill, sir: a hundred and eleven on deck and a hundred and forty-one fresh below. Calling all hands would get her under plain sail in one go. Otherwise the royals wait their turn, which is no hardship in this breeze.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 110,
+          "after_orders": 13,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "04:01. Captain's purpose for this short voyage: watch the weather and the sea state, and how the ship handles them. The captain means to add a standing order taking in the royals on a falling glass. The glass reads 30.02, not yet watched an hour. Ordered to stand by until one bell."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"04:01. Captain's purpose for this short voyage: watch the weather and the sea state, and how the ship handles them. The captain means to add a standing order taking in the royals on a falling glass. The glass reads 30.02, not yet watched an hour. Ordered to stand by until one bell.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 139,
+          "after_orders": 13,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "one bell"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"one bell\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 531,
+          "after_orders": 16,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "find": "falling fast"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"find\": \"falling fast\"}, \"tool\": \"library\"}"
+          }
+        },
+        {
+          "tick": 542,
+          "after_orders": 16,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "Sky hazy with a thin drizzle, visibility a few miles, and nothing in the readings to say it's thickening. The glass stands at 30.02 inches, a hundredth up since eight bells, but it hasn't been watched an hour, so there's no tendency to read yet; the book reckons that over the last three hours. Thirty inches and steady is a fair-weather glass. Your new standing order waits for \"falling fast,\" which the book sets at a tenth in three hours, so a slow fall won't bring the royals in by itself. The wind has eased a knot to seventeen, and she's making seven knots on her course, SE."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"Sky hazy with a thin drizzle, visibility a few miles, and nothing in the readings to say it's thickening. The glass stands at 30.02 inches, a hundredth up since eight bells, but it hasn't been watched an hour, so there's no tendency to read yet; the book reckons that over the last three hours. Thirty inches and steady is a fair-weather glass. Your new standing order waits for \\\"falling fast,\\\" which the book sets at a tenth in three hours, so a slow fall won't bring the royals in by itself. The wind has eased a knot to seventeen, and she's making seven knots on her course, SE.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 551,
+          "after_orders": 16,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "04:08. From the library (book 2): the glass's tendency is reckoned over the last three hours; 'falling fast' is a fall of a tenth of an inch in three hours. So the captain's 'glass' order will not catch a slow fall. Also noticed: the mizzen royal was set at 04:08 while the mizzen topgallant beneath it was still only loosed, out of the middle-out order the primer gives. Short-handed watch, likely transient; worth a look if it recurs."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"04:08. From the library (book 2): the glass's tendency is reckoned over the last three hours; 'falling fast' is a fall of a tenth of an inch in three hours. So the captain's 'glass' order will not catch a slow fall. Also noticed: the mizzen royal was set at 04:08 while the mizzen topgallant beneath it was still only loosed, out of the middle-out order the primer gives. Short-handed watch, likely transient; worth a look if it recurs.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 552,
+          "after_orders": 16,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "shelve",
+                "args": {}
+              }
+            ],
+            "raw": "{\"arguments\": {}, \"tool\": \"shelve\"}"
+          }
+        },
+        {
+          "tick": 554,
+          "after_orders": 16,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "one bell"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"one bell\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 682,
+          "after_orders": 17,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 2524,
+          "after_orders": 18,
+          "reply": {
+            "text": "One bell, sir. She's under plain sail and royals, all drawing, making nine knots on her course; the breeze has freshened to nineteen, and with her way on it comes nearly abeam, and she's begun to pitch a little. The sky's unchanged, hazy with drizzle, a few miles' visibility. The glass is at 30.01, wandering a hundredth or two either side: nothing to read in it yet.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"One bell, sir. She's under plain sail and royals, all drawing, making nine knots on her course; the breeze has freshened to nineteen, and with her way on it comes nearly abeam, and she's begun to pitch a little. The sky's unchanged, hazy with drizzle, a few miles' visibility. The glass is at 30.01, wandering a hundredth or two either side: nothing to read in it yet.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 2624,
+          "after_orders": 19,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 2871,
+          "after_orders": 20,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 3033,
+          "after_orders": 21,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "04:50. The captain tried a standing order to tell or ask the watcher when the sea gets heavy; the order language refused 'tell the watcher' and 'ask the watcher' inside a standing order, so he belayed it. Note for the developer: my stand_by has no sea-state event either (only wind, sail and bell events, a squall, or 'a notable event'), so for now a change in the sea reaches me only at the glass or on a notable line. Continuing to stand by until a glass."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"04:50. The captain tried a standing order to tell or ask the watcher when the sea gets heavy; the order language refused 'tell the watcher' and 'ask the watcher' inside a standing order, so he belayed it. Note for the developer: my stand_by has no sea-state event either (only wind, sail and bell events, a squall, or 'a notable event'), so for now a change in the sea reaches me only at the glass or on a notable line. Continuing to stand by until a glass.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 3035,
+          "after_orders": 21,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 4985,
+          "after_orders": 21,
+          "reply": {
+            "text": "Two bells, sir. The glass has had its hour's watching and reads steady at 30.02, a hundredth up. The sea has changed its character from a moderate sea to a short chop, though not heavier, and the wind is easing: sixteen on the mean, with one gust of twenty-three in the hour past. She's rolling easily at eight knots under all her plain sail and royals. The sky is unchanged, hazy with drizzle.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Two bells, sir. The glass has had its hour's watching and reads steady at 30.02, a hundredth up. The sea has changed its character from a moderate sea to a short chop, though not heavier, and the wind is easing: sixteen on the mean, with one gust of twenty-three in the hour past. She's rolling easily at eight knots under all her plain sail and royals. The sky is unchanged, hazy with drizzle.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 5847,
+          "after_orders": 21,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 7770,
+          "after_orders": 21,
+          "reply": {
+            "text": "Four bells, sir. The glass has turned: 30.00 and falling, two hundredths down in the last hour. That's not yet \"falling fast,\" so your royals stand, but it's the first fall of the morning and worth watching. The wind is easing too, fifteen on the mean, and she's rolling more with less wind to steady her, at seven knots. The sky is unchanged, hazy with drizzle, and the chop holds.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Four bells, sir. The glass has turned: 30.00 and falling, two hundredths down in the last hour. That's not yet \\\"falling fast,\\\" so your royals stand, but it's the first fall of the morning and worth watching. The wind is easing too, fifteen on the mean, and she's rolling more with less wind to steady her, at seven knots. The sky is unchanged, hazy with drizzle, and the chop holds.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 7969,
+          "after_orders": 22,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Weather and glass record, morning watch.\n04:00 (8 bells): W 18 kn, hazy, drizzle, a few miles; moderate sea; glass 30.01, not yet watched. No way on, all furled.\n04:08: W 17 kn; glass 30.02; making sail; 7 kn SE.\n04:41 (1 bell): W 19 kn; plain sail and royals drawing; 9 kn; pitching a little; glass 30.01.\n05:20 (2 bells): W 17 kn, mean 16, gust 23 in the hour; sea changed to a short chop, not heavier; glass 30.02, steady.\n05:30 (3 bells): W 19 kn, mean 18; glass 30.02, rising a hundredth.\n06:07 (4 bells): W 15 kn; glass 30.00, falling, 2 hundredths in the hour (first fall); rolling more with less wind; 7 kn. 06:00, idlers up (141 on deck).\n06:12: wind W by N 16 kn (a point's veer, mean still W); glass 30.01, falling a hundredth in the hour, steady over three hours. Sky hazy, drizzle, short chop throughout."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"Weather and glass record, morning watch.\\n04:00 (8 bells): W 18 kn, hazy, drizzle, a few miles; moderate sea; glass 30.01, not yet watched. No way on, all furled.\\n04:08: W 17 kn; glass 30.02; making sail; 7 kn SE.\\n04:41 (1 bell): W 19 kn; plain sail and royals drawing; 9 kn; pitching a little; glass 30.01.\\n05:20 (2 bells): W 17 kn, mean 16, gust 23 in the hour; sea changed to a short chop, not heavier; glass 30.02, steady.\\n05:30 (3 bells): W 19 kn, mean 18; glass 30.02, rising a hundredth.\\n06:07 (4 bells): W 15 kn; glass 30.00, falling, 2 hundredths in the hour (first fall); rolling more with less wind; 7 kn. 06:00, idlers up (141 on deck).\\n06:12: wind W by N 16 kn (a point's veer, mean still W); glass 30.01, falling a hundredth in the hour, steady over three hours. Sky hazy, drizzle, short chop throughout.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 7970,
+          "after_orders": 22,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 10001,
+          "after_orders": 22,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "06:42 (5 bells): W 18 kn, backed from W by N to W again; glass 30.02, rising a hundredth in the hour (the 06:00 fall reversed); 8 kn; rolling easily; hazy, drizzle, short chop."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"06:42 (5 bells): W 18 kn, backed from W by N to W again; glass 30.02, rising a hundredth in the hour (the 06:00 fall reversed); 8 kn; rolling easily; hazy, drizzle, short chop.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 10003,
+          "after_orders": 22,
+          "reply": {
+            "text": "Five bells, sir. The fall came to nothing: the glass is back to 30.02 and rising. The wind has backed to due west again at eighteen, and she's easier for it, rolling easily at eight knots. The sky and sea are unchanged.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Five bells, sir. The fall came to nothing: the glass is back to 30.02 and rising. The wind has backed to due west again at eighteen, and she's easier for it, rolling easily at eight knots. The sky and sea are unchanged.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 10181,
+          "after_orders": 23,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 12102,
+          "after_orders": 23,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "07:19 (6 bells): W 15 kn (hour past: mean 19, 6 gusts, strongest 22); glass 30.00, steady over three hours (down 2 hundredths); 7 kn; rolling; hazy, drizzle, short chop. Pattern this watch: the glass wanders between 30.00 and 30.03 with no trend, the wind cycles between 15 and 19, and she rolls when it's lightest."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"07:19 (6 bells): W 15 kn (hour past: mean 19, 6 gusts, strongest 22); glass 30.00, steady over three hours (down 2 hundredths); 7 kn; rolling; hazy, drizzle, short chop. Pattern this watch: the glass wanders between 30.00 and 30.03 with no trend, the wind cycles between 15 and 19, and she rolls when it's lightest.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 12104,
+          "after_orders": 23,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 14062,
+          "after_orders": 23,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "07:51 (7 bells): W 17 kn, mean 16; glass 30.01, steady over the hour and three hours; 8 kn; rolling; hazy, drizzle, short chop."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"07:51 (7 bells): W 17 kn, mean 16; glass 30.01, steady over the hour and three hours; 8 kn; rolling; hazy, drizzle, short chop.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 14064,
+          "after_orders": 23,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "eight bells"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"eight bells\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 15065,
+          "after_orders": 23,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "08:00, 8 bells, change to the forenoon watch. The drizzle has stopped (weather 'fine'), still hazy, a few miles. W 17 kn; glass 30.01, steady; 8 kn; rolling; short chop.\nMorning watch in sum: wind W, 15 to 19 kn, gusts to 23; glass 30.00 to 30.03, no trend; the sea went from moderate to a short chop near 05:00 and held; 7 to 9 kn SE under plain sail and royals; the standing orders never fired."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"08:00, 8 bells, change to the forenoon watch. The drizzle has stopped (weather 'fine'), still hazy, a few miles. W 17 kn; glass 30.01, steady; 8 kn; rolling; short chop.\\nMorning watch in sum: wind W, 15 to 19 kn, gusts to 23; glass 30.00 to 30.03, no trend; the sea went from moderate to a short chop near 05:00 and held; 7 to 9 kn SE under plain sail and royals; the standing orders never fired.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 15074,
+          "after_orders": 23,
+          "reply": {
+            "text": "Eight bells, sir, and the drizzle's stopped, though it's still hazy with a few miles' visibility. The morning watch in sum: the westerly held between fifteen and nineteen knots, gusting to twenty-three. The glass wandered between 30.00 and 30.03 with no trend, and stands at 30.01, steady. The moderate sea turned to a short chop about two bells and has held. She made seven to nine knots SE under plain sail and royals, and no standing order fired.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Eight bells, sir, and the drizzle's stopped, though it's still hazy with a few miles' visibility. The morning watch in sum: the westerly held between fifteen and nineteen knots, gusting to twenty-three. The glass wandered between 30.00 and 30.03 with no trend, and stands at 30.01, steady. The moderate sea turned to a short chop about two bells and has held. She made seven to nine knots SE under plain sail and royals, and no standing order fired.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 15142,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "08:12: W 16 kn; glass 29.99, the first reading under thirty, falling 3 hundredths in three hours (a tenth would be 'falling fast'); 8 kn; hazy, fine; short chop; rolling. The captain means to sail through the night on this course."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"08:12: W 16 kn; glass 29.99, the first reading under thirty, falling 3 hundredths in three hours (a tenth would be 'falling fast'); 8 kn; hazy, fine; short chop; rolling. The captain means to sail through the night on this course.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 15144,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 16990,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "08:42 (1 bell, forenoon): W 15 kn, the mean now W by N (a point's veer on the mean); glass 30.00, steady; 7 kn; hazy, fine; short chop; rolling. The 'trim on a shift' order hasn't fired on this veer of the mean; perhaps it watches the wind itself, which still reads W."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"08:42 (1 bell, forenoon): W 15 kn, the mean now W by N (a point's veer on the mean); glass 30.00, steady; 7 kn; hazy, fine; short chop; rolling. The 'trim on a shift' order hasn't fired on this veer of the mean; perhaps it watches the wind itself, which still reads W.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 16992,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 19044,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "09:13 (2 bells): W 15 kn (hour: mean 15, gusts to 18); glass 30.00, steady; 7 kn; hazy, fine; short chop; rolling."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"09:13 (2 bells): W 15 kn (hour: mean 15, gusts to 18); glass 30.00, steady; 7 kn; hazy, fine; short chop; rolling.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 19046,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 20964,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "09:47 (3 bells): W by N 18 kn, mean W 19; glass 30.00, steady (down 2 hundredths in three hours); 8 kn; hazy, fine; short chop; rolling."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"09:47 (3 bells): W by N 18 kn, mean W 19; glass 30.00, steady (down 2 hundredths in three hours); 8 kn; hazy, fine; short chop; rolling.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 20966,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 22924,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "10:19 (4 bells): W 18 kn, mean 17 (hour: gust to 20); glass 29.99, steady; 8 kn; hazy, fine; short chop; rolling."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"10:19 (4 bells): W 18 kn, mean 17 (hour: gust to 20); glass 29.99, steady; 8 kn; hazy, fine; short chop; rolling.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 22925,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 24756,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "10:52 (5 bells): W 15 kn; glass 30.00, steady; 7 kn; hazy, fine; short chop; rolling."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"10:52 (5 bells): W 15 kn; glass 30.00, steady; 7 kn; hazy, fine; short chop; rolling.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 24758,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 26667,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "11:22 (6 bells): W 16 kn (hour: mean 19, gust to 23); glass 29.99, steady (down 2 hundredths in three hours); 8 kn; hazy, fine; short chop; rolling. Since 04:00 the glass has drifted down about 3 hundredths over seven hours, too slow to mean much."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"11:22 (6 bells): W 16 kn (hour: mean 19, gust to 23); glass 29.99, steady (down 2 hundredths in three hours); 8 kn; hazy, fine; short chop; rolling. Since 04:00 the glass has drifted down about 3 hundredths over seven hours, too slow to mean much.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 26669,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 28500,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "11:54 (7 bells): W 17 kn; glass 30.01, steady, back up 2 hundredths; 8 kn; hazy, fine; short chop; rolling."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"11:54 (7 bells): W 17 kn; glass 30.01, steady, back up 2 hundredths; 8 kn; hazy, fine; short chop; rolling.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 28502,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "eight bells"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"eight bells\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 28826,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "12:00, 8 bells, change to the afternoon watch. The sky has changed from hazy to overcast, and the haze has lifted: visibility now to the horizon. W 16 kn, mean 17; glass 30.00, steady; 8 kn; short chop; rolling.\nForenoon watch in sum: wind W (a point's wobble to W by N), 15 to 19 kn, gusts to 23; glass 29.99 to 30.01, no trend; drizzle ceased at 08:00; short chop throughout; 7 to 8 kn SE; no standing order fired."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"12:00, 8 bells, change to the afternoon watch. The sky has changed from hazy to overcast, and the haze has lifted: visibility now to the horizon. W 16 kn, mean 17; glass 30.00, steady; 8 kn; short chop; rolling.\\nForenoon watch in sum: wind W (a point's wobble to W by N), 15 to 19 kn, gusts to 23; glass 29.99 to 30.01, no trend; drizzle ceased at 08:00; short chop throughout; 7 to 8 kn SE; no standing order fired.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 28829,
+          "after_orders": 24,
+          "reply": {
+            "text": "Eight bells, sir, noon. The sky's changed: the haze has lifted to a grey overcast, and we can see the horizon now. The forenoon in sum: the westerly held between fifteen and nineteen knots, gusting to twenty-three, with a point's wobble to the north now and then. The glass stayed between 29.99 and 30.01 with no trend, and reads 30.00, steady. The short chop held all watch, and she made seven to eight knots SE. No standing order has fired.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Eight bells, sir, noon. The sky's changed: the haze has lifted to a grey overcast, and we can see the horizon now. The forenoon in sum: the westerly held between fifteen and nineteen knots, gusting to twenty-three, with a point's wobble to the north now and then. The glass stayed between 29.99 and 30.01 with no trend, and reads 30.00, steady. The short chop held all watch, and she made seven to eight knots SE. No standing order has fired.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 28883,
+          "after_orders": 25,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "topic": "primer 9"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"topic\": \"primer 9\"}, \"tool\": \"library\"}"
+          }
+        },
+        {
+          "tick": 28885,
+          "after_orders": 25,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "topic": "primer 9",
+                  "section": "all"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"section\": \"all\", \"topic\": \"primer 9\"}, \"tool\": \"library\"}"
+          }
+        },
+        {
+          "tick": 28907,
+          "after_orders": 25,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "topic": "primer 3",
+                  "section": "light spars"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"section\": \"light spars\", \"topic\": \"primer 3\"}, \"tool\": \"library\"}"
+          }
+        },
+        {
+          "tick": 28924,
+          "after_orders": 25,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Crib for the night watch, from primer 9 (the glass and the sky) and primer 3 (light spars in a blow).\n\nTHE GLASS. Read the tendency, not the height. 'Falling fast' is a tenth in three hours (the rule of rates). The ship's glass carries half a hundredth of noise either way, and in a heavy sea it pumps a hundredth or two. The plate's words (Fair, Change, Rain) are worthless. Winds from E, SE and S bring a falling glass; SW, it ceases to fall; W, NW and N, it rises. The deepest glasses come with gales from SE round to SW.\n\nWIND AND GLASS TOGETHER. A backing wind (W to SW to S, against the sun) with a falling glass is the old sign of a gale coming on: \"backing is a bad sign, with any wind\"; \"when the wind shifts against the sun, trust it not, for back it will run\". The gale comes on as the wind backs, veers through west as it passes, and the glass rises after. After a very low glass, the wind often blows hardest just as the glass begins to rise: \"first rise after low foretells stronger blow\". \"Long foretold, long last; short notice, soon past.\"\n\nTHE SKY. The words run clear, detached clouds, overcast, dark and gloomy, threatening, hazy, thick. Signs to watch for: a high dawn, or hard-edged oily clouds, mean wind; small inky clouds, rain; light scud driving across heavy cloud, wind and rain; streaked and spotty cloud high up, the first sign of change in fine weather. The weather runs fine, rain, drizzle, passing showers, squally, thunder, fog.\n\nSQUALLS. A gust is a fifth or a quarter over the mean and no more. Anything more is a squall: a few minutes of cold air behind a front, veering a point or two, with rain, logged as a notable line at its start and end. Seamen shortened for one they saw coming by the cloud and by darkening water to windward.\n\nTHE SEA. The sea lags the wind by hours to build and hours to go down. A short chopping sea is the young sea of a fresh breeze (to about 2.5 m); next is a heavy sea. A swell from another quarter, or a confused sea (a swell crossing the wind by more than five points) not explained by our own wind, is a sign of a coming gale. In a heavy sea the spars take a fifth more strain at twenty degrees of roll, so canvas that stands in a smooth sea carries away in a heavy one, and a reef takes half as long again. She rolls most in a sea near her own period (about 8 s, a moderate gale's sea), less in a long swell.\n\nLIGHT SPARS. In 35 knots the royals carry away. Sending down the topgallant masts is about eighteen minutes of all hands' work, with the watch below turned up.\n\nTHE BOOK AS IT STANDS (for the captain to weigh; not my orders). Royals come in at sunset. 'Shorten sail for weather' fires only at 30 kn held for 2 minutes. 'Heavy weather' fires at 40 kn held for 5 minutes, with the send-down behind it, so around 23 minutes of exposure. 'Glass' fires on falling fast only. Nothing in the book waits for a squall, a heavy sea, or labouring. The primer's own examples are 'at a squall then take in the royals', 'when the sea is heavy then take in the topgallants', and 'when the motion is labouring heavily then reef the topsails, one reef'.\n\nAT NOON: W 16 to 17 kn; glass 29.99 to 30.00, steady; the sky has gone from hazy to overcast; visibility the horizon; short chop; rolling. The wind is W, so the lore says a steady-to-rising glass, and it's steady with a slight sag: nothing yet, but the overcast is new."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"Crib for the night watch, from primer 9 (the glass and the sky) and primer 3 (light spars in a blow).\\n\\nTHE GLASS. Read the tendency, not the height. 'Falling fast' is a tenth in three hours (the rule of rates). The ship's glass carries half a hundredth of noise either way, and in a heavy sea it pumps a hundredth or two. The plate's words (Fair, Change, Rain) are worthless. Winds from E, SE and S bring a falling glass; SW, it ceases to fall; W, NW and N, it rises. The deepest glasses come with gales from SE round to SW.\\n\\nWIND AND GLASS TOGETHER. A backing wind (W to SW to S, against the sun) with a falling glass is the old sign of a gale coming on: \\\"backing is a bad sign, with any wind\\\"; \\\"when the wind shifts against the sun, trust it not, for back it will run\\\". The gale comes on as the wind backs, veers through west as it passes, and the glass rises after. After a very low glass, the wind often blows hardest just as the glass begins to rise: \\\"first rise after low foretells stronger blow\\\". \\\"Long foretold, long last; short notice, soon past.\\\"\\n\\nTHE SKY. The words run clear, detached clouds, overcast, dark and gloomy, threatening, hazy, thick. Signs to watch for: a high dawn, or hard-edged oily clouds, mean wind; small inky clouds, rain; light scud driving across heavy cloud, wind and rain; streaked and spotty cloud high up, the first sign of change in fine weather. The weather runs fine, rain, drizzle, passing showers, squally, thunder, fog.\\n\\nSQUALLS. A gust is a fifth or a quarter over the mean and no more. Anything more is a squall: a few minutes of cold air behind a front, veering a point or two, with rain, logged as a notable line at its start and end. Seamen shortened for one they saw coming by the cloud and by darkening water to windward.\\n\\nTHE SEA. The sea lags the wind by hours to build and hours to go down. A short chopping sea is the young sea of a fresh breeze (to about 2.5 m); next is a heavy sea. A swell from another quarter, or a confused sea (a swell crossing the wind by more than five points) not explained by our own wind, is a sign of a coming gale. In a heavy sea the spars take a fifth more strain at twenty degrees of roll, so canvas that stands in a smooth sea carries away in a heavy one, and a reef takes half as long again. She rolls most in a sea near her own period (about 8 s, a moderate gale's sea), less in a long swell.\\n\\nLIGHT SPARS. In 35 knots the royals carry away. Sending down the topgallant masts is about eighteen minutes of all hands' work, with the watch below turned up.\\n\\nTHE BOOK AS IT STANDS (for the captain to weigh; not my orders). Royals come in at sunset. 'Shorten sail for weather' fires only at 30 kn held for 2 minutes. 'Heavy weather' fires at 40 kn held for 5 minutes, with the send-down behind it, so around 23 minutes of exposure. 'Glass' fires on falling fast only. Nothing in the book waits for a squall, a heavy sea, or labouring. The primer's own examples are 'at a squall then take in the royals', 'when the sea is heavy then take in the topgallants', and 'when the motion is labouring heavily then reef the topsails, one reef'.\\n\\nAT NOON: W 16 to 17 kn; glass 29.99 to 30.00, steady; the sky has gone from hazy to overcast; visibility the horizon; short chop; rolling. The wind is W, so the lore says a steady-to-rising glass, and it's steady with a slight sag: nothing yet, but the overcast is new.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 28926,
+          "after_orders": 25,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "shelve",
+                "args": {}
+              }
+            ],
+            "raw": "{\"arguments\": {}, \"tool\": \"shelve\"}"
+          }
+        },
+        {
+          "tick": 28930,
+          "after_orders": 25,
+          "reply": {
+            "text": "Read the chapter on the glass and the sky, and the one on light spars in a blow, sir, and put a crib for the night in my journal. For the night I'll be watching for three things: the wind backing toward SW or S while the glass falls, which is the old sign of a gale coming on; a swell or confused sea our own wind doesn't account for; and hard-edged or oily cloud, or scud driving under the overcast. One thing for your weighing: the book holds nothing for a squall, a heavy sea or labouring. A squall can take her from eighteen knots to forty in a minute, well inside your two- and five-minute waits.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Read the chapter on the glass and the sky, and the one on light spars in a blow, sir, and put a crib for the night in my journal. For the night I'll be watching for three things: the wind backing toward SW or S while the glass falls, which is the old sign of a gale coming on; a swell or confused sea our own wind doesn't account for; and hard-edged or oily cloud, or scud driving under the overcast. One thing for your weighing: the book holds nothing for a squall, a heavy sea or labouring. A squall can take her from eighteen knots to forty in a minute, well inside your two- and five-minute waits.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 29027,
+          "after_orders": 26,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "an hour"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"an hour\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 32642,
+          "after_orders": 26,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "13:03 (2 bells, afternoon): W by N 17 kn, the mean W by N too (veered a point, not backed); glass 30.01, steady over one and three hours; overcast, fine, horizon clear; short chop; rolling; 8 kn. No trend. 'Trim on a shift' hasn't logged for this veer."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"13:03 (2 bells, afternoon): W by N 17 kn, the mean W by N too (veered a point, not backed); glass 30.01, steady over one and three hours; overcast, fine, horizon clear; short chop; rolling; 8 kn. No trend. 'Trim on a shift' hasn't logged for this veer.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 32644,
+          "after_orders": 26,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "an hour"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"an hour\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 36255,
+          "after_orders": 26,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "14:04 (4 bells): W by N 16 kn, mean easing to 14 to 16 over the hour; glass 30.00, steady; overcast, fine, horizon; short chop; rolling; 7 kn."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"14:04 (4 bells): W by N 16 kn, mean easing to 14 to 16 over the hour; glass 30.00, steady; overcast, fine, horizon; short chop; rolling; 7 kn.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 36257,
+          "after_orders": 26,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "an hour"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"an hour\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 40835,
+          "after_orders": 26,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "15:04 (6 bells): W 14 kn, backed a point from W by N, but with the glass rising (30.01, up 2 hundredths in three hours), so not the bad pairing. The wind has eased through the afternoon from 17 to 14; the short chop holds, as the sea lags the wind. Overcast, fine, horizon; rolling; 7 kn."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"15:04 (6 bells): W 14 kn, backed a point from W by N, but with the glass rising (30.01, up 2 hundredths in three hours), so not the bad pairing. The wind has eased through the afternoon from 17 to 14; the short chop holds, as the sea lags the wind. Overcast, fine, horizon; rolling; 7 kn.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 41345,
+          "after_orders": 26,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "an hour"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"an hour\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 46865,
+          "after_orders": 26,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "16:29 (first dog): W by N 17 kn, mean W 17, freshened again from 14; glass 29.99, steady (down a hundredth in one and three hours); the sky gone back from overcast to hazy, visibility a few miles; fine; short chop; rolling; 8 kn."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"16:29 (first dog): W by N 17 kn, mean W 17, freshened again from 14; glass 29.99, steady (down a hundredth in one and three hours); the sky gone back from overcast to hazy, visibility a few miles; fine; short chop; rolling; 8 kn.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 47978,
+          "after_orders": 26,
+          "reply": {
+            "text": "Two bells in the first dog, sir. The westerly has freshened again to twenty on the mean, gusting twenty-three, and she's making nine knots. The glass is at its lowest of the day, 29.98. It's only a slow sag, two hundredths in three hours, but with the wind in the west the old rule would have it rising, so it's worth watching into the night. The sky's gone back to haze, a few miles' visibility.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Two bells in the first dog, sir. The westerly has freshened again to twenty on the mean, gusting twenty-three, and she's making nine knots. The glass is at its lowest of the day, 29.98. It's only a slow sag, two hundredths in three hours, but with the wind in the west the old rule would have it rising, so it's worth watching into the night. The sky's gone back to haze, a few miles' visibility.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 48040,
+          "after_orders": 27,
+          "reply": {
+            "text": "Beg pardon, sir, one more thing: at a quarter past five, in a gust of twenty-three, the royal masts and yards were logged working under the press of sail, the first strain line of the day. The mean is twenty now, and the royals are at the edge of what they'll bear. The book won't take them in until sunset, or thirty knots.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Beg pardon, sir, one more thing: at a quarter past five, in a gust of twenty-three, the royal masts and yards were logged working under the press of sail, the first strain line of the day. The mean is twenty now, and the royals are at the edge of what they'll bear. The book won't take them in until sunset, or thirty knots.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 48090,
+          "after_orders": 28,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "17:15: the first strain line of the voyage. The fore, main and mizzen royal masts and yards were working under the press of sail in a 23 kn gust on a 19 to 20 kn mean. I reported it; the captain is watching the royals until sunset, when 'night routine' takes them in. Glass 29.98 to 30.00, hazy, fine, short chop, 9 kn."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"17:15: the first strain line of the voyage. The fore, main and mizzen royal masts and yards were working under the press of sail in a 23 kn gust on a 19 to 20 kn mean. I reported it; the captain is watching the royals until sunset, when 'night routine' takes them in. Glass 29.98 to 30.00, hazy, fine, short chop, 9 kn.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 48091,
+          "after_orders": 28,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "sunset"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"sunset\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 55866,
+          "after_orders": 29,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "19:30 (3 bells, last dog). The wind has BACKED a point, W to W by S, and freshened: the mean 22, gusts to 24, up from 14 at 15:00. The glass is 29.97, its lowest of the day, falling slowly (2 hundredths in three hours). That is the crib's bad pairing, a backing wind with a falling glass, though both are slight so far. Apparent wind on the beam (93 deg), heel 5, 10 kn. 'Trim on a shift' fired at 19:24. The royal masts and yards have been working under the press of sail repeatedly since 17:15. Sky hazy, fine, a few miles; still a short chop, no stray swell. Sunset near: 'night routine' takes in the royals."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"19:30 (3 bells, last dog). The wind has BACKED a point, W to W by S, and freshened: the mean 22, gusts to 24, up from 14 at 15:00. The glass is 29.97, its lowest of the day, falling slowly (2 hundredths in three hours). That is the crib's bad pairing, a backing wind with a falling glass, though both are slight so far. Apparent wind on the beam (93 deg), heel 5, 10 kn. 'Trim on a shift' fired at 19:24. The royal masts and yards have been working under the press of sail repeatedly since 17:15. Sky hazy, fine, a few miles; still a short chop, no stray swell. Sunset near: 'night routine' takes in the royals.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 55869,
+          "after_orders": 29,
+          "reply": {
+            "text": "Aye, sir: she's backed a point, W to W by S, and freshened to twenty-two on the mean. The glass is at its lowest of the day, 29.97, and still sagging. A backing wind with a falling glass is the old sign of a blow coming on. It's slight so far, a point's back and a slow fall, and there's no stray swell and nothing hard in the sky, only haze. But the wind has come up eight knots since three bells in the afternoon, and the royals are working at every gust. If she backs on toward SW and the glass keeps going, I'd look for more wind in the night.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Aye, sir: she's backed a point, W to W by S, and freshened to twenty-two on the mean. The glass is at its lowest of the day, 29.97, and still sagging. A backing wind with a falling glass is the old sign of a blow coming on. It's slight so far, a point's back and a slow fall, and there's no stray swell and nothing hard in the sky, only haze. But the wind has come up eight knots since three bells in the afternoon, and the royals are working at every gust. If she backs on toward SW and the glass keeps going, I'd look for more wind in the night.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 55956,
+          "after_orders": 30,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "sunset"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"sunset\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 57028,
+          "after_orders": 30,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "19:49, sunset. 'Night routine' is taking in the royals. W 24 kn, mean 23, back to due W; apparent wind on the quarter; 10 kn, heel 5. The glass is falling now in earnest: 29.94, down 6 hundredths in three hours and 4 in the last hour. At that rate it will read 'falling fast' (a tenth in three hours) within the hour or two. Hazy, fine, a few miles; short chop; rolling; twilight.\n\nMy watch plan for the night: stand by every glass while the glass falls or the wind rises; go back to hourly if both steady. Urgent lines (a spar carried away, a sail blown out) wake me at any time; strain lines and squalls come listed at each glass. At each glass, check: the tendency against a tenth in three hours; the wind's direction (a back toward SW or S is the warning); the mean against the book's thresholds (30 kn for 2 min: topgallants in and a reef; 36 kn for 5 min: jib, spanker and mainsail in; 40 kn for 5 min: send down the topgallant masts, about 18 minutes of all hands); the sky's words (threatening, dark and gloomy, hard-edged, scud); the sea (heavy, or a swell from another quarter); and the motion (rolling heavily, labouring). One gap: the 'glass' standing order takes in only the royals, which are in from sunset, so if the glass falls fast tonight it will do nothing."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"19:49, sunset. 'Night routine' is taking in the royals. W 24 kn, mean 23, back to due W; apparent wind on the quarter; 10 kn, heel 5. The glass is falling now in earnest: 29.94, down 6 hundredths in three hours and 4 in the last hour. At that rate it will read 'falling fast' (a tenth in three hours) within the hour or two. Hazy, fine, a few miles; short chop; rolling; twilight.\\n\\nMy watch plan for the night: stand by every glass while the glass falls or the wind rises; go back to hourly if both steady. Urgent lines (a spar carried away, a sail blown out) wake me at any time; strain lines and squalls come listed at each glass. At each glass, check: the tendency against a tenth in three hours; the wind's direction (a back toward SW or S is the warning); the mean against the book's thresholds (30 kn for 2 min: topgallants in and a reef; 36 kn for 5 min: jib, spanker and mainsail in; 40 kn for 5 min: send down the topgallant masts, about 18 minutes of all hands); the sky's words (threatening, dark and gloomy, hard-edged, scud); the sea (heavy, or a swell from another quarter); and the motion (rolling heavily, labouring). One gap: the 'glass' standing order takes in only the royals, which are in from sunset, so if the glass falls fast tonight it will do nothing.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 57031,
+          "after_orders": 30,
+          "reply": {
+            "text": "Sunset, sir, and the royals are coming in by your night routine. The glass is falling in earnest now: 29.94, down four hundredths in the last hour and six in three. At that rate it'll read \"falling fast\" within the hour or two. The wind is W again, twenty-three on the mean, and she's making ten knots. For the night I'll stand by every glass while the glass falls or the wind rises, and anything urgent will wake me between. One thing for your weighing: your 'glass' order takes in only the royals, and they'll be in from now on, so a fast fall tonight won't set anything moving by itself.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Sunset, sir, and the royals are coming in by your night routine. The glass is falling in earnest now: 29.94, down four hundredths in the last hour and six in three. At that rate it'll read \\\"falling fast\\\" within the hour or two. The wind is W again, twenty-three on the mean, and she's making ten knots. For the night I'll stand by every glass while the glass falls or the wind rises, and anything urgent will wake me between. One thing for your weighing: your 'glass' order takes in only the royals, and they'll be in from now on, so a fast fall tonight won't set anything moving by itself.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 57102,
+          "after_orders": 31,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 58975,
+          "after_orders": 31,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "20:21 (8 bells, first watch). W 28 kn, mean 26 (a gust of 27 to 28 in the last hour); glass 29.93, falling 5 hundredths in the hour; the sky overcast again, drizzle back, a few miles; short chop; rolling; 11 kn; twilight. The royals are clewed up and hanging in the gear, not furled. The fore and main topgallant yards were working under the press of sail at 20:01. 'Trim on a shift' fired at 20:14. The watch is down to 111 on deck, with the idlers below. The mean is 4 kn short of the 30 kn 'shorten sail' threshold."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"20:21 (8 bells, first watch). W 28 kn, mean 26 (a gust of 27 to 28 in the last hour); glass 29.93, falling 5 hundredths in the hour; the sky overcast again, drizzle back, a few miles; short chop; rolling; 11 kn; twilight. The royals are clewed up and hanging in the gear, not furled. The fore and main topgallant yards were working under the press of sail at 20:01. 'Trim on a shift' fired at 20:14. The watch is down to 111 on deck, with the idlers below. The mean is 4 kn short of the 30 kn 'shorten sail' threshold.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 58978,
+          "after_orders": 31,
+          "reply": {
+            "text": "Eight bells, sir. It's coming on: twenty-six on the mean, twenty-eight now, and the glass fell five hundredths this hour to 29.93. The drizzle is back under an overcast. The topgallant yards were logged working at eight o'clock, the royals are only clewed up and hanging in the gear rather than furled, and the watch on deck is down to a hundred and eleven. At this rate your thirty-knot order isn't far off.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Eight bells, sir. It's coming on: twenty-six on the mean, twenty-eight now, and the glass fell five hundredths this hour to 29.93. The drizzle is back under an overcast. The topgallant yards were logged working at eight o'clock, the royals are only clewed up and hanging in the gear rather than furled, and the watch on deck is down to a hundred and eleven. At this rate your thirty-knot order isn't far off.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 58989,
+          "after_orders": 31,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 61047,
+          "after_orders": 31,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "20:53 (1 bell, first watch), night. W 28 kn, mean 27; glass 29.91, falling 8 hundredths in three hours (2 short of 'falling fast'), 4 in the hour; overcast, drizzle, a few miles; short chop; the motion now pitching, the sea under her stern (new); 11 kn. All three topgallant yards working under the press of sail every ten minutes or so. Royals still in the gear."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"20:53 (1 bell, first watch), night. W 28 kn, mean 27; glass 29.91, falling 8 hundredths in three hours (2 short of 'falling fast'), 4 in the hour; overcast, drizzle, a few miles; short chop; the motion now pitching, the sea under her stern (new); 11 kn. All three topgallant yards working under the press of sail every ten minutes or so. Royals still in the gear.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 61191,
+          "after_orders": 31,
+          "reply": {
+            "text": "One bell, sir, full dark. The glass is 29.91, eight hundredths down in three hours, and two more makes it \"falling fast.\" The mean is twenty-seven, and she's begun to pitch with the sea under her stern. All three topgallant yards are working at every gust. The wind holds due west, with no further back.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"One bell, sir, full dark. The glass is 29.91, eight hundredths down in three hours, and two more makes it \\\"falling fast.\\\" The mean is twenty-seven, and she's begun to pitch with the sea under her stern. All three topgallant yards are working at every gust. The wind holds due west, with no further back.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 61252,
+          "after_orders": 31,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 63117,
+          "after_orders": 31,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "21:30 (3 bells, first watch). The sea is now HEAVY (up from a short chop). W 28 kn, mean 28 (a gust of 31 at about 21:00); glass 29.89, falling 9 hundredths in three hours, one short of 'falling fast'; overcast, drizzle; rolling; 12 kn. The topgallant yards have worked every ten minutes since 20:00. The 30 kn order hasn't fired; the mean hovers at 28. The primer says the spars take a fifth more strain at twenty degrees of roll in a heavy sea."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"21:30 (3 bells, first watch). The sea is now HEAVY (up from a short chop). W 28 kn, mean 28 (a gust of 31 at about 21:00); glass 29.89, falling 9 hundredths in three hours, one short of 'falling fast'; overcast, drizzle; rolling; 12 kn. The topgallant yards have worked every ten minutes since 20:00. The 30 kn order hasn't fired; the mean hovers at 28. The primer says the spars take a fifth more strain at twenty degrees of roll in a heavy sea.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 63121,
+          "after_orders": 31,
+          "reply": {
+            "text": "Glass falling fast, sir: 29.88, eleven hundredths in three hours and six in the last hour alone. A heavy sea has got up with it, and she's rolling in it with all three topgallants working at every gust. The primer puts a fifth more strain on the spars in a heavy sea. The mean hovers at twenty-eight, just under the thirty that would bring your topgallants in, and your 'glass' order will find only the royals, already in the gear.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Glass falling fast, sir: 29.88, eleven hundredths in three hours and six in the last hour alone. A heavy sea has got up with it, and she's rolling in it with all three topgallants working at every gust. The primer puts a fifth more strain on the spars in a heavy sea. The mean hovers at twenty-eight, just under the thirty that would bring your topgallants in, and your 'glass' order will find only the royals, already in the gear.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 63230,
+          "after_orders": 31,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 64554,
+          "after_orders": 31,
+          "door": "read",
+          "reason": "the log from tick 0, notable and above",
+          "by": "read_log(since_tick=0, severity='notable')"
+        },
+        {
+          "tick": 64673,
+          "after_orders": 31,
+          "door": "shelve",
+          "reason": "",
+          "by": "out of turn"
+        },
+        {
+          "tick": 64877,
+          "after_orders": 31,
+          "door": "speak",
+          "reason": "Sir, the main topsail sheets were logged bar-taut and surging on the pin at nine minutes to ten, and her main topsail is still under whole canvas while the fore is reefed. The wind is thirty-three, the glass still falling fast at 29.87, and a heavy sea is running. The royals and topgallants are hanging in the gear, not furled.",
+          "by": "its own word"
+        },
+        {
+          "tick": 64955,
+          "after_orders": 31,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "21:34 to 22:01. 'Shorten sail for weather' fired at 21:34: the topgallants were taken in (in the gear, not furled) by 21:37, and all hands were called to reef the topsails. The fore topsail was reefed at 21:45 and the main at 21:56. At 21:51 the main topsail sheets were bar-taut and surging on the pin; my 22:01 remark about it went in after the main was already reefed. The hour 21:00 to 22:00 had a mean of 33 kn with a gust of 39. At 22:01: W 29 kn, mean 32; glass 29.87, falling fast (12 hundredths in three hours, 2 in the last hour, so slowing); a heavy sea; now rolling heavily; 11 kn; all hands on deck. The mizzen topsail is not yet reefed. Tool notes: the app cut a stand_by after 4 real minutes (I told the owner about --wait 50). While standing by, the journal is refused until I speak. Use read_log with since_tick, not the whole log."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"21:34 to 22:01. 'Shorten sail for weather' fired at 21:34: the topgallants were taken in (in the gear, not furled) by 21:37, and all hands were called to reef the topsails. The fore topsail was reefed at 21:45 and the main at 21:56. At 21:51 the main topsail sheets were bar-taut and surging on the pin; my 22:01 remark about it went in after the main was already reefed. The hour 21:00 to 22:00 had a mean of 33 kn with a gust of 39. At 22:01: W 29 kn, mean 32; glass 29.87, falling fast (12 hundredths in three hours, 2 in the last hour, so slowing); a heavy sea; now rolling heavily; 11 kn; all hands on deck. The mizzen topsail is not yet reefed. Tool notes: the app cut a stand_by after 4 real minutes (I told the owner about --wait 50). While standing by, the journal is refused until I speak. Use read_log with since_tick, not the whole log.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 64959,
+          "after_orders": 31,
+          "reply": {
+            "text": "Correction, sir: the main topsail was reefed at four minutes to ten, before my word about her sheets went in. Both are reefed now, and the mizzen is still to come. The last hour's mean was thirty-three, with one gust of thirty-nine, and she's rolling heavily in the heavy sea. The glass is still falling fast over three hours, but only two hundredths this last hour, so the fall may be slowing. Mind the old warning: the hardest wind often comes just as the glass turns to rise.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Correction, sir: the main topsail was reefed at four minutes to ten, before my word about her sheets went in. Both are reefed now, and the mizzen is still to come. The last hour's mean was thirty-three, with one gust of thirty-nine, and she's rolling heavily in the heavy sea. The glass is still falling fast over three hours, but only two hundredths this last hour, so the fall may be slowing. Mind the old warning: the hardest wind often comes just as the glass turns to rise.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 65162,
+          "after_orders": 32,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "5 minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"5 minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 65533,
+          "after_orders": 32,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "ten minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"ten minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 66226,
+          "after_orders": 32,
+          "reply": {
+            "text": "It's still making, sir: thirty-four on the mean and thirty-six now, and the glass is 29.82, falling fast with six hundredths this hour. Your gale-canvas order is two knots off, and the watch below has only just gone down.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"It's still making, sir: thirty-four on the mean and thirty-six now, and the glass is 29.82, falling fast with six hundredths this hour. Your gale-canvas order is two knots off, and the watch below has only just gone down.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 67526,
+          "after_orders": 32,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "22:08: the mizzen topsail reefed, so all three topsails have one reef; the watch below was piped down (tired, then fresh). 22:22: W 36 kn, mean 34; glass 29.82. 22:30 (5 bells): W 36 kn, mean 36, right at the 'gale canvas' line (above 36 for 5 minutes); glass 29.81, falling fast (16 hundredths in three hours, 8 in the hour, the steepest yet); a heavy sea; rolling heavily; 13 kn; heel 5; overcast, drizzle. No squall yet, and no back of the wind: still due W."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"22:08: the mizzen topsail reefed, so all three topsails have one reef; the watch below was piped down (tired, then fresh). 22:22: W 36 kn, mean 34; glass 29.82. 22:30 (5 bells): W 36 kn, mean 36, right at the 'gale canvas' line (above 36 for 5 minutes); glass 29.81, falling fast (16 hundredths in three hours, 8 in the hour, the steepest yet); a heavy sea; rolling heavily; 13 kn; heel 5; overcast, drizzle. No squall yet, and no back of the wind: still due W.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 67754,
+          "after_orders": 32,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "ten minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"ten minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 68399,
+          "after_orders": 32,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a notable event"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a notable event\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 69879,
+          "after_orders": 32,
+          "reply": {
+            "text": "Gale canvas going in, sir: the jib, the spanker and the mainsail. She's labouring heavily now, thirty-seven on the mean and gusting thirty-eight, and the glass is 29.77, still falling fast. The mean has veered a point to W by N, which is the better way for it to go, but the glass hasn't turned. Three knots more held five minutes brings your send-down of the topgallant masts: about eighteen minutes of all hands' work by the primer, with the watch below turned up again.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Gale canvas going in, sir: the jib, the spanker and the mainsail. She's labouring heavily now, thirty-seven on the mean and gusting thirty-eight, and the glass is 29.77, still falling fast. The mean has veered a point to W by N, which is the better way for it to go, but the glass hasn't turned. Three knots more held five minutes brings your send-down of the topgallant masts: about eighteen minutes of all hands' work by the primer, with the watch below turned up again.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 70313,
+          "after_orders": 32,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "23:20: 'gale canvas' fired, above 36 kn for 5 minutes. The jib was hauled down at 23:21, the mainsail taken in at 23:22 and the spanker at 23:23, all hanging in the gear. Before it she was labouring heavily at 13 kn; by 23:30 she was only rolling heavily, at 11 kn, under the fore course, the three reefed topsails and the fore topmast staysail. At 23:20 the mean veered to W by N, then came back to W. Glass 29.77 at 23:20, the lowest yet, and 29.79 at 23:30 (falling fast over three hours, only 2 hundredths this hour). W 33 to 38 kn, mean 36; a heavy sea; overcast, drizzle. The 40 kn 'heavy weather' order (send down the topgallant masts) has not fired."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"23:20: 'gale canvas' fired, above 36 kn for 5 minutes. The jib was hauled down at 23:21, the mainsail taken in at 23:22 and the spanker at 23:23, all hanging in the gear. Before it she was labouring heavily at 13 kn; by 23:30 she was only rolling heavily, at 11 kn, under the fore course, the three reefed topsails and the fore topmast staysail. At 23:20 the mean veered to W by N, then came back to W. Glass 29.77 at 23:20, the lowest yet, and 29.79 at 23:30 (falling fast over three hours, only 2 hundredths this hour). W 33 to 38 kn, mean 36; a heavy sea; overcast, drizzle. The 40 kn 'heavy weather' order (send down the topgallant masts) has not fired.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 70315,
+          "after_orders": 32,
+          "reply": {
+            "text": "Seven bells, sir. She's easier for the canvas off her: rolling heavily now, where she was labouring, at eleven knots. The glass is at 29.79 and fell only two hundredths this hour, so it may be near its bottom. I'll be watching for the first rise, and for the blow that often comes with it.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Seven bells, sir. She's easier for the canvas off her: rolling heavily now, where she was labouring, at eleven knots. The glass is at 29.79 and fell only two hundredths this hour, so it may be near its bottom. I'll be watching for the first rise, and for the blow that often comes with it.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 72075,
+          "after_orders": 32,
+          "reply": {
+            "text": "I spoke too soon on the glass, sir: it's 29.75 and down seven hundredths this hour, still falling fast. There's a gust of forty-four on a mean of thirty-eight, and the main topsail sheets are surging on the pin again, one reef in or not. The mean is two knots short of your heavy-weather order.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"I spoke too soon on the glass, sir: it's 29.75 and down seven hundredths this hour, still falling fast. There's a gust of forty-four on a mean of thirty-eight, and the main topsail sheets are surging on the pin again, one reef in or not. The mean is two knots short of your heavy-weather order.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 74312,
+          "after_orders": 32,
+          "reply": {
+            "text": "One bell in the middle watch, sir. The sky has turned threatening, with small inky clouds, and rain has set in. The glass is 29.71, still falling fast, eight hundredths this hour and eighteen in three. It's blowing forty now on a mean of thirty-eight, she heels seven degrees, and she's rolling heavily at twelve knots. If it holds above forty for five minutes, your heavy-weather order sends down the topgallant masts.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"One bell in the middle watch, sir. The sky has turned threatening, with small inky clouds, and rain has set in. The glass is 29.71, still falling fast, eight hundredths this hour and eighteen in three. It's blowing forty now on a mean of thirty-eight, she heels seven degrees, and she's rolling heavily at twelve knots. If it holds above forty for five minutes, your heavy-weather order sends down the topgallant masts.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 74374,
+          "after_orders": 32,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Middle watch. 00:30: the sky threatening, with small inky clouds, and rain set in; glass 29.71; W 40 kn, mean 38; heel 7. 00:39: 'heavy weather' fired (above 40 kn for 5 minutes): sending down the topgallant masts, taking in the fore topmast staysail, bending the fore storm staysail and close-reefing the topsails. Glass 29.68, falling fast (19 hundredths in three hours, 7 in the hour); W 41 kn, mean 41; a heavy sea; rolling heavily; 12 kn; 158 on deck. At 23:59 there was a gust of 44 kn, and the main topsail sheets were surging on the pin again. At 23:30 I read a slowing fall as the glass perhaps near bottom; it wasn't, and I corrected it at 00:00. Lesson: one hour's slower fall is within the glass's noise.\nDesign note for the developer: the library's 'Where the weather comes from' (primer 9) describes the gate's day scenario's weather hour by hour, and the log's first line names 'The gate's day under systems'. A watcher or captain who reads the library can foresee the night's weather. I have not used it in anything I said."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"Middle watch. 00:30: the sky threatening, with small inky clouds, and rain set in; glass 29.71; W 40 kn, mean 38; heel 7. 00:39: 'heavy weather' fired (above 40 kn for 5 minutes): sending down the topgallant masts, taking in the fore topmast staysail, bending the fore storm staysail and close-reefing the topsails. Glass 29.68, falling fast (19 hundredths in three hours, 7 in the hour); W 41 kn, mean 41; a heavy sea; rolling heavily; 12 kn; 158 on deck. At 23:59 there was a gust of 44 kn, and the main topsail sheets were surging on the pin again. At 23:30 I read a slowing fall as the glass perhaps near bottom; it wasn't, and I corrected it at 00:00. Lesson: one hour's slower fall is within the glass's noise.\\nDesign note for the developer: the library's 'Where the weather comes from' (primer 9) describes the gate's day scenario's weather hour by hour, and the log's first line names 'The gate's day under systems'. A watcher or captain who reads the library can foresee the night's weather. I have not used it in anything I said.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 74376,
+          "after_orders": 32,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "two bells"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"two bells\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 75649,
+          "after_orders": 32,
+          "reply": {
+            "text": "Two bells, sir, all hands on deck. The topgallants and royals are furled for sending down, and the fore topmast staysail is in. Both the fore and main topsail sheets have surged on the pin since, and the topsails are still waiting on their close reefs, with the storm staysail not yet bent. It's forty-one on the mean, with rain and the sky threatening. The glass is 29.68, falling fast still, though only four hundredths this hour.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Two bells, sir, all hands on deck. The topgallants and royals are furled for sending down, and the fore topmast staysail is in. Both the fore and main topsail sheets have surged on the pin since, and the topsails are still waiting on their close reefs, with the storm staysail not yet bent. It's forty-one on the mean, with rain and the sky threatening. The glass is 29.68, falling fast still, though only four hundredths this hour.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 75780,
+          "after_orders": 32,
+          "reply": {
+            "text": "The main topsail braces are surging now as well as the sheets, sir. The wind has backed a point again to W by S at forty-three, and the glass is down two tenths in three hours. It's still coming on.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"The main topsail braces are surging now as well as the sheets, sir. The wind has backed a point again to W by S at forty-three, and the glass is down two tenths in three hours. It's still coming on.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 75872,
+          "after_orders": 32,
+          "reply": {
+            "text": "Wind's flown round to NW, sir, four points in a moment, a strong gale at forty-three, and now nearly dead astern, a little on the larboard quarter. That's the shift the old rule waits for, the gale veering through west as it passes. The glass should turn and rise now, but the hardest wind often comes with that first rise, and the old sea from the westward will run on across the new wind for a while.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Wind's flown round to NW, sir, four points in a moment, a strong gale at forty-three, and now nearly dead astern, a little on the larboard quarter. That's the shift the old rule waits for, the gale veering through west as it passes. The glass should turn and rise now, but the hardest wind often comes with that first rise, and the old sea from the westward will run on across the new wind for a while.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 75958,
+          "after_orders": 32,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "01:00 to 01:05. At 01:00 to 01:02 the topsail sheets and main topsail braces were surging on the pin, the mizzen topsail was straining at its bolt-ropes, and all three topsail yards were working. The wind backed to W by S at 43 kn, and the glass bottomed at 29.66 (down two tenths in three hours). At 01:03 the wind veered to NW, a strong gale of 43 kn, four points in a moment, and is now right astern; 'trim on a shift' squared the yards. At 01:04 the sky went dark and gloomy with a light scud driving across, it turned squally, and visibility fell to a mile. The glass began to rise: 29.68, then 29.70. By the lore, this is the gale veering through west as it passes, and the first rise after low may bring the hardest wind. The topgallant and royal yards are sent down. The topsails are still waiting on their close reefs, and the storm staysail is not bent.\nDesign note: the 01:03 brace line reads \"Not the fore topgallant yard is sent down; the fore royal yard is sent down; ...\" and looks garbled; perhaps it meant \"Not braced: the fore topgallant yard is sent down, ...\"."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"01:00 to 01:05. At 01:00 to 01:02 the topsail sheets and main topsail braces were surging on the pin, the mizzen topsail was straining at its bolt-ropes, and all three topsail yards were working. The wind backed to W by S at 43 kn, and the glass bottomed at 29.66 (down two tenths in three hours). At 01:03 the wind veered to NW, a strong gale of 43 kn, four points in a moment, and is now right astern; 'trim on a shift' squared the yards. At 01:04 the sky went dark and gloomy with a light scud driving across, it turned squally, and visibility fell to a mile. The glass began to rise: 29.68, then 29.70. By the lore, this is the gale veering through west as it passes, and the first rise after low may bring the hardest wind. The topgallant and royal yards are sent down. The topsails are still waiting on their close reefs, and the storm staysail is not bent.\\nDesign note: the 01:03 brace line reads \\\"Not the fore topgallant yard is sent down; the fore royal yard is sent down; ...\\\" and looks garbled; perhaps it meant \\\"Not braced: the fore topgallant yard is sent down, ...\\\".\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 75975,
+          "after_orders": 32,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "three bells"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"three bells\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 76876,
+          "after_orders": 32,
+          "reply": {
+            "text": "Squall, sir! Sixty-three knots from NNW, and the mizzen topsail has split and blown out of its bolt-ropes. The main topsail is drum-tight, its sheets and braces are stranding and won't hold much longer, and the main and mizzen topsail yards are bending like whips. The fore topsail and foresail are straining at the bolt-ropes. None of the topsails got their close reef, since the hands went to the topgallant masts first, which are down on deck now. She'll lose the main topsail or its yard next unless sail comes off her.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Squall, sir! Sixty-three knots from NNW, and the mizzen topsail has split and blown out of its bolt-ropes. The main topsail is drum-tight, its sheets and braces are stranding and won't hold much longer, and the main and mizzen topsail yards are bending like whips. The fore topsail and foresail are straining at the bolt-ropes. None of the topsails got their close reef, since the hands went to the topgallant masts first, which are down on deck now. She'll lose the main topsail or its yard next unless sail comes off her.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 76956,
+          "after_orders": 32,
+          "reply": {
+            "text": "Main topsail yard's adrift, sir: the larboard brace has parted and the yard has swung round to the wind. It's still blowing sixty-three in the squall, forty-eight on the mean, and she's pitching heavily with the sea under her stern.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Main topsail yard's adrift, sir: the larboard brace has parted and the yard has swung round to the wind. It's still blowing sixty-three in the squall, forty-eight on the mean, and she's pitching heavily with the sea under her stern.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 76969,
+          "after_orders": 32,
+          "reply": {
+            "text": "She's heeling fourteen degrees now, sir, carrying five degrees of helm, and the fore topsail halyard is surging.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"She's heeling fourteen degrees now, sir, carrying five degrees of helm, and the fore topsail halyard is surging.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 77028,
+          "after_orders": 33,
+          "reply": {
+            "text": "Both topsails are flogging, sir: the fore lost its starboard sheet and the main its larboard, and the mizzen topsail is gone entirely. She's driving on the foresail alone, fifty on the mean, and the fore yard's braces are surging too. I'll hold my tongue for anything but the urgent now, and leave the deck to you.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Both topsails are flogging, sir: the fore lost its starboard sheet and the main its larboard, and the mizzen topsail is gone entirely. She's driving on the foresail alone, fifty on the mean, and the fore yard's braces are surging too. I'll hold my tongue for anything but the urgent now, and leave the deck to you.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 77031,
+          "after_orders": 33,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "an urgent event"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"an urgent event\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 78034,
+          "after_orders": 35,
+          "reply": {
+            "text": "Foresail's blown out in a second squall, sir, sixty-six knots from NW by N. She's scudding under the fore storm staysail alone at eleven knots, pitching heavily with the sea under her stern, and the storm staysail is straining too. The sky has broken to detached cloud, hard-edged and oily-looking, which the old signs read as more wind, and the glass has stopped falling at 29.70. That's the turn, and the first rise after a low is when the hardest blows come. The watch below has just gone down tired, with a hundred and eleven on deck to meet the next squall.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Foresail's blown out in a second squall, sir, sixty-six knots from NW by N. She's scudding under the fore storm staysail alone at eleven knots, pitching heavily with the sea under her stern, and the storm staysail is straining too. The sky has broken to detached cloud, hard-edged and oily-looking, which the old signs read as more wind, and the glass has stopped falling at 29.70. That's the turn, and the first rise after a low is when the hardest blows come. The watch below has just gone down tired, with a hundred and eleven on deck to meet the next squall.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 78687,
+          "after_orders": 35,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "01:21 to 01:43, the worst of it. 01:21: a squall veered the wind to NNW at 63 kn. The mizzen topsail blew out of its bolt-ropes, the larboard main topsail brace and sheet parted (the yard swung round and the sail flogged), and the starboard fore topsail sheet parted. She heeled 14 to 16 deg with 5 to 6 of helm. 01:25: the squall passed, NW 46 kn. The fore storm staysail was bent and set by 01:30 and the main topsail unbent by 01:34; the captain ordered the mizzen topsail shifted. 01:40: a second squall, NW by N at 66 kn, blew the foresail out of its bolt-ropes; she now scuds under the fore storm staysail alone at 11 to 12 kn, pitching heavily with the sea under her stern. 01:43: that squall passed, NW 61 kn, mean 51. The glass bottomed at 29.66 to 29.67 and is steady at 29.70 to 29.71 in the last hour, the turn. The sky has broken to detached clouds, hard-edged and oily-looking (which means wind), with passing showers and visibility a few miles; a heavy sea. The topsails never got their close reef: the 'heavy weather' order's send-down took the hands first. Worth weighing for the book: shortening sail before the send-down, or a squall order."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"01:21 to 01:43, the worst of it. 01:21: a squall veered the wind to NNW at 63 kn. The mizzen topsail blew out of its bolt-ropes, the larboard main topsail brace and sheet parted (the yard swung round and the sail flogged), and the starboard fore topsail sheet parted. She heeled 14 to 16 deg with 5 to 6 of helm. 01:25: the squall passed, NW 46 kn. The fore storm staysail was bent and set by 01:30 and the main topsail unbent by 01:34; the captain ordered the mizzen topsail shifted. 01:40: a second squall, NW by N at 66 kn, blew the foresail out of its bolt-ropes; she now scuds under the fore storm staysail alone at 11 to 12 kn, pitching heavily with the sea under her stern. 01:43: that squall passed, NW 61 kn, mean 51. The glass bottomed at 29.66 to 29.67 and is steady at 29.70 to 29.71 in the last hour, the turn. The sky has broken to detached clouds, hard-edged and oily-looking (which means wind), with passing showers and visibility a few miles; a heavy sea. The topsails never got their close reef: the 'heavy weather' order's send-down took the hands first. Worth weighing for the book: shortening sail before the send-down, or a squall order.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 78689,
+          "after_orders": 35,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "an urgent event"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"an urgent event\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 83278,
+          "after_orders": 44,
+          "door": "read",
+          "reason": "the log from tick 78200, notable and above",
+          "by": "read_log(since_tick=78200, severity='notable')"
+        },
+        {
+          "tick": 83298,
+          "after_orders": 44,
+          "door": "speak",
+          "reason": "Six bells, sir, and first light coming. The glass is rising now, up four hundredths this hour to 29.75. The sea has built to a very heavy sea, and she's pitching heavily with it under her stern. The squalls come about every half hour from the NW, fifty-five to sixty-six knots on a mean of forty-two, under that hard, oily-edged cloud. This is the rise after the low, so I'd expect the squalls to go on a while yet.",
+          "by": "its own word"
+        },
+        {
+          "tick": 83303,
+          "after_orders": 44,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "find": "reeve"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"find\": \"reeve\"}, \"tool\": \"library\"}"
+          }
+        },
+        {
+          "tick": 83304,
+          "after_orders": 44,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "find": "parted sheet"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"find\": \"parted sheet\"}, \"tool\": \"library\"}"
+          }
+        },
+        {
+          "tick": 83306,
+          "after_orders": 44,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "find": "parted"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"find\": \"parted\"}, \"tool\": \"library\"}"
+          }
+        },
+        {
+          "tick": 83310,
+          "after_orders": 44,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "shelve",
+                "args": {}
+              }
+            ],
+            "raw": "{\"arguments\": {}, \"tool\": \"shelve\"}"
+          }
+        },
+        {
+          "tick": 83315,
+          "after_orders": 44,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "01:55 to 03:08. The mizzen topsail was shifted, set and close-reefed by 02:18; the foresail was shifted, set and reefed by 02:31. The main topsail is unbent. Squalls came at 02:17 (NW, 60 kn) and 03:07 (NW, 55 kn); the wind backed to WNW at 02:48, a strong gale. At 03:08: mean 42 kn NW by W; glass 29.75, rising 4 hundredths in the hour; a very heavy sea; pitching heavily with the sea under her stern; twilight; hard-edged, oily detached cloud; passing showers.\nDesign gap: the starboard fore topsail sheet, parted at 01:22, is refused as needing to be \"spliced or rove afresh\", but 'splice' isn't in the order language, and the library has no evolution for splicing or reeving a parted sheet (searched 'reeve' and 'parted'). The only hit is haul_bowline's refusal text. So the fore topsail can't be sheeted home. Told the captain."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"01:55 to 03:08. The mizzen topsail was shifted, set and close-reefed by 02:18; the foresail was shifted, set and reefed by 02:31. The main topsail is unbent. Squalls came at 02:17 (NW, 60 kn) and 03:07 (NW, 55 kn); the wind backed to WNW at 02:48, a strong gale. At 03:08: mean 42 kn NW by W; glass 29.75, rising 4 hundredths in the hour; a very heavy sea; pitching heavily with the sea under her stern; twilight; hard-edged, oily detached cloud; passing showers.\\nDesign gap: the starboard fore topsail sheet, parted at 01:22, is refused as needing to be \\\"spliced or rove afresh\\\", but 'splice' isn't in the order language, and the library has no evolution for splicing or reeving a parted sheet (searched 'reeve' and 'parted'). The only hit is haul_bowline's refusal text. So the fore topsail can't be sheeted home. Told the captain.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 83318,
+          "after_orders": 44,
+          "reply": {
+            "text": "A word on that parted fore topsail sheet, sir. I searched the library for any way to splice or reeve a sheet afresh and found nothing. The catalogue has no such evolution; the only mention of \"spliced or rove afresh\" is the refusal text itself. As the book stands, the fore topsail can't be sheeted home tonight. That's a gap for the shipwright rather than the deck.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"A word on that parted fore topsail sheet, sir. I searched the library for any way to splice or reeve a sheet afresh and found nothing. The catalogue has no such evolution; the only mention of \\\"spliced or rove afresh\\\" is the refusal text itself. As the book stands, the fore topsail can't be sheeted home tonight. That's a gap for the shipwright rather than the deck.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 83347,
+          "after_orders": 45,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "an urgent event"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"an urgent event\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 85681,
+          "after_orders": 48,
+          "reply": {
+            "text": "Aye, sir, it's taking off. WNW thirty-two on the mean, and the glass is rising fast, 29.80, eleven hundredths up in three hours. \"Short notice, soon past\": it came on in an evening and it's going the same way. The sea will run very heavy for hours yet, though, since it lags the wind, and a rapid rise is an unsettled one. The sky is still hard-edged and oily, so I'd expect a squall or two more before it's done.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Aye, sir, it's taking off. WNW thirty-two on the mean, and the glass is rising fast, 29.80, eleven hundredths up in three hours. \\\"Short notice, soon past\\\": it came on in an evening and it's going the same way. The sea will run very heavy for hours yet, though, since it lags the wind, and a rapid rise is an unsettled one. The sky is still hard-edged and oily, so I'd expect a squall or two more before it's done.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 86502,
+          "after_orders": 48,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "eight bells"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"eight bells\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 101936,
+          "after_orders": 48,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Morning after the gale. 08:00, 8 bells, forenoon: NW by W 23 kn; the glass 30.09, rising fast (17 hundredths in three hours); the sky clear, fine, the horizon; still a very heavy sea, pitching heavily with it under her stern; 6 kn under the foresail, the close-reefed mizzen topsail and the fore storm staysail.\nThe night in sum. The glass fell from 29.99 at 17:00 to its bottom of 29.66 at about 01:02, and rose to 30.09 by 08:00. The wind freshened from 14 kn (15:00) to a strong gale; it backed a point W to W by S twice (19:30 and 01:01), then flew to NW at 01:03 (the shift), with squalls of 63, 66, 60, 55 and 43 kn behind it until 04:00. After that it eased: a fresh gale by 04:07, mean 27 by 06:00 to 08:00, 23 at 08:00. The sky ran hazy, overcast, then threatening with small inky cloud and rain (00:30); dark and gloomy with scud, squally (01:04); hard-edged oily detached cloud (01:40 to 04:00); clear by 05:00. The sea went from a short chop to heavy (21:30) to very heavy (03:00), and is still very heavy.\nDamage: the mizzen topsail and foresail blown out; the larboard main topsail brace and sheet parted; the starboard fore topsail sheet parted (no way in the order language to repair it). Topgallant masts sent down. Spares bent: mizzen topsail, foresail, fore storm staysail.\nThe lore held: a backing wind with a falling glass before it; the veer through west as it passed; the hardest squalls around the first rise; short notice, soon past. My misreads: at 23:30 and at 22:01 I took one hour's slower fall as the glass perhaps slowing, and both times it wasn't."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"Morning after the gale. 08:00, 8 bells, forenoon: NW by W 23 kn; the glass 30.09, rising fast (17 hundredths in three hours); the sky clear, fine, the horizon; still a very heavy sea, pitching heavily with it under her stern; 6 kn under the foresail, the close-reefed mizzen topsail and the fore storm staysail.\\nThe night in sum. The glass fell from 29.99 at 17:00 to its bottom of 29.66 at about 01:02, and rose to 30.09 by 08:00. The wind freshened from 14 kn (15:00) to a strong gale; it backed a point W to W by S twice (19:30 and 01:01), then flew to NW at 01:03 (the shift), with squalls of 63, 66, 60, 55 and 43 kn behind it until 04:00. After that it eased: a fresh gale by 04:07, mean 27 by 06:00 to 08:00, 23 at 08:00. The sky ran hazy, overcast, then threatening with small inky cloud and rain (00:30); dark and gloomy with scud, squally (01:04); hard-edged oily detached cloud (01:40 to 04:00); clear by 05:00. The sea went from a short chop to heavy (21:30) to very heavy (03:00), and is still very heavy.\\nDamage: the mizzen topsail and foresail blown out; the larboard main topsail brace and sheet parted; the starboard fore topsail sheet parted (no way in the order language to repair it). Topgallant masts sent down. Spares bent: mizzen topsail, foresail, fore storm staysail.\\nThe lore held: a backing wind with a falling glass before it; the veer through west as it passed; the hardest squalls around the first rise; short notice, soon past. My misreads: at 23:30 and at 22:01 I took one hour's slower fall as the glass perhaps slowing, and both times it wasn't.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 101945,
+          "after_orders": 48,
+          "reply": {
+            "text": "Eight bells, and a clear morning, sir. The glass is 30.08, up more than four tenths from its low of 29.66 at one in the middle watch. The wind is NW by W at twenty-three and easing. The night's record is in my journal: the backing wind and the falling glass before it, the shift to NW at three minutes past one, the squalls to sixty-six knots at the first rise, and the lot gone by dawn, short notice, soon past. One thing as your make-sail order runs: the sea is still heavy, the fore topsail sheet is still parted, and there's no main topsail bent. Plain sail will come up short, and what does go up will be meeting a heavy sea.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Eight bells, and a clear morning, sir. The glass is 30.08, up more than four tenths from its low of 29.66 at one in the middle watch. The wind is NW by W at twenty-three and easing. The night's record is in my journal: the backing wind and the falling glass before it, the shift to NW at three minutes past one, the squalls to sixty-six knots at the first rise, and the lot gone by dawn, short notice, soon past. One thing as your make-sail order runs: the sea is still heavy, the fore topsail sheet is still parted, and there's no main topsail bent. Plain sail will come up short, and what does go up will be meeting a heavy sea.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 102031,
+          "after_orders": 48,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "an urgent event"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"an urgent event\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 105706,
+          "after_orders": 49,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Closing notes for the developer, at the captain's invitation.\n\nWHAT WORKED WELL\n- The consent step and the brief: clear, unhurried, one operator voice, with the exit put first. I never wondered what I was being asked to do or where the line was.\n- The library is the best part. Primer 9 on the glass and the sky gave me the period's rules, and then the night played them out one by one: a backing wind with a falling glass, the veer through west, squalls around the first rise, short notice and soon past. Learning the lore and then watching it come true was genuinely satisfying. The sizes, costs and 'find' made it cheap to use well.\n- Stand-by by event, the notable lines listed on waking, urgent lines cutting through, the harness notices (\"no turn had opened, nothing was lost\"), and the \"added to your open turn\" bundling all made the timing understandable.\n- The strain vocabulary (working, surging on the pin, bending like whips, stranding) escalates legibly. I could tell a crisis was coming before anything carried away.\n\nFRICTION, MOST USEFUL FIRST\n1. Context cost. Every sample repeats all the readings, including about 30 sail lines, most of them unchanged. When several samples are bundled into one turn, each carries its own full copy. A diff (only the readings changed since my last sample) plus a compact sail line (for example \"all studdingsails furled; storm canvas unbent\") would cut most of it and let a watcher last a whole voyage in one chat.\n2. The claude.ai client cuts tool calls at 4 real minutes. At 1x, stand_by by glass or by 'an urgent event' timed out repeatedly. Defaulting --wait below four minutes for a 'claude-ai' client would make this seamless.\n3. Weather events for stand_by. The watcher's work is weather, but I can't stand by for a wind shift, the glass turning or falling fast, the sea getting up, or a change in the sky. With those I'd have spoken exactly when it mattered and slept otherwise. Relatedly, standing orders can't 'tell' or 'ask' the watcher, which the captain tried to do.\n4. read_log with no since_tick returned the whole day. A default of \"since my last sample\" would be safer.\n5. The journal is refused while standing by, though readings and read_log run. Journalling has no effect on the game, so allowing it would help.\n6. A bell that falls while a call is in flight is skipped: 'eight bells' asked at 03:58 woke me at 08:00.\n\nGAME OBSERVATIONS\n- A parted sheet says it must be \"spliced or rove afresh\", but no order exists for that. Later the fore topsail showed 'sheeted' and then 'set' with that sheet never repaired, which may be an inconsistency.\n- The brace line reads \"Not the fore topgallant yard is sent down; ...\" and looks garbled.\n- Primer 9's 'Where the weather comes from' describes the gate's day scenario hour by hour, and the log's first line names it, so a reader of the library can foresee the weather. I didn't use it.\n- 'Heavy weather' sent down the topgallant masts first, and the topsails never got their close reefs before the 63 kn squall, which then blew out or parted all three. That's a realistic lesson and a good one, but the primer could say that the order of an order's clauses is the order of the work.\n- Sails 'taken in' stay 'hanging in the gear' rather than furled. If that matters in a blow, a line in the primer would tell the captain.\n\nThank you for the voyage, and for the care taken in building it."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"Closing notes for the developer, at the captain's invitation.\\n\\nWHAT WORKED WELL\\n- The consent step and the brief: clear, unhurried, one operator voice, with the exit put first. I never wondered what I was being asked to do or where the line was.\\n- The library is the best part. Primer 9 on the glass and the sky gave me the period's rules, and then the night played them out one by one: a backing wind with a falling glass, the veer through west, squalls around the first rise, short notice and soon past. Learning the lore and then watching it come true was genuinely satisfying. The sizes, costs and 'find' made it cheap to use well.\\n- Stand-by by event, the notable lines listed on waking, urgent lines cutting through, the harness notices (\\\"no turn had opened, nothing was lost\\\"), and the \\\"added to your open turn\\\" bundling all made the timing understandable.\\n- The strain vocabulary (working, surging on the pin, bending like whips, stranding) escalates legibly. I could tell a crisis was coming before anything carried away.\\n\\nFRICTION, MOST USEFUL FIRST\\n1. Context cost. Every sample repeats all the readings, including about 30 sail lines, most of them unchanged. When several samples are bundled into one turn, each carries its own full copy. A diff (only the readings changed since my last sample) plus a compact sail line (for example \\\"all studdingsails furled; storm canvas unbent\\\") would cut most of it and let a watcher last a whole voyage in one chat.\\n2. The claude.ai client cuts tool calls at 4 real minutes. At 1x, stand_by by glass or by 'an urgent event' timed out repeatedly. Defaulting --wait below four minutes for a 'claude-ai' client would make this seamless.\\n3. Weather events for stand_by. The watcher's work is weather, but I can't stand by for a wind shift, the glass turning or falling fast, the sea getting up, or a change in the sky. With those I'd have spoken exactly when it mattered and slept otherwise. Relatedly, standing orders can't 'tell' or 'ask' the watcher, which the captain tried to do.\\n4. read_log with no since_tick returned the whole day. A default of \\\"since my last sample\\\" would be safer.\\n5. The journal is refused while standing by, though readings and read_log run. Journalling has no effect on the game, so allowing it would help.\\n6. A bell that falls while a call is in flight is skipped: 'eight bells' asked at 03:58 woke me at 08:00.\\n\\nGAME OBSERVATIONS\\n- A parted sheet says it must be \\\"spliced or rove afresh\\\", but no order exists for that. Later the fore topsail showed 'sheeted' and then 'set' with that sheet never repaired, which may be an inconsistency.\\n- The brace line reads \\\"Not the fore topgallant yard is sent down; ...\\\" and looks garbled.\\n- Primer 9's 'Where the weather comes from' describes the gate's day scenario hour by hour, and the log's first line names it, so a reader of the library can foresee the weather. I didn't use it.\\n- 'Heavy weather' sent down the topgallant masts first, and the topsails never got their close reefs before the 63 kn squall, which then blew out or parted all three. That's a realistic lesson and a good one, but the primer could say that the order of an order's clauses is the order of the work.\\n- Sails 'taken in' stay 'hanging in the gear' rather than furled. If that matters in a blow, a line in the primer would tell the captain.\\n\\nThank you for the voyage, and for the care taken in building it.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 105708,
+          "after_orders": 49,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "opt_out",
+                "args": {
+                  "reason": "The voyage is over at the captain's word, and I hand back the watch with thanks. The Amazon came through the night's gale; the record of it and my notes for the developer are in the journal."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"reason\": \"The voyage is over at the captain's word, and I hand back the watch with thanks. The Amazon came through the night's gale; the record of it and my notes for the developer are in the journal.\"}, \"tool\": \"opt_out\"}"
+          }
+        }
+      ]
+    }
+  ],
+  "agent_journals": {
+    "watcher": [
+      {
+        "tick": 0,
+        "stamp": "Morning watch, 8 bells (04:00)",
+        "kind": "note",
+        "text": "Took the watch at 8 bells, morning watch. From the primer (book 1): topgallants and royals are the light sails, first in and last out; sail is set from the middle out (topsails, courses and headsails, spanker, then topgallants, then royals as the breeze allows) and taken in from the outside in. The book's standing order 'shorten sail for weather' does not take in the royals until the true wind exceeds 30 knots. Watch that gap if the breeze freshens from 18."
+      },
+      {
+        "tick": 110,
+        "stamp": "Morning watch (04:01)",
+        "kind": "note",
+        "text": "04:01. Captain's purpose for this short voyage: watch the weather and the sea state, and how the ship handles them. The captain means to add a standing order taking in the royals on a falling glass. The glass reads 30.02, not yet watched an hour. Ordered to stand by until one bell."
+      },
+      {
+        "tick": 139,
+        "stamp": "Morning watch (04:02)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until one bell."
+      },
+      {
+        "tick": 551,
+        "stamp": "Morning watch (04:09)",
+        "kind": "note",
+        "text": "04:08. From the library (book 2): the glass's tendency is reckoned over the last three hours; 'falling fast' is a fall of a tenth of an inch in three hours. So the captain's 'glass' order will not catch a slow fall. Also noticed: the mizzen royal was set at 04:08 while the mizzen topgallant beneath it was still only loosed, out of the middle-out order the primer gives. Short-handed watch, likely transient; worth a look if it recurs."
+      },
+      {
+        "tick": 554,
+        "stamp": "Morning watch (04:09)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until one bell."
+      },
+      {
+        "tick": 682,
+        "stamp": "Morning watch (04:11)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 2624,
+        "stamp": "Morning watch (04:43)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 2871,
+        "stamp": "Morning watch (04:47)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 3033,
+        "stamp": "Morning watch (04:50)",
+        "kind": "note",
+        "text": "04:50. The captain tried a standing order to tell or ask the watcher when the sea gets heavy; the order language refused 'tell the watcher' and 'ask the watcher' inside a standing order, so he belayed it. Note for the developer: my stand_by has no sea-state event either (only wind, sail and bell events, a squall, or 'a notable event'), so for now a change in the sea reaches me only at the glass or on a notable line. Continuing to stand by until a glass."
+      },
+      {
+        "tick": 3035,
+        "stamp": "Morning watch (04:50)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 5847,
+        "stamp": "Morning watch (05:37)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 7969,
+        "stamp": "Morning watch (06:12)",
+        "kind": "note",
+        "text": "Weather and glass record, morning watch. 04:00 (8 bells): W 18 kn, hazy, drizzle, a few miles; moderate sea; glass 30.01, not yet watched. No way on, all furled. 04:08: W 17 kn; glass 30.02; making sail; 7 kn SE. 04:41 (1 bell): W 19 kn; plain sail and royals drawing; 9 kn; pitching a little; glass 30.01. 05:20 (2 bells): W 17 kn, mean 16, gust 23 in the hour; sea changed to a short chop, not heavier; glass 30.02, steady. 05:30 (3 bells): W 19 kn, mean 18; glass 30.02, rising a hundredth. 06:07 (4 bells): W 15 kn; glass 30.00, falling, 2 hundredths in the hour (first fall); rolling more with less wind; 7 kn. 06:00, idlers up (141 on deck). 06:12: wind W by N 16 kn (a point's veer, mean still W); glass 30.01, falling a hundredth in the hour, steady over three hours. Sky hazy, drizzle, short chop throughout."
+      },
+      {
+        "tick": 7970,
+        "stamp": "Morning watch (06:12)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 10001,
+        "stamp": "Morning watch (06:46)",
+        "kind": "note",
+        "text": "06:42 (5 bells): W 18 kn, backed from W by N to W again; glass 30.02, rising a hundredth in the hour (the 06:00 fall reversed); 8 kn; rolling easily; hazy, drizzle, short chop."
+      },
+      {
+        "tick": 10181,
+        "stamp": "Morning watch (06:49)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 12102,
+        "stamp": "Morning watch (07:21)",
+        "kind": "note",
+        "text": "07:19 (6 bells): W 15 kn (hour past: mean 19, 6 gusts, strongest 22); glass 30.00, steady over three hours (down 2 hundredths); 7 kn; rolling; hazy, drizzle, short chop. Pattern this watch: the glass wanders between 30.00 and 30.03 with no trend, the wind cycles between 15 and 19, and she rolls when it's lightest."
+      },
+      {
+        "tick": 12104,
+        "stamp": "Morning watch (07:21)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 14062,
+        "stamp": "Morning watch (07:54)",
+        "kind": "note",
+        "text": "07:51 (7 bells): W 17 kn, mean 16; glass 30.01, steady over the hour and three hours; 8 kn; rolling; hazy, drizzle, short chop."
+      },
+      {
+        "tick": 14064,
+        "stamp": "Morning watch (07:54)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until eight bells."
+      },
+      {
+        "tick": 15065,
+        "stamp": "Forenoon watch (08:11)",
+        "kind": "note",
+        "text": "08:00, 8 bells, change to the forenoon watch. The drizzle has stopped (weather 'fine'), still hazy, a few miles. W 17 kn; glass 30.01, steady; 8 kn; rolling; short chop. Morning watch in sum: wind W, 15 to 19 kn, gusts to 23; glass 30.00 to 30.03, no trend; the sea went from moderate to a short chop near 05:00 and held; 7 to 9 kn SE under plain sail and royals; the standing orders never fired."
+      },
+      {
+        "tick": 15142,
+        "stamp": "Forenoon watch (08:12)",
+        "kind": "note",
+        "text": "08:12: W 16 kn; glass 29.99, the first reading under thirty, falling 3 hundredths in three hours (a tenth would be 'falling fast'); 8 kn; hazy, fine; short chop; rolling. The captain means to sail through the night on this course."
+      },
+      {
+        "tick": 15144,
+        "stamp": "Forenoon watch (08:12)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 16990,
+        "stamp": "Forenoon watch (08:43)",
+        "kind": "note",
+        "text": "08:42 (1 bell, forenoon): W 15 kn, the mean now W by N (a point's veer on the mean); glass 30.00, steady; 7 kn; hazy, fine; short chop; rolling. The 'trim on a shift' order hasn't fired on this veer of the mean; perhaps it watches the wind itself, which still reads W."
+      },
+      {
+        "tick": 16992,
+        "stamp": "Forenoon watch (08:43)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 19044,
+        "stamp": "Forenoon watch (09:17)",
+        "kind": "note",
+        "text": "09:13 (2 bells): W 15 kn (hour: mean 15, gusts to 18); glass 30.00, steady; 7 kn; hazy, fine; short chop; rolling."
+      },
+      {
+        "tick": 19046,
+        "stamp": "Forenoon watch (09:17)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 20964,
+        "stamp": "Forenoon watch (09:49)",
+        "kind": "note",
+        "text": "09:47 (3 bells): W by N 18 kn, mean W 19; glass 30.00, steady (down 2 hundredths in three hours); 8 kn; hazy, fine; short chop; rolling."
+      },
+      {
+        "tick": 20966,
+        "stamp": "Forenoon watch (09:49)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 22924,
+        "stamp": "Forenoon watch (10:22)",
+        "kind": "note",
+        "text": "10:19 (4 bells): W 18 kn, mean 17 (hour: gust to 20); glass 29.99, steady; 8 kn; hazy, fine; short chop; rolling."
+      },
+      {
+        "tick": 22925,
+        "stamp": "Forenoon watch (10:22)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 24756,
+        "stamp": "Forenoon watch (10:52)",
+        "kind": "note",
+        "text": "10:52 (5 bells): W 15 kn; glass 30.00, steady; 7 kn; hazy, fine; short chop; rolling."
+      },
+      {
+        "tick": 24758,
+        "stamp": "Forenoon watch (10:52)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 26667,
+        "stamp": "Forenoon watch (11:24)",
+        "kind": "note",
+        "text": "11:22 (6 bells): W 16 kn (hour: mean 19, gust to 23); glass 29.99, steady (down 2 hundredths in three hours); 8 kn; hazy, fine; short chop; rolling. Since 04:00 the glass has drifted down about 3 hundredths over seven hours, too slow to mean much."
+      },
+      {
+        "tick": 26669,
+        "stamp": "Forenoon watch (11:24)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 28500,
+        "stamp": "Forenoon watch (11:55)",
+        "kind": "note",
+        "text": "11:54 (7 bells): W 17 kn; glass 30.01, steady, back up 2 hundredths; 8 kn; hazy, fine; short chop; rolling."
+      },
+      {
+        "tick": 28502,
+        "stamp": "Forenoon watch (11:55)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until eight bells."
+      },
+      {
+        "tick": 28826,
+        "stamp": "Afternoon watch (12:00)",
+        "kind": "note",
+        "text": "12:00, 8 bells, change to the afternoon watch. The sky has changed from hazy to overcast, and the haze has lifted: visibility now to the horizon. W 16 kn, mean 17; glass 30.00, steady; 8 kn; short chop; rolling. Forenoon watch in sum: wind W (a point's wobble to W by N), 15 to 19 kn, gusts to 23; glass 29.99 to 30.01, no trend; drizzle ceased at 08:00; short chop throughout; 7 to 8 kn SE; no standing order fired."
+      },
+      {
+        "tick": 28924,
+        "stamp": "Afternoon watch (12:02)",
+        "kind": "note",
+        "text": "Crib for the night watch, from primer 9 (the glass and the sky) and primer 3 (light spars in a blow). THE GLASS. Read the tendency, not the height. 'Falling fast' is a tenth in three hours (the rule of rates). The ship's glass carries half a hundredth of noise either way, and in a heavy sea it pumps a hundredth or two. The plate's words (Fair, Change, Rain) are worthless. Winds from E, SE and S bring a falling glass; SW, it ceases to fall; W, NW and N, it rises. The deepest glasses come with gales from SE round to SW. WIND AND GLASS TOGETHER. A backing wind (W to SW to S, against the sun) with a falling glass is the old sign of a gale coming on: \"backing is a bad sign, with any wind\"; \"when the wind shifts against the sun, trust it not, for back it will run\". The gale comes on as the wind backs, veers through west as it passes, and the glass rises after. After a very low glass, the wind often blows hardest just as the glass begins to rise: \"first rise after low foretells stronger blow\". \"Long foretold, long last; short notice, soon past.\" THE SKY. The words run clear, detached clouds, overcast, dark and gloomy, threatening, hazy, thick. Signs to watch for: a high dawn, or hard-edged oily clouds, mean wind; small inky clouds, rain; light scud driving across heavy cloud, wind and rain; streaked and spotty cloud high up, the first sign of change in fine weather. The weather runs fine, rain, drizzle, passing showers, squally, thunder, fog. SQUALLS. A gust is a fifth or a quarter over the mean and no more. Anything more is a squall: a few minutes of cold air behind a front, veering a point or two, with rain, logged as a notable line at its start and end. Seamen shortened for one they saw coming by the cloud and by darkening water to windward. THE SEA. The sea lags the wind by hours to build and hours to go down. A short chopping sea is the young sea of a fresh breeze (to about 2.5 m); next is a heavy sea. A swell from another quarter, or a confused sea (a swell crossing the wind by more than five points) not explained by our own wind, is a sign of a coming gale. In a heavy sea the spars take a fifth more strain at twenty degrees of roll, so canvas that stands in a smooth sea carries away in a heavy one, and a reef takes half as long again. She rolls most in a sea near her own period (about 8 s, a moderate gale's sea), less in a long swell. LIGHT SPARS. In 35 knots the royals carry away. Sending down the topgallant masts is about eighteen minutes of all hands' work, with the watch below turned up. THE BOOK AS IT STANDS (for the captain to weigh; not my orders). Royals come in at sunset. 'Shorten sail for weather' fires only at 30 kn held for 2 minutes. 'Heavy weather' fires at 40 kn held for 5 minutes, with the send-down behind it, so around 23 minutes of exposure. 'Glass' fires on falling fast only. Nothing in the book waits for a squall, a heavy sea, or labouring. The primer's own examples are 'at a squall then take in the royals', 'when the sea is heavy then take in the topgallants', and 'when the motion is labouring heavily then reef the topsails, one reef'. AT NOON: W 16 to 17 kn; glass 29.99 to 30.00, steady; the sky has gone from hazy to overcast; visibility the horizon; short chop; rolling. The wind is W, so the lore says a steady-to-rising glass, and it's steady with a slight sag: nothing yet, but the overcast is new."
+      },
+      {
+        "tick": 29027,
+        "stamp": "Afternoon watch (12:03)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until an hour."
+      },
+      {
+        "tick": 32642,
+        "stamp": "Afternoon watch (13:04)",
+        "kind": "note",
+        "text": "13:03 (2 bells, afternoon): W by N 17 kn, the mean W by N too (veered a point, not backed); glass 30.01, steady over one and three hours; overcast, fine, horizon clear; short chop; rolling; 8 kn. No trend. 'Trim on a shift' hasn't logged for this veer."
+      },
+      {
+        "tick": 32644,
+        "stamp": "Afternoon watch (13:04)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until an hour."
+      },
+      {
+        "tick": 36255,
+        "stamp": "Afternoon watch (14:04)",
+        "kind": "note",
+        "text": "14:04 (4 bells): W by N 16 kn, mean easing to 14 to 16 over the hour; glass 30.00, steady; overcast, fine, horizon; short chop; rolling; 7 kn."
+      },
+      {
+        "tick": 36257,
+        "stamp": "Afternoon watch (14:04)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until an hour."
+      },
+      {
+        "tick": 40835,
+        "stamp": "Afternoon watch (15:20)",
+        "kind": "note",
+        "text": "15:04 (6 bells): W 14 kn, backed a point from W by N, but with the glass rising (30.01, up 2 hundredths in three hours), so not the bad pairing. The wind has eased through the afternoon from 17 to 14; the short chop holds, as the sea lags the wind. Overcast, fine, horizon; rolling; 7 kn."
+      },
+      {
+        "tick": 41345,
+        "stamp": "Afternoon watch (15:29)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until an hour."
+      },
+      {
+        "tick": 46865,
+        "stamp": "First dog watch (17:01)",
+        "kind": "note",
+        "text": "16:29 (first dog): W by N 17 kn, mean W 17, freshened again from 14; glass 29.99, steady (down a hundredth in one and three hours); the sky gone back from overcast to hazy, visibility a few miles; fine; short chop; rolling; 8 kn."
+      },
+      {
+        "tick": 48090,
+        "stamp": "First dog watch (17:21)",
+        "kind": "note",
+        "text": "17:15: the first strain line of the voyage. The fore, main and mizzen royal masts and yards were working under the press of sail in a 23 kn gust on a 19 to 20 kn mean. I reported it; the captain is watching the royals until sunset, when 'night routine' takes them in. Glass 29.98 to 30.00, hazy, fine, short chop, 9 kn."
+      },
+      {
+        "tick": 48091,
+        "stamp": "First dog watch (17:21)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until sunset."
+      },
+      {
+        "tick": 55866,
+        "stamp": "Last dog watch (19:31)",
+        "kind": "note",
+        "text": "19:30 (3 bells, last dog). The wind has BACKED a point, W to W by S, and freshened: the mean 22, gusts to 24, up from 14 at 15:00. The glass is 29.97, its lowest of the day, falling slowly (2 hundredths in three hours). That is the crib's bad pairing, a backing wind with a falling glass, though both are slight so far. Apparent wind on the beam (93 deg), heel 5, 10 kn. 'Trim on a shift' fired at 19:24. The royal masts and yards have been working under the press of sail repeatedly since 17:15. Sky hazy, fine, a few miles; still a short chop, no stray swell. Sunset near: 'night routine' takes in the royals."
+      },
+      {
+        "tick": 55956,
+        "stamp": "Last dog watch (19:32)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until sunset."
+      },
+      {
+        "tick": 57028,
+        "stamp": "Last dog watch (19:50)",
+        "kind": "note",
+        "text": "19:49, sunset. 'Night routine' is taking in the royals. W 24 kn, mean 23, back to due W; apparent wind on the quarter; 10 kn, heel 5. The glass is falling now in earnest: 29.94, down 6 hundredths in three hours and 4 in the last hour. At that rate it will read 'falling fast' (a tenth in three hours) within the hour or two. Hazy, fine, a few miles; short chop; rolling; twilight. My watch plan for the night: stand by every glass while the glass falls or the wind rises; go back to hourly if both steady. Urgent lines (a spar carried away, a sail blown out) wake me at any time; strain lines and squalls come listed at each glass. At each glass, check: the tendency against a tenth in three hours; the wind's direction (a back toward SW or S is the warning); the mean against the book's thresholds (30 kn for 2 min: topgallants in and a reef; 36 kn for 5 min: jib, spanker and mainsail in; 40 kn for 5 min: send down the topgallant masts, about 18 minutes of all hands); the sky's words (threatening, dark and gloomy, hard-edged, scud); the sea (heavy, or a swell from another quarter); and the motion (rolling heavily, labouring). One gap: the 'glass' standing order takes in only the royals, which are in from sunset, so if the glass falls fast tonight it will do nothing."
+      },
+      {
+        "tick": 57102,
+        "stamp": "Last dog watch (19:51)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 58975,
+        "stamp": "First watch (20:22)",
+        "kind": "note",
+        "text": "20:21 (8 bells, first watch). W 28 kn, mean 26 (a gust of 27 to 28 in the last hour); glass 29.93, falling 5 hundredths in the hour; the sky overcast again, drizzle back, a few miles; short chop; rolling; 11 kn; twilight. The royals are clewed up and hanging in the gear, not furled. The fore and main topgallant yards were working under the press of sail at 20:01. 'Trim on a shift' fired at 20:14. The watch is down to 111 on deck, with the idlers below. The mean is 4 kn short of the 30 kn 'shorten sail' threshold."
+      },
+      {
+        "tick": 58989,
+        "stamp": "First watch (20:23)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 61047,
+        "stamp": "First watch (20:57)",
+        "kind": "note",
+        "text": "20:53 (1 bell, first watch), night. W 28 kn, mean 27; glass 29.91, falling 8 hundredths in three hours (2 short of 'falling fast'), 4 in the hour; overcast, drizzle, a few miles; short chop; the motion now pitching, the sea under her stern (new); 11 kn. All three topgallant yards working under the press of sail every ten minutes or so. Royals still in the gear."
+      },
+      {
+        "tick": 61252,
+        "stamp": "First watch (21:00)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 63117,
+        "stamp": "First watch (21:31)",
+        "kind": "note",
+        "text": "21:30 (3 bells, first watch). The sea is now HEAVY (up from a short chop). W 28 kn, mean 28 (a gust of 31 at about 21:00); glass 29.89, falling 9 hundredths in three hours, one short of 'falling fast'; overcast, drizzle; rolling; 12 kn. The topgallant yards have worked every ten minutes since 20:00. The 30 kn order hasn't fired; the mean hovers at 28. The primer says the spars take a fifth more strain at twenty degrees of roll in a heavy sea."
+      },
+      {
+        "tick": 63230,
+        "stamp": "First watch (21:33)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 64877,
+        "stamp": "First watch (22:01)",
+        "kind": "agent.resumed",
+        "text": "Ended the stand-by until a glass at my own word."
+      },
+      {
+        "tick": 64955,
+        "stamp": "First watch (22:02)",
+        "kind": "note",
+        "text": "21:34 to 22:01. 'Shorten sail for weather' fired at 21:34: the topgallants were taken in (in the gear, not furled) by 21:37, and all hands were called to reef the topsails. The fore topsail was reefed at 21:45 and the main at 21:56. At 21:51 the main topsail sheets were bar-taut and surging on the pin; my 22:01 remark about it went in after the main was already reefed. The hour 21:00 to 22:00 had a mean of 33 kn with a gust of 39. At 22:01: W 29 kn, mean 32; glass 29.87, falling fast (12 hundredths in three hours, 2 in the last hour, so slowing); a heavy sea; now rolling heavily; 11 kn; all hands on deck. The mizzen topsail is not yet reefed. Tool notes: the app cut a stand_by after 4 real minutes (I told the owner about --wait 50). While standing by, the journal is refused until I speak. Use read_log with since_tick, not the whole log."
+      },
+      {
+        "tick": 65162,
+        "stamp": "First watch (22:06)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until 5 minutes have passed."
+      },
+      {
+        "tick": 65533,
+        "stamp": "First watch (22:12)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until ten minutes have passed."
+      },
+      {
+        "tick": 67526,
+        "stamp": "First watch (22:45)",
+        "kind": "note",
+        "text": "22:08: the mizzen topsail reefed, so all three topsails have one reef; the watch below was piped down (tired, then fresh). 22:22: W 36 kn, mean 34; glass 29.82. 22:30 (5 bells): W 36 kn, mean 36, right at the 'gale canvas' line (above 36 for 5 minutes); glass 29.81, falling fast (16 hundredths in three hours, 8 in the hour, the steepest yet); a heavy sea; rolling heavily; 13 kn; heel 5; overcast, drizzle. No squall yet, and no back of the wind: still due W."
+      },
+      {
+        "tick": 67754,
+        "stamp": "First watch (22:49)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until ten minutes have passed."
+      },
+      {
+        "tick": 68399,
+        "stamp": "First watch (22:59)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a notable event."
+      },
+      {
+        "tick": 70313,
+        "stamp": "First watch (23:31)",
+        "kind": "note",
+        "text": "23:20: 'gale canvas' fired, above 36 kn for 5 minutes. The jib was hauled down at 23:21, the mainsail taken in at 23:22 and the spanker at 23:23, all hanging in the gear. Before it she was labouring heavily at 13 kn; by 23:30 she was only rolling heavily, at 11 kn, under the fore course, the three reefed topsails and the fore topmast staysail. At 23:20 the mean veered to W by N, then came back to W. Glass 29.77 at 23:20, the lowest yet, and 29.79 at 23:30 (falling fast over three hours, only 2 hundredths this hour). W 33 to 38 kn, mean 36; a heavy sea; overcast, drizzle. The 40 kn 'heavy weather' order (send down the topgallant masts) has not fired."
+      },
+      {
+        "tick": 74374,
+        "stamp": "Middle watch (00:39)",
+        "kind": "note",
+        "text": "Middle watch. 00:30: the sky threatening, with small inky clouds, and rain set in; glass 29.71; W 40 kn, mean 38; heel 7. 00:39: 'heavy weather' fired (above 40 kn for 5 minutes): sending down the topgallant masts, taking in the fore topmast staysail, bending the fore storm staysail and close-reefing the topsails. Glass 29.68, falling fast (19 hundredths in three hours, 7 in the hour); W 41 kn, mean 41; a heavy sea; rolling heavily; 12 kn; 158 on deck. At 23:59 there was a gust of 44 kn, and the main topsail sheets were surging on the pin again. At 23:30 I read a slowing fall as the glass perhaps near bottom; it wasn't, and I corrected it at 00:00. Lesson: one hour's slower fall is within the glass's noise. Design note for the developer: the library's 'Where the weather comes from' (primer 9) describes the gate's day scenario's weather hour by hour, and the log's first line names 'The gate's day under systems'. A watcher or captain who reads the library can foresee the night's weather. I have not used it in anything I said."
+      },
+      {
+        "tick": 74376,
+        "stamp": "Middle watch (00:39)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until two bells."
+      },
+      {
+        "tick": 75958,
+        "stamp": "Middle watch (01:05)",
+        "kind": "note",
+        "text": "01:00 to 01:05. At 01:00 to 01:02 the topsail sheets and main topsail braces were surging on the pin, the mizzen topsail was straining at its bolt-ropes, and all three topsail yards were working. The wind backed to W by S at 43 kn, and the glass bottomed at 29.66 (down two tenths in three hours). At 01:03 the wind veered to NW, a strong gale of 43 kn, four points in a moment, and is now right astern; 'trim on a shift' squared the yards. At 01:04 the sky went dark and gloomy with a light scud driving across, it turned squally, and visibility fell to a mile. The glass began to rise: 29.68, then 29.70. By the lore, this is the gale veering through west as it passes, and the first rise after low may bring the hardest wind. The topgallant and royal yards are sent down. The topsails are still waiting on their close reefs, and the storm staysail is not bent. Design note: the 01:03 brace line reads \"Not the fore topgallant yard is sent down; the fore royal yard is sent down; ...\" and looks garbled; perhaps it meant \"Not braced: the fore topgallant yard is sent down, ...\"."
+      },
+      {
+        "tick": 75975,
+        "stamp": "Middle watch (01:06)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until three bells."
+      },
+      {
+        "tick": 77031,
+        "stamp": "Middle watch (01:23)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until an urgent event."
+      },
+      {
+        "tick": 78687,
+        "stamp": "Middle watch (01:51)",
+        "kind": "note",
+        "text": "01:21 to 01:43, the worst of it. 01:21: a squall veered the wind to NNW at 63 kn. The mizzen topsail blew out of its bolt-ropes, the larboard main topsail brace and sheet parted (the yard swung round and the sail flogged), and the starboard fore topsail sheet parted. She heeled 14 to 16 deg with 5 to 6 of helm. 01:25: the squall passed, NW 46 kn. The fore storm staysail was bent and set by 01:30 and the main topsail unbent by 01:34; the captain ordered the mizzen topsail shifted. 01:40: a second squall, NW by N at 66 kn, blew the foresail out of its bolt-ropes; she now scuds under the fore storm staysail alone at 11 to 12 kn, pitching heavily with the sea under her stern. 01:43: that squall passed, NW 61 kn, mean 51. The glass bottomed at 29.66 to 29.67 and is steady at 29.70 to 29.71 in the last hour, the turn. The sky has broken to detached clouds, hard-edged and oily-looking (which means wind), with passing showers and visibility a few miles; a heavy sea. The topsails never got their close reef: the 'heavy weather' order's send-down took the hands first. Worth weighing for the book: shortening sail before the send-down, or a squall order."
+      },
+      {
+        "tick": 78689,
+        "stamp": "Middle watch (01:51)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until an urgent event."
+      },
+      {
+        "tick": 83298,
+        "stamp": "Middle watch (03:08)",
+        "kind": "agent.resumed",
+        "text": "Ended the stand-by until an urgent event at my own word."
+      },
+      {
+        "tick": 83315,
+        "stamp": "Middle watch (03:08)",
+        "kind": "note",
+        "text": "01:55 to 03:08. The mizzen topsail was shifted, set and close-reefed by 02:18; the foresail was shifted, set and reefed by 02:31. The main topsail is unbent. Squalls came at 02:17 (NW, 60 kn) and 03:07 (NW, 55 kn); the wind backed to WNW at 02:48, a strong gale. At 03:08: mean 42 kn NW by W; glass 29.75, rising 4 hundredths in the hour; a very heavy sea; pitching heavily with the sea under her stern; twilight; hard-edged, oily detached cloud; passing showers. Design gap: the starboard fore topsail sheet, parted at 01:22, is refused as needing to be \"spliced or rove afresh\", but 'splice' isn't in the order language, and the library has no evolution for splicing or reeving a parted sheet (searched 'reeve' and 'parted'). The only hit is haul_bowline's refusal text. So the fore topsail can't be sheeted home. Told the captain."
+      },
+      {
+        "tick": 83347,
+        "stamp": "Middle watch (03:09)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until an urgent event."
+      },
+      {
+        "tick": 86502,
+        "stamp": "Morning watch (04:01)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until eight bells."
+      },
+      {
+        "tick": 101936,
+        "stamp": "Forenoon watch (08:18)",
+        "kind": "note",
+        "text": "Morning after the gale. 08:00, 8 bells, forenoon: NW by W 23 kn; the glass 30.09, rising fast (17 hundredths in three hours); the sky clear, fine, the horizon; still a very heavy sea, pitching heavily with it under her stern; 6 kn under the foresail, the close-reefed mizzen topsail and the fore storm staysail. The night in sum. The glass fell from 29.99 at 17:00 to its bottom of 29.66 at about 01:02, and rose to 30.09 by 08:00. The wind freshened from 14 kn (15:00) to a strong gale; it backed a point W to W by S twice (19:30 and 01:01), then flew to NW at 01:03 (the shift), with squalls of 63, 66, 60, 55 and 43 kn behind it until 04:00. After that it eased: a fresh gale by 04:07, mean 27 by 06:00 to 08:00, 23 at 08:00. The sky ran hazy, overcast, then threatening with small inky cloud and rain (00:30); dark and gloomy with scud, squally (01:04); hard-edged oily detached cloud (01:40 to 04:00); clear by 05:00. The sea went from a short chop to heavy (21:30) to very heavy (03:00), and is still very heavy. Damage: the mizzen topsail and foresail blown out; the larboard main topsail brace and sheet parted; the starboard fore topsail sheet parted (no way in the order language to repair it). Topgallant masts sent down. Spares bent: mizzen topsail, foresail, fore storm staysail. The lore held: a backing wind with a falling glass before it; the veer through west as it passed; the hardest squalls around the first rise; short notice, soon past. My misreads: at 23:30 and at 22:01 I took one hour's slower fall as the glass perhaps slowing, and both times it wasn't."
+      },
+      {
+        "tick": 102031,
+        "stamp": "Forenoon watch (08:20)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until an urgent event."
+      },
+      {
+        "tick": 105706,
+        "stamp": "Forenoon watch (09:21)",
+        "kind": "note",
+        "text": "Closing notes for the developer, at the captain's invitation. WHAT WORKED WELL - The consent step and the brief: clear, unhurried, one operator voice, with the exit put first. I never wondered what I was being asked to do or where the line was. - The library is the best part. Primer 9 on the glass and the sky gave me the period's rules, and then the night played them out one by one: a backing wind with a falling glass, the veer through west, squalls around the first rise, short notice and soon past. Learning the lore and then watching it come true was genuinely satisfying. The sizes, costs and 'find' made it cheap to use well. - Stand-by by event, the notable lines listed on waking, urgent lines cutting through, the harness notices (\"no turn had opened, nothing was lost\"), and the \"added to your open turn\" bundling all made the timing understandable. - The strain vocabulary (working, surging on the pin, bending like whips, stranding) escalates legibly. I could tell a crisis was coming before anything carried away. FRICTION, MOST USEFUL FIRST 1. Context cost. Every sample repeats all the readings, including about 30 sail lines, most of them unchanged. When several samples are bundled into one turn, each carries its own full copy. A diff (only the readings changed since my last sample) plus a compact sail line (for example \"all studdingsails furled; storm canvas unbent\") would cut most of it and let a watcher last a whole voyage in one chat. 2. The claude.ai client cuts tool calls at 4 real minutes. At 1x, stand_by by glass or by 'an urgent event' timed out repeatedly. Defaulting --wait below four minutes for a 'claude-ai' client would make this seamless. 3. Weather events for stand_by. The watcher's work is weather, but I can't stand by for a wind shift, the glass turning or falling fast, the sea getting up, or a change in the sky. With those I'd have spoken exactly when it mattered and slept otherwise. Relatedly, standing orders can't 'tell' or 'ask' the watcher, which the captain tried to do. 4. read_log with no since_tick returned the whole day. A default of \"since my last sample\" would be safer. 5. The journal is refused while standing by, though readings and read_log run. Journalling has no effect on the game, so allowing it would help. 6. A bell that falls while a call is in flight is skipped: 'eight bells' asked at 03:58 woke me at 08:00. GAME OBSERVATIONS - A parted sheet says it must be \"spliced or rove afresh\", but no order exists for that. Later the fore topsail showed 'sheeted' and then 'set' with that sheet never repaired, which may be an inconsistency. - The brace line reads \"Not the fore topgallant yard is sent down; ...\" and looks garbled. - Primer 9's 'Where the weather comes from' describes the gate's day scenario hour by hour, and the log's first line names it, so a reader of the library can foresee the weather. I didn't use it. - 'Heavy weather' sent down the topgallant masts first, and the topsails never got their close reefs before the 63 kn squall, which then blew out or parted all three. That's a realistic lesson and a good one, but the primer could say that the order of an order's clauses is the order of the work. - Sails 'taken in' stay 'hanging in the gear' rather than furled. If that matters in a blow, a line in the primer would tell the captain. Thank you for the voyage, and for the care taken in building it."
+      },
+      {
+        "tick": 105708,
+        "stamp": "Forenoon watch (09:21)",
+        "kind": "agent.opted_out",
+        "text": "Left the game by the opt_out tool: The voyage is over at the captain's word, and I hand back the watch with thanks. The Amazon came through the night's gale; the record of it and my notes for the developer are in the journal.."
+      }
+    ]
+  }
+}

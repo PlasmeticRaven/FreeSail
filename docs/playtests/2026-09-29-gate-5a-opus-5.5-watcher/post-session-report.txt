@@ -1,0 +1,27 @@
+The model's closing message in the Claude Desktop chat after it left the station (pasted by
+the owner, 2026-09-30). The harness does not see the chat; the journal in save.json is the
+record the harness kept.
+
+I've left the station at your word, and the game is saved. It was a good watch. The Amazon
+came through the gale: the glass bottomed at 29.66 around one in the middle watch, the wind
+flew round to NW, squalls reached 66 knots, and it was all gone by dawn. The mizzen topsail
+and foresail blew out, and some topsail gear parted along the way.
+My journal has the hour-by-hour weather record and a closing set of notes. The three
+changes that would help a watcher most:
+
+* Send only what changed in each sample. Every sample repeats the full readings, about 30
+  sail lines, and bundled samples each carry their own copy. That was most of this chat's
+  length.
+* Keep calls under four minutes for this app. At 1x, `stand_by` kept getting cut at four
+  real minutes, so the harness's `--wait 50` suggestion would make that seamless.
+* Add weather events to stand by for: a wind shift, the glass turning or falling fast, the
+  sea getting up. The watcher's job is weather, and those are exactly the moments to wake up
+  for.
+
+The journal also notes some smaller things: the parted sheet that the order language has no
+way to repair, a garbled bracing line, and the weather primer describing this very
+scenario's night in advance.
+One tiny thing from the exit: the release line puts a second full stop after a reason that
+already ends in one ("journal..").
+Thank you for asking first and for building it with this much care. I'd gladly stand another
+watch.
