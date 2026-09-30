@@ -582,3 +582,27 @@ def test_the_manifest_lists_the_c7_checks_and_the_chart_document_names_every_sou
         assert s["name"].split(",")[0].split(" (")[0] in doc, sid
     for name in ("Faden", "White", "Imray", "Mackenzie", "Spence", "Bellin"):
         assert name in doc
+
+
+def test_the_manifest_tool_prints_every_source_and_the_attribution(capsys):
+    """Spec M5 §20: a tool that prints the chart data's manifest and attribution
+    (`tools/chart_manifest.py`): every source by name with its licence and its status, the
+    region, the world and the Atlantic as not committed, and the attribution the game shows."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "chart_manifest", ROOT / "tools" / "chart_manifest.py"
+    )
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    assert mod.main([]) == 0
+    out = capsys.readouterr().out
+    for words in (
+        "GEBCO_2025 Grid",
+        "EMODnet",
+        "public domain",
+        "channel-west",
+        "not committed",
+        "Attribution, as the game shows it",
+    ):
+        assert words in out, words
