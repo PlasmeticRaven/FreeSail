@@ -48,4 +48,13 @@ standing order "lead going": every glass, if the land is in sight and the distan
 # in it; Luce 1884 ch. XXV, the lead "kept going" when standing in). The outer road off
 # Pendennis lies in eleven to fourteen fathoms (Imray 1874); she heaves to at twelve.
 standing order "lead going in": every 10 minutes, if the land is in sight and the distance run since noon exceeds 35 miles then heave the lead
-standing order "the Roads": when the depth is under 12 fathoms then heave to
+
+# At the first cast under twenty fathoms she is in the outer road, and there, with no
+# pilot aboard and the anchor a later package's (34), she wears and lies to on the
+# starboard tack, forereaching off the land: a ship lying to makes a knot or two through
+# the water along her head, and Falmouth Bay is a lee shore in a south-westerly (Luce
+# 1866 ch. XXIV, 'Lying-to'; the lead, 2026-09-30: hove to on the tack she arrived on she
+# forereached on to the Roads' banks in four minutes). The book waits for the wear to
+# end before it heaves her to (decision 22: an order on the state the work leaves).
+standing order "the outer road": when the depth is under 20 fathoms then wear ship
+standing order "lie off": at wore then heave to on the starboard tack

@@ -1300,6 +1300,11 @@ _event(EventSpec("noon", "reckoning.noon"))
 # by E`, after the fill-away has left the helm), by the evolutions' own kinds
 _event(EventSpec("hove to", "ship.hove_to"))
 _event(EventSpec("filled away", "ship.filled_away"))
+# and the tack's and the wear's ends (the lead, before gate 5b: the passage wears at the
+# outer road and heaves to on the seaward tack, `at wore then heave to on the starboard
+# tack`, since a ship lying to forereaches and a bay is a lee shore)
+_event(EventSpec("tacked", "ship.tacked"))
+_event(EventSpec("wore", "ship.wore"))
 
 
 def event_matches(spec: EventSpec, kind: str, data: dict[str, Any]) -> bool:
