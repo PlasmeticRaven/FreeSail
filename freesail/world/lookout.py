@@ -30,7 +30,9 @@ from freesail.world.geo import estimate_words
 
 __all__ = [
     "DEFAULT_HEIGHT_OF_EYE_M",
+    "LOOKOUT_HAIL_MAX",
     "LOOKOUT_REPEAT_MIN",
+    "READING_MAX",
     "Lookout",
     "height_of_eye",
     "relative_words",
@@ -43,6 +45,15 @@ DEFAULT_HEIGHT_OF_EYE_M = 30.0
 # A feature lost and found again within this many minutes is not hailed again
 # (judgement: a headland flickering at the edge of the haze is not a line a minute).
 LOOKOUT_REPEAT_MIN = 30
+
+# A look hails at most this many things newly in sight, dangers first, then lights, the
+# land and the marks, nearest first; the rest are in the reading and not the log
+# (judgement: off Falmouth's mouth fifty features are in sight, and a lookout hails the
+# Black Rock, not every church behind the town).
+LOOKOUT_HAIL_MAX = 6
+
+# `what is in sight` names at most this many, nearest first, and counts the rest.
+READING_MAX = 8
 
 MAST_CLASSES = frozenset({"mast", "topmast", "topgallant_mast", "royal_mast"})
 
@@ -111,12 +122,18 @@ class Lookout:
         lines: list[tuple[Severity, str, str, dict[str, Any]]] = []
         land_now = any(s.seen_as in ("land", "light") for s in found)
         first_land = land_now and not self._had_land
+        # what is newly in sight, dangers first, then lights, the land, the marks, nearest
+        # first within each; a lookout hails the few that matter (LOOKOUT_HAIL_MAX) and the
+        # rest are in the reading, not the log
+        order = {"danger": 0, "light": 1, "land": 2, "mark": 3}
+        fresh = []
         for s in found:
             last = self._announced.get(s.feature.id)
-            if last is not None and minute - last < LOOKOUT_REPEAT_MIN:
-                self._announced[s.feature.id] = minute
-                continue
             self._announced[s.feature.id] = minute
+            if last is None or minute - last >= LOOKOUT_REPEAT_MIN:
+                fresh.append(s)
+        fresh.sort(key=lambda s: (order.get(s.seen_as, 9), s.distance_m))
+        for s in fresh[:LOOKOUT_HAIL_MAX]:
             text = self.words(s, heading)
             # a danger is notable; so is everything seen in the look that makes the landfall
             notable = s.seen_as == "danger" or first_land
@@ -167,9 +184,11 @@ class Lookout:
                     "words": self.words(s, heading_rad).rstrip("."),
                 }
             )
-        words = (
-            "; ".join(i["words"][:1].lower() + i["words"][1:] for i in items) or "nothing in sight"
-        )
+        named = [i["words"][:1].lower() + i["words"][1:] for i in items[:READING_MAX]]
+        rest = len(items) - len(named)
+        if rest > 0:
+            named.append(f"and {rest} more in sight")
+        words = "; ".join(named) or "nothing in sight"
         return {"count": len(items), "words": words, "items": items}
 
     def land(self, heading_rad: float) -> dict[str, Any]:
