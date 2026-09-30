@@ -4,7 +4,7 @@ Since milestone 5 the wind has a cause. Somewhere beyond the horizon a low is pa
 
 ## The glass
 
-If the ship carries a barometer (the scenario file says, `glass: true` under `ship:`; the frigate of the gate's day has her captain's own, and a small vessel may well have none), `the glass` is a reading: the height of the mercury in inches, to the hundredth, as the vernier of a marine barometer reads it.
+If the ship carries a barometer (the scenario file says, `glass: true` under `ship:`; the frigate of the scenarios shipped with the game has her captain's own, and a small vessel may well have none), `the glass` is a reading: the height of the mercury in inches, to the hundredth, as the vernier of a marine barometer reads it.
 
 ```
 the glass is 29.72 inches
@@ -89,10 +89,10 @@ What the game does with the words: a smooth sea under half a metre of significan
 The log says the sea when its words change, and the hour's line carries it with the glass:
 
 ```
-  Morning watch (05:04)  A short chopping sea getting up.
-  First watch (20:45)  A heavy sea getting up.
-  Middle watch, 3 bells (01:30)  Overcast, drizzle; the glass 29.71; a heavy sea, rolling heavily.
-  Forenoon watch (08:22)  A heavy sea, the sea going down.
+  Forenoon watch (10:41)  A short chopping sea getting up.
+  First dog watch (17:26)  A heavy sea getting up.
+  Middle watch, 5 bells (02:30)  Overcast, drizzle; the glass 29.62; a heavy sea, rolling heavily.
+  Afternoon watch (13:07)  A heavy sea, the sea going down.
 ```
 
 ## The ship's motion
@@ -117,9 +117,9 @@ standing order "easy again": when the sea is not heavy and the motion is easy th
 The log says the motion when its words have changed and held for five minutes:
 
 ```
-  First watch (21:57)  Rolling heavily.
-  First watch (22:54)  Labouring heavily.
-  Middle watch (01:04)  Pitching heavily, the sea under her stern.
+  Last dog watch (18:33)  Rolling heavily.
+  First watch (23:19)  Labouring heavily.
+  Morning watch (05:52)  Pitching heavily, the sea under her stern.
 ```
 
 ## What a captain of 1805 did not know
@@ -128,4 +128,6 @@ He knew the glass falls before a southerly gale, that the wind will back as the 
 
 ## Where the weather comes from
 
-A scenario file gives its weather in two forms, and a captain need know neither (`freesail/world/scenarios.py` has the syntax; the author's view, not the deck's). The pinned `wind` waypoints of milestone 4 set the wind directly and are what every truth is measured on. The `systems` are the milestone 5 form: a low or a high as a track of positions and central pressures, from which the wind, the glass and the sky at the ship follow; or `climatology: true`, and the month's systems are drawn from `data/weather/climatology.yaml`, the first pass of a table that says how often the lows come, where they pass, how deep they are and where the highs sit, checked against the shares of westerly and easterly days that the Royal Navy's logbooks of 1750 to 1854 give for the Channel. When both forms are given the pinned wind wins and the systems give only the sky and the glass. The gate's day of milestone 4 (`data/scenarios/gate-4c-day.yaml`) now carries both: a low passing well north of Falmouth with the ship in its warm sector, the cold front through at ten in the evening, the gale in the cold air behind it and the ridge by dawn, the glass falling slowly all day and rising fast in the gale.
+The shape behind all of these readings, which the game never names in any line you read, is the depression of the kind that crosses the Channel most weeks of the year, and it is worth knowing in general terms. Its centre passes to the north of a ship in the Channel more often than to the south. Ahead of it the glass falls and the wind backs into the south or south-west; the sky thickens from the westward, high cloud first and then a low grey sheet with rain or drizzle, which is the warm front going over. Behind that front the ship is in the warm sector: the wind steady in the south-west or west, the glass still falling but slowly, the air mild and hazy with drizzle, and it may stay so for a day. Then the cold front: the wind veers sharply, three or four points toward the north-west, the glass touches its lowest and turns, and the air behind is cold and unstable, clear between hard-edged showers, with the squalls of the section above; it is here that the wind blows hardest, Luce's "just beginning to rise, directly after having been very low". The gale eases as the glass climbs and a ridge of high pressure follows the low, the sky clearing, the wind falling light and the sea, which was slower to rise than the wind, slower to go down. A low that passes to the south of the ship gives the mirror of it: an easterly backing through north, cold and wet, and no warm sector at all. How long each stage lasts and how hard it blows is the low's own business and differs from one to the next; a scenario's day may hurry it or draw it out, and the log's first line names the scenario, which is all a captain is told.
+
+A scenario file gives its weather in one of two forms, and a captain need know neither (`freesail/world/scenarios.py` has the syntax; the author's view, not the deck's). A pinned `wind` is a list of waypoints the wind follows exactly, its gusts and its wander drawn as in neutral air unless a waypoint says the air is warm or unstable from its moment on; `systems` are a low or a high as a track of positions and central pressures, from which the wind, the glass and the sky at the ship follow, the air being whatever sector the ship is in; or `climatology: true`, and the month's systems are drawn from `data/weather/climatology.yaml`, the first pass of a table that says how often the lows come, where they pass, how deep they are and where the highs sit, checked against the shares of westerly and easterly days that the Royal Navy's logbooks of 1750 to 1854 give for the Channel. When both forms are given the pinned wind wins and the systems give only the sky and the glass. The days the tests are measured on exist in both forms; what they hold, hour by hour, is for the tests and not for the deck.
