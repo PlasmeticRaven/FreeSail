@@ -1952,6 +1952,8 @@ GATE_DAY_TRIM_ON_A_SHIFT_TICKS = [
     82056,
     82680,
     87053,
+    98501,  # two more after package 32e: the sheets held as trimmed through the ease
+    98938,  # of the gale, the wind's wander fires the point rule twice in the forenoon
 ]
 
 
