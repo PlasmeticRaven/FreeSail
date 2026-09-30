@@ -105,11 +105,13 @@ KINDS: dict[str, str] = {
     "strain": "the strain: exceeds the rating, exceeds 1.2, is straining",
     "hands": "the hands: exceeds N, are fresh, are tired, are worn out",
     "glass": "the glass in inches: exceeds, is over, is under, is below 29.5",
-    "tendency": "the glass's tendency: is steady, is rising, is falling, is falling fast",
+    "tendency": "the glass's tendency: is steady, is rising, is falling, is falling fast, "
+    "is turning",
     "sky": "the sky: is clear, is overcast, is dark and gloomy, is threatening, is hazy",
     "weather": "the weather: is fine, is rain, is drizzle, is squally, is fog",
     "visibility": "the visibility: is the horizon, is a few miles, is a mile, is a cable",
-    "sea": "the sea: is smooth, is moderate, is short, is heavy, is very heavy, is confused",
+    "sea": "the sea: is smooth, is moderate, is short, is heavy, is very heavy, is confused, "
+    "gets up",
     "motion": "the motion: is easy, is rolling, is rolling heavily, is pitching, is labouring",
     "absent": "not a reading the ship has yet",
 }
@@ -888,13 +890,24 @@ REGISTRY.add_absent(
 @dataclass(frozen=True)
 class EventSpec:
     """A log kind the runtime watches for, and a test on the event's data where the kind
-    alone is not enough ("eight bells" is a `clock.bell` with eight in it)."""
+    alone is not enough ("eight bells" is a `clock.bell` with eight in it); `also`, more
+    kinds that are the same event ("a change in the sky" is the sky's line or the
+    weather's).
+
+    Or, where the log has no line for it, a reading's change (package 31c): `watch` is a
+    condition in the standing dialect's words, and the event is that condition coming to
+    hold, each time it does ("the glass falling fast" is the tendency coming to "falling
+    fast"). One condition serves both watchers: a stand-by (`agents.harness`) and a
+    standing order's `at` (`standing.rules.event_condition`, which the runtime evaluates as
+    a `when`), so the dialect has the event for nothing and the two cannot disagree."""
 
     words: str
     kind: str
     test: Callable[[dict[str, Any]], bool] | None = None
     absent: str | None = None  # registered but not yet raised by anything in the world
     data: dict[str, Any] = field(default_factory=dict)
+    also: tuple[str, ...] = ()
+    watch: str | None = None  # the dialect's condition whose coming to hold is the event
 
 
 def _bells_test(n: int) -> Callable[[dict[str, Any]], bool]:
@@ -934,6 +947,27 @@ _event(EventSpec("all hands called", "crew.all_hands"))
 _event(EventSpec("the watch piped down", "crew.piped_down"))
 # a squall (spec M5 §3): the wind's own event in unstable air, logged by name
 _event(EventSpec("a squall", "weather.squall"))
+# The weather's other events to stand by for (package 31c; playtest 11's finding 3: "the
+# watcher's work is weather, but I can't stand by for a wind shift, the glass turning or
+# falling fast, the sea getting up, or a change in the sky"). The sky's and the weather's
+# words each have a line in the log when they change; the rest are the readings' changes,
+# watched as conditions (`EventSpec.watch`), since the log says a shift only past two
+# points of the wind itself and never the glass's tendency.
+#   a wind shift: the ten minutes' mean wind a point or more from where it stood when the
+#     watch for it began (a stand-by, a standing order), and afresh from each shift; the
+#     mean and not the wind itself, which wanders a point either way in any breeze (the
+#     day under systems: W and W by N by turns all its forenoon)
+#   the glass falling fast: its tendency coming to "falling fast" (a tenth in three hours)
+#   the glass turning: the last hour's change against the three hours' (`rules`,
+#     GLASS_TURN_IN): the rise after the low, the fall after the high
+#   (the glass's two once a fall or a turn: again only after an hour without, since its
+#     words hover about their thresholds; `standing.rules.EVENT_SETTLE_S`)
+#   the sea getting up: its words changing upward (a short sea to a heavy one)
+_event(EventSpec("a wind shift", "", watch="the mean wind shifts 1 point"))
+_event(EventSpec("the glass falling fast", "", watch="the glass is falling fast"))
+_event(EventSpec("the glass turning", "", watch="the glass is turning"))
+_event(EventSpec("the sea getting up", "", watch="the sea gets up"))
+_event(EventSpec("a change in the sky", "weather.sky", also=("weather.change",)))
 _event(
     EventSpec(
         "a sighting",
@@ -951,7 +985,9 @@ _event(
 
 
 def event_matches(spec: EventSpec, kind: str, data: dict[str, Any]) -> bool:
-    if kind != spec.kind:
+    """Whether a log line of `kind` with `data` is the event. An event that is a reading's
+    change (`EventSpec.watch`) is never a line: its watcher evaluates its condition."""
+    if not kind or (kind != spec.kind and kind not in spec.also):
         return False
     return spec.test(data) if spec.test is not None else True
 

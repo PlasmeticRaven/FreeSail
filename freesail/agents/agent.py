@@ -72,6 +72,10 @@ SESSION_SOLO = "a play session for its own sake, with no human captain present"
 # is manned; the later ones are milestones 6 and 7b's.
 STATION_NAMES: tuple[str, ...] = ("watcher", "officer of the watch", "captain", "director")
 
+# The stations the game can man now, each with its brief and a door to it (`watcher`
+# below; `remote.STATIONS`): the ones a standing order may tell or ask (package 31c).
+STATIONS_ABOARD: tuple[str, ...] = ("watcher",)
+
 
 class Authority(Enum):
     """What an agent at a station may submit (spec §11). Only NONE is exercised in

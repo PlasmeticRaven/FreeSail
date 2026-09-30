@@ -22,13 +22,18 @@ from freesail import units
 from freesail.api import readings as R
 
 __all__ = [
+    "CHANGE_OPS",
+    "EVENT_SETTLE_S",
+    "GLASS_TURN_IN",
     "RANKS",
     "STANDING_DWELL_S",
     "Clause",
     "Comparison",
     "Condition",
+    "EventCondition",
     "Rule",
     "Trigger",
+    "event_condition",
     "officer_words",
     "rank_of",
 ]
@@ -49,6 +54,20 @@ RANKS: tuple[str, ...] = (
     "master's mate",
     "midshipman",
 )
+
+
+# The glass is turning when the last hour's change goes against the three hours' by this
+# much, each way at least (package 31c, "the glass turning"). The glass reads to the
+# hundredth and pumps a hundredth or two in a seaway (W §3; `world.weather.GLASS_PUMP_MAX_IN`),
+# so a turn is three hundredths in the hour against three or more in the three hours the
+# other way, the same three hundredths that divide steady from rising or falling there
+# (`TENDENCY_STEADY_IN_PER_3H`). Judgement, checked on the day under systems at seed 7,
+# watched a minute at a time: it turns at 01:53 on the second day, fifty minutes after the
+# low's bottom at 29.66, where the watcher of playtest 11 saw "the glass began to rise",
+# and once (`EVENT_SETTLE_S`); not once in the steady forenoon, where the hour's change
+# wanders a hundredth or two either way, nor at 08:30 the next morning, where the pumping
+# of a very heavy sea dips it two hundredths.
+GLASS_TURN_IN = 0.03
 
 
 def rank_of(officer: str) -> int:
@@ -105,6 +124,25 @@ def _sea_is(reading: dict[str, Any], word: str) -> bool:
     if word == "heavy":
         return reading["state"] in ("heavy", "very heavy")
     return reading["state"] == word
+
+
+def _glass_turning(tendency: dict[str, Any]) -> bool:
+    """The last hour's change against the three hours', each at least `GLASS_TURN_IN`:
+    the rise after a fall, or the fall after a rise."""
+    one, three = tendency.get("one_hour_in"), tendency.get("three_hours_in")
+    if one is None or three is None:
+        return False
+    # to the hundredth, as the glass reads: the record's differences carry float noise
+    one, three = round(one, 2), round(three, 2)
+    return one * three < 0 and abs(one) >= GLASS_TURN_IN and abs(three) >= GLASS_TURN_IN
+
+
+def _sea_rank(reading: dict[str, Any]) -> int:
+    """The sea's state word as a rank, smooth lowest (`readings.SEA_STATE_WORDS`)."""
+    from freesail.world.sea import SEA_STATE_WORDS
+
+    state = reading.get("state")
+    return SEA_STATE_WORDS.index(state) if state in SEA_STATE_WORDS else -1
 
 
 def _motion_is(reading: dict[str, Any], word: str) -> bool:
@@ -181,8 +219,19 @@ class Clause:
             return (value["bells"] == v) if op == "is" else (value["bells"] != v)
         if kind in ("daylight", "gust", "weather"):
             return (value == v) if op == "is" else (value != v)
+        if kind == "tendency" and v == "turning":
+            turning = _glass_turning(value)
+            return turning if op == "is" else not turning
         if kind in ("tendency", "sky", "visibility"):
             return (value["words"] == v) if op == "is" else (value["words"] != v)
+        if kind == "sea" and op == "gets_up":
+            # measured from the sea when the rule was armed, as a wind's shift is, and
+            # afresh after each firing (`spend_shift`)
+            key = f"{self.text}:reference"
+            if key not in memory:
+                memory[key] = _sea_rank(value)
+                return False
+            return _sea_rank(value) > memory[key]
         if kind in ("sea", "motion"):
             holds = _sea_is(value, v) if kind == "sea" else _motion_is(value, v)
             return holds if op == "is" else not holds
@@ -204,10 +253,11 @@ class Clause:
         """A wind's shift that fired the rule is spent: the next is measured from the
         direction now (package 29b, "trim on a shift": a wind veering steadily through a
         night is trimmed to point by point)."""
-        if self.comparison.op in ("backs", "veers", "shifts"):
+        if self.comparison.op in CHANGE_OPS:
             value = self._values(view)[0]
             if value is not None:
-                memory[f"{self.text}:reference"] = value
+                ref = _sea_rank(value) if self.comparison.op == "gets_up" else value
+                memory[f"{self.text}:reference"] = ref
 
     def holds(self, view: R.ReadingsView, memory: dict[str, Any] | None = None) -> bool:
         memory = memory if memory is not None else {}
@@ -236,6 +286,8 @@ class Clause:
             for now, then in (("backs", "backed"), ("veers", "veered"), ("shifts", "shifted")):
                 done = done.replace(now, then)
             return f"{self.phrase} {verb} {said}, and has not {done}"
+        if self.comparison.op == "gets_up":
+            return f"{self.phrase} {verb} {said}, and has not got up"
         return f"{self.phrase} {verb} {said}, not {self.comparison.text}"
 
 
@@ -265,6 +317,73 @@ class Condition:
         return list(dict.fromkeys(c.reading for c in self.clauses))
 
 
+@dataclass
+class EventCondition(Condition):
+    """An event that is a reading's change (`readings.EventSpec.watch`, package 31c): its
+    condition coming to hold, each time it does. `holds` is true on the tick it comes to
+    hold, not while it goes on holding, and false at the first look, which sets what a
+    change is measured from (the glass already falling fast is not the glass coming to
+    fall fast). At each coming to hold a change the condition measures (the wind's shift,
+    the sea getting up) is measured afresh from there, so a steady veer is an event at
+    each point. A standing order's `at` evaluates it as its `when` condition (`Trigger`),
+    a stand-by once a tick (`agents.harness`); each keeps its own memory."""
+
+    def holds(self, view: R.ReadingsView, memory: dict[str, Any] | None = None) -> bool:
+        memory = memory if memory is not None else {}
+        # every clause is read, so that each sets its reference at the first look
+        now = all([c.holds(view, memory) for c in self.clauses])
+        key, quiet = f"{self.text}:held", f"{self.text}:false since"
+        was = memory.get(key)
+        memory[key] = now
+        if not now:
+            if was is not False:
+                # false from here; false at the first look is false long enough
+                memory[quiet] = view.tick if was else None
+            return False
+        if was is not False:
+            return False  # the first look, or holding still
+        since = memory.get(quiet)
+        change = any(c.comparison.op in CHANGE_OPS for c in self.clauses)
+        if not change and since is not None and view.tick - since < EVENT_SETTLE_S:
+            return False  # the same event come again inside the settle
+        for c in self.clauses:
+            c.spend_shift(view, memory)
+        return True
+
+
+# The comparisons that measure a change from a reference, spent when they fire.
+CHANGE_OPS: tuple[str, ...] = ("backs", "veers", "shifts", "gets_up")
+
+# An event that is a state coming to hold (the glass falling fast, the glass turning) comes
+# again only once its condition has been false this long (package 31c). The glass's words
+# hover about their thresholds: on the day under systems at seed 7 the tendency sat about
+# a tenth in three hours from 21:00 to 21:52, "falling fast" coming and going eight times,
+# and the hour's change about three hundredths for an hour after the low; a fall that
+# eases for a few minutes and comes again inside the hour is the same fall. An hour, the
+# glass's own span (the tendency is read by the hour and the three hours; judgement). A
+# change measured from a reference (the wind's shift, the sea getting up) has none, since
+# it is measured afresh from each: each point of a steady veer is an event.
+EVENT_SETTLE_S = 3600
+
+# The events' conditions, parsed once (their clauses keep no state; the memory is the
+# caller's).
+_EVENT_CONDITIONS: dict[str, Condition] = {}
+
+
+def event_condition(words: str) -> EventCondition | None:
+    """The condition of an event that is a reading's change, by the event's words; None
+    for an event the log says (a bell, a squall) or no event at all."""
+    spec = R.EVENTS.get(words)
+    if spec is None or spec.watch is None:
+        return None
+    base = _EVENT_CONDITIONS.get(words)
+    if base is None:
+        from freesail.standing.grammar import parse_condition
+
+        base = _EVENT_CONDITIONS[words] = parse_condition(spec.watch)
+    return EventCondition(list(base.clauses), base.text)
+
+
 # ---------------------------------------------------------------------------
 # Triggers and rules
 # ---------------------------------------------------------------------------
@@ -272,7 +391,11 @@ class Condition:
 
 @dataclass
 class Trigger:
-    """`when <condition> [for <duration>]`, `at <event>` or `every <interval>`."""
+    """`when <condition> [for <duration>]`, `at <event>` or `every <interval>`.
+
+    `at` an event that is a reading's change ("at the glass falling fast", package 31c) is
+    kept as a `when` of the event's condition (`event_condition`): the runtime evaluates it
+    with the `when` orders, edge and dwell alike, and the book says it as it was given."""
 
     kind: str  # "when" | "at" | "every"
     text: str
@@ -280,6 +403,13 @@ class Trigger:
     duration_s: int = 0
     event: str | None = None  # the event's words, a key of readings.EVENTS
     interval_s: int = 0
+
+    def __post_init__(self) -> None:
+        if self.kind == "at" and self.event is not None:
+            watched = event_condition(self.event)
+            if watched is not None:
+                self.kind = "when"
+                self.condition = watched
 
 
 @dataclass

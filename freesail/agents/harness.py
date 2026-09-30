@@ -516,7 +516,10 @@ class Harness:
             return
         if not self.started or self.agent.released:
             return
-        new = [world.log[i] for i in range(self._seen_log, len(world.log))]
+        # the lines since the last look, less any a sample has carried already (a question
+        # sampled on the order, after the lines of its tick: package 31c, a standing
+        # order's `ask`, whose firing line is notable, sampled once and not twice)
+        new = [world.log[i] for i in range(max(self._seen_log, self._sample_seen), len(world.log))]
         self._seen_log = len(world.log)
         if self._open is not None:
             # the floor is the model's: a sampling point folds into the open sample
@@ -1453,9 +1456,11 @@ class Harness:
         self.agent.question = " ".join(text.split())
         self._sample(reason)
 
-    def put_question(self, question: str) -> str:
+    def put_question(self, question: str, by: str = "", officer: str = "the captain") -> str:
         """`ask the <station> <question>`: the question is answered at this tick, after
-        the order is logged (`on_order`)."""
+        the order is logged (`on_order`). `by` names a standing order that asks it
+        (package 31c), which the log line names as the speaker, in `officer`'s name; the
+        question itself is put as the captain's own would be."""
         a = self.agent
         question = " ".join(question.split()).rstrip("?")
         if not question:
@@ -1470,14 +1475,19 @@ class Harness:
                 f"{self.station.name}' first."
             )
         a.question = question
+        if by:
+            return f"By {by}: {officer} asks the {self.station.name}: {question}?"
         return f"Asked the {self.station.name}: {question}?"
 
-    def put_word(self, words: str) -> str:
+    def put_word(self, words: str, by: str = "", officer: str = "the captain") -> str:
         """`tell the <station> <words>` (package 29, the owner's tenth item): the words go
         to the model in its next sample under `word`, not `question`: no answer is owed,
         and nothing that waits on a question is set by them. The sample is taken at the
         next tick (so that an `ask` given at once after rides in the same sample); a
-        stand-by is woken by it, a turn already open has it folded in."""
+        stand-by is woken by it, a turn already open has it folded in. `by` names a
+        standing order that says it (package 31c): the log line names it as the speaker
+        ("By standing order 'sea': the captain to the watcher: ..."), and the words ride
+        the sample as the captain's own would."""
         a = self.agent
         words = " ".join(str(words).split())
         if not words:
@@ -1492,6 +1502,8 @@ class Harness:
                 f"{self.station.name}' first."
             )
         a.word = f"{a.word}\n{words}" if a.word else words
+        if by:
+            return f"By {by}: {officer} to the {self.station.name}: {words}"
         return f"The captain to the {self.station.name}: {words}"
 
     # -- release -----------------------------------------------------------------------

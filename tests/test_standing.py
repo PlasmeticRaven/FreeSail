@@ -577,6 +577,107 @@ TABLE: list[tuple[str, str, ok | no]] = [
         'standing order "x": when the true wind exceeds thirty then trim sails',
         no(["what number"]),
     ),
+    # -- package 31c: the weather's events, the new comparisons, the station verbs ------
+    # an event that is a reading's change is kept as a `when` of its condition
+    (
+        F,
+        'standing order "g": at the glass falling fast then take in the royals',
+        ok("when", "tendency", "is", "falling fast", event="the glass falling fast"),
+    ),
+    (
+        F,
+        'standing order "g": at glass falling fast then take in the royals',
+        ok("when", "tendency", "is", "falling fast", event="the glass falling fast"),
+    ),
+    (
+        F,
+        'standing order "t": at the glass turning then trim sails',
+        ok("when", "tendency", "is", "turning", event="the glass turning"),
+    ),
+    (
+        F,
+        'standing order "s": at a wind shift then trim sails',
+        ok("when", "mean_true_wind_from", "shifts", (1.0, 1.0), event="a wind shift"),
+    ),
+    (
+        F,
+        'standing order "u": at the sea getting up, if the true wind exceeds 30 knots then '
+        "reef the topsails, one reef",
+        ok(
+            "when", "sea", "gets_up", None, event="the sea getting up", if_reading="true_wind_speed"
+        ),
+    ),
+    (
+        F,
+        'standing order "c": at a change in the sky then trim sails',
+        ok("at", event="a change in the sky"),
+    ),
+    (
+        F,
+        'standing order "t": when the glass is turning then trim sails',
+        ok("when", "tendency", "is", "turning"),
+    ),
+    (
+        F,
+        'standing order "u": when the sea gets up then trim sails',
+        ok("when", "sea", "gets_up", None),
+    ),
+    (
+        F,
+        'standing order "u": when the sea is getting up for 5 minutes then trim sails',
+        ok("when", "sea", "gets_up", None, duration=300),
+    ),
+    (
+        F,
+        'standing order "x": when the heel gets up then trim sails',
+        no(["'the heel' cannot be 'gets up'"]),
+    ),
+    (F, 'standing order "x": at the glass rising then trim sails', no(["names no event"])),
+    # the station verbs after 'then' (the owner's finding at gate 5a): tell and ask, to a
+    # station aboard, resolved when the order is given
+    (
+        F,
+        'standing order "sea": when the sea is heavy then tell the watcher the sea is getting up',
+        ok("when", "sea", "is", "heavy", actions=1),
+    ),
+    (
+        F,
+        'standing order "glass": every glass then ask the watcher how the glass stands; '
+        "say to the watcher keep a weather eye",
+        ok("every", interval=1800, actions=2),
+    ),
+    (
+        F,
+        'standing order "w": at eight bells then tell watcher the watch is changed; trim sails',
+        ok("at", event="eight bells", actions=2),
+    ),
+    (
+        F,
+        'standing order "look": at sunset then tell the lookout to look sharp',
+        no(["'tell the lookout to look sharp' is refused", "there is no lookout aboard yet"]),
+    ),
+    (
+        F,
+        'standing order "o": at sunset then ask the officer of the watch how she heads',
+        no(["there is no officer of the watch aboard yet", "tell or ask the watcher"]),
+    ),
+    (
+        F,
+        'standing order "c": at sunset then ask the captain whether to shorten sail',
+        no(["a standing order speaks for the captain"]),
+    ),
+    (
+        F,
+        'standing order "d": at sunset then stand down the watcher',
+        no(["the captain's own to say to a station, not a standing order's"]),
+    ),
+    (
+        F,
+        'standing order "j": at sunset then show the watcher\'s journal',
+        no(["the captain's own to say to a station"]),
+    ),
+    (F, 'standing order "e": at sunset then tell the watcher', no(["Tell the watcher what?"])),
+    (F, 'standing order "e": at sunset then ask the watcher', no(["Ask the watcher what?"])),
 ]
 
 
@@ -1313,3 +1414,167 @@ def test_completion_knows_the_words():
     )
     got = complete.suggestions(ship, 'standing order "x": at sunset then set the roy')
     assert 'standing order "x": at sunset then set the royals' in got
+
+
+# ---------------------------------------------------------------------------
+# Package 31c: the weather's events in the dialect, and the station verbs
+# ---------------------------------------------------------------------------
+
+
+def tendency(words: str, three: float = 0.0, one: float = 0.0) -> dict[str, Any]:
+    return {"words": words, "three_hours_in": three, "one_hour_in": one}
+
+
+def test_an_event_that_is_a_readings_change_fires_at_its_onset_each_time(synthetic):
+    """The glass falling fast is the tendency coming to "falling fast": not while it goes
+    on falling fast, and not at the first look (an order given while it is falling fast
+    waits for the next time it comes); and a fall that eases for a while and comes again
+    inside the hour (`EVENT_SETTLE_S`) is the same fall, not a new event, since the glass's
+    words hover about their thresholds. The same condition a stand-by watches
+    (`rules.event_condition`)."""
+    from freesail.standing.rules import EVENT_SETTLE_S
+
+    glass = {"v": tendency("falling fast", -0.12, -0.04)}
+    synthetic("tendency", lambda w: glass["v"])
+    w = point_world()
+    rule = rule_of("at the glass falling fast", w)
+    assert rule.trigger.kind == "when" and rule.trigger.event == "the glass falling fast"
+    assert rule.trigger.text == "at the glass falling fast"
+    w.run(STANDING_DWELL_S + 60)
+    assert firings(w) == [], "falling fast when given: not the event"
+    glass["v"] = tendency("falling", -0.08, -0.02)
+    w.run(600)
+    glass["v"] = tendency("falling fast", -0.11, -0.04)
+    w.run(600)
+    assert firings(w) == [], "come again inside the hour: the same fall"
+    glass["v"] = tendency("falling", -0.08, -0.02)
+    w.run(EVENT_SETTLE_S)
+    glass["v"] = tendency("falling fast", -0.11, -0.04)
+    w.run(10)
+    first = firings(w)
+    assert len(first) == 1, "an hour without: this is a new fall"
+    w.run(STANDING_DWELL_S + 60)  # it goes on falling fast: no second firing
+    assert firings(w) == first
+    for _ in range(3):  # hovering about the tenth: the same fall
+        glass["v"] = tendency("falling", -0.09, -0.02)
+        w.run(120)
+        glass["v"] = tendency("falling fast", -0.10, -0.03)
+        w.run(240)
+    assert firings(w) == first
+    glass["v"] = tendency("falling", -0.09, -0.02)
+    w.run(EVENT_SETTLE_S + 10)
+    glass["v"] = tendency("falling fast", -0.12, -0.05)
+    w.run(1)
+    assert len(firings(w)) == 2
+    assert EVENT_SETTLE_S == 3600
+    assert "at the glass falling fast then steer 90" in w.standing.book.lines()[1]
+
+
+def test_a_wind_shift_is_the_mean_wind_a_point_from_where_it_stood(synthetic):
+    """'a wind shift' is the ten minutes' mean a point or more from where it stood when the
+    order was given, and afresh from each shift: a steady veer is an event at each point."""
+    mean = {"v": 0.0}
+    synthetic("mean_true_wind_from", lambda w: mean["v"])
+    w = point_world()
+    rule_of("at a wind shift", w)
+    w.run(10)
+    mean["v"] = 0.9 * units.POINT
+    w.run(10)
+    assert firings(w) == []
+    mean["v"] = 1.05 * units.POINT
+    w.run(1)
+    assert firings(w) == [21]
+    w.run(STANDING_DWELL_S + 10)
+    assert firings(w) == [21], "held there: no second shift"
+    mean["v"] = units.wrap_2pi(-0.1 * units.POINT)  # backed a point from where it fired
+    w.run(1)
+    assert len(firings(w)) == 2
+
+
+def test_the_sea_getting_up_is_its_words_upward_and_the_glass_turning_its_hour_against_three(
+    synthetic,
+):
+    from freesail.standing.rules import GLASS_TURN_IN, event_condition
+
+    sea = {"v": {"words": "a moderate sea", "state": "moderate", "confused": False}}
+    synthetic("sea", lambda w: sea["v"])
+    w = point_world()
+    rule_of("at the sea getting up", w, name="sea")
+    w.run(10)
+    sea["v"] = {"words": "a smooth sea", "state": "smooth", "confused": False}
+    w.run(10)
+    assert firings(w, "sea") == [], "going down is not getting up"
+    sea["v"] = {"words": "a moderate sea", "state": "moderate", "confused": False}
+    w.run(10)
+    assert firings(w, "sea") == [], "back to where it stood when the order was given"
+    sea["v"] = {"words": "a short chopping sea", "state": "short", "confused": False}
+    w.run(1)
+    assert firings(w, "sea") == [31]
+    # the glass turning: the last hour's change against the three hours', three hundredths
+    # each way at least
+    assert GLASS_TURN_IN == 0.03
+    cond = event_condition("the glass turning")
+    for three, one, turning in (
+        (-0.12, 0.01, False),  # a hundredth in the hour is the glass's noise
+        (-0.08, 0.03, True),  # the rise after the low
+        (0.11, -0.02, False),  # the pumping of a heavy sea
+        (0.10, -0.04, True),  # the fall after the high
+        (-0.02, 0.05, False),  # steady over three hours: nothing to turn from
+        (-0.08, -0.03, False),  # falling still
+    ):
+        clause = cond.clauses[0]
+        assert clause._one(tendency("x", three, one), {}) is turning, (three, one)
+
+
+def test_a_change_in_the_sky_is_the_skys_line_or_the_weathers():
+    from freesail.core.events import Severity
+
+    w = point_world()
+    rule_of("at a change in the sky", w, name="sky")
+    w.record(Severity.ROUTINE, "weather.sky", "The sky overcast.", data={"sky": "overcast"})
+    w.run(1)
+    w.record(Severity.ROUTINE, "weather.change", "Rain set in.", data={"weather": "rain"})
+    w.run(1)
+    w.record(Severity.ROUTINE, "weather.hour", "Overcast, rain; the glass 29.90.")
+    w.run(1)
+    assert len(firings(w, "sky")) == 2
+    spec = R.EVENTS["a change in the sky"]
+    assert (spec.kind, spec.also, spec.watch) == ("weather.sky", ("weather.change",), None)
+    for words in (
+        "a wind shift",
+        "the glass falling fast",
+        "the glass turning",
+        "the sea getting up",
+    ):
+        assert R.EVENTS[words].watch and not R.event_matches(R.EVENTS[words], "", {})
+
+
+def test_the_station_verbs_after_then_are_resolved_when_the_order_is_given():
+    """The owner's finding at gate 5a: `standing order "sea": when the sea is heavy then
+    tell the watcher the sea is getting up` was refused ("'tell the watcher' is said to an
+    agent's station"). Now `tell` and `ask` follow `then`, to a station aboard, whether or
+    not one mans it when the order is given; the words are free, and checked for nothing
+    but being there."""
+    w = frigate()
+    e = w.submit(
+        'standing order "sea": when the sea is heavy then tell the watcher the sea is getting '
+        "up; take in the royals"
+    )
+    assert e.kind == "standing.given", e.text
+    assert e.text == (
+        "Standing order 'sea' entered in the book: when the sea is heavy then tell the "
+        "watcher the sea is getting up; take in the royals."
+    )
+    # free words: 'the well' in them is not the absent reading, 'standing order' no sentence
+    e = w.submit(
+        'standing order "q": every glass then ask the watcher whether the well wants sounding '
+        "and what the standing order says"
+    )
+    assert e.kind == "standing.given", e.text
+    e = w.submit('standing order "l": at sunset then tell the lookout to look sharp')
+    assert e.kind == "order.rejected"
+    assert e.text.endswith(
+        "In standing order 'l', 'tell the lookout to look sharp' is refused: there is no "
+        "lookout aboard yet; a standing order may tell or ask the watcher."
+    )
+    assert [r.name for r in w.standing.book] == ["sea", "q"]
