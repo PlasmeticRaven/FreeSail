@@ -2409,7 +2409,7 @@ GATE_5A_SEA_TICKS = {
     "A heavy sea, the sea going down.": 102120,
 }
 GATE_5A_DAY_LINES = 493
-GATE_5A_DAY_DIGEST = "45eac662eaad0f17"
+GATE_5A_DAY_DIGEST = "87c9d80a3b477233"
 
 
 def the_gate_day_under_systems(until: int = GATE_5A_DAY_TICKS, saves=GATE_5A_DAY_SAVES):

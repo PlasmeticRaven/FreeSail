@@ -113,9 +113,27 @@ class Log:
         """
         h = hashlib.sha256()
         for e in self._events:
-            h.update(json.dumps(e.to_dict(), sort_keys=True, default=_json_default).encode())
+            h.update(
+                json.dumps(_canonical(e.to_dict()), sort_keys=True, default=_json_default).encode()
+            )
             h.update(b"\n")
         return h.hexdigest()
+
+
+def _canonical(o: Any) -> Any:
+    """The event's dict with every float rounded to nine significant digits, for the
+    digest. A float that differs by a last bit between two machines' maths libraries
+    (Windows' and glibc's exp and atan2; found at gate 5a, 2026-09-30: the day under
+    systems matched the build machine line for line on the owner's machine and differed
+    in the digest alone, in the wind's unprinted direction) is the same log; a real
+    difference is far larger than a billionth."""
+    if isinstance(o, float):
+        return float(format(o, ".9g"))
+    if isinstance(o, dict):
+        return {k: _canonical(v) for k, v in o.items()}
+    if isinstance(o, (list, tuple)):
+        return [_canonical(v) for v in o]
+    return o
 
 
 def _json_default(o: Any) -> Any:

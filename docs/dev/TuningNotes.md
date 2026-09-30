@@ -575,7 +575,7 @@ The model's roll at a glance (the frigate, her period 8.2 s): a fresh breeze's s
 
 ### The day under systems, its constants
 
-The same day as the pinned one but for the wind's cause: the systems' wind at the ship (W by N 18 through the day, a point north of the pinned west; the cold front's veer at 22:00; 45 to 48 knots from midnight to three; 18 by seven), the gust factor by air mass, squalls in the unstable air behind the front, the sea and the motion. Measured at seed 7, 29 hours, 493 lines, the digest `45eac662eaad0f17`:
+The same day as the pinned one but for the wind's cause: the systems' wind at the ship (W by N 18 through the day, a point north of the pinned west; the cold front's veer at 22:00; 45 to 48 knots from midnight to three; 18 by seven), the gust factor by air mass, squalls in the unstable air behind the front, the sea and the motion. Measured at seed 7, 29 hours, 493 lines, the digest `87c9d80a3b477233 (re-pinned 2026-09-30 when the digest began rounding floats to nine significant digits; it was 45eac662eaad0f17 before)`:
 
 | Ship's time | Tick | What |
 |---|---|---|
