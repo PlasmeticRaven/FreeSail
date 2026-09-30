@@ -674,7 +674,7 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (C, "brace the gaff sharp up", no(["gaff, not a yard"])),
     (C, "back the topsail", ok(evo="brace", count=3, params={"mode": "aback"})),
     (C, "back the mainsail", no(["gaff sail", "no yard"])),
-    (C, "brace the yards to the wind", ok(evo="brace", count=3, text=["3 yards to the wind"])),
+    (C, "brace the yards to the wind", ok(evo="brace", count=3, text=["three yards to the wind"])),
     (C, "haul the weather topsail brace", ok(kind="line.hauled", text=["(weather) topsail brace"])),
     (C, "haul the weather main brace", no(["no such part as the main brace"], UnknownNounError)),
     (C, "ease the main sheet", ok(kind="line.eased", text=["main sail now 5°"])),
@@ -701,7 +701,7 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (C, "strike the topmast", ok(evo="strike_topmasts", subjects=["ship"])),
     (C, "steer west-north-west", ok(kind="helm.order", text=["WNW (292°)"])),
     (C, "keep her full and by", ok(kind="helm.order", text=["full and by"])),
-    (C, "splice the mainbrace", no(["not an order this ship understands"])),
+    (C, "splice the mainbrace", no(["no such part"], UnknownNounError)),
     # -- package 32b: the brig Harpy, the frigate less a mast --------------------------
     (B, "set the fore topsail", ok(evo="set_square", subjects=["fore.topsail"])),
     (B, "set the topsails", ok(evo="set_square", subjects=["fore.topsail", "main.topsail"])),
@@ -763,7 +763,7 @@ TABLE: list[tuple[str, str, ok | no]] = [
             params={"mode": "aback", "tack": "larboard"},
         ),
     ),
-    (B, "brace the yards to the wind", ok(evo="brace", count=8, text=["8 yards to the wind"])),
+    (B, "brace the yards to the wind", ok(evo="brace", count=8, text=["eight yards to the wind"])),
     (B, "haul the weather main brace", ok(kind="line.hauled", text=["(weather) main brace"])),
     (
         B,
@@ -798,7 +798,7 @@ TABLE: list[tuple[str, str, ok | no]] = [
         ok(evo="rig_out_studdingsail_boom", subjects=["fore.topmast.studdingsail_boom.starboard"]),
     ),
     (B, "steer west-north-west", ok(kind="helm.order", text=["WNW (292°)"])),
-    (B, "splice the mainbrace", no(["not an order this ship understands"])),
+    (B, "splice the mainbrace", no(["no such part"], UnknownNounError)),
 ]
 
 
