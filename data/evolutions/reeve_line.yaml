@@ -1,0 +1,44 @@
+# Reeve a new line in the place of one that has parted, or splice the parted ends
+# (scripted, ReeveScript in scripts.py; package 31b, from playtest 11's finding 7: a
+# parted sheet could not be repaired, and the refusal's "spliced or rove afresh" named
+# no order). Running rigging is what "reeves through blocks, or sheave holes ... such as
+# halliards, braces, clew-lines, buntlines" (Lever 1808, 'Rigging'); it is "got out in
+# the coil, and cut to proper lengths when reeved on board" (Steel 1794, vol. I, the note
+# to the tables of rigging), and the spare cordage is the boatswain's, in the store-room
+# forward (Luce 1884, ch. XII). A parted rope may instead be joined: "ropes reeving
+# through blocks are joined by a long splice, otherwise a short splice is used. The
+# splice is weaker than the main part of the rope by about one-eighth" (Luce 1884, ch.
+# II Knotting and Splicing, 'Splicing'; Lever 1808, 'The Long Splice'), so a spliced line
+# keeps its place at seven eighths of its rating and costs no cordage.
+#
+# Phases (`reeve a new <line>`, `reeve the <line> afresh`; `splice the <line>` takes the
+# third alone):
+#   cut     on deck: the coil roused up from the boatswain's store, the length measured
+#           off and cut (the fathoms by the line's class, scripts.LINE_FATHOMS)
+#   reeve   aloft: the new line rove through its blocks, the end bent or clinched,
+#           belayed slack
+#   splice  aloft: the two ends brought together and spliced
+# The sail or the yard the line serves is held while it is done, so a `set` given behind
+# it waits its turn; the set evolutions refuse a sail whose sheet, tack or halyard is
+# parted, so the sail is not sheeted home on a sheet that is gone.
+id: reeve_line
+verb: reeve
+applies_to: {class: line}
+script: reeve
+params: {aloft: [reeve, splice], splice: false}
+preconditions: []
+timing:
+  cut_s: 60       # rouse up the coil, measure off and cut (judgement)
+  reeve_s: 240    # lay aloft, reeve through the blocks, bend the end, belay (judgement: the
+                  # work of one hand at the yardarm and two on deck; the weather stretches it)
+  splice_s: 300   # a long splice in a rope aloft (judgement: Luce's 'a long splice' is
+                  # slow work with a fid and a marline-spike)
+on_start: {log: "{begin}"}
+on_complete: {log: "{done}", kind: line.rove, severity: notable}
+on_fail: {log: "Could not {verb_word} the {line}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: reeving is the boatswain's party's work, a hand aloft at the block and the rest to
+# rouse up and overhaul the rope on deck; the number is judgement for one line (a
+# topsail sheet is a heavy rope, and its blocks are at the yardarm and the quarter of
+# the lower yard). Able seamen: a marline-spike seaman's work.
+crew: {hands: 6, rating: able, stations: [topmen, forecastle, afterguard]}
+source: "Lever 1808, 'Rigging' (running rigging reeves through blocks), 'The Long Splice'; Steel 1794, vol. I, the note to the tables of standing and running rigging (\"cut to proper lengths when reeved on board\"); Luce 1884, ch. II Knotting and Splicing, 'Splicing' (\"weaker than the main part of the rope by about one-eighth\"), ch. XII (the yeoman's store-room, the spare cordage)"

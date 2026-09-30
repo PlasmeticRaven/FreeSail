@@ -192,7 +192,10 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (F, "set the fore topsail sharp up", no(["'sharp up' belongs with 'brace'"])),
     (F, "haul the main brace, weather, two reefs", no(["reefs belongs with"])),
     # -- unknown verbs, console commands, empty ------------------------------
-    (F, "splice the main brace", no(["not an order this ship understands", "begins with a verb"])),
+    # ("splice the main brace" was the unknown verb here until package 31b made `splice`
+    # an order on a parted line; the rum is still not served)
+    (F, "splice the main brace", no(["Which main brace", "'splice' was understood"])),
+    (F, "splice the mainbrace", no(["no such part"], UnknownNounError)),
     (F, "sett the fore topsail", no(["not an order", "did you mean 'set'"])),
     (F, "hold", no(["console command"])),
     (F, "time 10", no(["console command"])),
@@ -413,7 +416,8 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (S, "heave to on the starboard tack", ok(evo="heave_to", params={"tack": "starboard"})),
     (S, "shorten sail", ok(evo="reef_square", count=1, text=["Shorten sail"])),
     (S, "set the cro'jack", no(["no such part"], UnknownNounError)),
-    (S, "splice the mainbrace", no(["not an order this ship understands"])),
+    (S, "splice the mainbrace", no(["no such part"], UnknownNounError)),
+    (S, "splice the fore topsail sheets", no(["sound and rove", "only a parted line is spliced"])),
     # -- package 15: the period forms the primer reached for ------------------
     # squaring, bracing round, to the wind, aback
     (
@@ -434,7 +438,12 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (
         F,
         "brace the yards to the wind",
-        ok(evo="brace", count=12, params={"mode": "to the wind"}, text=["12 yards to the wind"]),
+        ok(
+            evo="brace",
+            count=12,
+            params={"mode": "to the wind"},
+            text=["twelve yards to the wind"],
+        ),
     ),
     (
         F,
@@ -1634,4 +1643,5 @@ def test_completion_offers_the_wreck_and_the_spar_to_shift():
     assert not any("starboard" in o or "jib" in o for o in offered)  # sound parts are not
     offered = complete.suggestions(ship, "shift the larboard fore topmast studdingsail b")
     assert offered == ["shift the larboard fore topmast studdingsail boom"]
-    assert complete.suggestions(ship, "the bo") == ["the booms"]
+    offered = complete.suggestions(ship, "the bo")
+    assert offered[0] == "the booms" and "the boatswains store" in offered  # package 31b

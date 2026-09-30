@@ -151,7 +151,7 @@ def test_a_trims_braces_log_one_line_when_the_last_is_done():
     w.run(900)
     after = w.log.all()[n0:]
     said = [e for e in after if e.kind == "sail.trimmed"]
-    assert said and said[0].text.startswith("Braced 12 yards to the wind")
+    assert said and said[0].text.startswith("Braced twelve yards to the wind,")
     assert not [e for e in after if e.text.startswith("Man the") and "braces" in e.text]
     (braced,) = [e for e in after if e.kind == "yard.braced"]
     assert braced.severity.value == "notable"
@@ -165,3 +165,42 @@ def test_a_trims_braces_log_one_line_when_the_last_is_done():
     w.run(300)
     alone = [e for e in w.log.all()[n1:] if e.kind == "yard.braced"]
     assert [e.text.split(";")[0] for e in alone] == ["Braced the fore yard"]
+
+
+def test_the_trim_line_says_the_yards_on_deck_as_a_clause_and_not_as_a_refusal():
+    """Playtest 11's finding 8 (package 31b): with the topgallant masts sent down, "trim
+    sails" braced the six yards aloft and then said "Not the fore topgallant yard is sent
+    down; the fore royal yard is sent down; ...". The line now reads "Braced six yards to
+    the wind, ...; the topgallant and royal yards are on deck." and names a single yard
+    on deck or carried away by itself."""
+    from freesail.api.session import make_world
+    from freesail.core.world import Scenario
+
+    w = make_world(
+        7,
+        "data/ships/frigate-36.yaml",
+        Scenario(wind_from_deg=0, ship_heading_deg=180, gustiness=0, variability=0),
+    )
+    w.submit("set plain sail")
+    w.run(2400)
+    w.submit("send down the topgallant masts")
+    w.run(2400)
+    assert all(w.ship.spars[m].sent_down for m in w.ship.groups["topgallant masts"])
+    e = w.submit("trim sails")
+    assert e.kind == "sail.trimmed"
+    assert e.text.startswith("Braced six yards to the wind, ")
+    assert "; the topgallant and royal yards are on deck." in e.text
+    assert "Not " not in e.text and "sent down" not in e.text
+    assert len(e.data["subjects"]) == 6 and len(e.data["failed_subjects"]) == 6
+    w.run(600)
+    # one yard carried away and one royal yard on deck, the rest aloft: each by name
+    w.submit("sway up the topgallant masts")
+    w.run(3000)
+    assert not any(w.ship.spars[m].sent_down for m in w.ship.groups["topgallant masts"])
+    w.ship.spars["fore.royal.yard"].sent_down = True
+    w.ship.spars["main.topgallant.yard"].wrecked = True
+    e = w.submit("trim the yards")
+    assert e.text.startswith("Braced ten yards to the wind, ")
+    assert e.text.endswith(
+        "; the fore royal yard is on deck and the main topgallant yard is carried away."
+    )

@@ -537,7 +537,7 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (
         F,
         'standing order "x": at sunset then set the royals; splice the mainbrace',
-        no(["'splice the mainbrace' is refused", "not an order this ship understands"]),
+        no(["'splice the mainbrace' is refused", "no such part as the mainbrace"]),
     ),
     (
         F,

@@ -701,6 +701,69 @@ def booms(ship: Any) -> Booms:
     return store
 
 
+# ---------------------------------------------------------------------------
+# The boatswain's store: spare cordage (package 31b)
+# ---------------------------------------------------------------------------
+
+# The spare rope a ship carries when her file gives no `crew.stores.cordage_fathoms`: one
+# coil. Rope for running rigging was laid in lengths that "stand 120 to 130 fathoms" (Steel
+# 1794, vol. I, 'Rope-making', of hawser-laid rope); one coil is judgement, as
+# DEFAULT_SPARE_SAILS is for the sail room.
+DEFAULT_CORDAGE_FATHOMS = 120.0
+
+
+@dataclass
+class Cordage:
+    """The spare cordage in the boatswain's store, in fathoms, from which a parted line is
+    rove afresh (`data/evolutions/reeve_line.yaml`, package 31b). "Running rigging had
+    better be got out in the coil, and cut to proper lengths when reeved on board" (Steel
+    1794, vol. I, the note to the tables of standing and running rigging); the spare
+    cordage is kept in the store-room forward with "all small spare articles furnished for
+    the use of the boatswain" (Luce 1884, ch. XII, the yeoman's store-room). Taken by the
+    fathom, as the sail room is taken by the sail; a replay rebuilds it from the ship file
+    and the orders given."""
+
+    fathoms: float = 0.0
+
+    def take(self, fathoms: float) -> None:
+        if fathoms > self.fathoms + 1e-9:
+            raise ValueError("there is not that much spare cordage in the boatswain's store")
+        self.fathoms = max(0.0, self.fathoms - fathoms)
+
+    def describe(self) -> str:
+        """'570 fathoms of spare cordage', 'no spare cordage'."""
+        n = round(self.fathoms)
+        if n <= 0:
+            return "no spare cordage"
+        return f"{n} fathom{'s' if n != 1 else ''} of spare cordage"
+
+    def inventory_lines(self) -> list[str]:
+        """The `the boatswain's store` query, in the form of the sail room's."""
+        if self.fathoms < 1.0:
+            return [
+                "The boatswain's store has no spare cordage; a parted line can be spliced, "
+                "but not rove afresh until the dockyard supplies rope."
+            ]
+        return [f"The boatswain's store holds {self.describe()}."]
+
+
+def cordage(ship: Any) -> Cordage:
+    """The ship's spare cordage, kept in `ship.extra["cordage"]`: made on first use from the
+    ship file's `crew.stores.cordage_fathoms`, else one coil (`DEFAULT_CORDAGE_FATHOMS`)
+    for a ship whose file gives no stores. `ship.extra["spare_cordage_fathoms"]` is kept
+    as the count."""
+    store = ship.extra.get("cordage")
+    if not isinstance(store, Cordage):
+        stores = _stores_of(ship)
+        get = stores.get if isinstance(stores, dict) else lambda k: getattr(stores, k, None)
+        given = get("cordage_fathoms") if stores is not None else None
+        ok = isinstance(given, int | float) and not isinstance(given, bool) and given >= 0
+        store = Cordage(float(given) if ok else DEFAULT_CORDAGE_FATHOMS)
+        ship.extra["cordage"] = store
+    ship.extra["spare_cordage_fathoms"] = store.fathoms
+    return store
+
+
 @dataclass
 class Hull:
     spec: HullSpec

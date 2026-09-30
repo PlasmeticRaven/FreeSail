@@ -483,6 +483,7 @@ def _modifier_words(vocab: Vocabulary) -> set[str]:
         vocab.both_sides,
         vocab.manner,
         vocab.a_little,
+        vocab.afresh,
         vocab.reef_close,
         vocab.tack_phrase,
         vocab.haul_home,
@@ -684,6 +685,12 @@ def _parse_modifiers(
             if side is not None and side != sw:
                 raise OrderError(f"Two sides were given ('{side}' and '{sw}'); say one.")
             side = sw
+            i += 1
+            continue
+
+        # "afresh", "anew": a line rove again (package 31b)
+        if w in vocab.afresh:
+            mods["afresh"] = True
             i += 1
             continue
 

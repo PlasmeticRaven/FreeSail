@@ -2956,6 +2956,254 @@ class BackAndFillScript(Script):
         return {"backed": sail_name_on(self.ship, self.yards)}
 
 
+# ---------------------------------------------------------------------------
+# A parted line rove afresh, or spliced (package 31b; playtest 11's finding 7)
+# ---------------------------------------------------------------------------
+
+# Fathoms of rope a new line of each class takes from the coil, for a frigate's rig:
+# judgement from each line's lead (a topsail sheet from the clew through the yardarm
+# sheave and the quarter block to the deck, both parts of a double sheet; a halyard's tye
+# and fall; a brace's pendant and its fall led aft to the deck; a course's tack short and
+# doubled, "twice the length of the single tacks", Steel 1794, vol. I, the note to the
+# tables). Steel's tables of the lengths of running rigging by rate are at the end of his
+# second volume and their figures did not survive the OCR, so these are not read from
+# them (docs/dev/TuningNotes.md, M5a, package 31b). Scaled by the ship's length on the
+# waterline against the frigate's (`REEVE_REFERENCE_LENGTH_M`), so the schooner's lines
+# take about three fifths.
+LINE_FATHOMS: dict[str, float] = {
+    "sheet": 30.0,
+    "tack": 15.0,
+    "halyard": 40.0,
+    "throat_halyard": 30.0,
+    "peak_halyard": 40.0,
+    "brace": 35.0,
+    "lift": 20.0,
+    "clewline": 30.0,
+    "buntline": 30.0,
+    "bowline": 25.0,
+    "downhaul": 25.0,
+    "reef_tackle": 20.0,
+    "vang": 15.0,
+    "outhaul": 15.0,
+}
+DEFAULT_LINE_FATHOMS = 25.0
+REEVE_REFERENCE_LENGTH_M = 41.8  # the frigate's length on the waterline (her ship file)
+# A spliced rope is "weaker than the main part of the rope by about one-eighth" (Luce
+# 1884, ch. II Knotting and Splicing, 'Splicing'): a spliced line's rating, of its own.
+SPLICED_STRENGTH = 7.0 / 8.0
+# The lines whose hauled part is slack when new-rove: the next set hauls them home.
+_ROVE_SLACK_CLASSES = frozenset(
+    {"sheet", "tack", "halyard", "throat_halyard", "peak_halyard", "clewline", "buntline"}
+    | {"downhaul", "reef_tackle", "outhaul", "bowline", "vang"}
+)
+
+
+def line_fathoms(ship: Ship, line: Any) -> float:
+    """The fathoms a new line of this class takes from the coil, for this ship's size."""
+    base = LINE_FATHOMS.get(getattr(line, "cls", ""), DEFAULT_LINE_FATHOMS)
+    hull = getattr(getattr(ship, "hull", None), "spec", None)
+    length = getattr(hull, "length_waterline_m", None)
+    scale = float(length) / REEVE_REFERENCE_LENGTH_M if length else 1.0
+    return float(round(base * max(0.3, min(scale, 2.0))))
+
+
+def reeve_refusal(ship: Ship, line: Any, splice: bool = False) -> str | None:
+    """Why this line cannot be rove afresh (or spliced) now, in a sentence, or None: it
+    is standing rigging, it went with a spar that carried away (its gear is rove again
+    when the spar is shifted for a spare, `regear`), it is sound, or the boatswain's
+    store has not the rope for it."""
+    from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+    if not isinstance(line, parts.Line):
+        return "Name the line to reeve."
+    name = part_name(ship, line.id)
+    if line.is_standing:
+        return (
+            f"The {name} is standing rigging, set up with deadeyes and lanyards; it is not "
+            f"rove, and nothing here sets it up afresh yet."
+        )
+    if line.wrecked:
+        return (
+            f"The {name} went with its spar when it carried away; clear the wreck and shift "
+            f"the spar for a spare, and its gear is rove again with the rest."
+        )
+    if line.state is not LineState.PARTED:
+        done = "spliced" if splice else "rove afresh"
+        return f"The {name} is sound and rove; only a parted line is {done}."
+    if not splice:
+        store = parts.cordage(ship)
+        wants = line_fathoms(ship, line)
+        if store.fathoms + 1e-9 < wants:
+            have = round(store.fathoms)
+            if have <= 0:
+                return (
+                    f"There is no spare cordage in the boatswain's store to reeve a new "
+                    f"{name}; splice it instead, or wait for the dockyard."
+                )
+            return (
+                f"There {'is' if have == 1 else 'are'} but {have} fathom{'s' if have != 1 else ''} "
+                f"of spare cordage in the boatswain's store; a new {name} wants {wants:g}. "
+                f"Splice it instead."
+            )
+    return None
+
+
+def _line_part(ship: Ship, params: dict[str, Any], words: dict[str, Any] | None) -> Any:
+    """The line a reeve works on: `params["line"]` (the verbs pass it), or the subject the
+    runner names in its words."""
+    from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+    lid = params.get("line")
+    if isinstance(lid, str) and lid in ship.lines:
+        return ship.lines[lid]
+    name = (words or {}).get("subject")
+    for ln in ship.lines.values():
+        if part_name(ship, ln.id) == name:
+            params["line"] = ln.id
+            return ln
+    return None
+
+
+class ReeveScript(PhasedScript):
+    """Reeve a new line in the place of one that has parted, from the coil in the
+    boatswain's store, or splice the parted ends (`params.splice`): package 31b, from
+    playtest 11's finding 7. Running rigging is what "reeves through blocks, or sheave
+    holes" (Lever 1808, 'Rigging'), "got out in the coil, and cut to proper lengths when
+    reeved on board" (Steel 1794, vol. I); "ropes reeving through blocks are joined by a
+    long splice ... the splice is weaker than the main part of the rope by about
+    one-eighth" (Luce 1884, ch. II). Phases:
+      cut     on deck: the coil roused up, the length measured off and cut
+      reeve   aloft: the new line rove through its blocks and belayed slack
+      splice  aloft: the two ends brought together and spliced (a splice alone)
+    A new line is whole at the ship file's rating; a spliced one at seven eighths. A
+    yard that swung when its brace parted is a yard again (to be braced by order); a
+    sail that came down or flogged is set again by order, its gear being whole."""
+
+    DEFAULTS = {"cut": 60.0, "reeve": 240.0, "splice": 300.0}
+
+    def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
+        super().__init__(ship, params, timing)
+        self.line = _line_part(ship, params, None)
+        self.splice = bool(params.get("splice"))
+        self.fathoms = 0.0
+
+    def _name(self, part: Any) -> str:
+        from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+        return part_name(self.ship, part.id)
+
+    def holds(self) -> set[str]:
+        """The line, and the sail or the yard it serves, so that a set or a brace given
+        behind the reeve waits its turn."""
+        if not isinstance(self.line, parts.Line):
+            return set()
+        held = {self.line.id}
+        if self.line.of in self.ship.parts:
+            held.add(self.line.of)
+        return held
+
+    def check(self, words: dict[str, Any]) -> str | None:
+        if self.line is None:
+            self.line = _line_part(self.ship, self.params, words)
+        return reeve_refusal(self.ship, self.line, self.splice)
+
+    def begin(self, words: dict[str, Any]) -> None:
+        self.start_phases(["splice"] if self.splice else ["cut", "reeve"])
+
+    def end_phase(self, name: str) -> None:
+        ship, line = self.ship, self.line
+        if name == "cut":
+            store = parts.cordage(ship)
+            wants = line_fathoms(ship, line)
+            if store.fathoms + 1e-9 < wants:  # taken by another reeve meanwhile
+                self.fail(
+                    f"there {'is' if round(store.fathoms) == 1 else 'are'} but "
+                    f"{round(store.fathoms)} fathoms of spare cordage left in the boatswain's "
+                    f"store, and a new {self._name(line)} wants {wants:g}"
+                )
+                return
+            store.take(wants)
+            ship.extra["spare_cordage_fathoms"] = store.fathoms
+            self.fathoms = wants
+            self.note(
+                f"Roused up the coil and measured off {wants:g} fathoms for the new "
+                f"{self._name(line)}."
+            )
+        elif name in ("reeve", "splice"):
+            self._make_whole(new=name == "reeve")
+
+    def _make_whole(self, new: bool) -> None:
+        ship, line = self.ship, self.line
+        line.state = LineState.FREE if line.cls == "bowline" else LineState.BELAYED
+        line.hauled = 0.0 if line.cls in _ROVE_SLACK_CLASSES else 1.0
+        line.load_kn = 0.0
+        if new:
+            spec = next((ln for ln in ship.spec.lines if ln.id == line.id), None)
+            if spec is not None and spec.rating_kn:
+                line.rating_kn = float(spec.rating_kn)
+            line.condition = 100.0
+        else:
+            line.rating_kn = line.rating_kn * SPLICED_STRENGTH
+        target = ship.parts.get(line.of)
+        if line.cls == "brace" and isinstance(target, Spar):
+            from freesail.physics.strain import strain_state  # local import to avoid a cycle
+
+            strain_state(ship).swung.discard(target.id)
+
+    def _ready_words(self) -> str:
+        """What the whole line lets the captain do: 'the fore topsail may be sheeted home
+        and set', 'the main topsail yard may be braced again'."""
+        ship, line = self.ship, self.line
+        target = ship.parts.get(line.of)
+        if isinstance(target, Sail):
+            if line.cls == "sheet":
+                return f"the {self._name(target)} may be sheeted home and set"
+            if line.cls in ("halyard", "throat_halyard", "peak_halyard"):
+                return f"the {self._name(target)} may be hoisted again"
+            return f"the {self._name(target)} may be worked again"
+        if isinstance(target, Spar):
+            if line.cls == "brace":
+                return f"the {self._name(target)} may be braced again"
+            if line.cls in ("halyard", "throat_halyard", "peak_halyard"):
+                sails = ship.sails_using(target)
+                if sails:
+                    return f"the {self._name(sails[0])} may be hoisted again"
+            return f"the {self._name(target)} may be worked again"
+        return "it may be worked again"
+
+    def words(self) -> dict[str, Any]:
+        ship, line = self.ship, self.line
+        if not isinstance(line, parts.Line):
+            return {}
+        name = self._name(line)
+        store = parts.cordage(ship)
+        if self.splice:
+            begin = f"Splice the {name}! A marline-spike and a fid aloft."
+            done = f"Spliced the {name}, an eighth the weaker for it; {self._ready_words()}."
+        else:
+            begin = f"Reeve a new {name}! Rouse up the coil from the boatswain's store."
+            done = (
+                f"Rove a new {name}; {self._ready_words()}. {store.describe().capitalize()} "
+                f"left in the boatswain's store."
+            )
+        return {
+            "begin": begin,
+            "done": done,
+            "verb_word": "splice" if self.splice else "reeve",
+            "fathoms": self.fathoms,
+            "cordage_left": store.describe(),
+        }
+
+    def data(self) -> dict[str, Any]:
+        d = super().data()
+        if isinstance(self.line, parts.Line):
+            d["line"] = self.line.id
+        d["splice"] = self.splice
+        d["fathoms"] = self.fathoms
+        d["cordage_left_fathoms"] = round(parts.cordage(self.ship).fathoms, 1)
+        return d
+
+
 SCRIPTS: dict[str, type[Script]] = {
     "tack": TackScript,
     "wear": WearScript,
@@ -2968,6 +3216,7 @@ SCRIPTS: dict[str, type[Script]] = {
     "shift": ShiftScript,
     "clear_wreck": ClearWreckScript,
     "shift_spar": ShiftSparScript,
+    "reeve": ReeveScript,
     "loose_to_dry": LooseToDryScript,
     "furl_all": FurlAllScript,
     "boxhaul": BoxHaulScript,
