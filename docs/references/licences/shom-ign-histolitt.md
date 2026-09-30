@@ -1,0 +1,3 @@
+# SHOM-IGN Histolitt: the conditions of reuse
+
+Not fetched in this build. The data.gouv.fr record found from the build network on 2026-09-30 (https://www.data.gouv.fr/api/1/datasets/shom-ign-trait-de-cote-histolitt-r/) is a regional republication (Occitanie) whose licence field reads 'notspecified'; SHOM's own diffusion of the shoreline (https://diffusion.shom.fr/) is behind a form. The study (docs/design/ChartData.md §2) records the conditions as free reuse with the credit "© IGN-Shom 2009" and SHOM-IGN's own conditions (logos and links when shown on a website), to be copied here verbatim when the shoreline is fetched. No Histolitt data is in this build's tiles or coast: the French shore is EMODnet's.

@@ -1,0 +1,161 @@
+# GEBCO Grid: terms of use
+
+Read from https://www.gebco.net/data-products/gridded-bathymetry/terms-of-use on 2026-09-30 (the same text accompanies every extract as GEBCO_Grid_terms_of_use.pdf). The GEBCO_2025 Grid's attribution, from its page (https://www.gebco.net/gebco2025-grid): "GEBCO Compilation Group (2025) GEBCO 2025 Grid (doi:10.5285/37c52e96-24ea-67ce-e063-7086abc05f29)".
+
+Scope
+
+ These terms of use apply to The GEBCO Grid and other GEBCO-derived information products.
+
+ For brevity 'The GEBCO Grid' is used throughout and should be interpreted as meaning The GEBCO Grid and other GEBCO-derived information products.
+
+ Bathymetric Data refers to measurements made by various instruments of the ocean depth, associated ocean properties and the supporting metadata.
+
+ Information products are the result of applying algorithms, mathematical techniques, scientific theory and Intellectual Property to data to create useful, derived values.
+
+ As The GEBCO Grid is created by interpolating, applying algorithms and mathematical techniques to bathymetric data, GEBCO considers the GEBCO Grid to be an information product.
+
+ GEBCO does not provide the underlying source bathymetric data when distributing The GEBCO Grid.
+
+ Terms of use
+
+ The GEBCO Grid is placed in the public domain and may be used free of charge.
+
+ Use of the GEBCO Grid indicates that the user accepts the conditions of use and disclaimer information given below.
+
+ Users are free to:
+
+ Copy, publish, distribute and transmit The GEBCO Grid.
+
+ Adapt The GEBCO Grid.
+
+ Commercially exploit The GEBCO Grid, by, for example, combining it with other information, or by including it in their own product or application.
+
+ Users must:
+
+ Acknowledge the source of The GEBCO Grid. A suitable form of attribution is given in the documentation that accompanies The GEBCO Grid.
+
+ Not use The GEBCO Grid in a way that suggests any official status or that GEBCO, or the IHO or IOC, endorses any particular application of The GEBCO Grid.
+
+ Not mislead others or misrepresent The GEBCO Grid or its source.
+
+ Disclaimer
+
+ The GEBCO Grid should NOT be used for navigation or for any other purpose involving safety at sea.
+
+ The GEBCO Grid is made available 'as is'. While every effort has been made to ensure reliability within the limits of present knowledge, the accuracy and completeness of The GEBCO Grid cannot be guaranteed. No responsibility can be accepted by GEBCO, IHO, IOC, or those involved in its creation or publication for any consequential loss, injury or damage arising from its use or for determining the fitness of The GEBCO Grid for any particular use.
+
+ The GEBCO Grid is based on bathymetric data from many different sources of varying quality and coverage.
+
+ As The GEBCO Grid is an information product created by interpolation of measured data, the resolution of The GEBCO Grid may be significantly different to that of the resolution of the underlying measured data.
+
+ Jump to
+
+ Copyright © 2020-2026,  GEBCO 
+
+ Hosted by the British Oceanographic Data Centre (BODC)
+
+ Footer menu
+
+ Privacy Policy 
+
+ Disclaimer 
+
+ Home 
+
+ Data & Products 
+
+ Gridded Bathymetry Data 
+
+ Regional grid - Arctic Ocean (IBCAO) 
+
+ Regional grid - Southern Ocean (IBCSO) 
+
+ Errata and known issues 
+
+ GEBCO_2026 Grid 
+
+ GEBCO_2025 Grid 
+
+ GEBCO_2024 Grid 
+
+ GEBCO_2023 Grid 
+
+ GEBCO_2022 Grid 
+
+ GEBCO_2021 Grid 
+
+ GEBCO_2020 Grid 
+
+ GEBCO_2019 Grid 
+
+ Undersea Feature Names 
+
+ GEBCO Web Services 
+
+ Web Map Service 
+
+ Previous GEBCO WMS 
+
+ Printable Maps 
+
+ IHO-IOC GEBCO Cook Book 
+
+ Historical GEBCO Charts 
+
+ Historical Data Sets 
+
+ Imagery 
+
+ History of GEBCO 
+
+ GEBCO Digital Atlas 
+
+ Seabed 2030 
+
+ Training 
+
+ News & Media 
+
+ About 
+
+ Overview 
+
+ GEBCO Strategy 
+
+ Project History 
+
+ Seabed 2030 
+
+ Acknowledgements 
+
+ Our Data Contributors 
+
+ Working With Industry 
+
+ Contributing Data 
+
+ Presentations and Publications 
+
+ Committees and Groups 
+
+ Guiding Committee 
+
+ Regional Mapping 
+
+ Mapping projects 
+
+ Undersea Features Names 
+
+ Technical Mapping 
+
+ Communication and Outreach 
+
+ Meetings and Minutes 
+
+ GEBCO Symposium 
+
+ Frequently Asked Questions 
+
+ Useful links 
+
+ Contact

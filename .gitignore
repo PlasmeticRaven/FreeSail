@@ -12,6 +12,9 @@ saves/
 .DS_Store
 Thumbs.db
 .claude/
+# the chart build's fetch cache (tools/build_charts.py): the sources' downloads and the
+# period scans, never committed
+.cache/
 # the harness's saves on an opt-out or a stand-down, written in the working directory
 freesail-seed*-tick*.json
 day.json
