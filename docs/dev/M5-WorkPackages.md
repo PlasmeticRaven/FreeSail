@@ -483,12 +483,15 @@ exists to make, and the lead decides.
   table; the square sail on its yard (Steel's "cross-jack" of the one-masted vessel, set
   flying from the deck and not a standing yard: model it as the schooner's fore yard is,
   or as a yard that is crossed and sent down, whichever the file can say without an
-  engine change, and say which); the square topsail on the topsail yard and the
+  engine change, and say which; spec M0 to M2 §12 item 7 records that the schooner's own
+  bare fore yard was left out of her file for a milestone 1 test that counts her yards,
+  which is the same question, and may be closed the same way); the square topsail on the topsail yard and the
   topgallant above it, as the kit's model shows three yards; the fore staysail on the
   forestay; the jib on its traveller on the running bowsprit; the gaff topsail if Fincham
   or Steel gives the type one at her date, else not; the storm trysail and the storm jib;
   reef bands on the mainsail (three, as the type's), the topsail (two) and the jib. Guns
-  as parts if the frigate's are; else in the description. The sail room and the booms
+  in the description and the `era_notes`, as the frigate's are (they are not parts until
+  milestone 7). The sail room and the booms
   (package 30b's `spare_spars`) scaled to her: a spare topmast, a spare topsail yard, a
   spare jib and mainsail, judgement said so. A crew of thirty by the schooner's stations
   with no tops (forecastle, afterguard, waisters, idlers), `posts` master and mate and
@@ -540,9 +543,12 @@ exists to make, and the lead decides.
   few degrees of weather helm on a beam reach, the numbers in the comment; each ship's
   polar drawn by the same means the frigate's and the schooner's were (close-hauled
   angle and speed in 15 knots, the beam reach, the run) and written in the report and in
-  `TuningNotes.md` beside the two existing ships', so that the hierarchy can be seen:
-  the cutter weatherly and quick for her size, the brig between the schooner and the
-  frigate. No truths: milestone 8 verifies both as reference ships (§23, §25).
+  `TuningNotes.md` in the form of its "Where the ships stand" tables (speed by apparent
+  angle, plain sail, 15 knots), so that the hierarchy can be seen: the cutter weatherly
+  and quick for her size, closer to the wind than the schooner's five points as spec M0
+  to M2 §12 item 11 expects of a cutter, the brig between the schooner and the frigate.
+  These are expectations to report against, not truths: milestone 8 verifies both as
+  reference ships (§23, §25).
 - **The grammar across four ships** (the test §23 names). Every test module that loads
   the two ship files loads four; every test that runs an order on "both ships" runs it on
   all four where the ship has the part, and asserts the refusal's words where she has
@@ -565,9 +571,12 @@ exists to make, and the lead decides.
   exercises; on the cutter the head sail is the staysail and the after sail the
   mainsail, which the scripts must find by class and place, not by name); lying a-try
   under the storm canvas each ship has; the topmen's mast (`runner.py`'s "the mast the
-  subject stands on") on a ship with no tops; `client/projection.js` drawing a gaff
-  mainsail whose boom overhangs the counter, a running bowsprit, and the brig's
-  staysails between two masts; the sail room's and the booms' queries; `tools/day_log.py`
+  subject stands on") on a ship with no tops; `client/projection.js`, which draws the
+  hull as a lens from the file's dimensions and the rig from its parts and so needs no
+  art for a new ship, drawing a gaff mainsail whose boom overhangs the counter, a running
+  bowsprit, and the brig's staysails between two masts; the primer test's fences
+  (```` ```orders cutter ````, ```` ```orders brig ````) once its ship table knows the
+  names; the sail room's and the booms' queries; `tools/day_log.py`
   and the day's scenarios run under each ship (`--ship` if the tool lacks it). Every
   failure fixed in the grammar or the generator, and every fix listed: that list is
   the package's finding about pillar 2.
@@ -587,7 +596,8 @@ exists to make, and the lead decides.
 
 Not in 32b: the pilot's boarding and the port's cutter as a person's vessel (35), the brig
 at far detail and her merchant description (36), truths for either ship (milestone 8),
-*Alert*, *Speedy* and the wishlist (milestone 8), the lateen mizzen and the yacht.
+*Alert*, *Speedy* and the wishlist (milestone 8), the tartane and the bilander of decision
+11 (milestone 8, unchanged by this package), the lateen mizzen and the yacht.
 
 ## Packages 33 to 36 (outline; written in turn)
 
