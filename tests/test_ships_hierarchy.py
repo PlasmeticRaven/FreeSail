@@ -8,10 +8,9 @@ the period sources give no polars, only the reputation of each rig (a cutter the
 winded of them, a brig a ship in little, a schooner between), and the figures measured
 when the files were built are in docs/dev/TuningNotes.md, "Where the ships stand".
 
-- 73: a cutter lies closer to the wind than a topsail schooner. Expected to fail: the
-  pointing is set by the shared sail-class curves and trim floors, not by the ship file,
-  so the cutter's best course to windward is the schooner's to the degree (strict xfail
-  with the measured values in its reason).
+- 73: a cutter lies as close to the wind as a topsail schooner or closer (the owner's
+  wording of 2026-09-30; the first asked for half a point closer, which the shared
+  sail-class curves and trim floors cannot give: spec M5 open item 12).
 - 74: a brig lies as a ship does, about six points, and less close than the schooner.
 - 75: the cutter's beam reach in 15 knots of wind under plain sail is 6 to 8 knots.
 - 76: the brig's beam reach is 7 to 9 knots, within a knot of the frigate's, and, as the
@@ -75,29 +74,13 @@ def frigate_polar():
     return polar(FRIGATE)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "Truth 73: the cutter's best course to windward is the schooner's to the degree "
-        "(58 deg off the true wind each, holding three knots to 46 and 44 deg, measured "
-        "when the files were built). How close a ship lies is set by the sail-class lift "
-        "curves and the trim floors the four ships share, not by the ship file: the cutter's "
-        "great mainsail and her running bowsprit give her the area and the balance but not "
-        "a higher-pointing sail. Meeting this needs a per-rig or per-sail pointing factor "
-        "(a cutter's flat-cut mainsail and long boom); see docs/dev/TuningNotes.md, "
-        "package 32b."
-    ),
-)
-def test_truth_73_a_cutter_lies_closer_than_a_topsail_schooner(cutter_sweep, schooner_sweep):
-    best_c, closest_c = best_sustained_course(cutter_sweep)
-    best_s, closest_s = best_sustained_course(schooner_sweep)
-    assert best_c <= best_s - HALF_A_POINT, f"cutter {best_c} deg off, schooner {best_s}"
-    assert closest_c <= closest_s
-
-
-def test_truth_73_the_cutter_at_least_lies_as_close_as_the_schooner(cutter_sweep, schooner_sweep):
-    """What does hold: she is no worse than the schooner, and holds three knots inside
-    five points, where the frigate cannot."""
+def test_truth_73_the_cutter_lies_as_close_as_the_schooner_or_closer(cutter_sweep, schooner_sweep):
+    """Truth 73 as the owner amended it (2026-09-30): a cutter points much as a schooner
+    does, so she lies as close or closer, and holds three knots inside five points, where
+    the frigate cannot. The first wording asked for half a point closer and failed: how
+    close a ship lies is set by the sail-class curves and trim floors the four ships share,
+    not by the file (58.004 deg each when built); pointing from the file's own geometry is
+    spec M5 open item 12's."""
     best_c, closest_c = best_sustained_course(cutter_sweep)
     best_s, _ = best_sustained_course(schooner_sweep)
     assert 50.0 <= best_c <= 62.0, f"cutter's best course {best_c} deg off"

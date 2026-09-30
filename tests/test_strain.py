@@ -347,13 +347,12 @@ def test_parted_halyard_drops_the_yard_and_the_sail_hangs_in_the_gear():
     assert ship.sails["fore.topsail"].force_kn == 0.0
     tick(ship, 1)
     assert halyard.load_kn == 0.0
-    # it cannot be set again: the hoist goes via the parted halyard
+    # it cannot be set again: the set is refused on the parted halyard in words that
+    # name it and the remedy (package 31b: reeve a new one)
     runner = Runner(ship)
-    runner.start(ship, "set_square", "fore.topsail")
-    for _ in range(600):
-        runner.step(ship, 1.0, wind)
+    with pytest.raises(OrderError, match="fore topsail yard halyard is parted and must be rove"):
+        runner.start(ship, "set_square", "fore.topsail")
     assert ship.sails["fore.topsail"].state is not SailState.SET
-    assert any("halyard is parted" in n[2] for n in ship.drain_notes())
 
 
 def test_parted_peak_halyard_drops_the_gaff():
@@ -407,8 +406,12 @@ def test_parted_sheet_frees_the_sail_until_it_is_set_again():
     assert sail.force_kn > 0
     assert yard.load_kn == pytest.approx(2.0 * sail.force_kn)
     assert topmast.load_kn == pytest.approx(2.0 * sail.force_kn)
-    # setting the sail sheets it home again and the flogging stops
+    # it is not set again on a sheet that is gone (package 31b); with the sheet rove
+    # afresh, setting the sail sheets it home again and the flogging stops
     runner = Runner(ship)
+    with pytest.raises(OrderError, match="main topsail sheet is parted and must be rove"):
+        runner.start(ship, "set_square", "main.topsail")
+    sheet.state = LineState.BELAYED  # as reeve_line.yaml leaves it
     runner.start(ship, "set_square", "main.topsail")
     for _ in range(600):
         runner.step(ship, 1.0, wind)

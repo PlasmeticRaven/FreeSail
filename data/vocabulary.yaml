@@ -130,6 +130,19 @@ verbs:
     synonyms: [sheet home the, haul home the sheets of, haul aft the sheets of]
     object: sail
     level: 0
+  # A parted line rove afresh from the boatswain's coil, or its ends spliced (package
+  # 31b; reeve_line.yaml): "reeve a new fore topsail sheet", "reeve the main brace
+  # afresh", "splice the main topsail halyard". Work for hands, with its time; a sound
+  # line is refused in words, and so is standing rigging, which is set up and not rove.
+  reeve:
+    synonyms: [reeve a new, reeve new, reeve off a new, reeve off, reeve afresh, reeve again,
+               reeve the new, reeve fresh]
+    object: line
+    level: 1
+  splice:
+    synonyms: [splice up, long splice, short splice, splice the ends of, splice the parted]
+    object: line
+    level: 1
   steer:
     synonyms: [course, helm, steer for, head]
     object: heading
@@ -455,6 +468,13 @@ verbs:
     synonyms: [sail room, show the sail room]
     object: query
     level: 1
+  # The spare cordage (package 31b), kept in fathoms as the sail room is kept in sails.
+  the boatswain's store:
+    synonyms: [the boatswains store, the bosun's store, the bosuns store, the boatswain's stores,
+               the spare cordage, the cordage, spare cordage, show the boatswain's store,
+               show the spare cordage]
+    object: query
+    level: 1
   # Group evolutions: verb phrases with no object, expanded from the list below.
   set plain sail:
     synonyms: [make plain sail, make sail]
@@ -610,6 +630,9 @@ evolutions:
     spar: shift_spar  # package 30b: any spar carried away, for a spare of its class
   cut away: clear_wreck
   send down: clear_wreck
+  # a parted line rove afresh, or spliced (package 31b; the verb says which)
+  reeve: reeve_line
+  splice: reeve_line
   goose wing:
     square: goose_wing
   # rig out and rig in take a studding sail boom, or the studding sail on it; and a running
@@ -735,6 +758,8 @@ both_sides: [both sides, both, either side, on both sides]
 # ---------------------------------------------------------------------------
 manner: [handsomely, roundly, cheerly, smartly, together]
 a_little: [a little, a trifle, a bit]
+# After a line's name, that it is rove again: "reeve the fore topsail sheet afresh" (31b).
+afresh: [afresh, anew, again]
 reef_close: [close, close reefed, close reef, close reefs, all reefs]
 tack_phrase: ["on the", "on", "to the"]   # "on the starboard tack", "to the starboard tack"
 point_directions:

@@ -90,8 +90,9 @@ radius, waypoints of position, central pressure and time, and for a low its fron
 initial bearings; the model follows the waypoints exactly as `WeatherScript.at` does
 today and draws nothing while a scripted system is present. The old `wind` waypoints
 remain as a second form that pins the base wind directly (steady wind, gustiness 0, as
-every truth is measured); when both are given the pinned wind wins and the systems
-supply only the sky and the glass. `data/scenarios/gate-4c-day.yaml` is re-expressed as a
+every truth is measured; its gusts and wander by the air mass since package 31b, §3);
+when both are given the pinned wind wins and the systems supply only the sky and the
+glass. `data/scenarios/gate-4c-day.yaml` is re-expressed as a
 low passing well north of Falmouth with the ship in its warm sector, the cold front
 through at 22:00 and the ridge by dawn; the glass falls slowly all day, checks at the
 front and rises fast in the gale. A world order (§27) appends a system or a waypoint,
@@ -109,13 +110,19 @@ then gusts to about 55, and to 65 only in a squall the log names. The direction'
 walk becomes mean-reverting about the systems' wind with a spread of 5 to 10 degrees in
 unstable air and less in stable; its docstring's "a point an hour" is corrected. Speed
 wander stays at about a tenth of the mean. The M4c tuning note on the gust factor is
-closed by this section. **As built (package 30):** the air-mass rule, the squalls and the
-reverting wander run only when the wind has a cause (the systems); under a fixed or a
-pinned wind the milestone 2 draws are kept bit for bit, so that truths 48 to 51 and the
-gate's day in its pinned form do not move (the pinned gale still gusts to 67; under the
-systems it gusts to about 55, and to 61 in a named squall). Whether the pinned form should
-also take the air-mass rule, with a new digest for the M4 truths, is the owner's ruling at
-gate 5a. A gust's peak is the ten-minute mean times the factor, as the studies define it.
+closed by this section. **As built (package 30, revised by package 31b):** package 30
+ran the air-mass rule, the squalls and the reverting wander only when the wind had a
+cause (the systems) and kept the milestone 2 draws bit for bit under a fixed or a pinned
+wind, so that truths 48 to 51 and the gate's day in its pinned form did not move (the
+pinned gale still gusted to 67). The owner ruled at gate 5a (decision 28) that the pinned
+form should take the rule too, and package 31b retired the milestone 2 draws: every wind
+is in an air mass, the systems' sector when they drive it, else neutral unless the
+scenario says (`wind: {air_mass: ...}` for a fixed wind; a pinned waypoint's `air_mass`,
+which holds from its moment on, so a scripted cold front can say the air behind it is
+unstable). Truths 48 to 51 and the day's digest were re-measured and re-pinned with the
+reasons (`docs/dev/TuningNotes.md`, M5a, package 31b): the pinned gale gusts to about 55
+outside a squall, and squalls come only where a waypoint says the air is unstable. A
+gust's peak is the ten-minute mean times the factor, as the studies define it.
 
 ### 4. The sea state and the ship's motion (`freesail/world/sea.py`, `physics/motion.py`)
 

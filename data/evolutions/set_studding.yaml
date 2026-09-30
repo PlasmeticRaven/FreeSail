@@ -22,6 +22,8 @@ preconditions:
   - {check: "yard_of(sail) == none or sail_of(yard_of(sail)).is_set", reason: "The {sail} cannot be set until the sail on its yard is set."}
   - {check: "yard_of(sail) != none or any_set(sails_using(spar_of_role(sail, boom))) or any_set(sails_using(parent_of(spar_of_role(sail, boom))))", reason: "The {sail} cannot be set until the sail it extends is set."}
   - {check: "spar_of_role(sail, boom) == none or spar_of_role(sail, boom).rigged_out", reason: "The {sail} boom is rigged in; rig it out first."}
+  # not set on a parted sheet, tack or halyard (package 31b)
+  - {check: "not wrecked(sheets_of(sail)) and not wrecked(lines_of(sail, tack)) and not wrecked(halyard_of(sail))", reason: "{parted}"}
 requires:
   - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
   - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}

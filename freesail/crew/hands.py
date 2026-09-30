@@ -4,6 +4,7 @@ Every evolution file carries a ``crew:`` line, and here it becomes a request::
 
     crew: {hands: 12, rating: ordinary, stations: [topmen, afterguard]}
     crew: {hands: all, rating: ordinary, stations: [all hands]}
+    crew: {hands: all, party: 40, rating: able, stations: [topmen, all hands]}
 
 `CrewRequest.from_mapping` reads it. `request` fills it from the hands that are on deck,
 fit and idle, marks the sailors taken with the instance that holds them (`Sailor.at`), and
@@ -11,6 +12,18 @@ says how it went: enough, short but workable, or too few to begin (spec §3.2). 
 gives them back. `crew_factor` says how much longer the work takes with the hands actually
 assigned (spec §3.3); the runner multiplies it into every step's time and passes it to the
 scripts with the weather factor.
+
+**A party bounds an all-hands sail evolution** (spec M3 §3.2 as revised; the owner's
+ruling at gate 5a, decision 28, from playtest 11's finding 14: "reef the topsails" put a
+hundred and fifty hands on the fore topsail while the main and the mizzen waited). A file
+that says ``party: N`` beside ``hands: all`` takes at most N hands: the call still turns
+the watch below up, but the job takes N of the idle hands (its own top's men and the
+rating wanted first, by the file's stations), the rest stay idle for the next job of the
+same order and then for whatever else waits for hands, and the top-up joins hands only up
+to the party. Its numbers term is the party over the hands at it, so more hands are faster
+up to the party and no faster beyond it. A file without a party (a manoeuvre, the masts)
+takes everyone, as before.
+
 
 The order hands are taken in (spec §3.1, with the judgement noted at `_tier`):
 
@@ -114,6 +127,8 @@ class CrewRequest:
     hands: int | None = 0  # None: all hands
     rating: Rating = DEFAULT_RATING
     stations: tuple[str, ...] = ()
+    # all hands: the most any one job of this kind uses (package 31b); None takes everyone
+    party: int | None = None
 
     @property
     def all_hands(self) -> bool:
@@ -140,13 +155,28 @@ class CrewRequest:
             raise CrewRequestError(
                 f"The crew line asks for {raw_hands!r} hands; say a number or 'all'."
             )
+        raw_party = mapping.get("party")
+        party: int | None = None
+        if raw_party is not None:
+            a_number = isinstance(raw_party, int) and not isinstance(raw_party, bool)
+            if not a_number or raw_party < 1:
+                raise CrewRequestError(
+                    f"The crew line names a party of {raw_party!r}; a party is a number of "
+                    "hands, one or more."
+                )
+            if hands is not None:
+                raise CrewRequestError(
+                    f"The crew line names a party of {raw_party} beside {hands} hands; a party "
+                    "bounds an all-hands evolution (hands: all), and a number is its own bound."
+                )
+            party = raw_party
         raw_rating = str(mapping.get("rating") or DEFAULT_RATING.value)
         rating = _rating_named(raw_rating)
         raw_stations = mapping.get("stations") or []
         if isinstance(raw_stations, str):
             raw_stations = [raw_stations]
         stations = tuple(_station_word(str(s)) for s in raw_stations)
-        return cls(hands=hands, rating=rating, stations=stations)
+        return cls(hands=hands, rating=rating, stations=stations, party=party)
 
 
 def _rating_named(name: str) -> Rating:
@@ -221,6 +251,7 @@ class Assignment:
     outcome: str = ENOUGH  # ENOUGH, SHORT or TOO_FEW
     available: int = 0  # idle hands on deck that could have been taken, when TOO_FEW
     all_hands: bool = False
+    party: int | None = None  # all hands: the most this job takes (package 31b)
 
     @property
     def got(self) -> int:
@@ -275,18 +306,26 @@ def request(
     if want.all_hands:
         # A pool action (the owner's ruling of 2026-09-29 at gate 4c): the idle hands now,
         # and the rest of the deck as its earlier work finishes (`top_up`). Wanted is every
-        # hand on deck fit for the work, so it begins short while some are at other work.
-        for s in idle:
-            s.at = inst_id
+        # hand on deck fit for the work, so it begins short while some are at other work;
+        # with a party (package 31b) it is the party, and the job takes that many of the
+        # idle hands, ranked as a numbered request is (the subject's own top first), and
+        # leaves the rest idle for the next job.
         wanted = _deck_for(on_deck, aloft)
-        outcome = TOO_FEW if not idle else ENOUGH if len(idle) >= wanted else SHORT
-        return Assignment(inst_id, wanted, list(idle), outcome, len(idle), all_hands=True)
+        taken = list(idle)
+        if want.party is not None:
+            wanted = min(want.party, wanted)
+            taken = _ranked(idle, want, subject_mast, aloft)[: want.party]
+            taken.sort(key=lambda s: s.id)
+        for s in taken:
+            s.at = inst_id
+        outcome = TOO_FEW if not taken else ENOUGH if len(taken) >= wanted else SHORT
+        return Assignment(
+            inst_id, wanted, taken, outcome, len(idle), all_hands=True, party=want.party
+        )
     wanted = min(int(want.hands or 0), company_can_give(crew, aloft))
     if wanted <= 0:
         return Assignment(inst_id, 0)
-    preferred = preferred_stations(want, subject_mast)
-    want_skill = rating_skill(want.rating, aloft)
-    ranked = sorted(idle, key=lambda s: _tier(s, preferred, want_skill, aloft))
+    ranked = _ranked(idle, want, subject_mast, aloft)
     taken = ranked[:wanted]
     if len(taken) < wanted * SHORT_HANDED_SHARE:
         return Assignment(inst_id, wanted, [], TOO_FEW, len(taken))
@@ -296,25 +335,50 @@ def request(
     return Assignment(inst_id, wanted, taken, outcome, len(taken))
 
 
+def _ranked(
+    idle: list[Sailor], want: CrewRequest, subject_mast: str | None, aloft: bool
+) -> list[Sailor]:
+    """The idle hands in the order a request takes them (`_tier`)."""
+    preferred = preferred_stations(want, subject_mast)
+    want_skill = rating_skill(want.rating, aloft)
+    return sorted(idle, key=lambda s: _tier(s, preferred, want_skill, aloft))
+
+
 def _deck_for(on_deck: Iterable[Sailor], aloft: bool) -> int:
     """How many hands on deck could be put to the work, idle or at other work."""
     return sum(1 for s in on_deck if can_work(s, aloft))
 
 
-def top_up(assignment: Assignment, on_deck: Iterable[Sailor], aloft: bool = False) -> int:
+def top_up(
+    assignment: Assignment,
+    on_deck: Iterable[Sailor],
+    aloft: bool = False,
+    want: CrewRequest | None = None,
+    subject_mast: str | None = None,
+) -> int:
     """An all-hands assignment takes every hand who has come on deck since (the watch
     below comes up over a minute and a half, spec M3 §4.2) and every hand whose earlier
-    work has finished (the owner's ruling of 2026-09-29 at gate 4c). Returns how many
-    joined."""
+    work has finished (the owner's ruling of 2026-09-29 at gate 4c); one with a party takes
+    hands only up to it, the best fitted first when `want` is given (package 31b). Returns
+    how many joined."""
     if not assignment.all_hands:
         return 0
     on_deck = list(on_deck)
-    joined = [s for s in on_deck if s.at is None and can_work(s, aloft)]
+    idle = [s for s in on_deck if s.at is None and can_work(s, aloft)]
+    party = assignment.party
+    if party is not None:
+        room = max(0, party - assignment.got)
+        if want is not None:
+            idle = _ranked(idle, want, subject_mast, aloft)
+        joined = idle[:room]
+    else:
+        joined = idle
     for s in joined:
         s.at = assignment.inst_id
     assignment.hands.extend(joined)
     assignment.hands.sort(key=lambda s: s.id)
-    assignment.wanted = max(len(assignment.hands), _deck_for(on_deck, aloft))
+    wanted = max(len(assignment.hands), _deck_for(on_deck, aloft))
+    assignment.wanted = min(party, wanted) if party is not None else wanted
     if assignment.hands:
         assignment.outcome = ENOUGH if assignment.got >= assignment.wanted else SHORT
     return len(joined)
@@ -349,7 +413,8 @@ def crew_factor(
     work over the hands at it: 1.0 with the whole deck, as always when it is the only work;
     more while some of the deck is still at earlier work, less as they join (the owner's
     ruling of 2026-09-29 at gate 4c: a reef begins short and speeds up as the topgallant
-    men come down).
+    men come down). With a party (package 31b) the term is the party over the hands at it,
+    so more hands are faster up to the party and no faster beyond.
     """
     hands = assignment.hands
     seaway = seaway_factor(roll_deg, aloft)

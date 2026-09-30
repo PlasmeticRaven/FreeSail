@@ -738,10 +738,11 @@ def test_shorten_sail_takes_in_the_topgallants_while_the_reef_is_taken_and_the_r
     a call for all hands is a pool action. "Shorten sail for weather" as the starter book
     has it fires in 32 knots with the frigate under plain sail by day: the topgallants
     start first, in the book's order, with hands of the watch; the reef calls all hands
-    and begins short, with the idle hands and the watch below as it comes up; the
-    topgallants come in while the reef is being taken, not after it, and their hands join
-    it, which speeds it to the whole deck's pace. Nothing is belayed, and the hands are
-    piped down once, when the last topsail is reefed."""
+    and the three topsails are manned together, each up to its party of forty (package
+    31b, decision 28), the first two from the deck and the third short, with what is
+    left, filling as the watch below comes up and the topgallant men come down; the
+    topgallants come in while the reefs are being taken, not after them. Nothing is
+    belayed, and the hands are piped down once, when the last topsail is reefed."""
     from freesail.crew import hands
 
     line = (
@@ -758,15 +759,17 @@ def test_shorten_sail_takes_in_the_topgallants_while_the_reef_is_taken_and_the_r
     world.submit(line)
     start = world.clock.tick
     blow(world, 32.0)
-    factors: list[tuple[int, int, int, float]] = []  # tick, hands at it, the deck's, factor
+    party = hands.CrewRequest.from_mapping(runner_evolution_crew("reef_square")).party
+    # per topsail: (tick, hands at it, wanted, factor) while its reef runs
+    factors: dict[str, list[tuple[int, int, int, float]]] = {}
     for _ in range(1800):
         world.tick()
-        reef = next((i for i in runner.instances if i.evo.id == "reef_square"), None)
-        if reef is not None and reef.subject_id == "fore.topsail" and not reef.waiting:
-            a = reef.assignment
-            factors.append(
-                (world.clock.tick, a.got, a.wanted, hands.crew_factor(a, reef.want, True))
-            )
+        for reef in runner.instances:
+            if reef.evo.id == "reef_square" and not reef.waiting:
+                a = reef.assignment
+                factors.setdefault(reef.subject_id, []).append(
+                    (world.clock.tick, a.got, a.wanted, hands.crew_factor(a, reef.want, True))
+                )
         if not runner.instances and factors:
             break
     fired = by_order(world, "shorten sail for weather")
@@ -774,27 +777,39 @@ def test_shorten_sail_takes_in_the_topgallants_while_the_reef_is_taken_and_the_r
         "taking in the topgallants.",
         "reefing the topsails, one reef.",
     ]
-    began = factors[0][0]
+    fore, mizzen = factors["fore.topsail"], factors["mizzen.topsail"]
+    began = min(f[0][0] for f in factors.values())
     taken_in = [e.tick for e in events(world, "sail.taken_in", after=start)]
     reefed = [e.tick for e in events(world, "sail.reefed", after=start)]
     assert len(taken_in) == 3 and len(reefed) == 3
-    # the topgallants in while the fore topsail is being reefed, not after it
+    # the topgallants in while the topsails are being reefed, not after them
     assert began <= min(taken_in) and max(taken_in) < min(reefed)
     assert events(world, "evolution.belayed", after=start) == []
-    # the reef begins short (part of the deck at the topgallants) and speeds up as the
-    # watch below comes up and the topgallant men come down, to the whole deck's pace
-    _, got0, deck0, first = factors[0]
-    assert got0 < deck0 and first > 1.1
+    # the fore topsail has its party from the first tick and goes at the file's pace; the
+    # mizzen, the last to get hands, begins short (part of the deck at the topgallants)
+    # and speeds up as the watch below comes up and the topgallant men come down, to the
+    # party's pace; no reef ever has more than its party
+    assert fore[0][1] == fore[0][2] == party and fore[0][3] == pytest.approx(1.0, abs=0.02)
+    _, got0, wanted0, first = mizzen[0]
+    assert got0 < wanted0 == party and first > 1.1
     shorts = [e for e in events(world, "evolution.short_handed", after=start)]
-    assert any("fore topsail" in e.text and "topgallant" in e.text for e in shorts)
-    assert [f for _, _, _, f in factors] == sorted((f for _, _, _, f in factors), reverse=True)
-    joined = next(t for t, got, deck, _ in factors if got == deck)
-    assert max(taken_in) <= joined < min(reefed)
-    assert factors[-1][3] == pytest.approx(1.0, abs=0.02)
-    # one call and one pipe-down for the three topsails
+    assert any("mizzen topsail" in e.text and "topgallant" in e.text for e in shorts)
+    assert [f for _, _, _, f in mizzen] == sorted((f for _, _, _, f in mizzen), reverse=True)
+    joined = next(t for t, got, wanted, _ in mizzen if got == wanted)
+    assert mizzen[0][0] < joined < min(reefed)  # filled as the watch below came up
+    assert mizzen[-1][3] == pytest.approx(1.0, abs=0.02)
+    assert max(got for f in factors.values() for _, got, _, _ in f) == party
+    # the three reefed together; one call and one pipe-down for the three topsails
+    assert max(reefed) - min(reefed) < 60
     assert len(events(world, "crew.all_hands", after=start)) == 1
     piped = events(world, "crew.piped_down", after=start)
     assert [e.tick for e in piped] == [max(reefed)]
+
+
+def runner_evolution_crew(evolution_id: str) -> dict:
+    from freesail.evolutions import registry
+
+    return registry.get(evolution_id).crew
 
 
 def morning_crew_factor(calls: bool) -> tuple[float, float]:
@@ -1883,9 +1898,32 @@ GATE_DAY_TOPGALLANTS_AGAIN_TICK = 95650
 # Package 29b (all hands a pool action; trim on a shift; the grouped lines): the three
 # ticks above did not move; "shorten sail for weather" fires three times, at 21:43:57,
 # 22:16:13 and 22:56:28 (twice in package 29's last measurement, at the first and the
-# third), and "trim on a shift" four times (20:42, 21:58, 22:57, 23:55) as the wind veers
+# third), and "trim on a shift" four times (20:42, 21:58, 22:57, 23:55) as the wind veers.
+# Package 31b (the pinned form under the air-mass rule, the owner's ruling at gate 5a;
+# the topsails reefed by three parties together): the ticks above and the shortening
+# ticks did not move, since the pinned wind's speed fires the routines and neutral air's
+# gusts, 1.30 of the mean at most, never reach a dwell; "trim on a shift" fires fourteen
+# times, none by day (the scenario says the warm sector's air, three degrees of wander)
+# and every twenty to forty minutes through the gale in neutral air, whose wander of five
+# degrees about the base carries the point rule over its mark and back
+# (docs/dev/TuningNotes.md, M5a, package 31b).
 GATE_DAY_SHORTEN_SAIL_TICKS = [63837, 65773, 68188]
-GATE_DAY_TRIM_ON_A_SHIFT_TICKS = [60148, 64720, 68248, 71749]
+GATE_DAY_TRIM_ON_A_SHIFT_TICKS = [
+    55866,
+    56843,
+    59062,
+    64840,
+    66022,
+    68980,
+    77099,
+    78222,
+    80789,
+    82056,
+    82680,
+    87053,
+    98501,
+    98938,
+]
 
 
 def the_gate_day(until: int = GATE_DAY_TICKS, saves: tuple[int, ...] = GATE_DAY_SAVES):
@@ -2329,7 +2367,10 @@ def test_truth_55_the_weather_replays_tick_for_tick_and_the_pinned_wind_wins():
         assert pinned.wind.base_speed == pytest.approx(s, rel=1e-12)
         assert pinned.wind.state() == changed.wind.state()
     assert pinned.readings["glass"] != changed.readings["glass"], "the systems still give the glass"
-    assert pinned.wind.air_mass is None and changed.wind.air_mass is None
+    # the air is the pinned waypoint's (the warm sector's by day, package 31b), whatever
+    # the systems' sector says: the deeper low changes nothing of the wind
+    said = pinned.weather.air_mass_at(pinned.clock.ship_time)
+    assert pinned.wind.air_mass == changed.wind.air_mass == said == "warm"
 
 
 def test_truth_57_no_line_or_reading_names_a_front_a_centre_an_isobar_or_a_hectopascal(
@@ -2379,37 +2420,40 @@ def test_truth_57_no_line_or_reading_names_a_front_a_centre_an_isobar_or_a_hecto
 GATE_5A_DAY = "data/scenarios/gate-5a-day.yaml"
 GATE_5A_DAY_TICKS = GATE_DAY_TICKS
 GATE_5A_DAY_SAVES = (16 * 3600, 21 * 3600)
-# Measured at seed 7: sunset and the night routine at 19:50; the starter's "shorten sail
-# for weather" once, at 21:33 (the systems' wind passes thirty a quarter of an hour before
-# the pinned one); the captain's "gale canvas" at 23:11; the heavy-weather routine at
-# 00:37, its four orders on one tick (the close reef carried out: one reef was in); the
-# storm staysail set at 01:21; the first squall of the middle watch at 01:17, 65 knots,
-# which blows out the close-reefed mizzen topsail and parts the main topsail's larboard
-# brace and sheet; "make sail after the gale" at 08:14; nothing else lost, no spar
-# carried away.
+# Measured at seed 7 (package 31, and again by package 31b with the topsails reefed by
+# three parties of forty together and the close reef first in the starter's heavy-weather
+# routine; docs/dev/TuningNotes.md, M5a, package 31b): sunset and the night routine at
+# 19:50; the starter's "shorten sail for weather" once, at 21:33 (the systems' wind passes
+# thirty a quarter of an hour before the pinned one), its three reefs in together by
+# 21:44; the captain's "gale canvas" at 23:11; the heavy-weather routine at 00:37, its
+# four orders on one tick, the close reefs in by 00:51 (package 31 had them waiting for
+# the send-down's hands until the first squall, and lost the mizzen topsail and the main
+# topsail's brace and sheet to it); the first squall of the middle watch at 01:17, 65
+# knots, with the topsails close-reefed and the topgallant masts coming down; the storm
+# staysail set at 01:26; nothing lost, no spar carried away; "make sail after the gale"
+# at 08:13 and the captain's "topgallants again" at 08:52 (before this package it had not
+# fired by nine).
 GATE_5A_SUNSET_TICK = 57039
 GATE_5A_SHORTEN_SAIL_TICK = 63200
 GATE_5A_GALE_CANVAS_TICK = 69115
 GATE_5A_HEAVY_WEATHER_TICK = 74245
 GATE_5A_FIRST_SQUALL_TICK = 76673
-GATE_5A_MAKE_SAIL_TICK = 101644
-GATE_5A_LOST = [
-    "Mizzen topsail split and blew out of the bolt-ropes.",
-    "Larboard main topsail yard brace parted; the main topsail yard swung round to the wind.",
-    "Larboard main topsail sheet parted; the main topsail flogging itself to ribbons.",
-]
+GATE_5A_CLOSE_REEFS_IN_TICK = 75103
+GATE_5A_MAKE_SAIL_TICK = 101624
+GATE_5A_TOPGALLANTS_AGAIN_TICK = 103976
+GATE_5A_LOST: list[str] = []
 # The sea's words through the day: a short chopping sea from 05:04, a heavy sea from
 # 20:45 as the gale comes on, a very heavy sea from 01:51, and going down to a heavy sea
-# at 08:22, hours after the wind eased (the ten-minute mean under a moderate gale from
+# at 08:26, hours after the wind eased (the ten-minute mean under a moderate gale from
 # about five).
 GATE_5A_SEA_TICKS = {
     "A short chopping sea getting up.": 3840,
     "A heavy sea getting up.": 60300,
     "A very heavy sea getting up.": 78660,
-    "A heavy sea, the sea going down.": 102120,
+    "A heavy sea, the sea going down.": 102360,
 }
-GATE_5A_DAY_LINES = 493
-GATE_5A_DAY_DIGEST = "87c9d80a3b477233"
+GATE_5A_DAY_LINES = 487
+GATE_5A_DAY_DIGEST = "d2c9e73c52a1e1fd"
 
 
 def the_gate_day_under_systems(until: int = GATE_5A_DAY_TICKS, saves=GATE_5A_DAY_SAVES):
@@ -2491,18 +2535,26 @@ def test_the_day_under_systems_alone_at_seed_7_has_its_own_constants(gate_5a_day
     assert sorted({t for t, _ in by_order(world, "gale canvas")}) == [GATE_5A_GALE_CANVAS_TICK]
     heavy = by_order(world, "heavy weather")
     assert [t for t, _ in heavy] == [GATE_5A_HEAVY_WEATHER_TICK] * 4
+    # the close reef first (package 31b, the order of the clauses being the order of
+    # the work), and in before the first squall: the three topsails by three parties
     assert [text.split(": ")[1] for _, text in heavy] == [
+        "close reefing the topsails.",
         "sending down the topgallant masts.",
         "taking in the fore topmast staysail.",
         "bending the fore storm staysail.",
-        "close reefing the topsails.",
     ]
+    close = [e for e in events(world, "sail.reefed") if "3 reefs" in e.text]
+    assert sorted(e.subject for e in close) == sorted(world.ship.groups["topsails"])
+    assert max(e.tick for e in close) == GATE_5A_CLOSE_REEFS_IN_TICK < GATE_5A_FIRST_SQUALL_TICK
+    assert max(e.tick for e in close) - min(e.tick for e in close) < 60  # together
     squalls = events(world, "weather.squall")
     assert squalls and squalls[0].tick == GATE_5A_FIRST_SQUALL_TICK
     assert "65 knots" in squalls[0].text and squalls[0].data["air_mass"] == "unstable"
-    assert [e.text for e in world.log if e.kind in LOST] == GATE_5A_LOST
+    assert [e.text for e in world.log if e.kind in LOST] == GATE_5A_LOST == []
     assert [p.id for p in world.ship.parts.values() if p.wrecked] == []
     assert min(t for t, _ in by_order(world, "make sail after the gale")) == GATE_5A_MAKE_SAIL_TICK
+    again = by_order(world, "topgallants again")
+    assert again and again[0][0] == GATE_5A_TOPGALLANTS_AGAIN_TICK
     assert len(world.log) == GATE_5A_DAY_LINES
     assert world.log.digest()[:16] == GATE_5A_DAY_DIGEST
     # the motion's words through the gale, and no line names a number of the sea
@@ -2651,3 +2703,25 @@ def test_the_pace_on_the_gates_day_with_the_region_loaded_holds_truth_51s_floor(
         world.run(1000)
         best = max(best, 1000 / (time.perf_counter() - t0))
     assert best >= BUILD_MACHINE_FLOOR, f"{best:.0f} ticks a second"
+
+
+def test_the_primers_chapter_nine_does_not_narrate_the_gates_day(gate_5a_day):
+    """Playtest 11's finding 9 (package 31b): chapter 9 described the gate's day hour by
+    hour, and the log's first line names the scenario, so a reader of the library could
+    foresee the night. The chapter now names no scenario file and no day of the tests,
+    and none of its sample lines carries a moment of the day under systems (its notable
+    lines and its standing orders' firings); the hours in it are any day's."""
+    primer = Path(__file__).resolve().parents[1] / "docs" / "primer"
+    text = (primer / "09-the-glass-and-the-sky.md").read_text(encoding="utf-8")
+    for words in ("gate-4c-day", "gate-5a-day", "gate's day", "Falmouth", "ten in the evening"):
+        assert words not in text, words
+    world, _, _ = gate_5a_day
+    moments = {
+        e.ship_time.strftime("%H:%M")
+        for e in world.log
+        if e.severity is not Severity.ROUTINE or e.actor.startswith("standing order")
+    }
+    assert len(moments) > 50
+    said = set(re.findall(r"\((\d\d:\d\d)\)", text))
+    assert said, "the chapter still shows the log's lines"
+    assert not (said & moments), sorted(said & moments)

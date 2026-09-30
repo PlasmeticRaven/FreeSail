@@ -96,6 +96,8 @@ def execute(
         return _trim(ship, order, vocab, skip, group=group)
     if order.verb == "sheet home":
         return _sheet_home(ship, order, vocab)
+    if order.verb in REEVE_VERBS:
+        return _reeve(ship, order, vocab)  # a parted line rove afresh or spliced (31b)
     if order.verb in BOOM_VERBS or (order.verb == "reef" and _names_bowsprit(ship, order)):
         # a studding sail boom rigged out or in; a running bowsprit rigged out or reefed
         # ("reef the bowsprit", package 32b), the evolution refusing a standing one in words
@@ -189,6 +191,7 @@ def _no_stray_modifiers(order: Order, allowed: set[str]) -> None:
         "a_little": "'a little' belongs with 'haul' or 'ease'",
         "home": "'home' and 'aft' belong with 'haul'",
         "manner": "'handsomely' and 'roundly' belong with 'haul' or 'ease'",
+        "afresh": "'afresh' belongs with 'reeve'",
         "heading": "a heading belongs with 'steer'",
         "points": "a number of points belongs with 'steer', 'come up' or 'bear away'",
         "direction": "a direction belongs with 'steer'",
@@ -752,6 +755,8 @@ def _trim(
     too_far: dict[str, str] = {}  # yards refused by the adjacent-yards rule, with the reason
     folded: list[str] = []  # yards whose trim in hand, not yet begun, takes the new angle
     busy: list[str] = []  # yards being braced to the wind now: that trim stands
+    down: list[Spar] = []  # yards sent down on deck: said as a clause, not a refusal
+    gone: list[Spar] = []  # yards carried away, likewise
     if do_yards:
         sync_catharpins(ship)  # the limits as the lower rigging stands now
         runner = runner_of(ship)
@@ -796,8 +801,11 @@ def _trim(
         for yard in yards:
             name = resolve.the(ship, yard.id)
             if yard.wrecked or yard.sent_down:
+                # said as one clause of the line, "the topgallant and royal yards are on
+                # deck", not as a "Not ..." list (package 31b; playtest 11's finding 8)
                 failed.append(f"{name} is {'carried away' if yard.wrecked else 'sent down'}")
                 failed_ids.append(yard.id)
+                (gone if yard.wrecked else down).append(yard)
                 continue
             if yard.id in too_far:
                 failed.append(too_far[yard.id])
@@ -859,7 +867,7 @@ def _trim(
         which = (
             f"the {object_name}"
             if object_name != "yards"
-            else f"{len(started)} yard{'s' if len(started) != 1 else ''}"
+            else f"{number_words(len(started))} yard{'s' if len(started) != 1 else ''}"
         )
         how = yard_trim.difference_words(staggered)
         parts.append(
@@ -872,10 +880,16 @@ def _trim(
         parts.append(f"trimmed the {sheets} of {errors.sentence_list(trimmed)}")
     if in_hand_words:
         parts.append(in_hand_words)
+    off_deck = _yards_off_words(ship, down, gone)
+    if off_deck:
+        parts.append(off_deck)
     text = "; ".join(parts)
     text = text[0].upper() + text[1:] + "."
+    off_ids = {y.id for y in down + gone}
     refused = [f for f, i in zip(failed, failed_ids, strict=True) if i in too_far]
-    others = [f for f, i in zip(failed, failed_ids, strict=True) if i not in too_far]
+    others = [
+        f for f, i in zip(failed, failed_ids, strict=True) if i not in too_far and i not in off_ids
+    ]
     if others:
         text += f" Not {errors.sentence_list(others)}."
     if refused:
@@ -1151,12 +1165,17 @@ def _sheet_home(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
     changes: list[dict[str, Any]] = []
     for sail in sails:
         name = resolve.the(ship, sail.id)
-        sheets = [ln for ln in ship.sheets_of(sail) if ln.state is not LineState.PARTED]
+        parted = [ln for ln in ship.sheets_of(sail) if ln.state is LineState.PARTED]
+        if parted:
+            # a sail is not sheeted home on a sheet that is gone (package 31b, playtest
+            # 11's finding 7): the one sheet left would only make it flog the worse
+            names = errors.join_names([resolve.the(ship, ln.id) for ln in parted], "and")
+            verb = "is" if len(parted) == 1 else "are"
+            failed.append(f"{names} {verb} parted; reeve a new one before {name} is sheeted home")
+            continue
+        sheets = list(ship.sheets_of(sail))
         if not sheets:
-            failed.append(
-                f"{name} has no sheet to haul"
-                + (" that is not parted" if ship.sheets_of(sail) else "")
-            )
+            failed.append(f"{name} has no sheet to haul")
             continue
         moved = False
         if sail.is_fore_and_aft:
@@ -1415,6 +1434,54 @@ def _haul_or_ease(
     what = "home" if new >= 1.0 - 1e-9 else ("right off" if new <= 1e-9 else _tenths(new))
     text = f"{did} {name}; now {what}."
     return text, {"line": line.id, "hauled": new}
+
+
+def _yard_kind(yard_id: str) -> str:
+    """'topgallant' for fore.topgallant.yard, 'topsail', 'royal'; 'lower' for a lower yard
+    (fore.yard, mizzen.crossjack.yard)."""
+    words = yard_id.split(".")
+    if len(words) < 3 or words[1] == "crossjack":
+        return "lower"
+    return words[1]
+
+
+def _yard_kinds_words(ship: Ship, yards: list[Spar]) -> str:
+    """'the topgallant and royal yards' when every yard of those kinds is named, else the
+    yards by name: 'the fore topgallant yard and the royal yards'."""
+    all_yards = [s for s in ship.spars.values() if s.is_yard]
+    kinds: list[str] = []
+    for y in all_yards:
+        k = _yard_kind(y.id)
+        if k not in kinds:
+            kinds.append(k)
+    named = {y.id for y in yards}
+    whole: list[str] = []
+    rest: list[str] = []
+    for kind in kinds:
+        of_kind = [y for y in all_yards if _yard_kind(y.id) == kind]
+        mine = [y for y in of_kind if y.id in named]
+        if not mine:
+            continue
+        if len(mine) == len(of_kind) and len(mine) > 1:
+            whole.append(kind)
+        else:
+            rest.extend(resolve.the(ship, y.id) for y in mine)
+    phrases = ([f"the {errors.join_names(whole, 'and', limit=8)} yards"] if whole else []) + rest
+    return errors.join_names(phrases, "and", limit=8)
+
+
+def _yards_off_words(ship: Ship, down: list[Spar], gone: list[Spar]) -> str:
+    """The trim line's clause for the yards it could not brace because they are not aloft
+    (package 31b; playtest 11's finding 8): 'the topgallant and royal yards are on deck',
+    'the fore topgallant yard is carried away'."""
+    clauses: list[str] = []
+    if down:
+        verb = "is" if len(down) == 1 else "are"
+        clauses.append(f"{_yard_kinds_words(ship, down)} {verb} on deck")
+    if gone:
+        verb = "is" if len(gone) == 1 else "are"
+        clauses.append(f"{_yard_kinds_words(ship, gone)} {verb} carried away")
+    return " and ".join(clauses)
 
 
 def _brace_words(angle: float) -> str:
@@ -1901,13 +1968,92 @@ def _names_bowsprit(ship: Ship, order: Order) -> bool:
 
 
 def _query(ship: Ship, order: Order) -> Result:
-    """'The booms' and 'the sail room': what the ship's stores hold, in the log and never
-    journaled (the World logs a `query.` kind as it is)."""
-    from freesail.ship.parts import booms, sail_room
+    """'The booms', 'the sail room' and 'the boatswain's store': what the ship's stores
+    hold, in the log and never journaled (the World logs a `query.` kind as it is)."""
+    from freesail.ship.parts import booms, cordage, sail_room
 
     if order.verb == "the booms":
         return "query.booms", "\n".join(booms(ship).inventory_lines()), {}
+    if order.verb == BOATSWAINS_STORE:
+        return "query.cordage", "\n".join(cordage(ship).inventory_lines()), {}
     return "query.sail_room", "\n".join(sail_room(ship).inventory_lines()), {}
+
+
+# The verb's name as the vocabulary keys it (`vocabulary.key` drops the apostrophe).
+BOATSWAINS_STORE = "the boatswains store"
+
+
+# ---------------------------------------------------------------------------
+# Level 1: a parted line rove afresh, or spliced (package 31b)
+# ---------------------------------------------------------------------------
+
+REEVE_VERBS = ("reeve", "splice")
+
+
+def _reeve(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
+    """'Reeve a new <line>', 'reeve the <line> afresh', 'splice the <line>' (package 31b,
+    playtest 11's finding 7): one reeve_line evolution a line, with hands and time, from
+    the coil in the boatswain's store (a splice takes none and leaves the line an eighth
+    the weaker). A sound line, standing rigging, a line that went with its spar and a
+    store too short for the length are refused in words; of several lines, the ones that
+    can be rove are, and the rest are reported."""
+    _no_stray_modifiers(order, {"afresh", "manner", "hands_from"})
+    splice = order.verb == "splice"
+    res = resolve.resolve(ship, order.object or "", order.side_word, order.verb)
+    lines: list[Line] = []
+    for pid in res.ids:
+        part = ship.parts[pid]
+        if not isinstance(part, Line):
+            raise errors.wrong_kind(
+                order.verb,
+                resolve.display_name(ship, pid),
+                _what(ship, part),
+                "lines",
+                _line_hint(ship, part),
+            )
+        lines.append(part)
+    runner = runner_of(ship)
+    evo = vocab.evolutions[order.verb]
+    extra, call = _hands_params(ship, order, [evo] * len(lines), None)
+    started: list[dict[str, Any]] = []
+    texts: list[str] = []
+    failed: list[str] = []
+    failed_ids: list[str] = []
+    for line in lines:
+        name = resolve.the(ship, line.id)
+        reason = scripts.reeve_refusal(ship, line, splice)
+        if reason:
+            failed.append(_lower(reason))
+            failed_ids.append(line.id)
+            continue
+        params = {"line": line.id, "splice": splice, **extra}
+        try:
+            texts.append(runner.start(ship, evo, line.id, params))
+        except OrderError as e:
+            failed.append(_refused(name, e))
+            failed_ids.append(line.id)
+            continue
+        started.append({"evolution": evo, "subject": line.id, "params": params})
+    _settle_call(ship, call, bool(started))
+    if not started:
+        if len(failed) == 1:
+            raise OrderError(failed[0][0].upper() + failed[0][1:].rstrip(".") + ".")
+        raise OrderError(f"Nothing done: {errors.sentence_list(failed)}.")
+    text = " ".join(t.strip() for t in texts if t)
+    if failed:
+        text += " Not done: " + errors.sentence_list(f.rstrip(".") for f in failed) + "."
+    data = {
+        "verb": order.verb,
+        "level": 1,
+        "object": res.name,
+        "side": res.side,
+        "subjects": [s["subject"] for s in started],
+        "evolutions": started,
+        "failed": failed,
+        "failed_subjects": failed_ids,
+        "splice": splice,
+    }
+    return "evolution.started", text, data
 
 
 def _clear_wreck(ship: Ship, order: Order, vocab: Vocabulary) -> Result:

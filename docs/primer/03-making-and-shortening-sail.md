@@ -54,7 +54,7 @@ set the flying jib
 set the main topmast staysail
 ```
 
-Taking in runs the other way: light sails first. *Take in* leaves a square sail *in the gear*, hauled up to its yard by clewlines and buntlines but not yet stowed (Falconer, *Buntlines*); *furl* sends the topmen out on the yard to pass the gaskets and make it fast (Falconer, *Furling*). A sail in the gear can be set again quickly; a furled sail must be loosed first.
+Taking in runs the other way: light sails first. *Take in* leaves a square sail *in the gear*, hauled up to its yard by clewlines and buntlines but not yet stowed (Falconer, *Buntlines*); *furl* sends the topmen out on the yard to pass the gaskets and make it fast (Falconer, *Furling*). A sail in the gear can be set again quickly; a furled sail must be loosed first. In a blow that difference matters: a sail hanging in its gear still bags and catches wind, about a seventh of its area, two to four times what the same sail presents furled and gasketed on the yard, and that windage bears on its yard and mast like any other. The standing orders take sails in and leave them so, which is a squall's economy; before a night of it, furl what is not coming back ("furl all square sails", Luce 1884, ch. XXIX In a Gale, 'Preparations for a Gale').
 
 ```orders frigate all-sail
 take in the studdingsails
@@ -135,6 +135,8 @@ To reef a topsail the halyards are settled and the yard clewed down, the reef ta
   Morning watch (04:36)  Laid out and passed the earings of the fore topsail.
 * Morning watch (04:38)  Reefed the fore topsail; now set, 1 reef.
 ```
+
+Reefing is all hands' work, but not every hand's. `reef the topsails` turns the watch below up and puts forty hands to each topsail, its own topmen on the yard and the rest at the halyards and reef tackles on deck (Luce 1884, ch. XVIII, the station billet: "Reefing topsails: topsail buntlines, reef topsail, on deck to halliards"), so the three are reefed together in the time one takes; the hands beyond a sail's forty go to the next job waiting, and a job that begins short of its party says so once and fills as the watch below comes up. More hands are faster up to the forty and no faster beyond. A tack or a wear, and the sending down of the topgallant masts, still take everyone.
 
 You say how many reefs, or *close* for all of them (a *close-reefed* topsail has every reef in), after the sail or in the verb: `close reef`, `double reef`, `single reef`, `treble reef`, or Luce's `take in one reef in the topsails`. A reef comes out with `shake out`; `shake out the reefs` shakes out all of them:
 
@@ -420,6 +422,29 @@ With nothing carried away every one of these is refused in words: "The fore tops
 ```
 
 Twenty minutes from the carry-away to a studding sail ready to set again. A boom is the lightest of it: the wreck of a topmast, with the yards and the sails above it, takes the better part of an hour to clear in a fresh breeze, and a new topmast six times a boom's work to send up, each at the pace the weather and the hands allow. The spars that went with it are shifted one by one, the topmast first.
+
+## Reeving a parted line
+
+A sheet, a brace or a halyard that parts in a gust leaves its sail flogging, its yard swung round to the wind or its sail down in the gear, and nothing can be hauled on it: the refusal says it "must be spliced or rove afresh", and both are orders. Running rigging is what "reeves through blocks, or sheave holes ... such as halliards, braces, clew-lines, buntlines" (Lever 1808), and it is "got out in the coil, and cut to proper lengths when reeved on board" (Steel 1794). `reeve a new <line>` (or `reeve the <line> afresh`) rouses up the coil from the boatswain's store, measures off the length the line wants and reeves it through its blocks: six hands and four or five minutes in a breeze, and the new line is as good as the ship file made it. `splice the <line>` joins the parted ends instead, with no rope from the store, but "the splice is weaker than the main part of the rope by about one-eighth" (Luce 1884, ch. II Knotting and Splicing), and the line is rated so from then on.
+
+```
+  Morning watch (04:20)  Order: reeve a new larboard fore topsail sheet.
+  Morning watch (04:20)  Reeve a new larboard fore topsail sheet! Rouse up the coil from the boatswain's store.
+  Morning watch (04:21)  Roused up the coil and measured off 30 fathoms for the new larboard fore topsail sheet.
+* Morning watch (04:26)  Rove a new larboard fore topsail sheet; the fore topsail may be sheeted home and set. 570 fathoms of spare cordage left in the boatswain's store.
+```
+
+While a sheet, a tack or a halyard is parted its sail is refused for setting and for sheeting home ("The fore topsail: the larboard fore topsail sheet is parted and must be rove afresh."), so a sail is never sheeted home on a sheet that is gone; a `set` given behind the reeve waits its turn and goes ahead when the line is whole. A yard whose brace parted swung round to the wind, and is a yard to brace again once the brace is rove. Standing rigging, the stays and shrouds, is set up with deadeyes and lanyards and not rove, and the game does not yet set it up afresh. `the boatswain's store` (or `the cordage`) says what rope is left: the frigate carries six hundred fathoms, five coils, and the schooner a hundred and fifty; a topsail sheet takes thirty of the frigate's, a halyard forty, a brace thirty-five, and the schooner's lines about three fifths of that for her size. With the store short, only a splice remains, and the refusal says so.
+
+```orders frigate plain-sail
+the boatswain's store
+the cordage
+# rejected: reeve a new main brace
+# rejected: reeve a new starboard main brace
+# rejected: splice the main stay
+```
+
+The refusals: the first wants a side ("Which main brace: the starboard, the larboard ..."); the starboard main brace "is sound and rove; only a parted line is rove afresh"; the main stay "is standing rigging, set up with deadeyes and lanyards".
 
 ## Loosing to dry and furling everything
 

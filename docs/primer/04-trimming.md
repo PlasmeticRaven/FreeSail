@@ -189,9 +189,9 @@ trim the yards
 
 ```
   Morning watch (04:20)  Order: trim sails.
-  Morning watch (04:20)  Braced 12 yards to the wind, 48° on the starboard bow, the after yards two degrees sharper; trimmed the sheets of the mizzen spanker; the fore topmast staysail; the jib.
+  Morning watch (04:20)  Braced twelve yards to the wind, 48° on the starboard bow, the after yards two degrees sharper; trimmed the sheets of the mizzen spanker; the fore topmast staysail; the jib.
   Morning watch (05:05)  Order: trim sails with the head yards sharper.
-  Morning watch (05:05)  Braced 12 yards to the wind, 45° on the starboard bow, the head yards three degrees sharper; trimmed the sheets of the mizzen spanker; the fore topmast staysail; the jib.
+  Morning watch (05:05)  Braced twelve yards to the wind, 45° on the starboard bow, the head yards three degrees sharper; trimmed the sheets of the mizzen spanker; the fore topmast staysail; the jib.
 ```
 
 What it is worth in the game is small: at 66° off the wind the frigate makes 5.2 knots with the after yards two degrees sharper and 5.0 with all alike, and 4.8 with the head yards sharper. Fincham's reason is the head sails bending the wind aft of them, and the game's sails all feel one wind, so the after sails gain only the little they gain by standing nearer their luff. The owner is judging it (truth 24).
@@ -257,7 +257,7 @@ swifter in the catharpins
   Morning watch (05:20)  Boatswain's party to the main mast shrouds; reeve the swifter.
 * Morning watch (05:45)  Swiftered in the catharpins on the main mast; the main yard will brace four degrees sharper.
   Morning watch (05:50)  Order: trim sails.
-  Morning watch (05:50)  Braced 12 yards to the wind, 45° on the starboard bow, the after yards six degrees sharper; ...
+  Morning watch (05:50)  Braced twelve yards to the wind, 45° on the starboard bow, the after yards six degrees sharper; ...
 ```
 
 and, eased again:

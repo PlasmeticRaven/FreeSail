@@ -438,12 +438,23 @@ def test_wrecked_spar_rejects_at_start_and_fails_mid_way():
     assert ship.sails["main.royal"].state is not SailState.SET
 
 
-def test_parted_halyard_fails_the_hoist():
+def test_a_parted_halyard_refuses_the_set_and_parting_midway_fails_the_hoist():
+    """A sail is not set on a parted halyard (package 31b: the set is refused in words
+    that name the line and the remedy); a halyard that parts while the topmen are
+    loosing the sail fails the hoist as it always did (the step's `via`)."""
     ship = load_ship(SCHOONER)
     runner = Runner(ship)
     wind = make_wind()
-    ship.lines["fore.topsail.yard.halyard"].state = LineState.PARTED
+    halyard = ship.lines["fore.topsail.yard.halyard"]
+    halyard.state = LineState.PARTED
+    with pytest.raises(OrderError, match="fore topsail yard halyard is parted and must be rove"):
+        runner.start(ship, "set_square", "fore.topsail")
+    assert runner.in_progress() == []
+    halyard.state = LineState.BELAYED
     runner.start(ship, "set_square", "fore.topsail")
+    for _ in range(30):
+        runner.step(ship, 1.0, wind)
+    halyard.state = LineState.PARTED  # parts while the sail is being loosed
     _, notes = run(runner, ship, wind)
     assert kinds(notes)[-1] == "evolution.failed"
     assert "fore topsail yard halyard is parted" in texts(notes)[-1]
@@ -1120,3 +1131,179 @@ def test_clearing_and_shifting_give_the_same_log_every_time():
     first = play()
     assert any(k == "spar.shifted" for _, k, _ in first)
     assert first == play()
+
+
+# ---------------------------------------------------------------------------
+# A parted line rove afresh, or spliced (package 31b; playtest 11's finding 7)
+# ---------------------------------------------------------------------------
+
+
+def _frigate_under_plain_sail():
+    from freesail.api.session import make_world
+    from freesail.core.world import Scenario
+
+    sc = Scenario(
+        wind_from_deg=0.0,
+        wind_speed_kn=15.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=90.0,
+        ship_speed_kn=4.0,
+    )
+    w = make_world(7, FRIGATE, sc)
+    w.ship.extra["evolutions"].clock = w.clock
+    w.submit("set plain sail")
+    w.run(1200)
+    return w
+
+
+def test_a_parted_sheet_is_rove_afresh_from_the_coil_and_the_sail_set_again():
+    """The refusal of playtest 11 ("it must be spliced or rove afresh") now names an order
+    that exists: `reeve a new <line>` takes its fathoms from the boatswain's store, holds
+    the sail so a `set` given behind it waits its turn, and leaves the line whole at the
+    file's rating; meanwhile the sail is refused for setting and for sheeting home, so a
+    sail is never sheeted on a sheet that is gone."""
+    from freesail.evolutions import scripts
+    from freesail.ship.parts import cordage
+
+    w = _frigate_under_plain_sail()
+    ship = w.ship
+    runner = ship.extra["evolutions"]
+    sheet = ship.lines["fore.topsail.sheet.larboard"]
+    rating = sheet.rating_kn
+    sheet.state = LineState.PARTED
+    ship.sails["fore.topsail"].state = SailState.LOOSED  # as the strain model leaves it
+    store = cordage(ship)
+    assert store.fathoms == 600.0  # the frigate's file: five coils
+    e = w.submit("the boatswain's store")
+    assert e.kind == "query.cordage"
+    assert e.text == "The boatswain's store holds 600 fathoms of spare cordage."
+    e = w.submit("set the fore topsail")
+    assert e.kind == "order.rejected"
+    assert e.text.endswith(
+        "The fore topsail: the larboard fore topsail sheet is parted and must be rove afresh."
+    )
+    e = w.submit("sheet home the fore topsail")
+    assert e.kind == "order.rejected" and "reeve a new one before" in e.text
+    e = w.submit("reeve a new fore topsail sheet")
+    assert e.kind == "order.rejected" and "Which fore topsail sheet" in e.text
+    n0 = len(w.log)
+    e = w.submit("reeve the larboard fore topsail sheet afresh")
+    assert e.kind == "order.accepted"
+    e = w.submit("set the fore topsail")
+    assert e.kind == "order.accepted"  # queued behind the reeve, which holds the sail
+    snap = {s["subject"]: s for s in runner.in_progress()}
+    assert snap["fore.topsail.sheet.larboard"]["hands"] == 6
+    assert snap["fore.topsail"]["waiting"] is True
+    w.run(1200)
+    assert runner.in_progress() == []
+    texts = [ev.text for ev in list(w.log)[n0:]]
+    wants = scripts.line_fathoms(ship, sheet)
+    assert wants == 30.0
+    assert (
+        "Reeve a new larboard fore topsail sheet! Rouse up the coil from the boatswain's store."
+        in texts
+    )
+    assert (
+        "Roused up the coil and measured off 30 fathoms for the new larboard fore topsail sheet."
+        in texts
+    )
+    rove = [ev for ev in list(w.log)[n0:] if ev.kind == "line.rove"]
+    assert len(rove) == 1 and rove[0].severity.value == "notable"
+    assert rove[0].text == (
+        "Rove a new larboard fore topsail sheet; the fore topsail may be sheeted home and set. "
+        "570 fathoms of spare cordage left in the boatswain's store."
+    )
+    assert rove[0].data["fathoms"] == 30.0 and rove[0].data["splice"] is False
+    assert sheet.state is LineState.BELAYED and sheet.rating_kn == rating
+    assert store.fathoms == 570.0
+    assert ship.sails["fore.topsail"].state is SailState.SET
+    # the line's log line comes after the reeve began and before the set began
+    kinds = [ev.kind for ev in list(w.log)[n0:]]
+    assert kinds.index("line.rove") < kinds.index("sail.set")
+
+
+def test_a_splice_costs_no_cordage_and_leaves_the_line_an_eighth_the_weaker():
+    """ "Ropes reeving through blocks are joined by a long splice ... the splice is weaker
+    than the main part of the rope by about one-eighth" (Luce 1884, ch. II): a spliced
+    brace is whole at seven eighths of its rating, the coil untouched, and its yard, which
+    swung to the wind when the brace parted, may be braced again."""
+    from freesail.physics.strain import strain_state
+    from freesail.ship.parts import cordage
+
+    w = _frigate_under_plain_sail()
+    ship = w.ship
+    brace = ship.lines["main.topsail.yard.brace.larboard"]
+    rating = brace.rating_kn
+    brace.state = LineState.PARTED
+    strain_state(ship).swung.add("main.topsail.yard")
+    before = cordage(ship).fathoms
+    n0 = len(w.log)
+    e = w.submit("splice the larboard main topsail brace")
+    assert e.kind == "order.accepted"
+    w.run(900)
+    assert brace.state is LineState.BELAYED
+    assert brace.rating_kn == pytest.approx(rating * 7 / 8)
+    assert cordage(ship).fathoms == before
+    assert "main.topsail.yard" not in strain_state(ship).swung
+    rove = [ev for ev in list(w.log)[n0:] if ev.kind == "line.rove"]
+    assert rove[0].text == (
+        "Spliced the larboard main topsail yard brace, an eighth the weaker for it; the main "
+        "topsail yard may be braced again."
+    )
+    assert rove[0].data["splice"] is True and rove[0].data["fathoms"] == 0.0
+
+
+def test_reeving_is_refused_in_words_for_a_sound_line_standing_rigging_and_an_empty_store():
+    from freesail.ship.parts import cordage
+
+    w = _frigate_under_plain_sail()
+    ship = w.ship
+    e = w.submit("reeve a new starboard main brace")
+    assert e.kind == "order.rejected"
+    assert e.text.endswith(
+        "The starboard main yard brace is sound and rove; only a parted line is rove afresh."
+    )
+    e = w.submit("splice the main stay")
+    assert e.kind == "order.rejected" and "standing rigging" in e.text and "not rove" in e.text
+    e = w.submit("reeve a new fore topsail")
+    assert e.kind == "order.rejected" and "lines" in e.text
+    # of two sheets named, the sound one is refused and the parted one rove
+    ship.lines["fore.topsail.sheet.larboard"].state = LineState.PARTED
+    e = w.submit("reeve new fore topsail sheets")
+    assert e.kind == "evolution.started"  # one of the two rove: the line says which
+    assert e.text.endswith(
+        "Not done: the starboard fore topsail sheet is sound and rove; only a parted line is "
+        "rove afresh."
+    )
+    w.run(900)
+    # the store short of the length: a splice is the way, and the refusal says so
+    cordage(ship).fathoms = 20.0
+    ship.lines["main.course.sheet.starboard"].state = LineState.PARTED
+    e = w.submit("reeve a new starboard main sheet")
+    assert e.kind == "order.rejected"
+    assert e.text.endswith(
+        "There are but 20 fathoms of spare cordage in the boatswain's store; a new starboard "
+        "main course sheet wants 30. Splice it instead."
+    )
+    cordage(ship).fathoms = 0.0
+    e = w.submit("reeve the starboard main sheet afresh")
+    assert e.kind == "order.rejected" and "no spare cordage" in e.text
+    e = w.submit("the cordage")
+    assert e.text.startswith("The boatswain's store has no spare cordage")
+    e = w.submit("splice the starboard main sheet")
+    assert e.kind == "order.accepted"
+
+
+def test_the_schooners_lines_take_less_rope_and_her_store_is_her_own():
+    from freesail.api.session import make_world
+    from freesail.core.world import Scenario
+    from freesail.evolutions import scripts
+    from freesail.ship.parts import cordage
+
+    w = make_world(7, SCHOONER, Scenario(gustiness=0.0, variability=0.0))
+    ship = w.ship
+    assert cordage(ship).fathoms == 150.0  # her file
+    sheet = ship.lines["fore.topsail.sheet.larboard"]
+    assert scripts.line_fathoms(ship, sheet) == 19.0  # 30 fathoms scaled by her length
+    assert scripts.line_fathoms(ship, ship.lines["fore.topsail.yard.halyard"]) == 25.0

@@ -49,10 +49,13 @@ standing order "keep her full": when the apparent wind is forward of 55 degrees 
 # again once the wind has held its new direction for five minutes, and measures the next
 # point from there, so a wind that veers steadily from west to north-west through a night
 # is trimmed to point by point (playtest 7: the yards stayed braced for the old wind until
-# the captain asked). A gust does not move the wind's direction, and its wander is a
-# fraction of a degree an hour (physics/wind.py), so it is a shift and not the wander that
-# fires it; a trim the watch is still at is not stacked behind, the yards still to brace
-# take the new angle (orders/verbs.py).
+# the captain asked). A gust does not move the wind's direction; its wander about the base
+# is a few degrees either way (three in a warm sector, five in neutral air, eight in the
+# unstable air behind a cold front, physics/wind.py, since package 31b under every wind),
+# so a shift of a point is mostly the shift and not the wander that fires it, though the
+# wander moves the firing some minutes and in unstable air may fire it by itself now and
+# then; a trim the watch is still at is not stacked behind, the yards still to brace take
+# the new angle (orders/verbs.py).
 standing order "trim on a shift": when the true wind veers 1 point or backs 1 point then trim sails
 
 # Heavy weather. Forty knots is a gale (units.describe_wind_strength); in 45 knots the
@@ -65,11 +68,21 @@ standing order "trim on a shift": when the true wind veers 1 point or backs 1 po
 # than the head sails are shortened the fore topmast staysail may have blown out before
 # this fires (it goes at about 43 knots under plain sail on a wind); the order is then
 # refused in words and the rest go on.
+# The order of the clauses is the order of the work (package 31b, from playtest 11's
+# finding 10): the hands go to the first clause first, and the rest get what is left and
+# what comes free. The close reef leads: the three topsails are reefed together by three
+# parties of forty (spec M3 §3.2) while the sending down of the masts, which takes every
+# hand it can get, begins short and fills as the reefs are done. With the send-down first,
+# the reefs waited for its hands and the topsails were still unreefed when the first squall
+# of the middle watch came on the day under systems (docs/dev/TuningNotes.md, M5a, package
+# 31b); Luce's order of shortening sail is the reefs before the light spars come down
+# ("If the wind still increases ... take a second and a third reef", then "it is
+# recommended to send down top-gallant masts in a heavy gale", Luce 1884, ch. XXVII, XXIX).
 standing order "heavy weather": when the true wind exceeds 40 knots for 5 minutes
-    then send down the topgallant masts;
+    then close reef the topsails;
+    send down the topgallant masts;
     take in the fore topmast staysail;
-    bend the fore storm staysail;
-    close reef the topsails
+    bend the fore storm staysail
 
 # The storm staysail, set when it is bent: a standing order may test a sail's state, and
 # "bent and furled" is what the bending leaves. Edge-triggered, so it fires once as the

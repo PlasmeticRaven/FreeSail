@@ -12,6 +12,9 @@ preconditions:
   - {check: sail.state != set, reason: "The {sail} is set already."}
   - {check: sail.state != blown_out, reason: "The {sail} is blown out of the bolt-ropes; a new one must be bent."}
   - {check: sail.state != unbent, reason: "The {sail} is unbent; bend a sail to the yard first."}
+  # a sail is not sheeted home on a sheet that is gone, nor hoisted on a parted halyard
+  # (package 31b, playtest 11's finding 7): reeve a new one first (reeve_line.yaml)
+  - {check: "not wrecked(sheets_of(sail)) and not wrecked(lines_of(sail, tack)) and not wrecked(halyard_of(sail))", reason: "{parted}"}
 requires:
   - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
   - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}

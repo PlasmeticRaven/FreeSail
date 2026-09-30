@@ -41,5 +41,20 @@ on_fail: {log: "Could not reef the {sail}: {reason}.", kind: evolution.failed, s
 # better hands and goes a little faster than milestone 2; the frigate's watch fills it.
 # All hands to reef topsails: Luce 1884 ch. XVIII station billet, and the owner's decision at the
 # milestone 3 review (the watch on deck for plain sail handling; all hands for tack, wear and reefing).
-crew: {hands: all, rating: able, stations: [all hands]}
+# party (package 31b; the owner's ruling at gate 5a, decision 28): the most hands one
+# topsail's reef uses, forty for a frigate's. The call turns everyone up, and the three
+# topsails of "reef the topsails" are manned together, each with its party, the surplus
+# to the next. The number: the topsail yard's own topmen lay out on it (Luce 1884, ch.
+# XVIII Organization, 'Station Billet': "Reefing topsails: topsail buntlines, reef
+# topsail, on deck to halliards"; the frigate's tops are 24, 30 and 14 men both watches,
+# the ship file), and on deck the halyards, the reef tackles, the buntlines and the
+# weather braces want a dozen and more ("Man the topsail clewlines and buntlines,
+# weather topsail braces! Hands by the lee braces, bowlines, and halliards! A few hands
+# take through the slack of the reef-tackles", Luce 1884, ch. XXVII Reefing, 'Reefing
+# and Hoisting'; "Man the topsail halliards!" to hoist). Neither source counts the men;
+# forty is judgement from those stations, the sail's own top and about the same again on
+# deck, so that a frigate's deck of a hundred and twenty and more mans her three topsails
+# at once. A smaller ship's deck clamps it (the schooner's whole company is under forty).
+# The stations: the subject's own top first, then the other tops, then anyone.
+crew: {hands: all, party: 40, rating: able, stations: [topmen, all hands]}
 source: "Luce 1866, ch. XXVII Reefing, 'Reefing and Hoisting'; Lever 1808, 'Reefing Topsails'"

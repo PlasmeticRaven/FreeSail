@@ -18,11 +18,14 @@ the captain's first orders:
       speed_kn: 0                    # optional, and x_m, y_m
       glass: true                    # she carries a barometer (spec M5 §5; rare in a small vessel)
     wind:
-      gustiness: 0.3                 # physics/wind.py's, as the M2 wind
+      gustiness: 0.3                 # physics/wind.py's
       variability: 0.3
+      air_mass: neutral              # optional: the air under a fixed or pinned wind (spec
+                                     # M5 §3; package 31b): warm, neutral or unstable
     weather:                         # spec M5 §2: two forms
       wind:                          # the pinned wind (freesail.world.weather_script)
         - {at: 1805-06-01T04:00, from_deg: 270, knots: 18}
+        - {at: 1805-06-01T22:00, from_deg: 315, knots: 36, air_mass: unstable}  # from here on
         - ...
       systems:                       # the systems (freesail.world.weather)
         - name: the low
@@ -63,6 +66,7 @@ from typing import Any
 import yaml
 
 from freesail.core.world import Scenario, World
+from freesail.physics.wind import AIR_MASSES
 from freesail.world.geo import Position, format_position
 from freesail.world.weather import WeatherError, _system_from_dict
 from freesail.world.weather_script import WeatherScript
@@ -103,6 +107,8 @@ class ScenarioFile:
             out += ["The weather: " + self.script.lines()[0]]
             out += ["  " + ln for ln in self.script.lines()[1:]]
         sc = self.scenario
+        if sc.air_mass != "neutral" and not (sc.systems and not sc.weather):
+            out.append(f"The air {sc.air_mass} under the pinned wind.")
         if sc.systems:
             which = "the sky and the glass" if sc.weather else "the wind, the sky and the glass"
             out.append(f"The systems ({which}):")
@@ -176,6 +182,12 @@ def load_scenario(path: str | Path) -> ScenarioFile:
         sc.wind_speed_kn = float(wind.get("knots", sc.wind_speed_kn))
     except (TypeError, ValueError, AttributeError) as e:
         raise ScenarioError(f"{where}: {e}") from None
+    if wind.get("air_mass") is not None:
+        air = str(wind["air_mass"]).strip().lower()
+        if air not in AIR_MASSES:
+            airs = ", ".join(AIR_MASSES)
+            raise ScenarioError(f"{where}, wind air_mass: '{air}' is not an air; say {airs}.")
+        sc.air_mass = air
     weather = raw.get("weather") or []
     systems: list[Any] = []
     if isinstance(weather, dict):

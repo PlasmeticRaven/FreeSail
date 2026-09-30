@@ -11,6 +11,8 @@ preconditions:
   # jib, package 32b) wants the bowsprit rigged out to its full length; a sail with no
   # such spar passes
   - {check: "spar_of_role(sail, halyard_spar) == none or spar_of_role(sail, halyard_spar).rigged_out", reason: "The {sail}'s tack rides the bowsprit, which is reefed; rig out the bowsprit first, or set the storm jib."}
+  # not sheeted on a parted sheet nor hoisted on a parted halyard (package 31b)
+  - {check: "not wrecked(sheets_of(sail)) and not wrecked(halyard_of(sail))", reason: "{parted}"}
 requires:
   - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
   - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s stay or mast is carried away"}

@@ -56,7 +56,12 @@ is a call for all hands, a pool action: it turns the watch below up through
 the routine, takes the idle hands and everyone who comes up, and the hands
 of earlier work join it as that work finishes (the per-tick top-up), so it
 begins short and speeds up; it pipes down when it ends unless the captain
-called all hands himself. Only a manoeuvre (its file says ``belays: true``:
+called all hands himself. An all-hands *sail* evolution names its party
+(``party: N`` in its crew line, package 31b): it takes at most that many, so
+the three topsails of "reef the topsails" are manned together, each up to
+its party in the order's order, the surplus to the next job and then to
+whatever else waits for hands; the manoeuvres and the masts, with no party,
+take everyone. Only a manoeuvre (its file says ``belays: true``:
 tack, wear, box-haul, lie a-try) also belays the step-list work in hand,
 which holds its progress and resumes, hands permitting, when the all-hands
 work is done: the owner's ruling of 2026-09-29 at gate 4c (spec M3 §3.4).
@@ -530,6 +535,8 @@ class Runner:
             return  # any spar: shifting one for a spare (package 30b)
         if wanted == "part" and isinstance(subject, Sail | Spar):
             return  # a spar or a sail: clearing a wreck (package 30b)
+        if wanted == "line" and isinstance(subject, Line):
+            return  # any line: reeving a parted one afresh (package 31b)
         if wanted == "yard":
             if isinstance(subject, Spar) and subject.cls in YARD_LIKE_CLASSES:
                 return
@@ -1005,14 +1012,22 @@ class Runner:
         }
 
     def _top_up_all_hands(self, crew: Crew) -> None:
-        """Hands who have come on deck since an all-hands evolution began join it."""
+        """Hands who have come on deck since an all-hands evolution began join it, the
+        earlier work first and each job only up to its party (package 31b), so that the
+        surplus goes to the next job of the order and then to whatever else waits."""
         running = self._all_hands_at_work()
         if not running:
             return
         deck = self._on_deck(crew)
         for inst in sorted(running, key=lambda i: i.order):
             if inst.assignment is not None:
-                hands.top_up(inst.assignment, deck, aloft=self._aloft(inst))
+                hands.top_up(
+                    inst.assignment,
+                    deck,
+                    aloft=self._aloft(inst),
+                    want=self._want(inst),
+                    subject_mast=self._subject_mast(self.ship, inst),
+                )
 
     def _call_all_hands(self, ship: Ship, inst: Instance, crew: Crew) -> None:
         """An all-hands evolution turns the hands up (spec M3 §3.4). A manoeuvre (its file
@@ -1139,6 +1154,7 @@ class Runner:
             ctx["state"] = subject.describe_state()
             ctx["reefs"] = subject.reefs
             ctx["reef_bands"] = subject.reef_bands
+            ctx["parted"] = self._parted_gear(ship, subject)
         if isinstance(subject, Spar):
             ctx["brace_deg"] = f"{abs(units.rad_to_deg(subject.brace_angle)):.0f}"
         for key, value in inst.params.items():
@@ -1151,6 +1167,25 @@ class Runner:
         ctx = _SafeDict(self._format_context(inst))
         ctx["reason"] = reason
         return template.format_map(ctx)
+
+    @staticmethod
+    def _parted_gear(ship: Ship, sail: Sail) -> str:
+        """The sail's gear that is parted, for a set evolution's refusal (package 31b):
+        'the larboard fore topsail sheet is parted and must be rove afresh'. The sheets,
+        the tacks and the halyard: the lines a set hauls on."""
+        gear = [
+            ln
+            for ln in ship.lines_of(sail)
+            if ln.state is LineState.PARTED and ln.cls in ("sheet", "tack", "halyard")
+        ]
+        halyard = ship.halyard_of(sail)
+        if halyard is not None and halyard.state is LineState.PARTED and halyard not in gear:
+            gear.append(halyard)
+        if not gear:
+            return "its gear is parted and must be rove afresh"
+        names = [f"the {part_name(ship, ln.id)}" for ln in gear]
+        verb = "is" if len(names) == 1 else "are"
+        return f"{_and(names)} {verb} parted and must be rove afresh"
 
     def _target(self, inst: Instance) -> str:
         """What the hands are sent to: 'the fore topsail', or 'tack ship'."""

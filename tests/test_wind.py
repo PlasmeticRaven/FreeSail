@@ -1,15 +1,15 @@
-"""Package 30: the wind's two regimes (spec M5 §3; the study's §4).
+"""Package 30's wind by the air mass (spec M5 §3; the study's §4), under every wind since
+package 31b (the owner's ruling at gate 5a, decision 28).
 
-Without an air mass the M2 wind is unchanged draw for draw, so every truth measured on a
-fixed or pinned wind stands. With an air mass from the systems' sector the gust factor is
-drawn by the air mass as a multiple of the ten-minute mean, squalls come only in unstable
-air with a veer and a few minutes' length, and the direction's wander is mean-reverting
-about the base with a spread by the air mass.
+The gust factor is drawn by the air mass as a multiple of the ten-minute mean, squalls
+come only in unstable air with a veer and a few minutes' length, and the direction's
+wander is mean-reverting about the base with a spread by the air mass. A wind given no
+air mass (a fixed wind, a pinned wind whose scenario says nothing) is in neutral air; the
+milestone 2 draws are retired.
 """
 
 from __future__ import annotations
 
-import math
 import random
 import statistics
 
@@ -25,48 +25,29 @@ def stream(seed: int = 7) -> random.Random:
     return Rng(seed).stream("wind")
 
 
-def old_m2_step(w: Wind, r: random.Random, dt: float = 1.0) -> None:
-    """The M2 `Wind.step` as it stood at the close of milestone 4, kept here as the
-    regression's yardstick."""
-    v = w.params.variability
-    w._direction = units.wrap_2pi(w._direction + r.gauss(0.0, 0.0002 * v * math.sqrt(dt)))
-    pull = (w.base_speed - w.speed) * 0.0005 * dt
-    noise = r.gauss(0.0, 0.01 * v * w.base_speed * math.sqrt(dt))
-    w.speed = max(w.MIN_SPEED, w.speed + pull + noise)
-    w.gust_started = False
-    if w.gust_remaining > 0:
-        w.gust_remaining -= dt
-        if w.gust_remaining <= 0:
-            w.gust_factor = 1.0
-    elif r.random() < w.params.gustiness * 0.002 * dt:
-        w.gust_factor = r.uniform(1.1, 1.5)
-        w.gust_remaining = r.uniform(5.0, 30.0)
-        w.gust_started = True
-
-
-def test_without_an_air_mass_the_m2_wind_is_unchanged_draw_for_draw():
-    params = WindParams.from_nautical(270.0, 20.0, gustiness=0.5, variability=0.5)
-    new = Wind(params, stream(7))
-    old = Wind(params, stream(7))
-    r_old = stream(7)  # the same numbers, stepped by the old code by hand
-    old._stream = r_old
+def test_a_wind_given_no_air_mass_is_in_neutral_air_and_gusts_to_1_3_at_most():
+    """The default air is neutral (`DEFAULT_AIR_MASS`): a fixed wind stepped a day at full
+    gustiness gusts to 1.30 of its mean at most, never squalls, and its direction stays
+    within the neutral spread of the base instead of walking away."""
+    params = WindParams.from_nautical(270.0, 20.0, gustiness=1.0, variability=0.3)
+    w = Wind(params, stream(7))
+    assert w.air_mass == Wm.DEFAULT_AIR_MASS == "neutral"
+    mean = units.knots_to_ms(20.0)
     gusts = 0
-    for _ in range(7200):
-        new.step(1.0)
-        old_m2_step(old, r_old)
-        assert new.direction_from == old.direction_from
-        assert new.speed == old.speed and new.gust_factor == old.gust_factor
-        assert new.effective_speed == old.speed * old.gust_factor
-        gusts += new.gust_started
-    assert gusts > 0 and new.air_mass is None and not new.in_squall
-
-
-def test_the_m2_walk_is_a_fraction_of_a_degree_an_hour_not_a_point():
-    """The corrected docstring (W §4): 0.0002 rad per root second at variability 1 is 0.69
-    degrees an hour of standard deviation."""
-    sd_per_hour = units.rad_to_deg(Wm.M2_WALK_RAD_PER_SQRT_S * math.sqrt(3600.0))
-    assert sd_per_hour == pytest.approx(0.69, abs=0.01)
-    assert sd_per_hour < units.rad_to_deg(units.POINT) / 10
+    peaks = []
+    offsets = []
+    for _ in range(24 * 3600):
+        w.step(1.0, mean_speed=mean)
+        assert not w.squall_started and not w.in_squall
+        if w.gust_started:
+            gusts += 1
+            assert Wm.GUST_FACTOR_RANGES["neutral"][0] <= w.gust_factor <= 1.30
+            peaks.append(w.effective_speed)
+        offsets.append(units.rad_to_deg(units.wrap_pi(w.direction_from - w.base_direction)))
+    assert gusts > 100 and max(peaks) <= mean * 1.30 + 1e-9
+    assert max(abs(x) for x in offsets) < 5 * Wm.WANDER_SPREAD_DEG["neutral"]
+    # the milestone 2 draws are retired: no factor above 1.30 in a day, where the old
+    # rule drew 1.1 to 1.5 whatever the mean and reached 1.45 within an hour
 
 
 @pytest.mark.parametrize("air", ["warm", "neutral", "unstable"])
@@ -122,8 +103,9 @@ def test_squalls_come_only_in_unstable_air_with_a_veer_and_last_a_few_minutes():
         for _ in range(8 * 3600):
             w.step(1.0, mean_speed=mean)
             assert not w.squall_started
-    # no air mass: the M2 regime, no squalls whatever the stream
+    # a wind given no air mass is in neutral air: no squalls whatever the stream
     w = Wind(params, stream(5))
+    assert w.air_mass == "neutral"
     for _ in range(8 * 3600):
         w.step(1.0, mean_speed=mean)
         assert not w.squall_started and not w.in_squall
@@ -160,8 +142,8 @@ def test_with_variability_nought_the_systems_wind_does_not_wander():
     assert w.speed == pytest.approx(units.knots_to_ms(25.0))
 
 
-def test_follow_moves_the_base_and_the_offset_rides_on_it_in_both_regimes():
-    for air in (None, "warm"):
+def test_follow_moves_the_base_and_the_offset_rides_on_it_in_any_air():
+    for air in ("neutral", "warm", "unstable"):
         params = WindParams.from_nautical(270.0, 20.0, gustiness=0.0, variability=0.3)
         w = Wind(params, stream(9))
         w.air_mass = air
