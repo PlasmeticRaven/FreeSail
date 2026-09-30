@@ -96,7 +96,9 @@ def execute(
         return _trim(ship, order, vocab, skip, group=group)
     if order.verb == "sheet home":
         return _sheet_home(ship, order, vocab)
-    if order.verb in BOOM_VERBS:
+    if order.verb in BOOM_VERBS or (order.verb == "reef" and _names_bowsprit(ship, order)):
+        # a studding sail boom rigged out or in; a running bowsprit rigged out or reefed
+        # ("reef the bowsprit", package 32b), the evolution refusing a standing one in words
         return _boom_evolution(ship, order, vocab, skip, group)
     if order.verb in CATHARPIN_VERBS:
         return _catharpins(ship, order, vocab)
@@ -1768,7 +1770,12 @@ def _boom_evolution(
     """'Rig out' and 'rig in' a studding sail boom. The object is the boom
     ('the starboard fore topmast studdingsail boom') or the studding sail it
     carries ('the fore topmast studdingsails, both sides'); either way the
-    evolution works on the boom (Luce 1884, ch. XXIII: "Rig out! Hoist away!")."""
+    evolution works on the boom (Luce 1884, ch. XXIII: "Rig out! Hoist away!").
+
+    Package 32b: a bowsprit is taken too, for 'rig out the bowsprit', 'reef the
+    bowsprit' and 'run in the bowsprit', the evolutions of a cutter's running
+    bowsprit (reef_bowsprit.yaml, rig_out_bowsprit.yaml), which refuse a standing
+    one in words; the vocabulary maps the verb and the spar's class to the file."""
     _no_stray_modifiers(order, {"manner", "hands_from"})
     verb = order.verb
     res = resolve.resolve(ship, order.object or "", order.side_word, verb)
@@ -1777,7 +1784,7 @@ def _boom_evolution(
     for pid in res.ids:
         part = ship.parts[pid]
         boom: Spar | None = None
-        if isinstance(part, Spar) and part.cls == "studdingsail_boom":
+        if isinstance(part, Spar) and part.cls in mapping:
             boom = part
         elif isinstance(part, Sail) and part.cls == "studding":
             boom = ship.spar_of_role(part, "boom")
@@ -1798,22 +1805,24 @@ def _boom_evolution(
     texts: list[str] = []
     failed: list[str] = []
     failed_ids: list[str] = []
-    evo = mapping["studdingsail_boom"]
     # a lee boom will not go out past the lee rigging (spec 3b §7); one out already is
     # left to the evolution's own reason
     fouled: dict[str, str] = {}
     if verb == "rig out":
         for boom in booms:
+            if boom.cls != "studdingsail_boom":
+                continue
             why = None if boom.rigged_out else boom_fouled_by_brace(ship, boom)
             if why is not None:
                 fouled[boom.id] = why
     extra, call = _hands_params(
         ship,
         order,
-        [evo] * len([b for b in booms if b.id not in fouled]),
+        [mapping[b.cls] for b in booms if b.id not in fouled],
         _group_label(verb, res.name, group) if len(booms) > 1 else None,
     )
     for boom in booms:
+        evo = mapping[boom.cls]
         if boom.id in fouled:
             failed.append(f"{resolve.the(ship, boom.id)}: {fouled[boom.id]}")
             failed_ids.append(boom.id)
@@ -1883,6 +1892,12 @@ def _names_spars(ship: Ship, order: Order) -> bool:
     """Whether the object is spars alone: 'shift' then shifts a spar for a spare."""
     found = _object_parts(ship, order)
     return bool(found) and all(isinstance(p, Spar) for p in found)
+
+
+def _names_bowsprit(ship: Ship, order: Order) -> bool:
+    """Whether the object is a bowsprit: 'reef' then reefs a running one (package 32b)."""
+    found = _object_parts(ship, order)
+    return bool(found) and all(isinstance(p, Spar) and p.cls == "bowsprit" for p in found)
 
 
 def _query(ship: Ship, order: Order) -> Result:

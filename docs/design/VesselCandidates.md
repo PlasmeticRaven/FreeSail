@@ -46,6 +46,49 @@ Sherbourne 85 tons, Alert and Speedy about 200, the schooner 224, Harpy 316, the
 
 **The owner's choice (2026-09-29):** Sherbourne and Harpy as the initial two.
 
+## The figures as read (package 32b, 2026-09-30)
+
+The two files were built from what could be read, not from the memory above. What
+was read, and what each file takes from it:
+
+**Sherbourne (`data/ships/cutter.yaml`).** Hull: the kit manual's dimensions as the
+owner noted them, 85 tons burthen, 54 ft 6 in (taken as the length on deck) and 19 ft of
+beam, complement 30; the keel 44 ft 4 in by the Navy's burthen rule at that beam and
+tonnage, and the load water-line 50 ft, the draught 9 ft 6 in aft and 7 ft 6 in forward,
+the block 0.45 and the displacement 106 t all judgement (marked so in the file). Rig:
+Fincham 1843, *A Treatise on Masting*, p. 67, the second revenue cruiser's column of
+the cutter table (main mast hounded 2.6 x the beam, head 0.23, topmast 0.60 of the
+hounded length, pole 0.28, boom 0.87 of the length, gaff 0.64 of the boom, bowsprit
+0.79 of the length with 0.60 of the beam housed, square-sail yard 0.84 of the length,
+topsail yard 0.70 and topgallant yard 0.44 of it, the mast 0.101 of the water-line
+before the middle with a rake of 13 in in 12 ft, the mast's heel 0.269 of the beam below
+the water-line, the centre of effort 0.017 of the water-line abaft the middle, the excess
+draught aft 24 in) and arts. 86 and 87 (pp. 35 to 36) for the running bowsprit and the
+proportions of the sails; his footnote on the 85-ton cutter (mainsail 1566, foresail 367,
+second jib 541 sq ft). Canvas: Steel 1794, *The Elements and Practice of Rigging and
+Seamanship*, sail-making: the cutter's mainsail (p. 120, No. 1 or 2 canvas, four reef
+bands), the cutter's trysail, the sloop's square sail (p. 124), topsail (p. 125) and
+topgallant (p. 126), the gaff topsail, the smack's foresail and jib, the storm jib
+(p. 190), and HEEL-ROPE in his rigging tables. Winfield was not read: the ship's own
+career above is the lead's memory and stays unverified.
+
+**Harpy (`data/ships/brig.yaml`).** Hull: the kit manual's dimensions as the owner
+noted them, 316 tons, 95 ft on the gun deck, 75 ft 1 5/8 in of keel, 28 ft 1 1/2 in of
+beam, 12 ft 0 1/2 in of hold, complement 121 (the burthen recomputes to 316.1 by the
+Navy's rule, which checks the keel and beam); the water-line 88 ft, the draught 11 ft
+6 in, the block 0.50 and the displacement 413 t judgement. Rig: Fincham 1843 p. 88, the
+first brig of war of his table (100 ft by 30 ft 6 in) scaled to her, with pp. 82 to 83
+for the masts' places (the fore 0.331 of the water-line before the middle, the main
+0.147 abaft) and the royals on the topgallant pole; Steel 1794 for the brig's mainsail
+(p. 119, No. 5 or 6 canvas, three reef bands) and the brigs' mast positions; the head
+sails, the staysails between the masts, the studding sails (the lower swing-booms 0.6
+of the yard, Fincham p. 88) and the storm canvas by the frigate's rules at her size, all
+judgement. Complement 121 is the kit's, and the watch bill (forecastle 14, fore top 12,
+main top 14, afterguard 22, waisters 14, marines 20, idlers 17) judgement.
+
+The pointing and speed each made when built, beside the frigate's and the schooner's,
+are in `docs/dev/TuningNotes.md`, "Package 32b: where the four ships stand".
+
 Two cautions. The Vanguard kits are built from the Admiralty draughts and are a good
 guide to what exists, but the game's files cite the draughts and the printed dimensions
 (Winfield, Goodwin, Steel's tables for the spars), not the kits. And every number above

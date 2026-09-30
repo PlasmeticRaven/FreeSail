@@ -213,7 +213,15 @@ def test_bad_yaml_is_a_sentence(tmp_path):
     assert "not valid YAML" in str(e.value)
 
 
-@pytest.mark.parametrize("path", ["data/ships/frigate-36.yaml", "data/ships/topsail-schooner.yaml"])
+SHIPS = [
+    "data/ships/frigate-36.yaml",
+    "data/ships/topsail-schooner.yaml",
+    "data/ships/cutter.yaml",  # package 32b: the four ships
+    "data/ships/brig.yaml",
+]
+
+
+@pytest.mark.parametrize("path", SHIPS)
 def test_reference_ships_load(path):
     ship = load_ship(path)
     assert ship.sails and ship.spars and ship.lines
@@ -259,6 +267,113 @@ def test_schooner_is_mostly_fore_and_aft():
     fa = sum(s.area_m2 for s in ship.sails.values() if s.is_fore_and_aft)
     sq = sum(s.area_m2 for s in ship.sails.values() if s.cls == "square")
     assert fa > sq
+
+
+def test_cutter_is_a_one_master_with_a_running_bowsprit():
+    """Package 32b (spec M5 §23): one mast, a gaff mainsail on a boom over the counter, a
+    square sail, a topsail and a topgallant on three yards, the foresail on the forestay,
+    the jib on the running bowsprit, the storm trysail and storm jib in the sail room."""
+    ship = load_ship("data/ships/cutter.yaml")
+    assert ship.spec.warnings == []
+    assert [s.id for s in ship.spars.values() if s.cls == "mast"] == ["main.mast"]
+    assert sorted(s.id for s in ship.spars.values() if s.is_yard) == [
+        "square_sail.yard",
+        "topgallant.yard",
+        "topsail.yard",
+    ]
+    bent = [s for s in ship.sails.values() if s.state is not SailState.UNBENT]
+    fa = sum(s.area_m2 for s in bent if s.is_fore_and_aft)
+    sq = sum(s.area_m2 for s in bent if s.cls == "square")
+    assert fa > sq
+    assert ship.groups["plain sail"] == ["main.sail", "fore.staysail", "jib", "topsail"]
+    assert ship.aliases["foresail"] == "fore.staysail"  # a cutter's foresail is her staysail
+    assert ship.aliases["the crossjack"] == "square_sail"  # Steel's name for the square sail
+    assert ship.sails["main.sail"].reef_bands == 4  # Steel 1794 p. 120
+    assert ship.sails["storm_trysail"].in_place_of == "main.sail"
+    assert ship.sails["storm_jib"].in_place_of == "jib"
+    bowsprit = ship.spars["bowsprit"]
+    assert bowsprit.running and bowsprit.rigged_out
+    assert 0.0 < bowsprit.housed_length_m < bowsprit.full_length_m == bowsprit.length_m
+    assert ship.sails["jib"].roles["halyard_spar"] == "bowsprit"
+    assert ship.spar_chain("jib")[0] is bowsprit  # the jib loads the bowsprit its tack rides
+    assert "halyard_spar" not in ship.sails["storm_jib"].roles  # its tack lies at the reef
+    assert ship.line_of(bowsprit, "outhaul") is not None  # the heel-rope
+    assert ship.spec.crew is not None and ship.spec.crew.complement == 30
+    assert ship.spec.crew.stations["fore_top"] == ship.spec.crew.stations["main_top"] == 0
+
+
+def test_brig_is_the_frigate_less_a_mast():
+    """Package 32b (spec M5 §25): two square-rigged masts with royals, the spanker on the
+    main, the head sails complete, the staysails between the masts, studding sails by the
+    frigate's rule, the storm canvas of a brig."""
+    ship = load_ship("data/ships/brig.yaml")
+    assert ship.spec.warnings == []
+    assert [s.id for s in ship.spars.values() if s.cls == "mast"] == ["fore.mast", "main.mast"]
+    assert "mizzen.mast" not in ship.spars
+    for name in ("fore", "main"):
+        for level in ("topsail", "topgallant", "royal"):
+            assert f"{name}.{level}" in ship.sails
+        assert f"{name}.course" in ship.sails
+    assert ship.aliases["spanker"] == "main.spanker" == ship.aliases["driver"]
+    assert ship.aliases["mainsail"] == "main.course"  # as the frigate's, the square one
+    assert ship.groups["headsails"] == ["fore.topmast_staysail", "jib", "flying_jib"]
+    assert ship.groups["staysails"] == [
+        "fore.topmast_staysail",
+        "main.staysail",
+        "main.topmast_staysail",
+        "main.topgallant_staysail",
+    ]
+    assert len(ship.groups["studdingsails"]) == 10
+    assert set(ship.groups["storm canvas"]) == {
+        "fore.storm_staysail",
+        "main.storm_staysail",
+        "storm_trysail",
+    }
+    assert ship.sails["storm_trysail"].in_place_of == "main.spanker"
+    assert not ship.spars["bowsprit"].running and ship.spars["bowsprit"].rigged_out
+    assert ship.spec.crew is not None and ship.spec.crew.complement == 121
+    assert [p.post for p in ship.spec.crew.posts][:2] == ["commander", "lieutenant"]
+
+
+def _bowsprit(**keys):
+    d = {"id": "bowsprit", "class": "bowsprit", "x_m": 10.0, "length_m": 8.0}
+    d.update(keys)
+    return d
+
+
+@pytest.mark.parametrize(
+    "spar, message",
+    [
+        ({"id": "yard2", "class": "yard", "on": "mast", "running": True}, "only a bowsprit runs"),
+        (_bowsprit(running=True), "gives no 'housed_length_m'"),
+        (_bowsprit(running=True, housed_length_m=9.0), "shorter than its full outboard"),
+        (_bowsprit(housed_length_m=5.0), "not a running bowsprit"),
+        (_bowsprit(rigged_out=False), "only a studding sail boom or a running bowsprit"),
+    ],
+)
+def test_the_running_bowsprit_is_validated_in_words(spar, message):
+    """Package 32b: the running bowsprit's flag and its housed length are checked by the
+    loader as every other key is, with a sentence."""
+    import copy
+
+    d = copy.deepcopy(MINIMAL)
+    d["spars"] = [s for s in d["spars"] if s["id"] != "bowsprit"] + [spar]
+    with pytest.raises(ShipFileError, match=message):
+        ship_from_dict(d, "bowsprit")
+
+
+def test_a_running_bowsprit_starts_where_its_file_says():
+    import copy
+
+    d = copy.deepcopy(MINIMAL)
+    d["spars"] = [s for s in d["spars"] if s["id"] != "bowsprit"]
+    d["spars"].append(_bowsprit(running=True, housed_length_m=5.0, rigged_out=False))
+    ship = ship_from_dict(d, "bowsprit")
+    bowsprit = ship.spars["bowsprit"]
+    assert bowsprit.running and not bowsprit.rigged_out
+    assert bowsprit.length_m == 5.0 and bowsprit.full_length_m == 8.0
+    d["spars"][-1].pop("rigged_out")
+    assert ship_from_dict(d, "bowsprit").spars["bowsprit"].length_m == 8.0
 
 
 def test_frigate_particulars_stay_in_period():

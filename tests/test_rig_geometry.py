@@ -47,6 +47,9 @@ from freesail.ship.stub import OrderError
 ROOT = Path(__file__).resolve().parents[1]
 FRIGATE = "data/ships/frigate-36.yaml"
 SCHOONER = "data/ships/topsail-schooner.yaml"
+CUTTER = "data/ships/cutter.yaml"  # package 32b: the four ships
+BRIG = "data/ships/brig.yaml"
+SHIPS = [FRIGATE, SCHOONER, CUTTER, BRIG]
 GAIN = units.deg_to_rad(CATHARPIN_GAIN_DEG)
 
 
@@ -141,7 +144,7 @@ def log_texts(w, kind: str | None = None) -> list[str]:
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("path", [FRIGATE, SCHOONER])
+@pytest.mark.parametrize("path", SHIPS)
 def test_a_ship_starts_as_milestone_3_left_her(path):
     ship = load_ship(path)
     for ln in ship.lines.values():
@@ -155,7 +158,7 @@ def test_a_ship_starts_as_milestone_3_left_her(path):
         assert sp.brace_limit == sp.rigged_brace_limit
 
 
-@pytest.mark.parametrize("path", [FRIGATE, SCHOONER])
+@pytest.mark.parametrize("path", SHIPS)
 def test_close_hauled_forces_are_unchanged_without_bowlines(path):
     """The sail model with no bowline hauled is milestone 2's to the last newton: the
     new coefficient path gives the class tables' values at every angle."""
@@ -345,7 +348,7 @@ def test_the_schooner_swifters_in_and_gains_nothing_in_the_braces():
             assert y.brace_limit == y.rigged_brace_limit
 
 
-@pytest.mark.parametrize("path", [FRIGATE, SCHOONER])
+@pytest.mark.parametrize("path", SHIPS)
 def test_a_mast_swiftered_in_is_rated_down_athwartships(path):
     """On a wind the load is nearly all athwartships, so the mast is judged against
     nearly CATHARPIN_RATING_FACTOR of its rating: a sixth harder or so. Running
@@ -355,7 +358,7 @@ def test_a_mast_swiftered_in_is_rated_down_athwartships(path):
     w.submit("set plain sail")
     w.submit("brace sharp up on the starboard tack")
     ticks(w, 900, trim_every=120)
-    mast = w.ship.spars["main.mast"] if path == FRIGATE else w.ship.spars["fore.mast"]
+    mast = w.ship.spars["fore.mast"] if path == SCHOONER else w.ship.spars["main.mast"]
     assert mast.rating_factor == 1.0
     mast.swiftered_in = True
     ticks(w, 5)
@@ -572,10 +575,15 @@ def test_going_about_lets_the_bowlines_go_and_steadies_them_out_again(which, evo
     runner.start(ship, evolution, "ship")
     notes = run_runner(ship, runner, wind, _turner(0.4 if evolution == "tack" else 0.5))
     words = [n[2] for n in notes]
+    # Package 32b: the driver (a gaff sail on the aftermost of two or more masts with
+    # yards) is brailed up as the helm goes up; the schooner's mainsail is her driving
+    # sail and stands.
+    brail = "; brail up the spanker" if which == "frigate" else ""
     let_go = {
         "tack": "Rise tacks and sheets. Mainsail haul; let go the bowlines.",
         "wear": (
-            "Stand by to wear ship. Up helm; clear away the bowlines; brace in the after yards."
+            f"Stand by to wear ship. Up helm; clear away the bowlines{brail}; brace in the "
+            "after yards."
         ),
     }[evolution]
     steady = "Haul taut the lifts and weather braces. Steady out the bowlines."
@@ -704,7 +712,7 @@ def test_the_new_evolutions_load_with_sources_and_crew_lines():
     assert not any(s.aloft for s in EVOLUTIONS["haul_bowline"].steps)
 
 
-@pytest.mark.parametrize("path", [FRIGATE, SCHOONER])
+@pytest.mark.parametrize("path", SHIPS)
 def test_the_new_work_fits_one_watch_of_either_ship(path):
     w = make_world(7, path, Scenario())
     crew = w.ship.extra["crew"]

@@ -261,12 +261,15 @@ verbs:
   rig out:
     # A studding sail boom (Luce 1884, ch. XXIII: "Set taut! Rig out! Hoist
     # away!"). The object is the boom or the studding sail it carries; the
-    # grammar reads it as it reads a sail.
+    # grammar reads it as it reads a sail. Package 32b: a cutter's running
+    # bowsprit is rigged out to its full length and reefed (run in) too
+    # (rig_out_bowsprit.yaml, reef_bowsprit.yaml; "reef the bowsprit" is the
+    # period's order, "run in the bowsprit" the same work).
     synonyms: [run out]
     object: sail
     level: 1
   rig in:
-    synonyms: []
+    synonyms: [run in]
     object: sail
     level: 1
   # Spars aloft (Luce 1884, ch. XX, 'Sending up and down topgallant-masts';
@@ -576,6 +579,7 @@ evolutions:
   reef:
     square: reef_square
     gaff: reef_gaff
+    bowsprit: reef_bowsprit  # package 32b: a cutter's running bowsprit, run in to its reef
   shake out:
     square: shake_out_square
     gaff: shake_out_gaff
@@ -608,13 +612,16 @@ evolutions:
   send down: clear_wreck
   goose wing:
     square: goose_wing
-  # rig out and rig in take a studding sail boom, or the studding sail on it
+  # rig out and rig in take a studding sail boom, or the studding sail on it; and a running
+  # bowsprit (package 32b), rigged out to its full length or run in to its reef
   rig out:
     studdingsail_boom: rig_out_studdingsail_boom
     studding: rig_out_studdingsail_boom
+    bowsprit: rig_out_bowsprit
   rig in:
     studdingsail_boom: rig_in_studdingsail_boom
     studding: rig_in_studdingsail_boom
+    bowsprit: reef_bowsprit
   send down the topgallant masts: send_down_topgallant_masts
   sway up the topgallant masts: sway_up_topgallant_masts
   send down the topgallant yards: send_down_topgallant_yards
@@ -804,8 +811,15 @@ droppable_inner_words: [yard]
 group_evolutions:
   set plain sail:
     - set the plain sail
+  # Package 32b: the cutter's square sail (Steel's "cross-jack") and her topgallant are
+  # light canvas outside her plain sail (mainsail, foresail, jib and topsail); on the
+  # other rigs both lines are passed over, the topgallants being plain sail already set
+  # and the square sail no noun of theirs. The square sail is a fair-wind sail and comes
+  # in with the studding sails when it freshens.
   make all sail:
     - set the plain sail
+    - set the square sail
+    - set the topgallants
     - set the royals
     - set the flying jib
     - set the staysails
@@ -813,6 +827,7 @@ group_evolutions:
     - set the studdingsails, both sides
   shorten sail:
     - take in the studdingsails
+    - take in the square sail
     - take in the royals
     - take in the flying jib
     - take in the topgallants

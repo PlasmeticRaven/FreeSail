@@ -7,6 +7,10 @@ applies_to: {class: jibheaded}
 preconditions:
   - {check: sail.state != set, reason: "The {sail} is set already."}
   - {check: sail.state != blown_out, reason: "The {sail} is blown out; a new one must be bent."}
+  # a sail whose tack rides a running bowsprit (the ship file's `halyard_spar`: a cutter's
+  # jib, package 32b) wants the bowsprit rigged out to its full length; a sail with no
+  # such spar passes
+  - {check: "spar_of_role(sail, halyard_spar) == none or spar_of_role(sail, halyard_spar).rigged_out", reason: "The {sail}'s tack rides the bowsprit, which is reefed; rig out the bowsprit first, or set the storm jib."}
 requires:
   - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
   - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s stay or mast is carried away"}

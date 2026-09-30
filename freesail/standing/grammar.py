@@ -352,6 +352,8 @@ def parse_condition(text: str, ship: Any = None, vocab: Vocabulary | None = None
 
 
 _STOP = frozenset({"and", "for", "then", ","})
+# the words that may follow a sail's or a part's name in a condition (package 32b)
+_AFTER_PART = frozenset({"is", "are", "isn't", "aren't", "exceeds", "exceed"}) | _STOP
 
 # What each kind is compared with, for the refusal that names the word.
 _HOW = {
@@ -460,6 +462,13 @@ def _match_reading(tokens: list[str], i: int, ship: Any, vocab: Vocabulary) -> _
         for n in range(min(6, len(ws2)), 0, -1):
             phrase = " ".join(ws2[:n])
             if table.lookup(phrase) is None:
+                continue
+            # Package 32b: the name must be followed by its comparison, or a shorter
+            # name inside a longer one is taken ("the fore topsail is shaking" on the
+            # cutter, whose 'the fore' is her staysail and who has no fore topsail, read
+            # as 'the fore' compared 'topsail shaking'); an unknown name falls through to
+            # the refusal below, which suggests the nearest.
+            if n < len(ws2) and ws2[n] not in _AFTER_PART:
                 continue
             res = resolve.resolve(ship, phrase, side_word, "standing order")
             ids = tuple(res.ids)

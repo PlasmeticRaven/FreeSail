@@ -7,8 +7,9 @@ string is::
 
     ```orders <ship> [<preset>] [<tack>]
 
-- ``<ship>`` is ``frigate`` (data/ships/frigate-36.yaml) or ``schooner``
-  (data/ships/topsail-schooner.yaml).
+- ``<ship>`` is ``frigate`` (data/ships/frigate-36.yaml), ``schooner``
+  (data/ships/topsail-schooner.yaml), ``cutter`` (data/ships/cutter.yaml) or
+  ``brig`` (data/ships/brig.yaml).
 - ``<preset>`` is the state the ship starts the block in: ``furled`` (the
   default: nothing set, yards square), ``plain-sail`` (the ship file's
   ``plain sail`` group set, the yards braced sharp up and the fore-and-aft
@@ -73,6 +74,8 @@ PRIMER = ROOT / "docs" / "primer"
 SHIP_FILES = {
     "frigate": ROOT / "data" / "ships" / "frigate-36.yaml",
     "schooner": ROOT / "data" / "ships" / "topsail-schooner.yaml",
+    "cutter": ROOT / "data" / "ships" / "cutter.yaml",
+    "brig": ROOT / "data" / "ships" / "brig.yaml",
 }
 SPECS = {name: load_spec(path) for name, path in SHIP_FILES.items()}
 
@@ -132,6 +135,12 @@ class InstantRunner:
                     sail.state = SailState.FURLED
         elif evo.startswith("furl_"):
             ship.sails[subject].state = SailState.FURLED
+        elif evo in ("reef_bowsprit", "rig_out_bowsprit"):
+            # the cutter's running bowsprit (package 32b): run in to its housed length
+            # or out to its full one, as the evolutions' end states have it
+            spar = ship.spars[subject]
+            spar.rigged_out = evo == "rig_out_bowsprit"
+            spar.length_m = spar.full_length_m if spar.rigged_out else spar.housed_length_m
         elif evo.startswith("reef_"):
             sail = ship.sails[subject]
             n = sail.reef_bands if p.get("close") else int(p.get("reefs", 1))

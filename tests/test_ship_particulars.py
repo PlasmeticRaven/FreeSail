@@ -2,10 +2,13 @@
 
 The frigate is the Amazon class of 1795 (Winfield's dimensions) rigged by the
 rules of Luce 1866 ch. VII; the schooner a Baltimore-built topsail schooner of
-about 1804 after Chapelle. The ranges here are wide enough for tuning within
-the type and narrow enough that a slip of a decimal, a spar drawn at the wrong
-scale or a sail area doubled in a hand edit fails. `tools/gen_ships.py` is the
-source of both files; the last test regenerates them and compares.
+about 1804 after Chapelle; package 32b adds the cutter Sherbourne of 1763 (85
+tons, sparred by Fincham 1843 p. 67 and canvassed by Steel 1794) and the brig
+Harpy of 1796 (316 tons, Fincham p. 88). The ranges here are wide enough for
+tuning within the type and narrow enough that a slip of a decimal, a spar drawn
+at the wrong scale or a sail area doubled in a hand edit fails.
+`tools/gen_ships.py` is the source of all four files; the last test regenerates
+them and compares.
 """
 
 from __future__ import annotations
@@ -24,6 +27,8 @@ from freesail.ship.loader import load_ship
 ROOT = Path(__file__).resolve().parents[1]
 FRIGATE = ROOT / "data" / "ships" / "frigate-36.yaml"
 SCHOONER = ROOT / "data" / "ships" / "topsail-schooner.yaml"
+CUTTER = ROOT / "data" / "ships" / "cutter.yaml"
+BRIG = ROOT / "data" / "ships" / "brig.yaml"
 
 
 @pytest.fixture(scope="module")
@@ -34,6 +39,16 @@ def frigate():
 @pytest.fixture(scope="module")
 def schooner():
     return load_ship(SCHOONER)
+
+
+@pytest.fixture(scope="module")
+def cutter():
+    return load_ship(CUTTER)
+
+
+@pytest.fixture(scope="module")
+def brig():
+    return load_ship(BRIG)
 
 
 def area_of(ship, group):
@@ -231,7 +246,114 @@ def test_schooner_sail_plan_follows_fincham(schooner):
 
 
 # ---------------------------------------------------------------------------
-# both: the names an officer would use resolve, and the generator is the source
+# the cutter: Sherbourne of 1763, 85 tons, a revenue-cruiser rig (package 32b)
+# ---------------------------------------------------------------------------
+
+
+def test_cutter_hull_is_a_cutter_of_85_tons(cutter):
+    """54 ft 6 in on deck and 44 ft 4 in of keel by the burthen rule at 19 ft of beam, 85
+    tons; drawing 9 ft 6 in aft, 7 ft 6 in forward (Fincham 1843 p. 67, excess draught
+    aft 24 in). Deep and beamy: L/B under 3, displacement 1.1 to 1.4 x the burthen."""
+    h = cutter.hull.spec
+    assert units.feet_to_m(44.3) < h.length_waterline_m < units.feet_to_m(54.5)
+    assert 5.6 <= h.beam_m <= 6.0  # 19 ft extreme
+    assert 2.4 <= h.length_waterline_m / h.beam_m <= 2.9
+    assert 2.3 <= h.draught_m <= 2.9  # mean of 9 ft 6 in and 7 ft 6 in
+    assert 90_000 <= h.displacement_kg <= 125_000  # 1.1 to 1.4 x 85 tons burthen
+    assert 0.9 <= h.gm_m <= 1.4  # stiff: a cutter carries a great mainsail
+    assert 8.5 <= h.hull_speed_kn <= 10.5
+    assert -1.0 <= h.clr_x_m <= 0.5
+    assert h.deck_height_m < 1.2
+
+
+def test_cutter_sail_plan_follows_fincham_and_steel(cutter):
+    """Fincham 1843 p. 67 (second revenue cruiser column): main mast hounded 2.6 x the
+    beam, boom 0.87 of the length on deck, gaff 0.64 of the boom, bowsprit 0.79 of the
+    length outside the stem, square-sail yard 0.84 and topsail yard 0.70 of the length;
+    topsail yard 0.70 and topgallant yard 0.44 of the square-sail yard; the 85-ton
+    cutter's canvas of his footnote (mainsail 1566, foresail 367, second jib 541 sq ft)
+    and Steel 1794 for the rest. One mast, no tops, a running bowsprit."""
+    plain = area_of(cutter, "plain sail")
+    assert 230 <= plain <= 310
+    assert 370 <= area_of(cutter, "all sail") <= 480
+    areas = {s.id: s.area_m2 for s in cutter.sails.values()}
+    assert areas["main.sail"] > areas["square_sail"] > areas["topsail"] > areas["topgallant"]
+    assert areas["jib"] > areas["fore.staysail"]  # a cutter's jib is her larger head sail
+    assert 130 <= areas["main.sail"] <= 165  # 1400 to 1750 sq ft about Fincham's 1566
+    sp = cutter.spars
+    beam = cutter.hull.spec.beam_m
+    on_deck = units.feet_to_m(54.5)
+    masts = [s for s in sp.values() if s.cls == "mast"]
+    assert len(masts) == 1 and masts[0].id == "main.mast"
+    assert 2.4 * beam <= sp["main.mast"].height_m <= 3.0 * beam  # hounded 2.6 B plus the head
+    assert 0.80 * on_deck <= sp["main.boom"].length_m <= 0.95 * on_deck
+    assert 0.58 <= sp["main.gaff"].length_m / sp["main.boom"].length_m <= 0.70
+    assert 0.78 * on_deck <= sp["square_sail.yard"].length_m <= 0.90 * on_deck
+    sq_yard = sp["square_sail.yard"].length_m
+    assert 0.64 * sq_yard <= sp["topsail.yard"].length_m <= 0.76 * sq_yard
+    assert 0.38 * sq_yard <= sp["topgallant.yard"].length_m <= 0.50 * sq_yard
+    assert 22.0 <= truck_height(cutter, "main.mast") <= 27.0
+    bowsprit = sp["bowsprit"]
+    assert bowsprit.running and bowsprit.rigged_out
+    assert 0.5 * bowsprit.full_length_m <= bowsprit.housed_length_m <= 0.8 * bowsprit.full_length_m
+    assert 0.5 * on_deck <= bowsprit.full_length_m <= 0.7 * on_deck  # 0.79 L less the housing
+    # the mainsail stands well abaft her one mast; the jib's tack rides the bowsprit end
+    assert cutter.sails["main.sail"].x_m < sp["main.mast"].x_m - 4.0
+    assert cutter.sails["jib"].x_m > sp["bowsprit"].x_m
+    assert cutter.spec.warnings == []
+
+
+# ---------------------------------------------------------------------------
+# the brig: Harpy of 1796, 316 tons, the frigate less a mast (package 32b)
+# ---------------------------------------------------------------------------
+
+
+def test_brig_hull_is_harpy_of_1796(brig):
+    """95 ft on the gun deck, 75 ft 1 5/8 in of keel, 28 ft 1 1/2 in of beam, 316 tons;
+    drawing about 11 ft 6 in (Fincham 1843 p. 88, the first brig of war of 100 x 30.5 ft
+    scaled to her)."""
+    h = brig.hull.spec
+    assert units.feet_to_m(75.1) < h.length_waterline_m < units.feet_to_m(95.0)
+    assert 8.4 <= h.beam_m <= 8.8  # 28 ft 1.5 in extreme
+    assert 2.9 <= h.length_waterline_m / h.beam_m <= 3.4
+    assert 3.2 <= h.draught_m <= 3.9
+    assert 350_000 <= h.displacement_kg <= 450_000  # 1.1 to 1.4 x 316 tons burthen
+    assert 0.8 <= h.gm_m <= 1.2
+    assert 10.5 <= h.hull_speed_kn <= 12.5
+    assert -1.0 <= h.clr_x_m <= 1.5
+    assert h.deck_height_m < 2.0
+
+
+def test_brig_sail_plan_follows_fincham(brig):
+    """Fincham 1843 p. 88, the first brig of war: two masts, the main the taller, yards
+    alike on both, royals on the topgallant pole, a boom mainsail (Steel 1794 p. 119,
+    three reef bands), the frigate's head sails and studding sails scaled to her."""
+    plain = area_of(brig, "plain sail")
+    assert 680 <= plain <= 850
+    assert 1150 <= area_of(brig, "all sail") <= 1400
+    areas = {s.id: s.area_m2 for s in brig.sails.values()}
+    assert areas["main.spanker"] == max(areas.values())  # the boom mainsail is her great sail
+    assert areas["main.topsail"] >= areas["fore.topsail"] > areas["fore.course"]
+    assert areas["fore.topgallant"] > areas["fore.royal"]
+    sp = brig.spars
+    masts = [s.id for s in sp.values() if s.cls == "mast"]
+    assert sorted(masts) == ["fore.mast", "main.mast"]
+    assert sp["main.mast"].height_m > sp["fore.mast"].height_m
+    assert sp["fore.yard"].length_m == sp["main.yard"].length_m
+    beam = brig.hull.spec.beam_m
+    assert 1.7 * beam <= sp["main.yard"].length_m <= 2.0 * beam
+    assert 0.72 <= sp["main.topsail.yard"].length_m / sp["main.yard"].length_m <= 0.82
+    assert 29.0 <= truck_height(brig, "main.mast") <= 35.0
+    assert 27.0 <= truck_height(brig, "fore.mast") <= 33.0
+    assert not sp["bowsprit"].running and "jib_boom" in sp and "flying_jib_boom" in sp
+    assert len(brig.groups["studdingsails"]) == 10
+    assert len(brig.groups["storm canvas"]) == 3
+    assert brig.sails["main.spanker"].x_m < sp["main.mast"].x_m - 5.0
+    assert brig.spec.warnings == []
+
+
+# ---------------------------------------------------------------------------
+# all four: the names an officer would use resolve, and the generator is the source
 # ---------------------------------------------------------------------------
 
 
@@ -267,6 +389,42 @@ def test_schooner_sail_plan_follows_fincham(schooner):
             SCHOONER,
             ["fore", "main", "gaff topsail", "gaff sails", "jibs", "kites", "light sails"],
         ),
+        (
+            CUTTER,
+            [
+                "mainsail",
+                "main",
+                "fore",
+                "foresail",
+                "crossjack",
+                "crossjack yard",
+                "gaff topsail",
+                "trysail",
+                "storm mainsail",
+                "head sails",
+                "mast",
+                "heel rope",
+                "topgallant sails",
+            ],
+        ),
+        (
+            BRIG,
+            [
+                "spanker",
+                "driver",
+                "boom mainsail",
+                "trysail",
+                "middle staysail",
+                "kites",
+                "head sails",
+                "upper yards",
+                "fore yard",
+                "main yard",
+                "spanker boom",
+                "storm staysails",
+                "royal masts",
+            ],
+        ),
     ],
 )
 def test_period_names_resolve(path, phrases):
@@ -285,7 +443,7 @@ def test_generator_reproduces_the_committed_files(tmp_path):
         cwd=ROOT,
         capture_output=True,
     )
-    for committed in (FRIGATE, SCHOONER):
+    for committed in (FRIGATE, SCHOONER, CUTTER, BRIG):
         made = out / committed.name
         assert made.exists()
         # Compare as text so that a Windows checkout with CRLF endings

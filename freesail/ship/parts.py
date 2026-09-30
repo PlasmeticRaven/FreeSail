@@ -154,17 +154,30 @@ class Spar(Part):
     # Lower masts: the strain model's allowance for the catharpins, set by strain.py each
     # tick while they are swiftered in; 1.0 when the lower rigging stands as rigged.
     rating_factor: float = 1.0
+    # A running bowsprit (package 32b, spec M5 §23: a cutter's, run in and out on the deck
+    # through the gammoning iron and fidded at its reefs). `running` marks it; `length_m`
+    # is its outboard length now, between `housed_length_m` (reefed) and `full_length_m`
+    # (rigged out), which the two bowsprit evolutions move it between; `rigged_out` says
+    # which it stands at. A standing bowsprit has `running` false and reads rigged out.
+    running: bool = False
+    housed_length_m: float = 0.0
+    full_length_m: float = 0.0
 
     @classmethod
     def from_spec(cls, s: SparSpec) -> Spar:
         limit = units.deg_to_rad(s.brace_limit_deg or 0.0)
+        running = bool(s.running)
+        rigged_out = s.rigged_out if s.rigged_out is not None else s.cls not in RIGGED_IN_CLASSES
+        full = s.length_m or 0.0
+        housed = s.housed_length_m or 0.0
         return cls(
             id=s.id,
             cls=s.cls,
             rating_kn=s.rating_kn or 0.0,
             x_m=s.x_m or 0.0,
             height_m=s.height_m or 0.0,
-            length_m=s.length_m or 0.0,
+            # a running bowsprit the file starts reefed stands at its housed length
+            length_m=housed if running and not rigged_out else full,
             parent=s.parent,
             side=s.side,
             brace_limit=limit,
@@ -172,9 +185,10 @@ class Spar(Part):
             rigged_brace_limit=limit,
             # the ship file's starting state where it gives one; otherwise a studding sail
             # boom (the ringtail's among them) starts rigged in and every other spar reads out
-            rigged_out=(
-                s.rigged_out if s.rigged_out is not None else s.cls not in RIGGED_IN_CLASSES
-            ),
+            rigged_out=rigged_out,
+            running=running,
+            housed_length_m=housed if running else 0.0,
+            full_length_m=full if running else 0.0,
         )
 
     @property

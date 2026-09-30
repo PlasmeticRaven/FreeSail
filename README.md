@@ -13,13 +13,15 @@ python -m pip install -e ".[dev]"
 python -m pytest              # the test suite
 python -m freesail.ui.console data/ships/frigate-36.yaml --seed 7 --wind 0,15 --heading 293
 python -m freesail.ui.console data/ships/topsail-schooner.yaml --seed 7 --wind 0,15 --heading 300
+python -m freesail.ui.console data/ships/cutter.yaml --seed 7 --wind 0,15 --heading 300
+python -m freesail.ui.console data/ships/brig.yaml --seed 7 --wind 0,15 --heading 295
 python -m pip install -e ".[dev,server]"     # once, for the browser client
 python -m freesail.ui.server data/ships/frigate-36.yaml --wind 0,15 --heading 293
 ```
 
 The server prints an address (normally `http://localhost:8000`); open it in a browser for the log, instruments, ship view and map. The command line at the foot of the log takes the same orders and driver commands as the console. Add `?facing=45` to the address, or press `]` and `[`, to look at the ship from another bearing.
 
-In the console, driver commands (`hold`, `go`, `time 30`, `tick 600`, `state`, `muster`, `log`, `save file.json`, `replay file.json`, `quit`) control the clock and the session. Anything else is an order to the ship in the Orders language: `set plain sail`, `brace sharp up on the starboard tack`, `reef the topsails, one reef`, `haul the weather main brace`, `steer west by north`, `tack ship`, `wear ship`, `call all hands`, `pipe down`, `send the larboard watch aloft to furl the main course`. Two draft ships are in `data/ships/`: a 36-gun frigate and a topsail schooner. Without a ship file the console runs the milestone 0 point ship (`steer`, `speed`, `stop`).
+In the console, driver commands (`hold`, `go`, `time 30`, `tick 600`, `state`, `muster`, `log`, `save file.json`, `replay file.json`, `quit`) control the clock and the session. Anything else is an order to the ship in the Orders language: `set plain sail`, `brace sharp up on the starboard tack`, `reef the topsails, one reef`, `haul the weather main brace`, `steer west by north`, `tack ship`, `wear ship`, `call all hands`, `pipe down`, `send the larboard watch aloft to furl the main course`. Four reference ships are in `data/ships/`: a 36-gun frigate, a topsail schooner, a cutter with a running bowsprit and a brig, all written by `tools/gen_ships.py` from the period's rules. Without a ship file the console runs the milestone 0 point ship (`steer`, `speed`, `stop`).
 
 - `docs/DesignProposal.md`: the current design proposal (v0.2).
 - `docs/TechnicalSpec-M0-M2.md`: technical specification for the first three milestones.

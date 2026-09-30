@@ -1,0 +1,40 @@
+# Rig out the running bowsprit (package 32b; spec M5 §23): the reverse of reefing it
+# (reef_bowsprit.yaml). The fid is drawn, the bowsprit hauled out through the gammoning
+# iron to its full length by the heel-rope and fidded there, the bobstay and shrouds set
+# up, and the traveller run out to the end for the full jib. The ship file's `running`
+# bowsprit gives its full outboard `length_m` and its reefed `housed_length_m`; this
+# step's ramp moves it out and `rigged_out` says it is out.
+#
+# Refused unless the bowsprit runs and is reefed, and until any sail whose tack rides it
+# (the `halyard_spar` link) is down. Time and hands judgement, as reefing's.
+id: rig_out_bowsprit
+verb: rig_out
+applies_to: {class: bowsprit}
+preconditions:
+  - {check: spar.running, reason: "The {spar} is gammoned fast to the stem; only a cutter's running bowsprit is rigged out."}
+  - {check: not spar.wrecked, reason: "The {spar} is carried away; clear the wreck and shift it for a spare."}
+  - {check: not spar.rigged_out, reason: "The {spar} is rigged out to its full length already."}
+  - {check: not any_set(sails_on(spar)), reason: "A head sail is set with its tack on the {spar}; haul it down first."}
+requires:
+  - {check: not spar.wrecked, reason: "the {spar} is carried away"}
+steps:
+  - do: cast_off
+    duration_s: 120
+    log: "Cast off the bobstay and the bowsprit shrouds; drew the fid."
+  - do: heel_rope
+    duration_s: 0
+    via: line_of(spar, outhaul)   # the heel-rope: parted, nothing moves it; a file with none skips this
+  - do: run_out
+    duration_s: 240
+    ramp: {spar.length_m: spar.full_length_m}
+    sets: {spar.rigged_out: "true"}
+    log: "Hauled the {spar} out to its full length by the heel-rope and fidded it."
+  - do: set_up
+    duration_s: 120
+    log: "Set up the bobstay and the bowsprit shrouds; the traveller run out to the end."
+on_start: {log: "Rig out the {spar}! Hands to the heel-rope; cast off the bobstay."}
+on_complete: {log: "Rigged out the {spar} to its full length; the jib's tack may go out to the end again.", kind: spar.rigged_out, severity: notable}
+on_fail: {log: "Could not rig out the {spar}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the forecastlemen, whose station the head is (Luce 1884, ch. XVIII); judgement.
+crew: {hands: 6, rating: able, stations: [forecastle]}
+source: "Steel 1794 vol. I, HEEL-ROPE (\"to haul out the bowsprits of cutters, &c.\"); Lever 1808, 'The Jib' (the traveller); Fincham 1843 art. 87 (the bowsprit \"housed\")"
