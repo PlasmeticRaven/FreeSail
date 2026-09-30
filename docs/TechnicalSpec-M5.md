@@ -412,7 +412,7 @@ makes. The port's mooring is 5c's.
 | 64 | The captain's tide worked from Moore's rule and an 1805 establishment differs from the world's tide by less than an hour on the day of full moon and by up to an hour at the quarters |
 | 65 | The Bishop is dark and St Agnes is lit in 1805; a night landfall on Scilly from the south-west sees St Agnes at its range and nothing else |
 | 66 | Standing on by account across the reckoning's ellipse toward the Manacles in thick weather grounds the schooner on the ebb at the speed the log gives; the same passage with the lead going hourly does not |
-| 73 | In fifteen knots under plain sail the cutter lies closer to the wind than the schooner by at least half a point (package 32b; the hierarchy of the generator's rules across sizes; spec M0 to M2 §12 item 11) |
+| 73 | In fifteen knots under plain sail the cutter lies closer to the wind than the schooner by at least half a point (package 32b; the hierarchy of the generator's rules across sizes; spec M0 to M2 §12 item 11); **as built (32b): a strict expected failure**, the cutter lying 58° off as the schooner does, since pointing is set by the shared sail-class curves and trim floors and not by the file; a per-rig pointing factor is the fix, the owner's ruling awaited |
 | 74 | The brig lies further off the wind than the schooner and within half a point of the frigate, or the ordering the sources support, said which (package 32b) |
 | 75 | The cutter on a beam reach in fifteen knots under plain sail makes a speed within the band the package sets from the type's records, the source named (package 32b; provisional where a judgement) |
 | 76 | The brig likewise (package 32b) |
@@ -664,6 +664,7 @@ in (then 5b), double altitudes, the kedge, interiors beyond a name and a descrip
 9. From package 30: a frontal trough so the glass checks at the cold front; the north
    quarter's share; the pinned form and the air-mass rule (the gate 5a ruling); a
    `gate-5a-day.yaml` with the day under systems alone, for the gate cut (package 31).
+12. From package 32b: the cutter, the schooner and the brig all miss stays in the real physics (no state for a jib sheet held to windward; the 0.8-knot minimum), so truth 10 stays the frigate's and the three box-haul and wear; a per-rig pointing factor for truth 73; the browser draws a running bowsprit at the length in the ship graph fetched once and does not redraw a reef until reload (the snapshot carries no spar length, `api/queries.py`).
 11. From package 31c: a door act recorded at the stationing tick, before any tick has run, is not made by a replay (`restore()` then `start()` does not play door acts); and `a wind shift` as a stand-by event reads the mean wind while the log's own `wind.shift` line reads the instant wind at two points, two definitions to unify when `core/world.py` is next open.
 10. The lead at a station (§29): the consent question put to the lead's own weights inside
    the harness before the gate, the record kept as any other; and, for M6, the owner's

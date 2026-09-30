@@ -39,6 +39,7 @@ gate 5b:  wave 3  32 the chart data and the queries, the lookout
                   32c the suite in two tiers, the days built once, a Windows job (beside 32; the owner's local session)
                   32d the freesail command, the settings file and the setup step (beside 32; the owner's local session)
           wave 4  33a the reckoning, the noon sight, the captain's chart, the checkpoint save, gate 5b
+                  (landed 2026-09-30: 31c, 32, 32b; 31b's report awaited)
 gate 5c:  wave 5  33b the chronometer, the moon and the lunar (beside 34)
                   34 the tide, grounding and anchoring
           wave 6  35 places, people, ports and nations
