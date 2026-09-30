@@ -80,10 +80,16 @@ def test_every_row_of_the_spec_is_registered():
 
 
 def test_absent_readings_carry_their_sentences():
-    for id, word in (("well", "well"), ("depth", "lead line")):
+    for id, word in (("well", "well"), ("sail_in_sight", "nothing to sight")):
         row = R.REGISTRY.get(id)
         assert row.is_absent and row.getter is None
         assert word in row.absent and "yet" in row.absent
+    # the lead's cast arrived with package 33a (spec M5 §15): `the depth` is a reading,
+    # None before a cast, in the reckoning's words on a ship with no position
+    row = R.REGISTRY.get("depth")
+    assert not row.is_absent and row.kind == "depth"
+    assert World(seed=1).readings["depth"] is None
+    assert World(seed=1).readings.words("depth") == R.NO_RECKONING_WORDS
     # the glass arrived with package 30 (spec M5 §5): a reading, None on a ship without one
     row = R.REGISTRY.get("glass")
     assert not row.is_absent and row.kind == "glass"
@@ -110,9 +116,14 @@ def test_events_and_intervals_of_the_spec():
         "the watch piped down",
         "a sighting",
         "a sounding",
+        "a landfall",
+        "noon",
     ):
         assert words in R.EVENTS, words
-    assert R.EVENTS["a sighting"].absent and R.EVENTS["a sounding"].absent
+    # the lookout's sighting (package 32) and the lead's sounding (package 33a) are raised
+    assert not R.EVENTS["a sighting"].absent and not R.EVENTS["a sounding"].absent
+    assert R.event_matches(R.EVENTS["a landfall"], "lookout.sighting", {"landfall": True})
+    assert not R.event_matches(R.EVENTS["a landfall"], "lookout.sighting", {"landfall": False})
     assert R.event_matches(R.EVENTS["eight bells"], "clock.bell", {"bells": 8})
     assert not R.event_matches(R.EVENTS["eight bells"], "clock.bell", {"bells": 4})
     assert R.INTERVALS["a glass"] == R.INTERVALS["a bell"] == 1800

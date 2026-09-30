@@ -8,11 +8,13 @@ and `save`. Determinism: same seed, same scenario, same ship, same
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+import math
+from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime, timedelta
 from typing import Any
 
 from freesail import units
+from freesail.core.clock import TICK_SECONDS as TICK_S
 from freesail.core.clock import Clock
 from freesail.core.events import Event, Log, Severity
 from freesail.core.rng import Rng
@@ -20,6 +22,7 @@ from freesail.core.sun import DAY, DEFAULT_LATITUDE_DEG, Sun
 from freesail.physics.wind import AIR_MASSES, Wind, WindParams, WindRecord
 from freesail.ship.stub import OrderError, PointShip
 from freesail.world.geo import Position
+from freesail.world.reckoning import NAVIGATION_KINDS
 
 ENGINE_VERSION = "0.0.1"
 SAVE_FORMAT = 1
@@ -90,6 +93,19 @@ class Scenario:
     # a pinned wind alone keeps no sea, which is how every truth before this one is
     # measured, so none of them moves. A save from before the sea loads with None.
     sea: bool | None = None
+    # The instrument the master takes the noon sight with (spec M5 §14, package 33a;
+    # `freesail.world.sights`): "sextant" (the frigate's scenario) or "octant" (the
+    # everyday instrument, and the schooner's). A save from before loads with the octant.
+    instrument: str = "octant"
+    # The set the world has and the master does not know of (spec M5 §13, package 33a): the
+    # scenario's stated current as {"knots", "toward_deg"}, moving the truth's position
+    # each tick and nothing of the ship's own motion; none by default, until package 34's
+    # tide gives the world its streams.
+    current: dict[str, float] | None = None
+    # The sky pinned (package 33a, for the passage in thick weather, spec M5 §20): {"sky",
+    # "weather", "visibility"} in the readings' words, laid over the systems' conditions
+    # at the ship every minute; None: the systems' own. Needs weather systems to lay over.
+    sky: dict[str, str] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
@@ -311,6 +327,23 @@ class World:
             self.origin.lat_deg if self.origin is not None else self.scenario.latitude_deg
         )
         self._daylight = self.daylight
+        # The reckoning (spec M5 §13 to §15; package 33a; `freesail.world.reckoning`): the
+        # captain's account of where she is, kept beside the truth from the first tick
+        # wherever the world has a position; the master, the log-line and the lead, the
+        # noon sight and the day's work. The orders reach it through `ship.extra`.
+        self.navigation: Any = None
+        self._nav_pending: list[tuple[str, dict[str, Any]]] = []
+        if self.origin is not None:
+            from freesail.world.reckoning import Navigation
+
+            if self.scenario.instrument not in ("sextant", "octant"):
+                raise ValueError(
+                    f"The scenario's instrument is '{self.scenario.instrument}'; say sextant "
+                    f"or octant."
+                )
+            self.navigation = Navigation(self, self.rng.stream("reckoning"))
+            if getattr(self.ship, "extra", None) is not None:
+                self.ship.extra["navigation"] = self.navigation
         # The readings (spec M4 §2): one view per tick and per order, read by the standing
         # orders, the snapshot and the agents alike.
         self._readings_key: tuple[int, int] | None = None
@@ -430,8 +463,18 @@ class World:
             return
         x, y = self.ship_x, self.ship_y
         lx, ly = self._geo_last
-        if x != lx or y != ly:
-            self._position = self._position.advanced(x - lx, y - ly)
+        dx, dy = x - lx, y - ly
+        current = self.scenario.current
+        if current:
+            # the world's set (package 33a; package 34's tide takes this over): the stated
+            # current moves her over the ground and nothing of her motion through the water
+            kn = float(current.get("knots", 0.0))
+            toward = math.radians(float(current.get("toward_deg", 0.0)))
+            step = units.knots_to_ms(kn) * TICK_S
+            dx += step * math.sin(toward)
+            dy += step * math.cos(toward)
+        if dx != 0.0 or dy != 0.0:
+            self._position = self._position.advanced(dx, dy)
             self._geo_last = (x, y)
 
     def _coast_of_plane(self, x_km: float, y_km: float) -> tuple[float, float] | None:
@@ -496,6 +539,16 @@ class World:
         systems drive the wind)."""
         t = self.clock.ship_time
         self.conditions = self.systems.conditions_at(self.ship_x_km, self.ship_y_km, t)
+        if self.scenario.sky:
+            # the sky pinned by the scenario (package 33a): laid over the systems' words
+            self.conditions = replace(
+                self.conditions,
+                **{
+                    k: str(v)
+                    for k, v in self.scenario.sky.items()
+                    if k in ("sky", "weather", "visibility") and v is not None
+                },
+            )
         if self.glass is not None:
             # the mercury pumps with the ship's motion (spec M5 §4)
             pumping = self.motion.pumping if self.motion is not None else 1.0
@@ -791,12 +844,22 @@ class World:
                 self.record(*note)
             else:
                 severity, kind, text, subject, data = note
+                if kind in NAVIGATION_KINDS and self.navigation is not None:
+                    # the log or the lead is in (package 33a): the reckoning reads it after
+                    # the tick's run is on the sphere and says the line itself
+                    self._nav_pending.append((kind, dict(data or {})))
+                    continue
                 self.record(severity, kind, text, subject=subject, data=data)
         # the geographic frame (spec M5 §9): the tick's run turned to latitude and
         # longitude, then the chart's grounding check and the lookout (§11, §12)
         self._tick_geo()
         if self.chart is not None:
             self._tick_chart()
+        if self.navigation is not None:
+            # the reckoning (spec M5 §13, package 33a): the traverse board, the hourly
+            # log, the casts and the noon, after the lookout has looked
+            pending, self._nav_pending = self._nav_pending, []
+            self.navigation.tick(pending)
         # the watch routine (spec M3 §4): watch changes, all hands, fatigue and rest
         routine = (getattr(self.ship, "extra", None) or {}).get("routine")
         if routine is not None:
@@ -838,7 +901,8 @@ class World:
             "ship": self.ship.state(),
         }
         if self._position is not None:
-            # the truth's position, for the tests and the tools; never a reading
+            # the truth's position, for the tests and the tools; never a reading, and not in
+            # the snapshot the client receives (`api.queries.snapshot` gives the reckoning)
             out["position"] = self._position.to_dict()
         return out
 
@@ -862,6 +926,7 @@ class World:
             f"{daylight}. {self.sun_times().describe()}",
             *queries.weather_lines(self),
             *queries.lookout_lines(self),
+            *queries.reckoning_lines(self),
             *ship_lines,
             *queries.watch_lines(self),
         ]

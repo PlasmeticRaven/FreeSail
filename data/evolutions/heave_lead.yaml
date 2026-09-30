@@ -1,0 +1,36 @@
+# Heave the hand lead (spec M5 §13, §15; package 33a). "Soundings, to ascertain the depth
+# of water on entering or leaving a port, or in any case where there is supposed to be
+# less than twenty fathoms of water, are taken by the hand lead, a quartermaster or
+# forecastle-man being stationed in the main chains for the purpose; the lead weighing
+# from seven to fourteen pounds, and the line being from twenty to thirty fathoms in
+# length" (Luce 1884, ch. I 'The Lead'); the line marked at 2, 3, 5, 7, 10, 13, 15 and 17
+# with leather and rags "so that the marks can be told by feel at night" (Lever 1808,
+# 'The Hand-Lead'; Falconer 1780, 'Sounding'). Taken with way on, the leadsman heaving
+# forward and getting the depth as the vessel passes with the line nearly up and down,
+# and calling it: "By the mark seven", "By the deep nine", "And a half seven" (Luce).
+# The World reads the depth and the ground when this completes and says the leadsman's
+# line itself (`world.reckoning.LEAD_HOVE_KIND`); a depth beyond the line is "No bottom
+# at twenty fathoms", for which the deep-sea lead is wanted (heave_deep_sea_lead.yaml).
+#
+# The subject is `her` (see heave_log.yaml): the leadsman in the chains does not hold
+# the ship against a manoeuvre.
+id: heave_lead
+verb: heave_lead
+applies_to: {class: ship}
+params: {deep: false}
+preconditions: []
+steps:
+  - do: chains
+    duration_s: 30   # the leadsman into the chains, the breast-rope secured, the line clear
+                     # (Luce 1884, ch. I 'The Lead': "on going into the chains"; judgement)
+  - do: heave
+    duration_s: 45   # the heave, the line up and down as she passes, the call (judgement:
+                     # a cast a minute is the leadsman's pace in a channel)
+on_start: {log: "A hand into the chains with the lead."}
+on_complete: {log: "The lead is up.", kind: lead.hove, severity: routine}
+on_fail: {log: "Could not heave the lead: {reason}.", kind: evolution.failed, severity: routine}
+# crew: the leadsman and a hand to tend the line and haul it in (Luce 1884, ch. I: a
+# quartermaster or a forecastleman in the main chains); able, a leadsman's is a rated
+# man's work.
+crew: {hands: 2, rating: able, stations: [forecastle, quarterdeck]}
+source: "Luce 1884, ch. I 'The Lead' (the hand lead under twenty fathoms, the chains, the marks and deeps, the call); Lever 1808, 'The Hand-Lead' (7, 8 or 9 pounds on twenty fathoms, the marks); Falconer 1780, 'Sounding'"

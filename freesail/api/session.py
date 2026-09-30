@@ -19,11 +19,20 @@ from freesail.ship.loader import load_ship
 def attach_systems(ship: Ship) -> Ship:
     """Give a bare Ship its evolution runner, physics stepper and order handler."""
     from freesail.evolutions.runner import Runner
+
+    Runner(ship)  # registers itself as ship.extra["evolutions"]
+    return rebind_hooks(ship)
+
+
+def rebind_hooks(ship: Ship) -> Ship:
+    """The ship's two hooks, the stepper and the order handler, from the runner she has
+    (`ship.extra["evolutions"]`): given at composition, and again when a world is loaded
+    from its checkpoint (`core.replay.read_checkpoint`), since a closure is not state."""
     from freesail.evolutions.trim import tend_sheets
     from freesail.orders import handle as handle_order
     from freesail.physics import integrate
 
-    runner = Runner(ship)
+    runner = ship.extra["evolutions"]
 
     def stepper(s: Ship, dt: float, wind: Any) -> None:
         runner.step(s, dt, wind)

@@ -58,6 +58,7 @@ __all__ = [
     "MOTION_STATE_WORDS",
     "NO_CHART_WORDS",
     "NO_GLASS_WORDS",
+    "NO_RECKONING_WORDS",
     "NO_SEA_WORDS",
     "NO_WAY_WORDS",
     "NO_WEATHER_WORDS",
@@ -116,6 +117,12 @@ KINDS: dict[str, str] = {
     "motion": "the motion: is easy, is rolling, is rolling heavily, is pitching, is labouring",
     "sight": "what the lookout sees: is in sight, is not in sight",
     "depth": "a depth in fathoms: exceeds, is over, is under, is below 10 fathoms",
+    # the reckoning's readings (spec M5 §15, package 33a)
+    "position": "a position by account: is north of 49 30 N, is south of, is east of 6 W, "
+    "is west of",
+    "distance": "a distance in miles: exceeds, is over, is under, is below 20 miles",
+    "ground": "the ground the lead brings up: is sand, is mud, is not rock",
+    "person": "a person's place: is on deck, is below",
     "absent": "not a reading the ship has yet",
 }
 
@@ -559,6 +566,142 @@ def _no_chart_words(world: Any) -> str | None:
     return NO_CHART_WORDS if getattr(world, "chart", None) is None else None
 
 
+# The reckoning's readings (spec M5 §13, §15; package 33a; `world.reckoning.Navigation`):
+# the captain's account and never the truth. A world with no position keeps no
+# reckoning, and every row reads None in NO_RECKONING_WORDS.
+NO_RECKONING_WORDS = (
+    "No reckoning is kept: the scenario gives no position, and there is no sea here."
+)
+
+
+def _navigation_of(world: Any) -> Any:
+    return getattr(world, "navigation", None)
+
+
+def _reckoning(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the reckoning`: the position by account, in degrees and in words."""
+    nav = _navigation_of(world)
+    return nav.reckoning_reading() if nav is not None else None
+
+
+def _reckoning_uncertainty(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the reckoning's uncertainty`: the master's words, and behind them the larger of
+    the east-west and north-south doubts in metres (the dialect compares it in miles)."""
+    nav = _navigation_of(world)
+    if nav is None:
+        return None
+    r = nav.reckoning
+    worst = max(r.sigma_east_nm, r.sigma_north_nm)
+    return {
+        "metres": units.nm_to_m(worst),
+        "words": r.uncertainty_words,
+        "east_nm": r.sigma_east_nm,
+        "north_nm": r.sigma_north_nm,
+    }
+
+
+def _no_reckoning_words(world: Any) -> str | None:
+    return NO_RECKONING_WORDS if _navigation_of(world) is None else None
+
+
+def _depth(world: Any, _: str | None) -> float | None:
+    """`the depth`: the last cast's depth in metres (the lead's, with its error and its
+    age; distinct from the chart's `the depth of water`); None before a cast."""
+    nav = _navigation_of(world)
+    return nav.depth_reading() if nav is not None else None
+
+
+def _no_cast_words(world: Any) -> str | None:
+    nav = _navigation_of(world)
+    return NO_RECKONING_WORDS if nav is None else nav.no_cast_words()
+
+
+def _ground(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the ground`: what the arming brought up at the last cast, with its age."""
+    nav = _navigation_of(world)
+    return nav.ground_reading() if nav is not None else None
+
+
+def _bearing_of(world: Any, param: str | None) -> float | None:
+    """`the bearing of <mark>`: a mark in sight, its bearing by compass as the master
+    lays it down, in radians; None when not in sight."""
+    nav = _navigation_of(world)
+    if nav is None:
+        return None
+    found = nav.bearing_reading(param)
+    return None if found is None else float(found["bearing"])
+
+
+def _not_in_sight_words(world: Any) -> str | None:
+    if _navigation_of(world) is None:
+        return NO_RECKONING_WORDS
+    return "not in sight"
+
+
+def _run_since_noon(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the distance run since noon`, by account."""
+    nav = _navigation_of(world)
+    if nav is None:
+        return None
+    since = nav.since_noon_reading()
+    if since is None:
+        return None  # no noon yet: `_no_noon_words` says the run since the departure
+    run, _ = since
+    return {"metres": units.nm_to_m(run), "words": _miles(run)}
+
+
+def _course_made_good(world: Any, _: str | None) -> float | None:
+    """`the course made good` since noon, by account, in radians; None with no distance
+    made, or before the first noon."""
+    nav = _navigation_of(world)
+    if nav is None:
+        return None
+    since = nav.since_noon_reading()
+    if since is None or since[1] is None:
+        return None
+    return units.deg_to_rad(since[1])
+
+
+def _no_noon_words(world: Any) -> str | None:
+    nav = _navigation_of(world)
+    return NO_RECKONING_WORDS if nav is None else nav.no_noon_words()
+
+
+def _latitude_by_observation(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the latitude by observation`: today's noon latitude; None without a sight."""
+    nav = _navigation_of(world)
+    if nav is None:
+        return None
+    lat = nav.latitude_reading()
+    if lat is None:
+        return None
+    from freesail.world.geo import Position, format_position
+
+    return {"lat_deg": lat, "words": format_position(Position(lat, 0.0)).split(",")[0]}
+
+
+def _no_sight_words(world: Any) -> str | None:
+    nav = _navigation_of(world)
+    return NO_RECKONING_WORDS if nav is None else nav.no_sight_words()
+
+
+def _master(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the master`: his name and his place (spec §22's minimum), and what occupies him."""
+    nav = _navigation_of(world)
+    if nav is None:
+        return None
+    m = nav.master
+    busy = f", at the {m.occupied_with}" if m.occupied_with else ""
+    return m.to_dict() | {"words": f"{m.name}, {m.place}{busy}"}
+
+
+def _miles(nm: float) -> str:
+    n = round(nm)
+    if n <= 0:
+        return "half a mile" if nm >= 0.25 else "no distance"
+    return "a mile" if n == 1 else f"{n} miles"
+
+
 def _bells(world: Any, _: str | None) -> dict[str, Any]:
     """The last bell struck: watch name, bells, and whether it is striking now (the
     snapshot's `bell` block; spec §9.4)."""
@@ -950,10 +1093,108 @@ REGISTRY.add(
         none_words=_no_chart_words,
     )
 )
-REGISTRY.add_absent(
-    "depth",
-    ("the depth",),
-    "The ship has no lead line yet; that reading comes with the world.",
+# The reckoning's readings (spec M5 §15; package 33a): the captain's account, never the
+# truth; each None in NO_RECKONING_WORDS on the endless plane, and with its own absent
+# words where the account has nothing yet (no cast, no sight, nothing in sight).
+REGISTRY.add(
+    Reading(
+        "reckoning",
+        ("the reckoning", "the dead reckoning", "the position by account"),
+        "position",
+        "",
+        _reckoning,
+        description="the position by account: '49° 52' N, 6° 10' W by account'",
+        none_words=_no_reckoning_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "reckoning_uncertainty",
+        ("the reckoning's uncertainty", "the reckonings uncertainty", "the uncertainty"),
+        "distance",
+        "miles",
+        _reckoning_uncertainty,
+        description="how far the master would not trust the reckoning, in his words",
+        none_words=_no_reckoning_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "depth",
+        ("the depth",),
+        "depth",
+        "fathoms",
+        _depth,
+        description="the depth by the last cast of the lead, in fathoms",
+        none_words=_no_cast_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "ground",
+        ("the ground", "the bottom"),
+        "ground",
+        "",
+        _ground,
+        description="the ground the arming brought up at the last cast, with its age",
+        none_words=_no_cast_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "bearing_of",
+        ("the bearing of <mark>",),
+        "compass",
+        "",
+        _bearing_of,
+        parametric="mark",
+        description="the bearing by compass of a mark in sight, as the master lays it down",
+        none_words=_not_in_sight_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "run_since_noon",
+        ("the distance run since noon", "the run since noon", "the distance run"),
+        "distance",
+        "miles",
+        _run_since_noon,
+        description="the distance run since noon, by account; none before the first noon",
+        none_words=_no_noon_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "course_made_good",
+        ("the course made good",),
+        "compass",
+        "",
+        _course_made_good,
+        description="the course made good since noon, by account",
+        none_words=_no_noon_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "latitude_by_observation",
+        ("the latitude by observation", "the observed latitude", "the latitude"),
+        "position",
+        "",
+        _latitude_by_observation,
+        description="today's latitude by the noon sight",
+        none_words=_no_sight_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "master",
+        ("the master",),
+        "person",
+        "",
+        _master,
+        description="the master: his name, his place and what occupies him",
+        none_words=_no_reckoning_words,
+    )
 )
 REGISTRY.add_absent(
     "sail_in_sight",
@@ -1048,20 +1289,17 @@ _event(EventSpec("the glass falling fast", "", watch="the glass is falling fast"
 _event(EventSpec("the glass turning", "", watch="the glass is turning"))
 _event(EventSpec("the sea getting up", "", watch="the sea gets up"))
 _event(EventSpec("a change in the sky", "weather.sky", also=("weather.change",)))
-_event(
-    EventSpec(
-        "a sighting",
-        "sighting",
-        absent="There is nothing to sight yet; sightings come with the world.",
-    )
-)
-_event(
-    EventSpec(
-        "a sounding",
-        "sounding",
-        absent="The ship has no lead line yet; soundings come with the world.",
-    )
-)
+# The lookout's sighting (package 32 raised the line; package 33a names the event), a
+# landfall (the look that first raises the land), a sounding (the lead's cast, package
+# 33a), and noon (the day's work, the log-book's page turned).
+_event(EventSpec("a sighting", "lookout.sighting"))
+_event(EventSpec("a landfall", "lookout.sighting", lambda data: bool(data.get("landfall"))))
+_event(EventSpec("a sounding", "sounding"))
+_event(EventSpec("noon", "reckoning.noon"))
+# the manoeuvres' ends, for a passage's book (package 33a: `at filled away then steer N
+# by E`, after the fill-away has left the helm), by the evolutions' own kinds
+_event(EventSpec("hove to", "ship.hove_to"))
+_event(EventSpec("filled away", "ship.filled_away"))
 
 
 def event_matches(spec: EventSpec, kind: str, data: dict[str, Any]) -> bool:
@@ -1161,6 +1399,10 @@ def describe_value(reading: Reading, value: Any) -> str:
         from freesail.world.chart import fathoms_words
 
         return fathoms_words(value)
+    if kind in ("position", "distance", "person"):
+        return str(value["words"])
+    if kind == "ground":
+        return str(value.get("said") or value["words"])
     if isinstance(value, float):
         return f"{value:g}"
     return str(value)

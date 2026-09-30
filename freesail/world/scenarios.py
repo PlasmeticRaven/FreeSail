@@ -65,6 +65,7 @@ from typing import Any
 
 import yaml
 
+from freesail import units
 from freesail.core.world import Scenario, World
 from freesail.physics.wind import AIR_MASSES
 from freesail.world.geo import Position, format_position
@@ -78,6 +79,10 @@ DEFAULT_SEED = 1805
 
 class ScenarioError(ValueError):
     """A scenario file that cannot be read, in words that name the file and the field."""
+
+
+def _an(word: str) -> str:
+    return f"an {word}" if word[:1] in "aeiou" else f"a {word}"
 
 
 @dataclass
@@ -125,6 +130,17 @@ class ScenarioFile:
             out.append(f"The weather from the climatology for {sc.start_time.strftime('%B')}.")
         if sc.glass:
             out.append("She carries a glass.")
+        if sc.position:
+            out.append(f"The master takes the noon sight with {_an(sc.instrument)}.")
+        if sc.current and sc.current.get("knots"):
+            toward = units.point_name(units.deg_to_rad(float(sc.current["toward_deg"])))
+            out.append(
+                f"A current of {sc.current['knots']:g} knots sets toward {toward} (the author's "
+                f"view; the master does not know it)."
+            )
+        if sc.sky:
+            said = ", ".join(f"{k} {v}" for k, v in sc.sky.items())
+            out.append(f"The sky pinned: {said}.")
         keeps_sea = sc.sea if sc.sea is not None else bool(sc.systems or sc.climatology)
         keeps_sea = keeps_sea and (sc.sea is not None or not sc.weather)
         if keeps_sea:
@@ -171,6 +187,27 @@ def load_scenario(path: str | Path) -> ScenarioFile:
     ship = raw.get("ship") or {}
     wind = raw.get("wind") or {}
     sc.glass = bool(ship.get("glass", raw.get("glass", False)))
+    # the master's instrument for the noon sight (spec M5 §14, package 33a): the ship's
+    # line or the file's; the octant unless the file says the sextant
+    instrument = ship.get("instrument", raw.get("instrument"))
+    if instrument is not None:
+        sc.instrument = str(instrument).strip().lower()
+        if sc.instrument not in ("sextant", "octant"):
+            raise ScenarioError(
+                f"{where}, instrument: '{instrument}' is not an instrument; say sextant or octant."
+            )
+    # the world's stated current (package 33a; none by default): {knots, toward_deg}
+    current = raw.get("current")
+    if current is not None:
+        if not isinstance(current, dict):
+            raise ScenarioError(f"{where}, current: knots and toward_deg.")
+        try:
+            sc.current = {
+                "knots": float(current.get("knots", 0.0)),
+                "toward_deg": float(current.get("toward_deg", 0.0)),
+            }
+        except (TypeError, ValueError):
+            raise ScenarioError(f"{where}, current: numbers only.") from None
     try:
         sc.ship_heading_deg = float(ship.get("heading_deg", sc.ship_heading_deg))
         sc.ship_speed_kn = float(ship.get("speed_kn", sc.ship_speed_kn))
@@ -196,6 +233,30 @@ def load_scenario(path: str | Path) -> ScenarioFile:
         sc.climatology = bool(weather.get("climatology", False))
         if "sea" in weather and weather["sea"] is not None:
             sc.sea = bool(weather["sea"])
+        # the sky pinned (package 33a): {sky, weather, visibility} in the readings' words
+        if weather.get("sky") is not None:
+            from freesail.world.weather import SKY_WORDS, VISIBILITY_WORDS, WEATHER_WORDS
+
+            pin = weather["sky"]
+            if not isinstance(pin, dict):
+                raise ScenarioError(f"{where}, weather sky: a mapping of sky, weather, visibility.")
+            allowed = {"sky": SKY_WORDS, "weather": WEATHER_WORDS, "visibility": VISIBILITY_WORDS}
+            sc.sky = {}
+            for k, v in pin.items():
+                if k not in allowed:
+                    raise ScenarioError(
+                        f"{where}, weather sky: '{k}' is not sky, weather or visibility."
+                    )
+                if str(v) not in allowed[k]:
+                    raise ScenarioError(
+                        f"{where}, weather sky {k}: '{v}' is not one of {', '.join(allowed[k])}."
+                    )
+                sc.sky[k] = str(v)
+            if not systems and not weather.get("climatology"):
+                raise ScenarioError(
+                    f"{where}, weather sky: a pinned sky is laid over the systems' weather; "
+                    f"give systems or the climatology beside it."
+                )
         background = weather.get("background") or {}
         if not isinstance(background, dict):
             raise ScenarioError(

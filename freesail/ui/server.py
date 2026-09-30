@@ -715,8 +715,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.standing_orders:
         read_standing_orders(world, args.standing_orders)
     if args.load:
+        how = getattr(world, "loaded_from", "replay")
+        way = "from its checkpoint at" if how == "checkpoint" else "replayed to"
         print(
-            f"Loaded {args.load}: replayed to tick {world.clock.tick}, "
+            f"Loaded {args.load}: {way} tick {world.clock.tick}, "
             f"{world.clock.stamp()}; the log's digest is {world.log.digest()[:16]}."
         )
     driver = Driver(world, compression=args.time, lockstep=args.lockstep)

@@ -1,11 +1,15 @@
-/* map.js: the map, and from package 32 the captain's chart (spec M5 §17, the first
- * half). North up, the hull symbol with its heading, the last hour's track, a wind
- * arrow and a scale bar; under the track, when the world has a chart region, the
- * coast and the features of data/charts/ as the captain's chart of 1804 will have them
- * (fetched once from /api/chart). The truth's position is still drawn for now, since the
- * reckoning does not exist yet (package 33 draws the reckoned position and its ellipse
- * instead and takes the truth out of the snapshot). The truth's depth tiles are never
- * drawn. Canvas; drawn on every snapshot. */
+/* map.js: the map, and from package 32 the captain's chart (spec M5 §17). North up,
+ * the hull symbol with its heading, a wind arrow and a scale bar; under the track,
+ * when the world has a chart region, the coast and the features of data/charts/ as the
+ * captain's chart of 1804 has them (fetched once from /api/chart).
+ *
+ * Package 33a: the chart is the captain's. The hull is drawn at the reckoned position
+ * (snap.reckoning, the account brought up to now) with the ellipse of the master's
+ * doubt faintly about it, the track by account, the marks of the noons, the bearings
+ * taken and the soundings with their ground; the truth's position is not in the
+ * snapshot and nothing here draws it. On the endless plane (no reckoning) the map is
+ * what it was: the ship's own metres from the start and the last hour's track. The
+ * truth's depth tiles are never drawn. Canvas; drawn on every snapshot. */
 (function (root) {
   "use strict";
   var U = root.Units;
@@ -14,7 +18,7 @@
 
   function Map(canvas) {
     this.canvas = canvas;
-    this.track = []; // {tick, x, y, lat, lon}
+    this.track = []; // the plane's track: {tick, x, y}
     this.lastTick = -1;
     this.chart = null; // {coast, features, bounds, attribution} or null
     this.chartAsked = false;
@@ -39,44 +43,33 @@
   Map.prototype.record = function (snap) {
     var tick = snap.tick;
     if (tick < this.lastTick) this.track = []; // a replay or a new world
-    if (tick !== this.lastTick) {
-      var p = { tick: tick, x: snap.ship.x, y: snap.ship.y };
-      if (snap.position) {
-        p.lat = snap.position.lat_deg;
-        p.lon = snap.position.lon_deg;
-      }
-      this.track.push(p);
+    if (snap.reckoning) {
+      // the sphere: the track is the account's, carried in the snapshot
+      this.lastTick = tick;
+      return;
     }
+    if (tick !== this.lastTick) this.track.push({ tick: tick, x: snap.ship.x, y: snap.ship.y });
     this.lastTick = tick;
     var cutoff = tick - TRACK_SECONDS;
     while (this.track.length > 1 && this.track[0].tick < cutoff) this.track.shift();
   };
 
-  // The projection: the plane's metres when the world has no position; with one, an
-  // equirectangular projection about the ship (metres east and north of her), so the
-  // coast, the features, the track and the ship share one frame.
+  // The projection: the plane's metres when the world has no reckoning; with one, an
+  // equirectangular projection about the reckoned position (metres east and north of
+  // it), so the coast, the features, the track by account and the ship share one frame.
   function frameOf(snap) {
-    if (snap.position) {
-      var lat0 = snap.position.lat_deg, lon0 = snap.position.lon_deg;
+    if (snap.reckoning) {
+      var lat0 = snap.reckoning.lat_deg, lon0 = snap.reckoning.lon_deg;
       var k = Math.cos(lat0 * Math.PI / 180);
       return {
         geo: true,
         ship: [0, 0],
         of: function (lat, lon) {
           return [(lon - lon0) * k * M_PER_DEG, (lat - lat0) * M_PER_DEG];
-        },
-        track: function (p) {
-          return p.lat === undefined ? null : [(p.lon - lon0) * k * M_PER_DEG, (p.lat - lat0) * M_PER_DEG];
         }
       };
     }
-    return {
-      geo: false,
-      ship: [snap.ship.x, snap.ship.y],
-      track: function (p) {
-        return [p.x, p.y];
-      }
-    };
+    return { geo: false, ship: [snap.ship.x, snap.ship.y] };
   }
 
   var SYMBOL = {
@@ -192,6 +185,98 @@
     ctx.textBaseline = "alphabetic";
   };
 
+  // The captain's account on the chart (spec M5 §17): the track by account, the noons,
+  // the soundings with their ground, the bearings taken as lines from their marks, and
+  // the ellipse of the master's doubt about the reckoned position, faintly.
+  Map.prototype.drawAccount = function (ctx, snap, frame, toPx, scale, inkColour, trackColour) {
+    var rk = snap.reckoning;
+    if (!rk || !frame.geo) return;
+    var pts = (rk.track || []).map(function (p) {
+      return toPx.apply(null, frame.of(p[1], p[2]));
+    });
+    if (pts.length > 1) {
+      ctx.strokeStyle = trackColour;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      pts.forEach(function (q, i) {
+        if (i === 0) ctx.moveTo(q[0], q[1]);
+        else ctx.lineTo(q[0], q[1]);
+      });
+      ctx.stroke();
+      // the hourly pricks of the traverse
+      ctx.fillStyle = trackColour;
+      pts.forEach(function (q) {
+        ctx.beginPath();
+        ctx.arc(q[0], q[1], 1.5, 0, 2 * Math.PI);
+        ctx.fill();
+      });
+    }
+    ctx.font = "10px serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    // the bearings: a line from the mark along the reciprocal of the bearing laid down
+    (rk.bearings || []).forEach(function (b) {
+      var m = toPx.apply(null, frame.of(b.mark_lat_deg, b.mark_lon_deg));
+      var ang = (b.bearing_deg + 180) * Math.PI / 180;
+      var len = 20 * U.NAUTICAL_MILE * scale;
+      ctx.save();
+      ctx.setLineDash([6, 4]);
+      ctx.strokeStyle = trackColour;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(m[0], m[1]);
+      ctx.lineTo(m[0] + len * Math.sin(ang), m[1] - len * Math.cos(ang));
+      ctx.stroke();
+      ctx.restore();
+    });
+    // the soundings: the fathoms in small figures and the ground, as a chart prints them
+    (rk.soundings || []).forEach(function (s) {
+      var q = toPx.apply(null, frame.of(s.lat_deg, s.lon_deg));
+      ctx.fillStyle = inkColour;
+      var fm = s.depth_m === null || s.depth_m === undefined ? "no bottom" : Math.round(s.depth_m / U.FATHOM) + " fm";
+      ctx.fillText(fm + (s.ground ? " " + s.ground : ""), q[0] + 4, q[1] - 6);
+      ctx.beginPath();
+      ctx.arc(q[0], q[1], 2, 0, 2 * Math.PI);
+      ctx.fill();
+    });
+    // the noons: a circle with a dot, the log-book's page turned
+    (rk.noons || []).forEach(function (n) {
+      var q = toPx.apply(null, frame.of(n.lat_deg, n.lon_deg));
+      ctx.strokeStyle = inkColour;
+      ctx.fillStyle = inkColour;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(q[0], q[1], 5, 0, 2 * Math.PI);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(q[0], q[1], 1.5, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.fillText("noon", q[0] + 7, q[1] + 8);
+    });
+    // the ellipse of the master's doubt, faintly, about the reckoned position
+    var e = rk.ellipse;
+    if (e) {
+      var s0 = toPx(0, 0);
+      var a = Math.max(2, e.semi_major_nm * U.NAUTICAL_MILE * scale);
+      var b = Math.max(2, e.semi_minor_nm * U.NAUTICAL_MILE * scale);
+      ctx.save();
+      ctx.translate(s0[0], s0[1]);
+      // the major axis's bearing from north, clockwise; the canvas's y runs down
+      ctx.rotate(e.major_bearing_deg * Math.PI / 180);
+      ctx.strokeStyle = trackColour;
+      ctx.globalAlpha = 0.5;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, b, a, 0, 0, 2 * Math.PI);
+      ctx.stroke();
+      ctx.globalAlpha = 0.12;
+      ctx.fillStyle = trackColour;
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.textBaseline = "alphabetic";
+  };
+
   Map.prototype.draw = function (snap) {
     var canvas = this.canvas;
     var ctx = canvas.getContext("2d");
@@ -211,18 +296,31 @@
     ctx.fillStyle = seaColour;
     ctx.fillRect(0, 0, cw, ch);
 
-    if (snap.position) this.askChart();
+    if (snap.reckoning) this.askChart();
     var frame = frameOf(snap);
     var ship = snap.ship;
     var s0 = frame.ship;
-    // scale: fit the track and at least a few cables around the ship; with a chart, a
-    // few miles, so the coast is seen
+    // scale: fit the track (the last hour's on the plane, the account's last few hours
+    // on the chart) and at least a few cables around the ship; with a chart, a few miles,
+    // so the coast is seen; and the whole ellipse
     var minX = s0[0], maxX = s0[0], minY = s0[1], maxY = s0[1];
     var pts = [];
-    this.track.forEach(function (p) {
-      var m = frame.track(p);
-      if (!m) return;
-      pts.push(m);
+    if (frame.geo) {
+      var rk = snap.reckoning;
+      var tail = (rk.track || []).slice(-4);
+      tail.forEach(function (p) {
+        pts.push(frame.of(p[1], p[2]));
+      });
+      if (rk.ellipse) {
+        var r = rk.ellipse.semi_major_nm * U.NAUTICAL_MILE;
+        pts.push([-r, -r], [r, r]);
+      }
+    } else {
+      this.track.forEach(function (p) {
+        pts.push([p.x, p.y]);
+      });
+    }
+    pts.forEach(function (m) {
       if (m[0] < minX) minX = m[0];
       if (m[0] > maxX) maxX = m[0];
       if (m[1] < minY) minY = m[1];
@@ -263,8 +361,10 @@
       ctx.stroke();
     }
 
-    // the track
-    if (pts.length > 1) {
+    // the track: the account's on the chart, the plane's own on the plane
+    if (frame.geo) {
+      this.drawAccount(ctx, snap, frame, toPx, scale, inkColour, trackColour);
+    } else if (pts.length > 1) {
       ctx.strokeStyle = trackColour;
       ctx.lineWidth = 1.5;
       ctx.beginPath();
@@ -276,7 +376,8 @@
       ctx.stroke();
     }
 
-    // the hull symbol: a small pointed shape, bow toward the heading
+    // the hull symbol: a small pointed shape, bow toward the heading, at the reckoned
+    // position on the chart
     var s = toPx(s0[0], s0[1]);
     var size = Math.max(10, Math.min(18, 30 * scale));
     ctx.save();
@@ -348,31 +449,29 @@
     ctx.stroke();
     ctx.fillText(step === U.CABLE ? "1 cable" : step === U.NAUTICAL_MILE ? "1 mile" : "5 miles", bx, by - 6);
 
-    // position and course made good
+    // the position by account and the course made good, in the master's words
     ctx.textAlign = "right";
-    var made = pts.length > 1 ? pts[pts.length - 1] : null;
-    var first = pts.length > 1 ? pts[0] : null;
-    var cmg = made && first && (made[0] !== first[0] || made[1] !== first[1]) ? U.pointName(Math.atan2(made[0] - first[0], made[1] - first[1])) : "—";
-    var where;
-    if (snap.position) {
-      where = dm(snap.position.lat_deg, "N", "S") + " " + dm(snap.position.lon_deg, "E", "W");
+    var where, cmg;
+    if (snap.reckoning) {
+      where = snap.reckoning.words;
+      cmg = snap.reckoning.course_made_good_deg === null || snap.reckoning.course_made_good_deg === undefined
+        ? "—" : U.pointName(snap.reckoning.course_made_good_deg * Math.PI / 180);
     } else {
+      var made = pts.length > 1 ? pts[pts.length - 1] : null;
+      var first = pts.length > 1 ? pts[0] : null;
+      cmg = made && first && (made[0] !== first[0] || made[1] !== first[1]) ? U.pointName(Math.atan2(made[0] - first[0], made[1] - first[1])) : "—";
       where = "x " + (ship.x / U.NAUTICAL_MILE).toFixed(2) + " nm  y " + (ship.y / U.NAUTICAL_MILE).toFixed(2) + " nm";
     }
     ctx.fillText(where + "  ·  made good " + cmg, cw - 12, ch - 8);
+    if (snap.reckoning) {
+      ctx.textAlign = "left";
+      ctx.fillText(snap.reckoning.uncertainty, 12, ch - 28);
+    }
     if (this.chart && frame.geo && snap.lookout && snap.lookout.count) {
       ctx.textAlign = "left";
       ctx.fillText("in sight: " + snap.lookout.words, 12, 100);
     }
   };
-
-  function dm(value, pos, neg) {
-    var h = value >= 0 ? pos : neg;
-    var v = Math.abs(value);
-    var total = Math.round(v * 60);
-    var d = Math.floor(total / 60), m = total % 60;
-    return d + "° " + (m < 10 ? "0" : "") + m + "' " + h;
-  }
 
   root.SeaMap = Map;
 })(window);

@@ -410,19 +410,21 @@ def test_the_readings_on_a_ship_with_a_chart_and_on_one_without():
     assert r["in_sight"]["count"] >= 3 and "bearing" in r["in_sight"]["words"]
     assert [x.kind for x in R.REGISTRY.by_words("the land")] == ["sight"]
     assert [x.kind for x in R.REGISTRY.by_words("the depth of water")] == ["depth"]
-    assert R.REGISTRY.get("depth").is_absent  # the lead's cast is package 33's
+    assert not R.REGISTRY.get("depth").is_absent  # the lead's cast, package 33a's
+    assert with_chart.readings["depth"] is None  # no cast yet
     without = make_world(7, SCHOONER, Scenario(gustiness=0.0, variability=0.0))
     assert without.readings["depth_of_water"] is None and without.readings["land"] is None
     assert without.readings.words("land") == R.NO_CHART_WORDS
-    # the snapshot carries the lookout and, for now, the truth's position (spec §17; 33 removes it)
+    # the snapshot carries the lookout and the reckoning, and not the truth's position
+    # (spec §17; package 33a took it out): the truth is in the world and the tests only
     from freesail.api import queries
 
     snap = queries.snapshot(with_chart)
-    assert snap["position"] == with_chart.position.to_dict() and snap["lookout"]["count"] >= 3
-    assert (
-        queries.snapshot(without)["position"] is None
-        and queries.snapshot(without)["lookout"] is None
-    )
+    assert "position" not in snap and snap["lookout"]["count"] >= 3
+    assert snap["reckoning"]["words"].endswith("by account")
+    assert snap["ship"]["x"] is None and snap["ship"]["y"] is None
+    assert queries.snapshot(without)["reckoning"] is None
+    assert queries.snapshot(without)["lookout"] is None
     block = queries.chart_block(with_chart)
     assert block["region"] == REGION and len(block["coast"]) > 100 and len(block["features"]) >= 150
     assert queries.chart_block(without) is None

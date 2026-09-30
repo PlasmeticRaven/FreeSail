@@ -173,6 +173,26 @@ class Sun:
             return None  # the sun never reaches that altitude today
         return math.degrees(math.acos(cos_ha))
 
+    def transit(self, day: date | datetime, ship_x_m: float = 0.0) -> datetime:
+        """The sun's meridian passage on `day` in clock time: the ship's noon, when the
+        log-book's page turns and the latitude is taken (spec M5 §14; package 33a). From
+        the equation of time at that day's noon and the ship's easting, as `times` has it:
+        720 minutes less the longitude's four minutes a degree and the equation."""
+        d = day.date() if isinstance(day, datetime) else day
+        noon = datetime(d.year, d.month, d.day, 12, 0, 0)
+        _, eqtime = declination_and_equation_of_time(noon)
+        minutes = 720.0 - 4.0 * self.longitude_deg(ship_x_m) - eqtime
+        return datetime(d.year, d.month, d.day) + timedelta(seconds=round(minutes * 60.0))
+
+    def meridian_altitude_deg(self, day: date | datetime) -> float:
+        """The sun's altitude at its meridian passage on `day`: 90° less the difference of
+        the latitude and the declination, the arithmetic of the noon sight (Falconer 1780,
+        'Quadrant'; the master's, not the game's, which draws the sight's outcome)."""
+        d = day.date() if isinstance(day, datetime) else day
+        noon = datetime(d.year, d.month, d.day, 12, 0, 0)
+        decl, _ = declination_and_equation_of_time(noon)
+        return 90.0 - abs(self.latitude_deg - math.degrees(decl))
+
     def times(self, day: date | datetime, ship_x_m: float = 0.0) -> SunTimes:
         """Dawn, sunrise, sunset and dusk on `day`, in clock time, from the declination
         and equation of time at that day's noon (NOAA's simplification, good to a

@@ -25,7 +25,7 @@ from typing import Any
 
 from freesail import units
 from freesail.core.events import Severity
-from freesail.world.chart import Chart, Sighting
+from freesail.world.chart import NIGHT_LAND_NM, Chart, Feature, Sighting
 from freesail.world.geo import estimate_words
 
 __all__ = [
@@ -33,6 +33,8 @@ __all__ = [
     "LOOKOUT_HAIL_MAX",
     "LOOKOUT_REPEAT_MIN",
     "READING_MAX",
+    "SHORE_CLOSE_NM",
+    "SHORE_ID",
     "Lookout",
     "height_of_eye",
     "relative_words",
@@ -54,6 +56,13 @@ LOOKOUT_HAIL_MAX = 6
 
 # `what is in sight` names at most this many, nearest first, and counts the rest.
 READING_MAX = 8
+
+# The shore itself is hailed, when no headland of the chart is in sight, within this
+# many miles (package 33a; judgement: the cliffs seen close aboard in thick weather,
+# the same three miles a danger is made out at, `chart.DANGER_SEEN_NM`), and within the
+# visibility and the night's mile. Its sighting carries this id and is no mark.
+SHORE_CLOSE_NM = 3.0
+SHORE_ID = "the-shore"
 
 MAST_CLASSES = frozenset({"mast", "topmast", "topgallant_mast", "royal_mast"})
 
@@ -77,6 +86,14 @@ def height_of_eye(ship: Any) -> float:
         height = sum(float(p.height_m) for p in chain if p.cls in MAST_CLASSES)
         best = max(best, height)
     return deck + best if best > 0.0 else DEFAULT_HEIGHT_OF_EYE_M
+
+
+def _key(name: str) -> str:
+    """A name as it is matched: lower case, without its article or its punctuation."""
+    words = "".join(c if c.isalnum() or c.isspace() else " " for c in name.lower()).split()
+    if words and words[0] == "the":
+        words = words[1:]
+    return " ".join(words)
 
 
 def relative_words(relative_rad: float) -> str:
@@ -117,6 +134,11 @@ class Lookout:
         found = self.chart.in_sight(
             pos, self.height_of_eye_m, visibility_nm, world.daylight, world.clock.ship_time
         )
+        if not any(s.seen_as == "land" for s in found):
+            shore = self._shore_close_aboard(pos, visibility_nm, world.daylight)
+            if shore is not None:
+                found.append(shore)
+                found.sort(key=lambda s: s.distance_m)
         minute = world.clock.tick // 60
         heading = float(world.ship.heading)
         lines: list[tuple[Severity, str, str, dict[str, Any]]] = []
@@ -155,6 +177,31 @@ class Lookout:
         self._looked = True
         return lines
 
+    def _shore_close_aboard(
+        self, pos: Any, visibility_nm: float | None, daylight: str
+    ) -> Sighting | None:
+        """The shore itself, close aboard, when no headland of the chart is in sight
+        (package 33a: in thick weather a ship standing in sees the cliffs before any
+        named mark, and a landfall in fog is made on them). From the chart's distance
+        field: within `SHORE_CLOSE_NM`, the visibility, and at night `NIGHT_LAND_NM`. A
+        sighting of the shore is land for the reading `the land`, and no mark to take a
+        bearing of."""
+        found = self.chart.coast_distance(pos)
+        if found is None:
+            return None
+        distance_m, bearing_deg = found
+        limit = SHORE_CLOSE_NM
+        if visibility_nm is not None:
+            limit = min(limit, float(visibility_nm))
+        if daylight == "night":
+            limit = min(limit, NIGHT_LAND_NM)
+        if distance_m > limit * units.NAUTICAL_MILE:
+            return None
+        coast = self.chart.coast_at(pos)
+        name = f"the land about {coast.name}" if coast is not None and coast.name else "the land"
+        shore = Feature(SHORE_ID, "headland", name, pos.lat_deg, pos.lon_deg, height_m=0.0)
+        return Sighting(shore, bearing_deg, distance_m, "land")
+
     @staticmethod
     def words(s: Sighting, heading_rad: float) -> str:
         """The sighting in the lookout's words."""
@@ -165,9 +212,43 @@ class Lookout:
             return f"A light {relative}, bearing {point}."
         name = s.feature.name
         head = name[:1].upper() + name[1:]
+        if s.feature.id == SHORE_ID:
+            return f"{head} close aboard {relative}, bearing {point}, distant {distance}."
         if s.seen_as == "danger":
             return f"{head} bearing {point}, distant {distance}: a danger."
         return f"{head} bearing {point}, distant {distance}."
+
+    # -- for the bearing taken (package 33a, spec M5 §13, §15) ---------------------------
+
+    def find(self, name: str) -> Sighting | None:
+        """The sighting a name means, for `take a bearing of <mark>` and `the bearing of
+        <mark>`: a feature in sight by its period name or its modern one ('the Lizard',
+        'Lizard Point'), 'the land' for the nearest land in sight, 'the light' for the
+        nearest light; None when nothing in sight answers to it."""
+        key = _key(name)
+        if not key:
+            return None
+        if key in ("land", "shore", "coast", "headland", "nearest land"):
+            # the nearest land; at night, when the land itself is not to be seen, the
+            # nearest light or mark that is (the reading `the land` counts them so); the
+            # shore close aboard is no mark to take a bearing of
+            for kinds in (("land",), ("light", "mark")):
+                land = [
+                    s for s in self.sightings if s.seen_as in kinds and s.feature.id != SHORE_ID
+                ]
+                if land:
+                    return min(land, key=lambda s: s.distance_m)
+            return None
+        if key in ("light", "nearest light", "the light"):
+            lights = [s for s in self.sightings if s.seen_as == "light"]
+            return min(lights, key=lambda s: s.distance_m) if lights else None
+        for s in self.sightings:
+            f = s.feature
+            if f.id == SHORE_ID:
+                continue  # the shore close aboard is no mark of the chart
+            if key in (_key(f.name), _key(f.modern), _key(f.id.replace("-", " "))):
+                return s
+        return None
 
     # -- the readings -------------------------------------------------------------------
 

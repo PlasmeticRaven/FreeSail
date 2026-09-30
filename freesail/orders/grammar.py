@@ -135,6 +135,19 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
             verb_phrase=verb_phrase,
             object=said or None,
         )
+    if spec.object == "navigation":
+        # what the captain says to the master (spec M5 §15, package 33a): the words after
+        # the verb are a mark, a place, a position or an allowance, read by
+        # `orders.navigation` as they were said (the original text, not the lower-cased
+        # form: a mark's name is matched without regard to case, a position by its
+        # letters)
+        said = " ".join(w for w in [*rest, *(w for seg in segments[1:] for w in seg)] if w != ",")
+        return Order(
+            text=norm.replace(" , ", ", "),
+            verb=verb,
+            verb_phrase=verb_phrase,
+            object=said or None,
+        )
     if spec.object == "query":
         # a question of the ship's stores (package 30b): nothing more is said after it
         extra = [w for w in [*rest, *(w for seg in segments[1:] for w in seg)] if w != ","]

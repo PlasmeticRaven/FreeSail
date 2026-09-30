@@ -241,9 +241,29 @@ class Clause:
             words = value["words"] if isinstance(value, dict) else str(value)
             holds = (words == v) if v == "in sight" else (words != "in sight")
             return holds if op == "is" else not holds
-        if kind == "depth":  # the depth of water by the chart, in fathoms
+        if kind == "depth":  # the depth of water by the chart, or the lead's, in fathoms
             fm = units.m_to_fathoms(value)
             return fm > v if op == "gt" else fm < v
+        # the reckoning's readings (package 33a): by account, never the truth
+        if kind == "distance":
+            nm = units.m_to_nm(value["metres"])
+            return nm > v if op == "gt" else nm < v
+        if kind == "position":
+            if op in ("north_of", "south_of"):
+                lat = value.get("lat_deg")
+                if lat is None:
+                    return False
+                return lat > v if op == "north_of" else lat < v
+            lon = value.get("lon_deg")
+            if lon is None:
+                return False
+            return lon > v if op == "east_of" else lon < v
+        if kind == "ground":
+            holds = v in str(value["words"])
+            return holds if op == "is" else not holds
+        if kind == "person":
+            holds = value["place"] == v
+            return holds if op == "is" else not holds
         if kind == "sail":
             return _sail_is(value, v) if op == "is" else not _sail_is(value, v)
         if kind == "strain":
