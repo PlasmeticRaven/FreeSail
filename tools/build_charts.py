@@ -1550,6 +1550,12 @@ def main(argv: list[str] | None = None) -> int:
     )
     ap.add_argument("--world", action="store_true", help="build level 0 from GEBCO's global tiles")
     ap.add_argument("--atlantic", action="store_true", help="build level 1 (not committed)")
+    ap.add_argument(
+        "--reuse-world",
+        action="store_true",
+        help="keep the world level as the last manifest lists it, instead of decimating the "
+        "globe again (a region's rebuild after a change of its hand-made files)",
+    )
     ap.add_argument("--skip-fetch", action="store_true", help="use the cache only; refuse to fetch")
     ap.add_argument("--report", type=Path, default=None, help="write the report here too")
     ap.add_argument(
@@ -1566,7 +1572,23 @@ def main(argv: list[str] | None = None) -> int:
     for region in args.region or list(REGIONS):
         regions[region] = build.build_region(region)
     gebco_levels = build.build_gebco_levels(args.world, args.atlantic)
-    notes = yaml.safe_load(args.notes.read_text(encoding="utf-8")) if args.notes else {}
+    if args.reuse_world and "0" not in gebco_levels:
+        # the world level as the last manifest lists it, its tiles checked present
+        last = yaml.safe_load((CHARTS_DIR / "manifest.yaml").read_text(encoding="utf-8"))
+        world = (last or {}).get("world")
+        if world:
+            for t in world["tiles"]:
+                if not (CHARTS_DIR / "tiles" / "0" / f"{t['name']}.npz").exists():
+                    raise SystemExit(f"--reuse-world: the tile {t['name']} is missing; run --world")
+            gebco_levels["0"] = world
+            for f in (last.get("sources") or {}).get("gebco_2025", {}).get("fetched", []):
+                if f.get("file", "").endswith("gebco_2025_geotiff.zip"):
+                    build.fetched["gebco_2025"].append(
+                        Fetched(Path(f["file"]), f["url"], f["retrieved"], f["sha256"], f["bytes"])
+                    )
+            build.log("The world level kept as the last manifest lists it (--reuse-world).")
+    notes_path = args.notes or CHARTS_DIR / "unverified-checks.yaml"
+    notes = yaml.safe_load(notes_path.read_text(encoding="utf-8")) if notes_path.exists() else {}
     path = build.write_manifest(regions, gebco_levels, notes)
     build.log(f"Manifest written: {path}")
     if args.report:

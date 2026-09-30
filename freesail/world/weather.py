@@ -1019,6 +1019,10 @@ class Weather:
         vx, vy = self.geostrophic_at(x_km, y_km)
         speed = math.hypot(vx, vy) * SURFACE_SCALE
         if speed == 0.0:
+            # a calm under the centre of a high: the sea breeze alone, if there is one
+            bx, by = self.sea_breeze(x_km, y_km, when or self.now)
+            if bx or by:
+                return units.wind_direction_from(bx, by), math.hypot(bx, by)
             return 0.0, 0.0
         turn = math.radians(SURFACE_TURN_DEG)
         # rotate the velocity anticlockwise by `turn` (x east, y north)
@@ -1191,14 +1195,16 @@ class Weather:
         onshore direction is the bearing to the nearest coast; the strength is the
         product of the season's, the hour's, the distance's and the gradient's factors
         (`SEA_BREEZE_*`), and it blows only in fine weather away from a low's fronts."""
-        found = self._coast(x_km, y_km)
-        if found is None:
-            return 0.0, 0.0
-        distance_km, bearing_deg = found
-        if distance_km >= SEA_BREEZE_REACH_KM or when.month not in SEA_BREEZE_MONTHS:
+        if self.coast is None or when.month not in SEA_BREEZE_MONTHS:
             return 0.0, 0.0
         hour = when.hour + when.minute / 60.0
         if not SEA_BREEZE_ONSET_H < hour < SEA_BREEZE_END_H:
+            return 0.0, 0.0
+        found = self._coast(x_km, y_km)  # the chart's field, read only in the season's hours
+        if found is None:
+            return 0.0, 0.0
+        distance_km, bearing_deg = found
+        if distance_km >= SEA_BREEZE_REACH_KM:
             return 0.0, 0.0
         sector = self.sector_at(x_km, y_km, when)
         fine = sector.sector in ("high", "open") or (

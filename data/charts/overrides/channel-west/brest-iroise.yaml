@@ -1,0 +1,58 @@
+# Brest, the Goulet and the Iroise as 1805 had them (spec M5 §10; C §3.3, §5.2; package 32).
+# A period patch, hand-made and rasterised by tools/build_charts.py.
+#
+# What changed since 1805, verified in the study (C §3.3): the Goulet and the Iroise passages
+# are rock and unchanged; the naval port and the commercial reclamation are not the 1805
+# shore; Ushant had the Stiff light (1699) and Saint-Mathieu its abbey tower light (1692);
+# Le Créac'h (1863) did not exist. The rocks' names and marks are the features file's, from
+# Faden 1793; this patch returns the reclaimed shore of Brest to water.
+#
+# The sheets. Bellin's '5e carte particulière des costes de Bretagne' of 1773 (Rumsey, on the
+# Internet Archive as dr_5e-carte-particuliere-des-costes-de-bretagne-12066036) was read at
+# the archive's display size (1,536 by 975 pixels): the coast's shape and the larger names are
+# legible, the soundings in brasses are not, and the full-resolution JPEG 2000 (14.7 MB, CC
+# BY-NC-SA, cached and not committed) was not transcribed in this build. The Pilote français
+# of 1822 (Défense digital library) refused every connection from the build network (C §7).
+# The depths below rest on Faden 1793 as each says; the unit is his translation's fathoms,
+# not the Dépôt's brasses, so no brasse conversion is applied (C §3.3's unverified brasse is
+# recorded in the tool as BRASSE_M for a sheet that needs it).
+
+region: channel-west
+name: brest-iroise
+sheet: "Bellin 1773, '5e carte particulière des costes de Bretagne' (Rumsey/Internet Archive), read at the display size for the shore; the Pilote français 1822 not opened"
+source: "Faden 1793, 'Le Petit Neptune François', 'Bay of Brest' p. 57, 'Camaret' p. 57, 'Tides and Currents' p. 61"
+units: fathoms
+datum: "low water (Faden's soundings are the Dépôt's at low water of spring tides, given in his translation in fathoms)"
+# Mean low water springs above the modern chart datum (the zéro hydrographique) at Brest:
+# 1.0 m from memory of the port's reference levels (BMVE), unverified from the build network
+# (SHOM's RAM document was not reachable; C §7).
+datum_above_chart_datum_m: 1.0
+control_points:
+  - {name: "the Stiff (Ushant)", lat_deg: 48.4805, lon_deg: -5.0558, note: "tower of 1699, unmoved"}
+  - {name: "Pointe Saint-Mathieu", lat_deg: 48.3300, lon_deg: -4.7705, note: "rock head and abbey, unmoved"}
+  - {name: "Pointe des Espagnols", lat_deg: 48.3430, lon_deg: -4.5410, note: "rock head, unmoved"}
+  - {name: "the castle of Brest", lat_deg: 48.3825, lon_deg: -4.4945, note: "castle, unmoved"}
+  - {name: "Toulinguet", lat_deg: 48.2740, lon_deg: -4.6390, note: "rock, unmoved"}
+  - {name: "Le Four", lat_deg: 48.5240, lon_deg: -4.8020, note: "rock, unmoved"}
+  - {name: "the Pierres Noires", lat_deg: 48.3033, lon_deg: -4.9063, note: "rocks, unmoved"}
+patches:
+  - name: "the commercial port's quays, water before the 1860s"
+    kind: sea
+    depth: 3
+    polygon:
+      - [48.3862, -4.4895]
+      - [48.3862, -4.4700]
+      - [48.3785, -4.4700]
+      - [48.3785, -4.4895]
+    source: "Faden 1793, 'Bay of Brest', p. 57: within the Bay of Brest you anchor where you please in 8, 10 or 16 fathoms, muddy ground; the port's quays east of the castle date from the 1860s (the French encyclopaedia's 'Port de Brest', read 2026-09-30)"
+    note: "The reclaimed ground of the Port de commerce returned to water: three fathoms on mud, a judgement between Faden's eight fathoms in the bay and the shore, since no sounding of this shore was read from a sheet."
+  - name: "the naval port's ground west of the Penfeld, water before its works"
+    kind: sea
+    depth: 3
+    polygon:
+      - [48.3860, -4.5350]
+      - [48.3860, -4.5010]
+      - [48.3790, -4.5010]
+      - [48.3790, -4.5350]
+    source: "Faden 1793, 'Bay of Brest', p. 57; the arsenal's extension to Laninon in the nineteenth and twentieth centuries (the French encyclopaedia's 'Port de Brest')"
+    note: "The naval port's made ground west of the Penfeld's mouth returned to water at three fathoms on mud, the same judgement; the castle and the Penfeld are left as they are."

@@ -1,0 +1,271 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"192,-19": [
+"bec-de-la-chevre",
+"pointe-du-raz"
+],
+"192,-20": [
+"ile-de-sein"
+],
+"192,-21": [
+"ar-men"
+],
+"192,-22": [
+"soundings-off-ushant-near"
+],
+"192,-23": [
+"soundings-off-ushant"
+],
+"193,-18": [
+"brest-castle",
+"brest-town",
+"rade-de-brest"
+],
+"193,-19": [
+"le-coq",
+"la-parquette",
+"bertheaume-road",
+"bertheaume-point",
+"buzec-rock",
+"petit-minou",
+"le-goulet",
+"les-fillettes",
+"le-mengam",
+"pointe-des-espagnols",
+"portzic",
+"camaret-road",
+"camaret-town",
+"toulinguet",
+"le-bellen",
+"basses-du-lis",
+"pointe-des-pezeaux",
+"tas-de-pois"
+],
+"193,-20": [
+"molene",
+"beniguet",
+"pierres-noires",
+"pierres-noires-light",
+"chenal-du-four",
+"les-platresses",
+"la-valbelle",
+"la-helle",
+"le-conquet",
+"la-vinotiere",
+"kermorvan-point",
+"blanc-sablon",
+"st-mathieu-point",
+"st-mathieu-light",
+"les-moines",
+"gouemont-and-vandree",
+"iroise"
+],
+"193,-21": [
+"ushant",
+"stiff-light",
+"creach-light",
+"keller-island",
+"fromveur"
+],
+"194,-16": [
+"roscoff"
+],
+"194,-17": [
+"ile-de-batz"
+],
+"194,-19": [
+"ile-vierge"
+],
+"194,-20": [
+"le-four"
+],
+"195,-14": [
+"sept-iles"
+],
+"195,-15": [
+"les-triagoz"
+],
+"199,-21": [
+"lizard-point",
+"lizard-lights",
+"the-stags",
+"the-beast",
+"rose-rock",
+"spanam-rock",
+"craggan-rock",
+"cadgwith",
+"rill-point"
+],
+"199,-24": [
+"wolf-rock",
+"wolf-rock-light"
+],
+"199,-26": [
+"st-agnes-light",
+"bishop-rock",
+"bishop-rock-light",
+"crim-rocks",
+"bishops-ridge-and-shovel",
+"nun-deeps",
+"poll-bank",
+"st-agnes-island",
+"st-marys-island",
+"hugh-town",
+"star-castle",
+"peninnis-head",
+"peninnis-mill",
+"the-gilstone",
+"st-martins-daymark",
+"st-martins-island",
+"st-marys-road",
+"st-marys-sound",
+"woolpack-rock",
+"spanish-ledge",
+"bartholomew-ledge",
+"nut-rock",
+"hangman-island",
+"samson",
+"great-minalto",
+"great-mincarlo",
+"annet",
+"old-wreck-rock",
+"broad-sound",
+"nornour",
+"crow-bar",
+"crow-rock",
+"crow-sound",
+"new-grimsby",
+"old-grimsby",
+"st-helens-pool",
+"tresco",
+"round-island-scilly",
+"scilly-tides"
+],
+"200,-15": [
+"start-point"
+],
+"200,-16": [
+"east-rutts",
+"bolt-head",
+"bolt-tail"
+],
+"200,-18": [
+"eddystone",
+"hand-deeps",
+"eddystone-oozy-ground"
+],
+"200,-20": [
+"nare-head",
+"gull-rock-nare",
+"the-bizzies",
+"dodman-point",
+"gwineas-rock"
+],
+"200,-21": [
+"black-head",
+"coverack",
+"lowland-point",
+"the-manacles",
+"penwin-and-vaze",
+"manacles-clearing-mark",
+"manacle-point",
+"st-keverne-church",
+"helford-river",
+"the-gedges",
+"rosemullion-head",
+"mawnan-church",
+"nare-head-helford",
+"pendennis-castle",
+"pendennis-point",
+"st-anthony-head",
+"st-anthony-light",
+"black-rock-falmouth",
+"falmouth-eastern-channel",
+"falmouth-western-channel",
+"st-mawes-castle",
+"lugo-rock",
+"st-mawes-bank",
+"falmouth-bank",
+"governor-rock",
+"carrick-road",
+"cross-road",
+"st-just-pool",
+"mylor-point",
+"trefusis-point",
+"falmouth-town",
+"falmouth-church",
+"st-budock-church",
+"falmouth-outer-road",
+"the-old-wall",
+"falmouth-tides",
+"the-gray"
+],
+"200,-22": [
+"mullion-island",
+"porthleven",
+"godolphin-hill",
+"st-michaels-mount",
+"st-ives",
+"godrevy-island"
+],
+"200,-23": [
+"penzance",
+"gear-rock",
+"gwavas-lake",
+"low-lee",
+"mousehole",
+"runnel-stone",
+"tol-pedn-penwith",
+"lands-end",
+"longships-light",
+"the-brisons",
+"cape-cornwall"
+],
+"200,-25": [
+"seven-stones",
+"seven-stones-lightvessel"
+],
+"201,-17": [
+"rame-head",
+"rame-church",
+"penlee-point",
+"dragstone",
+"cawsand-bay",
+"cawsand-town",
+"maker-tower",
+"the-knap",
+"the-panther",
+"plymouth-sound-patches",
+"shagstone",
+"plymouth-mewstone",
+"plymouth-western-channel",
+"drakes-island",
+"plymouth-sound-anchorage",
+"mount-batten",
+"plymouth-citadel",
+"plymouth-town",
+"the-hamoaze"
+],
+"201,-18": [
+"looe-island"
+],
+"201,-19": [
+"gribbin-head",
+"fowey",
+"udder-rock"
+],
+"201,-20": [
+"mevagissey"
+],
+"201,-21": [
+"st-agnes-head-cornwall"
+],
+"202,-20": [
+"padstow"
+],
+"202,-21": [
+"trevose-head"
+]
+}
+}

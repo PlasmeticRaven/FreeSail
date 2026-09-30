@@ -62,7 +62,9 @@ def test_the_run_is_converted_per_tick_and_not_per_region():
         p = p.advanced(0.0, units.NAUTICAL_MILE)
     for _ in range(100):
         p = p.advanced(units.NAUTICAL_MILE, 0.0)
-    flat_lon = start.lon_deg + math.degrees(100 * units.NAUTICAL_MILE / (geo.EARTH_RADIUS_M * math.cos(math.radians(48.0))))
+    flat_lon = start.lon_deg + math.degrees(
+        100 * units.NAUTICAL_MILE / (geo.EARTH_RADIUS_M * math.cos(math.radians(48.0)))
+    )
     assert math.isclose(p.lat_deg, 48.0 + 100.0 / 60.0)
     # she is at 49° 40' when she turns east, so her hundred miles east are more degrees
     assert p.lon_deg > flat_lon
@@ -95,7 +97,9 @@ def test_the_horizon_is_the_specs_formula():
 def test_positions_and_distances_in_the_periods_words():
     assert str(Position(49.8667, -6.1667)) == "49° 52' N, 6° 10' W"
     assert geo.format_position(Position(-33.9, 151.2)) == "33° 54' S, 151° 12' E"
-    assert geo.parse_position("49 52 N 6 10 W") == Position(pytest.approx(49.8667, abs=1e-3), pytest.approx(-6.1667, abs=1e-3))
+    assert geo.parse_position("49 52 N 6 10 W") == Position(
+        pytest.approx(49.8667, abs=1e-3), pytest.approx(-6.1667, abs=1e-3)
+    )
     assert geo.parse_position("49°52'N, 6°10'W").lon_deg < 0
     assert geo.parse_position("48.5 N 5.1 W") == Position(48.5, -5.1)
     with pytest.raises(ValueError):
@@ -147,7 +151,9 @@ def test_a_scenario_without_a_position_is_the_plane_it_was():
 def test_the_ship_keeps_her_position_from_her_run_and_the_sun_reads_her_latitude():
     """With a position the World advances her latitude and longitude each tick from
     her run in metres, and the sun's latitude is hers, not the scenario's."""
-    w = point_world(position={"lat_deg": 49.0, "lon_deg": -6.0}, ship_heading_deg=0.0, ship_speed_kn=10.0)
+    w = point_world(
+        position={"lat_deg": 49.0, "lon_deg": -6.0}, ship_heading_deg=0.0, ship_speed_kn=10.0
+    )
     assert w.origin == Position(49.0, -6.0) and w.position == w.origin
     assert w.sun.latitude_deg == 49.0
     w.run(3600)  # an hour north at ten knots: ten miles, ten minutes of latitude
@@ -162,7 +168,9 @@ def test_the_ship_keeps_her_position_from_her_run_and_the_sun_reads_her_latitude
 
 
 def test_the_position_and_the_region_are_saved_and_a_replay_follows_them():
-    w = point_world(position={"lat_deg": 49.0, "lon_deg": -6.0}, ship_heading_deg=90.0, ship_speed_kn=6.0)
+    w = point_world(
+        position={"lat_deg": 49.0, "lon_deg": -6.0}, ship_heading_deg=90.0, ship_speed_kn=6.0
+    )
     w.run(1800)
     data = w.save()
     assert data["scenario"]["position"] == {"lat_deg": 49.0, "lon_deg": -6.0}
@@ -193,7 +201,10 @@ def test_the_scenario_file_reads_the_position_and_the_region(tmp_path):
         encoding="utf-8",
     )
     sf = load_scenario(p)
-    assert sf.scenario.position == {"lat_deg": pytest.approx(49.8667, abs=1e-3), "lon_deg": pytest.approx(-5.2, abs=1e-3)}
+    assert sf.scenario.position == {
+        "lat_deg": pytest.approx(49.8667, abs=1e-3),
+        "lon_deg": pytest.approx(-5.2, abs=1e-3),
+    }
     assert sf.scenario.region == "channel-west"
     assert sf.scenario.latitude_deg == pytest.approx(49.8667, abs=1e-3)  # the sun's, from it
     assert "She starts at 49° 52' N, 5° 12' W, on the chart of channel-west." in sf.lines()

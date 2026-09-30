@@ -321,6 +321,11 @@ class World:
             f"{units.describe_wind_strength(self.wind.effective_speed)}. "
             f"Heading {units.format_heading(self.ship.heading)}.",
         )
+        if self.lookout is not None:
+            # the lookout's first look, at the start (spec M5 §12): what is in sight is a
+            # reading from tick 0, and a landfall at the start is a line like any other
+            for severity, kind, text, data in self.lookout.look(self):
+                self.record(severity, kind, text, data=data)
 
     # -- logging -------------------------------------------------------------
 
@@ -418,10 +423,10 @@ class World:
         if self.chart is None or self.origin is None:
             return None
         pos = self.origin.advanced(x_km * 1000.0, y_km * 1000.0)
-        coast = self.chart.coast_at(pos)
-        if coast is None:
+        found = self.chart.coast_distance(pos)  # the field alone: microseconds, no name
+        if found is None:
             return None
-        return coast.distance_m / 1000.0, coast.bearing_deg
+        return found[0] / 1000.0, found[1]
 
     def _tick_chart(self) -> None:
         """Every tick the grounding check (spec M5 §11: short-circuited by the tile's

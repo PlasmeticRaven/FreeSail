@@ -1,0 +1,2205 @@
+# The features of the western Channel and the Western Approaches (spec M5 §10; the study
+# docs/design/ChartData.md §4, §5.2; package 32): hazards, marks, lights with their dates,
+# places, anchorages, transits and bottom notes, in the period's words, each with its
+# source in the references' form (docs/references/README.md), read from the pilots named
+# in docs/references/Charts.md:
+#
+#   Faden 1793      Le Petit Neptune Français; or, French Coasting Pilot (Internet Archive
+#                   lepetitneptunefr00fade), the pages of the directions for Ushant, the Four,
+#                   St Matthew, Brest, Camaret and the Iroise (pp. 53 to 62).
+#   White 1835      Martin White, Sailing Directions for the English Channel (Internet Archive
+#                   sailingdirectio00whitgoog), 'Coast of England' pp. 13 to 35.
+#   Imray 1874      James F. Imray, Sailing Directions for the English Channel, part I
+#                   (Internet Archive sailingdirection00unse_0, catalogued there as 1848; its
+#                   title page reads 1874, its variation note 1873), 'Start Point to
+#                   Plymouth' pp. 75 to 85, 'Plymouth to Land's End and the Seven Stones'
+#                   pp. 85 to 103, 'Scilly Islands' pp. 104 to 108.
+#   Trinity House   the lighthouse pages of trinityhouse.co.uk, read 2026-09-30, for the
+#                   English lights' dates; the encyclopaedia pages named for the French.
+#
+# Positions are in the modern frame (WGS 84, the EMODnet DTM 2024 grid the tiles are cut
+# from). They were first placed from the builder's knowledge of the modern chart and the
+# pilots' bearings, then checked against the chart's coast and EMODnet's shoalest sounding
+# in each cell, and where the first placing missed the land or the shoal they were moved
+# by a stated rule (package 32's report): a headland, island, town, castle, church, mill,
+# beacon or tower to the nearest land within 800 m; a light to the nearest land or shoal
+# head within 400 m; a rock, ledge or drying rock to the nearest shoal head within 400 m;
+# an anchorage to the nearest water holding half the pilot's depth within 800 m. Where a
+# position rests on a pilot's bearing and distance alone (a sunken rock the modern grid
+# does not resolve) the entry says so in `fix`, and the check left it where the pilot puts
+# it: the Penwin and Vaze, the Dragstone, the Seven Stones, the Nun Deeps, the Mingan, the
+# Bellen and the hay-ricks are such. The precision is that of the grid, a cable or so, and
+# a mark's position is the mark's, not its summit's. Heights are above the sea
+# for the horizon (spec §11), the modern chart's or the pilot's. A light carries `lit`:
+# `from` the year it was first lit and `until` the year it was put out, so that 1805 sees
+# St Agnes and not the Bishop (truth 65); `range_nm` is the period lamp's, a judgement
+# from the pilot's words where one is given ("five leagues", White) and from the
+# elevation where none is. `says` is a line the log can say; `view` names a coastal view.
+#
+# The lead reviews this list against the sources before the merge: the citation is on
+# every line for that.
+
+region: channel-west
+features:
+
+  # ---------------------------------------------------------------------------
+  # The Lizard and the coast to Falmouth
+  # ---------------------------------------------------------------------------
+
+  - id: lizard-point
+    kind: headland
+    name: the Lizard
+    modern: Lizard Point
+    lat_deg: 49.9594
+    lon_deg: -5.2067
+    height_m: 60
+    source: "White 1835, 'Coast of England', p. 24"
+    says: "The Lizard, a bold and precipitous promontory; you may approach it with great confidence, night or day, if the weather be at all clear."
+    view: "Serres 1801, plate 13, 'Lizard, N.W.'; 'Lizard, N.E.'; 'Lizard, N.N.W.'"
+
+  - id: lizard-lights
+    kind: light
+    name: the Lizard lights
+    modern: Lizard Lighthouse
+    lat_deg: 49.9587
+    lon_deg: -5.2028
+    height_m: 70
+    lit: {from: 1752, until: null, range_nm: 20, character: "two fixed lights, in one W by N"}
+    source: "Trinity House, 'Lizard Lighthouse' (completed 1752, first lit 22 August); White 1835, 'Coast of England', p. 24: the two lights stand high, their line of bearing W by N"
+    says: "The two lights of the Lizard, standing high; a leading mark for avoiding the Wolf and the Manacles, though at night their brilliancy makes them hard to tell apart."
+
+  - id: the-stags
+    kind: ledge
+    name: the Stags
+    modern: Stag Rocks
+    lat_deg: 49.95338
+    lon_deg: -5.21120
+    height_m: 2
+    extent_m: 700
+    source: "White 1835, 'Coast of England', p. 24"
+    says: "The Stag rocks, advancing south and south-west from the Lizard three-quarters of a mile, with from five to nine fathoms close to and among them."
+
+  - id: the-beast
+    kind: headland
+    name: the Beast
+    modern: Bass Point
+    lat_deg: 49.96244
+    lon_deg: -5.18686
+    height_m: 60
+    source: "White 1835, 'Coast of England', p. 24 (note): the eastern part of the land at the Lizard, higher than the lights"
+    says: "The Beast, the eastern part of the Lizard land, higher than the lighthouses, which it hides from a ship nearer Black Head than a mile and a half."
+
+  - id: rose-rock
+    kind: rock
+    name: the Rose
+    modern: Rose Rock (off Bass Point)
+    lat_deg: 49.95844
+    lon_deg: -5.19686
+    height_m: 0
+    fix: "White's bearing and distance: half a mile from the Lizard Point, S 89 E; three small heads with 13 feet at low water"
+    source: "White 1835, 'Coast of England', p. 24"
+    says: "The Rose rock, half a mile east of the Lizard point, three small heads with thirteen feet on them at low water and overfalls about it."
+
+  - id: spanam-rock
+    kind: rock
+    name: the Spanam
+    modern: Spernan Shoal
+    lat_deg: 49.96000
+    lon_deg: -5.16500
+    height_m: 0
+    fix: "White: above a mile from the shore, N 83 E of the Lizard Point; 4 1/2 fathoms on it"
+    source: "White 1835, 'Coast of England', p. 25"
+    says: "The Spanam, three heads with four fathoms and a half over them, above a mile east of the Lizard; the sea breaks about it with great impetuosity."
+
+  - id: craggan-rock
+    kind: rock
+    name: the Craggan
+    modern: Craggan Rocks (off Cadgwith)
+    lat_deg: 49.97746
+    lon_deg: -5.17345
+    height_m: 0
+    fix: "White: S 15 E of Cadgwith Cove, two-thirds of a mile; three heads with 9 1/2 feet at low water"
+    source: "White 1835, 'Coast of England', p. 24"
+    says: "The Craggan rock, three heads in a triangle with nine feet and a half on them, two-thirds of a mile off Cadgwith; a stranger should not come within a mile of the shore."
+
+  - id: cadgwith
+    kind: place
+    name: Cadgwith Cove
+    modern: Cadgwith
+    lat_deg: 49.9890
+    lon_deg: -5.1770
+    height_m: 30
+    source: "White 1835, 'Coast of England', p. 24"
+    says: "Cadgwith cove, a fishing cove under the cliffs north-east of the Lizard."
+
+  - id: black-head
+    kind: headland
+    name: Black Head
+    modern: Black Head
+    lat_deg: 50.0060
+    lon_deg: -5.1070
+    height_m: 60
+    source: "White 1835, 'Coast of England', p. 25"
+    says: "Black Head, the Manacles three miles E by S of it."
+
+  - id: coverack
+    kind: place
+    name: Coverack
+    modern: Coverack
+    lat_deg: 50.0240
+    lon_deg: -5.0960
+    height_m: 20
+    source: "Imray 1874, 'Plymouth to Land's End', p. 93"
+    says: "Coverack, a small cove with a pier, north of Black Head."
+
+  - id: lowland-point
+    kind: headland
+    name: Lowland Point
+    modern: Lowland Point
+    lat_deg: 50.0380
+    lon_deg: -5.0700
+    height_m: 10
+    source: "White 1835, 'Coast of England', p. 25"
+    says: "Lowland Point, low land under the Manacles; large ships should not haul to the northward after the Lizard until it opens east of Black Head."
+
+  - id: the-manacles
+    kind: ledge
+    name: the Manacles
+    modern: Manacle Rocks
+    lat_deg: 50.04666
+    lon_deg: -5.04419
+    height_m: 3
+    extent_m: 900
+    source: "White 1835, 'Coast of England', p. 25: three miles E by S from Black Head, three-quarters of a mile SE by S from Manacle Point; one head always above water, the rest cover and uncover"
+    says: "The Manacles, a group of dangerous rocks connected by ledges, projecting a mile from the nearest headland; one head always above water, the rest covering and uncovering."
+    view: "Serres 1801, plate 13, 'the Manacles'"
+
+  - id: penwin-and-vaze
+    kind: rock
+    name: the Penwin and the Vaze
+    modern: Penwin and Vase rocks (the Manacles' outliers)
+    lat_deg: 50.0530
+    lon_deg: -5.0330
+    height_m: 0
+    fix: "White: six-tenths of a mile ENE of the highest Manacle, a cable apart; the Penwin awash at low water, five feet on the Vaze"
+    source: "White 1835, 'Coast of England', pp. 25 to 26"
+    says: "The Penwin and the Vaze, outliers of the Manacles, the one awash and the other with five feet at low water: Mawnan church open of the Nare Head will not clear them."
+
+  - id: manacles-clearing-mark
+    kind: transit
+    name: Mawnan church open of the Nare Head
+    modern: Mawnan church and Nare Head (Roseland)
+    lat_deg: 50.0530
+    lon_deg: -5.0330
+    marks: [mawnan-church, nare-head]
+    bearing_deg: 45
+    source: "White 1835, 'Coast of England', p. 26: the square tower of Mawnan church well open north-east of the lowest point of the Nare Head gives a third of a mile off the Penwin and Vaze"
+    says: "Rounding the Manacles, do not shut in the Beast until the square tower of Mawnan church is well open to the north-east of the lowest point of the Nare Head."
+
+  - id: manacle-point
+    kind: headland
+    name: Manacle Point
+    modern: Manacle Point
+    lat_deg: 50.05375
+    lon_deg: -5.05812
+    height_m: 40
+    source: "White 1835, 'Coast of England', p. 25"
+    says: "Manacle Point, the rocks three-quarters of a mile SE by S of it."
+
+  - id: st-keverne-church
+    kind: church
+    name: St Keverne church
+    modern: St Keverne church tower
+    lat_deg: 50.0440
+    lon_deg: -5.0930
+    height_m: 110
+    source: "White 1835, 'Coast of England', p. 26; Imray 1874, p. 90 (the mark for St Just Pool)"
+    says: "St Keverne church, on the high ground behind the Manacles; a mark for Cross Road and St Just Pool."
+
+  - id: helford-river
+    kind: place
+    name: Helford river
+    modern: Helford River
+    lat_deg: 50.09462
+    lon_deg: -5.10180
+    height_m: 10
+    source: "Imray 1874, 'Plymouth to Land's End', p. 92"
+    says: "The Helford river, a deep inlet between Rosemullion Head and the Nare, with the Gedges at its mouth."
+
+  - id: the-gedges
+    kind: rock
+    name: the Gedges
+    modern: August Rock (the Gedges)
+    lat_deg: 50.0985
+    lon_deg: -5.1050
+    height_m: 0
+    extent_m: 150
+    source: "Imray 1874, 'Plymouth to Land's End', p. 92"
+    says: "The Gedges rocks at the mouth of the Helford, on the northern side of the entrance."
+
+  - id: rosemullion-head
+    kind: headland
+    name: Rosemullion Head
+    modern: Rosemullion Head
+    lat_deg: 50.10712
+    lon_deg: -5.08574
+    height_m: 40
+    source: "Imray 1874, 'Plymouth to Land's End', p. 92"
+    says: "Rosemullion Head, the north point of the Helford's mouth."
+
+  - id: mawnan-church
+    kind: church
+    name: Mawnan church
+    modern: Mawnan church (St Mawnan and St Stephen)
+    lat_deg: 50.1063
+    lon_deg: -5.1010
+    height_m: 60
+    source: "White 1835, 'Coast of England', p. 25"
+    says: "The square tower of Mawnan church, above the Helford's north shore: the mark for the Penwin and the Vaze."
+
+  - id: nare-head-helford
+    kind: headland
+    name: the Nare Head
+    modern: Nare Point (the Helford's south side)
+    lat_deg: 50.08668
+    lon_deg: -5.08646
+    height_m: 30
+    source: "White 1835, 'Coast of England', pp. 25 to 26"
+    says: "The Nare Head, the south point of the Helford's mouth."
+
+  # ---------------------------------------------------------------------------
+  # Falmouth: the harbour, the Roads and the marks
+  # ---------------------------------------------------------------------------
+
+  - id: pendennis-castle
+    kind: castle
+    name: Pendennis castle
+    modern: Pendennis Castle
+    lat_deg: 50.14631
+    lon_deg: -5.04966
+    height_m: 71
+    source: "Imray 1874, 'Plymouth to Land's End', p. 88: Pendennis castle on the western side of the entrance, 233 feet above high water"
+    says: "Pendennis castle, on its height on the western side of the entrance, two hundred and thirty feet above the water."
+    view: "Serres 1801, plate 13, 'Pendennis Castle'"
+
+  - id: pendennis-point
+    kind: headland
+    name: Pendennis Point
+    modern: Pendennis Point
+    lat_deg: 50.14597
+    lon_deg: -5.05045
+    height_m: 30
+    source: "Imray 1874, 'Plymouth to Land's End', p. 88"
+    says: "Pendennis Point, the Black Rock E by S a third of a mile from it."
+
+  - id: st-anthony-head
+    kind: headland
+    name: St Anthony's Head
+    modern: St Anthony Head (Zone Point)
+    lat_deg: 50.14222
+    lon_deg: -5.01375
+    height_m: 22
+    source: "White 1835, 'Coast of England', p. 26; Imray 1874, p. 88"
+    says: "St Anthony's Point, the eastern side of the entrance; give it a good berth, and in hazy weather two cables."
+    view: "Serres 1801, plate 13, 'St Mawes'"
+
+  - id: st-anthony-light
+    kind: light
+    name: St Anthony's light
+    modern: St Anthony's Lighthouse
+    lat_deg: 50.14194
+    lon_deg: -5.01363
+    height_m: 22
+    lit: {from: 1835, until: null, range_nm: 13, character: "revolving, a bright face every twenty seconds"}
+    source: "White 1835, 'Coast of England', p. 26 (note): 'a light-house is now erecting on this point'; Imray 1874, p. 89: the white stone lighthouse, 72 feet above high water, visible about 13 miles; Trinity House, 'St Anthony's Lighthouse' (1835)"
+    says: "The lighthouse on St Anthony's point, white stone, established in 1835; in 1805 there was none."
+
+  - id: black-rock-falmouth
+    kind: drying
+    name: the Black Rock
+    modern: Black Rock (Falmouth)
+    lat_deg: 50.14205
+    lon_deg: -5.03364
+    height_m: 2
+    extent_m: 100
+    source: "White 1835, 'Coast of England', p. 26; Imray 1874, p. 89: nearly in the middle of the entrance, appears at half-tide; a perch with a ball on it (later)"
+    says: "The Black Rock, nearly in the middle of the entrance and almost opposite Pendennis castle, showing at half-tide; the eastern channel is the better."
+
+  - id: falmouth-eastern-channel
+    kind: transit
+    name: Killiganoon house on with Mylor Point
+    modern: the eastern channel's leading line, N by E
+    lat_deg: 50.1500
+    lon_deg: -5.0260
+    marks: [mylor-point, st-anthony-head]
+    bearing_deg: 11
+    source: "White 1835, 'Coast of England', p. 26: Killiganoon House on with Milor Point bearing N 1/4 E carries a ship in mid-channel through Carrick Road"
+    says: "The leading mark for the eastern channel: Killiganoon house on with Mylor Point, bearing north a quarter east, carries a ship in mid-channel through Carrick Road."
+
+  - id: falmouth-western-channel
+    kind: transit
+    name: Feock house on with Mylor Point
+    modern: the western channel's leading line, N by E half E
+    lat_deg: 50.1440
+    lon_deg: -5.0380
+    marks: [mylor-point, pendennis-point]
+    bearing_deg: 17
+    source: "White 1835, 'Coast of England', p. 26: frigates not drawing more than 18 feet may pass between the Black Rock and Pendennis Point; Feock House on with Milor Point, N by E half E, carries a ship over Falmouth Bank in 5 fathoms at half-tide"
+    says: "Frigates drawing not more than eighteen feet may pass between the Black Rock and Pendennis Point, Feock house on with Mylor Point; at half-tide there is water for ships of the line."
+
+  - id: st-mawes-castle
+    kind: castle
+    name: St Mawes castle
+    modern: St Mawes Castle
+    lat_deg: 50.1560
+    lon_deg: -5.0240
+    height_m: 25
+    source: "Imray 1874, 'Plymouth to Land's End', p. 89"
+    says: "St Mawes castle, on the eastern shore above the entrance, the Lugo rock a sixth of a mile SSW of it."
+
+  - id: lugo-rock
+    kind: rock
+    name: the Lugo rock
+    modern: Lugo Rock
+    lat_deg: 50.1540
+    lon_deg: -5.0250
+    height_m: 0
+    extent_m: 80
+    source: "Imray 1874, 'Plymouth to Land's End', p. 89"
+    says: "The Lugo rock, a dangerous patch a sixth of a mile SSW from St Mawes castle."
+
+  - id: st-mawes-bank
+    kind: bank
+    name: St Mawes bank
+    modern: St Mawes Bank
+    lat_deg: 50.1560
+    lon_deg: -5.0300
+    height_m: 0
+    extent_m: 500
+    depth_fathoms: 2
+    source: "Imray 1874, 'Plymouth to Land's End', p. 89: a hard bank with 8 to 15 feet on it, its edge steep; White 1835, p. 26: not within 9 or 8 fathoms"
+    says: "St Mawes bank, a hard flat stretching from the eastern shore above the castle almost halfway across, eight to fifteen feet on it and thirteen or fourteen fathoms at its steep edge."
+
+  - id: falmouth-bank
+    kind: bank
+    name: Falmouth bank
+    modern: Falmouth Bank
+    lat_deg: 50.1500
+    lon_deg: -5.0430
+    height_m: 0
+    extent_m: 600
+    depth_fathoms: 3
+    source: "Imray 1874, 'Plymouth to Land's End', p. 89: 2 1/2 to 3 fathoms, decreasing to a foot at Penarrow point; White 1835, p. 26: 20 feet on the foul spots within the Black Rock"
+    says: "Falmouth bank, stretching from Pendennis Point across the approach to the town, two fathoms and a half to three on it, and within the Black Rock some spots of foul ground with twenty feet at low water springs."
+
+  - id: governor-rock
+    kind: rock
+    name: the Governor
+    modern: Governor Rock
+    lat_deg: 50.1530
+    lon_deg: -5.0400
+    height_m: 0
+    source: "Imray 1874, 'Plymouth to Land's End', p. 90: a 2-fathom patch a cable within the edge of Falmouth bank"
+    says: "The Governor rock, a two-fathom patch a cable within the edge of Falmouth bank."
+
+  - id: carrick-road
+    kind: anchorage
+    name: Carrick Road
+    modern: Carrick Roads
+    lat_deg: 50.16307
+    lon_deg: -5.03453
+    height_m: 0
+    depth_fathoms: 12
+    bottom: "good holding ground"
+    source: "Imray 1874, 'Plymouth to Land's End', p. 90: between St Mawes and Falmouth banks, 7 to 17 fathoms, the channel 320 fathoms wide, the usual anchorage for ships of war; White 1835, p. 27: keep the hawse open, southerly winds throw in much sea"
+    says: "Carrick Road, between St Mawes and Falmouth banks, seven to seventeen fathoms, the usual anchorage for ships of war; moored here the hawse must be kept open, for southerly winds throw in much sea."
+
+  - id: cross-road
+    kind: anchorage
+    name: Cross Road
+    modern: Cross Roads
+    lat_deg: 50.1780
+    lon_deg: -5.0270
+    height_m: 0
+    depth_fathoms: 10
+    bottom: "mud"
+    source: "Imray 1874, 'Plymouth to Land's End', p. 90; White 1835, p. 26: the Summer-house open of Falmouth church leads through Cross Road till St Keverne church opens east of Pendennis Point"
+    says: "Cross Road, between the north edge of St Mawes bank and the bank off Penarrow; better shelter than Carrick Road, though far from the town."
+
+  - id: st-just-pool
+    kind: anchorage
+    name: St Just Pool
+    modern: St Just Pool
+    lat_deg: 50.18260
+    lon_deg: -5.02818
+    height_m: 0
+    depth_fathoms: 14
+    bottom: "mud"
+    source: "White 1835, 'Coast of England', p. 26: anchor in St Just Pool in 14 or 15 fathoms with St Keverne church open east of Pendennis Point; Imray 1874, p. 90: 12 or 15 fathoms, muddy bottom, several first-class ships of war at moorings"
+    says: "St Just Pool, fourteen or fifteen fathoms on mud, room for several ships of the line at moorings; St Keverne church over Pendennis Point is the mark."
+
+  - id: mylor-point
+    kind: headland
+    name: Mylor Point
+    modern: Penarrow Point (Mylor)
+    lat_deg: 50.18606
+    lon_deg: -5.02659
+    height_m: 15
+    source: "White 1835, 'Coast of England', p. 26 ('Milor Point'); Imray 1874, p. 89 ('Milor or Penarrow point')"
+    says: "Mylor or Penarrow Point, on the western shore of the Road, from which an extensive bank runs a long way up the river."
+
+  - id: trefusis-point
+    kind: headland
+    name: Trefusis Point
+    modern: Trefusis Point
+    lat_deg: 50.16669
+    lon_deg: -5.04629
+    height_m: 20
+    source: "White 1835, 'Coast of England', p. 26"
+    says: "Trefusis Point, the rising ground over which St Budock church comes when a ship has run through Carrick Road."
+
+  - id: falmouth-town
+    kind: town
+    name: Falmouth
+    modern: Falmouth
+    lat_deg: 50.15346
+    lon_deg: -5.06946
+    height_m: 25
+    source: "Imray 1874, 'Plymouth to Land's End', pp. 88 and 90: the anchorage off the town in 3 fathoms decreasing to one at Flushing; White 1835, p. 26"
+    says: "Falmouth, the town under Pendennis, its church a mark; the anchorage before it in three fathoms shoaling to one at Flushing, and the packets' quay."
+
+  - id: falmouth-church
+    kind: church
+    name: Falmouth church
+    modern: King Charles the Martyr, Falmouth
+    lat_deg: 50.1530
+    lon_deg: -5.0730
+    height_m: 30
+    source: "White 1835, 'Coast of England', p. 26; Imray 1874, p. 90"
+    says: "Falmouth church, a mark with the Summer-house for Cross Road."
+
+  - id: st-budock-church
+    kind: church
+    name: St Budock church
+    modern: Budock church
+    lat_deg: 50.1580
+    lon_deg: -5.0980
+    height_m: 90
+    source: "White 1835, 'Coast of England', p. 26; Imray 1874, p. 90 ('Budoc church in line with the centre of Swan pool')"
+    says: "St Budock church, on the hill behind Falmouth: the mark for the outer road with Swanpool."
+
+  - id: falmouth-outer-road
+    kind: anchorage
+    name: Falmouth outer road
+    modern: Falmouth Bay
+    lat_deg: 50.1330
+    lon_deg: -5.0350
+    height_m: 0
+    depth_fathoms: 10
+    bottom: "good ground"
+    source: "Imray 1874, 'Plymouth to Land's End', p. 90: Pendennis castle N by W and St Anthony point NE by E 3/4 E, three-quarters of a mile, 10 fathoms good ground; farther out 11 or 12"
+    says: "The outer road, from St Anthony's point toward the Manacles with the mouth of the harbour open: ten fathoms good ground with Pendennis castle N by W, whence a ship may go to sea or run into Carrick Road as the wind veers."
+
+  - id: the-old-wall
+    kind: rock
+    name: the Old Wall
+    modern: Old Wall
+    lat_deg: 50.12070
+    lon_deg: -5.01570
+    height_m: 0
+    source: "Imray 1874, 'Plymouth to Land's End', p. 89: a small rocky shoal, 27 feet on its shoalest part, a mile and a quarter due south of St Anthony point"
+    says: "The Old Wall, a sharp conical rock with twenty-seven feet over it, a mile and a quarter south of St Anthony's, and rocky four-fathom patches within it causing an overfall with south-east winds on the flood."
+
+  - id: falmouth-tides
+    kind: bottom
+    name: the tide at Falmouth
+    modern: Falmouth
+    lat_deg: 50.1600
+    lon_deg: -5.0300
+    height_m: 0
+    bottom: "mud"
+    source: "Imray 1874, 'Plymouth to Land's End', p. 90: high water full and change at 4h 57m, springs rise 16 feet, neaps 12; the ebb sets out SSW a mile, then SW"
+    says: "In Falmouth harbour it is high water at full and change at five o'clock nearly; springs rise sixteen feet and neaps twelve; the ebb sets out south-south-west a mile from the entrance and then south-west."
+
+  # ---------------------------------------------------------------------------
+  # Falmouth to Plymouth
+  # ---------------------------------------------------------------------------
+
+  - id: nare-head
+    kind: headland
+    name: the Nare Head
+    modern: Nare Head (Roseland)
+    lat_deg: 50.2105
+    lon_deg: -4.9200
+    height_m: 100
+    source: "Imray 1874, 'Plymouth to Land's End', p. 87 (Gull rock, Nare head)"
+    says: "The Nare Head, a bold headland east of Falmouth, the Gull rock off it."
+
+  - id: gull-rock-nare
+    kind: rock
+    name: the Gull rock
+    modern: Gull Rock (off Nare Head)
+    lat_deg: 50.20206
+    lon_deg: -4.90655
+    height_m: 38
+    source: "Imray 1874, 'Plymouth to Land's End', p. 87"
+    says: "The Gull rock, a high rock off the Nare Head."
+
+  - id: the-bizzies
+    kind: shoal
+    name: the Bizzies
+    modern: Bizzies
+    lat_deg: 50.1900
+    lon_deg: -4.9200
+    height_m: 0
+    source: "Imray 1874, 'Plymouth to Land's End', p. 88 (contents: 'Lath rock, Gull rock, Bizzies')"
+    says: "The Bizzies, foul ground off Gerrans Bay between the Nare and Falmouth."
+
+  - id: the-gray
+    kind: hill
+    name: the Gray
+    modern: Carn Brea (the 'Gray' of White)
+    lat_deg: 50.2200
+    lon_deg: -5.2400
+    height_m: 225
+    source: "White 1835, 'Coast of England', p. 27: five miles NE of Falmouth the lofty conical rock called the Gray renders this part of the coast remarkable"
+    fix: "White places the Gray five miles north-east of Falmouth; the modern feature of that description is a judgement"
+    says: "The lofty conical rock called the Gray, which serves to render this part of the coast remarkable from the offing."
+
+  - id: dodman-point
+    kind: headland
+    name: the Deadman
+    modern: Dodman Point
+    lat_deg: 50.2185
+    lon_deg: -4.8020
+    height_m: 115
+    source: "White 1835, 'Coast of England', p. 28: nearly midway between the Lizard and Rame Head, a precipitous bluff 380 feet above the sea, its steep face to the east; Imray 1874, p. 87"
+    says: "The Deadman, a precipitous bluff three hundred and eighty feet above the sea, standing boldly out midway between the Lizard and Rame Head, its steep face toward the east."
+    view: "Serres 1801, plate 13, 'the Dodman'"
+
+  - id: gwineas-rock
+    kind: rock
+    name: the Gwineas
+    modern: Gwineas Rock
+    lat_deg: 50.24472
+    lon_deg: -4.76400
+    height_m: 8
+    source: "Imray 1874, 'Plymouth to Land's End', p. 87"
+    says: "The Gwineas rock, off Gorran Haven north of the Deadman."
+
+  - id: mevagissey
+    kind: place
+    name: Mevagissey
+    modern: Mevagissey
+    lat_deg: 50.2710
+    lon_deg: -4.7830
+    height_m: 15
+    source: "Imray 1874, 'Plymouth to Land's End', p. 87"
+    says: "Mevagissey, a fishing town in its bay north of the Deadman."
+
+  - id: gribbin-head
+    kind: headland
+    name: Gribbin Head
+    modern: Gribbin Head
+    lat_deg: 50.3160
+    lon_deg: -4.6690
+    height_m: 78
+    source: "White 1835, 'Coast of England', p. 28: distinguished by a beacon tower 85 feet high on an elevation of 257 feet (the daymark of 1832)"
+    says: "Gribbin Head, west of Fowey, after the deep bight of Polkerris; its beacon tower was raised in 1832 and in 1805 the head was bare."
+
+  - id: fowey
+    kind: place
+    name: Fowey
+    modern: Fowey
+    lat_deg: 50.3350
+    lon_deg: -4.6350
+    height_m: 20
+    source: "Imray 1874, 'Plymouth to Land's End', p. 86; Mackenzie junior's plan of Fowey Harbour 1774 (RMG G223:2/42 inset): soundings at low water spring tides, the tide rising 15 feet at springs, 7 or 8 at neaps"
+    says: "Fowey, a narrow harbour between two castles, with a bar and fifteen feet of tide at springs."
+
+  - id: udder-rock
+    kind: rock
+    name: the Udder rock
+    modern: Udder Rock
+    lat_deg: 50.31500
+    lon_deg: -4.56500
+    height_m: 0
+    source: "Imray 1874, 'Plymouth to Land's End', p. 86 (contents: 'Polperro, Udder rock')"
+    says: "The Udder rock, a sunken rock off Polperro."
+
+  - id: looe-island
+    kind: island
+    name: Looe Island
+    modern: Looe Island (St George's Island)
+    lat_deg: 50.3400
+    lon_deg: -4.4510
+    height_m: 45
+    source: "White 1835, 'Coast of England', p. 27: Looe Island bearing N 7 E marks the western extremity of the oozy ground off the Eddystone; Imray 1874, p. 85"
+    says: "Looe Island, off the town of Looe; a mark for the oozy ground to seaward."
+
+  - id: rame-head
+    kind: headland
+    name: Rame Head
+    modern: Rame Head
+    lat_deg: 50.3155
+    lon_deg: -4.2245
+    height_m: 100
+    source: "White 1835, 'Coast of England', pp. 27 to 32; Imray 1874, p. 78"
+    says: "Rame Head, the western point of Plymouth Sound's approach, with the steeple of Rame church behind it a mark for the Hand Deeps."
+    view: "Serres 1801, plate 13, 'Rame Head'"
+
+  - id: rame-church
+    kind: church
+    name: Rame church
+    modern: St Germanus, Rame
+    lat_deg: 50.3220
+    lon_deg: -4.2230
+    height_m: 110
+    source: "White 1835, 'Coast of England', p. 28: the steeple of Rame church open west of the apex of Rame Head clears the Hand Deeps to the north-west"
+    says: "Rame church steeple, appearing to the westward of the apex of Rame Head, the mark to avoid the Hand Deeps."
+
+  - id: penlee-point
+    kind: headland
+    name: Penlee Point
+    modern: Penlee Point
+    lat_deg: 50.31904
+    lon_deg: -4.19086
+    height_m: 40
+    source: "White 1835, 'Coast of England', pp. 32 to 35: do not approach Penlee Point at night nearer than 9 fathoms, the Dragstone two cables off it"
+    says: "Penlee Point, the eastern horn of Rame; give it a third of a mile, for the Dragstone lies off it with eleven feet at low water."
+
+  - id: dragstone
+    kind: rock
+    name: the Dragstone
+    modern: Draystone
+    lat_deg: 50.3210
+    lon_deg: -4.1790
+    height_m: 0
+    fix: "White: two cables off Penlee Point in the 9-fathom line; the grid does not resolve the rock, and the check left the position"
+    source: "White 1835, 'Coast of England', p. 33: not more than 11 feet on the Dragstone at low water; Imray 1874, p. 80 ('Draystone')"
+    says: "The Dragstone, off Penlee Point, with eleven feet at low water: keep Tor House four times its breadth open of Redding Point."
+
+  - id: cawsand-bay
+    kind: anchorage
+    name: Cawsand Bay
+    modern: Cawsand Bay
+    lat_deg: 50.3330
+    lon_deg: -4.1980
+    height_m: 0
+    depth_fathoms: 5
+    bottom: "sand, foul and rocky in the north part"
+    source: "White 1835, 'Coast of England', p. 33: very good anchorage in the centre with off-shore winds in 4 to 6 fathoms; the ground in the northern part foul and rocky; the Bolt Head not open east of the Mewstone nor the west end of Drake's Island shut in with Redding Point"
+    says: "Cawsand Bay, where the fleets lay before the breakwater was thought of: good anchorage in the centre in four to six fathoms with off-shore winds, the ground foul and rocky to the north; you may range it by the lead alone."
+
+  - id: cawsand-town
+    kind: town
+    name: Cawsand
+    modern: Cawsand and Kingsand
+    lat_deg: 50.3320
+    lon_deg: -4.2020
+    height_m: 15
+    source: "White 1835, 'Coast of England', p. 33 ('Cawsand Town in one with the western end of the Breakwater')"
+    says: "Cawsand town, on the western shore of the bay under Maker."
+
+  - id: maker-tower
+    kind: church
+    name: Maker tower
+    modern: Maker church tower
+    lat_deg: 50.3440
+    lon_deg: -4.1870
+    height_m: 130
+    source: "White 1835, 'Coast of England', pp. 34 to 35; Imray 1874, p. 78 (the Mewstone in one with Maker tower)"
+    says: "Maker tower, the church on the high ground of Mount Edgcumbe, a leading mark for the Sound."
+
+  - id: the-knap
+    kind: rock
+    name: the Knap
+    modern: Knap
+    lat_deg: 50.33816
+    lon_deg: -4.17600
+    height_m: 0
+    source: "White 1835, 'Coast of England', p. 33: standing east in Cawsand Bay do not shut in Tor House with the barrack chimneys on Drake's Island; Imray 1874, p. 80 (Knap and Panther shoals)"
+    says: "The Knap, a shoal patch on the eastern side of Cawsand Bay toward the Sound."
+
+  - id: the-panther
+    kind: shoal
+    name: the Panther
+    modern: Panther Rock
+    lat_deg: 50.3330
+    lon_deg: -4.1590
+    height_m: 0
+    source: "White 1835, 'Coast of England', p. 34: a good channel between the Panther and the Breakwater in 6 to 7 fathoms; Imray 1874, p. 80"
+    says: "The Panther, a rocky patch in the western entrance of the Sound; between it and where the breakwater now lies there are six or seven fathoms."
+
+  - id: plymouth-sound-patches
+    kind: shoal
+    name: the rocky patches of the Sound
+    modern: Tinker, Shag Stone bank and the eastern patches
+    lat_deg: 50.3290
+    lon_deg: -4.1330
+    height_m: 0
+    extent_m: 400
+    source: "White 1835, 'Coast of England', pp. 33 to 34: three rocky patches of 24 and 18 feet at low water springs in the fair-way of the eastern channel; Imray 1874, p. 79 (Tinker shoal)"
+    says: "In the eastern channel three rocky patches of eighteen and twenty-four feet at low water springs lie in the fair-way, the Tinker among them."
+
+  - id: shagstone
+    kind: rock
+    name: the Shagstone
+    modern: Shag Stone
+    lat_deg: 50.3225
+    lon_deg: -4.1200
+    height_m: 8
+    source: "White 1835, 'Coast of England', p. 33; Imray 1874, p. 79"
+    says: "The Shagstone, off Renney Point on the eastern side of the Sound's entrance, a bank extending from it."
+
+  - id: plymouth-mewstone
+    kind: island
+    name: the Mewstone
+    modern: Great Mew Stone (Plymouth)
+    lat_deg: 50.31315
+    lon_deg: -4.10683
+    height_m: 59
+    source: "White 1835, 'Coast of England', pp. 34 to 35: the Bolt Head in sight south of the Mewstone keeps you without all the shoals; Imray 1874, p. 78"
+    says: "The Mewstone, a high islet on the eastern side of the approach to Plymouth: while the Bolt Head is in sight to the southward of it you are without all the shoals."
+
+  - id: plymouth-western-channel
+    kind: transit
+    name: Tor House midway between Redding Point and Drake's Island
+    modern: the Western Channel's leading marks
+    lat_deg: 50.3300
+    lon_deg: -4.1650
+    marks: [drakes-island, penlee-point]
+    bearing_deg: 30
+    source: "White 1835, 'Coast of England', p. 32: Tor House so far open of Redding Point as to appear midway between it and the barrack chimneys on Drake's Island carries a ship two cables east of the Dragstone and through Cawsand Bay"
+    says: "Coming from the west, round Rame Head and Penlee a third of a mile off until Tor House appears midway between Redding Point and the barrack chimneys on Drake's Island; that leads through Cawsand Bay clear of the Dragstone and the Knap."
+
+  - id: drakes-island
+    kind: island
+    name: Drake's Island
+    modern: Drake's Island
+    lat_deg: 50.36211
+    lon_deg: -4.16060
+    height_m: 20
+    source: "White 1835, 'Coast of England', p. 32 (the barrack chimneys on its west end a mark); Imray 1874, p. 82"
+    says: "Drake's Island, with its battery, in the middle of the Sound's head; its west end shut in with Redding Point is the limit of Cawsand Bay's anchorage."
+
+  - id: plymouth-sound-anchorage
+    kind: anchorage
+    name: the anchorage in the Sound
+    modern: Plymouth Sound
+    lat_deg: 50.3420
+    lon_deg: -4.1480
+    height_m: 0
+    depth_fathoms: 5
+    bottom: "sand and mud"
+    source: "White 1835, 'Coast of England', pp. 32 to 33: within the triangle of Penlee Point on the west end of the Breakwater, Cawsand town on the same, and the Round Tower on the west side of Mount Batten: 36 feet in the south, 30 in the centre, 26 in the north-east at low water great springs"
+    says: "The best anchorage in the Sound, thirty-six feet in its southern part and twenty-six in the north-east at low water springs; open to the southerly swell until the breakwater was built."
+
+  - id: mount-batten
+    kind: tower
+    name: Mount Batten tower
+    modern: Mount Batten Tower
+    lat_deg: 50.35900
+    lon_deg: -4.12505
+    height_m: 25
+    source: "White 1835, 'Coast of England', p. 32 (the Tower on Mount Batten a mark for the western channel)"
+    says: "The tower on Mount Batten, at the mouth of the Catwater."
+
+  - id: plymouth-citadel
+    kind: castle
+    name: the Citadel
+    modern: Royal Citadel, Plymouth Hoe
+    lat_deg: 50.3640
+    lon_deg: -4.1370
+    height_m: 40
+    source: "White 1835, 'Coast of England', pp. 32 to 33 (the garrison wall and the Citadel as marks)"
+    says: "The Citadel on the Hoe, over the Sound's head, with the town of Plymouth behind it."
+
+  - id: plymouth-town
+    kind: town
+    name: Plymouth
+    modern: Plymouth
+    lat_deg: 50.3700
+    lon_deg: -4.1420
+    height_m: 30
+    source: "Imray 1874, 'Start Point to Plymouth', p. 78: Plymouth is generally considered, and not without reason, the most capacious harbour of the coast; White 1835, pp. 31 to 35"
+    says: "Plymouth, with its Sound, the Catwater and the Hamoaze where the King's ships lie, the dockyard at Dock on the Hamoaze."
+
+  - id: the-hamoaze
+    kind: anchorage
+    name: the Hamoaze
+    modern: Hamoaze
+    lat_deg: 50.37600
+    lon_deg: -4.19161
+    height_m: 0
+    depth_fathoms: 8
+    bottom: "mud"
+    source: "Imray 1874, 'Start Point to Plymouth', p. 83 (Hamoaze); White 1835, p. 35 (the dockyard water)"
+    says: "The Hamoaze, the river's reach above Devil's Point where the dockyard is and the ships of war moor."
+
+  - id: eddystone
+    kind: light
+    name: the Eddystone
+    modern: Eddystone Lighthouse (Smeaton's tower, 1759 to 1882)
+    lat_deg: 50.18290
+    lon_deg: -4.26247
+    height_m: 22
+    lit: {from: 1759, until: null, range_nm: 13, character: "a fixed light, twenty-four candles in 1805"}
+    source: "Trinity House, 'Eddystone Lighthouse': Winstanley's tower lit 1698, Rudyerd's 1709, Smeaton's 1759 to 1877, Douglass's 1882; White 1835, p. 27: 34 to 37 fathoms in the stream of the Eddystone; Imray 1874, p. 77"
+    says: "The Eddystone, Smeaton's tower on its rock in the open sea nine miles SSW of Rame Head, its light a fixed one; in thick weather come no nearer than forty-two fathoms and you pass five miles south of it."
+
+  - id: hand-deeps
+    kind: shoal
+    name: the Hand Deeps
+    modern: Hand Deeps
+    lat_deg: 50.2280
+    lon_deg: -4.3400
+    height_m: 0
+    fix: "White: three miles and a third NW by N from the Eddystone, 22 feet on them"
+    source: "White 1835, 'Coast of England', p. 28; Imray 1874, p. 77"
+    says: "The Hand Deeps, three miles and a third north-west of the Eddystone with only twenty-two feet on them, on the edge of the oozy ground; in bad weather known by the short turbulent breaking sea about them."
+
+  - id: east-rutts
+    kind: shoal
+    name: the East Rutts
+    modern: East Rutts
+    lat_deg: 50.1500
+    lon_deg: -3.9850
+    height_m: 0
+    fix: "White: from the Eddystone E by S eleven miles and a quarter; from the Mewstone S by E half E seven miles; 22 feet on parts of it"
+    source: "White 1835, 'Coast of England', p. 35"
+    says: "The East Rutts, a patch of sunken rocks with twenty-two feet on it in the fair-way from the eastward, sixteen to twenty fathoms all round; the peak of the Mewstone on Maker tower carries you a mile east of it."
+
+  - id: eddystone-oozy-ground
+    kind: bottom
+    name: the oozy ground off the Eddystone
+    modern: the Eddystone's western approach
+    lat_deg: 50.2000
+    lon_deg: -4.4500
+    height_m: 0
+    bottom: "dark greenish oozy sand"
+    depth_fathoms: 37
+    source: "White 1835, 'Coast of England', p. 27: in the stream of the Eddystone 34 to 37 fathoms, coarse and fine sand in the former depth, a dark greenish oozy sand in the latter, extending ten miles west and four south of the rock"
+    says: "In thirty-seven fathoms west of the Eddystone the lead brings up a dark greenish oozy sand, which reaches ten miles to the westward of the rock and four to the southward."
+
+  - id: bolt-head
+    kind: headland
+    name: the Bolt Head
+    modern: Bolt Head
+    lat_deg: 50.2145
+    lon_deg: -3.7845
+    height_m: 130
+    source: "White 1835, 'Coast of England', pp. 34 to 35; Imray 1874, p. 76"
+    says: "The Bolt Head, a high dark headland west of Salcombe; in sight to the south of the Mewstone it keeps you without the shoals of Plymouth."
+
+  - id: bolt-tail
+    kind: headland
+    name: the Bolt Tail
+    modern: Bolt Tail
+    lat_deg: 50.23355
+    lon_deg: -3.86128
+    height_m: 100
+    source: "White 1835, 'Coast of England', p. 35 (the Gregory rock three-quarters of a mile WSW of the signal-house on the Bolt Tail); Imray 1874, p. 76"
+    says: "The Bolt Tail, with its signal-house; the Gregory rock three-quarters of a mile WSW of it with four feet at low water."
+
+  - id: start-point
+    kind: headland
+    name: the Start
+    modern: Start Point
+    lat_deg: 50.22250
+    lon_deg: -3.64615
+    height_m: 50
+    source: "White 1835, 'Coast of England', p. 27: from the Lizard to the Start N 75 E, twenty-one leagues; round the Start within five or six leagues or in 38 and 39 fathoms"
+    says: "The Start, twenty-one leagues E by S of the Lizard; round it within five or six leagues, in thirty-eight or thirty-nine fathoms, to avoid the indraught of the Channel Islands; its lighthouse dates from 1836."
+
+  # ---------------------------------------------------------------------------
+  # The Lizard to Land's End: Mount's Bay
+  # ---------------------------------------------------------------------------
+
+  - id: rill-point
+    kind: headland
+    name: Rill Point
+    modern: Rill Head
+    lat_deg: 49.97800
+    lon_deg: -5.24300
+    height_m: 60
+    source: "White 1835, 'Coast of England', p. 24 (Meantale Point in one with Rill Point)"
+    says: "Rill Point, west of the Lizard beyond Kynance."
+
+  - id: mullion-island
+    kind: island
+    name: Mullion Island
+    modern: Mullion Island
+    lat_deg: 50.01625
+    lon_deg: -5.25979
+    height_m: 30
+    source: "Imray 1874, 'Plymouth to Land's End', p. 95"
+    says: "Mullion Island, off the cove of that name on the west side of the Lizard land."
+
+  - id: porthleven
+    kind: place
+    name: Porthleven
+    modern: Porthleven
+    lat_deg: 50.0830
+    lon_deg: -5.3170
+    height_m: 15
+    source: "Imray 1874, 'Plymouth to Land's End', p. 95"
+    says: "Porthleven, a small harbour at the head of Mount's Bay's eastern shore, with the Loe bar beside it."
+
+  - id: godolphin-hill
+    kind: hill
+    name: Godolphin Hill
+    modern: Godolphin Hill
+    lat_deg: 50.1330
+    lon_deg: -5.3600
+    height_m: 162
+    source: "White 1835, 'Coast of England', p. 24: Godolphin Hill, four miles NW of Helston, kept open of Meantale Point leads west of the Stags"
+    says: "Godolphin Hill, four miles north-west of Helston, kept open of Meantale Point, leads to the westward of the Stags."
+
+  - id: st-michaels-mount
+    kind: castle
+    name: St Michael's Mount
+    modern: St Michael's Mount
+    lat_deg: 50.11758
+    lon_deg: -5.47468
+    height_m: 60
+    source: "Imray 1874, 'Plymouth to Land's End', p. 96 ('Mount St. Michael')"
+    says: "St Michael's Mount, the castled rock in the head of Mount's Bay, joined to Marazion at low water."
+
+  - id: penzance
+    kind: town
+    name: Penzance
+    modern: Penzance
+    lat_deg: 50.1180
+    lon_deg: -5.5330
+    height_m: 15
+    source: "Imray 1874, 'Plymouth to Land's End', p. 97 (Penzance, Gear rock, Gwavas lake)"
+    says: "Penzance, at the head of Mount's Bay, its pier dry at low water; Gwavas Lake the anchorage off it."
+
+  - id: gear-rock
+    kind: rock
+    name: the Gear rock
+    modern: Gear Rock
+    lat_deg: 50.10954
+    lon_deg: -5.52546
+    height_m: 1
+    source: "Imray 1874, 'Plymouth to Land's End', p. 97"
+    says: "The Gear rock, off Penzance pier, a danger to those making for the harbour."
+
+  - id: gwavas-lake
+    kind: anchorage
+    name: Gwavas Lake
+    modern: Gwavas Lake
+    lat_deg: 50.1060
+    lon_deg: -5.5330
+    height_m: 0
+    depth_fathoms: 4
+    bottom: "sand"
+    source: "Imray 1874, 'Plymouth to Land's End', p. 97"
+    says: "Gwavas Lake, the anchorage in the western corner of Mount's Bay under Newlyn, sheltered from the west."
+
+  - id: low-lee
+    kind: rock
+    name: the Low Lee
+    modern: Low Lee
+    lat_deg: 50.09750
+    lon_deg: -5.52750
+    height_m: 0
+    source: "Imray 1874, 'Plymouth to Land's End', p. 98 (Carn base rock, Low lee rock)"
+    says: "The Low Lee, a sunken rock off Penlee Point on the west side of Mount's Bay."
+
+  - id: mousehole
+    kind: place
+    name: Mousehole
+    modern: Mousehole
+    lat_deg: 50.0830
+    lon_deg: -5.5380
+    height_m: 15
+    source: "Imray 1874, 'Plymouth to Land's End', p. 98"
+    says: "Mousehole, a fishing village with its island, on the west shore of Mount's Bay."
+
+  - id: runnel-stone
+    kind: rock
+    name: the Runnelstone
+    modern: Runnel Stone
+    lat_deg: 50.02324
+    lon_deg: -5.67200
+    height_m: 0
+    source: "Imray 1874, 'Plymouth to Land's End', p. 99 (Runnelstone, &c.)"
+    says: "The Runnelstone, a sunken rock off Tol-Pedn-Penwith, the southern point of the Land's End; the sea breaks on it in any swell."
+
+  - id: tol-pedn-penwith
+    kind: headland
+    name: Tol-Pedn-Penwith
+    modern: Gwennap Head
+    lat_deg: 50.0350
+    lon_deg: -5.6760
+    height_m: 60
+    source: "Imray 1874, 'Plymouth to Land's End', p. 99"
+    says: "Tol-Pedn-Penwith, the holed headland, the southern turn of the Land's End."
+
+  - id: lands-end
+    kind: headland
+    name: the Land's End
+    modern: Land's End
+    lat_deg: 50.0657
+    lon_deg: -5.7150
+    height_m: 60
+    source: "Imray 1874, 'Plymouth to Land's End', p. 101 (Longships rocks and light, Land's end)"
+    says: "The Land's End, the western extremity of England, granite cliffs with the Longships a mile off it."
+    view: "Serres 1801, plate 13, 'Lands-end'"
+
+  - id: longships-light
+    kind: light
+    name: the Longships light
+    modern: Longships Lighthouse (Smith's tower of 1795)
+    lat_deg: 50.06703
+    lon_deg: -5.74757
+    height_m: 25
+    lit: {from: 1795, until: null, range_nm: 12, character: "a fixed light"}
+    source: "Trinity House, 'Longships Lighthouse': the lease to Lieutenant Henry Smith and the tower on Carn Bras, first lit 1795; Imray 1874, p. 101; White 1835, p. 17 (the Pollard fourteen miles and a half from the Longships lighthouse)"
+    says: "The Longships light, a tower on Carn Bras, the largest of the Longships rocks off the Land's End, lit since 1795."
+
+  - id: the-brisons
+    kind: rock
+    name: the Brisons
+    modern: The Brisons
+    lat_deg: 50.12150
+    lon_deg: -5.72950
+    height_m: 27
+    source: "Imray 1874, 'Plymouth to Land's End', p. 102"
+    says: "The Brisons, two high rocks off Cape Cornwall, a mile from the shore."
+
+  - id: cape-cornwall
+    kind: headland
+    name: Cape Cornwall
+    modern: Cape Cornwall
+    lat_deg: 50.12738
+    lon_deg: -5.70868
+    height_m: 70
+    source: "Imray 1874, 'Plymouth to Land's End', p. 102 (Brisons rocks, Cape Cornwall bank)"
+    says: "Cape Cornwall, the headland north of the Land's End, the Brisons off it."
+
+  - id: wolf-rock
+    kind: rock
+    name: the Wolf
+    modern: Wolf Rock
+    lat_deg: 49.94500
+    lon_deg: -5.80830
+    height_m: 2
+    extent_m: 100
+    source: "White 1835, 'Coast of England', pp. 13 and 24 (the Wolf among the principal dangers of the Channel); Trinity House, 'Wolf Rock Lighthouse': an unlighted daymark erected 1795 and soon carried away, an iron beacon 1836 to 1840, the lighthouse lit 1870"
+    says: "The Wolf, a rock between the Land's End and Scilly, covered at high water and howling in a sea; a daymark set on it in 1795 was soon carried away, and no light stood on it before 1870."
+
+  - id: wolf-rock-light
+    kind: light
+    name: the Wolf Rock light
+    modern: Wolf Rock Lighthouse
+    lat_deg: 49.94500
+    lon_deg: -5.80830
+    height_m: 34
+    lit: {from: 1870, until: null, range_nm: 16, character: "alternate red and white"}
+    source: "Trinity House, 'Wolf Rock Lighthouse' (lit 1870); Imray 1874, p. 100"
+    says: "The lighthouse on the Wolf, lit in 1870; dark in 1805."
+
+  - id: seven-stones
+    kind: ledge
+    name: the Seven Stones
+    modern: Seven Stones
+    lat_deg: 50.0397
+    lon_deg: -6.1131
+    height_m: 1
+    extent_m: 1500
+    fix: "White's position of the Pollard, the north-westernmost: 50° 2' 23\" N, 6° 6' 47\" W; the South Stone two-thirds of a mile SE by S of it"
+    source: "White 1835, 'Coast of England', p. 17: a cluster of very dangerous rocks nearly in the fair-way between Scilly and the Land's End; the Pollard appears at half ebb, the South Stone at five hours ebb; from the daymark on St Martin's ENE 1/4 E seven miles"
+    says: "The Seven Stones, a cluster of very dangerous rocks nearly in the fair-way between Scilly and the Land's End, seven miles ENE of the daymark on St Martin's; the Pollard shows at half ebb and the Town between four hours ebb and low water."
+
+  - id: seven-stones-lightvessel
+    kind: light
+    name: the Seven Stones light-vessel
+    modern: Seven Stones Lightship
+    lat_deg: 50.0530
+    lon_deg: -6.0750
+    height_m: 12
+    lit: {from: 1841, until: null, range_nm: 10, character: "a light-vessel"}
+    source: "Imray 1874, 'Plymouth to Land's End', p. 102 (Seven stones, lightvessel: the vessel was on station by 1874); the year 1841 is the study's 'from the 1840s' made exact from memory and stays unverified (C §7; the encyclopaedia's page returned no text from the build network, 2026-09-30)"
+    says: "The light-vessel of the Seven Stones, first moored in 1841; in 1805 the rocks were unlit and unmarked."
+
+  # ---------------------------------------------------------------------------
+  # The Scilly Islands
+  # ---------------------------------------------------------------------------
+
+  - id: st-agnes-light
+    kind: light
+    name: St Agnes light
+    modern: St Agnes Lighthouse (1680 to 1911)
+    lat_deg: 49.8933
+    lon_deg: -6.3453
+    height_m: 47
+    lit: {from: 1680, until: 1911, range_nm: 15, character: "revolving, once in a minute (from 1790); a coal fire before"}
+    source: "White 1835, 'Coast of England', p. 13: the light on St Agnes may be seen at five leagues, the reflectors 153 feet above the mean level of the sea, revolving once in a minute, the lighthouse whitewashed; Trinity House and the encyclopaedia's 'St Agnes Lighthouse' (read 2026-09-30): first lit 30 October 1680, coal fired until 1790, then twenty-one Argand lamps revolving; decommissioned 1911"
+    says: "St Agnes light, on its island at the south-west of Scilly, a whitewashed tower showing a revolving light seen five leagues off: the landfall light of England in 1805, and the only light in the islands."
+
+  - id: bishop-rock
+    kind: rock
+    name: the Bishop
+    modern: Bishop Rock
+    lat_deg: 49.87456
+    lon_deg: -6.44591
+    height_m: 3
+    extent_m: 100
+    source: "White 1835, 'Coast of England', p. 14: the Crim and Bishop are always above water, their summits somewhat sharp, four miles from the light; from the Bishop the light bears E by S"
+    says: "The Bishop, the westernmost rock of Scilly, always above water with a sharp summit, four miles W by N of St Agnes light; coming from the westward at night give the light an offing of six miles."
+
+  - id: bishop-rock-light
+    kind: light
+    name: the Bishop Rock light
+    modern: Bishop Rock Lighthouse
+    lat_deg: 49.87451
+    lon_deg: -6.44563
+    height_m: 44
+    lit: {from: 1858, until: null, range_nm: 18, character: "a fixed white light (1858)"}
+    source: "Trinity House, 'Bishop Rock Lighthouse'; the encyclopaedia's 'Bishop Rock' (read 2026-09-30): the iron tower begun 1847 washed away, the granite tower completed 1858 and first lit 1 September 1858; Imray 1874, p. 104"
+    says: "The Bishop Rock lighthouse, first lit on the first of September 1858; in 1805 the Bishop was a bare rock in the dark."
+
+  - id: crim-rocks
+    kind: rock
+    name: the Crim
+    modern: Crim Rocks
+    lat_deg: 49.90188
+    lon_deg: -6.45079
+    height_m: 3
+    extent_m: 400
+    fix: "White: four miles from St Agnes light, from which the light bears S 86 E; always above water"
+    source: "White 1835, 'Coast of England', p. 14"
+    says: "The Crim, always above water with a sharp summit, four miles from the light and a little north of the Bishop; the flood sets north-west here the first half hour and then east through St Mary's Road."
+
+  - id: bishops-ridge-and-shovel
+    kind: ledge
+    name: the Bishop's Ridge and the Shovel
+    modern: Bishop's Ridge and Shovel ledges
+    lat_deg: 49.87969
+    lon_deg: -6.39725
+    height_m: 0
+    extent_m: 800
+    fix: "White: the light bears E 1/4 N from the Bishop's Ridge (four miles) and ENE 1/4 E from the Shovel, which lies within that radius"
+    source: "White 1835, 'Coast of England', p. 14"
+    says: "The Bishop's Ridge and the Shovel, rocky ledges projecting to the south-west of the islands within four miles of the light."
+
+  - id: nun-deeps
+    kind: ledge
+    name: the Nun Deeps
+    modern: Nundeeps
+    lat_deg: 49.9200
+    lon_deg: -6.4200
+    height_m: 0
+    extent_m: 500
+    fix: "White: the light bears SE from the Nun Deeps, which lie within four miles of it"
+    source: "White 1835, 'Coast of England', pp. 14 and 16 (the North Channel between the great Mincarlo and the Nun Deeps)"
+    says: "The Nun Deeps, a rocky ledge to the north-west of the islands, the North Channel between it and the great Mincarlo."
+
+  - id: poll-bank
+    kind: bank
+    name: the Poll Bank
+    modern: Pol Bank
+    lat_deg: 49.8400
+    lon_deg: -6.4700
+    height_m: 0
+    extent_m: 1000
+    depth_fathoms: 15
+    fix: "White: six miles and a third from St Agnes light, S 51 30 W; not less than 15 or 16 fathoms"
+    source: "White 1835, 'Coast of England', p. 14"
+    says: "The Poll Bank, a rocky ledge six miles and a third south-west by west of St Agnes light with fifteen or sixteen fathoms over it, dangerous to nothing but open boats in a sea."
+
+  - id: st-agnes-island
+    kind: island
+    name: St Agnes
+    modern: St Agnes, Isles of Scilly
+    lat_deg: 49.8940
+    lon_deg: -6.3400
+    height_m: 30
+    source: "White 1835, 'Coast of England', pp. 13 to 16"
+    says: "St Agnes, the south-western island, with the lighthouse on its top; its south-east shore may be approached within half a mile."
+
+  - id: st-marys-island
+    kind: island
+    name: St Mary's
+    modern: St Mary's, Isles of Scilly
+    lat_deg: 49.9200
+    lon_deg: -6.3000
+    height_m: 50
+    source: "White 1835, 'Coast of England', p. 14: the Telegraph-tower, the windmill and the port on St Mary's designate this dangerous group"
+    says: "St Mary's, the largest of the islands, with the Telegraph tower, the windmill and the garrison over Hugh Town."
+
+  - id: hugh-town
+    kind: town
+    name: Hugh Town
+    modern: Hugh Town, St Mary's
+    lat_deg: 49.91587
+    lon_deg: -6.31542
+    height_m: 10
+    source: "White 1835, 'Coast of England', p. 14 (the Port on St Mary)"
+    says: "Hugh Town, the port of St Mary's under the Garrison, on its neck of sand."
+
+  - id: star-castle
+    kind: castle
+    name: the Garrison
+    modern: Star Castle and the Garrison, St Mary's
+    lat_deg: 49.9125
+    lon_deg: -6.3225
+    height_m: 40
+    source: "White 1835, 'Coast of England', p. 14"
+    says: "The Garrison of St Mary's, with Star Castle on its hill above Hugh Town."
+
+  - id: peninnis-head
+    kind: headland
+    name: Peninnis Head
+    modern: Peninnis Head
+    lat_deg: 49.90500
+    lon_deg: -6.30550
+    height_m: 30
+    source: "White 1835, 'Coast of England', p. 16: Peninnis Head and the Stevel rock both bold close-to; p. 14: the Gilstone three-eighths of a mile from Peninnis ESE"
+    says: "Peninnis Head, the south point of St Mary's, bold close-to; the mill on it a mark for the Poll Bank."
+
+  - id: peninnis-mill
+    kind: mill
+    name: Peninnis mill
+    modern: the site of the old mill, Peninnis
+    lat_deg: 49.90703
+    lon_deg: -6.30685
+    height_m: 45
+    source: "White 1835, 'Coast of England', p. 14 (Peninnis Mill in one with Goreggan leads upon the Poll Bank)"
+    says: "The windmill on Peninnis, seen with the Telegraph tower from the offing."
+
+  - id: the-gilstone
+    kind: drying
+    name: the Gilstone
+    modern: Gilstone (Peninnis)
+    lat_deg: 49.90260
+    lon_deg: -6.29650
+    height_m: 1
+    fix: "White: three-eighths of a mile from Peninnis ESE; appears at low water"
+    source: "White 1835, 'Coast of England', p. 14"
+    says: "The Gilstone, three-eighths of a mile east-south-east of Peninnis, appearing at low water."
+
+  - id: st-martins-daymark
+    kind: beacon
+    name: the daymark on St Martin's
+    modern: St Martin's Daymark
+    lat_deg: 49.96532
+    lon_deg: -6.27762
+    height_m: 67
+    source: "White 1835, 'Coast of England', p. 14: on the eastern point of St Martin's an obelisk, whitewashed, somewhat in the form of a cone, 220 feet above the sea; p. 17: the Pollard bears from it ENE 1/4 E seven miles"
+    says: "The whitewashed obelisk on the east point of St Martin's, two hundred and twenty feet above the sea, the daymark of the islands."
+
+  - id: st-martins-island
+    kind: island
+    name: St Martin's
+    modern: St Martin's, Isles of Scilly
+    lat_deg: 49.9600
+    lon_deg: -6.2950
+    height_m: 45
+    source: "White 1835, 'Coast of England', pp. 14 to 16"
+    says: "St Martin's, the north-eastern island, with the daymark on its eastern point."
+
+  - id: st-marys-road
+    kind: anchorage
+    name: St Mary's Road
+    modern: St Mary's Roads
+    lat_deg: 49.9250
+    lon_deg: -6.3250
+    height_m: 0
+    depth_fathoms: 5
+    bottom: "loose sand, not very tenacious"
+    source: "White 1835, 'Coast of England', pp. 15 to 16: the only harbour for large vessels; shelter from all winds but WNW to SW; anchor with Hangman Island its own breadth open north of the Nut Rock, a third of a mile SE of the latter, in 4 and 5 fathoms; moor NW and SE"
+    says: "St Mary's Road, between St Mary's and Samson, the one anchorage for large ships in Scilly: four and five fathoms on loose sand that does not hold well, sheltered from every wind but those between west-north-west and south-west, which bring in a heavy fetch."
+
+  - id: st-marys-sound
+    kind: transit
+    name: the Great Minalto on the north-east side of the great Mincarlo
+    modern: St Mary's Sound leading line
+    lat_deg: 49.9080
+    lon_deg: -6.3280
+    marks: [great-minalto, great-mincarlo]
+    bearing_deg: 330
+    source: "White 1835, 'Coast of England', p. 16: bring the Great Minalto directly in one with the north-eastern side of the Great Mincarlo, which carries you in the fair-way between the Woolpack and the Spanish and Bartholomew ledges, until the daymark on St Martin's opens west of Bants Carn Point"
+    says: "To sail into St Mary's Road by St Mary's Sound, bring the Great Minalto in one with the north-east side of the Great Mincarlo, between the Woolpack and the Spanish and Bartholomew ledges, until the daymark opens west of Bants Carn."
+
+  - id: woolpack-rock
+    kind: drying
+    name: the Woolpack
+    modern: Woolpack Rock
+    lat_deg: 49.90683
+    lon_deg: -6.32392
+    height_m: 1
+    source: "White 1835, 'Coast of England', p. 16: projects nearly a fifth of a mile from the land, appearing a little before low water"
+    says: "The Woolpack, off St Mary's south-west shore, a fifth of a mile out, appearing a little before low water."
+
+  - id: spanish-ledge
+    kind: drying
+    name: the Spanish Ledge
+    modern: Spanish Ledge
+    lat_deg: 49.90704
+    lon_deg: -6.31755
+    height_m: 0
+    source: "White 1835, 'Coast of England', p. 16: but 5 feet on the Spanish Ledge at low water"
+    says: "The Spanish Ledge, with but five feet on it at low water, on the larboard hand entering St Mary's Sound."
+
+  - id: bartholomew-ledge
+    kind: drying
+    name: the Bartholomew Ledge
+    modern: Bartholomew Ledge
+    lat_deg: 49.90713
+    lon_deg: -6.33132
+    height_m: 1
+    source: "White 1835, 'Coast of England', p. 16: dries nearly at low water"
+    says: "The Bartholomew Ledge, drying nearly at low water, on the larboard hand in the Sound."
+
+  - id: nut-rock
+    kind: rock
+    name: the Nut Rock
+    modern: Nut Rock
+    lat_deg: 49.9300
+    lon_deg: -6.3340
+    height_m: 3
+    source: "White 1835, 'Coast of England', p. 16"
+    says: "The Nut Rock, in St Mary's Road; the berth is a third of a mile south-east of it with Hangman Island open north of it."
+
+  - id: hangman-island
+    kind: island
+    name: Hangman Island
+    modern: Hangman Island (Bryher)
+    lat_deg: 49.9560
+    lon_deg: -6.3450
+    height_m: 15
+    source: "White 1835, 'Coast of England', p. 16"
+    says: "Hangman Island, off Bryher at the mouth of New Grimsby; its breadth open of the Nut Rock is the mark for the berth in the Road."
+
+  - id: samson
+    kind: island
+    name: Samson
+    modern: Samson, Isles of Scilly
+    lat_deg: 49.9290
+    lon_deg: -6.3500
+    height_m: 40
+    source: "White 1835, 'Coast of England', p. 15"
+    says: "Samson, the twin-hilled island on the west side of St Mary's Road."
+
+  - id: great-minalto
+    kind: rock
+    name: the Great Minalto
+    modern: Great Minalto
+    lat_deg: 49.94477
+    lon_deg: -6.36957
+    height_m: 15
+    source: "White 1835, 'Coast of England', p. 16"
+    says: "The Great Minalto, a rock west of Samson, the leading mark with the Mincarlo for St Mary's Sound."
+
+  - id: great-mincarlo
+    kind: rock
+    name: the Great Mincarlo
+    modern: Mincarlo
+    lat_deg: 49.9480
+    lon_deg: -6.3660
+    height_m: 20
+    source: "White 1835, 'Coast of England', p. 16"
+    says: "The Great Mincarlo, the westernmost of the rocks off Samson, the North Channel between it and the Nun Deeps."
+
+  - id: annet
+    kind: island
+    name: Annet
+    modern: Annet
+    lat_deg: 49.89356
+    lon_deg: -6.37000
+    height_m: 18
+    source: "White 1835, 'Coast of England', pp. 15 to 16 (Smith Sound between St Agnes and Annet)"
+    says: "Annet, the low island west of St Agnes, Smith Sound between them."
+
+  - id: old-wreck-rock
+    kind: rock
+    name: the Old Wreck
+    modern: Old Wreck
+    lat_deg: 49.90358
+    lon_deg: -6.37961
+    height_m: 0
+    fix: "White: a sunken rock with 3 feet on it, about NNW three-quarters of a mile from Annet Head and NW by W half W from the Great Smith"
+    source: "White 1835, 'Coast of England', p. 16"
+    says: "The Old Wreck, a sunken rock with three feet on it three-quarters of a mile NNW of Annet Head, on the starboard hand going in by Broad Sound."
+
+  - id: broad-sound
+    kind: transit
+    name: Nornour open north of Bants Carn Point, E by N
+    modern: Broad Sound leading line
+    lat_deg: 49.9150
+    lon_deg: -6.4000
+    marks: [nornour, st-marys-island]
+    bearing_deg: 80
+    source: "White 1835, 'Coast of England', p. 16: run in between the Bishop and the Crim, nearest the former; the leading mark is Nornour its apparent length open north of Bants Carn Point, about E 1/4 N, leaving the Gunner, Southward ledge and Le Jeffry on the larboard hand and the Old Wreck on the starboard"
+    says: "Broad Sound, from the south-west between the Bishop and the Crim: Nornour its own length open to the north of Bants Carn Point, about east a quarter north, leads to St Mary's Road; very dangerous to those who do not know the marks and the set of the tides."
+
+  - id: nornour
+    kind: island
+    name: Nornour
+    modern: Nornour (the Eastern Isles)
+    lat_deg: 49.94800
+    lon_deg: -6.26224
+    height_m: 25
+    source: "White 1835, 'Coast of England', p. 16"
+    says: "Nornour, one of the eastern isles, the leading mark for Broad Sound."
+
+  - id: crow-bar
+    kind: bank
+    name: Crow Bar
+    modern: Crow Bar (Crow Sound)
+    lat_deg: 49.9370
+    lon_deg: -6.2920
+    height_m: 0
+    extent_m: 400
+    depth_fathoms: 0.5
+    source: "White 1835, 'Coast of England', p. 15: at high water equinoctial tides 23 feet on Crow Bar, at low water 3, more with westerly gales and less with easterly; the Crow Rock's three heads, the Great Crow, the Little Crow and the Crow Foot, show the water on the bar"
+    says: "Crow Bar, across Crow Sound between St Mary's and St Martin's, three feet on it at low water and twenty-three at high water springs; the three heads of the Crow Rock tell the water on it, the Great Crow awash at five hours flood."
+
+  - id: crow-rock
+    kind: drying
+    name: the Crow Rock
+    modern: Crow Rock (Bar Point)
+    lat_deg: 49.9385
+    lon_deg: -6.2950
+    height_m: 2
+    source: "White 1835, 'Coast of England', p. 15: near Bants Carn Point, three distinct heads"
+    says: "The Crow Rock, off Bants Carn Point, remarkable for its three heads, by which the water over Crow Bar is estimated with great precision."
+
+  - id: crow-sound
+    kind: anchorage
+    name: Crow Sound
+    modern: Crow Sound
+    lat_deg: 49.9400
+    lon_deg: -6.2850
+    height_m: 0
+    depth_fathoms: 3
+    bottom: "sand"
+    source: "White 1835, 'Coast of England', p. 15: with the wind between WNW and SW a vessel can always run to sea through Crow Sound at a proper period of tide"
+    says: "Crow Sound, the way out to the north-east from St Mary's Road at a proper time of tide when a westerly wind sends in the sea."
+
+  - id: new-grimsby
+    kind: anchorage
+    name: New Grimsby
+    modern: New Grimsby Sound (Tresco)
+    lat_deg: 49.95762
+    lon_deg: -6.34600
+    height_m: 0
+    depth_fathoms: 2
+    bottom: "sand"
+    source: "White 1835, 'Coast of England', p. 15: the harbours in most esteem for vessels capable of taking the ground are Old and New Grimsby and St Helen's Pool; Imray 1874, p. 108"
+    says: "New Grimsby, the harbour between Tresco and Bryher, in most esteem for vessels that can take the ground."
+
+  - id: old-grimsby
+    kind: anchorage
+    name: Old Grimsby
+    modern: Old Grimsby (Tresco)
+    lat_deg: 49.96204
+    lon_deg: -6.32928
+    height_m: 0
+    depth_fathoms: 2
+    bottom: "sand"
+    source: "White 1835, 'Coast of England', p. 15; Imray 1874, p. 108"
+    says: "Old Grimsby, on the east side of Tresco, a harbour for small vessels."
+
+  - id: st-helens-pool
+    kind: anchorage
+    name: St Helen's Pool
+    modern: St Helen's Pool
+    lat_deg: 49.96229
+    lon_deg: -6.32719
+    height_m: 0
+    depth_fathoms: 3
+    bottom: "sand"
+    source: "White 1835, 'Coast of England', p. 15; Imray 1874, p. 108"
+    says: "St Helen's Pool, between St Helen's, Tean and Tresco, a snug pool for those who know the way in."
+
+  - id: tresco
+    kind: island
+    name: Tresco
+    modern: Tresco
+    lat_deg: 49.9500
+    lon_deg: -6.3350
+    height_m: 40
+    source: "White 1835, 'Coast of England', p. 15 (Old and New Grimsby)"
+    says: "Tresco, the second island, with the two Grimsbys on either side of its neck."
+
+  - id: round-island-scilly
+    kind: island
+    name: Round Island
+    modern: Round Island (Scilly)
+    lat_deg: 49.97692
+    lon_deg: -6.32300
+    height_m: 40
+    source: "Trinity House, 'Round Island Lighthouse' (the lighthouse dates from 1887); White 1835 names the island among the northern isles"
+    says: "Round Island, the northernmost rock of Scilly; its lighthouse came in 1887."
+
+  - id: scilly-tides
+    kind: bottom
+    name: the tide off the Bishop
+    modern: the western rocks of Scilly
+    lat_deg: 49.8700
+    lon_deg: -6.4200
+    height_m: 0
+    bottom: "rock"
+    source: "White 1835, 'Coast of England', p. 14: a little to the south-west of the Crim and Bishop the tide runs with great rapidity to the north-westward, north and north-eastward, eight hours out of twelve"
+    says: "A little south-west of the Crim and the Bishop the tide runs with great rapidity to the north-west, north and north-east eight hours in twelve, which is the reason to keep the light six miles off at night."
+
+  # ---------------------------------------------------------------------------
+  # The north coast of Cornwall (within the region's box)
+  # ---------------------------------------------------------------------------
+
+  - id: st-ives
+    kind: town
+    name: St Ives
+    modern: St Ives
+    lat_deg: 50.2140
+    lon_deg: -5.4780
+    height_m: 20
+    source: "White 1835, 'Coast of England', p. 13 (the coasts named); the north coast is outside the pilots read for this list, and this entry rests on the modern chart"
+    says: "St Ives, in its bay on the north coast, a harbour drying at low water."
+
+  - id: godrevy-island
+    kind: island
+    name: Godrevy Island
+    modern: Godrevy Island
+    lat_deg: 50.24165
+    lon_deg: -5.39618
+    height_m: 20
+    source: "The encyclopaedia's 'Godrevy Lighthouse' (read 2026-09-30): built 1858 to 1859 to mark the Stones reef; no light in 1805. The entry rests on the modern chart for its position"
+    says: "Godrevy Island in St Ives Bay, marking the Stones reef; the lighthouse on it was built in 1859."
+
+  - id: st-agnes-head-cornwall
+    kind: headland
+    name: St Agnes Head
+    modern: St Agnes Head (Cornwall)
+    lat_deg: 50.3150
+    lon_deg: -5.2300
+    height_m: 90
+    source: "The RMG record of Mackenzie's survey 'from the Lizard Point to St Agnes Head', 1772 (rmgc-object-540451); position from the modern chart"
+    says: "St Agnes Head, on the north coast, where Mackenzie's survey of 1772 ended."
+
+  - id: trevose-head
+    kind: headland
+    name: Trevose Head
+    modern: Trevose Head
+    lat_deg: 50.5490
+    lon_deg: -5.0340
+    height_m: 60
+    source: "The encyclopaedia's 'Trevose Head Lighthouse' (read 2026-09-30): the lighthouse dates from 1847; position from the modern chart"
+    says: "Trevose Head, the bold headland of the north coast between Newquay and Padstow; no light on it before 1847."
+
+  - id: padstow
+    kind: place
+    name: Padstow
+    modern: Padstow
+    lat_deg: 50.54116
+    lon_deg: -4.93483
+    height_m: 15
+    source: "Modern chart; the north coast is outside the pilots read for this list"
+    says: "Padstow, in the Camel estuary behind Stepper Point, with its bar."
+
+  # ---------------------------------------------------------------------------
+  # Ushant, the Four and the Chenal du Four
+  # ---------------------------------------------------------------------------
+
+  - id: ushant
+    kind: island
+    name: Ushant
+    modern: Ouessant
+    lat_deg: 48.4600
+    lon_deg: -5.0950
+    height_m: 60
+    source: "Faden 1793, 'Ushant, or Ouessant', p. 56: three leagues from the main land of Brittany, steep and craggy almost all round, a league and a half long NE and SW and three-quarters of a league broad, a harbour on the SW end of difficult access"
+    says: "Ushant, three leagues from the main of Brittany, a steep and craggy island a league and a half long, surrounded with rocks except on the north side where there is anchorage; the lighthouse stands on the south-west."
+
+  - id: stiff-light
+    kind: light
+    name: the light on Ushant
+    modern: Phare du Stiff
+    lat_deg: 48.47804
+    lon_deg: -5.05209
+    height_m: 85
+    lit: {from: 1699, until: null, range_nm: 20, character: "a fixed light, two towers"}
+    source: "The French encyclopaedia's 'Phare du Stiff' (read 2026-09-30): Vauban's two conjoined towers on the Stiff, the highest point of Ushant, 1699; Faden 1793, p. 56: a lighthouse stands at the entrance of the harbour on the westernmost point of Ushant (Faden's placing differs from the tower's, which is on the north-east); White 1835, p. 13, 'Ushant light-house'"
+    says: "The light of Ushant on the Stiff, Vauban's tower of 1699 on the highest ground of the island, the landfall light of the French coast."
+
+  - id: creach-light
+    kind: light
+    name: the Créac'h light
+    modern: Phare du Créac'h
+    lat_deg: 48.46105
+    lon_deg: -5.12851
+    height_m: 70
+    lit: {from: 1863, until: null, range_nm: 20, character: "two white flashes"}
+    source: "The French encyclopaedia's 'Phare du Créac'h' (read 2026-09-30): built 1863 on the west of Ushant (the study's unverified date, confirmed there)"
+    says: "The Créac'h light on the west of Ushant, lit in 1863; dark in 1805."
+
+  - id: keller-island
+    kind: island
+    name: Keller
+    modern: Île de Keller
+    lat_deg: 48.4750
+    lon_deg: -5.0700
+    height_m: 30
+    source: "Faden 1793, 'Ushant', p. 56: between Ushant and another small island named Oueler, very near it, a vessel lies sheltered from all winds"
+    says: "Keller, the small island off the north-east of Ushant; between it and Ushant a vessel lies sheltered from all winds."
+
+  - id: fromveur
+    kind: bottom
+    name: the Fromveur
+    modern: Passage du Fromveur
+    lat_deg: 48.4200
+    lon_deg: -5.0300
+    height_m: 0
+    bottom: "rock"
+    depth_fathoms: 30
+    source: "Faden 1793, 'Directions for sailing to the Island of Ushant', p. 54: it is dangerous sailing about all these isles on the eastern and western sides because of the rocks; the channels known only to the inhabitants"
+    says: "The Fromveur, the race between Ushant and the isles to its south-east, where the tide runs harder than anywhere on this coast; its channels are known only to the inhabitants."
+
+  - id: molene
+    kind: island
+    name: Molène
+    modern: Île Molène
+    lat_deg: 48.3970
+    lon_deg: -4.9580
+    height_m: 20
+    source: "Faden 1793, 'Directions for sailing to the Island of Ushant', p. 54: the isles to the SE of Ushant are seven in number"
+    says: "Molène, the largest of the seven isles south-east of Ushant, all of them beset with rocks."
+
+  - id: beniguet
+    kind: island
+    name: Béniguet
+    modern: Île de Béniguet
+    lat_deg: 48.37100
+    lon_deg: -4.93096
+    height_m: 20
+    source: "Faden 1793, 'Directions for sailing to the Island of Ushant', pp. 54 to 55: the last and southernmost of the isles, three leagues SW of Ushant; a great rocky bank runs half a league north of it"
+    says: "Béniguet, the southernmost of the isles, three leagues south-west of Ushant, kept clear of St Matthew's Point to pass wide of the Parquette; a rocky bank half a league to its north."
+
+  - id: pierres-noires
+    kind: rock
+    name: the Black Rocks
+    modern: Les Pierres Noires
+    lat_deg: 48.31170
+    lon_deg: -4.91500
+    height_m: 10
+    extent_m: 800
+    source: "Faden 1793, 'Directions for sailing to the Island of Ushant', p. 55: the two rocks which I call the Noires, the inhabitants name the Bossevins, about a league west inclining a little south of St Matthew's Point; a great rocky ledge half a league to the south of them; 'these are what the English sailors call the Black Rocks'"
+    says: "The Black Rocks, two bulky rocks above water a league west of St Matthew's Point, which the French call the Noires or the Bossevins, with a great rocky ledge running half a league south of them."
+
+  - id: pierres-noires-light
+    kind: light
+    name: the Pierres Noires light
+    modern: Phare des Pierres Noires
+    lat_deg: 48.31170
+    lon_deg: -4.91500
+    height_m: 28
+    lit: {from: 1872, until: null, range_nm: 18, character: "red"}
+    source: "The French encyclopaedia's 'Phare des Pierres Noires' (read 2026-09-30): built 1867 to 1871, lit 1 May 1872"
+    says: "The lighthouse on the Black Rocks, lit in 1872; dark in 1805."
+
+  - id: le-four
+    kind: rock
+    name: the Four
+    modern: Le Four
+    lat_deg: 48.52345
+    lon_deg: -4.80130
+    height_m: 12
+    extent_m: 150
+    source: "Faden 1793, 'The Four', p. 53: 'the oven', a huge black rock never covered, shaped like an oven, a good half league from the land, the chief mark to pass by Ushant to Brest, three or four leagues ENE of Ushant"
+    says: "The Four, a huge black rock never covered, shaped like an oven, half a league off the westernmost point of the coast, the chief mark for the passage within Ushant; its lighthouse came in 1874."
+
+  - id: chenal-du-four
+    kind: bottom
+    name: the Passage du Four
+    modern: Chenal du Four
+    lat_deg: 48.4300
+    lon_deg: -4.8300
+    height_m: 0
+    bottom: "rock"
+    depth_fathoms: 15
+    source: "Faden 1793, 'Tides and Currents', p. 61: in the Passage du Four the currents are very strong, the flood north and the ebb south, the highest tides when the moon is WSW or ENE"
+    says: "The Passage du Four, between the isles and the main: the currents very strong, the flood setting north and the ebb south, and rocks above and below water all along the coast."
+
+  - id: les-platresses
+    kind: rock
+    name: the Platresses
+    modern: Les Plâtresses
+    lat_deg: 48.3800
+    lon_deg: -4.8400
+    height_m: 0
+    extent_m: 300
+    fix: "Faden: two leagues SW 1/4 S of the Four and above two miles NW 1/4 W of Point Conquet, about half way between the isles and the main"
+    source: "Faden 1793, 'Les Platresses', pp. 53 to 54: very dangerous rocks under water; the marks St Matthew's cloister with the little valley at Conquet, and a mill ESE of them"
+    says: "The Platresses, very dangerous rocks under water half way between the isles south of Ushant and the main, two miles north-west of Point Conquet; when St Matthew's cloister comes a little without Point Conquet you are very near them."
+
+  - id: la-valbelle
+    kind: rock
+    name: La Valbelle
+    modern: La Valbelle
+    lat_deg: 48.36731
+    lon_deg: -4.80625
+    height_m: 0
+    fix: "Faden: between the Platresses and the land, with 15 to 18 feet at low water springs; a mill on the land and a little tower on the brink of the sea in one mark it"
+    source: "Faden 1793, 'Les Platresses', p. 54: two rocks under water discovered by the king's ships, La Valbelle the northernmost and Le Tendéoc the southernmost"
+    says: "La Valbelle and Le Tendéoc, two rocks under water between the Platresses and the land with fifteen to eighteen feet on them at low water springs, discovered by the King's ships."
+
+  - id: la-helle
+    kind: rock
+    name: La Helle
+    modern: La Helle
+    lat_deg: 48.39952
+    lon_deg: -4.91686
+    height_m: 15
+    fix: "Faden: west of the Platresses, about half way between them and the isles south of Ushant; no passage from it to the isles"
+    source: "Faden 1793, 'Les Platresses', p. 54: a high rock which appears like a ship under sail"
+    says: "La Helle, a high rock which appears like a ship under sail, west of the Platresses; from it to the isles there is no passage for the rocks between."
+
+  - id: le-conquet
+    kind: place
+    name: Conquet
+    modern: Le Conquet
+    lat_deg: 48.3600
+    lon_deg: -4.7720
+    height_m: 15
+    source: "Faden 1793, 'Directions for sailing to the Island of Ushant', pp. 53 to 54: give Point Conquet a berth of one or two cables for La Vinotière under water directly west of it; Les Mulées south of Conquet stretch a good way out"
+    says: "Conquet, a small port behind its point; give the point a berth of a cable or two for the Vinotière, and stand off when the port opens for the Mulées to the south."
+
+  - id: la-vinotiere
+    kind: rock
+    name: La Vinotière
+    modern: La Grande Vinotière
+    lat_deg: 48.3620
+    lon_deg: -4.7950
+    height_m: 0
+    source: "Faden 1793, pp. 53 and 55: a rock under water directly west of Point Conquet, the Grande Vinotière; La Petite Vinotière between the point and Blanc Sablon"
+    says: "The Vinotière, a rock under water directly west of Point Conquet; the coast is not to be approached within a cable's length nor kept wider than two."
+
+  - id: kermorvan-point
+    kind: headland
+    name: Point Conquet
+    modern: Pointe de Kermorvan
+    lat_deg: 48.36138
+    lon_deg: -4.78654
+    height_m: 15
+    source: "Faden 1793, 'Directions for sailing to the Island of Ushant', pp. 53 to 54 (Point Conquet); the French encyclopaedia's 'Phare de Kermorvan': the lighthouse on it built 1847, lit 1849"
+    says: "Point Conquet, the western point of the port, Kermorvan on the modern chart; its lighthouse came in 1849."
+
+  - id: blanc-sablon
+    kind: anchorage
+    name: Blanc Sablon
+    modern: Anse des Blancs-Sablons
+    lat_deg: 48.3750
+    lon_deg: -4.7750
+    height_m: 0
+    depth_fathoms: 9
+    bottom: "sand"
+    source: "Faden 1793, 'Blanc Sablon', p. 55: north of Point Conquet, anchor in 8, 9 or 10 fathoms, sandy bottom"
+    says: "The bay of Blanc Sablon, north of Point Conquet, where you may anchor in eight, nine or ten fathoms on sand."
+
+  - id: st-mathieu-point
+    kind: headland
+    name: St Matthew's Point
+    modern: Pointe Saint-Mathieu
+    lat_deg: 48.33180
+    lon_deg: -4.77050
+    height_m: 30
+    source: "Faden 1793, 'St. Matthew's Point', pp. 55 to 56: known by its lighthouse, with several rocks above water called Les Moines and others under water stretching half a league SW"
+    says: "St Matthew's Point, known by its lighthouse and the ruined abbey, with the Monks above water off it and other rocks under water stretching half a league to the south-west."
+
+  - id: st-mathieu-light
+    kind: light
+    name: St Matthew's light
+    modern: Phare de Saint-Mathieu (the abbey tower light, then the tower of 1835)
+    lat_deg: 48.33174
+    lon_deg: -4.77080
+    height_m: 50
+    lit: {from: 1692, until: null, range_nm: 15, character: "a fixed light on the abbey tower (in 1805)"}
+    source: "The study (ChartData.md §3.3, verified there): Saint-Mathieu's abbey tower light of 1692; Faden 1793, p. 55: 'Point St. Matthew, known by its light-house'; the French encyclopaedia's 'Phare de Saint-Mathieu' (read 2026-09-30): the present tower built 1835 in the abbey's ruins, a landfall light of 29 miles"
+    says: "The light of St Matthew's, shown from the abbey tower on the point since 1692, seen from the Iroise and the Four."
+
+  - id: les-moines
+    kind: rock
+    name: the Monks
+    modern: Les Moines (off Saint-Mathieu)
+    lat_deg: 48.32400
+    lon_deg: -4.79000
+    height_m: 5
+    extent_m: 300
+    source: "Faden 1793, 'St. Matthew's Point', pp. 55 to 56"
+    says: "Les Moines, the Monks, rocks above water off St Matthew's Point, a narrow passage between them and the land."
+
+  - id: le-coq
+    kind: rock
+    name: the Cock
+    modern: Le Coq
+    lat_deg: 48.3330
+    lon_deg: -4.7230
+    height_m: 2
+    fix: "Faden: between St Matthew's and Bertheaume, a good quarter of a league off the shore, directly north of the Parquette, a passage of 10 or 12 fathoms between it and the land"
+    source: "Faden 1793, 'Rock, called the Cock', p. 56"
+    says: "The Cock, a rock a quarter of a league off the shore between St Matthew's and Bertheaume, directly north of the Parquette, with a passage of ten or twelve fathoms within it."
+
+  - id: la-parquette
+    kind: rock
+    name: La Parquette
+    modern: La Parquette
+    lat_deg: 48.32330
+    lon_deg: -4.73830
+    height_m: 3
+    fix: "Faden: above a league WSW of Point Camaret and near a league and a half SSE of St Matthew's Point"
+    source: "Faden 1793, 'La Parquette Rock', p. 58: a rock most commonly above water; when covered the sea always breaks over it unless in an extraordinary calm or at high water; between it and Toulinguet nothing but rocks"
+    says: "La Parquette, a rock most commonly above water in the mouth of the Goulet's approach, the sea always breaking over it when it is covered; between it and Toulinguet nothing but rocks known only to the inhabitants."
+
+  - id: bertheaume-road
+    kind: anchorage
+    name: the road of Bertheaume
+    modern: Anse de Bertheaume
+    lat_deg: 48.34181
+    lon_deg: -4.69340
+    height_m: 0
+    depth_fathoms: 10
+    bottom: "sand and mud"
+    source: "Faden 1793, 'Buzec Rock', p. 57: the anchorage in the road of Bertheaume is from 8, 10 to 12 fathoms, the bottom sand and mud, sheltered from the north, NE and NW winds"
+    says: "The road of Bertheaume, eight to twelve fathoms on sand and mud under the point, sheltered from the north-west round to north-east; the blockading squadrons' station off the Goulet."
+
+  - id: bertheaume-point
+    kind: headland
+    name: Point Bertheaume
+    modern: Pointe de Bertheaume
+    lat_deg: 48.3390
+    lon_deg: -4.6990
+    height_m: 40
+    source: "Faden 1793, 'Rock, called the Cock', p. 56: steer till Point Bertheaume bears north, then stand to the east"
+    says: "Point Bertheaume, with its fort on the islet, the western horn of the Goulet's approach; when it bears north you may stand to the east for Brest."
+
+  - id: buzec-rock
+    kind: rock
+    name: the Buzec
+    modern: Basse Beuzec
+    lat_deg: 48.32650
+    lon_deg: -4.69900
+    height_m: 0
+    fix: "Faden: about a quarter of a league south of Point Bertheaume; the little tower on the islet west of the point in one with a tower in Bertheaume cove marks it"
+    source: "Faden 1793, 'Buzec Rock', pp. 56 to 57: very dangerous to large ships at low water"
+    says: "The Buzec, a rock south of Point Bertheaume very dangerous to large ships at low water, found by bringing the little tower on the islet in one with the tower in Bertheaume cove."
+
+  - id: petit-minou
+    kind: headland
+    name: Petit Minou
+    modern: Pointe du Petit Minou
+    lat_deg: 48.33728
+    lon_deg: -4.61665
+    height_m: 30
+    source: "The French encyclopaedia's 'Phare du Petit Minou' (read 2026-09-30): its lighthouse dates from 1848; Faden 1793, 'Bay of Brest', p. 57: coming by the north channel you range along the north coast without any fear"
+    says: "The Petit Minou, the north point of the Goulet's mouth; its lighthouse came in 1848, and in 1805 the north shore was ranged without any fear."
+
+  - id: le-goulet
+    kind: bottom
+    name: the Goulet
+    modern: Goulet de Brest
+    lat_deg: 48.3380
+    lon_deg: -4.5900
+    height_m: 0
+    bottom: "rock and mud"
+    depth_fathoms: 15
+    source: "Faden 1793, 'Bay of Brest', p. 57: those who would enter the Bay of Brest may range along both sides of the coast and have nothing to fear, but not in the middle of the channel, on account of the rocks called Les Fillettes and the Mingan"
+    says: "The Goulet, the strait into the Bay of Brest: range either shore and fear nothing, but not the middle, for the Fillettes and the Mingan lie there."
+
+  - id: les-fillettes
+    kind: drying
+    name: the Fillettes
+    modern: Les Fillettes
+    lat_deg: 48.33038
+    lon_deg: -4.57278
+    height_m: 1
+    extent_m: 250
+    source: "Faden 1793, 'Bay of Brest', p. 57: never uncovered but at spring tides; you are upon them when the two steep points east of Camaret are in a line and the castle of Brest is hid by the point of Penaleuch"
+    says: "The Fillettes, in the middle of the Goulet, never uncovered but at spring tides: when the two steep points east of Camaret come in one and the castle of Brest is hid by Penaleuch point you are upon them."
+
+  - id: le-mengam
+    kind: rock
+    name: the Mingan
+    modern: Le Mengam
+    lat_deg: 48.3370
+    lon_deg: -4.5880
+    height_m: 2
+    fix: "the modern chart's Mengam, which carries a tower; the grid does not resolve the rock, and the check left the position"
+    source: "Faden 1793, 'Bay of Brest', p. 57: always above water except at spring tides; very dangerous passing between the Mingan and the Fillettes because of the rocks under water"
+    says: "The Mingan, a rock in the Goulet above water except at high water springs; the passage between it and the Fillettes is very dangerous for the rocks under water."
+
+  - id: pointe-des-espagnols
+    kind: headland
+    name: Penaleuch point
+    modern: Pointe des Espagnols
+    lat_deg: 48.34120
+    lon_deg: -4.54100
+    height_m: 50
+    source: "Faden 1793, 'Bay of Brest', p. 57 (the point of Penaleuch hiding the castle of Brest)"
+    says: "The point of Penaleuch, the Spaniards' point, the southern jaw of the Goulet's inner end, which hides the castle of Brest on the Fillettes' mark."
+
+  - id: portzic
+    kind: headland
+    name: Portzic
+    modern: Pointe du Portzic
+    lat_deg: 48.35760
+    lon_deg: -4.53500
+    height_m: 40
+    source: "The French encyclopaedia's 'Phare du Portzic' (read 2026-09-30): its lighthouse dates from 1848; position from the modern chart"
+    says: "The point of Portzic on the north shore inside the Goulet, under Brest; its lighthouse came in 1848."
+
+  - id: brest-castle
+    kind: castle
+    name: the castle of Brest
+    modern: Château de Brest
+    lat_deg: 48.38294
+    lon_deg: -4.49824
+    height_m: 40
+    source: "Faden 1793, 'Bay of Brest', p. 57: keep the castle of Brest in full view, clear of Penaleuch point, sailing through the south channel"
+    says: "The castle of Brest, at the mouth of the Penfeld with the dockyard behind it; kept in full view clear of Penaleuch point it leads through the south channel of the Goulet."
+
+  - id: brest-town
+    kind: town
+    name: Brest
+    modern: Brest
+    lat_deg: 48.3880
+    lon_deg: -4.4900
+    height_m: 40
+    source: "Faden 1793, 'Bay of Brest', p. 57; the French encyclopaedia's 'Port de Brest' (the commercial port's quays reclaimed from the 1860s, read 2026-09-30)"
+    says: "Brest, the arsenal of the French Atlantic fleet on the Penfeld, its town on the heights either side; the commercial port's quays below it were reclaimed only from the 1860s."
+
+  - id: rade-de-brest
+    kind: anchorage
+    name: the Bay of Brest
+    modern: Rade de Brest
+    lat_deg: 48.32500
+    lon_deg: -4.46000
+    height_m: 0
+    depth_fathoms: 12
+    bottom: "mud"
+    source: "Faden 1793, 'Bay of Brest', p. 57: within the Bay of Brest you anchor where you please in 8, 10 or 16 fathoms, muddy ground; high water at half after four, the sea rising 5 fathoms French measure"
+    says: "Within the Bay of Brest you anchor where you please in eight, ten or sixteen fathoms on mud; it is high water at half after four and the tide rises five fathoms."
+
+  - id: camaret-road
+    kind: anchorage
+    name: Camaret road
+    modern: Anse de Camaret
+    lat_deg: 48.2850
+    lon_deg: -4.5850
+    height_m: 0
+    depth_fathoms: 9
+    bottom: "mud"
+    source: "Faden 1793, 'Camaret', p. 57: without the Bay of Brest on the south side, in a great cove, the anchorage from 8 to 10 fathoms on mud, safe from ESE, south and SW winds; a little harbour dry every tide"
+    says: "Camaret road, in the great cove on the south side without the Goulet, eight to ten fathoms on mud, safe from east-south-east round by south to south-west; the little harbour within dries every tide."
+
+  - id: camaret-town
+    kind: town
+    name: Camaret
+    modern: Camaret-sur-Mer
+    lat_deg: 48.2780
+    lon_deg: -4.5950
+    height_m: 15
+    source: "Faden 1793, 'Camaret', p. 57"
+    says: "Camaret, with Vauban's tower on its sillon."
+
+  - id: toulinguet
+    kind: rock
+    name: Toulinguet
+    modern: Pointe du Toulinguet and its rock
+    lat_deg: 48.2740
+    lon_deg: -4.6390
+    height_m: 30
+    source: "Faden 1793, 'Toulinguet Rocks', pp. 57 to 58: half a league west of Camaret bay, rocks under water extending above a cable's length SW; without them a high and big rock called Toulinguet; pass between it and Camaret point or west of it two or three ships' lengths off, then two or three cables SE to avoid Le Bellen"
+    says: "Toulinguet, a high and big rock off the cape of that name west of Camaret; pass between it and Camaret point close by the rock, or west of it, and then stand two or three cables south-east to avoid the Bellen."
+
+  - id: le-bellen
+    kind: rock
+    name: Le Bellen
+    modern: Basse du Lis and the rocks south of Toulinguet (Faden's Bellen)
+    lat_deg: 48.2650
+    lon_deg: -4.6400
+    height_m: 0
+    fix: "Faden: past the south point of Toulinguet, two or three cables to the SE"
+    source: "Faden 1793, 'Toulinguet Rocks', p. 58"
+    says: "Le Bellen, a rock south of Toulinguet to be avoided by standing two or three cables to the south-east before shaping a course for the Raz."
+
+  - id: gouemont-and-vandree
+    kind: rock
+    name: Le Gouemont and La Vandrée
+    modern: Le Gouémon and La Vandrée
+    lat_deg: 48.30500
+    lon_deg: -4.77050
+    height_m: 0
+    extent_m: 400
+    fix: "Faden: about a quarter of a league WSW of the Parquette and half a league due south of St Matthew's Point; La Vandrée four or five cables west inclining NW of it; 12 or 13 feet on them at low water springs"
+    source: "Faden 1793, 'Rocks called Le Gouemont and La Vandree', p. 58"
+    says: "The Gouemont and the Vandrée, two rocks half a league south of St Matthew's Point with twelve or thirteen feet on them at low water springs."
+
+  - id: basses-du-lis
+    kind: shoal
+    name: the Basses du Lis and Le Menjan
+    modern: Basse du Lis and Le Mengant (Iroise)
+    lat_deg: 48.2750
+    lon_deg: -4.7400
+    height_m: 0
+    extent_m: 500
+    fix: "Faden: about a league due south of the Parquette; Le Menjan a league ESE of them, as deep"
+    source: "Faden 1793, 'Les Basses du Lis and Le Menjan', p. 58: named from the ship Le Lis which touched upon them, before which they were unknown; at low tide at least 14 or 15 feet"
+    says: "The Basses du Lis, a league south of the Parquette, with fourteen or fifteen feet at low water, unknown until the ship Le Lis touched on them; and Le Menjan a league east-south-east, as deep."
+
+  - id: pointe-des-pezeaux
+    kind: headland
+    name: Pointe des Pezeaux
+    modern: Pointe de Pen-Hir
+    lat_deg: 48.25935
+    lon_deg: -4.62491
+    height_m: 60
+    source: "Faden 1793, 'Pointe des Pezeaux', p. 58: half a league and more south of Point Camaret, steep cliffs; south of it five or six great rocks called Tas de Foin, hay-ricks"
+    says: "The point of the Pezeaux, steep cliffs south of Camaret, and off it the five or six great rocks called the hay-ricks."
+
+  - id: tas-de-pois
+    kind: rock
+    name: the Tas de Foin
+    modern: Tas de Pois
+    lat_deg: 48.2540
+    lon_deg: -4.6350
+    height_m: 40
+    extent_m: 600
+    fix: "the modern chart's Tas de Pois off Pen-Hir; the grid does not resolve the rocks as land, and the check left the position"
+    source: "Faden 1793, 'Pointe des Pezeaux', p. 58: five or six great rocks which go by the name of Tas de Foin, hay-ricks, on account of their similitude to heaps of hay"
+    says: "The hay-ricks, five or six great rocks off the point of the Pezeaux, like heaps of hay from the sea."
+
+  - id: bec-de-la-chevre
+    kind: headland
+    name: Le Bec de la Chèvre
+    modern: Cap de la Chèvre
+    lat_deg: 48.16703
+    lon_deg: -4.55611
+    height_m: 90
+    source: "Faden 1793, 'Le Bec de la Chevre', pp. 58 to 59: two leagues SE 1/4 S of the Pezeaux, forked, with little banks of rocks a good quarter of a league into the sea; the bay of Dinan between"
+    says: "The She-goat's Bill, two leagues south-east of the Pezeaux, forked into two points with banks of rocks a quarter of a league off them; the bay of Dinan between."
+
+  - id: iroise
+    kind: bottom
+    name: the Passage de l'Iroise
+    modern: Iroise
+    lat_deg: 48.2500
+    lon_deg: -4.9000
+    height_m: 0
+    bottom: "putrid shells and mouldering pieces of old rock"
+    depth_fathoms: 42
+    source: "Faden 1793, 'The Channel called Passage de l'Iroise', p. 61: between the isles south of Ushant and the Raz, six leagues wide, the common track to and from Brest; 40 to 45 fathoms on a bottom of putrid shells and mouldering pieces of old rocks; the flood NE and the ebb SW, high water about four o'clock"
+    says: "The Iroise, six leagues wide between the isles and the Raz, the common track to and from Brest: forty to forty-five fathoms on putrid shells and mouldering rock, the flood setting north-east and the ebb south-west."
+
+  - id: pointe-du-raz
+    kind: headland
+    name: the Raz
+    modern: Pointe du Raz
+    lat_deg: 48.03903
+    lon_deg: -4.73769
+    height_m: 70
+    source: "Faden 1793, 'Tides and Currents', p. 61: in the Passage du Raz the currents are very strong, the flood north and the ebb south; 'Toulinguet Rocks', p. 58: the Raz des Saints, or Raz de Fontenay, commonly called Passage du Raz"
+    says: "The Raz, the point where the race runs between the main and the isle of Sein; the currents very strong, the flood north and the ebb south."
+
+  - id: ile-de-sein
+    kind: island
+    name: the Isle of Saints
+    modern: Île de Sein
+    lat_deg: 48.03708
+    lon_deg: -4.84720
+    height_m: 6
+    source: "Faden 1793, 'Toulinguet Rocks', p. 58 ('the Raz des Saints'); the French encyclopaedia's 'Phare de l'île de Sein' (the light dates from 1839)"
+    says: "The Isle of Saints, low and beset with a chaussée of rocks running leagues to the westward, no light on it before 1839."
+
+  - id: ar-men
+    kind: rock
+    name: Ar Men
+    modern: Ar Men
+    lat_deg: 48.05608
+    lon_deg: -5.00700
+    height_m: 1
+    source: "The French encyclopaedia's 'Phare d'Ar-Men' (read 2026-09-30): the rock at the end of the chaussée de Sein, its lighthouse built 1867 to 1881; position from the modern chart"
+    says: "Ar Men, the rock at the end of the chaussée de Sein, unlit until 1881."
+
+  - id: soundings-off-ushant
+    kind: bottom
+    name: the soundings south-west of Ushant
+    modern: the Ushant approach
+    lat_deg: 48.1000
+    lon_deg: -5.6000
+    height_m: 0
+    bottom: "coarse white and red sand with worn-out stones"
+    depth_fathoms: 72
+    source: "Faden 1793, 'Soundings off Ushant', pp. 61 to 62: SW 1/4 S of Ushant between 12 and 13 leagues 70 to 75 fathoms, coarse white and red sand with small worn-out stones; at 20 leagues 95 to 100 fathoms, grey and white sand with small chaff like bran"
+    says: "South-west by south of Ushant, twelve or thirteen leagues off, the lead finds seventy to seventy-five fathoms on coarse white and red sand with small worn-out stones; at twenty leagues a hundred fathoms and grey sand with chaff like bran."
+
+  - id: soundings-off-ushant-near
+    kind: bottom
+    name: the soundings seven leagues south-west of Ushant
+    modern: the Ushant approach, inner
+    lat_deg: 48.2000
+    lon_deg: -5.4000
+    height_m: 0
+    bottom: "sand with bits of thick rotten shells"
+    depth_fathoms: 65
+    source: "Faden 1793, 'Soundings off Ushant', p. 62: SW 1/4 W at 7 leagues 65 fathoms, sand mixed with bits of thick rotten shells; SSW at 7 or 8 leagues 55 fathoms on white, red and yellow sand with bits of shells like the rind of cheese"
+    says: "Seven leagues south-west of Ushant, sixty-five fathoms on sand mixed with bits of thick rotten shell; south-south-west of it fifty-five fathoms on white, red and yellow sand with shells like the rind of cheese."
+
+  # ---------------------------------------------------------------------------
+  # The north coast of Brittany within the box
+  # ---------------------------------------------------------------------------
+
+  - id: ile-vierge
+    kind: island
+    name: the Isle Vierge
+    modern: Île Vierge
+    lat_deg: 48.63779
+    lon_deg: -4.56280
+    height_m: 10
+    source: "White 1835, 'Coast of England', p. 13 (the rocks of Abrevrach among the dangers of the French shore); the French encyclopaedia's 'Phare de l'île Vierge' (the first light 1845)"
+    says: "The Isle Vierge at the mouth of the Aber Wrac'h, the rocks of Abervrach about it; no light on it before 1845."
+
+  - id: ile-de-batz
+    kind: island
+    name: the Isle of Bas
+    modern: Île de Batz
+    lat_deg: 48.7450
+    lon_deg: -4.0100
+    height_m: 30
+    source: "White 1835, 'Coast of England', p. 13 ('the Isle Bas'); the French encyclopaedia's 'Phare de l'île de Batz' (the light of 1836)"
+    says: "The Isle of Bas, off Roscoff, with its rocks and channels; the lighthouse on it came in 1836."
+
+  - id: roscoff
+    kind: place
+    name: Roscoff
+    modern: Roscoff
+    lat_deg: 48.7280
+    lon_deg: -3.9850
+    height_m: 15
+    source: "White 1835, 'Coast of England', p. 13 (the Isle Bas); position from the modern chart"
+    says: "Roscoff, the smugglers' port behind the Isle of Bas."
+
+  - id: les-triagoz
+    kind: rock
+    name: the Triagons
+    modern: Les Triagoz
+    lat_deg: 48.87108
+    lon_deg: -3.64000
+    height_m: 5
+    extent_m: 800
+    source: "White 1835, 'Coast of England', p. 13 ('the Triagons'); the lighthouse on them dates from 1864"
+    says: "The Triagons, a reef off the coast of Tréguier west of the Sept Îles, unlit until 1864."
+
+  - id: sept-iles
+    kind: island
+    name: the Seven Islands
+    modern: Les Sept-Îles
+    lat_deg: 48.88031
+    lon_deg: -3.46973
+    height_m: 50
+    source: "White 1835, 'Coast of England', p. 13 ('the Sept Isles'); the light on the Île aux Moines dates from 1835"
+    says: "The Seven Islands, off Perros on the north coast of Brittany; their light came in 1835."

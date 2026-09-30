@@ -717,32 +717,39 @@ class Chart:
 
     # -- nearest coast (C §5.5) ---------------------------------------------------------
 
-    def coast_at(self, pos: Position) -> CoastReading | None:
-        """The distance and bearing to the nearest shore from the distance field of the
-        finest level that has one, with a name from the index: the nearest headland,
-        island or place within twice the distance (and at least a mile)."""
+    def coast_distance(self, pos: Position) -> tuple[float, float] | None:
+        """The distance in metres and the bearing toward the nearest shore, from the
+        distance field of the finest level that has one: the field's own read and its
+        gradient, microseconds, which the weather's hook reads every tick."""
         for lv in self.levels:
             if not lv.has(pos.lat_deg, pos.lon_deg):
                 continue
             found = lv.dist_at(pos.lat_deg, pos.lon_deg)
-            if found is None:
-                continue
-            distance_m, bearing_deg = found
-            name = None
-            fid = None
-            radius = max(2.0 * distance_m, units.NAUTICAL_MILE)
-            best = None
-            for f in self.nearby(pos, radius, LAND_KINDS):
-                b, d = bearing_and_distance(pos, f.position)
-                # prefer a name that lies the way the shore lies
-                off = abs(units.wrap_pi(math.radians(b - bearing_deg)))
-                score = d * (1.0 + off)
-                if best is None or score < best[0]:
-                    best = (score, f)
-            if best is not None:
-                name, fid = best[1].name, best[1].id
-            return CoastReading(distance_m, bearing_deg, name, fid)
+            if found is not None:
+                return found
         return None
+
+    def coast_at(self, pos: Position) -> CoastReading | None:
+        """The nearest shore with a name from the index: the nearest headland, island
+        or place within twice the distance (and at least a mile), preferring one that
+        lies the way the shore lies. Read when the log wants a name, not every tick."""
+        found = self.coast_distance(pos)
+        if found is None:
+            return None
+        distance_m, bearing_deg = found
+        name = None
+        fid = None
+        radius = max(2.0 * distance_m, units.NAUTICAL_MILE)
+        best = None
+        for f in self.nearby(pos, radius, LAND_KINDS):
+            b, d = bearing_and_distance(pos, f.position)
+            off = abs(units.wrap_pi(math.radians(b - bearing_deg)))
+            score = d * (1.0 + off)
+            if best is None or score < best[0]:
+                best = (score, f)
+        if best is not None:
+            name, fid = best[1].name, best[1].id
+        return CoastReading(distance_m, bearing_deg, name, fid)
 
     # -- features -------------------------------------------------------------------
 
@@ -817,7 +824,10 @@ class Chart:
         if f.kind == "light":
             if daylight != "day" and f.lit_in(year):
                 return "light"
-            return "mark" if daylight == "day" else None
+            # a tower not yet built is nothing; one built (lit or since put out) is a
+            # mark by day
+            built = f.lit and f.lit.get("from") is not None and year >= int(f.lit["from"])
+            return "mark" if daylight == "day" and built else None
         if f.kind in DANGER_KINDS:
             return "danger" if daylight == "day" else None
         if f.kind in LAND_KINDS:

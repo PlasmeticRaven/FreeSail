@@ -1,0 +1,56 @@
+# Falmouth and the Helford before the docks and the dredged channel (spec M5 §10; C §3.3,
+# §5.2; package 32). A period patch, hand-made and rasterised by tools/build_charts.py.
+#
+# What changed since 1805, verified in the study (C §3.3): Carrick Roads deep by nature, the
+# inner harbour and the Penryn river shallow and silting, and a three-hundred-foot dredged
+# channel to the docks only from about 1860; so the 1805 anchorage is the Roads and the
+# shore off St Mawes, not the modern inner harbour. Imray 1874 (pp. 88 to 89) describes the
+# docks as then building: two graving docks and a gridiron on the southern shore half a
+# mile from the town, an eastern breakwater of 1,400 feet completed and dredged to 22 feet,
+# a tidal harbour of 42 acres to be formed, and the channel to it to be dredged to 18 feet
+# at low water.
+#
+# The sheet. Mackenzie's Falmouth survey (1774 to 1775) is at the UKHO Archive, not online
+# (C §3.1). Dummer's manuscript of 1698, 'The harbour of Falmouth' (RMG P/34A(37),
+# https://www.rmg.co.uk/collections/archive/rmgc-object-541407), was seen at the museum's
+# display size (817 by 1,280 pixels): the Roads' shape before anyone touched them, no
+# sounding legible. The depths below rest on White 1835 and Imray 1874 as each says.
+
+region: channel-west
+name: falmouth-helford
+sheet: "Dummer 1698, 'The harbour of Falmouth' (RMG P/34A(37)), seen at the museum's display size for the shore's shape; Mackenzie's survey of 1774 to 1775 (UKHO Archive) not seen"
+source: "White 1835, 'Coast of England', pp. 26 to 27; Imray 1874, 'Plymouth to Land's End', pp. 88 to 91"
+units: fathoms
+datum: "low water of spring tides (the British practice, Mackenzie 1774; White and Imray give their depths at low water springs)"
+# Mean low water springs above the modern chart datum at Falmouth: 0.6 m from the modern
+# tide tables' MLWS there, from memory and unverified from the build network (C §7).
+datum_above_chart_datum_m: 0.6
+control_points:
+  - {name: "Pendennis Point", lat_deg: 50.1425, lon_deg: -5.0440, note: "rock head, unmoved"}
+  - {name: "St Anthony's Head", lat_deg: 50.1415, lon_deg: -5.0157, note: "rock head, unmoved"}
+  - {name: "the Black Rock", lat_deg: 50.1402, lon_deg: -5.0302, note: "drying rock, unmoved"}
+  - {name: "St Mawes castle", lat_deg: 50.1560, lon_deg: -5.0240, note: "castle, unmoved"}
+  - {name: "Trefusis Point", lat_deg: 50.1660, lon_deg: -5.0450, note: "point, unmoved"}
+  - {name: "Rosemullion Head", lat_deg: 50.1080, lon_deg: -5.0780, note: "rock head, unmoved"}
+patches:
+  - name: "the docks' ground, a foreshore before 1860"
+    kind: sea
+    depth: 1.5
+    polygon:
+      - [50.1562, -5.0592]
+      - [50.1562, -5.0500]
+      - [50.1518, -5.0500]
+      - [50.1518, -5.0592]
+    source: "Imray 1874, 'Plymouth to Land's End', pp. 88 to 89 (the docks then building on the southern shore of the harbour half a mile from the town, the ground made by their works); C §3.3"
+    note: "The quays and docks east of Pendennis returned to water. The depth is a judgement of a foreshore of a fathom and a half at low water springs between Pendennis' foot and the Narrows' channel, since no sounding of this shore was read from a sheet; the outline is the modern chart's."
+  - name: "the inner harbour off the town before the dredging"
+    kind: depth
+    depth: 2
+    polygon:
+      - [50.1600, -5.0660]
+      - [50.1600, -5.0565]
+      - [50.1565, -5.0560]
+      - [50.1540, -5.0600]
+      - [50.1540, -5.0680]
+    source: "Imray 1874, 'Plymouth to Land's End', p. 90: the channel to the anchorage off Falmouth is northward of the white buoy of the Narrows; in it the water gradually decreases from 3 fathoms at the entrance to one fathom at the town of Flushing"
+    note: "Imray's three fathoms at the entrance decreasing to one at Flushing, before the channel to the docks was dredged to eighteen feet: two fathoms across the reach off the town. Where the modern grid is deeper than this by more than the build's tolerance the tool prints the place, which is the dredging."

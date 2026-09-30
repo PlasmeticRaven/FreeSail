@@ -620,3 +620,59 @@ Truth 51's measure on the build machine with the suite running beside it, a thou
 - **The motion's words flicker.** A roll hovering about six degrees said "rolling" and "rolling easily" by turns every few minutes; the words now hold five minutes before the log says they changed (`MOTION_WORDS_HOLD_S`). The sea's words do not need it: the sea moves over hours.
 - **The head-sea factor in a smooth sea.** A smooth sea on the bow added a quarter of a per cent to the resistance and moved the loads at the seventh figure; the factor now counts the sea above a smooth one, so a scenario that keeps a smooth sea judges the same loads as one that keeps none.
 - **The squall's veer and the cross sea.** A squall's two-point veer, on top of a front's four, took the swell across the wind at the four-point threshold and the log said a confused sea for the squall's minutes and then the sea going down and getting up again; the threshold is five points, past a front's veer.
+
+## Milestone 5b: the geographic frame, the chart data, the queries and the lookout
+
+Package 32 (spec M5 §9 to §12, §17's first half, §30; the study `docs/design/ChartData.md`; the study `WeatherSystems.md` §1.4 for the sea breeze and the fog). The source of every constant, and whether the source was verified.
+
+### The constants and their sources
+
+| Constant | Value | Source | Verified |
+|---|---|---|---|
+| `geo.EARTH_RADIUS_M` | 6,366,707 m | the sphere on which a minute of arc is the nautical mile of 1852 m (`units.NAUTICAL_MILE`; the sun's `METRES_PER_DEGREE` is sixty of them); the WGS 84 mean radius is seven parts in ten thousand more | arithmetic |
+| `geo.LEAGUE_M` | 3 nautical miles | Falconer 1780, "League" | the reference text |
+| `geo.HORIZON_NM_PER_ROOT_METRE` | 2.08 | spec M5 §11 and C §5.5: d = 2.08 (√h_eye + √h_object) miles, heights in metres; Bowditch's 1.17 √h(feet) is 2.12 √h(m) | the spec's figure, kept |
+| `chart.AGROUND_HIGHEST_TIDE_M` | 7.0 m | the short-circuit's highest tide: Brest's spring range, about seven metres (T §1) | judgement from the study; package 34 pins it with the tide |
+| `chart.AGROUND_MARGIN_M` | 2.0 m | the heel and the sea, on top of the draught | judgement |
+| `chart.DANGER_SEEN_NM` | 3 miles | a rock or ledge above water made out by day | judgement |
+| `chart.NIGHT_LAND_NM` | 1 mile | a dark coast seen close aboard at night in clear weather | judgement |
+| `chart.TWILIGHT_FACTOR` | 0.5 | marks seen at half the day's range in twilight | judgement |
+| `chart.DEFAULT_HEIGHT_M` | by kind | heights for the horizon where a feature gives none | judgement |
+| `lookout.DEFAULT_HEIGHT_OF_EYE_M` | 30 m | a frigate's topmast head, for a ship without a rig | judgement |
+| `lookout.LOOKOUT_REPEAT_MIN` | 30 minutes | a feature lost and found again is not hailed twice within it | judgement |
+| the lights' ranges (`features/channel-west.yaml`, `range_nm`) | St Agnes 15, the Lizard 20, the Eddystone 13, the Longships 12, the Stiff 20, Saint-Mathieu 15 | White 1835 p. 13 for St Agnes ("five leagues"); the rest from the elevation and the period lamp | St Agnes verified; the rest judgements |
+| `weather.SEA_BREEZE_MAX_KN` | 10 knots | W §1.4: "some 10 knots at most" (Simpson 1994, S11, not read) | the study's words |
+| `weather.SEA_BREEZE_MONTHS` | May to September | W §1.4: "a summer ... wind" | judgement on the study's word |
+| `weather.SEA_BREEZE_ONSET_H`, `_END_H` | 10:00, 20:00 | W §1.4: daylight, strongest in mid-afternoon, dying at dusk; the peak of the hump between them at 15:00 | judgement |
+| `weather.SEA_BREEZE_FULL_KM`, `_REACH_KM` | 5, 15 km | W §1.4: "felt a few miles to sea" | judgement |
+| `weather.SEA_BREEZE_GRADIENT_FREE_KN`, `_CAP_KN` | 5, 20 knots | the gradient wind that leaves the breeze alone and the one that overrides it | judgement (the study gives none) |
+| `weather.FOG_CHANCE_BY_MONTH` | 1.5% to 4% | W §1.4, S10: fog west of the UK in nearly 4% of observations June to August, under 2% December to February; the months between drawn through | the two figures from the study; the curve a judgement |
+| `weather.FOG_CONDITIONAL_FACTOR` | 6 | the observations' fog falls in the hours that meet the conditions, about a sixth of all hours | judgement |
+| `weather.FOG_COAST_KM`, `FOG_MAX_WIND_KN` | 30 km, 12 knots | W §1.4: "near the coasts", "a fresh wind lifts it to low cloud" | judgement |
+| the overrides' `datum_above_chart_datum_m` | 0.8 (Devonport), 0.6 (Falmouth), 0.7 (St Mary's), 1.0 (Brest) | mean low water springs above chart datum, from memory of the modern tide tables | unverified (C §7): the tables were not reachable |
+| `build_charts.BRASSE_M` | 1.624 m | C §3.3: five pieds du roi | unverified, and unused (Faden's translation is in fathoms) |
+| `build_charts.OVERRIDE_TOLERANCE_M` | 3 m | where a period depth and the modern grid disagree in open water by more, the tool prints the place | judgement |
+| the world level's unit and clip | 2 m, land clipped at 50 m | measured: 40 MB at one metre unclipped, 26 MB so | measured |
+
+### The chart data, measured
+
+The region `channel-west` (48 to 51 N, 7 to 3 W): level 2 at 3″, 80 tiles of 512 cells, 11.9 MB compressed (83.9 MB raw with the distance field); level 3 at 0.5″, 69 tiles in four harbour patches, 5.1 MB (72 MB raw); the coast 2,593 pieces of 19,901 points, 710 KB; the features 200 entries (headland 35, rock 42, island 22, anchorage 17, light 12, place 10, bottom 9, town 8, drying 7, castle 6, church 6, shoal 6, transit 6, ledge 5, bank 4, hill 2, beacon 1, mill 1, tower 1); the overrides 7 patches in 4 files. The region on disk: 17.8 MB, under the brief's 25. The world at level 0 (2.5′): 150 tiles (the three all land dropped), 26.5 MB in two-metre steps with the land clipped at fifty metres (40.4 MB at one metre unclipped, 28.3 at five metres, 26.1 clipped at two); the brief's "about 25". The Atlantic at level 1 is built by `--atlantic` and not committed. Horizontal differencing before the compression (TIFF's predictor 2, undone by a cumulative sum at load) took level 2 from 18.3 MB to 11.9 and level 3 from 10.3 to 5.1.
+
+The build on the build machine: the region in about a minute (the distance field over 21 million cells in 1.4 s by the chamfer transform with the in-row running minimum; the coast's 57,000 segments chained and simplified in 3.5 s); the world in about twelve minutes (the eight GEBCO tiles decimated strip by strip); the fetches 5 MB for the region's GEBCO extract, 62 MB for each EMODnet variable, 4.2 GB for GEBCO's global GeoTIFF zip (15 MB/s from CEDA).
+
+The queries on the build machine, alone: depth here 10 µs with the tile in the cache (5 to 20 ms the first time a tile is read); the grounding check 4 µs at sea (the short-circuit) and 33 µs inshore (the keel's three cells); the coast's distance and bearing 17 µs from the field; the named coast 0.4 ms (the index's search, read when the log wants a name and never every tick); a look from the masthead, once a minute, under a millisecond.
+
+### The pace, measured
+
+Truth 51's measure (a thousand ticks to settle, the best of three thousands) on the gate's day under systems given a position off Falmouth (49° 57′ N, 5° 00′ W) and the region, taken in one process beside the pinned day and the day under systems so that the machine's load falls on all three alike. With the sibling packages' suites running (a load of six to eight on the build machine's four cores): the pinned day 637 ticks a second, the day under systems 588, the day under systems with the region loaded 605. The region costs nothing the measure can see: the chart's cost a tick is the grounding check's short-circuit (a tile lookup) and, in the season and the hours of the sea breeze, the coast hook's field read from the weather's `surface_wind_at`, microseconds together, with the lookout once a minute. Alone, the earlier days measured 862 and 843 (package 31); the test asserts truth 51's floor of 500, which the loaded machine held at 605.
+
+### Found on the way (package 32)
+
+- **The study's "Imray 1848" is the 1874 edition.** The Internet Archive item's catalogue date is 1848; its title page reads 1874 and its variation note 1873. Cited as Imray 1874 throughout, and used as the study meant it, for the completeness of the dangers and transits; the period's words are White's and Faden's.
+- **EMODnet's per-cell shoalest sounding is the per-tile minimum.** The DTM's `elevation_max` (the shoalest value in each 1/16′ cell) is fetched beside the mean and gives each tile's minimum depth, so the short-circuit is conservative where a rock stands in a deep cell.
+- **A sea breeze in a calm.** `surface_wind_at` returned no wind at all under the exact centre of a high before the breeze was added; now a calm gradient gives the breeze alone.
+- **The lookout's first look is at the start.** `what is in sight` read nothing until the first minute struck; the World now asks the lookout once at tick 0, after the log's first line.
+- **A light not yet built is nothing by day.** St Anthony's lighthouse (1835) was in sight as a tower off Falmouth in 1805 until a light's `lit.from` was read for the tower too.
+- **The features' positions.** Two hundred positions from memory of the modern chart and the pilots' bearings were checked against the EMODnet coast and shoalest cells and 96 moved within the rule the features file states (most under 300 m; the largest 800 m for a headland's tip); eight sunken rocks the grid cannot resolve stand where the pilot puts them and say so. The lead's review is against the sources, not the grid.
+- **Crow Bar moved.** The tool's override check prints the one place a period depth and the modern grid disagree: White's three feet on Crow Bar against the modern grid's four to five metres, which is the sands moving as the study says they do.
+- **The scratchpad is shared.** The build's cache lives in the session's scratchpad, which the sibling packages' sessions share; the tool's own default cache is `.cache/charts/` under the repository, ignored by git.

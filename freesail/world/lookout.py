@@ -118,12 +118,13 @@ class Lookout:
                 continue
             self._announced[s.feature.id] = minute
             text = self.words(s, heading)
-            notable = s.seen_as == "danger" or (first_land and s.seen_as in ("land", "light"))
+            # a danger is notable; so is everything seen in the look that makes the landfall
+            notable = s.seen_as == "danger" or first_land
             data = s.to_dict() | {
                 "relative": relative_words(math.radians(s.bearing_deg) - heading),
                 "estimate": estimate_words(s.distance_m),
                 "height_of_eye_m": round(self.height_of_eye_m, 1),
-                "landfall": bool(first_land and s.seen_as in ("land", "light")),
+                "landfall": bool(first_land),
             }
             lines.append(
                 (Severity.NOTABLE if notable else Severity.ROUTINE, "lookout.sighting", text, data)
@@ -173,7 +174,8 @@ class Lookout:
 
     def land(self, heading_rad: float) -> dict[str, Any]:
         """`the land`: in sight or not, with the nearest land or light sighted."""
-        land = [s for s in self.sightings if s.seen_as in ("land", "light", "mark", "danger")]
+        # the land: the shore, its marks and its lights; a rock in sight is a danger, not land
+        land = [s for s in self.sightings if s.seen_as in ("land", "light", "mark")]
         if not land:
             return {"in_sight": False, "words": "not in sight", "nearest": None}
         nearest = min(land, key=lambda s: s.distance_m)
