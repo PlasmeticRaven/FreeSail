@@ -59,6 +59,18 @@ import yaml
 
 from freesail import units
 
+# Seconds since a fixed naive epoch. `datetime.timestamp()` is not used: on Windows it
+# raises OSError for any date before 1970, which is every date in this game (found at
+# gate 5a, 2026-09-30, by the owner: 35 tests failing on 1805's scenario). The epoch is
+# 1970 so that the values equal the Unix seconds the build machine (UTC) produced, and
+# the day's digest and every seeded noise key stand unchanged.
+_EPOCH = datetime(1970, 1, 1)
+
+
+def _seconds(when: datetime) -> float:
+    return (when - _EPOCH).total_seconds()
+
+
 __all__ = [
     "AIR_MASSES",
     "BACKGROUND_HPA",
@@ -593,7 +605,7 @@ class Glass:
         in the record. `pumping` is the seaway's factor on the noise (spec M5 §4,
         `physics.motion.Motion.pumping`): the mercury pumps by a hundredth or two in a
         seaway (W §3), never more than GLASS_PUMP_MAX_IN."""
-        minute = int(when.timestamp() // 60)
+        minute = int(_seconds(when) // 60)
         amplitude = min(GLASS_NOISE_IN * max(pumping, 1.0), GLASS_PUMP_MAX_IN)
         noise = (2.0 * _noise(self._seed, f"glass:{minute}") - 1.0) * amplitude
         value = round(inches(pressure_hpa) + noise, 2)
@@ -1051,7 +1063,7 @@ class Weather:
         with a little seeded noise by the hour so that two hours differ; and the pressure."""
         when = when or self.now
         sec = self.sector_at(x_km, y_km, when)
-        block = int(when.timestamp() // 3600) // SKY_NOISE_HOURS
+        block = int(_seconds(when) // 3600) // SKY_NOISE_HOURS
         n1 = _noise(self.seed, f"sky:{block}")
         n2 = _noise(self.seed, f"weather:{block}")
         jitter = 0.8 + 0.4 * n1  # the distance thresholds move by a fifth either way

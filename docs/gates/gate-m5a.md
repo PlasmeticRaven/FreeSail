@@ -2,6 +2,8 @@
 
 **Verdict:** pending.
 
+**Re-cut as `gate-m5a-2` (2026-09-30):** the owner's first run of this gate on Windows failed 27 tests and errored 8 more with `OSError: [Errno 22] Invalid argument`, one fault: package 30 turned the ship's dates into Unix timestamps for the glass's and the sky's seeded noise, which Windows refuses for any date before 1970, and every scenario in this game is dated 1805. The two calls now count seconds from a fixed naive epoch, so the values, the noise and the day's digest are unchanged on the build machine and the same on every platform. The `gate-m5a` release is superseded by `gate-m5a-2`; the items below are unchanged.
+
 **As cut:** package 30 (weather systems, the glass and the sky, the scenario's systems, the gate's day as a system), 30b (clearing a wreck, spare spars, the storm mizzen in the viewer, two result strings) and 31 (the sea and the ship's motion, windage under bare poles, the day under systems alone). Two items are carried from gate 4c and count for both: `--load` of a save with a station (item 8) and a watcher through Claude Code, which item 6 may be run with instead of the local runner. The report for this gate is your playtest, on the form in `docs/playtests/README.md`: the items below are the day to sail and what to look for; the form is what you write. Three rulings are asked of you (item 10).
 
 ## Headline
