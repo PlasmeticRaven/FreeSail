@@ -78,7 +78,7 @@ A cast is an observation. The master moves his account onto the nearest point of
 
 ## Bearings and the landfall
 
-When the lookout raises the land, a bearing of a mark of the chart is a line of position, and the master puts his account on it. Two bearings cross to a point; a transit of the chart's two marks in one is exact. Name the mark as the lookout named it, or say the land for the nearest land in sight (at night, the nearest light):
+When the lookout raises the land, a bearing of a mark of the chart is a line of position, and the master puts his account on it, at the distance off he judges by eye. Two bearings cross to a point; a transit of the chart's two marks in one is exact. Name the mark as the lookout named it, or say the land for the nearest land in sight (at night, the nearest light):
 
 ```orders frigate
 take a bearing of the Lizard
@@ -89,7 +89,7 @@ take a bearing of the land
   First dog watch (16:32)  The Lizard bore NNW, four leagues by estimation.
 ```
 
-The bearing is by compass, as he reads it, so it carries the compass's errors as the traverse does, and the distance is the lookout's estimate, never the truth. A mark not in sight is refused in words. The reading `the bearing of <mark>` gives the bearing of any mark in sight.
+The bearing is by compass, as he reads it, so it carries the compass's errors as the traverse does, and the distance is the master's estimate, a fifth out either way as such estimates are, never the truth. A mark not in sight is refused in words. The reading `the bearing of <mark>` gives the bearing of any mark in sight.
 
 The land itself, close aboard in thick weather before any headland is made out, is hailed as the land and counts as land in sight for the book, but it is no mark to take a bearing of.
 

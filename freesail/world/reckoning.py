@@ -128,6 +128,15 @@ LOG_LINE_SHORT_MAX = 0.08
 # inferred from one heave").
 LOG_READ_KN = 0.25
 LOG_READ_SIGMA_KN = 0.25
+# Before the first heave of a passage the master has no read and runs the account on
+# her way as he judges it by eye, to the knot, with a knot of doubt one sigma
+# (judgement: the departure taken with the sails still going up; the first heave comes
+# at the hour, and a two-hourly log would otherwise leave the account standing).
+SPEED_BY_EYE_SIGMA_KN = 1.0
+# Hove to and making no way, the log-board notes the time and the master runs no
+# distance for it; a ship hove to fore-reaches a knot or so, and one with more way on
+# than this by eye is sailing whatever her yards say (judgement).
+HOVE_TO_WAY_KN = 2.0
 # "It is usual to heave the log once every hour in ships of war and East-Indiamen; and in
 # all other vessels, once in two hours" (Falconer 1780, 'Log'; N §1). A ship of war is
 # known by her marines (the frigate's and the brig's ship files muster them; the
@@ -230,6 +239,12 @@ CONTOUR_TOLERANCE_DEEP_FATHOMS = 2.5
 # sigma; a transit exact to a cable (spec §13: "a transit is exact"; judgement).
 BEARING_SIGMA_DEG = 1.5
 TRANSIT_SIGMA_NM = 0.1
+# The distance off by estimation that goes with a bearing (spec §12's words, "twelve
+# miles by estimation"): the master's judgement of a headland's distance from its height
+# and what shows of it, a fifth of the distance one sigma either way, drawn each bearing
+# (judgement). It is a second line, along the bearing, so a bearing with its distance
+# lays the ship on the chart as the period's master did; a transit has none.
+DISTANCE_BY_ESTIMATION_FRACTION = 0.2
 
 # The master's day's work at noon occupies him below this long (judgement: the traverse
 # reduced from the log-board by the table and the sight worked, Falconer 1780,
@@ -555,13 +570,15 @@ class Reckoning:
         close_hauled: bool = False,
         heavy_sea: bool = False,
         leeway_doubt_rad: float = 0.0,
+        read_sigma_kn: float = LOG_READ_SIGMA_KN,
     ) -> tuple[float, float]:
         """The traverse for one interval: the run `speed_kn` for `hours` along the course
         the master lays down (`course_rad`, already corrected as he corrects it), with
         the helmsman's error drawn for the interval; the doubt grown by the random terms
-        (the read, the steering) and the biases (the set, the leeway when close-hauled).
-        Returns the miles east and north made by account."""
-        if hours <= 0.0:
+        (the read, `read_sigma_kn` an hour, and the steering) and the biases (the set,
+        the leeway when close-hauled). Returns the miles east and north made by account.
+        No hours at all (the whole interval hove to) still steps the board."""
+        if hours < 0.0:
             return 0.0, 0.0
         run = max(0.0, speed_kn) * hours
         course = course_rad + steer_error_rad
@@ -577,7 +594,7 @@ class Reckoning:
         steer_sigma = units.points_to_rad(
             STEERING_SIGMA_POINTS_SEAWAY if heavy_sea else STEERING_SIGMA_POINTS_SMOOTH
         )
-        s_along = LOG_READ_SIGMA_KN * hours
+        s_along = read_sigma_kn * hours
         s_across = run * steer_sigma
         c, s = math.cos(course), math.sin(course)
         # R diag(s_along², s_across²) Rᵀ with R the course's rotation (east, north)
@@ -680,6 +697,15 @@ class Reckoning:
         de, dn = self.offset_nm(mark)
         n_e, n_n = math.cos(bearing_rad), -math.sin(bearing_rad)
         return self.update_line(de, dn, n_e, n_n, sigma_nm)
+
+    def update_distance(
+        self, mark: Position, bearing_rad: float, distance_nm: float, sigma_nm: float
+    ) -> float:
+        """The distance off a mark by estimation, along the bearing: the line across the
+        bearing at that distance from the mark, its normal along the bearing."""
+        de, dn = self.offset_nm(mark)
+        n_e, n_n = math.sin(bearing_rad), math.cos(bearing_rad)
+        return self.update_line(de - distance_nm * n_e, dn - distance_nm * n_n, n_e, n_n, sigma_nm)
 
     def set_position(self, pos: Position, tick: int, sigma_nm: float = DEPARTURE_SIGMA_NM) -> None:
         """The captain's override, or a departure: the account set to a point with a
@@ -878,6 +904,7 @@ class Navigation:
         self._n = 0
         self._leeway_sum = 0.0
         self._close_hauled_n = 0
+        self._hove_to_n = 0  # the ticks hove to since the last step: no run on the board
         self._sea_heavy = False
 
     @property
@@ -913,6 +940,10 @@ class Navigation:
             self._leeway_sum += float(dyn.leeway)
         if self._close_hauled_now():
             self._close_hauled_n += 1
+        if "hove_to" in (getattr(ship, "extra", None) or {}) and (
+            units.ms_to_knots(_speed_through_water(ship)) < HOVE_TO_WAY_KN
+        ):
+            self._hove_to_n += 1
         line = self.master.tick(world.clock.tick)
         if line:
             world.record(Severity.ROUTINE, "master.place", line, data=self.master.to_dict())
@@ -951,9 +982,12 @@ class Navigation:
         r = self.reckoning
         tick = self.world.clock.tick
         hours = (tick - r.last_step_tick) / 3600.0
-        read = self.last_log_read_kn or 0.0
+        read = self.last_log_read_kn
+        if read is None:
+            read = self._speed_by_eye_kn()
         if hours <= 0.0 or self._n == 0 or read <= 0.0:
             return r.position
+        hours = self._hours_under_way(hours)
         heading = math.atan2(self._hx, self._hy) % units.TWO_PI
         course = heading + self.errors.course_error_rad(heading)
         if self._close_hauled_n * 2 > self._n:
@@ -981,6 +1015,7 @@ class Navigation:
         hours = (tick - self.reckoning.last_step_tick) / 3600.0
         if hours <= 0.0 or self._n == 0:
             return 0.0, 0.0
+        hours = self._hours_under_way(hours)
         heading = math.atan2(self._hx, self._hy) % units.TWO_PI
         close_hauled = self._close_hauled_n * 2 > self._n
         leeway_allowed = 0.0
@@ -991,8 +1026,9 @@ class Navigation:
             )
         course = heading + leeway_allowed + self.errors.course_error_rad(heading)
         read = self.last_log_read_kn if speed_kn is None else speed_kn
+        read_sigma = LOG_READ_SIGMA_KN
         if read is None:
-            read = 0.0
+            read, read_sigma = self._speed_by_eye_kn(), SPEED_BY_EYE_SIGMA_KN
         heavy = self._heavy_sea()
         steer = self.stream.gauss(
             0.0,
@@ -1009,12 +1045,27 @@ class Navigation:
             close_hauled=close_hauled,
             heavy_sea=heavy,
             leeway_doubt_rad=units.points_to_rad(LEEWAY_DOUBT_POINTS),
+            read_sigma_kn=read_sigma,
         )
         self._hx = self._hy = 0.0
         self._n = 0
         self._leeway_sum = 0.0
         self._close_hauled_n = 0
+        self._hove_to_n = 0
         return made
+
+    def _hours_under_way(self, hours: float) -> float:
+        """The interval's hours less those hove to and making no way, which the
+        log-board notes and the master runs no distance for (her drift hove to is the
+        set he does not know)."""
+        if self._n <= 0 or self._hove_to_n <= 0:
+            return hours
+        return hours * max(0.0, 1.0 - self._hove_to_n / self._n)
+
+    def _speed_by_eye_kn(self) -> float:
+        """Her way as the master judges it by eye before the log's first read: through
+        the water, to the knot (`SPEED_BY_EYE_SIGMA_KN`)."""
+        return float(round(units.ms_to_knots(_speed_through_water(self.world.ship))))
 
     # -- the log-line -------------------------------------------------------------------
 
@@ -1198,7 +1249,15 @@ class Navigation:
         self.bring_up()
         r = self.reckoning
         moved = r.update_bearing(found.feature.position, laid, _bearing_sigma_nm(found.distance_m))
-        estimate = estimate_words(found.distance_m)
+        # the distance off by estimation, the master's judgement of it, a second line
+        distance_nm = found.distance_m / units.NAUTICAL_MILE
+        judged_nm = max(
+            0.1, distance_nm * (1.0 + self.stream.gauss(0.0, DISTANCE_BY_ESTIMATION_FRACTION))
+        )
+        moved += r.update_distance(
+            found.feature.position, laid, judged_nm, DISTANCE_BY_ESTIMATION_FRACTION * judged_nm
+        )
+        estimate = estimate_words(judged_nm * units.NAUTICAL_MILE)
         record = Bearing(
             world.clock.tick,
             found.feature.id,

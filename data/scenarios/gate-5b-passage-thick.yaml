@@ -12,7 +12,8 @@
 #
 # The sky is pinned over the same high as the clear passage's (`weather: sky`, package
 # 33a: thick, fog, a mile), which the sector table would not give of itself over open
-# water (its fog is coastal, W §1.4); the wind is the same.
+# water (its fog is coastal, W §1.4, and lifts off Ushant by eight); the wind is the
+# same, and the clear passage pins its sky clear over the same high.
 
 name: The passage for gate 5b in thick weather, Ushant to Falmouth
 seed: 7

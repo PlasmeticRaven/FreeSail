@@ -2725,3 +2725,288 @@ def test_the_primers_chapter_nine_does_not_narrate_the_gates_day(gate_5a_day):
     said = set(re.findall(r"\((\d\d:\d\d)\)", text))
     assert said, "the chapter still shows the log's lines"
     assert not (said & moments), sorted(said & moments)
+
+
+# ---------------------------------------------------------------------------
+# Milestone 5b: the reckoning and the passage (package 33a; spec M5 §13, §19, §20)
+# ---------------------------------------------------------------------------
+#
+# The passage for gate 5b (data/scenarios/gate-5b-passage.yaml): Ushant to Falmouth in the
+# frigate at seed 7 on the pinned south-westerly, by the reckoning and the noon sight
+# alone; the same in the schooner (gate-5b-passage-schooner.yaml) and in thick weather
+# (gate-5b-passage-thick.yaml, the sky pinned, the landfall made wrong on purpose). Its
+# ticks, its lines and its digests are truth constants measured at seed 7
+# (docs/dev/TuningNotes.md, M5b, package 33a). The account against the truth at each
+# moment is printed by `py tools/day_log.py <scenario> --reckoning`.
+
+GATE_5B_PASSAGE = "data/scenarios/gate-5b-passage.yaml"
+GATE_5B_PASSAGE_SCHOONER = "data/scenarios/gate-5b-passage-schooner.yaml"
+GATE_5B_PASSAGE_THICK = "data/scenarios/gate-5b-passage-thick.yaml"
+GATE_5B_HOURS = 17  # 04:00 to 21:00: the Roads entered at half past eight in the evening
+GATE_5B_SCHOONER_HOURS = 14  # before she takes the ground (TuningNotes, found on the way)
+GATE_5B_THICK_HOURS = 16
+# Measured at seed 7 (package 33a): the noon sight at the sun's noon (11:59 by the clock,
+# a minute before twelve on the start meridian), the frigate brought to and the deep-sea
+# lead's fifty-two fathoms at 12:18, the Lizard raised at 16:32 (the Beast and the Lizard
+# lights at four leagues: the landfall), the course shaped for Falmouth from the account,
+# the lead going in, eleven fathoms off St Anthony's Head at 20:02 and the ship hove to
+# in the Roads; the account 2.5 miles from the truth at noon, 7.8 at the landfall, within
+# a mile at the Roads. The thick passage: no sight, the same cast, and the land about
+# Black Head close aboard at 19:12 with the account 11.8 miles off (she believed herself
+# off Falmouth). The schooner: the sight with the octant, the Lizard at 15:49.
+GATE_5B_NOON_TICK = 28740
+GATE_5B_CAST_TICK = 29928
+GATE_5B_LANDFALL_TICK = 45000
+GATE_5B_ROADS_TICK = 59495
+GATE_5B_LINES = 474
+GATE_5B_DIGEST = "c160c0ef4b83d899"
+GATE_5B_SCHOONER_LANDFALL_TICK = 42540
+GATE_5B_SCHOONER_LINES = 320
+GATE_5B_SCHOONER_DIGEST = "8b852e793dc2f70d"
+GATE_5B_THICK_LANDFALL_TICK = 54420
+GATE_5B_THICK_LINES = 339
+GATE_5B_THICK_DIGEST = "1d9de61e14be40ac"
+
+
+def the_landfall(log):
+    """The landfall of the passage: the land raised after the land of the departure was
+    lost (the lookout's first look off Ushant is a landfall too, at tick 0)."""
+    lost = [e.tick for e in log if e.kind == "lookout.lost"]
+    since = lost[0] if lost else 0
+    return [
+        e for e in log if e.kind == "lookout.sighting" and e.data.get("landfall") and e.tick > since
+    ]
+
+
+def the_passage(path: str, hours: int, ship: str | None = None):
+    """A passage of gate 5b run for its hours, with the account beside the truth at each
+    notable moment: [(tick, kind, text, truth, account)]."""
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario(path)
+    world = make_scenario_world(sf, ship=ship)
+    moments: list[tuple] = []
+
+    def watch(e) -> None:
+        landfall = e.kind == "lookout.sighting" and e.data.get("landfall")
+        if e.kind in ("reckoning.noon", "sounding", "bearing.taken") or landfall:
+            nav = world.navigation
+            moments.append(
+                (
+                    "landfall" if landfall else e.kind,
+                    e.tick,
+                    e.text,
+                    world.position,
+                    nav.account_now(),
+                )
+            )
+
+    world.log.subscribe(watch)
+    begin(world, sf)
+    run(world, hours * 3600)
+    world.log.unsubscribe(watch)
+    return world, moments
+
+
+@pytest.fixture(scope="module")
+def gate_5b_passage():
+    return the_passage(GATE_5B_PASSAGE, GATE_5B_HOURS)
+
+
+def _miles(a, b) -> float:
+    from freesail.world.geo import bearing_and_distance
+
+    return bearing_and_distance(a, b)[1] / units.NAUTICAL_MILE
+
+
+def test_truth_58_four_days_of_thick_weather_leave_the_ellipse_lying_east_and_west():
+    """Spec M5 §19, truth 58: "Four days from Finisterre in thick weather without a sight,
+    the reckoning's ellipse is 30 to 50 miles long east and west and under ten north and
+    south, and a clear noon collapses the north-south axis to under five." The traverse
+    fed a day's run of 150 miles at six knots and a quarter for four days, the wind
+    free, on the course from Finisterre for the Channel (north-north-east) and on the
+    Channel's own (east): the ellipse's length is twice its standard deviation
+    (`Reckoning.ellipse`, `uncertainty_words`); N §3's 30 to 50 miles, Chan et al.'s
+    figures an upper bound and not a target."""
+    from freesail.world import reckoning as K
+    from freesail.world.geo import Position
+
+    for course_deg in (22.5, 90.0):
+        r = K.Reckoning(Position(43.0, -9.3), sigma_nm=1.0)
+        by_day = {}
+        for h in range(96):
+            r.advance(1.0, math.radians(course_deg), 6.25, (h + 1) * 3600)
+            if (h + 1) % 24 == 0:
+                by_day[(h + 1) // 24] = r.ellipse()
+        e = by_day[4]
+        assert 30.0 <= 2 * e["sigma_east_nm"] <= 50.0, (course_deg, e)
+        assert 2 * e["sigma_north_nm"] < 10.0, (course_deg, e)
+        assert 60.0 < e["major_bearing_deg"] < 120.0  # lying east and west
+        # the biases grow in a straight line: two days about twice one, four about four
+        assert 1.8 < by_day[2]["sigma_east_nm"] / by_day[1]["sigma_east_nm"] < 2.2
+        assert 3.5 < by_day[4]["sigma_east_nm"] / by_day[1]["sigma_east_nm"] < 4.2
+        words = r.uncertainty_words
+        assert (
+            words.startswith("I would not trust the reckoning within ")
+            and "miles east or west" in words
+        )
+        # a clear noon with a good horizon and the sextant: two miles or so
+        r.update_latitude(r.lat_deg + 0.1, 2.0)
+        e = r.ellipse()
+        assert 2 * e["sigma_north_nm"] < 5.0 and 30.0 <= 2 * e["sigma_east_nm"] <= 50.0
+
+
+def test_truth_59_a_cast_of_the_deep_sea_lead_moves_the_reckoning_onto_the_contour():
+    """Spec M5 §19, truth 59: "A cast of the deep-sea lead in the Channel Soundings moves
+    the reckoning onto the chart's contour consistent with the ground and narrows it
+    across the contour to a few miles, leaving it along the contour as it was." The
+    frigate in forty-six fathoms south of the Lizard with the account set nineteen
+    miles off in the shoal water under the Manacles, eight miles in doubt."""
+    from freesail.world import reckoning as K
+    from freesail.world.geo import Position
+
+    sc = Scenario(
+        start_time=datetime(1805, 6, 10, 10, 0),
+        wind_from_deg=225.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=0.0,
+        position={"lat_deg": 49.70, "lon_deg": -5.20},
+        region=CHART_REGION,
+    )
+    world = make_world(SEED, FRIGATE, sc)
+    r = world.navigation.reckoning
+    wrong = Position(50.0, -5.10)
+    r.set_position(wrong, 0, sigma_nm=8.0)
+    before = r.ellipse()
+    world.submit("heave the deep-sea lead")
+    run(world, 20 * 60)
+    cast = [e for e in world.log if e.kind == "sounding"][-1]
+    assert cast.text.endswith("; fine grey sand with black specks.") and cast.data["matched"]
+    assert abs(world.chart.depth_at(r.position) - cast.data["depth_m"]) <= units.fathoms_to_m(
+        K.CONTOUR_TOLERANCE_DEEP_FATHOMS
+    )
+    assert _miles(r.position, world.position) < _miles(wrong, world.position)
+    after = r.ellipse()
+    assert after["semi_minor_nm"] <= K.SOUNDING_ACROSS_SIGMA_NM + 0.01  # a few miles across
+    assert after["semi_major_nm"] > 0.8 * before["semi_major_nm"]  # along it as it was
+    assert "by account" in world.readings.words("reckoning")
+
+
+def test_the_passage_for_gate_5b_at_seed_7_has_its_own_constants(gate_5b_passage):
+    """The frigate's passage Ushant to Falmouth (spec M5 §20): the departure bearing off
+    the Stiff, the log hove hourly, the noon sight, the Channel Soundings by the deep-sea
+    lead with the ship brought to, the Lizard raised and bearings taken, the course for
+    Falmouth shaped from the account, the lead going in and the ship hove to in the
+    Roads; the account against the truth at each; the lines and the digest."""
+    world, moments = gate_5b_passage
+    log = world.log
+    noon = [e for e in log if e.kind == "reckoning.noon"]
+    assert [e.tick for e in noon] == [GATE_5B_NOON_TICK]
+    assert noon[0].text.startswith("Noon. Latitude by observation ")
+    assert noon[0].data["sight"]["instrument"] == "sextant"
+    heaves = [e for e in log if e.kind == "log.read"]
+    assert len(heaves) >= GATE_5B_HOURS - 2 and all(e.data["automatic"] for e in heaves[:3])
+    casts = [e for e in log if e.kind == "sounding"]
+    assert casts[0].tick == GATE_5B_CAST_TICK and casts[0].data["deep"]
+    assert casts[0].text == "Fifty-three fathoms; fine grey sand with black specks."
+    assert [e.tick for e in log if e.kind == "ship.hove_to"] == [28796, 59552]
+    landfall = the_landfall(log)
+    assert landfall[0].tick == GATE_5B_LANDFALL_TICK and landfall[0].data["id"] == "the-beast"
+    bearings = [e for e in log if e.kind == "bearing.taken"]
+    assert bearings[0].tick == 0 and bearings[0].data["id"] == "stiff-light"  # the departure
+    assert any(e.data["id"] == "the-beast" for e in bearings)
+    courses = [e for e in log if e.kind == "helm.set"]
+    assert any(e.text.startswith("Shaped a course for Falmouth") for e in courses)
+    roads = [e for e in log if e.actor == "standing order 'the Roads'"]
+    assert roads and roads[0].tick == GATE_5B_ROADS_TICK
+    # the account against the truth (the author's view: the truth is in the world and
+    # the tests only)
+    by_kind = {}
+    for kind, tick, _text, truth, account in moments:
+        by_kind.setdefault(kind, []).append((tick, _miles(truth, account)))
+    assert by_kind["reckoning.noon"][0][1] < 6.0  # the longitude by account, the day's run
+    assert 5.0 < by_kind["landfall"][-1][1] < 12.0  # made by the reckoning, corrected by the land
+    final = [m for m in moments if m[0] == "bearing.taken"][-1]
+    assert _miles(final[3], final[4]) < 2.0  # in the Roads, within a mile or two
+    assert len(log) == GATE_5B_LINES and log.digest()[:16] == GATE_5B_DIGEST
+
+
+def test_the_pace_on_the_passage_holds_truth_51s_floor(gate_5b_passage):
+    """Spec M5 §30 and package 33a: the queries and the reckoning per tick on the
+    passage (the traverse board every tick, the grounding check, the lookout once a
+    minute, the log hourly): the best of three thousands at least BUILD_MACHINE_FLOOR.
+    Measured on the build machine: docs/dev/TuningNotes.md, M5b, package 33a."""
+    import time
+
+    world, _ = gate_5b_passage
+    best = 0.0
+    for _ in range(3):
+        t0 = time.perf_counter()
+        world.run(1000)
+        best = max(best, 1000 / (time.perf_counter() - t0))
+    assert best >= BUILD_MACHINE_FLOOR, f"{best:.0f} ticks a second"
+
+
+def test_the_passage_in_thick_weather_makes_its_landfall_wrong_on_the_reckoning():
+    """Spec M5 §20: the same passage with the sky pinned thick, no sight at noon, the
+    course for Falmouth shaped by account when the run since noon says she is off the
+    Lizard, and the land raised close aboard where the reckoning's errors put her, some
+    twelve miles from where she believed herself; the ellipse read at noon and at the
+    landfall."""
+    world, moments = the_passage(GATE_5B_PASSAGE_THICK, GATE_5B_THICK_HOURS)
+    log = world.log
+    noon = [e for e in log if e.kind == "reckoning.noon"][0]
+    assert (
+        noon.tick == GATE_5B_NOON_TICK and "No sight; the sun was hid at noon in fog" in noon.text
+    )
+    assert world.readings.words("latitude_by_observation").startswith("No sight today;")
+    landfall = the_landfall(log)
+    assert landfall[0].tick == GATE_5B_THICK_LANDFALL_TICK
+    assert landfall[0].text.startswith("The land about Black Head close aboard")
+    assert [e for e in log if e.kind == "ship.hove_to"][-1].tick > landfall[0].tick
+    kinds = {m[0]: m for m in moments}
+    tick, _, _, truth, account = kinds["landfall"]
+    assert 8.0 < _miles(truth, account) < 16.0  # the landfall made wrong
+    assert account.lat_deg > truth.lat_deg  # she believed herself further on
+    e = world.navigation.reckoning.ellipse()
+    assert 2.0 < e["sigma_east_nm"] < 6.0 and 1.0 < e["sigma_north_nm"] < 6.0
+    assert len(log) == GATE_5B_THICK_LINES and log.digest()[:16] == GATE_5B_THICK_DIGEST
+
+
+def test_the_schooner_sails_the_passage_with_her_octant_and_the_log_every_two_hours():
+    world, moments = the_passage(GATE_5B_PASSAGE_SCHOONER, GATE_5B_SCHOONER_HOURS)
+    log = world.log
+    assert world.navigation.log_interval_h == 2
+    heaves = [e for e in log if e.kind == "log.read" and e.data["automatic"]]
+    assert [e.ship_time.hour for e in heaves[:3]] == [6, 8, 10]
+    noon = [e for e in log if e.kind == "reckoning.noon"][0]
+    assert noon.tick == GATE_5B_NOON_TICK and noon.data["sight"]["instrument"] == "octant"
+    landfall = the_landfall(log)
+    assert landfall[0].tick == GATE_5B_SCHOONER_LANDFALL_TICK
+    assert landfall[0].data["id"] == "lizard-point"
+    assert len(log) == GATE_5B_SCHOONER_LINES and log.digest()[:16] == GATE_5B_SCHOONER_DIGEST
+
+
+@pytest.mark.parametrize("ship", ["data/ships/cutter.yaml", "data/ships/brig.yaml"])
+def test_the_cutter_and_the_brig_sail_through_the_same_orders(ship):
+    """Spec M5 §20: the cutter and the brig through the passage's orders, a short leg
+    each: the log hove at their interval, the departure bearing taken, no navigation
+    order refused, the account within a few miles of the truth after six hours."""
+    world, moments = the_passage(GATE_5B_PASSAGE_SCHOONER, 6, ship=ship)
+    log = world.log
+    nav = world.navigation
+    assert nav.log_interval_h == (1 if "brig" in ship else 2)
+    heaves = [e for e in log if e.kind == "log.read"]
+    assert len(heaves) >= (5 if "brig" in ship else 2)
+    assert any(e.kind == "bearing.taken" and e.tick == 0 for e in log)
+    refused = [
+        e
+        for e in log
+        if e.kind == "order.rejected"
+        and any(w in e.data["order"] for w in ("bearing", "log", "lead", "reckoning", "course"))
+    ]
+    assert refused == [], [e.text for e in refused]
+    assert _miles(world.position, nav.account_now()) < 8.0
+    assert nav.master.name.startswith("Mr ")

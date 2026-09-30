@@ -2,14 +2,15 @@
 #
 # Ushant to Falmouth in the frigate, by the reckoning and the noon sight alone: no
 # chronometer, no lunar, no tide (33b's and 34's). She takes her departure off the Stiff
-# at four in the morning of 10 June 1805, two miles and a half north of the light in
-# the dawn twilight (the light still showing), and stands north for the Lizard under
-# plain sail (the Lizard bears a little west of north from Ushant); the log is hove hourly, the noon
-# latitude taken with the sextant, the Channel Soundings struck with the deep-sea lead
-# in the afternoon (she is brought to for it), the Lizard sighted and bearings taken,
-# a course shaped for Falmouth from the reckoning, and the lead going every glass as
-# she runs in to the Roads, where she heaves to in twelve fathoms (anchoring is
-# package 34's; the gate ends at the Roads). Given to either driver with --scenario:
+# at four in the morning of 10 June 1805, a mile and a half north of the tower (the sun
+# is up at four at this latitude in June; the tower is a mark by day), and stands north
+# for the Lizard under plain sail (the Lizard bears a little west of north from Ushant);
+# the log is hove hourly, the noon latitude taken with the sextant, the Channel
+# Soundings struck with the deep-sea lead in the afternoon (she is brought to for it),
+# the Lizard sighted and bearings taken, a course shaped for Falmouth from the
+# reckoning, and the lead going every glass as she runs in to the Roads, where she
+# heaves to in twelve fathoms (anchoring is package 34's; the gate ends at the Roads).
+# Given to either driver with --scenario:
 #     py -m freesail.ui.server --scenario data/scenarios/gate-5b-passage.yaml --watcher fake
 #     py -m freesail.ui.console --scenario data/scenarios/gate-5b-passage.yaml
 # and printed whole, with the account against the truth, by
@@ -17,12 +18,15 @@
 #
 # The day's weather is pinned (spec §20: "expected numbers from seed 7 and the day's
 # weather pinned"): a south-westerly of fifteen knots backing a little through the day,
-# so that the passage is the same on every machine and the sky, from the old high over
-# Biscay, lets the sun through at noon; the climatology's weather at seed 7 was not used
-# because a seeded low could hide the sun or the land on any given run, and the gate
-# wants the sight and the landfall both had on this passage and both refused on the
-# thick one (gate-5b-passage-thick.yaml). The sea and the motion are kept under the
-# pinned wind (`sea: true`), so the horizon's error at noon reads the sea. The reckoning
+# and the sky pinned clear over the old high over Biscay (`weather: sky`), so that the
+# passage is the same on every machine, the departure bearing is had and the sun is
+# seen at noon. The high alone lays coastal fog off Ushant from dusk to eight in the
+# morning (W §1.4, the sector table), which refused the departure bearing; the
+# climatology's weather at seed 7 was not used because a seeded low could hide the sun
+# or the land on any given run, and the gate wants the sight and the landfall both had
+# on this passage and both refused on the thick one (gate-5b-passage-thick.yaml). The
+# sea and the motion are kept under the pinned wind (`sea: true`), so the horizon's
+# error at noon reads the sea. The reckoning
 # errors are seed 7's draws (`freesail/world/reckoning.py`); the numbers measured are in
 # docs/dev/TuningNotes.md, M5b (package 33a), and the tests pin the passage's constants
 # (tests/test_known_truths.py, "the passage for gate 5b").
@@ -55,6 +59,7 @@ weather:
       track:
         - {at: 1805-06-09T12:00, x_km: 300, y_km: -500, hpa: 1024}
         - {at: 1805-06-11T12:00, x_km: 500, y_km: -600, hpa: 1022}
+  sky: {sky: clear, weather: fine, visibility: the horizon}
   sea: true
 
 standing_orders:
