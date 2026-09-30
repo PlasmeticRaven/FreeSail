@@ -63,7 +63,7 @@ from freesail.core.rng import Rng
 from freesail.core.world import Scenario, World
 from freesail.crew import muster
 from freesail.crew.routine import Routine
-from freesail.evolutions.trim import wanted_sheet_angle
+from freesail.evolutions.trim import set_sheet_angle, wanted_sheet_angle
 from freesail.orders.errors import OrderError
 from freesail.ship.graph import Ship
 from freesail.ship.loader import load_spec
@@ -209,8 +209,9 @@ def make_ship(which: str, preset: str, tack: str) -> Ship:
         sail = ship.sails[sail_id]
         sail.state = SailState.SET
         if sail.is_fore_and_aft:
-            # as setting the sail does: the sheet trimmed to the apparent wind
-            sail.sheet_angle = wanted_sheet_angle(sail.cls, ship.dyn.apparent_wind_angle)
+            # as setting the sail does: the sheet worked to the trim for the apparent wind
+            # (package 32e: the sheet holds the trim)
+            set_sheet_angle(ship, sail, wanted_sheet_angle(sail.cls, ship.dyn.apparent_wind_angle))
     for yard in ship.spars.values():
         if yard.is_yard:
             yard.brace_angle = sign * yard.brace_limit

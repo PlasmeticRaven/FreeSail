@@ -58,6 +58,16 @@ standing order "keep her full": when the apparent wind is forward of 55 degrees 
 # the new angle (orders/verbs.py).
 standing order "trim on a shift": when the true wind veers 1 point or backs 1 point then trim sails
 
+# Tending the sheets. Since package 32e the sheet holds the trim (spec M5 open item 13):
+# a jib's or a spanker's sheet stays where it was worked until hands work it again, so
+# the afterguard's routine of tending the fore-and-aft sheets to the wind is the book's,
+# every glass (the half-hour the sand runs), as sounding the well is; "trim on a shift"
+# above tends them with the yards when the wind shifts a point. A sheet within a degree
+# of its trim stands, and the line says so; a ship whose hands are all aloft has sheets
+# that are not tended, which is true. Luce 1866, ch. XXIV, 'Tacking': "trim aft the
+# sheets"; the cadence is judgement.
+standing order "tend the sheets": every glass then trim the sheets
+
 # Heavy weather. Forty knots is a gale (units.describe_wind_strength); in 45 knots the
 # storm canvas of truth 28 has the topgallant masts sent down, the storm staysails bent and
 # the topsails close-reefed, and nothing carries away in an hour. Five minutes is the

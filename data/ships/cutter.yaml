@@ -37,11 +37,12 @@ hull:
   hull_speed_kn: 9.5
   # The deck about 3 ft above the water (judgement: a low-sided vessel, as the schooner).
   deck_height_m: 0.9
-  # A deep narrow blade, about 9 ft by 1 ft 6 in (judgement).
+  # A deep narrow blade, about 9 ft by 1 ft 6 in (judgement; span_m its depth, 9 ft; package 32e).
   rudder:
     area_m2: 1.2
     max_angle_deg: 35
     rate_deg_s: 5.0
+    span_m: 2.7
 spars:
 # the mast (Steel calls a cutter's her main mast): 61 ft heel to head, hounded 49 ft (Fincham 1843 p. 67, the second revenue cruiser: 2.6 x the breadth) with a head 0.23 of that, 53 ft above the deck; stepped 0.269 x the breadth below the water-line (Fincham); raking 5.2 deg, 13 in in 12 ft (Fincham; Steel: 1.5 in to the yard); stationed 0.101 of the water-line before the middle (Fincham). Provisional (truth 9), see gen_ships.py. Rating: square_sail, topsail, topgallant, main.sail, main.gaff_topsail, fore.staysail in 55 kn -> 202.4 kN.
 - id: main.mast
@@ -69,12 +70,13 @@ spars:
   length_m: 9.2
   height_m: 11.9
   rating_kn: 44.1
-# boom 47 ft, 0.87 of the length on deck (Fincham p. 67), far over the counter: the clew of a cutter's mainsail lies 0.2 to 0.3 of the water-line abaft the post (Fincham art. 86); 5 ft above the deck (judgement). Rating: the sails named in the script in 45 kn -> 44.1 kN (the engine's graph loads nothing on it).
+# boom 47 ft, 0.87 of the length on deck (Fincham p. 67), far over the counter: the clew of a cutter's mainsail lies 0.2 to 0.3 of the water-line abaft the post (Fincham art. 86); 5 ft above the deck (judgement); horse_m is the horse across the stern for the sheet to travel on (Steel 1794 vol. I, p. 167, HORSE: 'a thick iron rod, fastened at the ends to the inside of the stern of vessels that carry a fore and aft mainsail, for the main sheet to travel on'), half the beam (judgement: the inside breadth of the stern); the sheet's geometry reads it (evolutions/trim.py). Rating: the sails named in the script in 45 kn -> 44.1 kN (the engine's graph loads nothing on it).
 - id: main.boom
   class: boom
   'on': main.mast
   length_m: 14.5
   height_m: 1.5
+  horse_m: 2.9
   rating_kn: 44.1
 # square-sail yard 46 ft, 0.84 of the length on deck (Fincham p. 67; Steel's 'cross-jack' yard of a one-masted vessel), hoisted from the deck by its halyard to the doubling under the cap, above the gaff's peak (Fincham art. 89). The type set this sail flying, the yard sent up with it and struck when it came in; the file crosses it, as a yard the engine can hoist and brace, since a yard sent up and down with its sail is not a thing the runner has (the schooner's own bare fore yard, spec M0 to M2 §12 item 7, is the same question left open). Braces 58 deg from square, as the schooner's topsail yard: a long yard, 2.4 breadths, against a cutter's few shrouds (judgement, spec 3b §2.1). Provisional (truth 9), see gen_ships.py. Rating: square_sail in 22 kn -> 9.1 kN.
 - id: square_sail.yard
@@ -405,6 +407,7 @@ lines:
   class: sheet
   of: main.sail
   rating_kn: 56.9
+  parts: 3
 - id: main.sail.outhaul
   class: outhaul
   of: main.sail
@@ -517,6 +520,7 @@ lines:
   class: sheet
   of: storm_trysail
   rating_kn: 56.9
+  parts: 3
 - id: storm_trysail.outhaul
   class: outhaul
   of: storm_trysail

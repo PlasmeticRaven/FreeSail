@@ -1,15 +1,26 @@
 # Tack ship (spec §8.5, scripted). The script in freesail/evolutions/scripts.py
-# gives the helm and the braces their orders on a timeline and watches the
+# gives the helm, the braces and the sheets their orders on a timeline and watches the
 # ship's head against the wind:
-#   "Helm's a-lee"        the helm is ordered twelve points round, through the wind
+#   "Helm's a-lee"        the helm is ordered twelve points round, through the wind; the
+#                         head sheets let fly, the spanker (or main) sheet hauled aft
 #   "Mainsail haul"       within a point of the wind, the after yards swing (brace_s)
-#   "Let go and haul"     head through the wind, the head yards swing (brace_s)
-#   steady on the new close-hauled course: ship.tacked.
-# She misses stays if her way falls below min_speed_kn, or she hangs longer
-# than stays_timeout_s, before her head comes through; then the yards are
-# squared for a wear and the helm put up.
-# A frigate in a working breeze takes five to ten minutes from "ready about"
-# to steady on the new tack; the turn itself is the physics' to make.
+#   "Let go and haul"     head through the wind, the head yards swing (brace_s); the head
+#                         sheets drawn on the new tack
+#   steady on the new close-hauled course, the sheets trimmed: ship.tacked.
+# Package 32e (spec M5 open item 12): the miss-stays rule reads the vessel. Her way is
+# gone when she makes less than way_gone_fraction of her speed at "helm's a-lee" or
+# fewer than way_gone_lengths_per_min of her lengths a minute, whichever is the more.
+# Way gone with her head more than a point off the wind is a plain miss; within a point
+# she hangs in stays and is given Luce's recovery (the helm kept a-lee and shifted with
+# sternway, the head yards aback, the head sheets held to windward, the boom hauled over
+# to windward), and only when she has fallen back two points on the old tack, or hung
+# stays_timeout_s from the moment her way went, has she missed stays. Missed stays: the
+# yards are squared as a brace with hands and time (brace_s), the head sheets flattened
+# in, the spanker sheet eased off and the helm put up as an order.
+# A frigate in a working breeze takes five to ten minutes from "ready about" to steady
+# on the new tack; a topsail schooner about two and a half, a cutter a minute and a
+# half, a brig as the frigate (docs/dev/TuningNotes.md, package 32e); the turn itself is
+# the physics' to make.
 id: tack
 verb: tack
 applies_to: {class: ship}
@@ -18,20 +29,32 @@ preconditions:
   - {check: dyn.speed >= knots(2), reason: "She has not way enough on her to stay: {speed} through the water."}
   - {check: close_hauled(), reason: "She is not close-hauled; bring her by the wind before going about."}
 timing:
-  brace_s: 45            # to swing the after yards, and again the head yards
-  stays_timeout_s: 180   # longer than this without coming through and she has missed stays
-  min_speed_kn: 0.8      # below this before coming through and she has missed stays
+  brace_s: 45            # to swing the after yards, and again the head yards; and to square them on a miss
+  stays_timeout_s: 180   # hung in stays this long from the moment her way went, and she has missed stays
+                         # (package 32e: counted from way gone, not from "helm's a-lee")
+  hang_after_s: 5        # her way is gone once she has made less than the rule below for this long:
+                         # the dip as she comes head to wind is the ordinary tack (judgement; at
+                         # fifteen the frigate in six knots of wind, her head two points short
+                         # of it when her way went, counted as hung and was boxed through,
+                         # where truth 10 has her miss: package 32e)
+  way_gone_fraction: 0.25       # her way is gone under this fraction of her speed at "helm's a-lee"
+  way_gone_lengths_per_min: 1.0 # or under one of her lengths a minute (the frigate 1.4 kn, the schooner
+                                # 0.8, the cutter 0.5, the brig 0.9), whichever is the more; judgement:
+                                # no period source gives the way a ship must keep to stay, and a hull
+                                # moving under a length a minute has no steerage-way (package 32e)
   steady_deg: 5          # within this of the new course counts as steady
   steady_timeout_s: 300  # or after this long on the new course order (package 10: at 120 s
                          # the frigate was called tacked while still gathering way nine
                          # degrees off her course; she is steady in about five and a half)
 on_start: {log: "All hands about ship."}
 on_complete: {log: "Tacked; braced up on the {new_tack} tack, heading {new_course}.", kind: ship.tacked, severity: notable}
-on_fail: {log: "Missed stays: {reason}. Squared the yards and fell off on the {old_tack} tack.", kind: ship.missed_stays, severity: urgent}
+# The urgent "Missed stays" line is the script's, at the moment she has (kind
+# ship.missed_stays); this line comes when the yards are square and she has fallen off.
+on_fail: {log: "Squared the yards; she fell off on the {old_tack} tack, to try again or to wear.", kind: ship.fell_off, severity: notable}
 # crew (package 19): checked; "Tacking and wearing: weather main-topsail and upper
 # braces" is in every topman's billet: all hands (Luce 1884, ch. XVIII Organization, 'Station Billet').
 crew: {hands: all, rating: ordinary, stations: [all hands]}
 # A manoeuvre: "Ready about!" stops the sail work in hand, which holds and resumes after
 # (spec M3 §3.4; the owner's ruling of 2026-09-29 at gate 4c). All-hands sail work does not.
 belays: true
-source: "Luce 1866, ch. XXIV Working to Windward, 'Tacking', 'Missing Stays'; Lever 1808, 'Tacking Expeditiously'"
+source: "Luce 1866, ch. XXIV Working to Windward, 'Tacking' (pp. 450-451), 'Missing Stays'; Luce 1884, ch. XXIV, 'Missing Stays' ('In Irons'), ch. XXXIV Handling Fore-and-Afters, 'Sloops'; Lever 1808, 'Tacking Expeditiously' (p. 78), 'Missing Stays' (p. 94)"

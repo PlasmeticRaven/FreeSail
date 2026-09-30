@@ -26,6 +26,7 @@ from freesail import units
 from freesail.physics.wind import Wind
 from freesail.ship.graph import Ship
 from freesail.ship.parts import HelmMode, Hull
+from freesail.ship.schema import RudderSpec
 
 # ---------------------------------------------------------------------------
 # Tuning constants (package 10 adjusts these against the known truths, §7.6)
@@ -34,9 +35,36 @@ from freesail.ship.parts import HelmMode, Hull
 C_F = 0.008  # resistance coefficient on the wetted surface: friction, form and copper roughness
 C_LAT = 1.0  # cross-flow drag of the lateral plane when the hull slides sideways (v |v|)
 C_LAT_LIFT = 1.0  # keel lift per radian of leeway at speed (u v); the keel's "grip" when moving
-C_YAW = 2.0  # quadratic yaw damping of the lateral plane when the ship swings fast (r |r|)
-C_YAW_LIN = 2.5  # linear yaw damping when moving ahead (u r): a moving hull resists swinging
-C_R = 2.5  # rudder lift per radian of helm; rudder side force = q * A_rudder * C_R * delta
+# Yaw damping of the lateral plane (package 32e, spec M5 open item 12). The water's moment
+# against the hull swinging is a cross-flow force on the lateral plane times a lever, and
+# both grow with the length: at a point x along the hull the swing gives a cross flow r x,
+# so the linear (lifting) term is rho A u (r L) acting at a lever of order L, a moment
+# proportional to A L^2 u r, and the quadratic (cross-flow drag) term rho A (r L)^2 at the
+# same lever, proportional to A L^3 r |r| (the standard slender-body form: Principles of
+# Naval Architecture, the controllability chapter, whose yaw derivatives are made
+# dimensionless by rho L^4 U for the linear and rho L^5 for the quadratic term). Package 10
+# wrote the moment with one length only, rho A L (C u r + C' L r |r|), which is a force,
+# not a moment, so the constants it tuned on the frigate hid her 41.8 m waterline: a
+# fifty-foot cutter got the frigate's damping on a third of the lever and turned as the
+# frigate turns, in metres (the lead's probe, 2026-09-30). The constants below are package
+# 10's divided by the frigate's waterline (2.5 / 41.8, 2.0 / 41.8), so the frigate keeps
+# the circle truth 16 measured (5.1 lengths at 8 knots) and every hull turns in a circle
+# that scales with her length. Judgement: no period source gives a sailing ship's yaw
+# damping; the form is the textbook's, the size fitted to the frigate's band.
+C_YAW = 0.048  # quadratic yaw damping, per (A L^3 r |r|): the plane's cross-flow drag
+C_YAW_LIN = 0.06  # linear yaw damping, per (A L^2 u r): a moving hull resists swinging
+# The rudder's lift slope (per radian of helm) from the blade's aspect ratio, span^2 over
+# area, by Helmbold's low-aspect-ratio formula 2 pi AR / (2 + sqrt(AR^2 + 4)) (Helmbold
+# 1942, as Hoerner, Fluid-Dynamic Lift, ch. 3, gives it; quoted from memory, the page not
+# verified), times RUDDER_EFFECTIVENESS for the wake of the deadwood and the sternpost the
+# blade hangs behind and the flow's angle in a turn. Package 10 tuned one slope, C_R = 2.5,
+# on the frigate (truths 10 and 16); her blade of 15 ft by 4 ft 3 in has an aspect ratio
+# of 3.5 and a Helmbold slope of 3.65, so the effectiveness is 2.5 / 3.65 = 0.685 and the
+# frigate's rudder pushes as it did. The schooner's, the cutter's and the brig's deeper,
+# narrower blades (the ship files' span_m) bite a little harder per square metre (3.0,
+# 3.1 and 2.8 per radian).
+RUDDER_EFFECTIVENESS = 0.685  # judgement, fitted to keep package 10's rudder on the frigate
+RUDDER_DEFAULT_ASPECT = 3.0  # a blade three times as deep as it is broad, when the file is silent
 RUDDER_X_FRACTION = 0.5  # the rudder hangs this fraction of the waterline length abaft amidships
 RUDDER_SMALL_SPEED2 = 0.01  # m^2/s^2 added to u^2 so the rudder keeps a whisper of effect at rest
 HEEL_DRAG_PER_RAD = 3.0  # extra resistance per radian of heel beyond HEEL_DRAG_ONSET (dragging)
@@ -164,9 +192,30 @@ def sway_damping(hull: Hull, u: float, v: float) -> float:
 
 
 def yaw_damping(hull: Hull, u: float, r: float) -> float:
-    """The water's resistance to the hull swinging, in newton-metres, opposing `r`."""
-    q_area = 0.5 * units.RHO_WATER * hull.lateral_area * hull.length
+    """The water's resistance to the hull swinging, in newton-metres, opposing `r`.
+
+    Cross-flow force on the lateral plane times its lever, both growing with the length
+    (see the constants above): the linear term is proportional to A L^2 u r, the
+    quadratic to A L^3 r |r|. A short hull swings freely where a long one is held.
+    """
+    length2 = hull.length * hull.length
+    q_area = 0.5 * units.RHO_WATER * hull.lateral_area * length2
     return -q_area * (C_YAW_LIN * abs(u) * r + C_YAW * hull.length * r * abs(r))
+
+
+def rudder_aspect_ratio(spec: RudderSpec) -> float:
+    """The blade's span squared over its area, from the ship file's `span_m`; a blade
+    RUDDER_DEFAULT_ASPECT times as deep as it is broad when the file gives no span."""
+    if spec.span_m is None or spec.span_m <= 0.0 or spec.area_m2 <= 0.0:
+        return RUDDER_DEFAULT_ASPECT
+    return spec.span_m * spec.span_m / spec.area_m2
+
+
+def rudder_lift_slope(spec: RudderSpec) -> float:
+    """Side force per radian of helm on the blade, per unit of dynamic pressure and area:
+    Helmbold's slope for the blade's aspect ratio times RUDDER_EFFECTIVENESS."""
+    ar = rudder_aspect_ratio(spec)
+    return RUDDER_EFFECTIVENESS * 2.0 * math.pi * ar / (2.0 + math.sqrt(ar * ar + 4.0))
 
 
 def rudder_lever(hull: Hull) -> float:
@@ -183,7 +232,7 @@ def rudder_forces(hull: Hull, u: float, rudder: float) -> tuple[float, float]:
     not answer her helm. With sternway the rudder works the other way, as it
     should.
     """
-    q = 0.5 * units.RHO_WATER * hull.spec.rudder.area_m2 * C_R
+    q = 0.5 * units.RHO_WATER * hull.spec.rudder.area_m2 * rudder_lift_slope(hull.spec.rudder)
     flow = u * abs(u) + math.copysign(RUDDER_SMALL_SPEED2, u if u != 0 else 1.0)
     side = -q * flow * rudder
     return side, side * rudder_lever(hull)

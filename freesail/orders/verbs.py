@@ -17,9 +17,13 @@ Three kinds of verb live here:
   fill`, `loose sails to dry`, `furl all` and the rest) on the tack's path.
 - **Level 0 line verbs** (`haul`, `ease`, `check`, `let go`, `belay`, and
   `sheet home` on a sail) act on the part at once: a brace shifts its yard's
-  angle by five degrees, a sheet of a fore-and-aft sail shifts the sail's
-  sheet angle by five degrees, a halyard (or any other line) shifts its
-  hoist by a tenth; `home` or `aft` takes it all the way.
+  angle by five degrees, a sheet of a fore-and-aft sail takes in or gives a
+  fathom of its fall, which moves the sail by the boom's geometry (package
+  32e: the sheet holds the trim, `evolutions/trim.py`), a halyard (or any
+  other line) shifts its hoist by a tenth; `home` or `aft` takes it all the
+  way. A sheet hauled `to windward` holds its sail aback; `let fly` lets it
+  run and the sail flogs; `draw <the sail>` lets it draw again. `trim the
+  <sail>` is an evolution on the sheet with hands and time.
 - **Helm verbs** (`steer`, `come up`, `bear away`, `keep her full`) set the
   helm targets in `ship.dyn` for the helmsman in the physics to follow; the
   **conning words** (`steady`, `meet her`, `right the helm`, `helm a-lee`,
@@ -59,9 +63,10 @@ from freesail.ship.parts import (
 )
 
 BRACE_STEP = units.deg_to_rad(5.0)  # one haul or ease on a brace
-SHEET_STEP = units.deg_to_rad(5.0)  # one haul or ease on a fore-and-aft sheet
 HOIST_STEP = 0.1  # one haul or ease on a halyard or any other line
-MAX_SHEET_ANGLE = units.deg_to_rad(90.0)
+# One haul or ease on a fore-and-aft sheet takes in or gives a fathom of the fall (package
+# 32e); "two fathoms" two. The sail's angle follows by the sheet's geometry.
+SHEET_TRIM_TOLERANCE = units.deg_to_rad(1.0)  # a sheet within this of its trim stands
 SHIP_SUBJECT = "ship"  # the subject id given to the runner for tack, wear, heave to
 
 Result = tuple[str, str, dict[str, Any]]
@@ -114,6 +119,8 @@ def execute(
         return _clear_wreck(ship, order, vocab)
     if order.verb == "shift" and _names_spars(ship, order):
         return _shift_spar(ship, order, vocab)
+    if order.verb == "draw":
+        return _draw(ship, order, vocab)  # a head sail let draw (package 32e)
     if spec.object == "sail":
         return _sail_evolution(ship, order, vocab, skip, group)
     if spec.object == "line":
@@ -722,7 +729,6 @@ def _trim(
     yards up to `AFTER_YARDS_SHARPER_DEG` sharper than the head yards as their rigging
     allows, or the after yards eased that much with 'head yards sharper' (spec 3b §2.2,
     Fincham arts. 94 and 96)."""
-    from freesail.evolutions.trim import wanted_sheet_angle
     from freesail.physics.sails import SAIL_CLASSES
 
     named_sheets: list[Sail] | None = None  # "trim the jib": that sail's sheet only
@@ -837,12 +843,56 @@ def _trim(
             started.append({"evolution": "brace", "subject": yard.id, "params": params})
         _settle_call(ship, call, bool(started))
 
-    trimmed: list[str] = []
+    trimmed: list[str] = []  # the sheets whose trim was started (package 32e)
+    standing: list[str] = []  # the sheets already at their trim
+    sheets_started: list[dict[str, Any]] = []
     if do_sheets:
-        for sail in named_sheets if named_sheets is not None else ship.sails.values():
-            if sail.is_set and sail.is_fore_and_aft and sail.cls in ("gaff", "jibheaded"):
-                sail.sheet_angle = wanted_sheet_angle(sail.cls, d.apparent_wind_angle)
-                trimmed.append(resolve.the(ship, sail.id))
+        # the sheet holds the trim (package 32e, spec M5 open item 13): each set
+        # fore-and-aft sail's sheet is worked to the wind by its own evolution, with hands
+        # and time; a sheet within a degree of its trim, belayed to leeward, stands
+        sheet_evos = vocab.evolutions.get("trim") or {}
+        candidates = [
+            sail
+            for sail in (named_sheets if named_sheets is not None else ship.sails.values())
+            if sail.is_set and sail.is_fore_and_aft and sail.cls in sheet_evos
+        ]
+        runner = runner_of(ship)
+        if do_yards:
+            extra_s = {k: v for k, v in extra.items() if k != "log_group"}
+            call_s = None
+        else:
+            extra_s, call_s = _hands_params(
+                ship,
+                order,
+                [sheet_evos[sl.cls] for sl in candidates],
+                _group_label("trim", "sheets", group) if len(candidates) > 1 else None,
+            )
+        new_group = getattr(runner, "new_log_group", None)
+        if len(candidates) > 1 and new_group is not None:
+            extra_s = {**extra_s, "log_group": new_group()}
+        for sail in candidates:
+            name = resolve.the(ship, sail.id)
+            wanted = yard_trim.wanted_sheet_angle(sail.cls, d.apparent_wind_angle)
+            reading = yard_trim.read_sheet(ship, sail)
+            if (
+                not reading.free
+                and not reading.held_to_windward
+                and abs(reading.angle - wanted) <= SHEET_TRIM_TOLERANCE
+            ):
+                standing.append(name)
+                continue
+            params = {"sail": sail.id, "angle_deg": None, "side": None, **extra_s}
+            try:
+                runner.start(ship, sheet_evos[sail.cls], sail.id, params)
+            except OrderError as e:
+                failed.append(_refused(name, e))
+                failed_ids.append(sail.id)
+                continue
+            sheets_started.append(
+                {"evolution": sheet_evos[sail.cls], "subject": sail.id, "params": params}
+            )
+            trimmed.append(name)
+        _settle_call(ship, call_s, bool(trimmed))
 
     in_hand_words = ""
     if folded or busy:
@@ -850,7 +900,7 @@ def _trim(
         in_hand_words = f"the {'yard is' if n == 1 else 'yards are'} being trimmed already" + (
             f", {len(folded)} still to brace taking the new angle" if folded else ""
         )
-    if not started and not trimmed:
+    if not started and not trimmed and not standing:
         if len(failed_ids) == 1 and failed_ids[0] in too_far:
             raise OrderError(too_far[failed_ids[0]])
         if in_hand_words and not folded:
@@ -877,7 +927,11 @@ def _trim(
         )
     if trimmed:
         sheets = "sheet" if len(trimmed) == 1 and named_sheets is not None else "sheets"
-        parts.append(f"trimmed the {sheets} of {errors.sentence_list(trimmed)}")
+        parts.append(f"trimming the {sheets} of {errors.join_names(trimmed, 'and')}")
+    if standing:
+        sheets = "sheet" if len(standing) == 1 else "sheets"
+        verb_s = "stands" if len(standing) == 1 else "stand"
+        parts.append(f"the {sheets} of {errors.join_names(standing, 'and')} {verb_s} as trimmed")
     if in_hand_words:
         parts.append(in_hand_words)
     off_deck = _yards_off_words(ship, down, gone)
@@ -897,9 +951,10 @@ def _trim(
     data = {
         "verb": order.verb,
         "level": 1,
-        "subjects": [s["subject"] for s in started],
-        "evolutions": started,
+        "subjects": [s["subject"] for s in started + sheets_started],
+        "evolutions": started + sheets_started,
         "trimmed_sheets": trimmed,
+        "standing_sheets": standing,
         "failed": failed,
         "failed_subjects": failed_ids,
         "folded": folded,
@@ -910,7 +965,8 @@ def _trim(
     # an order whose braces log as one line logs its own line too (the runner writes no
     # "Man the braces" for them)
     grouped = any(x["params"].get("log_group") for x in started)
-    kind = "evolution.started" if started and not trimmed and not grouped else "sail.trimmed"
+    yards_only = started and not trimmed and not standing and not grouped
+    kind = "evolution.started" if yards_only else "sail.trimmed"
     return kind, text, data
 
 
@@ -1179,20 +1235,27 @@ def _sheet_home(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
             continue
         moved = False
         if sail.is_fore_and_aft:
-            if sail.sheet_angle > 1e-9:
-                sail.sheet_angle = 0.0
+            # flat aft: the working sheet hauled to the sail's floor (package 32e)
+            reading = yard_trim.read_sheet(ship, sail)
+            geo = yard_trim.sheet_geometry(ship, sail)
+            if reading.free or reading.held_to_windward or reading.angle > geo.floor + 1e-6:
+                yard_trim.set_sheet_angle(ship, sail, geo.floor)
                 moved = True
-        for ln in sheets:
-            if ln.hauled < 1.0 - 1e-9 or ln.state is LineState.FREE:
-                moved = True
-            ln.hauled = 1.0
-            ln.state = LineState.BELAYED
+        else:
+            for ln in sheets:
+                if ln.hauled < 1.0 - 1e-9 or ln.state is LineState.FREE:
+                    moved = True
+                ln.hauled = 1.0
+                ln.state = LineState.BELAYED
         if not moved:
             failed.append(f"{name} is sheeted home already")
             continue
         changes.append({"sail": sail.id, "sheets": [ln.id for ln in sheets]})
         if sail.is_fore_and_aft:
-            texts.append(f"Hauled the {resolve.display_name(ship, sail.id)} sheet flat aft.")
+            texts.append(
+                f"Hauled the {resolve.display_name(ship, sail.id)} sheet flat aft; {name} "
+                f"{yard_trim.angle_words(sail.sheet_angle)}."
+            )
         else:
             texts.append(f"Sheeted home {name}.")
     if not changes:
@@ -1218,8 +1281,11 @@ def _line_action(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
     # Hauling a bowline is work for hands (spec 3b §4), so it may name them; and a
     # bowline hauled is the weather one unless a side is said ("haul the fore bowline").
     bowlines_hauled = verb == "haul" and "bowline" in (order.object or "")
-    allowed = {"fathoms", "a_little", "manner", "home"}
+    allowed = {"fathoms", "a_little", "manner", "home", "sheet_to"}
     _no_stray_modifiers(order, allowed | ({"hands_from"} if bowlines_hauled else set()))
+    sheet_to = order.modifiers.get("sheet_to")  # "to windward", "to leeward" (package 32e)
+    if sheet_to and verb not in ("haul", "ease"):
+        raise OrderError(f"'{verb}' was understood, but 'to windward' belongs with 'haul'.")
     if "home" in order.modifiers and verb != "haul":
         raise OrderError(f"'{verb}' was understood, but 'home' and 'aft' belong with 'haul'.")
     side_word = order.side_word
@@ -1247,6 +1313,7 @@ def _line_action(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
         )
     if verb == "haul" and any(ln.cls == "bowline" for ln in lines):
         return _haul_bowlines(ship, order, vocab, res, lines)
+    lines = _pick_sheets(ship, lines, verb, res.side is not None, sheet_to)
 
     steps = 1.0
     if "fathoms" in order.modifiers:
@@ -1273,7 +1340,7 @@ def _line_action(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
         if side_note and res.kind != "part":
             name = f"the {side_note} {resolve.family_name(ship, line.id)}"
         try:
-            text, change = _one_line(ship, line, verb, steps, name)
+            text, change = _one_line(ship, line, verb, steps, name, sheet_to)
         except OrderError as e:
             # Of several lines ("both sides", "the topsail sheets"), the ones
             # that cannot be worked are reported and the rest are worked.
@@ -1300,25 +1367,198 @@ def _lower(sentence: str) -> str:
     return sentence[0].lower() + sentence[1:] if sentence else sentence
 
 
+def _pick_sheets(
+    ship: Ship, lines: list[Line], verb: str, side_said: bool, sheet_to: str | None
+) -> list[Line]:
+    """Of a fore-and-aft sail's pair of sheets named without a side (package 32e), the
+    one the order means: the lee sheet (the working one), the weather sheet 'to
+    windward', and for 'let go' whichever is belayed. Other lines pass as they are."""
+    out: list[Line] = []
+    pairs: dict[str, list[Line]] = {}
+    for ln in lines:
+        target = ship.parts.get(ln.of)
+        sheet = ln.cls == "sheet" and isinstance(target, Sail) and target.is_fore_and_aft
+        if sheet and ln.side is not None and not side_said:
+            pairs.setdefault(target.id, []).append(ln)
+        else:
+            out.append(ln)
+    for sid, pair in pairs.items():
+        sail = ship.sails[sid]
+        if len(pair) < 2:
+            out.extend(pair)
+        elif sheet_to:
+            chosen = yard_trim.working_sheet(ship, sail, sheet_to)
+            out.append(chosen if chosen is not None else pair[0])
+        elif verb == "let go":
+            belayed = [ln for ln in pair if ln.state is LineState.BELAYED]
+            out.extend(belayed or pair)
+        else:
+            chosen = yard_trim.working_sheet(ship, sail, None)
+            out.append(chosen if chosen is not None else pair[0])
+    return out
+
+
 def _one_line(
-    ship: Ship, line: Line, verb: str, steps: float, name: str
+    ship: Ship, line: Line, verb: str, steps: float, name: str, sheet_to: str | None = None
 ) -> tuple[str, dict[str, Any]]:
     """Work one line; the sentence and the change, or OrderError with the reason."""
     if line.state is LineState.PARTED:
         raise OrderError(
             f"{name[0].upper()}{name[1:]} is parted; it must be spliced or rove afresh."
         )
+    target = ship.parts.get(line.of)
+    fore_and_aft_sheet = line.cls == "sheet" and isinstance(target, Sail) and target.is_fore_and_aft
     if verb == "let go":
         if line.state is LineState.FREE:
             raise OrderError(f"{name[0].upper()}{name[1:]} is already running free.")
         line.state = LineState.FREE
+        if fore_and_aft_sheet:
+            # let fly: the sheet runs out; the sail flogs unless its other sheet holds it
+            line.hauled = 0.0
+            line.held_side = None
+            reading = yard_trim.refresh_reading(ship, target)
+            sail_name = resolve.the(ship, target.id)
+            if reading.free:
+                target.shivering = True
+                text = f"Let fly {name}; {sail_name} flogging."
+            else:
+                where = yard_trim.side_name(reading.side or 1.0)
+                text = (
+                    f"Let go {name}; {sail_name} lies to {where}, "
+                    f"{yard_trim.angle_words(reading.angle)}."
+                )
+            return text, {"line": line.id, "state": "free", "sail": target.id}
         return f"Let go {name}; it ran free.", {"line": line.id, "state": "free"}
     if verb == "belay":
         line.state = LineState.BELAYED
+        if fore_and_aft_sheet:
+            yard_trim.refresh_reading(ship, target)
         return f"Belayed {name}.", {"line": line.id, "state": "belayed"}
+    if fore_and_aft_sheet:
+        return _work_sheet(ship, line, target, verb == "haul", steps, name, sheet_to)
     text, change = _haul_or_ease(ship, line, verb == "haul", steps, name)
     line.state = LineState.BELAYED
     return text, change
+
+
+def _work_sheet(
+    ship: Ship,
+    line: Line,
+    sail: Sail,
+    hauling: bool,
+    steps: float,
+    name: str,
+    sheet_to: str | None,
+) -> tuple[str, dict[str, Any]]:
+    """Haul or ease a fore-and-aft sail's sheet a fathom of its fall (times `steps`), or
+    flat aft and right off, and read the sail's angle from it (package 32e). Hauled 'to
+    windward' the sheet holds the sail aback on the weather side; of a pair, hauling one
+    sheet lets the other run. Returns the sentence and the change."""
+    geo = yard_trim.sheet_geometry(ship, sail)
+    home = math.isinf(steps)
+    did = "Hauled" if hauling else "Eased"
+    recover = hauling and line.state is LineState.FREE
+    was = line.hauled if line.state is not LineState.FREE else 0.0
+    if home or (sheet_to == "weather" and hauling and steps == 1.0):
+        # flat aft, right off; a sheet hauled over to windward is hauled aft with it
+        new = 1.0 if hauling else 0.0
+    else:
+        fall = steps * yard_trim.FATHOM_M / geo.scope_m
+        new = max(0.0, min(1.0, was + (fall if hauling else -fall)))
+    sail_name = resolve.the(ship, sail.id)
+    if abs(new - was) < 1e-9 and not recover and not sheet_to:
+        state = "hard in" if hauling else "eased right off"
+        raise OrderError(f"{name[0].upper()}{name[1:]} is already {state}.")
+    line.hauled = new
+    line.state = LineState.BELAYED
+    if line.side is None:
+        # a boom's one sheet: held over to windward when so ordered, else lying to leeward
+        lee = yard_trim.side_name(yard_trim.lee_side_sign(ship))
+        weather = "larboard" if lee == "starboard" else "starboard"
+        if sheet_to == "weather":
+            line.held_side = weather
+        elif sheet_to == "lee" or not hauling:
+            line.held_side = None
+    else:
+        # of a pair, the sheet worked is the one that holds the sail: the other runs
+        for other in ship.sheets_of(sail):
+            if other is not line and other.state is LineState.BELAYED:
+                other.state = LineState.FREE
+                other.hauled = 0.0
+    reading = yard_trim.refresh_reading(ship, sail)
+    sail.shivering = False
+    how = ""
+    if home:
+        how = " flat aft" if hauling else " right off"
+    elif sheet_to == "weather":
+        how = " to windward"
+    elif sheet_to == "lee":
+        how = " to leeward"
+    if abs(new - was) < 1e-9 and recover:
+        did = "Hauled"
+        how = " taut and belayed it"
+    aback = "; aback" if reading.held_to_windward else ""
+    text = f"{did} {name}{how}; {sail_name} now {yard_trim.angle_words(reading.angle)}{aback}."
+    change = {
+        "line": line.id,
+        "sail": sail.id,
+        "hauled": round(new, 3),
+        "sheet_angle": reading.angle,
+        "held_to_windward": reading.held_to_windward,
+    }
+    return text, change
+
+
+def _draw(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
+    """'Draw jib', 'let draw the jib' (Luce 1884, ch. XXIV, 'Missing Stays'; ch. XXXIV,
+    'Sloops'): a fore-and-aft sail held to windward, or with its sheets let fly, is let
+    draw: its lee sheet hauled aft to its trim and the weather one let go. Level 0, at
+    once (package 32e)."""
+    _no_stray_modifiers(order, {"manner"})
+    res = resolve.resolve(ship, order.object or "", order.side_word, "draw")
+    texts: list[str] = []
+    failed: list[str] = []
+    changes: list[dict[str, Any]] = []
+    for pid in res.ids:
+        part = ship.parts[pid]
+        if not isinstance(part, Sail) or not part.is_fore_and_aft:
+            raise errors.wrong_kind(
+                "draw", resolve.display_name(ship, pid), _what(ship, part), "sails", ""
+            )
+        name = resolve.the(ship, pid)
+        if not part.is_set:
+            failed.append(f"{name} is {part.describe_state()}")
+            continue
+        if not ship.sheets_of(part):
+            failed.append(f"{name} has no sheet")
+            continue
+        reading = yard_trim.read_sheet(ship, part)
+        wanted = yard_trim.wanted_sheet_angle(part.cls, ship.dyn.apparent_wind_angle)
+        if (
+            not reading.free
+            and not reading.held_to_windward
+            and abs(reading.angle - wanted) <= SHEET_TRIM_TOLERANCE
+        ):
+            failed.append(f"{name} is drawing already")
+            continue
+        angle = yard_trim.set_sheet_angle(ship, part, wanted, None)
+        part.shivering = False
+        texts.append(f"Let draw {name}; the lee sheet hauled aft, {yard_trim.angle_words(angle)}.")
+        changes.append({"sail": pid, "sheet_angle": angle})
+    if not changes:
+        if len(failed) == 1:
+            raise OrderError(failed[0][0].upper() + failed[0][1:] + ".")
+        raise OrderError(f"Nothing done: {errors.sentence_list(failed)}.")
+    text = " ".join(texts)
+    if failed:
+        text += " Not done: " + errors.sentence_list(failed) + "."
+    data = {
+        "verb": "draw",
+        "level": 0,
+        "subjects": [c["sail"] for c in changes],
+        "changes": changes,
+    }
+    return "line.hauled", text, data
 
 
 def _line_hint(ship: Ship, part: Any) -> str:
@@ -1358,18 +1598,6 @@ def _haul_or_ease(
     recover = hauling and line.state is LineState.FREE
     target = ship.parts[line.of]
 
-    if (
-        home
-        and hauling
-        and line.cls == "sheet"
-        and isinstance(target, Sail)
-        and target.is_fore_and_aft
-    ):
-        if abs(target.sheet_angle) < 1e-9 and not recover:
-            raise OrderError(f"{name[0].upper()}{name[1:]} is already hard in.")
-        target.sheet_angle = 0.0
-        text = f"Hauled {name} flat aft; {resolve.the(ship, target.id)} now amidships."
-        return text, {"line": line.id, "sail": target.id, "sheet_angle": 0.0}
     if line.cls == "brace" and isinstance(target, Spar):
         sync_catharpins(ship)  # the limit as the lower rigging stands now
     if home and line.cls == "brace" and isinstance(target, Spar):
@@ -1404,22 +1632,6 @@ def _haul_or_ease(
         target.brace_angle = new
         text = f"{did} {name}; {resolve.the(ship, target.id)} now {_brace_words(new)}."
         return text, {"line": line.id, "yard": target.id, "brace_angle": new}
-
-    if line.cls == "sheet" and isinstance(target, Sail) and target.is_fore_and_aft:
-        delta = SHEET_STEP * steps * (-1.0 if hauling else 1.0)
-        new = max(0.0, min(MAX_SHEET_ANGLE, target.sheet_angle + delta))
-        if abs(new - target.sheet_angle) < 1e-9 and recover:
-            return f"Hauled {name} taut and belayed it.", {"line": line.id, "sail": target.id}
-        if abs(new - target.sheet_angle) < 1e-9:
-            state = "hard in" if hauling else "eased right off"
-            raise OrderError(f"{name[0].upper()}{name[1:]} is already {state}.")
-        target.sheet_angle = new
-        deg = units.rad_to_deg(new)
-        text = (
-            f"{did} {name}; {resolve.the(ship, target.id)} now "
-            f"{'amidships' if deg < 0.5 else f'{deg:.0f}° off the centreline'}."
-        )
-        return text, {"line": line.id, "sail": target.id, "sheet_angle": new}
 
     # halyards, sheets of square sails, clewlines, tacks, downhauls and the rest:
     # a fraction hauled, 1 = home.
@@ -1696,6 +1908,17 @@ def _helm(ship: Ship, order: Order) -> Result:
         raise OrderError(
             f"'{order.verb_phrase}' takes no heading or points; it is the whole order."
         )
+    if "hove_to" in ship.extra and (
+        verb in ("keep her full", "steer") or ("points" in mods and verb not in HELM_VERBS)
+    ):
+        # A ship hove to has her helm a-lee by the manoeuvre and her yards set against
+        # each other; a course is given her by filling away, not by the helm alone.
+        # Package 33a found the starter book's "keep her full" bearing the schooner away
+        # from her noon sight, her yards still aback in the record, so that a later
+        # "heave to" was refused and no cast was made (package 32e): the helm orders
+        # that give a course are refused while she lies to; the conning words and the
+        # bare helm ("hard a-weather") are the deck's to give.
+        raise OrderError("She is hove to; fill away before giving her a course.")
 
     if verb == "keep her full":
         dyn.helm_mode = HelmMode.FULL_AND_BY

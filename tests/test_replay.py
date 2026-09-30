@@ -139,11 +139,12 @@ def test_truth_39_a_passage_under_the_starter_routines_replays_with_the_same_fir
         (1742, "standing order 'night routine'"),
         (1742, "standing order 'night routine'"),
         (2100, "standing order 'trim'"),
+        (2700, "standing order 'tend the sheets'"),
         (2700, "standing order 'trim'"),
-    ], "trim every ten minutes from 19:45; the night routine at sunset, 19:59"
+    ], "trim every ten minutes from 19:45; the night routine at sunset, 19:59; the sheets at 20:15"
     assert [e.tick for e in original.log if e.kind == "sun.set"] == [1742]
     assert all(not a.startswith("standing order") for _, a, _ in original.journal)
-    assert sum(1 for _, _, t in original.journal if t.startswith("standing order")) == 8
+    assert sum(1 for _, _, t in original.journal if t.startswith("standing order")) == 9
     assert "order.rejected" not in {e.kind for e in original.log}
     path = replay.save_to_file(original, tmp_path / "standing.json")
     data = replay.load_file(path)
@@ -153,6 +154,7 @@ def test_truth_39_a_passage_under_the_starter_routines_replays_with_the_same_fir
         "shorten sail for weather",
         "keep her full",
         "trim on a shift",
+        "tend the sheets",
         "heavy weather",
         "storm staysail",
         "trim",

@@ -4,7 +4,7 @@ There are two ways from one tack to the other. **Tacking** turns her head throug
 
 ## Tacking
 
-Luce (1866, ch. XXIV Working to Windward, 'Tacking') gives the sequence for a ship under courses, topsails, topgallants, jib and spanker, and the game's `tack` evolution follows it: *Ready about!*, the helm eased down and *Helm's a-lee!* with the head sheets let fly; as the sails shake, *Rise tacks and sheets!*; with the wind a point on the weather bow or dead ahead, *Mainsail haul!* and the after yards swing round; as the after sails fill on the new tack, *Let go and haul!* and the head yards follow; then brace up, trim the yards, and *keep her by the wind*. Lever's 'Tacking Expeditiously' is the same sequence with the reasons, and his warning that a ship put about with too much helm "was sure to miss stays, and fall off again".
+Luce (1866, ch. XXIV Working to Windward, 'Tacking', pp. 450-451) gives the sequence for a ship under courses, topsails, topgallants, jib and spanker, and the game's `tack` evolution follows it: *Ready about!*, the helm eased down and *Helm's a-lee!* with the head sheets let go and the spanker sheet hauled aft "as the sail lifts"; as the sails shake, *Rise tacks and sheets!*; with the wind a point on the weather bow or dead ahead, *Mainsail haul!* and the after yards swing round; as the after sails fill on the new tack, *Let go and haul!* and the head yards follow, *Draw jib!* and the head sheets are trimmed aft on the new tack; then brace up, trim the yards, and *keep her by the wind*. Lever's 'Tacking Expeditiously' (1808, p. 78) is the same sequence with the reasons, and his warning that a ship put about with too much helm "was sure to miss stays, and fall off again". Since package 32e the sheets are really worked through it (chapter 4): the head sheets are eased right off at *Helm's a-lee* and the jibs lift until *Let go and haul* draws them on the new tack, and the staysails abaft the fore mast have their sheets shifted over as she comes through.
 
 Before you give the order she must be **close-hauled with way on her**: the evolution refuses to start otherwise ("She has not way enough on her to stay: 1.4 kn through the water"; "She is not close-hauled; bring her by the wind before going about"). Two knots is the least the order will start with, but she misses stays below about three; from five she goes round, which is what plain sail gives her in a 15-knot breeze.
 
@@ -12,29 +12,27 @@ Before you give the order she must be **close-hauled with way on her**: the evol
 tack ship
 ```
 
-The log, from the frigate under plain sail at 4.7 knots close-hauled on the starboard tack:
+The log, from the frigate under plain sail at 5.4 knots close-hauled on the starboard tack:
 
 ```
   Morning watch (04:16)  Order: tack ship.
-  Morning watch (04:16)  Ready about. Helm's a-lee; eased off the head sheets.
+  Morning watch (04:16)  Ready about. Helm's a-lee; ease off the head sheets; haul aft the spanker sheet.
   Morning watch (04:16)  All hands about ship.
-* Morning watch (04:16)  Fore course taken aback.
-* Morning watch (04:16)  Main course taken aback.
-* Morning watch (04:16)  Fore topsail taken aback.
-* Morning watch (04:16)  Main topsail taken aback.
-* Morning watch (04:16)  Mizzen topsail taken aback.
+* Morning watch (04:17)  Fore course taken aback.
+* Morning watch (04:17)  Main course taken aback.
+* Morning watch (04:17)  Fore topsail taken aback.
   Morning watch (04:17)  Rise tacks and sheets. Mainsail haul.
-  Morning watch (04:17)  Main topsail filled again.
-  Morning watch (04:17)  Mizzen topsail filled again.
-  Morning watch (04:17)  Main course filled again.
-  Morning watch (04:18)  Let go and haul.
+* Morning watch (04:17)  Main topsail taken aback.
+  Morning watch (04:18)  Main topsail filled again.
+  Morning watch (04:18)  Main course filled again.
+  Morning watch (04:18)  Let go and haul. Draw jib; trim aft the head sheets.
   Morning watch (04:18)  Fore course filled again.
   Morning watch (04:18)  Fore topsail filled again.
-* Morning watch (04:21)  Tacked; braced up on the larboard tack, heading ENE (68°).
+* Morning watch (04:22)  Tacked; braced up on the larboard tack, heading ENE (68°).
   Morning watch (04:22)  Steady on ENE (68°).
 ```
 
-Read it against Luce. The helm goes down and she flies up into the wind; as her head comes within a point of it the sails are pressed back against the masts (*taken aback*, Falconer, *Aback*), which is the moment for *Mainsail haul*: the after yards are swung to the new tack while the wind on their weather leeches helps them round. Her head passes through the wind; the after sails fill on the new tack; *Let go and haul* swings the head yards, whose sails were aback and paying her head off, and she gathers way close-hauled on the larboard tack. Two minutes from the helm going down to *Let go and haul*, five to *Tacked* and six to *Steady*, most of it spent gathering way on the new tack; she is back at five knots ten minutes after the order. The fore sails may fill and go aback several times while the head yards swing; that is the same wind on a moving yard, not a fault.
+Read it against Luce. The helm goes down and she flies up into the wind, her jibs lifting with their sheets eased off and her spanker flat aft to help her round; as her head comes within a point of it the sails are pressed back against the masts (*taken aback*, Falconer, *Aback*), which is the moment for *Mainsail haul*: the after yards are swung to the new tack while the wind on their weather leeches helps them round. Her head passes through the wind; the after sails fill on the new tack; *Let go and haul* swings the head yards, whose sails were aback and paying her head off, the head sheets are drawn on the new tack, and she gathers way close-hauled on the larboard tack. A minute from the helm going down to *Mainsail haul*, two to *Let go and haul*, and five and a half to *Tacked*, most of it spent gathering way on the new tack with the sails trimmed for the wind she is coming to; she is back at five knots seven minutes after the order. Luce allows a frigate five to ten (truth 10). The fore sails may fill and go aback several times while the head yards swing; that is the same wind on a moving yard, not a fault.
 
 Synonyms the parser takes: `ready about`, `go about`, `about ship`, `put her about`, `stays`. A tack takes no side; she goes onto the other one.
 
@@ -46,7 +44,7 @@ put her about
 # rejected: tack ship on the larboard tack
 ```
 
-After a tack the yards are braced sharp up for the new tack by the evolution, but nothing else is trimmed: the jib and spanker sheets find their own trim (chapter 4) and your helm order is the new close-hauled course. Say `keep her full` if you want the helmsman sailing by the wind rather than by compass.
+After a tack the yards are braced sharp up for the new tack by the evolution and the sheets are trimmed for a full-and-by wind on the new tack; `trim sails` or the book's tending routine (chapter 4) brings them to the wind she settles at, and your helm order is the new close-hauled course. Say `keep her full` if you want the helmsman sailing by the wind rather than by compass.
 
 ### In studding-sails first, and the bowlines
 
@@ -78,19 +76,31 @@ The frigate close-hauled in a 10-knot breeze, her weather bowlines hauled and he
 
 Two minutes for the studding sails and booms, five more for the tack. Wearing is the same: from a broad reach with ten studding sails set, the wear begins "Stand by to take in the studding-sails. Haul taut! In studding-sails!" and "In studding-sails; rigged in and got alongside the booms." two minutes later, before "Stand by to wear ship". With none set and every boom in, both evolutions begin at *Ready about* and *Stand by to wear ship* as before.
 
-### Missing stays
+### Hanging in stays, and missing them
 
-If her way falls below eight tenths of a knot before her head comes through, or she hangs head to wind for three minutes, she has missed stays. In a 15-knot breeze under plain sail she has way to spare; in seven knots she makes 2.2 knots close-hauled, and the same order fails: Luce: "In vessels which are dull in stays and go off slowly after coming up head to wind, and particularly in a light breeze..." (Luce 1866, ch. XXIV, 'Missing Stays'); Lever's figures 497 to 500 show her boxed off by the sea and falling back. In the game the evolution fails with an urgent line:
+Since package 32e the rule reads the vessel. Her **way is gone** when for five seconds she has made less than a quarter of the speed she had at *Helm's a-lee*, or less than one of her own lengths a minute (the frigate 1.4 knots, the schooner 0.8, the cutter 0.5), whichever is the more. Way gone with her head still more than a point off the wind, before the after yards are swung, is a plain miss: Luce's "should she come to a stand, and fall off before the after yards are swung". Way gone within a point of the wind and she **hangs in stays**, and the evolution does what the seamanship texts say before it gives up: the helm is kept a-lee while she has way and shifted as she gathers sternway ("if she gathers sternboard, Shift the helm!", Luce 1866, p. 451; the helmsman's own rule in the game), the head yards are kept aback to box her head off, the head sheets are held to windward so that the jibs are aback on the new weather bow as she passes the wind and pay her off (Luce 1884, ch. XXXIV, 'Sloops'), and the spanker boom is hauled well over to windward, where the sail aback at the stern pushes her stern to leeward and her head up (Luce 1866, 'Tacking'). Only when she has plainly fallen back two points on the old tack, or hung three minutes from the moment her way went, has she **missed stays**; then, as Luce has it, the head sheets are flattened in, the spanker sheet eased off, the helm put up as an order the helmsman carries out, and the yards squared *as a brace with hands and time*, three quarters of a minute, not in a jump. The frigate in seven knots of wind, at 2.6 knots, hangs and is boxed through (in eight she carries her way through and tacks plainly):
 
 ```
-  Morning watch (04:15)  Order: tack ship.
-  Morning watch (04:15)  Ready about. Helm's a-lee; eased off the head sheets.
-  Morning watch (04:17)  Rise tacks and sheets. Mainsail haul.
-! Morning watch (04:17)  Missed stays: she lost her way before her head came through the wind. Squared the yards and fell off on the starboard tack.
-! Morning watch (04:17)  Taken aback: the sails pressed against the masts and she lost her way.
+  Morning watch (04:16)  Order: tack ship.
+  Morning watch (04:16)  Ready about. Helm's a-lee; ease off the head sheets; haul aft the spanker sheet.
+  Morning watch (04:18)  Rise tacks and sheets. Mainsail haul.
+  Morning watch (04:18)  Her way is gone; she hangs in stays. Helm kept a-lee; the head yards aback to box her off; the head sheets held to windward; the spanker boom hauled over to windward.
+  Morning watch (04:18)  Her head is through the wind; the head sails aback pay her off.
+  Morning watch (04:19)  Let go and haul. Draw jib; trim aft the head sheets.
+* Morning watch (04:23)  Tacked; braced up on the larboard tack, heading ENE (68°).
 ```
 
-She squares her yards and puts the helm up to fall off on the tack she came from, and you are where you started with less way: four minutes later she has 1.8 knots of sternway and her head at NW by N. What a sailing master does next is **wear** (below), or in a narrow place **box-haul** (below). Under a knot and a half she refuses the order for want of way instead, which is the same lesson given earlier.
+In six knots she makes 2.2 knots close-hauled and the same order fails, her way gone with her head still thirteen degrees short of the wind: Luce: "In vessels which are dull in stays and go off slowly after coming up head to wind, and particularly in a light breeze..." (Luce 1866, ch. XXIV, 'Missing Stays'); Lever's figures 497 to 500 (p. 94) show her boxed off by the sea and falling back. The log:
+
+```
+  Morning watch (04:16)  Order: tack ship.
+  Morning watch (04:16)  Ready about. Helm's a-lee; ease off the head sheets; haul aft the spanker sheet.
+! Morning watch (04:18)  Missed stays: she lost her way before her head came up to the wind. Up helm; square the yards; flatten in the head sheets; ease off the spanker sheet.
+* Morning watch (04:19)  Squared the yards; she fell off on the starboard tack, to try again or to wear.
+! Morning watch (04:19)  Taken aback: the sails pressed against the masts and she lost her way.
+```
+
+You are where you started with less way, her head falling off on the tack she came from with her yards square. What a sailing master does next is **wear** (below), or in a narrow place **box-haul** (below). Under two knots she refuses the order for want of way instead, which is the same lesson given earlier.
 
 ## Wearing
 
@@ -167,7 +177,7 @@ wear under bare poles
 
 "Lying-to: the situation of a ship when she is retarded in her course, by arranging the sails in such a manner as to counteract each other with nearly an equal effort, and render the ship almost immoveable, with respect to her progressive motion, or head-way. A ship is usually brought-to by the main and fore-top-sails, one of which is laid aback, whilst the other is full" (Falconer, *Lying-to*). Lever's 'Heaving to' has two ships lying to speak one another, the weather ship with her main topsail aback and the lee ship with her fore topsail aback so that she can box her head off and keep clear.
 
-The game's `heave_to` is the M2 simplification of Luce's 'To heave to' (Luce 1866, ch. XXVI Emergencies): the courses are hauled up, the spanker brailed up (Luce: "regulate by easing off the spanker and jib sheets") and the light sails forward of the backed mast clewed up ("settle down the top-gallant sails and royals, or clew them up"); the yards on the mast that carries the most square sail are braced aback (the main topsail on the frigate, the fore topsail on the schooner, which has no other), the rest are left full, and the helm is put a-lee. On the schooner the mainsail stays set, being her driving sail.
+The game's `heave_to` is the M2 simplification of Luce's 'To heave to' (Luce 1866, ch. XXVI Emergencies): the courses are hauled up, the spanker brailed up and the head sheets hauled aft (Luce: "regulate by easing off, or hauling aft, the spanker and jib sheets") and the light sails forward of the backed mast clewed up ("settle down the top-gallant sails and royals, or clew them up"); the yards on the mast that carries the most square sail are braced aback (the main topsail on the frigate), the rest are left full, and the helm is put a-lee. The brig, whose backed main topsail is on her aftermost mast with nothing square abaft it to balance her, keeps her spanker set with its sheet eased, and lies about six points off; brailed up she fell off to a run. A fore-and-after (the schooner, the cutter) is hove to her own way (Luce 1884, ch. XXXIV, 'To Heave to': "Haul flat aft the main sheet, putting the helm down, and haul the staysail sheet to windward"): her mainsail's sheet flat aft, her fore staysail's sheet held to windward, her topsail to the mast as well if it is set, and she lies four or five points off, forereaching a knot or two.
 
 ```orders frigate plain-sail
 heave to
@@ -245,11 +255,21 @@ fill away
 back and fill her
 ```
 
-## The schooner
+## The schooner, and the cutter
 
-A fore-and-aft vessel tacks quickly and wears with her main boom: "clew up the main gaff topsail, if set, drop the peak of the mainsail, up helm and ease off the main sheet... when the wind is aft shift over the boom and head sheets" (Luce 1884, ch. XXXIV Handling Fore-and-Afters, 'To Wear'). The game uses the same four evolutions for her with her two yards playing the part of the head yards; she has no after yards, so *Mainsail haul* passes in a moment. She wears in eight minutes and heaves to with the fore topsail to the mast.
+A fore-and-aft vessel tacks quickly and wears with her main boom: "clew up the main gaff topsail, if set, drop the peak of the mainsail, up helm and ease off the main sheet... when the wind is aft shift over the boom and head sheets" (Luce 1884, ch. XXXIV Handling Fore-and-Afters, 'To Wear'). The game uses the same four evolutions for her with her two yards playing the part of the head yards; she has no after yards, so there is no *Mainsail haul*: *Helm's a-lee*, her head sheets eased off and her main sheet hauled aft, and as she passes the wind *Let go and haul* swings her topsail yards round, draws the jibs and shifts her foresail's sheet over. Since package 32e the turn is her own (spec M5 open item 12): the water's hold on a hull swinging grows with the hull's length, and the schooner's and the cutter's rudders bite as their deep narrow blades should, so she is through the wind in forty seconds and steady on the new tack in two minutes and a half, and the cutter, who "spins on her heel", is through in twenty seconds and tacked in a minute and three quarters; the brig goes about as the frigate does. The cutter's log:
 
-Two things do not yet work as they should for her, and both are recorded for the lead. **`tack ship` is refused when she is close-hauled**: the runner's close-hauled check reads the luff angle of her square fore topsail, which wants 50° of apparent wind, though she sails at 40° to 44° ("She is not close-hauled; bring her by the wind before going about"; `docs/dev/TuningNotes.md`, 'Bugs found on the way'). Until it is fixed, wear her. And **she does not lie to**: with only her fore topsail to lay aback against two big gaff sails she pays off and forereaches at three or four knots. A schooner is properly hove to with a jib or fore sheet hauled to windward, which the sail model has no state for (Luce 1884, ch. XXXIV Handling Fore-and-Afters); that is crew work for milestone 3.
+```
+  Morning watch (04:16)  Order: tack ship.
+  Morning watch (04:16)  Ready about. Helm's a-lee; ease off the head sheets; haul aft the mainsail sheet.
+  Morning watch (04:16)  All hands about ship.
+* Morning watch (04:16)  Topsail taken aback.
+  Morning watch (04:17)  Let go and haul. Draw jib; trim aft the head sheets.
+  Morning watch (04:17)  Topsail filled again.
+* Morning watch (04:18)  Tacked; braced up on the larboard tack, heading ENE (68°).
+```
+
+Hove to, a fore-and-after has her main sheet flat aft and her fore staysail's sheet to windward (above), and lies four or five points off forereaching a knot or two; `fill away` lets the staysail draw. The turning circles are in their own lengths now: the frigate's five at eight knots, the brig's five, the schooner's six, the cutter's five (`docs/dev/TuningNotes.md`, package 32e).
 
 ```orders schooner plain-sail
 tack ship

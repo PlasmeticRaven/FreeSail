@@ -90,6 +90,7 @@ from freesail import units
 from freesail.crew import bill, hands
 from freesail.crew.model import Crew, number_words
 from freesail.evolutions import expr, registry
+from freesail.evolutions import trim as yard_trim
 from freesail.evolutions.scripts import SCRIPTS, Script
 from freesail.ship.graph import Ship
 from freesail.ship.parts import Line, LineState, Part, Sail, SailState, Spar
@@ -778,7 +779,13 @@ class Runner:
             self._apply_ramp(ship, inst, 1.0)
             for _key, (obj_tree, attr, value_tree) in step.sets.items():
                 obj = expr.evaluate(obj_tree, env)
-                _assign(obj, attr, expr.evaluate(value_tree, env))
+                value = expr.evaluate(value_tree, env)
+                if isinstance(obj, Sail) and attr == "sheet_angle":
+                    # the sheet holds the trim (package 32e): a file that sets a sail's
+                    # angle works its sheet to the length that angle needs
+                    yard_trim.set_sheet_angle(ship, obj, float(value))
+                    continue
+                _assign(obj, attr, value)
         except (expr.ExpressionError, TypeError, ValueError) as e:
             self._fail(ship, inst, f"the step '{step.do}' could not be applied ({e})")
             return
@@ -808,6 +815,11 @@ class Runner:
             deg = abs(units.rad_to_deg(inst.subject.brace_angle))
             self._log_groups.setdefault(key, []).append((inst.subject_id, deg))
             self._group_done(ship, inst, key)
+        elif key and isinstance(inst.subject, Sail):
+            # a trim's sheets (package 32e): one line for all of them, as for its braces
+            deg = abs(units.rad_to_deg(inst.subject.sheet_angle))
+            self._log_groups.setdefault(key, []).append((inst.subject_id, deg))
+            self._group_done(ship, inst, key)
         else:
             self._note(ship, inst, inst.evo.on_complete)
         self._after_all_hands(ship, inst)
@@ -831,12 +843,30 @@ class Runner:
             return
         degs = [round(d) for _, d in done]
         lo, hi = min(degs), max(degs)
+        outcome = inst.evo.on_complete
+        if isinstance(inst.subject, Sail):
+            # the sheets of a trim (package 32e): "Trimmed the sheets of the spanker, the
+            # fore topmast staysail and the jib; 24° to 32° off the centreline."
+            names = [f"the {part_name(ship, sid)}" for sid, _ in done]
+            angle = f"{lo}°" if lo == hi else f"{lo}° to {hi}°"
+            if len(done) == 1:
+                text = (
+                    f"Trimmed the {part_name(ship, done[0][0])} sheet; {angle} off the centreline."
+                )
+            else:
+                text = f"Trimmed the sheets of {_and(names)}; {angle} off the centreline."
+            data = {
+                "evolution": inst.evo.id,
+                "subjects": [sid for sid, _ in done],
+                "sheet_deg": {sid: round(d, 1) for sid, d in done},
+            }
+            ship.note(outcome.severity, outcome.kind, text, None, data)
+            return
         angle = f"{lo}° from square" if lo == hi else f"{lo}° to {hi}° from square"
         if len(done) == 1:
             text = f"Braced the {part_name(ship, done[0][0])}; {angle}."
         else:
             text = f"Braced {number_words(len(done))} yards to the wind; {angle}."
-        outcome = inst.evo.on_complete
         data = {
             "evolution": inst.evo.id,
             "subjects": [sid for sid, _ in done],

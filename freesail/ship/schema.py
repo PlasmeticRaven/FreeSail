@@ -250,6 +250,10 @@ class RudderSpec:
     area_m2: float = 2.0
     max_angle_deg: float = 35.0
     rate_deg_s: float = 4.0
+    # Package 32e: the blade's depth (its span, keel to the top of the blade), which with
+    # the area gives its aspect ratio and so its lift slope (physics/hull.py). None: a
+    # blade three times as deep as it is broad.
+    span_m: float | None = None
 
 
 @dataclass
@@ -288,6 +292,11 @@ class SparSpec:
     # `housed_length_m` is its outboard length reefed, `length_m` its full outboard length.
     running: bool | None = None
     housed_length_m: float | None = None
+    # Package 32e (spec M5 open item 13): a gaff sail's boom names the breadth of the horse
+    # its sheet travels on (Steel 1794 vol. I, p. 167, HORSE: "a thick iron rod, fastened
+    # at the ends to the inside of the stern of vessels that carry a fore and aft mainsail,
+    # for the main sheet to travel on"); the sheet's geometry reads it (evolutions/trim.py).
+    horse_m: float | None = None
 
     @property
     def parent(self) -> str | None:
@@ -317,6 +326,9 @@ class LineSpec:
     of: str
     side: str | None = None
     rating_kn: float | None = None
+    # Package 32e: the parts of a sheet's purchase (a threefold purchase: 3), which the
+    # sheet's scope in fathoms of fall reads (evolutions/trim.py); 1 for a single rope.
+    parts: int = 1
 
 
 @dataclass
@@ -454,6 +466,7 @@ def _parse_hull(h: Any, source: str) -> HullSpec:
         area_m2=_num(r, "area_m2", "hull.rudder", source, required=False) or 2.0,
         max_angle_deg=_num(r, "max_angle_deg", "hull.rudder", source, required=False) or 35.0,
         rate_deg_s=_num(r, "rate_deg_s", "hull.rudder", source, required=False) or 4.0,
+        span_m=_num(r, "span_m", "hull.rudder", source, required=False),
     )
     return HullSpec(
         length_waterline_m=_num(h, "length_waterline_m", where, source),
@@ -499,6 +512,7 @@ def _parse_spar(s: Any, i: int, source: str) -> SparSpec:
         rigged_out=_rigged_out(s, cls, where, source, running=bool(running)),
         running=running,
         housed_length_m=_housed_length(s, cls, where, source, running=bool(running)),
+        horse_m=_num(s, "horse_m", where, source, required=False),
     )
 
 
@@ -628,12 +642,16 @@ def _parse_line(ln: Any, i: int, source: str) -> LineSpec:
     side = _str(ln, "side", where, source, required=False)
     if side is not None and side not in SIDES:
         raise ShipFileError(f"{source}: {where} has side '{side}'; use starboard or larboard.")
+    parts = ln.get("parts", 1)
+    if isinstance(parts, bool) or not isinstance(parts, int) or parts < 1:
+        raise ShipFileError(f"{source}: {where} has parts = {parts!r}; a purchase has whole parts.")
     return LineSpec(
         id=lid,
         cls=cls,
         of=_str(ln, "of", where, source),
         side=side,
         rating_kn=_num(ln, "rating_kn", where, source, required=False),
+        parts=parts,
     )
 
 

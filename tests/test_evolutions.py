@@ -98,14 +98,20 @@ def staller(rate_deg_s: float, dies_in_s: float) -> Stepper:
     return stepper
 
 
-def hangs_in_stays(rate_deg_s: float) -> Stepper:
-    """Physics that turns until her head is twenty degrees off the wind, then hangs."""
+def hangs_in_stays(rate_deg_s: float, at_deg: float = 20.0, dies_in_s: float = 0.0) -> Stepper:
+    """Physics that turns until her head is `at_deg` off the wind, then hangs; with
+    `dies_in_s` her way then dies away over that many seconds (package 32e)."""
     turn = turner(rate_deg_s)
+    hung = {}
 
     def stepper(ship, dt, wind) -> None:
         rel = units.relative_bearing(ship.dyn.heading, wind.direction_from)
-        if abs(rel) > units.deg_to_rad(20):
+        if abs(rel) > units.deg_to_rad(at_deg):
             turn(ship, dt, wind)
+        elif dies_in_s > 0:
+            speed0 = hung.setdefault("speed", ship.dyn.speed)
+            hung["t"] = hung.get("t", 0.0) + dt
+            ship.dyn.speed = max(0.0, speed0 * (1 - hung["t"] / dies_in_s))
         deck_reading(ship, wind)
 
     return stepper
@@ -626,7 +632,13 @@ def test_tack_succeeds_when_the_ship_turns(path):
     assert kinds(notes)[-1] == "ship.tacked"
     assert "braced up on the larboard tack" in texts(notes)[-1]
     words = texts(notes)
-    assert words.index("Rise tacks and sheets. Mainsail haul.") < words.index("Let go and haul.")
+    if path == FRIGATE:
+        assert words.index("Rise tacks and sheets. Mainsail haul.") < words.index(
+            "Let go and haul."
+        )
+    else:
+        # a vessel with no after yards has no "mainsail haul" (package 32e)
+        assert "Let go and haul." in words and not any("Mainsail haul" in w for w in words)
     # The stub's turn rate sets the time; a frigate should take five to ten minutes.
     assert 240 <= ticks <= 600
     assert ship.dyn.tack == "larboard"
@@ -650,29 +662,44 @@ def test_tack_misses_stays_when_she_loses_her_way():
             y.brace_angle = y.brace_limit
     runner.start(ship, "tack", "ship")
     ticks, notes = run(runner, ship, wind, staller(0.4, dies_in_s=60))
-    assert kinds(notes)[-1] == "ship.missed_stays"
-    assert notes[-1][0] == "urgent"
-    assert "lost her way" in texts(notes)[-1]
+    # package 32e: her way gone with her head more than a point off the wind is a plain
+    # miss, said at once; the yards are then squared as a brace with hands and time, and
+    # the evolution ends when they are square and she has fallen off
+    missed = [n for n in notes if n[1] == "ship.missed_stays"]
+    assert len(missed) == 1 and missed[0][0] == "urgent"
+    assert "lost her way before her head came up to the wind" in missed[0][2]
+    assert "square the yards" in missed[0][2]
+    assert kinds(notes)[-1] == "ship.fell_off"
     assert "fell off on the starboard tack" in texts(notes)[-1]
     assert "ship.tacked" not in kinds(notes)
-    assert ticks < 120
+    missed_at = next(i for i, n in enumerate(notes) if n[1] == "ship.missed_stays")
+    assert missed_at < len(notes) - 1  # the squaring took time after the miss
+    assert 60 <= ticks <= 200
     for y in ship.spars.values():
         if y.is_yard:
-            assert y.brace_angle == 0.0, y.id  # squared, ready for a wear
+            assert y.brace_angle == pytest.approx(0.0), y.id  # squared, ready for a wear
     assert ship.dyn.target_heading == pytest.approx(old_heading)
     assert runner.in_progress() == []
 
 
 def test_tack_misses_stays_when_she_hangs_head_to_wind():
+    """Package 32e: her way gone within a point of the wind, she hangs in stays and is
+    given Luce's recovery (the helm kept a-lee, the head sheets to windward); hung for
+    the file's stays_timeout_s from the moment her way went, she has missed stays."""
     ship = load_ship(SCHOONER)
     runner = Runner(ship)
     wind = make_wind(from_deg=90.0, knots=10.0)
     close_hauled_on_starboard(ship, wind)
     runner.start(ship, "tack", "ship")
-    ticks, notes = run(runner, ship, wind, hangs_in_stays(1.0))
-    assert kinds(notes)[-1] == "ship.missed_stays"
-    assert "hung in stays" in texts(notes)[-1]
-    assert ticks == 181
+    ticks, notes = run(runner, ship, wind, hangs_in_stays(1.0, at_deg=8.0, dies_in_s=30))
+    words = texts(notes)
+    assert any(w.startswith("Her way is gone; she hangs in stays. Helm kept a-lee") for w in words)
+    missed = [n for n in notes if n[1] == "ship.missed_stays"]
+    assert len(missed) == 1 and "hung in stays and would not come round" in missed[0][2]
+    assert kinds(notes)[-1] == "ship.fell_off"
+    # about 47 s to come up to eight degrees off, 22 s more for her way to go and the
+    # fifteen the rule waits, then 180 s in stays, then the yards squared over brace_s
+    assert 280 <= ticks <= 360, ticks
 
 
 @pytest.mark.parametrize("path", SHIPS)
@@ -732,7 +759,8 @@ def test_heave_to_and_fill_away(path, backed_sail, backed_yard):
     close_hauled_on_starboard(ship, wind)
     with pytest.raises(OrderError, match="She is not hove to."):
         runner.start(ship, "fill_away", "ship")
-    with pytest.raises(OrderError, match="No sail is set on the"):
+    no_sail = "No sail is set on the" if path == FRIGATE else "No head sail is set to haul"
+    with pytest.raises(OrderError, match=no_sail):
         runner.start(ship, "heave_to", "ship")
     set_sail(runner, ship, wind, backed_sail)
     for y in ship.spars.values():

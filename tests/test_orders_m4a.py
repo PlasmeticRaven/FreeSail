@@ -94,23 +94,27 @@ TRIM_TABLE: list[tuple[str, ok | no]] = [
         ),
     ),
     ("trim the fore yard", ok(yards=["fore.yard"], text=["Braced the fore yard to the wind"])),
-    ("trim the jib", ok(sheets=["jib"], text=["Trimmed the sheet of the jib."])),
+    # package 32e: a sheet is trimmed by an evolution with hands and time, so the order's
+    # line says the work is begun
+    ("trim the jib", ok(sheets=["jib"], text=["Trimming the sheet of the jib."])),
     (
         "trim the spanker",
-        ok(sheets=["mizzen.spanker"], text=["Trimmed the sheet of the mizzen spanker."]),
+        ok(sheets=["mizzen.spanker"], text=["Trimming the sheet of the mizzen spanker."]),
     ),
     (
         "trim the headsails",
         ok(
             sheets=["fore.topmast_staysail", "jib"],
-            text=["Trimmed the sheets of the fore topmast staysail; the jib."],
+            text=["Trimming the sheets of the fore topmast staysail and the jib."],
         ),
     ),
     (
         "tend the sheets",
         ok(
             sheets=["mizzen.spanker", "fore.topmast_staysail", "jib"],
-            text=["Trimmed the sheets of the mizzen spanker; the fore topmast staysail; the jib."],
+            text=[
+                "Trimming the sheets of the mizzen spanker, the fore topmast staysail and the jib."
+            ],
         ),
     ),
     ("tend sheets", ok(sheets=["mizzen.spanker", "fore.topmast_staysail", "jib"])),
@@ -134,12 +138,12 @@ def test_trim_the_sail_and_tend_the_sheets(text: str, expect: ok | no):
         assert runner.started == []
         return
     kind, log, data = handle(ship, text)
-    assert [s for _, s, _ in runner.started] == expect.yards
+    assert [s for e, s, _ in runner.started if e == "brace"] == expect.yards
     assert data["trimmed_sheets"] == [
         f"the {ship.sails[s].id.replace('.', ' ').replace('_', ' ')}" for s in expect.sheets
     ] or len(data["trimmed_sheets"]) == len(expect.sheets)
-    for s in expect.sheets:
-        assert ship.sails[s].sheet_angle > 0.0
+    # each sheet trimmed by its own evolution (package 32e), none set at once
+    assert [s for e, s, _ in runner.started if e.startswith("trim_")] == expect.sheets
     for m in expect.text:
         assert m in log, log
     assert log[0].isupper() and log.endswith(".")
@@ -165,19 +169,23 @@ def test_trim_the_sail_braces_only_that_yard_and_to_the_wind():
 def test_tend_the_sheets_touches_no_brace_and_trim_sails_does_both():
     ship, runner = rigged()
     kind, _, data = handle(ship, "tend the sheets")
-    assert runner.started == [] and len(data["trimmed_sheets"]) == 3 and kind == "sail.trimmed"
+    assert not [e for e, _, _ in runner.started if e == "brace"]
+    assert len(runner.started) == 3 and len(data["trimmed_sheets"]) == 3
+    assert kind == "sail.trimmed"
     ship, runner = rigged()
     _, _, data = handle(ship, "trim sails")
-    assert len(runner.started) == 12 and len(data["trimmed_sheets"]) == 3
+    assert len([e for e, _, _ in runner.started if e == "brace"]) == 12
+    assert len(data["trimmed_sheets"]) == 3 and len(runner.started) == 15
 
 
 def test_the_schooner_trims_her_gaff_sails_by_the_sheet_and_her_topsail_by_the_yard():
     ship, runner = rigged(SCHOONER, awa_deg=45.0)
     kind, log, data = handle(ship, "trim the mainsail")
-    assert runner.started == [] and data["trimmed_sheets"] == ["the main sail"]
-    assert log == "Trimmed the sheet of the main sail."
+    assert [(e, s) for e, s, _ in runner.started] == [("trim_gaff_sheet", "main.sail")]
+    assert data["trimmed_sheets"] == ["the main sail"]
+    assert log == "Trimming the sheet of the main sail."
     kind, log, _ = handle(ship, "trim the fore topsail")
-    assert [s for _, s, _ in runner.started] == ["fore.topsail.yard"]
+    assert [s for e, s, _ in runner.started if e == "brace"] == ["fore.topsail.yard"]
 
 
 # ---------------------------------------------------------------------------
@@ -302,6 +310,7 @@ STARTER_NAMES = [
     "shorten sail for weather",
     "keep her full",
     "trim on a shift",
+    "tend the sheets",  # package 32e: the sheets tended every glass
     "heavy weather",
     "storm staysail",
 ]
@@ -312,18 +321,18 @@ def test_the_starter_file_loads_in_the_console_with_the_well_refused_and_the_res
     con = Console(close_hauled_frigate(), out=out)
     assert con.handle_line(f"read the standing orders from {STARTER}")
     text = out.getvalue()
-    assert f"Read 8 standing orders from {STARTER}." in text
+    assert f"Read 9 standing orders from {STARTER}." in text  # 32e: tending the sheets
     assert con.world.standing.book.names == STARTER_NAMES
     refused = [e for e in con.world.log if e.kind == "order.rejected"]
     assert len(refused) == 1
     assert "In standing order 'sound the well', 'sound the well': The ship has no well" in (
         refused[0].text
     )
-    # the refused line is not journaled; the seven that entered are
+    # the refused line is not journaled; the eight that entered are (32e: the sheets)
     journaled = [t for _, _, t in con.world.journal if t.startswith("standing order")]
-    assert len(journaled) == 7 and all("sound the well" not in t for t in journaled)
+    assert len(journaled) == 8 and all("sound the well" not in t for t in journaled)
     con.handle_line("standing orders")
-    assert "Standing orders (7):" in out.getvalue()
+    assert "Standing orders (8):" in out.getvalue()
 
 
 def test_the_starter_file_loads_on_the_server_driver():
@@ -337,7 +346,7 @@ def test_the_starter_file_names_a_source_for_every_order():
     from pathlib import Path
 
     text = Path(STARTER).read_text(encoding="utf-8")
-    assert text.count('standing order "') == 8
+    assert text.count('standing order "') == 9  # package 32e: "tend the sheets"
     for word in ("Luce 1866", "truth 9", "truth 28", "milestone 5", "judgement"):
         assert word in text, word
     assert "\r" not in text

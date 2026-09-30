@@ -9,6 +9,7 @@ import random
 import pytest
 
 from freesail import units
+from freesail.evolutions.trim import set_sheet_angle, sheet_geometry
 from freesail.physics import sails as S
 from freesail.physics.sails import SAIL_CLASSES, SailForces, compute_sail_forces
 from freesail.physics.wind import Wind, WindParams
@@ -46,7 +47,8 @@ def set_sails(ship, ids, brace_deg=0.0, sheet_deg=None):
     if sheet_deg is not None:
         for s in ship.sails.values():
             if s.is_fore_and_aft:
-                s.sheet_angle = math.radians(sheet_deg)
+                # package 32e: the sheet holds the trim; set through the line
+                set_sheet_angle(ship, s, math.radians(sheet_deg), "either")
 
 
 def frigate_plain_sail(brace_deg=38.0, sheet_deg=25.0, speed_kn=0.0):
@@ -354,7 +356,18 @@ def test_loads_go_on_cloth_spars_and_lines():
     assert ship.lines["topsail.sheet.starboard"].load_kn == pytest.approx(0.6 * top.force_kn)
     assert ship.lines["topsail.yard.halyard"].load_kn == pytest.approx(0.5 * top.force_kn)
     assert ship.lines["topsail.yard.brace.larboard"].load_kn == pytest.approx(0.3 * top.force_kn)
-    assert ship.lines["mainsail.sheet"].load_kn == pytest.approx(0.6 * main.force_kn)
+    # a boomed sail's sheet holds the boom against the sail's moment about the mast
+    # (package 32e): the pull times the centre's distance abaft the mast over the sheet's
+    # lever; the mainsail's centre is 4 m abaft the mast
+    geo = sheet_geometry(ship, main)
+    lever = geo.lever_m(main.sheet_angle)
+    assert ship.lines["mainsail.sheet"].load_kn == pytest.approx(main.force_kn * 4.0 / lever)
+    assert ship.lines["mainsail.sheet"].load_kn > 0.0
+    # a loose-footed sail's working sheet takes 0.6 of the pull, the slack one nothing
+    lee = "larboard" if ship.dyn.apparent_wind_angle >= 0 else "starboard"
+    weather = "starboard" if lee == "larboard" else "larboard"
+    assert ship.lines[f"jib.sheet.{lee}"].load_kn == pytest.approx(0.6 * jib.force_kn)
+    assert ship.lines[f"jib.sheet.{weather}"].load_kn == 0.0
     assert ship.lines["gaff.peak_halyard"].load_kn == pytest.approx(0.5 * main.force_kn)
     assert ship.lines["gaff.throat_halyard"].load_kn == pytest.approx(0.5 * main.force_kn)
     assert ship.spars["gaff"].load_kn == pytest.approx(main.force_kn)

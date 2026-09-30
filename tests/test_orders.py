@@ -273,12 +273,14 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (F, "haul the brace", no(["could be"], AmbiguousNounError)),
     (F, "ease the weather fore topsail brace", ok(kind="line.eased", text=["fore topsail yard"])),
     (F, "haul the starboard cro'jack brace", ok(kind="line.hauled", text=["crossjack"])),
-    (F, "ease the spanker sheet", ok(kind="line.eased", text=["mizzen spanker now 5°"])),
-    (F, "ease the spanker sheet a fathom", ok(kind="line.eased", text=["5° off the centreline"])),
+    # package 32e: a haul or an ease is a fathom of the fall; the sail's angle follows by
+    # the boom's geometry from its floor of 18 degrees (the spanker's sheet is flat aft)
+    (F, "ease the spanker sheet", ok(kind="line.eased", text=["mizzen spanker now 24°"])),
+    (F, "ease the spanker sheet a fathom", ok(kind="line.eased", text=["24° off the centreline"])),
     (
         F,
         "ease the spanker sheet two fathoms",
-        ok(kind="line.eased", text=["10° off the centreline"]),
+        ok(kind="line.eased", text=["29° off the centreline"]),
     ),
     (F, "ease the spanker sheet handsomely", ok(kind="line.eased", text=["handsomely"])),
     (F, "start the spanker sheet", ok(kind="line.eased")),
@@ -288,7 +290,9 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (F, "ease the fore topsail halyard a little", ok(kind="line.eased", text=["nine-tenths"])),
     (F, "check the fore topsail halyard", ok(kind="line.eased")),
     (F, "ease the jib sheet, lee", ok(kind="line.eased", text=["larboard (lee) jib sheet"])),
-    (F, "haul the jib sheet", no(["Which jib sheet"])),
+    (F, "haul the jib sheet", no(["already hard in"])),  # the lee sheet (package 32e)
+    (F, "haul the jib sheet to windward", ok(kind="line.hauled", text=["to windward", "aback"])),
+    (F, "let fly the jib sheet", ok(kind="line.let_go", text=["flogging"])),
     (F, "let go the fore topsail sheet, starboard", ok(kind="line.let_go", text=["ran free"])),
     (F, "let go the starboard fore topsail sheet", ok(kind="line.let_go")),
     (F, "cast off the fore course tack, weather", ok(kind="line.let_go")),
@@ -385,12 +389,12 @@ TABLE: list[tuple[str, str, ok | no]] = [
         ok(kind="line.hauled", text=["starboard (weather) fore topsail brace"]),
     ),
     (S, "haul the lee fore topsail brace", ok(kind="line.hauled", text=["larboard (lee)"])),
-    (S, "ease the main sheet", ok(kind="line.eased", text=["main sail now 5°"])),
-    (S, "ease the main sheet a fathom", ok(kind="line.eased", text=["5° off"])),
-    (S, "ease the mainsail sheet two fathoms", ok(kind="line.eased", text=["10° off"])),
+    (S, "ease the main sheet", ok(kind="line.eased", text=["main sail now 20°"])),
+    (S, "ease the main sheet a fathom", ok(kind="line.eased", text=["20° off"])),
+    (S, "ease the mainsail sheet two fathoms", ok(kind="line.eased", text=["22° off"])),
     (S, "ease the fore sheet, lee", ok(kind="line.eased", text=["larboard (lee) fore sail sheet"])),
     (S, "haul the fore sheet, lee", no(["already hard in"])),
-    (S, "haul the jib sheet", no(["Which jib sheet"])),
+    (S, "haul the jib sheet", no(["already hard in"])),  # the lee sheet (package 32e)
     (S, "haul the jib sheet, weather", no(["already hard in"])),
     (
         S,
@@ -503,7 +507,7 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (F, "gybe", ok(evo="wear", subjects=["ship"])),
     # sheets: aft, home, sheet home, plural families, the frigate's main sheet
     (F, "haul aft the spanker sheet", no(["already hard in"])),
-    (F, "haul the jib sheet aft", no(["Which jib sheet"])),
+    (F, "haul the jib sheet aft", no(["already hard in"])),
     (F, "haul the lee jib sheet aft", no(["already hard in"])),
     (F, "sheet home the fore topsail", no(["sheeted home already"])),
     (F, "haul home the topsail sheets", no(["Nothing done", "already hauled home"])),
@@ -677,13 +681,13 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (C, "brace the yards to the wind", ok(evo="brace", count=3, text=["three yards to the wind"])),
     (C, "haul the weather topsail brace", ok(kind="line.hauled", text=["(weather) topsail brace"])),
     (C, "haul the weather main brace", no(["no such part as the main brace"], UnknownNounError)),
-    (C, "ease the main sheet", ok(kind="line.eased", text=["main sail now 5°"])),
+    (C, "ease the main sheet", ok(kind="line.eased", text=["main sail now 21°"])),
     (
         C,
         "ease the fore sheet, lee",
         ok(kind="line.eased", text=["larboard (lee) fore staysail sheet"]),
     ),
-    (C, "haul the jib sheet", no(["Which jib sheet"])),
+    (C, "haul the jib sheet", no(["already hard in"])),  # the lee sheet (package 32e)
     (C, "ease the jib sheet, weather", ok(kind="line.eased", text=["(weather) jib sheet"])),
     (C, "ease the main peak halyard", ok(kind="line.eased", text=["main gaff peak halyard"])),
     (C, "ease the throat halyard", ok(kind="line.eased", text=["main gaff throat halyard"])),
@@ -926,18 +930,31 @@ def test_hauling_by_fathoms_takes_several_steps():
 
 
 def test_sheet_of_a_fore_and_aft_sail_changes_its_angle():
+    """Package 32e: the sheet holds the trim. A haul or an ease is a fathom of the fall
+    (a threefold purchase on the schooner's main boom), and the sail's angle is read from
+    the sheet's length through the boom's geometry, from its floor (flat aft)."""
+    from freesail.evolutions import trim
+
     ship, _ = make("schooner")
     sail = ship.sails["main.sail"]
-    assert sail.sheet_angle == 0.0
+    geo = trim.sheet_geometry(ship, sail)
+    assert ship.lines["main.sail.sheet"].hauled == 1.0  # flat aft: the floor
     with pytest.raises(OrderError, match="already hard in"):
         orders.handle(ship, "haul the main sheet")
     orders.handle(ship, "ease the main sheet")
-    assert sail.sheet_angle == pytest.approx(units.deg_to_rad(5))
+    after_one = sail.sheet_angle
+    assert after_one > geo.floor
+    assert ship.lines["main.sail.sheet"].hauled == pytest.approx(1.0 - trim.FATHOM_M / geo.scope_m)
     orders.handle(ship, "ease the main sheet three fathoms")
-    assert sail.sheet_angle == pytest.approx(units.deg_to_rad(20))
+    assert sail.sheet_angle > after_one
+    assert sail.sheet_angle == pytest.approx(
+        geo.angle_from_hauled(1.0 - 4 * trim.FATHOM_M / geo.scope_m)
+    )
     _, log, _ = orders.handle(ship, "haul the main sheet")
-    assert sail.sheet_angle == pytest.approx(units.deg_to_rad(15))
-    assert "15° off the centreline" in log
+    assert sail.sheet_angle == pytest.approx(
+        geo.angle_from_hauled(1.0 - 3 * trim.FATHOM_M / geo.scope_m)
+    )
+    assert "off the centreline" in log
 
 
 def test_sheet_of_a_square_sail_and_a_halyard_move_the_hoist():
@@ -1226,13 +1243,14 @@ def test_a_line_order_works_the_lines_it_can_and_reports_the_rest():
 def test_haul_aft_and_home_take_the_line_all_the_way():
     ship, _ = make("frigate")
     spanker = ship.sails["mizzen.spanker"]
+    floor = units.deg_to_rad(18.0)  # a gaff sail's floor (trim.TRIM_RANGE)
     orders.handle(ship, "ease the spanker sheet three fathoms")
-    assert spanker.sheet_angle == pytest.approx(units.deg_to_rad(15))
+    assert spanker.sheet_angle > floor + units.deg_to_rad(5)
     _, log, _ = orders.handle(ship, "haul aft the spanker sheet")
-    assert spanker.sheet_angle == 0.0 and "flat aft" in log and "amidships" in log
+    assert spanker.sheet_angle == pytest.approx(floor) and "flat aft" in log
     orders.handle(ship, "ease the spanker sheet")
     orders.handle(ship, "haul the spanker sheet aft")
-    assert spanker.sheet_angle == 0.0
+    assert spanker.sheet_angle == pytest.approx(floor)
     halyard = ship.lines["fore.topsail.yard.halyard"]
     orders.handle(ship, "ease the fore topsail halyard four fathoms")
     assert halyard.hauled == pytest.approx(0.6)
@@ -1255,11 +1273,13 @@ def test_sheet_home_hauls_every_sheet_of_the_sail():
         assert line.hauled == 1.0 and line.state is LineState.BELAYED
     with pytest.raises(OrderError, match="sheeted home already"):
         orders.handle(ship, "sheet home the fore topsail")
-    # a fore-and-aft sail: the sheet hauled flat aft
+    # a fore-and-aft sail: the sheet hauled flat aft, to the sail's floor (package 32e)
+    from freesail.evolutions import trim
+
     spanker = ship.sails["mizzen.spanker"]
-    spanker.sheet_angle = units.deg_to_rad(20)
+    trim.set_sheet_angle(ship, spanker, units.deg_to_rad(25))
     _, log, _ = orders.handle(ship, "sheet home the spanker")
-    assert spanker.sheet_angle == 0.0 and "flat aft" in log
+    assert spanker.sheet_angle == pytest.approx(units.deg_to_rad(18)) and "flat aft" in log
     with pytest.raises(OrderError, match="You sheet home sails"):
         orders.handle(ship, "sheet home the fore topsail sheet, starboard")
 

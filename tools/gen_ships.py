@@ -354,6 +354,16 @@ def ft(x: float) -> float:
     return round(x * FT, 1)
 
 
+# Package 32e: the horse a boom's sheet travels on, written on every gaff sail's boom.
+HORSE_NOTE = (
+    "is the horse across the stern for the sheet to travel on (Steel 1794 vol. I, p. 167, "
+    "HORSE: 'a thick iron rod, fastened at the ends to the inside of the stern of vessels "
+    "that carry a fore and aft mainsail, for the main sheet to travel on'), half the beam "
+    "(judgement: the inside breadth of the stern); the sheet's geometry reads it "
+    "(evolutions/trim.py)."
+)
+
+
 def rope_kn(circ_in: float, parts: int = 1) -> float:
     """Working rating of a tarred hemp rope of this circumference, rove with this many parts."""
     return round(parts * ROPE_KN_PER_SQ_IN * circ_in * circ_in, 1)
@@ -435,12 +445,15 @@ class Builder:
             self.notes[id] = note
         return id
 
-    def line(self, id, cls, of, side=None, rating=None, note=None):
+    def line(self, id, cls, of, side=None, rating=None, note=None, parts=None):
         d = {"id": id, "class": cls, "of": of}
         if side:
             d["side"] = side
         if rating:
             d["rating_kn"] = rating
+        if parts is not None and parts > 1:
+            # a sheet's purchase (package 32e): its fall's scope in fathoms reads it
+            d["parts"] = int(parts)
         self.doc["lines"].append(d)
         if note:
             self.notes[id] = note
@@ -724,7 +737,7 @@ def frigate(out_dir="data/ships"):
             "lateral_area_m2": round(lwl * draught * 0.85, -1),
             "hull_speed_kn": 13.0,
             "deck_height_m": deck_height,
-            "rudder": {"area_m2": 6.0, "max_angle_deg": 35, "rate_deg_s": 3.0},
+            "rudder": {"area_m2": 6.0, "max_angle_deg": 35, "rate_deg_s": 3.0, "span_m": 4.6},
         },
         {
             "length_waterline_m": f"{lwl_ft:.0f} ft: judgement, 0.96 of the 143 ft gundeck "
@@ -748,7 +761,9 @@ def frigate(out_dir="data/ships"):
             "reports is 12 to 13 knots (Winfield); the derived 1.34 sqrt(LWL ft) = 15.7 is "
             "a modern yacht's figure. Package 10 may tune within 12.5 to 13.5.",
             "deck_height_m": "Upper (gun) deck at midships, about 6 ft above the load line.",
-            "rudder": "Blade about 15 ft by 4 ft 3 in; 35 degrees is the period stop.",
+            "rudder": "Blade about 15 ft by 4 ft 3 in (span_m its depth, 15 ft: with the area "
+            "it gives the blade's aspect ratio and so its lift slope, physics/hull.py, package "
+            "32e); 35 degrees is the period stop.",
         },
     )
 
@@ -1049,8 +1064,9 @@ def frigate(out_dir="data/ships"):
         on="mizzen.mast",
         length_m=ft(boom_ft),
         height_m=2.4,
+        horse_m=round(0.5 * beam, 1),
         rating_kn=design_kn([(SPANKER_AREA, SPANKER_CENTRE, "gaff")], DESIGN_WIND_KN["gaff"]),
-        note=f"spanker boom {boom_ft:.0f} ft, half the main mast (Luce).",
+        note=f"spanker boom {boom_ft:.0f} ft, half the main mast (Luce); horse_m " + HORSE_NOTE,
     )
     spanker = b.sail(
         "mizzen.spanker",
@@ -1070,7 +1086,7 @@ def frigate(out_dir="data/ships"):
     )
     b.line("mizzen.gaff.throat_halyard", "throat_halyard", gaff, rating=rope_kn(4.5, 3))
     b.line("mizzen.gaff.peak_halyard", "peak_halyard", gaff, rating=rope_kn(4.0, 4))
-    b.line("mizzen.spanker.sheet", "sheet", spanker, rating=rope_kn(5.0, 2))
+    b.line("mizzen.spanker.sheet", "sheet", spanker, rating=rope_kn(5.0, 2), parts=2)
     b.line("mizzen.spanker.outhaul", "outhaul", spanker, rating=rope_kn(3.5))
     b.sided("mizzen.gaff.vang", "vang", gaff, rating=rope_kn(3.5))
 
@@ -1374,7 +1390,7 @@ def frigate(out_dir="data/ships"):
         "bent in place of the spanker; in the sail room." + canvas_note(storm_canvas),
     )
     b.line("storm_mizzen.halyard", "halyard", sm, rating=rope_kn(3.0, 2))
-    b.line("storm_mizzen.sheet", "sheet", sm, rating=rope_kn(3.5, 3))
+    b.line("storm_mizzen.sheet", "sheet", sm, rating=rope_kn(3.5, 3), parts=3)
     b.line("storm_mizzen.downhaul", "downhaul", sm, rating=rope_kn(2.5))
     storm = [fss, mss, sm]
 
@@ -1667,7 +1683,7 @@ def schooner(out_dir="data/ships"):
             "lateral_area_m2": round(lwl * draught * 0.78, -1),
             "hull_speed_kn": 11.5,
             "deck_height_m": deck_height,
-            "rudder": {"area_m2": 2.0, "max_angle_deg": 35, "rate_deg_s": 4.0},
+            "rudder": {"area_m2": 2.0, "max_angle_deg": 35, "rate_deg_s": 4.0, "span_m": 3.4},
         },
         {
             "length_waterline_m": f"{lwl_ft:.0f} ft: judgement between Lynx's {keel_ft:.0f} ft "
@@ -1691,7 +1707,8 @@ def schooner(out_dir="data/ships"):
             "1.34 sqrt(LWL ft) = 12.4 is too generous. Package 10 may tune within 11 to 12.",
             "deck_height_m": "Port sills 3 ft 5 in above the water and 10 in above the deck "
             "(Spider's specification, Chapelle pp. 166-167): a low-sided vessel.",
-            "rudder": "A deep narrow blade, about 11 ft by 2 ft.",
+            "rudder": "A deep narrow blade, about 11 ft by 2 ft (span_m its depth, 11 ft; "
+            "package 32e).",
         },
     )
 
@@ -1996,9 +2013,10 @@ def schooner(out_dir="data/ships"):
         on=main,
         length_m=ft(main_boom),
         height_m=1.5,
+        horse_m=round(0.5 * beam, 1),
         rating_kn=design_kn([(main_area, main_centre, "gaff")], dw["gaff"]),
         note=f"main boom {main_boom:.0f} ft, 0.70 of LWL (Fincham; Sea Lark's 0.71, Chapelle "
-        "p. 42), well over the taffrail.",
+        "p. 42), well over the taffrail; horse_m " + HORSE_NOTE,
     )
     mainsail = b.sail(
         "main.sail",
@@ -2024,6 +2042,7 @@ def schooner(out_dir="data/ships"):
         "sheet",
         mainsail,
         rating=rope_kn(4.0, 3),
+        parts=3,
         note="4 in, a threefold purchase.",
     )
     b.line("main.sail.outhaul", "outhaul", mainsail, rating=rope_kn(2.5))
@@ -2220,7 +2239,7 @@ def schooner(out_dir="data/ships"):
         "bent to the main gaff and boom in place of the mainsail; in the sail room."
         + canvas_note(storm_canvas),
     )
-    b.line("storm_trysail.sheet", "sheet", st, rating=rope_kn(4.0, 3))
+    b.line("storm_trysail.sheet", "sheet", st, rating=rope_kn(4.0, 3), parts=3)
     b.line("storm_trysail.outhaul", "outhaul", st, rating=rope_kn(2.5))
     # the storm jib: Steel 1794 vol. I, the sloop's jibs: "two-thirds of the size of the first
     # jib, and is used in stormy weather, in lieu of a larger one"; hanked to the jib stay in
@@ -2873,7 +2892,7 @@ def cutter(out_dir="data/ships"):
             "lateral_area_m2": round(lwl * draught * 0.85),
             "hull_speed_kn": 9.5,
             "deck_height_m": deck_height,
-            "rudder": {"area_m2": 1.2, "max_angle_deg": 35, "rate_deg_s": 5.0},
+            "rudder": {"area_m2": 1.2, "max_angle_deg": 35, "rate_deg_s": 5.0, "span_m": 2.7},
         },
         {
             "length_waterline_m": f"{lwl_ft:.0f} ft: judgement between the {keel_ft:.0f} ft "
@@ -2899,7 +2918,8 @@ def cutter(out_dir="data/ships"):
             "records of 10 to 11 knots are the big cutters' of 150 to 200 tons (judgement).",
             "deck_height_m": "The deck about 3 ft above the water (judgement: a low-sided "
             "vessel, as the schooner).",
-            "rudder": "A deep narrow blade, about 9 ft by 1 ft 6 in (judgement).",
+            "rudder": "A deep narrow blade, about 9 ft by 1 ft 6 in (judgement; span_m its "
+            "depth, 9 ft; package 32e).",
         },
     )
 
@@ -3099,10 +3119,12 @@ def cutter(out_dir="data/ships"):
         on=mast,
         length_m=ft(boom_ft),
         height_m=ft(boom_h),
+        horse_m=round(0.5 * beam, 1),
         rating_kn=design_kn([(main_area, main_centre, "gaff")], dw["gaff"]),
         note=f"boom {boom_ft:.0f} ft, 0.87 of the length on deck (Fincham p. 67), far over "
         f"the counter: the clew of a cutter's mainsail lies 0.2 to 0.3 of the water-line "
-        f"abaft the post (Fincham art. 86); {boom_h:.0f} ft above the deck (judgement).",
+        f"abaft the post (Fincham art. 86); {boom_h:.0f} ft above the deck (judgement); "
+        "horse_m " + HORSE_NOTE,
     )
     sqy = b.spar(
         "square_sail.yard",
@@ -3226,6 +3248,7 @@ def cutter(out_dir="data/ships"):
         "sheet",
         mainsail,
         rating=rope_kn(3.5, 3),
+        parts=3,
         note="3.5 in, a threefold purchase on the boom (judgement, as the schooner's main sheet).",
     )
     b.line("main.sail.outhaul", "outhaul", mainsail, rating=rope_kn(2.0))
@@ -3410,7 +3433,7 @@ def cutter(out_dir="data/ships"):
         "the mainsail's, judgement); three reef-bands; bent to the gaff and boom in place of "
         "the mainsail; in the sail room." + canvas_note(storm_canvas),
     )
-    b.line("storm_trysail.sheet", "sheet", st, rating=rope_kn(3.5, 3))
+    b.line("storm_trysail.sheet", "sheet", st, rating=rope_kn(3.5, 3), parts=3)
     b.line("storm_trysail.outhaul", "outhaul", st, rating=rope_kn(2.0))
     # the storm jib: Steel's sloop's storm jib, two-thirds of the first jib (p. 190); its
     # tack on the traveller run in to the reefed bowsprit's end, so it sets whether the
@@ -3719,7 +3742,7 @@ def brig(out_dir="data/ships"):
             "lateral_area_m2": round(lwl * draught * 0.85, -1),
             "hull_speed_kn": 11.5,
             "deck_height_m": deck_height,
-            "rudder": {"area_m2": 3.0, "max_angle_deg": 35, "rate_deg_s": 3.5},
+            "rudder": {"area_m2": 3.0, "max_angle_deg": 35, "rate_deg_s": 3.5, "span_m": 3.7},
         },
         {
             "length_waterline_m": f"{lwl_ft:.0f} ft: judgement, 0.93 of the 95 ft gun deck "
@@ -3742,7 +3765,8 @@ def brig(out_dir="data/ships"):
             f"between the schooner's 11.5 and the frigate's 13); 1.34 sqrt({lwl_ft:.0f} ft) "
             "= 12.6 is a modern yacht's figure.",
             "deck_height_m": "A flush deck about 5 ft above the load line (judgement).",
-            "rudder": "Blade about 12 ft by 3 ft; 35 degrees is the period stop (judgement).",
+            "rudder": "Blade about 12 ft by 3 ft (span_m its depth, 12 ft; package 32e); 35 "
+            "degrees is the period stop (judgement).",
         },
     )
 
@@ -4034,10 +4058,11 @@ def brig(out_dir="data/ships"):
         on="main.mast",
         length_m=ft(boom_ft),
         height_m=ft(boom_h),
+        horse_m=round(0.5 * beam, 1),
         rating_kn=design_kn([(sp_area, sp_centre, "gaff")], dw["gaff"]),
         note=f"main boom {boom_ft:.0f} ft, 0.58 of the length on deck (Fincham p. 88; Luce's "
         f"half the main mast gives 32 ft, a ship's spanker boom), {boom_h:.0f} ft above the "
-        "deck (judgement).",
+        "deck (judgement); horse_m " + HORSE_NOTE,
     )
     spanker = b.sail(
         "main.spanker",
@@ -4063,7 +4088,7 @@ def brig(out_dir="data/ships"):
     )
     b.line("main.gaff.throat_halyard", "throat_halyard", gaff, rating=rope_kn(3.5, 3))
     b.line("main.gaff.peak_halyard", "peak_halyard", gaff, rating=rope_kn(3.0, 4))
-    b.line("main.spanker.sheet", "sheet", spanker, rating=rope_kn(4.0, 2))
+    b.line("main.spanker.sheet", "sheet", spanker, rating=rope_kn(4.0, 2), parts=2)
     b.line("main.spanker.outhaul", "outhaul", spanker, rating=rope_kn(3.0))
     b.sided("main.gaff.vang", "vang", gaff, rating=rope_kn(3.0))
 
@@ -4369,7 +4394,7 @@ def brig(out_dir="data/ships"):
         "deeper; three reef-bands; bent in place of the spanker; in the sail room."
         + canvas_note(storm_canvas),
     )
-    b.line("storm_trysail.sheet", "sheet", st, rating=rope_kn(4.0, 2))
+    b.line("storm_trysail.sheet", "sheet", st, rating=rope_kn(4.0, 2), parts=2)
     b.line("storm_trysail.outhaul", "outhaul", st, rating=rope_kn(3.0))
     storm = [fss, mss, st]
 

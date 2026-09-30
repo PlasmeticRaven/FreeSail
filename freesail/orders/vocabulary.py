@@ -64,6 +64,9 @@ class Vocabulary:
     work_nouns: dict[str, str] = field(default_factory=dict)
     # words after a line's name meaning it is rove again: "reeve the sheet afresh" (31b)
     afresh: tuple[str, ...] = ()
+    # words after a sheet's name saying which side it is hauled on: "haul the jib sheet to
+    # windward" -> "weather", "... to leeward" -> "lee" (package 32e)
+    sheet_to: dict[str, str] = field(default_factory=dict)
 
     @property
     def class_bound_take_in_phrases(self) -> frozenset[str]:
@@ -189,6 +192,9 @@ def load_vocabulary(path: str | Path | None = None) -> Vocabulary:
         vocab.phrase_modifiers[k] = dict(mods or {})
     vocab.haul_home = _tuple(data.get("haul_home"))
     vocab.afresh = _tuple(data.get("afresh"))
+    vocab.sheet_to = {
+        key(phrase): str(value) for phrase, value in (data.get("sheet_to") or {}).items()
+    }
     for cls, phrases in (data.get("take_in_words") or {}).items():
         vocab.take_in_words[str(cls)] = _tuple(phrases)
     vocab.hands_selectors = {

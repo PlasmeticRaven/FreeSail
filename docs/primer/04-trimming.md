@@ -105,15 +105,10 @@ The refusal: braced sharp up on the starboard tack, the main yard "is already br
 
 ## Tending the sheets
 
-A fore-and-aft sail is trimmed by its sheet: hauled in for the wind ahead, eased off as it draws aft (Falconer, *Sheet*). The game measures a gaff sail's or jib's trim as the angle of its foot from the centreline, and each haul or ease moves it five degrees. When a sail is set its sheet is trimmed to the apparent wind at once, and there is a floor a boom on its horse cannot come inside: 18° for a gaff sail, 15° for a jib or staysail. Close-hauled at 49° apparent the spanker is sheeted to 24°, and `haul the spanker sheet` brings it to 19°:
-
-```
-  Morning watch (04:15)  Order: haul the spanker sheet.
-  Morning watch (04:15)  Hauled the mizzen spanker sheet; the mizzen spanker now 19° off the centreline.
-```
+A fore-and-aft sail is trimmed by its sheet: hauled in for the wind ahead, eased off as it draws aft (Falconer, *Sheet*). Since package 32e **the sheet holds the trim**: the game keeps one record of a gaff sail's or a jib's angle, the length of its sheet hauled in, and reads the sail's angle from it through the boom's geometry (the boom's length, the breadth of the horse across the stern that the sheet travels on, Steel 1794, *Horse*, and the parts of its purchase) or, for a loose-footed sail, the travel of its clew. Each `haul` or `ease` takes in or gives a fathom of the fall; *two fathoms* two. **Haul aft** (or *aft*, *home*, *flat* after the sheet's name) hauls it all the way, to the floor a boom on its horse cannot come inside: 18° for a gaff sail, 15° for a jib or staysail. Eased right off, a gaff sail lies at 85° and a jib at 60°. A sail set has its sheet hauled aft, so the spanker under plain sail lies at its floor and the first order below eases it:
 
 ```orders frigate plain-sail
-haul the spanker sheet
+ease the spanker sheet
 ease the spanker sheet a fathom
 ease the spanker sheet two fathoms
 haul in the spanker sheet handsomely
@@ -125,7 +120,20 @@ haul the jib sheet aft, lee
 ease the fore topmast staysail sheet, lee
 ```
 
-Each `ease` lets the boom off five degrees and each `haul` brings it in five; the block starts with the spanker sheeted at its 18° floor for a wind at 40° apparent, so the first haul takes it to 13°, the two eases to 28°, and the next haul to 23°. **Haul aft** (or *aft* after the sheet's name) hauls it all the way: "Hauled the mizzen spanker sheet flat aft; the mizzen spanker now amidships". Then come the two refusals: "The mizzen spanker sheet is already hard in", and a sheet already flat aft is refused a second time.
+```
+  Morning watch (04:15)  Order: ease the spanker sheet.
+  Morning watch (04:15)  Eased the mizzen spanker sheet; the mizzen spanker now 24° off the centreline.
+  Morning watch (04:15)  Order: ease the spanker sheet a fathom.
+  Morning watch (04:15)  Eased the mizzen spanker sheet; the mizzen spanker now 29° off the centreline.
+  Morning watch (04:16)  Order: ease the spanker sheet two fathoms.
+  Morning watch (04:16)  Eased the mizzen spanker sheet; the mizzen spanker now 38° off the centreline.
+  Morning watch (04:16)  Order: haul in the spanker sheet handsomely.
+  Morning watch (04:16)  Hauled the mizzen spanker sheet, handsomely; the mizzen spanker now 33° off the centreline.
+  Morning watch (04:17)  Order: haul aft the spanker sheet.
+  Morning watch (04:17)  Hauled the mizzen spanker sheet flat aft; the mizzen spanker now 18° off the centreline.
+```
+
+The spanker's sheet is a twofold purchase on a 44-foot boom, so a fathom of the fall moves the boom five or six degrees near the floor and more further out; the schooner's threefold purchase on her great boom moves her mainsail two degrees a fathom. Then the two refusals: "The mizzen spanker sheet is already hard in", and a sheet already flat aft is refused a second time. A jib has a sheet each side, and the one that holds it is the lee sheet; name the sheet without a side and the lee one is meant, or say `lee` or `weather`.
 
 A square sail's sheets and tacks are hauled home when it is set and stay there (its bowlines are not: they start running free and are hauled on a wind; *Pointing*, below); ease a sheet and the log counts it off in tenths ("Eased the larboard (lee) main course sheet; now nine-tenths hauled"). **Sheet home** the sail, or **haul home** its sheets, and they are hauled home again and belayed; the plural names both sheets at once. Their trim is the yard's business.
 
@@ -141,11 +149,37 @@ haul home the topsail sheets
 
 The last refusal: "The fore topsail is sheeted home already."
 
-Between your orders **the watch on deck tends the fore-and-aft sheets for you**: each set jib, staysail and gaff sail is sheeted to the apparent wind as she comes up or falls off, at about a degree a second (`freesail/evolutions/trim.py`), and never inside the floors above. Square sails are never touched without an order. So after a tack the spanker and jib will find their trim by themselves, but the yards will sit where the tack left them until you brace or `trim`. It also means a sheet you haul by hand is eased again within the minute: hauled to 19° at 04:15, the spanker was back at 24° when `ease the spanker sheet a fathom` a minute later put it at 29°. Sheet orders by hand are for the moment, and for the crew work of milestone 3, which will make the watch do only what it is told.
+### A sheet to windward, let fly, and let draw
+
+Three more things a sheet does, all of them period practice. **Haul the jib sheet to windward** hauls the weather sheet aft and lets the lee one go: the sail stands aback by its sheet, pressed on its outer face, and its push at the bow throws her head off (Luce 1884, ch. XXXIV, 'Sloops': "trim the jib sheet to windward"; the same for the fore staysail when a fore-and-after heaves to, below in chapter 5). A boom's one sheet can be **hauled over to windward** the same way ("haul the spanker boom well over to the windward", Luce 1866, ch. XXIV, 'Tacking'), and `to leeward` lets it lie to leeward again. **Let fly** (or *let go*) a sheet and it runs: the sail flogs, drives nothing and strains its spars as a sail whose sheet has parted does, until the sheet is hauled again. **Let draw** (or *draw*) the sail, Luce's "Draw jib!", hauls the lee sheet aft to its trim and lets the weather one go.
+
+```orders frigate plain-sail
+haul the jib sheet to windward
+let draw the jib
+let fly the jib sheet
+haul the jib sheet
+haul the spanker sheet to windward
+ease the spanker sheet to leeward
+```
+
+```
+  Morning watch (04:20)  Order: haul the jib sheet to windward.
+  Morning watch (04:20)  Hauled the starboard jib sheet to windward; the jib now 15° off the centreline; aback.
+  Morning watch (04:20)  Order: let draw the jib.
+  Morning watch (04:20)  Let draw the jib; the lee sheet hauled aft, 15° off the centreline.
+  Morning watch (04:21)  Order: let fly the jib sheet.
+  Morning watch (04:21)  Let fly the larboard jib sheet; the jib flogging.
+  Morning watch (04:21)  Order: haul the jib sheet.
+  Morning watch (04:21)  Hauled the larboard jib sheet; the jib now 48° off the centreline.
+```
+
+A sheet let fly ran out to its full scope, so the first fathom hauled brings the jib back only from 60° to 48°: `trim the jib` (below) hauls it home to its trim in one order.
+
+**Nobody tends the sheets for you between orders.** Until package 32e the watch eased and hauled every fore-and-aft sheet to the wind a degree a second, for free and without a line in the log; that is retired. A sheet stays where hands left it until hands work it again: your level-0 orders, `trim` (below), the manoeuvres (a tack lets the head sheets fly, hauls the spanker sheet aft and draws them on the new tack; a wear shifts the sheets over as the wind comes aft), and the starter book's routine `standing order "tend the sheets": every glass then trim the sheets`, which is the afterguard's routine work at the glass. A ship whose hands are all aloft has sheets that are not tended, which is true.
 
 ## Trimming one sail, and tending the sheets
 
-**Trim the** *sail* trims that sail alone: a fore-and-aft sail by its sheet, at once, and a square sail by its yard, braced to the wind as `trim sails` would brace it; a group of sails ("trim the topsails") or a yard by name ("trim the fore yard") does the same for each. **Tend the sheets** is every fore-and-aft sheet and no brace, which is what a watch on deck does between orders. A sail that is not set has nothing to trim, and the refusal says so.
+**Trim the** *sail* trims that sail alone: a square sail by its yard, braced to the wind as `trim sails` would brace it; a fore-and-aft sail by its sheet, which since package 32e is an **evolution with hands and time**: the afterguard (six hands to a spanker's purchase) or the forecastlemen (four to a jib sheet) work the sheet to the length the wind wants, a sheet let fly taken up and hauled as part of it, in a time set by the sail's size (the frigate's spanker about a minute, her jib forty seconds, a staysail twenty). A group of sails ("trim the topsails") or a yard by name ("trim the fore yard") does the same for each. **Tend the sheets** is every fore-and-aft sheet and no brace. A sheet within a degree of its trim stands, and the line says so. A sail that is not set has nothing to trim, and the refusal says so.
 
 ```orders frigate plain-sail
 trim the fore topsail
@@ -156,9 +190,19 @@ tend the sheets
 # rejected: trim the fore royal
 ```
 
+```
+  Morning watch (04:25)  Order: trim the jib.
+  Morning watch (04:25)  Trimming the sheet of the jib.
+  Morning watch (04:25)  Man the jib sheet.
+  Morning watch (04:26)  Trimmed the jib sheet; the jib 20° off the centreline.
+  Morning watch (04:30)  Order: tend the sheets.
+  Morning watch (04:30)  Trimming the sheets of the mizzen spanker, the fore topmast staysail and the jib.
+  Morning watch (04:31)  Trimmed the sheets of the spanker, the fore topmast staysail and the jib; 20° to 24° off the centreline.
+```
+
 ## The `trim` order
 
-Package 13 adds the order the owner reached for at the gate. It braces every yard that has sail set to the best angle for the present apparent wind, each as its own `brace` evolution, the after yards a little sharper than the head yards on a wind (*Pointing*, below), and sheets the fore-and-aft sails at once:
+Package 13 adds the order the owner reached for at the gate. It braces every yard that has sail set to the best angle for the present apparent wind, each as its own `brace` evolution, the after yards a little sharper than the head yards on a wind (*Pointing*, below), and works every fore-and-aft sheet that is off its trim, each as its own sheet evolution:
 
 ```orders frigate plain-sail
 trim the yards
@@ -189,9 +233,9 @@ trim the yards
 
 ```
   Morning watch (04:20)  Order: trim sails.
-  Morning watch (04:20)  Braced twelve yards to the wind, 48° on the starboard bow, the after yards two degrees sharper; trimmed the sheets of the mizzen spanker; the fore topmast staysail; the jib.
+  Morning watch (04:20)  Braced twelve yards to the wind, 48° on the starboard bow, the after yards two degrees sharper; trimming the sheets of the mizzen spanker, the fore topmast staysail and the jib.
   Morning watch (05:05)  Order: trim sails with the head yards sharper.
-  Morning watch (05:05)  Braced twelve yards to the wind, 45° on the starboard bow, the head yards three degrees sharper; trimmed the sheets of the mizzen spanker; the fore topmast staysail; the jib.
+  Morning watch (05:05)  Braced twelve yards to the wind, 45° on the starboard bow, the head yards three degrees sharper; the sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
 ```
 
 What it is worth in the game is small: at 66° off the wind the frigate makes 5.2 knots with the after yards two degrees sharper and 5.0 with all alike, and 4.8 with the head yards sharper. Fincham's reason is the head sails bending the wind aft of them, and the game's sails all feel one wind, so the after sails gain only the little they gain by standing nearer their luff. The owner is judging it (truth 24).

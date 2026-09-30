@@ -552,6 +552,11 @@ def resolve(ship: Ship, phrase: str, side_word: str | None, verb: str) -> Resolu
         return Resolution(kept, noun.kind, noun.name, side, side_word)
 
     if noun.kind == "family" and len(ids) > 1:
+        if _fore_and_aft_sheets(ship, ids):
+            # "haul the jib sheet" (package 32e): a fore-and-aft sail's pair of sheets named
+            # without a side means the working one (the lee sheet; "to windward" the
+            # weather); the verb picks it (orders/verbs.py, `_pick_sheets`)
+            return Resolution(ids, noun.kind, noun.name, None, None)
         raise errors.OrderError(
             f"Which {noun.name}: the starboard, the larboard (the weather or the lee), "
             f"or both sides? ('{verb}' was understood.)"
@@ -569,6 +574,20 @@ def resolve(ship: Ship, phrase: str, side_word: str | None, verb: str) -> Resolu
             )
         raise errors.ambiguous_noun(" ".join(phrase.split()), families, verb)
     return Resolution(ids, noun.kind, noun.name, None, None)
+
+
+def _fore_and_aft_sheets(ship: Ship, ids: list[str]) -> bool:
+    """True when the ids are the two sheets of one fore-and-aft sail."""
+    sails: set[str] = set()
+    for pid in ids:
+        part = ship.parts.get(pid)
+        if not isinstance(part, Line) or part.cls != "sheet":
+            return False
+        sail = ship.parts.get(part.of)
+        if not isinstance(sail, Sail) or not sail.is_fore_and_aft:
+            return False
+        sails.add(sail.id)
+    return len(sails) == 1
 
 
 def _resolve_compound(

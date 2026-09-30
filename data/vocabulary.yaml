@@ -130,6 +130,15 @@ verbs:
     synonyms: [sheet home the, haul home the sheets of, haul aft the sheets of]
     object: sail
     level: 0
+  draw:
+    # "Draw jib!" (Luce 1884, ch. XXIV, 'Missing Stays'; ch. XXXIV, 'Sloops': "As she
+    # gathers headway on the new tack, 'Draw jib,' let go the clew rope and the sheet
+    # will fly to leeward"): a head sail held to windward, or with its sheets let fly, is
+    # let draw: the lee sheet hauled aft to its trim and the weather one let go. Level 0,
+    # on a fore-and-aft sail (package 32e).
+    synonyms: [let draw the, draw the]
+    object: sail
+    level: 0
   # A parted line rove afresh from the boatswain's coil, or its ends spliced (package
   # 31b; reeve_line.yaml): "reeve a new fore topsail sheet", "reeve the main brace
   # afresh", "splice the main topsail halyard". Work for hands, with its time; a sound
@@ -721,6 +730,15 @@ evolutions:
   ease the catharpins: ease_catharpins
   haul:
     bowline: haul_bowline
+  # trim the <sail> (package 32e, spec M5 open item 13): a fore-and-aft sail's sheet worked
+  # to the trim the wind wants, an evolution with hands and time; a square sail's yard is
+  # braced (the `brace` evolution above)
+  trim:
+    gaff: trim_gaff_sheet
+    jibheaded: trim_jib_sheet
+    lug: trim_gaff_sheet
+    lateen: trim_gaff_sheet
+    sprit: trim_gaff_sheet
 
 refusals:
   furl: "A {class} sail is not furled on its spar; take it in instead."
@@ -817,6 +835,17 @@ manner: [handsomely, roundly, cheerly, smartly, together]
 a_little: [a little, a trifle, a bit]
 # After a line's name, that it is rove again: "reeve the fore topsail sheet afresh" (31b).
 afresh: [afresh, anew, again]
+# After a sheet's name, the side it is hauled on (package 32e): "haul the jib sheet to
+# windward" holds the sail aback on the weather side (Luce 1884, ch. XXXIV, 'Sloops', 'To
+# Heave to'; Luce 1866, ch. XXIV, 'Tacking': "haul the spanker boom well over to the
+# windward"); "to leeward" lets it lie to leeward again.
+sheet_to:
+  to windward: weather
+  over to windward: weather
+  well over to windward: weather
+  to weather: weather
+  to leeward: lee
+  over to leeward: lee
 reef_close: [close, close reefed, close reef, close reefs, all reefs]
 tack_phrase: ["on the", "on", "to the"]   # "on the starboard tack", "to the starboard tack"
 point_directions:

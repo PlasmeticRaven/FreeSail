@@ -30,8 +30,21 @@ How a sail is worked out (spec §7.1 to §7.3)
 5. **Which face the wind is on.** A square sail with the wind on its fore
    face is *backed*: it pushes the ship astern, `sail.backed` is set and the
    transition is logged. A fore-and-aft sail with the wind on its lee face
-   simply collapses and gives no lift (heaving to with a jib held to weather
-   needs a sail state this package does not have; see the report).
+   simply collapses and gives no lift, unless its sheet holds it there.
+
+The sheet holds the trim (package 32e, spec M5 open item 13)
+------------------------------------------------------------
+A fore-and-aft sail lies where its sheets hold it (`evolutions.trim.read_sheet`): on
+the side whose sheet is hauled and belayed, at the angle the sheet's length gives
+through the boom's or the clew's geometry. Held on the weather side (the jib sheet to
+windward, the spanker boom hauled over to windward) it stands aback by its sheet: a
+plate with the wind on its outer face, its force to leeward, which is what boxes a bow
+off and what a fore-and-after heaves to by (Luce 1884, ch. XXXIV, 'Sloops', 'To Heave
+to'). With every sheet let fly it flogs: no lift, a loose sail's windage, and the
+snatching that the studding sails' stall puts on its spars. The working sheet carries
+the sail's pull: a boomed sail's by the lever the sheet holds the boom by, a
+loose-footed sail's a fraction of the pull. `Sail.sheet_angle` is refreshed here from
+the sheet each time the rig is read; nothing sets it on its own.
 
 Studding sails and the wind (milestone 3b, spec 3b §7)
 ------------------------------------------------------
@@ -80,6 +93,7 @@ from typing import TYPE_CHECKING
 import yaml
 
 from freesail import units
+from freesail.evolutions import trim as yard_trim
 from freesail.physics.strain import (  # package 22: the worn-canvas luff term
     FLOGGING_DRAG_COEFFICIENT,
     FLOGGING_LOAD_MULTIPLIER,
@@ -300,7 +314,15 @@ class _Flow:
 # ---------------------------------------------------------------------------
 
 
-def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
+# A sail's "taken aback" and "filled again" are recorded when the physics has read it
+# so for this long: in a seaway the wind on a sail set near the eye, hove to, crosses its
+# face with every pitch, and the lines came at every roll (package 33a's finding, package
+# 32e). Ten seconds, longer than a hull's pitching period (the frigate's about eight,
+# spec M5 §4): judgement. Read without a `dt` (the tests' direct calls) it records at once.
+BACKED_DWELL_S = 10.0
+
+
+def compute_sail_forces(ship: Ship, wind: Wind, dt: float = 0.0) -> SailForces:
     """Forces from every sail and everything else the wind pushes on.
 
     Writes each sail's `backed`, `force_kn`, `thrust_kn`, `side_force_kn`,
@@ -340,16 +362,30 @@ def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
             area *= GOOSE_WINGED_AREA_FRACTION
         if d.square_chord is not None:
             chord, drive_normal = d.square_chord
+        elif d.side_sign != 0.0:
+            # a fore-and-aft sail lies on the side its sheet holds it (package 32e)
+            chord, drive_normal = _chord_on_lee(d.chord_angle, -d.side_sign)
         else:
             chord, drive_normal = _chord_on_lee(d.chord_angle, flow.awa)
         bowline = hauled_weather_bowline(ship, sail) if d.has_bowlines else None
         gain = units.deg_to_rad(BOWLINE_LUFF_GAIN_DEG) if bowline is not None else 0.0
         f_fwd, f_stb, backed = _plate_force(
-            flow, area, chord, drive_normal, cls, sail, gain, square_faced=d.square_faced
+            flow,
+            area,
+            chord,
+            drive_normal,
+            cls,
+            sail,
+            gain,
+            square_faced=d.square_faced,
+            held=d.held,
         )
         # the studding sails' stall (spec 3b §7): forward of Luce's angle the sail shakes in
-        # its gear; its lift falls away over a point and it flogs, a loose sail's windage
+        # its gear; its lift falls away over a point and it flogs, a loose sail's windage.
+        # A fore-and-aft sail with every sheet let fly flogs the same way (package 32e).
         stall = studding_stall(ship, sail, true_off) if d.studding else 0.0
+        if d.flogging:
+            stall = 1.0
         if stall > 0.0:
             shake = WINDAGE_BY_STATE[SailState.LOOSED] * area * flow.q
             f_fwd = (1.0 - stall) * f_fwd + stall * shake * flow.fwd
@@ -357,14 +393,16 @@ def compute_sail_forces(ship: Ship, wind: Wind) -> SailForces:
             backed = False  # shaking, not aback
         force = math.hypot(f_fwd, f_stb)
 
-        _record_backed(ship, sail, backed)
+        _record_backed(ship, sail, backed, dt)
         if d.studding:
             _record_shivering(ship, sail, stall, true_off)
+        elif d.side_sign != 0.0:
+            sail.shivering = d.flogging  # its sheet let fly: it flogs (the order said so)
         sail.area_effective_m2 = area
         sail.force_kn = force / 1000.0
         sail.thrust_kn = f_fwd / 1000.0
         sail.side_force_kn = f_stb / 1000.0
-        _apply_loads(ship, sail, force / 1000.0)
+        _apply_loads(ship, sail, force / 1000.0, d)
         if stall > 0.0:
             _apply_shaking(ship, sail, stall * flow.q * area * SHIVERING_AREA_FRACTION)
         if bowline is not None:
@@ -440,7 +478,8 @@ RIG_KEY = "sails.rig"
 class _Drawing:
     """One driving sail's figures that hold for the whole tick: its class, its area after
     reefing (before heel and blanketing), its chord's angle to the centreline, a square
-    sail's chord and drive normal (on its yard's brace), and its worn canvas's luff."""
+    sail's chord and drive normal (on its yard's brace), and its worn canvas's luff; a
+    fore-and-aft sail's side as its sheet holds it (package 32e)."""
 
     sail: Sail
     cls: SailClass
@@ -453,6 +492,10 @@ class _Drawing:
     baggy_luff: float
     height: float  # the cloth's height, for the blanketing shadow
     has_bowlines: bool  # any bowline at all (`hauled_weather_bowline` is None without one)
+    side_sign: float = 0.0  # a fore-and-aft sail: +1 lying to starboard, -1 to larboard
+    held: bool = False  # held on the weather side by its sheet: aback by the sheet
+    flogging: bool = False  # every sheet let fly: it flogs
+    working_sheet: str | None = None  # the sheet that carries its pull
 
 
 @dataclass
@@ -502,16 +545,25 @@ def _rig(ship: Ship) -> _Rig:
 def _read_rig(ship: Ship) -> _Rig:
     driving = [s for s in ship.sails.values() if _is_driving(ship, s)]
     drawing = []
+    lee = yard_trim.lee_side_sign(ship)
     for sail in driving:
         cls = SAIL_CLASSES[sail.cls]
         reefs = min(max(sail.reefs, 0), sail.reef_bands)
         square_faced = not _in_gaff_plane(sail)
         square_chord = None
+        side_sign, held, flogging, working = 0.0, False, False, None
         if sail.cls in SQUARE_FAMILY and square_faced:
             yard = _trim_yard(ship, sail)
             b = yard.brace_angle if yard is not None else 0.0
             # yard square: chord athwartships (pi/2); braced +b: starboard arm forward
             square_chord = (math.pi / 2 - b, (math.cos(b), -math.sin(b)))
+        elif sail.is_fore_and_aft:
+            # the sheet holds the trim (package 32e): the sail lies where its sheets hold
+            # it, and its angle reading is refreshed from them
+            reading = yard_trim.refresh_reading(ship, sail)
+            side_sign = reading.side if reading.side is not None else lee
+            held, flogging = reading.held_to_windward, reading.free
+            working = reading.working.id if reading.working is not None else None
         drawing.append(
             _Drawing(
                 sail=sail,
@@ -525,6 +577,10 @@ def _read_rig(ship: Ship) -> _Rig:
                 baggy_luff=baggy_luff(sail),
                 height=_sail_height(ship, sail),
                 has_bowlines=bool(ship.lines_of(sail, "bowline")),
+                side_sign=side_sign,
+                held=held,
+                flogging=flogging,
+                working_sheet=working,
             )
         )
     driving_ids = {s.id for s in driving}
@@ -594,7 +650,7 @@ def _blanket_factors_and_offsets(
     offsets = {}
     for d in rig.drawing:
         s = d.sail
-        y = _lateral_offset(ship, s, flows[s.id].awa)
+        y = _lateral_offset(ship, s, flows[s.id].awa, d.side_sign)
         offsets[s.id] = y
         pos[s.id] = (s.x_m, y, s.centre_height_m)
         height[s.id] = d.height
@@ -892,6 +948,7 @@ def _plate_force(
     sail: Sail,
     luff_gain: float = 0.0,
     square_faced: bool = True,
+    held: bool = False,
 ) -> tuple[float, float, bool]:
     """Lift and drag on one sail, resolved into (forward, starboard) newtons.
 
@@ -901,6 +958,9 @@ def _plate_force(
     `SailClass.coefficients`); it helps only a sail drawing on its after face.
     `square_faced` false takes a studding-class sail lying in a gaff sail's plane
     (the ringtail, the water sail) as fore-and-aft: wind on its lee face, it collapses.
+    `held` is a fore-and-aft sail whose sheet holds it on the weather side (package
+    32e): it stands as a plate with the wind on its outer face, aback, and does not
+    collapse.
     """
     d = (flow.fwd, flow.stb)
     c = (math.cos(chord), math.sin(chord))
@@ -913,7 +973,7 @@ def _plate_force(
     c_l, c_d = cls.coefficients(alpha, luff_gain if on_drive_face else 0.0)
     backed = False
     if not on_drive_face:
-        if sail.cls in SQUARE_FAMILY and square_faced:
+        if (sail.cls in SQUARE_FAMILY and square_faced) or held:
             backed = alpha > cls.luff_angle  # wind on the fore face and filling it
         else:
             c_l, c_d = 0.0, cls.coefficients(0.0)[1]  # cloth collapses and flogs
@@ -989,9 +1049,19 @@ def _tend_bowlines(ship: Ship) -> None:
             )
 
 
-def _record_backed(ship: Ship, sail: Sail, backed: bool) -> None:
+def _record_backed(ship: Ship, sail: Sail, backed: bool, dt: float = 0.0) -> None:
+    timers = ship.extra.get("sails.backed_for")
+    if not isinstance(timers, dict):
+        timers = ship.extra["sails.backed_for"] = {}
     if backed == sail.backed:
+        timers.pop(sail.id, None)
         return
+    if dt > 0.0:
+        held = timers.get(sail.id, 0.0) + dt
+        if held < BACKED_DWELL_S:
+            timers[sail.id] = held
+            return
+    timers.pop(sail.id, None)
     sail.backed = backed
     name = _name(sail.id)
     if backed:
@@ -1010,8 +1080,10 @@ def _name(part_id: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-def _lateral_offset(ship: Ship, sail: Sail, awa: float) -> float:
-    """Metres to starboard of the centreline of the sail's centre of effort."""
+def _lateral_offset(ship: Ship, sail: Sail, awa: float, side_sign: float = 0.0) -> float:
+    """Metres to starboard of the centreline of the sail's centre of effort. A
+    fore-and-aft sail lies on `side_sign`'s side (+1 starboard) when given (the side its
+    sheet holds it, package 32e), else to leeward of the apparent wind."""
     if sail.state is SailState.GOOSE_WINGED:
         # the weather clew is the one left set: the centre moves out to windward
         yard = _trim_yard(ship, sail)
@@ -1037,7 +1109,7 @@ def _lateral_offset(ship: Ship, sail: Sail, awa: float) -> float:
             if spar is not None and spar.length_m > 0
             else 0.8 * math.sqrt(sail.area_m2)
         )
-        lee = -1.0 if awa >= 0 else 1.0
+        lee = side_sign if side_sign != 0.0 else (-1.0 if awa >= 0 else 1.0)
         return lee * 0.5 * foot * math.sin(min(abs(sail.sheet_angle), math.pi / 2))
     return 0.0
 
@@ -1157,14 +1229,42 @@ def _load_path(ship: Ship, sail: Sail) -> _LoadPath:
     return path
 
 
-def _apply_loads(ship: Ship, sail: Sail, force_kn: float) -> None:
+def _sheet_load_kn(ship: Ship, sail: Sail, force_kn: float, d: _Drawing | None) -> float:
+    """What the working sheet carries of the sail's pull (package 32e). A boomed sail's
+    sheet holds the boom against the sail's moment about the mast: the pull times the
+    sail's centre's distance abaft the mast, over the sheet's lever (the perpendicular
+    from the mast to the sheet's line, `SheetGeometry.lever_m`), so a sheet eased far
+    off or hauled nearly amidships bears more than one at a working angle. A
+    loose-footed sail's sheet takes SHEET_LOAD_FRACTION of the pull, its tack and
+    halyard the rest."""
+    if d is None or d.side_sign == 0.0:
+        return SHEET_LOAD_FRACTION * force_kn
+    geo = yard_trim.sheet_geometry(ship, sail)
+    if not geo.boomed:
+        return SHEET_LOAD_FRACTION * force_kn
+    mast = ship.mast_of(sail)
+    arm = abs(mast.x_m - sail.x_m) if mast is not None else 0.4 * geo.arm_m
+    lever = geo.lever_m(d.chord_angle)
+    if lever <= 0.1:
+        lever = 0.1
+    return force_kn * arm / lever
+
+
+def _apply_loads(ship: Ship, sail: Sail, force_kn: float, d: _Drawing | None = None) -> None:
     """Put a sail's pull on its cloth, its spars and its running rigging."""
     sail.load_kn = force_kn
     path = _load_path(ship, sail)
     for spar in path.spars:
         spar.load_kn += force_kn
-    for ln in path.sheets:
-        ln.load_kn += SHEET_LOAD_FRACTION * force_kn
+    if d is not None and d.side_sign != 0.0:
+        # a fore-and-aft sail: its working sheet carries the pull, a sheet let fly nothing
+        if d.working_sheet is not None:
+            for ln in path.sheets:
+                if ln.id == d.working_sheet:
+                    ln.load_kn += _sheet_load_kn(ship, sail, force_kn, d)
+    else:
+        for ln in path.sheets:
+            ln.load_kn += SHEET_LOAD_FRACTION * force_kn
     for ln in path.halyards:
         ln.load_kn += HALYARD_LOAD_FRACTION * force_kn
     for ln in path.braces:

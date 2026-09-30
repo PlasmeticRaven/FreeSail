@@ -1,0 +1,41 @@
+# Trim a gaff sail's sheet (package 32e, spec M5 open item 13): the afterguard work the
+# sheet to the length the wanted angle needs, hauling in or easing off, and belay it; a
+# sheet let fly is taken up and hauled as part of it. The sheet holds the trim: the sail's
+# angle is read from the sheet's length through the boom's geometry (the boom's length,
+# the horse's breadth, the purchase's parts; freesail/evolutions/trim.py), and this
+# evolution is the one way the trim is worked with hands and time, by `trim the <sail>`,
+# by `trim sails` and `trim the sheets`, by the standing book's tending routine and by the
+# manoeuvres. "Trim aft the head sheets", "haul aft the spanker sheet as the sail lifts"
+# (Luce 1866, ch. XXIV, 'Tacking'); "trim aft the main sheet and right the helm" (Luce
+# 1884, ch. XXXIV, 'Sloops').
+#
+# Parameters:
+#   angle_deg   the angle off the centreline wanted; null: the trim for the apparent
+#               wind (trim.wanted_sheet_angle: the class's best angle of attack)
+#   side        weather, lee or null (lee): the side the sail is held on
+#
+# The time is the sail's size: seconds_per_m2 times the area, between min_s and max_s.
+# Judgement: no period timing for a sheet found; a spanker's sheet (a twofold purchase, a
+# party of the afterguard) is about a minute's work, a schooner's great main sheet (a
+# threefold purchase) two, a fore-and-after's boom sail on a small crew the same hands
+# for less canvas.
+id: trim_gaff_sheet
+verb: trim
+applies_to: {class: gaff}
+script: trim_sheet
+params: {angle_deg: null, side: null}
+preconditions:
+  - {check: "sail.state == set", reason: "The {sail} is {state}; there is no sail to trim."}
+  - {check: "not wrecked(sheets_of(sail))", reason: "{parted}"}
+timing:
+  seconds_per_m2: 0.4   # the frigate's spanker (167 m2) 67 s; the schooner's mainsail (198) 79 s
+  min_s: 20
+  max_s: 120
+on_start: {log: "Man the {sail} sheet.", kind: evolution.started, severity: routine}
+on_complete: {log: "Trimmed the {sail} sheet; the {sail} {angle_words}.", kind: sail.trimmed, severity: routine}
+on_fail: {log: "Could not trim the {sail} sheet: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the afterguard man the spanker and main sheets (Luce 1884, ch. XVIII Organization,
+# 'Duties of Men in Different Parts of the Ship'); six hands to a purchase (judgement: a
+# party, not a watch).
+crew: {hands: 6, rating: ordinary, stations: [afterguard]}
+source: "Luce 1866, ch. XXIV Working to Windward, 'Tacking' (\"hauling aft the spanker sheet as the sail lifts\"); Luce 1884, ch. XXXIV Handling Fore-and-Afters, 'Sloops' (\"trim aft the main sheet\"); Steel 1794 vol. I, p. 167, HORSE"
