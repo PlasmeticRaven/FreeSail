@@ -80,9 +80,11 @@ def set_sails(ship, ids, brace_deg: float = 0.0, sheet_deg: float = 30.0) -> Non
         if sp.is_yard:
             limit = sp.brace_limit if sp.brace_limit > 0 else math.pi / 2
             sp.brace_angle = math.copysign(min(abs(math.radians(brace_deg)), limit), brace_deg)
+    from freesail.evolutions.trim import set_sheet_angle
+
     for s in ship.sails.values():
         if s.is_fore_and_aft:
-            s.sheet_angle = math.radians(sheet_deg)
+            set_sheet_angle(ship, s, math.radians(sheet_deg))  # through the line (32e)
 
 
 def frigate_with_wind(sails, knots=15.0, brace_deg=45.0):

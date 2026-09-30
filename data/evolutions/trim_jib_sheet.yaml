@@ -1,0 +1,36 @@
+# Trim a jib-headed sail's sheet (package 32e, spec M5 open item 13): the forecastlemen
+# haul the lee sheet aft to the length the wanted angle needs and belay it, letting the
+# weather sheet go; a sheet let fly is taken up and hauled as part of it, and a sheet held
+# to windward is let draw unless the side says to keep it. The sheet holds the trim: the
+# sail's angle is read from the sheet's length through the clew's travel about the tack
+# (freesail/evolutions/trim.py). "Trim aft the head sheets" (Luce 1866, ch. XXIV,
+# 'Tacking'); "Draw jib!" (Luce 1884, ch. XXIV, 'Missing Stays').
+#
+# Parameters:
+#   angle_deg   the angle off the centreline wanted; null: the trim for the apparent
+#               wind (trim.wanted_sheet_angle: the class's best angle of attack)
+#   side        weather, lee or null (lee): the side the sail is held on
+#
+# The time is the sail's size: seconds_per_m2 times the area, between min_s and max_s.
+# Judgement: no period timing for a head sheet found; a jib's sheet is half a minute's
+# work for four hands, a staysail's less.
+id: trim_jib_sheet
+verb: trim
+applies_to: {class: jibheaded}
+script: trim_sheet
+params: {angle_deg: null, side: null}
+preconditions:
+  - {check: "sail.state == set", reason: "The {sail} is {state}; there is no sail to trim."}
+  - {check: "not wrecked(sheets_of(sail))", reason: "{parted}"}
+timing:
+  seconds_per_m2: 0.3   # the frigate's jib (130 m2) 39 s; the cutter's fore staysail (28) 15 s
+  min_s: 15
+  max_s: 60
+on_start: {log: "Man the {sail} sheet.", kind: evolution.started, severity: routine}
+on_complete: {log: "Trimmed the {sail} sheet; the {sail} {angle_words}.", kind: sail.trimmed, severity: routine}
+on_fail: {log: "Could not trim the {sail} sheet: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the forecastlemen work the head sheets, the afterguard the staysails abaft the
+# fore mast (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the
+# Ship'); four hands (judgement).
+crew: {hands: 4, rating: ordinary, stations: [forecastle, afterguard]}
+source: "Luce 1866, ch. XXIV Working to Windward, 'Tacking' (\"trim aft the head sheets\"); Luce 1884, ch. XXIV, 'Missing Stays' (\"DRAW JIB!\"); ch. XXXIV Handling Fore-and-Afters, 'Sloops'"

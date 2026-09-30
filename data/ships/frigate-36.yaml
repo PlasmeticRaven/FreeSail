@@ -33,11 +33,12 @@ hull:
   hull_speed_kn: 13.0
   # Upper (gun) deck at midships, about 6 ft above the load line.
   deck_height_m: 1.8
-  # Blade about 15 ft by 4 ft 3 in; 35 degrees is the period stop.
+  # Blade about 15 ft by 4 ft 3 in (span_m its depth, 15 ft: with the area it gives the blade's aspect ratio and so its lift slope, physics/hull.py, package 32e); 35 degrees is the period stop.
   rudder:
     area_m2: 6.0
     max_angle_deg: 35
     rate_deg_s: 3.0
+    span_m: 4.6
 spars:
 # fore lower mast: 79 ft heel to head (Luce: 9/10 of the main), 65 ft above the deck. Provisional (truth 9), see gen_ships.py. Rating: fore.course, fore.topsail, fore.topgallant, fore.royal, fore.topmast_staysail, jib, flying_jib in 55 kn -> 456.8 kN.
 - id: fore.mast
@@ -217,12 +218,13 @@ spars:
   length_m: 10.7
   height_m: 14.7
   rating_kn: 59.8
-# spanker boom 44 ft, half the main mast (Luce). Rating: the sails named in the script in 45 kn -> 59.8 kN (the engine's graph loads nothing on it).
+# spanker boom 44 ft, half the main mast (Luce); horse_m is the horse across the stern for the sheet to travel on (Steel 1794 vol. I, p. 167, HORSE: 'a thick iron rod, fastened at the ends to the inside of the stern of vessels that carry a fore and aft mainsail, for the main sheet to travel on'), half the beam (judgement: the inside breadth of the stern); the sheet's geometry reads it (evolutions/trim.py). Rating: the sails named in the script in 45 kn -> 59.8 kN (the engine's graph loads nothing on it).
 - id: mizzen.boom
   class: boom
   'on': mizzen.mast
   length_m: 13.4
   height_m: 2.4
+  horse_m: 5.8
   rating_kn: 59.8
 # bowsprit 55 ft, 5/8 of the main mast, 37 ft outboard (Luce). Rating: the sails named in the script in 55 kn -> 157.2 kN (the engine's graph loads nothing on it).
 - id: bowsprit
@@ -1402,6 +1404,7 @@ lines:
   class: sheet
   of: mizzen.spanker
   rating_kn: 77.5
+  parts: 2
 - id: mizzen.spanker.outhaul
   class: outhaul
   of: mizzen.spanker
@@ -1739,6 +1742,7 @@ lines:
   class: sheet
   of: storm_mizzen
   rating_kn: 56.9
+  parts: 3
 - id: storm_mizzen.downhaul
   class: downhaul
   of: storm_mizzen

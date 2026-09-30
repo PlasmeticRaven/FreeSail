@@ -34,11 +34,12 @@ hull:
   hull_speed_kn: 11.5
   # Port sills 3 ft 5 in above the water and 10 in above the deck (Spider's specification, Chapelle pp. 166-167): a low-sided vessel.
   deck_height_m: 0.9
-  # A deep narrow blade, about 11 ft by 2 ft.
+  # A deep narrow blade, about 11 ft by 2 ft (span_m its depth, 11 ft; package 32e).
   rudder:
     area_m2: 2.0
     max_angle_deg: 35
     rate_deg_s: 4.0
+    span_m: 3.4
 spars:
 # fore mast 72 ft heel to head (Fincham: 0.95 of the main), 61 ft above the deck, raking 1 in 5 like the main (Chapelle p. 82); stationed 0.30 of LWL before the middle (Fincham). Provisional (truth 9), see gen_ships.py. Rating: fore.topsail, fore.topgallant, fore.sail, fore.staysail, jib, flying_jib in 55 kn -> 240.9 kN.
 - id: fore.mast
@@ -102,12 +103,13 @@ spars:
   length_m: 8.7
   height_m: 16.2
   rating_kn: 69.6
-# main boom 59 ft, 0.70 of LWL (Fincham; Sea Lark's 0.71, Chapelle p. 42), well over the taffrail. Rating: the sails named in the script in 45 kn -> 69.6 kN (the engine's graph loads nothing on it).
+# main boom 59 ft, 0.70 of LWL (Fincham; Sea Lark's 0.71, Chapelle p. 42), well over the taffrail; horse_m is the horse across the stern for the sheet to travel on (Steel 1794 vol. I, p. 167, HORSE: 'a thick iron rod, fastened at the ends to the inside of the stern of vessels that carry a fore and aft mainsail, for the main sheet to travel on'), half the beam (judgement: the inside breadth of the stern); the sheet's geometry reads it (evolutions/trim.py). Rating: the sails named in the script in 45 kn -> 69.6 kN (the engine's graph loads nothing on it).
 - id: main.boom
   class: boom
   'on': main.mast
   length_m: 18.1
   height_m: 1.5
+  horse_m: 3.6
   rating_kn: 69.6
 # bowsprit 12 ft outboard, 0.14 of LWL (Fincham gives 0.12 for the Royal Navy's; Grecian's 'was probably rather short', Chapelle p. 93), steeved low. Rating: the sails named in the script in 55 kn -> 94.8 kN (the engine's graph loads nothing on it).
 - id: bowsprit
@@ -447,6 +449,7 @@ lines:
   class: sheet
   of: main.sail
   rating_kn: 74.4
+  parts: 3
 - id: main.sail.outhaul
   class: outhaul
   of: main.sail
@@ -636,6 +639,7 @@ lines:
   class: sheet
   of: storm_trysail
   rating_kn: 74.4
+  parts: 3
 - id: storm_trysail.outhaul
   class: outhaul
   of: storm_trysail

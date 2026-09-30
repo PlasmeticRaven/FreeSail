@@ -162,6 +162,10 @@ class Spar(Part):
     running: bool = False
     housed_length_m: float = 0.0
     full_length_m: float = 0.0
+    # A gaff sail's boom (package 32e): the breadth of the horse its sheet travels on
+    # (Steel 1794 vol. I, p. 167, HORSE); the sheet's geometry reads it (evolutions/trim.py).
+    # 0: no horse given; the geometry takes a quarter of the boom's length.
+    horse_m: float = 0.0
 
     @classmethod
     def from_spec(cls, s: SparSpec) -> Spar:
@@ -189,6 +193,7 @@ class Spar(Part):
             running=running,
             housed_length_m=housed if running else 0.0,
             full_length_m=full if running else 0.0,
+            horse_m=s.horse_m or 0.0,
         )
 
     @property
@@ -214,7 +219,12 @@ class Sail(Part):
     in_place_of: str | None = None  # the sail this one is bent instead of (spec 3b §6.4)
     state: SailState = SailState.FURLED
     reefs: int = 0
-    sheet_angle: float = 0.0  # radians from the centreline; fore-and-aft sails
+    # A fore-and-aft sail's angle from the centreline, radians: since package 32e (spec M5
+    # open item 13) a reading of its sheet, refreshed from the sheet's length hauled through
+    # the boom's or the clew's geometry (`evolutions.trim.read_sheet`) whenever the sheet
+    # is worked and each time the physics reads the rig, never set on its own. The line
+    # holds the trim; this is what the viewer and the log show.
+    sheet_angle: float = 0.0
     # physics outputs, refreshed each substep
     backed: bool = False
     # A studding sail with the wind forward of its limit (spec 3b §7): lift going or gone,
@@ -291,11 +301,32 @@ class Line(Part):
     of: str = ""
     side: str | None = None
     state: LineState = LineState.BELAYED
-    hauled: float = 1.0  # 0 = fully eased, 1 = hauled home (halyards, sheets)
+    # 0 = fully eased, 1 = hauled home (halyards, square sails' sheets). A fore-and-aft
+    # sail's sheet (package 32e): the fraction of its scope hauled in, 1 flat aft (the
+    # sail at its class's floor angle), 0 eased right off (the sail squared off as far as
+    # its class allows); the sail's angle follows by the boom's or the clew's geometry
+    # (evolutions/trim.py).
+    hauled: float = 1.0
+    # A sheet's purchase: the parts its fall is rove with (a threefold purchase: 3). A
+    # fathom of the fall eased moves the boom a third of a fathom.
+    parts: int = 1
+    # A single sheet (a boom's) held over to one side by hand or tackle, "the spanker boom
+    # well over to the windward" (Luce 1866, ch. XXIV, 'Tacking'): the sail lies on that
+    # side whatever the wind does, and is aback when the wind is on it. None: the sail
+    # lies to leeward, as a sheet lets it. A sail with a sheet each side needs no such
+    # flag: it lies on the side whose sheet is hauled.
+    held_side: str | None = None
 
     @classmethod
     def from_spec(cls, ln: LineSpec) -> Line:
-        line = cls(id=ln.id, cls=ln.cls, rating_kn=ln.rating_kn or 0.0, of=ln.of, side=ln.side)
+        line = cls(
+            id=ln.id,
+            cls=ln.cls,
+            rating_kn=ln.rating_kn or 0.0,
+            of=ln.of,
+            side=ln.side,
+            parts=max(int(ln.parts or 1), 1),
+        )
         if line.cls == "bowline":
             # Rove, with its fall clear on deck, but not hauled out: a bowline is hauled
             # on a wind by hands and let go again when the yards come in (spec 3b §4).

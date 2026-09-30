@@ -29,6 +29,7 @@ from freesail import orders, units
 from freesail.api.session import make_ship, make_world
 from freesail.core.world import Scenario
 from freesail.evolutions.scripts import STUDDING_IN_S, studding_work
+from freesail.evolutions.trim import set_sheet_angle
 from freesail.orders.errors import OrderError
 from freesail.orders.verbs import BOOM_FOUL_BRACE_DEG
 from freesail.physics import sails as sails_mod
@@ -446,7 +447,7 @@ def test_the_ringtail_lies_in_its_gaff_sails_plane_to_leeward(path, gaff_sail, w
     ship.dyn.heading = 0.0
     host = ship.sails[gaff_sail]
     host.state = SailState.SET
-    host.sheet_angle = rad(70.0)
+    set_sheet_angle(ship, host, rad(70.0))  # through the sheet (package 32e)
     ringtail = ship.sails["ringtail"]
     ringtail.state = SailState.SET
     ship.spars["ringtail_boom"].rigged_out = True
@@ -466,7 +467,7 @@ def test_the_water_sail_lies_under_the_main_boom_to_leeward():
     ship = make_ship(SCHOONER)
     ship.dyn.heading = 0.0
     ship.sails["main.sail"].state = SailState.SET
-    ship.sails["main.sail"].sheet_angle = rad(80.0)
+    set_sheet_angle(ship, ship.sails["main.sail"], rad(80.0))
     water = ship.sails["water_sail"]
     water.state = SailState.SET
     compute_sail_forces(ship, make_wind(from_deg=175.0, knots=10.0))

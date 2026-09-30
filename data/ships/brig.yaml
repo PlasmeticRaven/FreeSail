@@ -38,11 +38,12 @@ hull:
   hull_speed_kn: 11.5
   # A flush deck about 5 ft above the load line (judgement).
   deck_height_m: 1.5
-  # Blade about 12 ft by 3 ft; 35 degrees is the period stop (judgement).
+  # Blade about 12 ft by 3 ft (span_m its depth, 12 ft; package 32e); 35 degrees is the period stop (judgement).
   rudder:
     area_m2: 3.0
     max_angle_deg: 35
     rate_deg_s: 3.5
+    span_m: 3.7
 spars:
 # fore lower mast: 56 ft heel to head (Fincham p. 88: hounded 0.87 of the main's, the head 0.1933 of that), 46 ft above the deck, stepped 5.6 ft below the water-line (Fincham); raking 1.2 deg (Fincham p. 88: 3 in in 12 ft); stationed 0.331 of the water-line before the middle (Fincham pp. 83, 88; Steel 1794: the main two-thirds of the length abaft the stem, the fore three twentieths). Provisional (truth 9), see gen_ships.py. Rating: fore.course, fore.topsail, fore.topgallant, fore.royal, fore.topmast_staysail, jib, flying_jib in 55 kn -> 224.4 kN.
 - id: fore.mast
@@ -165,12 +166,13 @@ spars:
   length_m: 9.8
   height_m: 12.6
   rating_kn: 56.0
-# main boom 55 ft, 0.58 of the length on deck (Fincham p. 88; Luce's half the main mast gives 32 ft, a ship's spanker boom), 6 ft above the deck (judgement). Rating: the sails named in the script in 45 kn -> 56 kN (the engine's graph loads nothing on it).
+# main boom 55 ft, 0.58 of the length on deck (Fincham p. 88; Luce's half the main mast gives 32 ft, a ship's spanker boom), 6 ft above the deck (judgement); horse_m is the horse across the stern for the sheet to travel on (Steel 1794 vol. I, p. 167, HORSE: 'a thick iron rod, fastened at the ends to the inside of the stern of vessels that carry a fore and aft mainsail, for the main sheet to travel on'), half the beam (judgement: the inside breadth of the stern); the sheet's geometry reads it (evolutions/trim.py). Rating: the sails named in the script in 45 kn -> 56 kN (the engine's graph loads nothing on it).
 - id: main.boom
   class: boom
   'on': main.mast
   length_m: 16.8
   height_m: 1.8
+  horse_m: 4.3
   rating_kn: 56.0
 # bowsprit 42 ft, 0.886 of the fore mast's hounded length, 14 ft of it housed (0.5 x the breadth) and 28 ft outboard, steeved 51 in in 12 ft (Fincham p. 88). Rating: the sails named in the script in 55 kn -> 64.9 kN (the engine's graph loads nothing on it).
 - id: bowsprit
@@ -1104,6 +1106,7 @@ lines:
   class: sheet
   of: main.spanker
   rating_kn: 49.6
+  parts: 2
 - id: main.spanker.outhaul
   class: outhaul
   of: main.spanker
@@ -1467,6 +1470,7 @@ lines:
   class: sheet
   of: storm_trysail
   rating_kn: 49.6
+  parts: 2
 - id: storm_trysail.outhaul
   class: outhaul
   of: storm_trysail

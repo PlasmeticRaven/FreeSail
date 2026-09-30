@@ -239,7 +239,9 @@ def test_trim_sails_on_a_wind_staggers_and_off_the_wind_does_not():
     by_the_wind(ship)
     _, text, _ = orders.handle(ship, "trim sails with the head yards sharper")
     assert "the head yards three degrees sharper" in text
-    assert "trimmed the sheets" in text  # the words about the yards leave the sheets in
+    assert (
+        "sheets" in text
+    )  # the words about the yards leave the sheets in (32e: begun or standing)
     targets = {i.subject_id: i.params["target_angle"] for i in runner.instances}
     three = units.deg_to_rad(3.0)
     assert targets["main.yard"] == pytest.approx(targets["fore.yard"] - three)
@@ -579,8 +581,13 @@ def test_going_about_lets_the_bowlines_go_and_steadies_them_out_again(which, evo
     # yards) is brailed up as the helm goes up; the schooner's mainsail is her driving
     # sail and stands.
     brail = "; brail up the spanker" if which == "frigate" else ""
+    # package 32e: a vessel with no after yards (the schooner) has no "mainsail haul"
     let_go = {
-        "tack": "Rise tacks and sheets. Mainsail haul; let go the bowlines.",
+        "tack": (
+            "Rise tacks and sheets. Mainsail haul; let go the bowlines."
+            if which == "frigate"
+            else "Let go the bowlines."
+        ),
         "wear": (
             f"Stand by to wear ship. Up helm; clear away the bowlines{brail}; brace in the "
             "after yards."

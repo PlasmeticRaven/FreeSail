@@ -61,17 +61,34 @@ def test_trim_on_the_larboard_tack_is_negative_and_wider_wind_braces_less():
         assert abs(broad[sid]) < abs(close[sid])
 
 
-def test_trim_the_sheets_sets_fore_and_aft_sails_at_once():
-    ship, runner = frigate(60.0)
-    for s in ship.sails.values():
-        s.sheet_angle = 0.0
+def test_trim_the_sheets_works_each_sheet_by_an_evolution():
+    """Package 32e (spec M5 open item 13): the sheet holds the trim, so 'trim the sheets'
+    starts a sheet evolution with hands and time for each set fore-and-aft sail whose
+    sheet is off its trim, and sets nothing at once; a sheet at its trim stands."""
+    ship, runner = frigate(60.0)  # the sheets flat aft at the sails' floors
     kind, text, data = handle(ship, "trim the sheets")
-    assert runner.started == []
+    assert [(e, s) for e, s, _ in runner.started] == [
+        ("trim_gaff_sheet", "mizzen.spanker"),
+        ("trim_jib_sheet", "fore.topmast_staysail"),
+        ("trim_jib_sheet", "jib"),
+    ]
+    assert all(p["angle_deg"] is None and "sail" in p for _, _, p in runner.started)
     assert kind == "sail.trimmed"
     assert set(data["trimmed_sheets"]) >= {"the mizzen spanker", "the jib"}
-    assert ship.sails["mizzen.spanker"].sheet_angle == pytest.approx(units.deg_to_rad(35))
-    assert ship.sails["jib"].sheet_angle == pytest.approx(units.deg_to_rad(32))
-    assert "trimmed the sheets of the mizzen spanker" in text.lower()
+    assert ship.sails["mizzen.spanker"].sheet_angle == pytest.approx(units.deg_to_rad(18))
+    assert "trimming the sheets of the mizzen spanker" in text.lower()
+    # at their trim already, the sheets stand and the line says so
+    from freesail.evolutions import trim
+
+    for sid in ("mizzen.spanker", "fore.topmast_staysail", "jib"):
+        sail = ship.sails[sid]
+        trim.set_sheet_angle(
+            ship, sail, trim.wanted_sheet_angle(sail.cls, ship.dyn.apparent_wind_angle)
+        )
+    runner.started.clear()
+    kind, text, data = handle(ship, "trim the sheets")
+    assert runner.started == [] and data["trimmed_sheets"] == []
+    assert len(data["standing_sheets"]) == 3 and "stand as trimmed" in text
 
 
 def test_trim_sails_does_both_and_logs_a_sentence():
@@ -191,7 +208,8 @@ def test_the_trim_line_says_the_yards_on_deck_as_a_clause_and_not_as_a_refusal()
     assert e.text.startswith("Braced six yards to the wind, ")
     assert "; the topgallant and royal yards are on deck." in e.text
     assert "Not " not in e.text and "sent down" not in e.text
-    assert len(e.data["subjects"]) == 6 and len(e.data["failed_subjects"]) == 6
+    yards_started = [s for s in e.data["subjects"] if s in w.ship.spars]
+    assert len(yards_started) == 6 and len(e.data["failed_subjects"]) == 6
     w.run(600)
     # one yard carried away and one royal yard on deck, the rest aloft: each by name
     w.submit("sway up the topgallant masts")

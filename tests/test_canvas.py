@@ -23,6 +23,7 @@ from freesail.api.queries import muster_lines
 from freesail.api.session import make_world
 from freesail.core.world import Scenario
 from freesail.evolutions import Runner
+from freesail.evolutions.trim import set_sheet_angle
 from freesail.physics import strain as S
 from freesail.physics.sails import compute_sail_forces
 from freesail.physics.strain import apply_strain, strain_state
@@ -246,7 +247,7 @@ def test_a_worn_sail_is_baggier_and_lies_less_close():
     ship.dyn.heading = 0.0
     sail = ship.sails["jib"]
     sail.state = SailState.SET
-    sail.sheet_angle = units.deg_to_rad(20.0)
+    set_sheet_angle(ship, sail, units.deg_to_rad(20.0))  # through the sheet (package 32e)
     wind = Wind(WindParams.from_nautical(60.0, 12.0, gustiness=0.0, variability=0.0), None)
     compute_sail_forces(ship, wind)
     new_luff = ship.extra["luff_angle"]

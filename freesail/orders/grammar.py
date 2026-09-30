@@ -479,6 +479,8 @@ def _modifier_words(vocab: Vocabulary) -> set[str]:
     ):
         for phrase in group:
             out.update(phrase.split())
+    for phrase in vocab.sheet_to:
+        out.update(phrase.split())
     for seq in (
         vocab.both_sides,
         vocab.manner,
@@ -598,6 +600,13 @@ def _parse_modifiers(
         if bm and not (bm == "up" and i > 0 and words[i - 1] in ("point", "points")):
             mods["brace_mode"] = bm
             i += len(bm.split())
+            continue
+
+        # "to windward", "to leeward": the side a sheet is hauled on (package 32e)
+        st = _longest_at(words, i, vocab.sheet_to)
+        if st:
+            mods["sheet_to"] = vocab.sheet_to[st]
+            i += len(st.split())
             continue
 
         # "home", "aft", "flat aft": all the way in

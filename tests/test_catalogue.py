@@ -88,10 +88,15 @@ M2_TIMINGS = {
     "set_studding": [90.0, 120.0, 30.0],
     "shake_out_gaff": [30.0, 120.0, 60.0],
     "shake_out_square": [45.0, 120.0, 90.0],
+    # package 32e: the miss-stays rule reads the vessel (way_gone_fraction and
+    # way_gone_lengths_per_min in place of min_speed_kn; stays_timeout_s counted from the
+    # moment her way is gone); brace_s, steady_deg and steady_timeout_s stand
     "tack": {
         "brace_s": 45.0,
         "stays_timeout_s": 180.0,
-        "min_speed_kn": 0.8,
+        "hang_after_s": 15.0,
+        "way_gone_fraction": 0.25,
+        "way_gone_lengths_per_min": 1.0,
         "steady_deg": 5.0,
         "steady_timeout_s": 300.0,
     },

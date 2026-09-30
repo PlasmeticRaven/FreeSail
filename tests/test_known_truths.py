@@ -510,21 +510,28 @@ def test_truth_12_she_fills_away_without_hanging_aback():
 # ---------------------------------------------------------------------------
 
 
-def gaff_thrust_on_a_run(hauls: int) -> float:
+def gaff_thrust_on_a_run(angle_deg: float) -> float:
+    """The schooner's mainsail on a run with its sheet worked to `angle_deg` (package 32e:
+    the sheet holds the trim, and the angle is read from the sheet's length)."""
+    from freesail.evolutions import trim
+
     world = make(SCHOONER, 180.0)
     settle(world, ["set plain sail", "brace the yards square"])
     sail = world.ship.sails["main.sail"]
     assert math.degrees(sail.sheet_angle) == pytest.approx(85.0)  # squared right off
-    for _ in range(hauls):
-        world.submit("haul the main sheet")  # five degrees a haul
+    geo = trim.sheet_geometry(world.ship, sail)
+    fathoms = (
+        geo.sheet_length(math.radians(angle_deg)) - geo.sheet_length(geo.ceiling)
+    ) / trim.FATHOM_M
+    world.submit(f"haul the main sheet {abs(fathoms):.0f} fathoms")
     world.tick()
-    assert math.degrees(sail.sheet_angle) == pytest.approx(85.0 - 5 * hauls, abs=1.5)
+    assert math.degrees(sail.sheet_angle) == pytest.approx(angle_deg, abs=3.0)
     return sail.thrust_kn
 
 
 def test_truth_13_a_gaff_sail_wants_squaring_off_before_the_wind():
-    at_45 = gaff_thrust_on_a_run(8)
-    at_70 = gaff_thrust_on_a_run(3)
+    at_45 = gaff_thrust_on_a_run(45.0)
+    at_70 = gaff_thrust_on_a_run(70.0)
     assert 0.0 < at_45 < at_70
 
 
@@ -1908,6 +1915,12 @@ GATE_DAY_TOPGALLANTS_AGAIN_TICK = 95650
 # degrees about the base carries the point rule over its mark and back
 # (docs/dev/TuningNotes.md, M5a, package 31b).
 GATE_DAY_SHORTEN_SAIL_TICKS = [63837, 65773, 68188]
+# Package 32e (the sheet holds the trim; the sheets tended by the book every glass): the
+# ticks above did not move; "trim on a shift" fires twelve times, not fourteen: its last
+# two firings (03:22 and 03:29 on 2 June) fell while all hands were making sail after the
+# gale, and a trim now begins sheet evolutions that wait for hands, so the order's work had
+# not ended and it could not stand again until the wind had settled (docs/dev/TuningNotes.md,
+# package 32e).
 GATE_DAY_TRIM_ON_A_SHIFT_TICKS = [
     55866,
     56843,
@@ -1921,8 +1934,6 @@ GATE_DAY_TRIM_ON_A_SHIFT_TICKS = [
     82056,
     82680,
     87053,
-    98501,
-    98938,
 ]
 
 
@@ -2452,8 +2463,12 @@ GATE_5A_SEA_TICKS = {
     "A very heavy sea getting up.": 78660,
     "A heavy sea, the sea going down.": 102360,
 }
-GATE_5A_DAY_LINES = 487
-GATE_5A_DAY_DIGEST = "d2c9e73c52a1e1fd"
+# Package 32e (the sheet holds the trim): every tick of the day's routines held; the
+# lines are the starter book's "tend the sheets" firing every glass (fifty-seven times, the
+# sheets found standing as trimmed most glasses) and the sheet evolutions the trims and
+# the manoeuvres start, and the digest moved with them (docs/dev/TuningNotes.md, 32e).
+GATE_5A_DAY_LINES = 618
+GATE_5A_DAY_DIGEST = "d9cee1c3bc3db0b3"
 
 
 def the_gate_day_under_systems(until: int = GATE_5A_DAY_TICKS, saves=GATE_5A_DAY_SAVES):
@@ -2716,10 +2731,16 @@ def test_the_primers_chapter_nine_does_not_narrate_the_gates_day(gate_5a_day):
     for words in ("gate-4c-day", "gate-5a-day", "gate's day", "Falmouth", "ten in the evening"):
         assert words not in text, words
     world, _, _ = gate_5a_day
+    # a routine at a cadence ("every glass": the sheets tended, package 32e) fires at the
+    # bells, which are any day's moments, not the day's
+    cadence = {
+        f"standing order '{r.name}'" for r in world.standing.book.rules if r.trigger.kind == "every"
+    }
     moments = {
         e.ship_time.strftime("%H:%M")
         for e in world.log
-        if e.severity is not Severity.ROUTINE or e.actor.startswith("standing order")
+        if e.severity is not Severity.ROUTINE
+        or (e.actor.startswith("standing order") and e.actor not in cadence)
     }
     assert len(moments) > 50
     said = set(re.findall(r"\((\d\d:\d\d)\)", text))

@@ -3,12 +3,17 @@
 # up (Luce: "settle down the top-gallant sails"); the yards on the mast
 # carrying the most square sail are braced aback over brace_s while the
 # others stay full, and the helm is put a-lee (helm_deg of rudder toward the
-# wind). On a frigate that is the main topsail to the mast; on a topsail
-# schooner the fore topsail (her mainsail is left set: it is her driving sail,
-# and the sail model has no jib sheet to windward yet, so she forereaches).
-# The physics does the rest (truth 12: the frigate lies 55 to 60 degrees off
-# the wind at about a knot). The backed yards are remembered in
-# ship.extra["hove_to"] so that fill_away can undo it.
+# wind). On a frigate that is the main topsail to the mast. A vessel whose
+# yards are all on one mast (a topsail schooner, a cutter) is hove to the
+# fore-and-after's way as well (package 32e; Luce 1884, ch. XXXIV, 'To Heave
+# to': "Haul flat aft the main sheet, putting the helm down, and haul the
+# staysail sheet to windward"): her main sheet flat aft, her innermost head
+# sail's sheet held to windward (the sail aback by its sheet, the physics of
+# package 32e), her topsail to the mast if it is set, and her mainsail kept,
+# being her driving sail. The physics does the rest (truth 12: the frigate
+# lies 55 to 60 degrees off the wind at about a knot). The backed yards and
+# the head sail held are remembered in ship.extra["hove_to"] so that
+# fill_away can undo it ("Draw jib").
 #
 # Parameter `tack` (starboard or larboard): the tack to heave to on. She must
 # already be on it in M2; otherwise tack or wear first.
@@ -31,4 +36,4 @@ on_fail: {log: "Could not heave to: {reason}.", kind: evolution.failed, severity
 # able, two landsmen on deck at the least), so there the request is made up with
 # better hands and goes a little faster than milestone 2; the frigate's watch fills it.
 crew: {hands: 12, rating: ordinary, stations: [afterguard, marines]}
-source: "Luce 1866, ch. XXVI Emergencies, 'To heave to' (mizzen topsail aback), 'To heave to with the fore topsail to the mast'"
+source: "Luce 1866, ch. XXVI Emergencies, 'To heave to' (mizzen topsail aback), 'To heave to with the fore topsail to the mast'; Luce 1884, ch. XXXIV Handling Fore-and-Afters, 'To Heave to' (the staysail sheet to windward)"

@@ -30,6 +30,7 @@ import pytest
 from freesail.api import queries
 from freesail.api.session import make_ship, make_world
 from freesail.core.world import Scenario
+from freesail.evolutions.trim import set_sheet_angle
 from freesail.ship.parts import LineState, SailState
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -325,7 +326,7 @@ def test_the_ringtail_boom_is_at_the_gaff_sails_boom_end(tmp_path, path, gaff_bo
     ship = make_ship(path)
     host = next(s for s in ship.sails.values() if s.roles.get("boom") == gaff_boom)
     host.state = SailState.SET
-    host.sheet_angle = math.radians(60.0)
+    set_sheet_angle(ship, host, math.radians(60.0))  # through the sheet (package 32e)
     ringtail = ship.sails["ringtail"]
     ringtail.state = SailState.SET
     ship.spars["ringtail_boom"].rigged_out = True
@@ -364,7 +365,7 @@ def storm_mizzen_state(state: SailState = SailState.SET) -> dict:
     ship.sails["mizzen.spanker"].state = SailState.UNBENT
     for sid in ("storm_mizzen", "mizzen.storm_staysail"):
         ship.sails[sid].state = state
-        ship.sails[sid].sheet_angle = math.radians(20.0)
+        set_sheet_angle(ship, ship.sails[sid], math.radians(20.0))
     return ship_state(ship)
 
 
