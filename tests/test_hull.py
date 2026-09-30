@@ -35,7 +35,7 @@ def steady_wind(from_deg: float = 225.0, knots: float = 15.0) -> Wind:
 def fixed(thrust=0.0, side=0.0, heel=0.0, yaw=0.0):
     """A stub `compute_sail_forces` returning the same forces every substep."""
 
-    def stub(ship, wind):
+    def stub(ship, wind, *_substep):  # package 32e passes the substep's length too
         return SailForces(thrust, side, heel, yaw, 0.0)
 
     return stub
