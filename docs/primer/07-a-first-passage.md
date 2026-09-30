@@ -83,7 +83,7 @@ state
 Advanced 60 ticks to Morning watch (04:16).
   Morning watch (04:16)  Hauled the mizzen spanker sheet; the mizzen spanker now 24° off the centreline.
   Morning watch (04:16)  Order: tack ship.
-  Morning watch (04:16)  Ready about. Helm's a-lee; let fly the head sheets; haul aft the spanker sheet.
+  Morning watch (04:16)  Ready about. Helm's a-lee; ease off the head sheets; haul aft the spanker sheet.
   Morning watch (04:16)  All hands about ship.
 * Morning watch (04:16)  Fore course taken aback.
 * Morning watch (04:16)  Main course taken aback.

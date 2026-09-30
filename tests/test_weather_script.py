@@ -248,13 +248,14 @@ def test_the_gate_day_world_begins_with_its_book_and_its_first_orders():
         "shorten sail for weather",
         "keep her full",
         "trim on a shift",
+        "tend the sheets",
         "heavy weather",
         "storm staysail",
         "gale canvas",
         "make sail after the gale",
         "topgallants again",
     ]
-    assert n == 13  # eight lines of the starter file, three of the day's, two orders
+    assert n == 14  # nine lines of the starter file, three of the day's, two orders
     refused = [e.text for e in w.log if e.kind == "order.rejected"]
     assert len(refused) == 1 and "sound the well" in refused[0]
     assert [t for _, _, t in w.journal][-2:] == ["set plain sail", "set the royals"]

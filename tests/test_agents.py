@@ -399,7 +399,7 @@ def test_the_grammar_page_holds_the_standing_dialect_in_full():
         "striking it takes it out of the book, and its name may be given again." in dialect
     )
     lines = read_orders_file(ROOT / "data/standing_orders/starter.orders")
-    assert len(lines) == 8
+    assert len(lines) == 9  # the sheets tended every glass (package 32e)
     for line in lines:
         assert f"  {line}" in dialect
         e = world.submit(line)
@@ -1727,7 +1727,8 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     assert f"{tools.size_words(tools.tokens(ship))} whole, in 5 parts" in contents
     tool_page = lib(world, topic="tools")
     assert f"what each takes, {tools.size_words(tools.tokens(tool_page))}" in contents
-    assert "47 evolutions; the list about" in contents  # the bowsprit's two and reeve_line
+    # the bowsprit's two, reeve_line, the two sheet trims (package 32e)
+    assert "49 evolutions; the list about" in contents
 
 
 def test_a_chapter_lists_its_sections_with_sizes_and_serves_one_by_a_word_or_its_number():

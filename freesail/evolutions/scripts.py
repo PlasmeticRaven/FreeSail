@@ -247,6 +247,17 @@ def let_fly_sheets(ship: Ship, sails: list[Sail]) -> None:
         sl.shivering = True
 
 
+def ease_off_sheets(ship: Ship, sails: list[Sail]) -> None:
+    """Ease the sheets of these sails right off, belayed on the lee side: the sails luff
+    (a jib eased right off with the wind ahead lies over to leeward and lifts; let fly it
+    flogs, with a loose sail's windage all the while, which in the model cost the frigate
+    her way in stays and a hundred metres to leeward, package 32e)."""
+    for sl in sails:
+        geo = yard_trim.sheet_geometry(ship, sl)
+        yard_trim.set_sheet_angle(ship, sl, geo.ceiling, None)
+        sl.shivering = False
+
+
 def draw_sheets(
     ship: Ship, sails: list[Sail], side: str | None = None, awa: float | None = None
 ) -> None:
@@ -260,12 +271,21 @@ def draw_sheets(
         sl.shivering = False
 
 
-def full_and_by_apparent(ship: Ship) -> float:
-    """The apparent wind angle the helmsman keeps her full and by at: the rig's luffing
-    angle plus his margin (physics/hull.py, `FULL_AND_BY_MARGIN`); the wind a manoeuvre
-    trims a boom's sheet for before she has it."""
-    luff = float(ship.extra.get("luff_angle", units.deg_to_rad(45.0)))
-    return luff + units.deg_to_rad(8.0)
+def full_and_by_apparent(ship: Ship, wind: Wind, way: float) -> float:
+    """The apparent wind angle she will have on the close-hauled course she is coming to
+    (`close_hauled_true_angle`) with `way` (m/s) on her: the wind a manoeuvre trims the
+    sheets for before she has it (package 32e). The triangle of the true wind and the way
+    she carried by the wind before the manoeuvre began (at "helm's a-lee", at "up helm"),
+    since in stays she has next to none and the true wind's angle would have the sheets
+    eased for a reach: the schooner and the brig were called tacked with their sails
+    luffing and under a knot on them. Not the rig's luffing angle of the moment either,
+    which reads the yards where they stand: squared, as the wind comes aft in a wear, it
+    had the head sheets eased for a wind two points too broad, and the frigate griped up
+    and lost her way coming to."""
+    beta = close_hauled_true_angle(ship)
+    w = max(wind.speed, 0.0)
+    v = max(way, 0.0)
+    return math.atan2(w * math.sin(beta), w * math.cos(beta) + v)
 
 
 def shifted_sails(ship: Ship) -> list[Sail]:
@@ -288,12 +308,13 @@ def shifted_sails(ship: Ship) -> list[Sail]:
     ]
 
 
-def shift_sheets_over(ship: Ship, new_lee: str) -> None:
+def shift_sheets_over(ship: Ship, new_lee: str, wind: Wind, way: float) -> None:
     """Shift every set fore-and-aft sail's sheet to the new tack's lee side, trimmed for
-    a full-and-by wind: what a wear or a box-haul does as the wind comes aft, and a tack
-    at "let go and haul" (package 32e)."""
+    the wind of the course she is coming to with the `way` (m/s) she had before: what a
+    wear or a box-haul does as the wind comes aft, and a tack at "let go and haul"
+    (package 32e)."""
     sails = head_sails(ship) + boom_sails(ship) + shifted_sails(ship)
-    draw_sheets(ship, sails, new_lee, full_and_by_apparent(ship))
+    draw_sheets(ship, sails, new_lee, full_and_by_apparent(ship, wind, way))
 
 
 def innermost_head_sail(ship: Ship) -> Sail | None:
@@ -694,17 +715,19 @@ class TackScript(Script):
         dyn.target_heading = units.wrap_2pi(dyn.heading + self.sign * 12 * POINT)
         dyn.steady = False
         self.phase = "helm_down"
-        # "Helm's a-lee!" and the head sheets let fly; the spanker sheet hauled aft "as
-        # the sail lifts" (Luce 1866, ch. XXIV, 'Tacking'); a sloop's main sheet the same
-        # ("trim aft the main sheet", Luce 1884, ch. XXXIV)
+        # "Helm's a-lee!" and the head sheets eased off (Luce 1866, ch. XXIV, 'Tacking':
+        # the head sheets let go as the helm goes down; eased right off here rather than
+        # let fly, see `ease_off_sheets`); the spanker sheet hauled aft "as the sail
+        # lifts"; a sloop's main sheet the same ("trim aft the main sheet", Luce 1884,
+        # ch. XXXIV)
         self.heads = head_sails(self.ship)
         self.booms = boom_sails(self.ship)
         self.shifted = shifted_sails(self.ship)
-        let_fly_sheets(self.ship, self.heads)
+        ease_off_sheets(self.ship, self.heads)
         sheets_to(self.ship, self.booms, None, None)
         words = "Ready about. Helm's a-lee"
         if self.heads:
-            words += "; let fly the head sheets"
+            words += "; ease off the head sheets"
         if self.booms:
             words += f"; haul aft the {self._boom_words().replace('the ', '')} sheet"
         self.note(words + ".", "helm.order")
@@ -796,12 +819,7 @@ class TackScript(Script):
                 # sheets flat made a knot and a half at four points off after seven minutes
                 # (package 32e); trimmed for the wind, three and a half knots.
                 new_lee = self.old_side(weather=True)
-                draw_sheets(
-                    self.ship,
-                    self.heads + self.booms + self.shifted,
-                    new_lee,
-                    full_and_by_apparent(self.ship),
-                )
+                self._draw_on_new_tack(new_lee, wind)
                 draw = " Draw jib; trim aft the head sheets." if self.heads else ""
                 if self.head:
                     self.note("Let go and haul." + draw)
@@ -824,12 +842,7 @@ class TackScript(Script):
                 # side (to the wind of the moment they come flat while she is still coming
                 # round, and she stalls); the trim order and the book's tending routine
                 # take them from there
-                draw_sheets(
-                    self.ship,
-                    self.heads + self.booms + self.shifted,
-                    self.old_side(weather=True),
-                    full_and_by_apparent(self.ship),
-                )
+                self._draw_on_new_tack(self.old_side(weather=True), wind)
                 if steady_out_bowlines(self.ship, self.bowlined, -self.sign):
                     self.note("Haul taut the lifts and weather braces. Steady out the bowlines.")
         elif self.phase == "steady":
@@ -841,6 +854,15 @@ class TackScript(Script):
                 self.t_steady >= self.timing_value("steady_timeout_s", 120.0)
             ):
                 self.finish()
+
+    def _draw_on_new_tack(self, new_lee: str, wind: Wind) -> None:
+        """The sheets drawn on the new tack's lee side, for the full-and-by wind she is
+        coming to with the way she carried to "helm's a-lee" (`full_and_by_apparent`).
+        Eased a point fuller "until she has way" they were tried and found wrong in this
+        model, whose head sails want their working angle of attack to draw at all: the
+        frigate lost a hundred and fifty metres to leeward with them so (package 32e)."""
+        full_and_by = full_and_by_apparent(self.ship, wind, self.speed_at_helm)
+        draw_sheets(self.ship, self.heads + self.booms + self.shifted, new_lee, full_and_by)
 
     def _hang(self) -> None:
         """Her way is gone within a point of the wind: she hangs in stays, and the
@@ -954,6 +976,7 @@ class WearScript(Script):
         super().__init__(ship, params, timing)
         self.head, self.after = head_and_after_yards(ship)
         self.sign = 1.0 if ship.dyn.tack == "starboard" else -1.0
+        self.way_before = ship.dyn.speed  # by the wind, before "up helm" (for the sheets)
         self.new_course = ship.dyn.heading
         self.bowlined: list[str] = []  # sails whose bowlines were hauled out before wearing
         self.studding: StuddingSailsIn | None = None
@@ -1042,7 +1065,9 @@ class WearScript(Script):
                 # "when the wind is aft shift over the boom and head sheets" (Luce 1884,
                 # ch. XXXIV, 'To Wear'; package 32e): every fore-and-aft sheet to the new
                 # tack's lee side (the old weather side), trimmed for the wind she comes to
-                shift_sheets_over(self.ship, "starboard" if self.sign > 0 else "larboard")
+                shift_sheets_over(
+                    self.ship, "starboard" if self.sign > 0 else "larboard", wind, self.way_before
+                )
                 self.note(
                     "Wind aft. Squared the head yards; shifted over the sheets; hauled out "
                     "and braced up."
@@ -2934,6 +2959,7 @@ class BoxHaulScript(Script):
         super().__init__(ship, params, timing)
         self.head, self.after = head_and_after_yards(ship)
         self.sign = 1.0 if ship.dyn.tack == "starboard" else -1.0
+        self.way_before = ship.dyn.speed  # by the wind, before the helm (for the sheets)
         self.hauled_up: list = []
         self.swing: YardSwing | None = None
         self.new_course = ship.dyn.heading
@@ -3025,7 +3051,9 @@ class BoxHaulScript(Script):
                 words = self._restore()
                 # the sheets shifted over to the new tack's lee side, the old weather side
                 # (package 32e), the mainsail and spanker set again among them
-                shift_sheets_over(self.ship, "starboard" if self.sign > 0 else "larboard")
+                shift_sheets_over(
+                    self.ship, "starboard" if self.sign > 0 else "larboard", wind, self.way_before
+                )
                 self.note(f"Wind aft; braced up the after yards; shifted over the sheets.{words}")
         if self.phase == "come_to":
             self.new_course = units.wrap_2pi(wind.direction_from + self.sign * ch)

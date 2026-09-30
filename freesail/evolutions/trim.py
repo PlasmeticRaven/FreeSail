@@ -335,10 +335,12 @@ def read_sheet(ship: Ship, sail: Sail) -> SheetReading:
         lee_name = side_name(lee)
         working = max(sided, key=lambda ln: (ln.hauled, ln.side == lee_name))
         side = 1.0 if working.side == "starboard" else -1.0
+        if working.hauled <= 0.0:
+            side = lee  # eased right off, a sheet holds nothing: the sail blows over to leeward
         angle = geo.angle_from_hauled(working.hauled)
         return SheetReading(angle, side, side != lee, False, working)
     working = belayed[0]
-    if working.held_side is not None:
+    if working.held_side is not None and working.hauled > 0.0:
         side = 1.0 if working.held_side == "starboard" else -1.0
     else:
         side = lee

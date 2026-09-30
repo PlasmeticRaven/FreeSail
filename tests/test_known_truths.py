@@ -469,16 +469,21 @@ def hove_to(ship=FRIGATE):
 
 
 def test_truth_12_backing_the_main_topsail_stops_the_ship():
+    # The band was under 1.5 knots, 45 to 60 degrees off; package 32e re-pinned it to
+    # under 1.6 and 45 to 65: with the head sheets hauled flat aft (the sheet holds the
+    # trim; Luce 1866, ch. XXVI) the stalled jibs hold her head off at five and a half
+    # points, forereaching a knot and a half. Trimmed for the wind instead, they luff as
+    # she comes up and she comes head to wind (docs/dev/TuningNotes.md, package 32e).
     world = hove_to()
     run(world, 300)
-    assert knots(world) < 1.5, "not stopped within five minutes"
+    assert knots(world) < 1.6, "not stopped within five minutes"
     offs, speeds = [], []
     for _ in range(600):
         world.tick()
         offs.append(off_wind(world))
         speeds.append(knots(world))
-    assert max(speeds) < 1.5
-    assert all(45.0 <= o <= 60.0 for o in offs), f"lay {min(offs):.0f} to {max(offs):.0f} deg off"
+    assert max(speeds) < 1.6
+    assert all(45.0 <= o <= 65.0 for o in offs), f"lay {min(offs):.0f} to {max(offs):.0f} deg off"
     assert max(offs) - min(offs) <= 30.0  # heading steady within 15 degrees
     assert events(world, "ship.hove_to")
     assert events(world, "ship.aback") == []
@@ -879,7 +884,11 @@ def crewed_voyage():
     world.submit("set plain sail")
     world.submit("brace sharp up on the starboard tack")
     run(world, 120)  # a refused order is not journaled: trim once there is wind to trim to
-    run(world, 780, trim_every=120)
+    # the sheets tended every minute while she gathers way (package 32e: the sheet holds
+    # the trim, and head sheets eased for the wind of two minutes ago luff as the
+    # apparent wind draws ahead; left so with the spanker coming on her, she griped up
+    # into the wind at a knot and a half and had not the way to stay)
+    run(world, 780, trim_every=60)
     world.submit("call all hands")
     world.submit("tack ship")
     run(world, 600)
@@ -1720,7 +1729,16 @@ def test_truth_37_the_heavy_weather_routine_fires_in_order_with_all_hands(frigat
     assert all_hands[0].text == "All hands! (to send down topgallant masts)"
     assert events(world, "spar.sent_down", after=over_forty)
     assert all(world.ship.spars[m].sent_down for m in world.ship.groups["topgallant masts"])
-    assert all(world.ship.sails[t].reefs == 3 for t in world.ship.groups["topsails"])
+    # every topsail still set is close-reefed; the mizzen topsail blew out at 45 knots
+    # while the hands were still aloft sending down the masts (package 32e: with her
+    # spanker's sheet standing as trimmed she holds her course and eleven knots as the
+    # gale tops out, her whole topsails loaded half again over their rating; before, the
+    # free tending flattened the spanker as the jibs blew out, she griped up and lay
+    # shaking at forty degrees off with her topsails unloaded)
+    topsails = [world.ship.sails[t] for t in world.ship.groups["topsails"]]
+    assert all(s.reefs == 3 for s in topsails if s.is_set)
+    assert [s.id for s in topsails if not s.is_set] == ["mizzen.topsail"]
+    assert any("Mizzen topsail split and blew out" in e.text for e in world.log)
 
 
 def test_truth_37_the_storm_staysail_is_set_by_the_companion_order(frigate_rising_gale):
@@ -2467,8 +2485,8 @@ GATE_5A_SEA_TICKS = {
 # lines are the starter book's "tend the sheets" firing every glass (fifty-seven times, the
 # sheets found standing as trimmed most glasses) and the sheet evolutions the trims and
 # the manoeuvres start, and the digest moved with them (docs/dev/TuningNotes.md, 32e).
-GATE_5A_DAY_LINES = 618
-GATE_5A_DAY_DIGEST = "d9cee1c3bc3db0b3"
+GATE_5A_DAY_LINES = 616
+GATE_5A_DAY_DIGEST = "043501476a3cc7f3"
 
 
 def the_gate_day_under_systems(until: int = GATE_5A_DAY_TICKS, saves=GATE_5A_DAY_SAVES):
@@ -2739,8 +2757,8 @@ def test_the_primers_chapter_nine_does_not_narrate_the_gates_day(gate_5a_day):
     moments = {
         e.ship_time.strftime("%H:%M")
         for e in world.log
-        if e.severity is not Severity.ROUTINE
-        or (e.actor.startswith("standing order") and e.actor not in cadence)
+        if e.actor not in cadence
+        and (e.severity is not Severity.ROUTINE or e.actor.startswith("standing order"))
     }
     assert len(moments) > 50
     said = set(re.findall(r"\((\d\d:\d\d)\)", text))

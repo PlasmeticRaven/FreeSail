@@ -16,7 +16,7 @@ The log, from the frigate under plain sail at 5.4 knots close-hauled on the star
 
 ```
   Morning watch (04:16)  Order: tack ship.
-  Morning watch (04:16)  Ready about. Helm's a-lee; let fly the head sheets; haul aft the spanker sheet.
+  Morning watch (04:16)  Ready about. Helm's a-lee; ease off the head sheets; haul aft the spanker sheet.
   Morning watch (04:16)  All hands about ship.
 * Morning watch (04:16)  Fore course taken aback.
 * Morning watch (04:16)  Main course taken aback.
@@ -82,7 +82,7 @@ Since package 32e the rule reads the vessel. Her **way is gone** when for fiftee
 
 ```
   Morning watch (04:15)  Order: tack ship.
-  Morning watch (04:15)  Ready about. Helm's a-lee; let fly the head sheets; haul aft the spanker sheet.
+  Morning watch (04:15)  Ready about. Helm's a-lee; ease off the head sheets; haul aft the spanker sheet.
   Morning watch (04:16)  Rise tacks and sheets. Mainsail haul.
   Morning watch (04:17)  Her way is gone; she hangs in stays. Helm kept a-lee; the head yards aback to box her off; the head sheets held to windward; the spanker boom hauled over to windward.
   Morning watch (04:17)  Her head is through the wind; the head sails aback pay her off.
@@ -94,7 +94,7 @@ In six knots she makes 2.2 knots close-hauled and the same order fails, her way 
 
 ```
   Morning watch (04:15)  Order: tack ship.
-  Morning watch (04:15)  Ready about. Helm's a-lee; let fly the head sheets; haul aft the spanker sheet.
+  Morning watch (04:15)  Ready about. Helm's a-lee; ease off the head sheets; haul aft the spanker sheet.
 ! Morning watch (04:17)  Missed stays: she lost her way before her head came up to the wind. Up helm; square the yards; flatten in the head sheets; ease off the spanker sheet.
 ! Morning watch (04:17)  Taken aback: the sails pressed against the masts and she lost her way.
 * Morning watch (04:18)  Squared the yards; she fell off on the starboard tack, to try again or to wear.
@@ -261,7 +261,7 @@ A fore-and-aft vessel tacks quickly and wears with her main boom: "clew up the m
 
 ```
   Morning watch (04:16)  Order: tack ship.
-  Morning watch (04:16)  Ready about. Helm's a-lee; let fly the head sheets; haul aft the mainsail sheet.
+  Morning watch (04:16)  Ready about. Helm's a-lee; ease off the head sheets; haul aft the mainsail sheet.
   Morning watch (04:16)  All hands about ship.
 * Morning watch (04:16)  Topsail taken aback.
   Morning watch (04:16)  Let go and haul. Draw jib; trim aft the head sheets.

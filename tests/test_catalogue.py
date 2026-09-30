@@ -94,7 +94,7 @@ M2_TIMINGS = {
     "tack": {
         "brace_s": 45.0,
         "stays_timeout_s": 180.0,
-        "hang_after_s": 15.0,
+        "hang_after_s": 5.0,
         "way_gone_fraction": 0.25,
         "way_gone_lengths_per_min": 1.0,
         "steady_deg": 5.0,

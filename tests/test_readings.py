@@ -184,21 +184,24 @@ def test_a_sail_shaking_and_aback_read_from_the_physics(world: World):
     else:
         assert square.id in drawing
     # brought up toward the wind: the frigate comes head to wind and every sail shakes or
-    # is aback; the schooner stalls at some thirty-four degrees apparent, her square
-    # topsails shaking while her fore-and-aft canvas draws (the docstring of sails.py)
+    # is aback. The schooner, whose sheets stand as trimmed (package 32e), luffs as she is
+    # brought up, loses her way and goes through the wind into irons, her canvas aback by
+    # its sheets on what is now the weather side; before, the free tending flattened her
+    # sheets as she came up and she stalled at some thirty-four degrees apparent with her
+    # fore-and-aft canvas still drawing (the docstring of sails.py then)
+    world.submit("trim sails")
+    world.run(150)
     world.submit("steer north")
     world.run(600)
     awa = units.rad_to_deg(abs(ship.dyn.apparent_wind_angle))
+    assert awa < (45 if ship.spec.rig == "topsail-schooner" else 25), awa
     for s in ship.sails.values():
         if not s.is_set:
             continue
+        if any(ln.side is None for ln in ship.sheets_of(s)):
+            continue  # a boom sail swings to leeward of whatever wind she has, and fills
         v = world.readings.value("sail", s.id)
-        if ship.spec.rig == "topsail-schooner":
-            assert 25 < awa < 45, awa
-            assert v["shaking"] == (s.cls == "square"), (s.id, v, awa)
-        else:
-            assert awa < 25, awa
-            assert v["shaking"] or v["aback"], (s.id, v, awa)
+        assert v["shaking"] or v["aback"], (s.id, v, awa)
     # the physics' own flag decides "aback"
     square.backed = True
     world.record("routine", "test.bump", "readings recomputed")  # a new log line: a new view
