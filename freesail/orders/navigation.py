@@ -21,15 +21,17 @@ refused in words. `orders.handle` hands an order with this object here.
 
 from __future__ import annotations
 
+import math
 import re
 from typing import Any
 
 from freesail import units
+from freesail.orders import errors
 from freesail.orders.errors import OrderError
 from freesail.orders.grammar import Order
 from freesail.world.geo import parse_position
 
-__all__ = ["NO_RECKONING_WORDS", "execute"]
+__all__ = ["NO_RECKONING_WORDS", "execute", "mark_in_sight"]
 
 NO_RECKONING_WORDS = (
     "No reckoning is kept in this ship: the scenario gives her no position, and there is "
@@ -97,7 +99,7 @@ def execute(ship: Any, order: Order) -> Result:
                 "Take a bearing of what? Name a mark in sight, or say 'the land' or 'the light'."
             )
         nav = _navigation(ship)
-        text, data = nav.take_bearing(rest)
+        text, data = nav.take_bearing(mark_in_sight(nav, rest) or rest)
         return "bearing.taken", text, {"verb": verb, "level": 1, "mark": rest} | data
     if verb == "work up the reckoning":
         nav = _navigation(ship)
@@ -147,3 +149,97 @@ def execute(ship: Any, order: Order) -> Result:
         data = {"verb": verb, "level": 1, "place": rest, "heading": heading} | {"helm": helm_data}
         return "helm.set", f"{words} {helm_text}", data
     raise OrderError(f"'{verb}' is not a navigation order this ship knows.")
+
+
+# ---------------------------------------------------------------------------
+# A mark in sight by any of its words (package 33c; playtest 13's cutter: "take a bearing
+# of manacle" refused with Manacle Point in the list)
+# ---------------------------------------------------------------------------
+
+# The chart's kinds that are dangers, for the words of one not in sight.
+_DANGER_KINDS = frozenset({"ledge", "rock", "drying", "shoal", "bank"})
+# The lookout's own words for the nearest land or light (`Lookout.find`), never read as a
+# mark's word ('land' is not Land's End).
+_LOOKOUT_WORDS = frozenset(
+    {"land", "shore", "coast", "headland", "nearest land", "light", "nearest light"}
+)
+
+
+def _name_words(name: str) -> list[str]:
+    """A name's words as they are matched: lower case, no article, no punctuation."""
+    words = "".join(c if c.isalnum() or c.isspace() else " " for c in name.lower()).split()
+    return [w for w in words if w not in ("the", "of", "and")]
+
+
+def mark_in_sight(nav: Any, said: str, refuse: bool = True) -> str | None:
+    """The name of the mark in sight the words mean, for `take a bearing of <words>` and
+    the reading `the bearing of <words>`: the words as said when the lookout knows them
+    whole (`Lookout.find`: a name, 'the land', 'the light') or a transit of the chart
+    names them; else the one mark in sight that has every word said among its name's
+    words ('manacle' for Manacle Point). When two or more answer, or none does, refused
+    in words that name them, or say that the feature the words name is the chart's and
+    not in sight (the Manacles, the danger, are not Manacle Point), or the nearest name
+    in sight; with `refuse` False, None instead of a refusal."""
+    world = nav.world
+    lookout = getattr(world, "lookout", None)
+    if lookout is None or lookout.find(said) is not None:
+        return said
+    words = _name_words(said)
+    if " ".join(words) in _LOOKOUT_WORDS:
+        return said  # the lookout's own words ('the land', 'the light'): its refusal stands
+    chart = getattr(world, "chart", None)
+    features = list(chart.features.values()) if chart is not None else []
+    if any(f.kind == "transit" and _name_words(f.name) == words for f in features):
+        return said
+    if not words:
+        return said
+    from freesail.world.lookout import SHORE_ID
+
+    seen = [s for s in lookout.sightings if s.feature.id != SHORE_ID]
+    # by the period's name the lookout says (the modern one is taken whole by `find`: the
+    # Manacles' modern "Manacle Rocks" would make 'manacle' name two marks)
+    matches = [s for s in seen if set(words) <= set(_name_words(s.feature.name))]
+    if len({s.feature.id for s in matches}) == 1:
+        return matches[0].feature.name
+    if not refuse:
+        return None
+    heading = float(world.ship.heading)
+    if matches:
+        which = errors.join_names(
+            [
+                f"{s.feature.name} bearing {units.point_name(math.radians(s.bearing_deg))}"
+                for s in matches
+            ],
+            "and",
+        )
+        raise OrderError(f"{len(matches)} marks in sight answer to '{said}': {which}; say which.")
+    if not seen:
+        return said  # the lookout's own refusal: nothing in sight, or the shore alone
+    in_sight = lookout.reading(heading)["words"]
+    named = [f for f in features if f.kind != "transit" and _name_words(f.name) == words]
+    if named:
+        f = named[0]
+        verb = "are" if f.name.endswith("s") and not f.name.endswith("ss") else "is"
+        what = "a danger of the chart" if f.kind in _DANGER_KINDS else "a mark of the chart"
+        head = f"{f.name[:1].upper()}{f.name[1:]} {verb} not in sight ({what})"
+        # a mark in sight whose words begin as these do is another feature: the Manacles
+        # are not Manacle Point
+        near = [
+            s.feature.name
+            for s in seen
+            if any(w[:5] == x[:5] for w in _name_words(s.feature.name) for x in words)
+        ]
+        if near:
+            be = "is" if len(near) == 1 else "are"
+            head += f"; {errors.join_names(near, 'and')}, in sight, {be} another feature"
+        raise OrderError(f"{head}; in sight: {in_sight}.")
+    near = errors.nearest(
+        " ".join(words), [" ".join(_name_words(s.feature.name)) for s in seen], n=2
+    )
+    names = [s.feature.name for s in seen if " ".join(_name_words(s.feature.name)) in near]
+    if not names:
+        return said  # the lookout's own refusal, with what is in sight
+    head = said[:1].upper() + said[1:]
+    raise OrderError(
+        f"{head} is not in sight; did you mean {errors.join_names(names)}? In sight: {in_sight}."
+    )

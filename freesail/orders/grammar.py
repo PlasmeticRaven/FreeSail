@@ -135,12 +135,13 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
             verb_phrase=verb_phrase,
             object=said or None,
         )
-    if spec.object == "navigation":
+    if spec.object in ("navigation", "reading"):
         # what the captain says to the master (spec M5 §15, package 33a): the words after
         # the verb are a mark, a place, a position or an allowance, read by
         # `orders.navigation` as they were said (the original text, not the lower-cased
         # form: a mark's name is matched without regard to case, a position by its
-        # letters)
+        # letters); and a reading asked with its mark, `the bearing of the Lizard`
+        # (package 33c, `orders.prompt`)
         said = " ".join(w for w in [*rest, *(w for seg in segments[1:] for w in seg)] if w != ",")
         return Order(
             text=norm.replace(" , ", ", "),
@@ -180,11 +181,28 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
     side_word: str | None = None
     if spec.object in ("sail", "yards", "line", "wreck"):
         obj, side_word, rest = _match_object(ship, rest, vocab, verb, spec)
+        if verb == "trim" and obj is not None:
+            # "trim the spanker sheet", "tend the jib sheets" (package 33c; playtest 12):
+            # a sail's sheet named for the sail's trim, which works that sheet
+            obj, side_word = _sail_of_sheet(ship, obj, side_word)
 
     tail = list(rest)
     for seg in segments[1:]:
         tail.extend(seg)
-    mods, side_from_mods = _parse_modifiers(tail, vocab, verb)
+    try:
+        mods, side_from_mods = _parse_modifiers(tail, vocab, verb)
+    except OrderError:
+        place = _steer_for_a_place(verb, verb_phrase, tail)
+        if place is None or "navigation" not in (getattr(ship, "extra", None) or {}):
+            raise  # on the endless plane there is no place to steer for: the heading's words
+        # "steer for Falmouth", "head for the Lizard" (package 33c; playtest 12): a place
+        # and not a heading after 'for' is the course shaped for it, by account
+        return Order(
+            text=norm.replace(" , ", ", "),
+            verb="shape a course for",
+            verb_phrase=verb_phrase,
+            object=place,
+        )
     if side_from_mods is not None:
         if side_word is not None and side_from_mods != side_word:
             raise OrderError(
@@ -210,6 +228,48 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         side_word=side_word,
         modifiers=mods,
     )
+
+
+# ---------------------------------------------------------------------------
+# Package 33c: a sheet named for its sail's trim, a place to steer for
+# ---------------------------------------------------------------------------
+
+# The words before a place that make `steer` the course shaped for it: "steer for
+# Falmouth", "head for the Lizard", "steer towards St Anthony's Head".
+_FOR_A_PLACE = ("for", "towards", "toward")
+
+
+def _sail_of_sheet(ship: Ship, obj: str, side_word: str | None) -> tuple[str, str | None]:
+    """For `trim`: the fore-and-aft sail whose sheet or sheets the object names ("the
+    spanker sheet", "the jib sheets"), with no side, since the trim works the lee sheet as
+    the wind has it; any other object as it was (a square sail's sheets are not its trim,
+    which is its brace)."""
+    from freesail.orders.resolve import display_name
+    from freesail.ship.parts import Line
+
+    noun = noun_table(ship).lookup(obj)
+    if noun is None:
+        return obj, side_word
+    parts = [ship.parts.get(i) for i in noun.ids]
+    if not parts or not all(isinstance(p, Line) and p.cls == "sheet" for p in parts):
+        return obj, side_word
+    sails = list(dict.fromkeys(p.of for p in parts if p.of in ship.sails))
+    if len(sails) != 1 or not ship.sails[sails[0]].is_fore_and_aft:
+        return obj, side_word  # a square sail's sheets are not its trim: its brace is
+    return display_name(ship, sails[0]), None
+
+
+def _steer_for_a_place(verb: str, verb_phrase: str, words: list[str]) -> str | None:
+    """The place after `steer for` (or `head for`, `steer towards`) when the words are no
+    heading: the words, for `shape a course for`; None for any other order."""
+    if verb != "steer":
+        return None
+    words = [w for w in words if w != ","]
+    if verb_phrase.split()[-1] not in _FOR_A_PLACE:
+        if not words or words[0] not in _FOR_A_PLACE:
+            return None
+        words = words[1:]
+    return " ".join(words) or None
 
 
 # ---------------------------------------------------------------------------

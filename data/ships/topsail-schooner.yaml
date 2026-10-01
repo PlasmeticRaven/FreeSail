@@ -758,6 +758,9 @@ groups:
   fore bowlines:
   - fore.topsail.bowline.starboard
   - fore.topsail.bowline.larboard
+  topmast studdingsails:
+  - fore.topmast.studdingsail.starboard
+  - fore.topmast.studdingsail.larboard
 aliases:
   foresail: fore.sail
   the fore: fore.sail
@@ -773,6 +776,7 @@ aliases:
   topgallant sails: topgallants
   fore bowline: fore bowlines
   fore top bowline: fore bowlines
+  sails: all sail
 crew:
   # A privateer's complement of about forty (Chapelle, The Baltimore Clipper; judgement, spec M3 2.3).
   complement: 40

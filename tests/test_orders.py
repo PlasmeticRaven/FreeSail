@@ -1849,3 +1849,462 @@ def test_completion_offers_the_wreck_and_the_spar_to_shift():
     assert offered == ["shift the larboard fore topmast studdingsail boom"]
     offered = complete.suggestions(ship, "the bo")
     assert offered[0] == "the booms" and "the boatswains store" in offered  # package 31b
+
+
+# ---------------------------------------------------------------------------
+# Package 33c: the forty-nine orders refused in gate 5b's playtests, each with what it
+# does now (the refused orders of playtests 12 and 13, `refused.md`, `refused-cutter.md`
+# and `refused-brig.md` in their folders under docs/playtests/, with the lead's reading).
+# Each is given through `World.submit`, the one path the console and the browser share,
+# to its ship on the chart of the western Channel at seed 7, at a position and an hour
+# like the session's; those to be taken give their new answer, those still refused keep
+# their words.
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class took:
+    kinds: tuple[str, ...]  # the kind of the line `submit` returns
+    mentions: tuple[str, ...] = ()  # substrings of its text
+    started: tuple[str, ...] = ()  # evolutions the runner holds afterwards
+
+
+@dataclass
+class still:
+    mentions: tuple[str, ...] = ()  # substrings of the refusal
+
+
+def voyage(ship: str, lat: float, lon: float, hhmm: str) -> World:
+    from datetime import datetime
+
+    from freesail.api.session import make_world
+
+    h, m = (int(x) for x in hhmm.split(":"))
+    scenario = Scenario(
+        start_time=datetime(1805, 6, 10, h, m),
+        wind_from_deg=225.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=0.0,
+        position={"lat_deg": lat, "lon_deg": lon},
+        region="channel-west",
+    )
+    return make_world(7, str(SHIP_FILES[ship]), scenario)
+
+
+def _set(*sail_ids: str):
+    def setup(w: World) -> None:
+        for sid in sail_ids:
+            w.ship.sails[sid].state = SailState.SET
+        w.run(5)  # the apparent wind on deck, that a trim is made to
+
+    return setup
+
+
+def _sheets_eased_off(*sail_ids: str):
+    def setup(w: World) -> None:
+        _set(*sail_ids)(w)
+        for line in w.ship.lines.values():
+            if line.cls == "sheet" and line.of in sail_ids:
+                line.hauled = 0.0
+
+    return setup
+
+
+def _close_reefed_topsail(w: World) -> None:
+    sail = w.ship.sails["topsail"]
+    sail.state, sail.reefs = SailState.SET, sail.reef_bands
+
+
+def _orders(*texts: str):
+    def setup(w: World) -> None:
+        for t in texts:
+            w.submit(t)
+
+    return setup
+
+
+def _reaching(w: World) -> None:
+    w.submit("set plain sail")
+    w.submit("steer east")
+    w.run(600)
+
+
+def _plain_sail(w: World) -> None:
+    for sid in w.ship.groups["plain sail"]:
+        w.ship.sails[sid].state = SailState.SET
+
+
+# The passage's frigate well out from the Lizard, as at half past noon (the Lizard was
+# raised at 15:42); the cutter off Falmouth at four in the afternoon with Manacle Point in
+# sight and the Manacles not; the same a little south with the Old Wall not in sight; the
+# brig off Ushant at dawn.
+OFFING = (49.20, -5.30)
+OFF_FALMOUTH = (50.11, -4.97)
+SOUTH_OF_IT = (50.06, -5.00)
+OFF_USHANT = (48.53, -4.98)
+TRIM_FAIR = ("evolution.started", "order.accepted", "sail.trimmed")
+QUERY = ("query.reading",)
+HELD = ("Held until the ship can carry it out", "no well to sound yet")
+SCANDALISE = "cannot be scandalised: the physics has no state for a gaff sail with its peak"
+MANACLES = (
+    "The Manacles are not in sight (a danger of the chart); Manacle Point, in sight, is "
+    "another feature"
+)
+BLIND_LEAD = 'standing order "Blind Lead": every 10 minutes then heave the lead'
+TRIM_BY_THE_WIND = (
+    'standing order "Trim Sails by the Wind": when the true wind veers 1 point or backs 1 '
+    "point then trim sails"
+)
+
+PLAYTEST_REFUSALS: list[tuple[str, str, tuple[float, float], str, Any, took | still]] = [
+    # -- playtest 12, the frigate's passage (refused.md: fifteen) ------------------------
+    (
+        "frigate",
+        "04:00",
+        OFFING,
+        'standing order "sound the well": every glass then sound the well',
+        None,
+        took(("standing.given",), HELD),
+    ),
+    ("frigate", "08:01", OFFING, "Trim the spanker sheet", _set("mizzen.spanker"), took(TRIM_FAIR)),
+    ("frigate", "08:02", OFFING, "Tend the spanker sheet", _set("mizzen.spanker"), took(TRIM_FAIR)),
+    (
+        "frigate",
+        "12:29",
+        OFFING,
+        "The reckoning",
+        None,
+        took(QUERY, ("The reckoning: ", "account")),
+    ),
+    (
+        "frigate",
+        "12:29",
+        OFFING,
+        "the reckoning",
+        None,
+        took(QUERY, ("The reckoning: ", "account")),
+    ),
+    ("frigate", "12:30", OFFING, "the master", None, took(QUERY, ("The master: Mr ", "on deck"))),
+    (
+        "frigate",
+        "12:32",
+        OFFING,
+        "the bearing of the Lizard",
+        None,
+        took(QUERY, ("The bearing of the Lizard: not in sight.",)),
+    ),
+    (
+        "frigate",
+        "12:32",
+        OFFING,
+        "What is the bearing of the lizard",
+        None,
+        took(QUERY, ("The bearing of the lizard: not in sight.",)),
+    ),
+    (
+        "frigate",
+        "12:32",
+        OFFING,
+        "Ask the master the reckoning",
+        None,
+        took(QUERY, ("The reckoning: ",)),
+    ),
+    (
+        "frigate",
+        "12:37",
+        OFFING,
+        "work up a reckoning",
+        None,
+        took(("reckoning.worked",), ("The reckoning worked up: ",)),
+    ),
+    ("frigate", "12:37", OFFING, "take a bearing of the Lizard", None, still(("in sight",))),
+    (
+        "frigate",
+        "12:38",
+        OFFING,
+        "work up the reckoning's uncertainty",
+        None,
+        took(("reckoning.worked",), ("I would not trust the reckoning",)),
+    ),
+    (
+        "frigate",
+        "12:38",
+        OFFING,
+        "take the reckoning's uncertainty",
+        None,
+        took(QUERY, ("The reckoning's uncertainty: I would not trust",)),
+    ),
+    (
+        "frigate",
+        "18:11",
+        OFFING,
+        "Steer for falmouth",
+        None,
+        took(("helm.set",), ("Shaped a course for Falmouth", "Helm ordered: steer")),
+    ),
+    (
+        "frigate",
+        "18:18",
+        OFFING,
+        "Take a sounding",
+        None,
+        took(("order.accepted",), started=("heave_lead",)),
+    ),
+    # -- playtest 13, the cutter (refused-cutter.md: sixteen) ----------------------------
+    (
+        "cutter",
+        "04:02",
+        OFF_FALMOUTH,
+        "Set the mainsail, one reef",
+        None,
+        took(("order.accepted",), started=("set_gaff", "reef_gaff")),
+    ),
+    (
+        "cutter",
+        "05:21",
+        OFF_FALMOUTH,
+        "Ease the jib sheet a fathom",
+        _sheets_eased_off("jib"),
+        still(("already eased right off",)),
+    ),
+    (
+        "cutter",
+        "05:21",
+        OFF_FALMOUTH,
+        "Ease the fore staysail sheet a fathom",
+        _sheets_eased_off("fore.staysail"),
+        still(("already eased right off",)),
+    ),
+    (
+        "cutter",
+        "10:01",
+        OFF_FALMOUTH,
+        "Reef the topsail, one reef",
+        _close_reefed_topsail,
+        still(("already close reefed (1 reef in)",)),
+    ),
+    (
+        "cutter",
+        "10:56",
+        OFF_FALMOUTH,
+        "Reef the topsail, one reef",
+        _close_reefed_topsail,
+        still(("already close reefed (1 reef in)",)),
+    ),
+    (
+        "cutter",
+        "16:17",
+        OFF_FALMOUTH,
+        "take a bearing of manacle",
+        None,
+        took(("bearing.taken",), ("Manacle Point bore ",)),
+    ),
+    ("cutter", "16:33", OFF_FALMOUTH, "sightings", None, took(QUERY, ("The sightings: ",))),
+    (
+        "cutter",
+        "16:34",
+        OFF_FALMOUTH,
+        "takc a bearing of old wall",
+        None,
+        still(("is not an order this ship understands",)),
+    ),
+    (
+        "cutter",
+        "16:34",
+        OFF_FALMOUTH,
+        "take a bearing of black rock",
+        None,
+        still(("The Black Rock is not in sight (a danger of the chart)", "in sight: ")),
+    ),
+    (
+        "cutter",
+        "16:34",
+        OFF_FALMOUTH,
+        "Take a bearing of rosemullian head",
+        None,
+        still(("Rosemullian head is not in sight; did you mean Rosemullion Head",)),
+    ),
+    ("cutter", "16:51", OFF_FALMOUTH, "take a bearing of manacles", None, still((MANACLES,))),
+    (
+        "cutter",
+        "16:51",
+        OFF_FALMOUTH,
+        "take a bearing of manacle",
+        None,
+        took(("bearing.taken",), ("Manacle Point bore ",)),
+    ),
+    (
+        "cutter",
+        "17:06",
+        SOUTH_OF_IT,
+        "take a bearing of the old wall",
+        None,
+        still(("The Old Wall is not in sight (a danger of the chart)",)),
+    ),
+    (
+        "cutter",
+        "17:41",
+        OFF_FALMOUTH,
+        "belay heave the lead",
+        _orders("heave the lead"),
+        took(("work.belayed",), ("Belayed heaving lead",)),
+    ),
+    (
+        "cutter",
+        "17:41",
+        OFF_FALMOUTH,
+        "avast heave lead",
+        _orders("heave the lead"),
+        took(("work.belayed",), ("Belayed heaving lead",)),
+    ),
+    ("cutter", "17:41", OFF_FALMOUTH, "tack ship", _reaching, still(("She is not close-hauled",))),
+    # -- playtest 13, the brig (refused-brig.md: eighteen) -------------------------------
+    (
+        "brig",
+        "04:19",
+        OFF_USHANT,
+        'Standing order "Trim Sails by the Glass" Every glass then trim the sails',
+        None,
+        still(("After the name say a colon",)),
+    ),
+    (
+        "brig",
+        "04:31",
+        OFF_USHANT,
+        "Bend the ringtail",
+        None,
+        still(("no such part as the ringtail",)),
+    ),
+    ("brig", "04:53", OFF_USHANT, "Take a bearing", None, still(("Take a bearing of what?",))),
+    ("brig", "04:53", OFF_USHANT, "Take a bearing of", None, still(("Take a bearing of what?",))),
+    ("brig", "04:53", OFF_USHANT, "Take a bearing of f", None, still(("F is not in sight",))),
+    (
+        "brig",
+        "05:16",
+        OFF_USHANT,
+        "Bend the save-alls",
+        None,
+        still(("no such part as the save alls",)),
+    ),
+    (
+        "brig",
+        "12:11",
+        OFF_USHANT,
+        "Set the lee stuns'ls",
+        _plain_sail,
+        still(("rigged in; rig it out first",)),
+    ),
+    (
+        "brig",
+        "12:23",
+        OFF_USHANT,
+        'Belay "blind lead"',
+        _orders(BLIND_LEAD),
+        took(("standing.belayed",), ("Standing order 'Blind Lead' belayed.",)),
+    ),
+    (
+        "brig",
+        "16:14",
+        OFF_USHANT,
+        'Standing order "Night Sails": When the daylight is night then clew up the royals',
+        None,
+        took(("standing.given",), ("when the daylight is night then clew up the royals",)),
+    ),
+    (
+        "brig",
+        "04:36",
+        OFF_USHANT,
+        'Resume standing order "trim by the wind"',
+        _orders(TRIM_BY_THE_WIND, 'belay standing order "Trim Sails by the Wind"'),
+        took(("standing.resumed",), ("Standing order 'Trim Sails by the Wind' resumed.",)),
+    ),
+    # the table's "order as typed" is the refusal's own tail, a copy's slip; the order was
+    # `rig out the topmast stuns'ls`, as the refusal and the lead's reading have it
+    (
+        "brig",
+        "12:31",
+        OFF_USHANT,
+        "rig out the topmast stuns'ls",
+        None,
+        took(("order.accepted",), started=("rig_out_studdingsail_boom",)),
+    ),
+    (
+        "brig",
+        "13:16",
+        OFF_USHANT,
+        "Haul the starboard fore main brace",
+        None,
+        still(("no such part as the fore main brace",)),
+    ),
+    ("brig", "13:16", OFF_USHANT, "Haul the foresail brace", None, still(("Which fore brace",))),
+    (
+        "brig",
+        "13:20",
+        OFF_USHANT,
+        "Square the sails",
+        _plain_sail,
+        took(("order.accepted",), started=("brace",)),
+    ),
+    (
+        "brig",
+        "13:52",
+        OFF_USHANT,
+        "Clew up the sails",
+        _plain_sail,
+        took(("order.accepted", "evolution.started"), started=("take_in_square",)),
+    ),
+    (
+        "brig",
+        "13:52",
+        OFF_USHANT,
+        "Clew up the driver",
+        _set("main.spanker"),
+        still(("brailed up, not clewed up",)),
+    ),
+    ("brig", "13:52", OFF_USHANT, "Tryce the driver", _set("main.spanker"), still((SCANDALISE,))),
+    (
+        "brig",
+        "13:52",
+        OFF_USHANT,
+        "Scandalize the driver",
+        _set("main.spanker"),
+        still((SCANDALISE,)),
+    ),
+]
+
+
+def test_the_playtests_refusals_are_forty_nine():
+    assert len(PLAYTEST_REFUSALS) == 49
+    ships = [s for s, *_ in PLAYTEST_REFUSALS]
+    assert (ships.count("frigate"), ships.count("cutter"), ships.count("brig")) == (15, 16, 18)
+    taken = sum(1 for *_, e in PLAYTEST_REFUSALS if isinstance(e, took))
+    assert taken == 26  # and twenty-three still refused, each in its words
+
+
+@pytest.mark.parametrize(
+    "ship,when,where,text,setup,expect",
+    PLAYTEST_REFUSALS,
+    ids=[f"{s} {t}: {x}" for s, t, _, x, _, _ in PLAYTEST_REFUSALS],
+)
+def test_the_playtests_refusals_now(ship, when, where, text, setup, expect):
+    world = voyage(ship, *where, when)
+    if setup is not None:
+        setup(world)
+    journal = len(world.journal)
+    e = world.submit(text)
+    if isinstance(expect, still):
+        assert e.kind == "order.rejected", (e.kind, e.text)
+        for m in expect.mentions:
+            assert m in e.text, f"{text!r}: expected {m!r} in {e.text!r}"
+        assert len(world.journal) == journal
+        return
+    assert e.kind in expect.kinds, (e.kind, e.text)
+    for m in expect.mentions:
+        assert m in e.text, f"{text!r}: expected {m!r} in {e.text!r}"
+    held = {inst.evo.id for inst in world.ship.extra["evolutions"].instances}
+    for evo in expect.started:
+        assert evo in held, (text, held)
+    if e.kind == "query.reading":
+        assert len(world.journal) == journal  # a question is never journaled

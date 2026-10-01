@@ -14,6 +14,9 @@ and the nearest things that would have been.
 Group evolutions ("make all sail", "shorten sail") are lists of ordinary
 orders in `data/vocabulary.yaml`; `handle` runs each in turn, passing over
 the ones this ship has no parts for, and reports the rest on one line.
+
+A reading asked at the prompt (`the reckoning`, `what is the glass`, a sail by its name;
+package 33c) is a query answered in the registry's words by `prompt.py`.
 """
 
 from __future__ import annotations
@@ -21,12 +24,13 @@ from __future__ import annotations
 from typing import Any
 
 from freesail.evolutions.runner import gerund
-from freesail.orders import errors, verbs
+from freesail.orders import errors, prompt, verbs
 from freesail.orders.errors import (
     AmbiguousNounError,
     NothingToDoError,
     OrderError,
     UnknownNounError,
+    UnknownVerbError,
 )
 from freesail.orders.grammar import Order, parse
 from freesail.orders.resolve import Resolution, build_noun_table, noun_table
@@ -64,12 +68,28 @@ def handle(ship: Ship, text: str) -> tuple[str, str, dict[str, Any]]:
 
     if standing.recognises(text):
         return standing.handle(ship, text)
+    book = standing.bare_book_sentence(ship, text)
+    if book is not None:
+        # `belay "blind lead"`: a standing order by its name, without the words
+        # 'standing order' (package 33c)
+        return standing.handle(ship, book)
     if stations.recognises(text, ship):
         # a sentence to an agent's station (spec M4 §12): `ask the watcher ...`, `stand
         # down the watcher`, `resume the watcher`, `show the watcher's journal`
         return stations.handle(ship, text)
     vocab = load_vocabulary()
-    order = parse(ship, text, vocab)
+    try:
+        order = parse(ship, text, vocab)
+    except UnknownVerbError:
+        # no verb in the words: a reading said without its article, a sail or a part by
+        # name, or an absent reading (package 33c, `orders.prompt`); else the refusal
+        answered = prompt.answer_unparsed(ship, text, vocab)
+        if answered is None:
+            raise
+        return answered
+    if order.verb in vocab.readings:
+        # a reading asked at the prompt (package 33c): a query, in the registry's words
+        return prompt.answer(ship, order, text, vocab)
     runner = ship.extra.get("evolutions") if hasattr(ship, "extra") else None
     giving = getattr(runner, "giving", None)
     if giving is None:
@@ -85,8 +105,44 @@ def _carry_out(ship: Ship, order: Order, vocab: Vocabulary) -> tuple[str, str, d
         # what the captain says to the master (spec M5 §15, package 33a)
         from freesail.orders import navigation
 
+        if order.object and order.verb in LEAD_VERBS:
+            # "sound the well" (package 33c): the well is a reading the ship has not got
+            # yet, and the registry says so; the lead is not hove for it
+            absent = prompt.absent_named(order.object)
+            if absent is not None:
+                raise OrderError(absent)
         return navigation.execute(ship, order)
+    if order.verb == "set" and ("reefs" in order.modifiers or "close" in order.modifiers):
+        return _set_reefed(ship, order, vocab)
     return verbs.execute(ship, order, vocab)
+
+
+# The navigation verbs that heave a lead (`data/vocabulary.yaml`).
+LEAD_VERBS: tuple[str, ...] = ("heave the lead", "heave the deep sea lead")
+
+
+def _set_reefed(ship: Ship, order: Order, vocab: Vocabulary) -> tuple[str, str, dict[str, Any]]:
+    """`set the mainsail, one reef` (package 33c; playtest 13's cutter): the sail set and
+    then reefed, two evolutions in turn on the one sail, as the runner takes two orders on
+    one subject (a reef wants the sail set, and waits its turn behind the setting). A
+    sail with no reef bands is set and the line says it was not reefed, and why."""
+    reef_mods = {k: v for k, v in order.modifiers.items() if k in ("reefs", "close", "hands_from")}
+    set_mods = {k: v for k, v in order.modifiers.items() if k not in ("reefs", "close")}
+    as_set = Order(order.text, "set", "set", order.object, order.side_word, set_mods)
+    as_reef = Order(order.text, "reef", "reef", order.object, order.side_word, reef_mods)
+    kind, set_text, set_data = verbs.execute(ship, as_set, vocab)
+    try:
+        _, reef_text, reef_data = verbs.execute(ship, as_reef, vocab)
+    except OrderError as e:
+        return kind, f"{set_text} Not reefed: {str(e).rstrip('.')}.", set_data | {"reef": str(e)}
+    data = {
+        "verb": "set",
+        "level": 1,
+        "orders": [set_data, reef_data],
+        "subjects": list(set_data.get("subjects", [])),
+        "failed": list(set_data.get("failed", [])) + list(reef_data.get("failed", [])),
+    }
+    return kind, f"{set_text} {reef_text}", data
 
 
 def _group_evolution(

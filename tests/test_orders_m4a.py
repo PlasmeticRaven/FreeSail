@@ -313,26 +313,26 @@ STARTER_NAMES = [
     "tend the sheets",  # package 32e: the sheets tended every glass
     "heavy weather",
     "storm staysail",
+    "sound the well",  # package 33c: held in the book until the well is a reading
 ]
 
 
-def test_the_starter_file_loads_in_the_console_with_the_well_refused_and_the_rest_entered():
+def test_the_starter_file_loads_in_the_console_with_the_well_held_and_the_rest_entered():
     out = io.StringIO()
     con = Console(close_hauled_frigate(), out=out)
     assert con.handle_line(f"read the standing orders from {STARTER}")
     text = out.getvalue()
     assert f"Read 9 standing orders from {STARTER}." in text  # 32e: tending the sheets
     assert con.world.standing.book.names == STARTER_NAMES
-    refused = [e for e in con.world.log if e.kind == "order.rejected"]
-    assert len(refused) == 1
-    assert "In standing order 'sound the well', 'sound the well': The ship has no well" in (
-        refused[0].text
-    )
-    # the refused line is not journaled; the eight that entered are (32e: the sheets)
+    assert not [e for e in con.world.log if e.kind == "order.rejected"]
+    # package 33c: the well's order is entered and held, saying why, and journaled with
+    # the eight others (32e: the sheets)
+    held = [e for e in con.world.log if e.kind == "standing.given" and "Held until" in e.text]
+    assert len(held) == 1 and "The ship has no well to sound yet" in held[0].text
     journaled = [t for _, _, t in con.world.journal if t.startswith("standing order")]
-    assert len(journaled) == 8 and all("sound the well" not in t for t in journaled)
+    assert len(journaled) == 9
     con.handle_line("standing orders")
-    assert "Standing orders (8):" in out.getvalue()
+    assert "Standing orders (9):" in out.getvalue()
 
 
 def test_the_starter_file_loads_on_the_server_driver():

@@ -990,3 +990,59 @@ work_nouns:
   wreck: cut away
 # Words between "send the ... " and the order: "aloft to", "forward to", "to".
 send_directions: [aloft, up aloft, up, forward, aft, on deck, into the tops, into the rigging]
+
+# ---------------------------------------------------------------------------
+# Package 33c (the passage's words; playtests 12 and 13, decision 30). Everything in
+# this block is new and nothing above it is changed: `freesail/orders/vocabulary.py`
+# reads these keys after the ones above and never lets one of them take a phrase an
+# earlier verb already has.
+# ---------------------------------------------------------------------------
+# Other words for existing verbs, each to the verb's canonical name: the words the owner
+# and the watcher reached for in the gate's passage and the two free passages (the
+# refused orders of playtests 12 and 13, `refused*.md` in their folders). "Take a sounding" and
+# "sound" are the hand lead ("Sounding, the operation of trying the depth of the water,
+# and the quality of the ground, by a plummet, called the lead", Falconer 1780,
+# *Sounding*); "cast the lead" the same. "Tend" is the afterguard's word for a sheet, as
+# "tend the sheets" above ("trim the spanker sheet" and "tend the spanker sheet" are
+# read as the sail's trim: the grammar takes the sheet's name to its sail). "Trice up"
+# the driver's tack is the period's way of spilling a gaff sail's wind, which the physics
+# has no state for yet, as it has none for a peak dropped: it is answered with the
+# scandalise refusal's words.
+aliases:
+  take a sounding: heave the lead
+  get a sounding: heave the lead
+  sound: heave the lead
+  sound with the lead: heave the lead
+  cast the lead: heave the lead
+  tend: trim
+  work up a reckoning: work up the reckoning
+  work up reckoning: work up the reckoning
+  work up the reckoning's uncertainty: work up the reckoning
+  work up the reckoning's doubt: work up the reckoning
+  take a bearing: take a bearing of
+  trice up: scandalise
+  trice up the tack of: scandalise
+  trice: scandalise
+  tryce up: scandalise
+  tryce: scandalise
+# A reading asked at the prompt (package 33c): every phrase of the readings registry
+# (`freesail/api/readings.py`), said alone or after one of the asking words, is a query
+# answered in the log in the registry's own words (`freesail/orders/prompt.py`); the
+# vocabulary takes the phrases from the registry itself, so a row added there is a word
+# here for nothing. `aliases` gives another name of a reading, to the registry's words.
+reading_words:
+  asking: [what is, what's, what are, ask the master, ask the master for, take, tell me, show me]
+  aliases:
+    the reckoning's doubt: the reckoning's uncertainty
+    the master's doubt: the reckoning's uncertainty
+    the position: the reckoning
+    our position: the reckoning
+    the last cast: the depth
+    the soundings: the depth
+# Kinds of work by a noun, for `belay the lead` (package 33c), beside `work_nouns` above:
+# the lead's work is the order's that started it.
+more_work_nouns:
+  lead: heave the lead
+  sounding: heave the lead
+  cast: heave the lead
+  log: heave the log

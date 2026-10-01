@@ -169,6 +169,28 @@ This book uses `tick` throughout so that its logs are exact. At the console `go`
   Morning watch, 2 bells (05:00)  2 bells.
 ```
 
+## Asking a reading
+
+Every reading the instruments show may be asked at the prompt, in the console and the browser alike: type its words, alone or after `what is` or `ask the master`, or a sail's name for its state, and the answer is a routine line of the log in the very words the instruments and a model's `readings` give, never journaled and changing nothing aboard. Chapter 10 has the reckoning's in a table; the rest are the weather's (chapter 9) and the ship's own.
+
+```orders frigate plain-sail
+the true wind
+what is the heel
+the watch
+the hands on deck
+the fore topsail
+the topsails
+the main topmast
+ask the master the reckoning
+the well
+```
+
+```
+  Forenoon watch (10:00)  The true wind: 15 knots, from N, at the mean.
+  Forenoon watch (10:00)  The fore topsail: set.
+  Forenoon watch (10:00)  The well: the ship has no well to sound yet; that reading comes with the world.
+```
+
 ## Seeds, saving and replaying
 
 Nothing in the game is random except through a seeded stream: the same seed, the same orders at the same ticks, the same log to the last word. `--seed 7` on the command line gives this book's voyages; leave it off and the seed is 1805. The wind's wandering and gusts come from the seed, and later so will everything else that chance decides.

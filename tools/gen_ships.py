@@ -573,7 +573,25 @@ class Builder:
                 )
             self.notes[spar["id"]] = (self.notes.get(spar["id"], "").rstrip() + " " + how).strip()
 
+    def whole_ship_groups(self):
+        """The groups every ship has by the parts she has (package 33c; playtest 13's brig,
+        `rig out the topmast stuns'ls` and `square the sails` refused): the studding sails
+        of one level on every mast together ("the topmast studdingsails", the fore's and the
+        main's), where she has any; and "the sails" for her working canvas, the "all sail"
+        group (the storm canvas and the occasional sails are not in it, as they are not set
+        with the rest). A group or an alias the ship's builder gave is kept."""
+        sail_ids = [s["id"] for s in self.doc["sails"]]
+        groups, aliases = self.doc["groups"], self.doc["aliases"]
+        for level in ("lower", "topmast", "topgallant"):
+            members = [i for i in sail_ids if f".{level}.studdingsail." in f".{i}"]
+            name = f"{level} studdingsails"
+            if members and name not in groups and name not in aliases:
+                self.group(name, members)
+        if "all sail" in groups and "sails" not in groups and "sails" not in aliases:
+            self.alias("sails", "all sail")
+
     def dump(self, path, header):
+        self.whole_ship_groups()
         self.rate_spars()
         text = yaml.safe_dump(self.doc, sort_keys=False, allow_unicode=True, width=100)
         out = []

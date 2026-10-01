@@ -121,3 +121,29 @@ def test_belay_offers_the_work_in_hand_first_then_the_lines():
     assert "belay all standing orders" in suggestions(w.ship, "belay all")
     w.submit("belay all work")
     assert not any("setting" in x for x in suggestions(w.ship, "belay "))
+
+
+def test_the_readings_and_the_aliases_are_offered_by_the_vocabulary():
+    """Package 33c: a reading asked at the prompt is a query verb of the vocabulary, made
+    from the registry's own phrases, so the completer offers it by the means it offers
+    `the booms`; the aliases the playtests reached for likewise. Every one offered is
+    understood."""
+    ship = frigate()
+    assert "the reckoning" in suggestions(ship, "the reck")
+    assert "the reckonings uncertainty" in suggestions(ship, "the reck")
+    assert "the manoeuvre in hand" in suggestions(ship, "the man")
+    assert "ask the master the reckoning" in suggestions(ship, "ask the master the r")
+    assert any(s.startswith("what is the glass") for s in suggestions(ship, "what is the g"))
+    assert "take a sounding " in suggestions(ship, "take a s")
+    assert "work up a reckoning " in suggestions(ship, "work up a")
+    assert any(s.startswith("sound") for s in suggestions(ship, "sou"))
+    assert not any("a sail in sight" in s for s in suggestions(ship, "take a s"))
+    from freesail.api.session import make_world
+    from freesail.core.world import Scenario
+
+    world = make_world(7, "data/ships/frigate-36.yaml", Scenario())
+    for typed in ("the reck", "the man", "what is the ", "ask the master the r"):
+        for cand in suggestions(world.ship, typed, limit=40):
+            if not cand.endswith(" "):
+                e = world.submit(cand)
+                assert e.kind == "query.reading", (cand, e.kind, e.text)

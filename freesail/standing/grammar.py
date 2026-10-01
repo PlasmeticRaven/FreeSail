@@ -176,7 +176,7 @@ def parse_standing(
         )
     head, tail = body[: m.start()], body[m.end() :]
     trigger, condition = _parse_head(head, ship, vocab, name)
-    actions = _parse_actions(tail, ship, vocab, name)
+    actions, held = _parse_actions(tail, ship, vocab, name)
     rule = Rule(
         name=name,
         trigger=trigger,
@@ -185,6 +185,7 @@ def parse_standing(
         given_by=officer,
         text=sentence,
         given_tick=given_tick,
+        held=held,
     )
     return rule
 
@@ -248,7 +249,14 @@ def _parse_head(
     )
 
 
-def _parse_actions(tail: str, ship: Any, vocab: Vocabulary, name: str) -> list[str]:
+def _parse_actions(
+    tail: str, ship: Any, vocab: Vocabulary, name: str
+) -> tuple[list[str], str | None]:
+    """The orders after `then`, each parsed now; and, when one of them is on a reading the
+    ship has not got yet (`sound the well`), the registry's sentence for it: the standing
+    order is entered and held until the world has that reading (package 33c; spec M4 §24
+    item 4: the starter's `sound the well` was refused at every start since milestone 4a,
+    a line of noise in every log)."""
     from freesail.orders import stations
 
     parts = [p.strip(" .") for p in tail.split(";")]
@@ -256,6 +264,7 @@ def _parse_actions(tail: str, ship: Any, vocab: Vocabulary, name: str) -> list[s
     if not actions:
         raise OrderError(f"Standing order '{name}' gives no order after 'then'.")
     absent = [r for r in R.REGISTRY if r.is_absent]
+    held: str | None = None
     for order in actions:
         # a word or a question to a station (package 31c): resolved now to a station
         # aboard, its words free text, and delivered as the captain's own when it fires
@@ -266,9 +275,10 @@ def _parse_actions(tail: str, ship: Any, vocab: Vocabulary, name: str) -> list[s
         if addressed is not None:
             continue
         norm = f" {normalise(order)} "
-        for row in absent:
-            if any(f" {w} " in norm for w in row.words):
-                raise OrderError(f"In standing order '{name}', '{order}': {row.absent}")
+        missing = next((r for r in absent if any(f" {w} " in norm for w in r.words)), None)
+        if missing is not None:
+            held = held or missing.absent
+            continue
         if recognises(order):
             raise OrderError(
                 f"In standing order '{name}', '{order}' is a standing order itself; the orders "
@@ -278,7 +288,7 @@ def _parse_actions(tail: str, ship: Any, vocab: Vocabulary, name: str) -> list[s
             imperative.parse(ship, order, vocab)
         except OrderError as e:
             raise OrderError(f"In standing order '{name}', '{order}' is refused: {e}") from None
-    return actions
+    return actions, held
 
 
 # ---------------------------------------------------------------------------
@@ -414,6 +424,12 @@ _HOW = {
         "by how she moves: is easy, is rolling, is rolling heavily, is pitching, is "
         "pitching heavily, is labouring",
     ),
+    # package 33c
+    "manoeuvre": (
+        "the manoeuvre in hand",
+        "by what she is about: is hove to, is not hove to, is tacking, is wearing, is "
+        "heaving to, is filling away, is none",
+    ),
 }
 
 
@@ -447,8 +463,17 @@ class _Match:
     used: int
 
 
+# The ship herself as a condition's subject (package 33c): "if she is hove to" is the
+# manoeuvre in hand compared.
+_SHE = {"she": "the manoeuvre in hand"}
+
+
 def _match_reading(tokens: list[str], i: int, ship: Any, vocab: Vocabulary) -> _Match:
-    # the registry's words, longest first, with or without the article
+    if tokens[i] in _SHE:
+        return _Match(tokens[i], R.REGISTRY.by_words(_SHE[tokens[i]]), (), 1)
+    # the registry's words, longest first, with or without the article: "the true wind" or
+    # "true wind", "daylight" or "the daylight" (package 33c; playtest 13's brig, "the
+    # daylight is night" refused where "daylight is night" was taken)
     for phrase in R.REGISTRY.words():
         if "<" in phrase:
             continue
@@ -456,6 +481,8 @@ def _match_reading(tokens: list[str], i: int, ship: Any, vocab: Vocabulary) -> _
         forms = [pw]
         if pw[0] == "the":
             forms.append(pw[1:])
+        elif pw[0] not in ("what", "a"):
+            forms.append(["the", *pw])
         for form in forms:
             if tokens[i : i + len(form)] == form:
                 rows = R.REGISTRY.by_words(phrase)
@@ -875,6 +902,16 @@ def _parse_comparison(
                 return row, Comparison(op, word, f"{'not ' if op == 'is_not' else ''}{word}"), n + k
             # a sail may strain too: "the fore royal is straining" was caught above
             raise refuse()
+        # the manoeuvre in hand (package 33c): "she is hove to", "the manoeuvre in hand
+        # is tacking", "is none"
+        row = _pick(cands, ("manoeuvre",))
+        if row is not None:
+            word, k = _longest(tokens, j, _MANOEUVRE_SAID)
+            if word:
+                value = _MANOEUVRE_SAID[word]
+                said = f"{'not ' if op == 'is_not' else ''}{value}"
+                return row, Comparison(op, value, said), n + k
+            raise refuse()
         # the hands: a fatigue word, or a number below ("are under 40")
         row = _pick(cands, ("hands",))
         if row is not None:
@@ -1111,6 +1148,22 @@ _MOTION_SAID.update(
 )
 
 
+# The manoeuvre in hand's words as said (package 33c), and the reading's value for each.
+_MANOEUVRE_SAID: dict[str, str] = {w: w for w in R.MANOEUVRE_WORDS.values()}
+_MANOEUVRE_SAID.update(
+    {
+        R.HOVE_TO_WORDS: R.HOVE_TO_WORDS,
+        "lying to": R.HOVE_TO_WORDS,
+        "lying hove to": R.HOVE_TO_WORDS,
+        R.NO_MANOEUVRE_WORDS: R.NO_MANOEUVRE_WORDS,
+        "nothing": R.NO_MANOEUVRE_WORDS,
+        "going about": "tacking",
+        "in stays": "tacking",
+        "box hauling": "box hauling",
+    }
+)
+
+
 def _unit_of(cands: list[R.Reading]) -> str:
     kinds = {c.kind for c in cands}
     if kinds & {"glass"}:
@@ -1194,6 +1247,44 @@ def parse_book_command(text: str) -> BookCommand:
     if not name:
         raise OrderError(f"'{verb}' which? Name it in quotes: {verb} \"night routine\".")
     return BookCommand(verb, name)
+
+
+# The book's verbs said bare before a standing order's name (package 33c; playtest 13's
+# brig: `belay "blind lead"` was read as a line called the blind lead).
+_BARE_BOOK = {
+    "belay": "belay standing order",
+    "avast": "belay standing order",
+    "resume": "resume standing order",
+    "show": "show standing order",
+    "strike": "strike standing order",
+}
+
+
+def bare_book_sentence(ship: Any, text: str) -> str | None:
+    """`belay "blind lead"`, `resume "trim by the wind"`, `show "night routine"`: the
+    book's sentence the words mean, when they say a standing order's name in quotes (which
+    the book then finds case-blind and by any distinct part of its name, `Book.find`), or
+    the whole name of one in the book without them; None for anything else, so that
+    `belay the main sheet` is still the line verb."""
+    runtime = (getattr(ship, "extra", None) or {}).get("standing")
+    if runtime is None:
+        return None
+    said = " ".join(text.split())
+    first, _, rest = said.partition(" ")
+    verb = _BARE_BOOK.get(first.lower())
+    rest = rest.strip()
+    if verb is None or not rest:
+        return None
+    if rest[0] in _QUOTES:
+        try:
+            name, after = _quoted_name(rest, "")
+        except OrderError:
+            return None
+        if after.strip(" ."):
+            return None
+        return f'{verb} "{name}"'
+    rule = runtime.book.get(rest.strip(" ."))
+    return f'{verb} "{rule.name}"' if rule is not None else None
 
 
 def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:

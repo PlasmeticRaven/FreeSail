@@ -2023,6 +2023,19 @@ groups:
   mizzen topsail bowlines:
   - mizzen.topsail.bowline.starboard
   - mizzen.topsail.bowline.larboard
+  lower studdingsails:
+  - fore.lower.studdingsail.starboard
+  - fore.lower.studdingsail.larboard
+  topmast studdingsails:
+  - fore.topmast.studdingsail.starboard
+  - fore.topmast.studdingsail.larboard
+  - main.topmast.studdingsail.starboard
+  - main.topmast.studdingsail.larboard
+  topgallant studdingsails:
+  - fore.topgallant.studdingsail.starboard
+  - fore.topgallant.studdingsail.larboard
+  - main.topgallant.studdingsail.starboard
+  - main.topgallant.studdingsail.larboard
 aliases:
   spanker: mizzen.spanker
   driver: mizzen.spanker
@@ -2056,6 +2069,7 @@ aliases:
   fore top bowline: fore topsail bowlines
   main top bowline: main topsail bowlines
   mizzen top bowline: mizzen topsail bowlines
+  sails: all sail
 crew:
   # Winfield: the Amazon class establishment, 264 men.
   complement: 264

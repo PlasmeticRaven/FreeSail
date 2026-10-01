@@ -67,6 +67,12 @@ class Vocabulary:
     # words after a sheet's name saying which side it is hauled on: "haul the jib sheet to
     # windward" -> "weather", "... to leeward" -> "lee" (package 32e)
     sheet_to: dict[str, str] = field(default_factory=dict)
+    # a reading asked at the prompt (package 33c): each query verb made of a registry
+    # phrase -> that phrase as the registry has it ("the reckonings uncertainty" -> "the
+    # reckoning's uncertainty"); `orders.prompt` answers them
+    readings: dict[str, str] = field(default_factory=dict)
+    # the words before a reading's that ask for it: "what is", "ask the master" (33c)
+    asking: tuple[str, ...] = ()
 
     @property
     def class_bound_take_in_phrases(self) -> frozenset[str]:
@@ -76,7 +82,7 @@ class Vocabulary:
     @property
     def verb_names(self) -> list[str]:
         """Canonical verb names in file order (the order shown in error messages)."""
-        return [v for v in self.verbs if self.verbs[v].level != "driver"]
+        return [v for v in self.verbs if self.verbs[v].level not in ("driver", READING_LEVEL)]
 
 
 # ---------------------------------------------------------------------------
@@ -160,6 +166,9 @@ def load_vocabulary(path: str | Path | None = None) -> Vocabulary:
         else:
             brace_modes[key(phrase)] = float(target)
 
+    _aliases(data, verbs, phrase_to_verb, p)
+    readings = _reading_verbs(data, verbs, phrase_to_verb)
+
     group_evolutions = {
         key(name): [str(o) for o in (orders or [])]
         for name, orders in (data.get("group_evolutions") or {}).items()
@@ -184,6 +193,8 @@ def load_vocabulary(path: str | Path | None = None) -> Vocabulary:
         group_evolutions=group_evolutions,
         source=str(p),
     )
+    vocab.readings = readings
+    vocab.asking = _tuple((data.get("reading_words") or {}).get("asking"))
     vocab.verb_phrases = sorted(phrase_to_verb, key=lambda s: (-len(s.split()), -len(s), s))
     for phrase, mods in (data.get("phrase_modifiers") or {}).items():
         k = key(phrase)
@@ -205,4 +216,78 @@ def load_vocabulary(path: str | Path | None = None) -> Vocabulary:
         if key(verb) not in verbs:
             raise ValueError(f"{p}: work_nouns gives '{noun}' the verb '{verb}', which is none.")
         vocab.work_nouns[key(noun)] = key(verb)
+    for noun, verb in (data.get("more_work_nouns") or {}).items():
+        if key(verb) not in verbs:
+            raise ValueError(
+                f"{p}: more_work_nouns gives '{noun}' the verb '{verb}', which is none."
+            )
+        vocab.work_nouns.setdefault(key(noun), key(verb))
     return vocab
+
+
+# ---------------------------------------------------------------------------
+# Package 33c: aliases, and the readings asked at the prompt
+# ---------------------------------------------------------------------------
+
+# The level of a reading's query verb: neither an order's nor the console's, and left out
+# of `verb_names`, so that an order's refusal names the orders and not fifty readings.
+READING_LEVEL = "reading"
+
+
+def _aliases(
+    data: dict[str, Any], verbs: dict[str, VerbSpec], phrase_to_verb: dict[str, str], p: Path
+) -> None:
+    """`aliases:` (package 33c): another phrase for an existing verb. A phrase some verb
+    has already keeps it."""
+    for phrase, verb in (data.get("aliases") or {}).items():
+        if key(verb) not in verbs:
+            raise ValueError(f"{p}: the alias '{phrase}' names '{verb}', which is no verb.")
+        phrase_to_verb.setdefault(key(phrase), key(verb))
+
+
+def _reading_verbs(
+    data: dict[str, Any], verbs: dict[str, VerbSpec], phrase_to_verb: dict[str, str]
+) -> dict[str, str]:
+    """A query verb for each phrase of the readings registry (package 33c, a reading asked
+    at the prompt), with the asking words before it as its synonyms: "the reckoning",
+    "what is the reckoning", "ask the master the reckoning". The phrases are the
+    registry's own (`freesail.api.readings.REGISTRY`), so a row registered there is a word
+    here; a phrase without its article takes one too ("daylight", "the daylight"). The
+    parametric phrase `the bearing of <mark>` is the verb "the bearing of", which takes the
+    mark's words after it (object `reading`); a sail or a part by name is read by
+    `orders.prompt` from the ship. A phrase an existing verb has stays that verb's.
+    Returns each verb's registry phrase."""
+    from freesail.api.readings import REGISTRY
+
+    words = data.get("reading_words") or {}
+    asking = [key(a) for a in words.get("asking") or []]
+    named: dict[str, str] = {}  # the phrase as said -> the registry's phrase
+    for row in REGISTRY:
+        for phrase in row.words:
+            if "<sail>" in phrase or "<part>" in phrase:
+                continue
+            said = phrase.split(" <")[0]
+            named.setdefault(said, phrase)
+            if not said.startswith(("the ", "what ", "a ")):
+                named.setdefault(f"the {said}", phrase)
+    for alias, phrase in (words.get("aliases") or {}).items():
+        named.setdefault(str(alias), str(phrase))
+    out: dict[str, str] = {}
+    for said, phrase in named.items():
+        verb = key(said)
+        if verb in phrase_to_verb or verb in verbs:
+            continue  # an order's words already
+        bare = said.startswith(("what ", "a "))  # "what is in sight", "a sail in sight"
+        forms = [said] if bare else [said] + [f"{a} {said}" for a in asking]
+        synonyms = tuple(dict.fromkeys(key(f) for f in forms[1:]))
+        verbs[verb] = VerbSpec(
+            name=verb,
+            synonyms=synonyms,
+            object="reading" if "<" in phrase else "query",
+            level=READING_LEVEL,
+        )
+        phrase_to_verb[verb] = verb
+        for s in synonyms:
+            phrase_to_verb.setdefault(s, verb)
+        out[verb] = phrase
+    return out

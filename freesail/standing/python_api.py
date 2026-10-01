@@ -229,8 +229,11 @@ def _register(
         raise OrderError(f"Standing order '{rule_name}' gives no orders; call order(...) in it.")
     # the orders checked as the dialect checks them, at give time, against this ship
     ship = world.ship
+    held: str | None = None
     if hasattr(ship, "parts"):
-        actions = grammar._parse_actions("; ".join(actions), ship, load_vocabulary(), rule_name)
+        actions, held = grammar._parse_actions(
+            "; ".join(actions), ship, load_vocabulary(), rule_name
+        )
     try:
         rule = Rule(
             name=rule_name,
@@ -242,6 +245,7 @@ def _register(
             source="python",
             trusted=True,
             given_tick=world.clock.tick,
+            held=held,  # an order on a reading the ship has not got yet (package 33c)
         )
     except ValueError:
         raise OrderError(

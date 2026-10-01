@@ -403,10 +403,7 @@ def test_the_grammar_page_holds_the_standing_dialect_in_full():
     for line in lines:
         assert f"  {line}" in dialect
         e = world.submit(line)
-        if "sound the well" in line:
-            assert e.kind == "order.rejected"
-        else:
-            assert e.kind == "standing.given", e.text
+        assert e.kind == "standing.given", e.text  # the well's held (package 33c)
     # the standing sentences are listed once, with the dialect, not among the verbs above it
     assert page.count("strike standing order") == 1
 

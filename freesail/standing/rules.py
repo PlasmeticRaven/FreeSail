@@ -264,6 +264,11 @@ class Clause:
         if kind == "person":
             holds = value["place"] == v
             return holds if op == "is" else not holds
+        if kind == "manoeuvre":
+            # package 33c: 'she is hove to' holds from the moment the heave-to begins
+            # until she fills away, so a trim rule sleeps through the manoeuvre too
+            holds = value in ("hove to", "heaving to") if v == "hove to" else value == v
+            return holds if op == "is" else not holds
         if kind == "sail":
             return _sail_is(value, v) if op == "is" else not _sail_is(value, v)
         if kind == "strain":
@@ -315,6 +320,12 @@ class Clause:
             return f"{self.phrase} {verb} {said}, and has not {done}"
         if self.comparison.op == "gets_up":
             return f"{self.phrase} {verb} {said}, and has not got up"
+        if self.comparison.op == "is_not" or (
+            self.comparison.op == "is" and self.comparison.text in said
+        ):
+            # "she is hove to", not "she is hove to, not not hove to"; "the land is not in
+            # sight", not "the land is not in sight, not in sight" (package 33c)
+            return f"{self.phrase} {verb} {said}"
         return f"{self.phrase} {verb} {said}, not {self.comparison.text}"
 
 
@@ -464,6 +475,13 @@ class Rule:
     memory: dict[str, Any] = field(default_factory=dict)  # clause references
     started: list[Any] = field(default_factory=list)  # runner instances the last firing began
     conflicts: int = 0  # times countermanded
+    # -- package 33c -----------------------------------------------------------------------
+    # held until the world has a reading one of its orders is on: the registry's absent
+    # sentence ("The ship has no well to sound yet; ..."); never fired while it is set
+    held: str | None = None
+    # the ship's watch of the last "not carried out" line of a failing `if`, so that the
+    # line is said the first time and then once a watch (spec M5 open item 15)
+    held_line_watch: tuple[str, str] | None = None
 
     def __post_init__(self) -> None:
         rank_of(self.given_by)  # a stranger is refused at once
@@ -485,6 +503,8 @@ class Rule:
 
     def state_words(self, clock: Any = None) -> str:
         """'standing; fired twice, last at Forenoon watch (09:30)' for the book."""
+        if self.held is not None and not self.belayed:
+            return f"held: {self.held[:1].lower()}{self.held[1:].rstrip('.')}"
         head = "belayed" if self.belayed else "standing"
         if self.fired == 0:
             return f"{head}; never fired"
@@ -522,6 +542,7 @@ class Rule:
         self.held_s = 0.0
         self.clear_s = 0.0
         self.memory.clear()
+        self.held_line_watch = None
 
     def spend_shifts(self, view: R.ReadingsView) -> None:
         """At a firing: every wind's shift the trigger waits for is measured afresh from

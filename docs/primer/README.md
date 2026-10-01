@@ -38,7 +38,8 @@ What the log will say is shown in plain code blocks, copied from a run with seed
 | 7 | [A first passage](07-a-first-passage.md) | A worked hour on each ship that you can type along with. |
 | 8 | [Where to read more](08-where-to-read-more.md) | The chapters of Luce, Lever and Falconer behind each evolution. |
 | 9 | [The glass and the sky](09-the-glass-and-the-sky.md) | The barometer and its tendency, Beaufort's words for the sky, the weather and the visibility as readings and as lines in the book; the sea in the period's words and the ship's motion in it, what the hands and the gear feel of a seaway; what a captain of 1805 knew of the weather and what he did not. |
-| 10 | [The reckoning](10-the-reckoning.md) | The log-line, the traverse and the master's doubt; the noon sight; the lead and its arming; bearings and the landfall; the captain's override; shaping a course by account; the readings and what the master's words mean. |
+| 10 | [The reckoning](10-the-reckoning.md) | The log-line, the traverse and the master's doubt; the noon sight; the lead and its arming; bearings and the landfall; the captain's override; shaping a course by account; the readings and what the master's words mean; every form of the master's orders and the reckoning's readings in a table. |
+| 11 | [The starting book](11-the-starting-book.md) | The starter book of standing orders, a choice and never a requirement: each routine with the reason it exists, how to load it or begin with none, and the standing dialect whole for writing your own, its forms in a table. |
 
 ## Where to start
 
