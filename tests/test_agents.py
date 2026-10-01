@@ -1730,7 +1730,8 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     tool_page = lib(world, topic="tools")
     assert f"what each takes, {tools.size_words(tools.tokens(tool_page))}" in contents
     # the bowsprit's two, reeve_line, the three navigation evolutions, the two sheet trims
-    assert "52 evolutions; the list about" in contents
+    # ... and the lunar (package 33b: take_lunar.yaml)
+    assert "53 evolutions; the list about" in contents
 
 
 def test_a_chapter_lists_its_sections_with_sizes_and_serves_one_by_a_word_or_its_number():

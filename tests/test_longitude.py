@@ -420,8 +420,8 @@ def test_the_amplitude_finds_the_variation_to_a_degree_and_the_account_runs_true
     found = w.navigation.variation
     assert found.by == "amplitude" and found.day == date(1805, 6, 10)
     truth = K.VARIATION_1805_DEG + errors.deviation_deg(heading)
-    assert abs(found.deg_west - truth) <= 2.0  # to a degree, read to the half degree
-    assert abs(found.deg_west - K.VARIATION_1805_DEG) <= 2.5
+    assert abs(found.deg_west - truth) <= 1.25  # to a degree, read to the half degree
+    assert abs(found.deg_west - K.VARIATION_1805_DEG) <= 1.25 + K.DEVIATION_MAX_DEG
     after = abs(math.degrees(errors.course_error_rad(heading)))
     assert after < before and after <= 2.0 and errors.variation_allowed_deg == found.deg_west
     assert w.readings["variation"] == pytest.approx(math.radians(found.deg_west))

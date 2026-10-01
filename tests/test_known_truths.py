@@ -2799,18 +2799,27 @@ GATE_5B_THICK_HOURS = 16
 # 19:08 with the account 10.9 miles off (she believed herself off Falmouth), standing off
 # to the southward. The schooner: the sight with the octant, the Lizard at 16:15, the
 # whole passage to the outer road as the frigate's.
+# Re-measured after package 33b (the lookout's distance by estimation drawn once a
+# sighting episode from its own stream and taken at the bearing, where each bearing drew
+# its own from the reckoning's): the departure's estimate off Ushant moved the account a
+# mile, the course shaped from it by the book's "landfall" rule a fraction of a point,
+# and the truth's track with it: the Beast at four leagues at 16:30, nineteen fathoms and
+# a half in the outer road at 19:41, the account 3.6 miles from the truth at noon and 6.9
+# at the landfall; the schooner's Beast at five leagues at 16:17; the thick passage's
+# ticks unmoved and its digest moved by the hails' `estimate_m` (docs/dev/TuningNotes.md,
+# package 33b, "the pinned passages, re-measured").
 GATE_5B_NOON_TICK = 28740
 GATE_5B_CAST_TICK = 29883
-GATE_5B_LANDFALL_TICK = 44880
-GATE_5B_ROADS_TICK = 58294  # the outer road: the first cast under twenty fathoms
-GATE_5B_LINES = 837
-GATE_5B_DIGEST = "43fb9e16dab9670f"
-GATE_5B_SCHOONER_LANDFALL_TICK = 44100
-GATE_5B_SCHOONER_LINES = 907
-GATE_5B_SCHOONER_DIGEST = "e84617dfb1061ff7"
+GATE_5B_LANDFALL_TICK = 45000
+GATE_5B_ROADS_TICK = 56494  # the outer road: the first cast under twenty fathoms
+GATE_5B_LINES = 836
+GATE_5B_DIGEST = "7bcdb78ba3e8daae"
+GATE_5B_SCHOONER_LANDFALL_TICK = 44220
+GATE_5B_SCHOONER_LINES = 910
+GATE_5B_SCHOONER_DIGEST = "a17c9870a5880a6b"
 GATE_5B_THICK_LANDFALL_TICK = 54480
 GATE_5B_THICK_LINES = 526
-GATE_5B_THICK_DIGEST = "c5e9917759d7bf6b"
+GATE_5B_THICK_DIGEST = "cd5c2faa6b49b8c1"
 
 
 def the_landfall(log):
@@ -3072,8 +3081,8 @@ def test_the_passage_for_gate_5b_at_seed_7_has_its_own_constants(gate_5b_passage
     casts = [e for e in log if e.kind == "sounding"]
     assert casts[0].tick == GATE_5B_CAST_TICK and casts[0].data["deep"]
     assert casts[0].text == "Fifty-two fathoms; fine grey sand with black specks."
-    assert [e.tick for e in log if e.kind == "ship.hove_to"] == [28796, 58712]
-    assert [e.tick for e in log if e.kind == "ship.wore"] == [58653]  # the outer road
+    assert [e.tick for e in log if e.kind == "ship.hove_to"] == [28796, 56894]
+    assert [e.tick for e in log if e.kind == "ship.wore"] == [56834]  # the outer road
     landfall = the_landfall(log)
     assert landfall[0].tick == GATE_5B_LANDFALL_TICK and landfall[0].data["id"] == "the-beast"
     bearings = [e for e in log if e.kind == "bearing.taken"]

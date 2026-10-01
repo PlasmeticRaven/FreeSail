@@ -111,18 +111,18 @@ The lookout's "distant four leagues" is his eye's judgement, a sixth out either 
 | `shape a course for <place>` | `steer for <place>`, `lay a course for <place>` | chapter 10's course, now with the dangers its line passes |
 
 ```orders frigate
-take a time sight
+# rejected: take a time sight
 # rejected: take the sun for the longitude
 # rejected: wind up the chronometer
 # rejected: compare the chronometer
 take an azimuth
 observe the sun's azimuth
 # rejected: take an amplitude
-take a set of distances
 take a lunar of the sun
+# rejected: take a set of distances
 ```
 
-The time sight's forms parse and are refused for want of a chronometer (the first, `take a time sight`, is shown as the ship takes it: the refusal is the master's, not the grammar's); the chronometer's likewise; the azimuth's are taken; the amplitude's refused for the hour; the lunar's taken.
+The time sight's forms parse and are refused for want of a chronometer (the refusal is the master's, "there is no chronometer aboard", not the grammar's); the chronometer's likewise; the azimuth's are taken; the amplitude's refused for the hour; the lunar of the sun is taken, and the set of distances asked for after it is refused because the master is already at the lunar: "Mr Harvey is on deck at the lunar; wait for him."
 
 ## The readings
 

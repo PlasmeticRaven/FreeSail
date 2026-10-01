@@ -286,13 +286,14 @@ LUNAR_TRUST_SIGMAS = 2.0
 # degree"; Falconer 1780, 'Azimuth-compass': the brass edge "divided into degrees and
 # halves"). The amplitude is taken with the sun's centre about the horizon, between a
 # degree and a half under and three above (judgement: a quarter of an hour either side
-# of sunrise and sunset); a degree one sigma. The azimuth by day wants the sun's altitude
-# worked too and is a little worse, a degree and a half (judgement), with the sun above
-# five degrees and an hour or more from the meridian, where its bearing changes fastest
-# against the altitude (judgement).
+# of sunrise and sunset); "to a degree" is read as the whole of the error, half a degree
+# one sigma (judgement on the study's words; the compass read to the half degree). The
+# azimuth by day wants the sun's altitude worked too and is a little worse, three
+# quarters of a degree (judgement), with the sun above five degrees and an hour or more
+# from the meridian, where its bearing changes fastest against the altitude (judgement).
 AMPLITUDE_ELEVATION_DEG = (-1.5, 3.0)
-AMPLITUDE_SIGMA_DEG = 1.0
-AZIMUTH_SIGMA_DEG = 1.5
+AMPLITUDE_SIGMA_DEG = 0.5
+AZIMUTH_SIGMA_DEG = 0.75
 AZIMUTH_MIN_ALTITUDE_DEG = 5.0
 AZIMUTH_NOON_GUARD_H = 1.0
 
