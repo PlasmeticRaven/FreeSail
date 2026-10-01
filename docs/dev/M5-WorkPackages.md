@@ -41,10 +41,10 @@ gate 5b:  wave 3  32 the chart data and the queries, the lookout
           wave 4  33a the reckoning, the noon sight, the captain's chart, the checkpoint save, gate 5b
                   32e staying and sheets: the fore-and-aft rig at the small vessels' scale (spec open items 12 and 13; before gate 5b; launched 2026-09-30)
                   (landed 2026-09-30: 31b, 31c, 32, 32b)
-gate 5c:  wave 5  33b the chronometer, the moon, the lunar and the azimuth; the captain's chart in his hands (Fable; written 2026-10-01)
-                  33c the passage's words: readings at the prompt, the aliases, the starter book as a choice (Opus; beside 33b)
-                  33d the browser's shelf: completion, the library pane, the clock on a station, zoom and pan (Opus; beside 33b)
-                  34 the tide, grounding and anchoring, as Luce has it (Fable; after 33b)
+gate 5c:  wave 5  33b the chronometer, the moon, the lunar and the azimuth; the captain's chart in his hands (Fable; launched 2026-10-01)
+                  33c the passage's words: readings at the prompt, the aliases, the starter book as a choice (Opus; beside 33b; launched 2026-10-01)
+                  33d the browser's shelf: completion, the library pane, the clock on a station, zoom and pan (Opus; beside 33b; launched 2026-10-01)
+                  34 the tide, grounding and anchoring, as Luce has it (Fable; approved 2026-10-01, launched when 33b lands)
           wave 6  35 places, people, ports and nations
           wave 7  36 other sail, the world-order channel, the two scenarios, gate 5c cut
           wave 8  37 the officer of the watch; the lead's watch beside other models' (an Opus 5.5 watch, and a local model on the cutter: owner, 2026-10-01); the 5c verdict
