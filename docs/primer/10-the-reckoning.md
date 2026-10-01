@@ -58,7 +58,7 @@ In cloud, rain or fog there is no sight, and the line says so: "Noon. No sight; 
 # rejected: observe the sun
 ```
 
-Double altitudes when noon is clouded, the chronometer and the lunar are not in this build.
+Double altitudes when noon is clouded are not in this build. The chronometer, the time sight, the lunar and the amplitude are [chapter 12, the longitude](12-the-longitude.md), which has them in the master's words, with every form their orders take and the readings they carry (`the chronometer`, `the longitude by chronometer`, `the longitude by lunar`, `the chronometer's error by lunar`, `the moon`, `the variation`), and the chart in the captain's hands (`the bearing of <mark> by the chart`, `the distance to <mark>`, `the dangers`, and what `shape a course for <place>` says of a rock on the line).
 
 ## The lead
 
@@ -171,7 +171,7 @@ Every way the grammar takes each of the master's orders and each of the reckonin
 | `the land` | `what is the land` | whether any land is in sight, and the nearest |
 | `the depth of water` | `the water` | the chart's depth where she is (the truth's chart, which the lead finds and the master does not see) |
 
-In the book, the same readings are the standing dialect's (chapter 11 has the dialect whole); every one of these is taken, and the test reads them too:
+In the book, the same readings are the standing dialect's (chapter 11, the starting book, has the dialect whole); every one of these is taken, and the test reads them too:
 
 | Condition or event | What it waits for |
 |---|---|

@@ -68,6 +68,7 @@ __all__ = [
     "VISIBILITY_WORDS",
     "WEATHER_WORDS",
     "READING_SPEED_FLOOR_KN",
+    "Angle",
     "STERNWAY_WORDS",
     "REGISTRY",
     "Reading",
@@ -1258,6 +1259,244 @@ REGISTRY.add(
 
 
 # ---------------------------------------------------------------------------
+# Package 33b: the chronometer, the moon, the lunar, the variation, and the chart in the
+# captain's hands (spec M5 §14, §15; decision 30). Each row reads the account and never
+# the truth; each None in its own words. The kinds are the dialect's own: a longitude
+# by chronometer or by lunar is a position ("is west of 6 W"), the chronometer and its
+# error by lunar are distances (the master's trust and the error in miles of longitude:
+# "when the chronometer exceeds 10 miles then take a lunar"), the moon a sight ("is in
+# sight": up and the sky clear), the variation an angle whose words carry its source.
+# ---------------------------------------------------------------------------
+
+
+class Angle(float):
+    """An angle in radians that carries its words (the variation: '24° W by amplitude,
+    10 June'); the dialect compares the number, an agent reads the words."""
+
+    words: str = ""
+
+    def __new__(cls, value: float, words: str = "") -> Angle:
+        self = super().__new__(cls, value)
+        self.words = words
+        return self
+
+
+def _chronometer(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the chronometer`: its time at Greenwich, the days since rated, its winding; the
+    master's trust in miles of longitude behind it; None without one."""
+    nav = _navigation_of(world)
+    return nav.chronometer_reading() if nav is not None else None
+
+
+def _no_chronometer_words(world: Any) -> str | None:
+    nav = _navigation_of(world)
+    return NO_RECKONING_WORDS if nav is None else nav.no_chronometer_words()
+
+
+def _longitude_by_chronometer(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the longitude by chronometer`: today's time sight with the days since rated and
+    the master's trust; None without one today."""
+    nav = _navigation_of(world)
+    return nav.longitude_by_chronometer_reading() if nav is not None else None
+
+
+def _no_time_sight_words(world: Any) -> str | None:
+    nav = _navigation_of(world)
+    return NO_RECKONING_WORDS if nav is None else nav.no_time_sight_words()
+
+
+def _longitude_by_lunar(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the longitude by lunar`: the last lunar, with its date and the master's trust."""
+    nav = _navigation_of(world)
+    return nav.longitude_by_lunar_reading() if nav is not None else None
+
+
+def _no_lunar_words(world: Any) -> str | None:
+    nav = _navigation_of(world)
+    return NO_RECKONING_WORDS if nav is None else nav.no_lunar_words()
+
+
+def _chronometer_error(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the chronometer's error by lunar`: the last lunar against the chronometer."""
+    nav = _navigation_of(world)
+    return nav.chronometer_error_reading() if nav is not None else None
+
+
+def _no_chronometer_error_words(world: Any) -> str | None:
+    nav = _navigation_of(world)
+    return NO_RECKONING_WORDS if nav is None else nav.no_chronometer_error_words()
+
+
+def _moon(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the moon`: its age and phase, up or not, in distance of a body or not."""
+    nav = _navigation_of(world)
+    return nav.moon_reading() if nav is not None else None
+
+
+def _variation(world: Any, _: str | None) -> Angle | None:
+    """`the variation` the master allows, west positive, with its source and date."""
+    nav = _navigation_of(world)
+    if nav is None:
+        return None
+    return Angle(nav.variation_reading(), nav.variation.words)
+
+
+def _bearing_by_chart(world: Any, param: str | None) -> float | None:
+    """`the bearing of <mark> by the chart`: from the account to any charted feature,
+    in sight or not, by compass; None where the chart has no such name."""
+    nav = _navigation_of(world)
+    found = nav.by_chart(param) if nav is not None and param else None
+    return None if found is None else float(found["bearing"])
+
+
+def _distance_to(world: Any, param: str | None) -> dict[str, Any] | None:
+    """`the distance to <mark>`: from the account to any charted feature, by account."""
+    nav = _navigation_of(world)
+    found = nav.by_chart(param) if nav is not None and param else None
+    if found is None:
+        return None
+    return found | {"metres": found["metres"], "words": found["distance_words"]}
+
+
+def _not_charted_words(world: Any) -> str | None:
+    if _navigation_of(world) is None:
+        return NO_RECKONING_WORDS
+    return "not on the chart"
+
+
+def _dangers(world: Any, param: str | None) -> dict[str, Any] | None:
+    """`the dangers`: the charted dangers within ten miles of the account (or within
+    the miles said), the nearest first; the nearest's distance behind the words."""
+    nav = _navigation_of(world)
+    if nav is None:
+        return None
+    within = None
+    if param:
+        digits = "".join(c for c in param if c.isdigit() or c == ".")
+        within = float(digits) if digits else None
+    return nav.dangers(within)
+
+
+def _no_dangers_words(world: Any) -> str | None:
+    nav = _navigation_of(world)
+    return NO_RECKONING_WORDS if nav is None else nav.no_dangers_words()
+
+
+REGISTRY.add(
+    Reading(
+        "chronometer",
+        ("the chronometer",),
+        "distance",
+        "miles",
+        _chronometer,
+        description="the chronometer: its time at Greenwich, the days since rated, its "
+        "winding; the master's trust in miles of longitude",
+        none_words=_no_chronometer_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "longitude_by_chronometer",
+        ("the longitude by chronometer", "the longitude"),
+        "position",
+        "",
+        _longitude_by_chronometer,
+        description="today's longitude by the time sight, with the days since rated and "
+        "the master's trust",
+        none_words=_no_time_sight_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "longitude_by_lunar",
+        ("the longitude by lunar", "the longitude by the lunar"),
+        "position",
+        "",
+        _longitude_by_lunar,
+        description="the last longitude by lunar, with its date and the master's trust",
+        none_words=_no_lunar_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "chronometer_error_by_lunar",
+        (
+            "the chronometer's error by lunar",
+            "the chronometers error by lunar",
+            "the chronometer's error",
+            "the chronometers error",
+        ),
+        "distance",
+        "miles",
+        _chronometer_error,
+        description="the chronometer against the last lunar: gaining or losing on its rate, "
+        "in seconds of time and miles of longitude",
+        none_words=_no_chronometer_error_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "moon",
+        ("the moon",),
+        "sight",
+        "",
+        _moon,
+        description="the moon: its age and phase, up or not, in distance of a body or not",
+        none_words=_no_reckoning_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "variation",
+        ("the variation", "the variation of the compass"),
+        "angle",
+        "degrees",
+        _variation,
+        description="the variation the master allows, by the chart or by observation, "
+        "with its date",
+        none_words=_no_reckoning_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "bearing_by_chart",
+        ("the bearing of <mark> by the chart", "the bearing by the chart of <mark>"),
+        "compass",
+        "",
+        _bearing_by_chart,
+        parametric="mark",
+        description="the bearing by compass from the account to any charted feature, in "
+        "sight or not",
+        none_words=_not_charted_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "distance_to",
+        ("the distance to <mark>", "the distance of <mark>"),
+        "distance",
+        "miles",
+        _distance_to,
+        parametric="mark",
+        description="the distance from the account to any charted feature, by account",
+        none_words=_not_charted_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "dangers",
+        ("the dangers", "the charted dangers"),
+        "distance",
+        "miles",
+        _dangers,
+        description="the charted dangers within ten miles of the account, the nearest first, "
+        "by name, bearing and distance; the nearest's distance is the number",
+        none_words=_no_dangers_words,
+    )
+)
+
+
+# ---------------------------------------------------------------------------
 # Events, for `at` (spec §2)
 # ---------------------------------------------------------------------------
 
@@ -1359,6 +1598,18 @@ _event(EventSpec("filled away", "ship.filled_away"))
 # tack`, since a ship lying to forereaches and a bay is a lee shore)
 _event(EventSpec("tacked", "ship.tacked"))
 _event(EventSpec("wore", "ship.wore"))
+# Package 33b: a danger sighted (the lookout's hail of a rock or a ledge), a bearing
+# steady and closing (the lookout's collision rule, `lookout.closing`), a lunar cleared
+# and a longitude by chronometer had (the reckoning's lines), the chronometer run down
+# (a scenario event: it was not wound), and the variation observed.
+_event(
+    EventSpec("a danger sighted", "lookout.sighting", lambda data: data.get("seen_as") == "danger")
+)
+_event(EventSpec("a bearing steady and closing", "lookout.closing"))
+_event(EventSpec("a lunar", "reckoning.lunar"))
+_event(EventSpec("a longitude by chronometer", "reckoning.time_sight"))
+_event(EventSpec("the chronometer run down", "chronometer.dead"))
+_event(EventSpec("the variation observed", "reckoning.variation"))
 
 
 def event_matches(spec: EventSpec, kind: str, data: dict[str, Any]) -> bool:
@@ -1412,6 +1663,9 @@ def describe_value(reading: Reading, value: Any) -> str:
     """A reading's value in words, for the log's 'the true wind is 24 knots'."""
     if value is None:
         return "not to be had"
+    # package 33b: a number that carries its own words (`Angle`, the variation)
+    if getattr(value, "words", None):
+        return str(value.words)
     kind = reading.kind
     if kind == "speed":
         return f"{units.ms_to_knots(value):.0f} knots"

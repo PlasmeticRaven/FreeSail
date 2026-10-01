@@ -106,6 +106,11 @@ class Scenario:
     # "weather", "visibility"} in the readings' words, laid over the systems' conditions
     # at the ship every minute; None: the systems' own. Needs weather systems to lay over.
     sky: dict[str, str] | None = None
+    # The chronometer (package 33b; spec M5 §14; `freesail.world.sights.Chronometer`): the
+    # captain's own, as {"maker", "rated": ISO date, "rate_s_per_day", "drift": "seeded"
+    # or seconds a day, "forgotten": [ISO dates]}; None (the default, and every save from
+    # before) is a ship without one, whose longitude is by account and by lunar.
+    chronometer: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
