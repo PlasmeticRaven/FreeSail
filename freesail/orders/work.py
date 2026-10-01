@@ -228,8 +228,21 @@ def _as_order_text(words: list[str], vocab: Vocabulary) -> str:
     return " ".join([*phrase.split(), *words[len(phrase.split()) :]])
 
 
+# The navigation orders' evolutions, which the master's work starts and not the verb
+# table (`freesail.world.reckoning`): `belay heave the lead` (package 33c; playtest 13's
+# cutter, refused for the work's log name "heaving lead") belays the cast as package 29c
+# meant, by the order that started it.
+NAVIGATION_EVOLUTIONS: dict[str, str] = {
+    "heave the log": "heave_log",
+    "heave the lead": "heave_lead",
+    "heave the deep sea lead": "heave_deep_sea_lead",
+}
+
+
 def _evolution_ids(verb: str, vocab: Vocabulary) -> set[str]:
     """The evolutions an order's verb starts: 'reef' -> reef_square, reef_gaff."""
+    if verb in NAVIGATION_EVOLUTIONS:
+        return {NAVIGATION_EVOLUTIONS[verb]}
     if verb == "trim":
         return {str(vocab.evolutions["brace"])}
     mapping = vocab.evolutions.get(verb)

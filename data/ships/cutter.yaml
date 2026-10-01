@@ -633,6 +633,7 @@ aliases:
   topgallant sails: topgallants
   the mast: main.mast
   main mast: main.mast
+  sails: all sail
 crew:
   # Thirty: the kit's manual's complement for Sherbourne (Winfield not reached).
   complement: 30

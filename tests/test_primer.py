@@ -91,6 +91,7 @@ CHAPTERS = [
     "08-where-to-read-more.md",
     "09-the-glass-and-the-sky.md",
     "10-the-reckoning.md",
+    "11-the-starting-book.md",
 ]
 
 DRIVER_COMMANDS = frozenset(
@@ -391,3 +392,71 @@ def test_instant_runner_applies_end_states():
     assert main_yard.brace_angle == pytest.approx(-main_yard.brace_limit)
     orders.handle(ship, "tack ship")
     assert ship.dyn.tack == "larboard"
+
+
+# ---------------------------------------------------------------------------
+# Package 33c: every form in the forms tables of chapters 10 and 11 parses
+# ---------------------------------------------------------------------------
+
+# The tables of forms, by chapter and the heading they stand under.
+FORM_TABLES = {
+    "10-the-reckoning.md": "## Every form, in a table",
+    "11-the-starting-book.md": "## The dialect's forms, in a table",
+}
+TICK = "`"
+
+
+def table_forms(chapter: str, heading: str) -> list[str]:
+    """Every form in the tables under `heading`: in a table of three columns the first two
+    (the form, and the forms also taken), in one of two the first."""
+    text = (PRIMER / chapter).read_text(encoding="utf-8")
+    section = text.split(heading, 1)[1].split("\n## ", 1)[0]
+    forms: list[str] = []
+    for line in section.splitlines():
+        if not line.startswith("|") or set(line) <= set("|- "):
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if not cells[0].startswith(TICK):
+            continue  # the header
+        for cell in cells[: 2 if len(cells) == 3 else 1]:
+            forms += [f for i, f in enumerate(cell.split(TICK)) if i % 2 == 1]
+    return forms
+
+
+STANDING_HEADS = ("when ", "at ", "every ", "if ")
+FORMS = [(ch, f) for ch, heading in FORM_TABLES.items() for f in table_forms(ch, heading)]
+
+
+def test_the_forms_tables_are_there_and_large_enough():
+    by_chapter = {ch: [f for c, f in FORMS if c == ch] for ch in FORM_TABLES}
+    assert len(by_chapter["10-the-reckoning.md"]) >= 90
+    assert len(by_chapter["11-the-starting-book.md"]) >= 60
+    assert sum(1 for _, f in FORMS if f.startswith(STANDING_HEADS)) >= 80
+
+
+@pytest.mark.parametrize("chapter,form", FORMS, ids=[f"{c[:2]}: {f}" for c, f in FORMS])
+def test_every_form_in_the_forms_tables_is_taken(chapter: str, form: str):
+    """Package 33c (the owner's note at gate 5b: the reckoning's terms unclear with the
+    primer beside him, many orders refused): every form of the master's orders and the
+    reckoning's readings in chapter 10's table, and every form of the dialect in chapter
+    11's, is understood by the frigate off the Lizard. An order may be refused for the
+    ship's state (the sun not on the meridian, a mark not in sight), never for its words;
+    a condition or an event is given as a standing order and must be entered."""
+    from freesail.orders.errors import UnknownNounError, UnknownVerbError
+
+    ship = make_ship("frigate", "plain-sail", "starboard")
+    if form.startswith(STANDING_HEADS):
+        head = f"every glass, {form}" if form.startswith("if ") else form
+        kind, log, _ = orders.handle(ship, f'standing order "form": {head} then trim sails')
+        assert kind == "standing.given", log
+        return
+    try:
+        kind, log, _ = orders.handle(ship, form)
+    except (UnknownVerbError, UnknownNounError) as e:
+        raise AssertionError(f"{chapter}: {form!r} was not understood: {e}") from None
+    except OrderError as e:
+        words = str(e)
+        assert "was understood, but not" not in words, f"{form!r}: {words}"
+        assert "takes nothing after it" not in words, f"{form!r}: {words}"
+        return
+    assert kind and log and log[0].isupper(), (form, log)

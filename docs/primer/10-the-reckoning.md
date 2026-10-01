@@ -133,6 +133,59 @@ If the account is six miles east of the truth, the course laid off for Falmouth 
 
 Each has its absent pattern, and a ship on the endless plane of the earlier chapters, with no position, has none of them: "No reckoning is kept: the scenario gives no position, and there is no sea here."
 
+Every reading may be asked at the prompt: type its words, alone or after `what is` or `ask the master`, and the answer is a line of the log in the same words the instruments and a model's `readings` give, and nothing more:
+
+```
+  Afternoon watch (12:29)  The reckoning: 49° 23' N, 4° 58' W by account.
+  Afternoon watch (12:30)  The master: Mr Harvey, on deck.
+  Afternoon watch (12:32)  The bearing of the Lizard: not in sight.
+```
+
+A question is never journaled and changes nothing aboard; a reading the ship has not got answers so ("The ship has no well to sound yet; that reading comes with the world.").
+
+## Every form, in a table
+
+Every way the grammar takes each of the master's orders and each of the reckoning's readings; the first form of a row is the one this chapter uses, the rest are taken the same. A test in the repository (`tests/test_primer.py`) reads this table and gives every form in its first two columns to the frigate off the Lizard, and fails if any is not understood. The names of marks and places are examples: a mark is named as the lookout names it, or by any of its words when one mark in sight answers to them (`manacle` for Manacle Point; the Manacles themselves, the rocks, are another feature and the refusal says so), or `the land`, or `the light`.
+
+| Order or reading | Also taken | What it does |
+|---|---|---|
+| `heave the log` | `heave log`, `heave the log line` | the log hove now; hourly of itself in a ship of war |
+| `heave the lead` | `heave lead`, `heave the hand lead`, `sound with the hand lead`, `a cast of the lead`, `get a cast of the lead`, `try the lead`, `take a sounding`, `get a sounding`, `sound`, `sound with the lead`, `cast the lead` | the hand lead from the chains, to twenty fathoms |
+| `heave the deep-sea lead` | `heave the dipsey lead`, `strike soundings`, `try for soundings`, `sound with the deep-sea lead`, `get a cast of the deep-sea lead`, `a cast of the deep-sea lead` | the deep-sea lead, with the ship brought to or the line passed forward |
+| `take a bearing of the Lizard` | `take the bearing of the Lizard`, `take a bearing on the Lizard`, `bearing of the Lizard`, `take bearings of the Lizard`, `get a bearing of the Lizard`, `take a bearing of the land`, `take a bearing of the light`, `take a bearing of Lizard Point`, `take a bearing of lizard` | a line of position from a mark in sight; refused in words when it is not |
+| `work up the reckoning` | `work the reckoning`, `work up the dead reckoning`, `bring up the reckoning`, `the day's work`, `work up a reckoning`, `work up reckoning`, `work up the reckoning's uncertainty`, `work up the reckoning's doubt` | the account brought up to now, with the master's doubt |
+| `observe the sun` | `take the sun`, `take a sight of the sun`, `take the noon sight`, `take the sun's altitude`, `observe the sun at noon`, `take a meridian altitude` | the noon sight by order, in the quarter of an hour before noon |
+| `set the reckoning to 49 52 N 6 10 W` | `set the reckoning at 49 52 N 6 10 W`, `correct the reckoning to 49 52 N 6 10 W`, `put the reckoning at 49 52 N 6 10 W` | the captain overrides the master |
+| `allow one knot of set to the east` | `allow for one knot of set to the east`, `allow half a knot of set to the south west`, `allow no set` | the set the master allows in the traverse |
+| `shape a course for Falmouth` | `shape a course to Falmouth`, `shape course for Falmouth`, `lay a course for Falmouth`, `set a course for Falmouth`, `make for Falmouth`, `steer for Falmouth`, `head for Falmouth` | the course from the account to a place of the chart, and the helm ordered to it |
+| `the reckoning` | `the dead reckoning`, `the position by account`, `the position`, `what is the reckoning`, `ask the master the reckoning`, `ask the master for the reckoning` | the position by account |
+| `the reckoning's uncertainty` | `the uncertainty`, `the reckoning's doubt`, `the master's doubt`, `what is the reckoning's uncertainty`, `take the reckoning's uncertainty` | the master's doubt in his words |
+| `the depth` | `the last cast`, `the soundings`, `what is the depth` | the last cast, with its age |
+| `the ground` | `the bottom`, `what is the ground` | what the arming brought up at the last cast |
+| `the bearing of the Lizard` | `what is the bearing of the Lizard`, `ask the master the bearing of the Lizard` | a mark in sight, by compass |
+| `the distance run since noon` | `the run since noon`, `the distance run` | by account; before the first noon, the run since the departure |
+| `the course made good` | `what is the course made good` | since noon, by account |
+| `the latitude by observation` | `the observed latitude`, `the latitude` | today's noon latitude, or why there is none |
+| `the master` | `what is the master` | his name, his place and what occupies him |
+| `what is in sight` | `the sightings`, `sightings` | the lookout's sightings, by bearing and estimated distance |
+| `the land` | `what is the land` | whether any land is in sight, and the nearest |
+| `the depth of water` | `the water` | the chart's depth where she is (the truth's chart, which the lead finds and the master does not see) |
+
+In the book, the same readings are the standing dialect's (chapter 11 has the dialect whole); every one of these is taken, and the test reads them too:
+
+| Condition or event | What it waits for |
+|---|---|
+| `when the reckoning's uncertainty exceeds 20 miles` | the master's doubt grown past twenty miles |
+| `when the depth is under 40 fathoms` | a cast under forty fathoms |
+| `when the ground is sand`, `when the ground is not rock` | the arming's ground at the last cast |
+| `when the distance run since noon exceeds 20 miles` | the run by account |
+| `when the reckoning is north of 49 30 N`, `when the reckoning is west of 6 W` | the account past a latitude or a longitude |
+| `when the land is in sight`, `when the land is not in sight` | the lookout's word |
+| `when the master is on deck`, `when the master is below` | the master's place |
+| `at noon`, `at a sounding`, `at a sighting`, `at a landfall` | the day's work, a cast, the lookout's hail, the land raised |
+| `at hove to`, `at filled away`, `at tacked`, `at wore` | a manoeuvre's end |
+| `if she is hove to`, `if she is not hove to`, `when the manoeuvre in hand is tacking`, `when the manoeuvre in hand is none` | what she is about: hove to (from the moment the heave-to begins until she fills away), tacking, wearing, heaving to, filling away, or none |
+
 ## Sources
 
 Falconer 1780, *Dead-reckoning*, *Lee-way*, *Log*, *Log-board*, *Sounding*, *Traverse*, *Quadrant*; Lever 1808, *The Hand-Lead*, *The Deep-Sea Lead* and the passage on arming the lead and getting soundings under way (fig. 506); Luce 1866, "Log-line, Time-glasses"; Luce 1884, ch. I, "The Log", "The Lead"; the Admiralty's Regulations of 1806, the Master's articles XXV to XXXII. The error terms and their sizes are the design study's (`docs/design/Navigation1805.md` §3), and every constant is in `docs/dev/TuningNotes.md` with its source or the word "judgement"; two figures the study could not verify, the Channel's variation in 1805 and the size of a wooden frigate's deviation, are marked so there.

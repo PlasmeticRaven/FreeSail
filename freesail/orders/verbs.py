@@ -419,7 +419,8 @@ def _sail_check(
         elif sail.reefs + n > sail.reef_bands:
             left = sail.reef_bands - sail.reefs
             if left == 0:
-                return f"{name} is already close reefed ({sail.reef_bands} reefs in)"
+                n_in = sail.reef_bands  # "(1 reef in)", "(4 reefs in)": package 33c
+                return f"{name} is already close reefed ({n_in} reef{'s' if n_in != 1 else ''} in)"
             return (
                 f"{name} has {sail.reef_bands} reef band{'s' if sail.reef_bands > 1 else ''} "
                 f"and {sail.reefs} reef{'s' if sail.reefs != 1 else ''} in; "
@@ -558,7 +559,21 @@ def _brace(
             )
     if order.object:
         res = resolve.resolve(ship, order.object, order.side_word, verb)
-        yards = [_yard_for(ship, pid) for pid in res.ids]
+        yards = []
+        refusal: OrderError | None = None
+        for pid in res.ids:
+            try:
+                yard = _yard_for(ship, pid)
+            except OrderError as e:
+                # a group of sails ("square the sails", package 33c): its square sails'
+                # yards are braced and the fore-and-aft sails passed over; one sail named
+                # alone is refused in words, as before
+                refusal = refusal or e
+                continue
+            if yard not in yards:
+                yards.append(yard)
+        if refusal is not None and (len(res.ids) == 1 or not yards):
+            raise refusal
         object_name = res.name
     else:
         yards = [s for s in ship.spars.values() if s.is_yard]

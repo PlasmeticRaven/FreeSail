@@ -1,10 +1,21 @@
-# FreeSail: the starter routines (spec M4 §3 and §6).
+# FreeSail: the starter book (spec M4 §3 and §6; package 33c, decision 30).
+#
+# The general and instructive routines of a ship at sea, each with the reason it exists:
+# the night and the morning sail, shortening sail for weather, keeping her full, trimming
+# on a shift, tending the sheets, heavy weather and the storm staysail, and the well. It is
+# a choice, never a requirement for beginning (the owner's ruling at gate 5b): a game
+# begins with an empty book unless its scenario names this file (the gates' days and
+# passages do) or the player asks for it, and a passage's own orders are in the
+# scenario's file beside it (data/scenarios/*.orders). The primer's chapter 11, "The
+# starting book" (docs/primer/11-the-starting-book.md), prints each routine with its
+# reason and shows how to write one's own.
 #
 # Standing orders in the standing dialect, one a line; a line beginning # is a
 # comment, and a sentence may run on to indented lines. Load them at the prompt with
 #     read the standing orders from data/standing_orders/starter.orders
 # or at the start with
 #     py -m freesail.ui.console data/ships/frigate-36.yaml --standing-orders data/standing_orders/starter.orders
+#     py -m freesail.ui.server data/ships/frigate-36.yaml --standing-orders data/standing_orders/starter.orders
 # Each line is given as the captain's order, journaled, and replays; one the ship refuses
 # is logged as refused and the rest still load.
 
@@ -102,7 +113,10 @@ standing order "storm staysail": when the fore storm staysail is furled and the 
 
 # Sounding the well every glass is the pump routine of Luce's day ("Pump the ship out",
 # Luce 1866, ch. XXXII, daily routine at sea, morning watch art. III and dog watch art.
-# III). The ship has no well until milestone 5 (spec M4 §2), so this line is refused at
-# load with "The ship has no well to sound yet"; it is kept here so that the book is
-# complete when the well arrives, and to show that a refused line does not stop the rest.
+# III). The ship has no well yet (spec M4 §24 item 4; milestone 5 brought the glass and
+# the chart, not the well), so this order is entered in the
+# book and held, saying "The ship has no well to sound yet", and it never fires until the
+# well is a reading (package 33c; before, it was refused at every start, a line of noise
+# in every log since milestone 4a); it is kept here so that the book is complete when the
+# well arrives.
 standing order "sound the well": every glass then sound the well

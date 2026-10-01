@@ -112,10 +112,8 @@ def standing_voyage() -> World:
     w.run(300)
     w.submit("set the studdingsails, both sides")
     for text in read_orders_file(STARTER):
-        # the well's line is refused at load (spec §6), and a refused order is not
-        # journaled, so its refusal line is not replayed: a day that loaded it replays to
-        # the same ship and a log one line shorter. The voyage that must replay to the same
-        # digest loads the five that enter.
+        # the well's line was refused at load (spec §6) until package 33c, which holds it
+        # in the book instead; the voyage loads the others, as it always has.
         if "sound the well" not in text:
             w.submit(text)
     w.submit('standing order "trim": every 10 minutes then trim sails')

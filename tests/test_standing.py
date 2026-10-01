@@ -24,6 +24,7 @@ from freesail.orders import complete
 from freesail.orders.errors import OrderError
 from freesail.ship.graph import Ship
 from freesail.ship.loader import load_spec
+from freesail.ship.parts import SailState
 from freesail.standing import (
     STANDING_DWELL_S,
     Rule,
@@ -111,7 +112,7 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (F, SHORTEN, ok("when", "true_wind_speed", "gt", 30.0, duration=120, actions=3)),
     (F, KEEP_FULL, ok("when", "apparent_wind_angle", "forward_of", 55.0, actions=1)),
     (F, HEAVY, ok("when", "true_wind_speed", "gt", 40.0, duration=300, actions=3)),
-    (F, WELL, no(["no well to sound yet"])),
+    (F, WELL, ok("every", interval=1800, actions=1)),  # held, not refused (package 33c)
     # -- triggers ------------------------------------------------------------------------
     (
         F,
@@ -450,7 +451,7 @@ TABLE: list[tuple[str, str, ok | no]] = [
         HEAVY,
         no(["'shift the fore topmast staysail for the fore storm staysail' is refused"]),
     ),
-    (C, WELL, no(["no well to sound yet"])),
+    (C, WELL, ok("every", interval=1800, actions=1)),  # held (package 33c)
     (
         C,
         'standing order "night": at sunset then take in the gaff topsail; take in the topgallant',
@@ -528,7 +529,7 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (B, SHORTEN, ok("when", "true_wind_speed", "gt", 30.0, duration=120, actions=3)),
     (B, KEEP_FULL, ok("when", "apparent_wind_angle", "forward_of", 55.0, actions=1)),
     (B, HEAVY, ok("when", "true_wind_speed", "gt", 40.0, duration=300, actions=3)),
-    (B, WELL, no(["no well to sound yet"])),
+    (B, WELL, ok("every", interval=1800, actions=1)),  # held (package 33c)
     (
         B,
         'standing order "reef": when the true wind exceeds 25 knots for 2 minutes '
@@ -1726,3 +1727,216 @@ def test_the_station_verbs_after_then_are_resolved_when_the_order_is_given():
         "lookout aboard yet; a standing order may tell or ask the watcher."
     )
     assert [r.name for r in w.standing.book] == ["sea", "q"]
+
+
+# ---------------------------------------------------------------------------
+# Package 33c: the dialect's article, the manoeuvre in hand, a name said loosely, the well
+# held, the held lines once a watch, and the conflict rule's grain (spec M5 open item 15)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "condition,reading",
+    [
+        ("when the daylight is night", "daylight"),
+        ("when daylight is night", "daylight"),
+        ("when the true wind exceeds 30 knots", "true_wind_speed"),
+        ("when true wind exceeds 30 knots", "true_wind_speed"),
+        ("when she is hove to", "manoeuvre_in_hand"),
+        ("when she is not hove to", "manoeuvre_in_hand"),
+        ("when the manoeuvre in hand is tacking", "manoeuvre_in_hand"),
+        ("when the manoeuvre is none", "manoeuvre_in_hand"),
+    ],
+)
+def test_the_article_before_a_reading_and_she_for_the_manoeuvre(condition, reading):
+    """Playtest 13's brig: "the daylight is night" refused where "daylight is night" was
+    taken; the trim rules belayed by hand through a night hove to, for want of `if she is
+    not hove to`."""
+    rule = parse_standing(make(F), f'standing order "x": {condition} then trim sails')
+    assert rule.trigger.condition.clauses[0].reading == reading
+
+
+def test_she_is_hove_to_from_the_heave_to_until_she_fills_away():
+    """The manoeuvre in hand (a reading of its own, `the manoeuvre in hand`): none,
+    heaving to, hove to, filling away, none; `she is hove to` holds from the moment the
+    heave-to begins until she fills away, so a trim rule sleeps through it."""
+    w = frigate()
+    for sid in w.ship.groups["plain sail"]:
+        w.ship.sails[sid].state = SailState.SET
+    w.submit("brace the yards sharp up")
+    w.submit("keep her full")
+    w.run(300)
+    hove = parse_condition("she is hove to", w.ship)
+    awake = parse_condition("she is not hove to", w.ship)
+    seen: list[tuple[str, bool, bool]] = []
+
+    def look() -> None:
+        now = (
+            w.readings.words("manoeuvre_in_hand"),
+            hove.holds(w.readings),
+            awake.holds(w.readings),
+        )
+        if not seen or seen[-1] != now:
+            seen.append(now)
+
+    look()
+    w.submit("heave to")
+    for _ in range(900):
+        w.tick()
+        look()
+    w.submit("fill away")
+    for _ in range(900):
+        w.tick()
+        look()
+    assert seen == [
+        ("none", False, True),
+        ("heaving to", True, False),
+        ("hove to", True, False),
+        ("filling away", False, True),
+        ("none", False, True),
+    ]
+    e = w.submit("the manoeuvre in hand")
+    assert e.kind == "query.reading" and e.text == "The manoeuvre in hand: none."
+
+
+def test_a_standing_order_is_found_case_blind_and_by_a_distinct_part_of_its_name():
+    """Playtest 13's brig: `belay "blind lead"` read as a line called the blind lead, and
+    `resume standing order "trim by the wind"` refused for "Trim Sails by the Wind"."""
+    w = frigate()
+    w.submit('standing order "Blind Lead": every 10 minutes then heave the lead')
+    w.submit(
+        'standing order "Trim Sails by the Wind": when the true wind veers 1 point then trim sails'
+    )
+    w.submit('standing order "Trim Sails by the Glass": every glass then trim sails')
+    e = w.submit('Belay "blind lead"')
+    assert e.kind == "standing.belayed" and e.text == "Standing order 'Blind Lead' belayed."
+    e = w.submit('avast "trim by the wind"')
+    assert e.text == "Standing order 'Trim Sails by the Wind' belayed."
+    e = w.submit('resume standing order "trim by the wind"')
+    assert e.text == "Standing order 'Trim Sails by the Wind' resumed."
+    e = w.submit('belay standing order "trim sails"')  # two answer: say which
+    assert e.kind == "order.rejected"
+    assert "could be standing order 'Trim Sails by the Wind' or 'Trim Sails by the Glass'" in e.text
+    e = w.submit("resume blind lead")  # the whole name, without quotes
+    assert e.text == "Standing order 'Blind Lead' resumed."
+    e = w.submit('show "the glass"')
+    assert e.kind == "query.standing_orders" and "Trim Sails by the Glass" in e.text
+    # words that name a line are the line verb still, though a standing order's name has
+    # them in it
+    w.submit('standing order "ease the main sheet": every glass then ease the main sheet')
+    e = w.submit("belay the main sheet")
+    assert e.kind != "standing.belayed", e.text
+
+
+def test_the_well_is_held_in_the_book_and_never_fires():
+    """Spec M4 §24 item 4: the starter's `sound the well` was refused at every start, a
+    line of noise in every log; now it is entered, held, and silent until the well is a
+    reading, and it is journaled and replays like any order."""
+    from freesail.core import replay as replay_mod
+
+    w = frigate()
+    e = w.submit(WELL)
+    assert e.kind == "standing.given"
+    assert e.text == (
+        "Standing order 'sound the well' entered in the book: every glass then sound the well. "
+        "Held until the ship can carry it out: The ship has no well to sound yet; that "
+        "reading comes with the world."
+    )
+    rule = w.standing.book.get("sound the well")
+    assert rule.held is not None and rule.state_words() == (
+        "held: the ship has no well to sound yet; that reading comes with the world"
+    )
+    w.run(2 * 3600)
+    assert rule.fired == 0 and not [e for e in w.log if "sound the well" in e.actor]
+    assert [t for _, _, t in w.journal] == [WELL]
+    copy = replay_mod.replay(w.save(), ship_factory)
+    assert copy.log.digest() == w.log.digest()
+    # an order on the well at the prompt is refused in the registry's words
+    e = w.submit("sound the well")
+    assert e.kind == "order.rejected" and e.text.endswith(
+        "The ship has no well to sound yet; that reading comes with the world."
+    )
+
+
+def test_a_failing_if_is_said_the_first_time_and_then_once_a_watch(synthetic):
+    """Spec M5 open item 15: an `at` or `every` order whose `if` fails said so at every
+    firing (the gate's passage: a hundred and fifty-seven lines, the two leads every ten
+    minutes); now the first time, then once in each watch of the ship's clock while it goes
+    on failing, and afresh after it has fired."""
+    kn = {"v": 25.0}
+    synthetic("true_wind_speed", lambda w: units.knots_to_ms(kn["v"]))
+    w = point_world()  # 07:40, the morning watch
+    rule = Rule(
+        "lead",
+        Trigger("every", "every 10 minutes", interval_s=600),
+        ["steer 90"],
+        condition=parse_condition("the true wind is under 20 knots"),
+    )
+    w.standing.book.add(rule)
+    w.run(5 * 3600)  # to 12:40: the morning, the forenoon and the afternoon watches
+    held = [e for e in w.log if e.kind == "standing.held"]
+    assert [e.ship_time.strftime("%H:%M") for e in held] == ["07:50", "08:00", "12:00"]
+    kn["v"] = 15.0
+    w.run(600)
+    assert len(firings(w, "lead")) == 1
+    kn["v"] = 25.0
+    w.run(1200)  # fired, then failing again in the same watch: said again, once
+    held = [e for e in w.log if e.kind == "standing.held"]
+    assert [e.ship_time.strftime("%H:%M") for e in held][3:] == ["13:00"]
+
+
+def test_the_lead_and_a_manoeuvre_are_not_contrary_orders_on_the_ship():
+    """Spec M5 open item 15 (gate 5b's passage: `heave the lead` against `heave to` and
+    `wear ship` logged as contrary orders on "the ship"): the lead is the leadsman's, the
+    log the log's, a bearing the master's, a manoeuvre the helm's and the yards'."""
+    from freesail.standing.runtime import HELM, LEAD, LOG_LINE, RECKONING, action_parts
+
+    w = frigate()
+    ship = w.ship
+    yards = {s.id for s in ship.spars.values() if s.is_yard}
+    assert action_parts(ship, "heave the lead").parts == {LEAD}
+    assert action_parts(ship, "heave the deep-sea lead").parts == {LEAD}
+    assert action_parts(ship, "heave the log").parts == {LOG_LINE}
+    assert action_parts(ship, "take a bearing of the land").parts == {RECKONING}
+    assert action_parts(ship, "shape a course for Falmouth").parts == {HELM}
+    for manoeuvre in ("heave to", "wear ship", "tack ship", "fill away"):
+        assert action_parts(ship, manoeuvre).parts == {HELM} | yards
+    w.submit('standing order "a": when the speed is under 100 knots then heave the lead')
+    w.submit('standing order "b": when the speed is under 100 knots then heave to')
+    w.run(1)
+    assert not [e for e in w.log if e.kind == "standing.conflict"]
+    w.submit('standing order "c": when the speed is under 100 knots then trim sails')
+    w.run(1)
+    notes = [e.text for e in w.log if e.kind == "standing.conflict"]
+    assert notes == [
+        "Standing orders 'b' and 'c' (both the captain's) give contrary orders on the yards; "
+        "the later stands."
+    ]
+
+
+def test_an_order_after_a_firings_work_is_done_is_the_next_step_not_a_contrary_one():
+    """`at wore then heave to` follows the wear: a firing whose evolutions have all ended
+    is done with, though its five minutes are not out."""
+    w = frigate()
+    w.submit('standing order "a": when the speed is under 100 knots then square the fore yard')
+    w.run(1)
+    runner = w.ship.extra["evolutions"]
+    for _ in range(280):
+        if not runner.instances:
+            break
+        w.tick()
+    assert not runner.instances and w.clock.tick < 290  # the brace done inside the dwell
+    w.submit('standing order "b": when the speed is under 100 knots then brace the fore yard up')
+    w.run(1)
+    assert not [e for e in w.log if e.kind == "standing.conflict"]
+    # while the work is in hand the same two are contrary, as they always were
+    w2 = frigate()
+    w2.submit('standing order "a": when the speed is under 100 knots then square the fore yard')
+    w2.run(1)
+    w2.submit('standing order "b": when the speed is under 100 knots then brace the fore yard up')
+    w2.run(1)
+    notes = [e.text for e in w2.log if e.kind == "standing.conflict"]
+    assert notes == [
+        "Standing orders 'a' and 'b' (both the captain's) give contrary orders on the fore "
+        "yard; the later stands."
+    ]

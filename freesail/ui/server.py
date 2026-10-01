@@ -93,6 +93,7 @@ from freesail.core.world import World
 from freesail.ui.console import (
     ALARM_SPEED,
     SPEED_WORDS,
+    book_words,
     check_agents_unattended,
     clamp_compression,
     eased_words,
@@ -714,6 +715,12 @@ def main(argv: list[str] | None = None) -> int:
         begin(world, scenario_file)
     if args.standing_orders:
         read_standing_orders(world, args.standing_orders)
+    # package 33c (decision 30): the starter book is a choice; the opening words, on the
+    # terminal and as the browser's first driver line, say how to load it or begin with none
+    opening = book_words(world)
+    print(opening)
+    if not args.load:
+        world.record_driver("routine", "driver.book", opening)
     if args.load:
         how = getattr(world, "loaded_from", "replay")
         way = "from its checkpoint at" if how == "checkpoint" else "replayed to"

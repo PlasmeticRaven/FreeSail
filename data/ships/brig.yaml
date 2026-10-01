@@ -1678,6 +1678,19 @@ groups:
   main topsail bowlines:
   - main.topsail.bowline.starboard
   - main.topsail.bowline.larboard
+  lower studdingsails:
+  - fore.lower.studdingsail.starboard
+  - fore.lower.studdingsail.larboard
+  topmast studdingsails:
+  - fore.topmast.studdingsail.starboard
+  - fore.topmast.studdingsail.larboard
+  - main.topmast.studdingsail.starboard
+  - main.topmast.studdingsail.larboard
+  topgallant studdingsails:
+  - fore.topgallant.studdingsail.starboard
+  - fore.topgallant.studdingsail.larboard
+  - main.topgallant.studdingsail.starboard
+  - main.topgallant.studdingsail.larboard
 aliases:
   spanker: main.spanker
   driver: main.spanker
@@ -1709,6 +1722,7 @@ aliases:
   main tack: main tacks
   main bowline: main bowlines
   main top bowline: main topsail bowlines
+  sails: all sail
 crew:
   # The kit's manual: the Diligence class establishment, 121 (Winfield not reached).
   complement: 121

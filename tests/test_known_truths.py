@@ -2067,9 +2067,10 @@ def test_truth_49_the_day_saved_at_several_ticks_replays_to_the_same_digest(gate
     """Spec M4 §23, truth 49: "The day saved at any tick and replayed gives the same
     digest." Saved a glass in, at 20:00 and at 01:00 in the gale, each replayed from its
     seed, scenario (the weather script with it) and inputs to the digest the day had at
-    that tick. The well's standing order, refused when the book is read, is replayed too
-    (package 29's `inputs`: refusals and queries replay, not only the orders carried
-    out), so the replayed log is the log the player watched, line for line."""
+    that tick. The well's standing order, held in the book since package 33c (refused when
+    the book was read before it), is replayed too (package 29's `inputs`: refusals and
+    queries replay, not only the orders carried out), so the replayed log is the log the
+    player watched, line for line."""
     from freesail.api.session import ship_factory
     from freesail.core import replay as replay_mod
 

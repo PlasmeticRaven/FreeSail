@@ -307,11 +307,12 @@ def test_refusals_are_the_dialects_and_come_at_registration(unbound):
         def purser():
             order("set the royals")
 
-    with pytest.raises(OrderError, match="no well to sound"):
+    @every("a glass", name="sound the well")
+    def sound():
+        order("sound the well")
 
-        @every("a glass", name="sound the well")
-        def sound():
-            order("sound the well")
+    # package 33c: held in the book until the well is a reading, as the dialect's twin is
+    assert sound.rule.held is not None and "no well to sound" in sound.rule.held
 
     with pytest.raises(OrderError, match="only be called inside"):
         order("set the royals")

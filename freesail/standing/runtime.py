@@ -22,7 +22,17 @@ The three guards against thrashing (spec §3):
   log says so: "Standing order 'x' (the master) countermanded by 'y' (the captain)."
   The junior's order is not given; a senior firing after a junior's is given, and the
   junior's is logged as countermanded. Two of one rank give the later precedence with
-  a plain note.
+  a plain note. The grain (spec M5 open item 15, package 33c): a sail, a yard or a line
+  is its own part, the helm one, a manoeuvre the helm's and every yard's, the lead the
+  leadsman's, the log the log's, a bearing and the account the master's (`the
+  reckoning`), a course shaped the helm's, and the ship's only what is left (the masts
+  sent down, all work belayed); and a firing whose evolutions have all ended is done
+  with, so an order after it is the next step and not a contrary one (`at wore then
+  heave to`).
+
+A failing `, if` is said in the log the first time and then once a watch while it goes
+on failing (spec M5 open item 15; package 33c); an order held for a reading the ship has
+not got (`sound the well`) waits, silent, in the book.
 
 A firing is an ordinary order with an unusual actor: `World.submit(text, actor="standing
 order 'x'")`, which the World logs as "By standing order 'x': taking in the royals." and
@@ -87,6 +97,9 @@ class Firing:
     rule: Rule
     tick: int
     actions: list[ActionParts] = field(default_factory=list)
+    # the evolutions the firing began (package 33c): once every one has ended its orders
+    # are done with, and an order after them is the next step, not a contrary one
+    started: list[Any] = field(default_factory=list)
 
 
 def action_parts(ship: Any, text: str) -> ActionParts:
@@ -106,6 +119,16 @@ def action_parts(ship: Any, text: str) -> ActionParts:
         return ActionParts(text, order.verb, frozenset(parts), manner)
     if spec.object in ("heading", "points") or order.verb in imperative_helm_verbs():
         return ActionParts(text, order.verb, frozenset({HELM}), manner)
+    if spec.object == "navigation":
+        # the master's work (package 33c, spec M5 open item 15): the lead is the
+        # leadsman's, the log the log's, a bearing and the account the master's, and a
+        # course shaped the helm's; none of them is the ship's, so `heave the lead` and
+        # `heave to` are not contrary orders
+        return ActionParts(text, order.verb, frozenset({_navigation_part(order.verb)}), manner)
+    if order.verb in MANOEUVRES:
+        # a manoeuvre is the helm's and the yards' (package 33c)
+        yards = frozenset(s.id for s in ship.spars.values() if s.is_yard)
+        return ActionParts(text, order.verb, frozenset({HELM}) | yards, manner)
     if spec.object in ("sail", "yards", "line"):
         if order.object is None:
             yards = frozenset(s.id for s in ship.spars.values() if s.is_yard)
@@ -118,6 +141,36 @@ def action_parts(ship: Any, text: str) -> ActionParts:
     if order.verb in ("call all hands", "pipe down", "relieve the watch"):
         return ActionParts(text, order.verb, frozenset({CREW}), manner)
     return ActionParts(text, order.verb, frozenset({SHIP}), manner)
+
+
+# The ship's manoeuvres by their verbs (`data/vocabulary.yaml`): the helm's and the yards'.
+MANOEUVRES: frozenset[str] = frozenset(
+    {
+        "tack ship",
+        "wear ship",
+        "heave to",
+        "fill away",
+        "box haul",
+        "wear short round",
+        "lie a try",
+        "scud",
+        "back and fill",
+    }
+)
+# The navigation orders' parts, for the conflict rule (package 33c).
+LEAD = "the lead"
+LOG_LINE = "the log"
+RECKONING = "the reckoning"
+
+
+def _navigation_part(verb: str) -> str:
+    if verb in ("heave the lead", "heave the deep sea lead"):
+        return LEAD
+    if verb == "heave the log":
+        return LOG_LINE
+    if verb == "shape a course for":
+        return HELM
+    return RECKONING
 
 
 def imperative_helm_verbs() -> tuple[str, ...]:
@@ -182,8 +235,8 @@ class Runtime:
         tick = world.clock.tick
         self._firings = [f for f in self._firings if tick - f.tick < STANDING_DWELL_S]
         for rule in list(self.book.rules):
-            if rule.belayed:
-                continue
+            if rule.belayed or rule.held is not None:
+                continue  # a held order waits, silent, for the reading it is on (33c)
             kind = rule.trigger.kind
             if kind == "when":
                 self._tick_when(rule, view)
@@ -272,6 +325,14 @@ class Runtime:
         actor = f"{ACTOR_PREFIX}'{rule.name}'"
         tick = world.clock.tick
         if rule.condition is not None and not rule.condition.holds(view, rule.memory):
+            # the line the first time, then once a watch while the condition goes on
+            # failing (spec M5 open item 15; package 33c: the gate's passage had a hundred
+            # and fifty-seven of them, its two leads' `every ..., if` saying every ten
+            # minutes that the run since noon was short)
+            watch = (world.clock.ship_time.date().isoformat(), world.clock.watch())
+            if rule.held_line_watch == watch:
+                return
+            rule.held_line_watch = watch
             world.record(
                 Severity.ROUTINE,
                 "standing.held",
@@ -281,6 +342,7 @@ class Runtime:
                 data={"name": rule.name, "reason": rule.condition.explain(view, rule.memory)},
             )
             return
+        rule.held_line_watch = None  # it fires: the next failing `if` is said again
         firing = Firing(rule, tick)
         given: list[ActionParts] = []
         for text in rule.actions:
@@ -309,6 +371,7 @@ class Runtime:
         firing.actions = given
         if runner is not None:
             rule.started = list(runner.instances[before:])
+            firing.started = list(rule.started)
         if given:
             rule.fired += 1
             rule.last_fired_tick = tick
@@ -317,15 +380,21 @@ class Runtime:
     def _countermanded(self, rule: Rule, parts: ActionParts) -> bool:
         """The conflict rule. True when this order must not be given."""
         world = self.world
+        runner = self._runner()
+        live = runner.instances if runner is not None else []
         for firing in self._firings:
             other = firing.rule
             if other is rule:
+                continue
+            if firing.started and not any(inst in live for inst in firing.started):
+                # its work is done (package 33c): `at wore then heave to` follows the
+                # wear, and `at filled away then shape a course` the filling away
                 continue
             for theirs in firing.actions:
                 shared = parts.conflicts_with(theirs)
                 if not shared:
                     continue
-                where = errors.join_names(sorted(_part_words(world.ship, p) for p in shared), "and")
+                where = _where(world.ship, shared)
                 if other.rank < rule.rank:
                     rule.conflicts += 1
                     world.record(
@@ -391,6 +460,18 @@ class Runtime:
             due = rule.next_due_tick - self.world.clock.tick
             return [f"Next due in {due} s."]
         return []
+
+
+def _where(ship: Any, parts: frozenset[str]) -> str:
+    """The parts two orders are contrary on, in words: every yard of the ship together as
+    'the yards' (a manoeuvre's, package 33c), the rest by name."""
+    yards = {s.id for s in getattr(ship, "spars", {}).values() if s.is_yard}
+    words = []
+    if yards and yards <= parts:
+        words.append("the yards")
+        parts = frozenset(p for p in parts if p not in yards)
+    words += sorted(_part_words(ship, p) for p in parts)
+    return errors.join_names(words, "and")
 
 
 def _part_words(ship: Any, part: str) -> str:

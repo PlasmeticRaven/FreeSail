@@ -1202,6 +1202,60 @@ REGISTRY.add_absent(
     "There is nothing to sight yet; that reading comes with the world.",
 )
 
+# ---------------------------------------------------------------------------
+# Package 33c: the manoeuvre in hand (playtest 13's brig: the trim rules belayed by hand
+# through a night hove to, for want of `if she is not hove to`). A row of its own, in this
+# block, changing nothing above.
+# ---------------------------------------------------------------------------
+
+KINDS["manoeuvre"] = (
+    "the manoeuvre in hand: is hove to, is not hove to, is tacking, is wearing, is none"
+)
+
+# The manoeuvres by their evolutions' ids (`data/evolutions/`), in the gerund the log says
+# them in; a manoeuvre is in hand from its first step to its last.
+MANOEUVRE_WORDS: dict[str, str] = {
+    "tack": "tacking",
+    "wear": "wearing",
+    "heave_to": "heaving to",
+    "lie_a_try": "heaving to",
+    "fill_away": "filling away",
+    "boxhaul": "box hauling",
+    "wear_short_round": "wearing short round",
+    "back_and_fill": "backing and filling",
+    "scud": "bearing up to scud",
+}
+# What she is doing when no manoeuvre is in hand: lying to, or nothing.
+HOVE_TO_WORDS = "hove to"
+NO_MANOEUVRE_WORDS = "none"
+
+
+def _manoeuvre(world: Any, _: str | None) -> str:
+    """`the manoeuvre in hand`: the manoeuvre the hands are at (tacking, wearing, heaving
+    to, filling away), from the evolution runner's work in hand; else 'hove to' while she
+    lies to (the heave-to's record on the ship, `ship.extra["hove_to"]`, which filling away
+    clears), else 'none'."""
+    extra = getattr(world.ship, "extra", None) or {}
+    runner = extra.get("evolutions")
+    for inst in getattr(runner, "instances", None) or ():
+        words = MANOEUVRE_WORDS.get(inst.evo.id)
+        if words is not None and not inst.waiting:
+            return words
+    return HOVE_TO_WORDS if "hove_to" in extra else NO_MANOEUVRE_WORDS
+
+
+REGISTRY.add(
+    Reading(
+        "manoeuvre_in_hand",
+        ("the manoeuvre in hand", "the manoeuvre"),
+        "manoeuvre",
+        "",
+        _manoeuvre,
+        description="the manoeuvre in hand: hove to, heaving to, tacking, wearing, filling "
+        "away, or none",
+    )
+)
+
 
 # ---------------------------------------------------------------------------
 # Events, for `at` (spec §2)

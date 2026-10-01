@@ -119,6 +119,25 @@ def read_standing_orders(world: World, path: str) -> int:
     return len(lines)
 
 
+# The starter book (package 33c, decision 30): a choice, never a requirement for
+# beginning; the opening words of the console and the browser say how to load it.
+STARTER_BOOK = "data/standing_orders/starter.orders"
+
+
+def book_words(world: World) -> str:
+    """The opening words about the book of standing orders (package 33c, decision 30):
+    how to load the starter book or begin with none, or what the book holds."""
+    n = len(world.standing.book)
+    if n == 0:
+        return (
+            "The book of standing orders is empty. Begin with none, give your own, or load "
+            f"the starter book: read the standing orders from {STARTER_BOOK} (the primer's "
+            "chapter 11, 'The starting book', gives each routine with its reason)."
+        )
+    held = "one standing order" if n == 1 else f"{n} standing orders"
+    return f"The book holds {held}; 'standing orders' lists them."
+
+
 def agent_save_path(world: World) -> str:
     """Where an agent's harness saves the game on an opt-out or a stand-down (spec M4
     §11): the same name the server offers a download under, in the working directory."""
@@ -584,7 +603,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--wind", help="wind as 'FROM_DEG,KNOTS', e.g. 225,15")
     ap.add_argument("--heading", type=float, help="starting heading in degrees")
     ap.add_argument(
-        "--standing-orders", help="a file of standing orders to give at the start (spec M4 §6)"
+        "--standing-orders",
+        help="a file of standing orders to give at the start (spec M4 §6); the starter "
+        f"book is {STARTER_BOOK}, a choice: without it the book begins empty",
     )
     ap.add_argument(
         "--watcher", help="station a watcher: 'fake' for the scripted narrator (spec M4 §12)"
@@ -627,6 +648,7 @@ def main(argv: list[str] | None = None) -> int:
         f"FreeSail console. Seed {world.seed}. {units.time_stamp(world.clock.ship_time)}. "
         "Type 'help' for driver commands, 'go' to start the clock."
     )
+    console._print(book_words(world))  # the starter book a choice (package 33c)
     if args.agents_port:
         console.serve_agents(
             args.agents_port, records_dir=args.consent_records, saves_dir=args.saves

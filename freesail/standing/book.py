@@ -58,9 +58,30 @@ class Book:
                 return r
         return None
 
+    def loose(self, name: str) -> list[Rule]:
+        """The rules a name said loosely may mean (package 33c; playtest 13's brig,
+        `resume standing order "trim by the wind"` for "Trim Sails by the Wind"): those
+        whose name has every word said, in the order said, case and quotes aside ('the
+        well' for "sound the well")."""
+        said = _name_words(name)
+        if not said:
+            return []
+        out = []
+        for r in self.rules:
+            words = iter(_name_words(r.name))
+            if all(any(w == x for x in words) for w in said):
+                out.append(r)
+        return out
+
     def find(self, name: str) -> Rule:
         rule = self.get(name)
         if rule is None:
+            loose = self.loose(name)
+            if len(loose) == 1:
+                return loose[0]
+            if len(loose) > 1:
+                names = errors.join_names([f"'{r.name}'" for r in loose])
+                raise OrderError(f"'{name}' could be standing order {names}; say which.")
             if not self.rules:
                 raise OrderError(f"There is no standing order '{name}'; the book is empty.")
             near = errors.nearest(name, self.names)
@@ -91,7 +112,13 @@ class Book:
         self.add(rule)
         by = f" by {rule.officer}" if rule.given_by != "captain" else ""
         text = f"Standing order '{rule.name}' entered in the book{by}: {rule.body_words()}."
-        return "standing.given", text, {"name": rule.name, "given_by": rule.given_by}
+        data: dict[str, Any] = {"name": rule.name, "given_by": rule.given_by}
+        if rule.held is not None:
+            # an order on a reading the ship has not got yet (package 33c): in the book,
+            # held, and never fired until the world has it
+            text += f" Held until the ship can carry it out: {rule.held}"
+            data["held"] = rule.held
+        return "standing.given", text, data
 
     # -- the book's orders ----------------------------------------------------------------
 
@@ -204,6 +231,11 @@ class Book:
             rule.fired = int(entry.get("fired", 0))
             rule.last_fired_tick = entry.get("last_fired_tick")
         return missing
+
+
+def _name_words(name: str) -> list[str]:
+    """A standing order's name as its words are matched: lower case, no punctuation."""
+    return "".join(c if c.isalnum() or c.isspace() else " " for c in name.lower()).split()
 
 
 def read_orders_file(path: str | Path) -> list[str]:

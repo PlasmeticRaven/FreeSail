@@ -26,6 +26,11 @@ class AmbiguousNounError(OrderError):
     """The object phrase could name several parts; the candidates are in the message."""
 
 
+class UnknownVerbError(OrderError):
+    """The words begin with no verb this ship knows (package 33c: the prompt then asks
+    whether they name a reading or a part, `orders.prompt.answer_unparsed`)."""
+
+
 class NothingToDoError(OrderError):
     """Every part the order named was already dealt with by an earlier order in the same group."""
 
@@ -33,6 +38,7 @@ class NothingToDoError(OrderError):
 __all__ = [
     "OrderError",
     "UnknownNounError",
+    "UnknownVerbError",
     "AmbiguousNounError",
     "join_names",
     "nearest",
@@ -91,7 +97,7 @@ def suggest(word: str, known: Iterable[str], article: str = "the ") -> str:
     return "; did you mean " + join_names(f"{article}{h}" for h in hints) + "?"
 
 
-def unknown_verb(text: str, verbs: Iterable[str]) -> OrderError:
+def unknown_verb(text: str, verbs: Iterable[str]) -> UnknownVerbError:
     """'X is not an order this ship understands; did you mean 'set' or 'steer'?'"""
     verbs = list(verbs)
     words = text.split()
@@ -106,7 +112,7 @@ def unknown_verb(text: str, verbs: Iterable[str]) -> OrderError:
                 scored[h] = max(scored.get(h, 0.0), ratio)
     hints = sorted(scored, key=lambda h: -scored[h])
     hint = ("; did you mean " + join_names(f"'{h}'" for h in hints[:3]) + "?") if hints else "."
-    return OrderError(
+    return UnknownVerbError(
         f"'{text}' is not an order this ship understands{hint} "
         f"An order begins with a verb such as {join_names(verbs[:8], 'or', limit=8)}."
     )
