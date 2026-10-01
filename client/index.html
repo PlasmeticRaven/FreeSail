@@ -21,6 +21,8 @@
     <button type="button" data-time="10">10x</button>
     <button type="button" data-time="60">60x</button>
     <button type="button" data-time="300">300x</button>
+    <span class="sep"></span>
+    <button id="btn-library" type="button" title="the reference library and the ship's papers (also 'library' at the order line)">library</button>
   </span>
   <span id="status" class="bad">connecting</span>
 </header>
@@ -39,9 +41,16 @@
     <div class="command-line">
       <span class="prompt">&gt;</span>
       <input id="command" type="text" autocomplete="off" spellcheck="false"
-             placeholder="an order, or hold / go / speed 30 / tick 600">
+             placeholder="an order, or hold / go / speed 30 / tick 600 / library"
+             aria-describedby="hint">
     </div>
+    <!-- the console's completer as the line is typed (package 33d): Tab takes the first,
+         the arrows move through them, Escape puts them away -->
+    <div id="hint" class="hint-line" role="listbox" aria-label="suggestions" hidden></div>
   </section>
+
+  <!-- the library and the ship's papers (package 33d), in the ship view's place while open -->
+  <section id="library-panel" class="panel" hidden></section>
 
   <section id="ship-panel" class="panel">
     <div class="panel-head"><span>Ship</span><span class="hint">[ and ] turn the view; \ returns to leeward</span></div>
@@ -54,6 +63,7 @@
       <dt>Ship's time</dt><dd id="i-time"></dd>
       <dt>Bells</dt><dd id="i-bell"></dd>
       <dt>Clock</dt><dd id="i-clock"></dd>
+      <dt></dt><dd class="wrap"><label class="option" title="as an urgent line eases it; speed up again by hand (also --ease-on-station)"><input id="opt-ease-on-station" type="checkbox"> ease to 1x when a station is sampled or speaks</label></dd>
       <dt>Heading</dt><dd id="i-heading"></dd>
       <dt>Course</dt><dd id="i-course"></dd>
       <dt>Speed</dt><dd id="i-speed"></dd>
@@ -75,7 +85,9 @@
   </section>
 
   <section id="map-panel" class="panel">
-    <div class="panel-head"><span>Map</span><span class="hint">north up, last hour's track</span></div>
+    <div class="panel-head"><span>Map</span><span class="hint">north up; the wheel zooms, a drag pans
+      <button id="btn-map-centre" type="button" title="centre on the ship and follow her">centre</button>
+      <button id="btn-map-fit" type="button" title="the whole track and the ship, as at first">fit</button></span></div>
     <canvas id="map"></canvas>
   </section>
 </main>
@@ -86,6 +98,7 @@
 <script src="/client/log.js"></script>
 <script src="/client/instruments.js"></script>
 <script src="/client/map.js"></script>
+<script src="/client/library.js"></script>
 <script src="/client/app.js"></script>
 </body>
 </html>

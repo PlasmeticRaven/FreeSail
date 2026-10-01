@@ -2,7 +2,8 @@
 
     python -m freesail.ui.server data/ships/frigate-36.yaml [--seed N] [--wind FROM,KN]
                                  [--heading DEG] [--time N] [--port 8000] [--watcher fake]
-                                 [--lockstep] [--consent-records DIR] [--saves DIR]
+                                 [--lockstep] [--ease-on-station]
+                                 [--consent-records DIR] [--saves DIR]
     python -m freesail.ui.server --scenario data/scenarios/gate-4c-day.yaml [...]
     python -m freesail.ui.server --load SAVE [...]
 
@@ -28,8 +29,16 @@ Routes (spec §9.2):
                         of standing orders (also `read the standing orders from FILE`
                         on the command line, as in the console), or
                         {"action": "save", "value": PATH} to write a save file on the
-                        server's disk (also `save PATH` on the command line)
-    WS   /ws            every log event as it happens, and a snapshot every
+                        server's disk (also `save PATH` on the command line), or
+                        {"action": "ease_on_station", "value": true|false}, the
+                        instruments' option that `--ease-on-station` sets (below)
+    GET  /api/complete  ?line=...&limit=N: the console's completer, its whole-line
+                        suggestions for the order line (package 33d)
+    GET  /api/library   ?topic=...&section=...&find=...: a page of the reference
+                        library, as the model's `library` tool serves it, for the
+                        browser's pane; /api/library/topics the topics and their
+                        sections, /api/library/papers the ship's papers (`shelf_routes`)
+    WS   /ws          every log event as it happens, and a snapshot every
                         tick at 1x, every 10 ticks at 10x, every 60 at 60x and up;
                         at 60x and up the log is rolled up (spec M4 §20): the notable
                         and urgent lines and the captain's come as events, and each
@@ -59,6 +68,12 @@ hosts too on `--agents-port`): a language model's door is a client of this game.
 `--lockstep` holds the clock while a door has the floor (a sample open for it), for
 testing at 1x and for competitive play; without it the game runs at its compression and
 a door's late reply finds its turn grown by what happened meanwhile (the harness's fold).
+
+`--ease-on-station` (package 33d; playtest 12, the owner's note 3), also an option in the
+instruments: whenever a station is sampled or speaks while the clock runs faster than 1x,
+the clock is eased to 1x as an urgent line eases it, and the log says so in a driver's
+line (`driver.eased`, routine, with the station), which a replay writes again; the player
+speeds up again by hand. Off by default.
 
 The driver mirrors the console: the clock runs in a background thread that
 ticks the world `compression` times per real second, and every use of the
@@ -106,6 +121,11 @@ CLIENT_DIR = Path(__file__).resolve().parents[2] / "client"
 
 Listener = Callable[[dict[str, Any]], None]
 
+# The log kinds of a station speaking (`World.AGENT_LOG_KINDS`): its narration and its
+# answer to a question. With `--ease-on-station` either eases the clock, as its turn
+# opening does (package 33d; playtest 12, the owner's note 3).
+STATION_SPEAKS = ("agent.note", "agent.said")
+
 
 def snapshot_interval(compression: float) -> int:
     """Ticks between snapshots on the stream: every tick at 1x, every 10 at 10x,
@@ -134,11 +154,22 @@ class Driver:
     thread produced them; the websocket layer makes that safe.
     """
 
-    def __init__(self, world: World, compression: float = 1.0, lockstep: bool = False):
+    def __init__(
+        self,
+        world: World,
+        compression: float = 1.0,
+        lockstep: bool = False,
+        ease_on_station: bool = False,
+    ):
         self.world = world
         self.compression = clamp_compression(compression)
         self.world.compression = self.compression
         self.lockstep = lockstep
+        # `--ease-on-station` (package 33d): the clock eased to 1x when a station is sampled
+        # or speaks, as an urgent line eases it; off unless asked for
+        self.ease_on_station = bool(ease_on_station)
+        self._heard: tuple[str, str] | None = None  # (station, why) seen while running fast
+        self._samples_seen = self._samples_now()  # each station's samples, last looked at
         self._view = RollupView()  # the roll-up (spec M4 §20), the console's rule
         self._alarm: Event | None = None  # an urgent line seen while running fast
         # the last auto-slow (spec M4 open item 8), shown until the player sets the speed
@@ -175,6 +206,8 @@ class Driver:
             and self._alarm is None
         ):
             self._alarm = e  # eased once the tick is over (`_run_ticks`)
+        if e.kind in STATION_SPEAKS and self._heard is None and e.actor.startswith("the "):
+            self._heard = (e.actor.removeprefix("the "), "speaks")  # `--ease-on-station`
         for x in self._view.feed(e, self.compression):
             self._emit_shown(x)
 
@@ -194,6 +227,8 @@ class Driver:
         }
         if self.eased is not None:  # the clock was eased on an alarm (open item 8)
             out["eased"] = dict(self.eased)
+        if self.ease_on_station:  # and eases when a station is sampled or speaks (33d)
+            out["ease_on_station"] = True
         if self.lockstep:  # the clock waits for a door that has the floor
             out["lockstep"] = True
             out["waiting_for"] = self.held_for()
@@ -264,6 +299,61 @@ class Driver:
         )
         self.emit_snapshot()
 
+    # -- `--ease-on-station` (package 33d) ------------------------------------
+
+    def set_ease_on_station(self, on: bool) -> None:
+        """The instruments' option and the flag: ease the clock to 1x whenever a station is
+        sampled or speaks. The player speeds up again by hand, as after an alarm."""
+        with self.lock:
+            self.ease_on_station = bool(on)
+            self._station_heard()  # what a station did before the option was set is past
+            self.emit_snapshot()
+
+    def _samples_now(self) -> dict[str, int]:
+        return {
+            name: int(getattr(getattr(h, "agent", None), "samples", 0) or 0)
+            for name, h in self.world.agents.items()
+        }
+
+    def _station_heard(self) -> tuple[str, str] | None:
+        """The station that was sampled or spoke since the last look, and which (`sampled`,
+        `speaks`), or None. Looked at after every tick and every order, option or not, so
+        that switching the option on does not ease for what is past."""
+        heard, self._heard = self._heard, None
+        now = self._samples_now()
+        for name, n in now.items():
+            if n > self._samples_seen.get(name, 0):
+                heard = (name, "sampled")  # a turn opened is the first thing to say
+                break
+        self._samples_seen = now
+        return heard
+
+    def _ease_for_station(self) -> bool:
+        """`--ease-on-station`: a station sampled or speaking while the clock runs faster
+        than ALARM_SPEED eases it to that, as an urgent line does (`_ease`), and the log says
+        so in a driver's line, which a replay writes again. The line is routine, kept at any
+        speed as the driver's lines are, so that it does not itself sample a station that is
+        sampled on notable lines. Returns whether the clock was eased."""
+        heard = self._station_heard()
+        if heard is None or not self.ease_on_station or not self.running:
+            return False
+        if self.compression <= ALARM_SPEED:
+            return False
+        station, why = heard
+        was = self.compression
+        self._set_compression(ALARM_SPEED)
+        said = f"the {station} {'is sampled' if why == 'sampled' else 'speaks'}"
+        tick = self.world.clock.tick
+        self.eased = {"from": was, "to": ALARM_SPEED, "line": said, "tick": tick, "why": "station"}
+        self.world.record_driver(
+            "routine",
+            "driver.eased",
+            f"Compression eased to {ALARM_SPEED:g}x: {said}.",
+            data={"from": was, "to": ALARM_SPEED, "tick": tick, "station": station, "why": why},
+        )
+        self.emit_snapshot()
+        return True
+
     def shown_log(self, n: int = 500) -> list[dict[str, Any]]:
         """The last `n` lines of the store as the client shows them now: rolled up at the
         driver's compression, the hour still open left for the live view to close."""
@@ -291,7 +381,9 @@ class Driver:
                 # `save PATH`, as in the console: writing the disk is the driver's too
                 return self._save(path)
             e = self.world.submit(text)
-            self.emit_snapshot()
+            # a question put to a station is answered on the order (spec M4 §12)
+            if not self._ease_for_station():
+                self.emit_snapshot()
             return e
 
     def read_standing_orders(self, path: str) -> Event:
@@ -360,8 +452,11 @@ class Driver:
             self.world.tick()
             self._ticks_since_snapshot += 1
             if self._alarm is not None:
+                self._station_heard()  # the alarm's easing says it; a station's is past
                 self._ease()  # auto-slow: the rest of this batch is not run
                 break
+            if self._ease_for_station():
+                break  # `--ease-on-station`: the rest of this batch is not run either
             if self._ticks_since_snapshot >= every:
                 self.emit_snapshot()
 
@@ -399,6 +494,13 @@ class Driver:
         if self._thread is not None:
             self._thread.join(timeout=2.0)
             self._thread = None
+
+
+def switched_on(value: Any) -> bool:
+    """A driver option's value: true, 1, 'on', 'yes' and 'true' switch it on."""
+    if isinstance(value, str):
+        return value.strip().lower() in ("on", "yes", "true", "1")
+    return bool(value)
 
 
 def event_dict(e: Event) -> dict[str, Any]:
@@ -467,6 +569,140 @@ def agent_routes(lock: Any, world: Callable[[], World], **desk_options: Any) -> 
     return router
 
 
+# ---------------------------------------------------------------------------
+# The browser's shelf (package 33d): completion, the library and the ship's papers
+# ---------------------------------------------------------------------------
+
+# The console's own words, which its completer offers and the browser's order line does
+# not take: the instruments are its `state` and `muster`, the log panel its `log`, the
+# browser its `quit`; `replay` is `--load`. Everything else the completer offers is
+# offered as it is (`freesail.orders.complete`).
+CONSOLE_ONLY = ("state", "muster", "log", "replay ", "help", "quit")
+
+# The station the browser's captain reads the library as. The library serves every
+# station the same pages (`tools.library`); the name only fills its signature.
+BROWSER_READER = "captain"
+
+# The ship's papers that are not yet aboard, with what they wait for, in words.
+PAPERS_WAITING = (
+    (
+        "the sailmaker's account",
+        "The sail room is not yet a place aboard. Until it is, its paper here is what "
+        "'the sail room' answers at the order line; the sailmaker's account, kept below "
+        "and only as current as its last entry, waits for the ship's places.",
+    ),
+    (
+        "the establishment",
+        "The establishment of anchors and cable for the ship's rate waits for her ground tackle.",
+    ),
+)
+
+
+def ship_papers(world: World) -> dict[str, Any]:
+    """The ship's papers the game holds by handle, each in the words its query answers at
+    the order line (`the booms`, `the sail room`, `the boatswain's store`: the same lines,
+    from the same stores), and the papers that wait, with what for. Read, never logged:
+    the console's queries are printed and not logged either."""
+    from freesail.ship.parts import cordage
+
+    ship = world.ship
+    waiting = [{"handle": h, "words": w} for h, w in PAPERS_WAITING]
+    if not hasattr(ship, "spars"):
+        return {"papers": [], "waiting": waiting, "words": "A ship with no parts keeps no papers."}
+    papers = [
+        {
+            "handle": "the booms",
+            "words": "the spare spars aboard, by class",
+            "lines": queries.booms_lines(world),
+        },
+        {
+            "handle": "the sail room",
+            "words": "every spare sail, its canvas and its condition",
+            "lines": queries.sail_room_lines(world),
+        },
+        {
+            "handle": "the boatswain's store",
+            "words": "the spare cordage, in fathoms",
+            "lines": cordage(ship).inventory_lines(),
+        },
+    ]
+    return {"papers": papers, "waiting": waiting, "words": ""}
+
+
+def shelf_routes(lock: Any, world: Callable[[], World]) -> APIRouter:
+    """The browser's shelf (package 33d; `docs/design/Presentation.md`, playtest 12's
+    notes 1): the console's completer behind the order line, and the reference library
+    and the ship's papers in a pane of their own. Every page is the model's `library`
+    tool's own (`freesail.agents.tools.library`), the same text from the same Markdown;
+    nothing is served the model cannot ask for. All are reads: none writes the log.
+
+        GET /api/complete?line=...&limit=N    the completer's whole-line suggestions
+        GET /api/library?topic=&section=&find= a page of the library, as the tool serves it
+        GET /api/library/topics               the shelf's index: each topic, its sections
+        GET /api/library/papers               the ship's papers, and the papers that wait
+    """
+    from freesail.agents import tools
+    from freesail.orders.complete import suggestions
+
+    router = APIRouter()
+
+    @router.get("/api/complete")
+    def api_complete(line: str = "", limit: int = 12) -> JSONResponse:
+        limit = max(1, min(int(limit), 50))
+        with lock:
+            found = suggestions(world().ship, line, limit + len(CONSOLE_ONLY))
+        offered = [s for s in found if s not in CONSOLE_ONLY][:limit]
+        return JSONResponse({"line": line, "suggestions": offered})
+
+    @router.get("/api/library")
+    def api_library(topic: str = "contents", section: str = "", find: str = "") -> JSONResponse:
+        with lock:
+            page = tools.library(world(), BROWSER_READER, topic or "contents", section, find)
+        return JSONResponse(
+            {
+                "topic": topic or "contents",
+                "section": section,
+                "find": find,
+                "title": page.title,
+                "reopen": page.reopen,
+                "text": str(page),
+            }
+        )
+
+    @router.get("/api/library/topics")
+    def api_library_topics() -> JSONResponse:
+        """The topics `library(topic='contents')` names, with the sections each one lists,
+        and for each section the words `section=` takes (its number, else its heading)."""
+        with lock:
+            every = tools._every_topic(world())
+        topics = [
+            {
+                "key": top.key,
+                "name": top.name,
+                "title": top.title,
+                "sections": [
+                    {
+                        "number": sec.number,
+                        "heading": sec.heading,
+                        "label": sec.label(),
+                        "level": sec.level,
+                        "ask": sec.number or sec.heading,
+                    }
+                    for sec in top.sections
+                ],
+            }
+            for top in every
+        ]
+        return JSONResponse({"topics": topics})
+
+    @router.get("/api/library/papers")
+    def api_library_papers() -> JSONResponse:
+        with lock:
+            return JSONResponse(ship_papers(world()))
+
+    return router
+
+
 def create_app(
     driver: Driver,
     client_dir: Path = CLIENT_DIR,
@@ -496,6 +732,7 @@ def create_app(
     )
     driver.desk = router.desk  # type: ignore[attr-defined]
     app.include_router(router)
+    app.include_router(shelf_routes(driver.lock, lambda: driver.world))  # package 33d
 
     @app.get("/")
     def index() -> FileResponse:
@@ -566,12 +803,14 @@ def create_app(
                 driver.read_standing_orders(str(value or ""))
             elif action == "save":
                 driver.save(str(value or ""))
+            elif action == "ease_on_station":  # the instruments' option (package 33d)
+                driver.set_ease_on_station(switched_on(value))
             else:
                 raise HTTPException(
                     status_code=400,
                     detail=(
-                        "Say hold, go, speed N, tick N, standing_orders FILE or save PATH "
-                        "to the driver."
+                        "Say hold, go, speed N, tick N, standing_orders FILE, save PATH or "
+                        "ease_on_station on|off to the driver."
                     ),
                 )
         except (TypeError, ValueError):
@@ -695,6 +934,11 @@ def main(argv: list[str] | None = None) -> int:
         help="hold the clock while a model's door has the floor (spec M4 §13)",
     )
     ap.add_argument(
+        "--ease-on-station",
+        action="store_true",
+        help="ease the clock to 1x whenever a station is sampled or speaks (package 33d)",
+    )
+    ap.add_argument(
         "--consent-records",
         help="where the consent records are read and written (default docs/agents/consent)",
     )
@@ -721,7 +965,12 @@ def main(argv: list[str] | None = None) -> int:
             f"Loaded {args.load}: {way} tick {world.clock.tick}, "
             f"{world.clock.stamp()}; the log's digest is {world.log.digest()[:16]}."
         )
-    driver = Driver(world, compression=args.time, lockstep=args.lockstep)
+    driver = Driver(
+        world,
+        compression=args.time,
+        lockstep=args.lockstep,
+        ease_on_station=args.ease_on_station,
+    )
     app = create_app(
         driver,
         game=f"FreeSail's browser game (freesail.ui.server on port {args.port})",

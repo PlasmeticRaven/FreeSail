@@ -196,4 +196,60 @@ main {
 .evolutions li.none { list-style: none; margin-left: -16px; color: var(--ink-soft); }
 
 /* the map */
-#map { flex: 1; width: 100%; height: 100%; min-height: 0; display: block; }
+#map { flex: 1; width: 100%; height: 100%; min-height: 0; display: block; cursor: grab; touch-action: none; }
+#map.dragging { cursor: grabbing; }
+.panel-head .hint button { margin-left: 4px; text-transform: none; letter-spacing: 0; font-size: 11px; padding: 0 6px; }
+
+/* package 33d: the completer under the order line */
+.hint-line { display: flex; flex-wrap: wrap; gap: 2px 10px; max-height: 5.2em; overflow-y: auto; padding: 3px 8px 5px 22px; background: var(--paper); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: var(--ink-soft); }
+.hint-line[hidden] { display: none; }
+.hint-item { cursor: pointer; white-space: pre; border-bottom: 1px solid transparent; }
+.hint-item:hover { color: var(--ink); }
+.hint-item.first { color: var(--ink); }
+.hint-item.chosen { color: var(--paper); background: var(--ink); padding: 0 3px; border-radius: 2px; }
+
+/* the instruments' option */
+.instruments label.option { color: var(--ink-soft); font-size: 12px; cursor: pointer; }
+.instruments label.option input { vertical-align: -2px; margin: 0 4px 0 0; }
+#i-clock.eased { color: var(--accent); }
+
+/* package 33d: the library and the ship's papers, in the ship view's place while open */
+#library-panel { grid-column: 2 / span 2; grid-row: 1; }
+#library-panel[hidden] { display: none; }
+body.library-open #ship-panel { display: none; }
+@media (max-width: 1099px) {
+  #library-panel { grid-column: 2; grid-row: 1; }
+}
+.library-head .library-tools { display: flex; align-items: center; gap: 6px; text-transform: none; letter-spacing: 0; }
+.library-find input { font: inherit; font-size: 12px; width: 15em; padding: 1px 6px; border: 1px solid var(--rule); border-radius: 3px; background: var(--panel); color: var(--ink); }
+.library-find input:focus { outline: none; border-color: var(--accent); }
+.library-body { flex: 1; min-height: 0; display: flex; }
+.library-index { flex: none; width: 15em; overflow-y: auto; padding: 8px 6px 8px 10px; border-right: 1px solid var(--rule); font-size: 12.5px; }
+.library-index ul { list-style: none; margin: 0; padding: 0; }
+.library-index li { margin: 1px 0; }
+.library-index .library-sections { margin: 2px 0 6px 10px; font-size: 12px; }
+.library-index .level-2 { padding-left: 10px; }
+.library-index .level-3 { padding-left: 20px; }
+.library-index li.current > a { color: var(--ink); font-weight: 600; }
+.library-index .library-papers-link { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--rule); }
+.library a { color: var(--accent); text-decoration: none; }
+.library a:hover { text-decoration: underline; }
+.library-page { flex: 1; min-width: 0; overflow-y: auto; padding: 10px 16px 24px; font-size: 13.5px; line-height: 1.5; }
+.library-title { font-size: 17px; margin: 0 0 2px; font-weight: 600; }
+.library-asked { color: var(--ink-soft); font-size: 11.5px; margin-bottom: 10px; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.library-text p { white-space: pre-wrap; margin: 0 0 0.7em; }
+.library-text h2 { font-size: 15.5px; margin: 1.1em 0 0.4em; }
+.library-text h3 { font-size: 14.5px; margin: 1em 0 0.3em; }
+.library-text h4, .library-text h5, .library-text h6 { font-size: 13.5px; margin: 0.9em 0 0.3em; }
+.library-text pre { background: var(--paper); border: 1px solid var(--rule); border-radius: 3px; padding: 6px 8px; overflow-x: auto; font-size: 12px; }
+.library-text code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.92em; }
+.library-text table { border-collapse: collapse; margin: 0 0 0.8em; font-size: 12.5px; }
+.library-text th, .library-text td { border: 1px solid var(--rule); padding: 2px 6px; text-align: left; vertical-align: top; }
+.library-text blockquote { margin: 0 0 0.8em; padding-left: 10px; border-left: 3px solid var(--rule); color: var(--ink-soft); }
+.library-text ul { margin: 0 0 0.7em; padding-left: 20px; }
+.library-text ul.numbered { list-style: none; padding-left: 4px; }
+.library-text li.depth-1 { margin-left: 16px; }
+.library-text li.depth-2 { margin-left: 32px; }
+.library-text li.depth-3 { margin-left: 48px; }
+body.library-window { padding: 10px; }
+body.library-window #library-panel { flex: 1; }
