@@ -36,7 +36,7 @@ gate 5a:  wave 1  30 weather systems, the glass and the sky, the scenario's syst
                   31c the watcher's watch: the sample's delta, the door's wait, weather events, tell/ask in the book (beside 31b)
 gate 5b:  wave 3  32 the chart data and the queries, the lookout
                   32b the cutter and the brig as ship files, the orders' grammar across four ships (beside 32; pulled forward from 35 and 36, owner 2026-09-30)
-                  32c the suite in two tiers, the days built once, a Windows job (Opus; built by the lead, the Windows job proven on GitHub's runner; launched 2026-10-01)
+                  32c the suite in two tiers, the days built once, a Windows job (Opus; landed 2026-10-01; the Windows job proven on GitHub's runner at the push)
                   32d the freesail command, the settings file and the setup step, written for any machine (Opus; after 33c and 33d; one test cycle on the owner's machine)
           wave 4  33a the reckoning, the noon sight, the captain's chart, the checkpoint save, gate 5b
                   32e staying and sheets: the fore-and-aft rig at the small vessels' scale (spec open items 12 and 13; before gate 5b; launched 2026-09-30)
