@@ -1004,6 +1004,8 @@ with the held and conflict lines and the well's two lines:
 | gate 5b passage | 837 → 679 (held 157 → 18; conflicts 21 → 1) | `d74f05aefcc4f94b` |
 | the schooner's passage | 907 → 746 (held 155 → 15; conflicts 24 → 2) | `a3e2fd0a3a07170e` |
 | the thick passage | 526 → 501 (held 31 → 6; conflicts 2 → 1) | `9f1a7626e4d4265d` |
+
+Merged with 33b the same day (33b moved the ticks, 33c the lines): the frigate's passage 677 lines, `eacae6db04e7067a`; the schooner's 749, `e41ade78138e024d`; the thick passage 501, `f4d7575fea6ada34`; the ticks as 33b's section below has them (the landfall 45000, the outer road 56494, the wear 56834, lying to 56894; the schooner's landfall 44220).
 | the day under systems | 616 → 617 (the well) | `9bd4e0bffcfb6b10` |
 
 ### Found on the way (package 33c)

@@ -2825,14 +2825,14 @@ GATE_5B_ROADS_TICK = 56494  # the outer road: the first cast under twenty fathom
 # distance by estimation is drawn once a sighting episode, and the departure's estimate
 # off Ushant ("two miles", was "a mile") put the account a mile differently, from which
 # the book shaped the course; the lines and digests below are the merge of the two.
-GATE_5B_LINES = 836
-GATE_5B_DIGEST = "7bcdb78ba3e8daae"
+GATE_5B_LINES = 677
+GATE_5B_DIGEST = "eacae6db04e7067a"
 GATE_5B_SCHOONER_LANDFALL_TICK = 44220
-GATE_5B_SCHOONER_LINES = 910
-GATE_5B_SCHOONER_DIGEST = "a17c9870a5880a6b"
+GATE_5B_SCHOONER_LINES = 749
+GATE_5B_SCHOONER_DIGEST = "e41ade78138e024d"
 GATE_5B_THICK_LANDFALL_TICK = 54480
-GATE_5B_THICK_LINES = 526
-GATE_5B_THICK_DIGEST = "cd5c2faa6b49b8c1"
+GATE_5B_THICK_LINES = 501
+GATE_5B_THICK_DIGEST = "f4d7575fea6ada34"
 
 
 def the_landfall(log):
