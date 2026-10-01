@@ -41,7 +41,7 @@ gate 5b:  wave 3  32 the chart data and the queries, the lookout
           wave 4  33a the reckoning, the noon sight, the captain's chart, the checkpoint save, gate 5b
                   32e staying and sheets: the fore-and-aft rig at the small vessels' scale (spec open items 12 and 13; before gate 5b; launched 2026-09-30)
                   (landed 2026-09-30: 31b, 31c, 32, 32b)
-gate 5c:  wave 5  33b the chronometer, the moon, the lunar and the azimuth; the captain's chart in his hands (Fable; launched 2026-10-01)
+gate 5c:  wave 5  33b the chronometer, the moon, the lunar and the azimuth; the captain's chart in his hands (Fable; landed 2026-10-01)
                   33c the passage's words: readings at the prompt, the aliases, the starter book as a choice (Opus; landed 2026-10-01)
                   33d the browser's shelf: completion, the library pane, the clock on a station, zoom and pan (Opus; landed 2026-10-01)
                   34 the tide, grounding and anchoring, as Luce has it (Fable; approved 2026-10-01, launched when 33b lands)
@@ -1079,6 +1079,8 @@ physics and evolutions (Fable)**, since these are the same subject as 32e:
 re-poll at 1x (the client's limit; a longer hold is not ours to give, but a stand-by that
 needs no re-call could be); the `in_sight` cap and the chart query above are the
 watcher's first wants for the officer's station.
+
+**Still open after 33b and 33c** (2026-10-01): the roll-up's and the library's own `_lower_first` (`core/events.py`, `agents/tools.py`, the cold review's duplicated helper) still lower a proper name's first letter when a line opens with one; the lookout's lines are right since 33b. A small item for the next pass on the log's words, with the helper made one.
 
 **Noted, not acted on**: "morning sail" never fires on the gate's passage because the
 clock starts two minutes after sunrise (the scenario's; a line in the gate report); the
