@@ -32,7 +32,7 @@ py -m pip install -e ".[dev,server,agents]"
 ```
 py -m pytest -n 4
 ```
-*Ends `2097 passed, 7 xfailed` (the build machine: about twenty-five minutes on four workers), with `2 skipped` where the ship-view tests find no Node on the machine. The seven expected failures are your earlier rulings (truth 3 for the schooner, truth 11's ground, truth 18's times, and truths 24, 26, 28 and 31). A `failed` is a fault. The three passages of this gate run in it, and the day under systems.*
+*Ends `2089 passed, 7 xfailed` (the build machine: about twenty-five minutes on four workers; the report first said 2097, the lead's miscount from a log without its summary line, corrected 2026-10-01), with `2 skipped` where the ship-view tests find no Node on the machine. The seven expected failures are your earlier rulings (truth 3 for the schooner, truth 11's ground, truth 18's times, and truths 24, 26, 28 and 31). A `failed` is a fault. The three passages of this gate run in it, and the day under systems.*
 
 ## The passages
 

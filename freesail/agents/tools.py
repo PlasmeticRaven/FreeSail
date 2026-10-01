@@ -752,7 +752,9 @@ def _paragraphs(text: str) -> list[str]:
 
 def _primer_chapters() -> list[tuple[str, str]]:
     out = []
-    for path in sorted(PRIMER_DIR.glob("0*-*.md")):
+    # every numbered chapter, in number order (the first form's glob "0*" missed chapter
+    # 10, the reckoning, found by package 33d)
+    for path in sorted(PRIMER_DIR.glob("[0-9]*-*.md"), key=lambda q: int(q.stem.split("-", 1)[0])):
         n = path.stem.split("-", 1)[0].lstrip("0") or "0"
         title = path.stem.split("-", 1)[1].replace("-", " ")
         out.append((n, title))
@@ -1332,8 +1334,9 @@ def standing_dialect_lines(vocab: Any = None) -> list[str]:
         "  when <condition> [for <duration>]: fires once when the condition comes to hold "
         "(for that long, if a duration is given), and not again until it has been false "
         "for five minutes and the work it started is done",
-        f"  at <event>: once each time the event happens. The events: {events}; later, when "
-        f"the world has them: {later}. The weather's that are its readings' changes are "
+        f"  at <event>: once each time the event happens. The events: {events}"
+        + (f"; later, when the world has them: {later}" if later else "")
+        + ". The weather's that are its readings' changes are "
         "measured from when the order stands, and afresh after each firing: 'a wind shift' "
         "is the mean wind a point or more from where it stood; 'the glass falling fast' its "
         "tendency coming to falling fast, and 'the glass turning' the last hour's change "
