@@ -6,6 +6,13 @@
  *                 starboard beam, 270 on the larboard beam) instead of the
  *                 milestone 2 default, abeam to leeward
  *   [ and ]       rotate the facing by a point (11.25 degrees); \ returns to leeward
+ *
+ * Package 33d, the browser's shelf: the console's completer under the order line as it
+ * is typed (/api/complete; Tab takes the first or the one chosen, the arrows move through
+ * them, Escape puts them away, and with none showing the arrows walk the lines given
+ * before); the library and the ship's papers in a pane of their own (library.js), opened
+ * by the button or a `library` line; the option to ease the clock on a station; the
+ * map's centre and fit buttons.
  */
 (function (root) {
   "use strict";
@@ -19,9 +26,10 @@
     facingOverride: null, // radians, or null for abeam to leeward
     history: [],
     historyIndex: -1,
+    hint: { items: [], chosen: -1, asked: 0, timer: null },
   };
 
-  var log, seaMap, svg;
+  var log, seaMap, svg, library;
 
   function $(id) {
     return document.getElementById(id);
@@ -71,6 +79,8 @@
     Array.prototype.forEach.call(buttons, function (b) {
       b.classList.toggle("active", Number(b.getAttribute("data-time")) === Number(d.compression));
     });
+    var ease = $("opt-ease-on-station");
+    if (ease && document.activeElement !== ease) ease.checked = !!d.ease_on_station;
   }
 
   // -- the server ------------------------------------------------------------------
@@ -134,6 +144,11 @@
     state.historyIndex = state.history.length;
     var words = text.split(/\s+/);
     var head = words[0].toLowerCase();
+    if (head === LIBRARY_WORD) {
+      // the browser's own word, like hold and go: the pane, not an order to the ship
+      openLibrary(text.slice(words[0].length).trim());
+      return;
+    }
     if (DRIVER_WORDS[head] && words.length <= 2) {
       var value = words[1] !== undefined ? Number(words[1]) : undefined;
       if (words.length === 2 && isNaN(value)) {
@@ -144,6 +159,104 @@
       return;
     }
     post("/api/order", { text: text });
+  }
+
+  // -- the library pane (package 33d) ------------------------------------------------
+
+  var LIBRARY_WORD = "library";
+
+  /** Open the pane beside the log, in the ship view's place, at what `words` ask for
+   * ('library primer 3', 'library find goose-wing', 'library papers'). */
+  function openLibrary(words) {
+    var panel = $("library-panel");
+    if (!library) {
+      library = new root.LibraryPane(panel, { onClose: closeLibrary });
+    }
+    panel.hidden = false;
+    document.body.classList.add("library-open");
+    library.openWords(words || "");
+  }
+
+  function closeLibrary() {
+    $("library-panel").hidden = true;
+    document.body.classList.remove("library-open");
+    drawShip();
+    $("command").focus();
+  }
+
+  // -- completion under the order line (package 33d) ------------------------------------
+
+  // How long the line rests before the completer is asked (ms): one request a pause in
+  // the typing, not one a key.
+  var HINT_DELAY_MS = 60;
+
+  function askHint(text) {
+    var h = state.hint;
+    clearTimeout(h.timer);
+    if (!text.trim()) {
+      showHint([]);
+      return;
+    }
+    h.timer = setTimeout(function () {
+      var asked = (h.asked += 1);
+      fetch("/api/complete?line=" + encodeURIComponent(text))
+        .then(function (r) {
+          return r.json();
+        })
+        .then(function (data) {
+          if (asked !== h.asked || $("command").value !== text) return; // the line moved on
+          var items = (data.suggestions || []).slice();
+          // the browser's own word, which the console has not
+          if (LIBRARY_WORD.indexOf(text.trim().toLowerCase()) === 0 && text.trim().toLowerCase() !== LIBRARY_WORD) {
+            items.push(LIBRARY_WORD);
+          }
+          showHint(items);
+        })
+        .catch(function () {
+          showHint([]);
+        });
+    }, HINT_DELAY_MS);
+  }
+
+  function showHint(items) {
+    var h = state.hint;
+    h.items = items;
+    h.chosen = -1;
+    drawHint();
+  }
+
+  function hideHint() {
+    clearTimeout(state.hint.timer);
+    state.hint.asked += 1; // an answer on its way is not shown
+    showHint([]);
+  }
+
+  function drawHint() {
+    var h = state.hint;
+    var box = $("hint");
+    box.innerHTML = "";
+    box.hidden = !h.items.length;
+    h.items.forEach(function (s, i) {
+      var item = document.createElement("span");
+      item.className = "hint-item" + (i === h.chosen ? " chosen" : "") + (i === 0 && h.chosen < 0 ? " first" : "");
+      item.setAttribute("role", "option");
+      item.textContent = s;
+      item.addEventListener("mousedown", function (ev) {
+        ev.preventDefault(); // keep the order line's focus
+        take(s);
+      });
+      box.appendChild(item);
+    });
+    var chosen = box.querySelector(".chosen");
+    if (chosen && chosen.scrollIntoView) chosen.scrollIntoView({ block: "nearest" });
+  }
+
+  /** Put a suggestion in the order line, and ask what may follow it. */
+  function take(s) {
+    var input = $("command");
+    input.value = s;
+    input.focus();
+    askHint(s);
   }
 
   function note(text) {
@@ -188,30 +301,77 @@
     });
 
     var input = $("command");
+    input.addEventListener("input", function () {
+      askHint(input.value);
+    });
+    input.addEventListener("blur", function () {
+      setTimeout(hideHint, 150);
+    });
     input.addEventListener("keydown", function (ev) {
-      if (ev.key === "Enter") {
+      var h = state.hint;
+      var showing = h.items.length > 0;
+      if (ev.key === "Tab") {
+        // Tab takes the first suggestion, or the one the arrows chose
+        if (showing) {
+          take(h.items[h.chosen >= 0 ? h.chosen : 0]);
+          ev.preventDefault();
+        } else if (input.value.trim()) {
+          ev.preventDefault(); // nothing to take; the focus stays on the line
+        }
+      } else if (ev.key === "Escape") {
+        hideHint();
+      } else if (ev.key === "Enter") {
+        if (showing && h.chosen >= 0) {
+          take(h.items[h.chosen]); // the one chosen goes into the line; Enter again gives it
+          ev.preventDefault();
+          return;
+        }
+        hideHint();
         submitLine(input.value);
         input.value = "";
-      } else if (ev.key === "ArrowUp") {
-        if (state.historyIndex > 0) {
+      } else if (ev.key === "ArrowUp" || ev.key === "ArrowDown") {
+        ev.preventDefault();
+        var down = ev.key === "ArrowDown";
+        if (showing) {
+          // the arrows move through the suggestions
+          var n = h.items.length;
+          h.chosen = down ? (h.chosen + 1) % n : h.chosen <= 0 ? n - 1 : h.chosen - 1;
+          drawHint();
+          return;
+        }
+        // with none showing, through the lines given before
+        if (!down && state.historyIndex > 0) {
           state.historyIndex -= 1;
           input.value = state.history[state.historyIndex];
-        }
-        ev.preventDefault();
-      } else if (ev.key === "ArrowDown") {
-        if (state.historyIndex < state.history.length - 1) {
+        } else if (down && state.historyIndex < state.history.length - 1) {
           state.historyIndex += 1;
           input.value = state.history[state.historyIndex];
-        } else {
+        } else if (down) {
           state.historyIndex = state.history.length;
           input.value = "";
         }
-        ev.preventDefault();
       }
     });
 
+    $("btn-library").addEventListener("click", function () {
+      if (document.body.classList.contains("library-open")) closeLibrary();
+      else openLibrary("");
+    });
+    var ease = $("opt-ease-on-station");
+    if (ease) {
+      ease.addEventListener("change", function () {
+        driver("ease_on_station", ease.checked);
+      });
+    }
+    $("btn-map-centre").addEventListener("click", function () {
+      seaMap.centre();
+    });
+    $("btn-map-fit").addEventListener("click", function () {
+      seaMap.fit();
+    });
+
     document.addEventListener("keydown", function (ev) {
-      if (ev.target === input) return;
+      if (ev.target === input || /^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName || "")) return;
       var current = state.facingOverride !== null ? state.facingOverride : state.snapshot ? P.leewardFacing(state.snapshot.ship.tack) : Math.PI / 2;
       if (ev.key === "]") state.facingOverride = U.wrap2pi(current + U.POINT);
       else if (ev.key === "[") state.facingOverride = U.wrap2pi(current - U.POINT);

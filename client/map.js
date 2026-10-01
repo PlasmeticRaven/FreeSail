@@ -9,12 +9,104 @@
  * taken and the soundings with their ground; the truth's position is not in the
  * snapshot and nothing here draws it. On the endless plane (no reckoning) the map is
  * what it was: the ship's own metres from the start and the last hour's track. The
- * truth's depth tiles are never drawn. Canvas; drawn on every snapshot. */
+ * truth's depth tiles are never drawn. Canvas; drawn on every snapshot.
+ *
+ * Package 33d: zoom and pan (playtest 12, the owner's note 4). The wheel zooms about the
+ * point under it, a drag pans, and the view then stays where it was put while the ship
+ * sails on; "centre" puts the ship in the middle and follows her at the scale chosen,
+ * and "fit" goes back to the view drawn from the track, as at first. The scale bar, the
+ * graticule and the names follow the scale (the names when a mile is thirty pixels, as
+ * before). The plane's map the same. The view's arithmetic is pure (`view`), for Node. */
 (function (root) {
   "use strict";
-  var U = root.Units;
+  var U = root.Units || (typeof require === "function" ? require("./units.js") : null);
   var TRACK_SECONDS = 3600;
   var M_PER_DEG = 60 * U.NAUTICAL_MILE; // a degree of latitude: sixty miles of 1852 m
+
+  // -- the view: a scale (pixels a metre) and a centre in the frame's metres -------------
+
+  // A notch of the wheel: a quarter as much again (judgement: eight notches from a league
+  // to a cable's view is about right on a 300-pixel map).
+  var ZOOM_STEP = 1.25;
+  // The closest and the farthest the view goes: a cable across 185 pixels at most (a pixel
+  // a metre, the ship's length in fifty), and four hundred miles across three hundred
+  // pixels at least.
+  var MAX_SCALE = 1;
+  var MIN_SCALE = 300 / (400 * U.NAUTICAL_MILE);
+  // Names on the chart when a mile is this many pixels (package 32's rule).
+  var NAMES_AT_PX_PER_MILE = 30;
+
+  function clampScale(scale) {
+    return Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale));
+  }
+
+  /** The view drawn from the track: its points (frame metres) and the ship's, at least
+   * `least` metres across, with a margin; centred on the middle of them. */
+  function fitView(points, ship, least, cw, ch) {
+    var minX = ship[0], maxX = ship[0], minY = ship[1], maxY = ship[1];
+    points.forEach(function (m) {
+      if (m[0] < minX) minX = m[0];
+      if (m[0] > maxX) maxX = m[0];
+      if (m[1] < minY) minY = m[1];
+      if (m[1] > maxY) maxY = m[1];
+    });
+    var span = Math.max(maxX - minX, maxY - minY, least) * 1.3;
+    return { scale: Math.min(cw, ch) / span, cx: (minX + maxX) / 2, cy: (minY + maxY) / 2 };
+  }
+
+  /** Frame metres to the canvas's pixels (y down), and back. */
+  function toPixels(view, cw, ch, x, y) {
+    return [cw / 2 + (x - view.cx) * view.scale, ch / 2 - (y - view.cy) * view.scale];
+  }
+
+  function fromPixels(view, cw, ch, px, py) {
+    return [view.cx + (px - cw / 2) / view.scale, view.cy - (py - ch / 2) / view.scale];
+  }
+
+  /** Zoomed by `factor` about the pixel (px, py), which stays over the same spot. */
+  function zoomAbout(view, factor, px, py, cw, ch) {
+    var spot = fromPixels(view, cw, ch, px, py);
+    var scale = clampScale(view.scale * factor);
+    return { scale: scale, cx: spot[0] - (px - cw / 2) / scale, cy: spot[1] + (py - ch / 2) / scale };
+  }
+
+  /** Panned by a drag of (dx, dy) pixels: the chart moves with the hand. */
+  function panBy(view, dx, dy) {
+    return { scale: view.scale, cx: view.cx - dx / view.scale, cy: view.cy + dy / view.scale };
+  }
+
+  /** Whether the chart's names are drawn at this scale. */
+  function namesShown(scale) {
+    return scale * U.NAUTICAL_MILE > NAMES_AT_PX_PER_MILE;
+  }
+
+  /** The graticule's step and the scale bar's, for a view `span` metres across. */
+  function gridStep(span) {
+    if (span > 100 * U.NAUTICAL_MILE) return 20 * U.NAUTICAL_MILE;
+    if (span > 20 * U.NAUTICAL_MILE) return 5 * U.NAUTICAL_MILE;
+    if (span > 20 * U.CABLE) return U.NAUTICAL_MILE;
+    return U.CABLE;
+  }
+
+  function stepWords(step) {
+    if (step === U.CABLE) return "1 cable";
+    if (step === U.NAUTICAL_MILE) return "1 mile";
+    return Math.round(step / U.NAUTICAL_MILE) + " miles";
+  }
+
+  var view = {
+    ZOOM_STEP: ZOOM_STEP,
+    MAX_SCALE: MAX_SCALE,
+    MIN_SCALE: MIN_SCALE,
+    fitView: fitView,
+    toPixels: toPixels,
+    fromPixels: fromPixels,
+    zoomAbout: zoomAbout,
+    panBy: panBy,
+    namesShown: namesShown,
+    gridStep: gridStep,
+    stepWords: stepWords,
+  };
 
   function Map(canvas) {
     this.canvas = canvas;
@@ -22,7 +114,101 @@
     this.lastTick = -1;
     this.chart = null; // {coast, features, bounds, attribution} or null
     this.chartAsked = false;
+    // the player's view: null for the view drawn from the track; {scale, follow: true} to
+    // follow the ship; {scale, follow: false, at} held at a place (latitude and longitude
+    // on the chart, the plane's metres on the plane), so it stays put as the ship sails
+    this.view = null;
+    this.drawn = null; // the last drawing's {snap, frame, view, cw, ch}, for the hand
+    this.drag = null;
+    this.listen();
   }
+
+  /** The wheel and the drag on the canvas. */
+  Map.prototype.listen = function () {
+    var self = this;
+    var canvas = this.canvas;
+    if (!canvas || !canvas.addEventListener) return;
+    canvas.addEventListener(
+      "wheel",
+      function (ev) {
+        if (!self.drawn) return;
+        ev.preventDefault();
+        var notches = ev.deltaMode === 1 ? ev.deltaY / 3 : ev.deltaY / 100;
+        var factor = Math.pow(ZOOM_STEP, Math.max(-4, Math.min(4, -notches)));
+        var r = canvas.getBoundingClientRect();
+        self.zoom(factor, ev.clientX - r.left, ev.clientY - r.top);
+      },
+      { passive: false }
+    );
+    canvas.addEventListener("pointerdown", function (ev) {
+      if (!self.drawn || ev.button !== 0) return;
+      self.drag = { x: ev.clientX, y: ev.clientY, from: self.drawn.view, moved: false };
+      if (canvas.setPointerCapture) canvas.setPointerCapture(ev.pointerId);
+      canvas.classList.add("dragging");
+    });
+    canvas.addEventListener("pointermove", function (ev) {
+      var d = self.drag;
+      if (!d) return;
+      var dx = ev.clientX - d.x, dy = ev.clientY - d.y;
+      if (!d.moved && Math.abs(dx) + Math.abs(dy) < 3) return;
+      d.moved = true;
+      self.hold(panBy(d.from, dx, dy));
+    });
+    function end() {
+      self.drag = null;
+      canvas.classList.remove("dragging");
+    }
+    canvas.addEventListener("pointerup", end);
+    canvas.addEventListener("pointercancel", end);
+  };
+
+  /** Zoom by `factor` about the pixel (px, py); following the ship, about the ship. */
+  Map.prototype.zoom = function (factor, px, py) {
+    var d = this.drawn;
+    if (!d) return;
+    if (this.view && this.view.follow) {
+      this.view = { scale: clampScale(d.view.scale * factor), follow: true };
+      this.redraw();
+      return;
+    }
+    this.hold(zoomAbout(d.view, factor, px, py, d.cw, d.ch));
+  };
+
+  /** Hold the view at this scale and centre (frame metres), as a place on the chart. */
+  Map.prototype.hold = function (v) {
+    var d = this.drawn;
+    if (!d) return;
+    this.view = { scale: v.scale, follow: false, at: d.frame.at(v.cx, v.cy) };
+    this.redraw();
+  };
+
+  /** "centre": the ship in the middle, followed, at the scale now drawn. */
+  Map.prototype.centre = function () {
+    var scale = this.drawn ? this.drawn.view.scale : null;
+    this.view = scale ? { scale: scale, follow: true } : null;
+    this.redraw();
+  };
+
+  /** "fit": the view drawn from the track again. */
+  Map.prototype.fit = function () {
+    this.view = null;
+    this.redraw();
+  };
+
+  Map.prototype.redraw = function () {
+    if (this.drawn) this.draw(this.drawn.snap);
+  };
+
+  /** The view to draw: the player's, else the fit; a place held in another frame than
+   * this one's (the world changed) is let go and the ship followed. */
+  Map.prototype.viewFor = function (fit, frame) {
+    var v = this.view;
+    if (!v) return fit;
+    if (v.follow) return { scale: v.scale, cx: frame.ship[0], cy: frame.ship[1] };
+    var c = frame.from(v.at);
+    if (!c) return { scale: v.scale, cx: frame.ship[0], cy: frame.ship[1] };
+    return { scale: v.scale, cx: c[0], cy: c[1] };
+  };
 
   Map.prototype.askChart = function () {
     if (this.chartAsked) return;
@@ -34,6 +220,7 @@
       })
       .then(function (chart) {
         self.chart = chart;
+        self.redraw(); // the coast at once, not at the next snapshot (a held clock sends none)
       })
       .catch(function () {
         self.chart = null;
@@ -42,7 +229,10 @@
 
   Map.prototype.record = function (snap) {
     var tick = snap.tick;
-    if (tick < this.lastTick) this.track = []; // a replay or a new world
+    if (tick < this.lastTick) {
+      this.track = []; // a replay or a new world
+      this.view = null;
+    }
     if (snap.reckoning) {
       // the sphere: the track is the account's, carried in the snapshot
       this.lastTick = tick;
@@ -66,11 +256,28 @@
         ship: [0, 0],
         of: function (lat, lon) {
           return [(lon - lon0) * k * M_PER_DEG, (lat - lat0) * M_PER_DEG];
+        },
+        // a place held by the player's view, and back (package 33d)
+        at: function (x, y) {
+          return { lat: lat0 + y / M_PER_DEG, lon: lon0 + x / (k * M_PER_DEG) };
+        },
+        from: function (at) {
+          return at && at.lat !== undefined ? [(at.lon - lon0) * k * M_PER_DEG, (at.lat - lat0) * M_PER_DEG] : null;
         }
       };
     }
-    return { geo: false, ship: [snap.ship.x, snap.ship.y] };
+    return {
+      geo: false,
+      ship: [snap.ship.x, snap.ship.y],
+      at: function (x, y) {
+        return { x: x, y: y };
+      },
+      from: function (at) {
+        return at && at.x !== undefined ? [at.x, at.y] : null;
+      }
+    };
   }
+  view.frameOf = frameOf;
 
   var SYMBOL = {
     headland: "point", island: "point", hill: "point", town: "point", place: "point",
@@ -117,7 +324,7 @@
     chart.features.forEach(function (f) {
       byId[f.id] = f;
     });
-    var label = scale * U.NAUTICAL_MILE > 30; // names when a mile is thirty pixels
+    var label = namesShown(scale); // names when a mile is thirty pixels
     ctx.font = "11px serif";
     ctx.textAlign = "left";
     ctx.textBaseline = "middle";
@@ -302,8 +509,8 @@
     var s0 = frame.ship;
     // scale: fit the track (the last hour's on the plane, the account's last few hours
     // on the chart) and at least a few cables around the ship; with a chart, a few miles,
-    // so the coast is seen; and the whole ellipse
-    var minX = s0[0], maxX = s0[0], minY = s0[1], maxY = s0[1];
+    // so the coast is seen; and the whole ellipse. The player's zoom and pan (33d) are
+    // drawn instead when given.
     var pts = [];
     if (frame.geo) {
       var rk = snap.reckoning;
@@ -320,40 +527,36 @@
         pts.push([p.x, p.y]);
       });
     }
-    pts.forEach(function (m) {
-      if (m[0] < minX) minX = m[0];
-      if (m[0] > maxX) maxX = m[0];
-      if (m[1] < minY) minY = m[1];
-      if (m[1] > maxY) maxY = m[1];
-    });
     var least = this.chart && frame.geo ? 4 * U.NAUTICAL_MILE : 3 * U.CABLE;
-    var span = Math.max(maxX - minX, maxY - minY, least) * 1.3;
-    var scale = Math.min(cw, ch) / span; // px per metre
-    var cx = (minX + maxX) / 2;
-    var cy = (minY + maxY) / 2;
+    var v = this.viewFor(fitView(pts, s0, least, cw, ch), frame);
+    this.drawn = { snap: snap, frame: frame, view: v, cw: cw, ch: ch };
+    var scale = v.scale; // px per metre
+    var span = Math.min(cw, ch) / scale; // the view's width, the shorter way, in metres
+    var cx = v.cx;
+    var cy = v.cy;
     function toPx(x, y) {
-      return [cw / 2 + (x - cx) * scale, ch / 2 - (y - cy) * scale];
+      return toPixels(v, cw, ch, x, y);
     }
 
     // the chart under everything else
     var year = snap.ship_time ? parseInt(snap.ship_time.slice(0, 4), 10) : 1805;
     this.drawChart(ctx, frame, toPx, scale, cw, ch, year, inkColour, landColour);
 
-    // a light graticule every cable or mile
-    var step = span > 20 * U.CABLE ? U.NAUTICAL_MILE : U.CABLE;
-    if (span > 20 * U.NAUTICAL_MILE) step = 5 * U.NAUTICAL_MILE;
+    // a light graticule every cable or mile (or five or twenty miles, zoomed out)
+    var step = gridStep(span);
+    var halfW = cw / 2 / scale, halfH = ch / 2 / scale;
     ctx.strokeStyle = "rgba(255,255,255,0.12)";
     ctx.lineWidth = 1;
-    var gx0 = Math.floor((cx - span / 2) / step) * step;
-    for (var gx = gx0; gx < cx + span / 2; gx += step) {
+    var gx0 = Math.floor((cx - halfW) / step) * step;
+    for (var gx = gx0; gx < cx + halfW; gx += step) {
       var px = toPx(gx, 0)[0];
       ctx.beginPath();
       ctx.moveTo(px, 0);
       ctx.lineTo(px, ch);
       ctx.stroke();
     }
-    var gy0 = Math.floor((cy - span / 2) / step) * step;
-    for (var gy = gy0; gy < cy + span / 2; gy += step) {
+    var gy0 = Math.floor((cy - halfH) / step) * step;
+    for (var gy = gy0; gy < cy + halfH; gy += step) {
       var py = toPx(0, gy)[1];
       ctx.beginPath();
       ctx.moveTo(0, py);
@@ -447,7 +650,7 @@
     ctx.moveTo(bx + barPx, by - 4);
     ctx.lineTo(bx + barPx, by + 4);
     ctx.stroke();
-    ctx.fillText(step === U.CABLE ? "1 cable" : step === U.NAUTICAL_MILE ? "1 mile" : "5 miles", bx, by - 6);
+    ctx.fillText(stepWords(step), bx, by - 6);
 
     // the position by account and the course made good, in the master's words
     ctx.textAlign = "right";
@@ -465,7 +668,7 @@
     ctx.fillText(where + "  ·  made good " + cmg, cw - 12, ch - 8);
     if (snap.reckoning) {
       ctx.textAlign = "left";
-      ctx.fillText(snap.reckoning.uncertainty, 12, ch - 28);
+      ctx.fillText(snap.reckoning.uncertainty, 12, ch - 36); // above the scale bar's words
     }
     if (this.chart && frame.geo && snap.lookout && snap.lookout.count) {
       ctx.textAlign = "left";
@@ -473,5 +676,7 @@
     }
   };
 
-  root.SeaMap = Map;
-})(window);
+  Map.view = view;
+  if (typeof module === "object" && module.exports) module.exports = { SeaMap: Map, view: view };
+  else root.SeaMap = Map;
+})(typeof window !== "undefined" ? window : this);
