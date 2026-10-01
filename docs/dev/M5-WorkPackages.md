@@ -934,6 +934,139 @@ Not in 33a: the chronometer, the moon and the lunar (33b), the tide and the set 
 (34), grounding's consequences and anchoring (34), the port and the pilot (35), double
 altitudes, the kedge, the `--casual` display.
 
+## Follow-ups from gate 5b's playtests (12 and 13), sorted
+
+From the owner's notes and the watcher's post-session notes and journals of playtests 12
+(the frigate's passage) and 13 (the cutter's and the brig's free passages),
+`docs/playtests/2026-10-01-gate-5b-opus-5.5-*/`, read by the lead on 2026-10-01. Each
+finding is placed where it is cheapest to build well; the packages named below are
+written for the owner's word as their predecessors land. The owner's rulings on the gate
+(the four of `gate-m5b.md` item 11) and the verdict are decision 30 when given.
+
+**Into 33b (the chronometer, the moon and the lunar), as the captain's chart's second
+half**, since every one is the chart in the captain's hands rather than the world's:
+
+- A charted mark by account: `the bearing of <mark> by the chart` and `the distance to
+  <mark>` from the reckoned position (the watcher advised from memory of the real chart);
+  `the dangers` within some miles of the account, the nearest first; both readings for
+  the dialect and the stand-by for nothing.
+- `shape a course for <place>` says when the straight line crosses or passes close to a
+  charted danger ("N by E by account, 17 miles; the line passes the Manacles within a
+  mile"), and the pilot's answer (35) is the better course; "keep her full" and the other
+  helm rules have no guard against bearing away toward a danger, which is the same
+  reading's to give (playtest 12's course ran straight on to the Manacles twice).
+- The lookout's distance by estimation drawn once per feature per sighting and held
+  while the ship makes no way, not re-drawn at every hail (the Start at four miles, four
+  leagues, three leagues in an hour of calm); a mark's distance the same in the list and
+  in a bearing taken.
+- `what is in sight` names dangers first, then lights, the land, the marks, and the cap
+  of eight does not cut a danger off; a wake event `a danger sighted` (and `a bearing
+  steady and closing` if it can be read cheaply) in `EVENTS` for the watcher and the book.
+- The light at night against the weather's visibility: the rule bounds a light by the
+  visibility as it bounds a mark, and the squalls' rain had the cutter blind to the Lizard
+  lights ten miles off after dark while it had seen the towers by day at four leagues;
+  check the period's practice (a light's loom carries in rain where a headland does not)
+  and the visibility's words in passing showers, which may sit too low for too long.
+- The features' names: "the Nare Head" of the Manacles' transit is Nare Point by the
+  Helford (Nare Head is on the Roseland), to be read again from White 1835; the chart's
+  edge north of the Start (Berry Head, Torbay) said in words by the lookout.
+- Mark names are lower-cased mid-sentence by the reading ("black Head", "manacle Point":
+  `lookout.py`'s first-letter rule on a proper name).
+
+**Into 34 (the tide, grounding and anchoring)**, since the anchor is what every passage
+wanted at its end and the set is what every reckoning lacked:
+
+- The anchor: both free passages and the gate's own ended hove to for want of it; the
+  owner's "shoal water" rule hove the cutter to in seven fathoms in an entrance where she
+  drifted back toward the Head; the book's "lie off" answer is a stopgap the gate asks
+  the owner to rule on.
+- The log over-reads and the reckoning runs east of the truth on every passage (the
+  noon fix two to three miles short; the watcher says fifteen per cent): with the tide's
+  stream in, the set becomes the world's and the captain's allowance the dialect's, and
+  the log-line's bias is to be re-measured against the study's three to eight per cent.
+- A hove-to ship's reckoning (the board's "hours hove to making no way") against her
+  true drift and forereach, which disagreed in the brig's night.
+
+**A package of its own, "the fore-and-aft rig's second pass", after 34 and before 35,
+physics and evolutions (Fable)**, since these are the same subject as 32e:
+
+- Heaving to that holds: the frigate at noon came up, every sail aback for four minutes,
+  then paid off and gathered four knots before the cast; the brig came through the wind
+  and back before settling; the cutter's heave-to "a bit uncertain" (the owner). The
+  balance when lying to against the spanker's or the mainsail's trim, the yards' aback
+  through a wear (every square sail aback mid-wear at 18:43), and the lead able to go
+  while hove to without the conflict rule breaking the heave-to.
+- Filling away sets again the sail the heave-to took in (the courses, the topgallant and
+  the spanker stayed in the gear until the captain set them by hand).
+- Way coming off in a calm: the brig held three knots for forty minutes in two knots of
+  wind (the hull's resistance at low speed; `taken aback` fired every few minutes as an
+  urgent line and eased the clock each time: urgent only above a wind floor, notable in
+  a calm).
+- `trim sails` braces the furled square yards first and starves the mainsail's trim and
+  once the lead; furled yards last or not at all. `trim sails` on the instant wind
+  chases flaws in light shifting airs; the mean wind.
+- Manoeuvres pre-empt routine work for hands: the cutter's tack queued behind the lead;
+  `tack ship` from a reach brings her by the wind first instead of refusing; `avast that`
+  belayed the tack (the last order) when the lead was meant, which the words allow.
+- Reefs: `reef the mainsail, two reefs` takes two more; a `to N reefs` form and a ceiling
+  for a reef rule that fires at every squall (the main reached four reefs).
+- The helm reading gives its side (weather or lee); "making sternway" shown at four
+  knots; the sea's words chattering through squalls (a dwell on "getting up / going
+  down"); `state`'s apparent wind at 0 knots while the readings had 13; the hands on deck
+  changing at four bells in the morning watch (`NIGHT_ENDS_HOUR`, the tuning notes'
+  structural item since 29b).
+- The viewer: the cutter's storm trysail and storm jib drawn as the mainsail and the
+  jib, and the brig's storm trysail likewise (their own spars and positions from the
+  generator); the running bowsprit redrawn at its length (the snapshot carries the spar's
+  length; 32b's note).
+
+**A small grammar package, "the passage's words" (Opus)**, which can run beside anything:
+
+- A reading asked at the prompt: the owner typed `the reckoning`, `the master`, `the
+  bearing of the Lizard` and `the reckoning's uncertainty` as the gate report's item 2
+  told them to (the lead's error in the report), and the grammar refused each, since a
+  reading is a row the instruments show, a rule tests and a model asks for, with no form
+  at the prompt. Every reading's words typed alone (or after `what is`) are answered in
+  the log as a query, as `the booms` and `the sail room` are; parity with the model's
+  `readings` tool for nothing.
+- A bearing taken by any of a feature's words when one in sight matches (`manacle` for
+  Manacle Point; `the manacles` is the danger, a different feature, and says so);
+  `belay`/`avast` by the order's words as package 29c meant (`belay heave the lead` was
+  refused for the work's log name "heaving lead"); "(1 reefs in)"; `set the mainsail,
+  one reef` as set then reef; the starter's `sound the well` held, not refused at every
+  start, until the well is a reading (spec M4 §24 item 4).
+- Aliases the owner and the watcher reached for: `steer for <place>` (the course shaped),
+  `take a sounding` and `sound` (the lead), `trim the <sail> sheet` and `tend the <sail>
+  sheet` (the sheet's trim), `the reckoning's doubt`; the owner found "the take / work up
+  / reckoning's uncertainty terms" unclear with the primer and the gate guide beside
+  him and many orders refused (`refused.md` in each playtest folder lists them with the
+  reasons): the primer's reckoning chapter to carry every form the grammar takes, in a
+  table, and a test that every form in the chapter parses.
+- The dialect: "the daylight is night" refused where "daylight is night" was taken;
+  `if she is hove to` / `if she is not hove to` as a condition (the brig's trim rules
+  belayed by hand through a heave-to); a reading for the manoeuvre in hand.
+- The standing runtime (spec open item 15): the conflict rule's grain (`heave the lead`
+  against `heave to` and `wear ship` logged as contrary orders on the ship, and at noon
+  it cost the heave-to); the held lines of an `at ... if ...` rule.
+
+**The browser (a viewer package, the first of `Presentation.md`'s, when the owner says)**:
+
+- The console's completion in the browser (`Presentation.md`); the reference library and
+  the ship's papers readable in the browser in a pane of their own, which the owner puts
+  first and allows to wait for the places and papers of 35 (the sail room's worked
+  example in `InwardAndOutward.md`); an option to ease the clock to 1x when the watcher
+  is sampled or speaks; zoom and pan on the chart.
+
+**Harness, for 33c or the officer's package (37)**: the Desktop door's 200-second
+re-poll at 1x (the client's limit; a longer hold is not ours to give, but a stand-by that
+needs no re-call could be); the `in_sight` cap and the chart query above are the
+watcher's first wants for the officer's station.
+
+**Noted, not acted on**: "morning sail" never fires on the gate's passage because the
+clock starts two minutes after sunrise (the scenario's; a line in the gate report); the
+watcher's own two mistakes, corrected by itself in the log (the spanker's trim, the helm's
+side), which are the candour the brief asked for.
+
 ## Packages 33b to 37 (outline; written in turn)
 
 As spec M5 §31 after decision 29 (owner, 2026-09-30): 33a above; 33b the chronometer, the moon and the lunar (§14's rest; truths 60 and 61; Fable);

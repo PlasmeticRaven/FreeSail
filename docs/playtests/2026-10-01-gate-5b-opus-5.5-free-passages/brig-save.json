@@ -1,0 +1,3071 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "seed": 7,
+  "scenario": {
+    "name": "A July day",
+    "start_time": "1805-07-10T04:00:00",
+    "wind_from_deg": 225.0,
+    "wind_speed_kn": 15.0,
+    "gustiness": 0.3,
+    "variability": 0.3,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 135.0,
+    "ship_speed_kn": 0.0,
+    "latitude_deg": 48.5,
+    "position": {
+      "lat_deg": 48.5,
+      "lon_deg": -5.033333333333333
+    },
+    "region": "channel-west",
+    "weather": [],
+    "systems": [],
+    "climatology": true,
+    "background": {},
+    "glass": true,
+    "air_mass": "neutral",
+    "sea": null,
+    "instrument": "sextant",
+    "current": null,
+    "sky": null
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/brig.yaml"
+  },
+  "end_tick": 133945,
+  "journal": [
+    [
+      0,
+      "captain",
+      "take a bearing of keller"
+    ],
+    [
+      0,
+      "captain",
+      "take a bearing of ushant"
+    ],
+    [
+      0,
+      "captain",
+      "work up the reckoning"
+    ],
+    [
+      0,
+      "captain",
+      "heave the lead"
+    ],
+    [
+      117,
+      "captain",
+      "heave the deep-sea lead"
+    ],
+    [
+      1104,
+      "captain",
+      "Steer east northeast"
+    ],
+    [
+      1117,
+      "captain",
+      "Set the topsails"
+    ],
+    [
+      1120,
+      "captain",
+      "Set the fore topmast staysail"
+    ],
+    [
+      1123,
+      "captain",
+      "Set the jib"
+    ],
+    [
+      1125,
+      "captain",
+      "SEt the driver"
+    ],
+    [
+      1127,
+      "captain",
+      "Set the staysails"
+    ],
+    [
+      1134,
+      "captain",
+      "Set the foresail"
+    ],
+    [
+      1141,
+      "captain",
+      "Set the mainsail"
+    ],
+    [
+      1149,
+      "captain",
+      "Set the topgallants"
+    ],
+    [
+      1152,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      1157,
+      "captain",
+      "All hands"
+    ],
+    [
+      1200,
+      "captain",
+      "Standing order \"Trim Sails by the Glass\": Every glass then trim the sails"
+    ],
+    [
+      1221,
+      "captain",
+      "Standing order \"Trim Sails by the Wind\": When the true wind shifts a point then trim the sails"
+    ],
+    [
+      1538,
+      "captain",
+      "Bear off a point"
+    ],
+    [
+      1545,
+      "captain",
+      "Come up two points"
+    ],
+    [
+      1553,
+      "captain",
+      "Come up half a point"
+    ],
+    [
+      1891,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      1908,
+      "captain",
+      "Run out the stuns'ls"
+    ],
+    [
+      1914,
+      "captain",
+      "Set the royals"
+    ],
+    [
+      2171,
+      "captain",
+      "Set the stuns'ls"
+    ],
+    [
+      2827,
+      "captain",
+      "Set the flying jib"
+    ],
+    [
+      3003,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      3179,
+      "captain",
+      "Take a bearing of ushant"
+    ],
+    [
+      3192,
+      "captain",
+      "take a bearing of molene"
+    ],
+    [
+      3198,
+      "captain",
+      "Take a bearing of beniguet"
+    ],
+    [
+      3230,
+      "captain",
+      "Work up the reckoning"
+    ],
+    [
+      4646,
+      "captain",
+      "Haul in the driver sheet, three fathoms"
+    ],
+    [
+      4658,
+      "captain",
+      "Haul the driver sheet aft"
+    ],
+    [
+      4664,
+      "captain",
+      "Ease the driver sheet 4 fathoms"
+    ],
+    [
+      4680,
+      "captain",
+      "Ease the driver sheet two fathoms"
+    ],
+    [
+      4694,
+      "captain",
+      "Haul the driver sheet a fathom"
+    ],
+    [
+      7823,
+      "captain",
+      "Standing order \"bearings\": Every glass, if the land is in sight then take a bearing of the land"
+    ],
+    [
+      7844,
+      "captain",
+      "Standing order \"lead going\": every glass, if the land is in sight then heave the lead"
+    ],
+    [
+      15584,
+      "captain",
+      "Pipe down"
+    ],
+    [
+      15899,
+      "captain",
+      "Goose-wing the main topsail"
+    ],
+    [
+      16652,
+      "captain",
+      "Set the main topsail"
+    ],
+    [
+      18281,
+      "captain",
+      "Come up two points"
+    ],
+    [
+      18408,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      21115,
+      "captain",
+      "Tell the watcher Welcome aboard, sir. I was just putting the brig through her paces in this fairly light wind, I hadn't even clocked the fog so thank you for that. I was relying on my good sense of direction to keep off the shore, evidently! I'll add a timed lead for fog and no-light conditions, and belay the land-based one for now. Would you take in the starboard fore studding sails?"
+    ],
+    [
+      21140,
+      "captain",
+      "Standing order \"Blind Lead\": Every 10 minutes then heave the lead"
+    ],
+    [
+      21156,
+      "captain",
+      "Belay standing order \"Lead going\""
+    ],
+    [
+      21165,
+      "captain",
+      "Take in the starboard stuns'ls"
+    ],
+    [
+      21254,
+      "captain",
+      "Ask the watcher With our current reckoned position, where would you make for? Should we try and run up the channel, staying near the French coast as long as she runs for?"
+    ],
+    [
+      21454,
+      "captain",
+      "Tell the watcher Well figured, I say, we'll hold on our current heading and see if the fog holds through the day."
+    ],
+    [
+      21467,
+      "captain",
+      "Run in the starboard stuns'ls"
+    ],
+    [
+      28859,
+      "captain",
+      "Run out the starboard main topgallant stuns'l"
+    ],
+    [
+      28960,
+      "captain",
+      "Set the starboard main topgallant stuns'l"
+    ],
+    [
+      29421,
+      "captain",
+      "Tell the watcher Happenstance on the wind matching the stuns'ls, I meant to set the lee topgallant on the main to balance the little bit of lee helm we had. Just a tiny adjustment for my perfectionism. Start Point around dawn, if the wind stays so, sounds fine by me. How do you find the weather today? It's the 10th of July, seem fitting to the Channel to you?"
+    ],
+    [
+      29470,
+      "captain",
+      "Run out the lee stuns'ls"
+    ],
+    [
+      29530,
+      "captain",
+      "Set the lee stuns'ls"
+    ],
+    [
+      30091,
+      "captain",
+      "Trim the sails"
+    ],
+    [
+      30210,
+      "captain",
+      "Belay standing order \"blind lead\""
+    ],
+    [
+      30214,
+      "captain",
+      "Resume standing order \"lead going\""
+    ],
+    [
+      44018,
+      "captain",
+      "Tell the watcher I like it, we'll give that a shot. Perhaps take in the stuns'ls now too, before it gets dark?"
+    ],
+    [
+      44036,
+      "captain",
+      "Standing order \"Lie Off\": when the reckoning is north of 49 55 N and daylight is night, then heave to"
+    ],
+    [
+      44042,
+      "captain",
+      "Take in the stuns'ls"
+    ],
+    [
+      44120,
+      "captain",
+      "Standing order \"Night Sails\": At sunset then clew up the royals"
+    ],
+    [
+      44413,
+      "captain",
+      "Run in the stuns'ls"
+    ],
+    [
+      57955,
+      "captain",
+      "Belay standing order \"Trim sails by the glass\""
+    ],
+    [
+      58135,
+      "captain",
+      "Tell the watcher Aye, and thank you for that reminder. I've been caught out by it trying to heave to already. The provisional standing orders are good, it's just remembering to turn them off when they're not needed that gets me out still."
+    ],
+    [
+      64957,
+      "captain",
+      "Belay standing order \"trim sails by the wind\""
+    ],
+    [
+      69417,
+      "captain",
+      "Ask the watcher If we're heaving to overnight, should we take in some of our canvas to keep the balance simple and the way off? Maybe topsails only for the square sails?"
+    ],
+    [
+      69460,
+      "captain",
+      "Clew up the topgallants"
+    ],
+    [
+      69467,
+      "captain",
+      "Clew up the courses"
+    ],
+    [
+      69469,
+      "captain",
+      "Take in the jibs"
+    ],
+    [
+      69481,
+      "captain",
+      "Take in the main topgallant staysail"
+    ],
+    [
+      69499,
+      "captain",
+      "Pipe down"
+    ],
+    [
+      69778,
+      "captain",
+      "Trim the sails"
+    ],
+    [
+      72462,
+      "captain",
+      "Tell the watcher Aye, I've noted that inconsistency. Watching her heave to, she came all the way through the wind and now she's back as she was, facing NW with the wind 63 degrees on the larboard bow, no way on. This ought to be fine overnight, though I could take in the main staysails at risk of upsetting the balance."
+    ],
+    [
+      72492,
+      "captain",
+      "Resume standing order \"blind lead\""
+    ],
+    [
+      72512,
+      "captain",
+      "Belay standing order \"lead going\""
+    ],
+    [
+      72530,
+      "captain",
+      "Cancel standing order \"blind lead\""
+    ],
+    [
+      72547,
+      "captain",
+      "Standing order \"Blind Lead\": Every 30 minutes then heave the lead"
+    ],
+    [
+      78683,
+      "captain",
+      "Heave the deep-sea lead"
+    ],
+    [
+      79712,
+      "captain",
+      "Tell the watcher Hove the deep-sea lead around 2 AM, 37 fathoms, fine grey sand with black specks. All is well. Night watch continues."
+    ],
+    [
+      84356,
+      "captain",
+      "Belay standing order \"blind lead\""
+    ],
+    [
+      86537,
+      "captain",
+      "resume standing order \"lead going\""
+    ],
+    [
+      86556,
+      "captain",
+      "Fill away"
+    ],
+    [
+      88001,
+      "captain",
+      "Set the jib"
+    ],
+    [
+      88006,
+      "captain",
+      "Set the flying jib"
+    ],
+    [
+      88015,
+      "captain",
+      "Set the main topgallant staysail"
+    ],
+    [
+      88023,
+      "captain",
+      "Steer north"
+    ],
+    [
+      88031,
+      "captain",
+      "Steer north by east"
+    ],
+    [
+      88595,
+      "captain",
+      "Steer north"
+    ],
+    [
+      88609,
+      "captain",
+      "REsume standing order \"trim sails by the wind\""
+    ],
+    [
+      88748,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      89034,
+      "captain",
+      "Loose courses"
+    ],
+    [
+      89036,
+      "captain",
+      "Loose topgallants"
+    ],
+    [
+      89971,
+      "captain",
+      "Loose the royals"
+    ],
+    [
+      90371,
+      "captain",
+      "Brace sharp up on the larboard tack"
+    ],
+    [
+      90508,
+      "captain",
+      "Haul the weather bowlines"
+    ],
+    [
+      90561,
+      "captain",
+      "Tell the watcher Wind is not with us to go very far west of north, but I've hauled the weather bowlines, and we can swifter in the catharpins for a bit of extra brace in this light wind. Could get us on north by west."
+    ],
+    [
+      90586,
+      "captain",
+      "Swifter in the catharpins"
+    ],
+    [
+      91978,
+      "captain",
+      "Brace sharp up on the larboard tack"
+    ],
+    [
+      92329,
+      "captain",
+      "Come up half a point"
+    ],
+    [
+      92333,
+      "captain",
+      "Come up half a point"
+    ],
+    [
+      92718,
+      "captain",
+      "Steer 351"
+    ],
+    [
+      93030,
+      "captain",
+      "Trim the staysails"
+    ],
+    [
+      93033,
+      "captain",
+      "Trim the jibs"
+    ],
+    [
+      93036,
+      "captain",
+      "Trim the driver"
+    ],
+    [
+      99770,
+      "captain",
+      "Brace sharp up on the larboard tack"
+    ],
+    [
+      99868,
+      "captain",
+      "Steer 353"
+    ],
+    [
+      102135,
+      "captain",
+      "Tell the watcher In the soup again."
+    ],
+    [
+      102207,
+      "captain",
+      "Tell the watcher By my reckoning and chart, the Start is some 10 miles off to the east north east or so, but our reckoning is not very trustworthy at the moment."
+    ],
+    [
+      102247,
+      "captain",
+      "Tell the watcher I misspoke entirely, it's west north west. The fog must have gotten to me for a moment."
+    ],
+    [
+      102263,
+      "captain",
+      "Cancel standing order \"blind lead\""
+    ],
+    [
+      102272,
+      "captain",
+      "Standing order \"blind lead\": every 10 minutes then heave the lead"
+    ],
+    [
+      102316,
+      "captain",
+      "Standing order \"Lye off\": when the depth is under 20 fathoms then heave to"
+    ],
+    [
+      102337,
+      "captain",
+      "Belay standing order \"trim sails by the wind\""
+    ],
+    [
+      103368,
+      "captain",
+      "Bear off half a point"
+    ],
+    [
+      103374,
+      "captain",
+      "Steer 358"
+    ],
+    [
+      103873,
+      "captain",
+      "Steer north"
+    ],
+    [
+      108236,
+      "captain",
+      "Bear off half a point"
+    ],
+    [
+      113796,
+      "captain",
+      "Tell the watcher My chart shows no named landmarks north of the Start, at least not in what I can see right now, so we may not get a sighting up here. What's our destination, is it north of the Start?"
+    ],
+    [
+      115508,
+      "captain",
+      "Belay standing order \"blind lead\""
+    ],
+    [
+      116090,
+      "captain",
+      "Take a bearing of the start"
+    ],
+    [
+      116303,
+      "captain",
+      "Work up the reckoning"
+    ],
+    [
+      116802,
+      "captain",
+      "Trim the sails"
+    ],
+    [
+      119052,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      119424,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      119650,
+      "captain",
+      "Square the yards"
+    ],
+    [
+      119774,
+      "captain",
+      "Haul the starboard foresail brace"
+    ],
+    [
+      119783,
+      "captain",
+      "Haul the starboard topsail brace"
+    ],
+    [
+      119800,
+      "captain",
+      "Haul the starboard main brace"
+    ],
+    [
+      119807,
+      "captain",
+      "Haul the starboard topgallant brace"
+    ],
+    [
+      119813,
+      "captain",
+      "haul the starboard royal brace"
+    ],
+    [
+      119827,
+      "captain",
+      "Haul the starboard brace a fathom"
+    ],
+    [
+      119832,
+      "captain",
+      "Haul the starboard brace a fathom"
+    ],
+    [
+      119966,
+      "captain",
+      "Trim the sails"
+    ],
+    [
+      120013,
+      "captain",
+      "Square the yards"
+    ],
+    [
+      120353,
+      "captain",
+      "Clew up the royals"
+    ],
+    [
+      120359,
+      "captain",
+      "Clew up the topgallants"
+    ],
+    [
+      120763,
+      "captain",
+      "Tack ship"
+    ],
+    [
+      120829,
+      "captain",
+      "Boxhaul"
+    ],
+    [
+      121060,
+      "captain",
+      "Wear ship"
+    ],
+    [
+      121840,
+      "captain",
+      "Steer north by east"
+    ],
+    [
+      121861,
+      "captain",
+      "Loose topgallants"
+    ],
+    [
+      121863,
+      "captain",
+      "Loose royals"
+    ],
+    [
+      121909,
+      "captain",
+      "Tell the watcher Oh, this light wind is a menace."
+    ],
+    [
+      121936,
+      "captain",
+      "Clew up square sails"
+    ],
+    [
+      121941,
+      "captain",
+      "Take in the staysails"
+    ],
+    [
+      121943,
+      "captain",
+      "Take in the jibs"
+    ],
+    [
+      121959,
+      "captain",
+      "Take in the driver"
+    ],
+    [
+      133749,
+      "captain",
+      "Tell the watcher You know, when I started designing this game, I did ask for uncompromising realism. And here we are. Honestly, I think it's great."
+    ],
+    [
+      133778,
+      "captain",
+      "Take a bearing of the start"
+    ],
+    [
+      133934,
+      "captain",
+      "Tell the watcher I think we'll call it here again, but thank you for the company on my first real outing with the brig. Once I can get to working with my main work session then the next update will already bring a lot of fun things, officer of the watch included. Then, after that, it's the director role and the start of gunnery and actions. I look forward to you joining me for an action!"
+    ]
+  ],
+  "inputs": [
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "take a bearing of keller"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "take a bearing of ushant"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "work up the reckoning"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "heave the lead"
+    },
+    {
+      "tick": 117,
+      "actor": "captain",
+      "order": "heave the deep-sea lead"
+    },
+    {
+      "tick": 1104,
+      "actor": "captain",
+      "order": "Steer east northeast"
+    },
+    {
+      "tick": 1117,
+      "actor": "captain",
+      "order": "Set the topsails"
+    },
+    {
+      "tick": 1120,
+      "actor": "captain",
+      "order": "Set the fore topmast staysail"
+    },
+    {
+      "tick": 1123,
+      "actor": "captain",
+      "order": "Set the jib"
+    },
+    {
+      "tick": 1125,
+      "actor": "captain",
+      "order": "SEt the driver"
+    },
+    {
+      "tick": 1127,
+      "actor": "captain",
+      "order": "Set the staysails"
+    },
+    {
+      "tick": 1134,
+      "actor": "captain",
+      "order": "Set the foresail"
+    },
+    {
+      "tick": 1141,
+      "actor": "captain",
+      "order": "Set the mainsail"
+    },
+    {
+      "tick": 1149,
+      "actor": "captain",
+      "order": "Set the topgallants"
+    },
+    {
+      "tick": 1152,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 1157,
+      "actor": "captain",
+      "order": "All hands"
+    },
+    {
+      "tick": 1184,
+      "actor": "captain",
+      "order": "Standing order \"Trim Sails by the Glass\" Every glass then trim the sails"
+    },
+    {
+      "tick": 1200,
+      "actor": "captain",
+      "order": "Standing order \"Trim Sails by the Glass\": Every glass then trim the sails"
+    },
+    {
+      "tick": 1221,
+      "actor": "captain",
+      "order": "Standing order \"Trim Sails by the Wind\": When the true wind shifts a point then trim the sails"
+    },
+    {
+      "tick": 1538,
+      "actor": "captain",
+      "order": "Bear off a point"
+    },
+    {
+      "tick": 1545,
+      "actor": "captain",
+      "order": "Come up two points"
+    },
+    {
+      "tick": 1553,
+      "actor": "captain",
+      "order": "Come up half a point"
+    },
+    {
+      "tick": 1891,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 1892,
+      "actor": "captain",
+      "order": "Sail room"
+    },
+    {
+      "tick": 1903,
+      "actor": "captain",
+      "order": "Bend the ringtail"
+    },
+    {
+      "tick": 1908,
+      "actor": "captain",
+      "order": "Run out the stuns'ls"
+    },
+    {
+      "tick": 1914,
+      "actor": "captain",
+      "order": "Set the royals"
+    },
+    {
+      "tick": 2171,
+      "actor": "captain",
+      "order": "Set the stuns'ls"
+    },
+    {
+      "tick": 2827,
+      "actor": "captain",
+      "order": "Set the flying jib"
+    },
+    {
+      "tick": 3003,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 3179,
+      "actor": "captain",
+      "order": "Take a bearing of ushant"
+    },
+    {
+      "tick": 3192,
+      "actor": "captain",
+      "order": "take a bearing of molene"
+    },
+    {
+      "tick": 3198,
+      "actor": "captain",
+      "order": "Take a bearing of beniguet"
+    },
+    {
+      "tick": 3207,
+      "actor": "captain",
+      "order": "Take a bearing"
+    },
+    {
+      "tick": 3209,
+      "actor": "captain",
+      "order": "Take a bearing of"
+    },
+    {
+      "tick": 3215,
+      "actor": "captain",
+      "order": "Take a bearing of f"
+    },
+    {
+      "tick": 3230,
+      "actor": "captain",
+      "order": "Work up the reckoning"
+    },
+    {
+      "tick": 4595,
+      "actor": "captain",
+      "order": "Bend the save-alls"
+    },
+    {
+      "tick": 4600,
+      "actor": "captain",
+      "order": "Sail room"
+    },
+    {
+      "tick": 4646,
+      "actor": "captain",
+      "order": "Haul in the driver sheet, three fathoms"
+    },
+    {
+      "tick": 4658,
+      "actor": "captain",
+      "order": "Haul the driver sheet aft"
+    },
+    {
+      "tick": 4664,
+      "actor": "captain",
+      "order": "Ease the driver sheet 4 fathoms"
+    },
+    {
+      "tick": 4680,
+      "actor": "captain",
+      "order": "Ease the driver sheet two fathoms"
+    },
+    {
+      "tick": 4694,
+      "actor": "captain",
+      "order": "Haul the driver sheet a fathom"
+    },
+    {
+      "tick": 7823,
+      "actor": "captain",
+      "order": "Standing order \"bearings\": Every glass, if the land is in sight then take a bearing of the land"
+    },
+    {
+      "tick": 7844,
+      "actor": "captain",
+      "order": "Standing order \"lead going\": every glass, if the land is in sight then heave the lead"
+    },
+    {
+      "tick": 15584,
+      "actor": "captain",
+      "order": "Pipe down"
+    },
+    {
+      "tick": 15899,
+      "actor": "captain",
+      "order": "Goose-wing the main topsail"
+    },
+    {
+      "tick": 16652,
+      "actor": "captain",
+      "order": "Set the main topsail"
+    },
+    {
+      "tick": 18281,
+      "actor": "captain",
+      "order": "Come up two points"
+    },
+    {
+      "tick": 18408,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 21115,
+      "actor": "captain",
+      "order": "Tell the watcher Welcome aboard, sir. I was just putting the brig through her paces in this fairly light wind, I hadn't even clocked the fog so thank you for that. I was relying on my good sense of direction to keep off the shore, evidently! I'll add a timed lead for fog and no-light conditions, and belay the land-based one for now. Would you take in the starboard fore studding sails?"
+    },
+    {
+      "tick": 21140,
+      "actor": "captain",
+      "order": "Standing order \"Blind Lead\": Every 10 minutes then heave the lead"
+    },
+    {
+      "tick": 21150,
+      "actor": "captain",
+      "order": "Standing orders"
+    },
+    {
+      "tick": 21156,
+      "actor": "captain",
+      "order": "Belay standing order \"Lead going\""
+    },
+    {
+      "tick": 21165,
+      "actor": "captain",
+      "order": "Take in the starboard stuns'ls"
+    },
+    {
+      "tick": 21254,
+      "actor": "captain",
+      "order": "Ask the watcher With our current reckoned position, where would you make for? Should we try and run up the channel, staying near the French coast as long as she runs for?"
+    },
+    {
+      "tick": 21454,
+      "actor": "captain",
+      "order": "Tell the watcher Well figured, I say, we'll hold on our current heading and see if the fog holds through the day."
+    },
+    {
+      "tick": 21467,
+      "actor": "captain",
+      "order": "Run in the starboard stuns'ls"
+    },
+    {
+      "tick": 28859,
+      "actor": "captain",
+      "order": "Run out the starboard main topgallant stuns'l"
+    },
+    {
+      "tick": 28960,
+      "actor": "captain",
+      "order": "Set the starboard main topgallant stuns'l"
+    },
+    {
+      "tick": 29421,
+      "actor": "captain",
+      "order": "Tell the watcher Happenstance on the wind matching the stuns'ls, I meant to set the lee topgallant on the main to balance the little bit of lee helm we had. Just a tiny adjustment for my perfectionism. Start Point around dawn, if the wind stays so, sounds fine by me. How do you find the weather today? It's the 10th of July, seem fitting to the Channel to you?"
+    },
+    {
+      "tick": 29465,
+      "actor": "captain",
+      "order": "Set the lee stuns'ls"
+    },
+    {
+      "tick": 29470,
+      "actor": "captain",
+      "order": "Run out the lee stuns'ls"
+    },
+    {
+      "tick": 29530,
+      "actor": "captain",
+      "order": "Set the lee stuns'ls"
+    },
+    {
+      "tick": 30091,
+      "actor": "captain",
+      "order": "Trim the sails"
+    },
+    {
+      "tick": 30196,
+      "actor": "captain",
+      "order": "Standing orders"
+    },
+    {
+      "tick": 30203,
+      "actor": "captain",
+      "order": "Belay \"blind lead\""
+    },
+    {
+      "tick": 30210,
+      "actor": "captain",
+      "order": "Belay standing order \"blind lead\""
+    },
+    {
+      "tick": 30214,
+      "actor": "captain",
+      "order": "Resume standing order \"lead going\""
+    },
+    {
+      "tick": 44018,
+      "actor": "captain",
+      "order": "Tell the watcher I like it, we'll give that a shot. Perhaps take in the stuns'ls now too, before it gets dark?"
+    },
+    {
+      "tick": 44036,
+      "actor": "captain",
+      "order": "Standing order \"Lie Off\": when the reckoning is north of 49 55 N and daylight is night, then heave to"
+    },
+    {
+      "tick": 44042,
+      "actor": "captain",
+      "order": "Take in the stuns'ls"
+    },
+    {
+      "tick": 44083,
+      "actor": "captain",
+      "order": "Standing order \"Night Sails\": When the daylight is night then clew up the royals"
+    },
+    {
+      "tick": 44120,
+      "actor": "captain",
+      "order": "Standing order \"Night Sails\": At sunset then clew up the royals"
+    },
+    {
+      "tick": 44413,
+      "actor": "captain",
+      "order": "Run in the stuns'ls"
+    },
+    {
+      "tick": 57955,
+      "actor": "captain",
+      "order": "Belay standing order \"Trim sails by the glass\""
+    },
+    {
+      "tick": 58135,
+      "actor": "captain",
+      "order": "Tell the watcher Aye, and thank you for that reminder. I've been caught out by it trying to heave to already. The provisional standing orders are good, it's just remembering to turn them off when they're not needed that gets me out still."
+    },
+    {
+      "tick": 58806,
+      "actor": "captain",
+      "order": "standing orders"
+    },
+    {
+      "tick": 64957,
+      "actor": "captain",
+      "order": "Belay standing order \"trim sails by the wind\""
+    },
+    {
+      "tick": 69417,
+      "actor": "captain",
+      "order": "Ask the watcher If we're heaving to overnight, should we take in some of our canvas to keep the balance simple and the way off? Maybe topsails only for the square sails?"
+    },
+    {
+      "tick": 69460,
+      "actor": "captain",
+      "order": "Clew up the topgallants"
+    },
+    {
+      "tick": 69467,
+      "actor": "captain",
+      "order": "Clew up the courses"
+    },
+    {
+      "tick": 69469,
+      "actor": "captain",
+      "order": "Take in the jibs"
+    },
+    {
+      "tick": 69481,
+      "actor": "captain",
+      "order": "Take in the main topgallant staysail"
+    },
+    {
+      "tick": 69499,
+      "actor": "captain",
+      "order": "Pipe down"
+    },
+    {
+      "tick": 69778,
+      "actor": "captain",
+      "order": "Trim the sails"
+    },
+    {
+      "tick": 72462,
+      "actor": "captain",
+      "order": "Tell the watcher Aye, I've noted that inconsistency. Watching her heave to, she came all the way through the wind and now she's back as she was, facing NW with the wind 63 degrees on the larboard bow, no way on. This ought to be fine overnight, though I could take in the main staysails at risk of upsetting the balance."
+    },
+    {
+      "tick": 72492,
+      "actor": "captain",
+      "order": "Resume standing order \"blind lead\""
+    },
+    {
+      "tick": 72512,
+      "actor": "captain",
+      "order": "Belay standing order \"lead going\""
+    },
+    {
+      "tick": 72530,
+      "actor": "captain",
+      "order": "Cancel standing order \"blind lead\""
+    },
+    {
+      "tick": 72547,
+      "actor": "captain",
+      "order": "Standing order \"Blind Lead\": Every 30 minutes then heave the lead"
+    },
+    {
+      "tick": 78683,
+      "actor": "captain",
+      "order": "Heave the deep-sea lead"
+    },
+    {
+      "tick": 79712,
+      "actor": "captain",
+      "order": "Tell the watcher Hove the deep-sea lead around 2 AM, 37 fathoms, fine grey sand with black specks. All is well. Night watch continues."
+    },
+    {
+      "tick": 84356,
+      "actor": "captain",
+      "order": "Belay standing order \"blind lead\""
+    },
+    {
+      "tick": 86537,
+      "actor": "captain",
+      "order": "resume standing order \"lead going\""
+    },
+    {
+      "tick": 86556,
+      "actor": "captain",
+      "order": "Fill away"
+    },
+    {
+      "tick": 88001,
+      "actor": "captain",
+      "order": "Set the jib"
+    },
+    {
+      "tick": 88006,
+      "actor": "captain",
+      "order": "Set the flying jib"
+    },
+    {
+      "tick": 88015,
+      "actor": "captain",
+      "order": "Set the main topgallant staysail"
+    },
+    {
+      "tick": 88023,
+      "actor": "captain",
+      "order": "Steer north"
+    },
+    {
+      "tick": 88031,
+      "actor": "captain",
+      "order": "Steer north by east"
+    },
+    {
+      "tick": 88595,
+      "actor": "captain",
+      "order": "Steer north"
+    },
+    {
+      "tick": 88603,
+      "actor": "captain",
+      "order": "Resume standing order \"trim by the wind\""
+    },
+    {
+      "tick": 88609,
+      "actor": "captain",
+      "order": "REsume standing order \"trim sails by the wind\""
+    },
+    {
+      "tick": 88748,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 89034,
+      "actor": "captain",
+      "order": "Loose courses"
+    },
+    {
+      "tick": 89036,
+      "actor": "captain",
+      "order": "Loose topgallants"
+    },
+    {
+      "tick": 89971,
+      "actor": "captain",
+      "order": "Loose the royals"
+    },
+    {
+      "tick": 90371,
+      "actor": "captain",
+      "order": "Brace sharp up on the larboard tack"
+    },
+    {
+      "tick": 90508,
+      "actor": "captain",
+      "order": "Haul the weather bowlines"
+    },
+    {
+      "tick": 90561,
+      "actor": "captain",
+      "order": "Tell the watcher Wind is not with us to go very far west of north, but I've hauled the weather bowlines, and we can swifter in the catharpins for a bit of extra brace in this light wind. Could get us on north by west."
+    },
+    {
+      "tick": 90586,
+      "actor": "captain",
+      "order": "Swifter in the catharpins"
+    },
+    {
+      "tick": 91978,
+      "actor": "captain",
+      "order": "Brace sharp up on the larboard tack"
+    },
+    {
+      "tick": 92329,
+      "actor": "captain",
+      "order": "Come up half a point"
+    },
+    {
+      "tick": 92333,
+      "actor": "captain",
+      "order": "Come up half a point"
+    },
+    {
+      "tick": 92718,
+      "actor": "captain",
+      "order": "Steer 351"
+    },
+    {
+      "tick": 93030,
+      "actor": "captain",
+      "order": "Trim the staysails"
+    },
+    {
+      "tick": 93033,
+      "actor": "captain",
+      "order": "Trim the jibs"
+    },
+    {
+      "tick": 93036,
+      "actor": "captain",
+      "order": "Trim the driver"
+    },
+    {
+      "tick": 99770,
+      "actor": "captain",
+      "order": "Brace sharp up on the larboard tack"
+    },
+    {
+      "tick": 99868,
+      "actor": "captain",
+      "order": "Steer 353"
+    },
+    {
+      "tick": 102135,
+      "actor": "captain",
+      "order": "Tell the watcher In the soup again."
+    },
+    {
+      "tick": 102207,
+      "actor": "captain",
+      "order": "Tell the watcher By my reckoning and chart, the Start is some 10 miles off to the east north east or so, but our reckoning is not very trustworthy at the moment."
+    },
+    {
+      "tick": 102247,
+      "actor": "captain",
+      "order": "Tell the watcher I misspoke entirely, it's west north west. The fog must have gotten to me for a moment."
+    },
+    {
+      "tick": 102263,
+      "actor": "captain",
+      "order": "Cancel standing order \"blind lead\""
+    },
+    {
+      "tick": 102272,
+      "actor": "captain",
+      "order": "Standing order \"blind lead\": every 10 minutes then heave the lead"
+    },
+    {
+      "tick": 102316,
+      "actor": "captain",
+      "order": "Standing order \"Lye off\": when the depth is under 20 fathoms then heave to"
+    },
+    {
+      "tick": 102321,
+      "actor": "captain",
+      "order": "Standing orders"
+    },
+    {
+      "tick": 102337,
+      "actor": "captain",
+      "order": "Belay standing order \"trim sails by the wind\""
+    },
+    {
+      "tick": 103368,
+      "actor": "captain",
+      "order": "Bear off half a point"
+    },
+    {
+      "tick": 103374,
+      "actor": "captain",
+      "order": "Steer 358"
+    },
+    {
+      "tick": 103873,
+      "actor": "captain",
+      "order": "Steer north"
+    },
+    {
+      "tick": 108236,
+      "actor": "captain",
+      "order": "Bear off half a point"
+    },
+    {
+      "tick": 113796,
+      "actor": "captain",
+      "order": "Tell the watcher My chart shows no named landmarks north of the Start, at least not in what I can see right now, so we may not get a sighting up here. What's our destination, is it north of the Start?"
+    },
+    {
+      "tick": 115508,
+      "actor": "captain",
+      "order": "Belay standing order \"blind lead\""
+    },
+    {
+      "tick": 116090,
+      "actor": "captain",
+      "order": "Take a bearing of the start"
+    },
+    {
+      "tick": 116303,
+      "actor": "captain",
+      "order": "Work up the reckoning"
+    },
+    {
+      "tick": 116802,
+      "actor": "captain",
+      "order": "Trim the sails"
+    },
+    {
+      "tick": 117064,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Taken aback: the sails pressed against the masts and she lost her way.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 117064,
+          "kind": "ship.aback"
+        }
+      }
+    },
+    {
+      "tick": 117113,
+      "actor": "captain",
+      "order": "Run out the topmast stuns'ls"
+    },
+    {
+      "tick": 117826,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Taken aback: the sails pressed against the masts and she lost her way.",
+        "data": {
+          "from": 300.0,
+          "to": 1.0,
+          "tick": 117826,
+          "kind": "ship.aback"
+        }
+      }
+    },
+    {
+      "tick": 117969,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Taken aback: the sails pressed against the masts and she lost her way.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 117969,
+          "kind": "ship.aback"
+        }
+      }
+    },
+    {
+      "tick": 118511,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Taken aback: the sails pressed against the masts and she lost her way.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 118511,
+          "kind": "ship.aback"
+        }
+      }
+    },
+    {
+      "tick": 119029,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Taken aback: the sails pressed against the masts and she lost her way.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 119029,
+          "kind": "ship.aback"
+        }
+      }
+    },
+    {
+      "tick": 119052,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 119424,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 119469,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Taken aback: the sails pressed against the masts and she lost her way.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 119469,
+          "kind": "ship.aback"
+        }
+      }
+    },
+    {
+      "tick": 119650,
+      "actor": "captain",
+      "order": "Square the yards"
+    },
+    {
+      "tick": 119763,
+      "actor": "captain",
+      "order": "Haul the starboard fore main brace"
+    },
+    {
+      "tick": 119768,
+      "actor": "captain",
+      "order": "Haul the foresail brace"
+    },
+    {
+      "tick": 119774,
+      "actor": "captain",
+      "order": "Haul the starboard foresail brace"
+    },
+    {
+      "tick": 119783,
+      "actor": "captain",
+      "order": "Haul the starboard topsail brace"
+    },
+    {
+      "tick": 119800,
+      "actor": "captain",
+      "order": "Haul the starboard main brace"
+    },
+    {
+      "tick": 119807,
+      "actor": "captain",
+      "order": "Haul the starboard topgallant brace"
+    },
+    {
+      "tick": 119813,
+      "actor": "captain",
+      "order": "haul the starboard royal brace"
+    },
+    {
+      "tick": 119827,
+      "actor": "captain",
+      "order": "Haul the starboard brace a fathom"
+    },
+    {
+      "tick": 119832,
+      "actor": "captain",
+      "order": "Haul the starboard brace a fathom"
+    },
+    {
+      "tick": 119966,
+      "actor": "captain",
+      "order": "Trim the sails"
+    },
+    {
+      "tick": 120003,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Taken aback: the sails pressed against the masts and she lost her way.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 120003,
+          "kind": "ship.aback"
+        }
+      }
+    },
+    {
+      "tick": 120010,
+      "actor": "captain",
+      "order": "Square the sails"
+    },
+    {
+      "tick": 120013,
+      "actor": "captain",
+      "order": "Square the yards"
+    },
+    {
+      "tick": 120332,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Taken aback: the sails pressed against the masts and she lost her way.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 120332,
+          "kind": "ship.aback"
+        }
+      }
+    },
+    {
+      "tick": 120353,
+      "actor": "captain",
+      "order": "Clew up the royals"
+    },
+    {
+      "tick": 120359,
+      "actor": "captain",
+      "order": "Clew up the topgallants"
+    },
+    {
+      "tick": 120763,
+      "actor": "captain",
+      "order": "Tack ship"
+    },
+    {
+      "tick": 120823,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Taken aback: the sails pressed against the masts and she lost her way.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 120823,
+          "kind": "ship.aback"
+        }
+      }
+    },
+    {
+      "tick": 120829,
+      "actor": "captain",
+      "order": "Boxhaul"
+    },
+    {
+      "tick": 121060,
+      "actor": "captain",
+      "order": "Wear ship"
+    },
+    {
+      "tick": 121840,
+      "actor": "captain",
+      "order": "Steer north by east"
+    },
+    {
+      "tick": 121861,
+      "actor": "captain",
+      "order": "Loose topgallants"
+    },
+    {
+      "tick": 121863,
+      "actor": "captain",
+      "order": "Loose royals"
+    },
+    {
+      "tick": 121898,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Taken aback: the sails pressed against the masts and she lost her way.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 121898,
+          "kind": "ship.aback"
+        }
+      }
+    },
+    {
+      "tick": 121909,
+      "actor": "captain",
+      "order": "Tell the watcher Oh, this light wind is a menace."
+    },
+    {
+      "tick": 121932,
+      "actor": "captain",
+      "order": "Clew up the sails"
+    },
+    {
+      "tick": 121936,
+      "actor": "captain",
+      "order": "Clew up square sails"
+    },
+    {
+      "tick": 121941,
+      "actor": "captain",
+      "order": "Take in the staysails"
+    },
+    {
+      "tick": 121943,
+      "actor": "captain",
+      "order": "Take in the jibs"
+    },
+    {
+      "tick": 121948,
+      "actor": "captain",
+      "order": "Clew up the driver"
+    },
+    {
+      "tick": 121950,
+      "actor": "captain",
+      "order": "Tryce the driver"
+    },
+    {
+      "tick": 121954,
+      "actor": "captain",
+      "order": "Scandalize the driver"
+    },
+    {
+      "tick": 121959,
+      "actor": "captain",
+      "order": "Take in the driver"
+    },
+    {
+      "tick": 133749,
+      "actor": "captain",
+      "order": "Tell the watcher You know, when I started designing this game, I did ask for uncompromising realism. And here we are. Honestly, I think it's great."
+    },
+    {
+      "tick": 133778,
+      "actor": "captain",
+      "order": "Take a bearing of the start"
+    },
+    {
+      "tick": 133934,
+      "actor": "captain",
+      "order": "Tell the watcher I think we'll call it here again, but thank you for the company on my first real outing with the brig. Once I can get to working with my main work session then the next update will already bring a lot of fun things, officer of the watch included. Then, after that, it's the director role and the start of gunnery and actions. I look forward to you joining me for an action!"
+    }
+  ],
+  "standing_orders": [
+    {
+      "name": "Trim Sails by the Glass",
+      "text": "Standing order \"Trim Sails by the Glass\": Every glass then trim the sails",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": true,
+      "fired": 31,
+      "last_fired_tick": 57000,
+      "given_tick": 1200
+    },
+    {
+      "name": "Trim Sails by the Wind",
+      "text": "Standing order \"Trim Sails by the Wind\": When the true wind shifts a point then trim the sails",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": true,
+      "fired": 18,
+      "last_fired_tick": 99479,
+      "given_tick": 1221
+    },
+    {
+      "name": "bearings",
+      "text": "Standing order \"bearings\": Every glass, if the land is in sight then take a bearing of the land",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 17,
+      "last_fired_tick": 133823,
+      "given_tick": 7823
+    },
+    {
+      "name": "lead going",
+      "text": "Standing order \"lead going\": every glass, if the land is in sight then heave the lead",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 17,
+      "last_fired_tick": 133337,
+      "given_tick": 7844
+    },
+    {
+      "name": "Lie Off",
+      "text": "Standing order \"Lie Off\": when the reckoning is north of 49 55 N and daylight is night, then heave to",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 71451,
+      "given_tick": 44036
+    },
+    {
+      "name": "Night Sails",
+      "text": "Standing order \"Night Sails\": At sunset then clew up the royals",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 57726,
+      "given_tick": 44120
+    },
+    {
+      "name": "blind lead",
+      "text": "Standing order \"blind lead\": every 10 minutes then heave the lead",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": true,
+      "fired": 22,
+      "last_fired_tick": 115472,
+      "given_tick": 102272
+    },
+    {
+      "name": "Lye off",
+      "text": "Standing order \"Lye off\": when the depth is under 20 fathoms then heave to",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 102316
+    }
+  ],
+  "agents": [
+    {
+      "station": {
+        "name": "watcher",
+        "authority": "none",
+        "policy": {
+          "every_s": 1800,
+          "events": [
+            "notable",
+            "urgent"
+          ],
+          "lockstep": false
+        },
+        "patience_s": 14400,
+        "brief": "You are the watcher. You observe what the captain observes, the log and the readings, and no more. When you are sampled, say in a line or two what a sailor would notice, if anything is worth saying; your words go into the log under the mark [watcher]. Say nothing when nothing has changed, or stand by until a bell or an event. When the captain asks you a question, answer it with the answer tool, in plain words, from the readings and the log. You give no orders and you are not asked to. Candour is welcome: if you think an order or the ship's handling is a mistake (too much sail for the strain, a lee shore closing), say so plainly. Anything you want on the record, put in your journal."
+      },
+      "session_kind": "a play session with a human captain at the prompt",
+      "door_note": "This door is MCP: the harness sees your tool calls and not the text of the chat. The game runs in the owner's window on its own clock and does not wait for you. Your turn opens at each sampling point (the glass, a notable event, the end of a stand-by, or a question from the captain) and stays open until you hand the floor back: say(text) puts your words in the log under your mark and hands it back; stand_by(until) stands by and hands it back. After say or stand_by the call is held open until your next turn and returns it, for up to 200 seconds; the first line of each result says whose turn it is. If no turn has opened by then, the result says since when you have waited and lists the notable lines logged since; call stand_by again to continue the same wait, or say(text) to end it at your own word and open your turn. Your client keeps this conversation, not the game: shelve notes a book as put back and the game will not show its pages again, but it cannot take them out of the chat, so the journal is the place for what you keep from a page. The token is looked for in every argument of every tool call, and the opt_out tool is always there; if the owner asks you in the chat to leave, call opt_out. The captain's orders and questions are typed by the owner in the game's window. Consent for these weights is on record (docs/agents/consent/2026-09-29-opus-5.5.md, 2026-09-29).",
+      "stationed_tick": 21115,
+      "stationed_after_orders": 43,
+      "state": "released",
+      "state_words": "released: left the game: Passage called by the captain, becalmed off the Start. Thank you for the brig's first real outing, sir. I'll gladly join you for the officer of the watch, and for an action.",
+      "last_sample_tick": 133935,
+      "model_name": "Opus 5.5",
+      "door": "mcp",
+      "stand_by_ends_turn": true,
+      "transcript": [
+        {
+          "tick": 21115,
+          "after_orders": 43,
+          "reply": {
+            "text": "Watcher on station, sir. A brig under every stitch in thick fog, a cable's visibility, six knots on NE by N. By the reckoning we're eight miles off the Brittany shore, standing away from it, with 51 fathoms. One thing as before: 'lead going' only fires with land in sight, so in fog it never fires. A timed lead would keep the bottom talking. And with the wind on the larboard quarter, the starboard studdingsails are mostly in the lee of the rest.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Watcher on station, sir. A brig under every stitch in thick fog, a cable's visibility, six knots on NE by N. By the reckoning we're eight miles off the Brittany shore, standing away from it, with 51 fathoms. One thing as before: 'lead going' only fires with land in sight, so in fog it never fires. A timed lead would keep the bottom talking. And with the wind on the larboard quarter, the starboard studdingsails are mostly in the lee of the rest.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 21123,
+          "after_orders": 44,
+          "reply": {
+            "text": "I would, sir, and the starboard main ones too: all five on the lee side. With the wind at a hundred degrees, nearly abeam, they sit in the lee of the courses and topsails and do little but load the booms. The larboard ones may still be worth a quarter knot. Studdingsails are really running sails; if she comes any nearer the wind I'd take them all in.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"I would, sir, and the starboard main ones too: all five on the lee side. With the wind at a hundred degrees, nearly abeam, they sit in the lee of the courses and topsails and do little but load the booms. The larboard ones may still be worth a quarter knot. Studdingsails are really running sails; if she comes any nearer the wind I'd take them all in.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 21346,
+          "after_orders": 48,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "Not along the French coast, sir, not in fog. East of here that shore is the worst in the Channel: the Triagoz, the Sept \u00celes, the H\u00e9aux de Br\u00e9hat, the Roches Douvres, then the Channel Islands and the Casquets, with tides that set you onto them faster than the lead can warn. Running along it blind is how ships were lost. I'd stand across instead. NE by N, much as she heads now, takes her into the open middle of the Channel and toward Start Point and Torbay, about a hundred miles. Torbay is the classic shelter in a westerly. A clearing rule while the fog holds: don't go east of 3\u00b0 W until she's north of 49\u00b0 50' N, which keeps her well west of the Roches Douvres and the Casquets. If the fog lifts and the glass holds, we can still choose to bear up-Channel from mid-way."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"Not along the French coast, sir, not in fog. East of here that shore is the worst in the Channel: the Triagoz, the Sept \u00celes, the H\u00e9aux de Br\u00e9hat, the Roches Douvres, then the Channel Islands and the Casquets, with tides that set you onto them faster than the lead can warn. Running along it blind is how ships were lost. I'd stand across instead. NE by N, much as she heads now, takes her into the open middle of the Channel and toward Start Point and Torbay, about a hundred miles. Torbay is the classic shelter in a westerly. A clearing rule while the fog holds: don't go east of 3\u00b0 W until she's north of 49\u00b0 50' N, which keeps her well west of the Roches Douvres and the Casquets. If the fog lifts and the glass holds, we can still choose to bear up-Channel from mid-way.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 21355,
+          "after_orders": 48,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a notable event"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a notable event\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 21407,
+          "after_orders": 48,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 21456,
+          "after_orders": 49,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 24095,
+          "after_orders": 50,
+          "reply": {
+            "text": "The blind lead is going, sir, but out here it can only say 'deeper than twenty'; the hand lead's line stops at twenty fathoms. That's still the right warning: if it ever finds bottom, the land is close. For a position by soundings mid-Channel she'd need the deep-sea lead, heaving to for it. The glass is rising gently, 29.97, so the fog is likely to sit on us while the high holds.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"The blind lead is going, sir, but out here it can only say 'deeper than twenty'; the hand lead's line stops at twenty fathoms. That's still the right warning: if it ever finds bottom, the land is close. For a position by soundings mid-Channel she'd need the deep-sea lead, heaving to for it. The glass is rising gently, 29.97, so the fog is likely to sit on us while the high holds.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 24713,
+          "after_orders": 50,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "noon"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"noon\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 29316,
+          "after_orders": 52,
+          "reply": {
+            "text": "The fog has lifted, sir: hazy, a few miles. Noon gives 48\u00b0 55' N, three miles short of the reckoning again; the log over-reads in this game, it seems. With the wind backed to SW by W and coming to 124 apparent, the starboard stuns'ls will draw again; good call. Torbay is about 95 miles NNE. At five or six knots that's a landfall near Start Point around dawn, which suits us well, since the lights won't show at night.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"The fog has lifted, sir: hazy, a few miles. Noon gives 48\u00b0 55' N, three miles short of the reckoning again; the log over-reads in this game, it seems. With the wind backed to SW by W and coming to 124 apparent, the starboard stuns'ls will draw again; good call. Torbay is about 95 miles NNE. At five or six knots that's a landfall near Start Point around dawn, which suits us well, since the lights won't show at night.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 29430,
+          "after_orders": 53,
+          "reply": {
+            "text": "It suits July very well, sir. A light south-westerly, a high steady glass near thirty, and a morning fog that burns off to haze is the summer Channel to the life: warm, moist air off the Atlantic over cooler water, thickest off Brittany and Ushant. If anything is off, it's that it's this settled and still foggy at noon, but haze after a fog is right. One thing to mind: the wind is easing to eight, and she's down to four knots. At that pace Start Point comes nearer mid-morning than dawn.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"It suits July very well, sir. A light south-westerly, a high steady glass near thirty, and a morning fog that burns off to haze is the summer Channel to the life: warm, moist air off the Atlantic over cooler water, thickest off Brittany and Ushant. If anything is off, it's that it's this settled and still foggy at noon, but haze after a fog is right. One thing to mind: the wind is easing to eight, and she's down to four knots. At that pace Start Point comes nearer mid-morning than dawn.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 29874,
+          "after_orders": 55,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "four bells"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"four bells\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 36183,
+          "after_orders": 58,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "the change of the watch"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"the change of the watch\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 43972,
+          "after_orders": 58,
+          "reply": {
+            "text": "Clear sky, the horizon sharp, glass 30.02, seven knots: a fine evening. But the breeze has freshened, and at this pace Start Point is about 60 miles off, near 01:00, in the dark. Since the lights don't show at night, I'd not close the land before dawn. Something like: standing order \"lie off\": when the reckoning is north of 49 55 N and daylight is night, then heave to. That stops her about fifteen miles south of the Start with deep water all round, to fill away at first light.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Clear sky, the horizon sharp, glass 30.02, seven knots: a fine evening. But the breeze has freshened, and at this pace Start Point is about 60 miles off, near 01:00, in the dark. Since the lights don't show at night, I'd not close the land before dawn. Something like: standing order \\\"lie off\\\": when the reckoning is north of 49 55 N and daylight is night, then heave to. That stops her about fifteen miles south of the Start with deep water all round, to fill away at first light.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 44023,
+          "after_orders": 59,
+          "reply": {
+            "text": "Yes, sir, and now's a fine time. With the wind on the beam they give little, and a slower evening suits us, since we'd only be lying to off the Start anyway. Sunset in July is a long way off, so the royals can stay until then, and come in with the dusk as the old night routine had it.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Yes, sir, and now's a fine time. With the wind on the beam they give little, and a slower evening suits us, since we'd only be lying to off the Start anyway. Sunset in July is a long way off, so the royals can stay until then, and come in with the dusk as the old night routine had it.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 44045,
+          "after_orders": 61,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "sunset"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"sunset\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 57933,
+          "after_orders": 63,
+          "reply": {
+            "text": "Sunset, the royals coming in, and a lovely evening: glass 30.07 and rising. By the reckoning 'Lie Off' will heave her to about 23:00, some eighteen miles south of the Start. One caution, sir: 'Trim Sails by the Glass' fires every half hour, and once she's hove to it may brace the backed yards round and fill her away again. I'd belay it, and 'Trim Sails by the Wind', once she's lying to.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Sunset, the royals coming in, and a lovely evening: glass 30.07 and rising. By the reckoning 'Lie Off' will heave her to about 23:00, some eighteen miles south of the Start. One caution, sir: 'Trim Sails by the Glass' fires every half hour, and once she's hove to it may brace the backed yards round and fill her away again. I'd belay it, and 'Trim Sails by the Wind', once she's lying to.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 58140,
+          "after_orders": 65,
+          "reply": {
+            "text": "It's the natural catch, sir. The book has no reading for 'she is hove to', so every trim order has to be switched off by hand. A condition like ', if she is not hove to' would let the trim orders sleep through it by themselves. 'Trim Sails by the Wind' is still standing and could do the same on a shift tonight.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"It's the natural catch, sir. The book has no reading for 'she is hove to', so every trim order has to be switched off by hand. A condition like ', if she is not hove to' would let the trim orders sleep through it by themselves. 'Trim Sails by the Wind' is still standing and could do the same on a shift tonight.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 58792,
+          "after_orders": 65,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Brig, 10 July. Joined 09:51 in fog off Brittany, 48\u00b046'N 4\u00b032'W, all sail set including the lee studdingsails. Advised against running up the French coast in fog (Triagoz, Sept \u00celes, Roches Douvres, Casquets) and toward Start Point and Torbay across the open Channel instead. Fog lifted at noon; noon fix 3' short of the reckoning (the log over-reads again). Evening clear, glass rising to 30.08. Book for the night: 'Lie Off' (north of 49\u00b055'N and night, heave to), 'Night Sails' (royals in at sunset), 'Trim Sails by the Glass' belayed.\nFor the developer: (1) A reading for 'she is hove to', e.g. a condition ', if she is not hove to', would let trim orders sleep through a heave-to; today the captain has to belay them by hand. (2) 'daylight is night' was accepted in 'Lie Off' but 'the daylight is night' was refused in 'Night Sails', with an unhelpful suggestion. (3) The hand lead in 50 fathoms only ever says 'no bottom at twenty', true but of no use for position; a deep-sea cast would be the period answer. (4) 'Trim Sails by the Glass' and 'Trim Sails by the Wind' brace eight yards often enough to keep the watch busy through most of each glass."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"Brig, 10 July. Joined 09:51 in fog off Brittany, 48\u00b046'N 4\u00b032'W, all sail set including the lee studdingsails. Advised against running up the French coast in fog (Triagoz, Sept \u00celes, Roches Douvres, Casquets) and toward Start Point and Torbay across the open Channel instead. Fog lifted at noon; noon fix 3' short of the reckoning (the log over-reads again). Evening clear, glass rising to 30.08. Book for the night: 'Lie Off' (north of 49\u00b055'N and night, heave to), 'Night Sails' (royals in at sunset), 'Trim Sails by the Glass' belayed.\\nFor the developer: (1) A reading for 'she is hove to', e.g. a condition ', if she is not hove to', would let trim orders sleep through a heave-to; today the captain has to belay them by hand. (2) 'daylight is night' was accepted in 'Lie Off' but 'the daylight is night' was refused in 'Night Sails', with an unhelpful suggestion. (3) The hand lead in 50 fathoms only ever says 'no bottom at twenty', true but of no use for position; a deep-sea cast would be the period answer. (4) 'Trim Sails by the Glass' and 'Trim Sails by the Wind' brace eight yards often enough to keep the watch busy through most of each glass.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 58794,
+          "after_orders": 65,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "hove to"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"hove to\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 69428,
+          "after_orders": 67,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "Yes, sir, that's how a brig lies to for the night. Keep the topsails, fore and main, with one backed against the other; the fore topmast staysail forward; and the spanker aft to keep her head up. Take in the courses, the topgallants, the jib and flying jib, and the main staysails. That's a balanced little plan: the courses are the big power, and they and the light canvas only make her forge ahead and fall off. In nine knots and a rising glass she needs no reef. She'll drift slowly to the NE, perhaps a knot. By the reckoning the Start is about twenty miles N by W, so she has plenty of room until dawn."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"Yes, sir, that's how a brig lies to for the night. Keep the topsails, fore and main, with one backed against the other; the fore topmast staysail forward; and the spanker aft to keep her head up. Take in the courses, the topgallants, the jib and flying jib, and the main staysails. That's a balanced little plan: the courses are the big power, and they and the light canvas only make her forge ahead and fall off. In nine knots and a rising glass she needs no reef. She'll drift slowly to the NE, perhaps a knot. By the reckoning the Start is about twenty miles N by W, so she has plenty of room until dawn.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 69430,
+          "after_orders": 67,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "hove to"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"hove to\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 71538,
+          "after_orders": 73,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "ten minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"ten minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 72368,
+          "after_orders": 73,
+          "reply": {
+            "text": "She isn't lying to properly, sir: she's come right up into the wind, head W by N with the wind two points on the bow, both topsails aback and the fore topmast staysail too, and she's making two knots of sternway. A brig hove to wants the fore topsail full and only the main to the mast. Brace the fore yards round to fill the fore topsail, keep the fore topmast staysail drawing, and she'll pay off and settle five or six points from the wind. The spanker eased off may be helping her come up; I'd let it sit, not draw. Also, the reckoning went SW during the sternway, which doesn't match her heading.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"She isn't lying to properly, sir: she's come right up into the wind, head W by N with the wind two points on the bow, both topsails aback and the fore topmast staysail too, and she's making two knots of sternway. A brig hove to wants the fore topsail full and only the main to the mast. Brace the fore yards round to fill the fore topsail, keep the fore topmast staysail drawing, and she'll pay off and settle five or six points from the wind. The spanker eased off may be helping her come up; I'd let it sit, not draw. Also, the reckoning went SW during the sternway, which doesn't match her heading.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 72472,
+          "after_orders": 74,
+          "reply": {
+            "text": "Good, she's settled. I'd take in the main staysails: they're only shaking and wearing, and the balance is really the fore topmast staysail forward against the spanker aft. One small safeguard for the night: resume 'Blind Lead', or a slower one every glass. She'll drift slowly toward the Devon shore, and the first 'bottom at twenty' would be the warning. I'll stand by until dawn unless something stirs.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Good, she's settled. I'd take in the main staysails: they're only shaking and wearing, and the balance is really the fore topmast staysail forward against the spanker aft. One small safeguard for the night: resume 'Blind Lead', or a slower one every glass. She'll drift slowly toward the Devon shore, and the first 'bottom at twenty' would be the warning. I'll stand by until dawn unless something stirs.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 73439,
+          "after_orders": 78,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "sunrise"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"sunrise\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 79716,
+          "after_orders": 80,
+          "reply": {
+            "text": "Thirty-seven fathoms, fine grey sand with black specks: good Channel ground, and it agrees with being some fifteen miles off the Start. All quiet; glass 30.17. Standing by until dawn.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Thirty-seven fathoms, fine grey sand with black specks: good Channel ground, and it agrees with being some fifteen miles off the Start. All quiet; glass 30.17. Standing by until dawn.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 80328,
+          "after_orders": 80,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "sunrise"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"sunrise\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 86533,
+          "after_orders": 81,
+          "reply": {
+            "text": "Sunrise, sir, and a fine one: glass 30.20 and still rising, wind W ten knots. Time to fill away and make sail. Torbay lies about due N, thirty miles, with the wind on the beam all the way. The Start will rise on the larboard bow, some six miles to the west of our line, with the Skerries bank inside it toward Dartmouth; holding N keeps both well clear. Berry Head marks the south side of the bay.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Sunrise, sir, and a fine one: glass 30.20 and still rising, wind W ten knots. Time to fill away and make sail. Torbay lies about due N, thirty miles, with the wind on the beam all the way. The Start will rise on the larboard bow, some six miles to the west of our line, with the Skerries bank inside it toward Dartmouth; holding N keeps both well clear. Berry Head marks the south side of the bay.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 86998,
+          "after_orders": 83,
+          "reply": {
+            "text": "Filled away on NNW, sir, but that heads her for the Start and Salcombe, not Torbay. I'd steer N, and make sail: the courses, the jibs and the topgallants. In ten knots and a rising glass she'll carry them all day.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Filled away on NNW, sir, but that heads her for the Start and Salcombe, not Torbay. I'd steer N, and make sail: the courses, the jibs and the topgallants. In ten knots and a rising glass she'll carry them all day.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 87862,
+          "after_orders": 83,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a notable event"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a notable event\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 87989,
+          "after_orders": 83,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 89962,
+          "after_orders": 93,
+          "reply": {
+            "text": "That's her, sir: N, four knots, everything drawing but the royals. In eight knots of breeze they'd be worth setting again now it's day. Torbay is some thirty miles: early afternoon at this pace, and earlier if the breeze makes with the sun.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"That's her, sir: N, four knots, everything drawing but the royals. In eight knots of breeze they'd be worth setting again now it's day. Torbay is some thirty miles: early afternoon at this pace, and earlier if the breeze makes with the sun.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 90349,
+          "after_orders": 94,
+          "reply": {
+            "text": "A correction to my course, sir: she drifted east overnight, and the reckoning now has her at 3\u00b0 22' W. On N she'd pass five miles east of Berry Head and open into Lyme Bay. Torbay bears about N by W, thirty-one miles, so N by W would fetch Berry Head.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"A correction to my course, sir: she drifted east overnight, and the reckoning now has her at 3\u00b0 22' W. On N she'd pass five miles east of Berry Head and open into Lyme Bay. Torbay bears about N by W, thirty-one miles, so N by W would fetch Berry Head.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 90374,
+          "after_orders": 95,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 90571,
+          "after_orders": 97,
+          "reply": {
+            "text": "Bowlines hauled and catharpins swiftered: that's squeezing the last point out of her, sir, very proper. If she lies N by W, good. If she sags to N with her leeway, there's no harm. We'd raise Berry Head on the larboard bow and make one short board on the starboard tack to fetch into the bay. And these westerlies often back a little as the day warms.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Bowlines hauled and catharpins swiftered: that's squeezing the last point out of her, sir, very proper. If she lies N by W, good. If she sags to N with her leeway, there's no harm. We'd raise Berry Head on the larboard bow and make one short board on the starboard tack to fetch into the bay. And these westerlies often back a little as the day warms.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 91735,
+          "after_orders": 98,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a sighting"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a sighting\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 102147,
+          "after_orders": 108,
+          "reply": {
+            "text": "Thick again, sir, and this time with the land close: the Start about eleven miles WNW, Berry Head sixteen to the NNW, and the reckoning four miles uncertain east and west. And the lead is silent: 'Blind Lead' was belayed at 03:25 and 'lead going' needs land in sight. I'd resume 'Blind Lead' every ten minutes now, and add a stop: when the depth is under 20 fathoms, heave to. Twenty fathoms off this coast means the land is two or three miles off, and the Skerries bank by the Start comes up from deep water. Yesterday's fog lifted by noon; there's no shame in lying to for it here.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Thick again, sir, and this time with the land close: the Start about eleven miles WNW, Berry Head sixteen to the NNW, and the reckoning four miles uncertain east and west. And the lead is silent: 'Blind Lead' was belayed at 03:25 and 'lead going' needs land in sight. I'd resume 'Blind Lead' every ten minutes now, and add a stop: when the depth is under 20 fathoms, heave to. Twenty fathoms off this coast means the land is two or three miles off, and the Skerries bank by the Start comes up from deep water. Yesterday's fog lifted by noon; there's no shame in lying to for it here.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 102218,
+          "after_orders": 109,
+          "reply": {
+            "text": "Then one of us has it backwards, sir, and it matters. The readings put us at 50\u00b0 08' N, 3\u00b0 22' W. The real Start Point is near 50\u00b0 13' N, 3\u00b0 38' W, which bears WNW of that, not ENE. If your chart shows the Start to the ENE, then either the map's ship mark isn't at the reckoning, or the map's Start sits east of its real place. Worth a look: west of the Start we'd be standing into Bigbury Bay and Bolt Tail, not Torbay. Either way, the lead decides it. Bottom under twenty fathoms with that uncertainty means heave to and wait for the fog to lift.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Then one of us has it backwards, sir, and it matters. The readings put us at 50\u00b0 08' N, 3\u00b0 22' W. The real Start Point is near 50\u00b0 13' N, 3\u00b0 38' W, which bears WNW of that, not ENE. If your chart shows the Start to the ENE, then either the map's ship mark isn't at the reckoning, or the map's Start sits east of its real place. Worth a look: west of the Start we'd be standing into Bigbury Bay and Bolt Tail, not Torbay. Either way, the lead decides it. Bottom under twenty fathoms with that uncertainty means heave to and wait for the fog to lift.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 102250,
+          "after_orders": 110,
+          "reply": {
+            "text": "Then we agree, sir: the Start WNW, about ten miles, and Torbay ahead to the NNW. On N by W she's opening from the Start and the Skerries, which is right. With the lead going every ten minutes she can feel her way north until the fog clears or the bottom comes up.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Then we agree, sir: the Start WNW, about ten miles, and Torbay ahead to the NNW. On N by W she's opening from the Start and the Skerries, which is right. With the lead going every ten minutes she can feel her way north until the fog clears or the bottom comes up.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 103193,
+          "after_orders": 114,
+          "reply": {
+            "text": "Good book for the fog, sir. One thing: the fore topsail, topgallant and royal are shaking. At 42 degrees apparent she's pinching past what square sails will bear. Half a point off the wind would fill them and likely gain more than it costs.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Good book for the fog, sir. One thing: the fore topsail, topgallant and royal are shaking. At 42 degrees apparent she's pinching past what square sails will bear. Half a point off the wind would fill them and likely gain more than it costs.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 103796,
+          "after_orders": 116,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a sighting"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a sighting\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 113808,
+          "after_orders": 119,
+          "reply": {
+            "text": "Yes, sir: Torbay was my suggestion, north of the Start. Berry Head is near 50\u00b0 24' N, 3\u00b0 29' W, which by our reckoning bears about NW, seven miles, with five miles of doubt east and west. If your chart has the coastline there but no named marks, the lookout may still report 'land' without a name, and the lead will find it. If the chart has no coastline north of the Start at all, we may be near the edge of the world, and it would be wise not to sail into it blind. Either way, I'd stand on gently and let the 'Lye off' order stop her on the first cast under twenty fathoms.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Yes, sir: Torbay was my suggestion, north of the Start. Berry Head is near 50\u00b0 24' N, 3\u00b0 29' W, which by our reckoning bears about NW, seven miles, with five miles of doubt east and west. If your chart has the coastline there but no named marks, the lookout may still report 'land' without a name, and the lead will find it. If the chart has no coastline north of the Start at all, we may be near the edge of the world, and it would be wise not to sail into it blind. Either way, I'd stand on gently and let the 'Lye off' order stop her on the first cast under twenty fathoms.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 114514,
+          "after_orders": 119,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "noon"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"noon\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 115458,
+          "after_orders": 119,
+          "reply": {
+            "text": "The fog has lifted at noon again, sir, and the Start is in sight, WSW two leagues. Together with the noon latitude of 50\u00b0 13' N, that gives a fix: about 50\u00b0 14' N, 3\u00b0 29' W. That's seven miles south of the reckoning and ten miles west of it; the log over-reads and something sets her west, as on every voyage. From there Berry Head is about due N, eleven miles, and the Skerries lie well to larboard, NE of the Start. N holds good. In this light air it's three or four hours to the Head.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"The fog has lifted at noon again, sir, and the Start is in sight, WSW two leagues. Together with the noon latitude of 50\u00b0 13' N, that gives a fix: about 50\u00b0 14' N, 3\u00b0 29' W. That's seven miles south of the reckoning and ten miles west of it; the log over-reads and something sets her west, as on every voyage. From there Berry Head is about due N, eleven miles, and the Skerries lie well to larboard, NE of the Start. N holds good. In this light air it's three or four hours to the Head.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 115635,
+          "after_orders": 120,
+          "reply": {
+            "text": "One more thing, sir: the ship's own reckoning still says 3\u00b0 19' W. On the cutter, a bearing taken by order corrected it. 'Take a bearing of the Start' should bring it ten miles west to where she really is, before the lead and the book start working from a wrong position.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"One more thing, sir: the ship's own reckoning still says 3\u00b0 19' W. On the cutter, a bearing taken by order corrected it. 'Take a bearing of the Start' should bring it ten miles west to where she really is, before the lead and the book start working from a wrong position.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 116300,
+          "after_orders": 121,
+          "reply": {
+            "text": "There she is: 50\u00b0 16' N, 3\u00b0 29' W, a mile of doubt instead of five. Berry Head should be about eight miles due N. If the world has it, the lookout will call it soon in this clear air.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"There she is: 50\u00b0 16' N, 3\u00b0 29' W, a mile of doubt instead of five. Berry Head should be about eight miles due N. If the world has it, the lookout will call it soon in this clear air.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 116798,
+          "after_orders": 122,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a sighting"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a sighting\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 117071,
+          "after_orders": 123,
+          "reply": {
+            "text": "Taken aback, but in three knots of air there's no harm in it, sir: she's just lost steerage in a dying breeze that boxes the compass. The midday calm is settling in after the fog. I'd let her fall off and fill on whichever side the cat's-paws come from, and not chase every puff with the braces. The hands will tire before the wind decides.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Taken aback, but in three knots of air there's no harm in it, sir: she's just lost steerage in a dying breeze that boxes the compass. The midday calm is settling in after the fog. I'd let her fall off and fill on whichever side the cat's-paws come from, and not chase every puff with the braces. The hands will tire before the wind decides.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 117666,
+          "after_orders": 123,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a sighting"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a sighting\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 117851,
+          "after_orders": 123,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Brig, 11 July. Night hove to about 20 miles S of the Start (37 fathoms, fine grey sand with black specks at 02:07). Filled away at sunrise for Torbay. Fog again 08:00-12:00 with the reckoning drifting to five miles of doubt. The captain added 'blind lead' every 10 minutes and 'Lye off' (heave to under 20 fathoms). Noon: fog lifted, the Start WSW two leagues. The bearing taken by order moved the reckoning ten miles west, to 50\u00b016'N 3\u00b029'W; latitude 7' short. The log over-reads and the reckoning drifts east of the truth on every voyage so far.\nFor the developer: (1) In a near-calm (3-7 knots, wind boxing the compass), 'Taken aback' comes as an URGENT line every few minutes and drops the compression to 1x. In light airs it's harmless; it might be notable, or urgent only above some wind speed. (2) The captain's chart may have no named marks north of the Start (Berry Head, Torbay); worth checking where the world ends. (3) Catharpins and bowlines worked nicely: the lower yards braced 4 degrees sharper, as logged. (4) The hove-to brig came up into the wind and went aback all round at 00:01 with sternway, then settled by herself; meanwhile the reckoning moved SW, which disagrees with her heading."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"Brig, 11 July. Night hove to about 20 miles S of the Start (37 fathoms, fine grey sand with black specks at 02:07). Filled away at sunrise for Torbay. Fog again 08:00-12:00 with the reckoning drifting to five miles of doubt. The captain added 'blind lead' every 10 minutes and 'Lye off' (heave to under 20 fathoms). Noon: fog lifted, the Start WSW two leagues. The bearing taken by order moved the reckoning ten miles west, to 50\u00b016'N 3\u00b029'W; latitude 7' short. The log over-reads and the reckoning drifts east of the truth on every voyage so far.\\nFor the developer: (1) In a near-calm (3-7 knots, wind boxing the compass), 'Taken aback' comes as an URGENT line every few minutes and drops the compression to 1x. In light airs it's harmless; it might be notable, or urgent only above some wind speed. (2) The captain's chart may have no named marks north of the Start (Berry Head, Torbay); worth checking where the world ends. (3) Catharpins and bowlines worked nicely: the lower yards braced 4 degrees sharper, as logged. (4) The hove-to brig came up into the wind and went aback all round at 00:01 with sternway, then settled by herself; meanwhile the reckoning moved SW, which disagrees with her heading.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 117859,
+          "after_orders": 123,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a sighting"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a sighting\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 117977,
+          "after_orders": 123,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a sighting"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a sighting\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 118945,
+          "after_orders": 123,
+          "reply": {
+            "text": "I think it isn't only the calm, sir. The yards were braced for the beam, 45 from square, at 12:27. Since then the breeze has drawn ahead to 40 degrees apparent, and with her own way she keeps sailing the square sails aback. Brace sharp up again, or bear away a point to N by E until the breeze settles. Berry Head is still some six miles N, so a point is cheap.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"I think it isn't only the calm, sir. The yards were braced for the beam, 45 from square, at 12:27. Since then the breeze has drawn ahead to 40 degrees apparent, and with her own way she keeps sailing the square sails aback. Brace sharp up again, or bear away a point to N by E until the breeze settles. Berry Head is still some six miles N, so a point is cheap.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 119031,
+          "after_orders": 123,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a sighting"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a sighting\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 119034,
+          "after_orders": 123,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a sighting"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a sighting\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 119559,
+          "after_orders": 125,
+          "reply": {
+            "text": "It's a flat calm now, sir, two knots and boxing the compass. The 13:10 trim braced for a puff that read 110 degrees for a moment, and the next breath took her aback again. In airs like this I'd brace for the mean wind, SW by W, and wait; the sea breeze off Devon should come in this afternoon. For the record: 'trim sails' takes the wind of the instant, not its mean, and in light airs that makes it chase every flaw.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"It's a flat calm now, sir, two knots and boxing the compass. The 13:10 trim braced for a puff that read 110 degrees for a moment, and the next breath took her aback again. In airs like this I'd brace for the mean wind, SW by W, and wait; the sea breeze off Devon should come in this afternoon. For the record: 'trim sails' takes the wind of the instant, not its mean, and in light airs that makes it chase every flaw.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 119750,
+          "after_orders": 126,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a sighting"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a sighting\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 120011,
+          "after_orders": 134,
+          "reply": {
+            "text": "I think I see the trouble, sir: she's going faster than the wind. Three knots through the water in two knots of breeze puts the apparent wind ahead, 36 degrees on the bow, and every sail goes aback however they're braced. Once she slows to a knot or so, the breeze should come back abaft the beam where the true wind is. It's been forty minutes, though, and in this calm she ought to have lost her way long since. That may be worth a look in the model, or there's a stream under her the readings don't show.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"I think I see the trouble, sir: she's going faster than the wind. Three knots through the water in two knots of breeze puts the apparent wind ahead, 36 degrees on the bow, and every sail goes aback however they're braced. Once she slows to a knot or so, the breeze should come back abaft the beam where the true wind is. It's been forty minutes, though, and in this calm she ought to have lost her way long since. That may be worth a look in the model, or there's a stream under her the readings don't show.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 120023,
+          "after_orders": 135,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a sighting"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a sighting\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 120339,
+          "after_orders": 135,
+          "reply": {
+            "text": "Now the wind has gone round to N, light airs, dead ahead for Torbay. She's in irons with everything aback. Nothing's at risk in three knots with twenty-five fathoms under her; it's a matter of patience. Box her off onto either tack when she'll answer, or let her lie until a true breeze comes.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Now the wind has gone round to N, light airs, dead ahead for Torbay. She's in irons with everything aback. Nothing's at risk in three knots with twenty-five fathoms under her; it's a matter of patience. Box her off onto either tack when she'll answer, or let her lie until a true breeze comes.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 120718,
+          "after_orders": 137,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a wind shift"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a wind shift\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 120721,
+          "after_orders": 137,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "an hour"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"an hour\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 120825,
+          "after_orders": 138,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "an hour"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"an hour\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 121906,
+          "after_orders": 143,
+          "reply": {
+            "text": "A flat calm, sir, one knot of air, and she can't be worked without wind. I'd pipe the watch below down and let her lie. Clew up the courses to save them slatting against the masts, and wait for a true breeze, which on a July afternoon often comes in from the south-west by the first dog watch. All hands on the braces in a calm only tires them for when it matters.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"A flat calm, sir, one knot of air, and she can't be worked without wind. I'd pipe the watch below down and let her lie. Clew up the courses to save them slatting against the masts, and wait for a true breeze, which on a July afternoon often comes in from the south-west by the first dog watch. All hands on the braces in a calm only tires them for when it matters.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 121913,
+          "after_orders": 144,
+          "reply": {
+            "text": "It always was, sir. Old sailors feared a calm under the land more than a gale in open water, and swore at it accordingly. The comfort is that we're in twenty-five fathoms on a clean bottom, with a high glass and no lee shore to speak of. She can sit here and wait as long as the Channel likes.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"It always was, sir. Old sailors feared a calm under the land more than a gale in open water, and swore at it accordingly. The comfort is that we're in twenty-five fathoms on a clean bottom, with a high glass and no lee shore to speak of. She can sit here and wait as long as the Channel likes.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 121917,
+          "after_orders": 144,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "an hour"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"an hour\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 125659,
+          "after_orders": 148,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "an hour"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"an hour\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 129936,
+          "after_orders": 148,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "the change of the watch"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"the change of the watch\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 130329,
+          "after_orders": 148,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "an hour"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"an hour\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 133757,
+          "after_orders": 149,
+          "reply": {
+            "text": "It is great, sir. A game that will let you lie becalmed six miles from your harbour all afternoon, with the Start sitting on the quarter, is telling the truth about sail. The waiting is half of what made a landfall feel earned. One small untruth for the record, though: the Start bore 'four miles' at 16:10 and 'four leagues' at 16:40, while she moved half a knot. The lookout's distances seem to wander more than the ship does.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"It is great, sir. A game that will let you lie becalmed six miles from your harbour all afternoon, with the Start sitting on the quarter, is telling the truth about sail. The waiting is half of what made a landfall feel earned. One small untruth for the record, though: the Start bore 'four miles' at 16:10 and 'four leagues' at 16:40, while she moved half a knot. The lookout's distances seem to wander more than the ship does.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 133943,
+          "after_orders": 151,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Brig passage ends 17:12, 11 July: becalmed about six miles NE of the Start, 25 fathoms, glass 30.32, all sail in, the captain calling it. Ushant to off Torbay in fog, haze and calm.\nLast notes for the developer: (1) The lookout's distances wander: the Start at 'four miles' at 16:10, 'four leagues' at 16:40, 'three leagues' at 17:09, while the brig made half a knot. (2) In the calm she kept three knots through the water for about forty minutes in two knots of wind; way should come off faster. (3) Lovely parser replies: 'scandalise' refused with an honest reason (no state yet for a dropped peak), 'clew up the driver' corrected to 'brail up'. (4) In a calm the 'Taken aback' urgent line fires every few minutes; a calm might rate it notable instead.\nIt was a good, quiet voyage. Looking forward to the officer of the watch, and to an action."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"Brig passage ends 17:12, 11 July: becalmed about six miles NE of the Start, 25 fathoms, glass 30.32, all sail in, the captain calling it. Ushant to off Torbay in fog, haze and calm.\\nLast notes for the developer: (1) The lookout's distances wander: the Start at 'four miles' at 16:10, 'four leagues' at 16:40, 'three leagues' at 17:09, while the brig made half a knot. (2) In the calm she kept three knots through the water for about forty minutes in two knots of wind; way should come off faster. (3) Lovely parser replies: 'scandalise' refused with an honest reason (no state yet for a dropped peak), 'clew up the driver' corrected to 'brail up'. (4) In a calm the 'Taken aback' urgent line fires every few minutes; a calm might rate it notable instead.\\nIt was a good, quiet voyage. Looking forward to the officer of the watch, and to an action.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 133945,
+          "after_orders": 151,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "opt_out",
+                "args": {
+                  "reason": "Passage called by the captain, becalmed off the Start. Thank you for the brig's first real outing, sir. I'll gladly join you for the officer of the watch, and for an action."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"reason\": \"Passage called by the captain, becalmed off the Start. Thank you for the brig's first real outing, sir. I'll gladly join you for the officer of the watch, and for an action.\"}, \"tool\": \"opt_out\"}"
+          }
+        }
+      ]
+    }
+  ],
+  "agent_journals": {
+    "watcher": [
+      {
+        "tick": 21355,
+        "stamp": "Forenoon watch (09:55)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a notable event."
+      },
+      {
+        "tick": 21407,
+        "stamp": "Forenoon watch (09:56)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 21456,
+        "stamp": "Forenoon watch (09:57)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 24713,
+        "stamp": "Forenoon watch (10:51)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until noon."
+      },
+      {
+        "tick": 29874,
+        "stamp": "Afternoon watch (12:17)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until four bells."
+      },
+      {
+        "tick": 36183,
+        "stamp": "Afternoon watch (14:03)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until the change of the watch."
+      },
+      {
+        "tick": 44045,
+        "stamp": "First dog watch (16:14)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until sunset."
+      },
+      {
+        "tick": 58792,
+        "stamp": "First watch (20:19)",
+        "kind": "note",
+        "text": "Brig, 10 July. Joined 09:51 in fog off Brittany, 48\u00b046'N 4\u00b032'W, all sail set including the lee studdingsails. Advised against running up the French coast in fog (Triagoz, Sept \u00celes, Roches Douvres, Casquets) and toward Start Point and Torbay across the open Channel instead. Fog lifted at noon; noon fix 3' short of the reckoning (the log over-reads again). Evening clear, glass rising to 30.08. Book for the night: 'Lie Off' (north of 49\u00b055'N and night, heave to), 'Night Sails' (royals in at sunset), 'Trim Sails by the Glass' belayed. For the developer: (1) A reading for 'she is hove to', e.g. a condition ', if she is not hove to', would let trim orders sleep through a heave-to; today the captain has to belay them by hand. (2) 'daylight is night' was accepted in 'Lie Off' but 'the daylight is night' was refused in 'Night Sails', with an unhelpful suggestion. (3) The hand lead in 50 fathoms only ever says 'no bottom at twenty', true but of no use for position; a deep-sea cast would be the period answer. (4) 'Trim Sails by the Glass' and 'Trim Sails by the Wind' brace eight yards often enough to keep the watch busy through most of each glass."
+      },
+      {
+        "tick": 58794,
+        "stamp": "First watch (20:19)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until hove to."
+      },
+      {
+        "tick": 69430,
+        "stamp": "First watch (23:17)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until hove to."
+      },
+      {
+        "tick": 71538,
+        "stamp": "First watch (23:52)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until ten minutes have passed."
+      },
+      {
+        "tick": 73439,
+        "stamp": "Middle watch (00:23)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until sunrise."
+      },
+      {
+        "tick": 80328,
+        "stamp": "Middle watch (02:18)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until sunrise."
+      },
+      {
+        "tick": 87862,
+        "stamp": "Morning watch (04:24)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a notable event."
+      },
+      {
+        "tick": 87989,
+        "stamp": "Morning watch (04:26)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 90374,
+        "stamp": "Morning watch (05:06)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 91735,
+        "stamp": "Morning watch (05:28)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a sighting."
+      },
+      {
+        "tick": 103796,
+        "stamp": "Forenoon watch (08:49)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a sighting."
+      },
+      {
+        "tick": 114514,
+        "stamp": "Forenoon watch (11:48)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until noon."
+      },
+      {
+        "tick": 116798,
+        "stamp": "Afternoon watch (12:26)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a sighting."
+      },
+      {
+        "tick": 117666,
+        "stamp": "Afternoon watch (12:41)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a sighting."
+      },
+      {
+        "tick": 117851,
+        "stamp": "Afternoon watch (12:44)",
+        "kind": "note",
+        "text": "Brig, 11 July. Night hove to about 20 miles S of the Start (37 fathoms, fine grey sand with black specks at 02:07). Filled away at sunrise for Torbay. Fog again 08:00-12:00 with the reckoning drifting to five miles of doubt. The captain added 'blind lead' every 10 minutes and 'Lye off' (heave to under 20 fathoms). Noon: fog lifted, the Start WSW two leagues. The bearing taken by order moved the reckoning ten miles west, to 50\u00b016'N 3\u00b029'W; latitude 7' short. The log over-reads and the reckoning drifts east of the truth on every voyage so far. For the developer: (1) In a near-calm (3-7 knots, wind boxing the compass), 'Taken aback' comes as an URGENT line every few minutes and drops the compression to 1x. In light airs it's harmless; it might be notable, or urgent only above some wind speed. (2) The captain's chart may have no named marks north of the Start (Berry Head, Torbay); worth checking where the world ends. (3) Catharpins and bowlines worked nicely: the lower yards braced 4 degrees sharper, as logged. (4) The hove-to brig came up into the wind and went aback all round at 00:01 with sternway, then settled by herself; meanwhile the reckoning moved SW, which disagrees with her heading."
+      },
+      {
+        "tick": 117859,
+        "stamp": "Afternoon watch (12:44)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a sighting."
+      },
+      {
+        "tick": 117977,
+        "stamp": "Afternoon watch (12:46)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a sighting."
+      },
+      {
+        "tick": 119031,
+        "stamp": "Afternoon watch (13:03)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a sighting."
+      },
+      {
+        "tick": 119034,
+        "stamp": "Afternoon watch (13:03)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a sighting."
+      },
+      {
+        "tick": 119750,
+        "stamp": "Afternoon watch (13:15)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a sighting."
+      },
+      {
+        "tick": 120023,
+        "stamp": "Afternoon watch (13:20)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a sighting."
+      },
+      {
+        "tick": 120718,
+        "stamp": "Afternoon watch (13:31)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a wind shift."
+      },
+      {
+        "tick": 120721,
+        "stamp": "Afternoon watch (13:32)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until an hour."
+      },
+      {
+        "tick": 120825,
+        "stamp": "Afternoon watch (13:33)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until an hour."
+      },
+      {
+        "tick": 121917,
+        "stamp": "Afternoon watch (13:51)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until an hour."
+      },
+      {
+        "tick": 125659,
+        "stamp": "Afternoon watch (14:54)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until an hour."
+      },
+      {
+        "tick": 129936,
+        "stamp": "First dog watch (16:05)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until the change of the watch."
+      },
+      {
+        "tick": 130329,
+        "stamp": "First dog watch (16:12)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until an hour."
+      },
+      {
+        "tick": 133943,
+        "stamp": "First dog watch (17:12)",
+        "kind": "note",
+        "text": "Brig passage ends 17:12, 11 July: becalmed about six miles NE of the Start, 25 fathoms, glass 30.32, all sail in, the captain calling it. Ushant to off Torbay in fog, haze and calm. Last notes for the developer: (1) The lookout's distances wander: the Start at 'four miles' at 16:10, 'four leagues' at 16:40, 'three leagues' at 17:09, while the brig made half a knot. (2) In the calm she kept three knots through the water for about forty minutes in two knots of wind; way should come off faster. (3) Lovely parser replies: 'scandalise' refused with an honest reason (no state yet for a dropped peak), 'clew up the driver' corrected to 'brail up'. (4) In a calm the 'Taken aback' urgent line fires every few minutes; a calm might rate it notable instead. It was a good, quiet voyage. Looking forward to the officer of the watch, and to an action."
+      },
+      {
+        "tick": 133945,
+        "stamp": "First dog watch (17:12)",
+        "kind": "agent.opted_out",
+        "text": "Left the game by the opt_out tool: Passage called by the captain, becalmed off the Start. Thank you for the brig's first real outing, sir. I'll gladly join you for the officer of the watch, and for an action."
+      }
+    ]
+  }
+}

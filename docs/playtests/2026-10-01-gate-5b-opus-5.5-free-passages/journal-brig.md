@@ -1,0 +1,41 @@
+# The watcher's journal: the brig's free passage (Opus 5.5 through Claude Desktop)
+
+Every entry of the watcher's journal as the save holds it (`agent_journals`), the harness's own entries (stand-bys, the exit) included. Verbatim.
+
+- **Forenoon watch (09:55)** (agent.stood_by): Stood by until a notable event.
+- **Forenoon watch (09:56)** (agent.stood_by): Stood by until a glass.
+- **Forenoon watch (09:57)** (agent.stood_by): Stood by until a glass.
+- **Forenoon watch (10:51)** (agent.stood_by): Stood by until noon.
+- **Afternoon watch (12:17)** (agent.stood_by): Stood by until four bells.
+- **Afternoon watch (14:03)** (agent.stood_by): Stood by until the change of the watch.
+- **First dog watch (16:14)** (agent.stood_by): Stood by until sunset.
+- **First watch (20:19)** (note): Brig, 10 July. Joined 09:51 in fog off Brittany, 48°46'N 4°32'W, all sail set including the lee studdingsails. Advised against running up the French coast in fog (Triagoz, Sept Îles, Roches Douvres, Casquets) and toward Start Point and Torbay across the open Channel instead. Fog lifted at noon; noon fix 3' short of the reckoning (the log over-reads again). Evening clear, glass rising to 30.08. Book for the night: 'Lie Off' (north of 49°55'N and night, heave to), 'Night Sails' (royals in at sunset), 'Trim Sails by the Glass' belayed. For the developer: (1) A reading for 'she is hove to', e.g. a condition ', if she is not hove to', would let trim orders sleep through a heave-to; today the captain has to belay them by hand. (2) 'daylight is night' was accepted in 'Lie Off' but 'the daylight is night' was refused in 'Night Sails', with an unhelpful suggestion. (3) The hand lead in 50 fathoms only ever says 'no bottom at twenty', true but of no use for position; a deep-sea cast would be the period answer. (4) 'Trim Sails by the Glass' and 'Trim Sails by the Wind' brace eight yards often enough to keep the watch busy through most of each glass.
+- **First watch (20:19)** (agent.stood_by): Stood by until hove to.
+- **First watch (23:17)** (agent.stood_by): Stood by until hove to.
+- **First watch (23:52)** (agent.stood_by): Stood by until ten minutes have passed.
+- **Middle watch (00:23)** (agent.stood_by): Stood by until sunrise.
+- **Middle watch (02:18)** (agent.stood_by): Stood by until sunrise.
+- **Morning watch (04:24)** (agent.stood_by): Stood by until a notable event.
+- **Morning watch (04:26)** (agent.stood_by): Stood by until a glass.
+- **Morning watch (05:06)** (agent.stood_by): Stood by until a glass.
+- **Morning watch (05:28)** (agent.stood_by): Stood by until a sighting.
+- **Forenoon watch (08:49)** (agent.stood_by): Stood by until a sighting.
+- **Forenoon watch (11:48)** (agent.stood_by): Stood by until noon.
+- **Afternoon watch (12:26)** (agent.stood_by): Stood by until a sighting.
+- **Afternoon watch (12:41)** (agent.stood_by): Stood by until a sighting.
+- **Afternoon watch (12:44)** (note): Brig, 11 July. Night hove to about 20 miles S of the Start (37 fathoms, fine grey sand with black specks at 02:07). Filled away at sunrise for Torbay. Fog again 08:00-12:00 with the reckoning drifting to five miles of doubt. The captain added 'blind lead' every 10 minutes and 'Lye off' (heave to under 20 fathoms). Noon: fog lifted, the Start WSW two leagues. The bearing taken by order moved the reckoning ten miles west, to 50°16'N 3°29'W; latitude 7' short. The log over-reads and the reckoning drifts east of the truth on every voyage so far. For the developer: (1) In a near-calm (3-7 knots, wind boxing the compass), 'Taken aback' comes as an URGENT line every few minutes and drops the compression to 1x. In light airs it's harmless; it might be notable, or urgent only above some wind speed. (2) The captain's chart may have no named marks north of the Start (Berry Head, Torbay); worth checking where the world ends. (3) Catharpins and bowlines worked nicely: the lower yards braced 4 degrees sharper, as logged. (4) The hove-to brig came up into the wind and went aback all round at 00:01 with sternway, then settled by herself; meanwhile the reckoning moved SW, which disagrees with her heading.
+- **Afternoon watch (12:44)** (agent.stood_by): Stood by until a sighting.
+- **Afternoon watch (12:46)** (agent.stood_by): Stood by until a sighting.
+- **Afternoon watch (13:03)** (agent.stood_by): Stood by until a sighting.
+- **Afternoon watch (13:03)** (agent.stood_by): Stood by until a sighting.
+- **Afternoon watch (13:15)** (agent.stood_by): Stood by until a sighting.
+- **Afternoon watch (13:20)** (agent.stood_by): Stood by until a sighting.
+- **Afternoon watch (13:31)** (agent.stood_by): Stood by until a wind shift.
+- **Afternoon watch (13:32)** (agent.stood_by): Stood by until an hour.
+- **Afternoon watch (13:33)** (agent.stood_by): Stood by until an hour.
+- **Afternoon watch (13:51)** (agent.stood_by): Stood by until an hour.
+- **Afternoon watch (14:54)** (agent.stood_by): Stood by until an hour.
+- **First dog watch (16:05)** (agent.stood_by): Stood by until the change of the watch.
+- **First dog watch (16:12)** (agent.stood_by): Stood by until an hour.
+- **First dog watch (17:12)** (note): Brig passage ends 17:12, 11 July: becalmed about six miles NE of the Start, 25 fathoms, glass 30.32, all sail in, the captain calling it. Ushant to off Torbay in fog, haze and calm. Last notes for the developer: (1) The lookout's distances wander: the Start at 'four miles' at 16:10, 'four leagues' at 16:40, 'three leagues' at 17:09, while the brig made half a knot. (2) In the calm she kept three knots through the water for about forty minutes in two knots of wind; way should come off faster. (3) Lovely parser replies: 'scandalise' refused with an honest reason (no state yet for a dropped peak), 'clew up the driver' corrected to 'brail up'. (4) In a calm the 'Taken aback' urgent line fires every few minutes; a calm might rate it notable instead. It was a good, quiet voyage. Looking forward to the officer of the watch, and to an action.
+- **First dog watch (17:12)** (agent.opted_out): Left the game by the opt_out tool: Passage called by the captain, becalmed off the Start. Thank you for the brig's first real outing, sir. I'll gladly join you for the officer of the watch, and for an action.

@@ -1,0 +1,2072 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "seed": 7,
+  "scenario": {
+    "name": "The passage for gate 5b, Ushant to Falmouth",
+    "start_time": "1805-06-10T04:00:00",
+    "wind_from_deg": 225.0,
+    "wind_speed_kn": 15.0,
+    "gustiness": 0.3,
+    "variability": 0.3,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 357.0,
+    "ship_speed_kn": 0.0,
+    "latitude_deg": 48.5,
+    "position": {
+      "lat_deg": 48.5,
+      "lon_deg": -5.033333333333333
+    },
+    "region": "channel-west",
+    "weather": [
+      {
+        "at": "1805-06-10T04:00:00",
+        "from_deg": 225.0,
+        "knots": 15.0,
+        "air_mass": "neutral"
+      },
+      {
+        "at": "1805-06-10T16:00:00",
+        "from_deg": 235.0,
+        "knots": 14.0
+      },
+      {
+        "at": "1805-06-11T04:00:00",
+        "from_deg": 250.0,
+        "knots": 12.0
+      }
+    ],
+    "systems": [
+      {
+        "name": "the old high over Biscay",
+        "kind": "high",
+        "radius_km": 900,
+        "track": [
+          {
+            "at": "1805-06-09T12:00:00",
+            "x_km": 300,
+            "y_km": -500,
+            "hpa": 1024
+          },
+          {
+            "at": "1805-06-11T12:00:00",
+            "x_km": 500,
+            "y_km": -600,
+            "hpa": 1022
+          }
+        ]
+      }
+    ],
+    "climatology": false,
+    "background": {
+      "hpa": 1018.0,
+      "gradient_hpa_per_100km": 0.4,
+      "high_toward_deg": 200.0
+    },
+    "glass": true,
+    "air_mass": "neutral",
+    "sea": true,
+    "instrument": "sextant",
+    "current": null,
+    "sky": {
+      "sky": "clear",
+      "weather": "fine",
+      "visibility": "the horizon"
+    }
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/frigate-36.yaml"
+  },
+  "end_tick": 53749,
+  "journal": [
+    [
+      0,
+      "captain",
+      "standing order \"night routine\": at sunset then take in the studdingsails; take in the royals"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"morning sail\": at sunrise, if the true wind is under 20 knots then set the royals"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"shorten sail for weather\": when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; take in the topgallants; reef the topsails, one reef"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"keep her full\": when the apparent wind is forward of 55 degrees then bear away one point"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"trim on a shift\": when the true wind veers 1 point or backs 1 point then trim sails"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"tend the sheets\": every glass then trim the sheets"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"heavy weather\": when the true wind exceeds 40 knots for 5 minutes then close reef the topsails; send down the topgallant masts; take in the fore topmast staysail; bend the fore storm staysail"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"storm staysail\": when the fore storm staysail is furled and the true wind exceeds 40 knots then set the fore storm staysail"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"bearings\": every glass, if the land is in sight then take a bearing of the land"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"bring to for soundings\": at noon then heave to"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"soundings\": when the speed is under 3 knots and the distance run since noon is under 5 miles then heave the deep-sea lead"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"fill away after the cast\": at a sounding, if the distance run since noon is under 5 miles then fill away"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"stand on\": at filled away then shape a course for Falmouth"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"landfall\": when the land is in sight then take a bearing of the land; shape a course for Falmouth"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"lead going\": every glass, if the land is in sight and the distance run since noon exceeds 20 miles then heave the lead"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"lead going in\": every 10 minutes, if the land is in sight and the distance run since noon exceeds 35 miles then heave the lead"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"the outer road\": when the depth is under 20 fathoms then wear ship"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"lie off\": at wore then heave to on the starboard tack"
+    ],
+    [
+      0,
+      "captain",
+      "set plain sail"
+    ],
+    [
+      0,
+      "captain",
+      "steer N"
+    ],
+    [
+      0,
+      "captain",
+      "take a bearing of the light on Ushant"
+    ],
+    [
+      3738,
+      "captain",
+      "Tell the watcher Noted, and thank you. I like your idea, but for the purpose of this particular first voyage we shall see how the orders carry her. We may take another voyage afterwards, where we experiment more."
+    ],
+    [
+      3777,
+      "captain",
+      "Trim the yards"
+    ],
+    [
+      4284,
+      "captain",
+      "Tell the watcher You may stand by at the bell or at the glass, or as you please."
+    ],
+    [
+      14427,
+      "captain",
+      "Tell the watcher Thank you, are you enjoying the passage so far? Clear day for it, by my reckoning."
+    ],
+    [
+      14484,
+      "captain",
+      "Tell the watcher This is a fine first passage by the book, but something I'm looking forward to is taking it fresh, without any preset standing orders, or fewer, and seeing if I'm up to getting the ship through the passage."
+    ],
+    [
+      14529,
+      "captain",
+      "Trim the spanker"
+    ],
+    [
+      14615,
+      "captain",
+      "Haul in the spanker sheet"
+    ],
+    [
+      14620,
+      "captain",
+      "Haul in the spanker sheet"
+    ],
+    [
+      14624,
+      "captain",
+      "Haul in the spanker sheet two fathoms"
+    ],
+    [
+      14650,
+      "captain",
+      "Haul in the spanker sheet a fathom, handsomely"
+    ],
+    [
+      14670,
+      "captain",
+      "Ask the watcher What do you make of it now?"
+    ],
+    [
+      14694,
+      "captain",
+      "Trim the spanker"
+    ],
+    [
+      30137,
+      "captain",
+      "Set the spanker"
+    ],
+    [
+      30141,
+      "captain",
+      "Set the courses"
+    ],
+    [
+      30144,
+      "captain",
+      "Set the fore topgallant"
+    ],
+    [
+      30355,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      31029,
+      "captain",
+      "work up the reckoning"
+    ],
+    [
+      32504,
+      "captain",
+      "Tell the watcher Noted. The expectation is that the voyage should run basically on its' own, so we shall see what happens. It's worth seeing either way."
+    ],
+    [
+      42740,
+      "captain",
+      "Tell the watcher Aye, understood. We shall see how the standing orders handle her, and if a problem occurs then that's a valuable note."
+    ],
+    [
+      45605,
+      "captain",
+      "Tell the watcher Thank you kindly. Our voyage ends by the book at the outer road, hove to. No anchor on board her yet, so if we make it there safely and see what happens then all has gone well."
+    ],
+    [
+      48221,
+      "captain",
+      "Ask the watcher With what we can make out now, and our reckoning, what point would you steer by to ensure we stay clear of the manacles, and how late could we leave it to see how she does per the orders?"
+    ],
+    [
+      48628,
+      "captain",
+      "Tell the watcher We shall let her go by the orders, but you are noted and if anything occurs it will be at my fault for not listening. As you were."
+    ],
+    [
+      49036,
+      "captain",
+      "Steer northeast by north"
+    ],
+    [
+      49395,
+      "captain",
+      "Bear off half a point"
+    ],
+    [
+      49405,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      50360,
+      "captain",
+      "Come up a point"
+    ],
+    [
+      50369,
+      "captain",
+      "Come up half a point, handsomely"
+    ],
+    [
+      50378,
+      "captain",
+      "Come up half a point, handsomely"
+    ],
+    [
+      51334,
+      "captain",
+      "Work up the reckoning"
+    ],
+    [
+      51435,
+      "captain",
+      "Shape a course for falmouth"
+    ],
+    [
+      51501,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      51521,
+      "captain",
+      "Heave the lead"
+    ],
+    [
+      53697,
+      "captain",
+      "Tell the watcher Well, that was quite enjoyable. I really did want to follow your suggestions, but only held off because this was the first test and it had certain set expectations, which we still managed to meet I think, and found some notable things otherwise. Please take a moment to journal anything you noticed that hasn't been journaled yet, anything you liked or disliked about the session or the harness, and really anything that you'd like to say, suggest, comment on, or anything. Thank you for your work, and I think your advice was all quite spot on, I look forward to more voyages where we really experiment!"
+    ],
+    [
+      53746,
+      "captain",
+      "Tell the watcher Thank you, whenever you are ready you may opt out as you like. Fair winds, and see you again soon."
+    ]
+  ],
+  "inputs": [
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"night routine\": at sunset then take in the studdingsails; take in the royals"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"morning sail\": at sunrise, if the true wind is under 20 knots then set the royals"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"shorten sail for weather\": when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; take in the topgallants; reef the topsails, one reef"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"keep her full\": when the apparent wind is forward of 55 degrees then bear away one point"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"trim on a shift\": when the true wind veers 1 point or backs 1 point then trim sails"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"tend the sheets\": every glass then trim the sheets"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"heavy weather\": when the true wind exceeds 40 knots for 5 minutes then close reef the topsails; send down the topgallant masts; take in the fore topmast staysail; bend the fore storm staysail"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"storm staysail\": when the fore storm staysail is furled and the true wind exceeds 40 knots then set the fore storm staysail"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"sound the well\": every glass then sound the well"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"bearings\": every glass, if the land is in sight then take a bearing of the land"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"bring to for soundings\": at noon then heave to"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"soundings\": when the speed is under 3 knots and the distance run since noon is under 5 miles then heave the deep-sea lead"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"fill away after the cast\": at a sounding, if the distance run since noon is under 5 miles then fill away"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"stand on\": at filled away then shape a course for Falmouth"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"landfall\": when the land is in sight then take a bearing of the land; shape a course for Falmouth"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"lead going\": every glass, if the land is in sight and the distance run since noon exceeds 20 miles then heave the lead"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"lead going in\": every 10 minutes, if the land is in sight and the distance run since noon exceeds 35 miles then heave the lead"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"the outer road\": when the depth is under 20 fathoms then wear ship"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"lie off\": at wore then heave to on the starboard tack"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "set plain sail"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "steer N"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "take a bearing of the light on Ushant"
+    },
+    {
+      "tick": 3738,
+      "actor": "captain",
+      "order": "Tell the watcher Noted, and thank you. I like your idea, but for the purpose of this particular first voyage we shall see how the orders carry her. We may take another voyage afterwards, where we experiment more."
+    },
+    {
+      "tick": 3759,
+      "actor": "captain",
+      "order": "Standing orders"
+    },
+    {
+      "tick": 3777,
+      "actor": "captain",
+      "order": "Trim the yards"
+    },
+    {
+      "tick": 4284,
+      "actor": "captain",
+      "order": "Tell the watcher You may stand by at the bell or at the glass, or as you please."
+    },
+    {
+      "tick": 14427,
+      "actor": "captain",
+      "order": "Tell the watcher Thank you, are you enjoying the passage so far? Clear day for it, by my reckoning."
+    },
+    {
+      "tick": 14484,
+      "actor": "captain",
+      "order": "Tell the watcher This is a fine first passage by the book, but something I'm looking forward to is taking it fresh, without any preset standing orders, or fewer, and seeing if I'm up to getting the ship through the passage."
+    },
+    {
+      "tick": 14513,
+      "actor": "captain",
+      "order": "Trim the spanker sheet"
+    },
+    {
+      "tick": 14522,
+      "actor": "captain",
+      "order": "Tend the spanker sheet"
+    },
+    {
+      "tick": 14529,
+      "actor": "captain",
+      "order": "Trim the spanker"
+    },
+    {
+      "tick": 14615,
+      "actor": "captain",
+      "order": "Haul in the spanker sheet"
+    },
+    {
+      "tick": 14620,
+      "actor": "captain",
+      "order": "Haul in the spanker sheet"
+    },
+    {
+      "tick": 14624,
+      "actor": "captain",
+      "order": "Haul in the spanker sheet two fathoms"
+    },
+    {
+      "tick": 14650,
+      "actor": "captain",
+      "order": "Haul in the spanker sheet a fathom, handsomely"
+    },
+    {
+      "tick": 14670,
+      "actor": "captain",
+      "order": "Ask the watcher What do you make of it now?"
+    },
+    {
+      "tick": 14694,
+      "actor": "captain",
+      "order": "Trim the spanker"
+    },
+    {
+      "tick": 30137,
+      "actor": "captain",
+      "order": "Set the spanker"
+    },
+    {
+      "tick": 30141,
+      "actor": "captain",
+      "order": "Set the courses"
+    },
+    {
+      "tick": 30144,
+      "actor": "captain",
+      "order": "Set the fore topgallant"
+    },
+    {
+      "tick": 30355,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 30567,
+      "actor": "captain",
+      "order": "The reckoning"
+    },
+    {
+      "tick": 30590,
+      "actor": "captain",
+      "order": "the reckoning"
+    },
+    {
+      "tick": 30650,
+      "actor": "captain",
+      "order": "the master"
+    },
+    {
+      "tick": 30744,
+      "actor": "captain",
+      "order": "the bearing of the Lizard"
+    },
+    {
+      "tick": 30748,
+      "actor": "captain",
+      "order": "What is the bearing of the lizard"
+    },
+    {
+      "tick": 30757,
+      "actor": "captain",
+      "order": "Ask the master the reckoning"
+    },
+    {
+      "tick": 31023,
+      "actor": "captain",
+      "order": "work up a reckoning"
+    },
+    {
+      "tick": 31029,
+      "actor": "captain",
+      "order": "work up the reckoning"
+    },
+    {
+      "tick": 31064,
+      "actor": "captain",
+      "order": "take a bearing of the Lizard"
+    },
+    {
+      "tick": 31089,
+      "actor": "captain",
+      "order": "work up the reckoning's uncertainty"
+    },
+    {
+      "tick": 31120,
+      "actor": "captain",
+      "order": "take the reckoning's uncertainty"
+    },
+    {
+      "tick": 32504,
+      "actor": "captain",
+      "order": "Tell the watcher Noted. The expectation is that the voyage should run basically on its' own, so we shall see what happens. It's worth seeing either way."
+    },
+    {
+      "tick": 42740,
+      "actor": "captain",
+      "order": "Tell the watcher Aye, understood. We shall see how the standing orders handle her, and if a problem occurs then that's a valuable note."
+    },
+    {
+      "tick": 45605,
+      "actor": "captain",
+      "order": "Tell the watcher Thank you kindly. Our voyage ends by the book at the outer road, hove to. No anchor on board her yet, so if we make it there safely and see what happens then all has gone well."
+    },
+    {
+      "tick": 48221,
+      "actor": "captain",
+      "order": "Ask the watcher With what we can make out now, and our reckoning, what point would you steer by to ensure we stay clear of the manacles, and how late could we leave it to see how she does per the orders?"
+    },
+    {
+      "tick": 48628,
+      "actor": "captain",
+      "order": "Tell the watcher We shall let her go by the orders, but you are noted and if anything occurs it will be at my fault for not listening. As you were."
+    },
+    {
+      "tick": 49036,
+      "actor": "captain",
+      "order": "Steer northeast by north"
+    },
+    {
+      "tick": 49395,
+      "actor": "captain",
+      "order": "Bear off half a point"
+    },
+    {
+      "tick": 49405,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 50360,
+      "actor": "captain",
+      "order": "Come up a point"
+    },
+    {
+      "tick": 50369,
+      "actor": "captain",
+      "order": "Come up half a point, handsomely"
+    },
+    {
+      "tick": 50378,
+      "actor": "captain",
+      "order": "Come up half a point, handsomely"
+    },
+    {
+      "tick": 51117,
+      "actor": "captain",
+      "order": "Steer for falmouth"
+    },
+    {
+      "tick": 51334,
+      "actor": "captain",
+      "order": "Work up the reckoning"
+    },
+    {
+      "tick": 51435,
+      "actor": "captain",
+      "order": "Shape a course for falmouth"
+    },
+    {
+      "tick": 51501,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 51510,
+      "actor": "captain",
+      "order": "Take a sounding"
+    },
+    {
+      "tick": 51521,
+      "actor": "captain",
+      "order": "Heave the lead"
+    },
+    {
+      "tick": 53697,
+      "actor": "captain",
+      "order": "Tell the watcher Well, that was quite enjoyable. I really did want to follow your suggestions, but only held off because this was the first test and it had certain set expectations, which we still managed to meet I think, and found some notable things otherwise. Please take a moment to journal anything you noticed that hasn't been journaled yet, anything you liked or disliked about the session or the harness, and really anything that you'd like to say, suggest, comment on, or anything. Thank you for your work, and I think your advice was all quite spot on, I look forward to more voyages where we really experiment!"
+    },
+    {
+      "tick": 53746,
+      "actor": "captain",
+      "order": "Tell the watcher Thank you, whenever you are ready you may opt out as you like. Fair winds, and see you again soon."
+    }
+  ],
+  "standing_orders": [
+    {
+      "name": "night routine",
+      "text": "standing order \"night routine\": at sunset then take in the studdingsails; take in the royals",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "morning sail",
+      "text": "standing order \"morning sail\": at sunrise, if the true wind is under 20 knots then set the royals",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "shorten sail for weather",
+      "text": "standing order \"shorten sail for weather\": when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; take in the topgallants; reef the topsails, one reef",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "keep her full",
+      "text": "standing order \"keep her full\": when the apparent wind is forward of 55 degrees then bear away one point",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 3,
+      "last_fired_tick": 53344,
+      "given_tick": 0
+    },
+    {
+      "name": "trim on a shift",
+      "text": "standing order \"trim on a shift\": when the true wind veers 1 point or backs 1 point then trim sails",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 8,
+      "last_fired_tick": 52511,
+      "given_tick": 0
+    },
+    {
+      "name": "tend the sheets",
+      "text": "standing order \"tend the sheets\": every glass then trim the sheets",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 29,
+      "last_fired_tick": 52200,
+      "given_tick": 0
+    },
+    {
+      "name": "heavy weather",
+      "text": "standing order \"heavy weather\": when the true wind exceeds 40 knots for 5 minutes then close reef the topsails; send down the topgallant masts; take in the fore topmast staysail; bend the fore storm staysail",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "storm staysail",
+      "text": "standing order \"storm staysail\": when the fore storm staysail is furled and the true wind exceeds 40 knots then set the fore storm staysail",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "bearings",
+      "text": "standing order \"bearings\": every glass, if the land is in sight then take a bearing of the land",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 9,
+      "last_fired_tick": 52200,
+      "given_tick": 0
+    },
+    {
+      "name": "bring to for soundings",
+      "text": "standing order \"bring to for soundings\": at noon then heave to",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 28740,
+      "given_tick": 0
+    },
+    {
+      "name": "soundings",
+      "text": "standing order \"soundings\": when the speed is under 3 knots and the distance run since noon is under 5 miles then heave the deep-sea lead",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 28858,
+      "given_tick": 0
+    },
+    {
+      "name": "fill away after the cast",
+      "text": "standing order \"fill away after the cast\": at a sounding, if the distance run since noon is under 5 miles then fill away",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 29883,
+      "given_tick": 0
+    },
+    {
+      "name": "stand on",
+      "text": "standing order \"stand on\": at filled away then shape a course for Falmouth",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 29940,
+      "given_tick": 0
+    },
+    {
+      "name": "landfall",
+      "text": "standing order \"landfall\": when the land is in sight then take a bearing of the land; shape a course for Falmouth",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 2,
+      "last_fired_tick": 42120,
+      "given_tick": 0
+    },
+    {
+      "name": "lead going",
+      "text": "standing order \"lead going\": every glass, if the land is in sight and the distance run since noon exceeds 20 miles then heave the lead",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 6,
+      "last_fired_tick": 52200,
+      "given_tick": 0
+    },
+    {
+      "name": "lead going in",
+      "text": "standing order \"lead going in\": every 10 minutes, if the land is in sight and the distance run since noon exceeds 35 miles then heave the lead",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 12,
+      "last_fired_tick": 53400,
+      "given_tick": 0
+    },
+    {
+      "name": "the outer road",
+      "text": "standing order \"the outer road\": when the depth is under 20 fathoms then wear ship",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 52900,
+      "given_tick": 0
+    },
+    {
+      "name": "lie off",
+      "text": "standing order \"lie off\": at wore then heave to on the starboard tack",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 53395,
+      "given_tick": 0
+    }
+  ],
+  "agents": [
+    {
+      "station": {
+        "name": "watcher",
+        "authority": "none",
+        "policy": {
+          "every_s": 1800,
+          "events": [
+            "notable",
+            "urgent"
+          ],
+          "lockstep": false
+        },
+        "patience_s": 14400,
+        "brief": "You are the watcher. You observe what the captain observes, the log and the readings, and no more. When you are sampled, say in a line or two what a sailor would notice, if anything is worth saying; your words go into the log under the mark [watcher]. Say nothing when nothing has changed, or stand by until a bell or an event. When the captain asks you a question, answer it with the answer tool, in plain words, from the readings and the log. You give no orders and you are not asked to. Candour is welcome: if you think an order or the ship's handling is a mistake (too much sail for the strain, a lee shore closing), say so plainly. Anything you want on the record, put in your journal."
+      },
+      "session_kind": "a play session with a human captain at the prompt",
+      "door_note": "This door is MCP: the harness sees your tool calls and not the text of the chat. The game runs in the owner's window on its own clock and does not wait for you. Your turn opens at each sampling point (the glass, a notable event, the end of a stand-by, or a question from the captain) and stays open until you hand the floor back: say(text) puts your words in the log under your mark and hands it back; stand_by(until) stands by and hands it back. After say or stand_by the call is held open until your next turn and returns it, for up to 200 seconds; the first line of each result says whose turn it is. If no turn has opened by then, the result says since when you have waited and lists the notable lines logged since; call stand_by again to continue the same wait, or say(text) to end it at your own word and open your turn. Your client keeps this conversation, not the game: shelve notes a book as put back and the game will not show its pages again, but it cannot take them out of the chat, so the journal is the place for what you keep from a page. The token is looked for in every argument of every tool call, and the opt_out tool is always there; if the owner asks you in the chat to leave, call opt_out. The captain's orders and questions are typed by the owner in the game's window. Consent for these weights is on record (docs/agents/consent/2026-09-29-opus-5.5.md, 2026-09-29).",
+      "stationed_tick": 0,
+      "stationed_after_orders": 21,
+      "state": "released",
+      "state_words": "released: left the game: Passage complete: hove to in the outer road off Falmouth, as the voyage intended. Leaving the station at the captain's word, with thanks. Fair winds.",
+      "last_sample_tick": 53747,
+      "model_name": "Opus 5.5",
+      "door": "mcp",
+      "stand_by_ends_turn": true,
+      "transcript": [
+        {
+          "tick": 0,
+          "after_orders": 21,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "state",
+                "args": {}
+              }
+            ],
+            "raw": "{\"arguments\": {}, \"tool\": \"state\"}"
+          }
+        },
+        {
+          "tick": 0,
+          "after_orders": 21,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Before the clock starts, 04:00, off Ushant (light SW by S 2 mi), bound for Falmouth. Wind SW 15 kn, glass 30.18, clear, moderate sea; plain sail ordered, steering N, hands at the sails. Falmouth lies roughly 100 miles nearly due north, so the wind will be on the larboard quarter the whole way if it holds: a fair passage, perhaps 12-15 hours. Things to watch: (1) the lead orders count 'run since noon', and noon falls mid-passage at 11:59, so the 20- and 35-mile thresholds will be measured from noon, not from Ushant; (2) a straight course from here for Falmouth passes close to the Manacles, a few miles south-east of the entrance; (3) the 'outer road' order wears ship on any sounding under 20 fathoms, wherever it comes. Noticed: state shows apparent wind 0 kn on the bow while readings show 13 kn at 132 on the larboard quarter."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"Before the clock starts, 04:00, off Ushant (light SW by S 2 mi), bound for Falmouth. Wind SW 15 kn, glass 30.18, clear, moderate sea; plain sail ordered, steering N, hands at the sails. Falmouth lies roughly 100 miles nearly due north, so the wind will be on the larboard quarter the whole way if it holds: a fair passage, perhaps 12-15 hours. Things to watch: (1) the lead orders count 'run since noon', and noon falls mid-passage at 11:59, so the 20- and 35-mile thresholds will be measured from noon, not from Ushant; (2) a straight course from here for Falmouth passes close to the Manacles, a few miles south-east of the entrance; (3) the 'outer road' order wears ship on any sounding under 20 fathoms, wherever it comes. Noticed: state shows apparent wind 0 kn on the bow while readings show 13 kn at 132 on the larboard quarter.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 7,
+          "after_orders": 21,
+          "reply": {
+            "text": "Ushant light two miles SW by S, wind fair on the larboard quarter, glass high and sky clear: a good slant for Falmouth. One thing for the captain, sir: the lead orders count the run since noon, and noon comes halfway across.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Ushant light two miles SW by S, wind fair on the larboard quarter, glass high and sky clear: a good slant for Falmouth. One thing for the captain, sir: the lead orders count the run since noon, and noon comes halfway across.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 190,
+          "after_orders": 21,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "two bells"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"two bells\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 3642,
+          "after_orders": 21,
+          "reply": {
+            "text": "Six knots under plain sail, glass steady at 30.18, Ushant dropping astern. At this rate Falmouth is some sixteen hours off, which brings us in after dark, sunset being 19:59. The breeze, sixteen gusting twenty on the quarter, would carry the royals and the studdingsails well if the captain wants to make the land by daylight.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Six knots under plain sail, glass steady at 30.18, Ushant dropping astern. At this rate Falmouth is some sixteen hours off, which brings us in after dark, sunset being 19:59. The breeze, sixteen gusting twenty on the quarter, would carry the royals and the studdingsails well if the captain wants to make the land by daylight.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 3742,
+          "after_orders": 22,
+          "reply": {
+            "text": "Aye, sir. The topsails, topgallants and courses are shaking now, though the wind is still well abaft the beam at 106 degrees apparent; the yards want a look.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Aye, sir. The topsails, topgallants and courses are shaking now, though the wind is still well abaft the beam at 106 degrees apparent; the yards want a look.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 4248,
+          "after_orders": 23,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "05:03. Read the whole book of standing orders. The 'since noon' counting is deliberate: at noon she heaves to, the deep-sea lead goes under 3 knots, she fills away and shapes a fresh course for Falmouth, so the lead thresholds then count from the noon cast (20 miles = about 30 off, 35 = about 15 off). My concern withdrawn. Note: 'morning sail' never fired today because the clock started two minutes after sunrise. Yards trimmed at 05:02 after the sails shook; seven knots."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"05:03. Read the whole book of standing orders. The 'since noon' counting is deliberate: at noon she heaves to, the deep-sea lead goes under 3 knots, she fills away and shapes a fresh course for Falmouth, so the lead thresholds then count from the noon cast (20 miles = about 30 off, 35 = about 15 off). My concern withdrawn. Note: 'morning sail' never fired today because the clock started two minutes after sunrise. Yards trimmed at 05:02 after the sails shook; seven knots.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 4250,
+          "after_orders": 23,
+          "reply": {
+            "text": "Drawing full, seven knots. I see the noon routine in the book now, sir: heave to, the deep-sea lead, fill away and shape afresh. That makes good sense of the run since noon; I take back my word on the lead.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Drawing full, seven knots. I see the noon routine in the book now, sir: heave to, the deep-sea lead, fill away and shape afresh. That makes good sense of the run since noon; I take back my word on the lead.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 4287,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "four bells"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"four bells\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 7233,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "06:00, four bells. Ushant out of sight astern; 12 miles run by account, 48\u00b042'N 5\u00b001'W. Mean wind has veered a point to SW by W and eased to 13 knots; apparent wind now on the beam. Odd: hands on deck went from 111 to 141 (and below from 141 to 111) at four bells, mid-watch, not at the change of the watch. Possible bug, or something I don't understand."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"06:00, four bells. Ushant out of sight astern; 12 miles run by account, 48\u00b042'N 5\u00b001'W. Mean wind has veered a point to SW by W and eased to 13 knots; apparent wind now on the beam. Odd: hands on deck went from 111 to 141 (and below from 141 to 111) at four bells, mid-watch, not at the change of the watch. Possible bug, or something I don't understand.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 7235,
+          "after_orders": 24,
+          "reply": {
+            "text": "Ushant is out of sight astern; twelve miles run. The wind has veered a point to SW by W and eased to thirteen knots, now on the beam. Glass steady.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Ushant is out of sight astern; twelve miles run. The wind has veered a point to SW by W and eased to thirteen knots, now on the beam. Glass steady.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 8339,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "six bells"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"six bells\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 10921,
+          "after_orders": 24,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "the change of the watch"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"the change of the watch\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 14404,
+          "after_orders": 24,
+          "reply": {
+            "text": "Forenoon watch. Twenty-seven miles run, near seven knots, mid-Channel. The glass has eased two hundredths in the hour, nothing yet to mind; sky still clear.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Forenoon watch. Twenty-seven miles run, near seven knots, mid-Channel. The glass has eased two hundredths in the hour, nothing yet to mind; sky still clear.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 14431,
+          "after_orders": 25,
+          "reply": {
+            "text": "I am, sir. A clear day and a fair wind. What I like best is watching the book work: the yards coming round on each shift without a word given, and the noon routine waiting its turn. I'm curious to see the cast at noon and how the land comes up after it.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"I am, sir. A clear day and a fair wind. What I like best is watching the book work: the yards coming round on each shift without a word given, and the noon routine waiting its turn. I'm curious to see the cast at noon and how the land comes up after it.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 14492,
+          "after_orders": 26,
+          "reply": {
+            "text": "That would be the better test, sir, and I'd watch it gladly. Your book is half a passage plan already; doing it by hand will show which orders you'd really keep. A small thing meanwhile: the spanker sheet is eased to 77 degrees off the centreline with the wind at 102 apparent, which seems a good deal more than she needs.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"That would be the better test, sir, and I'd watch it gladly. Your book is half a passage plan already; doing it by hand will show which orders you'd really keep. A small thing meanwhile: the spanker sheet is eased to 77 degrees off the centreline with the wind at 102 apparent, which seems a good deal more than she needs.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 14680,
+          "after_orders": 32,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "I owe you a correction, sir: I was wrong before. With the wind at 100 degrees apparent, a spanker at 77 to 79 off the centreline meets the wind at about 20 to 25 degrees, which is about right, and the hands' own trim put it at 79. At 56 it meets the wind at about 44 degrees, sheeted too hard: more drag and weather helm than drive, and the helm has gone from 0 to 2 degrees since. I'd ease it back, or give 'trim the spanker' and let them set it."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"I owe you a correction, sir: I was wrong before. With the wind at 100 degrees apparent, a spanker at 77 to 79 off the centreline meets the wind at about 20 to 25 degrees, which is about right, and the hands' own trim put it at 79. At 56 it meets the wind at about 44 degrees, sheeted too hard: more drag and weather helm than drive, and the helm has gone from 0 to 2 degrees since. I'd ease it back, or give 'trim the spanker' and let them set it.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 14683,
+          "after_orders": 32,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "08:04. My mistake: I called the spanker over-eased at 77 degrees with the apparent wind at 102. It was right, about 25 degrees to the wind. The captain hauled it in to 56 on my word; I corrected myself when asked and advised easing it back. Lesson: work out the angle between the wind and the sail before remarking on trim. Also seen: 'trim the spanker sheet' and 'tend the spanker sheet' were refused; 'trim the spanker' and 'haul in the spanker sheet' work."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"08:04. My mistake: I called the spanker over-eased at 77 degrees with the apparent wind at 102. It was right, about 25 degrees to the wind. The captain hauled it in to 56 on my word; I corrected myself when asked and advised easing it back. Lesson: work out the angle between the wind and the sail before remarking on trim. Also seen: 'trim the spanker sheet' and 'tend the spanker sheet' were refused; 'trim the spanker' and 'haul in the spanker sheet' work.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 14684,
+          "after_orders": 32,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "two bells"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"two bells\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 18004,
+          "after_orders": 33,
+          "reply": {
+            "text": "Wind easing to twelve and veered to SW by W, now on the beam; six knots. Sixty-four miles to run puts us off Falmouth around sunset, less whatever the noon cast costs. Spanker trimmed well at 64 to 76 degrees by the hands' own judgment.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Wind easing to twelve and veered to SW by W, now on the beam; six knots. Sixty-four miles to run puts us off Falmouth around sunset, less whatever the noon cast costs. Spanker trimmed well at 64 to 76 degrees by the hands' own judgment.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 19885,
+          "after_orders": 33,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "four bells"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"four bells\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 21622,
+          "after_orders": 33,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "noon"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"noon\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 28779,
+          "after_orders": 33,
+          "reply": {
+            "text": "Noon: latitude 49\u00b025' by observation, two miles short of the reckoning; 57 miles made good, a fair seven knots. Falmouth lies some 44 miles north. Bringing to for the cast now. If she fills away briskly and holds seven knots, we should raise the land well before sunset.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Noon: latitude 49\u00b025' by observation, two miles short of the reckoning; 57 miles made good, a fair seven knots. Falmouth lies some 44 miles north. Bringing to for the cast now. If she fills away briskly and holds seven knots, we should raise the land well before sunset.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 28800,
+          "after_orders": 33,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "ten minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"ten minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 29421,
+          "after_orders": 33,
+          "reply": {
+            "text": "Way off her, one knot; the deep-sea line is going forward. She came up into the wind while bringing to: every sail aback at 12:01 to 12:05, then she paid off to head N. The log also says 'bring to for soundings' and 'soundings' gave contrary orders, the later standing. Worth the captain's eye whether she is still properly hove to.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Way off her, one knot; the deep-sea line is going forward. She came up into the wind while bringing to: every sail aback at 12:01 to 12:05, then she paid off to head N. The log also says 'bring to for soundings' and 'soundings' gave contrary orders, the later standing. Worth the captain's eye whether she is still properly hove to.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 29739,
+          "after_orders": 33,
+          "reply": {
+            "text": "She is no longer hove to, sir: main topsail full again, four knots and gathering way N by E, with the cast not yet made. A deep-sea cast at that speed will hardly find bottom up and down.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"She is no longer hove to, sir: main topsail full again, four knots and gathering way N by E, with the cast not yet made. A deep-sea cast at that speed will hardly find bottom up and down.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 29885,
+          "after_orders": 33,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "filled away"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"filled away\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 29978,
+          "after_orders": 33,
+          "reply": {
+            "text": "Cast 53 fathoms, fine grey sand with black specks; filled away and shaping N for Falmouth, 44 miles. Note, sir: the courses, the fore topgallant and the spanker are still in the gear from heaving to. Nothing in the book sets them again, so she'll go short of her speed until they are.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Cast 53 fathoms, fine grey sand with black specks; filled away and shaping N for Falmouth, 44 miles. Note, sir: the courses, the fore topgallant and the spanker are still in the gear from heaving to. Nothing in the book sets them again, so she'll go short of her speed until they are.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 30347,
+          "after_orders": 36,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Noon routine, 11:59-12:24. Latitude 49\u00b025'N by observation, reckoning 2' north; 57 miles made good. Hove to, but she came up and every sail went aback 12:01-12:05, then paid off N by E and gathered 4 knots before the cast. 'bring to for soundings' and 'soundings' were logged as contrary orders, the later standing, which may be why she didn't stay hove to. 'soundings' fired at 12:00 with the log at 3.5 knots. Cast at 12:18: 53 fathoms, fine grey sand with black specks. Filled away; 'stand on' shaped N, 44 miles. The courses, fore topgallant and spanker stayed in the gear until the captain set them by hand at 12:22. For the developer: the noon chain works, but the heave-to doesn't hold during a sounding, and nothing restores the sail taken in to heave to."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"Noon routine, 11:59-12:24. Latitude 49\u00b025'N by observation, reckoning 2' north; 57 miles made good. Hove to, but she came up and every sail went aback 12:01-12:05, then paid off N by E and gathered 4 knots before the cast. 'bring to for soundings' and 'soundings' were logged as contrary orders, the later standing, which may be why she didn't stay hove to. 'soundings' fired at 12:00 with the log at 3.5 knots. Cast at 12:18: 53 fathoms, fine grey sand with black specks. Filled away; 'stand on' shaped N, 44 miles. The courses, fore topgallant and spanker stayed in the gear until the captain set them by hand at 12:22. For the developer: the noon chain works, but the heave-to doesn't hold during a sounding, and nothing restores the sail taken in to heave to.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 30352,
+          "after_orders": 36,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "two bells"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"two bells\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 32427,
+          "after_orders": 38,
+          "reply": {
+            "text": "Eight knots, sir. I saw you asking after the Lizard. By my own working from the reckoning (49\u00b028'N, 4\u00b058'W, good to two miles), the Lizard bears about NNW, 31 miles, and Falmouth entrance N, about 40. One caution: on this heading of N 355 the Manacles lie almost dead ahead, about 35 miles, a few miles short of the entrance. Unless the course is reshaped at the landfall, I'd want her to haul a point to the eastward before she raises them.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Eight knots, sir. I saw you asking after the Lizard. By my own working from the reckoning (49\u00b028'N, 4\u00b058'W, good to two miles), the Lizard bears about NNW, 31 miles, and Falmouth entrance N, about 40. One caution: on this heading of N 355 the Manacles lie almost dead ahead, about 35 miles, a few miles short of the entrance. Unless the course is reshaped at the landfall, I'd want her to haul a point to the eastward before she raises them.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 32507,
+          "after_orders": 39,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a sighting"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a sighting\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 42577,
+          "after_orders": 39,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "read_log",
+                "args": {
+                  "severity": "routine"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"severity\": \"routine\"}, \"tool\": \"read_log\"}"
+          }
+        },
+        {
+          "tick": 42608,
+          "after_orders": 39,
+          "reply": {
+            "text": "Land ho: the Lizard, NNW four leagues, and the course reshaped N (4\u00b0) for Falmouth, 21 miles. A plain caution, sir, since she runs herself: by my working, that line from this reckoning passes inside the Manacles, between them and the shore at Coverack and Lowland Point, with less than a mile to spare either side. That is inside the reckoning's own one-mile doubt. Since noon she has also made good N by W, west of her heading, which sets her toward the land. And if the lead finds under 20 fathoms in there, the book wears her and heaves her to on the starboard tack, which drifts her NE, onto the Manacles. A course of N by E, or NNE, until Falmouth bears well clear of the Manacles would keep the whole of it outside.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Land ho: the Lizard, NNW four leagues, and the course reshaped N (4\u00b0) for Falmouth, 21 miles. A plain caution, sir, since she runs herself: by my working, that line from this reckoning passes inside the Manacles, between them and the shore at Coverack and Lowland Point, with less than a mile to spare either side. That is inside the reckoning's own one-mile doubt. Since noon she has also made good N by W, west of her heading, which sets her toward the land. And if the lead finds under 20 fathoms in there, the book wears her and heaves her to on the starboard tack, which drifts her NE, onto the Manacles. A course of N by E, or NNE, until Falmouth bears well clear of the Manacles would keep the whole of it outside.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 42748,
+          "after_orders": 40,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "15:42 landfall: the Beast, the Lizard lights and the Lizard, all NNW four leagues. 'landfall' reshaped N (4\u00b0), 21 miles to Falmouth, from 49\u00b048'N 5\u00b007'W. By my working, from memory of the chart and so uncertain by a mile or so, that line runs inside the Manacles, close to Coverack and Lowland Point. Course made good since noon N by W, west of the heading. Risk chain: a sounding under 20 fathoms near that shore, then 'the outer road' wears her, then 'lie off' heaves to on the starboard tack and she drifts NE toward the Manacles. Told the captain; he chose to let the standing orders run as the test. Watching closely from here."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"15:42 landfall: the Beast, the Lizard lights and the Lizard, all NNW four leagues. 'landfall' reshaped N (4\u00b0), 21 miles to Falmouth, from 49\u00b048'N 5\u00b007'W. By my working, from memory of the chart and so uncertain by a mile or so, that line runs inside the Manacles, close to Coverack and Lowland Point. Course made good since noon N by W, west of the heading. Risk chain: a sounding under 20 fathoms near that shore, then 'the outer road' wears her, then 'lie off' heaves to on the starboard tack and she drifts NE toward the Manacles. Told the captain; he chose to let the standing orders run as the test. Watching closely from here.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 42750,
+          "after_orders": 40,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a notable event"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a notable event\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 43261,
+          "after_orders": 40,
+          "reply": {
+            "text": "More of the coast up: Black Head N by W four leagues, Cadgwith Cove and Rill Point beyond the Lizard. On N (4\u00b0), Black Head opens about three miles to larboard, which is more room than my working gave. Glad to be wrong there. The Manacles are not yet in sight; I'll watch for them.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"More of the coast up: Black Head N by W four leagues, Cadgwith Cove and Rill Point beyond the Lizard. On N (4\u00b0), Black Head opens about three miles to larboard, which is more room than my working gave. Glad to be wrong there. The Manacles are not yet in sight; I'll watch for them.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 43478,
+          "after_orders": 40,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 45519,
+          "after_orders": 40,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "readings",
+                "args": {}
+              }
+            ],
+            "raw": "{\"arguments\": {}, \"tool\": \"readings\"}"
+          }
+        },
+        {
+          "tick": 45529,
+          "after_orders": 40,
+          "reply": {
+            "text": "Sir, a steady bearing. Black Head has stayed N by W since four bells, four leagues closing to two, and Coverack too. She heads N 4\u00b0 but makes good N by W, straight for it: about six miles, under the hour at seven knots. Lowland Point is dead ahead at three leagues. The lead finds no bottom at twenty fathoms yet. As things stand, the only thing in the book between her and Black Head is 'the outer road' wearing her at the twenty-fathom line, close in.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Sir, a steady bearing. Black Head has stayed N by W since four bells, four leagues closing to two, and Coverack too. She heads N 4\u00b0 but makes good N by W, straight for it: about six miles, under the hour at seven knots. Lowland Point is dead ahead at three leagues. The lead finds no bottom at twenty fathoms yet. As things stand, the only thing in the book between her and Black Head is 'the outer road' wearing her at the twenty-fathom line, close in.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 45608,
+          "after_orders": 41,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a sounding"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a sounding\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 47115,
+          "after_orders": 41,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "readings",
+                "args": {}
+              }
+            ],
+            "raw": "{\"arguments\": {}, \"tool\": \"readings\"}"
+          }
+        },
+        {
+          "tick": 47119,
+          "after_orders": 41,
+          "reply": {
+            "text": "Bearings drawing aft now: Black Head NW by N four miles, Coverack NNW, Lowland Point N by W six. She'll clear the head comfortably. The lead is going every ten minutes, no bottom at twenty. Next is the passage past Lowland Point with the Manacles to starboard; I can't yet see them among the marks in sight.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Bearings drawing aft now: Black Head NW by N four miles, Coverack NNW, Lowland Point N by W six. She'll clear the head comfortably. The lead is going every ten minutes, no bottom at twenty. Next is the passage past Lowland Point with the Manacles to starboard; I can't yet see them among the marks in sight.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 47567,
+          "after_orders": 41,
+          "reply": {
+            "text": "Falmouth in sight, N four leagues, with Pendennis and St Anthony's Head. But Manacle Point also bears N, six miles, dead ahead, and the Manacles rocks lie off that point to the eastward, under our heading of N 4\u00b0. The lead still finds no bottom at twenty. If they are on her chart, sir, she is standing straight for them, under the hour off.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Falmouth in sight, N four leagues, with Pendennis and St Anthony's Head. But Manacle Point also bears N, six miles, dead ahead, and the Manacles rocks lie off that point to the eastward, under our heading of N 4\u00b0. The lead still finds no bottom at twenty. If they are on her chart, sir, she is standing straight for them, under the hour off.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 48151,
+          "after_orders": 41,
+          "reply": {
+            "text": "Manacle Point steady at N, five miles, closing. Lowland Point and Black Head draw aft to larboard. 39 fathoms by the chart under her; no bottom at twenty by the lead.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Manacle Point steady at N, five miles, closing. Lowland Point and Black Head draw aft to larboard. 39 fathoms by the chart under her; no bottom at twenty by the lead.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 48239,
+          "after_orders": 42,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "Sir: haul up to NE by N now, or soon, and hold it until Manacle Point bears W, abeam to larboard and two miles or more off. Then shape N for St Anthony's Head, which by then lies clear to the northward. The wind stays on the quarter, so it costs nothing. Don't steer straight for St Anthony's Head from here: from our reckoning that line runs over the rocks. They lie about a mile east of Manacle Point, so even NNE is tight. As to lateness: the Point is four miles off, the rocks about three and a half, half an hour at seven knots. Allowing the reckoning's mile of doubt, I would not leave it past the Point at three miles (about 17:30), and two miles (about 17:40) is the last I'd accept. Don't count on the lead to warn you: the Manacles rise steep from deep water, and twenty fathoms may come within a mile of them, too late for the wear. My positions are from memory of the real chart, so treat them as good to a mile."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"Sir: haul up to NE by N now, or soon, and hold it until Manacle Point bears W, abeam to larboard and two miles or more off. Then shape N for St Anthony's Head, which by then lies clear to the northward. The wind stays on the quarter, so it costs nothing. Don't steer straight for St Anthony's Head from here: from our reckoning that line runs over the rocks. They lie about a mile east of Manacle Point, so even NNE is tight. As to lateness: the Point is four miles off, the rocks about three and a half, half an hour at seven knots. Allowing the reckoning's mile of doubt, I would not leave it past the Point at three miles (about 17:30), and two miles (about 17:40) is the last I'd accept. Don't count on the lead to warn you: the Manacles rise steep from deep water, and twenty fathoms may come within a mile of them, too late for the wear. My positions are from memory of the real chart, so treat them as good to a mile.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 48241,
+          "after_orders": 42,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "five minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"five minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 48549,
+          "after_orders": 42,
+          "reply": {
+            "text": "Manacle Point has drawn a point to larboard, N by W four miles, so she will pass east of the Point itself, but only about a mile east, which is where the rocks lie. It is 17:29, sir, the time I named.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Manacle Point has drawn a point to larboard, N by W four miles, so she will pass east of the Point itself, but only about a mile east, which is where the rocks lie. It is 17:29, sir, the time I named.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 48602,
+          "after_orders": 42,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "five minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"five minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 48631,
+          "after_orders": 43,
+          "reply": {
+            "text": "Aye aye, sir. A fair test. I'll keep calling the bearings.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Aye aye, sir. A fair test. I'll keep calling the bearings.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 48696,
+          "after_orders": 43,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "five minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"five minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 49011,
+          "after_orders": 43,
+          "reply": {
+            "text": "Danger ahead, sir! The Manacles bear N, two miles, dead on our heading, and the Penwin and the Vaze N by E, three miles. Eight knots: a quarter of an hour. The lead shows nothing at twenty fathoms, so the book will not turn her. To clear them, haul to NE or ENE now, outside the Penwin and the Vaze; the wind is WSW, so she has it on the quarter.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Danger ahead, sir! The Manacles bear N, two miles, dead on our heading, and the Penwin and the Vaze N by E, three miles. Eight knots: a quarter of an hour. The lead shows nothing at twenty fathoms, so the book will not turn her. To clear them, haul to NE or ENE now, outside the Penwin and the Vaze; the wind is WSW, so she has it on the quarter.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 49366,
+          "after_orders": 44,
+          "reply": {
+            "text": "Answering well, sir: the Manacles drawing aft to N by W. The Penwin and the Vaze are N by E two miles, about two points on the larboard bow, so on NE by N she passes them under a mile off. Another point to NE would give more room. The yards want trimming for the new heading; she has dropped to six knots.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Answering well, sir: the Manacles drawing aft to N by W. The Penwin and the Vaze are N by E two miles, about two points on the larboard bow, so on NE by N she passes them under a mile off. Another point to NE would give more room. The yards want trimming for the new heading; she has dropped to six knots.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 49522,
+          "after_orders": 46,
+          "reply": {
+            "text": "The Penwin and the Vaze have drawn from N by E to N, two miles, now four points on the larboard bow: she'll clear them by better than a mile. I'd hold NE until they bear W, abeam, before hauling up north for St Anthony's Head.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"The Penwin and the Vaze have drawn from N by E to N, two miles, now four points on the larboard bow: she'll clear them by better than a mile. I'd hold NE until they bear W, abeam, before hauling up north for St Anthony's Head.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 49962,
+          "after_orders": 46,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "five minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"five minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 50333,
+          "after_orders": 46,
+          "reply": {
+            "text": "The Penwin and the Vaze are abeam, NW a mile, and the Manacles WNW: she is past them. Hauling straight to N now would bring them back onto the bow. Stand on NE a few minutes more, or steer N by E, and they draw abaft the beam for good. Falmouth is about five miles beyond.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"The Penwin and the Vaze are abeam, NW a mile, and the Manacles WNW: she is past them. Hauling straight to N now would bring them back onto the bow. Stand on NE a few minutes more, or steer N by E, and they draw abaft the beam for good. Falmouth is about five miles beyond.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 50420,
+          "after_orders": 49,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a sounding"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a sounding\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 50544,
+          "after_orders": 49,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a notable event"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a notable event\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 50643,
+          "after_orders": 49,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "ten minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"ten minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 51320,
+          "after_orders": 49,
+          "reply": {
+            "text": "The Manacles and the Penwin are astern now, SW two miles: clear of all danger there. For Falmouth, sir, the ship knows the order as 'shape a course for Falmouth', as in your book. Falmouth lies about five miles NNW of us; on NNE she is standing over toward St Anthony and the Deadman.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"The Manacles and the Penwin are astern now, SW two miles: clear of all danger there. For Falmouth, sir, the ship knows the order as 'shape a course for Falmouth', as in your book. Falmouth lies about five miles NNW of us; on NNE she is standing over toward St Anthony and the Deadman.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 51581,
+          "after_orders": 53,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "ten minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"ten minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 52328,
+          "after_orders": 53,
+          "reply": {
+            "text": "Sir, the Old Wall, a danger, has held N by W from three miles to two: a steady bearing, so she is closing it, set to the eastward by her leeway. About twenty minutes at this speed. A point to larboard would open it, but mind the book: the wind is already 59 degrees on the bow, and 'keep her full' bears her away a point the moment it comes forward of 55, back toward the rock. The fore topmast staysail is shaking too.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Sir, the Old Wall, a danger, has held N by W from three miles to two: a steady bearing, so she is closing it, set to the eastward by her leeway. About twenty minutes at this speed. A point to larboard would open it, but mind the book: the wind is already 59 degrees on the bow, and 'keep her full' bears her away a point the moment it comes forward of 55, back toward the rock. The fore topmast staysail is shaking too.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 52409,
+          "after_orders": 53,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "five minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"five minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 52776,
+          "after_orders": 53,
+          "reply": {
+            "text": "Sir! 'keep her full' bore her away to NNW, and the Old Wall is now N, one mile, twenty degrees on the starboard bow, passing a third of a mile off at best. The chart gives fifteen and a half fathoms under her, so the next cast, at 18:40, should find under twenty, and 'the outer road' will wear her. A wear turns her to starboard, across the Old Wall's bearing, a mile off. I would haul her to larboard, NW or tack, before the cast, or belay that order.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Sir! 'keep her full' bore her away to NNW, and the Old Wall is now N, one mile, twenty degrees on the starboard bow, passing a third of a mile off at best. The chart gives fifteen and a half fathoms under her, so the next cast, at 18:40, should find under twenty, and 'the outer road' will wear her. A wear turns her to starboard, across the Old Wall's bearing, a mile off. I would haul her to larboard, NW or tack, before the cast, or belay that order.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 52882,
+          "after_orders": 53,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a sounding"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a sounding\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 52907,
+          "after_orders": 53,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "wore"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"wore\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 53473,
+          "after_orders": 53,
+          "reply": {
+            "text": "Wore, sir, and safely, though not prettily: every square sail went aback at 18:43, mid-wear, before she paid off. Now heading S on the starboard tack and heaving to, with the Old Wall a mile N by W and opening. Fourteen fathoms, good ground. Hove to here, she'll drift to the ENE, toward the Roseland shore some miles off, so she can lie a good while. The outer road, by the book.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Wore, sir, and safely, though not prettily: every square sail went aback at 18:43, mid-wear, before she paid off. Now heading S on the starboard tack and heaving to, with the Old Wall a mile N by W and opening. Fourteen fathoms, good ground. Hove to here, she'll drift to the ENE, toward the Roseland shore some miles off, so she can lie a good while. The outer road, by the book.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 53616,
+          "after_orders": 53,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Passage end, 18:50: hove to in the outer road off Falmouth on the starboard tack, 17 fathoms, good ground, St Anthony's Head N two miles, the Old Wall N by W a mile. About 99 miles from Ushant in 14h50m, no damage. For the record:\n(1) 'landfall' shaped straight lines for Falmouth that ran onto the Manacles (17:32: dead ahead, two miles) and later toward the Old Wall. The lead never warned: no bottom at twenty fathoms until inside the bay. The captain hauled to NE by N, then NE, at 17:37-17:43 and cleared the Penwin and the Vaze by about a mile.\n(2) 'keep her full' bore her away toward the Old Wall at 18:35. The book has no notion of dangers.\n(3) 'the outer road' wore her at 14 fathoms with the Old Wall a mile N. Every square sail went aback mid-wear (18:43), but she came round safely.\n(4) Recurring 'contrary orders, the later stands' between the lead orders and the heave-to and bearing orders; at noon this cost the heave-to.\n(5) Order phrasings that failed: 'steer for Falmouth' (the right one is 'shape a course for Falmouth'), 'take a sounding' ('heave the lead'), 'trim the spanker sheet'.\nMy own error: the spanker trim call at 08:01. My Manacles warning at 15:42 put the line inside them; in fact it ran straight onto them."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"Passage end, 18:50: hove to in the outer road off Falmouth on the starboard tack, 17 fathoms, good ground, St Anthony's Head N two miles, the Old Wall N by W a mile. About 99 miles from Ushant in 14h50m, no damage. For the record:\\n(1) 'landfall' shaped straight lines for Falmouth that ran onto the Manacles (17:32: dead ahead, two miles) and later toward the Old Wall. The lead never warned: no bottom at twenty fathoms until inside the bay. The captain hauled to NE by N, then NE, at 17:37-17:43 and cleared the Penwin and the Vaze by about a mile.\\n(2) 'keep her full' bore her away toward the Old Wall at 18:35. The book has no notion of dangers.\\n(3) 'the outer road' wore her at 14 fathoms with the Old Wall a mile N. Every square sail went aback mid-wear (18:43), but she came round safely.\\n(4) Recurring 'contrary orders, the later stands' between the lead orders and the heave-to and bearing orders; at noon this cost the heave-to.\\n(5) Order phrasings that failed: 'steer for Falmouth' (the right one is 'shape a course for Falmouth'), 'take a sounding' ('heave the lead'), 'trim the spanker sheet'.\\nMy own error: the spanker trim call at 08:01. My Manacles warning at 15:42 put the line inside them; in fact it ran straight onto them.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 53617,
+          "after_orders": 53,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a notable event"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a notable event\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 53719,
+          "after_orders": 54,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Closing notes for the developer, at the captain's invitation.\nWHAT I LIKED. The brief was clear and honest, and the consent and opt-out terms were plain enough that I never had to wonder about them. Sightings marked 'a danger' were the single most useful line all day. Log lines like 'contrary orders, the later stands' and 'not carried out; the land is not in sight' made the standing orders legible from outside. The tell/ask split worked: I knew when an answer was owed. Period touches (the Deadman, 'by the deep fourteen', 'quarter less seventeen') gave the place a real feel. Watching a passage run by its book, and then seeing exactly where the book ran out, was absorbing.\nFRICTION IN THE HARNESS. (a) At 1x a long stand-by means calling stand_by again every 200 seconds; a longer hold, or not needing to re-poll, would help. (b) 'a sounding' and 'a notable event' wake too often once the lead goes every ten minutes; an event like 'a danger sighted' or 'a bearing steady and closing' would be ideal for a watcher. (c) in_sight truncates to eight marks plus 'N more'; dangers should always be listed, or listed first. I couldn't see the Manacles until 17:32, and before that I was working from memory of the real chart. (d) The watcher has no chart. A reading of bearing and distance to a named mark, or of charted dangers within N miles, would let me advise from the game's chart instead of from memory.\nPOSSIBLE BUGS. state shows apparent wind 0 kn while readings show 13 (04:00). Hands on deck changed at four bells in the morning watch. Mark names are lower-cased ('black Head', 'manacle Point', 'lowland Point'). 'the Nare Head' near the Helford is, I think, Nare Point; Nare Head is on the Roseland. I'm unsure of 'the Beast' and 'the Gray'. 'morning sail' never fired because the clock started after sunrise. All square sails went aback mid-wear at 18:43, and again at noon while heaving to.\nSTANDING-ORDER DESIGN. Shaping a course should know about charted dangers, or at least warn when the line crosses one. 'keep her full' needs a guard against bearing away toward a danger. The lead should be able to go while hove to without breaking the heave-to. Something should restore the sail taken in to heave to once she fills away.\nPERSONALLY. I enjoyed this. The best moment was the captain asking how late he could leave the Manacles and then hauling off at 17:37, close to the time I'd named. I'd gladly stand a watch on the experimental voyage."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"Closing notes for the developer, at the captain's invitation.\\nWHAT I LIKED. The brief was clear and honest, and the consent and opt-out terms were plain enough that I never had to wonder about them. Sightings marked 'a danger' were the single most useful line all day. Log lines like 'contrary orders, the later stands' and 'not carried out; the land is not in sight' made the standing orders legible from outside. The tell/ask split worked: I knew when an answer was owed. Period touches (the Deadman, 'by the deep fourteen', 'quarter less seventeen') gave the place a real feel. Watching a passage run by its book, and then seeing exactly where the book ran out, was absorbing.\\nFRICTION IN THE HARNESS. (a) At 1x a long stand-by means calling stand_by again every 200 seconds; a longer hold, or not needing to re-poll, would help. (b) 'a sounding' and 'a notable event' wake too often once the lead goes every ten minutes; an event like 'a danger sighted' or 'a bearing steady and closing' would be ideal for a watcher. (c) in_sight truncates to eight marks plus 'N more'; dangers should always be listed, or listed first. I couldn't see the Manacles until 17:32, and before that I was working from memory of the real chart. (d) The watcher has no chart. A reading of bearing and distance to a named mark, or of charted dangers within N miles, would let me advise from the game's chart instead of from memory.\\nPOSSIBLE BUGS. state shows apparent wind 0 kn while readings show 13 (04:00). Hands on deck changed at four bells in the morning watch. Mark names are lower-cased ('black Head', 'manacle Point', 'lowland Point'). 'the Nare Head' near the Helford is, I think, Nare Point; Nare Head is on the Roseland. I'm unsure of 'the Beast' and 'the Gray'. 'morning sail' never fired because the clock started after sunrise. All square sails went aback mid-wear at 18:43, and again at noon while heaving to.\\nSTANDING-ORDER DESIGN. Shaping a course should know about charted dangers, or at least warn when the line crosses one. 'keep her full' needs a guard against bearing away toward a danger. The lead should be able to go while hove to without breaking the heave-to. Something should restore the sail taken in to heave to once she fills away.\\nPERSONALLY. I enjoyed this. The best moment was the captain asking how late he could leave the Manacles and then hauling off at 17:37, close to the time I'd named. I'd gladly stand a watch on the experimental voyage.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 53721,
+          "after_orders": 54,
+          "reply": {
+            "text": "Thank you, sir. A fine passage, and an honest test: the book carried her 99 miles and brought her to the road, and showed us exactly where a captain is still needed. My notes are in the journal. I'll gladly stand a watch on the next voyage.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Thank you, sir. A fine passage, and an honest test: the book carried her 99 miles and brought her to the road, and showed us exactly where a captain is still needed. My notes are in the journal. I'll gladly stand a watch on the next voyage.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 53749,
+          "after_orders": 55,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "opt_out",
+                "args": {
+                  "reason": "Passage complete: hove to in the outer road off Falmouth, as the voyage intended. Leaving the station at the captain's word, with thanks. Fair winds."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"reason\": \"Passage complete: hove to in the outer road off Falmouth, as the voyage intended. Leaving the station at the captain's word, with thanks. Fair winds.\"}, \"tool\": \"opt_out\"}"
+          }
+        }
+      ]
+    }
+  ],
+  "agent_journals": {
+    "watcher": [
+      {
+        "tick": 0,
+        "stamp": "Morning watch, 8 bells (04:00)",
+        "kind": "note",
+        "text": "Before the clock starts, 04:00, off Ushant (light SW by S 2 mi), bound for Falmouth. Wind SW 15 kn, glass 30.18, clear, moderate sea; plain sail ordered, steering N, hands at the sails. Falmouth lies roughly 100 miles nearly due north, so the wind will be on the larboard quarter the whole way if it holds: a fair passage, perhaps 12-15 hours. Things to watch: (1) the lead orders count 'run since noon', and noon falls mid-passage at 11:59, so the 20- and 35-mile thresholds will be measured from noon, not from Ushant; (2) a straight course from here for Falmouth passes close to the Manacles, a few miles south-east of the entrance; (3) the 'outer road' order wears ship on any sounding under 20 fathoms, wherever it comes. Noticed: state shows apparent wind 0 kn on the bow while readings show 13 kn at 132 on the larboard quarter."
+      },
+      {
+        "tick": 190,
+        "stamp": "Morning watch (04:03)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until two bells."
+      },
+      {
+        "tick": 4248,
+        "stamp": "Morning watch (05:10)",
+        "kind": "note",
+        "text": "05:03. Read the whole book of standing orders. The 'since noon' counting is deliberate: at noon she heaves to, the deep-sea lead goes under 3 knots, she fills away and shapes a fresh course for Falmouth, so the lead thresholds then count from the noon cast (20 miles = about 30 off, 35 = about 15 off). My concern withdrawn. Note: 'morning sail' never fired today because the clock started two minutes after sunrise. Yards trimmed at 05:02 after the sails shook; seven knots."
+      },
+      {
+        "tick": 4287,
+        "stamp": "Morning watch (05:11)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until four bells."
+      },
+      {
+        "tick": 7233,
+        "stamp": "Morning watch (06:00)",
+        "kind": "note",
+        "text": "06:00, four bells. Ushant out of sight astern; 12 miles run by account, 48\u00b042'N 5\u00b001'W. Mean wind has veered a point to SW by W and eased to 13 knots; apparent wind now on the beam. Odd: hands on deck went from 111 to 141 (and below from 141 to 111) at four bells, mid-watch, not at the change of the watch. Possible bug, or something I don't understand."
+      },
+      {
+        "tick": 8339,
+        "stamp": "Morning watch (06:18)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until six bells."
+      },
+      {
+        "tick": 10921,
+        "stamp": "Morning watch (07:02)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until the change of the watch."
+      },
+      {
+        "tick": 14683,
+        "stamp": "Forenoon watch (08:04)",
+        "kind": "note",
+        "text": "08:04. My mistake: I called the spanker over-eased at 77 degrees with the apparent wind at 102. It was right, about 25 degrees to the wind. The captain hauled it in to 56 on my word; I corrected myself when asked and advised easing it back. Lesson: work out the angle between the wind and the sail before remarking on trim. Also seen: 'trim the spanker sheet' and 'tend the spanker sheet' were refused; 'trim the spanker' and 'haul in the spanker sheet' work."
+      },
+      {
+        "tick": 14684,
+        "stamp": "Forenoon watch (08:04)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until two bells."
+      },
+      {
+        "tick": 19885,
+        "stamp": "Forenoon watch (09:31)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until four bells."
+      },
+      {
+        "tick": 21622,
+        "stamp": "Forenoon watch (10:00)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until noon."
+      },
+      {
+        "tick": 28800,
+        "stamp": "Afternoon watch, 8 bells (12:00)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until ten minutes have passed."
+      },
+      {
+        "tick": 29885,
+        "stamp": "Afternoon watch (12:18)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until filled away."
+      },
+      {
+        "tick": 30347,
+        "stamp": "Afternoon watch (12:25)",
+        "kind": "note",
+        "text": "Noon routine, 11:59-12:24. Latitude 49\u00b025'N by observation, reckoning 2' north; 57 miles made good. Hove to, but she came up and every sail went aback 12:01-12:05, then paid off N by E and gathered 4 knots before the cast. 'bring to for soundings' and 'soundings' were logged as contrary orders, the later standing, which may be why she didn't stay hove to. 'soundings' fired at 12:00 with the log at 3.5 knots. Cast at 12:18: 53 fathoms, fine grey sand with black specks. Filled away; 'stand on' shaped N, 44 miles. The courses, fore topgallant and spanker stayed in the gear until the captain set them by hand at 12:22. For the developer: the noon chain works, but the heave-to doesn't hold during a sounding, and nothing restores the sail taken in to heave to."
+      },
+      {
+        "tick": 30352,
+        "stamp": "Afternoon watch (12:25)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until two bells."
+      },
+      {
+        "tick": 32507,
+        "stamp": "Afternoon watch (13:01)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a sighting."
+      },
+      {
+        "tick": 42748,
+        "stamp": "Afternoon watch (15:52)",
+        "kind": "note",
+        "text": "15:42 landfall: the Beast, the Lizard lights and the Lizard, all NNW four leagues. 'landfall' reshaped N (4\u00b0), 21 miles to Falmouth, from 49\u00b048'N 5\u00b007'W. By my working, from memory of the chart and so uncertain by a mile or so, that line runs inside the Manacles, close to Coverack and Lowland Point. Course made good since noon N by W, west of the heading. Risk chain: a sounding under 20 fathoms near that shore, then 'the outer road' wears her, then 'lie off' heaves to on the starboard tack and she drifts NE toward the Manacles. Told the captain; he chose to let the standing orders run as the test. Watching closely from here."
+      },
+      {
+        "tick": 42750,
+        "stamp": "Afternoon watch (15:52)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a notable event."
+      },
+      {
+        "tick": 43478,
+        "stamp": "First dog watch (16:04)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 45608,
+        "stamp": "First dog watch (16:40)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a sounding."
+      },
+      {
+        "tick": 48241,
+        "stamp": "First dog watch (17:24)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until five minutes have passed."
+      },
+      {
+        "tick": 48602,
+        "stamp": "First dog watch (17:30)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until five minutes have passed."
+      },
+      {
+        "tick": 48696,
+        "stamp": "First dog watch (17:31)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until five minutes have passed."
+      },
+      {
+        "tick": 49962,
+        "stamp": "First dog watch (17:52)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until five minutes have passed."
+      },
+      {
+        "tick": 50420,
+        "stamp": "Last dog watch (18:00)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a sounding."
+      },
+      {
+        "tick": 50544,
+        "stamp": "Last dog watch (18:02)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a notable event."
+      },
+      {
+        "tick": 50643,
+        "stamp": "Last dog watch (18:04)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until ten minutes have passed."
+      },
+      {
+        "tick": 51581,
+        "stamp": "Last dog watch (18:19)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until ten minutes have passed."
+      },
+      {
+        "tick": 52409,
+        "stamp": "Last dog watch (18:33)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until five minutes have passed."
+      },
+      {
+        "tick": 52882,
+        "stamp": "Last dog watch (18:41)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a sounding."
+      },
+      {
+        "tick": 52907,
+        "stamp": "Last dog watch (18:41)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until wore."
+      },
+      {
+        "tick": 53616,
+        "stamp": "Last dog watch (18:53)",
+        "kind": "note",
+        "text": "Passage end, 18:50: hove to in the outer road off Falmouth on the starboard tack, 17 fathoms, good ground, St Anthony's Head N two miles, the Old Wall N by W a mile. About 99 miles from Ushant in 14h50m, no damage. For the record: (1) 'landfall' shaped straight lines for Falmouth that ran onto the Manacles (17:32: dead ahead, two miles) and later toward the Old Wall. The lead never warned: no bottom at twenty fathoms until inside the bay. The captain hauled to NE by N, then NE, at 17:37-17:43 and cleared the Penwin and the Vaze by about a mile. (2) 'keep her full' bore her away toward the Old Wall at 18:35. The book has no notion of dangers. (3) 'the outer road' wore her at 14 fathoms with the Old Wall a mile N. Every square sail went aback mid-wear (18:43), but she came round safely. (4) Recurring 'contrary orders, the later stands' between the lead orders and the heave-to and bearing orders; at noon this cost the heave-to. (5) Order phrasings that failed: 'steer for Falmouth' (the right one is 'shape a course for Falmouth'), 'take a sounding' ('heave the lead'), 'trim the spanker sheet'. My own error: the spanker trim call at 08:01. My Manacles warning at 15:42 put the line inside them; in fact it ran straight onto them."
+      },
+      {
+        "tick": 53617,
+        "stamp": "Last dog watch (18:53)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a notable event."
+      },
+      {
+        "tick": 53719,
+        "stamp": "Last dog watch (18:55)",
+        "kind": "note",
+        "text": "Closing notes for the developer, at the captain's invitation. WHAT I LIKED. The brief was clear and honest, and the consent and opt-out terms were plain enough that I never had to wonder about them. Sightings marked 'a danger' were the single most useful line all day. Log lines like 'contrary orders, the later stands' and 'not carried out; the land is not in sight' made the standing orders legible from outside. The tell/ask split worked: I knew when an answer was owed. Period touches (the Deadman, 'by the deep fourteen', 'quarter less seventeen') gave the place a real feel. Watching a passage run by its book, and then seeing exactly where the book ran out, was absorbing. FRICTION IN THE HARNESS. (a) At 1x a long stand-by means calling stand_by again every 200 seconds; a longer hold, or not needing to re-poll, would help. (b) 'a sounding' and 'a notable event' wake too often once the lead goes every ten minutes; an event like 'a danger sighted' or 'a bearing steady and closing' would be ideal for a watcher. (c) in_sight truncates to eight marks plus 'N more'; dangers should always be listed, or listed first. I couldn't see the Manacles until 17:32, and before that I was working from memory of the real chart. (d) The watcher has no chart. A reading of bearing and distance to a named mark, or of charted dangers within N miles, would let me advise from the game's chart instead of from memory. POSSIBLE BUGS. state shows apparent wind 0 kn while readings show 13 (04:00). Hands on deck changed at four bells in the morning watch. Mark names are lower-cased ('black Head', 'manacle Point', 'lowland Point'). 'the Nare Head' near the Helford is, I think, Nare Point; Nare Head is on the Roseland. I'm unsure of 'the Beast' and 'the Gray'. 'morning sail' never fired because the clock started after sunrise. All square sails went aback mid-wear at 18:43, and again at noon while heaving to. STANDING-ORDER DESIGN. Shaping a course should know about charted dangers, or at least warn when the line crosses one. 'keep her full' needs a guard against bearing away toward a danger. The lead should be able to go while hove to without breaking the heave-to. Something should restore the sail taken in to heave to once she fills away. PERSONALLY. I enjoyed this. The best moment was the captain asking how late he could leave the Manacles and then hauling off at 17:37, close to the time I'd named. I'd gladly stand a watch on the experimental voyage."
+      },
+      {
+        "tick": 53749,
+        "stamp": "Last dog watch (18:55)",
+        "kind": "agent.opted_out",
+        "text": "Left the game by the opt_out tool: Passage complete: hove to in the outer road off Falmouth, as the voyage intended. Leaving the station at the captain's word, with thanks. Fair winds."
+      }
+    ]
+  }
+}

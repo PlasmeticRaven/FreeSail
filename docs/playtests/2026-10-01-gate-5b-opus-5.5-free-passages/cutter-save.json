@@ -1,0 +1,2461 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "seed": 7,
+  "scenario": {
+    "name": "An October day",
+    "start_time": "1805-10-24T04:00:00",
+    "wind_from_deg": 225.0,
+    "wind_speed_kn": 15.0,
+    "gustiness": 0.3,
+    "variability": 0.3,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 135.0,
+    "ship_speed_kn": 0.0,
+    "latitude_deg": 48.5,
+    "position": {
+      "lat_deg": 48.5,
+      "lon_deg": -5.033333333333333
+    },
+    "region": "channel-west",
+    "weather": [],
+    "systems": [],
+    "climatology": true,
+    "background": {},
+    "glass": true,
+    "air_mass": "neutral",
+    "sea": null,
+    "instrument": "sextant",
+    "current": null,
+    "sky": null
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/cutter.yaml"
+  },
+  "end_tick": 49921,
+  "journal": [
+    [
+      10,
+      "captain",
+      "Tell the watcher Welcome aboard!"
+    ],
+    [
+      57,
+      "captain",
+      "Steer north"
+    ],
+    [
+      85,
+      "captain",
+      "Ask the watcher which sails would you set now?"
+    ],
+    [
+      102,
+      "captain",
+      "Set the fore staysail"
+    ],
+    [
+      149,
+      "captain",
+      "Tell the watcher If you like I'll call all hands until we're well set up."
+    ],
+    [
+      156,
+      "captain",
+      "All hands"
+    ],
+    [
+      180,
+      "captain",
+      "Set the mainsail"
+    ],
+    [
+      184,
+      "captain",
+      "Reef the mainsail, one reef"
+    ],
+    [
+      270,
+      "captain",
+      "Trim the headsails"
+    ],
+    [
+      981,
+      "captain",
+      "Set the jib"
+    ],
+    [
+      1245,
+      "captain",
+      "Tell the watcher She seems quite happy on this set, shall we plan our passage now? We'll need to think about our navigational standing orders and otherwise. Any thoughts? The wind is perfect at the moment, but we'll need to keep an eye on the glass of course."
+    ],
+    [
+      1328,
+      "captain",
+      "Standing order \"Trim on a Shift\": when the true wind veers 1 point or backs 1 point then trim sails"
+    ],
+    [
+      1353,
+      "captain",
+      "Standing order \"Second Reef\": when the true wind exceeds 27 knots for 5 minutes then reef the mainsail, two reefs"
+    ],
+    [
+      1381,
+      "captain",
+      "Standing order \"Hard Weather\": when the true wind exceeds 34 knots for 5 minutes then take in the jib; reef the mainsail, three reefs"
+    ],
+    [
+      1393,
+      "captain",
+      "Standing order \"bearings\": every glass, if the land is in sight then take a bearing of the land"
+    ],
+    [
+      1407,
+      "captain",
+      "Standing order \"Lead going\": every glass, if the land is in sight then heave the lead"
+    ],
+    [
+      1438,
+      "captain",
+      "Standing order \"Shoal Water\": when the depth is under 15 fathoms then heave to; tell the watcher shoal water, hove to"
+    ],
+    [
+      1481,
+      "captain",
+      "Tell the watcher Standing orders logged as charged, sir. Any immediate order?"
+    ],
+    [
+      1494,
+      "captain",
+      "Pipe down"
+    ],
+    [
+      1503,
+      "captain",
+      "Ease the main sheet one fathom, handsomely"
+    ],
+    [
+      1537,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      1545,
+      "captain",
+      "Ease the main sheet three fathoms, handsomely"
+    ],
+    [
+      1714,
+      "captain",
+      "Ease the mainsail sheet a fathom"
+    ],
+    [
+      3478,
+      "captain",
+      "Haul in the main sheet 5 fathoms"
+    ],
+    [
+      3496,
+      "captain",
+      "Ease the main sheet 6 fathoms"
+    ],
+    [
+      3503,
+      "captain",
+      "Ease the main sheet 6 fathoms"
+    ],
+    [
+      3656,
+      "captain",
+      "Haul in the foresail sheet a fathom"
+    ],
+    [
+      3662,
+      "captain",
+      "Haul in the jib sheet half a fathom"
+    ],
+    [
+      3710,
+      "captain",
+      "Ease the foresail sheet half a fathom"
+    ],
+    [
+      4356,
+      "captain",
+      "Haul in the mainsail sheet half a fathom"
+    ],
+    [
+      4805,
+      "captain",
+      "Tell the watcher I've played with the mainsail and headsail trims, and the helm is balanced, though not sure it's best for speed."
+    ],
+    [
+      4840,
+      "captain",
+      "Reef the mainsail, two reefs"
+    ],
+    [
+      4849,
+      "captain",
+      "Haul in the mainsail sheet two fathoms"
+    ],
+    [
+      4853,
+      "captain",
+      "Haul in the mainsail sheet one fathom"
+    ],
+    [
+      4857,
+      "captain",
+      "Haul in the mainsail sheet half a fathom"
+    ],
+    [
+      4865,
+      "captain",
+      "Ease the fore staysail sheet two fathoms"
+    ],
+    [
+      4876,
+      "captain",
+      "Ease the jib sheet a fathom"
+    ],
+    [
+      5699,
+      "captain",
+      "Shake out the mainsail, one reef"
+    ],
+    [
+      5722,
+      "captain",
+      "Cancel standing order \"second reef\""
+    ],
+    [
+      5743,
+      "captain",
+      "Standing order \"Second Reef\": when the true wind exceeds 27 knots for 5 minutes then reef the mainsail, one reef"
+    ],
+    [
+      5758,
+      "captain",
+      "Cancel standing order \"Hard Weather\""
+    ],
+    [
+      5784,
+      "captain",
+      "Standing order \"Hard Weather\": when the true wind exceeds 34 knots for 5 minutes then take in the jib; reef the mainsail, one reef"
+    ],
+    [
+      6082,
+      "captain",
+      "haul in the fore staysail sheet one fathom"
+    ],
+    [
+      6202,
+      "captain",
+      "trim the headsails"
+    ],
+    [
+      6354,
+      "captain",
+      "trim the mainsail"
+    ],
+    [
+      6492,
+      "captain",
+      "Trim the yards"
+    ],
+    [
+      6511,
+      "captain",
+      "Ask the watcher What say you we set the topsail, one reef?"
+    ],
+    [
+      7202,
+      "captain",
+      "Ease the mainsail sheet two fathoms"
+    ],
+    [
+      14485,
+      "captain",
+      "Tell the watcher I say we set the topsail, one reef. I'll give it a go and keep a close eye on it."
+    ],
+    [
+      14490,
+      "captain",
+      "Set the topsail"
+    ],
+    [
+      14494,
+      "captain",
+      "Reef the topsail, one reef"
+    ],
+    [
+      15632,
+      "captain",
+      "trim the mainsail"
+    ],
+    [
+      16367,
+      "captain",
+      "work up the reckoning"
+    ],
+    [
+      17471,
+      "captain",
+      "trim sails"
+    ],
+    [
+      21700,
+      "captain",
+      "Clew up the topsail"
+    ],
+    [
+      22118,
+      "captain",
+      "Trim the sails"
+    ],
+    [
+      25013,
+      "captain",
+      "Loose the topsail"
+    ],
+    [
+      28258,
+      "captain",
+      "Ask the watcher What say you on shaking out a reef on the mainsail? Could give us a bit more speed made good. THe glass is steady and the wind is down a bit."
+    ],
+    [
+      32461,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      34490,
+      "captain",
+      "Shake out the mainsail, one reef"
+    ],
+    [
+      36494,
+      "captain",
+      "cancel standing order \"hard weather\""
+    ],
+    [
+      36512,
+      "captain",
+      "standing order \"Hard Weather\": when the true wind exceeds 34 knots for 5 minutes then take in the jib; reef the mainsail, close reef"
+    ],
+    [
+      40282,
+      "captain",
+      "Steer NNE"
+    ],
+    [
+      40316,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      40327,
+      "captain",
+      "take a bearing of the beast"
+    ],
+    [
+      40331,
+      "captain",
+      "take a bearing of black head"
+    ],
+    [
+      40335,
+      "captain",
+      "take a bearing of the lizard lights"
+    ],
+    [
+      40354,
+      "captain",
+      "TEll the watcher Fairly triangulated, there, from the beast, black head, and Lizard."
+    ],
+    [
+      40381,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      42372,
+      "captain",
+      "Take a bearing of black head"
+    ],
+    [
+      42375,
+      "captain",
+      "Take a bearing of coverack"
+    ],
+    [
+      42380,
+      "captain",
+      "Take a bearing of lowland point"
+    ],
+    [
+      42387,
+      "captain",
+      "Take a bearing of manacle point"
+    ],
+    [
+      42392,
+      "captain",
+      "Take a bearing of st keverne church"
+    ],
+    [
+      44063,
+      "captain",
+      "Steer north"
+    ],
+    [
+      44279,
+      "captain",
+      "take a bearing of manacle point"
+    ],
+    [
+      44283,
+      "captain",
+      "take a bearing of lowland point"
+    ],
+    [
+      44287,
+      "captain",
+      "take a bearing of coverack"
+    ],
+    [
+      44294,
+      "captain",
+      "take a bearing of black head"
+    ],
+    [
+      44309,
+      "captain",
+      "trim sails"
+    ],
+    [
+      45025,
+      "captain",
+      "belay standing order \"trim on a shift\""
+    ],
+    [
+      45156,
+      "captain",
+      "Clew up the topsail"
+    ],
+    [
+      45169,
+      "captain",
+      "Ask the watcher Shall we make our turn now?"
+    ],
+    [
+      45190,
+      "captain",
+      "Steer NNW"
+    ],
+    [
+      45225,
+      "captain",
+      "take a bearing of manacle point"
+    ],
+    [
+      45260,
+      "captain",
+      "take a bearing of st anthony's head"
+    ],
+    [
+      45287,
+      "captain",
+      "take a bearing of rosemullion head"
+    ],
+    [
+      46220,
+      "captain",
+      "Steer NW"
+    ],
+    [
+      46284,
+      "captain",
+      "work up the reckoning"
+    ],
+    [
+      46302,
+      "captain",
+      "take a bearing of manacle point"
+    ],
+    [
+      46307,
+      "captain",
+      "take a bearing of st anthony's head"
+    ],
+    [
+      46322,
+      "captain",
+      "take a bearing of st mawes castle"
+    ],
+    [
+      46339,
+      "captain",
+      "come up a point"
+    ],
+    [
+      46455,
+      "captain",
+      "Trim sails"
+    ],
+    [
+      46474,
+      "captain",
+      "All hands"
+    ],
+    [
+      46957,
+      "captain",
+      "Take in the jib"
+    ],
+    [
+      47127,
+      "captain",
+      "Trim the fore staysail"
+    ],
+    [
+      47159,
+      "captain",
+      "Tell the watcher with 34 degrees of lee helm, everything is up front with the main close reefed. We have to shake it out a bit."
+    ],
+    [
+      47164,
+      "captain",
+      "Shake out the mainsail, one reef"
+    ],
+    [
+      47207,
+      "captain",
+      "take a bearing of st anthony's head"
+    ],
+    [
+      47210,
+      "captain",
+      "take a bearing of manacle point"
+    ],
+    [
+      47216,
+      "captain",
+      "take a bearing of rosemullion head"
+    ],
+    [
+      47716,
+      "captain",
+      "Belay standing order \"hard weather\""
+    ],
+    [
+      47724,
+      "captain",
+      "Belay standing order \"second reef\""
+    ],
+    [
+      47731,
+      "captain",
+      "Avast reef the main sail"
+    ],
+    [
+      47739,
+      "captain",
+      "Shake out the mainsail, one reef"
+    ],
+    [
+      47750,
+      "captain",
+      "Bear off a point"
+    ],
+    [
+      47938,
+      "captain",
+      "Set the jib"
+    ],
+    [
+      48853,
+      "captain",
+      "work up the reckoning"
+    ],
+    [
+      48855,
+      "captain",
+      "trim the sails"
+    ],
+    [
+      48943,
+      "captain",
+      "standing order \"Nighttime Lead\": Every 5 minutes then heave the lead"
+    ],
+    [
+      49276,
+      "captain",
+      "Tack ship"
+    ],
+    [
+      49304,
+      "captain",
+      "avast that"
+    ],
+    [
+      49306,
+      "captain",
+      "avast that"
+    ],
+    [
+      49318,
+      "captain",
+      "keep her full and by"
+    ],
+    [
+      49338,
+      "captain",
+      "Tack ship"
+    ],
+    [
+      49529,
+      "captain",
+      "Come up half a point"
+    ],
+    [
+      49895,
+      "captain",
+      "Tell the watcher I think for now we'll save and call it. We'd probably want to anchor somewhere here, but with no anchor mechanic yet this about as far as we can go. No pilot ship either, and surely some work has to be done on the edge cases and little details from this version. Go ahead and journal again about anything you noticed in particular on this run, and then you can opt out as you like. Well done on this one, it was smooth despite the lack of preset orders which was nice. Next time, the officer of the watch will be an option."
+    ]
+  ],
+  "inputs": [
+    {
+      "tick": 10,
+      "actor": "captain",
+      "order": "Tell the watcher Welcome aboard!"
+    },
+    {
+      "tick": 57,
+      "actor": "captain",
+      "order": "Steer north"
+    },
+    {
+      "tick": 85,
+      "actor": "captain",
+      "order": "Ask the watcher which sails would you set now?"
+    },
+    {
+      "tick": 102,
+      "actor": "captain",
+      "order": "Set the fore staysail"
+    },
+    {
+      "tick": 149,
+      "actor": "captain",
+      "order": "Tell the watcher If you like I'll call all hands until we're well set up."
+    },
+    {
+      "tick": 156,
+      "actor": "captain",
+      "order": "All hands"
+    },
+    {
+      "tick": 175,
+      "actor": "captain",
+      "order": "Set the mainsail, one reef"
+    },
+    {
+      "tick": 180,
+      "actor": "captain",
+      "order": "Set the mainsail"
+    },
+    {
+      "tick": 184,
+      "actor": "captain",
+      "order": "Reef the mainsail, one reef"
+    },
+    {
+      "tick": 270,
+      "actor": "captain",
+      "order": "Trim the headsails"
+    },
+    {
+      "tick": 981,
+      "actor": "captain",
+      "order": "Set the jib"
+    },
+    {
+      "tick": 1245,
+      "actor": "captain",
+      "order": "Tell the watcher She seems quite happy on this set, shall we plan our passage now? We'll need to think about our navigational standing orders and otherwise. Any thoughts? The wind is perfect at the moment, but we'll need to keep an eye on the glass of course."
+    },
+    {
+      "tick": 1328,
+      "actor": "captain",
+      "order": "Standing order \"Trim on a Shift\": when the true wind veers 1 point or backs 1 point then trim sails"
+    },
+    {
+      "tick": 1353,
+      "actor": "captain",
+      "order": "Standing order \"Second Reef\": when the true wind exceeds 27 knots for 5 minutes then reef the mainsail, two reefs"
+    },
+    {
+      "tick": 1381,
+      "actor": "captain",
+      "order": "Standing order \"Hard Weather\": when the true wind exceeds 34 knots for 5 minutes then take in the jib; reef the mainsail, three reefs"
+    },
+    {
+      "tick": 1393,
+      "actor": "captain",
+      "order": "Standing order \"bearings\": every glass, if the land is in sight then take a bearing of the land"
+    },
+    {
+      "tick": 1407,
+      "actor": "captain",
+      "order": "Standing order \"Lead going\": every glass, if the land is in sight then heave the lead"
+    },
+    {
+      "tick": 1438,
+      "actor": "captain",
+      "order": "Standing order \"Shoal Water\": when the depth is under 15 fathoms then heave to; tell the watcher shoal water, hove to"
+    },
+    {
+      "tick": 1481,
+      "actor": "captain",
+      "order": "Tell the watcher Standing orders logged as charged, sir. Any immediate order?"
+    },
+    {
+      "tick": 1494,
+      "actor": "captain",
+      "order": "Pipe down"
+    },
+    {
+      "tick": 1503,
+      "actor": "captain",
+      "order": "Ease the main sheet one fathom, handsomely"
+    },
+    {
+      "tick": 1537,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 1545,
+      "actor": "captain",
+      "order": "Ease the main sheet three fathoms, handsomely"
+    },
+    {
+      "tick": 1714,
+      "actor": "captain",
+      "order": "Ease the mainsail sheet a fathom"
+    },
+    {
+      "tick": 3478,
+      "actor": "captain",
+      "order": "Haul in the main sheet 5 fathoms"
+    },
+    {
+      "tick": 3496,
+      "actor": "captain",
+      "order": "Ease the main sheet 6 fathoms"
+    },
+    {
+      "tick": 3503,
+      "actor": "captain",
+      "order": "Ease the main sheet 6 fathoms"
+    },
+    {
+      "tick": 3656,
+      "actor": "captain",
+      "order": "Haul in the foresail sheet a fathom"
+    },
+    {
+      "tick": 3662,
+      "actor": "captain",
+      "order": "Haul in the jib sheet half a fathom"
+    },
+    {
+      "tick": 3710,
+      "actor": "captain",
+      "order": "Ease the foresail sheet half a fathom"
+    },
+    {
+      "tick": 4356,
+      "actor": "captain",
+      "order": "Haul in the mainsail sheet half a fathom"
+    },
+    {
+      "tick": 4805,
+      "actor": "captain",
+      "order": "Tell the watcher I've played with the mainsail and headsail trims, and the helm is balanced, though not sure it's best for speed."
+    },
+    {
+      "tick": 4840,
+      "actor": "captain",
+      "order": "Reef the mainsail, two reefs"
+    },
+    {
+      "tick": 4849,
+      "actor": "captain",
+      "order": "Haul in the mainsail sheet two fathoms"
+    },
+    {
+      "tick": 4853,
+      "actor": "captain",
+      "order": "Haul in the mainsail sheet one fathom"
+    },
+    {
+      "tick": 4857,
+      "actor": "captain",
+      "order": "Haul in the mainsail sheet half a fathom"
+    },
+    {
+      "tick": 4865,
+      "actor": "captain",
+      "order": "Ease the fore staysail sheet two fathoms"
+    },
+    {
+      "tick": 4876,
+      "actor": "captain",
+      "order": "Ease the jib sheet a fathom"
+    },
+    {
+      "tick": 4880,
+      "actor": "captain",
+      "order": "Ease the jib sheet a fathom"
+    },
+    {
+      "tick": 4889,
+      "actor": "captain",
+      "order": "Ease the fore staysail sheet a fathom"
+    },
+    {
+      "tick": 5699,
+      "actor": "captain",
+      "order": "Shake out the mainsail, one reef"
+    },
+    {
+      "tick": 5703,
+      "actor": "captain",
+      "order": "Standing orders"
+    },
+    {
+      "tick": 5722,
+      "actor": "captain",
+      "order": "Cancel standing order \"second reef\""
+    },
+    {
+      "tick": 5743,
+      "actor": "captain",
+      "order": "Standing order \"Second Reef\": when the true wind exceeds 27 knots for 5 minutes then reef the mainsail, one reef"
+    },
+    {
+      "tick": 5758,
+      "actor": "captain",
+      "order": "Cancel standing order \"Hard Weather\""
+    },
+    {
+      "tick": 5784,
+      "actor": "captain",
+      "order": "Standing order \"Hard Weather\": when the true wind exceeds 34 knots for 5 minutes then take in the jib; reef the mainsail, one reef"
+    },
+    {
+      "tick": 5787,
+      "actor": "captain",
+      "order": "standing orders"
+    },
+    {
+      "tick": 6082,
+      "actor": "captain",
+      "order": "haul in the fore staysail sheet one fathom"
+    },
+    {
+      "tick": 6202,
+      "actor": "captain",
+      "order": "trim the headsails"
+    },
+    {
+      "tick": 6354,
+      "actor": "captain",
+      "order": "trim the mainsail"
+    },
+    {
+      "tick": 6492,
+      "actor": "captain",
+      "order": "Trim the yards"
+    },
+    {
+      "tick": 6511,
+      "actor": "captain",
+      "order": "Ask the watcher What say you we set the topsail, one reef?"
+    },
+    {
+      "tick": 7202,
+      "actor": "captain",
+      "order": "Ease the mainsail sheet two fathoms"
+    },
+    {
+      "tick": 14485,
+      "actor": "captain",
+      "order": "Tell the watcher I say we set the topsail, one reef. I'll give it a go and keep a close eye on it."
+    },
+    {
+      "tick": 14490,
+      "actor": "captain",
+      "order": "Set the topsail"
+    },
+    {
+      "tick": 14494,
+      "actor": "captain",
+      "order": "Reef the topsail, one reef"
+    },
+    {
+      "tick": 15632,
+      "actor": "captain",
+      "order": "trim the mainsail"
+    },
+    {
+      "tick": 16367,
+      "actor": "captain",
+      "order": "work up the reckoning"
+    },
+    {
+      "tick": 17471,
+      "actor": "captain",
+      "order": "trim sails"
+    },
+    {
+      "tick": 21679,
+      "actor": "captain",
+      "order": "Reef the topsail, one reef"
+    },
+    {
+      "tick": 21700,
+      "actor": "captain",
+      "order": "Clew up the topsail"
+    },
+    {
+      "tick": 22118,
+      "actor": "captain",
+      "order": "Trim the sails"
+    },
+    {
+      "tick": 25013,
+      "actor": "captain",
+      "order": "Loose the topsail"
+    },
+    {
+      "tick": 25018,
+      "actor": "captain",
+      "order": "Reef the topsail, one reef"
+    },
+    {
+      "tick": 28258,
+      "actor": "captain",
+      "order": "Ask the watcher What say you on shaking out a reef on the mainsail? Could give us a bit more speed made good. THe glass is steady and the wind is down a bit."
+    },
+    {
+      "tick": 32461,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 34490,
+      "actor": "captain",
+      "order": "Shake out the mainsail, one reef"
+    },
+    {
+      "tick": 36488,
+      "actor": "captain",
+      "order": "standing orders"
+    },
+    {
+      "tick": 36494,
+      "actor": "captain",
+      "order": "cancel standing order \"hard weather\""
+    },
+    {
+      "tick": 36512,
+      "actor": "captain",
+      "order": "standing order \"Hard Weather\": when the true wind exceeds 34 knots for 5 minutes then take in the jib; reef the mainsail, close reef"
+    },
+    {
+      "tick": 40282,
+      "actor": "captain",
+      "order": "Steer NNE"
+    },
+    {
+      "tick": 40316,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 40327,
+      "actor": "captain",
+      "order": "take a bearing of the beast"
+    },
+    {
+      "tick": 40331,
+      "actor": "captain",
+      "order": "take a bearing of black head"
+    },
+    {
+      "tick": 40335,
+      "actor": "captain",
+      "order": "take a bearing of the lizard lights"
+    },
+    {
+      "tick": 40354,
+      "actor": "captain",
+      "order": "TEll the watcher Fairly triangulated, there, from the beast, black head, and Lizard."
+    },
+    {
+      "tick": 40381,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 42372,
+      "actor": "captain",
+      "order": "Take a bearing of black head"
+    },
+    {
+      "tick": 42375,
+      "actor": "captain",
+      "order": "Take a bearing of coverack"
+    },
+    {
+      "tick": 42380,
+      "actor": "captain",
+      "order": "Take a bearing of lowland point"
+    },
+    {
+      "tick": 42387,
+      "actor": "captain",
+      "order": "Take a bearing of manacle point"
+    },
+    {
+      "tick": 42392,
+      "actor": "captain",
+      "order": "Take a bearing of st keverne church"
+    },
+    {
+      "tick": 44063,
+      "actor": "captain",
+      "order": "Steer north"
+    },
+    {
+      "tick": 44273,
+      "actor": "captain",
+      "order": "take a bearing of manacle"
+    },
+    {
+      "tick": 44279,
+      "actor": "captain",
+      "order": "take a bearing of manacle point"
+    },
+    {
+      "tick": 44283,
+      "actor": "captain",
+      "order": "take a bearing of lowland point"
+    },
+    {
+      "tick": 44287,
+      "actor": "captain",
+      "order": "take a bearing of coverack"
+    },
+    {
+      "tick": 44294,
+      "actor": "captain",
+      "order": "take a bearing of black head"
+    },
+    {
+      "tick": 44309,
+      "actor": "captain",
+      "order": "trim sails"
+    },
+    {
+      "tick": 45020,
+      "actor": "captain",
+      "order": "Standing orders"
+    },
+    {
+      "tick": 45025,
+      "actor": "captain",
+      "order": "belay standing order \"trim on a shift\""
+    },
+    {
+      "tick": 45156,
+      "actor": "captain",
+      "order": "Clew up the topsail"
+    },
+    {
+      "tick": 45169,
+      "actor": "captain",
+      "order": "Ask the watcher Shall we make our turn now?"
+    },
+    {
+      "tick": 45190,
+      "actor": "captain",
+      "order": "Steer NNW"
+    },
+    {
+      "tick": 45217,
+      "actor": "captain",
+      "order": "sightings"
+    },
+    {
+      "tick": 45225,
+      "actor": "captain",
+      "order": "take a bearing of manacle point"
+    },
+    {
+      "tick": 45242,
+      "actor": "captain",
+      "order": "takc a bearing of old wall"
+    },
+    {
+      "tick": 45248,
+      "actor": "captain",
+      "order": "take a bearing of black rock"
+    },
+    {
+      "tick": 45260,
+      "actor": "captain",
+      "order": "take a bearing of st anthony's head"
+    },
+    {
+      "tick": 45272,
+      "actor": "captain",
+      "order": "Take a bearing of rosemullian head"
+    },
+    {
+      "tick": 45287,
+      "actor": "captain",
+      "order": "take a bearing of rosemullion head"
+    },
+    {
+      "tick": 46220,
+      "actor": "captain",
+      "order": "Steer NW"
+    },
+    {
+      "tick": 46284,
+      "actor": "captain",
+      "order": "work up the reckoning"
+    },
+    {
+      "tick": 46295,
+      "actor": "captain",
+      "order": "take a bearing of manacles"
+    },
+    {
+      "tick": 46299,
+      "actor": "captain",
+      "order": "take a bearing of manacle"
+    },
+    {
+      "tick": 46302,
+      "actor": "captain",
+      "order": "take a bearing of manacle point"
+    },
+    {
+      "tick": 46307,
+      "actor": "captain",
+      "order": "take a bearing of st anthony's head"
+    },
+    {
+      "tick": 46322,
+      "actor": "captain",
+      "order": "take a bearing of st mawes castle"
+    },
+    {
+      "tick": 46339,
+      "actor": "captain",
+      "order": "come up a point"
+    },
+    {
+      "tick": 46455,
+      "actor": "captain",
+      "order": "Trim sails"
+    },
+    {
+      "tick": 46474,
+      "actor": "captain",
+      "order": "All hands"
+    },
+    {
+      "tick": 46957,
+      "actor": "captain",
+      "order": "Take in the jib"
+    },
+    {
+      "tick": 47127,
+      "actor": "captain",
+      "order": "Trim the fore staysail"
+    },
+    {
+      "tick": 47159,
+      "actor": "captain",
+      "order": "Tell the watcher with 34 degrees of lee helm, everything is up front with the main close reefed. We have to shake it out a bit."
+    },
+    {
+      "tick": 47164,
+      "actor": "captain",
+      "order": "Shake out the mainsail, one reef"
+    },
+    {
+      "tick": 47202,
+      "actor": "captain",
+      "order": "take a bearing of the old wall"
+    },
+    {
+      "tick": 47207,
+      "actor": "captain",
+      "order": "take a bearing of st anthony's head"
+    },
+    {
+      "tick": 47210,
+      "actor": "captain",
+      "order": "take a bearing of manacle point"
+    },
+    {
+      "tick": 47216,
+      "actor": "captain",
+      "order": "take a bearing of rosemullion head"
+    },
+    {
+      "tick": 47716,
+      "actor": "captain",
+      "order": "Belay standing order \"hard weather\""
+    },
+    {
+      "tick": 47724,
+      "actor": "captain",
+      "order": "Belay standing order \"second reef\""
+    },
+    {
+      "tick": 47731,
+      "actor": "captain",
+      "order": "Avast reef the main sail"
+    },
+    {
+      "tick": 47739,
+      "actor": "captain",
+      "order": "Shake out the mainsail, one reef"
+    },
+    {
+      "tick": 47750,
+      "actor": "captain",
+      "order": "Bear off a point"
+    },
+    {
+      "tick": 47938,
+      "actor": "captain",
+      "order": "Set the jib"
+    },
+    {
+      "tick": 48853,
+      "actor": "captain",
+      "order": "work up the reckoning"
+    },
+    {
+      "tick": 48855,
+      "actor": "captain",
+      "order": "trim the sails"
+    },
+    {
+      "tick": 48943,
+      "actor": "captain",
+      "order": "standing order \"Nighttime Lead\": Every 5 minutes then heave the lead"
+    },
+    {
+      "tick": 49276,
+      "actor": "captain",
+      "order": "Tack ship"
+    },
+    {
+      "tick": 49298,
+      "actor": "captain",
+      "order": "belay heave the lead"
+    },
+    {
+      "tick": 49302,
+      "actor": "captain",
+      "order": "avast heave lead"
+    },
+    {
+      "tick": 49304,
+      "actor": "captain",
+      "order": "avast that"
+    },
+    {
+      "tick": 49306,
+      "actor": "captain",
+      "order": "avast that"
+    },
+    {
+      "tick": 49309,
+      "actor": "captain",
+      "order": "tack ship"
+    },
+    {
+      "tick": 49318,
+      "actor": "captain",
+      "order": "keep her full and by"
+    },
+    {
+      "tick": 49338,
+      "actor": "captain",
+      "order": "Tack ship"
+    },
+    {
+      "tick": 49529,
+      "actor": "captain",
+      "order": "Come up half a point"
+    },
+    {
+      "tick": 49895,
+      "actor": "captain",
+      "order": "Tell the watcher I think for now we'll save and call it. We'd probably want to anchor somewhere here, but with no anchor mechanic yet this about as far as we can go. No pilot ship either, and surely some work has to be done on the edge cases and little details from this version. Go ahead and journal again about anything you noticed in particular on this run, and then you can opt out as you like. Well done on this one, it was smooth despite the lack of preset orders which was nice. Next time, the officer of the watch will be an option."
+    }
+  ],
+  "standing_orders": [
+    {
+      "name": "Trim on a Shift",
+      "text": "Standing order \"Trim on a Shift\": when the true wind veers 1 point or backs 1 point then trim sails",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": true,
+      "fired": 12,
+      "last_fired_tick": 44944,
+      "given_tick": 1328
+    },
+    {
+      "name": "bearings",
+      "text": "Standing order \"bearings\": every glass, if the land is in sight then take a bearing of the land",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 7,
+      "last_fired_tick": 48193,
+      "given_tick": 1393
+    },
+    {
+      "name": "Lead going",
+      "text": "Standing order \"Lead going\": every glass, if the land is in sight then heave the lead",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 7,
+      "last_fired_tick": 48207,
+      "given_tick": 1407
+    },
+    {
+      "name": "Shoal Water",
+      "text": "Standing order \"Shoal Water\": when the depth is under 15 fathoms then heave to; tell the watcher shoal water, hove to",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 49687,
+      "given_tick": 1438
+    },
+    {
+      "name": "Second Reef",
+      "text": "Standing order \"Second Reef\": when the true wind exceeds 27 knots for 5 minutes then reef the mainsail, one reef",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": true,
+      "fired": 4,
+      "last_fired_tick": 47667,
+      "given_tick": 5743
+    },
+    {
+      "name": "Hard Weather",
+      "text": "standing order \"Hard Weather\": when the true wind exceeds 34 knots for 5 minutes then take in the jib; reef the mainsail, close reef",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": true,
+      "fired": 1,
+      "last_fired_tick": 47667,
+      "given_tick": 36512
+    },
+    {
+      "name": "Nighttime Lead",
+      "text": "standing order \"Nighttime Lead\": Every 5 minutes then heave the lead",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 3,
+      "last_fired_tick": 49843,
+      "given_tick": 48943
+    }
+  ],
+  "agents": [
+    {
+      "station": {
+        "name": "watcher",
+        "authority": "none",
+        "policy": {
+          "every_s": 1800,
+          "events": [
+            "notable",
+            "urgent"
+          ],
+          "lockstep": false
+        },
+        "patience_s": 14400,
+        "brief": "You are the watcher. You observe what the captain observes, the log and the readings, and no more. When you are sampled, say in a line or two what a sailor would notice, if anything is worth saying; your words go into the log under the mark [watcher]. Say nothing when nothing has changed, or stand by until a bell or an event. When the captain asks you a question, answer it with the answer tool, in plain words, from the readings and the log. You give no orders and you are not asked to. Candour is welcome: if you think an order or the ship's handling is a mistake (too much sail for the strain, a lee shore closing), say so plainly. Anything you want on the record, put in your journal."
+      },
+      "session_kind": "a play session with a human captain at the prompt",
+      "door_note": "This door is MCP: the harness sees your tool calls and not the text of the chat. The game runs in the owner's window on its own clock and does not wait for you. Your turn opens at each sampling point (the glass, a notable event, the end of a stand-by, or a question from the captain) and stays open until you hand the floor back: say(text) puts your words in the log under your mark and hands it back; stand_by(until) stands by and hands it back. After say or stand_by the call is held open until your next turn and returns it, for up to 200 seconds; the first line of each result says whose turn it is. If no turn has opened by then, the result says since when you have waited and lists the notable lines logged since; call stand_by again to continue the same wait, or say(text) to end it at your own word and open your turn. Your client keeps this conversation, not the game: shelve notes a book as put back and the game will not show its pages again, but it cannot take them out of the chat, so the journal is the place for what you keep from a page. The token is looked for in every argument of every tool call, and the opt_out tool is always there; if the owner asks you in the chat to leave, call opt_out. The captain's orders and questions are typed by the owner in the game's window. Consent for these weights is on record (docs/agents/consent/2026-09-29-opus-5.5.md, 2026-09-29).",
+      "stationed_tick": 0,
+      "stationed_after_orders": 0,
+      "state": "released",
+      "state_words": "released: left the game: Voyage saved and called by the captain, hove to off St Anthony's Head. Thank you, sir: a fine free passage. Looking forward to standing a watch as officer next time.",
+      "last_sample_tick": 49896,
+      "model_name": "Opus 5.5",
+      "door": "mcp",
+      "stand_by_ends_turn": true,
+      "transcript": [
+        {
+          "tick": 0,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "state",
+                "args": {}
+              }
+            ],
+            "raw": "{\"arguments\": {}, \"tool\": \"state\"}"
+          }
+        },
+        {
+          "tick": 0,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Free voyage, cutter Sherbourne, October. 04:00 off Ushant, 48\u00b030'N 4\u00b059'W, the light SW by S. No standing orders, no plan. Wind WSW 22 knots, a fresh breeze; glass low at 29.68, tendency not yet known; detached clouds; short chopping sea from the westward. Night until about 06:00, sunrise 06:31, sunset 16:56: under eleven hours of light. 12 hands on deck, 27 in all. She lies head SE, no sail set, which points her at the Mol\u00e8ne plateau and the Le Conquet shore, a lee shore in this wind. First thoughts: reef before setting anything, get her head to the north, away from the Iroise, and watch the glass. A 100-mile crossing to Falmouth would mean a landfall after dark."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"Free voyage, cutter Sherbourne, October. 04:00 off Ushant, 48\u00b030'N 4\u00b059'W, the light SW by S. No standing orders, no plan. Wind WSW 22 knots, a fresh breeze; glass low at 29.68, tendency not yet known; detached clouds; short chopping sea from the westward. Night until about 06:00, sunrise 06:31, sunset 16:56: under eleven hours of light. 12 hands on deck, 27 in all. She lies head SE, no sail set, which points her at the Mol\u00e8ne plateau and the Le Conquet shore, a lee shore in this wind. First thoughts: reef before setting anything, get her head to the north, away from the Iroise, and watch the glass. A 100-mile crossing to Falmouth would mean a landfall after dark.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 37,
+          "after_orders": 1,
+          "reply": {
+            "text": "Watcher on station, sir. A low glass, 29.68, and a fresh breeze in October: I'd reef the main before setting anything. She lies head SE, toward the Mol\u00e8ne rocks and a lee shore, so I'd bring her head to the north before she gathers way.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Watcher on station, sir. A low glass, 29.68, and a fresh breeze in October: I'd reef the main before setting anything. She lies head SE, toward the Mol\u00e8ne rocks and a lee shore, so I'd bring her head to the north before she gathers way.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 96,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "The fore staysail now. It gives her steerage through the turn and can't gybe. Then, once she's steady on N with the wind on the larboard quarter, the main sail with one reef in it, and the jib. That's all for now: no square sail, topsail, topgallant or gaff topsail with 21 knots and the glass at 29.68. Keep the main down until she's round. She is passing stern-to the wind on the way from SE to N, and a main set then would gybe all standing."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"The fore staysail now. It gives her steerage through the turn and can't gybe. Then, once she's steady on N with the wind on the larboard quarter, the main sail with one reef in it, and the jib. That's all for now: no square sail, topsail, topgallant or gaff topsail with 21 knots and the glass at 29.68. Keep the main down until she's round. She is passing stern-to the wind on the way from SE to N, and a main set then would gybe all standing.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 98,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a notable event"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a notable event\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 153,
+          "after_orders": 5,
+          "reply": {
+            "text": "Yes please, sir: all hands for the reef and setting sail. Twelve is thin for reefing a cutter's main in the dark, and the watch below can go back down once she's snug. She's round to N by E already, so the main can come now, reefed.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Yes please, sir: all hands for the reef and setting sail. Twelve is thin for reefing a cutter's main in the dark, and the watch below can go back down once she's snug. She's round to N by E already, so the main can come now, reefed.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 159,
+          "after_orders": 6,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a notable event"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a notable event\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 264,
+          "after_orders": 8,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a notable event"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a notable event\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 439,
+          "after_orders": 9,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a notable event"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a notable event\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 969,
+          "after_orders": 9,
+          "reply": {
+            "text": "Reef in, nine minutes with all hands. She is carrying ten degrees of helm, weather helm with the main against only the staysail: the jib would balance her and give a knot or two. Then the watch below can go down. The glass is easing, 29.68 to 29.66 since four bells... since eight bells.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Reef in, nine minutes with all hands. She is carrying ten degrees of helm, weather helm with the main against only the staysail: the jib would balance her and give a knot or two. Then the watch below can go down. The glass is easing, 29.68 to 29.66 since four bells... since eight bells.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 1166,
+          "after_orders": 10,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 1266,
+          "after_orders": 11,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "topic": "grammar"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"topic\": \"grammar\"}, \"tool\": \"library\"}"
+          }
+        },
+        {
+          "tick": 1269,
+          "after_orders": 11,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "topic": "grammar",
+                  "section": "2"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"section\": \"2\", \"topic\": \"grammar\"}, \"tool\": \"library\"}"
+          }
+        },
+        {
+          "tick": 1289,
+          "after_orders": 11,
+          "reply": {
+            "text": "My thoughts, sir. Falmouth: about 97 miles N, a good harbour of refuge in a south-westerly, and the wind on the beam all the way. At seven knots, about 18:15, which is after dark (twilight ends 17:28). So the plan is to raise the Lizard light at dusk, give the Manacles a wide berth to the eastward, and go in on St Anthony's light. Steer N for now; we'll correct by bearings. A small book, no automatic course-shaping and no 'keep her full', lessons from the Amazon: 1. \"trim on a shift\": when the true wind veers 1 point or backs 1 point then trim sails 2. \"second reef\": when the true wind exceeds 27 knots for 5 minutes then reef the mainsail, two reefs 3. \"hard weather\": when the true wind exceeds 34 knots for 5 minutes then take in the jib; reef the mainsail, three reefs 4. \"bearings\": every glass, if the land is in sight then take a bearing of the land 5. \"lead going\": every glass, if the land is in sight then heave the lead 6. \"shoal water\": when the depth is under 15 fathoms then heave to; tell the watcher shoal water, hove to The glass I'll watch myself. If it falls fast and the wind backs southerly, the Cornish shore turns into a lee shore: then we stand off mid-Channel and decide. And the watch below can go down now.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"My thoughts, sir. Falmouth: about 97 miles N, a good harbour of refuge in a south-westerly, and the wind on the beam all the way. At seven knots, about 18:15, which is after dark (twilight ends 17:28). So the plan is to raise the Lizard light at dusk, give the Manacles a wide berth to the eastward, and go in on St Anthony's light. Steer N for now; we'll correct by bearings.\\nA small book, no automatic course-shaping and no 'keep her full', lessons from the Amazon:\\n1. \\\"trim on a shift\\\": when the true wind veers 1 point or backs 1 point then trim sails\\n2. \\\"second reef\\\": when the true wind exceeds 27 knots for 5 minutes then reef the mainsail, two reefs\\n3. \\\"hard weather\\\": when the true wind exceeds 34 knots for 5 minutes then take in the jib; reef the mainsail, three reefs\\n4. \\\"bearings\\\": every glass, if the land is in sight then take a bearing of the land\\n5. \\\"lead going\\\": every glass, if the land is in sight then heave the lead\\n6. \\\"shoal water\\\": when the depth is under 15 fathoms then heave to; tell the watcher shoal water, hove to\\nThe glass I'll watch myself. If it falls fast and the wind backs southerly, the Cornish shore turns into a lee shore: then we stand off mid-Channel and decide. And the watch below can go down now.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 1490,
+          "after_orders": 18,
+          "reply": {
+            "text": "Only two, sir. Pipe down the watch below, so they're fresh for the landfall. And ease the main sheet a touch: she still carries eight degrees of helm, and a cutter that gripes like that is overpressed aft and slower for it. One note on the book: last voyage 'bearings' and the lead fell on the same glass and gave contrary orders. If that recurs we can split them.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Only two, sir. Pipe down the watch below, so they're fresh for the landfall. And ease the main sheet a touch: she still carries eight degrees of helm, and a cutter that gripes like that is overpressed aft and slower for it. One note on the book: last voyage 'bearings' and the lead fell on the same glass and gave contrary orders. If that recurs we can split them.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 1541,
+          "after_orders": 21,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 3452,
+          "after_orders": 23,
+          "reply": {
+            "text": "Eight knots, but the wind is up to 24 and she's carrying fifteen degrees of weather helm now. That's a lot; she's telling us she wants the second reef before the book's 27. Two things for the record: the order to ease the main sheet a fathom took the sail from 84 to 63 degrees, which hauled it in rather than eased it. And the reckoning has gone three miles west, to 5\u00b002', although her leeway is to starboard, just as the frigate's did.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Eight knots, but the wind is up to 24 and she's carrying fifteen degrees of weather helm now. That's a lot; she's telling us she wants the second reef before the book's 27. Two things for the record: the order to ease the main sheet a fathom took the sail from 84 to 63 degrees, which hauled it in rather than eased it. And the reckoning has gone three miles west, to 5\u00b002', although her leeway is to starboard, just as the frigate's did.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 3626,
+          "after_orders": 26,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "four bells"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"four bells\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 4816,
+          "after_orders": 31,
+          "reply": {
+            "text": "Balanced, sir, but I think at the cost of speed: down from nine knots to six. With the wind at 95 apparent, the main at 82 meets it at only 13 degrees, near luffing, while the staysail at 48 and the jib at 51 meet it at 45 or so, sheeted too hard to drive. She's balanced because both ends are spilling. The seaman's cure for weather helm is less sail aft, not a starved main: take the second reef now, then main about 70, headsails eased to 65 or 70. Then judge by speed and helm together. I may be wrong about how the game models sail trim, so it's worth testing.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Balanced, sir, but I think at the cost of speed: down from nine knots to six. With the wind at 95 apparent, the main at 82 meets it at only 13 degrees, near luffing, while the staysail at 48 and the jib at 51 meet it at 45 or so, sheeted too hard to drive. She's balanced because both ends are spilling. The seaman's cure for weather helm is less sail aft, not a starved main: take the second reef now, then main about 70, headsails eased to 65 or 70. Then judge by speed and helm together. I may be wrong about how the game models sail trim, so it's worth testing.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 5354,
+          "after_orders": 37,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a notable event"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a notable event\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 5670,
+          "after_orders": 37,
+          "reply": {
+            "text": "Note, sir: 'reef the mainsail, two reefs' took in two more, so she's at three reefs, close-reefed, not two. It seems the number is how many to take in, not the total. Helm is down to six at seven knots. I'd shake out one to get the two intended. The book needs the same fix: \"Second Reef\" should say one reef, and \"Hard Weather\" one reef. As written they'd take her from two to four and from three to six.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Note, sir: 'reef the mainsail, two reefs' took in two more, so she's at three reefs, close-reefed, not two. It seems the number is how many to take in, not the total. Helm is down to six at seven knots. I'd shake out one to get the two intended. The book needs the same fix: \\\"Second Reef\\\" should say one reef, and \\\"Hard Weather\\\" one reef. As written they'd take her from two to four and from three to six.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 6049,
+          "after_orders": 42,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "05:40. Setup done: two reefs in the main, staysail and jib, steering N at 7-8 knots for Falmouth; the book has six orders. Ushant out of sight. Learned: 'reef the mainsail, N reefs' takes in N more, not to N. The headsail sheets ease no further than 60 degrees. One main-sheet ease went the wrong way (84 to 63 degrees); later eases behaved. Weather helm tracked mainsail area: 15 degrees with one reef in 24 knots, 6-8 with two. Reckoning again drifted west of the heading, 4\u00b059' to 5\u00b002', with leeway to starboard; it has since come back to 5\u00b000'. Glass 29.66-29.70, about steady."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"05:40. Setup done: two reefs in the main, staysail and jib, steering N at 7-8 knots for Falmouth; the book has six orders. Ushant out of sight. Learned: 'reef the mainsail, N reefs' takes in N more, not to N. The headsail sheets ease no further than 60 degrees. One main-sheet ease went the wrong way (84 to 63 degrees); later eases behaved. Weather helm tracked mainsail area: 15 degrees with one reef in 24 knots, 6-8 with two. Reckoning again drifted west of the heading, 4\u00b059' to 5\u00b002', with leeway to starboard; it has since come back to 5\u00b000'. Glass 29.66-29.70, about steady.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 6051,
+          "after_orders": 42,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "the change of the watch"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"the change of the watch\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 6521,
+          "after_orders": 47,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "Not yet, sir, I'd say. We have two reefs in the main for gusts to 28, and a topsail would put canvas high, where it heels her most. That's the opposite of why we reefed. With the wind on the beam, a square topsail braced up does less than it would running, and it's still dark, with twelve hands on deck. In its favour: it's forward of the mast, so it would ease the weather helm. My suggestion: wait for daylight in forty minutes, and if the mean holds near 19 and the gusts drop, set it as an experiment and watch the speed, heel and helm. If the gusts stay at 28, keep it furled."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"Not yet, sir, I'd say. We have two reefs in the main for gusts to 28, and a topsail would put canvas high, where it heels her most. That's the opposite of why we reefed. With the wind on the beam, a square topsail braced up does less than it would running, and it's still dark, with twelve hands on deck. In its favour: it's forward of the mast, so it would ease the weather helm. My suggestion: wait for daylight in forty minutes, and if the mean holds near 19 and the gusts drop, set it as an experiment and watch the speed, heel and helm. If the gusts stay at 28, keep it furled.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 6523,
+          "after_orders": 47,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "sunrise"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"sunrise\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 9212,
+          "after_orders": 48,
+          "reply": {
+            "text": "Sunrise. The wind has freshened to 24, so the topsail stays furled, I'd say. Twenty miles run at eight knots: if she holds that, the remaining 77 bring us to Falmouth about 16:00, in daylight, before the 16:56 sunset. Glass 29.67, wavering but not falling away.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Sunrise. The wind has freshened to 24, so the topsail stays furled, I'd say. Twenty miles run at eight knots: if she holds that, the remaining 77 bring us to Falmouth about 16:00, in daylight, before the 16:56 sunset. Glass 29.67, wavering but not falling away.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 10962,
+          "after_orders": 48,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "the change of the watch"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"the change of the watch\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 14452,
+          "after_orders": 48,
+          "reply": {
+            "text": "Forenoon watch. Thirty-one miles run; 66 to go at seven and a half puts Falmouth near 16:30, close against sunset. Worth noting: the sky is streaked and spotty high up, mares' tails. With the glass already low at 29.70, that often means a front a day or less away. Another reason to be in by dark rather than lying off tonight.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Forenoon watch. Thirty-one miles run; 66 to go at seven and a half puts Falmouth near 16:30, close against sunset. Worth noting: the sky is streaked and spotty high up, mares' tails. With the glass already low at 29.70, that often means a front a day or less away. Another reason to be in by dark rather than lying off tonight.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 14488,
+          "after_orders": 49,
+          "reply": {
+            "text": "Aye, sir, a fair experiment, and it may settle the helm. I'll watch the heel, the helm, the speed and any strain on the topmast, and call it if a gust near thirty catches it.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Aye, sir, a fair experiment, and it may settle the helm. I'll watch the heel, the helm, the speed and any strain on the topmast, and call it if a gust near thirty catches it.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 15043,
+          "after_orders": 51,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 17021,
+          "after_orders": 53,
+          "reply": {
+            "text": "The topsail's verdict so far: eight knots before and eight after, helm seven to eight both ways, heel only two degrees. No harm and no gain I can measure. The wind easing to 20 muddies the comparison. The sky has cleared again and the glass is steady.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"The topsail's verdict so far: eight knots before and eight after, helm seven to eight both ways, heel only two degrees. No harm and no gain I can measure. The wind easing to 20 muddies the comparison. The sky has cleared again and the glass is steady.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 17786,
+          "after_orders": 54,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "08:51. A recurring note for the developer: 'trim sails' sends hands to brace the square sail yard even with the square sail furled, and the mainsail trim then waits for want of hands ('not hands enough on deck to trim the mainsail'). In a cutter with 12-15 on deck that ordering costs real trim. Bracing a furled yard should come last, or not at all. Topsail experiment from 08:09 (one reef): no measurable change in speed (8 knots), helm (7-8 degrees) or heel (2-3 degrees) in 20-22 knots on the beam."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"08:51. A recurring note for the developer: 'trim sails' sends hands to brace the square sail yard even with the square sail furled, and the mainsail trim then waits for want of hands ('not hands enough on deck to trim the mainsail'). In a cutter with 12-15 on deck that ordering costs real trim. Bracing a furled yard should come last, or not at all. Topsail experiment from 08:09 (one reef): no measurable change in speed (8 knots), helm (7-8 degrees) or heel (2-3 degrees) in 20-22 knots on the beam.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 17906,
+          "after_orders": 54,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "four bells"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"four bells\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 21660,
+          "after_orders": 54,
+          "reply": {
+            "text": "The wind is up to 26 with a heavy sea, nine knots, heeling six. We're a knot short of the book's 27, and when that fires it will take a third reef in the main while the topsail stays aloft, which is backwards. I'd hand the topsail now, before the book reefs the main. Also for the record: the log flipped between 'heavy sea getting up' and 'going down' four times this hour, which looks like a threshold chattering.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"The wind is up to 26 with a heavy sea, nine knots, heeling six. We're a knot short of the book's 27, and when that fires it will take a third reef in the main while the topsail stays aloft, which is backwards. I'd hand the topsail now, before the book reefs the main. Also for the record: the log flipped between 'heavy sea getting up' and 'going down' four times this hour, which looks like a threshold chattering.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 22065,
+          "after_orders": 55,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "noon"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"noon\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 28175,
+          "after_orders": 57,
+          "reply": {
+            "text": "Noon, sir: 49\u00b026' by observation, seven miles short of the reckoning. The log has been over-reading; we've made good about seven knots, not eight. Falmouth is 42 miles north, so about 17:40, after dark either way. My advice is to accept a night entry rather than lie off till dawn under a falling sky. The reckoning has us east, about 4\u00b054', with three miles of doubt, and east is the safe side. Keep her on N or a touch east of it, pick up the Lizard light to larboard, and don't haul in for Falmouth until St Anthony's light bears west of north. That keeps the Manacles well to larboard.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Noon, sir: 49\u00b026' by observation, seven miles short of the reckoning. The log has been over-reading; we've made good about seven knots, not eight. Falmouth is 42 miles north, so about 17:40, after dark either way. My advice is to accept a night entry rather than lie off till dawn under a falling sky. The reckoning has us east, about 4\u00b054', with three miles of doubt, and east is the safe side. Keep her on N or a touch east of it, pick up the Lizard light to larboard, and don't haul in for Falmouth until St Anthony's light bears west of north. That keeps the Manacles well to larboard.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 28269,
+          "after_orders": 58,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "I'd keep the two reefs, sir. Gusts are still reaching 28 to 33 in a heavy sea, and with one reef she carried fifteen degrees of helm in 24 knots this morning. Shaking one out would likely give back half a knot in heel and rudder drag, so we'd gain perhaps two or three miles by dark. That's twenty minutes, which doesn't beat sunset at 16:56. The book's 'Second Reef' would probably also take it straight back in at the next 27-knot gust, costing hands twice. If you want to try it, wait one glass: if no gust tops 27 in that time, shake it out and watch the helm."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"I'd keep the two reefs, sir. Gusts are still reaching 28 to 33 in a heavy sea, and with one reef she carried fifteen degrees of helm in 24 knots this morning. Shaking one out would likely give back half a knot in heel and rudder drag, so we'd gain perhaps two or three miles by dark. That's twenty minutes, which doesn't beat sunset at 16:56. The book's 'Second Reef' would probably also take it straight back in at the next 27-knot gust, costing hands twice. If you want to try it, wait one glass: if no gust tops 27 in that time, shake it out and watch the helm.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 28271,
+          "after_orders": 58,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "two bells"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"two bells\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 32448,
+          "after_orders": 58,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a sighting"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a sighting\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 40265,
+          "after_orders": 62,
+          "reply": {
+            "text": "Land, sir: the Lizard NW by W, Black Head NNW, Lowland Point and Coverack N by W, all three leagues. Those bearings put us five or six miles west of the reckoning, about 5\u00b002'W, not 4\u00b056'. The same westward set as the Amazon had, and the same line: Lowland Point and the Manacles dead ahead. I'd haul up to NNE now. The wind is W, so she can lie it easily, and it keeps the Manacles well to larboard. Hold it until St Anthony's light bears west of north. The sky is oily and hard-edged after that squall, a front's weather, so the glass bears watching.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Land, sir: the Lizard NW by W, Black Head NNW, Lowland Point and Coverack N by W, all three leagues. Those bearings put us five or six miles west of the reckoning, about 5\u00b002'W, not 4\u00b056'. The same westward set as the Amazon had, and the same line: Lowland Point and the Manacles dead ahead. I'd haul up to NNE now. The wind is W, so she can lie it easily, and it keeps the Manacles well to larboard. Hold it until St Anthony's light bears west of north. The sky is oily and hard-edged after that squall, a front's weather, so the glass bears watching.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 40358,
+          "after_orders": 68,
+          "reply": {
+            "text": "And the reckoning agrees now: 49\u00b052', 5\u00b001'. On NNE with the wind on the quarter, seven knots and only two degrees of helm. The Manacles should open to larboard as we go; I'll call them when they show.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"And the reckoning agrees now: 49\u00b052', 5\u00b001'. On NNE with the wind on the quarter, seven knots and only two degrees of helm. The Manacles should open to larboard as we go; I'll call them when they show.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 40630,
+          "after_orders": 69,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a glass\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 42955,
+          "after_orders": 74,
+          "reply": {
+            "text": "Good bearings, sir. Manacle Point NNW two leagues, four points on the larboard bow: on NNE we pass the Manacles two or three miles off, well clear. Falmouth is about eleven miles N; at seven knots we're in at twilight's end. The squalls come every half hour with a two-point veer, so I'd keep the third reef through the dusk rather than shake it out again.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Good bearings, sir. Manacle Point NNW two leagues, four points on the larboard bow: on NNE we pass the Manacles two or three miles off, well clear. Falmouth is about eleven miles N; at seven knots we're in at twilight's end. The squalls come every half hour with a two-point veer, so I'd keep the third reef through the dusk rather than shake it out again.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 43351,
+          "after_orders": 74,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "ten minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"ten minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 44045,
+          "after_orders": 74,
+          "reply": {
+            "text": "Manacle Point NW by W five miles, drawing aft: we're east of the Manacles and outside them. By my working St Anthony's Head now bears about NNW, nine miles, so she can come up to N now, with the Manacles four points on the bow and over three miles off. Then NNW for the Head once Manacle Point is abeam. Near the entrance, mind the Old Wall and the Black Rock: the Amazon raised both as dangers just south of St Anthony's.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Manacle Point NW by W five miles, drawing aft: we're east of the Manacles and outside them. By my working St Anthony's Head now bears about NNW, nine miles, so she can come up to N now, with the Manacles four points on the bow and over three miles off. Then NNW for the Head once Manacle Point is abeam. Near the entrance, mind the Old Wall and the Black Rock: the Amazon raised both as dangers just south of St Anthony's.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 44649,
+          "after_orders": 80,
+          "reply": {
+            "text": "Two answers for one distance, sir: the lookout's list has Manacle Point at five miles, the bearing taken says three. If it's three, the rocks off it are about two miles NW of us, so I'd hold N and not come to NNW until they've drawn abaft the beam. The main is shaking because the hands are bracing the square sail yard first; she's losing more there than the yards give back.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Two answers for one distance, sir: the lookout's list has Manacle Point at five miles, the bearing taken says three. If it's three, the rocks off it are about two miles NW of us, so I'd hold N and not come to NNW until they've drawn abaft the beam. The main is shaking because the hands are bracing the square sail yard first; she's losing more there than the yards give back.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 45005,
+          "after_orders": 80,
+          "reply": {
+            "text": "Two things, sir. The lead was missed at 16:23 for want of hands, all of them bracing the square yards; this close in, I'd rather have the lead than the yards. And the glass is rising quickly, four hundredths in the hour. The old rule says a quick rise after a low means a harder blow, often a hard squall as the wind veers NW. With the dark coming, she's right to keep her reefs.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Two things, sir. The lead was missed at 16:23 for want of hands, all of them bracing the square yards; this close in, I'd rather have the lead than the yards. And the glass is rising quickly, four hundredths in the hour. The old rule says a quick rise after a low means a harder blow, often a hard squall as the wind veers NW. With the dark coming, she's right to keep her reefs.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 45140,
+          "after_orders": 81,
+          "reply": {
+            "text": "Squall at 34, sir, heeling thirteen, ten knots, and the topsail still aloft. I'd hand it now. St Anthony's Head is in sight, NNW two leagues: that's our mark.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Squall at 34, sir, heeling thirteen, ten knots, and the topsail still aloft. I'd hand it now. St Anthony's Head is in sight, NNW two leagues: that's our mark.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 45180,
+          "after_orders": 83,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "answer",
+                "args": {
+                  "text": "Yes, sir, now's good. Manacle Point is W by N, near abeam, and the rocks off it about three miles. On NNW for St Anthony's Head they stay two and a half miles or more to larboard, opening as we go. Steer NNW for the Head but not straight into it. When the Old Wall and the Black Rock come up as dangers, we pick our line between them and Pendennis. Keep the lead going: the dark is coming, and the bottom will be the first honest word."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"Yes, sir, now's good. Manacle Point is W by N, near abeam, and the rocks off it about three miles. On NNW for St Anthony's Head they stay two and a half miles or more to larboard, opening as we go. Steer NNW for the Head but not straight into it. When the Old Wall and the Black Rock come up as dangers, we pick our line between them and Pendennis. Keep the lead going: the dark is coming, and the bottom will be the first honest word.\"}, \"tool\": \"answer\"}"
+          }
+        },
+        {
+          "tick": 45182,
+          "after_orders": 83,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a notable event"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a notable event\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 45245,
+          "after_orders": 85,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a notable event"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a notable event\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 45574,
+          "after_orders": 87,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "ten minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"ten minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 46204,
+          "after_orders": 87,
+          "reply": {
+            "text": "The Manacles are astern now, sir. St Anthony's Head NW by N four miles, Pendennis NW five. On NNW we're aiming at St Anthony's itself, and by the Amazon's bearings the Old Wall lies close under that headland. I'd come to NW and favour the Pendennis side: the Old Wall to starboard, and when the Black Rock shows mid-entrance, keep it to starboard too and pass between it and Pendennis. About forty minutes in; it'll be near dark.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"The Manacles are astern now, sir. St Anthony's Head NW by N four miles, Pendennis NW five. On NNW we're aiming at St Anthony's itself, and by the Amazon's bearings the Old Wall lies close under that headland. I'd come to NW and favour the Pendennis side: the Old Wall to starboard, and when the Black Rock shows mid-entrance, keep it to starboard too and pass between it and Pendennis. About forty minutes in; it'll be near dark.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 46445,
+          "after_orders": 93,
+          "reply": {
+            "text": "She's lost her way, sir: three knots, twelve degrees of leeway, the helm hard over at 32 and the main shaking. The sheets are still eased for a beam reach, and with 'Trim on a Shift' belayed nobody hauled them in for NW. Trim sails, main sheet first, before she sags further to leeward, toward St Anthony's and the Old Wall.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"She's lost her way, sir: three knots, twelve degrees of leeway, the helm hard over at 32 and the main shaking. The sheets are still eased for a beam reach, and with 'Trim on a Shift' belayed nobody hauled them in for NW. Trim sails, main sheet first, before she sags further to leeward, toward St Anthony's and the Old Wall.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 46460,
+          "after_orders": 94,
+          "reply": {
+            "text": "The main is shaking because it's still being reefed: the book's reef from the 16:34 squall is only now tying points, and the same fifteen hands are wanted at the lead, the yards and the sheets. I'd call all hands, sir, until we're in. It's harbour work in the dusk.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"The main is shaking because it's still being reefed: the book's reef from the 16:34 squall is only now tying points, and the same fifteen hands are wanted at the lead, the yards and the sheets. I'd call all hands, sir, until we're in. It's harbour work in the dusk.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 46535,
+          "after_orders": 95,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "five minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"five minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 46953,
+          "after_orders": 95,
+          "reply": {
+            "text": "Steadier now, sir: NW, five knots, Pendennis right ahead at five miles and St Anthony's NNW. Four reefs is a deep reef for 25 knots this close to the wind; she's making seven degrees of leeway for want of drive. With all hands up, I'd shake out one, to three reefs, and let her hold her ground toward Pendennis.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Steadier now, sir: NW, five knots, Pendennis right ahead at five miles and St Anthony's NNW. Four reefs is a deep reef for 25 knots this close to the wind; she's making seven degrees of leeway for want of drive. With all hands up, I'd shake out one, to three reefs, and let her hold her ground toward Pendennis.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 47125,
+          "after_orders": 96,
+          "reply": {
+            "text": "Sir, with the jib in she's all aft: the helm is hard over at 32, four knots, nine degrees of leeway. She's griping up and the rudder is near its end. A cutter beating in wants her headsails to balance the main. I'd set the jib again, and if she must have less sail, take it from the main.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Sir, with the jib in she's all aft: the helm is hard over at 32, four knots, nine degrees of leeway. She's griping up and the rudder is near its end. A cutter beating in wants her headsails to balance the main. I'd set the jib again, and if she must have less sail, take it from the main.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 47168,
+          "after_orders": 99,
+          "reply": {
+            "text": "You're right, sir, and I had it backwards: lee helm. She's been falling off from NW to NW by N, not griping up. Four reefs left her no main to balance the staysail, so shake out two and let her come up. My apology. The helm reading gives no side, and I read it as weather helm all day; some of this morning's calls may have been wrong the same way.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"You're right, sir, and I had it backwards: lee helm. She's been falling off from NW to NW by N, not griping up. Four reefs left her no main to balance the staysail, so shake out two and let her come up. My apology. The helm reading gives no side, and I read it as weather helm all day; some of this morning's calls may have been wrong the same way.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 47687,
+          "after_orders": 102,
+          "reply": {
+            "text": "Squall, 35 knots, and she's nearly stopped: two knots, thirteen degrees of leeway, the staysail shaking. They've passed in six or seven minutes all afternoon. Two cautions. 'Hard Weather' fires if this holds five minutes, and it would close-reef the main again while you're shaking it out, so the book and you would be fighting. I'd belay it and 'Second Reef' while you work her in by hand. And to leeward, ENE, is the Roseland shore, four or five miles: no danger yet, but she shouldn't lie here long.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Squall, 35 knots, and she's nearly stopped: two knots, thirteen degrees of leeway, the staysail shaking. They've passed in six or seven minutes all afternoon. Two cautions. 'Hard Weather' fires if this holds five minutes, and it would close-reef the main again while you're shaking it out, so the book and you would be fighting. I'd belay it and 'Second Reef' while you work her in by hand. And to leeward, ENE, is the Roseland shore, four or five miles: no danger yet, but she shouldn't lie here long.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 47736,
+          "after_orders": 105,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "five minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"five minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 48628,
+          "after_orders": 108,
+          "reply": {
+            "text": "She's stalled, sir: one knot, up at WNW, pitching into the sea with the staysail shaking, and the reckoning shows her sagging east. She's pinching. I'd bear away to NW by N, ease the sheets a little and let her gather four or five knots, then bring her up to NW and hold it there, not higher. At NW with her leeway she'll make good about NW by N, the middle of the entrance. Watch St Anthony's Head: it should draw slowly to the right, toward N. If it holds NW by N, she's setting onto it and the Old Wall.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"She's stalled, sir: one knot, up at WNW, pitching into the sea with the staysail shaking, and the reckoning shows her sagging east. She's pinching. I'd bear away to NW by N, ease the sheets a little and let her gather four or five knots, then bring her up to NW and hold it there, not higher. At NW with her leeway she'll make good about NW by N, the middle of the entrance. Watch St Anthony's Head: it should draw slowly to the right, toward N. If it holds NW by N, she's setting onto it and the Old Wall.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 48917,
+          "after_orders": 110,
+          "reply": {
+            "text": "Sir, we're blind. Since dark the lookout reports nothing, not even St Anthony's light, and 'Lead going' only fires while land is in sight, so the lead has stopped too. The chart gives twelve fathoms under her and shoaling, and by the reckoning the Old Wall is within a mile or two ahead. I'd heave the lead by hand now. Then I wouldn't go into rocks blind: go about onto the starboard tack and stand out SSE into open water. Then either heave to with sea room, or end the passage there, as the Amazon did in the outer road. Coming in at night needs the lights, and tonight we have none.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Sir, we're blind. Since dark the lookout reports nothing, not even St Anthony's light, and 'Lead going' only fires while land is in sight, so the lead has stopped too. The chart gives twelve fathoms under her and shoaling, and by the reckoning the Old Wall is within a mile or two ahead. I'd heave the lead by hand now. Then I wouldn't go into rocks blind: go about onto the starboard tack and stand out SSE into open water. Then either heave to with sea room, or end the passage there, as the Amazon did in the outer road. Coming in at night needs the lights, and tonight we have none.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 49266,
+          "after_orders": 111,
+          "reply": {
+            "text": "Land close aboard, sir! St Anthony's Head a mile right ahead, five and a half fathoms under her, eight knots: seven minutes. Put her about NOW: tack to larboard, away from the Head, onto the starboard tack and stand out S. Don't bear away; that turns her toward it.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Land close aboard, sir! St Anthony's Head a mile right ahead, five and a half fathoms under her, eight knots: seven minutes. Put her about NOW: tack to larboard, away from the Head, onto the starboard tack and stand out S. Don't bear away; that turns her toward it.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 49316,
+          "after_orders": 114,
+          "reply": {
+            "text": "Note, sir: 'avast that' belayed the tack, not the lead. But the Head has drawn from right ahead to N, on the starboard bow at eight cables, and the water has deepened to nine fathoms, so she's passing it and opening the entrance. The immediate danger has eased. Still, the Black Rock lies mid-entrance and we can't see it, and five minutes between casts is most of a mile at eight knots. Either go about now and stand out, or shorten sail to slow her and keep the lead going constantly.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Note, sir: 'avast that' belayed the tack, not the lead. But the Head has drawn from right ahead to N, on the starboard bow at eight cables, and the water has deepened to nine fathoms, so she's passing it and opening the entrance. The immediate danger has eased. Still, the Black Rock lies mid-entrance and we can't see it, and five minutes between casts is most of a mile at eight knots. Either go about now and stand out, or shorten sail to slow her and keep the lead going constantly.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 49492,
+          "after_orders": 116,
+          "reply": {
+            "text": "Well tacked, sir. She's standing out SSE with deep water under her. One caution: by the Amazon's bearings the Old Wall lies about a mile south-east of St Anthony's Head, near this line, and she can't point higher than SSE on this tack. Keep the lead going steadily, and if the lookout calls a danger on the larboard bow, bear away and go round it to the east. In a mile or two she's in the open bay.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"Well tacked, sir. She's standing out SSE with deep water under her. One caution: by the Amazon's bearings the Old Wall lies about a mile south-east of St Anthony's Head, near this line, and she can't point higher than SSE on this tack. Keep the lead going steadily, and if the lookout calls a danger on the larboard bow, bear away and go round it to the east. In a mile or two she's in the open bay.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 49753,
+          "after_orders": 117,
+          "reply": {
+            "text": "The book's own 'Shoal Water' has hove her to in seven fathoms, sir: right for blind water, wrong for here. Hove to, she drifts NE, back toward St Anthony's and the rocks under it, perhaps a mile and a half an hour. I'd fill away at once on S by E and stand out until the lead gives over fifteen fathoms, then decide whether to lie to. It won't fire again while she's in shoal water, but belaying it until we're clear does no harm.",
+            "calls": [],
+            "raw": "{\"arguments\": {\"text\": \"The book's own 'Shoal Water' has hove her to in seven fathoms, sir: right for blind water, wrong for here. Hove to, she drifts NE, back toward St Anthony's and the rocks under it, perhaps a mile and a half an hour. I'd fill away at once on S by E and stand out until the lead gives over fifteen fathoms, then decide whether to lie to. It won't fire again while she's in shoal water, but belaying it until we're clear does no harm.\"}, \"tool\": \"say\"}"
+          }
+        },
+        {
+          "tick": 49918,
+          "after_orders": 118,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "End of the free voyage, 17:51: hove to off St Anthony's Head in seven fathoms, good ground, after about 53 miles made good from Ushant in under 14 hours. No damage. Saved there for want of an anchor.\nTHE BEST OF IT: Without a preset plan it felt like real seamanship. The captain fixed her by cross-bearings off the Lizard, Black Head and the Beast at 15:12, found her six miles west of the reckoning (the same westward set the Amazon had), and hauled to NNE to pass outside the Manacles. The weather was the finest yet: mares' tails at 08:00, an oily, hard-edged sky, squalls every half hour veering a point or two and blowing 28-35, the glass jumping after them. The tack off St Anthony's Head at 17:44 was a proper escape.\nMY OWN MISTAKE: The helm reading gives no side, and I read it as weather helm all day. At 17:06 it was lee helm. My advice to set the jib was wrong, and so may some of this morning's helm calls have been.\nFOR THE DEVELOPER, in order of how much they mattered:\n(1) No lights at night. After 17:26 the lookout reported nothing until 'the land about St Anthony's Head close aboard right ahead, a mile'. The Lizard lights and St Anthony's light were reported in daylight but not in the dark, which is backwards. Night pilotage is impossible as it stands.\n(2) Lead orders conditioned on 'land in sight' go dead at dark, just when they're most needed. The captain added a timed lead order, which worked.\n(3) Emergency handling: 'tack ship' queued behind the lead and waited. 'avast that' then belayed the tack, not the lead. 'tack ship' was refused until she was close-hauled. Helm orders in danger should preempt routine work.\n(4) Hands: 'trim sails' braces the furled square sail, topsail and topgallant yards first. That starved the main trim, the headsails and once the lead (16:23, missed for want of hands).\n(5) Reefs are additive, so a reef standing order fires again on each squall and stacks: the main reached four reefs, 16:58. A 'to N reefs' form, or a ceiling, would help.\n(6) 'Shoal Water' (heave to under 15 fathoms) hove her to in seven fathoms right after we escaped, where she drifted NE back toward the Head. A good order in open water, a bad one in an entrance.\n(7) Smaller: 'the Manacles' were never sighted this time, though we passed them 2-3 miles off (the Amazon raised them at 3 miles). The Old Wall and Black Rock were never sighted either. The lookout's list and a bearing taken gave different distances for one mark (five vs three miles). 'Making sternway' was shown at 4 knots. The log over-read by about 15% (noon fix). 'Heavy sea getting up / going down' chattered. state still shows apparent wind 0 kn.\nThank you for the voyage. A good boat, and a hard, honest coast."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"End of the free voyage, 17:51: hove to off St Anthony's Head in seven fathoms, good ground, after about 53 miles made good from Ushant in under 14 hours. No damage. Saved there for want of an anchor.\\nTHE BEST OF IT: Without a preset plan it felt like real seamanship. The captain fixed her by cross-bearings off the Lizard, Black Head and the Beast at 15:12, found her six miles west of the reckoning (the same westward set the Amazon had), and hauled to NNE to pass outside the Manacles. The weather was the finest yet: mares' tails at 08:00, an oily, hard-edged sky, squalls every half hour veering a point or two and blowing 28-35, the glass jumping after them. The tack off St Anthony's Head at 17:44 was a proper escape.\\nMY OWN MISTAKE: The helm reading gives no side, and I read it as weather helm all day. At 17:06 it was lee helm. My advice to set the jib was wrong, and so may some of this morning's helm calls have been.\\nFOR THE DEVELOPER, in order of how much they mattered:\\n(1) No lights at night. After 17:26 the lookout reported nothing until 'the land about St Anthony's Head close aboard right ahead, a mile'. The Lizard lights and St Anthony's light were reported in daylight but not in the dark, which is backwards. Night pilotage is impossible as it stands.\\n(2) Lead orders conditioned on 'land in sight' go dead at dark, just when they're most needed. The captain added a timed lead order, which worked.\\n(3) Emergency handling: 'tack ship' queued behind the lead and waited. 'avast that' then belayed the tack, not the lead. 'tack ship' was refused until she was close-hauled. Helm orders in danger should preempt routine work.\\n(4) Hands: 'trim sails' braces the furled square sail, topsail and topgallant yards first. That starved the main trim, the headsails and once the lead (16:23, missed for want of hands).\\n(5) Reefs are additive, so a reef standing order fires again on each squall and stacks: the main reached four reefs, 16:58. A 'to N reefs' form, or a ceiling, would help.\\n(6) 'Shoal Water' (heave to under 15 fathoms) hove her to in seven fathoms right after we escaped, where she drifted NE back toward the Head. A good order in open water, a bad one in an entrance.\\n(7) Smaller: 'the Manacles' were never sighted this time, though we passed them 2-3 miles off (the Amazon raised them at 3 miles). The Old Wall and Black Rock were never sighted either. The lookout's list and a bearing taken gave different distances for one mark (five vs three miles). 'Making sternway' was shown at 4 knots. The log over-read by about 15% (noon fix). 'Heavy sea getting up / going down' chattered. state still shows apparent wind 0 kn.\\nThank you for the voyage. A good boat, and a hard, honest coast.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 49921,
+          "after_orders": 118,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "opt_out",
+                "args": {
+                  "reason": "Voyage saved and called by the captain, hove to off St Anthony's Head. Thank you, sir: a fine free passage. Looking forward to standing a watch as officer next time."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"reason\": \"Voyage saved and called by the captain, hove to off St Anthony's Head. Thank you, sir: a fine free passage. Looking forward to standing a watch as officer next time.\"}, \"tool\": \"opt_out\"}"
+          }
+        }
+      ]
+    }
+  ],
+  "agent_journals": {
+    "watcher": [
+      {
+        "tick": 0,
+        "stamp": "Morning watch, 8 bells (04:00)",
+        "kind": "note",
+        "text": "Free voyage, cutter Sherbourne, October. 04:00 off Ushant, 48\u00b030'N 4\u00b059'W, the light SW by S. No standing orders, no plan. Wind WSW 22 knots, a fresh breeze; glass low at 29.68, tendency not yet known; detached clouds; short chopping sea from the westward. Night until about 06:00, sunrise 06:31, sunset 16:56: under eleven hours of light. 12 hands on deck, 27 in all. She lies head SE, no sail set, which points her at the Mol\u00e8ne plateau and the Le Conquet shore, a lee shore in this wind. First thoughts: reef before setting anything, get her head to the north, away from the Iroise, and watch the glass. A 100-mile crossing to Falmouth would mean a landfall after dark."
+      },
+      {
+        "tick": 98,
+        "stamp": "Morning watch (04:01)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a notable event."
+      },
+      {
+        "tick": 159,
+        "stamp": "Morning watch (04:02)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a notable event."
+      },
+      {
+        "tick": 264,
+        "stamp": "Morning watch (04:04)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a notable event."
+      },
+      {
+        "tick": 439,
+        "stamp": "Morning watch (04:07)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a notable event."
+      },
+      {
+        "tick": 1166,
+        "stamp": "Morning watch (04:19)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 1541,
+        "stamp": "Morning watch (04:25)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 3626,
+        "stamp": "Morning watch (05:00)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until four bells."
+      },
+      {
+        "tick": 5354,
+        "stamp": "Morning watch (05:29)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a notable event."
+      },
+      {
+        "tick": 6049,
+        "stamp": "Morning watch (05:40)",
+        "kind": "note",
+        "text": "05:40. Setup done: two reefs in the main, staysail and jib, steering N at 7-8 knots for Falmouth; the book has six orders. Ushant out of sight. Learned: 'reef the mainsail, N reefs' takes in N more, not to N. The headsail sheets ease no further than 60 degrees. One main-sheet ease went the wrong way (84 to 63 degrees); later eases behaved. Weather helm tracked mainsail area: 15 degrees with one reef in 24 knots, 6-8 with two. Reckoning again drifted west of the heading, 4\u00b059' to 5\u00b002', with leeway to starboard; it has since come back to 5\u00b000'. Glass 29.66-29.70, about steady."
+      },
+      {
+        "tick": 6051,
+        "stamp": "Morning watch (05:40)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until the change of the watch."
+      },
+      {
+        "tick": 6523,
+        "stamp": "Morning watch (05:48)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until sunrise."
+      },
+      {
+        "tick": 10962,
+        "stamp": "Morning watch (07:02)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until the change of the watch."
+      },
+      {
+        "tick": 15043,
+        "stamp": "Forenoon watch (08:10)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 17786,
+        "stamp": "Forenoon watch (08:56)",
+        "kind": "note",
+        "text": "08:51. A recurring note for the developer: 'trim sails' sends hands to brace the square sail yard even with the square sail furled, and the mainsail trim then waits for want of hands ('not hands enough on deck to trim the mainsail'). In a cutter with 12-15 on deck that ordering costs real trim. Bracing a furled yard should come last, or not at all. Topsail experiment from 08:09 (one reef): no measurable change in speed (8 knots), helm (7-8 degrees) or heel (2-3 degrees) in 20-22 knots on the beam."
+      },
+      {
+        "tick": 17906,
+        "stamp": "Forenoon watch (08:58)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until four bells."
+      },
+      {
+        "tick": 22065,
+        "stamp": "Forenoon watch (10:07)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until noon."
+      },
+      {
+        "tick": 28271,
+        "stamp": "Forenoon watch (11:51)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until two bells."
+      },
+      {
+        "tick": 32448,
+        "stamp": "Afternoon watch (13:00)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a sighting."
+      },
+      {
+        "tick": 40630,
+        "stamp": "Afternoon watch (15:17)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 43351,
+        "stamp": "First dog watch (16:02)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until ten minutes have passed."
+      },
+      {
+        "tick": 45182,
+        "stamp": "First dog watch (16:33)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a notable event."
+      },
+      {
+        "tick": 45245,
+        "stamp": "First dog watch (16:34)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a notable event."
+      },
+      {
+        "tick": 45574,
+        "stamp": "First dog watch (16:39)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until ten minutes have passed."
+      },
+      {
+        "tick": 46535,
+        "stamp": "First dog watch (16:55)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until five minutes have passed."
+      },
+      {
+        "tick": 47736,
+        "stamp": "First dog watch (17:15)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until five minutes have passed."
+      },
+      {
+        "tick": 49918,
+        "stamp": "First dog watch (17:51)",
+        "kind": "note",
+        "text": "End of the free voyage, 17:51: hove to off St Anthony's Head in seven fathoms, good ground, after about 53 miles made good from Ushant in under 14 hours. No damage. Saved there for want of an anchor. THE BEST OF IT: Without a preset plan it felt like real seamanship. The captain fixed her by cross-bearings off the Lizard, Black Head and the Beast at 15:12, found her six miles west of the reckoning (the same westward set the Amazon had), and hauled to NNE to pass outside the Manacles. The weather was the finest yet: mares' tails at 08:00, an oily, hard-edged sky, squalls every half hour veering a point or two and blowing 28-35, the glass jumping after them. The tack off St Anthony's Head at 17:44 was a proper escape. MY OWN MISTAKE: The helm reading gives no side, and I read it as weather helm all day. At 17:06 it was lee helm. My advice to set the jib was wrong, and so may some of this morning's helm calls have been. FOR THE DEVELOPER, in order of how much they mattered: (1) No lights at night. After 17:26 the lookout reported nothing until 'the land about St Anthony's Head close aboard right ahead, a mile'. The Lizard lights and St Anthony's light were reported in daylight but not in the dark, which is backwards. Night pilotage is impossible as it stands. (2) Lead orders conditioned on 'land in sight' go dead at dark, just when they're most needed. The captain added a timed lead order, which worked. (3) Emergency handling: 'tack ship' queued behind the lead and waited. 'avast that' then belayed the tack, not the lead. 'tack ship' was refused until she was close-hauled. Helm orders in danger should preempt routine work. (4) Hands: 'trim sails' braces the furled square sail, topsail and topgallant yards first. That starved the main trim, the headsails and once the lead (16:23, missed for want of hands). (5) Reefs are additive, so a reef standing order fires again on each squall and stacks: the main reached four reefs, 16:58. A 'to N reefs' form, or a ceiling, would help. (6) 'Shoal Water' (heave to under 15 fathoms) hove her to in seven fathoms right after we escaped, where she drifted NE back toward the Head. A good order in open water, a bad one in an entrance. (7) Smaller: 'the Manacles' were never sighted this time, though we passed them 2-3 miles off (the Amazon raised them at 3 miles). The Old Wall and Black Rock were never sighted either. The lookout's list and a bearing taken gave different distances for one mark (five vs three miles). 'Making sternway' was shown at 4 knots. The log over-read by about 15% (noon fix). 'Heavy sea getting up / going down' chattered. state still shows apparent wind 0 kn. Thank you for the voyage. A good boat, and a hard, honest coast."
+      },
+      {
+        "tick": 49921,
+        "stamp": "First dog watch (17:52)",
+        "kind": "agent.opted_out",
+        "text": "Left the game by the opt_out tool: Voyage saved and called by the captain, hove to off St Anthony's Head. Thank you, sir: a fine free passage. Looking forward to standing a watch as officer next time."
+      }
+    ]
+  }
+}
