@@ -45,11 +45,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      # The whole suite, both tiers (`--slow`; package 32c), each module-scoped day built
+      # once on one worker (`--dist loadgroup`, the groups set in tests/conftest.py).
       - name: Run the checks the gate relies on
         run: |
           pip install -e ".[dev,server]"
           ruff check .
-          python -m pytest -n auto
+          python -m pytest -n auto --dist loadgroup --slow
       - name: Build the gate zip
         run: |
           git archive --format=zip --prefix="FreeSail-${{ steps.gate.outputs.tag }}/" \
