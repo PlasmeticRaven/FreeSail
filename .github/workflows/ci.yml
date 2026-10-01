@@ -5,9 +5,14 @@ name: checks
 # included, and used up the account's free Actions minutes in a day):
 #   - a push that changes only documentation runs nothing;
 #   - one Python (3.11, the owner's);
-#   - the suite runs on all the runner's cores (pytest-xdist);
-#   - a newer push to the same branch cancels the run of the older one.
-# The gate release workflow runs the same checks on the gate commit.
+#   - the fast tier only (package 32c: `pytest` alone leaves out the tests marked slow,
+#     the days sailed and replayed and the long truths; tests/conftest.py says which);
+#     the whole suite, `--slow`, runs in the gate release workflow and at a package's end;
+#   - on Linux and on Windows, the owner's platform, with UTF-8 as the owner runs it;
+#   - the suite on all the runner's cores (pytest-xdist), each module-scoped fixture on
+#     one worker (`--dist loadgroup`);
+#   - a newer push to the same branch cancels the run of the older one, both jobs.
+# The gate release workflow runs the whole suite on the gate commit.
 
 on:
   push:
@@ -29,13 +34,29 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    name: fast tier (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      PYTHONUTF8: "1"
+    defaults:
+      run:
+        # bash on both: Git for Windows' bash is on the Windows runner. `python` there is
+        # setup-python's 3.11 (the `py` launcher is not on the runner's path).
+        shell: bash
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install -e ".[dev,server]"
-      - run: ruff check .
-      - run: ruff format --check .
-      - run: python -m pytest -n auto
+      - run: python -m pip install -e ".[dev,server]"
+      - name: Lint (once, on Linux)
+        if: runner.os == 'Linux'
+        run: |
+          python -m ruff check .
+          python -m ruff format --check .
+      - name: The fast tier
+        run: python -m pytest -n auto --dist loadgroup

@@ -31,7 +31,13 @@ include = ["freesail*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q"
+# `--dist loadgroup`: under `-n`, the tests that share a module-scoped fixture (a day, a
+# passage, a sweep) go whole to one worker, so each is built once a run; without `-n` it
+# does nothing. The groups and the two tiers are set in tests/conftest.py (package 32c).
+addopts = "-q --dist loadgroup"
+markers = [
+    "slow: sails a day or replays one, or runs long; left out unless --slow (tests/conftest.py)",
+]
 
 [tool.ruff]
 line-length = 100

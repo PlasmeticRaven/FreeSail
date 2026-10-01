@@ -10,7 +10,7 @@ Requires Python 3.11 or newer.
 
 ```
 python -m pip install -e ".[dev]"
-python -m pytest              # the test suite
+python -m pytest -n auto      # the fast tier of the tests; add --slow for the whole suite (docs/gates/README.md)
 python -m freesail.ui.console data/ships/frigate-36.yaml --seed 7 --wind 0,15 --heading 293
 python -m freesail.ui.console data/ships/topsail-schooner.yaml --seed 7 --wind 0,15 --heading 300
 python -m freesail.ui.console data/ships/cutter.yaml --seed 7 --wind 0,15 --heading 300
