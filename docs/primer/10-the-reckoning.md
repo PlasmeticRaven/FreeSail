@@ -60,6 +60,9 @@ In cloud, rain or fog there is no sight, and the line says so: "Noon. No sight; 
 
 Double altitudes when noon is clouded, the chronometer and the lunar are not in this build.
 
+<!-- package 33b -->
+Since package 33b the chronometer, the time sight, the lunar and the amplitude are built, and double altitudes alone remain for a later note: [chapter 11, the longitude](11-the-longitude.md) has them in the master's words, with every form their orders take and the readings they carry (`the chronometer`, `the longitude by chronometer`, `the longitude by lunar`, `the chronometer's error by lunar`, `the moon`, `the variation`), and the chart in the captain's hands (`the bearing of <mark> by the chart`, `the distance to <mark>`, `the dangers`, and what `shape a course for <place>` says of a rock on the line).
+
 ## The lead
 
 Two leads. The hand lead, seven to nine pounds on twenty fathoms of line marked at 2, 3, 5, 7, 10, 13, 15 and 17 with leather and rags that can be told by feel in the dark (Lever, *The Hand-Lead*; Luce 1884, ch. I, *The Lead*), is hove from the chains with way on, and the leadsman calls what he finds: "By the mark seven" at a mark, "By the deep nine" at a deep, "And a half seven", "And a quarter five", "Quarter less five" between. The deep-sea lead, twenty to thirty pounds, is for the Channel Soundings, and "it is usual previously to bring-to the ship" for it (Falconer, *Sounding*), or with a light breeze to pass the line forward along the weather side to the spritsail yardarm and heave from there as she advances (Lever, fig. 506); it takes a dozen hands and a quarter of an hour, and with more than four knots of way on her it does not get bottom. Both leads are armed with tallow, which brings up the ground, "Sand, Coral, Shells, Oaze", by which, "from repeated trials being made and marked in the Charts", a ship's place is known (Lever).

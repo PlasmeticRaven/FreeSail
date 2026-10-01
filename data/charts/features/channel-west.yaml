@@ -187,14 +187,15 @@ features:
 
   - id: manacles-clearing-mark
     kind: transit
-    name: Mawnan church open of the Nare Head
-    modern: Mawnan church and Nare Head (Roseland)
+    name: Mawnan church open of Nare Point
+    modern: Mawnan church and Nare Point (the Helford's south side)
     lat_deg: 50.0530
     lon_deg: -5.0330
-    marks: [mawnan-church, nare-head]
-    bearing_deg: 45
-    source: "White 1835, 'Coast of England', p. 26: the square tower of Mawnan church well open north-east of the lowest point of the Nare Head gives a third of a mile off the Penwin and Vaze"
-    says: "Rounding the Manacles, do not shut in the Beast until the square tower of Mawnan church is well open to the north-east of the lowest point of the Nare Head."
+    marks: [nare-point, mawnan-church]
+    bearing_deg: 335
+    fix: "Package 33b (playtest 12): the transit's near mark is the Helford's Nare Point, which White and Imray call 'the Nare Head' in the Manacles' paragraph, not the Nare Head of the Roseland east of Falmouth; the marks were corrected from the page, the near mark first, and the bearing is that of the church beyond the point from a ship on the line (334° true from Nare Point to the church's tower)"
+    source: "White 1835, 'Coast of England', p. 26: the square tower of Mawnan church well open north-east of the lowest point of the Nare Head gives a third of a mile off the Penwin and Vaze; Imray 1874, 'Plymouth to Land's End', p. 92 (the Helford 'between Rosemullion and Nare points') and p. 93 (the same mark, 'Mawnan church ... in one with the lowest part of the Nare head')"
+    says: "Rounding the Manacles, do not shut in the Beast until the square tower of Mawnan church is well open to the north-east of the lowest point of the Nare, the Helford's south point."
 
   - id: manacle-point
     kind: headland
@@ -257,15 +258,16 @@ features:
     source: "White 1835, 'Coast of England', p. 25"
     says: "The square tower of Mawnan church, above the Helford's north shore: the mark for the Penwin and the Vaze."
 
-  - id: nare-head-helford
+  - id: nare-point
     kind: headland
-    name: the Nare Head
+    name: Nare Point
     modern: Nare Point (the Helford's south side)
     lat_deg: 50.08668
     lon_deg: -5.08646
     height_m: 30
-    source: "White 1835, 'Coast of England', pp. 25 to 26"
-    says: "The Nare Head, the south point of the Helford's mouth."
+    fix: "Package 33b (playtest 12): named Nare Point, as Imray 1874 names it in the Helford's paragraph, to keep it apart from the Nare Head of the Roseland (nare-head); White 1835 writes 'the Nare Head' for this point too, in the Manacles' paragraph"
+    source: "White 1835, 'Coast of England', pp. 25 to 26 (the Manacles' mark); Imray 1874, 'Plymouth to Land's End', p. 92: the Helford's entrance 'lies between Rosemullion and Nare points'"
+    says: "Nare Point, the south point of the Helford's mouth, whose lowest point in one with Mawnan church is the mark for the Penwin and the Vaze; White calls it the Nare Head, and the Nare Head of the Roseland lies east of Falmouth."
 
   # ---------------------------------------------------------------------------
   # Falmouth: the harbour, the Roads and the marks

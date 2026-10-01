@@ -17,6 +17,8 @@ the captain's first orders:
       heading_deg: 180
       speed_kn: 0                    # optional, and x_m, y_m
       glass: true                    # she carries a barometer (spec M5 §5; rare in a small vessel)
+      chronometer:                   # the captain's own (spec M5 §14, package 33b); none by default
+        {maker: Earnshaw, rated: 1805-05-01, rate_s_per_day: 1.8, drift: seeded}
     wind:
       gustiness: 0.3                 # physics/wind.py's
       variability: 0.3
@@ -59,7 +61,7 @@ the order `--standing-orders` has always kept.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -132,6 +134,21 @@ class ScenarioFile:
             out.append("She carries a glass.")
         if sc.position:
             out.append(f"The master takes the noon sight with {_an(sc.instrument)}.")
+        if sc.chronometer:
+            c = sc.chronometer
+            rate = float(c.get("rate_s_per_day", 0.0))
+            sense = "gaining" if rate >= 0 else "losing"
+            drift = c.get("drift", "seeded")
+            if drift == "seeded":
+                known = "its drift drawn from the seed"
+            elif not drift:
+                known = "its rate right"
+            else:
+                known = f"its true rate {drift:+g} s a day from that"
+            out.append(
+                f"She carries a chronometer by {c.get('maker')}, rated on {c.get('rated')} at "
+                f"{sense} {abs(rate):g} s a day by its certificate ({known}: the author's view)."
+            )
         if sc.current and sc.current.get("knots"):
             toward = units.point_name(units.deg_to_rad(float(sc.current["toward_deg"])))
             out.append(
@@ -196,6 +213,37 @@ def load_scenario(path: str | Path) -> ScenarioFile:
             raise ScenarioError(
                 f"{where}, instrument: '{instrument}' is not an instrument; say sextant or octant."
             )
+    # the chronometer (package 33b; spec M5 §14; N §4(b)): the captain's own, as
+    # {maker, rated, rate_s_per_day, drift: seeded | seconds a day, forgotten: [dates]};
+    # on the ship's line or the file's; none by default (rare in a small vessel)
+    chron = ship.get("chronometer", raw.get("chronometer"))
+    if chron is not None:
+        if not isinstance(chron, dict):
+            raise ScenarioError(
+                f"{where}, chronometer: a mapping of maker, rated, rate_s_per_day and drift."
+            )
+        try:
+            rated = chron.get("rated", sc.start_time.date())
+            rated_day = rated if isinstance(rated, date) else date.fromisoformat(str(rated))
+            drift = chron.get("drift", "seeded")
+            if not (isinstance(drift, str) and drift.strip().lower() == "seeded"):
+                drift = float(drift or 0.0)
+            else:
+                drift = "seeded"
+            forgotten = [
+                (d if isinstance(d, date) else date.fromisoformat(str(d))).isoformat()
+                for d in (chron.get("forgotten") or [])
+            ]
+            sc.chronometer = {
+                "maker": str(chron.get("maker") or "the chronometer"),
+                "where": str(chron.get("where") or chron.get("rated_at") or ""),
+                "rated": rated_day.isoformat(),
+                "rate_s_per_day": float(chron.get("rate_s_per_day", 0.0) or 0.0),
+                "drift": drift,
+                "forgotten": forgotten,
+            }
+        except (TypeError, ValueError) as e:
+            raise ScenarioError(f"{where}, chronometer: {e}") from None
     # the world's stated current (package 33a; none by default): {knots, toward_deg}
     current = raw.get("current")
     if current is not None:

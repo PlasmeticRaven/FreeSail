@@ -384,8 +384,13 @@ def test_features_are_read_with_their_words_and_their_index(chart):
     near = {x.id for x in chart.nearby(Position(50.14, -5.03), 3000.0)}
     assert {"black-rock-falmouth", "pendennis-castle", "st-anthony-head"} <= near
     transit = chart.feature("manacles-clearing-mark")
-    assert transit.kind == "transit" and set(transit.marks) == {"mawnan-church", "nare-head"}
+    # package 33b (playtest 12): the near mark is the Helford's Nare Point, not the
+    # Roseland's Nare Head, which stays on the chart east of Falmouth
+    assert transit.kind == "transit" and list(transit.marks) == ["nare-point", "mawnan-church"]
     assert all(chart.feature(m) is not None for m in transit.marks)
+    assert chart.feature("nare-point").name == "Nare Point"
+    assert chart.feature("nare-head").modern.startswith("Nare Head (Roseland)")
+    assert chart.feature("nare-head").lat_deg > chart.feature("nare-point").lat_deg + 0.1
 
 
 # ---------------------------------------------------------------------------

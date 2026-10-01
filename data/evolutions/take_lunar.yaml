@@ -1,0 +1,32 @@
+# Take a lunar (spec M5 §14; package 33b; N §2, §4(c), §5): a set of distances of the
+# sun or a star from the moon, with the two altitudes. "Ideally three observers at once,
+# one on the distance and one on each altitude, which is how a frigate did it (the
+# master and two mates or midshipmen)" (N §2); "a quarter of an hour on deck with the
+# sextant for a set of distances, and half an hour to an hour of arithmetic below"
+# (N §2: the quarter of an hour the study's, the hour below UNVERIFIED there, and
+# `sights.LUNAR_CLEARING_MINUTES` says so). The Regulations' Form of Remark Book (1806,
+# Nos. 26 and 28) has the column: "Longitude, computed from the observed Distance of the
+# Sun, or Stars, from the Moon; noting the various circumstances of the Observation".
+#
+# The World checks the conditions before this starts (`reckoning.Navigation.take_lunar`:
+# the moon up fifteen degrees, three days from the change, a body in distance, the sky)
+# and refuses in the registry's words; when it completes the World draws the result from
+# the truth and the seed (never computing a distance) and gives it an hour of ship's
+# time later, the master below meanwhile (`reckoning.LUNAR_TAKEN_KIND`). The subject is
+# `her` (see heave_log.yaml): the mates with their sextants hold nothing against a tack.
+id: take_lunar
+verb: take_lunar
+applies_to: {class: ship}
+params: {body: the sun}
+preconditions: []
+steps:
+  - do: distances
+    duration_s: 900   # a quarter of an hour on deck for a set of distances (N §2)
+on_start: {log: "The master and two of the young gentlemen to the quarterdeck with the sextants, for a set of distances of {body} and the moon."}
+on_complete: {log: "The distances taken; the master below to clear them.", kind: lunar.taken, severity: routine}
+on_fail: {log: "Could not take the lunar: {reason}.", kind: evolution.failed, severity: routine}
+# crew: the two mates or midshipmen on the altitudes beside the master on the distance
+# (N §2); the quarterdeck's officers, or the afterguard's steadiest hands to hold the
+# watch and the slate when none are free.
+crew: {hands: 2, rating: ordinary, stations: [quarterdeck, afterguard]}
+source: "N §2 (de Grijs 2020 §5, §6: the Almanac's distances at three-hour intervals, the clearing by the short methods; the quarter of an hour on deck); Admiralty Regulations 1806, Nos. 26 and 28, Form of Remark Book (the lunar's column)"

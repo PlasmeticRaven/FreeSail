@@ -96,8 +96,11 @@ def test_a_landfall_is_notable_the_reading_carries_it_and_the_land_lost_is_said_
     assert first.severity is Severity.NOTABLE and first.data["landfall"] is True
     assert any(e.data["id"] == "lizard-point" for e in sightings)
     lizard = next(e for e in sightings if e.data["id"] == "lizard-point")
-    assert lizard.text.startswith("The Lizard bearing N") and "distant three leagues" in lizard.text
-    assert lizard.data["estimate"] == "three leagues" and lizard.data["relative"] == "right ahead"
+    # the distance by estimation is the lookout's eye, drawn once a sighting episode
+    # (package 33b): at seed 7 he judges the Lizard, ten miles off, four leagues
+    assert lizard.text.startswith("The Lizard bearing N") and "distant four leagues" in lizard.text
+    assert lizard.data["estimate"] == "four leagues" and lizard.data["relative"] == "right ahead"
+    assert abs(lizard.data["distance_m"] - 10 * units.NAUTICAL_MILE) < 300.0  # the truth kept
     r = w.readings
     assert r["land"]["in_sight"] is True and r["land"]["words"] == "in sight"
     assert r["in_sight"]["count"] == len(w.lookout.sightings) >= 1

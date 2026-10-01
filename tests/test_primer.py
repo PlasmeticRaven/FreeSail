@@ -91,6 +91,7 @@ CHAPTERS = [
     "08-where-to-read-more.md",
     "09-the-glass-and-the-sky.md",
     "10-the-reckoning.md",
+    "11-the-longitude.md",  # package 33b
 ]
 
 DRIVER_COMMANDS = frozenset(

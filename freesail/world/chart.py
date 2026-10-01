@@ -77,6 +77,37 @@ AGROUND_MARGIN_M = 2.0
 DANGER_SEEN_NM = 3.0
 NIGHT_LAND_NM = 1.0
 TWILIGHT_FACTOR = 0.5
+# On a moonlit night (package 33b; spec §14's "the night's light": the moon up and more
+# than half lit, `sights.moonlit`) the land is seen at a league (judgement: a coast under
+# a full moon shows at three miles where a dark one shows at one).
+MOONLIT_LAND_NM = 3.0
+# A light in thick weather (package 33b; playtest 13's finding that the Lizard's lights
+# were not seen ten miles off in the squalls' rain). The pilots say a light is seen "in
+# clear weather" at its range (Imray 1874, 'Plymouth to Land's End', p. 94: the Lizard
+# "visible at the distance of 24 miles" in clear weather, "if the weather be at all
+# clear"; White 1835, 'Coast of England', p. 26: "in thick weather come no nearer to the
+# Lizard than 47 fathoms") and say nothing of a loom in rain. The rule here is Allard's
+# law as IALA's luminous range diagram applies it (modern; no period source): a light's
+# nominal range is its range in a meteorological visibility of ten miles, the
+# transmissivity per mile at a visibility V is 0.05^(1/V) (Koschmieder's five per cent
+# contrast threshold), and the luminous range in the weather's visibility solves
+# T^d / d² = T10^R / R². In a visibility of four miles a twenty-mile light is seen at
+# about ten, in one of a mile at three and a half: the loom carries where a headland does
+# not, and in fog it does not. Figures in docs/dev/TuningNotes.md (package 33b).
+LIGHT_NOMINAL_VISIBILITY_NM = 10.0
+LIGHT_CONTRAST_THRESHOLD = 0.05
+# The captain's chart in his hands (package 33b; decision 30): a course shaped from the
+# account says when its line passes a charted danger within a mile ("the line passes the
+# Manacles within a mile": the brief's figure, judgement); `the dangers` are those within
+# ten miles of the account (judgement: an hour's run and more); the lookout says the
+# chart ends when she is within ten miles of its edge (judgement).
+DANGER_PASS_NM = 1.0
+DANGERS_WITHIN_NM = 10.0
+CHART_EDGE_NM = 10.0
+# The kinds that are dangers to a ship: the rocks, ledges and drying rocks the lookout
+# makes out close-to, and the shoals the chart names (judgement: a bank with its depth in
+# fathoms is a sounding mark, not a danger).
+HAZARD_KINDS = frozenset({"rock", "ledge", "drying", "shoal"})
 
 # The step between the rings a cast's contour is searched on (package 33a, spec M5 §13):
 # half a mile, judgement (the level 2 cells are about a hundred metres; a cast is rare
@@ -163,6 +194,42 @@ def fathoms_words(depth_m: float) -> str:
 
 
 _fathoms_words = fathoms_words
+
+
+def luminous_range_nm(nominal_nm: float, visibility_nm: float) -> float:
+    """How far a light of `nominal_nm` range (its range in a visibility of
+    `LIGHT_NOMINAL_VISIBILITY_NM`) is seen in the weather's `visibility_nm`: Allard's law
+    as IALA's luminous range diagram has it (the module's note). In clear weather the
+    nominal range itself; in thicker, the range at which the light's intensity through
+    the air falls to what it has at the nominal range in the nominal visibility, found by
+    bisection."""
+    if nominal_nm <= 0.0:
+        return 0.0
+    if not math.isfinite(visibility_nm) or visibility_nm >= LIGHT_NOMINAL_VISIBILITY_NM:
+        return nominal_nm
+    t10 = LIGHT_CONTRAST_THRESHOLD ** (1.0 / LIGHT_NOMINAL_VISIBILITY_NM)
+    tv = LIGHT_CONTRAST_THRESHOLD ** (1.0 / max(visibility_nm, 0.01))
+    threshold = t10**nominal_nm / (nominal_nm * nominal_nm)
+    lo, hi = 0.01, nominal_nm
+    for _ in range(40):
+        mid = 0.5 * (lo + hi)
+        if tv**mid / (mid * mid) >= threshold:
+            lo = mid
+        else:
+            hi = mid
+    return lo
+
+
+def _name_key(name: str) -> str:
+    """A name as it is matched: lower case, without its article or its punctuation."""
+    words = "".join(c if c.isalnum() or c.isspace() else " " for c in name.lower()).split()
+    if words and words[0] == "the":
+        words = words[1:]
+    return " ".join(words)
+
+
+def _wrap(dlon: float) -> float:
+    return ((dlon + 180.0) % 360.0) - 180.0
 
 
 # ---------------------------------------------------------------------------
@@ -270,6 +337,14 @@ class Sighting:
     bearing_deg: float
     distance_m: float
     seen_as: str
+    # the lookout's distance by estimation (package 33b): drawn once per sighting
+    # episode and held while she makes no way (`lookout.Lookout`); None before it is
+    # judged, when the words fall back on the truth rounded
+    estimate_m: float | None = None
+
+    @property
+    def judged_m(self) -> float:
+        return self.distance_m if self.estimate_m is None else self.estimate_m
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -279,6 +354,7 @@ class Sighting:
             "seen_as": self.seen_as,
             "bearing_deg": round(self.bearing_deg, 1),
             "distance_m": round(self.distance_m),
+            "estimate_m": None if self.estimate_m is None else round(self.estimate_m),
         }
 
 
@@ -849,15 +925,19 @@ class Chart:
         visibility_nm: float | None,
         daylight: str,
         when: datetime,
+        moonlit: bool = False,
     ) -> list[Sighting]:
         """The features in sight from a height of eye: within the geographic horizon,
-        within the weather's visibility, and by each feature's own rule; nearest first."""
+        within the weather's visibility, and by each feature's own rule; nearest first.
+        A light at night by its luminous range in the weather (`luminous_range_nm`); the
+        land on a moonlit night at `MOONLIT_LAND_NM` (package 33b)."""
         vis_nm = math.inf if visibility_nm is None else float(visibility_nm)
         eye_nm = horizon_nm(height_of_eye_m)
+        night_land = MOONLIT_LAND_NM if moonlit else NIGHT_LAND_NM
         # the farthest anything could be seen bounds the index search
         reach_nm = min(vis_nm, eye_nm + horizon_nm(0.0, 300.0))
         if daylight != "day":
-            reach_nm = min(vis_nm, max(reach_nm, 30.0))
+            reach_nm = max(reach_nm, 30.0)
         out: list[Sighting] = []
         year = when.year
         for f in self.nearby(pos, reach_nm * units.NAUTICAL_MILE):
@@ -869,16 +949,86 @@ class Chart:
             limit = min(vis_nm, horizon_nm(height_of_eye_m, f.height))
             if seen_as == "light":
                 rng = float((f.lit or {}).get("range_nm") or 0.0)
-                limit = min(vis_nm, horizon_nm(height_of_eye_m, f.height), rng or math.inf)
+                luminous = luminous_range_nm(rng, vis_nm) if rng else vis_nm
+                limit = min(luminous, horizon_nm(height_of_eye_m, f.height))
             elif seen_as == "danger":
                 limit = min(limit, DANGER_SEEN_NM)
             elif daylight == "twilight":
-                limit = min(limit, max(NIGHT_LAND_NM, limit * TWILIGHT_FACTOR))
+                limit = min(limit, max(night_land, limit * TWILIGHT_FACTOR))
             elif daylight == "night":
-                limit = min(limit, NIGHT_LAND_NM)
+                limit = min(limit, night_land)
             if nm <= limit:
                 out.append(Sighting(f, bearing, distance, seen_as))
         out.sort(key=lambda s: s.distance_m)
+        return out
+
+    # -- the chart in the captain's hands (package 33b; decision 30) --------------------
+
+    def find_feature(self, name: str) -> Feature | None:
+        """A feature by its period name, its modern name or its id, the article and the
+        case disregarded; None when the chart has no such name."""
+        key = _name_key(name)
+        if not key:
+            return None
+        for f in self.features.values():
+            if key in (_name_key(f.name), _name_key(f.modern), _name_key(f.id.replace("-", " "))):
+                return f
+        return None
+
+    def dangers_near(self, pos: Position, radius_m: float) -> list[tuple[Feature, float, float]]:
+        """The charted dangers (`HAZARD_KINDS`) within `radius_m` of a point, nearest
+        first, each with its bearing in degrees true and its distance in metres."""
+        out = []
+        for f in self.nearby(pos, radius_m, HAZARD_KINDS):
+            bearing, distance = bearing_and_distance(pos, f.position)
+            out.append((f, bearing, distance))
+        out.sort(key=lambda t: t[2])
+        return out
+
+    def line_passes(
+        self, a: Position, b: Position, within_m: float
+    ) -> list[tuple[Feature, float, bool]]:
+        """The charted dangers the straight line from `a` to `b` passes within
+        `within_m` of (plus the danger's own extent), nearest the line first, each with
+        its distance from the line in metres and whether the line crosses it (within its
+        extent, or a cable of a point danger). The flat approximation at the mean
+        latitude, as the lookout's ranges are."""
+        dx, dy = a.offset_to(b)
+        length = math.hypot(dx, dy)
+        if length < 1.0:
+            return []
+        ux, uy = dx / length, dy / length
+        reach = length / 2.0 + within_m + 2000.0
+        mid_lon = a.lon_deg + 0.5 * _wrap(b.lon_deg - a.lon_deg)
+        mid = Position(0.5 * (a.lat_deg + b.lat_deg), mid_lon)
+        out = []
+        for f in self.nearby(mid, reach, HAZARD_KINDS):
+            fx, fy = a.offset_to(f.position)
+            along = fx * ux + fy * uy
+            if along < 0.0 or along > length:
+                continue
+            off = abs(fx * uy - fy * ux)
+            extent = max(float(f.extent_m), units.CABLE)
+            if off <= within_m + extent:
+                out.append((f, off, off <= extent))
+        out.sort(key=lambda t: t[1])
+        return out
+
+    def edge_near(self, pos: Position, within_m: float) -> list[str]:
+        """Which edges of the chart lie within `within_m` of the point, as the quarters
+        they lie toward ('north', 'east', ...); empty well inside the chart."""
+        south, north, west, east = self.bounds
+        lat_m = units.NAUTICAL_MILE * 60.0
+        lon_m = lat_m * math.cos(math.radians(pos.lat_deg))
+        out = []
+        if (north - pos.lat_deg) * lat_m <= within_m:
+            out.append("north")
+        if (pos.lat_deg - south) * lat_m <= within_m:
+            out.append("south")
+        if (east - pos.lon_deg) * lon_m <= within_m:
+            out.append("east")
+        if (pos.lon_deg - west) * lon_m <= within_m:
+            out.append("west")
         return out
 
     @staticmethod

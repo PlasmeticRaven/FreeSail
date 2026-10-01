@@ -60,6 +60,7 @@ from typing import Any
 from freesail import units
 from freesail.core.events import Severity
 from freesail.world.geo import Position, bearing_and_distance, estimate_words, format_position
+from freesail.world.lookout import DISTANCE_BY_ESTIMATION_FRACTION as _LOOKOUT_ESTIMATE_FRACTION
 
 __all__ = [
     "BEARING_SIGMA_DEG",
@@ -80,6 +81,7 @@ __all__ = [
     "LEEWAY_DOUBT_POINTS",
     "LEEWAY_ESTIMATE_ERROR_POINTS",
     "LEEWAY_ALLOWED_WITHIN_POINTS",
+    "LUNAR_TAKEN_KIND",
     "LOG_INTERVAL_H_SHIP_OF_WAR",
     "LOG_INTERVAL_H_OTHER",
     "LOG_LINE_SHORT_MAX",
@@ -240,11 +242,23 @@ CONTOUR_TOLERANCE_DEEP_FATHOMS = 2.5
 BEARING_SIGMA_DEG = 1.5
 TRANSIT_SIGMA_NM = 0.1
 # The distance off by estimation that goes with a bearing (spec §12's words, "twelve
-# miles by estimation"): the master's judgement of a headland's distance from its height
-# and what shows of it, a fifth of the distance one sigma either way, drawn each bearing
-# (judgement). It is a second line, along the bearing, so a bearing with its distance
-# lays the ship on the chart as the period's master did; a transit has none.
-DISTANCE_BY_ESTIMATION_FRACTION = 0.2
+# miles by estimation") is the lookout's own figure (package 33b: drawn once per sighting
+# episode and held while she makes no way, `lookout.DISTANCE_BY_ESTIMATION_FRACTION`),
+# the same in the list, the hail and the bearing taken. It is a second line, along the
+# bearing, so a bearing with its distance lays the ship on the chart as the period's
+# master did; a transit has none. The name is kept here for the tests.
+DISTANCE_BY_ESTIMATION_FRACTION = _LOOKOUT_ESTIMATE_FRACTION
+
+# The variation by observation (package 33b; decision 30; N §3: "an azimuth observation
+# gets it to a degree"): once the master has observed an amplitude or an azimuth he
+# allows his own figure in the traverse in place of the chart's decade-old one, and the
+# account's course error is the deviation and the observation's error alone.
+# `VARIATION_1805_DEG` above stays the world's truth (spec M5 §33 item 14, still
+# UNVERIFIED: the gufm1 value not computed by the chart build).
+
+# The lunar's evolution (`data/evolutions/take_lunar.yaml`) completes with this kind and
+# the World hands it here as it hands the log's and the lead's.
+LUNAR_TAKEN_KIND = "lunar.taken"
 
 # The master's day's work at noon occupies him below this long (judgement: the traverse
 # reduced from the log-board by the table and the sight worked, Falconer 1780,
@@ -437,6 +451,18 @@ class CompassErrors:
         """How far the course the master lays down lies from the course she steers: the
         chart's variation error and the deviation on her heading, in radians."""
         return math.radians(self.variation_error_deg + self.deviation_deg(heading_rad))
+
+    @property
+    def variation_allowed_deg(self) -> float:
+        """The variation the master allows, west positive: the chart's, or his own by
+        observation (package 33b)."""
+        return VARIATION_1805_DEG - self.variation_error_deg
+
+    def allow_variation(self, deg_west: float) -> None:
+        """The master allows a variation he has observed (an amplitude or an azimuth,
+        package 33b) in place of the chart's; the account's error in it is what the
+        observation was out by."""
+        self.variation_error_deg = VARIATION_1805_DEG - deg_west
 
 
 # ---------------------------------------------------------------------------
@@ -691,6 +717,13 @@ class Reckoning:
         dn = (lat_deg - self.lat_deg) * _NM_PER_DEG
         return self.update_line(0.0, dn, 0.0, 1.0, sigma_nm)
 
+    def update_longitude(self, lon_deg: float, sigma_nm: float) -> float:
+        """A longitude by chronometer or by lunar (package 33b, spec §13): a line north
+        and south through the observed longitude, which collapses east and west by the
+        observation's own doubt and leaves north and south as it was."""
+        de = (lon_deg - self.lon_deg) * _NM_PER_DEG * math.cos(math.radians(self.lat_deg))
+        return self.update_line(de, 0.0, 1.0, 0.0, sigma_nm)
+
     def update_bearing(self, mark: Position, bearing_rad: float, sigma_nm: float) -> float:
         """A bearing of a mark: the line from the mark along the reciprocal of the bearing
         laid down; its normal is across the bearing."""
@@ -862,7 +895,7 @@ def master_of(ship: Any) -> Master:
 # record the runner's own line, since the read is not known until the log is in.
 LOG_HOVE_KIND = "log.hove"
 LEAD_HOVE_KIND = "lead.hove"
-NAVIGATION_KINDS = frozenset({LOG_HOVE_KIND, LEAD_HOVE_KIND})
+NAVIGATION_KINDS = frozenset({LOG_HOVE_KIND, LEAD_HOVE_KIND, LUNAR_TAKEN_KIND})
 
 # The subject the two evolutions hold: the runner's alias for the ship that is not the
 # manoeuvres' `ship`, so the mate at the log and the leadsman in the chains do not hold
@@ -898,6 +931,24 @@ class Navigation:
         self.sight_refused: str | None = None  # today's refusal, in words
         self._noon_done_day: Any = None
         self._transit: datetime | None = None  # today's noon by the sun
+        # the longitude (package 33b; spec §14): the chronometer when the scenario gives
+        # one, its drift and its rating's offset drawn from the `chronometer` stream; the
+        # last time sight and the last lunar; a lunar in hand (the body, while the master
+        # and the mates are at the distances) and one cleared below, due at a tick; and
+        # the variation the master allows, the chart's until he observes his own
+        from freesail.world.sights import Chronometer, Variation
+
+        spec = getattr(world.scenario, "chronometer", None)
+        self.chronometer: Chronometer | None = (
+            Chronometer.from_scenario(spec, world.clock.ship_time, world.rng.stream("chronometer"))
+            if spec
+            else None
+        )
+        self.last_time_sight: Any = None  # sights.TimeSight
+        self.last_lunar: Any = None  # sights.Lunar
+        self._lunar_in_hand: str | None = None
+        self._lunar_pending: tuple[int, Any] | None = None
+        self.variation = Variation(self.errors.variation_allowed_deg, "the chart of 1794")
         # the traverse board: the heading summed since the last step, and the leeway
         self._hx = 0.0
         self._hy = 0.0
@@ -944,6 +995,8 @@ class Navigation:
             units.ms_to_knots(_speed_through_water(ship)) < HOVE_TO_WAY_KN
         ):
             self._hove_to_n += 1
+        if self._lunar_pending is not None and world.clock.tick >= self._lunar_pending[0]:
+            self._lunar_cleared()
         line = self.master.tick(world.clock.tick)
         if line:
             world.record(Severity.ROUTINE, "master.place", line, data=self.master.to_dict())
@@ -955,7 +1008,19 @@ class Navigation:
                 self._log_hove(automatic=automatic)
             elif kind == LEAD_HOVE_KIND:
                 self._cast(deep=data.get("evolution") == "heave_deep_sea_lead")
+            elif kind == LUNAR_TAKEN_KIND:
+                self._lunar_taken()
         t = world.clock.ship_time
+        if self.chronometer is not None:
+            said = self.chronometer.tick(t)
+            if said:
+                dead = not self.chronometer.going
+                world.record(
+                    Severity.NOTABLE if dead else Severity.ROUTINE,
+                    "chronometer.dead" if dead else "chronometer.wound",
+                    said,
+                    data=self.chronometer.to_dict(),
+                )
         if t.minute == 0 and t.second == 0 and t.hour % self.log_interval_h == 0:
             self.heave_log(automatic=True)
         self._tick_noon()
@@ -1249,11 +1314,9 @@ class Navigation:
         self.bring_up()
         r = self.reckoning
         moved = r.update_bearing(found.feature.position, laid, _bearing_sigma_nm(found.distance_m))
-        # the distance off by estimation, the master's judgement of it, a second line
-        distance_nm = found.distance_m / units.NAUTICAL_MILE
-        judged_nm = max(
-            0.1, distance_nm * (1.0 + self.stream.gauss(0.0, DISTANCE_BY_ESTIMATION_FRACTION))
-        )
+        # the distance off by estimation, the lookout's held figure (package 33b), a
+        # second line along the bearing
+        judged_nm = max(0.1, found.judged_m / units.NAUTICAL_MILE)
         moved += r.update_distance(
             found.feature.position, laid, judged_nm, DISTANCE_BY_ESTIMATION_FRACTION * judged_nm
         )
@@ -1501,11 +1564,507 @@ class Navigation:
         heading = math.radians(bearing)
         words = (
             f"Shaped a course for {feature.name}: {units.point_name(heading)} by account, "
-            f"{miles_words(dist / units.NAUTICAL_MILE)}."
+            f"{miles_words(dist / units.NAUTICAL_MILE)}"
         )
-        return heading, words
+        # the chart in the captain's hands (package 33b; decision 30): the straight line
+        # from the account checked against the charted dangers, the master's warning and
+        # no more (the pilot of package 35 is the better answer; the helm rules of the
+        # book have no guard, which is the captain's business)
+        from freesail.world.chart import DANGER_PASS_NM
+
+        within = DANGER_PASS_NM * units.NAUTICAL_MILE
+        passes = chart.line_passes(r.position, feature.position, within)
+        passes = [p for p in passes if p[0].id != feature.id]
+        if passes:
+            crossed = [f.name for f, _off, crosses in passes if crosses]
+            near = [f.name for f, _off, crosses in passes if not crosses]
+            said = []
+            if crossed:
+                said.append(f"the line crosses {_and(crossed)}")
+            if near:
+                said.append(f"the line passes {_and(near)} within a mile")
+            words += "; " + " and ".join(said)
+        return heading, words + "."
+
+    # -- the chart in the captain's hands (package 33b; decision 30) ---------------------
+
+    def _charted(self, name: str) -> Any:
+        """A feature of the chart by name, for the queries by account; refused in words
+        when the chart has no such name."""
+        from freesail.evolutions.runner import OrderError
+
+        chart = self.world.chart
+        if chart is None:
+            raise OrderError("No chart of these waters: there is nothing charted to ask of.")
+        feature = chart.find_feature(name)
+        if feature is None:
+            raise OrderError(f"The chart has nothing named {name!r}.")
+        return feature
+
+    def by_chart(self, name: str) -> dict[str, Any] | None:
+        """`the bearing of <mark> by the chart` and `the distance to <mark>`: from the
+        account brought up to now to the charted feature, in sight or not, "by account"
+        in the words; None where the chart has no such name."""
+        chart = self.world.chart
+        if chart is None or not name:
+            return None
+        feature = chart.find_feature(name)
+        if feature is None:
+            return None
+        now = self.account_now()
+        bearing, dist = bearing_and_distance(now, feature.position)
+        heading = math.radians(bearing)
+        laid = (heading + self.errors.course_error_rad(heading)) % units.TWO_PI  # by compass
+        nm = dist / units.NAUTICAL_MILE
+        return {
+            "id": feature.id,
+            "name": feature.name,
+            "bearing": laid,
+            "bearing_true_deg": round(bearing, 1),
+            "metres": dist,
+            "words": f"{units.point_name(laid)} by account, {miles_words(nm)}",
+            "distance_words": f"{miles_words(nm)} by account",
+        }
+
+    def dangers(self, within_nm: float | None = None) -> dict[str, Any] | None:
+        """`the dangers`: the charted dangers within so many miles of the account (ten
+        unless said), the nearest first, by name, bearing by compass and distance; None
+        where there is no chart, or none within reach (`no_dangers_words`)."""
+        from freesail.world.chart import DANGERS_WITHIN_NM
+
+        chart = self.world.chart
+        if chart is None:
+            return None
+        radius = float(within_nm) if within_nm else DANGERS_WITHIN_NM
+        now = self.account_now()
+        found = chart.dangers_near(now, radius * units.NAUTICAL_MILE)
+        if not found:
+            return None
+        items = []
+        for f, bearing, dist in found:
+            heading = math.radians(bearing)
+            laid = (heading + self.errors.course_error_rad(heading)) % units.TWO_PI
+            items.append(
+                {
+                    "id": f.id,
+                    "name": f.name,
+                    "kind": f.kind,
+                    "bearing": laid,
+                    "metres": dist,
+                    "words": f"{f.name} {units.point_name(laid)}, "
+                    f"{miles_words(dist / units.NAUTICAL_MILE)}",
+                }
+            )
+        words = "; ".join(i["words"] for i in items[:8])
+        if len(items) > 8:
+            words += f"; and {len(items) - 8} more"
+        return {
+            "metres": items[0]["metres"],
+            "words": f"{words}: by account, within {miles_words(radius)}",
+            "items": items,
+            "within_nm": radius,
+        }
+
+    def no_dangers_words(self) -> str:
+        from freesail.world.chart import DANGERS_WITHIN_NM
+
+        if self.world.chart is None:
+            return "no chart of these waters"
+        return f"no charted danger within {miles_words(DANGERS_WITHIN_NM)} of the account"
+
+    # -- the chronometer (package 33b; spec §14; N §4(b)) ---------------------------------
+
+    def _no_chronometer(self) -> None:
+        from freesail.evolutions.runner import OrderError
+
+        if self.chronometer is None:
+            raise OrderError(
+                "There is no chronometer aboard: the longitude is by account, and by lunar "
+                "when the moon serves."
+            )
+
+    def wind_chronometer(self) -> tuple[str, dict[str, Any]]:
+        """`wind the chronometer`: wound by order; one that had run down is set going
+        again by the deck watch, which is the ship's time by the account, so it keeps the
+        account's longitude error in its time until a lunar corrects it."""
+        self._no_chronometer()
+        c = self.chronometer
+        world = self.world
+        t = world.clock.ship_time
+        if c.going:
+            text = c.wind(t)
+            return text, {"chronometer": c.to_dict(), "set": False}
+        from freesail.world.sights import _SECONDS_PER_DEG
+
+        self.bring_up()
+        c.going = True
+        c.wind(t)
+        # the master sets it from the local time by the sun and his longitude by account
+        c.set_error_s = (world.position.lon_deg - self.reckoning.lon_deg) * _SECONDS_PER_DEG
+        c.set_error_s -= c.offset_s + c.drift_s_per_day * c.days_since_rated(t)
+        text = (
+            f"Wound {c.name} and set it going by the deck watch and the account; it keeps "
+            f"no Greenwich time now but {self.master.name}'s, until a lunar corrects it."
+        )
+        return text, {"chronometer": c.to_dict(), "set": True}
+
+    def compare_watches(self) -> tuple[str, dict[str, Any]]:
+        """`compare the watches`: the chronometer against the deck watch, which keeps the
+        ship's time."""
+        from freesail.world.sights import greenwich_time
+
+        self._no_chronometer()
+        c = self.chronometer
+        world = self.world
+        t = world.clock.ship_time
+        if not c.going:
+            text = f"Compared the watches: {c.name} is dead, not having been wound."
+            return text, {"chronometer": c.to_dict()}
+        gmt = c.masters_gmt(greenwich_time(world), t)
+        between = (gmt - t).total_seconds()
+        sign = "" if between >= 0 else "-"
+        m, s = divmod(int(round(abs(between))), 60)
+        h, m = divmod(m, 60)
+        text = (
+            f"Compared the watches: {c.name} {gmt:%Hh %Mm %Ss} at Greenwich, the deck watch "
+            f"{t:%Hh %Mm %Ss}; {sign}{h}h {m:02d}m {s:02d}s between them."
+        )
+        return text, {"chronometer": c.to_dict(), "between_s": round(between)}
+
+    def take_time_sight(self) -> tuple[str, dict[str, Any]]:
+        """`take a sight for the longitude` (N §4(b)): the longitude by chronometer, the
+        reckoning's east-west axis updated by it; refused in words."""
+        from freesail.evolutions.runner import OrderError
+        from freesail.world import sights
+
+        world = self.world
+        if self.master.occupied and self.master.place == "below":
+            raise OrderError(
+                f"{self.master.name} is below at the {self.master.occupied_with}; wait for him."
+            )
+        sight, refusal = sights.time_sight(world, self.master, self.chronometer, self.stream)
+        if sight is None:
+            raise OrderError(f"No sight for the longitude: {refusal}.")
+        self.bring_up()
+        r = self.reckoning
+        account_lon = r.lon_deg
+        moved = r.update_longitude(sight.longitude_deg, sight.sigma_nm)
+        self.last_time_sight = sight
+        tick = world.clock.tick
+        self.master.occupy("below", tick + sights.TIME_SIGHT_WORK_MINUTES * 60, "time sight")
+        c = self.chronometer
+        where = f" from {c.where}" if c.where else " from its rating"
+        trust = _round_miles(2.0 * sight.sigma_nm)
+        text = (
+            f"{'Forenoon' if sight.forenoon else 'Afternoon'}. The sun's altitude for the time: "
+            f"longitude by chronometer {sight.words}, {c.name} {sight.days_since_rated} days"
+            f"{where}; the reckoning was {_lon_words(account_lon)}. {self.master.name} would "
+            f"trust it within {miles_words(trust)}."
+        )
+        data = {
+            "sight": sight.to_dict(),
+            "reckoning": r.words,
+            "moved_nm": round(moved, 2),
+            "ellipse": r.ellipse(),
+        }
+        return text, data
+
+    # -- the lunar (package 33b; spec §14; N §4(c), §5) --------------------------------
+
+    def take_lunar(self, asked: str | None) -> str:
+        """`take a lunar [of the sun | of <star>]`: the conditions checked from the
+        moon, refused in the registry's words; allowed, the master and two mates to the
+        quarterdeck with the sextants for a quarter of an hour (the evolution), the
+        result an hour of ship's time later."""
+        from freesail.evolutions.runner import OrderError
+        from freesail.world import sights
+
+        world = self.world
+        if world.position is None:
+            raise OrderError("No lunar to be had: there is no sea here.")
+        body, refusal = sights.lunar_body(world, sights.moon_now(world), asked)
+        if body is None:
+            raise OrderError(refusal + ".")
+        if self.master.occupied:
+            raise OrderError(
+                f"{self.master.name} is {self.master.place} at the {self.master.occupied_with}; "
+                f"wait for him."
+            )
+        if self._lunar_pending is not None:
+            raise OrderError("A lunar is being cleared below already.")
+        runner = (getattr(world.ship, "extra", None) or {}).get("evolutions")
+        tick = world.clock.tick
+        self._lunar_in_hand = body
+        of = "the sun" if body == "the sun" else body
+        if runner is None or not hasattr(runner, "instances"):
+            self._lunar_taken()
+            return f"A set of distances of {of} and the moon taken."
+        line = runner.start(world.ship, "take_lunar", LOG_SUBJECT, {"body": of})
+        self.master.occupy("on deck", tick + sights.LUNAR_ON_DECK_MINUTES * 60, "lunar")
+        return line
+
+    def _lunar_taken(self) -> None:
+        """The distances are taken: the result drawn now from the truth and the seed
+        (the moment of the observation is the moment that matters) and given when the
+        master has cleared it below, an hour of ship's time later."""
+        from freesail.world import sights
+
+        world = self.world
+        body = self._lunar_in_hand or "the sun"
+        self._lunar_in_hand = None
+        chron_lon = None
+        if self.chronometer is not None and self.chronometer.going:
+            # what the chronometer gives at this moment, for the error by lunar
+            chron_lon = sights.chronometer_longitude(
+                world, self.master, self.chronometer, self.stream
+            )
+        result = sights.lunar_result(world, self.master, self.stream, body, chron_lon)
+        due = world.clock.tick + sights.LUNAR_CLEARING_MINUTES * 60
+        self._lunar_pending = (due, result)
+        self.master.occupy("below", due, "lunar")
+        world.record(
+            Severity.ROUTINE,
+            LUNAR_TAKEN_KIND,
+            f"The distances taken; {self.master.name} below to clear them.",
+            data={"body": body, "due_tick": due},
+        )
+
+    def _lunar_cleared(self) -> None:
+        """The lunar cleared: the log's line, the reckoning updated by it."""
+        from freesail.world import sights
+
+        world = self.world
+        assert self._lunar_pending is not None
+        _due, lunar = self._lunar_pending
+        self._lunar_pending = None
+        self.last_lunar = lunar
+        self.bring_up()
+        r = self.reckoning
+        account_lon = r.lon_deg
+        moved = r.update_longitude(lunar.longitude_deg, lunar.sigma_nm)
+        of = lunar.body
+        master = self.master.name
+        text = (
+            f"A set of distances of {of} and the moon taken by {master} and two of the young "
+            f"gentlemen, and cleared: longitude by lunar {lunar.words}, which he would trust "
+            f"{lunar.trust_words}; the reckoning was {_lon_words(account_lon)}."
+        )
+        fast = lunar.chronometer_fast_s
+        if fast is not None and self.chronometer is not None:
+            c = self.chronometer
+            if abs(fast) < sights.CHRONOMETER_FAULT_S:
+                verdict = f"and he finds no fault in {c.name}"
+            else:
+                sense = "gaining" if fast > 0 else "losing"
+                verdict = f"and he thinks it {sense} on its rate, by {_seconds_words(abs(fast))}"
+            gave = _lon_words(lunar.chronometer_longitude_deg)
+            text += f" {_head(c.name)} gave {gave}, {verdict}."
+        data = {
+            "lunar": lunar.to_dict(),
+            "reckoning": r.words,
+            "moved_nm": round(moved, 2),
+            "ellipse": r.ellipse(),
+            "chronometer_fast_s": None if fast is None else round(fast, 1),
+        }
+        world.record(Severity.NOTABLE, "reckoning.lunar", text, data=data)
+
+    # -- the variation by observation (package 33b; decision 30) -------------------------
+
+    def observe_variation(self, amplitude: bool) -> tuple[str, dict[str, Any]]:
+        """`observe an amplitude` at sunrise or sunset, `observe an azimuth` by day: the
+        variation by observation, which the master allows from now in place of the
+        chart's; refused in words in cloud or with the sun not where the sight wants it."""
+        from freesail.evolutions.runner import OrderError
+        from freesail.world import sights
+
+        world = self.world
+        if world.position is None:
+            raise OrderError("No sun to observe: there is no sea here.")
+        var, refusal, figures = sights.amplitude_or_azimuth(
+            world, self.errors, self.stream, amplitude, VARIATION_1805_DEG
+        )
+        if var is None:
+            what = "amplitude" if amplitude else "azimuth"
+            raise OrderError(f"No {what} to be had: {refusal}.")
+        self.bring_up()
+        before = self.variation
+        was = (
+            f"where the chart gave {before.words}"
+            if before.by.startswith("the chart")
+            else f"where he allowed {before.words} before"
+        )
+        self.errors.allow_variation(var.deg_west)
+        self.variation = var
+        compass = units.point_name(math.radians(figures["compass_bearing_deg"]))
+        if amplitude:
+            when = "rising" if figures["rising"] else "setting"
+            head = f"Observed the sun's amplitude at its {when}, bearing {compass} by compass"
+        else:
+            head = f"Observed the sun's azimuth, bearing {compass} by compass"
+        text = (
+            f"{head}: variation of the compass {var.words}, {was}; {self.master.name} allows it "
+            f"in the reckoning from now."
+        )
+        return text, {"variation": var.to_dict(), "figures": figures}
 
     # -- the readings -----------------------------------------------------------------
+
+    def chronometer_reading(self) -> dict[str, Any] | None:
+        """`the chronometer`: its time, the days since rated, and the master's trust in
+        miles of longitude (the number the dialect compares); None without one."""
+        c = self.chronometer
+        if c is None:
+            return None
+        world = self.world
+        t = world.clock.ship_time
+        lat = world.position.lat_deg if world.position is not None else 50.0
+        doubt = c.doubt_nm(t, lat)
+        trust = _round_miles(2.0 * doubt) if c.going else 0
+        words = c.words(world)
+        if c.going:
+            words += f"; {self.master.name} would trust it within {miles_words(trust)}"
+        return {"metres": units.nm_to_m(doubt), "words": words, "going": c.going} | c.to_dict()
+
+    def no_chronometer_words(self) -> str:
+        return "the ship carries no chronometer"
+
+    def longitude_by_chronometer_reading(self) -> dict[str, Any] | None:
+        """`the longitude by chronometer`: today's time sight, with the days since rated
+        and the master's trust; None without one today."""
+        s = self.last_time_sight
+        if s is None or s.tick // 86400 != self.world.clock.tick // 86400:
+            return None
+        c = self.chronometer
+        where = f" from {c.where}" if c is not None and c.where else " from its rating"
+        trust = _round_miles(2.0 * s.sigma_nm)
+        return {
+            "lat_deg": self.reckoning.lat_deg,
+            "lon_deg": s.longitude_deg,
+            "words": f"{s.words} by chronometer, {s.days_since_rated} days{where}, which "
+            f"{self.master.name} would trust within {miles_words(trust)}",
+            "sigma_nm": s.sigma_nm,
+        }
+
+    def no_time_sight_words(self) -> str:
+        if self.chronometer is None:
+            return "no longitude by chronometer: the ship carries none"
+        if not self.chronometer.going:
+            return f"no longitude by chronometer: {self.chronometer.name} is dead"
+        return "no sight for the longitude today"
+
+    def longitude_by_lunar_reading(self) -> dict[str, Any] | None:
+        """`the longitude by lunar`: the last lunar, with its date and the master's trust."""
+        lunar = self.last_lunar
+        if lunar is None:
+            return None
+        age = age_words(self.world.clock.tick - lunar.tick)
+        return {
+            "lat_deg": self.reckoning.lat_deg,
+            "lon_deg": lunar.longitude_deg,
+            "words": f"{lunar.words} by lunar of {lunar.body}, {age}, which {self.master.name} "
+            f"would trust {lunar.trust_words}",
+            "sigma_nm": lunar.sigma_nm,
+        }
+
+    def no_lunar_words(self) -> str:
+        from freesail.world import sights
+
+        if self._lunar_pending is not None:
+            return "a lunar is being cleared below"
+        _body, refusal = sights.lunar_body(self.world, sights.moon_now(self.world), None)
+        if refusal:
+            return refusal[:1].lower() + refusal[1:]
+        return "no lunar taken yet; the moon serves"
+
+    def chronometer_error_reading(self) -> dict[str, Any] | None:
+        """`the chronometer's error by lunar`: the last lunar against the chronometer,
+        in seconds of time and in miles of longitude (the number the dialect compares)."""
+        lunar = self.last_lunar
+        if lunar is None or lunar.chronometer_fast_s is None:
+            return None
+        from freesail.world import sights
+
+        fast = lunar.chronometer_fast_s
+        lat = self.reckoning.lat_deg
+        miles = abs(fast) / 240.0 * 60.0 * math.cos(math.radians(lat))
+        c = self.chronometer
+        name = c.name if c is not None else "the chronometer"
+        if abs(fast) < sights.CHRONOMETER_FAULT_S:
+            words = f"{name} shows no fault by the lunar of {lunar.body}"
+        else:
+            sense = "gaining" if fast > 0 else "losing"
+            words = (
+                f"{name} {sense} on its rate by {_seconds_words(abs(fast))}, "
+                f"{miles_words(miles)} of longitude, by the lunar of {lunar.body}"
+            )
+        return {"metres": units.nm_to_m(miles), "words": words, "fast_s": round(fast, 1)}
+
+    def no_chronometer_error_words(self) -> str:
+        if self.chronometer is None:
+            return "the ship carries no chronometer"
+        if self.last_lunar is None:
+            return "no lunar taken yet to check the chronometer by"
+        return "the last lunar had no chronometer to check"
+
+    def moon_reading(self) -> dict[str, Any] | None:
+        """`the moon`: its age, its phase, whether it is up and in distance of a body."""
+        from freesail.world import sights
+
+        world = self.world
+        moon = sights.moon_now(world)
+        if moon is None:
+            return None
+        allowed, _ = sights.sky_allows(getattr(world, "conditions", None))
+        age = int(round(moon.age_days))
+        age_said = "new" if age == 0 else f"{number_words(age)} day{'s' if age != 1 else ''} old"
+        if moon.up:
+            alt = int(round(moon.altitude_deg))
+            where = f"up, {number_words(alt)} degrees high"
+            if not allowed:
+                where += " behind the cloud"
+        else:
+            where = "not up"
+        body, refusal = sights.lunar_body(world, moon, None)
+        if body is not None:
+            distance = f"in distance of {body}"
+        else:
+            distance = refusal.replace("No lunar to be had: ", "no lunar: ")
+        return {
+            "in_sight": bool(moon.up and allowed),
+            "words": f"{age_said}, {moon.phase}; {where}; {distance}",
+            "age_days": round(moon.age_days, 2),
+            "phase": moon.phase,
+            "fraction": round(moon.fraction, 3),
+            "altitude_deg": round(moon.altitude_deg, 1),
+            "azimuth_deg": round(moon.azimuth_deg, 1),
+            "up": moon.up,
+            "body": body,
+        }
+
+    def variation_reading(self) -> float:
+        """`the variation` the master allows, west positive, in radians; the words carry
+        its source and its date (`api.readings.Angle`)."""
+        return math.radians(self.variation.deg_west)
+
+    def to_dict(self) -> dict[str, Any]:
+        """The captain's chart's block (`api.queries.snapshot`): the reckoning brought up
+        to now, its ellipse, the track by account, the noons, the bearings, the
+        soundings, the master, the chronometer, the longitude sights and the variation;
+        the truth nowhere in it."""
+        out = self.reckoning.to_dict()
+        now = self.account_now()
+        out["lat_deg"], out["lon_deg"] = round(now.lat_deg, 5), round(now.lon_deg, 5)
+        out["words"] = f"{format_position(now)} by account"
+        out["master"] = self.master.to_dict()
+        out["log_interval_h"] = self.log_interval_h
+        out["last_log_kn"] = self.last_log_read_kn
+        out["chronometer"] = None if self.chronometer is None else self.chronometer.to_dict()
+        out["time_sight"] = None if self.last_time_sight is None else self.last_time_sight.to_dict()
+        out["lunar"] = None if self.last_lunar is None else self.last_lunar.to_dict()
+        out["variation"] = self.variation.to_dict()
+        return out
+
+    # -- the readings of package 33a ------------------------------------------------------
 
     def depth_reading(self) -> float | None:
         """`the depth`: the last cast's depth in metres, None before a cast or without bottom."""
@@ -1591,8 +2150,8 @@ class Navigation:
             "id": found.feature.id,
             "name": found.feature.name,
             "bearing": laid,
-            "words": f"{units.point_name(laid)}, {estimate_words(found.distance_m)}",
-            "estimate": estimate_words(found.distance_m),
+            "words": f"{units.point_name(laid)}, {estimate_words(found.judged_m)}",
+            "estimate": estimate_words(found.judged_m),
         }
 
     def reckoning_reading(self) -> dict[str, Any]:
@@ -1604,23 +2163,33 @@ class Navigation:
             "words": f"{format_position(now)} by account",
         }
 
-    def to_dict(self) -> dict[str, Any]:
-        """The captain's chart's block (`api.queries.snapshot`): the reckoning brought up
-        to now, its ellipse, the track by account, the noons, the bearings, the
-        soundings and the master; the truth nowhere in it."""
-        out = self.reckoning.to_dict()
-        now = self.account_now()
-        out["lat_deg"], out["lon_deg"] = round(now.lat_deg, 5), round(now.lon_deg, 5)
-        out["words"] = f"{format_position(now)} by account"
-        out["master"] = self.master.to_dict()
-        out["log_interval_h"] = self.log_interval_h
-        out["last_log_kn"] = self.last_log_read_kn
-        return out
-
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+
+def _and(names: list[str]) -> str:
+    if len(names) <= 1:
+        return "".join(names)
+    return ", ".join(names[:-1]) + f" and {names[-1]}"
+
+
+def _seconds_words(seconds: float) -> str:
+    """'a minute and twenty seconds', 'forty seconds', 'two minutes'."""
+    n = int(round(seconds))
+    m, s = divmod(n, 60)
+    minutes = "" if m == 0 else ("a minute" if m == 1 else f"{number_words(m)} minutes")
+    secs = "" if s == 0 else f"{number_words(s)} second{'s' if s != 1 else ''}"
+    if minutes and secs:
+        return f"{minutes} and {secs}"
+    return minutes or secs or "no time"
+
+
+def _variation_words(deg_west: float, by: str) -> str:
+    from freesail.world.sights import Variation
+
+    return Variation(deg_west, by).words
 
 
 def _ship_of_war(ship: Any) -> bool:

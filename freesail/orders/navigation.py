@@ -9,7 +9,17 @@
     observe the sun                 the noon sight by order, at noon
     set the reckoning to <lat> <long>   the captain overrides the master
     allow <n> knots of set to <direction>   the master's allowance in the traverse
-    shape a course for <place>      the course from the reckoning to a place of the chart
+    shape a course for <place>      the course from the reckoning to a place of the chart,
+                                    with the charted dangers its line passes (package 33b)
+
+and the longitude's (spec M5 §14; package 33b):
+
+    take a sight for the longitude  the time sight against the chronometer
+    take a lunar [of the sun | of <star>]   a set of distances; the result an hour later
+    wind the chronometer            by order (daily of itself)
+    compare the watches             the chronometer against the deck watch
+    observe an amplitude            the variation by the sun's rising or setting
+    observe an azimuth              the variation by the sun's bearing by day
 
 Each is a verb of `data/vocabulary.yaml` with the object `navigation`: the imperative
 grammar takes the words after the verb as they are (`grammar.parse`), and this module
@@ -146,4 +156,25 @@ def execute(ship: Any, order: Order) -> Result:
         _, helm_text, helm_data = handle(ship, f"steer {units.rad_to_deg(heading):.0f}")
         data = {"verb": verb, "level": 1, "place": rest, "heading": heading} | {"helm": helm_data}
         return "helm.set", f"{words} {helm_text}", data
+    # the longitude's orders (package 33b)
+    if verb == "take a sight for the longitude":
+        nav = _navigation(ship)
+        text, data = nav.take_time_sight()
+        return "reckoning.time_sight", text, {"verb": verb, "level": 1} | data
+    if verb == "take a lunar":
+        nav = _navigation(ship)
+        line = nav.take_lunar(rest or None)
+        return "evolution.started", line, {"verb": verb, "level": 1, "subjects": ["her"]}
+    if verb == "wind the chronometer":
+        nav = _navigation(ship)
+        text, data = nav.wind_chronometer()
+        return "chronometer.wound", text, {"verb": verb, "level": 1} | data
+    if verb == "compare the watches":
+        nav = _navigation(ship)
+        text, data = nav.compare_watches()
+        return "chronometer.compared", text, {"verb": verb, "level": 1} | data
+    if verb in ("observe an amplitude", "observe an azimuth"):
+        nav = _navigation(ship)
+        text, data = nav.observe_variation(amplitude=verb == "observe an amplitude")
+        return "reckoning.variation", text, {"verb": verb, "level": 1} | data
     raise OrderError(f"'{verb}' is not a navigation order this ship knows.")

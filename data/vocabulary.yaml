@@ -541,6 +541,51 @@ verbs:
                steer for, make for]
     object: navigation
     level: 1
+  # The longitude's orders (spec M5 §14, §15; package 33b; `freesail/orders/navigation.py`):
+  # the chronometer, the time sight, the lunar, and the variation by observation. The
+  # object `navigation` takes the words after the verb as said (a body for the lunar);
+  # each is refused in words on a ship without the instrument or the sky for it.
+  take a sight for the longitude:
+    # A morning or afternoon altitude of the sun against the chronometer (N §4(b)).
+    synonyms: [take a time sight, take a sight for the time, take the sun for the longitude,
+               observe the sun for the time, take a sight for longitude, take the time sight,
+               take a chronometer sight, take a sight of the sun for the longitude]
+    object: navigation
+    level: 1
+  take a lunar:
+    # `take a lunar`, `take a lunar of the sun`, `take a lunar of Aldebaran` (N §4(c), §5).
+    synonyms: [take a lunar distance, take a lunar observation, take a set of distances,
+               take a set of lunar distances, observe a lunar distance, observe a lunar,
+               take lunar distances, take the lunar distance, take a lunar of, take lunars]
+    object: navigation
+    level: 1
+  wind the chronometer:
+    # Daily of itself at eight in the morning; by order at any hour, and a dead one set
+    # going again by the deck watch (spec M5 §14).
+    synonyms: [wind the chronometers, wind up the chronometer, wind the timekeeper]
+    object: navigation
+    level: 1
+  compare the watches:
+    # The chronometer against the deck watch.
+    synonyms: [compare watches, compare the chronometer, compare the chronometer with the deck watch,
+               compare the deck watch with the chronometer, compare the watch]
+    object: navigation
+    level: 1
+  observe an amplitude:
+    # The sun's bearing by compass as it rises or sets against its true amplitude
+    # (decision 30; N §3; Falconer 1780, 'Azimuth-compass', 'Variation').
+    synonyms: [take an amplitude, observe the sun's amplitude, observe the suns amplitude,
+               take the sun's amplitude, take the suns amplitude, observe the amplitude,
+               take the amplitude, observe an amplitude of the sun, take an amplitude of the sun]
+    object: navigation
+    level: 1
+  observe an azimuth:
+    # The sun's bearing by compass by day with its altitude, for the variation.
+    synonyms: [take an azimuth, observe the sun's azimuth, observe the suns azimuth,
+               take the sun's azimuth, take the suns azimuth, observe the azimuth, take the azimuth,
+               observe an azimuth of the sun, take an azimuth of the sun]
+    object: navigation
+    level: 1
   # Group evolutions: verb phrases with no object, expanded from the list below.
   set plain sail:
     synonyms: [make plain sail, make sail]

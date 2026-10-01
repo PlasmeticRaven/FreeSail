@@ -2939,6 +2939,122 @@ def test_truth_59_a_cast_of_the_deep_sea_lead_moves_the_reckoning_onto_the_conto
     assert "by account" in world.readings.words("reckoning")
 
 
+def _frigate_with_a_chronometer(
+    drift: float, start: datetime, lat: float = 49.5, lon: float = -5.2
+):
+    """The frigate given a chronometer by a test scenario (package 33b: the gate's
+    passage files stay without one), rated at Plymouth forty days before 5 June 1805,
+    gaining 1.8 seconds a day by its certificate, the true rate `drift` seconds a day
+    from that; a quiet day on a fixed south-westerly, no sea kept."""
+    sc = Scenario(
+        start_time=start,
+        wind_from_deg=225.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=0.0,
+        position={"lat_deg": lat, "lon_deg": lon},
+        region=CHART_REGION,
+        instrument="sextant",
+        chronometer={
+            "maker": "Earnshaw",
+            "where": "Plymouth",
+            "rated": "1805-04-26",
+            "rate_s_per_day": 1.8,
+            "drift": drift,
+        },
+    )
+    return make_world(SEED, FRIGATE, sc)
+
+
+def _lon_miles(world, lon_deg: float) -> float:
+    truth = world.position
+    return abs(lon_deg - truth.lon_deg) * 60.0 * math.cos(math.radians(truth.lat_deg))
+
+
+def test_truth_60_the_chronometer_within_four_miles_and_a_lunar_shows_it_gaining():
+    """Spec M5 §19, truth 60: "The frigate with a chronometer rated at Plymouth forty
+    days before has a longitude by chronometer within four miles of the truth when the
+    rate is right, and a lunar on a quiet day shows the chronometer gaining when the
+    scenario's rate is wrong by two seconds a day." Seed 7, 5 June 1805 (the moon at the
+    first quarter, in distance of the sun through the afternoon); the truth read from
+    the world (`world.position`), never from a reading."""
+    from freesail.world import sights as S
+
+    right = _frigate_with_a_chronometer(0.0, datetime(1805, 6, 5, 9, 0))
+    e = right.submit("take a sight for the longitude")
+    assert e.kind == "reckoning.time_sight" and "the Earnshaw 40 days from Plymouth" in e.text
+    sight = right.navigation.last_time_sight
+    assert sight.days_since_rated == 40
+    assert _lon_miles(right, sight.longitude_deg) < 4.0
+    assert _lon_miles(right, right.readings["longitude_by_chronometer"]["lon_deg"]) < 4.0
+    # the rate wrong by two seconds a day: forty days make eighty seconds, twenty
+    # minutes of longitude, thirteen miles west at this latitude, which the time sight
+    # carries and the lunar does not
+    wrong = _frigate_with_a_chronometer(2.0, datetime(1805, 6, 5, 9, 0))
+    wrong.submit("take a sight for the longitude")
+    off = wrong.navigation.last_time_sight.longitude_deg
+    assert 9.0 < _lon_miles(wrong, off) < 17.0 and off < wrong.position.lon_deg
+    wrong.run(8 * 3600 + 40 * 60)  # 17:40, the moon twenty degrees up and the sun forty
+    e = wrong.submit("take a lunar")
+    assert e.kind == "order.accepted"
+    wrong.run((S.LUNAR_ON_DECK_MINUTES + 9 + S.LUNAR_CLEARING_MINUTES) * 60)
+    lines = [x for x in wrong.log if x.kind == "reckoning.lunar"]
+    assert len(lines) == 1 and "he thinks it gaining on its rate" in lines[0].text
+    lunar = wrong.navigation.last_lunar
+    assert lunar.chronometer_fast_s > S.CHRONOMETER_FAULT_S
+    assert _lon_miles(wrong, lunar.longitude_deg) < _lon_miles(
+        wrong, lunar.chronometer_longitude_deg
+    )
+    error = wrong.readings["chronometer_error_by_lunar"]
+    assert "gaining on its rate" in error["words"] and error["fast_s"] > 0
+    assert lines[0].data["chronometer_fast_s"] == error["fast_s"]
+
+
+def test_truth_61_the_lunar_is_refused_in_words_that_say_which_and_answers_within_a_degree():
+    """Spec M5 §19, truth 61: "`take a lunar` is refused within three days of new moon,
+    with the moon under fifteen degrees, and in thick weather, in words that say which;
+    allowed, it occupies the master and two mates for a quarter of an hour and answers
+    within a degree an hour later." The new moon of 27 June 1805; the moon just risen on
+    the 5th at ten past two; the sky pinned thick by the test; then the afternoon's
+    lunar of the sun."""
+    from freesail.world import sights as S
+    from freesail.world.weather import Conditions
+
+    young = _frigate_with_a_chronometer(0.0, datetime(1805, 6, 26, 10, 0))
+    e = young.submit("take a lunar")
+    assert e.kind == "order.rejected" and "No lunar to be had: the moon is" in e.text
+    assert "from the change" in e.text
+    low = _frigate_with_a_chronometer(0.0, datetime(1805, 6, 5, 14, 10))
+    e = low.submit("take a lunar")
+    assert e.kind == "order.rejected" and "the moon is too low" in e.text and "degrees up" in e.text
+    thick = _frigate_with_a_chronometer(0.0, datetime(1805, 6, 5, 17, 40))
+    thick.conditions = Conditions("warm", "warm", "thick", "", "fog", "a mile", 1012.0)
+    e = thick.submit("take a lunar")
+    assert e.kind == "order.rejected" and "the sky is thick with fog" in e.text
+    assert thick.readings.words("longitude_by_lunar").startswith("no lunar to be had: the sky")
+    world = _frigate_with_a_chronometer(0.0, datetime(1805, 6, 5, 17, 40))
+    e = world.submit("take a lunar")
+    assert e.kind == "order.accepted"
+    master = world.navigation.master
+    assert master.occupied and master.occupied_with == "lunar" and master.place == "on deck"
+    inst = next(i for i in world.ship.extra["evolutions"].instances if i.evo.id == "take_lunar")
+    assert inst.want.hands == 2 and inst.evo.steps[0].duration_s == S.LUNAR_ON_DECK_MINUTES * 60
+    tick0 = world.clock.tick
+    world.run(S.LUNAR_ON_DECK_MINUTES * 60 - 60)
+    assert not [x for x in world.log if x.kind == "lunar.taken"]
+    world.run(10 * 60)  # the file's quarter of an hour at the hands' pace in the weather
+    taken = [x for x in world.log if x.kind == "lunar.taken"]
+    assert len(taken) == 1 and taken[0].tick - tick0 <= (S.LUNAR_ON_DECK_MINUTES + 9) * 60
+    assert master.place == "below"
+    world.run(S.LUNAR_CLEARING_MINUTES * 60)
+    lines = [x for x in world.log if x.kind == "reckoning.lunar"]
+    assert len(lines) == 1 and lines[0].tick == taken[0].tick + S.LUNAR_CLEARING_MINUTES * 60
+    lunar = world.navigation.last_lunar
+    assert abs(lunar.longitude_deg - world.position.lon_deg) < 1.0
+    assert "longitude by lunar" in lines[0].text and "would trust within" in lines[0].text
+
+
 def test_the_passage_for_gate_5b_at_seed_7_has_its_own_constants(gate_5b_passage):
     """The frigate's passage Ushant to Falmouth (spec M5 §20): the departure bearing off
     the Stiff, the log hove hourly, the noon sight, the Channel Soundings by the deep-sea
