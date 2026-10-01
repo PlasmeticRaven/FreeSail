@@ -1853,12 +1853,12 @@ def test_completion_offers_the_wreck_and_the_spar_to_shift():
 
 # ---------------------------------------------------------------------------
 # Package 33c: the forty-nine orders refused in gate 5b's playtests, each with what it
-# does now (docs/playtests/2026-10-01-gate-5b-opus-5.5-the-passage/refused.md and
-# docs/playtests/2026-10-01-gate-5b-opus-5.5-free-passages/refused-cutter.md and
-# refused-brig.md, with the lead's reading). Each is given through `World.submit`, the
-# one path the console and the browser share, to its ship on the chart of the western
-# Channel at seed 7, at a position and an hour like the session's; those to be taken
-# give their new answer, those still refused keep their words.
+# does now (the refused orders of playtests 12 and 13, `refused.md`, `refused-cutter.md`
+# and `refused-brig.md` in their folders under docs/playtests/, with the lead's reading).
+# Each is given through `World.submit`, the one path the console and the browser share,
+# to its ship on the chart of the western Channel at seed 7, at a position and an hour
+# like the session's; those to be taken give their new answer, those still refused keep
+# their words.
 # ---------------------------------------------------------------------------
 
 

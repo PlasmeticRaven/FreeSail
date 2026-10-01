@@ -2488,8 +2488,10 @@ GATE_5A_SEA_TICKS = {
 # lines are the starter book's "tend the sheets" firing every glass (fifty-seven times, the
 # sheets found standing as trimmed most glasses) and the sheet evolutions the trims and
 # the manoeuvres start, and the digest moved with them (docs/dev/TuningNotes.md, 32e).
-GATE_5A_DAY_LINES = 616
-GATE_5A_DAY_DIGEST = "d17cba7b900ed18d"  # a cadence's firing a routine line (the lead, 2026-09-30)
+# Package 33c: every tick held; one line more, the starter's "sound the well" entered in
+# the book and held (an accepted order's line and the book's) where it was refused (one).
+GATE_5A_DAY_LINES = 617
+GATE_5A_DAY_DIGEST = "9bd4e0bffcfb6b10"
 
 
 def the_gate_day_under_systems(until: int = GATE_5A_DAY_TICKS, saves=GATE_5A_DAY_SAVES):
@@ -2804,14 +2806,21 @@ GATE_5B_NOON_TICK = 28740
 GATE_5B_CAST_TICK = 29883
 GATE_5B_LANDFALL_TICK = 44880
 GATE_5B_ROADS_TICK = 58294  # the outer road: the first cast under twenty fathoms
-GATE_5B_LINES = 837
-GATE_5B_DIGEST = "43fb9e16dab9670f"
+# Package 33c (spec M5 open item 15): every tick held, every line but the standing
+# runtime's own the same; the lines moved by the held lines said the first time and then
+# once a watch (the frigate 157 to 18, the schooner 155 to 15, the thick passage 31 to
+# 6), the conflict rule's grain (the lead, the log and a bearing no longer contrary to one
+# another or to a manoeuvre on "the ship": 21 to 1, 24 to 2, 2 to 1, those left the helm's,
+# "keep her full" against the heave-to, the wear or the stand-off), and the well entered
+# and held (one refusal for two lines).
+GATE_5B_LINES = 679
+GATE_5B_DIGEST = "d74f05aefcc4f94b"
 GATE_5B_SCHOONER_LANDFALL_TICK = 44100
-GATE_5B_SCHOONER_LINES = 907
-GATE_5B_SCHOONER_DIGEST = "e84617dfb1061ff7"
+GATE_5B_SCHOONER_LINES = 746
+GATE_5B_SCHOONER_DIGEST = "a3e2fd0a3a07170e"
 GATE_5B_THICK_LANDFALL_TICK = 54480
-GATE_5B_THICK_LINES = 526
-GATE_5B_THICK_DIGEST = "c5e9917759d7bf6b"
+GATE_5B_THICK_LINES = 501
+GATE_5B_THICK_DIGEST = "9f1a7626e4d4265d"
 
 
 def the_landfall(log):

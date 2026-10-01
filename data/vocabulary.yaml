@@ -998,8 +998,8 @@ send_directions: [aloft, up aloft, up, forward, aft, on deck, into the tops, int
 # earlier verb already has.
 # ---------------------------------------------------------------------------
 # Other words for existing verbs, each to the verb's canonical name: the words the owner
-# and the watcher reached for in the gate's passage and the two free passages
-# (docs/playtests/2026-10-01-gate-5b-opus-5.5-*/refused*.md). "Take a sounding" and
+# and the watcher reached for in the gate's passage and the two free passages (the
+# refused orders of playtests 12 and 13, `refused*.md` in their folders). "Take a sounding" and
 # "sound" are the hand lead ("Sounding, the operation of trying the depth of the water,
 # and the quality of the ground, by a plummet, called the lead", Falconer 1780,
 # *Sounding*); "cast the lead" the same. "Tend" is the afterguard's word for a sheet, as
