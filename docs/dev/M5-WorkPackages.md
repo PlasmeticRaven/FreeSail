@@ -41,11 +41,13 @@ gate 5b:  wave 3  32 the chart data and the queries, the lookout
           wave 4  33a the reckoning, the noon sight, the captain's chart, the checkpoint save, gate 5b
                   32e staying and sheets: the fore-and-aft rig at the small vessels' scale (spec open items 12 and 13; before gate 5b; launched 2026-09-30)
                   (landed 2026-09-30: 31b, 31c, 32, 32b)
-gate 5c:  wave 5  33b the chronometer, the moon and the lunar (beside 34)
-                  34 the tide, grounding and anchoring
+gate 5c:  wave 5  33b the chronometer, the moon, the lunar and the azimuth; the captain's chart in his hands (Fable; written 2026-10-01)
+                  33c the passage's words: readings at the prompt, the aliases, the starter book as a choice (Opus; beside 33b)
+                  33d the browser's shelf: completion, the library pane, the clock on a station, zoom and pan (Opus; beside 33b)
+                  34 the tide, grounding and anchoring, as Luce has it (Fable; after 33b)
           wave 6  35 places, people, ports and nations
           wave 7  36 other sail, the world-order channel, the two scenarios, gate 5c cut
-          wave 8  37 the officer of the watch; the lead's watch; the 5c verdict
+          wave 8  37 the officer of the watch; the lead's watch beside other models' (an Opus 5.5 watch, and a local model on the cutter: owner, 2026-10-01); the 5c verdict
 ```
 
 31 needs 30's wind (the sea reads its history). 32 needs nothing of 5a and may start
@@ -1071,10 +1073,267 @@ clock starts two minutes after sunrise (the scenario's; a line in the gate repor
 watcher's own two mistakes, corrected by itself in the log (the spanker's trim, the helm's
 side), which are the candour the brief asked for.
 
-## Packages 33b to 37 (outline; written in turn)
+## Package 33b: the chronometer, the moon, the lunar and the azimuth; the captain's chart in his hands (`freesail/core/moon.py` new; `freesail/world/sights.py` for the time sight, the lunar, the amplitude; `freesail/world/reckoning.py` for the chronometer's and the lunar's updates and the variation by observation; `freesail/world/chart.py` and `lookout.py` for the chart queries by account, the dangers, the distance held, the names; `freesail/api/readings.py` for the new rows and events; `freesail/orders/navigation.py`, `data/vocabulary.yaml`, `data/evolutions/` for the sights' evolutions; `freesail/world/scenarios.py` for `chronometer:`; `data/charts/features/channel-west.yaml` for the two names; `data/scenarios/gate-5b-passage*.yaml` only if the frigate gains a chronometer for 5c's cruise (she does not here); `docs/primer/10-the-reckoning.md` and a chapter on the longitude; `docs/dev/TuningNotes.md`; `tests/test_sights.py`, `test_moon.py` new, `test_reckoning.py`, `test_chart.py`, `test_lookout.py`, `tests/test_known_truths.py` truths 60 and 61)
 
-As spec M5 §31 after decision 29 (owner, 2026-09-30): 33a above; 33b the chronometer, the moon and the lunar (§14's rest; truths 60 and 61; Fable);
-34 the tide, grounding and anchoring (§16, §18; truths 62 to 64 and 66; Fable); 35 places,
+Spec M5 §14 (the chronometer, the lunar), §15's readings and orders they carry, §13's
+updates; `Navigation1805.md` §2 (chronometers and lunars, every figure with its
+unverified mark), §4(b) and (c), §5; decision 29 (in gate 5c's set); decision 30 (the
+azimuth comes here; the captain's chart items from playtests 12 and 13). Fable. Written
+2026-10-01 for the owner's final review.
+
+- **The moon** (`core/moon.py`, §14): a low-precision moon good to a degree (Meeus's
+  short method, the chapter and the terms cited), giving its age, phase, altitude, azimuth
+  and the distance to the sun and to a short list of the lunar stars; the night's light
+  for the lookout's words ("a moonlit night", which the land rule of §12 may read) and the
+  age for the tide of 34 and for the almanac in the ship's papers. If the model runs past
+  about a hundred lines, say so and keep it to what the lunar needs.
+- **The chronometer** (§14; N §2): a scenario item, `chronometer: {maker, rated, rate_s_per_day,
+  drift: seeded}`, the captain's own, absent unless the scenario says; wound daily by the
+  master, the log saying so; `wind the chronometer` by order, and a chronometer not wound
+  is a dead one, a scenario event; `compare the watches`. **The time sight** (`take a sight
+  for the longitude`): a morning or afternoon sun altitude with the latitude and the
+  declination giving the local hour angle, the longitude against the chronometer's time
+  with the rate error times the days since rating plus the sight's own two or three miles;
+  refused in cloud or with the sun too low; the reckoning's east-west axis updated by it.
+  Readings `the chronometer` (its time, the days since rated) and `the longitude by
+  chronometer` with the master's trust in words.
+- **The lunar** (§14; N §2, §4(c), §5): `take a lunar [of the sun | of <star>]`, the
+  conditions from the moon (up and above fifteen degrees, a body in distance, the sky
+  clear enough, a horizon by day or by moonlight), refused in the registry's words
+  otherwise ("No lunar to be had: the moon is two days old"); allowed, it occupies the
+  master and two mates for a quarter of an hour (a crew cost, the master's place taken),
+  and an hour of ship's time later the log gets the result, *drawn and not computed*: the
+  true longitude plus an error from the seed scaled by the master's skill, the sea state
+  of 5a and the moon's rate, a quarter of a degree for a good master on a quiet day, a
+  degree for a poor one in a seaway (10 to 39 miles at 50° N). The reckoning updated by
+  it; `the longitude by lunar`, `the chronometer's error by lunar`, `the moon`. The star
+  lunar is cut first if the budget bites.
+- **The azimuth** (decision 30): `observe an amplitude` at sunrise or sunset (the sun's
+  bearing by compass against its true amplitude from the declination and the latitude:
+  N §3's "an azimuth observation gets it to a degree"), refused in cloud or with the sun
+  not on the horizon; `observe an azimuth` by day with the sun's altitude; the result the
+  variation by observation, `the variation` as a reading with its date, and the reckoning
+  thereafter corrected by it rather than the chart's decade-old figure, the master's
+  words saying what he found. `VARIATION_1805_DEG` stays the world's truth (open item 14,
+  still unverified; say so).
+- **The captain's chart in his hands** (playtests 12 and 13; decision 30): `the bearing of
+  <mark> by the chart` and `the distance to <mark>` from the reckoned position for any
+  charted feature, in sight or not, with "by account" in the words; `the dangers` within
+  a stated distance of the account, the nearest first, by name and bearing; `shape a
+  course for <place>` says when the straight line passes a charted danger within a
+  mile or crosses it ("N by E by account, 17 miles; the line passes the Manacles within a
+  mile"), the pilot of 35 being the better answer and this the warning the master could
+  give; the helm rules of the book have no guard, and that is the captain's business, so
+  no rule is added; the events `a danger sighted` and, if it reads cheaply, `a bearing
+  steady and closing` in `EVENTS` for the book and the stand-by.
+- **The lookout, three faults** (playtest 13): a feature's distance by estimation drawn
+  once per sighting episode and held while the ship makes under a knot, not re-drawn at
+  every hail (the Start at four miles, four leagues and three leagues in an hour of calm),
+  the same figure in the list and in a bearing taken; `what is in sight` names dangers
+  first, then lights, the land, the marks, the cap of eight never cutting a danger off;
+  a mark's name whole mid-sentence ("Black Head", not "black Head": the reading's
+  first-letter rule stops at a proper name). The light at night against the visibility:
+  read the period's practice on a light's loom in rain against a headland's (White 1835,
+  Imray 1874 on the Lizard lights' range in thick weather) and either keep the rule with
+  the words in the tuning notes or give a light a floor the weather does not cut below;
+  and the visibility's words in passing showers between squalls checked against §5's
+  table. The chart's edge: the lookout says in words that the chart ends ("the chart has
+  nothing north of the Start").
+- **Two names** (playtest 12): the Manacles' transit mark is Nare Point by the Helford
+  (White 1835; Nare Head is on the Roseland), the feature and the transit corrected from
+  the page; "the Beast" and "the Gray" checked against White's words.
+- **Truths 60 and 61** (§19) as written, measured at seed 7 on the frigate given a
+  chronometer by a test scenario (the gate's passage files stay without one); the
+  azimuth's truth as a line in the reckoning tests (a sunrise amplitude on a clear
+  morning finds the variation within a degree and the account thereafter runs truer).
+- **The primer**: chapter 10 gains the chronometer, the time sight, the lunar and the
+  amplitude in the master's words and an orders block for each; every form the grammar
+  takes in a table (the owner's note 2, playtest 12), with the test that each parses.
+- **Report**: the suite's last line; every constant with its source and the study's mark;
+  the moon's accuracy against a known date (the Almanac's figure for one night, cited);
+  the chronometer's and the lunar's errors on the frigate's test passage; the amplitude's
+  result; the chart queries' words; the lookout's distances before and after; anything
+  not done and why.
+
+Not in 33b: the tide (34), the anchor (34), the pilot (35), double altitudes, the
+star catalogue beyond the lunar's short list, the `--casual` display.
+
+## Package 33c: the passage's words (`freesail/orders/*` for the readings at the prompt, the aliases, the bearing by any word, belay by the order's words, the groups; `freesail/standing/grammar.py` and `rules.py` for the article, the hove-to condition, a named rule case-blind; `freesail/standing/runtime.py` for the conflict rule's grain and the held lines (spec open item 15) and the starter's `sound the well` held; `data/vocabulary.yaml`; `data/standing_orders/starter.orders` split; `docs/primer/06-the-watch-and-the-log.md` or a chapter of its own for the starter book; `docs/primer/10-the-reckoning.md` for the forms table; `tests/test_orders.py`, `test_standing.py`, `test_primer.py`, `test_complete.py`, `test_tell.py`)
+
+From playtests 12 and 13's refused orders (`refused*.md` in their folders, each with the
+lead's reading) and the owner's notes and rulings of 2026-10-01 (decision 30). Opus.
+Written 2026-10-01 for the owner's final review; runs beside 33b and 33d, touching none
+of their files (33b owns `navigation.py`'s new orders; this package touches only the
+aliases of the existing ones).
+
+1. **A reading asked at the prompt.** Every reading's words typed alone, or after `what
+   is`, are answered in the log as a query line (kind `query.reading`, routine), as `the
+   booms` and `the sail room` are: `the reckoning`, `the reckoning's uncertainty`, `the
+   bearing of the Lizard`, `the master`, `the glass`, `the sea`, a sail by name; the
+   registry's absent words where a reading is not to be had. The console and the browser
+   alike (one path through `World.submit`); the completer offers them. Parity: the same
+   words the model's `readings` tool gives, nothing more.
+2. **Aliases**: `steer for <place>` and `make for <place>` (the course shaped); `take a
+   sounding`, `sound` and `cast the lead` (the lead); `trim the <sail> sheet` and `tend
+   the <sail> sheet` (the sheet's trim evolution of 32e); `work up a reckoning`; `the
+   reckoning's doubt`; `trice up the driver` answered with the scandalise refusal's words
+   (no state for a dropped peak yet); `set the <sail>, one reef` as set then reef.
+3. **Bearings and belays.** `take a bearing of <words>` takes a feature by any of its
+   words when one feature in sight matches (`manacle` for Manacle Point), says which two
+   when two do, and says in words that the Manacles proper are a different feature and
+   not in sight; `belay`/`avast <the order's words>` matches the work by the order that
+   started it as package 29c meant (`belay heave the lead` against "heaving lead");
+   "(1 reefs in)" and every count's plural.
+4. **The groups the brig and the cutter lack**: `the square sails`, `the sails` (every
+   sail set), `the topmast studdingsails` of both masts, `the stuns'ls`, by the ship's
+   file through the generator's groups where the ship has the parts, refused in words
+   where she has not; `the lee stuns'ls` names the lee side's.
+5. **The dialect**: "the daylight is night" taken as "daylight is night" is (the article
+   before a reading's name everywhere); `if she is hove to` / `if she is not hove to`,
+   and `the manoeuvre in hand` as a reading (hove to, tacking, wearing, none), so a trim
+   rule can sleep through a heave-to; a standing order named in `belay`, `resume` and
+   `show` case-blind and by any distinct part of its name.
+6. **The standing runtime** (spec open item 15): the conflict rule's grain, so that
+   `heave the lead` and `heave to` or `wear ship` are not contrary orders on "the ship"
+   (the lead is the lead's; a manoeuvre is the helm's and the yards'); an `at <event>, if
+   <condition>` rule whose condition fails does not log a held line at every event, only
+   the first and then once a watch; the starter's `sound the well` held until the well is
+   a reading (spec M4 §24 item 4), not refused at every start.
+7. **The starter book is a choice** (the owner's ruling, decision 30). The starter file
+   is split: `starter.orders` keeps the general and instructive routines (the night and
+   morning sail, shortening for weather, keeping her full, trim on a shift, tending the
+   sheets, heavy weather and the storm staysail, the well), and a passage's own orders
+   stay in the scenario's file; no game loads the starter book unless the scenario says
+   or the player asks (`--standing-orders data/standing_orders/starter.orders` on the
+   console and the server, and a line in the browser's and the console's opening words
+   saying how to load it or to begin with none); a primer chapter, "the starting book",
+   prints each routine with the reason it exists and shows how to write one's own, with
+   the dialect's forms; the gate's and the climatology day scenarios keep the book by
+   name as they do. The owner's words: never a hard requirement for beginning.
+8. **The forms table**: the primer's chapter 10 (and chapter 6 for the standing forms)
+   carries every form the grammar takes for the reckoning's orders and readings in a
+   table, and a test parses every row.
+9. **Tests** for each; the refused orders of playtests 12 and 13 that should now be taken
+   are a table in `tests/test_orders.py` (each with its new answer), and those that should
+   still be refused keep their words.
+10. **Report**: the suite's last line; the table of the forty-nine refusals of the three
+    sessions with what each now does; the starter book's split; anything not done.
+
+## Package 33d: the browser's shelf (`client/app.js`, `log.js`, `map.js`, `index.html`, `style.css`; `freesail/ui/server.py` for the completion route, the library routes and the driver's option; `freesail/orders/complete.py` as the completer behind the route; `freesail/agents/tools.py`'s `library` reused, not changed; `docs/agents/Harness.md` untouched; `README.md`'s run lines; `tests/test_server.py`)
+
+From `docs/design/Presentation.md` (completion in the browser), the owner's notes of
+playtest 12 (items 1, 3 and 4) and decision 30. Opus. Written 2026-10-01 for the owner's
+final review; runs beside 33b and 33c and touches none of their files. Text and data
+remain the baseline: nothing here is the only way to know something.
+
+1. **Completion in the browser.** A route on the console's completer (`/api/complete?line=`),
+   and a hint under the order line as the line is typed, the same words the console
+   offers; Tab takes the first, the arrows move through them; the readings at the prompt
+   of 33c appear among them once that lands (the route reads the completer, so nothing
+   here changes for it).
+2. **The library in a pane.** A pane of its own beside the log (or a pop-out window, the
+   owner's word: "to avoid cluttering the log"), opened by a button and by a `library`
+   line at the prompt: the reference library's topics as the model's `library` tool serves
+   them (the primer by chapter and section, the catalogue of evolutions, the grammar's
+   page, the tools' page), and the ship's papers the game holds by handle (`the booms`,
+   `the sail room`, `the boatswain's store` as 31b and 30b answer them; the establishment
+   table when 34 brings it), rendered from the same Markdown the model reads, with
+   `find` across it. Nothing is served the model cannot ask for, and nothing the model
+   can ask for is withheld. The sail room's pane is the one `InwardAndOutward.md` holds
+   for 35's places: until then the console's query stands, and the pane shows the papers
+   that exist and says which wait.
+3. **The clock and the stations.** An option in the instruments (and a flag,
+   `--ease-on-station`) to ease the clock to 1x whenever a station is sampled or speaks,
+   as an urgent line eases it, and to speed up again by hand; off by default; a driver's
+   line in the log says it happened, so a replay makes it.
+4. **The chart's zoom and pan.** The wheel and a drag on the chart; the scale bar and the
+   names follow (names when a mile is thirty pixels, as now); a button to centre on the
+   ship again; the plane's map the same.
+5. **Tests**: the completion route; the library routes serving each topic and `find`; the
+   option easing the clock on a sample with the fake watcher and the log's line; the chart
+   block unchanged (zoom is the client's; a Node test of the projection if one fits the
+   existing view tests).
+6. **Report**: the suite's last line; the routes and their words; what the pane shows and
+   what it says waits; anything not done.
+
+## Package 34: the tide, grounding and anchoring (`freesail/world/tide.py` new; `data/tides/constituents.yaml` and `streams.yaml` new; `freesail/core/world.py` for the tide's minute and the water's velocity in the physics; `freesail/physics/integrate.py` for the stream as a water velocity; `freesail/world/chart.py` for the tide's height under the lead and over the rocks that cover (`tide_m`); `freesail/world/reckoning.py` for the set the master allows against the world's; `freesail/world/ground.py` new; `data/evolutions/anchor_*.yaml` new (let go, veer, ride, heave short, weigh, cat and fish, a kedge laid by the boat as a later note) and `freesail/evolutions/scripts.py` for their scripts; `freesail/ship/parts.py` and `tools/gen_ships.py` for the anchors and the cable as parts of the four ships (bowers, a stream and a kedge; hemp cable by the fathom); `freesail/orders/*` and `data/vocabulary.yaml` for the ground tackle's words; `freesail/api/readings.py` for the tide's exposures and the ship's riding; `data/scenarios/gate-5b-passage*.yaml` gaining the anchor at the end; `docs/primer/` a chapter on the tide and the anchor; `docs/references/` the licence texts; `docs/dev/TuningNotes.md`; `tests/test_tide.py`, `test_ground.py`, `test_anchor.py` new, `tests/test_known_truths.py` truths 62 to 64 and 66)
+
+Spec M5 §16, §18; `Tides1805.md` whole (§1's figures, §5 the recommendation adopted,
+§6's unverified list); Luce 1866 ch. XIV and XV (ground tackle), ch. XXXIV (anchoring and
+tending ship) and 1884 Appendix I and K (in a tideway, tending at single anchor); Lever
+1808 on the anchor; Steel 1794 vol. II on stemming the tide; decision 29 (gate 5c's set)
+and decision 30 (the owner: "full Luce/reference based anchor handling is well desired").
+Fable. Written 2026-10-01 for the owner's final review; after 33b has landed (the moon's
+age sets the tide's springs and neaps).
+
+- **The world's tide** (§16; T §5). M2, S2 and N2 at the eleven TICON gauges (St Mary's,
+  Newlyn, Devonport, Weymouth, Dover, Brest, Le Conquet, Roscoff, Saint-Malo, St Helier,
+  Cherbourg; CC BY 4.0, the licence text under `docs/references/`), interpolated along
+  the coast and across the Channel by the cotidal geometry; the astronomical arguments
+  from the moon of 33b so that high water at full and change falls at the port's
+  establishment; K1 and O1 dropped. Streams tabulated by area (`streams.yaml`: axis,
+  spring rate, neap rate, phase against local high water) from T §1 and Bowditch 1802's
+  headland table, with SHOM's open atlas for the Fromveur, the Four and the Goulet;
+  evaluated once a simulated minute, five cosines. The stream sets the ship in the
+  physics as a water velocity (the reckoning does not see it); the height is under the
+  lead (`heave the lead` reads the chart's depth plus the tide) and over the rocks that
+  cover (the aground test of §11 reads it).
+- **The captain's tide** (§16). The establishment of the port from his epitome (the ship's
+  papers, by handle: the table of high water at full and change by port, in hours and
+  minutes or in points of the moon's bearing, with the spring rise, a poorer ship a poorer
+  table) and the moon's age from his almanac, worked by Moore's rule of 48 minutes a day,
+  wrong by up to an hour as Bowditch admits and by more with an old establishment; `the
+  tide by the almanac` as a reading in the master's words ("high water at Falmouth about
+  half past four this afternoon by the epitome"); the set he allows in the traverse
+  (`allow <n> knots of set to <direction>`, 33a's) against the world's stream, the
+  difference the play; the log-line's bias and the reckoning's eastward run of playtests
+  12 and 13 re-measured once the stream is in (N §3's three to eight per cent), the
+  tuning notes saying what the set explains and what the bias must. No tide readout, ever
+  (T §5): the exposures are the table, the moon, the lead against the chart, the shore's
+  marks that cover and dry (the Black Rock at half tide: the lookout's line), the ship
+  riding to the tide, the reckoning's set.
+- **Grounding** (§18; `ground.py`). Touching is an event with speed, heel, tide and bottom
+  (32's urgent line becomes the beginning): the consequences are the hull's (a stop, the
+  strain on the masts by the speed, a leak by the bottom's kind and the speed, the well
+  rising, the pumps) and the log's; getting off is the tide's business (she floats on the
+  flood if she took the ground on the ebb, the log saying when) or the anchor's (a kedge
+  laid by the boat, noted as 35's boat work or later). The rule of truth 66 as written.
+- **Anchoring, as Luce has it** (§18; decision 30). The anchors and the cable as parts of
+  each ship from the generator (a 36's bowers and sheet anchor, a stream and a kedge; the
+  schooner's, the cutter's and the brig's by their size; hemp cable by the fathom with its
+  rating, Steel's tables; chain allowed by the file where the era says): `come to an
+  anchor` as the evolution Luce ch. XXXIV gives (the sails taken in as she comes head to
+  wind or tide, the anchor let go with way off her, the cable veered to a scope the depth
+  wants, the yards squared, "riding to the flood"); `let go the best bower`, `veer cable`,
+  `heave short`, `weigh` (the capstan, the hands, the time by the scope), `cat and fish the
+  anchor`; at anchor she rides to the wind and the tide by the physics (the cable's pull
+  on the bow, the stream and the windage, the ship swinging at slack water, "the cable
+  slack at the turn"), the log saying how and the readings `the cable` (the scope, the
+  strain) and `the anchor` (down, aweigh, catted); the cable's strain in the strain model
+  (it parts, she drags); an anchor dragging a notable line, with Luce's answers (veer
+  more cable, let go the second anchor, back an anchor) as orders. Mooring with two
+  anchors is 5c's port (35). The gate 5b passages end with the anchor let go in the
+  outer road or Carrick Road instead of lying to (the scenario's book amended; decision
+  30: lying to was fine for the testing and no more), and the schooner's with hers off
+  the town.
+- **Truths 62, 63, 64 and 66** (§19) as written, measured at seed 7; a truth for the
+  anchor (she brings up in the depth the scope allows and rides to the tide, and drags in
+  a gale on short scope), its band from Luce.
+- **The primer**: a chapter on the tide (the rule of 48 minutes, the headland table, the
+  lead against the chart) and the anchor (Luce's sequence in the captain's words), with
+  orders blocks.
+- **Report**: the suite's last line; the constituents' sources and the datum offsets (open
+  item 3's unverified four) as found or still not; the stream table with its sources; the
+  two tides at Falmouth on the day of full moon; the log bias and the set re-measured on
+  the three passages; the anchor's evolutions with their sources and times; anything not
+  done and why.
+
+Not in 34: the pilot and the port (35), mooring (35), the kedge laid by the boat (35's
+boat), the Fromveur's eddies beyond the atlas, warping and towing (M7, M8).
+
+## Packages 35 to 37 (outline; written in turn)
+
+As spec M5 §31 after decisions 29 and 30: 33a, 33b, 33c, 33d and 34 above; 35 places,
 people, ports and nations, the pilot boarding from the cutter of 32b (§22 to §24, truths
 68 to 70; Fable, the owner's ruling of 2026-09-30, the earlier outline's Opus struck); 36
 other sail, the world-order channel, the brig of 32b at far detail with her merchant
