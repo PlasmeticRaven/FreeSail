@@ -2835,8 +2835,11 @@ GATE_5B_BROUGHT_UP_TICK = 59145  # brought up, the sails furled
 GATE_5B_LINES = 640
 GATE_5B_DIGEST = "03c0d70755a19011"
 GATE_5B_SCHOONER_LANDFALL_TICK = 43920
-GATE_5B_SCHOONER_LINES = 0  # package 34: set below from the schooner's run
-GATE_5B_SCHOONER_DIGEST = "0000000000000000"
+GATE_5B_SCHOONER_ROADS_TICK = 56502  # the outer road: sail shortened, a course for Carrick Road
+GATE_5B_SCHOONER_ANCHORED_TICK = 57615  # off the town: the best bower let go
+GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58618
+GATE_5B_SCHOONER_LINES = 725
+GATE_5B_SCHOONER_DIGEST = "a81f3d70e5b35ba4"
 GATE_5B_THICK_LANDFALL_TICK = 54900
 GATE_5B_THICK_LINES = 504
 GATE_5B_THICK_DIGEST = "b3b1f54a4b97a8f4"
@@ -3195,6 +3198,23 @@ def test_the_schooner_sails_the_passage_with_her_octant_and_the_log_every_two_ho
     landfall = the_landfall(log)
     assert landfall[0].tick == GATE_5B_SCHOONER_LANDFALL_TICK
     assert landfall[0].data["id"] in ("lizard-point", "the-beast")  # the two at one look
+    # her own ending (package 34): at the outer road she shortens sail and stands on for
+    # Carrick Road by the eastern channel, and comes to an anchor off the town at the
+    # first cast under ten fathoms, within St Anthony's; brought up, riding, nothing
+    # dragging and nothing aground
+    roads = [e for e in log if e.actor == "standing order 'the outer road'"]
+    assert roads and roads[0].tick == GATE_5B_SCHOONER_ROADS_TICK
+    town = [e for e in log if e.actor == "standing order 'off the town'"]
+    assert town and "coming to an anchor" in town[0].text
+    anchored = [e for e in log if e.kind == "ship.anchored"]
+    brought_up = [e for e in log if e.kind == "ship.brought_up"]
+    assert [e.tick for e in anchored] == [GATE_5B_SCHOONER_ANCHORED_TICK]
+    assert [e.tick for e in brought_up] == [GATE_5B_SCHOONER_BROUGHT_UP_TICK]
+    assert world.at_anchor and not world.ship.extra.get("aground")
+    assert not [e for e in log if e.kind in ("anchor.dragging", "ship.aground")]
+    riding = world.ship.extra["ground_tackle"].riding_by()
+    assert 7.0 < units.m_to_fathoms(riding.depth_m) < 14.0 and riding.scope_fathoms >= 40.0
+    assert _miles(world.position, world.navigation.account_now()) < 1.0
     assert len(log) == GATE_5B_SCHOONER_LINES and log.digest()[:16] == GATE_5B_SCHOONER_DIGEST
 
 

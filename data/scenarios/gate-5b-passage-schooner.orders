@@ -42,4 +42,4 @@ standing order "lead going in": every 10 minutes, if the land is in sight and th
 # rock off St Mawes castle before the lead could say the Road's depth; sail shortened,
 # and the anchor at the eight-fathom line, she brings up in the mouth.
 standing order "the outer road": when the depth is under 20 fathoms then shorten sail; shape a course for Carrick Road
-standing order "off the town": when the depth is under 8 fathoms then come to an anchor
+standing order "off the town": when the depth is under 10 fathoms then come to an anchor

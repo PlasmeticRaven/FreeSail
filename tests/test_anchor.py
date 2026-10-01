@@ -139,6 +139,10 @@ def test_she_brings_up_in_the_depth_the_scope_allows(brought_up):
     assert w.at_anchor and w.ship.dyn.speed < 0.6
     # the readings
     assert w.readings.words("anchor").startswith("down, riding by the best bower to the")
+    # the helm has no say at anchor, nor a manoeuvre; the book's 'keep her full' is refused
+    for text in ("steer N", "bear away a point", "trim sails", "tack ship", "heave to"):
+        e = w.submit(text)
+        assert e.kind == "order.rejected" and "She is at anchor" in e.text, e.text
     cable = w.readings["cable"]
     assert 0.0 <= float(cable) < 0.5 and "fathoms of the best bower's cable out" in cable.words
     assert "the strain" in w.readings.words("cable")

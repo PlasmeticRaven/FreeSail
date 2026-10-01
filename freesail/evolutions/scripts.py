@@ -3921,13 +3921,17 @@ class _AnchorScript(Script):
 
 
 def _belay_held_work(ship: Ship) -> None:
-    """The sail work the manoeuvre belayed is not resumed at anchor (the runner resumes
-    a manoeuvre's belayed work when all hands are done, decision 25; a sail half set when
-    she came to anchor is furled with the rest and its order is done with)."""
+    """The sail work the manoeuvre belayed, or that waited its turn for hands while all
+    hands were at the anchor, is not taken up at anchor (the runner resumes a manoeuvre's
+    belayed work when all hands are done, decision 25; a sail half set when she came to
+    anchor is furled with the rest and its order is done with, and a trim that waited
+    finds no sail to trim)."""
     runner = ship.extra.get("evolutions")
     if runner is None or not hasattr(runner, "belay"):
         return
-    held = [i for i in runner.instances if getattr(i, "paused", False)]
+    held = [
+        i for i in runner.instances if getattr(i, "paused", False) or getattr(i, "waiting", False)
+    ]
     if held:
         runner.belay(ship, held)
 
@@ -4039,6 +4043,7 @@ class ComeToAnchorScript(_AnchorScript):
                 for sl in ship.sails.values():
                     if sl.is_set and (sl.cls == "square" or sl.cls == "jibheaded"):
                         sl.state = SailState.IN_THE_GEAR
+                _belay_held_work(ship)  # the sail work waiting for hands finds no sail now
                 self.note(
                     f"Let go the topsail sheets; clew up; haul down the jib. Helm down for "
                     f"{units.point_name(self.heading_target)}."
