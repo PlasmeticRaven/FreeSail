@@ -2832,14 +2832,14 @@ GATE_5B_BROUGHT_UP_TICK = 59145  # brought up, the sails furled
 # distance by estimation is drawn once a sighting episode, and the departure's estimate
 # off Ushant ("two miles", was "a mile") put the account a mile differently, from which
 # the book shaped the course; the lines and digests below are the merge of the two.
-GATE_5B_LINES = 640
-GATE_5B_DIGEST = "03c0d70755a19011"
+GATE_5B_LINES = 624
+GATE_5B_DIGEST = "6880cabc6e0ac53e"
 GATE_5B_SCHOONER_LANDFALL_TICK = 43920
 GATE_5B_SCHOONER_ROADS_TICK = 56502  # the outer road: sail shortened, a course for Carrick Road
 GATE_5B_SCHOONER_ANCHORED_TICK = 57615  # off the town: the best bower let go
 GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58618
 GATE_5B_SCHOONER_LINES = 725
-GATE_5B_SCHOONER_DIGEST = "a81f3d70e5b35ba4"
+GATE_5B_SCHOONER_DIGEST = "c59b39435e5f2c15"
 GATE_5B_THICK_LANDFALL_TICK = 54900
 GATE_5B_THICK_LINES = 504
 GATE_5B_THICK_DIGEST = "b3b1f54a4b97a8f4"
