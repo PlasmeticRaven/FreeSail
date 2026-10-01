@@ -258,6 +258,19 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_weather_script.py::test_a_veering_script_is_logged_as_a_veer_and_a_standing_order_sees_it",
         "test_weather_script.py::test_trim_on_a_shift_fires_at_each_point_of_a_steady_veer_and_not_on_the_gusts",
         "test_weather_script.py::test_trim_on_a_shift_while_a_trim_is_in_hand_is_folded_not_stacked",
+        # Packages 33b to 33d's tests, written beside this package and measured on the
+        # lead's branch (ed865ca) on a quieter machine, where the bar above is about 2.3 s
+        # (the whole suite ran 2.2 times faster than in the two runs above).
+        "test_known_truths.py::test_truth_60_the_chronometer_within_four_miles_and_a_lunar_shows_it_gaining",
+        "test_known_truths.py::test_truth_61_the_lunar_is_refused_in_words_that_say_which_and_answers_within_a_degree",
+        "test_longitude.py::test_a_bearing_steady_and_closing_is_hailed_for_a_danger_and_the_chart_edge_said",
+        "test_longitude.py::test_the_chronometer_is_the_scenarios_and_keeps_greenwich_time_with_its_error",
+        "test_longitude.py::test_the_lunar_occupies_the_master_and_two_mates_and_answers_an_hour_later",
+        "test_longitude.py::test_the_master_winds_it_at_eight_and_a_forgotten_one_runs_down",
+        "test_orders_m4a.py::test_the_starter_file_loads_in_the_console_with_the_well_held_and_the_rest_entered",
+        "test_server.py::test_ease_on_station_eases_the_clock_on_a_sample_and_says_so",
+        "test_standing.py::test_she_is_hove_to_from_the_heave_to_until_she_fills_away",
+        "test_standing.py::test_the_well_is_held_in_the_book_and_never_fires",
     }
 )
 
