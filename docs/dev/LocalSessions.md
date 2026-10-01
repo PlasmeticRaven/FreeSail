@@ -1,5 +1,10 @@
 # Packages run in the owner's local sessions
 
+**Superseded 2026-10-01** (decision 31): 32c is built by the lead's cloud session with the
+Windows job proven on GitHub's runner, and 32d is deferred and rewritten for any machine,
+with one test cycle on the owner's. The prompts below are kept as the record of the first
+plan and are not to be run.
+
 Some packages are about the owner's machine (its paths, its launcher, its timings) and
 are run there, in a Claude Code session opened on a clone of the repository, rather than
 in the lead's cloud worktrees. The brief stays in `docs/dev/M5-WorkPackages.md`; the text

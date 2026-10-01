@@ -36,8 +36,8 @@ gate 5a:  wave 1  30 weather systems, the glass and the sky, the scenario's syst
                   31c the watcher's watch: the sample's delta, the door's wait, weather events, tell/ask in the book (beside 31b)
 gate 5b:  wave 3  32 the chart data and the queries, the lookout
                   32b the cutter and the brig as ship files, the orders' grammar across four ships (beside 32; pulled forward from 35 and 36, owner 2026-09-30)
-                  32c the suite in two tiers, the days built once, a Windows job (beside 32; the owner's local session)
-                  32d the freesail command, the settings file and the setup step (beside 32; the owner's local session)
+                  32c the suite in two tiers, the days built once, a Windows job (Opus; built by the lead, the Windows job proven on GitHub's runner; launched 2026-10-01)
+                  32d the freesail command, the settings file and the setup step, written for any machine (Opus; after 33c and 33d; one test cycle on the owner's machine)
           wave 4  33a the reckoning, the noon sight, the captain's chart, the checkpoint save, gate 5b
                   32e staying and sheets: the fore-and-aft rig at the small vessels' scale (spec open items 12 and 13; before gate 5b; launched 2026-09-30)
                   (landed 2026-09-30: 31b, 31c, 32, 32b)
@@ -45,6 +45,7 @@ gate 5c:  wave 5  33b the chronometer, the moon, the lunar and the azimuth; the 
                   33c the passage's words: readings at the prompt, the aliases, the starter book as a choice (Opus; beside 33b; launched 2026-10-01)
                   33d the browser's shelf: completion, the library pane, the clock on a station, zoom and pan (Opus; beside 33b; launched 2026-10-01)
                   34 the tide, grounding and anchoring, as Luce has it (Fable; approved 2026-10-01, launched when 33b lands)
+                  32f the launcher page: the browser's front door with the game's options (Opus; after 33d and 32d; owner, 2026-10-01)
           wave 6  35 places, people, ports and nations
           wave 7  36 other sail, the world-order channel, the two scenarios, gate 5c cut
           wave 8  37 the officer of the watch; the lead's watch beside other models' (an Opus 5.5 watch, and a local model on the cutter: owner, 2026-10-01); the 5c verdict
@@ -647,8 +648,10 @@ at far detail and her merchant description (36), truths for either ship (milesto
 
 From the cold review of 2026-09-30 (`docs/design/ColdReview-2026-09-30.md` §2.1 "The test
 suite has become an integration suite" and §6 item 1), approved by the owner the same
-day. Opus, **run by the owner in a local Claude Code session on the Windows machine** so
-that the timings are the owner's machine's. No design change; no test moves between
+day. Opus. First written for the owner's local session; built by the lead's cloud session
+instead (owner, 2026-10-01: the repository is public, so the Windows job on GitHub's runner
+costs nothing and is the Windows test; the owner runs the fast tier once afterwards for
+the tuning notes' timing on their machine). No design change; no test moves between
 files and no test's body changes (package 31b is editing `tests/test_known_truths.py`
 at the same time, so that file is not to be touched at all).
 
@@ -683,9 +686,18 @@ at the same time, so that file is not to be touched at all).
 ## Package 32d: the `freesail` command, the settings file and the setup step (`freesail/cli.py` new, `freesail/__main__.py` new; `pyproject.toml` for `[project.scripts]`; `docs/Setup.md` new; `README.md`'s "Running it"; `tests/test_cli.py` new)
 
 Spec M4 §24 open item 6 (the owner's note at gate 4b, 2026-09-27) and the cold review's
-§6 item 9, approved by the owner 2026-09-30. Opus, **run by the owner in a local Claude
-Code session on the Windows machine**, since the whole package is about that machine's
-paths, launcher and configuration files. No change to any door, the server, the console
+§6 item 9, approved by the owner 2026-09-30. Opus. **Deferred to after 33c and 33d land
+and to be rewritten before launch** (owner, 2026-10-01, decision 31): built by the lead's
+session and written for any machine, not the owner's, with one test cycle on the owner's
+machine (the only Windows machine with Claude Desktop on it). The rewrite: the three
+platforms' locations discovered by the command (`%APPDATA%`, `~/Library/Application
+Support`, `~/.config`), the records and saves in the user's own data folder since the
+consent records belong to whoever runs the game, its own entry merged beside any other
+server in the Desktop config with a backup taken first, nothing of the owner's machine
+hardcoded; the doors left open for others to come (an OpenRouter API door is wanted,
+with a security pass of its own before it is built: a key kept outside the repository
+and never in a settings file that is shared, never logged, never passed to the game);
+and `freesail play` opening the browser on the launcher page of 32f once that exists. No change to any door, the server, the console
 or the harness: the command wraps their `main(argv)` functions and passes arguments
 through. `docs/agents/Harness.md` is not edited here (package 31c holds it); the report
 gives the lead the lines that point from it to `docs/Setup.md`.
@@ -1330,6 +1342,17 @@ age sets the tide's springs and neaps).
 
 Not in 34: the pilot and the port (35), mooring (35), the kedge laid by the boat (35's
 boat), the Fromveur's eddies beyond the atlas, warping and towing (M7, M8).
+
+## Package 32f: the launcher page (outline; written after 33d and 32d land)
+
+Owner, 2026-10-01 (decision 31): the launcher with options is a page in the browser,
+not a separate program, since the game is already a browser client of a server. The
+first page the server shows: the ship, the scenario or a free passage, the seed, the
+month's weather or a pinned day, the starter book or none (33c's choice, given a place),
+the compression, which door a model comes through and under what name, the records
+folder; then start. The console and the command-line arguments stay for preference and
+for scripts. Packaging for a machine without Python (a start that carries its own
+Python) is milestone 8's, and runs the `freesail` command, which opens this page.
 
 ## Packages 35 to 37 (outline; written in turn)
 
