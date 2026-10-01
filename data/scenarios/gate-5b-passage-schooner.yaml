@@ -2,8 +2,11 @@
 # passage as gate-5b-passage.yaml, Ushant to Falmouth, in the topsail schooner with her
 # octant (the everyday instrument; N §1: the merchant master's kit) and no glass, the
 # log hove every two hours as in all vessels but ships of war (Falconer 1780, 'Log').
-# The same weather pinned, the same orders. The cutter and the brig are sailed through
-# the same orders with `--ship`:
+# The same weather pinned, the same orders to the outer road; from there her own book
+# (gate-5b-passage-schooner.orders, package 34) takes her in by the eastern channel to
+# anchor off the town in Carrick Road, where the frigate, deep and without a pilot,
+# anchors in the outer road. The cutter and the brig are sailed through the same orders
+# with `--ship`:
 #     py tools/day_log.py data/scenarios/gate-5b-passage-schooner.yaml --ship data/ships/cutter.yaml --hours 6 --reckoning
 #     py tools/day_log.py data/scenarios/gate-5b-passage-schooner.yaml --ship data/ships/brig.yaml --hours 6 --reckoning
 
@@ -40,7 +43,7 @@ weather:
 
 standing_orders:
   - data/standing_orders/starter.orders
-  - data/scenarios/gate-5b-passage.orders
+  - data/scenarios/gate-5b-passage-schooner.orders
 
 orders:
   - set plain sail

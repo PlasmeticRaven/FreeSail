@@ -49,12 +49,13 @@ standing order "lead going": every glass, if the land is in sight and the distan
 # Pendennis lies in eleven to fourteen fathoms (Imray 1874); she heaves to at twelve.
 standing order "lead going in": every 10 minutes, if the land is in sight and the distance run since noon exceeds 35 miles then heave the lead
 
-# At the first cast under twenty fathoms she is in the outer road, and there, with no
-# pilot aboard and the anchor a later package's (34), she wears and lies to on the
-# starboard tack, forereaching off the land: a ship lying to makes a knot or two through
-# the water along her head, and Falmouth Bay is a lee shore in a south-westerly (Luce
-# 1866 ch. XXIV, 'Lying-to'; the lead, 2026-09-30: hove to on the tack she arrived on she
-# forereached on to the Roads' banks in four minutes). The book waits for the wear to
-# end before it heaves her to (decision 22: an order on the state the work leaves).
-standing order "the outer road": when the depth is under 20 fathoms then wear ship
-standing order "lie off": at wore then heave to on the starboard tack
+# At the first cast under twenty fathoms she is in the outer road, ten to fourteen
+# fathoms of good ground off Pendennis (Imray 1874, p. 90: "whence a ship may go to sea
+# or run into Carrick Road"), and there she comes to an anchor (package 34; spec M5
+# §18): all hands, the light sails and the courses in, the helm down for the stronger
+# of wind and tide, the best bower let go with the way off her, the cable veered to
+# five times the depth, the sails furled (Luce 1866 ch. XXXIV, 'Having a leading wind,
+# to run in and anchor', pp. 569 to 571). Before package 34 she wore here and lay to
+# on the starboard tack, forereaching off the land, Falmouth Bay being a lee shore in a
+# south-westerly; a ship brought up rides to it.
+standing order "the outer road": when the depth is under 20 fathoms then come to an anchor

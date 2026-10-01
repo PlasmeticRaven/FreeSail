@@ -285,8 +285,14 @@ class Feature:
         return 0.0
 
     def covered(self, tide_m: float) -> bool:
-        """Whether the tide covers this danger now (a rock with no head above the water
-        is not seen; `dries_m` None reads as awash at the datum)."""
+        """Whether the tide covers this danger now, so that the lookout does not see it:
+        a rock with a height stands above the water at any tide (the Manacles' one head
+        "always above water"); one with none is covered once the tide is over its head
+        (`dries_m`, or awash at the datum when the pilot gives no figure)."""
+        if self.kind not in DANGER_KINDS:
+            return False
+        if self.kind != "drying" and self.height_m is not None and float(self.height_m) > 0.0:
+            return False
         head = self.head_above_datum_m()
         return head is not None and tide_m > head
 

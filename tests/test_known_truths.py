@@ -2786,7 +2786,7 @@ def test_the_primers_chapter_nine_does_not_narrate_the_gates_day(gate_5a_day):
 GATE_5B_PASSAGE = "data/scenarios/gate-5b-passage.yaml"
 GATE_5B_PASSAGE_SCHOONER = "data/scenarios/gate-5b-passage-schooner.yaml"
 GATE_5B_PASSAGE_THICK = "data/scenarios/gate-5b-passage-thick.yaml"
-GATE_5B_HOURS = 17  # 04:00 to 21:00: the outer road at a quarter past eight, lying to after
+GATE_5B_HOURS = 17  # 04:00 to 21:00: the outer road after eight, brought up before half past
 GATE_5B_SCHOONER_HOURS = 17  # the whole passage since package 32e's hove-to refusal held her
 GATE_5B_THICK_HOURS = 16
 # Measured at seed 7 (package 33a; re-measured by the lead on 2026-09-30 after package
@@ -2811,10 +2811,17 @@ GATE_5B_THICK_HOURS = 16
 # at the landfall; the schooner's Beast at five leagues at 16:17; the thick passage's
 # ticks unmoved and its digest moved by the hails' `estimate_m` (docs/dev/TuningNotes.md,
 # package 33b, "the pinned passages, re-measured").
+# Package 34 (the tide): the stream in the track moves every tick after the departure
+# but the noon's (the sun's), and the lead reads the tide; the passages end at the anchor
+# (the frigate in the outer road, the schooner off the town) in place of lying to, so
+# the ticks, the lines and the digests below are the tide's (docs/dev/TuningNotes.md,
+# package 34, "the pinned passages, re-measured with the tide in").
 GATE_5B_NOON_TICK = 28740
-GATE_5B_CAST_TICK = 29883
-GATE_5B_LANDFALL_TICK = 45000
-GATE_5B_ROADS_TICK = 56494  # the outer road: the first cast under twenty fathoms
+GATE_5B_CAST_TICK = 29884
+GATE_5B_LANDFALL_TICK = 44700
+GATE_5B_ROADS_TICK = 57732  # the outer road: the first cast under twenty fathoms
+GATE_5B_ANCHORED_TICK = 58167  # the best bower let go
+GATE_5B_BROUGHT_UP_TICK = 59145  # brought up, the sails furled
 # Package 33c (spec M5 open item 15): every tick held, every line but the standing
 # runtime's own the same; the lines moved by the held lines said the first time and then
 # once a watch (the frigate 157 to 18, the schooner 155 to 15, the thick passage 31 to
@@ -2825,14 +2832,14 @@ GATE_5B_ROADS_TICK = 56494  # the outer road: the first cast under twenty fathom
 # distance by estimation is drawn once a sighting episode, and the departure's estimate
 # off Ushant ("two miles", was "a mile") put the account a mile differently, from which
 # the book shaped the course; the lines and digests below are the merge of the two.
-GATE_5B_LINES = 677
-GATE_5B_DIGEST = "eacae6db04e7067a"
-GATE_5B_SCHOONER_LANDFALL_TICK = 44220
-GATE_5B_SCHOONER_LINES = 749
-GATE_5B_SCHOONER_DIGEST = "e41ade78138e024d"
-GATE_5B_THICK_LANDFALL_TICK = 54480
-GATE_5B_THICK_LINES = 501
-GATE_5B_THICK_DIGEST = "f4d7575fea6ada34"
+GATE_5B_LINES = 640
+GATE_5B_DIGEST = "03c0d70755a19011"
+GATE_5B_SCHOONER_LANDFALL_TICK = 43920
+GATE_5B_SCHOONER_LINES = 0  # package 34: set below from the schooner's run
+GATE_5B_SCHOONER_DIGEST = "0000000000000000"
+GATE_5B_THICK_LANDFALL_TICK = 54900
+GATE_5B_THICK_LINES = 504
+GATE_5B_THICK_DIGEST = "b3b1f54a4b97a8f4"
 
 
 def the_landfall(log):
@@ -3081,8 +3088,9 @@ def test_the_passage_for_gate_5b_at_seed_7_has_its_own_constants(gate_5b_passage
     """The frigate's passage Ushant to Falmouth (spec M5 §20): the departure bearing off
     the Stiff, the log hove hourly, the noon sight, the Channel Soundings by the deep-sea
     lead with the ship brought to, the Lizard raised and bearings taken, the course for
-    Falmouth shaped from the account, the lead going in and the ship wearing at the outer
-    road to lie to off it; the account against the truth at each; the lines and the digest."""
+    Falmouth shaped from the account, the lead going in and the ship brought to an anchor
+    in the outer road (package 34); the account against the truth at each; the lines and
+    the digest."""
     world, moments = gate_5b_passage
     log = world.log
     noon = [e for e in log if e.kind == "reckoning.noon"]
@@ -3093,9 +3101,10 @@ def test_the_passage_for_gate_5b_at_seed_7_has_its_own_constants(gate_5b_passage
     assert len(heaves) >= GATE_5B_HOURS - 2 and all(e.data["automatic"] for e in heaves[:3])
     casts = [e for e in log if e.kind == "sounding"]
     assert casts[0].tick == GATE_5B_CAST_TICK and casts[0].data["deep"]
-    assert casts[0].text == "Fifty-two fathoms; fine grey sand with black specks."
-    assert [e.tick for e in log if e.kind == "ship.hove_to"] == [28796, 56894]
-    assert [e.tick for e in log if e.kind == "ship.wore"] == [56834]  # the outer road
+    # fifty-three: the tide over the chart's fifty-two at the Channel Soundings (package 34)
+    assert casts[0].text == "Fifty-three fathoms; fine grey sand with black specks."
+    assert [e.tick for e in log if e.kind == "ship.hove_to"] == [28797]  # for the cast only
+    assert [e.tick for e in log if e.kind == "ship.wore"] == []  # she anchors, and wears no more
     landfall = the_landfall(log)
     assert landfall[0].tick == GATE_5B_LANDFALL_TICK and landfall[0].data["id"] == "the-beast"
     bearings = [e for e in log if e.kind == "bearing.taken"]
@@ -3105,12 +3114,26 @@ def test_the_passage_for_gate_5b_at_seed_7_has_its_own_constants(gate_5b_passage
     assert any(e.text.startswith("Shaped a course for Falmouth") for e in courses)
     roads = [e for e in log if e.actor == "standing order 'the outer road'"]
     assert roads and roads[0].tick == GATE_5B_ROADS_TICK
+    # the ending at anchor (package 34): the best bower let go in the outer road, brought
+    # up with five times the depth, riding; nothing dragging, nothing aground
+    anchored = [e for e in log if e.kind == "ship.anchored"]
+    brought_up = [e for e in log if e.kind == "ship.brought_up"]
+    assert [e.tick for e in anchored] == [GATE_5B_ANCHORED_TICK]
+    assert [e.tick for e in brought_up] == [GATE_5B_BROUGHT_UP_TICK]
+    assert brought_up[0].text.startswith("Brought up by the best bower in ")
+    assert world.at_anchor and not world.ship.extra.get("aground")
+    assert not [e for e in log if e.kind in ("anchor.dragging", "ship.aground")]
+    riding = world.ship.extra["ground_tackle"].riding_by()
+    assert 9.0 < units.m_to_fathoms(riding.depth_m) < 20.0 and riding.scope_fathoms >= 45.0
+    assert world.readings.words("anchor").startswith("down, riding by the best bower to the")
     # the account against the truth (the author's view: the truth is in the world and
     # the tests only)
     by_kind = {}
     for kind, tick, _text, truth, account in moments:
         by_kind.setdefault(kind, []).append((tick, _miles(truth, account)))
-    assert by_kind["reckoning.noon"][0][1] < 6.0  # the longitude by account, the day's run
+    # the longitude by account at noon, the day's run and the stream's set in it (6.6
+    # miles with the tide in, 3.6 without: package 34, the log-line's bias)
+    assert by_kind["reckoning.noon"][0][1] < 8.0
     assert 5.0 < by_kind["landfall"][-1][1] < 12.0  # made by the reckoning, corrected by the land
     final = [m for m in moments if m[0] == "bearing.taken"][-1]
     assert _miles(final[3], final[4]) < 2.0  # in the Roads, within a mile or two

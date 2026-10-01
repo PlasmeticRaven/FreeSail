@@ -1,0 +1,45 @@
+# FreeSail: the captain's orders for the passage of gate 5b in the schooner (spec M5 §15,
+# §18, §20; packages 33a and 34). The frigate's book (gate-5b-passage.orders) to the outer
+# road, word for word; from there the schooner, a small vessel with a pilot's knowledge of
+# the harbour in her master, runs in by the eastern channel and comes to an anchor off the
+# town in Carrick Road (Imray 1874, p. 90: "between St Mawes and Falmouth banks, 7 to 17
+# fathoms, the usual anchorage for ships of war"; White 1835, p. 27). The frigate, deep
+# and without a pilot, anchors in the outer road.
+
+# The departure: while the land is in sight astern, a bearing of it every glass, so that
+# the account is fixed off the Stiff before the land is lost (N §1).
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land
+
+# The Channel Soundings: at noon she is brought to and the deep-sea lead hove (Falconer
+# 1780, 'Sounding'; Rennell's procedure, N §3).
+standing order "bring to for soundings": at noon then heave to
+standing order "soundings": when the speed is under 3 knots and the distance run since noon is under 5 miles then heave the deep-sea lead
+
+# Once the cast is had she fills away, and when the fill-away has left the helm the
+# course for Falmouth is shaped afresh from the account.
+standing order "fill away after the cast": at a sounding, if the distance run since noon is under 5 miles then fill away
+standing order "stand on": at filled away then shape a course for Falmouth
+
+# The landfall: the first land seen gives a bearing, and the course for Falmouth is
+# shaped from the reckoning.
+standing order "landfall": when the land is in sight then take a bearing of the land; shape a course for Falmouth
+
+# Running in: the hand lead every glass once the land is in sight and the run since
+# noon says she is closing the coast, and every ten minutes within the thirty-five
+# miles since noon that put her off the Manacles (Luce 1884 ch. XXV).
+standing order "lead going": every glass, if the land is in sight and the distance run since noon exceeds 20 miles then heave the lead
+standing order "lead going in": every 10 minutes, if the land is in sight and the distance run since noon exceeds 35 miles then heave the lead
+
+# At the first cast under twenty fathoms she is in the outer road; a small vessel with
+# her master's knowledge of the harbour shortens sail and stands on for Carrick Road by
+# the eastern channel (White 1835, p. 26: "the eastern channel is the better"), the lead
+# going every ten minutes, and comes to an anchor off the town at the first cast under
+# eight fathoms, which is the harbour's mouth within St Anthony's: in Luce's manner (ch.
+# XXXIV, 'Beating in on a flood tide, to anchor', p. 573: head to the stronger of wind
+# and tide), the best bower let go with the way off her and the cable veered to five
+# times the depth (package 34; spec M5 §18). The lead, 2026-10-01: shaped for the Road
+# under all plain sail she ran the eastern channel at eight knots and struck the Lugo
+# rock off St Mawes castle before the lead could say the Road's depth; sail shortened,
+# and the anchor at the eight-fathom line, she brings up in the mouth.
+standing order "the outer road": when the depth is under 20 fathoms then shorten sail; shape a course for Carrick Road
+standing order "off the town": when the depth is under 8 fathoms then come to an anchor

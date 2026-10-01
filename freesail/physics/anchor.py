@@ -51,7 +51,9 @@ from freesail.ship.parts import Anchor, AnchorState, GroundTackle
 __all__ = [
     "CABLE_DAMPING_FRACTION",
     "CABLE_STRETCH_FRACTION",
-    "DRAG_FLOOR_OF_WEIGHT",
+    "DRAGGING_HOLD_FRACTION",
+    "DRAG_SAY_S",
+    "DRAG_SETTLE_S",
     "GROUND_HOLDING",
     "HAWSE_FRACTION",
     "HOLDING_PER_WEIGHT",
@@ -88,10 +90,17 @@ DEFAULT_GROUND_HOLDING = 0.9
 # The cable's angle at the anchor at which it lifts the fluke out: judgement on Lever's
 # words (above); the holding falls in a straight line from the horizontal to this.
 TRIP_ANGLE_DEG = 35.0
-# An anchor is said to drag only under a pull along the ground above this fraction of
-# its own weight (judgement: at the let-go, with the cable up and down and running out,
-# the anchor holds nothing and the hawse's every foot would otherwise be a drag).
-DRAG_FLOOR_OF_WEIGHT = 1.0
+# An anchor lifted past its tripping angle, or dragging on its side, still holds this
+# part of its full holding (judgement: a quarter, about its own weight in good ground;
+# an anchor coming home is not a free weight on the bottom).
+DRAGGING_HOLD_FRACTION = 0.25
+# And only once it has been coming home for this long (judgement: a minute; the snub as
+# she is brought up moves the anchor a fathom in seconds and is not a drag), and it holds
+# again once it has held this long (judgement: five minutes; an anchor coming home and
+# holding by turns as she sheers about is one dragging). `judge_cables` keeps the count
+# once a tick from what `cable_forces` did in its substeps.
+DRAG_SAY_S = 60.0
+DRAG_SETTLE_S = 300.0
 # The hemp cable's stretch at its breaking strain (Luce 1866, ch. IV: one seventh to one
 # fifth); the stiffness follows.
 CABLE_STRETCH_FRACTION = 0.15
@@ -128,6 +137,7 @@ def scope_wanted_m(depth_m: float, per_depth: float = RIDING_SCOPE_PER_DEPTH) ->
 def holding_n(anchor: Anchor, angle_rad: float) -> float:
     """What the anchor holds along the ground now, in newtons."""
     lift = max(0.0, 1.0 - math.sin(max(angle_rad, 0.0)) / math.sin(math.radians(TRIP_ANGLE_DEG)))
+    lift = max(lift, DRAGGING_HOLD_FRACTION)
     return HOLDING_PER_WEIGHT * anchor.weight_kn * 1000.0 * ground_factor(anchor.bottom) * lift
 
 
@@ -168,7 +178,6 @@ def cable_forces(ship: Ship, water: tuple[float, float], h: float) -> tuple[floa
         if length <= scope or dist < 1e-6:
             anchor.taut = False
             anchor.cable_load_kn = 0.0
-            anchor.dragging = False
             anchor.holding_kn = holding_n(anchor, math.atan2(depth, max(dist, 1e-6))) / 1000.0
             continue
         ux, uy = dx / dist, dy / dist  # toward the anchor
@@ -186,10 +195,8 @@ def cable_forces(ship: Ship, water: tuple[float, float], h: float) -> tuple[floa
             # the capstan heaves the ship up to her anchor: the cable's pull brings her
             # ahead, and the anchor is not said to drag (it is broken out when the cable
             # is up and down, the weigh script's word)
-            anchor.dragging = False
-        elif (
-            pull > holds and holds > 0.0 and pull > DRAG_FLOOR_OF_WEIGHT * anchor.weight_kn * 1000.0
-        ):
+            pass
+        elif pull > holds:
             # it drags: the anchor comes toward the ship along the cable's line until the
             # pull along the ground is what it holds
             tension = holds / math.cos(theta)
@@ -198,11 +205,7 @@ def cable_forces(ship: Ship, water: tuple[float, float], h: float) -> tuple[floa
             anchor.ground_x = hx + ux * new_dist
             anchor.ground_y = hy + uy * new_dist
             pull = holds
-            anchor.dragging = True
-        elif pull > holds and pull > DRAG_FLOOR_OF_WEIGHT * anchor.weight_kn * 1000.0:
-            anchor.dragging = True
-        else:
-            anchor.dragging = False
+            anchor.came_home = True
         anchor.taut = True
         anchor.cable_load_kn = tension / 1000.0
         fx, fy = pull * ux, pull * uy
@@ -215,14 +218,34 @@ def cable_forces(ship: Ship, water: tuple[float, float], h: float) -> tuple[floa
 
 
 def judge_cables(ship: Ship, dt: float) -> None:
-    """Once a tick: the cables of the anchors down against their ratings, by the strain
-    model's rule (spec §7.5): worn above the rating, warned once in ten minutes, parted
-    above half the breaking strain by the strain stream's draw or when worn out."""
+    """Once a tick: the drag judged over time (an anchor that has come home for
+    DRAG_SAY_S together is dragging, and holds again after DRAG_SETTLE_S holding), and
+    the cables of the anchors down against their ratings, by the strain model's rule
+    (spec §7.5): worn above the rating, warned once in ten minutes, parted above half the
+    breaking strain by the strain stream's draw or when worn out."""
     tackle = ship.extra.get("ground_tackle")
     if not isinstance(tackle, GroundTackle):
         return
     stream = strain._stream(ship, None)
     st = strain.strain_state(ship)
+    for anchor in tackle.anchors:
+        if not anchor.down or anchor.heaving:
+            anchor.dragging = False
+            anchor.came_home = False
+            anchor.drag_s = anchor.hold_s = 0.0
+            continue
+        if anchor.came_home:
+            anchor.drag_s += dt
+            anchor.hold_s = 0.0
+        else:
+            anchor.hold_s += dt
+            if anchor.hold_s >= DRAG_SETTLE_S:
+                anchor.drag_s = 0.0
+        anchor.came_home = False
+        if anchor.drag_s >= DRAG_SAY_S:
+            anchor.dragging = True
+        elif anchor.drag_s == 0.0:
+            anchor.dragging = False
     for anchor in tackle.down():
         ratio = anchor.cable_strain_ratio
         if ratio <= strain.DECAY_RATIO:

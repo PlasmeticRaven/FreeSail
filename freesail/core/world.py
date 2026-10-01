@@ -179,15 +179,6 @@ AGENT_LOG_KINDS: tuple[str, ...] = (
 NOTABLE_ORDER_KINDS = frozenset({"agent.told", "work.belayed"})
 
 
-# An anchor that dragged is said to hold again only after this long holding (package
-# 34; judgement: five minutes, so that an anchor dragging and holding by turns as she
-# sheers about is one dragging and not twenty lines).
-DRAG_SETTLE_S = 300
-# And one is said to drag only after it has dragged this long (judgement: a minute; the
-# snub as she is brought up moves the anchor a fathom in seconds and is not a drag).
-DRAG_SAY_S = 60
-
-
 class World:
     WIND_SHIFT_LOG_THRESHOLD = 2 * units.POINT
 
@@ -236,8 +227,6 @@ class World:
         self.ground: Any = None
         self._tide_was_flood: bool | None = None
         self._dragging: set[str] = set()
-        self._held_since: dict[str, int] = {}  # a dragging anchor's first tick holding
-        self._drag_since: dict[str, int] = {}  # a holding anchor's first tick dragging
         if self.chart is not None:
             from freesail.world.ground import Ground
             from freesail.world.tide import load_tide
@@ -536,19 +525,17 @@ class World:
 
     def _tick_anchors(self) -> None:
         """Every tick at anchor: an anchor beginning to drag is a notable line with Luce's
-        answers, and one holding again a routine line (package 34)."""
+        answers, and one holding again a routine line (package 34). The judgement of the
+        drag over time is the physics' (`physics.anchor.judge_cables`)."""
         tackle = (getattr(self.ship, "extra", None) or {}).get("ground_tackle")
         if not tackle:
             return
-        for anchor in tackle.down():
-            if anchor.heaving:
+        for anchor in tackle.anchors:
+            if not anchor.down:
+                self._dragging.discard(anchor.id)
                 continue
             if anchor.dragging and anchor.id not in self._dragging:
-                since = self._drag_since.setdefault(anchor.id, self.clock.tick)
-                if self.clock.tick - since < DRAG_SAY_S:
-                    continue
                 self._dragging.add(anchor.id)
-                self._held_since.pop(anchor.id, None)
                 second = tackle.by_words("the second anchor")
                 more = (
                     f"; let go {second.name}, or back her with the stream"
@@ -562,29 +549,14 @@ class World:
                     f"cable{more}.",
                     data=anchor.to_dict(),
                 )
-            elif anchor.dragging:
-                self._held_since.pop(anchor.id, None)
-            elif anchor.id not in self._dragging:
-                self._drag_since.pop(anchor.id, None)
-            else:
-                # it holds again when it has held for DRAG_SETTLE_S (an anchor that
-                # drags and holds by turns as she sheers is dragging)
-                since = self._held_since.setdefault(anchor.id, self.clock.tick)
-                if self.clock.tick - since < DRAG_SETTLE_S:
-                    continue
+            elif not anchor.dragging and anchor.id in self._dragging:
                 self._dragging.discard(anchor.id)
-                self._held_since.pop(anchor.id, None)
                 self.record(
                     Severity.ROUTINE,
                     "anchor.holding",
                     f"{anchor.name[:1].upper()}{anchor.name[1:]} holds again.",
                     data=anchor.to_dict(),
                 )
-        for anchor in tackle.anchors:
-            if not anchor.down:
-                self._dragging.discard(anchor.id)
-                self._held_since.pop(anchor.id, None)
-                self._drag_since.pop(anchor.id, None)
 
     def _sun_now(self) -> Sun:
         """The sun at the ship's latitude now: the scenario's on the plane, hers with a

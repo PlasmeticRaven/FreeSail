@@ -206,6 +206,13 @@ SET_DOUBT_NORTH_KN = 0.03
 # epitome, or this where the table gives no rise (judgement: the Channel's mean level
 # over the datum, about three metres, T §1).
 TIDE_ALLOWANCE_DEFAULT_M = 3.0
+# The master's rise at the quarters as a part of the spring rise (Norie 1805, the tide
+# table's note: the neap rise "about two-thirds" of the spring's; judgement in the figure,
+# the Epitome's text not read, the rule a commonplace of the period's tables), and the
+# tide's own day, twelve hours and twenty-five minutes (Moore 1799, 'Of the Tides').
+NEAP_RISE_OF_SPRING = 2.0 / 3.0
+TIDE_HOURS = 12.0 + 25.0 / 60.0
+SYNODIC_MONTH_DAYS = 29.53
 
 # A departure: the reckoning begins where the land was last seen, a mile in doubt
 # (judgement: a bearing of a headland and its distance by estimation).
@@ -1287,15 +1294,35 @@ class Navigation:
 
     def _tide_allowance_m(self) -> float:
         """What the master takes off a cast for the tide before he lays it on the chart:
-        half the spring rise of the nearest place in his epitome (the mean level over the
-        chart's low-water datum), `TIDE_ALLOWANCE_DEFAULT_M` where the table gives none."""
+        his own tide, never the world's (decision 29). The rise at the nearest place in
+        his epitome by the moon's age (the spring rise at full and change, two-thirds of
+        it at the quarters: Norie's rule of thumb, `NEAP_RISE_OF_SPRING`), and the height
+        above low water now by the time from his high water (`tide_by_almanac`) as the
+        half-cosine of the tide's twelve hours and twenty-five minutes, which is the rule
+        of twelfths worked exactly; `TIDE_ALLOWANCE_DEFAULT_M` where the table gives no
+        rise for the place."""
         epitome = getattr(self, "epitome", None)
         if epitome is None:
             return TIDE_ALLOWANCE_DEFAULT_M
         port, _ = epitome.nearest(self.reckoning.position)
         if port.spring_rise_ft is None:
             return TIDE_ALLOWANCE_DEFAULT_M
-        return 0.5 * units.feet_to_m(port.spring_rise_ft)
+        age = self.almanac_age_days()
+        springs = abs(math.cos(2.0 * math.pi * age / SYNODIC_MONTH_DAYS))
+        range_m = units.feet_to_m(port.spring_rise_ft) * (
+            NEAP_RISE_OF_SPRING + (1.0 - NEAP_RISE_OF_SPRING) * springs
+        )
+        now = self.world.clock.ship_time
+        day = now.date()
+        highs = epitome.high_waters(port, age, day) + epitome.high_waters(
+            port, age + 1.0, day + timedelta(days=1)
+        )
+        if not highs:
+            return 0.5 * range_m
+        nearest = min(highs, key=lambda t: abs((t - now).total_seconds()))
+        hours = (now - nearest).total_seconds() / 3600.0
+        phase = 2.0 * math.pi * hours / TIDE_HOURS
+        return 0.5 * range_m * (1.0 + math.cos(phase))
 
     def _record_cast(
         self,

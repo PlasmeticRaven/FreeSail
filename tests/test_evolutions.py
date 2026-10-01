@@ -197,7 +197,14 @@ def test_only_the_manoeuvres_belay_the_work_in_hand():
     "Ready about!" and its kind stop the sail work in hand, a reef or a furl does not."""
     all_hands = {e.id for e in EVOLUTIONS.values() if str(e.crew.get("hands")) == "all"}
     belaying = {e.id for e in EVOLUTIONS.values() if e.belays}
-    assert belaying == {"tack", "wear", "boxhaul", "wear_short_round", "lie_a_try"}
+    assert belaying == {
+        "tack",
+        "wear",
+        "boxhaul",
+        "wear_short_round",
+        "lie_a_try",
+        "come_to_anchor",
+    }
     assert {"reef_square", "furl_all", "send_down_topgallant_masts"} <= all_hands - belaying
 
 

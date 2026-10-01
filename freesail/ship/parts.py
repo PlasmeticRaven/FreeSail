@@ -862,7 +862,10 @@ class Anchor:
     cable_condition: float = 100.0  # as a line's (spec §7.5): worn by the strain
     cable_load_kn: float = 0.0  # the tension now, set by the physics each tick
     holding_kn: float = 0.0  # what it holds now, set by the physics
-    dragging: bool = False  # the pull on it exceeds its holding this tick
+    dragging: bool = False  # it is dragging: come home for DRAG_SAY_S together (physics/anchor)
+    came_home: bool = False  # it moved this tick (set by the physics each substep it does)
+    drag_s: float = 0.0  # the seconds it has been coming home
+    hold_s: float = 0.0  # the seconds it has held since it last came home
     taut: bool = False  # the cable bar-taut (she is riding by it), else slack
     heaving: bool = False  # the cable being hove in at the capstan (weighing, heaving short)
 
