@@ -1,6 +1,6 @@
 # Playtest 13: gate 5b, two free passages, the cutter and the brig (Opus 5.5 through Claude Desktop)
 
-Two passages the owner sailed without a scenario's book, in the gate-m5b build, with Opus 5.5 at the watcher's station through Claude Desktop (the consent record of 2026-09-29): the cutter *Sherbourne* on "An October day" (the climatology's weather, seed 7) from off Ushant to off St Anthony's Head, fourteen hours; and the brig *Harpy* on "A July day" (seed 7) from off Brittany in fog to off the Start, a night hove to between, thirty-seven hours. The owner's notes are below as written; the watcher's post-session notes are `post-session-notes-cutter.md` and `post-session-notes-brig.md`, its journals `journal-cutter.md` and `journal-brig.md`, all verbatim; the saves are `cutter-save.json` (tick 49921) and `brig-save.json` (tick 133945) with their checkpoints. The refused orders of each, replayed by the lead, are in `refused.md`.
+Two passages the owner sailed without a scenario's book, in the gate-m5b build, with Opus 5.5 at the watcher's station through Claude Desktop (the consent record of 2026-09-29): the cutter *Sherbourne* on "An October day" (the climatology's weather, seed 7) from off Ushant to off St Anthony's Head, fourteen hours; and the brig *Harpy* on "A July day" (seed 7) from off Brittany in fog to off the Start, a night hove to between, thirty-seven hours. The owner's notes are below as written; the watcher's post-session notes are `post-session-notes-cutter.md` and `post-session-notes-brig.md`, its journals `journal-cutter.md` and `journal-brig.md`, all verbatim; the saves are `cutter-save.json` (tick 49921) and `brig-save.json` (tick 133945) with their checkpoints. The refused orders of each, replayed by the lead, are in `refused-cutter.md` and `refused-brig.md`.
 
 ## 1. The scenario, the seed and the build
 
@@ -19,7 +19,7 @@ The cutter: reefed before setting anything on a lee shore in 22 knots, two reefs
 
 ## 4. What the owner wished to say and could not
 
-`refused.md`. From the watcher's notes: `scandalise the driver` refused with an honest reason (no state for a dropped peak yet); `clew up the driver` corrected to `brail up`; `reef the mainsail, N reefs` takes N more, not to N; "daylight is night" accepted in one standing order and "the daylight is night" refused in another.
+`refused-cutter.md` and `refused-brig.md`. From the watcher's notes: `scandalise the driver` refused with an honest reason (no state for a dropped peak yet); `clew up the driver` corrected to `brail up`; `reef the mainsail, N reefs` takes N more, not to N; "daylight is night" accepted in one standing order and "the daylight is night" refused in another.
 
 ## 5. What the watcher said
 

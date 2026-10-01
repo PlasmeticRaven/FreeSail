@@ -1042,6 +1042,10 @@ physics and evolutions (Fable)**, since these are the same subject as 32e:
   him and many orders refused (`refused.md` in each playtest folder lists them with the
   reasons): the primer's reckoning chapter to carry every form the grammar takes, in a
   table, and a test that every form in the chapter parses.
+- From the brig's refusals: a standing order named case-blind and loosely in `belay`
+  and `resume` (`belay "blind lead"` was read as a part); whole-ship groups the brig lacks
+  (`the topmast studdingsails` of both masts, `the sails`, `the square sails` as the
+  cutter's file has it); `trice` as the period's word that earns the scandalise refusal.
 - The dialect: "the daylight is night" refused where "daylight is night" was taken;
   `if she is hove to` / `if she is not hove to` as a condition (the brig's trim rules
   belayed by hand through a heave-to); a reading for the manoeuvre in hand.
