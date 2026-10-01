@@ -968,3 +968,52 @@ Three truths and a test were re-pinned besides, each with its reason at the test
 - **Four order-table entries failed at the base commit** (the merge of 31b and 32b): "brace the yards to the wind" on the cutter and the brig expected "3 yards" and "8 yards" where `number_words` has written "three" and "eight" since 31b, and "splice the mainbrace" expected a verb unknown where `splice` has been a verb since 31b. Their expectations are corrected here.
 - **The tending routine's firing line is notable.** The standing runtime logs every firing of a standing order as a notable line, so "By standing order 'tend the sheets': trimming the sheets." appears at every glass, fifty-seven times a day, mostly followed by "the sheets ... stand as trimmed". The severity is the standing module's (not this package's files); for the lead.
 - **Not done: a main sheet parting in a gybe.** The load a belayed boom sheet carries is quasi-static (the pull over the lever); a gybe's snatch is the boom's swing arriving on the sheet, which wants the boom coming over on a timeline (the rig-motion item), outside this package. In 35 knots running the frigate's spanker sheet stands at a fifth of its rating.
+
+## Milestone 5: the passage's words (package 33c)
+
+Recorded by the lead from the package's report (2026-10-01). No physics; two judgements in
+the standing runtime and the re-pinned days that follow from them.
+
+### The conflict rule's grain (spec M5 open item 15)
+
+A sail, a yard or a line is its own part and the helm is one; a manoeuvre (tack, wear,
+heave to, fill away, box haul, lie a-try, scud, back and fill, wear short round) takes the
+helm and every yard; `heave the lead` is the lead's, `heave the log` the log's, a bearing
+and the account the master's, a shaped course the helm's; the ship's is only what is left.
+A firing whose evolutions have all ended no longer counts against a later order, so `at
+wore then heave to` follows the wear instead of clashing with it. On the gate 5b passage
+the conflicts fell from 21 to 1 (the one real: "keep her full" against "lie off" on the
+helm, which the book's author should see).
+
+### The held lines, once a watch (judgement)
+
+A failing `, if` on an `at` or an `every` order is logged the first time and then once a
+watch of the ship's clock while it goes on failing, and afresh after the order fires.
+"Once a watch" is a judgement: the cadence at which an officer would mention again that
+a standing order's condition is not met. The brief named `at` only; `every` was most of
+the noise (the two leads' `every ten minutes, if` on the passage) and took the rule too.
+The starter's `sound the well` is entered and held, not refused at every start.
+
+### The pinned days, re-measured
+
+Every tick of every pinned moment stands; only the line counts and the digests moved,
+with the held and conflict lines and the well's two lines:
+
+| Run | Lines before → after | Digest after |
+|---|---|---|
+| gate 5b passage | 837 → 679 (held 157 → 18; conflicts 21 → 1) | `d74f05aefcc4f94b` |
+| the schooner's passage | 907 → 746 (held 155 → 15; conflicts 24 → 2) | `a3e2fd0a3a07170e` |
+| the thick passage | 526 → 501 (held 31 → 6; conflicts 2 → 1) | `9f1a7626e4d4265d` |
+| the day under systems | 616 → 617 (the well) | `9bd4e0bffcfb6b10` |
+
+### Found on the way (package 33c)
+
+- **The browser's first driver line.** The server writes the opening words about the book
+  as a driver line (`driver.book`) so the browser's log says how to load the starter book;
+  a driver line is in the digest, so the same scenario's digest differs between the console
+  and the browser by that line, as it already did by any driver's line.
+- **Two refusals left to other packages.** Tacking from a reach and the sheet-ease limit
+  are the fore-and-aft second pass's; the lower-cased mark names in the lookout's list are
+  33b's.
+- **A sail by name is answered at the prompt but not offered by the completer**, which
+  lists vocabulary phrases; a part's name alone would need `complete.py` to offer parts.

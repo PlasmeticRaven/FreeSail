@@ -42,7 +42,7 @@ gate 5b:  wave 3  32 the chart data and the queries, the lookout
                   32e staying and sheets: the fore-and-aft rig at the small vessels' scale (spec open items 12 and 13; before gate 5b; launched 2026-09-30)
                   (landed 2026-09-30: 31b, 31c, 32, 32b)
 gate 5c:  wave 5  33b the chronometer, the moon, the lunar and the azimuth; the captain's chart in his hands (Fable; launched 2026-10-01)
-                  33c the passage's words: readings at the prompt, the aliases, the starter book as a choice (Opus; beside 33b; launched 2026-10-01)
+                  33c the passage's words: readings at the prompt, the aliases, the starter book as a choice (Opus; landed 2026-10-01)
                   33d the browser's shelf: completion, the library pane, the clock on a station, zoom and pan (Opus; landed 2026-10-01)
                   34 the tide, grounding and anchoring, as Luce has it (Fable; approved 2026-10-01, launched when 33b lands)
                   32f the launcher page: the browser's front door with the game's options (Opus; after 33d and 32d; owner, 2026-10-01)
