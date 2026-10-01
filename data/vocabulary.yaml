@@ -586,6 +586,63 @@ verbs:
                observe an azimuth of the sun, take an azimuth of the sun]
     object: navigation
     level: 1
+  # The ground tackle's orders (spec M5 §18; package 34; decision 30; `freesail/orders/
+  # ground_tackle.py`): the object `anchor` takes the words after the verb as said (an
+  # anchor by name, a number of fathoms), as `navigation` does. "Let go the best bower"
+  # outranks the line verb "let go" by its length, as the grammar matches the longest
+  # phrase; a bare "let go the anchor" is the anchor she would ride by. The words are
+  # Luce's and Lever's: "Let go the starboard anchor!" (Luce 1866 ch. XXXIV), "veer away",
+  # "heave short", "All hands up anchor!" (ch. XXI), "cat and fish" (Lever 1808 p. 68),
+  # "back the anchor" (Luce p. 568).
+  come to an anchor:
+    synonyms: [come to anchor, bring ship to anchor, bring her to anchor, bring her to an anchor,
+               bring the ship to anchor, anchor ship, anchor, come to an anchor with,
+               come to anchor with, anchor with, bring up with, bring up, let go and bring up,
+               all hands bring ship to anchor]
+    object: anchor
+    level: 1
+  let go the anchor:
+    synonyms: [let go the best bower, let go the small bower, let go the sheet anchor,
+               let go the stream anchor, let go the stream, let go the kedge,
+               let go the second anchor, let go the other anchor, let go the lee bower,
+               let go the weather bower, let go the bower, let go an anchor, let go anchor,
+               let go the starboard anchor, let go the larboard anchor, let go the port anchor,
+               drop the anchor, drop anchor, let go the best bower anchor, let go the small bower anchor]
+    object: anchor
+    level: 1
+  veer cable:
+    synonyms: [veer, veer away, veer away cable, veer the cable, veer away on the cable,
+               veer more cable, give her more cable, veer away the cable, veer out, veer to,
+               veer cable to, veer away to]
+    object: anchor
+    level: 1
+  heave short:
+    synonyms: [heave in to a short stay, heave in the cable, heave in cable, heave in,
+               shorten in the cable, heave her short, heave short on the cable, heave to a short stay]
+    object: anchor
+    level: 1
+  weigh:
+    synonyms: [weigh anchor, weigh the anchor, up anchor, heave up the anchor, heave up,
+               all hands up anchor, get the anchor, heave up the best bower, heave up the small bower,
+               weigh the best bower, weigh the small bower, get under way, get under weigh]
+    object: anchor
+    level: 1
+  cat and fish the anchor:
+    synonyms: [cat and fish, cat the anchor, fish the anchor, cat and fish the best bower,
+               cat and fish the small bower, cat and fish the sheet anchor, cat and fish the stream,
+               cat and fish the kedge, cat and fish anchor]
+    object: anchor
+    level: 1
+  back the anchor:
+    synonyms: [back the best bower, back the bower, back her anchor, back the anchor with the stream,
+               back the best bower with the stream, back the anchor with the stream anchor,
+               back the small bower]
+    object: anchor
+    level: 1
+  the ground tackle:
+    synonyms: [the anchors, the anchors and cables, show the ground tackle, the cables]
+    object: query
+    level: 0
   # Group evolutions: verb phrases with no object, expanded from the list below.
   set plain sail:
     synonyms: [make plain sail, make sail]

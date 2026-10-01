@@ -235,7 +235,13 @@ class Lookout:
         else:
             self._moonlit_said = False
         found = self.chart.in_sight(
-            pos, self.height_of_eye_m, visibility_nm, daylight, world.clock.ship_time, self.moonlit
+            pos,
+            self.height_of_eye_m,
+            visibility_nm,
+            daylight,
+            world.clock.ship_time,
+            self.moonlit,
+            tide_m=float(getattr(world, "tide_height_m", 0.0)),  # a rock covered (34)
         )
         if not any(s.seen_as == "land" for s in found):
             shore = self._shore_close_aboard(pos, visibility_nm, daylight)
@@ -392,7 +398,9 @@ class Lookout:
         if s.feature.id == SHORE_ID:
             return f"{head} close aboard {relative}, bearing {point}, distant {distance}."
         if s.seen_as == "danger":
-            return f"{head} bearing {point}, distant {distance}: a danger."
+            # a rock that covers and dries is "showing" when it is seen (package 34)
+            showing = " showing" if s.feature.kind == "drying" else ""
+            return f"{head}{showing} bearing {point}, distant {distance}: a danger."
         return f"{head} bearing {point}, distant {distance}."
 
     # -- for the bearing taken (package 33a, spec M5 §13, §15) ---------------------------

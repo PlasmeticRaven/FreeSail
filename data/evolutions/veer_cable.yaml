@@ -1,0 +1,28 @@
+# Veer cable (spec M5 §18; package 34): more cable given to the anchor she rides by.
+# "When the wind is so violent as to bring the anchors home, and make the vessel drive,
+# the cable is veered away; and, in veering away, the turns of the stopper laniards are
+# slackened, and a portion of the cable suffered to go out of the hawse, to let the
+# vessel further astern of her anchor; in which situation she bears less strain on the
+# flukes, and is less liable to drag the anchor; for, the more cable is out, the flukes
+# become deeper buried, and the ship rides in greater safety" (Steel 1794 vol. II, p. 292,
+# 'Of coming to anchor'). Luce's first answer to an anchor dragging ("veer more cable",
+# the World's line, physics/anchor.py).
+#
+# Parameters: `fathoms` (how many more to veer, or with `to` true the scope to veer to);
+# a bare "veer cable" veers a third as much again (judgement).
+id: veer_cable
+verb: veer_cable
+applies_to: {class: ship}
+script: veer_cable
+params: {fathoms: null, to: false}
+preconditions: []
+timing:
+  veer_fathoms_per_s: 0.5  # the stoppers slackened and the cable surged through the
+                           # bitts a few fathoms at a time: judgement, half the rate it
+                           # runs when let go
+on_start: {log: "Veer away on {anchor} cable."}
+on_complete: {log: "Veered to {fathoms} on {anchor}.", kind: cable.veered, severity: routine}
+on_fail: {log: "Could not veer cable: {reason}.", kind: evolution.failed, severity: routine}
+# crew: the forecastlemen at the stoppers and the bitts (judgement in the number).
+crew: {hands: 8, rating: ordinary, stations: [forecastle]}
+source: "Steel 1794 vol. II, p. 292; Lever 1808, 'Single Anchor', p. 97 (the long or leeward service veered to against wind and tide); Luce 1866, ch. XXXIV, p. 568 (the scope to ride by)"

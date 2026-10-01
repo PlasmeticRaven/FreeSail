@@ -777,6 +777,49 @@ aliases:
   fore bowline: fore bowlines
   fore top bowline: fore bowlines
   sails: all sail
+# The ground tackle (package 34, spec M5 §18): the anchors by the ship's size and the hemp cables by the fathom, every figure's rule in tools/gen_ships.py; chain cable is later than 1805 and the file says so.
+ground_tackle:
+  chain: false
+  anchors:
+  # The bowers: 11.2 cwt by the rule of five cwt to the hundred tons (224 tons burthen; the beam rule, two thirds the draught and the beam in cwt, gives 31.3), Luce 1866 ch. XIV. The cable 12 inches, half an inch to the foot of beam (judgement, unverified), rated as every rope by Luce ch. IV; two cables of 120 fathoms spliced on the best bower (Falconer 1780, CABLE; Lever 1808 p. 67).
+  - id: best_bower
+    kind: bower
+    name: the best bower
+    weight_kg: 570.0
+    cable_fathoms: 240.0
+    cable_in: 12.0
+    cable_kn: 223.1
+  - id: small_bower
+    kind: bower
+    name: the small bower
+    weight_kg: 570.0
+    cable_fathoms: 120.0
+    cable_in: 12.0
+    cable_kn: 223.1
+  # The sheet anchor, the bowers' size and cable (Lever 1808 p. 67).
+  - id: sheet
+    kind: sheet
+    name: the sheet anchor
+    weight_kg: 570.0
+    cable_fathoms: 120.0
+    cable_in: 12.0
+    cable_kn: 223.1
+  # The stream anchor, a quarter of the bower (Luce 1866 ch. XIV, the Book of Allowances), its cable two thirds of the bower's (judgement).
+  - id: stream
+    kind: stream
+    name: the stream anchor
+    weight_kg: 140.0
+    cable_fathoms: 120.0
+    cable_in: 8.0
+    cable_kn: 99.2
+  # The kedge, an eighth of the bower (Luce 1866 ch. XIV), on a hawser of half the cable's size (judgement).
+  - id: kedge
+    kind: kedge
+    name: the kedge
+    weight_kg: 70.0
+    cable_fathoms: 120.0
+    cable_in: 6.0
+    cable_kn: 55.8
 crew:
   # A privateer's complement of about forty (Chapelle, The Baltimore Clipper; judgement, spec M3 2.3).
   complement: 40

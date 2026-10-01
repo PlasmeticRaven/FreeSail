@@ -204,6 +204,17 @@ def load_scenario(path: str | Path) -> ScenarioFile:
     ship = raw.get("ship") or {}
     wind = raw.get("wind") or {}
     sc.glass = bool(ship.get("glass", raw.get("glass", False)))
+    # the master's epitome for the tide (spec M5 §16, package 34): the ship's line or the
+    # file's; a table of data/tides/establishments.yaml (norie, moore); none, the ship's
+    # kind chooses (a ship of war Norie's, a merchantman Moore's)
+    epitome = ship.get("epitome", raw.get("epitome"))
+    if epitome is not None:
+        sc.epitome = str(epitome).strip().lower()
+        if sc.epitome not in ("norie", "moore"):
+            raise ScenarioError(
+                f"{where}, epitome: '{epitome}' is not a table of the establishments; say "
+                f"norie or moore."
+            )
     # the master's instrument for the noon sight (spec M5 §14, package 33a): the ship's
     # line or the file's; the octant unless the file says the sextant
     instrument = ship.get("instrument", raw.get("instrument"))

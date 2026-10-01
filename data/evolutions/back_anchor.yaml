@@ -1,0 +1,27 @@
+# Back the anchor (spec M5 §18; package 34): the stream anchor let go on the riding
+# cable to help the bower hold. "If you want to back your anchor with another one, on
+# account of dragging, or the danger of doing so, put an anchor shackle on the riding
+# cable; shackle the end of the backing anchor cable (taken outside all) to this; look
+# out for, or give the ship a sheer, and let go" (Luce 1866, ch. XXXIV, p. 568); "the
+# anchor is backed, or retained, by carrying out the stream, or kedge, ahead of the
+# anchor the ship usually rides by. In this situation, the bower anchor is confined by
+# the stream, or kedge, in the same manner as the ship is restrained by the bower anchor"
+# (Steel 1794 vol. II, p. 292). Steel's way wants the boat (package 35); Luce's is done
+# from the ship, and that is this: the stream anchor goes down on the bower's cable and
+# the two hold together (physics/anchor.py takes each anchor's holding on the same
+# cable's line, which is the backing). Luce's third answer to an anchor dragging.
+id: back_anchor
+verb: back_anchor
+applies_to: {class: ship}
+script: back_anchor
+params: {}
+preconditions: []
+timing:
+  shackle_s: 240   # the shackle on the riding cable, the stream's cable bent outside all
+                   # and the anchor got over the side: judgement
+on_start: {log: "A shackle on {anchor} cable; bend the stream cable outside all and get the stream anchor over the side."}
+on_complete: {log: "Backed {anchor} with the stream anchor.", kind: anchor.backed, severity: notable}
+on_fail: {log: "Could not back {anchor}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the forecastlemen and the waisters to get the stream over (judgement).
+crew: {hands: 20, rating: ordinary, stations: [forecastle, waisters]}
+source: "Luce 1866, ch. XXXIV Anchoring, p. 568; Steel 1794 vol. II, p. 292"

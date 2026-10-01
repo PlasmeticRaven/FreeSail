@@ -1,0 +1,37 @@
+# Weigh anchor (spec M5 §18; package 34): the cable hove in at the capstan from
+# wherever it stands to up and down, the anchor broken out of the ground ("the officer
+# of the forecastle reports when the cable is 'up and down', and also, when the anchor is
+# 'aweigh!'", Luce 1866 ch. XXI), hove up to the bows ("heave the anchor up to the bows;
+# and as soon as it is high enough, Avast heaving! Pawl the capstan! stopper the cable;
+# cat and fish the anchor", the same), then catted and fished: "The Hook of the Cat Block
+# is put through the Ring of the Anchor: the Cat Fall ... being swayed upon, the Anchor
+# is thus brought up to the Cat-head. This is called Catting the Anchor ... The Fish Hook
+# is taken to the inner Arm of the Anchor ... and the Shank Painter ... belayed to Timber
+# Heads" (Lever 1808, 'Catting and Fishing the Anchors', p. 68). The time is by the
+# scope: the cable comes in at the capstan's rate, the anchor comes up at the depth's;
+# a frigate riding to sixty fathoms in twelve is a quarter of an hour at it (the
+# package's measure, docs/dev/TuningNotes.md). Once the anchor is aweigh she is adrift:
+# the sails are the captain's to set, as Luce has them made before the anchor is tripped.
+#
+# "aweigh" is Falconer's word (1780, AWEIGH: "the state of the anchor when it is drawn out
+# of the ground in a perpendicular direction"; ATRIP the same); the log says it.
+id: weigh_anchor
+verb: weigh_anchor
+applies_to: {class: ship}
+script: weigh_anchor
+params: {}
+preconditions: []
+timing:
+  rig_capstan_s: 180        # as heave_short's, when not hove short already
+  heave_fathoms_per_s: 0.1  # six fathoms a minute at the capstan (judgement)
+  break_out_s: 60           # the anchor broken out of the ground at the heave (judgement)
+  hoist_fathoms_per_s: 0.2  # the anchor hove up to the bows, by the depth (judgement)
+  cat_and_fish_s: 300       # the cat hooked and swayed up, the fish tackle on the fluke,
+                            # the shank painter passed (Lever p. 68): judgement
+on_start: {log: "All hands up anchor! Man the bars; heave round."}
+on_complete: {log: "{anchor_cap} catted and fished; she is under way.", kind: ship.weighed, severity: notable}
+on_fail: {log: "Could not weigh: {reason}.", kind: evolution.failed, severity: notable}
+# crew: all hands at the bars ("All hands up anchor!"); not a manoeuvre, sail is made
+# meanwhile.
+crew: {hands: all, rating: ordinary, stations: [all hands]}
+source: "Luce 1866, ch. XXI Getting Under Way, 'To get under way and stand out on a wind' (up and down, aweigh, cat and fish); Lever 1808, 'Catting and Fishing the Anchors', p. 68 (figs. 365-366); Falconer 1780, AWEIGH, ATRIP, To CAT the anchor, To FISH the anchor"

@@ -2214,12 +2214,18 @@ def _names_bowsprit(ship: Ship, order: Order) -> bool:
 def _query(ship: Ship, order: Order) -> Result:
     """'The booms', 'the sail room' and 'the boatswain's store': what the ship's stores
     hold, in the log and never journaled (the World logs a `query.` kind as it is)."""
-    from freesail.ship.parts import booms, cordage, sail_room
+    from freesail.ship.parts import booms, cordage, ground_tackle, sail_room
 
     if order.verb == "the booms":
         return "query.booms", "\n".join(booms(ship).inventory_lines()), {}
     if order.verb == BOATSWAINS_STORE:
         return "query.cordage", "\n".join(cordage(ship).inventory_lines()), {}
+    if order.verb == "the ground tackle":
+        # the anchors and their cables (package 34)
+        tackle = ground_tackle(ship)
+        if tackle is None:
+            return "query.ground_tackle", "She carries no ground tackle.", {}
+        return "query.ground_tackle", "\n".join(tackle.describe()), {}
     return "query.sail_room", "\n".join(sail_room(ship).inventory_lines()), {}
 
 

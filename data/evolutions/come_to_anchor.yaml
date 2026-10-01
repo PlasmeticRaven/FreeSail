@@ -1,0 +1,60 @@
+# Come to an anchor (spec M5 §18; package 34; decision 30: "full Luce/reference based
+# anchor handling"). The evolution as Luce 1866 ch. XXXIV, p. 569, 'Having a leading
+# wind, to run in and anchor', gives it: "Call all hands, bring ship to anchor! ... Haul
+# taut! In studding-sails and royals! ... In top-gallant sails, up foresail! ... Man the
+# topsail clew-jiggers and buntlines; jib downhaul! spanker outhaul! ... When near the
+# anchorage, put the helm to starboard or port, as the case may be, having allowed for
+# head-reach in bringing her to the wind. Then give the order, Haul taut! Let go the
+# topsail sheets! Clew up! Haul down the jib! Haul out the spanker! ... She comes to the
+# wind by the effect of the helm and spanker, and as soon as she loses entirely her
+# headway, give the orders, Stand clear of the cable! Stream the buoy! Let go the
+# starboard (or port) anchor! ... and as soon as she swings to the anchor, Brail up the
+# spanker! Direct the navigator to give the ship the requisite number of fathoms ...
+# furl sails, square yards, haul taut rigging, and pipe down." In a tideway "always come
+# to, however, with the head of the ship to that which is the stronger, either the wind
+# or the tide" (p. 573), and "Much benefit may result from letting go the anchor stemming
+# the tide, especially with a rapid tide, for it gives an opportunity to observe at what
+# rate the ship drives astern" (Steel 1794 vol. II, p. 296). The scope "the depth of water
+# wants": five times the depth (Luce 1866 ch. XXXIV, p. 568, against the old rule of
+# three), as far as the cable bent to the anchor allows.
+#
+# The script (freesail/evolutions/scripts.py, ComeToAnchorScript) does it in phases:
+#   shorten_sail   the studding sails, royals, topgallants and courses clewed up (the M2
+#                  simplification heave_to uses: the sails' states set, the hands' time
+#                  the phase's)
+#   round_to       the helm put down for the wind or the stream, whichever is the
+#                  stronger; the topsails clewed up and the jib hauled down as the sails
+#                  shake; the spanker kept to bring her to
+#   let_go         when her headway is gone (or the timeout), the anchor let go where
+#                  the hawse is, the depth the lead's
+#   veer           the cable veered roundly to the scope the depth wants
+#   brought_up     the cable taut and her way over the ground stopped: the spanker
+#                  brailed up, the sails furled and the yards squared over furl_s;
+#                  "riding to the flood, the wind across the tide" in the log
+# Parameter `anchor`: which (the best bower unless said). The physics does the riding:
+# the cable's pull at the hawse, the stream and the windage (physics/anchor.py).
+id: come_to_anchor
+verb: come_to_anchor
+applies_to: {class: ship}
+script: come_to_anchor
+params: {anchor: null}
+preconditions: []
+timing:
+  clew_up_s: 150         # the light sails and the courses in: judgement, a well-drilled
+                         # crew "all together" (Luce p. 570)
+  topsails_s: 60         # the topsails clewed up and the jib down as she comes to
+  lose_way_timeout_s: 420  # she is given seven minutes to lose her way head to it
+  veer_fathoms_per_s: 1.0  # the cable "veered away roundly" (Luce): judgement
+  settle_s: 240          # the cable taut and her way stopped: "brought up"
+  furl_s: 600            # the sails furled and the yards squared by all hands (judgement)
+  stem_tide_kn: 1.5      # a stream over this is stemmed in preference to the wind
+                         # (Luce p. 573: head to the stronger; judgement in the figure)
+on_start: {log: "All hands, bring ship to anchor! Stand by to take in the light sails."}
+on_complete: {log: "Brought up by {anchor} in {depth}, {fathoms} of cable; {riding}", kind: ship.brought_up, severity: notable}
+on_fail: {log: "Could not come to an anchor: {reason}.", kind: evolution.failed, severity: notable}
+# crew: all hands ("Call all hands, bring ship to anchor!", Luce 1866 ch. XXXIV p. 569;
+# "Shortening sail and coming to anchor" a station of the bill, Luce 1884 ch. XX); a
+# manoeuvre, it belays the sail work in hand (decision 25).
+crew: {hands: all, rating: ordinary, stations: [all hands]}
+belays: true
+source: "Luce 1866, ch. XXXIV Anchoring, 'Having a leading wind, to run in and anchor' (p. 569), 'To stand in on a wind and anchor' (p. 571), 'Beating in on a flood tide, to anchor' (p. 573), the scope (p. 568); Steel 1794 vol. II, p. 296, 'To come to an anchor with the wind across the tide'; Lever 1808, 'Anchoring', pp. 97-98 (fig. 518 to 524: stemming the tide, the leeward tide)"

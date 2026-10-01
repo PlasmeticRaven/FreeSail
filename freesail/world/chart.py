@@ -259,10 +259,36 @@ class Feature:
     bearing_deg: float | None = None  # a transit's bearing
     bottom: str = ""  # a bottom note's ground
     depth_fathoms: float | None = None  # a bank's or an anchorage's depth as the pilot gives it
+    # A danger's head above the chart's datum, metres (package 34, spec M5 §16, §18): the
+    # Black Rock "shows itself at half tide" (Moore 1799), the Penwin "awash at low
+    # water" (White 1835), a sunken rock with so many feet over it at low water a negative
+    # figure. The tide's height against it says whether it is covered (the lookout cannot
+    # see it) and whether there is water over it for the keel (the aground test). None: a
+    # rock or ledge taken as awash at the datum, a bank as nothing.
+    dries_m: float | None = None
 
     @property
     def position(self) -> Position:
         return Position(self.lat_deg, self.lon_deg)
+
+    def head_above_datum_m(self) -> float | None:
+        """A danger's head above the datum: `dries_m` (the pilot's figure for the water
+        over it at low water, or how far it dries), else its height above the water for
+        a rock that stands above it, else the datum itself for a rock or a ledge the pilot
+        gives no figure for; None for a kind that is no danger."""
+        if self.kind not in DANGER_KINDS:
+            return None
+        if self.dries_m is not None:
+            return float(self.dries_m)
+        if self.height_m is not None and float(self.height_m) > 0.0:
+            return float(self.height_m)
+        return 0.0
+
+    def covered(self, tide_m: float) -> bool:
+        """Whether the tide covers this danger now (a rock with no head above the water
+        is not seen; `dries_m` None reads as awash at the datum)."""
+        head = self.head_above_datum_m()
+        return head is not None and tide_m > head
 
     @property
     def height(self) -> float:
@@ -300,6 +326,7 @@ class Feature:
             bearing_deg=None if d.get("bearing_deg") is None else float(d["bearing_deg"]),
             bottom=str(d.get("bottom", "")),
             depth_fathoms=None if d.get("depth_fathoms") is None else float(d["depth_fathoms"]),
+            dries_m=None if d.get("dries_m") is None else float(d["dries_m"]),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -323,6 +350,8 @@ class Feature:
             out["bottom"] = self.bottom
         if self.depth_fathoms is not None:
             out["depth_fathoms"] = self.depth_fathoms
+        if self.dries_m is not None:
+            out["dries_m"] = self.dries_m
         if self.view:
             out["view"] = self.view
         return out
@@ -792,6 +821,55 @@ class Chart:
         where, water = worst
         return Grounding(water, draught_m, where, self.bottom_near(pos))
 
+    def danger_under(
+        self,
+        pos: Position,
+        heading_rad: float,
+        length_m: float,
+        draught_m: float,
+        tide_m: float = 0.0,
+        dangers: list[Feature] | None = None,
+    ) -> Grounding | None:
+        """Whether the keel touches a charted danger (package 34, spec M5 §18): a rock, a
+        ledge or a drying rock whose head (`Feature.dries_m` above the datum, the datum
+        itself when the pilot gives no figure) has less water over it than she draws,
+        within its extent (a cable at the least: the chart's rocks are points) of her
+        bow, her stern or her middle. The tiles blur a rock to its cell, so the dangers
+        are read by name as the pilots give them. `dangers` is the list already found
+        about her (the World keeps it a minute at a time); else the index is searched."""
+        if draught_m <= 0.0:
+            return None
+        if dangers is None:
+            dangers = self.dangers_about(pos, length_m)
+        if not dangers:
+            return None
+        half = 0.5 * length_m
+        hx, hy = math.sin(heading_rad) * half, math.cos(heading_rad) * half
+        places = (("forward", hx, hy), ("aft", -hx, -hy), ("amidships", 0.0, 0.0))
+        for f in dangers:
+            head = f.head_above_datum_m()
+            if head is None:
+                continue
+            water = tide_m - head
+            if water >= draught_m:
+                continue  # covered deep enough for her
+            fx, fy = pos.offset_to(f.position)
+            reach = max(float(f.extent_m), units.CABLE)
+            for where, px, py in places:
+                if math.hypot(fx - px, fy - py) <= reach:
+                    return Grounding(water, draught_m, where, f"{f.name} (rock)")
+        return None
+
+    def dangers_about(self, pos: Position, length_m: float) -> list[Feature]:
+        """The charted dangers within reach of her (the longest extent and her length)."""
+        reach = 2000.0 + length_m
+        return [
+            f
+            for f in self.nearby(pos, reach, DANGER_KINDS)
+            if bearing_and_distance(pos, f.position)[1]
+            <= max(float(f.extent_m), units.CABLE) + length_m
+        ]
+
     def contour_point(
         self,
         pos: Position,
@@ -926,11 +1004,14 @@ class Chart:
         daylight: str,
         when: datetime,
         moonlit: bool = False,
+        tide_m: float = 0.0,
     ) -> list[Sighting]:
         """The features in sight from a height of eye: within the geographic horizon,
         within the weather's visibility, and by each feature's own rule; nearest first.
         A light at night by its luminous range in the weather (`luminous_range_nm`); the
-        land on a moonlit night at `MOONLIT_LAND_NM` (package 33b)."""
+        land on a moonlit night at `MOONLIT_LAND_NM` (package 33b); a danger only while
+        the tide leaves its head above the water (package 34: the Black Rock shows at
+        half tide, the Penwin is awash at low water and covered after)."""
         vis_nm = math.inf if visibility_nm is None else float(visibility_nm)
         eye_nm = horizon_nm(height_of_eye_m)
         night_land = MOONLIT_LAND_NM if moonlit else NIGHT_LAND_NM
@@ -944,6 +1025,8 @@ class Chart:
             seen_as = self._seen_as(f, daylight, year)
             if seen_as is None:
                 continue
+            if seen_as == "danger" and f.covered(tide_m):
+                continue  # under water: nothing for the lookout to see (package 34)
             bearing, distance = bearing_and_distance(pos, f.position)
             nm = distance / units.NAUTICAL_MILE
             limit = min(vis_nm, horizon_nm(height_of_eye_m, f.height))

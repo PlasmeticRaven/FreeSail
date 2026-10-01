@@ -403,6 +403,125 @@ def design_kn(sails: list[tuple[float, float, str]], wind_kn: float) -> DesignLo
     return DesignLoad(round(static_kn(sails, wind_kn) * SUSTAINED_FRACTION, 1), wind_kn)
 
 
+# ---------------------------------------------------------------------------
+# The ground tackle (package 34, spec M5 §18; decision 30): one rule for every ship
+# ---------------------------------------------------------------------------
+
+CWT_KG = 50.8023  # the hundredweight of 112 lb
+# "The old rule for determining the weight of anchors for any vessel was as follows: For
+# the bowers, two thirds the draught of water when loaded and the greatest breadth of beam,
+# allowing one cwt. for each foot of the same. Or the simple rule of five cwt. for every
+# hundred tons burden may be adopted" (Luce 1866, ch. XIV Ground Tackle, 'Rules for
+# finding weight of anchors and kedges'). The tonnage rule is the one used, since it
+# serves a cutter of 85 tons as it serves a frigate of 933 (the beam rule gives the
+# frigate 48 cwt against the tonnage rule's 47, and would give the cutter 15 against 4);
+# the beam rule is written as the check in the frigate's comment. Steel 1794's table of
+# anchors by rate ('The most approved dimensions and weight of anchors', vol. I) is
+# illegible in the OCR; the figure recalled for a 36-gun frigate's bowers (about 42 cwt)
+# is UNVERIFIED and noted in docs/dev/TuningNotes.md.
+BOWER_CWT_PER_100_TONS = 5.0
+# The stream "about one fourth the weight of the bower" and a single kedge "one eighth"
+# (Luce 1866, ch. XIV, the Book of Allowances of 1865 quoted, items 3 and 4).
+STREAM_OF_BOWER = 0.25
+KEDGE_OF_BOWER = 0.125
+# "All cables ought to be one hundred and twenty fathoms in length" (Falconer 1780, CABLE),
+# and "it is necessary to splice at least two cables together, in order to double the
+# length when a ship is obliged to anchor in deep water" (the same); on the Channel service
+# "three Cables on the best Bower, two on the small Bower" (Lever 1808, 'Anchors', p. 67).
+# The best bower here has two spliced, the rest one each (judgement between the two).
+CABLE_FATHOMS = 120.0
+BEST_BOWER_CABLES = 2
+# The cable's size: half an inch of circumference to every foot of the ship's beam, the
+# rule of thumb (JUDGEMENT, UNVERIFIED: not found in the texts in hand; Steel's table
+# 'The number of cables, and their sizes, allowed in the Navy, to ships of each rate',
+# vol. I, is garbled in the OCR, and the 17 inches recalled for a 36-gun frigate's bower
+# cable against this rule's 19 is noted in the tuning notes). The stream's cable two
+# thirds of the bower's and the kedge's hawser half (judgement; Luce 1866 ch. XIV:
+# "not counting stream-cables, the largest hawsers ... are eleven inches").
+CABLE_IN_PER_FOOT_OF_BEAM = 0.5
+STREAM_CABLE_OF_BOWER = 2.0 / 3.0
+KEDGE_HAWSER_OF_BOWER = 0.5
+# Two bowers and a sheet anchor, a stream and a kedge for a ship; a small vessel under
+# two hundred tons two bowers and a kedge: "Two bower anchors, and in vessels of two
+# hundred tons and upwards, a spare or waist anchor" (Lever 1808, 'Anchors', p. 67, the
+# coasters), the stream with the spare (judgement).
+SHEET_AND_STREAM_FROM_TONS = 200.0
+
+
+def ground_tackle_for(b, burthen, beam_ft, draught_ft):
+    """The anchors and cables of a ship by her size: the one rule for the four files."""
+    bower_cwt = round(BOWER_CWT_PER_100_TONS * burthen / 100.0, 1)
+    beam_rule_cwt = round(2.0 / 3.0 * draught_ft + beam_ft, 1)
+    circ = round(CABLE_IN_PER_FOOT_OF_BEAM * beam_ft * 2.0) / 2.0  # to the half inch
+    stream_circ = round(STREAM_CABLE_OF_BOWER * circ * 2.0) / 2.0
+    kedge_circ = round(KEDGE_HAWSER_OF_BOWER * circ * 2.0) / 2.0
+    kg = round(bower_cwt * CWT_KG, -1)
+    anchors = [
+        (
+            "best_bower",
+            "bower",
+            "the best bower",
+            kg,
+            CABLE_FATHOMS * BEST_BOWER_CABLES,
+            circ,
+            rope_kn(circ),
+            f"The bowers: {bower_cwt:g} cwt by the rule of five cwt to the hundred tons "
+            f"({burthen:g} tons burthen; the beam rule, two thirds the draught and the beam in "
+            f"cwt, gives {beam_rule_cwt:g}), Luce 1866 ch. XIV. The cable {circ:g} inches, "
+            f"half an inch to the foot of beam (judgement, unverified), rated as every rope "
+            f"by Luce ch. IV; two cables of 120 fathoms spliced on the best bower (Falconer "
+            f"1780, CABLE; Lever 1808 p. 67).",
+        ),
+        ("small_bower", "bower", "the small bower", kg, CABLE_FATHOMS, circ, rope_kn(circ), None),
+    ]
+    if burthen >= SHEET_AND_STREAM_FROM_TONS:
+        anchors.append(
+            (
+                "sheet",
+                "sheet",
+                "the sheet anchor",
+                kg,
+                CABLE_FATHOMS,
+                circ,
+                rope_kn(circ),
+                "The sheet anchor, the bowers' size and cable (Lever 1808 p. 67).",
+            )
+        )
+        anchors.append(
+            (
+                "stream",
+                "stream",
+                "the stream anchor",
+                round(kg * STREAM_OF_BOWER, -1),
+                CABLE_FATHOMS,
+                stream_circ,
+                rope_kn(stream_circ),
+                "The stream anchor, a quarter of the bower (Luce 1866 ch. XIV, the Book of "
+                "Allowances), its cable two thirds of the bower's (judgement).",
+            )
+        )
+    anchors.append(
+        (
+            "kedge",
+            "kedge",
+            "the kedge",
+            round(kg * KEDGE_OF_BOWER, -1),
+            CABLE_FATHOMS,
+            kedge_circ,
+            rope_kn(kedge_circ),
+            "The kedge, an eighth of the bower (Luce 1866 ch. XIV), on a hawser of half the "
+            "cable's size (judgement).",
+        )
+    )
+    b.ground_tackle(
+        "The ground tackle (package 34, spec M5 §18): the anchors by the ship's size and the "
+        "hemp cables by the fathom, every figure's rule in tools/gen_ships.py; chain cable "
+        "is later than 1805 and the file says so.",
+        anchors,
+        chain=False,
+    )
+
+
 def quarter(x: float) -> float:
     """Round a rope size to the nearest quarter inch."""
     return round(x * 4.0) / 4.0
@@ -422,6 +541,7 @@ class Builder:
         self.notes: dict[str, str] = {}
         self.hull_notes: dict[str, str] = dict(hull_notes or {})
         self.crew_notes: dict[tuple[str, ...], str] = {}
+        self.tackle_notes: dict[tuple[str, ...], str] = {}
 
     def spar(self, id, cls, note=None, **kw):
         d = {"id": id, "class": cls}
@@ -507,6 +627,30 @@ class Builder:
         for cls, _, text in entries:
             if text:
                 self.crew_notes[("spare_spars", cls)] = text
+
+    def ground_tackle(self, note, anchors, chain=False):
+        """The `ground_tackle:` section (package 34, spec M5 §18) from (id, kind, name,
+        weight_kg, cable_fathoms, cable_in, cable_kn, note) entries, the note above each
+        anchor's line and `note` above the section."""
+        self.doc["ground_tackle"] = {
+            "chain": chain,
+            "anchors": [
+                {
+                    "id": aid,
+                    "kind": kind,
+                    "name": name,
+                    "weight_kg": weight,
+                    "cable_fathoms": fathoms,
+                    "cable_in": circ,
+                    "cable_kn": kn,
+                }
+                for aid, kind, name, weight, fathoms, circ, kn, _ in anchors
+            ],
+        }
+        self.tackle_notes = {("section",): note}
+        for aid, _, _, _, _, _, _, text in anchors:
+            if text:
+                self.tackle_notes[("anchors", aid)] = text
 
     def rate_spars(self):
         """Second pass: rate every spar from what the engine's graph hangs on it.
@@ -599,6 +743,7 @@ class Builder:
         in_crew = False
         crew_key = ""
         store_key = ""
+        in_tackle = False
         for line in text.splitlines():
             if line.startswith("hull:"):
                 in_hull = True
@@ -608,6 +753,17 @@ class Builder:
                 in_crew = True
             elif in_crew and not line.startswith("  "):
                 in_crew = False
+            if line.startswith("ground_tackle:"):
+                in_tackle = True
+                note = self.tackle_notes.get(("section",))
+                if note:
+                    out.append("# " + note)
+            elif in_tackle and not line.startswith("  "):
+                in_tackle = False
+            if in_tackle and (m := re.match(r"^  - id: (\S+)$", line)):
+                note = self.tackle_notes.get(("anchors", m.group(1)))
+                if note:
+                    out.append("  # " + note)
             if in_crew:
                 note = None
                 if m := re.match(r"^    - kind: (\S+)$", line):
@@ -1609,6 +1765,7 @@ def frigate(out_dir="data/ships"):
     for name in ("fore", "main", "mizzen"):
         b.group(f"{name} topsail bowlines", [f"{name}.topsail.bowline.{s}" for s in SIDES])
         b.alias(f"{name} top bowline", f"{name} topsail bowlines")
+    ground_tackle_for(b, 933.0, beam_ft, draught_ft)
     frigate_crew(b)
     b.dump(
         os.path.join(out_dir, "frigate-36.yaml"),
@@ -2394,6 +2551,7 @@ def schooner(out_dir="data/ships"):
     b.group("fore bowlines", ["fore.topsail.bowline.starboard", "fore.topsail.bowline.larboard"])
     b.alias("fore bowline", "fore bowlines")
     b.alias("fore top bowline", "fore bowlines")
+    ground_tackle_for(b, 224.0, beam_ft, draught_ft)
     schooner_crew(b)
     b.dump(
         os.path.join(out_dir, "topsail-schooner.yaml"),
@@ -3528,6 +3686,7 @@ def cutter(out_dir="data/ships"):
     b.alias("topgallant sails", "topgallants")
     b.alias("the mast", "main.mast")
     b.alias("main mast", "main.mast")
+    ground_tackle_for(b, burthen, beam_ft, draught_ft)
     cutter_crew(b)
     b.dump(
         os.path.join(out_dir, "cutter.yaml"),
@@ -4499,6 +4658,7 @@ def brig(out_dir="data/ships"):
             b.alias(f"{name} {cls}", f"{name} {cls}s")
         b.group(f"{name} topsail bowlines", [f"{name}.topsail.bowline.{s}" for s in SIDES])
         b.alias(f"{name} top bowline", f"{name} topsail bowlines")
+    ground_tackle_for(b, burthen, beam_ft, draught_ft)
     brig_crew(b)
     b.dump(
         os.path.join(out_dir, "brig.yaml"),
