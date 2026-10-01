@@ -628,8 +628,13 @@ measures the whole at the gate's scenario, and the tuning notes carry the number
   and 9; spec M4 §24 item 6). Opus, in the owner's local sessions on the Windows machine.
 - **33a. The reckoning, the noon sight, the captain's chart, the checkpoint save** (5b
   §13, §14's noon latitude, §15, §17; truths 58 and 59; gate 5b cut). Fable.
-- **33b. The chronometer, the moon and the lunar** (5b §14's rest; truths 60 and 61; in
-  gate 5c's set by decision 29). Fable.
+- **33b. The chronometer, the moon, the lunar and the azimuth; the captain's chart in
+  his hands** (5b §14's rest; the variation by observation and the chart queries by
+  account from decision 30; truths 60 and 61; in gate 5c's set by decision 29). Fable.
+- **33c. The passage's words** and **33d. The browser's shelf** (the playtests' grammar
+  and viewer follow-ups of decision 30: the readings at the prompt, the aliases, the
+  starter book as a choice, open item 15; completion, the library pane, the clock on a
+  station, zoom and pan). Opus, beside 33b.
 - **34. The tide, grounding and anchoring** (5b §16, §18; truths 62 to 64, 66; in gate
   5c's set by decision 29). Fable.
 - **35. Places, people, ports and nations** (5c §22 to §24; the pilot boarding from 32b's
