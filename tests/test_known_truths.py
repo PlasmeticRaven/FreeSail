@@ -2961,7 +2961,10 @@ def test_truth_59_a_cast_of_the_deep_sea_lead_moves_the_reckoning_onto_the_conto
     run(world, 20 * 60)
     cast = [e for e in world.log if e.kind == "sounding"][-1]
     assert cast.text.endswith("; fine grey sand with black specks.") and cast.data["matched"]
-    assert abs(world.chart.depth_at(r.position) - cast.data["depth_m"]) <= units.fathoms_to_m(
+    # the lead reads the tide (package 34): the cast is laid on the chart less the master's
+    # own allowance for it, by his almanac
+    on_the_chart = cast.data["depth_m"] - world.navigation._tide_allowance_m()
+    assert abs(world.chart.depth_at(r.position) - on_the_chart) <= units.fathoms_to_m(
         K.CONTOUR_TOLERANCE_DEEP_FATHOMS
     )
     assert _miles(r.position, world.position) < _miles(wrong, world.position)
