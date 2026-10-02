@@ -46,7 +46,8 @@ gate 5c:  wave 5  33b the chronometer, the moon, the lunar and the azimuth; the 
                   33d the browser's shelf: completion, the library pane, the clock on a station, zoom and pan (Opus; landed 2026-10-01)
                   34 the tide, grounding and anchoring, as Luce has it (Fable; landed 2026-10-02)
                   32f the launcher page: the browser's front door with the game's options (Opus; after 33d and 32d; owner, 2026-10-01)
-          wave 6  35 places, people, ports and nations; the pilot boarding from the cutter (Fable; written 2026-10-02 for the owner's review)
+          wave 6  35 places, people, ports and nations (Falmouth, Plymouth, Brest); the pilot boarding from the cutter (Fable; launched 2026-10-02)
+                  35b St Mary's and Roscoff as ports on 35's machinery, Roscoff's patch (Opus; after 35; owner, 2026-10-02)
           wave 7  36 other sail, the world-order channel, the two scenarios, gate 5c cut
           wave 8  37 the officer of the watch; the lead's watch beside other models' (an Opus 5.5 watch, and a local model on the cutter: owner, 2026-10-01); the 5c verdict
 ```
@@ -1356,7 +1357,7 @@ folder; then start. The console and the command-line arguments stay for preferen
 for scripts. Packaging for a machine without Python (a start that carries its own
 Python) is milestone 8's, and runs the `freesail` command, which opens this page.
 
-## Package 35: places, people, ports and nations; the pilot boarding from the cutter (`freesail/world/places.py` new, `people.py` new, `ports.py` new, `nations.py` new; `data/ports/falmouth.yaml` and `brest.yaml` new, `data/nations.yaml` new, `data/papers/` new for the epitome's establishment table and the port's price list; `freesail/world/scenarios.py` for `people:`, `papers:`, `cargo:`, `ports:`; `freesail/core/world.py` for the places' and people's tick (a person occupied until when; the boat's passage); `freesail/world/ships.py` only for the pilot cutter as a vessel that comes off and goes back (the far-detail ships are 36's; the cutter's file is 32b's); `freesail/evolutions/scripts.py` and `data/evolutions/` for `send the boat`, `get under way` (Luce's order: heave short, loose and sheet home the topsails, weigh, cast her), `moor`/`unmoor` (two anchors and the hawse, 34's note), `lay out a kedge` by the boat; `freesail/orders/*` and `data/vocabulary.yaml` for the people's and the port's words; `freesail/api/readings.py` for the new rows and events; `freesail/agents/tools.py` for the ship's papers served by `library` to every station (the one change to the agents' code, as a `papers` topic beside the primer, read-only); `freesail/ui/server.py` only so that the library pane's papers come from the same source; `tools/gen_ships.py` for each ship's hold and her complement of boats; `docs/primer/14-the-port.md` new; `docs/dev/TuningNotes.md`; `tests/test_places.py`, `test_people.py`, `test_ports.py`, `test_nations.py` new, `tests/test_known_truths.py` truths 68, 69 and 70)
+## Package 35: places, people, ports and nations; the pilot boarding from the cutter (`freesail/world/places.py` new, `people.py` new, `ports.py` new, `nations.py` new; `data/ports/falmouth.yaml`, `plymouth.yaml` and `brest.yaml` new, `data/nations.yaml` new, `data/papers/` new for the epitome's establishment table and the port's price list; `freesail/world/scenarios.py` for `people:`, `papers:`, `cargo:`, `ports:`; `freesail/core/world.py` for the places' and people's tick (a person occupied until when; the boat's passage); `freesail/world/ships.py` only for the pilot cutter as a vessel that comes off and goes back (the far-detail ships are 36's; the cutter's file is 32b's); `freesail/evolutions/scripts.py` and `data/evolutions/` for `send the boat`, `get under way` (Luce's order: heave short, loose and sheet home the topsails, weigh, cast her), `moor`/`unmoor` (two anchors and the hawse, 34's note), `lay out a kedge` by the boat; `freesail/orders/*` and `data/vocabulary.yaml` for the people's and the port's words; `freesail/api/readings.py` for the new rows and events; `freesail/agents/tools.py` for the ship's papers served by `library` to every station (the one change to the agents' code, as a `papers` topic beside the primer, read-only); `freesail/ui/server.py` only so that the library pane's papers come from the same source; `tools/gen_ships.py` for each ship's hold and her complement of boats; `docs/primer/14-the-port.md` new; `docs/dev/TuningNotes.md`; `tests/test_places.py`, `test_people.py`, `test_ports.py`, `test_nations.py` new, `tests/test_known_truths.py` truths 68, 69 and 70)
 
 Spec M5 §22, §23, §24 (with §16's tide window and §18's anchorage from 34); `InwardAndOutward.md`
 whole (the inward minimum and the sail room's worked example); `Papers-and-Books.md` (the
@@ -1367,8 +1368,10 @@ what the captain signs; Luce 1866 ch. XXXIV and XXXV (getting under way, mooring
 unmooring), Lever 1808 (the boats, the kedge); Steel 1794 on the boats a ship carried; the
 pilots White 1835 and Imray 1874 for the Roads and the Rade. Decision 30 (the owner's wish
 for the full anchor handling; the pilot's answer as the better course than the master's
-warning). Fable. Written 2026-10-02 for the owner's final review; after 34 (the anchorage
-and the tide's window are its).
+warning). Fable. Written 2026-10-02 for the owner's final review; approved and launched the same
+day with Plymouth added as the third port (the owner, 2026-10-02: 36's naval cruise
+starts from it and its patch is drawn). After 34 (the anchorage and the tide's window
+are its).
 
 - **Places** (§22). A place is a name and a description, no more: the quarterdeck, the
   deck, the cabin, the gunroom, the tops, the sail room, the hold, the boat, the shore (the
@@ -1399,9 +1402,10 @@ and the tide's window are its).
   found, a paper reachable only through `submit_order`, closes here); the browser's pane
   reads the same topic and the two "waiting" entries go. A paper is only as current as
   its last entry, and the log says when one is written or read.
-- **Ports** (§23). `data/ports/falmouth.yaml` and `brest.yaml`: the anchorage and the
-  mooring (Carrick Road and the inner harbour off the town; the Rade and the Penfeld) as
-  positions on 32's chart with 34's tide window (the depth at low water, the flood to
+- **Ports** (§23). `data/ports/falmouth.yaml`, `plymouth.yaml` and `brest.yaml`: the
+  anchorage and the mooring (Carrick Road and the inner harbour off the town; Cawsand
+  Bay and the Sound with the dockyard's water in the Hamoaze, the fleet's anchorage before
+  the breakwater; the Rade and the Penfeld) as positions on 32's chart with 34's tide window (the depth at low water, the flood to
   carry her in); the boat (sent ashore and back, a passage by distance at the boat's pace
   with hands and time, carrying a person, a message or a purchase; the kedge laid from it);
   the **market** (a list of goods with a price each that moves by a small rules table:
@@ -1417,8 +1421,12 @@ and the tide's window are its).
   under the ship's lee), the pilot aboard as a person with his skill, `the pilot` as a
   reading (his words: the channel, the marks, when the tide serves) and `ask the pilot`
   as a question; the anchorage; the boat; the shore. **Leaving** is the reverse: `get
-  under way` as Luce has it, with the tide, the pilot off at the outer road. `moor` and
-  `unmoor` with two anchors and the hawse in the inner harbour.
+  under way` as Luce has it (heave short, loose and sheet home the topsails, weigh, cast
+  her on the tack the pilot wants), with the tide, the pilot off at the outer road; `weigh`
+  alone stays what 34 made it, the anchor up and no sail set, since the captain may set
+  sail as he pleases (the owner, 2026-10-02) and the log says she has no way on. `moor`
+  and `unmoor` with two anchors and the hawse in the inner harbour. Each port's file is
+  data on 35's machinery, so that 35b's two (St Mary's and Roscoff) are files and a patch.
 - **Nations** (§24). `data/nations.yaml`: Britain, France, Spain, the Batavian Republic,
   the United States, Portugal, Denmark; who is at war with whom in June 1805, letters of
   marque, the flags' words for 36's "a stranger, her colours not made out"; each port's
@@ -1438,7 +1446,9 @@ and the tide's window are its).
   nations table with its source for each war; every pinned constant that moved and why;
   anything not done and why.
 
-Not in 35: the far-detail ships and the sighting of sail (36), the two scenarios whole
+Not in 35: St Mary's and Roscoff (35b, Opus: two port files on 35's machinery, Roscoff's
+harbour patch from Bellin and the Pilote français, St Mary's on the Scilly patch drawn),
+the far-detail ships and the sighting of sail (36), the two scenarios whole
 (36), the world-order channel (36), a person as a station a model may hold (M6; a
 person is data and a line here), interiors beyond a name and a description (the bound of
 `InwardAndOutward.md`), prizes and convoys (M7), warping and towing (M8).
