@@ -47,8 +47,8 @@ gate 5c:  wave 5  33b the chronometer, the moon, the lunar and the azimuth; the 
                   34 the tide, grounding and anchoring, as Luce has it (Fable; landed 2026-10-02)
                   32f the launcher page: the browser's front door with the game's options (Opus; after 33d and 32d; owner, 2026-10-01)
           wave 6  35 places, people, ports and nations (Falmouth, Plymouth, Brest); the pilot boarding from the cutter (Fable; launched 2026-10-02)
-                  35b St Mary's and Roscoff as ports on 35's machinery, Roscoff's patch (Opus; after 35; owner, 2026-10-02)
-          wave 7  36 other sail, the world-order channel, the two scenarios, gate 5c cut
+                  35b St Mary's and Roscoff as ports on 35's machinery, Roscoff's patch (Opus; after 35; written 2026-10-02 for the owner's review)
+          wave 7  36 other sail, the world-order channel, the two scenarios, gate 5c cut (Fable; written 2026-10-02 for the owner's review)
           wave 8  37 the officer of the watch; the lead's watch beside other models' (an Opus 5.5 watch, and a local model on the cutter: owner, 2026-10-01); the 5c verdict
 ```
 
@@ -1453,12 +1453,135 @@ the far-detail ships and the sighting of sail (36), the two scenarios whole
 person is data and a line here), interiors beyond a name and a description (the bound of
 `InwardAndOutward.md`), prizes and convoys (M7), warping and towing (M8).
 
-## Packages 36 and 37 (outline; written in turn)
+## Package 35b: St Mary's and Roscoff as ports (`data/ports/st-marys.yaml` and `roscoff.yaml` new on 35's machinery; `data/charts/overrides/channel-west/roscoff.yaml` new and the region's tiles rebuilt at level 3 for the harbour patch by `tools/build_charts.py`; `data/charts/features/channel-west.yaml` for the marks the patch names; `data/papers/` for the two price lists; `docs/primer/14-the-port.md` a section each; `docs/references/Charts.md` for the sheets read; `docs/dev/TuningNotes.md`; `tests/test_ports.py`)
 
-As spec M5 §31 after decisions 29 and 30: 33a, 33b, 33c, 33d, 34 and 35 above; 36
-other sail, the world-order channel, the brig of 32b at far detail with her merchant
-description, the two scenarios, gate 5c cut (§25 to §27, truths 67, 71, 72; Fable); 37 the
-officer of the watch (per-order authority from the vocabulary's verb levels, a domain, the
+The owner's choice of 2026-10-02 (the lead's recommendation: the two ports in the charted
+area that are small, notable and cheap, St Mary's on the Scilly patch already drawn,
+Roscoff wanting a patch of its own). Opus. Written 2026-10-02 for the owner's final review;
+after 35 has landed (its machinery is what each port is a file on). No engine change: a
+port is data, and anything a port needs that 35's machinery lacks is a fault reported, not
+a feature built here.
+
+1. **St Mary's, Scilly.** St Mary's Road and the pools (Crow Sound, New and Old Grimsby,
+   St Helen's Pool are charted anchorages) as the anchorage and the mooring off Hugh
+   Town, with 34's tide window; water and fresh provisions and a small market (the isles'
+   produce, no yard; Imray 1874 and White 1835 on the road and its marks); the **Scilly
+   pilots**, who came off in gigs, as the port's pilot vessel: 35's pilot boarding takes
+   its vessel from the port's file, so here a gig under oars and sail, not the cutter, and
+   the sighting and the boarding read as the type (the pilot cutter's rules generalised,
+   said so in the report if 35 built them for the cutter alone); the stance open to
+   Britain, neutral to the rest. The first port of the Approaches and the natural start
+   for a passage up Channel; the wrong landfall of truth 65 made from here.
+2. **Roscoff.** The harbour, which dries, and the road under the Île de Batz as the
+   mooring and the anchorage (the channel between the island and the town by the leading
+   marks the pilots give), with the tide window from 34's Roscoff gauge; a market with
+   the trade the port lived by (spirits, tea, tobacco priced for the Cornish run; Faden
+   1793 and the French pilots for the harbour, the smuggling trade's prices a judgement
+   named as such); the pilot from the town's boat; **the stance**: a French port, closed to
+   Britain in 1805 by the nations table, so the cutter is refused in the pilot's words as
+   truth 70 has it, which is the honest 1805 state; the smuggler's run under false colours
+   waits for M7's colours and is noted, not built. **The patch**: a level-3 override from
+   Bellin's Petit Atlas Maritime sheet of 1764 and the Pilote français (the north coast
+   was surveyed 1837 to 1838, later than the period, said so), the harbour and the Batz
+   channel in fathoms, georeferenced by the church and the island's marks as the other
+   four patches were; the facts transcribed, the images never shipped; the region's tiles
+   rebuilt by the tool with the manifest's build hash moved, the build recorded.
+3. **Tests**: the pilot boards and the ship comes to an anchor in each port's road from
+   seaward at seed 7, and is refused at Roscoff under British colours; the patch's depths
+   where the sheet gives them; the price lists and the stance read from the files; the
+   manifest's check (every override cites its sheet; every source its licence).
+4. **Report**: the suite's last line; the two files with their sources; the sheets read for
+   Roscoff and what was judged; what 35's machinery lacked, if anything; the tiles'
+   rebuild and the manifest's hash; anything not done.
+
+Not in 35b: Fowey and Penzance (files for later, when a scenario asks), the smuggler's
+scenario (M7's colours), warping into the drying harbour (M8).
+
+## Package 36: other sail, the world-order channel, the two scenarios, gate 5c cut (`freesail/world/ships.py` for the far-detail ships (35's pilot vessel generalised); `freesail/world/orders.py` new for the world-order channel; `freesail/world/lookout.py` for the sighting of sail; `freesail/world/scenarios.py` for `ships:`, `orders:` by time, the papers and people whole (§27); `freesail/core/world.py` for the ships' tick at the roll-up's cadence and the journal of world orders; `freesail/core/replay.py` for their replay; `freesail/api/readings.py` for `a sail in sight` made real, `the strangers`, and the events; `freesail/api/queries.py` and `client/map.js` for sightings on the captain's chart by bearing and distance by estimation (never the truth's positions); `freesail/orders/*` and `data/vocabulary.yaml` for the refusal of a world order at the prompt and the words of a sighting (`what sail is in sight`, `make her out`); `data/ships/brig.yaml` through `tools/gen_ships.py` for the merchant description beside the brig-sloop's; `data/scenarios/merchant-passage.yaml` and `naval-cruise.yaml` new with their books; `data/nations.yaml` for the flags' words; `docs/primer/15-other-sail.md` new; `docs/gates/gate-m5c.md` (the lead writes it at the cut; the package supplies the expected numbers); `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_world_orders.py` new, `tests/test_known_truths.py` truths 67, 71 and 72 and the pace truth for the gate's scenarios)
+
+Spec M5 §25, §26, §27 and §28 truths 67, 71, 72; §29's gate outline (the merchant passage
+and the naval cruise); §30 (the pace); the proposal's §5.2 (NPC ships with a level of
+detail), §7.6 (the director's channel, which this package's seam is for) and §6.1 (the map
+shows other ships "at the fidelity your lookouts can actually see"); `InwardAndOutward.md`
+(the outward arrival: a sail reaches the ship through the lookout, a message through a
+boat); `ThreeDimensions.md` ("Scaling"); `VesselCandidates.md` (the brig's two
+descriptions); decision 29 (gate 5c's set) and 30 (the officer's watch after this
+package). Fable. Written 2026-10-02 for the owner's final review; after 35 (the ports
+the scenarios sail between, the people and the papers they carry, the pilot vessel the
+far-detail ship generalises).
+
+- **A dozen ships at far detail** (§25; `ships.py`). Each a hull from the four ship files
+  (the frigate, the schooner, the cutter, the brig in her two descriptions: the
+  brig-sloop of the Navy and the merchant brig of the trade, one file, the description a
+  line of the scenario), a nation, a captain with a goal (trade this route, patrol this
+  station, run home, carry the mail) and a plan (waypoints and a speed from the wind by a
+  polar drawn once from her file, the tide's stream of 34 added), moved at the roll-up's
+  cadence and no oftener; her sail state a word from her plan (plain sail, reefed, lying
+  to) for the lookout's description and nothing more. The **level-of-detail switch**
+  built with its promotion point, a stated range of the player, at which she becomes a
+  near-detail object with a heading and a speed and a keep-course captain who obeys her
+  plan and no more, her sails drawn by the viewer from her state when the viewer draws
+  her at all; the crewed promotion and the rules-based captain are M6's and the switch
+  says so in one line of code. The pace truth of §30 holds with the dozen on the sea.
+- **The lookout sights sail** (§12, §25). By the horizon formula from the masthead with
+  5a's visibility and the daylight: "Sail ho!" with a bearing first, notable; then as she
+  nears what the tops make out at the period's distances (a rig, a size, her course, her
+  colours or none: "a stranger, her colours not made out"), each a routine line as it
+  changes and `the strangers` as a reading (what is in sight, bearing, distance by
+  estimation, what has been made out); `make her out` as an order that sends a glass
+  aloft and answers with what the distance allows; the events `a sail sighted`, `a
+  stranger's colours made out`, `a sail lost` in `EVENTS` for the book and the stand-by.
+  The captain's chart draws a sighting at its bearing and estimated distance from the
+  account, never the truth, and the sighting's doubt grows with the estimate (the same
+  rule as 33b's held estimate). 35's pilot vessel coming off is the first sighting of this
+  kind; what 35 built for it is generalised here, not duplicated.
+- **The world-order channel** (§26; `orders.py`). Orders to the world, not to the ship:
+  append a weather system or a waypoint; put a ship on the sea with a goal, or change
+  her goal; deliver a message to a place (the boat's and the door's business from 35
+  carry it); change a port's stance or a price; name a person aboard or ashore. Given only
+  by a scenario file at a time, or by the lead's test harness; never by the captain's
+  grammar, which refuses one in words (truth 71). Every world order journaled at its tick
+  with its source, visible after the fact at the driver's mark, saved and replayed. This
+  is the director's seam (proposal §7.6) and the principle's carrier rule, built so that
+  milestone 7b adds a client of it and no second channel.
+- **The scenario file whole** (§27). `position`, `region`, `systems` or `wind`, the date,
+  the papers (the chart and its year, the epitome, the almanac, the chronometer), the
+  people, the cargo, the ports' state, `ships:` and `orders:` by time. The two starting
+  conditions: **the merchant passage**, the schooner from Falmouth for Brest with a cargo
+  bought at the quay, no chronometer, a master who can work a lunar, the tide's window out
+  of Carrick Road, a sail sighted off the Lizard and not made out, the Iroise in her
+  chart's words, the Goulet refused by the master's tide on the ebb and taken on the
+  flood, Brest entered by the pilot, the cargo sold; **the naval cruise**, the frigate
+  from Plymouth to the station off Ushant with a chronometer at the captain's charge,
+  stores from the yard, a lunarian master, the station kept two days under standing
+  orders, a stranger sighted and chased by the plan's speed alone, a message by the
+  cutter. Both on the climatology's weather or a pinned day, both replaying to their
+  digests (truth 72), each with a book that is a choice and a `.orders` file beside it.
+- **Truths 67, 71 and 72** as written, and the pace truth at the merchant passage's start
+  with the dozen ships on the sea; the numbers of both scenarios pinned at seed 7 for the
+  gate.
+- **The primer**: chapter 15, "Other sail": the lookout's words for a sail, making her
+  out, the colours, what a world order is and that the captain cannot give one, in the
+  captain's words with orders blocks and a forms table with its parse test.
+- **Gate 5c cut.** The lead writes `docs/gates/gate-m5c.md` at the merge (the two
+  scenarios as its items, a watcher through each door for a watch of each, the lunar
+  and the tide's items of 33b and 34, the ports of 35, the truths 60 to 72, the
+  checkpoint, the fast tier and the whole suite); the package supplies every expected
+  number. The verdict waits on package 37 and the lead's officer's watch (§29).
+- **Report**: the suite's last line; the dozen ships of each scenario with their goals
+  and the pace with them on the sea; the sighting's distances by rig against the
+  period's (the sources named); the world orders built with their words and the refusal
+  at the prompt; the two scenarios' expected numbers (the ticks of the notable moments,
+  the lines, the digests, the account against the truth at each port); every pinned
+  constant that moved and why; anything not done and why.
+
+Not in 36: a crewed ship beside the player's and a rules-based captain who fights or
+evades (M6), the director as a client of the channel (M7b), colours as deception and the
+private signal (M7), convoys and prizes (M7), a station for the lookout (open item 6).
+
+## Package 37 (outline; written when 36 lands)
+
+As spec M5 §31 after decisions 29 and 30: 33a to 36 above; 37 the officer of the watch (per-order authority from the vocabulary's verb levels, a domain, the
 standing conflict rule as the welfare detector for a station with authority, `hand over
 the deck`, the station brief, the fake proving each; written when 36 lands so that it is
 built with the world in place; Fable), after which the lead takes the officer's watch on
