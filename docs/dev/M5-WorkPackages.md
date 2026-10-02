@@ -47,9 +47,9 @@ gate 5c:  wave 5  33b the chronometer, the moon, the lunar and the azimuth; the 
                   34 the tide, grounding and anchoring, as Luce has it (Fable; landed 2026-10-02)
                   32f the launcher page: the browser's front door with the game's options (Opus; after 33d and 32d; owner, 2026-10-01)
           wave 6  35 places, people, ports and nations (Falmouth, Plymouth, Brest); the pilot boarding from the cutter (Fable; launched 2026-10-02)
-                  35b St Mary's and Roscoff as ports on 35's machinery, Roscoff's patch (Opus; after 35; written 2026-10-02 for the owner's review)
-          wave 7  36 other sail, the world-order channel, the two scenarios, gate 5c cut (Fable; written 2026-10-02 for the owner's review)
-          wave 8  37 the officer of the watch; the lead's watch beside other models' (an Opus 5.5 watch, and a local model on the cutter: owner, 2026-10-01); the 5c verdict
+                  35b St Mary's and Roscoff as ports on 35's machinery, Roscoff's patch (Opus; approved 2026-10-02, launched when 35 lands clean, beside 36)
+          wave 7  36 other sail, the world-order channel, the two scenarios (Fable; approved 2026-10-02, launched when 35 lands clean)
+          wave 8  37 the officer of the watch; gate 5c cut after it so that the gate covers the officer's watch (owner, 2026-10-02); the lead's watch beside other models' (an Opus 5.5 watch, and a local model on the cutter: owner, 2026-10-01); the 5c verdict
 ```
 
 31 needs 30's wind (the sea reads its history). 32 needs nothing of 5a and may start
@@ -1497,7 +1497,7 @@ a feature built here.
 Not in 35b: Fowey and Penzance (files for later, when a scenario asks), the smuggler's
 scenario (M7's colours), warping into the drying harbour (M8).
 
-## Package 36: other sail, the world-order channel, the two scenarios, gate 5c cut (`freesail/world/ships.py` for the far-detail ships (35's pilot vessel generalised); `freesail/world/orders.py` new for the world-order channel; `freesail/world/lookout.py` for the sighting of sail; `freesail/world/scenarios.py` for `ships:`, `orders:` by time, the papers and people whole (§27); `freesail/core/world.py` for the ships' tick at the roll-up's cadence and the journal of world orders; `freesail/core/replay.py` for their replay; `freesail/api/readings.py` for `a sail in sight` made real, `the strangers`, and the events; `freesail/api/queries.py` and `client/map.js` for sightings on the captain's chart by bearing and distance by estimation (never the truth's positions); `freesail/orders/*` and `data/vocabulary.yaml` for the refusal of a world order at the prompt and the words of a sighting (`what sail is in sight`, `make her out`); `data/ships/brig.yaml` through `tools/gen_ships.py` for the merchant description beside the brig-sloop's; `data/scenarios/merchant-passage.yaml` and `naval-cruise.yaml` new with their books; `data/nations.yaml` for the flags' words; `docs/primer/15-other-sail.md` new; `docs/gates/gate-m5c.md` (the lead writes it at the cut; the package supplies the expected numbers); `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_world_orders.py` new, `tests/test_known_truths.py` truths 67, 71 and 72 and the pace truth for the gate's scenarios)
+## Package 36: other sail, the world-order channel, the two scenarios (`freesail/world/ships.py` for the far-detail ships (35's pilot vessel generalised); `freesail/world/orders.py` new for the world-order channel; `freesail/world/lookout.py` for the sighting of sail; `freesail/world/scenarios.py` for `ships:`, `orders:` by time, the papers and people whole (§27); `freesail/core/world.py` for the ships' tick at the roll-up's cadence and the journal of world orders; `freesail/core/replay.py` for their replay; `freesail/api/readings.py` for `a sail in sight` made real, `the strangers`, and the events; `freesail/api/queries.py` and `client/map.js` for sightings on the captain's chart by bearing and distance by estimation (never the truth's positions); `freesail/orders/*` and `data/vocabulary.yaml` for the refusal of a world order at the prompt and the words of a sighting (`what sail is in sight`, `make her out`); `data/ships/brig.yaml` through `tools/gen_ships.py` for the merchant description beside the brig-sloop's; `data/scenarios/merchant-passage.yaml` and `naval-cruise.yaml` new with their books; `data/nations.yaml` for the flags' words; `docs/primer/15-other-sail.md` new; `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_world_orders.py` new, `tests/test_known_truths.py` truths 67, 71 and 72 and the pace truth for the gate's scenarios)
 
 Spec M5 §25, §26, §27 and §28 truths 67, 71, 72; §29's gate outline (the merchant passage
 and the naval cruise); §30 (the pace); the proposal's §5.2 (NPC ships with a level of
@@ -1506,9 +1506,10 @@ shows other ships "at the fidelity your lookouts can actually see"); `InwardAndO
 (the outward arrival: a sail reaches the ship through the lookout, a message through a
 boat); `ThreeDimensions.md` ("Scaling"); `VesselCandidates.md` (the brig's two
 descriptions); decision 29 (gate 5c's set) and 30 (the officer's watch after this
-package). Fable. Written 2026-10-02 for the owner's final review; after 35 (the ports
-the scenarios sail between, the people and the papers they carry, the pilot vessel the
-far-detail ship generalises).
+package). Fable. Written 2026-10-02 for the owner's final review and approved the same day; after
+35 (the ports the scenarios sail between, the people and the papers they carry, the pilot
+vessel the far-detail ship generalises). The gate is cut after 37, not here (the owner,
+2026-10-02: so that the gate covers the officer's watch directly).
 
 - **A dozen ships at far detail** (§25; `ships.py`). Each a hull from the four ship files
   (the frigate, the schooner, the cutter, the brig in her two descriptions: the
@@ -1563,11 +1564,9 @@ far-detail ship generalises).
 - **The primer**: chapter 15, "Other sail": the lookout's words for a sail, making her
   out, the colours, what a world order is and that the captain cannot give one, in the
   captain's words with orders blocks and a forms table with its parse test.
-- **Gate 5c cut.** The lead writes `docs/gates/gate-m5c.md` at the merge (the two
-  scenarios as its items, a watcher through each door for a watch of each, the lunar
-  and the tide's items of 33b and 34, the ports of 35, the truths 60 to 72, the
-  checkpoint, the fast tier and the whole suite); the package supplies every expected
-  number. The verdict waits on package 37 and the lead's officer's watch (§29).
+- **The gate's numbers.** Gate 5c is cut after package 37 (the owner, 2026-10-02), so
+  that its items cover the officer's watch directly; this package supplies every expected
+  number of the two scenarios for the report the lead writes then.
 - **Report**: the suite's last line; the dozen ships of each scenario with their goals
   and the pace with them on the sea; the sighting's distances by rig against the
   period's (the sources named); the world orders built with their words and the refusal
@@ -1579,7 +1578,7 @@ Not in 36: a crewed ship beside the player's and a rules-based captain who fight
 evades (M6), the director as a client of the channel (M7b), colours as deception and the
 private signal (M7), convoys and prizes (M7), a station for the lookout (open item 6).
 
-## Package 37 (outline; written when 36 lands)
+## Package 37 (outline; written when 36 lands; gate 5c cut at its merge)
 
 As spec M5 §31 after decisions 29 and 30: 33a to 36 above; 37 the officer of the watch (per-order authority from the vocabulary's verb levels, a domain, the
 standing conflict rule as the welfare detector for a station with authority, `hand over

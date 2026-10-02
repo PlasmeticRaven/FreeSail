@@ -640,8 +640,9 @@ measures the whole at the gate's scenario, and the tuning notes carry the number
 - **35. Places, people, ports and nations** (5c §22 to §24; the pilot boarding from 32b's
   cutter; truths 68 to 70). Fable (the owner's ruling, 2026-09-30; the draft said Opus).
 - **36. Other sail and the world-order channel** (5c §25 to §27; 32b's brig at far detail
-  with her merchant description; the two scenarios; truths 67, 71, 72; gate 5c cut). Fable.
-- **37. The officer of the watch** (§29; written when 36 lands; the lead's watch follows
+  with her merchant description; the two scenarios; truths 67, 71, 72). Fable.
+- **37. The officer of the watch** (§29; written when 36 lands; gate 5c is cut at its merge
+  so that the gate covers the officer's watch (owner, 2026-10-02); the lead's watch follows
   it and gate 5c's verdict waits on that watch). Fable.
 
 Each package's brief is written in `docs/dev/M5-WorkPackages.md` when its predecessor
