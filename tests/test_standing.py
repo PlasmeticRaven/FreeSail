@@ -793,9 +793,15 @@ TABLE: list[tuple[str, str, ok | no]] = [
         no(["'tell the lookout to look sharp' is refused", "there is no lookout aboard yet"]),
     ),
     (
+        # the officer of the watch is a station aboard (package 37): a book may ask it
         F,
         'standing order "o": at sunset then ask the officer of the watch how she heads',
-        no(["there is no officer of the watch aboard yet", "tell or ask the watcher"]),
+        ok("at", event="sunset", actions=1),
+    ),
+    (
+        F,
+        'standing order "o": at sunset then ask the lookout what she sees',
+        no(["there is no lookout aboard yet", "tell or ask the watcher or the officer"]),
     ),
     (
         F,
@@ -1725,7 +1731,8 @@ def test_the_station_verbs_after_then_are_resolved_when_the_order_is_given():
     assert e.kind == "order.rejected"
     assert e.text.endswith(
         "In standing order 'l', 'tell the lookout to look sharp' is refused: there is no "
-        "lookout aboard yet; a standing order may tell or ask the watcher."
+        "lookout aboard yet; a standing order may tell or ask the watcher or the officer of "
+        "the watch."
     )
     assert [r.name for r in w.standing.book] == ["sea", "q"]
 

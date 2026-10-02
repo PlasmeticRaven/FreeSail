@@ -44,6 +44,7 @@ What the log will say is shown in plain code blocks, copied from a run with seed
 | 13 | [The tide and the anchor](13-the-tide-and-the-anchor.md) | The world's tide under the lead and in the track, and the captain's by his epitome and the moon's age; taking the ground and floating off; the ground tackle by the ship's size; coming to an anchor, riding, dragging and weighing in Luce's words; the readings and events of it, in a table. |
 | 14 | [The port](14-the-port.md) | The named people aboard and where they are; the places and the ship's papers by handle; the pilot who comes off in his cutter and what he knows; the anchorage, the moor and the kedge; the boat ashore, the market and its rules, the yard and the crew pool; getting under way as Luce has it, with the tide; every form in a table. |
 | 15 | [Other sail](15-other-sail.md) | The dozen other ships at far detail and what the lookout makes out of a sail as she nears: the hail, her rig, her colours or none, what she is; the strangers, the glass aloft and the chase; what a world order is and why the captain cannot give one; the two passages of the gate; the forms in a table. |
+| 16 | [The officer of the watch](16-the-officer-of-the-watch.md) | The first station with authority: who the officer is, how the captain gives and takes the deck, what the station may order and may not and why, the night orders and standing orders by rank, standing by with the deck, the handover note, what the harness watches for; the forms in a table. |
 
 ## Where to start
 

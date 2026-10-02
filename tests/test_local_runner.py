@@ -687,7 +687,7 @@ def test_the_context_guard_refuses_a_small_context_with_what_it_measured(tmp_pat
     assert code == L.EXIT_UNREACHABLE
     assert (
         "The context is too small: the model server gives made-up-gemma:26b (digest abc123) a "
-        "context of 4096 tokens (Ollama's /api/ps (context_length)); the watcher needs about "
+        "context of 4096 tokens (Ollama's /api/ps (context_length)); the station needs about "
     ) in text
     assert "the brief " in text and "the tool definitions " in text and "(measured, at 4 " in text
     assert f"a turn {L.TURN_ALLOWANCE_TOKENS} and the reply budget {L.REPLY_MAX_TOKENS}" in text

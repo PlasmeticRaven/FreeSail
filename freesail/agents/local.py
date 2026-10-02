@@ -353,7 +353,7 @@ class LocalModel:
         else:
             return (
                 f"The model server did not say what context it gives {identity}, and no --ctx "
-                f"was given; the watcher needs about {need} tokens (the brief {brief_cost}, "
+                f"was given; the station needs about {need} tokens (the brief {brief_cost}, "
                 f"the tool definitions {tools_cost}, a turn {TURN_ALLOWANCE_TOKENS}, the reply "
                 f"budget {self.max_reply}). Ollama's own default is small unless "
                 "OLLAMA_CONTEXT_LENGTH or the Modelfile's num_ctx says more: check with "
@@ -361,7 +361,7 @@ class LocalModel:
             )
         words = (
             f"the model server gives {identity} a context of {got} tokens ({where}); the "
-            f"watcher needs about {need}: the brief {brief_cost} tokens and the tool "
+            f"station needs about {need}: the brief {brief_cost} tokens and the tool "
             f"definitions {tools_cost} (measured, at {CHARS_PER_TOKEN} characters a token), "
             f"a turn {TURN_ALLOWANCE_TOKENS} and the reply budget {self.max_reply}"
         )
@@ -751,7 +751,12 @@ def main(
         default=REQUEST_TIMEOUT_S,
         help=f"real seconds one request may take (default {REQUEST_TIMEOUT_S:g})",
     )
-    ap.add_argument("--station", default="watcher", choices=["watcher"])
+    ap.add_argument(
+        "--station",
+        default="watcher",
+        choices=["watcher", "officer"],
+        help="the station asked for: the watcher, or the officer of the watch (package 37)",
+    )
     ap.add_argument("--session", choices=("play", "test"), default="play")
     ap.add_argument("--ask-again", action="store_true", help="put the consent question again")
     args = ap.parse_args(argv)
@@ -785,6 +790,9 @@ def main(
             session_kind=args.session,
             client=server,
             ask_again=args.ask_again,
+            # the context this door gives the model, for the handover note (package 37;
+            # spec M4 open item 9b): the harness asks for the note at a fraction of it
+            context_tokens=model.context_size(),
         )
     except GameError as e:
         print(e.words, file=out, flush=True)

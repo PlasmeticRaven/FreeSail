@@ -291,6 +291,16 @@ KEEP_WATCH = (
     "you first. If it offers you the watcher's station, keep watch as its brief describes, "
     "handing the floor back with say or stand_by at each of your turns."
 )
+# ...and to take the officer of the watch's station (package 37): the deck is the
+# captain's to give, in the game's own window.
+TAKE_THE_WATCH = (
+    "Please connect to the FreeSail game through its tools and read what its harness sends "
+    "you first. If it offers you the officer of the watch's station, read the captain's "
+    "night orders in the brief and wait for his word in your turns: he gives the deck with "
+    "'you have the deck' in the game's window, and takes it back with 'I have the deck'. "
+    "While you have it, keep the ship as the brief describes, handing the floor back with "
+    "say or stand_by at each of your turns."
+)
 
 CONSENT, STATION, STOPPED = "consent", "station", "stopped"
 
@@ -1055,6 +1065,16 @@ def build_server(bridge: Bridge) -> MCPServer:
     def keep_watch() -> str:
         return KEEP_WATCH
 
+    @srv.prompt(
+        name="take_the_watch",
+        description=(
+            "Ask the model to connect to the FreeSail game as the officer of the watch and "
+            "wait for the captain's word (the bridge started with --station officer)."
+        ),
+    )
+    def take_the_watch() -> str:
+        return TAKE_THE_WATCH
+
     return srv
 
 
@@ -1070,7 +1090,12 @@ def main(argv: list[str] | None = None) -> int:
         required=True,
         help="the exact name of the model behind the client, which names its consent record",
     )
-    ap.add_argument("--station", default="watcher", choices=["watcher"])
+    ap.add_argument(
+        "--station",
+        default="watcher",
+        choices=["watcher", "officer"],
+        help="the station asked for: the watcher, or the officer of the watch (package 37)",
+    )
     ap.add_argument(
         "--wait",
         type=float,

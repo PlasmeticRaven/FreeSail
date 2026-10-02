@@ -51,6 +51,7 @@ RANKS: tuple[str, ...] = (
     "first lieutenant",
     "lieutenant",
     "master",
+    "mate",  # the schooner's and the cutter's, who keeps the watch under the master (package 37)
     "master's mate",
     "midshipman",
 )

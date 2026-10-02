@@ -95,6 +95,7 @@ CHAPTERS = [
     "12-the-longitude.md",  # package 33b
     "14-the-port.md",  # package 35
     "15-other-sail.md",  # package 36
+    "16-the-officer-of-the-watch.md",  # package 37
 ]
 
 DRIVER_COMMANDS = frozenset(
@@ -189,7 +190,7 @@ def make_ship(which: str, preset: str, tack: str) -> Ship:
     # ...and on the sphere, ten miles south of the Lizard on the chart of the western
     # Channel, so that chapter 10's navigation orders have a reckoning to keep and a
     # mark in sight (package 33a; the reckoning refuses every order on the plane)
-    World(
+    world = World(
         seed=7,
         scenario=Scenario(
             start_time=PRIMER_TIME,
@@ -203,6 +204,19 @@ def make_ship(which: str, preset: str, tack: str) -> Ship:
         # chapter 6's crew orders have hands to call (package 20)
         ship.extra["crew"] = muster(ship.spec.crew, Rng(7).stream("muster"), ship_name=ship.name)
         ship.extra["routine"] = Routine(ship.extra["crew"], Clock(PRIMER_TIME))
+    # a scripted officer of the watch at its station, silent and never sampled but at the
+    # captain's word, so that chapter 16's deck sentences have an officer to give the deck
+    # to (package 37); the watcher's station stays empty, as the chapters' blocks never
+    # address it
+    from freesail.agents import Fake, Harness, SamplingPolicy
+    from freesail.agents.agent import officer
+
+    Harness(
+        world,
+        officer(SamplingPolicy(lockstep=True), world=world),
+        Fake([]),
+        save=lambda w, why: None,
+    ).start()
     sign = 1.0 if tack == "starboard" else -1.0
     ship.dyn.apparent_wind_angle = sign * math.radians(40.0)
     ship.dyn.apparent_wind_speed = 8.0
@@ -407,6 +421,7 @@ FORM_TABLES = {
     "11-the-starting-book.md": "## The dialect's forms, in a table",
     "14-the-port.md": "## The forms, in a table",  # package 35
     "15-other-sail.md": "## The forms, in a table",  # package 36
+    "16-the-officer-of-the-watch.md": "## The forms, in a table",  # package 37
 }
 TICK = "`"
 

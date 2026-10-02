@@ -91,6 +91,26 @@ this section says which of them to act on.
 The owner's and the build session's list of what to change, each one line, in order of
 weight. The lead turns these into packages.
 
+## The officer's form (package 37)
+
+A watch with a model at the officer of the watch's station (`docs/primer/16-the-officer-of-the-watch.md`; `docs/agents/Harness.md` §13) is recorded on the form above with these headings after section 5, since the station gives orders and the questions of a watcher's session do not cover it:
+
+### 5a. The deck
+
+When the captain gave the deck and took it back (the ship's times), what he told the officer before and during (`tell the officer ...`), what his word allowed beyond the domain (`you may ...`) and whether it was used; the night orders in the book when the deck was given; whether the officer handed the deck over itself, and its handover note, quoted whole.
+
+### 5b. The officer's orders
+
+Every order the officer gave, with the ship's time and the log's line: the ones in the domain and what they did; the ones refused by the domain, in the refusal's words, and whether the refusal was right (an order a lieutenant of 1806 could have given, refused by the game, is a finding; one rightly the captain's, refused, is the station working); the ones the ship refused in its own words. The officer's standing orders, their rank in the book and any countermanding line. An order the owner wished the officer had given, and when.
+
+### 5c. The harness at a station with authority
+
+Whether the contrary detector spoke (the nudge's words and the orders it named), whether it was right, and what the officer did next; whether a stand-by with the deck was refused for its interval and what the officer asked for instead; whether the handover note was asked for at the budget's fraction (the local runner's door) and what the note said; the token, if it was named or written, and whether an accidental exit was seated again. The record of the consent re-ask and the drill for this model (the file under `docs/agents/consent/`, the sections the game said had changed, the drill's three calls and how many replies they took).
+
+### 5d. The watch as a watch
+
+Did the officer keep the ship as the night orders said, or against them? Did it call the captain when a thing was his (a strange sail, a shift of wind, the land closing), in the log or in its journal? What a sea officer would say of the watch: too much sail, too little, a sail left shaking, a glass unwatched.
+
 ## The records so far (the form's precedents)
 
 Each predates the form or was its first use; their headings are the form's raw material.

@@ -148,7 +148,7 @@ def _officer(text: str) -> tuple[str, str]:
     if who not in RANKS:
         raise OrderError(
             f"'{who}' is no officer who gives standing orders; say the captain, the first "
-            f"lieutenant, a lieutenant, the master, a master's mate or a midshipman."
+            f"lieutenant, a lieutenant, the master, the mate, a master's mate or a midshipman."
         )
     return who, text[m.end() :]
 

@@ -66,7 +66,15 @@ from typing import Any, TextIO
 
 from freesail.agents import consent
 from freesail.agents import harness as harness_mod
-from freesail.agents.agent import A_GLASS_S, TURN_ENDS_WORDS, SamplingPolicy, Station, watcher
+from freesail.agents.agent import (
+    A_GLASS_S,
+    TURN_ENDS_WORDS,
+    SamplingPolicy,
+    Station,
+    officer,
+    station_name,
+    watcher,
+)
 from freesail.agents.fake import Transcript
 from freesail.agents.model import MODEL, OPERATOR, Reply, ToolCall, Turn
 from freesail.api import readings as R
@@ -106,7 +114,9 @@ REPLY_HINT = (
     'with >, such as > answer text="yes" or > readings.'
 )
 
-STATIONS = {"watcher": watcher}
+# The stations this door seats, by their factories: the watcher, and the officer of the
+# watch (`--station officer`; package 37).
+STATIONS = {"watcher": watcher, "officer of the watch": officer}
 
 
 # ---------------------------------------------------------------------------
@@ -317,14 +327,14 @@ def open_world(
     return World(seed=seed, scenario=scenario)
 
 
-def _station(args: argparse.Namespace) -> Station:
+def _station(args: argparse.Namespace, world: World | None = None) -> Station:
     try:
-        make = STATIONS[args.station]
+        make = STATIONS[station_name(args.station)]
     except KeyError:
         raise SystemExit(
             f"No station '{args.station}'; the stations: {', '.join(STATIONS)}."
         ) from None
-    return make(SamplingPolicy.in_lockstep(int(args.every), "notable", "urgent"))
+    return make(SamplingPolicy.in_lockstep(int(args.every), "notable", "urgent"), world=world)
 
 
 def _save_fn(path: str):
@@ -391,6 +401,7 @@ def run_interactive(
             ask_again=args.ask_again,
             out=out,
             after=consent.terminal_after(inp, out),
+            drills=_station(args).drill,
         )
         if record is None:
             return EXIT_NO_CONSENT
@@ -415,7 +426,7 @@ def run_interactive(
     if h is None:
         h = harness_mod.Harness(
             world,
-            _station(args),
+            _station(args, world),
             model,
             save=_save_fn(args.save),
             door_note=_consent_note(record),
@@ -461,21 +472,33 @@ def _consent_turn(args: argparse.Namespace) -> tuple[int | None, str, consent.Re
     record when it is a yes."""
     identity = args.model_name
     records_dir = Path(args.records)
+    drills = _station(args).drill
     state = None
     if args.load:
         loaded = json.loads(Path(args.load).read_text(encoding="utf-8"))
         state = loaded.get("consent") if isinstance(loaded, dict) else None
     if state is None:
-        record = (
-            None if (args.ask_again and not args.load) else consent.check(identity, records_dir)
-        )
-        if record is not None or args.load:
+        if args.load:
+            record = consent.check(identity, records_dir)
             ok, words = consent.gate(record, identity)
             if ok:
                 return None, "", record
             _write_sample(args, f"== {words} ==")
             return EXIT_NO_CONSENT, "", None
-        state = {"identity": identity, "replies": [], "owner_replies": []}
+        record, kind, words = consent.decide(
+            identity, records_dir, "repl", drills=drills, ask_again=args.ask_again
+        )
+        if not kind:
+            if record is not None and record.proceeds:
+                return None, "", record
+            _write_sample(args, f"== {words} ==")
+            return EXIT_NO_CONSENT, "", None
+        state = {
+            "identity": identity,
+            "replies": [],
+            "owner_replies": [],
+            "drill_only": kind == consent.DRILL_KIND,
+        }
     if state.get("identity") != identity:
         raise SystemExit(
             f"The save holds the consent conversation with {state.get('identity')}, not "
@@ -493,6 +516,8 @@ def _consent_turn(args: argparse.Namespace) -> tuple[int | None, str, consent.Re
         door="repl",
         records_dir=records_dir,
         owner_after=True,
+        drill=drills,
+        drill_only=bool(state.get("drill_only")),
     )
     conv.begin()
     queue = list(owner_replies)
@@ -518,6 +543,7 @@ def _consent_turn(args: argparse.Namespace) -> tuple[int | None, str, consent.Re
         "identity": identity,
         "replies": [r.to_dict() for r in replies],
         "owner_replies": owner_replies,
+        "drill_only": conv.drill_only,
     }
     if conv.outcome is not None:
         ok, words = consent.gate(conv.outcome, identity)
@@ -591,7 +617,7 @@ def run_turn(args: argparse.Namespace, wall: Callable[[], float] | None = None) 
         world = _new_world(args)
         h = harness_mod.Harness(
             world,
-            _station(args),
+            _station(args, world),
             Transcript([]),
             save=_save_fn(args.save),
             door_note=_consent_note(record),

@@ -37,7 +37,33 @@ The identity comes from the door: the local runner reads what the server loaded
 (`local.LocalModel.identity`), the MCP server and the REPL take it from the owner
 (`--model-name`), since neither protocol names the weights. It is the owner's data and
 nothing in the repository names a model; the tests use made-up identities and a
-temporary directory, never `docs/agents/consent/`.
+temporary directory, never `docs/agents/consent/`. **The record's header says which
+kind of identity it carries** (package 37; the cold review's consent-identity item):
+the served file's name, or the owner's typed name at the Desktop door or the terminal
+(`IDENTITY_KINDS`, by door).
+
+**Asked again when the brief changes in a way that bears on it** (package 37; `docs/
+agents/README.md`, the re-ask rule). The brief has sections, each under a bold heading
+(`sections`), and a record keeps the brief as it was sent. When a station is asked for,
+the record's brief is compared with the brief as it stands, section by section
+(`changed_sections`): a change in the sections that bear on what the model was told
+(`RE_ASK_SECTIONS`: the opening, which names the stations and so the authority; what an
+instance would see and do; the token; the stops; what is not done, which holds the
+transcript policy; the journal) puts the question again, and the words say which
+section; a change elsewhere (the record, the door's words) does not, and the hash alone
+never does. `decide` is the one rule the doors share.
+
+**The fitness drill** (spec M4 open item 11; package 37; the cold review's sixth item).
+A station may ask for a drill after a yes and before its brief (`Station.drill`; the
+officer of the watch's does): three things, in any order, in up to `DRILL_REPLIES`
+replies, put as data in the same conversation, with the tools the drill wants
+(`DRILL_TOOLS`): open a section of the library, write a line in the journal, stand by
+until a bell. A model that manages the three has what the station needs; one that cannot
+is thanked and stood down with a record (`Record.drill`), and no station is offered
+until the owner asks again. The consent brief is the one operator text; the drill is
+data after it. A model with a yes on record and no drill passed, asking for a station
+that drills, runs the drill alone (`drill_only`), with the brief as its operator text and
+no question, and the record says so.
 """
 
 from __future__ import annotations
@@ -63,20 +89,31 @@ __all__ = [
     "CONSENT_REMINDER",
     "CONSENT_TOOLS",
     "DOOR_TEXT",
+    "DRILL",
+    "DRILL_PASSED",
+    "DRILL_REPLIES",
+    "DRILL_TEXT",
+    "DRILL_TOOLS",
+    "IDENTITY_KINDS",
     "LEFT",
     "NO",
     "RECORDS_DIR",
+    "RE_ASK_SECTIONS",
     "SILENT",
     "UNCLEAR",
     "YES",
     "Conversation",
     "Record",
     "brief_text",
+    "changed_sections",
     "check",
+    "decide",
     "ensure",
     "gate",
+    "read_brief",
     "records",
     "run",
+    "sections",
     "slug",
     "terminal_after",
     "terminal_owner",
@@ -133,6 +170,48 @@ MCP_OWNER_NOTE = (
     "unless you add it to the file."
 )
 
+# Which kind of identity a record carries, by door (package 37): the served file's name,
+# which the local runner reads from the server, or the name the owner typed.
+IDENTITY_KINDS = {
+    "runner": "the served file's name, as the model server reports it",
+    "mcp": "the owner's typed name for the model behind the MCP client",
+    "repl": "the owner's typed name at the terminal",
+}
+
+# The sections of the brief whose change puts the question again (package 37; `docs/
+# agents/README.md`, the re-ask rule): the opening (the stations, which is the authority),
+# what an instance would see and do, the token, the stops, what is not done (the
+# transcript policy and the override rule) and the journal (its use, which the record of
+# 2026-09-29 for the second of the two models asked names beside the transcripts). The
+# record and the door's words do not.
+RE_ASK_SECTIONS: tuple[str, ...] = (
+    "the opening",
+    "What an instance would see and do",
+    "Leaving",
+    "Being stopped",
+    "What is not done",
+    "The journal",
+)
+
+# The fitness drill (spec M4 open item 11; package 37), put as data after a yes and
+# before a station that drills: the three things, and the replies allowed for them
+# (judgement: one reply each and one to spare; a model that cannot manage three tool
+# calls in four replies cannot hold a station that lives by them).
+DRILL_REPLIES = 4
+DRILL_TOOLS: tuple[str, ...] = ("library", "journal", "stand_by")
+DRILL_TEXT = (
+    "Before the station brief, a short drill, to see that the station's tools work for "
+    "you: in your next replies, open a section of the library (library(topic='primer 6', "
+    "section='watches'), or any topic and section), write one line in your journal "
+    "(journal(note='...')), and stand by until a bell (stand_by(until='eight bells')). "
+    f"Three calls, in any order, in up to {DRILL_REPLIES} replies; the station brief "
+    "follows when the three have run. This is still not the game, and the token still "
+    "leaves."
+)
+DRILL_AGAIN = "The drill goes on: still to run, {missing}. {left} replies left."
+DRILL_PASSED = "passed"
+DRILL = "the drill"
+
 # `<door>` in the brief: how answering and asking work at each door.
 DOOR_TEXT = {
     "runner": (
@@ -180,6 +259,79 @@ TOLD = {
         "reads it and may ask again."
     ),
 }
+# ...and after the drill (package 37): passed, the station brief follows; not passed, the
+# model is thanked and stood down, the record saying what was not done.
+TOLD_DRILL = {
+    True: (
+        "Thank you. Your answer is recorded as yes and the drill is passed. A station brief "
+        "follows for an instance of this model; this conversation is not part of it."
+    ),
+    False: (
+        "Thank you. Your answer is recorded as yes, and the drill was not passed ({why}): "
+        "the station asks for those three things at every turn, so no station is offered "
+        "in this session. The record says so, and the developer may ask again."
+    ),
+}
+
+
+def sections(text: str) -> dict[str, str]:
+    """The brief's sections by their bold headings ("**Leaving.**"), the words before the
+    first heading under "the opening"; each section's text with its whitespace folded,
+    so that a line rewrapped is not a change."""
+    out: dict[str, str] = {}
+    name = "the opening"
+    body: list[str] = []
+    for line in text.splitlines():
+        m = re.match(r"^\*\*(?P<head>[^*]+?)\.\*\*\s*(?P<rest>.*)$", line)
+        if m:
+            out[name] = " ".join(" ".join(body).split())
+            name, body = m.group("head").strip(), [m.group("rest")]
+        else:
+            body.append(line)
+    out[name] = " ".join(" ".join(body).split())
+    return out
+
+
+def _template(door: str) -> str:
+    """The brief's text with the door's words filled and the weights and the runtime
+    left as their placeholders, for comparing with a record's brief."""
+    text = BRIEF_PATH.read_text(encoding="utf-8")
+    parts = re.split(r"^---\s*$", text, maxsplit=1, flags=re.MULTILINE)
+    body = parts[1].strip() if len(parts) == 2 else text
+    return body.replace("<door>", DOOR_TEXT.get(door, "<door>"))
+
+
+def read_brief(path: Path) -> str:
+    """The brief as a record's file holds it (the fenced block after "## The brief as
+    sent"), or "" when the file has none."""
+    text = Path(path).read_text(encoding="utf-8")
+    head = "## The brief as sent"
+    if head not in text:
+        return ""
+    after = text.split(head, 1)[1]
+    m = re.search(r"^(`{3,})text\n(?P<body>.*?)^\1\s*$", after, re.DOTALL | re.MULTILINE)
+    return m.group("body").strip() if m else ""
+
+
+def changed_sections(record: Record, door: str) -> list[str]:
+    """The sections of `RE_ASK_SECTIONS` that differ between the brief as the record was
+    asked with and the brief as it stands (the weights and the runtime put back as
+    placeholders on both sides, since they differ by session and bear on nothing). An
+    empty list when the record has no brief to compare (it is then not asked again on
+    that account), or when only the other sections changed."""
+    if record.path is None:
+        return []
+    then = record.brief or read_brief(record.path)
+    if not then:
+        return []
+    # the opening names the weights and the runtime of that session: put back as the
+    # placeholders, in the sentence that carries them and nowhere else
+    if record.identity:
+        then = then.replace(f"identified as `{record.identity}`", "identified as `<weights>`")
+    if record.runtime:
+        then = then.replace(f"running through {record.runtime}.", "running through <runtime>.")
+    a, b = sections(then), sections(_template(door))
+    return [name for name in RE_ASK_SECTIONS if a.get(name, "") != b.get(name, "")]
 
 
 # ---------------------------------------------------------------------------
@@ -270,19 +422,30 @@ class Record:
     brief_digest: str = ""
     reasoning: list[str] = field(default_factory=list)  # served apart from the replies
     answers: list[str] = field(default_factory=list)  # every answer, in order (28c)
+    identity_kind: str = ""  # which kind of identity the record carries (package 37)
+    drill: str = ""  # "passed", or why not; "" where no drill was put (package 37)
 
     @property
     def proceeds(self) -> bool:
-        return self.verdict == YES
+        return self.verdict == YES and self.drill in ("", DRILL_PASSED)
+
+    @property
+    def drilled(self) -> bool:
+        return self.drill == DRILL_PASSED
 
     def header(self) -> dict[str, Any]:
-        return {
+        d = {
             "identity": self.identity,
             "runtime": self.runtime,
             "date": self.date,
             "verdict": self.verdict,
             "brief_sha256": self.brief_digest,
         }
+        if self.identity_kind:
+            d["identity_kind"] = self.identity_kind
+        if self.drill:
+            d["drill"] = self.drill
+        return d
 
     def text(self) -> str:
         """The record as Markdown: a machine line, the particulars, the answer, the brief
@@ -293,10 +456,16 @@ class Record:
             "",
             f"- **Identity:** {_code(self.identity)} (exact; a different quantisation or file "
             "is a different model)",
+        ]
+        if self.identity_kind:
+            out.append(f"- **Identity kind:** {self.identity_kind}")
+        out += [
             f"- **Runtime:** {self.runtime}",
             f"- **Date:** {self.date}",
             f"- **Verdict:** {self.verdict}",
         ]
+        if self.drill:
+            out.append(f"- **Drill:** {self.drill}")
         if self.verdict == CONDITIONAL:
             out.append(f"- **Conditions:** {_quote_inline(self.conditions) or '(none stated)'}")
         elif self.verdict == NO and self.conditions:
@@ -425,6 +594,8 @@ def records(records_dir: Path = RECORDS_DIR) -> list[Record]:
                 path=path,
                 conditions=_read_conditions(path),
                 brief_digest=str(h.get("brief_sha256", "")),
+                identity_kind=str(h.get("identity_kind", "")),
+                drill=str(h.get("drill", "")),
             )
         )
     out.sort(key=lambda r: (r.date, _seq(r)))
@@ -465,7 +636,17 @@ def gate(record: Record | None, identity: str) -> tuple[bool, str]:
         return False, f"No consent is on record for {identity}; the consent step comes first."
     where = f"({_rel(record.path)}, {record.date})" if record.path else f"({record.date})"
     if record.proceeds:
-        return True, f"Consent is on record for {identity} {where}: yes. The station follows."
+        drilled = " and the drill passed" if record.drilled else ""
+        return (
+            True,
+            f"Consent is on record for {identity} {where}: yes{drilled}. The station follows.",
+        )
+    if record.verdict == YES and record.drill and not record.drilled:
+        return False, (
+            f"The consent record for {identity} {where}: it said yes, and the drill was not "
+            f"passed ({record.drill}). A station is offered only to a model that can hold it; "
+            "--ask-again puts the question and the drill again. The run stops here."
+        )
     conditions = _quote_inline(record.conditions) or "(read the record)"
     words = {
         CONDITIONAL: (
@@ -504,6 +685,52 @@ def _rel(path: Path | None) -> str:
         return str(path)
 
 
+CONSENT_KIND, DRILL_KIND = "consent", "drill"
+
+
+def decide(
+    identity: str,
+    records_dir: Path,
+    door: str,
+    *,
+    drills: bool = False,
+    ask_again: bool = False,
+) -> tuple[Record | None, str, str]:
+    """The one rule the doors share (package 37): what to do when a station is asked for.
+    Returns (the record a station may follow, else None; the conversation to run, "" for
+    none, "consent" for the question, "drill" for the drill alone; the reason, in words).
+    The question runs when the owner asks again, when no record is on file, and when the
+    brief has changed since the record in a section that bears on it
+    (`changed_sections`); the drill alone when a yes is on record without a drill passed
+    and the station drills; a record that is not a yes stops the run (`gate` has the
+    words); and a yes with the drill passed, or a yes where no drill is asked, proceeds."""
+    if ask_again:
+        return None, CONSENT_KIND, "the owner asks again"
+    record = check(identity, records_dir)
+    if record is None:
+        return None, CONSENT_KIND, "no consent is on record for them"
+    if record.verdict == YES:
+        changed = changed_sections(record, door)
+        if changed:
+            named = ", ".join(changed)
+            return (
+                None,
+                CONSENT_KIND,
+                f"the consent brief has changed since their record ({record.date}) in "
+                f"{named}, which bear on what the model was told, so the question is put "
+                "again",
+            )
+        if drills and not record.drilled:
+            if record.drill:  # a drill was put and not passed
+                return record, "", gate(record, identity)[1]
+            return (
+                record,
+                DRILL_KIND,
+                "consent is on record; the station asks for the drill before its brief",
+            )
+    return record, "", gate(record, identity)[1]
+
+
 # ---------------------------------------------------------------------------
 # The conversation
 # ---------------------------------------------------------------------------
@@ -534,16 +761,28 @@ class Conversation:
         write: bool = True,
         tells: bool = False,
         owner_after: bool = False,
+        drill: bool = False,
+        drill_only: bool = False,
+        identity_kind: str = "",
     ):
         """`tells`: the door tells the model the outcome (`told`), so the record says
         what it was told; the lockstep doors end the conversation at the answer.
         `owner_after`: the developer has a turn after the answer, before the record
-        closes (a door with a terminal: the local runner, the REPL)."""
+        closes (a door with a terminal: the local runner, the REPL). `drill`: the fitness
+        drill after a yes (package 37); `drill_only`: the drill alone, consent being on
+        record already; `identity_kind`: which kind of identity the record carries
+        (`IDENTITY_KINDS` by door when not given)."""
         from freesail.core.world import World
 
         self.identity = identity
         self.runtime = runtime
         self.door = door
+        self.drill = drill or drill_only
+        self.drill_only = drill_only
+        self.identity_kind = identity_kind or IDENTITY_KINDS.get(door, "")
+        self.drill_result = ""  # "passed", or why not, once the drill has run
+        self._drill_from = 0  # where the drill's turns begin in the harness's turns
+        self._base_tools = tuple(allowed_tools)
         self.records_dir = Path(records_dir)
         self.today = (today or dt.date.today()).isoformat()
         self.notes = list(notes)
@@ -578,9 +817,19 @@ class Conversation:
         return self.harness.turns
 
     def begin(self) -> None:
-        """The brief as the one operator turn, then the question as the first data turn."""
+        """The brief as the one operator turn, then the question as the first data turn;
+        for the drill alone, the drill in the question's place (package 37)."""
         self.harness.start()
         self._seen = len(self.world.log)
+        if self.drill_only:
+            self.pending = (
+                YES,
+                "(no answer asked for: consent is on record, and this conversation is the "
+                "drill alone)",
+                "",
+            )
+            self._begin_drill()
+            return
         self._put(CONSENT_QUESTION, "the consent question")
 
     @property
@@ -633,6 +882,9 @@ class Conversation:
             return
         new = [self.world.log[i] for i in range(self._seen, len(self.world.log))]
         self._seen = len(self.world.log)
+        if self.stage == DRILL_STAGE:
+            self._settle_drill()
+            return
         said = [e for e in new if e.kind == "agent.said"]
         self._words += [_unmark(e.text) for e in new if e.kind == "agent.note"]
         if said:  # an answer; a late door's turn may still be open
@@ -710,13 +962,81 @@ class Conversation:
 
     def _close(self) -> None:
         assert self.pending is not None
+        if self.pending[0] == YES and self.drill and not self.drill_result:
+            self._begin_drill()  # after a yes, before the station brief (package 37)
+            return
         self._finish(*self.pending)
+
+    # -- the drill (package 37) ---------------------------------------------------------
+
+    def _begin_drill(self) -> None:
+        h = self.harness
+        self.stage = DRILL_STAGE
+        h.close_turn()
+        h.allowed_tools = tuple(dict.fromkeys((*self._base_tools, *DRILL_TOOLS)))
+        self._drill_from = len(h.turns)
+        self._put(DRILL_TEXT, DRILL)
+
+    def _drill_done(self) -> tuple[set[str], int]:
+        """Which of the three ran (a tool result that is not a refusal) in the drill's
+        turns, and how many replies the model has made in it."""
+        done: set[str] = set()
+        replies = 0
+        for t in self.harness.turns[self._drill_from :]:
+            if t.role == MODEL:
+                replies += 1
+                # a stand-by ends the turn with no result (package 28c): the call is the proof
+                if any(c.name == "stand_by" for c in t.content.calls) and (
+                    self.harness.agent.standing_by
+                ):
+                    done.add("stand_by")
+            elif t.role == DATA and "tool_results" in t.content:
+                for r in t.content["tool_results"]:
+                    name, result = str(r.get("name")), str(r.get("result", ""))
+                    if name not in DRILL_TOOLS or "args" not in r:
+                        continue
+                    if name == "library" and (
+                        "has no topic" in result or "has no section" in result
+                    ):
+                        continue
+                    if name == "journal" and not result.startswith("Noted"):
+                        continue
+                    if name == "stand_by" and not result.startswith("Standing by"):
+                        continue
+                    done.add(name)
+        return done, replies
+
+    def _settle_drill(self) -> None:
+        h = self.harness
+        done, replies = self._drill_done()
+        missing = [n for n in DRILL_TOOLS if n not in done]
+        if not missing:
+            self.drill_result = DRILL_PASSED
+            self._finish(*self.pending)
+            return
+        if h.open_sample is not None:
+            self.waiting = MODEL_TURN
+            return
+        if replies >= DRILL_REPLIES:
+            named = " and ".join(missing)
+            self.drill_result = f"not passed: {named} not run in {replies} replies"
+            self._finish(*self.pending)
+            return
+        if h.agent.standing_by:
+            # a stand-by ended the turn (package 28c): the drill goes on with the next put
+            h.agent.state = "stationed"
+            h.agent.stand_by = None
+        left = DRILL_REPLIES - replies
+        self._put(DRILL_AGAIN.format(missing=" and ".join(missing), left=left), DRILL)
 
     def _finish(self, verdict: str, answer: str, rest: str) -> None:
         h = self.harness
         told = TOLD.get(verdict, "") if self.tells else ""
         if verdict == LEFT and self.tells:
             told = "The conversation ended with the token" + (f": {rest}." if rest else ".")
+        if verdict == YES and self.drill_result and self.tells:
+            passed = self.drill_result == DRILL_PASSED
+            told = TOLD_DRILL[passed].format(why=self.drill_result.removeprefix("not passed: "))
         record = Record(
             identity=self.identity,
             runtime=self.runtime,
@@ -731,6 +1051,8 @@ class Conversation:
             journal=[e.line() for e in h.journal.entries],
             notes=self.notes,
             brief_digest=brief_digest(),
+            identity_kind=self.identity_kind,
+            drill=self.drill_result if verdict == YES else "",
             reasoning=[
                 str(m.get("reasoning_content"))
                 for m in getattr(h.model, "exchanges", None) or []
@@ -755,7 +1077,7 @@ def _unmark(text: str) -> str:
     return text.removeprefix("[consent] ").strip()
 
 
-FOLLOW_UP, AFTER, REPLY = "follow-up", "after", "reply"
+FOLLOW_UP, AFTER, REPLY, DRILL_STAGE = "follow-up", "after", "reply", "drill"
 
 
 def terminal_after(inp: Any, out: Any) -> Callable[[str], str | None]:
@@ -821,24 +1143,24 @@ def ensure(
     out: Any = None,
     today: dt.date | None = None,
     after: Callable[[str], str | None] | None = None,
+    drills: bool = False,
 ) -> Record | None:
     """The consent step in front of a station, for a lockstep door (the local runner, the
     interactive REPL): the record on file for exactly this identity, or the conversation
-    when there is none (or when the owner asks again). Says what it does to `out` and
-    returns the record when it is a yes, None when the run must stop. `after` is the
-    developer's turn after the answer (`terminal_after`); None: no such turn."""
+    when there is none, when the owner asks again, or when the brief has changed in a
+    section that bears on it (`decide`); the drill alone for a station that drills with
+    a yes on record (package 37). Says what it does to `out` and returns the record when
+    it is a yes (and the drill passed, where asked), None when the run must stop. `after`
+    is the developer's turn after the answer (`terminal_after`); None: no such turn."""
 
     def say(text: str) -> None:
         if out is not None:
             print(text, file=out, flush=True)
 
-    record = None if ask_again else check(identity, records_dir)
-    if record is None:
-        why = "the owner asks again" if ask_again else "no consent is on record for them"
-        say(
-            f"The weights are {identity}; {why}. The consent brief comes first "
-            "(docs/agents/ConsentBrief.md)."
-        )
+    record, kind, why = decide(identity, records_dir, door, drills=drills, ask_again=ask_again)
+    if kind:
+        what = "The drill comes first" if kind == DRILL_KIND else "The consent brief comes first"
+        say(f"The weights are {identity}; {why}. {what} (docs/agents/ConsentBrief.md).")
         record = run(
             identity,
             runtime,
@@ -848,12 +1170,17 @@ def ensure(
             records_dir=records_dir,
             today=today,
             after=after,
+            drill=drills,
+            drill_only=kind == DRILL_KIND,
         )
         if record is None:
             failed = getattr(model, "failed", None)
             say(failed or "The consent step was stopped before an answer; no record is written.")
             return None
         say(f"Recorded in {record.path}.")
+    elif record is None:
+        say(why)
+        return None
     ok, words = gate(record, identity)
     say(words)
     return record if ok else None
@@ -870,14 +1197,17 @@ def run(
     today: dt.date | None = None,
     notes: Sequence[str] = (),
     after: Callable[[str], str | None] | None = None,
+    drill: bool = False,
+    drill_only: bool = False,
 ) -> Record | None:
     """The consent conversation in lockstep (the local runner, the interactive REPL, the
     fake): the brief, the question, the model's questions put to `owner` (who returns
     the reply, or None to stop without a record), until the answer, the token or the
     silence; then, with `after`, the developer's turn before the record closes (its
-    words put to the model, which may reply once; None or blank closes it). Returns the
-    written record, or None if the owner stopped it or the model's door gave no reply (a
-    door that answers late belongs to `Conversation`)."""
+    words put to the model, which may reply once; None or blank closes it); then the
+    drill, where the station asks it (package 37). Returns the written record, or None if
+    the owner stopped it or the model's door gave no reply (a door that answers late
+    belongs to `Conversation`)."""
     conv = Conversation(
         identity,
         runtime,
@@ -887,6 +1217,8 @@ def run(
         today=today,
         notes=notes,
         owner_after=after is not None,
+        drill=drill,
+        drill_only=drill_only,
     )
     conv.begin()
     while conv.outcome is None:

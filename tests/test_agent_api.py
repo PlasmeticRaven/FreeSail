@@ -289,11 +289,19 @@ def test_a_manned_station_is_refused_to_another_model_and_attached_by_the_same(t
     assert again["attached"] and again["since"] == first["next"]
     assert roles(again) == ["operator", "data"]
     assert again["turns"][1]["content"]["reason"] == "the start"  # the open turn, again
-    # released, the station is not taken again in this game (spec §11: once a game)
+    # released, the station is seated again once in this game by the same model (package
+    # 37, the consent record of 2026-09-29's note 1: an instance that left by accident),
+    # never by another, and not a third time
     g.http.post("/api/agents/watcher/release", json={"reason": "the door closed"})
-    r = g.station()
-    assert r.status_code == 409 and "a station is taken once in a game" in r.json()["detail"]
     assert g.harness.journal.entries[-1].text == "Stood down by the MCP bridge: the door closed."
+    r = g.station(model_name="someone-else")
+    assert r.status_code == 409 and "someone-else is another model" in r.json()["detail"]
+    again = g.took(g.station())
+    assert again["phase"] == "station" and g.harness.agent.seatings == 2
+    assert g.lines("agent.stationed")[-1].startswith("The watcher takes the station again")
+    g.http.post("/api/agents/watcher/release", json={"reason": "the door closed again"})
+    r = g.station()
+    assert r.status_code == 409 and "all a game allows" in r.json()["detail"]
 
 
 def test_bad_requests_are_refused_in_words(tmp_path):

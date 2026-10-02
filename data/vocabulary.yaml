@@ -829,6 +829,43 @@ verbs:
     synonyms: [the watcher's journal, show the watcher journal, show the journal of the watcher]
     object: station
     level: 2
+  # The officer of the watch's station (package 37; spec M5 §29): the same sentences to
+  # it ('the officer' says the officer of the watch in any of them), and the deck's own,
+  # the captain's word that gives it and takes it, as the period had it (Luce 1884 ch.
+  # XXIII, the officer of the deck; Falconer 1780, LIEUTENANT), and his word for the
+  # watch that allows a named thing beyond the station's domain.
+  ask the officer of the watch:
+    synonyms: [ask the officer]
+    object: station
+    level: 2
+  tell the officer of the watch:
+    synonyms: [tell the officer, say to the officer of the watch, say to the officer]
+    object: station
+    level: 2
+  stand down the officer of the watch:
+    synonyms: [stand down the officer, stand the officer down]
+    object: station
+    level: 2
+  resume the officer of the watch:
+    synonyms: [resume the officer, continue the officer]
+    object: station
+    level: 2
+  show the officer of the watch's journal:
+    synonyms: [the officer's journal, show the officer's journal, show the journal of the officer]
+    object: station
+    level: 2
+  you have the deck:
+    synonyms: []
+    object: station
+    level: 2
+  i have the deck:
+    synonyms: [the captain has the deck]
+    object: station
+    level: 2
+  you may:
+    synonyms: []
+    object: station
+    level: 2
   # Reading a file of standing orders is the driver's business (it reads the disk): the
   # console and the server take `read the standing orders from <file>`, and the ship,
   # should it reach her, says so.

@@ -268,13 +268,16 @@ def test_the_head_situation_reads_the_log_and_the_readings_through_the_tools():
 
 
 def test_the_tools_are_the_nine_of_the_spec_and_shelve_with_a_description_each():
-    """The nine of spec §11, and the tenth, `shelve`, of package 28d (the shelf)."""
+    """The nine of spec §11, the tenth, `shelve`, of package 28d (the shelf), and the two
+    of a station with authority, `hand_over` and `handover_note` (package 37)."""
     assert tuple(TOOLS) == (
         "read_log",
         "readings",
         "state",
         "library",
         "submit_order",
+        "hand_over",
+        "handover_note",
         "stand_by",
         "journal",
         "opt_out",
@@ -283,8 +286,9 @@ def test_the_tools_are_the_nine_of_the_spec_and_shelve_with_a_description_each()
     )
     for t in TOOLS.values():
         assert t.description.endswith(".") and len(t.description) > 40
-    assert TOOLS["submit_order"].needs_authority
-    assert not any(t.needs_authority for n, t in TOOLS.items() if n != "submit_order")
+    with_authority = {"submit_order", "hand_over", "handover_note"}
+    assert all(TOOLS[n].needs_authority for n in with_authority)
+    assert not any(t.needs_authority for n, t in TOOLS.items() if n not in with_authority)
 
 
 def test_readings_tool_reads_the_registry_and_nothing_else():
@@ -673,11 +677,13 @@ def test_truth_43_the_same_order_three_times_while_the_readings_change_brings_no
     order = reply("", call("submit_order", text="steer east"))
     h, fake, saves = stationed(world, [order, ""], st, loop=True)
     world.run(40)  # five submissions, ten seconds apart, the ship turning throughout
-    assert [a for _, a, _ in world.journal] == ["the watcher"] * 5
+    # a station's orders are not journaled (package 37): its replies are its harness's
+    # transcript, which a replay gives again at their ticks
+    assert world.journal == [] and world.inputs == []
     assert "agent.nudged" not in kinds(world) and "agent.paused" not in kinds(world)
     assert h.agent.repeat_count == 1
     accepted = [e for e in world.log if e.kind == "order.accepted" and e.actor == "the watcher"]
-    assert accepted[0].text == "The watcher orders: steer east."
+    assert len(accepted) == 5 and accepted[0].text == "The watcher orders: steer east."
     # and once the turn is done and the readings hold still, the same order does trip it
     world.run(200)
     assert "agent.nudged" in kinds(world)
@@ -1436,6 +1442,15 @@ def test_the_agent_log_kinds_are_listed_in_one_place_and_used():
     Harness(world, watcher(SamplingPolicy.in_lockstep(A_GLASS_S)), narrator()).start()
     world.submit("ask the watcher how she lies")
     world.submit("tell the watcher we make for Falmouth")  # package 29
+    used |= set(kinds(world))
+    # the officer of the watch's own kinds (package 37): the deck and the handover note
+    from freesail.agents.agent import officer
+
+    world = frigate_world()
+    script = [reply("", call("hand_over", note="All quiet; nothing ordered; watching the glass."))]
+    Harness(world, officer(SamplingPolicy.in_lockstep(A_GLASS_S), world=world), Fake(script))
+    world.submit("you have the deck")
+    world.agents["officer of the watch"].start()
     used |= set(kinds(world))
     assert used == set(AGENT_LOG_KINDS)
     for kind in AGENT_LOG_KINDS:

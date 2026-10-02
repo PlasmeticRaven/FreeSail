@@ -32,7 +32,17 @@ from typing import Any
 
 from freesail.agents.model import DATA, Reply, ToolCall, Turn
 
-__all__ = ["Fake", "Item", "Transcript", "call", "narrator", "reply", "say", "silence"]
+__all__ = [
+    "Fake",
+    "Item",
+    "Transcript",
+    "call",
+    "narrator",
+    "officer_of_the_watch",
+    "reply",
+    "say",
+    "silence",
+]
 
 Item = (
     Reply | str | ToolCall | Sequence[ToolCall] | Callable[[dict[str, Any], Sequence[Turn]], Reply]
@@ -174,3 +184,61 @@ def narrate(last: dict[str, Any], turns: Sequence[Turn]) -> Reply:
 
 def narrator() -> Fake:
     return Fake([narrate], loop=True)
+
+
+# The scripted officer's thresholds (package 37), from the starter book's reasons
+# (`docs/primer/11-the-starting-book.md`): the royals come in over twenty knots and go
+# back under fifteen, a wind a sailor would call fresh and moderate.
+OFFICER_ROYALS_IN_KN = 20
+OFFICER_ROYALS_OUT_KN = 15
+
+
+def _knots(words: Any) -> float | None:
+    try:
+        return float(str(words).split()[0])
+    except (ValueError, IndexError):
+        return None
+
+
+def keep_the_deck(last: dict[str, Any], turns: Sequence[Turn]) -> Reply:
+    """The built-in officer's turn (package 37): with the deck, the royals taken in when
+    the true wind is over `OFFICER_ROYALS_IN_KN` and set again under `OFFICER_ROYALS_OUT_KN`
+    (one order a turn, so a repeated refusal is the ship's and not a loop); a question
+    answered from the readings; a note of the deck's giving in the journal; nothing after
+    a tool result but the next thing. Without the deck it watches as the narrator does."""
+    if "tool_results" in last:
+        return Reply()
+    r = readings_so_far(turns)
+    question = last.get("question")
+    if question:
+        text = narrate(last, turns)
+        answer = text.calls[0].args["text"] if text.calls else text.text or "Nothing to report."
+        return Reply(calls=(ToolCall("answer", {"text": answer}),))
+    word = str(last.get("word") or "")
+    if "You have the deck" in word:
+        return Reply(
+            text="I have the deck, sir.",
+            calls=(ToolCall("journal", {"note": "Took the deck; the night orders read."}),),
+        )
+    officer = r.get("officer_of_the_watch")
+    has_deck = isinstance(officer, dict) and officer.get("deck")
+    if not has_deck and "has the deck since" not in str(officer):
+        return narrate(last, turns)
+    kn = _knots(r.get("true_wind_speed"))
+    sails = r.get("sails")
+    royals_set = None
+    if isinstance(sails, dict):
+        royals = [s for n, s in sails.items() if n.endswith("royal")]
+        royals_set = any(s in ("set", "drawing") for s in royals) if royals else None
+    elif isinstance(sails, str):
+        royals_set = "royals set" in sails or ("the royals" in sails.split(";")[0])
+    if kn is not None and royals_set is not None:
+        if kn > OFFICER_ROYALS_IN_KN and royals_set:
+            return Reply(calls=(ToolCall("submit_order", {"text": "take in the royals"}),))
+        if kn < OFFICER_ROYALS_OUT_KN and not royals_set:
+            return Reply(calls=(ToolCall("submit_order", {"text": "set the royals"}),))
+    return narrate(last, turns)
+
+
+def officer_of_the_watch() -> Fake:
+    return Fake([keep_the_deck], loop=True)

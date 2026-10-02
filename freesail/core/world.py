@@ -16,7 +16,7 @@ from typing import Any
 from freesail import units
 from freesail.core.clock import TICK_SECONDS as TICK_S
 from freesail.core.clock import Clock
-from freesail.core.events import Event, Log, Severity
+from freesail.core.events import STATION_ACTORS, Event, Log, Severity
 from freesail.core.rng import Rng
 from freesail.core.sun import DAY, DEFAULT_LATITUDE_DEG, Sun
 from freesail.physics.wind import AIR_MASSES, Wind, WindParams, WindRecord
@@ -190,13 +190,16 @@ AGENT_LOG_KINDS: tuple[str, ...] = (
     "agent.paused",  # the pattern went on: sampling paused, the human asked
     "agent.stopped",  # stood down: by the captain, or unattended past the bound
     "agent.opted_out",  # the token seen, or `opt_out` called
+    # a station with authority (package 37, the officer of the watch)
+    "agent.deck",  # the deck given, taken back, handed over; the captain's word for the watch
+    "agent.handover",  # the handover note, said and journaled
 )
 # `show the <station>'s journal` is answered as `query.journal`, a query like `state`.
 
 # The kinds of an order's own line that are notable rather than routine: the captain's word
 # to a station (package 29, the owner's ruling: a `tell` is seen in the log at any speed),
 # and work belayed at his word, with how it was left (package 29c).
-NOTABLE_ORDER_KINDS = frozenset({"agent.told", "work.belayed"})
+NOTABLE_ORDER_KINDS = frozenset({"agent.told", "work.belayed", "agent.deck"})
 
 
 class World:
@@ -986,7 +989,12 @@ class World:
         """
         text = " ".join(text.split())
         standing = actor.startswith(STANDING_ACTOR_PREFIX)
-        if not standing:
+        # an agent's station's order (package 37, the officer of the watch): given through
+        # `World.submit` with the station's actor and refused by the same grammar, but not
+        # journaled, since its replies are its harness's transcript and a replay gives
+        # them again at their ticks (spec M4 §11; `freesail.agents.harness`)
+        station = actor in STATION_ACTORS
+        if not standing and not station:
             self.inputs.append({"tick": self.clock.tick, "actor": actor, "order": text})
         try:
             kind, log_text, data = self.ship.handle_order(text)
@@ -1001,7 +1009,7 @@ class World:
             )
         if kind.startswith("query."):
             return self.record(Severity.ROUTINE, kind, log_text, actor=actor, data=data)
-        if not standing:
+        if not standing and not station:
             self.journal.append((self.clock.tick, actor, text))
         accepted = self.record(
             Severity.NOTABLE if standing and not routine else Severity.ROUTINE,
