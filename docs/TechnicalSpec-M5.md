@@ -648,8 +648,8 @@ measures the whole at the gate's scenario, and the tuning notes carry the number
 Each package's brief is written in `docs/dev/M5-WorkPackages.md` when its predecessor
 has landed, in the form the M4 packages took.
 
-What was built for gate 5b, and how it stands against this chapter, is
-`docs/dev/M5-CloseOut-5b.md` (the close-out form of milestone 4, adopted from the cold
+What was built for gate 5c, and how it stands against this chapter whole, is
+`docs/dev/M5-CloseOut-5c.md`; for gate 5b, `docs/dev/M5-CloseOut-5b.md` (the close-out form of milestone 4, adopted from the cold
 review: the specification keeps the contract and points to the close-out rather than
 growing "as built" paragraphs).
 
