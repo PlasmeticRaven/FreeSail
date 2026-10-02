@@ -2821,7 +2821,7 @@ GATE_5B_CAST_TICK = 29884
 GATE_5B_LANDFALL_TICK = 44700
 GATE_5B_ROADS_TICK = 57732  # the outer road: the first cast under twenty fathoms
 GATE_5B_ANCHORED_TICK = 58167  # the best bower let go
-GATE_5B_BROUGHT_UP_TICK = 59144  # brought up, the sails furled (59145 before the tide table read its cells at their centres, package 35)
+GATE_5B_BROUGHT_UP_TICK = 59144  # brought up, the sails furled (59145 before package 35)
 # Package 33c (spec M5 open item 15): every tick held, every line but the standing
 # runtime's own the same; the lines moved by the held lines said the first time and then
 # once a watch (the frigate 157 to 18, the schooner 155 to 15, the thick passage 31 to
