@@ -1,0 +1,32 @@
+# Let go an anchor (spec M5 §18; package 34): the anchor let go where she is, whatever
+# her way, the cable veered to the scope the depth wants, nothing done to the sails. The
+# bare order of Luce's sequence ("Stand clear of the cable! Stream the buoy! Let go the
+# starboard anchor!", 1866 ch. XXXIV p. 569), given on its own when there is no time for
+# the rest: a second anchor let go when the first drags ("If you break adrift from one
+# anchor, it is best to let go two at the same time", p. 568; "let go the lee bower", p.
+# 574), or an anchor let go with way on her, which Luce allows "while there is headway on,
+# and pay out roundly ... the chance of damaging the copper and snapping the chain" (p.
+# 568): the physics takes the snatch when the cable comes taut (physics/anchor.py), and a
+# cable that parts is the captain's lesson.
+#
+# Parameters: `anchor` (the best bower, the small bower, the sheet, the stream, the kedge,
+# the second anchor: the one not down); `fathoms` (the scope to veer to; the depth's
+# rule when not said).
+id: let_go_anchor
+verb: let_go_anchor
+applies_to: {class: ship}
+script: let_go_anchor
+params: {anchor: null, fathoms: null}
+preconditions: []
+timing:
+  stand_clear_s: 15      # "Stand clear of the cable! Stream the buoy!": judgement
+  veer_fathoms_per_s: 1.0  # the cable "veered away roundly": judgement
+on_start: {log: "Stand clear of the cable; stream the buoy; let go {anchor}!"}
+on_complete: {log: "{anchor_cap} let go in {depth}; {fathoms} of cable veered.", kind: ship.anchored, severity: notable}
+on_fail: {log: "Could not let go {anchor}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the forecastlemen at the stoppers, the shank painter and the compressors (Lever
+# 1808, 'Anchoring', p. 97: "Hands stationed at the Stopper and Shank Painter, and every
+# thing clear of the Range of the Cable"; Luce 1884 ch. XX, the forecastlemen "the head,
+# anchors and headsails"). A dozen: judgement.
+crew: {hands: 12, rating: ordinary, stations: [forecastle]}
+source: "Luce 1866, ch. XXXIV Anchoring, pp. 568-569, 574; Lever 1808, 'Anchoring', p. 97 (fig. 519: 'the proper Scope of cable is veered away according to the strength of the wind, the Stopper is clapped on forwards, the Bight of the Cable thrown over the Bitts')"

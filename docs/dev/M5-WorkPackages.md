@@ -44,7 +44,7 @@ gate 5b:  wave 3  32 the chart data and the queries, the lookout
 gate 5c:  wave 5  33b the chronometer, the moon, the lunar and the azimuth; the captain's chart in his hands (Fable; landed 2026-10-01)
                   33c the passage's words: readings at the prompt, the aliases, the starter book as a choice (Opus; landed 2026-10-01)
                   33d the browser's shelf: completion, the library pane, the clock on a station, zoom and pan (Opus; landed 2026-10-01)
-                  34 the tide, grounding and anchoring, as Luce has it (Fable; launched 2026-10-01, after 33b landed)
+                  34 the tide, grounding and anchoring, as Luce has it (Fable; landed 2026-10-02)
                   32f the launcher page: the browser's front door with the game's options (Opus; after 33d and 32d; owner, 2026-10-01)
           wave 6  35 places, people, ports and nations
           wave 7  36 other sail, the world-order channel, the two scenarios, gate 5c cut

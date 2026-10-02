@@ -1,6 +1,6 @@
 # Licence Ouverte / Open Licence 2.0 (Etalab)
 
-Read from https://raw.githubusercontent.com/etalab/licence-ouverte/master/LO.md on 2026-09-30 (Etalab's site, https://www.etalab.gouv.fr/licence-ouverte-open-licence/, reset every connection from the build network that day). The licence data.gouv.fr states for SHOM's HOMONIM bathymetry (licence id lov2) and for the archive charts (fr-lo).
+Read from https://raw.githubusercontent.com/etalab/licence-ouverte/master/LO.md on 2026-09-30 (Etalab's site, https://www.etalab.gouv.fr/licence-ouverte-open-licence/, reset every connection from the build network that day). The licence data.gouv.fr states for SHOM's HOMONIM bathymetry (licence id lov2) and for the archive charts (fr-lo), and for SHOM's Références Altimétriques Maritimes (RAM), whose mean levels above the chart datum at the French ports are in data/tides/constituents.yaml (package 34; docs/references/Tides.md).
 
 # LICENCE OUVERTE 2.0/OPEN LICENCE 2.0
 

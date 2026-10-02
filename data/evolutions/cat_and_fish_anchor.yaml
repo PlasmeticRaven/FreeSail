@@ -1,0 +1,22 @@
+# Cat and fish the anchor (spec M5 §18; package 34): an anchor hove up and left hanging
+# at the bows (aweigh, or catted and not fished) secured for sea: "the two Bowers are
+# catted and fished; and the Stoppers and Shank Painters passed" (Lever 1808, 'Catting
+# and Fishing the Anchors', p. 68): the cat block hooked to the ring and the cat fall
+# swayed upon to the cat-head (catting), the fish hook on the inner arm and the fluke
+# hove up to the gunwale, the shank painter belayed to the timber heads (fishing). The
+# weigh does this of itself at its end; this is the order for an anchor left aweigh.
+id: cat_and_fish_anchor
+verb: cat_and_fish_anchor
+applies_to: {class: ship}
+script: cat_and_fish
+params: {anchor: null}
+preconditions: []
+timing:
+  cat_s: 150    # the cat hooked and the fall swayed upon (judgement)
+  fish_s: 150   # the fish hook on the arm, the fluke up, the shank painter passed
+on_start: {log: "Hook the cat; cat and fish {anchor}."}
+on_complete: {log: "{anchor_cap} catted and fished.", kind: anchor.catted, severity: routine}
+on_fail: {log: "Could not cat and fish {anchor}: {reason}.", kind: evolution.failed, severity: routine}
+# crew: the forecastlemen on the cat fall and the fish tackle (judgement in the number).
+crew: {hands: 20, rating: ordinary, stations: [forecastle, waisters]}
+source: "Lever 1808, 'Catting and Fishing the Anchors', p. 68 (figs. 365-366); Falconer 1780, To CAT the anchor, To FISH the anchor; Luce 1866, ch. XV (the cat and fish gear)"

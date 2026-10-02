@@ -173,7 +173,17 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (F, "set the fore topsel", no(["no such part", "fore topsail"], UnknownNounError)),
     (F, "set the gaff topsail", no(["no such part"], UnknownNounError)),
     (F, "set", no(["Set what?"])),
-    (F, "let go the best bower", no(["no such part as the best bower"], UnknownNounError)),
+    # the anchor let go (package 34): a ground-tackle order, not a line's
+    (F, "let go the best bower", ok(kind="evolution.started")),
+    (F, "let go the anchor", ok(kind="evolution.started")),
+    (F, "come to an anchor with the small bower", ok(kind="evolution.started")),
+    (F, "veer to ninety fathoms", ok(kind="evolution.started")),
+    (F, "veer cable", ok(kind="evolution.started")),
+    (F, "veer to the moon", no(["Veer how much?"])),
+    (F, "heave short", ok(kind="evolution.started")),
+    (F, "weigh", ok(kind="evolution.started")),
+    (F, "weigh anchor", ok(kind="evolution.started")),
+    (F, "up anchor", ok(kind="evolution.started")),
     # -- verbs that make no sense for the part --------------------------------
     (F, "set the fore topsail yard", no(["You set sails", "is a yard", "fore topsail"])),
     (F, "set the main brace", no(["Which main brace"])),

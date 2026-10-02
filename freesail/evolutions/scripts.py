@@ -3790,6 +3790,681 @@ class TrimSheetScript(Script):
         return d
 
 
+# ---------------------------------------------------------------------------
+# Package 34: the ground tackle (spec M5 §18; decision 30)
+# ---------------------------------------------------------------------------
+#
+# The anchor's evolutions, as Luce 1866 ch. XXI and XXXIV, Lever 1808 and Steel 1794 vol.
+# II have them (the files under data/evolutions/ cite the pages). Each script works the
+# ship's `GroundTackle` (`ship.parts.ground_tackle`): the anchors' states, the cable
+# veered or hove in by the fathom at the file's rates; the physics of the cable's pull,
+# the holding and the dragging is `physics/anchor.py`, and the World says the riding, the
+# turn of the tide and an anchor dragging. The depth the anchor goes down in is the
+# truth's (the World keeps `ship.extra["water_depth_m"]` up each minute: the chart's depth
+# and the tide), which is what the lead in the chains calls as the cable runs.
+
+
+def _tackle(ship: Ship) -> Any:
+    from freesail.ship.parts import ground_tackle
+
+    return ground_tackle(ship)
+
+
+def _water_depth(ship: Ship) -> float | None:
+    depth = ship.extra.get("water_depth_m")
+    return None if depth is None else float(depth)
+
+
+def _hawse(ship: Ship) -> tuple[float, float]:
+    from freesail.physics.anchor import hawse_position
+
+    return hawse_position(ship)
+
+
+def _ground_speed(ship: Ship) -> float:
+    """Her speed over the ground, metres a second."""
+    from freesail.physics.integrate import water_velocity
+
+    d = ship.dyn
+    wx, wy = water_velocity(ship)
+    ex, ey = units.heading_vector(d.heading)
+    return math.hypot(d.u * ex + d.v * ey + wx, d.u * ey - d.v * ex + wy)
+
+
+def _headway_over_ground(ship: Ship) -> float:
+    """Her way along her head over the ground, metres a second (negative astern)."""
+    from freesail.physics.integrate import water_velocity
+
+    d = ship.dyn
+    wx, wy = water_velocity(ship)
+    ex, ey = units.heading_vector(d.heading)
+    return d.u + wx * ex + wy * ey
+
+
+def _fathoms_words(fathoms: float) -> str:
+    from freesail.world.reckoning import number_words
+
+    n = int(round(fathoms))
+    return f"{number_words(n)} fathom{'s' if n != 1 else ''}"
+
+
+def _depth_words(depth_m: float | None) -> str:
+    from freesail.world.chart import fathoms_words
+
+    return "no bottom" if depth_m is None else fathoms_words(depth_m)
+
+
+def _cap(words: str) -> str:
+    return words[:1].upper() + words[1:]
+
+
+def _riding(ship: Ship, wind: Wind | None) -> str:
+    from freesail.physics.anchor import riding_words
+
+    state = ship.extra.get("tide_state")
+    wind_from = wind.direction_from if wind is not None else float(ship.dyn.heading)
+    return riding_words(ship, state, wind_from)
+
+
+class _AnchorScript(Script):
+    """What the anchor scripts share: the tackle found, the anchor named, the cable
+    veered or hove by the fathom at a rate."""
+
+    def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
+        super().__init__(ship, params, timing)
+        self.tackle = _tackle(ship)
+        self.anchor: Any = None
+        self.wind: Wind | None = None
+
+    def holds(self) -> set[str]:
+        return {self.ship.name}
+
+    def _no_tackle(self) -> str | None:
+        if self.tackle is None or not self.tackle.anchors:
+            return "she carries no ground tackle"
+        return None
+
+    def _named(self, words: Any) -> Any:
+        anchor = self.tackle.by_words(words if isinstance(words, str) else None)
+        return anchor
+
+    def _veer(self, dt: float, factor: float, target_m: float, rate_key: str) -> bool:
+        """The cable veered toward `target_m` at the file's rate; True when there."""
+        rate = units.fathoms_to_m(self.timing_value(rate_key, 1.0)) / max(factor, 1e-9)
+        limit = min(target_m, units.fathoms_to_m(self.anchor.cable_fathoms))
+        self.anchor.scope_m = min(limit, self.anchor.scope_m + rate * dt)
+        return self.anchor.scope_m >= limit - 1e-6
+
+    def _heave(self, dt: float, factor: float, target_m: float, rate_key: str) -> bool:
+        """The cable hove in toward `target_m` at the capstan's rate; True when there."""
+        rate = units.fathoms_to_m(self.timing_value(rate_key, 0.1)) / max(factor, 1e-9)
+        self.anchor.scope_m = max(target_m, self.anchor.scope_m - rate * dt)
+        return self.anchor.scope_m <= target_m + 1e-6
+
+    def words(self) -> dict[str, Any]:
+        anchor = self.anchor.name if self.anchor is not None else "the anchor"
+        fathoms = self.anchor.scope_fathoms if self.anchor is not None else 0.0
+        depth = self.anchor.depth_m if self.anchor is not None else _water_depth(self.ship)
+        return {
+            "anchor": anchor,
+            "anchor_cap": _cap(anchor),
+            "fathoms": _fathoms_words(fathoms),
+            "depth": _depth_words(depth),
+            "riding": _riding(self.ship, self.wind),
+        }
+
+    def data(self) -> dict[str, Any]:
+        d = super().data()
+        if self.anchor is not None:
+            d["anchor"] = self.anchor.to_dict()
+        return d
+
+
+def _belay_held_work(ship: Ship) -> None:
+    """The sail work the manoeuvre belayed, or that waited its turn for hands while all
+    hands were at the anchor, is not taken up at anchor (the runner resumes a manoeuvre's
+    belayed work when all hands are done, decision 25; a sail half set when she came to
+    anchor is furled with the rest and its order is done with, and a trim that waited
+    finds no sail to trim)."""
+    runner = ship.extra.get("evolutions")
+    if runner is None or not hasattr(runner, "belay"):
+        return
+    held = [
+        i for i in runner.instances if getattr(i, "paused", False) or getattr(i, "waiting", False)
+    ]
+    if held:
+        runner.belay(ship, held)
+
+
+def _let_go(ship: Ship, anchor: Any, depth_m: float) -> None:
+    """The anchor let go where the hawse is: on the bottom, the cable out to the depth,
+    the ground the chart's bottom note."""
+    from freesail.ship.parts import AnchorState
+
+    hx, hy = _hawse(ship)
+    anchor.state = AnchorState.DOWN
+    anchor.ground_x, anchor.ground_y = hx, hy
+    anchor.depth_m = depth_m
+    anchor.scope_m = depth_m
+    anchor.bottom = str(ship.extra.get("bottom", "") or "")
+    anchor.taut = False
+    anchor.dragging = False
+    anchor.cable_load_kn = 0.0
+
+
+def _scope_wanted(ship: Ship, anchor: Any, depth_m: float, fathoms: Any) -> float:
+    from freesail.physics.anchor import scope_wanted_m
+
+    if fathoms:
+        return units.fathoms_to_m(float(fathoms))
+    return scope_wanted_m(depth_m)
+
+
+class ComeToAnchorScript(_AnchorScript):
+    """Come to an anchor as Luce has it (data/evolutions/come_to_anchor.yaml)."""
+
+    def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
+        super().__init__(ship, params, timing)
+        self.target: float = 0.0
+        self.heading_target: float | None = None
+        self.swing: YardSwing | None = None
+        self.phase_t = 0.0
+
+    def check(self, words: dict[str, Any]) -> str | None:
+        if (why := self._no_tackle()) is not None:
+            return why
+        if self.tackle.at_anchor():
+            riding = self.tackle.riding_by()
+            return f"she is at anchor already, riding by {riding.name}"
+        if self.ship.extra.get("aground"):
+            return "she is aground"
+        self.anchor = self._named(self.params.get("anchor"))
+        if self.anchor is None:
+            return f"no anchor aboard answers to '{self.params.get('anchor')}'"
+        from freesail.ship.parts import AnchorState
+
+        if self.anchor.state not in (AnchorState.STOWED, AnchorState.READY):
+            return f"{self.anchor.name} is {self.anchor.state.value}"
+        depth = _water_depth(self.ship)
+        if depth is None:
+            return "no bottom here to anchor in"
+        if depth > units.fathoms_to_m(self.anchor.cable_fathoms) / 3.0:
+            return (
+                f"no anchoring ground here: {_depth_words(depth)}, and {self.anchor.name} "
+                f"has {_fathoms_words(self.anchor.cable_fathoms)} of cable"
+            )
+        return None
+
+    def begin(self, words: dict[str, Any]) -> None:
+        ship = self.ship
+        self.phase = "shorten_sail"
+        self.phase_t = 0.0
+        light = [
+            sl
+            for sl in ship.sails.values()
+            if sl.is_set and (sl.cls == "studding" or _is_upper_square(ship, sl))
+        ]
+        for sl in light:
+            sl.state = SailState.IN_THE_GEAR
+        for sl in lowest_square_sails(ship):
+            if sl.is_set:
+                sl.state = SailState.IN_THE_GEAR
+        if light or any(True for _ in lowest_square_sails(ship)):
+            self.note("Haul taut! In studding sails, royals and topgallants; up courses.")
+
+    def _stronger(self, wind: Wind) -> float:
+        """The heading to come to: the stream's if it runs stronger than
+        `stem_tide_kn`, else the wind's (Luce 1866 ch. XXXIV, p. 573)."""
+        from freesail.physics.integrate import water_velocity
+
+        wx, wy = water_velocity(self.ship)
+        stream_kn = units.ms_to_knots(math.hypot(wx, wy))
+        if stream_kn >= self.timing_value("stem_tide_kn", 1.5):
+            # head to the stream: the way it comes from
+            return units.wrap_2pi(math.atan2(-wx, -wy))
+        return units.wrap_2pi(wind.direction_from)
+
+    def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        self.t += dt
+        self.phase_t += dt
+        self.wind = wind
+        ship = self.ship
+        dyn = ship.dyn
+        if self.phase == "shorten_sail":
+            if self.phase_t >= self.timing_value("clew_up_s", 150.0) * factor:
+                self.phase = "round_to"
+                self.phase_t = 0.0
+                self.heading_target = self._stronger(wind)
+                dyn.helm_mode = HelmMode.HEADING
+                dyn.target_heading = self.heading_target
+                dyn.steady = False
+                # the topsails clewed up and the jib hauled down as she comes to; the
+                # spanker kept to bring her up (Luce p. 569)
+                for sl in ship.sails.values():
+                    if sl.is_set and (sl.cls == "square" or sl.cls == "jibheaded"):
+                        sl.state = SailState.IN_THE_GEAR
+                _belay_held_work(ship)  # the sail work waiting for hands finds no sail now
+                self.note(
+                    f"Let go the topsail sheets; clew up; haul down the jib. Helm down for "
+                    f"{units.point_name(self.heading_target)}."
+                )
+            return
+        if self.phase == "round_to":
+            depth = _water_depth(ship)
+            way = _headway_over_ground(ship)
+            timeout = self.timing_value("lose_way_timeout_s", 420.0)
+            if way <= 0.3 or self.phase_t >= timeout:
+                if depth is None:
+                    self.fail("no bottom here to anchor in")
+                    return
+                self.phase = "veer"
+                self.phase_t = 0.0
+                _let_go(ship, self.anchor, depth)
+                self.target = _scope_wanted(ship, self.anchor, depth, self.params.get("fathoms"))
+                self.note(
+                    f"Stand clear of the cable; stream the buoy; let go {self.anchor.name}! "
+                    f"Let go in {_depth_words(depth)}."
+                )
+                ship.note(
+                    "notable",
+                    "ship.anchored",
+                    f"{_cap(self.anchor.name)} let go in {_depth_words(depth)}.",
+                    ship.name,
+                    {"anchor": self.anchor.to_dict()},
+                )
+            return
+        if self.phase == "veer":
+            if self._veer(dt, factor, self.target, "veer_fathoms_per_s"):
+                self.phase = "brought_up"
+                self.phase_t = 0.0
+                for sl in after_gaff_sails(ship):
+                    if sl.is_set:
+                        sl.state = SailState.IN_THE_GEAR
+                self.note(
+                    f"Veered to {_fathoms_words(self.anchor.scope_fathoms)}; brail up the spanker."
+                )
+            return
+        if self.phase == "brought_up":
+            settled = self.anchor.taut and _ground_speed(ship) < 0.3
+            if settled or self.phase_t >= self.timing_value("settle_s", 240.0):
+                self.phase = "furl"
+                self.phase_t = 0.0
+                dyn.helm_mode = HelmMode.RUDDER
+                dyn.target_rudder = 0.0
+                yards = working_yards(ship)
+                self.swing = YardSwing(
+                    yards, [0.0 for _ in yards], self.timing_value("furl_s", 600.0)
+                )
+                self.note("Brought up. Stations for furling sail; square the yards.")
+            return
+        if self.phase == "furl":
+            if self.swing is not None:
+                self.swing.advance(dt, factor)
+            if self.phase_t >= self.timing_value("furl_s", 600.0) * factor:
+                for sl in ship.sails.values():
+                    if (
+                        sl.state
+                        in (
+                            SailState.SET,
+                            SailState.IN_THE_GEAR,
+                            SailState.LOOSED,
+                            SailState.SHEETED,
+                            SailState.GOOSE_WINGED,
+                        )
+                        and not sl.wrecked
+                    ):
+                        sl.state = SailState.FURLED
+                _belay_held_work(ship)
+                self.finish()
+
+    def remaining_s(self) -> float:
+        return (
+            max(0.0, self.timing_value("furl_s", 600.0) - self.phase_t)
+            if self.phase == "furl"
+            else 600.0
+        )
+
+
+def _is_upper_square(ship: Ship, sail: Any) -> bool:
+    """A square sail above the topsails: on a topgallant or royal yard."""
+    if sail.cls != "square":
+        return False
+    yard = ship.yard_of(sail)
+    parent = ship.parent_of(yard) if yard is not None else None
+    return parent is not None and parent.cls in ("topgallant_mast", "royal_mast")
+
+
+class LetGoAnchorScript(_AnchorScript):
+    """Let go an anchor where she is (data/evolutions/let_go_anchor.yaml)."""
+
+    def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
+        super().__init__(ship, params, timing)
+        self.target = 0.0
+
+    def check(self, words: dict[str, Any]) -> str | None:
+        if (why := self._no_tackle()) is not None:
+            return why
+        if self.ship.extra.get("aground"):
+            return "she is aground"
+        self.anchor = self._named(self.params.get("anchor"))
+        if self.anchor is None:
+            return f"no anchor aboard answers to '{self.params.get('anchor')}'"
+        from freesail.ship.parts import AnchorState
+
+        if self.anchor.state is AnchorState.DOWN:
+            return f"{self.anchor.name} is down already"
+        if self.anchor.state is AnchorState.LOST:
+            return f"{self.anchor.name} is lost"
+        if self.anchor.state not in (AnchorState.STOWED, AnchorState.READY):
+            return f"{self.anchor.name} is {self.anchor.state.value}"
+        depth = _water_depth(self.ship)
+        if depth is None:
+            return "no bottom here to anchor in"
+        if depth > units.fathoms_to_m(self.anchor.cable_fathoms) / 3.0:
+            return f"no anchoring ground here: {_depth_words(depth)}"
+        return None
+
+    def begin(self, words: dict[str, Any]) -> None:
+        self.phase = "stand_clear"
+
+    def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        self.t += dt
+        self.wind = wind
+        if self.phase == "stand_clear":
+            if self.t >= self.timing_value("stand_clear_s", 15.0) * factor:
+                depth = _water_depth(self.ship)
+                if depth is None:
+                    self.fail("no bottom here to anchor in")
+                    return
+                _let_go(self.ship, self.anchor, depth)
+                self.target = _scope_wanted(
+                    self.ship, self.anchor, depth, self.params.get("fathoms")
+                )
+                self.phase = "veer"
+            return
+        if self._veer(dt, factor, self.target, "veer_fathoms_per_s"):
+            self.finish()
+
+    def remaining_s(self) -> float:
+        if self.anchor is None:
+            return 60.0
+        left = max(0.0, self.target - self.anchor.scope_m)
+        return units.m_to_fathoms(left) / max(self.timing_value("veer_fathoms_per_s", 1.0), 0.01)
+
+
+class VeerCableScript(_AnchorScript):
+    """Veer cable on the anchor she rides by (data/evolutions/veer_cable.yaml)."""
+
+    def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
+        super().__init__(ship, params, timing)
+        self.target = 0.0
+
+    def check(self, words: dict[str, Any]) -> str | None:
+        if (why := self._no_tackle()) is not None:
+            return why
+        self.anchor = self.tackle.riding_by()
+        if self.anchor is None:
+            return "no anchor is down to veer on"
+        whole = units.fathoms_to_m(self.anchor.cable_fathoms)
+        fathoms = self.params.get("fathoms")
+        if fathoms:
+            wanted = units.fathoms_to_m(float(fathoms))
+            self.target = wanted if self.params.get("to") else self.anchor.scope_m + wanted
+        else:
+            self.target = self.anchor.scope_m * 4.0 / 3.0
+        if self.target <= self.anchor.scope_m + 1e-6:
+            return f"{self.anchor.name} has {_fathoms_words(self.anchor.scope_fathoms)} out already"
+        if self.anchor.scope_m >= whole - 1e-6:
+            whole_words = _fathoms_words(self.anchor.cable_fathoms)
+            return f"the whole cable is out on {self.anchor.name}, {whole_words}"
+        self.target = min(self.target, whole)
+        return None
+
+    def begin(self, words: dict[str, Any]) -> None:
+        self.phase = "veer"
+
+    def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        self.t += dt
+        self.wind = wind
+        if self._veer(dt, factor, self.target, "veer_fathoms_per_s"):
+            self.finish()
+
+    def remaining_s(self) -> float:
+        if self.anchor is None:
+            return 60.0
+        left = max(0.0, self.target - self.anchor.scope_m)
+        return units.m_to_fathoms(left) / max(self.timing_value("veer_fathoms_per_s", 0.5), 0.01)
+
+
+class HeaveShortScript(_AnchorScript):
+    """Heave in to a short stay (data/evolutions/heave_short.yaml)."""
+
+    def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
+        super().__init__(ship, params, timing)
+        self.target = 0.0
+
+    def check(self, words: dict[str, Any]) -> str | None:
+        if (why := self._no_tackle()) is not None:
+            return why
+        self.anchor = self.tackle.riding_by()
+        if self.anchor is None:
+            return "no anchor is down"
+        per = self.timing_value("short_stay_per_depth", 1.5)
+        self.target = max(self.anchor.depth_m * per, self.anchor.depth_m)
+        if self.anchor.scope_m <= self.target + 1e-6:
+            return f"she is hove short already, {_fathoms_words(self.anchor.scope_fathoms)} out"
+        return None
+
+    def begin(self, words: dict[str, Any]) -> None:
+        self.phase = "rig_capstan"
+        self.anchor.heaving = True
+
+    def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        self.t += dt
+        self.wind = wind
+        if self.phase == "rig_capstan":
+            if self.t >= self.timing_value("rig_capstan_s", 180.0) * factor:
+                self.phase = "heave"
+                self.note("The messenger passed, the bars shipped and swiftered; heave round!")
+            return
+        if self._heave(dt, factor, self.target, "heave_fathoms_per_s"):
+            self.anchor.heaving = False
+            self.finish()
+
+    def remaining_s(self) -> float:
+        if self.anchor is None:
+            return 60.0
+        left = max(0.0, self.anchor.scope_m - self.target)
+        return units.m_to_fathoms(left) / max(self.timing_value("heave_fathoms_per_s", 0.1), 0.01)
+
+
+class WeighAnchorScript(_AnchorScript):
+    """Weigh: heave in, break the anchor out, hove up to the bows, cat and fish
+    (data/evolutions/weigh_anchor.yaml)."""
+
+    def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
+        super().__init__(ship, params, timing)
+        self.phase_t = 0.0
+        self.hoist_s = 0.0
+
+    def check(self, words: dict[str, Any]) -> str | None:
+        if (why := self._no_tackle()) is not None:
+            return why
+        self.anchor = self.tackle.riding_by()
+        if self.anchor is None:
+            return "no anchor is down"
+        if self.ship.extra.get("aground"):
+            return "she is aground"
+        return None
+
+    def begin(self, words: dict[str, Any]) -> None:
+        per = self.timing_value("short_stay_per_depth", 1.5)
+        short = max(self.anchor.depth_m * per, self.anchor.depth_m)
+        self.phase = "rig_capstan" if self.anchor.scope_m > short + 1e-6 else "heave"
+        self.phase_t = 0.0
+        self.anchor.heaving = True
+
+    def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        from freesail.ship.parts import AnchorState
+
+        self.t += dt
+        self.phase_t += dt
+        self.wind = wind
+        ship = self.ship
+        if self.phase == "rig_capstan":
+            if self.phase_t >= self.timing_value("rig_capstan_s", 180.0) * factor:
+                self.phase = "heave"
+                self.phase_t = 0.0
+                self.note("The messenger passed, the bars shipped and swiftered; heave round!")
+            return
+        if self.phase == "heave":
+            up_and_down = max(self.anchor.depth_m, 1.0)
+            if self._heave(dt, factor, up_and_down, "heave_fathoms_per_s"):
+                self.phase = "break_out"
+                self.phase_t = 0.0
+                self.note("The cable is up and down.")
+            return
+        if self.phase == "break_out":
+            if self.phase_t >= self.timing_value("break_out_s", 60.0) * factor:
+                self.anchor.state = AnchorState.AWEIGH
+                self.anchor.heaving = False
+                self.anchor.taut = False
+                self.anchor.dragging = False
+                self.anchor.cable_load_kn = 0.0
+                self.anchor.holding_kn = 0.0
+                self.phase = "hoist"
+                self.phase_t = 0.0
+                self.hoist_s = units.m_to_fathoms(self.anchor.depth_m) / max(
+                    self.timing_value("hoist_fathoms_per_s", 0.2), 0.01
+                )
+                ship.note(
+                    "notable",
+                    "ship.aweigh",
+                    f"{_cap(self.anchor.name)} is aweigh.",
+                    ship.name,
+                    {"anchor": self.anchor.to_dict()},
+                )
+            return
+        if self.phase == "hoist":
+            if self.phase_t >= self.hoist_s * factor:
+                self.anchor.scope_m = 0.0
+                self.anchor.ground_x = self.anchor.ground_y = None
+                self.phase = "cat_and_fish"
+                self.phase_t = 0.0
+                self.note(
+                    f"{_cap(self.anchor.name)} up to the bows; avast heaving, pawl the capstan. "
+                    f"Hook the cat."
+                )
+            return
+        if self.phase == "cat_and_fish":
+            if self.phase_t >= self.timing_value("cat_and_fish_s", 300.0) * factor:
+                self.anchor.state = AnchorState.STOWED
+                self.finish()
+
+    def remaining_s(self) -> float:
+        if self.anchor is None:
+            return 60.0
+        heave = units.m_to_fathoms(max(0.0, self.anchor.scope_m - self.anchor.depth_m)) / max(
+            self.timing_value("heave_fathoms_per_s", 0.1), 0.01
+        )
+        return (
+            heave
+            + self.timing_value("break_out_s", 60.0)
+            + self.timing_value("cat_and_fish_s", 300.0)
+        )
+
+
+class CatAndFishScript(_AnchorScript):
+    """Cat and fish an anchor left aweigh (data/evolutions/cat_and_fish_anchor.yaml)."""
+
+    def check(self, words: dict[str, Any]) -> str | None:
+        from freesail.ship.parts import AnchorState
+
+        if (why := self._no_tackle()) is not None:
+            return why
+        named = self.params.get("anchor")
+        hanging = [
+            a for a in self.tackle.anchors if a.state in (AnchorState.AWEIGH, AnchorState.CATTED)
+        ]
+        self.anchor = self._named(named) if named else (hanging[0] if hanging else None)
+        if self.anchor is None:
+            return "no anchor is aweigh to cat and fish"
+        if self.anchor.state is AnchorState.STOWED:
+            return f"{self.anchor.name} is catted and fished already"
+        if self.anchor.state not in (AnchorState.AWEIGH, AnchorState.CATTED):
+            return f"{self.anchor.name} is {self.anchor.state.value}"
+        return None
+
+    def begin(self, words: dict[str, Any]) -> None:
+        from freesail.ship.parts import AnchorState
+
+        self.phase = "fish" if self.anchor.state is AnchorState.CATTED else "cat"
+
+    def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        from freesail.ship.parts import AnchorState
+
+        self.t += dt
+        self.wind = wind
+        if self.phase == "cat":
+            if self.t >= self.timing_value("cat_s", 150.0) * factor:
+                self.anchor.state = AnchorState.CATTED
+                self.phase = "fish"
+                self.note(f"Hooked the cat; {self.anchor.name} up to the cat-head.")
+            return
+        total = self.timing_value("cat_s", 150.0) + self.timing_value("fish_s", 150.0)
+        if self.t >= total * factor:
+            self.anchor.state = AnchorState.STOWED
+            self.finish()
+
+    def remaining_s(self) -> float:
+        return max(
+            0.0, self.timing_value("cat_s", 150.0) + self.timing_value("fish_s", 150.0) - self.t
+        )
+
+
+class BackAnchorScript(_AnchorScript):
+    """Back the riding anchor with the stream (data/evolutions/back_anchor.yaml)."""
+
+    def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
+        super().__init__(ship, params, timing)
+        self.stream: Any = None
+
+    def check(self, words: dict[str, Any]) -> str | None:
+        from freesail.ship.parts import AnchorState
+
+        if (why := self._no_tackle()) is not None:
+            return why
+        self.anchor = self.tackle.riding_by()
+        if self.anchor is None:
+            return "no anchor is down to back"
+        self.stream = next((a for a in self.tackle.anchors if a.kind == "stream"), None)
+        if self.stream is None:
+            return "she carries no stream anchor"
+        if self.stream.state is not AnchorState.STOWED:
+            return f"the stream anchor is {self.stream.state.value}"
+        return None
+
+    def begin(self, words: dict[str, Any]) -> None:
+        self.phase = "shackle"
+
+    def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        from freesail.ship.parts import AnchorState
+
+        self.t += dt
+        self.wind = wind
+        if self.t >= self.timing_value("shackle_s", 240.0) * factor:
+            # the stream goes down on the riding cable's line and holds with the bower
+            self.stream.state = AnchorState.DOWN
+            self.stream.ground_x, self.stream.ground_y = self.anchor.ground_x, self.anchor.ground_y
+            self.stream.depth_m = self.anchor.depth_m
+            self.stream.scope_m = self.anchor.scope_m
+            self.stream.bottom = self.anchor.bottom
+            self.finish()
+
+    def remaining_s(self) -> float:
+        return max(0.0, self.timing_value("shackle_s", 240.0) - self.t)
+
+
 SCRIPTS: dict[str, type[Script]] = {
     "tack": TackScript,
     "trim_sheet": TrimSheetScript,
@@ -3810,4 +4485,12 @@ SCRIPTS: dict[str, type[Script]] = {
     "lie_a_try": LieATryScript,
     "scud": ScudScript,
     "back_and_fill": BackAndFillScript,
+    # the ground tackle (package 34)
+    "come_to_anchor": ComeToAnchorScript,
+    "let_go_anchor": LetGoAnchorScript,
+    "veer_cable": VeerCableScript,
+    "heave_short": HeaveShortScript,
+    "weigh_anchor": WeighAnchorScript,
+    "cat_and_fish": CatAndFishScript,
+    "back_anchor": BackAnchorScript,
 }

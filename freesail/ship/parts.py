@@ -27,7 +27,7 @@ from enum import StrEnum
 from typing import Any
 
 from freesail import units
-from freesail.ship.schema import HullSpec, LineSpec, SailSpec, SparSpec
+from freesail.ship.schema import GroundTackleSpec, HullSpec, LineSpec, SailSpec, SparSpec
 
 # ---------------------------------------------------------------------------
 # Canvas (spec 3b §6.1 and §6.2)
@@ -806,6 +806,211 @@ def cordage(ship: Any) -> Cordage:
         store = Cordage(float(given) if ok else DEFAULT_CORDAGE_FATHOMS)
         ship.extra["cordage"] = store
     ship.extra["spare_cordage_fathoms"] = store.fathoms
+    return store
+
+
+# ---------------------------------------------------------------------------
+# The ground tackle: the anchors and their cables (package 34, spec M5 §18)
+# ---------------------------------------------------------------------------
+
+# "Every ship has, or ought to have, three principal anchors, with a cable to each, viz.
+# the sheet, the best bower and small bower, so called from their usual situation on the
+# ship's bows. There are besides smaller anchors, for removing a ship from place to place
+# in a harbour or river ... the stream-anchor, the kedge and grappling" (Falconer 1780,
+# ANCHOR). "In the Royal Navy, the two Bower, and Sheet Anchors are of the same size, as
+# are their Cables" (Lever 1808, 'Anchors', p. 67). The anchors are parts the ship file
+# lists (`ground_tackle:`, written by tools/gen_ships.py by the ship's size), each with
+# the cable bent to it; the state is kept here, in `ship.extra["ground_tackle"]`, and the
+# physics of the cable's pull, the holding and the dragging is `physics/anchor.py`.
+
+
+class AnchorState(StrEnum):
+    STOWED = "at the bows"  # catted and fished, the cable bent (Lever: the anchors "hung")
+    READY = "a-cockbill"  # "ready to be sunk from the bow at a moment's warning" (Falconer)
+    DOWN = "down"  # let go, the ship riding by it or dragging it
+    AWEIGH = "aweigh"  # broken out of the ground and hove up to the bows, not yet catted
+    CATTED = "catted"  # hooked to the cat and hove up to the cat-head, not yet fished
+    LOST = "lost"  # the cable parted or cut: the anchor on the bottom with its buoy
+
+
+# The kinds in the log's words, for a line that names one by its kind.
+ANCHOR_KIND_WORDS: dict[str, str] = {
+    "bower": "bower",
+    "sheet": "sheet anchor",
+    "stream": "stream anchor",
+    "kedge": "kedge",
+}
+
+
+@dataclass
+class Anchor:
+    """One anchor with its cable: the file's figures, and the state."""
+
+    id: str
+    kind: str
+    name: str  # "the best bower"
+    weight_kg: float
+    cable_fathoms: float  # the cable bent to it, whole
+    cable_in: float  # the cable's circumference, inches
+    cable_kn: float  # the cable's rating, the working load (parts at 1.5 of it, spec §7.5)
+    state: AnchorState = AnchorState.STOWED
+    scope_m: float = 0.0  # the cable veered, metres, while down
+    ground_x: float | None = None  # where it lies, metres east and north of the start
+    ground_y: float | None = None
+    depth_m: float = 0.0  # the water over it now (the chart's depth and the tide)
+    bottom: str = ""  # the ground it lies in, from the chart's bottom note
+    cable_condition: float = 100.0  # as a line's (spec §7.5): worn by the strain
+    cable_load_kn: float = 0.0  # the tension now, set by the physics each tick
+    holding_kn: float = 0.0  # what it holds now, set by the physics
+    dragging: bool = False  # it is dragging: come home for DRAG_SAY_S together (physics/anchor)
+    came_home: bool = False  # it moved this tick (set by the physics each substep it does)
+    drag_s: float = 0.0  # the seconds it has been coming home
+    hold_s: float = 0.0  # the seconds it has held since it last came home
+    taut: bool = False  # the cable bar-taut (she is riding by it), else slack
+    heaving: bool = False  # the cable being hove in at the capstan (weighing, heaving short)
+
+    @property
+    def weight_kn(self) -> float:
+        return self.weight_kg * units.G / 1000.0
+
+    @property
+    def scope_fathoms(self) -> float:
+        return units.m_to_fathoms(self.scope_m)
+
+    @property
+    def cable_strain_ratio(self) -> float:
+        return self.cable_load_kn / self.cable_kn if self.cable_kn > 0 else 0.0
+
+    @property
+    def down(self) -> bool:
+        return self.state is AnchorState.DOWN
+
+    @property
+    def kind_words(self) -> str:
+        return ANCHOR_KIND_WORDS.get(self.kind, self.kind)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "kind": self.kind,
+            "name": self.name,
+            "weight_kg": self.weight_kg,
+            "state": self.state.value,
+            "scope_fathoms": round(self.scope_fathoms, 1),
+            "cable_fathoms": self.cable_fathoms,
+            "cable_in": self.cable_in,
+            "cable_kn": self.cable_kn,
+            "cable_load_kn": round(self.cable_load_kn, 1),
+            "cable_condition": round(self.cable_condition, 1),
+            "holding_kn": round(self.holding_kn, 1),
+            "depth_m": round(self.depth_m, 2),
+            "bottom": self.bottom,
+            "dragging": self.dragging,
+            "taut": self.taut,
+        }
+
+
+@dataclass
+class GroundTackle:
+    """The ship's anchors, in the file's order (the best bower first), and whether the
+    cable is chain."""
+
+    anchors: list[Anchor]
+    chain: bool = False
+
+    @classmethod
+    def from_spec(cls, spec: GroundTackleSpec) -> GroundTackle:
+        return cls(
+            anchors=[
+                Anchor(a.id, a.kind, a.name, a.weight_kg, a.cable_fathoms, a.cable_in, a.cable_kn)
+                for a in spec.anchors
+            ],
+            chain=spec.chain,
+        )
+
+    def get(self, anchor_id: str) -> Anchor | None:
+        for a in self.anchors:
+            if a.id == anchor_id:
+                return a
+        return None
+
+    def by_words(self, words: str | None) -> Anchor | None:
+        """The anchor the words name: 'the best bower', 'small bower', 'the sheet', 'the
+        stream', 'the kedge', 'the second anchor' (the bower not yet down), or 'the
+        anchor' (the one she rides by if one is down, else the best bower); None when no
+        anchor answers to them."""
+        cleaned = "".join(c if c.isalnum() or c.isspace() else " " for c in (words or "").lower())
+        key = " ".join(w for w in cleaned.split() if w not in ("the", "anchor", "anchors", "cable"))
+        bowers = self.bowers()
+        if key in ("", "best", "an", "a"):
+            riding = self.riding_by()
+            if riding is not None:
+                return riding
+            return bowers[0] if bowers else (self.anchors[0] if self.anchors else None)
+        if key in ("second", "other", "lee", "weather", "second bower"):
+            for a in bowers:
+                if a.state is not AnchorState.DOWN:
+                    return a
+            return None
+        for a in self.anchors:
+            name = a.name.lower().replace("the ", "").replace("anchor", "").strip()
+            if key in (a.id.replace("_", " "), name, a.kind, f"{a.kind} anchor", a.id):
+                return a
+        return None
+
+    def bowers(self) -> list[Anchor]:
+        return [a for a in self.anchors if a.kind == "bower"]
+
+    def down(self) -> list[Anchor]:
+        return [a for a in self.anchors if a.state is AnchorState.DOWN]
+
+    def riding_by(self) -> Anchor | None:
+        """The anchor she rides by: the one down with the most cable out."""
+        down = self.down()
+        if not down:
+            return None
+        return max(down, key=lambda a: a.scope_m)
+
+    def at_anchor(self) -> bool:
+        return bool(self.down())
+
+    @property
+    def cable_words(self) -> str:
+        return "chain" if self.chain else "cable"
+
+    def describe(self) -> list[str]:
+        """The `the ground tackle` query: every anchor, its weight, its cable, its state."""
+        out = []
+        for a in self.anchors:
+            cwt = a.weight_kg / 50.802
+            cable = f"{a.cable_fathoms:g} fathoms of {a.cable_in:g}-inch {self.cable_words}"
+            state = a.state.value
+            if a.state is AnchorState.DOWN:
+                state = f"down, {a.scope_fathoms:.0f} fathoms out"
+            out.append(f"{a.name[:1].upper()}{a.name[1:]}, {cwt:.0f} cwt, {cable}: {state}.")
+        return out
+
+    def muster_line(self) -> str:
+        names = [a.name.replace("the ", "") for a in self.anchors]
+        return f"Ground tackle: {len(self.anchors)} anchors, the {', the '.join(names)}."
+
+
+def ground_tackle(ship: Any) -> GroundTackle | None:
+    """The ship's anchors and cables, kept in `ship.extra["ground_tackle"]`: made on first
+    use from the ship file's `ground_tackle:` section; None for a ship whose file lists
+    none (the anchor orders are then refused in words). Like the sail room, a function
+    of the ship file and the orders given, so a replay rebuilds it."""
+    extra = getattr(ship, "extra", None)
+    if extra is None:
+        return None
+    store = extra.get("ground_tackle")
+    if isinstance(store, GroundTackle):
+        return store
+    spec = getattr(getattr(ship, "spec", None), "ground_tackle", None)
+    if spec is None:
+        return None
+    store = GroundTackle.from_spec(spec)
+    extra["ground_tackle"] = store
     return store
 
 

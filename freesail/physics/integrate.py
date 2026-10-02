@@ -11,6 +11,16 @@ what keeps the arithmetic from running away). Heel relaxes toward its balance.
 After the four substeps the readings a sailor sees are refreshed (speed
 through the water, leeway, weather helm) and the log is told of anything
 worth a line: settled on the ordered heading, taken aback, leeway changed.
+
+The water moves too (package 34, spec M5 §16): `ship.extra["water"]` is the tide's
+stream as a velocity over the ground (metres a second east and north), which the World
+sets once a minute. The hull's forces are what they always were, functions of her motion
+*through the water* (`u`, `v`); her position over the ground advances by that motion plus
+the water's, and the apparent wind is the true wind less her motion over the ground, since
+the air is the ground's and not the water's. With no stream every number is the same to
+the bit. At anchor the cable pulls at the hawse (`physics/anchor.py`), and aground
+(`ship.extra["aground"]`, the World's grounding, spec M5 §18) the ground holds her: her
+speeds are nothing and she does not move until the tide lifts her.
 """
 
 from __future__ import annotations
@@ -18,6 +28,7 @@ from __future__ import annotations
 import math
 
 from freesail import units
+from freesail.physics import anchor as ground_tackle
 from freesail.physics import hull as hp
 from freesail.physics.sails import compute_sail_forces, hold_rig, release_rig
 from freesail.physics.strain import apply_strain
@@ -26,6 +37,15 @@ from freesail.ship.graph import Ship
 from freesail.ship.parts import HelmMode
 
 SUBSTEPS = 4  # per tick (spec §3.1)
+
+
+def water_velocity(ship: Ship) -> tuple[float, float]:
+    """The water's velocity over the ground at the ship, metres a second east and north
+    (the tide's stream, `world/tide.py`); nothing when the World keeps no tide."""
+    water = ship.extra.get("water")
+    if not water:
+        return 0.0, 0.0
+    return float(water[0]), float(water[1])
 
 
 def step(ship: Ship, dt: float, wind: Wind) -> None:
@@ -37,13 +57,19 @@ def step(ship: Ship, dt: float, wind: Wind) -> None:
     # sea, a factor read once a tick; 1.0 without a sea
     motion = ship.extra.get("motion")
     st.sea_drag = motion.resistance_factor if motion is not None else 1.0
+    # the tide's stream (package 34), read once a tick; the ground tackle, if any is down
+    st.water = water_velocity(ship)
+    st.at_anchor = bool(ship.extra.get("ground_tackle")) and any(
+        a.down for a in ship.extra["ground_tackle"].anchors
+    )
+    st.aground = bool(ship.extra.get("aground"))
     # the rig is read once for the four substeps (package 29's profile; `sails._Rig` says
     # why nothing it holds can change between them)
     hold_rig(ship)
     try:
         for _ in range(SUBSTEPS):
             forces = compute_sail_forces(ship, wind, h)
-            st.awa, st.aws = hp.apparent_wind(ship, wind)
+            st.awa, st.aws = hp.apparent_wind(ship, wind, st.water)
             _substep(
                 ship,
                 st,
@@ -57,6 +83,8 @@ def step(ship: Ship, dt: float, wind: Wind) -> None:
     finally:
         release_rig(ship)
     apply_strain(ship, dt)  # package 9: wear and carrying away, once per tick (spec §7.5)
+    if st.at_anchor:
+        ground_tackle.judge_cables(ship, dt)  # the cable against its rating (package 34)
     _update_readings(ship)
     _log_notes(ship, st, dt)
 
@@ -88,6 +116,13 @@ def _substep(
     drag_v = _rate(hp.sway_damping(hull, d.u, d.v), d.v)
     drag_r = _rate(hp.yaw_damping(hull, d.u, d.r), d.r)
 
+    # the cable's pull at the hawse (package 34), when an anchor is down
+    if st.at_anchor:
+        cable_fwd, cable_stb, cable_yaw = ground_tackle.cable_forces(ship, st.water, h)
+        thrust_n += cable_fwd
+        side_n += cable_stb
+        yaw_moment_nm += cable_yaw
+
     # Body-axis kinematics: as the bow swings, the water the ship is moving
     # through does not swing with it (the m v r and -m u r terms, with the
     # ship's own mass m, not the water she carries along).
@@ -100,12 +135,26 @@ def _substep(
     v_limit = hp.SWAY_CLAMP_SLOPE * abs(u_new) + hp.SWAY_CLAMP_OFFSET
     v_new = max(-v_limit, min(v_limit, v_new))
 
+    if st.aground:
+        # the ground holds her (package 34, spec M5 §18): no way through the water but
+        # the stream's past her, no swing, until the tide floats her off
+        wx, wy = st.water
+        ex, ey = units.heading_vector(d.heading)
+        u_new, v_new, r_new = -(wx * ex + wy * ey), -(wx * ey - wy * ex), 0.0
+
     d.u, d.v, d.r = u_new, v_new, r_new
 
     # -- position and heading from the new speeds ------------------------------
     ex, ey = units.heading_vector(d.heading)
-    d.x += (d.u * ex + d.v * ey) * h
-    d.y += (d.u * ey - d.v * ex) * h
+    if st.aground:
+        pass  # held fast
+    elif st.water != (0.0, 0.0):
+        # over the ground: her way through the water and the water's own (package 34)
+        d.x += (d.u * ex + d.v * ey + st.water[0]) * h
+        d.y += (d.u * ey - d.v * ex + st.water[1]) * h
+    else:
+        d.x += (d.u * ex + d.v * ey) * h
+        d.y += (d.u * ey - d.v * ex) * h
     d.heading = units.wrap_2pi(d.heading + d.r * h)
 
     # -- heel settles toward its balance -------------------------------------------
@@ -227,7 +276,8 @@ def _log_notes(ship: Ship, st: hp.HullState, dt: float) -> None:
     # sternway, leeway is not a reading (playtest 1: "Leeway 145°" from a standing start)
     st.seconds_since_leeway_note += dt
     if (
-        d.u >= units.knots_to_ms(hp.WAY_ON_KN)
+        not (st.at_anchor or st.aground)  # the stream past her at anchor is not leeway
+        and d.u >= units.knots_to_ms(hp.WAY_ON_KN)
         and abs(d.leeway - st.last_noted_leeway) > hp.LEEWAY_NOTE_THRESHOLD
         and st.seconds_since_leeway_note >= hp.LEEWAY_NOTE_INTERVAL
     ):

@@ -126,6 +126,11 @@ class HullState:
     awa: float = 0.0  # deck-level apparent wind angle computed here, for the helm
     aws: float = 0.0  # deck-level apparent wind speed computed here
     sea_drag: float = 1.0  # the head sea's factor on the resistance this tick (spec M5 §4)
+    # the tide's stream this tick, metres a second east and north (package 34), the
+    # anchor down, and the ground holding her (`physics/integrate.py`)
+    water: tuple[float, float] = (0.0, 0.0)
+    at_anchor: bool = False
+    aground: bool = False
     extra: dict = field(default_factory=dict)
 
 
@@ -272,13 +277,20 @@ def relax_heel(heel: float, target: float, dt: float) -> float:
 # ---------------------------------------------------------------------------
 
 
-def apparent_wind(ship: Ship, wind: Wind) -> tuple[float, float]:
-    """Apparent wind angle (radians, + on the starboard bow) and speed (m/s) on deck."""
+def apparent_wind(
+    ship: Ship, wind: Wind, water: tuple[float, float] = (0.0, 0.0)
+) -> tuple[float, float]:
+    """Apparent wind angle (radians, + on the starboard bow) and speed (m/s) on deck:
+    the true wind less her motion over the ground, which is her way through the water
+    and the water's own (`water`, the tide's stream, package 34)."""
     d = ship.dyn
     wx, wy = wind.vector_at_height(ship.hull.spec.deck_height_m)
     ex, ey = units.heading_vector(d.heading)
     sx = d.u * ex + d.v * ey
     sy = d.u * ey - d.v * ex
+    if water != (0.0, 0.0):
+        sx += water[0]
+        sy += water[1]
     ax, ay = wx - sx, wy - sy
     speed = math.hypot(ax, ay)
     if speed < 1e-9:

@@ -668,7 +668,10 @@ in (then 5b), double altitudes, the kedge, interiors beyond a name and a descrip
    table (W) are quoted only once verified.
 3. The chart study's unverified list (C §7): the Défense library's records, SHOM's two
    licence statements, the UKHO bathymetry licence, the datum offsets at the four ports,
-   the lights' dates.
+   the lights' dates. Package 34 (2026-10-02) verified the tide's constituents against
+   TICON's own file and the French ports' datum offsets from the RAM; Newlyn's and
+   Devonport's are the study's UKHO figures, and Weymouth's, Dover's and St Helier's remain
+   judgement (`data/tides/constituents.yaml` says which).
 4. The lunar's day count per lunation and the 1805 clearing time (N) are the study's
    estimates; the game's constants say so.
 5. Whether the schooner's file offers `shift the mainsail for the storm trysail`

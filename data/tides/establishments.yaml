@@ -1,0 +1,77 @@
+# FreeSail: the captain's tide, the establishment tables of his epitome (spec M5 §16; the
+# study docs/design/Tides1805.md §2 and §5 point 2; package 34).
+#
+# "The time of high water at full and change", the hour of high water on the day of new
+# or full moon, by port: what a captain of 1805 had in his epitome, and all he had. The
+# master works the day's high water from it by Moore's rule (Moore 1799, the catechism:
+# "I multiply the moon's age by 48, and divide the product by 60, the quotient will be the
+# hours, and the remainder the minutes when she is on the meridian past noon ... being
+# added to the time of high water on the change and full days, at any place, will ...
+# give the time of high water there"), the moon's age from his almanac. It is wrong by up
+# to an hour, as Bowditch 1802 admits ("will sometimes differ an hour from the truth,
+# owing to the neglect of the disturbing force of the sun"), and by more when the table is
+# an old one. The world's tide (data/tides/constituents.yaml) is computed, and never read
+# by the master; the difference is the play.
+#
+# Two tables, a better and a poorer (T §5: "a poorer ship has a poorer table"), chosen by
+# the scenario (`epitome:`) or, by default, by the ship: a ship of war carries Norie's,
+# the rest Moore's.
+#
+# `norie`: the hours and minutes of Dessiou's Plymouth tide tables and Sailing Directions
+# and of Daussy in the Connaissance des Temps for 1834, as Whewell 1833 quotes them
+# ("Essay towards a first approximation to a map of cotidal lines", Phil. Trans.; the
+# study read it at darwin-online 1833_Whewell_A839, T §2), standing for Norie's Table XLI
+# of 1803, whose Channel rows the study found illegible in the OCR (UNVERIFIED as
+# Norie's own figures: T §6; they are the period's figures as the study has them). The
+# spring rise, where the table gives one, in feet: Fowey's "Tides rise 15 feet at
+# springs. Neaps 7 or 8" from Mackenzie junior's plan of 1774 (RMG G223:2/42, read from
+# the image, Charts.md) stands for Falmouth and Plymouth (judgement: the same coast);
+# the French ports' from the RAM's modern mean springs (T §1), judgement for a period
+# table.
+#
+# `moore`: Moore's New Practical Navigator (1799), the table by the moon's bearing at high
+# water, a point of the compass to every 45 minutes ("S. by W." 12h 45m, "S.S.W." 1h 30m,
+# ... "W." 6h 00m), in the manner of the seventeenth-century pilots; the study could pin
+# Brest with the 3h 45m places, Ushant and Scilly at 4h 30m, Plymouth, Ramhead and Torbay
+# at 6h, and not Falmouth ("the OCR does not let me pin Falmouth's group with confidence",
+# T §2). The poorer table therefore has no Falmouth: the master takes the nearest place it
+# names and says so.
+
+tables:
+  norie:
+    title: "the epitome's table of high water at full and change (Norie 1803, Table XLI, the figures Dessiou's and Daussy's as Whewell 1833 quotes them)"
+    ports:
+      - {name: Scilly, lat_deg: 49.914, lon_deg: -6.317, hw_h: 4, hw_m: 10, note: "Dessiou; Lubbock 4h 30m"}
+      - {name: the Land's End, lat_deg: 50.066, lon_deg: -5.716, hw_h: 4, hw_m: 20}
+      - {name: Mount's Bay, lat_deg: 50.100, lon_deg: -5.530, hw_h: 4, hw_m: 30}
+      - {name: the Lizard, lat_deg: 49.959, lon_deg: -5.207, hw_h: 4, hw_m: 30}
+      - {name: Falmouth, lat_deg: 50.153, lon_deg: -5.055, hw_h: 5, hw_m: 15, spring_rise_ft: 15, note: "Falmouth Harbour, Dessiou; the rise Fowey's of 1774"}
+      - {name: Fowey, lat_deg: 50.333, lon_deg: -4.634, hw_h: 5, hw_m: 15, spring_rise_ft: 15}
+      - {name: the Eddystone, lat_deg: 50.183, lon_deg: -4.267, hw_h: 5, hw_m: 15}
+      - {name: Plymouth, lat_deg: 50.368, lon_deg: -4.185, hw_h: 5, hw_m: 33, spring_rise_ft: 16, note: "the mean establishment"}
+      - {name: Dartmouth, lat_deg: 50.350, lon_deg: -3.567, hw_h: 6, hw_m: 0}
+      - {name: Torbay, lat_deg: 50.450, lon_deg: -3.500, hw_h: 6, hw_m: 0}
+      - {name: Portland, lat_deg: 50.515, lon_deg: -2.457, hw_h: 5, hw_m: 30, note: "Portland Bill"}
+      - {name: Dover, lat_deg: 51.117, lon_deg: 1.318, hw_h: 10, hw_m: 50}
+      - {name: Ushant, lat_deg: 48.459, lon_deg: -5.054, hw_h: 3, hw_m: 47}
+      - {name: Brest, lat_deg: 48.383, lon_deg: -4.495, hw_h: 3, hw_m: 48, spring_rise_ft: 19}
+      - {name: Morlaix, lat_deg: 48.655, lon_deg: -3.872, hw_h: 5, hw_m: 15}
+      - {name: St Malo, lat_deg: 48.641, lon_deg: -2.028, hw_h: 6, hw_m: 0, spring_rise_ft: 35}
+      - {name: Jersey, lat_deg: 49.183, lon_deg: -2.117, hw_h: 6, hw_m: 10}
+      - {name: Guernsey, lat_deg: 49.455, lon_deg: -2.537, hw_h: 6, hw_m: 30}
+      - {name: Alderney, lat_deg: 49.717, lon_deg: -2.200, hw_h: 6, hw_m: 45}
+      - {name: Cherbourg, lat_deg: 49.651, lon_deg: -1.636, hw_h: 7, hw_m: 45, spring_rise_ft: 17}
+  moore:
+    title: "Moore's table of high water by the moon's bearing (Moore 1799), a point to every three quarters of an hour"
+    ports:
+      - {name: Brest, lat_deg: 48.383, lon_deg: -4.495, hw_h: 3, hw_m: 45, bearing: "SW by W"}
+      - {name: Ushant, lat_deg: 48.459, lon_deg: -5.054, hw_h: 4, hw_m: 30, bearing: WSW}
+      - {name: Scilly, lat_deg: 49.914, lon_deg: -6.317, hw_h: 4, hw_m: 30, bearing: WSW}
+      - {name: Plymouth, lat_deg: 50.368, lon_deg: -4.185, hw_h: 6, hw_m: 0, bearing: W}
+      - {name: Ramhead, lat_deg: 50.313, lon_deg: -4.225, hw_h: 6, hw_m: 0, bearing: W}
+      - {name: Torbay, lat_deg: 50.450, lon_deg: -3.500, hw_h: 6, hw_m: 0, bearing: W}
+
+# Moore's rule of 48 minutes a day: the moon's southing comes later each day by this
+# (Moore 1799, the catechism; Bowditch 1802 uses 49). The true mean is 50 minutes and
+# 28 seconds (24 h 50 m 28 s of lunar day), which is part of the hour the rule is out by.
+minutes_per_day_of_age: 48

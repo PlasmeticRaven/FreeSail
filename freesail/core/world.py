@@ -111,6 +111,12 @@ class Scenario:
     # or seconds a day, "forgotten": [ISO dates]}; None (the default, and every save from
     # before) is a ship without one, whose longitude is by account and by lunar.
     chronometer: dict[str, Any] | None = None
+    # The captain's epitome (package 34; spec M5 §16; `freesail.world.tide.Epitome`): the
+    # table of high water at full and change his tide is worked from, "norie" (the hours
+    # and minutes of the period's tables, a ship of war's) or "moore" (Moore 1799's points
+    # of the moon's bearing, the poorer table); None chooses by the ship (a ship of war
+    # carries Norie's, the rest Moore's). The world's tide is not a scenario's choice.
+    epitome: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
@@ -211,6 +217,22 @@ class World:
                     f"'{self.scenario.region}' ({self.chart.bounds_words()})."
                 )
             self.lookout = Lookout(self.chart)
+        # The tide (spec M5 §16, package 34; `freesail.world.tide`): the world's, wherever
+        # the world has a chart, evaluated once a minute at the ship (`_tick_tide`): the
+        # height under the lead and over the rocks that cover, the stream as the water's
+        # velocity in the physics. No reading gives it. The grounding (§18,
+        # `freesail.world.ground`) reads it every tick.
+        self.tide: Any = None
+        self.tide_state: Any = None
+        self.ground: Any = None
+        self._tide_was_flood: bool | None = None
+        self._dragging: set[str] = set()
+        if self.chart is not None:
+            from freesail.world.ground import Ground
+            from freesail.world.tide import load_tide
+
+            self.tide = _tide_table(load_tide)
+            self.ground = Ground(self)
         # The weather script (spec M4 §19): the base wind at every tick, from the scenario.
         self.weather: Any = None
         wind_params = WindParams.from_nautical(
@@ -349,6 +371,8 @@ class World:
             self.navigation = Navigation(self, self.rng.stream("reckoning"))
             if getattr(self.ship, "extra", None) is not None:
                 self.ship.extra["navigation"] = self.navigation
+        if self.tide is not None:
+            self._tick_tide()  # the tide at the start, before the first look
         # The readings (spec M4 §2): one view per tick and per order, read by the standing
         # orders, the snapshot and the agents alike.
         self._readings_key: tuple[int, int] | None = None
@@ -440,6 +464,100 @@ class World:
         (33's reckoning is the captain's account of it); None on the endless plane."""
         return self._position
 
+    @property
+    def tide_height_m(self) -> float:
+        """The tide's height above the chart's datum at the ship now (spec M5 §16): the
+        truth, under the lead and over the rocks; nothing where the world keeps no tide."""
+        return float(self.tide_state.height_m) if self.tide_state is not None else 0.0
+
+    @property
+    def at_anchor(self) -> bool:
+        tackle = (getattr(self.ship, "extra", None) or {}).get("ground_tackle")
+        return bool(tackle) and tackle.at_anchor()
+
+    def _tick_tide(self) -> None:
+        """Once a minute (package 34): the tide at the ship, the stream given to the
+        physics as the water's velocity, the water over her and over her anchors kept
+        up, and at anchor the turn of the tide and an anchor dragging said."""
+        pos = self._position
+        if pos is None or self.tide is None:
+            return
+        from freesail.world.sights import greenwich_time
+
+        state = self.tide.at(pos, greenwich_time(self))
+        self.tide_state = state
+        extra = getattr(self.ship, "extra", None)
+        if extra is None:
+            return
+        extra["water"] = (state.stream_east_ms, state.stream_north_ms)
+        extra["tide_state"] = state  # the scripts' riding words read it; never a reading
+        depth = self.chart.depth_at(pos) if self.chart is not None else None
+        extra["water_depth_m"] = None if depth is None else depth + state.height_m
+        extra["bottom"] = self.chart.bottom_near(pos) if self.chart is not None else ""
+        tackle = extra.get("ground_tackle")
+        if not tackle or not tackle.at_anchor():
+            self._tide_was_flood = None
+            self._dragging.clear()
+            return
+        for anchor in tackle.down():
+            if anchor.ground_x is None or anchor.ground_y is None or self.origin is None:
+                continue
+            at = self.origin.advanced(anchor.ground_x, anchor.ground_y)
+            d = self.chart.depth_at(at) if self.chart is not None else None
+            if d is not None:
+                anchor.depth_m = max(0.0, d + state.height_m)
+        # the turn of the tide, the ship's exposure of it: the cable slackens and she
+        # swings (Luce 1884 App. K; Lever 1808, 'Single Anchor')
+        flood = state.flood if not state.slack else None
+        if flood is not None and self._tide_was_flood is not None and flood != self._tide_was_flood:
+            from freesail.physics.anchor import riding_words
+
+            which = "the flood" if flood else "the ebb"
+            self.record(
+                Severity.NOTABLE,
+                "ship.swung",
+                f"The cable slack at the turn; she swings to {which}. "
+                f"{riding_words(self.ship, state, self.wind.direction_from)}",
+                data={"flood": flood} | state.to_dict(),
+            )
+        if flood is not None:
+            self._tide_was_flood = flood
+
+    def _tick_anchors(self) -> None:
+        """Every tick at anchor: an anchor beginning to drag is a notable line with Luce's
+        answers, and one holding again a routine line (package 34). The judgement of the
+        drag over time is the physics' (`physics.anchor.judge_cables`)."""
+        tackle = (getattr(self.ship, "extra", None) or {}).get("ground_tackle")
+        if not tackle:
+            return
+        for anchor in tackle.anchors:
+            if not anchor.down:
+                self._dragging.discard(anchor.id)
+                continue
+            if anchor.dragging and anchor.id not in self._dragging:
+                self._dragging.add(anchor.id)
+                second = tackle.by_words("the second anchor")
+                more = (
+                    f"; let go {second.name}, or back her with the stream"
+                    if second is not None
+                    else ""
+                )
+                self.record(
+                    Severity.NOTABLE,
+                    "anchor.dragging",
+                    f"{anchor.name[:1].upper()}{anchor.name[1:]} is dragging: veer more "
+                    f"cable{more}.",
+                    data=anchor.to_dict(),
+                )
+            elif not anchor.dragging and anchor.id in self._dragging:
+                self._dragging.discard(anchor.id)
+                self.record(
+                    Severity.ROUTINE,
+                    "anchor.holding",
+                    f"{anchor.name[:1].upper()}{anchor.name[1:]} holds again.",
+                    data=anchor.to_dict(),
+                )
+
     def _sun_now(self) -> Sun:
         """The sun at the ship's latitude now: the scenario's on the plane, hers with a
         position (the sun of spec M4 §5 "now reads the ship's", spec M5 §9)."""
@@ -471,13 +589,18 @@ class World:
         dx, dy = x - lx, y - ly
         current = self.scenario.current
         if current:
-            # the world's set (package 33a; package 34's tide takes this over): the stated
-            # current moves her over the ground and nothing of her motion through the water
+            # the world's set (package 33a): the scenario's stated current moves her over
+            # the ground and nothing of her motion through the water; the tide's stream
+            # (package 34) is the physics' business, a water velocity, and sets a point
+            # ship here as the stated current does
             kn = float(current.get("knots", 0.0))
             toward = math.radians(float(current.get("toward_deg", 0.0)))
             step = units.knots_to_ms(kn) * TICK_S
             dx += step * math.sin(toward)
             dy += step * math.cos(toward)
+        if self.tide_state is not None and getattr(self.ship, "dyn", None) is None:
+            dx += self.tide_state.stream_east_ms * TICK_S
+            dy += self.tide_state.stream_north_ms * TICK_S
         if dx != 0.0 or dy != 0.0:
             self._position = self._position.advanced(dx, dy)
             self._geo_last = (x, y)
@@ -501,26 +624,12 @@ class World:
         pos = self._position
         if pos is None:
             return
-        touched = self.chart.aground(
-            pos,
-            self.ship.heading,
-            _ship_length_m(self.ship),
-            _ship_draught_m(self.ship),
-            _ship_heel(self.ship),
-            tide_m=0.0,  # the tide of package 34 goes here
-        )
-        if touched is not None and not self._aground:
-            self._aground = True
-            self.record(
-                Severity.URGENT,
-                "ship.aground",
-                touched.words,
-                data=touched.to_dict()
-                | {"speed_kn": round(units.ms_to_knots(_ship_speed(self.ship)), 1)},
-            )
-        elif touched is None and self._aground:
-            self._aground = False
-            self.record(Severity.NOTABLE, "ship.afloat", "She is off, and afloat again.")
+        # the grounding and its consequences (spec M5 §18, package 34): the tide under
+        # the keel and the charted dangers by name
+        self.ground.tick()
+        self._aground = self.ground.aground
+        if self.at_anchor:
+            self._tick_anchors()
         if self.lookout is not None and self.clock.ship_time.second == 0:
             for severity, kind, text, data in self.lookout.look(self):
                 self.record(severity, kind, text, data=data)
@@ -850,6 +959,9 @@ class World:
             if self.clock.ship_time.second == 0:
                 self._tick_sea()
             self._tick_motion()
+        if self.tide is not None and self.clock.ship_time.second == 0:
+            # the tide once a minute (spec M5 §16), before the ship feels the stream
+            self._tick_tide()
         for note in self.ship.step(1.0, self.wind):
             if len(note) == 3:
                 self.record(*note)
@@ -930,6 +1042,12 @@ class World:
                 for ln in ship_lines
             ]
         daylight = str(self.readings["daylight"]).capitalize()  # through the registry
+        anchor_lines: list[str] = []
+        if self.at_anchor or self._aground:
+            # the ship riding, or aground (package 34), through the registry's words
+            anchor_lines.append(self.readings.words("anchor"))
+            if self.at_anchor:
+                anchor_lines.append(self.readings.words("cable"))
         return [
             self.clock.stamp(),
             f"Wind {self.wind.describe()}, "
@@ -938,6 +1056,7 @@ class World:
             *queries.weather_lines(self),
             *queries.lookout_lines(self),
             *queries.reckoning_lines(self),
+            *anchor_lines,
             *ship_lines,
             *queries.watch_lines(self),
         ]
@@ -965,6 +1084,18 @@ class World:
             "agents": [agent.save() for agent in self.agents.values()],
             "agent_journals": {name: j.save() for name, j in self.agent_journals.items()},
         }
+
+
+_TIDE: Any = None
+
+
+def _tide_table(loader: Any) -> Any:
+    """The tide's tables, read once and shared between Worlds (pure data; each World
+    keeps its own state)."""
+    global _TIDE
+    if _TIDE is None:
+        _TIDE = loader()
+    return _TIDE
 
 
 def _ship_length_m(ship: Any) -> float:

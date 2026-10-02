@@ -685,6 +685,11 @@ class _FlowField:
         psi = ship.dyn.heading
         self.sin_h, self.cos_h = math.sin(psi), math.cos(psi)
         self.u, self.v = ship.dyn.u, ship.dyn.v
+        water = ship.extra.get("water")
+        if water and (water[0] != 0.0 or water[1] != 0.0):
+            # the tide's stream (package 34): the rig feels her motion over the ground
+            self.u += water[0] * self.sin_h + water[1] * self.cos_h
+            self.v += water[0] * self.cos_h - water[1] * self.sin_h
         self.eff = self.sin_t = self.cos_t = 0.0
         if self.plain:
             self.eff = wind.effective_speed
@@ -762,9 +767,14 @@ def _apparent(ship: Ship, wind: Wind, height: float) -> _Flow:
     vx, vy = wind.vector_at_height(height)
     psi = ship.dyn.heading
     sin_h, cos_h = math.sin(psi), math.cos(psi)
+    u, v = ship.dyn.u, ship.dyn.v
+    water = ship.extra.get("water")
+    if water and (water[0] != 0.0 or water[1] != 0.0):
+        u += water[0] * sin_h + water[1] * cos_h  # over the ground (package 34)
+        v += water[0] * cos_h - water[1] * sin_h
     # world (x east, y north) to body (forward, starboard)
-    a_fwd = vx * sin_h + vy * cos_h - ship.dyn.u
-    a_stb = vx * cos_h - vy * sin_h - ship.dyn.v
+    a_fwd = vx * sin_h + vy * cos_h - u
+    a_stb = vx * cos_h - vy * sin_h - v
     speed = math.hypot(a_fwd, a_stb)
     if speed < 1e-9:
         return _Flow(0.0, -1.0, 0.0, 0.0)

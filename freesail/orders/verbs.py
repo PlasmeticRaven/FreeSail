@@ -90,6 +90,13 @@ def execute(
     """
     vocab = vocab or load_vocabulary()
     spec = vocab.verbs[order.verb]
+    if (
+        spec.object in ("heading", "points")
+        or order.verb in HELM_VERBS
+        or order.verb == "trim"
+        or (order.verb in vocab.evolutions and isinstance(vocab.evolutions[order.verb], str))
+    ):
+        _not_riding(ship, order)  # the helm, the trim and the manoeuvres want her under way
     if order.verb in work.WORK_VERBS:
         return work.execute(ship, order, vocab)  # belaying work (package 29c)
     if order.verb in crew_orders.CREW_VERBS:
@@ -1914,6 +1921,18 @@ def _catharpins(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
 # ---------------------------------------------------------------------------
 
 
+def _not_riding(ship: Ship, order: Order) -> None:
+    """At anchor or aground (package 34) the helm has no say and a manoeuvre no meaning:
+    the order is refused in words, so that a book's 'keep her full' does not steer a
+    ship at anchor through the night."""
+    extra = getattr(ship, "extra", None) or {}
+    if extra.get("aground"):
+        raise OrderError(f"She is aground; '{order.verb_phrase}' must wait till she floats.")
+    tackle = extra.get("ground_tackle")
+    if tackle is not None and tackle.at_anchor():
+        raise OrderError(f"She is at anchor; '{order.verb_phrase}' must wait till she weighs.")
+
+
 def _helm(ship: Ship, order: Order) -> Result:
     dyn = ship.dyn
     mods = order.modifiers
@@ -2214,12 +2233,18 @@ def _names_bowsprit(ship: Ship, order: Order) -> bool:
 def _query(ship: Ship, order: Order) -> Result:
     """'The booms', 'the sail room' and 'the boatswain's store': what the ship's stores
     hold, in the log and never journaled (the World logs a `query.` kind as it is)."""
-    from freesail.ship.parts import booms, cordage, sail_room
+    from freesail.ship.parts import booms, cordage, ground_tackle, sail_room
 
     if order.verb == "the booms":
         return "query.booms", "\n".join(booms(ship).inventory_lines()), {}
     if order.verb == BOATSWAINS_STORE:
         return "query.cordage", "\n".join(cordage(ship).inventory_lines()), {}
+    if order.verb == "the ground tackle":
+        # the anchors and their cables (package 34)
+        tackle = ground_tackle(ship)
+        if tackle is None:
+            return "query.ground_tackle", "She carries no ground tackle.", {}
+        return "query.ground_tackle", "\n".join(tackle.describe()), {}
     return "query.sail_room", "\n".join(sail_room(ship).inventory_lines()), {}
 
 

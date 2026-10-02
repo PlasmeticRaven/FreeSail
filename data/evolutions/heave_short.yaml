@@ -1,0 +1,30 @@
+# Heave short (spec M5 §18; package 34): the cable hove in at the capstan to a short
+# stay, the ship over her anchor nearly, ready to weigh. "Pass and lash the messenger;
+# get up the nippers and capstan bars; ... ship and swifter the bars; call, All hands up
+# anchor! bring to on the cable, and unbitt; man the bars, Heave around! and heave in
+# the cable to a short stay. ... the navigator orders, Avast heaving! ... The cable being
+# in to a short stay, Pawl the capstan! stopper the cable well, and unship the bars"
+# (Luce 1866, ch. XXI Getting Under Way, 'To get under way and stand out on a wind'),
+# "the old rule for a short stay was, that the cable should be in a line with the fore
+# topmast stay" (the same, the note). The hands walk the capstan round at the messenger
+# and the nippers (Lever 1808, 'Weighing the Anchor'); the rate is judgement.
+id: heave_short
+verb: heave_short
+applies_to: {class: ship}
+script: heave_short
+params: {}
+preconditions: []
+timing:
+  rig_capstan_s: 180       # the messenger passed, the bars shipped and swiftered (judgement)
+  heave_fathoms_per_s: 0.1  # six fathoms a minute at the capstan, hemp through the
+                            # nippers (judgement: no period rate found)
+  short_stay_per_depth: 1.5  # the cable in to a short stay, a cable's length and a half
+                             # the depth (judgement on Luce's "in a line with the fore
+                             # topmast stay")
+on_start: {log: "All hands up anchor! Man the bars; heave round."}
+on_complete: {log: "Hove short on {anchor}: {fathoms} of cable, the cable a-stay in {depth}.", kind: cable.hove_short, severity: routine}
+on_fail: {log: "Could not heave short: {reason}.", kind: evolution.failed, severity: routine}
+# crew: all hands at the capstan bars ("All hands up anchor!", Luce 1866 ch. XXI); not a
+# manoeuvre: sail is made while the cable comes in.
+crew: {hands: all, rating: ordinary, stations: [all hands]}
+source: "Luce 1866, ch. XXI Getting Under Way, 'To get under way and stand out on a wind' (the short stay); Lever 1808, 'Weighing the Anchor' (the messenger and nippers), 'Single Anchor', p. 100 (a-peak)"

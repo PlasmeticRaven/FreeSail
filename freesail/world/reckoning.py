@@ -191,14 +191,28 @@ LEEWAY_DOUBT_POINTS = 0.25
 # The set the master did not allow for (N §3: "Channel streams one to three knots turning
 # with the tide, allowed for only if the master knows the establishment and his own
 # longitude"; Rennell's current "a mile an hour to the northward for days in
-# south-westerly gales", read in summary). Until package 34 the world's set is the
-# scenario's stated current, none by default; the master's doubt of it is his whatever
-# the world does, and grows in a straight line: the streams run east and west along the
-# Channel, so the doubt lies east and west above all, and a little north and south for
-# Rennell's current. The sizes are judgement, tuned so that four days of thick weather
-# leave the ellipse N §3 describes (truth 58; TuningNotes, M5b).
+# south-westerly gales", read in summary). Since package 34 the world's set is the tide's
+# stream (`world/tide.py`, the water's velocity in the physics) and the scenario's stated
+# current if it gives one; the master's doubt of it is his whatever the world does, and
+# grows in a straight line: the streams run east and west along the Channel, so the doubt
+# lies east and west above all, and a little north and south for Rennell's current. The
+# sizes are judgement, tuned so that four days of thick weather leave the ellipse N §3
+# describes (truth 58; TuningNotes, M5b), and are not re-tuned to the tide: the stream
+# turns, so a day's net set is a mile or two, within the doubt (TuningNotes, package 34).
 SET_DOUBT_EAST_KN = 0.2
 SET_DOUBT_NORTH_KN = 0.03
+# What the master takes off a cast for the tide before he lays it on the chart's
+# low-water contours (package 34): half the spring rise of the nearest place in his
+# epitome, or this where the table gives no rise (judgement: the Channel's mean level
+# over the datum, about three metres, T §1).
+TIDE_ALLOWANCE_DEFAULT_M = 3.0
+# The master's rise at the quarters as a part of the spring rise (Norie 1805, the tide
+# table's note: the neap rise "about two-thirds" of the spring's; judgement in the figure,
+# the Epitome's text not read, the rule a commonplace of the period's tables), and the
+# tide's own day, twelve hours and twenty-five minutes (Moore 1799, 'Of the Tides').
+NEAP_RISE_OF_SPRING = 2.0 / 3.0
+TIDE_HOURS = 12.0 + 25.0 / 60.0
+SYNODIC_MONTH_DAYS = 29.53
 
 # A departure: the reckoning begins where the land was last seen, a mile in doubt
 # (judgement: a bearing of a headland and its distance by estimation).
@@ -949,6 +963,16 @@ class Navigation:
         self._lunar_in_hand: str | None = None
         self._lunar_pending: tuple[int, Any] | None = None
         self.variation = Variation(self.errors.variation_allowed_deg, "the chart of 1794")
+        # the captain's tide (package 34; spec M5 §16; T §2, §5): the epitome's table of
+        # high water at full and change, the scenario's choice or the ship's (a ship of
+        # war carries Norie's hours and minutes, the rest Moore's points), and Moore's
+        # rule of 48 minutes; the world's tide is never read here
+        from freesail.world.tide import Epitome
+
+        table = getattr(world.scenario, "epitome", None)
+        if not table:
+            table = "norie" if _ship_of_war(world.ship) else "moore"
+        self.epitome = Epitome.load(str(table))
         # the traverse board: the heading summed since the last step, and the leeway
         self._hx = 0.0
         self._hy = 0.0
@@ -991,7 +1015,10 @@ class Navigation:
             self._leeway_sum += float(dyn.leeway)
         if self._close_hauled_now():
             self._close_hauled_n += 1
-        if "hove_to" in (getattr(ship, "extra", None) or {}) and (
+        if self._riding():
+            # at anchor or aground (package 34): the master runs no distance, as hove to
+            self._hove_to_n += 1
+        elif "hove_to" in (getattr(ship, "extra", None) or {}) and (
             units.ms_to_knots(_speed_through_water(ship)) < HOVE_TO_WAY_KN
         ):
             self._hove_to_n += 1
@@ -1022,8 +1049,18 @@ class Navigation:
                     data=self.chronometer.to_dict(),
                 )
         if t.minute == 0 and t.second == 0 and t.hour % self.log_interval_h == 0:
-            self.heave_log(automatic=True)
+            if not self._riding():  # the log is not hove at anchor (package 34)
+                self.heave_log(automatic=True)
         self._tick_noon()
+
+    def _riding(self) -> bool:
+        """At anchor or aground (package 34): the ship goes nowhere by the master's
+        account, whatever the stream does past her."""
+        extra = getattr(self.world.ship, "extra", None) or {}
+        if extra.get("aground"):
+            return True
+        tackle = extra.get("ground_tackle")
+        return bool(tackle) and tackle.at_anchor()
 
     def _close_hauled_now(self) -> bool:
         world = self.world
@@ -1199,6 +1236,10 @@ class Navigation:
         pos = world.position
         tick = world.clock.tick
         truth = chart.depth_at(pos) if chart is not None and pos is not None else None
+        if truth is not None:
+            # the lead reads the water there is (package 34, spec M5 §16): the chart's
+            # depth at the datum and the tide's height over it
+            truth += float(getattr(world, "tide_height_m", 0.0))
         limit = DEEP_SEA_LEAD_FATHOMS if deep else HAND_LEAD_FATHOMS
         speed_kn = units.ms_to_knots(_speed_through_water(world.ship))
         if deep and speed_kn > DEEP_SEA_LEAD_MAX_KN:
@@ -1221,9 +1262,14 @@ class Navigation:
         r = self.reckoning
         radius = max(CONTOUR_SEARCH_MIN_NM, 2.0 * r.ellipse()["semi_major_nm"])
         tolerance = CONTOUR_TOLERANCE_DEEP_FATHOMS if deep else CONTOUR_TOLERANCE_HAND_FATHOMS
+        # the master allows for the tide he does not know the state of (package 34; T §2:
+        # "the period judged the height between the tides by eye and by the lead"): half
+        # the spring rise of the nearest place in his table, the mean level, which is
+        # wrong by up to half the range either way (judgement on the study's words)
+        allowed_m = self._tide_allowance_m()
         found = chart.contour_point(
             r.position,
-            depth_m,
+            max(0.0, depth_m - allowed_m),
             units.fathoms_to_m(tolerance),
             radius * units.NAUTICAL_MILE,
             ground=ground,
@@ -1245,6 +1291,38 @@ class Navigation:
             moved = r.update_line(de, dn, n_e, n_n, SOUNDING_ACROSS_SIGMA_NM)
         text = f"{chant(fathoms, not deep)}; {ground}."
         self._record_cast(tick, depth_m, ground, text, deep, moved, found is not None)
+
+    def _tide_allowance_m(self) -> float:
+        """What the master takes off a cast for the tide before he lays it on the chart:
+        his own tide, never the world's (decision 29). The rise at the nearest place in
+        his epitome by the moon's age (the spring rise at full and change, two-thirds of
+        it at the quarters: Norie's rule of thumb, `NEAP_RISE_OF_SPRING`), and the height
+        above low water now by the time from his high water (`tide_by_almanac`) as the
+        half-cosine of the tide's twelve hours and twenty-five minutes, which is the rule
+        of twelfths worked exactly; `TIDE_ALLOWANCE_DEFAULT_M` where the table gives no
+        rise for the place."""
+        epitome = getattr(self, "epitome", None)
+        if epitome is None:
+            return TIDE_ALLOWANCE_DEFAULT_M
+        port, _ = epitome.nearest(self.reckoning.position)
+        if port.spring_rise_ft is None:
+            return TIDE_ALLOWANCE_DEFAULT_M
+        age = self.almanac_age_days()
+        springs = abs(math.cos(2.0 * math.pi * age / SYNODIC_MONTH_DAYS))
+        range_m = units.feet_to_m(port.spring_rise_ft) * (
+            NEAP_RISE_OF_SPRING + (1.0 - NEAP_RISE_OF_SPRING) * springs
+        )
+        now = self.world.clock.ship_time
+        day = now.date()
+        highs = epitome.high_waters(port, age, day) + epitome.high_waters(
+            port, age + 1.0, day + timedelta(days=1)
+        )
+        if not highs:
+            return 0.5 * range_m
+        nearest = min(highs, key=lambda t: abs((t - now).total_seconds()))
+        hours = (now - nearest).total_seconds() / 3600.0
+        phase = 2.0 * math.pi * hours / TIDE_HOURS
+        return 0.5 * range_m * (1.0 + math.cos(phase))
 
     def _record_cast(
         self,
@@ -1671,6 +1749,85 @@ class Navigation:
         if self.world.chart is None:
             return "no chart of these waters"
         return f"no charted danger within {miles_words(DANGERS_WITHIN_NM)} of the account"
+
+    # -- the captain's tide (package 34; spec M5 §16; T §2, §5) ---------------------------
+
+    def almanac_age_days(self, when: datetime | None = None) -> float:
+        """The moon's age from the almanac at the day's noon, to the quarter of a day (the
+        almanac gives the hour of the change; the master reckons from it): the mean
+        elements' arithmetic (`tide.moon_age_days`), which is the almanac's."""
+        from freesail.world.sights import greenwich_time
+        from freesail.world.tide import moon_age_days
+
+        t = self.world.clock.ship_time if when is None else when
+        noon = greenwich_time(self.world, t.replace(hour=12, minute=0, second=0))
+        return round(moon_age_days(noon) * 4.0) / 4.0
+
+    def tide_by_almanac(self, port_words: str | None = None) -> dict[str, Any]:
+        """`the tide by the almanac`: high water today at the port named, or the nearest
+        place of the epitome's table to the account, by Moore's rule of 48 minutes and
+        the table's establishment; in the master's words, with the next high water from
+        now. Never the world's tide."""
+        from freesail.world.tide import time_words
+
+        world = self.world
+        table = self.epitome
+        port = table.by_name(port_words) if port_words else None
+        asked_for = port_words
+        if port is None:
+            port, distance_nm = table.nearest(self.account_now())
+        else:
+            distance_nm = 0.0
+        day = world.clock.ship_time.date()
+        age = self.almanac_age_days()
+        times = table.high_waters(port, age, day)
+        now = world.clock.ship_time
+        upcoming = [t for t in times if t >= now]
+        if not upcoming:
+            later = table.high_waters(port, age + 1.0, day + timedelta(days=1))
+            upcoming = [t for t in later if t >= now]
+        said = [time_words(t.hour + t.minute / 60.0) for t in times]
+        if len(said) == 2:
+            when = f"{said[0]} and {said[1]}"
+        elif said:
+            when = said[0]
+        else:
+            when = "no high water falls within the day"
+        head = f"High water at {port.name} about {when} by the epitome"
+        if asked_for and _key(asked_for) != _key(port.name):
+            head = (
+                f"The epitome has no {asked_for}; the nearest place in the master's table is "
+                f"{port.name}, {miles_words(distance_nm)} off: high water there about {when}"
+            )
+        elif distance_nm > 5.0 and not asked_for:
+            head = (
+                f"High water at {port.name}, the nearest place in the master's table "
+                f"({miles_words(distance_nm)} off), about {when} by the epitome"
+            )
+        age_words = f"the moon {_age_words(age)} old"
+        table_words = f"{port.name} {port.establishment_words} at full and change"
+        next_words = (
+            time_words(upcoming[0].hour + upcoming[0].minute / 60.0)
+            if upcoming
+            else "the next tide"
+        )
+        if upcoming and upcoming[0].date() != day:
+            next_words += " tomorrow"
+        rise = ""
+        if port.spring_rise_ft is not None:
+            rise = f"; the rise {port.spring_rise_ft:g} feet at springs"
+        words = f"{head} ({table_words}, {age_words}{rise})"
+        return {
+            "port": port.name,
+            "words": words,
+            "times": [t.isoformat() for t in times],
+            "next": upcoming[0].isoformat() if upcoming else None,
+            "next_words": next_words,
+            "establishment_h": port.establishment_h,
+            "age_days": age,
+            "table": table.table,
+            "spring_rise_ft": port.spring_rise_ft,
+        }
 
     # -- the chronometer (package 33b; spec §14; N §4(b)) ---------------------------------
 
@@ -2190,6 +2347,20 @@ def _variation_words(deg_west: float, by: str) -> str:
     from freesail.world.sights import Variation
 
     return Variation(deg_west, by).words
+
+
+def _age_words(age_days: float) -> str:
+    """'fifteen days', 'seven days and a half': the moon's age in the master's words."""
+    whole = int(age_days)
+    quarter = age_days - whole
+    words = f"{number_words(whole)} day{'s' if whole != 1 else ''}" if whole else "under a day"
+    if abs(quarter - 0.5) < 0.01:
+        words += " and a half"
+    elif abs(quarter - 0.25) < 0.01:
+        words += " and a quarter"
+    elif abs(quarter - 0.75) < 0.01:
+        words += " and three quarters"
+    return words
 
 
 def _ship_of_war(ship: Any) -> bool:

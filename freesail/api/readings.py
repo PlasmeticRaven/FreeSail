@@ -58,6 +58,8 @@ __all__ = [
     "MOTION_STATE_WORDS",
     "NO_CHART_WORDS",
     "NO_GLASS_WORDS",
+    "NO_TACKLE_WORDS",
+    "NO_ANCHOR_DOWN_WORDS",
     "NO_RECKONING_WORDS",
     "NO_SEA_WORDS",
     "NO_WAY_WORDS",
@@ -1497,6 +1499,156 @@ REGISTRY.add(
 
 
 # ---------------------------------------------------------------------------
+# Package 34: the tide as the captain has it, the anchor and the cable (spec M5 §16, §18)
+# ---------------------------------------------------------------------------
+# No reading gives the world's tide: `the tide by the almanac` is the master's, from the
+# epitome's establishment and Moore's rule on the moon's age (decision 29). The anchor's
+# and the cable's readings are the ship's own state (the forecastle sees the cable and
+# the buoy), and the ground's when she is aground.
+
+NO_TACKLE_WORDS = "She carries no ground tackle: this ship's file lists no anchors."
+NO_ANCHOR_DOWN_WORDS = "no anchor is down"
+
+
+def _tide_by_almanac(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the tide by the almanac`: high water today at the nearest place of the master's
+    table, by the establishment and the moon's age; never the world's tide."""
+    nav = _navigation_of(world)
+    return nav.tide_by_almanac() if nav is not None else None
+
+
+def _tackle_of(world: Any) -> Any:
+    from freesail.ship.parts import ground_tackle
+
+    return ground_tackle(world.ship)
+
+
+def _anchor(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the anchor`: down (riding by which, to the flood or the ebb, the cable out),
+    aweigh, catted, at the bows, lost; aground, where and how she struck. None for a
+    ship with no ground tackle."""
+    tackle = _tackle_of(world)
+    if tackle is None:
+        return None
+    from freesail.physics.anchor import riding_words
+    from freesail.ship.parts import AnchorState
+
+    aground = (getattr(world.ship, "extra", None) or {}).get("aground")
+    if aground:
+        words = f"aground, {aground.get('where', 'the ground under her')}"
+        if aground.get("bottom"):
+            words += f" on {aground['bottom']}"
+        return {"words": words, "state": "aground", "anchor": None} | dict(aground)
+    riding = tackle.riding_by()
+    if riding is not None:
+        state = getattr(world, "tide_state", None)
+        how = riding_words(world.ship, state, world.wind.direction_from)
+        how = how[:1].lower() + how[1:]
+        words = f"down, {how.rstrip('.')}, {riding.scope_fathoms:.0f} fathoms out"
+        if riding.dragging:
+            words = f"dragging; {words}"
+        return {"words": words, "state": "down", "anchor": riding.id} | riding.to_dict()
+    # no anchor down: the one furthest along in its evolution, else the best bower
+    order = (AnchorState.AWEIGH, AnchorState.CATTED, AnchorState.READY, AnchorState.LOST)
+    for st in order:
+        for a in tackle.anchors:
+            if a.state is st:
+                return {
+                    "words": a.state.value,
+                    "state": a.state.value,
+                    "anchor": a.id,
+                } | a.to_dict()
+    bowers = tackle.bowers() or tackle.anchors
+    a = bowers[0]
+    return {"words": a.state.value, "state": a.state.value, "anchor": a.id} | a.to_dict()
+
+
+def _no_tackle_words(world: Any) -> str | None:
+    return NO_TACKLE_WORDS if _tackle_of(world) is None else None
+
+
+def _cable(world: Any, _: str | None) -> Angle | None:
+    """`the cable`: the riding cable's scope and strain against its rating, taut or
+    slack; the number is the strain, as a line's. None with no anchor down."""
+    tackle = _tackle_of(world)
+    if tackle is None:
+        return None
+    riding = tackle.riding_by()
+    if riding is None:
+        return None
+    ratio = riding.cable_strain_ratio
+    lie = "bar-taut" if riding.taut else "slack"
+    words = (
+        f"{riding.scope_fathoms:.0f} fathoms of the {riding.name.replace('the ', '')}'s "
+        f"{tackle.cable_words} out, {lie}, the strain {ratio:.2f} of the rating"
+    )
+    if riding.cable_condition < 99.5:
+        words += f", the {tackle.cable_words} worn to {riding.cable_condition:.0f}"
+    return Angle(ratio, words)
+
+
+def _no_cable_words(world: Any) -> str | None:
+    return NO_TACKLE_WORDS if _tackle_of(world) is None else NO_ANCHOR_DOWN_WORDS
+
+
+def _ground_tackle(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the ground tackle`: every anchor, its weight, its cable and its state."""
+    tackle = _tackle_of(world)
+    if tackle is None:
+        return None
+    return {"words": " ".join(tackle.describe()), "anchors": [a.to_dict() for a in tackle.anchors]}
+
+
+REGISTRY.add(
+    Reading(
+        "tide_by_almanac",
+        ("the tide by the almanac", "high water by the almanac", "the tide"),
+        "position",
+        "",
+        _tide_by_almanac,
+        description="high water today at the nearest place of the master's table, by the "
+        "establishment and the moon's age (the master's tide, never the world's)",
+        none_words=_no_reckoning_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "anchor",
+        ("the anchor",),
+        "ground",
+        "",
+        _anchor,
+        description="the anchor: down (riding by which, to the flood or the ebb, the cable "
+        "out), dragging, aweigh, catted, at the bows, lost; or aground, where",
+        none_words=_no_tackle_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "cable",
+        ("the cable",),
+        "strain",
+        "",
+        _cable,
+        description="the riding cable: the scope, taut or slack, the strain against its "
+        "rating (the number)",
+        none_words=_no_cable_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "ground_tackle",
+        ("the ground tackle",),
+        "ground",
+        "",
+        _ground_tackle,
+        description="the anchors and their cables, each with its weight and state",
+        none_words=_no_tackle_words,
+    )
+)
+
+
+# ---------------------------------------------------------------------------
 # Events, for `at` (spec §2)
 # ---------------------------------------------------------------------------
 
@@ -1610,6 +1762,19 @@ _event(EventSpec("a lunar", "reckoning.lunar"))
 _event(EventSpec("a longitude by chronometer", "reckoning.time_sight"))
 _event(EventSpec("the chronometer run down", "chronometer.dead"))
 _event(EventSpec("the variation observed", "reckoning.variation"))
+# Package 34: the anchor's evolutions' ends and the ground's events (spec M5 §18), by the
+# evolutions' and the World's kinds (`data/evolutions/*anchor*.yaml`, `world/ground.py`).
+_event(EventSpec("the anchor let go", "ship.anchored"))
+_event(EventSpec("brought up", "ship.brought_up"))
+_event(EventSpec("the anchor aweigh", "ship.aweigh"))
+_event(EventSpec("the anchor weighed", "ship.weighed"))
+_event(EventSpec("under way", "ship.weighed"))
+_event(EventSpec("the anchor dragging", "anchor.dragging"))
+_event(EventSpec("the cable parted", "cable.parted"))
+_event(EventSpec("aground", "ship.aground"))
+_event(EventSpec("the ground taken", "ship.aground"))
+_event(EventSpec("afloat", "ship.afloat"))
+_event(EventSpec("the turn of the tide", "ship.swung"))
 
 
 def event_matches(spec: EventSpec, kind: str, data: dict[str, Any]) -> bool:

@@ -36,6 +36,8 @@ py -m pytest -n 4 --slow
 
 ## The passages
 
+*Since package 34 (2026-10-02, after this gate was passed) the two clear passages end with the anchor let go rather than lying to, the tide's stream sets the ship, and the schooner has a book of her own; the ticks and words below are the build at the cut. The current numbers are in `tests/test_known_truths.py` and the tuning notes' section on the tide.*
+
 **The frigate, clear** (`data/scenarios/gate-5b-passage.yaml`, seed 7, the weather pinned SW 15 knots and the sky clear): *Amazon* off the Stiff at 04:00 on 10 June 1805, plain sail, heading north for Falmouth, a sextant aboard and no chronometer. Her captain's book (`gate-5b-passage.orders`) beside the starter routines: a bearing of the land every glass while it is in sight, the ship brought to at noon and the deep-sea lead hove, the course for Falmouth shaped from the account, the hand lead going in every glass and then every ten minutes past the Manacles, and at the first cast under twenty fathoms she wears and lies to on the starboard tack, forereaching off the land, since the anchor is package 34's. **The frigate, thick** (`gate-5b-passage-thick.yaml`): the same passage in fog, no sight, no bearings, the course shaped by account when the run since noon says she is off the Lizard, and at the first land seen close aboard she stands off to the southward. **The schooner** (`gate-5b-passage-schooner.yaml`): the same passage in *Speedwell* with an octant, no glass, the log every two hours; the cutter and the brig sail six hours of it through the same orders with `--ship`.
 
 The account against the truth, at seed 7 (the author's view; the game never shows it):

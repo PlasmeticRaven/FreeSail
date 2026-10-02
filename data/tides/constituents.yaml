@@ -1,0 +1,160 @@
+# FreeSail: the world's tide, the harmonic constants at the eleven gauges (spec M5 §16;
+# the study docs/design/Tides1805.md §1, §3, §5, model (b) adopted; package 34).
+#
+# M2, S2 and N2 at each gauge: the amplitude in metres and the Greenwich phase lag in
+# degrees, read by `freesail/world/tide.py` and interpolated between the gauges by the
+# inverse square of the distance on the complex constants (the cotidal and corange
+# geometry of the Channel in its simplest honest form: the amplitude and the phase both
+# vary smoothly between the gauges, and a weighted mean of A e^{-ig} keeps the wave's
+# progression up-Channel). K1 and O1 are dropped (5 to 9 cm at every gauge; the study's
+# form factor 0.03 to 0.06). The astronomical arguments come from the moon's and the
+# sun's mean longitudes (`tide.py`, Meeus ch. 25, 47), so that springs fall a day or two
+# after full and change of themselves, as the age of the tide has them.
+#
+# SOURCE. TICON: Piccioni, Dettmering, Bosch and Seitz, "TICON: TIdal CONstants based on
+# GESLA sea-level records from globally located tide gauges", Geoscience Data Journal 6(2),
+# 2019; the data file PANGAEA doi:10.1594/PANGAEA.896587, licence CC BY 4.0 (the licence
+# text: docs/references/licences/cc-by-4.0.txt). VERIFIED: the figures below were read from
+# the dataset's own TICON.txt (the zip at doi.pangaea.de, fetched 2026-10-01), the station
+# found by its coordinates (the file names no station: its columns are latitude,
+# longitude, constituent, amplitude in centimetres, phase lag in degrees, the record's
+# source and span). Where the file has two records of one gauge (Brest's REFMAR and UHSLC
+# series, Newlyn's three) the longest is taken and the others agree to a centimetre and a
+# degree. The study's table (T §1) was computed from the same file and agrees.
+#
+# The datum: TICON's amplitudes are about the gauge's mean level; the chart's depths (data/
+# charts/, levels 2 and 3) are relative to lowest astronomical tide (C §5; Charts.md). The
+# height of the tide above the chart's datum is therefore `mean_level_m` plus the sum of
+# the cosines. `mean_level_m` is mean sea level above chart datum, from the published
+# levels the study quotes (T §1): the mean of MHWS, MHWN, MLWN and MLWS at Falmouth (5.3,
+# 4.2, 1.9, 0.6: 3.0 m; eoceanic harbour pages crediting UKHO), at Plymouth (5.5, 4.4,
+# 2.2, 0.8: 3.2) and St Mary's (5.7, 4.3, 2.0, 0.7: 3.2); SHOM's Références Altimétriques
+# Maritimes 2025 (data.gouv.fr, Licence Ouverte 2.0, the text under docs/references/
+# licences/licence-ouverte-2.0.md; read by the study from the CSV in the package, not by
+# this package) for Brest (NM 4.14 m above chart datum), Le Conquet (the mean of PMVE 6.85
+# and BMVE 1.10: 3.98), Roscoff (8.90 and 1.30: 5.10), Saint-Malo (the mean of PMVE 12.20,
+# PMME 9.30, BMME 4.30, BMVE 1.50: 6.83) and Cherbourg (6.45 and 1.15: 3.80). UNVERIFIED
+# (judgement, marked so in docs/dev/TuningNotes.md): St Helier (springs "about 11 m above
+# datum", the Government of Jersey page the study quotes, taken as 6.0), Weymouth (1.2)
+# and Dover (3.7), which lie outside the game's box and bear on nothing a ship meets. The
+# study's open item (spec M5 §33 item 3, "the datum offsets at the four ports") is the
+# chart's datum against the period sheets' low-water springs, and is not settled here.
+#
+# The establishment of each port, for the captain's table, is NOT here: his epitome's
+# figures are data/tides/establishments.yaml (the period's, from Whewell 1833 and Moore
+# 1799), and the world's own high water is computed from the constants.
+
+constituents:
+  # the speeds in degrees an hour (Schureman 1958, Table 2; Doodson)
+  M2: {speed_deg_per_h: 28.9841042, name: "the principal lunar semidiurnal"}
+  S2: {speed_deg_per_h: 30.0000000, name: "the principal solar semidiurnal"}
+  N2: {speed_deg_per_h: 28.4397295, name: "the larger lunar elliptic semidiurnal"}
+
+gauges:
+  - id: st-marys
+    name: St Mary's, Scilly
+    lat_deg: 49.9185
+    lon_deg: -6.3164
+    record: "GESLA-2, BODC, 1976 to 2014"
+    mean_level_m: 3.2
+    M2: {amplitude_m: 1.758, phase_deg: 131.0}
+    S2: {amplitude_m: 0.604, phase_deg: 172.8}
+    N2: {amplitude_m: 0.345, phase_deg: 110.9}
+  - id: newlyn
+    name: Newlyn
+    lat_deg: 50.1030
+    lon_deg: -5.5428
+    record: "GESLA-2, BODC, 1915 to 2014"
+    mean_level_m: 3.0
+    M2: {amplitude_m: 1.712, phase_deg: 133.8}
+    S2: {amplitude_m: 0.572, phase_deg: 177.8}
+    N2: {amplitude_m: 0.330, phase_deg: 113.9}
+  - id: devonport
+    name: Devonport
+    lat_deg: 50.3684
+    lon_deg: -4.1852
+    record: "GESLA-2, BODC, 1987 to 2014"
+    mean_level_m: 3.2
+    M2: {amplitude_m: 1.685, phase_deg: 153.6}
+    S2: {amplitude_m: 0.606, phase_deg: 206.6}
+    N2: {amplitude_m: 0.318, phase_deg: 137.7}
+  - id: weymouth
+    name: Weymouth
+    lat_deg: 50.6085
+    lon_deg: -2.4479
+    record: "GESLA-2, BODC, 1991 to 2014"
+    mean_level_m: 1.2
+    M2: {amplitude_m: 0.600, phase_deg: 191.2}
+    S2: {amplitude_m: 0.313, phase_deg: 242.7}
+    N2: {amplitude_m: 0.134, phase_deg: 184.6}
+  - id: dover
+    name: Dover
+    lat_deg: 51.1169
+    lon_deg: 1.3181
+    record: "GESLA-2, BODC, 1924 to 2014"
+    mean_level_m: 3.7
+    M2: {amplitude_m: 2.254, phase_deg: 331.9}
+    S2: {amplitude_m: 0.708, phase_deg: 23.6}
+    N2: {amplitude_m: 0.411, phase_deg: 309.5}
+  - id: brest
+    name: Brest
+    lat_deg: 48.3829
+    lon_deg: -4.4950
+    record: "GESLA-2, REFMAR, 1846 to 2014"
+    mean_level_m: 4.14
+    M2: {amplitude_m: 2.051, phase_deg: 109.0}
+    S2: {amplitude_m: 0.749, phase_deg: 148.3}
+    N2: {amplitude_m: 0.417, phase_deg: 90.6}
+  - id: le-conquet
+    name: Le Conquet
+    lat_deg: 48.3591
+    lon_deg: -4.7807
+    record: "GESLA-2, REFMAR, 1970 to 2014"
+    mean_level_m: 3.98
+    M2: {amplitude_m: 2.018, phase_deg: 110.7}
+    S2: {amplitude_m: 0.733, phase_deg: 150.5}
+    N2: {amplitude_m: 0.409, phase_deg: 91.7}
+  - id: roscoff
+    name: Roscoff
+    lat_deg: 48.7184
+    lon_deg: -3.9657
+    record: "GESLA-2, REFMAR, 1973 to 2014"
+    mean_level_m: 5.10
+    M2: {amplitude_m: 2.695, phase_deg: 142.1}
+    S2: {amplitude_m: 1.004, phase_deg: 187.7}
+    N2: {amplitude_m: 0.533, phase_deg: 123.8}
+  - id: saint-malo
+    name: Saint-Malo
+    lat_deg: 48.6408
+    lon_deg: -2.0281
+    record: "GESLA-2, REFMAR, 1986 to 2014"
+    mean_level_m: 6.83
+    M2: {amplitude_m: 3.676, phase_deg: 177.6}
+    S2: {amplitude_m: 1.435, phase_deg: 228.0}
+    N2: {amplitude_m: 0.717, phase_deg: 161.5}
+  - id: st-helier
+    name: St Helier, Jersey
+    lat_deg: 49.1833
+    lon_deg: -2.1167
+    record: "GESLA-2, BODC, 1992 to 2014"
+    mean_level_m: 6.0
+    M2: {amplitude_m: 3.344, phase_deg: 182.0}
+    S2: {amplitude_m: 1.304, phase_deg: 231.7}
+    N2: {amplitude_m: 0.657, phase_deg: 165.3}
+  - id: cherbourg
+    name: Cherbourg
+    lat_deg: 49.6514
+    lon_deg: -1.6355
+    record: "GESLA-2, REFMAR, 1943 to 2014"
+    mean_level_m: 3.80
+    M2: {amplitude_m: 1.867, phase_deg: 228.3}
+    S2: {amplitude_m: 0.695, phase_deg: 272.1}
+    N2: {amplitude_m: 0.371, phase_deg: 209.1}
+
+# The interpolation's power: the inverse square of the distance, judgement (a weighted
+# mean that follows the nearest gauge close to it and blends between the shores in
+# mid-Channel; the north Cornish coast, whose tide is the Bristol Channel's, lies outside
+# the game's play and gets the south coast's gauges, which is wrong there by half an hour
+# and a third of the range, and is said so here).
+interpolation:
+  power: 2

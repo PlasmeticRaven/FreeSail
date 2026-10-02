@@ -112,6 +112,11 @@ def _carry_out(ship: Ship, order: Order, vocab: Vocabulary) -> tuple[str, str, d
             if absent is not None:
                 raise OrderError(absent)
         return navigation.execute(ship, order)
+    if vocab.verbs[order.verb].object == "anchor":
+        # the ground tackle's orders (spec M5 §18, package 34)
+        from freesail.orders import ground_tackle
+
+        return ground_tackle.execute(ship, order)
     if order.verb == "set" and ("reefs" in order.modifiers or "close" in order.modifiers):
         return _set_reefed(ship, order, vocab)
     return verbs.execute(ship, order, vocab)

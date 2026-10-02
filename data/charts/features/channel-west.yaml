@@ -35,6 +35,10 @@
 # St Agnes and not the Bishop (truth 65); `range_nm` is the period lamp's, a judgement
 # from the pilot's words where one is given ("five leagues", White) and from the
 # elevation where none is. `says` is a line the log can say; `view` names a coastal view.
+# `dries_m` (package 34, the tide) is a danger's head against the chart's datum, the
+# pilot's figure for the water over it at low water (negative) or how far it dries
+# (positive), LAT taken as the pilot's low water; a rock with none is read as awash at the
+# datum, or as standing its `height_m` above it. The grounding reads the tide over it.
 #
 # The lead reviews this list against the sources before the merge: the citation is on
 # every line for that.
@@ -96,6 +100,7 @@ features:
     lat_deg: 49.95844
     lon_deg: -5.19686
     height_m: 0
+    dries_m: -4  # thirteen feet on them at low water (the pilot's words below)
     fix: "White's bearing and distance: half a mile from the Lizard Point, S 89 E; three small heads with 13 feet at low water"
     source: "White 1835, 'Coast of England', p. 24"
     says: "The Rose rock, half a mile east of the Lizard point, three small heads with thirteen feet on them at low water and overfalls about it."
@@ -107,6 +112,7 @@ features:
     lat_deg: 49.96000
     lon_deg: -5.16500
     height_m: 0
+    dries_m: -8.2  # four fathoms and a half over them
     fix: "White: above a mile from the shore, N 83 E of the Lizard Point; 4 1/2 fathoms on it"
     source: "White 1835, 'Coast of England', p. 25"
     says: "The Spanam, three heads with four fathoms and a half over them, above a mile east of the Lizard; the sea breaks about it with great impetuosity."
@@ -118,6 +124,7 @@ features:
     lat_deg: 49.97746
     lon_deg: -5.17345
     height_m: 0
+    dries_m: -2.9  # nine feet and a half on them
     fix: "White: S 15 E of Cadgwith Cove, two-thirds of a mile; three heads with 9 1/2 feet at low water"
     source: "White 1835, 'Coast of England', p. 24"
     says: "The Craggan rock, three heads in a triangle with nine feet and a half on them, two-thirds of a mile off Cadgwith; a stranger should not come within a mile of the shore."
@@ -169,6 +176,7 @@ features:
     lat_deg: 50.04666
     lon_deg: -5.04419
     height_m: 3
+    dries_m: 2  # covering and uncovering: judgement, the heads dry two metres
     extent_m: 900
     source: "White 1835, 'Coast of England', p. 25: three miles E by S from Black Head, three-quarters of a mile SE by S from Manacle Point; one head always above water, the rest cover and uncover"
     says: "The Manacles, a group of dangerous rocks connected by ledges, projecting a mile from the nearest headland; one head always above water, the rest covering and uncovering."
@@ -181,6 +189,7 @@ features:
     lat_deg: 50.0530
     lon_deg: -5.0330
     height_m: 0
+    dries_m: 0  # the one awash (at the datum), the other with five feet
     fix: "White: six-tenths of a mile ENE of the highest Manacle, a cable apart; the Penwin awash at low water, five feet on the Vaze"
     source: "White 1835, 'Coast of England', pp. 25 to 26"
     says: "The Penwin and the Vaze, outliers of the Manacles, the one awash and the other with five feet at low water: Mawnan church open of the Nare Head will not clear them."
@@ -323,6 +332,7 @@ features:
     lat_deg: 50.14205
     lon_deg: -5.03364
     height_m: 2
+    dries_m: 3  # showing at half-tide: judgement, the mean level above the datum
     extent_m: 100
     source: "White 1835, 'Coast of England', p. 26; Imray 1874, p. 89: nearly in the middle of the entrance, appears at half-tide; a perch with a ball on it (later)"
     says: "The Black Rock, nearly in the middle of the entrance and almost opposite Pendennis castle, showing at half-tide; the eastern channel is the better."
@@ -377,6 +387,7 @@ features:
     lat_deg: 50.1560
     lon_deg: -5.0300
     height_m: 0
+    dries_m: -2.4  # eight to fifteen feet on it: the least
     extent_m: 500
     depth_fathoms: 2
     source: "Imray 1874, 'Plymouth to Land's End', p. 89: a hard bank with 8 to 15 feet on it, its edge steep; White 1835, p. 26: not within 9 or 8 fathoms"
@@ -389,6 +400,7 @@ features:
     lat_deg: 50.1500
     lon_deg: -5.0430
     height_m: 0
+    dries_m: -4.6  # two fathoms and a half to three on it: the least
     extent_m: 600
     depth_fathoms: 3
     source: "Imray 1874, 'Plymouth to Land's End', p. 89: 2 1/2 to 3 fathoms, decreasing to a foot at Penarrow point; White 1835, p. 26: 20 feet on the foul spots within the Black Rock"
@@ -401,6 +413,7 @@ features:
     lat_deg: 50.1530
     lon_deg: -5.0400
     height_m: 0
+    dries_m: -3.7  # a two-fathom patch
     source: "Imray 1874, 'Plymouth to Land's End', p. 90: a 2-fathom patch a cable within the edge of Falmouth bank"
     says: "The Governor rock, a two-fathom patch a cable within the edge of Falmouth bank."
 
@@ -509,6 +522,7 @@ features:
     lat_deg: 50.12070
     lon_deg: -5.01570
     height_m: 0
+    dries_m: -8.2  # twenty-seven feet over it
     source: "Imray 1874, 'Plymouth to Land's End', p. 89: a small rocky shoal, 27 feet on its shoalest part, a mile and a quarter due south of St Anthony point"
     says: "The Old Wall, a sharp conical rock with twenty-seven feet over it, a mile and a quarter south of St Anthony's, and rocky four-fathom patches within it causing an overfall with south-east winds on the flood."
 
@@ -626,6 +640,7 @@ features:
     lat_deg: 50.31500
     lon_deg: -4.56500
     height_m: 0
+    dries_m: -1  # a sunken rock: judgement, a metre under at the datum
     source: "Imray 1874, 'Plymouth to Land's End', p. 86 (contents: 'Polperro, Udder rock')"
     says: "The Udder rock, a sunken rock off Polperro."
 
@@ -677,6 +692,7 @@ features:
     lat_deg: 50.3210
     lon_deg: -4.1790
     height_m: 0
+    dries_m: -3.4  # eleven feet at low water
     fix: "White: two cables off Penlee Point in the 9-fathom line; the grid does not resolve the rock, and the check left the position"
     source: "White 1835, 'Coast of England', p. 33: not more than 11 feet on the Dragstone at low water; Imray 1874, p. 80 ('Draystone')"
     says: "The Dragstone, off Penlee Point, with eleven feet at low water: keep Tor House four times its breadth open of Redding Point."
@@ -740,6 +756,7 @@ features:
     lat_deg: 50.3290
     lon_deg: -4.1330
     height_m: 0
+    dries_m: -5.5  # eighteen and twenty-four feet at low water springs: the least
     extent_m: 400
     source: "White 1835, 'Coast of England', pp. 33 to 34: three rocky patches of 24 and 18 feet at low water springs in the fair-way of the eastern channel; Imray 1874, p. 79 (Tinker shoal)"
     says: "In the eastern channel three rocky patches of eighteen and twenty-four feet at low water springs lie in the fair-way, the Tinker among them."
@@ -857,6 +874,7 @@ features:
     lat_deg: 50.2280
     lon_deg: -4.3400
     height_m: 0
+    dries_m: -6.7  # twenty-two feet on them
     fix: "White: three miles and a third NW by N from the Eddystone, 22 feet on them"
     source: "White 1835, 'Coast of England', p. 28; Imray 1874, p. 77"
     says: "The Hand Deeps, three miles and a third north-west of the Eddystone with only twenty-two feet on them, on the edge of the oozy ground; in bad weather known by the short turbulent breaking sea about them."
@@ -868,6 +886,7 @@ features:
     lat_deg: 50.1500
     lon_deg: -3.9850
     height_m: 0
+    dries_m: -6.7  # twenty-two feet on it
     fix: "White: from the Eddystone E by S eleven miles and a quarter; from the Mewstone S by E half E seven miles; 22 feet on parts of it"
     source: "White 1835, 'Coast of England', p. 35"
     says: "The East Rutts, a patch of sunken rocks with twenty-two feet on it in the fair-way from the eastward, sixteen to twenty fathoms all round; the peak of the Mewstone on Maker tower carries you a mile east of it."
@@ -1007,6 +1026,7 @@ features:
     lat_deg: 50.09750
     lon_deg: -5.52750
     height_m: 0
+    dries_m: -1  # a sunken rock: judgement, a metre under at the datum
     source: "Imray 1874, 'Plymouth to Land's End', p. 98 (Carn base rock, Low lee rock)"
     says: "The Low Lee, a sunken rock off Penlee Point on the west side of Mount's Bay."
 
@@ -1027,6 +1047,7 @@ features:
     lat_deg: 50.02324
     lon_deg: -5.67200
     height_m: 0
+    dries_m: -1  # a sunken rock: judgement, a metre under at the datum
     source: "Imray 1874, 'Plymouth to Land's End', p. 99 (Runnelstone, &c.)"
     says: "The Runnelstone, a sunken rock off Tol-Pedn-Penwith, the southern point of the Land's End; the sea breaks on it in any swell."
 
@@ -1089,6 +1110,7 @@ features:
     lat_deg: 49.94500
     lon_deg: -5.80830
     height_m: 2
+    dries_m: 4.5  # covered at high water: judgement, the head under the high water of springs
     extent_m: 100
     source: "White 1835, 'Coast of England', pp. 13 and 24 (the Wolf among the principal dangers of the Channel); Trinity House, 'Wolf Rock Lighthouse': an unlighted daymark erected 1795 and soon carried away, an iron beacon 1836 to 1840, the lighthouse lit 1870"
     says: "The Wolf, a rock between the Land's End and Scilly, covered at high water and howling in a sea; a daymark set on it in 1795 was soon carried away, and no light stood on it before 1870."
@@ -1111,6 +1133,7 @@ features:
     lat_deg: 50.0397
     lon_deg: -6.1131
     height_m: 1
+    dries_m: 2.5  # the Pollard shows at half ebb: judgement, the mean level above the datum
     extent_m: 1500
     fix: "White's position of the Pollard, the north-westernmost: 50° 2' 23\" N, 6° 6' 47\" W; the South Stone two-thirds of a mile SE by S of it"
     source: "White 1835, 'Coast of England', p. 17: a cluster of very dangerous rocks nearly in the fair-way between Scilly and the Land's End; the Pollard appears at half ebb, the South Stone at five hours ebb; from the daymark on St Martin's ENE 1/4 E seven miles"
@@ -1207,6 +1230,7 @@ features:
     lat_deg: 49.8400
     lon_deg: -6.4700
     height_m: 0
+    dries_m: -27.4  # fifteen fathoms over it
     extent_m: 1000
     depth_fathoms: 15
     fix: "White: six miles and a third from St Agnes light, S 51 30 W; not less than 15 or 16 fathoms"
@@ -1280,6 +1304,7 @@ features:
     lat_deg: 49.90260
     lon_deg: -6.29650
     height_m: 1
+    dries_m: 0  # appearing at low water: awash at the datum
     fix: "White: three-eighths of a mile from Peninnis ESE; appears at low water"
     source: "White 1835, 'Coast of England', p. 14"
     says: "The Gilstone, three-eighths of a mile east-south-east of Peninnis, appearing at low water."
@@ -1334,6 +1359,7 @@ features:
     lat_deg: 49.90683
     lon_deg: -6.32392
     height_m: 1
+    dries_m: 0  # appearing a little before low water: awash at the datum
     source: "White 1835, 'Coast of England', p. 16: projects nearly a fifth of a mile from the land, appearing a little before low water"
     says: "The Woolpack, off St Mary's south-west shore, a fifth of a mile out, appearing a little before low water."
 
@@ -1344,6 +1370,7 @@ features:
     lat_deg: 49.90704
     lon_deg: -6.31755
     height_m: 0
+    dries_m: -1.5  # five feet on it at low water
     source: "White 1835, 'Coast of England', p. 16: but 5 feet on the Spanish Ledge at low water"
     says: "The Spanish Ledge, with but five feet on it at low water, on the larboard hand entering St Mary's Sound."
 
@@ -1354,6 +1381,7 @@ features:
     lat_deg: 49.90713
     lon_deg: -6.33132
     height_m: 1
+    dries_m: 0  # drying nearly at low water: awash at the datum
     source: "White 1835, 'Coast of England', p. 16: dries nearly at low water"
     says: "The Bartholomew Ledge, drying nearly at low water, on the larboard hand in the Sound."
 
@@ -1424,6 +1452,7 @@ features:
     lat_deg: 49.90358
     lon_deg: -6.37961
     height_m: 0
+    dries_m: -0.9  # three feet on it
     fix: "White: a sunken rock with 3 feet on it, about NNW three-quarters of a mile from Annet Head and NW by W half W from the Great Smith"
     source: "White 1835, 'Coast of England', p. 16"
     says: "The Old Wreck, a sunken rock with three feet on it three-quarters of a mile NNW of Annet Head, on the starboard hand going in by Broad Sound."
@@ -1456,6 +1485,7 @@ features:
     lat_deg: 49.9370
     lon_deg: -6.2920
     height_m: 0
+    dries_m: -0.9  # three feet on it at low water
     extent_m: 400
     depth_fathoms: 0.5
     source: "White 1835, 'Coast of England', p. 15: at high water equinoctial tides 23 feet on Crow Bar, at low water 3, more with westerly gales and less with easterly; the Crow Rock's three heads, the Great Crow, the Little Crow and the Crow Foot, show the water on the bar"
@@ -1468,6 +1498,7 @@ features:
     lat_deg: 49.9385
     lon_deg: -6.2950
     height_m: 2
+    dries_m: 4  # the Great Crow awash at five hours flood: judgement, near the high water of springs
     source: "White 1835, 'Coast of England', p. 15: near Bants Carn Point, three distinct heads"
     says: "The Crow Rock, off Bants Carn Point, remarkable for its three heads, by which the water over Crow Bar is estimated with great precision."
 
@@ -1734,6 +1765,7 @@ features:
     lat_deg: 48.3800
     lon_deg: -4.8400
     height_m: 0
+    dries_m: -1  # rocks under water: judgement, a metre under at the datum
     extent_m: 300
     fix: "Faden: two leagues SW 1/4 S of the Four and above two miles NW 1/4 W of Point Conquet, about half way between the isles and the main"
     source: "Faden 1793, 'Les Platresses', pp. 53 to 54: very dangerous rocks under water; the marks St Matthew's cloister with the little valley at Conquet, and a mill ESE of them"
@@ -1746,6 +1778,7 @@ features:
     lat_deg: 48.36731
     lon_deg: -4.80625
     height_m: 0
+    dries_m: -4.6  # fifteen to eighteen feet on them at low water springs: the least
     fix: "Faden: between the Platresses and the land, with 15 to 18 feet at low water springs; a mill on the land and a little tower on the brink of the sea in one mark it"
     source: "Faden 1793, 'Les Platresses', p. 54: two rocks under water discovered by the king's ships, La Valbelle the northernmost and Le Tendéoc the southernmost"
     says: "La Valbelle and Le Tendéoc, two rocks under water between the Platresses and the land with fifteen to eighteen feet on them at low water springs, discovered by the King's ships."
@@ -1778,6 +1811,7 @@ features:
     lat_deg: 48.3620
     lon_deg: -4.7950
     height_m: 0
+    dries_m: -1  # a rock under water: judgement, a metre under at the datum
     source: "Faden 1793, pp. 53 and 55: a rock under water directly west of Point Conquet, the Grande Vinotière; La Petite Vinotière between the point and Blanc Sablon"
     says: "The Vinotière, a rock under water directly west of Point Conquet; the coast is not to be approached within a cable's length nor kept wider than two."
 
@@ -1886,6 +1920,7 @@ features:
     lat_deg: 48.32650
     lon_deg: -4.69900
     height_m: 0
+    dries_m: -3  # very dangerous to large ships at low water: judgement, three metres under
     fix: "Faden: about a quarter of a league south of Point Bertheaume; the little tower on the islet west of the point in one with a tower in Bertheaume cove marks it"
     source: "Faden 1793, 'Buzec Rock', pp. 56 to 57: very dangerous to large ships at low water"
     says: "The Buzec, a rock south of Point Bertheaume very dangerous to large ships at low water, found by bringing the little tower on the islet in one with the tower in Bertheaume cove."
@@ -1919,6 +1954,7 @@ features:
     lat_deg: 48.33038
     lon_deg: -4.57278
     height_m: 1
+    dries_m: 0.5  # never uncovered but at spring tides: judgement, half a metre above the datum
     extent_m: 250
     source: "Faden 1793, 'Bay of Brest', p. 57: never uncovered but at spring tides; you are upon them when the two steep points east of Camaret are in a line and the castle of Brest is hid by the point of Penaleuch"
     says: "The Fillettes, in the middle of the Goulet, never uncovered but at spring tides: when the two steep points east of Camaret come in one and the castle of Brest is hid by Penaleuch point you are upon them."
@@ -2025,6 +2061,7 @@ features:
     lat_deg: 48.2650
     lon_deg: -4.6400
     height_m: 0
+    dries_m: -1  # a rock: judgement, a metre under at the datum
     fix: "Faden: past the south point of Toulinguet, two or three cables to the SE"
     source: "Faden 1793, 'Toulinguet Rocks', p. 58"
     says: "Le Bellen, a rock south of Toulinguet to be avoided by standing two or three cables to the south-east before shaping a course for the Raz."
@@ -2036,6 +2073,7 @@ features:
     lat_deg: 48.30500
     lon_deg: -4.77050
     height_m: 0
+    dries_m: -3.7  # twelve or thirteen feet on them at low water springs
     extent_m: 400
     fix: "Faden: about a quarter of a league WSW of the Parquette and half a league due south of St Matthew's Point; La Vandrée four or five cables west inclining NW of it; 12 or 13 feet on them at low water springs"
     source: "Faden 1793, 'Rocks called Le Gouemont and La Vandree', p. 58"
@@ -2048,6 +2086,7 @@ features:
     lat_deg: 48.2750
     lon_deg: -4.7400
     height_m: 0
+    dries_m: -4.3  # fourteen or fifteen feet at low water
     extent_m: 500
     fix: "Faden: about a league due south of the Parquette; Le Menjan a league ESE of them, as deep"
     source: "Faden 1793, 'Les Basses du Lis and Le Menjan', p. 58: named from the ship Le Lis which touched upon them, before which they were unknown; at low tide at least 14 or 15 feet"

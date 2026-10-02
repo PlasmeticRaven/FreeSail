@@ -1,0 +1,143 @@
+# FreeSail: the tidal streams by area (spec M5 §16; the study docs/design/Tides1805.md
+# §1 "Streams" and §4 model (a)'s stream table, adopted in §5; package 34).
+#
+# Each area is a polygon of [latitude, longitude] corners, taken in the order given (the
+# first that contains the ship is hers; the last entry, with no polygon, is the open
+# Channel), with the stream as the period's directions and the modern summaries give it:
+#   axis_deg      the direction the flood runs toward, degrees true; the ebb runs the
+#                 other way (every stream here is rectilinear; the rotation off the
+#                 Manacles and round Scilly is not modelled, and the study says so)
+#   spring_kn     the rate at mean springs, knots
+#   neap_kn       the rate at mean neaps
+#   phase_h       the hour, after local high water, at which the flood runs strongest:
+#                 0 for the progressive wave of the open Channel (the stream strongest at
+#                 high and low water, slack at half tide: Bowditch 1802's headland
+#                 table, T §1), about -3 for a harbour's mouth, where the flood runs in
+#                 from low water to high (a standing wave; judgement where a pilot does
+#                 not say)
+# The rate between springs and neaps follows the local range the constants give
+# (`freesail/world/tide.py`): the stream is M2 and S2 by another name (T §4), and the
+# perigean spring runs a fifth harder than the apogean as the height does.
+#
+# SOURCES. The period's: Bowditch 1802, "Tides", the headland table from the English
+# tables ("the time of high water at the principal headlands in the channel on full and
+# change days", "the time the current runs after high water", "the time the current has
+# done running": Lizard 5h 00m, 3h 00m, 8h 00m; Eddystone 5h 30m, 3h 00m, 8h 30m; the
+# Start 6h 10m, 2h 30m, 8h 40m; Portland 7h 15m, 3h 00m, 10h 15m; "the Current in the
+# Mid. Channel is N.E. about 1 H. 30 M. after High Water"), as the study quotes it (T §1);
+# Steel 1794 vol. II, p. 296, "To come to an anchor with the wind across the tide" (the
+# ship stems the tide). The modern: the Admiralty tidal stream atlases NP250, NP255 and
+# NP257 as quoted in published summaries (eoceanic's route pages; visitmyharbour for
+# Carrick Road; the Southampton SERG study for the Alderney Race; Figaro Nautisme 2026
+# and Ifremer for the Fromveur; bateaux.com for the Four and the Goulet), the atlases
+# themselves being Crown copyright and NOT READ (the study's §6 unverified list). The
+# timing of the Fromveur, the Four and the Goulet against high water was not found in an
+# open source (T §1, §6) and is JUDGEMENT here, marked so; SHOM's 2D atlas (Licence
+# Ouverte 2.0, NetCDF) would give it and was not read by this package (no reader, and
+# the rule that the game adds no dependency), which docs/dev/TuningNotes.md records.
+
+areas:
+  - id: carrick-road
+    name: Carrick Road
+    polygon: [[50.147, -5.075], [50.147, -5.005], [50.215, -5.005], [50.215, -5.075]]
+    axis_deg: 10
+    spring_kn: 1.5
+    neap_kn: 0.75
+    phase_h: -3.0
+    source: "visitmyharbour, Carrick Roads, as T §1 quotes it: 1.5 to 2 knots in the lower reaches, 3 in the upper; the flood from low water to high is judgement (an estuary)"
+  - id: falmouth-entrance
+    name: the entrance of Falmouth harbour
+    polygon: [[50.125, -5.075], [50.125, -5.005], [50.147, -5.005], [50.147, -5.075]]
+    axis_deg: 355
+    spring_kn: 1.0
+    neap_kn: 0.5
+    phase_h: -3.0
+    source: "T §1 (eoceanic, from NP255): the harbour entrance 1 knot at springs and 0.5 at neaps; the timing judgement as Carrick Road's"
+  - id: the-manacles
+    name: off the Manacles
+    polygon: [[50.02, -5.09], [50.02, -4.98], [50.09, -4.98], [50.09, -5.09]]
+    axis_deg: 20
+    spring_kn: 1.2
+    neap_kn: 0.6
+    phase_h: -1.0
+    source: "T §1 (eoceanic, from NP255): off the Manacles 1.1 to 1.3 knots, rotating clockwise (not modelled: the axis is the coast's); the timing as the Falmouth approaches' (judgement)"
+  - id: falmouth-approaches
+    name: the approaches to Falmouth
+    polygon: [[50.03, -5.12], [50.03, -4.85], [50.125, -4.85], [50.125, -5.12]]
+    axis_deg: 75
+    spring_kn: 0.7
+    neap_kn: 0.35
+    phase_h: -1.0
+    source: "T §1 (eoceanic, from NP255): 5 miles east of St Anthony Head 0.7 knots, the east-going stream beginning at HW Dover +0245 (HW Devonport -0400) and so centred about an hour before local high water"
+  - id: the-lizard
+    name: off the Lizard
+    polygon: [[49.78, -5.40], [49.78, -5.05], [49.97, -5.05], [49.97, -5.40]]
+    axis_deg: 85
+    spring_kn: 2.3
+    neap_kn: 1.1
+    phase_h: 0.0
+    source: "T §1 (eoceanic, from NP250): 5 miles south of the Lizard 2.3 knots at springs, 1.1 at neaps, nearly rectilinear; Bowditch 1802's headland table, the Lizard: the current runs three hours after high water, so the east-going stream runs from three hours before local high water to three after (truth 63)"
+  - id: start-point
+    name: off the Start
+    polygon: [[50.10, -3.75], [50.10, -3.50], [50.23, -3.50], [50.23, -3.75]]
+    axis_deg: 65
+    spring_kn: 3.0
+    neap_kn: 1.5
+    phase_h: -0.5
+    source: "T §1 (eoceanic, from NP257): 3 knots off the point, the ENE-going stream from HW Dover +0445 to -0120; Bowditch 1802, the Start: the current runs two hours and a half after high water, so the flood is centred half an hour before local high water (the modern atlas puts it an hour after, within the study's hour)"
+  - id: scilly-and-lands-end
+    name: between Scilly and the Land's End
+    polygon: [[49.85, -6.28], [49.85, -5.68], [50.12, -5.68], [50.12, -6.28]]
+    axis_deg: 345
+    spring_kn: 1.8
+    neap_kn: 0.9
+    phase_h: -3.5
+    source: "T §1 (eoceanic, from NP255): between the isles and Land's End 1.8 knots SSE-going at HW Dover -0340 and 1.6 knots N-going at +0245; with high water at Scilly about HW Dover -0630 the north-going stream runs strongest some three hours and a half before local high water"
+  - id: scilly
+    name: round Scilly
+    polygon: [[49.83, -6.50], [49.83, -6.28], [50.00, -6.28], [50.00, -6.50]]
+    axis_deg: 20
+    spring_kn: 1.2
+    neap_kn: 0.6
+    phase_h: -3.5
+    source: "T §1 (eoceanic, from NP255): rotary streams round the isles, 0.6 to 1.5 knots at springs (the rotation not modelled); the timing as between the isles and the Land's End"
+  - id: the-fromveur
+    name: the Fromveur
+    polygon: [[48.38, -5.08], [48.38, -4.92], [48.50, -4.92], [48.50, -5.08]]
+    axis_deg: 45
+    spring_kn: 7.0
+    neap_kn: 5.0
+    phase_h: -2.5
+    source: "T §1: the Fromveur 'regularly exceeds 6 knots at springs' and reaches 9 locally (Figaro Nautisme 2026), 4 m/s in the academic literature, neaps 20 to 30 per cent less (Ifremer); the timing against HW Brest UNVERIFIED (not found in an open source, T §1 and §6): the north-east-going flood centred two hours and a half before local high water is judgement"
+  - id: chenal-du-four
+    name: the Chenal du Four
+    polygon: [[48.28, -4.90], [48.28, -4.74], [48.52, -4.74], [48.52, -4.90]]
+    axis_deg: 10
+    spring_kn: 4.0
+    neap_kn: 2.5
+    phase_h: -2.5
+    source: "T §1 (bateaux.com): the Chenal du Four 3 to 5 knots; the timing UNVERIFIED, judgement as the Fromveur's"
+  - id: the-goulet
+    name: the Goulet de Brest
+    polygon: [[48.29, -4.62], [48.29, -4.42], [48.37, -4.42], [48.37, -4.62]]
+    axis_deg: 80
+    spring_kn: 4.5
+    neap_kn: 3.0
+    phase_h: -3.0
+    source: "T §1 (bateaux.com): the Goulet de Brest 4 to 5 knots; the flood running in from low water to high is judgement (the mouth of the rade), UNVERIFIED against SHOM's atlas"
+  - id: the-iroise
+    name: the Iroise
+    polygon: [[47.95, -5.25], [47.95, -4.60], [48.45, -4.60], [48.45, -5.25]]
+    axis_deg: 30
+    spring_kn: 1.5
+    neap_kn: 0.8
+    phase_h: -2.5
+    source: "judgement: the approaches to Brest between Ushant and the Raz, weaker than the Four and the Fromveur it feeds, the timing theirs; no figure in the sources in hand"
+  - id: mid-channel
+    name: the open Channel
+    polygon: null
+    axis_deg: 65
+    spring_kn: 1.6
+    neap_kn: 0.8
+    phase_h: 0.0
+    source: "N §3: 'Channel streams one to three knots turning with the tide'; Bowditch 1802: 'the Current in the Mid. Channel is N.E.'; the rate is judgement between the Lizard's 2.3 knots and the Falmouth approaches' 0.7, the timing the progressive wave's (strongest at high and low water, T §1)"

@@ -634,6 +634,33 @@ aliases:
   the mast: main.mast
   main mast: main.mast
   sails: all sail
+# The ground tackle (package 34, spec M5 §18): the anchors by the ship's size and the hemp cables by the fathom, every figure's rule in tools/gen_ships.py; chain cable is later than 1805 and the file says so.
+ground_tackle:
+  chain: false
+  anchors:
+  # The bowers: 4.2 cwt by the rule of five cwt to the hundred tons (85 tons burthen; the beam rule, two thirds the draught and the beam in cwt, gives 24.7), Luce 1866 ch. XIV. The cable 9.5 inches, half an inch to the foot of beam (judgement, unverified), rated as every rope by Luce ch. IV; two cables of 120 fathoms spliced on the best bower (Falconer 1780, CABLE; Lever 1808 p. 67).
+  - id: best_bower
+    kind: bower
+    name: the best bower
+    weight_kg: 210.0
+    cable_fathoms: 240.0
+    cable_in: 9.5
+    cable_kn: 139.8
+  - id: small_bower
+    kind: bower
+    name: the small bower
+    weight_kg: 210.0
+    cable_fathoms: 120.0
+    cable_in: 9.5
+    cable_kn: 139.8
+  # The kedge, an eighth of the bower (Luce 1866 ch. XIV), on a hawser of half the cable's size (judgement).
+  - id: kedge
+    kind: kedge
+    name: the kedge
+    weight_kg: 30.0
+    cable_fathoms: 120.0
+    cable_in: 5.0
+    cable_kn: 38.7
 crew:
   # Thirty: the kit's manual's complement for Sherbourne (Winfield not reached).
   complement: 30

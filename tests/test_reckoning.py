@@ -300,10 +300,15 @@ def test_a_sounding_moves_the_account_onto_the_charts_contour_consistent_with_th
     assert cast.data["matched"] and cast.data["moved_nm"] > 0.5
     r = nav.reckoning
     depth_at_account = w.chart.depth_at(r.position)
-    assert abs(depth_at_account - cast.data["depth_m"]) <= units.fathoms_to_m(
+    # the lead reads the tide (package 34): the master lays his cast on the chart less
+    # his own allowance for it, by his almanac
+    cast_on_the_chart = cast.data["depth_m"] - nav._tide_allowance_m()
+    assert abs(depth_at_account - cast_on_the_chart) <= units.fathoms_to_m(
         K.CONTOUR_TOLERANCE_DEEP_FATHOMS
     )
-    assert abs(depth_at_account - truth_depth) < units.fathoms_to_m(5.0)
+    # within six fathoms of the truth: the lead's error and the master's allowance for the
+    # tide (package 34), which is by his almanac and not the world's
+    assert abs(depth_at_account - truth_depth) < units.fathoms_to_m(6.0)
     # a sounding is a line, not a point (N §3): the account is on the contour, nearer
     # the truth than it was, and still along the contour from it
     before = miles_between(Position(50.0, -5.10), w.position)
@@ -370,7 +375,9 @@ def test_the_noon_the_days_work_and_the_readings_since_noon():
     assert "Longitude by account " in text and text.endswith("W.")
     assert noons[0].severity is Severity.NOTABLE
     transit = w.navigation.noon_by_the_sun()
-    assert noons[0].ship_time == transit
+    # to the minute: the transit is read at her easting, which the stream has moved a
+    # few hundred metres since the master fixed his noon (package 34)
+    assert abs((noons[0].ship_time - transit).total_seconds()) < 60
     # the master on deck for the sight, then below at the day's work, then on deck again
     places = [e for e in w.log if e.kind == "master.place"]
     assert places and places[-1].text.endswith("came on deck, the day's work done.")

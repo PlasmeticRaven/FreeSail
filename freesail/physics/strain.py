@@ -230,6 +230,33 @@ def apply_strain(ship: Ship, dt: float, rng_stream: random.Random | None = None)
     _log_warnings(ship, warnings)
 
 
+def shock_spars(ship: Ship, ratio: float, rng_stream: random.Random | None = None) -> None:
+    """The blow of the ship brought up all standing (package 34: striking the ground at
+    speed, spec M5 §18): one strain of `ratio` on every standing topmast and the masts
+    above it, half of it on the lower masts, judged by the rule above in one tick: the
+    condition loses points as a minute at that strain would, and above CARRY_AWAY_RATIO
+    the spar carries away by the strain stream's draw, or for certain when its condition
+    is spent. The masts fall from the top down, so the dependents of a wrecked spar go
+    with it as ever."""
+    st = strain_state(ship)
+    stream = _stream(ship, rng_stream)
+    upper = ("topmast", "topgallant_mast", "royal_mast")
+    for spar in list(ship.spars.values()):
+        if spar.wrecked or spar.sent_down or spar.cls not in (*upper, "mast"):
+            continue
+        r = ratio if spar.cls in upper else 0.5 * ratio
+        if r <= DECAY_RATIO:
+            continue
+        spar.condition = max(0.0, spar.condition - DECAY_POINTS_PER_MINUTE * (r - DECAY_RATIO))
+        fails = spar.condition <= 0.0 or (
+            stream is not None and r > CARRY_AWAY_RATIO and stream.random() < min(1.0, r - 1.0)
+        )
+        if fails:
+            _wreck_spar(ship, st, spar, r)
+        else:
+            _warn(ship, st, spar, r)
+
+
 def cloth_wear_per_hour(ship: Ship, sail: Sail, st: StrainState | None = None) -> float:
     """Points of condition this sail loses an hour by use alone (spec 3b §6.2): three times
     CLOTH_WEAR_PER_HOUR_SET while it flogs or is aback, CLOTH_WEAR_PER_HOUR_SET while it is

@@ -26,6 +26,13 @@ Package 30b (milestone 5) makes the spare spars a store by class: the stores'
 (`{topmast: 2, studdingsail_boom: 4}`), and the count is then derived from it. A
 plain number is still taken: that many spars of no class, which the carpenter can
 fit to any spar.
+
+Package 34 (spec M5 §18; decision 30) adds the ground tackle: an optional
+`ground_tackle:` section listing the anchors (bowers, a sheet anchor, a stream and a
+kedge, each with its weight and the cable bent to it by the fathom, with its size and
+rating) and whether the cable is chain (`chain: true`, where the era allows it; hemp in
+1805). It is parsed into a `GroundTackleSpec`; a file without it has
+`ground_tackle = None`, and the anchor orders are refused on such a ship.
 """
 
 from __future__ import annotations
@@ -147,6 +154,11 @@ FORE_AND_AFT_SPAR_CLASSES = frozenset({"boom", "gaff"})
 # The canvas numbers the engine knows the strength of: Luce 1884 App. E pp. 610-611
 # (docs/references/Tables.md §2) tabulates Nos. 1 to 9, No. 1 the heaviest.
 CANVAS_NUMBERS = range(1, 10)
+
+# The anchors a ship file may list (spec M5 §18; Falconer 1780, ANCHOR: "the sheet, the
+# best bower and small bower ... the stream-anchor, the kedge and grappling").
+ANCHOR_KINDS = ("bower", "sheet", "stream", "kedge")
+ANCHOR_KEYS = ("id", "kind", "name", "weight_kg", "cable_fathoms", "cable_in", "cable_kn")
 
 # Default load ratings (kN) by class, used with a warning when a file omits one.
 DEFAULT_SPAR_RATING_KN: dict[str, float] = {
@@ -378,6 +390,28 @@ class CrewSpec:
 
 
 @dataclass
+class AnchorSpec:
+    """One anchor of the ground tackle (package 34): its kind, the name the hands use,
+    its weight, and the cable bent to it: the fathoms (the cables spliced end to end,
+    120 fathoms each, Falconer 1780, CABLE), the circumference in inches and the rating
+    in kN (the working load, as a line's)."""
+
+    id: str
+    kind: str
+    name: str
+    weight_kg: float
+    cable_fathoms: float
+    cable_in: float
+    cable_kn: float
+
+
+@dataclass
+class GroundTackleSpec:
+    anchors: list[AnchorSpec]
+    chain: bool = False  # chain cable, where the era allows it; hemp in 1805
+
+
+@dataclass
 class ShipSpec:
     name: str
     rig: str
@@ -391,6 +425,7 @@ class ShipSpec:
     source: str = "<memory>"
     warnings: list[str] = field(default_factory=list)
     crew: CrewSpec | None = None  # None: no crew, and the runner has unlimited hands
+    ground_tackle: GroundTackleSpec | None = None  # None: no anchors (package 34)
 
 
 # ---------------------------------------------------------------------------
@@ -452,9 +487,65 @@ def parse_ship(data: dict[str, Any], source: str = "<memory>") -> ShipSpec:
         source=source,
         warnings=warnings,
         crew=_parse_crew(data["crew"], source) if data.get("crew") is not None else None,
+        ground_tackle=(
+            _parse_ground_tackle(data["ground_tackle"], source)
+            if data.get("ground_tackle") is not None
+            else None
+        ),
     )
     validate(spec)
     return spec
+
+
+def _parse_ground_tackle(raw: Any, source: str) -> GroundTackleSpec:
+    """The `ground_tackle:` section (package 34): the anchors with their cables."""
+    if not isinstance(raw, dict):
+        raise ShipFileError(f"{source}: 'ground_tackle' is not a mapping.")
+    for key in raw:
+        if key not in ("anchors", "chain"):
+            raise ShipFileError(f"{source}: the ground tackle has '{key}', which it does not take.")
+    chain = raw.get("chain", False)
+    if not isinstance(chain, bool):
+        raise ShipFileError(f"{source}: the ground tackle's chain = {chain!r}; say true or false.")
+    anchors_raw = raw.get("anchors")
+    if not isinstance(anchors_raw, list) or not anchors_raw:
+        raise ShipFileError(f"{source}: the ground tackle lists no anchors.")
+    anchors: list[AnchorSpec] = []
+    seen: set[str] = set()
+    for i, a in enumerate(anchors_raw):
+        where = f"anchor #{i + 1}"
+        if not isinstance(a, dict):
+            raise ShipFileError(f"{source}: {where} is not a mapping.")
+        for key in a:
+            if key not in ANCHOR_KEYS:
+                raise ShipFileError(
+                    f"{source}: {where} has '{key}', which an anchor does not take."
+                )
+        aid = _str(a, "id", where, source)
+        if aid in seen:
+            raise ShipFileError(f"{source}: the ground tackle lists '{aid}' twice.")
+        seen.add(aid)
+        where = f"anchor '{aid}'"
+        kind = _str(a, "kind", where, source)
+        if kind not in ANCHOR_KINDS:
+            raise ShipFileError(
+                f"{source}: {where} is of kind '{kind}'; say one of {', '.join(ANCHOR_KINDS)}."
+            )
+        anchors.append(
+            AnchorSpec(
+                id=aid,
+                kind=kind,
+                name=_str(a, "name", where, source, required=False) or aid.replace("_", " "),
+                weight_kg=_num(a, "weight_kg", where, source),
+                cable_fathoms=_num(a, "cable_fathoms", where, source),
+                cable_in=_num(a, "cable_in", where, source),
+                cable_kn=_num(a, "cable_kn", where, source),
+            )
+        )
+        for field_name in ("weight_kg", "cable_fathoms", "cable_in", "cable_kn"):
+            if getattr(anchors[-1], field_name) <= 0.0:
+                raise ShipFileError(f"{source}: {where} has {field_name} of nothing.")
+    return GroundTackleSpec(anchors=anchors, chain=chain)
 
 
 def _parse_hull(h: Any, source: str) -> HullSpec:
