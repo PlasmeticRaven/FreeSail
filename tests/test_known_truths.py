@@ -2849,21 +2849,25 @@ GATE_5B_BROUGHT_UP_TICK = 59144  # brought up, the sails furled (59145 before pa
 # ship's own moves, the lines grow by the sail's lines (629 → 633, 730 → 734) and the
 # digests follow (the hail's line carries the cutter's errand in its data too, for the
 # book's `the pilot's hail` and `the pilot asks to be put off`); the thick passage, with
-# no cutter, is untouched (docs/dev/TuningNotes.md, package 36). Measured in package 36's
-# tree before the lead's tide-words change to `ports.py`, which moved these two digests
-# again and no tick; the lead reconciles.
-GATE_5B_SAIL_SIGHTED_TICK = 54600  # "Sail ho! A sail on the larboard bow", three leagues
-GATE_5B_PILOT_HAIL_TICK = 56940  # the cutter hails within four cables
-GATE_5B_PILOT_ABOARD_TICK = 58200  # the pilot aboard, half a minute after the anchor
+# no cutter, is untouched (docs/dev/TuningNotes.md, package 36). The cutter comes off from
+# the pilots' station, the outer road, not from the shore (36: from the shore of Brest she
+# beat out six hours for a ship in the Iroise), so she is sighted two leagues off bearing
+# N by W, hails at 56280 and puts the pilot aboard at 56340, half an hour before the
+# anchor (the schooner's 55320 and 55380). Measured in package 36's tree before the lead's
+# tide-words change to `ports.py`, which moved these two digests again and no tick; the
+# lead reconciles.
+GATE_5B_SAIL_SIGHTED_TICK = 54600  # "Sail ho! A sail on the larboard bow", two leagues
+GATE_5B_PILOT_HAIL_TICK = 56280  # the cutter hails within four cables
+GATE_5B_PILOT_ABOARD_TICK = 56340  # the pilot aboard, half an hour before the anchor
 GATE_5B_LINES = 633
-GATE_5B_DIGEST = "59864e53cb531400"
+GATE_5B_DIGEST = "dd07888fdd36ee45"
 GATE_5B_SCHOONER_LANDFALL_TICK = 43920
 GATE_5B_SCHOONER_ROADS_TICK = 56502  # the outer road: sail shortened, a course for Carrick Road
-GATE_5B_SCHOONER_PILOT_ABOARD_TICK = 57000  # the pilot aboard, American colours no bar
+GATE_5B_SCHOONER_PILOT_ABOARD_TICK = 55380  # the pilot aboard, American colours no bar
 GATE_5B_SCHOONER_ANCHORED_TICK = 57615  # off the town: the best bower let go
 GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58618
 GATE_5B_SCHOONER_LINES = 734
-GATE_5B_SCHOONER_DIGEST = "faefcf027509ebb6"
+GATE_5B_SCHOONER_DIGEST = "f5a2b2b7d097df75"
 GATE_5B_THICK_LANDFALL_TICK = 54900
 GATE_5B_THICK_LINES = 504
 GATE_5B_THICK_DIGEST = "65927077f46006eb"
@@ -3158,9 +3162,8 @@ def test_the_passage_for_gate_5b_at_seed_7_has_its_own_constants(gate_5b_passage
     assert world.readings.words("anchor").startswith("down, riding by the best bower to the")
     # the pilot boarding from the cutter (package 35; spec M5 §23): the cutter sighted
     # as any sail is, a bearing first; the hail; the pilot aboard as a person with his
-    # words and the port's news, as she anchors (package 36: the hail comes before she
-    # has shortened sail, and he boards once she is slow enough); the ship's own ticks
-    # unmoved
+    # words and the port's news, before she anchors (package 36: the cutter comes off
+    # from the outer road, the pilots' station); the ship's own ticks unmoved
     sails = [e for e in log if e.kind == "lookout.sighting" and e.data.get("seen_as") == "sail"]
     assert sails and sails[0].tick == GATE_5B_SAIL_SIGHTED_TICK
     assert sails[0].text.startswith("Sail ho! A sail on the larboard bow, bearing ")

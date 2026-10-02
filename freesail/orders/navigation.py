@@ -400,7 +400,11 @@ def execute(ship: Any, order: Order) -> Result:
         if which and sighting is None:
             raise OrderError(f"Nothing in sight answers to {which!r}; the strangers are listed.")
         if sighting is None:
-            sighting = min(sails, key=lambda s: s.distance_m)
+            # the chase in hand is kept while she is in sight (a second sail nearer does
+            # not take the helm from her); else the nearest sail
+            chases = getattr(lookout, "_chases", None) or {}
+            in_hand = [s for s in sails if s.feature.id in chases]
+            sighting = min(in_hand or sails, key=lambda s: s.distance_m)
         from freesail.world.lookout import relative_words
 
         heading = float(world.ship.heading)
