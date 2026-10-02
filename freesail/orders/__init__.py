@@ -65,7 +65,13 @@ def handle(ship: Ship, text: str) -> tuple[str, str, dict[str, Any]]:
     """
     from freesail.orders import stations
     from freesail.standing import grammar as standing
+    from freesail.world import orders as world_channel
 
+    if world_channel.recognises(text):
+        # a world order at the captain's prompt (spec M5 §26, truth 71; package 36): the
+        # channel is the scenario's and the director's, never the captain's grammar's;
+        # refused in the vocabulary's words
+        raise OrderError(load_vocabulary().world_order_refusal or world_channel.REFUSAL)
     if standing.recognises(text):
         return standing.handle(ship, text)
     book = standing.bare_book_sentence(ship, text)

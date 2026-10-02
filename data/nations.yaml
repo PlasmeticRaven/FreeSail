@@ -26,6 +26,7 @@ nations:
     people: the English          # the pilots' word for the ship's people
     names: english               # the names list in data/crew/names.yaml for her people
     colours: "the red, white or blue ensign by her admiral's squadron, the union jack at the bowsprit; a merchantman the red ensign"
+    flag: "the red ensign"    # the flag's short word, for the lookout's "shows British colours, the red ensign" (package 36)
     letters_of_marque: true      # issued by the Admiralty against France, Spain and the Batavian Republic (from memory)
     closed_to: []
   france:
@@ -34,6 +35,7 @@ nations:
     people: the French
     names: french                # a short list in the port files (Brest's pilots); none in names.yaml
     colours: "the tricolour, blue at the hoist, white, red in the fly (the ensign of 1794)"
+    flag: "the tricolour"    # the flag's short word, for the lookout's "shows British colours, the red ensign" (package 36)
     letters_of_marque: true      # the corsairs of St Malo, Dunkirk and Bordeaux (from memory)
     closed_to: []
   spain:
@@ -42,6 +44,7 @@ nations:
     people: the Spaniards
     names: english
     colours: "red and yellow in three bands, the yellow twice the depth of the red (the naval ensign of 1785)"
+    flag: "the red and yellow"    # the flag's short word, for the lookout's "shows British colours, the red ensign" (package 36)
     letters_of_marque: true
     closed_to: []
   batavian-republic:
@@ -50,6 +53,7 @@ nations:
     people: the Dutch
     names: american              # the Dutch and German names of the american list serve for want of a Dutch one
     colours: "red, white and blue in horizontal bands, the Batavian jack with the maid of liberty at the hoist"
+    flag: "the Batavian tricolour"    # the flag's short word, for the lookout's "shows British colours, the red ensign" (package 36)
     letters_of_marque: true
     closed_to: []
   united-states:
@@ -58,6 +62,7 @@ nations:
     people: the Americans
     names: american
     colours: "fifteen stripes and fifteen stars (the flag of 1795 to 1818)"
+    flag: "the stars and stripes"    # the flag's short word, for the lookout's "shows British colours, the red ensign" (package 36)
     letters_of_marque: false     # none issued in 1805; the Barbary war was the Navy's (from memory)
     closed_to: []
   portugal:
@@ -66,6 +71,7 @@ nations:
     people: the Portuguese
     names: english
     colours: "white, with the royal arms in the middle"
+    flag: "the white ensign with the arms"    # the flag's short word, for the lookout's "shows British colours, the red ensign" (package 36)
     letters_of_marque: false
     closed_to: []
   denmark:
@@ -74,6 +80,7 @@ nations:
     people: the Danes
     names: english
     colours: "the Dannebrog, a white cross on red, swallow-tailed in a King's ship"
+    flag: "the Dannebrog"    # the flag's short word, for the lookout's "shows British colours, the red ensign" (package 36)
     letters_of_marque: false
     closed_to: []
 

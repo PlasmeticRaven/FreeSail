@@ -1808,6 +1808,13 @@ def _sail_in_sight(world: Any, _: str | None) -> dict[str, Any] | None:
     return lookout.sail(float(world.ship.heading)) if lookout is not None else None
 
 
+def _strangers(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the strangers` (spec M5 §25; package 36): every sail in sight with her bearing,
+    her distance by estimation and what has been made out of her; never her position."""
+    lookout = _lookout_of(world)
+    return lookout.strangers(world, float(world.ship.heading)) if lookout is not None else None
+
+
 REGISTRY.add(
     Reading(
         "people",
@@ -1951,6 +1958,18 @@ REGISTRY.add(
         "",
         _sail_in_sight,
         description="other sail in sight: in sight or not, each with the lookout's words",
+        none_words=_no_chart_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "strangers",
+        ("the strangers", "what sail is in sight"),
+        "sight",
+        "",
+        _strangers,
+        description="every sail in sight: her bearing, her distance by estimation and what "
+        "has been made out of her (her rig, her course, her colours or none)",
         none_words=_no_chart_words,
     )
 )
@@ -2101,6 +2120,17 @@ _event(EventSpec("got under way", "ship.under_way"))
 EVENTS["under way"] = EventSpec("under way", "ship.weighed", also=("ship.under_way",))
 _event(EventSpec("the hands entered", "crew.entered"))
 _event(EventSpec("the yard's stores aboard", "yard.done"))
+# Package 36: the other sail's events (spec M5 §25), by the lookout's kinds
+# (`world/lookout.py`): what the tops make out as she nears, her colours made out, a sail
+# lost from the horizon; and a vessel within hail (`world/ships.py`).
+_event(EventSpec("a sail made out", "lookout.made_out"))
+_event(
+    EventSpec(
+        "a stranger's colours made out", "lookout.made_out", lambda data: bool(data.get("colours"))
+    )
+)
+_event(EventSpec("a sail lost", "lookout.sail_lost"))
+_event(EventSpec("a sail within hail", "sail.within_hail"))
 
 
 def event_matches(spec: EventSpec, kind: str, data: dict[str, Any]) -> bool:

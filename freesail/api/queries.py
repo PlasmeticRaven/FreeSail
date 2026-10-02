@@ -204,6 +204,10 @@ def snapshot(world: World) -> dict[str, Any]:
         "weather": weather_block(world),
         # the lookout's reading (spec M5 §12), None without a chart
         "lookout": r["in_sight"],
+        # the other sail in sight (spec M5 §25, package 36): each by her bearing and her
+        # distance by estimation with what has been made out, for the captain's chart to
+        # draw at that bearing and distance from the account; never her position
+        "strangers": r["strangers"],
         # the captain's chart (spec M5 §17, package 33a): the reckoned position brought up
         # to now and its ellipse, the track by account, the noons, the bearings taken, the
         # soundings with their ground, the master; None on the plane. The truth's position

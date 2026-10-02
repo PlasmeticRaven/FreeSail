@@ -776,6 +776,46 @@ class Weather:
         """The scripted systems as the scenario holds them."""
         return [s.to_dict() for s in self.systems if s.scripted]
 
+    # -- the world-order channel (spec M5 §26; package 36) ----------------------------
+
+    def find(self, name: str) -> System | None:
+        key = " ".join(str(name).lower().split())
+        for s in self.systems:
+            if not s.gone and " ".join(s.name.lower().split()) == key:
+                return s
+        return None
+
+    def append_system(self, d: Mapping[str, Any]) -> System:
+        """A scripted system appended by a world order (`world/orders.py`): it follows
+        its track from its first waypoint and holds the ends, beside the seeded ones."""
+        if self.find(str(d.get("name") or "")) is not None:
+            raise WeatherError(f"The weather has a system named {d.get('name')!r} already.")
+        system = _system_from_dict(d, self.now)
+        self.systems.append(system)
+        x, y, hpa = _track_at(system.track, system.track_times, self.now)
+        system.x_km, system.y_km, system.anomaly_hpa = x, y, hpa - self._background
+        return system
+
+    def append_waypoint(
+        self, name: str, at: datetime, x_km: float, y_km: float, hpa: float
+    ) -> None:
+        """A waypoint appended to a scripted system's track, after its last."""
+        system = self.find(name)
+        if system is None:
+            known = ", ".join(s.name for s in self.systems if not s.gone) or "none"
+            raise WeatherError(
+                f"The weather has no system named {name!r}; the systems are {known}."
+            )
+        if not system.scripted:
+            raise WeatherError(f"{system.name} is a seeded system and follows no track.")
+        if system.track and at <= system.track[-1].at:
+            raise WeatherError(
+                f"{system.name}'s track ends at {system.track[-1].at.isoformat()}; a waypoint "
+                f"appended comes after it."
+            )
+        system.track.append(TrackPoint(at, float(x_km), float(y_km), float(hpa)))
+        system.track_times.append(at)
+
     def describe(self) -> list[str]:
         """The systems in words, for the driver's load line (the author's view: names,
         kinds, where they are now; never a log line)."""
@@ -934,6 +974,9 @@ class Weather:
         live: list[System] = []
         freed = 0
         for s in self.systems:
+            if s.scripted:
+                live.append(s)  # a system a world order appended follows its track (36)
+                continue
             age = s.age_h(when)
             assert s.life_h is not None
             s.anomaly_hpa = s.peak_hpa * math.sin(math.pi * min(max(age / s.life_h, 0.0), 1.0))

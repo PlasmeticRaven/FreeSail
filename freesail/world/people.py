@@ -266,6 +266,44 @@ class People:
                 p.where = "gunroom"
             elif p.role in ("carpenter", "boatswain", "gunner", "master-at-arms"):
                 p.where = "deck"
+        self._scenario_people()
+
+    def _scenario_people(self) -> None:
+        """The scenario's `people:` (spec M5 §27; package 36): a person beyond the muster
+        ({role, name, skill, place, ashore}), or, named by a role the muster fills with
+        no name given, that man's skill and place set (a lunarian master: `{role: master,
+        skill: 0.95}`; the master's skill is the reckoning's, through his mirror)."""
+        world = self.world
+        for spec in getattr(world.scenario, "people", None) or []:
+            role = str(spec.get("role") or "").strip().lower()
+            name = str(spec.get("name") or "").strip()
+            if not role:
+                continue
+            found = None if name else next((p for p in self.people if p.role == role), None)
+            if found is not None:
+                if spec.get("skill") is not None:
+                    found.skill = float(spec["skill"])
+                    if found.mirror is not None:
+                        found.mirror.skill = found.skill
+                if spec.get("place"):
+                    found.where = str(spec["place"]).replace(" ", "_")
+                continue
+            pid = (role + ("_" + name if name else "")).lower()
+            pid = "".join(c if c.isalnum() else "_" for c in pid).strip("_")
+            ashore = bool(spec.get("ashore")) or str(spec.get("place") or "") == "shore"
+            self.people.append(
+                Person(
+                    pid,
+                    name or _address(role, role),
+                    role,
+                    float(spec.get("skill", 0.7) or 0.7),
+                    place="shore"
+                    if ashore
+                    else str(spec.get("place") or "cabin").replace(" ", "_"),
+                    aboard=not ashore,
+                    port=str(spec.get("port")) if spec.get("port") else None,
+                )
+            )
 
     # -- finding ------------------------------------------------------------------
 

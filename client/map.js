@@ -16,7 +16,14 @@
  * sails on; "centre" puts the ship in the middle and follows her at the scale chosen,
  * and "fit" goes back to the view drawn from the track, as at first. The scale bar, the
  * graticule and the names follow the scale (the names when a mile is thirty pixels, as
- * before). The plane's map the same. The view's arithmetic is pure (`view`), for Node. */
+ * before). The plane's map the same. The view's arithmetic is pure (`view`), for Node.
+ *
+ * Package 36: other sail. A sighting (snap.strangers, the lookout's reading) is drawn at
+ * its bearing and its distance by estimation from the reckoned position, never at the
+ * truth, which the snapshot does not carry; the doubt grows with the estimate (a bar
+ * along the bearing, a sixth of the estimate either way, the lookout's own error, the
+ * same rule as the held estimate of 33b), and the words beside it are what has been
+ * made out: "a sail", "a brig, standing to the eastward", her colours. */
 (function (root) {
   "use strict";
   var U = root.Units || (typeof require === "function" ? require("./units.js") : null);
@@ -484,6 +491,49 @@
     ctx.textBaseline = "alphabetic";
   };
 
+  // The lookout's estimate of a distance is a sixth out either way (one sigma;
+  // freesail/world/lookout.py, DISTANCE_BY_ESTIMATION_FRACTION): the bar's half-length.
+  var ESTIMATE_DOUBT = 0.15;
+
+  // other sail in sight (package 36): each at its bearing and estimated distance from
+  // the reckoned position, a sail glyph with a bar of doubt along the bearing and the
+  // words made out; nothing here knows where she truly is.
+  Map.prototype.drawStrangers = function (ctx, snap, frame, toPx, scale, inkColour) {
+    var st = snap.strangers;
+    if (!st || !st.items || !st.items.length) return;
+    var s0 = frame.ship;
+    ctx.font = "10px serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    st.items.forEach(function (it) {
+      if (it.estimate_m === null || it.estimate_m === undefined) return;
+      var ang = it.bearing_deg * Math.PI / 180;
+      var est = it.estimate_m;
+      var near = toPx(s0[0] + est * (1 - ESTIMATE_DOUBT) * Math.sin(ang), s0[1] + est * (1 - ESTIMATE_DOUBT) * Math.cos(ang));
+      var far = toPx(s0[0] + est * (1 + ESTIMATE_DOUBT) * Math.sin(ang), s0[1] + est * (1 + ESTIMATE_DOUBT) * Math.cos(ang));
+      var at = toPx(s0[0] + est * Math.sin(ang), s0[1] + est * Math.cos(ang));
+      ctx.save();
+      ctx.strokeStyle = inkColour;
+      ctx.globalAlpha = 0.5;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(near[0], near[1]);
+      ctx.lineTo(far[0], far[1]);
+      ctx.stroke();
+      ctx.restore();
+      // the glyph: a small sail, point up
+      ctx.fillStyle = inkColour;
+      ctx.beginPath();
+      ctx.moveTo(at[0], at[1] - 6);
+      ctx.lineTo(at[0] + 4, at[1] + 4);
+      ctx.lineTo(at[0] - 4, at[1] + 4);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillText(it.words.split(",")[0], at[0] + 7, at[1]);
+    });
+    ctx.textBaseline = "alphabetic";
+  };
+
   Map.prototype.draw = function (snap) {
     var canvas = this.canvas;
     var ctx = canvas.getContext("2d");
@@ -567,6 +617,7 @@
     // the track: the account's on the chart, the plane's own on the plane
     if (frame.geo) {
       this.drawAccount(ctx, snap, frame, toPx, scale, inkColour, trackColour);
+      this.drawStrangers(ctx, snap, frame, toPx, scale, inkColour);
     } else if (pts.length > 1) {
       ctx.strokeStyle = trackColour;
       ctx.lineWidth = 1.5;

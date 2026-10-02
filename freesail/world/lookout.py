@@ -31,6 +31,20 @@ steady and closing`), and on a moonlit night sees the land at a league
 The reading `what is in sight` (`freesail.api.readings`) is the last look's sightings,
 and `the land` whether any land is among them, so a book may say `when the land is in
 sight then ...`.
+
+**Other sail** (spec M5 §25; package 35 began it with the pilot cutter, package 36 the
+rest): a vessel of `freesail.world.ships` is sighted at the horizon her rig's height and
+the eye give and hailed as "Sail ho!" with a bearing first (notable; the event `a sail
+sighted`); then, as she nears, what the tops make out at the period's distances is a
+routine line each time it changes (`lookout.made_out`: her rig and her course at
+`ships.RIG_MADE_OUT_NM`, her colours or their want at `ships.COLOURS_MADE_OUT_NM`, the
+event `a stranger's colours made out`; what she is at `ships.MADE_OUT_NM`), and a sail
+gone from the horizon is "out of sight" (`lookout.sail_lost`, the event `a sail lost`).
+`make her out` sends a glass aloft (`Lookout.make_out`) and answers with what the
+distance allows, half as far again as the eye. `the strangers` (`Lookout.strangers`) is
+every sail in sight with her bearing, her distance by estimation and what has been made
+out of her, and never her position: the world keeps the truth and the captain keeps his
+account, for other ships as for his own.
 """
 
 from __future__ import annotations
@@ -185,6 +199,15 @@ _SAIL_WORDS = frozenset(
         "the pilot cutter",
     }
 )
+# A sail by her rig as the tops made it out (package 36): the word in the lookout's name
+# for her ("a brig, standing to the eastward").
+_RIG_WORDS = {
+    "brig": "brig",
+    "ship": "ship",
+    "frigate": "frigate",
+    "schooner": "schooner",
+    "merchantman": "merchant",
+}
 
 
 @dataclass
@@ -218,6 +241,11 @@ class Lookout:
     _edge_said: bool = False
     _moonlit_said: bool = False
     moonlit: bool = False
+    # other sail (package 36): the level made out of each sail so far (0 a sail, 1 her
+    # rig, 2 her colours, 3 what she is) and the words of her last bearing, for the line
+    # when she is lost
+    _sail_said: dict[str, int] = field(default_factory=dict)
+    _sails_seen: dict[str, str] = field(default_factory=dict)
 
     def look(self, world: Any) -> list[tuple[Severity, str, str, dict[str, Any]]]:
         """Look from the masthead now: the sightings kept for the reading, and the log's
@@ -298,9 +326,7 @@ class Lookout:
             # a danger is notable; so is everything seen in the look that makes the
             # landfall, and a sail ("Sail ho!", package 35)
             notable = s.seen_as in ("danger", "sail") or first_land
-            data = s.to_dict() | {
-                "relative": relative_words(math.radians(s.bearing_deg) - heading),
-                "estimate": estimate_words(s.judged_m),
+            data = self._data(s, heading) | {
                 "height_of_eye_m": round(self.height_of_eye_m, 1),
                 "landfall": bool(first_land),
             }
@@ -308,6 +334,7 @@ class Lookout:
                 (Severity.NOTABLE if notable else Severity.ROUTINE, "lookout.sighting", text, data)
             )
         lines.extend(self._closing(found, heading, minute))
+        lines.extend(self._sails(world, found, fresh_ids, heading))
         if self._had_land and not land_now and self._looked:
             lines.append(
                 (Severity.ROUTINE, "lookout.lost", "The land is out of sight.", {"count": 0})
@@ -390,6 +417,172 @@ class Lookout:
             out.append((Severity.NOTABLE, "lookout.closing", text, data))
         return out
 
+    # -- other sail (spec M5 §25; package 36) -------------------------------------------
+
+    @staticmethod
+    def _data(s: Sighting, heading_rad: float) -> dict[str, Any]:
+        """A sighting's data for a line or a reading: a sail's without the truth's
+        distance (the captain has her bearing and his estimate, never her position)."""
+        d = s.to_dict()
+        if s.seen_as == "sail":
+            d.pop("distance_m", None)
+        return d | {
+            "relative": relative_words(math.radians(s.bearing_deg) - heading_rad),
+            "estimate": estimate_words(s.judged_m),
+        }
+
+    def _vessel(self, world: Any, s: Sighting) -> Any:
+        vessels = getattr(world, "vessels", None)
+        return vessels.get(s.feature.modern) if vessels is not None else None
+
+    def _sails(
+        self, world: Any, found: list[Sighting], fresh_ids: set[str], heading: float
+    ) -> list[tuple[Severity, str, str, dict[str, Any]]]:
+        """What the tops make out of each sail as she nears, a routine line as it
+        changes; and a sail lost from the horizon."""
+        out: list[tuple[Severity, str, str, dict[str, Any]]] = []
+        seen: dict[str, str] = {}
+        for s in found:
+            if s.seen_as != "sail":
+                continue
+            v = self._vessel(world, s)
+            if v is None:
+                continue
+            fid = s.feature.id
+            relative = relative_words(math.radians(s.bearing_deg) - heading)
+            level, words = v.made_out(s.distance_m)
+            said = self._sail_said.get(fid)
+            if said is None:
+                # hailed this look: the hail says what the distance allows
+                self._sail_said[fid] = level
+            elif level > said:
+                self._sail_said[fid] = level
+                out.append(self._made_out_line(v, s, level, words, relative, glass=False))
+            seen[fid] = f"{_head(self._sail_word(v, level))} {relative}"
+        for fid, where in list(self._sails_seen.items()):
+            if fid not in seen:
+                self._sail_said.pop(fid, None)
+                out.append(
+                    (
+                        Severity.ROUTINE,
+                        "lookout.sail_lost",
+                        f"{where} is out of sight.",
+                        {"id": fid.removeprefix("sail:"), "words": where},
+                    )
+                )
+        self._sails_seen = seen
+        return out
+
+    @staticmethod
+    def _sail_word(v: Any, level: int) -> str:
+        """'the sail', 'the brig', 'the merchant brig': how the lookout names her now."""
+        if level >= 3:
+            return "the " + (v.what or v.name).split(",")[0].removeprefix("a ").removeprefix("the ")
+        if level >= 1:
+            return "the " + v.kind.removeprefix("a ")
+        return "the sail"
+
+    def _made_out_line(
+        self, v: Any, s: Sighting, level: int, words: str, relative: str, glass: bool
+    ) -> tuple[Severity, str, str, dict[str, Any]]:
+        who = self._sail_word(v, level - 1 if level > 1 else 0)
+        colours = level >= 2 and v.shows_colours and bool(v.nation_adjective)
+        if glass:
+            text = f"The glass aloft makes out {who} {relative}: {words}."
+        elif level == 1:
+            text = f"{_head(who)} {relative} is {words}."
+        elif level == 2:
+            text = (
+                f"{_head(who)} {relative} shows {v.colours_words()}."
+                if colours
+                else (f"{_head(who)} {relative} is {v.colours_words()}.")
+            )
+        else:
+            text = f"{_head(who)} {relative} is {words}."
+        data = {
+            "id": v.id,
+            "level": level,
+            "colours": bool(colours),
+            "nation": v.nation if colours else None,
+            "words": words,
+            "relative": relative,
+            "bearing_deg": round(s.bearing_deg, 1),
+            "estimate_m": None if s.estimate_m is None else round(s.estimate_m),
+            "glass": glass,
+        }
+        return Severity.ROUTINE, "lookout.made_out", text, data
+
+    def make_out(self, world: Any, which: str | None = None) -> tuple[str, dict[str, Any]]:
+        """`make her out`: a glass sent aloft, and the answer at once with what the
+        distance allows (`ships.GLASS_FACTOR` further than the eye); refused in words
+        with no sail in sight. Returns (the line, its data)."""
+        from freesail.orders.errors import OrderError
+
+        sails = [s for s in self.sightings if s.seen_as == "sail"]
+        if not sails:
+            raise OrderError("No sail in sight to make out.")
+        s = self.find(which) if which else None
+        if which and s is None:
+            raise OrderError(f"Nothing in sight answers to {which!r}; the strangers are listed.")
+        if s is None:
+            s = min(sails, key=lambda x: x.distance_m)
+        v = self._vessel(world, s)
+        heading = float(world.ship.heading)
+        relative = relative_words(math.radians(s.bearing_deg) - heading)
+        if v is None:
+            return f"The glass aloft makes out nothing more of the sail {relative}.", {
+                "id": s.feature.id,
+                "glass": True,
+            }
+        level, words = v.made_out(s.distance_m, glass=True)
+        self._sail_said[s.feature.id] = max(level, self._sail_said.get(s.feature.id, 0))
+        if level == 0:
+            text = (
+                f"The glass aloft makes out nothing more of the sail {relative}: her hull is "
+                f"below the horizon, distant {estimate_words(s.judged_m)}."
+            )
+            return text, {"id": v.id, "level": 0, "colours": False, "glass": True}
+        _, _, text, data = self._made_out_line(v, s, level, words, relative, glass=True)
+        return text, data
+
+    def strangers(self, world: Any, heading_rad: float) -> dict[str, Any]:
+        """`the strangers`: every sail in sight, nearest first, with her bearing, her
+        distance by estimation and what has been made out of her; never her position."""
+        sails = sorted(
+            (s for s in self.sightings if s.seen_as == "sail"), key=lambda s: s.distance_m
+        )
+        items = []
+        for s in sails:
+            v = self._vessel(world, s)
+            level = self._sail_said.get(s.feature.id, 0)
+            point = units.point_name(math.radians(s.bearing_deg))
+            relative = relative_words(math.radians(s.bearing_deg) - heading_rad)
+            head = self._sail_word(v, level).removeprefix("the ") if v is not None else "sail"
+            head = "a sail" if head == "sail" else f"a {head}"
+            known = v.words_at(level) if v is not None and level > 0 else ""
+            detail = ""
+            if known:
+                # the course and the colours after the bearing: what has been made out
+                detail = ": " + known.split(", ", 1)[1] if ", " in known else ""
+            items.append(
+                {
+                    "id": s.feature.modern,
+                    "bearing_deg": round(s.bearing_deg, 1),
+                    "bearing": point,
+                    "relative": relative,
+                    "estimate_m": None if s.estimate_m is None else round(s.estimate_m),
+                    "estimate": estimate_words(s.judged_m),
+                    "made_out": level,
+                    "known": known or "a sail",
+                    "words": f"{head} {relative}, bearing {point}, distant "
+                    f"{estimate_words(s.judged_m)}{detail}",
+                }
+            )
+        if not items:
+            return {"in_sight": False, "count": 0, "words": "no sail in sight", "items": []}
+        words = "; ".join(lead_words(i["words"]) for i in items)
+        return {"in_sight": True, "count": len(items), "words": words, "items": items}
+
     def _shore_close_aboard(
         self, pos: Any, visibility_nm: float | None, daylight: str
     ) -> Sighting | None:
@@ -460,9 +653,14 @@ class Lookout:
         if key in ("light", "nearest light", "the light"):
             lights = [s for s in self.sightings if s.seen_as == "light"]
             return min(lights, key=lambda s: s.distance_m) if lights else None
-        if key in _SAIL_WORDS or f"the {key}" in _SAIL_WORDS:
-            # a sail in sight, by the lookout's words for her (package 35)
+        if key in _SAIL_WORDS or f"the {key}" in _SAIL_WORDS or key in _RIG_WORDS:
+            # a sail in sight, by the lookout's words for her (package 35), or by her rig
+            # as made out ('the brig': the nearest brig among the sails; package 36)
             sails = [s for s in self.sightings if s.seen_as == "sail"]
+            if key in _RIG_WORDS:
+                rig = _RIG_WORDS[key]
+                named = [s for s in sails if rig in _key(s.feature.name)]
+                return min(named, key=lambda s: s.distance_m) if named else None
             return min(sails, key=lambda s: s.distance_m) if sails else None
         for s in self.sightings:
             f = s.feature
@@ -482,12 +680,7 @@ class Lookout:
         items = []
         for s in ordered:
             items.append(
-                s.to_dict()
-                | {
-                    "relative": relative_words(math.radians(s.bearing_deg) - heading_rad),
-                    "estimate": estimate_words(s.judged_m),
-                    "words": self.words(s, heading_rad).rstrip("."),
-                }
+                self._data(s, heading_rad) | {"words": self.words(s, heading_rad).rstrip(".")}
             )
         dangers = [i for i in items if i["seen_as"] == "danger"]
         rest = [i for i in items if i["seen_as"] != "danger"]
@@ -508,12 +701,8 @@ class Lookout:
             (s for s in self.sightings if s.seen_as == "sail"), key=lambda s: s.distance_m
         )
         items = [
-            s.to_dict()
-            | {
-                "relative": relative_words(math.radians(s.bearing_deg) - heading_rad),
-                "estimate": estimate_words(s.judged_m),
-                "words": self.words(s, heading_rad).removeprefix("Sail ho! ").rstrip("."),
-            }
+            self._data(s, heading_rad)
+            | {"words": self.words(s, heading_rad).removeprefix("Sail ho! ").rstrip(".")}
             for s in sails
         ]
         if not items:

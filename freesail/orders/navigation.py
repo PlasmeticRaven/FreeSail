@@ -90,6 +90,30 @@ def _knots(text: str) -> float:
     raise OrderError(f"'{text}' is not a number of knots; say 'allow one knot of set to the east'.")
 
 
+def _world_with_lookout(ship: Any) -> Any:
+    """The World with a lookout at the masthead (a chart), for the other sail's orders;
+    refused in words on the plane."""
+    from freesail.orders.prompt import world_of
+
+    world = world_of(ship)
+    if world is None or getattr(world, "lookout", None) is None:
+        raise OrderError(
+            "No lookout is kept: the scenario gives her no chart, and there is no sea for "
+            "another sail to be on."
+        )
+    return world
+
+
+def _sail_named(verb_phrase: str) -> str | None:
+    """Which sail a phrase names of itself: 'make out the brig' names the brig; 'make her
+    out' names none (the nearest)."""
+    words = verb_phrase.split()
+    for word in ("brig", "cutter", "ship", "schooner", "frigate", "stranger", "sail"):
+        if word in words:
+            return word
+    return None
+
+
 def execute(ship: Any, order: Order) -> Result:
     """Carry out a navigation order. The verb is the vocabulary's key."""
     verb = order.verb
@@ -158,6 +182,43 @@ def execute(ship: Any, order: Order) -> Result:
         _, helm_text, helm_data = handle(ship, f"steer {units.rad_to_deg(heading):.0f}")
         data = {"verb": verb, "level": 1, "place": rest, "heading": heading} | {"helm": helm_data}
         return "helm.set", f"{words} {helm_text}", data
+    # other sail (spec M5 §25; package 36): the glass aloft, and the chase
+    if verb == "make her out":
+        world = _world_with_lookout(ship)
+        which = rest or _sail_named(order.verb_phrase)
+        text, data = world.lookout.make_out(world, which)
+        return "lookout.made_out", text, {"verb": verb, "level": 1} | data
+    if verb == "give chase":
+        world = _world_with_lookout(ship)
+        which = rest or _sail_named(order.verb_phrase)
+        lookout = world.lookout
+        sails = [s for s in lookout.sightings if s.seen_as == "sail"]
+        if not sails:
+            raise OrderError("No sail in sight to chase.")
+        sighting = lookout.find(which) if which else None
+        if which and sighting is None:
+            raise OrderError(f"Nothing in sight answers to {which!r}; the strangers are listed.")
+        if sighting is None:
+            sighting = min(sails, key=lambda s: s.distance_m)
+        from freesail.world.lookout import relative_words
+
+        heading = float(world.ship.heading)
+        relative = relative_words(math.radians(sighting.bearing_deg) - heading)
+        point = units.point_name(math.radians(sighting.bearing_deg))
+        who = sighting.feature.name
+        from freesail.orders import handle
+
+        _, helm_text, helm_data = handle(ship, f"steer {sighting.bearing_deg:.0f}")
+        words = f"Gave chase to {who} {relative}, bearing {point}. {helm_text}"
+        data = {
+            "verb": verb,
+            "level": 1,
+            "id": sighting.feature.modern,
+            "bearing_deg": round(sighting.bearing_deg, 1),
+            "relative": relative,
+            "helm": helm_data,
+        }
+        return "helm.set", words, data
     # the longitude's orders (package 33b)
     if verb == "take a sight for the longitude":
         nav = _navigation(ship)

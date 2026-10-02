@@ -783,6 +783,16 @@ class Builder:
         if "all sail" in groups and "sails" not in groups and "sails" not in aliases:
             self.alias("sails", "all sail")
 
+    def descriptions(self, entries):
+        """The vessel's descriptions at far detail (spec M5 §25; package 36): one file,
+        two descriptions where the type served two trades (the brig-sloop of the Navy and
+        the merchant brig). Each {key: {rig, what, note}}: her rig's word as the tops make
+        it out at four miles, what she is when made out, and the source. Read by
+        `freesail.world.ships` for the other sail; the engine's physics reads none of it."""
+        self.doc["ship"]["descriptions"] = {
+            key: {"rig": rig, "what": what, "note": note} for key, rig, what, note in entries
+        }
+
     def dump(self, path, header):
         self.whole_ship_groups()
         self.rate_spars()
@@ -4977,6 +4987,30 @@ def brig(out_dir="data/ships"):
                 ),
             ],
         ),
+    )
+    # Her two descriptions at far detail (spec M5 §25, package 36; the owner, 2026-09-29:
+    # the brig-sloop is the Navy's brig and the merchant brig the trade's, one file): what
+    # the tops make out at four miles is the rig, two square-rigged masts (Falconer 1780,
+    # BRIG: "a merchant-ship with two masts"; Steel 1794 vol. I: the brig's sails as a
+    # ship's fore and main), and what she is when made out within a mile and a half.
+    b.descriptions(
+        [
+            (
+                "brig-sloop",
+                "a brig",
+                "a brig-sloop of war, sixteen ports a side",
+                "Harpy herself: sixteen 32-pounder carronades (the kit's manual; "
+                "docs/design/VesselCandidates.md); the ports are what the glass counts.",
+            ),
+            (
+                "merchant brig",
+                "a brig",
+                "a merchant brig, deep laden",
+                "The trade's brig of the same rig and size, her ports painted and no guns "
+                "run out (Falconer 1780, BRIG); 'deep laden' is the merchantman's look, "
+                "judgement.",
+            ),
+        ]
     )
     b.dump(
         os.path.join(out_dir, "brig.yaml"),

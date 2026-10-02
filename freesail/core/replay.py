@@ -117,9 +117,13 @@ def replay(
 
 
 def _give(world: World, entry: dict[str, Any]) -> None:
-    """One input again: an order to the ship, or a driver's line to the log."""
+    """One input again: an order to the ship, a world order from outside the scenario
+    (package 36: at its tick with its source, truth 72), or a driver's line to the log."""
     if "order" in entry:
         world.submit(str(entry["order"]), actor=str(entry["actor"]))
+        return
+    if "world_order" in entry:
+        world.world_order(str(entry["world_order"]), source=str(entry.get("source", "")))
         return
     line = entry["line"]
     world.record_driver(line["severity"], line["kind"], line["text"], line.get("data"))

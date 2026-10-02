@@ -47,6 +47,7 @@ class Nation:
     colours: str
     letters_of_marque: bool
     closed_to: tuple[str, ...] = ()
+    flag: str = ""  # the flag's short word for the lookout: "the red ensign" (package 36)
 
 
 @dataclass
@@ -178,6 +179,7 @@ def load_nations(path: str | Path = NATIONS_PATH) -> Nations:
             colours=str(d.get("colours") or ""),
             letters_of_marque=bool(d.get("letters_of_marque", False)),
             closed_to=tuple(str(x) for x in (d.get("closed_to") or [])),
+            flag=str(d.get("flag") or ""),
         )
     wars = []
     for w in doc.get("wars") or []:

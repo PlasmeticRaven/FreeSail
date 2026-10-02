@@ -129,6 +129,14 @@ class Scenario:
     papers: dict[str, Any] = field(default_factory=dict)
     cargo: dict[str, Any] = field(default_factory=dict)
     ports: Any = None
+    # Package 36 (spec M5 §25 to §27): the other sail on the sea at the start, each
+    # {"id", "description", "name", "nation", "position", "goal", "colours"}
+    # (`freesail.world.ships.vessel_from_spec`), and the world orders by time, each
+    # {"at": ISO time, "order": the words} (`freesail.world.orders`), applied by the World
+    # at their ticks and journaled at the driver's mark; a replay from the saved scenario
+    # applies them again (truth 72). A save from before loads with none.
+    ships: list[dict[str, Any]] = field(default_factory=list)
+    world_orders: list[dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
@@ -400,7 +408,7 @@ class World:
         self.places = Places(getattr(self.ship, "name", ""))
         self.people = People(self)
         self.papers = Papers(self)
-        self.vessels = Vessels()
+        self.vessels = Vessels(self)
         hold_spec = getattr(getattr(self.ship, "spec", None), "hold", None)
         cargo = self.scenario.cargo or {}
         self.hold = Hold(float(hold_spec.capacity_tons) if hold_spec is not None else 0.0)
@@ -414,6 +422,30 @@ class World:
             float(getattr(stores_spec, "provisions_days", 0.0) or 0.0),
         )
         self.ports = Ports(self)
+        # The other sail on the sea at the start and the world orders by time (spec M5 §25
+        # to §27; package 36; `freesail.world.ships`, `freesail.world.orders`): the ships
+        # are the scenario's state, as the people are; the orders are applied at their
+        # ticks by `_tick_world_orders` and kept in `world_orders` with their source, the
+        # harness's with them (`world_order`).
+        self.world_orders: list[dict[str, Any]] = []
+        self._scenario_orders: list[tuple[int, str]] = sorted(
+            (
+                int(
+                    (
+                        datetime.fromisoformat(str(o["at"])) - self.scenario.start_time
+                    ).total_seconds()
+                ),
+                str(o["order"]),
+            )
+            for o in self.scenario.world_orders
+        )
+        self._scenario_order_i = 0
+        if self.scenario.ships:
+            from freesail.world.ships import vessel_from_spec
+
+            for spec in self.scenario.ships:
+                self.vessels.serial += 1
+                self.vessels.add(vessel_from_spec(self, dict(spec), self.vessels.serial))
         # The readings (spec M4 §2): one view per tick and per order, read by the standing
         # orders, the snapshot and the agents alike.
         self._readings_key: tuple[int, int] | None = None
@@ -671,12 +703,70 @@ class World:
         self._aground = self.ground.aground
         if self.at_anchor:
             self._tick_anchors()
-        if self.clock.ship_time.second == 0:
-            # the other sail move once a minute, before the lookout looks (package 35)
-            self.vessels.tick(self)
         if self.lookout is not None and self.clock.ship_time.second == 0:
             for severity, kind, text, data in self.lookout.look(self):
                 self.record(severity, kind, text, data=data)
+
+    def _tick_vessels(self) -> None:
+        """The other sail (spec M5 §25, package 36): every far-detail vessel once a game
+        minute, at the roll-up's cadence and no oftener; a near-detail one every second;
+        both before the lookout looks (`_tick_chart`). The lines their own events make
+        (a letter brought alongside, a stranger within hail) are recorded here."""
+        if self._position is None or not self.vessels.vessels:
+            return
+        lines = self.vessels.tick_near(self)
+        if self.clock.ship_time.second == 0:
+            lines = lines + self.vessels.tick(self)
+        for severity, kind, text, data in lines:
+            self.record(severity, kind, text, data=data)
+
+    # -- the world-order channel (spec M5 §26; package 36) -----------------------------
+
+    def world_order(self, text: str, source: str = "the harness") -> Event:
+        """A world order from outside the scenario (the lead's test harness; the director
+        of milestone 7b): journaled in `inputs` at this tick with its source, so that a
+        replay gives it again, then carried out and logged at the driver's mark."""
+        text = " ".join(str(text).split())
+        self.inputs.append({"tick": self.clock.tick, "world_order": text, "source": str(source)})
+        return self._apply_world_order(text, source)
+
+    def _apply_world_order(self, text: str, source: str) -> Event:
+        from freesail.world import orders as world_orders
+
+        order = world_orders.parse(text)
+        try:
+            words, data = world_orders.apply(self, order)
+            result = "done"
+        except world_orders.WorldOrderError as e:
+            words, data, result = f"not carried out: {str(e).rstrip('.')}", {}, "refused"
+        self.world_orders.append(
+            {
+                "tick": self.clock.tick,
+                "source": str(source),
+                "order": text,
+                "result": result,
+                "words": words,
+            }
+        )
+        return self.record(
+            Severity.ROUTINE,
+            "world.order",
+            f"World order ({source}): {words}.",
+            actor="driver",
+            data={"order": text, "source": str(source), "channel": order.channel, "result": result}
+            | data,
+        )
+
+    def _tick_world_orders(self) -> None:
+        """The scenario's world orders due at this tick, in their order (a function of
+        the scenario, applied again by a replay, as the standing orders' firings are)."""
+        while (
+            self._scenario_order_i < len(self._scenario_orders)
+            and self._scenario_orders[self._scenario_order_i][0] <= self.clock.tick
+        ):
+            _, text = self._scenario_orders[self._scenario_order_i]
+            self._scenario_order_i += 1
+            self._apply_world_order(text, "the scenario")
 
     def _tick_sun(self) -> None:
         phase = self.daylight
@@ -955,6 +1045,9 @@ class World:
     def tick(self) -> None:
         """Advance the world by one game second."""
         self.clock.advance()
+        if self._scenario_order_i < len(self._scenario_orders):
+            # the scenario's world orders due now, before the weather moves (package 36)
+            self._tick_world_orders()
         if self.systems is not None:
             # the systems move every tick (microseconds: a bell and two segments a system);
             # the sky and the glass are read once a minute (`_observe_weather`)
@@ -1020,6 +1113,8 @@ class World:
         # the geographic frame (spec M5 §9): the tick's run turned to latitude and
         # longitude, then the chart's grounding check and the lookout (§11, §12)
         self._tick_geo()
+        # the other sail move before the lookout looks (packages 35 and 36)
+        self._tick_vessels()
         if self.chart is not None:
             self._tick_chart()
         if self.navigation is not None:
@@ -1136,6 +1231,10 @@ class World:
             # model's replies, which a replay plays back) and its journal
             "agents": [agent.save() for agent in self.agents.values()],
             "agent_journals": {name: j.save() for name, j in self.agent_journals.items()},
+            # the world orders applied, with their ticks and sources, for the reader (spec
+            # M5 §26, package 36); a replay applies the scenario's again from the scenario
+            # and the harness's from `inputs`
+            "world_orders": [dict(o) for o in self.world_orders],
         }
 
 
