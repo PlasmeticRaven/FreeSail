@@ -1643,6 +1643,19 @@ two sentences). Fable. Written 2026-10-02 for the owner's final review; after 36
    the watch: taking in the royals."). A person of 35 holds the place (the first
    lieutenant's name on the frigate, the mate's on the schooner and the cutter); the model
    takes his station, as the harness's stations are meant to bind to a person (§22).
+2b. **Standing orders by rank** (the owner, 2026-10-02: in 37, not M6). The officer may
+   give a standing order, and its rank is the station's, never the text's (`by the captain`
+   written by the officer is refused); each order of the rule is checked against the
+   officer's domain where the dialect already checks a rule's orders at entry, and a rule
+   with an action outside the domain is refused in words as a plain order would be; the
+   officer may belay, resume and strike his own standing orders only, the captain's refused
+   to him; the book lists each rule's rank, and the captain's night orders are the captain's
+   book. A conflict between the officer's rule and the captain's is the rule built at 4a
+   (truth 38): the captain's stands, the log says the officer's was countermanded. The
+   officer's rules fall under the same welfare detector as his orders (item 3), since the
+   conflict rule reads both. The fake proves each: a rule in the domain entered by the
+   officer, one outside refused, one countermanded by the captain's, a belay of the
+   captain's refused.
 3. **Welfare for a station with authority** (the cold review's second item). The repeat
    detector cannot fire for an officer whose orders change the readings; the pattern that
    matters is contradiction (set, take in, set) and drift (a course order every sample),
@@ -1703,14 +1716,15 @@ two sentences). Fable. Written 2026-10-02 for the owner's final review; after 36
     (§29), through Claude Code opened on the repository, on the same terms as every other
     model, the record kept under `docs/agents/consent/`.
 11. **Report**: the suite's last line; the domain as built with the refusals' words; the
+    officer's standing orders and the countermanding line; the
     welfare detector's cases on the fake and what it saw; the handover note as written by
     the fake and its size; the brief head's size at the officer's station on each door;
     the consent brief's new hash and the sections that changed; the drill; the pinned
     constants that moved (none expected: the officer's game is not a pinned day); anything
     not done and why.
 
-Not in 37: a captain's station (M6), officers writing standing orders by rank (M6; the
-field exists since 4a), the lookout as a station for a small model (open item 6; the
+Not in 37: a captain's station (M6), officers writing Python rules (M6, with the sandbox;
+the dialect's rules by rank are item 2b), the lookout as a station for a small model (open item 6; the
 drill is its first half), the director (M7b), the officer taking a person's place in the
 world beyond the name (M6's binding of station to person is here only as the name).
 
