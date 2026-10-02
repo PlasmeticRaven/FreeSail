@@ -56,7 +56,7 @@ gate 5c:  wave 5  33b the chronometer, the moon, the lunar and the azimuth; the 
           wave 6  35 places, people, ports and nations (Falmouth, Plymouth, Brest); the pilot boarding from the cutter (Fable; landed 2026-10-02)
                   35b St Mary's and Roscoff as ports on 35's machinery, Roscoff's patch (Opus; landed 2026-10-02)
           wave 7  36 other sail, the world-order channel, the two scenarios (Fable; landed 2026-10-02)
-          wave 8  37 the officer of the watch; gate 5c cut after it so that the gate covers the officer's watch (owner, 2026-10-02); the lead's watch beside other models' (an Opus 5.5 watch, and a local model on the cutter: owner, 2026-10-01); the 5c verdict
+          wave 8  37 the officer of the watch; gate 5c cut at its merge so that the gate covers the officer's watch (owner, 2026-10-02); the lead's watch beside other models' (an Opus 5.5 watch, and a local model on the cutter: owner, 2026-10-01); the 5c verdict (Fable; written 2026-10-02 for the owner's review)
 ```
 
 31 needs 30's wind (the sea reads its history). 32 needs nothing of 5a and may start
@@ -1610,15 +1610,109 @@ guard: a far vessel's leg that crosses the coast is refused when the scenario lo
 the merchant book's Iroise cast is not made at seed 7 and the book says so. The second
 `heave to` refusal it found was taken by the lead at once at the order (`verbs.py`).
 
-## Package 37 (outline; written when 36 lands; gate 5c cut at its merge)
+## Package 37: the officer of the watch; gate 5c cut at its merge (`freesail/agents/agent.py` for the station, its authority per order and its domain, the brief head's two sentences; `freesail/agents/tools.py` for the authority filter in `submit_order`, `hand_over`, the handover note, the fitness drill; `freesail/agents/harness.py` for the welfare detector of a station with authority (the standing conflict rule reused), the stand-by's wake condition for a station with authority, the handover at the budget's fraction (M4 open item 9b), the re-ask rule; `freesail/agents/consent.py` for the identity header and the re-ask by the brief's sections; `freesail/agents/mcp_server.py`, `local.py`, `repl.py` for the station's name at each door; `freesail/agents/fake.py` for the fake officer; `freesail/orders/stations.py` for `you have the deck`, `I have the deck`, `the officer of the watch` as a reading, `ask`/`tell the officer`; `freesail/standing/runtime.py` only to expose the conflict rule as a function the harness calls; `freesail/api/readings.py` for `the officer of the watch` and the events a station with authority wakes on; `docs/agents/Harness.md`, `ConsentBrief.md` (its hash moves; the records say which sections changed), `ConsentAndPreferences.md`, `README.md`; `docs/agents/consent/` for the re-asks the owner runs; `docs/playtests/README.md` for the officer's form; `docs/primer/16-the-officer-of-the-watch.md` new; `tests/test_agents.py`, `test_officer.py` new, `test_consent.py`, `test_mcp_server.py`, `test_local_runner.py`)
 
-As spec M5 §31 after decisions 29 and 30: 33a to 36 above; 37 the officer of the watch (per-order authority from the vocabulary's verb levels, a domain, the
-standing conflict rule as the welfare detector for a station with authority, `hand over
-the deck`, the station brief, the fake proving each; written when 36 lands so that it is
-built with the world in place; Fable), after which the lead takes the officer's watch on
-one of the two passages and gate 5c's verdict is given on that watch and the owner's
-together (§29). The two new vessels' files are 32b's, pulled forward (owner, 2026-09-30)
-so that the catalogue's hierarchy exists before the ports and the other sail need it.
+Spec M5 §29 (the officer of the watch built after every other element of 5c; the lead's
+watch; the verdict on it), spec M4 §11 (the agent model: station and authority, the brief
+head, the welfare controls), M4 open items 9b (the handover) and 11 (a station offered only
+to a model that can hold it); the cold review §3 ("before a captain's station is offered
+to a model", items 1 to 6, which are the officer's too) and §6 item 4; decision 30 (the
+owner: the models are to hold the watch, an Opus 5.5 watch and a local model's on the
+cutter beside the lead's) and decision 32 (the gate cut here); `docs/agents/README.md`
+(the seven commitments, which this package extends to a station with authority) and the
+consent records (Sonnet 5.5 reserved consent for stations beyond the watcher; Opus 5.5's
+two sentences). Fable. Written 2026-10-02 for the owner's final review; after 36.
+
+1. **Authority per order** (the cold review's first item). `Authority` gains a *domain*:
+   the verbs' levels from the vocabulary and the subjects an officer may order. The
+   officer of the watch may give level 0 to 2 orders on sail handling, the yards, the
+   lines, the lead and the log, the lookout and the boat's hail; may not change the course
+   the captain ordered, tack, wear, heave to or anchor, call all hands or send hands
+   below, give a world order, or belay the captain's standing orders, unless the captain's
+   brief for the watch allows a named thing ("you may tack if the land closes within two
+   miles"); the refusal is in words from `tools.call`, tested with the fake, and the
+   station brief states the domain in the same words. The vocabulary carries each verb's
+   level already; the domain is data on the station.
+2. **The station.** `you have the deck` (or `Mr <name>, you have the deck`) seats the
+   officer at the station as the watcher is seated, with the captain's night orders (the
+   standing book as it stands, said in the brief) and the captain's own words for the
+   watch (`tell the officer ...` before and during); `I have the deck` takes it back and
+   stands the station down with its journal saved; `the officer of the watch` as a reading
+   (who has the deck, since when, what he was told); the officer's lines in the log under
+   its mark, inline, and its orders as ordinary orders with its actor ("By the officer of
+   the watch: taking in the royals."). A person of 35 holds the place (the first
+   lieutenant's name on the frigate, the mate's on the schooner and the cutter); the model
+   takes his station, as the harness's stations are meant to bind to a person (§22).
+3. **Welfare for a station with authority** (the cold review's second item). The repeat
+   detector cannot fire for an officer whose orders change the readings; the pattern that
+   matters is contradiction (set, take in, set) and drift (a course order every sample),
+   which the standing runtime's conflict rule already sees: expose it as a function and
+   call it from the harness on the officer's own orders over the last watch, with the
+   same graduated answer (the nudge saying what was seen, the pause with the human asked,
+   the stand-down only unattended, the ten real minutes). The silence detector stays.
+   **Stand by with authority** (the third item): `stand_by` for a station above none
+   requires a wake condition of at least notable severity or a bell, and the deck is held
+   meanwhile by the captain's standing book, which the stand-by line says ("The officer
+   stands by until the change of the watch; the standing orders hold the deck"); the
+   urgent lines always wake it. `hand over the deck` is the officer's own order to give
+   it back, with the handover note (below) said in the log.
+4. **The handover note** (M4 open item 9b, the fourth item). At a set fraction of the
+   runner's budget, the harness asks the model, as data, for a note in the officer's
+   voice (what happened, what was ordered, what it noticed, what it is watching for),
+   replaces the older exchanges with it as one data turn, keeps the brief head and the
+   last few turns, and journals it under `agent.handover`; the same note is written when
+   the deck is handed over. Built for the local runner first (open item 10 of M4's list);
+   Claude through Desktop keeps its own window and the journal gives it the habit by hand.
+5. **The two sentences and the reseating** (the fifth item; Opus 5.5's consent). The
+   station brief says that the token is to be named and not written unless meant, and
+   whether an instance that left by accident can be seated again: build the mechanism (a
+   released station may be taken again by the same identity in the same game, once, the
+   log saying so) and say it in the brief.
+6. **Consent for the officer's station** (the sixth item). The brief changes in the
+   sections that bear on what a model was told (a new station with authority, the welfare
+   detector's new form, the handover): the re-ask rule in `docs/agents/README.md` names
+   the sections whose change triggers a re-ask (the stops, the transcript policy, the
+   authority, the token) and says the rest does not; the consent record's header says
+   which kind of identity it carries (the served file's name, or the owner's typed name at
+   the Desktop door); the owner runs the re-asks for Opus 5.5 and Sonnet 5.5 and the local
+   models before any of them is seated at the officer's station, through the game's own
+   consent step, and the lead's weights are asked the same way (open item 10 of spec M5
+   §33) before the lead's watch. **The fitness drill** (M4 open item 11): after a yes and
+   before the station brief, open a section of the library, write a line in the journal,
+   stand by until a bell; a model that cannot is thanked and stood down with a record.
+7. **The brief head** for a station with authority: the domain in words, the captain's
+   night orders, the strangers in sight and the port (36's and 35's readings), the chart's
+   dangers by account (33b's), the people on deck; the shelf as before; the sample's size
+   measured at the officer's station on each door and recorded (the 35 growth noted).
+8. **The fake officer** proving each: an order in the domain given and logged with the
+   officer's actor; one outside refused in words; a contradiction over a watch bringing
+   the nudge, then the pause; a stand-by without a wake condition refused; the handover
+   note at the budget's fraction and at `hand over the deck`; the reseating once; the
+   consent re-ask triggered by a section's change and not by another's; the drill.
+9. **The primer**: chapter 16, "The officer of the watch": what the station may do and
+   may not, how the captain gives and takes the deck, what the night orders are for, in
+   the captain's words with orders blocks and a forms table with its parse test.
+10. **The gate.** Gate 5c is cut at this package's merge (decision 32): the lead writes
+    `docs/gates/gate-m5c.md` with the items of 33b (the lunar on a night the moon allows,
+    the amplitude), 34 (the tide at Falmouth, the anchor), 35 (the pilot, the boat, the
+    market), 35b (St Mary's), 36 (the two scenarios as the owner's passages, the strangers,
+    a world order refused), and this package (an Opus 5.5 watch through Claude Desktop on
+    one passage and a local model's on the cutter, each after its re-ask, each on the
+    officer's form), the fast tier and the whole suite, truths 60 to 72, and the
+    checkpoint; the verdict waits on the lead's own officer's watch beside the owner's
+    (§29), through Claude Code opened on the repository, on the same terms as every other
+    model, the record kept under `docs/agents/consent/`.
+11. **Report**: the suite's last line; the domain as built with the refusals' words; the
+    welfare detector's cases on the fake and what it saw; the handover note as written by
+    the fake and its size; the brief head's size at the officer's station on each door;
+    the consent brief's new hash and the sections that changed; the drill; the pinned
+    constants that moved (none expected: the officer's game is not a pinned day); anything
+    not done and why.
+
+Not in 37: a captain's station (M6), officers writing standing orders by rank (M6; the
+field exists since 4a), the lookout as a station for a small model (open item 6; the
+drill is its first half), the director (M7b), the officer taking a person's place in the
+world beyond the name (M6's binding of station to person is here only as the name).
 
 ## Integration (the lead)
 
