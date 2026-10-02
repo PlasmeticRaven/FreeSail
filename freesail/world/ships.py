@@ -715,6 +715,8 @@ class Vessel:
             "detail": self.detail,
             "done": self.done,
             "alongside": self.alongside,
+            "hailed": self.hailed,
+            "spoken": self.spoken,  # the book's: a sail spoken is a stranger no more
         }
 
 

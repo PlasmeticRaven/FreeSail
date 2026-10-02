@@ -16,15 +16,17 @@
 # a point fifteen miles west-north-west of Ushant, passing a mile to the westward of the
 # Eddystone; on the station she reaches to and fro between two points pricked on the
 # chart, north-east and south-west, two days under her book, the chronometer wound and
-# the master's sights taken. On the morning of the 13th a sail is sighted to the
-# westward (a world order of this file: a French brig-sloop out of the Atlantic running
-# for Brest under no colours), made out and chased, the frigate's helm put for her
-# bearing each time the tops make out more of her (Luce 1884 p. 553: "keeping the chase
-# on the same compass bearing"), until she is within hail; the brig runs on at her plan's
-# speed and the frigate returns to her station. In the afternoon the Plymouth cutter,
-# sent by a world order the evening before with the port admiral's letter, comes up
-# with her, and the letter comes aboard by the cutter, is carried aft by the midshipman
-# and read where the captain is (truth 68's chain).
+# the master's sights taken. As she clears the Sound the Plymouth cutter, sent by a
+# world order at ten with the port admiral's letter, comes up with her within the hour,
+# and the letter comes aboard by the cutter, is carried aft by the midshipman and read
+# where the captain is (truth 68's chain). On the forenoon of the 13th, as she stands
+# back for the station, a sail is sighted ahead (a world order of this file: a French
+# brig-sloop out of Brest standing up-Channel for the trade under no colours, placed by
+# the author, who sees the world, five leagues on the frigate's bow at seven), made out
+# and chased, the frigate's helm put for her bearing each glass while she is a stranger
+# (Luce 1884 p. 553: "keeping the chase on the same compass bearing"), until she is
+# within hail; the brig runs on at her plan's speed and the frigate returns to her
+# station.
 #
 # The weather is pinned (a north-westerly of fourteen knots backing northerly and falling
 # through the two days, the sky clear over the old high over Biscay, the merchant
@@ -109,7 +111,7 @@ ships:
 world_orders:
   - {at: 1805-06-12T10:00, order: 'message: by a cutter from Plymouth from the port admiral: "Rejoin the squadron off the Black Rocks without delay; the enemy is reported out of Rochefort."'}
   - {at: 1805-06-13T06:00, order: 'weather: waypoint for "the old high over Biscay" at 1805-06-14T12:00 600 -700 1020'}
-  - {at: 1805-06-13T07:00, order: 'ship: a brig-sloop "Palinure" of France at 48 44 N 5 10 W, bound for 47 48 N 6 34 W, no colours'}
+  - {at: 1805-06-13T07:00, order: 'ship: a brig-sloop "Palinure" of France at 48 50 N 5 16 W, bound for the Start, no colours'}
 
 standing_orders:
   - data/scenarios/naval-cruise.orders

@@ -3672,10 +3672,10 @@ def test_truth_71_a_scenarios_world_order_is_journaled_at_its_tick_and_the_capta
 # Channel crossed, the Iroise passed, the road of Bertheaume on the ebb, the Goulet on
 # the flood, the Bay of Brest, the tin sold); the naval cruise forty-eight
 # (12 June 06:00 to 14 June 06:00: the yard's stores, the station, the cutter's letter,
-# the stranger chased and spoken, two days under the book); the merchant passage's
-# thirty-six hours end with the tin sold in the Bay of Brest at 15:09 on the 13th, the
-# flood having served by daylight the same forenoon she anchored in the road of
-# Bertheaume on the ebb. The constants below are the
+# the stranger put on the sea across the station, two days under the book); the
+# merchant passage's thirty-six hours end with the tin sold in the Bay of Brest at 15:10
+# on the 13th, the flood having served by daylight the same forenoon she anchored in the
+# road of Bertheaume on the ebb. The constants below are the
 # build machine's (docs/dev/TuningNotes.md, package 36). The fixtures are module-scoped
 # and sail two or three game days each: the lead adds them to `tests/conftest.py`'s
 # DAY_FIXTURES so that they are the slow tier's (this file does not mark them).
@@ -3689,45 +3689,48 @@ GATE_5C_SHIPS = 12  # the dozen ships of each scenario, the player's not among t
 # the naval cruise's ticks at seed 7
 GATE_5C_CRUISE_YARD_TICK = 5460  # thirty days' provisions off from the King's yard
 GATE_5C_CRUISE_UNDER_WAY_TICK = 6834  # under way on the starboard tack, S by W
-GATE_5C_CRUISE_PILOT_ABOARD_TICK = 11760  # Mr Tozer aboard from the cutter
-GATE_5C_CRUISE_PILOT_LEFT_TICK = 18000  # put off into his cutter, the ship hove to for it
+GATE_5C_CRUISE_PILOT_ABOARD_TICK = 7920  # Mr Tozer aboard from the cutter off the Sound, 08:12
+GATE_5C_CRUISE_PILOT_LEFT_TICK = 11220  # put off into his cutter, the ship hove to for it, 09:07
 GATE_5C_CRUISE_WORLD_ORDERS = [
     (14400, "the scenario"),
     (86400, "the scenario"),
-    (93600, "the scenario"),
+    (90000, "the scenario"),
 ]
-GATE_5C_CRUISE_CUTTER_HAIL_TICK = 82212  # the port admiral's cutter within hail, 04:50 on the 13th
-GATE_5C_CRUISE_LETTER_READ_TICK = 82272  # the letter read in the cabin a minute after
-GATE_5C_CRUISE_STRANGER_SIGHTED_TICK = 94800  # the Palinure, "a sail on the starboard bow, NE"
-GATE_5C_CRUISE_STRANGER_SPOKEN_TICK = 98877  # within hail, a stranger under no colours
+GATE_5C_CRUISE_CUTTER_HAIL_TICK = 17840  # the port admiral's cutter within hail, 10:57 on the 12th
+GATE_5C_CRUISE_LETTER_READ_TICK = 17900  # the letter read on the quarterdeck a minute after
+GATE_5C_CRUISE_STRANGER_SIGHTED_TICK = 90960  # the Palinure, "a sail right ahead, bearing SW"
+GATE_5C_CRUISE_CHASE_TICK = 91800  # the chase given at the glass after, by "keep her bearing"
+GATE_5C_CRUISE_STRANGER_SPOKEN_TICK = 106931  # within hail at 11:42, a stranger under no colours
 GATE_5C_CRUISE_NOON_TICKS = [21600, 108240]
-GATE_5C_CRUISE_WEARS_AT_LEAST = 10  # wore ship every second hour on the station
-GATE_5C_CRUISE_LINES = 2211
-GATE_5C_CRUISE_DIGEST = "760d4c962f46a826"
+GATE_5C_CRUISE_WEARS_AT_LEAST = 8  # wore ship on the station, and once for the chase
+GATE_5C_CRUISE_LINES = 2014
+GATE_5C_CRUISE_DIGEST = "b23ad76e93212c63"
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16005  # under way on the ebb, starboard tack, S by E
 GATE_5C_MERCHANT_PILOT_ABOARD_TICKS = [
-    17040,
-    100920,
-]  # Mr Tregenza of Falmouth; Mr Le Floch of Brest
+    16320,
+    91560,
+]  # Mr Tregenza of Falmouth in the outer road; Mr Le Floch of Brest in the Iroise
 GATE_5C_MERCHANT_PILOT_LEFT_TICKS = [
-    19740
+    18420
 ]  # put off into his cutter beyond the outer road, hove to for it
-GATE_5C_MERCHANT_SAIL_OFF_LIZARD_TICK = 29760  # "Sail ho! A sail right ahead", 13:16, not made out
-GATE_5C_MERCHANT_NOON_TICKS = [25200, 111600]
+GATE_5C_MERCHANT_SAIL_OFF_LIZARD_TICK = (
+    28140  # "Sail ho! A sail on the larboard bow, bearing SE by E", 12:49, not made out
+)
+GATE_5C_MERCHANT_NOON_TICKS = [25200, 111660]
 GATE_5C_MERCHANT_ANCHORED_TICKS = [
     57,
-    100607,
-    115531,
-]  # Carrick Road; the road of Bertheaume; the Bay
+    96475,
+    115534,
+]  # Carrick Road; the road of Bertheaume, 07:47 on the 13th; the Bay, 13:05
 GATE_5C_MERCHANT_FLOOD_TICK = (
     108960  # the turn to the flood at Bertheaume, 11:16 on the 13th, by daylight
 )
-GATE_5C_MERCHANT_GOULET_TICK = 111988  # the mouth of the Goulet, 12:06
-GATE_5C_MERCHANT_TIN_SOLD_TICK = 122963  # the boat alongside from the quay, 15:09
-GATE_5C_MERCHANT_LINES = 2396
-GATE_5C_MERCHANT_DIGEST = "d4aaf1a26a70e525"
+GATE_5C_MERCHANT_GOULET_TICK = 112005  # the mouth of the Goulet, 12:06
+GATE_5C_MERCHANT_TIN_SOLD_TICK = 123004  # the boat alongside from the quay, 15:10
+GATE_5C_MERCHANT_LINES = 2460
+GATE_5C_MERCHANT_DIGEST = "a66e31615102220b"
 
 
 def _people(world) -> list[dict]:
@@ -3788,10 +3791,11 @@ def test_the_merchant_passage_at_seed_7_has_its_own_constants(gate_5c_merchant):
     account; the Iroise raised and passed (the cast at its mark, which reads her chart's
     words, is given once within a mile and a half of the mark and was not made at seed 7:
     she passed it two miles wide by account, which docs/dev/TuningNotes.md records); the
-    road of Bertheaume on the ebb by the lead, the pilot of Brest aboard at the anchor
-    with the agent's letter, the flood taken by daylight on the pilot's and the master's
-    tide; the Goulet by the pass north of the Mingan and the Fillettes with the lead
-    going and a bearing every five minutes; the Bay of Brest by the lead, the boat
+    road of Bertheaume on the ebb by the lead, the pilot of Brest (come off from the
+    outer road, the pilots' station, to the Iroise) aboard with the agent's letter ten
+    miles out, the flood taken by daylight on the pilot's and the master's tide; the
+    Goulet by the pass north of the Mingan and the Fillettes with the lead going and a
+    bearing every five minutes; the Bay of Brest by the lead, the boat
     ashore, the tin sold; the account against the truth at each; the lines and the
     digest."""
     world, moments, _ = gate_5c_merchant
@@ -3838,7 +3842,7 @@ def test_the_merchant_passage_at_seed_7_has_its_own_constants(gate_5c_merchant):
     assert [
         e.tick for e in anchored
     ] == GATE_5C_MERCHANT_ANCHORED_TICKS  # Carrick Road, Bertheaume, Brest
-    assert "eleven fathoms" in anchored[1].text and anchored[1].tick < aboard[1].tick
+    assert "13 fathoms and a half" in anchored[1].text and aboard[1].tick < anchored[1].tick
     swung = [e for e in log if e.kind == "ship.swung" and e.tick > anchored[1].tick]
     assert swung and swung[0].data["flood"] is True and swung[0].tick == GATE_5C_MERCHANT_FLOOD_TICK
     flood = _by_order(log, "the flood")
@@ -3889,8 +3893,9 @@ def test_the_naval_cruise_at_seed_7_has_its_own_constants(gate_5c_cruise):
     off, the course for the station, the chronometer's time sights; the port admiral's
     cutter with the letter sighted, within hail, the letter read; the station kept by the
     wind, wearing every second hour; the stranger put on the sea by the scenario's order,
-    sighted, made out, chased by the bearing's drift and spoken, a brig-sloop of war under
-    no colours; the lines and the digest."""
+    sighted ahead, made out, chased by the bearing's drift (she weathers the frigate and
+    passes, the frigate wears and runs her down in three hours) and spoken, a brig-sloop
+    of war under no colours; the lines and the digest."""
     world, moments, (_data, _digest, vessels_at_save, _people_at_save) = gate_5c_cruise
     log = world.log
     assert len(world.scenario.ships) == GATE_5C_SHIPS - 1  # eleven, and the stranger by order
@@ -3928,6 +3933,7 @@ def test_the_naval_cruise_at_seed_7_has_its_own_constants(gate_5c_cruise):
     # the stranger: on the sea by the scenario's order, sighted at the horizon, made out
     # by the glass and the tops, chased by the bearing's drift, spoken under no colours
     by_name = {v["name"]: v for v in vessels_at_save}  # at 09:00 on the 13th, the chase in hand
+    assert by_name["Palinure"]["spoken"] is False  # not yet within hail
     assert "Palinure" in by_name and by_name["Palinure"]["nation"] == "france"
     sighted = [
         e
@@ -3941,8 +3947,8 @@ def test_the_naval_cruise_at_seed_7_has_its_own_constants(gate_5c_cruise):
         e
         for e in log
         if e.kind == "helm.set" and e.text.startswith("Gave chase to") and e.tick >= sighted[0].tick
-    ]  # the cutter with the letter was chased at dawn too, a stranger until her colours
-    assert chase and chase[0].tick == sighted[0].tick
+    ]  # the cutter with the letter was chased off the Sound too, a stranger until her colours
+    assert chase and chase[0].tick == GATE_5C_CRUISE_CHASE_TICK > sighted[0].tick
     assert any("the course led" in e.text for e in chase)
     spoken = [e for e in log if e.kind == "sail.within_hail" and "brig-sloop" in e.text]
     assert spoken and spoken[0].tick == GATE_5C_CRUISE_STRANGER_SPOKEN_TICK
@@ -3956,7 +3962,7 @@ def test_the_naval_cruise_at_seed_7_has_its_own_constants(gate_5c_cruise):
     by_kind = {}
     for kind, tick, _text, truth, account in moments:
         by_kind.setdefault(kind, []).append((tick, _miles(truth, account)))
-    assert by_kind["reckoning.noon"][1][1] < 10.0  # the chronometer's longitude, its rate unapplied
+    assert by_kind["reckoning.noon"][1][1] < 10.0  # by account since the chase, the sights unworked
     assert len(log) == GATE_5C_CRUISE_LINES and log.digest()[:16] == GATE_5C_CRUISE_DIGEST
 
 
