@@ -205,27 +205,56 @@ def _chase_course(world: Any, sighting: Any) -> tuple[float, str]:
 
 # A course shaped nearer the wind than close-hauled and half a point is not laid
 # (package 35's rule for the pilot's course, `evolutions.scripts`): she is kept full and
-# by instead, and the line says so.
+# by on the tack that points nearer the course, put about for it when it is the other,
+# and the line says so; a course laid but reached by a turn through the wind's eye is
+# worn round for (the book gives the course again after, as the cruise's does).
 COURSE_NOT_LAID_MARGIN_POINTS = 0.5
 
 
-def _course_not_laid(ship: Any, heading: float) -> str:
-    """The words when a course shaped lies too near the wind to be laid, else ''."""
+def _course_not_laid(ship: Any, heading: float) -> tuple[str, str] | None:
+    """When a course shaped lies too near the wind to be laid: (the words, the helm order
+    that stands in for it: 'keep her full and by' on the tack that points nearer the
+    course, 'tack' when that is the other tack); None when the course is laid."""
     from freesail.evolutions.scripts import close_hauled_true_angle
     from freesail.orders.prompt import world_of
 
     world = world_of(ship)
     wind = getattr(world, "wind", None)
     if wind is None:
-        return ""
-    off = abs(units.wrap_pi(heading - float(wind.direction_from)))
-    limit = close_hauled_true_angle(ship) + COURSE_NOT_LAID_MARGIN_POINTS * units.POINT
-    if off >= limit:
-        return ""
-    return (
-        f"{units.format_heading(heading)} lying too near the wind to be laid, she is kept "
-        "full and by"
+        return None
+    wind_from = float(wind.direction_from)
+    closest = close_hauled_true_angle(ship)
+    off = abs(units.wrap_pi(heading - wind_from))
+    dyn = getattr(ship, "dyn", None)
+    if off >= closest + COURSE_NOT_LAID_MARGIN_POINTS * units.POINT:
+        # laid; but a helm put over for it turns her the shorter way, and when the wind's
+        # eye lies in that arc she is taken aback and lies in irons (a frigate chasing a
+        # cutter down wind and shaping back for her station, found on the way): she is
+        # worn round instead (Luce 1866 ch. XXIV), and the course is given again after
+        if dyn is not None and float(getattr(dyn, "speed", 0.0)) > 0.1:
+            now = float(dyn.heading)
+            turn = units.wrap_pi(heading - now)
+            to_eye = units.wrap_pi(wind_from - now)
+            if abs(turn) > closest and (turn > 0) == (to_eye > 0) and abs(to_eye) < abs(turn):
+                return (
+                    f"{units.format_heading(heading)} lying across the wind's eye from her "
+                    "head, she is worn round for it",
+                    "wear ship",
+                )
+        return None
+    # the wind over the starboard side: her head lies the closest angle to the left of
+    # the wind's eye; over the larboard side, to the right
+    starboard = units.wrap_2pi(wind_from - closest)
+    larboard = units.wrap_2pi(wind_from + closest)
+    nearer = (
+        "starboard"
+        if abs(units.wrap_pi(heading - starboard)) <= abs(units.wrap_pi(heading - larboard))
+        else "larboard"
     )
+    said = f"{units.format_heading(heading)} lying too near the wind to be laid"
+    if dyn is not None and getattr(dyn, "tack", None) == nearer:
+        return f"{said}, she is kept full and by on the {nearer} tack", "keep her full and by"
+    return f"{said}, she is put about for the {nearer} tack", "tack"
 
 
 def _world_with_lookout(ship: Any) -> Any:
@@ -326,10 +355,11 @@ def execute(ship: Any, order: Order) -> Result:
         not_laid = _course_not_laid(ship, heading)
         if not_laid:
             # the course lies nearer the wind than she will sail: said, not steered, and
-            # she is kept full and by on the tack she is on (as the pilot's course is,
+            # she is kept full and by on the tack that points nearer it, put about for it
+            # when that is the other tack (as the pilot's course is said and not steered,
             # package 35; the book's helm rules have no other guard)
-            _, helm_text, helm_data = handle(ship, "keep her full and by")
-            words = words.rstrip(".") + f"; {not_laid}."
+            _, helm_text, helm_data = handle(ship, not_laid[1])
+            words = words.rstrip(".") + f"; {not_laid[0]}."
         else:
             _, helm_text, helm_data = handle(ship, f"steer {units.rad_to_deg(heading):.0f}")
         data = {"verb": verb, "level": 1, "place": rest, "heading": heading} | {"helm": helm_data}

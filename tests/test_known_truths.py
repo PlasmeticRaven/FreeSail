@@ -2839,19 +2839,29 @@ GATE_5B_BROUGHT_UP_TICK = 59144  # brought up, the sails furled (59145 before pa
 # port's news; nothing of the ship's physics moves, so every tick above stands and only
 # the lines and the digests change (the frigate 624 → 629 lines, the schooner 725 → 730;
 # the thick passage, which never comes within the cruising ground, is untouched). The
-# pilot's ticks are pinned below (docs/dev/TuningNotes.md, package 35).
-GATE_5B_SAIL_SIGHTED_TICK = 55800  # "Sail ho! A sail on the larboard bow", two leagues
-GATE_5B_PILOT_HAIL_TICK = 57720  # the cutter hails within four cables
-GATE_5B_PILOT_ABOARD_TICK = 58020  # the pilot aboard, two minutes before the anchor
-GATE_5B_LINES = 629
-GATE_5B_DIGEST = "a7fe3d92fc16d1ed"
+# pilot's ticks are pinned below (docs/dev/TuningNotes.md, package 35). Package 36
+# generalised the cutter into a vessel of the world sailing by her own file's polar
+# (seven knots on a reach, not six capped at half the wind) and sighted at the horizon
+# her masthead gives: she comes out sooner and is seen sooner (the frigate's cutter
+# sighted 55800 → 54600, "three leagues"; the hail 57720 → 56940, before the frigate has
+# shortened sail, so the pilot boards once she is slow enough, at the anchor, 58020 →
+# 58200; the schooner's 54840 → 53640, 56880 → 56820, 56940 → 57000); nothing of the
+# ship's own moves, the lines grow by the sail's lines (629 → 633, 730 → 734) and the
+# digests follow; the thick passage, with no cutter, is untouched (docs/dev/TuningNotes.md,
+# package 36). Measured in package 36's tree before the lead's tide-words change to
+# `ports.py`, which moved these two digests again and no tick; the lead reconciles.
+GATE_5B_SAIL_SIGHTED_TICK = 54600  # "Sail ho! A sail on the larboard bow", three leagues
+GATE_5B_PILOT_HAIL_TICK = 56940  # the cutter hails within four cables
+GATE_5B_PILOT_ABOARD_TICK = 58200  # the pilot aboard, half a minute after the anchor
+GATE_5B_LINES = 633
+GATE_5B_DIGEST = "95cbeedb158c27d4"
 GATE_5B_SCHOONER_LANDFALL_TICK = 43920
 GATE_5B_SCHOONER_ROADS_TICK = 56502  # the outer road: sail shortened, a course for Carrick Road
-GATE_5B_SCHOONER_PILOT_ABOARD_TICK = 56940  # the pilot aboard, American colours no bar
+GATE_5B_SCHOONER_PILOT_ABOARD_TICK = 57000  # the pilot aboard, American colours no bar
 GATE_5B_SCHOONER_ANCHORED_TICK = 57615  # off the town: the best bower let go
 GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58618
-GATE_5B_SCHOONER_LINES = 730
-GATE_5B_SCHOONER_DIGEST = "b49d841fd40f9482"
+GATE_5B_SCHOONER_LINES = 734
+GATE_5B_SCHOONER_DIGEST = "667c4021f415c3af"
 GATE_5B_THICK_LANDFALL_TICK = 54900
 GATE_5B_THICK_LINES = 504
 GATE_5B_THICK_DIGEST = "65927077f46006eb"
@@ -3146,7 +3156,9 @@ def test_the_passage_for_gate_5b_at_seed_7_has_its_own_constants(gate_5b_passage
     assert world.readings.words("anchor").startswith("down, riding by the best bower to the")
     # the pilot boarding from the cutter (package 35; spec M5 §23): the cutter sighted
     # as any sail is, a bearing first; the hail; the pilot aboard as a person with his
-    # words and the port's news, before she anchors; the ship's own ticks unmoved
+    # words and the port's news, as she anchors (package 36: the hail comes before she
+    # has shortened sail, and he boards once she is slow enough); the ship's own ticks
+    # unmoved
     sails = [e for e in log if e.kind == "lookout.sighting" and e.data.get("seen_as") == "sail"]
     assert sails and sails[0].tick == GATE_5B_SAIL_SIGHTED_TICK
     assert sails[0].text.startswith("Sail ho! A sail on the larboard bow, bearing ")
@@ -3503,3 +3515,146 @@ def test_truth_70_a_port_closed_to_the_ships_nation_refuses_her_in_the_pilots_wo
     assert "the port hostile to the English" in frigate.readings.words("port")
     # open: her own port, where the pilot comes off (the passage of gate 5b has it)
     assert frigate.ports.stance(frigate.ports.ports["falmouth"]) == "open"
+
+
+# ---------------------------------------------------------------------------
+# Truths 67, 71 and 72 at seed 7 (package 36; spec M5 §25 to §28). Other sail at far
+# detail is a hull from one of the ship files with a polar drawn once from the file,
+# moved by the player's wind and tide; the lookout sees her at the horizon her masthead
+# gives and names her rig only as she nears; the world-order channel is the scenario's
+# and the harness's, never the captain's; the two scenarios of gate 5c replay to their
+# digests from their files.
+# ---------------------------------------------------------------------------
+
+OPEN_WATER_5C = {"lat_deg": 49.60, "lon_deg": -5.40}  # south-west of the Lizard, forty fathoms
+
+
+def _open_sea(ship=FRIGATE, heading=180.0, **kw):
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, 10, 0),
+        wind_from_deg=315.0,
+        wind_speed_kn=14.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=heading,
+        ship_speed_kn=0.0,
+        position=OPEN_WATER_5C,
+        region=CHART_REGION,
+        **kw,
+    )
+    return make_world(SEED, ship, sc)
+
+
+def _put(world, description, bearing_deg, miles, goal, nation="britain"):
+    from freesail.world import ships as S
+    from freesail.world.geo import destination
+
+    pos = destination(world.position, bearing_deg, miles * units.NAUTICAL_MILE)
+    spec = {"description": description, "name": description.title(), "nation": nation}
+    spec |= {"position": pos, "goal": goal}
+    world.vessels.serial += 1
+    return world.vessels.add(S.vessel_from_spec(world, spec, world.vessels.serial))
+
+
+def test_truth_67_a_far_ship_moves_by_the_players_wind_and_tide_and_is_sighted_at_the_horizon():
+    """Spec M5 §28, truth 67: "A ship at far detail moves by the same wind and tide as the
+    player and is sighted at the horizon distance her rig's height and the visibility
+    give, as 'Sail ho!' with a bearing first and her rig only as she nears." A merchant
+    brig put thirty miles north-east of the anchored frigate, bound south-west on a reach
+    to pass a mile from her:
+    she is moved once a game minute at her polar's speed for her course in the wind at
+    her place, the tide's stream added over the ground; the lookout hails her as "Sail
+    ho! A sail" with a bearing and an estimate, no rig, when she comes within the horizon
+    the two mastheads give (2.08 times the root of each height in metres, C §5.5), and
+    her rig, her colours and what she is follow as she nears, in that order."""
+    from freesail.world import ships as S
+    from freesail.world.geo import bearing_and_distance, horizon_nm
+
+    w = _open_sea()
+    w.submit("let go the best bower")
+    w.run(60)
+    v = _put(w, "merchant brig", 45.0, 30.0, "bound for 49 21 N 5 45 W")
+    # moved by the wind at her place and the tide, once a minute
+    p0 = v.position
+    w.run(59)
+    assert v.position == p0
+    w.run(1)
+    wind_from, wind_ms = v._wind_at(w)
+    base_from, base_ms = float(w.wind.direction_from), float(w.wind.speed)
+    assert abs(units.wrap_pi(math.radians(wind_from) - base_from)) < 1e-9
+    assert wind_ms == pytest.approx(base_ms)
+    off = abs(units.rad_to_deg(units.wrap_pi(math.radians(v.heading_deg - wind_from))))
+    assert v.speed_kn == pytest.approx(
+        v.polar.speed_kn(off, units.ms_to_knots(wind_ms)) * v.sailing_factor
+    )
+    _, run_m = bearing_and_distance(p0, v.position)
+    east, north = w.tide.stream_at(v.position, w.clock.ship_time)
+    # a few metres: the stream read at the minute's end, not along it
+    assert abs(run_m - units.knots_to_ms(v.speed_kn) * 60.0) <= math.hypot(east, north) * 60.0 + 5.0
+    # sighted at the horizon the two mastheads give, as a sail with a bearing first
+    eye = w.lookout.height_of_eye_m
+    horizon = horizon_nm(eye, S.rig_height_m(v.ship_file))
+    assert 22.0 < horizon < 24.0  # a frigate's eye to a brig's masthead
+    sails = []
+    for _ in range(6 * 60):
+        w.run(60)
+        sails = [e for e in events(w, "lookout.sighting") if e.data.get("seen_as") == "sail"]
+        if sails:
+            break
+    assert sails and sails[0].text.startswith("Sail ho! A sail ")
+    assert ", bearing " in sails[0].text and "brig" not in sails[0].text
+    _, at_m = bearing_and_distance(w.position, v.position)
+    assert at_m / units.NAUTICAL_MILE <= horizon + 0.15  # a minute's run inside the line
+    assert at_m / units.NAUTICAL_MILE > horizon - 1.0
+    assert "distance_m" not in sails[0].data and sails[0].data["estimate_m"] > 0
+    # her rig, her colours and what she is, as she nears, in that order
+    made = []
+    for _ in range(8 * 60):
+        w.run(60)
+        made = events(w, "lookout.made_out")
+        if len(made) >= 3 or v.done:
+            break
+    assert [e.data["level"] for e in made[:3]] == [1, 2, 3]
+    assert " is a brig, " in made[0].text
+    assert made[1].text.endswith("shows British colours, the red ensign.")
+    assert "a merchant brig, deep laden" in made[2].text
+
+
+def test_truth_71_a_scenarios_world_order_is_journaled_at_its_tick_and_the_captains_is_refused():
+    """Spec M5 §28, truth 71: "A world order given by the scenario at a time is journaled
+    at that tick with its source; the same order typed at the captain's prompt is
+    refused." The naval cruise's own orders by time, run through its first quarter of an
+    hour with the first of them moved to the first minute: the line at the driver's mark
+    with the source "the scenario", saved with the world and not among the inputs; the
+    same words at the prompt refused in words that say whose channel it is; the
+    harness's order the same line with its own source, an input that replays."""
+    from freesail.world import orders as world_channel
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario("data/scenarios/naval-cruise.yaml")
+    order = sf.scenario.world_orders[0]["order"]
+    sf.scenario.world_orders = [{"at": "1805-06-12T06:01", "order": order}] + [
+        o for o in sf.scenario.world_orders[1:]
+    ]
+    world = make_scenario_world(sf)
+    begin(world, sf)
+    world.run(900)
+    lines = events(world, "world.order")
+    assert [(e.tick, e.actor, e.data["source"]) for e in lines] == [(60, "driver", "the scenario")]
+    assert lines[0].text.startswith("World order (the scenario): a cutter sent from Plymouth")
+    saved = world.save()
+    assert [(o["tick"], o["source"]) for o in saved["world_orders"]] == [(60, "the scenario")]
+    assert not [i for i in saved["inputs"] if "world_order" in i]
+    # the captain's grammar refuses the same words, naming the channels
+    e = world.submit(order)
+    assert e.kind == "order.rejected"
+    assert "an order to the world, not to the ship" in e.text
+    assert e.text.rstrip(".").endswith(world_channel.REFUSAL.rstrip("."))
+    for words in ("the weather", "the other sail", "a message", "a port", "the people ashore"):
+        assert words in e.text
+    assert not [x for x in events(world, "world.order") if x.tick > 60]
+    # and the harness's order is the same line with its own source, an input replayed
+    world.world_order("port falmouth: price of tin 140")
+    harness = [x for x in events(world, "world.order") if x.tick > 60]
+    assert harness and harness[0].data["source"] == "the harness"
+    assert [i["source"] for i in world.save()["inputs"] if "world_order" in i] == ["the harness"]

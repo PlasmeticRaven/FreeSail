@@ -25,20 +25,22 @@ standing order "for the station": at the pilot off then set plain sail; shape a 
 standing order "bearings": every glass, if the land is in sight then take a bearing of the land
 standing order "the morning sight": at two bells, if the daylight is day then take a sight for the longitude
 
-# The station, two days under the book: she reaches between two points pricked on the
-# chart, seven miles and a half north-north-east and south-south-west of each other with
-# the station's point at the northern end, the wind west-north-west to north-west on the
-# beam either way; each point reached within three miles (the points are reached by
-# account, and the account is two or three miles out at the end of the passage), the
-# course is shaped for the other; and from wherever a chase has carried her, no sail in
-# sight, the course is shaped for the station again at each watch's end.
-standing order "the southern leg": when the distance to 48 30 N 5 30 W is under 3 miles then shape a course for 48 23.5 N 5 35.6 W
-standing order "the northern leg": when the distance to 48 23.5 N 5 35.6 W is under 3 miles then shape a course for 48 30 N 5 30 W
-standing order "back to the station": every watch, if a sail in sight is not in sight and the distance to 48 30 N 5 30 W is over 6 miles then shape a course for 48 30 N 5 30 W
+# The station, two days under the book, kept as the squadron off Ushant kept it: by the
+# wind on one tack and the other, wearing at the end of every second hour (the blockade's
+# logs: "wore ship" watch by watch; Luce 1866 ch. XXIV, 'Wearing', the square-rigged
+# ship's safe way round), and the course shaped for the station again at each watch's end
+# when she has worked twelve miles from it, no sail in sight; no mark is reached by
+# account within less than that, since the account between the log's heaves runs on the
+# mean heading and swings an hour's run as she turns (package 33a's mate), and a chase
+# in hand is not interrupted.
+standing order "wear at the hour": every 2 hours, if a stranger in sight is not in sight and the distance to 48 30 N 5 30 W is under 20 miles then wear ship
+standing order "by the wind": at wore then keep her full and by
+standing order "back to the station": every watch, if a stranger in sight is not in sight and the distance to 48 30 N 5 30 W is over 12 miles then shape a course for 48 30 N 5 30 W
 
 # A stranger: on the station every sail sighted is made out and chased, the helm put for
-# her bearing again every glass while she is in sight and each time the tops make out
-# more of her, each order after the first leading the course off her bearing by what the
+# her bearing again every glass while she is a stranger (every sail is one until her
+# colours are made out for British; the port's own cutter with a letter is not chased
+# home) and each time the tops make out more of her, each order after the first leading the course off her bearing by what the
 # bearing's drift, the estimate of her distance and his own way across the line of sight
 # make it, so that the drift comes to nothing (Luce 1884 p. 553: "By constantly keeping
 # the chase on the same compass bearing, the chaser will attain the chase in the shortest
@@ -46,7 +48,7 @@ standing order "back to the station": every watch, if a sail in sight is not in 
 # station again, since what follows a chase is milestone 7's, and a chase lost over the
 # horizon is given up the same.
 standing order "a sail on the station": at a sail sighted, if the distance to 48 30 N 5 30 W is under 25 miles then make her out; give chase
-standing order "keep her bearing": every glass, if a sail in sight is in sight and the distance to 48 30 N 5 30 W is under 40 miles then give chase
-standing order "more of her": at a sail made out, if the distance to 48 30 N 5 30 W is under 40 miles then give chase
+standing order "keep her bearing": every glass, if a stranger in sight is in sight and the distance to 48 30 N 5 30 W is under 40 miles then give chase
+standing order "more of her": at a sail made out, if a stranger in sight is in sight and the distance to 48 30 N 5 30 W is under 40 miles then give chase
 standing order "the chase up": at a sail within hail then shape a course for 48 30 N 5 30 W
 standing order "the chase lost": at a sail lost, if the distance to 48 30 N 5 30 W is under 40 miles then shape a course for 48 30 N 5 30 W

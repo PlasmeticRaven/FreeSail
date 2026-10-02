@@ -85,6 +85,7 @@ Two scenarios ship with this milestone and are the gate's: **the merchant passag
 | Form | Also taken | What it does |
 |---|---|---|
 | `the strangers` | `what sail is in sight` | every sail in sight: her bearing, her distance by estimation, what has been made out |
+| `a stranger in sight` | `a stranger` | the strangers alone: every sail until her colours are made out, and one under none or another nation's after; for the book, `if a stranger in sight is in sight` |
 | `a sail in sight` | `the stranger`, `the pilot cutter` | in sight or not, with the nearest sail's words |
 | `make her out` | `make out the sail`, `make out the stranger`, `make out the brig`, `send a glass aloft`, `what is she` | a glass aloft: her rig, her course, her colours, as the distance allows |
 | `give chase` | `chase`, `chase the stranger`, `chase the brig`, `stand after her` | the helm put for her bearing, led by the bearing's drift when given again |

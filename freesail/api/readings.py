@@ -1848,6 +1848,17 @@ def _strangers(world: Any, _: str | None) -> dict[str, Any] | None:
     return lookout.strangers(world, float(world.ship.heading)) if lookout is not None else None
 
 
+def _stranger_in_sight(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`a stranger in sight` (package 36): the strangers alone, a sail being one until
+    her colours are made out for the ship's own nation's."""
+    lookout = _lookout_of(world)
+    if lookout is None:
+        return None
+    ports = getattr(world, "ports", None)
+    own = ports.ship_nation if ports is not None else None
+    return lookout.stranger(world, float(world.ship.heading), own)
+
+
 REGISTRY.add(
     Reading(
         "people",
@@ -1991,6 +2002,18 @@ REGISTRY.add(
         "",
         _sail_in_sight,
         description="other sail in sight: in sight or not, each with the lookout's words",
+        none_words=_no_chart_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "stranger_in_sight",
+        ("a stranger in sight", "a stranger"),
+        "sight",
+        "",
+        _stranger_in_sight,
+        description="a sail in sight not known for the ship's own nation: every sail until "
+        "her colours are made out, and one under none or another nation's after",
         none_words=_no_chart_words,
     )
 )

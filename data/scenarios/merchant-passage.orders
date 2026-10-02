@@ -29,12 +29,13 @@ standing order "the pilot off": at the pilot off then set plain sail
 # by the afternoon; the Goulet's are a cable or two, with the land in sight and the
 # bearings every five minutes): from the outer road a course a little east of
 # south to a point off the Manacles' meridian (the ledge lies two miles and a half to the
-# westward of the line), then south-west for a point three miles and a half south of the
-# Lizard, and from there for the soundings seven leagues south-west of Ushant, which
-# keeps her ten miles to the westward of the island and clear of the Fromveur.
+# westward of the line), then south-south-west for a point six miles south-east of the
+# Lizard (south-west would lie four points off a westerly wind, which she will not lay),
+# and from there for the soundings seven leagues south-west of Ushant, which keeps her
+# ten miles to the westward of the island and clear of the Fromveur.
 standing order "clear of the road": when the distance to Falmouth outer road is under 0.6 miles then shape a course for 50 00.3 N 4 58.8 W
-standing order "round the Manacles": when the distance to 50 00.3 N 4 58.8 W is under 2 miles then shape a course for 49 54 N 5 12 W
-standing order "across the Channel": when the distance to 49 54 N 5 12 W is under 3 miles then shape a course for the soundings seven leagues south-west of Ushant
+standing order "round the Manacles": when the distance to 50 00.3 N 4 58.8 W is under 2 miles then shape a course for 49 52 N 5 06 W
+standing order "across the Channel": when the distance to 49 52 N 5 06 W is under 3 miles then shape a course for the soundings seven leagues south-west of Ushant
 
 # The departure and the landfall: a bearing of the land every glass while it is in
 # sight (N §1), so that the account is fixed on the Lizard before the land is lost and
@@ -55,12 +56,19 @@ standing order "the course across": every hour, if the distance to Falmouth is o
 # (Faden 1793, p. 61); she is brought to there and the deep-sea lead hove, which reads
 # the Iroise in her chart's words, forty to forty-five fathoms on putrid shells and
 # mouldering rock; then on for a point between La Parquette and the Toulinguet, and so
-# to the road of Bertheaume.
+# to the road of Bertheaume. The bringing to is guarded so that it is done once: not
+# while she lies to already (her way under two knots), and not again once she has
+# filled away for Bertheaume (the point off it within ten miles), since the account
+# between the log's heaves runs on the mean heading and may put her back inside the
+# mark for a glass. Should she pass the Iroise's mark wide by account and cast nothing,
+# the course for the point off Bertheaume is shaped once she is east of it all the
+# same, since the straight course east from the Iroise ends on the Toulinguet.
 standing order "the Iroise": when the distance to the soundings seven leagues south-west of Ushant is under 5 miles then shape a course for the Passage de l'Iroise
-standing order "bring to in the Iroise": when the distance to the Passage de l'Iroise is under 3 miles then heave to
+standing order "bring to in the Iroise": when the distance to the Passage de l'Iroise is under 3.5 miles and the speed is over 2 knots and the distance to 48 18 N 4 42 W is over 10 miles then heave to
 standing order "the bottom of the Iroise": at hove to, if the distance to the Passage de l'Iroise is under 5 miles then heave the deep-sea lead
-standing order "fill away after the cast": at a sounding, if the distance to the Passage de l'Iroise is under 5 miles then fill away
+standing order "fill away after the cast": at a sounding, if the distance to the Passage de l'Iroise is under 5 miles and the speed is under 2 knots then fill away
 standing order "for Bertheaume": at filled away, if the distance to the Passage de l'Iroise is under 5 miles then shape a course for 48 18 N 4 42 W
+standing order "past the Iroise": when the distance to the Passage de l'Iroise is under 6 miles and the distance to 48 18 N 4 42 W is under 9 miles then shape a course for 48 18 N 4 42 W
 standing order "the road of Bertheaume": when the distance to 48 18 N 4 42 W is under 2 miles then shape a course for the road of Bertheaume
 
 # The pilot comes off in the road of Bertheaume (the fore topsail in at his hail, as
@@ -76,7 +84,8 @@ standing order "the flood": at the turn to the flood, if the daylight is day and
 # The Goulet on the flood by the pass north of the Mingan and the Fillettes (Faden 1793,
 # p. 57: range either shore and fear nothing, but not the middle), by points pricked on
 # the chart from the mouth under Petit Minou to the inner end under Portzic, and then
-# for the Bay of Brest; in pilot water the hand lead is kept going and a bearing taken
+# for the Bay of Brest; in pilot water (within six miles of the Goulet's middle, which
+# is the road of Bertheaume to the Bay) the hand lead is kept going and a bearing taken
 # every five minutes (the Regulations of 1806, the Pilot's articles; the Master's art.
 # XXIX).
 standing order "the mouth of the Goulet": when the distance to 48 19.8 N 4 38.4 W is under 0.4 miles then shape a course for 48 20.5 N 4 35.7 W
@@ -84,8 +93,8 @@ standing order "north of the Mingan": when the distance to 48 20.5 N 4 35.7 W is
 standing order "north of the Fillettes": when the distance to 48 20.8 N 4 33.9 W is under 0.4 miles then shape a course for 48 21.1 N 4 32.7 W
 standing order "under Portzic": when the distance to 48 21.1 N 4 32.7 W is under 0.4 miles then shape a course for 48 21.1 N 4 31.2 W
 standing order "into the Bay": when the distance to 48 21.1 N 4 31.2 W is under 0.4 miles then shape a course for the Bay of Brest
-standing order "pilot water": every 5 minutes, if the distance to the road of Bertheaume is under 9 miles and the land is in sight then take a bearing of the land
-standing order "the lead in pilot water": every 5 minutes, if the distance to the road of Bertheaume is under 9 miles then heave the lead
+standing order "pilot water": every 5 minutes, if the distance to 48 20.8 N 4 33.9 W is under 6 miles and the land is in sight then take a bearing of the land
+standing order "the lead in pilot water": every 5 minutes, if the distance to 48 20.8 N 4 33.9 W is under 6 miles then heave the lead
 
 # The Bay of Brest: anchor where you please in eight, ten or sixteen fathoms on mud
 # (Faden); the boat ashore for the prices, and the tin sold at the quay.

@@ -588,12 +588,29 @@ class Lookout:
                     "estimate": estimate_words(s.judged_m),
                     "made_out": level,
                     "known": known or "a sail",
+                    # her nation once her colours are made out and she shows them; None
+                    # while she is a stranger (too far, or no colours)
+                    "nation": v.nation
+                    if v is not None and level >= 2 and v.shows_colours and v.nation_adjective
+                    else None,
                     "words": f"{head} {relative}, bearing {point}, distant "
                     f"{estimate_words(s.judged_m)}{detail}",
                 }
             )
         if not items:
             return {"in_sight": False, "count": 0, "words": "no sail in sight", "items": []}
+        words = "; ".join(lead_words(i["words"]) for i in items)
+        return {"in_sight": True, "count": len(items), "words": words, "items": items}
+
+    def stranger(self, world: Any, heading_rad: float, own_nation: str | None) -> dict[str, Any]:
+        """`a stranger in sight`: the sail in sight that is not known for one of the ship's
+        own nation, the nearest first: every sail is a stranger until her colours are made
+        out (Falconer 1780, COLOURS), and one that shows none or another nation's stays
+        one. For the book: a cruiser chases strangers and not the port's own cutter."""
+        every = self.strangers(world, heading_rad)
+        items = [i for i in every["items"] if i["nation"] is None or i["nation"] != own_nation]
+        if not items:
+            return {"in_sight": False, "count": 0, "words": "no stranger in sight", "items": []}
         words = "; ".join(lead_words(i["words"]) for i in items)
         return {"in_sight": True, "count": len(items), "words": words, "items": items}
 
