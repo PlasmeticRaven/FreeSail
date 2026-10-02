@@ -2569,6 +2569,17 @@ def _ship_evolution(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
                 f"'Heave to on the larboard tack' is the order that takes one."
             )
         params["tack"] = order.modifiers["tack"]
+    if evo in ("heave_to", "lie_a_try"):
+        # refused at once, not after the hands have shortened sail for eight minutes
+        # (package 36's finding on the merchant passage's book, which gave `heave to`
+        # twice: the script's own check came late and left the yards half braced)
+        if "hove_to" in ship.extra:
+            raise OrderError("She is hove to already; fill away before heaving to again.")
+        in_hand = ship.extra.get("evolutions").instances if ship.extra.get("evolutions") else []
+        if any(
+            inst.evo.id in ("heave_to", "lie_a_try") and inst.script is not None for inst in in_hand
+        ):
+            raise OrderError("She is heaving to already.")
     runner = runner_of(ship)
     extra, call = crew_orders.take_hands_from(ship, order, [evo])
     params.update(extra)

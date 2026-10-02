@@ -1,0 +1,66 @@
+# FreeSail: the captain's orders for the naval cruise, Plymouth to the station off
+# Ushant (spec M5 §27, §29; package 36). The frigate's own book: the starter book is a
+# choice and is not loaded by the scenario; `read the standing orders from
+# data/standing_orders/starter.orders` adds its routines at any time.
+
+# The yard's stores and the departure: with the anchor down in the Sound (the best
+# bower let go at the start) thirty days' provisions are demanded of the King's yard
+# (the Regulations of 1806: supply by demand and survey; her water is complete already);
+# when the yard's stores are aboard she gets under way, cast on the starboard tack
+# (the wind west-north-westerly, the head paying off through west to south-west) and
+# steering S by W, the Plymouth pilot's own course out of the Sound
+# (data/ports/plymouth.yaml; Imray 1874 p. 80, the western channel past the Panther),
+# which keeps her a mile to the eastward of Penlee Point;
+# the pilot comes off to her as she stands out, and when he asks to be put off beyond
+# Cawsand Bay she heaves to for his cutter (under topsails she outran it, and he was
+# carried half way to Ushant), fills away when he is in it, and the course is shaped for
+# the station, a point fifteen miles west-north-west of Ushant, passing a mile to the
+# westward of the Eddystone.
+standing order "the yard": at the anchor let go, if the distance to Plymouth is under 5 miles then take in provisions for thirty days
+standing order "under way": at the yard's stores aboard then get under way on the starboard tack and steer S by W
+standing order "the pilot put off": at the pilot asks to be put off then heave to
+standing order "the pilot off": at the pilot off then fill away
+standing order "for the station": at filled away, if the distance to Plymouth is under 25 miles then set plain sail; shape a course for 48 30 N 5 30 W
+
+# The yards and the sheets: trimmed when she is steady on a course the book has shaped
+# or a chase has given (the starter book's trim answers a shift of the true wind, not a
+# turn of the ship), on a shift of a point, and the sheets tended every glass (the
+# starter book's rule; Luce 1866 ch. XXIV).
+standing order "trim to the course": at steady on the course then trim sails
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point then trim sails
+standing order "tend the sheets": every glass then trim the sheets
+
+# The departure and the landfalls: a bearing of the land every glass while it is in
+# sight (N §1); the chronometer wound at eight bells in the forenoon watch of itself,
+# and a time sight taken when the sun is well up and again in the afternoon, since the
+# chronometer is the captain's charge and the master a lunarian.
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land
+standing order "the morning sight": at two bells, if the daylight is day then take a sight for the longitude
+
+# The station, two days under the book, kept as the squadron off Ushant kept it: by the
+# wind on one tack and the other, wearing at the end of every second hour (the blockade's
+# logs: "wore ship" watch by watch; Luce 1866 ch. XXIV, 'Wearing', the square-rigged
+# ship's safe way round), and the course shaped for the station again at each watch's end
+# when she has worked twelve miles from it, no sail in sight; no mark is reached by
+# account within less than that, since the account between the log's heaves runs on the
+# mean heading and swings an hour's run as she turns (package 33a's mate), and a chase
+# in hand is not interrupted.
+standing order "wear at the hour": every 2 hours, if a stranger in sight is not in sight and the distance to 48 30 N 5 30 W is under 20 miles then wear ship
+standing order "by the wind": at wore then keep her full and by
+standing order "back to the station": every watch, if a stranger in sight is not in sight and the distance to 48 30 N 5 30 W is over 12 miles then shape a course for 48 30 N 5 30 W
+
+# A stranger: on the station every sail sighted is made out and chased, the helm put for
+# her bearing again every glass while she is a stranger (every sail is one until her
+# colours are made out for British; the port's own cutter with a letter is not chased
+# home) and each time the tops make out more of her, each order after the first leading the course off her bearing by what the
+# bearing's drift, the estimate of her distance and his own way across the line of sight
+# make it, so that the drift comes to nothing (Luce 1884 p. 553: "By constantly keeping
+# the chase on the same compass bearing, the chaser will attain the chase in the shortest
+# time possible"); within hail the chase is given up and the course shaped for the
+# station again, since what follows a chase is milestone 7's, and a chase lost over the
+# horizon is given up the same.
+standing order "a sail on the station": at a sail sighted, if the distance to 48 30 N 5 30 W is under 25 miles then make her out; give chase
+standing order "keep her bearing": every glass, if a stranger in sight is in sight and the distance to 48 30 N 5 30 W is under 40 miles then give chase
+standing order "more of her": at a sail made out, if a stranger in sight is in sight and the distance to 48 30 N 5 30 W is under 40 miles then give chase
+standing order "the chase up": at a sail within hail then shape a course for 48 30 N 5 30 W
+standing order "the chase lost": at a sail lost, if the distance to 48 30 N 5 30 W is under 40 miles then shape a course for 48 30 N 5 30 W

@@ -695,6 +695,26 @@ verbs:
                ask the pilot where, ask the pilot what, ask pilot]
     object: person
     level: 1
+  # Other sail (spec M5 §25; package 36; `freesail/orders/navigation.py`): a glass sent
+  # aloft for the sail in sight, answered at once with what the distance allows (Luce 1866
+  # ch. XXXIII, 'Chasing': "the angle subtended by the masts"); and the chase, the helm
+  # put for her bearing (Luce 1884 p. 553: "taking the bearing by compass ... keeping the
+  # chase on the same compass bearing"), the book giving it again every glass. The object
+  # `navigation` takes the words after the verb as said (which sail, by the lookout's
+  # words for her: the stranger, the brig, the cutter).
+  make her out:
+    synonyms: [make out the sail, make out the stranger, make the stranger out, make her out with the glass,
+               send a glass aloft, what is she, make out the strangers, make out, make out the brig,
+               make out the cutter, make out the ship, make out the schooner, make out the frigate,
+               make them out]
+    object: navigation
+    level: 1
+  give chase:
+    synonyms: [chase, chase the stranger, chase her, chase the sail, give chase to the stranger,
+               give chase to the sail, give chase to her, stand after her, make sail in chase,
+               chase the brig, chase the cutter, chase the schooner, chase the ship, chase the frigate]
+    object: navigation
+    level: 1
   # The port (spec M5 §23; `freesail/orders/port.py`): the object `port` takes the words
   # after the verb as said (a person for the boat, a number of tons and a good, an item
   # of the yard, a number of hands and a rating).
@@ -1249,6 +1269,21 @@ reading_words:
     the pilot cutter: a sail in sight
     the stranger: a sail in sight
     the sail: a sail in sight
+
+# ---------------------------------------------------------------------------
+# The world-order channel (spec M5 §26; package 36; `freesail/world/orders.py`): orders
+# to the world, not to the ship, given only by a scenario file at a time or by the lead's
+# harness, never by the captain. A line at the prompt that opens with one of these
+# channels' words and a colon, or with the words below, is refused with the sentence
+# here (truth 71); the captain orders his ship, sends the boat and reads what the
+# lookout sees. The channels are the channel's own (`orders.CHANNELS`); a test keeps the
+# two lists one.
+# ---------------------------------------------------------------------------
+world_orders:
+  channels: [weather, ship, message, port, person]
+  words: [world order, order to the world, order the world]
+  refusal: "That is an order to the world, not to the ship: the weather, the other sail, a message, a port and the people ashore are the scenario's and the director's to order, journaled at the driver's mark; the captain orders his ship, sends the boat and reads what the lookout sees."
+
 # Kinds of work by a noun, for `belay the lead` (package 33c), beside `work_nouns` above:
 # the lead's work is the order's that started it.
 more_work_nouns:

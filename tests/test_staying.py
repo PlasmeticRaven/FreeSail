@@ -456,3 +456,20 @@ def test_a_sails_aback_line_waits_out_a_seas_period():
     assert sail.backed
     sail_physics._record_backed(ship, sail, False, 0.0)
     assert not sail.backed  # no dt: at once
+
+
+def test_heave_to_given_while_hove_to_or_heaving_to_is_refused_at_once():
+    """Package 36's finding: a second `heave to` ran eight minutes of sail work before the
+    script's own check said "she is hove to already" and left the yards half braced. The
+    refusal is at the order (the lead, 2026-10-02): lying to, and while the manoeuvre is
+    in hand."""
+    world = under_plain_sail(FRIGATE, 292.5)
+    world.run(300)
+    world.submit("heave to")
+    world.run(20)
+    e = world.submit("heave to")
+    assert e.kind == "order.rejected" and "heaving to already" in e.text
+    world.run(900)
+    assert "hove_to" in world.ship.extra
+    e = world.submit("heave to")
+    assert e.kind == "order.rejected" and "hove to already; fill away" in e.text

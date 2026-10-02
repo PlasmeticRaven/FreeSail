@@ -55,7 +55,7 @@ gate 5c:  wave 5  33b the chronometer, the moon, the lunar and the azimuth; the 
                   32f the launcher page: the browser's front door with the game's options (Opus; after 33d and 32d; owner, 2026-10-01)
           wave 6  35 places, people, ports and nations (Falmouth, Plymouth, Brest); the pilot boarding from the cutter (Fable; landed 2026-10-02)
                   35b St Mary's and Roscoff as ports on 35's machinery, Roscoff's patch (Opus; landed 2026-10-02)
-          wave 7  36 other sail, the world-order channel, the two scenarios (Fable; launched 2026-10-02)
+          wave 7  36 other sail, the world-order channel, the two scenarios (Fable; landed 2026-10-02)
           wave 8  37 the officer of the watch; gate 5c cut after it so that the gate covers the officer's watch (owner, 2026-10-02); the lead's watch beside other models' (an Opus 5.5 watch, and a local model on the cutter: owner, 2026-10-01); the 5c verdict
 ```
 
@@ -1594,6 +1594,21 @@ vessel the far-detail ship generalises). The gate is cut after 37, not here (the
 Not in 36: a crewed ship beside the player's and a rules-based captain who fights or
 evades (M6), the director as a client of the channel (M7b), colours as deception and the
 private signal (M7), convoys and prizes (M7), a station for the lookout (open item 6).
+
+**As built (2026-10-02; the lead's notes on the report).** Both scenarios run whole at seed 7
+and are pinned: the merchant passage 36 hours, Carrick Road to the tin sold in the Bay of
+Brest by the Goulet on the flood; the naval cruise 48 hours, the stranger sighted, made out,
+chased, weathered and run down before the wind. The pilot's boat from the port's file was
+taken (a gig at Scilly, sighted within two miles). Carried forward from its report: the
+account swings up to an hour's run as the ship turns (33a's `account_now`), which the books
+are written round; the grid's Mingan and Fillettes shoals lie east of the chart's features
+(a features item for the chart's next pass); the chase's lead at close quarters lets a chase
+in the wind's eye pass out of hail, and a beat for a chase to windward is M7's; a far-detail
+vessel does not take the ground and sails over land between her waypoints, which 37's
+officer may see from the tops and is to be bounded before gate 5c's playtest (a one-line
+guard: a far vessel's leg that crosses the coast is refused when the scenario loads);
+the merchant book's Iroise cast is not made at seed 7 and the book says so. The second
+`heave to` refusal it found was taken by the lead at once at the order (`verbs.py`).
 
 ## Package 37 (outline; written when 36 lands; gate 5c cut at its merge)
 

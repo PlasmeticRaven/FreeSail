@@ -73,6 +73,12 @@ class Vocabulary:
     readings: dict[str, str] = field(default_factory=dict)
     # the words before a reading's that ask for it: "what is", "ask the master" (33c)
     asking: tuple[str, ...] = ()
+    # the world-order channel's words (package 36; `freesail.world.orders`): the channels
+    # a line may not open with at the captain's prompt, the words that name the channel,
+    # and the sentence the captain's grammar refuses one with (truth 71)
+    world_order_channels: tuple[str, ...] = ()
+    world_order_words: tuple[str, ...] = ()
+    world_order_refusal: str = ""
 
     @property
     def class_bound_take_in_phrases(self) -> frozenset[str]:
@@ -195,6 +201,10 @@ def load_vocabulary(path: str | Path | None = None) -> Vocabulary:
     )
     vocab.readings = readings
     vocab.asking = _tuple((data.get("reading_words") or {}).get("asking"))
+    world_orders = data.get("world_orders") or {}
+    vocab.world_order_channels = _tuple(world_orders.get("channels"))
+    vocab.world_order_words = _tuple(world_orders.get("words"))
+    vocab.world_order_refusal = str(world_orders.get("refusal") or "")
     vocab.verb_phrases = sorted(phrase_to_verb, key=lambda s: (-len(s.split()), -len(s), s))
     for phrase, mods in (data.get("phrase_modifiers") or {}).items():
         k = key(phrase)

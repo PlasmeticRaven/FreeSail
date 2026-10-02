@@ -54,10 +54,19 @@ ship's motion are kept with it (spec M5 §4; `sea` above overrides either way).
     cargo: {purse_pounds: 500, goods: {tin: 20}}   # the purse and the hold (§23)
     ports:                           # the ports' state (§23, §27): a list of ids, or each
       brest: {closed_to: [], letters: [{text: "...", origin: Brest}], news: ["..."]}
+    ships:                           # the other sail on the sea at the start (§25; package 36)
+      - {id: two-brothers, description: merchant brig, name: Two Brothers, nation: britain,
+         position: 49 50 N 5 30 W, goal: "trading Falmouth to the Lizard", colours: shown}
+    world_orders:                    # orders to the world by time (§26; freesail.world.orders)
+      - {at: 1805-06-12T14:00, order: 'message: at Brest from the Prefect maritime: "..."'}
     standing_orders:                 # files read at the start, in order
       - data/standing_orders/starter.orders
     orders:                          # the captain's first orders, given at tick 0
       - set plain sail
+
+The papers may be given whole (§27) under `papers:`: `chart: {year: 1804}`, `epitome:
+norie`, `almanac: 1805`, `chronometer: {...}` (the ship's line wins where both say),
+`price_lists: [falmouth]`.
 
 Everything the World needs goes into its `Scenario` (the script included), so a save
 holds it and a replay follows it; the standing orders and the first orders are given as
@@ -183,6 +192,19 @@ class ScenarioFile:
         if sc.ports is not None:
             names = list(sc.ports) if not isinstance(sc.ports, dict) else list(sc.ports)
             out.append(f"The ports: {', '.join(names) if names else 'none'}.")
+        # package 36: the other sail and the world orders (the author's view: the truth
+        # of where each ship is put and what she is about, which no log line gives)
+        if sc.ships:
+            out.append(f"Other sail on the sea at the start: {len(sc.ships)}.")
+            for s in sc.ships:
+                out.append(
+                    f"  {s.get('description')} {s.get('name', '')} of {s.get('nation', 'britain')}"
+                    f" at {s.get('position')}, {s.get('goal')}."
+                )
+        if sc.world_orders:
+            out.append(f"World orders by time: {len(sc.world_orders)}.")
+            for o in sc.world_orders:
+                out.append(f"  {str(o['at'])[5:16]}  {o['order']}")
         return out
 
 
@@ -225,10 +247,17 @@ def load_scenario(path: str | Path) -> ScenarioFile:
     ship = raw.get("ship") or {}
     wind = raw.get("wind") or {}
     sc.glass = bool(ship.get("glass", raw.get("glass", False)))
+    # the papers whole (spec M5 §27; package 36): the epitome and the chronometer may be
+    # given under `papers:` beside the chart's year and the almanac; the ship's line wins
+    papers_raw = raw.get("papers") or {}
+    if not isinstance(papers_raw, dict):
+        raise ScenarioError(
+            f"{where}, papers: a mapping (chart, epitome, almanac, chronometer, price_lists)."
+        )
     # the master's epitome for the tide (spec M5 §16, package 34): the ship's line or the
     # file's; a table of data/tides/establishments.yaml (norie, moore); none, the ship's
     # kind chooses (a ship of war Norie's, a merchantman Moore's)
-    epitome = ship.get("epitome", raw.get("epitome"))
+    epitome = ship.get("epitome", raw.get("epitome", papers_raw.get("epitome")))
     if epitome is not None:
         sc.epitome = str(epitome).strip().lower()
         if sc.epitome not in ("norie", "moore"):
@@ -248,7 +277,7 @@ def load_scenario(path: str | Path) -> ScenarioFile:
     # the chronometer (package 33b; spec M5 §14; N §4(b)): the captain's own, as
     # {maker, rated, rate_s_per_day, drift: seeded | seconds a day, forgotten: [dates]};
     # on the ship's line or the file's; none by default (rare in a small vessel)
-    chron = ship.get("chronometer", raw.get("chronometer"))
+    chron = ship.get("chronometer", raw.get("chronometer", papers_raw.get("chronometer")))
     if chron is not None:
         if not isinstance(chron, dict):
             raise ScenarioError(
@@ -295,10 +324,7 @@ def load_scenario(path: str | Path) -> ScenarioFile:
         if not isinstance(p, dict) or not str(p.get("role") or "").strip():
             raise ScenarioError(f"{where}, people {i + 1}: a person is a mapping with a role.")
     sc.people = [dict(p) for p in people]
-    papers = raw.get("papers") or {}
-    if not isinstance(papers, dict):
-        raise ScenarioError(f"{where}, papers: a mapping (price_lists: [ports]).")
-    sc.papers = {str(k): v for k, v in papers.items()}
+    sc.papers = {str(k): v for k, v in papers_raw.items() if k not in ("epitome", "chronometer")}
     cargo = raw.get("cargo") or {}
     if not isinstance(cargo, dict):
         raise ScenarioError(f"{where}, cargo: a mapping of purse_pounds and goods.")
@@ -319,6 +345,41 @@ def load_scenario(path: str | Path) -> ScenarioFile:
             raise ScenarioError(
                 f"{where}, ports: a list of port ids, or a mapping of each port's state."
             )
+    # Package 36 (spec M5 §25 to §27): the other sail on the sea at the start, and the
+    # world orders by time, each refused in words here rather than at the tick
+    ships_raw = raw.get("ships") or []
+    if not isinstance(ships_raw, list):
+        raise ScenarioError(
+            f"{where}, ships: a list of {{id, description, name, nation, position, goal}}."
+        )
+    from freesail.world.ships import DESCRIPTIONS, description_key
+
+    for i, s in enumerate(ships_raw):
+        if not isinstance(s, dict):
+            raise ScenarioError(f"{where}, ships {i + 1}: a ship is a mapping.")
+        if description_key(str(s.get("description") or s.get("kind") or "")) is None:
+            raise ScenarioError(
+                f"{where}, ships {i + 1}: '{s.get('description')}' is no description; say one "
+                f"of {', '.join(DESCRIPTIONS)}."
+            )
+        if s.get("position") is None or not str(s.get("goal") or "").strip():
+            raise ScenarioError(f"{where}, ships {i + 1}: a ship needs a position and a goal.")
+    sc.ships = [{str(k): v for k, v in s.items()} for s in ships_raw]
+    orders_raw = raw.get("world_orders") or []
+    if not isinstance(orders_raw, list):
+        raise ScenarioError(f"{where}, world_orders: a list of {{at, order}}.")
+    from freesail.world import orders as world_orders
+
+    for i, o in enumerate(orders_raw):
+        if not isinstance(o, dict) or o.get("at") is None or not str(o.get("order") or ""):
+            raise ScenarioError(f"{where}, world_orders {i + 1}: at and order.")
+        at = _time(o["at"], f"{where}, world_orders {i + 1}")
+        text = " ".join(str(o["order"]).split())
+        try:
+            world_orders.parse(text)
+        except world_orders.WorldOrderError as e:
+            raise ScenarioError(f"{where}, world_orders {i + 1}: {e}") from None
+        sc.world_orders.append({"at": at.isoformat(), "order": text})
     # the world's stated current (package 33a; none by default): {knots, toward_deg}
     current = raw.get("current")
     if current is not None:

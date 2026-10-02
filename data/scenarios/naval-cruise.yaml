@@ -1,0 +1,120 @@
+# FreeSail: the naval cruise (spec M5 §27, §29; package 36). The frigate Amazon from
+# Plymouth to the station off Ushant with a chronometer at the captain's charge, stores
+# from the King's yard, a lunarian master; the station kept two days under standing
+# orders; a stranger sighted and chased by the plan's speed alone; a message by the
+# cutter. Given to either driver with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/naval-cruise.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/naval-cruise.yaml
+# and printed whole, with the account against the truth, by
+#     py tools/day_log.py data/scenarios/naval-cruise.yaml --hours 44 --reckoning
+#
+# The cruise as the book beside this file sails it (naval-cruise.orders): she lies at
+# anchor in the Sound at six in the morning of 12 June 1805; her water is completed and
+# thirty days' provisions taken in from the King's yard by demand; when the yard's
+# stores are aboard she gets under way, the Plymouth pilot takes her out past the
+# Panther and leaves her beyond Cawsand Bay, and she shapes a course for the station,
+# a point fifteen miles west-north-west of Ushant, passing a mile to the westward of the
+# Eddystone; on the station she reaches to and fro between two points pricked on the
+# chart, north-east and south-west, two days under her book, the chronometer wound and
+# the master's sights taken. As she clears the Sound the Plymouth cutter, sent by a
+# world order at ten with the port admiral's letter, comes up with her within the hour,
+# and the letter comes aboard by the cutter, is carried aft by the midshipman and read
+# where the captain is (truth 68's chain). On the forenoon of the 13th, as she stands
+# back for the station, a sail is sighted ahead (a world order of this file: a French
+# brig-sloop out of Brest standing up-Channel for the trade under no colours, placed by
+# the author, who sees the world, five leagues on the frigate's bow at seven), made out
+# and chased, the frigate's helm put for her bearing each glass while she is a stranger
+# (Luce 1884 p. 553: "keeping the chase on the same compass bearing"), until she is
+# within hail; the brig runs on at her plan's speed and the frigate returns to her
+# station.
+#
+# The weather is pinned (a north-westerly of fourteen knots backing northerly and falling
+# through the two days, the sky clear over the old high over Biscay, the merchant
+# passage's high and days), so that the cruise is the same on every machine; the sea and
+# the motion are kept. The
+# dozen other sail: the Channel's traffic, two cruisers kept out of her sight on the
+# Breton coast, the stranger and the cutter by world order. The numbers at seed 7 are
+# pinned in tests/test_known_truths.py and measured in docs/dev/TuningNotes.md (package
+# 36). The starter book is not loaded; the cruise's book holds what it needs.
+
+name: The naval cruise, Plymouth to the station off Ushant
+seed: 7
+start: 1805-06-12T06:00
+position: {lat_deg: 50.3420, lon_deg: -4.1480}   # the anchorage in the Sound (Imray 1874 pp. 78-83)
+region: channel-west
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 200
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.95}   # a lunarian master (spec M5 §27)
+
+papers:
+  chart: {year: 1804}
+  epitome: norie                  # a ship of war's
+  almanac: 1805
+  chronometer:                    # the captain's own, at his charge (spec M5 §14, §27)
+    {maker: Arnold, rated: 1805-06-01, rate_s_per_day: 2.0, drift: seeded}
+
+cargo:
+  purse_pounds: 200
+
+ports: [falmouth, plymouth, brest]
+
+weather:
+  wind:
+    - {at: 1805-06-12T05:00, from_deg: 290, knots: 14, air_mass: neutral}
+    - {at: 1805-06-12T20:00, from_deg: 300, knots: 12}
+    - {at: 1805-06-13T12:00, from_deg: 300, knots: 10}
+    - {at: 1805-06-14T06:00, from_deg: 290, knots: 10}
+  background:
+    {hpa: 1018, gradient_hpa_per_100km: 0.4, high_toward_deg: 200}
+  systems:
+    - name: the old high over Biscay
+      kind: high
+      radius_km: 900
+      track:
+        - {at: 1805-06-11T12:00, x_km: 300, y_km: -500, hpa: 1024}
+        - {at: 1805-06-13T12:00, x_km: 500, y_km: -600, hpa: 1022}
+  sky: {sky: clear, weather: fine, visibility: the horizon}
+  sea: true
+
+ships:
+  - {id: two-brothers, description: merchant brig, name: Two Brothers, nation: britain,
+     position: 49 18 N 6 18 W, goal: "bound from the Longships for the Eddystone"}
+  - {id: nancy, description: merchant brig, name: Nancy, nation: britain,
+     position: 50 05 N 4 30 W, goal: "bound from the Eddystone for 49 20 N 6 20 W"}
+  - {id: lark, description: cutter, name: Lark, nation: britain,
+     position: 50 08 N 4 22 W, goal: "patrolling off the Eddystone within 5 miles"}
+  - {id: diamond, description: frigate, name: Diamond, nation: britain,
+     position: 48 00 N 4 55 W, goal: "patrolling off the Raz within 8 miles"}
+  - {id: harpy, description: brig-sloop, name: Harpy, nation: britain,
+     position: 47 50 N 6 00 W, goal: "patrolling off 47 50 N 6 00 W within 10 miles"}
+  - {id: hirondelle, description: schooner, name: Hirondelle, nation: france,
+     position: the Isle of Saints, goal: "bound for Camaret road"}
+  - {id: betsey, description: schooner, name: Betsey, nation: united-states,
+     position: 49 18 N 4 54 W, goal: "bound for Falmouth"}
+  - {id: anna-maria, description: merchant brig, name: Anna Maria, nation: denmark,
+     position: 49 30 N 4 40 W, goal: "bound for 48 30 N 5 40 W"}
+  - {id: bom-jesus, description: merchant brig, name: Bom Jesus, nation: portugal,
+     position: 48 40 N 5 50 W, goal: "bound for the Start"}
+  - {id: dolphin, description: schooner, name: Dolphin, nation: britain,
+     position: 50 02 N 4 50 W, goal: "trading Falmouth to the Eddystone"}
+  - {id: swift, description: cutter, name: Swift, nation: britain,
+     position: 49 40 N 5 20 W, goal: "carrying the mail to Plymouth"}
+
+world_orders:
+  - {at: 1805-06-12T10:00, order: 'message: by a cutter from Plymouth from the port admiral: "Rejoin the squadron off the Black Rocks without delay; the enemy is reported out of Rochefort."'}
+  - {at: 1805-06-13T06:00, order: 'weather: waypoint for "the old high over Biscay" at 1805-06-14T12:00 600 -700 1020'}
+  - {at: 1805-06-13T07:00, order: 'ship: a brig-sloop "Palinure" of France at 48 50 N 5 16 W, bound for the Start, no colours'}
+
+standing_orders:
+  - data/scenarios/naval-cruise.orders
+
+orders:
+  - let go the best bower

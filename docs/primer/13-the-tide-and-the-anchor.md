@@ -133,7 +133,7 @@ Sail is yours to make: the anchor's evolutions set none, and a ship weighing in 
 | `the cable` | | the scope and the strain against the rating |
 | `the tide by the almanac` | `the tide`, `high water by the almanac` | the master's high water today, by his epitome |
 
-The events for the book: `the anchor let go`, `brought up`, `the anchor aweigh`, `the anchor weighed` (or `under way`), `the anchor dragging`, `the cable parted`, `aground` (or `the ground taken`), `afloat`, `the turn of the tide`.
+The events for the book: `the anchor let go`, `brought up`, `the anchor aweigh`, `the anchor weighed` (or `under way`), `the anchor dragging`, `the cable parted`, `aground` (or `the ground taken`), `afloat`, `the turn of the tide` (and, by which way she swung, `the turn to the flood`, `the turn to the ebb`).
 
 ## Where it comes from
 

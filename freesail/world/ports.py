@@ -187,6 +187,15 @@ class PilotSpec:
     cast: str
     course_out_deg: float
     words: dict[str, str]
+    # what comes off for the pilot when it is not the cutter (package 35b's files, read by
+    # package 36): {kind: a gig, name: the St Mary's pilots' gig, under: oars and a lugsail}
+    vessel: dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def craft(self) -> str:
+        """'cutter', 'gig', 'boat': the word the log uses for what comes off."""
+        kind = str(self.vessel.get("kind") or "a cutter")
+        return kind.removeprefix("a ").removeprefix("an ").removeprefix("the ") or "cutter"
 
 
 @dataclass
@@ -383,6 +392,7 @@ def load_port(path: str | Path, chart: Any = None, state: dict[str, Any] | None 
         cast=str(pr.get("cast") or "starboard"),
         course_out_deg=float(pr.get("course_out_deg", 180.0)),
         words={str(k): str(v) for k, v in (pr.get("words") or {}).items()},
+        vessel={str(k): v for k, v in (pr.get("vessel") or {}).items()},
     )
     mk = doc.get("market") or {}
     goods: dict[str, Good] = {}
@@ -613,17 +623,28 @@ class Ports:
         from freesail.world.ships import Vessel
 
         self._counter += 1
-        vessel = Vessel(
-            id=f"{port.id}-pilot-cutter-{self._counter}",
-            name=f"the {port.name} pilot's cutter",
-            kind="a cutter",
-            ship_file=port.pilot.cutter_file,
-            nation=port.nation,
-            position=port.shore.position,
-            purpose="standing out from the land",
-            colours=self.world.nations.get(port.nation).colours,
-            plan=[("to_ship", PILOT_BOARDS_WITHIN_M)],
-        )
+        common = {
+            "id": f"{port.id}-pilot-{port.pilot.craft}-{self._counter}",
+            "ship_file": port.pilot.cutter_file,
+            "nation": port.nation,
+            # from the pilots' station, the outer road, where the cutter cruises for ships
+            # (package 36: she sails by her own polar now, and from the shore of Brest she
+            # beat out through the Goulet six hours for a ship in the Iroise; the
+            # cruising ground is measured from the same road)
+            "position": port.outer_road.position,
+            "colours": self.world.nations.get(port.nation).colours,
+            "plan": [("to_ship", PILOT_BOARDS_WITHIN_M)],
+        }
+        if port.pilot.vessel:
+            # a boat under oars and sail (35b's gig, the town's boat): `ships.Vessel.boat_of`
+            vessel = Vessel.boat_of(port.id, port.pilot.vessel, **common)
+        else:
+            vessel = Vessel(
+                name=f"the {port.name} pilot's cutter",
+                kind="a cutter",
+                purpose="standing out from the land",
+                **common,
+            )
         self.world.vessels.add(vessel)
         self.cutter_id = vessel.id
         self.cutter_port = port.id
@@ -671,8 +692,11 @@ class Ports:
             if found is None:
                 return
             port, _ = found
-            _, d_anch = bearing_and_distance(world.position, port.anchorage.position)
-            if d_anch / units.NAUTICAL_MILE > port.pilot.cruising_nm:
+            # the cruising ground is measured from the pilot's station, the outer road
+            # (package 36: Brest's pilots met ships in the Iroise, seven miles from the
+            # road of Bertheaume, not from the Bay within the Goulet)
+            _, d_station = bearing_and_distance(world.position, port.outer_road.position)
+            if d_station / units.NAUTICAL_MILE > port.pilot.cruising_nm:
                 return
             if (
                 world.at_anchor or world.ship.extra.get("aground")
@@ -695,14 +719,20 @@ class Ports:
             _, dist = bearing_and_distance(world.position, cutter.position)
             if dist <= PILOT_HAIL_WITHIN_M and not self.cutter_hailed:
                 self.cutter_hailed = True
+                craft = port.pilot.craft
                 if self.cutter_errand == "bring":
                     text = (
-                        f"The cutter hailed: a pilot for {port.name}; shorten sail and he will "
+                        f"The {craft} hailed: a pilot for {port.name}; shorten sail and he will "
                         f"come aboard."
                     )
                 else:
-                    text = "The cutter hailed: she has come off for the pilot."
-                self._record(Severity.ROUTINE, "port.pilot_hail", text, {"port": port.id})
+                    text = f"The {craft} hailed: she has come off for the pilot."
+                self._record(
+                    Severity.ROUTINE,
+                    "port.pilot_hail",
+                    text,
+                    {"port": port.id, "errand": self.cutter_errand},
+                )
             if dist <= PILOT_BOARDS_WITHIN_M and self._ground_speed_kn() <= PILOT_BOARDS_UNDER_KN:
                 cutter.alongside = True
                 if self.cutter_errand == "bring":
@@ -710,7 +740,14 @@ class Ports:
                 else:
                     self._pilot_leaves(port, cutter, now)
             return
-        if self.pilot is not None and cutter is None and not world.at_anchor:
+        if (
+            self.pilot is not None
+            and (cutter is None or self.cutter_errand is None)
+            and not world.at_anchor
+        ):
+            # the cutter comes off for him again while the one that brought him is still
+            # going home (package 36: a frigate under topsails was past the cruising
+            # ground before the first was in, and the pilot stayed aboard)
             port = self.ports[self.pilot_port or ""]
             _, d_road = bearing_and_distance(world.position, port.outer_road.position)
             _, d_anch = bearing_and_distance(world.position, port.anchorage.position)
@@ -726,16 +763,28 @@ class Ports:
                 and d_road / units.NAUTICAL_MILE < port.pilot.cruising_nm
             ):
                 self._launch_cutter(port, "fetch")
+                # the pilot asks for sail to be shortened as his boat comes off (package
+                # 36: a schooner with her sheets tended outran the cutter and carried the
+                # Falmouth pilot to the Iroise); the same line as the boat's hail, so
+                # that a book which shortens sail at the pilot's hail does so now
+                self._record(
+                    Severity.ROUTINE,
+                    "port.pilot_hail",
+                    f"The pilot asks for sail to be shortened: his {port.pilot.craft} is "
+                    f"coming off for him.",
+                    {"port": port.id, "asks": True, "errand": "fetch"},
+                )
 
     def _pilot_boards(self, port: Port, cutter: Any, now: int) -> None:
         world = self.world
         stance = self.stance(port)
         nation = world.nations.get(self.ship_nation)
         if stance == "closed":
+            craft = port.pilot.craft
             text = (
-                f"The pilot hailed from the cutter: {port.name} is closed to {nation.people} "
+                f"The pilot hailed from the {craft}: {port.name} is closed to {nation.people} "
                 f"by the port's order; you will get no pilot here, and the batteries will not "
-                f"let you pass. The cutter bore up for the land."
+                f"let you pass. The {craft} bore up for the land."
             )
             self._record(
                 Severity.NOTABLE,
@@ -765,8 +814,8 @@ class Ports:
         self.pilot_since = now
         self._last_distance_nm.pop(port.id, None)
         head = (
-            f"The pilot, {pilot.name} of {port.name}, came aboard from the cutter and took "
-            f"charge of her"
+            f"The pilot, {pilot.name} of {port.name}, came aboard from the {port.pilot.craft} "
+            f"and took charge of her"
         )
         if stance == "neutral":
             head += f" ({nation.adjective} colours being no bar at {port.name})"
@@ -788,7 +837,7 @@ class Ports:
                 Severity.ROUTINE, "port.news", f"The pilot's news: {news}", {"port": port.id}
             )
         for letter in list(port.letters):
-            letter.carried_by = "the pilot cutter"
+            letter.carried_by = f"the pilot {port.pilot.craft}"
             for severity, kind, text, data in world.people.message_aboard(letter):
                 self._record(severity, kind, text, data)
             port.letters.remove(letter)
@@ -816,7 +865,8 @@ class Ports:
         self._record(
             Severity.NOTABLE,
             "port.pilot_left",
-            f"{pilot.name} left her in the cutter, clear of {port.outer_road.name}{paid}.",
+            f"{pilot.name} left her in the {port.pilot.craft}, clear of "
+            f"{port.outer_road.name}{paid}.",
             {"port": port.id, "pilot": pilot.to_dict(), "fee_pounds": fee},
         )
         self.pilot = None
@@ -954,7 +1004,7 @@ class Ports:
         cutter = self._cutter()
         if cutter is not None:
             bits.append(
-                "the pilot cutter "
+                f"the pilot {port.pilot.craft} "
                 + ("alongside" if cutter.alongside else "standing out toward her")
             )
         bits.append(self.boat.words())

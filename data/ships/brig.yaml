@@ -19,6 +19,17 @@ ship:
     the kit''s manual (Winfield and the Greenwich draught not reached); spars by Fincham 1843''s table
     of proportions for brigs of war (p. 88) checked against Luce 1866 ch. VII; sails by Steel 1794; see
     tools/gen_ships.py for every rule.'
+  descriptions:
+    brig-sloop:
+      rig: a brig
+      what: a brig-sloop of war, sixteen ports a side
+      note: 'Harpy herself: sixteen 32-pounder carronades (the kit''s manual; docs/design/VesselCandidates.md);
+        the ports are what the glass counts.'
+    merchant brig:
+      rig: a brig
+      what: a merchant brig, deep laden
+      note: The trade's brig of the same rig and size, her ports painted and no guns run out (Falconer
+        1780, BRIG); 'deep laden' is the merchantman's look, judgement.
 hull:
   # 88 ft: judgement, 0.93 of the 95 ft gun deck (keel 75 ft 1 5/8 in), a brig-sloop's ends raking more than a frigate's.
   length_waterline_m: 26.8
