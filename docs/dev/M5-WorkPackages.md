@@ -22,6 +22,13 @@ Three rules added for this milestone:
   comment and in `docs/dev/TuningNotes.md`.
 - **Parity is structural**, as in milestone 4: a reading in the registry or nowhere.
 
+A fourth rule, from package 36 (owner, 2026-10-02): **a scenario's book is tuned once and
+cheaply.** It needs to bring the ship through at the pinned seed and no more, since the
+gate asks the owner to sail the scenario as captain and better it; iterate a late leg from
+a checkpoint, not from the start, and stop when it works, recording what it does not
+handle. A builder that finds itself on its tenth whole-passage run is to say so in its
+report rather than run a twentieth.
+
 The owner's ruling (2026-09-29): the heavy packages go to Fable, the lead reviewing as
 before; each package is written here when its predecessor has landed and is launched on
 the owner's approval, not on the merge.
