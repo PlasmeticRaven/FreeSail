@@ -968,3 +968,18 @@ def test_the_roscoff_patch_gives_the_sheets_depths_and_cites_its_sheet_in_the_ma
     patches, _ = tool.load_overrides("channel-west")
     for p in (p for p in patches if p.override == "roscoff"):
         assert "Bellin 1764" in p.source, p.name
+
+
+def test_a_yard_purchase_at_a_port_without_the_item_gets_the_yards_refusal_not_the_markets():
+    """35b's finding: 'buy a suit of sails from the chandlers' at St Mary's, whose chandlers
+    keep no sails, fell through to the market with the words garbled; it is the yard's
+    refusal, naming what the yard supplies (the lead, 2026-10-02)."""
+    w = at_anchor_in({"lat_deg": 49.925, "lon_deg": -6.325})  # St Mary's Road
+    e = w.submit("buy a suit of sails from the chandlers")
+    assert e.kind == "order.rejected"
+    assert (
+        "The yard at St Mary's has no suit of sails; it supplies cordage, water, provisions."
+        in e.text
+    )
+    e = w.submit("buy a topmast")
+    assert e.kind == "order.rejected" and "has no topmast" in e.text

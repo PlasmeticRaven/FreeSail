@@ -129,6 +129,14 @@ def execute(ship: Any, order: Order) -> Result:
         # 'buy a suit of sails', 'buy a topmast from the chandlers': the yard's business
         text, data = ports.demand(_yard_item(ports, rest), None)
         return "yard.demanded", text, {"verb": verb, "level": 1} | data
+    if verb == "buy" and re.search(
+        r"\b(chandlers|yard|sails?|spars?|topmast|cordage)\b", rest.lower()
+    ):
+        # the yard's kind of thing at a port whose yard has none of it: the yard's refusal,
+        # naming what it supplies, not the market's with the words garbled (35b's finding)
+        words = re.sub(r"\b(from|the|yard|chandlers|a|an|spare)\b", " ", rest.lower())
+        text, data = ports.demand(" ".join(words.split()), None)
+        return "yard.demanded", text, {"verb": verb, "level": 1} | data
     if verb in ("buy", "sell"):
         tons, good = _tons_and_good(rest, verb)
         text, data = ports.trade(verb, tons, good)
