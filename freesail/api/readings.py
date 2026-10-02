@@ -2223,6 +2223,83 @@ def event_matches(spec: EventSpec, kind: str, data: dict[str, Any]) -> bool:
 
 
 # ---------------------------------------------------------------------------
+# Package 37: the officer of the watch (spec M5 §29). A row of its own, in this block,
+# changing nothing above: who has the deck, since when, what he was told and what the
+# captain's word allows; and the events a station with authority wakes on, besides the
+# urgent lines that wake every stand-by. Read from the station's harness
+# (`freesail.agents.harness`), which is the one place the deck is kept; the truth is not
+# in it beyond what the captain said.
+# ---------------------------------------------------------------------------
+
+NO_OFFICER_WORDS = "no officer of the watch is stationed; the captain has the deck"
+
+
+def _officer_of_the_watch(world: Any, _: str | None) -> dict[str, Any] | None:
+    harness = (getattr(world, "agents", None) or {}).get("officer of the watch")
+    if harness is None:
+        return None
+    a = harness.agent
+    st = harness.station
+    who = st.person or "the officer of the watch"
+    if a.released:
+        words = f"{who} stood down ({a.released_reason}); the captain has the deck"
+    elif a.deck:
+        words = f"{who}, {st.rank}, has the deck since {a.deck_stamp}"
+    else:
+        words = f"{who}, {st.rank}, is at the station; the captain has the deck"
+    if harness.model_name:
+        words += f" ({harness.model_name}, through {harness.door or 'the game'})"
+    told = [w for w in a.told if w]
+    if told:
+        words += "; told: " + " ".join(told)
+    if a.allowances:
+        words += "; may also " + "; ".join(
+            f"{verb} ({w})" if w else verb for verb, w in a.allowances.items()
+        )
+    return {
+        "words": words,
+        "person": st.person,
+        "rank": st.rank,
+        "deck": bool(a.deck and not a.released),
+        "since": a.deck_stamp if a.deck else None,
+        "told": list(told),
+        "allowances": dict(a.allowances),
+        "state": a.state,
+    }
+
+
+def _no_officer_words(world: Any) -> str | None:
+    return NO_OFFICER_WORDS
+
+
+REGISTRY.add(
+    Reading(
+        "officer_of_the_watch",
+        ("the officer of the watch", "who has the deck"),
+        "ground",
+        "",
+        _officer_of_the_watch,
+        description="who has the deck: the officer of the watch by name and rank, since "
+        "when, what the captain told him and what his word allows",
+        none_words=_no_officer_words,
+    )
+)
+# the events a station with authority wakes on, and the book may act on: the deck given
+# and taken (the captain's `you have the deck`, `I have the deck`, the officer's hand-over)
+# and a standing order countermanded (the officer's by the captain's)
+_event(EventSpec("the deck given", "agent.deck", lambda data: data.get("deck") == "given"))
+_event(
+    EventSpec(
+        "the deck taken",
+        "agent.deck",
+        lambda data: data.get("deck") in ("taken", "handed over"),
+    )
+)
+_event(EventSpec("a handover", "agent.handover"))
+_event(EventSpec("a standing order countermanded", "standing.countermanded"))
+
+
+# ---------------------------------------------------------------------------
 # Intervals, for `every` (spec §2): seconds of ship's time
 # ---------------------------------------------------------------------------
 

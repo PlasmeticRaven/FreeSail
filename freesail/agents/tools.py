@@ -54,6 +54,8 @@ from freesail.agents.agent import (
 )
 from freesail.api import readings as R
 from freesail.core.events import Severity
+from freesail.orders.errors import OrderError
+from freesail.orders.vocabulary import load_vocabulary
 
 if TYPE_CHECKING:
     from freesail.core.world import World
@@ -62,13 +64,17 @@ __all__ = [
     "BOOK_TOOLS",
     "CHARS_PER_TOKEN",
     "FIND_LIMIT",
+    "HAND_OVER_BY_TOOL",
     "READ_LOG_LIMIT",
     "TOOLS",
     "Page",
     "Tool",
     "answer",
+    "authority_check",
     "book_of",
     "call",
+    "hand_over",
+    "handover_note",
     "journal",
     "library",
     "log_line",
@@ -353,12 +359,192 @@ def _reopen(key: str, section: str = "", find: str = "") -> str:
 
 
 def submit_order(world: World, station: str, text: str) -> str:
-    """Authority is checked by `call` before this runs."""
+    """A station's order to the ship (package 37): the station's authority and the deck
+    are checked by `call`; the order is checked against the station's domain here
+    (`authority_check`), refused in words and logged `agent.refused` when it falls
+    outside, and otherwise given through `World.submit` with the station's actor, so
+    that the grammar, the refusals and the log line are the captain's own ("By the
+    officer of the watch: taking in the royals")."""
     text = " ".join(str(text).split())
     if not text:
         return "An order needs some words."
-    e = world.submit(text, actor=f"the {station}", said=f"The {station} orders: {text}")
+    harness = world.agents.get(station)
+    st = harness.station if harness is not None else None
+    if st is not None and st.has_authority:
+        if " ".join(text.lower().split()).rstrip(".!") == "hand over the deck":
+            return HAND_OVER_BY_TOOL
+        text, why = authority_check(world, station, text)
+        if why:
+            return _refuse(world, station, text, why)
+    said = f"The {station} orders: {text}"
+    if st is not None and st.domain is not None and hasattr(world.ship, "parts"):
+        from freesail.standing.runtime import said_as_done
+
+        said = f"By the {station}: {said_as_done(world.ship, text)}"
+    e = world.submit(text, actor=f"the {station}", said=said)
     return e.text
+
+
+# What `submit_order('hand over the deck')` answers a station with authority: the deck is
+# handed over with the note, by the tool (package 37).
+HAND_OVER_BY_TOOL = (
+    "To hand over the deck, call hand_over(note) with your note for the relief: what "
+    "happened, what was ordered, what you noticed, what you are watching for."
+)
+
+
+def _refuse(world: World, station: str, text: str, why: str) -> str:
+    """A refusal by the station's authority or domain, in words, logged `agent.refused`
+    with the station's actor (truth 42's line, widened to the domain)."""
+    world.record(
+        Severity.ROUTINE,
+        "agent.refused",
+        f"{why} {text!r} not carried out." if text else why,
+        actor=f"the {station}",
+        data={"order": text, "tool": "submit_order"},
+    )
+    return why
+
+
+def authority_check(world: World, station: str, text: str) -> tuple[str, str]:
+    """The domain filter (package 37; the cold review's first item): the text as it is
+    to be submitted (a standing order given its station's rank), and the refusal in
+    words, or "" when the domain allows it. A plain order is read for its verb by the
+    imperative grammar and the verb's level and object by the vocabulary; a standing
+    order has its rank set to the station's (`by the captain` written by the officer is
+    refused) and each order after `then` checked as a plain order would be; the book's
+    orders are allowed on the station's own standing orders only. An order the grammar
+    cannot read is passed to `World.submit`, whose refusal is the captain's own."""
+    from freesail.orders import grammar as imperative
+    from freesail.orders import stations
+    from freesail.standing import grammar as standing
+
+    harness = world.agents[station]
+    st = harness.station
+    domain = st.domain
+    allowances = dict(harness.agent.allowances)
+    vocab = load_vocabulary()
+    who = f"The {station}"
+    ship = world.ship
+    if domain is None or not hasattr(ship, "parts"):
+        # an authority with no domain (a test's synthetic officer), or a point ship, whose
+        # grammar knows no verbs to filter: the order goes to the ship as said
+        return text, ""
+    verb = standing.recognises(text)
+    if verb == "standing order":
+        return _standing_by_rank(world, station, text, vocab)
+    bare = standing.bare_book_sentence(ship, text)
+    if verb is not None or bare is not None:
+        return text, _book_check(world, station, bare or text, vocab)
+    if stations.recognises(text, ship) is not None:
+        return text, f"{who} may not {text}: {_STATION_WHY}."
+    try:
+        order = imperative.parse(ship, text, vocab)
+    except OrderError:
+        return text, ""  # the grammar's own refusal, through `World.submit`
+    spec = vocab.verbs[order.verb]
+    ok, why = domain.allows(order.verb, spec.object, spec.level, allowances)
+    if ok:
+        return text, ""
+    return text, f"{who} may not {text} without the captain: {why}."
+
+
+_STATION_WHY = "a station is addressed by the captain"
+
+
+def _standing_by_rank(world: World, station: str, text: str, vocab: Any) -> tuple[str, str]:
+    """A standing order given by a station (package 37, item 2b): its rank is the
+    station's and never the text's, and each of its orders is within the domain."""
+    from freesail.orders import stations
+    from freesail.standing import grammar as standing
+
+    harness = world.agents[station]
+    st = harness.station
+    who = f"The {station}"
+    rank = st.rank or "first lieutenant"
+    m = re.match(r'^\s*standing\s+order\s*(["“\'][^"”\']*["”\'])\s*(by\s+[^:]*?)?\s*:', text, re.I)
+    if m is None:
+        return text, ""  # the dialect's own refusal
+    name, by = m.group(1), m.group(2)
+    if by is not None:
+        said = " ".join(by.lower().split()).removeprefix("by ").removeprefix("the ").strip()
+        if said != rank:
+            return text, (
+                f"{who} gives standing orders in his own rank, the {rank}; 'by the {said}' "
+                "is refused."
+            )
+    else:
+        text = f"{text[: m.start(1)]}{name} by the {rank}{text[m.end(1) :]}"
+    try:
+        rule = standing.parse_standing(world.ship, text, vocab=vocab)
+    except OrderError:
+        return text, ""  # the dialect's own refusal, through `World.submit`
+    for order in rule.actions:
+        if stations.for_standing(world.ship, order) is not None:
+            return text, f"{who} may not give '{order}' in a standing order: {_STATION_WHY}."
+        _, why = authority_check(world, station, order)
+        if why:
+            return text, f"In standing order '{rule.name}', '{order}' is refused: {why}"
+    return text, ""
+
+
+def _book_check(world: World, station: str, text: str, vocab: Any) -> str:
+    """The book's orders from a station (package 37, item 2b): listing and showing are
+    anyone's; belaying, resuming and striking are allowed on the station's own standing
+    orders only; `belay all standing orders` is the captain's."""
+    from freesail.standing import grammar as standing
+
+    harness = world.agents[station]
+    rank = harness.station.rank or "first lieutenant"
+    who = f"The {station}"
+    try:
+        command = standing.parse_book_command(text)
+    except OrderError:
+        return ""  # the dialect's own refusal
+    if command.verb in ("standing orders", "show standing order"):
+        return ""
+    if command.verb == "belay all standing orders" or command.name is None:
+        return f"{who} may not belay all standing orders: the captain's book is his own."
+    runtime = (getattr(world.ship, "extra", None) or {}).get("standing")
+    if runtime is None:
+        return ""
+    try:
+        rule = runtime.book.find(command.name)
+    except OrderError:
+        return ""  # the book's own refusal
+    if rule.given_by != rank:
+        verb = command.verb.split()[0]
+        return (
+            f"Standing order '{rule.name}' is {rule.officer}'s; {who.lower()} may {verb}, "
+            f"resume and strike his own standing orders only."
+        )
+    return ""
+
+
+def hand_over(world: World, station: str, note: str) -> str:
+    """The officer's own order to give the deck back (package 37; the cold review's third
+    item): the handover note said in the log and journaled, then the station stood down
+    with the game saved. `note` is the note for the relief, in the officer's voice."""
+    note = " ".join(str(note).split())
+    if not note:
+        return (
+            "A handover note needs some words: what happened, what was ordered, what you "
+            "noticed, what you are watching for."
+        )
+    return _harness(world, station).hand_over(note)
+
+
+def handover_note(world: World, station: str, note: str) -> str:
+    """The handover note written without giving the deck back (package 37; spec M4 open
+    item 9b): journaled under `agent.handover`, said in the log, and the older exchanges
+    of the conversation folded into it, the brief and the last turns kept whole."""
+    note = " ".join(str(note).split())
+    if not note:
+        return (
+            "A handover note needs some words: what happened, what was ordered, what you "
+            "noticed, what you are watching for."
+        )
+    return _harness(world, station).handover_note(note)
 
 
 def stand_by(world: World, station: str, until: str = "eight bells") -> str:
@@ -462,10 +648,33 @@ TOOLS: dict[str, Tool] = {
         Tool(
             "submit_order",
             "Give an order to the ship in the order language, exactly as a captain would "
-            "type it ('set the fore topsail'). Checked against your station's authority; "
-            "a station with none is refused. Returns the log line the order made.",
+            "type it ('set the fore topsail'). Checked against your station's authority and "
+            "its domain; a station with none is refused, and an order outside the domain is "
+            "refused in words that say why. A standing order is given in your own rank. "
+            "Returns the log line the order made.",
             {"text": "string: the order"},
             submit_order,
+            needs_authority=True,
+        ),
+        Tool(
+            "hand_over",
+            "Give the deck back to the captain with your handover note for the relief, in "
+            "the officer's voice: what happened, what was ordered, what you noticed, what "
+            "you are watching for. The note is said in the log and journaled, the station "
+            "is stood down and the game saved. For a station with the deck.",
+            {"note": "string: the handover note"},
+            hand_over,
+            needs_authority=True,
+        ),
+        Tool(
+            "handover_note",
+            "Write the watch's handover note without giving the deck back: what happened, "
+            "what was ordered, what you noticed, what you are watching for. It is journaled "
+            "and said in the log, and the older exchanges of this conversation are folded "
+            "into it, the brief and your last turns kept whole; the harness asks for it when "
+            "the conversation grows long. For a station with the deck.",
+            {"note": "string: the handover note"},
+            handover_note,
             needs_authority=True,
         ),
         Tool(
@@ -564,6 +773,26 @@ def call(world: World, station: str, name: str, args: dict[str, Any] | None = No
     authority = harness.station.authority if harness is not None else None
     if tool.needs_authority and (authority is None or not authority.may_submit_orders):
         sentence = f"The {station} has no authority to give orders."
+        what = " ".join(str(args.get("text", "")).split())
+        world.record(
+            Severity.ROUTINE,
+            "agent.refused",
+            f"{sentence} {what!r} not carried out." if what else sentence,
+            actor=f"the {station}",
+            data={"order": what, "tool": name},
+        )
+        return sentence
+    if (
+        tool.needs_authority
+        and harness is not None
+        and harness.station.domain is not None
+        and not harness.agent.has_deck
+    ):
+        # a station with a domain but not the deck (package 37): the captain gives it
+        sentence = (
+            f"The {station} has not the deck: the captain gives it with 'you have the "
+            "deck', and until then no order is given."
+        )
         what = " ".join(str(args.get("text", "")).split())
         world.record(
             Severity.ROUTINE,

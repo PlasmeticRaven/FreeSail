@@ -59,7 +59,7 @@ from freesail.standing.rules import STANDING_DWELL_S, Rule
 if TYPE_CHECKING:
     from freesail.core.world import World
 
-__all__ = ["ACTOR_PREFIX", "Runtime", "action_parts", "said_as_done"]
+__all__ = ["ACTOR_PREFIX", "Runtime", "action_parts", "contrary", "said_as_done", "where_words"]
 
 # The actor a firing carries; the World knows a firing by it (spec §4).
 ACTOR_PREFIX = "standing order "
@@ -460,6 +460,23 @@ class Runtime:
             due = rule.next_due_tick - self.world.clock.tick
             return [f"Next due in {due} s."]
         return []
+
+
+def contrary(ship: Any, earlier: str, later: str) -> str:
+    """The conflict rule as a function (package 37; the cold review's second item): the
+    parts two orders are contrary on, in words, or "" when they are not. The same rule the
+    runtime applies between two standing orders' firings (`ActionParts.conflicts_with`):
+    the same part with a different verb, or the same verb said otherwise (set, take in;
+    steer 90, steer 95); the same order twice is a repetition and not a conflict. The
+    harness calls it over an officer's own orders, where the repeat detector cannot see
+    (an order with authority changes the readings by definition)."""
+    shared = action_parts(ship, earlier).conflicts_with(action_parts(ship, later))
+    return where_words(ship, shared) if shared else ""
+
+
+def where_words(ship: Any, parts: frozenset[str]) -> str:
+    """`_where` for a caller outside the runtime (package 37)."""
+    return _where(ship, parts) if parts else ""
 
 
 def _where(ship: Any, parts: frozenset[str]) -> str:

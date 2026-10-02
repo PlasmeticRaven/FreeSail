@@ -751,7 +751,12 @@ def main(
         default=REQUEST_TIMEOUT_S,
         help=f"real seconds one request may take (default {REQUEST_TIMEOUT_S:g})",
     )
-    ap.add_argument("--station", default="watcher", choices=["watcher"])
+    ap.add_argument(
+        "--station",
+        default="watcher",
+        choices=["watcher", "officer"],
+        help="the station asked for: the watcher, or the officer of the watch (package 37)",
+    )
     ap.add_argument("--session", choices=("play", "test"), default="play")
     ap.add_argument("--ask-again", action="store_true", help="put the consent question again")
     args = ap.parse_args(argv)
@@ -785,6 +790,9 @@ def main(
             session_kind=args.session,
             client=server,
             ask_again=args.ask_again,
+            # the context this door gives the model, for the handover note (package 37;
+            # spec M4 open item 9b): the harness asks for the note at a fraction of it
+            context_tokens=model.context_size(),
         )
     except GameError as e:
         print(e.words, file=out, flush=True)

@@ -70,10 +70,14 @@ from typing import TYPE_CHECKING, Any
 from freesail.agents import consent, tools
 from freesail.agents.agent import (
     A_GLASS_S,
+    MAX_SEATINGS,
+    OFFICER,
     OPT_OUT_TOKEN,
     SESSION_PLAY,
     SESSION_TEST,
     SamplingPolicy,
+    officer,
+    station_name,
     watcher,
 )
 from freesail.agents.harness import Harness, Playback, _reason_after_token, full_stop
@@ -128,7 +132,9 @@ DOORS: dict[str, tuple[str, str]] = {
 # MCP `opt_out` too, since the chat's text never reaches the game (package 28).
 CONSENT_TOOLS_AT = {"mcp": ("answer", "opt_out"), "runner": consent.CONSENT_TOOLS}
 
-STATIONS = {"watcher": watcher}
+# The stations a door may ask for, each by its factory `(policy, world=...)`: the watcher,
+# and the officer of the watch (package 37), which the doors name `officer`.
+STATIONS = {"watcher": watcher, OFFICER: officer}
 
 CONSENT, STATION, STOPPED = "consent", "station", "stopped"
 
@@ -174,6 +180,7 @@ class Seat:
     client: str = ""
     door_note: str = ""
     session_kind: str = SESSION_PLAY
+    context_tokens: int | None = None  # the door's context, for the handover (package 37)
     phase: str = CONSENT
     conv: consent.Conversation | None = None
     harness: Harness | None = None
@@ -267,6 +274,7 @@ class Desk:
         or the station brief; or an attach, for the same model at a manned station."""
         model_name = " ".join(str(body.get("model_name") or "").split())
         door = str(body.get("door") or "").strip().lower()
+        name = station_name(name)
         if name not in STATIONS:
             raise DeskError(
                 404, f"There is no station '{name}'; the stations: {', '.join(STATIONS)}."
@@ -296,25 +304,36 @@ class Desk:
                 return self._attach(seat)
             existing = world.agents.get(name)
             if existing is not None and existing.agent.released:
-                raise DeskError(
-                    409,
-                    f"The {name}'s station was released in this game "
-                    f"({existing.agent.released_reason}); a station is taken once in a game. "
-                    "Start a new game to station it again.",
-                )
-            if existing is not None and not isinstance(existing.model, Playback):
+                # a released station is seated again by the same identity, once in a game
+                # (package 37); the consent gate runs again as it did the first time
+                same = existing.model_name == model_name
+                if not same or existing.agent.seatings >= MAX_SEATINGS:
+                    why = (
+                        f"{model_name} is another model"
+                        if not same
+                        else f"it was seated {existing.agent.seatings} times, which is all a "
+                        "game allows"
+                    )
+                    raise DeskError(
+                        409,
+                        f"The {name}'s station was released in this game "
+                        f"({existing.agent.released_reason}) and {why}. Start a new game to "
+                        "station it again.",
+                    )
+            elif existing is not None and not isinstance(existing.model, Playback):
                 raise DeskError(
                     409,
                     f"The station of the {name} is manned already in this game (by the "
                     f"game's own {'scripted watcher' if name == 'watcher' else 'agent'}, "
                     "--watcher fake); a station is taken once in a game.",
                 )
-            if existing is not None and existing.model_name not in ("", model_name):
+            elif existing is not None and existing.model_name not in ("", model_name):
                 raise DeskError(
                     409,
                     f"The {name} in this game was {existing.model_name}; a station is taken "
                     f"once in a game, and {model_name} is another model.",
                 )
+            context = body.get("context_tokens")
             seat = Seat(
                 name,
                 model_name,
@@ -322,18 +341,24 @@ class Desk:
                 client=" ".join(str(body.get("client") or "").split()),
                 door_note=str(body.get("door_note") or "").strip(),
                 session_kind=session,
+                context_tokens=int(context) if context else None,
                 world=world,
             )
             ask_again = bool(body.get("ask_again"))
-            record = None if ask_again else consent.check(model_name, self.records_dir)
-            if record is None:
-                self._begin_consent(seat, ask_again)
+            record, kind, why = consent.decide(
+                model_name,
+                self.records_dir,
+                door,
+                drills=_drills(name, world),
+                ask_again=ask_again,
+            )
+            if kind:
+                self._begin_consent(seat, why, drill_only=kind == consent.DRILL_KIND)
+            elif record is None or not record.proceeds:
+                self.say(f"FreeSail: {why}")
+                raise DeskError(403, why)
             else:
-                ok, words = consent.gate(record, model_name)
-                if not ok:
-                    self.say(f"FreeSail: {words}")
-                    raise DeskError(403, words)
-                seat.words = words
+                seat.words = why
                 self._take_station(seat, record)
             self.seats[name] = seat
             self.changed()
@@ -345,7 +370,7 @@ class Desk:
         client = f", {seat.client}" if seat.client else ""
         return f"{self.game}, through {door}{client}"
 
-    def _begin_consent(self, seat: Seat, ask_again: bool) -> None:
+    def _begin_consent(self, seat: Seat, why: str, drill_only: bool = False) -> None:
         notes = []
         if seat.door == "mcp":
             notes.append(
@@ -366,12 +391,15 @@ class Desk:
             # the developer's turn after the answer, at the door's terminal (the runner's
             # owner> prompt); over MCP the chat is the owner's, and the result says so
             owner_after=seat.door == "runner",
+            # the fitness drill after a yes, for a station that asks it (package 37)
+            drill=_drills(seat.station, seat.world),
+            drill_only=drill_only,
         )
         seat.phase = CONSENT
-        why = "the owner asks again" if ask_again else "no consent is on record for it"
+        first = "The drill comes first" if drill_only else "The consent brief comes first"
         seat.words = (
-            f"The {seat.station} is asked for by {seat.who}; {why}. The consent brief comes "
-            "first (docs/agents/ConsentBrief.md)."
+            f"The {seat.station} is asked for by {seat.who}; {why}. {first} "
+            "(docs/agents/ConsentBrief.md)."
         )
         self.say(f"FreeSail: {seat.words}")
         seat.conv.begin()
@@ -383,7 +411,20 @@ class Desk:
         note = note.strip()
         model = RemoteModel(seat.bump)
         existing = world.agents.get(seat.station)
-        if existing is not None:
+        if existing is not None and existing.agent.released:
+            # a released station seated again by the same identity (package 37): the
+            # brief sent again as it stands, the journal kept, the log saying so
+            seat.base = len(existing.turns)
+            existing.budget_tokens = seat.context_tokens
+            existing.reseat(
+                model,
+                identity=seat.model_name,
+                door=seat.door,
+                save=self._saver(seat),
+                door_note=note,
+            )
+            h = existing
+        elif existing is not None:
             # a loaded game's station, not released: this model takes it over, with the
             # brief sent again as it stands now
             seat.base = len(existing.turns)
@@ -394,7 +435,7 @@ class Desk:
             policy = SamplingPolicy(every, events, lockstep=self.lockstep)
             h = Harness(
                 world,
-                STATIONS[seat.station](policy),
+                STATIONS[seat.station](policy, world=world),
                 model,
                 session_kind=seat.session_kind,
                 save=self._saver(seat),
@@ -403,6 +444,8 @@ class Desk:
             seat.base = 0
         h.model_name = seat.model_name
         h.door = seat.door
+        if seat.context_tokens:
+            h.budget_tokens = seat.context_tokens
         seat.harness = h
         seat.record = record
         seat.phase = STATION
@@ -775,6 +818,7 @@ class Desk:
     # -- helpers ----------------------------------------------------------------------
 
     def _seat(self, name: str) -> Seat:
+        name = station_name(name)  # 'officer' names the officer of the watch (package 37)
         seat = self.seats.get(name)
         if seat is None:
             raise DeskError(
@@ -829,6 +873,12 @@ class Desk:
                 "record": consent._rel(seat.record.path),
             }
         return out
+
+
+def _drills(name: str, world: Any) -> bool:
+    """Whether the station asks for the fitness drill before its brief (package 37)."""
+    make = STATIONS.get(name)
+    return bool(make is not None and make(world=world).drill)
 
 
 def _station_line(d: dict[str, Any]) -> str:
@@ -955,8 +1005,9 @@ class GameClient:
         session_kind: str = "play",
         client: str = "",
         ask_again: bool = False,
+        context_tokens: int | None = None,
     ) -> dict[str, Any]:
-        body = {
+        body: dict[str, Any] = {
             "model_name": model_name,
             "door": door,
             "door_note": door_note,
@@ -964,6 +1015,8 @@ class GameClient:
             "client": client,
             "ask_again": ask_again,
         }
+        if context_tokens:
+            body["context_tokens"] = int(context_tokens)  # for the handover (package 37)
         # the answer carries the turns from where this door starts reading (the start, or
         # the brief sent again when it attaches) and the index to read on from
         answer = self._took(self._request("POST", f"/api/agents/{self.name}", json=body))

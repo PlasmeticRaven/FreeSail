@@ -7,6 +7,22 @@
     resume the watcher                            an order, journaled: the answer to a pause
     show the watcher's journal                    a query, like `state`: never journaled
 
+The deck (package 37; spec M5 §29): the officer of the watch's station is given and
+taken by the captain's word, as the period had it.
+
+    you have the deck                             an order, journaled: the officer takes the
+    Mr Pearce, you have the deck                  deck, with the night orders said to him
+    you may tack ship if the land closes          his word allows a named thing for the watch
+    you may not tack ship                         and takes it back
+    I have the deck                               the captain takes the deck back; the
+                                                  station is stood down, its journal saved
+    the officer of the watch                      a reading: who has the deck, since when,
+                                                  what he was told (`api.readings`)
+
+`the officer` says the officer of the watch in any of them (`agent.STATION_ALIASES`).
+`hand over the deck` is the officer's own (the `hand_over` tool), and the captain is
+told to say `I have the deck`.
+
 `orders.handle` hands a sentence that names a station to `handle` here before the
 imperative parser sees it, as it hands the standing dialect to its grammar. The agents
 are reached through `ship.extra["agents"]` (the World's `agents`, by station name) and
@@ -28,14 +44,32 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from freesail.agents.agent import STATION_NAMES, STATIONS_ABOARD
+from freesail.agents.agent import OFFICER, STATION_ALIASES, STATION_NAMES, STATIONS_ABOARD
 from freesail.orders.errors import OrderError
 from freesail.orders.vocabulary import normalise
 
 __all__ = ["STANDING_STATION_VERBS", "STATION_VERBS", "for_standing", "handle", "recognises"]
 
 # The canonical verbs, as `data/vocabulary.yaml` lists them with `object: station`.
-STATION_VERBS: tuple[str, ...] = ("ask", "tell", "stand down", "resume", "show the journal of")
+STATION_VERBS: tuple[str, ...] = (
+    "ask",
+    "tell",
+    "stand down",
+    "resume",
+    "show the journal of",
+    "you have the deck",
+    "i have the deck",
+    "you may",
+    "you may not",
+)
+
+# The deck's sentences (package 37): the captain's word that gives and takes it, and his
+# word for the watch. The officer's name before the giving, as the period had it ("Mr
+# Pearce, you have the deck"), is any words before the comma.
+_GIVE_DECK = re.compile(r"^(?:(?P<who>[\w' ]+?)\s*,\s*)?you have the deck\s*$")
+_TAKE_DECK = re.compile(r"^(?:i have the deck|i'll take the deck|the captain has the deck)\s*$")
+_ALLOW = re.compile(r"^you may (?P<not>not )?(?P<rest>.+)$")
+_HAND_OVER = re.compile(r"^hand over the deck\s*$")
 
 # The station verbs a standing order may give (package 31c): a word and a question. The
 # rest are the captain's own acts on a station, never a routine's.
@@ -72,7 +106,24 @@ def _station_in(who: str, ship: Any) -> str | None:
     for name in _known(ship):
         if who == name or who.startswith(name + " "):
             return name
+    for alias, name in STATION_ALIASES.items():
+        # 'the officer' for the officer of the watch (package 37); 'the deck' only in
+        # the deck's own sentences, never 'ask the deck'
+        if alias != "the deck" and (who == alias or who.startswith(alias + " ")):
+            return name
     return None
+
+
+def _alias_words(who: str) -> int:
+    """How many words of `who` name the station: the station's own name or its alias."""
+    who = " ".join(who.split())
+    for name in sorted(STATION_NAMES, key=lambda n: -len(n)):
+        if who == name or who.startswith(name + " "):
+            return len(name.split())
+    for alias in STATION_ALIASES:
+        if who == alias or who.startswith(alias + " "):
+            return len(alias.split())
+    return 0
 
 
 def recognises(text: str, ship: Any = None) -> str | None:
@@ -80,6 +131,16 @@ def recognises(text: str, ship: Any = None) -> str | None:
     knows ("ask the watcher"), so an `ask` to nobody in particular is left to the
     imperative parser's refusal."""
     norm = normalise(text).replace(" , ", " ")
+    deck = normalise(text).replace(" , ", ", ")
+    if _GIVE_DECK.match(deck):
+        return "you have the deck"
+    if _TAKE_DECK.match(deck):
+        return "i have the deck"
+    if _HAND_OVER.match(deck):
+        return "i have the deck"  # the captain's word for it, refused in words (handle)
+    m = _ALLOW.match(deck)
+    if m is not None:
+        return "you may not" if m.group("not") else "you may"
     for verb, pattern in (
         ("show the journal of", _JOURNAL),
         ("stand down", _STAND_DOWN),
@@ -112,8 +173,8 @@ def _split_ask(text: str, ship: Any, verb: str = "ask") -> tuple[str, str]:
         if verb == "tell":
             raise OrderError("Tell whom? Say 'tell the watcher <words>'.")
         raise OrderError("Ask whom? Say 'ask the watcher <question>'.")
-    # the question is what follows the station's name in the text as said
-    n = len(station.split())
+    # the question is what follows the station's name (or its alias) in the text as said
+    n = _alias_words(normalise(rest)) or len(station.split())
     words = rest.split()
     question = " ".join(words[n:]).lstrip(",:").strip()
     return station, question
@@ -186,6 +247,12 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
     norm = normalise(text).replace(" , ", " ")
     by, officer = _speaker(ship)
     said_by = {"by": by} if by else {}
+    if verb in ("you have the deck", "i have the deck", "you may", "you may not"):
+        if by:
+            raise OrderError(
+                f"'{norm}' is the captain's own word to the {OFFICER}, not a standing order's."
+            )
+        return _deck(ship, agents, verb, text)
     if verb == "ask":
         station, question = _split_ask(text, ship)
         agent = _manned(agents, station)
@@ -229,3 +296,74 @@ def _manned(agents: dict[str, Any], station: str) -> Any:
     if agent is None:
         raise OrderError(f"There is no {station} at the station; nobody has been stationed there.")
     return agent
+
+
+def _deck(
+    ship: Any, agents: dict[str, Any], verb: str, text: str
+) -> tuple[str, str, dict[str, Any]]:
+    """The deck's sentences (package 37), carried out by the officer's harness."""
+    deck = normalise(text).replace(" , ", ", ")
+    if _HAND_OVER.match(deck):
+        raise OrderError(
+            f"'hand over the deck' is the {OFFICER}'s own order, given with his note; the "
+            "captain takes the deck with 'I have the deck'."
+        )
+    agent = agents.get(OFFICER)
+    if agent is None:
+        raise OrderError(
+            f"There is no {OFFICER} at the station; a model's door seats one first "
+            "(docs/agents/Harness.md), and then the captain gives the deck."
+        )
+    if verb == "you have the deck":
+        m = _GIVE_DECK.match(deck)
+        assert m is not None
+        who = " ".join((m.group("who") or "").split())
+        return (
+            "agent.deck",
+            agent.give_deck(by="the captain", name=who),
+            {"station": OFFICER, "deck": "given", "name": who},
+        )
+    if verb == "i have the deck":
+        return (
+            "agent.deck",
+            agent.take_deck(by="the captain"),
+            {"station": OFFICER, "deck": "taken"},
+        )
+    m = _ALLOW.match(deck)
+    assert m is not None
+    rest = m.group("rest").strip(" .")
+    verb_said, words = _verb_in(rest)
+    if verb_said is None:
+        raise OrderError(
+            f"'{rest}' names no order the {OFFICER} could be allowed; say the order's words "
+            "first ('you may tack ship if the land closes within two miles')."
+        )
+    if verb == "you may not":
+        return (
+            "agent.deck",
+            agent.disallow(verb_said),
+            {"station": OFFICER, "disallowed": verb_said},
+        )
+    return (
+        "agent.deck",
+        agent.allow(verb_said, words),
+        {"station": OFFICER, "allowed": verb_said, "words": words},
+    )
+
+
+def _verb_in(rest: str) -> tuple[str | None, str]:
+    """The vocabulary's verb the captain's allowance names, longest first, and his words
+    after it (his condition, kept as said)."""
+    from freesail.orders.vocabulary import load_vocabulary
+
+    vocab = load_vocabulary()
+    words = rest.split()
+    for phrase in vocab.verb_phrases:  # longest first
+        pw = phrase.split()
+        if words[: len(pw)] == pw:
+            verb = vocab.phrase_to_verb[phrase]
+            spec = vocab.verbs[verb]
+            if spec.level in ("driver", "reading") or spec.object in ("standing", "station"):
+                return None, ""
+            return verb, " ".join(words[len(pw) :])
+    return None, ""
