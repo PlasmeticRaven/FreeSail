@@ -864,7 +864,10 @@ class Ports:
                 )
         else:
             serves = f"the ebb will serve from about {when}"
-        return f"high water at {port.name} about {when}, {rise:.0f} feet above the datum; {serves}"
+        return (
+            f"high water at {port.name} about {when}, the tide rising some {rise:.0f} feet; "
+            f"{serves}"
+        )
 
     def pilot_words(self, port: Port | None = None) -> str:
         """`the pilot`: the channel, the marks, the anchorage and when the tide serves."""

@@ -46,7 +46,7 @@ gate 5c:  wave 5  33b the chronometer, the moon, the lunar and the azimuth; the 
                   33d the browser's shelf: completion, the library pane, the clock on a station, zoom and pan (Opus; landed 2026-10-01)
                   34 the tide, grounding and anchoring, as Luce has it (Fable; landed 2026-10-02)
                   32f the launcher page: the browser's front door with the game's options (Opus; after 33d and 32d; owner, 2026-10-01)
-          wave 6  35 places, people, ports and nations (Falmouth, Plymouth, Brest); the pilot boarding from the cutter (Fable; launched 2026-10-02)
+          wave 6  35 places, people, ports and nations (Falmouth, Plymouth, Brest); the pilot boarding from the cutter (Fable; landed 2026-10-02)
                   35b St Mary's and Roscoff as ports on 35's machinery, Roscoff's patch (Opus; approved 2026-10-02, launched when 35 lands clean, beside 36)
           wave 7  36 other sail, the world-order channel, the two scenarios (Fable; approved 2026-10-02, launched when 35 lands clean)
           wave 8  37 the officer of the watch; gate 5c cut after it so that the gate covers the officer's watch (owner, 2026-10-02); the lead's watch beside other models' (an Opus 5.5 watch, and a local model on the cutter: owner, 2026-10-01); the 5c verdict
