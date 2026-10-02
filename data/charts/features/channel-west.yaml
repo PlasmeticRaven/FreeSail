@@ -2237,8 +2237,8 @@ features:
     lat_deg: 48.726494
     lon_deg: -3.985795
     height_m: 40
-    source: "Bellin 1764, Petit Atlas Maritime t. V no. 51 (the church in the town of Roscou); the French encyclopaedia's 'Église Notre-Dame-de-Croaz-Batz de Roscoff' for the position, read 2026-10-02; the height judgement (the belfry over the roofs)"
-    says: "The church of Roscoff with its tall belfry of open lanterns, standing over the harbour at the eastern end of the channel of Bas."
+    source: "Bellin 1764, Petit Atlas Maritime t. V no. 51 (the church in the town of Roscou); the French encyclopaedia's 'Église Notre-Dame-de-Croaz-Batz de Roscoff', read 2026-10-02, for the position and the dates (built 1522 to 1545 on ground taken from the sea, by the shipowners; the openwork Renaissance belfry with its balustrades, domes and lanterns standing since 1585); the height judgement"
+    says: "The church of Roscoff, the shipowners' church, its openwork belfry of domes and lanterns standing over the harbour at the eastern end of the channel of Bas."
 
   - id: ile-verte-roscoff
     kind: island

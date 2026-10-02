@@ -135,7 +135,7 @@ def test_every_feature_and_every_override_cites_a_source():
         assert str(f["says"]).strip(), f["id"]
         assert f["kind"] in tool.FEATURE_KINDS
     patches, records = tool.load_overrides(REGION)
-    assert len(records) == 4 and len(patches) >= 5
+    assert len(records) == 5 and len(patches) >= 5
     for r in records:
         assert r["sheet"] and r["source"] and r["units"] and r["datum"]
         assert r["control_points"] and len(r["control_points"]) >= 5
@@ -147,6 +147,7 @@ def test_every_feature_and_every_override_cites_a_source():
         "plymouth-cawsand.yaml",
         "scilly.yaml",
         "brest-iroise.yaml",
+        "roscoff.yaml",  # package 35b
     }
 
 

@@ -29,8 +29,9 @@ reads the manifest against it.
 
 ## The period charts and pilots in the hand-made files
 
-Read into `data/charts/features/channel-west.yaml` (200 entries) and the four overrides of
-`data/charts/overrides/channel-west/`, each entry citing the work and the page in the form
+Read into `data/charts/features/channel-west.yaml` (206 entries) and the five overrides of
+`data/charts/overrides/channel-west/` (the fifth, Roscoff's, package 35b's), each entry
+citing the work and the page in the form
 of `docs/references/README.md`. The scans and the OCR texts are cached outside the
 repository and never committed.
 
@@ -47,13 +48,29 @@ repository and never committed.
 | Spence, the Scilly Islands, 1792, on Hurd's sheet of 1808 | RMG rmgc-object-540451 | Not read: no display image on the museum's page. White's word for it stands. |
 | Bellin, *5e carte particulière des costes de Bretagne*, 1773 | Rumsey, Internet Archive `dr_5e-carte-particuliere-des-costes-de-bretagne-12066036`, the display image (1,536 by 975 pixels) | The coast's shape and the larger names; the soundings in brasses and the legend not legible at that size; the full-resolution JPEG 2000 (14.7 MB, CC BY-NC-SA) cached and not transcribed. |
 | Beautemps-Beaupré, *Le Pilote français*, I, 1822 | Défense digital library | Not opened: the site refused every connection from the build network. |
+| Bellin, *Carte de l'entrée des rivières de Morlaix, de St Paul de Léon, et Isle de Bas, avec les roches, basses, et isles*, *Petit Atlas Maritime* t. V no. 51, 1764 (package 35b) | Rumsey 6903.538, Internet Archive `dr_carte-de-ientree-des-rivieres-de-morlaix-de-st-paul-de-leon-et-isle-de-ba-6903538`; read 2026-10-02 at full resolution (11,336 by 6,959 pixels) through the Rumsey collection's IIIF server, the crops cached outside the repository (CC BY-NC-SA 3.0) and none committed | Engraved south up. The town of Roscou with its church and its harbour (stippled, dry), the Chenal de Bas and its soundings in brasses (½ twice in the narrows by Roscoff, 2 and 1 east of them, 3 twice south of the island's middle, 6 off the Roche Croix, 10 and 15 at the western entrance, 12 at the Pierre Blanche), the Petite and Grande Lavandière, the Isle Verte, the Isle Ledanet and le Loup, Pointe de Pergueridre, Bloscou, the churches of N.D. de St Paul and N.D. de Bon Secours on the island, le Taureau; the scale, 1,800 toises to 1,330 pixels. No legend for the soundings: brasses at low water of springs, unverified for Bellin. Georeferenced by six control points (residuals 70 to 230 m); the Roscoff override names it and carries the road (3 brasses), the channel west of it (6), the harbour drying, the town and the Isle Verte as land. |
+| Beautemps-Beaupré, *Le Pilote français*, the north coast (surveyed 1837 to 1838) (package 35b) | Gallica; the Défense digital library | Not reached: gallica.bnf.fr answered 403 to every request from the build network on 2026-10-02, and the Défense library reset the connection. Later than the period in any case; the Roscoff patch rests on Bellin's sheet and the pilots' words, as it says. |
+| Faden 1793, 'Isle de Bas' and the tides of the north coast (package 35b) | the same OCR text, pp. 44 to 48 | Roscoff's free port for the rum "sold to our smugglers"; the eastern passage "at low tide no passing at all" and to be taken with a pilot; the western passage by the Lavandière and the Couillon, a man on the mizzen yard; the anchorage over against the island's great cove "in 4 fathoms at low water"; the tides W ¼ S and E ¼ N; high water at the Isle of Bas with a W by S moon. |
+| La Barre, *The French Coasting Pilot*, 1825; Norie, *The New British Channel Pilot*, 1839 (package 35b) | Internet Archive `frenchcoastingp00barrgoog` (the OCR's running heads partly illegible, pp. 39 to 40) and `newbritishchann00norigoog`, p. 148 | La Barre: "Roscoff Harbour or Toum, a place well known to the English smugglers", the island road in three to four fathoms on sand; Norie: "frequented only by smugglers and fishermen", the tide till a quarter past five at full and change. |
+| Imray 1874, 'Roscoff', 'Ile de Bas', and 'Scilly Islands' (package 35b) | the same OCR text, pp. 104 to 108 and 211 to 212 | Roscoff "dry at low water", the Isle de Bas's high water 4h 49m at full and change and its springs' rise of 23 feet; St Mary's Road "capable of containing a fleet of 200 sail", St Mary's Pool "where small craft anchor opposite the town", St Mary's Sound "by far the best and safest channel", the fresh water and provisions. |
+| *Arrest du Conseil d'État du Roi* of 3 September 1769, on the entrepôt of tafias at Roscoff (package 35b) | Internet Archive `arrestduconsei00fran_32` (the Newberry's French pamphlets), the OCR text | The colonies' rum allowed to lie a year in bond at Roscoff for export abroad: the market file's note on the rum. |
+| The French encyclopaedia's pages for Roscoff's marks (package 35b) | fr.wikipedia.org, read 2026-10-02 (the API; several requests refused for their rate) | The positions of the church of Roscoff (built 1522 to 1545, its openwork belfry since 1585), the chapel of Sainte-Anne on the Isle of Bas (the ruins of the old church of Saint-Paul-Aurélien, the sheet's St Paul), the bourg of the island and Pointe de Perharidy: the override's control points. |
 | Trinity House, the lighthouse pages; the encyclopaedias' pages for the French lights | trinityhouse.co.uk; en. and fr.wikipedia.org, read 2026-09-30 | The lights' dates: the Lizard 1752, the Eddystone 1698, 1709, 1759 and 1882, the Longships 1795, St Agnes 1680 to 1911, the Bishop 1858, the Wolf 1870 (a daymark 1795), St Anthony 1835, the Start 1836, Godrevy 1859, Trevose 1847, Round Island 1887; the Stiff 1699, Saint-Mathieu 1692 and 1835, Créac'h 1863, the Pierres Noires 1872, Kermorvan 1849, the Four 1874, the Petit Minou and Portzic 1848, Sein 1839, Ar Men 1881, the Île Vierge 1845, Batz 1836, the Sept-Îles 1835, the Triagoz 1864. |
 
 The positions of the features are the modern chart's, checked against the EMODnet coast
 and moved by the rule the features file's head states; the doubtful ones say so in `fix`.
-The four overrides each name their sheet, their unit, their datum, the datum correction
-applied (from memory of the modern tide tables, marked unverified) and their control
-points.
+The five overrides each name their sheet, their unit, their datum, the datum correction
+applied (from memory of the modern tide tables, marked unverified; Roscoff's 1.30 m is
+SHOM's BMVE as the tide study quotes the RAM) and their control points.
+
+**The rebuild of 2026-10-02 (package 35b).** The Roscoff override and its harbour group
+(`roscoff` in the tool's `REGIONS`, 48.71 to 48.76 N, 4.07 to 3.95 W) were rasterised by
+`python tools/build_charts.py --skip-fetch` from the sources cached on 2026-09-30 (their
+checksums the manifest's, unchanged). One level-2 tile changed (`175200_-15168`, the north
+coast of Léon) and four level-3 tiles were added under Roscoff; every other tile came out
+byte for byte as before, the coast moved only at Roscoff, and the manifest's build hash
+moved with the hand-made files and the tool's recipe. A rebuild with the same files gives
+the same tiles: the tool's output is a function of its inputs.
 
 ## The unverified list, checked
 

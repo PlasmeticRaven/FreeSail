@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import math
 import shutil
+import sys
 from datetime import datetime
 
 import pytest
@@ -30,10 +31,10 @@ THE_SOUND = {"lat_deg": 50.345, "lon_deg": -4.150}  # Plymouth Sound, within the
 START = datetime(1805, 6, 10, 10, 0)
 
 
-def world_at(where, ship=FRIGATE, heading=20.0, speed=0.0, start=START, **kw):
+def world_at(where, ship=FRIGATE, heading=20.0, speed=0.0, start=START, wind=225.0, **kw):
     sc = Scenario(
         start_time=start,
-        wind_from_deg=225.0,
+        wind_from_deg=wind,
         wind_speed_kn=12.0,
         gustiness=0.0,
         variability=0.0,
@@ -72,11 +73,11 @@ def run_until(world, kind, minutes=240):
 # ---------------------------------------------------------------------------
 
 
-def test_the_three_ports_are_files_on_one_machinery_placed_from_the_chart():
+def test_the_five_ports_are_files_on_one_machinery_placed_from_the_chart():
     files = PT.port_files()
-    assert list(files) == ["brest", "falmouth", "plymouth"]
+    assert list(files) == ["brest", "falmouth", "plymouth", "roscoff", "st-marys"]
     w = world_at(OFF_THE_LIZARD)
-    assert list(w.ports.ports) == ["brest", "falmouth", "plymouth"]
+    assert list(w.ports.ports) == ["brest", "falmouth", "plymouth", "roscoff", "st-marys"]
     falmouth = w.ports.ports["falmouth"]
     assert falmouth.nation == "britain" and "White 1835" in falmouth.source
     # the roads and the anchorage are the chart's features, not figures of their own
@@ -97,7 +98,9 @@ def test_the_three_ports_are_files_on_one_machinery_placed_from_the_chart():
         assert set(port.pilot.words) >= {"channel", "marks", "anchorage", "tide"}
         assert port.tide["enter_on"] == "flood" and port.tide["leave_on"] == "ebb"
         assert len(port.market.goods) >= 10 and port.market.currency == "pounds"
-        assert port.dockyard.kind in ("yard", "chandlers") and "topmast" in port.dockyard.items
+        assert port.dockyard.kind in ("yard", "chandlers") and "water" in port.dockyard.items
+        # every port has its spars but St Mary's, which had no yard in 1805 (package 35b)
+        assert ("topmast" in port.dockyard.items) == (port.id != "st-marys")
         assert set(port.crew_pool) == {"able", "ordinary", "landsman"}
         for good in port.market.goods.values():
             assert good.price > 0 and all(isinstance(m, int) for m in good.season)
@@ -122,7 +125,14 @@ def test_a_fourth_port_costs_a_file_and_nothing_else(tmp_path):
     )
     text = text.replace("  feature: falmouth-outer-road\n", "  feature: st-michaels-mount\n", 1)
     (fourth / "penzance.yaml").write_text(text, encoding="utf-8")
-    assert list(PT.port_files(fourth)) == ["brest", "falmouth", "penzance", "plymouth"]
+    assert list(PT.port_files(fourth)) == [
+        "brest",
+        "falmouth",
+        "penzance",
+        "plymouth",
+        "roscoff",
+        "st-marys",
+    ]
     w = world_at(OFF_THE_LIZARD)
     port = PT.load_port(fourth / "penzance.yaml", w.chart)
     assert port.id == "penzance" and port.name == "Penzance"
@@ -216,6 +226,8 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
         "falmouth": "open",
         "plymouth": "open",
         "brest": "hostile",
+        "st-marys": "open",
+        "roscoff": "hostile",
     }
     schooner = world_at(OFF_THE_LIZARD, ship=SCHOONER)
     assert schooner.ports.ship_nation == "united-states"
@@ -223,10 +235,14 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
         "falmouth": "neutral",
         "plymouth": "neutral",
         "brest": "neutral",
+        "st-marys": "neutral",
+        "roscoff": "neutral",
     }
     french = world_at(OFF_THE_LIZARD, ship=SCHOONER, nation="france")
     assert french.ports.ship_nation == "france"
     assert french.ports.stance(french.ports.ports["brest"]) == "open"
+    assert french.ports.stance(french.ports.ports["roscoff"]) == "open"
+    assert french.ports.stance(french.ports.ports["st-marys"]) == "hostile"
     assert french.ports.stance(french.ports.ports["falmouth"]) == "hostile"
     closed = world_at(
         OFF_THE_LIZARD, ship=SCHOONER, ports={"falmouth": {"closed_to": ["united-states"]}}
@@ -696,3 +712,259 @@ def test_the_port_is_a_function_of_the_seed_and_a_checkpoint_mid_errand_resumes_
         run_until(w, "port.pilot_aboard", 150)
     assert p1.ports.pilot.name == p2.ports.pilot.name
     assert p1.log.digest() == p2.log.digest()
+
+
+# ---------------------------------------------------------------------------
+# Package 35b: St Mary's and Roscoff, two files and a patch on 35's machinery
+# ---------------------------------------------------------------------------
+
+CUTTER = "data/ships/cutter.yaml"
+BRASSE_M = 1.624  # tools/build_charts.py BRASSE_M, the study's unverified brasse
+ROSCOFF_DATUM_M = 1.3  # the Roscoff override's correction (SHOM's BMVE as T §1 quotes it)
+# St Mary's Sound from the south-east with an easterly wind (Imray 1874 p. 105: the Road
+# "an excellent roadstead in easterly gales"), and the western passage of the Isle of Bas
+# from the west with the south-westerly of the other tests (Faden 1793: "the western
+# passage is easier than the eastern")
+ST_MARYS_IN = [(49.9025, -6.3335), (49.9240, -6.3335)]
+BATZ_IN = [(48.7362, -4.0480), (48.7356, -4.0170)]
+
+
+def _yaml(path):
+    import yaml
+
+    return yaml.safe_load(open(path, encoding="utf-8"))
+
+
+def stand_in(world, waypoints, minutes=240):
+    """Sail her by the waypoints, the helm ordered in degrees once a minute as the
+    bearing moves, and come to an anchor at the last; the anchor's line is returned."""
+    from freesail.world.geo import Position, bearing_and_distance
+
+    points = [Position(lat, lon) for lat, lon in waypoints]
+    k, course = 0, None
+    for _ in range(minutes):
+        brg, d = bearing_and_distance(world.position, points[k])
+        if k == len(points) - 1 and d < 200.0:
+            assert world.submit("come to an anchor").kind == "order.accepted"
+            return run_until(world, "ship.anchored", 30)
+        if d < 150.0 and k < len(points) - 1:
+            k += 1
+            continue
+        want = round(brg) % 360
+        if course is None or abs((want - course + 180) % 360 - 180) >= 4:
+            world.submit(f"steer {want}")
+            course = want
+        world.run(60)
+    raise AssertionError(f"she did not reach the road in {minutes} minutes")
+
+
+def test_st_marys_is_a_file_on_the_scilly_patch_with_the_isles_produce_and_no_yard():
+    """St Mary's Road as the anchorage (the chart's feature, White's four and five fathoms
+    on loose sand), the Pool off Hugh Town as the mooring for small craft, the mouth of
+    St Mary's Sound as the outer road; the isles' produce for a market and no spars; the
+    gig the file says comes off (which 35's machinery does not read: the fault reported)."""
+    w = world_at(OFF_THE_LIZARD)
+    port = w.ports.ports["st-marys"]
+    assert port.name == "St Mary's" and port.nation == "britain"
+    assert "White 1835 pp. 13-17" in port.source and "Imray 1874 pp. 104-108" in port.source
+    assert port.anchorage.feature_id == "st-marys-road" and port.anchorage.name == "St Mary's Road"
+    assert port.anchorage.depth_words == "five fathoms" and "loose sand" in port.anchorage.bottom
+    assert port.shore.feature_id == "hugh-town" and port.shore.name == "the quay at Hugh Town"
+    assert port.mooring.name == "the Pool off Hugh Town" and port.mooring.deep_draught_ft == 9
+    # the frigate and the schooner lie in the Road, the cutter in the Pool
+    assert port.mooring_for(units.feet_to_m(15.0)) is port.anchorage
+    assert port.mooring_for(units.feet_to_m(8.5)) is port.mooring
+    # each place is the chart's water, the quay the island's land
+    for spot in (port.outer_road, port.anchorage, port.mooring):
+        assert w.chart.depth_at(spot.position) > 2.0, spot.name
+    assert w.chart.depth_at(port.shore.position) < 0.0
+    assert port.pilot.words["marks"].startswith("Bring the Great Minalto directly in one")
+    assert port.pilot.cruising_nm == 8 and not port.pilot.by_night
+    # the isles' produce, no spars, no sails; every price says where it comes from
+    assert {"kelp", "salt fish", "potatoes", "barley"} <= set(port.market.goods)
+    assert set(port.dockyard.items) == {"cordage", "water", "provisions"}
+    raw = _yaml(PT.PORTS_DIR / "st-marys.yaml")
+    for good in raw["market"]["goods"]:
+        assert "memory" in good["note"] or "judgement" in good["note"], good["good"]
+    assert raw["pilot"]["vessel"]["kind"] == "a gig"
+    assert raw["pilot"]["cutter"] == CUTTER  # the stand-in while the machinery reads no vessel
+
+
+def test_the_pilot_boards_from_seaward_and_the_frigate_anchors_in_st_marys_road():
+    """Seed 7, the frigate standing in from the south-east of Peninnis for St Mary's Sound
+    with the wind at ESE: the pilot's boat is sighted, hails, and the pilot boards with his
+    port's words; she runs up the Sound and comes to an anchor in the Road, in port."""
+    w = world_at({"lat_deg": 49.885, "lon_deg": -6.300}, heading=309.0, speed=4.0, wind=120.0)
+    w.submit("set plain sail")
+    anchored = stand_in(w, ST_MARYS_IN)
+    sails = [e for e in events(w, "lookout.sighting") if e.data.get("seen_as") == "sail"]
+    hail = events(w, "port.pilot_hail")[0]
+    aboard = events(w, "port.pilot_aboard")[0]
+    assert sails and sails[0].tick < hail.tick < aboard.tick < anchored.tick
+    assert sails[0].text.startswith("Sail ho!")
+    assert hail.text == (
+        "The cutter hailed: a pilot for St Mary's; shorten sail and he will come aboard."
+    )
+    pilot = w.ports.pilot
+    assert pilot is not None and pilot.port == "st-marys"
+    assert pilot.name.removeprefix("Mr ") in w.ports.ports["st-marys"].pilot.names
+    # 35's words: the vessel is the cutter until the machinery reads the file's gig
+    assert aboard.text == (
+        f"The pilot, {pilot.name} of St Mary's, came aboard from the cutter and took charge of her."
+    )
+    said = events(w, "port.pilot_words")[0].text
+    assert said.startswith("The pilot says: Strangers do not attempt the harbours of Scilly")
+    assert "Hangman Island its own breadth open north of the Nut Rock" in said
+    assert "High water at St Mary's about" in said
+    assert anchored.text.startswith("The best bower let go in ")
+    w.run(900)
+    assert w.at_anchor and w.ports.in_port() is w.ports.ports["st-marys"]
+    assert w.readings.words("port").startswith("at anchor in St Mary's, St Mary's Road")
+    assert not events(w, "ship.aground")
+
+
+def test_the_pilot_boards_a_neutral_off_the_isle_of_bas_and_she_anchors_in_the_road():
+    """Seed 7, the American schooner standing in from the west for the western passage of
+    the Isle of Bas: the Roscoff pilot boards (her colours no bar at a French port) and she
+    comes to an anchor in the road under the island, in the patch's depth."""
+    w = world_at({"lat_deg": 48.736, "lon_deg": -4.17}, ship=SCHOONER, heading=90.0, speed=4.0)
+    w.submit("set plain sail")
+    anchored = stand_in(w, BATZ_IN)
+    aboard = events(w, "port.pilot_aboard")[0]
+    pilot = w.ports.pilot
+    assert pilot is not None and pilot.port == "roscoff"
+    assert aboard.text == (
+        f"The pilot, {pilot.name} of Roscoff, came aboard from the cutter and took charge of "
+        "her (American colours being no bar at Roscoff)."
+    )
+    assert aboard.data["stance"] == "neutral" and aboard.tick < anchored.tick
+    said = events(w, "port.pilot_words")[0].text
+    assert said.startswith("The pilot says: The western passage is the easier.")
+    assert "Lavandière" in said and "Couillon" in said
+    assert "The Lavandière" in " ".join(e.text for e in events(w, "lookout.sighting"))
+    assert anchored.text == "The best bower let go in five fathoms."
+    w.run(900)
+    assert w.at_anchor and w.ports.in_port() is w.ports.ports["roscoff"]
+    assert w.readings.words("port").startswith(
+        "at anchor in Roscoff, the road of the Isle of Bas; the port neutral to the Americans"
+    )
+    assert not events(w, "ship.aground")
+
+
+def test_roscoff_is_hostile_to_british_colours_and_closed_in_the_pilots_words_by_an_order():
+    """The nations table makes Roscoff hostile to a British ship in June 1805: the cutter
+    standing in under British colours is met by no pilot, and at anchor in the road every
+    port order is refused in words. A port's order closing it (truth 70's form) refuses
+    the American in the pilot's words. The brief's 'closed to Britain' cannot be had while
+    the table says war (a closure never outranks a war: tests/test_nations.py); reported."""
+    cutter = world_at({"lat_deg": 48.736, "lon_deg": -4.10}, ship=CUTTER, heading=90.0, speed=4.0)
+    assert cutter.ports.ship_nation == "britain"
+    assert cutter.ports.stance(cutter.ports.ports["roscoff"]) == "hostile"
+    cutter.submit("set plain sail")
+    cutter.run(3600)
+    assert not cutter.vessels.vessels and not events(cutter, "port.pilot_hail")
+    assert "the port hostile to the English" in cutter.readings.words("port")
+    riding = at_anchor_in({"lat_deg": 48.7356, "lon_deg": -4.0170}, ship=CUTTER, heading=250.0)
+    assert riding.ports.in_port() is riding.ports.ports["roscoff"]
+    for order, words in (
+        ("send the boat ashore", "Roscoff is hostile to her; a boat sent in would be taken."),
+        ("buy ten tons of brandy", "Roscoff is hostile to her; there is no trading there."),
+        ("demand a topmast from the yard", "Roscoff is hostile to her; the yard will not serve"),
+        ("enter two able seamen", "Roscoff is hostile to her; no hands will enter."),
+    ):
+        e = riding.submit(order)
+        assert e.kind == "order.rejected" and words in e.text, order
+    closed = world_at(
+        {"lat_deg": 48.736, "lon_deg": -4.17},
+        ship=SCHOONER,
+        heading=90.0,
+        speed=4.0,
+        ports={"roscoff": {"closed_to": ["united-states"]}},
+    )
+    closed.submit("set plain sail")
+    refused = run_until(closed, "port.pilot_refused", 120)
+    assert refused.text.startswith(
+        "The pilot hailed from the cutter: Roscoff is closed to the Americans by the port's "
+        "order; you will get no pilot here"
+    )
+    assert closed.ports.pilot is None and refused.data["stance"] == "closed"
+
+
+def test_the_price_lists_are_the_files_and_the_rules_table_moves_them():
+    """The two markets are the port files' figures moved by 35's rules: St Mary's brandy
+    and Roscoff's English tin by the war, the kelp by the season; the boat brings St Mary's
+    list off and the purser's paper says it; the yard has no spar to give there."""
+    w = at_anchor_in({"lat_deg": 49.9250, "lon_deg": -6.3300}, cargo={"purse_pounds": 100.0})
+    assert w.ports.in_port() is w.ports.ports["st-marys"]
+    assert w.submit("send the boat ashore").kind == "order.accepted"
+    prices = run_until(w, "market.prices", 120)
+    assert prices.text.startswith(
+        "The purser's list of the prices at St Mary's is aboard: kelp £4 10s, salt fish £20"
+    )
+    listed = w.readings["prices"]["prices"]
+    raw = {g["good"]: g for g in _yaml(PT.PORTS_DIR / "st-marys.yaml")["market"]["goods"]}
+    assert listed["kelp"] == raw["kelp"]["price"] * raw["kelp"]["season"][6]  # June's 0.9
+    assert listed["brandy"] == raw["brandy"]["price"] * PT.WAR_FACTOR  # French, at war
+    assert listed["potatoes"] == 5.0 and listed["barley"] == raw["barley"]["price"]
+    assert w.papers.page("the price list").lines[0].startswith("Prices at St Mary's, 10 June")
+    e = w.submit("demand a topmast from the yard")
+    assert e.kind == "order.rejected" and "has no topmast; it supplies cordage, water" in e.text
+    e = w.submit("take in twenty tons of water")
+    assert e.kind == "yard.demanded" and "from the chandlers for £2 at St Mary's" in e.text
+    e = w.submit("buy ten tons of turnips")
+    assert e.kind == "order.rejected" and "St Mary's market has no turnips" in e.text
+    # Roscoff's trade for the Cornish run, priced by judgement and saying so
+    roscoff = w.ports.ports["roscoff"]
+    when = datetime(1805, 6, 10)
+    for good in ("brandy", "geneva", "rum", "tea", "tobacco"):
+        assert "judgement" in roscoff.market.goods[good].note, good
+        assert roscoff.market.price(good, when, w.nations, "france") == (
+            roscoff.market.goods[good].price
+        )
+    assert roscoff.market.price("tin", when, w.nations, "france") == 170 * PT.WAR_FACTOR
+    assert "Faden" in roscoff.market.goods["rum"].note
+
+
+def test_the_roscoff_patch_gives_the_sheets_depths_and_cites_its_sheet_in_the_manifest():
+    """The override's depths where Bellin's sheet gives them (brasses at low water springs
+    with Roscoff's datum correction), the harbour drying, the town and the Isle Verte land
+    again, in a level-3 harbour group the tool rebuilt; the manifest names the sheet, the
+    control points and the correction, and every source an allowed licence."""
+    import importlib.util
+    from pathlib import Path
+
+    from freesail.world.chart import load_chart, load_manifest
+    from freesail.world.geo import Position
+
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location("build_charts", root / "tools/build_charts.py")
+    tool = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = tool  # the dataclasses look their module up here
+    spec.loader.exec_module(tool)
+    assert tool.BRASSE_M == BRASSE_M
+    chart = load_chart("channel-west")
+    road, channel = Position(48.7356, -4.0160), Position(48.7360, -4.0250)
+    assert chart.depth_at(road) == pytest.approx(3 * BRASSE_M + ROSCOFF_DATUM_M, abs=0.05)
+    assert chart.depth_at(channel) == pytest.approx(6 * BRASSE_M + ROSCOFF_DATUM_M, abs=0.05)
+    harbour = Position(48.7249, -3.9798)
+    assert chart.depth_at(harbour) == pytest.approx(-(BRASSE_M + ROSCOFF_DATUM_M), abs=0.05)
+    assert chart.depth_at(Position(48.7265, -3.9870)) == pytest.approx(-12.0, abs=0.05)
+    assert chart.depth_at(Position(48.7309, -3.9867)) == pytest.approx(-10.0, abs=0.05)
+    assert chart.levels[0].tile_at(road.lat_deg, road.lon_deg).level == 3
+    assert chart.feature("batz-road").depth_fathoms == 3
+    for fid in ("roscoff-church", "ile-verte-roscoff", "la-lavandiere", "batz-western-entrance"):
+        f = chart.feature(fid)
+        assert f is not None and ("Bellin 1764" in f.source or "Faden 1793" in f.source), fid
+    manifest = load_manifest()
+    region = manifest["regions"]["channel-west"]
+    assert region["harbours"]["roscoff"] == tool.REGIONS["channel-west"]["harbours"]["roscoff"]
+    assert any(t.get("harbour") == "roscoff" for t in region["tiles"]["3"])
+    record = next(r for r in region["overrides"] if r["file"].endswith("roscoff.yaml"))
+    assert record["sheet"].startswith("Bellin 1764") and record["units"] == "brasses"
+    assert record["datum_above_chart_datum_m"] == ROSCOFF_DATUM_M
+    assert len(record["control_points"]) >= 5 and record["patches"] == 5
+    for sid, s in manifest["sources"].items():
+        assert s["licence"] in tool.ALLOWED_LICENCES, sid
+    patches, _ = tool.load_overrides("channel-west")
+    for p in (p for p in patches if p.override == "roscoff"):
+        assert "Bellin 1764" in p.source, p.name

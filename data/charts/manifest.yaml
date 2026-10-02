@@ -4,7 +4,7 @@
 format: 1
 built: '2026-10-02'
 tool: tools/build_charts.py
-build_hash: 32f5541c90122d30
+build_hash: e5d396d7a61c0172
 levels:
   '0':
     cell_sec: 150.0
@@ -1011,13 +1011,15 @@ regions:
       - name: the church of Roscoff (Notre-Dame de Croaz-Batz)
         lat_deg: 48.726494
         lon_deg: -3.985795
-        note: tower of the 1520s to 1570s, unmoved; the cross-hatched block in the sheet's town; the position
-          the French encyclopaedia's, read 2026-10-02; residual 154 m
+        note: built 1522 to 1545, its openwork belfry standing since 1585, unmoved; the cross-hatched
+          block in the sheet's town; the position and the dates the French encyclopaedia's, read 2026-10-02;
+          residual 154 m
       - name: the chapel of St Pol on the Isle of Bas (the sheet's N.D. de St Paul)
         lat_deg: 48.741927
         lon_deg: -3.99323
-        note: the chapel of Sainte-Anne at the island's east end, taken as the sheet's St Pol's (judgement
-          in the identification); the encyclopaedia's position; residual 230 m
+        note: the ruined chapel of Sainte-Anne at the island's east end, the remains of the old church
+          of Saint-Paul-Aurélien (the French encyclopaedia, read 2026-10-02), which is the sheet's St
+          Paul; its position; residual 230 m
       - name: the church of the Isle of Bas (the sheet's N.D. de Bon Secours)
         lat_deg: 48.745278
         lon_deg: -4.009722

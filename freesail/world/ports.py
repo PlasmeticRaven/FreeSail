@@ -1063,7 +1063,9 @@ class Ports:
         good = port.market.find(good_words)
         if good is None:
             names = ", ".join(port.market.goods)
-            raise OrderError(f"{port.name}'s market has no {good_words}; it deals in {names}.")
+            raise OrderError(
+                f"{_possessive(port.name)} market has no {good_words}; it deals in {names}."
+            )
         if tons <= 0:
             raise OrderError("How many tons? Say 'buy twenty tons of tin'.")
         price = self.price_of(port, good.good)
@@ -1420,8 +1422,8 @@ class Ports:
             found = self.nearest(IN_PORT_NM * 2.5)
             if found is not None and not world.at_anchor:
                 raise OrderError(
-                    f"She is under way; bring her to an anchor in {found[0].name}'s roads "
-                    f"before the boat goes ashore."
+                    f"She is under way; bring her to an anchor in "
+                    f"{_possessive(found[0].name)} roads before the boat goes ashore."
                 )
             raise OrderError("She is not in port; there is no shore within a boat's pull.")
         if self.stance(port) == "hostile":
@@ -1637,6 +1639,12 @@ class Ports:
 
 def _cap(text: str) -> str:
     return text[:1].upper() + text[1:]
+
+
+def _possessive(name: str) -> str:
+    """'Falmouth's', and 'St Mary's' as it stands (package 35b: a port named for a saint
+    is a possessive already, and 'St Mary's's market' is no clerk's English)."""
+    return name if name.endswith(("'s", "’s")) else f"{name}'s"
 
 
 def _after(text: str, leads: tuple[str, ...]) -> str:

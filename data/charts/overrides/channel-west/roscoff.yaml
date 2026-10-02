@@ -48,8 +48,8 @@ datum: "low water of spring tides (the sheet has no legend for its soundings; re
 # from the RAM's CSV and not by this package.
 datum_above_chart_datum_m: 1.3
 control_points:
-  - {name: "the church of Roscoff (Notre-Dame de Croaz-Batz)", lat_deg: 48.726494, lon_deg: -3.985795, note: "tower of the 1520s to 1570s, unmoved; the cross-hatched block in the sheet's town; the position the French encyclopaedia's, read 2026-10-02; residual 154 m"}
-  - {name: "the chapel of St Pol on the Isle of Bas (the sheet's N.D. de St Paul)", lat_deg: 48.741927, lon_deg: -3.993230, note: "the chapel of Sainte-Anne at the island's east end, taken as the sheet's St Pol's (judgement in the identification); the encyclopaedia's position; residual 230 m"}
+  - {name: "the church of Roscoff (Notre-Dame de Croaz-Batz)", lat_deg: 48.726494, lon_deg: -3.985795, note: "built 1522 to 1545, its openwork belfry standing since 1585, unmoved; the cross-hatched block in the sheet's town; the position and the dates the French encyclopaedia's, read 2026-10-02; residual 154 m"}
+  - {name: "the chapel of St Pol on the Isle of Bas (the sheet's N.D. de St Paul)", lat_deg: 48.741927, lon_deg: -3.993230, note: "the ruined chapel of Sainte-Anne at the island's east end, the remains of the old church of Saint-Paul-Aurélien (the French encyclopaedia, read 2026-10-02), which is the sheet's St Paul; its position; residual 230 m"}
   - {name: "the church of the Isle of Bas (the sheet's N.D. de Bon Secours)", lat_deg: 48.745278, lon_deg: -4.009722, note: "the bourg's church on the south shore, the encyclopaedia's position for the commune; residual 220 m"}
   - {name: "Pointe de Perharidy (the sheet's Pointe de Pergueridre)", lat_deg: 48.725726, lon_deg: -4.004929, note: "rock head, unmoved; the encyclopaedia's position; residual 124 m"}
   - {name: "the west end of the Isle of Bas (the sheet's Pointe de l'Isle)", lat_deg: 48.7448, lon_deg: -4.0425, note: "rock head, unmoved; the modern grid's shore; residual 70 m"}

@@ -73,7 +73,13 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
     assert table.stance("france", "united-states", closed_to=["united-states"]) == "closed"
     # a closure never outranks a war
     assert table.stance("france", "britain", closed_to=["britain"]) == "hostile"
-    assert table.port_nations == {"falmouth": "britain", "plymouth": "britain", "brest": "france"}
+    assert table.port_nations == {
+        "falmouth": "britain",
+        "plymouth": "britain",
+        "brest": "france",
+        "st-marys": "britain",  # package 35b
+        "roscoff": "france",
+    }
     for pid, path in port_files().items():
         assert load_port(path, chart).nation == table.port_nations[pid]
 

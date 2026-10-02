@@ -108,7 +108,7 @@ market:
   goods:
     - {good: brandy, price: 100, origin: france, note: "French brandy for the run, a little under Brest's (judgement)"}
     - {good: geneva, price: 70, origin: batavian-republic, note: "Dutch gin brought round for the English trade (judgement)"}
-    - {good: rum, price: 80, origin: france, note: "colonial rum, the free port's trade as Faden has it (pp. 45-46); the price judgement"}
+    - {good: rum, price: 80, origin: france, note: "colonial rum (tafia), the free port's trade as Faden has it (pp. 45-46): the King's council's arrêt of 3 September 1769 let it lie a year in the entrepôt at Roscoff for export abroad (the Internet Archive's arrestduconsei00fran_32, read 2026-10-02); the price judgement"}
     - {good: tea, price: 170, origin: null, note: "tea for the run at about eighteen pence the pound, two thousand two hundred and forty pounds to the ton (judgement); no origin the war rule reads"}
     - {good: tobacco, price: 60, origin: null, note: "leaf tobacco for the run at about sixpence the pound (judgement)"}
     - {good: wine, price: 38, origin: france, season: {12: 1.1}, note: "Bordeaux wine landed from the coasters; from memory, a little over Brest's"}
