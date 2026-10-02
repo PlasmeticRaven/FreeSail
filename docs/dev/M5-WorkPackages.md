@@ -46,7 +46,7 @@ gate 5c:  wave 5  33b the chronometer, the moon, the lunar and the azimuth; the 
                   33d the browser's shelf: completion, the library pane, the clock on a station, zoom and pan (Opus; landed 2026-10-01)
                   34 the tide, grounding and anchoring, as Luce has it (Fable; landed 2026-10-02)
                   32f the launcher page: the browser's front door with the game's options (Opus; after 33d and 32d; owner, 2026-10-01)
-          wave 6  35 places, people, ports and nations
+          wave 6  35 places, people, ports and nations; the pilot boarding from the cutter (Fable; written 2026-10-02 for the owner's review)
           wave 7  36 other sail, the world-order channel, the two scenarios, gate 5c cut
           wave 8  37 the officer of the watch; the lead's watch beside other models' (an Opus 5.5 watch, and a local model on the cutter: owner, 2026-10-01); the 5c verdict
 ```
@@ -1356,11 +1356,96 @@ folder; then start. The console and the command-line arguments stay for preferen
 for scripts. Packaging for a machine without Python (a start that carries its own
 Python) is milestone 8's, and runs the `freesail` command, which opens this page.
 
-## Packages 35 to 37 (outline; written in turn)
+## Package 35: places, people, ports and nations; the pilot boarding from the cutter (`freesail/world/places.py` new, `people.py` new, `ports.py` new, `nations.py` new; `data/ports/falmouth.yaml` and `brest.yaml` new, `data/nations.yaml` new, `data/papers/` new for the epitome's establishment table and the port's price list; `freesail/world/scenarios.py` for `people:`, `papers:`, `cargo:`, `ports:`; `freesail/core/world.py` for the places' and people's tick (a person occupied until when; the boat's passage); `freesail/world/ships.py` only for the pilot cutter as a vessel that comes off and goes back (the far-detail ships are 36's; the cutter's file is 32b's); `freesail/evolutions/scripts.py` and `data/evolutions/` for `send the boat`, `get under way` (Luce's order: heave short, loose and sheet home the topsails, weigh, cast her), `moor`/`unmoor` (two anchors and the hawse, 34's note), `lay out a kedge` by the boat; `freesail/orders/*` and `data/vocabulary.yaml` for the people's and the port's words; `freesail/api/readings.py` for the new rows and events; `freesail/agents/tools.py` for the ship's papers served by `library` to every station (the one change to the agents' code, as a `papers` topic beside the primer, read-only); `freesail/ui/server.py` only so that the library pane's papers come from the same source; `tools/gen_ships.py` for each ship's hold and her complement of boats; `docs/primer/14-the-port.md` new; `docs/dev/TuningNotes.md`; `tests/test_places.py`, `test_people.py`, `test_ports.py`, `test_nations.py` new, `tests/test_known_truths.py` truths 68, 69 and 70)
 
-As spec M5 §31 after decisions 29 and 30: 33a, 33b, 33c, 33d and 34 above; 35 places,
-people, ports and nations, the pilot boarding from the cutter of 32b (§22 to §24, truths
-68 to 70; Fable, the owner's ruling of 2026-09-30, the earlier outline's Opus struck); 36
+Spec M5 §22, §23, §24 (with §16's tide window and §18's anchorage from 34); `InwardAndOutward.md`
+whole (the inward minimum and the sail room's worked example); `Papers-and-Books.md` (the
+reference is a promise, the papers are things); `VesselCandidates.md` (the cutter as the
+pilot's); `Tides1805.md` §2 (the port's establishment; "when the tide serves, get under
+way"); the Regulations of 1806 in `docs/references/admiralty/` for who comes aboard and
+what the captain signs; Luce 1866 ch. XXXIV and XXXV (getting under way, mooring and
+unmooring), Lever 1808 (the boats, the kedge); Steel 1794 on the boats a ship carried; the
+pilots White 1835 and Imray 1874 for the Roads and the Rade. Decision 30 (the owner's wish
+for the full anchor handling; the pilot's answer as the better course than the master's
+warning). Fable. Written 2026-10-02 for the owner's final review; after 34 (the anchorage
+and the tide's window are its).
+
+- **Places** (§22). A place is a name and a description, no more: the quarterdeck, the
+  deck, the cabin, the gunroom, the tops, the sail room, the hold, the boat, the shore (the
+  port's quay). A person is in one. `where is <person>` and `the people` read them;
+  `go below`/`come on deck` move the captain between the cabin and the quarterdeck (the
+  log says so, and the first consequence: a message reaches him where he is). No layout,
+  no movement simulated; a person's place changes at the moments the period's orders
+  changed it (`send for the master`, `pass the word for the carpenter`, the boat's going
+  and coming). Text and data are the baseline; the viewer draws nothing new.
+- **People** (§22). The named few: the captain, the master (33a's, now a person whole),
+  the first lieutenant, two mates, the surgeon, the purser, the boatswain, the carpenter,
+  the sailmaker, a midshipman as messenger; for the schooner the master and a mate; for
+  each a name from the crew's names file, a role, a skill where a system reads it (the
+  master's for the sights as now; the pilot's for the channel), a place and a state (on
+  deck, below, asleep by the watch bill, ashore, sick, occupied by a task until a tick).
+  A task that occupies a person (the lunar, the reckoning, the boat) says so in the log
+  and refuses a second call on him in words. The people are saved and replayed, and
+  `the people` lists them as the muster lists the hands. The crew of M3 stays counts.
+- **The papers** (§22; `Papers-and-Books.md`). Each paper is a thing aboard with a keeper
+  and a place: the sailmaker's account (the sail room; what `the sail room` answers,
+  dated by its last entry, written when the sailmaker is sent to look or at the muster),
+  the manifest (the hold; the cargo by tons), the purser's books (the stores), the
+  boatswain's store book (the cordage), the booms' list, the epitome's establishment
+  table (34's `tide_by_almanac` reads it; the table itself as a page: port, high water at
+  full and change, spring rise), the port's price list once bought ashore. **Served by
+  handle through `library`** as a `papers` topic, listed with their sizes and shelved as
+  the primer is, to every station the same (the watcher included: the parity gap 33d
+  found, a paper reachable only through `submit_order`, closes here); the browser's pane
+  reads the same topic and the two "waiting" entries go. A paper is only as current as
+  its last entry, and the log says when one is written or read.
+- **Ports** (§23). `data/ports/falmouth.yaml` and `brest.yaml`: the anchorage and the
+  mooring (Carrick Road and the inner harbour off the town; the Rade and the Penfeld) as
+  positions on 32's chart with 34's tide window (the depth at low water, the flood to
+  carry her in); the boat (sent ashore and back, a passage by distance at the boat's pace
+  with hands and time, carrying a person, a message or a purchase; the kedge laid from it);
+  the **market** (a list of goods with a price each that moves by a small rules table:
+  supply by what has been sold, demand by season, war by the nations table; `buy <n> tons
+  of <good>`, `sell`, `the prices` after the boat has been ashore; the schooner's hold by
+  tons from the generator); the **dockyard** (a spar, a suit of sails, cordage, water and
+  provisions, each with a time and a cost against the part graph, the frigate's from the
+  yard by the Regulations' forms, the schooner's from the market); the **crew pool** (hands
+  by rating at a price and a delay, mustered into the crew of M3); the **stance** toward
+  each nation (open, neutral, closed, hostile) from `data/nations.yaml`. **Arriving** is a
+  sequence the log tells and the readings carry: the pilot cutter sighted by the lookout
+  (32b's cutter as a vessel that comes off from the port at the right tide and lies to
+  under the ship's lee), the pilot aboard as a person with his skill, `the pilot` as a
+  reading (his words: the channel, the marks, when the tide serves) and `ask the pilot`
+  as a question; the anchorage; the boat; the shore. **Leaving** is the reverse: `get
+  under way` as Luce has it, with the tide, the pilot off at the outer road. `moor` and
+  `unmoor` with two anchors and the hawse in the inner harbour.
+- **Nations** (§24). `data/nations.yaml`: Britain, France, Spain, the Batavian Republic,
+  the United States, Portugal, Denmark; who is at war with whom in June 1805, letters of
+  marque, the flags' words for 36's "a stranger, her colours not made out"; each port's
+  nation. The stance is read from it; prizes and convoys are M7's.
+- **Truths 68, 69 and 70** (§28) as written, measured at seed 7: a message from Brest
+  reaches the captain in his cabin by the boat, the door and a person, each a line in
+  order, never from nowhere; the schooner's cargo bought at Falmouth and sold at Brest
+  makes or loses the sum the two price lists give, and a week's war news moves a price by
+  the rules table; a port closed to the ship's nation refuses her entry in the pilot's
+  words and the stance is the table's.
+- **The primer**: chapter 14, "The port": the pilot, the anchorage and the mooring, the
+  boat, the market and the yard, getting under way with the tide, in the captain's words
+  with orders blocks and a forms table with its parse test.
+- **Report**: the suite's last line; the people, places and papers as built with their
+  words; the pilot's boarding on the frigate's passage (the ticks, the lines); the two
+  ports' files with their sources; the market's rules table and the sums of truth 69; the
+  nations table with its source for each war; every pinned constant that moved and why;
+  anything not done and why.
+
+Not in 35: the far-detail ships and the sighting of sail (36), the two scenarios whole
+(36), the world-order channel (36), a person as a station a model may hold (M6; a
+person is data and a line here), interiors beyond a name and a description (the bound of
+`InwardAndOutward.md`), prizes and convoys (M7), warping and towing (M8).
+
+## Packages 36 and 37 (outline; written in turn)
+
+As spec M5 §31 after decisions 29 and 30: 33a, 33b, 33c, 33d, 34 and 35 above; 36
 other sail, the world-order channel, the brig of 32b at far detail with her merchant
 description, the two scenarios, gate 5c cut (§25 to §27, truths 67, 71, 72; Fable); 37 the
 officer of the watch (per-order authority from the vocabulary's verb levels, a domain, the
