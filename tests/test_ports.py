@@ -834,7 +834,7 @@ def test_the_pilot_boards_a_neutral_off_the_isle_of_bas_and_she_anchors_in_the_r
     pilot = w.ports.pilot
     assert pilot is not None and pilot.port == "roscoff"
     assert aboard.text == (
-        f"The pilot, {pilot.name} of Roscoff, came aboard from the cutter and took charge of "
+        f"The pilot, {pilot.name} of Roscoff, came aboard from the boat and took charge of "
         "her (American colours being no bar at Roscoff)."
     )
     assert aboard.data["stance"] == "neutral" and aboard.tick < anchored.tick
@@ -884,7 +884,7 @@ def test_roscoff_is_hostile_to_british_colours_and_closed_in_the_pilots_words_by
     closed.submit("set plain sail")
     refused = run_until(closed, "port.pilot_refused", 120)
     assert refused.text.startswith(
-        "The pilot hailed from the cutter: Roscoff is closed to the Americans by the port's "
+        "The pilot hailed from the boat: Roscoff is closed to the Americans by the port's "
         "order; you will get no pilot here"
     )
     assert closed.ports.pilot is None and refused.data["stance"] == "closed"

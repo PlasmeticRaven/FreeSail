@@ -2575,7 +2575,7 @@ def _ship_evolution(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
         # twice: the script's own check came late and left the yards half braced)
         if "hove_to" in ship.extra:
             raise OrderError("She is hove to already; fill away before heaving to again.")
-        in_hand = ship.extra.get("evolutions").instances if ship.extra.get("evolutions") else []
+        in_hand = getattr(ship.extra.get("evolutions"), "instances", None) or []
         if any(
             inst.evo.id in ("heave_to", "lie_a_try") and inst.script is not None for inst in in_hand
         ):
