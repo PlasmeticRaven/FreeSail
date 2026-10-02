@@ -303,11 +303,19 @@ class Tide:
         found = self._cache.get(key)
         if found is not None:
             return found
+        # Evaluated at the cell's centre, not at the point that happened to ask first: the
+        # table is shared between the Worlds of one process, and a value that depended on
+        # the first asker made a passage's log depend on the worlds built before it
+        # (package 35 found the schooner's pinned digest moving with the suite's order).
+        centre = Position(
+            (key[0] + 0.5) * CONSTANTS_CELL_DEG,
+            (key[1] + 0.5) * CONSTANTS_CELL_DEG,
+        )
         total = 0.0
         level = 0.0
         sums: dict[str, complex] = {name: 0j for name in self.speeds}
         for g in self.gauges:
-            _, d = bearing_and_distance(pos, g.position)
+            _, d = bearing_and_distance(centre, g.position)
             w = 1.0 / max(d, GAUGE_FLOOR_M) ** self.power
             total += w
             level += w * g.mean_level_m

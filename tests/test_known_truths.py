@@ -2821,7 +2821,7 @@ GATE_5B_CAST_TICK = 29884
 GATE_5B_LANDFALL_TICK = 44700
 GATE_5B_ROADS_TICK = 57732  # the outer road: the first cast under twenty fathoms
 GATE_5B_ANCHORED_TICK = 58167  # the best bower let go
-GATE_5B_BROUGHT_UP_TICK = 59145  # brought up, the sails furled
+GATE_5B_BROUGHT_UP_TICK = 59144  # brought up, the sails furled (59145 before the tide table read its cells at their centres, package 35)
 # Package 33c (spec M5 open item 15): every tick held, every line but the standing
 # runtime's own the same; the lines moved by the held lines said the first time and then
 # once a watch (the frigate 157 to 18, the schooner 155 to 15, the thick passage 31 to
@@ -2844,17 +2844,17 @@ GATE_5B_SAIL_SIGHTED_TICK = 55800  # "Sail ho! A sail on the larboard bow", two 
 GATE_5B_PILOT_HAIL_TICK = 57720  # the cutter hails within four cables
 GATE_5B_PILOT_ABOARD_TICK = 58020  # the pilot aboard, two minutes before the anchor
 GATE_5B_LINES = 629
-GATE_5B_DIGEST = "42b9beb72735cff9"
+GATE_5B_DIGEST = "a7fe3d92fc16d1ed"
 GATE_5B_SCHOONER_LANDFALL_TICK = 43920
 GATE_5B_SCHOONER_ROADS_TICK = 56502  # the outer road: sail shortened, a course for Carrick Road
 GATE_5B_SCHOONER_PILOT_ABOARD_TICK = 56940  # the pilot aboard, American colours no bar
 GATE_5B_SCHOONER_ANCHORED_TICK = 57615  # off the town: the best bower let go
 GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58618
 GATE_5B_SCHOONER_LINES = 730
-GATE_5B_SCHOONER_DIGEST = "6be7916828f57818"
+GATE_5B_SCHOONER_DIGEST = "b49d841fd40f9482"
 GATE_5B_THICK_LANDFALL_TICK = 54900
 GATE_5B_THICK_LINES = 504
-GATE_5B_THICK_DIGEST = "b3b1f54a4b97a8f4"
+GATE_5B_THICK_DIGEST = "65927077f46006eb"
 
 
 def the_landfall(log):
