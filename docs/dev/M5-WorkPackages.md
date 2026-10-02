@@ -29,15 +29,12 @@ a checkpoint, not from the start, and stop when it works, recording what it does
 handle. A builder that finds itself on its tenth whole-passage run is to say so in its
 report rather than run a twentieth.
 
-A fifth rule, from the cost of gate 5c (owner, 2026-10-02: the week's allowance and more
-spent in a day): **a package is budgeted.** Each brief names a reading list of the files
-the builder will change and the spec sections that bind them, not the chapter whole; the
-builder runs its own tests and the fast tier while building and the whole suite once at
-the end, the lead running it again at the merge; a builder that passes about three
-hundred thousand tokens says so in a line of its report and finishes rather than
-polishes; the physics and the design-heavy packages go to Fable, the rest to Opus. The
-gate 5c verdict waits on the allowance's reset; the owner tests with local models,
-Sonnet and Opus meanwhile.
+A fifth rule, on who builds what (owner, 2026-10-02, at the cut of gate 5c): **the
+physics and the design-heavy packages go to Fable; boilerplate, standard work and the
+building-out of existing systems go to Opus.** The usage budget is the owner's own to
+watch, not a rule in a brief; milestone 5 was the widest of the plan, the whole world
+made, and its cost was expected. The gate 5c verdict waits on the allowance's reset;
+the owner tests with local models, Sonnet and Opus meanwhile.
 
 The owner's ruling (2026-09-29): the heavy packages go to Fable, the lead reviewing as
 before; each package is written here when its predecessor has landed and is launched on
