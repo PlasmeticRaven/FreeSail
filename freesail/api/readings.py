@@ -2191,9 +2191,26 @@ _event(
 )
 _event(EventSpec("a sail lost", "lookout.sail_lost"))
 _event(EventSpec("a sail within hail", "sail.within_hail"))
+# the helm's own (package 36; the passages' books trim the yards to a course shaped by
+# the book, which the starter's "trim on a shift" of the true wind does not catch)
+_event(EventSpec("the course shaped", "helm.set"))
+_event(EventSpec("steady on the course", "helm.steady"))
 # and the pilot cutter's hail (package 35's kind; the merchant passage's book shortens
 # sail on it, as the cutter asks) and the cargo's coming aboard and going ashore
-_event(EventSpec("the pilot's hail", "port.pilot_hail"))
+_event(
+    EventSpec(
+        "the pilot's hail",
+        "port.pilot_hail",
+        lambda data: data.get("errand", "bring") == "bring" and not data.get("asks"),
+    )
+)
+# the pilot aboard asking for sail to be shortened as his boat comes off for him (package
+# 36): the passages' books heave to for it
+_event(
+    EventSpec(
+        "the pilot asks to be put off", "port.pilot_hail", lambda data: bool(data.get("asks"))
+    )
+)
 _event(EventSpec("the cargo aboard", "market.bought"))
 
 

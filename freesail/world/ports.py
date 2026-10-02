@@ -723,7 +723,12 @@ class Ports:
                     )
                 else:
                     text = f"The {craft} hailed: she has come off for the pilot."
-                self._record(Severity.ROUTINE, "port.pilot_hail", text, {"port": port.id})
+                self._record(
+                    Severity.ROUTINE,
+                    "port.pilot_hail",
+                    text,
+                    {"port": port.id, "errand": self.cutter_errand},
+                )
             if dist <= PILOT_BOARDS_WITHIN_M and self._ground_speed_kn() <= PILOT_BOARDS_UNDER_KN:
                 cutter.alongside = True
                 if self.cutter_errand == "bring":
@@ -754,6 +759,17 @@ class Ports:
                 and d_road / units.NAUTICAL_MILE < port.pilot.cruising_nm
             ):
                 self._launch_cutter(port, "fetch")
+                # the pilot asks for sail to be shortened as his boat comes off (package
+                # 36: a schooner with her sheets tended outran the cutter and carried the
+                # Falmouth pilot to the Iroise); the same line as the boat's hail, so
+                # that a book which shortens sail at the pilot's hail does so now
+                self._record(
+                    Severity.ROUTINE,
+                    "port.pilot_hail",
+                    f"The pilot asks for sail to be shortened: his {port.pilot.craft} is "
+                    f"coming off for him.",
+                    {"port": port.id, "asks": True, "errand": "fetch"},
+                )
 
     def _pilot_boards(self, port: Port, cutter: Any, now: int) -> None:
         world = self.world

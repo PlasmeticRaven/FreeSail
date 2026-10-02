@@ -593,6 +593,7 @@ class Lookout:
                     "nation": v.nation
                     if v is not None and level >= 2 and v.shows_colours and v.nation_adjective
                     else None,
+                    "spoken": bool(v is not None and v.spoken),  # within hail at any time
                     "words": f"{head} {relative}, bearing {point}, distant "
                     f"{estimate_words(s.judged_m)}{detail}",
                 }
@@ -606,9 +607,15 @@ class Lookout:
         """`a stranger in sight`: the sail in sight that is not known for one of the ship's
         own nation, the nearest first: every sail is a stranger until her colours are made
         out (Falconer 1780, COLOURS), and one that shows none or another nation's stays
-        one. For the book: a cruiser chases strangers and not the port's own cutter."""
+        one until she is spoken within hail (what follows is milestone 7's). For the
+        book: a cruiser chases strangers, and not the port's own cutter nor a sail she has
+        spoken."""
         every = self.strangers(world, heading_rad)
-        items = [i for i in every["items"] if i["nation"] is None or i["nation"] != own_nation]
+        items = [
+            i
+            for i in every["items"]
+            if (i["nation"] is None or i["nation"] != own_nation) and not i["spoken"]
+        ]
         if not items:
             return {"in_sight": False, "count": 0, "words": "no stranger in sight", "items": []}
         words = "; ".join(lead_words(i["words"]) for i in items)

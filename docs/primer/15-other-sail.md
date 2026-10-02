@@ -90,7 +90,7 @@ Two scenarios ship with this milestone and are the gate's: **the merchant passag
 | `make her out` | `make out the sail`, `make out the stranger`, `make out the brig`, `send a glass aloft`, `what is she` | a glass aloft: her rig, her course, her colours, as the distance allows |
 | `give chase` | `chase`, `chase the stranger`, `chase the brig`, `stand after her` | the helm put for her bearing, led by the bearing's drift when given again |
 | `take a bearing of the stranger` | `take a bearing of the sail`, `take a bearing of the brig` | a bearing of a sail, for the master's account |
-| `at a sail sighted` | `at sail ho`, `at a sail made out`, `at a stranger's colours made out`, `at a sail lost`, `at a sail within hail`, `at the pilot's hail`, `at the cargo aboard`, `at the turn to the flood`, `at the turn to the ebb` | the events, for the book |
+| `at a sail sighted` | `at sail ho`, `at a sail made out`, `at a stranger's colours made out`, `at a sail lost`, `at a sail within hail`, `at the pilot's hail`, `at the cargo aboard`, `at the turn to the flood`, `at the turn to the ebb`, `at the course shaped`, `at steady on the course`, `at the pilot asks to be put off` | the events, for the book |
 
 ## Where it comes from
 

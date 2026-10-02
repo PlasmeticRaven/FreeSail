@@ -195,9 +195,9 @@ def _chase_course(world: Any, sighting: Any) -> tuple[float, str]:
     closest = units.rad_to_deg(close_hauled_true_angle(world.ship))
     off = units.rad_to_deg(units.wrap_pi(math.radians(course - wind_from)))
     if abs(off) < closest:
-        side = 1.0 if off >= 0 else -1.0
-        if abs(off) < 1e-6:
-            side = 1.0 if units.wrap_pi(math.radians(bearing - heading_deg)) >= 0 else -1.0
+        # on the tack she is on: her head's side of the wind's eye (a chase dead to
+        # windward is not a reason to put her about every glass)
+        side = 1.0 if units.wrap_pi(math.radians(heading_deg - wind_from)) >= 0 else -1.0
         course = (wind_from + side * closest) % 360.0
         words += ", as near the wind as she will lie"
     return course, words
@@ -255,6 +255,23 @@ def _course_not_laid(ship: Any, heading: float) -> tuple[str, str] | None:
     if dyn is not None and getattr(dyn, "tack", None) == nearer:
         return f"{said}, she is kept full and by on the {nearer} tack", "keep her full and by"
     return f"{said}, she is put about for the {nearer} tack", "tack"
+
+
+def _helm_for(ship: Any, not_laid: tuple[str, str]) -> tuple[str, str, dict[str, Any]]:
+    """The helm order that stands in for a course not laid or across the eye, given; a
+    tack refused because she is not by the wind brings her by the wind instead (the book
+    gives the course again at its next glass, and the tack is accepted then)."""
+    from freesail.orders import handle
+
+    words, order = not_laid
+    try:
+        _, helm_text, helm_data = handle(ship, order)
+    except OrderError as exc:
+        if order != "tack" or "close-hauled" not in str(exc):
+            raise
+        _, helm_text, helm_data = handle(ship, "keep her full and by")
+        words = words.replace("she is put about for", "she is brought by the wind to go about for")
+    return words, helm_text, helm_data
 
 
 def _world_with_lookout(ship: Any) -> Any:
@@ -358,8 +375,8 @@ def execute(ship: Any, order: Order) -> Result:
             # she is kept full and by on the tack that points nearer it, put about for it
             # when that is the other tack (as the pilot's course is said and not steered,
             # package 35; the book's helm rules have no other guard)
-            _, helm_text, helm_data = handle(ship, not_laid[1])
-            words = words.rstrip(".") + f"; {not_laid[0]}."
+            said, helm_text, helm_data = _helm_for(ship, not_laid)
+            words = words.rstrip(".") + f"; {said}."
         else:
             _, helm_text, helm_data = handle(ship, f"steer {units.rad_to_deg(heading):.0f}")
         data = {"verb": verb, "level": 1, "place": rest, "heading": heading} | {"helm": helm_data}
@@ -393,7 +410,13 @@ def execute(ship: Any, order: Order) -> Result:
         course, drift_words = _chase_course(world, sighting)
         from freesail.orders import handle
 
-        _, helm_text, helm_data = handle(ship, f"steer {course:.0f}")
+        across = _course_not_laid(ship, math.radians(course))
+        if across:
+            # the course lies across the wind's eye from her head: worn round for it
+            said, helm_text, helm_data = _helm_for(ship, across)
+            drift_words += f"; {said}"
+        else:
+            _, helm_text, helm_data = handle(ship, f"steer {course:.0f}")
         words = f"Gave chase to {who} {relative}, bearing {point}{drift_words}. {helm_text}"
         data = {
             "verb": verb,

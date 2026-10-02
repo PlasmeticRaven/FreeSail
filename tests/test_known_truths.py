@@ -2847,21 +2847,23 @@ GATE_5B_BROUGHT_UP_TICK = 59144  # brought up, the sails furled (59145 before pa
 # shortened sail, so the pilot boards once she is slow enough, at the anchor, 58020 →
 # 58200; the schooner's 54840 → 53640, 56880 → 56820, 56940 → 57000); nothing of the
 # ship's own moves, the lines grow by the sail's lines (629 → 633, 730 → 734) and the
-# digests follow; the thick passage, with no cutter, is untouched (docs/dev/TuningNotes.md,
-# package 36). Measured in package 36's tree before the lead's tide-words change to
-# `ports.py`, which moved these two digests again and no tick; the lead reconciles.
+# digests follow (the hail's line carries the cutter's errand in its data too, for the
+# book's `the pilot's hail` and `the pilot asks to be put off`); the thick passage, with
+# no cutter, is untouched (docs/dev/TuningNotes.md, package 36). Measured in package 36's
+# tree before the lead's tide-words change to `ports.py`, which moved these two digests
+# again and no tick; the lead reconciles.
 GATE_5B_SAIL_SIGHTED_TICK = 54600  # "Sail ho! A sail on the larboard bow", three leagues
 GATE_5B_PILOT_HAIL_TICK = 56940  # the cutter hails within four cables
 GATE_5B_PILOT_ABOARD_TICK = 58200  # the pilot aboard, half a minute after the anchor
 GATE_5B_LINES = 633
-GATE_5B_DIGEST = "95cbeedb158c27d4"
+GATE_5B_DIGEST = "59864e53cb531400"
 GATE_5B_SCHOONER_LANDFALL_TICK = 43920
 GATE_5B_SCHOONER_ROADS_TICK = 56502  # the outer road: sail shortened, a course for Carrick Road
 GATE_5B_SCHOONER_PILOT_ABOARD_TICK = 57000  # the pilot aboard, American colours no bar
 GATE_5B_SCHOONER_ANCHORED_TICK = 57615  # off the town: the best bower let go
 GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58618
 GATE_5B_SCHOONER_LINES = 734
-GATE_5B_SCHOONER_DIGEST = "667c4021f415c3af"
+GATE_5B_SCHOONER_DIGEST = "faefcf027509ebb6"
 GATE_5B_THICK_LANDFALL_TICK = 54900
 GATE_5B_THICK_LINES = 504
 GATE_5B_THICK_DIGEST = "65927077f46006eb"
@@ -3658,3 +3660,339 @@ def test_truth_71_a_scenarios_world_order_is_journaled_at_its_tick_and_the_capta
     harness = [x for x in events(world, "world.order") if x.tick > 60]
     assert harness and harness[0].data["source"] == "the harness"
     assert [i["source"] for i in world.save()["inputs"] if "world_order" in i] == ["the harness"]
+
+
+# The two scenarios of gate 5c at seed 7 (spec M5 §27, §29; package 36), each run whole
+# under its own book (`data/scenarios/*.orders`; the starter book is a choice and not
+# loaded), with a save taken at a tick for truth 72's replay. The merchant passage runs
+# thirty-six hours (12 June 05:00 to 13 June 17:00: the tin bought, out on the ebb, the
+# Channel crossed, the Iroise passed, the road of Bertheaume on the ebb, the Goulet on
+# the flood, the Bay of Brest, the tin sold); the naval cruise forty-eight
+# (12 June 06:00 to 14 June 06:00: the yard's stores, the station, the cutter's letter,
+# the stranger chased and spoken, two days under the book); the merchant passage's
+# thirty-six hours end with the tin sold in the Bay of Brest at 15:09 on the 13th, the
+# flood having served by daylight the same forenoon she anchored in the road of
+# Bertheaume on the ebb. The constants below are the
+# build machine's (docs/dev/TuningNotes.md, package 36). The fixtures are module-scoped
+# and sail two or three game days each: the lead adds them to `tests/conftest.py`'s
+# DAY_FIXTURES so that they are the slow tier's (this file does not mark them).
+GATE_5C_MERCHANT = "data/scenarios/merchant-passage.yaml"
+GATE_5C_CRUISE = "data/scenarios/naval-cruise.yaml"
+GATE_5C_MERCHANT_HOURS = 36
+GATE_5C_CRUISE_HOURS = 48
+GATE_5C_MERCHANT_SAVE_TICK = 12 * 3600  # 17:00 on the 12th, the Channel crossing
+GATE_5C_CRUISE_SAVE_TICK = 27 * 3600  # 09:00 on the 13th, the chase in hand
+GATE_5C_SHIPS = 12  # the dozen ships of each scenario, the player's not among them
+# the naval cruise's ticks at seed 7
+GATE_5C_CRUISE_YARD_TICK = 5460  # thirty days' provisions off from the King's yard
+GATE_5C_CRUISE_UNDER_WAY_TICK = 6834  # under way on the starboard tack, S by W
+GATE_5C_CRUISE_PILOT_ABOARD_TICK = 11760  # Mr Tozer aboard from the cutter
+GATE_5C_CRUISE_PILOT_LEFT_TICK = 18000  # put off into his cutter, the ship hove to for it
+GATE_5C_CRUISE_WORLD_ORDERS = [
+    (14400, "the scenario"),
+    (86400, "the scenario"),
+    (93600, "the scenario"),
+]
+GATE_5C_CRUISE_CUTTER_HAIL_TICK = 82212  # the port admiral's cutter within hail, 04:50 on the 13th
+GATE_5C_CRUISE_LETTER_READ_TICK = 82272  # the letter read in the cabin a minute after
+GATE_5C_CRUISE_STRANGER_SIGHTED_TICK = 94800  # the Palinure, "a sail on the starboard bow, NE"
+GATE_5C_CRUISE_STRANGER_SPOKEN_TICK = 98877  # within hail, a stranger under no colours
+GATE_5C_CRUISE_NOON_TICKS = [21600, 108240]
+GATE_5C_CRUISE_WEARS_AT_LEAST = 10  # wore ship every second hour on the station
+GATE_5C_CRUISE_LINES = 2211
+GATE_5C_CRUISE_DIGEST = "760d4c962f46a826"
+# the merchant passage's ticks at seed 7
+GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
+GATE_5C_MERCHANT_UNDER_WAY_TICK = 16005  # under way on the ebb, starboard tack, S by E
+GATE_5C_MERCHANT_PILOT_ABOARD_TICKS = [
+    17040,
+    100920,
+]  # Mr Tregenza of Falmouth; Mr Le Floch of Brest
+GATE_5C_MERCHANT_PILOT_LEFT_TICKS = [
+    19740
+]  # put off into his cutter beyond the outer road, hove to for it
+GATE_5C_MERCHANT_SAIL_OFF_LIZARD_TICK = 29760  # "Sail ho! A sail right ahead", 13:16, not made out
+GATE_5C_MERCHANT_NOON_TICKS = [25200, 111600]
+GATE_5C_MERCHANT_ANCHORED_TICKS = [
+    57,
+    100607,
+    115531,
+]  # Carrick Road; the road of Bertheaume; the Bay
+GATE_5C_MERCHANT_FLOOD_TICK = (
+    108960  # the turn to the flood at Bertheaume, 11:16 on the 13th, by daylight
+)
+GATE_5C_MERCHANT_GOULET_TICK = 111988  # the mouth of the Goulet, 12:06
+GATE_5C_MERCHANT_TIN_SOLD_TICK = 122963  # the boat alongside from the quay, 15:09
+GATE_5C_MERCHANT_LINES = 2396
+GATE_5C_MERCHANT_DIGEST = "d4aaf1a26a70e525"
+
+
+def _people(world) -> list[dict]:
+    return [p.to_dict() for p in world.people.all()]
+
+
+def the_scenario_whole(path: str, hours: int, save_tick: int):
+    """A scenario of gate 5c run whole under its book, with the account beside the truth
+    at each notable moment and a save at `save_tick`: (world, moments, (save, digest))."""
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario(path)
+    world = make_scenario_world(sf)
+    moments: list[tuple] = []
+
+    def watch(e) -> None:
+        landfall = e.kind == "lookout.sighting" and e.data.get("landfall")
+        if e.kind in ("reckoning.noon", "sounding", "bearing.taken", "ship.anchored") or landfall:
+            nav = world.navigation
+            moments.append(
+                (
+                    "landfall" if landfall else e.kind,
+                    e.tick,
+                    e.text,
+                    world.position,
+                    nav.account_now(),
+                )
+            )
+
+    world.log.subscribe(watch)
+    begin(world, sf)
+    run(world, save_tick)
+    saved = (world.save(), world.log.digest(), world.vessels.to_dict(), _people(world))
+    run(world, hours * 3600 - save_tick)
+    world.log.unsubscribe(watch)
+    return world, moments, saved
+
+
+@pytest.fixture(scope="module")
+def gate_5c_merchant():
+    return the_scenario_whole(GATE_5C_MERCHANT, GATE_5C_MERCHANT_HOURS, GATE_5C_MERCHANT_SAVE_TICK)
+
+
+@pytest.fixture(scope="module")
+def gate_5c_cruise():
+    return the_scenario_whole(GATE_5C_CRUISE, GATE_5C_CRUISE_HOURS, GATE_5C_CRUISE_SAVE_TICK)
+
+
+def _by_order(log, name: str):
+    return [e for e in log if e.actor == f"standing order '{name}'" and e.kind == "order.accepted"]
+
+
+def test_the_merchant_passage_at_seed_7_has_its_own_constants(gate_5c_merchant):
+    """Gate 5c's merchant passage (spec M5 §29): the schooner at Carrick Road, forty tons
+    of tin bought at the quay and struck down from the lighter; out on the ebb, the
+    Falmouth pilot aboard and put off into his cutter, the ship hove to for it; a sail
+    sighted off the Lizard and not made out; the course across worked hourly from the
+    account; the Iroise raised and passed (the cast at its mark, which reads her chart's
+    words, is given once within a mile and a half of the mark and was not made at seed 7:
+    she passed it two miles wide by account, which docs/dev/TuningNotes.md records); the
+    road of Bertheaume on the ebb by the lead, the pilot of Brest aboard at the anchor
+    with the agent's letter, the flood taken by daylight on the pilot's and the master's
+    tide; the Goulet by the pass north of the Mingan and the Fillettes with the lead
+    going and a bearing every five minutes; the Bay of Brest by the lead, the boat
+    ashore, the tin sold; the account against the truth at each; the lines and the
+    digest."""
+    world, moments, _ = gate_5c_merchant
+    log = world.log
+    assert len(world.vessels.vessels) >= GATE_5C_SHIPS  # the dozen, and the pilots' cutters
+    # the cargo at Falmouth, by the lighter while the boat is at the quay
+    bought = [e for e in log if e.kind == "market.bought"]
+    assert [e.tick for e in bought] == [GATE_5C_MERCHANT_TIN_ABOARD_TICK]
+    assert bought[0].text.startswith("40 tons of tin hoisted in and struck down")
+    assert _by_order(log, "sail on the ebb")[0].tick == GATE_5C_MERCHANT_TIN_ABOARD_TICK
+    under_way = [e for e in log if e.kind == "ship.under_way"]
+    assert under_way[0].tick == GATE_5C_MERCHANT_UNDER_WAY_TICK
+    # the Falmouth pilot aboard and off, the fore topsail in at his hail each time
+    aboard = [e for e in log if e.kind == "port.pilot_aboard"]
+    left = [e for e in log if e.kind == "port.pilot_left"]
+    assert [e.tick for e in aboard] == GATE_5C_MERCHANT_PILOT_ABOARD_TICKS
+    assert [e.tick for e in left] == GATE_5C_MERCHANT_PILOT_LEFT_TICKS
+    assert "Mr Tregenza of Falmouth" in aboard[0].text and "of Brest" in aboard[1].text
+    assert len(_by_order(log, "the pilot boards")) >= 2
+    # a sail off the Lizard, sighted and not made out: the book has no order for it
+    sails = [e for e in log if e.kind == "lookout.sighting" and e.data.get("seen_as") == "sail"]
+    off_lizard = [e for e in sails if 25200 <= e.tick <= 36000]
+    assert off_lizard and off_lizard[0].tick == GATE_5C_MERCHANT_SAIL_OFF_LIZARD_TICK
+    assert (
+        off_lizard[0].text.startswith("Sail ho! A sail ") and "distance_m" not in off_lizard[0].data
+    )
+    assert not [e for e in log if e.kind == "lookout.made_out" and e.data.get("glass")]
+    # the noons: the first's tick stands whatever the book does
+    noons = [e for e in log if e.kind == "reckoning.noon"]
+    assert [e.tick for e in noons] == GATE_5C_MERCHANT_NOON_TICKS
+    assert noons[0].data["sight"]["instrument"] == "octant"
+    # the Falmouth pilot put off: the ship hove to for his cutter and filled away after
+    hove = [e for e in log if e.kind == "ship.hove_to"]
+    filled = [e for e in log if e.kind == "ship.filled_away"]
+    assert hove and filled and hove[0].tick < left[0].tick < filled[0].tick
+    assert _by_order(log, "the pilot put off") and _by_order(log, "under way again")
+    # the Iroise passed, the course for the points off Bertheaume shaped; no cast at its
+    # mark at this seed (see the docstring)
+    assert _by_order(log, "the Iroise") and _by_order(log, "past the Iroise")
+    assert not [e for e in log if e.kind == "sounding" and e.data.get("deep")]
+    # the road of Bertheaume on the ebb by the lead, the pilot aboard at the anchor; the
+    # turn to the flood by daylight the same forenoon, and the Goulet on it
+    anchored = [e for e in log if e.kind == "ship.anchored"]
+    assert [
+        e.tick for e in anchored
+    ] == GATE_5C_MERCHANT_ANCHORED_TICKS  # Carrick Road, Bertheaume, Brest
+    assert "eleven fathoms" in anchored[1].text and anchored[1].tick < aboard[1].tick
+    swung = [e for e in log if e.kind == "ship.swung" and e.tick > anchored[1].tick]
+    assert swung and swung[0].data["flood"] is True and swung[0].tick == GATE_5C_MERCHANT_FLOOD_TICK
+    flood = _by_order(log, "the flood")
+    assert [e.tick for e in flood] == [GATE_5C_MERCHANT_FLOOD_TICK]
+    assert flood[0].ship_time.day == 13 and flood[0].ship_time.hour == 11
+    assert [e.tick for e in _by_order(log, "the mouth of the Goulet")] == [
+        GATE_5C_MERCHANT_GOULET_TICK
+    ]
+    for name in (
+        "under Petit Minou",
+        "north of the Mingan",
+        "north of the Fillettes",
+        "under Portzic",
+        "into the Bay",
+    ):
+        assert _by_order(log, name), name
+    casts_in = [
+        e for e in log if e.kind == "sounding" and anchored[1].tick < e.tick < anchored[2].tick
+    ]
+    assert len(casts_in) >= 12  # the lead going in pilot water
+    bearings_in = [
+        e for e in log if e.kind == "bearing.taken" and anchored[1].tick < e.tick < anchored[2].tick
+    ]
+    assert len(bearings_in) >= 12  # a bearing every five minutes in pilot water
+    assert not [e for e in log if e.kind in ("ship.aground", "anchor.dragging")]
+    # the Bay of Brest: the boat ashore and the tin sold at the quay
+    sold = [e for e in log if e.kind == "market.bargain" and e.data.get("verb") == "sell"]
+    assert [e.tick for e in sold] == [GATE_5C_MERCHANT_TIN_SOLD_TICK]
+    assert sold[0].text.startswith("Sold 40 tons of tin at Brest at ")
+    assert _by_order(log, "the tin sold")[0].tick == sold[0].tick
+    # the account against the truth
+    by_kind = {}
+    for kind, tick, _text, truth, account in moments:
+        by_kind.setdefault(kind, []).append((tick, _miles(truth, account)))
+    # the first noon: the hour hove to for the pilot ran on at the log's last read (nine
+    # miles), set right by the Lizard's bearings within the glass; the second in the road
+    # of Bertheaume on bearings every five minutes
+    assert by_kind["reckoning.noon"][0][1] < 12.0
+    assert by_kind["reckoning.noon"][1][1] < 1.0
+    at_anchor = by_kind["ship.anchored"]
+    assert at_anchor[1][1] < 1.0 and at_anchor[2][1] < 1.0  # Bertheaume and Brest, by bearings
+    assert len(log) == GATE_5C_MERCHANT_LINES and log.digest()[:16] == GATE_5C_MERCHANT_DIGEST
+
+
+def test_the_naval_cruise_at_seed_7_has_its_own_constants(gate_5c_cruise):
+    """Gate 5c's naval cruise (spec M5 §29): the frigate in the Sound, the yard's thirty
+    days of provisions, under way on the starboard tack, the Plymouth pilot aboard and
+    off, the course for the station, the chronometer's time sights; the port admiral's
+    cutter with the letter sighted, within hail, the letter read; the station kept by the
+    wind, wearing every second hour; the stranger put on the sea by the scenario's order,
+    sighted, made out, chased by the bearing's drift and spoken, a brig-sloop of war under
+    no colours; the lines and the digest."""
+    world, moments, _ = gate_5c_cruise
+    log = world.log
+    assert len(world.vessels.vessels) >= GATE_5C_SHIPS
+    yard = [e for e in log if e.kind == "yard.done"]
+    assert [e.tick for e in yard] == [GATE_5C_CRUISE_YARD_TICK]
+    assert yard[0].text.startswith("Provisions for 30 days came off")
+    under_way = [e for e in log if e.kind == "ship.under_way"]
+    assert (
+        under_way[0].tick == GATE_5C_CRUISE_UNDER_WAY_TICK and "starboard tack" in under_way[0].text
+    )
+    aboard = [e for e in log if e.kind == "port.pilot_aboard"]
+    left = [e for e in log if e.kind == "port.pilot_left"]
+    assert [e.tick for e in aboard] == [GATE_5C_CRUISE_PILOT_ABOARD_TICK]
+    assert [e.tick for e in left] == [GATE_5C_CRUISE_PILOT_LEFT_TICK]
+    sights = [e for e in log if e.kind == "reckoning.time_sight"]
+    assert len(sights) >= 4 and "longitude by chronometer" in sights[0].text
+    # the message by the cutter: the world's order at its tick, the cutter sighted as a
+    # sail, within hail, the letter aboard and read, each a line in order
+    orders = [e for e in log if e.kind == "world.order"]
+    assert [(e.tick, e.data["source"]) for e in orders] == GATE_5C_CRUISE_WORLD_ORDERS
+    cutter_hail = [e for e in log if e.kind == "sail.within_hail" and "letter" in e.text]
+    assert [e.tick for e in cutter_hail] == [GATE_5C_CRUISE_CUTTER_HAIL_TICK]
+    read = [e for e in log if e.kind == "message.received"]
+    assert [e.tick for e in read] == [GATE_5C_CRUISE_LETTER_READ_TICK]
+    assert "Rejoin the squadron off the Black Rocks" in read[0].text
+    cutter_seen = [
+        e
+        for e in log
+        if e.kind == "lookout.sighting" and e.data.get("seen_as") == "sail" and "cutter" in e.text
+    ]
+    assert cutter_seen and cutter_seen[0].tick < cutter_hail[0].tick < read[0].tick
+    # the station kept by the wind: wore ship watch by watch, no sail in sight
+    wore = [e for e in log if e.kind == "ship.wore"]
+    assert len(wore) >= GATE_5C_CRUISE_WEARS_AT_LEAST
+    # the stranger: on the sea by the scenario's order, sighted at the horizon, made out
+    # by the glass and the tops, chased by the bearing's drift, spoken under no colours
+    stranger = world.vessels.find("Palinure")
+    assert stranger is not None and not stranger.shows_colours
+    sighted = [
+        e
+        for e in log
+        if e.kind == "lookout.sighting"
+        and e.data.get("seen_as") == "sail"
+        and e.tick >= orders[-1].tick
+    ]
+    assert sighted and sighted[0].tick == GATE_5C_CRUISE_STRANGER_SIGHTED_TICK
+    chase = [e for e in log if e.kind == "helm.set" and e.text.startswith("Gave chase to")]
+    assert chase and chase[0].tick == sighted[0].tick
+    assert any("the course led" in e.text for e in chase)
+    spoken = [e for e in log if e.kind == "sail.within_hail" and "brig-sloop" in e.text]
+    assert spoken and spoken[0].tick == GATE_5C_CRUISE_STRANGER_SPOKEN_TICK
+    assert spoken[0].text.endswith("a stranger, her colours not made out.")
+    assert (
+        _by_order(log, "the chase up") and _by_order(log, "the chase up")[0].tick == spoken[0].tick
+    )
+    assert not [e for e in log if e.kind in ("ship.aground", "anchor.dragging")]
+    noons = [e for e in log if e.kind == "reckoning.noon"]
+    assert [e.tick for e in noons] == GATE_5C_CRUISE_NOON_TICKS
+    by_kind = {}
+    for kind, tick, _text, truth, account in moments:
+        by_kind.setdefault(kind, []).append((tick, _miles(truth, account)))
+    assert by_kind["reckoning.noon"][1][1] < 10.0  # the chronometer's longitude, its rate unapplied
+    assert len(log) == GATE_5C_CRUISE_LINES and log.digest()[:16] == GATE_5C_CRUISE_DIGEST
+
+
+def test_truth_72_the_two_scenarios_replay_to_the_same_digest(gate_5c_merchant, gate_5c_cruise):
+    """Spec M5 §28, truth 72: "The merchant passage and the naval cruise replay to the
+    same digest from their scenario files, ships, ports, people and weather included."
+    Each saved at a tick of its run and replayed from the save (the seed, the scenario
+    file whole, the inputs; the scenario's own world orders applied again at their ticks
+    from the file, the harness's from the inputs): the digest at that tick the same, the
+    ships where they were, the people and the port's state the same."""
+    from freesail.api.session import ship_factory
+    from freesail.core import replay as replay_mod
+
+    for _world, _moments, (data, digest, vessels, people) in (gate_5c_merchant, gate_5c_cruise):
+        assert data["scenario"]["ships"] and data["scenario"]["world_orders"]
+        copy = replay_mod.replay(data, ship_factory)
+        assert copy.clock.tick == data["end_tick"]
+        assert copy.log.digest() == digest
+        assert copy.vessels.to_dict() == vessels  # every ship where she was, far or near
+        assert _people(copy) == people
+        assert [o["tick"] for o in copy.save()["world_orders"]] == [
+            o["tick"] for o in data["world_orders"]
+        ]
+
+
+def test_the_pace_at_the_merchant_passages_start_with_the_dozen_ships_holds_truth_51s_floor():
+    """Spec M5 §30 and package 36: the merchant passage's start, the schooner at anchor in
+    Carrick Road with the dozen ships on the sea at far detail (each moved once a game
+    minute by her polar, the lookout's look over them, the strangers in every sample),
+    the best of three thousands at least BUILD_MACHINE_FLOOR. Measured on the build
+    machine: docs/dev/TuningNotes.md, package 36."""
+    import time
+
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario(GATE_5C_MERCHANT)
+    world = make_scenario_world(sf)
+    begin(world, sf)
+    assert len(world.vessels.active()) >= GATE_5C_SHIPS
+    world.run(600)  # the anchor down, the boat away
+    best = 0.0
+    for _ in range(3):
+        t0 = time.perf_counter()
+        world.run(1000)
+        best = max(best, 1000 / (time.perf_counter() - t0))
+    assert best >= BUILD_MACHINE_FLOOR, f"{best:.0f} ticks a second"

@@ -400,6 +400,7 @@ class Vessel:
     detail: str = "far"
     letter: Any = None  # a Message she carries for the ship (`carry a letter`)
     hailed: bool = False  # within hail once: the line said
+    spoken: bool = False  # within hail at any time: a stranger no more (the book's)
     # a boat under oars and sail (a port's `pilot.vessel`): her own height, the distance
     # she is seen within, and her pace, in place of a ship file's
     boat: bool = False
@@ -924,6 +925,7 @@ class Vessels:
                 v.promote(False)
             if nm <= HAIL_NM and not v.hailed:
                 v.hailed = True
+                v.spoken = True
                 words = v.what or v.name
                 if v.letter is not None:
                     v.alongside = True
