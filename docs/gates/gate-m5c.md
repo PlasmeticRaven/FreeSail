@@ -1,6 +1,8 @@
 # Gate M5c: Ports, nations and other sail
 
-**Verdict:** Not yet cut. *Draft written 2026-10-02 while package 37 builds (decision 32: the gate is cut at 37's merge so that it covers the officer's watch); the items marked [at the cut] are filled from 37's report and the lead's measurements then.*
+**Verdict:** Pending.
+
+**Cut 2026-10-02** at package 37's merge (decision 32). The owner's verdict and the lead's officer's watch together decide it (spec M5 §29).
 
 **As cut:** packages 33b (the chronometer, the moon, the lunar and the azimuth; the chart in the captain's hands), 33c (the passage's words; the starter book a choice), 33d (the browser's shelf), 32c (the suite in two tiers), 34 (the tide, grounding and anchoring as Luce has it), 35 (places, people, the ship's papers by handle, Falmouth, Plymouth and Brest, the pilot from the cutter), 35b (St Mary's and Roscoff), 36 (other sail at far detail, the world-order channel, the merchant passage and the naval cruise) and 37 (the officer of the watch), with the lead's own work between them. The verdict waits on two watches together (spec M5 §29): yours, on the items below, and the lead's own officer's watch on one of the two passages through Claude Code opened on the repository, on the same terms as every other model.
 
@@ -13,7 +15,7 @@ Milestone 5c claims (spec M5 §21): *there is somewhere to go and someone there:
 3. **The tide, the ground and the anchor.** The world's tide from three constituents at eleven gauges with the streams by area; the captain's from his epitome and Moore's rule; the lead reads the one and the pilot speaks the other. Touching the ground is an event with consequences; the anchor is let go, veered, hove short and weighed as Luce has it, and she rides to the tide.
 4. **Other sail.** A dozen ships at far detail in each scenario, sighted at the horizon the rig's height gives, made out as they near, chased; the captain's chart draws each by bearing and estimate and never by the truth.
 5. **The longitude.** A chronometer by the captain's charge and the time sight; the lunar on a night the moon allows, drawn and not computed; the amplitude at sunrise for the variation.
-6. **The officer of the watch.** [at the cut: 37's words] A model seated with authority over sail handling and no more, under the captain's night orders, with its own standing orders by rank, a handover note, and the welfare contract extended to a station whose orders change the world.
+6. **The officer of the watch.** A model takes the place of one of the ship's own officers (the first lieutenant on the frigate, the mate on the schooner and the cutter) and holds the deck from your word: orders within a domain that is data on the station (sail handling, the yards, the lines, the lead and the log, the lookout; not the course, a manoeuvre, the anchor, all hands or the port unless you allow a named thing), standing orders in his own rank with yours standing over his, a stand-by that must name an event or a bell while your book holds the deck, a handover note, a second seating once, and the welfare contract extended to a station whose orders change the world: contrary orders within a watch bring the nudge, then the pause with you asked. The consent brief changed for it, so every model with a yes on record is asked again, and a fitness drill follows a yes before the station.
 
 ## What you need
 
@@ -25,16 +27,16 @@ Python 3.11 or newer (`py`), the gate zip extracted to a fresh folder, Claude De
 py -m pip install -e ".[dev,server,agents]"
 py -m pytest -n 4
 ```
-*The fast tier, two to three minutes: ends `N passed` with a line saying how many slow tests were left out [at the cut: N].*
+*The fast tier, three to six minutes: ends `2471 passed` and a line saying 244 slow tests were left out.*
 
 ```
 py -m pytest -n 4 --slow
 ```
-*The whole suite, about twenty minutes on four workers: ends `[at the cut] passed, 7 xfailed`; the seven are your rulings on truths 3, 11, 18, 24, 26, 28 and 31, unchanged since milestone 3b.*
+*The whole suite, about twenty minutes on four workers: ends `2708 passed, 7 xfailed`; the seven are your rulings on truths 3, 11, 18, 24, 26, 28 and 31, unchanged since milestone 3b.*
 
 ## The passages
 
-**The merchant passage** (`data/scenarios/merchant-passage.yaml`, seed 7; its book `merchant-passage.orders`): the schooner *Sherbourne*'s sister *Betsey*... [at the cut: the scenario's own words]. At seed 7 under her book: anchored in Carrick Road at the start, forty tons of tin bought at £120 and aboard by the lighter at 08:57, under way on the ebb at 09:26, the Falmouth pilot off at 10:07, a sail off the Lizard at 12:49 hailed and not made out, Ushant's light at night, the Brest pilot aboard in the Iroise at 06:26 with a letter, anchored in Bertheaume road at 07:47, the Goulet taken on the flood by the pass north of the Mingan with the lead and bearings every five minutes, anchored in the Bay at 13:05, the tin sold at 15:10 for £10,800. No grounding. 36 hours.
+**The merchant passage** (`data/scenarios/merchant-passage.yaml`, seed 7; its book `merchant-passage.orders`): the topsail schooner from Falmouth for Brest with a cargo of tin, no chronometer, a master who can work a lunar, a dozen other sail on the sea. At seed 7 under her book: anchored in Carrick Road at the start, forty tons of tin bought at £120 and aboard by the lighter at 08:57, under way on the ebb at 09:26, the Falmouth pilot off at 10:07, a sail off the Lizard at 12:49 hailed and not made out, Ushant's light at night, the Brest pilot aboard in the Iroise at 06:26 with a letter, anchored in Bertheaume road at 07:47, the Goulet taken on the flood by the pass north of the Mingan with the lead and bearings every five minutes, anchored in the Bay at 13:05, the tin sold at 15:10 for £10,800. No grounding. 36 hours.
 
 **The naval cruise** (`data/scenarios/naval-cruise.yaml`, seed 7; its book `naval-cruise.orders`): the frigate *Amazon* from Cawsand Bay, thirty days' provisions from the King's yard, the Plymouth pilot aboard at 08:12 and off at 09:07, the port admiral's cutter within hail at 10:57 with a letter read on the quarterdeck a minute after, the station off Ushant kept under standing orders through the night with eight wears, the stranger *Palinure* sighted at 07:16 on the second morning right ahead four leagues, the chase given at the glass and kept by her bearing, made out, weathered, run down before the wind and spoken at 11:42 under no colours; the station shaped for again. 48 hours.
 
@@ -50,7 +52,7 @@ The account against the truth, at seed 7 (the author's view; the game never show
 
 - [ ] **2. The naval cruise in the browser**, the same way with `naval-cruise.yaml`. *The yard's thirty days of provisions; the port admiral's letter by the cutter, through the messenger and the door, read where the captain is; the station kept through the night; "Sail ho! A sail right ahead, bearing SW, distant four leagues" on the second morning; `give chase` (or the book's) and the chase by her bearing; "within hail: a stranger under no colours".* Try `world order: a brig at 48 50 N 5 16 W` at the prompt: *refused in words, "That is an order to the world, not to the ship".*
 
-- [ ] **3. The lunar and the amplitude.** [at the cut: a scenario and a night the moon allows, with the refusal's words by day and the result an hour later; the sunrise amplitude's line and the variation it finds.]
+- [ ] **3. The longitude.** On the naval cruise, which carries a chronometer: in the forenoon `take a sight for the longitude` *("longitude by chronometer ...", the days since rating and the master's trust)*; `the chronometer`; at sunrise `observe an amplitude` *("variation of the compass ... by amplitude", and the master allows it from then on)*. The moon is full on 12 June, so `take a lunar of the sun` by day is refused in the registry's words (say which words you got), and `the moon` says whether a star is in distance at night: if it is, `take a lunar of Antares` (or the star it names) *(the master and two hands occupied a quarter of an hour, the result an hour later within a degree, and "he finds no fault in the chronometer" or what he finds)*.
 
 - [ ] **4. The tide at Falmouth.** At anchor in Carrick Road: `the tide by the almanac` *("high water at Falmouth about ... by the epitome")*; `ask the pilot when the tide serves` *(his own figure, to the quarter hour, within an hour of the epitome's)*; `heave the lead` on the hour through a tide *(the depth rising and falling under the chart's figure)*; "The cable slack at the turn; she swings to the ebb" in the log at the slack.
 
@@ -64,15 +66,19 @@ The account against the truth, at seed 7 (the author's view; the game never show
 
 - [ ] **9. The lookout and the chart in the captain's hands.** `the dangers` *(by account, nearest first)*; `shape a course for Falmouth` from the south *("the line passes the Manacles within a mile")*; `the strangers` *(each by bearing and estimate)*; the chart's sightings drawn by estimate with a doubt bar.
 
-- [ ] **10. The officer's watch, Opus 5.5 through Claude Desktop.** [at the cut: 37's commands and the form.] *The consent step runs again first (the brief's hash moved); the fitness drill; `you have the deck` with the captain's night orders; the officer's orders in the log under its mark within its domain, one outside refused in words; a standing order by the officer, and one of the captain's standing over it; `hand over the deck` with the handover note.* A watch of the merchant passage or the cruise, on the officer's form in `docs/playtests/README.md`.
+- [ ] **10. The officer's watch, Opus 5.5 through Claude Desktop.** `docs/agents/Harness.md` section 13: add `"--station", "officer"` to the bridge's `args` in Claude Desktop's configuration, restart it, start the game with `--scenario data/scenarios/naval-cruise.yaml` (or the merchant passage), and open the chat with the prompt `take_the_watch`. *The consent step runs again first (the brief's hash moved); the fitness drill; `you have the deck` with the captain's night orders; the officer's orders in the log under its mark within its domain, one outside refused in words; a standing order by the officer, and one of the captain's standing over it; `hand over the deck` with the handover note.* A watch of the merchant passage or the cruise, on the officer's form in `docs/playtests/README.md`.
 
-- [ ] **11. The officer's watch, a local model on the cutter.** [at the cut: the local runner's command.] *The same, on a free passage in the cutter, after its own re-ask.*
+- [ ] **11. The officer's watch, a local model on the cutter.** The game with `data/ships/cutter.yaml` (a free passage, seed 7, off Falmouth), then `py -m freesail.agents.local --game http://localhost:8000 --endpoint http://127.0.0.1:8080 --seed 7 --station officer` (Ollama at its own port with `--model`); the officer is the mate. *The same, on a free passage in the cutter, after its own re-ask.*
 
 - [ ] **12. The truths of this gate.** `py -m pytest tests/test_known_truths.py -k "truth_6 or truth_7 or gate_5c" -n 4` *(truths 60 to 72 pass)*; `py -m pytest tests/test_officer.py tests/test_agents.py -n 4` *(the officer's cases on the fake)*.
 
 - [ ] **13. A scenario saved and loaded.** `save cruise.json` during the chase; `py -m freesail.ui.server --load cruise.json` *(from its checkpoint in a second or two; the chase goes on to the same words).*
 
-- [ ] **14. Rulings wanted.** [at the cut: from 37's report and the lead's review; expected: the officer's domain as drawn; the sample's size at the officer's station on a local model; the far-detail vessel's bound.]
+- [ ] **14. Rulings wanted.**
+  - **The officer's domain as drawn.** Sail handling, the yards, the lines, the lead and the log, the lookout, and his own standing orders; not the course, a manoeuvre, the anchor, all hands, the people or the port unless you allow a named thing in your words. Rule whether the line is where a captain of 1805 would draw it for a lieutenant with the deck (Falconer: never to change the course without the captain's directions, unless to avoid an immediate danger), and whether the "immediate danger" exception should be built as a standing allowance rather than your word.
+  - **The sample's size on a local model.** The officer's brief head is about 4,300 tokens and a glass's sample about 1,500 at its fullest (the people and the boats since 35); say whether the local model on the cutter kept the thread through a watch, and how its context stood.
+  - **A far-detail vessel's bound.** A ship at far detail keeps her plan between waypoints and does not take the ground; rule whether a leg that crosses the coast should be refused when the scenario loads, before any scenario is written that sails one along a shore.
+  - **The re-asks.** The consent brief changed for the officer's station; the game asks each model again at its next door. Say whether the sections the rule names (the opening, what an instance would see and do, leaving, being stopped, the journal) are the right ones to put the question again, and whether the drill was the right size.
 
 ## The report
 

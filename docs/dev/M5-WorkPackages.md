@@ -56,7 +56,7 @@ gate 5c:  wave 5  33b the chronometer, the moon, the lunar and the azimuth; the 
           wave 6  35 places, people, ports and nations (Falmouth, Plymouth, Brest); the pilot boarding from the cutter (Fable; landed 2026-10-02)
                   35b St Mary's and Roscoff as ports on 35's machinery, Roscoff's patch (Opus; landed 2026-10-02)
           wave 7  36 other sail, the world-order channel, the two scenarios (Fable; landed 2026-10-02)
-          wave 8  37 the officer of the watch; gate 5c cut at its merge so that the gate covers the officer's watch (owner, 2026-10-02); the lead's watch beside other models' (an Opus 5.5 watch, and a local model on the cutter: owner, 2026-10-01); the 5c verdict (Fable; launched 2026-10-02)
+          wave 8  37 the officer of the watch; gate 5c cut at its merge so that the gate covers the officer's watch (owner, 2026-10-02); the lead's watch beside other models' (an Opus 5.5 watch, and a local model on the cutter: owner, 2026-10-01); the 5c verdict (Fable; landed 2026-10-02; gate 5c cut at its merge)
 ```
 
 31 needs 30's wind (the sea reads its history). 32 needs nothing of 5a and may start
