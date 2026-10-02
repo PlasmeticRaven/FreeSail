@@ -1,0 +1,113 @@
+# Roscoff and the channel of the Isle of Bas as 1805 had them (spec M5 §10; C §3.3,
+# §5.2; package 35b). A period patch, hand-made and rasterised by tools/build_charts.py
+# at levels 2 and 3 (the harbour patch `roscoff` in the tool's recipe).
+#
+# The sheet. Bellin, 'Carte de l'entrée des rivières de Morlaix, de St Paul de Léon, et
+# Isle de Bas, avec les roches, basses, et isles', Petit Atlas Maritime (Paris, 1764),
+# t. V no. 51: David Rumsey Map Collection 6903.538, on the Internet Archive as
+# dr_carte-de-ientree-des-rivieres-de-morlaix-de-st-paul-de-leon-et-isle-de-ba-6903538,
+# read 2026-10-02 at full resolution (11,336 by 6,959 pixels) through the collection's
+# IIIF server; the image is CC BY-NC-SA 3.0 and is not committed (it stays in the build's
+# cache): the facts below are transcribed from it. The sheet is engraved with south at the
+# head and east to the left; its scale is "Echelle de dix huit cent toises" (1,800 toises
+# to 1,330 pixels, 2.64 metres a pixel); it has no legend for its soundings, which are
+# read as brasses (the Dépôt's brasse of five feet, BRASSE_M in the tool, the study's
+# unverified figure) at low water of spring tides (the Dépôt's practice as C §3.3 has it
+# for the later surveys; unverified for Bellin's own sheets).
+#
+# The georeference: a similarity fitted by least squares to the six control points below
+# (the sheet's pixel to the modern frame), scale 2.96 metres a pixel and the sheet turned
+# 173 degrees; the residuals 70 to 230 metres (the church 154, the chapel of St Pol 230,
+# the bourg's church 220, Perharidy 124, the island's west end 70, the Isle Verte 130),
+# which is a small plate's drawing and the size of the channel's narrows. So: the road and
+# the channel west of it, where the channel is wide, are patched at the sheet's depths;
+# the narrows by Roscoff, where the sheet has half a brasse and a georeference error is
+# the channel's width, are left to the modern grid (which agrees within a metre); the
+# entrances in open water (ten and fifteen brasses at the western, twelve at the Pierre
+# Blanche) are left to the modern grid, as the method has it, and their figures recorded
+# in the notes. The town and the Isle Verte, which the modern grid has as a metre of water
+# (GEBCO's fill where EMODnet has no land), are returned to the land as the sheet draws
+# them, and the harbour, which the modern grid has as water at the datum, dries as the
+# pilots say.
+#
+# The Pilote français (the north coast surveyed by Beautemps-Beaupré in 1837 and 1838,
+# later than the period) was not reached: Gallica answered 403 to every request from the
+# build network on 2026-10-02, and the Défense library refused it as before (C §7). The
+# patch rests on Bellin's sheet and the pilots' words (Faden 1793, La Barre 1825, Imray
+# 1874), as each patch says.
+
+region: channel-west
+name: roscoff
+sheet: "Bellin 1764, 'Carte de l'entrée des rivières de Morlaix, de St Paul de Léon, et Isle de Bas', Petit Atlas Maritime t. V no. 51 (David Rumsey 6903.538, Internet Archive dr_carte-de-ientree-des-rivieres-de-morlaix-de-st-paul-de-leon-et-isle-de-ba-6903538), read at full resolution; the Pilote français (1837-38 survey) not reached"
+source: "Faden 1793, 'Isle de Bas', pp. 45 to 46; La Barre 1825, 'Ile de Bass', pp. 39 to 40; Imray 1874, 'Roscoff', 'Ile de Bas', pp. 211 to 212"
+units: brasses
+datum: "low water of spring tides (the sheet has no legend for its soundings; read as the Dépôt's low water of spring tides, unverified for Bellin)"
+# Mean low water springs above the modern chart datum (the zéro hydrographique) at
+# Roscoff: 1.30 m, SHOM's Références Altimétriques Maritimes (BMVE 1.30, PMVE 8.90) as the
+# tide study quotes them (data/tides/constituents.yaml's head; T §1); read by the study
+# from the RAM's CSV and not by this package.
+datum_above_chart_datum_m: 1.3
+control_points:
+  - {name: "the church of Roscoff (Notre-Dame de Croaz-Batz)", lat_deg: 48.726494, lon_deg: -3.985795, note: "tower of the 1520s to 1570s, unmoved; the cross-hatched block in the sheet's town; the position the French encyclopaedia's, read 2026-10-02; residual 154 m"}
+  - {name: "the chapel of St Pol on the Isle of Bas (the sheet's N.D. de St Paul)", lat_deg: 48.741927, lon_deg: -3.993230, note: "the chapel of Sainte-Anne at the island's east end, taken as the sheet's St Pol's (judgement in the identification); the encyclopaedia's position; residual 230 m"}
+  - {name: "the church of the Isle of Bas (the sheet's N.D. de Bon Secours)", lat_deg: 48.745278, lon_deg: -4.009722, note: "the bourg's church on the south shore, the encyclopaedia's position for the commune; residual 220 m"}
+  - {name: "Pointe de Perharidy (the sheet's Pointe de Pergueridre)", lat_deg: 48.725726, lon_deg: -4.004929, note: "rock head, unmoved; the encyclopaedia's position; residual 124 m"}
+  - {name: "the west end of the Isle of Bas (the sheet's Pointe de l'Isle)", lat_deg: 48.7448, lon_deg: -4.0425, note: "rock head, unmoved; the modern grid's shore; residual 70 m"}
+  - {name: "the Isle Verte", lat_deg: 48.7309, lon_deg: -3.9867, note: "islet, unmoved; the modern grid's land; residual 130 m"}
+patches:
+  - name: "the road of the Isle of Bas, three brasses at low water"
+    kind: depth
+    depth: 3
+    polygon:
+      - [48.7370, -4.0205]
+      - [48.7370, -4.0115]
+      - [48.7343, -4.0115]
+      - [48.7343, -4.0205]
+    source: "Bellin 1764, the two soundings of 3 in the Chenal de Bas south of the island's middle (georeferenced to 48.7356, -4.0155 and 48.7377, -4.0168); Faden 1793, 'Isle de Bas', p. 46: over-against the great cove 'you may anchor in 4 fathoms at low water'; La Barre 1825, p. 40: 'from three to four fathoms of water' with sandy bottom"
+    note: "Three brasses at low water springs, 6.2 m below the chart's datum with the 1.3 m correction; Faden's four fathoms and La Barre's three to four are the same road a little deeper. The polygon is drawn where the modern channel is wide (five to nine metres at the datum), a little south of the second sounding, whose place lies within the georeference's error of the island's rocks."
+  - name: "the channel west of the road, six brasses"
+    kind: depth
+    depth: 6
+    polygon:
+      - [48.7372, -4.0300]
+      - [48.7372, -4.0205]
+      - [48.7345, -4.0205]
+      - [48.7345, -4.0300]
+    source: "Bellin 1764, the sounding of 6 in the Chenal de Bas off the Roche Croix (georeferenced to 48.7332, -4.0231)"
+    note: "Six brasses at low water springs, 11.0 m below the chart's datum. The polygon is the channel's deep core, eight to twelve metres in the modern grid, 150 m north of the sounding's georeferenced place (within the residuals): drawn where the sheet's sounding georeferences, it lay over the rocks on the main's side, which the grid has within two metres of the datum."
+  - name: "the harbour of Roscoff, which dries"
+    kind: drying
+    drying_height: 1
+    polygon:
+      - [48.7266, -3.9810]
+      - [48.7266, -3.9786]
+      - [48.7232, -3.9786]
+      - [48.7232, -3.9810]
+    source: "Bellin 1764, the basin east of the town of Roscou, stippled as the sand that dries; Imray 1874, 'Roscoff', p. 211: 'It is dry at low water'; Faden 1793, p. 45: 'a small harbour'"
+    note: "The drying height is judgement: a brasse above the low water of springs (2.9 m above the chart's datum), which leaves the harbour with water from about half flood for a vessel that takes the ground; no sheet or pilot gives the figure. The modern grid had the basin at the datum, always afloat."
+  - name: "the town of Roscoff on its point"
+    kind: land
+    height_m: 12
+    polygon:
+      - [48.7284, -3.9925]
+      - [48.7284, -3.9866]
+      - [48.7272, -3.9840]
+      - [48.7266, -3.9811]
+      - [48.7228, -3.9811]
+      - [48.7222, -3.9890]
+      - [48.7200, -3.9895]
+      - [48.7200, -3.9925]
+    source: "Bellin 1764, the town of Roscou hatched on its point between the channel and the harbour; the modern town about the church (the control points)"
+    note: "The modern grid has the town as a metre of water (GEBCO's -1 m under the cells where EMODnet has no land); the town is returned to the land at twelve metres, above the highest springs (judgement). The outline is the grid's hole, which is the town's."
+  - name: "the Isle Verte"
+    kind: land
+    height_m: 10
+    polygon:
+      - [48.7316, -3.9881]
+      - [48.7316, -3.9855]
+      - [48.7302, -3.9855]
+      - [48.7302, -3.9881]
+    source: "Bellin 1764, the Isle Verte off the town, an islet with its rocks"
+    note: "Returned to the land for the same reason as the town (the grid's hole); its height judgement, an islet above high water."
+notes:
+  - "Read from the sheet and not patched (the modern grid's figure beside it): half a brasse twice in the narrows by Roscoff (the grid 0 to 1 m); 2 and 1 east of them toward the Pierre Blanche (1 to 3 m); 10 and 15 at the western entrance (12 to 20 m); 12 at the Pierre Blanche, the eastern entrance (15 m); 14, 7, 7 and 6 in the bay east of Roscoff toward Morlaix; 20 off the Basse Hastan, 18 off the Taureau and 12 off the Rocueur north of the island."

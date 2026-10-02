@@ -89,6 +89,21 @@ items:
       Verified. The French encyclopaedia's 'Phare du Créac'h' (read 2026-09-30): built in
       1863 on Ushant. The Stiff's date, 1699 (Vauban's two towers), is from the same source's
       'Phare du Stiff' page; Saint-Mathieu's tower of 1835 from 'Phare de Saint-Mathieu'.
+  - item: "Roscoff's sheets (package 35b, checked 2026-10-02): Bellin's Petit Atlas Maritime sheet of 1764 and the Pilote français"
+    found: >-
+      Bellin's 'Carte de l'entrée des rivières de Morlaix, de St Paul de Léon, et Isle de
+      Bas' (Petit Atlas Maritime t. V no. 51; Rumsey 6903.538, the Internet Archive's
+      dr_carte-de-ientree-des-rivieres-de-morlaix-de-st-paul-de-leon-et-isle-de-ba-6903538)
+      was read at full resolution (11,336 by 6,959 pixels) through the Rumsey collection's
+      IIIF server, the crops cached outside the repository and none committed (CC BY-NC-SA
+      3.0). Its soundings carry no legend, so the brasse stays the study's unverified figure
+      (BRASSE_M) and the datum the Dépôt's low water of springs, unverified for Bellin; the
+      sheet was georeferenced by six control points with residuals of 70 to 230 metres
+      (data/charts/overrides/channel-west/roscoff.yaml). The Pilote français was not reached:
+      gallica.bnf.fr answered 403 ("Access Interdit") to every request and the Défense library
+      reset the connection, as before; its north coast (surveyed 1837 to 1838) is later than
+      the period in any case. Roscoff's correction to the chart's datum, 1.30 m, is SHOM's
+      BMVE as the tide study quotes the RAM (data/tides/constituents.yaml), not read here.
 found_on_the_way:
   - >-
     The Internet Archive item the study calls Imray 1848 (sailingdirection00unse_0) is the
@@ -112,3 +127,9 @@ found_on_the_way:
     Histolitt: the data.gouv.fr record found is a regional republication whose licence
     field reads "notspecified"; SHOM's own diffusion is behind a form. The French shore in
     the tiles and the coast is EMODnet's.
+  - >-
+    GEBCO's fill under the land EMODnet leaves empty is not always land: at Roscoff the
+    town and the Isle Verte read a metre of water (GEBCO's -1 m), so that the town was sea
+    in the tiles and missing from the coast (package 35b; the Roscoff override returns
+    both to the land). The same fill may stand elsewhere on the coast where EMODnet has no
+    land and GEBCO's fifteen-second cell straddles the shore; not searched for here.

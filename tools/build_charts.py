@@ -176,6 +176,8 @@ REGIONS: dict[str, dict[str, Any]] = {
             "plymouth-cawsand": {"south": 50.28, "north": 50.42, "west": -4.28, "east": -4.05},
             "scilly": {"south": 49.85, "north": 49.99, "west": -6.42, "east": -6.22},
             "brest-iroise": {"south": 48.25, "north": 48.42, "west": -4.85, "east": -4.40},
+            # package 35b: Roscoff's harbour and the channel of the Isle of Bas
+            "roscoff": {"south": 48.71, "north": 48.76, "west": -4.07, "east": -3.95},
         },
     },
 }

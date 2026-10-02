@@ -1,0 +1,136 @@
+# FreeSail: Roscoff as a port (spec M5 §23; package 35b). The same form as falmouth.yaml,
+# on package 35's machinery (freesail/world/ports.py); the harbour and the channel of the
+# Isle of Bas are the period patch data/charts/overrides/channel-west/roscoff.yaml, from
+# Bellin's sheet of 1764, and the marks are the features file's.
+#
+# Sources. Faden 1793, Le Petit Neptune Français, 'Isle de Bas', pp. 45 to 46: "The Isle
+# de Bas ... is separated from the land by a narrow channel, at the eastern end of which
+# lies Roscou, or Roscof; it is a small harbour, which some years ago was made, by the
+# French government, a kind of free port for the exportation of rum brought from their
+# colonies, which was there deposited, and sold to our smugglers. You may enter Roscou by
+# the two ends of the Channel ... but the shore of this isle is encumbered with a
+# multitude of rocks above and under water"; the eastern entrance "at high water you have
+# 7 or 8 fathoms, but at low tide there is no passing at all ... you ought always to take
+# a pilot"; "the western passage is easier than the eastern": the Lavandière kept close
+# aboard to starboard and the Couillon under water to larboard, a man on the mizzen yard
+# for the two rocks near the shore, and "about the middle of the isle you see a great
+# cove, with several houses on it, over-against which you may anchor in 4 fathoms at low
+# water"; "the tides here are W 1/4 S and E 1/4 N"; at the Isle of Bas a W by S moon makes
+# high water (p. 48). La Barre 1825, The French Coasting Pilot, 'Ile de Bass' (pp. 39 to
+# 40 by the OCR's running heads, partly illegible): "Roscoff Harbour or Toum, a place
+# well known to the English smugglers"; the island road "in from three to four fathoms,
+# with sandy bottom". Norie 1839, p. 148: "frequented only by smugglers and fishermen";
+# the tide "until a quarter past five o'clock" at full and change. Imray 1874, pp. 211 to
+# 212: Roscoff "is dry at low water, and the entrances are likewise encumbered with rocks
+# and shoals"; at the Isle de Bas high water at full and change 4h 49m, springs rising 23
+# feet. Bellin 1764, 'Carte de l'entrée des rivières de Morlaix, de St Paul de Léon, et
+# Isle de Bas' (Petit Atlas Maritime, t. V no. 51; Rumsey 6903.538, read 2026-10-02 at
+# full resolution): the town and its harbour, the Chenal de Bas and its soundings, the
+# Lavandières, the Isle Verte, the churches of the island.
+#
+# The stance. Roscoff is French (data/nations.yaml): to a King's ship in June 1805 it is
+# hostile by the nations table, Britain and France at war, so no pilot comes off to her
+# and a boat sent in would be taken; to a neutral it is open to trade and the pilot comes
+# off as at Brest. The brief asked for Roscoff "closed to Britain" with the cutter refused
+# in the pilot's words; the table gives hostile, and package 35 made a closure never
+# outrank a war (tests/test_nations.py), so a port file cannot say closed where the table
+# says war: package 35b reports it for the lead's decision and the file claims nothing
+# the machinery does not do. The English smugglers whom Faden's free port served came in
+# under false colours or by licence, and that run waits for milestone 7's colours: noted
+# here, not built.
+#
+# The pilot comes off in the town's boat (`pilot.vessel`), which package 35's machinery
+# does not yet read; until it does, the cutter stands for her at far detail (the fault
+# reported in 35b; the lead decides). The prices are the trade the port lived by, spirits,
+# tea and tobacco priced for the Cornish run: JUDGEMENT throughout (no page in
+# docs/references/ gives a Roscoff price current), beside FROM MEMORY figures for the
+# common goods as Brest's file has them; sterling at the exchange, as Brest's.
+
+id: roscoff
+name: Roscoff
+nation: france
+source: "Faden 1793 pp. 45-46, 48; La Barre 1825 pp. 39-40; Norie 1839 p. 148; Imray 1874 pp. 211-212; Bellin 1764, Petit Atlas Maritime t. V no. 51"
+
+# The outer road is the western entrance of the channel of Bas, the easier passage
+# (Faden), where a ship from the sea brings up to wait for the pilot and the tide and
+# where he leaves her outward bound; the anchorage is the road under the island, over
+# against Faden's cove; the mooring is the harbour of Roscoff, which dries, for a vessel
+# that can take the ground.
+outer_road:
+  feature: batz-western-entrance
+  name: the western entrance of the channel of Bas
+anchorage:
+  feature: batz-road
+  name: the road of the Isle of Bas
+mooring:
+  name: the harbour of Roscoff
+  lat_deg: 48.7249       # the basin east of the town, as Bellin draws it, georeferenced (the
+  lon_deg: -3.9798       # override's control points); it dries (Imray p. 211)
+  depth_fathoms: -1.6    # dries: the patch's drying height, 2.9 m (about ten feet) above the datum, a depth below nothing ("dry at the datum")
+  bottom: sand and mud
+  deep_draught_ft: 9     # judgement: the harbour is for vessels that take the ground; a ship drawing more lies in the road
+shore:
+  name: the quay at Roscoff
+  lat_deg: 48.7258       # the town's quay on the harbour, under the church
+  lon_deg: -3.9833
+
+pilot:
+  station: batz-western-entrance
+  cruising_nm: 6                 # judgement: the Roscoff and Batz pilots met ships off the western end of the island
+  comes_off_by_night: false      # judgement: no pilot's light on the Isle of Bas in 1805 (the lighthouse came in 1836)
+  cutter: data/ships/cutter.yaml # the stand-in at far detail until the machinery reads `vessel` (the head)
+  vessel:                        # what comes off, for the machinery that reads it (not yet: the fault reported in 35b)
+    kind: a boat
+    name: the Roscoff pilots' boat
+    under: a lugsail and oars
+    note: "the town's boat, a chaloupe under lugs (judgement; Faden's pilot at the eastern entrance is the town's)"
+  names: [Le Bihan, Pouliquen, Créac'h, Le Saout, Kerbrat, Moal, Prigent, Cabioch, Le Roux, Corre]   # Breton names of the Léon: judgement
+  skill: 0.9
+  fee_pounds: 3                  # judgement, in sterling for the one account; unverified
+  cast: larboard                 # from the road the head paying off to the westward for the western passage (judgement)
+  course_out_deg: 270            # west along the channel and out between the Lavandière and the Couillon
+  words:
+    channel: "The western passage is the easier. Come to the end of the isle within cannon-shot, where a single rock stands about a third of the way to the main: that is the Lavandière. Steer close by it, as near as an oar's length, keeping it on the starboard side and the Couillon, a rock under water twice a ship's length from it, on the larboard. Within them haul a little toward the island and put a man on the mizzen yard for the two rocks near the shore; the water is very clear here. The eastern passage by Roscoff is for high water only and with a pilot; at low tide there is no passing at all."
+    marks: "The church of Roscoff with its lantern belfry stands over the harbour at the channel's eastern end; the Isle Verte lies off the town. The Lavandière at the western entrance is your mark going in, kept close aboard to starboard; about the middle of the isle you will see a great cove with several houses on it."
+    anchorage: "Anchor over against the cove in the middle of the isle, in three or four fathoms at low water on sand, sheltered from the sea by the island. The harbour of Roscoff dries at low water and is for vessels that take the ground; a ship lies in the road."
+    tide: "The tide sets west a quarter south and east a quarter north through the channel; it is high water at the Isle of Bas about five o'clock at full and change, and the springs rise three and twenty feet. Take the western passage on the flood."
+
+tide:
+  establishment: Morlaix         # the epitome's nearest row (data/tides/establishments.yaml has no Roscoff; Morlaix 5h 15m, Norie's 'a quarter past five' for Roscou)
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds               # sterling at the exchange, as Brest's (a livre a tenth of a pound, from memory)
+  # price: pounds a ton at the quay. The spirits, the tea and the tobacco are the
+  # smugglers' trade, priced for the Cornish run by JUDGEMENT (the head): cheap here, for a
+  # run to a coast where the duty made them dear; the rest FROM MEMORY as at Brest.
+  goods:
+    - {good: brandy, price: 100, origin: france, note: "French brandy for the run, a little under Brest's (judgement)"}
+    - {good: geneva, price: 70, origin: batavian-republic, note: "Dutch gin brought round for the English trade (judgement)"}
+    - {good: rum, price: 80, origin: france, note: "colonial rum, the free port's trade as Faden has it (pp. 45-46); the price judgement"}
+    - {good: tea, price: 170, origin: null, note: "tea for the run at about eighteen pence the pound, two thousand two hundred and forty pounds to the ton (judgement); no origin the war rule reads"}
+    - {good: tobacco, price: 60, origin: null, note: "leaf tobacco for the run at about sixpence the pound (judgement)"}
+    - {good: wine, price: 38, origin: france, season: {12: 1.1}, note: "Bordeaux wine landed from the coasters; from memory, a little over Brest's"}
+    - {good: salt, price: 12, origin: france, note: "Breton salt; from memory as at Brest"}
+    - {good: canvas, price: 42, origin: france, note: "Breton sailcloth; from memory as at Brest"}
+    - {good: onions, price: 6, origin: france, season: {8: 0.8, 9: 0.8, 10: 0.9, 3: 1.3, 4: 1.3}, note: "the Léon's onions, cheap after the harvest (judgement)"}
+    - {good: tin, price: 170, origin: britain, note: "English tin, run the other way; from memory as at Brest"}
+    - {good: salt beef, price: 70, origin: france, note: "from memory, as at Brest"}
+
+dockyard:
+  kind: chandlers                # no yard: the town's shipwrights and chandlers at a price
+  items:
+    - {item: topmast, hours: 10, pounds: 42, note: "a spar from the town's shipwrights, who built the smugglers' boats (judgement)"}
+    - {item: yard, hours: 8, pounds: 26}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05, note: "Breton hemp as at Brest (judgement)"}
+    - {item: water, hours_per_ton: 0.12, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: the conscription of the Inscription maritime takes the town's seamen for the fleet
+  able: {hands: 2, pounds: 2, delay_h: 24}
+  ordinary: {hands: 4, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 8, pounds: 1, delay_h: 12}
+
+closed_to: []                    # the table's war with Britain makes the stance; nothing closed beside it

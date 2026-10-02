@@ -2224,6 +2224,78 @@ features:
     source: "White 1835, 'Coast of England', p. 13 (the Isle Bas); position from the modern chart"
     says: "Roscoff, the smugglers' port behind the Isle of Bas."
 
+  # The channel of the Isle of Bas and the harbour of Roscoff (package 35b): the marks the
+  # patch names (data/charts/overrides/channel-west/roscoff.yaml), read from Bellin's sheet
+  # of 1764 (Petit Atlas Maritime t. V no. 51) georeferenced by them, and Faden's words.
+  # Positions by the head's rule: the sheet's place, georeferenced, moved to the modern
+  # grid's land or shoal head within 400 m where there is one (`fix` says which).
+
+  - id: roscoff-church
+    kind: church
+    name: the church of Roscoff
+    modern: Notre-Dame de Croaz-Batz, Roscoff
+    lat_deg: 48.726494
+    lon_deg: -3.985795
+    height_m: 40
+    source: "Bellin 1764, Petit Atlas Maritime t. V no. 51 (the church in the town of Roscou); the French encyclopaedia's 'Église Notre-Dame-de-Croaz-Batz de Roscoff' for the position, read 2026-10-02; the height judgement (the belfry over the roofs)"
+    says: "The church of Roscoff with its tall belfry of open lanterns, standing over the harbour at the eastern end of the channel of Bas."
+
+  - id: ile-verte-roscoff
+    kind: island
+    name: the Isle Verte
+    modern: Île Verte (Roscoff)
+    lat_deg: 48.7309
+    lon_deg: -3.9867
+    height_m: 10
+    fix: "Bellin's Isle Verte georeferenced to 48.7315, -3.9842; the modern grid's land 190 m west-south-west of it"
+    source: "Bellin 1764, Petit Atlas Maritime t. V no. 51 (I. Verte)"
+    says: "The Isle Verte, an islet with its rocks off the town of Roscoff, on the south side of the channel's eastern narrows."
+
+  - id: perharidy-point
+    kind: headland
+    name: Pointe de Pergueridre
+    modern: Pointe de Perharidy
+    lat_deg: 48.725726
+    lon_deg: -4.004929
+    height_m: 10
+    source: "Bellin 1764, Petit Atlas Maritime t. V no. 51 (Pointe de Pergueridre); the French encyclopaedia's 'Pointe de Perharidy' for the position, read 2026-10-02"
+    says: "Pointe de Pergueridre, the low point west of Roscoff on the main side of the channel of Bas."
+
+  - id: la-lavandiere
+    kind: rock
+    name: the Lavandière
+    modern: La Lavandière (western entrance of the Île de Batz channel)
+    lat_deg: 48.7327
+    lon_deg: -4.0453
+    height_m: 2
+    fix: "Bellin's Petite and Grande Lavandière georeferenced to 48.7321, -4.0388 and 48.7314, -4.0431; the modern grid's shoal head 3.8 m under the datum at 48.7327, -4.0453, within 400 m (the grid smooths a rock Faden's pilot pushed off with an oar); the height above the datum judgement on Faden's 'a single rock'"
+    source: "Faden 1793, 'Isle de Bas', p. 46: a single rock about a third of the distance between the end of the isle and the main land; 'you must steer close by it, and push it with a long oar; it is very safe'; at twice a ship's length from it is another rock under water, called Le Couillon; pass between them with the Lavandière on the starboard side and the Couillon on the larboard; Bellin 1764 (Petite and Grande Lavandière)"
+    says: "The Lavandière, a single rock at the western entrance of the channel of Bas, a third of the way from the island to the main: steer close by it and keep it to starboard going in, for the Couillon lies under water twice a ship's length from it on the other hand."
+
+  - id: batz-western-entrance
+    kind: anchorage
+    name: the western entrance of the channel of Bas
+    modern: the western approach to the Île de Batz channel
+    lat_deg: 48.7360
+    lon_deg: -4.0480
+    height_m: 0
+    depth_fathoms: 9
+    bottom: "sand and rock"
+    source: "Faden 1793, 'Isle de Bas', p. 46: 'the western passage is easier than the eastern'; Bellin 1764, the soundings of 10 and 15 brasses at the western entrance (nine and thirteen fathoms)"
+    says: "The western entrance of the channel of Bas, the easier passage to Roscoff, in nine fathoms and more off the end of the island; ships wait here for a pilot and the flood."
+
+  - id: batz-road
+    kind: anchorage
+    name: the road of the Isle of Bas
+    modern: the Île de Batz channel off Porz Kernoc
+    lat_deg: 48.7356
+    lon_deg: -4.0160
+    height_m: 0
+    depth_fathoms: 3
+    bottom: "sand"
+    source: "Faden 1793, 'Isle de Bas', p. 46: 'about the middle of the isle you see a great cove, with several houses on it, over-against which you may anchor in 4 fathoms at low water'; La Barre 1825, 'Ile de Bass', p. 40: three to four fathoms with sandy bottom; Bellin 1764, the soundings of 3 brasses in the channel south of the island's middle"
+    says: "The road of the Isle of Bas, over against the great cove with its houses in the middle of the island: three or four fathoms at low water on sand, the island between it and the sea."
+
   - id: les-triagoz
     kind: rock
     name: the Triagons
