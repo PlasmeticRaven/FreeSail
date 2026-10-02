@@ -125,6 +125,12 @@ NEAR_TURN_DEG_S = 1.0
 # at; between them linear (judgement: the truths' polars are read every ten degrees).
 POLAR_ANGLES_DEG = tuple(range(40, 181, 10))
 POLAR_WINDS_KN = (8.0, 15.0, 25.0)
+# Beating for a mark she holds her tack until she can lay the mark, and goes about when
+# the mark has drawn to the other bow by this part of her beating angle (judgement: a
+# pilot cutter beating up to a ship under way must go about as the ship crosses her,
+# which truth 70's Brest cutter did not, and held her tack while the schooner passed to
+# windward and away).
+BEAT_TACK_FRACTION = 0.5
 # Ships of one class sail differently by their trim and their age: a dull sailer makes
 # this part of her file's polar at least, a smart one all of it, drawn once from the
 # `ships` stream (judgement).
@@ -264,6 +270,20 @@ class Polar:
 
     def _at_angle(self, row: tuple[float, ...], off: float) -> float:
         return _interp(self.angles_deg, row, off)
+
+    def beat_deg(self, wind_kn: float) -> float:
+        """The angle off the wind she beats at: the polar's best to windward, the speed
+        times the cosine of the angle greatest (a cutter with a knot and a half of way
+        at the closest angle makes more to windward a point and a half freer; truth 70's
+        Brest pilot found it, beating out of the Goulet at a knot and a half)."""
+        best, best_vmg = float(self.closest_deg), -1.0
+        for a in self.angles_deg:
+            if a >= 90:
+                break
+            vmg = self.speed_kn(float(a), wind_kn) * math.cos(math.radians(a))
+            if vmg > best_vmg:
+                best, best_vmg = float(a), vmg
+        return best
 
 
 def _interp(xs: Any, ys: Any, x: float) -> float:
@@ -469,19 +489,56 @@ class Vessel:
             kn *= REEFED_FACTOR
         return max(VESSEL_MIN_SPEED_KN, kn) if off >= self.polar.closest_deg else kn
 
-    def _course_for(self, bearing_deg: float, wind_from_deg: float) -> float:
-        """The course she steers for a mark: the bearing when she can lay it, else
-        close-hauled on the tack that points nearer, held until she can lay it."""
+    def _intercept(self, world: Any, target: Position) -> Position:
+        """Where to steer for a ship under way: her position run on at her way over the
+        ground for the time it takes to get there at this vessel's own pace (the world's
+        own boat knows the world's truth; two passes of the sum are enough). Found on the
+        way: a pilot cutter steering for where the ship was, beating, fell astern of a
+        schooner crossing her at four knots and never came up with her (truth 70)."""
+        east, north = _ship_velocity(world)
+        if abs(east) + abs(north) < 0.05:
+            return target
+        own = max(units.knots_to_ms(max(self.speed_kn, VESSEL_MIN_SPEED_KN)), 0.25)
+        # the time to the meeting: |r + v t| = own t, r the ship's offset from here and v
+        # her way; the least positive root, else (she cannot be caught) the ship herself
+        bearing, distance = bearing_and_distance(self.position, target)
+        rx = distance * math.sin(math.radians(bearing))
+        ry = distance * math.cos(math.radians(bearing))
+        a = east * east + north * north - own * own
+        b = 2.0 * (rx * east + ry * north)
+        c = rx * rx + ry * ry
+        roots = []
+        if abs(a) < 1e-9:
+            if abs(b) > 1e-9:
+                roots.append(-c / b)
+        else:
+            disc = b * b - 4.0 * a * c
+            if disc >= 0.0:
+                sq = math.sqrt(disc)
+                roots.extend(((-b - sq) / (2.0 * a), (-b + sq) / (2.0 * a)))
+        times = [t for t in roots if t > 0.0]
+        if not times:
+            return target
+        t = min(min(times), 3 * 3600.0)  # three hours at most
+        return target.advanced(east * t, north * t)
+
+    def _course_for(self, bearing_deg: float, wind_from_deg: float, wind_kn: float) -> float:
+        """The course she steers for a mark: the bearing when she can lay it at her
+        beating angle or freer, else by the wind at that angle on the tack that points
+        nearer, held until she can lay it."""
         if self.pace_override_kn is not None:
             return bearing_deg  # a boat pulls straight for her mark
-        closest = self.polar.closest_deg
+        beat = self.polar.beat_deg(wind_kn)
         theta = units.rad_to_deg(units.wrap_pi(math.radians(bearing_deg - wind_from_deg)))
-        if abs(theta) >= closest:
+        if abs(theta) >= beat:
             self.tack = 0.0
             return bearing_deg
         if self.tack == 0.0:
             self.tack = 1.0 if theta >= 0.0 else -1.0
-        return (wind_from_deg + self.tack * closest) % 360.0
+        elif theta * self.tack < 0.0 and abs(theta) > beat * BEAT_TACK_FRACTION:
+            # the mark has drawn to the other bow (a ship under way passing her): about
+            self.tack = -self.tack
+        return (wind_from_deg + self.tack * beat) % 360.0
 
     def tick(self, world: Any, dt: float) -> None:
         """Move along the plan for `dt` seconds, by the wind at her and the tide."""
@@ -508,6 +565,7 @@ class Vessel:
             if target is None:
                 self.plan.pop(0)
                 return
+            target = self._intercept(world, target)
             # she runs in to a little under the hailing distance asked, so that a ship
             # under way is caught and not followed for ever at exactly that distance
             arrive_m = (float(leg[1]) if len(leg) > 1 else units.CABLE * 2.0) * ARRIVE_FRACTION
@@ -523,7 +581,7 @@ class Vessel:
             self.speed_kn = 0.0
             self._drift(world, (wind_from + 180.0) % 360.0, units.knots_to_ms(LYING_TO_KN), dt)
             return
-        course = self._course_for(bearing, wind_from)
+        course = self._course_for(bearing, wind_from, wind_kn)
         if self.detail == "near":
             # the keep-course captain at near detail: her head swings at a rate
             swing = units.rad_to_deg(units.wrap_pi(math.radians(course - self.heading_deg)))
@@ -982,6 +1040,24 @@ class Vessels:
 
     def to_dict(self) -> list[dict[str, Any]]:
         return [v.to_dict() for v in self.vessels]
+
+
+def _ship_velocity(world: Any) -> tuple[float, float]:
+    """The player's ship's way over the ground, metres a second east and north (the
+    truth, for the world's own vessels); nothing for a point ship or at anchor."""
+    ship = world.ship
+    dyn = getattr(ship, "dyn", None)
+    if dyn is None or getattr(world, "at_anchor", False):
+        return 0.0, 0.0
+    try:
+        from freesail.physics.integrate import water_velocity
+
+        wx, wy = water_velocity(ship)
+    except Exception:  # a ship without the physics' water: her way alone
+        wx, wy = 0.0, 0.0
+    ex, ey = units.heading_vector(float(dyn.heading))
+    u, v = float(getattr(dyn, "u", 0.0)), float(getattr(dyn, "v", 0.0))
+    return u * ex + v * ey + wx, u * ey - v * ex + wy
 
 
 def _head(words: str) -> str:

@@ -163,9 +163,10 @@ def test_she_moves_at_the_roll_ups_cadence_by_the_wind_and_the_tide_and_beats_wh
     # a mark dead to windward (NW): she beats, close-hauled on one tack, and holds it
     beat = put(w, "schooner", 90.0, 10.0, "bound for 50 00 N 6 00 W")
     w.run(600)
-    wind_from, _ = beat._wind_at(w)
+    wind_from, wind_ms = beat._wind_at(w)
     off = abs(units.rad_to_deg(units.wrap_pi(math.radians(beat.heading_deg - wind_from))))
-    assert abs(off - beat.polar.closest_deg) < 0.5 and beat.tack != 0.0
+    assert abs(off - beat.polar.beat_deg(units.ms_to_knots(wind_ms))) < 0.5 and beat.tack != 0.0
+    assert beat.polar.beat_deg(15.0) >= beat.polar.closest_deg
     assert beat.speed_kn > 1.0
 
 

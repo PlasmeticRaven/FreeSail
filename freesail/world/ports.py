@@ -627,7 +627,11 @@ class Ports:
             "id": f"{port.id}-pilot-{port.pilot.craft}-{self._counter}",
             "ship_file": port.pilot.cutter_file,
             "nation": port.nation,
-            "position": port.shore.position,
+            # from the pilots' station, the outer road, where the cutter cruises for ships
+            # (package 36: she sails by her own polar now, and from the shore of Brest she
+            # beat out through the Goulet six hours for a ship in the Iroise; the
+            # cruising ground is measured from the same road)
+            "position": port.outer_road.position,
             "colours": self.world.nations.get(port.nation).colours,
             "plan": [("to_ship", PILOT_BOARDS_WITHIN_M)],
         }

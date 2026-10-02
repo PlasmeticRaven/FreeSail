@@ -3495,7 +3495,7 @@ def test_truth_70_a_port_closed_to_the_ships_nation_refuses_her_in_the_pilots_wo
     assert schooner.ports.ship_nation == "united-states"
     assert schooner.ports.stance(brest) == "closed"
     assert schooner.nations.stance("france", "united-states", brest.closed_to) == "closed"
-    for _ in range(180):
+    for _ in range(360):  # six hours at most; the cutter from the road is up with her in one
         schooner.run(60)
         if events(schooner, "port.pilot_refused"):
             break
@@ -3728,7 +3728,7 @@ GATE_5C_MERCHANT_DIGEST = "d4aaf1a26a70e525"
 
 
 def _people(world) -> list[dict]:
-    return [p.to_dict() for p in world.people.all()]
+    return [p.to_dict() for p in world.people.all]
 
 
 def the_scenario_whole(path: str, hours: int, save_tick: int):
@@ -3793,7 +3793,7 @@ def test_the_merchant_passage_at_seed_7_has_its_own_constants(gate_5c_merchant):
     digest."""
     world, moments, _ = gate_5c_merchant
     log = world.log
-    assert len(world.vessels.vessels) >= GATE_5C_SHIPS  # the dozen, and the pilots' cutters
+    assert len(world.scenario.ships) == GATE_5C_SHIPS  # the dozen on the sea at the start
     # the cargo at Falmouth, by the lighter while the boat is at the quay
     bought = [e for e in log if e.kind == "market.bought"]
     assert [e.tick for e in bought] == [GATE_5C_MERCHANT_TIN_ABOARD_TICK]
@@ -3827,7 +3827,7 @@ def test_the_merchant_passage_at_seed_7_has_its_own_constants(gate_5c_merchant):
     assert _by_order(log, "the pilot put off") and _by_order(log, "under way again")
     # the Iroise passed, the course for the points off Bertheaume shaped; no cast at its
     # mark at this seed (see the docstring)
-    assert _by_order(log, "the Iroise") and _by_order(log, "past the Iroise")
+    assert _by_order(log, "the course for the Iroise") and _by_order(log, "past the Iroise")
     assert not [e for e in log if e.kind == "sounding" and e.data.get("deep")]
     # the road of Bertheaume on the ebb by the lead, the pilot aboard at the anchor; the
     # turn to the flood by daylight the same forenoon, and the Goulet on it
@@ -3888,9 +3888,9 @@ def test_the_naval_cruise_at_seed_7_has_its_own_constants(gate_5c_cruise):
     wind, wearing every second hour; the stranger put on the sea by the scenario's order,
     sighted, made out, chased by the bearing's drift and spoken, a brig-sloop of war under
     no colours; the lines and the digest."""
-    world, moments, _ = gate_5c_cruise
+    world, moments, (_data, _digest, vessels_at_save, _people_at_save) = gate_5c_cruise
     log = world.log
-    assert len(world.vessels.vessels) >= GATE_5C_SHIPS
+    assert len(world.scenario.ships) == GATE_5C_SHIPS - 1  # eleven, and the stranger by order
     yard = [e for e in log if e.kind == "yard.done"]
     assert [e.tick for e in yard] == [GATE_5C_CRUISE_YARD_TICK]
     assert yard[0].text.startswith("Provisions for 30 days came off")
@@ -3924,8 +3924,8 @@ def test_the_naval_cruise_at_seed_7_has_its_own_constants(gate_5c_cruise):
     assert len(wore) >= GATE_5C_CRUISE_WEARS_AT_LEAST
     # the stranger: on the sea by the scenario's order, sighted at the horizon, made out
     # by the glass and the tops, chased by the bearing's drift, spoken under no colours
-    stranger = world.vessels.find("Palinure")
-    assert stranger is not None and not stranger.shows_colours
+    by_name = {v["name"]: v for v in vessels_at_save}  # at 09:00 on the 13th, the chase in hand
+    assert "Palinure" in by_name and by_name["Palinure"]["nation"] == "france"
     sighted = [
         e
         for e in log
@@ -3934,15 +3934,19 @@ def test_the_naval_cruise_at_seed_7_has_its_own_constants(gate_5c_cruise):
         and e.tick >= orders[-1].tick
     ]
     assert sighted and sighted[0].tick == GATE_5C_CRUISE_STRANGER_SIGHTED_TICK
-    chase = [e for e in log if e.kind == "helm.set" and e.text.startswith("Gave chase to")]
+    chase = [
+        e
+        for e in log
+        if e.kind == "helm.set" and e.text.startswith("Gave chase to") and e.tick >= sighted[0].tick
+    ]  # the cutter with the letter was chased at dawn too, a stranger until her colours
     assert chase and chase[0].tick == sighted[0].tick
     assert any("the course led" in e.text for e in chase)
     spoken = [e for e in log if e.kind == "sail.within_hail" and "brig-sloop" in e.text]
     assert spoken and spoken[0].tick == GATE_5C_CRUISE_STRANGER_SPOKEN_TICK
     assert spoken[0].text.endswith("a stranger, her colours not made out.")
-    assert (
-        _by_order(log, "the chase up") and _by_order(log, "the chase up")[0].tick == spoken[0].tick
-    )
+    # the chase given up at her hail (a merchant brig was spoken on the way out too)
+    chase_up = [e for e in _by_order(log, "the chase up") if e.tick >= spoken[0].tick]
+    assert chase_up and chase_up[0].tick == spoken[0].tick
     assert not [e for e in log if e.kind in ("ship.aground", "anchor.dragging")]
     noons = [e for e in log if e.kind == "reckoning.noon"]
     assert [e.tick for e in noons] == GATE_5C_CRUISE_NOON_TICKS
