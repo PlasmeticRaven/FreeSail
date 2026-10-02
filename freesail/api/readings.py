@@ -1199,11 +1199,8 @@ REGISTRY.add(
         none_words=_no_reckoning_words,
     )
 )
-REGISTRY.add_absent(
-    "sail_in_sight",
-    ("a sail in sight",),
-    "There is nothing to sight yet; that reading comes with the world.",
-)
+# `a sail in sight` was registered absent here from milestone 4 to package 34; package 35
+# registers it below as a reading of the lookout's (the pilot cutter the first sail).
 
 # ---------------------------------------------------------------------------
 # Package 33c: the manoeuvre in hand (playtest 13's brig: the trim rules belayed by hand
@@ -1547,7 +1544,12 @@ def _anchor(world: Any, _: str | None) -> dict[str, Any] | None:
         words = f"down, {how.rstrip('.')}, {riding.scope_fathoms:.0f} fathoms out"
         if riding.dragging:
             words = f"dragging; {words}"
-        return {"words": words, "state": "down", "anchor": riding.id} | riding.to_dict()
+        moored = len([a for a in tackle.down() if a.kind == "bower"]) >= 2  # package 35
+        if moored:
+            words = f"moored with two anchors; {words}"
+        return {"words": words, "state": "down", "anchor": riding.id, "moored": moored} | (
+            riding.to_dict()
+        )
     # no anchor down: the one furthest along in its evolution, else the best bower
     order = (AnchorState.AWEIGH, AnchorState.CATTED, AnchorState.READY, AnchorState.LOST)
     for st in order:
@@ -1644,6 +1646,302 @@ REGISTRY.add(
         _ground_tackle,
         description="the anchors and their cables, each with its weight and state",
         none_words=_no_tackle_words,
+    )
+)
+
+
+# ---------------------------------------------------------------------------
+# Package 35: the people, the places and their ledgers, the port and the other sail
+# (spec M5 §22 to §25). Every row's words are the world's own (`freesail.world.people`,
+# `places`, `ports`, the lookout's `sail`); nothing is computed a second way, and the
+# truth is not in them (the pilot's tide is the port's own, which he knows as a man who
+# lives by it: the one way the world's tide reaches the captain, through a person).
+# ---------------------------------------------------------------------------
+
+NO_PEOPLE_WORDS = "no people are kept: the ship is not in a world"
+NO_PILOT_WORDS = "no pilot aboard"
+NO_PORT_WORDS = "no port within the pilot's cruising ground"
+NO_HOLD_WORDS = "no hold is kept: the ship's file gives her no room for a cargo"
+
+
+def _people(world: Any, _: str | None) -> dict[str, Any] | None:
+    people = getattr(world, "people", None)
+    if people is None:
+        return None
+    return {
+        "words": " ".join(people.describe()),
+        "count": len(people.all),
+        "people": [p.to_dict() | {"state": people.state_words(p)} for p in people.all],
+    }
+
+
+def _no_people_words(world: Any) -> str | None:
+    return NO_PEOPLE_WORDS
+
+
+def _where_is(world: Any, param: str | None) -> dict[str, Any] | None:
+    """`where is <person>`: his name and his state; the standing dialect compares his
+    place as the master's (is on deck, is below)."""
+    people = getattr(world, "people", None)
+    if people is None or not param:
+        return None
+    found = people.where_is(param)
+    if found is None:
+        return None
+    where = found["place"]
+    if not found.get("aboard", True):
+        place = "ashore"
+    elif where in ("quarterdeck", "deck", "tops"):
+        place = "on deck"
+    else:
+        place = "below"
+    return found | {"where": where, "place": place}
+
+
+def _places(world: Any, _: str | None) -> dict[str, Any] | None:
+    places = getattr(world, "places", None)
+    return {"words": " ".join(places.describe())} if places is not None else None
+
+
+def _ports_of(world: Any) -> Any:
+    ports = getattr(world, "ports", None)
+    return ports if ports is not None and ports.ports else None
+
+
+def _pilot(world: Any, _: str | None) -> dict[str, Any] | None:
+    ports = _ports_of(world)
+    return ports.pilot_reading() if ports is not None else None
+
+
+def _no_pilot_words(world: Any) -> str | None:
+    return NO_PILOT_WORDS
+
+
+def _port(world: Any, _: str | None) -> dict[str, Any] | None:
+    ports = _ports_of(world)
+    return ports.port_words() if ports is not None else None
+
+
+def _no_port_words(world: Any) -> str | None:
+    return (
+        NO_PORT_WORDS
+        if _ports_of(world) is not None
+        else NO_CHART_WORDS[:1].lower() + NO_CHART_WORDS[1:]
+    )
+
+
+def _boat(world: Any, _: str | None) -> dict[str, Any] | None:
+    ports = getattr(world, "ports", None)
+    return ports.boat_reading() if ports is not None else None
+
+
+def _boats(world: Any, _: str | None) -> dict[str, Any] | None:
+    ports = getattr(world, "ports", None)
+    return {"words": ports.boats_words()} if ports is not None else None
+
+
+def _prices(world: Any, _: str | None) -> dict[str, Any] | None:
+    ports = _ports_of(world)
+    return ports.prices_reading() if ports is not None else None
+
+
+def _no_prices_words(world: Any) -> str | None:
+    ports = _ports_of(world)
+    return ports.no_prices_words() if ports is not None else NO_PORT_WORDS
+
+
+def _manifest(world: Any, _: str | None) -> dict[str, Any] | None:
+    hold = getattr(world, "hold", None)
+    if hold is None or hold.capacity_tons <= 0:
+        return None
+    return {
+        "words": hold.words(),
+        "capacity_tons": hold.capacity_tons,
+        "stowed_tons": round(hold.stowed_tons, 2),
+        "room_tons": round(hold.room_tons, 2),
+        "goods": dict(hold.goods),
+    }
+
+
+def _no_hold_words(world: Any) -> str | None:
+    return NO_HOLD_WORDS
+
+
+def _purse(world: Any, _: str | None) -> dict[str, Any] | None:
+    purse = getattr(world, "purse", None)
+    if purse is None:
+        return None
+    return {"words": purse.words(), "pounds": round(purse.pounds, 2)}
+
+
+def _stores(world: Any, _: str | None) -> dict[str, Any] | None:
+    stores = getattr(world, "stores", None)
+    if stores is None:
+        return None
+    return {
+        "words": stores.words(),
+        "water_tons": stores.water_tons,
+        "provisions_days": stores.provisions_days,
+    }
+
+
+def _epitome(world: Any, _: str | None) -> dict[str, Any] | None:
+    papers = getattr(world, "papers", None)
+    if papers is None or getattr(world, "navigation", None) is None:
+        return None
+    page = papers.page("the epitome's table of the establishments")
+    return {"words": " ".join(page.lines), "lines": list(page.lines), "as_of": page.as_of}
+
+
+def _sail_in_sight(world: Any, _: str | None) -> dict[str, Any] | None:
+    lookout = _lookout_of(world)
+    return lookout.sail(float(world.ship.heading)) if lookout is not None else None
+
+
+REGISTRY.add(
+    Reading(
+        "people",
+        ("the people",),
+        "ground",
+        "",
+        _people,
+        description="the named people aboard, each by name and role with his place and state",
+        none_words=_no_people_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "where_is",
+        ("where is <person>",),
+        "person",
+        "",
+        _where_is,
+        parametric="person",
+        description="a person by his role or his name: his place and state (is on deck, is below)",
+        none_words=_no_people_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "places",
+        ("the places",),
+        "ground",
+        "",
+        _places,
+        description="the places aboard, each a name and a description",
+        none_words=_no_people_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "pilot",
+        ("the pilot",),
+        "ground",
+        "",
+        _pilot,
+        description="the pilot aboard: his name and port, and when the tide serves by his word",
+        none_words=_no_pilot_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "port",
+        ("the port",),
+        "ground",
+        "",
+        _port,
+        description="the port she is in or near: its stance to her, the pilot, the cutter and "
+        "the boat",
+        none_words=_no_port_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "boat",
+        ("the boat",),
+        "ground",
+        "",
+        _boat,
+        description="the ship's boat: alongside, or away on its errand and where",
+        none_words=_no_people_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "boats",
+        ("the boats",),
+        "ground",
+        "",
+        _boats,
+        description="the boats she carries, each with its length, oars and crew",
+        none_words=_no_people_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "prices",
+        ("the prices",),
+        "ground",
+        "",
+        _prices,
+        description="the prices at the port she lies in, as the purser last brought them off",
+        none_words=_no_prices_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "manifest",
+        ("the manifest",),
+        "ground",
+        "",
+        _manifest,
+        description="the hold: the cargo in it by tons and the room left",
+        none_words=_no_hold_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "purse",
+        ("the purse",),
+        "ground",
+        "",
+        _purse,
+        description="the money aboard, in pounds",
+        none_words=_no_people_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "stores",
+        ("the stores",),
+        "ground",
+        "",
+        _stores,
+        description="the purser's stores: water by the ton, provisions by the day",
+        none_words=_no_people_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "epitome",
+        ("the epitome",),
+        "ground",
+        "",
+        _epitome,
+        description="the epitome's table of the establishments: high water at full and change "
+        "by port",
+        none_words=_no_reckoning_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "sail_in_sight",
+        ("a sail in sight",),
+        "sight",
+        "",
+        _sail_in_sight,
+        description="other sail in sight: in sight or not, each with the lookout's words",
+        none_words=_no_chart_words,
     )
 )
 
@@ -1775,6 +2073,24 @@ _event(EventSpec("aground", "ship.aground"))
 _event(EventSpec("the ground taken", "ship.aground"))
 _event(EventSpec("afloat", "ship.afloat"))
 _event(EventSpec("the turn of the tide", "ship.swung"))
+# Package 35: the people's, the port's and the other sail's events (spec M5 §22 to §25),
+# by the World's kinds (`world/people.py`, `world/ports.py`, the lookout's sail).
+_event(EventSpec("a sail sighted", "lookout.sighting", lambda data: data.get("seen_as") == "sail"))
+_event(EventSpec("sail ho", "lookout.sighting", lambda data: data.get("seen_as") == "sail"))
+_event(EventSpec("the pilot aboard", "port.pilot_aboard"))
+_event(EventSpec("the pilot refused", "port.pilot_refused"))
+_event(EventSpec("the pilot off", "port.pilot_left"))
+_event(EventSpec("the boat away", "boat.away"))
+_event(EventSpec("the boat alongside", "boat.alongside"))
+_event(EventSpec("a message", "message.received"))
+_event(EventSpec("a letter", "message.received"))
+_event(EventSpec("moored", "ship.moored"))
+_event(EventSpec("unmoored", "ship.unmoored"))
+_event(EventSpec("the kedge laid", "ship.kedged"))
+_event(EventSpec("got under way", "ship.under_way"))
+EVENTS["under way"] = EventSpec("under way", "ship.weighed", also=("ship.under_way",))
+_event(EventSpec("the hands entered", "crew.entered"))
+_event(EventSpec("the yard's stores aboard", "yard.done"))
 
 
 def event_matches(spec: EventSpec, kind: str, data: dict[str, Any]) -> bool:

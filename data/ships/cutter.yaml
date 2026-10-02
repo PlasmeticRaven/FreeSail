@@ -723,3 +723,31 @@ crew:
     - kind: storm_jib
       canvas_no: 1
       condition: 100
+  # The named people beyond the posts (package 35, spec M5 §22); see tools/gen_ships.py.
+  people:
+  # A boy as the messenger (judgement).
+  - role: boy
+    station: afterguard
+    rating: landsman
+    messenger: true
+# The hold (package 35, spec M5 §23): room for 42 tons of cargo beyond her own stores, 0.5 of the 85 tons burthen (a revenue cutter's hold less her own stores: judgement; Falconer 1780, HOLD); see tools/gen_ships.py.
+hold:
+  capacity_tons: 42
+# The boats (package 35, spec M5 §23): their lengths by Luce 1866's rule ('Boats', 'Rules for Size of Boats for Ships-of-War': the launch 2.6 times the square root of the ship's length, the cutters 0.9 of it), the allowance after Steel 1794 vol. II and Falconer 1780 (BOAT, PINNACE, YAWL), the oars a thwart to three feet, the tons by Luce's weight rule for the boat herself; see tools/gen_ships.py.
+boats:
+# The cutter's boat, a yawl of four oars (Falconer, YAWL), on the deck amidships.
+- id: boat
+  kind: yawl
+  name: the boat
+  length_ft: 15.0
+  oars: 4
+  crew: 5
+  tons: 0.1
+# A punt for the pilot and the shore (judgement).
+- id: punt
+  kind: punt
+  name: the punt
+  length_ft: 12.0
+  oars: 4
+  crew: 5
+  tons: 0.1

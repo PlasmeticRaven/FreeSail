@@ -204,6 +204,7 @@ def test_only_the_manoeuvres_belay_the_work_in_hand():
         "wear_short_round",
         "lie_a_try",
         "come_to_anchor",
+        "get_under_way",  # package 35: "All hands up anchor!", Luce's whole sequence
     }
     assert {"reef_square", "furl_all", "send_down_topgallant_masts"} <= all_hands - belaying
 

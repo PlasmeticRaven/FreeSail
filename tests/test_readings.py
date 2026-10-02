@@ -80,10 +80,14 @@ def test_every_row_of_the_spec_is_registered():
 
 
 def test_absent_readings_carry_their_sentences():
-    for id, word in (("well", "well"), ("sail_in_sight", "nothing to sight")):
+    for id, word in (("well", "well"),):
         row = R.REGISTRY.get(id)
         assert row.is_absent and row.getter is None
         assert word in row.absent and "yet" in row.absent
+    # a sail in sight arrived with package 35 (spec M5 §25): the lookout's, the pilot
+    # cutter the first sail; None without a chart, in the chart's words
+    row = R.REGISTRY.get("sail_in_sight")
+    assert not row.is_absent and row.kind == "sight"
     # the lead's cast arrived with package 33a (spec M5 §15): `the depth` is a reading,
     # None before a cast, in the reckoning's words on a ship with no position
     row = R.REGISTRY.get("depth")

@@ -648,6 +648,10 @@ class Runner:
         held = {inst.subject_id}
         if inst.script is not None:
             held |= inst.script.holds()
+            if not getattr(inst.script, "holds_subject", True):
+                # package 35: the boat away holds the boat and not the ship, so that the
+                # cable is veered and the yards trimmed while she is ashore
+                held.discard(inst.subject_id)
             return held
         env = self._env(ship, inst)
         for step in inst.evo.steps:

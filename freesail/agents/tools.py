@@ -301,6 +301,7 @@ LIBRARY_TOPICS = (
     "catalogue",
     "grammar",
     "the ship",
+    "papers",
     "standing orders",
     "tools",
 )
@@ -445,7 +446,9 @@ TOOLS: dict[str, Tool] = {
             "The reference library, always there to read. library() lists its topics and "
             "what each costs in tokens; topic='primer 3' lists a chapter's sections with "
             "their sizes (the catalogue its evolutions, the grammar its parts, 'the ship' her "
-            "masts); section='reefing' (a word of its heading, or its number) serves one, "
+            "masts, 'papers' the ship's own papers by handle: the manifest, the sailmaker's "
+            "account, the price list); section='reefing' (a word of its heading, or its "
+            "number) serves one, "
             "section='all' the whole; find='goose-wing' returns the matching paragraphs, "
             "each with where it is, in a topic or the whole library. Every read is a book "
             "with a number, which shelve puts back.",
@@ -1095,6 +1098,51 @@ def _ship_names(world: World) -> str:
     return _ship_topic(world).whole
 
 
+def _papers_topic(world: World) -> Topic:
+    """The ship's papers (package 35; spec M5 §22; `docs/design/Papers-and-Books.md`):
+    in-world things read through the same tool and shelf as the reference, served by
+    handle to every station the same, the browser's pane included. Each paper is a
+    section (its handle), its page the store's own lines as its keeper last wrote them,
+    dated by its last entry (`freesail.world.places.Papers`). Read-only here: the
+    keepers write them, and the log says when."""
+    from freesail.world.places import PLACES
+
+    papers = getattr(world, "papers", None)
+    ship = world.ship
+    if papers is None or not hasattr(ship, "spars"):
+        name = getattr(ship, "name", "The ship")
+        text = f"{name} keeps no papers: a point ship has no stores to record."
+        return Topic("papers", "the ship's papers", "the ship's papers: none", text)
+    sections: list[Section] = []
+    for k, page in enumerate(papers.pages(), 1):
+        head = page.handle[:1].upper() + page.handle[1:]
+        place = PLACES.get(page.place)
+        where = place.name if place is not None else page.place
+        body = [
+            f"{head}: {page.words}; kept by the {page.keeper} in {where}; last written "
+            f"{page.as_of}.",
+            *page.lines,
+        ]
+        text = "\n".join(body)
+        sections.append(Section(str(k), page.handle, text, text, by_line=True))
+    whole = "\n\n".join(
+        [
+            f"{ship.name}'s papers, each as its keeper last wrote it; a paper is only as "
+            "current as its last entry.",
+            *(s.text for s in sections),
+        ]
+    )
+    n = len(sections)
+    return Topic(
+        "papers",
+        "the ship's papers",
+        f"the ship's papers: {n} papers aboard, each by handle, as current as its last entry",
+        whole,
+        tuple(sections),
+        whole_words="the whole bundle",
+    )
+
+
 def _topic(world: World, key: str) -> Topic | str:
     """The topic a call names, or the refusal in words."""
     if key.startswith("primer"):
@@ -1109,6 +1157,8 @@ def _topic(world: World, key: str) -> Topic | str:
         return _grammar_topic()
     if key in ("the ship", "ship", "names", "parts"):
         return _ship_topic(world)
+    if key in ("papers", "the papers", "the ships papers", "the ship's papers", "ships papers"):
+        return _papers_topic(world)
     if key in ("standing orders", "the book", "book", "the standing orders"):
         text = "\n".join(world.standing.book.lines())
         return Topic("standing orders", "the standing orders", text, text)
@@ -1122,7 +1172,13 @@ def _topic(world: World, key: str) -> Topic | str:
 
 
 def _every_topic(world: World) -> list[Topic]:
-    out: list[Topic] = [*_primer_all(), _catalogue_topic(), _grammar_topic(), _ship_topic(world)]
+    out: list[Topic] = [
+        *_primer_all(),
+        _catalogue_topic(),
+        _grammar_topic(),
+        _ship_topic(world),
+        _papers_topic(world),
+    ]
     for key in ("standing orders", "tools"):
         top = _topic(world, key)
         assert isinstance(top, Topic)
@@ -1277,6 +1333,14 @@ def _contents(world: World) -> str:
     lines.append(
         "  the ship: this ship's parts by their names, by mast, with her groups and aliases: "
         f"{size_words(tokens(ship.whole))} whole" + (f", in {parts} parts" if parts else "")
+    )
+    papers = _papers_topic(world)
+    handles = "; ".join(s.heading for s in papers.sections)
+    lines.append(
+        f"  papers: the ship's papers, {len(papers.sections)} aboard, each by handle and as "
+        f"current as its last entry ({handles}): {size_words(tokens(papers.whole))} whole"
+        if papers.sections
+        else f"  papers: the ship's papers: none aboard ({size_words(tokens(papers.whole))})"
     )
     book = "\n".join(world.standing.book.lines())
     lines.append(

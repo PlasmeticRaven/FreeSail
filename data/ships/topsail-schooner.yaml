@@ -898,3 +898,31 @@ crew:
     - kind: water_sail
       canvas_no: 7
       condition: 100
+  # The named people beyond the posts (package 35, spec M5 §22); see tools/gen_ships.py.
+  people:
+  # A boy as the messenger (judgement).
+  - role: boy
+    station: afterguard
+    rating: landsman
+    messenger: true
+# The hold (package 35, spec M5 §23): room for 112 tons of cargo beyond her own stores, 0.5 of the 224 tons burthen (a sharp Baltimore hull stows about half her tonnage: judgement; Falconer 1780, HOLD); see tools/gen_ships.py.
+hold:
+  capacity_tons: 112
+# The boats (package 35, spec M5 §23): their lengths by Luce 1866's rule ('Boats', 'Rules for Size of Boats for Ships-of-War': the launch 2.6 times the square root of the ship's length, the cutters 0.9 of it), the allowance after Steel 1794 vol. II and Falconer 1780 (BOAT, PINNACE, YAWL), the oars a thwart to three feet, the tons by Luce's weight rule for the boat herself; see tools/gen_ships.py.
+boats:
+# The long-boat, a fifth under Luce's rule for a ship of war (judgement for a privateer).
+- id: long_boat
+  kind: long-boat
+  name: the long-boat
+  length_ft: 20.0
+  oars: 6
+  crew: 7
+  tons: 0.6
+# The yawl, four oars (Falconer, YAWL).
+- id: yawl
+  kind: yawl
+  name: the yawl
+  length_ft: 16.0
+  oars: 4
+  crew: 5
+  tons: 0.1

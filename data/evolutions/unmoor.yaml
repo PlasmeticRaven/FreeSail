@@ -1,0 +1,33 @@
+# Unmoor (spec M5 §23; package 35): from a moor with two anchors to single anchor,
+# ready to weigh. Luce 1866, ch. XXXIV, 'Unmooring' (p. 578 of the 1877 printing): "In
+# unmooring, pick up the lee anchor first; otherwise you may foul other ships or your own
+# anchor", and of a foul hawse "the anchor having the most cable should be picked up
+# first. If the upper anchor was picked up first, it would hook the cable of the under
+# one." The lee anchor is hove up as any anchor is weighed (weigh_anchor.yaml: up and
+# down, aweigh, hove up, catted and fished), the other cable veered meanwhile to the
+# riding scope the depth wants, so that she rides to the weather anchor at single anchor
+# when it is done.
+#
+# The script (freesail/evolutions/scripts.py, UnmoorScript):
+#   rig_capstan   the messenger passed on the lee cable
+#   heave         the lee cable hove in to up and down, the weather cable veered
+#   break_out     the lee anchor aweigh
+#   hoist         hove up to the bows, catted and fished
+id: unmoor
+verb: unmoor
+applies_to: {class: ship}
+script: unmoor
+params: {}
+preconditions: []
+timing:
+  rig_capstan_s: 180        # judgement, as heave_short's
+  heave_fathoms_per_s: 0.1  # judgement
+  veer_fathoms_per_s: 1.0   # judgement
+  break_out_s: 60           # judgement
+  hoist_fathoms_per_s: 0.2  # judgement
+  cat_and_fish_s: 300       # judgement
+on_start: {log: "Unmoor ship! Bring to on {anchor} cable, the lee anchor; veer away on {second}."}
+on_complete: {log: "Unmoored: {anchor} catted and fished; riding at single anchor by {second}, {fathoms} out.", kind: ship.unmoored, severity: notable}
+on_fail: {log: "Could not unmoor: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: all, rating: ordinary, stations: [all hands]}
+source: "Luce 1866, ch. XXXIV Anchoring, 'Unmooring' (p. 578); ch. XXI Getting Under Way (up and down, aweigh, cat and fish); Lever 1808, 'Catting and Fishing the Anchors' (p. 68)"

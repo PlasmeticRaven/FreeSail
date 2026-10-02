@@ -33,6 +33,15 @@ kedge, each with its weight and the cable bent to it by the fathom, with its siz
 rating) and whether the cable is chain (`chain: true`, where the era allows it; hemp in
 1805). It is parsed into a `GroundTackleSpec`; a file without it has
 `ground_tackle = None`, and the anchor orders are refused on such a ship.
+
+Package 35 (spec M5 §22, §23) adds the hold, the boats and the people's roles: an
+optional `hold:` section (`capacity_tons`, what she can stow beyond her own stores, a
+`HoldSpec`), an optional `boats:` list (each boat with its kind, name, length, oars, crew
+and the tons it carries, a `BoatSpec`), and under `crew:` an optional `people:` list of
+the named roles beyond the posts (a master's mate, a midshipman as messenger: each a role
+drawn from a station at muster, a `PersonRoleSpec`). A file without them has
+`hold = None`, no boats, and the posts alone for people; the ports' orders are refused
+in words on such a ship.
 """
 
 from __future__ import annotations
@@ -373,6 +382,18 @@ class StoresSpec:
 
 
 @dataclass
+class PersonRoleSpec:
+    """A named role beyond the posts (package 35, spec M5 §22): the role's words, the
+    station the person is drawn from at muster, the rating wanted (None: any), and
+    whether he is the ship's messenger (the midshipman who passes the word)."""
+
+    role: str
+    station: str
+    rating: str | None = None
+    messenger: bool = False
+
+
+@dataclass
 class CrewSpec:
     """The ship's company as the ship file establishes it (spec M3 §2.3)."""
 
@@ -383,6 +404,7 @@ class CrewSpec:
     posts: list[PostSpec]
     idlers_by_trade: dict[str, int]  # in the file's order
     stores: StoresSpec = field(default_factory=StoresSpec)
+    people: list[PersonRoleSpec] = field(default_factory=list)  # package 35
 
     @property
     def seamen(self) -> int:
@@ -412,6 +434,34 @@ class GroundTackleSpec:
 
 
 @dataclass
+class HoldSpec:
+    """The hold (package 35, spec M5 §23): what she can stow in tons beyond her own
+    stores, which the manifest counts the cargo against."""
+
+    capacity_tons: float
+
+
+@dataclass
+class BoatSpec:
+    """One of the ship's boats (package 35, spec M5 §23): its kind (launch, barge,
+    pinnace, cutter, yawl, jolly boat, punt), the name the hands use, its length, its
+    oars, the crew that mans it and the tons it carries."""
+
+    id: str
+    kind: str
+    name: str
+    length_ft: float
+    oars: int
+    crew: int
+    tons: float
+
+
+BOAT_KINDS = ("launch", "long-boat", "barge", "pinnace", "cutter", "yawl", "jolly boat", "punt")
+BOAT_KEYS = ("id", "kind", "name", "length_ft", "oars", "crew", "tons")
+PERSON_ROLE_KEYS = ("role", "station", "rating", "messenger")
+
+
+@dataclass
 class ShipSpec:
     name: str
     rig: str
@@ -426,6 +476,8 @@ class ShipSpec:
     warnings: list[str] = field(default_factory=list)
     crew: CrewSpec | None = None  # None: no crew, and the runner has unlimited hands
     ground_tackle: GroundTackleSpec | None = None  # None: no anchors (package 34)
+    hold: HoldSpec | None = None  # None: no room for a cargo (package 35)
+    boats: list[BoatSpec] = field(default_factory=list)  # none: no boat to send (package 35)
 
 
 # ---------------------------------------------------------------------------
@@ -492,9 +544,66 @@ def parse_ship(data: dict[str, Any], source: str = "<memory>") -> ShipSpec:
             if data.get("ground_tackle") is not None
             else None
         ),
+        hold=_parse_hold(data["hold"], source) if data.get("hold") is not None else None,
+        boats=_parse_boats(data["boats"], source) if data.get("boats") is not None else [],
     )
     validate(spec)
     return spec
+
+
+def _parse_hold(raw: Any, source: str) -> HoldSpec:
+    """The `hold:` section (package 35): the room for a cargo, in tons."""
+    if not isinstance(raw, dict):
+        raise ShipFileError(f"{source}: 'hold' is not a mapping.")
+    for key in raw:
+        if key != "capacity_tons":
+            raise ShipFileError(f"{source}: the hold has '{key}', which it does not take.")
+    tons = _num(raw, "capacity_tons", "the hold", source)
+    if tons < 0.0:
+        raise ShipFileError(
+            f"{source}: the hold's capacity is {tons:g} tons; it cannot be less than nothing."
+        )
+    return HoldSpec(capacity_tons=tons)
+
+
+def _parse_boats(raw: Any, source: str) -> list[BoatSpec]:
+    """The `boats:` list (package 35): each boat with its kind, name, length, oars, crew
+    and tons."""
+    if not isinstance(raw, list):
+        raise ShipFileError(f"{source}: 'boats' is not a list.")
+    boats: list[BoatSpec] = []
+    seen: set[str] = set()
+    for i, b in enumerate(raw):
+        where = f"boat #{i + 1}"
+        if not isinstance(b, dict):
+            raise ShipFileError(f"{source}: {where} is not a mapping.")
+        for key in b:
+            if key not in BOAT_KEYS:
+                raise ShipFileError(f"{source}: {where} has '{key}', which a boat does not take.")
+        bid = _str(b, "id", where, source)
+        if bid in seen:
+            raise ShipFileError(f"{source}: the boats list '{bid}' twice.")
+        seen.add(bid)
+        where = f"boat '{bid}'"
+        kind = _str(b, "kind", where, source)
+        if kind not in BOAT_KINDS:
+            raise ShipFileError(
+                f"{source}: {where} is of kind '{kind}'; say one of {', '.join(BOAT_KINDS)}."
+            )
+        boats.append(
+            BoatSpec(
+                id=bid,
+                kind=kind,
+                name=_str(b, "name", where, source, required=False) or f"the {kind}",
+                length_ft=_num(b, "length_ft", where, source),
+                oars=_count(b.get("oars"), f"{where}'s oars", source),
+                crew=_count(b.get("crew"), f"{where}'s crew", source),
+                tons=_num(b, "tons", where, source),
+            )
+        )
+        if boats[-1].length_ft <= 0.0 or boats[-1].crew <= 0:
+            raise ShipFileError(f"{source}: {where} has no length or no crew.")
+    return boats
 
 
 def _parse_ground_tackle(raw: Any, source: str) -> GroundTackleSpec:
@@ -1019,6 +1128,7 @@ def _parse_crew(c: Any, source: str) -> CrewSpec:
             "posts",
             "idlers_by_trade",
             "stores",
+            "people",  # package 35
         ):
             raise ShipFileError(f"{source}: the crew section has '{key}', which it does not take.")
 
@@ -1128,6 +1238,32 @@ def _parse_crew(c: Any, source: str) -> CrewSpec:
             )
         stores.spare_sails = len(stores.sails)
 
+    raw_people = c.get("people") or []
+    if not isinstance(raw_people, list):
+        raise ShipFileError(f"{source}: the crew's 'people' is not a list.")
+    people: list[PersonRoleSpec] = []
+    for i, p in enumerate(raw_people):
+        where = f"person #{i + 1} of the crew's people"
+        if not isinstance(p, dict) or not str(p.get("role") or "").strip():
+            raise ShipFileError(f"{source}: {where} does not say which role it is.")
+        for key in p:
+            if key not in PERSON_ROLE_KEYS:
+                raise ShipFileError(f"{source}: {where} has '{key}', which a role does not take.")
+        station = _known(p.get("station", "afterguard"), CREW_STATIONS, "the station", source)
+        rating = p.get("rating")
+        if rating is not None:
+            rating = _known(rating, SEAMAN_RATINGS, "the rating", source)
+        messenger = p.get("messenger", False)
+        if not isinstance(messenger, bool):
+            raise ShipFileError(
+                f"{source}: {where}'s messenger = {messenger!r}; say true or false."
+            )
+        people.append(
+            PersonRoleSpec(
+                role=str(p["role"]).strip(), station=station, rating=rating, messenger=messenger
+            )
+        )
+
     return CrewSpec(
         complement=complement,
         names=names,
@@ -1136,4 +1272,5 @@ def _parse_crew(c: Any, source: str) -> CrewSpec:
         posts=posts,
         idlers_by_trade=trades,
         stores=stores,
+        people=people,
     )

@@ -483,30 +483,55 @@ def test_the_library_routes_serve_every_topic_and_section_as_the_tool_does(clien
     assert refused["text"].startswith("The library has no topic 'the stars'")
 
 
-def test_the_ship_papers_are_the_queries_answers_and_name_what_waits(client, world):
-    """`/api/library/papers`: the booms, the sail room and the boatswain's store in the
-    words their queries answer at the order line, from the same stores, read without a
-    line in the log; and the papers that wait, with what for."""
-    from freesail.ship.parts import cordage
+def test_the_ship_papers_are_the_librarys_papers_topic_and_nothing_waits(client, world):
+    """`/api/library/papers` (package 35; spec M5 §22): the ship's papers are the library's
+    `papers` topic, the same pages the model's `library(topic='papers')` serves, each by
+    handle with its keeper, its place and its last entry, read without a line in the log;
+    the stores' pages are the words their queries answer at the order line, from the
+    same stores; and nothing waits any more (the two entries of package 33d are gone)."""
+    from freesail.agents import tools
+    from freesail.ship.parts import cordage, ground_tackle
 
     n = len(world.log)
     data = client.get("/api/library/papers").json()
     assert len(world.log) == n, "reading the papers writes nothing"
     by = {p["handle"]: p for p in data["papers"]}
-    assert list(by) == ["the booms", "the sail room", "the boatswain's store"]
-    assert by["the booms"]["lines"] == queries.booms_lines(world)
-    assert by["the sail room"]["lines"] == queries.sail_room_lines(world)
-    assert by["the boatswain's store"]["lines"] == cordage(world.ship).inventory_lines()
-    for handle, paper in by.items():
-        answered = world.submit(handle)  # the same words at the order line
-        assert answered.kind.startswith("query.") and answered.text == "\n".join(paper["lines"])
-    waiting = {w["handle"]: w["words"] for w in data["waiting"]}
-    assert "the sailmaker's account" in waiting and "the establishment" in waiting
-    assert "the ship's places" in waiting["the sailmaker's account"]
+    assert list(by) == [
+        "the sailmaker's account",
+        "the manifest",
+        "the purser's books",
+        "the boatswain's store book",
+        "the booms' list",
+        "the establishment of ground tackle",
+        "the epitome's table of the establishments",
+        "the price list",
+    ]
+    assert by["the booms' list"]["lines"] == queries.booms_lines(world)
+    assert by["the sailmaker's account"]["lines"] == queries.sail_room_lines(world)
+    assert by["the boatswain's store book"]["lines"] == cordage(world.ship).inventory_lines()
+    assert by["the establishment of ground tackle"]["lines"] == ground_tackle(world.ship).describe()
+    for handle, query in (
+        ("the booms' list", "the booms"),
+        ("the sailmaker's account", "the sail room"),
+        ("the boatswain's store book", "the boatswain's store"),
+        ("the establishment of ground tackle", "the ground tackle"),
+    ):
+        answered = world.submit(query)  # the same words at the order line
+        assert answered.kind.startswith("query.")
+        assert answered.text == "\n".join(by[handle]["lines"])
+    assert "kept by the sailmaker in the sail room" in by["the sailmaker's account"]["words"]
+    # the purser keeps the manifest in a ship of war; the mate in a merchantman
+    keeper = "purser" if world.people.find("the purser") is not None else "mate"
+    assert f"kept by the {keeper} in the hold" in by["the manifest"]["words"]
+    assert by["the manifest"]["ask"] == "library(topic='papers', section='the manifest')"
+    # the same page the model reads, by handle
+    page = tools.library(world, "watcher", "papers", section="manifest")
+    assert page.splitlines()[1:] == by["the manifest"]["lines"]
+    assert data["waiting"] == []
     point = Driver(World(seed=1))
     with TestClient(create_app(point)) as c:
         bare = c.get("/api/library/papers").json()
-        assert bare["papers"] == [] and bare["words"] and bare["waiting"]
+        assert bare["papers"] == [] and bare["words"] and bare["waiting"] == []
 
 
 def watched_driver(**kw) -> Driver:

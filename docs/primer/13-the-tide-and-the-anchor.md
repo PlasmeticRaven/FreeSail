@@ -125,7 +125,7 @@ Sail is yours to make: the anchor's evolutions set none, and a ship weighing in 
 | `let go the anchor` | `let go the best bower`, `let go the small bower`, `let go the sheet anchor`, `let go the stream anchor`, `let go the kedge`, `let go the second anchor`, `drop anchor` | the anchor let go where she is; `in twenty fathoms` the scope |
 | `veer cable` | `veer away`, `veer twenty fathoms`, `veer to ninety fathoms` | more cable on the riding anchor |
 | `heave short` | `heave in to a short stay` | the cable in to a short stay |
-| `weigh` | `weigh anchor`, `up anchor`, `get under way` | heave short, break out, cat and fish |
+| `weigh` | `weigh anchor`, `up anchor` | heave short, break out, cat and fish; no sail is set (`get under way`, chapter 14, is Luce's whole sequence) |
 | `cat and fish the anchor` | `cat the anchor` | an anchor aweigh secured |
 | `back the anchor` | `back the anchor with the stream` | the stream anchor on the riding cable |
 | `the ground tackle` | `the anchors`, `the cables` | what she carries and where each anchor is |

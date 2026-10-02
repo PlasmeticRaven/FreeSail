@@ -62,7 +62,7 @@ pilot:
   skill: 0.9                     # a branch pilot's knowledge of his own harbour: judgement
   fee_pounds: 5                  # the pilotage into Falmouth for a frigate: from memory of the Trinity House rates; unverified
   cast: starboard                # the tack to cast on when getting under way from the Road: the head paying off to the eastward, the wind westerly (judgement)
-  course_out_deg: 160            # the pilot's course out of the Road by the eastern channel, S by E, to the outer road
+  course_out_deg: 169            # the pilot's course out of the Road by the eastern channel, S by E, to the outer road
   words:
     channel: "Keep the fair way and the lead going; there is a narrow deep channel of sixteen or eighteen fathoms all the way into Carrick Road. The Black Rock lies nearly in the middle of the entrance and shows itself at half tide; the eastern channel is the better, and you may borrow on St Mawes side in five or six fathoms."
     marks: "Killiganoon house on with Mylor Point, north a quarter east, carries you in mid-channel through Carrick Road; St Keverne church open east of Pendennis Point leads into St Just Pool. Moored in the Road, keep the hawse open to the southward, for southerly winds throw in much sea."

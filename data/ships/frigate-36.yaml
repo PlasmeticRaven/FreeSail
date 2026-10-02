@@ -2267,3 +2267,71 @@ crew:
     - kind: fore.save_all.larboard
       canvas_no: 7
       condition: 100
+  # The named people beyond the posts (package 35, spec M5 §22): each drawn from his station at muster, the counts above unchanged; see tools/gen_ships.py.
+  people:
+  # Two master's mates, able seamen of the forecastle (the Regulations of 1806, the Master, art. XXVIII: the mates and midshipmen assist him in the observations).
+  - role: master's mate
+    station: forecastle
+    rating: able
+  # Two master's mates, able seamen of the forecastle (the Regulations of 1806, the Master, art. XXVIII: the mates and midshipmen assist him in the observations).
+  - role: master's mate
+    station: forecastle
+    rating: able
+  # A midshipman as the captain's messenger, one of the boys of the afterguard.
+  - role: midshipman
+    station: afterguard
+    rating: landsman
+    messenger: true
+# The hold (package 35, spec M5 §23): room for 93 tons of cargo beyond her own stores, 0.1 of the 933 tons burthen (a ship of war's hold is her own stores and ballast: judgement; Falconer 1780, HOLD); see tools/gen_ships.py.
+hold:
+  capacity_tons: 93
+# The boats (package 35, spec M5 §23): their lengths by Luce 1866's rule ('Boats', 'Rules for Size of Boats for Ships-of-War': the launch 2.6 times the square root of the ship's length, the cutters 0.9 of it), the allowance after Steel 1794 vol. II and Falconer 1780 (BOAT, PINNACE, YAWL), the oars a thwart to three feet, the tons by Luce's weight rule for the boat herself; see tools/gen_ships.py.
+boats:
+# The launch, 2.6 root(143 ft) = 31 ft; the stream anchor is sent in her (Steel 1794 vol. I: 'sent in the long-boat'), and the water comes off in her in gang casks (Luce 1866, 'Boats').
+- id: launch
+  kind: launch
+  name: the launch
+  length_ft: 31.0
+  oars: 10
+  crew: 11
+  tons: 2.1
+# The captain's barge, a little longer than the launch and narrower (Falconer, BARGE: 'longer, slighter, and narrower').
+- id: barge
+  kind: barge
+  name: the barge
+  length_ft: 32.0
+  oars: 10
+  crew: 11
+  tons: 1.7
+# The pinnace, eight oars (Falconer, PINNACE).
+- id: pinnace
+  kind: pinnace
+  name: the pinnace
+  length_ft: 28.0
+  oars: 8
+  crew: 9
+  tons: 1.2
+# The first cutter, 0.9 of the launch (Luce's rule).
+- id: first_cutter
+  kind: cutter
+  name: the first cutter
+  length_ft: 28.0
+  oars: 8
+  crew: 9
+  tons: 0.9
+# The second cutter, 0.9 of the first.
+- id: second_cutter
+  kind: cutter
+  name: the second cutter
+  length_ft: 25.0
+  oars: 8
+  crew: 9
+  tons: 0.6
+# The jolly boat, the small boat at the stern davits (judgement in the size).
+- id: jolly_boat
+  kind: jolly boat
+  name: the jolly boat
+  length_ft: 20.0
+  oars: 6
+  crew: 7
+  tons: 0.2
