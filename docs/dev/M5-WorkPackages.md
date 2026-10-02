@@ -47,7 +47,7 @@ gate 5c:  wave 5  33b the chronometer, the moon, the lunar and the azimuth; the 
                   34 the tide, grounding and anchoring, as Luce has it (Fable; landed 2026-10-02)
                   32f the launcher page: the browser's front door with the game's options (Opus; after 33d and 32d; owner, 2026-10-01)
           wave 6  35 places, people, ports and nations (Falmouth, Plymouth, Brest); the pilot boarding from the cutter (Fable; landed 2026-10-02)
-                  35b St Mary's and Roscoff as ports on 35's machinery, Roscoff's patch (Opus; launched 2026-10-02, beside 36)
+                  35b St Mary's and Roscoff as ports on 35's machinery, Roscoff's patch (Opus; landed 2026-10-02)
           wave 7  36 other sail, the world-order channel, the two scenarios (Fable; launched 2026-10-02)
           wave 8  37 the officer of the watch; gate 5c cut after it so that the gate covers the officer's watch (owner, 2026-10-02); the lead's watch beside other models' (an Opus 5.5 watch, and a local model on the cutter: owner, 2026-10-01); the 5c verdict
 ```
@@ -1496,6 +1496,16 @@ a feature built here.
 
 Not in 35b: Fowey and Penzance (files for later, when a scenario asks), the smuggler's
 scenario (M7's colours), warping into the drying harbour (M8).
+
+**As built (2026-10-02, the lead's two rulings on the report).** Roscoff is *hostile* to a
+British ship, not closed: the nations table has Britain and France at war, a hostile port
+sends no pilot and a boat sent in would be taken, which is the honest 1805 state; the brief's
+"closed" was loose, and the closure in the pilot's words is shown against the American
+schooner by a scenario's order. The pilot vessel's type is declared in each port file
+(`pilot.vessel`: St Mary's gig, Roscoff's town boat) and not yet read: 36 owns the vessel
+at far detail and takes it (a boat's height and pace from the port's file, the hail's words
+to match). The Pilote français was not reachable; the patch rests on Bellin's sheet of 1764
+read at full resolution and the pilots' words, and says so.
 
 ## Package 36: other sail, the world-order channel, the two scenarios (`freesail/world/ships.py` for the far-detail ships (35's pilot vessel generalised); `freesail/world/orders.py` new for the world-order channel; `freesail/world/lookout.py` for the sighting of sail; `freesail/world/scenarios.py` for `ships:`, `orders:` by time, the papers and people whole (§27); `freesail/core/world.py` for the ships' tick at the roll-up's cadence and the journal of world orders; `freesail/core/replay.py` for their replay; `freesail/api/readings.py` for `a sail in sight` made real, `the strangers`, and the events; `freesail/api/queries.py` and `client/map.js` for sightings on the captain's chart by bearing and distance by estimation (never the truth's positions); `freesail/orders/*` and `data/vocabulary.yaml` for the refusal of a world order at the prompt and the words of a sighting (`what sail is in sight`, `make her out`); `data/ships/brig.yaml` through `tools/gen_ships.py` for the merchant description beside the brig-sloop's; `data/scenarios/merchant-passage.yaml` and `naval-cruise.yaml` new with their books; `data/nations.yaml` for the flags' words; `docs/primer/15-other-sail.md` new; `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_world_orders.py` new, `tests/test_known_truths.py` truths 67, 71 and 72 and the pace truth for the gate's scenarios)
 

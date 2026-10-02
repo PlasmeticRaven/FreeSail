@@ -704,6 +704,12 @@ in (then 5b), double altitudes, the kedge, interiors beyond a name and a descrip
    `at <event>, if <condition>` rule logs a routine "not carried out" line at every event
    whose condition fails. Both for the standing runtime's next pass.
 
+16. From package 35b (2026-10-02): where EMODnet has no land GEBCO's fill left a metre of
+   water over some of the shore (Roscoff's town and the Isle Verte were water in the tiles
+   until the patch made them land); the rest of the region's coast is to be swept for the
+   same once, a build-tool check; and Roscoff's narrows were left to the modern grid where
+   the sheet's georeference error was as wide as the channel.
+
 ## 34. The scoping draft's rulings (record)
 
 The questions put to the owner on 2026-09-29 and the rulings: 1, a real sea with older

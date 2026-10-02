@@ -2,7 +2,7 @@
 
 Chapter 13 brought her to an anchor in the outer road and left her riding there. This chapter takes her in: the pilot who comes off in his cutter, the roads and the mooring, the boat sent ashore, the market and the yard, and getting under way again as Luce has it, with the tide. It also gives the ship her people by name and her papers by handle, because the port is where they are wanted. Two rules run through it. **Everything inward is reached by an order or a reading**: there is no menu of the port; you send the boat and read what it brings back. **Everything outward arrives through something the ship models**: a letter comes aboard in the boat or in the pilot's pocket, is carried aft by a person, and is read where the captain is, and each of those is a line in the log. Nothing arrives from nowhere.
 
-The port is data. Falmouth, Plymouth and Brest are three files in `data/ports/`, each the same shape: the roads, the anchorage and the mooring as the chart's features; the pilot, his cruising ground and his words; the market with its goods; the yard or the chandlers; the hands to be had. A fourth port costs a file and nothing else. Which nations are at war is a fourth file, `data/nations.yaml`, and the ship's nation is her company's names unless the scenario says otherwise: the frigate is British, the schooner American.
+The port is data. Falmouth, Plymouth, Brest, St Mary's and Roscoff are five files in `data/ports/`, each the same shape: the roads, the anchorage and the mooring as the chart's features; the pilot, his cruising ground and his words; the market with its goods; the yard or the chandlers; the hands to be had. Another port costs a file and nothing else (St Mary's and Roscoff, the last two, have sections of their own before the forms table). Which nations are at war is another file, `data/nations.yaml`, and the ship's nation is her company's names unless the scenario says otherwise: the frigate is British, the schooner American.
 
 ## The people aboard
 
@@ -214,6 +214,50 @@ his certificate signed.
 
 A tack or a course the ship does not know is refused in the words; at sea, with no anchor down, `get under way` is refused when it is called ("no anchor is down: she is under way already, or adrift").
 
+## St Mary's, in Scilly
+
+St Mary's is the first port of the Approaches and the natural start of a passage up Channel, and the port a King's ship puts into when the Atlantic has used her hard. It is a file like the others (`data/ports/st-marys.yaml`) on the Scilly patch the chart already carries. White's word for strangers is "not to attempt the harbours of Scilly without pilots", and the pilots are worth having: they come off "from one quarter or the other, even in the worst weather, as soon as the signal for that purpose is made". The isles' pilots came off in gigs, six oars and a lugsail; the file says so, and the game brings the pilot off in the pilot cutter until its pilot vessel is taken from the port's file, so the log calls her a cutter.
+
+The way in from the Channel is St Mary's Sound, between St Mary's and St Agnes, "by far the best and safest channel" (Imray): the Great Minalto in one with the north-east side of the Great Mincarlo carries a ship between the Woolpack to starboard and the Spanish and Bartholomew ledges to larboard, and when the daymark on St Martin's opens west of Bants Carn she steers north by east for the anchorage. **St Mary's Road**, between St Mary's and Samson, is the one anchorage for a large ship, four and five fathoms on loose sand that does not hold well, sheltered from every wind but those between west-north-west and south-west; in those, White says, run to sea through Crow Sound at a proper time of tide. **The Pool** off Hugh Town is for small craft: a ship drawing more than nine feet lies in the Road, so the frigate, the schooner and the brig anchor there and only the cutter takes the Pool. The outer road is the mouth of the Sound, and the pilot leaves her a mile beyond it outward bound.
+
+Standing in for the Sound from the south-east of Peninnis with the wind at east-south-east, the frigate has the pilot aboard in a quarter of an hour and is brought up in the Road in three-quarters:
+
+```
+Sail ho! A cutter standing out from the land on the starboard bow, bearing N by W,
+distant two miles.
+The cutter hailed: a pilot for St Mary's; shorten sail and he will come aboard.
+The pilot, Mr Woodcock of St Mary's, came aboard from the cutter and took charge of her.
+The pilot says: Strangers do not attempt the harbours of Scilly without a pilot. St Mary's
+Sound, between St Mary's and St Agnes, is by far the best and safest way into the Road ...
+Anchor in St Mary's Road with Hangman Island its own breadth open north of the Nut Rock, a
+third of a mile south-east of it, in four and five fathoms ...
+All hands, bring ship to anchor! Stand by to take in the light sails.
+The best bower let go in six fathoms.
+```
+
+There is no yard at St Mary's in 1805 (Imray's spars and rope-walk are the 1870s'), so `demand a topmast from the yard` is refused there in words; the chandlers have water, fresh provisions and a little cordage. The market is the isles' produce, kelp, salt fish, pilchards, potatoes and barley, with what the islands bought in, and French brandy at the war's price as everywhere in England. The hands to be had are few: the young men of the isles pull in the gigs.
+
+## Roscoff, behind the Isle of Bas
+
+Roscoff is a small French harbour at the eastern end of the narrow channel between the Isle of Bas and the main. Faden (1793) says what it lived by: "a kind of free port for the exportation of rum brought from their colonies, which was there deposited, and sold to our smugglers"; the King's council had allowed the rum to be warehoused there for a year for export in 1769. The harbour dries at low water and is for vessels that take the ground; a ship lies in **the road of the Isle of Bas**, over against the great cove with its houses in the middle of the island, in three or four fathoms on sand. The chart there is Bellin's sheet of 1764, in brasses, georeferenced by the church of Roscoff and the island's marks (`data/charts/overrides/channel-west/roscoff.yaml`).
+
+The western passage is the easier. Come to the end of the island within cannon-shot, where the Lavandière stands a third of the way to the main; keep it close aboard to starboard, for the Couillon lies under water twice a ship's length from it on the other hand. The eastern passage, by the town, is for high water and a pilot only: at low water there is no passing at all. The tide sets west a quarter south and east a quarter north through the channel, and the springs rise twenty-three feet, so the road that has three fathoms at low water has seven at high.
+
+What Roscoff does when a ship stands in depends on her colours, which is the nations table's word. To a King's ship in June 1805 it is **hostile**: France and Britain are at war, no pilot comes off, and every order of the port is refused ("Roscoff is hostile to her; a boat sent in would be taken."). To a neutral it is open to trade and the town's pilot takes her in on the flood:
+
+```
+Sail ho! A sail right ahead, bearing E, distant three leagues.
+The cutter hailed: a pilot for Roscoff; shorten sail and he will come aboard.
+The pilot, Mr Cabioch of Roscoff, came aboard from the cutter and took charge of her
+(American colours being no bar at Roscoff).
+The pilot says: The western passage is the easier. Come to the end of the isle within
+cannon-shot, where a single rock stands about a third of the way to the main: that is the
+Lavandière ...
+The best bower let go in five fathoms.
+```
+
+The market is the trade the port lived by, brandy, geneva, rum, tea and tobacco priced for the Cornish run, beside the wine, the salt and the canvas of the coast. Those prices are judgement and the file says so; no price current of Roscoff is in the references. The English smugglers who bought there came under false colours or by licence, and that run waits for the colours of a later milestone: an English ship that stands in for Roscoff today is met as an enemy.
+
 ## The forms, in a table
 
 | Form | Also taken | What it does |
@@ -249,4 +293,4 @@ A tack or a course the ship does not know is refused in the words; at sea, with 
 
 ## Where it comes from
 
-The pilot is the Regulations of 1806, the Pilot's articles (borne as a supernumerary, the captain's certificate, the hand lead kept going in pilot water) and the Master's art. XXIX; the roads are White 1835 ('Coast of England', Falmouth pp. 26 to 27 and Plymouth pp. 31 to 35), Imray 1874 (pp. 78 to 90) and Moore 1799's catechism for Falmouth, Faden 1793 for Brest; the pilot's words in each file are those pages' directions. Getting under way is Luce 1866 ch. XXI, 'Remarks on Casting' and 'To get under way and stand out on a wind'; mooring and unmooring Luce ch. XXXIV and Lever 1808, 'Mooring' (the open hawse); the kedge Falconer 1780, KEDGE, and Lever p. 100; the boats Luce 1866, 'Boats', and Falconer, LONG-BOAT and YAWL; the yard's supply the Regulations' Captain's art. XVI and the standing officers' expense books. The nations table's dates are from memory and say so; the market's prices are from memory and say so; the rules that move them, the pilot's distances and the boat's times are judgement, named with their reasons in `docs/dev/TuningNotes.md`, package 35. The design is spec M5 §22 to §24 and `docs/design/InwardAndOutward.md`.
+The pilot is the Regulations of 1806, the Pilot's articles (borne as a supernumerary, the captain's certificate, the hand lead kept going in pilot water) and the Master's art. XXIX; the roads are White 1835 ('Coast of England', Falmouth pp. 26 to 27 and Plymouth pp. 31 to 35), Imray 1874 (pp. 78 to 90) and Moore 1799's catechism for Falmouth, Faden 1793 for Brest; St Mary's is White 1835 pp. 13 to 17 and Imray 1874 pp. 104 to 108, Roscoff Faden 1793 pp. 45 to 46, La Barre 1825, Norie 1839, Imray 1874 pp. 211 to 212, the King's council's arrêt of 3 September 1769 on the rum warehoused there, and Bellin's sheet of 1764 for its chart (package 35b; the tuning notes say what is judgement); the pilot's words in each file are those pages' directions. Getting under way is Luce 1866 ch. XXI, 'Remarks on Casting' and 'To get under way and stand out on a wind'; mooring and unmooring Luce ch. XXXIV and Lever 1808, 'Mooring' (the open hawse); the kedge Falconer 1780, KEDGE, and Lever p. 100; the boats Luce 1866, 'Boats', and Falconer, LONG-BOAT and YAWL; the yard's supply the Regulations' Captain's art. XVI and the standing officers' expense books. The nations table's dates are from memory and say so; the market's prices are from memory and say so; the rules that move them, the pilot's distances and the boat's times are judgement, named with their reasons in `docs/dev/TuningNotes.md`, package 35. The design is spec M5 §22 to §24 and `docs/design/InwardAndOutward.md`.

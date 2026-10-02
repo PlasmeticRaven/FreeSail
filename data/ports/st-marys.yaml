@@ -1,0 +1,128 @@
+# FreeSail: St Mary's, Scilly, as a port (spec M5 §23; package 35b). The same form as
+# falmouth.yaml, on package 35's machinery (freesail/world/ports.py); the chart is the
+# Scilly patch package 32 drew (data/charts/overrides/channel-west/scilly.yaml), and no
+# patch of its own is needed.
+#
+# Sources. The road and its marks: White 1835, 'Coast of England', pp. 13 to 17 (St Mary
+# Road "the only harbour for large vessels", loose sand "not very tenacious, the anchors
+# coming home long before stay-peak can be obtained"; shelter from all winds but those
+# between WNW and SW, which bring in a heavy fetch, when a vessel "can always run to sea
+# through Crow Sound at a proper period of tide"; the five entrances; St Mary Sound by
+# the Great Minalto on the north-east side of the Great Mincarlo, between the Woolpack and
+# the Spanish and Bartholomew ledges, until the daymark on St Martin's opens west of Bants
+# Carn; the berth with Hangman Island its own breadth open north of the Nut Rock, a third
+# of a mile south-east of it, in four and five fathoms; moor NW and SE for an open hawse
+# with westerly winds; the harbours for vessels that take the ground, Old and New
+# Grimsby and St Helen's Pool; "strangers not to attempt the harbours of Scilly without
+# pilots, and their attendance may always be depended upon, from one quarter or the
+# other, even in the worst weather, as soon as the signal for that purpose is made").
+# Imray 1874, 'Scilly Islands', pp. 104 to 108 (the road "capable of containing a fleet
+# of 200 sail", five to seven fathoms; "St Mary's pool is a little place just eastward of
+# St Mary's castle, where small craft anchor opposite the town"; a bountiful supply of
+# fresh water and provisions; St Mary's Sound "by far the best and safest channel"; the
+# Crow Bar's depths by the hour of tide). Imray's yard (spars in stock, a rope-walk, the
+# sailmakers, "the principal trade of the port is ship-building") is the 1870s', after
+# the islands' shipbuilding of the 1830s; in 1805 the isles had no yard, and the file
+# gives none (the brief: water and fresh provisions and a small market).
+#
+# The pilots. The Scilly pilots came off in gigs, six-oared open boats with a lugsail,
+# pulled out to the westward to be first to a ship (White's "from one quarter or the
+# other"). Package 35's machinery takes the pilot's ship file from the port's file and
+# names her a cutter in every line (freesail/world/ports.py, `_launch_cutter` and the
+# hails): the gig below (`pilot.vessel`) is the file's statement of what comes off, which
+# the machinery does not yet read; until it does, the pilot comes off in the cutter that
+# stands for her at far detail, as Brest's chasse-marée does. Package 35b reports this as
+# the fault in 35's machinery it is; the lead decides.
+#
+# The market is the isles' produce, priced FROM MEMORY and by judgement as package 35's
+# files are: the kelp the islanders burnt for the glass-makers' soda, the salt ling and
+# the pilchards of the fishery, potatoes and barley, and the water and fresh provisions a
+# ship came in for; no spars, no sails, no yard. The crew pool is small (judgement: a
+# poor island whose young men are the gigs' crews and the smugglers').
+
+id: st-marys
+name: St Mary's
+nation: britain
+source: "White 1835 pp. 13-17; Imray 1874 pp. 104-108; the Regulations of 1806, the Pilot's articles"
+
+# The pilot's cruising ground and the roads. A ship from the Channel or the westward comes
+# in by St Mary's Sound, the best and safest channel (Imray p. 106); the outer road is its
+# mouth off Peninnis, where the pilot leaves her outward bound; the anchorage is St Mary's
+# Road; the mooring is the Pool off Hugh Town, where small craft lie and a ship drawing
+# more goes to the Road instead.
+outer_road:
+  name: the mouth of St Mary's Sound
+  lat_deg: 49.9020      # the fair way between the Woolpack and the Bartholomew Ledge, half a
+  lon_deg: -6.3270      # mile south of them (the chart's water, 12 m at the datum)
+  depth_fathoms: 7      # Imray p. 106: "immediately off [the Woolpack] is a depth of 7 and 6 fathoms"
+  bottom: sand
+anchorage:
+  feature: st-marys-road
+  name: St Mary's Road
+mooring:
+  name: the Pool off Hugh Town
+  lat_deg: 49.9195      # Imray p. 105: "just eastward of St Mary's castle, where small craft
+  lon_deg: -6.3170      # anchor opposite the town" (the chart's water, under 3 m at the datum)
+  depth_fathoms: 1.5    # judgement: small craft's water at low water off the town's quay
+  bottom: sand
+  deep_draught_ft: 9    # judgement: a vessel drawing more lies in the Road (the cutter, 8 ft 6, may lie in the Pool)
+shore:
+  feature: hugh-town
+  name: the quay at Hugh Town
+
+pilot:
+  station: st-marys-sound
+  cruising_nm: 8                 # judgement: the gigs pulled out to the westward to be first to a ship, off the Bishop and the Crim (White p. 17, "from one quarter or the other")
+  comes_off_by_night: false      # judgement: White's "as soon as the signal for that purpose is made" is by day; no pilot's light in 1805
+  cutter: data/ships/cutter.yaml # the stand-in at far detail until the machinery reads `vessel` (the head)
+  vessel:                        # what comes off, for the machinery that reads it (not yet: the fault reported in 35b)
+    kind: a gig
+    name: the St Mary's pilots' gig
+    under: oars and a lugsail
+    note: "the Scilly pilot gig, six oars and a lugsail, thirty feet or so (judgement; no page in docs/references/ gives her)"
+  names: [Hicks, Jenkins, Pender, Ellis, Tregarthen, Mumford, Nance, Woodcock, Banfield, Trenear]   # the isles' names: judgement
+  skill: 0.95                    # White p. 17: "their conduct ... universally marked with attention, skill, and intrepidity"; the figure judgement
+  fee_pounds: 3                  # from memory of the Scilly pilotage for a ship; unverified
+  cast: starboard                # the head paying off to the eastward from the Road with a westerly wind, for the Sound (judgement)
+  course_out_deg: 160            # out by St Mary's Sound, SSE (the leading mark NNW astern, White p. 16; Imray's N 3/4 W inward)
+  words:
+    channel: "Strangers do not attempt the harbours of Scilly without a pilot. St Mary's Sound, between St Mary's and St Agnes, is by far the best and safest way into the Road: keep the lead going off Peninnis and come no nearer it than fifteen fathoms; the Woolpack, a fifth of a mile off the land, shows a little before low water, and there are but five feet on the Spanish Ledge at that time, the Bartholomew drying nearly."
+    marks: "Bring the Great Minalto directly in one with the north-east side of the Great Mincarlo; that carries you in the fair way between the Woolpack to starboard and the Spanish and Bartholomew ledges to larboard, until the white daymark on St Martin's opens to the westward of Bants Carn, when you steer north by east for the anchorage. The Crow Rock's three heads tell the water on Crow Bar."
+    anchorage: "Anchor in St Mary's Road with Hangman Island its own breadth open north of the Nut Rock, a third of a mile south-east of it, in four and five fathoms; moor north-west and south-east for an open hawse with the westerly winds. The ground is loose sand and the anchors come home; the Road is open between west-north-west and south-west, and with those winds you run to sea through Crow Sound at a proper time of tide. Small craft lie in the Pool off Hugh Town; the vessels that take the ground go to Old and New Grimsby or St Helen's Pool."
+    tide: "Through Broad Sound the flood sets east through the Road for the east end of St Martin's; in St Mary's Sound the stream sets out south-east by east until two hours' ebb on the shore, then runs north-west by west. Take the Sound on the flood."
+
+tide:
+  establishment: Scilly          # the epitome's row (data/tides/establishments.yaml)
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  # price: pounds a ton at the quay, FROM MEMORY and judgement (the head); the isles' produce
+  # is cheap at home and dear nowhere; what the islands lacked came from Penzance.
+  goods:
+    - {good: kelp, price: 5, origin: britain, season: {6: 0.9, 7: 0.9, 8: 0.9}, note: "kelp burnt on the isles for the glass-makers' soda, the islanders' trade from the 1680s; from memory about £5 a ton, cheap at the end of the burning season (judgement)"}
+    - {good: salt fish, price: 20, origin: britain, note: "ling and cod salted on the isles; from memory"}
+    - {good: pilchards, price: 13, origin: britain, season: {3: 1.3, 4: 1.3, 5: 1.3, 6: 1.2, 8: 0.8, 9: 0.8, 10: 0.8, 11: 0.8}, note: "cured and pressed, as at Falmouth and a little cheaper at the fishery (judgement)"}
+    - {good: potatoes, price: 4, origin: britain, season: {5: 1.4, 6: 1.3, 9: 0.8, 10: 0.8}, note: "the islanders' crop, dear before the new crop is lifted; from memory and judgement"}
+    - {good: barley, price: 9, origin: britain, note: "forty shillings the quarter, four and a half quarters to the ton; from memory"}
+    - {good: salt, price: 28, origin: britain, note: "brought over from Penzance under the duty; a little dearer than at Falmouth (judgement)"}
+    - {good: coal, price: 3, origin: britain, season: {11: 1.2, 12: 1.2, 1: 1.2, 2: 1.2}, note: "Welsh coal landed at Hugh Town; from memory, dearer than Falmouth's by the freight (judgement)"}
+    - {good: brandy, price: 160, origin: france, note: "French brandy as the isles had it, cheaper than at Falmouth for being nearer the run; from memory and judgement"}
+    - {good: salt beef, price: 60, origin: britain, note: "Irish beef in tierces, brought round; from memory"}
+    - {good: timber, price: 8, origin: britain, note: "wreck-wood and imported deals, the isles having no trees; judgement"}
+
+dockyard:
+  kind: chandlers                # no yard in 1805 (the head): water, fresh provisions and a little cordage at a price
+  items:
+    - {item: cordage, hours: 3, pounds_per_fathom: 0.08, note: "what cordage the isles had, dearer than Falmouth's (judgement)"}
+    - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.1, note: "watered by the boat from the springs above Hugh Town (Imray p. 105: 'a bountiful supply of fresh water'); the time judgement"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.05, note: "fresh provisions (Imray p. 105: 'large stocks of fresh and other provisions'); a shilling a man a day, judgement"}
+
+crew_pool:
+  # judgement: a few seamen between voyages and the islands' boatmen; the young men pull in the gigs
+  able: {hands: 2, pounds: 3, delay_h: 12}
+  ordinary: {hands: 4, pounds: 2, delay_h: 12}
+  landsman: {hands: 6, pounds: 1, delay_h: 6}
+
+closed_to: []
