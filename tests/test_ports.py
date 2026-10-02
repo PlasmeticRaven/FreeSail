@@ -803,14 +803,14 @@ def test_the_pilot_boards_from_seaward_and_the_frigate_anchors_in_st_marys_road(
     assert sails and sails[0].tick < hail.tick < aboard.tick < anchored.tick
     assert sails[0].text.startswith("Sail ho!")
     assert hail.text == (
-        "The cutter hailed: a pilot for St Mary's; shorten sail and he will come aboard."
+        "The gig hailed: a pilot for St Mary's; shorten sail and he will come aboard."
     )
     pilot = w.ports.pilot
     assert pilot is not None and pilot.port == "st-marys"
     assert pilot.name.removeprefix("Mr ") in w.ports.ports["st-marys"].pilot.names
-    # 35's words: the vessel is the cutter until the machinery reads the file's gig
+    # the port's file says a gig, which 36 reads (`pilot.vessel`)
     assert aboard.text == (
-        f"The pilot, {pilot.name} of St Mary's, came aboard from the cutter and took charge of her."
+        f"The pilot, {pilot.name} of St Mary's, came aboard from the gig and took charge of her."
     )
     said = events(w, "port.pilot_words")[0].text
     assert said.startswith("The pilot says: Strangers do not attempt the harbours of Scilly")
