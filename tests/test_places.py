@@ -76,7 +76,11 @@ def test_the_places_are_a_name_and_a_description_and_no_more():
     # the reading at the prompt is the same words
     w = world_for()
     e = w.submit("the places")
-    assert e.kind == "query.reading" and "The hold: the whole interior cavity" in e.text
+    assert e.kind == "query.reading" and e.text.startswith("The places: the quarterdeck, the deck")
+    assert w.readings["places"]["items"]["hold"]["description"].startswith(
+        "the whole interior cavity"
+    )
+    assert "The hold: the whole interior cavity" in " ".join(w.readings["places"]["described"])
 
 
 def test_the_hold_the_purse_and_the_stores_are_ledgers():

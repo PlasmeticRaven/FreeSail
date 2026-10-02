@@ -1699,8 +1699,18 @@ def _where_is(world: Any, param: str | None) -> dict[str, Any] | None:
 
 
 def _places(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the places`: the names in the words (every sample carries them, so the static
+    descriptions ride in `items`, where the prompt's answer and the pane find them)."""
+    from freesail.world.places import PLACES
+
     places = getattr(world, "places", None)
-    return {"words": " ".join(places.describe())} if places is not None else None
+    if places is None:
+        return None
+    return {
+        "words": ", ".join(p.name for p in PLACES.values()),
+        "items": {p.id: {"name": p.name, "description": p.description} for p in PLACES.values()},
+        "described": places.describe(),
+    }
 
 
 def _ports_of(world: Any) -> Any:
