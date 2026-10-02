@@ -246,6 +246,7 @@ class Lookout:
     # when she is lost
     _sail_said: dict[str, int] = field(default_factory=dict)
     _sails_seen: dict[str, str] = field(default_factory=dict)
+    _sail_known: dict[str, str] = field(default_factory=dict)  # the words made out so far
 
     def look(self, world: Any) -> list[tuple[Severity, str, str, dict[str, Any]]]:
         """Look from the masthead now: the sightings kept for the reading, and the log's
@@ -455,13 +456,16 @@ class Lookout:
             if said is None:
                 # hailed this look: the hail says what the distance allows
                 self._sail_said[fid] = level
+                self._sail_known[fid] = v.words_at(level)
             elif level > said:
                 self._sail_said[fid] = level
+                self._sail_known[fid] = v.words_at(level)
                 out.append(self._made_out_line(v, s, level, words, relative, glass=False))
             seen[fid] = f"{_head(self._sail_word(v, level))} {relative}"
         for fid, where in list(self._sails_seen.items()):
             if fid not in seen:
                 self._sail_said.pop(fid, None)
+                self._sail_known.pop(fid, None)
                 out.append(
                     (
                         Severity.ROUTINE,
@@ -472,6 +476,12 @@ class Lookout:
                 )
         self._sails_seen = seen
         return out
+
+    def sail_name(self, fid: str, default: str = "a sail") -> str:
+        """How a sail is named in an order's words from what has been made out of her so
+        far, eye or glass: 'a sail', 'a brig', 'a brig-sloop of war' (the first words of
+        `the strangers`)."""
+        return (self._sail_known.get(fid) or default).split(",")[0].split(";")[0]
 
     @staticmethod
     def _sail_word(v: Any, level: int) -> str:
@@ -536,6 +546,8 @@ class Lookout:
             }
         level, words = v.made_out(s.distance_m, glass=True)
         self._sail_said[s.feature.id] = max(level, self._sail_said.get(s.feature.id, 0))
+        if level >= self._sail_said[s.feature.id]:
+            self._sail_known[s.feature.id] = v.words_at(level)
         if level == 0:
             text = (
                 f"The glass aloft makes out nothing more of the sail {relative}: her hull is "
@@ -561,9 +573,11 @@ class Lookout:
             head = "a sail" if head == "sail" else f"a {head}"
             known = v.words_at(level) if v is not None and level > 0 else ""
             detail = ""
-            if known:
+            if v is not None and level >= 1:
                 # the course and the colours after the bearing: what has been made out
-                detail = ": " + known.split(", ", 1)[1] if ", " in known else ""
+                detail = ": " + v.course_words()
+                if level >= 2:
+                    detail += "; " + v.colours_words()
             items.append(
                 {
                     "id": s.feature.modern,
@@ -659,7 +673,12 @@ class Lookout:
             sails = [s for s in self.sightings if s.seen_as == "sail"]
             if key in _RIG_WORDS:
                 rig = _RIG_WORDS[key]
-                named = [s for s in sails if rig in _key(s.feature.name)]
+                named = [
+                    s
+                    for s in sails
+                    if rig in _key(s.feature.name)
+                    or rig in _key(self._sail_known.get(s.feature.id, ""))
+                ]
                 return min(named, key=lambda s: s.distance_m) if named else None
             return min(sails, key=lambda s: s.distance_m) if sails else None
         for s in self.sightings:

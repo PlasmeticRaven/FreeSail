@@ -130,6 +130,16 @@ POLAR_WINDS_KN = (8.0, 15.0, 25.0)
 # `ships` stream (judgement).
 SAILING_FACTOR_MIN = 0.85
 
+# A pilot's boat under oars and a lugsail (the Scilly gig, the Roscoff pilots' boat:
+# `pilot.vessel` in a port's file, package 35b's; read here at the lead's word, 2026-10-02):
+# her masthead a few metres (a thirty-foot gig's lugsail yard: judgement), so that she is
+# not seen at the horizon a cutter's rig gives but within `BOAT_SEEN_NM` by day (a boat's
+# sail from a masthead, a mile or two: judgement), and her pace under oars and sail the
+# boat's of `ports.BOAT_PACE_KN`, four knots, whatever the wind (judgement, as there).
+BOAT_MASTHEAD_M = 5.0
+BOAT_SEEN_NM = 2.0
+BOAT_PACE_KN = 4.0
+
 # The descriptions a scenario may give a far-detail ship: her file, her rig's word (what
 # the tops make out at four miles), and what she is when made out (spec M5 §25: the
 # brig-sloop of the Navy and the merchant brig of the trade, one file, two descriptions).
@@ -390,10 +400,34 @@ class Vessel:
     detail: str = "far"
     letter: Any = None  # a Message she carries for the ship (`carry a letter`)
     hailed: bool = False  # within hail once: the line said
+    # a boat under oars and sail (a port's `pilot.vessel`): her own height, the distance
+    # she is seen within, and her pace, in place of a ship file's
+    boat: bool = False
+    height_override_m: float | None = None
+    seen_within_nm: float | None = None
+    pace_override_kn: float | None = None
 
     @property
     def height_m(self) -> float:
+        if self.height_override_m is not None:
+            return self.height_override_m
         return rig_height_m(self.ship_file)
+
+    @classmethod
+    def boat_of(cls, port_id: str, spec: dict[str, Any], **kw: Any) -> Vessel:
+        """A pilot's boat from a port file's `pilot.vessel` ({kind: a gig, name: the St
+        Mary's pilots' gig, under: oars and a lugsail}): sighted within `BOAT_SEEN_NM`,
+        pulling at `BOAT_PACE_KN` whatever the wind, "pulling off from the land"."""
+        return cls(
+            kind=str(spec.get("kind") or "a boat"),
+            name=str(spec.get("name") or f"the {port_id} pilots' boat"),
+            purpose="pulling off from the land",
+            boat=True,
+            height_override_m=float(spec.get("height_m", BOAT_MASTHEAD_M)),
+            seen_within_nm=float(spec.get("seen_nm", BOAT_SEEN_NM)),
+            pace_override_kn=float(spec.get("pace_kn", BOAT_PACE_KN)),
+            **kw,
+        )
 
     @property
     def polar(self) -> Polar:
@@ -426,6 +460,8 @@ class Vessel:
     def pace_kn(self, course_deg: float, wind_from_deg: float, wind_kn: float) -> float:
         """Her speed through the water on a course in a wind, by her polar and her
         sail state; nothing closer to the wind than her polar allows."""
+        if self.pace_override_kn is not None:
+            return self.pace_override_kn  # a boat under oars: her pull, whatever the wind
         off = abs(units.rad_to_deg(units.wrap_pi(math.radians(course_deg - wind_from_deg))))
         kn = self.polar.speed_kn(off, wind_kn) * self.sailing_factor
         if self.sail_state == "under reefed topsails":
@@ -435,6 +471,8 @@ class Vessel:
     def _course_for(self, bearing_deg: float, wind_from_deg: float) -> float:
         """The course she steers for a mark: the bearing when she can lay it, else
         close-hauled on the tack that points nearer, held until she can lay it."""
+        if self.pace_override_kn is not None:
+            return bearing_deg  # a boat pulls straight for her mark
         closest = self.polar.closest_deg
         theta = units.rad_to_deg(units.wrap_pi(math.radians(bearing_deg - wind_from_deg)))
         if abs(theta) >= closest:
@@ -525,6 +563,11 @@ class Vessel:
             self.plan.append(self.plan.pop(0))
             return
         self.plan.pop(0)
+        if kind == "to_ship" and not self.plan:
+            # come up with the ship and nothing after: she lies to under the ship's lee
+            # until whoever sent her gives her a plan (the pilot's cutter, `ports.py`)
+            self.plan = [("lie_to", math.inf)]
+            return
         if kind == "home" or (kind == "to" and not self.plan):
             self.done = True
 
@@ -926,6 +969,8 @@ class Vessels:
             bearing, distance = bearing_and_distance(pos, v.position)
             nm = distance / units.NAUTICAL_MILE
             limit = min(vis_nm, horizon_nm(height_of_eye_m, v.height_m))
+            if v.seen_within_nm is not None:
+                limit = min(limit, v.seen_within_nm)  # a boat: the eye's limit, not the horizon's
             if daylight != "day":
                 limit = min(limit, NIGHT_LAND_NM)
             if nm <= limit:

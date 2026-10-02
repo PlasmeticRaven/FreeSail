@@ -1,0 +1,94 @@
+# FreeSail: the captain's orders for the merchant passage, Falmouth for Brest (spec M5
+# §27, §29; package 36). The schooner's own book: the starter book is a choice and is
+# not loaded by the scenario; `read the standing orders from
+# data/standing_orders/starter.orders` adds its routines at any time.
+
+# The cargo and the tide. With the anchor down in Carrick Road (the best bower let go at
+# the start) forty tons of tin are bought at the quay by the list the supercargo brought
+# off; the tin comes off by the port's lighter while the boat is ashore and is struck
+# down when the boat is alongside again; the ebb serves from five (high water at
+# Falmouth 04:50 by the world's tide; the pilot's word: "a ship takes the Road on the
+# flood and leaves on the ebb"), and she gets under way on it, cast on the starboard
+# tack with the head paying off to the eastward and steering S by E for the eastern
+# channel (White 1835, p. 27: "the eastern channel is the better"). The conditions keep
+# the rules to Falmouth: the anchor is let go and the boat comes alongside at Brest too.
+standing order "the cargo": at the anchor let go, if the distance to Falmouth is under 5 miles then buy forty tons of tin
+standing order "sail on the ebb": at the boat alongside, if the distance to Falmouth is under 5 miles then get under way on the starboard tack and steer S by E
+
+# The pilot, outward and inward: the Falmouth pilot comes off to her as she stands out
+# and leaves her beyond the outer road, the pilot of Brest comes off in the road of
+# Bertheaume; at each cutter's hail the fore topsail comes in so that she is slow enough
+# for the boat ("shorten sail and he will come aboard"), and when he has boarded or
+# left her plain sail is made again.
+standing order "the pilot boards": at the pilot's hail then take in the fore topsail
+standing order "the pilot aboard": at the pilot aboard, if the distance to Falmouth is under 9 miles then set plain sail
+standing order "the pilot off": at the pilot off then set plain sail
+
+# Out of the bay clear of the Manacles (the open sea's marks are given a berth of two or
+# three miles, since they are reached by account and the account is a mile or two out
+# by the afternoon; the Goulet's are a cable or two, with the land in sight and the
+# bearings every five minutes): from the outer road a course a little east of
+# south to a point off the Manacles' meridian (the ledge lies two miles and a half to the
+# westward of the line), then south-west for a point three miles and a half south of the
+# Lizard, and from there for the soundings seven leagues south-west of Ushant, which
+# keeps her ten miles to the westward of the island and clear of the Fromveur.
+standing order "clear of the road": when the distance to Falmouth outer road is under 0.6 miles then shape a course for 50 00.3 N 4 58.8 W
+standing order "round the Manacles": when the distance to 50 00.3 N 4 58.8 W is under 2 miles then shape a course for 49 54 N 5 12 W
+standing order "across the Channel": when the distance to 49 54 N 5 12 W is under 3 miles then shape a course for the soundings seven leagues south-west of Ushant
+
+# The departure and the landfall: a bearing of the land every glass while it is in
+# sight (N §1), so that the account is fixed on the Lizard before the land is lost and
+# on Ushant when it is raised.
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land
+
+# The course across is worked afresh from the account every hour, after the bearing of
+# the land when there is one, since the leeway and the Channel's stream set her off a
+# hundred-mile leg and the account is what he has to correct it by; the rule sleeps until
+# Falmouth is eighteen miles astern (the Lizard's point rounded; the straight line from
+# the bay crosses the Manacles, as the order's own warning says), when the soundings are
+# within five, and once the Passage de l'Iroise is within twenty, which it is only on the
+# leg from the soundings.
+standing order "the course across": every hour, if the distance to Falmouth is over 18 miles and the distance to the soundings seven leagues south-west of Ushant is over 5 miles and the distance to the Passage de l'Iroise is over 20 miles then shape a course for the soundings seven leagues south-west of Ushant
+
+# The Iroise: from the soundings south-west of Ushant east for the Passage de l'Iroise,
+# six leagues wide between the isles and the Raz, the common track to and from Brest
+# (Faden 1793, p. 61); she is brought to there and the deep-sea lead hove, which reads
+# the Iroise in her chart's words, forty to forty-five fathoms on putrid shells and
+# mouldering rock; then on for a point between La Parquette and the Toulinguet, and so
+# to the road of Bertheaume.
+standing order "the Iroise": when the distance to the soundings seven leagues south-west of Ushant is under 5 miles then shape a course for the Passage de l'Iroise
+standing order "bring to in the Iroise": when the distance to the Passage de l'Iroise is under 3 miles then heave to
+standing order "the bottom of the Iroise": at hove to, if the distance to the Passage de l'Iroise is under 5 miles then heave the deep-sea lead
+standing order "fill away after the cast": at a sounding, if the distance to the Passage de l'Iroise is under 5 miles then fill away
+standing order "for Bertheaume": at filled away, if the distance to the Passage de l'Iroise is under 5 miles then shape a course for 48 18 N 4 42 W
+standing order "the road of Bertheaume": when the distance to 48 18 N 4 42 W is under 2 miles then shape a course for the road of Bertheaume
+
+# The pilot comes off in the road of Bertheaume (the fore topsail in at his hail, as
+# above), and with him aboard she anchors in the road, since it is the ebb and no ship
+# takes the Goulet against it (the pilot's words; the master's tide by his epitome says
+# the same, high water at Brest in the afternoon). At the turn to the flood, by daylight
+# (the night's flood is let go by: the Goulet's marks are taken by bearings every five
+# minutes, and the pilot aboard answers and does not con), she gets under way, cast on the
+# larboard tack, and steers east-south-east for the Goulet's mouth.
+standing order "wait for the flood": at the pilot aboard, if the distance to the road of Bertheaume is under 4 miles then come to an anchor
+standing order "the flood": at the turn to the flood, if the daylight is day and the distance to the road of Bertheaume is under 4 miles then get under way on the larboard tack and steer ESE
+
+# The Goulet on the flood by the pass north of the Mingan and the Fillettes (Faden 1793,
+# p. 57: range either shore and fear nothing, but not the middle), by points pricked on
+# the chart from the mouth under Petit Minou to the inner end under Portzic, and then
+# for the Bay of Brest; in pilot water the hand lead is kept going and a bearing taken
+# every five minutes (the Regulations of 1806, the Pilot's articles; the Master's art.
+# XXIX).
+standing order "the mouth of the Goulet": when the distance to 48 19.8 N 4 38.4 W is under 0.4 miles then shape a course for 48 20.5 N 4 35.7 W
+standing order "north of the Mingan": when the distance to 48 20.5 N 4 35.7 W is under 0.4 miles then shape a course for 48 20.8 N 4 33.9 W
+standing order "north of the Fillettes": when the distance to 48 20.8 N 4 33.9 W is under 0.4 miles then shape a course for 48 21.1 N 4 32.7 W
+standing order "under Portzic": when the distance to 48 21.1 N 4 32.7 W is under 0.4 miles then shape a course for 48 21.1 N 4 31.2 W
+standing order "into the Bay": when the distance to 48 21.1 N 4 31.2 W is under 0.4 miles then shape a course for the Bay of Brest
+standing order "pilot water": every 5 minutes, if the distance to the road of Bertheaume is under 9 miles and the land is in sight then take a bearing of the land
+standing order "the lead in pilot water": every 5 minutes, if the distance to the road of Bertheaume is under 9 miles then heave the lead
+
+# The Bay of Brest: anchor where you please in eight, ten or sixteen fathoms on mud
+# (Faden); the boat ashore for the prices, and the tin sold at the quay.
+standing order "in the Bay": when the distance to the Bay of Brest is under 0.5 miles then come to an anchor
+standing order "the agent": at brought up, if the distance to Brest is under 6 miles then send the boat ashore with the mate
+standing order "the tin sold": at the boat alongside, if the distance to Brest is under 6 miles then sell forty tons of tin

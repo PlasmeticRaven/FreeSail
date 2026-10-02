@@ -1059,10 +1059,21 @@ class Chart:
         key = _name_key(name)
         if not key:
             return None
-        for f in self.features.values():
-            if key in (_name_key(f.name), _name_key(f.modern), _name_key(f.id.replace("-", " "))):
-                return f
-        return None
+        index = getattr(self, "_name_index", None)
+        if index is None:
+            # built once (package 36: a book's `the distance to <place>` reads this every
+            # tick for every rule; two hundred names normalised each time was the cost)
+            index = {}
+            for f in self.features.values():
+                for word in (
+                    _name_key(f.id.replace("-", " ")),
+                    _name_key(f.modern),
+                    _name_key(f.name),
+                ):
+                    if word:
+                        index.setdefault(word, f)
+            self._name_index = index
+        return index.get(key)
 
     def dangers_near(self, pos: Position, radius_m: float) -> list[tuple[Feature, float, float]]:
         """The charted dangers (`HAZARD_KINDS`) within `radius_m` of a point, nearest

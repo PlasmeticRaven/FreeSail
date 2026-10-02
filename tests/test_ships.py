@@ -1,0 +1,427 @@
+"""Package 36: other sail at far detail (spec M5 §25; the proposal's §5.2 and §6.1).
+
+A vessel is a hull from one of the four ship files with a polar drawn once from the
+file, a nation, a goal and a plan, moved at the roll-up's cadence by the same wind and
+tide as the player; the level-of-detail switch with its promotion point; the lookout's
+words as she nears (her rig, her colours or none, what she is), `the strangers`, `make
+her out` and the chase; the captain's chart draws a sighting by bearing and estimate and
+never her position; everything deterministic under the seed.
+"""
+
+from __future__ import annotations
+
+import json
+import math
+from datetime import datetime
+
+import pytest
+
+from freesail import units
+from freesail.api.queries import snapshot
+from freesail.api.session import make_world
+from freesail.core.world import Scenario
+from freesail.world import ships as S
+from freesail.world.geo import Position, bearing_and_distance, destination, horizon_nm
+
+FRIGATE = "data/ships/frigate-36.yaml"
+SCHOONER = "data/ships/topsail-schooner.yaml"
+CUTTER = "data/ships/cutter.yaml"
+BRIG = "data/ships/brig.yaml"
+OPEN_WATER = Position(49.60, -5.40)  # south-west of the Lizard, forty fathoms, no land in sight
+
+
+def world_at(pos: Position = OPEN_WATER, ship: str = FRIGATE, heading: float = 180.0, **kw):
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, 10, 0),
+        wind_from_deg=315.0,
+        wind_speed_kn=14.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=heading,
+        ship_speed_kn=0.0,
+        position=pos.to_dict(),
+        region="channel-west",
+        **kw,
+    )
+    return make_world(7, ship, sc)
+
+
+def events(world, kind: str):
+    return [e for e in world.log if e.kind == kind]
+
+
+def put(world, description: str, bearing_deg: float, miles: float, goal: str, **kw) -> S.Vessel:
+    """A vessel of `description` put `miles` from the ship on `bearing_deg`, with a goal."""
+    pos = destination(world.position, bearing_deg, miles * units.NAUTICAL_MILE)
+    spec = {
+        "description": description,
+        "name": kw.pop("name", description.title()),
+        "nation": kw.pop("nation", "britain"),
+        "position": pos,
+        "goal": goal,
+        **kw,
+    }
+    world.vessels.serial += 1
+    return world.vessels.add(S.vessel_from_spec(world, spec, world.vessels.serial))
+
+
+# ---------------------------------------------------------------------------
+# The polar drawn once from the file
+# ---------------------------------------------------------------------------
+
+
+def test_the_polar_is_drawn_from_the_file_and_agrees_with_the_measured_polars():
+    """`polar_of` balances the sails model against the hull's resistance at each angle
+    off the wind; its beam reaches in fifteen knots are within half a knot of the polars
+    the truths measure by sailing (docs/dev/TuningNotes.md, "Where the four ships
+    stand": the frigate 8.0, the schooner 7.9, the cutter 7.3, the brig 7.7), and the
+    ships stand in the same order."""
+    measured = {FRIGATE: 8.0, SCHOONER: 7.9, CUTTER: 7.3, BRIG: 7.7}
+    for path, kn in measured.items():
+        p = S.polar_of(path)
+        assert abs(p.speed_kn(90.0, 15.0) - kn) <= 0.5, (path, p.speed_kn(90.0, 15.0))
+        assert p.speed_kn(90.0, 8.0) < p.speed_kn(90.0, 15.0) < p.speed_kn(90.0, 25.0)
+        assert p.speed_kn(20.0, 15.0) == 0.0  # nothing closer than the grid's first angle
+    assert S.polar_of(CUTTER).speed_kn(90, 15) < S.polar_of(BRIG).speed_kn(90, 15)
+    # the fore-and-aft rigs lie closer than the square ones (truths 2 and 74)
+    assert S.polar_of(SCHOONER).closest_deg < S.polar_of(FRIGATE).closest_deg
+    assert S.polar_of(CUTTER).closest_deg < S.polar_of(BRIG).closest_deg
+    # drawn once and the same again
+    S.polar_of.cache_clear()
+    again = S.polar_of(FRIGATE)
+    assert again.speeds_kn == S.polar_of(FRIGATE).speeds_kn
+
+
+def test_the_descriptions_name_the_four_files_and_the_brigs_two_come_from_her_file():
+    assert S.description_key("a merchant brig") == "merchant brig"
+    assert S.description_key("brig-sloop") == "brig-sloop"
+    assert S.description_key("a ship of the line") is None
+    own = S.file_descriptions(BRIG)
+    assert set(own) == {"brig-sloop", "merchant brig"}  # one file, two descriptions
+    assert S.description("merchant brig")["what"] == own["merchant brig"]["what"]
+    assert S.description("brig-sloop")["file"] == S.description("merchant brig")["file"] == BRIG
+    assert S.description("frigate")["rig"] == "a ship"  # three masts, square-rigged, from the tops
+
+
+# ---------------------------------------------------------------------------
+# Goals and plans
+# ---------------------------------------------------------------------------
+
+
+def test_a_goal_makes_a_plan_and_a_goal_the_captain_does_not_know_is_refused_in_words():
+    w = world_at()
+    trade = put(w, "merchant brig", 90.0, 6.0, "trading Falmouth to the Lizard")
+    assert trade.cycle and [leg[0] for leg in trade.plan] == ["to", "to"]
+    assert trade.goal == "trading Falmouth to the Lizard"
+    bound = put(w, "schooner", 180.0, 6.0, "bound from the Longships for the Eddystone")
+    assert not bound.cycle and bound.plan[0][2] == "the Eddystone"
+    patrol = put(w, "frigate", 270.0, 6.0, "patrolling off Ushant within 6 miles")
+    assert patrol.cycle and len(patrol.plan) == 4
+    for leg in patrol.plan:
+        _, d = bearing_and_distance(Position(48.46, -5.095), leg[1])
+        assert abs(d / units.NAUTICAL_MILE - 6.0) < 0.01
+    home = put(w, "brig-sloop", 0.0, 6.0, "running home to Brest", nation="france")
+    assert home.plan[0][0] == "home" and home.nation == "france"
+    mail = put(w, "cutter", 45.0, 6.0, "carrying the mail to Plymouth")
+    assert mail.plan[0][2] == "Plymouth"
+    letter = put(w, "cutter", 135.0, 6.0, "carrying a letter to the ship", letter="A word.")
+    assert [leg[0] for leg in letter.plan] == ["to_ship", "home"] and letter.letter is not None
+    with pytest.raises(ValueError, match="no goal a captain at far detail knows"):
+        put(w, "cutter", 0.0, 3.0, "hunting the coast")
+    with pytest.raises(ValueError, match="knows no such place"):
+        put(w, "cutter", 0.0, 3.0, "bound for Valparaiso")
+    with pytest.raises(ValueError, match="no description"):
+        put(w, "ship of the line", 0.0, 3.0, "bound for Brest")
+    # two brigs of one file are not one brig: the sailing factor is drawn once each
+    other = put(w, "merchant brig", 100.0, 7.0, "trading Falmouth to the Lizard")
+    assert S.SAILING_FACTOR_MIN <= trade.sailing_factor <= 1.0
+    assert trade.sailing_factor != other.sailing_factor
+
+
+def test_she_moves_at_the_roll_ups_cadence_by_the_wind_and_the_tide_and_beats_when_she_must():
+    """Truth 67's first half: a far-detail vessel moves once a game minute and no
+    oftener, at her polar's speed for her course in the player's wind, the tide's stream
+    added over the ground; a mark to windward is beaten for, close-hauled on the tack that
+    points nearer, and the pace is no more than the polar gives."""
+    w = world_at()
+    v = put(w, "merchant brig", 180.0, 8.0, "bound for 49 00 N 5 00 W")  # a reach, SE
+    p0 = v.position
+    w.run(59)
+    assert v.position == p0  # nothing between the minutes
+    w.run(1)
+    assert v.position != p0
+    _, run_m = bearing_and_distance(p0, v.position)
+    wind_from, wind_ms = v._wind_at(w)
+    off = abs(units.rad_to_deg(units.wrap_pi(math.radians(v.heading_deg - wind_from))))
+    polar_kn = v.polar.speed_kn(off, units.ms_to_knots(wind_ms)) * v.sailing_factor
+    assert v.speed_kn == pytest.approx(polar_kn)
+    # over the ground in a minute: her way and the stream's set (the tide of 34)
+    east, north = w.tide.stream_at(v.position, w.clock.ship_time)
+    stream_m = math.hypot(east, north) * 60.0
+    assert abs(run_m - units.knots_to_ms(v.speed_kn) * 60.0) <= stream_m + 1.0
+    assert v.sail_state == "under plain sail"
+    # a mark dead to windward (NW): she beats, close-hauled on one tack, and holds it
+    beat = put(w, "schooner", 90.0, 10.0, "bound for 50 00 N 6 00 W")
+    w.run(600)
+    wind_from, _ = beat._wind_at(w)
+    off = abs(units.rad_to_deg(units.wrap_pi(math.radians(beat.heading_deg - wind_from))))
+    assert abs(off - beat.polar.closest_deg) < 0.5 and beat.tack != 0.0
+    assert beat.speed_kn > 1.0
+
+
+def test_the_level_of_detail_switch_promotes_within_two_miles_and_demotes_beyond_three():
+    """Spec M5 §25: within `NEAR_DETAIL_NM` of the player a vessel is a near-detail
+    object ticked every second, her head swinging at a rate; beyond `NEAR_DEMOTE_NM` she
+    is far again. The crewed promotion is milestone 6's, and the switch says so."""
+    assert "milestone 6" in (S.Vessel.promote.__doc__ or "")
+    w = world_at()
+    near = put(w, "cutter", 90.0, 1.5, "bound for 49 36 N 4 30 W")
+    far = put(w, "cutter", 270.0, 5.0, "bound for 49 36 N 6 30 W")
+    w.run(60)
+    assert near.detail == "near" and far.detail == "far"
+    p0 = near.position
+    w.run(1)
+    assert near.position != p0  # ticked by the second
+    # her head swings at NEAR_TURN_DEG_S, not at once
+    near.heading_deg = 0.0
+    w.run(1)
+    assert abs(units.wrap_pi(math.radians(near.heading_deg))) <= math.radians(
+        S.NEAR_TURN_DEG_S + 1e-9
+    )
+    # demoted beyond three miles (she stands away eastward at her pace)
+    for _ in range(90):
+        w.run(60)
+        if near.detail == "far":
+            break
+    _, d = bearing_and_distance(w.position, near.position)
+    assert near.detail == "far" and d / units.NAUTICAL_MILE > S.NEAR_DEMOTE_NM
+
+
+# ---------------------------------------------------------------------------
+# The lookout: a sail, her rig, her colours, what she is; lost; the glass; the chase
+# ---------------------------------------------------------------------------
+
+
+def test_the_lookout_hails_a_sail_at_the_horizon_then_her_rig_her_colours_and_what_she_is():
+    """Truth 67's second half: "Sail ho!" with a bearing first at the horizon distance
+    her rig's height and the eye give, her rig only as she nears (within
+    `RIG_MADE_OUT_NM`), her colours within `COLOURS_MADE_OUT_NM`, what she is within
+    `MADE_OUT_NM`; each a routine line as it changes, the events for the book."""
+    w = world_at()
+    w.submit("let go the best bower")  # she rides where she is, so the brig's track passes her
+    eye = w.lookout.height_of_eye_m if w.lookout.height_of_eye_m else 30.0
+    horizon = horizon_nm(eye, S.rig_height_m(BRIG))
+    # a merchant brig standing toward her from beyond the horizon, out of the north-east,
+    # for a point a mile south of her
+    past = destination(w.position, 180.0, 1.0 * units.NAUTICAL_MILE)
+    goal = f"bound for {past.lat_deg:.4f} N {-past.lon_deg:.4f} W"
+    v = put(w, "merchant brig", 45.0, horizon + 1.5, goal)
+    seen = []
+    for _ in range(600):
+        w.run(60)
+        sails = [e for e in events(w, "lookout.sighting") if e.data.get("seen_as") == "sail"]
+        if sails and not seen:
+            seen = sails
+            _, d = bearing_and_distance(w.position, v.position)
+            assert d / units.NAUTICAL_MILE <= horizon + 0.2
+            assert (
+                seen[0].text.startswith("Sail ho! A sail on the ") and "bearing N" in seen[0].text
+            )
+            assert seen[0].severity.value == "notable" and "distance_m" not in seen[0].data
+        made = events(w, "lookout.made_out")
+        if any(e.data["level"] >= 3 for e in made):
+            break
+    made = events(w, "lookout.made_out")
+    levels = [e.data["level"] for e in made]
+    assert levels == [1, 2, 3], [e.text for e in made]
+    assert made[0].text.startswith("The sail ") and " is a brig, standing to the " in made[0].text
+    assert "under plain sail" in made[0].text
+    assert made[1].text.startswith("The brig ") and made[1].text.endswith(
+        "shows British colours, the red ensign."
+    )
+    assert made[1].data["colours"] and made[1].data["nation"] == "britain"
+    assert "is a merchant brig, deep laden" in made[2].text
+    for e in made:
+        assert e.severity.value == "routine" and "distance_m" not in e.data
+    # the strangers: bearing, estimate and what has been made out; never her position
+    st = w.readings["strangers"]
+    assert st["in_sight"] and st["count"] == 1
+    item = st["items"][0]
+    assert {"bearing_deg", "estimate_m", "made_out", "words"} <= set(item)
+    assert "lat_deg" not in item and "distance_m" not in item and item["made_out"] == 3
+    assert item["words"].startswith("a merchant brig ")
+    assert w.readings.words("strangers") == st["words"]
+
+
+def test_a_stranger_under_no_colours_and_a_sail_lost():
+    w = world_at()
+    w.submit("let go the best bower")
+    # a French brig-sloop out of the north, standing for a point a mile east of her
+    past = destination(w.position, 90.0, 1.0 * units.NAUTICAL_MILE)
+    goal = f"bound for {past.lat_deg:.4f} N {-past.lon_deg:.4f} W"
+    v = put(w, "brig-sloop", 0.0, 3.5, goal, nation="france", colours="none")
+    for _ in range(240):
+        w.run(60)
+        if any(e.data["level"] >= 2 for e in events(w, "lookout.made_out")):
+            break
+    colours = [e for e in events(w, "lookout.made_out") if e.data["level"] == 2]
+    assert colours and colours[0].text.endswith("is a stranger, her colours not made out.")
+    assert not colours[0].data["colours"] and colours[0].data["nation"] is None
+    # she stands away south at her pace and is lost over the horizon
+    v.plan = [("to", Position(47.0, -5.4), "away")]
+    for _ in range(400):
+        w.run(60)
+        if events(w, "lookout.sail_lost"):
+            break
+    lost = events(w, "lookout.sail_lost")
+    assert lost and lost[0].text.endswith(" is out of sight.") and lost[0].data["id"] == v.id
+    assert not w.readings["strangers"]["in_sight"]
+
+
+def test_make_her_out_sends_a_glass_aloft_and_give_chase_puts_the_helm_for_her_bearing():
+    w = world_at()
+    e = w.submit("make her out")
+    assert e.kind == "order.rejected" and "No sail in sight to make out" in e.text
+    e = w.submit("give chase")
+    assert e.kind == "order.rejected" and "No sail in sight to chase" in e.text
+    # a brig at five miles: the eye says a sail; the glass, half as far again, her rig
+    put(w, "merchant brig", 90.0, 5.0, "bound for 49 36 N 4 00 W")
+    w.run(60)
+    assert w.readings["strangers"]["items"][0]["made_out"] == 0
+    e = w.submit("make her out")
+    assert e.kind == "lookout.made_out" and e.data["glass"] and e.data["level"] == 1
+    assert e.text.startswith(
+        "The glass aloft makes out the sail abeam to larboard: a brig, standing"
+    )
+    assert w.readings["strangers"]["items"][0]["made_out"] == 1
+    # a sail beyond the glass's reach: nothing more, and the words say why
+    far = put(w, "schooner", 270.0, 12.0, "bound for 49 36 N 7 00 W")
+    w.run(60)
+    e = w.submit("make out the schooner")
+    assert e.kind == "order.rejected"  # not made out as a schooner yet: 'a sail'
+    e = w.submit("make out the stranger")  # the nearest sail: the brig
+    assert e.kind == "lookout.made_out" and e.data["id"] != far.id
+    # the chase: the helm put for the brig's bearing, Luce 1884 p. 553
+    e = w.submit("chase the brig")
+    assert e.kind == "helm.set" and e.text.startswith("Gave chase to a brig")
+    assert "bearing E" in e.text and abs(e.data["bearing_deg"] - 90.0) < 2.0
+    assert abs(math.degrees(w.ship.dyn.target_heading) - e.data["bearing_deg"]) < 1.0
+    # the events for the book
+    e = w.submit('standing order "x": at a sail made out then give chase')
+    assert e.kind == "standing.given"
+    e = w.submit('standing order "y": at a stranger\'s colours made out then make her out')
+    assert e.kind == "standing.given"
+    e = w.submit('standing order "z": at a sail lost then heave the log')
+    assert e.kind == "standing.given"
+
+
+# ---------------------------------------------------------------------------
+# The captain's chart: by account, never the truth
+# ---------------------------------------------------------------------------
+
+
+def test_the_chart_draws_a_sighting_by_bearing_and_estimate_and_the_snapshot_carries_no_position():
+    """The proposal's §6.1: other ships "at the fidelity your lookouts can actually
+    see". The snapshot's `strangers` are bearing, estimate and words; nothing in the
+    snapshot gives a vessel's latitude or longitude, and the doubt grows with the
+    estimate (the lookout's own error, 33b's rule, which `client/map.js` draws)."""
+    w = world_at()
+    v = put(w, "frigate", 60.0, 7.0, "patrolling off 49 40 N 5 10 W within 4 miles")
+    w.run(120)
+    snap = snapshot(w)
+    st = snap["strangers"]
+    assert st["count"] == 1
+    item = st["items"][0]
+    assert item["estimate_m"] and abs(item["bearing_deg"] - 60.0) < 3.0
+    truth_bearing, truth_m = bearing_and_distance(w.position, v.position)
+    assert abs(item["estimate_m"] / truth_m - 1.0) < 0.6  # an estimate, not the truth
+    text = json.dumps(snap)
+    for value in (v.position.lat_deg, v.position.lon_deg):
+        for digits in (3, 4, 5):
+            assert f"{value:.{digits}f}" not in text  # her truth is nowhere in the snapshot
+    assert "position" not in json.dumps(st) and "lat_deg" not in json.dumps(st)
+    # the drawing's rule is in the client
+    js = open("client/map.js", encoding="utf-8").read()
+    assert "drawStrangers" in js and "ESTIMATE_DOUBT = 0.15" in js
+
+
+# ---------------------------------------------------------------------------
+# Determinism and the save
+# ---------------------------------------------------------------------------
+
+
+def test_two_worlds_with_the_same_ships_give_one_digest_and_a_checkpoint_holds_them(tmp_path):
+    from freesail.api.session import ship_factory
+    from freesail.core import replay
+
+    def voyage():
+        w = world_at()
+        put(w, "merchant brig", 45.0, 12.0, "bound for 49 30 N 5 40 W")
+        put(w, "cutter", 200.0, 9.0, "patrolling off 49 30 N 5 30 W within 3 miles")
+        w.submit("set plain sail")
+        w.run(90 * 60)
+        return w
+
+    a, b = voyage(), voyage()
+    assert a.log.digest() == b.log.digest()
+    assert [v.to_dict() for v in a.vessels.vessels] == [v.to_dict() for v in b.vessels.vessels]
+    assert "ships" in a.rng.stream_names() and "sail" in a.rng.stream_names()
+    # a checkpoint holds the vessels whole and carries on to the same digest
+    path = tmp_path / "ships.json"
+    replay.save_to_file(a, path)
+    loaded, how = replay.load(path, ship_factory)
+    assert how == "checkpoint"
+    assert [v.to_dict() for v in loaded.vessels.vessels] == [v.to_dict() for v in a.vessels.vessels]
+    a.run(30 * 60)
+    loaded.run(30 * 60)
+    assert loaded.log.digest() == a.log.digest()
+
+
+# ---------------------------------------------------------------------------
+# A pilot's boat under oars (a port file's `pilot.vessel`; the lead, 2026-10-02)
+# ---------------------------------------------------------------------------
+
+
+def test_a_ports_pilot_vessel_comes_off_as_a_boat_seen_within_two_miles_pulling_at_four_knots(
+    tmp_path,
+):
+    """35b's St Mary's and Roscoff declare what comes off under `pilot.vessel` (a gig,
+    the town's boat): her masthead a few metres, so she is seen within `BOAT_SEEN_NM`
+    and not at a cutter's horizon, her pace the boat's under oars, the lookout's words
+    "pulling off from the land", and the boarding line naming her; Falmouth, Plymouth
+    and Brest keep the cutter."""
+    from freesail.world import ports as PT
+
+    src = PT.port_files()["falmouth"]
+    path = tmp_path / "falmouth.yaml"
+    text = src.read_text(encoding="utf-8").replace(
+        "  cutter: data/ships/cutter.yaml",
+        "  cutter: data/ships/cutter.yaml\n"
+        "  vessel: {kind: a gig, name: the Falmouth pilots' gig, under: oars and a lugsail}",
+        1,
+    )
+    path.write_text(text, encoding="utf-8")
+    # the frigate standing in for Falmouth from four miles south of the outer road
+    w = world_at(Position(50.06, -5.03), heading=20.0)
+    w.ports.ports["falmouth"] = PT.load_port(path, w.chart)
+    assert w.ports.ports["falmouth"].pilot.craft == "gig"
+    w.submit("set plain sail")
+    for _ in range(150):
+        w.run(60)
+        if events(w, "port.pilot_aboard"):
+            break
+    gig = next(v for v in w.vessels.vessels if v.boat)
+    assert gig.kind == "a gig" and gig.height_m == S.BOAT_MASTHEAD_M
+    assert gig.pace_kn(0.0, 315.0, 14.0) == S.BOAT_PACE_KN
+    sails = [e for e in events(w, "lookout.sighting") if e.data.get("seen_as") == "sail"]
+    assert sails and sails[0].data["estimate_m"] <= S.BOAT_SEEN_NM * 1.4 * units.NAUTICAL_MILE
+    assert "pulling off from the land" in " ".join(
+        e.text for e in sails + events(w, "lookout.made_out")
+    )
+    hail = events(w, "port.pilot_hail")
+    assert hail and hail[0].text.startswith("The gig hailed: a pilot for Falmouth")
+    aboard = events(w, "port.pilot_aboard")
+    assert aboard and "came aboard from the gig" in aboard[0].text
+    # the three ports of 35 keep the cutter
+    for pid in ("falmouth", "plymouth", "brest"):
+        assert PT.load_port(PT.port_files()[pid], w.chart).pilot.craft == "cutter"

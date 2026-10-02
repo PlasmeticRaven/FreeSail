@@ -27,6 +27,7 @@ data; intervals (`INTERVALS`, for `every`) are seconds of ship's time.
 
 from __future__ import annotations
 
+import functools
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
@@ -1348,12 +1349,44 @@ def _bearing_by_chart(world: Any, param: str | None) -> float | None:
     return None if found is None else float(found["bearing"])
 
 
-def _distance_to(world: Any, param: str | None) -> dict[str, Any] | None:
-    """`the distance to <mark>`: from the account to any charted feature, by account."""
-    nav = _navigation_of(world)
-    found = nav.by_chart(param) if nav is not None and param else None
-    if found is None:
+@functools.lru_cache(maxsize=256)
+def _pricked(words: str) -> Any:
+    """A point pricked on the chart from its words, or None; read once per words (a
+    book's rule asks every tick)."""
+    import re
+
+    from freesail.world.geo import parse_position
+
+    try:
+        return parse_position(re.sub(r"\b(degrees?|minutes?)\b", " ", words))
+    except ValueError:
         return None
+
+
+def _distance_to(world: Any, param: str | None) -> dict[str, Any] | None:
+    """`the distance to <mark>`: from the account to any charted feature, by account; or
+    to a point pricked on the chart ('48 20 N 4 36 W': the books' waypoints, package 36),
+    likewise by account."""
+    nav = _navigation_of(world)
+    if nav is None or not param:
+        return None
+    found = nav.by_chart(param)
+    if found is None:
+        from freesail.world.geo import bearing_and_distance, format_position
+
+        pricked = _pricked(param)
+        if pricked is None:
+            return None
+        now = nav.account_now()
+        bearing, dist = bearing_and_distance(now, pricked)
+        from freesail.world.reckoning import miles_words
+
+        return {
+            "name": format_position(pricked),
+            "bearing_deg": round(bearing, 1),
+            "metres": dist,
+            "words": f"{miles_words(dist / units.NAUTICAL_MILE)} by account",
+        }
     return found | {"metres": found["metres"], "words": found["distance_words"]}
 
 
@@ -2102,6 +2135,10 @@ _event(EventSpec("aground", "ship.aground"))
 _event(EventSpec("the ground taken", "ship.aground"))
 _event(EventSpec("afloat", "ship.afloat"))
 _event(EventSpec("the turn of the tide", "ship.swung"))
+# which way she swung (package 36; the merchant passage's book takes the Goulet on the
+# flood and not on the ebb): the same line, read by its data
+_event(EventSpec("the turn to the flood", "ship.swung", lambda data: data.get("flood") is True))
+_event(EventSpec("the turn to the ebb", "ship.swung", lambda data: data.get("flood") is False))
 # Package 35: the people's, the port's and the other sail's events (spec M5 §22 to §25),
 # by the World's kinds (`world/people.py`, `world/ports.py`, the lookout's sail).
 _event(EventSpec("a sail sighted", "lookout.sighting", lambda data: data.get("seen_as") == "sail"))
@@ -2131,6 +2168,10 @@ _event(
 )
 _event(EventSpec("a sail lost", "lookout.sail_lost"))
 _event(EventSpec("a sail within hail", "sail.within_hail"))
+# and the pilot cutter's hail (package 35's kind; the merchant passage's book shortens
+# sail on it, as the cutter asks) and the cargo's coming aboard and going ashore
+_event(EventSpec("the pilot's hail", "port.pilot_hail"))
+_event(EventSpec("the cargo aboard", "market.bought"))
 
 
 def event_matches(spec: EventSpec, kind: str, data: dict[str, Any]) -> bool:

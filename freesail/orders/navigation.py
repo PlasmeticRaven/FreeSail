@@ -90,6 +90,144 @@ def _knots(text: str) -> float:
     raise OrderError(f"'{text}' is not a number of knots; say 'allow one knot of set to the east'.")
 
 
+def _position_in(words: str) -> Any:
+    """A position in the words ('48 20 N 4 36 W'), or None for a place's name."""
+    try:
+        return parse_position(re.sub(r"\b(degrees?|minutes?)\b", " ", words))
+    except ValueError:
+        return None
+
+
+def _shape_for_position(nav: Any, pricked: Any) -> tuple[float, str]:
+    """`shape a course for <position>`: the course from the account brought up to now to
+    a point pricked on the chart, with the charted dangers its line passes, as
+    `Navigation.shape_course` gives it for a named place (never from the truth)."""
+    from freesail.world.chart import DANGER_PASS_NM
+    from freesail.world.geo import bearing_and_distance, format_position
+    from freesail.world.reckoning import miles_words
+
+    world = nav.world
+    now = nav.account_now()
+    bearing, dist = bearing_and_distance(now, pricked)
+    heading = math.radians(bearing)
+    words = (
+        f"Shaped a course for {format_position(pricked)}: {units.point_name(heading)} by "
+        f"account, {miles_words(dist / units.NAUTICAL_MILE)}"
+    )
+    chart = getattr(world, "chart", None)
+    if chart is not None:
+        passes = chart.line_passes(now, pricked, DANGER_PASS_NM * units.NAUTICAL_MILE)
+        crossed = [f.name for f, _off, crosses in passes if crosses]
+        near = [f.name for f, _off, crosses in passes if not crosses]
+        said = []
+        if crossed:
+            said.append(f"the line crosses {errors.join_names(crossed, 'and')}")
+        if near:
+            said.append(f"the line passes {errors.join_names(near, 'and')} within a mile")
+        if said:
+            words += "; " + " and ".join(said)
+    return heading, words + "."
+
+
+# A chaser keeps the chase on a steady compass bearing (Luce 1884 p. 553: "by constantly
+# keeping the chase on the same compass bearing, the chaser will attain the chase in the
+# shortest time possible"; Luce 1866 ch. XXXIII, 'Chasing': the officers "should
+# constantly take the bearings"). The first order steers her bearing. Each order after
+# it, for the same sail, reads how the bearing has drawn since the last and works the
+# lead that brings the drift to nothing, as the master would on the slate: the chase's
+# way across the line of sight is the lookout's estimate of her distance times the rate
+# the bearing draws, together with his own way across it on the course he has been
+# steering; the lead off her bearing is the angle whose sine is that over his own speed.
+# Everything in it is his (the bearing, the glass, the estimate, which is a third out at
+# the worst, his log and his course); the lead is capped (judgement: a bearing that
+# swings fast is a close pass, and the lead would otherwise put her head anywhere), and
+# the course is never nearer the wind than she lies close-hauled, when she is put
+# close-hauled on the tack nearer the course (judgement).
+CHASE_LEAD_MAX_DEG = 45.0
+CHASE_STEADY_DEG = 0.5  # a drift below this is 'the bearing steady'
+CHASE_MIN_INTERVAL_S = 60.0  # two orders within a minute read no drift
+
+
+def _chase_course(world: Any, sighting: Any) -> tuple[float, str]:
+    """The course to steer for a chase, and the words of the bearing's drift and the lead;
+    the courses are degrees true."""
+    from freesail.evolutions.scripts import close_hauled_true_angle
+
+    lookout = world.lookout
+    chases = getattr(lookout, "_chases", None)
+    if chases is None:
+        chases = lookout._chases = {}
+    fid = sighting.feature.id
+    bearing = float(sighting.bearing_deg)
+    tick = int(world.clock.tick)
+    heading_deg = units.rad_to_deg(float(world.ship.heading)) % 360.0
+    last = chases.get(fid)
+    chases[fid] = (tick, bearing)
+    words = ""
+    course = bearing
+    if last is not None and tick - last[0] >= CHASE_MIN_INTERVAL_S:
+        drift = units.rad_to_deg(units.wrap_pi(math.radians(bearing - last[1])))
+        if abs(drift) < CHASE_STEADY_DEG:
+            words = ", the bearing steady"
+        else:
+            way = (
+                "aft"
+                if (drift > 0) == (units.wrap_pi(math.radians(bearing - heading_deg)) < 0)
+                else "forward"
+            )
+            words = f", drawing {way} {abs(drift):.0f} degrees since the last"
+            lead = drift
+            dyn = getattr(world.ship, "dyn", None)
+            speed = float(dyn.speed) if dyn is not None else 0.0
+            estimate = getattr(sighting, "estimate_m", None)
+            if estimate and speed > 0.1:
+                rate = math.radians(drift) / float(tick - last[0])  # rad/s, clockwise
+                across = float(estimate) * rate / speed + math.sin(
+                    math.radians(heading_deg - bearing)
+                )
+                lead = units.rad_to_deg(math.asin(max(-0.95, min(0.95, across))))
+            lead = max(-CHASE_LEAD_MAX_DEG, min(CHASE_LEAD_MAX_DEG, lead))
+            course = (bearing + lead) % 360.0
+            side = "starboard" if lead > 0 else "larboard"
+            words += f", the course led {abs(lead):.0f} degrees to {side} of her"
+    # never nearer the wind than she lies close-hauled
+    wind_from = units.rad_to_deg(float(world.wind.direction_from)) % 360.0
+    closest = units.rad_to_deg(close_hauled_true_angle(world.ship))
+    off = units.rad_to_deg(units.wrap_pi(math.radians(course - wind_from)))
+    if abs(off) < closest:
+        side = 1.0 if off >= 0 else -1.0
+        if abs(off) < 1e-6:
+            side = 1.0 if units.wrap_pi(math.radians(bearing - heading_deg)) >= 0 else -1.0
+        course = (wind_from + side * closest) % 360.0
+        words += ", as near the wind as she will lie"
+    return course, words
+
+
+# A course shaped nearer the wind than close-hauled and half a point is not laid
+# (package 35's rule for the pilot's course, `evolutions.scripts`): she is kept full and
+# by instead, and the line says so.
+COURSE_NOT_LAID_MARGIN_POINTS = 0.5
+
+
+def _course_not_laid(ship: Any, heading: float) -> str:
+    """The words when a course shaped lies too near the wind to be laid, else ''."""
+    from freesail.evolutions.scripts import close_hauled_true_angle
+    from freesail.orders.prompt import world_of
+
+    world = world_of(ship)
+    wind = getattr(world, "wind", None)
+    if wind is None:
+        return ""
+    off = abs(units.wrap_pi(heading - float(wind.direction_from)))
+    limit = close_hauled_true_angle(ship) + COURSE_NOT_LAID_MARGIN_POINTS * units.POINT
+    if off >= limit:
+        return ""
+    return (
+        f"{units.format_heading(heading)} lying too near the wind to be laid, she is kept "
+        "full and by"
+    )
+
+
 def _world_with_lookout(ship: Any) -> Any:
     """The World with a lookout at the masthead (a chart), for the other sail's orders;
     refused in words on the plane."""
@@ -176,11 +314,27 @@ def execute(ship: Any, order: Order) -> Result:
         if not rest:
             raise OrderError("Shape a course for where? Name a place of the chart.")
         nav = _navigation(ship)
-        heading, words = nav.shape_course(rest)
+        pricked = _position_in(rest)
+        if pricked is not None:
+            # a point pricked on the chart (package 36: the books' waypoints through the
+            # Goulet and out of Falmouth), the course from the account as for a place
+            heading, words = _shape_for_position(nav, pricked)
+        else:
+            heading, words = nav.shape_course(rest)
         from freesail.orders import handle
 
-        _, helm_text, helm_data = handle(ship, f"steer {units.rad_to_deg(heading):.0f}")
+        not_laid = _course_not_laid(ship, heading)
+        if not_laid:
+            # the course lies nearer the wind than she will sail: said, not steered, and
+            # she is kept full and by on the tack she is on (as the pilot's course is,
+            # package 35; the book's helm rules have no other guard)
+            _, helm_text, helm_data = handle(ship, "keep her full and by")
+            words = words.rstrip(".") + f"; {not_laid}."
+        else:
+            _, helm_text, helm_data = handle(ship, f"steer {units.rad_to_deg(heading):.0f}")
         data = {"verb": verb, "level": 1, "place": rest, "heading": heading} | {"helm": helm_data}
+        if not_laid:
+            data["course_not_laid"] = True
         return "helm.set", f"{words} {helm_text}", data
     # other sail (spec M5 §25; package 36): the glass aloft, and the chase
     if verb == "make her out":
@@ -205,16 +359,18 @@ def execute(ship: Any, order: Order) -> Result:
         heading = float(world.ship.heading)
         relative = relative_words(math.radians(sighting.bearing_deg) - heading)
         point = units.point_name(math.radians(sighting.bearing_deg))
-        who = sighting.feature.name
+        who = lookout.sail_name(sighting.feature.id, sighting.feature.name)
+        course, drift_words = _chase_course(world, sighting)
         from freesail.orders import handle
 
-        _, helm_text, helm_data = handle(ship, f"steer {sighting.bearing_deg:.0f}")
-        words = f"Gave chase to {who} {relative}, bearing {point}. {helm_text}"
+        _, helm_text, helm_data = handle(ship, f"steer {course:.0f}")
+        words = f"Gave chase to {who} {relative}, bearing {point}{drift_words}. {helm_text}"
         data = {
             "verb": verb,
             "level": 1,
             "id": sighting.feature.modern,
             "bearing_deg": round(sighting.bearing_deg, 1),
+            "course_deg": round(course, 1),
             "relative": relative,
             "helm": helm_data,
         }

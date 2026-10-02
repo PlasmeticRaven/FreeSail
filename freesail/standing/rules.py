@@ -238,8 +238,14 @@ class Clause:
         if kind == "glass":
             return value > v if op == "gt" else value < v
         if kind == "sight":  # the land (package 32): the lookout's word, in sight or not
-            words = value["words"] if isinstance(value, dict) else str(value)
-            holds = (words == v) if v == "in sight" else (words != "in sight")
+            if isinstance(value, dict) and "in_sight" in value:
+                # a sail in sight, the strangers (packages 35 and 36): the row's own flag,
+                # since its words carry the nearest sail after "in sight"
+                seen = bool(value["in_sight"])
+            else:
+                words = value["words"] if isinstance(value, dict) else str(value)
+                seen = words == "in sight"
+            holds = seen if v == "in sight" else not seen
             return holds if op == "is" else not holds
         if kind == "depth":  # the depth of water by the chart, or the lead's, in fathoms
             fm = units.m_to_fathoms(value)

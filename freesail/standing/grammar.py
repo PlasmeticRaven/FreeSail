@@ -362,6 +362,8 @@ def parse_condition(text: str, ship: Any = None, vocab: Vocabulary | None = None
 
 
 _STOP = frozenset({"and", "for", "then", ","})
+# the words that open a condition on the distance to a place (package 36)
+_DISTANCE_HEADS = ("the distance to", "distance to", "the distance of", "distance of")
 # the words that may follow a sail's or a part's name in a condition (package 32b)
 _AFTER_PART = frozenset({"is", "are", "isn't", "aren't", "exceeds", "exceed"}) | _STOP
 
@@ -471,6 +473,22 @@ _SHE = {"she": "the manoeuvre in hand"}
 def _match_reading(tokens: list[str], i: int, ship: Any, vocab: Vocabulary) -> _Match:
     if tokens[i] in _SHE:
         return _Match(tokens[i], R.REGISTRY.by_words(_SHE[tokens[i]]), (), 1)
+    # the distance to a charted place, or to a point pricked on the chart, by account
+    # (package 36; the passages' books: "when the distance to the Lizard is under 4
+    # miles"): the parametric row read with the place's words as its parameter, which
+    # run to the comparison's first word
+    for head in _DISTANCE_HEADS:
+        hw = head.split()
+        if tokens[i : i + len(hw)] != hw:
+            continue
+        j = i + len(hw)
+        k = j
+        while k < len(tokens) and tokens[k] not in _AFTER_PART:
+            k += 1
+        place = " ".join(tokens[j:k])
+        if place:
+            rows = R.REGISTRY.by_words("the distance to <mark>")
+            return _Match(f"the distance to {place}", rows, (place,), k - i)
     # the registry's words, longest first, with or without the article: "the true wind" or
     # "true wind", "daylight" or "the daylight" (package 33c; playtest 13's brig, "the
     # daylight is night" refused where "daylight is night" was taken)
