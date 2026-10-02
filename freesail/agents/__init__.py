@@ -25,12 +25,15 @@ The harness and the consent step import nothing of any vendor; only the two door
 from __future__ import annotations
 
 from freesail.agents.agent import (
+    OFFICER,
     OPT_OUT_TOKEN,
     AgentState,
     Authority,
     Brief,
+    Domain,
     SamplingPolicy,
     Station,
+    officer,
     watcher,
 )
 from freesail.agents.fake import Fake, Transcript, call, narrator, reply, say
@@ -46,6 +49,7 @@ from freesail.agents.model import Reply, Sample, ToolCall, Turn
 from freesail.agents.tools import TOOLS
 
 __all__ = [
+    "OFFICER",
     "OPT_OUT_TOKEN",
     "TOOLS",
     "TOOL_CALLS_PER_SAMPLE",
@@ -54,6 +58,7 @@ __all__ = [
     "AgentState",
     "Authority",
     "Brief",
+    "Domain",
     "Fake",
     "Harness",
     "Journal",
@@ -66,6 +71,7 @@ __all__ = [
     "Turn",
     "call",
     "narrator",
+    "officer",
     "reply",
     "restore",
     "say",
