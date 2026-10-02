@@ -11,10 +11,22 @@ says to the forecastle about the anchors and the cable.
     veer to <n> fathoms             the scope veered to
     heave short                     the cable in to a short stay
     weigh                           the anchor hove up, catted and fished; the time by the
-                                    scope
+                                    scope; no sail set (the owner, 2026-10-02)
     cat and fish the anchor         an anchor left aweigh secured
     back the anchor                 the stream anchor let go on the riding cable
     the ground tackle               the anchors and their cables (a query)
+
+and the port's (spec M5 §23; package 35):
+
+    get under way [on the <tack> tack] [and steer <course>]
+                                    Luce's whole sequence: heave short, loose and sheet
+                                    home the topsails, weigh, cast her on the tack the
+                                    pilot wants, the anchor catted and fished as she pays
+                                    off; the pilot's tack and course when he is aboard
+    moor [with the small bower]     a second anchor laid, a cable each way, the hawse open
+    unmoor                          the lee anchor hove up, to single anchor
+    lay out a kedge [to the <point>] [<n> fathoms]
+                                    the kedge carried out by the boat and let go there
 
 Each is a verb of `data/vocabulary.yaml` with the object `anchor`: the grammar takes the
 words after the verb as they are, and this module reads an anchor's name and a number of
@@ -51,7 +63,16 @@ _EVOLUTIONS = {
     "weigh": "weigh_anchor",
     "cat and fish the anchor": "cat_and_fish_anchor",
     "back the anchor": "back_anchor",
+    # the port (package 35; spec M5 §23): Luce's whole getting under way, the moor and
+    # the unmoor, and a kedge laid out by the boat
+    "get under way": "get_under_way",
+    "moor": "moor",
+    "unmoor": "unmoor",
+    "lay out a kedge": "lay_out_kedge",
 }
+
+_TACK_RE = re.compile(r"\b(?:on|to)?\s*(?:the\s+)?(starboard|larboard|port)\s+tack\b")
+_COURSE_RE = re.compile(r"\b(?:and\s+)?(?:steer|steering|course)\s+(?P<course>[\w\s]+?)\s*$")
 
 _FATHOMS_RE = re.compile(r"(?P<n>\d+(?:\.\d+)?|[a-z]+(?:\s+and\s+a\s+half)?)\s+fathoms?\b")
 _NUMBER_WORDS = {
@@ -131,12 +152,56 @@ def execute(ship: Any, order: Order) -> Result:
         "let go the anchor",
         "cat and fish the anchor",
         "back the anchor",
+        "moor",
     ):
         words = _anchor_words(remainder)
         if words and named is None:
             named = words
         if named is not None:
             params["anchor"] = named
+    elif verb == "get under way":
+        # the tack to cast on and the course to steer once she has cast (package 35):
+        # 'get under way on the larboard tack', '... and steer S by E'; the pilot's when
+        # none is said and he is aboard
+        low = remainder.lower()
+        m = _TACK_RE.search(low)
+        if m:
+            params["tack"] = "larboard" if m.group(1) == "port" else m.group(1)
+            low = low[: m.start()] + " " + low[m.end() :]
+        c = _COURSE_RE.search(low)
+        if c:
+            from freesail import units
+
+            heading = units.parse_compass_point(c.group("course").strip())
+            if heading is None:
+                try:
+                    heading = units.deg_to_rad(float(c.group("course").strip()))
+                except ValueError:
+                    raise OrderError(
+                        f"'{c.group('course').strip()}' is not a course to steer once she has cast."
+                    ) from None
+            params["course_deg"] = units.rad_to_deg(heading)
+            low = low[: c.start()] + " " + low[c.end() :]
+        left = " ".join(w for w in low.split() if w not in ("and", "the", "on", "to", "her"))
+        if left:
+            raise OrderError(
+                f"'{left}' was not understood after 'get under way'; say 'get under way', "
+                "'get under way on the larboard tack' or '... and steer S by E'."
+            )
+    elif verb == "lay out a kedge":
+        # the bearing to lay it out on, and the fathoms of hawser (package 35)
+        low = remainder.lower()
+        low = re.sub(r"\b(to|toward|towards|the|of|hawser|with|out)\b", " ", low).strip()
+        if low:
+            from freesail import units
+
+            toward = units.parse_compass_point(low)
+            if toward is None:
+                raise OrderError(
+                    f"'{low}' is not a bearing to lay the kedge out on; say 'lay out a kedge to "
+                    "the NE', with the fathoms of hawser if you like."
+                )
+            params["toward_deg"] = units.rad_to_deg(toward)
     elif remainder.strip():
         raise OrderError(
             f"'{verb}' takes nothing after it; '{remainder.strip()}' was not understood."

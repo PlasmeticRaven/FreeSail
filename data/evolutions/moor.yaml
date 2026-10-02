@@ -1,0 +1,45 @@
+# Moor (spec M5 §23; package 35; package 34's note: "mooring with two anchors and the
+# hawse"). From single anchor, a second anchor laid so that she rides between the two
+# with a cable on each and the hawse open to the quarter the worst wind comes from.
+# Luce 1866, ch. XXXIV Anchoring, 'Mooring' (pp. 574 to 578 of the 1877 printing): the
+# reasons for mooring ("in a river too narrow for a ship to swing in at single anchor
+# without grounding"; "when the flag officer desires to have his ships as close together
+# as possible, he orders them to moor"), and the way of it: the ship at single anchor
+# veers away on the riding cable to twice the scope she will ride by, lets go the second
+# bower where she has dropped to, then heaves in on the first and veers on the second
+# until she lies midway with a cable's length on each (the open-hawse moor, "the two
+# bow-chains ... an angle of sixty degrees with each other" in the four-anchor case). Of
+# the hawse Lever 1808, 'Mooring' (p. 100 of the 1827 printing): "Ships are moored with
+# an open Hawse to that Quarter from whence the most violent wind is to be expected: and
+# it is of the greatest consequence to keep the Hawse clear; for should it blow hard
+# when foul, the Cables cannot be veered away for a greater Scope to ride by"; and of a
+# cross, an elbow and a round turn in the hawse the same page. Falconer 1780, MOORING:
+# "the act of confining and securing a ship in a particular station, by chains or cables
+# ... A ship may be either moored by the head, or by the head and stern." The hawse is
+# kept clear by swinging with the tide (Luce, 'To keep the hawse clear or tend ship when
+# moored'); the game keeps the two cables as two anchors down in the physics
+# (physics/anchor.py sums the pull of every anchor down) and does not yet foul the hawse.
+#
+# The script (freesail/evolutions/scripts.py, MoorScript):
+#   veer        the riding cable veered to twice the riding scope the depth wants
+#   let_go      the second bower let go where the hawse is
+#   middle      the first cable hove in and the second veered to the riding scope each
+# Parameter `anchor`: the second anchor (the bower not down, unless said).
+id: moor
+verb: moor
+applies_to: {class: ship}
+script: moor
+params: {anchor: null}
+preconditions: []
+timing:
+  veer_fathoms_per_s: 1.0   # "veering away roundly" (Luce): judgement
+  stand_clear_s: 15         # "Stand clear of the cable!": judgement
+  heave_fathoms_per_s: 0.1  # six fathoms a minute at the capstan: judgement
+  rig_capstan_s: 180        # the messenger and the bars for middling: judgement
+on_start: {log: "Moor ship! Veer away on {anchor} cable; clear away {second}."}
+on_complete: {log: "Moored with {anchor} to the {first_point} and {second} to the {second_point}, {fathoms} on each; the hawse open to the {open_point}.", kind: ship.moored, severity: notable}
+on_fail: {log: "Could not moor: {reason}.", kind: evolution.failed, severity: notable}
+# crew: all hands at the cables and the capstan (Luce's 'Mooring' has the whole company);
+# not a manoeuvre: sail is furled already.
+crew: {hands: all, rating: ordinary, stations: [all hands]}
+source: "Luce 1866, ch. XXXIV Anchoring, 'Mooring' and 'To keep the hawse clear or tend ship when moored' (pp. 574 to 578); Lever 1808, 'Mooring' (p. 100: the open hawse, a cross, an elbow, a round turn); Falconer 1780, MOORING"

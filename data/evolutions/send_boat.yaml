@@ -1,0 +1,37 @@
+# Send the boat (spec M5 §23; package 35; InwardAndOutward.md: "the boat alongside").
+# A passage by distance at a boat's pace with hands and time: the boat hoisted out, away
+# to the port's quay, her business ashore, back alongside and hoisted in; carrying a
+# person, a message or a purchase, and bringing back the purser's list of the prices,
+# the letters that wait at the port, and the goods bought. What she brings reaches the
+# captain where he is through the messenger and the door (freesail/world/people.py,
+# truth 68). Luce 1866, 'Boats' (the boats a ship carries, lowering and hoisting, the
+# launch bringing off the water in gang casks); Falconer 1780, BOAT and LONG-BOAT; the
+# Regulations of 1806 for the purser's purchases ashore (p. 106 of the 1808 printing,
+# by survey and voucher). The boat and her crew are the ship file's (`boats:`, from
+# tools/gen_ships.py); the hands below are the launch's crew of a frigate, which the
+# smaller vessels' boats take as well (judgement: the file's crew figure is the words,
+# the request the hands).
+#
+# The script (freesail/evolutions/scripts.py, SendBoatScript) holds the boat and not
+# the ship, so that the cable is veered and the sheets tended while she is away:
+#   hoist_out   the boat out
+#   pull_out    to the quay at the boat's pace, by the distance
+#   ashore      the business ashore (ports.BOAT_ASHORE_S by errand)
+#   pull_back   back alongside
+#   hoist_in    hoisted in; what she brings comes aboard
+# The errand and the port are the order's (freesail/world/ports.py).
+id: send_boat
+verb: send_boat
+applies_to: {class: ship}
+script: send_boat
+params: {errand: prices, port: null}
+preconditions: []
+timing:
+  hoist_out_s: 300     # ports.BOAT_HOIST_OUT_S: judgement
+  hoist_in_s: 300      # ports.BOAT_HOIST_IN_S: judgement
+  boat_pace_kn: 4.0    # ports.BOAT_PACE_KN: judgement
+on_start: {log: "Away {boat}'s crew! Hoist out {boat}."}
+on_complete: {log: "{boat_cap} hoisted in.", kind: boat.in, severity: routine}
+on_fail: {log: "The boat could not go: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 11, rating: ordinary, stations: [forecastle, afterguard, waisters]}
+source: "Luce 1866, 'Boats' (lowering and hoisting, the launch and the water); Falconer 1780, BOAT, LONG-BOAT, YAWL; the Regulations of 1806, the Captain, art. XVI (purchases ashore)"

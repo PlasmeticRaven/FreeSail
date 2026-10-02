@@ -1,0 +1,39 @@
+# Lay out a kedge by the boat (spec M5 §23; package 35; package 34's note "a kedge laid
+# by the boat"). The kedge and its hawser carried out in the launch to a bearing and let
+# go there, the hawser's end aboard: Falconer 1780, KEDGE: "a small anchor used to keep
+# a ship steady whilst she rides in a harbour or river, particularly at the turn of the
+# tide, when she might otherwise drive over her principal anchor, and entangle the stock
+# or flukes with her slack cable"; Lever 1808, 'Mooring' (p. 100): "When the Ship cannot
+# be managed by the Helm and Sails, in light winds, a Kedge Anchor and Hawser must be
+# carried out, and she may be hove to it by the Capstern, the Hawser being led in
+# through one of the Quarter Ports"; Luce 1866, ch. XXXIV, 'Laying out a kedge' (the
+# hawser coiled in the boat's stern sheets, the kedge slung over the stern, paid out as
+# she pulls, let go at the end). Warping to it (heaving the ship up to the kedge) is
+# milestone 8's; here the kedge holds as any anchor down does (physics/anchor.py), the
+# ship riding between it and her bower at the turn of the tide, which is Falconer's use.
+#
+# The script (freesail/evolutions/scripts.py, LayOutKedgeScript):
+#   hoist_out   the boat hoisted out, the kedge slung and the hawser coiled in her
+#   pull_out    the boat pulls out the hawser's length on the bearing at a boat's pace
+#   let_go      the kedge let go; the hawser taut aboard
+#   pull_back   the boat back alongside and hoisted in
+# Parameters: `toward_deg`, the bearing to lay it out on (none: ahead, up the stream
+# she rides to); `fathoms` of hawser (none: three quarters of the hawser, the rest for
+# the scope and the quarter port).
+id: lay_out_kedge
+verb: lay_out_kedge
+applies_to: {class: ship}
+script: lay_out_kedge
+params: {toward_deg: null, fathoms: null}
+preconditions: []
+timing:
+  hoist_out_s: 300        # the boat out with the yard and stay tackles, the kedge slung (Luce 1866 'Boats' for the sequence; judgement in the time)
+  sling_s: 300            # the kedge over the boat's stern and the hawser coiled in her (judgement)
+  boat_pace_kn: 4.0       # a boat pulling, laden: judgement (ports.BOAT_PACE_KN)
+  hoist_in_s: 300         # judgement
+  hawser_fraction: 0.75   # the part of the hawser laid out (judgement)
+on_start: {log: "Hoist out {boat}; the kedge and a hawser into her."}
+on_complete: {log: "The kedge laid out {fathoms} to the {point} by {boat}; the hawser taut to the capstan.", kind: ship.kedged, severity: notable}
+on_fail: {log: "Could not lay out the kedge: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 16, rating: ordinary, stations: [forecastle, waisters]}
+source: "Falconer 1780, KEDGE; Lever 1808, 'Mooring', p. 100 (the kedge and hawser carried out); Luce 1866, ch. XXXIV, 'Laying out a kedge' and 'Boats'"

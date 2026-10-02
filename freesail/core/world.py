@@ -117,6 +117,18 @@ class Scenario:
     # of the moon's bearing, the poorer table); None chooses by the ship (a ship of war
     # carries Norie's, the rest Moore's). The world's tide is not a scenario's choice.
     epitome: str | None = None
+    # Package 35 (spec M5 §22 to §24, §27): the ship's nation (None: by the names list her
+    # company is drawn from, `freesail.world.nations`); her people beyond the muster's
+    # ([{"role", "name", "skill", "place"}]); her papers ({"price_lists": [port ids]} she
+    # starts with); her cargo and purse ({"purse_pounds", "goods": {good: tons}}); and
+    # the ports' state (a list of port ids, or {id: {"closed_to": [...], "letters":
+    # [...], "news": [...]}}; None: every port file when the world has a chart). A save
+    # from before loads with the defaults.
+    nation: str | None = None
+    people: list[dict[str, Any]] = field(default_factory=list)
+    papers: dict[str, Any] = field(default_factory=dict)
+    cargo: dict[str, Any] = field(default_factory=dict)
+    ports: Any = None
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
@@ -373,6 +385,35 @@ class World:
                 self.ship.extra["navigation"] = self.navigation
         if self.tide is not None:
             self._tick_tide()  # the tide at the start, before the first look
+        # The nations, the places with their ledgers, the people, the papers, the ports and
+        # the other sail (spec M5 §22 to §25; package 35). The people are built at their
+        # first call, the crew being mustered after the World is made (as the master is);
+        # the ports load their files when the world has a chart, or when the scenario
+        # names them; the vessels are the pilot cutter's list until package 36.
+        from freesail.world.nations import load_nations
+        from freesail.world.people import People
+        from freesail.world.places import Hold, Papers, Places, Purse, Stores
+        from freesail.world.ports import Ports
+        from freesail.world.ships import Vessels
+
+        self.nations = load_nations()
+        self.places = Places(getattr(self.ship, "name", ""))
+        self.people = People(self)
+        self.papers = Papers(self)
+        self.vessels = Vessels()
+        hold_spec = getattr(getattr(self.ship, "spec", None), "hold", None)
+        cargo = self.scenario.cargo or {}
+        self.hold = Hold(float(hold_spec.capacity_tons) if hold_spec is not None else 0.0)
+        for good, tons in (cargo.get("goods") or {}).items():
+            self.hold.goods[str(good)] = float(tons)
+        self.purse = Purse(float(cargo.get("purse_pounds", 0.0) or 0.0))
+        crew_spec = getattr(getattr(self.ship, "spec", None), "crew", None)
+        stores_spec = getattr(crew_spec, "stores", None)
+        self.stores = Stores(
+            float(getattr(stores_spec, "water_tons", 0.0) or 0.0),
+            float(getattr(stores_spec, "provisions_days", 0.0) or 0.0),
+        )
+        self.ports = Ports(self)
         # The readings (spec M4 §2): one view per tick and per order, read by the standing
         # orders, the snapshot and the agents alike.
         self._readings_key: tuple[int, int] | None = None
@@ -630,6 +671,9 @@ class World:
         self._aground = self.ground.aground
         if self.at_anchor:
             self._tick_anchors()
+        if self.clock.ship_time.second == 0:
+            # the other sail move once a minute, before the lookout looks (package 35)
+            self.vessels.tick(self)
         if self.lookout is not None and self.clock.ship_time.second == 0:
             for severity, kind, text, data in self.lookout.look(self):
                 self.record(severity, kind, text, data=data)
@@ -983,6 +1027,12 @@ class World:
             # log, the casts and the noon, after the lookout has looked
             pending, self._nav_pending = self._nav_pending, []
             self.navigation.tick(pending)
+        # the ports (spec M5 §23, package 35): the pilot's coming and going once a minute,
+        # the yard's and the pool's jobs when due; then the people's tasks done, the moves
+        # in hand finished and the letters delivered through the door (§22)
+        self.ports.tick()
+        for severity, kind, text, data in self.people.tick(self.clock.tick):
+            self.record(severity, kind, text, data=data)
         # the watch routine (spec M3 §4): watch changes, all hands, fatigue and rest
         routine = (getattr(self.ship, "extra", None) or {}).get("routine")
         if routine is not None:
@@ -1048,6 +1098,9 @@ class World:
             anchor_lines.append(self.readings.words("anchor"))
             if self.at_anchor:
                 anchor_lines.append(self.readings.words("cable"))
+        if self.ports.ports and self.readings["port"] is not None:
+            # the port she is in or near, the pilot and the boat (package 35)
+            anchor_lines.append(f"Port: {self.readings.words('port')}.")
         return [
             self.clock.stamp(),
             f"Wind {self.wind.describe()}, "

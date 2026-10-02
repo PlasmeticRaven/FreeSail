@@ -584,50 +584,37 @@ CONSOLE_ONLY = ("state", "muster", "log", "replay ", "help", "quit")
 # station the same pages (`tools.library`); the name only fills its signature.
 BROWSER_READER = "captain"
 
-# The ship's papers that are not yet aboard, with what they wait for, in words.
-PAPERS_WAITING = (
-    (
-        "the sailmaker's account",
-        "The sail room is not yet a place aboard. Until it is, its paper here is what "
-        "'the sail room' answers at the order line; the sailmaker's account, kept below "
-        "and only as current as its last entry, waits for the ship's places.",
-    ),
-    (
-        "the establishment",
-        "The establishment of anchors and cable for the ship's rate waits for her ground tackle.",
-    ),
-)
-
 
 def ship_papers(world: World) -> dict[str, Any]:
-    """The ship's papers the game holds by handle, each in the words its query answers at
-    the order line (`the booms`, `the sail room`, `the boatswain's store`: the same lines,
-    from the same stores), and the papers that wait, with what for. Read, never logged:
-    the console's queries are printed and not logged either."""
-    from freesail.ship.parts import cordage
+    """The ship's papers (package 35; spec M5 §22): the library's `papers` topic, the
+    same pages the model's `library(topic='papers')` serves (`freesail.agents.tools`),
+    each by handle with its keeper, its place and its last entry; nothing waits any
+    more. Read, never logged: the keepers' writing is what the log says."""
+    from freesail.agents import tools
+    from freesail.world.places import PLACES
 
     ship = world.ship
-    waiting = [{"handle": h, "words": w} for h, w in PAPERS_WAITING]
     if not hasattr(ship, "spars"):
-        return {"papers": [], "waiting": waiting, "words": "A ship with no parts keeps no papers."}
-    papers = [
-        {
-            "handle": "the booms",
-            "words": "the spare spars aboard, by class",
-            "lines": queries.booms_lines(world),
-        },
-        {
-            "handle": "the sail room",
-            "words": "every spare sail, its canvas and its condition",
-            "lines": queries.sail_room_lines(world),
-        },
-        {
-            "handle": "the boatswain's store",
-            "words": "the spare cordage, in fathoms",
-            "lines": cordage(ship).inventory_lines(),
-        },
-    ]
-    return {"papers": papers, "waiting": waiting, "words": ""}
+        return {"papers": [], "waiting": [], "words": "A ship with no parts keeps no papers."}
+    top = tools._papers_topic(world)
+    papers = []
+    for page in world.papers.pages():
+        place = PLACES.get(page.place)
+        papers.append(
+            {
+                "handle": page.handle,
+                "words": (
+                    f"{page.words}; kept by the {page.keeper} in "
+                    f"{place.name if place is not None else page.place}; last written {page.as_of}"
+                ),
+                "lines": page.lines,
+                "keeper": page.keeper,
+                "place": page.place,
+                "as_of": page.as_of,
+                "ask": f"library(topic='papers', section='{page.handle}')",
+            }
+        )
+    return {"papers": papers, "waiting": [], "words": "", "title": top.title}
 
 
 def shelf_routes(lock: Any, world: Callable[[], World]) -> APIRouter:
@@ -640,7 +627,7 @@ def shelf_routes(lock: Any, world: Callable[[], World]) -> APIRouter:
         GET /api/complete?line=...&limit=N    the completer's whole-line suggestions
         GET /api/library?topic=&section=&find= a page of the library, as the tool serves it
         GET /api/library/topics               the shelf's index: each topic, its sections
-        GET /api/library/papers               the ship's papers, and the papers that wait
+        GET /api/library/papers               the ship's papers, the library's `papers` topic
     """
     from freesail.agents import tools
     from freesail.orders.complete import suggestions

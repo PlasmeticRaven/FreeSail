@@ -1,0 +1,62 @@
+# FreeSail: the ship's papers (spec M5 §22; docs/design/Papers-and-Books.md; package 35).
+# Read by freesail/world/places.py (`Papers`), which makes each paper's page from the
+# store it records, and served by handle through the library's `papers` topic
+# (freesail/agents/tools.py) to every station the same, the browser's pane included.
+#
+# Each paper is a thing aboard with a keeper (a role of freesail/world/people.py) and a
+# place (freesail/world/places.py), and is only as current as its last entry: the page
+# says when it was last written, and the log says when a keeper writes it. `source` names
+# the store the page is made from; the page's words are the store's own query's lines
+# (`the sail room`, `the booms`, `the boatswain's store`, `the ground tackle`), so that the
+# paper and the query at the order line say one thing.
+#
+# The period's papers these stand for: the Regulations of 1806 require of the standing
+# officers "Accounts of the receipt, expenditure or remains of the Stores" (the boatswain's
+# and carpenter's expense books, p. 226 and p. 233 of the 1808 printing), of the sailmaker
+# that he "very carefully examine the sails" and keep them in repair (p. 299), of the
+# purser his books of provisions and slops (pp. 317 ff.), and of the master his log and
+# remark book. The epitome's table of the establishments is Norie's Table XLI (1803) as
+# data/tides/establishments.yaml has it; a merchantman's manifest is her cargo by tons for
+# the custom house.
+
+papers:
+  - handle: the sailmaker's account
+    keeper: sailmaker
+    place: sail_room
+    source: sail_room
+    words: every spare sail in the sail room, its canvas and its condition, as the sailmaker last found it
+  - handle: the manifest
+    keeper: purser            # the mate in a merchantman: the keeper falls to the mate where there is no purser
+    place: hold
+    source: manifest
+    words: the hold's capacity and the cargo in it by tons, with the purse
+  - handle: the purser's books
+    keeper: purser
+    place: hold
+    source: purser
+    words: the stores of water and provisions, and the slops issued
+  - handle: the boatswain's store book
+    keeper: boatswain
+    place: deck
+    source: cordage
+    words: the spare cordage, in fathoms
+  - handle: the booms' list
+    keeper: boatswain
+    place: deck
+    source: booms
+    words: the spare spars aboard, by class
+  - handle: the establishment of ground tackle
+    keeper: boatswain
+    place: deck
+    source: ground_tackle
+    words: the anchors and their cables, each with its weight and its state
+  - handle: the epitome's table of the establishments
+    keeper: master
+    place: cabin
+    source: epitome
+    words: the time of high water at full and change by port, and the spring rise, from the master's epitome
+  - handle: the price list
+    keeper: purser
+    place: cabin
+    source: prices
+    words: the prices at the last port the boat was ashore in, as the purser brought them off

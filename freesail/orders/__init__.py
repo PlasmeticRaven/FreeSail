@@ -87,6 +87,13 @@ def handle(ship: Ship, text: str) -> tuple[str, str, dict[str, Any]]:
         if answered is None:
             raise
         return answered
+    except UnknownNounError:
+        # 'take in twenty tons of water', 'take in provisions for thirty days': the sail
+        # verb's words with no sail in them, the port's business (package 35)
+        stores = _stores_order(text)
+        if stores is None:
+            raise
+        order = stores
     if order.verb in vocab.readings:
         # a reading asked at the prompt (package 33c): a query, in the registry's words
         return prompt.answer(ship, order, text, vocab)
@@ -113,13 +120,41 @@ def _carry_out(ship: Ship, order: Order, vocab: Vocabulary) -> tuple[str, str, d
                 raise OrderError(absent)
         return navigation.execute(ship, order)
     if vocab.verbs[order.verb].object == "anchor":
-        # the ground tackle's orders (spec M5 §18, package 34)
+        # the ground tackle's orders (spec M5 §18, package 34), and the port's evolutions
+        # on it (package 35: get under way, moor, unmoor, lay out a kedge)
         from freesail.orders import ground_tackle
 
         return ground_tackle.execute(ship, order)
+    if vocab.verbs[order.verb].object == "person":
+        # the people's orders (spec M5 §22, package 35)
+        from freesail.orders import people
+
+        return people.execute(ship, order)
+    if vocab.verbs[order.verb].object == "port":
+        # the port's orders (spec M5 §23, package 35)
+        from freesail.orders import port
+
+        return port.execute(ship, order)
     if order.verb == "set" and ("reefs" in order.modifiers or "close" in order.modifiers):
         return _set_reefed(ship, order, vocab)
     return verbs.execute(ship, order, vocab)
+
+
+def _stores_order(text: str) -> Order | None:
+    """'take in twenty tons of water' as the port's `take in water` with the words after
+    the verb as said, or None when the words are not the stores'."""
+    low = " ".join(text.lower().split())
+    if not low.startswith("take in "):
+        return None
+    rest = low.removeprefix("take in ").strip()
+    words = rest.split()
+    if any(w in ("water",) for w in words):
+        verb = "take in water"
+    elif any(w in ("provisions", "provision") for w in words):
+        verb = "take in provisions"
+    else:
+        return None
+    return Order(text=low, verb=verb, verb_phrase="take in", object=rest)
 
 
 # The navigation verbs that heave a lead (`data/vocabulary.yaml`).

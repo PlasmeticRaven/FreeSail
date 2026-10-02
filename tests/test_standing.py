@@ -620,7 +620,8 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (
         F,
         'standing order "x": when a sail in sight is near then clear for action',
-        no(["nothing to sight yet"]),
+        # a reading since package 35 (the lookout's other sail): compared as the land is
+        no(["'a sail in sight' cannot be 'near'", "in sight or not in sight"]),
     ),
     (
         F,

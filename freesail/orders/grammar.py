@@ -135,13 +135,14 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
             verb_phrase=verb_phrase,
             object=said or None,
         )
-    if spec.object in ("navigation", "reading", "anchor"):
+    if spec.object in ("navigation", "reading", "anchor", "person", "port"):
         # what the captain says to the master (spec M5 §15, package 33a): the words after
         # the verb are a mark, a place, a position or an allowance, read by
         # `orders.navigation` as they were said (the original text, not the lower-cased
         # form: a mark's name is matched without regard to case, a position by its
         # letters); and a reading asked with its mark, `the bearing of the Lizard`
-        # (package 33c, `orders.prompt`)
+        # (package 33c, `orders.prompt`); a person by his role or his name, and the
+        # port's words (package 35, `orders.people` and `orders.port`)
         said = " ".join(w for w in [*rest, *(w for seg in segments[1:] for w in seg)] if w != ",")
         return Order(
             text=norm.replace(" , ", ", "),

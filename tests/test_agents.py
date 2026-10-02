@@ -338,7 +338,15 @@ def test_library_serves_the_primer_the_catalogue_the_grammar_the_ship_and_the_bo
     world.submit('standing order "night routine": at sunset then take in the royals')
     lib = lambda topic: tools.call(world, "watcher", "library", {"topic": topic})  # noqa: E731
     contents = lib("contents")
-    for topic in ("primer", "catalogue", "grammar", "the ship", "standing orders", "tools"):
+    for topic in (
+        "primer",
+        "catalogue",
+        "grammar",
+        "the ship",
+        "papers",
+        "standing orders",
+        "tools",
+    ):
         assert topic in contents
     assert "primer 2: the wind and the points of sail" in contents
     # a chapter is its sections with their sizes; the whole is there on request
@@ -1727,8 +1735,11 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     tool_page = lib(world, topic="tools")
     assert f"what each takes, {tools.size_words(tools.tokens(tool_page))}" in contents
     # the bowsprit's two, reeve_line, the three navigation evolutions, the two sheet trims
-    # ... and the lunar (package 33b: take_lunar.yaml), and the anchor's seven (package 34)
-    assert "60 evolutions; the list about" in contents
+    # ... and the lunar (package 33b: take_lunar.yaml), the anchor's seven (package 34),
+    # and the port's five (package 35: get under way, moor, unmoor, the kedge, the boat)
+    assert "65 evolutions; the list about" in contents
+    # the ship's papers are a topic beside the ship (package 35), listed with their handles
+    assert "  papers: the ship's papers, 8 aboard" in contents and "the manifest" in contents
 
 
 def test_a_chapter_lists_its_sections_with_sizes_and_serves_one_by_a_word_or_its_number():

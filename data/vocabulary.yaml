@@ -624,7 +624,7 @@ verbs:
   weigh:
     synonyms: [weigh anchor, weigh the anchor, up anchor, heave up the anchor, heave up,
                all hands up anchor, get the anchor, heave up the best bower, heave up the small bower,
-               weigh the best bower, weigh the small bower, get under way, get under weigh]
+               weigh the best bower, weigh the small bower]
     object: anchor
     level: 1
   cat and fish the anchor:
@@ -643,6 +643,97 @@ verbs:
     synonyms: [the anchors, the anchors and cables, show the ground tackle, the cables]
     object: query
     level: 0
+  # Package 35 (spec M5 §22, §23; the people's and the port's words). The port's
+  # evolutions take the object `anchor`, as 34's do (`freesail/orders/ground_tackle.py`
+  # reads the tack to cast on and the bearing to lay the kedge out on from the words after
+  # the verb). `get under way` is Luce's whole sequence (ch. XXI: heave short, loose and
+  # sheet home the topsails, weigh, cast her) and leaves `weigh` alone what package 34
+  # made it, the anchor up and no sail set (the owner, 2026-10-02). `moor` and `unmoor`
+  # are Luce's ch. XXXIV and Lever's 'Mooring' (the open hawse); `lay out a kedge` is
+  # Falconer's KEDGE and Lever's p. 100, by the boat.
+  get under way:
+    synonyms: [get under weigh, get her under way, get the ship under way, up anchor and make sail,
+               weigh and make sail, make sail and weigh, get under way on the]
+    object: anchor
+    level: 1
+  moor:
+    synonyms: [moor ship, moor her, moor the ship, moor with two anchors, moor a cable each way,
+               moor with the]
+    object: anchor
+    level: 1
+  unmoor:
+    synonyms: [unmoor ship, unmoor her, unmoor the ship, get to single anchor]
+    object: anchor
+    level: 1
+  lay out a kedge:
+    synonyms: [lay out the kedge, lay out a kedge anchor, carry out a kedge, carry out the kedge,
+               run out a kedge, run out the kedge, lay out the kedge to the, lay out a kedge to the,
+               carry out the kedge to the]
+    object: anchor
+    level: 1
+  # The people (spec M5 §22; `freesail/orders/people.py`): the object `person` takes the
+  # words after the verb as said (a role or a surname). "Pass the word for" is the
+  # period's call about the decks; "send for" the captain's to his cabin.
+  send for:
+    synonyms: [pass the word for, send aft for, send for the, pass the word for the, summon,
+               call the carpenter, call the master, call the surgeon, call the boatswain,
+               call the purser, call the sailmaker, call the first lieutenant, call the mate,
+               call the pilot]
+    object: person
+    level: 1
+  go below:
+    synonyms: [go below to the cabin, go to the cabin, go to my cabin, retire to the cabin,
+               go down to the cabin, below]
+    object: person
+    level: 1
+  come on deck:
+    synonyms: [come up on deck, come up, go on deck, on deck, come on deck again, up on deck]
+    object: person
+    level: 1
+  ask the pilot:
+    synonyms: [ask the pilot about, ask the pilot for, ask the pilot when, ask the pilot how,
+               ask the pilot where, ask the pilot what, ask pilot]
+    object: person
+    level: 1
+  # The port (spec M5 §23; `freesail/orders/port.py`): the object `port` takes the words
+  # after the verb as said (a person for the boat, a number of tons and a good, an item
+  # of the yard, a number of hands and a rating).
+  send the boat:
+    synonyms: [send the boat ashore, send a boat ashore, send the boat to the shore,
+               send the boat in, send the boat ashore with the, send the boat ashore with,
+               send the boat with the, send the boat with, send the boat for, send the boat ashore for,
+               away the boat, man the boat, lower the boat, send the launch, send the launch ashore,
+               send the cutter ashore, send the pinnace ashore, send the barge ashore,
+               send the long boat ashore, send the yawl ashore, send a boat]
+    object: port
+    level: 1
+  buy:
+    synonyms: [purchase, buy in, lay in]
+    object: port
+    level: 1
+  sell:
+    synonyms: [sell off, dispose of]
+    object: port
+    level: 1
+  demand:
+    synonyms: [demand from the yard, indent for, demand of the yard, buy from the yard,
+               buy from the chandlers, demand a, demand an]
+    object: port
+    level: 1
+  take in water:
+    synonyms: [water the ship, water ship, complete the water, complete her water, fill the water,
+               take in the water, take water]
+    object: port
+    level: 1
+  take in provisions:
+    synonyms: [complete provisions, complete the provisions, provision the ship, victual the ship,
+               take in the provisions, take in provisions for]
+    object: port
+    level: 1
+  enter:
+    synonyms: [enter hands, recruit, ship hands, enter men, raise men, enter seamen]
+    object: port
+    level: 1
   # Group evolutions: verb phrases with no object, expanded from the list below.
   set plain sail:
     synonyms: [make plain sail, make sail]
@@ -1127,6 +1218,10 @@ aliases:
   trice: scandalise
   tryce up: scandalise
   tryce: scandalise
+  # Package 35: the port's and the people's other words
+  up anchor and away: get under way
+  send for the master to the cabin: send for
+  pass the word: send for
 # A reading asked at the prompt (package 33c): every phrase of the readings registry
 # (`freesail/api/readings.py`), said alone or after one of the asking words, is a query
 # answered in the log in the registry's own words (`freesail/orders/prompt.py`); the
@@ -1141,6 +1236,19 @@ reading_words:
     our position: the reckoning
     the last cast: the depth
     the soundings: the depth
+    # Package 35: the people, the papers and the port
+    who is aboard: the people
+    the ship's people: the people
+    the officers: the people
+    the cargo: the manifest
+    the hold: the manifest
+    the money: the purse
+    the market: the prices
+    the price list: the prices
+    the pilot's words: the pilot
+    the pilot cutter: a sail in sight
+    the stranger: a sail in sight
+    the sail: a sail in sight
 # Kinds of work by a noun, for `belay the lead` (package 33c), beside `work_nouns` above:
 # the lead's work is the order's that started it.
 more_work_nouns:

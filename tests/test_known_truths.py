@@ -2821,7 +2821,7 @@ GATE_5B_CAST_TICK = 29884
 GATE_5B_LANDFALL_TICK = 44700
 GATE_5B_ROADS_TICK = 57732  # the outer road: the first cast under twenty fathoms
 GATE_5B_ANCHORED_TICK = 58167  # the best bower let go
-GATE_5B_BROUGHT_UP_TICK = 59145  # brought up, the sails furled
+GATE_5B_BROUGHT_UP_TICK = 59144  # brought up, the sails furled (59145 before package 35)
 # Package 33c (spec M5 open item 15): every tick held, every line but the standing
 # runtime's own the same; the lines moved by the held lines said the first time and then
 # once a watch (the frigate 157 to 18, the schooner 155 to 15, the thick passage 31 to
@@ -2832,17 +2832,29 @@ GATE_5B_BROUGHT_UP_TICK = 59145  # brought up, the sails furled
 # distance by estimation is drawn once a sighting episode, and the departure's estimate
 # off Ushant ("two miles", was "a mile") put the account a mile differently, from which
 # the book shaped the course; the lines and digests below are the merge of the two.
-GATE_5B_LINES = 624
-GATE_5B_DIGEST = "6880cabc6e0ac53e"
+# Package 35 (the pilot boarding from the cutter; spec M5 §23): the Falmouth pilot's
+# cutter comes off when she is within the pilot's cruising ground by day, is sighted by
+# the lookout ("Sail ho!", the sail's estimate drawn from a stream of its own), hails
+# her within four cables and puts the pilot aboard within two, with his words and the
+# port's news; nothing of the ship's physics moves, so every tick above stands and only
+# the lines and the digests change (the frigate 624 → 629 lines, the schooner 725 → 730;
+# the thick passage, which never comes within the cruising ground, is untouched). The
+# pilot's ticks are pinned below (docs/dev/TuningNotes.md, package 35).
+GATE_5B_SAIL_SIGHTED_TICK = 55800  # "Sail ho! A sail on the larboard bow", two leagues
+GATE_5B_PILOT_HAIL_TICK = 57720  # the cutter hails within four cables
+GATE_5B_PILOT_ABOARD_TICK = 58020  # the pilot aboard, two minutes before the anchor
+GATE_5B_LINES = 629
+GATE_5B_DIGEST = "a7fe3d92fc16d1ed"
 GATE_5B_SCHOONER_LANDFALL_TICK = 43920
 GATE_5B_SCHOONER_ROADS_TICK = 56502  # the outer road: sail shortened, a course for Carrick Road
+GATE_5B_SCHOONER_PILOT_ABOARD_TICK = 56940  # the pilot aboard, American colours no bar
 GATE_5B_SCHOONER_ANCHORED_TICK = 57615  # off the town: the best bower let go
 GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58618
-GATE_5B_SCHOONER_LINES = 725
-GATE_5B_SCHOONER_DIGEST = "c59b39435e5f2c15"
+GATE_5B_SCHOONER_LINES = 730
+GATE_5B_SCHOONER_DIGEST = "b49d841fd40f9482"
 GATE_5B_THICK_LANDFALL_TICK = 54900
 GATE_5B_THICK_LINES = 504
-GATE_5B_THICK_DIGEST = "b3b1f54a4b97a8f4"
+GATE_5B_THICK_DIGEST = "65927077f46006eb"
 
 
 def the_landfall(log):
@@ -3132,6 +3144,26 @@ def test_the_passage_for_gate_5b_at_seed_7_has_its_own_constants(gate_5b_passage
     riding = world.ship.extra["ground_tackle"].riding_by()
     assert 9.0 < units.m_to_fathoms(riding.depth_m) < 20.0 and riding.scope_fathoms >= 45.0
     assert world.readings.words("anchor").startswith("down, riding by the best bower to the")
+    # the pilot boarding from the cutter (package 35; spec M5 §23): the cutter sighted
+    # as any sail is, a bearing first; the hail; the pilot aboard as a person with his
+    # words and the port's news, before she anchors; the ship's own ticks unmoved
+    sails = [e for e in log if e.kind == "lookout.sighting" and e.data.get("seen_as") == "sail"]
+    assert sails and sails[0].tick == GATE_5B_SAIL_SIGHTED_TICK
+    assert sails[0].text.startswith("Sail ho! A sail on the larboard bow, bearing ")
+    hail = [e for e in log if e.kind == "port.pilot_hail"]
+    aboard = [e for e in log if e.kind == "port.pilot_aboard"]
+    assert [e.tick for e in hail] == [GATE_5B_PILOT_HAIL_TICK]
+    assert [e.tick for e in aboard] == [GATE_5B_PILOT_ABOARD_TICK]
+    assert aboard[0].text.startswith(
+        "The pilot, Mr Tregenza of Falmouth, came aboard from the cutter"
+    )
+    words = [e for e in log if e.kind == "port.pilot_words"]
+    assert words[0].tick == GATE_5B_PILOT_ABOARD_TICK and "Carrick Road" in words[0].text
+    assert world.ports.pilot is not None and world.people.find("the pilot") is world.ports.pilot
+    assert world.readings.words("pilot").startswith(
+        "Mr Tregenza of Falmouth aboard; high water at Falmouth about"
+    )
+    assert not world.vessels.active(), "the cutter lies to under her lee, then goes back"
     # the account against the truth (the author's view: the truth is in the world and
     # the tests only)
     by_kind = {}
@@ -3209,6 +3241,11 @@ def test_the_schooner_sails_the_passage_with_her_octant_and_the_log_every_two_ho
     assert roads and roads[0].tick == GATE_5B_SCHOONER_ROADS_TICK
     town = [e for e in log if e.actor == "standing order 'off the town'"]
     assert town and "coming to an anchor" in town[0].text
+    # the pilot aboard before she runs in (package 35): American colours no bar at
+    # Falmouth, the port neutral to her
+    aboard = [e for e in log if e.kind == "port.pilot_aboard"]
+    assert [e.tick for e in aboard] == [GATE_5B_SCHOONER_PILOT_ABOARD_TICK]
+    assert "American colours being no bar at Falmouth" in aboard[0].text
     anchored = [e for e in log if e.kind == "ship.anchored"]
     brought_up = [e for e in log if e.kind == "ship.brought_up"]
     assert [e.tick for e in anchored] == [GATE_5B_SCHOONER_ANCHORED_TICK]
@@ -3242,3 +3279,227 @@ def test_the_cutter_and_the_brig_sail_through_the_same_orders(ship):
     assert refused == [], [e.text for e in refused]
     assert _miles(world.position, nav.account_now()) < 8.0
     assert nav.master.name.startswith("Mr ")
+
+
+# ---------------------------------------------------------------------------
+# Milestone 5c: places, people, ports and nations (package 35; spec M5 §22 to §24, §28)
+# ---------------------------------------------------------------------------
+#
+# Truths 68 to 70 at seed 7. The ports are files on one machinery (data/ports/); the
+# schooner is American by her company's names, so Falmouth and Brest are neutral to her
+# and the French market's war rule reads Britain's war, not hers. Everything inward is
+# reached by an order or a reading, everything outward arrives through something the
+# ship models: the boat, the gangway, the messenger, the cabin door.
+
+THE_RADE_INNER = {"lat_deg": 48.345, "lon_deg": -4.470}  # the Bay of Brest, within the Goulet
+CARRICK_ROAD_5C = {"lat_deg": 50.160, "lon_deg": -5.034}  # Falmouth, twelve fathoms
+
+
+def _in_port(where, ship=SCHOONER, heading=250.0, **kw):
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, 9, 0),
+        wind_from_deg=225.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=heading,
+        position=where,
+        region=CHART_REGION,
+        **kw,
+    )
+    world = make_world(SEED, ship, sc)
+    world.run(60)
+    world.submit("let go the best bower")
+    world.run(300)
+    assert world.at_anchor
+    return world
+
+
+def test_truth_68_a_message_from_brest_reaches_the_captain_in_his_cabin_by_boat_door_and_person():
+    """Spec M5 §28, truth 68: "A message from Brest reaches the captain in his cabin only
+    by the boat, the door and a person, each a line in the log in order, and never by a
+    line from nowhere." The schooner at anchor in the Bay of Brest with a letter waiting
+    at the port; the captain gone below; the boat sent ashore for the prices."""
+    from freesail.world.people import PASS_THE_WORD_S, Message
+
+    letter = "The Prefect maritime begs the captain to dine on Thursday."
+    world = _in_port(
+        THE_RADE_INNER,
+        ports={"brest": {"letters": [{"text": letter, "origin": "Brest"}]}},
+        cargo={"purse_pounds": 200.0},
+    )
+    e = world.submit("go below")
+    assert e.kind == "captain.below" and world.people.captain.where == "cabin"
+    before = len(world.log)
+    e = world.submit("send the boat ashore")
+    assert e.kind == "order.accepted" and world.ports.boat.away
+    for _ in range(240):
+        world.run(60)
+        if events(world, "message.received"):
+            break
+    kinds = [x.kind for x in list(world.log)[before:]]
+    chain = [
+        "boat.away",
+        "boat.ashore",
+        "boat.returning",
+        "boat.alongside",
+        "message.aboard",
+        "message.door",
+        "message.received",
+    ]
+    found = [k for k in kinds if k in chain]
+    assert found == chain, found
+    ticks = {k: next(x.tick for x in world.log if x.kind == k) for k in chain}
+    assert ticks["boat.away"] < ticks["boat.ashore"] < ticks["boat.returning"]
+    assert ticks["boat.returning"] < ticks["boat.alongside"] == ticks["message.aboard"]
+    assert ticks["message.aboard"] < ticks["message.door"] == ticks["message.received"]
+    assert ticks["message.door"] - ticks["message.aboard"] == PASS_THE_WORD_S
+    aboard = events(world, "message.aboard")[0]
+    assert aboard.data["carried_by"] == "the long-boat"
+    assert "came aboard by the long-boat" in aboard.text
+    messenger = world.people.messenger
+    assert messenger is not None and messenger.name in aboard.text  # a person carries it
+    door = events(world, "message.door")[0]
+    assert door.text == f"{messenger.name} knocked at the cabin door with a letter from Brest."
+    received = events(world, "message.received")[0]
+    assert received.text == f"The captain read it: {letter}" and received.data["place"] == "cabin"
+    # never a line from nowhere: no letter is read that did not come aboard first, and
+    # the port's letter was given once
+    assert len(events(world, "message.received")) == 1 == len(events(world, "message.aboard"))
+    assert world.ports.ports["brest"].letters == []
+    # the same chain to the quarterdeck: the messenger brings it to him on deck
+    world.submit("come on deck")
+    world.ports.ports["brest"].letters.append(Message("A second word.", "Brest"))
+    world.submit("send the boat ashore")
+    for _ in range(240):
+        world.run(60)
+        if len(events(world, "message.received")) == 2:
+            break
+    second = events(world, "message.door")[1]
+    assert second.text.startswith(
+        f"{messenger.name} brought a letter from Brest to the captain on the quarterdeck"
+    )
+
+
+def test_truth_69_the_cargo_bought_at_falmouth_and_sold_at_brest_makes_the_sum_the_two_lists_give():
+    """Spec M5 §28, truth 69: "The schooner's cargo bought at Falmouth and sold at Brest
+    makes or loses the sum the two markets' prices give, and a week's war news moves a
+    price by the rules table." Forty tons of tin: bought at Falmouth after the boat has
+    brought the list off, sold at Brest likewise (a second world, the hold given the
+    tin, since the passage between is gate 5c's); the purse moves by the two lists'
+    figures and nothing else. Then the news: England at peace with France takes the war
+    rule's half off English tin at Brest (`ports.WAR_FACTOR`), and the war declared
+    again puts it back."""
+    from freesail.world import ports as PT
+
+    falmouth = _in_port(CARRICK_ROAD_5C, cargo={"purse_pounds": 6000.0})
+    e = falmouth.submit("buy forty tons of tin")
+    assert e.kind == "order.rejected" and "not known" in e.text  # the boat first
+    falmouth.submit("send the boat ashore with the mate")
+    for _ in range(240):
+        falmouth.run(60)
+        if events(falmouth, "boat.alongside"):
+            break
+    listed = falmouth.readings["prices"]
+    assert listed["port"] == "falmouth"
+    tin_at_falmouth = listed["prices"]["tin"]
+    purse0 = falmouth.purse.pounds
+    e = falmouth.submit("buy forty tons of tin")
+    assert e.kind == "market.bargain" and e.data["sum_pounds"] == 40 * tin_at_falmouth
+    assert falmouth.purse.pounds == purse0 - 40 * tin_at_falmouth
+    for _ in range(300):
+        falmouth.run(60)
+        if events(falmouth, "market.bought"):
+            break
+    assert falmouth.hold.goods == {"tin": 40.0}
+    assert falmouth.readings.words("manifest").startswith("40 tons of tin; room for 72 tons")
+    assert "The manifest written up by the mate" in events(falmouth, "paper.written")[-1].text
+    # at Brest, the hold carrying the tin bought
+    brest = _in_port(
+        THE_RADE_INNER, cargo={"purse_pounds": falmouth.purse.pounds, "goods": {"tin": 40.0}}
+    )
+    brest.submit("send the boat ashore")
+    for _ in range(240):
+        brest.run(60)
+        if events(brest, "boat.alongside"):
+            break
+    tin_at_brest = brest.readings["prices"]["prices"]["tin"]
+    assert tin_at_brest > tin_at_falmouth  # English tin is dear in a French port at war
+    purse1 = brest.purse.pounds
+    e = brest.submit("sell forty tons of tin")
+    assert e.kind == "market.bargain" and e.data["sum_pounds"] == 40 * tin_at_brest
+    assert brest.purse.pounds == purse1 + 40 * tin_at_brest and brest.hold.goods == {}
+    # the voyage's sum is the two lists' figures and nothing else
+    assert brest.purse.pounds - 6000.0 == pytest.approx(40 * (tin_at_brest - tin_at_falmouth))
+    # the rules table: the price at Brest is the file's base through the season's, the
+    # war's and the supply's factors; a week's news of peace moves it by the war's
+    port = brest.ports.ports["brest"]
+    good = port.market.goods["tin"]
+    factors = port.market.factors(good, brest.clock.ship_time, brest.nations, port.nation)
+    assert factors["war"] == PT.WAR_FACTOR and factors["season"] == 1.0
+    assert factors["supply"] == pytest.approx(1.0 - PT.SUPPLY_PER_TON * 40.0)  # forty tons sold
+    brest.run(7 * 86400)  # a week: the glut clears by a seventh a day
+    sold_before = brest.ports.price_of(port, "tin")
+    assert brest.nations.make_peace("britain", "france", "1805-06-19")
+    at_peace = brest.ports.price_of(port, "tin")
+    assert sold_before == pytest.approx(at_peace * PT.WAR_FACTOR, abs=PT.PRICE_ROUND)
+    brest.nations.declare_war("britain", "france", "1805-06-26", "the pilot's news")
+    assert brest.ports.price_of(port, "tin") == sold_before
+    # the list the purser brought off is a paper, as current as its last entry
+    page = brest.papers.page("the price list")
+    assert page.lines[0].startswith("Prices at Brest, 12 June")
+
+
+def test_truth_70_a_port_closed_to_the_ships_nation_refuses_her_in_the_pilots_words():
+    """Spec M5 §28, truth 70: "A port closed to the ship's nation refuses her entry in
+    the pilot's words and the stance is the nations table's." The American schooner
+    standing in for Brest with the port closed to the United States by the scenario's
+    order: the pilot cutter comes off, hails, and the pilot refuses from the cutter;
+    the stance read from the table and the port's closure is 'closed'. The British
+    frigate on the same approach: hostile, and no cutter comes off at all."""
+    approach = {"lat_deg": 48.30, "lon_deg": -4.75}
+
+    def standing_in(ship, **kw):
+        sc = Scenario(
+            start_time=datetime(1805, 6, 12, 10, 0),
+            wind_from_deg=225.0,
+            wind_speed_kn=12.0,
+            gustiness=0.0,
+            variability=0.0,
+            ship_heading_deg=80.0,
+            ship_speed_kn=4.0,
+            position=approach,
+            region=CHART_REGION,
+            **kw,
+        )
+        world = make_world(SEED, ship, sc)
+        world.submit("set plain sail")
+        return world
+
+    schooner = standing_in(SCHOONER, ports={"brest": {"closed_to": ["united-states"]}})
+    brest = schooner.ports.ports["brest"]
+    assert schooner.ports.ship_nation == "united-states"
+    assert schooner.ports.stance(brest) == "closed"
+    assert schooner.nations.stance("france", "united-states", brest.closed_to) == "closed"
+    for _ in range(180):
+        schooner.run(60)
+        if events(schooner, "port.pilot_refused"):
+            break
+    refused = events(schooner, "port.pilot_refused")
+    assert len(refused) == 1 and refused[0].data["stance"] == "closed"
+    assert refused[0].text.startswith(
+        "The pilot hailed from the cutter: Brest is closed to the Americans by the port's "
+        "order; you will get no pilot here"
+    )
+    assert schooner.ports.pilot is None and schooner.people.find("the pilot") is None
+    assert "the port closed to the Americans" in schooner.readings.words("port")
+    sails = [e for e in events(schooner, "lookout.sighting") if e.data.get("seen_as") == "sail"]
+    assert sails and sails[0].tick < refused[0].tick  # the cutter was sighted first
+    # hostile: no pilot comes off to a King's ship, and the port says so
+    frigate = standing_in(FRIGATE)
+    assert frigate.ports.stance(frigate.ports.ports["brest"]) == "hostile"
+    frigate.run(2 * 3600)
+    assert not events(frigate, "port.pilot_hail") and not frigate.vessels.vessels
+    assert "the port hostile to the English" in frigate.readings.words("port")
+    # open: her own port, where the pilot comes off (the passage of gate 5b has it)
+    assert frigate.ports.stance(frigate.ports.ports["falmouth"]) == "open"

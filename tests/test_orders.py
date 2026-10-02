@@ -1858,7 +1858,9 @@ def test_completion_offers_the_wreck_and_the_spar_to_shift():
     offered = complete.suggestions(ship, "shift the larboard fore topmast studdingsail b")
     assert offered == ["shift the larboard fore topmast studdingsail boom"]
     offered = complete.suggestions(ship, "the bo")
-    assert offered[0] == "the booms" and "the boatswains store" in offered  # package 31b
+    # package 31b; the boat and the boats (package 35) stand before the booms
+    assert "the booms" in offered[:3] and "the boatswains store" in offered
+    assert "the boat" in offered and "the boats" in offered
 
 
 # ---------------------------------------------------------------------------

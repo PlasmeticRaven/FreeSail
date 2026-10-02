@@ -542,6 +542,8 @@ class Builder:
         self.hull_notes: dict[str, str] = dict(hull_notes or {})
         self.crew_notes: dict[tuple[str, ...], str] = {}
         self.tackle_notes: dict[tuple[str, ...], str] = {}
+        self.hold_note: str = ""
+        self.boat_notes: dict[tuple[str, ...], str] = {}
 
     def spar(self, id, cls, note=None, **kw):
         d = {"id": id, "class": cls}
@@ -652,6 +654,53 @@ class Builder:
             if text:
                 self.tackle_notes[("anchors", aid)] = text
 
+    def hold(self, capacity_tons, note):
+        """The `hold:` section (package 35, spec M5 §23): the room for a cargo in tons,
+        the note above the section."""
+        self.doc["hold"] = {"capacity_tons": capacity_tons}
+        self.hold_note = note
+
+    def boats(self, note, entries):
+        """The `boats:` list (package 35, spec M5 §23) from (id, kind, name, length_ft,
+        oars, crew, tons, note) entries, the note above each boat's line and `note` above
+        the section."""
+        self.doc["boats"] = [
+            {
+                "id": bid,
+                "kind": kind,
+                "name": name,
+                "length_ft": length,
+                "oars": oars,
+                "crew": crew,
+                "tons": tons,
+            }
+            for bid, kind, name, length, oars, crew, tons, _ in entries
+        ]
+        self.boat_notes = {("section",): note}
+        for bid, _, _, _, _, _, _, text in entries:
+            if text:
+                self.boat_notes[("boats", bid)] = text
+
+    def people(self, note, entries):
+        """The crew's `people:` list (package 35, spec M5 §22) from (role, station,
+        rating, messenger, note) entries: the named roles beyond the posts, each drawn
+        from its station at muster; the note above each role's line and `note` above the
+        list."""
+        crew = self.doc["crew"]
+        crew["people"] = [
+            {
+                "role": role,
+                "station": station,
+                **({"rating": rating} if rating else {}),
+                **({"messenger": True} if messenger else {}),
+            }
+            for role, station, rating, messenger, _ in entries
+        ]
+        self.crew_notes[("people",)] = note
+        for role, _, _, _, text in entries:
+            if text:
+                self.crew_notes[("people", role)] = text
+
     def rate_spars(self):
         """Second pass: rate every spar from what the engine's graph hangs on it.
 
@@ -744,6 +793,7 @@ class Builder:
         crew_key = ""
         store_key = ""
         in_tackle = False
+        in_boats = False
         for line in text.splitlines():
             if line.startswith("hull:"):
                 in_hull = True
@@ -764,12 +814,28 @@ class Builder:
                 note = self.tackle_notes.get(("anchors", m.group(1)))
                 if note:
                     out.append("  # " + note)
+            # the hold and the boats (package 35), noted as the ground tackle is
+            if line.startswith("hold:") and self.hold_note:
+                out.append("# " + self.hold_note)
+            if line.startswith("boats:"):
+                in_boats = True
+                note = self.boat_notes.get(("section",))
+                if note:
+                    out.append("# " + note)
+            elif in_boats and not line.startswith("  ") and not line.startswith("- "):
+                in_boats = False
+            if in_boats and (m := re.match(r"^- id: (\S+)$", line)):
+                note = self.boat_notes.get(("boats", m.group(1)))
+                if note:
+                    out.append("# " + note)
             if in_crew:
                 note = None
                 if m := re.match(r"^    - kind: (\S+)$", line):
                     note = self.crew_notes.get(("sails", m.group(1)))
                 elif m := re.match(r"^  - post: (.+)$", line):
                     note = self.crew_notes.get(("posts", m.group(1)))
+                elif m := re.match(r"^  - role: (.+)$", line):
+                    note = self.crew_notes.get(("people", m.group(1).strip("'\"")))
                 elif m := re.match(r"^  (\w+):", line):
                     crew_key = m.group(1)
                     note = self.crew_notes.get((crew_key,))
@@ -781,7 +847,7 @@ class Builder:
                 if note:
                     out.append(" " * (len(line) - len(line.lstrip())) + "# " + note)
             m = re.match(r"^- id: (\S+)$", line)
-            if m and m.group(1) in self.notes:
+            if m and m.group(1) in self.notes and not in_boats:
                 out.append("# " + self.notes[m.group(1)])
             m = re.match(r"^  (\w+):", line) if in_hull else None
             if m and m.group(1) in self.hull_notes:
@@ -1767,6 +1833,61 @@ def frigate(out_dir="data/ships"):
         b.alias(f"{name} top bowline", f"{name} topsail bowlines")
     ground_tackle_for(b, 933.0, beam_ft, draught_ft)
     frigate_crew(b)
+    hold_for(b, 933.0, True, "a ship of war's hold is her own stores and ballast: judgement")
+    b.boats(
+        BOATS_NOTE,
+        boat_entries(
+            gundeck_ft,
+            True,
+            [
+                (
+                    "launch",
+                    "launch",
+                    "the launch",
+                    1.0,
+                    "The launch, 2.6 root(143 ft) = 31 ft; the stream anchor is sent in her "
+                    "(Steel 1794 vol. I: 'sent in the long-boat'), and the water comes off in "
+                    "her in gang casks (Luce 1866, 'Boats').",
+                ),
+                (
+                    "barge",
+                    "barge",
+                    "the barge",
+                    1.03,
+                    "The captain's barge, a little longer than the launch and narrower "
+                    "(Falconer, BARGE: 'longer, slighter, and narrower').",
+                ),
+                (
+                    "pinnace",
+                    "pinnace",
+                    "the pinnace",
+                    0.9,
+                    "The pinnace, eight oars (Falconer, PINNACE).",
+                ),
+                (
+                    "first_cutter",
+                    "cutter",
+                    "the first cutter",
+                    0.9,
+                    "The first cutter, 0.9 of the launch (Luce's rule).",
+                ),
+                (
+                    "second_cutter",
+                    "cutter",
+                    "the second cutter",
+                    0.81,
+                    "The second cutter, 0.9 of the first.",
+                ),
+                (
+                    "jolly_boat",
+                    "jolly boat",
+                    "the jolly boat",
+                    JOLLY_BOAT_OF_LAUNCH,
+                    "The jolly boat, the small boat at the stern davits (judgement in the size).",
+                ),
+            ],
+        ),
+    )
     b.dump(
         os.path.join(out_dir, "frigate-36.yaml"),
         "# Reference ship: Amazon, a 36-gun 18-pounder frigate of the Amazon class (Rule, 1795).\n"
@@ -2553,6 +2674,25 @@ def schooner(out_dir="data/ships"):
     b.alias("fore top bowline", "fore bowlines")
     ground_tackle_for(b, 224.0, beam_ft, draught_ft)
     schooner_crew(b)
+    hold_for(b, 224.0, False, "a sharp Baltimore hull stows about half her tonnage: judgement")
+    b.boats(
+        BOATS_NOTE,
+        boat_entries(
+            lod_ft,
+            False,
+            [
+                (
+                    "long_boat",
+                    "long-boat",
+                    "the long-boat",
+                    1.0,
+                    "The long-boat, a fifth under Luce's rule for a ship of war (judgement for "
+                    "a privateer).",
+                ),
+                ("yawl", "yawl", "the yawl", 0.8, "The yawl, four oars (Falconer, YAWL)."),
+            ],
+        ),
+    )
     b.dump(
         os.path.join(out_dir, "topsail-schooner.yaml"),
         "# Reference ship: Speedwell, a Baltimore-built topsail schooner of about 1804, to the\n"
@@ -2565,6 +2705,85 @@ def schooner(out_dir="data/ships"):
         "# curves; see the script. Canvas: Steel 1794 vol. I (sloops and cutters); cloth ratings\n"
         "# from the number by Luce App. E. Units: metres, m2, kg, kN. Comments mark judgements.\n",
     )
+
+
+# ---------------------------------------------------------------------------
+# The hold and the boats (package 35, spec M5 §22, §23): one rule for every ship
+# ---------------------------------------------------------------------------
+
+# The room for a cargo, as a part of the burthen (Falconer 1780, HOLD: "the ballast,
+# provisions, and stores of a ship of war, and the principal part of the cargo in a
+# merchantman"). A ship of war's hold is full of her own water, provisions, cable tiers
+# and ballast, and what is left stows a prize's goods or stores taken in: judgement, a
+# tenth of the burthen. A trader stows about half her tonnage of measurement in a sharp
+# hull (Chapelle 1930 remarks the Baltimore type's small capacity; the fraction is
+# judgement) and a revenue cutter, deep and full, the same half less her own stores.
+HOLD_OF_BURTHEN_SHIP_OF_WAR = 0.1
+HOLD_OF_BURTHEN_TRADER = 0.5
+# The boats, by Luce 1866's rules of size ('Boats', 'Rules for Size of Boats for
+# Ships-of-War': "For the length of first launch, multiply the square root of the length
+# of the ship by 2.6; breadth, 1/4 of the length. First and second cutters of ships of the
+# line, and first cutters of sloops to be .9 of launch. Third and fourth cutters ... and
+# second cutters of sloops to be .9 of first cutter. Quarter, waist or stern boats to be of
+# the same dimensions as the ... second cutter of sloops, but lighter built"), and the
+# boats a ship carried from Steel 1794 vol. II (the chapters 'ships' long-boats or
+# launches', 'ships' pinnaces and rowing barges', 'ships' cutters or yawls') and Falconer
+# 1780, BOAT ("the long-boat ... the barges are next in order ... pinnaces ... cutters ...
+# yawls"), PINNACE ("usually rowed with eight oars") and YAWL ("rowed by four or six
+# oars"). The allowance by the ship's size is judgement on those texts: a frigate a
+# launch, a barge, a pinnace, two cutters and a jolly boat; a brig a launch, a cutter and
+# a jolly boat; a schooner a long-boat and a yawl; a cutter a boat and a punt. A merchant
+# or revenue vessel's boats are smaller than Luce's rule for a ship of war gives, by a
+# fifth (judgement). The oars by the length, a thwart to every three feet (judgement on
+# Falconer's eight and six); the crew the oars and a coxswain; the tons a boat carries by
+# Luce's weight rule for the boat herself (the breadth squared times the length, in
+# pounds, times 2.5 for a launch, 1.9 a first cutter, 1.4 a second, 1.0 a quarter boat),
+# a boat carrying about her own weight (judgement).
+LAUNCH_LENGTH_FACTOR = 2.6
+BOAT_BREADTH_OF_LENGTH = 0.25
+CUTTER_OF_LAUNCH = 0.9
+JOLLY_BOAT_OF_LAUNCH = 0.65  # judgement: a jolly boat of 18 to 20 feet to a 30-foot launch
+SMALL_VESSEL_BOAT_FACTOR = 0.8
+BOAT_FEET_PER_OAR = 3.0
+BOAT_WEIGHT_FACTORS = {"launch": 2.5, "long-boat": 2.5, "barge": 1.9, "pinnace": 1.9, "cutter": 1.4}
+BOAT_WEIGHT_DEFAULT = 1.0
+LB_PER_TON = 2240.0
+
+
+def hold_for(b, burthen, ship_of_war, note):
+    fraction = HOLD_OF_BURTHEN_SHIP_OF_WAR if ship_of_war else HOLD_OF_BURTHEN_TRADER
+    tons = round(burthen * fraction)
+    b.hold(
+        tons,
+        f"The hold (package 35, spec M5 §23): room for {tons} tons of cargo beyond her own "
+        f"stores, {fraction:g} of the {burthen:g} tons burthen ({note}; Falconer 1780, HOLD); "
+        "see tools/gen_ships.py.",
+    )
+
+
+def boat_entries(length_ft, ship_of_war, allowance):
+    """The boats' lines from Luce's rule: `allowance` is a list of (id, kind, name, of_launch)."""
+    launch = LAUNCH_LENGTH_FACTOR * math.sqrt(length_ft)
+    if not ship_of_war:
+        launch *= SMALL_VESSEL_BOAT_FACTOR
+    out = []
+    for bid, kind, name, of_launch, text in allowance:
+        length = round(launch * of_launch)
+        breadth = length * BOAT_BREADTH_OF_LENGTH
+        oars = max(2, int(length / BOAT_FEET_PER_OAR) // 2 * 2)
+        weight_lb = breadth * breadth * length * BOAT_WEIGHT_FACTORS.get(kind, BOAT_WEIGHT_DEFAULT)
+        tons = round(max(0.1, weight_lb / LB_PER_TON), 1)
+        out.append((bid, kind, name, float(length), oars, oars + 1, tons, text))
+    return out
+
+
+BOATS_NOTE = (
+    "The boats (package 35, spec M5 §23): their lengths by Luce 1866's rule ('Boats', 'Rules "
+    "for Size of Boats for Ships-of-War': the launch 2.6 times the square root of the ship's "
+    "length, the cutters 0.9 of it), the allowance after Steel 1794 vol. II and Falconer 1780 "
+    "(BOAT, PINNACE, YAWL), the oars a thwart to three feet, the tons by Luce's weight rule "
+    "for the boat herself; see tools/gen_ships.py."
+)
 
 
 # ---------------------------------------------------------------------------
@@ -2698,6 +2917,37 @@ def frigate_crew(b):
                 "Spare rope in the boatswain's store (judgement).",
             ),
         ]
+    )
+    # The people (package 35, spec M5 §22): the named few beyond the posts. The master's
+    # mates and the midshipmen "assist him in making any other observations or calculations"
+    # (the Regulations of 1806, the Master, art. XXVIII, p. 192 of the 1808 printing); a
+    # midshipman carries the captain's word about the ship (the messenger of
+    # InwardAndOutward.md). Each is drawn from his station at muster, keeping the counts
+    # of spec M3 §2.3 as they are: a master's mate an able seaman of the forecastle, a
+    # midshipman one of the boys of the afterguard (spec M3 §9 item 6: the boys count as
+    # landsmen).
+    b.people(
+        "The named people beyond the posts (package 35, spec M5 §22): each drawn from his "
+        "station at muster, the counts above unchanged; see tools/gen_ships.py.",
+        [
+            (
+                "master's mate",
+                "forecastle",
+                "able",
+                False,
+                "Two master's mates, able seamen of the forecastle (the Regulations of 1806, "
+                "the Master, art. XXVIII: the mates and midshipmen assist him in the "
+                "observations).",
+            ),
+            ("master's mate", "forecastle", "able", False, None),
+            (
+                "midshipman",
+                "afterguard",
+                "landsman",
+                True,
+                "A midshipman as the captain's messenger, one of the boys of the afterguard.",
+            ),
+        ],
     )
     # The booms (package 30b): the spare spars Luce stows between the fore and main masts
     # (1866, ch. XVII Spare Spars, 'Stowing Booms between the fore and mainmast', 'In two
@@ -2863,6 +3113,12 @@ def schooner_crew(b):
             (("stores", "spare_spars"), {}, None),  # the booms, by class: below
             (("stores", "cordage_fathoms"), 150, "Spare rope (judgement)."),
         ]
+    )
+    # The people (package 35, spec M5 §22): the master and a mate are posts already; a boy
+    # of the afterguard carries the word (judgement: a privateer rated no midshipmen).
+    b.people(
+        "The named people beyond the posts (package 35, spec M5 §22); see tools/gen_ships.py.",
+        [("boy", "afterguard", "landsman", True, "A boy as the messenger (judgement).")],
     )
     # The booms (package 30b): a privateer on a short cruise carried fewer spares than
     # Luce's frigate (1866, ch. XVII 'Stowing Booms', which the frigate's follow), and no
@@ -3688,6 +3944,31 @@ def cutter(out_dir="data/ships"):
     b.alias("main mast", "main.mast")
     ground_tackle_for(b, burthen, beam_ft, draught_ft)
     cutter_crew(b)
+    hold_for(b, burthen, False, "a revenue cutter's hold less her own stores: judgement")
+    b.boats(
+        BOATS_NOTE,
+        boat_entries(
+            lod_ft,
+            False,
+            [
+                (
+                    "boat",
+                    "yawl",
+                    "the boat",
+                    1.0,
+                    "The cutter's boat, a yawl of four oars (Falconer, YAWL), on the deck "
+                    "amidships.",
+                ),
+                (
+                    "punt",
+                    "punt",
+                    "the punt",
+                    0.75,
+                    "A punt for the pilot and the shore (judgement).",
+                ),
+            ],
+        ),
+    )
     b.dump(
         os.path.join(out_dir, "cutter.yaml"),
         "# The cutter: Sherbourne, H.M. armed cutter of 1763 (Slade; Woolwich), the Channel's\n"
@@ -3760,6 +4041,12 @@ def cutter_crew(b):
             (("stores", "spare_spars"), {}, None),  # the booms, by class: below
             (("stores", "cordage_fathoms"), 80, "Spare rope (judgement)."),
         ]
+    )
+    # The people (package 35, spec M5 §22): a boy of the afterguard carries the word
+    # (judgement: a revenue cutter's company had no midshipman).
+    b.people(
+        "The named people beyond the posts (package 35, spec M5 §22); see tools/gen_ships.py.",
+        [("boy", "afterguard", "landsman", True, "A boy as the messenger (judgement).")],
     )
     # The booms (package 30b): a spare topmast and a spare topsail yard, the two spars a
     # cutter could shift at sea (judgement after Luce 1866 ch. XVII, 'Stowing Booms', as
@@ -4660,6 +4947,37 @@ def brig(out_dir="data/ships"):
         b.alias(f"{name} top bowline", f"{name} topsail bowlines")
     ground_tackle_for(b, burthen, beam_ft, draught_ft)
     brig_crew(b)
+    hold_for(b, burthen, True, "a brig-sloop's hold is her own stores: judgement")
+    b.boats(
+        BOATS_NOTE,
+        boat_entries(
+            gundeck_ft,
+            True,
+            [
+                (
+                    "launch",
+                    "launch",
+                    "the launch",
+                    1.0,
+                    "The launch, 2.6 root(95 ft) = 25 ft (Luce's rule).",
+                ),
+                (
+                    "cutter",
+                    "cutter",
+                    "the cutter",
+                    0.9,
+                    "The cutter, 0.9 of the launch, a sloop's first cutter (Luce's rule).",
+                ),
+                (
+                    "jolly_boat",
+                    "jolly boat",
+                    "the jolly boat",
+                    JOLLY_BOAT_OF_LAUNCH,
+                    "The jolly boat at the stern (judgement in the size).",
+                ),
+            ],
+        ),
+    )
     b.dump(
         os.path.join(out_dir, "brig.yaml"),
         "# The brig: Harpy, H.M. brig-sloop of the Diligence class (launched 1796, sold 1817),\n"
@@ -4769,6 +5087,30 @@ def brig_crew(b):
                 "Spare rope in the boatswain's store (judgement).",
             ),
         ]
+    )
+    # The people (package 35, spec M5 §22): a master's mate and a midshipman as the
+    # messenger, as the frigate's in small (the Regulations of 1806, the Master, art.
+    # XXVIII).
+    b.people(
+        "The named people beyond the posts (package 35, spec M5 §22): each drawn from his "
+        "station at muster, the counts above unchanged; see tools/gen_ships.py.",
+        [
+            (
+                "master's mate",
+                "forecastle",
+                "able",
+                False,
+                "A master's mate, an able seaman of the forecastle (the Regulations of 1806, "
+                "the Master, art. XXVIII).",
+            ),
+            (
+                "midshipman",
+                "afterguard",
+                "landsman",
+                True,
+                "A midshipman as the messenger, one of the boys of the afterguard.",
+            ),
+        ],
     )
     # The booms (package 30b): the frigate's list (Luce 1866 ch. XVII, 'Stowing Booms')
     # scaled to a brig-sloop: one topmast, made alike for either mast "in order that the

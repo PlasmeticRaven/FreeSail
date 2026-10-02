@@ -1,0 +1,105 @@
+# FreeSail: the nations table (spec M5 §24; package 35). Read by freesail/world/nations.py.
+#
+# Seven nations, who is at war with whom in June 1805, who issues letters of marque, the
+# words of their flags for the lookout's "a stranger, her colours not made out" (package
+# 36), and each port's nation (the port files say theirs; `ports` here is the index).
+# The stance of a port toward a ship (spec M5 §23: open, neutral, closed, hostile) is
+# read from this table and the port's own closures (`freesail/world/nations.py`,
+# `Nations.stance`): a port is open to its own nation, hostile to a nation its own is at
+# war with, closed to a nation it names under `closed_to` without war (a decree, a
+# quarantine, a prefect's order), and neutral to the rest. Prizes, convoys and blockades
+# are M7's; the table is theirs to read.
+#
+# The wars are given with the date each began and the source the builder has for it. The
+# sources are standard histories read from memory (no page is in docs/references/), and
+# the file says so: every date here is FROM MEMORY and is to be checked against a printed
+# history before milestone 7 builds prizes on it. What is certain is the state in June
+# 1805: Britain at war with France, Spain and the Batavian Republic; the United States,
+# Portugal and Denmark at peace with all of them.
+
+as_of: 1805-06-01
+
+nations:
+  britain:
+    name: Britain
+    adjective: British
+    people: the English          # the pilots' word for the ship's people
+    names: english               # the names list in data/crew/names.yaml for her people
+    colours: "the red, white or blue ensign by her admiral's squadron, the union jack at the bowsprit; a merchantman the red ensign"
+    letters_of_marque: true      # issued by the Admiralty against France, Spain and the Batavian Republic (from memory)
+    closed_to: []
+  france:
+    name: France
+    adjective: French
+    people: the French
+    names: french                # a short list in the port files (Brest's pilots); none in names.yaml
+    colours: "the tricolour, blue at the hoist, white, red in the fly (the ensign of 1794)"
+    letters_of_marque: true      # the corsairs of St Malo, Dunkirk and Bordeaux (from memory)
+    closed_to: []
+  spain:
+    name: Spain
+    adjective: Spanish
+    people: the Spaniards
+    names: english
+    colours: "red and yellow in three bands, the yellow twice the depth of the red (the naval ensign of 1785)"
+    letters_of_marque: true
+    closed_to: []
+  batavian-republic:
+    name: the Batavian Republic
+    adjective: Dutch
+    people: the Dutch
+    names: american              # the Dutch and German names of the american list serve for want of a Dutch one
+    colours: "red, white and blue in horizontal bands, the Batavian jack with the maid of liberty at the hoist"
+    letters_of_marque: true
+    closed_to: []
+  united-states:
+    name: the United States
+    adjective: American
+    people: the Americans
+    names: american
+    colours: "fifteen stripes and fifteen stars (the flag of 1795 to 1818)"
+    letters_of_marque: false     # none issued in 1805; the Barbary war was the Navy's (from memory)
+    closed_to: []
+  portugal:
+    name: Portugal
+    adjective: Portuguese
+    people: the Portuguese
+    names: english
+    colours: "white, with the royal arms in the middle"
+    letters_of_marque: false
+    closed_to: []
+  denmark:
+    name: Denmark
+    adjective: Danish
+    people: the Danes
+    names: english
+    colours: "the Dannebrog, a white cross on red, swallow-tailed in a King's ship"
+    letters_of_marque: false
+    closed_to: []
+
+# Who is at war with whom in June 1805, each war once, with its beginning and its source.
+wars:
+  - between: [britain, france]
+    since: 1803-05-18
+    source: "the end of the Peace of Amiens: Britain's declaration of 18 May 1803 (from memory)"
+  - between: [britain, batavian-republic]
+    since: 1803-06-17
+    source: "the Batavian Republic's declaration as France's ally, June 1803 (from memory; the day uncertain)"
+  - between: [britain, spain]
+    since: 1804-12-12
+    source: "Spain's declaration of 12 December 1804, after the action off Cape Santa Maria of 5 October (from memory)"
+
+# Alliances the stance does not read but the sightings and M7 may: Spain bound to France by
+# the Treaty of San Ildefonso (1796) and the subsidy convention of 1803; the Batavian
+# Republic a French client since 1795; Portugal neutral by the Treaty of Badajoz (1801)
+# and England's old ally; Denmark in armed neutrality, Copenhagen bombarded only in 1807
+# (all from memory).
+allies:
+  - [france, spain]
+  - [france, batavian-republic]
+
+# The ports and their nations (the port files repeat it; this is the index).
+ports:
+  falmouth: britain
+  plymouth: britain
+  brest: france

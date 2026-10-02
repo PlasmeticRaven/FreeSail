@@ -169,7 +169,22 @@ def lead_words(words: str) -> str:
     return words
 
 
-_ORDER = {"danger": 0, "light": 1, "land": 2, "mark": 3}
+_ORDER = {"danger": 0, "sail": 1, "light": 2, "land": 3, "mark": 4}
+
+# The words the lookout's sail is asked for by (`find`), for a bearing of her (package 35).
+_SAIL_WORDS = frozenset(
+    {
+        "sail",
+        "a sail",
+        "the sail",
+        "the stranger",
+        "stranger",
+        "cutter",
+        "the cutter",
+        "pilot cutter",
+        "the pilot cutter",
+    }
+)
 
 
 @dataclass
@@ -197,6 +212,9 @@ class Lookout:
     _looked: bool = False
     _episodes: dict[str, Episode] = field(default_factory=dict)
     _stream: random.Random | None = None
+    # the other sail's estimates are drawn from a stream of their own (package 35), so
+    # that a sail in sight never moves the land's draws and the pinned passages' ticks
+    _sail_stream: random.Random | None = None
     _edge_said: bool = False
     _moonlit_said: bool = False
     moonlit: bool = False
@@ -212,6 +230,7 @@ class Lookout:
         if self._stream is None:
             rng = getattr(world, "rng", None)
             self._stream = rng.stream("lookout") if rng is not None else random.Random(0)
+            self._sail_stream = rng.stream("sail") if rng is not None else random.Random(1)
         conditions = getattr(world, "conditions", None)
         visibility_nm = conditions.visibility_nm if conditions is not None else None
         self.height_of_eye_m = height_of_eye(world.ship)
@@ -248,6 +267,12 @@ class Lookout:
             if shore is not None:
                 found.append(shore)
                 found.sort(key=lambda s: s.distance_m)
+        vessels = getattr(world, "vessels", None)
+        if vessels is not None and vessels.vessels:
+            # the other sail (spec M5 §25; package 35's pilot cutter): at the horizon her
+            # rig's height and the eye give, within the weather's visibility
+            found.extend(vessels.in_sight(pos, self.height_of_eye_m, visibility_nm, daylight))
+            found.sort(key=lambda s: s.distance_m)
         minute = world.clock.tick // 60
         heading = float(world.ship.heading)
         land_now = any(s.seen_as in ("land", "light") for s in found)
@@ -270,8 +295,9 @@ class Lookout:
         fresh.sort(key=lambda s: (_ORDER.get(s.seen_as, 9), s.distance_m))
         for s in fresh[:LOOKOUT_HAIL_MAX]:
             text = self.words(s, heading)
-            # a danger is notable; so is everything seen in the look that makes the landfall
-            notable = s.seen_as == "danger" or first_land
+            # a danger is notable; so is everything seen in the look that makes the
+            # landfall, and a sail ("Sail ho!", package 35)
+            notable = s.seen_as in ("danger", "sail") or first_land
             data = s.to_dict() | {
                 "relative": relative_words(math.radians(s.bearing_deg) - heading),
                 "estimate": estimate_words(s.judged_m),
@@ -315,7 +341,10 @@ class Lookout:
         here = (pos.lat_deg, pos.lon_deg)
         if ep is None or new_episode:
             assert self._stream is not None
-            factor = max(0.3, 1.0 + self._stream.gauss(0.0, DISTANCE_BY_ESTIMATION_FRACTION))
+            stream = (
+                self._sail_stream if s.seen_as == "sail" and self._sail_stream else self._stream
+            )
+            factor = max(0.3, 1.0 + stream.gauss(0.0, DISTANCE_BY_ESTIMATION_FRACTION))
             ep = Episode(
                 factor, s.distance_m * factor, here, s.bearing_deg, s.distance_m, minute, minute
             )
@@ -395,6 +424,10 @@ class Lookout:
         if s.seen_as == "light":
             return f"A light {relative}, bearing {point}."
         head = _head(s.feature.name)
+        if s.seen_as == "sail":
+            # the hail for other sail (spec M5 §25, truth 67's form; package 35): a bearing
+            # first, her rig only as she nears (`ships.Vessel.seen_as_feature`)
+            return f"Sail ho! {head} {relative}, bearing {point}, distant {distance}."
         if s.feature.id == SHORE_ID:
             return f"{head} close aboard {relative}, bearing {point}, distant {distance}."
         if s.seen_as == "danger":
@@ -427,6 +460,10 @@ class Lookout:
         if key in ("light", "nearest light", "the light"):
             lights = [s for s in self.sightings if s.seen_as == "light"]
             return min(lights, key=lambda s: s.distance_m) if lights else None
+        if key in _SAIL_WORDS or f"the {key}" in _SAIL_WORDS:
+            # a sail in sight, by the lookout's words for her (package 35)
+            sails = [s for s in self.sightings if s.seen_as == "sail"]
+            return min(sails, key=lambda s: s.distance_m) if sails else None
         for s in self.sightings:
             f = s.feature
             if f.id == SHORE_ID:
@@ -463,6 +500,34 @@ class Lookout:
         if self._edge_said:
             words += "; the chart ends here"
         return {"count": len(items), "words": words, "items": items}
+
+    def sail(self, heading_rad: float) -> dict[str, Any]:
+        """`a sail in sight` (package 35; the row the registry held absent since M4): in
+        sight or not, with the nearest sail and the lookout's words for each."""
+        sails = sorted(
+            (s for s in self.sightings if s.seen_as == "sail"), key=lambda s: s.distance_m
+        )
+        items = [
+            s.to_dict()
+            | {
+                "relative": relative_words(math.radians(s.bearing_deg) - heading_rad),
+                "estimate": estimate_words(s.judged_m),
+                "words": self.words(s, heading_rad).removeprefix("Sail ho! ").rstrip("."),
+            }
+            for s in sails
+        ]
+        if not items:
+            return {"in_sight": False, "words": "not in sight", "count": 0, "items": []}
+        words = "in sight: " + items[0]["words"]
+        if len(items) > 1:
+            words += f", and {len(items) - 1} more"
+        return {
+            "in_sight": True,
+            "words": words,
+            "count": len(items),
+            "items": items,
+            "nearest": items[0],
+        }
 
     def land(self, heading_rad: float) -> dict[str, Any]:
         """`the land`: in sight or not, with the nearest land or light sighted."""

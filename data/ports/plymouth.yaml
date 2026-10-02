@@ -1,0 +1,93 @@
+# FreeSail: Plymouth as a port (spec M5 §23; package 35; the owner, 2026-10-02: the third
+# port, from which 36's naval cruise starts). The same form as falmouth.yaml; read by
+# freesail/world/ports.py.
+#
+# Sources. The Sound and the Hamoaze: White 1835, 'Coast of England', pp. 31 to 35 (the
+# anchorage in the Sound within the triangle of Penlee Point, Cawsand town and the Round
+# Tower on Mount Batten, 36 feet in the south and 26 in the north-east at low water
+# springs; Cawsand Bay, "very good anchorage in the centre with off-shore winds in 4 to 6
+# fathoms", foul and rocky to the north; the western channel by Tor House midway between
+# Redding Point and the barrack chimneys on Drake's Island; the three rocky patches of the
+# eastern channel; the Hamoaze, "the dockyard water"); Imray 1874, 'Start Point to
+# Plymouth', pp. 78 to 83 (the Mewstone and Maker tower in one; the Panther and the Knap;
+# the Hamoaze "where the ships of war moor"). The yard: the Regulations of 1806, the
+# Captain's articles on stores and the yard (p. 106 of the 1808 printing: purchases of
+# stores only where the yard cannot supply, by survey and voucher) and the standing
+# officers' store accounts (the Boatswain's and Carpenter's expense books). The tide: the
+# epitome's row for Plymouth (5h 33m, the mean establishment; 16 feet at springs) and
+# Bowditch 1802's headland table for the Eddystone. Prices FROM MEMORY as Falmouth's;
+# the yard's times judgement.
+
+id: plymouth
+name: Plymouth
+nation: britain
+source: "White 1835 pp. 31-35; Imray 1874 pp. 78-83; the Regulations of 1806 (the yard's supply by demand and survey)"
+
+outer_road:
+  feature: cawsand-bay
+  name: Cawsand Bay
+anchorage:
+  feature: plymouth-sound-anchorage
+  name: the anchorage in the Sound
+mooring:
+  feature: the-hamoaze
+  name: the Hamoaze
+shore:
+  feature: plymouth-town
+  name: the Barbican steps at Plymouth
+
+pilot:
+  station: cawsand-bay
+  cruising_nm: 8                  # judgement: the Plymouth pilots met ships off the Eddystone
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  names: [Hodge, Luscombe, Pengelly, Toms, Yeo, Hancock, Pearn, Tozer]   # judgement
+  skill: 0.9
+  fee_pounds: 6                   # from memory; unverified
+  cast: larboard                  # the head paying off to the westward from the Sound, to clear the Shagstone and the Mewstone (judgement)
+  course_out_deg: 200             # S by W out of the Sound by the western channel, past the Panther, to Cawsand Bay and the sea
+  words:
+    channel: "Coming from the west, round Rame Head and Penlee a third of a mile off until Tor House appears midway between Redding Point and the barrack chimneys on Drake's Island; that leads through Cawsand Bay clear of the Dragstone and the Knap. The eastern channel has three rocky patches of eighteen and twenty-four feet in its fair way, and while the Bolt Head is in sight south of the Mewstone you are without all the shoals."
+    marks: "Maker tower, the church on the high ground of Mount Edgcumbe, is the leading mark for the Sound; the Mewstone in one with it clears the shoals of the eastern side. The Citadel on the Hoe stands over the Sound's head, and the tower on Mount Batten at the Catwater's mouth."
+    anchorage: "The best anchorage in the Sound lies within Penlee Point on the west end of where the breakwater now is, Cawsand town on the same, and the Round Tower on Mount Batten: thirty-six feet in its southern part at low water springs, open to the southerly swell. The fleets lie in Cawsand Bay with off-shore winds; the King's ships moor in the Hamoaze above Devil's Point, where the yard is."
+    tide: "The flood runs up the Hamoaze from low water to high and the ebb runs out three knots at springs off Devil's Point; take the Hamoaze on the flood and leave it on the first of the ebb. In the Sound the stream is weak."
+
+tide:
+  establishment: Plymouth
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: coal, price: 2, origin: britain, season: {11: 1.2, 12: 1.2, 1: 1.2, 2: 1.2}, note: "from memory, about 40s a ton"}
+    - {good: canvas, price: 55, origin: britain, note: "from memory"}
+    - {good: hemp, price: 65, origin: null, note: "Baltic hemp; from memory"}
+    - {good: salt, price: 24, origin: britain, note: "from memory"}
+    - {good: pilchards, price: 16, origin: britain, season: {3: 1.3, 4: 1.3, 5: 1.3, 6: 1.2, 8: 0.8, 9: 0.8, 10: 0.8, 11: 0.8}, note: "from memory; dearer than at Falmouth, away from the fishery"}
+    - {good: wine, price: 75, origin: portugal, season: {12: 1.1}, note: "from memory"}
+    - {good: brandy, price: 210, origin: france, note: "from memory"}
+    - {good: biscuit, price: 40, origin: britain, note: "the victualling office's bread, by the ton; from memory"}
+    - {good: timber, price: 6, origin: britain, note: "from memory"}
+    - {good: salt beef, price: 50, origin: britain, note: "from memory"}
+    - {good: copper ore, price: 11, origin: britain, note: "from memory"}
+
+dockyard:
+  kind: yard                      # the King's yard at Dock on the Hamoaze: the frigate's stores by demand and survey, no money
+  items:
+    - {item: topmast, hours: 8, pounds: 0, note: "by demand on the yard (the Regulations of 1806: stores supplied by the yard on the captain's demand, surveyed and vouched); the time to send it off and get it in: judgement"}
+    - {item: topgallant_mast, hours: 4, pounds: 0}
+    - {item: yard, hours: 6, pounds: 0}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 0, note: "from the yard's sail loft: two days, judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0, note: "from the ropehouse"}
+    - {item: water, hours_per_ton: 0.1, pounds_per_ton: 0, note: "watered by the launch from the yard's tanks in gang casks (Luce 1866, 'Boats'): ten tons an hour, judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0, note: "from the victualling office"}
+
+crew_pool:
+  # the press and the receiving ship take the seamen; a few come off for the bounty
+  # (judgement: dearer and slower than at Falmouth, but more of them)
+  able: {hands: 10, pounds: 5, delay_h: 24}
+  ordinary: {hands: 20, pounds: 3, delay_h: 24}
+  landsman: {hands: 30, pounds: 1, delay_h: 12}
+
+closed_to: []

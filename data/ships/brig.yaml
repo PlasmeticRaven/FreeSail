@@ -1869,3 +1869,43 @@ crew:
     - kind: storm_trysail
       canvas_no: 1
       condition: 100
+  # The named people beyond the posts (package 35, spec M5 §22): each drawn from his station at muster, the counts above unchanged; see tools/gen_ships.py.
+  people:
+  # A master's mate, an able seaman of the forecastle (the Regulations of 1806, the Master, art. XXVIII).
+  - role: master's mate
+    station: forecastle
+    rating: able
+  # A midshipman as the messenger, one of the boys of the afterguard.
+  - role: midshipman
+    station: afterguard
+    rating: landsman
+    messenger: true
+# The hold (package 35, spec M5 §23): room for 32 tons of cargo beyond her own stores, 0.1 of the 316.133 tons burthen (a brig-sloop's hold is her own stores: judgement; Falconer 1780, HOLD); see tools/gen_ships.py.
+hold:
+  capacity_tons: 32
+# The boats (package 35, spec M5 §23): their lengths by Luce 1866's rule ('Boats', 'Rules for Size of Boats for Ships-of-War': the launch 2.6 times the square root of the ship's length, the cutters 0.9 of it), the allowance after Steel 1794 vol. II and Falconer 1780 (BOAT, PINNACE, YAWL), the oars a thwart to three feet, the tons by Luce's weight rule for the boat herself; see tools/gen_ships.py.
+boats:
+# The launch, 2.6 root(95 ft) = 25 ft (Luce's rule).
+- id: launch
+  kind: launch
+  name: the launch
+  length_ft: 25.0
+  oars: 8
+  crew: 9
+  tons: 1.1
+# The cutter, 0.9 of the launch, a sloop's first cutter (Luce's rule).
+- id: cutter
+  kind: cutter
+  name: the cutter
+  length_ft: 23.0
+  oars: 6
+  crew: 7
+  tons: 0.5
+# The jolly boat at the stern (judgement in the size).
+- id: jolly_boat
+  kind: jolly boat
+  name: the jolly boat
+  length_ft: 16.0
+  oars: 4
+  crew: 5
+  tons: 0.1

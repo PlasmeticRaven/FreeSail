@@ -1,0 +1,115 @@
+# FreeSail: Falmouth as a port (spec M5 §23; package 35). Read by freesail/world/ports.py,
+# which gives every port file the same machinery: the roads and the mooring as positions
+# of the chart's features (data/charts/features/channel-west.yaml, each with its pilot's
+# source), the pilot and his cutter, the boat's landing, the market with its rules table,
+# the dockyard or the chandlers, the crew pool, and the stance toward each nation from
+# data/nations.yaml and the closures below. A fourth port is a file of this form and
+# nothing else (35b's St Mary's and Roscoff).
+#
+# Sources. The roads: White 1835, 'Coast of England', pp. 26 to 27 (the Black Rock, the
+# two channels, Carrick Road "keep the hawse open", Cross Road, St Just Pool); Imray 1874,
+# 'Plymouth to Land's End', pp. 88 to 90 (the outer road, Carrick Road "the usual anchorage
+# for ships of war", the anchorage off the town in 3 fathoms); Moore 1799, the catechism
+# (the Black Rock "shews itself at half tide ... the east side is the best"; Carrick Road
+# "keep in the fair way, and my lead going"). The pilot: the Regulations of 1806, the
+# Pilot's articles (pp. 199 to 203 of the 1808 printing: borne as a supernumerary for
+# wages and victuals, the captain's certificate naming the ports he conducted her into or
+# out of, a berth enclosed for him, the hand lead kept going in pilot water whether he
+# requires it or not) and the Master's art. XXIX (p. 192: in pilot water the master is to
+# have everything prepared for anchoring at the shortest notice). The tide: the epitome's
+# row for Falmouth (data/tides/establishments.yaml, 5h 15m, 15 feet at springs) and the
+# streams' areas (data/tides/streams.yaml: Carrick Road's flood from low water to high;
+# Imray p. 90, "the ebb sets out SSW a mile, then SW"). The market's prices are FROM
+# MEMORY of the period's price currents (Cornish tin about a hundred and twenty pounds a
+# ton in the war years, copper ore ten, pilchards two or three pounds the hogshead, salt
+# dear under the salt duty, brandy a smuggler's price): no page in docs/references/ gives
+# them, and every figure is marked so; the rules that move them are judgement, named in
+# freesail/world/ports.py and docs/dev/TuningNotes.md. The crew pool's bounties are
+# judgement on the port's size and the press's competition.
+
+id: falmouth
+name: Falmouth
+nation: britain
+source: "White 1835 pp. 26-27; Imray 1874 pp. 88-90; Moore 1799, the catechism (Falmouth); the Regulations of 1806, the Pilot's articles"
+
+# The pilot's cruising ground and the roads. `outer_road` is where a ship from sea first
+# brings up and where the pilot leaves her outward bound; `anchorage` is where he takes
+# her; `mooring` the inner harbour where she moors with two anchors and the hawse open.
+outer_road:
+  feature: falmouth-outer-road
+  name: the outer road
+anchorage:
+  feature: carrick-road
+  name: Carrick Road
+mooring:
+  name: the harbour off the town
+  lat_deg: 50.1545      # off the town's quay, within Falmouth bank (Imray p. 90: 3 fathoms,
+  lon_deg: -5.0560      # shoaling to one at Flushing); the frigate, drawing 15 ft, moors
+  depth_fathoms: 3      # in Carrick Road instead (`deep_draught_ft`)
+  bottom: mud
+  deep_draught_ft: 15   # a ship drawing more moors in the anchorage (White p. 26: frigates
+                        # not drawing more than 18 feet pass within the Black Rock at half tide)
+shore:
+  feature: falmouth-town
+  name: the quay at Falmouth
+
+pilot:
+  station: falmouth-outer-road   # the cutter cruises off the harbour's mouth and the Manacles
+  cruising_nm: 6                 # judgement: the Falmouth pilots met ships off the Manacles and the Dodman
+  comes_off_by_night: false      # judgement: no pilot's light at the Roads in 1805
+  cutter: data/ships/cutter.yaml # 32b's cutter at far detail (freesail/world/ships.py)
+  names: [Pascoe, Trethowan, Vivian, Jenkin, Hocking, Rowe, Bowden, Tregenza]   # Cornish pilots' names: judgement
+  skill: 0.9                     # a branch pilot's knowledge of his own harbour: judgement
+  fee_pounds: 5                  # the pilotage into Falmouth for a frigate: from memory of the Trinity House rates; unverified
+  cast: starboard                # the tack to cast on when getting under way from the Road: the head paying off to the eastward, the wind westerly (judgement)
+  course_out_deg: 169            # the pilot's course out of the Road by the eastern channel, S by E, to the outer road
+  words:
+    channel: "Keep the fair way and the lead going; there is a narrow deep channel of sixteen or eighteen fathoms all the way into Carrick Road. The Black Rock lies nearly in the middle of the entrance and shows itself at half tide; the eastern channel is the better, and you may borrow on St Mawes side in five or six fathoms."
+    marks: "Killiganoon house on with Mylor Point, north a quarter east, carries you in mid-channel through Carrick Road; St Keverne church open east of Pendennis Point leads into St Just Pool. Moored in the Road, keep the hawse open to the southward, for southerly winds throw in much sea."
+    anchorage: "Carrick Road, between St Mawes and Falmouth banks, seven to seventeen fathoms, the usual anchorage for ships of war; a small vessel may lie off the town in three fathoms, the packets' quay under Pendennis."
+    tide: "The flood runs in from low water to high and the ebb sets out south-south-west a mile from the entrance, then south-west; a ship takes the Road on the flood and leaves on the ebb."
+
+tide:
+  establishment: Falmouth        # the epitome's row (data/tides/establishments.yaml)
+  enter_on: flood                # when the tide serves to go in (the pilot's word)
+  leave_on: ebb
+
+market:
+  currency: pounds
+  # price: pounds a ton at the quay, FROM MEMORY (see the head); origin: the nation whose
+  # goods these are, which the war rule reads; season: the months in which the price is
+  # moved, and by what (judgement: the pilchard season is July to December, so the fish
+  # are dear in spring; coal is dear in winter).
+  goods:
+    - {good: tin, price: 120, origin: britain, note: "Cornish block tin, from memory about £120 a ton in the war years"}
+    - {good: copper ore, price: 9, origin: britain, note: "ore for the Swansea smelters, from memory about £9 a ton"}
+    - {good: pilchards, price: 14, origin: britain, season: {3: 1.3, 4: 1.3, 5: 1.3, 6: 1.2, 8: 0.8, 9: 0.8, 10: 0.8, 11: 0.8}, note: "cured and pressed, by the hogshead; from memory £2 10s the hogshead, five hogsheads to the ton"}
+    - {good: salt, price: 25, origin: britain, note: "Cheshire salt under the duty; from memory"}
+    - {good: coal, price: 2, origin: britain, season: {11: 1.2, 12: 1.2, 1: 1.2, 2: 1.2}, note: "Welsh coal landed at Falmouth; from memory about 40s a ton"}
+    - {good: canvas, price: 60, origin: britain, note: "Bridport and Coker sailcloth; from memory"}
+    - {good: hemp, price: 70, origin: null, note: "Baltic hemp at war prices; from memory £70 to £80 a ton; no origin the war rule reads"}
+    - {good: wine, price: 70, origin: portugal, season: {12: 1.1}, note: "Portuguese red, by the tun of 252 gallons taken as a ton; from memory"}
+    - {good: brandy, price: 200, origin: france, note: "French brandy, a smuggler's price while France is at war with us; from memory"}
+    - {good: timber, price: 6, origin: britain, note: "oak and elm by the load, taken as a ton; from memory"}
+    - {good: salt beef, price: 55, origin: britain, note: "Irish beef in tierces; from memory"}
+
+dockyard:
+  kind: chandlers                # no King's yard at Falmouth: the chandlers sell at a price
+  # each item with its time at the quay (hours) and its cost, judgement throughout
+  items:
+    - {item: topmast, hours: 8, pounds: 40, note: "a spar from the chandlers' yard: judgement"}
+    - {item: topgallant_mast, hours: 4, pounds: 12}
+    - {item: yard, hours: 6, pounds: 25}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 25, note: "a sail made to measure by the town's sailmakers: judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.06, note: "about a shilling a fathom of 3-inch rope at £60 the ton of hemp: judgement"}
+    - {item: water, hours_per_ton: 0.1, pounds_per_ton: 0.1, note: "watered by the boat from the quay: a shilling the ton for the waterman: judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05, note: "fresh provisions at a shilling a man a day: judgement"}
+
+crew_pool:
+  # hands to be had by rating: how many, the bounty each and the delay before they come
+  # off (judgement: a packet port with few idle seamen, the press at Plymouth taking most)
+  able: {hands: 4, pounds: 3, delay_h: 12}
+  ordinary: {hands: 8, pounds: 2, delay_h: 12}
+  landsman: {hands: 12, pounds: 1, delay_h: 6}
+
+closed_to: []                    # nations the port is closed to without war (a decree, a quarantine)

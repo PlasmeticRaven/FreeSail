@@ -1,0 +1,93 @@
+# FreeSail: Brest as a port (spec M5 §23; package 35). The same form as falmouth.yaml;
+# read by freesail/world/ports.py.
+#
+# Sources. The Goulet and the Rade: Faden 1793, Le Petit Neptune Français, 'Bay of Brest'
+# and 'Camaret', pp. 56 to 57 (range either shore of the Goulet and fear nothing, but not
+# the middle, for the Fillettes and the Mingan; keep the castle of Brest in full view clear
+# of Penaleuch point through the south channel; within the Bay anchor where you please in
+# 8, 10 or 16 fathoms on mud; high water at half after four, the sea rising five fathoms
+# French measure; the road of Bertheaume in 8 to 12 fathoms, sand and mud; Camaret road
+# in 8 to 10 on mud), as data/charts/features/channel-west.yaml quotes it. The tide: the
+# epitome's row for Brest (3h 48m, 19 feet at springs; Moore's 3h 45m) and the streams'
+# areas (the Goulet 4.5 knots at springs, judgement in the timing, data/tides/streams.yaml).
+# The pilots of Brest: the Pilote français and the Regulations are silent on their names;
+# the names below are Breton names of the Léon and the Crozon coast, judgement. Prices
+# FROM MEMORY as Falmouth's: wine and brandy at their source, Breton salt and sailcloth,
+# English tin scarce under the blockade. The port is French: at war with Britain in June
+# 1805 (data/nations.yaml), so to a King's ship its stance is hostile and no pilot comes
+# off; to an American neutral it is open, and her pilot takes her in on the flood.
+
+id: brest
+name: Brest
+nation: france
+source: "Faden 1793 pp. 56-57 (the Goulet, the Bay, Bertheaume and Camaret); the epitome's row (Whewell 1833 after Daussy) and Moore 1799"
+
+outer_road:
+  feature: bertheaume-road
+  name: the road of Bertheaume
+anchorage:
+  feature: rade-de-brest
+  name: the Bay of Brest
+mooring:
+  name: the Penfeld, under the castle
+  lat_deg: 48.3815
+  lon_deg: -4.4935
+  depth_fathoms: 6               # judgement: the river's mouth under the castle, where the ships of the line moor
+  bottom: mud
+shore:
+  feature: brest-town
+  name: the quay below the castle of Brest
+
+pilot:
+  station: bertheaume-road
+  cruising_nm: 7                  # judgement: the pilots of Brest and Camaret met ships in the Iroise
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml  # a Breton chasse-marée would be truer; the cutter stands for her at far detail (36 may give her a file)
+  names: [Le Gall, Kerguelen, Le Bris, Guivarch, Quéré, Le Floch, Salaün, Tanguy]   # judgement
+  skill: 0.9
+  fee_pounds: 4                   # from memory of the French pilotage tariffs, in sterling for the one account; unverified
+  cast: larboard                  # the head paying off to the westward, for the Goulet (judgement)
+  course_out_deg: 270             # west through the Goulet, then WSW past Bertheaume for the Iroise
+  words:
+    channel: "Range along either shore of the Goulet and fear nothing, but not the middle, for the Fillettes and the Mingan lie there; the passage between them is very dangerous for the rocks under water. Keep the castle of Brest in full view, clear of Penaleuch point, and you are in the south channel."
+    marks: "When Point Bertheaume bears north you may stand to the east for the Goulet. You are upon the Fillettes when the two steep points east of Camaret come in one and the castle is hid by Penaleuch point; the Mingan shows above water except at high water springs."
+    anchorage: "Within the Bay of Brest you anchor where you please in eight, ten or sixteen fathoms on mud; the ships of the line moor in the Penfeld under the castle. Without the Goulet the road of Bertheaume has eight to twelve fathoms on sand and mud, sheltered from the north-west round to north-east, and Camaret road eight to ten on mud, safe from the south."
+    tide: "The flood runs through the Goulet four or five knots at springs; no ship takes the Goulet against the ebb. It is high water at half after four at full and change, and the tide rises five fathoms French measure."
+
+tide:
+  establishment: Brest
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds                # the one account, in sterling at the exchange (a livre tournois a tenth of a pound, from memory)
+  goods:
+    - {good: wine, price: 35, origin: france, season: {12: 1.1}, note: "Bordeaux and Nantes wine at the source; from memory"}
+    - {good: brandy, price: 110, origin: france, note: "cognac at the source; from memory"}
+    - {good: canvas, price: 40, origin: france, note: "Breton sailcloth of Locronan and Pouldavid; from memory"}
+    - {good: salt, price: 12, origin: france, note: "Guérande salt; from memory"}
+    - {good: hemp, price: 55, origin: null, note: "Breton hemp; from memory"}
+    - {good: tin, price: 180, origin: britain, note: "English tin, scarce under the blockade; from memory"}
+    - {good: pilchards, price: 30, origin: britain, season: {2: 1.3, 3: 1.3, 4: 1.2}, note: "Cornish pilchards for the Lenten market; from memory"}
+    - {good: coal, price: 6, origin: britain, season: {11: 1.2, 12: 1.2, 1: 1.2, 2: 1.2}, note: "sea coal, scarce; from memory"}
+    - {good: timber, price: 5, origin: france, note: "from memory"}
+    - {good: salt beef, price: 70, origin: france, note: "from memory"}
+    - {good: copper ore, price: 20, origin: britain, note: "from memory"}
+
+dockyard:
+  kind: yard                      # the arsenal of the French Atlantic fleet: a yard, closed to the English
+  items:
+    - {item: topmast, hours: 8, pounds: 45, note: "the arsenal sells to a neutral at a price: judgement"}
+    - {item: topgallant_mast, hours: 4, pounds: 14}
+    - {item: yard, hours: 6, pounds: 28}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 22}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.1, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  able: {hands: 6, pounds: 2, delay_h: 24}
+  ordinary: {hands: 10, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 20, pounds: 1, delay_h: 12}
+
+closed_to: []

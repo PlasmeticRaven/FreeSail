@@ -42,6 +42,7 @@ What the log will say is shown in plain code blocks, copied from a run with seed
 | 11 | [The starting book](11-the-starting-book.md) | The starter book of standing orders, a choice and never a requirement: each routine with the reason it exists, how to load it or begin with none, and the standing dialect whole for writing your own, its forms in a table. |
 | 12 | [The longitude](12-the-longitude.md) | The chronometer and the time sight; the moon and the lunar, drawn and not computed; the amplitude and the azimuth for the variation; the chart in the captain's hands (a bearing by account, the dangers, a course that passes a rock); the lookout's distances; every form the longitude's orders take, in a table. |
 | 13 | [The tide and the anchor](13-the-tide-and-the-anchor.md) | The world's tide under the lead and in the track, and the captain's by his epitome and the moon's age; taking the ground and floating off; the ground tackle by the ship's size; coming to an anchor, riding, dragging and weighing in Luce's words; the readings and events of it, in a table. |
+| 14 | [The port](14-the-port.md) | The named people aboard and where they are; the places and the ship's papers by handle; the pilot who comes off in his cutter and what he knows; the anchorage, the moor and the kedge; the boat ashore, the market and its rules, the yard and the crew pool; getting under way as Luce has it, with the tide; every form in a table. |
 
 ## Where to start
 

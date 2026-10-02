@@ -68,8 +68,34 @@ def answer(ship: Ship, order: Order, raw: str = "", vocab: Vocabulary | None = N
     vocab = vocab or load_vocabulary()
     phrase = vocab.readings[order.verb]
     if "<" in phrase:
-        return _bearing_of(ship, phrase, order.object or "", raw)
+        if phrase.startswith("the bearing of"):
+            return _bearing_of(ship, phrase, order.object or "", raw)
+        return _with_words(ship, phrase, order.object or "", raw)
     return _phrase(ship, phrase)
+
+
+def _with_words(ship: Any, phrase: str, said: str, raw: str) -> Result:
+    """A parametric reading other than the bearing (package 35: `where is <person>`): the
+    row read with the words after the phrase's head, in the registry's words."""
+    row = next(r for r in R.REGISTRY.by_words(phrase))
+    head = phrase.split(" <")[0]
+    words = _said_after(raw, head) or said
+    if not words.strip():
+        raise OrderError(
+            f"{head[:1].upper()}{head[1:]} whom? Name a person by his role or his name."
+        )
+    world, view = _view(ship)
+    value = view.value(row.id, words)
+    if value is None:
+        raise OrderError(f"Nobody aboard answers to '{words}'; 'the people' lists them.")
+    return (
+        KIND,
+        _sentence(f"{head} {words}", R.reading_words(row, value, world)),
+        {
+            "reading": [row.id],
+            "words": words,
+        },
+    )
 
 
 def _phrase(ship: Any, phrase: str) -> Result:

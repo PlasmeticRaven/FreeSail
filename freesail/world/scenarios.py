@@ -46,6 +46,14 @@ A bare list under `weather` is the old form, the pinned wind alone. With both fo
 pinned wind wins and the systems give only the sky and the glass; with systems alone the
 systems' surface wind at the ship is the base wind (spec M5 §2), and the sea and the
 ship's motion are kept with it (spec M5 §4; `sea` above overrides either way).
+    nation: britain                  # the ship's nation (spec M5 §24; package 35); by her
+                                     # company's names list when not said
+    people:                          # people beyond the muster's posts (§22; package 35)
+      - {role: supercargo, name: Mr Pentreath, place: cabin}
+    papers: {price_lists: [falmouth]}   # the price lists she starts with (§22)
+    cargo: {purse_pounds: 500, goods: {tin: 20}}   # the purse and the hold (§23)
+    ports:                           # the ports' state (§23, §27): a list of ids, or each
+      brest: {closed_to: [], letters: [{text: "...", origin: Brest}], news: ["..."]}
     standing_orders:                 # files read at the start, in order
       - data/standing_orders/starter.orders
     orders:                          # the captain's first orders, given at tick 0
@@ -162,6 +170,19 @@ class ScenarioFile:
         keeps_sea = keeps_sea and (sc.sea is not None or not sc.weather)
         if keeps_sea:
             out.append("The sea and the ship's motion are kept.")
+        # package 35: the nation, the cargo and the ports (the author's view)
+        if sc.nation:
+            out.append(f"She is of {sc.nation.replace('-', ' ')}.")
+        cargo = sc.cargo or {}
+        if cargo.get("purse_pounds") or cargo.get("goods"):
+            goods = ", ".join(f"{t:g} tons of {g}" for g, t in (cargo.get("goods") or {}).items())
+            out.append(
+                f"The purse holds £{cargo.get('purse_pounds', 0):g}"
+                + (f"; the hold {goods}." if goods else ".")
+            )
+        if sc.ports is not None:
+            names = list(sc.ports) if not isinstance(sc.ports, dict) else list(sc.ports)
+            out.append(f"The ports: {', '.join(names) if names else 'none'}.")
         return out
 
 
@@ -255,6 +276,49 @@ def load_scenario(path: str | Path) -> ScenarioFile:
             }
         except (TypeError, ValueError) as e:
             raise ScenarioError(f"{where}, chronometer: {e}") from None
+    # Package 35 (spec M5 §22 to §24, §27): the ship's nation, her people beyond the
+    # muster, her papers, her cargo and purse, and the ports' state.
+    nation = ship.get("nation", raw.get("nation"))
+    if nation is not None:
+        from freesail.world.nations import load_nations
+
+        found = load_nations().find(str(nation))
+        if found is None:
+            raise ScenarioError(
+                f"{where}, nation: '{nation}' is not a nation of data/nations.yaml."
+            )
+        sc.nation = found.id
+    people = raw.get("people") or []
+    if not isinstance(people, list):
+        raise ScenarioError(f"{where}, people: a list of {{role, name, skill, place}}.")
+    for i, p in enumerate(people):
+        if not isinstance(p, dict) or not str(p.get("role") or "").strip():
+            raise ScenarioError(f"{where}, people {i + 1}: a person is a mapping with a role.")
+    sc.people = [dict(p) for p in people]
+    papers = raw.get("papers") or {}
+    if not isinstance(papers, dict):
+        raise ScenarioError(f"{where}, papers: a mapping (price_lists: [ports]).")
+    sc.papers = {str(k): v for k, v in papers.items()}
+    cargo = raw.get("cargo") or {}
+    if not isinstance(cargo, dict):
+        raise ScenarioError(f"{where}, cargo: a mapping of purse_pounds and goods.")
+    try:
+        goods = {str(g): float(t) for g, t in (cargo.get("goods") or {}).items()}
+        sc.cargo = {"purse_pounds": float(cargo.get("purse_pounds", 0.0) or 0.0), "goods": goods}
+    except (TypeError, ValueError, AttributeError):
+        raise ScenarioError(
+            f"{where}, cargo: purse_pounds a number, goods a mapping of tons."
+        ) from None
+    if raw.get("ports") is not None:
+        ports_raw = raw["ports"]
+        if isinstance(ports_raw, list):
+            sc.ports = [str(x) for x in ports_raw]
+        elif isinstance(ports_raw, dict):
+            sc.ports = {str(k): dict(v or {}) for k, v in ports_raw.items()}
+        else:
+            raise ScenarioError(
+                f"{where}, ports: a list of port ids, or a mapping of each port's state."
+            )
     # the world's stated current (package 33a; none by default): {knots, toward_deg}
     current = raw.get("current")
     if current is not None:
