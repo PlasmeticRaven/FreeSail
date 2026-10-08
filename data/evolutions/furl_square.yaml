@@ -6,7 +6,7 @@ id: furl_square
 verb: furl
 applies_to: {class: square}
 preconditions:
-  - {check: sail.state != furled, reason: "The {sail} is furled already."}
+  - {check: sail.state != furled, reason: "The {sail} is furled already.", done: true}
   - {check: sail.state != blown_out, reason: "The {sail} is blown out; there is nothing left to furl."}
   - {check: sail.state != unbent, reason: "The {sail} is unbent; there is no sail on the yard to furl."}
 requires:

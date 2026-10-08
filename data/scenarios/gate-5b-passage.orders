@@ -9,7 +9,11 @@
 # the account is fixed off the Stiff before the land is lost (the Regulations' master
 # "to ascertain the latitude, longitude and variation of every headland he passes";
 # N §1). "The land" is the nearest land, or at night the nearest light.
-standing order "bearings": every glass, if the land is in sight then take a bearing of the land
+# Package 37d: a bearing gives a line, and the lookout's distance by estimation is laid
+# down with it only when it is the better figure (a landfall on one mark after a long
+# run), so the book takes a fix by cross bearings after the bearing, which stands when
+# one mark only is in sight or the marks cut too fine.
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix
 
 # The Channel Soundings: at noon, when the sight is had and she is by account in the
 # fifty-fathom water south of the Lizard, she is brought to and the deep-sea lead hove
@@ -25,14 +29,48 @@ standing order "soundings": when the speed is under 3 knots and the distance run
 # course for Falmouth is shaped afresh from the account as the day's work left it; the
 # sounding and the filling away are events the dialect names (spec M5 §15).
 standing order "fill away after the cast": at a sounding, if the distance run since noon is under 5 miles then fill away
-standing order "stand on": at filled away then shape a course for Falmouth
+standing order "stand on": at filled away then shape a course for 50 02 N 4 58 W
 
 # The landfall: the first land seen gives a bearing, and the course for Falmouth is
 # shaped from the reckoning (never the truth: spec §15's "shape a course for <place>").
 # The land is in sight from the start (Ushant astern), so this fires at the departure
 # too, which shapes the same course north by east; it fires again when the Lizard is
 # raised after the land has been out of sight.
-standing order "landfall": when the land is in sight then take a bearing of the land; shape a course for Falmouth
+standing order "landfall": when the land is in sight then take a bearing of the land; shape a course for 50 02 N 4 58 W
+
+# Package 37e: a course shaped is now a course made good, the master's tide allowed in
+# it (spec M5 §15), and the order's own words say what the line does: from the Lizard's
+# landfall the line for Falmouth "crosses the land about Black Head" and "passes the
+# Manacles within a mile". Until 37e the heading for Falmouth was held and the flood set
+# her a league to the eastward of that line, clear of the ledge; made good, the line is
+# sailed and she struck. So the book rounds the Manacles as the merchant passage's does,
+# by a point three miles east of them (50 02 N 4 58 W), and shapes for Falmouth when it
+# is within a mile by the account, which the bearings and the fix hold to a few cables.
+# Package 37f: and shortens sail there, to stand in for the road at dusk under her
+# reefed topsails. Standing in at six knots and a half she was hailed by the pilot's
+# cutter ten minutes before her anchor, and her sail, shortened at the hail as the next
+# order has it, was not in before she let go: he did not board. At a little under six
+# knots from the point he boards a minute after his hail.
+standing order "round the Manacles": when the distance to 50 02 N 4 58 W is under 1 mile then shape a course for Falmouth; shorten sail
+# Package 37f: a course shaped is worked once, for the way she has as it is shaped, and
+# the master does not alter the helm after. Brought to for the noon's cast she now has
+# her way taken off before "Hove to" is said, and fills away with a knot and a half on
+# her where she had four: the course shaped as she filled, "steer NNW to make it good"
+# against three quarters of a knot of flood, was a point too far to the westward for the
+# seven knots she had ten minutes after, she raised the Lizard a league further west, and
+# passed the point more than a mile wide by her own account and stood on up the Channel.
+# So the course for the point is worked again every glass on the way to it, as the
+# merchant passage's is for the Iroise: from the noon's cast until the point is within a
+# mile, and not once she has rounded it (the point is eight miles from the town, and on
+# her way to it from the southward she is nine and more).
+standing order "the course for the point": every glass, if the distance run since noon exceeds 1 mile and the distance to 50 02 N 4 58 W is over 1 mile and the distance to Falmouth is over 9 miles then shape a course for 50 02 N 4 58 W
+
+# The pilot (package 37e): the Falmouth cutter hails her as she stands in, "shorten sail
+# and he will come aboard", and the boat boards a ship making under six knots over the
+# ground. Until 37e she stood in N by E at five knots and three quarters and he boarded
+# of himself; from the point east of the Manacles she stands in NNW with the wind freer,
+# at six and a half, and he was left astern. So sail is shortened at his hail, as he asks.
+standing order "the pilot boards": at the pilot's hail then shorten sail
 
 # Running in: the hand lead every glass once the land is in sight and the run since
 # noon says she is closing the coast (Master, art. XXVI: "always sounding to inform

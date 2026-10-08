@@ -278,6 +278,12 @@ class ReadingsView:
     def tick(self) -> int:
         return self._world.clock.tick
 
+    def event_ready(self, watch: str) -> bool:
+        """Whether the watched event with this condition may come now (`EventSpec.ready`):
+        true of every event that has no floor."""
+        spec = _WATCHED.get(watch)
+        return spec is None or spec.ready is None or bool(spec.ready(self._world))
+
     def reading(self, id: str) -> Reading:
         return self._registry.get(id)
 
@@ -554,6 +560,22 @@ def _land(world: Any, _: str | None) -> dict[str, Any] | None:
     return lookout.land(float(world.ship.heading)) if lookout is not None else None
 
 
+def _nearest_land(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the nearest land` (package 37d): the shore itself as the lookout's last look had
+    it, where it lies from the ship's head, its bearing to the point, its distance by
+    estimation and the coast's name; behind the words the distance as he said it, for
+    the dialect (`when the nearest land is under half a mile then ...`), never the
+    chart's own metres. None without a chart, with no shore within a league, or when the
+    weather or the night hides it (`_no_nearest_land_words` says which)."""
+    lookout = _lookout_of(world)
+    return lookout.nearest_land(float(world.ship.heading)) if lookout is not None else None
+
+
+def _no_nearest_land_words(world: Any) -> str | None:
+    lookout = _lookout_of(world)
+    return NO_CHART_WORDS if lookout is None else lookout.no_nearest_land_words()
+
+
 def _depth_of_water(world: Any, _: str | None) -> float | None:
     """The depth of water by the chart at the ship's position, in metres at the datum
     (the tide of package 34 goes on top): the world's own number, which the lead of
@@ -583,24 +605,33 @@ def _navigation_of(world: Any) -> Any:
 
 
 def _reckoning(world: Any, _: str | None) -> dict[str, Any] | None:
-    """`the reckoning`: the position by account, in degrees and in words."""
+    """`the reckoning`: the position by account, in degrees and in words, and the tide
+    the master allows in it (package 37e): "49° 52' N, 6° 10' W by account; the tide
+    allowed: the flood, a knot and a half to the E by N, by the directions for the Iroise
+    and high water at Brest by the epitome", or "by the captain's order, two knots to the
+    westward", or "none, in open water"."""
     nav = _navigation_of(world)
     return nav.reckoning_reading() if nav is not None else None
 
 
 def _reckoning_uncertainty(world: Any, _: str | None) -> dict[str, Any] | None:
     """`the reckoning's uncertainty`: the master's words, and behind them the larger of
-    the east-west and north-south doubts in metres (the dialect compares it in miles)."""
+    the east-west and north-south doubts in metres (the dialect compares it in miles).
+    Since package 37e it is the doubt as it stands at this moment (it grows by the hour,
+    under way or not, and a reading between two workings of the account must not give it
+    as it stood at the last), said in cables under a mile and with its lie when it is
+    long and thin; the data carries the ellipse."""
     nav = _navigation_of(world)
     if nav is None:
         return None
-    r = nav.reckoning
-    worst = max(r.sigma_east_nm, r.sigma_north_nm)
+    doubt = nav.doubt_now()
+    worst = max(doubt["sigma_east_nm"], doubt["sigma_north_nm"])
     return {
         "metres": units.nm_to_m(worst),
-        "words": r.uncertainty_words,
-        "east_nm": r.sigma_east_nm,
-        "north_nm": r.sigma_north_nm,
+        "words": doubt["words"],
+        "east_nm": doubt["sigma_east_nm"],
+        "north_nm": doubt["sigma_north_nm"],
+        "ellipse": {k: v for k, v in doubt.items() if k != "words"},
     }
 
 
@@ -1086,6 +1117,23 @@ REGISTRY.add(
         none_words=_no_chart_words,
     )
 )
+# The shore itself (package 37d; the review of gate 5c's playtests, 5.1: off any named
+# coast the nearest land was never spoken of): what a man on deck sees of it, in the
+# lookout's words, in every sample; compared in miles by what he said.
+REGISTRY.add(
+    Reading(
+        "nearest_land",
+        ("the nearest land", "the nearest shore"),
+        "distance",
+        "miles",
+        _nearest_land,
+        description="the nearest shore within a league as the lookout sees it: where it "
+        "lies from the ship's head, its bearing to the point, its distance by estimation, "
+        "the coast's name; 'no land within a league', or 'not to be seen' by night or in "
+        "thick weather",
+        none_words=_no_nearest_land_words,
+    )
+)
 REGISTRY.add(
     Reading(
         "depth_of_water",
@@ -1107,7 +1155,8 @@ REGISTRY.add(
         "position",
         "",
         _reckoning,
-        description="the position by account: '49° 52' N, 6° 10' W by account'",
+        description="the position by account, and the tide the master allows in it: "
+        "'49° 52' N, 6° 10' W by account; the tide allowed: ...'",
         none_words=_no_reckoning_words,
     )
 )
@@ -1254,6 +1303,58 @@ REGISTRY.add(
         _manoeuvre,
         description="the manoeuvre in hand: hove to, heaving to, tacking, wearing, filling "
         "away, or none",
+    )
+)
+
+# The work in hand (package 37g, item 9; game 9's officer ordered the catharpins twice
+# for want of it): what the hands are doing and what waits for hands or its turn, as the
+# captain's window shows it (the instruments' work list, `queries.crew_state`), from the
+# evolution runner's own list in the order it was given. Parity is structural: the
+# captain reads it at the prompt (`the work in hand`) and every station in its readings.
+# The words name each piece of work and never how far along it is, so that they change
+# only when work begins, ends or gets its hands, and "no change in the readings" still
+# means what it meant to the welfare detector.
+NO_WORK_WORDS = "nothing in hand"
+
+
+def _work_in_hand(world: Any, _: str | None) -> dict[str, Any]:
+    extra = getattr(world.ship, "extra", None) or {}
+    runner = extra.get("evolutions")
+    doing: list[str] = []
+    waiting: list[str] = []
+    belayed: list[str] = []
+    for inst in runner.work() if runner is not None and hasattr(runner, "work") else ():
+        words = runner.doing(inst)
+        if inst.waiting:
+            waiting.append(f"{words} ({'for hands' if inst.waiting_for else 'its turn'})")
+        elif inst.paused:
+            belayed.append(words)
+        else:
+            doing.append(words)
+    parts = []
+    if doing:
+        parts.append("doing: " + ", ".join(doing))
+    if waiting:
+        parts.append("waiting: " + ", ".join(waiting))
+    if belayed:
+        parts.append("belayed while all hands are about ship: " + ", ".join(belayed))
+    return {
+        "words": "; ".join(parts) or NO_WORK_WORDS,
+        "doing": doing,
+        "waiting": waiting,
+        "belayed": belayed,
+    }
+
+
+REGISTRY.add(
+    Reading(
+        "work_in_hand",
+        ("the work in hand", "the work"),
+        "ground",
+        "",
+        _work_in_hand,
+        description="the work in hand: what the hands are doing, and what waits for hands "
+        "or its turn, in the order it was given",
     )
 )
 
@@ -2057,6 +2158,15 @@ class EventSpec:
     data: dict[str, Any] = field(default_factory=dict)
     also: tuple[str, ...] = ()
     watch: str | None = None  # the dialect's condition whose coming to hold is the event
+    # a watched event's floor (package 37f): while this is false of the world the event
+    # neither comes nor moves what it is measured from
+    ready: Callable[[Any], bool] | None = None
+    # what the event needs of the ship to come at all (package 37g, item 4): a function
+    # of the world that gives None when it can come as she is, else the reason it cannot
+    # and the nearest event that can, in words ("She swings to the tide only at anchor,
+    # and she is under way; stand by for 'the turn of the tide by the reckoning'"). A
+    # station with the deck is refused a wait for it when it is asked (`agents.harness`).
+    needs: Callable[[Any], str | None] | None = None
 
 
 def _bells_test(n: int) -> Callable[[dict[str, Any]], bool]:
@@ -2075,10 +2185,13 @@ _BELL_WORDS = {
 }
 
 EVENTS: dict[str, EventSpec] = {}
+_WATCHED: dict[str, EventSpec] = {}  # the watched events, by their conditions' words
 
 
 def _event(spec: EventSpec) -> None:
     EVENTS[spec.words] = spec
+    if spec.watch is not None:
+        _WATCHED[spec.watch] = spec
 
 
 # The sun's two events are package 26's to raise (kinds agreed here so that a rule given
@@ -2112,7 +2225,18 @@ _event(EventSpec("a squall", "weather.squall"))
 #   (the glass's two once a fall or a turn: again only after an hour without, since its
 #     words hover about their thresholds; `standing.rules.EVENT_SETTLE_S`)
 #   the sea getting up: its words changing upward (a short sea to a heavy one)
-_event(EventSpec("a wind shift", "", watch="the mean wind shifts 1 point"))
+#     and never of a wind too light or too unsteady to have a direction (package 37f,
+#     the floor of the log's own `wind.shift` line, `World.WIND_SHIFT_FLOOR_KN`): while
+#     the wind is not settled the event does not come, and what it is measured from
+#     stands, so that a wind that dies at SW and comes again at NE is one shift
+_event(
+    EventSpec(
+        "a wind shift",
+        "",
+        watch="the mean wind shifts 1 point",
+        ready=lambda world: bool(getattr(world, "wind_settled", True)),
+    )
+)
 _event(EventSpec("the glass falling fast", "", watch="the glass is falling fast"))
 _event(EventSpec("the glass turning", "", watch="the glass is turning"))
 _event(EventSpec("the sea getting up", "", watch="the sea gets up"))
@@ -2122,7 +2246,10 @@ _event(EventSpec("a change in the sky", "weather.sky", also=("weather.change",))
 # 33a), and noon (the day's work, the log-book's page turned).
 _event(EventSpec("a sighting", "lookout.sighting"))
 _event(EventSpec("a landfall", "lookout.sighting", lambda data: bool(data.get("landfall"))))
-_event(EventSpec("a sounding", "sounding"))
+# (a sounding is bottom found, package 37f: a cast that finds none is no event, so that
+# `at a sounding then ...` and a stand-by for one wait for the bottom and not for every
+# heave of the lead off soundings)
+_event(EventSpec("a sounding", "sounding", lambda data: data.get("depth_m") is not None))
 _event(EventSpec("noon", "reckoning.noon"))
 # the manoeuvres' ends, for a passage's book (package 33a: `at filled away then steer N
 # by E`, after the fill-away has left the helm), by the evolutions' own kinds
@@ -2141,6 +2268,12 @@ _event(
     EventSpec("a danger sighted", "lookout.sighting", lambda data: data.get("seen_as") == "danger")
 )
 _event(EventSpec("a bearing steady and closing", "lookout.closing"))
+# Package 37d: the lookout's warning that she is standing into the land (`lookout.
+# land_ahead`: notable under ten minutes at her speed over the ground, urgent under
+# four), and a fix by cross bearings (`take a fix`, the reckoning's line).
+_event(EventSpec("land ahead", "lookout.land_ahead", lambda data: not data.get("urgent")))
+_event(EventSpec("land close ahead", "lookout.land_ahead", lambda data: bool(data.get("urgent"))))
+_event(EventSpec("a fix", "reckoning.fix"))
 _event(EventSpec("a lunar", "reckoning.lunar"))
 _event(EventSpec("a longitude by chronometer", "reckoning.time_sight"))
 _event(EventSpec("the chronometer run down", "chronometer.dead"))
@@ -2156,17 +2289,41 @@ _event(EventSpec("the anchor dragging", "anchor.dragging"))
 _event(EventSpec("the cable parted", "cable.parted"))
 _event(EventSpec("aground", "ship.aground"))
 _event(EventSpec("the ground taken", "ship.aground"))
-_event(EventSpec("afloat", "ship.afloat"))
-_event(EventSpec("the turn of the tide", "ship.swung"))
+_event(EventSpec("afloat", "ship.afloat", needs=lambda world: _needs_aground(world)))
+_event(EventSpec("the turn of the tide", "ship.swung", needs=lambda world: _needs_anchor(world)))
+# Package 37e: the turn of the master's own tide, which he works into the reckoning from
+# his directions and his epitome (the line `reckoning.tide`): the turn of the tide as the
+# captain can have it under way, where the swing above comes only at anchor.
+_event(
+    EventSpec(
+        "the turn of the tide by the reckoning",
+        "reckoning.tide",
+        lambda data: bool(data.get("turn")),
+    )
+)
 # which way she swung (package 36; the merchant passage's book takes the Goulet on the
 # flood and not on the ebb): the same line, read by its data
-_event(EventSpec("the turn to the flood", "ship.swung", lambda data: data.get("flood") is True))
-_event(EventSpec("the turn to the ebb", "ship.swung", lambda data: data.get("flood") is False))
+_event(
+    EventSpec(
+        "the turn to the flood",
+        "ship.swung",
+        lambda data: data.get("flood") is True,
+        needs=lambda world: _needs_anchor(world),
+    )
+)
+_event(
+    EventSpec(
+        "the turn to the ebb",
+        "ship.swung",
+        lambda data: data.get("flood") is False,
+        needs=lambda world: _needs_anchor(world),
+    )
+)
 # Package 35: the people's, the port's and the other sail's events (spec M5 §22 to §25),
 # by the World's kinds (`world/people.py`, `world/ports.py`, the lookout's sail).
 _event(EventSpec("a sail sighted", "lookout.sighting", lambda data: data.get("seen_as") == "sail"))
 _event(EventSpec("sail ho", "lookout.sighting", lambda data: data.get("seen_as") == "sail"))
-_event(EventSpec("the pilot aboard", "port.pilot_aboard"))
+_event(EventSpec("the pilot aboard", "port.pilot_aboard", needs=lambda world: _needs_pilot(world)))
 _event(EventSpec("the pilot refused", "port.pilot_refused"))
 _event(EventSpec("the pilot off", "port.pilot_left"))
 _event(EventSpec("the boat away", "boat.away"))
@@ -2222,6 +2379,91 @@ def event_matches(spec: EventSpec, kind: str, data: dict[str, Any]) -> bool:
     return spec.test(data) if spec.test is not None else True
 
 
+# What an event needs of the ship to come at all (package 37g, item 4; the review of gate
+# 5c's playtests, 5.4: a stand-by "can wait on an event that can no longer come ... and is
+# not told so"). Each reads only what the captain has: whether she rides at anchor or is
+# aground, whether a pilot is aboard, whether any sail is in sight (a pilot's boat is one;
+# which sail she is the lookout has yet to make out, and this does not say).
+
+
+def _needs_anchor(world: Any) -> str | None:
+    if bool(getattr(world, "at_anchor", False)):
+        return None
+    return (
+        "She swings to the tide only at anchor, and she is not at anchor; stand by for "
+        "'the turn of the tide by the reckoning', the turn of the master's own tide"
+    )
+
+
+def _needs_aground(world: Any) -> str | None:
+    extra = getattr(getattr(world, "ship", None), "extra", None) or {}
+    if extra.get("aground") or getattr(world, "_aground", False):
+        return None
+    return "She is not aground, so she cannot come afloat; stand by for 'aground', or a bell"
+
+
+def _needs_pilot(world: Any) -> str | None:
+    ports = getattr(world, "ports", None)
+    if ports is None:
+        return None
+    if getattr(ports, "pilot", None) is not None:
+        return "The pilot is aboard already; stand by for 'the pilot off', or a bell"
+    lookout = getattr(world, "lookout", None)
+    sails = [s for s in getattr(lookout, "sightings", None) or [] if s.seen_as == "sail"]
+    if sails or getattr(ports, "cutter_hailed", False):
+        return None
+    return (
+        "No sail is in sight, and a pilot comes off in his boat; stand by for 'a sail "
+        "sighted' or 'the pilot's hail'"
+    )
+
+
+# ---------------------------------------------------------------------------
+# The lines that speak of danger (package 37g, item 4; the review of gate 5c's playtests,
+# 5.4, the table of what each stand-by missed: "Fog came down." with studdingsails set,
+# "The best bower is dragging" twice, the three closing hails before the strike, nine
+# strain warnings behind a glass). A station with the deck that stands by is woken by an
+# urgent line, as every station is, and by a notable line of one of these kinds: an
+# anchor dragging or still coming home, fog coming down, land or a sail closing, a spar
+# or a line straining, an evolution failed, the ship taken aback. Kept here as data,
+# beside the events; `speaks_of_danger` is the one test.
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class DangerLine:
+    """A kind of log line that speaks of danger, with what it is in words and a test on
+    the line's data where the kind alone is not enough."""
+
+    words: str
+    kind: str
+    test: Callable[[dict[str, Any]], bool] | None = None
+
+
+DANGER_LINES: tuple[DangerLine, ...] = (
+    DangerLine("an anchor dragging", "anchor.dragging"),
+    DangerLine("an anchor still coming home", "anchor.coming_home"),
+    DangerLine("fog coming down", "weather.change", lambda data: data.get("weather") == "fog"),
+    DangerLine("land ahead", "lookout.land_ahead"),
+    DangerLine("a bearing steady and closing", "lookout.closing"),
+    DangerLine(
+        "a danger sighted", "lookout.sighting", lambda data: data.get("seen_as") == "danger"
+    ),
+    DangerLine("a spar or a line straining", "strain.warning"),
+    DangerLine("an evolution failed", "evolution.failed"),
+    DangerLine("the ship taken aback", "ship.aback"),
+)
+
+
+def speaks_of_danger(kind: str, data: dict[str, Any] | None) -> str | None:
+    """What a log line of `kind` with `data` speaks of, when it is one of `DANGER_LINES`
+    ("fog coming down"); None when it is not."""
+    for line in DANGER_LINES:
+        if kind == line.kind and (line.test is None or line.test(data or {})):
+            return line.words
+    return None
+
+
 # ---------------------------------------------------------------------------
 # Package 37: the officer of the watch (spec M5 §29). A row of its own, in this block,
 # changing nothing above: who has the deck, since when, what he was told and what the
@@ -2245,17 +2487,31 @@ def _officer_of_the_watch(world: Any, _: str | None) -> dict[str, Any] | None:
         words = f"{who} stood down ({a.released_reason}); the captain has the deck"
     elif a.deck:
         words = f"{who}, {st.rank}, has the deck since {a.deck_stamp}"
+    elif getattr(a, "deck_lost", ""):
+        words = (
+            f"{who}, {st.rank}, is at the station, {a.deck_lost}; the captain has the deck "
+            "meanwhile"
+        )
     else:
-        words = f"{who}, {st.rank}, is at the station; the captain has the deck"
+        words = f"{who}, {st.rank}, is at the station, off watch; the captain has the deck"
     if harness.model_name:
-        words += f" ({harness.model_name}, through {harness.door or 'the game'})"
+        from freesail.agents.agent import door_words
+
+        words += f" ({harness.model_name}, through {door_words(harness.door)})"
     told = [w for w in a.told if w]
     if told:
         words += "; told: " + " ".join(told)
-    if a.allowances:
-        words += "; may also " + "; ".join(
-            f"{verb} ({w})" if w else verb for verb, w in a.allowances.items()
-        )
+    # what the captain's word allows (package 37g): every named grant that stands, several
+    # of one order together, and his general authority; in force only with the deck
+    grants = [] if a.released else list(a.all_grants())
+    general = bool(a.general) and not a.released
+    if general:
+        said = f" ({a.general_words})" if a.general_words else ""
+        words += f"; has the captain's general authority to work the ship{said}"
+    if grants:
+        words += "; may also " + "; ".join(g.said() for g in grants)
+    if (general or grants) and not a.deck:
+        words += " (in force when he has the deck)"
     return {
         "words": words,
         "person": st.person,
@@ -2263,7 +2519,8 @@ def _officer_of_the_watch(world: Any, _: str | None) -> dict[str, Any] | None:
         "deck": bool(a.deck and not a.released),
         "since": a.deck_stamp if a.deck else None,
         "told": list(told),
-        "allowances": dict(a.allowances),
+        "allowances": [g.said() for g in grants],
+        "general": general,
         "state": a.state,
     }
 
@@ -2292,7 +2549,8 @@ _event(
     EventSpec(
         "the deck taken",
         "agent.deck",
-        lambda data: data.get("deck") in ("taken", "handed over"),
+        lambda data: data.get("deck") in ("taken", "handed over", "lost"),
+        also=("agent.paused",),
     )
 )
 _event(EventSpec("a handover", "agent.handover"))

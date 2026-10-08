@@ -1059,24 +1059,91 @@ def _tend_bowlines(ship: Ship) -> None:
             )
 
 
+# A sail's "taken aback" is said once an episode, and "filled again" once after it
+# (package 37f; the review of gate 5c's playtests, 8.2 under "The log"): the lines are
+# armed again when the sail has stood full this long together with way on her, so a sail
+# that lifts and fills by turns in a calm, or with her in irons, is one line and its
+# answer. The hull's own figures (`hull.ABACK_REARM_SECONDS`, `hull.WAY_ON_KN`), kept
+# here since the hull's module is not this one's to import.
+BACKED_REARM_S = 60.0
+BACKED_REARM_WAY_KN = 0.5
+
+
+def _laid_aback_by_order(ship: Ship, sail: Sail) -> bool:
+    """Whether a sail going aback now is aback by order (package 37f: none of the
+    per-sail lines for those): she is hove to, when the yards to the mast and the head
+    sheet to windward are the watch's own work; or a whole-ship evolution is in hand (a
+    tack, a wear, heaving to, filling away, getting under way, coming to anchor), which
+    lays yards aback as it goes; or an evolution is working this sail, its yard or its
+    sheets (`back the main topsail`, a sheet hauled to windward)."""
+    if "hove_to" in ship.extra:
+        return True
+    runner = ship.extra.get("evolutions")
+    instances = getattr(runner, "instances", None)
+    if not instances:
+        return False
+    yard = ship.yard_of(sail)
+    mine = {sail.id, *(ln.id for ln in ship.sheets_of(sail))}
+    if yard is not None:
+        mine.add(yard.id)
+    for inst in instances:
+        subject = getattr(inst, "subject_id", None)
+        if subject in ("ship", ship.name) or subject in mine:
+            return True
+    return False
+
+
 def _record_backed(ship: Ship, sail: Sail, backed: bool, dt: float = 0.0) -> None:
     timers = ship.extra.get("sails.backed_for")
     if not isinstance(timers, dict):
         timers = ship.extra["sails.backed_for"] = {}
+    said = ship.extra.get("sails.backed_said")
+    if not isinstance(said, dict):
+        said = ship.extra["sails.backed_said"] = {}
     if backed == sail.backed:
         timers.pop(sail.id, None)
+        entry = said.get(sail.id)
+        if entry is not None and not backed and dt > 0.0:
+            # full, and with way on her: the lines are armed again after a minute of it
+            if ship.dyn.u >= units.knots_to_ms(BACKED_REARM_WAY_KN):
+                entry["clear_s"] = entry.get("clear_s", 0.0) + dt
+                if entry["clear_s"] >= BACKED_REARM_S:
+                    del said[sail.id]
+            else:
+                entry["clear_s"] = 0.0
         return
+    by_order = ship.extra.get("sails.backed_by_order")
+    if not isinstance(by_order, dict):
+        by_order = ship.extra["sails.backed_by_order"] = {}
     if dt > 0.0:
         held = timers.get(sail.id, 0.0) + dt
         if held < BACKED_DWELL_S:
+            if sail.id not in timers:
+                # as it begins to go: an order's work may be done before the dwell is
+                by_order[sail.id] = _laid_aback_by_order(ship, sail)
             timers[sail.id] = held
             return
     timers.pop(sail.id, None)
+    ordered = bool(by_order.pop(sail.id, False)) or _laid_aback_by_order(ship, sail)
     sail.backed = backed
     name = _name(sail.id)
+    entry = said.get(sail.id)
     if backed:
+        if ordered:
+            # laid aback by order: no line for it, nor for its filling when the order ends
+            said[sail.id] = {"silent": True, "filled": True, "clear_s": 0.0}
+            return
+        if entry is not None:
+            entry["clear_s"] = 0.0
+            return  # once an episode
+        said[sail.id] = {"filled": False, "clear_s": 0.0}
         ship.note("notable", "sail.backed", f"{name} taken aback.", subject=sail.id)
     else:
+        if entry is None or entry.get("filled"):
+            if entry is not None and entry.get("silent"):
+                del said[sail.id]  # the order's own sail, full again: nothing stands
+            return
+        entry["filled"] = True
         ship.note("routine", "sail.filled", f"{name} filled again.", subject=sail.id)
 
 

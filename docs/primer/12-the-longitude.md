@@ -30,7 +30,7 @@ With a chronometer the longitude is had from the sun in the forenoon or the afte
 ```
 
 ```
-  Forenoon watch (08:00)  Forenoon. The sun's altitude for the time: longitude by chronometer 5° 02' W, the Earnshaw 40 days from Plymouth; the reckoning was 5° 02' W. Mr Harvey would trust it within 15 miles.
+  Forenoon watch (08:00)  Forenoon. The sun's altitude for the time: longitude by chronometer 5° 02' W, the Earnshaw 40 days from Plymouth; the reckoning was 5° 02' W. Mr Harvey would trust it within 15 miles, and the account within two miles: the account kept.
 ```
 
 The reckoning's east-west doubt collapses to the sight's, as the noon sight collapses the north-south; its north-south is left as it was. `the longitude by chronometer` is today's, with the days since rating and the master's trust; before one, "no sight for the longitude today", or the reason there can be none.
@@ -56,10 +56,10 @@ take a lunar
 In this book's world, at ten in the forenoon of 1 June with a four-day moon seventeen degrees up and the sun in distance, the lunar of the sun is taken; Aldebaran is refused by day, and Sirius because the Almanac has no distances for it. Say `take a lunar of the sun` or `of <star>` to choose the body, or `take a lunar` for whatever serves. The log an hour later:
 
 ```
-  Afternoon watch (18:57)  A set of distances of the sun and the moon taken by Mr Harvey and two of the young gentlemen, and cleared: longitude by lunar 5° 07' W, which he would trust within 20 miles; the reckoning was 5° 24' W. The Earnshaw gave 5° 22' W, and he thinks it gaining on its rate, by a minute and nine seconds.
+  Afternoon watch (18:57)  A set of distances of the sun and the moon taken by Mr Harvey and two of the young gentlemen, and cleared: longitude by lunar 5° 07' W, which he would trust within 20 miles; the reckoning was 5° 24' W: the account moved two miles to the E. The Earnshaw gave 5° 22' W, and he thinks it gaining on its rate, by a minute and nine seconds.
 ```
 
-The reckoning is updated by it, east and west; `the longitude by lunar` is the last one, with its date and the master's trust; and `the chronometer's error by lunar` is the difference between the lunar's longitude and the chronometer's, which is how a rate was checked at sea and the reason a captain with a chronometer still wanted a lunarian. Whether to believe the lunar or the chronometer when they disagree by twenty miles is the judgement the period's captains made, and the two lines are all a captain at the table has to make it with.
+The lunar is an observation of the longitude, and the master works it against his account by the one rule of chapter 10: weighed by the two doubts, his account's east and west and the lunar's own; taken, the account laid down on it, when the two stand further apart than their doubts together allow; kept when it would move the account under half a cable. The line says which, and a kept one gives both doubts side by side: "... which he would trust within 25 miles, and the account within two miles; the reckoning was 5° 16' W: the account kept." So a lunar good to twenty-five miles no longer displaces an account good to two, as it did when any sight taken after two miles of run replaced the account; and a lunar after a week without a sight, the account sixty miles in doubt, is taken nearly whole. The time sight is worked the same way. `the longitude by lunar` is the last one, with its date and the master's trust; and `the chronometer's error by lunar` is the difference between the lunar's longitude and the chronometer's, which is how a rate was checked at sea and the reason a captain with a chronometer still wanted a lunarian. Whether to believe the lunar or the chronometer when they disagree by twenty miles is the judgement the period's captains made, and the two lines are all a captain at the table has to make it with.
 
 ## The amplitude and the azimuth
 

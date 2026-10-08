@@ -45,6 +45,25 @@
 # course out of the road; none: full and by on the tack). The sails she gets under way
 # under are the topsails and the jib on a square rig, the mainsail and the jib on a
 # fore-and-after; the captain makes more sail as he pleases.
+# Package 37f (the review of gate 5c's playtests, 5.8, "Getting under way"): the
+# fore-and-aft cast, and no cast said at a timeout. A vessel whose yards are all on one
+# mast (the schooner, the cutter) is got under way as Luce's schooner is (1884, ch.
+# XXXIV, 'Getting under way.--Schooners': "To cast to starboard, heave up the anchor,
+# putting the helm a starboard, main boom steadied over to starboard ... hoist the
+# staysail, or staysail and jib, with the port sheets aft. When she has paid off
+# sufficiently to starboard, 'Draw' the head sheets, right the helm, and trim the fore
+# and main sheets"): her mainsail hoisted with its boom steadied over to the side she
+# is to cast toward (cast_boom_deg), which sheers her for the tack while the anchor
+# still holds her; her topsail hoisted with its yard square and laid abox only when
+# the anchor is aweigh (abox_s); her jib hoisted then with its sheet to windward; her
+# helm tended from the first heave. In the playtests her mainsail was set flat aft for
+# the tack and her jib to leeward, all three of a schooner's casts ran to the timeout,
+# and each was logged "She has paid off". For every rig now: at cast_timeout_s she is
+# taken as she lies. Paid off cast_enough_points on the tack wanted, she has cast, and
+# the line says how far; as far on the other, the line says "She would not cast on the
+# larboard tack: she has paid off on the starboard" and she is got under way on that
+# tack; hanging nearer the wind than that she is given till cast_give_up_s, and the
+# evolution then fails in words, the anchor aweigh.
 id: get_under_way
 verb: get_under_way
 applies_to: {class: ship}
@@ -58,9 +77,13 @@ timing:
   loose_s: 240              # the sail-loosers aloft, let fall, sheeted home and hoisted (Luce's sequence; the time judgement, a frigate's topsails in four minutes)
   brace_s: 60               # the after yards braced up and the head yards abox: judgement
   break_out_s: 60           # the anchor broken out of the ground: judgement
+  abox_s: 20                # a fore-and-after's one topsail yard laid abox when the anchor is aweigh (package 37f): judgement
+  cast_boom_deg: 30         # a fore-and-after's main boom steadied over so far to the side she casts toward (Luce 1884, ch. XXXIV, 'Schooners': "main boom steadied over"; the angle is judgement)
   hoist_fathoms_per_s: 0.2  # the anchor hove up to the bows, by the depth: judgement
   cast_points: 7            # her head paid off this far from the wind before the head yards are filled and the spanker set: past close-hauled, so that the spanker does not bring her back into the wind before she has way (judgement on Luce's "fallen off sufficiently"; the package found four points too few, docs/dev/TuningNotes.md)
-  cast_timeout_s: 420       # she is given seven minutes to cast before the yards are filled regardless
+  cast_timeout_s: 420       # she is given seven minutes to cast; then she is taken as she lies (package 37f: "paid off" is never said on a timeout)
+  cast_enough_points: 4     # at the timeout: paid off this far on the tack wanted she has cast; as far on the other she has cast the wrong way, and is got under way on that tack
+  cast_give_up_s: 900       # hanging nearer the wind than that, she is given till this, and the evolution then fails in words, the anchor aweigh
   cat_and_fish_s: 300       # as weigh_anchor's: judgement
 on_start: {log: "All hands up anchor! Pass the messenger, ship the bars; send the ready-men aloft to get the sails ready for loosing."}
 on_complete: {log: "Under way on the {tack} tack, {sail_words}; {anchor} catted and fished; {course_words}.", kind: ship.under_way, severity: notable}

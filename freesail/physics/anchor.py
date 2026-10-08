@@ -52,6 +52,8 @@ __all__ = [
     "CABLE_DAMPING_FRACTION",
     "CABLE_STRETCH_FRACTION",
     "DRAGGING_HOLD_FRACTION",
+    "DRAG_REPORT_MIN_M",
+    "DRAG_REPORT_S",
     "DRAG_SAY_S",
     "DRAG_SETTLE_S",
     "GROUND_HOLDING",
@@ -101,6 +103,11 @@ DRAGGING_HOLD_FRACTION = 0.25
 # once a tick from what `cable_forces` did in its substeps.
 DRAG_SAY_S = 60.0
 DRAG_SETTLE_S = 300.0
+# While a dragging goes on the log says how far the anchor has come no oftener than this
+# (package 37f; the brief's quarter of an hour), and only if it has come this much further
+# since it last said (judgement: two fathoms, more than a snub moves it).
+DRAG_REPORT_S = 900.0
+DRAG_REPORT_MIN_M = 3.6576
 # The hemp cable's stretch at its breaking strain (Luce 1866, ch. IV: one seventh to one
 # fifth); the stiffness follows.
 CABLE_STRETCH_FRACTION = 0.15
@@ -121,12 +128,21 @@ SHORT_STAY_SCOPE_PER_DEPTH = 1.5
 
 
 def ground_factor(bottom: str) -> float:
-    """The holding of a ground by the words of its bottom note."""
+    """The holding of a ground by the words of its bottom note: the mean of the grounds it
+    names (package 37f; the review of gate 5c's playtests, 10.5). A note of two grounds,
+    "rock and mud" in the Goulet, "sand and rock" at Roscoff, was held as the first word
+    of the table found in it, which is the worst, bare rock, and the Goulet held a third
+    of good ground where the pilot anchors on it. A rule, not a table: `GROUND_HOLDING`
+    keeps its figures, each ground named counts once ("ooze" and "oozy" are one), and a
+    note that names none of them is `DEFAULT_GROUND_HOLDING`."""
     words = (bottom or "").lower()
+    found: dict[str, float] = {}
     for key, factor in GROUND_HOLDING:
         if key in words:
-            return factor
-    return DEFAULT_GROUND_HOLDING
+            found.setdefault(key[:3], factor)  # "ooze" and "oozy": one ground
+    if not found:
+        return DEFAULT_GROUND_HOLDING
+    return sum(found.values()) / len(found)
 
 
 def scope_wanted_m(depth_m: float, per_depth: float = RIDING_SCOPE_PER_DEPTH) -> float:
@@ -206,6 +222,7 @@ def cable_forces(ship: Ship, water: tuple[float, float], h: float) -> tuple[floa
             anchor.ground_y = hy + uy * new_dist
             pull = holds
             anchor.came_home = True
+            anchor.moved_m += max(0.0, dist - new_dist)  # how far it came, for the log
         anchor.taut = True
         anchor.cable_load_kn = tension / 1000.0
         fx, fy = pull * ux, pull * uy
@@ -233,19 +250,33 @@ def judge_cables(ship: Ship, dt: float) -> None:
             anchor.dragging = False
             anchor.came_home = False
             anchor.drag_s = anchor.hold_s = 0.0
+            anchor.moved_m = anchor.drag_m = 0.0
             continue
+        # Package 37f (the review's 10.4): the dragging is one thing from the minute it is
+        # judged to have begun until the anchor has held DRAG_SETTLE_S, and how far it has
+        # come in that time is kept for the log. It is judged to begin only on a tick in
+        # which the anchor moves, so never of an anchor whose cable is slack; and seconds
+        # of creeping long past are forgiven as it holds (DRAG_SAY_S of them in
+        # DRAG_SETTLE_S), where before they stood until five minutes' holding wiped them
+        # all, and an anchor that crept a second in every few minutes was "dragging" in
+        # the end with its cable slack.
         if anchor.came_home:
+            if anchor.drag_s <= 0.0:
+                anchor.drag_m = 0.0  # a new coming home: how far is counted from here
             anchor.drag_s += dt
             anchor.hold_s = 0.0
+            anchor.drag_m += anchor.moved_m
+            if anchor.drag_s >= DRAG_SAY_S:
+                anchor.dragging = True
         else:
             anchor.hold_s += dt
             if anchor.hold_s >= DRAG_SETTLE_S:
                 anchor.drag_s = 0.0
+                anchor.dragging = False
+            elif not anchor.dragging:
+                anchor.drag_s = max(0.0, anchor.drag_s - dt * DRAG_SAY_S / DRAG_SETTLE_S)
         anchor.came_home = False
-        if anchor.drag_s >= DRAG_SAY_S:
-            anchor.dragging = True
-        elif anchor.drag_s == 0.0:
-            anchor.dragging = False
+        anchor.moved_m = 0.0
     for anchor in tackle.down():
         ratio = anchor.cable_strain_ratio
         if ratio <= strain.DECAY_RATIO:

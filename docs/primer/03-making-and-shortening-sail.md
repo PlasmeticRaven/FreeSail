@@ -105,6 +105,8 @@ Each evolution is a data file in `data/evolutions/` with the steps a working wat
 | (sheet home) | the sheets haul the clews out to the yardarms below |
 | *Set the fore topsail.* | the halyard hoists the yard; the sail is drawing |
 
+The order `loose` sets a sail, as `set` does: `loose the fore topsail` goes through all four steps and leaves it drawing, and is not the period's "loose", which leaves the sail hanging from its yard.
+
 A course's yard does not hoist: its tack is hauled aboard and its sheet aft instead. A gaff sail (`set_gaff.yaml`): "Hands to the spanker halyards and outhaul", "Cast off the gaskets and cleared away the brails", "Set the spanker". A jib (`set_jibheaded.yaml`): "Clear away the jib; man the halyards", "Set the jib". A studding sail (`set_studding.yaml`): "Stand by to set the...", "Got the ... out and bent on the halyards and tack", "Set the ...".
 
 Every step has its time (about four and a half minutes for a topsail, three for a course or a spanker, under two for a jib, four for a studding sail, five for a reef), scaled up to double in a strong breeze and a heavy heel, and taken with the hands the file asks for. Short-handed, the work goes slower and the log says so; with too few it waits for hands, and all hands called do it at the file's pace (chapter 6).

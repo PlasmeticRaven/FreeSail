@@ -88,12 +88,27 @@ def now_of(ship: Ship) -> datetime:
 # ---------------------------------------------------------------------------
 
 
+def whose_order(ship: Any) -> str:
+    """Whose order is being carried out, as the log's lines say it: "the captain's",
+    or a station's when one gives it ("the officer of the watch's"; package 37g, item 10:
+    all hands called by the officer under the captain's grant were logged "by the
+    captain's order", and so was a reckoning he set). The World keeps the order's actor
+    on the ship while its handler runs (`core.world.ORDER_ACTOR`); a standing order's
+    firing is the captain's book's, and reads as his, as it did."""
+    from freesail.core.events import STATION_ACTORS
+
+    actor = str((getattr(ship, "extra", None) or {}).get("order_actor") or "")
+    return f"{actor}'s" if actor in STATION_ACTORS else "the captain's"
+
+
 def call_all_hands(ship: Ship, order: Order) -> Result:
     routine = _routine(ship, order.verb)
     crew = crew_of(ship)
     assert crew is not None
     already = crew.all_hands_called or routine.calling
-    note = routine.call_all_hands("by the captain's order", by_order=True)
+    whose = whose_order(ship)
+    note = routine.call_all_hands(f"by {whose} order", by_order=True)
+    crew.all_hands_called_by = whose
     data: dict[str, Any] = {"verb": order.verb, "level": 1, "all_hands": True}
     if note is None:
         if already and not crew.all_hands_called:

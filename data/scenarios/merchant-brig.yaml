@@ -1,0 +1,104 @@
+# FreeSail: the merchant passage (spec M5 §27, §29; package 36). The topsail schooner
+# Speedwell, American, from Falmouth for Brest with a cargo bought at the quay, no
+# chronometer, a master who can work a lunar. Given to either driver with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/merchant-passage.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/merchant-passage.yaml
+# and printed whole, with the account against the truth, by
+#     py tools/day_log.py data/scenarios/merchant-passage.yaml --hours 34 --reckoning
+#
+# The passage as the book beside this file sails it (merchant-passage.orders): she lies
+# at anchor in Carrick Road at five in the morning of 12 June 1805 with the price list of
+# Falmouth aboard; forty tons of tin are bought at the quay and come off by the lighter
+# while the boat is ashore; the ebb serves from five (high water at Falmouth 04:50 by
+# the world's tide) and she gets under way on it when the boat is alongside, out by the
+# eastern channel; a sail is sighted off the Lizard and not made out (a brig bound up
+# Channel, far enough off to be a sail and no more); the night across the Channel; the
+# Iroise in her chart's words at the deep-sea lead's cast on the morning of the 13th;
+# the pilot of Brest comes off in the road of Bertheaume on the ebb (high water at
+# Brest 04:19; the Goulet is not taken against the ebb, which runs four or five knots at
+# springs), and she anchors in the road to wait; at the turn she gets under way and
+# takes the Goulet on the flood by the pass north of the Mingan and the Fillettes
+# (Faden 1793: "range along either shore of the Goulet and fear nothing, but not the
+# middle"), the pilot answering and the lead going; she anchors in the Bay of Brest and
+# the tin is sold at the quay. The tin, bought at £120 and sold at £270 (the war's half
+# on English tin in a French port; truth 69), makes the voyage £6,000.
+#
+# The weather is pinned (a westerly of fourteen knots, a fair wind for Brest, veering
+# north-westerly and falling through the two days, the sky clear over the old high over
+# Biscay) so that the passage is the same on every machine; the sea and the motion are
+# kept. The dozen other
+# sail are the Channel's traffic of a June day: three merchant brigs, a revenue cutter
+# off the Wolf, two of the Channel fleet's cruisers off Ushant, a French brig-sloop and
+# a chasse-marée's schooner in the Iroise, a Dane and a Portuguese bound down, an
+# American schooner for Falmouth, a frigate out of Plymouth and the mail cutter; each a
+# hull from the four ship files at far detail, moved by the same wind and tide
+# (freesail/world/ships.py; truth 67). The world orders by time are a waypoint appended
+# to the high and a letter left at Brest for the pilot to bring off. The numbers of the
+# passage at seed 7 are pinned in tests/test_known_truths.py and measured in
+# docs/dev/TuningNotes.md (package 36). The starter book is not loaded: the passage's
+# own book holds what it needs, and `read the standing orders from
+# data/standing_orders/starter.orders` adds the starter's routines at any time.
+
+name: A merchant brig, free
+seed: 7
+start: 1805-06-12T05:00
+position: {lat_deg: 50.1631, lon_deg: -5.0345}   # Carrick Road, the usual anchorage (Imray 1874 p. 90)
+region: channel-west
+nation: united-states
+ship:
+  file: data/ships/brig.yaml
+  heading_deg: 190
+  glass: true
+  instrument: octant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.9}    # a master who can work a lunar (spec M5 §27): his skill set
+
+papers:
+  chart: {year: 1804}
+  epitome: moore                  # a merchantman's epitome
+  almanac: 1805
+  price_lists: [falmouth]         # the list the supercargo brought off the day before
+
+cargo:
+  purse_pounds: 1000
+
+ports: [falmouth, plymouth, brest, roscoff, st-marys]
+
+weather:
+  climatology: true
+
+# The other sail on the sea at the start (spec M5 §25): each a description of
+# freesail/world/ships.py, a nation of data/nations.yaml, a position and a goal. A goal's
+# legs are straight, so each is laid at sea.
+ships:
+  - {id: two-brothers, description: merchant brig, name: Two Brothers, nation: britain,
+     position: 49 18 N 6 18 W, goal: "bound from the Longships for the Eddystone", colours: none}
+  - {id: nancy, description: merchant brig, name: Nancy, nation: britain,
+     position: 50 05 N 4 30 W, goal: "bound from the Eddystone for 49 20 N 6 20 W"}
+  - {id: lark, description: cutter, name: Lark, nation: britain,
+     position: 49 55 N 5 45 W, goal: "patrolling off the Wolf within 4 miles"}
+  - {id: diamond, description: frigate, name: Diamond, nation: britain,
+     position: 48 20 N 5 20 W, goal: "patrolling off the soundings seven leagues south-west of Ushant within 8 miles"}
+  - {id: harpy, description: brig-sloop, name: Harpy, nation: britain,
+     position: 48 05 N 5 40 W, goal: "patrolling off the soundings south-west of Ushant within 10 miles"}
+  - {id: palinure, description: brig-sloop, name: Palinure, nation: france,
+     position: the Raz, goal: "running home to Brest", colours: none}
+  - {id: hirondelle, description: schooner, name: Hirondelle, nation: france,
+     position: the Isle of Saints, goal: "bound for Camaret road"}
+  - {id: betsey, description: schooner, name: Betsey, nation: united-states,
+     position: 49 18 N 4 54 W, goal: "bound for Falmouth"}
+  - {id: anna-maria, description: merchant brig, name: Anna Maria, nation: denmark,
+     position: 49 30 N 4 40 W, goal: "bound for 48 30 N 5 40 W"}
+  - {id: bom-jesus, description: merchant brig, name: Bom Jesus, nation: portugal,
+     position: 48 40 N 5 50 W, goal: "bound for the Start"}
+  - {id: indefatigable, description: frigate, name: Indefatigable, nation: britain,
+     position: Cawsand Bay, goal: "bound for the soundings south-west of Ushant"}
+  - {id: swift, description: cutter, name: Swift, nation: britain,
+     position: 49 40 N 5 20 W, goal: "carrying the mail to Plymouth"}
+
+orders:
+  - let go the best bower

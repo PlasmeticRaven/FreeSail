@@ -5,7 +5,7 @@ id: take_in_gaff
 verb: take_in
 applies_to: {class: gaff}
 preconditions:
-  - {check: "sail.state in [set, loosed]", reason: "The {sail} is {state}; there is nothing to take in."}
+  - {check: "sail.state in [set, loosed]", reason: "The {sail} is {state}; there is nothing to take in.", done: true}
 requires:
   - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s gaff or mast is wrecked"}
 steps:

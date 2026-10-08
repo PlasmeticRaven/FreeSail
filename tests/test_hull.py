@@ -317,6 +317,7 @@ def test_taken_aback_is_urgent_after_ten_seconds_with_sail_set(frigate, monkeypa
     notes = run(frigate, 30)
     assert not [n for n in notes if n[1] == "ship.aback"]  # no sail set: not aback, just drifting
     frigate.sails["main.topsail"].state = SailState.SET
+    frigate.dyn.u = 3.0  # way on as the episode begins, so there is way to lose
     notes = run(frigate, 9)
     assert not [n for n in notes if n[1] == "ship.aback"]
     notes = run(frigate, 2)
@@ -326,12 +327,54 @@ def test_taken_aback_is_urgent_after_ten_seconds_with_sail_set(frigate, monkeypa
     assert "aback" in aback[0][2].lower()
     notes = run(frigate, 60)
     assert not [n for n in notes if n[1] == "ship.aback"]  # once per episode
-    # she fills again, then is taken aback anew
+    # she fills again for a minute and gathers way, then is taken aback anew
     monkeypatch.setattr(integrate, "compute_sail_forces", fixed(thrust=15_000.0))
-    run(frigate, 5)
+    run(frigate, int(hp.ABACK_REARM_SECONDS))
+    frigate.dyn.u = 3.0
     monkeypatch.setattr(integrate, "compute_sail_forces", fixed(thrust=-15_000.0))
     notes = run(frigate, 15)
     assert len([n for n in notes if n[1] == "ship.aback"]) == 1
+
+
+def _aback_notes(ship, monkeypatch, seconds=15, wind=None):
+    monkeypatch.setattr(integrate, "compute_sail_forces", fixed(thrust=-15_000.0))
+    return [n for n in run(ship, seconds, wind) if n[1] == "ship.aback"]
+
+
+def test_a_flickering_aback_is_one_line_until_a_minute_clear(frigate, monkeypatch):
+    """Package 37c: the thrust flickering about nought in a light air was a new urgent
+    line every time it crossed; now an episode is logged again only after a minute clear."""
+    frigate.sails["main.topsail"].state = SailState.SET
+    frigate.dyn.u = 3.0
+    assert len(_aback_notes(frigate, monkeypatch)) == 1
+    for _ in range(3):  # filling for a few seconds at a time is not clear of it
+        monkeypatch.setattr(integrate, "compute_sail_forces", fixed(thrust=15_000.0))
+        run(frigate, 5)
+        frigate.dyn.u = 3.0
+        assert _aback_notes(frigate, monkeypatch) == []
+
+
+def test_aback_without_way_or_in_a_light_air_or_at_anchor_is_notable(frigate, monkeypatch):
+    """Package 37c: urgent only with way to lose in a working breeze, free of the anchor
+    and the ground; otherwise notable, and saying why."""
+    frigate.sails["main.topsail"].state = SailState.SET
+    frigate.dyn.u = 0.0
+    (note,) = _aback_notes(frigate, monkeypatch)
+    assert note[0] == "notable" and "no way on" in note[2]
+
+    light = load_ship(FRIGATE)
+    light.sails["main.topsail"].state = SailState.SET
+    light.dyn.u = 1.5  # three knots of way, in two knots of true wind from ahead and astern
+    (note,) = _aback_notes(light, monkeypatch, wind=steady_wind(225.0, 2.0))
+    assert note[0] == "notable" and "light air" in note[2]
+
+    ashore = load_ship(FRIGATE)
+    ashore.sails["main.topsail"].state = SailState.SET
+    ashore.dyn.u = 3.0
+    ashore.extra["aground"] = True
+    notes = _aback_notes(ashore, monkeypatch)
+    assert notes and all(n[0] == "notable" for n in notes)
+    assert "aground" in notes[0][2]
 
 
 def test_leeway_change_is_noted_at_most_once_a_minute(frigate, monkeypatch):

@@ -181,6 +181,11 @@ class Ground:
         extra = getattr(ship, "extra", None)
         if extra is not None:
             extra["aground"] = self.grounded.to_dict()
+            if "hove_to" in extra:
+                # a ship that has taken the ground is hove to no longer (package 37f)
+                from freesail.evolutions.scripts import end_lying_to
+
+                end_lying_to(ship)
             # the way through the water is checked at once; the ground holds her
             dyn = getattr(ship, "dyn", None)
             if dyn is not None:

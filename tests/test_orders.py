@@ -2320,3 +2320,107 @@ def test_the_playtests_refusals_now(ship, when, where, text, setup, expect):
         assert evo in held, (text, held)
     if e.kind == "query.reading":
         assert len(world.journal) == journal  # a question is never journaled
+
+
+# ---------------------------------------------------------------------------
+# Package 37d: `take a fix`, an order of the master's where `take a bearing of` is
+# ---------------------------------------------------------------------------
+
+
+def test_take_a_fix_is_a_navigation_order_with_the_words_a_seaman_would_type():
+    """The forms: `take a fix`; `take a fix by <mark> and <mark>`; the synonyms; all at
+    the level and with the object of `take a bearing of`, so the same refusals apply."""
+    from freesail.orders.vocabulary import load_vocabulary
+
+    vocab = load_vocabulary()
+    spec, bearing = vocab.verbs["take a fix"], vocab.verbs["take a bearing of"]
+    assert (spec.object, spec.level) == (bearing.object, bearing.level)
+    assert spec.object == "navigation"
+    for said in (
+        "take a fix",
+        "take a fix by",
+        "fix her position",
+        "fix the position",
+        "take cross bearings",
+        "take cross bearings of",
+        "cross bearings",
+        "get a fix",
+    ):
+        assert vocab.phrase_to_verb[said] == "take a fix", said
+    w = voyage("frigate", 50.08, -4.95, "10:00")
+    for said in ("take a fix", "fix her position", "take cross bearings", "get a fix"):
+        e = w.submit(said)
+        assert e.kind == "reckoning.fix" and e.text.startswith("Fixed by cross bearings: "), said
+    e = w.submit("Take a fix by Black Head and St Anthony's Head.")
+    assert e.kind == "reckoning.fix" and e.data["by"] == ["Black Head", "St Anthony's Head"]
+    # on a ship that keeps no reckoning it is refused as every navigation order is
+    from freesail.api.session import make_world
+
+    plane = make_world(7, str(SHIP_FILES["frigate"]), Scenario())
+    refused = plane.submit("take a fix")
+    assert refused.kind == "order.rejected" and "No reckoning is kept" in refused.text
+
+
+def test_take_a_fix_is_completed_from_the_marks_in_sight():
+    from freesail.orders.complete import FIX_OFFER_MARKS, suggestions
+
+    w = voyage("frigate", 50.08, -4.95, "10:00")
+    assert "take a fix " in suggestions(w.ship, "take a f")
+    offered = suggestions(w.ship, "take a fix ", limit=40)
+    marks = [s.feature.name for s in w.navigation._fix_marks()[:FIX_OFFER_MARKS]]
+    assert offered[: len(marks)] == [f"take a fix by {name}" for name in marks]
+    assert f"take a fix by {marks[0]} and {marks[1]}" in offered
+    third = suggestions(w.ship, f"take a fix by {marks[0]} and {marks[1]} ", limit=40)
+    assert f"take a fix by {marks[0]} and {marks[1]} and {marks[2]}" in third
+    for line in offered[:8] + third[:4]:
+        assert w.submit(line).kind in ("reckoning.fix", "order.rejected"), line
+    # with fewer than two marks in sight there is nothing to offer but the order itself
+    w.lookout.sightings = []
+    assert suggestions(w.ship, "take a fix ") == []
+
+
+def test_the_three_forms_of_allow_are_offered_and_each_is_taken_and_logged_as_whose_it_is():
+    """Package 37e, item 8: after "allow" the completion offers the tide handed back to
+    the master, no set, and the captain's own set; each is taken, and its line and the
+    reading say whose allowance stands. A course shaped then gives the line and the
+    course to make it good against that allowance."""
+    from freesail.orders.complete import ALLOW_OFFERS, suggestions
+
+    w = voyage("frigate", 49.70, -5.10, "10:00")
+    assert suggestions(w.ship, "allow ") == list(ALLOW_OFFERS)
+    assert "allow the tide by the book" in suggestions(w.ship, "allow the t")
+    w.submit("set plain sail")
+    w.run(1800)
+    w.submit("heave the log")
+    w.run(120)
+    own = w.submit("allow two knots of set to the west")
+    assert own.kind == "reckoning.set_allowance" and own.text == (
+        "Allowing two knots of set to the west in the reckoning, by the captain's order, in "
+        "place of the master's own tide."
+    )
+    assert w.readings["reckoning"]["tide"]["by"] == "captain"
+    assert w.readings.words("reckoning").endswith(
+        "; the tide allowed: by the captain's order, two knots to the westward"
+    )
+    shaped = w.submit("shape a course for 50 02 N 4 58 W")
+    assert shaped.kind == "helm.set" and shaped.data["allowing"]["by"] == "captain"
+    assert " of set to the westward by the captain's order, steer " in shaped.text
+    assert " to make it good. Helm ordered: steer " in shaped.text
+    line, steer = shaped.data["line_deg"], shaped.data["allowing"]["steer_deg"]
+    assert 2.0 < (steer - line) % 360.0 < 40.0  # her head up-tide of the line, to the eastward
+    none = w.submit("allow no set")
+    assert none.text.startswith("No set allowed for in the reckoning, by the captain's order")
+    assert w.readings.words("reckoning").endswith("the tide allowed: none, by the captain's order")
+    back = w.submit("allow the tide by the book")
+    assert back.kind == "reckoning.set_allowance" and back.text.startswith(
+        "The tide in the reckoning handed back to the master, by the book: "
+    )
+    assert w.readings["reckoning"]["tide"]["by"] == "book"
+    assert " by the directions for the open Channel and high water at " in w.readings.words(
+        "reckoning"
+    )
+    for line in ALLOW_OFFERS:
+        assert w.submit(line).kind == "reckoning.set_allowance", line
+    # a course across a headland says so, and is ordered all the same
+    across = w.submit("shape a course for Brest")
+    assert across.kind == "helm.set" and "; the line crosses the land about " in across.text

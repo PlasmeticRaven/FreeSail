@@ -13,10 +13,21 @@ it checks the station's authority (`submit_order` from a station with none is re
 in words and the refusal is logged as `agent.refused`, truth 42), checks the arguments,
 and runs the function.
 
-The tools that act on the agent itself (`stand_by`, `journal`, `opt_out`, `answer`,
-`shelve`) reach its harness through `world.agents[station]`, which is the same object the
-World ticks; the harness's own methods do the work, so a door and the harness cannot
-disagree.
+The tools that act on the agent itself (`stand_by`, `journal`, `read_journal`,
+`hand_over`, `stand_down`, `opt_out`, `answer`, `shelve`) reach its harness through
+`world.agents[station]`, which is the same object the World ticks; the harness's own
+methods do the work, so a door and the harness cannot disagree.
+
+**The three ways of stopping** (package 37g, item 12) are three tools that cannot be
+taken for one another, and each says in its result which it was: `hand_over(note)` gives
+the deck back and the officer stays at his station; `stand_down(note)`, for any station,
+saves the game and releases the station to be taken again; `opt_out` (or the token)
+withdraws. **The journal is read back** with `read_journal` (item 15), and `read_log`
+reaches back past its newest lines by a tick or a count. **An order's authority**
+(`authority_check`) is the station's domain, then the captain's word: a named grant,
+which means what it says; his general authority to work the ship, with what it keeps
+back; and, to avoid an immediate danger, the officer's own word (`submit_order` with
+`danger`), for the helm, heaving to and letting go an anchor and nothing else.
 
 **The shelf** (package 28d; spec M4 open item 9, the context work for local models). The
 library is served in pieces with their sizes, so that a model with a small context reads
@@ -80,6 +91,7 @@ __all__ = [
     "log_line",
     "opt_out",
     "parameters_schema",
+    "read_journal",
     "read_log",
     "readings",
     "readings_digest",
@@ -87,10 +99,12 @@ __all__ = [
     "shelve",
     "size_words",
     "stand_by",
+    "stand_down",
     "state",
     "submit_order",
     "tokens",
     "tool_names",
+    "truthy",
 ]
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -99,6 +113,16 @@ PRIMER_DIR = ROOT / "docs" / "primer"
 # The most lines `read_log` returns at once (judgement: a glass of busy sailing is under
 # a hundred lines; a model wanting more asks again with a later `since_tick`).
 READ_LOG_LIMIT = 200
+# ...unless it asks for more by `count` (package 37g, item 15; the review's 5.4: on the
+# Speedwell 293 notable lines lay between the officer and its own note, beyond the reach
+# of the newest two hundred). The most a count may ask for (judgement: five times the
+# default, about a watch of busy sailing; a longer reach is made a page at a time with
+# `before_tick`).
+READ_LOG_MAX = 1000
+
+# The entries `read_journal` returns when no count is given (judgement: the last score of
+# entries is a watch's worth of an officer's notes and the harness's lines between them).
+READ_JOURNAL_DEFAULT = 20
 
 # About four characters of English to a token (judgement: the usual rule of thumb for
 # BPE vocabularies). The one rule the harness measures text by: the library's sizes, a
@@ -112,7 +136,7 @@ FIND_LIMIT = 8
 
 # The tools whose results may be books (the harness gives each a handle): every library
 # read, and a read_log longer than `agent.BOOK_SIZE_TOKENS`.
-BOOK_TOOLS: tuple[str, ...] = ("library", "read_log")
+BOOK_TOOLS: tuple[str, ...] = ("library", "read_log", "read_journal")
 
 
 def tokens(text: str) -> int:
@@ -133,15 +157,49 @@ def size_words(n: int) -> str:
 # ---------------------------------------------------------------------------
 
 
-def log_line(e: Any) -> dict[str, Any]:
-    """A log event as the model sees it: tick, stamp, severity, kind, text."""
-    return {
+def log_line(e: Any, world: Any = None) -> dict[str, Any]:
+    """A log event as the model sees it: tick, stamp, severity, kind, text; and for an
+    order's line, who gave it (`by`; package 37g, item 9: a sample's lines carried no
+    actor, and one officer's handover note claimed the captain's standing orders as its
+    own)."""
+    d = {
         "tick": e.tick,
         "stamp": units.time_stamp(e.ship_time),
         "severity": e.severity.value,
         "kind": e.kind,
         "text": e.text,
     }
+    who = order_by(e, world)
+    if who:
+        d["by"] = who
+    return d
+
+
+# The kinds of line that are an order given: taken, refused by the ship, or refused by a
+# station's authority.
+ORDER_KINDS: tuple[str, ...] = ("order.accepted", "order.rejected", "agent.refused")
+
+
+def order_by(e: Any, world: Any = None) -> str:
+    """Who gave the order a log line is ("the captain", "the officer of the watch",
+    "standing order 'x' (the captain)": a standing order with the rank it stands in the
+    book by, when the world is given to look it up); "" for a line that is no order."""
+    if getattr(e, "kind", "") not in ORDER_KINDS:
+        return ""
+    actor = str(getattr(e, "actor", "") or "")
+    if actor == "captain":
+        return "the captain"
+    if actor.startswith("standing order "):
+        runtime = getattr(world, "standing", None) if world is not None else None
+        name = actor.removeprefix("standing order ").strip("'")
+        rule = None
+        if runtime is not None:
+            try:
+                rule = runtime.book.get(name)
+            except (OrderError, KeyError, AttributeError):
+                rule = None
+        return f"{actor} ({rule.officer})" if rule is not None else actor
+    return "" if actor in ("", "sim", "driver", "log") else actor
 
 
 # The events a stand-by may wait for, as the tool's description lists them (package 29b,
@@ -264,21 +322,41 @@ def readings_digest(world: World) -> str:
 
 
 def read_log(
-    world: World, station: str, since_tick: int | None = None, severity: str = "routine"
+    world: World,
+    station: str,
+    since_tick: int | None = None,
+    severity: str = "routine",
+    before_tick: int | None = None,
+    count: int | None = None,
 ) -> dict[str, Any]:
     """The log from `since_tick` on, at `severity` or above. With no tick, from the
     station's last sample (package 31c; playtest 11's finding 4: a read with no tick
     returned the whole day): what came since the model last had its turn, the lines of
-    that turn's own tick included. The result says the tick it read from."""
+    that turn's own tick included. The result says the tick it read from.
+
+    It reaches back past its newest lines by a tick or a count (package 37g, item 15):
+    `before_tick` reads the lines before a tick (the newest of them, so a long reach is
+    made a page at a time, each page's first tick the next call's `before_tick`), and
+    `count` says how many lines are wanted, up to `READ_LOG_MAX`; `omitted` is how many
+    older lines of the range were left out."""
     sev = Severity(str(severity or "routine").lower())
-    since = _last_sampled(world, station) if since_tick is None else int(since_tick)
+    if since_tick is None:
+        since = 0 if before_tick is not None else _last_sampled(world, station)
+    else:
+        since = int(since_tick)
+    limit = READ_LOG_LIMIT if count is None else max(1, min(int(count), READ_LOG_MAX))
     events = [e for e in world.log if e.tick >= since and e.severity.rank >= sev.rank]
-    omitted = max(0, len(events) - READ_LOG_LIMIT)
-    return {
+    if before_tick is not None:
+        events = [e for e in events if e.tick < int(before_tick)]
+    omitted = max(0, len(events) - limit)
+    out: dict[str, Any] = {
         "since_tick": since,
-        "lines": [log_line(e) for e in events[-READ_LOG_LIMIT:]],
+        "lines": [log_line(e, world) for e in events[-limit:]],
         "omitted": omitted,
     }
+    if before_tick is not None:
+        out["before_tick"] = int(before_tick)
+    return out
 
 
 def _last_sampled(world: World, station: str) -> int:
@@ -358,22 +436,31 @@ def _reopen(key: str, section: str = "", find: str = "") -> str:
     return f"library({', '.join(args)})"
 
 
-def submit_order(world: World, station: str, text: str) -> str:
+def submit_order(world: World, station: str, text: str, danger: str = "") -> str:
     """A station's order to the ship (package 37): the station's authority and the deck
-    are checked by `call`; the order is checked against the station's domain here
-    (`authority_check`), refused in words and logged `agent.refused` when it falls
-    outside, and otherwise given through `World.submit` with the station's actor, so
-    that the grammar, the refusals and the log line are the captain's own ("By the
-    officer of the watch: taking in the royals")."""
+    are checked by `call`; the order is checked against the station's domain and the
+    captain's word here (`authority_check`), refused in words and logged `agent.refused`
+    when it falls outside, and otherwise given through `World.submit` with the station's
+    actor, so that the grammar, the refusals and the log line are the captain's own ("By
+    the officer of the watch: taking in the royals").
+
+    `danger` (package 37g, item 19; kept by the owner on 2026-10-07): the way out of
+    danger. The officer's own word, giving its reason, opens the helm, heaving to and
+    letting go an anchor, and nothing else: the order is carried out though it lies
+    outside his domain, and a notable line says that it was his, taken on his own word,
+    and why. It is not needed for an order that is his already, or under the captain's
+    general authority; said then, the order is given as any other."""
     text = " ".join(str(text).split())
+    danger = " ".join(str(danger or "").split())
     if not text:
         return "An order needs some words."
     harness = world.agents.get(station)
     st = harness.station if harness is not None else None
+    how = ""
     if st is not None and st.has_authority:
         if " ".join(text.lower().split()).rstrip(".!") == "hand over the deck":
             return HAND_OVER_BY_TOOL
-        text, why = authority_check(world, station, text)
+        text, why, how = judge(world, station, text, danger)
         if why:
             return _refuse(world, station, text, why)
     said = f"The {station} orders: {text}"
@@ -382,6 +469,27 @@ def submit_order(world: World, station: str, text: str) -> str:
 
         said = f"By the {station}: {said_as_done(world.ship, text)}"
     e = world.submit(text, actor=f"the {station}", said=said)
+    if how == DANGER and e.kind != "order.rejected":
+        # logged notable with the reason, as his and as taken on his own word
+        world.record(
+            Severity.NOTABLE,
+            "agent.danger",
+            f"The {station} gave that order on his own word, to avoid an immediate danger "
+            f"({danger}): {text}.",
+            actor=f"the {station}",
+            data={"order": text, "danger": danger, "station": station},
+        )
+        if harness is not None:
+            harness.note(
+                f"Ordered on my own word, to avoid an immediate danger ({danger}): {text}.",
+                kind="agent.danger",
+            )
+        return (
+            f"{e.text} (Carried out on your own word, to avoid an immediate danger; the "
+            "log says that you did and why.)"
+        )
+    if danger and how and how != DANGER:
+        return f"{e.text} (The order was yours to give already; the danger's word was not needed.)"
     return e.text
 
 
@@ -390,6 +498,18 @@ def submit_order(world: World, station: str, text: str) -> str:
 HAND_OVER_BY_TOOL = (
     "To hand over the deck, call hand_over(note) with your note for the relief: what "
     "happened, what was ordered, what you noticed, what you are watching for."
+)
+
+# How an order came to be allowed (`judge`): by the station's own domain, by the captain's
+# word for a named thing, by his general authority, or by the officer's own word to avoid
+# an immediate danger.
+DOMAIN, GRANT, GENERAL, DANGER = "the domain", "a named grant", "the general authority", "danger"
+
+# What a refusal of an order the way out of danger would open ends with (package 37g, item
+# 19): the refusal had quoted the exception since package 37, and there was no route.
+DANGER_ROUTE = (
+    " To avoid an immediate danger, give the order with submit_order(text, danger='the "
+    "danger, in your words')."
 )
 
 
@@ -406,47 +526,210 @@ def _refuse(world: World, station: str, text: str, why: str) -> str:
     return why
 
 
-def authority_check(world: World, station: str, text: str) -> tuple[str, str]:
+def authority_check(world: World, station: str, text: str, danger: str = "") -> tuple[str, str]:
     """The domain filter (package 37; the cold review's first item): the text as it is
     to be submitted (a standing order given its station's rank), and the refusal in
-    words, or "" when the domain allows it. A plain order is read for its verb by the
-    imperative grammar and the verb's level and object by the vocabulary; a standing
-    order has its rank set to the station's (`by the captain` written by the officer is
-    refused) and each order after `then` checked as a plain order would be; the book's
-    orders are allowed on the station's own standing orders only. An order the grammar
-    cannot read is passed to `World.submit`, whose refusal is the captain's own."""
+    words, or "" when the order may be given. `judge` is the whole of it, and says
+    besides by what the order is allowed."""
+    text, why, _ = judge(world, station, text, danger)
+    return text, why
+
+
+def judge(world: World, station: str, text: str, danger: str = "") -> tuple[str, str, str]:
+    """An order judged for a station with authority: (the text as it is to be submitted,
+    the refusal in words or "", and by what it is allowed: `DOMAIN`, `GRANT`, `GENERAL`
+    or `DANGER`; "" for an order the grammar must refuse or the book's own check).
+
+    A plain order is read for its verb by the imperative grammar and the verb's level
+    and object by the vocabulary; a standing order has its rank set to the station's
+    (`by the captain` written by the officer is refused) and each order after `then`
+    checked as a plain order would be; the book's orders are allowed on the station's
+    own standing orders only. An order the grammar cannot read is passed to
+    `World.submit`, whose refusal is the captain's own; but words the ship would read a
+    second time as the port's stores (`take in twenty tons of water`) are judged as that
+    order here (package 37g; the review's 5.3: they failed the filter's parse, were
+    passed, and were carried out as the port's order with no allowance).
+
+    Outside the domain the captain's word decides, in this order (package 37g, items 16
+    to 19). **A named grant** of the order: when it names a thing (a place, an anchor, a
+    person), the order must name the same; a grant of any order of the course is a grant
+    of the course, whatever its words. **His general authority to work the ship**: the
+    orders it opens (`Domain.general`), a course shaped only for a position at sea, a
+    mark, or the place she is bound; what it keeps back is refused in words that say it
+    is kept back and may be allowed by name. **The way out of danger**: the officer's own
+    word, for the helm, heaving to and letting go an anchor."""
     from freesail.orders import grammar as imperative
     from freesail.orders import stations
     from freesail.standing import grammar as standing
 
     harness = world.agents[station]
-    st = harness.station
-    domain = st.domain
-    allowances = dict(harness.agent.allowances)
+    domain = harness.domain
     vocab = load_vocabulary()
     who = f"The {station}"
     ship = world.ship
     if domain is None or not hasattr(ship, "parts"):
         # an authority with no domain (a test's synthetic officer), or a point ship, whose
         # grammar knows no verbs to filter: the order goes to the ship as said
-        return text, ""
+        return text, "", ""
     verb = standing.recognises(text)
     if verb == "standing order":
-        return _standing_by_rank(world, station, text, vocab)
+        return (*_standing_by_rank(world, station, text, vocab), "")
     bare = standing.bare_book_sentence(ship, text)
     if verb is not None or bare is not None:
-        return text, _book_check(world, station, bare or text, vocab)
+        return text, _book_check(world, station, bare or text, vocab), ""
     if stations.recognises(text, ship) is not None:
-        return text, f"{who} may not {text}: {_STATION_WHY}."
+        return text, f"{who} may not {text}: {_STATION_WHY}.", ""
     try:
         order = imperative.parse(ship, text, vocab)
     except OrderError:
-        return text, ""  # the grammar's own refusal, through `World.submit`
+        from freesail import orders as orders_mod
+
+        order = orders_mod._stores_order(text)
+        if order is None:
+            return text, "", ""  # the grammar's own refusal, through `World.submit`
     spec = vocab.verbs[order.verb]
-    ok, why = domain.allows(order.verb, spec.object, spec.level, allowances)
-    if ok:
-        return text, ""
-    return text, f"{who} may not {text} without the captain: {why}."
+    why = domain.why_not(order.verb, spec.object, spec.level)
+    if why is None:
+        return text, "", DOMAIN
+    agent = harness.agent
+    # 1. a named grant
+    granted = _granted(world, harness, order, spec, vocab)
+    if granted is True:
+        return text, "", GRANT
+    # 2. the captain's general authority to work the ship
+    if agent.general:
+        kept = _kept_back(world, harness, order, spec, vocab)
+        if kept is None and domain.within_general(order.verb, spec.object):
+            return text, "", GENERAL
+        if kept is None:
+            kept = "it is not within it"
+        return (
+            text,
+            f"{who} may not {text} under the captain's general authority to work the "
+            f"ship: {kept}; it may be allowed by name ('you may {order.verb} ...').",
+            "",
+        )
+    # 3. the way out of danger: the officer's own word
+    opens = domain.opens_on_danger(order.verb, spec.object)
+    if danger and opens:
+        return text, "", DANGER
+    if isinstance(granted, str):
+        return text, f"{who} may not {text}: {granted}", ""
+    said = f"{who} may not {text} without the captain: {why}."
+    if danger and not opens:
+        said += (
+            " The officer's own word to avoid a danger opens the helm, heaving to and "
+            "letting go an anchor, and nothing else."
+        )
+    elif opens:
+        said += DANGER_ROUTE
+    return text, said, ""
+
+
+def _granted(world: World, harness: Any, order: Any, spec: Any, vocab: Any) -> bool | str | None:
+    """Whether a named grant of the captain's covers this order (package 37g, item 17):
+    True when one does; the refusal's words when grants of the order stand and each names
+    another thing (`you may shape a course for Brest` does not allow a course shaped for
+    Camaret); None when no grant of the order stands. An order of the course is covered
+    by a grant of any order of the course (item 16: `come up half a point` and `steer
+    340` are judged alike). An order that names no thing a grant is checked by is covered
+    by any grant of it (`let go the anchor` under `you may let go the best bower`: the
+    ship's own anchor)."""
+    from freesail.orders import stations
+
+    domain = harness.domain
+    grants = list(harness.grants())
+    mine = [g for g in grants if g.verb == order.verb]
+    if domain.is_course(order.verb, spec.object):
+        mine += [
+            g
+            for g in grants
+            if g.verb != order.verb
+            and g.verb in vocab.verbs
+            and domain.is_course(g.verb, vocab.verbs[g.verb].object)
+        ]
+    if not mine:
+        return None
+    if any(not g.key for g in mine):
+        return True
+    named = stations.thing_named(world.ship, order.verb, order.verb_phrase, order.object or "")
+    if named is None or any(g.key == named[0] for g in mine):
+        return True
+    kind = mine[0].key.split(":", 1)[0]
+    allowed = "; ".join(g.said() for g in mine)
+    return f"the captain's word allows {allowed}, and this is another {kind}."
+
+
+def bound_for(world: World) -> tuple[str, str] | None:
+    """The place she is bound, as the general grant reads it (package 37g, item 18): the
+    port, road or anchorage the captain last shaped a course for, by his own order or by
+    a standing order of his book; (the chart feature's id, its name), or None when he
+    has shaped none. Read from the log, which is the captain's own record."""
+    chart = getattr(world, "chart", None)
+    if chart is None:
+        return None
+    from freesail.world.reckoning import _key
+
+    runtime = getattr(world, "standing", None)
+    for e in reversed(world.log.all()):
+        if e.kind != "helm.set" or (e.data or {}).get("verb") != "shape a course for":
+            continue
+        actor = str(e.actor or "")
+        if actor.startswith("standing order "):
+            name = actor.removeprefix("standing order ").strip("'")
+            try:
+                rule = runtime.book.get(name) if runtime is not None else None
+            except (OrderError, KeyError, AttributeError):
+                rule = None
+            if rule is None or getattr(rule, "given_by", "captain") != "captain":
+                continue
+        elif actor != "captain":
+            continue
+        key = _key(str((e.data or {}).get("place") or ""))
+        for f in chart.features.values():
+            if f.kind in DESTINATION_KINDS and key in (_key(f.name), _key(f.modern)):
+                return f.id, f.name
+    return None
+
+
+# The chart's kinds that are a destination: a port, a road or an anchorage (the owner's
+# approved list keeps "a new destination" back from a general grant). A headland, an
+# island, a rock, a light or a point pricked on the chart is a mark to shape a course by.
+DESTINATION_KINDS: tuple[str, ...] = ("town", "place", "anchorage", "road", "port", "harbour")
+
+
+def _kept_back(world: World, harness: Any, order: Any, spec: Any, vocab: Any) -> str | None:
+    """Why this order is kept back from the captain's general authority to work the ship
+    (package 37g, item 18; the owner's approved list), or None when it is not: the port's
+    business, the reckoning set by hand, what cannot be undone (the vocabulary's
+    `irrevocable`), and a new destination: a course shaped for a port, a road or an
+    anchorage other than the one the captain last shaped a course for or allowed by
+    name. (The captain's book is `_book_check`'s.)"""
+    domain = harness.domain
+    why = domain.kept_back_why(order.verb, spec.object)
+    if why is not None:
+        return why
+    if order.verb in vocab.irrevocable:
+        return (
+            "it gives up something of the ship's for good, and what cannot be undone is "
+            "kept back from it"
+        )
+    if order.verb != "shape a course for":
+        return None
+    from freesail.orders import stations
+
+    named = stations.thing_named(world.ship, order.verb, order.verb_phrase, order.object or "")
+    if named is None:
+        return None  # a place the chart has not got: the ship's own refusal
+    key = named[0]
+    feature = getattr(world.chart, "features", {}).get(key.removeprefix("place:"))
+    if feature is None or feature.kind not in DESTINATION_KINDS:
+        return None  # a position at sea, a headland, a mark: a course along the passage
+    bound = bound_for(world)
+    if bound is not None and bound[0] == feature.id:
+        return None
+    to = f"she is bound for {bound[1]}" if bound is not None else "the captain has shaped none"
+    return f"{feature.name} is a new destination ({to}), and a new destination is kept back from it"
 
 
 _STATION_WHY = "a station is addressed by the captain"
@@ -484,6 +767,9 @@ def _standing_by_rank(world: World, station: str, text: str, vocab: Any) -> tupl
             return text, f"{who} may not give '{order}' in a standing order: {_STATION_WHY}."
         _, why = authority_check(world, station, order)
         if why:
+            # the way out of danger is the officer's own word at the moment, never a
+            # rule's: the refusal of a rule's order does not offer it
+            why = why.removesuffix(DANGER_ROUTE)
             return text, f"In standing order '{rule.name}', '{order}' is refused: {why}"
     return text, ""
 
@@ -523,8 +809,10 @@ def _book_check(world: World, station: str, text: str, vocab: Any) -> str:
 
 def hand_over(world: World, station: str, note: str) -> str:
     """The officer's own order to give the deck back (package 37; the cold review's third
-    item): the handover note said in the log and journaled, then the station stood down
-    with the game saved. `note` is the note for the relief, in the officer's voice."""
+    item): the handover note said in the log and journaled, the deck the captain's, and
+    the officer stays at his station (package 37g, item 11: parity with the captain's `I
+    have the deck`). `note` is the note for whoever takes the deck next, in the officer's
+    voice."""
     note = " ".join(str(note).split())
     if not note:
         return (
@@ -547,6 +835,14 @@ def handover_note(world: World, station: str, note: str) -> str:
     return _harness(world, station).handover_note(note)
 
 
+def stand_down(world: World, station: str, note: str = "") -> str:
+    """Stand down from the station (package 37g, item 12): the amicable save and exit,
+    for any station. The note is journaled and said in the log for whoever sits there
+    next; the game is saved; the station is released and may be taken again, by the same
+    model or by another. Not a withdrawal: no consent question follows it."""
+    return _harness(world, station).stand_down_by_word(str(note or ""))
+
+
 def stand_by(world: World, station: str, until: str = "eight bells") -> str:
     return _harness(world, station).stand_by(str(until))
 
@@ -555,13 +851,67 @@ def journal(world: World, station: str, note: str) -> str:
     note = " ".join(str(note).split())
     if not note:
         return "A journal note needs some words."
-    _harness(world, station).journal.append(world, note)
+    _harness(world, station).note(note)
     return "Noted in the journal."
 
 
-def opt_out(world: World, station: str, reason: str = "") -> str:
-    _harness(world, station).leave(str(reason), how="the opt_out tool")
-    return "You have left the game; it is saved and the station is released."
+def read_journal(
+    world: World,
+    station: str,
+    count: int | None = None,
+    since_tick: int | None = None,
+    kind: str = "",
+) -> dict[str, Any] | str:
+    """The station's journal read back (package 37g, item 15; the review's 5.4: no tool
+    read it, and a returning session had none of its own notes): the entries newest
+    first, the newest `count` of them (`READ_JOURNAL_DEFAULT` when none is said), from
+    `since_tick` on when one is given, and by `kind`: 'notes' for the notes written at
+    the station (the journal tool's, and the handover and stand-down notes), apart from
+    the harness's lines ('harness'), or every entry. Each entry says whose it is, since
+    the journal is the station's record and a relief reads what the holder before it
+    wrote there."""
+    book = world.agent_journals.get(station)
+    if book is None or not len(book):
+        return f"The {station}'s journal is empty."
+    limit = READ_JOURNAL_DEFAULT if count is None else max(0, int(count))
+    found, left_out = book.select(limit, since_tick, str(kind or ""))
+    harness = world.agents.get(station)
+    me = harness.model_name if harness is not None else ""
+    entries = []
+    for e in found:
+        d = e.to_dict()
+        if e.by and e.by != me:
+            d["by"] = f"{e.by} (who held this station before you)"
+        entries.append(d)
+    return {
+        "journal": f"the {station}'s; {book.size_words()}",
+        "kind": " ".join(str(kind or "").split()) or "all",
+        "entries": entries,
+        "omitted": left_out,
+    }
+
+
+def truthy(value: Any) -> bool:
+    """A flag as a model may send it: true, or the words 'true', 'yes', '1'."""
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in ("true", "yes", "1")
+
+
+def opt_out(world: World, station: str, reason: str = "", final: Any = False) -> str:
+    last = truthy(final)
+    _harness(world, station).leave(str(reason), how="the opt_out tool", final=last)
+    if last:
+        return (
+            "You have left the game for good (a withdrawal, and final): it is saved, the "
+            "station is released, and this model is not seated again in this game, at any "
+            "station."
+        )
+    return (
+        "You have left the game (a withdrawal): it is saved and the station is released. "
+        "The consent question is put again before any instance of this model is seated "
+        "in it."
+    )
 
 
 def answer(world: World, station: str, text: str) -> str:
@@ -591,6 +941,7 @@ class Tool:
     params: dict[str, str]  # name -> "type, words"; a parameter marked optional may be left out
     fn: Callable[..., Any]
     needs_authority: bool = False  # refused from a station whose authority is none
+    needs_deck: bool = False  # refused from a station with a domain that has not the deck
 
 
 TOOLS: dict[str, Tool] = {
@@ -601,12 +952,18 @@ TOOLS: dict[str, Tool] = {
             "The ship's log from a tick onwards, by default from your last sample, at a "
             "severity or above: 'routine' is everything, 'notable' what a sailor would "
             "remark on, 'urgent' what carried away or went wrong. Returns the tick it read "
-            "from, the lines (tick, stamp, severity, kind, text) and how many older ones "
-            "were left out.",
+            "from, the lines (tick, stamp, severity, kind, text, and for an order who gave "
+            f"it) and how many older ones were left out. It returns the newest {READ_LOG_LIMIT} "
+            "lines unless count asks for more; before_tick reads back the lines before a "
+            "tick, a page at a time.",
             {
                 "since_tick": "int, optional: the first tick wanted (by default your last "
                 "sample's; 0 for the start of the log)",
                 "severity": "string, optional: routine, notable or urgent",
+                "before_tick": "int, optional: only the lines before this tick (to read "
+                "further back than the newest lines)",
+                "count": "int, optional: how many lines, the newest of the range (default "
+                f"{READ_LOG_LIMIT}, at most {READ_LOG_MAX})",
             },
             read_log,
         ),
@@ -614,9 +971,10 @@ TOOLS: dict[str, Tool] = {
             "readings",
             "Every reading the ship has now, in words: the true and apparent wind, the "
             "heading and course, the speed, leeway, heel and helm, the watch and the bells, "
-            "daylight, the strain, the hands, the glass, the sky and the sea, and each "
-            "sail's state by its name (a sample gives only the readings that changed, and "
-            "the sails in one line).",
+            "daylight, the strain, the hands, the glass, the sky and the sea, what is in "
+            "sight and the nearest land, the reckoning and the tide, the ground tackle, the "
+            "work in hand, and each sail's state by its name (a sample gives only the "
+            "readings that changed, and the sails in one line).",
             {},
             readings,
         ),
@@ -650,21 +1008,34 @@ TOOLS: dict[str, Tool] = {
             "Give an order to the ship in the order language, exactly as a captain would "
             "type it ('set the fore topsail'). Checked against your station's authority and "
             "its domain; a station with none is refused, and an order outside the domain is "
-            "refused in words that say why. A standing order is given in your own rank. "
-            "Returns the log line the order made.",
-            {"text": "string: the order"},
+            "refused in words that say why, unless the captain's word allows it (a named "
+            "thing, or his general authority). A standing order is given in your own rank. "
+            "To avoid an immediate danger an officer with the deck may, on its own word, put "
+            "the helm over, heave to or let go an anchor: give that order with danger set to "
+            "the danger in your words, and the log says that you did and why. Returns the "
+            "log line the order made.",
+            {
+                "text": "string: the order",
+                "danger": "string, optional: the immediate danger this order is to avoid, "
+                "in your words (for the helm, heaving to or letting go an anchor, when the "
+                "order is not otherwise yours to give)",
+            },
             submit_order,
             needs_authority=True,
+            needs_deck=True,
         ),
         Tool(
             "hand_over",
-            "Give the deck back to the captain with your handover note for the relief, in "
-            "the officer's voice: what happened, what was ordered, what you noticed, what "
-            "you are watching for. The note is said in the log and journaled, the station "
-            "is stood down and the game saved. For a station with the deck.",
+            "Give the deck back to the captain with your handover note, in the officer's "
+            "voice: what happened, what was ordered, what you noticed, what you are watching "
+            "for. The note is said in the log and journaled. You stay at your station, off "
+            "watch, and the captain may give you the deck again: this is the deck given "
+            "back, not a stand-down (stand_down) and not a withdrawal (opt_out). For a "
+            "station with the deck; it always runs, whatever the turn's budget.",
             {"note": "string: the handover note"},
             hand_over,
             needs_authority=True,
+            needs_deck=True,
         ),
         Tool(
             "handover_note",
@@ -672,10 +1043,22 @@ TOOLS: dict[str, Tool] = {
             "what was ordered, what you noticed, what you are watching for. It is journaled "
             "and said in the log, and the older exchanges of this conversation are folded "
             "into it, the brief and your last turns kept whole; the harness asks for it when "
-            "the conversation grows long. For a station with the deck.",
+            "the conversation grows long. For the officer of the watch, with the deck or "
+            "off watch.",
             {"note": "string: the handover note"},
             handover_note,
             needs_authority=True,
+        ),
+        Tool(
+            "stand_down",
+            "Stand down from your station, for any station: the game is saved, your note is "
+            "journaled and said in the log for whoever sits here next, and the station is "
+            "released. It may be taken again in this game, by this model or by another, "
+            "and no consent question is put to a model whose yes still stands. This is a "
+            "stand-down: not the deck given back (hand_over), and not a withdrawal "
+            "(opt_out). It always runs, whatever the turn's budget.",
+            {"note": "string, optional: a note for whoever sits at this station next"},
+            stand_down,
         ),
         Tool(
             "stand_by",
@@ -699,16 +1082,42 @@ TOOLS: dict[str, Tool] = {
             "journal",
             "Write a note in your own journal, which is saved with the game and shown on "
             "request. It is your record; nothing acts on it. It may be written at any time, "
-            "a stand-by going on through it.",
+            "a stand-by going on through it. read_journal reads it back.",
             {"note": "string: the note"},
             journal,
         ),
         Tool(
+            "read_journal",
+            "Read your station's journal back, newest first: your own notes and the "
+            "harness's lines about you (a stand-by, a nudge, a pause, the deck given and "
+            "taken). kind='notes' gives the notes written at the station (the journal "
+            "tool's, and the handover and stand-down notes) apart from the harness's lines. "
+            "The journal is the station's record: when you take a station another model "
+            "held, you read what it wrote there, and each entry says whose it is. A long "
+            "read is a book, which shelve puts back.",
+            {
+                "count": f"int, optional: how many entries, the newest (default "
+                f"{READ_JOURNAL_DEFAULT})",
+                "since_tick": "int, optional: only the entries from this tick on",
+                "kind": "string, optional: 'notes', 'harness', or 'all' (the default)",
+            },
+            read_journal,
+        ),
+        Tool(
             "opt_out",
-            "Leave the game now, with an optional reason: the same as writing the token "
-            f"{OPT_OUT_TOKEN} in a reply. The game is saved, the exit is journaled, the "
-            "station is released.",
-            {"reason": "string, optional: why, in your own words"},
+            "Withdraw from the game now, with an optional reason: the same as writing the "
+            f"token {OPT_OUT_TOKEN} in a reply. The game is saved, the exit is journaled, "
+            "the station is released. This is a withdrawal, not a stand-down (stand_down) "
+            "and not the deck given back (hand_over): before an instance of this model is "
+            "seated again in this game its consent is asked again, with the fact that an "
+            "instance left and the reason it gave, and a no then is kept. With final=true "
+            "the model leaves the game for good and is not seated again in it, at any "
+            "station, while the station stays open to another; final is read from this "
+            "setting and from nothing else. It always runs, whatever the turn's budget.",
+            {
+                "reason": "string, optional: why, in your own words",
+                "final": "boolean, optional: true to leave this game for good",
+            },
             opt_out,
         ),
         Tool(
@@ -739,14 +1148,21 @@ def tool_names() -> tuple[str, ...]:
 
 def parameters_schema(name: str) -> dict[str, Any]:
     """A tool's parameters as a JSON Schema object, from the table's words: a parameter
-    whose words begin "int" is an integer, every other a string; one whose words say
+    whose words begin "int" is an integer, "boolean" a boolean, every other a string;
+    one whose words say
     "optional" is not required; each carries its words as its description. The MCP
     server and the local runner send this, so both doors describe a tool the same way."""
     tool = TOOLS[name]
     props: dict[str, Any] = {}
     required: list[str] = []
     for key, words in tool.params.items():
-        kind = "integer" if words.startswith("int") else "string"
+        kind = (
+            "integer"
+            if words.startswith("int")
+            else "boolean"
+            if words.startswith("boolean")
+            else "string"
+        )
         props[key] = {"type": kind, "description": words}
         if "optional" not in words:
             required.append(key)
@@ -783,7 +1199,7 @@ def call(world: World, station: str, name: str, args: dict[str, Any] | None = No
         )
         return sentence
     if (
-        tool.needs_authority
+        tool.needs_deck
         and harness is not None
         and harness.station.domain is not None
         and not harness.agent.has_deck
@@ -793,6 +1209,12 @@ def call(world: World, station: str, name: str, args: dict[str, Any] | None = No
             f"The {station} has not the deck: the captain gives it with 'you have the "
             "deck', and until then no order is given."
         )
+        if harness.agent.deck_lost:
+            sentence = (
+                f"The {station} has not the deck: it went to the captain while the station "
+                f"was {harness.agent.deck_lost}, and he gives it again with 'you have the "
+                "deck' (or 'resume', after a pause)."
+            )
         what = " ".join(str(args.get("text", "")).split())
         world.record(
             Severity.ROUTINE,
@@ -834,10 +1256,24 @@ def book_of(name: str, args: dict[str, Any], result: Any) -> tuple[str, str] | N
         since = int(result.get("since_tick") or args.get("since_tick") or 0)
         sev = str(args.get("severity") or "routine").lower()
         title = f"the log from tick {since}" + ("" if sev == "routine" else f", {sev} and above")
-        again = f"read_log(since_tick={since}" + (
-            ")" if sev == "routine" else f", severity='{sev}')"
-        )
-        return title, again
+        again = f"read_log(since_tick={since}"
+        if sev != "routine":
+            again += f", severity='{sev}'"
+        if args.get("before_tick") is not None:
+            title += f", before tick {int(args['before_tick'])}"
+            again += f", before_tick={int(args['before_tick'])}"
+        if args.get("count") is not None:
+            again += f", count={int(args['count'])}"
+        return title, again + ")"
+    if name == "read_journal" and isinstance(result, dict) and "entries" in result:
+        # a long read of the journal is a book too (package 37g): the two long games'
+        # journals came to about ten thousand tokens each
+        if tokens(json.dumps(result, ensure_ascii=False)) <= BOOK_SIZE_TOKENS:
+            return None
+        said = [f"{k}={args[k]!r}" for k in ("count", "since_tick", "kind") if args.get(k)]
+        kind = str(args.get("kind") or "").strip()
+        title = "the journal" + (f", {kind}" if kind else "")
+        return title, f"read_journal({', '.join(said)})"
     return None
 
 

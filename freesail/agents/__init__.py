@@ -38,6 +38,7 @@ from freesail.agents.agent import (
 )
 from freesail.agents.fake import Fake, Transcript, call, narrator, reply, say
 from freesail.agents.harness import (
+    READS_PER_SAMPLE,
     TOOL_CALLS_PER_SAMPLE,
     WELFARE_REPEAT_N,
     WELFARE_UNATTENDED_REAL_S,
@@ -51,6 +52,7 @@ from freesail.agents.tools import TOOLS
 __all__ = [
     "OFFICER",
     "OPT_OUT_TOKEN",
+    "READS_PER_SAMPLE",
     "TOOLS",
     "TOOL_CALLS_PER_SAMPLE",
     "WELFARE_REPEAT_N",

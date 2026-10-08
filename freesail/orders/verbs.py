@@ -94,7 +94,7 @@ def execute(
         spec.object in ("heading", "points")
         or order.verb in HELM_VERBS
         or order.verb == "trim"
-        or (order.verb in vocab.evolutions and isinstance(vocab.evolutions[order.verb], str))
+        or _under_way_only(vocab, order.verb)
     ):
         _not_riding(ship, order)  # the helm, the trim and the manoeuvres want her under way
     if order.verb in work.WORK_VERBS:
@@ -140,6 +140,35 @@ def execute(
 
 
 BRACE_VERBS = ("brace", "square", "back")  # "square the yards", "back the main topsail"
+# The whole-ship evolutions a ship at anchor or aground is refused (`_not_riding`): the
+# manoeuvres, which want her under way. Until package 37f every whole-ship order was
+# refused there, twenty-six verbs with the helm's (the review of gate 5c's playtests,
+# 5.8): `furl all sail`, `furl sails`, `square the yards` and `brace the yards square`
+# were each answered "She is at anchor; ... must wait till she weighs", and the primer's
+# own `at aground then furl all sail` was refused. Sail handed, furled or loosed to dry,
+# yards squared or braced, the upper masts and yards sent down or swayed up, a wreck
+# cleared and a line rove are a ship's work at anchor as at sea, and are taken.
+UNDER_WAY_ONLY = frozenset(
+    {
+        "tack",
+        "wear",
+        "heave_to",
+        "fill_away",
+        "boxhaul",
+        "wear_short_round",
+        "lie_a_try",
+        "scud",
+        "back_and_fill",
+    }
+)
+
+
+def _under_way_only(vocab: Vocabulary, verb: str) -> bool:
+    """Whether the verb is a manoeuvre, which a ship at anchor or aground is refused."""
+    evo = vocab.evolutions.get(verb)
+    return isinstance(evo, str) and evo in UNDER_WAY_ONLY
+
+
 BOOM_VERBS = ("rig out", "rig in")  # a studding sail boom, or the studding sail on it
 # The lower rigging (milestone 3b): one evolution per lower mast. True: swiftering in.
 CATHARPIN_VERBS = {"swifter in the catharpins": True, "ease the catharpins": False}
@@ -771,6 +800,18 @@ def _trim(
         do_yards, do_sheets = True, False  # "brace ... to the wind"
     head_sharper = bool(order.modifiers.get(HEAD_YARDS_SHARPER))
     d = ship.dyn
+    if lying_to(ship) and (
+        (order.verb == "trim" and order.object is None)
+        or (order.verb != "trim" and yards is not None and _every_yard(ship, yards))
+    ):
+        # the owner's ruling of 2026-10-07 (package 37f; the review of gate 5c's
+        # playtests, 5.7: `trim sails` filled a ship that was hove to, four times in two
+        # games, her backed yards braced round with the rest and the record left standing):
+        # the trim of the whole ship declines while she lies to, as `steer` and `keep her
+        # full` do; a yard braced by name and a sheet hauled by name are still taken
+        if do_sheets and not do_yards:  # "trim the sheets": the cure is a sheet's
+            raise OrderError(HOVE_TO_TRIM_SHEETS_WORDS)
+        raise OrderError(HOVE_TO_TRIM_WORDS)
     if d.apparent_wind_speed < 0.5:
         raise OrderError("There is no wind to trim to.")
     awa = abs(d.apparent_wind_angle)
@@ -990,6 +1031,32 @@ def _trim(
     yards_only = started and not trimmed and not standing and not grouped
     kind = "evolution.started" if yards_only else "sail.trimmed"
     return kind, text, data
+
+
+# What a trim of the whole ship is answered with while she is hove to (package 37f; the
+# owner's ruling): the words carry the cure.
+HOVE_TO_TRIM_WORDS = "She is hove to; fill away before trimming, or brace a yard by name."
+HOVE_TO_TRIM_SHEETS_WORDS = (
+    "She is hove to, and the watch tends her sheets; fill away before trimming them, or "
+    "work a sheet by name."
+)
+
+
+def lying_to(ship: Ship) -> bool:
+    """Whether she is hove to, or heaving to: the record on the ship
+    (`ship.extra["hove_to"]`), or the manoeuvre in hand."""
+    if "hove_to" in ship.extra:
+        return True
+    return any(
+        inst.evo.id in ("heave_to", "lie_a_try") and inst.script is not None
+        for inst in getattr(ship.extra.get("evolutions"), "instances", None) or ()
+    )
+
+
+def _every_yard(ship: Ship, yards: list[Spar]) -> bool:
+    """Whether these are all the ship's yards (a trim of the whole ship, however said)."""
+    every = [s for s in ship.spars.values() if s.is_yard]
+    return len(every) > 1 and {y.id for y in yards} >= {y.id for y in every}
 
 
 def _trim_targets(ship: Ship, res: resolve.Resolution) -> tuple[list[Spar], list[Sail]]:
@@ -1942,11 +2009,7 @@ def _helm(ship: Ship, order: Order) -> Result:
         raise OrderError(
             f"'{order.verb_phrase}' takes no heading or points; it is the whole order."
         )
-    heaving_to = any(
-        inst.evo.id in ("heave_to", "lie_a_try") and inst.script is not None
-        for inst in getattr(ship.extra.get("evolutions"), "instances", [])
-    )
-    if ("hove_to" in ship.extra or heaving_to) and (
+    if lying_to(ship) and (
         verb in ("keep her full", "steer") or ("points" in mods and verb not in HELM_VERBS)
     ):
         # A ship hove to has her helm a-lee by the manoeuvre and her yards set against
@@ -2053,6 +2116,12 @@ def _conn(ship: Ship, order: Order) -> Result:
         return "helm.order", text, data
     dyn.helm_mode = HelmMode.RUDDER
     dyn.steady = False
+    record = ship.extra.get("hove_to")
+    if isinstance(record, dict):
+        # lying to, the helm is the watch's to tend (package 37f); a conning word puts it
+        # where the captain says and the watch leaves it there, tending the sheets alone,
+        # until she fills away
+        record["helm_by_order"] = True
     if verb == "right the helm":
         dyn.target_rudder = 0.0
         text = f"Helm ordered: {said}; rudder amidships."
@@ -2536,9 +2605,22 @@ def _shift_spar(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
 
 
 def _ship_evolution(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
-    _no_stray_modifiers(order, {"tack", "manner", "hands_from"})
+    allowed = {"tack", "manner", "hands_from"}
+    if order.verb == "fill away":
+        allowed.add("heading")  # "fill away and steer SW by W" (package 37f)
+    _no_stray_modifiers(order, allowed)
     evo = vocab.evolutions[order.verb]
     params: dict[str, Any] = {}
+    if order.verb == "fill away":
+        if "heading" in order.modifiers:
+            # she is filled on the tack she is on, and the helm then has the course
+            params["course_deg"] = round(units.rad_to_deg(order.modifiers["heading"]), 3)
+        elif order.verb_phrase.split()[-1] in ("steer", "steering"):
+            raise OrderError(
+                "Fill away and steer where? Give a compass point ('fill away and steer "
+                "south-west by west') or degrees, or say 'fill away' to fill her close-hauled "
+                "on the tack she is on."
+            )
     bare_poles = "bare poles" in order.verb_phrase
     if bare_poles:
         drawing = [

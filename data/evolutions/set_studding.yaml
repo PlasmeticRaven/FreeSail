@@ -17,7 +17,7 @@ id: set_studding
 verb: set
 applies_to: {class: studding}
 preconditions:
-  - {check: sail.state != set, reason: "The {sail} is set already."}
+  - {check: sail.state != set, reason: "The {sail} is set already.", done: true}
   - {check: sail.state != blown_out, reason: "The {sail} is blown out; a new one must be bent."}
   - {check: "yard_of(sail) == none or sail_of(yard_of(sail)).is_set", reason: "The {sail} cannot be set until the sail on its yard is set."}
   - {check: "yard_of(sail) != none or any_set(sails_using(spar_of_role(sail, boom))) or any_set(sails_using(parent_of(spar_of_role(sail, boom))))", reason: "The {sail} cannot be set until the sail it extends is set."}

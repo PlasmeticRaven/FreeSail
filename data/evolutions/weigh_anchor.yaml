@@ -15,21 +15,32 @@
 #
 # "aweigh" is Falconer's word (1780, AWEIGH: "the state of the anchor when it is drawn out
 # of the ground in a perpendicular direction"; ATRIP the same); the log says it.
+#
+# Package 37f (the review of gate 5c's playtests, 5.8 and 10.4): the anchor named is the
+# anchor weighed (parameter `anchor`; the one she rides by when none is named). In game
+# 9, moored, `weigh the small bower` weighed the best bower. With another anchor down its
+# cable is veered as she comes over the one she is heaving up (veer_fathoms_per_s), and
+# the last line says how she is left: "The small bower catted and fished; she rides by
+# the best bower, a hundred and thirteen fathoms out." Where the other cable is too short
+# to let her come over it the order is refused, in words that name the anchor she rides
+# by and what would do it (weigh the other first, or unmoor). A number after `weigh` is
+# refused: it heaves the anchor up to the bows.
 id: weigh_anchor
 verb: weigh_anchor
 applies_to: {class: ship}
 script: weigh_anchor
-params: {}
+params: {anchor: null}
 preconditions: []
 timing:
   rig_capstan_s: 180        # as heave_short's, when not hove short already
   heave_fathoms_per_s: 0.1  # six fathoms a minute at the capstan (judgement)
   break_out_s: 60           # the anchor broken out of the ground at the heave (judgement)
   hoist_fathoms_per_s: 0.2  # the anchor hove up to the bows, by the depth (judgement)
+  veer_fathoms_per_s: 1.0   # another anchor still down: its cable veered as this one comes in (unmoor's rate)
   cat_and_fish_s: 300       # the cat hooked and swayed up, the fish tackle on the fluke,
                             # the shank painter passed (Lever p. 68): judgement
 on_start: {log: "All hands up anchor! Man the bars; heave round."}
-on_complete: {log: "{anchor_cap} catted and fished; she is under way.", kind: ship.weighed, severity: notable}
+on_complete: {log: "{anchor_cap} catted and fished; {after}.", kind: ship.weighed, severity: notable}
 on_fail: {log: "Could not weigh: {reason}.", kind: evolution.failed, severity: notable}
 # crew: all hands at the bars ("All hands up anchor!"); not a manoeuvre, sail is made
 # meanwhile.

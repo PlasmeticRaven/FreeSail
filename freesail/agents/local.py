@@ -5,7 +5,7 @@ client of the running game and of the endpoint, and builds no World.
 
     python -m freesail.agents.local --game http://localhost:8000 --endpoint http://localhost:8080
         [--model NAME] [--seed N] [--temperature T] [--ctx N] [--station watcher]
-        [--session play|test] [--ask-again]
+        [--session play|test] [--ask-again] [--handover-reserve N]
 
 It reads the served model's identity (`LocalModel.identity`), stations it through the
 game's agent API with that identity (`remote.GameClient`; the game runs the consent gate:
@@ -45,11 +45,20 @@ happened meanwhile is folded into the open turn) and asks again; only
 **The context guard.** Before stationing, the runner asks the server what context it
 gives the model (llama-server's `/props` `n_ctx`; Ollama's `/api/ps` `context_length`
 for a loaded model, else the `num_ctx` of `/api/show`), falling back to `--ctx`, and
-refuses in words, with what it measured, when that is smaller than the consent brief
-(measured as this door sends it; it is the longer of the two briefs: about 6,000
-characters against the watcher's 5,200 on the frigate at seed 7, measured for package
-28c), the tool definitions (measured), one turn (`TURN_ALLOWANCE_TOKENS`) and the reply
-budget; and says so when it cannot learn it.
+refuses in words, with what it measured, when that is smaller than the longer of the
+two briefs the model will meet (the consent brief, measured as this door sends it; and
+the station's own brief, measured from its own words with an allowance for what the
+ship adds, `station_brief_tokens`: package 37g, item 8, since the officer's brief is
+about twice the consent brief and the guard had passed a context the officer's station
+could not use), the tool definitions (measured), one turn (`TURN_ALLOWANCE_TOKENS`) and
+the reply budget; and says so when it cannot learn it. **No officer is seated when
+neither the server nor `--ctx` gives a context size** (the gate's ruling 2, the report's
+8.7): without one nothing is asked for and nothing is trimmed, and the server cuts the
+conversation unseen (the two Ollama officers of gate 5c's playtests).
+
+**The handover's reserve** (package 37g, item 8): `--handover-reserve N` is the tokens
+of the context kept free when the harness asks for the handover note, sent with the
+station request; unset, the harness's own (`harness.HANDOVER_RESERVE_TOKENS`).
 
 **The budget.** The conversation grows a sample at a time. When the context size is
 known (`--ctx-size`, else the server's `n_ctx` from `/props`), the oldest turns are left
@@ -89,7 +98,7 @@ from typing import Any
 import httpx
 
 from freesail.agents import consent
-from freesail.agents.agent import TURN_ENDS_WORDS
+from freesail.agents.agent import OFFICER, TURN_ENDS_WORDS, station_name
 from freesail.agents.harness import conversation_text
 from freesail.agents.model import DATA, MODEL, OPERATOR, Reply, ToolCall, Turn
 from freesail.agents.remote import GameClient, GameError, turn_from_dict
@@ -145,6 +154,14 @@ FAILURES_TO_STAND_DOWN = 3
 # frigate at seed 7 measured about 450 tokens, docs/agents/Harness.md §5; a turn that
 # grew while the model thought is longer).
 TURN_ALLOWANCE_TOKENS = 600
+
+# What the ship adds to a station's brief beyond its own words, allowed for in the
+# context guard (package 37g; measured by the review's reader V1a, K: every reading at
+# once is about 1,150 tokens, a first brief's twenty log lines some hundreds, and a
+# reseat's brief ran to 6,500 tokens against 4,000 to 4,400 for a first; the captain's
+# night orders are the book's lines, a score of them in the starter book). Judgement:
+# two thousand five hundred, so that the guard errs toward refusing a context too small.
+SITUATION_ALLOWANCE_TOKENS = 2500
 
 # Keys a server might give the loaded file's hash under. llama-server's /props gives the
 # path and not a hash, as far as its README says; these are read if a server gives one.
@@ -333,15 +350,22 @@ class LocalModel:
             return None
         return None
 
-    def check_context(self, identity: str, runtime: str) -> str:
-        """The context guard, before stationing (package 28c): what the watcher needs,
-        measured at `CHARS_PER_TOKEN`: the consent brief as this door sends it (the
-        longer of the two briefs; the module docstring), the tool definitions, one turn
+    def check_context(self, identity: str, runtime: str, station: str = "watcher") -> str:
+        """The context guard, before stationing (package 28c): what the station needs,
+        measured at `CHARS_PER_TOKEN`: the longer of the two briefs the model will meet
+        (the consent brief as this door sends it, and the station's own brief,
+        `station_brief_tokens`; package 37g), the tool definitions, one turn
         (`TURN_ALLOWANCE_TOKENS`) and the reply budget. Raises `DoorError` in words, with
-        the numbers, when the context the server gives (or `--ctx`) is smaller; returns a
-        line for the owner otherwise, saying what it measured or that it could not ask."""
+        the numbers, when the context the server gives (or `--ctx`) is smaller, and for
+        the officer's station when no context size is to be had at all; returns a line
+        for the owner otherwise, saying what it measured or that it could not ask."""
         brief = consent.brief_text(identity, runtime, "runner")
-        brief_cost = len(json.dumps({"role": "system", "content": brief})) // CHARS_PER_TOKEN + 1
+        consent_cost = len(json.dumps({"role": "system", "content": brief})) // CHARS_PER_TOKEN + 1
+        # the watcher's own brief is shorter than the consent brief, as it was when the
+        # guard was written; the officer's is measured (package 37g)
+        is_officer = station_name(station) == OFFICER
+        station_cost = station_brief_tokens(station) if is_officer else 0
+        brief_cost = max(consent_cost, station_cost)
         tools_cost = len(json.dumps(self.tools_schema())) // CHARS_PER_TOKEN
         need = brief_cost + tools_cost + TURN_ALLOWANCE_TOKENS + self.max_reply
         served = self.served_context()
@@ -350,6 +374,18 @@ class LocalModel:
             got, where = served
         elif self.ctx_size:
             got, where = int(self.ctx_size), "--ctx, as the owner gave it"
+        elif station_name(station) == OFFICER:
+            raise DoorError(
+                f"The model server did not say what context it gives {identity}, and no "
+                "--ctx was given: the officer of the watch is not seated without a context "
+                "size. With none, the harness can neither ask for the handover note in time "
+                "nor leave out old turns, and the server cuts the conversation unseen. The "
+                f"station needs about {need} tokens (the brief {brief_cost}, the tool "
+                f"definitions {tools_cost}, a turn {TURN_ALLOWANCE_TOKENS}, the reply budget "
+                f"{self.max_reply}). For Ollama, check with `ollama ps` once the model is "
+                "loaded (OLLAMA_CONTEXT_LENGTH or the Modelfile's num_ctx sets it), and state "
+                "it with --ctx; llama-server reports its own (docs/agents/Harness.md)."
+            )
         else:
             return (
                 f"The model server did not say what context it gives {identity}, and no --ctx "
@@ -359,11 +395,16 @@ class LocalModel:
                 "OLLAMA_CONTEXT_LENGTH or the Modelfile's num_ctx says more: check with "
                 "`ollama ps` once the model is loaded, and state it with --ctx."
             )
+        which = (
+            f"the {station_name(station)}'s own brief"
+            if station_cost >= consent_cost
+            else "the consent brief, the longer of the two"
+        )
         words = (
             f"the model server gives {identity} a context of {got} tokens ({where}); the "
-            f"station needs about {need}: the brief {brief_cost} tokens and the tool "
-            f"definitions {tools_cost} (measured, at {CHARS_PER_TOKEN} characters a token), "
-            f"a turn {TURN_ALLOWANCE_TOKENS} and the reply budget {self.max_reply}"
+            f"station needs about {need}: the brief {brief_cost} tokens ({which}) and the "
+            f"tool definitions {tools_cost} (measured, at {CHARS_PER_TOKEN} characters a "
+            f"token), a turn {TURN_ALLOWANCE_TOKENS} and the reply budget {self.max_reply}"
         )
         if got < need:
             raise DoorError(
@@ -465,7 +506,7 @@ class LocalModel:
                     for k, cid in enumerate(last_ids):
                         res = results[k] if k < len(results) else None
                         if res is None:
-                            content = "Not run: this sample's tool-call budget was spent."
+                            content = "Not run: this turn's budget for it was spent."
                         else:
                             value = res.get("result")
                             content = (
@@ -650,6 +691,31 @@ class LocalModel:
         self.client.close()
 
 
+def station_brief_tokens(station: str) -> int:
+    """What a station's own brief costs, for the context guard (package 37g, item 8; the
+    report's 8.2, item 14): the brief built from the station's own words as the harness
+    builds it (the generated head, the domain, the station brief, this door's note),
+    measured at `CHARS_PER_TOKEN`, with `SITUATION_ALLOWANCE_TOKENS` for what the ship
+    adds (the log's last lines, every reading, the captain's night orders). No World is
+    built for it: the runner is a client."""
+    from freesail.agents.agent import SESSION_PLAY, Brief, officer, watcher
+
+    is_officer = station_name(station) == OFFICER
+    st = officer() if is_officer else watcher()
+    brief = Brief.build(
+        st,
+        SESSION_PLAY,
+        [],
+        {},
+        tool_names(),
+        door_note=RUNNER_NOTE,
+        night_orders=[] if is_officer else None,
+        deck="The deck is the captain's now." if is_officer else "",
+    )
+    cost = len(json.dumps({"role": "system", "content": brief.text()})) // CHARS_PER_TOKEN + 1
+    return cost + SITUATION_ALLOWANCE_TOKENS
+
+
 def _error_words(r: httpx.Response) -> str:
     try:
         err = r.json().get("error")
@@ -681,8 +747,9 @@ POLL_WAIT_S = 30.0
 RUNNER_NOTE = (
     "This door is a model server on the owner's machine. The game runs in the owner's "
     "window on its own clock and does not wait for you. Your turn opens at each sampling "
-    "point (the glass, a notable event, the end of a stand-by, or a question from the "
-    f"captain). {TURN_ENDS_WORDS} What happens while it is open is added to it, so your "
+    "point (the glass, a notable or urgent event, the end of a stand-by, or a question or "
+    f"a word from the captain). {TURN_ENDS_WORDS} What happens while it is open is added to "
+    "it, so your "
     "next turn carries everything since your last reply. The captain's orders and "
     "questions are typed by the owner in the game's window."
 )
@@ -759,6 +826,16 @@ def main(
     )
     ap.add_argument("--session", choices=("play", "test"), default="play")
     ap.add_argument("--ask-again", action="store_true", help="put the consent question again")
+    ap.add_argument(
+        "--handover-reserve",
+        type=int,
+        help=(
+            "the tokens of the context kept free when the harness asks the officer for the "
+            "handover note (default: the harness's own, 14000; the note is asked for when "
+            "the conversation has left less than this, and never before six tenths of the "
+            "context)"
+        ),
+    )
     args = ap.parse_args(argv)
 
     model = LocalModel(
@@ -777,7 +854,7 @@ def main(
         server = model.server_words()
         print(f"The model server serves {identity}.", file=out, flush=True)
         runtime = f"FreeSail's game at {args.game}, through {DOOR_WORDS}, {server}"
-        print(model.check_context(identity, runtime), file=out, flush=True)
+        print(model.check_context(identity, runtime, args.station), file=out, flush=True)
     except DoorError as e:
         print(str(e), file=out, flush=True)
         return EXIT_UNREACHABLE
@@ -791,8 +868,10 @@ def main(
             client=server,
             ask_again=args.ask_again,
             # the context this door gives the model, for the handover note (package 37;
-            # spec M4 open item 9b): the harness asks for the note at a fraction of it
+            # spec M4 open item 9b): the harness asks for the note when the conversation
+            # has left less than a reserve of it (`--handover-reserve`; package 37g)
             context_tokens=model.context_size(),
+            handover_reserve=args.handover_reserve,
         )
     except GameError as e:
         print(e.words, file=out, flush=True)

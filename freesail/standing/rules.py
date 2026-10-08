@@ -375,6 +375,10 @@ class EventCondition(Condition):
 
     def holds(self, view: R.ReadingsView, memory: dict[str, Any] | None = None) -> bool:
         memory = memory if memory is not None else {}
+        if not view.event_ready(self.text):
+            # under the event's floor (package 37f: a wind shift in airs too light to
+            # have a direction): it does not come, and its reference is left standing
+            return False
         # every clause is read, so that each sets its reference at the first look
         now = all([c.holds(view, memory) for c in self.clauses])
         key, quiet = f"{self.text}:held", f"{self.text}:false since"
@@ -489,6 +493,11 @@ class Rule:
     # the ship's watch of the last "not carried out" line of a failing `if`, so that the
     # line is said the first time and then once a watch (spec M5 open item 15)
     held_line_watch: tuple[str, str] | None = None
+    # the "held" lines said, each reason with the ship's watch it was last said in
+    # (package 37f: one a watch for each reason, whatever it is that holds the order: a
+    # failing `if`, its work still queued, or its order refused); None, a plain default,
+    # so that a rule in a checkpoint from before the package loads
+    held_said: dict[str, Any] | None = None
 
     def __post_init__(self) -> None:
         rank_of(self.given_by)  # a stranger is refused at once
@@ -550,6 +559,7 @@ class Rule:
         self.clear_s = 0.0
         self.memory.clear()
         self.held_line_watch = None
+        self.held_said = None
 
     def spend_shifts(self, view: R.ReadingsView) -> None:
         """At a firing: every wind's shift the trigger waits for is measured afresh from

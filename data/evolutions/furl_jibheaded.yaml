@@ -5,7 +5,7 @@ id: furl_jibheaded
 verb: furl
 applies_to: {class: jibheaded}
 preconditions:
-  - {check: sail.state != furled, reason: "The {sail} is stowed already."}
+  - {check: sail.state != furled, reason: "The {sail} is stowed already.", done: true}
   - {check: sail.state != blown_out, reason: "The {sail} is blown out; there is nothing left to stow."}
 requires:
   - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s stay or mast is carried away"}

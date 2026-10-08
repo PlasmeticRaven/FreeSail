@@ -325,7 +325,7 @@ Everything here is per ship, per substep. Symbols: ρ_air = 1.225 kg/m³, ρ_wat
 
 - **True wind** in M0 to M2 is a single field over the plane: a base direction and speed from the scenario, a slow random walk in both (stream `wind`), and **gusts**: multiplicative bursts of 1.1 to 1.5 on speed lasting 5 to 30 s, with a probability per tick set by a "gustiness" parameter. Vertical shear: speed at height *h* above water is `V(h) = V10 * (h/10)^0.11`, applied per sail at its centre height.
 - **Apparent wind** at a sail: `V_app = V_true(h) - V_ship` (vectors). Its angle relative to the bow is the **apparent wind angle** (AWA), 0 ahead, positive to starboard.
-- Wind shifts of more than two points since the last logged direction produce `wind.shift`.
+- Wind shifts of more than two points since the last logged direction produce `wind.shift`. (Since package 37c the direction is the ten-minute mean's, held past the threshold a minute; see TechnicalSpec-M5 open item 11.)
 
 ### 7.2 Per-sail force
 
@@ -431,7 +431,7 @@ Case-insensitive. Punctuation ignored except the comma. Numbers as words or digi
 | `tack ship`, `ready about`, `go about` | | 1 | evolution `tack` (§8.5) |
 | `wear ship` | | 1 | evolution `wear` |
 | `heave to` [on the T tack] | | 1 | evolution `heave_to` (M2 simplified: back the after topsail) |
-| `fill away`, `fill` | | 1 | undo heave to |
+| `fill away`, `fill` | | 1 | undo heave to, on the tack she is on; `fill away and steer <course>` gives the helm the course when she is full (package 37f) |
 | `set plain sail`, `make all sail`, `shorten sail` | | 1 | group evolutions from `vocabulary.yaml` |
 | `hold`, `pause`; `go`, `resume`; `time` n | | driver | console and client control, not journaled as ship orders |
 
@@ -480,6 +480,14 @@ Without crew these are scripted sequences that manipulate helm and yards on a ti
 **Wear**: bear away until running, brace yards round progressively as the wind comes aft then onto the new quarter, then come up to the new close-hauled course. Total 6 to 12 minutes for the frigate is the truth to hit.
 
 **Heave to** (M2 simplified): brace the aftermost square yard aback with the others full, helm a-lee. The physics does the rest (truth 12).
+
+**As built (package 37f, 2026-10-07; the review of gate 5c's playtests, 5.7, 5.8 and 10.3, under the owner's note that "the helm and sails need to try to keep her hove to properly on the tack she hove to on").** The physics alone did not hold her: in game 9 the brig came up through the wind in four heave-tos of seven. Heaving to now has three parts (`evolutions/scripts.py`, `data/evolutions/heave_to.yaml`).
+
+- *Her way is taken off first.* The backed yards are laid aback and the yards that stay full braced sharp up for the tack (a ship brought to from a run is rounded to under them), the helm and the after and head sheets are worked from the first tick, and "Hove to on the starboard tack, ..." is said only when she lies between `near_points` and `far_points` from the wind on her tack, has stopped swinging (`quiet_deg_s`) and has lost her way (under `way_off_kn`, or settled under `way_most_kn`) for `lie_s`. At `way_off_timeout_s` she is taken as she lies if that is on her tack with the wind before the beam, and otherwise the evolution fails in words.
+- *She is kept there* (`keep_lying_to`, once a tick from the runner while `ship.extra["hove_to"]` stands and no manoeuvre has the helm): the watch tends the helm for a mark in the middle of the band, leaned toward the wind when she has more way than `lie_kn`, and works the spanker's and the head sail's sheets as Luce has it ("regulate by easing off, or hauling aft, the spanker and jib sheets"). It holds `keep_hands` hands, released and taken again at the change of the watch, and says one routine line a watch (`ship.lying_to`). A conning word given while she lies to is the captain's helm until she fills away (`helm_by_order`); the sheets are still tended.
+- *The record follows the ship.* Forced through the wind (`round_points` for `round_s`) with yards aback on the new tack, she is hove to on that tack and one urgent line says so (`ship.forced_round`); round with nothing aback, fallen off abaft `abaft_points` for `abaft_s`, or full and gathering way for `fill_s`, she is hove to no longer, urgently (`ship.filled`), the record is cleared and the helm keeps her full and by. The record is also cleared by a tack at "ready about", a wear at "up helm", an anchor let go, an anchor aweigh, and the ground. One record serves the reading `the manoeuvre in hand`, the dialect's guard and the helm's refusal.
+
+`fill away` fills her on the tack she is on, the side the wind is on as the order is given, and braces round whichever yards are aback for that tack; `fill away and steer <course>` gives the helm the course when she is full, if it can be laid on that tack (more than half a point outside close-hauled), her yards and sheets trimmed to the wind as she pays off, and says so and keeps her full and by when it cannot. `trim sails` (and `trim the sheets`, and a brace of every yard to the wind) is refused while she is hove to, in words that carry the cure; a yard or a sheet worked by name is taken. Measured: `docs/dev/TuningNotes.md`, package 37f.
 
 ---
 

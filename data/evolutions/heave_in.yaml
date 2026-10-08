@@ -1,0 +1,31 @@
+# Heave in cable at the capstan (scripted; package 37f): so much of it ("heave in twenty
+# fathoms"), or to a scope ("heave in to eighty fathoms"), on the anchor named or the one
+# she rides by. The messenger is passed and the bars shipped (rig_capstan_s), and the
+# cable comes in at the capstan's rate; the ship is hove up toward her anchor as it does,
+# and the anchor is not said to drag meanwhile. It is `heave short` with a figure:
+# `heave short` itself takes none and heaves in to a short stay, a cable and a half the
+# depth. Never to less than the depth of water, which is the cable up and down and the
+# anchor breaking out: that is `weigh`, and the refusal says so.
+#
+# The review of gate 5c's playtests, 5.8 and 10.4: `heave in 70 fathoms` ran as `heave
+# short` and a hundred and sixty-three fathoms came in; the officer of game 9, with too
+# much cable out in a narrow berth, had no order to shorten it to a figure.
+#
+# Parameters: `fathoms` (the number said), `to` (true for "heave in to <n> fathoms"),
+# `anchor` (the anchor named, else the one she rides by).
+id: heave_in
+verb: heave_in
+applies_to: {class: ship}
+script: heave_in
+params: {fathoms: null, to: false, anchor: null}
+preconditions: []
+timing:
+  rig_capstan_s: 180        # the messenger passed, the bars shipped and swiftered, as heave_short's (judgement)
+  heave_fathoms_per_s: 0.1  # six fathoms a minute at the capstan, as heave_short's (judgement)
+  veer_fathoms_per_s: 1.0   # moored: the other cable veered as this one comes in (unmoor's rate)
+  short_stay_per_depth: 1.5  # for the refusal's words: the short stay `heave short` heaves in to
+on_start: {log: "Man the bars; heave in on {anchor} cable."}
+on_complete: {log: "Hove in to {fathoms} on {anchor}, in {depth}{followed}. {riding}", kind: cable.hove_in, severity: routine}
+on_fail: {log: "Could not heave in: {reason}.", kind: evolution.failed, severity: routine}
+crew: {hands: all, rating: ordinary, stations: [all hands]}
+source: "Lever 1808, 'Weighing the Anchor' (the messenger and nippers); Luce 1866, ch. XXI Getting Under Way (heaving in at the capstan); ch. XXXIV, p. 568 (the scope to ride by)"

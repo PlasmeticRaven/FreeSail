@@ -7,17 +7,36 @@
     resume the watcher                            an order, journaled: the answer to a pause
     show the watcher's journal                    a query, like `state`: never journaled
 
-The deck (package 37; spec M5 §29): the officer of the watch's station is given and
-taken by the captain's word, as the period had it.
+The deck (package 37; spec M5 §29; as package 37g has it): the officer of the watch's
+deck is given and taken by the captain's word, as the period had it, and neither unseats
+him.
 
     you have the deck                             an order, journaled: the officer takes the
     Mr Pearce, you have the deck                  deck, with the night orders said to him
-    you may tack ship if the land closes          his word allows a named thing for the watch
+    I have the deck                               the captain takes the deck and no more:
+                                                  the officer stays at his station, off watch
+    you may tack ship if the land closes          his word allows a named thing, his
+                                                  condition kept as said
+    you may shape a course for Brest              a grant means what it says: for Brest
     you may not tack ship                         and takes it back
-    I have the deck                               the captain takes the deck back; the
-                                                  station is stood down, its journal saved
+    you may work the ship                         his general authority to work the ship
+    you have general authority                    (`you have my authority`), which keeps back
+                                                  the port's business, his standing orders, a
+                                                  new destination and what cannot be undone
+    you may not work the ship                     and takes it back
     the officer of the watch                      a reading: who has the deck, since when,
-                                                  what he was told (`api.readings`)
+                                                  what his word allows (`api.readings`)
+
+**A named grant means what it says** (package 37g, item 17; the review's 10.5: in game 9
+`you may shape a course for Brest` allowed a course shaped for anywhere, since a grant
+was matched by its order word alone and kept one to a word). `read_grant` reads the
+captain's words: the order, the thing they name where the order's own reader knows it (a
+place for a course shaped, an anchor by its name, a person sent for), which is checked
+when the officer gives the order, and his other words, kept as said for the officer to
+judge. Several grants of one order stand together. A grant that resolves by its first
+word to an order the officer may give already is refused, with the longer orders that
+begin with the same word named (`you may set the reckoning` granted the sail verb `set`),
+and so are two orders joined in one sentence (`you may tack or wear`).
 
 `the officer` says the officer of the watch in any of them (`agent.STATION_ALIASES`).
 `hand over the deck` is the officer's own (the `hand_over` tool), and the captain is
@@ -44,11 +63,27 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from freesail.agents.agent import OFFICER, STATION_ALIASES, STATION_NAMES, STATIONS_ABOARD
+from freesail.agents.agent import (
+    OFFICER,
+    STATION_ALIASES,
+    STATION_NAMES,
+    STATIONS_ABOARD,
+    Grant,
+)
 from freesail.orders.errors import OrderError
 from freesail.orders.vocabulary import normalise
 
-__all__ = ["STANDING_STATION_VERBS", "STATION_VERBS", "for_standing", "handle", "recognises"]
+__all__ = [
+    "GENERAL_GRANT",
+    "GENERAL_TAKEN",
+    "STANDING_STATION_VERBS",
+    "STATION_VERBS",
+    "for_standing",
+    "handle",
+    "read_grant",
+    "recognises",
+    "thing_named",
+]
 
 # The canonical verbs, as `data/vocabulary.yaml` lists them with `object: station`.
 STATION_VERBS: tuple[str, ...] = (
@@ -61,7 +96,14 @@ STATION_VERBS: tuple[str, ...] = (
     "i have the deck",
     "you may",
     "you may not",
+    "you may work the ship",
+    "you may not work the ship",
 )
+
+# The general grant's two sentences, by their verbs in the vocabulary (package 37g, item
+# 18): the words a captain would type for each are its synonyms there.
+GENERAL_GRANT = "you may work the ship"
+GENERAL_TAKEN = "you may not work the ship"
 
 # The deck's sentences (package 37): the captain's word that gives and takes it, and his
 # word for the watch. The officer's name before the giving, as the period had it ("Mr
@@ -126,6 +168,31 @@ def _alias_words(who: str) -> int:
     return 0
 
 
+def _general(text: str) -> tuple[str, str] | None:
+    """The general grant's sentence in the text, if it is one: (its verb, `GENERAL_GRANT`
+    or `GENERAL_TAKEN`; the captain's words after it, kept as said: 'in to Brest').
+    The longest of the vocabulary's phrases for either that the text begins with, so
+    that `you may not work the ship` is never `you may ...` and `you have not my
+    authority` never `you have my authority`."""
+    from freesail.orders.vocabulary import load_vocabulary
+
+    vocab = load_vocabulary()
+    said = normalise(text).replace(" , ", " ")
+    words = said.split()
+    for phrase in vocab.verb_phrases:  # longest first
+        verb = vocab.phrase_to_verb[phrase]
+        if verb not in (GENERAL_GRANT, GENERAL_TAKEN):
+            continue
+        pw = phrase.split()
+        if words[: len(pw)] == pw:
+            tail = " ".join(words[len(pw) :]).strip(" .")
+            as_said = " ".join(text.split()).rstrip(" .")
+            if tail and as_said.lower().endswith(tail):
+                tail = as_said[len(as_said) - len(tail) :]  # his words as he said them
+            return verb, tail
+    return None
+
+
 def recognises(text: str, ship: Any = None) -> str | None:
     """The station verb the text is, or None. The station's name must be one the game
     knows ("ask the watcher"), so an `ask` to nobody in particular is left to the
@@ -138,6 +205,9 @@ def recognises(text: str, ship: Any = None) -> str | None:
         return "i have the deck"
     if _HAND_OVER.match(deck):
         return "i have the deck"  # the captain's word for it, refused in words (handle)
+    general = _general(text)
+    if general is not None:
+        return general[0]
     m = _ALLOW.match(deck)
     if m is not None:
         return "you may not" if m.group("not") else "you may"
@@ -247,7 +317,14 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
     norm = normalise(text).replace(" , ", " ")
     by, officer = _speaker(ship)
     said_by = {"by": by} if by else {}
-    if verb in ("you have the deck", "i have the deck", "you may", "you may not"):
+    if verb in (
+        "you have the deck",
+        "i have the deck",
+        "you may",
+        "you may not",
+        GENERAL_GRANT,
+        GENERAL_TAKEN,
+    ):
         if by:
             raise OrderError(
                 f"'{norm}' is the captain's own word to the {OFFICER}, not a standing order's."
@@ -329,41 +406,228 @@ def _deck(
             agent.take_deck(by="the captain"),
             {"station": OFFICER, "deck": "taken"},
         )
+    if verb == GENERAL_GRANT:
+        _, words = _general(text) or (verb, "")
+        return (
+            "agent.deck",
+            agent.allow_general(words),
+            {"station": OFFICER, "general": True, "words": words},
+        )
+    if verb == GENERAL_TAKEN:
+        return (
+            "agent.deck",
+            agent.disallow_general(),
+            {"station": OFFICER, "general": False},
+        )
     m = _ALLOW.match(deck)
     assert m is not None
     rest = m.group("rest").strip(" .")
-    verb_said, words = _verb_in(rest)
-    if verb_said is None:
-        raise OrderError(
-            f"'{rest}' names no order the {OFFICER} could be allowed; say the order's words "
-            "first ('you may tack ship if the land closes within two miles')."
-        )
+    grant = read_grant(ship, None, rest, said=True)
     if verb == "you may not":
         return (
             "agent.deck",
-            agent.disallow(verb_said),
-            {"station": OFFICER, "disallowed": verb_said},
+            agent.disallow(grant.verb, grant=grant),
+            {"station": OFFICER, "disallowed": grant.verb, "thing": grant.thing},
         )
+    _not_his_already(agent, grant, rest)
     return (
         "agent.deck",
-        agent.allow(verb_said, words),
-        {"station": OFFICER, "allowed": verb_said, "words": words},
+        agent.allow(grant.verb, grant.words, grant=grant),
+        {"station": OFFICER, "allowed": grant.verb, "words": grant.words, "thing": grant.thing},
     )
 
 
 def _verb_in(rest: str) -> tuple[str | None, str]:
     """The vocabulary's verb the captain's allowance names, longest first, and his words
     after it (his condition, kept as said)."""
+    verb, _, words = _verb_and_phrase(rest)
+    return verb, words
+
+
+def _verb_and_phrase(rest: str) -> tuple[str | None, str, str]:
+    """(the verb, the phrase of it the words began with, the words after it); (None, "",
+    "") when the words begin with no order the officer could be allowed."""
     from freesail.orders.vocabulary import load_vocabulary
 
     vocab = load_vocabulary()
     words = rest.split()
+    # an order whose phrase ends in a word that wants a thing after it, granted whole:
+    # 'you may shape a course' is `shape a course for`, for any place
+    if " ".join(words) in _WHOLE:
+        verb = _WHOLE[" ".join(words)]
+        return verb, verb, ""
     for phrase in vocab.verb_phrases:  # longest first
         pw = phrase.split()
         if words[: len(pw)] == pw:
             verb = vocab.phrase_to_verb[phrase]
             spec = vocab.verbs[verb]
             if spec.level in ("driver", "reading") or spec.object in ("standing", "station"):
-                return None, ""
-            return verb, " ".join(words[len(pw) :])
-    return None, ""
+                return None, "", ""
+            return verb, phrase, " ".join(words[len(pw) :])
+    return None, "", ""
+
+
+_WHOLE = {
+    "shape a course": "shape a course for",
+    "shape courses": "shape a course for",
+}
+
+
+# The words that begin the captain's condition after the thing a grant names: 'you may
+# shape a course for Brest if the wind serves'.
+_CONDITION = re.compile(
+    r"\s+(?=(?:if|when|whenever|unless|until|till|while|once|after|before|as|should|"
+    r"provided|so long as|but only|only)\b)"
+)
+
+
+def thing_named(ship: Any, verb: str, phrase: str, said: str) -> tuple[str, str] | None:
+    """The thing an order names, where the order's own reader knows it (package 37g, item
+    17): (what it is checked by, the order with it in words), or None when the order
+    names nothing a grant is checked by. A place for `shape a course for` (a feature of
+    the chart by its name, or a position pricked on it), an anchor by its name for the
+    ground tackle's orders, a person for `send for`. `phrase` is the verb's words as
+    said (an anchor or a person may be named in them: `weigh the small bower`, `call
+    the carpenter`), `said` the words after them."""
+    from freesail.orders.vocabulary import load_vocabulary
+
+    spec = load_vocabulary().verbs.get(verb)
+    if spec is None:
+        return None
+    said = " ".join(str(said or "").split())
+    if verb == "shape a course for":
+        if not said:
+            return None
+        from freesail.orders.navigation import _position_in
+
+        pricked = _position_in(said)
+        if pricked is not None:
+            from freesail.world.geo import format_position
+
+            where = format_position(pricked)
+            return f"place:{where}", f"{verb} {where}"
+        nav = (getattr(ship, "extra", None) or {}).get("navigation")
+        chart = getattr(getattr(nav, "world", None), "chart", None)
+        if chart is None:
+            return None
+        from freesail.world.reckoning import _key
+
+        key = _key(said)
+        for f in chart.features.values():
+            if _key(f.name) == key or _key(f.modern) == key:
+                return f"place:{f.id}", f"{verb} {f.name}"
+        return None
+    if spec.object == "anchor":
+        from freesail.orders.ground_tackle import _anchor_in_phrase
+
+        name = _anchor_in_phrase(f"{phrase} {said}")
+        if name is None:
+            return None
+        head = phrase if _anchor_in_phrase(phrase) else f"{verb}, the {name}"
+        return f"anchor:{name}", head
+    if verb == "send for":
+        who = said
+        if phrase.startswith("call the "):
+            who = f"{phrase.removeprefix('call the ')} {said}".strip()
+        nav = (getattr(ship, "extra", None) or {}).get("navigation")
+        people = getattr(getattr(nav, "world", None), "people", None)
+        person = people.find(who) if people is not None and who else None
+        if person is None:
+            return None
+        return f"person:{person.name}", f"send for {person.name}"
+    return None
+
+
+def read_grant(ship: Any, verb: str | None, rest: str, said: bool = False) -> Grant:
+    """The captain's grant from his words (package 37g, item 17). With `verb` None, `rest`
+    is everything after `you may`: the order is the vocabulary's verb they begin with,
+    longest first (refused in words when they begin with none, or when two orders are
+    joined in one sentence); with a verb given, `rest` is his words after it (a grant a
+    checkpoint from before this package holds, read as one given today). The thing the
+    words name, where the order's own reader knows it, is what the grant is checked by;
+    the words after it, or all of them when they name no such thing, are his condition,
+    kept as said. A place the chart has not got is refused when the grant is said
+    (`said`), as the order itself would be."""
+    phrase = verb or ""
+    if verb is None:
+        verb, phrase, words = _verb_and_phrase(rest)
+        if verb is None:
+            raise OrderError(
+                f"'{rest}' names no order the {OFFICER} could be allowed; say the order's "
+                "words first ('you may tack ship if the land closes within two miles'), or "
+                "'you may work the ship' for his general authority."
+            )
+        first = words.split()[0] if words.split() else ""
+        if first in ("and", "or"):
+            raise OrderError(
+                f"'{rest}' joins two orders, and a grant names one: say each in its own "
+                f"sentence ('you may {phrase}', and then the other)."
+            )
+    else:
+        words = rest
+    words = " ".join(str(words).split())
+    head, tail = words, ""
+    found = thing_named(ship, verb, phrase, head)
+    if found is None and words:
+        # his condition after the thing: tried at each place a condition's word begins
+        for m in _CONDITION.finditer(words):
+            head, tail = words[: m.start()], words[m.end() :]
+            found = thing_named(ship, verb, phrase, head)
+            if found is not None:
+                break
+    if found is None:
+        if said and verb == "shape a course for" and words:
+            # a place the chart has not got, refused now in the order's own words
+            nav = (getattr(ship, "extra", None) or {}).get("navigation")
+            if nav is not None and getattr(nav.world, "chart", None) is not None:
+                place = _CONDITION.split(words)[0]
+                raise OrderError(
+                    f"The chart has no place named '{place}', so no course for it can be "
+                    "allowed; name a place of the chart, or say 'you may shape a course' "
+                    "for any."
+                )
+        return Grant(verb, words)
+    key, thing = found
+    return Grant(verb, tail, thing=thing, key=key)
+
+
+def _not_his_already(agent: Any, grant: Grant, rest: str) -> None:
+    """A grant that resolves to an order the officer may give already grants nothing, and
+    is refused with the longer orders that begin with the same word named (package 37g,
+    item 17; the report's 8.2, item 13: `You may set the reckoning` was logged "may set
+    (the reckoning)", the sail verb, and the order was refused three seconds later;
+    `You may let go` granted nothing for the anchor)."""
+    from freesail.orders.vocabulary import load_vocabulary
+
+    domain = getattr(agent, "domain", None)
+    if domain is None:
+        return
+    vocab = load_vocabulary()
+    spec = vocab.verbs[grant.verb]
+    if domain.why_not(grant.verb, spec.object, spec.level) is not None:
+        return
+    first = rest.split()[0] if rest.split() else ""
+    longer: list[str] = []
+    for phrase in vocab.verb_phrases:
+        if not phrase.startswith(first + " "):
+            continue
+        verb = vocab.phrase_to_verb[phrase]
+        vs = vocab.verbs[verb]
+        if vs.level in ("driver", "reading") or vs.object in ("standing", "station"):
+            continue
+        if domain.why_not(verb, vs.object, vs.level) is None:
+            continue
+        if phrase == verb and verb not in longer:
+            longer.append(verb)
+    named = (
+        " The longer orders that begin with the same word: "
+        + ", ".join(f"'you may {v}'" for v in longer)
+        + "."
+        if longer
+        else " No longer order begins with that word; say the order as the officer would "
+        "give it ('you may steer', 'you may tack ship')."
+    )
+    raise OrderError(
+        f"'{rest}' reads as the order '{grant.verb}', which the {OFFICER} may give "
+        f"already, so it would allow nothing.{named}"
+    )

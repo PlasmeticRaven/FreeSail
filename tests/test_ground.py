@@ -131,7 +131,10 @@ def test_truth_66_the_same_passage_with_the_lead_going_hourly_does_not_ground():
         'standing order "fill away after the cast": at a sounding then fill away',
         'standing order "stand on": at filled away, if the depth exceeds 40 fathoms '
         "then steer NW by W",
-        'standing order "haul off": at filled away, if the depth is under 40 fathoms then steer SE',
+        # forty fathoms and less (package 37f): heaving to takes her way off before
+        # "Hove to" is said, the casts fall a few minutes later, and the third found
+        # forty fathoms to the fathom, which "under 40" and "exceeds 40" both let pass
+        'standing order "haul off": at filled away, if the depth is under 41 fathoms then steer SE',
     ):
         assert w.submit(line).kind != "order.refused", line
     aground = run_until_aground(w, 6.0)

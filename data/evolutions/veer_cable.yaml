@@ -8,13 +8,23 @@
 # 'Of coming to anchor'). Luce's first answer to an anchor dragging ("veer more cable",
 # the World's line, physics/anchor.py).
 #
+# Package 37f (the review of gate 5c's playtests, 5.8 and 10.4): the cable veered is
+# the anchor's that the order names (parameter `anchor`; the one she rides by when it
+# names none), and "to" is kept wherever the name stands: "veer to 80 fathoms", "veer
+# the best bower to 80 fathoms" and "veer to 80 fathoms on the best bower" all veer to
+# eighty; "veer 20 fathoms" and "veer the small bower 20 fathoms" veer twenty more. In
+# game 9 `veer the small bower to 80 fathoms` veered the best bower, and `veer the best
+# bower to 80 fathoms` veered eighty more. An anchor that is not down is refused by name,
+# with the one she rides by; a "to" less than what is out is refused, as before, with the
+# order that does it ("heave in to 60 fathoms").
+#
 # Parameters: `fathoms` (how many more to veer, or with `to` true the scope to veer to);
-# a bare "veer cable" veers a third as much again (judgement).
+# `anchor`; a bare "veer cable" veers a third as much again (judgement).
 id: veer_cable
 verb: veer_cable
 applies_to: {class: ship}
 script: veer_cable
-params: {fathoms: null, to: false}
+params: {fathoms: null, to: false, anchor: null}
 preconditions: []
 timing:
   veer_fathoms_per_s: 0.5  # the stoppers slackened and the cable surged through the

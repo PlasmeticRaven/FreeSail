@@ -36,16 +36,16 @@ standing order "shorten sail for weather": when the true wind exceeds 30 knots f
 standing order "keep her full": when the apparent wind is forward of 55 degrees then bear away one point
 ```
 
-**Trimming on a shift.** The yards are trimmed to the wind as it shifts, a point at a time, as Luce's table of the yard's best angle is given point by point. It is measured afresh from each firing, so a wind veering steadily through a night has the yards trimmed to it point by point.
+**Trimming on a shift.** The yards are trimmed to the wind as it shifts, a point at a time, as Luce's table of the yard's best angle is given point by point. It is measured afresh from each firing, so a wind veering steadily through a night has the yards trimmed to it point by point. Not while she is hove to: her yards are then set against each other on purpose, and in two playtests this rule braced a hove-to ship's backed yard round and filled her. The guard is the dialect's own, `and the manoeuvre in hand is not hove to`; with it the rule sleeps while she lies to and wakes when she has filled away. (`trim sails` given by hand to a ship hove to is refused in words; chapter 5.) Put the same guard on any trimming rule of your own.
 
 ```orders frigate
-standing order "trim on a shift": when the true wind veers 1 point or backs 1 point then trim sails
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails
 ```
 
-**Tending the sheets.** The sheet holds the trim (chapter 4): a jib's or a spanker's sheet stays where it was worked until hands work it again, so the afterguard's routine is to tend the fore-and-aft sheets every glass, and a sheet within a degree of its trim stands.
+**Tending the sheets.** The sheet holds the trim (chapter 4): a jib's or a spanker's sheet stays where it was worked until hands work it again, so the afterguard's routine is to tend the fore-and-aft sheets every glass, and a sheet within a degree of its trim stands. It has the same guard: hove to, the watch tends the spanker and jib sheets to keep her head where it lies, and not to the wind.
 
 ```orders frigate
-standing order "tend the sheets": every glass then trim the sheets
+standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets
 ```
 
 **Heavy weather, and the storm staysail.** Forty knots is a gale; five minutes tells a gale from a squall. The close reef leads, because the hands go to the first clause first and the topsails must be reefed before the weather comes; the topgallant masts come down next, the fore topmast staysail in, and the storm staysail is bent, and set by the companion order as soon as it is bent and furled.

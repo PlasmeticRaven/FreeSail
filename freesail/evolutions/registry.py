@@ -15,7 +15,12 @@ The file shape (spec §8.4, with the additions the runner needs)::
                                    # sail: clearing a wreck, package 30b), or "ship"
     params: {reefs: 1}             # optional; defaults for order parameters
     preconditions:                 # checked when the evolution starts
-      - {check: sail.state != set, reason: "The {sail} is already set."}
+      - {check: sail.state != set, reason: "The {sail} is already set.", done: true}
+                                   # ``done: true``: failing this, what was ordered is done
+                                   # already. At the order it is refused in these words, as
+                                   # any precondition; found so by work that waited its
+                                   # turn, it is a routine line (`evolution.done_already`)
+                                   # and not a failed evolution (package 37f)
     requires:                      # checked at the start and again before every step
       - {check: not wrecked(spar_chain(sail)), reason: "The {sail}'s spars are wrecked."}
     steps:
@@ -82,6 +87,9 @@ class Condition:
     text: str  # the expression as written
     reason: str  # what to say when it does not hold
     tree: expr.Node
+    # ``done: true`` in the file: when this does not hold, what was ordered is done
+    # already (the sail is set, the boom rigged in), which is no failure (package 37f)
+    done: bool = False
 
 
 @dataclass
@@ -141,11 +149,13 @@ class Evolution:
 
 
 def _condition(raw: Any, where: str) -> Condition:
+    done = False
     if isinstance(raw, str):
         text, reason = raw, f"the condition '{raw}' does not hold"
     elif isinstance(raw, dict) and "check" in raw:
         text = str(raw["check"])
         reason = str(raw.get("reason") or f"the condition '{text}' does not hold")
+        done = bool(raw.get("done", False))
     else:
         raise EvolutionFileError(
             f"{where}: a precondition must be an expression or a {{check, reason}} mapping."
@@ -154,7 +164,7 @@ def _condition(raw: Any, where: str) -> Condition:
         tree = expr.parse(text)
     except expr.ExpressionError as e:
         raise EvolutionFileError(f"{where}: {e}") from None
-    return Condition(text=text, reason=reason, tree=tree)
+    return Condition(text=text, reason=reason, tree=tree, done=done)
 
 
 def _targets(raw: Any, where: str) -> dict[str, tuple[expr.Node, str, expr.Node]]:

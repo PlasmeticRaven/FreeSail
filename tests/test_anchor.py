@@ -375,3 +375,58 @@ def test_the_readings_and_events_are_in_the_registry_by_kind():
     assert (
         plane.readings["anchor"]["state"] == "at the bows"
     )  # the tackle is the ship's, chart or none
+
+
+# ---------------------------------------------------------------------------
+# Package 37d: a dragging anchor is urgent, and the anchor's depth is read where it lies
+# (the review of gate 5c's playtests, 5.8 under "Anchoring", and 8.2 item 13)
+# ---------------------------------------------------------------------------
+
+
+def test_a_dragging_anchor_is_an_urgent_line_and_holding_again_a_routine_one():
+    from freesail.core.events import Severity
+
+    w = road_world(heading=225.0, knots=40.0, where=OUTER_ROAD)
+    w.run(60)
+    assert w.submit("let go the best bower in twenty fathoms").kind == "order.accepted"
+    w.run(900)
+    dragging = events(w, "anchor.dragging")
+    assert dragging and all(e.severity is Severity.URGENT for e in dragging)
+    assert all(e.severity is Severity.ROUTINE for e in events(w, "anchor.holding"))
+
+
+def test_an_anchor_let_go_after_a_run_of_sixty_miles_lies_in_the_depth_the_lead_found():
+    """Item 13: the anchor's depth was read at a point found by one jump from the
+    scenario's origin by the whole voyage's displacement, which drifts from the ship's
+    own place with the miles run: "let go in twelve fathoms and a half" and then "Brought
+    up ... in six fathoms and a half"; the Harpy "Brought up ... in no water", her
+    anchor's point having fallen on the land. After sixty miles made good to Carrick Road
+    the anchor lies in the water the ship is in, to the fathom."""
+    from freesail.world.geo import Position
+
+    road = Position(CARRICK_ROAD["lat_deg"], CARRICK_ROAD["lon_deg"])
+    w = road_world(heading=0.0, knots=6.0, from_deg=180.0)
+    # sixty miles of run in her plane, east and north, as a long passage leaves her: the
+    # ship's own place carried to the road, her plane's point sixty miles from its start
+    east, north = 45 * units.NAUTICAL_MILE, 40 * units.NAUTICAL_MILE
+    w.ship.dyn.x, w.ship.dyn.y = east, north
+    w._geo_last = (east, north)
+    w._position = road
+    by_one_jump = w.origin.advanced(east, north)
+    assert bearing_and_distance(by_one_jump, road)[1] > 60 * units.NAUTICAL_MILE
+    w.run(60)
+    at_ship = w.ship.extra["water_depth_m"]
+    assert 8.0 < units.m_to_fathoms(at_ship) < 20.0
+    assert w.submit("let go the best bower").kind == "order.accepted"
+    w.run(120)
+    anchor = ground_tackle(w.ship).get("best_bower")
+    assert anchor.down and anchor.ground_x is not None
+    # where it lies by the world's one frame, and the water over it by the chart there
+    lies = w.place_of_plane(anchor.ground_x, anchor.ground_y)
+    assert bearing_and_distance(lies, w.position)[1] < 200.0
+    over_it = w.chart.depth_at(lies) + w.tide_height_m
+    assert anchor.depth_m == pytest.approx(over_it, abs=0.2)
+    assert abs(anchor.depth_m - w.ship.extra["water_depth_m"]) < units.fathoms_to_m(1.5)
+    # the old arithmetic put it sixty miles off, in another depth altogether
+    elsewhere = w.chart.depth_at(w.origin.advanced(anchor.ground_x, anchor.ground_y))
+    assert elsewhere is None or abs(elsewhere + w.tide_height_m - anchor.depth_m) > 1.0

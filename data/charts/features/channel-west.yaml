@@ -2022,6 +2022,18 @@ features:
     source: "Faden 1793, 'Bay of Brest', p. 57: within the Bay of Brest you anchor where you please in 8, 10 or 16 fathoms, muddy ground; high water at half after four, the sea rising 5 fathoms French measure"
     says: "Within the Bay of Brest you anchor where you please in eight, ten or sixteen fathoms on mud; it is high water at half after four and the tide rises five fathoms."
 
+  - id: brest-road
+    kind: bottom
+    name: Brest road
+    modern: Rade de Brest, before the town and the mouth of the Penfeld
+    lat_deg: 48.3600
+    lon_deg: -4.4900
+    height_m: 0
+    bottom: "mud"
+    depth_fathoms: 14
+    source: "Faden 1793, 'Bay of Brest', p. 57: within the Bay of Brest you anchor where you please in 8, 10 or 16 fathoms, muddy ground. The Bay's own note above is set two miles and more to the south-east, and the road before the town, where a ship bound to the Penfeld brings up, lay beyond its reach: a brig anchored and moored there in the playtest of 6 October 2026 on no note at all (package 37f). The same words, set here; the place of the note is judgement"
+    says: "Brest road, before the town and the castle, in fourteen fathoms on mud."
+
   - id: camaret-road
     kind: anchorage
     name: Camaret road

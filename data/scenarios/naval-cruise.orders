@@ -25,16 +25,22 @@ standing order "for the station": at filled away, if the distance to Plymouth is
 # The yards and the sheets: trimmed when she is steady on a course the book has shaped
 # or a chase has given (the starter book's trim answers a shift of the true wind, not a
 # turn of the ship), on a shift of a point, and the sheets tended every glass (the
-# starter book's rule; Luce 1866 ch. XXIV).
-standing order "trim to the course": at steady on the course then trim sails
-standing order "trim on a shift": when the true wind veers 1 point or backs 1 point then trim sails
-standing order "tend the sheets": every glass then trim the sheets
+# starter book's rule; Luce 1866 ch. XXIV). Not while she is hove to (package 37f): each
+# carries the dialect's own guard, since a trim braces a hove-to ship's backed yards
+# round with the rest.
+standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails
+standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets
 
 # The departure and the landfalls: a bearing of the land every glass while it is in
 # sight (N §1); the chronometer wound at eight bells in the forenoon watch of itself,
 # and a time sight taken when the sun is well up and again in the afternoon, since the
 # chronometer is the captain's charge and the master a lunarian.
-standing order "bearings": every glass, if the land is in sight then take a bearing of the land
+# Package 37d: a bearing gives a line, and the lookout's distance by estimation is laid
+# down with it only when it is the better figure (a landfall on one mark after a long
+# run), so the book takes a fix by cross bearings after the bearing, which stands when
+# one mark only is in sight or the marks cut too fine.
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix
 standing order "the morning sight": at two bells, if the daylight is day then take a sight for the longitude
 
 # The station, two days under the book, kept as the squadron off Ushant kept it: by the

@@ -196,37 +196,68 @@ She must already be on the tack you name; "heave to on the larboard tack" while 
   Morning watch (04:51)  Order: heave to.
   Morning watch (04:51)  Hauled up the courses; brailed up the spanker.
   Morning watch (04:51)  Clewed up the fore topgallant.
-  Morning watch (04:51)  Braced the main topsail aback; helm a-lee.
+  Morning watch (04:51)  Braced the main topsail aback; hauled aft the head sheets; helm a-lee.
   Morning watch (04:51)  Hands to the after braces; heave to.
-* Morning watch (04:51)  Main topsail taken aback.
-* Morning watch (04:51)  Main topgallant taken aback.
-* Morning watch (04:52)  Hove to, main topsail to the mast, helm a-lee.
+* Morning watch (04:54)  Hove to on the starboard tack, main topsail to the mast, helm a-lee.
 ```
 
-and ten minutes later:
+and ten minutes after the order:
 
 ```
-Amazon: heading NW by W (298°), speed 1.4 kn, leeway -44°, heel -4°
-Apparent wind 56° on the starboard bow, 14.2 kn; helm +15°
+Amazon: heading NW by W (298°), speed 1.3 kn, leeway -48°, heel -3°
+Apparent wind 56° on the starboard bow, 12.0 kn; helm +19°
 ```
 
-She lies with her head about five points (58° to 62°) off the true wind, making a knot or so, mostly to leeward: the leeway of 44° says the little way she has is nearly as much sideways as ahead, and now and then it turns to sternway for a spell. That is a ship hove to (truth 12 of the tuning notes: under a knot and a half, head 45° to 60° off, steady within 15°). She will lie so as long as you leave her. The courses, spanker and topgallant that were taken in stay in until you set them again.
+**Her way is taken off first.** "Hove to" is not said as the yard comes aback: it is said when she lies on her tack between four and seven points from the wind, has stopped swinging, and has lost her way (under a knot and a half, or as slow as she will go). From five knots by the wind that is three minutes; from seven with the wind on the quarter she is rounded to first, the yards that stay full braced sharp up as she comes, and it is longer. If she will not lie so in ten minutes the order fails and says how she lies. The line names the tack, since everything after depends on it.
+
+She lies with her head about five points and a half (60° to 65°) off the true wind, making a knot or so, mostly to leeward: the leeway of 48° says the little way she has is nearly as much sideways as ahead. That is a ship hove to (truth 12 of the tuning notes: under a knot and a half, head four to seven points off, steady). The courses, spanker and topgallant that were taken in stay in until you set them again.
+
+**She is kept there.** A ship left to herself with a yard aback does not lie still for long: she comes up, loses her way, and falls off or goes round. So while she is hove to the watch tends her, as Luce has it ("regulate by easing off, or hauling aft, the spanker and jib sheets"): four hands at the helm and the after and head sheets, who meet her with the helm as she comes up or falls off, ease the spanker and haul the jib's sheet aft when she comes too near the wind, and the other way when she falls off. It costs those hands, who are not to be had for other work, and it is said once a watch, routinely:
+
+```
+  Forenoon watch, 8 bells (08:00)  Lying to on the starboard tack, her head five points and a half from the wind; the watch tending the helm and the sheets.
+```
+
+In the measured runs the brig, who would not lie to at all in the playtest of 6 October, kept her head between five and six points and a quarter from the wind for six hours, on the tack she hove to on, and never over a knot and a half. If the weather is too much for them all the same (a shift of the wind that takes her aback, a squall), the log says what she has done, urgently, and the record follows the ship: "She has been forced round through the wind and lies on the larboard tack, the main topsail to the mast: hove to on it. To stand on, fill away."; or, when nothing is aback any longer and she gathers way, "She has filled and gathers way, the wind on the starboard bow: hove to no longer. The helm keeps her full and by." A conning word of your own (`helm a-lee`, `right the helm`) takes the helm from the watch until you fill away; the sheets are still tended.
+
+**What she will not do hove to.** A course (`steer`, `keep her full`) is refused: "She is hove to; fill away before giving her a course." So is `trim sails`, which would brace her backed yard round and fill her: "She is hove to; fill away before trimming, or brace a yard by name." A yard braced by name and a sheet hauled by name are still taken. The starting book's two trimming routines sleep while she lies to (chapter 11). She is hove to no longer when she tacks or wears, lets go an anchor, or takes the ground.
 
 ## Filling away
 
 To get under way again the head sheets are hauled aft and her head let fall off until the backed sails will fill when braced, then the backed yards are braced round full and she is steered close-hauled (Luce 1866, ch. XXVI, 'To fill away, after lying to with the main topsail to the mast'). The script keeps the helm a-lee while she has sternway, which throws her head off, and puts it up once she has headway, until her head is five points (55°) off the true wind; lying to as `heave to` leaves her, that is at once:
 
 ```
-  Morning watch (05:01)  Order: fill away.
-  Morning watch (05:01)  Hauled aft the head sheets; kept the helm a-lee to let her fall off.
-  Morning watch (05:01)  Fill away; man the after braces.
-  Morning watch (05:01)  Braced the main topsail full.
-  Morning watch (05:01)  Main topsail filled again.
-* Morning watch (05:02)  Filled away; braced full and steering WNW (293°).
-  Morning watch (05:03)  Steady on WNW (293°).
+  Forenoon watch (09:01)  Order: fill away.
+  Forenoon watch (09:01)  Hauled aft the head sheets; kept the helm a-lee to let her fall off.
+  Forenoon watch (09:01)  Fill away; man the after braces.
+  Forenoon watch (09:01)  Braced the main topsail full.
+* Forenoon watch (09:01)  Filled away on the starboard tack; braced full and steering WNW (292°).
+  Forenoon watch (09:03)  Steady on WNW (292°).
 ```
 
 Two minutes to *Steady*, and she is close-hauled with four knots of way inside seven, under topsails, topgallants and headsails only; `set the courses` and `set the spanker` give her back her plain sail. Braced full from nearer the wind than five points she would only be taken aback, which is why the script waits (and gives up waiting after three minutes). `fill away` when she is not hove to is refused: "She is not hove to."
+
+**She is filled on the tack she is on**, the side the wind is on as the order is given, and the line says which. A ship that has been forced round while she lay to is filled where she lies, and not taken back through the wind to the tack she hove to on.
+
+**`fill away and steer <course>`** fills her and gives the helm that course in the one order, by a point or in degrees:
+
+```orders frigate plain-sail
+heave to
+fill away and steer W by S
+heave to
+fill away and steer 250
+```
+
+```
+  Forenoon watch (09:16)  Order: fill away and steer W by S.
+  Forenoon watch (09:16)  Hauled aft the head sheets; kept the helm a-lee to let her fall off.
+  Forenoon watch (09:16)  Fill away; man the after braces.
+  Forenoon watch (09:16)  Braced the main topsail full.
+* Forenoon watch (09:19)  Filled away on the starboard tack; braced full and steering W by S (259°), the course ordered.
+  Forenoon watch (09:19)  Steady on W by S (259°).
+```
+
+She is braced full by the wind first, and as she pays off to the course her yards and sheets are trimmed to the wind she has, so the evolution is three minutes where filling by the wind is one. The course must be one she can lay on the tack she is on, more than half a point outside close-hauled. One that lies across the wind, or too near it, is not given her; she is kept full and by on her tack and the line says why, so that you can tack or wear for it: "Filled away on the starboard tack; braced full and steering WNW (292°), full and by (NE (45°) lies on the other tack; she is kept full and by on the starboard tack: tack or wear for it)."
 
 ## In a gale: lying a-try and scudding
 
@@ -269,7 +300,7 @@ A fore-and-aft vessel tacks quickly and wears with her main boom: "clew up the m
 * Morning watch (04:18)  Tacked; braced up on the larboard tack, heading ENE (68°).
 ```
 
-Hove to, a fore-and-after has her main sheet flat aft and her fore staysail's sheet to windward (above), and lies four or five points off forereaching a knot or two; `fill away` lets the staysail draw. The turning circles are in their own lengths now: the frigate's five at eight knots, the brig's five, the schooner's six, the cutter's five (`docs/dev/TuningNotes.md`, package 32e).
+Hove to, a fore-and-after has her main sheet flat aft and her fore staysail's sheet to windward (above), and lies four or five points off forereaching a knot or two (the schooner under two knots, the cutter under three, in the measured six hours: they are kept on their tack as the square-riggers are, but a fore-and-after hove to forereaches, and will not be brought under a knot and a half); `fill away` lets the staysail draw. The turning circles are in their own lengths now: the frigate's five at eight knots, the brig's five, the schooner's six, the cutter's five (`docs/dev/TuningNotes.md`, package 32e).
 
 ```orders schooner plain-sail
 tack ship

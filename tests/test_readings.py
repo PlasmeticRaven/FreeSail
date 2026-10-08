@@ -502,3 +502,154 @@ def test_the_gust_line_names_the_mean_and_the_dialect_reads_the_mean_and_the_lab
     # the true wind's speed is read as before
     clause = parse_condition("the true wind is under 20 knots").clauses[0]
     assert clause.reading == "true_wind_speed"
+
+
+# ---------------------------------------------------------------------------
+# Package 37d: `the nearest land`, a reading in the registry (so the prompt, the dialect
+# and every station's sample have it), and the three events
+# ---------------------------------------------------------------------------
+
+
+def _coast_world(lat: float, lon: float, heading: float = 20.0, hour: int = 10, day: int = 19):
+    from datetime import datetime
+
+    sc = Scenario(
+        start_time=datetime(1805, 6, day, hour, 0),
+        wind_from_deg=225.0,
+        wind_speed_kn=10.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=heading,
+        position={"lat_deg": lat, "lon_deg": lon},
+        region="channel-west",
+    )
+    return make_world(7, ROOT / "data/ships/frigate-36.yaml", sc)
+
+
+def test_the_nearest_land_is_a_reading_in_the_lookouts_words_and_never_the_charts_metres():
+    """Item 9: where it lies from the ship's head, its bearing to the point, its distance
+    by estimation in the lookout's own words and the coast's name; the value behind the
+    words is the distance as he said it, in whole cables, for the dialect."""
+    from freesail import units
+    from freesail.agents.tools import readings_words
+    from freesail.world.lookout import SHORE_ID
+
+    row = R.REGISTRY.get("nearest_land")
+    assert row.kind == "distance" and row.words == ("the nearest land", "the nearest shore")
+    w = _coast_world(50.300, -4.20)  # under a mile south of Rame Head
+    shore = next(s for s in w.lookout.sightings if s.feature.id == SHORE_ID)
+    value = w.readings["nearest_land"]
+    said = w.readings.words("nearest_land")
+    assert (
+        said
+        == value["words"]
+        == (
+            f"the land about Rame Head, {value['relative']}, bearing {value['bearing']}, "
+            f"{value['estimate']}"
+        )
+    )
+    assert value["relative"] == "on the larboard bow" and value["estimate"].endswith("cables")
+    # as said, never as measured: whole cables, and no true figure in the value
+    cables = value["metres"] / units.CABLE
+    assert abs(cables - round(cables)) < 1e-9
+    assert value["metres"] != shore.distance_m and set(value) == {
+        "metres",
+        "words",
+        "name",
+        "relative",
+        "bearing",
+        "estimate",
+    }
+    # at the prompt, by either name, and in every station's sample
+    e = w.submit("the nearest land")
+    assert e.kind == "query.reading" and e.text == f"The nearest land: {said}."
+    assert w.submit("the nearest shore").text == f"The nearest shore: {said}."
+    assert readings_words(w)["nearest_land"] == said
+    # the dialect compares what he said, in miles
+    given = w.submit(
+        'standing order "close": when the nearest land is under a mile then heave the lead'
+    )
+    assert given.kind == "standing.given", given.text
+    assert (
+        w.submit(
+            'standing order "far": when the nearest shore exceeds 2 miles then heave the log'
+        ).kind
+        == "standing.given"
+    )
+    w.run(2)
+    fired = {
+        e.actor for e in w.log if e.kind == "order.accepted" and e.actor.startswith("standing")
+    }
+    assert fired == {"standing order 'close'"}
+    refused = w.submit('standing order "x": when the nearest land is in sight then heave the lead')
+    assert refused.kind == "order.rejected" and "compared in miles" in refused.text
+
+
+def test_the_nearest_land_says_none_within_a_league_and_not_to_be_seen():
+    """Item 9: beyond a league, "no land within a league"; when the weather or the night
+    bounds his sight short of that, "not to be seen", with how far he can see (what lies
+    beyond it he cannot say); with no chart, the chart's own absent words."""
+    from types import SimpleNamespace
+
+    far = _coast_world(50.20, -4.20)  # seven miles south of Rame Head: the land in sight
+    assert far.readings["land"]["in_sight"] and far.readings["nearest_land"] is None
+    assert far.readings.words("nearest_land") == "no land within a league"
+    night = _coast_world(50.285, -4.20, hour=1, day=26)  # a dark night, two miles off
+    assert night.daylight == "night" and not night.lookout.moonlit
+    assert night.readings["nearest_land"] is None
+    assert night.readings.words("nearest_land") == (
+        "not to be seen: by night the shore shows within a mile at most"
+    )
+    fog = _coast_world(50.300, -4.20)
+    assert fog.readings["nearest_land"] is not None
+    fog.conditions = SimpleNamespace(visibility_nm=0.1, air_mass="neutral")
+    fog.lookout.look(fog)
+    fog._readings_key = None
+    assert fog.readings.words("nearest_land") == (
+        "not to be seen: in this weather the shore shows within a cable at most"
+    )
+    plane = make_world(7, ROOT / "data/ships/frigate-36.yaml", Scenario())
+    assert plane.readings["nearest_land"] is None
+    assert plane.readings.words("nearest_land") == R.NO_CHART_WORDS
+
+
+def test_the_three_events_of_package_37d_are_in_the_registry():
+    spec = R.EVENTS
+    assert R.event_matches(spec["a fix"], "reckoning.fix", {})
+    assert R.event_matches(spec["land ahead"], "lookout.land_ahead", {"urgent": False})
+    assert not R.event_matches(spec["land ahead"], "lookout.land_ahead", {"urgent": True})
+    assert R.event_matches(spec["land close ahead"], "lookout.land_ahead", {"urgent": True})
+    assert not R.event_matches(spec["land close ahead"], "lookout.land_ahead", {"urgent": False})
+    w = _coast_world(50.300, -4.20)
+    for name in ("a fix", "land ahead", "land close ahead"):
+        given = w.submit(f'standing order "{name}": at {name} then heave the lead')
+        assert given.kind == "standing.given", given.text
+
+
+def test_the_reckonings_reading_carries_the_tide_allowed_and_the_doubt_as_it_stands_now():
+    """Package 37e: `the reckoning` gives the position by account and the tide allowed in
+    it, with whose it is; `the reckoning's uncertainty` gives the master's doubt as it
+    stands at this moment, which grows between the workings of the account, with the
+    ellipse the chart draws; and the turn of the master's own tide is an event."""
+    w = _coast_world(50.300, -4.20)
+    reading = w.readings["reckoning"]
+    assert set(reading) >= {"words", "position", "tide"}
+    tide = reading["tide"]
+    assert tide["by"] == "book" and tide["words"] in reading["words"]
+    assert reading["words"].startswith(reading["position"] + "; the tide allowed: ")
+    assert w.readings.words("reckoning") == reading["words"]
+    doubt = w.readings["reckoning_uncertainty"]
+    assert doubt["words"].startswith("I would not trust the reckoning within ")
+    assert set(doubt["ellipse"]) >= {"semi_major_nm", "semi_minor_nm", "major_bearing_deg"}
+    before = doubt["ellipse"]["semi_major_nm"]
+    w.run(1800)  # half an hour with no working of the account: the doubt has grown
+    w._readings_key = None
+    assert w.readings["reckoning_uncertainty"]["ellipse"]["semi_major_nm"] > before
+    spec = R.EVENTS["the turn of the tide by the reckoning"]
+    assert R.event_matches(spec, "reckoning.tide", {"turn": True})
+    assert not R.event_matches(spec, "reckoning.tide", {"turn": False})
+    given = w.submit(
+        'standing order "the tide": at the turn of the tide by the reckoning then '
+        "work up the reckoning"
+    )
+    assert given.kind == "standing.given", given.text

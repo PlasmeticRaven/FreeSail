@@ -544,7 +544,7 @@ def test_a_bridge_restarted_for_the_same_model_attaches_to_its_station(tmp_path)
     assert len(g.lines("agent.stationed")) == 1  # one station, taken up again
     other = session(g.bridge(identity="another-made-up-model"), look)
     assert other.startswith("No station is offered in this session")
-    assert "manned by" in other
+    assert "is held by made-up-chat-model" in other and "taken by nobody else" in other
 
 
 def test_a_game_with_an_mcp_watcher_replays_from_its_save_to_the_same_log(tmp_path):
@@ -1029,3 +1029,131 @@ def test_the_repository_mcp_json_points_claude_code_at_the_bridge(tmp_path):
     out = session(b, script)
     assert out.startswith("No station is offered: the bridge was started without the model's")
     assert g.world.agents == {} and not (tmp_path / "consent").exists()
+
+
+# ---------------------------------------------------------------------------
+# Package 37g, item 8: the bridge asks again, and its wait adapts
+# ---------------------------------------------------------------------------
+
+
+def test_the_bridge_asks_for_its_station_again_when_the_game_has_none(tmp_path):
+    """The review's 5.4: the bridge asked for its station once in its life, so after a
+    restart of the game every call failed the same way until the client was restarted.
+    When the game answers that it holds no station for this door, the bridge forgets the
+    seating and asks again through the ordinary gate; the brief comes first and the call
+    is not run. A call that was leaving has nothing left to leave."""
+    g = Game(tmp_path)
+    yes_on_record(tmp_path / "consent")
+    b = g.bridge()
+    assert b.call("state", {}).startswith("Your call to state was not run")
+    assert b.game.key and "watcher" in g.world.agents
+    first_key = b.game.key
+    # the game is restarted: another world behind the same address, with no station in it
+    g2 = Game(tmp_path)
+    b.game.http = g2.http
+    got = b.call("readings", {})
+    assert got.startswith(
+        "Your call to readings was not run: the game holds no station for this door any more "
+        "(it was restarted, or another game was started in its place). The bridge has asked "
+        "for the station again, and the harness's brief comes first. Read it, then call again."
+    )
+    assert "This is a message from the harness of FreeSail" in got
+    assert "watcher" in g2.world.agents and b.phase == M.STATION
+    assert b.game.key and b.game.key != first_key  # a new seating, with its own key
+    assert (
+        "FreeSail: No agent is stationed at the watcher's station through the agent API; "
+        "station one first (POST /api/agents/watcher)."
+    ) in b.told_owner
+    assert "true_wind_speed" in json.loads(b.call("readings", {}))  # and the next call runs
+    assert g2.world.agents["watcher"].agent.samples == 1
+    # a leaving call after a restart has nothing to leave, and asks for no station
+    g3 = Game(tmp_path)
+    b.game.http = g3.http
+    left = b.call("opt_out", {"reason": "enough"})
+    assert left == (
+        "No station is held in this session: the game holds no station for this door any more "
+        "(it was restarted, or another game was started in its place), so there was nothing to "
+        "leave."
+    )
+    assert g3.world.agents == {} and b.phase == M.STOPPED
+
+
+def test_the_bridges_wait_adapts_when_the_client_cuts_a_waiting_call_short(tmp_path):
+    """Item 8: a `say` or a `stand_by` held open for the next turn and cut by the client
+    sooner than the bridge waits shortens the wait to a little under the cut (never below
+    the floor), so that the bridge's own "Still waiting" comes back before the client's
+    cut; the owner is told, and the note after the next result says the wait as it is
+    now. A read cut off shortens nothing."""
+    g = Game(tmp_path)
+    yes_on_record(tmp_path / "consent")
+    b = g.bridge(wait=120.0, slice_s=0.2)
+    b.call("state", {})
+    cid = b.begin_call()
+    b.call("readings", {}, call_id=cid)
+    b.cut_off(cid)  # a read, cut after it was made: nothing waits, nothing adapts
+    assert b.wait == 120.0 and b.adapted_from is None
+    b._take_lost()
+    cid = b.begin_call()
+    got: dict[str, str] = {}
+    t = threading.Thread(target=lambda: got.update(r=b.call("say", {}, call_id=cid)))
+    t.start()
+    deadline = time.monotonic() + 5
+    while cid not in b._waiting and time.monotonic() < deadline:
+        time.sleep(0.02)
+    with b._book:
+        b._started[cid] = time.monotonic() - 60.0  # as if the client had cut it at a minute
+    b.cut_off(cid)
+    t.join(timeout=5)
+    assert not t.is_alive()
+    assert b.wait == 60.0 - M.WAIT_MARGIN_S == 50.0 and b.adapted_from == 120.0
+    assert b.told_owner[-1] == (
+        "FreeSail: the client cut a waiting call after 60 seconds; the bridge now waits 50 "
+        "seconds at a time (it was 120 seconds)."
+    )
+    nxt = b.call("stand_by", {"until": "a glass"}, call_id=b.begin_call())
+    assert nxt.endswith(
+        "no turn had opened in it, so nothing was lost. The bridge has shortened its wait to "
+        "that: say and stand_by now hold a call open for up to 50 seconds, and then come back "
+        "of themselves with what has been logged.)"
+    )
+    # never below the floor, and never lengthened
+    b._adapt(12.0)
+    assert b.wait == M.WAIT_FLOOR_S == 15.0 and b.adapted_from == 120.0
+    b._adapt(100.0)
+    assert b.wait == 15.0
+
+
+def test_a_call_whose_key_is_refused_stops_the_bridge_and_it_does_not_take_the_seat_back(
+    tmp_path,
+):
+    """Item 1 at this door: when another door takes the station up for the same model (a
+    second bridge started for it), the first bridge's key is no longer the seating's; its
+    next call is refused in words that say the station is held and by which identity, the
+    bridge stops, and it does not ask for the seat again of itself. The log says the door
+    behind the station changed."""
+    g = Game(tmp_path)
+    yes_on_record(tmp_path / "consent")
+    first = g.bridge()
+    first.call("state", {})
+    second = g.bridge()  # a new client for the same model: it attaches, with a new key
+    second.call("state", {})
+    assert second.game.key and second.game.key != first.game.key
+    door = g.lines("agent.door")
+    assert door == [
+        "The door behind the watcher changes: made-up-chat-model, as the client lists it takes "
+        "up the station again through the MCP bridge, and the door that held it before is no "
+        "longer answered."
+    ]
+    got = first.call("readings", {})
+    assert got.startswith("The game did not take the call: ")
+    assert got == (
+        "The game did not take the call: The station of the watcher is held by "
+        "made-up-chat-model, as the client lists it, through the MCP bridge (stationed); this "
+        "call carries another seating's key to that seating, and nothing was run. A key is "
+        "given once, to the door that stations, and no other door's calls are run under a "
+        "seated model's name. A door stations first (POST /api/agents/watcher) under its own "
+        "model's name."
+    )
+    assert first.phase == M.STOPPED
+    assert first.call("readings", {}).startswith("No station is offered in this session: ")
+    assert isinstance(second.call("readings", {}), str) and second.phase == M.STATION

@@ -1948,3 +1948,71 @@ def test_an_order_after_a_firings_work_is_done_is_the_next_step_not_a_contrary_o
         "Standing orders 'a' and 'b' (both the captain's) give contrary orders on the fore "
         "yard; the later stands."
     ]
+
+
+# ---------------------------------------------------------------------------
+# Package 37g, item 5: what undoes what, as data beside the vocabulary
+# ---------------------------------------------------------------------------
+
+
+def test_what_undoes_what_is_a_table_of_the_vocabulary_and_the_books_rule_is_unchanged(tmp_path):
+    """The harness's detector for a station with authority counts a link only when the
+    later order undoes the earlier (`standing.runtime.undoes`), and what undoes what is a
+    table of `data/vocabulary.yaml`, each pair read both ways and each name a verb. The
+    book's own conflict rule (`contrary`, between two standing orders' firings) is another
+    rule and is as it was: it still calls two helm orders contrary, which the undo rule
+    never does."""
+    import shutil
+
+    from freesail.orders.vocabulary import load_vocabulary
+    from freesail.standing.runtime import (
+        GROUND_TACKLE,
+        contrary,
+        order_acts,
+        undo_chain,
+        undoes,
+        where_words,
+    )
+
+    ship = frigate().ship
+    vocab = load_vocabulary()
+    assert all(len(pair) == 2 and pair <= set(vocab.verbs) for pair in vocab.undoes)
+    assert set(vocab.irrevocable) <= set(vocab.verbs)
+    # the same sail set and taken in; hove to and filled away; an anchor let go and weighed;
+    # cable veered and hove in; a thing allowed and disallowed
+    assert where_words(ship, undoes(ship, "set the jib", "furl the jib")) == "the jib"
+    assert undoes(ship, "fill away", "heave to") and undoes(ship, "heave to", "fill away")
+    assert undoes(ship, "let go the best bower", "weigh") == {GROUND_TACKLE}
+    assert undoes(ship, "veer the small bower to 100 fathoms", "heave in 20 fathoms")
+    assert undoes(ship, "call all hands", "pipe down")
+    assert undoes(ship, 'belay standing order "trim"', 'resume standing order "trim"')
+    assert not undoes(ship, 'belay standing order "trim"', 'resume standing order "reef"')
+    # a group evolution is its lines: shortening sail undoes the royals set
+    assert [a.verb for a in order_acts(ship, "set the main royal")] == ["set"]
+    # the course is never a pair, and the book's own rule still calls it contrary
+    assert not undoes(ship, "steer 90", "steer 95") and contrary(ship, "steer 90", "steer 95")
+    assert not undoes(ship, "tack ship", "wear ship") and contrary(ship, "tack ship", "wear ship")
+    assert not undoes(ship, "heave to", "steer N")
+    # the chain is the run at the end in which each undoes the one before it
+    orders = ["steer N", "set the jib", "take in the jib", "set the jib"]
+    chain, shared = undo_chain(ship, orders)
+    assert chain == orders[1:] and where_words(ship, shared) == "the jib"
+    assert undo_chain(ship, [*orders, "steer NE"])[0] == ["steer NE"]
+    assert undo_chain(ship, []) == ([], frozenset())
+    # the loader refuses a pair that is not two verbs of the table
+    source = Path(__file__).resolve().parents[1] / "data" / "vocabulary.yaml"
+    for bad, why in (
+        ("  - [set, no such verb]\n", "undoes names 'no such verb', which is no verb"),
+        ("  - [set, set]\n", "a pair is two different verbs"),
+    ):
+        copy = tmp_path / f"vocabulary-{len(why)}.yaml"
+        shutil.copyfile(source, copy)
+        text = copy.read_text(encoding="utf-8").replace("\nundoes:\n", "\nundoes:\n" + bad, 1)
+        copy.write_text(text, encoding="utf-8", newline="\n")
+        with pytest.raises(ValueError, match=why):
+            load_vocabulary(copy)
+    copy = tmp_path / "vocabulary-irrevocable.yaml"
+    text = source.read_text(encoding="utf-8").replace("  - cut away\n", "  - cut and run\n")
+    copy.write_text(text, encoding="utf-8", newline="\n")
+    with pytest.raises(ValueError, match="irrevocable names 'cut and run', which is no verb"):
+        load_vocabulary(copy)

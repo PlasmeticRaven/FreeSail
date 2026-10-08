@@ -706,6 +706,7 @@ class TackScript(Script):
 
     def _ready_about(self) -> None:
         self.t = 0.0  # the stays are timed from "ready about"
+        end_lying_to(self.ship)  # a ship going about is hove to no longer (package 37f)
         dyn = self.ship.dyn
         self.sign = 1.0 if dyn.tack == "starboard" else -1.0
         self.bowlined = bowlines_hauled(self.ship)
@@ -998,6 +999,7 @@ class WearScript(Script):
 
     def _up_helm(self) -> None:
         self.t = 0.0  # the wear is timed from "up helm"
+        end_lying_to(self.ship)  # a ship wearing is hove to no longer (package 37f)
         dyn = self.ship.dyn
         self.sign = 1.0 if dyn.tack == "starboard" else -1.0
         dyn.helm_mode = HelmMode.HEADING
@@ -1131,24 +1133,516 @@ class WearScript(Script):
 # easing off, or hauling aft, the spanker and jib sheets".
 HOVE_TO_DRIVER_APPARENT = 6 * POINT
 
+# Lying to, and the watch that keeps her so (package 37f; the review of gate 5c's
+# playtests, 5.8 and 10.3 under the owner's note 6: "the helm and sails need to try to
+# keep her hove to properly on the tack she hove to on"). Until this package the script
+# braced the yards aback, put the helm a-lee and ended, and nobody tended her: from seven
+# knots the fixed helm carried the brig's head through the wind inside a minute, and in a
+# shifting light air she came round in six minutes and in twenty, to lie for hours with
+# the wind abaft the other beam. Now the helm is eased as she comes up and her way is
+# taken off before she is said to be hove to (`HeaveToScript`), and while the record
+# stands the watch tends the helm and the sheets (`keep_lying_to`, once a tick from the
+# runner), as Luce has it: "regulate by easing off, or hauling aft, the spanker and jib
+# sheets" (Luce 1866, ch. XXVI, 'To heave to'). Every figure is the `timing:` block of
+# data/evolutions/heave_to.yaml (`lying_to_timing`); the defaults written here are the
+# file's.
+LYING_TO_HANDS = "lying_to#watch"  # what the hands at the sheets carry in `Sailor.at`
+# Sternway beyond which the helm is shifted lying to (m/s): the helmsman's own figure
+# (`physics.hull.STERNWAY_SHIFT_SPEED`), written here so that the scripts do not import
+# the physics.
+LYING_TO_STERNWAY = 0.15
+# Her way lying to is read smoothed over this long, seconds, for where the watch holds her.
+LYING_TO_WAY_SMOOTH_S = 60.0
+# The manoeuvres that have the helm and the yards while they are in hand: the watch's
+# tending stands off for them (a ship being filled away is not held to her old tack).
+HELM_MANOEUVRES = frozenset(
+    {
+        "heave_to",
+        "fill_away",
+        "tack",
+        "wear",
+        "boxhaul",
+        "wear_short_round",
+        "lie_a_try",
+        "scud",
+        "back_and_fill",
+        "come_to_anchor",
+        "get_under_way",
+    }
+)
+
+
+def lying_to_timing() -> dict[str, float]:
+    """The heave-to's own figures (data/evolutions/heave_to.yaml, `timing:`), for the
+    tending that goes on after its script has ended."""
+    from freesail.evolutions import registry  # local import: the registry reads the files
+
+    evo = registry.get("heave_to")
+    return evo.timing if evo is not None else {}
+
+
+def lying_off(ship: Ship, wind: Wind, sign: float) -> float:
+    """Her head's angle from the wind on the tack `sign` (+1 starboard), radians:
+    positive while the wind is on that side, negative once it has come round her bow
+    (or her stern) to the other."""
+    return sign * wind_rel(ship, wind)
+
+
+def _tack_name(sign: float) -> str:
+    return "starboard" if sign > 0 else "larboard"
+
+
+def _lee_name(sign: float) -> str:
+    return "larboard" if sign > 0 else "starboard"
+
+
+def _kept_after_sails(ship: Ship, info: dict[str, Any]) -> list[Sail]:
+    """The after sails whose sheets the watch regulates lying to: the gaff sails set on
+    a boom (a brig's or a ship's spanker when it is kept, a fore-and-after's mainsail)."""
+    return boom_sails(ship)
+
+
+def tend_lying_to(
+    ship: Ship,
+    info: dict[str, Any],
+    dt: float,
+    wind: Wind,
+    timing: dict[str, float],
+    sheets: bool = True,
+    nearer: bool = True,
+) -> float:
+    """One tick of the tending: the helm, and with hands for them (`sheets`) the spanker
+    and jib sheets, worked to hold her head between `near_points` and `far_points` from
+    the wind on the tack `info["sign"]`. Returns her head's angle from the wind on that
+    tack (`lying_off`).
+
+    The helm. She lies with `helm_deg` of lee helm when her head is midway between the
+    two; it is eased as she comes up, righted a quarter point outside `near_points` and
+    put up (to leeward) nearer the wind than that; more of it as she falls off, to
+    `helm_max_deg`. The helmsman meets her swing `helm_lead_s` ahead, so a ship rounding
+    to with way on has the helm righted before her head is where it is to lie. With
+    sternway the rudder works the other way and the helm is shifted (the helmsman's own
+    rule, `physics/hull.py`).
+
+    The sheets (Luce 1866, ch. XXVI: "regulate by easing off, or hauling aft, the spanker
+    and jib sheets"). Within three quarters of a point of either bound nothing is touched.
+    Falling off past that, the spanker (or a fore-and-after's main) sheet is hauled aft
+    and the head sheets eased, in proportion, all of it a point further on; coming up,
+    the spanker sheet is eased off and the head sheets kept flat; and nearer the wind than
+    `aback_points` the innermost head sail's sheet is hauled to windward, to box her head
+    off, until she is a half point inside her bounds again. The hands work a sheet from
+    one end of that to the other in `sheet_s`.
+    """
+    dyn = ship.dyn
+    sign = float(info.get("sign", 1.0))
+    off = lying_off(ship, wind, sign)
+    coming_up = sign * dyn.r  # rad/s: her head swinging toward the wind
+    near = float(timing.get("near_points", 4.0)) * POINT
+    far = float(timing.get("far_points", 7.0)) * POINT
+    # -- where she is held ---------------------------------------------------------------
+    # Midway between her bounds with `lie_kn` of headway; a point nearer the wind for each
+    # knot she forereaches beyond that (her head yards lift and her way falls), a point
+    # further off for each knot short of it or astern (they fill and she comes ahead). The
+    # helm is given a mark no nearer either bound than a quarter of a point, the sheets
+    # one no nearer than three quarters. Her way is read smoothed over a minute, so that
+    # she is not hunted about by it.
+    margin = 0.75 * POINT
+    middle = 0.5 * (near + far)
+    way_kn = units.ms_to_knots(dyn.u)
+    smooth = float(info.get("way_kn", way_kn))
+    smooth += (way_kn - smooth) * min(1.0, dt / LYING_TO_WAY_SMOOTH_S)
+    info["way_kn"] = smooth
+    lean = (float(timing.get("lie_kn", 0.5)) - smooth) * float(timing.get("lean_points_kn", 1.0))
+    if not nearer:
+        lean = max(lean, 0.0)  # bringing her to: not nearer the wind for the way she carries
+    mark = max(near + 0.25 * POINT, min(far - 0.25 * POINT, middle + lean * POINT))
+    aim = max(near + margin, min(far - margin, mark))
+    # -- the helm -------------------------------------------------------------------
+    helm = units.deg_to_rad(float(timing.get("helm_deg", 15.0)))
+    hard = units.deg_to_rad(ship.hull.spec.rudder.max_angle_deg)
+    most = min(hard, units.deg_to_rad(float(timing.get("helm_max_deg", 25.0))))
+    ahead = off - coming_up * float(timing.get("helm_lead_s", 15.0))
+    turn = helm * (ahead - mark) / (1.25 * POINT)  # + to bring her head up
+    if dyn.u < -LYING_TO_STERNWAY:
+        # sternway: the rudder works the other way, and the lee helm she carries with
+        # headway is not wanted (a-lee, it throws her head off)
+        wanted = max(-most, min(most, -turn))
+    else:
+        wanted = max(-hard, min(most, helm + turn))  # + is a-lee, toward the wind
+    if not info.get("helm_by_order"):
+        # a conning word given while she lies to (`helm a-weather`, `right the helm`) is
+        # the captain's helm: the watch leaves it where he put it and tends the sheets
+        dyn.helm_mode = HelmMode.RUDDER
+        dyn.target_rudder = sign * wanted
+    if not sheets:
+        return off
+    # -- the sheets ------------------------------------------------------------------
+    looked = off - coming_up * float(timing.get("sheet_lead_s", 20.0))
+    if looked > aim + margin:
+        demand = min(1.0, (looked - (aim + margin)) / POINT)  # falling off: bring her up
+    elif looked < aim - margin:
+        demand = -min(1.0, ((aim - margin) - looked) / POINT)  # coming up: pay her off
+    else:
+        demand = 0.0
+    now = float(info.get("sheets", 0.0))
+    step = dt / max(float(timing.get("sheet_s", 30.0)), 1.0)
+    new = now + max(-step, min(step, demand - now))
+    boxed = bool(info.get("boxed"))
+    box = looked < float(timing.get("aback_points", 2.5)) * POINT or (
+        boxed and looked < near + 0.5 * POINT
+    )
+    if abs(new - now) < 1e-9 and box == boxed and info.get("sheets_set"):
+        return off
+    info["sheets"] = new
+    info["boxed"] = box
+    info["sheets_set"] = True
+    _work_lying_to_sheets(ship, info, new, box)
+    return off
+
+
+def _work_lying_to_sheets(ship: Ship, info: dict[str, Any], demand: float, box: bool) -> None:
+    """The sheets as the tending wants them: `demand` from -1 (pay her off) through 0 (as
+    the heave-to left them) to +1 (bring her up); `box` the innermost head sail's sheet to
+    windward. The sides are named by the tack she hove to on, not read from the wind of
+    the moment, which is on either bow as she comes head to it."""
+    sign = float(info.get("sign", 1.0))
+    lee, weather = _lee_name(sign), _tack_name(sign)
+    fore_and_aft = len(_masts_with_yards(ship)) < 2
+    for sl in _kept_after_sails(ship, info):
+        geo = yard_trim.sheet_geometry(ship, sl)
+        # as the heave-to left it: a fore-and-after's main flat aft, a brig's spanker
+        # eased for a wind six points on the bow
+        rest = (
+            geo.floor
+            if fore_and_aft
+            else yard_trim.wanted_sheet_angle(sl.cls, HOVE_TO_DRIVER_APPARENT)
+        )
+        to = geo.floor if demand > 0 else geo.ceiling
+        yard_trim.set_sheet_angle(ship, sl, rest + (to - rest) * abs(demand), lee)
+        sl.shivering = False
+    heads = head_sails(ship)
+    held = info.get("headsail")
+    inner = min(heads, key=lambda sl: sl.x_m) if heads else None
+    for sl in heads:
+        geo = yard_trim.sheet_geometry(ship, sl)
+        eased = geo.floor + (geo.ceiling - geo.floor) * max(demand, 0.0)
+        if sl.id == held:
+            # the fore-and-after's way: her staysail's sheet to windward, eased to let
+            # her come up
+            yard_trim.set_sheet_angle(ship, sl, eased, weather)
+        elif fore_and_aft:
+            continue  # her other head sails draw as they were trimmed
+        elif box and sl is inner:
+            yard_trim.set_sheet_angle(ship, sl, geo.floor, weather)
+        else:
+            yard_trim.set_sheet_angle(ship, sl, eased, lee)
+        sl.shivering = False
+
+
+def end_lying_to(ship: Ship) -> bool:
+    """She is hove to no longer: the record cleared and the watch's hands let go. Called
+    by whatever ends it without filling away (an anchor let go, the anchor aweigh, a tack
+    or a wear begun, the ground: package 37f, the review's 5.8 and 10.3, where the record
+    outlived a night at anchor and refused her a course four times with the anchor up).
+    True if she was."""
+    was = ship.extra.pop("hove_to", None) is not None
+    lying_to_hands_off(ship)
+    return was
+
+
+def lying_to_hands_off(ship: Ship) -> None:
+    from freesail.crew import hands  # local import: the crew is not the scripts' business
+    from freesail.crew.model import Crew
+
+    crew = ship.extra.get("crew")
+    if isinstance(crew, Crew) and ship.extra.pop("lying_to.hands", None):
+        hands.release(crew, LYING_TO_HANDS)
+
+
+def _lying_to_hands_on(ship: Ship, info: dict[str, Any], clock: Any, timing: dict) -> bool:
+    """The hands the tending costs the watch on deck (`keep_hands` of them, at the
+    spanker and the head sheets): taken when she is hove to, given back and taken afresh
+    from the relief when the watch changes, and asked for again every ten seconds while
+    none are to be had. True when the sheets are manned. A ship without a crew has them
+    (milestone 2's rule: every request met)."""
+    from freesail.crew import bill, hands
+    from freesail.crew.model import Crew
+    from freesail.evolutions.runner import DEFAULT_WATCH_TIME
+
+    crew = ship.extra.get("crew")
+    if not isinstance(crew, Crew):
+        return True
+    when = clock if clock is not None else DEFAULT_WATCH_TIME
+    watch = bill.watch_on_deck(crew, when).value
+    held = int(ship.extra.get("lying_to.hands") or 0)
+    if held and info.get("watch") == watch:
+        return True
+    kept = float(info.get("kept_s", 0.0))
+    if not held and kept - float(info.get("hands_asked_s", -1e9)) < 10.0:
+        return False
+    info["hands_asked_s"] = kept
+    if held:
+        hands.release(crew, LYING_TO_HANDS)  # the watch relieved: the relief takes them
+        ship.extra.pop("lying_to.hands", None)
+    want = hands.CrewRequest(
+        hands=max(1, int(timing.get("keep_hands", 4))),
+        stations=("afterguard", "forecastle"),
+    )
+    got = hands.request(crew, bill.on_deck(crew, when), LYING_TO_HANDS, want, None)
+    info["watch"] = watch
+    if got.outcome == hands.TOO_FEW:
+        return False
+    ship.extra["lying_to.hands"] = got.got
+    return True
+
+
+def _aback_now(ship: Ship, info: dict[str, Any]) -> bool:
+    """Whether anything of hers is aback as a ship hove to has it: a square sail set and
+    pressed to its mast, or a head sail held aback by its sheet."""
+    for sl in ship.sails.values():
+        if not sl.is_set:
+            continue
+        if sl.cls == "square" and sl.backed:
+            return True
+        if sl.is_fore_and_aft and sl.backed:
+            return True
+    return False
+
+
+def _yards_aback_for(ship: Ship, sign: float) -> list[Spar]:
+    """The yards that are braced aback for the tack `sign` with a square sail set on
+    them: braced up for the other tack."""
+    out = []
+    for y in working_yards(ship):
+        sl = ship.sail_of(y)
+        if sl is None or not sl.is_set or sl.cls != "square":
+            continue
+        if y.brace_angle * sign < -units.deg_to_rad(5.0):
+            out.append(y)
+    return out
+
+
+def _judge_lying_to(
+    ship: Ship, info: dict[str, Any], dt: float, wind: Wind, timing: dict[str, float]
+) -> None:
+    """If she is forced round all the same (a shift of many points, a squall), one urgent
+    line says so and the record follows what she is doing (package 37f, item 1). Her
+    head through the wind and `round_points` on the other bow for `round_s`: she has come
+    round, and lies on the other tack with whatever of her yards is now aback (hove to
+    on it, and kept on it), or with nothing aback is hove to no longer. And on either
+    tack, with nothing of hers aback and more way on than `way_off_kn` for `fill_s`, she
+    has filled and gathers way: hove to no longer, urgently (the review's 5.8: "she filled
+    in a squall and sailed toward the land for an hour with no alert, the game still
+    answering 'She is hove to'")."""
+    dyn = ship.dyn
+    sign = float(info.get("sign", 1.0))
+    off = lying_off(ship, wind, sign)
+    a_try = info.get("how") == "a-try"
+    way_off = units.knots_to_ms(float(timing.get("way_off_kn", 1.5)))
+    # -- through the wind -------------------------------------------------------------
+    across = float(timing.get("round_points", 1.0)) * POINT
+    if off < -across and off > -math.pi + across:
+        info["round_s"] = float(info.get("round_s", 0.0)) + dt
+    else:
+        info["round_s"] = 0.0
+    if info["round_s"] >= float(timing.get("round_s", 20.0)):
+        new_sign = -sign
+        aback = [] if a_try else _yards_aback_for(ship, new_sign)
+        old, new = _tack_name(sign), _tack_name(new_sign)
+        if aback:
+            what = sail_name_on(ship, aback)
+            info.update(
+                {
+                    "sign": new_sign,
+                    "yards": [y.id for y in aback],
+                    "round_s": 0.0,
+                    "full_s": 0.0,
+                    "sheets": 0.0,
+                    "boxed": False,
+                    "sheets_set": False,
+                    "forced": True,
+                }
+            )
+            info.pop("headsail", None)
+            ship.note(
+                "urgent",
+                "ship.forced_round",
+                f"She has been forced round through the wind and lies on the {new} tack, the "
+                f"{what} to the mast: hove to on it. To stand on, fill away.",
+                ship.name,
+                {"old_tack": old, "tack": new, "yards": info["yards"], "hove_to": True},
+            )
+            return
+        _hove_to_no_longer(
+            ship,
+            f"She has been forced round through the wind onto the {new} tack with nothing "
+            f"aback: hove to no longer.",
+            {"old_tack": old, "tack": new, "hove_to": False, "why": "forced round"},
+        )
+        return
+    if a_try:
+        return
+    # -- fallen off, the wind abaft the beam -----------------------------------------------
+    # more than `abaft_points` from the wind for `abaft_s`: the helm and the sheets have
+    # not brought her to (a brig under her topsails alone has no sheet to regulate by),
+    # and a ship lying with the wind abaft her beam is not hove to
+    if off > float(timing.get("abaft_points", 9.0)) * POINT:
+        info["abaft_s"] = float(info.get("abaft_s", 0.0)) + dt
+    else:
+        info["abaft_s"] = 0.0
+    if info["abaft_s"] >= float(timing.get("abaft_s", 120.0)):
+        rel = wind_rel(ship, wind)
+        _hove_to_no_longer(
+            ship,
+            f"She has fallen off, the wind {units.wind_bearing_words(rel)}, and the helm and "
+            f"the sheets will not bring her to: hove to no longer.",
+            {
+                "tack": _tack_name(1.0 if rel > 0 else -1.0),
+                "hove_to": False,
+                "why": "fallen off",
+            },
+        )
+        return
+    # -- filled, and gathering way ------------------------------------------------------
+    # nothing of hers aback and more way on than she lies to with; or, forced round onto
+    # the other tack, her after yards full there and the same way on her
+    if dyn.u > way_off and (info.get("forced") or not _aback_now(ship, info)):
+        info["full_s"] = float(info.get("full_s", 0.0)) + dt
+    else:
+        info["full_s"] = 0.0
+    if info["full_s"] >= float(timing.get("fill_s", 60.0)):
+        rel = wind_rel(ship, wind)
+        where = units.wind_bearing_words(rel)
+        how = "Her after yards full, she" if info.get("forced") else "She has filled and"
+        _hove_to_no_longer(
+            ship,
+            f"{how} gathers way, the wind {where}: hove to no longer.",
+            {"tack": _tack_name(1.0 if rel > 0 else -1.0), "hove_to": False, "why": "filled"},
+        )
+
+
+def _hove_to_no_longer(ship: Ship, text: str, data: dict[str, Any]) -> None:
+    """The record cleared with an urgent line, and the helm told to keep her full and by
+    on the tack she is on: a ship sailing off with her helm where the tending left it is
+    nobody's, and a heading held might be the wind's eye."""
+    dyn = ship.dyn
+    end_lying_to(ship)
+    dyn.helm_mode = HelmMode.FULL_AND_BY
+    dyn.steady = False
+    data = {**data, "speed_kn": round(units.ms_to_knots(dyn.u), 1), "heading": dyn.heading}
+    ship.note(
+        "urgent",
+        "ship.filled",
+        f"{text} The helm keeps her full and by.",
+        ship.name,
+        data,
+    )
+
+
+def keep_lying_to(ship: Ship, dt: float, wind: Wind, runner: Any = None) -> None:
+    """Once a tick, from the runner: while she is hove to (`ship.extra["hove_to"]`) and no
+    manoeuvre has the helm, the watch tends the helm and the sheets to hold her on her
+    tack (`tend_lying_to`), which costs it `keep_hands` hands; she is judged
+    (`_judge_lying_to`); and once a watch a routine line says how she lies. Lying a-try
+    (`how: a-try`) keeps the helm its own script gave it and is judged only."""
+    info = ship.extra.get("hove_to")
+    if not isinstance(info, dict):
+        if ship.extra.get("lying_to.hands"):
+            lying_to_hands_off(ship)
+        return
+    for inst in getattr(runner, "instances", None) or ():
+        if inst.evo.id in HELM_MANOEUVRES and not inst.waiting and inst.script is not None:
+            return
+    timing = lying_to_timing()
+    kept = float(info.get("kept_s", 0.0)) + dt
+    info["kept_s"] = kept
+    clock = getattr(runner, "clock", None)
+    a_try = info.get("how") == "a-try"
+    if not a_try:
+        manned = _lying_to_hands_on(ship, info, clock, timing)
+        tend_lying_to(ship, info, dt, wind, timing, sheets=manned)
+    _judge_lying_to(ship, info, dt, wind, timing)
+    if ship.extra.get("hove_to") is not info:
+        return
+    # the routine line, one a watch: at the change of the watch by the ship's clock, or
+    # every four hours of lying to where the runner has been given none
+    if clock is not None:
+        name = clock.watch()
+        due = info.get("said_watch") not in (None, name)
+        info["said_watch"] = name
+    else:
+        due = int(kept // 14400.0) > int((kept - dt) // 14400.0)
+    if due:
+        sign = float(info.get("sign", 1.0))
+        off = lying_off(ship, wind, sign)
+        ship.note(
+            "routine",
+            "ship.lying_to",
+            f"Lying to on the {_tack_name(sign)} tack, her head {_points_off_words(off)} from "
+            f"the wind; the watch tending the helm and the sheets.",
+            ship.name,
+            {
+                "tack": _tack_name(sign),
+                "off_points": round(units.rad_to_points(off), 1),
+                "speed_kn": round(units.ms_to_knots(ship.dyn.u), 1),
+            },
+        )
+
+
+def _points_off_words(off: float) -> str:
+    """'six points', 'five points and a half', to the half point."""
+    from freesail.crew.model import number_words  # local import: the words' one home
+
+    halves = max(0, int(round(units.rad_to_points(abs(off)) * 2.0)))
+    whole, half = divmod(halves, 2)
+    if whole == 0:
+        return "half a point" if half else "no points"
+    noun = "point" if whole == 1 else "points"
+    return f"{number_words(whole)} {noun}{' and a half' if half else ''}"
+
 
 class HeaveToScript(Script):
-    """Heave to (M2 simplified, after Luce 1866 ch. XXVI 'To heave to'): haul up
-    the courses, lay the yards of the mast carrying the most square sail aback
-    (the main topsail to the mast), the rest full, and put the helm a-lee. The
-    physics does the rest. The backed yards are remembered in
-    ``ship.extra["hove_to"]`` so that fill away can undo it. Hauling up the
-    courses is done directly here rather than through their own evolutions,
-    which is the M2 simplification; the crew system will replace it."""
+    """Heave to (after Luce 1866 ch. XXVI 'To heave to'): haul up the courses, lay the
+    yards of the mast carrying the most square sail aback (the main topsail to the mast),
+    the rest full, and put the helm a-lee. Hauling up the courses is done directly here
+    rather than through their own evolutions, which is milestone 2's simplification.
+
+    Package 37f: her way is taken off first. The helm is not lashed a-lee: it is tended
+    from the first tick as the watch tends it afterwards (`tend_lying_to`), eased and
+    righted as she comes up, so that the way she carries does not take her head through
+    the wind. "Hove to" is said when she lies on her tack between `near_points` and
+    `far_points` from the wind with less than `way_off_kn` of way and her head quiet for
+    `lie_s`; or at `way_off_timeout_s`, if she is on her tack with the wind before the
+    beam, and otherwise the evolution fails in words. The backed yards and the tack are
+    then written in ``ship.extra["hove_to"]``: the record that she is hove to, which the
+    watch keeps her by (`keep_lying_to`) and which fill away, or whatever else ends it,
+    clears (`end_lying_to`)."""
+
+    # class defaults for the fields package 37f added, so that a heave-to caught mid-way
+    # in a checkpoint from an earlier build loads and goes on
+    headsail: Sail | None = None
+    full: tuple | list = ()
+    info: dict[str, Any] | None = None
+    quiet_s = 0.0
+    off = 0.0
+    way_was = 0.0
+    slowing = 1.0
 
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
         self.yards = yards_to_back(ship)
         self.sign = 1.0 if ship.dyn.tack == "starboard" else -1.0
         self.swing: YardSwing | None = None
+        self.headsail: Sail | None = None
+        self.full: list[Spar] = []  # the yards that stay full, braced up for the tack
+        self.info: dict[str, Any] = {}
+        self.quiet_s = 0.0
+        self.off = 0.0
+        self.way_was = units.ms_to_knots(abs(ship.dyn.u))
+        self.slowing = 1.0  # knots a second her way is falling by, smoothed
 
     def holds(self) -> set[str]:
-        return {self.ship.name} | {y.id for y in self.yards}
+        return {self.ship.name} | {y.id for y in working_yards(self.ship)}
 
     def fore_and_after(self) -> bool:
         """A vessel whose yards are all on one mast (a topsail schooner, a cutter): hove to
@@ -1183,9 +1677,27 @@ class HeaveToScript(Script):
     def begin(self, words: dict[str, Any]) -> None:
         dyn = self.ship.dyn
         self.sign = 1.0 if dyn.tack == "starboard" else -1.0
+        # The yards that stay full are braced up for the tack as she comes to (Luce 1884,
+        # ch. XXVI, 'To heave to, having the wind aft, or on the quarter': "brace the
+        # mizzen topsail sharp up ... meet her, as she comes to, with the helm, and by
+        # bracing up the head yards, and hauling aft the head sheets"). Package 37f: left
+        # as they were trimmed for a wind on the quarter they are all but square, and
+        # with her head five points from the wind every sail she has is then aback: the
+        # brig brought to from a run so went astern at a knot and a half for as long as
+        # she lay. By the wind already they do not move.
+        head, after = head_and_after_yards(self.ship)
+        sharp = sharp_up_targets(self.ship, head, after)
+        self.full = [y for y in working_yards(self.ship) if y not in self.yards]
+        braced_up = any(
+            abs(self.sign * sharp.get(y.id, y.brace_limit) - y.brace_angle) > units.deg_to_rad(3.0)
+            and self.ship.sail_of(y) is not None
+            and self.ship.sail_of(y).is_set
+            for y in self.full
+        )
         self.swing = YardSwing(
-            self.yards,
-            [-self.sign * y.brace_limit for y in self.yards],
+            self.yards + self.full,
+            [-self.sign * y.brace_limit for y in self.yards]
+            + [self.sign * sharp.get(y.id, y.brace_limit) for y in self.full],
             self.timing_value("brace_s", 45.0),
         )
         dyn.helm_mode = HelmMode.RUDDER
@@ -1228,7 +1740,7 @@ class HeaveToScript(Script):
             sl.state = SailState.IN_THE_GEAR
         if light:
             self.note(f"Clewed up {names_of_sails(self.ship, light)}.")
-        self.headsail: Sail | None = None
+        self.headsail = None
         if self.fore_and_after():
             # the fore-and-after's way (Luce 1884, ch. XXXIV, 'To Heave to'): the main
             # sheet flat aft, the staysail sheet to windward, the helm down
@@ -1254,30 +1766,115 @@ class HeaveToScript(Script):
             # them eased she came head to wind and gathered sternway; hauled aft she lies
             # five points off at a knot, truth 12)
             sheets_to(self.ship, head_sails(self.ship), None, None)
+            up = "; braced up the other yards" if braced_up else ""
             self.note(
-                f"Braced the {sail_name_on(self.ship, self.yards)} aback; hauled aft the head "
-                "sheets; helm a-lee."
+                f"Braced the {sail_name_on(self.ship, self.yards)} aback{up}; hauled aft the "
+                "head sheets; helm a-lee."
             )
+        # The other fore-and-aft sails that stay drawing (the staysails abaft the fore
+        # mast, a schooner's foresail, a fore-and-after's jib): a sheet eased for a wind
+        # free is hauled aft to the trim of a wind six points on the bow, where she is to
+        # lie ("hauling aft the head sheets", Luce 1884, ch. XXVI, of heaving to with the
+        # wind on the quarter). Left eased they shake when she has come to, and the
+        # schooner brought to from a run went astern for it (package 37f). One held on
+        # the weather side (a ship that has been taken aback and come round with her
+        # sheets where they were) is shifted over to leeward the same way.
+        others = shifted_sails(self.ship)
+        if self.fore_and_after():
+            others += [sl for sl in head_sails(self.ship) if sl is not self.headsail]
+        lee = _lee_name(self.sign)
+        for sl in others:
+            wanted = yard_trim.wanted_sheet_angle(sl.cls, HOVE_TO_DRIVER_APPARENT)
+            reading = yard_trim.read_sheet(self.ship, sl)
+            eased = reading.angle > wanted + units.deg_to_rad(1.0)
+            if reading.free or reading.held_to_windward or eased:
+                yard_trim.set_sheet_angle(self.ship, sl, min(reading.angle, wanted), lee)
+                sl.shivering = False
+        self.info = {"yards": [y.id for y in self.yards], "sign": self.sign}
+        if self.headsail is not None:
+            self.info["headsail"] = self.headsail.id
 
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
         self.t += dt
         assert self.swing is not None
-        if self.swing.advance(dt, factor):
-            info: dict[str, Any] = {"yards": [y.id for y in self.yards], "sign": self.sign}
-            if getattr(self, "headsail", None) is not None:
-                info["headsail"] = self.headsail.id
-            self.ship.extra["hove_to"] = info
-            self.finish()
+        dyn = self.ship.dyn
+        if self.info is None:  # begun under an earlier build: the record as it wrote it
+            self.info = {"yards": [y.id for y in self.yards], "sign": self.sign}
+            if self.headsail is not None:
+                self.info["headsail"] = self.headsail.id
+        swung = self.swing.advance(dt, factor)
+        # the helm and the sheets tended from the first: eased as she comes up, so that
+        # her way does not carry her head through the wind (the hands at the braces and
+        # the sheets are the evolution's own)
+        self.off = tend_lying_to(self.ship, self.info, dt, wind, self.timing, nearer=False)
+        if not swung:
+            return
+        self.phase = "take_way_off"
+        near = self.timing_value("near_points", 4.0) * POINT
+        far = self.timing_value("far_points", 7.0) * POINT
+        way = units.ms_to_knots(abs(dyn.u))
+        quiet = abs(dyn.r) <= units.deg_to_rad(self.timing_value("quiet_deg_s", 0.25))
+        # her way off: under `way_off_kn`, or no longer falling (a fore-and-after hove to
+        # forereaches a knot or two in a breeze, and that is her way of lying to)
+        self.slowing = 0.9 * self.slowing + 0.1 * (self.way_was - way) / max(dt, 1e-9)
+        self.way_was = way
+        off_kn = self.timing_value("way_off_kn", 1.5)
+        most_kn = self.timing_value("way_most_kn", 4.5)
+        ahead_kn = units.ms_to_knots(dyn.u)
+        settled = (
+            abs(self.slowing) <= self.timing_value("way_steady_kn_s", 0.004)
+            and -off_kn < ahead_kn < most_kn
+        )
+        way_off = way < off_kn or settled
+        if near <= self.off <= far and way_off and quiet:
+            self.quiet_s += dt
+        else:
+            self.quiet_s = 0.0
+        if self.quiet_s >= self.timing_value("lie_s", 20.0):
+            self._hove_to()
+        elif self.t >= self.timing_value("way_off_timeout_s", 600.0):
+            if POINT < self.off < 8 * POINT and way < most_kn:
+                self._hove_to()  # on her tack, the wind before the beam: she lies to
+            else:
+                dyn.target_rudder = 0.0
+                self.fail(
+                    f"she would not lie to on the {_tack_name(self.sign)} tack, the wind "
+                    f"{units.wind_bearing_words(wind_rel(self.ship, wind))}; the "
+                    f"{sail_name_on(self.ship, self.yards)} left aback and the helm amidships"
+                    if self.yards
+                    else f"she would not lie to on the {_tack_name(self.sign)} tack; the helm "
+                    "amidships"
+                )
+
+    def _hove_to(self) -> None:
+        self.ship.extra["hove_to"] = self.info
+        self.finish()
 
     def remaining_s(self) -> float:
-        return self.swing.remaining_s() if self.swing else self.timing_value("brace_s", 45.0)
+        brace = self.swing.remaining_s() if self.swing else self.timing_value("brace_s", 45.0)
+        if self.phase == "take_way_off":
+            return max(0.0, self.timing_value("lie_s", 20.0) - self.quiet_s)
+        return brace + self.timing_value("lie_s", 20.0)
 
     def words(self) -> dict[str, Any]:
+        tack = _tack_name(self.sign)
         if not self.yards and getattr(self, "headsail", None) is not None:
             from freesail.evolutions.runner import part_name  # local import to avoid a cycle
 
-            return {"backed": part_name(self.ship, self.headsail.id) + " sheet to windward,"}
-        return {"backed": sail_name_on(self.ship, self.yards)}
+            backed = part_name(self.ship, self.headsail.id) + " sheet to windward,"
+            return {"backed": backed, "hove_tack": tack}
+        return {"backed": sail_name_on(self.ship, self.yards), "hove_tack": tack}
+
+    def data(self) -> dict[str, Any]:
+        d = super().data()
+        d.update(
+            {
+                "tack": _tack_name(self.sign),
+                "off_points": round(units.rad_to_points(self.off), 1),
+                "speed_kn": round(units.ms_to_knots(self.ship.dyn.u), 1),
+            }
+        )
+        return d
 
 
 class FillAwayScript(Script):
@@ -1291,18 +1888,48 @@ class FillAwayScript(Script):
     head is ``fill_off_deg`` off the true wind (far enough for the backed
     sails to fill when braced) or ``fall_off_timeout_s`` has passed. Lying
     hove to as heave_to leaves her, five points off, she needs no falling
-    off and is braced at once. Then the backed yards are braced round
-    full over ``brace_s`` and the helm ordered to the close-hauled course on the
-    present tack. The courses and driver that heaving to hauled up stay as they
-    are: setting them again is the captain's order."""
+    off and is braced at once. Then every yard that is aback is braced round
+    full over ``brace_s`` and the helm given its course. The courses and driver
+    that heaving to hauled up stay as they are: setting them again is the
+    captain's order.
+
+    Package 37f (the review's 5.8 and 10.3: "fill away picks the old course or the wrong
+    tack"): she is filled on the tack she is on, the side the wind is on now, and not on
+    the tack the record says she hove to on; a ship that had put herself about was taken
+    back through the wind by it with every sail aback, three times in game 9. The yards
+    braced round are those that are aback for that tack, whichever mast they are on.
+    `fill away and steer <course>` (`params["course_deg"]`): when she is full the helm
+    has that course, if it can be laid on the tack she is on (more than half a point
+    outside close-hauled, the wind on the same side). She is braced full by the wind
+    first, as with no course, and then pays off to it, her yards and sheets trimmed to
+    the wind she has every `retrim_s` as it draws aft (Luce: "As she falls off ... trim to
+    the course"), and to the course's own wind when her head is within half a point of
+    it or `pay_off_timeout_s` has passed; braced at once for a course with the wind
+    abaft the beam, as this first did, the frigate's topsails lifted with her head
+    still five points from the wind and the log said "Her sails aback". A course that
+    cannot be laid so is said, and she is kept full and by on her tack. With no course
+    she is steered close-hauled on her tack, as before."""
+
+    # class defaults for the fields package 37f added (a checkpoint from an earlier build)
+    course: float | None = None
+    not_laid = ""
+    signed = False
+    phase_t = 0.0
+    retrim_in = 0.0
+    last_trim = False
 
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
-        info = ship.extra.get("hove_to") or {}
-        self.yards = [ship.spars[i] for i in info.get("yards", []) if i in ship.spars]
-        self.sign = float(info.get("sign", 1.0 if ship.dyn.tack == "starboard" else -1.0))
+        self.sign = 1.0 if ship.dyn.tack == "starboard" else -1.0
+        self.yards: list[Spar] = working_yards(ship)
         self.swing: YardSwing | None = None
         self.new_course = ship.dyn.heading
+        course = params.get("course_deg")
+        self.course: float | None = (
+            None if course is None else units.wrap_2pi(units.deg_to_rad(float(course)))
+        )
+        self.not_laid = ""  # why the course said could not be given her, in words
+        self.signed = False  # the tack read from the true wind, at the first tick
 
     def holds(self) -> set[str]:
         return {self.ship.name} | {y.id for y in self.yards}
@@ -1315,62 +1942,187 @@ class FillAwayScript(Script):
     def begin(self, words: dict[str, Any]) -> None:
         dyn = self.ship.dyn
         ch = close_hauled_true_angle(self.ship)
+        self.sign = 1.0 if dyn.tack == "starboard" else -1.0
         self.new_course = units.wrap_2pi(estimated_wind_from(self.ship) - self.sign * ch)
         dyn.helm_mode = HelmMode.RUDDER
         dyn.target_rudder = self.sign * units.deg_to_rad(self.timing_value("helm_deg", 20.0))
         dyn.steady = False
         self.phase = "fall_off"
+        # the watch's tending ends here: the hands at the sheets are the evolution's
+        lying_to_hands_off(self.ship)
         # the head sheets hauled aft (Luce 1866, ch. XXVI): a head sail held to windward
-        # to heave to (package 32e) is let draw, and the boom sails trimmed to the wind
+        # to heave to (package 32e) is let draw, and the boom sails trimmed to the wind,
+        # on the lee side of the tack she is on
         drawn = head_sails(self.ship)
-        draw_sheets(self.ship, drawn + boom_sails(self.ship))
+        draw_sheets(self.ship, drawn + boom_sails(self.ship), _lee_name(self.sign))
         self.note(
             "Hauled aft the head sheets; kept the helm a-lee to let her fall off.", "helm.order"
         )
 
+    def _course_for(self, wind: Wind) -> float:
+        """The course she is given when full: the one said, if it can be laid on the tack
+        she is on; else close-hauled on it, and `not_laid` says why."""
+        ch = close_hauled_true_angle(self.ship)
+        by_the_wind = units.wrap_2pi(wind.direction_from - self.sign * ch)
+        if self.course is None:
+            return by_the_wind
+        # the wind's bearing on her bow when she is on the course, on this tack's side
+        off = self.sign * units.wrap_pi(wind.direction_from - self.course)
+        said = units.format_heading(self.course)
+        tack = _tack_name(self.sign)
+        if off < 0.0:
+            self.not_laid = (
+                f"{said} lies on the other tack; she is kept full and by on the {tack} "
+                f"tack: tack or wear for it"
+            )
+            return by_the_wind
+        if off < ch + 0.5 * POINT:
+            self.not_laid = (
+                f"{said} lies too near the wind to be laid; she is kept full and by on "
+                f"the {tack} tack"
+            )
+            return by_the_wind
+        self.not_laid = ""
+        return self.course
+
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
         self.t += dt
         dyn = self.ship.dyn
-        ch = close_hauled_true_angle(self.ship)
-        self.new_course = units.wrap_2pi(wind.direction_from - self.sign * ch)
+        rel = wind_rel(self.ship, wind)
+        if not self.signed and abs(rel) > 0.5 * POINT:
+            # the tack she is on, by the wind itself (the deck's reading lags a ship that
+            # has just come round)
+            self.signed = True
+            sign = 1.0 if rel > 0 else -1.0
+            if sign != self.sign:
+                self.sign = sign
+                draw_sheets(
+                    self.ship,
+                    head_sails(self.ship) + boom_sails(self.ship),
+                    _lee_name(self.sign),
+                )
+        self.new_course = self._course_for(wind)
         if self.phase == "fall_off":
             helm = units.deg_to_rad(self.timing_value("helm_deg", 20.0))
             # with sternway the rudder works the other way: the helm a-lee throws
             # her head off; with headway it is the helm up that does it
             dyn.target_rudder = self.sign * helm if dyn.u < 0.0 else -self.sign * helm
             wanted = units.deg_to_rad(self.timing_value("fill_off_deg", 55.0))
-            fallen_off = abs(wind_rel(self.ship, wind)) >= wanted
+            fallen_off = self.sign * rel >= wanted
             if fallen_off or self.t >= self.timing_value("fall_off_timeout_s", 180.0):
                 self.phase = "brace_full"
-                what = sail_name_on(self.ship, self.yards)
+                aback = _yards_aback_for(self.ship, self.sign)
+                what = sail_name_on(self.ship, aback) if aback else "yards"
                 if self.t > 1.0:
                     self.note(f"Fallen off; braced the {what} full.")
                 else:
                     self.note(f"Braced the {what} full.")
-                self.swing = YardSwing(
-                    self.yards,
-                    [self.sign * y.brace_limit for y in self.yards],
-                    self.timing_value("brace_s", 45.0),
-                )
+                head, after = head_and_after_yards(self.ship)
+                sharp = sharp_up_targets(self.ship, head, after)
+                # every yard that is aback, or braced up for the other tack with nothing
+                # set, is braced round for this tack, sharp up by the wind (the after
+                # yards the sharper, spec 3b §2.2): full for where her head is now,
+                # whatever course she is to have
+                swung: list[Spar] = []
+                targets: list[float] = []
+                for y in self.yards:
+                    if y.brace_angle * self.sign >= 0.0 and y not in aback:
+                        continue  # full on this tack already: left as it is
+                    swung.append(y)
+                    targets.append(self.sign * sharp.get(y.id, y.brace_limit))
+                self.swing = YardSwing(swung, targets, self.timing_value("brace_s", 45.0))
                 dyn.helm_mode = HelmMode.HEADING
                 dyn.target_heading = self.new_course
                 dyn.target_rudder = 0.0
                 dyn.steady = False
             return
-        dyn.target_heading = self.new_course
+        if self.course is None or self.not_laid:
+            dyn.target_heading = self.new_course  # by the wind: the wind's own point
+        if self.phase == "pay_off":
+            self._pay_off(dt, wind, factor, rel)
+            return
         assert self.swing is not None
         if self.swing.advance(dt, factor):
-            self.ship.extra.pop("hove_to", None)
+            ch = close_hauled_true_angle(self.ship)
+            on_course = self.sign * units.wrap_pi(wind.direction_from - self.new_course)
+            if self.course is not None and not self.not_laid and on_course > ch + 0.5 * POINT:
+                # full: now she pays off to the course ordered, trimmed as she goes
+                dyn.target_heading = self.new_course
+                self.phase = "pay_off"
+                self.phase_t = 0.0
+                self.retrim_in = 0.0
+                self.swing = None
+                return
+            end_lying_to(self.ship)
             self.finish()
+
+    def _pay_off(self, dt: float, wind: Wind, factor: float, rel: float) -> None:
+        """Full and gathering way, she pays off to the course ordered: her yards and
+        sheets trimmed to the wind on her bow as it draws aft, and to the course's own
+        wind at the last."""
+        ship = self.ship
+        dyn = ship.dyn
+        dyn.target_heading = self.new_course
+        self.phase_t += dt
+        self.retrim_in -= dt
+        if self.swing is not None and self.swing.advance(dt, factor):
+            self.swing = None
+        if self.last_trim:
+            if self.swing is None:
+                end_lying_to(ship)
+                self.finish()
+            return
+        ch = close_hauled_true_angle(ship)
+        on_course = self.sign * units.wrap_pi(wind.direction_from - self.new_course)
+        now = self.sign * rel
+        there = now >= on_course - 0.5 * POINT
+        late = self.phase_t >= self.timing_value("pay_off_timeout_s", 240.0)
+        if there or late:
+            aim = on_course if there else max(ch, min(now, on_course))
+            self.last_trim = True  # done when this swing is
+        elif self.retrim_in > 0.0:
+            return
+        else:
+            aim = max(ch, min(now, on_course))
+            self.retrim_in = self.timing_value("retrim_s", 20.0)
+        every = self.timing_value("retrim_s", 20.0)
+        targets = [trim_angle(self.sign * aim, y.brace_limit, ch) for y in self.yards]
+        self.swing = YardSwing(list(self.yards), targets, every)
+        draw_sheets(ship, head_sails(ship) + boom_sails(ship), _lee_name(self.sign), aim)
 
     def remaining_s(self) -> float:
         brace_s = self.timing_value("brace_s", 45.0)
         if self.phase == "fall_off":
             return max(0.0, self.timing_value("fall_off_timeout_s", 180.0) - self.t) + brace_s
+        if self.phase == "pay_off":
+            return max(0.0, self.timing_value("pay_off_timeout_s", 240.0) - self.phase_t)
         return self.swing.remaining_s() if self.swing else brace_s
 
     def words(self) -> dict[str, Any]:
-        return {"new_course": units.format_heading(self.new_course)}
+        course = units.format_heading(self.new_course)
+        if self.not_laid:
+            course_words = f"steering {course}, full and by ({self.not_laid})"
+        elif self.course is not None:
+            course_words = f"steering {course}, the course ordered"
+        else:
+            course_words = f"steering {course}"
+        return {
+            "new_course": course,
+            "filled_tack": _tack_name(self.sign),
+            "course_words": course_words,
+        }
+
+    def data(self) -> dict[str, Any]:
+        d = super().data()
+        d.update(
+            {
+                "tack": _tack_name(self.sign),
+                "course_deg": round(units.rad_to_deg(self.new_course), 1),
+                "course_ordered": self.course is not None and not self.not_laid,
+                "not_laid": self.not_laid,
+            }
+        )
+        return d
 
 
 # ---------------------------------------------------------------------------
@@ -3870,11 +4622,16 @@ class _AnchorScript(Script):
     """What the anchor scripts share: the tackle found, the anchor named, the cable
     veered or hove by the fathom at a rate."""
 
+    # the scope each other anchor had before its cable was veered to follow this one's
+    # coming in (package 37f); a class default for a checkpoint from an earlier build
+    followed: dict[str, float] | None = None
+
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
         self.tackle = _tackle(ship)
         self.anchor: Any = None
         self.wind: Wind | None = None
+        self.followed = None
 
     def holds(self) -> set[str]:
         return {self.ship.name}
@@ -3887,6 +4644,27 @@ class _AnchorScript(Script):
     def _named(self, words: Any) -> Any:
         anchor = self.tackle.by_words(words if isinstance(words, str) else None)
         return anchor
+
+    def _worked(self) -> str | None:
+        """The anchor an order to veer or heave in works: the one it names
+        (`params["anchor"]`), which must be down, or the one she rides by. Sets
+        `self.anchor`; returns the refusal in words, which name the anchor she rides by
+        (package 37f: `veer the small bower to 80 fathoms` veered the best bower, and
+        `weigh the small bower` weighed it, without a word)."""
+        riding = self.tackle.riding_by()
+        if riding is None:
+            return "no anchor is down"
+        named = self.params.get("anchor")
+        if not named:
+            self.anchor = riding
+            return None
+        anchor = self._named(named)
+        if anchor is None:
+            return f"no anchor aboard answers to '{named}'; she rides by {riding.name}"
+        if not anchor.down:
+            return f"{anchor.name} is {anchor.state.value}, not down; she rides by {riding.name}"
+        self.anchor = anchor
+        return None
 
     def _veer(self, dt: float, factor: float, target_m: float, rate_key: str) -> bool:
         """The cable veered toward `target_m` at the file's rate; True when there."""
@@ -3901,6 +4679,31 @@ class _AnchorScript(Script):
         self.anchor.scope_m = max(target_m, self.anchor.scope_m - rate * dt)
         return self.anchor.scope_m <= target_m + 1e-6
 
+    def _follow(self, dt: float, factor: float) -> None:
+        """Another anchor down while this one's cable comes in: its cable veered to
+        follow (`_veer_to_follow`), and what it had out before remembered for the words.
+        Without it a moored ship hove toward one anchor drags the other home (package
+        37f: the review's table of the ground-tackle orders, run moored)."""
+        others = [a for a in self.tackle.down() if a is not self.anchor]
+        if not others:
+            return
+        if self.followed is None:
+            self.followed = {a.id: a.scope_m for a in others}
+        _veer_to_follow(
+            self.ship, self.anchor, others, dt, factor, self.timing_value("veer_fathoms_per_s", 1.0)
+        )
+
+    def _followed_words(self) -> str:
+        """'; the small bower's cable veered to ninety fathoms as it came in', or nothing."""
+        said = []
+        for a in self.tackle.down() if self.tackle is not None else []:
+            before = (self.followed or {}).get(a.id)
+            if before is not None and a.scope_m > before + units.fathoms_to_m(1.0):
+                said.append(
+                    f"{a.name}'s cable veered to {_fathoms_words(a.scope_fathoms)} as it came in"
+                )
+        return ("; " + "; ".join(said)) if said else ""
+
     def words(self) -> dict[str, Any]:
         anchor = self.anchor.name if self.anchor is not None else "the anchor"
         fathoms = self.anchor.scope_fathoms if self.anchor is not None else 0.0
@@ -3911,6 +4714,7 @@ class _AnchorScript(Script):
             "fathoms": _fathoms_words(fathoms),
             "depth": _depth_words(depth),
             "riding": _riding(self.ship, self.wind),
+            "followed": self._followed_words(),
         }
 
     def data(self) -> dict[str, Any]:
@@ -3946,10 +4750,19 @@ def _let_go(ship: Ship, anchor: Any, depth_m: float) -> None:
     anchor.ground_x, anchor.ground_y = hx, hy
     anchor.depth_m = depth_m
     anchor.scope_m = depth_m
+    if end_lying_to(ship):
+        # brought to her anchor she is hove to no longer (package 37f): the record
+        # cleared and the helm righted
+        ship.dyn.helm_mode = HelmMode.RUDDER
+        ship.dyn.target_rudder = 0.0
     anchor.bottom = str(ship.extra.get("bottom", "") or "")
     anchor.taut = False
     anchor.dragging = False
     anchor.cable_load_kn = 0.0
+    anchor.drag_s = anchor.hold_s = anchor.drag_m = anchor.moved_m = 0.0
+    # she is not yet brought up by it: the evolution says when she is, or the World
+    # (`World._say_brought_up`, for an anchor let go by itself)
+    anchor.brought_up = False
 
 
 def _scope_wanted(ship: Ship, anchor: Any, depth_m: float, fathoms: Any) -> float:
@@ -3960,8 +4773,130 @@ def _scope_wanted(ship: Ship, anchor: Any, depth_m: float, fathoms: Any) -> floa
     return scope_wanted_m(depth_m)
 
 
+def _scope_plan(anchor: Any, depth_m: float, fathoms: Any) -> tuple[float, str]:
+    """The cable an anchor let go in this depth will be given, metres, and the words for
+    it as the anchor goes (package 37f; the owner's ruling of 2026-10-07: `let go` keeps
+    veering the scope the depth wants, says the figure as it lets go, and takes a number
+    when one is given): 'veering to a hundred and thirty fathoms, five times the depth';
+    'veering to forty-five fathoms and no further'; or all the cable she has to it, when
+    the depth wants more."""
+    from freesail.physics.anchor import RIDING_SCOPE_PER_DEPTH, scope_wanted_m
+    from freesail.world.reckoning import number_words
+
+    whole_m = units.fathoms_to_m(anchor.cable_fathoms)
+    if fathoms:
+        target = min(units.fathoms_to_m(float(fathoms)), whole_m)
+        return target, f"veering to {_fathoms_words(units.m_to_fathoms(target))} and no further"
+    wanted = scope_wanted_m(depth_m)
+    times = number_words(int(round(RIDING_SCOPE_PER_DEPTH)))
+    if wanted > whole_m + 1e-6:
+        return whole_m, (
+            f"veering all the cable bent to it, {_fathoms_words(anchor.cable_fathoms)}, "
+            f"where {times} times the depth wants {_fathoms_words(units.m_to_fathoms(wanted))}"
+        )
+    return wanted, (
+        f"veering to {_fathoms_words(units.m_to_fathoms(wanted))}, {times} times the depth"
+    )
+
+
+def _low_water_warning(ship: Ship, depth_m: float) -> str | None:
+    """'By the master's tide there will be two fathoms here at low water, and she draws
+    eleven feet.': the warning as an anchor goes, when the water the lead finds less the
+    fall the master reckons to low water (his own tide by the epitome, never the
+    world's) is less than her draught; else None (package 37f; the review's 5.8:
+    "Nothing checks depth against draught")."""
+    world = _world_of(ship)
+    nav = getattr(world, "navigation", None)
+    fall = getattr(nav, "tide_height_by_master_m", None)
+    if fall is None:
+        return None
+    at_low = depth_m - float(fall())
+    draught = float(ship.hull.spec.draught_m)
+    if at_low >= draught:
+        return None
+    feet = int(round(units.m_to_feet(draught)))
+    there = "no water" if at_low <= 0.0 else _depth_words(at_low)
+    return (
+        f"By the master's tide there will be {there} here at low water, and she draws {feet} feet."
+    )
+
+
+def _anchoring_warnings(
+    ship: Ship, anchor: Any, depth_m: float, scope_m: float, fathoms: Any = None
+) -> None:
+    """The notable lines as an anchor goes: the scope when it is more than the cable she
+    has, the swinging room on the scope to be veered, and the water at low water against
+    her draught."""
+    for kind, text in (
+        ("anchor.scope_warning", _cable_warning(anchor, depth_m, fathoms)),
+        ("anchor.scope_warning", _scope_warning(ship, anchor, depth_m, scope_m)),
+        ("anchor.depth_warning", _low_water_warning(ship, depth_m)),
+    ):
+        if text:
+            ship.note("notable", kind, text, ship.name, {})
+
+
+def _cable_warning(anchor: Any, depth_m: float, fathoms: Any) -> str | None:
+    """'The best bower has a hundred and twenty fathoms of cable bent to it, and five
+    times the depth wants a hundred and thirty: she will have all of it and no more.':
+    the warning when the scope ordered, or the scope the depth wants, is more than the
+    cable she has; else None (package 37f, item 7)."""
+    from freesail.physics.anchor import RIDING_SCOPE_PER_DEPTH, scope_wanted_m
+    from freesail.world.reckoning import number_words
+
+    whole = float(anchor.cable_fathoms)
+    if fathoms:
+        asked = float(fathoms)
+        why = f"{_fathoms_words(asked)} were ordered"
+    else:
+        asked = units.m_to_fathoms(scope_wanted_m(depth_m))
+        times = number_words(int(round(RIDING_SCOPE_PER_DEPTH)))
+        why = f"{times} times the depth wants {_fathoms_words(asked)}"
+    if asked <= whole + 0.5:
+        return None
+    return (
+        f"{_cap(anchor.name)} has {_fathoms_words(whole)} of cable bent to it, and {why}: "
+        "she will have all of it and no more."
+    )
+
+
+# A ship at anchor swings about it with the wind and the tide: the circle's radius is the
+# cable along the ground and her own length. The scope is warned of when the circle comes
+# within this of the nearest land, as the lookout judges it (package 37f; a cable: the
+# brief's figure, the least a prudent officer leaves under his stern).
+SWINGING_ROOM_M = units.CABLE
+
+
+def _scope_warning(ship: Ship, anchor: Any, depth_m: float, scope_m: float) -> str | None:
+    """'With a hundred and thirty fathoms out she will swing within a cable of the land to
+    the northward.': the warning as the scope is said, when her swinging circle on that
+    scope comes within `SWINGING_ROOM_M` of the nearest land by the lookout's judgement
+    (his distance by estimation, never the chart's), else None. In game 9 the officer
+    veered a hundred and twenty-eight fathoms in a berth two cables from the shore."""
+    from freesail.world.reckoning import ward_words
+
+    world = _world_of(ship)
+    lookout = getattr(world, "lookout", None)
+    if lookout is None:
+        return None
+    land = lookout.nearest_land(float(ship.dyn.heading))
+    if not land:
+        return None
+    along = math.sqrt(max(scope_m * scope_m - depth_m * depth_m, 0.0))
+    room = float(land["metres"]) - (along + ship.hull.length)
+    if room >= SWINGING_ROOM_M:
+        return None
+    toward = units.parse_compass_point(str(land.get("bearing") or ""))
+    where = f" {ward_words(toward)}" if toward is not None else ""
+    out = _fathoms_words(units.m_to_fathoms(scope_m))
+    how = "onto" if room <= 0.0 else "within a cable of"
+    return f"With {out} out she will swing {how} the land{where}."
+
+
 class ComeToAnchorScript(_AnchorScript):
     """Come to an anchor as Luce has it (data/evolutions/come_to_anchor.yaml)."""
+
+    let_go_depth: float | None = None  # "in twelve fathoms": the depth to let go in, metres
 
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
@@ -3988,14 +4923,45 @@ class ComeToAnchorScript(_AnchorScript):
         depth = _water_depth(self.ship)
         if depth is None:
             return "no bottom here to anchor in"
-        if depth > units.fathoms_to_m(self.anchor.cable_fathoms) / 3.0:
+        whole = units.fathoms_to_m(self.anchor.cable_fathoms)
+        wanted = self.params.get("depth_fathoms")
+        if wanted:
+            # "come to an anchor in twelve fathoms": the depth to let go in, as the primer
+            # has it; she stands on until the lead calls it (package 37f)
+            self.let_go_depth = units.fathoms_to_m(float(wanted))
+            depth = self.let_go_depth
+        if depth > whole / 3.0:
             return (
-                f"no anchoring ground here: {_depth_words(depth)}, and {self.anchor.name} "
-                f"has {_fathoms_words(self.anchor.cable_fathoms)} of cable"
+                f"no anchoring ground {'there' if wanted else 'here'}: {_depth_words(depth)}, "
+                f"and {self.anchor.name} has {_fathoms_words(self.anchor.cable_fathoms)} of cable"
+            )
+        scope = self.params.get("fathoms")
+        if scope and units.fathoms_to_m(float(scope)) < depth:
+            return (
+                f"{_fathoms_words(float(scope))} of cable will not reach the bottom in "
+                f"{_depth_words(depth)}"
+            )
+        if scope and units.fathoms_to_m(float(scope)) > whole + 1e-6:
+            return (
+                f"{self.anchor.name} has but {_fathoms_words(self.anchor.cable_fathoms)} of "
+                f"cable bent to it"
             )
         return None
 
     def begin(self, words: dict[str, Any]) -> None:
+        ship = self.ship
+        depth = _water_depth(ship)
+        if self.let_go_depth is not None and (depth is None or depth > self.let_go_depth):
+            self.phase = "stand_on"
+            self.phase_t = 0.0
+            self.note(
+                f"Stand on until the lead calls {_depth_words(self.let_go_depth)}; the anchor "
+                "clear for letting go."
+            )
+            return
+        self._shorten_sail()
+
+    def _shorten_sail(self) -> None:
         ship = self.ship
         self.phase = "shorten_sail"
         self.phase_t = 0.0
@@ -4030,6 +4996,18 @@ class ComeToAnchorScript(_AnchorScript):
         self.wind = wind
         ship = self.ship
         dyn = ship.dyn
+        if self.phase == "stand_on":
+            depth = _water_depth(ship)
+            assert self.let_go_depth is not None
+            if depth is not None and depth <= self.let_go_depth:
+                self.note(f"The lead calls {_depth_words(depth)}.")
+                self._shorten_sail()
+            elif self.phase_t >= self.timing_value("stand_on_timeout_s", 3600.0):
+                self.fail(
+                    f"the lead has not called {_depth_words(self.let_go_depth)} in an hour's "
+                    f"standing on; {_depth_words(depth)} here"
+                )
+            return
         if self.phase == "shorten_sail":
             if self.phase_t >= self.timing_value("clew_up_s", 150.0) * factor:
                 self.phase = "round_to"
@@ -4060,7 +5038,7 @@ class ComeToAnchorScript(_AnchorScript):
                 self.phase = "veer"
                 self.phase_t = 0.0
                 _let_go(ship, self.anchor, depth)
-                self.target = _scope_wanted(ship, self.anchor, depth, self.params.get("fathoms"))
+                self.target, plan = _scope_plan(self.anchor, depth, self.params.get("fathoms"))
                 self.note(
                     f"Stand clear of the cable; stream the buoy; let go {self.anchor.name}! "
                     f"Let go in {_depth_words(depth)}."
@@ -4068,9 +5046,15 @@ class ComeToAnchorScript(_AnchorScript):
                 ship.note(
                     "notable",
                     "ship.anchored",
-                    f"{_cap(self.anchor.name)} let go in {_depth_words(depth)}.",
+                    f"{_cap(self.anchor.name)} let go in {_depth_words(depth)}; {plan}.",
                     ship.name,
-                    {"anchor": self.anchor.to_dict()},
+                    {
+                        "anchor": self.anchor.to_dict(),
+                        "scope_fathoms": round(units.m_to_fathoms(self.target), 1),
+                    },
+                )
+                _anchoring_warnings(
+                    ship, self.anchor, depth, self.target, self.params.get("fathoms")
                 )
             return
         if self.phase == "veer":
@@ -4095,6 +5079,7 @@ class ComeToAnchorScript(_AnchorScript):
                 self.swing = YardSwing(
                     yards, [0.0 for _ in yards], self.timing_value("furl_s", 600.0)
                 )
+                self.anchor.brought_up = True  # the evolution's own line says so
                 self.note("Brought up. Stations for furling sail; square the yards.")
             return
         if self.phase == "furl":
@@ -4135,11 +5120,23 @@ def _is_upper_square(ship: Ship, sail: Any) -> bool:
 
 
 class LetGoAnchorScript(_AnchorScript):
-    """Let go an anchor where she is (data/evolutions/let_go_anchor.yaml)."""
+    """Let go an anchor where she is (data/evolutions/let_go_anchor.yaml). It veers the
+    scope the depth wants, five times the depth, and its first line says the figure; with
+    a number (`let go the best bower and veer to 45 fathoms`) it veers to that and no
+    further (package 37f; the owner's ruling of 2026-10-07: the officer of game 9 met the
+    scope as a veer that "ran past its number")."""
+
+    # class defaults for the fields package 37f added (a checkpoint from an earlier build)
+    plan = ""
+    depth0: float | None = None
+    warned = True
 
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
         self.target = 0.0
+        self.plan = ""
+        self.depth0: float | None = None
+        self.warned = False
 
     def check(self, words: dict[str, Any]) -> str | None:
         if (why := self._no_tackle()) is not None:
@@ -4160,30 +5157,63 @@ class LetGoAnchorScript(_AnchorScript):
         depth = _water_depth(self.ship)
         if depth is None:
             return "no bottom here to anchor in"
-        if depth > units.fathoms_to_m(self.anchor.cable_fathoms) / 3.0:
+        whole = units.fathoms_to_m(self.anchor.cable_fathoms)
+        if depth > whole / 3.0:
             return f"no anchoring ground here: {_depth_words(depth)}"
+        scope = self.params.get("fathoms")
+        if scope and units.fathoms_to_m(float(scope)) < depth:
+            return (
+                f"{_fathoms_words(float(scope))} of cable will not reach the bottom in "
+                f"{_depth_words(depth)}"
+            )
+        if scope and units.fathoms_to_m(float(scope)) > whole + 1e-6:
+            return (
+                f"{self.anchor.name} has but {_fathoms_words(self.anchor.cable_fathoms)} of "
+                f"cable bent to it"
+            )
         return None
 
     def begin(self, words: dict[str, Any]) -> None:
         self.phase = "stand_clear"
+        # what it will do, said as the order is given: the depth here and the scope
+        self.depth0 = _water_depth(self.ship)
+        if self.depth0 is not None:
+            self.target, self.plan = _scope_plan(
+                self.anchor, self.depth0, self.params.get("fathoms")
+            )
 
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
         self.t += dt
         self.wind = wind
         if self.phase == "stand_clear":
+            if not self.warned and self.depth0 is not None:
+                self.warned = True
+                _anchoring_warnings(
+                    self.ship, self.anchor, self.depth0, self.target, self.params.get("fathoms")
+                )
             if self.t >= self.timing_value("stand_clear_s", 15.0) * factor:
                 depth = _water_depth(self.ship)
                 if depth is None:
                     self.fail("no bottom here to anchor in")
                     return
                 _let_go(self.ship, self.anchor, depth)
-                self.target = _scope_wanted(
-                    self.ship, self.anchor, depth, self.params.get("fathoms")
-                )
+                self.target, self.plan = _scope_plan(self.anchor, depth, self.params.get("fathoms"))
                 self.phase = "veer"
             return
         if self._veer(dt, factor, self.target, "veer_fathoms_per_s"):
             self.finish()
+
+    def words(self) -> dict[str, Any]:
+        d = super().words()
+        depth = self.depth0 if self.depth0 is not None else _water_depth(self.ship)
+        d["let_go_depth"] = _depth_words(depth)
+        d["plan"] = self.plan or "veering to the scope the depth wants"
+        return d
+
+    def data(self) -> dict[str, Any]:
+        d = super().data()
+        d["scope_fathoms"] = round(units.m_to_fathoms(self.target), 1)
+        return d
 
     def remaining_s(self) -> float:
         if self.anchor is None:
@@ -4193,7 +5223,8 @@ class LetGoAnchorScript(_AnchorScript):
 
 
 class VeerCableScript(_AnchorScript):
-    """Veer cable on the anchor she rides by (data/evolutions/veer_cable.yaml)."""
+    """Veer cable on the anchor she rides by, or on the one named
+    (data/evolutions/veer_cable.yaml)."""
 
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
@@ -4202,9 +5233,8 @@ class VeerCableScript(_AnchorScript):
     def check(self, words: dict[str, Any]) -> str | None:
         if (why := self._no_tackle()) is not None:
             return why
-        self.anchor = self.tackle.riding_by()
-        if self.anchor is None:
-            return "no anchor is down to veer on"
+        if (why := self._worked()) is not None:
+            return f"{why} to veer on" if why == "no anchor is down" else why
         whole = units.fathoms_to_m(self.anchor.cable_fathoms)
         fathoms = self.params.get("fathoms")
         if fathoms:
@@ -4213,7 +5243,13 @@ class VeerCableScript(_AnchorScript):
         else:
             self.target = self.anchor.scope_m * 4.0 / 3.0
         if self.target <= self.anchor.scope_m + 1e-6:
-            return f"{self.anchor.name} has {_fathoms_words(self.anchor.scope_fathoms)} out already"
+            out = _fathoms_words(self.anchor.scope_fathoms)
+            return (
+                f"{self.anchor.name} has {out} out already; to have less out, heave in to "
+                f"{float(fathoms):g} fathoms"
+                if fathoms
+                else f"{self.anchor.name} has {out} out already"
+            )
         if self.anchor.scope_m >= whole - 1e-6:
             whole_words = _fathoms_words(self.anchor.cable_fathoms)
             return f"the whole cable is out on {self.anchor.name}, {whole_words}"
@@ -4246,13 +5282,15 @@ class HeaveShortScript(_AnchorScript):
     def check(self, words: dict[str, Any]) -> str | None:
         if (why := self._no_tackle()) is not None:
             return why
-        self.anchor = self.tackle.riding_by()
-        if self.anchor is None:
-            return "no anchor is down"
+        if (why := self._worked()) is not None:
+            return why
         per = self.timing_value("short_stay_per_depth", 1.5)
         self.target = max(self.anchor.depth_m * per, self.anchor.depth_m)
         if self.anchor.scope_m <= self.target + 1e-6:
-            return f"she is hove short already, {_fathoms_words(self.anchor.scope_fathoms)} out"
+            out = _fathoms_words(self.anchor.scope_fathoms)
+            if self.params.get("anchor"):
+                return f"{self.anchor.name} is hove short already, {out} out"
+            return f"she is hove short already, {out} out"
         return None
 
     def begin(self, words: dict[str, Any]) -> None:
@@ -4267,6 +5305,71 @@ class HeaveShortScript(_AnchorScript):
                 self.phase = "heave"
                 self.note("The messenger passed, the bars shipped and swiftered; heave round!")
             return
+        self._follow(dt, factor)
+        if self._heave(dt, factor, self.target, "heave_fathoms_per_s"):
+            self.anchor.heaving = False
+            self.finish()
+
+    def remaining_s(self) -> float:
+        if self.anchor is None:
+            return 60.0
+        left = max(0.0, self.anchor.scope_m - self.target)
+        return units.m_to_fathoms(left) / max(self.timing_value("heave_fathoms_per_s", 0.1), 0.01)
+
+
+class HeaveInScript(_AnchorScript):
+    """Heave in so much cable, or to a scope, at the capstan (data/evolutions/heave_in.yaml;
+    package 37f: `heave in 70 fathoms` ran as `heave short`, and 163 fathoms came in). On
+    the anchor named, or the one she rides by; never to less than the depth, which is the
+    cable up and down and the anchor breaking out: that is `weigh`."""
+
+    def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
+        super().__init__(ship, params, timing)
+        self.target = 0.0
+
+    def check(self, words: dict[str, Any]) -> str | None:
+        if (why := self._no_tackle()) is not None:
+            return why
+        if (why := self._worked()) is not None:
+            return why
+        fathoms = self.params.get("fathoms")
+        if not fathoms or float(fathoms) <= 0.0:
+            return "heave in how much? Say 'heave in twenty fathoms' or 'heave in to eighty'"
+        wanted = units.fathoms_to_m(float(fathoms))
+        out = _fathoms_words(self.anchor.scope_fathoms)
+        if self.params.get("to"):
+            self.target = wanted
+            if self.target >= self.anchor.scope_m - 1e-6:
+                return (
+                    f"{self.anchor.name} has but {out} out; to have more out, veer to "
+                    f"{float(fathoms):g} fathoms"
+                )
+        else:
+            self.target = self.anchor.scope_m - wanted
+        if self.target < self.anchor.depth_m - 1e-6:
+            per = self.timing_value("short_stay_per_depth", 1.5)
+            short = _fathoms_words(units.m_to_fathoms(self.anchor.depth_m * per))
+            left = _fathoms_words(units.m_to_fathoms(max(self.target, 0.0)))
+            return (
+                f"{left} of cable in {_depth_words(self.anchor.depth_m)} of water would have "
+                f"{self.anchor.name} off the ground ({out} are out): to heave it up say "
+                f"'weigh', and for a short stay, {short}, 'heave short'"
+            )
+        return None
+
+    def begin(self, words: dict[str, Any]) -> None:
+        self.phase = "rig_capstan"
+        self.anchor.heaving = True
+
+    def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        self.t += dt
+        self.wind = wind
+        if self.phase == "rig_capstan":
+            if self.t >= self.timing_value("rig_capstan_s", 180.0) * factor:
+                self.phase = "heave"
+                self.note("The messenger passed, the bars shipped and swiftered; heave round!")
+            return
+        self._follow(dt, factor)
         if self._heave(dt, factor, self.target, "heave_fathoms_per_s"):
             self.anchor.heaving = False
             self.finish()
@@ -4280,21 +5383,46 @@ class HeaveShortScript(_AnchorScript):
 
 class WeighAnchorScript(_AnchorScript):
     """Weigh: heave in, break the anchor out, hove up to the bows, cat and fish
-    (data/evolutions/weigh_anchor.yaml)."""
+    (data/evolutions/weigh_anchor.yaml).
+
+    Package 37f: the anchor named is the one weighed (`weigh the small bower`); with none
+    named, the one she rides by. While another anchor holds her, she is hove up to this one
+    by the unmoor's method, the other cable veered as this one comes in (Luce 1866, ch.
+    XXXIV, 'Unmooring'); where the other cable has not the length to let her come over
+    this anchor, the order is refused in words that name the anchor she rides by and what
+    would do it. Never another anchor in silence."""
+
+    others: tuple | list = ()  # a class default: a weigh in a checkpoint from an earlier build
 
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
         self.phase_t = 0.0
         self.hoist_s = 0.0
+        self.others: list[Any] = []  # the anchors that still hold her, their cables veered
 
     def check(self, words: dict[str, Any]) -> str | None:
         if (why := self._no_tackle()) is not None:
             return why
-        self.anchor = self.tackle.riding_by()
-        if self.anchor is None:
-            return "no anchor is down"
+        if (why := self._worked()) is not None:
+            return why
         if self.ship.extra.get("aground"):
             return "she is aground"
+        riding = self.tackle.riding_by()
+        self.others = [a for a in self.tackle.down() if a is not self.anchor]
+        for other in self.others:
+            need = _reach_m(self.ship, self.anchor, other)
+            if need is None:
+                continue
+            whole = units.fathoms_to_m(other.cable_fathoms)
+            if need > whole + 1e-6:
+                apart = _fathoms_words(units.m_to_fathoms(need))
+                return (
+                    f"{self.anchor.name} cannot be hove up while {other.name} holds her: to "
+                    f"come over it she must have {apart} of {other.name}'s cable, which is "
+                    f"{_fathoms_words(other.cable_fathoms)} in all. Weigh {other.name} first"
+                    f"{', or unmoor' if len(self.tackle.down()) == 2 else ''}; she rides by "
+                    f"{riding.name}"
+                )
         return None
 
     def begin(self, words: dict[str, Any]) -> None:
@@ -4319,14 +5447,29 @@ class WeighAnchorScript(_AnchorScript):
             return
         if self.phase == "heave":
             up_and_down = max(self.anchor.depth_m, 1.0)
+            # the cables of the anchors that still hold her veered as this one comes in,
+            # so that she is hove up to it and not held between the two
+            _veer_to_follow(
+                ship,
+                self.anchor,
+                list(self.others),
+                dt,
+                factor,
+                self.timing_value("veer_fathoms_per_s", 1.0),
+            )
             if self._heave(dt, factor, up_and_down, "heave_fathoms_per_s"):
                 self.phase = "break_out"
                 self.phase_t = 0.0
-                self.note("The cable is up and down.")
+                self.note(
+                    f"{_cap(self.anchor.name)}'s cable is up and down."
+                    if self.others
+                    else "The cable is up and down."
+                )
             return
         if self.phase == "break_out":
             if self.phase_t >= self.timing_value("break_out_s", 60.0) * factor:
                 self.anchor.state = AnchorState.AWEIGH
+                end_lying_to(ship)  # weighing, she is hove to no longer (package 37f)
                 self.anchor.heaving = False
                 self.anchor.taut = False
                 self.anchor.dragging = False
@@ -4372,6 +5515,49 @@ class WeighAnchorScript(_AnchorScript):
             + self.timing_value("break_out_s", 60.0)
             + self.timing_value("cat_and_fish_s", 300.0)
         )
+
+    def words(self) -> dict[str, Any]:
+        d = super().words()
+        riding = self.tackle.riding_by() if self.tackle is not None else None
+        if riding is not None and riding is not self.anchor:
+            d["after"] = f"she rides by {riding.name}, {_fathoms_words(riding.scope_fathoms)} out"
+        else:
+            d["after"] = "she is under way"
+        return d
+
+
+def _reach_m(ship: Ship, anchor: Any, other: Any) -> float | None:
+    """The cable `other` must have out for the ship to lie over `anchor`: from her hawse
+    there to where `other` lies, with the water over it; None if either is not placed."""
+    if None in (anchor.ground_x, anchor.ground_y, other.ground_x, other.ground_y):
+        return None
+    apart = math.hypot(other.ground_x - anchor.ground_x, other.ground_y - anchor.ground_y)
+    return math.hypot(apart, max(other.depth_m, 0.0))
+
+
+def _veer_to_follow(
+    ship: Ship, anchor: Any, others: list[Any], dt: float, factor: float, rate_fm_s: float
+) -> None:
+    """The cables of the anchors that still hold her veered as `anchor`'s comes in (the
+    unmoor's method, for any anchor weighed while another is down: Luce 1866, ch. XXXIV,
+    'Unmooring', "veer away on the weather cable as the lee one comes in"). Each is given
+    what lets her lie between the two anchors at the scope now out on the one being hove:
+    their distance apart less that scope along the ground, with the water over it and a
+    fiftieth to spare, as far as it has cable; never taken in. She is so kept riding by the
+    other anchor till she is over this one, and the other cable is not run out to let her
+    swing round it."""
+    rate = units.fathoms_to_m(rate_fm_s) / max(factor, 1e-9)
+    if anchor.ground_x is None or anchor.ground_y is None:
+        return
+    along = math.sqrt(max(anchor.scope_m**2 - max(anchor.depth_m, 0.0) ** 2, 0.0))
+    for other in others:
+        if not other.down or other.ground_x is None or other.ground_y is None:
+            continue
+        apart = math.hypot(other.ground_x - anchor.ground_x, other.ground_y - anchor.ground_y)
+        line = math.hypot(max(apart - along, 0.0), max(other.depth_m, 0.0))
+        wanted = min(1.02 * line, units.fathoms_to_m(other.cable_fathoms))
+        if other.scope_m < wanted:
+            other.scope_m = min(wanted, other.scope_m + rate * dt)
 
 
 class CatAndFishScript(_AnchorScript):
@@ -4545,7 +5731,18 @@ def _set_fore_and_aft(ship: Ship, sails: list[Sail], tack: str) -> None:
 class GetUnderWayScript(_AnchorScript):
     """Get under way as Luce has it (data/evolutions/get_under_way.yaml): heave short,
     loose and sheet home the topsails, weigh, cast her on the tack wanted; the anchor
-    catted and fished as she pays off."""
+    catted and fished as she pays off.
+
+    Package 37f (the review of gate 5c's playtests, 5.8, "Getting under way"): a vessel
+    whose yards are all on one mast casts as a fore-and-after does, her jib's sheet held
+    to windward, her mainsail's eased till she has cast, and her helm tended (a-lee
+    while she drops astern, up when she has headway); and "paid off" is never said on a
+    timeout: at cast_timeout_s she is taken as she lies, on the tack wanted, on the
+    other (which the line says, and she is got under way on it), or hanging head to
+    wind, when she is given till cast_give_up_s and the evolution then fails in words."""
+
+    fore_and_aft = False  # a class default, for a checkpoint from an earlier build
+    main_eased = False  # the same: her main sheet eased off as she pays off
 
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
@@ -4559,6 +5756,7 @@ class GetUnderWayScript(_AnchorScript):
         self.anchor_t = 0.0  # the anchor's own clock from the break-out: hoisting, catting
         self.anchor_phase = ""
         self.cast_done = False
+        self.fore_and_aft = False
         self.sails_words = "under topsails and jib"
         self.pilot_course = False
         self.course_not_laid: float | None = None
@@ -4601,8 +5799,37 @@ class GetUnderWayScript(_AnchorScript):
         self.phase = "rig_capstan" if self.anchor.scope_m > self.short_m + 1e-6 else "loose"
         self.phase_t = 0.0
         self.anchor.heaving = True
+        self.fore_and_aft = len(_masts_with_yards(self.ship)) < 2
         if self.phase == "loose":
             self._begin_loose()
+
+    def _sheer_helm(self) -> None:
+        """A fore-and-after's helm, tended from the first heave till she has cast
+        (package 37f): put over to sheer her head across the wind for the tack wanted
+        while she has way through the water (heaving up to her anchor she has, and in a
+        stream), a-lee for the stern-board when she has none or drops astern. Left where
+        the last course had it, as it was, the helmsman steered for that course as the
+        capstan drew her ahead, and sheered her as often the wrong way as the right: the
+        wind was then three and four points on the wrong bow when the anchor broke out,
+        and no jib will throw her head across the wind from there."""
+        dyn = self.ship.dyn
+        helm = units.deg_to_rad(15.0)
+        dyn.helm_mode = HelmMode.RUDDER
+        dyn.steady = False
+        dyn.target_rudder = -self.sign * helm if dyn.u > 0.15 else self.sign * helm
+
+    def _steady_boom_over(self) -> None:
+        """Her main boom steadied over to the side she is to cast toward (see the tick)."""
+        mains = [sl for sl in _boom_mainsails(self.ship) if sl.is_set]
+        angle = units.deg_to_rad(self.timing_value("cast_boom_deg", 30.0))
+        sheets_to(self.ship, mains, _lee_name(self.sign), angle)
+        for sl in mains:
+            for ln in self.ship.sheets_of(sl):
+                if ln.side is None and ln.state is LineState.BELAYED:
+                    # held there whichever bow the wind is on (a sheet worked to the lee
+                    # side of the moment is not held, and the boom would swing across)
+                    ln.held_side = _lee_name(self.sign)
+            yard_trim.refresh_reading(self.ship, sl)
 
     def _begin_loose(self) -> None:
         ship = self.ship
@@ -4636,6 +5863,14 @@ class GetUnderWayScript(_AnchorScript):
         dyn = ship.dyn
         if self.swing is not None:
             self.swing.advance(dt, factor)
+        if self.fore_and_aft and self.phase in (
+            "rig_capstan",
+            "heave_short",
+            "loose",
+            "heave",
+            "break_out",
+        ):
+            self._sheer_helm()
         if self.phase == "rig_capstan":
             if self.phase_t >= self.timing_value("rig_capstan_s", 180.0) * factor:
                 self.phase = "heave_short"
@@ -4653,20 +5888,47 @@ class GetUnderWayScript(_AnchorScript):
                     if sl.state in (SailState.LOOSED, SailState.FURLED, SailState.IN_THE_GEAR):
                         sl.state = SailState.SET
                         sl.reefs = 0
-                _set_fore_and_aft(ship, _boom_mainsails(ship), self.tack)
+                mains = _boom_mainsails(ship)
+                _set_fore_and_aft(ship, mains, self.tack)
+                # A fore-and-after's mainsail is hoisted with its boom steadied over to
+                # the side she is to cast toward, the lee side of the tack wanted (package
+                # 37f; Luce 1884, ch. XXXIV, 'Getting under way.--Schooners': "To cast to
+                # starboard, heave up the anchor, putting the helm a starboard, main boom
+                # steadied over to starboard ... hoist the staysail, or staysail and jib,
+                # with the port sheets aft"). So held, the wind ahead or on either bow
+                # takes it on its fore side and drives her stern the other way: she is
+                # sheered for the tack while the anchor still holds her, and cast when it
+                # is aweigh. Set flat aft for the tack, as it was, it held her head to the
+                # wind, and all three of a schooner's casts in the playtests timed out
+                # (the review's 5.8).
+                self._steady_boom_over()
+                self.fore_and_aft = len(_masts_with_yards(ship)) < 2
                 head, after = head_and_after_yards(ship)
                 yards = head + after
                 targets = [-self.sign * y.brace_limit for y in head] + [
                     self.sign * y.brace_limit for y in after
                 ]
-                self.swing = YardSwing(yards, targets, self.timing_value("brace_s", 60.0))
                 _belay_held_work(ship)
                 self.phase = "heave"
                 self.phase_t = 0.0
-                self.note(
-                    f"Let fall! Sheet home! Hoist away the topsails! Brace up the after yards for "
-                    f"the {self.tack} tack, the head yards abox. Man the bars; heave round!"
-                )
+                if self.fore_and_aft:
+                    # Her topsail is hoisted with its yard square and laid abox only when
+                    # the anchor is aweigh (package 37f). Abox while the anchor still holds
+                    # her by the bow, it swings her stern and not her head: the schooner
+                    # and the cutter were so sheered the wrong way at the breakout, and
+                    # cast on the wrong tack or hung till the timeout.
+                    self.note(
+                        "Let fall! Sheet home! Hoist away the topsail and the mainsail, the "
+                        f"main boom steadied over to {_lee_name(self.sign)}. Man the bars; "
+                        "heave round!"
+                    )
+                else:
+                    self.swing = YardSwing(yards, targets, self.timing_value("brace_s", 60.0))
+                    self.note(
+                        f"Let fall! Sheet home! Hoist away the topsails! Brace up the after "
+                        f"yards for the {self.tack} tack, the head yards abox. Man the bars; "
+                        "heave round!"
+                    )
             return
         if self.phase == "heave":
             up_and_down = max(self.anchor.depth_m, 1.0)
@@ -4678,6 +5940,7 @@ class GetUnderWayScript(_AnchorScript):
         if self.phase == "break_out":
             if self.phase_t >= self.timing_value("break_out_s", 60.0) * factor:
                 self.anchor.state = AnchorState.AWEIGH
+                end_lying_to(ship)  # weighing, she is hove to no longer (package 37f)
                 self.anchor.heaving = False
                 self.anchor.taut = False
                 self.anchor.dragging = False
@@ -4697,13 +5960,30 @@ class GetUnderWayScript(_AnchorScript):
                 )
                 # the jib hoisted and the helm a-lee for the stern-board (Luce)
                 _set_fore_and_aft(ship, _jib(ship), self.tack)
+                self.fore_and_aft = len(_masts_with_yards(ship)) < 2
+                if self.fore_and_aft:
+                    # a fore-and-after casts by her jib: its sheet held to windward of the
+                    # tack she is to cast on, aback, which pays her head off (Luce 1884,
+                    # ch. XXXIV, 'Sloops': "trim the jib sheet to windward"); sheeted to
+                    # leeward, as it was, it did nothing for her head to wind. And her
+                    # topsail yard abox now that she is free to turn.
+                    sheets_to(ship, [sl for sl in _jib(ship) if sl.is_set], self.tack, None)
+                    head, _after = head_and_after_yards(ship)
+                    self.swing = YardSwing(
+                        head,
+                        [-self.sign * y.brace_limit for y in head],
+                        self.timing_value("abox_s", 20.0),
+                    )
                 dyn.helm_mode = HelmMode.RUDDER
                 dyn.target_rudder = self.sign * units.deg_to_rad(15.0)
                 dyn.steady = False
                 self.phase = "cast"
                 self.phase_t = 0.0
                 self.note(
-                    "Let go the downhauls, hoist away the jib! Helm a-lee for the stern-board."
+                    "Let go the downhauls, hoist away the jib, its sheet to windward! The "
+                    "topsail yard abox. Helm a-lee for the stern-board."
+                    if self.fore_and_aft
+                    else "Let go the downhauls, hoist away the jib! Helm a-lee for the stern-board."
                 )
             return
         if self.phase in ("cast", "under_way"):
@@ -4728,14 +6008,69 @@ class GetUnderWayScript(_AnchorScript):
                 rel = units.wrap_pi(float(wind.direction_from) - float(dyn.heading))
                 side = "starboard" if rel > 0 else "larboard"
                 off = units.rad_to_points(abs(rel))
-                if (
-                    off >= self.timing_value("cast_points", 7.0) and side == self.tack
-                ) or self.phase_t >= self.timing_value("cast_timeout_s", 420.0):
+                if self.fore_and_aft:
+                    # her helm tended as she casts: a-lee while she drops astern, which
+                    # throws her head off, and put up as soon as she gathers headway
+                    self._sheer_helm()
+                    boom = units.deg_to_rad(self.timing_value("cast_boom_deg", 30.0))
+                    if not self.main_eased and side == self.tack and abs(rel) > boom:
+                        # the wind now abaft the boom's own angle on the bow she is cast
+                        # on, the mainsail would fill and hold her head up: its sheet is
+                        # eased right off till she has paid off
+                        self.main_eased = True
+                        ease_off_sheets(ship, [sl for sl in _boom_mainsails(ship) if sl.is_set])
+                cast = off >= self.timing_value("cast_points", 7.0) and side == self.tack
+                how = "She has paid off"
+                if not cast and off >= self.timing_value("cast_points", 7.0):
+                    # cast the other way, plainly: she is got under way on the tack she
+                    # has taken, and the line says so (never the tack wanted, in silence)
+                    cast = True
+                    how = (
+                        f"She would not cast on the {self.tack} tack: she has paid off on "
+                        f"the {side}"
+                    )
+                    self.tack = side
+                    self.sign = 1.0 if side == "starboard" else -1.0
+                if not cast and self.phase_t >= self.timing_value("cast_timeout_s", 420.0):
+                    # Package 37f: "paid off" is never said on a timeout. At cast_timeout_s
+                    # she is taken as she lies: paid off four points or more on the tack
+                    # wanted, she has cast; as far on the other, she has cast the wrong
+                    # way and is got under way on that tack, and the line says so; hanging
+                    # nearer the wind than that she is given till cast_give_up_s, and then
+                    # the evolution fails in words, the anchor aweigh.
+                    enough = self.timing_value("cast_enough_points", 4.0)
+                    if off >= enough and side == self.tack:
+                        cast = True
+                        how = f"She has paid off {_points_off_words(abs(rel))} and no further"
+                    elif off >= enough:
+                        cast = True
+                        how = (
+                            f"She would not cast on the {self.tack} tack: she has paid off on "
+                            f"the {side}"
+                        )
+                        self.tack = side
+                        self.sign = 1.0 if side == "starboard" else -1.0
+                    elif self.phase_t >= self.timing_value("cast_give_up_s", 900.0):
+                        dyn.target_rudder = 0.0
+                        self.fail(
+                            f"she hangs {_points_off_words(abs(rel))} from the wind and will "
+                            f"not cast, {self.anchor.name} aweigh; let go again, or cast her "
+                            "by hand with the jib sheet to windward and the helm"
+                        )
+                        return
+                if cast:
                     self.cast_done = True
                     head, after = head_and_after_yards(ship)
+                    if self.fore_and_aft:
+                        # let draw: the jib's sheet shifted to leeward and the main sheet
+                        # hauled aft, both for the wind she now has
+                        fore_aft = [sl for sl in _jib(ship) + _boom_mainsails(ship) if sl.is_set]
+                        draw_sheets(ship, fore_aft, _lee_name(self.sign), abs(rel))
+                    # the head yards braced round for the tack (and the after yards with
+                    # them, if she has cast the other way from the one they were braced for)
                     self.swing = YardSwing(
-                        head,
-                        [self.sign * y.brace_limit for y in head],
+                        head + after,
+                        [self.sign * y.brace_limit for y in head + after],
                         self.timing_value("brace_s", 60.0),
                     )
                     _set_fore_and_aft(ship, after_gaff_sails_all(ship), self.tack)
@@ -4758,8 +6093,10 @@ class GetUnderWayScript(_AnchorScript):
                     self.phase = "under_way"
                     self.phase_t = 0.0
                     self.note(
-                        "She has paid off; right the helm, brace round the head yards, set the "
-                        "spanker."
+                        f"{how}; right the helm, draw the jib, haul aft the main sheet, brace "
+                        "round the topsail yard."
+                        if self.fore_and_aft
+                        else f"{how}; right the helm, brace round the head yards, set the spanker."
                     )
                 return
             if self.anchor_phase == "done" and (self.swing is None or self.swing.done):
@@ -4922,6 +6259,7 @@ class MoorScript(_AnchorScript):
             self.second.scope_m = min(limit, self.second.scope_m + rate * dt)
             if first_done and self.second.scope_m >= limit - 1e-6:
                 self.anchor.heaving = False
+                self.second.brought_up = True  # moored: the moor's own line says how she lies
                 self.finish()
 
     def words(self) -> dict[str, Any]:
@@ -5016,6 +6354,7 @@ class UnmoorScript(_AnchorScript):
         if self.phase == "break_out":
             if self.phase_t >= self.timing_value("break_out_s", 60.0) * factor:
                 self.anchor.state = AnchorState.AWEIGH
+                end_lying_to(ship)  # weighing, she is hove to no longer (package 37f)
                 self.anchor.heaving = False
                 self.anchor.taut = False
                 self.anchor.dragging = False
@@ -5342,6 +6681,7 @@ SCRIPTS: dict[str, type[Script]] = {
     "let_go_anchor": LetGoAnchorScript,
     "veer_cable": VeerCableScript,
     "heave_short": HeaveShortScript,
+    "heave_in": HeaveInScript,
     "weigh_anchor": WeighAnchorScript,
     "cat_and_fish": CatAndFishScript,
     "back_anchor": BackAnchorScript,

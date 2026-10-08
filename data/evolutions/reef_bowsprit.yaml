@@ -21,7 +21,7 @@ applies_to: {class: bowsprit}
 preconditions:
   - {check: spar.running, reason: "The {spar} is gammoned fast to the stem; only a cutter's running bowsprit reefs."}
   - {check: not spar.wrecked, reason: "The {spar} is carried away; clear the wreck and shift it for a spare."}
-  - {check: spar.rigged_out, reason: "The {spar} is reefed already."}
+  - {check: spar.rigged_out, reason: "The {spar} is reefed already.", done: true}
   - {check: not any_set(sails_on(spar)), reason: "A head sail is set with its tack on the {spar}; haul it down first."}
 requires:
   - {check: not spar.wrecked, reason: "the {spar} is carried away"}

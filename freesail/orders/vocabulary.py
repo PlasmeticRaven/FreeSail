@@ -79,6 +79,13 @@ class Vocabulary:
     world_order_channels: tuple[str, ...] = ()
     world_order_words: tuple[str, ...] = ()
     world_order_refusal: str = ""
+    # what undoes what (package 37g): the pairs of verbs of which the later undoes the
+    # earlier on a shared part, each pair read both ways (`standing.runtime.undoes`, the
+    # harness's detector for a station with authority)
+    undoes: frozenset[frozenset[str]] = frozenset()
+    # the orders that give up something of the ship's for good (package 37g): kept back
+    # from the captain's general authority to work the ship (`agents.tools`)
+    irrevocable: tuple[str, ...] = ()
 
     @property
     def class_bound_take_in_phrases(self) -> frozenset[str]:
@@ -232,6 +239,20 @@ def load_vocabulary(path: str | Path | None = None) -> Vocabulary:
                 f"{p}: more_work_nouns gives '{noun}' the verb '{verb}', which is none."
             )
         vocab.work_nouns.setdefault(key(noun), key(verb))
+    pairs: set[frozenset[str]] = set()
+    for pair in data.get("undoes") or []:
+        names = [key(str(v)) for v in pair or []]
+        if len(names) != 2 or names[0] == names[1]:
+            raise ValueError(f"{p}: undoes lists {pair!r}; a pair is two different verbs.")
+        for name in names:
+            if name not in verbs:
+                raise ValueError(f"{p}: undoes names '{name}', which is no verb.")
+        pairs.add(frozenset(names))
+    vocab.undoes = frozenset(pairs)
+    for verb in data.get("irrevocable") or []:
+        if key(str(verb)) not in verbs:
+            raise ValueError(f"{p}: irrevocable names '{verb}', which is no verb.")
+    vocab.irrevocable = _tuple(data.get("irrevocable"))
     return vocab
 
 

@@ -8,7 +8,11 @@
 
 # The departure: while the land is in sight astern, a bearing of it every glass, so that
 # the account is fixed off the Stiff before the land is lost (N §1).
-standing order "bearings": every glass, if the land is in sight then take a bearing of the land
+# Package 37d: a bearing gives a line, and the lookout's distance by estimation is laid
+# down with it only when it is the better figure (a landfall on one mark after a long
+# run), so the book takes a fix by cross bearings after the bearing, which stands when
+# one mark only is in sight or the marks cut too fine.
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix
 
 # The Channel Soundings: at noon she is brought to and the deep-sea lead hove (Falconer
 # 1780, 'Sounding'; Rennell's procedure, N §3).
@@ -18,11 +22,29 @@ standing order "soundings": when the speed is under 3 knots and the distance run
 # Once the cast is had she fills away, and when the fill-away has left the helm the
 # course for Falmouth is shaped afresh from the account.
 standing order "fill away after the cast": at a sounding, if the distance run since noon is under 5 miles then fill away
-standing order "stand on": at filled away then shape a course for Falmouth
+standing order "stand on": at filled away then shape a course for 50 02 N 4 58 W
 
 # The landfall: the first land seen gives a bearing, and the course for Falmouth is
 # shaped from the reckoning.
-standing order "landfall": when the land is in sight then take a bearing of the land; shape a course for Falmouth
+standing order "landfall": when the land is in sight then take a bearing of the land; shape a course for 50 02 N 4 58 W
+
+# Package 37e: a course shaped is now a course made good, the master's tide allowed in
+# it (spec M5 §15), and the order's own words say what the line does: from the Lizard's
+# landfall the line for Falmouth "crosses the land about Black Head" and "passes the
+# Manacles within a mile". Until 37e the heading for Falmouth was held and the flood set
+# her a league to the eastward of that line, clear of the ledge; made good, the line is
+# sailed and she struck. So the book rounds the Manacles as the merchant passage's does,
+# by a point three miles east of them (50 02 N 4 58 W), and shapes for Falmouth when it
+# is within a mile by the account, which the bearings and the fix hold to a few cables.
+standing order "round the Manacles": when the distance to 50 02 N 4 58 W is under 1 mile then shape a course for Falmouth
+
+# The pilot (package 37e): the Falmouth cutter hails her as she stands in, and until 37e
+# the pilot boarded a minute after. From the point east of the Manacles she stands in NNW
+# at seven knots and he is left astern, hailed and not aboard. Three mends were tried and
+# none is kept: sail shortened at his hail, and the fore topsail taken in, each put her
+# on the ground within St Anthony's (she ran the entrance slower, on the ebb); brought to
+# for his boat she lay to two glasses and the cutter did not come alongside. For the
+# lead: `docs/dev/TuningNotes.md`, package 37e.
 
 # Running in: the hand lead every glass once the land is in sight and the run since
 # noon says she is closing the coast, and every ten minutes within the thirty-five

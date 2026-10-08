@@ -94,6 +94,23 @@ WEATHER_HELM_TIME_CONSTANT = 30.0  # seconds; the weather-helm reading averages 
 STEADY_TOLERANCE = math.radians(2.0)  # within this of the ordered heading counts as on it
 STEADY_SECONDS = 20.0  # for this long before the log says "steady"
 ABACK_SECONDS = 10.0  # net thrust astern for this long with sail set is "taken aback"
+# Taken aback, the urgent line and its repeats (package 37c, the owner's ruling of
+# 2026-10-03): a new episode is logged only after she has been clear of aback this long,
+# so a thrust flickering about nought in a light air is one line and not one a minute;
+# and the line is urgent only when there was something to lose, way on her as it began in
+# an apparent wind of at least ABACK_URGENT_AWS_KN, free of the ground and the anchor.
+# Otherwise it is notable (judgement: four knots, a light air to a light breeze, below
+# which the sails aback cost her nothing she had).
+ABACK_REARM_SECONDS = 60.0
+ABACK_URGENT_AWS_KN = 4.0
+# The lesser lines of it (package 37f; the review of gate 5c's playtests, 8.2 under "The
+# log": "Her sails aback; she had no way on to lose" ten times in three hours of a calm).
+# The clock arms the episode again, and the urgent line with it; the notable lines have a
+# flag of their own (`HullState.aback_lesser`), armed again by her state and not by the
+# clock: "no way on to lose", when she has way on again (`WAY_ON_KN`); "in the light
+# air", when she has way on again or the wind is a working one again
+# (`ABACK_URGENT_AWS_KN`); "as she lies at anchor" or "aground", when she does so no
+# longer. So a calm is one line however long it lasts.
 LEEWAY_NOTE_THRESHOLD = math.radians(1.0)  # leeway must change by this much to be noted
 LEEWAY_NOTE_INTERVAL = 60.0  # seconds; at most one leeway note per minute
 LEEWAY_MIN_SPEED = 0.25  # m/s; below this leeway is meaningless and read as zero
@@ -119,6 +136,13 @@ class HullState:
     steady_noted: bool = False  # helm.steady already logged for this order
     seconds_aback: float = 0.0  # time the net thrust has been astern with sail set
     aback_noted: bool = False  # ship.aback already logged for this episode
+    # time clear of aback since the last episode (starting armed), and whether she had
+    # way on as this episode began (package 37c); class defaults, so older saves load
+    seconds_clear_of_aback: float = ABACK_REARM_SECONDS
+    aback_had_way: bool = False
+    # which lesser line stands said ("anchor", "no_way", "light"; "" for none): package
+    # 37f, with a default so that an older save loads
+    aback_lesser: str = ""
     beam_ends_noted: bool = False  # "on her beam ends" already logged for this episode
     last_noted_leeway: float = 0.0  # radians, leeway when last written in the log
     seconds_since_leeway_note: float = LEEWAY_NOTE_INTERVAL

@@ -462,10 +462,17 @@ class Vessel:
         else the world's base wind (the mean, not the gust)."""
         systems = getattr(world, "systems", None)
         if systems is not None and getattr(world, "weather", None) is None and world.origin:
-            bearing, dist = bearing_and_distance(world.origin, self.position)
-            rad = math.radians(bearing)
-            x_km = dist * math.sin(rad) / 1000.0
-            y_km = dist * math.cos(rad) / 1000.0
+            # her place on the systems' plane by the world's one frame (package 37d: from
+            # the player's own position and her offset from it, not by one jump from the
+            # scenario's origin, which drifts from the ship's plane with the miles run)
+            plane = world.plane_of(self.position) if hasattr(world, "plane_of") else None
+            if plane is not None:
+                x_km, y_km = plane[0] / 1000.0, plane[1] / 1000.0
+            else:
+                bearing, dist = bearing_and_distance(world.origin, self.position)
+                rad = math.radians(bearing)
+                x_km = dist * math.sin(rad) / 1000.0
+                y_km = dist * math.cos(rad) / 1000.0
             direction, speed = systems.surface_wind_at(x_km, y_km)
             return math.degrees(direction) % 360.0, float(speed)
         wind = world.wind

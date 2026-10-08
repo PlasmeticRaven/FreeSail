@@ -483,7 +483,8 @@ def watch_lines(world: World) -> list[str]:
     lines = [line]
     routine = (getattr(world.ship, "extra", None) or {}).get("routine")
     if crew.all_hands_called:
-        by = " by the captain's order" if crew.all_hands_called_by_order else ""
+        whose = getattr(crew, "all_hands_called_by", "") or "the captain's"
+        by = f" by {whose} order" if crew.all_hands_called_by_order else ""
         lines.append(f"All hands called{by}.")
     elif getattr(routine, "calling", False):
         lines.append("All hands called; the watch below coming up.")

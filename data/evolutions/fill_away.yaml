@@ -1,24 +1,43 @@
 # Fill away after lying to (scripted): keep the helm a-lee while she has
 # sternway (and put it up once she has headway) until her head is fill_off_deg
 # off the true wind, far enough for the backed sails to fill when braced, then
-# brace the backed yards round full over brace_s and order the close-hauled
-# course on the present tack. Lying to as heave_to leaves her (five points
-# off) she is braced at once; braced full from closer than that she would only
-# be taken aback (package 10, truth 12). Undoes heave_to; needs
-# ship.extra["hove_to"] to be present. The courses, driver and topgallant that
-# heave_to hauled up are left for the captain to set again.
+# brace the yards that are aback round full over brace_s and give the helm its
+# course. Lying to as heave_to leaves her (five points off) she is braced at
+# once; braced full from closer than that she would only be taken aback
+# (package 10, truth 12). Undoes heave_to; needs ship.extra["hove_to"] to be
+# present. The courses, driver and topgallant that heave_to hauled up are left
+# for the captain to set again.
+#
+# She is filled on the tack she is on (package 37f): the side the wind is on
+# now, not the tack recorded when she hove to. A ship that had come round of
+# herself was taken back through the wind by the record, every sail aback
+# (three times in the playtest). The yards braced round are whichever are aback
+# for that tack. The words name the tack and the course.
+#
+# Parameter `course_deg` ("fill away and steer SW by W"): when she is full the
+# helm has that course, if it can be laid on the tack she is on (the wind on the
+# same side, and more than half a point outside close-hauled). She is braced full
+# by the wind first, and as she pays off the yards and sheets are trimmed to the
+# wind on her bow every retrim_s, and to the course's own wind when her head is
+# within half a point of it or pay_off_timeout_s has passed (Luce: "As she falls
+# off, brace up the after yards ... and trim to the course"). A course that
+# cannot be laid is said, and she is kept full and by on her tack. With none she
+# is steered close-hauled on her tack.
 id: fill_away
 verb: fill_away
 applies_to: {class: ship}
 script: fill_away
+params: {course_deg: null}
 preconditions: []
 timing:
   brace_s: 45              # to brace the backed yards round full
   helm_deg: 20             # rudder used to throw her head off
   fill_off_deg: 55         # her head this far off the true wind before bracing full
   fall_off_timeout_s: 180  # brace full anyway after this long
+  retrim_s: 20             # with a course to pay off to: the yards and sheets trimmed to the wind she has, so often (package 37f: judgement)
+  pay_off_timeout_s: 240   # and trimmed for the course, and the evolution done, after this long though her head is not yet on it (judgement)
 on_start: {log: "Fill away; man the after braces."}
-on_complete: {log: "Filled away; braced full and steering {new_course}.", kind: ship.filled_away, severity: notable}
+on_complete: {log: "Filled away on the {filled_tack} tack; braced full and {course_words}.", kind: ship.filled_away, severity: notable}
 on_fail: {log: "Could not fill away: {reason}.", kind: evolution.failed, severity: notable}
 # crew (package 19): the after braces; the marines "divide at the gear of main and
 # mizzen top-sails" (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship', 'Idlers, Firemen, Marines').

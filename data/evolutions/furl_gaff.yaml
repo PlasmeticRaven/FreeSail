@@ -5,7 +5,7 @@ id: furl_gaff
 verb: furl
 applies_to: {class: gaff}
 preconditions:
-  - {check: sail.state != furled, reason: "The {sail} is furled already."}
+  - {check: sail.state != furled, reason: "The {sail} is furled already.", done: true}
   - {check: sail.state != blown_out, reason: "The {sail} is blown out; there is nothing left to furl."}
 requires:
   - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s gaff or mast is wrecked"}

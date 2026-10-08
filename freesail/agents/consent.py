@@ -53,6 +53,15 @@ transcript policy; the journal) puts the question again, and the words say which
 section; a change elsewhere (the record, the door's words) does not, and the hash alone
 never does. `decide` is the one rule the doors share.
 
+**The question says why it is put again** (package 37g, items 13 and 22). A model asked
+a second time is told so in the question's own turn, as data: that the brief has changed
+since its answer, and in which sections (`why_again`); or that an instance of it left a
+game by its own word, when, and the reason it gave (`again_words`, from the game's one
+rule, `harness.seating`); or that the developer asks again. Until this package only the
+owner's terminal was told, and the model had nothing to decide on. After an opt-out the
+answer is kept by the game beside the leaving, so a no is held to and the question is
+not put again at each start.
+
 **The fitness drill** (spec M4 open item 11; package 37; the cold review's sixth item).
 A station may ask for a drill after a yes and before its brief (`Station.drill`; the
 officer of the watch's does): three things, in any order, in up to `DRILL_REPLIES`
@@ -104,6 +113,7 @@ __all__ = [
     "YES",
     "Conversation",
     "Record",
+    "again_words",
     "brief_text",
     "changed_sections",
     "check",
@@ -118,6 +128,7 @@ __all__ = [
     "terminal_after",
     "terminal_owner",
     "verdict_of",
+    "why_again",
 ]
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -688,6 +699,45 @@ def _rel(path: Path | None) -> str:
 CONSENT_KIND, DRILL_KIND = "consent", "drill"
 
 
+def again_words(why: str) -> str:
+    """What the question is put with when it is asked again after an opt-out (package
+    37g, item 13): `why` is the game's own account (`harness.Seating.asked_why`: that an
+    instance of this model left this game by its own word, when, and the reason it
+    gave)."""
+    return (
+        f"This question is put to you again because {why} A yes seats an instance of this "
+        "model in that game again; a no is kept, and the question is not put again there."
+    )
+
+
+def why_again(identity: str, records_dir: Path, door: str, ask_again: bool = False) -> str:
+    """Why the consent question is put again to an identity that has a record, in words
+    for the model (package 37g, item 22): that the brief has changed since its yes, and
+    in which of the sections that bear on what it was told; or that the developer asks
+    again. "" for a first asking, which needs no reason."""
+    record = check(identity, Path(records_dir))
+    if record is None:
+        return ""
+    if record.verdict == YES:
+        changed = changed_sections(record, door)
+        if changed:
+            n = len(changed)
+            named = "; ".join(f"**{name}**" for name in changed)
+            return (
+                "This question is put to you again because the consent brief has changed "
+                f"since this model's answer of {record.date}, which was yes, in "
+                f"{n} section{'s' if n != 1 else ''} that bear{'s' if n == 1 else ''} on "
+                f"what it was told: {named}. The brief above is the brief as it stands now; "
+                "an earlier yes is not carried to it."
+            )
+    if ask_again:
+        return (
+            "This question is put to you again at the developer's asking; this model's "
+            f"last answer on record, of {record.date}, was: {record.verdict}."
+        )
+    return ""
+
+
 def decide(
     identity: str,
     records_dir: Path,
@@ -764,14 +814,21 @@ class Conversation:
         drill: bool = False,
         drill_only: bool = False,
         identity_kind: str = "",
+        drill_carried: str = "",
+        asked_again: str = "",
     ):
-        """`tells`: the door tells the model the outcome (`told`), so the record says
+        """`asked_again`: why the question is put a second time, in words for the model
+        (`why_again`, `again_words`), put with the question as data and kept in the
+        record (package 37g).
+        `tells`: the door tells the model the outcome (`told`), so the record says
         what it was told; the lockstep doors end the conversation at the answer.
         `owner_after`: the developer has a turn after the answer, before the record
         closes (a door with a terminal: the local runner, the REPL). `drill`: the fitness
         drill after a yes (package 37); `drill_only`: the drill alone, consent being on
         record already; `identity_kind`: which kind of identity the record carries
-        (`IDENTITY_KINDS` by door when not given)."""
+        (`IDENTITY_KINDS` by door when not given); `drill_carried`: the date of a record
+        whose drill passed, carried to this one and not put again (the question put again
+        after an opt-out, package 37b)."""
         from freesail.core.world import World
 
         self.identity = identity
@@ -786,6 +843,18 @@ class Conversation:
         self.records_dir = Path(records_dir)
         self.today = (today or dt.date.today()).isoformat()
         self.notes = list(notes)
+        self.drill_carried = drill_carried
+        self.asked_again = " ".join(str(asked_again or "").split())
+        if self.asked_again:
+            self.notes.append(
+                f"The question was put again, and the model was told why: {self.asked_again}"
+            )
+        if drill_carried:
+            self.notes.append(
+                f"The question was put again because the model had left the game by opting "
+                f"out and was asked back to its station. Its drill passed on record "
+                f"({drill_carried}) is carried to this record and was not put again."
+            )
         self.write_record = write
         self.tells = tells
         self._words: list[str] = []
@@ -830,6 +899,9 @@ class Conversation:
             )
             self._begin_drill()
             return
+        if self.asked_again:
+            # why the question is put again rides the question's own turn, as data
+            self.harness.agent.notices.append(self.asked_again)
         self._put(CONSENT_QUESTION, "the consent question")
 
     @property
@@ -1052,7 +1124,9 @@ class Conversation:
             notes=self.notes,
             brief_digest=brief_digest(),
             identity_kind=self.identity_kind,
-            drill=self.drill_result if verdict == YES else "",
+            drill=(self.drill_result or (DRILL_PASSED if self.drill_carried else ""))
+            if verdict == YES
+            else "",
             reasoning=[
                 str(m.get("reasoning_content"))
                 for m in getattr(h.model, "exchanges", None) or []
@@ -1144,6 +1218,7 @@ def ensure(
     today: dt.date | None = None,
     after: Callable[[str], str | None] | None = None,
     drills: bool = False,
+    asked_why: str = "",
 ) -> Record | None:
     """The consent step in front of a station, for a lockstep door (the local runner, the
     interactive REPL): the record on file for exactly this identity, or the conversation
@@ -1151,14 +1226,29 @@ def ensure(
     section that bears on it (`decide`); the drill alone for a station that drills with
     a yes on record (package 37). Says what it does to `out` and returns the record when
     it is a yes (and the drill passed, where asked), None when the run must stop. `after`
-    is the developer's turn after the answer (`terminal_after`); None: no such turn."""
+    is the developer's turn after the answer (`terminal_after`); None: no such turn.
+    `asked_why` (package 37g): the game's own reason for asking again after an opt-out
+    (`harness.Seating.asked_why`), which puts the question whatever is on record and is
+    said to the model with it."""
 
     def say(text: str) -> None:
         if out is not None:
             print(text, file=out, flush=True)
 
-    record, kind, why = decide(identity, records_dir, door, drills=drills, ask_again=ask_again)
+    record, kind, why = decide(
+        identity, records_dir, door, drills=drills, ask_again=ask_again or bool(asked_why)
+    )
     if kind:
+        told = ""
+        carried = ""
+        if asked_why:
+            why = "an instance of it left this game by opting out, so the question is put again"
+            told = again_words(asked_why)
+            before = check(identity, Path(records_dir))
+            if before is not None and before.drilled:
+                carried = before.date  # a drill passed on record is carried, not put again
+        elif kind == CONSENT_KIND:
+            told = why_again(identity, Path(records_dir), door, ask_again)
         what = "The drill comes first" if kind == DRILL_KIND else "The consent brief comes first"
         say(f"The weights are {identity}; {why}. {what} (docs/agents/ConsentBrief.md).")
         record = run(
@@ -1170,8 +1260,10 @@ def ensure(
             records_dir=records_dir,
             today=today,
             after=after,
-            drill=drills,
+            drill=drills and not carried,
             drill_only=kind == DRILL_KIND,
+            asked_again=told,
+            drill_carried=carried,
         )
         if record is None:
             failed = getattr(model, "failed", None)
@@ -1199,6 +1291,8 @@ def run(
     after: Callable[[str], str | None] | None = None,
     drill: bool = False,
     drill_only: bool = False,
+    asked_again: str = "",
+    drill_carried: str = "",
 ) -> Record | None:
     """The consent conversation in lockstep (the local runner, the interactive REPL, the
     fake): the brief, the question, the model's questions put to `owner` (who returns
@@ -1219,6 +1313,8 @@ def run(
         owner_after=after is not None,
         drill=drill,
         drill_only=drill_only,
+        asked_again=asked_again,
+        drill_carried=drill_carried,
     )
     conv.begin()
     while conv.outcome is None:

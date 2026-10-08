@@ -5,7 +5,7 @@ id: set_jibheaded
 verb: set
 applies_to: {class: jibheaded}
 preconditions:
-  - {check: sail.state != set, reason: "The {sail} is set already."}
+  - {check: sail.state != set, reason: "The {sail} is set already.", done: true}
   - {check: sail.state != blown_out, reason: "The {sail} is blown out; a new one must be bent."}
   # a sail whose tack rides a running bowsprit (the ship file's `halyard_spar`: a cutter's
   # jib, package 32b) wants the bowsprit rigged out to its full length; a sail with no

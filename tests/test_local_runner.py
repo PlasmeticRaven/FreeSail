@@ -807,3 +807,95 @@ def test_the_door_note_says_when_a_turn_ends_in_one_rule():
         "at once when you stand by), and the next message is the sample that ended the "
         "stand-by."
     )
+
+
+# ---------------------------------------------------------------------------
+# Package 37g, item 8: the local door's guard and the handover's reserve
+# ---------------------------------------------------------------------------
+
+
+def test_no_officer_is_seated_without_a_context_size_and_the_guard_measures_his_own_brief(
+    tmp_path,
+):
+    """The report's 8.2, item 14, and 8.7, ruling 2. With no context size the harness can
+    neither ask for the handover note in time nor leave out old turns, and the server
+    cuts the conversation unseen: so the officer of the watch is not seated when the
+    server reports none and no `--ctx` is given (a watcher still is, with the note it
+    had). And the stationing guard is measured on the officer's own brief, which is
+    longer than the consent brief the guard was written against."""
+    m = L.LocalModel("http://127.0.0.1:11434", transport=ollama({}))
+    m.identity()
+    with pytest.raises(L.DoorError) as refused:
+        m.check_context("x", "a test runtime", "officer")
+    words = str(refused.value)
+    assert words.startswith(
+        "The model server did not say what context it gives x, and no --ctx was given: the "
+        "officer of the watch is not seated without a context size."
+    )
+    assert "state it with --ctx" in words and "The station needs about " in words
+    assert "did not say what context it gives" in m.check_context("x", "a test runtime", "watcher")
+    # the whole door: nothing is asked of the game, and no station is taken
+    game = Game(tmp_path)
+    out = io.StringIO()
+    code = L.main(
+        [
+            "--game",
+            "http://testserver",
+            "--endpoint",
+            "http://127.0.0.1:11434",
+            "--station",
+            "officer",
+        ],
+        inp=io.StringIO(""),
+        out=out,
+        transport=ollama({}),
+        game_http=game.http,
+    )
+    assert code == L.EXIT_UNREACHABLE and game.world.agents == {} and not game.records.exists()
+    assert "the officer of the watch is not seated without a context size" in out.getvalue()
+    # the guard on the officer's own brief
+    officers = L.station_brief_tokens("officer")
+    watchers = L.station_brief_tokens("watcher")
+    assert officers > watchers > L.SITUATION_ALLOWANCE_TOKENS == 2500
+    m = L.LocalModel("http://127.0.0.1:11434", transport=ollama({"show": 65536}))
+    m.identity()
+    said = m.check_context("x", "a test runtime", "officer")
+    assert f"the brief {officers} tokens (the officer of the watch's own brief)" in said
+    as_watcher = m.check_context("x", "a test runtime", "watcher")
+    assert "(the consent brief, the longer of the two)" in as_watcher
+    need = int(said.split("the station needs about ")[1].split(":")[0])
+    need_w = int(as_watcher.split("the station needs about ")[1].split(":")[0])
+    assert need > need_w
+    # a context between the two seats a watcher and refuses the officer, with the numbers
+    between = L.LocalModel("http://127.0.0.1:11434", transport=ollama({"show": need - 1}))
+    between.identity()
+    with pytest.raises(L.DoorError, match="The context is too small"):
+        between.check_context("x", "a test runtime", "officer")
+    if need_w <= need - 1:
+        assert between.check_context("x", "a test runtime", "watcher").startswith(
+            "The context is enough"
+        )
+
+
+def test_the_handover_reserve_is_a_flag_sent_with_the_station_request(tmp_path):
+    """`--handover-reserve N`: the tokens of the context kept free when the harness asks
+    for the handover note, sent with the station request and kept on the harness; unset,
+    the harness's own."""
+    from freesail.agents import harness as harness_mod
+    from freesail.agents.remote import GameClient
+
+    game = Game(tmp_path)
+    client = GameClient("http://testserver", http=game.http)
+    consent.Record("made-up-weights", "r", "2026-09-26", consent.YES, answer="Yes.").write(
+        game.records
+    )
+    first = client.station("made-up-weights", "runner", context_tokens=32768, handover_reserve=9000)
+    assert first["phase"] == "station"
+    h = game.world.agents["watcher"]
+    assert h.budget_tokens == 32768 and h.reserve_tokens == 9000
+    assert h.handover_threshold() == (32768 - 9000, 9000 // 4)
+    assert game.world.save()["agents"][0]["reserve_tokens"] == 9000
+    usage = io.StringIO()
+    with pytest.raises(SystemExit):
+        L.main(["--help"], out=usage)
+    assert harness_mod.HANDOVER_RESERVE_TOKENS == 14000

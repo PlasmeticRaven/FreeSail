@@ -372,9 +372,10 @@ class Sighting:
     bearing_deg: float
     distance_m: float
     seen_as: str
-    # the lookout's distance by estimation (package 33b): drawn once per sighting
-    # episode and held while she makes no way (`lookout.Lookout`); None before it is
-    # judged, when the words fall back on the truth rounded
+    # the lookout's distance by estimation (package 33b): the eye's error drawn once per
+    # sighting episode, the distance judged afresh as it changes (package 37d,
+    # `lookout.Lookout._judge`); None before it is judged, when the words fall back on
+    # the truth rounded
     estimate_m: float | None = None
 
     @property
@@ -632,6 +633,78 @@ class Level:
         r = row - int(round((s + 90 * 3600) / self.cell_sec))
         c = col - int(round((w + 180 * 3600) / self.cell_sec))
         return float(t.dist[r, c])
+
+    @property
+    def cell_m(self) -> float:
+        """A cell's width north and south in metres (a second of latitude is a sixtieth
+        of a mile)."""
+        return self.cell_sec * units.NAUTICAL_MILE / 60.0
+
+    def dist_smooth(self, lat: float, lon: float) -> float | None:
+        """The distance to the shore in metres at a point, bilinear between the four cell
+        centres about it (package 37d): the field as a continuous one, for the coast's
+        trend, where `dist_at` reads the one cell the point is in. None without a field
+        or a tile under the point; a corner off the level's tiles takes the nearest
+        known."""
+        fr, fc = self.global_cell(lat, lon)
+        fr -= 0.5
+        fc -= 0.5
+        r0, c0 = int(math.floor(fr)), int(math.floor(fc))
+        wr, wc = fr - r0, fc - c0
+        n = self.tile_cells
+        ty, tx = r0 // n, c0 // n
+        lr, lc = r0 - ty * n, c0 - tx * n
+        if lr < n - 1 and lc < n - 1:
+            # the four cells in one tile, which is nearly always: one lookup
+            t = self.tile(
+                int(round(-90 * 3600 + ty * self.span_sec)),
+                int(round(-180 * 3600 + tx * self.span_sec)),
+            )
+            if t is None or t.dist is None:
+                return None
+            d = t.dist
+            v00, v01 = float(d[lr, lc]), float(d[lr, lc + 1])
+            v10, v11 = float(d[lr + 1, lc]), float(d[lr + 1, lc + 1])
+        else:
+            cells = (
+                self._dist_cell(r0, c0),
+                self._dist_cell(r0, c0 + 1),
+                self._dist_cell(r0 + 1, c0),
+                self._dist_cell(r0 + 1, c0 + 1),
+            )
+            known = [v for v in cells if v is not None]
+            if not known:
+                return None
+            nearest = self._dist_cell(int(round(fr)), int(round(fc)))
+            fill = nearest if nearest is not None else known[0]
+            v00, v01, v10, v11 = (fill if v is None else v for v in cells)
+        cells_off = (
+            v00 * (1 - wr) * (1 - wc) + v01 * (1 - wr) * wc + v10 * wr * (1 - wc) + v11 * wr * wc
+        )
+        return cells_off * self.cell_m
+
+    def land_window(self, r0: int, r1: int, c0: int, c1: int) -> tuple[np.ndarray, bool]:
+        """Which cells of the block of global rows `r0` to `r1` and columns `c0` to `c1`
+        (the upper bounds left out) stand above the datum, as a mask (package 37d, for
+        `Chart.nearest_shore`), and whether every tile the block touches is known to
+        this level; a cell of a tile the level has not is not land."""
+        n = self.tile_cells
+        mask = np.zeros((r1 - r0, c1 - c0), dtype=bool)
+        whole = True
+        for ty in range(r0 // n, (r1 - 1) // n + 1):
+            for tx in range(c0 // n, (c1 - 1) // n + 1):
+                t = self.tile(
+                    int(round(-90 * 3600 + ty * self.span_sec)),
+                    int(round(-180 * 3600 + tx * self.span_sec)),
+                )
+                if t is None:
+                    whole = False
+                    continue
+                a, b = max(r0, ty * n), min(r1, (ty + 1) * n)
+                c, d = max(c0, tx * n), min(c1, (tx + 1) * n)
+                block = t.elevation[a - ty * n : b - ty * n, c - tx * n : d - tx * n]
+                mask[a - r0 : b - r0, c - c0 : d - c0] = (block > 0) & (block != t.nodata)
+        return mask, whole
 
 
 # ---------------------------------------------------------------------------
@@ -913,6 +986,15 @@ class Chart:
                 return p, self._contour_normal(p, step_m)
         return None
 
+    def depth_span(self, pos: Position, step_m: float = CONTOUR_STEP_M) -> tuple[float, float]:
+        """The least and the greatest depth the chart shows at `pos` and a step from it
+        on eight bearings (the land counted as no water): what the chart can say of the
+        ground about a place at the contour search's own grain (package 37e)."""
+        depths = [self.depth_at(pos)]
+        depths += [self.depth_at(destination(pos, 45.0 * i, step_m)) for i in range(8)]
+        known = [0.0 if d is None else float(d) for d in depths]
+        return min(known), max(known)
+
     def _contour_normal(self, p: Position, step_m: float) -> float:
         """The bearing across the contour at `p`, toward deeper water, from the depth's
         gradient over a step either way; across the reckoning's course when flat."""
@@ -951,11 +1033,128 @@ class Chart:
                 return found
         return None
 
-    def coast_at(self, pos: Position) -> CoastReading | None:
+    def nearest_shore(self, pos: Position, within_m: float | None = None) -> CoastReading | None:
+        """The nearest dry ground (package 37d; C §5.5, "for the lookout"): its distance
+        in metres and its bearing in degrees true, good to a cell's width and well within
+        half a point, with no name (`coast_at` gives one). `coast_distance` reads the
+        shore's distance in whole cells and takes its bearing from the difference of
+        neighbouring cells, which is one of a handful of directions and due north where
+        the differences are nought; this looks for the ground itself: the field says how
+        far to look, and the cells above the datum within that reach are searched for
+        the nearest, in the finest level under the point, and in the next where the
+        finest's tiles end within reach (a harbour patch knows only its own shores).
+        A window of the tile's cells and one pass of numpy: tens of microseconds close
+        in, a millisecond or two a league off in a harbour patch; once a minute, for the
+        lookout, not every tick. None where the chart has no field, or, with `within_m`,
+        where the field puts the shore beyond it."""
+        best: tuple[float, float] | None = None
+        for lv in self.levels:
+            if not lv.has(pos.lat_deg, pos.lon_deg):
+                continue
+            found = self._nearest_land(lv, pos, within_m)
+            if found is None:
+                continue
+            distance_m, bearing_deg, whole = found
+            # a coarser level's shore is taken over a finer's only when it is nearer by
+            # more than its own cell (the finer level is the truer where both know it)
+            if best is None or distance_m < best[0] - lv.cell_m:
+                best = (distance_m, bearing_deg)
+            if whole:
+                break
+        if best is None or (within_m is not None and best[0] > within_m):
+            return None
+        return CoastReading(best[0], best[1])
+
+    @staticmethod
+    def _nearest_land(
+        lv: Level, pos: Position, within_m: float | None
+    ) -> tuple[float, float, bool] | None:
+        """The nearest cell above the datum in one level: (metres to its centre, the
+        bearing to it, whether the level's tiles covered the whole search). The field's
+        own figure bounds the search (the chamfer transform is within two per cent, and
+        the field is kept in whole cells), widened when the stored heights and the field
+        disagree by a cell at the water's edge."""
+        fr, fc = lv.global_cell(pos.lat_deg, pos.lon_deg)
+        row, col = int(math.floor(fr)), int(math.floor(fc))
+        cells = lv._dist_cell(row, col)
+        if cells is None:
+            return None
+        cell_ns = lv.cell_m
+        if within_m is not None and (cells - 2.0) * cell_ns > within_m:
+            return math.inf, 0.0, True
+        cell_ew = cell_ns * math.cos(math.radians(pos.lat_deg))
+        reach = int(cells * 1.05) + 2
+        for _ in range(4):
+            across = int(math.ceil(reach * cell_ns / cell_ew))
+            r0, c0 = row - reach, col - across
+            mask, whole = lv.land_window(r0, row + reach + 1, c0, col + across + 1)
+            rr, cc = np.nonzero(mask)
+            if len(rr):
+                dy = (rr + (r0 + 0.5 - fr)) * cell_ns
+                dx = (cc + (c0 + 0.5 - fc)) * cell_ew
+                d2 = dx * dx + dy * dy
+                k = int(np.argmin(d2))
+                distance = float(math.sqrt(d2[k]))
+                if distance <= reach * cell_ns:
+                    bearing = math.degrees(math.atan2(float(dx[k]), float(dy[k]))) % 360.0
+                    if cells == 0 or (int(rr[k]) + r0 == row and int(cc[k]) + c0 == col):
+                        distance = 0.0  # the point is on the ground itself, by the field
+                    return distance, bearing, whole
+                # found in a corner of the window, beyond its reach to either hand:
+                # look as far all round before taking it for the nearest
+                reach = int(distance / cell_ns) + 1
+                continue
+            if not whole:
+                return None  # the shore the field knows lies off this level's tiles
+            reach += 4
+        return None
+
+    def coast_trend(self, pos: Position, baseline_m: float) -> tuple[float, float] | None:
+        """The coast's trend at a point (package 37d; the review of gate 5c's playtests,
+        5.6): the bearing toward the land as a whole, in degrees true, and how steeply
+        the shore's distance rises to seaward there, from 0 (flat: a channel, a sound
+        among islands, a harbour ringed by land) to 1 (an open coast). The distance field
+        differenced over `baseline_m` (half of it either way, east and west, north and
+        south) and at least four cells of the level read; the field read as a continuous
+        one (`Level.dist_smooth`), so the trend turns smoothly as the point moves, where
+        the bearing of the nearest cell of shore jumped from cell to cell. Read from the
+        coarsest level with a field (the region's, which knows every shore; a harbour
+        patch's field knows only its own). Land reads nought, so a sample that falls
+        ashore pulls the trend toward it and one that falls on the far shore of a channel
+        flattens it. Four reads of the field: a few microseconds. None where the chart
+        has no field under the point."""
+        for lv in reversed(self.levels):
+            if not lv.has(pos.lat_deg, pos.lon_deg):
+                continue
+            here = lv.dist_smooth(pos.lat_deg, pos.lon_deg)
+            if here is None:
+                continue
+            half = max(0.5 * baseline_m, 2.0 * lv.cell_m)
+            dlat = half / (60.0 * units.NAUTICAL_MILE)
+            dlon = dlat / max(0.1, math.cos(math.radians(pos.lat_deg)))
+            lat, lon = pos.lat_deg, pos.lon_deg
+            e = lv.dist_smooth(lat, lon + dlon)
+            w = lv.dist_smooth(lat, lon - dlon)
+            n = lv.dist_smooth(lat + dlat, lon)
+            s = lv.dist_smooth(lat - dlat, lon)
+            gx = ((here if e is None else e) - (here if w is None else w)) / (2.0 * half)
+            gy = ((here if n is None else n) - (here if s is None else s)) / (2.0 * half)
+            steep = math.hypot(gx, gy)
+            if steep == 0.0:
+                return 0.0, 0.0
+            # the field grows away from the shore: the land lies down the gradient
+            return math.degrees(math.atan2(-gx, -gy)) % 360.0, min(1.0, steep)
+        return None
+
+    def coast_at(self, pos: Position, shore: CoastReading | None = None) -> CoastReading | None:
         """The nearest shore with a name from the index: the nearest headland, island
         or place within twice the distance (and at least a mile), preferring one that
-        lies the way the shore lies. Read when the log wants a name, not every tick."""
-        found = self.coast_distance(pos)
+        lies the way the shore lies (by `nearest_shore`, package 37d: the ground itself,
+        not the field's coarse bearing; `shore` when the caller has it already). Read
+        when the log wants a name, not every tick."""
+        if shore is None:
+            shore = self.nearest_shore(pos)
+        found = (shore.distance_m, shore.bearing_deg) if shore else self.coast_distance(pos)
         if found is None:
             return None
         distance_m, bearing_deg = found
@@ -1113,6 +1312,62 @@ class Chart:
                 out.append((f, off, off <= extent))
         out.sort(key=lambda t: t[1])
         return out
+
+    def line_shore(
+        self,
+        a: Position,
+        b: Position,
+        within_m: float,
+        skip_start_m: float = 0.0,
+        skip_end_m: float = 0.0,
+    ) -> tuple[float, Position, bool] | None:
+        """A straight line tried against the land (package 37e; the review of gate 5c's
+        playtests, 10.4: a course shaped for Brest from off Roscoff ran across Brittany
+        without a word, and a waypoint chosen against the shore "came back clear"): where
+        the line from `a` to `b` first crosses dry ground, or else its nearest approach
+        to it when that is within `within_m`. Returns (the distance from the line to the
+        ground in metres, nought for a crossing; the point of the line; whether it
+        crosses), or None when the line keeps clear. The first cable is not tried for a
+        crossing (she lies where she lies) nor the first `skip_start_m` for a near pass,
+        and the last `skip_end_m` is not tried at all (a place on the land itself). The
+        line is stepped by the shore's own distance while that is more than `within_m`
+        off (the distance field, `coast_distance`), and by a third of a cable when
+        nearer, the ground itself looked for there (`nearest_shore`); the chart's coast
+        is the captain's own paper, and the points are the account's, never the ship's."""
+        dx, dy = a.offset_to(b)
+        length = math.hypot(dx, dy)
+        end = length - skip_end_m
+        if end <= 0.0:
+            return None
+        ux, uy = dx / length, dy / length
+        fine = units.CABLE / 3.0
+        nearest: tuple[float, Position] | None = None
+        along = 0.0
+        while along <= end:
+            p = a.advanced(ux * along, uy * along)
+            field = self.coast_distance(p)
+            if field is None:
+                along += max(fine, within_m)
+                continue
+            off = float(field[0])
+            if off > within_m + 2.0 * units.CABLE:
+                # the field is in whole cells: step short of where the shore could be
+                along += max(fine, off - within_m - units.CABLE)
+                continue
+            shore = self.nearest_shore(p, within_m=within_m + units.CABLE)
+            if shore is not None:
+                if shore.distance_m <= 0.0 and along >= units.CABLE:
+                    return 0.0, p, True
+                if (
+                    along >= skip_start_m
+                    and shore.distance_m <= within_m
+                    and (nearest is None or shore.distance_m < nearest[0])
+                ):
+                    nearest = (float(shore.distance_m), p)
+            along += fine
+        if nearest is None:
+            return None
+        return nearest[0], nearest[1], False
 
     def edge_near(self, pos: Position, within_m: float) -> list[str]:
         """Which edges of the chart lie within `within_m` of the point, as the quarters

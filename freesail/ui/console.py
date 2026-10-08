@@ -39,7 +39,9 @@ Driver commands (not ship orders, not journaled):
                     (--watcher fake stations a scripted one; spec M4 §12)
     log [N]         print the last N log entries (default 20)
     save PATH       write a save file
-    replay PATH     rebuild a world from a save and continue from it
+    replay PATH     rebuild a world from a save and continue from it; a save of another
+                    build that holds a station's transcript is refused in words unless
+                    `replay PATH --replay-anyway` (package 37d)
     help            this text
     quit            leave
 
@@ -198,9 +200,15 @@ def restore_python_rules(world: World, data: dict) -> None:
 
 class Console:
     def __init__(
-        self, world: World, compression: float = 1.0, out=sys.stdout, lockstep: bool = False
+        self,
+        world: World,
+        compression: float = 1.0,
+        out=sys.stdout,
+        lockstep: bool = False,
+        replay_anyway: bool = False,
     ):
         self.world = world
+        self.replay_anyway = replay_anyway  # `--replay-anyway` given at the start
         self.compression = clamp_compression(compression)
         self.world.compression = self.compression
         self.lockstep = lockstep
@@ -344,10 +352,12 @@ class Console:
                 p = replay_mod.save_to_file(self.world, args[0])
                 self._print(f"Saved to {p} at tick {self.world.clock.tick}.")
         elif cmd == "replay":
-            if not args:
+            anyway = REPLAY_ANYWAY_FLAG in args
+            paths = [a for a in args if a != REPLAY_ANYWAY_FLAG]
+            if not paths:
                 self._print("Say 'replay somewhere.json'.")
             else:
-                self._replay(args[0])
+                self._replay(paths[0], replay_anyway=anyway or self.replay_anyway)
         else:
             self.world.submit(line)
         return True
@@ -389,8 +399,16 @@ class Console:
             return [str(e)]
         return text.split("\n")
 
-    def _replay(self, path: str) -> None:
+    def _replay(self, path: str, replay_anyway: bool = False) -> None:
         data = replay_mod.load_file(path)
+        # the load's rule (package 37d): another build's game with a station's transcript
+        # in it is not replayed unless asked for, and the words say why
+        try:
+            report = replay_mod.check_replay(data, path, replay_anyway)
+        except replay_mod.ReplayRefused as refused:
+            for line in refused.report.words:
+                self._print(line)
+            return
         self.running = False
         self._detach()
         self._view = RollupView()
@@ -401,6 +419,8 @@ class Console:
         self._attach()
         restore_python_rules(self.world, data)  # attached, so its lines are printed
         self._print(f"Replayed. Log digest {self.world.log.digest()[:16]}. Clock held.")
+        for line in report.words:
+            self._print(line)
         for s in self.world.summary_lines():
             self._print(s)
 
@@ -543,7 +563,10 @@ def _rolls_up(compression: float) -> bool:
 
 def start_world(args: argparse.Namespace) -> tuple[World, Any]:
     """The World a driver starts with, from its command line (shared with the server):
-    `--load SAVE` replays a save to its last tick; `--scenario FILE` builds the scenario's
+    `--load SAVE` takes a save up at its last tick, from its checkpoint or by a replay
+    (`core.replay.load_report`, whose report is left on the World as `load_report` for
+    `loaded_words`; a replay refused stops the driver with the words); `--scenario FILE`
+    builds the scenario's
     world (the orders it names are given by the caller, after the watcher is stationed);
     otherwise the ship, the seed, `--wind` and `--heading`. Returns the World and the
     scenario file read, if any."""
@@ -551,11 +574,18 @@ def start_world(args: argparse.Namespace) -> tuple[World, Any]:
 
     if getattr(args, "load", None):
         # from the checkpoint beside the save when it belongs to it (package 33a: seconds
-        # for a day's save), else by replaying the journal
-        world, how = replay_mod.load(args.load, ship_factory)
-        if how == "replay":
+        # for a day's save), else by replaying the journal; another build's game with a
+        # station's transcript in it is not replayed unless asked for (package 37d)
+        try:
+            world, report = replay_mod.load_report(
+                args.load, ship_factory, replay_anyway=bool(getattr(args, "replay_anyway", False))
+            )
+        except replay_mod.ReplayRefused as refused:
+            raise SystemExit("\n".join(refused.report.words)) from None
+        if report.how == "replay":
             restore_python_rules(world, replay_mod.load_file(args.load))
-        world.loaded_from = how  # type: ignore[attr-defined]
+        world.loaded_from = report.how  # type: ignore[attr-defined]
+        world.load_report = report  # type: ignore[attr-defined]
         return world, None
     if getattr(args, "scenario", None):
         from freesail.world.scenarios import load_scenario, make_scenario_world
@@ -581,6 +611,31 @@ def start_world(args: argparse.Namespace) -> tuple[World, Any]:
 # The seed without a scenario or `--seed` (the drivers' default since M0).
 DEFAULT_SEED = 1805
 
+# Every door that loads or replays a save takes this flag (package 37d): a save of another
+# build that holds a station's transcript is replayed only when it is given.
+REPLAY_ANYWAY_FLAG = "--replay-anyway"
+REPLAY_ANYWAY_HELP = (
+    "replay a save all the same when it was written by another build and holds a "
+    "station's transcript (the replay is then not the game that was played); without it "
+    "such a save is loaded from its checkpoint or refused in words"
+)
+
+
+def loaded_words(world: World, path: str) -> list[str]:
+    """What a door prints for a game loaded with `--load`: the road taken, the tick and
+    the log's digest, then the load's own words (which build wrote the save or the
+    checkpoint, why a checkpoint was not used, that a replay's log may differ)."""
+    report = getattr(world, "load_report", None)
+    how = report.how if report is not None else getattr(world, "loaded_from", "replay")
+    way = "from its checkpoint at" if how == "checkpoint" else "replayed to"
+    lines = [
+        f"Loaded {path}: {way} tick {world.clock.tick}, {world.clock.stamp()}; the log's "
+        f"digest is {world.log.digest()[:16]}."
+    ]
+    if report is not None:
+        lines += list(report.words)
+    return lines
+
 
 def _stdin_reader(q: queue.Queue[str]) -> None:
     for line in sys.stdin:
@@ -596,6 +651,7 @@ def main(argv: list[str] | None = None) -> int:
         "--time", "--speed", type=float, default=1.0, help="compression, game s per real s"
     )
     ap.add_argument("--load", help="save file to replay and continue from")
+    ap.add_argument(REPLAY_ANYWAY_FLAG, action="store_true", help=REPLAY_ANYWAY_HELP)
     ap.add_argument(
         "--scenario",
         help="a scenario file: ship, start, weather script, orders (spec M4 §19)",
@@ -638,7 +694,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.standing_orders:
         read_standing_orders(world, args.standing_orders)
 
-    console = Console(world, compression=args.time, lockstep=args.lockstep)
+    console = Console(
+        world, compression=args.time, lockstep=args.lockstep, replay_anyway=args.replay_anyway
+    )
     if scenario_file is not None:
         for line in scenario_file.lines():
             console._print(line)
@@ -649,6 +707,9 @@ def main(argv: list[str] | None = None) -> int:
         "Type 'help' for driver commands, 'go' to start the clock."
     )
     console._print(book_words(world))  # the starter book a choice (package 33c)
+    if args.load:
+        for line in loaded_words(world, args.load):  # the road taken, and why (package 37d)
+            console._print(line)
     if args.agents_port:
         console.serve_agents(
             args.agents_port, records_dir=args.consent_records, saves_dir=args.saves

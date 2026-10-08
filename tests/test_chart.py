@@ -31,7 +31,7 @@ from freesail.api.session import make_world
 from freesail.core.world import Scenario, World
 from freesail.world import chart as C
 from freesail.world.chart import Chart, Feature, load_chart, load_manifest
-from freesail.world.geo import Position, destination
+from freesail.world.geo import Position, bearing_and_distance, destination
 from freesail.world.weather import (
     FOG_COAST_KM,
     SEA_BREEZE_MAX_KN,
@@ -312,7 +312,13 @@ def test_nearest_coast_from_the_distance_field_with_a_name_from_the_index(chart)
     mid = chart.coast_at(MID_CHANNEL)
     assert mid is not None and 40000.0 < mid.distance_m < 70000.0
     # the field alone (the weather's hook every tick) is microseconds; the name is for the log
-    assert chart.coast_distance(OFF_THE_LIZARD) == (coast.distance_m, coast.bearing_deg)
+    # (package 37d: the name is chosen by the ground itself, `nearest_shore`, and the field's
+    # own figure is the same distance to a cell or two with a coarser bearing)
+    field_m, field_deg = chart.coast_distance(OFF_THE_LIZARD)
+    assert abs(field_m - coast.distance_m) < 100.0 and field_deg == 0.0
+    assert chart.nearest_shore(OFF_THE_LIZARD) == C.CoastReading(
+        coast.distance_m, coast.bearing_deg
+    )
     t0 = time.perf_counter()
     for _ in range(1000):
         chart.coast_distance(OFF_THE_LIZARD)
@@ -427,7 +433,8 @@ def test_the_readings_on_a_ship_with_a_chart_and_on_one_without():
 
     snap = queries.snapshot(with_chart)
     assert "position" not in snap and snap["lookout"]["count"] >= 3
-    assert snap["reckoning"]["words"].endswith("by account")
+    # the account, and since package 37e the tide the master allows in it
+    assert " by account; the tide allowed: " in snap["reckoning"]["words"]
     assert snap["ship"]["x"] is None and snap["ship"]["y"] is None
     assert queries.snapshot(without)["reckoning"] is None
     assert queries.snapshot(without)["lookout"] is None
@@ -532,10 +539,12 @@ def test_the_sea_breeze_blows_onshore_on_a_summer_afternoon_off_falmouth_and_not
     bx, by = w.systems.sea_breeze(0.0, 0.0, at)
     speed_kn = units.ms_to_knots(math.hypot(bx, by))
     assert 4.0 < speed_kn <= SEA_BREEZE_MAX_KN
-    # onshore: toward the coast's bearing
-    _, bearing = w.systems.coast(0.0, 0.0)
+    # onshore: toward the land as a whole, the coast's trend (package 37d; the bearing of
+    # the nearest cell of shore before), which off the harbour's mouth is northward
+    bearing, steep = w.systems.coast_trend(0.0, 0.0)
     breeze_toward = math.degrees(math.atan2(bx, by)) % 360.0
-    assert abs(units.wrap_pi(math.radians(breeze_toward - bearing))) < math.radians(15.0)
+    assert abs(units.wrap_pi(math.radians(breeze_toward - bearing))) < math.radians(1.0)
+    assert steep > 0.5 and (bearing < 45.0 or bearing > 315.0)
     assert w.systems.sea_breeze(0.0, 0.0, datetime(1805, 6, 15, 3, 0)) == (0.0, 0.0)
     assert w.systems.sea_breeze(0.0, 0.0, datetime(1805, 1, 15, 15, 0)) == (0.0, 0.0)
     far_x = 0.0
@@ -612,3 +621,193 @@ def test_the_manifest_tool_prints_every_source_and_the_attribution(capsys):
         "Attribution, as the game shows it",
     ):
         assert words in out, words
+
+
+# ---------------------------------------------------------------------------
+# Package 37d: the nearest shore by the ground itself, the coast's trend for the sea
+# breeze, and one frame for the plane's points (the review of gate 5c's playtests, 5.1,
+# 5.6 and 5.8 under "Anchoring")
+# ---------------------------------------------------------------------------
+
+PENLEE_POINT = Position(50.319, -4.1909)
+# Where the nearest shore is asked for, beside a plain search of the elevation: off
+# Penlee Point, in the mouth of St Mary's Sound, in the road of the Isle of Bas where the
+# land lies on both hands, off an open coast, and the rest of a dozen.
+SHORE_PLACES = {
+    "off Penlee Point, three cables": Position(50.31137, -4.19490),
+    "off Penlee Point, a mile": Position(50.29983, -4.1909),
+    "Cawsand Bay": Position(50.335, -4.19),
+    "the mouth of St Mary's Sound": Position(49.895, -6.325),
+    "St Mary's Sound": Position(49.90, -6.33),
+    "St Mary's road": Position(49.92, -6.325),
+    "the road of the Isle of Bas": Position(48.737, -4.01),
+    "the road of the Isle of Bas, westward": Position(48.737, -4.03),
+    "an open coast: two miles off the Lizard": Position(49.925, -5.20),
+    "an open coast: Whitsand Bay": Position(50.32, -4.28),
+    "an open coast: off the Deadman": Position(50.185, -4.80),
+    "Carrick Road": Position(50.165, -5.035),
+}
+
+
+def plain_nearest_land(chart, pos: Position, radius_m: float) -> tuple[float, float, float]:
+    """The nearest cell above the datum by a plain search of the finest level's cells
+    about a point: (metres to its centre, the bearing to it, the level's cell in metres)."""
+    lv = chart._finest_level(pos)
+    fr, fc = lv.global_cell(pos.lat_deg, pos.lon_deg)
+    row, col = int(math.floor(fr)), int(math.floor(fc))
+    cell_ns = lv.cell_m
+    cell_ew = cell_ns * math.cos(math.radians(pos.lat_deg))
+    nr, nc = int(radius_m / cell_ns) + 1, int(radius_m / cell_ew) + 1
+    best = (math.inf, 0.0)
+    for r in range(row - nr, row + nr + 1):
+        for c in range(col - nc, col + nc + 1):
+            v = lv.value(r, c)
+            if v is not None and v > 0.0:
+                dy, dx = (r + 0.5 - fr) * cell_ns, (c + 0.5 - fc) * cell_ew
+                d = math.hypot(dx, dy)
+                if d < best[0]:
+                    best = (d, math.degrees(math.atan2(dx, dy)) % 360.0)
+    return best[0], best[1], cell_ns
+
+
+@pytest.mark.parametrize("place", sorted(SHORE_PLACES))
+def test_the_nearest_shore_is_the_ground_itself_beside_a_plain_search(chart, place):
+    """Item 9's query: the bearing and distance of the nearest dry ground, true to half a
+    point and a cell's width, against a plain search of the elevation. `coast_distance`
+    gives the shore's distance in whole cells and a bearing from the difference of
+    neighbouring cells, one of a handful of directions and due north where the
+    differences are nought."""
+    pos = SHORE_PLACES[place]
+    shore = chart.nearest_shore(pos)
+    assert shore is not None and shore.name is None
+    field_m = chart.coast_distance(pos)[0]
+    distance, bearing, cell = plain_nearest_land(chart, pos, 1.1 * field_m + 4 * 93.0)
+    assert abs(shore.distance_m - distance) <= cell
+    off = abs(units.wrap_pi(math.radians(shore.bearing_deg - bearing)))
+    assert off <= 0.5 * units.POINT or distance < 2 * cell
+    # the field's own figure is the same distance to a cell or two, by another road
+    assert abs(field_m - shore.distance_m) <= 0.03 * shore.distance_m + 2 * cell
+    # with a reach, nothing beyond it; and the name is chosen by the ground
+    assert chart.nearest_shore(pos, within_m=0.5 * shore.distance_m - cell) is None
+    assert chart.nearest_shore(pos, within_m=shore.distance_m + cell) == shore
+    named = chart.coast_at(pos)
+    assert named.distance_m == shore.distance_m and named.bearing_deg == shore.bearing_deg
+    assert named.name and chart.coast_at(pos, shore) == named
+
+
+def test_the_field_alone_gave_due_north_where_the_ground_lies_elsewhere(chart):
+    """The review's 5.6: across the road of the Isle of Bas the field's bearing was due
+    north by default at every sample with land on both hands, and off Carrick Road due
+    east where the ground lies ESE."""
+    road = SHORE_PLACES["Carrick Road"]
+    assert chart.coast_distance(road)[1] == 90.0
+    assert 105.0 < chart.nearest_shore(road).bearing_deg < 125.0
+    bas = SHORE_PLACES["the road of the Isle of Bas, westward"]
+    assert abs(chart.coast_distance(bas)[1] - chart.nearest_shore(bas).bearing_deg) > 20.0
+    # no land known: no shore; on the ground itself: no distance
+    assert chart.nearest_shore(Position(49.5, -5.0), within_m=5000.0) is None
+    assert chart.nearest_shore(Position(49.5, -5.0)).distance_m > 25 * units.NAUTICAL_MILE
+    assert chart.nearest_shore(Position(50.153, -5.070)).distance_m == 0.0
+
+
+# The three tracks of the review's 5.6, a mile and a half each, sampled every ten metres.
+BREEZE_TRACKS = {
+    "north-east from the Harpy's anchorage off Rame Head": (Position(50.3247, -4.1965), 45.0),
+    "through the mouth of St Mary's Sound": (Position(49.885, -6.335), 20.0),
+    "across the road of the Isle of Bas": (Position(48.725, -4.01), 0.0),
+}
+
+
+@pytest.mark.parametrize("track", sorted(BREEZE_TRACKS))
+def test_the_coasts_trend_never_turns_two_points_between_samples(chart, track):
+    """Item 12: the sea breeze blew toward the bearing of the nearest cell of shore, which
+    turned every few yards as the ship moved (the three tracks: 125 changes in 2.5 km, the
+    largest 57 degrees; 201, the largest 180; due north at every sample). Its direction is
+    now the coast's trend, the shore's distance differenced over a baseline of kilometres,
+    and along each track it never turns two points between samples ten metres apart,
+    wherever there is a breeze to have a direction."""
+    from freesail.world.weather import SEA_BREEZE_SLOPE_NONE, SEA_BREEZE_TREND_KM
+
+    start, bearing = BREEZE_TRACKS[track]
+    base = SEA_BREEZE_TREND_KM * 1000.0
+    last = None
+    worst = 0.0
+    old_last, old_changes, old_worst = None, 0, 0.0
+    for i in range(int(1.5 * units.NAUTICAL_MILE / 10.0) + 1):
+        p = destination(start, bearing, 10.0 * i)
+        toward, steep = chart.coast_trend(p, base)
+        assert 0.0 <= steep <= 1.0 and 0.0 <= toward < 360.0
+        if last is not None and min(steep, last[1]) > SEA_BREEZE_SLOPE_NONE:
+            worst = max(worst, abs(units.wrap_pi(math.radians(toward - last[0]))))
+        last = (toward, steep)
+        old = chart.coast_distance(p)[1]
+        if old_last is not None and old != old_last:
+            old_changes += 1
+            old_worst = max(old_worst, abs(units.wrap_pi(math.radians(old - old_last))))
+        old_last = old
+    assert worst < 0.5 * units.POINT  # measured: two degrees at the most
+    # what it replaced, on the same track: the bearing of the nearest cell of shore
+    assert old_changes >= 20 and old_worst >= 2.0 * units.POINT
+
+
+def test_off_an_open_coast_the_trend_is_square_on_to_the_land_and_flat_in_a_road(chart):
+    """Item 12: off an open coast the breeze blows within a point of square on to the
+    land, at its full strength; in a channel, a sound among islands or a road ringed by
+    land the field is flat and there is little or none."""
+    from freesail.world.weather import (
+        SEA_BREEZE_SLOPE_FULL,
+        SEA_BREEZE_SLOPE_NONE,
+        SEA_BREEZE_TREND_KM,
+    )
+
+    base = SEA_BREEZE_TREND_KM * 1000.0
+    for place in ("an open coast: two miles off the Lizard", "an open coast: off the Deadman"):
+        pos = SHORE_PLACES[place]
+        toward, steep = chart.coast_trend(pos, base)
+        shore = chart.nearest_shore(pos)
+        assert abs(units.wrap_pi(math.radians(toward - shore.bearing_deg))) <= units.POINT
+        assert steep >= SEA_BREEZE_SLOPE_FULL
+    for i in range(0, 60):
+        p = destination(Position(48.7335, -4.01), 0.0, 10.0 * i)  # the road, bank to bank
+        assert chart.coast_trend(p, base)[1] < SEA_BREEZE_SLOPE_NONE + 0.05
+    assert chart.coast_trend(Position(49.0, -4.5), base)[1] >= 0.0  # far at sea: no error
+
+
+def test_the_coasts_distance_at_the_ship_is_the_charts_at_her_position_after_a_long_run():
+    """Item 13: the ship's place on the sphere is carried forward tick by tick, and a
+    point of the plane was elsewhere turned into a place by one jump from the scenario's
+    origin; the two drift apart with the miles run. The World places every point of the
+    plane from the ship's own position: after a run of sixty miles the weather's coast at
+    the ship is the chart's at her position, and a point a mile off her lies a mile off."""
+    start = Position(49.2, -6.2)
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, 4, 0),
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=50.0,
+        ship_speed_kn=10.0,
+        position=start.to_dict(),
+        region=REGION,
+    )
+    w = World(seed=7, scenario=sc)
+    w.run(6 * 3600)
+    run_m = math.hypot(w.ship_x, w.ship_y)
+    assert run_m > 59 * units.NAUTICAL_MILE
+    by_one_jump = start.advanced(w.ship_x, w.ship_y)
+    drift = bearing_and_distance(by_one_jump, w.position)[1]
+    assert drift > 300.0  # the fault's size here: hundreds of metres (the tide's set is in it)
+    assert w.place_of_plane(w.ship_x, w.ship_y) == w.position
+    x, y = w.plane_of(w.position)
+    assert abs(x - w.ship_x) < 1e-6 and abs(y - w.ship_y) < 1e-6
+    off = w.place_of_plane(w.ship_x + 1852.0, w.ship_y)
+    bearing, distance = bearing_and_distance(w.position, off)
+    assert abs(distance - 1852.0) < 1.0 and abs(bearing - 90.0) < 0.1
+    x, y = w.plane_of(off)
+    assert abs(x - w.ship_x - 1852.0) < 0.5 and abs(y - w.ship_y) < 0.5
+    at_ship = w._coast_of_plane(w.ship_x_km, w.ship_y_km)
+    assert at_ship == pytest.approx(
+        (w.chart.coast_distance(w.position)[0] / 1000.0, w.chart.coast_distance(w.position)[1])
+    )
+    assert w._coast_trend_of_plane(w.ship_x_km, w.ship_y_km) == w.chart.coast_trend(
+        w.position, 3000.0
+    )

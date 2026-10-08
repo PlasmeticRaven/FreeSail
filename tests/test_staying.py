@@ -378,9 +378,14 @@ def test_the_starter_book_tends_the_sheets_every_glass():
     from pathlib import Path
 
     book = Path("data/standing_orders/starter.orders").read_text(encoding="utf-8")
-    assert 'standing order "tend the sheets": every glass then trim the sheets' in book
+    # (with the dialect's own guard since package 37f: not while she is hove to)
+    line = (
+        'standing order "tend the sheets": every glass, if the manoeuvre in hand is not '
+        "hove to then trim the sheets"
+    )
+    assert line in book
     world = under_plain_sail(FRIGATE, 292.5, ticks=600)
-    world.submit('standing order "tend the sheets": every glass then trim the sheets')
+    world.submit(line)
     world.submit("ease the spanker sheet three fathoms")
     world.run(3)
     spanker = world.ship.sails["mizzen.spanker"]
@@ -413,8 +418,9 @@ def test_a_course_order_is_refused_while_she_lies_hove_to():
     ship = world.ship
     start = world.clock.tick
     world.submit("heave to")
-    world.run(100)
-    assert "hove_to" in ship.extra
+    # package 37f: "Hove to" is said when her way is off, some minutes after the order
+    done, _ = until(world, ("ship.hove_to",), 600)
+    assert done and "hove_to" in ship.extra
     world.submit(
         'standing order "keep her full": when the apparent wind is forward of 55 degrees '
         "then bear away one point"

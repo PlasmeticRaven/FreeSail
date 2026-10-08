@@ -6,6 +6,7 @@ turn, once package 28 has put the consent step in front.
 
     python -m freesail.agents.repl <ship> --seed N --station watcher [--load SAVE]
                                    [--every SECONDS] [--wind FROM,KN] [--heading DEG]
+                                   [--replay-anyway]
 
 prints the brief once, then at each sampling point prints the sample and waits for a
 reply on stdin. **The reply syntax**: free text on any line; a tool call on its own
@@ -51,6 +52,16 @@ to the model (which may reply once, by `--reply`), or, empty, closes the record.
 record written, a yes goes straight on to the station's brief and first sample in the
 same call, anything else exits 5 with the reason. A game saved under a named model is
 continued only while a yes is on record for that name.
+
+**A released station taken again** (package 37g, items 13 and 14; the review's section 6:
+"the REPL door cannot seat again at all"). A save whose station was stood down, or left,
+is loaded, and the game's one rule decides as it does at every door
+(`harness.seating`): an identity that left for good is refused, at any station; one that
+left by its own word is asked for its consent again first, with the fact that an
+instance left and the reason it gave, and its answer is kept; every other takes the
+station, its own or another's (a relief), with the last handover note in its brief. In
+turn mode a station is taken again when no question is owed; where one is, the call says
+so in words and the question is put at the interactive door.
 """
 
 from __future__ import annotations
@@ -173,7 +184,10 @@ def render_turn(turn: Turn) -> str:
             + "):"
         )
         marks = {"routine": " ", "notable": "*", "urgent": "!"}
-        out += [f"  {marks.get(e['severity'], ' ')} {e['stamp']}  {e['text']}" for e in log]
+        out += [
+            f"  {marks.get(e['severity'], ' ')} {e['stamp']}  {e['text']}{_by_words(e)}"
+            for e in log
+        ]
     else:
         out.append("No new log lines.")
     r = d.get("readings") or {}
@@ -188,6 +202,21 @@ def render_turn(turn: Turn) -> str:
         else:
             out.append(f"  {k}: {v}")
     return "\n".join(out)
+
+
+def _by_words(line: dict[str, Any]) -> str:
+    """Who gave the order a log line is, where the line's own words do not say (package
+    37g, item 9): the captain's "Order: steer east." is marked his, and a standing
+    order's firing with whose book it stands in."""
+    by = str(line.get("by") or "")
+    text = str(line.get("text") or "")
+    if not by:
+        return ""
+    if by.startswith("standing order ") and by.endswith(")") and "(" in by:
+        return f"  [{by[by.rindex('(') + 1 : -1]}'s standing order]"
+    if by in text:
+        return ""
+    return f"  [{by}]"
 
 
 def _quote(v: Any) -> str:
@@ -300,20 +329,45 @@ def _new_world(args: argparse.Namespace) -> World:
     return World(seed=args.seed, scenario=scenario)
 
 
+def replay_save(
+    data: dict[str, Any], path: str, replay_anyway: bool = False, out: TextIO | None = None
+) -> World:
+    """A save replayed at this door, which always replays (the recorded replies are
+    played back and the terminal goes on), by the load's rule (package 37d;
+    `core.replay.check_replay`): a save of another build, or unstamped, that holds a
+    station's transcript is refused in words (the run stops with them) unless
+    `--replay-anyway`; one without a transcript is replayed and `out` is told that its
+    log may differ from the one that was watched. A save of this build replays as it
+    always did, with a line to `out` when one is given."""
+    from freesail.api.session import ship_factory
+
+    try:
+        report = replay_mod.check_replay(data, path, replay_anyway)
+    except replay_mod.ReplayRefused as refused:
+        raise SystemExit("\n".join(refused.report.words)) from None
+    world = replay_mod.replay(data, ship_factory)
+    if out is not None:
+        for line in report.words:
+            print(line, file=out, flush=True)
+    return world
+
+
 def open_world(
     target: str | None,
     seed: int,
     wind: str | None = None,
     heading: float | None = None,
+    replay_anyway: bool = False,
 ) -> World:
-    """A ship file or a save (a `.json`, replayed), as the console opens them; the doors
-    of package 28 share it. `wind` is 'FROM_DEG,KNOTS'."""
-    from freesail.api.session import make_world, ship_factory
+    """A ship file or a save (a `.json`, replayed by the load's rule, `replay_save`), as
+    the console opens them; the doors of package 28 share it. `wind` is
+    'FROM_DEG,KNOTS'."""
+    from freesail.api.session import make_world
     from freesail.ui.console import restore_python_rules
 
     if target and target.lower().endswith(".json"):
         data = replay_mod.load_file(target)
-        world = replay_mod.replay(data, ship_factory)
+        world = replay_save(data, target, replay_anyway, out=sys.stderr)
         restore_python_rules(world, data)
         return world
     scenario = Scenario()
@@ -387,8 +441,19 @@ def run_interactive(
     """The REPL at a terminal, in lockstep. A pause holds the clock and the ten real
     minutes of the unattended bound run on `clock` (package 31c: the one bound, however
     fast the ship's clock would run); `clock` and `sleep` are the test's to give."""
-    from freesail.api.session import ship_factory
-
+    identity = args.model_name or ""
+    station = station_name(args.station)
+    world = None
+    again = None  # the game's one rule, when the save's station is released
+    if args.load:
+        data = replay_mod.load_file(args.load)
+        world = replay_save(data, args.load, getattr(args, "replay_anyway", False), out=out)
+        held = world.agents.get(station)
+        if held is not None and held.agent.released:
+            again = harness_mod.seating(world, station, identity)
+            if not again.ok:
+                print(f"== {again.why} ==", file=out, flush=True)
+                return EXIT_NO_CONSENT
     record = None
     if args.model_name:
         record = consent.ensure(
@@ -402,7 +467,16 @@ def run_interactive(
             out=out,
             after=consent.terminal_after(inp, out),
             drills=_station(args).drill,
+            # the question put again after an opt-out says why (package 37g, item 13)
+            asked_why=again.asked_why if again is not None and again.ask_again else "",
         )
+        if again is not None and again.ask_again:
+            # the answer is kept beside the leaving, whatever it was: a no is held to,
+            # and the question is not put again at each start
+            asked = consent.check(args.model_name, Path(args.records))
+            left = world.agents.get(again.left_at) if world is not None else None
+            if left is not None:
+                left.door_act("asked", identity, asked.verdict if asked is not None else "")
         if record is None:
             return EXIT_NO_CONSENT
     else:
@@ -413,16 +487,23 @@ def run_interactive(
             flush=True,
         )
     model = Repl(inp, out)
-    if args.load:
-        data = replay_mod.load_file(args.load)
-        world = replay_mod.replay(data, ship_factory)
-        h = world.agents.get(args.station)
-        if h is not None:
+    h = None
+    if world is not None:
+        h = world.agents.get(station)
+        if h is not None and h.agent.released:
+            # a released station taken again, by the same identity or another (37g)
+            h.reseat(
+                model,
+                identity=identity,
+                door="repl",
+                save=_save_fn(args.save),
+                door_note=_consent_note(record),
+            )
+        elif h is not None:
             h.model = model  # the recorded replies are played; the terminal continues
             h.save_fn = _save_fn(args.save)
     else:
         world = _new_world(args)
-        h = None
     if h is None:
         h = harness_mod.Harness(
             world,
@@ -432,6 +513,7 @@ def run_interactive(
             door_note=_consent_note(record),
         )
         h.door = "repl"  # the terminal keeps what it printed (the shelf's words)
+        h.model_name = identity
         h.start()
     told_paused = False
     while not h.agent.released and not model.closed:
@@ -583,8 +665,6 @@ def run_turn(args: argparse.Namespace, wall: Callable[[], float] | None = None) 
     unattended bound are measured across the calls on `wall` (the wall clock, since each
     call is a process of its own), from when a call first found the station paused, kept
     in the save beside the game (`repl.paused_since`; package 31c)."""
-    from freesail.api.session import ship_factory
-
     if not args.save or not args.sample:
         raise SystemExit("Turn mode needs --save STATE.json and --sample NEXT.txt.")
     before, record = "", None
@@ -607,12 +687,40 @@ def run_turn(args: argparse.Namespace, wall: Callable[[], float] | None = None) 
                 record["transcript"].append(
                     {"tick": data["end_tick"], "reply": new_reply.to_dict()}
                 )
-        world = replay_mod.replay(data, ship_factory)
-        h = world.agents.get(args.station)
+        # each call replays the state the call before wrote: this build's, and silent as
+        # it always was; another build's is refused or warned of by the load's rule
+        # (package 37d), the words to the terminal's error stream
+        world = replay_save(
+            data,
+            args.load,
+            getattr(args, "replay_anyway", False),
+            out=None if replay_mod.same_build(replay_mod.stamp_of(data)) else sys.stderr,
+        )
+        h = world.agents.get(station_name(args.station))
         if h is None:
             raise SystemExit(f"The save has no {args.station}.")
         h.save_fn = _save_fn(args.save)
         paused_since = (data.get("repl") or {}).get("paused_since")
+        if h.agent.released and new_reply is None:
+            # a released station taken again by the game's one rule (package 37g): at
+            # once when no question is owed; where one is, in words, for the interactive
+            # door to put it
+            again = harness_mod.seating(world, h.station.name, args.model_name or "")
+            # (a human at this door meets no consent step, so none is owed again)
+            if not again.ok or (again.ask_again and args.model_name):
+                words = again.why or (
+                    f"{args.model_name} left this game by its own word, and the consent "
+                    "question is put again before it is seated: start this door without "
+                    "--turn for the question, and then call again."
+                )
+                _write_sample(args, f"== {words} ==")
+                return 3
+            h.reseat(
+                Transcript([]),
+                identity=args.model_name or "",
+                door="repl",
+                save=_save_fn(args.save),
+            )
     else:
         world = _new_world(args)
         h = harness_mod.Harness(
@@ -623,6 +731,7 @@ def run_turn(args: argparse.Namespace, wall: Callable[[], float] | None = None) 
             door_note=_consent_note(record),
         )
         h.door = "repl"  # the reader keeps what each call wrote (the shelf's words)
+        h.model_name = args.model_name or ""
         h.start()
     ticks = 0
     while (
@@ -664,6 +773,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--wind", help="wind as 'FROM_DEG,KNOTS'")
     ap.add_argument("--heading", type=float)
     ap.add_argument("--load", help="a save to replay and continue from")
+    ap.add_argument(
+        "--replay-anyway",
+        action="store_true",
+        help="replay a save all the same when it was written by another build and holds a "
+        "station's transcript (the replay is then not the game that was played); without "
+        "it such a save is refused in words",
+    )
     ap.add_argument("--save", default="freesail-agent-save.json", help="where the game is saved")
     ap.add_argument("--turn", action="store_true", help="one turn from files, then exit")
     ap.add_argument("--reply", help="turn mode: the file holding this turn's reply")

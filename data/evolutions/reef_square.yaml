@@ -11,7 +11,7 @@ params: {reefs: 1}
 preconditions:
   - {check: sail.state == set, reason: "The {sail} is {state}; it must be set to be reefed."}
   - {check: sail.reef_bands > 0, reason: "The {sail} has no reef bands."}
-  - {check: sail.reefs < sail.reef_bands, reason: "The {sail} is close reefed already."}
+  - {check: sail.reefs < sail.reef_bands, reason: "The {sail} is close reefed already.", done: true}
 requires:
   - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
 steps:

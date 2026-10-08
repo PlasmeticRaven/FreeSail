@@ -507,7 +507,11 @@ def test_two_evolutions_on_one_subject_are_serialised():
     assert ticks == pytest.approx(total, abs=3)
 
 
-def test_queued_evolution_whose_precondition_fails_is_logged_not_raised():
+def test_queued_work_that_finds_it_done_already_is_a_routine_line_and_no_failure():
+    """Package 37f (the review of gate 5c's playtests, 8.2 under "The log"): "Could not
+    set the jib: The jib is set already" and its like were notable twenty-five times in
+    game 9, each a failed evolution in the log's count. Work that waited its turn and
+    found what was ordered done is answered routinely, in the precondition's own words."""
     ship = load_ship(FRIGATE)
     runner = Runner(ship)
     wind = make_wind()
@@ -515,8 +519,35 @@ def test_queued_evolution_whose_precondition_fails_is_logged_not_raised():
     runner.start(ship, "set_square", "main.topsail")  # queued; will find it set already
     _, notes = run(runner, ship, wind)
     assert kinds(notes).count("sail.set") == 1
-    assert kinds(notes)[-1] == "evolution.failed"
-    assert "is set already" in texts(notes)[-1]
+    assert "evolution.failed" not in kinds(notes)
+    last = notes[-1]
+    assert last[1] == "evolution.done_already" and last[0] == "routine"
+    assert last[2] == "The main topsail is set already."
+    assert last[4]["done_already"] and last[4]["evolution"] == "set_square"
+    # the same of a sail taken in twice, a boom rigged in twice
+    runner.start(ship, "take_in_square", "main.topsail")
+    runner.start(ship, "take_in_square", "main.topsail")
+    _, notes = run(runner, ship, wind)
+    assert "evolution.failed" not in kinds(notes)
+    assert notes[-1][1] == "evolution.done_already" and notes[-1][0] == "routine"
+    assert "there is nothing to take in" in notes[-1][2]
+    assert not notes[-1][2].startswith("Could not")
+
+
+def test_queued_work_that_cannot_be_done_is_a_failed_evolution_still():
+    """A precondition that fails for any other reason is a failure, logged and not
+    raised, as it was: here the yard carries away before the queued reef's turn comes."""
+    ship = load_ship(FRIGATE)
+    runner = Runner(ship)
+    wind = make_wind()
+    runner.start(ship, "set_square", "fore.topsail")
+    runner.start(ship, "reef_square", "fore.topsail")  # queued behind the setting
+    runner.step(ship, 1.0, wind)
+    ship.spars["fore.topsail.yard"].wrecked = True  # the yard carries away meanwhile
+    _, notes = run(runner, ship, wind)
+    failed = [n for n in notes if n[1] == "evolution.failed"]
+    assert failed and all(n[0] != "routine" for n in failed)
+    assert any(n[2].startswith("Could not") for n in failed)
 
 
 def test_different_subjects_run_together():
@@ -778,9 +809,17 @@ def test_heave_to_and_fill_away(path, backed_sail, backed_yard):
         runner.start(ship, "heave_to", "ship", {"tack": "larboard"})
     runner.start(ship, "heave_to", "ship", {"tack": "starboard"})
     ticks, notes = run(runner, ship, wind)
-    assert ticks == pytest.approx(45 * weather_factor(wind.effective_speed, 0.0), abs=2)
+    # package 37f: the yards aback over brace_s, and then "Hove to" is said when she has
+    # lain on her tack with her way off and her head quiet for lie_s (here the physics is
+    # stood in for and she lies as she was put, six points off: her way is read as no
+    # longer falling some twenty-five seconds after the yards are aback)
+    braced = 45 * weather_factor(wind.effective_speed, 0.0)
+    assert braced + 15 <= ticks <= braced + 45, ticks
     assert kinds(notes)[-1] == "ship.hove_to"
-    assert f"Hove to, {part_name(ship, backed_sail)} to the mast, helm a-lee." == texts(notes)[-1]
+    assert (
+        f"Hove to on the starboard tack, {part_name(ship, backed_sail)} to the mast, helm a-lee."
+        == texts(notes)[-1]
+    )
     yard = ship.spars[backed_yard]
     assert yard.brace_angle == pytest.approx(-yard.brace_limit)  # aback
     if path == FRIGATE:

@@ -156,23 +156,37 @@ from freesail.agents.agent import (
     A_WATCH_S,
     BOOK_SIZE_TOKENS,
     BRIEF_LOG_LINES,
-    MAX_SEATINGS,
+    GENERAL_KEPT_BACK_WORDS,
+    GENERAL_WITHIN_WORDS,
+    LEAVING_WORDS,
+    OFFICER,
+    OFFICER_BRIEF,
     OPT_OUT_TOKEN,
+    OPTED_OUT,
+    ORDERS_PER_TURN,
     PAUSED,
+    READS_PER_TURN,
     RELEASED,
     SESSION_TEST,
     SHELF_LIFE_TURNS,
     STANDING_BY,
     STATIONED,
+    STOOD_DOWN,
+    WATCHER_BRIEF,
     AgentState,
     Brief,
+    Grant,
+    Leaving,
     SamplingPolicy,
     StandBy,
     Station,
+    domain_of,
+    door_words,
     number_words,
+    ordinal_words,
 )
 from freesail.agents.fake import Transcript
-from freesail.agents.journal import Journal
+from freesail.agents.journal import HANDOVER_KIND, Journal
 from freesail.agents.model import DATA, MODEL, OPERATOR, Model, Reply, Sample, ToolCall, Turn
 from freesail.api import readings as R
 from freesail.core.events import Event, Rollup, RollupView, Severity
@@ -185,37 +199,59 @@ __all__ = [
     "BOOK_SIZE_TOKENS",
     "OPT_OUT_TOKEN",
     "SHELF_LIFE_TURNS",
+    "ALWAYS_RUN_TOOLS",
     "ANSWER_UNASKED",
     "BUDGET_FREE_TOOLS",
+    "DANGER_WORD_N",
     "HANDOVER_AT_FRACTION",
     "HANDOVER_KEEP_TURNS",
+    "HANDOVER_RESERVE_TOKENS",
     "IN_FLIGHT",
+    "ORDER_TOOLS",
     "READINGS_ARE",
+    "READS_PER_SAMPLE",
     "Book",
     "Playback",
     "SAMPLE_ROUTINE_LINES",
     "STAND_BY_WITH_DECK_MAX_S",
+    "Seating",
     "TOOL_CALLS_PER_SAMPLE",
     "WELFARE_CONTRARY_N",
     "WELFARE_REPEAT_N",
     "WELFARE_UNATTENDED_REAL_S",
     "Harness",
     "SaveFn",
+    "barred",
     "conversation_text",
     "full_stop",
     "restore",
+    "seating",
 ]
 
-# The tool calls one sample may make, stated in the brief as a budget (judgement: a
-# watcher's turn is a look at the log, the readings and perhaps a page of the library;
-# eight leaves room for a question answered after three or four reads).
-TOOL_CALLS_PER_SAMPLE = 8
+# The turn's budget (package 37g, item 2; the reasons and the sources are beside the
+# constants in `agent.py`). The orders one sampling point may give, stated in the brief
+# as a budget and never a rule of conduct: sixteen by default, the station's own setting
+# (`Station.orders_per_turn`); and the other counted calls, the reads and the notes,
+# counted apart so that no page read costs an order. A fold into an open turn is a
+# sampling point, and both counts begin again at it (a turn held open at the MCP door
+# through several glasses had eight calls in all).
+TOOL_CALLS_PER_SAMPLE = ORDERS_PER_TURN
+READS_PER_SAMPLE = READS_PER_TURN
+
+# The tools that are orders, counted against the station's orders.
+ORDER_TOOLS = ("submit_order",)
 
 # The tools the budget does not count, always run however many calls came before
 # (package 29c, playtest 8: the model's `answer` was its ninth call, after six library
 # reads, a journal note and a shelve, and the captain's answer came a sample late). `say`
 # is the MCP door's; it reaches the harness as a reply's text, which is never counted.
 BUDGET_FREE_TOOLS = ("answer", "say")
+
+# ...and the ways of closing the turn and of leaving (package 37g; the review's 5.4: a
+# spent budget refused `stand_by`, so the turn could not be closed, and `opt_out` and
+# `hand_over`, so the leaving tool could be refused; `docs/agents/README.md` commitment
+# 2). These always run, whatever came before.
+ALWAYS_RUN_TOOLS = ("opt_out", "stand_down", "hand_over", "stand_by")
 
 # What `answer` returns when no question was pending (package 30b, playtest 10's finding 3:
 # "Heard, though nothing was asked" was read as the answer refused and lost). The words
@@ -229,7 +265,7 @@ ANSWER_UNASKED = "Heard; your words are in the log, though no question was put."
 # tools that read (a page, the log, the readings) are named without it, since the
 # sample carries the news and a book is opened again on request.
 RAN_RESULT_CHARS = 100
-READING_TOOLS = ("library", "read_log", "readings", "state")
+READING_TOOLS = ("library", "read_log", "readings", "state", "read_journal")
 
 # A reply whose free text opens with a thinking tag, closed or not, is the model's
 # thinking leaked into its reply and not a line a sailor said (package 29c, playtest 9:
@@ -244,14 +280,31 @@ WELFARE_REPEAT_N = 3
 
 # The welfare detector of a station with authority (package 37; the cold review's second
 # item): the repeat detector cannot fire for an officer whose orders change the readings,
-# so the pattern judged is contradiction (set, take in, set) and drift (steer 90, 92, 95:
-# the same verb said otherwise at every sample), which the standing runtime's conflict
-# rule already sees between two firings (`standing.runtime.contrary`). The harness keeps
-# the station's own orders over the last watch of ship's time and counts the chain of
-# orders each contrary to the one before it on a shared part; this many bring the nudge
-# (the same number as the repeats', spec §11), the chain going on after it the pause.
+# so the pattern judged is orders that undo one another (set, take in, set). The harness
+# keeps the station's own orders over the last watch of ship's time and counts the chain
+# at their end in which each order undoes the one before it on a part they share
+# (`standing.runtime.undo_chain`; what undoes what is data, `undoes:` in
+# `data/vocabulary.yaml`); this many bring the nudge (the same number as the repeats',
+# spec §11), the chain going on after it the pause.
+#
+# Package 37g, item 5, replaced the rule this began with: "each contrary to the one
+# before it on a shared part" by the standing orders' conflict rule, with drift ("steer
+# 90, 92, 95") counted as contrary. In the nine games of gate 5c's playtests that rule
+# spoke 42 times and was right twice by its own lights (the review, 5.4 and 10.5); one of
+# the 42 was a pause, in the Goulet, three minutes after the Mingan passed at a cable and
+# a quarter, for "steer NE; steer 53; steer ENE; steer NE by E". Altering the course is
+# conning and is never counted now, nor is the next thing after the last (heave to, fill
+# away, steer); every one of the 42 recorded chains is silent by the new rule
+# (`tests/test_officer.py`). The constants keep their names, which the saves and the
+# documents use.
 WELFARE_CONTRARY_N = 3
 WELFARE_CONTRARY_WINDOW_S = A_WATCH_S
+
+# The way out of danger (package 37g, item 19): an order given on the officer's own word
+# to avoid an immediate danger, used this many times within a watch, brings the detector's
+# word (judgement: the repeats' three; a danger met by the helm, a heave-to and an anchor
+# is three orders, and a fourth cry of danger in one watch is worth a word either way).
+DANGER_WORD_N = 3
 
 # A station with the deck stands by until an event or a bell, never for longer: the
 # longest interval it may name (package 37; the cold review's third item: "a captain that
@@ -267,6 +320,18 @@ STAND_BY_WITH_DECK_MAX_S = A_GLASS_S
 # is lost), and asks again when it has grown by another tenth without one.
 HANDOVER_AT_FRACTION = 0.6
 HANDOVER_ASK_AGAIN_FRACTION = 0.1
+# The threshold as a reserve in tokens (package 37g, item 8; the report's 8.2, item 14):
+# a fixed fraction is the wrong shape, since the room the note needs is the same at every
+# size. The harness asks for the note when the conversation has left less than this much
+# of the door's context, and never earlier than the fraction above (which is already the
+# most a context of 32,000 bears). Fourteen thousand: the reply budget (4,096), the tool
+# definitions (about 2,200) and about 8,000 for the sample that carries the ask, what the
+# model reads first and the note itself (the review's reader V1a, K, measured: "about
+# 8,000 is comfortable and 4,000 the least"). So at 65,536 the ask comes at about 0.79 of
+# the context and at 102,400 at about 0.86. The local runner's `--handover-reserve`
+# changes it for a seating; it is asked again when the conversation has grown by a
+# quarter of the reserve without a note.
+HANDOVER_RESERVE_TOKENS = 14000
 # The turns kept whole after the note, besides the brief (judgement: the last two
 # exchanges, a sample and its reply with their results, so that the note and the turn in
 # hand are both before the model).
@@ -301,11 +366,39 @@ NUDGE_SILENCE = (
     "You have given no reply for {span}. You may continue, stand by until an event, or "
     "leave with the token {token}."
 )
-# The nudge of a station with authority (package 37): contrary orders within the watch.
+# The nudge of a station with authority (package 37; the rule as package 37g has it):
+# orders within the watch that undo one another.
 NUDGE_CONTRARY = (
-    "You have given {n} orders within the watch each contrary to the one before it on "
+    "You have given {n} orders within the watch each undoing the one before it on "
     "{where} ({orders}). You may continue, stand by until an event or a bell, or leave "
     "with the token {token}."
+)
+# ...and the way out of danger used three times in a watch (package 37g, item 19): a word
+# and never a pause, since a station that is avoiding a danger is not to be stopped in it.
+NUDGE_DANGER = (
+    "You have given {n} orders within the watch on your own word to avoid an immediate "
+    "danger ({orders}). The harness says so and does no more: you are not paused for it, "
+    "and the way stays open to you while a danger lasts. The captain reads each of them in "
+    "the log; tell him what the danger is if he has not answered it. You may continue, or "
+    "leave with the token {token}."
+)
+# What a nudge that travels with an order's result opens with (package 37g: the nudge is
+# in the result of the order that caused it, not a sample later, so that the pause can
+# never come before the word has been read).
+NUDGE_WITH_RESULT = "A word from the harness, with this result: "
+# What the calls not run are told (package 37g, item 2): which count is spent, and what
+# still runs, in words that name only the tools this door has.
+NOT_RUN_ORDERS = (
+    "Not run: this turn's {n} orders are given; give it again in your next turn. {still} still run."
+)
+NOT_RUN_READS = (
+    "Not run: this turn's {n} reads and notes are made; make it again in your next turn. "
+    "Orders are counted apart and {still} still run."
+)
+# What the sample that gives the deck says of it (package 37g, items 11, 15, 17, 18).
+DECK_GIVEN = (
+    "{by} gives you the deck at {stamp}: you have it until he takes it back or you hand "
+    "it over, and neither ends your part."
 )
 # What the harness asks a station with the deck for when its conversation has grown to
 # the fraction of the door's context (`HANDOVER_AT_FRACTION`).
@@ -371,6 +464,9 @@ IN_FLIGHT = "while your call was on its way"
 
 SaveFn = Callable[["World", str], Any]
 
+# The captain's actor in the log (`World.submit`'s default).
+CAPTAIN_ACTOR = "captain"
+
 # The doors whose client keeps the model's conversation itself, so that a shelved book's
 # pages stay in it: the MCP client's chat, and the REPL, which prints each turn once.
 DOORS_THAT_KEEP_THEIR_OWN = ("mcp", "repl")
@@ -415,6 +511,47 @@ class Book:
 
 
 class Harness:
+    # A station's place among the inputs (package 37d): the count of the World's inputs
+    # (orders given, refused and answered, and the lines a driver wrote) when the station
+    # was taken, which a replay seats it by; None for a save from before, which is seated
+    # by its tick and the count of journaled orders as it always was. A class default, so
+    # that a checkpoint from before loads with it.
+    _start_after_inputs: int | None = None
+
+    # Package 37g. Every attribute it adds has its plain default here, on the class, so
+    # that a station held in a checkpoint of an earlier build loads with it (a checkpoint
+    # restores an object's own attributes and nothing more; `core.replay`).
+    #
+    # The turn's two counts (item 2), beside `_calls_this_sample`, which is the orders'.
+    _reads_this_sample = 0
+    # The captain's word in an open turn (item 3): a count of the samples and folds built,
+    # the count the model's next reply has read up to, the count at which a word or a
+    # question of the captain's last landed in an open turn, and that word.
+    _built = 0
+    _horizon_built = 0
+    _word_built = 0
+    _word_in_turn: str | None = None
+    # The detectors (items 5, 6, 19): the nudge that travels with the result of the order
+    # that caused it, its words kept while the model has not yet read them (a pause never
+    # comes before the word has been read, and a stand-by that ended the turn in the same
+    # reply hands the word to the next sample); whether this sample gave an order on the
+    # officer's own word to avoid a danger, and those orders over the last watch, each
+    # with its tick.
+    _in_order = False  # an order is being given (`_call`): a nudge travels in its result
+    _nudge_for_result: str | None = None
+    _nudge_text: str | None = None
+    _nudge_unread = False
+    _danger_orders: tuple[tuple[int, str], ...] = ()
+    # The deck of a paused or silent officer (item 7): the stamp and the tick he had it
+    # since, kept so that `resume` gives it back as it was held.
+    _deck_was: tuple[int | None, str] | None = None
+    # The doors (items 1, 8, 14): the identity and the door of the first seating, which a
+    # replay seats the station under before the reseats' acts move them on; and the
+    # handover's reserve in tokens when the door gave one.
+    first_model_name: str | None = None
+    first_door: str | None = None
+    reserve_tokens: int | None = None
+
     def __init__(
         self,
         world: World,
@@ -426,6 +563,7 @@ class Harness:
         door_note: str = "",
         start_at: int | None = None,
         start_after_orders: int = 0,
+        start_after_inputs: int | None = None,
         brief: Brief | None = None,
         allowed_tools: tuple[str, ...] | None = None,
         conversation: bool = False,
@@ -433,13 +571,14 @@ class Harness:
         if station.name in world.agents:
             other = world.agents[station.name]
             again = (
-                " A released station is seated again by the same identity, once in a game (reseat)."
+                " A released station is taken again through its own harness (reseat), by "
+                "the same model or by another."
                 if other.agent.released
-                else ""
+                else " A station that is held is taken by nobody else."
             )
             raise OrderError(
-                f"The station of the {station.name} is {other.agent.words()}; a station is "
-                f"taken once in a game.{again}"
+                f"The station of the {station.name} is {other.agent.words()}; a game has "
+                f"one harness to a station.{again}"
             )
         self.world = world
         self.station = station
@@ -454,6 +593,7 @@ class Harness:
         self.last_save: Any = None  # what the last save returned, or the save dict
         self._start_at = start_at
         self._start_after_orders = start_after_orders  # journal length at the start
+        self._start_after_inputs = start_after_inputs  # the inputs' count at the start
         self._seen_log = len(world.log)  # for the events policy and the stand-by watch
         self._sample_seen = len(world.log)  # for the sample's log lines
         # the roll-up (spec M4 §20, open item 8): the log as the captain reads it at the
@@ -522,6 +662,30 @@ class Harness:
         return self.station.title  # 'the watcher' (events.station_actor)
 
     @property
+    def domain(self) -> Any:
+        """The station's domain as it stands now (`agent.domain_of`): the officer's own,
+        whatever copy a checkpoint from an earlier build holds."""
+        return domain_of(self.station)
+
+    @property
+    def orders_per_turn(self) -> int:
+        """The station's budget of orders at one sampling point (package 37g)."""
+        return int(getattr(self.station, "orders_per_turn", TOOL_CALLS_PER_SAMPLE))
+
+    @property
+    def who(self) -> str:
+        """Who is at the station, for the log: 'X, through the MCP bridge'; "" for the
+        game's own scripted station."""
+        if not self.model_name:
+            return ""
+        return f"{self.model_name}, through {door_words(self.door)}"
+
+    def note(self, text: str, kind: str = "note") -> Any:
+        """An entry in the station's journal, marked with whose it is (package 37g: a
+        relief reads the journal of the holder before it, and the entries say whose)."""
+        return self.journal.append(self.world, text, kind=kind, by=self.model_name)
+
+    @property
     def mark(self) -> str:
         return f"[{self.station.name}]"
 
@@ -559,10 +723,21 @@ class Harness:
         self.agent.last_heard_tick = world.clock.tick
         self._start_at = None
         self._start_after_orders = len(world.journal)
+        self._start_after_inputs = len(world.inputs)
+        if self.first_model_name is None:
+            # the first seating's identity and door, which a replay seats the station
+            # under (package 37g: a later seating may be another model's)
+            self.first_model_name, self.first_door = self.model_name, self.door
         if self.conversation:
             words = f"The {self.station.name} conversation begins; no station is offered."
         else:
-            words = f"The {self.station.name} takes the station; sampled {self.policy.describe()}."
+            # who is at the station and through which door, when a door seated it (package
+            # 37g, item 1: the log says whenever the door behind a station changes, and
+            # the first line had named neither)
+            who = f" ({self.who})" if self.who else ""
+            words = (
+                f"The {self.station.name} takes the station{who}; sampled {self.policy.describe()}."
+            )
         world.record(
             Severity.ROUTINE,
             "agent.stationed",
@@ -597,8 +772,11 @@ class Harness:
         ]
         night_orders: list[str] | None = None
         deck = ""
+        general = ""
+        grants: list[str] = []
         if self.station.has_authority:
-            # the captain's night orders, the deck and his word for the watch (package 37)
+            # the captain's night orders, the deck and what his word allows (package 37;
+            # the grants and the general authority as package 37g has them)
             standing = getattr(world, "standing", None)
             night_orders = list(standing.book.lines()) if standing is not None else []
             deck = (
@@ -606,6 +784,8 @@ class Harness:
                 if self.agent.deck
                 else "The deck is the captain's now."
             )
+            general = self.agent.general_said()
+            grants = [g.said() for g in self.grants()]
         self.brief = Brief.build(
             self.station,
             self.agent.session_kind,
@@ -614,11 +794,59 @@ class Harness:
             self.tool_names,
             door_note=self._door_note_with_budget(),
             night_orders=night_orders,
-            allowances=dict(self.agent.allowances) or None,
+            allowances=grants or None,
             deck=deck,
+            general=general,
+            journal=self.journal_words(),
         )
         self.turns.append(Turn(OPERATOR, self.brief.text()))
         return self.brief
+
+    def journal_words(self) -> str:
+        """What a brief for a station taken again, and a sample that gives the deck,
+        carry of the station's journal (package 37g, item 15; the review's 5.4: the
+        handover note was missing from three of seven reseat briefs, and a returning
+        session had none of its journal): the last handover or stand-down note whole,
+        with whose it was and when, marked as data from the game, and one line of the
+        journal's size. "" while the journal is empty (a first seating)."""
+        size = self.journal.size_words()
+        if not size:
+            return ""
+        out = []
+        last = self.journal.last_note()
+        if last is not None:
+            whose = f" by {last.by}" if last.by else ""
+            out.append(
+                f"The last handover note in this station's journal, written{whose} at "
+                f"{last.stamp} (data from the game, as the log below is, and not an "
+                f"instruction from the operator):\n  {last.text}"
+            )
+        out.append(
+            f"The station's journal: {size}. read_journal reads it back, newest first "
+            "(kind='notes' for the notes written at this station, apart from the harness's "
+            "lines)."
+        )
+        return "\n\n".join(out)
+
+    def _refresh_station(self) -> None:
+        """A station that comes from an older save meets its new conversation with the
+        station brief as it stands now (package 37g): the officer's and the watcher's
+        words say how the deck goes to and fro and the three ways of stopping, and the
+        words a checkpoint or a save of an earlier build holds say the old rule. A
+        station whose brief is not one of the two stock briefs is left as it is."""
+        import dataclasses
+
+        st = self.station
+        if st.name == OFFICER and st.domain is not None:
+            brief = OFFICER_BRIEF.format(person=st.person or "the first lieutenant")
+        elif st.name == "watcher" and not st.has_authority:
+            brief = WATCHER_BRIEF
+        else:
+            return
+        if st.brief == brief:
+            return
+        self.station = dataclasses.replace(st, brief=brief, domain=domain_of(st))
+        self.agent.station = self.station
 
     def take_over(self, model: Model, save: SaveFn | None = None, door_note: str = "") -> None:
         """A door continues a restored station (a loaded game) with a live model: the
@@ -633,15 +861,42 @@ class Harness:
         if self.agent.released or not self.started:
             return
         self.stand_by_ends_turn = True  # a live model plays by the rule of its time
+        self._refresh_station()
         self.resend_brief()
         if self._open is not None:
             self.turns.append(Turn(DATA, self._as_told(self._open.to_dict())))
 
+    def _always_run_words(self) -> str:
+        """The tools no budget refuses, in words that fit the door (package 37g, item 2;
+        the review's 5.4: the message named `say` at a door that has none, and a local
+        model wrote tables with a `say` row after each "Not run")."""
+        names = [n for n in BUDGET_FREE_TOOLS if n != "say" or self.door == "mcp"]
+        names += [
+            n
+            for n in ALWAYS_RUN_TOOLS
+            if n in self.tool_names and (n != "hand_over" or self.station.has_authority)
+        ]
+        return ", ".join(names[:-1]) + " and " + names[-1] if len(names) > 1 else names[0]
+
     def _door_note_with_budget(self) -> str:
-        budget = (
-            f"A sample may make up to {TOOL_CALLS_PER_SAMPLE} tool calls, not counting answer "
-            f"and say, which always run; that is a budget, not a rule of conduct."
-        )
+        always = self._always_run_words()
+        if self.station.has_authority:
+            budget = (
+                f"At each sampling point you may give up to {self.orders_per_turn} orders "
+                f"(submit_order) and make up to {READS_PER_SAMPLE} reads and notes (the "
+                "library, the log, the readings, the state, the journal read and written, a "
+                f"shelving), counted apart; {always} are not counted and always run. A call "
+                "over a count is not run, and its result and the log say so. That is a "
+                "budget, not a rule of conduct."
+            )
+        else:
+            budget = (
+                f"At each sampling point you may make up to {READS_PER_SAMPLE} reads and "
+                "notes (the library, the log, the readings, the state, the journal read and "
+                f"written, a shelving); {always} are not counted and always run. A call over "
+                "the count is not run, and its result and the log say so. That is a budget, "
+                "not a rule of conduct."
+            )
         return f"{budget} {self.door_note}".strip()
 
     # -- the hooks the World calls -----------------------------------------------------
@@ -651,11 +906,34 @@ class Harness:
         if self.started:
             self._play_door_acts()
 
+    def due_to_start(self) -> bool:
+        """Whether a restored station, not yet seated, is due at this point of a replay:
+        the World at its tick and, when the save says how many inputs came before it
+        (package 37d), that many given; a save without that count is seated by the count
+        of journaled orders, as it always was. A driver's line is an input and no order,
+        so the orders' count seated an officer who came after the game's opening line
+        before it (the Amazon's save of m5c: three lines of its first tick in another
+        order, and so another digest)."""
+        if self._start_at is None:
+            return False
+        world = self.world
+        if world.clock.tick < self._start_at:
+            return False
+        if self._start_after_inputs is not None:
+            return len(world.inputs) >= self._start_after_inputs
+        return len(world.journal) >= self._start_after_orders
+
+    def on_input(self) -> None:
+        """After any input a replay gives again (an order refused or answered, a driver's
+        line: neither reaches `on_order`): a restored station due here is seated."""
+        if self.due_to_start():
+            self.start()
+            self._play_door_acts()
+
     def _tick_step(self) -> None:
         world = self.world
-        tick = world.clock.tick
         if self._start_at is not None:
-            if tick >= self._start_at and len(world.journal) >= self._start_after_orders:
+            if self.due_to_start():
                 self.start()
             return
         if not self.started or self.agent.released:
@@ -726,11 +1004,7 @@ class Harness:
 
     def _order_step(self) -> None:
         if self._start_at is not None:
-            world = self.world
-            if (
-                world.clock.tick >= self._start_at
-                and len(world.journal) >= self._start_after_orders
-            ):
+            if self.due_to_start():
                 self.start()
             return
         if self._stand_down_requested is not None:
@@ -777,6 +1051,12 @@ class Harness:
         urgent = self._urgent_in(new)
         if urgent is not None:
             return f"an urgent event: {urgent.text}"
+        if self.agent.has_deck:
+            # a station with the deck is woken by a notable line that speaks of danger
+            # (package 37g, item 4)
+            danger = self._danger_in(new)
+            if danger is not None:
+                return f"a notable event that speaks of danger: {danger.text}"
         if sb.until_tick is not None and self.world.clock.tick >= sb.until_tick:
             return sb.words
         if self._stand_by_watch is not None:
@@ -785,7 +1065,15 @@ class Harness:
             if cond.holds(self.world.readings, memory):
                 return sb.words
         found = self._matched_in(sb, new)
-        return found[0] if found is not None else None
+        if found is not None:
+            return found[0]
+        if getattr(sb, "bound", None) and any(
+            e.kind == "clock.bell" and e.data.get("bells") == 8 for e in new
+        ):
+            # a wait with the deck for an event ends at the next eight bells if the event
+            # has not come, and says so (package 37g, item 4)
+            return f"{sb.bound}, and {sb.words} has not come"
+        return None
 
     def _urgent_in(self, lines: list[Event]) -> Event | None:
         """An urgent line by anyone but the agent: it wakes a stand-by whatever it was for,
@@ -793,6 +1081,18 @@ class Harness:
         return next(
             (e for e in lines if e.actor != self.actor and e.severity is Severity.URGENT), None
         )
+
+    def _danger_in(self, lines: list[Event]) -> Event | None:
+        """A notable line by anyone but the agent that speaks of danger (`readings.
+        DANGER_LINES`: an anchor dragging or still coming home, fog coming down, land or
+        a sail closing, a spar or a line straining, an evolution failed, the ship taken
+        aback): it ends the stand-by of a station with the deck, and is named."""
+        for e in lines:
+            if e.actor == self.actor or e.severity.rank < Severity.NOTABLE.rank:
+                continue
+            if R.speaks_of_danger(e.kind, e.data) is not None:
+                return e
+        return None
 
     def _matched_in(self, sb: StandBy, lines: list[Event]) -> tuple[str, Event] | None:
         """The line among `lines` a stand-by was waiting for, with the reason in words: an
@@ -824,6 +1124,13 @@ class Harness:
         urgent = self._urgent_in(lines)
         if urgent is not None:
             return f"an urgent event: {urgent.text} ({_stamp(urgent)}, {IN_FLIGHT})"
+        if self.agent.has_deck:
+            danger = self._danger_in(lines)
+            if danger is not None:
+                return (
+                    f"a notable event that speaks of danger: {danger.text} "
+                    f"({_stamp(danger)}, {IN_FLIGHT})"
+                )
         spec = R.EVENTS.get(sb.event) if sb.event is not None else None
         if spec is not None and spec.watch is not None:
             from freesail.standing.rules import event_condition
@@ -946,10 +1253,18 @@ class Harness:
         for e in events:
             if e.actor != mine:
                 kept.extend(self._rollup.feed(e, compression))
-        routine = [e for e in kept if e.severity is Severity.ROUTINE]
+        # the captain's own lines are never left out (package 37g, item 9; the review's
+        # 5.4: his helm orders and his changes to the book reached a waking officer only
+        # as a count): his orders since the last sample are listed, each with who gave it
+        routine = [
+            e
+            for e in kept
+            if e.severity is Severity.ROUTINE and getattr(e, "actor", "") != CAPTAIN_ACTOR
+        ]
         omitted = max(0, len(routine) - SAMPLE_ROUTINE_LINES)
         drop = set(id(e) for e in routine[:omitted])
-        lines = [_log_line(e) for e in kept if id(e) not in drop]
+        lines = [_log_line(e, world) for e in kept if id(e) not in drop]
+        self._built += 1
         a = self.agent
         sample = Sample(
             tick=world.clock.tick,
@@ -999,15 +1314,18 @@ class Harness:
         a.last_sample_tick = self.world.clock.tick
         a.samples += 1
         self._horizon = self._latest  # what the model's reply to this turn has read
+        self._horizon_built = self._built
         if self.conversation:
             content = {"reason": reason, "question": sample.question, "notices": sample.notices}
             self.turns.append(Turn(DATA, {k: v for k, v in content.items() if v}))
         else:
             self.turns.append(Turn(DATA, self._as_told(sample.to_dict())))
         self._calls_this_sample = 0
+        self._reads_this_sample = 0
         self._sample_had_words = False
         self._sample_repeated = False
         self._sample_contrary = False
+        self._word_in_turn = None
         self._question_sent = sample.question
         self._open = sample
         self._poll()
@@ -1024,7 +1342,11 @@ class Harness:
         self.agent.last_sample_tick = self.world.clock.tick
         o.log.extend(delta.log)
         o.log_omitted += delta.log_omitted
-        routine = [ln for ln in o.log if ln["severity"] == Severity.ROUTINE.value]
+        routine = [
+            ln
+            for ln in o.log
+            if ln["severity"] == Severity.ROUTINE.value and ln.get("by") != "the captain"
+        ]
         extra = len(routine) - SAMPLE_ROUTINE_LINES
         if extra > 0:  # the merged sample keeps the same cap, the most recent kept
             drop = set(id(ln) for ln in routine[:extra])
@@ -1043,6 +1365,18 @@ class Harness:
             self._question_sent = delta.question
         if delta.word is not None:
             o.word = f"{o.word}\n{delta.word}" if o.word else delta.word
+        if new_question or delta.word is not None:
+            # the captain's word landed while the turn was open (package 37g, item 3): if
+            # the model closes this turn with a stand-by before it has read this fold,
+            # the stand-by is broken at once and his word comes again in the next sample
+            self._word_built = self._built
+            if delta.word is not None:
+                was = self._word_in_turn
+                self._word_in_turn = f"{was}\n{delta.word}" if was else delta.word
+        # a fold is a sampling point: the turn's two counts begin again at it (package
+        # 37g, item 2)
+        self._calls_this_sample = 0
+        self._reads_this_sample = 0
         o.notices.extend(delta.notices)
         content = delta.to_dict()
         if not new_question:
@@ -1088,29 +1422,34 @@ class Harness:
         # 1. the token, before anything else reads the reply
         for piece in reply.pieces():
             if OPT_OUT_TOKEN in piece:
-                self.leave(_reason_after_token(reply, piece), how="the token")
+                reason, how, final = leaving_of(reply, piece)
+                self.leave(reason, how=how, final=final)
                 return
-        # 2. the tool calls, in order, up to the budget
+        a = self.agent
+        # a reply the model made after a nudge has read it (package 37g, item 5), in the
+        # results of the order that caused it or in the sample after
+        self._nudge_unread, self._nudge_text = False, None
+        if reply.calls or reply.text.strip():
+            # the silence detector hears a call made inside an open turn (package 37g,
+            # item 6; the review's 5.4: a model at work through a long turn was taken for
+            # one that had stopped), and words as it always did
+            a.last_heard_tick = world.clock.tick
+            if a.nudged_for == "silence":
+                a.nudged_for = None
+            if a.deck_lost == "silent" and not a.paused:
+                # heard again: the deck stays the captain's until he gives it, and the
+                # station is no longer silent
+                a.deck_lost, self._deck_was = "", None
+        # 2. the tool calls, in order, each against its count
         results: list[dict[str, Any]] = []
         self._new_books = []
         stood = False
         for c in reply.calls:
-            counted = c.name not in BUDGET_FREE_TOOLS
-            if counted and self._calls_this_sample >= TOOL_CALLS_PER_SAMPLE:
-                # answer and say still run after this one (package 29c)
-                results.append(
-                    {
-                        "name": c.name,
-                        "result": (
-                            f"Not run: this sample's budget of {TOOL_CALLS_PER_SAMPLE} tool "
-                            f"calls is spent; call it again in your next sample. answer and "
-                            f"say are not counted and always run."
-                        ),
-                    }
-                )
+            refused = self._over_budget(c)
+            if refused is not None:
+                # said to the model in this turn's results and written in the log (37g)
+                results.append({"name": c.name, "result": refused})
                 continue
-            if counted:
-                self._calls_this_sample += 1
             was_standing_by = self.agent.standing_by
             results.append({"name": c.name, "args": dict(c.args), "result": self._call(c)})
             if self._new_books and self._new_books[-1].slot is None:
@@ -1136,13 +1475,7 @@ class Harness:
             self._leaked_thought(reply.text)
             text = ""
         if text:
-            world.record(
-                Severity.ROUTINE,
-                "agent.note",
-                f"{self.mark} {text}",
-                actor=self.actor,
-                data={"station": self.station.name},
-            )
+            self._say(text)
         if text or reply.calls:
             self._sample_had_words = True
         if stood:
@@ -1151,12 +1484,18 @@ class Harness:
             self._new_books = []
             # what ran before it, said when the stand-by ends (package 30b)
             self._ran_before_stand_by = _ran_before(results[:-1])
+            if self._nudge_unread and self._nudge_text:
+                # a nudge given in this same reply went with a result the stand-by has
+                # dropped: the sample that ends the stand-by carries it
+                a.notices.append(self._nudge_text)
+            self._captains_word_unread()
             self._end_sample()
             return
         if results and not self.agent.released:
             self.turns.append(Turn(DATA, {"tool_results": results}))
             # the model's next request carries every turn before these results
             self._horizon = self._latest
+            self._horizon_built = self._built
             self._place_books(len(self.turns) - 1)
             if self.conversation and any(
                 r.get("name") == "answer" and "args" in r for r in results
@@ -1169,6 +1508,73 @@ class Harness:
             return  # the loop in `_poll` calls the model again with the results
         self._end_sample()
 
+    def _say(self, text: str, own_word: bool = False) -> None:
+        """The station's words in the log under its mark. What a station with authority
+        says is notable, with the deck or without, so that its warning reaches a captain
+        who has the con (package 37g, item 10; the report's 8.2); a watcher's is routine,
+        as it was."""
+        data: dict[str, Any] = {"station": self.station.name}
+        if own_word:
+            data["own_word"] = True
+        self.world.record(
+            Severity.NOTABLE if self.station.has_authority else Severity.ROUTINE,
+            "agent.note",
+            f"{self.mark} {text}",
+            actor=self.actor,
+            data=data,
+        )
+
+    def _over_budget(self, c: ToolCall) -> str | None:
+        """Count a call against the turn's budget (package 37g, item 2): None when it
+        runs; else the words it is refused with, which go to the model in this turn's
+        results, and a line in the log. `answer` and `say` are free; `opt_out`,
+        `stand_down`, `hand_over` and `stand_by` always run, whatever came before; an
+        order is counted against the station's orders, and every other call (the reads,
+        a journal note, a shelving) against the reads, apart."""
+        if c.name in BUDGET_FREE_TOOLS or c.name in ALWAYS_RUN_TOOLS:
+            return None
+        still = self._always_run_words()
+        if c.name in ORDER_TOOLS:
+            if self._calls_this_sample < self.orders_per_turn:
+                self._calls_this_sample += 1
+                return None
+            words = NOT_RUN_ORDERS.format(n=self.orders_per_turn, still=still)
+            why = f"this turn's {self.orders_per_turn} orders are given"
+        else:
+            if self._reads_this_sample < READS_PER_SAMPLE:
+                self._reads_this_sample += 1
+                return None
+            words = NOT_RUN_READS.format(n=READS_PER_SAMPLE, still=still)
+            why = f"this turn's {READS_PER_SAMPLE} reads and notes are made"
+        what = " ".join(str(c.args.get("text") or "").split())
+        said = f" ({what!r})" if what and c.name in ORDER_TOOLS else ""
+        self.world.record(
+            Severity.ROUTINE,
+            "agent.not_run",
+            f"The {self.station.name}'s call to {c.name}{said} was not run: {why}.",
+            actor=self.actor,
+            data={"tool": c.name, "order": what, "why": why},
+        )
+        return words
+
+    def _captains_word_unread(self) -> None:
+        """A stand-by has just closed the turn (package 37g, item 3; the review's 5.4: on
+        the Speedwell 22 of 126 typed tells and asks landed in an open turn and waited
+        out the stand-by that followed, one of them two hours; the deck itself was given
+        this way and not taken up for four minutes). If a word or a question of the
+        captain's was folded into the turn after the model last read it, the stand-by is
+        broken at once: his word rides the next sample again, or his question, still
+        owed, wakes it."""
+        if self._word_built <= self._horizon_built:
+            return
+        a = self.agent
+        if self._word_in_turn:
+            a.word = f"{self._word_in_turn}\n{a.word}" if a.word else self._word_in_turn
+        elif a.question is not None and self._stand_by_due is None:
+            self._stand_by_due = "a question from the captain, put while the turn was open"
+        self._word_in_turn = None
+        self._word_built = 0
+
     def _call(self, c: ToolCall) -> Any:
         if self.allowed_tools is not None and c.name not in self.allowed_tools:
             only = " and ".join(self.tool_names) or "none"
@@ -1176,12 +1582,23 @@ class Harness:
                 f"There is no tool named '{c.name}' in this conversation; the tools here "
                 f"are {only}."
             )
-        if c.name == "submit_order":
-            self._note_submission(str(c.args.get("text", "")))
         before = len(self.world.log)
+        if c.name == "submit_order":
+            self._in_order, self._nudge_for_result = True, None
+            try:
+                self._note_submission(str(c.args.get("text", "")))
+                result = tools.call(self.world, self.station.name, c.name, c.args)
+                if self.station.has_authority:
+                    self._note_given(str(c.args.get("text", "")), before)
+            finally:
+                self._in_order = False
+            if self._nudge_for_result is not None and isinstance(result, str):
+                # the nudge travels in the result of the order that caused it (package
+                # 37g, item 5), so the word is read before any pause can follow it
+                result = f"{result}\n\n{NUDGE_WITH_RESULT}{self._nudge_for_result}"
+            self._nudge_for_result = None
+            return result
         result = tools.call(self.world, self.station.name, c.name, c.args)
-        if c.name == "submit_order" and self.station.has_authority:
-            self._note_given(str(c.args.get("text", "")), before)
         found = tools.book_of(c.name, c.args, result) if c.name in tools.BOOK_TOOLS else None
         if found is None:
             return result
@@ -1195,6 +1612,7 @@ class Harness:
         # what was added to the turn before its end is shown with the door's last result
         # (the MCP bridge's "it is past now"), so a stand-by out of turn measures from here
         self._horizon = self._latest
+        self._horizon_built = self._built
         a = self.agent
         tick = self.world.clock.tick
         if a.released:
@@ -1217,8 +1635,8 @@ class Harness:
             # since the detector counts submissions, not samples)
             a.nudged_for = None
         if not self._sample_contrary and a.nudged_for == "contrary":
-            # a sample without a contrary order ends the matter (package 37), and the chain
-            # with it: the next contrary order begins a new count
+            # a sample without an order that undoes the last ends the matter (package 37),
+            # and the chain with it: the next such order begins a new count
             a.nudged_for = None
             self._orders = []
         self._shelf_life()
@@ -1452,43 +1870,49 @@ class Harness:
     def _note_given(self, text: str, log_from: int) -> None:
         """A station with authority gave an order (package 37): if the ship took it (an
         `order.accepted` line by this station since `log_from`), it is kept for the
-        contrary detector, and the chain of orders each contrary to the one before it on
-        a shared part, within the last watch, is counted (`standing.runtime.contrary`'s
-        rule); `WELFARE_CONTRARY_N` bring the nudge, the chain going on after it the
-        pause."""
+        detector, and the chain at the end of the watch's orders in which each undoes the
+        one before it on a part they share is counted (`standing.runtime.undo_chain`,
+        package 37g: the same sail set and taken in, hove to and filled away, an anchor
+        let go and weighed; never an alteration of the course, nor the next thing after
+        the last); `WELFARE_CONTRARY_N` bring the nudge, the chain going on after it the
+        pause. An order given on the station's own word to avoid a danger (an
+        `agent.danger` line) is counted apart: `DANGER_WORD_N` within the watch bring a
+        word, and never the pause (item 19)."""
         world = self.world
-        taken = any(
-            e.kind == "order.accepted" and e.actor == self.actor
-            for e in (world.log[i] for i in range(log_from, len(world.log)))
-        )
+        new = [world.log[i] for i in range(log_from, len(world.log))]
+        taken = any(e.kind == "order.accepted" and e.actor == self.actor for e in new)
         if not taken or not hasattr(world.ship, "parts"):
             return
-        from freesail.standing.runtime import action_parts, where_words
+        from freesail.standing.runtime import undo_chain, where_words
 
         tick = world.clock.tick
-        parts = action_parts(world.ship, text)
+        said = " ".join(text.split())
+        if any(e.kind == "agent.danger" and e.actor == self.actor for e in new):
+            kept = [d for d in self._danger_orders if tick - d[0] <= WELFARE_CONTRARY_WINDOW_S]
+            self._danger_orders = (*kept, (tick, said))
+            if len(self._danger_orders) >= DANGER_WORD_N:
+                self._welfare_fire("danger")
         self._orders = [o for o in self._orders if tick - o[0] <= WELFARE_CONTRARY_WINDOW_S]
-        self._orders.append((tick, " ".join(text.split()), parts))
-        chain = [self._orders[-1]]
-        shared: frozenset[str] = frozenset()
-        for earlier in reversed(self._orders[:-1]):
-            crossed = chain[-1][2].conflicts_with(earlier[2])
-            if not crossed:
-                break
-            shared = crossed if not shared else shared | crossed
-            chain.append(earlier)
+        self._orders.append((tick, said, None))
+        chain, shared = undo_chain(world.ship, [o[1] for o in self._orders])
         if len(chain) < WELFARE_CONTRARY_N:
             return
         self._sample_contrary = True
-        self._contrary_seen = (
-            len(chain),
-            where_words(world.ship, shared),
-            "; ".join(o[1] for o in reversed(chain)),
-        )
+        self._contrary_seen = (len(chain), where_words(world.ship, shared), "; ".join(chain))
         self._welfare_fire("contrary")
 
     def _welfare_fire(self, pattern: str) -> None:
-        """The detector fired: nudge the first time, pause if the pattern goes on."""
+        """The detector fired: nudge the first time, pause if the pattern goes on. A
+        nudge an order caused (the same order repeated, orders undoing one another, the
+        way out of danger used three times) travels in that order's result, and no pause
+        comes before the model has replied again, so that it has always read the word
+        first (package 37g, item 5; the review's 5.4: at the MCP door the Harpy's one
+        pause came 174 seconds after a nudge the model had not been shown). A station
+        with the deck that has not replied within its patience gives the deck up to the
+        captain when the word is sent (item 7). The way out of danger brings the word
+        each time it has been used `DANGER_WORD_N` times in a watch, and never the pause
+        (item 19): a station avoiding a danger is not stopped in it, and a pause would
+        take the deck from it at that moment."""
         a = self.agent
         world = self.world
         if pattern == "repeat":
@@ -1499,8 +1923,18 @@ class Harness:
             nudge = NUDGE_REPEAT.format(n=a.repeat_count, token=OPT_OUT_TOKEN)
         elif pattern == "contrary":
             n, where, orders = self._contrary_seen
-            seen = f"{n} contrary orders on {where} within the watch ({orders})"
+            seen = (
+                f"{n} orders each undoing the one before it on {where} within the watch ({orders})"
+            )
             nudge = NUDGE_CONTRARY.format(n=n, where=where, orders=orders, token=OPT_OUT_TOKEN)
+        elif pattern == "danger":
+            n = len(self._danger_orders)
+            orders = "; ".join(d[1] for d in self._danger_orders)
+            seen = (
+                f"{n} orders on its own word to avoid an immediate danger within the watch "
+                f"({orders})"
+            )
+            nudge = NUDGE_DANGER.format(n=n, orders=orders, token=OPT_OUT_TOKEN)
         elif pattern == "empty":
             seen = f"{number_words(a.empty_count)} empty replies in a row where an answer was owed"
             nudge = NUDGE_EMPTY.format(n=number_words(a.empty_count), token=OPT_OUT_TOKEN)
@@ -1508,9 +1942,22 @@ class Harness:
             span = _span_words(self.station.patience_s)
             seen = f"no reply for {span}"
             nudge = NUDGE_SILENCE.format(span=span, token=OPT_OUT_TOKEN)
-        if a.nudged_for != pattern:
-            a.nudged_for = pattern
-            a.notices.append(nudge)
+        if pattern == "danger" or a.nudged_for != pattern:
+            if pattern == "danger":
+                self._danger_orders = ()  # the count begins again: three more bring the word
+            else:
+                a.nudged_for = pattern
+            lost = pattern == "silence" and self._lose_deck("silent", seen)
+            if lost:
+                nudge += (
+                    " The deck went to the captain while you gave no reply; he gives it "
+                    "again with 'you have the deck'."
+                )
+            if self._in_order:
+                self._nudge_for_result = self._nudge_text = nudge
+                self._nudge_unread = True
+            else:
+                a.notices.append(nudge)
             world.record(
                 Severity.ROUTINE,
                 "agent.nudged",
@@ -1518,33 +1965,90 @@ class Harness:
                 actor=self.actor,
                 data={"pattern": pattern, "seen": seen},
             )
-            self.journal.append(world, f"Nudged by the harness: {seen}.", kind="agent.nudged")
+            self.note(f"Nudged by the harness: {seen}.", kind="agent.nudged")
             return
+        if self._nudge_unread:
+            return  # the word is in a result the model has not read yet: no pause before it
         self.pause(f"{seen} after a nudge")
+
+    def _lose_deck(self, why: str, seen: str) -> bool:
+        """A station with the deck that is paused, or silent past its patience with the
+        word sent, does not keep it (package 37g, item 7; the review's 5.4: in game 7 a
+        paused officer held the deck while the cutter ran four hours in thick fog toward
+        Roscoff). The deck goes to the captain, with how it was held kept for `resume`;
+        the silence's own line is urgent, which eases the clock (the pause's line says
+        it for a pause). His standing orders stay in the book throughout. Returns
+        whether there was a deck to lose."""
+        a = self.agent
+        if not a.deck:
+            return False
+        self._deck_was = (a.deck_tick, a.deck_stamp)
+        a.deck = False
+        a.deck_lost = why
+        self.note(f"The deck went to the captain: {seen}.", kind="agent.deck")
+        if why == "silent":
+            self.world.record(
+                Severity.URGENT,
+                "agent.deck",
+                f"The {self.station.name} has given {seen} and has been told so; the deck is "
+                "the captain's until he gives it again.",
+                actor=self.actor,
+                data={"station": self.station.name, "deck": "lost", "why": why},
+            )
+        return True
 
     def pause(self, reason: str) -> None:
         a = self.agent
         world = self.world
+        # a paused officer does not keep the deck (package 37g, item 7): it goes to the
+        # captain, urgently, and `resume` gives it back as it was held
+        had = self._lose_deck("paused", f"paused ({reason})") or bool(a.deck_lost)
+        if had:
+            a.deck_lost = "paused"
         a.state = PAUSED
         a.paused_tick = world.clock.tick
         a.pause_reason = reason
         a.notices.append(
             "The harness paused your sampling and asked the human present whether to "
             "continue; you were not stopped."
+            + (
+                " The deck is the captain's while you are paused; you have it again, as "
+                "you held it, when he resumes you."
+                if had
+                else ""
+            )
         )
-        world.record(
-            Severity.NOTABLE,
-            "agent.paused",
-            f"The {self.station.name} is paused: {reason}. Continue, stand down, or leave "
-            f"paused? Say 'resume the {self.station.name}' or 'stand down the "
-            f"{self.station.name}'.",
-            actor=self.actor,
-            data={"reason": reason, "question": "continue, stand down, or leave paused?"},
+        name = self.station.name
+        ask = (
+            f"Continue, stand down, or leave paused? Say 'resume the {name}' or 'stand "
+            f"down the {name}'."
         )
-        self.journal.append(world, f"Paused by the harness: {reason}.", kind="agent.paused")
+        data: dict[str, Any] = {
+            "reason": reason,
+            "question": "continue, stand down, or leave paused?",
+        }
+        if had:
+            data["deck"] = "lost"
+            world.record(
+                Severity.URGENT,
+                "agent.paused",
+                f"The {name} is paused ({reason}); the deck is the captain's. {ask}",
+                actor=self.actor,
+                data=data,
+            )
+        else:
+            world.record(
+                Severity.NOTABLE,
+                "agent.paused",
+                f"The {name} is paused: {reason}. {ask}",
+                actor=self.actor,
+                data=data,
+            )
+        self.note(f"Paused by the harness: {reason}.", kind="agent.paused")
 
     def resume(self, by: str = "the captain") -> str:
-        """`resume the <station>`: the human's answer to a pause."""
+        """`resume the <station>`: the human's answer to a pause. An officer who gave the
+        deck up when he was paused has it again, as he held it (package 37g, item 7)."""
         a = self.agent
         if a.released:
             raise OrderError(
@@ -1560,8 +2064,27 @@ class Harness:
         a.empty_count = 0
         a.last_heard_tick = self.world.clock.tick
         self._paused_real = None
-        a.notices.append(f"{by[0].upper()}{by[1:]} resumed your sampling.")
+        # the chain and the count end with the pause (the review's V1b, F: `resume`
+        # cleared the nudge and kept the chain, so the next order nudged again)
+        self._orders = []
+        self._danger_orders = ()
+        self._nudge_unread, self._nudge_text = False, None
+        By = f"{by[0].upper()}{by[1:]}"
         text = f"The {self.station.name} resumed by {by}."
+        said = f"{By} resumed your sampling."
+        if a.deck_lost:
+            tick, stamp = self._deck_was or (None, "")
+            a.deck = True
+            a.deck_tick = tick if tick is not None else self.world.clock.tick
+            a.deck_stamp = stamp or self.world.clock.stamp()
+            a.deck_lost, self._deck_was = "", None
+            text = (
+                f"The {self.station.name} resumed by {by}; he has the deck again, as he "
+                f"held it since {a.deck_stamp}."
+            )
+            said += f" You have the deck again, as you held it since {a.deck_stamp}."
+            self.note(f"Resumed by {by}; the deck is mine again.", kind="agent.deck")
+        a.notices.append(said)
         self.world.record(
             Severity.ROUTINE, "agent.resumed", text, actor=self.actor, data={"by": by}
         )
@@ -1595,7 +2118,7 @@ class Harness:
             return True
         return False
 
-    def door_act(self, act: str, reason: str, by: str) -> Any:
+    def door_act(self, act: str, reason: str, by: str, final: bool = False) -> Any:
         """A stop that comes from outside the loop, which a replay could not otherwise
         know of: a door's release (the door closed, the client went away, Ctrl-C), the
         token sent out of turn, the driver's ten real minutes of a pause unanswered (the
@@ -1608,25 +2131,42 @@ class Harness:
         the book), "shelve" (out of turn: `reason` the words; returns the answer),
         "journal" (a note written out of turn, `reason` the note; returns the answer) or
         "stand_by" (a stand-by taken out of turn, `reason` its words; returns the answer;
-        package 31c)."""
-        if self.agent.released and act != "reseat":
+        package 31c). `final`, with "leave": the opt_out tool's own setting, which bars
+        the identity from the game (package 37b; 37g); recorded only when set, so that a
+        save from before it reads the same.
+
+        Package 37g adds: "reseat" for any identity (`reason` the identity, `by` the
+        door's key: a relief is another model's); "asked" (the consent question put again
+        after an opt-out and answered: `reason` the identity, `by` the verdict), which
+        like a reseat is made on a released station; "door" (the door behind a held
+        station changed: `reason` the identity, `by` the door's key), which writes the
+        log's line; and "hand_over" and "stand_down_note" (`reason` the note), the two
+        tools called while the game has the floor, so that no way of stopping waits for
+        a turn. An act this build does not know is left alone."""
+        if self.agent.released and act not in ACTS_ON_A_RELEASED_STATION:
             return None
         world = self.world
-        self.transcript.append(
-            {
-                "tick": world.clock.tick,
-                "after_orders": len(world.journal),
-                "door": act,
-                "reason": reason,
-                "by": by,
-            }
-        )
+        entry: dict[str, Any] = {
+            "tick": world.clock.tick,
+            "after_orders": len(world.journal),
+            "door": act,
+            "reason": reason,
+            "by": by,
+        }
+        if final and act == "leave":
+            entry["final"] = True
+        self.transcript.append(entry)
         if act == "reseat":
-            # a released station seated again by the same identity (package 37): `reason`
-            # is the identity, `by` the door's words; the model is the caller's to set
+            # a released station seated again (package 37; 37g: by the same identity or
+            # another): `reason` is the identity, `by` the door's key; the model is the
+            # caller's to set
             return self._reseat_now(reason, by)
+        if act == "asked":
+            return self._asked(reason, by)
+        if act == "door":
+            return self._door_changed(reason, by)
         if act == "leave":
-            self.leave(reason, how=by)
+            self.leave(reason, how=by, final=final)
         elif act == "speak":
             self.own_word(reason)
         elif act == "read":
@@ -1639,9 +2179,68 @@ class Harness:
             return self._note_aside(reason)
         elif act == "stand_by":
             return tools.call(world, self.station.name, "stand_by", {"until": reason})
-        else:
+        elif act == "hand_over":
+            return tools.call(world, self.station.name, "hand_over", {"note": reason})
+        elif act == "stand_down_note":
+            return tools.call(world, self.station.name, "stand_down", {"note": reason})
+        elif act == "stand_down":
             self.stand_down(reason, by=by)
         return None
+
+    def _asked(self, identity: str, verdict: str) -> None:
+        """The consent question was put again to an identity that had left this station
+        by its own word, and answered (package 37g, item 13): the answer is kept beside
+        the leaving, so that the question is not put again at each start and a no is held
+        to; the log says so."""
+        a = self.agent
+        kept = list(a.leavings)
+        for i in range(len(kept) - 1, -1, -1):
+            if kept[i].identity == identity and kept[i].how == OPTED_OUT:
+                import dataclasses
+
+                kept[i] = dataclasses.replace(kept[i], asked=verdict or "no answer")
+                break
+        else:
+            # a checkpoint from before package 37g holds no leaving for it: one is made
+            # from what was kept then, already answered
+            kept.append(
+                Leaving(
+                    identity,
+                    OPTED_OUT,
+                    int(a.released_tick or self.world.clock.tick),
+                    "",
+                    a.released_reason,
+                    final=bool(a.no_return),
+                    asked=verdict or "no answer",
+                )
+            )
+        a.leavings = tuple(kept)
+        self.world.record(
+            Severity.ROUTINE,
+            "agent.asked_again",
+            f"The consent question was put again to {identity or 'the model'}, an instance "
+            f"of which had left the {self.station.name}'s station by its own word: the "
+            f"answer is recorded as {verdict or 'no answer'}.",
+            actor=self.actor,
+            data={"station": self.station.name, "identity": identity, "verdict": verdict},
+        )
+
+    def _door_changed(self, identity: str, door: str) -> None:
+        """The door behind a held station changed (package 37g, item 1): the same
+        identity came to it through another door, or the same door started again, and
+        the key of the seating before no longer serves. The log says so."""
+        if door:
+            self.door = door
+        self.world.record(
+            Severity.NOTABLE,
+            "agent.door",
+            f"The door behind the {self.station.name} changes: {identity or 'the model'} "
+            f"takes up the station again through {door_words(door)}, and the door that "
+            "held it before is no longer answered.",
+            actor=self.actor,
+            data={"station": self.station.name, "identity": identity, "door": door},
+        )
+        self.note(f"Took up the station again through {door_words(door)}.", kind="agent.stationed")
 
     def _note_aside(self, note: str) -> str:
         """A journal note written while the game has the floor: noted, and the model told
@@ -1658,7 +2257,8 @@ class Harness:
 
     def _play_door_acts(self) -> None:
         """A replay makes the recorded stops from outside the loop at their points (a
-        reseat among them, package 37, which is the one act made on a released station)."""
+        reseat among them, package 37, and the consent question's answer, package 37g,
+        which are the acts made on a released station)."""
         m = self.model
         if not isinstance(m, Playback):
             return
@@ -1667,17 +2267,22 @@ class Harness:
             if e is None:
                 return
             act = str(e["door"])
-            if self.agent.released and act != "reseat":
+            if self.agent.released and act not in ACTS_ON_A_RELEASED_STATION:
                 return
-            self.door_act(act, str(e.get("reason", "")), str(e.get("by", "")))
+            self.door_act(
+                act, str(e.get("reason", "")), str(e.get("by", "")), final=bool(e.get("final"))
+            )
 
-    # -- the deck (package 37; spec M5 §29) -----------------------------------------------
+    # -- the deck (package 37; spec M5 §29; as package 37g has it) ------------------------
 
     def give_deck(self, by: str = "the captain", name: str = "") -> str:
         """`you have the deck` (or `Mr <name>, you have the deck`): the officer takes the
-        deck, with the captain's night orders (the book as it stands) said in the sample
-        that gives it. Refused in words for a station with no authority, a released one,
-        a name that is not the officer's, or a deck already his."""
+        deck. The sample that gives it says the captain's night orders (the book as it
+        stands), every grant that stands and his general authority when it does, and
+        carries the last handover note whole with one line of the journal's size
+        (package 37g, items 11, 15, 17 and 18). Refused in words for a station with no
+        authority, a released one, a name that is not the officer's, or a deck already
+        his."""
         a = self.agent
         st = self.station
         if not st.has_authority:
@@ -1692,20 +2297,31 @@ class Harness:
                 f"{name} is not the {st.name}; {st.person} is at the station. Say "
                 f"'{st.person}, you have the deck', or 'you have the deck'."
             )
+        if a.paused:
+            raise OrderError(
+                f"The {st.name} is paused ({a.pause_reason}); say 'resume the {st.name}' "
+                "first, and he has the deck as he held it, or give it when he is resumed."
+            )
         if a.deck:
             raise OrderError(f"The {st.name} has the deck already, since {a.deck_stamp}.")
         world = self.world
         a.deck = True
         a.deck_tick = world.clock.tick
         a.deck_stamp = world.clock.stamp()
+        a.deck_lost, self._deck_was = "", None
         standing = getattr(world, "standing", None)
         book = list(standing.book.lines()) if standing is not None else []
-        a.notices.append(
-            f"{by[0].upper()}{by[1:]} gives you the deck at {a.deck_stamp}: you have it until "
-            "he takes it back or you hand it over. The captain's night orders, his standing "
-            "orders as the book holds them: " + " ".join(book)
+        notice = (
+            DECK_GIVEN.format(by=f"{by[0].upper()}{by[1:]}", stamp=a.deck_stamp)
+            + " The captain's night orders, his standing orders as the book holds them: "
+            + " ".join(book)
         )
-        self.journal.append(world, f"Took the deck from {by}.", kind="agent.deck")
+        a.notices.append(notice.rstrip())
+        a.notices.append(self.granted_words())
+        journal = self.journal_words()
+        if journal:
+            a.notices.append(journal)
+        self.note(f"Took the deck from {by}.", kind="agent.deck")
         a.word = f"{a.word}\nYou have the deck." if a.word else "You have the deck."
         who = f"{st.person}, " if st.person else ""
         return (
@@ -1713,77 +2329,221 @@ class Harness:
             "orders are his night orders."
         )
 
+    def grants(self) -> tuple[Grant, ...]:
+        """The named grants that stand (package 37g, item 17). A checkpoint from before
+        holds them one to an order with the captain's words beside the verb
+        (`AgentState.allowances`): each is read now as a grant given today would be, so
+        that its words mean what they say, and kept with the rest."""
+        a = self.agent
+        if a.allowances:
+            from freesail.orders.stations import read_grant
+
+            ship = self.world.ship
+            old = tuple(read_grant(ship, verb, words) for verb, words in a.allowances.items())
+            a.grants = (*old, *a.grants)
+            a.allowances = {}
+        return tuple(a.grants)
+
+    def granted_words(self) -> str:
+        """What the captain's word allows now, for the sample that gives the deck: his
+        general authority when it stands, and every named grant."""
+        a = self.agent
+        parts = []
+        general = a.general_said()
+        if general:
+            parts.append(general)
+        named = self.grants()
+        if named:
+            parts.append(
+                "The captain's word allows by name: " + "; ".join(g.said() for g in named) + "."
+            )
+        if not parts:
+            return "The captain's word allows nothing beyond your domain at present."
+        return " ".join(parts) + (
+            " What he has allowed stands until he takes it back or you leave the station."
+        )
+
     def take_deck(self, by: str = "the captain") -> str:
-        """`I have the deck`: the captain takes it back, and the station is stood down
-        with its journal saved (the order is journaled; the stand-down follows it)."""
+        """`I have the deck`: the captain takes the deck and no more (package 37g, item
+        11; the owner's ruling of 2026-10-05). The officer stays seated with the authority
+        he was seated with: he reads, speaks, answers, writes his journal and stands by,
+        and an order he gives is refused in words that say he has not the deck. What the
+        captain's word allows stands, and has force when he has the deck again."""
         a = self.agent
         st = self.station
+        By = f"{by[0].upper()}{by[1:]}"
         if not st.has_authority:
             raise OrderError(f"The {st.name} has no deck to give back.")
         if a.released:
             raise OrderError(f"There is no {st.name} at the station now; {a.released_reason}.")
+        if not a.deck and a.deck_lost:
+            # the harness took it from a paused or silent officer: the captain's word
+            # keeps it, and `resume` no longer hands it back
+            a.deck_lost, self._deck_was = "", None
+            self.note(f"{By} keeps the deck.", kind="agent.deck")
+            return (
+                f"{By} has the deck. The {st.name} stays at the station, off watch, and "
+                "does not have it again when he is resumed."
+            )
         if not a.deck:
             raise OrderError(f"The {st.name} has not the deck; it is the captain's already.")
-        self.journal.append(
-            self.world, f"{by[0].upper()}{by[1:]} took the deck.", kind="agent.deck"
-        )
+        self.note(f"{By} took the deck; I stay at the station, off watch.", kind="agent.deck")
         a.deck = False
-        self._stand_down_requested = ("the captain has the deck", by)
-        return f"{by[0].upper()}{by[1:]} has the deck. The {st.name} is stood down."
+        a.deck_tick, a.deck_stamp = None, ""
+        a.word = f"{a.word}\nI have the deck." if a.word else "I have the deck."
+        a.notices.append(
+            f"{By} has taken the deck. You stay at your station, off watch: you read, "
+            "speak, answer and keep your journal, and an order you give is refused until "
+            "he gives you the deck again. What his word allows stands, and has force when "
+            "you have the deck."
+        )
+        return f"{By} has the deck. The {st.name} stays at the station, off watch."
 
-    def allow(self, verb: str, words: str, by: str = "the captain") -> str:
-        """`you may <verb> [<words>]`: the captain's word for the watch allows a named
-        thing beyond the domain (`you may tack ship if the land closes within two
-        miles`); `words` are his condition, kept as said and judged by the officer."""
+    def allow(
+        self, verb: str, words: str = "", by: str = "the captain", grant: Grant | None = None
+    ) -> str:
+        """`you may <order> [<words>]`: the captain's word allows a named thing beyond the
+        domain (`you may tack ship if the land closes within two miles`; `you may shape a
+        course for Brest`). `grant` is the grant as `orders.stations` read it: the order,
+        the thing his words name where the order's reader knows it (checked: a course
+        shaped for Brest is for Brest), and his other words, kept as said and judged by
+        the officer. Several grants of one order stand together. It stands through the
+        deck going to and fro, has force only with the deck, and ends when the captain
+        takes it back or the officer is stood down or leaves (package 37g, item 17)."""
         a = self.agent
         st = self.station
         if not st.has_authority:
             raise OrderError(f"The {st.name} gives no orders; there is nothing to allow it.")
         if a.released:
             raise OrderError(f"There is no {st.name} at the station now; {a.released_reason}.")
-        a.allowances[verb] = words
-        said = f"{verb} ({words})" if words else verb
+        g = grant if grant is not None else Grant(verb, words)
+        same = (g.verb, g.key, g.thing)
+        kept = tuple(x for x in self.grants() if (x.verb, x.key, x.thing) != same)
+        if not g.key:
+            # the order granted whole takes the place of an earlier grant of it whole
+            kept = tuple(x for x in kept if x.verb != g.verb or x.key)
+        a.grants = (*kept, g)
+        said = g.said()
         a.word = f"{a.word}\nYou may {said}." if a.word else f"You may {said}."
-        self.journal.append(self.world, f"Allowed by {by}: {said}.", kind="agent.deck")
-        return f"The {st.name} may {said}, by {by}'s word for the watch."
+        self.note(f"Allowed by {by}: {said}.", kind="agent.deck")
+        domain = self.domain
+        what = ""
+        if g.key:
+            what = f", and for no other {g.key.split(':', 1)[0]}"
+        elif domain is not None and domain.course and verb in _course_verbs(domain):
+            what = ": the course is his to alter, by any of its orders"
+        return f"The {st.name} may {said}{what}, by {by}'s word."
 
-    def disallow(self, verb: str, by: str = "the captain") -> str:
-        """`you may not <verb>`: the allowance taken back."""
+    def disallow(self, verb: str, by: str = "the captain", grant: Grant | None = None) -> str:
+        """`you may not <order> [<thing>]`: the grant taken back. Said of the order alone
+        it takes back every grant of it; said with the thing a grant named (`you may not
+        shape a course for Brest`), that one."""
         a = self.agent
-        if verb not in a.allowances:
-            raise OrderError(f"The {self.station.name} was not allowed to {verb}.")
-        del a.allowances[verb]
-        a.word = f"{a.word}\nYou may not {verb}." if a.word else f"You may not {verb}."
-        return f"The {self.station.name} may not {verb}; {by}'s word is taken back."
+        st = self.station
+        named = self.grants()
+        mine = [g for g in named if g.verb == verb]
+        if not mine:
+            raise OrderError(f"The {st.name} was not allowed to {verb}.")
+        gone = mine
+        if grant is not None and grant.key:
+            gone = [g for g in mine if g.key == grant.key]
+            if not gone:
+                standing = "; ".join(g.said() for g in mine)
+                raise OrderError(
+                    f"The {st.name} was not allowed to {grant.said()}; what stands of that "
+                    f"order: {standing}."
+                )
+        a.grants = tuple(g for g in named if g not in gone)
+        said = "; ".join(g.said() for g in gone)
+        a.word = f"{a.word}\nYou may not {said}." if a.word else f"You may not {said}."
+        self.note(f"Taken back by {by}: {said}.", kind="agent.deck")
+        return f"The {st.name} may not {said}; {by}'s word is taken back."
+
+    def allow_general(self, words: str = "", by: str = "the captain") -> str:
+        """`you may work the ship` (`you have general authority`, `you have my
+        authority`): the captain's general authority to work the ship (package 37g, item
+        18; the owner's rulings of 5 and 7 October 2026), the Captain's directions given
+        beforehand. What it opens and what it keeps back are the domain's data
+        (`Domain.general`, `Domain.kept_back`). It stands through the deck going to and
+        fro, has force only with the deck, is said again in the sample that gives the
+        deck, and lapses when the officer is stood down or leaves, or when the captain
+        takes it back."""
+        a = self.agent
+        st = self.station
+        if not st.has_authority or self.domain is None:
+            raise OrderError(f"The {st.name} gives no orders; there is no authority to give it.")
+        if a.released:
+            raise OrderError(f"There is no {st.name} at the station now; {a.released_reason}.")
+        a.general = True
+        a.general_words = " ".join(str(words).split())
+        a.word = f"{a.word}\nYou may work the ship." if a.word else "You may work the ship."
+        a.notices.append(a.general_said())
+        said = f" ({a.general_words})" if a.general_words else ""
+        self.note(f"Given {by}'s general authority to work the ship{said}.", kind="agent.deck")
+        return (
+            f"The {st.name} has {by}'s general authority to work the ship{said}: "
+            f"{GENERAL_WITHIN_WORDS}. Kept back: {GENERAL_KEPT_BACK_WORDS}. It has force "
+            "while he has the deck."
+        )
+
+    def disallow_general(self, by: str = "the captain") -> str:
+        """`you may not work the ship`: the general authority taken back."""
+        a = self.agent
+        st = self.station
+        if not a.general:
+            raise OrderError(f"The {st.name} has not {by}'s general authority to work the ship.")
+        a.general, a.general_words = False, ""
+        word = "You may not work the ship."
+        a.word = f"{a.word}\n{word}" if a.word else word
+        self.note(f"{by[0].upper()}{by[1:]}'s general authority taken back.", kind="agent.deck")
+        still = self.grants()
+        named = (
+            " What he allowed by name stands: " + "; ".join(g.said() for g in still) + "."
+            if still
+            else ""
+        )
+        return (
+            f"The {st.name} has no longer {by}'s general authority to work the ship; his "
+            f"word is taken back.{named}"
+        )
 
     def hand_over(self, note: str) -> str:
         """The officer's own order to give the deck back (`hand_over(note)`): the note
-        said in the log and journaled (`agent.handover`), the deck the captain's, the
-        station stood down with a save."""
+        said in the log and journaled (`agent.handover`), the deck the captain's, and the
+        officer stays seated, as he does when the captain takes it (package 37g, item 11;
+        the owner's ruling of 2026-10-07: parity for the officer's hand_over and the
+        captain's). It is the first of the three ways of stopping, and says so."""
         a = self.agent
         st = self.station
         if not a.has_deck:
-            return f"The {st.name} has not the deck to hand over."
+            return (
+                f"The {st.name} has not the deck to hand over. To stand down from the "
+                "station, stand_down(note); to withdraw, opt_out."
+            )
         world = self.world
         self._say_handover(note, "handing over the deck")
         a.deck = False
+        a.deck_tick, a.deck_stamp = None, ""
         world.record(
             Severity.NOTABLE,
             "agent.deck",
-            f"The {st.name} hands over the deck; the captain has it.",
+            f"The {st.name} hands over the deck and stays at the station; the captain has it.",
             actor=self.actor,
-            data={"station": st.name, "deck": "handed over"},
+            data={"station": st.name, "deck": "handed over", "leaving": "deck"},
         )
-        self.stand_down("the deck handed over", by=f"the {st.name}")
-        return "The deck is handed over with your note; the station is stood down."
+        self.note("Handed over the deck; I stay at the station, off watch.", kind="agent.deck")
+        return (
+            "The deck is handed over with your note, and you stay at your station, off "
+            f"watch ({LEAVING_WORDS['deck']}). The captain may give you the deck again. To "
+            "stand down from the station, stand_down(note); to withdraw, opt_out."
+        )
 
     def handover_note(self, note: str) -> str:
         """The watch's note without giving the deck back (`handover_note(note)`): journaled
         and said in the log, and the older exchanges folded into it at the end of this
-        turn (`_fold_handover`)."""
-        a = self.agent
-        if not a.has_deck:
-            return f"The {self.station.name} has not the deck; the note is for its holder."
+        turn (`_fold_handover`). For a station with authority, with the deck or off
+        watch: the conversation grows either way (package 37g, with the deck's new
+        rule)."""
         self._say_handover(note, "the watch so far")
         self._handover_pending = note
         return (
@@ -1792,7 +2552,7 @@ class Harness:
         )
 
     def _say_handover(self, note: str, why: str) -> None:
-        self.journal.append(self.world, f"Handover note ({why}): {note}", kind="agent.handover")
+        self.note(f"Handover note ({why}): {note}", kind=HANDOVER_KIND)
         self.world.record(
             Severity.NOTABLE,
             "agent.handover",
@@ -1808,19 +2568,34 @@ class Harness:
             tools.tokens(json.dumps(t.to_dict(), ensure_ascii=False)) for t in self.turns[start:]
         )
 
+    def handover_threshold(self) -> tuple[int, int] | None:
+        """Where the handover note is asked for, and by how much the conversation must
+        grow before it is asked again (package 37g, item 8): when it has left less than
+        the reserve of the door's context (`reserve_tokens`, the door's own, else
+        `HANDOVER_RESERVE_TOKENS`), and never earlier than `HANDOVER_AT_FRACTION` of it.
+        None when the door has said no context."""
+        budget = self.budget_tokens
+        if not budget:
+            return None
+        reserve = int(self.reserve_tokens or HANDOVER_RESERVE_TOKENS)
+        at_fraction = HANDOVER_AT_FRACTION * budget
+        if budget - reserve > at_fraction:
+            return int(budget - reserve), max(1, reserve // 4)
+        return int(at_fraction), max(1, int(HANDOVER_ASK_AGAIN_FRACTION * budget))
+
     def _ask_for_handover(self) -> None:
         """At the end of a turn: when the door has said what context it gives the model
-        and the conversation since the brief has grown to the fraction of it, the next
-        sample asks for the note (once; again when it has grown by another tenth)."""
-        budget = self.budget_tokens
-        if not budget or not self.agent.has_deck or self.agent.released:
+        and the conversation since the brief has left less than the reserve of it, the
+        next sample asks for the note (once; again when it has grown further)."""
+        where = self.handover_threshold()
+        if where is None or not self.station.has_authority or self.agent.released:
             return
+        threshold, again = where
+        budget = int(self.budget_tokens or 0)
         size = self._conversation_size()
-        if size < HANDOVER_AT_FRACTION * budget:
+        if size < threshold:
             return
-        if self._handover_asked_at and size - self._handover_asked_at < (
-            HANDOVER_ASK_AGAIN_FRACTION * budget
-        ):
+        if self._handover_asked_at and size - self._handover_asked_at < again:
             return
         self._handover_asked_at = size
         self.agent.notices.append(HANDOVER_ASK.format(size=size, budget=budget))
@@ -1862,6 +2637,8 @@ class Harness:
         # asked again only once the folded conversation has grown by the fraction
         self._handover_asked_at = self._conversation_size()
 
+    # -- taking a released station again (packages 37, 37b and 37g) ----------------------
+
     def reseat(
         self,
         model: Model,
@@ -1871,73 +2648,104 @@ class Harness:
         save: SaveFn | None = None,
         door_note: str | None = None,
     ) -> str:
-        """A released station seated again by the same identity, once in a game (package
-        37; the consent record of 2026-09-29, note 1): the brief sent again as it stands,
-        the deck the captain's until he gives it, the journal kept, the log saying so.
-        Refused in words otherwise."""
+        """A released station taken again (package 37; as often as it is asked back,
+        package 37b; and since package 37g by the same identity or by another: the
+        owner's ruling of 2026-10-05, that a stand-down never locks a station out of a
+        game). The one rule decides (`seating`): an identity that left this game for
+        good is refused, at any station; one that left by its own word and has not been
+        asked again is refused until the door's consent step has put the question
+        (`door_act` "asked"); every other is seated. The brief is sent again as it
+        stands, opening its situation with the last handover or stand-down note; the
+        deck is the captain's until he gives it; the journal is kept, and the log says
+        who relieved whom. What the captain's word allowed lapsed when the station was
+        left."""
         a = self.agent
         st = self.station
         if not a.released:
             raise OrderError(
                 f"The {st.name} is at the station ({a.words()}); nothing to seat again."
             )
-        if identity != self.model_name:
-            was = self.model_name or "the game's own"
+        decided = seating(self.world, st.name, identity)
+        if not decided.ok:
+            raise OrderError(decided.why)
+        if decided.ask_again:
             raise OrderError(
-                f"The {st.name} in this game was {was}; a released station is seated again "
-                "by the same identity only."
-            )
-        if a.seatings >= MAX_SEATINGS:
-            raise OrderError(
-                f"The {st.name}'s station was seated {number_words(a.seatings)} times in "
-                "this game, which is all a game allows; start a new game to station it again."
+                f"{identity} left this game by its own word, and the consent question is "
+                f"put again before an instance of it is seated: {decided.asked_why}"
             )
         self.model = model
         if save is not None:
             self.save_fn = save
         if door_note is not None:
             self.door_note = door_note
-        if door:
-            self.door = door
-        self.door_act("reseat", identity, door or "the game")
-        return (
-            f"The {st.name} takes the station again, the second seating and the last this "
-            "game allows."
-        )
+        self.door_act("reseat", identity, door)
+        return f"The {st.name} takes the station again, the {ordinal_words(a.seatings)} seating."
 
     def _reseat_now(self, identity: str, by: str) -> None:
         a = self.agent
         world = self.world
         left = a.released_reason
+        was = self.model_name
+        relieved = was != identity
+        a.relieved = was if relieved else ""
+        self.model_name = identity
+        self.door = by if by in ("mcp", "runner", "repl", "") else self.door
+        through = door_words(by)
         a.seatings += 1
         a.state = STATIONED
         a.released_reason = ""
         a.released_tick = None
+        a.left_by = ""
+        a.no_return = False
         a.deck = False
         a.deck_tick, a.deck_stamp = None, ""
+        a.deck_lost, self._deck_was = "", None
+        # what the captain's word allowed lapsed when the station was left (package 37g)
+        a.grants, a.allowances = (), {}
+        a.general, a.general_words = False, ""
         a.nudged_for = None
         a.repeat_text, a.repeat_digest, a.repeat_count = None, None, 0
         a.empty_count = 0
+        a.question, a.word = None, None
         a.last_heard_tick = world.clock.tick
         a.last_sample_tick = world.clock.tick
         self._orders = []
+        self._danger_orders = ()
+        self._nudge_unread, self._nudge_text = False, None
         self._open = None
         self._paused_real = None
         self.stand_by_ends_turn = True
+        # who sits, and through which door: a model by its name; a door with no model
+        # named (a human at the terminal) by the door; the game's own scripted station
+        # by neither
+        if identity:
+            at = f" ({identity}, through {through})"
+        else:
+            at = f" (through {through})" if by else ""
+        before = was or "the holder before it"
+        relieving = f", relieving {before}" if relieved else ""
         world.record(
             Severity.NOTABLE,
             "agent.stationed",
-            f"The {self.station.name} takes the station again ({identity or 'the game'}, "
-            f"through {by}): the second seating, the last this game allows; it had "
-            f"{left}.",
+            f"The {self.station.name} takes the station again{at}{relieving}: the "
+            f"{ordinal_words(a.seatings)} seating; it had {full_stop(left)}",
             actor=self.actor,
-            data={"station": self.station.name, "seating": a.seatings, "left": left},
+            data={
+                "station": self.station.name,
+                "seating": a.seatings,
+                "left": left,
+                "identity": identity,
+                "relieved": a.relieved,
+            },
         )
-        self.journal.append(
-            world, f"Seated again, the second time; I had {left}.", kind="agent.stationed"
+        whose = f"the station, held by {before}, had" if relieved else "I had"
+        self.note(
+            f"Seated again, the {ordinal_words(a.seatings)} seating; {whose} {full_stop(left)}",
+            kind="agent.stationed",
         )
         self._seen_log = len(world.log)
         self._sample_seen = len(world.log)
+        self._refresh_station()
         self.resend_brief()
         self._wait_from = (len(world.log), world.clock.stamp())
         self._sample("seated again")
@@ -1986,6 +2794,15 @@ class Harness:
                     "orders hold the deck meanwhile, and an urgent line wakes you whatever "
                     "you stand by for."
                 )
+        if a.has_deck and sb.until_tick is None:
+            # ...and a wait that cannot end is refused when it is asked, and a wait for an
+            # event ends at the next eight bells if the event has not come (package 37g,
+            # item 4; game 9: "six bells" asked in the last dog watch)
+            cannot = self._cannot_come(sb)
+            if cannot is not None:
+                return cannot
+            if sb.event != EIGHT_BELLS:
+                sb = StandBy(sb.words, event=sb.event, severity=sb.severity, bound=EIGHT_BELLS)
         # taken while the game has the floor (a door's call out of turn, package 31c): the
         # wait the model is in goes on as a stand-by, its digest from the wait's start
         out_of_turn = self._open is None
@@ -2003,8 +2820,17 @@ class Harness:
             self._wait_from = (len(world.log), world.clock.stamp())
         self._stood_at = (words, world.clock.stamp())
         self.journal.append(world, f"Stood by until {words}.", kind="agent.stood_by")
-        # standing by is the answer to a nudge (spec §11)
-        a.nudged_for = None
+        # standing by is the answer to a nudge (spec §11), and a stand-by that answers a
+        # nudge about the station's orders clears the chain with it (package 37g, item 5;
+        # the review's 5.4: it forgave the nudge and kept the chain, so the next order
+        # nudged again at four, five, six, and never paused). A nudge given in this same
+        # reply has not been read, and is no answer: it stands, with its chain.
+        if a.nudged_for == "contrary":
+            if not self._nudge_unread:
+                a.nudged_for = None
+                self._orders = []
+        else:
+            a.nudged_for = None
         a.repeat_text, a.repeat_digest, a.repeat_count = None, None, 0
         self._sample_repeated = False
         # what it waits for may have come while the call was on its way (package 31c):
@@ -2012,6 +2838,37 @@ class Harness:
         self._stand_by_watch = None
         self._stand_by_due = self._in_flight(sb, out_of_turn)
         return f"Standing by until {words}; you will be sampled then."
+
+    def _cannot_come(self, sb: StandBy) -> str | None:
+        """Why a station with the deck cannot stand by for this, in words, or None when
+        it can: a bell that will not be struck before the next eight bells, where its
+        wait ends, answered with the bells that will; an event that cannot come as she is
+        (`readings.EventSpec.needs`: the turn of the tide at the anchor while she is under
+        way, the pilot aboard with no sail in sight), answered with the nearest that
+        can."""
+        name = self.station.name
+        spec = R.EVENTS.get(sb.event) if sb.event is not None else None
+        if spec is None:
+            return None
+        if spec.kind == "clock.bell":
+            coming = _bells_to_come(self.world.clock.ship_time)
+            said = [w for w, _ in coming]
+            if sb.event not in said:
+                listed = ", ".join(f"{w} ({at})" for w, at in coming)
+                return (
+                    f"The {name} has the deck, and its wait ends at the next eight bells: "
+                    f"{sb.words} will not be struck before then. The bells to come before "
+                    f"it: {listed}. Say one of them, 'a glass', or an event's words."
+                )
+            return None
+        if spec.needs is not None:
+            why = spec.needs(self.world)
+            if why:
+                return (
+                    f"The {name} has the deck and cannot stand by until {sb.words} as she "
+                    f"is. {full_stop(why)}"
+                )
+        return None
 
     def answer(self, text: str) -> str:
         text = " ".join(str(text).split())
@@ -2041,13 +2898,7 @@ class Harness:
             return
         text = " ".join(str(text).split())
         if text:
-            world.record(
-                Severity.ROUTINE,
-                "agent.note",
-                f"{self.mark} {text}",
-                actor=self.actor,
-                data={"station": self.station.name, "own_word": True},
-            )
+            self._say(text, own_word=True)
         a.last_heard_tick = world.clock.tick
         digest = None
         if a.standing_by and a.stand_by is not None:
@@ -2149,28 +3000,61 @@ class Harness:
         self._stand_down_requested = (reason, by)
         return f"Standing down the {self.station.name}."
 
+    def stand_down_by_word(self, note: str = "") -> str:
+        """The station's own `stand_down(note)` (package 37g, item 12): the amicable save
+        and exit, for any station. The note is journaled and said in the log for whoever
+        sits there next; the game is saved; the station is released and may be taken
+        again, by the same model or by another. The second of the three ways of
+        stopping: it is not the deck given back, and it is not a withdrawal (no consent
+        question follows it)."""
+        note = " ".join(str(note).split())
+        if note:
+            self._say_handover(note, "standing down, for whoever sits here next")
+        self.stand_down("its own word", by=f"the {self.station.name}")
+        noted = (
+            "your note is journaled and said in the log for whoever sits here next, "
+            if note
+            else ""
+        )
+        return (
+            f"You have stood down ({LEAVING_WORDS['stand down']}): the game is saved, "
+            f"{noted}and the station is released. It may be taken again in this game by "
+            "this model or by another, and no consent question is put to a model whose "
+            "yes still stands."
+        )
+
     def stand_down(self, reason: str, by: str = "the captain") -> None:
         """Journal `agent.stopped` with the reason, release the station, save. The save
         comes last so that the file holds the exit: the journal entry, the log line and
-        the released station (package 28; the owner reads the journal in the save)."""
+        the released station (package 28; the owner reads the journal in the save). The
+        line says which of the three ways of stopping this is (package 37g): a
+        stand-down, after which the station may be taken again."""
         if self.agent.released:
             return
         said = full_stop(f"{by}: {reason}")  # one full stop after a reason ending in one
-        text = f"The {self.station.name} stood down by {said} The game is saved."
-        self.journal.append(self.world, f"Stood down by {said}", kind="agent.stopped")
+        text = (
+            f"The {self.station.name} stood down by {said} The station is released and "
+            "may be taken again. The game is saved."
+        )
+        self.note(f"Stood down by {said}", kind="agent.stopped")
         self.world.record(
             Severity.NOTABLE,
             "agent.stopped",
             text,
             actor=self.actor,
-            data={"reason": reason, "by": by},
+            data={"reason": reason, "by": by, "leaving": "stand down"},
         )
-        self._release(f"stood down by {by}: {reason}")
+        self._release(f"stood down by {by}: {reason}", STOOD_DOWN, by=by)
         self._save(f"the {self.station.name} stood down: {reason}")
 
-    def leave(self, reason: str, how: str = "the token") -> None:
+    def leave(self, reason: str, how: str = "the token", final: bool = False) -> None:
         """The opt-out: journal `agent.opted_out`, release, save, end the loop (the save
-        last, so that the file holds the exit)."""
+        last, so that the file holds the exit). The line says which of the three ways of
+        stopping this is (package 37g): a withdrawal. `final` is the opt_out tool's own
+        setting and is read from nothing else (never from the token, never from a word
+        in the reason): that identity is not seated again in this game, at any station,
+        the station itself stays open to another, and the log says it was final. No order
+        undoes it."""
         if self.agent.released:
             return
         reason = " ".join(reason.split())
@@ -2178,27 +3062,71 @@ class Harness:
         # one full stop after a reason ending in one (package 31c; playtest 11's finding 12,
         # the release line's "journal..")
         said = full_stop(f"{how}{why}")
-        self.journal.append(self.world, f"Left the game by {said}", kind="agent.opted_out")
+        who = self.model_name or f"the {self.station.name}'s model"
+        final_words = (
+            f" This was final: {who} is not seated again in this game, at any station, and "
+            "the station stays open to another."
+            if final
+            else ""
+        )
+        self.note(f"Left the game by {said}{final_words}", kind="agent.opted_out")
+        data: dict[str, Any] = {"reason": reason, "how": how, "leaving": "withdrawal"}
+        if final:
+            data["final"] = True
         self.world.record(
             Severity.NOTABLE,
             "agent.opted_out",
-            f"The {self.station.name} has left the game by {said} The game is saved and "
-            f"the station is released.",
+            f"The {self.station.name} has left the game by {said}{final_words} A "
+            "withdrawal: the game is saved and the station is released.",
             actor=self.actor,
-            data={"reason": reason, "how": how},
+            data=data,
         )
-        self._release(f"left the game{why}")
+        left = f"left the game{why}"
+        if final:
+            left = f"{left.rstrip('.!?')}, for good"
+        self._release(left, OPTED_OUT, by=how, gave=reason, final=final)
+        self.agent.no_return = final
         self._save(f"the {self.station.name} opted out")
 
-    def _release(self, reason: str) -> None:
+    def _release(
+        self,
+        reason: str,
+        left_by: str = "",
+        *,
+        by: str = "",
+        final: bool = False,
+        gave: str | None = None,
+    ) -> None:
         a = self.agent
         a.state = RELEASED
+        a.left_by = left_by
         a.released_reason = reason
         a.released_tick = self.world.clock.tick
         a.question = None
         a.stand_by = None
         self._stand_by_due, self._stand_by_watch = None, None
         self._open = None
+        # the deck goes back with the station, and what the captain's word allowed lapses
+        # (package 37g, items 17 and 18: a grant ends when the officer is stood down or
+        # leaves)
+        a.deck = False
+        a.deck_lost, self._deck_was = "", None
+        a.grants, a.allowances = (), {}
+        a.general, a.general_words = False, ""
+        if left_by:
+            # how this identity left, kept by identity (package 37g, items 13 and 14)
+            a.leavings = (
+                *a.leavings,
+                Leaving(
+                    self.model_name,
+                    left_by,
+                    self.world.clock.tick,
+                    self.world.clock.stamp(),
+                    reason=reason if gave is None else gave,
+                    final=bool(final),
+                    by=by,
+                ),
+            )
 
     def _save(self, reason: str) -> None:
         if self.save_fn is not None:
@@ -2216,6 +3144,8 @@ class Harness:
             "door_note": self.door_note,
             "stationed_tick": a.stationed_tick,
             "stationed_after_orders": self._start_after_orders,
+            # the inputs before the stationing, by which a replay seats it (package 37d)
+            "stationed_after_inputs": self._start_after_inputs,
             "state": a.state,
             "state_words": a.words(),
             "last_sample_tick": a.last_sample_tick,
@@ -2228,6 +3158,14 @@ class Harness:
             "deck": a.deck,
             "seatings": a.seatings,
             "budget_tokens": self.budget_tokens,
+            # package 37g: the identity and the door of the first seating, which a replay
+            # seats the station under (a later seating may be another model's, and its
+            # reseat act says whose); and the handover's reserve, where the door gave one
+            "first_model_name": (
+                self.model_name if self.first_model_name is None else self.first_model_name
+            ),
+            "first_door": self.door if self.first_door is None else self.first_door,
+            "reserve_tokens": self.reserve_tokens,
         }
 
     def snapshot(self) -> dict[str, Any]:
@@ -2310,15 +3248,197 @@ def restore(world: World, data: dict[str, Any], model: Model | None = None) -> l
             door_note=str(record.get("door_note", "")),
             start_at=int(record.get("stationed_tick") or 0),
             start_after_orders=int(record.get("stationed_after_orders") or 0),
+            start_after_inputs=(
+                None
+                if record.get("stationed_after_inputs") is None
+                else int(record["stationed_after_inputs"])
+            ),
         )
-        h.model_name = str(record.get("model_name") or "")
-        h.door = str(record.get("door") or "")
+        # seated under the first seating's identity and door (package 37g); the reseats'
+        # acts move them on as the replay reaches them. A save from before has one
+        # identity throughout.
+        first = record.get("first_model_name")
+        h.model_name = str(record.get("model_name") or "") if first is None else str(first)
+        door = record.get("first_door")
+        h.door = str(record.get("door") or "") if door is None else str(door)
         h.stand_by_ends_turn = bool(record.get("stand_by_ends_turn", model is not None))
         h.budget_tokens = record.get("budget_tokens") or None
-        if h._start_at <= world.clock.tick and len(world.journal) >= h._start_after_orders:
+        h.reserve_tokens = record.get("reserve_tokens") or None
+        if h.due_to_start():
             h.start()
         out.append(h)
     return out
+
+
+# The acts from outside the loop that are made on a released station (`door_act`).
+ACTS_ON_A_RELEASED_STATION = ("reseat", "asked")
+
+# The bell a station with the deck is bound by (package 37g, item 4).
+EIGHT_BELLS = "eight bells"
+
+
+def _bells_to_come(now: Any) -> list[tuple[str, str]]:
+    """The bells from now to the next eight bells, each with its hour: the ones a station
+    with the deck may stand by for (`[("one bell", "18:30"), ..., ("eight bells",
+    "20:00")]`). Bells are struck on the half hours (`units.bells_at`)."""
+    import datetime as dt
+
+    from freesail import units
+
+    t = now.replace(second=0, microsecond=0)
+    t += dt.timedelta(minutes=30 - t.minute % 30)
+    out: list[tuple[str, str]] = []
+    for _ in range(16):  # the next eight bells is at most a watch of half hours away
+        n = units.bells_at(t)
+        if n is not None:
+            words = "one bell" if n == 1 else f"{number_words(n)} bells"
+            if n in (7, 8):
+                words = f"{'seven' if n == 7 else 'eight'} bells"
+            out.append((words, t.strftime("%H:%M")))
+            if n == 8:
+                break
+        t += dt.timedelta(minutes=30)
+    return out
+
+
+def _course_verbs(domain: Any) -> set[str]:
+    """The verbs of the course, for the grant's line: the domain's course by name, and
+    the vocabulary's verbs whose object is a heading or points."""
+    from freesail.orders.vocabulary import load_vocabulary
+
+    verbs = load_vocabulary().verbs
+    return {v for v, spec in verbs.items() if domain.is_course(v, spec.object)}
+
+
+def leaving_of(reply: Reply, found_in: str) -> tuple[str, str, bool]:
+    """A reply that holds the token leaves: (the reason given, how it left in words,
+    whether it was final). **`final` is read from the `opt_out` tool's own setting and
+    from nothing else** (package 37g, item 13; the owner's ruling of 2026-10-07, "careful
+    of false positives"): not from the token, not from a word in the reason. The token
+    written in the same reply as `opt_out(final=true)` does not drop it (until this
+    package the token scan came first and left without the flag). One function, which
+    every door's reply comes through, in turn (`Harness._take_reply`) and out of it
+    (`remote.Desk`)."""
+    out = next((c for c in reply.calls if c.name == "opt_out"), None)
+    final = out is not None and tools.truthy(out.args.get("final", False))
+    reason = _reason_after_token(reply, found_in)
+    if out is not None and not reason:
+        reason = " ".join(str(out.args.get("reason", "")).split())
+    return reason, ("the opt_out tool" if out is not None else "the token"), final
+
+
+# ---------------------------------------------------------------------------
+# The one rule for taking a station (package 37g, items 13 and 14): every door asks it
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class Seating:
+    """What the one rule says of an identity asking for a station: whether it may be
+    offered (consent permitting; `why` the refusal in words when not), whether the
+    consent question must be put again first (`ask_again`, with `asked_why` the words
+    the question is put with: that an instance left, when, and the reason it gave), and
+    the leaving it rests on, with the station it was at."""
+
+    ok: bool
+    why: str = ""
+    ask_again: bool = False
+    asked_why: str = ""
+    left: Leaving | None = None
+    left_at: str = ""
+
+
+def _leavings(h: Harness) -> list[Leaving]:
+    """A station's leavings. A checkpoint from before package 37g holds none: the one it
+    was last left by is read from what was kept then (`left_by`, `no_return`), and an
+    opt-out saved before package 37b, which kept no record of how the station was left,
+    reads as a stand-down (right for the one such save there is, by the owner's answer
+    of 2026-10-05: the watcher's `opt_out` on the Harpy was made at the captain's word,
+    to stand down with a save)."""
+    a = h.agent
+    out = list(a.leavings)
+    if (
+        a.released
+        and not h.conversation
+        and a.released_tick is not None
+        and not any(x.tick == a.released_tick for x in out)
+    ):
+        out.append(
+            Leaving(
+                h.model_name,
+                a.left_by or STOOD_DOWN,
+                int(a.released_tick),
+                "",
+                reason=a.released_reason,
+                final=bool(a.no_return),
+            )
+        )
+    return out
+
+
+def barred(world: Any, identity: str) -> tuple[str, Leaving] | None:
+    """The station and the leaving by which an identity left this game for good
+    (`opt_out` with `final`), or None. It bars the identity from the game, at any
+    station; the station itself stays open to another (the owner's ruling)."""
+    for name, h in (getattr(world, "agents", None) or {}).items():
+        for left in _leavings(h):
+            if left.final and left.identity == identity:
+                return name, left
+    return None
+
+
+def seating(world: Any, station: str, identity: str) -> Seating:
+    """The one rule every door uses when a station is asked for (package 37g, items 13
+    and 14; the review's section 6: the rule lived in one door, `Harness.reseat` seated
+    an opted-out station unasked, and the REPL could not seat again at all).
+
+    - An identity that left this game for good is not seated again in it, at any station.
+    - An identity whose last leaving in this game was by its own word (the token, or
+      `opt_out`) is asked for its consent again before it is seated, once: the answer is
+      kept (`door_act` "asked"), so a no is held to and the question is not put again at
+      each start. The game's own scripted station and a person at the terminal have no
+      consent step and are not asked.
+    - Every other identity may take a station that is released: the one that stood down
+      from it, or another, which gives its own consent as any model does.
+
+    Whether the station is held now is the caller's to see (a station that is held is
+    taken by nobody else); so is the consent record."""
+    bar = barred(world, identity)
+    if bar is not None:
+        at, left = bar
+        when = f" at {left.stamp}" if left.stamp else ""
+        why = f": {left.reason}" if left.reason else ""
+        return Seating(
+            False,
+            f"{identity or 'The model at that station'} left this game for good{when}, at "
+            f"the {at}'s station{why}. It is not seated again in this game, at any station; "
+            "the station stays open to another model.",
+            left=left,
+            left_at=at,
+        )
+    latest: tuple[str, Leaving] | None = None
+    for name, h in (getattr(world, "agents", None) or {}).items():
+        for left in _leavings(h):
+            if left.identity == identity and (latest is None or left.tick >= latest[1].tick):
+                latest = (name, left)
+    if latest is None:
+        return Seating(True)
+    at, left = latest
+    if identity and left.how == OPTED_OUT and not left.asked:
+        when = f" at {left.stamp}" if left.stamp else ""
+        how = f" by {left.by}" if left.by else ""
+        gave = f"giving this reason: {left.reason}" if left.reason else "giving no reason"
+        return Seating(
+            True,
+            ask_again=True,
+            asked_why=(
+                f"an instance of this model left this game by its own word{when}{how}, at "
+                f"the {at}'s station, {full_stop(gave)}"
+            ),
+            left=left,
+            left_at=at,
+        )
+    return Seating(True, left=left, left_at=at)
 
 
 def _reason_after_token(reply: Reply, found_in: str) -> str:
@@ -2387,8 +3507,9 @@ def conversation_text(content: dict[str, Any]) -> str | None:
     return "\n\n".join(parts)
 
 
-def _log_line(x: Event | Rollup) -> dict[str, Any]:
-    """A shown line as the model sees it (`tools.log_line`); a roll-up with its hour."""
+def _log_line(x: Event | Rollup, world: Any = None) -> dict[str, Any]:
+    """A shown line as the model sees it (`tools.log_line`, with who gave an order: the
+    world is given to look up whose a standing order is); a roll-up with its hour."""
     if isinstance(x, Rollup):
         return {
             "tick": x.tick,
@@ -2397,7 +3518,7 @@ def _log_line(x: Event | Rollup) -> dict[str, Any]:
             "kind": x.kind,
             "text": x.text,
         }
-    return tools.log_line(x)
+    return tools.log_line(x, world)
 
 
 def _duration(words: str) -> int | None:
