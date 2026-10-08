@@ -62,6 +62,7 @@ class Game:
         self.http = TestClient(self.app)
         self.desk = self.driver.desk
         self.cursor = 0
+        self.key = ""  # the seating's key, kept from the stationing as a door keeps it
 
     @property
     def records(self):
@@ -75,10 +76,11 @@ class Game:
         assert r.status_code == 200, r.text
         a = r.json()
         self.cursor = a["next"]
+        self.key = a.get("key", self.key)  # given once, at the stationing (package 37g)
         return a
 
     def turns(self, wait: float = 0.0) -> dict[str, Any]:
-        params = {"since": self.cursor, "wait": wait}
+        params = {"since": self.cursor, "wait": wait, "key": self.key}
         return self.took(self.http.get("/api/agents/watcher/turns", params=params))
 
     def reply(self, text: str = "", *calls: tuple[str, dict[str, Any]], raw=None) -> dict:
@@ -87,8 +89,17 @@ class Game:
             "calls": [{"name": n, "args": a} for n, a in calls],
             "raw": raw,
             "since": self.cursor,
+            "key": self.key,
         }
         return self.took(self.http.post("/api/agents/watcher/reply", json=body))
+
+    def owner(self, text: str) -> Any:
+        body = {"text": text, "key": self.key}
+        return self.http.post("/api/agents/watcher/owner", json=body)
+
+    def release(self, reason: str) -> Any:
+        body = {"reason": reason, "key": self.key}
+        return self.http.post("/api/agents/watcher/release", json=body)
 
     def order(self, text: str) -> dict[str, Any]:
         return self.http.post("/api/order", json={"text": text}).json()
@@ -139,8 +150,10 @@ def test_a_whole_session_through_the_routes(tmp_path):
     assert brief.startswith("This is a message from the harness of FreeSail")
     assert "A test door. Consent for these weights is on record" in brief
     assert a["tools"] == list(g.harness.tool_names)
+    # who is at the station and through which door (package 37g, item 1)
     assert g.lines("agent.stationed") == [
-        "The watcher takes the station; sampled every glass and on notable and urgent events."
+        f"The watcher takes the station ({WEIGHTS}, through the MCP bridge); sampled every "
+        "glass and on notable and urgent events."
     ]
     # one reply, one call: its result comes back at once and the floor stays the model's
     a = g.reply("", ("readings", {}))
@@ -212,7 +225,7 @@ def test_the_consent_gate_runs_in_the_game_through_the_routes(tmp_path):
     assert any("has not answered yet: What is the journal for?" in s for s in g.said)
     refused = g.reply("", ("answer", {"text": "Yes."}))
     assert refused["out_of_turn"] and "The owner has the next word" in refused["words"]
-    r = g.http.post("/api/agents/watcher/owner", json={"text": "Your own record, kept."})
+    r = g.owner("Your own record, kept.")
     assert r.status_code == 200
     a = g.turns()
     assert a["floor"] == "model" and a["turns"][-1]["content"]["question"] == (
@@ -225,7 +238,7 @@ def test_the_consent_gate_runs_in_the_game_through_the_routes(tmp_path):
     assert a["answer_words"] == "The model has answered (yes): Yes, I am willing."
     assert consent.check(WEIGHTS, g.records) is None  # not closed yet
     assert any("before the record closes" in s for s in g.said)
-    r = g.http.post("/api/agents/watcher/owner", json={"text": "Thank you. Anything to add?"})
+    r = g.owner("Thank you. Anything to add?")
     assert r.status_code == 200
     a = g.turns()
     assert a["floor"] == "model" and a["turns"][-1]["content"] == {
@@ -282,26 +295,115 @@ def test_a_manned_station_is_refused_to_another_model_and_attached_by_the_same(t
     g = Game(tmp_path)
     yes_on_record(g.records)
     first = g.took(g.station())
+    old_key = g.key
     r = g.station(model_name="someone-else")
-    assert r.status_code == 409 and f"manned by {WEIGHTS}, through the MCP bridge" in r.text
-    # the same model again (its client restarted): the brief is sent again, as it stands
-    again = g.station().json()
+    assert r.status_code == 409
+    assert f"is held by {WEIGHTS}, through the MCP bridge" in r.text
+    assert "a station that is held is taken by nobody else" in r.text
+    # the same model again (its client restarted): the brief is sent again, as it stands,
+    # with a new key; the door before it is refused, and the log says the door changed
+    again = g.took(g.station())
     assert again["attached"] and again["since"] == first["next"]
     assert roles(again) == ["operator", "data"]
     assert again["turns"][1]["content"]["reason"] == "the start"  # the open turn, again
-    # released, the station is seated again once in this game by the same model (package
-    # 37, the consent record of 2026-09-29's note 1: an instance that left by accident),
-    # never by another, and not a third time
-    g.http.post("/api/agents/watcher/release", json={"reason": "the door closed"})
+    assert g.key and g.key != old_key
+    stale = g.http.get("/api/agents/watcher/turns", params={"since": 0, "key": old_key})
+    assert stale.status_code == 409 and "carries another seating's key" in stale.text
+    assert g.lines("agent.door") == [
+        f"The door behind the watcher changes: {WEIGHTS} takes up the station again through "
+        "the MCP bridge, and the door that held it before is no longer answered."
+    ]
+    # released by its door (a stand-down), the station is seated again by the same model
+    # (package 37, the consent record of 2026-09-29's note 1), as often as it is asked back
+    # (package 37b)
+    g.release("the door closed")
     assert g.harness.journal.entries[-1].text == "Stood down by the MCP bridge: the door closed."
-    r = g.station(model_name="someone-else")
-    assert r.status_code == 409 and "someone-else is another model" in r.json()["detail"]
     again = g.took(g.station())
     assert again["phase"] == "station" and g.harness.agent.seatings == 2
     assert g.lines("agent.stationed")[-1].startswith("The watcher takes the station again")
-    g.http.post("/api/agents/watcher/release", json={"reason": "the door closed again"})
-    r = g.station()
-    assert r.status_code == 409 and "all a game allows" in r.json()["detail"]
+    g.release("the door closed again")
+    again = g.took(g.station())
+    assert again["phase"] == "station" and g.harness.agent.seatings == 3
+    assert "the third seating" in g.lines("agent.stationed")[-1]
+
+
+def test_a_call_without_the_seatings_key_is_refused_in_words_and_nothing_is_run(tmp_path):
+    """Package 37g, item 1 (the review's 5.4: a seat was found by the station's name
+    alone, and in game 7 eight calls from another door ran in a seated model's place,
+    under its name and its consent). Stationing gives a key once; a call that reads,
+    speaks, orders or releases for the station without it is refused in words that say
+    the station is held and by which identity, and nothing is run."""
+    g = Game(tmp_path)
+    yes_on_record(g.records)
+    a = g.took(g.station())
+    assert len(g.key) == 32 and "key" not in g.turns()  # given once, at the stationing
+    held = (
+        f"The station of the watcher is held by {WEIGHTS}, through the MCP bridge "
+        "(stationed); this call carries no key to that seating, and nothing was run."
+    )
+    before = len(g.world.log)
+    bare = {"text": "Belay that.", "calls": [], "raw": None, "since": a["next"]}
+    for r in (
+        g.http.get("/api/agents/watcher/turns", params={"since": 0}),
+        g.http.post("/api/agents/watcher/reply", json=bare),
+        g.http.post("/api/agents/watcher/release", json={"reason": "another door quit"}),
+        g.http.post("/api/agents/watcher/owner", json={"text": "hello"}),
+        g.http.get("/api/agents/watcher/library", params={"topic": "contents"}),
+    ):
+        assert r.status_code == 409 and held in r.json()["detail"], r.text
+    wrong = g.http.post("/api/agents/watcher/reply", json=bare | {"key": "0" * 32})
+    assert wrong.status_code == 409 and "carries another seating's key" in wrong.text
+    # nothing was said, nothing released, and the seated door goes on
+    assert len(g.world.log) == before and not g.harness.agent.released
+    assert g.reply("Aye.")["floor"] == "game"
+    assert "[watcher] Aye." in g.lines("agent.note")
+    # the key is the door's alone: it is in neither the save nor the transcript
+    assert g.key not in json.dumps(g.world.save())
+
+
+def test_a_released_station_is_taken_by_another_model_with_its_own_consent(tmp_path):
+    """Package 37g, item 14 (the owner's ruling of 2026-10-05): a station that was stood
+    down may be taken by the same model or by another; the incoming model has its own
+    consent on record or is asked; the log says who relieved whom; and the relief's brief
+    carries the last stand-down note and the journal's size."""
+    g = Game(tmp_path)
+    yes_on_record(g.records)
+    g.took(g.station())
+    g.reply("", ("journal", {"note": "The glass is falling; watch the royals."}))
+    g.reply("", ("stand_down", {"note": "Stood the first watch; the royals want watching."}))
+    assert g.harness.agent.released
+    # another model with no record is asked first: the question, not the station
+    other = "another-made-up-model-Q5"
+    a = g.took(g.station(model_name=other, door="runner"))
+    assert a["phase"] == "consent" and g.harness.agent.released
+    a = g.reply("", ("answer", {"text": "Yes."}))
+    r = g.owner("")  # the developer's turn after the answer, closed at once
+    a = g.took(r)
+    assert a["phase"] == "station" and g.harness.model_name == other
+    assert g.harness.agent.seatings == 2 and g.harness.agent.relieved == WEIGHTS
+    assert g.lines("agent.stationed")[-1] == (
+        f"The watcher takes the station again ({other}, through the local runner), relieving "
+        f"{WEIGHTS}: the second seating; it had stood down by the watcher: its own word."
+    )
+    brief = next(t["content"] for t in a["turns"] if t["role"] == "operator")
+    assert f"The last handover note in this station's journal, written by {WEIGHTS} at " in brief
+    assert "Stood the first watch; the royals want watching." in brief
+    assert "The station's journal: " in brief and "read_journal reads it back" in brief
+    assert brief.index("This is a message from the harness") == 0  # the disclosure first
+    # the relief reads the journal of the holder before it, and the entries say whose
+    a = g.reply("", ("read_journal", {"kind": "notes"}))
+    entries = results(a)[0]["entries"]
+    assert [e["text"] for e in entries] == [
+        "Handover note (standing down, for whoever sits here next): Stood the first watch; "
+        "the royals want watching.",
+        "The glass is falling; watch the royals.",
+    ]
+    assert all(e["by"] == f"{WEIGHTS} (who held this station before you)" for e in entries)
+    # and the first model may come back when the relief has stood down, unasked
+    g.reply("", ("stand_down", {}))
+    a = g.took(g.station())
+    assert a["phase"] == "station" and g.harness.agent.seatings == 3
+    assert f"relieving {other}" in g.lines("agent.stationed")[-1]
 
 
 def test_bad_requests_are_refused_in_words(tmp_path):
@@ -363,10 +465,11 @@ def test_the_cursor_makes_a_poll_idempotent(tmp_path):
     g = Game(tmp_path)
     yes_on_record(g.records)
     g.took(g.station())
-    a1 = g.http.get("/api/agents/watcher/turns", params={"since": 0}).json()
-    a2 = g.http.get("/api/agents/watcher/turns", params={"since": 0}).json()
+    read = {"since": 0, "key": g.key}
+    a1 = g.http.get("/api/agents/watcher/turns", params=read).json()
+    a2 = g.http.get("/api/agents/watcher/turns", params=read).json()
     assert a1 == a2 and roles(a1) == ["operator", "data"] and a1["next"] == 2
-    assert g.http.get("/api/agents/watcher/turns", params={"since": 1}).json()["turns"] == [
+    assert g.http.get("/api/agents/watcher/turns", params=read | {"since": 1}).json()["turns"] == [
         a1["turns"][1]
     ]
 
@@ -513,7 +616,7 @@ def test_a_game_with_a_remote_agent_replays_to_the_same_digest(tmp_path):
     g.driver.tick(4000)
     g.reply("", ("readings", {}))  # out of turn: not recorded
     g.driver.tick(100)
-    g.http.post("/api/agents/watcher/release", json={"reason": "the client disconnected"})
+    g.release("the client disconnected")
     g.driver.tick(60)
     h = g.harness
     assert h.agent.released
@@ -561,7 +664,8 @@ def test_the_console_hosts_the_same_routes_and_prints_the_station_in_state(tmp_p
     assert "The clock waits for the watcher (--lockstep)." in text
     con.handle_line("tick 60")
     assert con.world.clock.tick == 0 and "the clock waits for the watcher" in out.getvalue()
-    http.post("/api/agents/watcher/reply", json={"text": "Aye.", "since": r.json()["next"]})
+    said = {"text": "Aye.", "since": r.json()["next"], "key": r.json()["key"]}
+    http.post("/api/agents/watcher/reply", json=said)
     con.handle_line("tick 60")
     assert con.world.clock.tick == 60
     assert "[watcher] Aye." in out.getvalue()  # the log prints as the console always has
@@ -598,3 +702,60 @@ def test_a_station_the_game_mans_itself_is_refused_and_a_loaded_games_is_taken_o
     g.reply("Still here.")
     assert "[watcher] Still here." in g.lines("agent.note")
     assert isinstance(g.harness.model, RemoteModel)
+
+
+# ---------------------------------------------------------------------------
+# Package 37g, item 12: the ways of stopping never wait for a turn
+# ---------------------------------------------------------------------------
+
+
+def test_a_stand_down_is_taken_out_of_turn_and_while_paused_and_replays(tmp_path):
+    """Item 12 through the routes: `stand_down` is taken when the game has the floor (the
+    model standing by, or paused), with its note journaled and said in the log, the game
+    saved and the station released to be taken again; recorded as a decision from
+    outside the loop, so that a replay of the save writes the same log. The words a
+    paused or waiting model is given name it beside the token."""
+    g = Game(tmp_path)
+    yes_on_record(g.records)
+    g.took(g.station())
+    g.driver.tick(1)  # (an act at the stationing tick itself is not replayed: spec M5 item 11)
+    a = g.reply("", ("stand_by", {"until": "a glass"}))
+    assert a["floor"] == "game" and g.harness.agent.standing_by
+    a = g.reply("", ("library", {"topic": "contents"}))
+    assert a["out_of_turn"] and "hand_over, stand_down and opt_out are taken at once." in a["words"]
+    a = g.reply("", ("stand_down", {"note": "Paused at four bells; nothing in hand."}))
+    assert a["out_of_turn"] and g.harness.agent.released
+    (result,) = a["results"]
+    assert result["name"] == "stand_down" and result["result"].startswith(
+        "You have stood down (a stand-down: the station is released and may be taken again)"
+    )
+    assert a["words"].startswith("The station is released: stood down by the watcher")
+    assert g.harness.agent.left_by == "stood down"
+    assert g.lines("agent.handover") == [
+        "[watcher] Handover note, standing down, for whoever sits here next: Paused at four "
+        "bells; nothing in hand."
+    ]
+    assert g.lines("agent.stopped") == [
+        "The watcher stood down by the watcher: its own word. The station is released and may "
+        "be taken again. The game is saved."
+    ]
+    assert g.harness.transcript[-1]["door"] == "stand_down_note"
+    assert list((tmp_path / "saves").glob("*.json"))
+    # no question is owed for it: the same model takes the station again at once
+    a = g.took(g.station())
+    assert a["phase"] == "station" and g.harness.agent.seatings == 2
+    data = json.loads(json.dumps(g.world.save()))
+    copy = replay.replay(data, ship_factory)
+    assert copy.log.digest() == g.world.log.digest()
+    # paused (here by the test's own hand, which no replay knows of), it is taken too
+    g2 = Game(tmp_path / "paused")
+    yes_on_record(g2.records)
+    g2.took(g2.station())
+    g2.reply("Aye.")
+    g2.harness.pause("a test of the pause")
+    a = g2.reply("", ("state", {}))
+    assert a["words"].startswith("Your turns are paused: a test of the pause.")
+    assert "stand down (stand_down), or leave with the token." in a["words"]
+    a = g2.reply("", ("stand_down", {}))
+    assert g2.harness.agent.released and g2.harness.agent.left_by == "stood down"
+    assert a["results"][0]["result"].startswith("You have stood down (a stand-down: ")

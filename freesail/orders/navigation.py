@@ -5,12 +5,20 @@
     heave the deep-sea lead         the deep-sea lead, to a hundred and twenty (the key
                                     `heave the deep sea lead`, as the parser normalises it)
     take a bearing of <mark>        a mark in sight, or "the land", "the light"; a transit
+    take a fix [by <mark> and <mark> [and <mark>]]
+                                    cross bearings of two or three charted marks in sight,
+                                    the account set at their crossing (package 37d)
     work up the reckoning           the day's work on demand
     observe the sun                 the noon sight by order, at noon
     set the reckoning to <lat> <long>   the captain overrides the master
-    allow <n> knots of set to <direction>   the master's allowance in the traverse
+    allow <n> knots of set to <direction>   the captain's own set in the traverse, in the
+                                    place of the master's tide until it is handed back
+    allow no set                    the captain's word that there is none
+    allow the tide by the book      the tide handed back to the master (package 37e)
     shape a course for <place>      the course from the reckoning to a place of the chart,
-                                    with the charted dangers its line passes (package 33b)
+                                    made good against the tide the master allows (package
+                                    37e), with the charted dangers and the land its line
+                                    passes (packages 33b and 37e)
 
 and the longitude's (spec M5 §14; package 33b):
 
@@ -55,6 +63,20 @@ _SET_RE = re.compile(
     r"(?P<dir>.+)$"
 )
 _NO_SET = {"no set", "none", "nothing", "no", "no set at all"}
+# `allow the tide by the book` (package 37e): the words after `allow` (or `allow for`)
+# that hand the tide back to the master; `work the tide yourself` and its like are verbs
+# of their own in the vocabulary and reach the same order.
+_BY_THE_BOOK = {
+    "the tide by the book",
+    "the tide",
+    "the tide by the directions",
+    "the tide by the epitome",
+    "the master's tide",
+    "the masters tide",
+    "the tide as the books give it",
+    "the tide yourself",
+    "by the book",
+}
 _NUMBER_WORDS = {
     "no": 0.0,
     "half": 0.5,
@@ -68,6 +90,19 @@ _NUMBER_WORDS = {
     "a quarter": 0.25,
     "quarter": 0.25,
 }
+
+
+def _whose(ship: Any, text: str) -> str:
+    """A line of the master's that says "the captain's order", said as the order's own
+    giver's when a station gave it under the captain's word (package 37g, item 10: the
+    officer of the watch's order is logged as his). The captain's own lines are as they
+    were."""
+    from freesail.orders.crew import whose_order
+
+    whose = whose_order(ship)
+    if whose == "the captain's":
+        return text
+    return text.replace("the captain's order", f"{whose} order")
 
 
 def _navigation(ship: Any) -> Any:
@@ -96,37 +131,6 @@ def _position_in(words: str) -> Any:
         return parse_position(re.sub(r"\b(degrees?|minutes?)\b", " ", words))
     except ValueError:
         return None
-
-
-def _shape_for_position(nav: Any, pricked: Any) -> tuple[float, str]:
-    """`shape a course for <position>`: the course from the account brought up to now to
-    a point pricked on the chart, with the charted dangers its line passes, as
-    `Navigation.shape_course` gives it for a named place (never from the truth)."""
-    from freesail.world.chart import DANGER_PASS_NM
-    from freesail.world.geo import bearing_and_distance, format_position
-    from freesail.world.reckoning import miles_words
-
-    world = nav.world
-    now = nav.account_now()
-    bearing, dist = bearing_and_distance(now, pricked)
-    heading = math.radians(bearing)
-    words = (
-        f"Shaped a course for {format_position(pricked)}: {units.point_name(heading)} by "
-        f"account, {miles_words(dist / units.NAUTICAL_MILE)}"
-    )
-    chart = getattr(world, "chart", None)
-    if chart is not None:
-        passes = chart.line_passes(now, pricked, DANGER_PASS_NM * units.NAUTICAL_MILE)
-        crossed = [f.name for f, _off, crosses in passes if crosses]
-        near = [f.name for f, _off, crosses in passes if not crosses]
-        said = []
-        if crossed:
-            said.append(f"the line crosses {errors.join_names(crossed, 'and')}")
-        if near:
-            said.append(f"the line passes {errors.join_names(near, 'and')} within a mile")
-        if said:
-            words += "; " + " and ".join(said)
-    return heading, words + "."
 
 
 # A chaser keeps the chase on a steady compass bearing (Luce 1884 p. 553: "by constantly
@@ -298,6 +302,73 @@ def _sail_named(verb_phrase: str) -> str | None:
     return None
 
 
+_FIX_LEAD = re.compile(r"^(?:by|on|of|from|with|upon)\s+", re.IGNORECASE)
+_FIX_SPLIT = re.compile(r"\s*,\s*(?:and\s+)?|\s+and\s+", re.IGNORECASE)
+
+
+def _fix_names(nav: Any, rest: str) -> list[str]:
+    """The marks a fix is to be taken by, as the words after `take a fix` name them
+    ('by the Lizard and the Manacles', 'by the Lizard, Black Head and St Anthony's
+    light'): each the name of a mark in sight by any of its words (`mark_in_sight`, with
+    its refusals); none for a bare `take a fix`. The grammar hands the words on without
+    their commas, so a run of words between two 'and's that is no one mark is divided
+    where each part is a mark in sight ('Black Head St Anthony's Head and the Deadman');
+    a name that holds an 'and' of its own ('the Penwin and the Vaze') is one mark."""
+    words = _FIX_LEAD.sub("", rest.strip().rstrip("."))
+    if not words:
+        return []
+    lookout = getattr(nav.world, "lookout", None)
+
+    def known(text: str) -> str | None:
+        """The name in sight a run of words means, or None."""
+        if lookout is None or not text:
+            return None
+        seen = lookout.find(text)
+        if seen is not None:
+            return str(seen.feature.name)  # by the name the lookout says
+        try:
+            return mark_in_sight(nav, text, refuse=False)
+        except OrderError:
+            return None
+
+    def divided(text: str) -> list[str] | None:
+        """A run of words as two or three marks in sight, said one after another."""
+        tokens = text.split()
+        n = len(tokens)
+        for i in range(1, n):
+            head, tail = known(" ".join(tokens[:i])), known(" ".join(tokens[i:]))
+            if head and tail:
+                return [head, tail]
+        for i in range(1, n - 1):
+            for j in range(i + 1, n):
+                three = [
+                    known(" ".join(tokens[:i])),
+                    known(" ".join(tokens[i:j])),
+                    known(" ".join(tokens[j:])),
+                ]
+                if all(three):
+                    return [name for name in three if name]
+        return None
+
+    whole = known(words)
+    if whole is not None and " and " not in f" {words.lower()} ".replace(",", " "):
+        return [whole]
+    names: list[str] = []
+    for part in (w.strip() for w in _FIX_SPLIT.split(words)):
+        if not part:
+            continue
+        one = known(part)
+        if one is not None:
+            names.append(one)
+            continue
+        several = divided(part)
+        # not in sight by any division: left as said, for the refusal that names it
+        names.extend(several if several else [mark_in_sight(nav, part) or part])
+    if whole is not None and len(set(names)) < 2:
+        return [whole]  # 'the Penwin and the Vaze': one mark with an 'and' of its own
+    return list(dict.fromkeys(names))
+
+
 def execute(ship: Any, order: Order) -> Result:
     """Carry out a navigation order. The verb is the vocabulary's key."""
     verb = order.verb
@@ -319,6 +390,13 @@ def execute(ship: Any, order: Order) -> Result:
         nav = _navigation(ship)
         text, data = nav.take_bearing(mark_in_sight(nav, rest) or rest)
         return "bearing.taken", text, {"verb": verb, "level": 1, "mark": rest} | data
+    if verb == "take a fix":
+        # cross bearings of two or three charted marks in sight, and the account set at
+        # their crossing (package 37d); unnamed, the master takes those that cut best
+        nav = _navigation(ship)
+        names = _fix_names(nav, rest)
+        text, data = nav.take_fix(names or None)
+        return "reckoning.fix", text, {"verb": verb, "level": 1, "by": names} | data
     if verb == "work up the reckoning":
         nav = _navigation(ship)
         text, data = nav.work_up()
@@ -337,25 +415,34 @@ def execute(ship: Any, order: Order) -> Result:
                 f"'{rest}' is not a position; say 'set the reckoning to 49 52 N 6 10 W'."
             ) from None
         text, data = nav.set_reckoning(pos)
-        return "reckoning.set", text, {"verb": verb, "level": 1} | data
+        return "reckoning.set", _whose(ship, text), {"verb": verb, "level": 1} | data
+    if verb == "allow the tide by the book":
+        # the tide handed back to the master (package 37e)
+        nav = _navigation(ship)
+        text, data = nav.allow_tide_by_book()
+        return "reckoning.set_allowance", text, {"verb": verb, "level": 1} | data
     if verb == "allow":
         nav = _navigation(ship)
-        low = rest.lower()
+        low = " ".join(rest.lower().rstrip(".").split())
+        if low in _BY_THE_BOOK:
+            text, data = nav.allow_tide_by_book()
+            return "reckoning.set_allowance", text, {"verb": verb, "level": 1} | data
         if not rest or low in _NO_SET or low.startswith("no set"):
             text, data = nav.allow_set(0.0, None)
-            return "reckoning.set_allowance", text, {"verb": verb, "level": 1} | data
+            return "reckoning.set_allowance", _whose(ship, text), {"verb": verb, "level": 1} | data
         m = _SET_RE.match(low)
         if m is None:
             raise OrderError(
-                "Say how much set and which way: 'allow one knot of set to the east', or "
-                "'allow no set'."
+                "Say how much set and which way: 'allow one knot of set to the east'; or "
+                "'allow no set'; or 'allow the tide by the book', to hand the tide back to "
+                "the master."
             )
         knots = _knots(m.group("n"))
         toward = units.parse_compass_point(m.group("dir"))
         if toward is None:
             raise OrderError(f"'{m.group('dir')}' is not a compass point to allow the set toward.")
         text, data = nav.allow_set(knots, toward)
-        return "reckoning.set_allowance", text, {"verb": verb, "level": 1} | data
+        return "reckoning.set_allowance", _whose(ship, text), {"verb": verb, "level": 1} | data
     if verb == "shape a course for":
         if not rest:
             raise OrderError("Shape a course for where? Name a place of the chart.")
@@ -364,9 +451,11 @@ def execute(ship: Any, order: Order) -> Result:
         if pricked is not None:
             # a point pricked on the chart (package 36: the books' waypoints through the
             # Goulet and out of Falmouth), the course from the account as for a place
-            heading, words = _shape_for_position(nav, pricked)
+            from freesail.world.geo import format_position
+
+            heading, words, shaped = nav.shape_for(pricked, format_position(pricked))
         else:
-            heading, words = nav.shape_course(rest)
+            heading, words, shaped = nav.shape_course(rest)
         from freesail.orders import handle
 
         not_laid = _course_not_laid(ship, heading)
@@ -379,7 +468,8 @@ def execute(ship: Any, order: Order) -> Result:
             words = words.rstrip(".") + f"; {said}."
         else:
             _, helm_text, helm_data = handle(ship, f"steer {units.rad_to_deg(heading):.0f}")
-        data = {"verb": verb, "level": 1, "place": rest, "heading": heading} | {"helm": helm_data}
+        data = {"verb": verb, "level": 1, "place": rest, "heading": heading} | shaped
+        data["helm"] = helm_data
         if not_laid:
             data["course_not_laid"] = True
         return "helm.set", f"{words} {helm_text}", data

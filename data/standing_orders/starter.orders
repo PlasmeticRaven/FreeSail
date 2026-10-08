@@ -67,7 +67,14 @@ standing order "keep her full": when the apparent wind is forward of 55 degrees 
 # wander moves the firing some minutes and in unstable air may fire it by itself now and
 # then; a trim the watch is still at is not stacked behind, the yards still to brace take
 # the new angle (orders/verbs.py).
-standing order "trim on a shift": when the true wind veers 1 point or backs 1 point then trim sails
+# The guard is the dialect's own (package 33c) and was put here by package 37f: while she
+# is hove to her yards are set against each other on purpose and are not trimmed (in two
+# playtests this rule braced a hove-to ship's backed yards round and filled her, four
+# times). `trim sails` itself declines while she lies to; with the guard the rule sleeps
+# and logs no refusal, and a shift that came while she lay to is trimmed to when she has
+# filled away.
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point
+    and the manoeuvre in hand is not hove to then trim sails
 
 # Tending the sheets. Since package 32e the sheet holds the trim (spec M5 open item 13):
 # a jib's or a spanker's sheet stays where it was worked until hands work it again, so
@@ -76,8 +83,9 @@ standing order "trim on a shift": when the true wind veers 1 point or backs 1 po
 # above tends them with the yards when the wind shifts a point. A sheet within a degree
 # of its trim stands, and the line says so; a ship whose hands are all aloft has sheets
 # that are not tended, which is true. Luce 1866, ch. XXIV, 'Tacking': "trim aft the
-# sheets"; the cadence is judgement.
-standing order "tend the sheets": every glass then trim the sheets
+# sheets"; the cadence is judgement. Not while she is hove to (package 37f): the watch
+# then tends the spanker and jib sheets to keep her head where it lies, not to the wind.
+standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets
 
 # Heavy weather. Forty knots is a gale (units.describe_wind_strength); in 45 knots the
 # storm canvas of truth 28 has the topgallant masts sent down, the storm staysails bent and

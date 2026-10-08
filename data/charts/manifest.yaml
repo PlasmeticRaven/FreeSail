@@ -1093,12 +1093,12 @@ regions:
         north: 48.76
         west: -4.07
         east: -3.95
-    feature_count: 206
+    feature_count: 207
     features_by_kind:
       anchorage: 19
       bank: 4
       beacon: 1
-      bottom: 9
+      bottom: 10
       castle: 6
       church: 7
       drying: 7

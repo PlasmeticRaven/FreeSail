@@ -6,7 +6,7 @@ id: set_gaff
 verb: set
 applies_to: {class: gaff}
 preconditions:
-  - {check: sail.state != set, reason: "The {sail} is set already."}
+  - {check: sail.state != set, reason: "The {sail} is set already.", done: true}
   - {check: sail.state != blown_out, reason: "The {sail} is blown out; a new one must be bent."}
   # not sheeted on a parted sheet nor hoisted on a parted halyard (package 31b)
   - {check: "not wrecked(sheets_of(sail)) and not wrecked(halyard_of(sail))", reason: "{parted}"}

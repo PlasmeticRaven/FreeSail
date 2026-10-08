@@ -22,3 +22,6 @@ day.json
 # world at 2.5 minutes and the Atlantic at 30 seconds, tools/build_charts.py --world/--atlantic
 data/charts/tiles/0/
 data/charts/tiles/1/
+# package 37d kept three saves as test fixtures (tests/fixtures/saves/): the rule above would
+# hide them, so they are let through here
+!tests/fixtures/saves/

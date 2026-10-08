@@ -8,21 +8,27 @@
 # "the old rule for a short stay was, that the cable should be in a line with the fore
 # topmast stay" (the same, the note). The hands walk the capstan round at the messenger
 # and the nippers (Lever 1808, 'Weighing the Anchor'); the rate is judgement.
+#
+# Package 37f: the anchor named is the anchor hove short (parameter `anchor`; the one
+# she rides by when none is named); moored, the other cable is veered as this one comes
+# in, and the line says so. It takes no number: a number after it is answered with
+# `heave in to` (heave_in.yaml).
 id: heave_short
 verb: heave_short
 applies_to: {class: ship}
 script: heave_short
-params: {}
+params: {anchor: null}
 preconditions: []
 timing:
   rig_capstan_s: 180       # the messenger passed, the bars shipped and swiftered (judgement)
   heave_fathoms_per_s: 0.1  # six fathoms a minute at the capstan, hemp through the
                             # nippers (judgement: no period rate found)
+  veer_fathoms_per_s: 1.0   # moored: the other cable veered as this one comes in (unmoor's rate)
   short_stay_per_depth: 1.5  # the cable in to a short stay, a cable's length and a half
                              # the depth (judgement on Luce's "in a line with the fore
                              # topmast stay")
 on_start: {log: "All hands up anchor! Man the bars; heave round."}
-on_complete: {log: "Hove short on {anchor}: {fathoms} of cable, the cable a-stay in {depth}.", kind: cable.hove_short, severity: routine}
+on_complete: {log: "Hove short on {anchor}: {fathoms} of cable, the cable a-stay in {depth}{followed}.", kind: cable.hove_short, severity: routine}
 on_fail: {log: "Could not heave short: {reason}.", kind: evolution.failed, severity: routine}
 # crew: all hands at the capstan bars ("All hands up anchor!", Luce 1866 ch. XXI); not a
 # manoeuvre: sail is made while the cable comes in.

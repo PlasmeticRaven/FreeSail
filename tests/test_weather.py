@@ -12,7 +12,9 @@ sky for nothing. The behavioural truths 52 to 55 and 57 are in test_known_truths
 from __future__ import annotations
 
 import math
+import random
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import pytest
 
@@ -595,3 +597,99 @@ def test_a_standing_order_on_the_glass_fires_when_it_falls():
     ]
     assert fired, [e.text for e in w.log if "glass" in e.text][-5:]
     assert w.readings["tendency"]["words"] == "falling fast"
+
+
+# ---------------------------------------------------------------------------
+# Package 37d: the sea breeze blows from the sea (the review of gate 5c's playtests, 5.6)
+# ---------------------------------------------------------------------------
+
+
+def _breeze_weather() -> W.Weather:
+    """A slack high over the ship on a June afternoon: fine weather and no gradient to
+    speak of, so what wind there is near a coast is the breeze."""
+    start = datetime(1805, 6, 19, 12, 0)
+    high = {
+        "name": "the high",
+        "kind": "high",
+        "radius_km": 1200,
+        "track": [{"at": start.isoformat(), "x_km": 0, "y_km": 0, "hpa": 1028}],
+    }
+    return W.Weather(start, random.Random(1), seed=7, systems=[high])
+
+
+def test_the_breeze_blows_toward_the_coasts_trend_and_is_scaled_by_its_steepness():
+    """Item 12: the direction is the coast's trend (`coast_trend`, the World's second
+    hook) and the strength is scaled by how steeply the shore's distance rises there:
+    full on an open coast, little or none where the field is flat. Without the second
+    hook (a checkpoint from before, a coast of the test's own) it blows toward the
+    bearing the first gives, at full strength, as it did."""
+    at = datetime(1805, 6, 19, 15, 0)
+    w = _breeze_weather()
+    w.coast = lambda x, y: (3.0, 10.0)  # three kilometres off, the nearest cell NNE-ish
+    bx, by = w.sea_breeze(0.0, 0.0, at)
+    full = math.hypot(bx, by)
+    assert units.ms_to_knots(full) > 5.0
+    assert abs(math.degrees(math.atan2(bx, by)) % 360.0 - 10.0) < 1e-6
+    # the trend decides the direction, whatever the nearest cell's bearing
+    w.coast_trend = lambda x, y: (300.0, 1.0)
+    bx, by = w.sea_breeze(0.0, 0.0, at)
+    assert abs(math.degrees(math.atan2(bx, by)) % 360.0 - 300.0) < 1e-6
+    assert math.hypot(bx, by) == pytest.approx(full)
+    # full at the steepness of an open coast and above, none where the field is flat
+    for steep, share in (
+        (W.SEA_BREEZE_SLOPE_FULL, 1.0),
+        (0.5 * (W.SEA_BREEZE_SLOPE_FULL + W.SEA_BREEZE_SLOPE_NONE), 0.5),
+        (W.SEA_BREEZE_SLOPE_NONE, 0.0),
+        (0.0, 0.0),
+    ):
+        w.coast_trend = lambda x, y, steep=steep: (300.0, steep)
+        assert math.hypot(*w.sea_breeze(0.0, 0.0, at)) == pytest.approx(share * full)
+    w.coast_trend = lambda x, y: None
+    assert w.sea_breeze(0.0, 0.0, at) == (0.0, 0.0)
+    # the trend is read only while a breeze blows: not at night, not beyond its reach
+    asked = []
+    w.coast_trend = lambda x, y: asked.append((x, y)) or (300.0, 1.0)
+    assert w.sea_breeze(0.0, 0.0, datetime(1805, 6, 19, 3, 0)) == (0.0, 0.0)
+    w.coast = lambda x, y: (W.SEA_BREEZE_REACH_KM + 1.0, 10.0)
+    assert w.sea_breeze(0.0, 0.0, at) == (0.0, 0.0) and asked == []
+    assert W.SEA_BREEZE_TREND_KM == 3.0 and 0.0 < W.SEA_BREEZE_SLOPE_NONE < W.SEA_BREEZE_SLOPE_FULL
+
+
+def test_from_the_harpys_own_weather_the_wind_no_longer_turns_as_the_ship_moves():
+    """Item 12 by the method of the review's script (`evidence/tools/seabreeze_check.py`):
+    the Harpy's save of tick 602,100 loaded from its checkpoint and run on with the brig
+    left at anchor, so that the weather is the game's own for 19 June 1805; from 12:27 to
+    13:50 the surface wind sampled each second along a line run north-east at four knots
+    from her anchorage. As built it turned two points or more 386 times, by as much as
+    169 degrees; now not once, moving or at anchor. Skipped when the playtest's save is
+    not in the tree (the owner's to say)."""
+    from freesail.core import replay as replay_mod
+
+    save = Path(__file__).resolve().parent / "fixtures" / "saves" / "m5c-b-harpy-tick602100.json"
+    if not save.exists() or not replay_mod.checkpoint_path(save).exists():
+        pytest.skip("the Harpy's playtest save is not in the tree (the owner's to say)")
+    world, how = replay_mod.load(save)
+    assert how == "checkpoint" and world.systems.coast_trend is not None
+    x0, y0 = world.ship_x_km, world.ship_y_km
+    start, end = 631_666, 636_653  # aweigh; the strike
+    step_km = units.knots_to_ms(4.0) / 1000.0
+    world.run(start - world.clock.tick)
+    moving, riding, breeze = [], [], []
+    n = 0
+    while world.clock.tick < end:
+        world.tick()
+        n += 1
+        x = x0 + step_km * n * math.sin(math.radians(45.0))
+        y = y0 + step_km * n * math.cos(math.radians(45.0))
+        moving.append(world.systems.surface_wind_at(x, y))
+        riding.append(world.systems.surface_wind_at(x0, y0))
+        breeze.append(math.hypot(*world.systems.sea_breeze(x, y, world.systems.now)))
+    assert n == end - start and world.at_anchor
+
+    def turns(rows):
+        return [abs(units.wrap_pi(rows[i][0] - rows[i - 1][0])) for i in range(1, len(rows))]
+
+    assert max(turns(moving)) < 0.5 * units.POINT and max(turns(riding)) < 0.5 * units.POINT
+    assert sum(1 for t in turns(moving) if t >= 2.0 * units.POINT) == 0
+    # and there was a breeze to turn: some knots of it the whole run, as on the day
+    assert units.ms_to_knots(min(breeze)) > 1.0 and units.ms_to_knots(max(breeze)) < 10.0

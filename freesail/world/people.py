@@ -52,6 +52,12 @@ __all__ = [
 # and forty feet long and the man may be below).
 PASS_THE_WORD_S = 60
 
+# Where the man in whose place the officer of the watch stands is, in the people's words
+# (package 37g, item 10): with the watch while the station has the deck, and off watch
+# while it is seated without it.
+ON_DECK_WORDS = "on deck, with the watch"
+OFF_WATCH_WORDS = "off watch"
+
 # The roles that keep a watch and sleep in the other at night (Luce 1884 ch. XX: the
 # lieutenants and the master's mates and midshipmen by watches; the first lieutenant,
 # the master and the standing officers keep no watch), paired with the watch each keeps
@@ -378,19 +384,42 @@ class People:
             return place_words(p.where)
         if p.sick:
             return "sick, in the sick berth"
+        deck = self._at_the_station(p)
+        if deck is True:
+            return ON_DECK_WORDS
         if p.occupied:
             return f"at the {p.task}, {place_words(p.where)}"
         if p.pending is not None:
             return f"sent for, on his way to {PLACES[p.pending[0]].name}"
+        if deck is False:
+            return OFF_WATCH_WORDS
         if self._asleep(p):
             return "below, asleep"
         return place_words(p.where)
 
+    def _at_the_station(self, p: Person) -> bool | None:
+        """Whether this is the man in whose place the officer of the watch stands, and
+        the station has the deck (package 37g, item 10; in game 9 the readings had him
+        "below, asleep" through 78 hours of deck): True while the station has the deck,
+        False while it is seated without it, None for anyone else, and for him when
+        nobody holds the station. The deck is the harness's to keep (`World.agents`);
+        this reads it and changes nothing. The officer as a person who moves about the
+        ship is Milestone 6's."""
+        agents = getattr(self.world, "agents", None) or {}
+        harness = agents.get("officer of the watch")
+        if harness is None or harness.agent.released:
+            return None
+        if harness.station.person != p.name:
+            return None
+        return bool(harness.agent.deck)
+
     def _asleep(self, p: Person) -> bool:
         """A watch-keeper in his watch below at night is asleep (Luce 1884 ch. XX: the
         watch below turns in), unless an order has him elsewhere: at a task, sent for,
-        in the boat or ashore."""
+        in the boat or ashore; or the deck is his (package 37g)."""
         if p.watch is None or p is self.captain or not p.aboard or p.sick:
+            return False
+        if self._at_the_station(p) is True:
             return False
         if (
             p.occupied

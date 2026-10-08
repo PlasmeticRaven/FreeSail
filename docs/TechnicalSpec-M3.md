@@ -275,7 +275,7 @@ Twenty files exist. Milestone 3 brings the catalogue to at least forty, every fi
 | `unbend_sail`, `bend_sail`, `shift_sail` | a blown-out or wrecked sail is unbent and a new one bent from `stores.spare_sails` (one fewer); `shift` is the pair; new `SailState.UNBENT`. The one repair pulled forward from M8, because it is the most crew-heavy evolution the ship does and it lets the gale's damage be made good |
 | `goose_wing` | a course or topsail with one clew hauled up: `SailState.GOOSE_WINGED`, effective area one half, centre shifted a quarter of the yard to the set side; `physics/sails.py` reads the state (the one physics edit) |
 | `boxhaul` | script: a wear made short by bracing the head yards aback (Luce 1866 ch. XXIV "Box-hauling") |
-| `lie_a_try`, `scud`, `back_and_fill` | scripts: heavy-weather and tideway setups from Luce ch. XXV and XXVI, each a helm policy plus a sail set, ended by `fill away` or a new order |
+| `lie_a_try`, `scud`, `back_and_fill` | scripts: heavy-weather and tideway setups from Luce ch. XXV and XXVI, each a helm policy plus a sail set, ended by `fill away` or a new order (package 37f: a ship lying a-try is not tended as one hove to is, her helm and sail being the setup's own; she is judged all the same, and if she is forced through the wind the log says so and the record follows her, spec M0-M2 §8, "Heave to", as built) |
 | `wear_under_bare_poles` | a parameter of `wear`, not a file, but the primer names it |
 | `loose_sails_to_dry`, `furl_all` | routine work that costs hands and shows the muster at work |
 

@@ -1,0 +1,295 @@
+GAME 9 (the brig on m5c-c/37d, Falmouth - Roscoff - Brest): the lead's measurements, 2026-10-06/07.
+How made: a scratch COPY of saves/freesail-seed7-tick430516.json was replayed on the build that wrote it
+(tools/replay_probe.py), which reproduced the played log exactly: 7,140 lines, digest 82f84bfa2ad19ca0, both
+the checkpoint's and the replay's. The truth, the account and the master's doubt were sampled once a minute
+and at every bearing, fix, sight and sounding; tools/g9_analyse.py prints what follows. The anchors' places on
+the ground come from a second replay (tools/anchor_probe.py); the last block is tools/tackle_words_test.py,
+run in memory on the game's last checkpoint. Miles are sea miles; a cable is a tenth of one.
+
+== THE ACCOUNT'S ERROR FROM THE TRUTH (miles), a sample a minute
+   whole game: median 1.53, mean 2.00, 9 in 10 under 4.66, worst 8.32; over 1 nm 65%, over 3 nm 28%
+   Falmouth to the Bas landfall (owner alone, open Channel)   median 2.80, mean 2.96, 9 in 10 under 5.24, worst 5.53; over 1 nm 89%, over 3 nm 48%
+   the landfall to anchor at Roscoff (owner alone)            median 1.55, mean 2.05, 9 in 10 under 3.79, worst 7.09; over 1 nm 81%, over 3 nm 22%
+   at anchor, Roscoff                                         median 0.09, mean 0.09, 9 in 10 under 0.11, worst 0.12; over 1 nm 0%, over 3 nm 0%
+   out of Roscoff along the coast (officer conning)           median 0.53, mean 0.93, 9 in 10 under 2.23, worst 2.77; over 1 nm 33%, over 3 nm 0%
+   four hours of fog, standing off                            median 5.58, mean 5.57, 9 in 10 under 7.50, worst 8.32; over 1 nm 100%, over 3 nm 85%
+   round Ushant by night                                      median 2.03, mean 2.46, 9 in 10 under 4.30, worst 4.75; over 1 nm 98%, over 3 nm 34%
+   into the Iroise                                            median 1.71, mean 1.84, 9 in 10 under 3.04, worst 3.32; over 1 nm 83%, over 3 nm 12%
+   hove to in fog, six hours                                  median 4.30, mean 4.14, 9 in 10 under 4.85, worst 4.88; over 1 nm 100%, over 3 nm 91%
+   light airs and calm off Ar Men                             median 1.98, mean 2.27, 9 in 10 under 4.22, worst 4.69; over 1 nm 97%, over 3 nm 23%
+   working east on the flood and ebb                          median 1.98, mean 2.39, 9 in 10 under 4.77, worst 4.96; over 1 nm 85%, over 3 nm 33%
+   noon to the mouth of the Goulet                            median 0.52, mean 0.55, 9 in 10 under 0.80, worst 4.21; over 1 nm 2%, over 3 nm 2%
+   the Goulet to the first anchor                             median 0.21, mean 0.21, 9 in 10 under 0.34, worst 0.41; over 1 nm 0%, over 3 nm 0%
+   at anchor in the Goulet                                    median 0.22, mean 0.21, 9 in 10 under 0.30, worst 0.44; over 1 nm 0%, over 3 nm 0%
+   the Goulet to Brest road                                   median 0.44, mean 0.54, 9 in 10 under 1.09, worst 1.39; over 1 nm 15%, over 3 nm 0%
+
+== THE FIXES (61)
+   the account before each fix: median 0.25, mean 0.47, 9 in 10 under 1.14, worst 4.13; over 1 nm 13%, over 3 nm 2%
+   the fix's own error:         median 0.12, mean 0.25, 9 in 10 under 0.69, worst 1.09; over 1 nm 3%, over 3 nm 0%
+   fixes that left the account worse than it was: 19 of 61
+   'good to' (stated doubt): median 0.13 nm; true error over twice the stated doubt in 12 of 61
+   marks' distance: median 2.5 nm; nearest mark of each fix median 1.5
+   tick | when | by | account before | fix error | said | hat nm | marks (nm off)
+        0 | 12 Jun 05:00 | capt | 0.10 | 0.10 | 0.06 | 0.10 | St Anthony's Head 1.5, St Budock church 2.5, Nare Point 5.0
+     1475 | 12 Jun 05:24 | capt | 0.62 | 0.07 | 0.2 | 0.40 | Pendennis castle 0.7, Trefusis Point 1.4, Nare Point 4.1
+     2080 | 12 Jun 05:34 | capt | 0.12 | 0.18 | 0.06 |   -   | St Anthony's Head 0.8, Trefusis Point 2.1  WORSE
+     4135 | 12 Jun 06:08 | capt | 1.04 | 0.28 | 0.3 | 0.59 | Rosemullion Head 3.9, Lowland Point 4.4, Mylor Point 6.0
+   129791 | 13 Jun 17:03 | capt | 0.44 | 0.15 | 0.15 |   -   | the Lavandière 1.1, the Isle of Bas 2.4
+   130298 | 13 Jun 17:11 | capt | 0.22 | 0.10 | 0.27 | 0.53 | the Lavandière 0.4, the Isle of Bas 1.6, Pointe de Pergueridre 1.9
+   134911 | 13 Jun 18:28 | capt | 0.06 | 0.08 | 0.07 |   -   | the Lavandière 0.6, Pointe de Pergueridre 1.3  WORSE
+   134938 | 13 Jun 18:28 | capt | 0.06 | 0.07 | 0.07 |   -   | the Lavandière 0.6, Pointe de Pergueridre 1.3  WORSE
+   156085 | 14 Jun 00:21 | book | 0.11 | 0.11 | 0.08 |   -   | the Isle of Bas 1.0, Pointe de Pergueridre 1.3  WORSE
+   156362 | 14 Jun 00:26 | offr | 0.11 | 0.05 | 0.07 |   -   | the Isle of Bas 1.0, Pointe de Pergueridre 1.3
+   157885 | 14 Jun 00:51 | book | 0.05 | 0.08 | 0.07 |   -   | the Isle of Bas 1.0, Pointe de Pergueridre 1.3  WORSE
+   159685 | 14 Jun 01:21 | book | 0.08 | 0.06 | 0.07 |   -   | the Isle of Bas 1.0, Pointe de Pergueridre 1.3
+   161485 | 14 Jun 01:51 | book | 0.07 | 0.10 | 0.07 |   -   | the Isle of Bas 1.0, Pointe de Pergueridre 1.3  WORSE
+   163285 | 14 Jun 02:21 | book | 0.10 | 0.04 | 0.07 |   -   | the Isle of Bas 1.0, Pointe de Pergueridre 1.3
+   165085 | 14 Jun 02:51 | book | 0.06 | 0.09 | 0.07 |   -   | the Isle of Bas 0.9, Pointe de Pergueridre 1.3  WORSE
+   166885 | 14 Jun 03:21 | book | 0.08 | 0.10 | 0.07 |   -   | the Isle of Bas 0.9, Pointe de Pergueridre 1.3  WORSE
+   168685 | 14 Jun 03:51 | book | 0.09 | 0.09 | 0.07 |   -   | the Isle of Bas 0.9, Pointe de Pergueridre 1.3
+   183603 | 14 Jun 08:00 | offr | 0.11 | 0.07 | 0.06 |   -   | the Lavandière 0.6, Pointe de Pergueridre 1.3
+   184885 | 14 Jun 08:21 | book | 0.07 | 0.10 | 0.06 |   -   | the Isle of Bas 0.9, Pointe de Pergueridre 1.2  WORSE
+   185998 | 14 Jun 08:39 | capt | 0.14 | 0.10 | 0.07 |   -   | the Isle of Bas 1.0, Pointe de Pergueridre 1.2
+   186339 | 14 Jun 08:45 | offr | 0.28 | 0.11 | 0.08 |   -   | the Isle of Bas 1.2, Pointe de Pergueridre 1.4
+   186685 | 14 Jun 08:51 | book | 0.32 | 0.09 | 0.06 |   -   | the Lavandière 0.3, Pointe de Pergueridre 1.6
+   262805 | 15 Jun 06:00 | offr | 1.71 | 0.91 | 0.59 |   -   | Molène 11.6, Ushant 9.2
+   339334 | 16 Jun 03:15 | capt | 1.85 | 1.03 | 0.64 |   -   | St Matthew's light 13.7, the light on Ushant 19.1
+   345559 | 16 Jun 04:59 | capt | 2.29 | 0.78 | 0.38 |   -   | the Isle of Saints 10.2, St Matthew's Point 10.5
+   349515 | 16 Jun 06:05 | capt | 0.18 | 1.09 | 0.27 | 0.30 | Conquet 10.8, the Isle of Saints 10.5, Pointe des Pezeaux 11.9  WORSE
+   356099 | 16 Jun 07:54 | capt | 1.56 | 0.49 | 0.26 | 0.12 | Point Conquet 10.6, the Raz 11.6, Pointe des Pezeaux 11.4
+   370983 | 16 Jun 12:03 | offr | 4.13 | 0.69 | 0.82 | 1.61 | the Raz 8.0, St Matthew's light 11.7, Pointe des Pezeaux 11.6
+   374404 | 16 Jun 13:00 | offr | 0.48 | 0.90 | 0.31 | 0.57 | the Raz 8.2, Point Bertheaume 11.5, Le Bec de la Chèvre 10.5  WORSE
+   380643 | 16 Jun 14:44 | offr | 0.16 | 0.43 | 0.2 | 0.03 | Le Bec de la Chèvre 8.2, Point Conquet 9.1, Penaleuch point 11.4  WORSE
+   381909 | 16 Jun 15:05 | offr | 0.77 | 0.27 | 0.56 | 1.07 | Camaret 6.0, Le Bec de la Chèvre 7.9, the Raz 11.5
+   382650 | 16 Jun 15:17 | offr | 0.35 | 0.13 | 0.19 | 0.36 | Point Bertheaume 5.5, Camaret 5.0, Le Bec de la Chèvre 7.8
+   382885 | 16 Jun 15:21 | book | 0.17 | 0.52 | 0.19 | 0.35 | the Tas de Foin 2.8, St Matthew's light 5.4, Petit Minou 6.2  WORSE
+   383302 | 16 Jun 15:28 | offr | 0.53 | 0.12 | 0.21 | 0.36 | Pointe des Pezeaux 2.9, Petit Minou 5.3, Conquet 6.4
+   384365 | 16 Jun 15:46 | offr | 0.29 | 0.19 | 0.07 | 0.12 | Point Bertheaume 2.8, Camaret 3.4, Petit Minou 3.5
+   384685 | 16 Jun 15:51 | book | 0.21 | 0.08 | 0.09 | 0.14 | the Tas de Foin 3.0, Petit Minou 2.9, St Matthew's light 4.7
+   385341 | 16 Jun 16:02 | offr | 0.52 | 0.12 | 0.38 | 0.75 | Toulinguet 2.2, the Mingan 2.7, Conquet 5.9
+   386291 | 16 Jun 16:18 | capt | 0.41 | 0.23 | 0.29 | 0.56 | Pointe des Pezeaux 4.0, the castle of Brest 6.1, Conquet 6.2
+   386485 | 16 Jun 16:21 | book | 0.18 | 0.12 | 0.7 | 1.38 | Camaret 3.2, Conquet 6.3, Brest 6.3
+   386712 | 16 Jun 16:25 | capt | 0.29 | 0.12 | 0.51 | 1.00 | Camaret 3.3, Brest 5.9, Conquet 6.6
+   387115 | 16 Jun 16:31 | capt | 0.40 | 0.30 | 0.71 | 1.42 | Camaret 3.5, Brest 5.2, Conquet 7.2
+   388285 | 16 Jun 16:51 | book | 0.40 | 0.13 | 0.5 | 0.97 | the Mingan 0.7, Camaret 4.0, Conquet 7.9
+   390085 | 16 Jun 17:21 | book | 0.31 | 0.20 | 0.81 | 1.61 | the castle of Brest 4.0, Camaret 3.9, Conquet 7.8
+   391885 | 16 Jun 17:51 | book | 0.09 | 0.21 | 0.28 | 0.51 | Portzic 1.8, Camaret 4.0, Conquet 8.0  WORSE
+   393685 | 16 Jun 18:21 | book | 0.31 | 0.40 | 0.66 | 1.30 | the castle of Brest 3.9, Camaret 4.0, Conquet 7.8  WORSE
+   395485 | 16 Jun 18:51 | book | 0.39 | 0.17 | 0.08 |   -   | the Mingan 0.6, Penaleuch point 1.4
+   397285 | 16 Jun 19:21 | book | 0.17 | 0.11 | 0.08 |   -   | the Mingan 0.6, Penaleuch point 1.4
+   399085 | 16 Jun 19:51 | book | 0.11 | 0.17 | 0.08 |   -   | the Mingan 0.6, Penaleuch point 1.4  WORSE
+   400885 | 16 Jun 20:21 | book | 0.16 | 0.21 | 0.11 |   -   | Penaleuch point 1.5, Portzic 1.9  WORSE
+   413485 | 16 Jun 23:51 | book | 0.28 | 0.14 | 0.12 |   -   | Penaleuch point 1.6, Portzic 2.0
+   415285 | 17 Jun 00:21 | book | 0.15 | 0.08 | 0.13 |   -   | Penaleuch point 1.5, Portzic 1.9
+   417085 | 17 Jun 00:51 | book | 0.07 | 0.07 | 0.12 |   -   | Penaleuch point 1.5, Portzic 1.9  WORSE
+   417821 | 17 Jun 01:03 | capt | 0.32 | 0.05 | 0.12 |   -   | Penaleuch point 1.4, Portzic 1.8
+   418885 | 17 Jun 01:21 | book | 0.47 | 0.03 | 0.09 |   -   | Penaleuch point 1.0, Portzic 1.4
+   420478 | 17 Jun 01:47 | capt | 1.14 | 0.12 | 0.6 | 1.18 | Portzic 0.5, Brest 3.0, St Matthew's light 9.5
+   420685 | 17 Jun 01:51 | book | 0.25 | 0.14 | 0.3 | 0.58 | Portzic 0.6, Brest 2.8, St Matthew's light 9.7
+   422344 | 17 Jun 02:19 | capt | 1.39 | 0.19 | 0.13 | 0.24 | Portzic 1.6, Penaleuch point 2.0, Brest 2.2
+   422485 | 17 Jun 02:21 | book | 0.28 | 0.18 | 0.06 |   -   | Portzic 1.7, Brest 2.1
+   424285 | 17 Jun 02:51 | book | 0.25 | 0.11 | 0.06 |   -   | Portzic 1.7, Brest 2.1
+   426085 | 17 Jun 03:21 | book | 0.11 | 0.95 | 0.29 |   -   | the castle of Brest 1.8, St Matthew's light 11.2  WORSE
+   427885 | 17 Jun 03:51 | book | 0.95 | 0.63 | 0.29 |   -   | the castle of Brest 1.8, St Matthew's light 11.2
+
+== THE BEARINGS (46); those whose distance was laid down, or that moved the account over half a mile
+   distance laid down in 13 of 46
+    87534 13 Jun 05:18 the Isle of Bas          true  11.9 nm, judged  14.7; account error 7.09 -> 0.67; doubt E/N 4.12/2.71 -> 0.89/1.58; LAID DOWN
+    89141 13 Jun 05:45 Pointe de Pergueridre    true  11.8 nm, judged  13.9; account error 0.85 -> 0.29; doubt E/N 0.89/1.58 -> 0.87/1.58; line only
+    92982 13 Jun 06:49 the Isle of Bas          true   8.0 nm, judged  10.6; account error 1.59 -> 1.43; doubt E/N 0.87/1.57 -> 0.35/1.14; LAID DOWN
+   128820 13 Jun 16:47 the Isle of Bas          true   3.8 nm, judged   4.5; account error 1.20 -> 0.72; doubt E/N 0.91/1.20 -> 0.56/0.13; LAID DOWN
+   128832 13 Jun 16:47 the Lavandière           true   2.5 nm, judged   2.4; account error 1.20 -> 0.27; doubt E/N 0.91/1.20 -> 0.26/0.10; LAID DOWN
+   130302 13 Jun 17:11 the Lavandière           true   0.4 nm, judged   0.4; account error 0.22 -> 0.02; doubt E/N 0.15/0.06 -> 0.05/0.06; LAID DOWN
+   196553 14 Jun 11:35 the Isle Vierge          true  11.5 nm, judged  11.3; account error 1.52 -> 1.69; doubt E/N 0.39/0.15 -> 0.43/0.37; line only
+   212409 14 Jun 16:00 the Isle Vierge          true   7.7 nm, judged   6.2; account error 4.42 -> 1.53; doubt E/N 1.08/0.46 -> 0.56/0.45; LAID DOWN
+   216467 14 Jun 17:07 the Isle Vierge          true   8.9 nm, judged   6.8; account error 1.94 -> 0.68; doubt E/N 0.67/0.51 -> 0.71/0.37; line only
+   226314 14 Jun 19:51 the light on Ushant      true  11.7 nm, judged  16.6; account error 4.33 -> 2.00; doubt E/N 0.95/0.47 -> 0.32/0.48; line only
+   246153 15 Jun 01:22 the light on Ushant      true  11.4 nm, judged   9.9; account error 2.33 -> 4.22; doubt E/N 0.83/0.59 -> 1.21/0.77; LAID DOWN
+   252007 15 Jun 03:00 the light on Ushant      true  13.3 nm, judged  10.9; account error 4.16 -> 3.71; doubt E/N 1.22/0.79 -> 1.13/0.32; line only
+   299944 15 Jun 16:19 Béniguet                 true  12.0 nm, judged  14.3; account error 2.21 -> 2.68; doubt E/N 2.61/1.64 -> 1.31/1.39; line only
+   336005 16 Jun 02:20 the light on Ushant      true  20.0 nm, judged  22.9; account error 4.30 -> 2.67; doubt E/N 1.39/1.02 -> 0.48/1.00; line only
+   386301 16 Jun 16:18 Petit Minou              true   0.7 nm, judged   0.9; account error 0.41 -> 0.10; doubt E/N 0.37/0.38 -> 0.09/0.10; LAID DOWN
+   386716 16 Jun 16:25 Petit Minou              true   0.4 nm, judged   0.4; account error 0.29 -> 0.06; doubt E/N 0.69/0.70 -> 0.06/0.05; LAID DOWN
+   387118 16 Jun 16:31 Petit Minou              true   0.8 nm, judged   0.9; account error 0.40 -> 0.01; doubt E/N 0.06/0.03 -> 0.13/0.07; LAID DOWN
+   387120 16 Jun 16:32 the Mingan               true   0.3 nm, judged   0.3; account error 0.40 -> 0.02; doubt E/N 0.06/0.03 -> 0.04/0.04; LAID DOWN
+   391004 16 Jun 17:36 the Mingan               true   0.7 nm, judged   0.6; account error 0.03 -> 0.05; doubt E/N 0.81/0.81 -> 0.08/0.06; LAID DOWN
+   420472 17 Jun 01:47 Portzic                  true   0.5 nm, judged   0.7; account error 1.14 -> 0.26; doubt E/N 0.09/0.04 -> 0.12/0.06; line only
+   420483 17 Jun 01:48 Portzic                  true   0.5 nm, judged   0.7; account error 0.12 -> 0.16; doubt E/N 0.59/0.60 -> 0.05/0.10; LAID DOWN
+   of these, the account was the truer afterwards in 16
+
+== THE SIGHTS: noon latitudes and the lunar
+    25200 12 Jun 12:00 reckoning.noon: Noon. Latitude by observation 49° 35' N; the reckoning was 49° 30' N. Course made good since the departure SSE, 44 miles. Longitude by account 4° 38' 
+          truth 49.569 N 4.660 W; account before 49.501 N 4.647 W (error 4.22: +0.55 E, -4.18 N; doubt E/N 1.20/0.64; run since obs 31.2)
+          account after  49.578 N 4.641 W (error 0.94: +0.76 E, +0.55 N; doubt E/N 1.44/2.52)
+   111420 13 Jun 11:57 reckoning.noon: Noon. No sight; the sun was hid at noon in fog. Latitude by account 48° 46' N. Course made good since yesterday SSE, 57 miles. Longitude by account 4°
+          truth 48.757 N 4.066 W; account before 48.770 N 4.033 W (error 1.53: +1.31 E, +0.79 N; doubt E/N 1.08/1.88; run since obs 0.0)
+          account after  48.770 N 4.033 W (error 1.54: +1.31 E, +0.81 N; doubt E/N 1.08/1.88)
+   197760 14 Jun 11:56 reckoning.noon: Noon. Latitude by observation 48° 46' N; the reckoning was 48° 45' N. Course made good since yesterday W by S, 26 miles. Longitude by account 4° 19' W
+          truth 48.739 N 4.363 W; account before 48.746 N 4.310 W (error 2.06: +2.02 E, +0.41 N; doubt E/N 0.43/0.37; run since obs 0.0)
+          account after  48.745 N 4.312 W (error 2.07: +2.03 E, +0.39 N; doubt E/N 0.48/0.37)
+   246131 15 Jun 01:22 reckoning.lunar: A set of distances of Markab and the moon taken by Mr Pascoe and two of the young gentlemen, and cleared: longitude by lunar 5° 23' W, which he would 
+          truth 48.516 N 5.331 W; account before 48.511 N 5.273 W (error 2.33: +2.31 E, -0.31 N; doubt E/N 0.83/0.59; run since obs 2.76)
+          account after  48.511 N 5.377 W (error 1.86: -1.83 E, -0.31 N; doubt E/N 12.12/0.60)
+   284460 15 Jun 12:01 reckoning.noon: Noon. No sight; the sun was hid at noon in fog. Latitude by account 48° 15' N. Course made good since yesterday SW, 70 miles. Longitude by account 5° 
+          truth 48.172 N 5.131 W; account before 48.248 N 5.094 W (error 4.78: +1.47 E, +4.55 N; doubt E/N 1.12/0.61; run since obs 8.78)
+          account after  48.248 N 5.094 W (error 4.78: +1.47 E, +4.55 N; doubt E/N 1.12/0.61)
+   370860 16 Jun 12:01 reckoning.noon: Noon. Latitude by observation 48° 07' N; the reckoning was 48° 13' N. Course made good since yesterday E by S, 13 miles. Longitude by account 4° 49' W
+          truth 48.145 N 4.859 W; account before 48.209 N 4.814 W (error 4.21: +1.81 E, +3.81 N; doubt E/N 0.61/0.26; run since obs 0.0)
+          account after  48.208 N 4.814 W (error 4.13: +1.79 E, +3.73 N; doubt E/N 0.62/0.26)
+
+== THE MASTER'S DOUBT AGAINST THE TRUE ERROR, at moments (doubt = one sigma east / north, miles)
+   -- fog 12:00-16:00 on 14 June, standing off under sail
+      199800 14 Jun 12:30  error  2.80 (+2.66 E, +0.87 N)   doubt 0.49 / 0.37   run since last observation  0.36   way 4.98 kn
+      201600 14 Jun 13:00  error  2.47 (+2.09 E, +1.32 N)   doubt 0.49 / 0.37   run since last observation  0.36   way 2.28 kn
+      203400 14 Jun 13:30  error  5.64 (+5.25 E, +2.07 N)   doubt 0.68 / 0.39   run since last observation  2.64   way 3.71 kn
+      205200 14 Jun 14:00  error  6.25 (+5.82 E, +2.29 N)   doubt 0.68 / 0.39   run since last observation  2.64   way 1.62 kn
+      207000 14 Jun 14:30  error  7.22 (+6.83 E, +2.33 N)   doubt 0.88 / 0.41   run since last observation  4.14   way 2.58 kn
+      208800 14 Jun 15:00  error  8.27 (+7.94 E, +2.28 N)   doubt 0.88 / 0.41   run since last observation  4.14   way 3.64 kn
+      210600 14 Jun 15:30  error  5.23 (+4.63 E, +2.43 N)   doubt 1.08 / 0.46   run since last observation  8.38   way 3.33 kn
+      212400 14 Jun 16:00  error  4.42 (+3.70 E, +2.43 N)   doubt 1.08 / 0.46   run since last observation  8.38   way 3.41 kn
+   -- hove to in fog 10:00-16:00 on 15 June, then the Beniguet bearing at 299,944
+      277320 15 Jun 10:02  error  3.33 (+0.21 E, +3.33 N)   doubt 1.08 / 0.60   run since last observation  8.78   way 1.54 kn
+      279120 15 Jun 10:32  error  4.05 (+0.45 E, +4.02 N)   doubt 1.08 / 0.60   run since last observation  8.78   way 0.64 kn
+      280920 15 Jun 11:02  error  4.18 (+0.90 E, +4.08 N)   doubt 1.12 / 0.61   run since last observation  8.78   way -0.0 kn
+      282720 15 Jun 11:32  error  4.57 (+1.22 E, +4.40 N)   doubt 1.12 / 0.61   run since last observation  8.78   way -0.11 kn
+      284520 15 Jun 12:02  error  4.79 (+1.48 E, +4.55 N)   doubt 1.12 / 0.61   run since last observation  8.78   way -0.17 kn
+      286320 15 Jun 12:32  error  4.88 (+1.67 E, +4.58 N)   doubt 2.61 / 1.64   run since last observation  0.00   way -0.16 kn
+      288120 15 Jun 13:02  error  4.83 (+1.76 E, +4.49 N)   doubt 2.61 / 1.64   run since last observation  0.00   way -0.16 kn
+      289920 15 Jun 13:32  error  4.63 (+1.78 E, +4.27 N)   doubt 2.61 / 1.64   run since last observation  0.00   way -0.18 kn
+      291720 15 Jun 14:02  error  4.30 (+1.74 E, +3.94 N)   doubt 2.61 / 1.64   run since last observation  0.00   way -0.14 kn
+      293520 15 Jun 14:32  error  3.89 (+1.64 E, +3.52 N)   doubt 2.61 / 1.64   run since last observation  0.00   way -0.11 kn
+      295320 15 Jun 15:02  error  3.43 (+1.54 E, +3.06 N)   doubt 2.61 / 1.64   run since last observation  0.00   way -0.2 kn
+      297120 15 Jun 15:32  error  2.96 (+1.44 E, +2.59 N)   doubt 2.61 / 1.64   run since last observation  0.00   way -0.19 kn
+      298920 15 Jun 16:02  error  2.50 (+1.33 E, +2.12 N)   doubt 2.61 / 1.64   run since last observation  0.00   way -0.09 kn
+   -- becalmed off Ar Men, the deep-sea lead every glass
+      306000 15 Jun 18:00  error  1.25 (+0.94 E, +0.84 N)   doubt 1.33 / 1.39   run since last observation  1.04   way 1.21 kn
+      307800 15 Jun 18:30  error  1.18 (+0.36 E, +1.12 N)   doubt 1.39 / 1.41   run since last observation  2.04   way 1.38 kn
+      309600 15 Jun 19:00  error  1.27 (+0.36 E, +1.22 N)   doubt 1.39 / 1.41   run since last observation  2.04   way 0.92 kn
+      311400 15 Jun 19:30  error  0.98 (+0.95 E, +0.24 N)   doubt 2.20 / 2.79   run since last observation  0.00   way 0.69 kn
+      313200 15 Jun 20:00  error  1.29 (+1.16 E, +0.56 N)   doubt 2.20 / 2.79   run since last observation  0.00   way 0.71 kn
+      315000 15 Jun 20:30  error  1.84 (+1.75 E, +0.57 N)   doubt 1.90 / 2.19   run since last observation  0.00   way 0.54 kn
+      316800 15 Jun 21:00  error  1.84 (+1.46 E, +1.13 N)   doubt 1.90 / 2.19   run since last observation  0.00   way 0.17 kn
+      318600 15 Jun 21:30  error  2.74 (+2.10 E, +1.75 N)   doubt 1.93 / 2.19   run since last observation  0.18   way 0.2 kn
+      320400 15 Jun 22:00  error  2.77 (+2.21 E, +1.68 N)   doubt 1.93 / 1.84   run since last observation  0.00   way 0.12 kn
+      322200 15 Jun 22:30  error  3.35 (+2.64 E, +2.06 N)   doubt 1.75 / 1.67   run since last observation  0.00   way 0.06 kn
+      324000 15 Jun 23:00  error  3.82 (+2.91 E, +2.47 N)   doubt 1.67 / 1.55   run since last observation  0.00   way 0.08 kn
+      325800 15 Jun 23:30  error  4.45 (+3.18 E, +3.11 N)   doubt 1.68 / 1.38   run since last observation  0.00   way 0.02 kn
+      327600 16 Jun 00:00  error  4.70 (+3.30 E, +3.34 N)   doubt 1.47 / 1.37   run since last observation  0.00   way -0.08 kn
+   -- the ebb, forenoon of 16 June, to the noon sight
+      356400 16 Jun 08:00  error  0.55 (-0.05 E, +0.55 N)   doubt 0.23 / 0.26   run since last observation  0.00   way 0.55 kn
+      358200 16 Jun 08:30  error  0.96 (+0.22 E, +0.94 N)   doubt 0.24 / 0.26   run since last observation  0.01   way 0.65 kn
+      360000 16 Jun 09:00  error  1.45 (+0.51 E, +1.35 N)   doubt 0.29 / 0.26   run since last observation  0.00   way 0.75 kn
+      361800 16 Jun 09:30  error  2.01 (+0.80 E, +1.85 N)   doubt 0.35 / 0.26   run since last observation  0.01   way 0.8 kn
+      363600 16 Jun 10:00  error  2.58 (+1.06 E, +2.35 N)   doubt 0.40 / 0.26   run since last observation  0.00   way 0.87 kn
+      365400 16 Jun 10:30  error  3.19 (+1.43 E, +2.85 N)   doubt 0.44 / 0.26   run since last observation  0.01   way 0.76 kn
+      367200 16 Jun 11:00  error  3.76 (+1.81 E, +3.29 N)   doubt 0.50 / 0.26   run since last observation  0.00   way 0.89 kn
+      369000 16 Jun 11:30  error  4.12 (+1.97 E, +3.62 N)   doubt 0.56 / 0.26   run since last observation  0.01   way 1.17 kn
+      370800 16 Jun 12:00  error  4.21 (+1.81 E, +3.81 N)   doubt 0.61 / 0.26   run since last observation  0.00   way 1.6 kn
+   -- observations in those windows that changed the doubt (kind, doubt before -> after, error before -> after)
+      285488 15 Jun 12:18 sounding       doubt 1.12/0.61 -> 2.61/1.64; error 4.85 -> 4.85; Fifty fathoms; fine grey sand with black specks.
+      299944 15 Jun 16:19 bearing.taken  doubt 2.61/1.64 -> 1.31/1.39; error 2.21 -> 2.66; Béniguet bore NE, five leagues by estimation; three leagues by the account.
+      310641 15 Jun 19:17 sounding       doubt 1.48/1.42 -> 2.20/2.79; error 1.46 -> 0.90; Forty-five fathoms; fine grey sand with black specks.
+      314241 15 Jun 20:17 sounding       doubt 2.23/2.79 -> 1.90/2.19; error 1.55 -> 1.68; Forty-seven fathoms; fine grey sand with black specks.
+      318867 15 Jun 21:34 sounding       doubt 1.93/2.19 -> 1.93/1.84; error 2.82 -> 2.31; Fifty fathoms; fine grey sand with black specks.
+      320672 15 Jun 22:04 sounding       doubt 1.93/1.84 -> 1.75/1.67; error 2.85 -> 2.90; Forty-seven fathoms; fine grey sand with black specks.
+      322479 15 Jun 22:34 sounding       doubt 1.75/1.67 -> 1.67/1.55; error 3.41 -> 3.43; Forty-four fathoms; fine grey sand with black specks.
+      324286 15 Jun 23:04 sounding       doubt 1.67/1.55 -> 1.68/1.38; error 3.88 -> 4.14; Forty fathoms; fine grey sand with black specks.
+      326093 15 Jun 23:34 sounding       doubt 1.68/1.38 -> 1.47/1.37; error 4.49 -> 4.50; Forty-three fathoms; fine grey sand with black specks.
+      327901 16 Jun 00:05 sounding       doubt 1.47/1.37 -> 1.33/1.37; error 4.72 -> 4.73; Forty-three fathoms; fine grey sand with black specks.
+
+== HOVE TO: her head against the wind (wind relative to her head: + starboard side, - larboard; 0 = head to wind)
+     3780 to   4560 (12 Jun 06:03, 0.2 h), wind 10-12 kn: through head-to-wind 1 times, stern through the wind 0 times
+          minutes:wind-on-bow  0m:+28  1m:-60  2m:-103  3m:-99  4m:-105  5m:-114  6m:-120  7m:-121  8m:-118  9m:-115  10m:-115  11m:-117  12m:-116  13m:-115
+    69600 to  82740 (13 Jun 00:20, 3.6 h), wind 3-4 kn: through head-to-wind 0 times, stern through the wind 0 times
+          minutes:wind-on-bow  0m:-54  13m:-56  26m:-55  39m:-57  52m:-58  65m:-62  78m:-64  91m:-68  104m:-70  117m:-70  130m:-72  143m:-76  156m:-78  169m:-82  182m:-83  195m:-83  208m:-87
+    98640 to 116220 (13 Jun 08:24, 4.9 h), wind 5-11 kn: through head-to-wind 0 times, stern through the wind 0 times
+          minutes:wind-on-bow  0m:+91  18m:+60  36m:+63  54m:+63  72m:+66  90m:+63  108m:+67  126m:+72  144m:+68  162m:+68  180m:+67  198m:+68  216m:+63  234m:+64  252m:+67  270m:+65  288m:+64
+   117780 to 125280 (13 Jun 13:43, 2.1 h), wind 11-22 kn: through head-to-wind 0 times, stern through the wind 0 times
+          minutes:wind-on-bow  0m:+71  7m:+72  14m:+72  21m:+72  28m:+71  35m:+71  42m:+70  49m:+72  56m:+70  63m:+70  70m:+68  77m:+69  84m:+69  91m:+68  98m:+68  105m:+68  112m:+68
+   130740 to 185820 (13 Jun 17:19, 15.3 h), wind 5-10 kn: through head-to-wind 10 times, stern through the wind 3 times
+          minutes:wind-on-bow  0m:-97  57m:+114  114m:+117  171m:+102  228m:-15  285m:-37  342m:-42  399m:-35  456m:-42  513m:-26  570m:+3  627m:+167  684m:+130  741m:+127  798m:+128  855m:+128  912m:+75
+   188580 to 189420 (14 Jun 09:23, 0.2 h), wind 8-8 kn: through head-to-wind 1 times, stern through the wind 0 times
+          minutes:wind-on-bow  0m:+52  1m:+14  2m:-50  3m:-93  4m:-94  5m:-84  6m:-81  7m:-86  8m:-91  9m:-94  10m:-103  11m:-110  12m:-108  13m:-103  14m:-90
+   277440 to 278040 (15 Jun 10:04, 0.2 h), wind 4-5 kn: through head-to-wind 1 times, stern through the wind 0 times
+          minutes:wind-on-bow  0m:-71  1m:-62  2m:-53  3m:-43  4m:-28  5m:-4  6m:+32  7m:+75  8m:+104  9m:+121  10m:+120
+   278940 to 298920 (15 Jun 10:29, 5.5 h), wind 3-6 kn: through head-to-wind 1 times, stern through the wind 0 times
+          minutes:wind-on-bow  0m:+66  20m:-110  40m:-110  60m:-99  80m:-103  100m:-97  120m:-95  140m:-93  160m:-96  180m:-95  200m:-94  220m:-93  240m:-92  260m:-94  280m:-96  300m:-97  320m:-95
+
+== THE GOULET (16 June, 16:10 to the first anchor)
+   the Mingan at 48.3370 N 4.5880 W: nearest truth 1.2 cables at tick 387300 (16 Jun 16:35)
+      386400 16 Jun 16:20  Mingan true 14.9 cables, by the account 16.4; account error  1.5 cables; way 3.62 kn, wind 9.4 kn
+      386520 16 Jun 16:22  Mingan true 13.4 cables, by the account 14.4; account error  1.3 cables; way 3.76 kn, wind 8.9 kn
+      386640 16 Jun 16:24  Mingan true 11.2 cables, by the account 13.5; account error  2.3 cables; way 3.28 kn, wind 8.8 kn
+      386760 16 Jun 16:26  Mingan true  9.2 cables, by the account 10.2; account error  0.9 cables; way 3.46 kn, wind 8.6 kn
+      386880 16 Jun 16:28  Mingan true  7.0 cables, by the account  9.2; account error  2.2 cables; way 3.89 kn, wind 8.1 kn
+      387000 16 Jun 16:30  Mingan true  4.8 cables, by the account  8.3; account error  3.4 cables; way 3.58 kn, wind 7.9 kn
+      387120 16 Jun 16:32  Mingan true  3.0 cables, by the account  2.9; account error  0.1 cables; way 2.98 kn, wind 6.2 kn
+      387240 16 Jun 16:34  Mingan true  1.5 cables, by the account  2.1; account error  0.7 cables; way 2.58 kn, wind 4.8 kn
+      387360 16 Jun 16:36  Mingan true  1.4 cables, by the account  1.7; account error  1.4 cables; way 1.85 kn, wind 3.1 kn
+      387480 16 Jun 16:38  Mingan true  2.4 cables, by the account  1.9; account error  1.9 cables; way 1.21 kn, wind 1.7 kn
+      387600 16 Jun 16:40  Mingan true  3.6 cables, by the account  2.4; account error  2.3 cables; way 1.17 kn, wind 0.5 kn
+      387720 16 Jun 16:42  Mingan true  4.7 cables, by the account  2.4; account error  3.5 cables; way 0.7 kn, wind 1.0 kn
+   386280 lookout.land_ahead error 3.8 -> 4.1 cables | Land ahead, fine on the larboard bow, eight cables: she is standing into it.
+   386291 reckoning.fix      error 4.1 -> 2.3 cables | Fixed by cross bearings: Pointe des Pezeaux S, the castle of Brest NE by E, Conquet WNW; the lines met within six cables. The account moved 
+   386301 bearing.taken      error 4.1 -> 1.0 cables | Petit Minou bore NE by N, nine cables by estimation; the account laid down at that distance, the estimate being the better figure: moved thr
+   386309 bearing.taken      error 4.1 -> 1.1 cables | The Mingan bore ENE, two miles by estimation.
+   386485 reckoning.fix      error 1.8 -> 1.2 cables | Fixed by cross bearings: Camaret SSE, Conquet WNW, Brest NE by E; the lines met within a mile and a half. The account moved two cables to th
+   386712 reckoning.fix      error 2.9 -> 1.2 cables | Fixed by cross bearings: Camaret S by E, Brest NE by E, Conquet WNW; the lines met within a mile. The account moved four cables to the E: 48
+   386716 bearing.taken      error 2.9 -> 0.6 cables | Petit Minou bore NNW, four cables by estimation; the account laid down at that distance, the estimate being the better figure: moved a cable
+   386719 bearing.taken      error 2.9 -> 0.6 cables | The Mingan bore E by N, a mile by estimation.
+   387000 lookout.land_ahead error 2.8 -> 3.4 cables | The Mingan close ahead, on the starboard bow, four cables! She will be on it in three minutes.
+   387047 bearing.taken      error 3.4 -> 3.9 cables | The Mingan bore E by N, five cables by estimation; eight cables by the account.
+   387111 bearing.taken      error 4.0 -> 4.0 cables | Petit Minou bore W, nine cables by estimation; four cables by the account.
+   387115 reckoning.fix      error 4.0 -> 3.0 cables | Fixed by cross bearings: Camaret S, Brest NE by E, Conquet W by N; the lines met within a mile and a half. The account moved four cables to 
+   387118 bearing.taken      error 4.0 -> 0.1 cables | Petit Minou bore W by N, nine cables by estimation; the account laid down at that distance, the estimate being the better figure: moved thre
+   387120 bearing.taken      error 4.0 -> 0.2 cables | The Mingan bore E, three cables by estimation; the account laid down at that distance, the estimate being the better figure: it stood there 
+
+== AT ANCHOR: did she move when the anchors were said to drag?
+   Roscoff, coming to: 2 dragging lines; she ended 0.7 cables from where she began, farthest 0.9, path 1.2 cables
+   Roscoff, weighing in fog: 1 dragging lines; she ended 0.3 cables from where she began, farthest 0.3, path 0.5 cables
+   the Goulet: 18 dragging lines; she ended 2.5 cables from where she began, farthest 2.5, path 25.4 cables
+   Brest road: 1 dragging lines; she ended 1.5 cables from where she began, farthest 1.6, path 2.5 cables
+   the Goulet, each dragging line and how far she moved over the ground in the ten minutes after it:
+      387773 16 Jun 16:42 anchor.dragging  moved  1.9 cables in 10 min | The best bower is dragging: veer more cable; let go the small bower, o | data {"id": "best_bower", "kind": "bower", "name": "the best bower", "weight_kg": 800.0, "state": "down", "scope_fathoms": 128.3, "cable_fathoms": 240.0, "cable_in":
+      387888 16 Jun 16:44 ship.anchored    moved  1.4 cables in 10 min | The small bower let go in 26 fathoms and a half; a hundred and twenty  | data {"evolution": "let_go_anchor", "subject": "Harpy", "phase": "veer", "elapsed_s": 111.0, "anchor": {"id": "small_bower", "kind": "bower", "name": "the small bowe
+      388094 16 Jun 16:48 anchor.dragging  moved  1.0 cables in 10 min | The small bower is dragging: veer more cable. | data {"id": "small_bower", "kind": "bower", "name": "the small bower", "weight_kg": 800.0, "state": "down", "scope_fathoms": 120.0, "cable_fathoms": 120.0, "cable_in
+      391064 16 Jun 17:37 anchor.dragging  moved  0.9 cables in 10 min | The small bower is dragging: veer more cable; let go the best bower, o | data {"id": "small_bower", "kind": "bower", "name": "the small bower", "weight_kg": 800.0, "state": "down", "scope_fathoms": 120.0, "cable_fathoms": 120.0, "cable_in
+      391195 16 Jun 17:39 ship.anchored    moved  0.6 cables in 10 min | The best bower let go in 26 fathoms and a half; a hundred and thirty-t | data {"evolution": "let_go_anchor", "subject": "Harpy", "phase": "veer", "elapsed_s": 127.0, "anchor": {"id": "best_bower", "kind": "bower", "name": "the best bower"
+      391571 16 Jun 17:46 anchor.dragging  moved  0.9 cables in 10 min | The small bower is dragging: veer more cable. | data {"id": "small_bower", "kind": "bower", "name": "the small bower", "weight_kg": 800.0, "state": "down", "scope_fathoms": 120.0, "cable_fathoms": 120.0, "cable_in
+      393900 16 Jun 18:25 ship.swung       moved  0.0 cables in 10 min | The cable slack at the turn; she swings to the ebb. Riding by the best | data {"flood": false, "height_m": 6.25, "phase_deg": 9.2, "amplitude_m": 2.15, "rising": false, "stream_kn": 0.41, "stream_toward_deg": 260.0, "area": "the-goulet"}
+      400693 16 Jun 20:18 anchor.dragging  moved  1.2 cables in 10 min | The best bower is dragging: veer more cable. | data {"id": "best_bower", "kind": "bower", "name": "the best bower", "weight_kg": 800.0, "state": "down", "scope_fathoms": 133.1, "cable_fathoms": 240.0, "cable_in":
+      400757 16 Jun 20:19 anchor.dragging  moved  1.1 cables in 10 min | The small bower is dragging: veer more cable. | data {"id": "small_bower", "kind": "bower", "name": "the small bower", "weight_kg": 800.0, "state": "down", "scope_fathoms": 120.0, "cable_fathoms": 120.0, "cable_in
+      401359 16 Jun 20:29 anchor.dragging  moved  0.6 cables in 10 min | The best bower is dragging: veer more cable. | data {"id": "best_bower", "kind": "bower", "name": "the best bower", "weight_kg": 800.0, "state": "down", "scope_fathoms": 240.0, "cable_fathoms": 240.0, "cable_in":
+      401474 16 Jun 20:31 ship.anchored    moved  0.2 cables in 10 min | The sheet anchor let go in 20 fathoms and a half; a hundred and ten fa | data {"evolution": "let_go_anchor", "subject": "Harpy", "phase": "veer", "elapsed_s": 108.0, "anchor": {"id": "sheet", "kind": "sheet", "name": "the sheet anchor", "
+      402352 16 Jun 20:45 anchor.dragging  moved  0.7 cables in 10 min | The small bower is dragging: veer more cable. | data {"id": "small_bower", "kind": "bower", "name": "the small bower", "weight_kg": 800.0, "state": "down", "scope_fathoms": 120.0, "cable_fathoms": 120.0, "cable_in
+      403402 16 Jun 21:03 anchor.dragging  moved  0.6 cables in 10 min | The sheet anchor is dragging: veer more cable. | data {"id": "sheet", "kind": "sheet", "name": "the sheet anchor", "weight_kg": 800.0, "state": "down", "scope_fathoms": 110.2, "cable_fathoms": 120.0, "cable_in": 14
+      404290 16 Jun 21:18 anchor.dragging  moved  1.7 cables in 10 min | The small bower is dragging: veer more cable. | data {"id": "small_bower", "kind": "bower", "name": "the small bower", "weight_kg": 800.0, "state": "down", "scope_fathoms": 120.0, "cable_fathoms": 120.0, "cable_in
+      404527 16 Jun 21:22 anchor.dragging  moved  2.0 cables in 10 min | The best bower is dragging: veer more cable. | data {"id": "best_bower", "kind": "bower", "name": "the best bower", "weight_kg": 800.0, "state": "down", "scope_fathoms": 38.2, "cable_fathoms": 240.0, "cable_in": 
+      405021 16 Jun 21:30 anchor.dragging  moved  0.4 cables in 10 min | The small bower is dragging: veer more cable. | data {"id": "small_bower", "kind": "bower", "name": "the small bower", "weight_kg": 800.0, "state": "down", "scope_fathoms": 120.0, "cable_fathoms": 120.0, "cable_in
+      405960 16 Jun 21:46 anchor.dragging  moved  0.8 cables in 10 min | The best bower is dragging: veer more cable. | data {"id": "best_bower", "kind": "bower", "name": "the best bower", "weight_kg": 800.0, "state": "down", "scope_fathoms": 38.2, "cable_fathoms": 240.0, "cable_in": 
+      406225 16 Jun 21:50 anchor.dragging  moved  1.1 cables in 10 min | The small bower is dragging: veer more cable. | data {"id": "small_bower", "kind": "bower", "name": "the small bower", "weight_kg": 800.0, "state": "down", "scope_fathoms": 40.5, "cable_fathoms": 120.0, "cable_in"
+      406449 16 Jun 21:54 anchor.dragging  moved  0.5 cables in 10 min | The sheet anchor is dragging: veer more cable. | data {"id": "sheet", "kind": "sheet", "name": "the sheet anchor", "weight_kg": 800.0, "state": "down", "scope_fathoms": 110.2, "cable_fathoms": 120.0, "cable_in": 14
+      415103 17 Jun 00:18 anchor.dragging  moved  0.4 cables in 10 min | The best bower is dragging: veer more cable. | data {"id": "best_bower", "kind": "bower", "name": "the best bower", "weight_kg": 800.0, "state": "down", "scope_fathoms": 38.2, "cable_fathoms": 240.0, "cable_in": 
+      415142 17 Jun 00:19 anchor.dragging  moved  0.4 cables in 10 min | The small bower is dragging: veer more cable. | data {"id": "small_bower", "kind": "bower", "name": "the small bower", "weight_kg": 800.0, "state": "down", "scope_fathoms": 40.5, "cable_fathoms": 120.0, "cable_in"
+      416040 17 Jun 00:34 ship.swung       moved  0.2 cables in 10 min | The cable slack at the turn; she swings to the flood. Riding by the sm | data {"flood": true, "height_m": 2.04, "phase_deg": 189.3, "amplitude_m": 2.11, "rising": true, "stream_kn": 0.41, "stream_toward_deg": 80.0, "area": "the-goulet"}
+      416694 17 Jun 00:44 anchor.dragging  moved  0.2 cables in 10 min | The best bower is dragging: veer more cable; let go the small bower, o | data {"id": "best_bower", "kind": "bower", "name": "the best bower", "weight_kg": 800.0, "state": "down", "scope_fathoms": 38.2, "cable_fathoms": 240.0, "cable_in": 
+
+== THE ANCHORS THEMSELVES (tools/anchor_probe.py): how far each moved over the ground while down
+   Roscoff, coming to, 13 June: best bower 0.38 cables (bottom 'sand and rock', holding 7.5 kN); small bower 0.10 (bottom 'sand')
+   Roscoff, weighing in fog, 14 June: best bower 0.00; small bower 0.10 cables
+   The Goulet, 16-17 June (bottom 'rock and mud', counted as rock; holding 2.4 to 6.2 kN against loads to 78 kN):
+      best bower, first time down (47 min): 0.81 cables; second time (7.3 h): 2.05 cables, flagged dragging 73 min
+      small bower (8.0 h): 1.83 cables, flagged dragging 96 min
+      sheet anchor (3.9 h): 0.61 cables, flagged dragging 38 min
+      the ship herself ended 2.5 cables from where she first brought up
+   Brest road, 17 June (no bottom note on the chart there; default holding): best bower 0.56 cables as she brought up; small bower 0.00
+
+== WHAT THE GROUND-TACKLE ORDERS DO WITH A NAME AND WITH 'TO' (tools/tackle_words_test.py; moored, both bowers at 68 fathoms, riding by the best bower)
+   'veer to 80 fathoms'                  -> the best bower veered to 80
+   'veer the best bower to 80 fathoms'   -> the best bower veered to 148 (80 MORE)
+   'veer the small bower to 80 fathoms'  -> the BEST bower veered to 148; the small bower untouched
+   'veer 10 fathoms'                     -> the best bower to 78
+   'weigh the small bower'               -> the BEST bower weighed
+   'weigh the best bower'                -> the best bower weighed
+   'heave short the small bower'         -> refused in words ('heave short' takes nothing after it)
+   'heave short'                         -> the best bower hove short

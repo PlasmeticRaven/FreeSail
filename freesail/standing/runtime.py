@@ -42,6 +42,7 @@ does not journal, since firings are a deterministic function of the seed and the
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
@@ -59,7 +60,17 @@ from freesail.standing.rules import STANDING_DWELL_S, Rule
 if TYPE_CHECKING:
     from freesail.core.world import World
 
-__all__ = ["ACTOR_PREFIX", "Runtime", "action_parts", "contrary", "said_as_done", "where_words"]
+__all__ = [
+    "ACTOR_PREFIX",
+    "Runtime",
+    "action_parts",
+    "contrary",
+    "order_acts",
+    "said_as_done",
+    "undo_chain",
+    "undoes",
+    "where_words",
+]
 
 # The actor a firing carries; the World knows a firing by it (spec §4).
 ACTOR_PREFIX = "standing order "
@@ -254,15 +265,17 @@ class Runtime:
                 if tick >= rule.next_due_tick:
                     rule.next_due_tick += rule.trigger.interval_s
                     if self._still_queued(rule):
-                        world.record(
-                            Severity.ROUTINE,
-                            "standing.held",
-                            f"Standing order '{rule.name}' {rule.trigger.text}: held; the last "
-                            f"firing's work is still waiting its turn.",
-                            actor=f"{ACTOR_PREFIX}'{rule.name}'",
-                            data={"name": rule.name},
-                        )
+                        if self.say_held(rule, "queued"):
+                            world.record(
+                                Severity.ROUTINE,
+                                "standing.held",
+                                f"Standing order '{rule.name}' {rule.trigger.text}: held; the "
+                                f"last firing's work is still waiting its turn.",
+                                actor=f"{ACTOR_PREFIX}'{rule.name}'",
+                                data={"name": rule.name},
+                            )
                     else:
+                        self.clear_held(rule, "queued")
                         self._fire(rule, view)
 
     def _tick_when(self, rule: Rule, view: R.ReadingsView) -> None:
@@ -298,6 +311,43 @@ class Runtime:
             rule.held_s = 0.0
             rule.clear_s = 0.0
 
+    # -- the "held" lines: one a watch for each reason (package 37f) -----------------------
+
+    def say_held(self, rule: Rule, reason: str) -> bool:
+        """Whether a line saying this rule did nothing, for this reason, is to be said
+        now: the first time, and then once a watch while it goes on (package 37f; the
+        review of gate 5c's playtests, 8.2 under "The log"). A standing order with
+        nothing to do said so at every firing: on the gate's merchant passage "in the
+        Bay ... she is at anchor already" twenty-six times and "tend the sheets ... She
+        is at anchor" twenty-one, one a glass. The reason is taken without its figures
+        ("the distance to the Lizard is 14 miles by account, not under 12 miles" and the
+        same at 13 are one reason), and each reason has its own line: an order held for
+        one thing and then for another says both."""
+        world = self.world
+        watch = (world.clock.ship_time.date().isoformat(), world.clock.watch())
+        key = _reason_key(reason)
+        said = rule.held_said if isinstance(rule.held_said, dict) else {}
+        if said.get(key) == watch:
+            return False
+        said = {k: v for k, v in said.items() if v == watch}  # earlier watches are done with
+        said[key] = watch
+        rule.held_said = said
+        return True
+
+    def clear_held(self, rule: Rule, prefix: str) -> None:
+        """What held the rule holds it no longer (its `if` passed, its order was taken,
+        its queue ran): the next time it is held for that, the line is said again."""
+        said = rule.held_said
+        if isinstance(said, dict):
+            for key in [k for k in said if k.startswith(prefix)]:
+                del said[key]
+
+    def say_refused(self, order: str, reason: str) -> bool:
+        """Whether the refusal of a firing's order is to be logged (`World.submit` asks):
+        the first time for this order and this reason, then once a watch."""
+        rule = self.firing
+        return rule is None or self.say_held(rule, f"order:{order}:{reason}")
+
     # -- the runner's word on a firing's work ---------------------------------------------
 
     def _runner(self) -> Any:
@@ -329,10 +379,13 @@ class Runtime:
             # failing (spec M5 open item 15; package 33c: the gate's passage had a hundred
             # and fifty-seven of them, its two leads' `every ..., if` saying every ten
             # minutes that the run since noon was short)
-            watch = (world.clock.ship_time.date().isoformat(), world.clock.watch())
-            if rule.held_line_watch == watch:
+            # (and since package 37f once a watch for each reason: `say_held`; the reason
+            # is the clause that fails, as the order says it, whatever the reading is
+            # now: "the distance to Falmouth is over 2 miles" is one reason at a mile
+            # and at a mile and a half)
+            failing = rule.condition.failing(view, rule.memory)
+            if not self.say_held(rule, f"if:{failing.text if failing is not None else ''}"):
                 return
-            rule.held_line_watch = watch
             world.record(
                 Severity.ROUTINE,
                 "standing.held",
@@ -342,7 +395,7 @@ class Runtime:
                 data={"name": rule.name, "reason": rule.condition.explain(view, rule.memory)},
             )
             return
-        rule.held_line_watch = None  # it fires: the next failing `if` is said again
+        self.clear_held(rule, "if:")  # it fires: the next failing `if` is said again
         firing = Firing(rule, tick)
         given: list[ActionParts] = []
         for text in rule.actions:
@@ -359,13 +412,16 @@ class Runtime:
         self.firing = rule
         try:
             for parts in given:
-                world.submit(
+                done = world.submit(
                     parts.text,
                     actor=actor,
                     said=f"By standing order '{rule.name}': {said_as_done(ship, parts.text)}",
                     # a cadence's firing is the watch's routine work: a routine line
                     routine=rule.trigger.kind == "every",
                 )
+                if done.kind != "order.rejected":
+                    # taken: a later refusal of it is said again
+                    self.clear_held(rule, f"order:{parts.text}:")
         finally:
             self.firing = None
         firing.actions = given
@@ -462,6 +518,12 @@ class Runtime:
         return []
 
 
+def _reason_key(reason: str) -> str:
+    """A reason without its figures, for `Runtime.say_held`: the same thing said with
+    another number is the same reason."""
+    return re.sub(r"\d+(?:\.\d+)?", "#", reason)
+
+
 def contrary(ship: Any, earlier: str, later: str) -> str:
     """The conflict rule as a function (package 37; the cold review's second item): the
     parts two orders are contrary on, in words, or "" when they are not. The same rule the
@@ -477,6 +539,104 @@ def contrary(ship: Any, earlier: str, later: str) -> str:
 def where_words(ship: Any, parts: frozenset[str]) -> str:
     """`_where` for a caller outside the runtime (package 37)."""
     return _where(ship, parts) if parts else ""
+
+
+# ---------------------------------------------------------------------------
+# What undoes what (package 37g, item 5): the harness's rule for a station with authority
+# ---------------------------------------------------------------------------
+
+# The thing an order with no part of the ship's graph is said of, for the undo rule's
+# words: the ground tackle for every anchor verb, and the spar or the rigging a verb
+# names in itself. (The conflict rule above keeps `the ship` for these, unchanged: its
+# lines are in the recorded passages.)
+GROUND_TACKLE = "the ground tackle"
+_UNDO_THINGS = {
+    "send down the topgallant masts": "the topgallant masts",
+    "sway up the topgallant masts": "the topgallant masts",
+    "send down the topgallant yards": "the topgallant yards",
+    "cross the topgallant yards": "the topgallant yards",
+    "strike the topmasts": "the topmasts",
+    "fid the topmasts": "the topmasts",
+    "swifter in the catharpins": "the catharpins",
+    "ease the catharpins": "the catharpins",
+}
+
+
+def order_acts(ship: Any, text: str) -> list[ActionParts]:
+    """An order as the acts it is made of, for the undo rule: the order itself with the
+    parts it lays hands on (`action_parts`), an anchor's verb said of the ground tackle
+    and a mast's or the catharpins' of that thing; a group evolution as its lines, each
+    with its own verb (`shorten sail` takes in and reefs); a sentence of the book that
+    belays or resumes a standing order as an act on that order. An order that cannot be
+    read is no act."""
+    from freesail.standing import grammar as standing
+
+    vocab = load_vocabulary()
+    said = standing.recognises(text) or ""
+    bare = standing.bare_book_sentence(ship, text) if not said else None
+    if said or bare:
+        try:
+            command = standing.parse_book_command(bare or text)
+        except OrderError:
+            return []
+        if command.name is None:
+            return []
+        rule = f"standing order '{' '.join(command.name.lower().split())}'"
+        return [ActionParts(text, command.verb, frozenset({rule}), frozenset())]
+    try:
+        order = imperative.parse(ship, text, vocab)
+    except OrderError:
+        return []
+    if order.verb in vocab.group_evolutions:
+        acts: list[ActionParts] = []
+        for line in vocab.group_evolutions[order.verb]:
+            acts.extend(order_acts(ship, line))
+        return acts
+    parts = action_parts(ship, text)
+    spec = vocab.verbs[order.verb]
+    if spec.object == "anchor":
+        return [ActionParts(text, order.verb, frozenset({GROUND_TACKLE}), parts.manner)]
+    if order.verb in _UNDO_THINGS:
+        thing = frozenset({_UNDO_THINGS[order.verb]})
+        return [ActionParts(text, order.verb, thing, parts.manner)]
+    return [parts] if parts.parts else []
+
+
+def undoes(ship: Any, earlier: str, later: str) -> frozenset[str]:
+    """The parts on which the later order undoes the earlier, empty when it does not: the
+    two are a pair of the vocabulary's `undoes` table (the same sail set and taken in,
+    hove to and filled away, an anchor let go and weighed, cable veered and hove in, a
+    thing allowed and disallowed) and share a part. Altering the course is no pair,
+    however often (`steer NE; steer 53; steer ENE` is conning); nor is the next thing
+    after the last (`heave to; fill away; steer`); nor the same order said again. This
+    is the relation the harness's detector counts for a station with authority; the
+    book's own conflict rule (`contrary`, `ActionParts.conflicts_with`) is another and is
+    unchanged."""
+    pairs = load_vocabulary().undoes
+    shared: set[str] = set()
+    befores = order_acts(ship, earlier)
+    for a in order_acts(ship, later):
+        for b in befores:
+            if frozenset((a.verb, b.verb)) in pairs:
+                shared |= a.parts & b.parts
+    return frozenset(shared)
+
+
+def undo_chain(ship: Any, orders: list[str]) -> tuple[list[str], frozenset[str]]:
+    """The chain at the end of `orders` (oldest first) in which each order undoes the one
+    before it: the chain's orders, oldest first, and the parts they share. One order is a
+    chain of one; `set; take in; set` is a chain of three."""
+    if not orders:
+        return [], frozenset()
+    chain = [orders[-1]]
+    shared: frozenset[str] = frozenset()
+    for earlier in reversed(orders[:-1]):
+        crossed = undoes(ship, earlier, chain[0])
+        if not crossed:
+            break
+        shared = shared | crossed
+        chain.insert(0, earlier)
+    return chain, shared
 
 
 def _where(ship: Any, parts: frozenset[str]) -> str:

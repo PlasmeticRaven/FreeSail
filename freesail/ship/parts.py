@@ -866,6 +866,15 @@ class Anchor:
     came_home: bool = False  # it moved this tick (set by the physics each substep it does)
     drag_s: float = 0.0  # the seconds it has been coming home
     hold_s: float = 0.0  # the seconds it has held since it last came home
+    # package 37f: how far it has come home, metres: this tick (the physics adds each
+    # substep's move, `judge_cables` takes it), and since this dragging began (for the
+    # log's "a cable since it began"); plain defaults, so an older checkpoint loads
+    moved_m: float = 0.0
+    drag_m: float = 0.0
+    # whether the log has said she is brought up by it (package 37f: `let go the anchor`
+    # never did); true by default, so that an anchor down in an older checkpoint is not
+    # said to bring her up a second time, and cleared when one is let go
+    brought_up: bool = True
     taut: bool = False  # the cable bar-taut (she is riding by it), else slack
     heaving: bool = False  # the cable being hove in at the capstan (weighing, heaving short)
 
@@ -907,6 +916,7 @@ class Anchor:
             "bottom": self.bottom,
             "dragging": self.dragging,
             "taut": self.taut,
+            "come_home_m": round(self.drag_m, 1),
         }
 
 

@@ -9,7 +9,7 @@ id: set_square
 verb: set
 applies_to: {class: square}
 preconditions:
-  - {check: sail.state != set, reason: "The {sail} is set already."}
+  - {check: sail.state != set, reason: "The {sail} is set already.", done: true}
   - {check: sail.state != blown_out, reason: "The {sail} is blown out of the bolt-ropes; a new one must be bent."}
   - {check: sail.state != unbent, reason: "The {sail} is unbent; bend a sail to the yard first."}
   # a sail is not sheeted home on a sheet that is gone, nor hoisted on a parted halyard

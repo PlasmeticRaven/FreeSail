@@ -33,11 +33,21 @@
 #                  "riding to the flood, the wind across the tide" in the log
 # Parameter `anchor`: which (the best bower unless said). The physics does the riding:
 # the cable's pull at the hawse, the stream and the windage (physics/anchor.py).
+#
+# Package 37f (the review of gate 5c's playtests, 5.8): "come to an anchor in twelve
+# fathoms" is the depth to let go in, as the primer always had it (parameter
+# `depth_fathoms`): with her sail shortened she stands on until the lead calls it
+# (phase stand_on, "The lead calls twelve fathoms."), and the order is given up in words
+# after stand_on_timeout_s. "... and veer to fifty fathoms" (or "with fifty fathoms") is
+# the scope (parameter `fathoms`), veered to and no further. The line as the anchor goes
+# says the scope, "The best bower let go in twelve fathoms; veering to sixty fathoms,
+# five times the depth.", and the three warnings of let_go_anchor.yaml follow it. The
+# record that she is hove to is cleared as the anchor goes.
 id: come_to_anchor
 verb: come_to_anchor
 applies_to: {class: ship}
 script: come_to_anchor
-params: {anchor: null}
+params: {anchor: null, fathoms: null, depth_fathoms: null}
 preconditions: []
 timing:
   clew_up_s: 150         # the light sails and the courses in: judgement, a well-drilled
@@ -47,6 +57,7 @@ timing:
   veer_fathoms_per_s: 1.0  # the cable "veered away roundly" (Luce): judgement
   settle_s: 240          # the cable taut and her way stopped: "brought up"
   furl_s: 600            # the sails furled and the yards squared by all hands (judgement)
+  stand_on_timeout_s: 3600  # "in twelve fathoms": she stands on this long for the lead to call it
   stem_tide_kn: 1.5      # a stream over this is stemmed in preference to the wind
                          # (Luce p. 573: head to the stronger; judgement in the figure)
 on_start: {log: "All hands, bring ship to anchor! Stand by to take in the light sails."}

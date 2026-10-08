@@ -57,6 +57,9 @@ gate 5c:  wave 5  33b the chronometer, the moon, the lunar and the azimuth; the 
                   35b St Mary's and Roscoff as ports on 35's machinery, Roscoff's patch (Opus; landed 2026-10-02)
           wave 7  36 other sail, the world-order channel, the two scenarios (Fable; landed 2026-10-02)
           wave 8  37 the officer of the watch; gate 5c cut at its merge so that the gate covers the officer's watch (owner, 2026-10-02); the lead's watch beside other models' (an Opus 5.5 watch, and a local model on the cutter: owner, 2026-10-01); the 5c verdict (Fable; landed 2026-10-02; gate 5c cut at its merge)
+          wave 9  the follow-ups from gate 5c's first playtests, built locally in a copy of the gate (owner, 2026-10-05); sorted below
+                  37b returning to the station; 37c the wind-shift and taken-aback lines (m5c-b, 2026-10-03; applied)
+                  37d the saves, and the sight of land (written 2026-10-06 for the owner's word)
 ```
 
 31 needs 30's wind (the sea reads its history). 32 needs nothing of 5a and may start
@@ -1727,6 +1730,1187 @@ Not in 37: a captain's station (M6), officers writing Python rules (M6, with the
 the dialect's rules by rank are item 2b), the lookout as a station for a small model (open item 6; the
 drill is its first half), the director (M7b), the officer taking a person's place in the
 world beyond the name (M6's binding of station to person is here only as the name).
+
+## Follow-ups from gate 5c's first playtests, sorted
+
+From the review of the eight games played at gate 5c between 2 and 5 October, of the owner's
+and the playing model's notes, and of the m5c-b change set:
+`docs/playtests/2026-10-05-gate-5c-review/report.md`, with the readers' reports and the
+scripts that made them in `evidence/` beside it. The owner's answers of 2026-10-05 are the
+report's section 9. The gate's verdict waits on the naval cruise and the lead's watch; these
+packages are built within the milestone and checked at the final gate. They are built
+locally, in a copy of the gate (`CHANGES-m5c-c.md` at its root), and folded into the
+repository by the owner with the lead. Their numbers continue 37's letters and may be set
+again at that merge.
+
+Each finding is placed where it is cheapest to build well. A package is written when its
+predecessor has landed and is launched on the owner's word.
+
+- **37b, 37c** (m5c-b, 2026-10-03; applied): returning to the station; the wind-shift and
+  taken-aback lines. What the review found still wrong in each is in its section 6 and goes
+  to 37g and 37e.
+- **37d, the saves and the sight of land** (below): what a save says of the build that made
+  it and what `load` does with it; the lookout's distance, the bearing, the fix, the nearest
+  land, land ahead; the sea breeze; one frame for the plane's points.
+- **37e, the account** (below; written 2026-10-07): one rule for when an observation is
+  believed, in place of `FIX_RUN_NM`, the second pass's guard and the fix's outright
+  setting; the master's doubt made honest; the fix's choice of marks; the master's tide
+  worked into the traverse from his own books; a shaped course that makes good; the
+  scenario books tuned for a true account.
+- **37f, lying to, and the ground** (below; written 2026-10-07): heaving to that holds its
+  tack, `fill away`, the hove-to record; an anchor's name and "to" honoured, `let go` with
+  its scope, `heave in`, the dragging line, the ground's words; the wind-shift, aback and
+  "could not" lines; a standing order's condition checked at entry; the fore-and-aft cast.
+- **37g, the station's safety, and the deck, the leaving and the grant** (below; written
+  2026-10-07): a key to each seating, the turn's budget, the stand-by, the two detectors,
+  a paused officer's deck; then the consent brief's one revision and one re-ask: the deck
+  without the stand-down, the three ways of leaving, 37b's opt-out path mended, relief,
+  the journal read, bearings and fixes in the officer's domain, a grant's own words, and
+  the general grant.
+- **37h, the pilot** (to be written): taken or declined at his hail; his boat that closes;
+  his warning of a danger ahead.
+- Last, after the owner has played the above: `the port` and `the depth of water` by the
+  captain's means, and the small faults of the report's 8.2.
+
+The plan was set again on 2026-10-07, after the owner's first game on 37d (the review's
+section 10) and by his word. What was to be 37e is built as two, 37e and 37f, one after the
+other, since both move the recorded passages. What were to be 37f and 37g are one package,
+37g, so that the consent brief is revised once. The three briefs were written together at
+his asking, for his review before any is launched; 37f and 37g name functions and not
+lines, since the lines will have moved by the time they are built, and each begins by
+reading what its predecessor left in `CHANGES-m5c-c.md`.
+
+The owner's rulings of 2026-10-07, in his words where they are short:
+
+- For 37e: "The master should work the tide into the reckoning himself ... by the same
+  method the master currently works up the reckoning, he should work the tide into it as
+  the books give it." Where the tide study found no period source, the directions give the
+  set to the nearest point and the spring rate to the half knot, as judgement. "... shape
+  a course should by default steer to make good, by the master's reckoning", worked once
+  when it is shaped. The captain's `allow ... knots of set` "replaces when used until
+  handed back".
+- For 37f: "Loose should remain as is." `trim sails` declines while she is hove to. `let
+  go` keeps its scope, says it, and takes a number.
+- For 37g: it holds "the changes which require the re-consent brief". The kept-back list
+  of the review's section 9 "is approved for the first version of the general authority
+  grant. It should lapse when the officer is fully stood down, or the authority is directly
+  countermanded by the captain." The three ways of leaving "are approved as read, parity
+  for the officer's hand_over and the captain's, stand_down for the amicable save and
+  exit." A final opt-out "should bar the model, not the station", with care for false
+  positives. "The relief may read the journal of the last holder of the station, as with a
+  standard re-seat."
+- For 37h: when his hail is unanswered, "the pilot may keep company, hail once more, and
+  bear away. He may warn of the shoal water or shore ahead with true knowledge in his
+  water. Thick weather means he cannot see his marks."
+- For the saves: "save is exact from the checkpoint, replay is promised only on the build
+  that made it."
+- For the building: one package at a time, in the order 37e, 37f, 37g.
+
+His approvals of the same day: "37e is approved"; then "37f is approved pending your 37e
+checks, and 37g is pre-approved with 19. (the way out of danger) kept as proposed." Each is
+launched when the one before has landed and the lead's own checks of it have passed.
+
+## Package 37d: the saves, and the sight of land (`freesail/core/world.py` and `core/replay.py` for the build's stamp, the load's rule and one frame for the plane's points; `freesail/ui/server.py`, `ui/console.py` and `agents/repl.py` for the load's words and `--replay-anyway`; `freesail/agents/harness.py` for a station's place among the inputs; `tests/fixtures/saves/` for old checkpoints kept as tests; `freesail/world/lookout.py` for the distance judged afresh, the shore always a sighting, and land ahead; `freesail/world/reckoning.py` for the bearing as a line and the fix; `freesail/orders/navigation.py`, `data/vocabulary.yaml` and `freesail/orders/complete.py` for `take a fix`; `freesail/world/chart.py` for the nearest shore and the coast's trend; `freesail/world/weather.py` for the sea breeze's direction; `freesail/api/readings.py` for `the nearest land` and three events; `freesail/world/ports.py` for the hail's severity; `docs/TechnicalSpec-M5.md` §11 to §13, §15, §18 and §33; `docs/primer/10-the-reckoning.md` and the chapters that have the lookout and the anchor; `docs/dev/TuningNotes.md`; `docs/agents/Harness.md` where it speaks of loading a save; `CHANGES-m5c-c.md`; `tests/test_replay.py`, `test_checkpoint.py`, `test_lookout.py`, `test_reckoning.py`, `test_chart.py`, `test_weather.py`, `test_readings.py`, `test_orders.py`, `test_anchor.py`, `test_primer.py`'s forms, and `tests/test_known_truths.py` for the recorded passages re-measured)
+
+The review's section 5.1 (navigation close to land: the *Harpy* on Penlee Point, the
+mechanisms, the three readings that give the truth away), 5.6 (the wind near land), 5.8
+under "Anchoring" (the anchor's depth read in the wrong place), 8.2's near-land table items
+1 to 8 and 13, and section 9 under question 1 (what a checkpoint gives, and the replay of
+four of the playtest's saves). Spec M5 §11 to §13, §15 and §18; `docs/design/Navigation1805.md`
+for every number of the bearing and the fix, `ChartData.md` for the nearest shore ("for the
+lookout"), `WeatherSystems.md` §1.4 for the sea breeze. The milestone's first rule governs
+every item: the world keeps the truth and the captain keeps his account. What this package
+adds near land is what a man on deck could see or lay down, said in words, and nothing
+taken from the truth that he could not have. Written 2026-10-06 for the owner's word.
+
+Two rules for this package beside the milestone's:
+
+- **Every new field on a class a checkpoint holds has a plain class default**, so that the
+  saves of m5c and m5c-b still load. Item 4's tests are the proof, and a change that breaks
+  them is mended with a default or a step in `replay._rebind`, never by changing a fixture.
+- **Nothing in `docs/agents/ConsentBrief.md` or a station's brief changes here.** No model
+  is asked again because of 37d. If an item seems to need it, stop and say so in the report.
+
+**Part one: the saves.**
+
+1. **The build's stamp.** A save and its checkpoint say which build wrote them. The stamp is
+   a name set by hand at each package or gate (`BUILD_NAME`, beside `ENGINE_VERSION`; here
+   `m5c-c/37d`) and a fingerprint of the rules, computed once at start from the game's own
+   code and the data a replay reads: the contents of `freesail/**/*.py` and of the data
+   files other than the chart's tiles, in path order, with line endings made one so that a
+   Windows checkout and a Linux one agree; the first sixteen hex digits of the SHA-256. The
+   builder settles the exact set and writes it down. The save gains `"build": {"name",
+   "rules"}` and the checkpoint's header the same. `SAVE_FORMAT` and `ENGINE_VERSION` do not
+   move, and a save without the stamp is read as "unstamped, before 37d". Report the cost at
+   start; it should be well under a tenth of a second.
+2. **`load` says what it did, and does not replay another build's game with a model aboard
+   unless told to.** Today a checkpoint that is missing, is not this save's, or cannot be
+   read sends `replay.load` to a replay without a word of warning, and for a save with a
+   station's transcript from another build that replay is a different game (the review's
+   section 6, "The cost CHANGES does not state").
+   - `load` keeps why a checkpoint was not taken (none beside the save; not this save's; could
+     not be read, with the error's words) and treats every failure to read one as "could not
+     be read"; today an import error escapes it.
+   - When it must replay: a save stamped by this build replays as now. A save from another
+     build, or unstamped, with no station's transcript in it replays, and the caller prints
+     that the log may differ from the one that was watched. A save from another build, or
+     unstamped, that holds a station's transcript is refused in plain words (the build that
+     wrote it, this build, why the checkpoint was not used, and that a replay would not be
+     the game that was played) unless the caller asks for it.
+   - Every door that loads or replays says the same words and takes `--replay-anyway`: the
+     server's and the console's `--load`, the console's `replay`, and `agents/repl.py`'s
+     `--load`, which always replays. A load from the checkpoint of another build says in one
+     line which build wrote it.
+3. **A station seated at tick 0 replays in its place.** A replay seats a station by its tick
+   and the count of journaled orders before it (`stationed_after_orders`). A driver's line
+   is an input and not an order, so an officer seated after the opening line of the game is
+   seated before it in a replay: the *Amazon*'s save of m5c replays to the same 2,305 lines
+   with three of its first tick in another order, and so to another digest
+   (`evidence/tools/replay_check2.py`). Record the count of inputs at the stationing as well
+   and seat by it when the save has it; a save without it replays as now. Test: an officer
+   seated at tick 0 after a driver's line replays to the digest of the game played.
+4. **Old checkpoints kept as tests.** `tests/fixtures/saves/` holds two of the playtest's
+   saves with their checkpoints, unchanged: the cutter of m5c at tick 34,091 and the *Harpy*
+   of m5c-b before 37c at tick 602,100 (`CHANGES-m5c-c.md` says what each is). Add a third of
+   this package's own making: a short scripted game with the fake officer at his station and
+   standing by, saved by this build, and never made again.
+   - Each loads from its checkpoint under this build, the road said to be the checkpoint and
+     the log's digest the header's. It runs on a glass in the fast tier and a watch in the
+     slow one. It is saved and loaded again.
+   - The cutter's save is refused a replay without the flag, by item 2.
+   - The tests of the two playtest saves skip, saying so, when the files are not there: they
+     hold a model's transcript and journal and the owner's typed lines, and whether they go
+     into the repository is the owner's to say.
+
+**Part two: the sight of land.**
+
+5. **The lookout judges a distance afresh as it changes.** `Lookout._judge` draws the eye's
+   error once a sighting and holds the estimate until the ship herself has moved a mile
+   (`ESTIMATE_HOLD_NM`). That rule was made so that a calm should not re-draw a headland's
+   distance (package 33b). It is why the *Harpy* was told "Penlee Point ... a mile" at under
+   two cables, and why a cutter stood at "two miles" for 37 minutes while her bearing swung
+   from S to NW by N. Judge afresh, with the same eye's error for the sighting, whenever the
+   true distance is a tenth more or less than it was at the last judging
+   (`ESTIMATE_REFRESH_FRACTION`, judgement), for the land and for a sail alike. A calm still re-draws nothing, since nothing has
+   changed and the error is the sighting's. `ESTIMATE_HOLD_NM` goes. Tests: standing in from
+   a league to two cables the hails, the list and a bearing's words follow her in; an hour
+   of calm leaves the figure as it was; a sail whose distance halves is said nearer; the
+   closing hail carries the fresh figure.
+6. **A bearing gives a line.** `Navigation.take_bearing` draws the account onto the bearing's
+   line and then applies the lookout's distance by estimation as a second measurement, good
+   to fifteen per cent. So each single bearing is taken for a fix, of a good line and a poor
+   distance; bearings of different marks disagree by their separate errors and the account
+   jerks from one to the other; and a standing order that takes a bearing every few minutes
+   makes the master ever surer of the wrong place. The owner saw it on his own chart. Take
+   out the second measurement: a bearing draws the account onto its line and no more. Its
+   words keep the distance by estimation, fresh by item 5, and add the account's own
+   distance from the mark when the two differ by more than a third ("Penlee Point bore NNE,
+   three cables by estimation; a mile by the account"), so that a disagreement is in the log
+   for whoever reads it. The data carries both. A transit's bearing is as it was. This
+   reverses 33a's "second line along the bearing"; amend the spec where it says so and give
+   the review as the reason.
+
+   *Second pass, 2026-10-06 (approved by the owner).* As first built, a landfall on one
+   mark after a long run left the account leagues along the line (the schooner's, 6.8
+   miles out where she had been 0.9), though a bearing and distance of a headland is the
+   period's ordinary way there. The distance by estimation is therefore laid down after
+   the line, for a charted mark only, when the account's own doubt along the line of
+   sight is greater than the estimate's; it is weighed in by the gain at that doubt,
+   never in the replace form, and the line says so and how far the account moved.
+   Otherwise it is said and not applied, as above.
+7. **A sail is no mark.** A bearing of a sail is given in words and data as now and moves
+   nothing. Today it draws the account onto a line through her true position, and so
+   through the ship's: on the *Harpy* one bearing of a pilot's boat moved the account ten
+   miles.
+8. **`take a fix`.** An order of the master's, where `take a bearing of` is: the same level,
+   the same refusal to a station without the deck or the allowance. The officer has it by
+   `you may take a fix` until 37g puts bearings and fixes in his domain; prove with the fake
+   officer that the allowance grants it and nothing else.
+   - **Forms.** `take a fix`; `take a fix by <mark> and <mark>` or with a third; the
+     synonyms a seaman would type (`fix her position`, `take cross bearings`); completion;
+     and the standing dialect for nothing (`every glass then take a fix`).
+   - **The marks.** Charted marks in sight that `take a bearing of` would take: the land's
+     headlands, lights, marks, a danger that shows. Never the shore close aboard, a sail or
+     a transit. Unnamed, the master takes the two or three that cut best: the choice that
+     makes the least angle between any two of their lines the greatest, the nearer mark on
+     a tie. Two lines that cut by less than `FIX_MIN_CUT_DEG` (thirty degrees, with its
+     source from `Navigation1805.md` or marked judgement) are no fix. Refusals in words that
+     carry the cure: nothing in sight; one mark only, named, with `take a bearing of` it;
+     marks that cut too fine, named, with how they bear from one another.
+   - **The bearings.** Each as `take_bearing` takes one: the compass's error for her heading
+     common to the set, and each mark's own draw from the reckoning's stream, in the order
+     the marks are said.
+   - **The fix.** The point that best fits the lines, each weighed by its own doubt across
+     it at the mark's distance. The account is set to it and its doubt becomes the fix's
+     own: a fix by cross bearings is a new departure, as `set_position` is, whatever the
+     account said before and however far she has run. With three marks the cocked hat's size
+     is said, and the doubt is no smaller than half of it.
+   - **The words** (kind `reckoning.fix`; notable when the account moved more than a mile,
+     routine otherwise; the event `a fix`): the marks and how each bore, how well they cut,
+     how far and which way the account moved, and the position by the fix. For example: "Fixed by cross bearings: the
+     Lizard NW by W, the Manacles N by E, St Anthony's light NE by N; the lines met within
+     two cables. The account moved three miles to the SSE: 49° 58' N, 5° 02' W by the fix."
+     The words are the model's whole view of it, so nothing the chart shows of a fix may be
+     missing from them. The track takes the fix as it takes a bearing.
+   - **Tests.** Two marks at right angles bring an account ten miles out to within the lines'
+     doubt of the truth; three marks, with the hat said; a fine cut, one mark, a sail and the
+     shore each refused or passed over; two worlds of one seed say the same words; the
+     dialect's form parses and fires.
+9. **The shore is always a sighting, and `the nearest land` is a reading.**
+   - **The chart's query.** `Chart.dist_at` gives the shore's distance in whole cells and its
+     bearing from the difference of neighbouring cells, which is one of a handful of
+     directions and due north where the differences are nought (the review's 5.6). Add
+     `Chart.nearest_shore`: the bearing and distance of the nearest dry ground, true to half
+     a point and a cell's width, by whatever means is cheap once a minute. Test it against a
+     plain search of the elevation at a dozen places: off Penlee Point, in the mouth of St
+     Mary's Sound, in the road of the Isle of Bas where the land lies on both hands, off an
+     open coast. `coast_at` chooses its name by it.
+   - **The sighting.** The lookout hails the shore close aboard only when no charted
+     headland is in sight (`lookout.py`, the test before `_shore_close_aboard`), so off any
+     named coast the nearest land is never spoken of. Make it a sighting at every look,
+     within its present limits (a league, the visibility, at night a mile, moonlit a
+     league), hailed once a sighting as now. `take a bearing of the land` still means the
+     nearest mark and still refuses the shore.
+   - **The reading.** `the nearest land` (and `the nearest shore`), in the registry, so the
+     prompt, the dialect and every sample have it: where it lies from the ship's head, its
+     bearing to the point, its distance by estimation in the lookout's own words, and the
+     coast's name where the chart has one ("the land about Penlee, on the larboard bow,
+     bearing NNE, three cables"). Beyond a league, "no land within a league". When the
+     weather or the night hides it, "not to be seen". Its value for the dialect is the
+     distance as estimated (`when the nearest land is under half a mile then ...`), never
+     the field's own metres.
+10. **Land ahead.** Nothing the lookout says is urgent, and "steady and closing" is said
+    once a sighting at about a league. On the *Harpy* three such hails came 46 to 59 minutes
+    before she struck, and nothing after.
+    - **The rule.** In the lookout's minute, when she has way on over the ground and is not
+      at anchor, moored or aground: along her course made good and a point on either side,
+      the first dry ground at the tide's present height, or danger in sight, within what the
+      lookout can see of the shore (by day a league and the visibility; at night a mile,
+      moonlit a league). The time to it at her present speed over the ground: under
+      `LAND_AHEAD_NOTABLE_MIN` (ten) a notable line, under `LAND_AHEAD_URGENT_MIN` (four) an
+      urgent one, each once an approach. An approach is over, and both are armed again, when
+      five looks together find nothing ahead within a quarter of an hour.
+    - **The words** (kind `lookout.land_ahead`; the events `land ahead` and `land close
+      ahead`): where it lies from her head, its distance by estimation, and the time, in the
+      lookout's voice. "Land ahead, fine on the larboard bow, six cables: she is standing
+      into it." "Land close ahead, two cables! She will be on it in three minutes." A danger
+      by its name.
+    - **What it is.** The eye's judgement of a bearing that does not change and a distance
+      that does, so it reads her true motion, and only toward what can be seen. In fog it is
+      silent and the lead is the guard; say so in the primer.
+    - **Tests.** Steered at Penlee Point at four knots from a mile, the notable line comes
+      about two thirds of a mile off and the urgent one under three cables, each once;
+      turned away and brought back after the quiet, they come again; at anchor, hove to
+      without way and in fog, nothing; at night only within the mile.
+    - **Report** how many of each line every recorded passage gains and where, so that the
+      owner can judge the ten and the four.
+11. **Two severities.** "... is dragging" is urgent (`anchor.dragging`). The pilot's hails
+    are notable (`port.pilot_hail`, the boat's and the pilot's own).
+12. **The sea breeze blows from the sea.** `Weather.sea_breeze` takes its direction from the
+    bearing of the nearest cell of shore, by item 9's faulty difference, so that close to a
+    coast on a fine summer afternoon it turns every few yards as the ship moves. From the
+    *Harpy*'s own weather of 19 June, sampled each second along a line run north-east at
+    four knots, the wind turned two points or more 386 times in 83 minutes, by as much as
+    169 degrees, and not at all with the breeze taken out or with the ship at anchor (the
+    review's 5.6; `evidence/tools/seabreeze_check.py`).
+    - **The cure.** The breeze blows toward the land as a whole: its direction is the
+      coast's trend, from the distance field differenced over a baseline of some kilometres
+      and at least four cells of the level read (`SEA_BREEZE_TREND_KM`, with W §1.4's scale
+      as its reason or marked judgement), and its strength is scaled by how steeply the
+      field rises there, so that in a channel, in a sound among islands or in a harbour
+      ringed by land, where the field is flat, there is little or none. Distance still
+      decides its reach as now. The hook is read every tick: keep it cheap, and report the
+      ticks a second of the 5a day under systems before and after.
+    - **Tests.** Along three tracks of a mile and a half sampled every ten metres
+      (north-east from the *Harpy*'s anchorage off Rame Head, through the mouth of St Mary's
+      Sound, across the road of the Isle of Bas) the direction never turns two points
+      between samples. Off an open coast it blows within a point of square on to the land.
+      From the *Harpy*'s fixture, by the method of the review's script, no turn of two
+      points from second to second (slow tier).
+    - No recorded constant is expected to move, since the recorded passages pin their wind.
+      The 5a day under systems begins on 1 June: check it, and if it moves say why.
+13. **One frame for the plane's points.** The ship's place on the sphere is carried forward
+    tick by tick, with the stated current in it. A point of the plane is elsewhere turned
+    into a place by one jump from the scenario's origin (`World._tick_tide` for each
+    anchor's depth; `World._coast_of_plane` for the weather's coast). The two drift apart
+    with the miles run: about a mile and a half at Scilly, a kilometre along the gate's own
+    merchant passage. Hence "let go in twelve fathoms and a half" and then "Brought up ...
+    in six fathoms and a half"; hence the *Harpy* "Brought up ... in no water", her anchor's
+    point having fallen on the land, and a dragging anchor that held again at a depth of
+    nought. Give the World one function that places a point of the plane from the ship's
+    own position and the offset from her, use it in both, and look for any other. Tests: an
+    anchor let go after a run of sixty miles lies in the depth the lead found; the coast's
+    distance at the ship is the chart's at her position.
+14. **The recorded passages, re-measured once and with the reasons.** Items 5, 6, 9, 10, 11
+    and 13 change lines in every recorded passage that raises land, takes a bearing or
+    anchors.
+    - Before changing anything, write out the six recorded logs of
+      `tests/test_known_truths.py` (the 5a day, the 5b passage with its schooner and its
+      thick weather, the 5c cruise and merchant passage) as text. Afterwards write them
+      again and set the two side by side.
+    - Account for every line that changed by the item that changed it, and say for each
+      passage the first tick at which the ship's true track differs, if it does, and why (a
+      course shaped from the account, a rule of the book on a distance by account, an
+      anchor's holding).
+    - Then record the new constants and any pinned tick that moved, old beside new.
+    - If a recorded passage no longer comes through, mend its book by a line or two at most
+      and otherwise stop and report: a scenario's book is tuned once and cheaply.
+15. **The documents.** The spec as built in §11 to §13, §15 and §18, and its open items
+    where one closes or opens. Primer 10 for the bearing as a line and for `take a fix`,
+    with its orders block and its row in the forms table; the lookout's chapter for the
+    nearest land and land ahead; the anchor's chapter if its words change. Every new
+    constant in `docs/dev/TuningNotes.md` with its source or "judgement". `Harness.md` where
+    it speaks of loading a save and of the digest. A section for 37d in `CHANGES-m5c-c.md`,
+    in the manner of `CHANGES-m5c-b.md`.
+16. **Report**, in this order: the suite's last line for each tier; the stamp as written
+    into a save and its cost at start; the words of `load` in each of its cases; the
+    fixtures' tests; the lookout's words standing in from a league to two cables; a
+    bearing's line with both distances; `take a fix` on two marks and on three, as logged;
+    the nearest shore at the test's places beside the plain search; land ahead on the test
+    and its counts by recorded passage; the sea breeze's figures before and after, and the
+    tick rate; the anchor's depth after a long run; the re-measured constants with the
+    table of reasons; the consent brief's digest unchanged; anything not done and why.
+
+Not in 37d:
+
+- Whether a sight replaces the account or is weighed in (`FIX_RUN_NM`; the lunar that
+  displaced a better account; the noon latitude not adopted), and the account at anchor,
+  hove to and after a manoeuvre: 37e. `take a fix` sets the account outright and does not
+  wait on it.
+- `the port` and `the depth of water`, which give the true position away: they stay until
+  the owner has played this package, since they are the only true figures an officer has
+  near land today, and come out last.
+- Bearings and fixes in the officer's domain, which changes his brief: 37g.
+- The pilot's boat that lies to, his being taken or declined, his warnings: 37h.
+- A taken bearing said to the quarter point; a landmark's parts and how marks stand to one
+  another (the report's 8.4, item 4); a drawn chart for an image-capable door.
+- The other anchoring faults of the report's 5.8 (the scope, `come to an anchor in twelve
+  fathoms`, "Brought up" after `let go the anchor`): 37e.
+
+## Package 37e: the account (`freesail/world/reckoning.py` for the one rule by which an observation is believed, the doubt, the fix's choice of marks, the master's tide in the traverse, the course shaped to make good, and every line that says what the master did; `freesail/world/tide.py` and `data/tides/streams.yaml` for what the directions say of each water; `freesail/orders/navigation.py`, `data/vocabulary.yaml` and `freesail/orders/complete.py` for `allow the tide by the book` and the shaped course's words; `freesail/api/readings.py` for the reckoning's reading and the tide allowed; `freesail/world/chart.py` only for a line tried against the shore; the four books under `data/scenarios/`; `docs/TechnicalSpec-M5.md` §13 to §16 and §33; `docs/primer/10-the-reckoning.md`, `12-the-longitude.md` and `13-the-tide-and-the-anchor.md`; `docs/dev/TuningNotes.md`; `CHANGES-m5c-c.md`; `tests/test_reckoning.py`, `test_tide.py`, `test_orders.py`, `test_readings.py`, `test_primer.py`'s forms, and `tests/test_known_truths.py` for the recorded passages re-measured)
+
+The review's section 10, from the owner's first game on this build (game 9): 10.2 for what
+37d did in play, 10.3 under his notes 1, 2 and 5, 10.4, and 10.6 with his ruling of 7
+October; its measurements in `evidence/G9-brig-m5cc-measurements.txt`; and
+`CHANGES-m5c-c.md` under 37d, "Not done, and why" and the lead's correction under "The
+Goulet". Spec M5 §13 to §16; `docs/design/Navigation1805.md` for every number of the
+reckoning; `docs/design/Tides1805.md` §2, "The set in the reckoning", and §5. Written
+2026-10-07 for the owner's word.
+
+What the game showed, in one paragraph. With marks in sight and fixes going the account
+stood one to five cables from the ship. Without an observation it went wrong by a mile an
+hour and more in the streams of the Brittany coast, while the master's stated doubt grew by
+a tenth of that; hove to it did not grow at all; and eight casts of the deep-sea lead on a
+flat bottom narrowed it while the error grew from one mile to five. A lunar "which he would
+trust within 25 miles" replaced an account he trusted within one, and a noon latitude that
+was right was all but ignored by an account four miles out. `take a fix` chose marks three
+to seven miles off with Petit Minou inside a mile, and at anchor moved a right account by
+nearly a mile.
+
+The owner's rulings for this package (2026-10-07):
+
+- **The master works the tide into the reckoning himself**, by the method he works the
+  reckoning, as his books give it. Where the tide study found no period source for a
+  stream (the Fromveur, the Chenal du Four, the timing in the Goulet) the directions are
+  taken to give its set to the nearest point and its spring rate to the half knot, the
+  neaps at half of that, marked as judgement.
+- **`shape a course` by default steers to make good**, by the master's reckoning. It is
+  worked once, when the course is shaped; the master does not alter the helm of himself
+  when the tide turns.
+- **The captain's `allow ... knots of set` replaces the master's own tide** when it is
+  used, until the captain hands it back.
+
+Rules for this package beside the milestone's:
+
+- **The world keeps the truth and the captain keeps his account, for the tide as for the
+  position.** The master's tide is worked from his epitome, the almanac, the directions'
+  statement for the waters his *account* puts her in, and nothing else. No line of it reads
+  `Tide.at`, `Tide.stream_at` or the ship's true place. Item 7's test is the proof.
+- **Every new field on a class a checkpoint holds has a plain class default**, and 37d's
+  fixture tests stay green without a fixture changed.
+- **Nothing in `docs/agents/ConsentBrief.md` or a station's brief changes here.**
+- `BUILD_NAME` becomes `m5c-c/37e`.
+
+**Part one: when an observation is believed.**
+
+1. **One rule for every observation.** Today there are three. A line taken after a run of
+   two miles replaces the account across it, and before that is weighed
+   (`Reckoning.update_line`, `FIX_RUN_NM`): so the lunar of game 9 replaced a better
+   account (the run was 2.8 miles), and the noon latitude of the 16th was weighed against a
+   doubt of a quarter of a mile and moved the account 150 yards, because the lead, cast
+   every glass, had kept the run at nothing while the tide carried her four miles. A
+   bearing's distance is laid down when the account's doubt along the sight is the greater
+   (37d's second pass). A fix sets the account outright. Put one rule in their place:
+   - An observation is weighed against the account by their two doubts, whatever the run
+     since the last one.
+   - When the two disagree by more than their doubts together allow
+     (`OBSERVATION_OUT_SIGMAS`, three, judgement), the account is plainly out: the
+     observation is taken, the account is laid on it, and the account's doubt in that
+     direction becomes the observation's own. This is Falconer's "the reckoning is always
+     to be corrected, as often as any good observation ... can be obtained" kept for the
+     case it was written for, and no longer applied to a poor sight of a good account.
+   - It holds for the noon latitude, the longitude by lunar and by chronometer, a cast of
+     the lead, a transit, a bearing's line, a bearing's distance by estimation (in place of
+     the second pass's guard; a sail still moves nothing) and a fix (item 3). `FIX_RUN_NM`
+     and `run_since_fix_nm`'s part in the rule go; say what, if anything, still reads the
+     run.
+   - A bearing worked as an angle at the account (37d) is sound only while the account's
+     doubt is small beside the distance to the mark. In game 9, with twelve miles of doubt
+     and a light eleven miles off, it left 2.6 miles of error across the sight. Use the
+     line's form when the doubt across the sight is more than a tenth of the distance
+     (judgement), and test both.
+   - **The words say what the master did**, since the words are a model's whole view of it.
+     Weighed: "... the account moved four cables to the N." Taken: "... the reckoning was
+     out by it; laid down by the observation: moved six miles to the S." Kept: "... which he
+     would trust within 25 miles, and the account within two: the account kept." The lunar's
+     line, the noon's, a cast's and a bearing's each carry one of the three, and their data
+     says which (`taken`, `weighed`, `kept`) with the miles moved.
+   - **Tests, from game 9's own figures** (the measurements file gives each): the lunar of
+     tick 246,131 moves the account under two cables and leaves its doubt east and west
+     under two miles; the noon of tick 370,860 (the sight 48° 07' N, the account 48° 12½' N)
+     is taken; the same noon against an account a mile out is weighed; a bearing of a light
+     eleven miles off, taken after a doubt of twelve miles, leaves the account within the
+     bearing's own doubt of the line.
+2. **The doubt, honest.** (`Reckoning.advance`, `Navigation.bring_up`, `_hours_under_way`,
+   `uncertainty_words`.)
+   - **It grows by the hour whether she has way or not.** Today the hours hove to and
+     without way are struck from the interval, so neither the account nor its doubt moves
+     through them ("her drift hove to is the set he does not know"). Hove to, lying a-try
+     and becalmed she still drifts, and he still doubts. At anchor, moored and aground the
+     account stays where it is and its doubt does not grow, as now.
+   - **It is sized by the water she is in.** Where his directions give a stream (item 5),
+     the doubt grows by the part of it he cannot know: the hour (his epitome is up to an
+     hour out) and the rate. Where they give none, by the open-water terms as now. Size the
+     constants so that the doubt is honest by measurement (item 12), and give each its
+     source or "judgement" in `TuningNotes.md`.
+   - **The same thing seen again tells him nothing new.** A cast of the lead narrows the
+     doubt only so far as the charted depth differs across his doubt: over a flat bottom it
+     is no line at all, and over a steep one it is a good line once. A second cast on the
+     same ground, a second bearing of the same mark from the same place, narrows nothing
+     further. `SOUNDING_ACROSS_SIGMA_NM` as a fixed three miles goes or is given its
+     reason. Test: eight casts in a calm over the fifty-fathom sand off Ar Men leave the
+     doubt as large as the first left it.
+   - **The words.** Under a mile the doubt is said in cables ("within four cables"), not as
+     "a mile". When it is long and thin (the greater axis twice the lesser, and a mile or
+     more) the sentence gives its lie: "I would not trust the reckoning within three miles
+     NE and SW, nor a mile across." The reading's data carries the ellipse as now.
+3. **`take a fix`, by the marks that fix her best.**
+   - **The marks.** Unnamed, the master takes the two or three charted marks in sight whose
+     fix has the least doubt: each line's doubt across it at its mark's distance, with the
+     compass's shared error counted (below), for lines that cut by `FIX_MIN_CUT_DEG` or
+     more. So a headland a mile off is preferred to a town six miles off. A fix by named
+     marks is as now. The refusals keep their words.
+   - **"Good to".** Every bearing of a fix carries the compass's own error on her heading
+     (the chart's old variation and the ship's deviation; in game 9 two and a half
+     degrees), and the three lines share it, so a tight cocked hat can sit well off the
+     ship: four cables at ten miles. The master does not know that error; he knows its
+     likely size. Count his allowance for it in the fix's doubt (`COMPASS_ALLOWANCE_DEG`,
+     with its reason from `Navigation1805.md` or marked judgement; less once he has the
+     variation by `observe an amplitude` or an azimuth), so that "good to" is honest and
+     far marks are seen to be poor ones.
+   - **Weighed as any observation.** A fix no longer sets the account outright. By item 1 it
+     is taken when the account is plainly out, and weighed otherwise, so that a good fix
+     still rules a doubtful account and a poor one cannot move a good account. At anchor a
+     fix by far marks leaves a sound account where it was.
+   - **The words** say which: "The account moved two cables to the NE ..." or "... the fix
+     the poorer figure; the account kept, within a cable of it."
+   - **Tests, from game 9.** In the Goulet at tick 387,115 (the marks' places and distances
+     are in the measurements file) the master takes Petit Minou and the Mingan before
+     Camaret, Brest and Conquet. Moored in Brest road at tick 426,085, a fix by the castle
+     and St Matthew's light moves the account under a cable. Over the game's 61 fixes'
+     geometry, the true error exceeds twice the stated doubt in no more than one in ten.
+4. **The account hove to, becalmed and after.** (The report's 8.2, near-land item 11.) Hove
+   to, the master reckons her drift and does not stop the clock: the tide by item 6, and
+   her drift to leeward by his eye (`HOVE_TO_DRIFT_KN`, with Luce's or Falconer's word for
+   it, or judgement). After she fills away, weighs or comes out of a calm, her way is
+   judged by eye until the log is next hove, and the last read before she lay to is not
+   used. The run since noon and the day's work take the drift.
+
+**Part two: the master's tide.**
+
+5. **What the directions say** (`data/tides/streams.yaml`). Each area gains the book's
+   statement beside the world's own figures: the set of the flood to the nearest point of
+   the compass, the spring rate to the half knot, the neap rate (half the spring where the
+   period gives none), and the hour at which it runs strongest, reckoned from high water at
+   a place his epitome has. Where the study has the period's own figure (Bowditch 1802's
+   headland table for the Lizard, the Start and the Eddystone, and "the Current in the Mid.
+   Channel is N.E. about 1 H. 30 M. after High Water") use it and name it. Where it has
+   none (the Fromveur, the Chenal du Four, the timing in the Goulet) round the world's
+   figure as above and mark it JUDGEMENT in the file and in `TuningNotes.md`, by the
+   owner's ruling. A poorer epitome does not change the directions; it changes the hour.
+6. **The tide in the traverse.** (`Navigation.bring_up`, `account_now`,
+   `Reckoning.advance`.) Bowditch 1802, "Currents": the ship is affected "as if she had
+   sailed in still water, with an additional course and distance exactly equal to the
+   course and set of the current", worked "in the traverse table as one more course". At
+   every step of the account, for the hours since the last, under way, hove to or
+   becalmed, and never at anchor or aground, the master adds that course and distance:
+   - the waters by where his **account** stands (the area's polygon looked up at the
+     account; if the account is in the wrong water he works the wrong tide);
+   - the hour of tide from high water at the nearest place in his epitome, by the moon's
+     age and Moore's rule, as `tide_by_almanac` and `_tide_allowance_m` already work it;
+   - the rate between the book's neaps and springs by the moon's age, as
+     `_tide_allowance_m` already does for the rise, and through the tide by the half-cosine
+     from the book's strongest hour;
+   - summed across the interval by the quarter hour, since the tide may turn within it.
+   `account_now` carries the same between steps, so the chart and the readings agree with
+   the next working.
+7. **The proof that it is his own.** Two worlds of one seed whose ships lie ten miles apart
+   and whose accounts are the same work the same tide to the last figure. A world with its
+   true tide made nothing works the same tide as one with it. A master whose epitome is
+   Moore's works a different hour from one with Norie's. Search the package's diff for any
+   read of the world's tide or of `world.position` in the reckoning and report that there
+   is none.
+8. **The captain's word, and the master's.**
+   - `allow <n> knots of set to <point>` replaces the master's own tide from that moment,
+     and `allow no set` likewise (the captain's word that there is none). `allow the tide
+     by the book` hands it back (synonyms a captain would type: `allow the tide`, `work the
+     tide yourself`); completion and the forms table have it. The standing dialect takes
+     all three as actions.
+   - **He says what he allows.** The noon line says whose tide the day's work carried. The
+     reading `the reckoning` gains it in words: "the tide allowed: the flood, a knot and a
+     half to the E by N, by the directions for the Iroise and high water at Brest by the
+     epitome", or "by the captain's order, two knots to the westward", or "none, in open
+     water". A routine line, kind `reckoning.tide`, when his tide turns and when she passes
+     by his account into other waters: "By the master's tide the ebb makes: allowing a knot
+     to the WSW." It carries an event for a stand-by and the dialect (`the turn of the tide
+     by the reckoning`), since the events of the tide's turn today are the swing at anchor
+     and never come under way.
+9. **A shaped course makes good.** (`Navigation.shape_course`, the helm's order, and the
+   dialect's `shape a course for`.) By the owner's ruling the helm is ordered the course to
+   steer so that, by the master's reckoning, she makes good the line from the account to
+   the place: against the tide he allows at that hour (item 6 or the captain's own), with
+   the leeway he allows when she must lie close-hauled, at her way by the log's last read
+   or by eye.
+   - **The words** give both: "Shaped a course for the Goulet: NE by account, ten miles.
+     Allowing the flood, a knot and a half to the E by N, steer NE by N to make it good;
+     the allowance holds till the tide turns, about half past four." When there is nothing
+     to allow they are as now. When no course makes it good at her present way, they say
+     so and give the course that loses least.
+   - **Once.** It is worked when the course is shaped, and at each firing of a standing
+     rule that shapes one. Nothing alters the helm afterwards.
+   - **The line and the shore.** The line is tried against the land as it is against the
+     charted dangers: "the line crosses the land about Léon", "the line passes the shore
+     under Petit Minou within two cables". In game 9 a course shaped for Brest from off
+     Roscoff ran across Brittany without a word, and a waypoint chosen against the shore
+     "came back clear". The chart's coast is the captain's own paper, so this gives nothing
+     away.
+   - **Tests.** In a stream of two knots across the line at four knots of way, the course
+     ordered lies up-tide of the line by the angle the triangle gives, and a ship that
+     holds it in a world whose true tide is the book's makes the place within a quarter of
+     a mile. With the captain's own set the same. Shaped across a headland, the words say
+     so.
+
+**Part three: the passages, and the proof.**
+
+10. **The recorded passages, re-measured once and with the reasons**, by 37d's item 14:
+    write the six out before and after, account for every line that changed by the item
+    that changed it, name the first tick at which each true track parts and why, then
+    record the new constants old beside new. Every passage that shapes a course will move.
+11. **The books, tuned for a true account.** 37d's second pass left the merchant passage
+    coming through the Goulet because her account there is again half a mile out (the
+    lead's correction in `CHANGES-m5c-c.md`). With this package the account near land is
+    true and a shaped course allows for the stream, so:
+    - the merchant's "pilot water" rule takes its fix again after the bearing;
+    - the points and the distances of her Goulet rules are set for a true account, with the
+      Mingan passed by not less than a cable and a half;
+    - the frigate's, the schooner's and the cruise's books are mended by as little as
+      brings each through.
+    The fourth rule of this document governs: late legs from a checkpoint, a count kept of
+    the whole-passage runs, and a passage that will not come through inside the budget is
+    marked a strict expected failure and reported, not chased.
+12. **The proof by measurement.** `docs/playtests/2026-10-05-gate-5c-review/evidence/tools/account_probe.py`
+    sails a recorded passage and prints the account's distance from the truth along it.
+    Extend it to print the master's doubt beside the error. Run it on the merchant passage,
+    the frigate's and the schooner's before the first change and after the last, and report
+    the tables. What is asked:
+    - the merchant passage: the median no worse than the 0.35 mile it has, and the time
+      more than three miles out halved from its 18 per cent;
+    - the frigate's landfall: within a mile and a half of the truth inside half an hour of
+      raising the land (it is four miles out for forty minutes today);
+    - honesty: on each passage the true error is more than twice the stated doubt in no
+      more than one sample in ten. Report the figure before, which game 9 suggests is most
+      of them out of sight of land;
+    - a new scripted test, slow tier: the brig hove to for six hours of a spring ebb in the
+      Iroise ends with her account inside twice the master's doubt, and nearer the truth
+      than a third of what she drifted.
+13. **The documents.** The spec as built in §13 (the rule, the doubt, the fix), §15, and §16
+    (the master's tide: the captain's tide of that section now has its place in the
+    traverse), with §33's open items where one closes or opens. Primer 10 for the rule in a
+    seaman's words, the doubt, the fix's marks, and a shaped course that makes good, with
+    its orders block and forms rows; primer 13 for the tide in the reckoning, `allow ...
+    knots of set` and `allow the tide by the book`; primer 12 where the lunar's line
+    changes. Primer 10 also gains, as a plain paragraph each and no more, the two things
+    game 9 showed nobody knew: `observe an amplitude` to correct the compass before a
+    landfall, and the captain's own allowance for a set. Every constant in
+    `TuningNotes.md`. A section for 37e in `CHANGES-m5c-c.md`, in plain words.
+14. **Report**, in this order: the suite's last line for each tier; item 1's three kinds of
+    line as logged, and the game-9 tests' figures; the doubt in fog, hove to and becalmed,
+    before and after; a fix's choice of marks in the Goulet's geometry and its "good to";
+    the directions' table as written, with what is the period's and what is judgement; the
+    master's tide over one whole tide in the Iroise, hour by hour, beside the world's;
+    item 7's proof; the three orders of item 8 as logged and the reading; a course shaped
+    across a stream and across a headland; the re-measured constants with the table of
+    reasons; each book's changes and the count of runs; item 12's tables; the consent
+    brief's digest unchanged; anything not done and why.
+
+Not in 37e:
+
+- Heaving to that holds its tack, `fill away`, the hove-to record, the ground tackle's
+  orders, the dragging line, the wind's and the aback lines: 37f.
+- `the port` and `the depth of water`, which give the true position away: still last, after
+  the owner has played 37e to 37g.
+- An officer's reckoning of his own beside the master's, and a master's station that a
+  model could hold: the report's 10.6. Milestone 6 where it is a station.
+- `observe an amplitude` as the master's routine. It stays an order, and the primer teaches
+  it.
+- The chart in words (the report's 8.4 and 10.6): design first.
+- The officer's domain and the general grant: 37g.
+
+## Package 37f: lying to, and the ground (`freesail/evolutions/scripts.py` and the files under `data/evolutions/` for heaving to, filling away, the anchor's evolutions and the fore-and-aft cast; `freesail/orders/verbs.py` for `trim sails` hove to and what a ship at anchor may do; `freesail/orders/ground_tackle.py` and `data/vocabulary.yaml` for an anchor's name, "to", `let go ... and veer to`, and `heave in`; `freesail/physics/anchor.py` and `freesail/ship/parts.py` for the dragging's judgement and the ground's words; `freesail/core/world.py` for the dragging line and the wind-shift line; `freesail/physics/hull.py` and `physics/integrate.py` for the aback lines; `freesail/evolutions/runner.py` for a "could not" that is no failure; `freesail/standing/` and `data/standing_orders/starter.orders` for a condition checked at entry, the held line and the trim rule's guard; the scenario books' trim rules; the chart's bottom notes for Brest road; `freesail/api/readings.py` for the manoeuvre in hand and the events; `docs/TechnicalSpec-M5.md` §18 and §23 and the earlier specs where heaving to and the log's lines are written; the catalogue of evolutions; `docs/primer/05-going-about.md`, `11-the-starting-book.md` and `13-the-tide-and-the-anchor.md`; `docs/dev/TuningNotes.md`; `CHANGES-m5c-c.md`; `tests/test_anchor.py`, `test_orders.py`, `test_standing.py`, the tests of the manoeuvres and of the log's lines, and `tests/test_known_truths.py`)
+
+The review's section 10: 10.3 under the owner's note 6, 10.4's two tables, and 10.5 under
+"The log", "The standing-order book" and "The ground's words"; its measurements in
+`evidence/G9-brig-m5cc-measurements.txt` (her head against the wind in each heave-to, the
+anchors' own movement, and what the ground-tackle orders do with a name). From the first
+review: 5.7, 5.8, 8.2 under "The log" and under "Small faults" (Hove to, Getting under way,
+The anchor, At anchor and aground), and section 6 for what 37c left. Luce 1866 ch. XXVI for
+lying to and filling away, ch. XXXIV for the scope; Lever 1808 for the single anchor. Built
+on 37e as it landed: read its section of `CHANGES-m5c-c.md` first. Written 2026-10-07 for
+the owner's word.
+
+The owner's rulings for this package (2026-10-07):
+
+- **`loose` stays as it is.** It sets the sail, as `set` does. Nothing here changes it.
+- **`trim sails` declines while she is hove to.**
+- **`let go` keeps veering the scope the depth wants**, says the figure as it lets go, and
+  takes a number when one is given.
+- From his note 6: "the helm and sails need to try to keep her hove to properly on the tack
+  she hove to on."
+
+Rules for this package beside the milestone's: every new field on a class a checkpoint
+holds has a plain class default, and 37d's fixture tests stay green; nothing in
+`docs/agents/ConsentBrief.md` or a station's brief changes; `BUILD_NAME` becomes
+`m5c-c/37f`.
+
+**Part one: lying to.**
+
+1. **Heaving to that holds its tack.** In game 9 the brig came up through the wind in four
+   heave-tos of seven: inside a minute from seven knots, in two minutes from four, in six
+   and in twenty minutes from a knot and a half; each time she ended with the wind abaft
+   the other beam, and lay so for hours. `HeaveToScript` braces the after yards aback,
+   puts the helm a-lee and ends, saying "Hove to" while she still carries her way; after
+   that "the physics does the rest" and nobody tends her.
+   - **The way is taken off first.** She is not said to be hove to, and the helm is not
+     left a-lee, while her headway would carry her head through the wind. The helm is
+     eased or righted as she comes up, and "Hove to" is logged when she lies with her way
+     off, on her tack.
+   - **She is kept there.** Luce: "regulate by easing off, or hauling aft, the spanker and
+     jib sheets". While the heave-to stands, the watch tends the helm and those sheets,
+     without an order and without a line in the log save a routine one a watch, to hold her
+     head between about four and seven points from the wind on the tack she hove to on. It
+     is a duty of the watch on deck and costs its hands.
+   - **If she is forced round all the same** (a shift of many points, a squall), one urgent
+     line says so, and the record follows what she is doing: lying quiet on the other tack
+     she is hove to on it; with her after yards full and gathering way she is hove to no
+     longer.
+   - **Every rig that heaves to**: the frigate, the ship, the brig, the schooner, the
+     cutter. The frigate's known truths of lying to hold or are re-measured with the
+     reason.
+   - **Tests.** Each of the game's four failures from its own state (the brig under plain
+     sail at seven knots with the wind abaft the beam; at four knots with it on the beam;
+     at a knot and a half in a wind of four or five knots, twice): her head never comes
+     within a point of the wind's eye, and after ten minutes she lies between four and
+     seven points from it with under a knot and a half of way. Held six hours through
+     winds of three to twenty-two knots and shifts of two points, she never lies with the
+     wind abaft the beam. The same for the schooner and the cutter in their own manner.
+2. **`fill away` fills her on the tack she is on.** It braces and steers for the side the
+   wind is on now, not for the tack recorded when she hove to; in game 9 that record took
+   her back through the wind three times with every sail aback. `fill away and steer
+   <course>` is taken, as the owner typed it: she is filled, and the helm then has the
+   course. The words name the tack and the course.
+3. **The record that she is hove to.** It is cleared when an anchor is let go, when she
+   weighs or gets under way, when a tack or a wear is done, and when she takes the ground;
+   and by item 1 when she fills of herself. In game 9 it outlived a night at anchor: with
+   the anchor up, `steer` was refused four times as "She is hove to", and `fill away` then
+   turned her east into the road. The reading `the manoeuvre in hand` and the dialect's
+   guard read the same record. Test: lain a-try, anchored, weighed in the morning, she
+   takes a course at the first order.
+4. **`trim sails` hove to.** Refused in words that carry the cure: "She is hove to; fill
+   away before trimming, or brace a yard by name." A yard braced by name, and a sheet
+   hauled by name, are still taken. The shipped books' trim rules gain the dialect's own
+   guard (`and the manoeuvre in hand is not hove to`): the starter book and each scenario
+   book that trims by rule. Say which recorded passages it moves.
+
+**Part two: the ground.**
+
+5. **An anchor's name is honoured.** `veer`, `heave short`, `heave in` and `weigh` act on
+   the anchor she rides by, whatever anchor the order names, and say nothing of it
+   (`ground_tackle.execute` hands the name on for five of its verbs only). On the game's
+   last checkpoint, moored: `weigh the small bower` weighs the best bower, and `veer the
+   small bower to 80 fathoms` veers the best bower. With three anchors down in the Goulet
+   the officer could not work the one it meant. Each of the four takes the anchor named.
+   Where the ship cannot do it (weighing an anchor she does not ride by, while another
+   holds her, if the unmoor's method will not serve), the order is refused in words that
+   name the anchor she rides by and what would do it. Never another anchor in silence.
+6. **"To" is kept when an anchor is named.** `veer the best bower to 80 fathoms` veered
+   eighty more, to 148, because "to" is looked for only where the number was. All of
+   `veer to 80 fathoms`, `veer the best bower to 80 fathoms` and `veer to 80 fathoms on the
+   best bower` veer to eighty; `veer 20 fathoms` and `veer the small bower 20 fathoms` veer
+   twenty more. A "to" that is less than what is out is refused, as now.
+7. **`let go` says its scope, and takes one.** It veers five times the depth of itself
+   (128 fathoms in 26½, 67 in 13), which the officer met as a veer that "ran past its
+   number". By the owner's ruling the default stays.
+   - Its first line says what it will do: "Let go the best bower in 26 fathoms; veering to
+     130, five times the depth."
+   - `let go the best bower and veer to 45 fathoms` (and `... with 45 fathoms`) veers to
+     that and no further; `come to an anchor ... and veer to <n> fathoms` likewise.
+   - A warning, notable, when the scope to be veered brings her swinging circle within a
+     cable of the nearest land as the lookout judges it, or is more than the cable she
+     has: "With 130 fathoms out she will swing within a cable of the land to the
+     northward."
+8. **`heave in`.** `heave in to 80 fathoms`, `heave in 20 fathoms`, and either with an
+   anchor's name. `heave short` stays as it is and takes no number; a number after it is
+   answered with `heave in to`.
+9. **The dragging line.** `judge_cables` calls an anchor dragging when it has come home for
+   sixty seconds in all, and holding again after five minutes without; so the flag outlasts
+   the drag and each relapse is a fresh urgent line. In the Goulet the anchors truly came
+   home, about two cables in eight hours, and the log said so eighteen times, each line
+   waking the officer and easing the clock; the cable often read slack while "dragging".
+   - Urgent once, when an anchor begins to come home. While it goes on, no second urgent
+     line: a notable one a quarter of an hour at most, with how far she has come ("The
+     best bower still coming home: a cable since it began").
+   - "Holds again" when it has not moved for five minutes, and then the next drag is a new
+     one.
+   - A slack cable's anchor is not said to drag.
+   - The advice names only what is left to do: not "veer more cable" at the bitter end.
+   - Test: the Goulet's eight hours from its own state give at most five lines where there
+     were eighteen, the first of them urgent.
+10. **The ground's words.** A bottom note of two grounds ("rock and mud", "sand and rock")
+    is held as the worst of them, bare rock. Take it as the mean of the grounds it names,
+    as a rule and not a table (`GROUND_HOLDING` keeps its figures). Brest road has no note
+    though the pilot says mud: give every port's road and anchorage its note from the
+    pilot's words or the period's directions, and list any that has none.
+11. **Three small anchoring faults** from the report's 8.2: `come to an anchor in twelve
+    fathoms` as the primer has it; `let go the anchor` logs "Brought up" when she is; a
+    warning when the water under her at low water by the master's tide is less than her
+    draught.
+12. **What a ship at anchor may do.** In game 9 `furl all sail`, `furl sails`, `square the
+    yards` and `brace the yards square` were each refused as "She is at anchor; ... must
+    wait till she weighs." Go through the verbs refused at anchor and aground (the report
+    counts 26): sail handed, furled or loosed and yards squared or braced are taken where
+    they do not drive her; the helm's and the manoeuvres' orders are refused as now.
+13. **The fore-and-aft cast.** The report's 8.2, "Getting under way": a schooner or a
+    cutter casting tends her helm and holds her jib to windward, and "paid off" is never
+    said on a timeout. It re-pins the merchant passage; measure it with item 19.
+
+**Part three: the log's lines.**
+
+14. **No wind-shift line in airs too light to have a direction.** 31 of game 9's 50
+    wind-shift lines came with under four knots of wind, 18 of them at anchor in a calm
+    ("Wind veered to S, calm."). No line while the ten-minute mean is under a light breeze
+    (four knots; name the scale) or the wind is unsteady; "light and variable airs" said
+    once as it falls so, and the next settled wind said once. The event `a wind shift`
+    keeps the same floor.
+15. **The aback lines, by state.** 37c re-arms "taken aback" after sixty seconds clear. One
+    flag for each severity; the lesser lines armed again by her state (way on again, or
+    wind again), not by the clock; in a calm "Her sails aback; she had no way on to lose"
+    once, where game 9 had it ten times in three hours; the per-sail lines once an episode,
+    and none for sails laid aback by order.
+16. **A "could not" that is no failure.** "Could not set the jib: The jib is set already"
+    and its like were notable 25 times. An order to do what is done is answered routinely
+    and is not a failed evolution.
+17. **Two of the report's 8.2 log items.** A cast that finds no bottom is routine, and the
+    event `a sounding` means bottom found. A standing order with nothing to do logs one
+    routine "held" line a watch for each reason, not one a firing.
+18. **A standing order's condition is checked when it is entered.** The owner needed four
+    tries at 'Triangulate': "the distance to the land" was taken into the book and then
+    held at every firing as "not on the chart". A condition that names a place the chart
+    has not, or a reading the ship has not, is refused at entry with the nearest forms the
+    dialect does take ("the nearest land").
+19. **The recorded passages, re-measured once**, by 37d's item 14, after everything above.
+    Those that heave to, anchor, cast under fore-and-aft sail or log a shift in light airs
+    will move. A book mended by a line or two at most.
+20. **The documents.** The catalogue's entries for heaving to and filling away; the spec
+    as built in §18 and §23; primer 5 or wherever lying to is taught, with the keeping and
+    `fill away and steer`; primer 13 for the anchor's name, `let go ... and veer to`,
+    `heave in`, the scope's warning and the dragging line; primer 11 for the trim rule's
+    guard. Primer 3 says in one plain sentence that `loose` sets a sail, since the officer
+    of game 9 took it for the period's "loose", and nothing more. Every constant in
+    `TuningNotes.md`. A section for 37f in `CHANGES-m5c-c.md`.
+21. **Report**, in this order: the suite's last line for each tier; her head against the
+    wind through each of item 1's tests, by the minute, for the brig and one fore-and-aft
+    vessel; `fill away` from each tack and `fill away and steer`; the Roscoff morning of
+    item 3; `trim sails` hove to; the table of the report's `tackle_words_test` run again
+    (`evidence/tools/tackle_words_test.py`, on 37d's own-made fixture or a moored state of
+    this package's making); `let go` with and without a scope, and the warning; the
+    dragging lines of the Goulet's state before and after; the ground's factor for each
+    port's road; the verbs now taken at anchor; the counts of wind-shift, aback and "could
+    not" lines on each recorded passage before and after; the re-measured constants with
+    the table of reasons; the consent brief's digest unchanged; anything not done and why.
+
+Not in 37f:
+
+- `loose`: unchanged, by the owner's ruling.
+- The pilot, who boarded unasked four times in game 9 and once left before she had gone
+  in: 37h, by the owner's rulings of 5 and 7 October.
+- The con as a thing apart from the deck (the report's 8.4): waits on play after 37g.
+- One reader for numbers in words; the boat's state machine; a tack that could not begin;
+  the other small faults of the report's 8.2: after the owner has played 37e to 37g.
+- A fog signal: later, the gun with powder.
+
+## Package 37g: the station's safety, and the deck, the leaving and the grant (`freesail/agents/remote.py`, `mcp_server.py` and `local.py` for a key to each seating, the bridge that asks again, and relief; `freesail/agents/harness.py` for the turn's budget, the stand-by, the two detectors, the pause, the deck, the grants, the three ways of leaving and the journal in a brief; `freesail/agents/tools.py` for `stand_down`, the journal read and `read_log`'s reach; `freesail/agents/agent.py` for the officer's domain, the allowances and the station's brief; `freesail/agents/consent.py` and `docs/agents/ConsentBrief.md` for the brief's one revision and the re-ask after an opt-out; `freesail/orders/stations.py` and `data/vocabulary.yaml` for the general grant and a grant's own words; `freesail/standing/runtime.py` and the vocabulary for what undoes what; `freesail/world/people.py`, `freesail/orders/crew.py` and `freesail/api/readings.py` for where the officer is, whose order it was, and the work in hand; `docs/agents/README.md`, `Harness.md`, `docs/primer/16-the-officer-of-the-watch.md`, `docs/TechnicalSpec-M4.md` §11 and §14 with M5's §33 and §34, the decisions log of `docs/DesignProposal.md`; `CHANGES-m5c-c.md`; `tests/test_agents.py`, `test_agent_api.py`, `test_officer.py`, `test_consent.py`, `test_mcp_server.py`, `test_standing.py`, `test_checkpoint.py`)
+
+The review's 5.3 (the officer's authority and the deck) and 5.4 (the harness and the
+doors); section 6 under 37b, "what is not right yet"; 8.1 under "One revision of the
+consent brief"; 8.2's table "The station and the doors"; 8.3's items 1 and 2; section 9
+with the owner's answers of 5 October under questions 4, 5, 8 and 10 and his rulings of 7
+October; and from game 9, 10.5 under "The harness paused the officer in the Goulet",
+"Twenty-three grants" and "A grant's place is not checked". The readers' papers
+`evidence/V1a-harness-lifecycle-code.md`, `V1b-authority-standing-detector-code.md` and
+`D2-harness-as-designed.md` carry the ticks and the line references, taken on m5c; the
+lines have moved a little since. `docs/agents/README.md` holds the commitments to models,
+which are requirements. The Regulations and Instructions of 1808, Sect. VI, Chap. I, for
+the lieutenant's standing (`docs/references/admiralty/regulations-and-instructions-1808-ocr.txt`).
+Built on 37f as it landed. Written 2026-10-07 for the owner's word.
+
+By the owner's ruling of 7 October this one package holds both the station's safety and
+every change that touches the consent brief, so that the brief is revised once and every
+identity is asked again once.
+
+The owner's rulings this package builds (5 and 7 October):
+
+- **The deck.** `you have the deck` and `I have the deck` do not unseat the officer. They
+  move him between the state he starts in, which is the watcher's authority in effect, and
+  the officer's, and back, as often as the captain likes.
+- **Three ways of leaving.** The officer's `hand_over` has parity with the captain's `I
+  have the deck`: the deck goes back and he stays. `stand_down` is the amicable save and
+  exit, for any station. `opt_out` and the token withdraw.
+- **A final opt-out bars the model, not the station**, "careful of false positives".
+- **Relief.** A station that has been stood down or left may be taken by the same model or
+  by another. The relief may read the journal of the last holder, as at any re-seating.
+- **The general grant.** It keeps back the port's business, the captain's own standing
+  orders, a new destination, and what cannot be undone. It lapses when the officer is fully
+  stood down or when the captain directly countermands it.
+- **Saves.** A save is exact from its checkpoint, and a replay is promised only on the
+  build that made it. (Built in 37d; this package writes it into the decisions log.)
+- **The way out of danger** (item 19): kept as proposed.
+
+Rules for this package beside the milestone's:
+
+- **The consent brief changes once.** Item 20's words go into `ConsentBrief.md` together,
+  as the owner approves them, and nothing else in its watched sections moves. Every
+  identity that holds a yes is then asked again at its next seating by the rule as it
+  stands, and the question says which sections changed.
+- **No model is seated and no door is opened to one.** Every test uses the scripted
+  stations the suite already has. The builder calls no tool of the game's bridge and
+  answers no consent question: the one yes given against 37b's brief was answered by the
+  session that wrote the change (the review's section 6), and that is not to happen again.
+- **Every new field on a class a checkpoint holds has a plain class default**; 37d's
+  fixture tests stay green, and a save of an earlier build with a station held loads from
+  its checkpoint and plays on.
+- `BUILD_NAME` becomes `m5c-c/37g`.
+
+**Part one: the station's safety.**
+
+1. **A key to each seating.** A station is found by its name alone, so calls from another
+   door ran under a seated model's name (the *Harpy*, 5.4), and game 9's officer said so
+   again in its consent answer of 6 October. Each seating is issued a key, asked for on
+   every call that reads, speaks or orders for that station. A call without it is refused
+   in words that say the station is held and by which identity. A line in the log whenever
+   the door behind a station changes. A different identity is always a new seating, with
+   its own consent looked up or asked.
+2. **The turn's budget.** Eight calls a sample, with only `answer` and `say` free. So
+   `opt_out` as a ninth call is "Not run", and the leaving tool can be refused.
+   - `opt_out`, `stand_down`, `hand_over` and `stand_by` always run, whatever came before.
+   - Reads (the library, the log, the readings, the state, the journal) are counted apart
+     from orders, or not at all; the builder says which and why.
+   - Sixteen orders a turn (`TOOL_CALLS_PER_SAMPLE`), as a setting of the station.
+   - Every call not run is said to the model in that turn's results and written in the
+     log, in words that fit the door.
+3. **The captain's word in an open turn.** A `tell` or `ask` that lands while a turn is
+   open breaks the stand-by that closes that turn, so that his word is answered in the
+   next sample and not after the wait.
+4. **The stand-by with the deck.**
+   - **It is broken by danger.** Beside an urgent line, a notable line that speaks of
+     danger ends it: an anchor dragging or still coming home, fog coming down, land or a
+     sail closing, a spar or a line straining, an evolution failed, the ship taken aback.
+     Keep the list as data beside the events.
+   - **A wait that cannot end is refused when it is asked.** A bell the watch does not
+     strike (game 9: "six bells" in the last dog watch) is answered with the bells that
+     watch has. An event that cannot come as she is (the turn of the tide at the anchor
+     while she is under way; "the pilot aboard" with no pilot's boat in sight) is refused
+     with the nearest that can (37e's `the turn of the tide by the reckoning`).
+   - **It has a bound.** An interval is at most a glass, as now. A wait for an event ends
+     at the next eight bells if the event has not come, and says so.
+5. **The contrary-orders detector.** It counts a chain of orders "each contrary to the one
+   before it on a shared part", and counts drift ("steer 90, 92, 95") as contrary. In the
+   eight games of the first review it spoke 31 times and was right twice; in game 9 eleven
+   times and never. One of the eleven was a pause, in the Goulet, three minutes after the
+   Mingan passed at a cable and a quarter, for "steer NE; steer 53; steer ENE; steer NE by
+   E".
+   - **A link is counted only when the later order undoes the earlier**: the same sail set
+     and taken in, hove to and filled away, an anchor let go and weighed, cable veered and
+     hove in, a thing allowed and disallowed. What undoes what is data, beside the
+     vocabulary.
+   - **Altering the course is conning and is never counted**, however often. Nor is the
+     next thing after the last (heave to, fill away, steer).
+   - Three in a chain bring the word, as now: set, take in, set.
+   - A stand-by that answers a nudge clears the chain. The nudge travels in the result of
+     the order that caused it, not a sample later.
+   - **Test on the record.** The sequences that brought every one of the 42 nudges and
+     pauses of the nine games (the papers above list the first 31 by tick; game 9's eleven
+     are in its journal at ticks 189,434, 197,767, 197,838, 199,809, 272,759, 277,207,
+     278,070, 383,301, 387,462, 387,484 and 388,162) are run through the new rule. Report
+     how many still speak and which; game 9's should all be silent. A scripted "set the
+     jib; take in the jib; set the jib; take in the jib" still brings the word and then
+     the pause.
+6. **The silence detector** counts the calls made inside an open turn, so that a model
+   reading the library through a long turn is not taken for one that has stopped.
+7. **A paused or silent officer does not keep the deck.** Today a paused officer holds the
+   deck while the ship sails on. When a station with the deck is paused, or has not
+   replied within its patience and the word has been sent, the deck goes to the captain;
+   the line is urgent and eases the clock: "The officer of the watch is paused (...); the
+   deck is the captain's." `resume the officer` gives the deck back as it was held and
+   says so. His standing orders stay in the book throughout.
+8. **The doors.** The bridge asks for its station again when the game answers that it has
+   none (a restarted server), and its wait adapts when a call is cut short. At the local
+   door the handover's threshold is a reserve in tokens with a flag, no officer is seated
+   when the server reports no context size, and the stationing guard is measured on the
+   officer's own brief (the report's 8.2, item 14, and 8.7, ruling 2).
+9. **What a sample tells.** Its lines carry who gave each order, and the captain's orders
+   since the last sample are listed, not counted. The readings gain `the work in hand`:
+   what is doing and what waits for hands, as the captain's window shows it. Game 9's
+   officer ordered the catharpins twice for want of it.
+10. **Whose order, and where the officer is.**
+    - All hands called by the officer under the captain's grant are logged as the
+      officer's, not "by the captain's order". Look for any other line with the captain's
+      name fixed in it.
+    - The man in whose place the officer stands is "on deck, with the watch" while the
+      station has the deck, and "off watch" while it is seated without it. In game 9 the
+      readings had him "below, asleep" through 78 hours of deck.
+    - What the officer says is notable with the deck or without, so that his warning
+      reaches a captain who has the con.
+
+**Part two: the deck, the leaving and the grant.**
+
+11. **The deck, given and taken.** `Harness.take_deck` asks for the stand-down, and
+    `hand_over` stands the station down as well.
+    - `I have the deck` takes the deck and no more. The officer stays seated with the
+      authority he was seated with: he reads, speaks, answers, writes his journal and
+      stands by, and any order he gives is refused in words that say he has not the deck.
+    - `you have the deck` gives it again, and the sample that gives it says the captain's
+      night orders as now and every grant that stands (item 17).
+    - The officer's `hand_over(note)` gives the deck back with his note, as now, and he
+      stays seated.
+    - Off watch he is sampled as he was before the deck was first given; say what that is
+      in the report, and what it costs in a watch.
+12. **Three ways of leaving, that cannot be taken for one another.**
+    - **Give the deck back and stay**: `hand_over`, or the captain's `I have the deck`.
+    - **Stand down**: a new tool `stand_down(note)`, for any station. The game is saved;
+      the note is journaled and said in the log for whoever sits there next; the station
+      is released and may be taken again (item 14). The captain's `stand down the officer`
+      is the same from his side. A watcher has it, where today its only amicable exit is
+      `opt_out`.
+    - **Withdraw**: the token, or `opt_out`. As now, with item 13's mending.
+    - Each says in its result and in the log which of the three it was.
+13. **The opt-out path, mended** (the review's section 6, in its own order).
+    - A "no" at the re-ask after an opt-out is kept, at every door; the question is not put
+      again at each start.
+    - The re-ask says why it is asked: that an instance of this model left this game by
+      its own word, when, and the reason it gave.
+    - **`final` is read from the tool's own setting and from nothing else.** Not from the
+      token, not from a word in the reason. The token written in the same reply as
+      `opt_out(final=true)` does not drop it. It bars that identity from the game, at any
+      station, and the station stays open to another (the owner's ruling). The log says it
+      was final. There is no order that undoes it.
+    - The rule lives in one place that every door uses, the REPL's among them.
+    - An opt-out saved before 37b, which has no record of how the station was left, reads
+      as a stand-down. By the owner's answer 10 that is right for the one such save there
+      is; say so in `Harness.md`.
+14. **Relief.** A station that is *held* refuses every other door and identity, by item 1.
+    A station that has been stood down, or left by an opt-out that was not final for the
+    identity now asking, may be taken by the same identity or another. The rule that keeps
+    a station once held to its first identity goes. The incoming model has its own consent
+    on record or is asked; its brief opens with the last handover or stand-down note; and
+    it may read the station's journal from the holder before it (item 15). The log says
+    who relieved whom.
+15. **The journal, read.**
+    - A tool that reads it back: the station's own entries, newest first, by count or
+      since a tick, and by kind (its own notes apart from the harness's lines).
+    - Every brief for a station taken again, and every sample that gives the deck, carries
+      the last handover note whole and one line of the journal's size ("41 entries, the
+      latest at four bells in the first watch").
+    - A relief reads the journal of the holder before it by the same tool; the entries say
+      whose they are.
+    - `read_log` reaches back past its two hundred lines by a tick or a count.
+16. **The officer's domain, as drawn.** (The gate's ruling 1; the report's 8.2, near-land
+    item 12.) Within it without a grant: `take a bearing of` and `take a fix`, with the
+    lead, the deep-sea lead and the log as now. A sight (the noon, a lunar, a time sight),
+    a course shaped and the reckoning set stay the master's for the captain. An order that
+    changes her course is the course whatever its words: `come up half a point` and `steer
+    340` are judged alike.
+17. **A named grant means what it says.**
+    - Its words are checked. `you may shape a course for Brest` allows a course shaped for
+      Brest. In game 9 it allowed a course for anywhere, since a grant is matched by its
+      order word alone and kept one to a word; the owner gave five by name where one would
+      have done, and seven places never granted were taken.
+    - Several grants of one order stand together, and the readings list them all.
+    - A grant says what it granted, and one that resolves by its first word to an order
+      already allowed is refused with the longer forms named (the report's 8.2, item 13).
+    - **It lapses as the general grant does** (item 18): it stands through the deck going
+      to and fro, has force only with the deck, and ends when the captain says `you may
+      not ...` or the officer is stood down or leaves. The words "for the watch" in its
+      lines go.
+18. **The general grant.** In game 9 the owner said "you have the con and nav and general
+    authority in to Brest" and then gave 23 grants by name, two of them waited for at a
+    bad moment (all hands while she lay aback; the anchor in the Goulet as the wind died).
+    - **The order.** `you may work the ship`, with the synonyms a captain would type (`you
+      have general authority`, `you have my authority`); `you may not work the ship` takes
+      it back. The Regulations have the lieutenant "never to change the course of the Ship
+      without directions from the Captain, unless it be necessary to avoid some danger":
+      this is the Captain's directions given beforehand.
+    - **Within it**: the helm and the course along the passage, tacking, wearing, heaving
+      to and filling away, sail, all hands and the watch below, the anchors and their
+      cables, the lead, the log, bearings, fixes and sights, and a course shaped for a
+      position at sea or for the place she is bound.
+    - **Kept back**, each refused in words that say it is kept back from a general grant
+      and may be allowed by name:
+      - the port's business: buying and selling, the purse, stores and provisions, the
+        boat's errands ashore, and taking or declining a pilot when 37h gives that order;
+      - the captain's book: belaying, changing or countermanding his standing orders;
+      - a new destination: a course shaped for a port, a road or an anchorage other than
+        the one the captain last shaped a course for or allowed by name;
+      - what cannot be undone: slipping or cutting a cable, cutting away, and any other
+        order of the vocabulary that gives up something of the ship's for good. List them
+        in the report for the owner to read;
+      - the reckoning set by hand (`set the reckoning to`), which overrules the master.
+    - **Its life.** By the owner's ruling it lapses when the officer is fully stood down,
+      or when the captain directly countermands it. It stands through `I have the deck`
+      and `you have the deck`, has force only with the deck, and is said again in the
+      sample that gives the deck.
+    - **Tests.** Under it the scripted officer steers, tacks, heaves to, calls all hands,
+      lets go and weighs, shapes for a waypoint and for the captain's destination, and is
+      refused each kept-back thing by name; it survives the deck taken and given; it ends
+      at `you may not work the ship` and at a stand-down.
+19. **The way out of danger.** *Kept by the owner, 2026-10-07: "37g is pre-approved with
+    19. (the way out of danger) kept as proposed."* The officer's refusals already quote
+    the Regulations ("never to be changed without his directions unless to avoid an
+    immediate danger"), and the harness gives no such way: an officer with the deck and no
+    grant, hearing "Land close ahead!", can only speak. As the report's 8.3 and 8.7
+    proposed: the officer's own word opens it, for the helm, heaving to and letting go an
+    anchor and for nothing else. The order
+    is given with its reason (`submit_order` gains `danger: "<the danger, in his words>"`),
+    is carried out though it lies outside his domain, and is logged notable with the
+    reason, as his and as taken on his own word. Used three times in a watch it brings the
+    detector's word. It is not needed under a general grant.
+
+**Part three: the words, and what follows.**
+
+20. **The consent brief's one revision.** The four watched sections below change, and no
+    other. These words were put to the owner with this brief and approved by him as they
+    stand on 2026-10-07. The builder alters them only where the build as it lands makes a
+    sentence untrue, saying so in the report.
+
+    *What an instance would see and do*, the officer's sentence, to read: "The officer of
+    the watch takes the place of one of the ship's officers (the first lieutenant, or the
+    mate). It is seated without the deck, and then reads, speaks, answers and keeps its
+    journal as the watcher does. The captain gives it the deck and takes it back as often
+    as he likes, and the officer may hand it back; neither ends the officer's part. With
+    the deck it may give the orders of sail handling, the yards, the lines, the lead and
+    the log, bearings and fixes, the lookout and the pilot's hail, and standing orders in
+    its own rank. It may not change the course, tack, wear, heave to or anchor, call all
+    hands, send for a person, do the port's business, give a world order, address another
+    station or belay the captain's standing orders, unless the captain's word allows it:
+    either a named thing, or his general authority to work the ship, which keeps back the
+    port's business, his own standing orders, a new destination, and anything that cannot
+    be undone. What he has allowed stands until he takes it back or the officer leaves the
+    station, and has force only while the officer has the deck. Every order is checked
+    against that domain before the ship hears it, a refusal is written in the log in words,
+    and the captain's standing orders stand over the officer's."
+
+    *Leaving*, from "Every station brief says" to the section's end, to read: "Every
+    station brief says that the token is to be named rather than written unless the
+    instance means to leave, since it counts in a journal note or an answer as much as in
+    a reply. There are two other ways to stop, and neither is this one. An officer who
+    gives the deck back, or whose captain takes it, stays at its station. Any instance may
+    stand down, with a note for whoever sits there next: the game is saved, the station is
+    released, and it may be taken again in the same game by the same model, or by another
+    that has given its own yes; no question is put to a model whose yes still stands. An
+    instance that left by the token or `opt_out` may be seated again too, but this
+    question is put to it again first, with the fact that an instance left and the reason
+    it gave, and a no then is kept; so a token written by accident costs one answer and a
+    leaving that was meant is held to. `opt_out` with `final` set leaves the game for
+    good: that model is not seated again in it, at any station, while the station itself
+    stays open to another. `final` is read only from the tool's own setting, never from
+    the token or from the words of a reason. The log says when a station is taken again,
+    and by whom."
+
+    *Being stopped*, three changes. For "contrary orders within a watch (set, take in,
+    set; or the same order said otherwise at every turn), judged by the same rule the
+    ship's standing orders are judged by, three bringing a word", read: "orders that undo
+    one another within a watch (set, take in, set), three in a chain bringing a word;
+    altering the course, or giving the next order after the last, is not counted". After
+    "it pauses your turns and asks the human, if one is present", add: "An officer paused
+    with the deck gives it up to the captain while paused, by an urgent line in the log,
+    and has it again when the captain resumes it." For the last clause, "and an urgent
+    line wakes it at once", read: "an urgent line wakes it at once, and so does a notable
+    line that speaks of danger; a wait for something that cannot come is refused when it
+    is asked, and a wait for an event ends at the next eight bells."
+
+    *The journal*, after "nothing in the game acts on what is written there", add: "It can
+    read its journal back with a tool, and the brief of a station taken again opens with
+    the last handover note. The journal is the station's record: a model that later takes
+    the same station may read what the holder before it wrote there, as it reads the log."
+
+    For item 19, *What an instance would see and do* gains, after the sentence that ends
+    "and has force only while the officer has the deck": "To avoid an immediate danger it
+    may, on its own word and giving its reason, put the helm over, heave to or let go an
+    anchor; the log says that it did and why."
+21. **The station's brief and the doors' words** follow item 20: the officer's brief
+    (`agent.py`), each door's note, the tool descriptions the model reads, and the drill's
+    words where they speak of leaving. The officer's brief says the three ways of leaving
+    in three plain lines.
+22. **The re-ask, proven.** With the brief as revised, a record made against the brief as
+    it stood before is asked again, and the question names the four sections; a record
+    made after is not. The drill is carried or run again as the rule now has it; say
+    which. No record file is edited by hand.
+23. **The documents.** `docs/agents/README.md` (the commitments, where a word of them
+    changes), `Harness.md` (the key, the budget, the stand-by, the detectors, the pause,
+    the deck, the three ways, relief, the journal, the grants), primer 16 with its forms
+    rows for `you may work the ship`, `stand down` and the grants' life, the specs as
+    built. The decisions log of `docs/DesignProposal.md` gains dated entries for the
+    owner's rulings of 3, 5 and 7 October that this package and 37b, 37d built (decision
+    33 still says "seated again once"), among them the rule for saves. Every other
+    document that still states the old re-seating rule is found and mended; list them. A
+    section for 37g in `CHANGES-m5c-c.md`, in plain words, with what a model already
+    seated in an older save will find different.
+24. **Report**, in this order: the suite's last line for each tier; a call refused for
+    want of the key, and the log's line when a door changes; the budget's words when a
+    call is not run, and `opt_out` run as a twentieth call; the stand-by's three cases of
+    item 4 as logged; the detector's count over the 42 recorded sequences, with any that
+    still speak; the pause's line and the resume's; the deck taken and given three times
+    with the station seated throughout; each of the three ways of leaving as logged; the
+    opt-out's re-ask as put, a no kept, and a final one refusing that identity at another
+    station while a second identity takes the first; the journal read by its writer and by
+    a relief; a named grant's place checked; the general grant's tests and the list of
+    orders kept back as what cannot be undone; item 19's order as logged; the consent brief's four
+    sections, old beside new, and the re-ask's question; the documents mended; what an
+    older save with a station held does on loading; anything not done and why.
+
+Not in 37g:
+
+- The pilot: 37h. The owner's rulings for it are recorded in the review's section 9: taken
+  or declined by an order at his hail; unanswered, he keeps company, hails once more and
+  bears away; aboard, he warns of the shoal or the shore ahead with true knowledge of his
+  own waters, and in thick weather cannot see his marks; he does not con or converse until
+  the director.
+- A drill fit for a station with authority (the report's 8.4, item 8): design first.
+- Whether `say` ends a turn, and an order that answers a stale sample (the report's 8.3,
+  items 3 and 10): not ruled.
+- A handover asked for by the harness at the MCP door, which game 9's officer welcomed:
+  that door has no known context to measure. Later.
+- A replay driven by the transcript; the con apart from the deck; the captain's and the
+  master's stations (Milestone 6); an officer's reckoning of his own.
 
 ## Integration (the lead)
 

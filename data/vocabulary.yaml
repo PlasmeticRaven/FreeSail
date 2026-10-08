@@ -229,7 +229,10 @@ verbs:
     object: none
     level: 1
   fill away:
-    synonyms: [fill, fill and stand on, let draw]
+    # "fill away and steer SW by W" (package 37f; the owner typed it in game 9): she is
+    # filled on the tack she is on, and the helm then has the course said after it
+    synonyms: [fill, fill and stand on, let draw, fill away and steer, fill and steer,
+               fill away steering, fill away and stand on]
     object: none
     level: 1
   # Milestone 3 (package 19): the catalogue to forty. Sail work first.
@@ -514,6 +517,19 @@ verbs:
     synonyms: [take the bearing of, take a bearing on, bearing of, take bearings of, get a bearing of]
     object: navigation
     level: 1
+  take a fix:
+    # Cross bearings of two or three charted marks in sight, the account set at their
+    # crossing (package 37d): `take a fix`, the master choosing the marks that cut best,
+    # or `take a fix by <mark> and <mark>` (and a third). Never by the shore close aboard,
+    # a sail or a transit; refused in words for one mark only or marks that cut too fine.
+    synonyms: [take a fix by, take a fix on, take a fix of, take a fix from, take the fix,
+               get a fix, get a fix by, fix her position, fix her position by,
+               fix the position, fix the position by, fix our position, fix our position by,
+               fix the ship, fix the ship by, take cross bearings, take cross bearings of,
+               take cross bearings on, take cross bearings by, take a cross bearing,
+               take a cross bearing of, cross bearings, cross bearings of]
+    object: navigation
+    level: 1
   work up the reckoning:
     synonyms: [work the reckoning, work up the dead reckoning, bring up the reckoning, the day's work]
     object: navigation
@@ -530,13 +546,26 @@ verbs:
     object: navigation
     level: 1
   allow:
-    # `allow <n> knots of set to <direction>` in the traverse; `allow no set` clears it.
+    # `allow <n> knots of set to <direction>`: the captain's own set in the traverse, in
+    # the place of the master's own tide until it is handed back (package 37e); `allow no
+    # set` is his word that there is none.
     synonyms: [allow for]
+    object: navigation
+    level: 1
+  allow the tide by the book:
+    # Hands the tide back to the master, who works it into the reckoning from his sailing
+    # directions and his epitome (package 37e; `freesail/orders/navigation.py`).
+    synonyms: [allow the tide, allow for the tide, allow for the tide by the book,
+               allow the tide by the directions, allow the master's tide,
+               work the tide yourself, work the tide by the book, work the tide,
+               reckon the tide yourself, reckon the tide by the book,
+               the tide by the book, hand the tide back, hand back the tide]
     object: navigation
     level: 1
   shape a course for:
     # Reads the reckoning and the chart's places, never the truth; refused where the chart
-    # has no such place.
+    # has no such place. Since package 37e the helm is ordered the course that makes the
+    # line good against the tide the master allows, worked once when it is shaped.
     synonyms: [shape a course to, shape course for, lay a course for, set a course for,
                steer for, make for]
     object: navigation
@@ -617,8 +646,18 @@ verbs:
     object: anchor
     level: 1
   heave short:
-    synonyms: [heave in to a short stay, heave in the cable, heave in cable, heave in,
-               shorten in the cable, heave her short, heave short on the cable, heave to a short stay]
+    # no number: a number after it is answered with `heave in to` (package 37f)
+    synonyms: [heave in to a short stay, shorten in the cable, heave her short,
+               heave short on the cable, heave short on, heave to a short stay]
+    object: anchor
+    level: 1
+  heave in:
+    # Package 37f: so much of the cable hove in at the capstan, or the cable hove in to a
+    # scope, on the anchor named or the one she rides by: `heave in 20 fathoms`, `heave
+    # in to 80 fathoms`, `heave in the small bower to 80 fathoms`. With no number it is
+    # `heave short`, as these words always were.
+    synonyms: [heave in the cable, heave in cable, heave in on, heave in on the cable,
+               heave in to, heave in cable to, heave in the cable to]
     object: anchor
     level: 1
   weigh:
@@ -864,6 +903,29 @@ verbs:
     level: 2
   you may:
     synonyms: []
+    object: station
+    level: 2
+  you may not:
+    synonyms: []
+    object: station
+    level: 2
+  # The captain's general authority to work the ship (package 37g, item 18; the owner's
+  # rulings of 5 and 7 October 2026), with the words a captain would type for it, and its
+  # taking back. The Regulations and Instructions (1808 printing), the Lieutenant, art.
+  # XIII, have him "never to change the course of the Ship without directions from the
+  # Captain, unless it be necessary to avoid some danger": this is the Captain's directions
+  # given beforehand. What it opens and what it keeps back are data on the station's
+  # domain (`freesail/agents/agent.py`); `orders/stations.py` reads the sentence.
+  you may work the ship:
+    synonyms: [you have general authority, you have my authority, you have my general authority,
+               you have full authority, you may handle the ship, work the ship as you see fit,
+               she is yours to work]
+    object: station
+    level: 2
+  you may not work the ship:
+    synonyms: [you have not general authority, you have not my authority,
+               you no longer have general authority, you no longer have my authority,
+               i take back my authority, i take back my general authority]
     object: station
     level: 2
   # Reading a file of standing orders is the driver's business (it reads the disk): the
@@ -1328,3 +1390,59 @@ more_work_nouns:
   sounding: heave the lead
   cast: heave the lead
   log: heave the log
+
+# ---------------------------------------------------------------------------
+# What undoes what (package 37g, item 5; the review of gate 5c's playtests, 5.4 and 10.5):
+# the pairs of orders of which the later undoes the earlier on a part they share. The
+# harness's detector for a station with authority counts a link in its chain only for
+# such a pair (`freesail.standing.runtime.undoes`): the same sail set and taken in, hove
+# to and filled away, an anchor let go and weighed, cable veered and hove in, a thing
+# allowed and disallowed. Three in a chain bring its word (set, take in, set). Altering
+# the course is conning and is no pair here, however often; nor is the next thing after
+# the last (heave to, fill away, steer). The old rule, "touches the same part", spoke 42
+# times in the nine games of gate 5c's playtests and was right twice by its own lights;
+# every one of those 42 chains is silent by this table (`tests/test_officer.py`). The
+# standing orders' own conflict rule is not this one and is unchanged. Each name is a
+# verb of the table above; a pair is read both ways.
+# ---------------------------------------------------------------------------
+undoes:
+  - [set, take in]
+  - [set, furl]
+  - [reef, shake out]
+  - [rig out, rig in]
+  - [bend, unbend]
+  - [heave to, fill away]
+  - [call all hands, pipe down]
+  - [let go the anchor, weigh]
+  - [come to an anchor, weigh]
+  - [let go the anchor, get under way]
+  - [come to an anchor, get under way]
+  - [veer cable, heave short]
+  - [veer cable, heave in]
+  - [moor, unmoor]
+  - [send down the topgallant masts, sway up the topgallant masts]
+  - [send down the topgallant yards, cross the topgallant yards]
+  - [strike the topmasts, fid the topmasts]
+  - [swifter in the catharpins, ease the catharpins]
+  # a thing allowed and disallowed: a standing order belayed and resumed (the station's
+  # own, on the same rule), and the captain's word given and taken back
+  - [belay standing order, resume standing order]
+  - [you may, you may not]
+  - [you may work the ship, you may not work the ship]
+
+# ---------------------------------------------------------------------------
+# What cannot be undone (package 37g, item 18; the owner's ruling of 2026-10-07 on the
+# general grant: it keeps back "what cannot be undone: slipping or cutting a cable,
+# cutting away, and any other order of the vocabulary that gives up something of the
+# ship's for good"). The orders of the table above that give up something of the ship's
+# for good, which the captain's general authority to work the ship does not open and his
+# word allows by name. Today the vocabulary has one: `cut away`, the wreck of a spar
+# carried away cut clear and lost over the side. That one has been within the officer's
+# own domain since package 37 (the vocabulary's object `wreck`), so that he can clear a
+# wreck without waiting for the captain; the grant opens nothing by it and keeps nothing
+# back in practice, and the list stands for the orders to come. There is no order yet to
+# slip or cut a cable; when one is written it is listed here. (Selling the cargo and
+# spending the purse are the port's business, kept back under that head.)
+# ---------------------------------------------------------------------------
+irrevocable:
+  - cut away

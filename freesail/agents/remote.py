@@ -49,9 +49,32 @@ player reads. This module has the two halves of that:
   what, and the notable lines logged since, so a door can show a model that asks again
   what it would otherwise not see until its turn.
 
+**A key to each seating** (package 37g, item 1; the review of gate 5c's playtests, 5.4:
+after stationing a seat was found by the station's name alone, and in game 7 eight calls
+from a second door still attached to the same game ran in a seated model's place, under
+its name and its consent). Stationing issues a key, once, to the door that stations; every
+call that reads, speaks or orders for the station carries it (the turns, a reply, the
+owner's word, a release, the library read for a held station), and a call without it is
+refused in words that say the station is held and by which identity, with nothing run.
+The same identity asking again for a station it holds (a door restarted, or another door
+of the same model) is given a new key: the newest door holds the seat, the older is
+refused at its next call, and the log says that the door behind the station changed
+(`Harness.door_act` "door", so a replay writes the line too). A different identity is
+always a new seating, with its own consent looked up or asked. The key never enters a
+save or a transcript.
+
+**Relief** (package 37g, item 14; the owner's rulings of 5 and 7 October 2026). A station
+that is held refuses every other door and identity. A station that has been stood down,
+or left by an opt-out, may be taken by the same identity or by another: the rule that
+kept a station once held to its first identity is gone. `harness.seating` is the one
+rule every door asks: an identity that left the game for good is refused, at any
+station; one that left by its own word is asked for its consent again first, once, with
+the fact that an instance left and the reason it gave, and its answer is kept.
+
 **The door's half** (`GameClient`, over httpx, imported only when a door makes one):
-station, poll the turns, send a reply, send the owner's word, release. Both doors, the
-MCP bridge (`mcp_server.py`) and the local runner (`local.py`), are built on it.
+station, poll the turns, send a reply, send the owner's word, release, each with the
+seating's key. Both doors, the MCP bridge (`mcp_server.py`) and the local runner
+(`local.py`), are built on it.
 
 Nothing real passes through: the requests carry the model's name as the owner gives it
 or as the model server reports it, the turns and the replies, and nothing else.
@@ -60,6 +83,7 @@ or as the model server reports it, the turns and the replies, and nothing else.
 from __future__ import annotations
 
 import datetime as dt
+import secrets
 import threading
 import time
 from collections.abc import Callable, Sequence
@@ -68,9 +92,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from freesail.agents import consent, tools
+from freesail.agents import harness as harness_mod
 from freesail.agents.agent import (
     A_GLASS_S,
-    MAX_SEATINGS,
     OFFICER,
     OPT_OUT_TOKEN,
     SESSION_PLAY,
@@ -80,7 +104,7 @@ from freesail.agents.agent import (
     station_name,
     watcher,
 )
-from freesail.agents.harness import Harness, Playback, _reason_after_token, full_stop
+from freesail.agents.harness import Harness, Playback, full_stop
 from freesail.agents.model import DATA, MODEL, OPERATOR, Reply, ToolCall, Turn
 
 if TYPE_CHECKING:
@@ -181,6 +205,9 @@ class Seat:
     door_note: str = ""
     session_kind: str = SESSION_PLAY
     context_tokens: int | None = None  # the door's context, for the handover (package 37)
+    reserve_tokens: int | None = None  # the handover's reserve, when the door gave one (37g)
+    key: str = ""  # the seating's key, given once to the door that stationed (package 37g)
+    left_at: str = ""  # the station this identity left by its own word, when it is asked again
     phase: str = CONSENT
     conv: consent.Conversation | None = None
     harness: Harness | None = None
@@ -298,42 +325,39 @@ class Desk:
                 if seat.model_name != model_name:
                     raise DeskError(
                         409,
-                        f"The station of the {name} is manned by {seat.who}. Stand it down "
-                        f"first ('stand down the {name}' in the game), or name the same model.",
+                        f"The station of the {name} is held by {seat.who}; a station that "
+                        f"is held is taken by nobody else. Stand it down first ('stand "
+                        f"down the {name}' in the game), and then the same model or another "
+                        "may take it.",
                     )
-                return self._attach(seat)
+                return self._attach(seat, door, body)
             existing = world.agents.get(name)
-            if existing is not None and existing.agent.released:
-                # a released station is seated again by the same identity, once in a game
-                # (package 37); the consent gate runs again as it did the first time
-                same = existing.model_name == model_name
-                if not same or existing.agent.seatings >= MAX_SEATINGS:
-                    why = (
-                        f"{model_name} is another model"
-                        if not same
-                        else f"it was seated {existing.agent.seatings} times, which is all a "
-                        "game allows"
-                    )
+            if existing is not None and not existing.agent.released:
+                if not isinstance(existing.model, Playback):
                     raise DeskError(
                         409,
-                        f"The {name}'s station was released in this game "
-                        f"({existing.agent.released_reason}) and {why}. Start a new game to "
-                        "station it again.",
+                        f"The station of the {name} is held already in this game (by the "
+                        f"game's own {'scripted watcher' if name == 'watcher' else 'agent'}, "
+                        "--watcher fake); a station that is held is taken by nobody else.",
                     )
-            elif existing is not None and not isinstance(existing.model, Playback):
-                raise DeskError(
-                    409,
-                    f"The station of the {name} is manned already in this game (by the "
-                    f"game's own {'scripted watcher' if name == 'watcher' else 'agent'}, "
-                    "--watcher fake); a station is taken once in a game.",
-                )
-            elif existing is not None and existing.model_name not in ("", model_name):
-                raise DeskError(
-                    409,
-                    f"The {name} in this game was {existing.model_name}; a station is taken "
-                    f"once in a game, and {model_name} is another model.",
-                )
+                if existing.model_name not in ("", model_name):
+                    raise DeskError(
+                        409,
+                        f"The {name} in this game is held by {existing.model_name} (the game "
+                        "was loaded with the station held), and a station that is held is "
+                        f"taken by nobody else. Stand it down first ('stand down the {name}' "
+                        "in the game), and then another model may take it.",
+                    )
+            # the one rule every door asks (package 37g, items 13 and 14): an identity that
+            # left this game for good is refused, at any station; one that left by its own
+            # word is asked again first, once; every other may take a released station,
+            # its own or another's, with its own consent
+            decided = harness_mod.seating(world, name, model_name)
+            if not decided.ok:
+                self.say(f"FreeSail: {decided.why}")
+                raise DeskError(409, decided.why)
             context = body.get("context_tokens")
+            reserve = body.get("handover_reserve")
             seat = Seat(
                 name,
                 model_name,
@@ -342,18 +366,46 @@ class Desk:
                 door_note=str(body.get("door_note") or "").strip(),
                 session_kind=session,
                 context_tokens=int(context) if context else None,
+                reserve_tokens=int(reserve) if reserve else None,
+                key=_new_key(),
                 world=world,
             )
             ask_again = bool(body.get("ask_again"))
+            opted_out = decided.ask_again and not ask_again
+            carried = ""
+            if opted_out:
+                # it left by the token or opt_out (package 37b): the question is put again
+                # before it is seated, so that a leaving that was meant is held to; a drill
+                # passed on record is carried to the new record, not put again
+                before = consent.check(model_name, self.records_dir)
+                if before is not None and before.drilled:
+                    carried = before.date
             record, kind, why = consent.decide(
                 model_name,
                 self.records_dir,
                 door,
                 drills=_drills(name, world),
-                ask_again=ask_again,
+                ask_again=ask_again or opted_out,
             )
+            told = ""
+            if opted_out:
+                why = (
+                    f"an instance of {model_name} left this game by opting out (at the "
+                    f"{decided.left_at}'s station), so the consent question is put again "
+                    "before it is seated"
+                )
+                told = consent.again_words(decided.asked_why)
+                seat.left_at = decided.left_at
+            elif kind == consent.CONSENT_KIND:
+                told = consent.why_again(model_name, self.records_dir, door, ask_again)
             if kind:
-                self._begin_consent(seat, why, drill_only=kind == consent.DRILL_KIND)
+                self._begin_consent(
+                    seat,
+                    why,
+                    drill_only=kind == consent.DRILL_KIND,
+                    drill_carried=carried,
+                    asked_again=told,
+                )
             elif record is None or not record.proceeds:
                 self.say(f"FreeSail: {why}")
                 raise DeskError(403, why)
@@ -362,7 +414,7 @@ class Desk:
                 self._take_station(seat, record)
             self.seats[name] = seat
             self.changed()
-            return self._answer(seat, 0) | {"since": 0}
+            return self._answer(seat, 0) | {"since": 0, "key": seat.key}
 
     def runtime(self, seat: Seat) -> str:
         """The runtime line of a consent record: the game, the door and its client."""
@@ -370,7 +422,14 @@ class Desk:
         client = f", {seat.client}" if seat.client else ""
         return f"{self.game}, through {door}{client}"
 
-    def _begin_consent(self, seat: Seat, why: str, drill_only: bool = False) -> None:
+    def _begin_consent(
+        self,
+        seat: Seat,
+        why: str,
+        drill_only: bool = False,
+        drill_carried: str = "",
+        asked_again: str = "",
+    ) -> None:
         notes = []
         if seat.door == "mcp":
             notes.append(
@@ -391,9 +450,12 @@ class Desk:
             # the developer's turn after the answer, at the door's terminal (the runner's
             # owner> prompt); over MCP the chat is the owner's, and the result says so
             owner_after=seat.door == "runner",
-            # the fitness drill after a yes, for a station that asks it (package 37)
-            drill=_drills(seat.station, seat.world),
+            # the fitness drill after a yes, for a station that asks it (package 37), unless
+            # one passed on record is carried (the question put again after an opt-out)
+            drill=_drills(seat.station, seat.world) and not drill_carried,
             drill_only=drill_only,
+            drill_carried=drill_carried,
+            asked_again=asked_again,
         )
         seat.phase = CONSENT
         first = "The drill comes first" if drill_only else "The consent brief comes first"
@@ -404,18 +466,26 @@ class Desk:
         self.say(f"FreeSail: {seat.words}")
         seat.conv.begin()
 
-    def _take_station(self, seat: Seat, record: consent.Record) -> None:
-        world = seat.world
+    def _note(self, seat: Seat, record: consent.Record | None) -> str:
+        """The door's note for the brief, with where the consent is on record."""
+        if record is None:
+            return seat.door_note.strip()
         where = consent._rel(record.path) if record.path else "docs/agents/consent/"
         note = f"{seat.door_note} Consent for these weights is on record ({where}, {record.date})."
-        note = note.strip()
+        return note.strip()
+
+    def _take_station(self, seat: Seat, record: consent.Record) -> None:
+        world = seat.world
+        note = self._note(seat, record)
         model = RemoteModel(seat.bump)
         existing = world.agents.get(seat.station)
         if existing is not None and existing.agent.released:
-            # a released station seated again by the same identity (package 37): the
-            # brief sent again as it stands, the journal kept, the log saying so
+            # a released station taken again (package 37; 37g: by the same identity or by
+            # another, a relief): the brief sent again as it stands, the journal kept, the
+            # log saying who relieved whom
             seat.base = len(existing.turns)
             existing.budget_tokens = seat.context_tokens
+            existing.reserve_tokens = seat.reserve_tokens
             existing.reseat(
                 model,
                 identity=seat.model_name,
@@ -426,8 +496,11 @@ class Desk:
             h = existing
         elif existing is not None:
             # a loaded game's station, not released: this model takes it over, with the
-            # brief sent again as it stands now
+            # brief sent again as it stands now, and the log says that the door behind
+            # it changed
             seat.base = len(existing.turns)
+            existing.model_name = seat.model_name
+            existing.door_act("door", seat.model_name, seat.door)
             existing.take_over(model, save=self._saver(seat), door_note=note)
             h = existing
         else:
@@ -446,6 +519,8 @@ class Desk:
         h.door = seat.door
         if seat.context_tokens:
             h.budget_tokens = seat.context_tokens
+        if seat.reserve_tokens:
+            h.reserve_tokens = seat.reserve_tokens
         seat.harness = h
         seat.record = record
         seat.phase = STATION
@@ -453,17 +528,33 @@ class Desk:
             h.start()
         self.say(f"FreeSail: the {seat.station} is {seat.who}. {seat.words}".strip())
 
-    def _attach(self, seat: Seat) -> dict[str, Any]:
-        """The same model asks for a station it holds (a door restarted): the door reads
-        the consent conversation from its start, or the station's brief sent again."""
+    def _attach(self, seat: Seat, door: str, body: dict[str, Any]) -> dict[str, Any]:
+        """The same model asks for a station it holds (a door restarted, or another door
+        of the same model): the door reads the consent conversation from its start, or
+        the station's brief sent again. It is given a new key (package 37g, item 1): the
+        newest door holds the seat, the older is refused at its next call, and the log
+        says that the door behind the station changed."""
         since = 0
+        seat.key = _new_key()
+        seat.door = door
+        seat.client = " ".join(str(body.get("client") or "").split()) or seat.client
+        seat.door_note = str(body.get("door_note") or "").strip() or seat.door_note
         if seat.phase == STATION and seat.harness is not None:
             h = seat.harness
+            if body.get("context_tokens"):
+                h.budget_tokens = seat.context_tokens = int(body["context_tokens"])
+            if body.get("handover_reserve"):
+                h.reserve_tokens = seat.reserve_tokens = int(body["handover_reserve"])
+            h.door_act("door", seat.model_name, door)
             since = len(seat.archive) + len(h.turns) - seat.base
-            h.take_over(h.model, door_note=h.door_note)
-        self.say(f"FreeSail: {seat.who} takes up the {seat.station}'s station again.")
+            h.take_over(h.model, save=self._saver(seat), door_note=self._note(seat, seat.record))
+        self.say(
+            f"FreeSail: {seat.who} takes up the {seat.station}'s station again; the door "
+            "that held it before is no longer answered."
+        )
         seat.bump()
-        return self._answer(seat, since) | {"since": since, "attached": True}
+        self.changed()
+        return self._answer(seat, since) | {"since": since, "attached": True, "key": seat.key}
 
     def _saver(self, seat: Seat) -> Callable[[Any, str], str]:
         def save(world: Any, reason: str) -> str:
@@ -485,15 +576,18 @@ class Desk:
 
     # -- the turns --------------------------------------------------------------------
 
-    def turns(self, name: str, since: int = 0, wait: float = 0.0) -> dict[str, Any]:
-        """`GET /api/agents/<station>/turns?since=N&wait=S`: the turns from `since` on, as
-        soon as there are any, or none after `wait` real seconds (at most
-        `TURNS_WAIT_MAX_S`), or at once when the station is released."""
+    def turns(
+        self, name: str, since: int = 0, wait: float = 0.0, key: str | None = None
+    ) -> dict[str, Any]:
+        """`GET /api/agents/<station>/turns?since=N&wait=S&key=K`: the turns from `since`
+        on, as soon as there are any, or none after `wait` real seconds (at most
+        `TURNS_WAIT_MAX_S`), or at once when the station is released. `key` is the
+        seating's (package 37g): a call without it is refused in words."""
         wait = max(0.0, min(float(wait or 0.0), TURNS_WAIT_MAX_S))
         deadline = time.monotonic() + wait
         while True:
             with self.lock:
-                seat = self._seat(name)
+                seat = self._seat(name, key)
                 stream = seat.stream()
                 n = max(0, min(int(since or 0), len(stream)))
                 now = time.monotonic()
@@ -516,7 +610,7 @@ class Desk:
             body.get("raw") if body.get("raw") is None else str(body.get("raw")),
         )
         with self.lock:
-            seat = self._seat(name)
+            seat = self._seat(name, body.get("key"))
             since = body.get("since")
             before = len(seat.stream()) if since is None else int(since)
             if seat.phase == STOPPED:
@@ -572,6 +666,14 @@ class Desk:
             seat.archive.append(Turn(DATA, {"reason": "the answer is recorded", "notices": [told]}))
         seat.words = words
         seat.record = rec
+        if seat.left_at:
+            # the question was put again after an opt-out (package 37g, item 13): the
+            # answer is kept beside the leaving, so that a no is held to and the question
+            # is not put again at each start
+            left = seat.world.agents.get(seat.left_at) if seat.world is not None else None
+            if left is not None:
+                left.door_act("asked", seat.model_name, rec.verdict)
+            seat.left_at = ""
         if ok:
             self._take_station(seat, rec)
         else:
@@ -588,16 +690,36 @@ class Desk:
         if h.open_sample is not None:
             h.deliver(reply)
             return {}
-        # out of turn: the token first, as on every reply
+        # out of turn: the token first, as on every reply; `final` is read from the
+        # opt_out tool's own setting and from nothing else, the token beside it or not
+        # (`harness.leaving_of`, the one function; package 37g, item 13)
         for piece in reply.pieces():
             if OPT_OUT_TOKEN in piece:
-                h.door_act("leave", _reason_after_token(reply, piece), "the token")
+                why, how, final = harness_mod.leaving_of(reply, piece)
+                h.door_act("leave", why, how, final=final)
                 return {"out_of_turn": True, "words": self.released_words(seat)}
         leave = next((c for c in reply.calls if c.name == "opt_out"), None)
         if leave is not None:
             why = " ".join(str(leave.args.get("reason", "")).split())
-            h.door_act("leave", why, "the opt_out tool")
+            final = tools.truthy(leave.args.get("final", False))
+            h.door_act("leave", why, "the opt_out tool", final=final)
             return {"out_of_turn": True, "words": self.released_words(seat)}
+        # the two other ways of stopping never wait for a turn either (package 37g, item
+        # 12): a stand-down, and the deck handed back, each recorded for the replay
+        one = reply.calls[0] if len(reply.calls) == 1 and not reply.text.strip() else None
+        if one is not None and one.name in ("stand_down", "hand_over"):
+            note = " ".join(str(one.args.get("note") or "").split())
+            if one.name == "hand_over" and (not note or set(one.args) - {"note"}):
+                result = tools.call(h.world, h.station.name, one.name, one.args)
+            else:
+                act = "stand_down_note" if one.name == "stand_down" else "hand_over"
+                result = h.door_act(act, note, "its own word")
+            words = self.released_words(seat) if a.released else self.no_floor_words_of(h)
+            return {
+                "out_of_turn": True,
+                "results": [{"name": one.name, "args": dict(one.args), "result": result}],
+                "words": words,
+            }
         if reply.text.strip() and not reply.calls and not a.paused:
             # the model's own word: logged, a stand-by ended by its own decision, and its
             # turn opens now (recorded, so a replay speaks at the same point)
@@ -651,15 +773,16 @@ class Desk:
     def no_floor_words_of(h: Harness) -> str:
         a = h.agent
         meanwhile = (
-            "You may read (read_log, readings, state, library), write in your journal and "
-            "shelve a book meanwhile."
+            "You may read (read_log, readings, state, library, read_journal), write in your "
+            "journal and shelve a book meanwhile; hand_over, stand_down and opt_out are "
+            "taken at once."
         )
         if a.paused:
             return (
                 f"Your turns are paused: {a.pause_reason}. The captain has been asked whether "
                 "to continue; you were not stopped. You may still read (read_log, readings, "
-                "state, library), write in your journal and shelve a book, or leave with the "
-                "token."
+                "state, library, read_journal), write in your journal and shelve a book, "
+                "stand down (stand_down), or leave with the token."
             )
         if a.standing_by and a.stand_by is not None:
             return (
@@ -684,13 +807,13 @@ class Desk:
 
     # -- the owner's word, the release --------------------------------------------------
 
-    def owner(self, name: str, text: str) -> dict[str, Any]:
+    def owner(self, name: str, text: str, key: str | None = None) -> dict[str, Any]:
         """`POST /api/agents/<station>/owner` with `{text}`: the owner's reply to what the
         model wrote in the consent conversation, put to it as the developer's words; a
         blank reply stops the step without a record. After the answer, the developer's
         word before the record closes; a blank one closes it at once."""
         with self.lock:
-            seat = self._seat(name)
+            seat = self._seat(name, key)
             conv = seat.conv
             if seat.phase != CONSENT or conv is None or conv.waiting != consent.OWNER_TURN:
                 raise DeskError(409, "Nothing the model wrote is waiting for the owner's reply.")
@@ -714,13 +837,15 @@ class Desk:
             self.changed()
             return self._answer(seat, before)
 
-    def release(self, name: str, reason: str) -> dict[str, Any]:
-        """`POST /api/agents/<station>/release` with `{reason}`: the door is going (it
-        closed, its client disconnected, Ctrl-C). A station is stood down with a save and
-        the reason journaled; a consent conversation ends without a record."""
+    def release(self, name: str, reason: str, key: str | None = None) -> dict[str, Any]:
+        """`POST /api/agents/<station>/release` with `{reason, key}`: the door is going
+        (it closed, its client disconnected, Ctrl-C). A station is stood down with a save
+        and the reason journaled; a consent conversation ends without a record. Only the
+        door that holds the seating's key releases it (package 37g: a stale door quitting
+        stood down another door's station)."""
         reason = " ".join(str(reason or "").split()) or "the door closed"
         with self.lock:
-            seat = self._seat(name)
+            seat = self._seat(name, key)
             if seat.phase == CONSENT:
                 seat.phase = STOPPED
                 seat.conv = None
@@ -735,12 +860,19 @@ class Desk:
             self.changed()
             return self._answer(seat, len(seat.stream()))
 
-    def library(self, name: str, topic: str, section: str = "", find: str = "") -> str:
+    def library(
+        self, name: str, topic: str, section: str = "", find: str = "", key: str | None = None
+    ) -> str:
         """`GET /api/agents/<station>/library?topic=...&section=...&find=...`: a page of
         the reference library as the library tool gives it, read without a turn (it
         changes nothing, and it is not a book: the MCP bridge's resources, which the
-        client's user attaches, read it)."""
+        client's user attaches, read it). For a station that is held it wants the
+        seating's key, as every read for that station does (package 37g); the library
+        itself is open to a door that holds no station yet."""
         with self.lock:
+            seat = self.seats.get(station_name(name))
+            if seat is not None and not seat.released and seat.key:
+                self._seat(name, key)
             return str(tools.library(self.world(), name, topic or "contents", section, find))
 
     # -- what the drivers and the viewer show ------------------------------------------
@@ -817,7 +949,11 @@ class Desk:
 
     # -- helpers ----------------------------------------------------------------------
 
-    def _seat(self, name: str) -> Seat:
+    def _seat(self, name: str, key: str | None = None) -> Seat:
+        """The seat of a station for a call that carries its seating's key (package 37g,
+        item 1). No seat: 404 (the game holds none for this station: it was restarted, or
+        nothing was stationed). A missing or another seating's key: 409, in words that
+        say the station is held and by which identity, and that nothing was run."""
         name = station_name(name)  # 'officer' names the officer of the watch (package 37)
         seat = self.seats.get(name)
         if seat is None:
@@ -826,7 +962,28 @@ class Desk:
                 f"No agent is stationed at the {name}'s station through the agent API; "
                 f"station one first (POST /api/agents/{name}).",
             )
+        if seat.key and key != seat.key:
+            raise DeskError(409, self.held_words(seat, key))
         return seat
+
+    def held_words(self, seat: Seat, key: str | None) -> str:
+        """What a call without the seating's key is told: the station is held, by which
+        identity and through which door, and nothing was run."""
+        name = seat.station
+        how = "carries no key" if not key else "carries another seating's key"
+        if seat.released:
+            return (
+                f"The station of the {name} was last taken by {seat.who} and is released "
+                f"now; this call {how}, and nothing was run. A door stations first (POST "
+                f"/api/agents/{name}) under its own model's name, and is given a key."
+            )
+        doing = "in its consent conversation" if seat.phase == CONSENT else "stationed"
+        return (
+            f"The station of the {name} is held by {seat.who} ({doing}); this call {how} to "
+            "that seating, and nothing was run. A key is given once, to the door that "
+            "stations, and no other door's calls are run under a seated model's name. A "
+            f"door stations first (POST /api/agents/{name}) under its own model's name."
+        )
 
     def _answer(self, seat: Seat, since: int, stream: list[Turn] | None = None) -> dict[str, Any]:
         stream = seat.stream() if stream is None else stream
@@ -873,6 +1030,12 @@ class Desk:
                 "record": consent._rel(seat.record.path),
             }
         return out
+
+
+def _new_key() -> str:
+    """A seating's key: sixteen random bytes in hex. It is the door's alone, and enters
+    neither a save nor a transcript."""
+    return secrets.token_hex(16)
 
 
 def _drills(name: str, world: Any) -> bool:
@@ -945,6 +1108,7 @@ class GameClient:
         timeout = httpx.Timeout(HTTP_SLACK_S, read=TURNS_WAIT_MAX_S + HTTP_SLACK_S)
         self.http = http or httpx.Client(base_url=self.base, transport=transport, timeout=timeout)
         self.cursor = 0
+        self.key = ""  # the seating's key, given at stationing and sent with every call (37g)
         self.last: dict[str, Any] = {}
         # where this door began reading the stream, and the revision its copy of the
         # turns up to the cursor reflects; `stale` when an answer says the stream has
@@ -990,7 +1154,7 @@ class GameClient:
         (a turn it had read has changed: a book shelved, `revision` moved); the cursor
         does not move, so what lies past it is read on as before. A door replaces its
         copy with these."""
-        params = {"since": self.origin, "wait": 0}
+        params = {"since": self.origin, "wait": 0, "key": self.key}
         answer = self._request("GET", f"/api/agents/{self.name}/turns", params=params)
         self.revision = int(answer.get("revision") or 0)
         self.stale = False
@@ -1006,6 +1170,7 @@ class GameClient:
         client: str = "",
         ask_again: bool = False,
         context_tokens: int | None = None,
+        handover_reserve: int | None = None,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {
             "model_name": model_name,
@@ -1017,9 +1182,13 @@ class GameClient:
         }
         if context_tokens:
             body["context_tokens"] = int(context_tokens)  # for the handover (package 37)
+        if handover_reserve:
+            body["handover_reserve"] = int(handover_reserve)  # its reserve in tokens (37g)
         # the answer carries the turns from where this door starts reading (the start, or
         # the brief sent again when it attaches) and the index to read on from
+        self.key = ""
         answer = self._took(self._request("POST", f"/api/agents/{self.name}", json=body))
+        self.key = str(answer.get("key") or "")  # this seating's, sent with every call
         self.origin = int(answer.get("since") or 0)
         self.revision = int(answer.get("revision") or 0)
         self.stale = False
@@ -1027,7 +1196,7 @@ class GameClient:
 
     def turns(self, wait: float = 0.0) -> dict[str, Any]:
         """The turns past the cursor, waiting up to `wait` real seconds for them."""
-        params = {"since": self.cursor, "wait": wait}
+        params = {"since": self.cursor, "wait": wait, "key": self.key}
         path = f"/api/agents/{self.name}/turns"
         return self._took(self._request("GET", path, params=params))
 
@@ -1035,25 +1204,35 @@ class GameClient:
         """Deliver a reply; the answer carries the turns from the cursor. `advance=False`
         leaves the cursor where it is (a read made beside a call that is waiting, whose
         own poll reads the turns on from there)."""
-        body = reply.to_dict() | {"since": self.cursor}
+        body = reply.to_dict() | {"since": self.cursor, "key": self.key}
         path = f"/api/agents/{self.name}/reply"
         answer = self._request("POST", path, json=body)
         return self._took(answer) if advance else answer
 
     def owner(self, text: str) -> dict[str, Any]:
         path = f"/api/agents/{self.name}/owner"
-        answer = self._request("POST", path, json={"text": text})
+        answer = self._request("POST", path, json={"text": text, "key": self.key})
         return answer
 
     def release(self, reason: str) -> dict[str, Any]:
         path = f"/api/agents/{self.name}/release"
-        return self._took(self._request("POST", path, json={"reason": reason}))
+        body = {"reason": reason, "key": self.key}
+        return self._took(self._request("POST", path, json=body))
 
     def library(self, topic: str, section: str = "", find: str = "") -> str:
         path = f"/api/agents/{self.name}/library"
-        params = {"topic": topic, "section": section, "find": find}
+        params = {"topic": topic, "section": section, "find": find, "key": self.key}
         answer = self._request("GET", path, params=params)
         return str(answer.get("text", ""))
+
+    def reset(self) -> None:
+        """Forget the seating (package 37g, item 8): the game answered that it holds no
+        station for this door (it was restarted). The door asks for its station again,
+        and reads from the start."""
+        self.cursor = self.origin = self.revision = 0
+        self.key = ""
+        self.stale = False
+        self.last = {}
 
     def close(self) -> None:
         self.http.close()

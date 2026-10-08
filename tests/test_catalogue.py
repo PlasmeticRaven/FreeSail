@@ -70,16 +70,46 @@ NEW = [
 # The milestone 2 timings, frozen (spec M3 §1): step durations, or a script's timing.
 M2_TIMINGS = {
     "brace": [45.0],
+    # package 37f: the four of milestone 2 stand; the two after them are `fill away and
+    # steer <course>`, her yards and sheets trimmed to the wind as she pays off to it
     "fill_away": {
         "brace_s": 45.0,
         "helm_deg": 20.0,
         "fill_off_deg": 55.0,
         "fall_off_timeout_s": 180.0,
+        "retrim_s": 20.0,
+        "pay_off_timeout_s": 240.0,
     },
     "furl_gaff": [90.0, 120.0],
     "furl_jibheaded": [45.0, 90.0],
     "furl_square": [60.0, 150.0],
-    "heave_to": {"brace_s": 45.0, "helm_deg": 15.0},
+    # package 37f: brace_s and helm_deg stand; the rest is the lying to and its keeping
+    # (her way taken off before "Hove to" is said, and the watch's tending afterwards)
+    "heave_to": {
+        "brace_s": 45.0,
+        "helm_deg": 15.0,
+        "near_points": 4.0,
+        "far_points": 7.0,
+        "helm_max_deg": 25.0,
+        "helm_lead_s": 15.0,
+        "sheet_lead_s": 20.0,
+        "sheet_s": 30.0,
+        "aback_points": 2.5,
+        "way_off_kn": 1.5,
+        "way_steady_kn_s": 0.004,
+        "way_most_kn": 4.5,
+        "lie_kn": 0.5,
+        "lean_points_kn": 1.0,
+        "quiet_deg_s": 0.25,
+        "lie_s": 20.0,
+        "way_off_timeout_s": 600.0,
+        "round_points": 1.0,
+        "round_s": 20.0,
+        "fill_s": 60.0,
+        "abaft_points": 9.0,
+        "abaft_s": 120.0,
+        "keep_hands": 4.0,
+    },
     "reef_gaff": [45.0, 180.0, 60.0],
     "reef_square": [60.0, 150.0, 90.0],
     "set_gaff": [60.0, 120.0, 30.0],

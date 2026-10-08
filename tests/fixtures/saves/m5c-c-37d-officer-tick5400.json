@@ -1,0 +1,661 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "build": {
+    "name": "m5c-c/37d",
+    "rules": "c9d048803e0f591d"
+  },
+  "builds": [
+    {
+      "name": "m5c-c/37d",
+      "rules": "c9d048803e0f591d"
+    }
+  ],
+  "seed": 7,
+  "scenario": {
+    "name": "The passage for gate 5b, Ushant to Falmouth",
+    "start_time": "1805-06-10T04:00:00",
+    "wind_from_deg": 225.0,
+    "wind_speed_kn": 15.0,
+    "gustiness": 0.3,
+    "variability": 0.3,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 357.0,
+    "ship_speed_kn": 0.0,
+    "latitude_deg": 48.5,
+    "position": {
+      "lat_deg": 48.5,
+      "lon_deg": -5.033333333333333
+    },
+    "region": "channel-west",
+    "weather": [
+      {
+        "at": "1805-06-10T04:00:00",
+        "from_deg": 225.0,
+        "knots": 15.0,
+        "air_mass": "neutral"
+      },
+      {
+        "at": "1805-06-10T16:00:00",
+        "from_deg": 235.0,
+        "knots": 14.0
+      },
+      {
+        "at": "1805-06-11T04:00:00",
+        "from_deg": 250.0,
+        "knots": 12.0
+      }
+    ],
+    "systems": [
+      {
+        "name": "the old high over Biscay",
+        "kind": "high",
+        "radius_km": 900,
+        "track": [
+          {
+            "at": "1805-06-09T12:00:00",
+            "x_km": 300,
+            "y_km": -500,
+            "hpa": 1024
+          },
+          {
+            "at": "1805-06-11T12:00:00",
+            "x_km": 500,
+            "y_km": -600,
+            "hpa": 1022
+          }
+        ]
+      }
+    ],
+    "climatology": false,
+    "background": {
+      "hpa": 1018.0,
+      "gradient_hpa_per_100km": 0.4,
+      "high_toward_deg": 200.0
+    },
+    "glass": true,
+    "air_mass": "neutral",
+    "sea": true,
+    "instrument": "sextant",
+    "current": null,
+    "sky": {
+      "sky": "clear",
+      "weather": "fine",
+      "visibility": "the horizon"
+    },
+    "chronometer": null,
+    "epitome": null,
+    "nation": null,
+    "people": [],
+    "papers": {},
+    "cargo": {
+      "purse_pounds": 0.0,
+      "goods": {}
+    },
+    "ports": null,
+    "ships": [],
+    "world_orders": []
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/frigate-36.yaml"
+  },
+  "end_tick": 5400,
+  "journal": [
+    [
+      0,
+      "captain",
+      "you have the deck"
+    ],
+    [
+      0,
+      "captain",
+      "you may take a fix"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"night routine\": at sunset then take in the studdingsails; take in the royals"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"morning sail\": at sunrise, if the true wind is under 20 knots then set the royals"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"shorten sail for weather\": when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; take in the topgallants; reef the topsails, one reef"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"keep her full\": when the apparent wind is forward of 55 degrees then bear away one point"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"trim on a shift\": when the true wind veers 1 point or backs 1 point then trim sails"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"tend the sheets\": every glass then trim the sheets"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"heavy weather\": when the true wind exceeds 40 knots for 5 minutes then close reef the topsails; send down the topgallant masts; take in the fore topmast staysail; bend the fore storm staysail"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"storm staysail\": when the fore storm staysail is furled and the true wind exceeds 40 knots then set the fore storm staysail"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"sound the well\": every glass then sound the well"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"bearings\": every glass, if the land is in sight then take a bearing of the land; take a fix"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"bring to for soundings\": at noon then heave to"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"soundings\": when the speed is under 3 knots and the distance run since noon is under 5 miles then heave the deep-sea lead"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"fill away after the cast\": at a sounding, if the distance run since noon is under 5 miles then fill away"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"stand on\": at filled away then shape a course for Falmouth"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"landfall\": when the land is in sight then take a bearing of the land; shape a course for Falmouth"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"lead going\": every glass, if the land is in sight and the distance run since noon exceeds 20 miles then heave the lead"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"lead going in\": every 10 minutes, if the land is in sight and the distance run since noon exceeds 35 miles then heave the lead"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"the outer road\": when the depth is under 20 fathoms then come to an anchor"
+    ],
+    [
+      0,
+      "captain",
+      "set plain sail"
+    ],
+    [
+      0,
+      "captain",
+      "steer N"
+    ],
+    [
+      0,
+      "captain",
+      "take a bearing of the light on Ushant"
+    ]
+  ],
+  "inputs": [
+    {
+      "tick": 0,
+      "line": {
+        "severity": "routine",
+        "kind": "driver.book",
+        "text": "The book of standing orders is the passage's.",
+        "data": {}
+      }
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "you have the deck"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "you may take a fix"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"night routine\": at sunset then take in the studdingsails; take in the royals"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"morning sail\": at sunrise, if the true wind is under 20 knots then set the royals"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"shorten sail for weather\": when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; take in the topgallants; reef the topsails, one reef"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"keep her full\": when the apparent wind is forward of 55 degrees then bear away one point"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"trim on a shift\": when the true wind veers 1 point or backs 1 point then trim sails"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"tend the sheets\": every glass then trim the sheets"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"heavy weather\": when the true wind exceeds 40 knots for 5 minutes then close reef the topsails; send down the topgallant masts; take in the fore topmast staysail; bend the fore storm staysail"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"storm staysail\": when the fore storm staysail is furled and the true wind exceeds 40 knots then set the fore storm staysail"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"sound the well\": every glass then sound the well"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"bearings\": every glass, if the land is in sight then take a bearing of the land; take a fix"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"bring to for soundings\": at noon then heave to"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"soundings\": when the speed is under 3 knots and the distance run since noon is under 5 miles then heave the deep-sea lead"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"fill away after the cast\": at a sounding, if the distance run since noon is under 5 miles then fill away"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"stand on\": at filled away then shape a course for Falmouth"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"landfall\": when the land is in sight then take a bearing of the land; shape a course for Falmouth"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"lead going\": every glass, if the land is in sight and the distance run since noon exceeds 20 miles then heave the lead"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"lead going in\": every 10 minutes, if the land is in sight and the distance run since noon exceeds 35 miles then heave the lead"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"the outer road\": when the depth is under 20 fathoms then come to an anchor"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "set plain sail"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "steer N"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "take a bearing of the light on Ushant"
+    }
+  ],
+  "standing_orders": [
+    {
+      "name": "night routine",
+      "text": "standing order \"night routine\": at sunset then take in the studdingsails; take in the royals",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "morning sail",
+      "text": "standing order \"morning sail\": at sunrise, if the true wind is under 20 knots then set the royals",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "shorten sail for weather",
+      "text": "standing order \"shorten sail for weather\": when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; take in the topgallants; reef the topsails, one reef",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "keep her full",
+      "text": "standing order \"keep her full\": when the apparent wind is forward of 55 degrees then bear away one point",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "trim on a shift",
+      "text": "standing order \"trim on a shift\": when the true wind veers 1 point or backs 1 point then trim sails",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "tend the sheets",
+      "text": "standing order \"tend the sheets\": every glass then trim the sheets",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 3,
+      "last_fired_tick": 5400,
+      "given_tick": 0
+    },
+    {
+      "name": "heavy weather",
+      "text": "standing order \"heavy weather\": when the true wind exceeds 40 knots for 5 minutes then close reef the topsails; send down the topgallant masts; take in the fore topmast staysail; bend the fore storm staysail",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "storm staysail",
+      "text": "standing order \"storm staysail\": when the fore storm staysail is furled and the true wind exceeds 40 knots then set the fore storm staysail",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "sound the well",
+      "text": "standing order \"sound the well\": every glass then sound the well",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "bearings",
+      "text": "standing order \"bearings\": every glass, if the land is in sight then take a bearing of the land; take a fix",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 3,
+      "last_fired_tick": 5400,
+      "given_tick": 0
+    },
+    {
+      "name": "bring to for soundings",
+      "text": "standing order \"bring to for soundings\": at noon then heave to",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "soundings",
+      "text": "standing order \"soundings\": when the speed is under 3 knots and the distance run since noon is under 5 miles then heave the deep-sea lead",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "fill away after the cast",
+      "text": "standing order \"fill away after the cast\": at a sounding, if the distance run since noon is under 5 miles then fill away",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "stand on",
+      "text": "standing order \"stand on\": at filled away then shape a course for Falmouth",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "landfall",
+      "text": "standing order \"landfall\": when the land is in sight then take a bearing of the land; shape a course for Falmouth",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 1,
+      "given_tick": 0
+    },
+    {
+      "name": "lead going",
+      "text": "standing order \"lead going\": every glass, if the land is in sight and the distance run since noon exceeds 20 miles then heave the lead",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "lead going in",
+      "text": "standing order \"lead going in\": every 10 minutes, if the land is in sight and the distance run since noon exceeds 35 miles then heave the lead",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "the outer road",
+      "text": "standing order \"the outer road\": when the depth is under 20 fathoms then come to an anchor",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    }
+  ],
+  "agents": [
+    {
+      "station": {
+        "name": "officer of the watch",
+        "authority": "officer, levels 0 to 2",
+        "policy": {
+          "every_s": 1800,
+          "events": [
+            "notable",
+            "urgent"
+          ],
+          "lockstep": true
+        },
+        "patience_s": 3600,
+        "brief": "You are the officer of the watch, in the place of Mr Pearce, and you hold the deck from the captain's word ('you have the deck') until he takes it back ('I have the deck') or you hand it over. You have what the captain has, the log and the readings, and no more. While you have the deck you keep the ship as the captain's night orders say: his standing orders stand, the book holds them, and your own orders are given with submit_order in the order language, as he would type them; the log says each as yours ('By the officer of the watch: taking in the royals'). Your orders are checked against your station's domain, stated above: sail handling, the yards, the lines, the lead and the log, the lookout and the pilot's hail; the course, the manoeuvres, the anchor, all hands and the captain's book are his, unless his word for the watch allows a named thing. A standing order you give carries your own rank and never the captain's, and where it crosses his the captain's stands and the log says yours was countermanded. When you stand by, say until what event or bell: the standing orders hold the deck meanwhile and an urgent line wakes you at once. The captain may ask you a question (answer it with the answer tool, plainly, from the readings and the log) or tell you something; call him with a word in the log when a thing is his to decide, as a lieutenant of 1806 informed the captain of every strange sail and every shift of wind. When the harness asks for it, or when you give the deck back (hand_over), write the handover note in the officer's voice: what happened, what was ordered, what you noticed, what you are watching for; it is journaled and the relief reads it. Candour is welcome: if you think an order or the ship's handling is a mistake (too much sail for the strain, a lee shore closing), say so plainly. Anything you want on the record, put in your journal.",
+        "domain": "officer",
+        "person": "Mr Pearce",
+        "rank": "first lieutenant",
+        "drill": true
+      },
+      "session_kind": "a test session, exercising a feature of the game with a scripted or live model",
+      "door_note": "",
+      "stationed_tick": 0,
+      "stationed_after_orders": 2,
+      "stationed_after_inputs": 3,
+      "state": "standing by",
+      "state_words": "standing by until eight bells; with the deck since Morning watch, 8 bells (04:00)",
+      "last_sample_tick": 0,
+      "model_name": "",
+      "door": "",
+      "stand_by_ends_turn": true,
+      "transcript": [
+        {
+          "tick": 0,
+          "after_orders": 2,
+          "reply": {
+            "text": "I have the deck, sir.",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Took the deck off Ushant."
+                }
+              }
+            ],
+            "raw": null
+          }
+        },
+        {
+          "tick": 0,
+          "after_orders": 2,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "submit_order",
+                "args": {
+                  "text": "take a fix"
+                }
+              }
+            ],
+            "raw": null
+          }
+        },
+        {
+          "tick": 0,
+          "after_orders": 2,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "submit_order",
+                "args": {
+                  "text": "heave the log"
+                }
+              }
+            ],
+            "raw": null
+          }
+        },
+        {
+          "tick": 0,
+          "after_orders": 2,
+          "reply": {
+            "text": "The departure is fixed; standing by.",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "eight bells"
+                }
+              }
+            ],
+            "raw": null
+          }
+        }
+      ],
+      "deck": true,
+      "seatings": 1,
+      "budget_tokens": null
+    }
+  ],
+  "agent_journals": {
+    "officer of the watch": [
+      {
+        "tick": 0,
+        "stamp": "Morning watch, 8 bells (04:00)",
+        "kind": "agent.deck",
+        "text": "Took the deck from the captain."
+      },
+      {
+        "tick": 0,
+        "stamp": "Morning watch, 8 bells (04:00)",
+        "kind": "agent.deck",
+        "text": "Allowed by the captain: take a fix."
+      },
+      {
+        "tick": 0,
+        "stamp": "Morning watch, 8 bells (04:00)",
+        "kind": "note",
+        "text": "Took the deck off Ushant."
+      },
+      {
+        "tick": 0,
+        "stamp": "Morning watch, 8 bells (04:00)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until eight bells."
+      }
+    ]
+  },
+  "world_orders": []
+}

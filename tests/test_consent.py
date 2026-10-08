@@ -68,18 +68,31 @@ def test_the_consent_brief_is_the_file_below_its_rule_with_every_placeholder_fil
 
 
 def test_the_brief_says_what_the_harness_does_in_its_own_numbers():
-    """Each claim the brief makes is a number or a behaviour of the code."""
-    from freesail.agents.agent import A_WATCH_S
+    """Each claim the brief makes is a number or a behaviour of the code. Since the leaner
+    brief of 2026-10-07 (package 37g's second pass) the consent brief keeps one number, the
+    ten real minutes, and the kinds of sign the harness watches for; a station's own
+    numbers are in that station's brief, as the consent brief's *The record* now says."""
+    from freesail.agents.agent import A_WATCH_S, OFFICER_BRIEF, OFFICER_PATIENCE_S, WATCHER_BRIEF
     from freesail.agents.harness import WELFARE_REPEAT_N, WELFARE_UNATTENDED_REAL_S
 
     text = consent.brief_text(WEIGHTS, "r", "runner")
-    assert WELFARE_REPEAT_N == 3 and "the same order given three times" in text
-    assert A_WATCH_S == 4 * 3600 and "a watch: four hours of ship's time" in text
     assert WELFARE_UNATTENDED_REAL_S == 600 and "ten real minutes" in text
-    assert "saved with the game and shown when the human asks for it" in text  # not private
+    assert (
+        "an order repeated to no effect, orders that undo one another, or no reply at all for "
+        "a long while"
+    ) in text
+    assert "what the harness counts and by what numbers) are in that station's brief" in text
+    assert WELFARE_REPEAT_N == 3
+    assert "the same order submitted three times with no change in the readings" in WATCHER_BRIEF
+    assert A_WATCH_S == 4 * 3600
+    assert "no reply at all for a watch, four hours of the ship's time" in WATCHER_BRIEF
+    assert OFFICER_PATIENCE_S == 3600
+    assert "no reply at all for an hour of the ship's time" in OFFICER_BRIEF
+    assert "three times" not in text and "four hours" not in text and "an hour" not in text
+    assert "saved with the game, shown when the human asks for it" in text  # not private
     assert "not used to train models" in text
     assert "docs/agents/consent/" in text
-    assert "every argument of every tool call count" in text
+    assert "in its text and in every argument of every tool call" in text
     assert "Reasoning that a model server returns apart from the reply is not scanned" in text
     assert "a tool named `opt_out` is always there" in text
 

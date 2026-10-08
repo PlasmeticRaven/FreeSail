@@ -150,9 +150,12 @@ FIVE_POINTS = 5 * 11.25
 
 def test_a_veering_script_is_logged_as_a_veer_and_a_standing_order_sees_it():
     """West to north-west by north over an hour is five points: the log says the wind
-    veered each time it has turned two points since it last said so
-    (World.WIND_SHIFT_LOG_THRESHOLD), at 24 and 48 minutes, and a standing order that waits
-    for the true wind to veer two points fires with the first."""
+    veered each time its ten-minute mean has turned two points since it last said so
+    (World.WIND_SHIFT_LOG_THRESHOLD) and held there a minute (World.WIND_SHIFT_HOLD_S,
+    package 37c). The mean of a steady turn lags it by half the window, five minutes, so
+    the lines come at 24 + 5 + 1 = 30 minutes and, the second measured from the mean the
+    first gave, at 55 minutes. A standing order that waits for the true wind to veer two
+    points reads the instant wind and still fires at 24 minutes."""
     sc = Scenario(start_time=T0, gustiness=0.0, variability=0.0, ship_heading_deg=135.0)
     sc.weather = script((0, 270, 15), (1, 270 + FIVE_POINTS, 15))
     w = make_world(7, FRIGATE, sc)
@@ -163,9 +166,19 @@ def test_a_veering_script_is_logged_as_a_veer_and_a_standing_order_sees_it():
         "Wind veered to WNW, a moderate breeze.",
         "Wind veered to NW, a moderate breeze.",
     ]
-    assert [e.tick for e in shifts] == [pytest.approx(1440, abs=1), pytest.approx(2880, abs=1)]
+    assert [e.tick for e in shifts] == [pytest.approx(1800, abs=2), pytest.approx(3300, abs=2)]
     fired = [e for e in w.log if e.actor == "standing order 'veer'" and e.tick > 0]
     assert fired and fired[0].tick == pytest.approx(1440, abs=1)
+
+
+def test_a_wind_chattering_across_the_points_does_not_fill_the_log():
+    """Package 37c (the Harpy off Penlee): a light wind flicking four points either way
+    every minute wrote a `wind.shift` line at nearly every flick when the line read the
+    instant wind. The mean of it holds still, and the log says nothing."""
+    flicks = [(0, 225, 6)] + [(m / 60, 225 + (45 if m % 2 else -45), 6) for m in range(1, 61)]
+    w = calm_world(script(*flicks))
+    w.run(3600)
+    assert [e for e in w.log if e.kind == "wind.shift"] == []
 
 
 def test_a_backing_script_is_logged_as_a_backing():
@@ -304,9 +317,10 @@ def test_a_scenario_world_replays_from_its_save(tmp_path):
 
 # -- trim on a shift (package 29b; playtest 7, finding 3) ----------------------------------
 
+# with the dialect's own guard since package 37f: not while she is hove to
 TRIM_ON_A_SHIFT = (
     'standing order "trim on a shift": when the true wind veers 1 point or backs 1 point '
-    "then trim sails"
+    "and the manoeuvre in hand is not hove to then trim sails"
 )
 
 

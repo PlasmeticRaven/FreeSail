@@ -34,6 +34,65 @@ __all__ = ["Book", "read_orders_file"]
 Result = tuple[str, str, dict[str, Any]]
 
 
+# The readings that take a charted place, by their registry ids, and the words that mean
+# the shore in sight and are no place on any chart (package 37f).
+_CHART_READINGS = ("distance_to", "bearing_by_chart")
+_SHORE_WORDS = frozenset(
+    {"land", "shore", "coast", "nearest land", "nearest shore", "nearest coast", "land in sight"}
+)
+
+
+def check_places(rule: Rule, world: Any) -> None:
+    """A standing order's condition is checked when it is entered (package 37f; the
+    review of gate 5c's playtests, 5.8 and 8.2: the owner needed four tries at
+    'Triangulate', since "the distance to the land" was taken into the book and then held
+    at every firing as "not on the chart"). A condition on the distance to a place, or on
+    its bearing by the chart, must name a place the chart has, or a position pricked on
+    it; else the order is refused here, in words that give the nearest forms the dialect
+    does take: for the shore in sight, "the nearest land"; for a name the chart nearly
+    has, that name. A world with no chart checks nothing, as it reads nothing."""
+    chart = getattr(world, "chart", None)
+    if chart is None or getattr(world, "navigation", None) is None:
+        return
+    from freesail.api import readings as R
+
+    for cond in (rule.trigger.condition, rule.condition):
+        for clause in cond.clauses if cond is not None else ():
+            if clause.reading not in _CHART_READINGS:
+                continue
+            for place in clause.params:
+                if chart.find_feature(place) is None and R._pricked(place) is None:
+                    raise OrderError(_no_such_place(chart, place, clause.reading))
+
+
+def _no_such_place(chart: Any, place: str, reading: str) -> str:
+    said = "the bearing by the chart of" if reading == "bearing_by_chart" else "the distance to"
+    words = " ".join(place.lower().split())
+    bare = words[4:] if words.startswith("the ") else words
+    takes = (
+        f"'{said}' takes a place by its name on the chart ('{said} the Lizard') or a "
+        f"position pricked on it ('{said} 48 20 N 4 36 W')"
+    )
+    if bare in _SHORE_WORDS:
+        return (
+            f"'{place}' is not a place on the chart: {takes}. For the shore in sight say "
+            f"'the nearest land' (as in 'when the nearest land is under half a mile'), and "
+            f"for whether any land is in sight, 'the land is in sight'."
+        )
+    names = [f.name for f in chart.features.values() if f.name]
+    near = errors.nearest(bare, [n.lower() for n in names])
+    by_lower = {n.lower(): n for n in names}
+    if near:
+        hint = (
+            " Did you mean "
+            + errors.join_names([f"'{by_lower.get(n, n)}'" for n in near], "or")
+            + "?"
+        )
+    else:
+        hint = " For the shore in sight say 'the nearest land'."
+    return f"'{place}' is not a place on the chart: {takes}.{hint}"
+
+
 class Book:
     def __init__(self, runtime: Runtime | None = None):
         self.runtime = runtime
@@ -102,6 +161,7 @@ class Book:
                 f"or give the new one another name."
             )
         if self.runtime is not None:
+            check_places(rule, self.runtime.world)
             rule.given_tick = self.runtime.world.clock.tick
             self.runtime.arm(rule)
         self.rules.append(rule)

@@ -7,11 +7,21 @@ says to the forecastle about the anchors and the cable.
                                     to the scope the depth wants, the sails furled
     let go the best bower           the anchor let go where she is, whatever her way
     let go the second anchor        the bower not yet down (when the first drags)
+    let go the best bower and veer to <n> fathoms
+                                    the same, the cable veered to that scope and no further
+                                    (`with <n> fathoms`, `in <n> fathoms` likewise)
     veer cable [<n> fathoms]        more cable on the anchor she rides by
     veer to <n> fathoms             the scope veered to
-    heave short                     the cable in to a short stay
+    veer the small bower to <n> fathoms
+                                    on the anchor named (package 37f)
+    heave short                     the cable in to a short stay; no number
+    heave in <n> fathoms            so much of the cable hove in at the capstan
+    heave in to <n> fathoms         the cable hove in to that scope (package 37f)
     weigh                           the anchor hove up, catted and fished; the time by the
                                     scope; no sail set (the owner, 2026-10-02)
+    weigh the small bower           the anchor named, the other cable veered as it comes
+                                    in, or refused in words that name the anchor she rides
+                                    by (package 37f)
     cat and fish the anchor         an anchor left aweigh secured
     back the anchor                 the stream anchor let go on the riding cable
     the ground tackle               the anchors and their cables (a query)
@@ -60,6 +70,7 @@ _EVOLUTIONS = {
     "let go the anchor": "let_go_anchor",
     "veer cable": "veer_cable",
     "heave short": "heave_short",
+    "heave in": "heave_in",
     "weigh": "weigh_anchor",
     "cat and fish the anchor": "cat_and_fish_anchor",
     "back the anchor": "back_anchor",
@@ -122,6 +133,56 @@ def _anchor_words(text: str) -> str | None:
     return words or None
 
 
+# The words about a cable that name no anchor and no number: left out before an anchor's
+# name is looked for in an order to veer, heave in or weigh (package 37f).
+_CABLE_FILLERS = re.compile(
+    r"\b(with|on|by|the|in|to|her|of|and|a|an|cable|cables|more|away|out|scope|veer|veering|"
+    r"anchor|upon)\b"
+)
+# The orders that work a cable already out, each on the anchor named or the one she rides by.
+_CABLE_VERBS = ("veer cable", "heave short", "heave in", "weigh")
+# "in twelve fathoms", "in 12 fathoms of water": a depth, unless it is "of cable"
+_DEPTH_RE = re.compile(
+    r"\bin\s+(?P<n>\d+(?:\.\d+)?|[a-z]+(?:\s+[a-z]+)??(?:\s+and\s+a\s+half)?)\s+fathoms?"
+    r"(?:\s+of\s+water|\s+water)?\b(?!\s+of\s+cable)"
+)
+
+
+def _depth_said(text: str) -> tuple[float | None, str]:
+    """'in twelve fathoms' after `come to an anchor`: the depth to let go in, and the
+    words without it; (None, the words) when none is said."""
+    low = text.lower()
+    m = _DEPTH_RE.search(low)
+    if m is None:
+        return None, text
+    n, _ = _fathoms(m.group("n") + " fathoms")
+    if n is None:
+        return None, text
+    return n, low[: m.start()] + " " + low[m.end() :]
+
+
+def _named_anchor(ship: Any, phrase: str, remainder: str) -> tuple[str | None, str]:
+    """The anchor an order to veer, heave in or weigh names, in the verb's own phrase
+    ('weigh the small bower') or after it ('veer the best bower to 80 fathoms', 'veer to
+    80 fathoms on the best bower'), as the words `GroundTackle.by_words` takes; None when
+    it names none; and whatever words are left that are neither (the refusal names them)."""
+    named = _anchor_in_phrase(phrase)
+    left = " ".join(_CABLE_FILLERS.sub(" ", remainder.lower()).split())
+    if not left:
+        return named, ""
+    tackle = ground_tackle(ship)
+    found = _anchor_in_phrase(left)
+    if found is not None and tackle is not None and tackle.by_words(found) is not None:
+        rest = left
+        for words, _name in _PHRASE_ANCHORS:
+            rest = re.sub(rf"\b{words}\b", " ", rest)
+        rest = " ".join(w for w in rest.split() if w not in ("bower", "anchor"))
+        return found, rest
+    if tackle is not None and tackle.by_words(left) is not None:
+        return left, ""
+    return named, left
+
+
 def execute(ship: Any, order: Order) -> Result:
     """Carry out a ground-tackle order. The verb is the vocabulary's key."""
     verb = order.verb
@@ -135,18 +196,75 @@ def execute(ship: Any, order: Order) -> Result:
     params: dict[str, Any] = {}
     # the anchor named in the verb's own phrase ("let go the small bower") or after it
     named = _anchor_in_phrase(phrase) or None
+    if verb == "come to an anchor":
+        # "in twelve fathoms" is the depth to let go in, as the primer has it (package
+        # 37f; the review of gate 5c's playtests, 5.8: it was taken for the scope)
+        depth_said, rest = _depth_said(rest)
+        if depth_said is not None:
+            params["depth_fathoms"] = depth_said
     fathoms, remainder = _fathoms(rest)
     if fathoms is not None:
         params["fathoms"] = fathoms
-    if verb == "veer cable":
-        if phrase.endswith(" to") or remainder.strip().startswith("to "):
-            params["to"] = True
-        rest_words = remainder.strip()
-        if fathoms is None and rest_words and rest_words not in ("away", "to"):
-            raise OrderError(
-                "Veer how much? Say 'veer twenty fathoms', 'veer to ninety fathoms' or "
-                "'veer cable'."
-            )
+    if verb in _CABLE_VERBS:
+        # Package 37f (the review of gate 5c's playtests, 10.4): an anchor's name is
+        # honoured by every order that works a cable, and "to" is kept wherever it is
+        # said. Until now the name reached five verbs only, and "to" was looked for where
+        # the number had been: `veer the best bower to 80 fathoms` veered eighty more, and
+        # `weigh the small bower` weighed the best bower without a word.
+        name, left = _named_anchor(ship, phrase, remainder)
+        if name is not None:
+            params["anchor"] = name
+        said_to = phrase.endswith(" to") or bool(re.search(r"\bto\b", remainder.lower()))
+        if verb == "veer cable":
+            if fathoms is not None and said_to:
+                params["to"] = True
+            if left or (fathoms is None and said_to):
+                if fathoms is None:
+                    raise OrderError(
+                        "Veer how much? Say 'veer twenty fathoms', 'veer to ninety fathoms' "
+                        "or 'veer cable'."
+                    )
+                raise OrderError(
+                    f"'{left}' was not understood after 'veer'. Say 'veer twenty fathoms', "
+                    "'veer to ninety fathoms', 'veer the small bower to ninety fathoms' or "
+                    "'veer cable'."
+                )
+        elif verb == "heave short":
+            if fathoms is not None:
+                # `heave short` takes no number (the review's 5.8: `heave in 70 fathoms`
+                # ran as `heave short` and 163 fathoms came in)
+                n = f"{fathoms:g}"
+                raise OrderError(
+                    f"'Heave short' takes no number: it heaves in to a short stay, a cable and "
+                    f"a half the depth. To heave in to a scope say 'heave in to {n} fathoms'; "
+                    f"to heave in so much, 'heave in {n} fathoms'."
+                )
+            if left:
+                raise OrderError(
+                    f"'{left}' was not understood after 'heave short'; say 'heave short' or "
+                    "'heave short on the small bower'."
+                )
+        elif verb == "heave in":
+            if left:
+                raise OrderError(
+                    f"'{left}' was not understood after 'heave in'; say 'heave in twenty "
+                    "fathoms', 'heave in to eighty fathoms' or 'heave in the small bower to "
+                    "eighty fathoms'."
+                )
+            if fathoms is None:
+                # "heave in", "heave in the cable": to a short stay, as it always was
+                evo = _EVOLUTIONS["heave short"]
+                verb = "heave short"
+            elif said_to:
+                params["to"] = True
+        else:
+            if fathoms is not None:
+                raise OrderError("'Weigh' takes no number: it heaves the anchor up to the bows.")
+            if left:
+                raise OrderError(
+                    f"'{left}' was not understood after 'weigh'; say 'weigh' or 'weigh the "
+                    "small bower'."
+                )
     elif verb in (
         "come to an anchor",
         "let go the anchor",
@@ -154,7 +272,22 @@ def execute(ship: Any, order: Order) -> Result:
         "back the anchor",
         "moor",
     ):
-        words = _anchor_words(remainder)
+        low = remainder.lower()
+        if verb in ("come to an anchor", "let go the anchor"):
+            # "... and veer to 45 fathoms", "... with 45 fathoms of cable": the scope to
+            # veer, and no further (package 37f; the owner's ruling: `let go` keeps the
+            # scope the depth wants, says it, and takes a number). After `let go`, which
+            # lets go where she is, "in twenty fathoms" is the scope too, as it always was.
+            if fathoms is None and re.search(r"\b(veer|veering|scope)\b", low):
+                raise OrderError(
+                    "Veer to how much? Say 'let go the best bower and veer to forty-five "
+                    "fathoms', or 'let go the best bower' for five times the depth."
+                )
+            if fathoms is not None:
+                low = re.sub(
+                    r"\b(and|veer|veering|to|scope|of|cable|out|a|water|depth)\b", " ", low
+                )
+        words = _anchor_words(low)
         if words and named is None:
             named = words
         if named is not None:

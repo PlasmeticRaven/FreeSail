@@ -262,6 +262,21 @@ SEA_BREEZE_FULL_KM = 5.0
 SEA_BREEZE_REACH_KM = 15.0
 SEA_BREEZE_GRADIENT_FREE_KN = 5.0
 SEA_BREEZE_GRADIENT_CAP_KN = 20.0
+# The breeze blows from the sea toward the land as a whole (package 37d; the review of gate
+# 5c's playtests, 5.6: its direction was the bearing of the nearest cell of shore, which
+# turned every few yards as the ship moved, 386 turns of two points in 83 minutes off
+# Penlee on 19 June). Its direction is the coast's trend (`chart.Chart.coast_trend`): the
+# shore's distance differenced over this baseline, a mile or so either way, which is the
+# scale the study gives the breeze itself ("felt a few miles to sea", W §1.4: a wind of
+# the coast, not of a rock or a cove; the figure is judgement). Its strength is scaled by
+# how steeply that distance rises to seaward: full where it rises half a metre in the
+# metre or more (an open coast reads about one; a mile inside a wide bay a half), none
+# where it rises under a seventh (a channel, a sound among islands, a harbour ringed by
+# land, where the field is flat and there is no one shore for a breeze to blow toward);
+# both figures judgement, measured on the chart in docs/dev/TuningNotes.md.
+SEA_BREEZE_TREND_KM = 3.0
+SEA_BREEZE_SLOPE_NONE = 0.15
+SEA_BREEZE_SLOPE_FULL = 0.5
 
 # Coastal fog (W §1.4; the ship observations of [S10]: fog west of the United Kingdom in
 # nearly 4% of observations in June to August and under 2% in December to February;
@@ -1219,6 +1234,12 @@ class Weather:
     # or None where the chart has no field. None (no chart): no coast, no breeze, no fog,
     # and every scenario of the earlier milestones is what it was.
     coast: Any = None
+    # `coast_trend` is the World's second hook (package 37d): a callable of a point of the
+    # plane giving the bearing toward the land as a whole in degrees and how steeply the
+    # shore's distance rises to seaward there (0 to 1), or None. None (a class default: a
+    # checkpoint from before, a test's own coast): the breeze blows toward the bearing
+    # `coast` gives, at full strength, as it did.
+    coast_trend: Any = None
 
     def coast_distance_km(self, x_km: float, y_km: float) -> float | None:
         """The distance to the nearest coast (spec §11), from the chart through the
@@ -1234,10 +1255,13 @@ class Weather:
     def sea_breeze(self, x_km: float, y_km: float, when: datetime) -> tuple[float, float]:
         """The sea breeze's velocity (m/s east, north) to add to the surface wind (W §1.4,
         Simpson 1994): a summer, daylight, fine-weather onshore wind of some ten knots at
-        most, strongest in mid-afternoon, felt a few miles to sea and dying at dusk. The
-        onshore direction is the bearing to the nearest coast; the strength is the
-        product of the season's, the hour's, the distance's and the gradient's factors
-        (`SEA_BREEZE_*`), and it blows only in fine weather away from a low's fronts."""
+        most, strongest in mid-afternoon, felt a few miles to sea and dying at dusk. It
+        blows toward the land as a whole: the onshore direction is the coast's trend
+        (`coast_trend`, package 37d; the bearing of the nearest shore where the World
+        gives no trend), and the strength is the product of the season's, the hour's, the
+        distance's and the gradient's factors and of how steeply the shore's distance
+        rises there (`SEA_BREEZE_*`); it blows only in fine weather away from a low's
+        fronts."""
         if self.coast is None or when.month not in SEA_BREEZE_MONTHS:
             return 0.0, 0.0
         hour = when.hour + when.minute / 60.0
@@ -1277,6 +1301,20 @@ class Weather:
         speed = units.knots_to_ms(SEA_BREEZE_MAX_KN) * diurnal * reach * damping
         if speed <= 0.0:
             return 0.0, 0.0
+        if self.coast_trend is not None:
+            # toward the land as a whole, and little or none where the shore's distance
+            # is flat (read only now, while a breeze blows: a few microseconds)
+            trend = self.coast_trend(x_km, y_km)
+            if trend is None:
+                return 0.0, 0.0
+            bearing_deg, steep = trend
+            speed *= min(
+                1.0,
+                max(0.0, steep - SEA_BREEZE_SLOPE_NONE)
+                / (SEA_BREEZE_SLOPE_FULL - SEA_BREEZE_SLOPE_NONE),
+            )
+            if speed <= 0.0:
+                return 0.0, 0.0
         toward = math.radians(bearing_deg)
         return speed * math.sin(toward), speed * math.cos(toward)
 

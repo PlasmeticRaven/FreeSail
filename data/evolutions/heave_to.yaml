@@ -1,22 +1,37 @@
-# Heave to (M2 simplified, scripted): the courses are hauled up, the driver
-# (spanker) brailed up and the light sails forward of the backed mast clewed
-# up (Luce: "settle down the top-gallant sails"); the yards on the mast
-# carrying the most square sail are braced aback over brace_s while the
-# others stay full, and the helm is put a-lee (helm_deg of rudder toward the
-# wind). On a frigate that is the main topsail to the mast. A vessel whose
-# yards are all on one mast (a topsail schooner, a cutter) is hove to the
-# fore-and-after's way as well (package 32e; Luce 1884, ch. XXXIV, 'To Heave
-# to': "Haul flat aft the main sheet, putting the helm down, and haul the
-# staysail sheet to windward"): her main sheet flat aft, her innermost head
-# sail's sheet held to windward (the sail aback by its sheet, the physics of
-# package 32e), her topsail to the mast if it is set, and her mainsail kept,
-# being her driving sail. The physics does the rest (truth 12: the frigate
-# lies 55 to 60 degrees off the wind at about a knot). The backed yards and
-# the head sail held are remembered in ship.extra["hove_to"] so that
-# fill_away can undo it ("Draw jib").
+# Heave to (scripted): the courses are hauled up, the driver (spanker) brailed up and
+# the light sails forward of the backed mast clewed up (Luce: "settle down the
+# top-gallant sails"); the yards on the mast carrying the most square sail are braced
+# aback over brace_s while the others stay full, and the helm is put a-lee. On a frigate
+# that is the main topsail to the mast. A vessel whose yards are all on one mast (a
+# topsail schooner, a cutter) is hove to the fore-and-after's way as well (package 32e;
+# Luce 1884, ch. XXXIV, 'To Heave to': "Haul flat aft the main sheet, putting the helm
+# down, and haul the staysail sheet to windward"): her main sheet flat aft, her innermost
+# head sail's sheet held to windward (the sail aback by its sheet, the physics of package
+# 32e), her topsail to the mast if it is set, and her mainsail kept, being her driving
+# sail.
+#
+# Her way is taken off first (package 37f). The helm is not lashed a-lee: it is tended
+# from the first, eased and righted as she comes up, so that the way she carries does
+# not take her head through the wind (in the playtest the brig did so from seven knots
+# inside a minute, the helm fixed at helm_deg). "Hove to" is logged when she lies on her
+# tack between near_points and far_points from the wind, with less than way_off_kn of
+# way and her head quiet for lie_s; or at way_off_timeout_s if she is on her tack with
+# the wind before the beam. The backed yards and the tack are then remembered in
+# ship.extra["hove_to"], the record that she is hove to.
+#
+# She is kept there. While the record stands the watch on deck tends the helm and the
+# spanker and jib sheets, without an order and with one routine line a watch, to hold
+# her head between near_points and far_points from the wind on the tack she hove to on
+# (Luce 1866, ch. XXVI: "regulate by easing off, or hauling aft, the spanker and jib
+# sheets"); it costs the watch keep_hands hands. If she is forced round all the same (a
+# shift of many points, a squall) one urgent line says so and the record follows what
+# she is doing: lying on the other tack with a topsail to the mast she is hove to on it;
+# with nothing aback and gathering way she is hove to no longer. The record is cleared
+# by fill away, and by an anchor let go, the anchor aweigh, a tack or a wear, and the
+# ground. The frigate lies five to six points off the wind at about a knot (truth 12).
 #
 # Parameter `tack` (starboard or larboard): the tack to heave to on. She must
-# already be on it in M2; otherwise tack or wear first.
+# already be on it; otherwise tack or wear first.
 id: heave_to
 verb: heave_to
 applies_to: {class: ship}
@@ -25,9 +40,33 @@ params: {tack: null}
 preconditions: []
 timing:
   brace_s: 45     # to lay the after yards aback
-  helm_deg: 15    # rudder toward the wind for "helm a-lee"
+  # The lying to, and its keeping (package 37f). Every figure below is judgement, set on
+  # the four ships at seed 7 (docs/dev/TuningNotes.md, package 37f); the bounds are the
+  # brief's "about four and seven points", which hold Luce's frigate at five and a half.
+  near_points: 4          # her head kept no nearer the wind than this
+  far_points: 7           # nor further from it
+  helm_deg: 15            # the lee helm she carries lying midway between them
+  helm_max_deg: 25        # the most lee helm given her as she falls off
+  helm_lead_s: 15         # the helmsman meets her swing this many seconds ahead
+  sheet_lead_s: 20        # and the hands at the sheets look this far ahead
+  sheet_s: 30             # a sheet worked from as she was hove to, to right aft or off
+  aback_points: 2.5       # nearer the wind than this, the head sheet is hauled to windward
+  way_off_kn: 1.5         # "Hove to" is said with less way than this on her, or her way no longer falling
+  way_steady_kn_s: 0.004  # her way no longer falling: changing by less than this, knots a second
+  way_most_kn: 4.5        # and never said with this much way on her, nor with more than way_off_kn of sternway
+  lie_kn: 0.5             # the headway she is held with: midway between her bounds with this much
+  lean_points_kn: 1.0     # held this many points nearer the wind for each knot beyond it, further off for each knot short
+  quiet_deg_s: 0.25       # and her head swinging no faster than this
+  lie_s: 20               # for this long
+  way_off_timeout_s: 600  # or after this, if she is on her tack with the wind before the beam
+  round_points: 1         # forced round: the wind this far on the other bow
+  round_s: 20             # for this long
+  fill_s: 60              # filled: nothing aback and more than way_off_kn of way for this long
+  abaft_points: 9         # fallen off: her head this far from the wind (a point abaft the beam)
+  abaft_s: 120            # for this long
+  keep_hands: 4           # the hands the tending costs the watch: the spanker and head sheets
 on_start: {log: "Hands to the after braces; heave to."}
-on_complete: {log: "Hove to, {backed} to the mast, helm a-lee.", kind: ship.hove_to, severity: notable}
+on_complete: {log: "Hove to on the {hove_tack} tack, {backed} to the mast, helm a-lee.", kind: ship.hove_to, severity: notable}
 on_fail: {log: "Could not heave to: {reason}.", kind: evolution.failed, severity: notable}
 # crew (package 19): the after braces; the marines "divide at the gear of main and
 # mizzen top-sails" (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship', 'Idlers, Firemen, Marines').

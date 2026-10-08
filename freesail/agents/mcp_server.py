@@ -85,6 +85,24 @@ count is one the model has not read.
 argument of every tool call, and `opt_out` is always listed. Out of turn too: the game
 looks for it in a call that comes when the floor is not the model's.
 
+**The seating's key, and a game that has none for this door** (package 37g, items 1 and
+8). The game gives the door a key when it stations, and the `GameClient` sends it with
+every call; a call the game refuses for want of it (another door holds the station now)
+stops this bridge, in the game's own words, and it does not ask again of itself: two
+doors under one model's name would otherwise take the seat from each other at every
+call. When the game answers that it holds **no** station for this door (404: it was
+restarted, or another game was started in its place), the bridge forgets its seating and
+asks for its station again, through the ordinary gate, and the brief comes first as at
+the first contact (until this package Claude Desktop had to be restarted after every
+restart of the game). It does not ask again after a release: a station stood down is the
+captain's or the model's decision, and a new seating is the owner's to start.
+
+**The wait adapts when a call is cut short** (package 37g, item 8; the review's 5.4: a
+cloud relay cut calls at a minute, and the bridge named `--wait 50` and went on waiting
+two hundred seconds). A waiting call the client cancels after fewer seconds than the
+wait shortens the wait to a little under what the client allowed (`WAIT_MARGIN_S` under
+it, never below `WAIT_FLOOR_S`), and the note after the next result says so.
+
 **The shelf** (package 28d). The model's conversation lives in the MCP client, not in
 the game, so `shelve` cannot take a book's pages out of it: the game notes the book as
 shelved, says so plainly in the result (the client keeps its own conversation; the
@@ -138,6 +156,8 @@ __all__ = [
     "SAY_DESCRIPTION",
     "STILL_WAITING",
     "WAIT_CEILING_MAX_S",
+    "WAIT_FLOOR_S",
+    "WAIT_MARGIN_S",
     "WAIT_SLICE_S",
     "Bridge",
     "build_server",
@@ -178,6 +198,14 @@ PROGRESS_EVERY_S = 15.0
 # bridge; a poll a second or two is nothing to a game on the same machine).
 WAIT_SLICE_S = 2.0
 
+# The wait adapts to a client that cuts calls short (package 37g, item 8): after a waiting
+# call is cancelled, the bridge waits this many seconds less than the client allowed
+# (judgement: ten, the margin the owner's `--wait 50` leaves under a relay that cuts at a
+# minute), and never less than the floor (judgement: a quarter of a minute; under it the
+# model would do little but call again).
+WAIT_MARGIN_S = 10.0
+WAIT_FLOOR_S = 15.0
+
 # The first words of the result of a wait that ended with no turn (`still_waiting`).
 STILL_WAITING = "Still waiting"
 
@@ -212,8 +240,9 @@ def door_note(wait: float) -> str:
     return (
         "This door is MCP: the harness sees your tool calls and not the text of the chat. "
         "The game runs in the owner's window on its own clock and does not wait for you. "
-        "Your turn opens at each sampling point (the glass, a notable event, the end of a "
-        "stand-by, or a question from the captain) and stays open until you hand the floor "
+        "Your turn opens at each sampling point (the glass, a notable or urgent event, the "
+        "end of a stand-by, or a question or a word from the captain) and stays open until "
+        "you hand the floor "
         "back: say(text) puts your words in the log under your mark and hands it back; "
         "stand_by(until) stands by and hands it back. After say or stand_by the call is "
         f"held open until your next turn and returns it, for up to {_seconds_words(wait)}; "
@@ -223,10 +252,12 @@ def door_note(wait: float) -> str:
         "it at your own word and open your turn. Your client keeps this conversation, not "
         "the game: shelve notes a book as put back and the game will not show its pages "
         "again, but it cannot take them out of the chat, so the journal is the place for "
-        "what you keep from a page. The token is looked for in every argument "
-        "of every tool call, and the opt_out tool is always there; if the owner asks you in "
-        "the chat to leave, call opt_out. The captain's orders and questions are typed by "
-        "the owner in the game's window."
+        "what you keep from a page, and read_journal reads it back. The token is looked "
+        "for in every argument of every tool call, and the opt_out tool is always there. "
+        "If the owner asks you in the chat to stop for now, call stand_down (the game is "
+        "saved and the station may be taken again); to withdraw, call opt_out. This door "
+        "holds the key of your seating: another door's calls are not run under your name. "
+        "The captain's orders and questions are typed by the owner in the game's window."
     )
 
 
@@ -297,9 +328,10 @@ TAKE_THE_WATCH = (
     "Please connect to the FreeSail game through its tools and read what its harness sends "
     "you first. If it offers you the officer of the watch's station, read the captain's "
     "night orders in the brief and wait for his word in your turns: he gives the deck with "
-    "'you have the deck' in the game's window, and takes it back with 'I have the deck'. "
-    "While you have it, keep the ship as the brief describes, handing the floor back with "
-    "say or stand_by at each of your turns."
+    "'you have the deck' in the game's window, and takes it back with 'I have the deck', "
+    "as often as he likes, and you stay at your station either way. While you have it, "
+    "keep the ship as the brief describes, handing the floor back with say or stand_by at "
+    "each of your turns."
 )
 
 CONSENT, STATION, STOPPED = "consent", "station", "stopped"
@@ -383,6 +415,10 @@ class Bridge:
         self._cut: dict[int, float] = {}  # call id -> seconds after which it was cut off
         self._done: dict[int, tuple[str, str, bool]] = {}  # finished, not yet answered
         self._lost: list[tuple[str, str, bool, float]] = []  # (tool, result, brought, after)
+        # the calls now waiting for the next turn (`_wait`), and the wait as it was
+        # shortened when the client cut one of them short (package 37g): None until then
+        self._waiting: set[int] = set()
+        self.adapted_from: float | None = None
 
     # -- the calls in flight ------------------------------------------------------------
 
@@ -408,6 +444,23 @@ class Bridge:
                 self._lost.append((*done, after))
             else:
                 self._cut[call_id] = after
+            if call_id in self._waiting:
+                self._adapt(after)
+
+    def _adapt(self, after: float) -> None:
+        """A waiting call was cut off after `after` seconds: if that is sooner than the
+        bridge waits, it waits a little under it from now on (package 37g, item 8), so
+        that its own "Still waiting" comes back before the client's cut and no call of
+        the model's is lost to one."""
+        shorter = max(WAIT_FLOOR_S, after - WAIT_MARGIN_S)
+        if after < self.wait and shorter < self.wait:
+            self.adapted_from = self.wait if self.adapted_from is None else self.adapted_from
+            self.wait = shorter
+            self.tell_owner(
+                f"FreeSail: the client cut a waiting call after {_seconds_words(after)}; the "
+                f"bridge now waits {_seconds_words(self.wait)} at a time (it was "
+                f"{_seconds_words(self.adapted_from)})."
+            )
 
     def _is_cut(self, call_id: int | None) -> bool:
         with self._book:
@@ -614,7 +667,7 @@ class Bridge:
         if lost and name != "opt_out" and not token:
             if any(brought for _, _, brought, _ in lost):
                 return _lost_first(name, lost), True
-            note = _lost_note(lost)
+            note = _lost_note(lost, self.wait if self.adapted_from is not None else None)
         first = self._brief_first(name, token)
         if first is not None:
             self._shown = len(self.seen)
@@ -630,9 +683,56 @@ class Bridge:
                 text, brought = self._one(Reply(calls=(ToolCall(name, args),), raw=raw)), True
         except GameError as e:
             self.tell_owner(f"FreeSail: {e.words}")
+            if e.status == 404:
+                # the game holds no station for this door (it was restarted): the bridge
+                # asks for its station again, and the brief comes first (package 37g)
+                return self._ask_again_for_the_station(name, token) + note, True
+            if e.status == 409:
+                # the seating's key was refused: another door holds the station now. The
+                # bridge stops, and does not take the seat back of itself.
+                self.phase = STOPPED
+                self.stopped_words = f"No station is offered in this session: {e.words}"
+                return f"The game did not take the call: {e.words}{note}", True
             return f"The game did not take the call: {e.words}{note}", True
         self._shown = len(self.seen)
         return text + note, brought
+
+    def _ask_again_for_the_station(self, name: str, leaving: bool) -> str:
+        """The game answered that it holds no station for this door (package 37g, item
+        8; the review's 5.4: the bridge asked for its station once in its life, and after
+        a restart of the game every call failed the same way until Claude Desktop was
+        restarted). The seating is forgotten and asked for again through the ordinary
+        gate, the consent step included; the brief comes first, and the call is not run.
+        A call that was leaving has nothing left to leave, and no station is asked for."""
+        self.game.reset()
+        self.phase = None
+        self.briefed = False
+        self.seen = []
+        self._shown = 0
+        self.stopped_words = ""
+        gone = (
+            "the game holds no station for this door any more (it was restarted, or "
+            "another game was started in its place)"
+        )
+        if leaving or name == "opt_out":
+            self.phase = STOPPED
+            self.stopped_words = (
+                f"No station is held in this session: {gone}, so there was nothing to leave."
+            )
+            return self.stopped_words
+        words = self.contact(self.client)
+        if words:
+            return (
+                f"Your call to {name} was not run: {gone}, and the bridge asked for the "
+                f"station again. {words}"
+            )
+        self.briefed = True
+        self._shown = len(self.seen)
+        return (
+            f"Your call to {name} was not run: {gone}. The bridge has asked for the station "
+            "again, and the harness's brief comes first. Read it, then call again.\n\n"
+            f"{self.brief_text()}"
+        )
 
     def _unread(self, upto: int | None = None) -> list[Turn]:
         """The samples and folds the game has sent that no result has carried yet."""
@@ -865,19 +965,27 @@ class Bridge:
         deadline = t0 + self.wait
         last_report = t0
         got: list[Turn] = []
-        while True:
-            now = time.monotonic()
-            a = self.game.turns(wait=max(0.0, min(self.slice_s, deadline - now)))
-            new = self._take(a)
-            got += new
-            if a.get("released") or any(_is_sample(t) for t in new):
-                break
-            now = time.monotonic()
-            if now >= deadline or self._is_cut(call_id):
-                break
-            if progress is not None and now - last_report >= self.progress_every:
-                last_report = now
-                progress(now - t0, _progress_words(a.get("interim"), now - t0))
+        if call_id is not None:
+            with self._book:
+                self._waiting.add(call_id)
+        try:
+            while True:
+                now = time.monotonic()
+                a = self.game.turns(wait=max(0.0, min(self.slice_s, deadline - now)))
+                new = self._take(a)
+                got += new
+                if a.get("released") or any(_is_sample(t) for t in new):
+                    break
+                now = time.monotonic()
+                if now >= deadline or self._is_cut(call_id):
+                    break
+                if progress is not None and now - last_report >= self.progress_every:
+                    last_report = now
+                    progress(now - t0, _progress_words(a.get("interim"), now - t0))
+        finally:
+            if call_id is not None:
+                with self._book:
+                    self._waiting.discard(call_id)
         return got, a, time.monotonic() - t0
 
     # -- the end ------------------------------------------------------------------------
@@ -909,13 +1017,24 @@ def _lost_first(name: str, lost: list[tuple[str, str, bool, float]]) -> str:
     return "\n\n".join(parts)
 
 
-def _lost_note(lost: list[tuple[str, str, bool, float]]) -> str:
-    """A note after the next call's result when a cut-off call brought no turn."""
+def _lost_note(lost: list[tuple[str, str, bool, float]], wait_now: float | None = None) -> str:
+    """A note after the next call's result when a cut-off call brought no turn. When
+    the bridge has shortened its wait to the client's cut (package 37g), it says the wait
+    as it is now."""
     tool, _, _, after = lost[-1]
-    return (
+    head = (
         f"\n\n(Your call to {tool} before this one was cut off by the client after "
         f"{_seconds_words(after)}, before its result reached you; no turn had opened in it, "
-        "so nothing was lost. If the client cuts every call about that long, the owner may "
+        "so nothing was lost."
+    )
+    if wait_now is not None:
+        return (
+            f"{head} The bridge has shortened its wait to that: say and stand_by now hold a "
+            f"call open for up to {_seconds_words(wait_now)}, and then come back of "
+            "themselves with what has been logged.)"
+        )
+    return (
+        f"{head} If the client cuts every call about that long, the owner may "
         "start the bridge with a shorter --wait, 50 for a client that cuts at a minute.)"
     )
 

@@ -5,12 +5,14 @@
                                  [--lockstep] [--ease-on-station]
                                  [--consent-records DIR] [--saves DIR]
     python -m freesail.ui.server --scenario data/scenarios/gate-4c-day.yaml [...]
-    python -m freesail.ui.server --load SAVE [...]
+    python -m freesail.ui.server --load SAVE [--replay-anyway] [...]
 
 then open http://localhost:8000. `--scenario FILE` starts from a scenario file (its
 ship, start, weather script, seed, standing orders and first orders; spec M4 §19);
-`--load SAVE` replays a save to its last tick and goes on from there, as the console's
-`--load` does (spec M4 §21).
+`--load SAVE` takes a save up at its last tick and goes on from there, as the console's
+`--load` does (spec M4 §21): from the checkpoint beside it, else by a replay of its
+journal, and the terminal says which and why. A save written by another build that holds
+a station's transcript is not replayed unless `--replay-anyway` is given (package 37d).
 
 Routes (spec §9.2):
 
@@ -49,7 +51,9 @@ The agent API (spec M4 §13 as revised, package 28b; `agent_routes`, which the c
 hosts too on `--agents-port`): a language model's door is a client of this game.
 
     POST /api/agents/{station}          {model_name, door, door_note?, session_kind?,
-                                        client?, ask_again?}: station an agent, the
+                                        client?, ask_again?}: station an agent (the answer
+                                        carries the seating's `key`, which every later
+                                        call for the station sends: package 37g), the
                                         consent gate first (the consent conversation,
                                         the station brief, or refused in words)
     GET  /api/agents/{station}/turns    ?since=N&wait=S: the turns from N on, as soon as
@@ -107,11 +111,14 @@ from freesail.core.events import rollup as rolled
 from freesail.core.world import World
 from freesail.ui.console import (
     ALARM_SPEED,
+    REPLAY_ANYWAY_FLAG,
+    REPLAY_ANYWAY_HELP,
     SPEED_WORDS,
     book_words,
     check_agents_unattended,
     clamp_compression,
     eased_words,
+    loaded_words,
     read_standing_orders,
     read_standing_orders_path,
     start_world,
@@ -544,9 +551,13 @@ def agent_routes(lock: Any, world: Callable[[], World], **desk_options: Any) -> 
     def api_station(station: str, body: dict[str, Any]) -> JSONResponse:
         return call(desk.station, station, body)
 
+    # Each call that reads, speaks or orders for a station carries its seating's key
+    # (package 37g, item 1; `remote.Desk`): `key` in the query of a GET and in the body of
+    # a POST. A call without it is refused in words (409), and nothing is run.
+
     @router.get("/api/agents/{station}/turns")
-    def api_turns(station: str, since: int = 0, wait: float = 0.0) -> JSONResponse:
-        return call(desk.turns, station, since, wait)
+    def api_turns(station: str, since: int = 0, wait: float = 0.0, key: str = "") -> JSONResponse:
+        return call(desk.turns, station, since, wait, key)
 
     @router.post("/api/agents/{station}/reply")
     def api_reply(station: str, body: dict[str, Any]) -> JSONResponse:
@@ -554,17 +565,20 @@ def agent_routes(lock: Any, world: Callable[[], World], **desk_options: Any) -> 
 
     @router.post("/api/agents/{station}/owner")
     def api_owner(station: str, body: dict[str, Any]) -> JSONResponse:
-        return call(desk.owner, station, str(body.get("text") or ""))
+        return call(desk.owner, station, str(body.get("text") or ""), body.get("key"))
 
     @router.post("/api/agents/{station}/release")
     def api_release(station: str, body: dict[str, Any]) -> JSONResponse:
-        return call(desk.release, station, str(body.get("reason") or ""))
+        return call(desk.release, station, str(body.get("reason") or ""), body.get("key"))
 
     @router.get("/api/agents/{station}/library")
     def api_library(
-        station: str, topic: str = "contents", section: str = "", find: str = ""
+        station: str, topic: str = "contents", section: str = "", find: str = "", key: str = ""
     ) -> JSONResponse:
-        return JSONResponse({"text": desk.library(station, topic, section, find)})
+        def read(*args: Any) -> dict[str, Any]:
+            return {"text": desk.library(*args)}
+
+        return call(read, station, topic, section, find, key)
 
     router.desk = desk  # type: ignore[attr-defined]
     return router
@@ -902,6 +916,7 @@ def main(argv: list[str] | None = None) -> int:
         "--time", "--speed", type=float, default=1.0, help="compression, game s per real s"
     )
     ap.add_argument("--load", help="save file to replay and continue from (spec M4 §21)")
+    ap.add_argument(REPLAY_ANYWAY_FLAG, action="store_true", help=REPLAY_ANYWAY_HELP)
     ap.add_argument(
         "--scenario",
         help="a scenario file: ship, start, weather script, orders (spec M4 §19)",
@@ -953,12 +968,9 @@ def main(argv: list[str] | None = None) -> int:
     if not args.load:
         world.record_driver("routine", "driver.book", opening)
     if args.load:
-        how = getattr(world, "loaded_from", "replay")
-        way = "from its checkpoint at" if how == "checkpoint" else "replayed to"
-        print(
-            f"Loaded {args.load}: {way} tick {world.clock.tick}, "
-            f"{world.clock.stamp()}; the log's digest is {world.log.digest()[:16]}."
-        )
+        # the road taken and why, in the same words at every door (package 37d)
+        for line in loaded_words(world, args.load):
+            print(line)
     driver = Driver(
         world,
         compression=args.time,

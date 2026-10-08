@@ -225,7 +225,15 @@ def test_the_time_sight_is_refused_in_words_and_allowed_in_the_forenoon():
     after = r.ellipse()
     assert after["sigma_east_nm"] <= sight.sigma_nm + 0.01 < before["sigma_east_nm"]
     assert abs(after["sigma_north_nm"] - before["sigma_north_nm"]) < 0.01
-    assert lon_miles(w, r.lon_deg) < 5.0  # the account brought onto the sight's line
+    # weighed against the account by their two doubts (package 37e): the account, twelve
+    # miles in doubt, against a chronometer forty days from its rating, good to six and
+    # a half, goes three quarters of the way to the sight's line, and the words say how far
+    assert e.data["how"] == "weighed" and ": the account moved " in e.text
+    gain = 12.0**2 / (12.0**2 + sight.sigma_nm**2)
+    apart = abs(sight.longitude_deg - (-5.6)) * 60.0 * math.cos(math.radians(49.5))
+    assert 0.7 < gain < 0.8 and e.data["moved_nm"] == pytest.approx(gain * apart, rel=0.02)
+    left = abs(sight.longitude_deg - r.lon_deg) * 60.0 * math.cos(math.radians(49.5))
+    assert left == pytest.approx((1.0 - gain) * apart, rel=0.02)
     reading = w.readings["longitude_by_chronometer"]
     assert reading["lon_deg"] == sight.longitude_deg
     assert "by chronometer, 40 days from Plymouth" in reading["words"]

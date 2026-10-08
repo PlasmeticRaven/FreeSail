@@ -54,6 +54,7 @@ DAY_FIXTURES: dict[str, frozenset[str]] = {
             "gate_system_day",
             "gate_5a_day",
             "gate_5b_passage",
+            "gate_5b_schooner",  # package 37e: the schooner's passage, read by two tests
             "gate_5c_merchant",  # package 36: the merchant passage, 36 hours
             "gate_5c_cruise",  # package 36: the naval cruise, 48 hours
         }
@@ -115,6 +116,10 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_catalogue.py::test_the_other_three_wear_and_heave_to[data/ships/topsail-schooner.yaml]",
         "test_chart.py::test_a_save_on_the_chart_replays_to_the_same_digest",
         "test_chart.py::test_she_takes_the_ground_and_the_log_says_so_once_and_comes_off_again",
+        # package 37d: the kept saves run on a watch (a glass in the fast tier)
+        "test_checkpoint.py::test_a_playtest_save_loads_from_its_checkpoint_and_runs_on_a_watch[m5c-b-harpy-tick602100]",
+        "test_checkpoint.py::test_a_playtest_save_loads_from_its_checkpoint_and_runs_on_a_watch[m5c-cutter-tick34091]",
+        "test_checkpoint.py::test_the_packages_own_save_loads_from_its_checkpoint_and_runs_on_a_watch",
         "test_crew_orders.py::test_close_reef_takes_every_reef_band",
         "test_crew_orders.py::test_pipe_down_is_refused_while_the_hands_are_about_ship",
         "test_evolutions.py::test_a_parted_sheet_is_rove_afresh_from_the_coil_and_the_sail_set_again",
@@ -195,6 +200,7 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_readings.py::test_readings_are_the_physics_own_numbers[frigate-36]",
         "test_readings.py::test_snapshot_reads_its_instruments_from_the_registry[frigate-36]",
         "test_readings.py::test_the_view_is_cached_per_tick_and_per_order",
+        "test_reckoning.py::test_the_brig_hove_to_six_hours_of_a_spring_ebb_in_the_iroise_keeps_an_honest_account",
         "test_reckoning.py::test_the_captains_chart_carries_the_account_and_never_the_truth",
         "test_reckoning.py::test_the_hand_lead_and_the_deep_sea_lead_cast_with_their_words_and_the_ground",
         "test_reckoning.py::test_the_log_is_hove_hourly_in_the_frigate_and_two_hourly_in_the_schooner",
@@ -254,6 +260,8 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_trim_order.py::test_a_trims_braces_log_one_line_when_the_last_is_done",
         "test_trim_order.py::test_the_trim_line_says_the_yards_on_deck_as_a_clause_and_not_as_a_refusal",
         "test_weather.py::test_a_standing_order_on_the_glass_fires_when_it_falls",
+        # package 37d: eighty-three minutes of the Harpy's own weather, a sample a second
+        "test_weather.py::test_from_the_harpys_own_weather_the_wind_no_longer_turns_as_the_ship_moves",
         "test_weather.py::test_the_gate_day_file_carries_both_forms_and_the_pinned_wind_wins",
         "test_weather.py::test_the_readings_on_a_ship_with_a_glass_and_on_one_without",
         "test_weather_script.py::test_a_scenario_world_replays_from_its_save",
@@ -273,6 +281,17 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_server.py::test_ease_on_station_eases_the_clock_on_a_sample_and_says_so",
         "test_standing.py::test_she_is_hove_to_from_the_heave_to_until_she_fills_away",
         "test_standing.py::test_the_well_is_held_in_the_book_and_never_fires",
+        # package 37f: six hours hove to for each ship, the watch's hands at the tending,
+        # the starter book asleep through a heave-to, the Goulet's eight hours at anchor,
+        # and a standing order held through two watches (measured at `-n 4`)
+        "test_lying_to.py::test_held_six_hours_through_shifts_and_all_winds_she_never_lies_abaft_the_beam[data/ships/brig.yaml]",
+        "test_lying_to.py::test_held_six_hours_through_shifts_and_all_winds_she_never_lies_abaft_the_beam[data/ships/cutter.yaml]",
+        "test_lying_to.py::test_held_six_hours_through_shifts_and_all_winds_she_never_lies_abaft_the_beam[data/ships/frigate-36.yaml]",
+        "test_lying_to.py::test_held_six_hours_through_shifts_and_all_winds_she_never_lies_abaft_the_beam[data/ships/topsail-schooner.yaml]",
+        "test_lying_to.py::test_the_starter_books_trim_rules_sleep_through_a_heave_to_and_wake_after_it",
+        "test_lying_to.py::test_the_tending_costs_the_watch_its_hands_and_the_relief_takes_them_over",
+        "test_log_lines.py::test_a_standing_order_with_nothing_to_do_says_so_once_a_watch_for_each_reason",
+        "test_tackle_orders.py::test_the_goulets_eight_hours_give_at_most_five_lines_the_first_urgent",
     }
 )
 

@@ -842,7 +842,11 @@ def test_the_pilot_boards_a_neutral_off_the_isle_of_bas_and_she_anchors_in_the_r
     assert said.startswith("The pilot says: The western passage is the easier.")
     assert "Lavandière" in said and "Couillon" in said
     assert "The Lavandière" in " ".join(e.text for e in events(w, "lookout.sighting"))
-    assert anchored.text == "The best bower let go in five fathoms."
+    # package 37f: the line says the scope it will veer as the anchor goes
+    assert anchored.text == (
+        "The best bower let go in five fathoms; veering to twenty-six fathoms, five times "
+        "the depth."
+    )
     w.run(900)
     assert w.at_anchor and w.ports.in_port() is w.ports.ports["roscoff"]
     assert w.readings.words("port").startswith(
@@ -983,3 +987,16 @@ def test_a_yard_purchase_at_a_port_without_the_item_gets_the_yards_refusal_not_t
     )
     e = w.submit("buy a topmast")
     assert e.kind == "order.rejected" and "has no topmast" in e.text
+
+
+def test_the_pilots_hails_are_notable_lines():
+    """Package 37d (the review of gate 5c's playtests, 8.2 item 13): the boat's hail and
+    the pilot's own asking for sail to be shortened are notable, where at routine
+    severity they were rolled up and woke no station."""
+    from freesail.core.events import Severity
+
+    w = world_at(SOUTH_OF_FALMOUTH, heading=0.0, speed=4.0)
+    w.submit("set plain sail")
+    run_until(w, "port.pilot_aboard", 150)
+    hails = events(w, "port.pilot_hail")
+    assert hails and all(e.severity is Severity.NOTABLE for e in hails)

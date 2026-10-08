@@ -181,6 +181,10 @@ class Crew:
     sailors: list[Sailor]
     all_hands_called: bool = False
     all_hands_called_by_order: bool = False
+    # whose order called them, as the state's line says it ("the captain's", or "the
+    # officer of the watch's" when he called them under the captain's word: package 37g);
+    # "" in a checkpoint from before, which reads as the captain's
+    all_hands_called_by: str = ""
     watch_on_deck: Watch | None = None
     by_station: dict[Station, list[Sailor]] = field(init=False, repr=False)
     by_watch: dict[Watch, list[Sailor]] = field(init=False, repr=False)

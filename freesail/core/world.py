@@ -27,6 +27,69 @@ from freesail.world.reckoning import NAVIGATION_KINDS
 ENGINE_VERSION = "0.0.1"
 SAVE_FORMAT = 1
 
+# The build's stamp (package 37d; the review of gate 5c's playtests, section 9 under
+# "Replay"): a save and its checkpoint say which build wrote them. `BUILD_NAME` is set by
+# hand at each package or gate. The fingerprint of the rules is computed once a process,
+# at the first World made (`rules_fingerprint`), from the game's own code and the data a
+# replay reads: every `freesail/**/*.py` and every file under `data/` but the chart's
+# tiles (`data/charts/tiles/`, binary and large; the manifest that lists them is in), in
+# the order of their paths written with forward slashes from the folder that holds
+# `freesail/` and `data/`; for each the path, a zero byte, the file's bytes with every
+# CR LF made LF (so that a Windows checkout and a Linux one agree), a zero byte; the
+# first sixteen hex digits of the SHA-256 of the whole. `ENGINE_VERSION` and
+# `SAVE_FORMAT` do not move for it, and a save without a stamp is read as "unstamped,
+# before 37d" (`UNSTAMPED_WORDS`). A replay is promised only on the build that wrote the
+# save (`core.replay.load`): the same fingerprint.
+BUILD_NAME = "m5c-c/37g"
+BUILD_RULES_DIGITS = 16
+UNSTAMPED_WORDS = "unstamped, before 37d"
+
+_BUILD_RULES: str | None = None
+
+
+def fingerprint_of(root: Any) -> str:
+    """The fingerprint of the rules under a folder that holds `freesail/` and `data/`,
+    by the set and the order written above."""
+    import hashlib
+    from pathlib import Path
+
+    root = Path(root)
+    code = root / "freesail"
+    data = root / "data"
+    tiles = data / "charts" / "tiles"
+    files = [p for p in code.rglob("*.py") if "__pycache__" not in p.parts]
+    if data.is_dir():
+        files += [p for p in data.rglob("*") if p.is_file() and tiles not in p.parents]
+    h = hashlib.sha256()
+    for name, path in sorted((p.relative_to(root).as_posix(), p) for p in files):
+        h.update(name.encode("utf-8") + b"\0")
+        h.update(path.read_bytes().replace(b"\r\n", b"\n") + b"\0")
+    return h.hexdigest()[:BUILD_RULES_DIGITS]
+
+
+def rules_fingerprint() -> str:
+    """The fingerprint of the rules this process runs by, computed once (some thirty
+    milliseconds for two hundred files and four megabytes) and kept."""
+    global _BUILD_RULES
+    if _BUILD_RULES is None:
+        from pathlib import Path
+
+        _BUILD_RULES = fingerprint_of(Path(__file__).resolve().parents[2])
+    return _BUILD_RULES
+
+
+def build_stamp() -> dict[str, str]:
+    """This build's stamp as a save and a checkpoint carry it: {"name", "rules"}."""
+    return {"name": BUILD_NAME, "rules": rules_fingerprint()}
+
+
+def build_words(stamp: Any) -> str:
+    """A stamp in words, for the doors that load a save: 'm5c-c/37d, rules
+    0123456789abcdef', or 'unstamped, before 37d' for a save that carries none."""
+    if not isinstance(stamp, dict) or not stamp.get("rules"):
+        return UNSTAMPED_WORDS
+    return f"{stamp.get('name') or 'unnamed'}, rules {stamp['rules']}"
+
 
 @dataclass
 class Scenario:
@@ -202,10 +265,72 @@ AGENT_LOG_KINDS: tuple[str, ...] = (
 NOTABLE_ORDER_KINDS = frozenset({"agent.told", "work.belayed", "agent.deck"})
 
 
+# The key under which the ship holds the actor of the order being carried out (package
+# 37g): there while `World.submit` runs the order's handler, and at no other time.
+ORDER_ACTOR = "order_actor"
+
+
 class World:
+    # The log's `wind.shift` line (package 37c, the owner's ruling of 2026-10-03, closing
+    # the M5 spec's open item 11): the ten-minute mean wind, as the readings and the
+    # `a wind shift` event read it, two points from where the log last put it, and held
+    # there `WIND_SHIFT_HOLD_S`. The instant wind it read before chattered across the
+    # threshold many times a minute in a light, shifting air (the Harpy off Penlee).
     WIND_SHIFT_LOG_THRESHOLD = 2 * units.POINT
+    WIND_SHIFT_HOLD_S = 60
+    # seconds the mean has stood past the threshold; a class default so that a checkpoint
+    # saved before package 37c loads with it
+    _wind_shift_held_s = 0
+    # Package 37f (the review of gate 5c's playtests, 5.8 and 8.2 under "The log": 31 of
+    # game 9's 50 wind-shift lines came with under four knots of wind, 18 of them at
+    # anchor in a calm, "Wind veered to S, calm."; and the Speedwell logged 23 shifts in
+    # three hours and a half of a gentle breeze among the Scilly Isles, the wind swinging
+    # in a slack gradient). A wind with no direction has no shift to log:
+    #   - Airs too light: no line while the ten-minute mean is under a light breeze, four
+    #     knots, where Beaufort's scale and the log's own words (`units.
+    #     describe_wind_strength`) pass from "light airs" to "a light breeze". "Light and
+    #     variable airs." is said once when it has been so `WIND_SHIFT_HOLD_S`, and the
+    #     next settled wind once, when it has stood a light breeze `WIND_SETTLE_S` (five
+    #     minutes; judgement: a puff across a calm is not the wind come back).
+    #   - An unsteady wind: one whose mean swings back and forth. A shift that would be
+    #     the wind's second turn within `WIND_SWING_S` (an hour; judgement: it has
+    #     veered, backed, and now veers again, or the other way about) is not logged as
+    #     a shift: "The wind unsteady, backing and veering about NW" is said once, and
+    #     nothing more until the mean has stood within the shift's own two points for
+    #     `WIND_STEADY_S` (half an hour; judgement), when the settled wind is said once.
+    #     A wind that backs before a front and veers at it has turned once, and is
+    #     logged as it was.
+    # The event `a wind shift` keeps the same floor (`api.readings`): it does not come
+    # while `wind_settled` is false. Class defaults, for a checkpoint saved before the
+    # package.
+    WIND_SHIFT_FLOOR_KN = 4.0
+    WIND_SETTLE_S = 300
+    WIND_SWING_S = 3600
+    WIND_STEADY_S = 1800
+    wind_settled = True
+    _wind_unsettled_s = 0
+    _wind_settling_s = 0
+    _wind_unsettled_why = ""  # "light" or "swing" while `wind_settled` is false
+    _wind_swing_ref: float | None = None  # where an unsteady wind's mean last stood
+    _wind_shifts_said: tuple[tuple[int, int], ...] = ()  # the last shifts logged: tick, sense
+    # The builds this game has been played under, oldest first (package 37d): this build's
+    # stamp at the start, and each later build's added when it takes the game up from a
+    # checkpoint (`core.replay._rebind`); None stands for a build from before the stamp.
+    # Saved as `"builds"` beside `"build"`, so that a game begun under one build, loaded
+    # from its checkpoint and saved again by another is not taken for the second's own
+    # and replayed without a word. None as the class default: a checkpoint from before
+    # the stamp loads with it and is given [None, this build].
+    played_under: list[Any] | None = None
+    # Package 37f, the dragging's lines and "Brought up" after an anchor let go by itself:
+    # when each anchor's dragging was last spoken of and how far it had then come, and the
+    # seconds she has lain still on a cable not yet said to have brought her up. Class
+    # defaults, so that a checkpoint from an earlier build loads with them.
+    _drag_said: dict[str, tuple[int, float]] | None = None
+    _brought_up_s: int = 0
 
     def __init__(self, seed: int, scenario: Scenario | None = None, ship: Any = None):
+        # the build's stamp, worked once at the start (package 37d)
+        self.played_under = [build_stamp()]
         self.seed = int(seed)
         self.scenario = scenario or Scenario()
         self.clock = Clock(self.scenario.start_time)
@@ -300,8 +425,10 @@ class World:
             if self.scenario.glass:
                 self.glass = Glass(self.seed)
             if self.chart is not None:
-                # the coast the sea breeze and the coastal fog read (spec M5 §11; W §1.4)
+                # the coast the sea breeze and the coastal fog read (spec M5 §11; W §1.4),
+                # and the coast's trend the breeze blows toward (package 37d)
                 self.systems.coast = self._coast_of_plane
+                self.systems.coast_trend = self._coast_trend_of_plane
         self.wind = Wind(wind_params, self.rng.stream("wind"))
         # the air mass of a fixed or a pinned wind (package 31b): the scenario's, or the
         # script's waypoint's from the first that names one
@@ -576,10 +703,14 @@ class World:
             self._dragging.clear()
             return
         for anchor in tackle.down():
-            if anchor.ground_x is None or anchor.ground_y is None or self.origin is None:
+            if anchor.ground_x is None or anchor.ground_y is None:
                 continue
-            at = self.origin.advanced(anchor.ground_x, anchor.ground_y)
-            d = self.chart.depth_at(at) if self.chart is not None else None
+            # where the anchor lies on the chart: from the ship's own place and the
+            # anchor's offset from her (package 37d, `place_of_plane`); one jump from the
+            # scenario's origin by the whole voyage's displacement fell a mile and a half
+            # from her at Scilly, and on the land off Cawsand ("Brought up ... in no water")
+            at = self.place_of_plane(anchor.ground_x, anchor.ground_y)
+            d = self.chart.depth_at(at) if self.chart is not None and at is not None else None
             if d is not None:
                 anchor.depth_m = max(0.0, d + state.height_m)
         # the turn of the tide, the ship's exposure of it: the cable slackens and she
@@ -600,39 +731,112 @@ class World:
             self._tide_was_flood = flood
 
     def _tick_anchors(self) -> None:
-        """Every tick at anchor: an anchor beginning to drag is a notable line with Luce's
-        answers, and one holding again a routine line (package 34). The judgement of the
-        drag over time is the physics' (`physics.anchor.judge_cables`)."""
+        """Every tick at anchor: an anchor beginning to drag is an urgent line with Luce's
+        answers (notable until package 37d), and one holding again a routine line
+        (package 34). The judgement of the
+        drag over time is the physics' (`physics.anchor.judge_cables`).
+
+        Package 37f (the review of gate 5c's playtests, 10.4: in the Goulet the anchors
+        truly came home, two cables in eight hours, and the log said so eighteen times,
+        each line urgent, waking the officer and easing the clock). Urgent once, when an
+        anchor begins to come home, with the advice that is left to take (not "veer more
+        cable" at the bitter end, nor an anchor that is down already). While it goes on,
+        a notable line no oftener than `DRAG_REPORT_S`, with how far it has come, and
+        only while it is still moving. "Holds again", routine, when it has not moved for
+        `DRAG_SETTLE_S`; the next drag is then a new one. And when she is brought up by an
+        anchor let go by itself, the log says so, as `come to an anchor` always has."""
+        from freesail.physics.anchor import DRAG_REPORT_MIN_M, DRAG_REPORT_S
+
         tackle = (getattr(self.ship, "extra", None) or {}).get("ground_tackle")
         if not tackle:
             return
+        said = self._drag_said
+        if said is None:
+            said = self._drag_said = {}
         for anchor in tackle.anchors:
             if not anchor.down:
                 self._dragging.discard(anchor.id)
+                said.pop(anchor.id, None)
                 continue
+            name = f"{anchor.name[:1].upper()}{anchor.name[1:]}"
             if anchor.dragging and anchor.id not in self._dragging:
                 self._dragging.add(anchor.id)
-                second = tackle.by_words("the second anchor")
-                more = (
-                    f"; let go {second.name}, or back her with the stream"
-                    if second is not None
-                    else ""
-                )
+                said[anchor.id] = (self.clock.tick, anchor.drag_m)
+                # urgent (package 37d; the review of gate 5c's playtests, 8.2 item 13): a
+                # dragging anchor is a ship adrift toward whatever lies to leeward, and
+                # a station standing by must be woken for it
                 self.record(
-                    Severity.NOTABLE,
+                    Severity.URGENT,
                     "anchor.dragging",
-                    f"{anchor.name[:1].upper()}{anchor.name[1:]} is dragging: veer more "
-                    f"cable{more}.",
+                    f"{name} is dragging: {_dragging_advice(tackle, anchor)}.",
                     data=anchor.to_dict(),
                 )
-            elif not anchor.dragging and anchor.id in self._dragging:
+            elif anchor.dragging:
+                at, far = said.get(anchor.id, (self.clock.tick, anchor.drag_m))
+                if (
+                    self.clock.tick - at >= DRAG_REPORT_S
+                    and anchor.drag_m - far >= DRAG_REPORT_MIN_M
+                    and anchor.hold_s < 60.0
+                ):
+                    said[anchor.id] = (self.clock.tick, anchor.drag_m)
+                    self.record(
+                        Severity.NOTABLE,
+                        "anchor.coming_home",
+                        f"{name} still coming home: {_come_home_words(anchor.drag_m)} since "
+                        f"it began.",
+                        data=anchor.to_dict(),
+                    )
+            elif anchor.id in self._dragging:
                 self._dragging.discard(anchor.id)
+                came = said.pop(anchor.id, (0, 0.0))[1]
+                came = max(came, anchor.drag_m)
                 self.record(
                     Severity.ROUTINE,
                     "anchor.holding",
-                    f"{anchor.name[:1].upper()}{anchor.name[1:]} holds again.",
+                    f"{name} holds again, having come home {_come_home_words(came)}."
+                    if came >= 1.0
+                    else f"{name} holds again.",
                     data=anchor.to_dict(),
                 )
+        self._say_brought_up(tackle)
+
+    def _say_brought_up(self, tackle: Any) -> None:
+        """ "Brought up" for an anchor let go by itself (package 37f; the review's 5.8:
+        `let go the anchor` never said it, six stand-bys on the event never fired, and the
+        captain needed sixty-seven minutes to be sure she rode). When no anchor's work is
+        in hand and the anchor she rides by has not been said to bring her up: its cable
+        taut and her way over the ground under three tenths of a metre a second for ten
+        seconds (the evolution's own measure), or slack and she lying still for two
+        minutes (a calm at slack water), and it not dragging."""
+        riding = tackle.riding_by()
+        if riding is None or riding.brought_up or riding.heaving or riding.dragging:
+            self._brought_up_s = 0
+            return
+        runner = self.ship.extra.get("evolutions")
+        for inst in getattr(runner, "instances", None) or ():
+            if inst.evo.id in _ANCHOR_WORK and not inst.waiting:
+                self._brought_up_s = 0
+                return
+        from freesail.evolutions.scripts import _ground_speed
+
+        way = _ground_speed(self.ship)
+        if way < (0.3 if riding.taut else 0.1):
+            self._brought_up_s += 1
+        else:
+            self._brought_up_s = 0
+        if self._brought_up_s < (10 if riding.taut else 120):
+            return
+        self._brought_up_s = 0
+        riding.brought_up = True
+        from freesail.evolutions.scripts import _depth_words, _fathoms_words, _riding
+
+        self.record(
+            Severity.NOTABLE,
+            "ship.brought_up",
+            f"Brought up by {riding.name} in {_depth_words(riding.depth_m)}, "
+            f"{_fathoms_words(riding.scope_fathoms)} of cable; {_riding(self.ship, self.wind)}",
+            data={"anchor": riding.to_dict(), "evolution": "let_go_anchor"},
+        )
 
     def _sun_now(self) -> Sun:
         """The sun at the ship's latitude now: the scenario's on the plane, hers with a
@@ -681,17 +885,64 @@ class World:
             self._position = self._position.advanced(dx, dy)
             self._geo_last = (x, y)
 
+    def place_of_plane(self, x_m: float, y_m: float) -> Position | None:
+        """Where a point of the ship's plane (metres east and north of the start) lies on
+        the sphere: from the ship's own position and the point's offset from her (package
+        37d). The one frame for every point of the plane: her place is carried forward
+        tick by tick with the stated current in it (`_tick_geo`), and a point placed by
+        one jump from the scenario's origin drifts from it with the miles run (a mile
+        and a half at Scilly). `_geo_last` is the plane's point her position stands for.
+        None on the endless plane."""
+        pos = getattr(self, "_position", None)
+        if pos is None:
+            if self.origin is None:
+                return None
+            # the World still being made (the weather's first look comes before her
+            # position is set): she lies at the origin
+            return self.origin.advanced(x_m - self.ship_x, y_m - self.ship_y)
+        lx, ly = self._geo_last
+        return pos.advanced(x_m - lx, y_m - ly)
+
+    def plane_of(self, pos: Position) -> tuple[float, float] | None:
+        """The point of the ship's plane (metres east and north of the start) where a
+        place on the sphere lies, by the same frame as `place_of_plane`; None on the
+        endless plane."""
+        if self._position is None:
+            return None
+        dx, dy = self._position.offset_to(pos)
+        lx, ly = self._geo_last
+        return lx + dx, ly + dy
+
     def _coast_of_plane(self, x_km: float, y_km: float) -> tuple[float, float] | None:
         """The weather's coast hook (spec M5 §11; W §1.4): for a point of the systems'
         plane, the distance to the nearest coast in kilometres and the bearing toward it
-        in degrees, from the chart's distance field; None where the chart has no field."""
-        if self.chart is None or self.origin is None:
+        in degrees, from the chart's distance field; None where the chart has no field.
+        The point is placed from the ship's own position (package 37d), so the coast's
+        distance at the ship is the chart's at her position."""
+        if self.chart is None:
             return None
-        pos = self.origin.advanced(x_km * 1000.0, y_km * 1000.0)
+        pos = self.place_of_plane(x_km * 1000.0, y_km * 1000.0)
+        if pos is None:
+            return None
         found = self.chart.coast_distance(pos)  # the field alone: microseconds, no name
         if found is None:
             return None
         return found[0] / 1000.0, found[1]
+
+    def _coast_trend_of_plane(self, x_km: float, y_km: float) -> tuple[float, float] | None:
+        """The weather's second coast hook (package 37d; W §1.4): for a point of the
+        systems' plane, the bearing toward the land as a whole in degrees and how steeply
+        the shore's distance rises to seaward there (0 to 1), from the chart's distance
+        field differenced over a baseline of kilometres (`chart.Chart.coast_trend`); None
+        where the chart has no field. Read only while a sea breeze blows."""
+        if self.chart is None:
+            return None
+        pos = self.place_of_plane(x_km * 1000.0, y_km * 1000.0)
+        if pos is None:
+            return None
+        from freesail.world.weather import SEA_BREEZE_TREND_KM
+
+        return self.chart.coast_trend(pos, SEA_BREEZE_TREND_KM * 1000.0)
 
     def _tick_chart(self) -> None:
         """Every tick the grounding check (spec M5 §11: short-circuited by the tile's
@@ -996,10 +1247,35 @@ class World:
         station = actor in STATION_ACTORS
         if not standing and not station:
             self.inputs.append({"tick": self.clock.tick, "actor": actor, "order": text})
+        # whose order it is, for the lines that say so (package 37g, item 10: all hands
+        # called by the officer of the watch were logged "by the captain's order"): kept
+        # on the ship while the order is carried out and no longer (`orders.crew.
+        # whose_order`), so it is never in a save or a checkpoint
+        extra = getattr(self.ship, "extra", None)
+        if isinstance(extra, dict):
+            extra[ORDER_ACTOR] = actor
         try:
-            kind, log_text, data = self.ship.handle_order(text)
+            try:
+                kind, log_text, data = self.ship.handle_order(text)
+            finally:
+                if isinstance(extra, dict):
+                    extra.pop(ORDER_ACTOR, None)
         except OrderError as e:
             head = f"{actor[0].upper()}{actor[1:]}: order" if standing else "Order"
+            runtime = self.standing
+            if standing and runtime is not None and not runtime.say_refused(text, str(e)):
+                # a standing order's order refused as it was at its last firing: said
+                # once a watch for each reason, not once a firing (package 37f); the
+                # refusal goes back to the runtime all the same, unlogged
+                return Event(
+                    tick=self.clock.tick,
+                    ship_time=self.clock.ship_time,
+                    severity=Severity.ROUTINE,
+                    kind="order.rejected",
+                    text=f"{head} not carried out ({text!r}): {e}",
+                    actor=actor,
+                    data={"order": text, "reason": str(e), "unsaid": True},
+                )
             return self.record(
                 Severity.ROUTINE,
                 "order.rejected",
@@ -1022,7 +1298,10 @@ class World:
             # the evolution runner writes its own "started" line; avoid saying it twice
             self._after_order()
             return accepted
-        severity = Severity.NOTABLE if kind in NOTABLE_ORDER_KINDS else Severity.ROUTINE
+        # notable by its kind, or because the order's own result says so (package 37d: a
+        # fix that moved the account more than a mile; `data["notable"]`)
+        notable = kind in NOTABLE_ORDER_KINDS or bool(data.get("notable"))
+        severity = Severity.NOTABLE if notable else Severity.ROUTINE
         event = self.record(severity, kind, log_text, actor=actor, data=data)
         self._after_order()
         return event
@@ -1047,6 +1326,126 @@ class World:
         put by `ask` is answered on the tick it was asked, spec M4 §12)."""
         for agent in list(self.agents.values()):
             agent.on_order()
+
+    def _log_wind_shift(self) -> None:
+        """The `wind.shift` line: the ten-minute mean wind two points or more from where
+        the log last put it, and held there `WIND_SHIFT_HOLD_S`; not during a squall,
+        which has its own line; and not of a wind too light or too unsteady to have a
+        direction (package 37f, `_wind_has_a_direction`). The words give the mean's point
+        and strength."""
+        mean_from = self.wind_record.mean_from()
+        if mean_from is None:
+            return
+        shift = units.wrap_pi(mean_from - self._last_logged_wind_direction)
+        if self.wind.in_squall:
+            self._wind_shift_held_s = 0
+            return
+        if not self._wind_has_a_direction(mean_from, shift):
+            return
+        if abs(shift) >= self.WIND_SHIFT_LOG_THRESHOLD:
+            self._wind_shift_held_s += 1
+        else:
+            self._wind_shift_held_s = 0
+            return
+        if self._wind_shift_held_s < self.WIND_SHIFT_HOLD_S:
+            return
+        self._wind_shift_held_s = 0
+        mean_speed = self.wind_record.mean_speed() or self.wind.speed
+        strength = units.describe_wind_strength(mean_speed)
+        tick = self.clock.tick
+        sense = 1 if shift > 0 else -1
+        recent = [s for s in self._wind_shifts_said if tick - s[0] <= self.WIND_SWING_S]
+        senses = [s[1] for s in recent] + [sense]
+        turns = sum(1 for was, now in zip(senses, senses[1:], strict=False) if was != now)
+        if turns >= 2:
+            # the wind's second turn within the hour (it has veered, backed, and veers
+            # again, or the other way about): it is unsteady, and that is said in place
+            # of the shift
+            self.wind_settled = False
+            self._wind_unsettled_why = "swing"
+            self._wind_swing_ref = mean_from
+            self._wind_settling_s = 0
+            self._wind_shifts_said = ()
+            self.record(
+                Severity.NOTABLE,
+                "wind.variable",
+                f"The wind unsteady, backing and veering about {units.point_name(mean_from)}, "
+                f"{strength}.",
+                data={"direction_from": mean_from, "mean_kn": _knots(mean_speed)},
+            )
+            self._last_logged_wind_direction = mean_from
+            return
+        self._wind_shifts_said = tuple(recent) + ((tick, sense),)
+        self.record(
+            Severity.NOTABLE,
+            "wind.shift",
+            f"Wind {'veered' if sense > 0 else 'backed'} to {units.point_name(mean_from)}, "
+            f"{strength}.",
+            data={"direction_from": mean_from, "shift": shift, "mean": True},
+        )
+        self._last_logged_wind_direction = mean_from
+
+    def _wind_has_a_direction(self, mean_from: float, shift: float) -> bool:
+        """Whether the wind is settled enough to have a shift logged (package 37f; see
+        `WIND_SHIFT_FLOOR_KN`), keeping `wind_settled` and saying each change of it once:
+        "Light and variable airs." as it falls light, and the wind's point and strength
+        when it has settled again, from light airs or from swinging, which is then where
+        the next shift is measured from."""
+        mean_speed = self.wind_record.mean_speed() or 0.0
+        light = units.ms_to_knots(mean_speed) < self.WIND_SHIFT_FLOOR_KN
+        if self.wind_settled or self._wind_unsettled_why == "swing":
+            # falling light, from a settled wind or from an unsteady one
+            if light:
+                self._wind_shift_held_s = 0
+                self._wind_unsettled_s += 1
+                if self._wind_unsettled_s >= self.WIND_SHIFT_HOLD_S:
+                    self.wind_settled = False
+                    self._wind_unsettled_why = "light"
+                    self._wind_unsettled_s = self._wind_settling_s = 0
+                    self._wind_shifts_said = ()
+                    self.record(
+                        Severity.NOTABLE,
+                        "wind.variable",
+                        "Light and variable airs.",
+                        data={"mean_kn": _knots(mean_speed)},
+                    )
+                return False
+            self._wind_unsettled_s = 0
+            if self.wind_settled:
+                return True
+        if self._wind_unsettled_why == "swing":
+            # unsteady: settled when the mean has stood within the shift's own two points
+            # for `WIND_STEADY_S`
+            ref = mean_from if self._wind_swing_ref is None else self._wind_swing_ref
+            if abs(units.wrap_pi(mean_from - ref)) >= self.WIND_SHIFT_LOG_THRESHOLD:
+                self._wind_swing_ref = mean_from
+                self._wind_settling_s = 0
+                return False
+            self._wind_swing_ref = ref
+            self._wind_settling_s += 1
+            if self._wind_settling_s < self.WIND_STEADY_S:
+                return False
+        else:
+            # light airs: settled when the mean has stood a light breeze `WIND_SETTLE_S`
+            if light:
+                self._wind_settling_s = 0
+                return False
+            self._wind_settling_s += 1
+            if self._wind_settling_s < self.WIND_SETTLE_S:
+                return False
+        self.wind_settled = True
+        self._wind_unsettled_why = ""
+        self._wind_swing_ref = None
+        self._wind_settling_s = self._wind_shift_held_s = 0
+        self.record(
+            Severity.NOTABLE,
+            "wind.shift",
+            f"The wind has settled at {units.point_name(mean_from)}, "
+            f"{units.describe_wind_strength(mean_speed)}.",
+            data={"direction_from": mean_from, "shift": shift, "mean": True, "settled": True},
+        )
+        self._last_logged_wind_direction = mean_from
+        return False
 
     # -- time ----------------------------------------------------------------
 
@@ -1086,17 +1485,7 @@ class World:
                     "air_mass": self.wind.air_mass,
                 },
             )
-        shift = units.wrap_pi(self.wind.direction_from - self._last_logged_wind_direction)
-        if abs(shift) >= self.WIND_SHIFT_LOG_THRESHOLD and not self.wind.in_squall:
-            sense = "veered" if shift > 0 else "backed"
-            self.record(
-                Severity.NOTABLE,
-                "wind.shift",
-                f"Wind {sense} to {units.point_name(self.wind.direction_from)}, "
-                f"{units.describe_wind_strength(self.wind.effective_speed)}.",
-                data={"direction_from": self.wind.direction_from, "shift": shift},
-            )
-            self._last_logged_wind_direction = self.wind.direction_from
+        self._log_wind_shift()
         if self.systems is not None and self.clock.ship_time.second == 0:
             self._tick_weather()
         if self.sea is not None:
@@ -1224,6 +1613,12 @@ class World:
         return {
             "format": SAVE_FORMAT,
             "engine": ENGINE_VERSION,
+            # the build that wrote this save (package 37d): its name and the fingerprint
+            # of its rules; a replay is promised only under the same fingerprint
+            "build": build_stamp(),
+            # every build the game has been played under, oldest first (null: one from
+            # before the stamp); more than this build's when it came by a checkpoint
+            "builds": [dict(b) if b else None for b in (self.played_under or [None])],
             "seed": self.seed,
             "scenario": self.scenario.to_dict(),
             "ship_ref": self.ship.save_ref(),
@@ -1244,6 +1639,76 @@ class World:
             # and the harness's from `inputs`
             "world_orders": [dict(o) for o in self.world_orders],
         }
+
+
+# The ground-tackle evolutions (`data/evolutions/`): while one is in hand the World does
+# not say "Brought up" of itself (the evolution says its own, or the cable is still running).
+_ANCHOR_WORK = frozenset(
+    {
+        "come_to_anchor",
+        "let_go_anchor",
+        "veer_cable",
+        "heave_short",
+        "heave_in",
+        "weigh_anchor",
+        "moor",
+        "unmoor",
+        "get_under_way",
+        "back_anchor",
+    }
+)
+
+
+def _come_home_words(metres: float) -> str:
+    """How far an anchor has come home, in the log's words: 'three fathoms', 'half a
+    cable', 'a cable', 'a cable and a half', 'two cables'."""
+    from freesail.world.reckoning import number_words
+
+    halves = int(round(metres / (units.CABLE / 2.0)))
+    if halves < 1:
+        fathoms = max(1, int(round(units.m_to_fathoms(metres))))
+        return f"{number_words(fathoms)} fathom{'s' if fathoms != 1 else ''}"
+    whole, half = divmod(halves, 2)
+    if whole == 0:
+        return "half a cable"
+    if whole == 1:
+        return "a cable and a half" if half else "a cable"
+    return f"{number_words(whole)} cables{' and a half' if half else ''}"
+
+
+def _dragging_advice(tackle: Any, anchor: Any) -> str:
+    """Luce's answers to an anchor coming home, those that are left to take (package 37f:
+    "veer more cable" was said at the bitter end, and of the second anchor when it was
+    down already): veer more cable, while there is cable; let go another anchor, a bower
+    first and then the sheet; back her with the stream, if it is at the bows."""
+    from freesail.ship.parts import AnchorState
+
+    advice = []
+    if anchor.scope_fathoms < anchor.cable_fathoms - 1.0:
+        advice.append("veer more cable")
+    ready = (AnchorState.STOWED, AnchorState.READY)
+    spare = [
+        a
+        for a in tackle.anchors
+        if a is not anchor and a.state in ready and a.kind in ("bower", "sheet")
+    ]
+    spare.sort(key=lambda a: 0 if a.kind == "bower" else 1)
+    if spare:
+        advice.append(f"let go {spare[0].name}")
+    stream = next((a for a in tackle.anchors if a.kind == "stream" and a.state in ready), None)
+    if stream is not None and anchor.kind != "stream":
+        advice.append("back her with the stream")
+    if not advice:
+        return "the whole of its cable is out and there is no anchor left to let go"
+    if len(advice) == 1:
+        return advice[0]
+    if len(advice) == 2:
+        return f"{advice[0]}, or {advice[1]}"
+    return f"{advice[0]}; {advice[1]}, or {advice[2]}"
+
+
+def _knots(speed_ms: float) -> float:
+    return round(units.ms_to_knots(speed_ms), 1)
 
 
 _TIDE: Any = None

@@ -111,7 +111,7 @@ Each line is marked by its severity in the first column:
 |---|---|---|
 | (blank) | routine | orders as given, hands sent to a job, steps of an evolution, small changes of leeway, gusts, bells, the watch relieved, idlers up and down, piped down, short-handed |
 | `*` | notable | an evolution completed (*Set the fore topsail*, *Tacked*), a sail taken aback, a large wind shift, a spar or rope under dangerous strain, *All hands!*, work waiting for hands or belayed |
-| `!` | urgent | anything carried away, missing stays, the ship taken aback and stopped |
+| `!` | urgent | anything carried away, missing stays, the ship taken aback and stopped (with way on to lose, in a breeze of four knots or more, free of the anchor and the ground; otherwise her sails aback are notable) |
 
 The entries you will see most:
 
@@ -129,7 +129,7 @@ The entries you will see most:
 * Morning watch (04:52)  Main topmast bending like a whip; she will carry it away if sail is not shortened.
 ```
 
-*Order:* is the ship accepting what you said, in the words you said it. *Order not carried out* is a refusal, and its sentence always says what was understood and what was not; the refusal is logged and nothing else happens. *Steady on* is the helmsman reporting the course made good. A sail *taken aback* has the wind on its forward side; the ship *Taken aback* has lost her way to it. A spar *working* or *bending like a whip* is loaded past its rating and may carry away if you do not shorten sail (package 9): in this book's breeze that line comes only in a gust with everything set.
+*Order:* is the ship accepting what you said, in the words you said it. *Order not carried out* is a refusal, and its sentence always says what was understood and what was not; the refusal is logged and nothing else happens. *Steady on* is the helmsman reporting the course made good. A sail *taken aback* has the wind on its forward side; the ship *Taken aback* has lost her way to it. That line is logged once an episode, and again only after she has been a minute clear of it; when she had no way on, lay in a light air, or lay at anchor or aground, the notable *Her sails aback* says so instead (package 37c). *Wind veered* and *Wind backed* read the ten-minute mean wind, as the readings do: the mean two points from where the log last put it, held there a minute. So the line comes some minutes after a steady turn begins, and not at all for an air that flicks about and comes back. A spar *working* or *bending like a whip* is loaded past its rating and may carry away if you do not shorten sail (package 9): in this book's breeze that line comes only in a gust with everything set.
 
 Every entry also carries a machine-readable kind (`order.accepted`, `sail.set`, `ship.tacked`, `wind.gust` and so on) and data in SI units, which the browser client and, later, standing orders read (`docs/TechnicalSpec-M0-M2.md` §5).
 

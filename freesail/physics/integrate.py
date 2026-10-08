@@ -242,19 +242,53 @@ def _log_notes(ship: Ship, st: hp.HullState, dt: float) -> None:
     in_stays = "hove_to" in ship.extra or (
         bool(runner) and any(e.get("subject") in ("ship", ship.name) for e in runner.in_progress())
     )
+    # A new episode is logged only after a minute clear of the last (package 37c), and the
+    # line is urgent only when she had way to lose in a working breeze, free of the anchor
+    # and the ground; otherwise it is a notable line saying why it matters less.
     if sail_set and pressed and st.last_thrust_n < 0 and not in_stays:
+        if st.seconds_aback == 0.0:
+            st.aback_had_way = d.u >= units.knots_to_ms(hp.WAY_ON_KN)
         st.seconds_aback += dt
+        st.seconds_clear_of_aback = 0.0
     else:
         st.seconds_aback = 0.0
-        st.aback_noted = False
+        st.seconds_clear_of_aback += dt
+        if st.seconds_clear_of_aback >= hp.ABACK_REARM_SECONDS:
+            st.aback_noted = False
+    # the lesser lines' flag, armed again by her state (package 37f; see hull.py)
+    if st.aback_lesser:
+        way_again = st.seconds_aback == 0.0 and d.u >= units.knots_to_ms(hp.WAY_ON_KN)
+        wind_again = units.ms_to_knots(st.aws) >= hp.ABACK_URGENT_AWS_KN
+        if st.aback_lesser == "anchor":
+            if not (st.at_anchor or st.aground):
+                st.aback_lesser = ""
+        elif way_again or (st.aback_lesser == "light" and wind_again):
+            st.aback_lesser = ""
     if st.seconds_aback >= hp.ABACK_SECONDS and not st.aback_noted:
         st.aback_noted = True
-        ship.note(
-            "urgent",
-            "ship.aback",
-            "Taken aback: the sails pressed against the masts and she lost her way.",
-            data={"thrust_n": st.last_thrust_n, "speed": d.speed},
-        )
+        data = {"thrust_n": st.last_thrust_n, "speed": d.speed, "aws": st.aws}
+        lesser = text = ""
+        if st.at_anchor or st.aground:
+            where = "at anchor" if st.at_anchor else "aground"
+            lesser, text = "anchor", f"Her sails aback as she lies {where}."
+        elif not st.aback_had_way:
+            lesser, text = "no_way", "Her sails aback; she had no way on to lose."
+        elif units.ms_to_knots(st.aws) < hp.ABACK_URGENT_AWS_KN:
+            lesser = "light"
+            text = "Her sails aback in the light air; she has lost what way she had."
+        if lesser:
+            # said once, and again only when her state has armed it; lying at anchor or
+            # aground is a state of its own, said though a calm's line stands
+            if not st.aback_lesser or (lesser == "anchor" and st.aback_lesser != "anchor"):
+                st.aback_lesser = lesser
+                ship.note("notable", "ship.aback", text, data=data)
+        else:
+            ship.note(
+                "urgent",
+                "ship.aback",
+                "Taken aback: the sails pressed against the masts and she lost her way.",
+                data=data,
+            )
 
     # on her beam ends: heel beyond 40 degrees, once per episode
     if abs(d.heel) >= hp.BEAM_ENDS_HEEL:

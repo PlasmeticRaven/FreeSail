@@ -727,8 +727,11 @@ class Ports:
                     )
                 else:
                     text = f"The {craft} hailed: she has come off for the pilot."
+                # notable (package 37d; the review of gate 5c's playtests, 8.2 item 13):
+                # a hail from a boat alongside is a thing the deck must answer, and at
+                # routine severity it was rolled up and woke no station
                 self._record(
-                    Severity.ROUTINE,
+                    Severity.NOTABLE,
                     "port.pilot_hail",
                     text,
                     {"port": port.id, "errand": self.cutter_errand},
@@ -766,9 +769,10 @@ class Ports:
                 # the pilot asks for sail to be shortened as his boat comes off (package
                 # 36: a schooner with her sheets tended outran the cutter and carried the
                 # Falmouth pilot to the Iroise); the same line as the boat's hail, so
-                # that a book which shortens sail at the pilot's hail does so now
+                # that a book which shortens sail at the pilot's hail does so now; notable,
+                # as the boat's own hail is (package 37d)
                 self._record(
-                    Severity.ROUTINE,
+                    Severity.NOTABLE,
                     "port.pilot_hail",
                     f"The pilot asks for sail to be shortened: his {port.pilot.craft} is "
                     f"coming off for him.",

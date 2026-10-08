@@ -23,7 +23,10 @@ points of the moon's bearing for the rest, T §2) and the moon's age from his al
 worked by Moore's rule of 48 minutes a day (`Epitome.high_waters`), wrong by up to an
 hour as Bowditch admits and by more with an old table; the reading `the tide by the
 almanac` (`api/readings.py`) says it in the master's words. The difference between the
-two tides is the play (truth 64).
+two tides is the play (truth 64). Since package 37e the master works the stream into
+his reckoning himself, from what his sailing directions say of the water his account
+puts her in (`Directions`, each area's `book:` in the streams' file) and the hour from
+that same epitome; nothing of it reads the world's tide (`world/reckoning.py`).
 
 The arithmetic: h(t) = Z0 + Σ f_i A_i cos(V_i(t) + u_i − g_i), the Greenwich phase lag g
 as TICON gives it; V_M2 = 2(T + h − s), V_S2 = 2T, V_N2 = 2(T + h − s) − (s − p) with T the
@@ -57,6 +60,8 @@ __all__ = [
     "CONSTITUENTS_PATH",
     "ESTABLISHMENTS_PATH",
     "STREAMS_PATH",
+    "BookStream",
+    "Directions",
     "Epitome",
     "EpitomePort",
     "Gauge",
@@ -64,6 +69,7 @@ __all__ = [
     "Tide",
     "TideState",
     "astronomical_arguments",
+    "load_directions",
     "load_tide",
     "local_mean_time",
     "moore_minutes",
@@ -525,6 +531,118 @@ def moore_minutes(age_days: float, minutes_per_day: float = 48.0) -> float:
     quarter of a day (`Navigation.almanac_age_days`): a whole day's age alone puts the
     tide up to 48 minutes out, the day's worth of Moore's rule itself."""
     return (age_days * minutes_per_day) % (24.0 * 60.0)
+
+
+# ---------------------------------------------------------------------------
+# The captain's tide: what his sailing directions say of each water (package 37e)
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class BookStream:
+    """What the master's sailing directions say of one water (`data/tides/streams.yaml`,
+    each area's `book:`): the point the flood sets toward, the rate at springs to the
+    half knot and at neaps, and the hour after high water (at the nearest place in his
+    epitome) at which the flood runs strongest. The area's polygon is the water the
+    statement is of; the world's own figures for it are beside it in the file and are
+    not here."""
+
+    id: str
+    name: str
+    polygon: tuple[tuple[float, float], ...] | None  # (lat, lon) corners; None: the rest
+    set_point: str  # 'NE by N'
+    set_rad: float
+    spring_kn: float
+    neap_kn: float
+    strongest_h: float
+    source: str = ""
+    judgement: tuple[str, ...] = ()
+
+    def contains(self, pos: Position) -> bool:
+        if self.polygon is None:
+            return True
+        return _point_in_polygon(pos.lat_deg, pos.lon_deg, self.polygon)
+
+    def rate_kn(self, springs: float) -> float:
+        """The rate at the tide's strength, between the book's neaps (`springs` 0) and
+        its springs (1)."""
+        return self.neap_kn + (self.spring_kn - self.neap_kn) * max(0.0, min(1.0, springs))
+
+
+@dataclass(frozen=True)
+class Directions:
+    """The master's sailing directions for the streams: the statements by water, in the
+    file's order (the first whose water holds a position is that position's; the last,
+    with no polygon, is the open Channel), and the limits of the waters they cover,
+    beyond which he has no statement. **Nothing of the world's tide is here**: the
+    master looks his account up in it, never the ship's true place."""
+
+    areas: tuple[BookStream, ...]
+    limits: tuple[float, float, float, float]  # south, north, west, east
+
+    def area_at(self, pos: Position) -> BookStream | None:
+        """The statement for the water a position lies in; None beyond the directions'
+        limits."""
+        south, north, west, east = self.limits
+        if not (south <= pos.lat_deg <= north and west <= pos.lon_deg <= east):
+            return None
+        for a in self.areas:
+            if a.contains(pos):
+                return a
+        return None
+
+    def by_id(self, area_id: str) -> BookStream | None:
+        for a in self.areas:
+            if a.id == area_id:
+                return a
+        return None
+
+
+_DIRECTIONS: dict[str, Directions] = {}
+
+
+def load_directions(streams: str | Path = STREAMS_PATH) -> Directions:
+    """The directions' statements, read once a process from the streams' file (pure
+    data, shared between Worlds as the tide's tables are)."""
+    key = str(streams)
+    found = _DIRECTIONS.get(key)
+    if found is not None:
+        return found
+    doc = yaml.safe_load(Path(streams).read_text(encoding="utf-8"))
+    areas = []
+    for a in doc["areas"]:
+        book = a.get("book")
+        if not book:
+            continue
+        point = str(book["set"])
+        toward = units.parse_compass_point(point)
+        if toward is None:
+            raise ValueError(f"{streams}: the directions' set '{point}' is no compass point")
+        poly = a.get("polygon")
+        areas.append(
+            BookStream(
+                str(a["id"]),
+                str(a["name"]),
+                tuple((float(p[0]), float(p[1])) for p in poly) if poly else None,
+                units.point_name(toward),
+                toward,
+                float(book["spring_kn"]),
+                float(book["neap_kn"]),
+                float(book["strongest_h"]),
+                str(book.get("source", "")),
+                tuple(str(x) for x in (book.get("judgement") or ())),
+            )
+        )
+    lim = doc.get("book_limits") or {}
+    limits = (
+        float(lim.get("south", -90.0)),
+        float(lim.get("north", 90.0)),
+        float(lim.get("west", -180.0)),
+        float(lim.get("east", 180.0)),
+    )
+    out = Directions(tuple(areas), limits)
+    _DIRECTIONS[key] = out
+    return out
 
 
 def time_words(hours: float, clock: bool = True) -> str:

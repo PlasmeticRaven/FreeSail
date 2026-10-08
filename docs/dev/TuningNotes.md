@@ -829,7 +829,7 @@ Package 33a (spec M5 §8, §13 to §16, §17's second half, §18, §20; the stud
 | `sights.SIGHT_ON_DECK_MINUTES` | 15 minutes | the master on deck watching the sun rise to its greatest altitude | judgement |
 | `sights.SKY_HIDES_THE_SUN`, `WEATHER_HIDES_THE_SUN` | overcast, dark and gloomy, threatening, thick; rain, drizzle, fog, thunder | Beaufort's words as spec §5 gives them; hazy lets the sun through with a worse horizon | judgement on the words |
 | `sights.SKILL_REFERENCE` | 0.5 | a skilled master (0.9) reads his instrument at three fifths of its error, a poor one (0.5) at the whole | judgement |
-| `lookout.SHORE_CLOSE_NM` | 3 miles | the shore itself hailed close aboard when no headland of the chart is in sight, within the visibility and the night's mile; the same three miles a danger is made out at | judgement |
+| `lookout.SHORE_CLOSE_NM` | 3 miles | the shore itself hailed close aboard when no headland of the chart is in sight (at every look since package 37d), within the visibility and the night's mile; the same three miles a danger is made out at | judgement |
 | `sun.Sun.transit` | the sun's meridian passage from the equation of time and the ship's longitude | Meeus's approximation already in `core/sun.py` | arithmetic |
 
 The errors the master cannot know shift the account and not the ellipse (N §3; Apollo: "the ellipse drawn too small"): the line's marking, the chart's variation a decade stale, the deviation by heading and the leeway bias. The ellipse holds the doubts he does know he has: the read, the steering, the set he did not allow for, the leeway he allowed by eye. Seed 7's draws for the frigate: the log-line 7.98% short, the deviation B −0.048° and C −0.379°, the leeway bias +0.22 points, the variation error 2.5° (the chart's 21.5° against the world's 24°); the master's skill from the ship file's deck.
@@ -1061,7 +1061,7 @@ Package 33b (spec M5 §12, §14, §15, §17; decision 30; the study `docs/design
 | `chart.CHART_EDGE_NM` | 10 miles | the lookout says the chart ends within this of its bound | judgement |
 | `chart.HAZARD_KINDS` | rock, ledge, drying, shoal | a bank with its depth in fathoms is a sounding mark | judgement |
 | `lookout.DISTANCE_BY_ESTIMATION_FRACTION` | a sixth of the distance, one sigma, drawn once a sighting episode (was a fifth, drawn at every bearing taken, package 33a) | the eye's judgement of a headland's distance from its height and what shows of it | judgement; the fifth at seed 7 called the Lizard, ten miles off, five leagues, and a sixth four |
-| `lookout.ESTIMATE_HOLD_NM` | a mile | held while she makes under a knot (the brief); judged afresh a mile on with the same eye | judgement |
+| `lookout.ESTIMATE_HOLD_NM` | a mile | held while she makes under a knot (the brief); judged afresh a mile on with the same eye. **Gone in package 37d**: `ESTIMATE_REFRESH_FRACTION` | judgement |
 | `lookout.CLOSING_MINUTES`, `_STEADY_POINTS`, `_FRACTION`, `_LAND_NM` | 10 minutes; a point; a fifth closed; the land within a league | the seaman's rule for a collision course; a ship running in has every headland ahead steady and closing, so the hail is for a danger at any distance and the land or a light within a league | judgement |
 
 ### The moon against the Almanac's figures
@@ -1424,7 +1424,7 @@ Package 37 (spec M5 §29; spec M4 §11 extended; the cold review of 2026-09-30 �
 | `OFFICER_PATIENCE_S` | two glasses (3,600 s) of silence before the nudge | the watcher's is a watch; an officer with the deck is worth a word sooner, and the answer is a nudge | judgement |
 | `HANDOVER_AT_FRACTION`, `HANDOVER_ASK_AGAIN_FRACTION` | 0.6 of the door's context, asked again after a further 0.1 | spec M4 open item 9b ("a set fraction of the budget, a named constant"); under the runner's own dropping point (the context less the reply budget and the tool definitions) | judgement |
 | `HANDOVER_KEEP_TURNS` | the last 6 turns kept whole after the note (two exchanges) | spec M4 open item 9b ("keeps the brief head and the last few turns whole") | judgement |
-| `MAX_SEATINGS` | 2: the first seating and one more, by the same identity | the consent record of 2026-09-29, note 1 (an instance that left by accident seated again) | the owner's reading of the note |
+| `MAX_SEATINGS` (gone since package 37b) | was 2: the first seating and one more, by the same identity. There is no count now: how the station was left decides, and since package 37g the same identity or another may take a released station (`harness.seating`) | the consent record of 2026-09-29, note 1 (an instance that left by accident seated again); the owner's rulings of 2026-10-03 and 2026-10-05 | the owner's rulings |
 | `DRILL_REPLIES` | 4 replies for the three calls | spec M4 open item 11; one reply each and one to spare | judgement |
 | the mate's rank | `standing.rules.RANKS` gains `mate` after `master` | the schooner's and the cutter's officer of the watch is the mate (package 35's posts); a merchant mate under the master | judgement |
 
@@ -1453,3 +1453,638 @@ The frigate at seed 7, plain sail, the officer with the deck, an order a sample:
 - **The frigate stays only with way on her**: an allowed `tack ship` with 0.7 knots through the water is refused by the ship ("not way enough on her to stay"), as the captain's would be.
 - **Every yes on record is asked again.** `consent.changed_sections` on the seven records of `docs/agents/consent/` finds the opening, what an instance would see and do, leaving, being stopped and the journal changed for each (the sections this package changed), so the first time each of those models comes to a door after this build the question is put again, as the brief promised; the owner runs them.
 - **Not done.** `--officer fake` on the drivers (the scripted officer is `fake.officer_of_the_watch`, used by the tests; the drivers' practice flag is the watcher's alone); the drill at the watcher's station (one flag, `Station.drill`, off for the watcher so that the watcher's consent step and its tests stand as they were); `take a bearing of` kept the master's; the boat's errands the captain's.
+
+## Milestone 5: the saves, and the sight of land (package 37d, 2026-10-06)
+
+From the review of gate 5c's first playtests (`docs/playtests/2026-10-05-gate-5c-review/report.md`, sections 5.1, 5.6, 5.8, 6 and 9). Built in the working copy `FreeSail-gate-m5c-c`; `CHANGES-m5c-c.md` has the files.
+
+### The constants and their sources
+
+| Constant | Value | What it is | Source |
+|---|---|---|---|
+| `core.world.BUILD_NAME` | `m5c-c/37d` | the build's name in a save's stamp, set by hand at each package or gate | the brief |
+| `core.world.BUILD_RULES_DIGITS` | 16 | hex digits of the SHA-256 kept as the fingerprint of the rules | the brief |
+| `lookout.ESTIMATE_REFRESH_FRACTION` | a tenth | the distance by estimation is judged afresh, with the sighting's own eye, when the true distance is this much more or less than at the last judging; replaces `ESTIMATE_HOLD_NM` (a mile of the ship's own run), which is gone | judgement (the review's 8.2 item 1) |
+| `lookout.SHORE_CLOSE_ABOARD_NM` | a mile | the shore's hail says "close aboard" within it | judgement on the words |
+| `lookout.LAND_AHEAD_NOTABLE_MIN` | 10 minutes | land ahead is a notable line when she would be on it sooner than this at her speed over the ground | the review's 8.2 item 6 (the owner's figure); judgement |
+| `lookout.LAND_AHEAD_URGENT_MIN` | 4 minutes | and an urgent one sooner than this | the same |
+| `lookout.LAND_AHEAD_CLEAR_MIN`, `_CLEAR_LOOKS` | a quarter of an hour; 5 looks | an approach is over when five looks together find nothing ahead within a quarter of an hour | the brief; judgement |
+| `lookout.LAND_AHEAD_POINTS` | a point either side | the width looked along her course made good | the seaman's "bearing steady" (`CLOSING_STEADY_POINTS`); judgement |
+| `lookout.LAND_AHEAD_WAY_KN` | half a knot | way on over the ground, under which nothing is said | `physics.hull.WAY_ON_KN`'s figure |
+| `lookout.LAND_AHEAD_MARGIN_M`, `_STEP_M` | 100 m; 20 m | the cast along each line steps by the shore's own distance while that is more than the margin off, and by the step when nearer | judgement (a harbour cell is 15 m, the region's 93 m) |
+| `reckoning.FIX_MIN_CUT_DEG` | 30 degrees | two lines that cut by less are no fix | **judgement**: `Navigation1805.md` gives the bearing's error and that "two bearings [are] a fix" and no least angle of cut; thirty degrees is the later manuals' figure, at which the doubt along the finer line is already twice the bearing's own (1 / sin 30°) |
+| `reckoning.FIX_MARKS_CONSIDERED`, `FIX_MARKS_IN_ALL` | 12; 36 | unnamed, the master chooses among the nearest twelve marks, and among thirty-six when no two of those cut (a coast seen end on) | judgement |
+| `reckoning.FIX_NOTABLE_NM` | a mile | a fix's line is notable when the account moved more than this | the brief |
+| `reckoning.FIX_ACCOUNT_DIFFERS` | a third | a bearing's words add the account's own distance from the mark when it differs from the estimate by more than this of the estimate | the brief; twice the eye's own error |
+| `weather.SEA_BREEZE_TREND_KM` | 3 km | the baseline over which the shore's distance is differenced for the breeze's direction, a mile or so either way | W §1.4's scale in words ("felt a few miles to sea"); the figure is judgement |
+| `weather.SEA_BREEZE_SLOPE_NONE`, `_SLOPE_FULL` | 0.15; 0.5 | the breeze's strength is nought where the shore's distance rises by less than the first to seaward and full at the second and above | judgement, from the figures below |
+| `orders.complete.FIX_OFFER_MARKS` | 6 | the marks `take a fix` offers in completion, the nearest | judgement |
+
+No figure here is from a study's "unverified" list. The bearing's degree and a half (`BEARING_SIGMA_DEG`) and the eye's sixth (`DISTANCE_BY_ESTIMATION_FRACTION`) are package 33a's and 33b's and did not move.
+
+### The build's stamp
+
+The fingerprint is the SHA-256 of every `freesail/**/*.py` (no `__pycache__`) and every file under `data/` but `data/charts/tiles/`, in the order of their paths with forward slashes from the folder that holds `freesail/` and `data/`; for each file the path, a zero byte, the bytes with CR LF made LF, a zero byte; the first sixteen hex digits. On the owner's machine: 205 files, 4.1 megabytes, **0.03 seconds**, once a process at the first World made. `tests/test_replay.py` proves that a CR LF copy has the same fingerprint, that the tiles and the caches are not in it, and that a changed rule, a changed data file and a moved file each change it.
+
+### The nearest shore beside a plain search
+
+`Chart.nearest_shore` against a plain search of every cell above the datum (`tests/test_chart.py`, twelve places), with what `coast_distance` gave for the bearing before:
+
+| Place | The ground itself | The plain search | The field's bearing before |
+|---|---|---|---|
+| off Penlee Point, three cables | 529 m, 360° | 529 m, 360° | 0° |
+| off Penlee Point, a mile | 1,877 m, 358° | 1,877 m, 358° | 0° |
+| Cawsand Bay | 216 m, 325° | 216 m, 325° | 322° |
+| the mouth of St Mary's Sound | 9 m, 327° | 9 m, 327° | 0° |
+| St Mary's Sound | 363 m, 163° | 363 m, 163° | 180° |
+| St Mary's road | 295 m, 131° | 295 m, 131° | 123° |
+| the road of the Isle of Bas | 64 m, 355° | 64 m, 355° | 0° |
+| the road of the Isle of Bas, westward | 253 m, 350° | 253 m, 350° | 323° |
+| two miles off the Lizard | 3,586 m, 354° | 3,586 m, 354° | 0° |
+| Whitsand Bay | 3,198 m, 26° | 3,198 m, 26° | 38° |
+| off the Deadman | 3,658 m, 360° | 3,658 m, 360° | 0° |
+| Carrick Road | 654 m, 116° | 654 m, 116° | 90° |
+
+It costs 16 to 30 microseconds close in and some hundreds a league off in a harbour patch, once a minute and only when the field puts the shore within the lookout's reach.
+
+### The sea breeze, before and after
+
+Along the review's three tracks, a mile and a half each sampled every ten metres (`tests/test_chart.py`): the bearing of the nearest cell of shore, which the breeze blew toward, changed 136 times north-east from the Harpy's anchorage (the largest turn 123°), 131 times through the mouth of St Mary's Sound (180°) and 32 times across the road of the Isle of Bas (180°). The coast's trend over three kilometres turns 0.8°, 2.0° and 1.7° at the most between samples; its steepness is 0.38 to 0.63 off the Harpy's anchorage (a wide bay: seven tenths of the breeze or all of it), 0.93 to 1.00 off the open coast of Whitsand Bay, and under 0.2 across the road of the Isle of Bas (little or none). A read is 8 microseconds, and only while a breeze blows.
+
+By the review's own script (`evidence/tools/seabreeze_check.py`) on the Harpy's save of tick 602,100, the game's own weather of 19 June 1805 from 12:27 to 13:50, the wind sampled each second:
+
+| | Turns of two points or more, second to second | Compass points visited | Wind |
+|---|---|---|---|
+| Moving, the breeze as built before | 386 (largest 169°) | 13 | 4.8 to 13.1 knots |
+| Moving, the breeze now | none (no turn of a point; the largest under a degree) | 12, in order, as she rounds Penlee into the Sound | 5.2 to 9.5 knots |
+| Moving, the breeze set to nothing | none | 2 | 3.4 to 4.1 knots |
+| At anchor, before | none | 2 | 6.6 to 8.8 knots |
+| At anchor, now | none | 1 | 8.6 to 11.2 knots |
+
+The 5a day under systems has no chart, so no coast and no breeze: its log is the same line for line and digest for digest (`684580064bfc6ecd`), and its tick path is untouched (measured alone on the owner's machine, the best of five thousands: 1,295 ticks a second; the day's 104,400 ticks sailed whole beside five other passages 1,348 a second before and 799 to 935 after, on a machine by then busy with other work).
+
+### Land ahead on the test and in the recorded passages
+
+Steered at the shore under Penlee Point at four knots from a mile (`tests/test_lookout.py`): the notable line between nine and ten minutes off, about two thirds of a mile; the urgent one between three and four minutes off, under three cables; each once; again after five clear looks. In the recorded passages at seed 7:
+
+| Passage | Notable | Urgent | Where |
+|---|---|---|---|
+| the 5a day | 0 | 0 | no chart |
+| the 5b frigate | 0 | 0 | she anchors in the outer road with nothing ahead inside ten minutes |
+| the 5b passage in thick weather | 1 | 0 | 54900, at the landfall in a mile of fog: "Land ahead, fine on the starboard bow, nine cables", the tick the book stands her off |
+| the 5b schooner | 1 | 1 | 59580 and 59880, standing in for Carrick Road; she strikes at 60075, three minutes after the urgent line |
+| the 5c cruise | 0 | 0 | |
+| the 5c merchant passage | 3 | 3 | 15600 getting under way in Carrick Road ("Land on the larboard quarter, three cables: she is setting down on it"); 16080 and 16380 the Black Rock in Falmouth's mouth, which she passes; 113280 and 113520 the Mingan in the Goulet, which she strikes at 113701; 121920 the Mingan again as she floats off |
+
+The schooner's and the merchant's rows above are the first pass's, when each took the ground; the second pass, below, has them as they are now (the schooner one notable line and no urgent one; the merchant five and two, and neither strikes).
+
+### The recorded passages, re-measured with the reasons
+
+This table is the first pass; the same passages after the second pass are tabled under "The second pass", below.
+
+The six logs were written out before and after and set side by side. Items 5, 9, 10, 11 and 13 change lines; item 6 changes the account, and through the courses the books shape from it, the truth's track.
+
+| Passage | Lines | Digest | The truth's track first differs | Why |
+|---|---|---|---|---|
+| the 5a day under systems | 616, 616 | `684580064bfc6ecd`, the same | never | no chart, no land, no bearing |
+| the 5b passage in thick weather | 502, 503 | `bc80736aa7189f14`, `2472b62d8cac3193` | never | no bearing is taken; two lines: the shore's hail at the start by the eye's estimate (item 9), and land ahead at the landfall (item 10) |
+| the 5b frigate | 630, 656 | `e3bc746c4a6b58b3`, `aaf8cce44143c6f0` | tick 10 (by a metre at 245) | item 6: the departure bearing off Ushant no longer lays the estimate down, the account stands a mile otherwise and the book's "landfall" rule shapes N 358° for N 359° |
+| the 5c cruise | 1966, 1963 | `72ba9f898e7231f2`, `792f830fd4166bc5` | tick 174 in the ninth decimal (item 13: the anchor's place by another arithmetic); by a metre at 57626 | item 6: "back to the station" shapes her course from an account kept by lines and fixes |
+| the 5b schooner | 731, 768 | not recorded | tick 6 (by a metre at 198) | item 6, as the frigate; did not come through in the first pass (the second pass, below) |
+| the 5c merchant passage | 2460, 2876 | not recorded | tick 313 in the ninth decimal (item 13); by a metre at 16714 | item 6: the courses out of Falmouth shaped from the account; did not come through in the first pass (the second pass, below) |
+
+By item, in the lines of the four that changed (the frigate, the schooner, the cruise, the merchant):
+
+- **Item 5** (the distance judged afresh): the distance in the words of every later bearing and of each "steady and closing" hail, which carry the figure as last judged and not the first look's; a sail's distance as she nears.
+- **Item 6** (a bearing a line): the bearings' words gain "; ... by the account" where the two differ by a third (4, 6, 3 and 25 of the bearings); the account; and, after the tick above, every line that depends on where she is: the trims, the leeway, the log's reads, the casts, the hails, each at its own new tick. This is the bulk of the lines that differ.
+- **Item 8, by the mended books**: 11, 10, 12 and 184 fixes, 3, 3, 3 and 8 of them notable (the account moved over a mile), with their orders' lines (14, 14, 16 and 198).
+- **Item 9** (the shore always a sighting): the shore's own hail, 2, 2, 1 and 3 times (once for each approach to within a league).
+- **Item 10**: the table above.
+- **Item 11**: the pilot's hails notable (1, 2, 3 and 4 lines); one dragging anchor, urgent (the merchant, in the Bay of Brest after her grounding).
+- **Item 13** (the anchor's depth where it lies): the merchant's "let go in twelve fathoms and a half" and "Brought up ... in six fathoms and a half" of the recorded passage was the fault itself; her anchors now read "let go in ten fathoms", "Brought up ... in nine fathoms and a half" and "let go in 14 fathoms", "Brought up ... in 14 fathoms".
+
+The constants that moved, old beside new (`tests/test_known_truths.py`):
+
+| Constant | Before | After |
+|---|---|---|
+| `GATE_5B_CAST_TICK` (and the cast: fifty-three fathoms, fifty-five) | 29884 | 29886 |
+| `GATE_5B_LANDFALL_TICK` | 44700 | 44520 |
+| `GATE_5B_ROADS_TICK` | 57732 | 57824 |
+| `GATE_5B_ANCHORED_TICK` | 58167 | 58172 |
+| `GATE_5B_BROUGHT_UP_TICK` | 59144 | 59152 |
+| `GATE_5B_SAIL_SIGHTED_TICK` | 54600 | 55080 |
+| `GATE_5B_PILOT_HAIL_TICK` | 56280 | 56760 |
+| `GATE_5B_PILOT_ABOARD_TICK` | 56340 | 56880 |
+| `GATE_5B_LINES`, `GATE_5B_DIGEST` | 630, `e3bc746c4a6b58b3` | 656, `aaf8cce44143c6f0` |
+| `GATE_5B_THICK_LINES`, `GATE_5B_THICK_DIGEST` | 502, `bc80736aa7189f14` | 503, `2472b62d8cac3193` |
+| `GATE_5C_CRUISE_STRANGER_SIGHTED_TICK` | 90960 | 91380 |
+| `GATE_5C_CRUISE_STRANGER_SPOKEN_TICK` | 106931 | 95189 |
+| `GATE_5C_CRUISE_LINES`, `GATE_5C_CRUISE_DIGEST` | 1966, `72ba9f898e7231f2` | 1963, `792f830fd4166bc5` |
+
+Unmoved: the 5a day's every constant; `GATE_5B_NOON_TICK` (the sun's); the thick passage's ticks; the cruise's yard, under way, pilot aboard and off, world orders, cutter's hail, letter, chase and both noons.
+
+### The books, mended by a line, and the two passages that did not come through (the first pass)
+
+This section is the first pass as it was reported. Both passages come through since the second pass, below.
+
+Each book's rule `every glass, if the land is in sight then take a bearing of the land` relied on the bearing's distance by estimation to put the ship on the chart. Each now reads `... then take a bearing of the land; take a fix` (one line in the 5b frigate's, the 5b schooner's and the cruise's books; in the merchant's that line and the same in "pilot water", two). With one mark only in sight or marks that cut too fine the fix is refused in words and the bearing stands as a line; the refusal is held by the standing runtime after the first.
+
+- **The frigate's passage and the cruise come through** on that one line, re-measured above.
+- **The schooner's passage does not.** Her landfall is on the Lizard's lights alone, four leagues off, with the account two leagues from them by her two-hourly log; one bearing no longer corrects that, she shapes N by E for Falmouth from it, makes the outer road eastward of her old track with the pilot aboard, shapes for Carrick Road from a fix, and takes the ground at seven knots at 60075 (the recorded passage brought up off the town at 58618). Two other mends of a line or two were tried once each and left out: shaping the course afresh at every fix put her (and the frigate) on the Manacles, the straight line from a true position crossing them; a point east of the Manacles to steer for brought her to the outer road and the same grounding in the eastern channel.
+- **The merchant passage does not.** She makes the road of Bertheaume, takes the Brest pilot and anchors as before (101349 for 96475), gets under way on the flood, and in the Goulet strikes the Mingan at 113701, the lookout crying it ahead at seven cables and close ahead three minutes before; the book has no rule for his cry. Its waypoints through the Goulet were tuned at seed 7 to the account the old rule kept there (a bearing every five minutes with its held distance), and with a true account they set her on the rock on the flood.
+
+Their two tests (`test_the_schooner_sails_the_passage_with_her_octant_and_the_log_every_two_hours`, `test_the_merchant_passage_at_seed_7_has_its_own_constants`) are marked expected to fail, strictly, with the reason, and their constants left as recorded before 37d for whoever tunes the books; the suite's summary line therefore shows nine expected failures for the owner's seven. The milestone's fourth rule was followed: a handful of whole-passage runs for each (four for the schooner's book, three for the merchant's), and no further.
+
+### The second pass (2026-10-06): the distance laid down when it is the better figure
+
+The suite after it: the fast tier `2549 passed in 342.23s (0:05:42)`; the whole suite `2790 passed, 7 xfailed in 1022.51s (0:17:02)`.
+
+**The rule.** After a bearing's line is worked, for a charted mark and never for a sail or a transit, the account's variance along the line of sight (t P t, t the unit vector toward the mark as the account has it) is set against the estimate's own, (`DISTANCE_BY_ESTIMATION_FRACTION` x the judged distance) squared. When the account's is the greater the estimate is weighed in along the sight by the gain at that doubt (`Reckoning.weigh_line`; `update_line` and its replace-or-blend rule are untouched). Otherwise it is said and not applied, as in the first pass. No new constant.
+
+**The words.** Applied: "The Lizard bore N by W, five leagues by estimation; the account laid down at that distance, the estimate being the better figure: moved three leagues to the SW." Not applied: "The Beast bore NW, three leagues by estimation." Not applied, the two differing by a third: "The Beast bore N by W, five leagues by estimation; three leagues by the account."
+
+**The schooner's account, miles from the truth, through her landfall** (seed 7; the landfall on the Lizard at 16:12, tick 43920):
+
+| Tick | Before 37d | First pass | Now |
+|---|---|---|---|
+| 43800 (two minutes before) | 8.46 | 5.74 | 7.39 |
+| 43920 (the landfall) | 1.73 | 5.58 | 1.12 |
+| 44400 | 1.32 | 5.00 | 1.37 |
+| 45000 | 0.88 | 6.82 | 1.38 |
+| 45600 | 1.55 | 6.16 | 1.16 |
+| 46200 | 2.53 | 5.51 | 1.71 |
+| 47400 | 1.28 | 1.29 | 1.28 |
+| 52800 | 0.90 | 1.46 | 1.44 |
+| 56400 | 0.57 | 1.11 | 1.08 |
+
+She makes her landfall, her pilot (55380), the outer road (56502), her berth (57615) and brings up (58618) on the ticks recorded before 37d; one notable "Land ahead, fine on the starboard bow, a mile" at 57240 standing in. Her book was not touched in this pass beyond its comment.
+
+**The frigate's account at her landfall is the case the rule does not help.** Miles from the truth:
+
+| Tick | Before 37d | First pass | Now |
+|---|---|---|---|
+| 44400 | 5.28 | 4.89 | 4.63 |
+| 44520 (the landfall) | 5.29 | 0.61 | 4.23 |
+| 45000 | 1.33 | 1.14 | 4.49 |
+| 45600 | 2.25 | 1.22 | 3.90 |
+| 46200 | 3.25 | 1.90 | 3.41 |
+| 47400 | 1.52 | 0.63 | 1.42 |
+| 52800 | 1.09 | 1.38 | 1.08 |
+| 58800 | 0.71 | 0.49 | 2.12 |
+
+At 44520 the line moves her account 4.9 miles W by S and the words are "The Beast bore N by W, five leagues by estimation; three leagues by the account": the lookout is right and the account two leagues wrong along the sight, but the account believes its doubt that way (its latitude, by the noon's sight four hours before) less than the estimate's 2.3 miles, so the distance is not laid down. It is laid down two glasses later (46800: "moved four miles to the S by E") and the fix follows. She comes through: the outer road 58895, the anchor 59250, brought up 60239, the pilot aboard 57180.
+
+**The lead's correction, 2026-10-06** (measured from this package's own dumps of the three runs; see `CHANGES-m5c-c.md`, "The Goulet"). The paragraph below says the fix put a worse account in the place of a headland's bearing. The account's median distance from the truth says otherwise: on the leg from the Iroise to the road, 0.91 mile before 37d, 0.50 with the fix every five minutes, 0.45 with the bearing alone; in the Goulet, 0.45 before, 0.17 with the fix, 0.48 with the bearing alone. She struck with the truer account, and comes through as delivered with one about as wrong as before 37d: the book's points are tuned to an account that lags her on the flood. Nine fixes of sixty left the account worse than it was a second before; the nearest land's mark was among a fix's marks in 22 of 60.
+
+**The merchant passage and the Goulet.** What set her on the Mingan in the first pass was the account, and not the chain's points alone. The first pass had made her pilot-water rule `take a bearing of the land; take a fix` every five minutes; in the Iroise and the road the fix's marks are distant and its lines met "within six cables" or "within a mile", and it put that in the place of a headland's bearing every time. She anchored a mile north of her old berth, the course for the mouth passed half a mile north of the mouth's point so that its rule never fired, she turned late and through four points under Petit Minou, lost her way, and the flood (3.4 knots to the eastward there) set her down on the rock. In this pass:
+
+- The pilot-water rule takes **the bearing alone**, as before 37d; the fix every glass by the rule "bearings" stands. At anchor in the road her account is then within half a cable of the truth.
+- **Two points moved.** "for the Goulet" shapes for 48 19.15 N 4 38 W (was 48 19.3 N 4 38 W; the mouth's rule still turns on the old point): a shaped course is a heading, and outside the mouth she makes good six or seven degrees north of it. "under Petit Minou" shapes for 48 20.9 N 4 35.1 W (was 48 20.7 N 4 35 W), and "north of the Mingan" turns four cables short of that point: inside Petit Minou a head of 44 to 50 degrees makes good 62 to 67 on the flood.
+- **The result at seed 7.** The whole chain fires in its order (the mouth 112740, Petit Minou 113100, the Mingan's pass 113763, the Fillettes 113852, Portzic 114301, the Bay 114737). She passes **the Mingan 328 m (1.8 cables) to the north** at 113600, the Fillettes eight cables off, and the shore under Petit Minou 294 m (1.6 cables) off; before 37d the figures were 311 m and 273 m. The lookout cries "The Mingan ahead ... nine cables" at 113040 and "The Mingan close ahead, on the starboard bow, three cables!" at 113400, which is the truth of that pass. She anchors in the Bay at 116140 in six fathoms and the tin is sold at 123901.
+- **Also moved by the account earlier in the passage:** the cast at the Iroise's mark, never made at seed 7 before, is made at 91836 in thirty-nine fathoms and matches her chart's words; the pilot of Brest boards at 98160 (91560); she anchors in the road of Bertheaume at 101373 in nine fathoms and a half (96475 in thirteen and a half).
+
+**What was tried on the Goulet** (nine runs of the late leg from a save at tick 110000, and four whole passages; the budget was about fifteen). Runs 1 to 7 kept the first pass's bearing-and-fix rule and moved the points: every one took the ground, on the Mingan (1, 3) or on the north shore under Petit Minou (2, 4, 5, 6, 7), because the rules fire on the account's distance and the account there was two to four cables out to the south-east. A fix taken before the bearing (run 8) brought her through the leg, 254 m from the Mingan, but the same rule sailed from Falmouth ran her ashore in the Iroise at 99414. The bearing alone with the old points brought her through, 365 m from the Mingan but 125 m from the shore under Petit Minou, the mouth's rule not firing. Run 9, the bearing alone with the two points moved, is the book as it stands.
+
+**The account in the Goulet is still not a true one, and the rule cannot make it so.** Miles from the truth with the book as it stands: 0.02 to 0.06 at anchor in the road; 0.33 at 110500, 0.74 at 110900 and 0.79 at 111300 as she gets under way (the account runs to the south-south-east while she casts and gathers way; a leeway of 54 degrees is logged at 110721); then half a mile astern of the truth along her track on the flood (0.53 at 112100, 0.60 at 112500). All that time the bearings read "Point Bertheaume bore N by W, five cables by estimation; a mile by the account" and the distance is not laid down, because the account believes its doubt along that sight under the estimate's cable. The passage comes through because the points and the radii allow for it at this seed, not because the account is right. Two things would mend it and neither was in this pass: the account's doubt growing as she gets under way and on a stream; or the estimate laid down also when it and the account differ by several times the estimate's own error.
+
+**The recorded passages after the second pass.**
+
+| Passage | Lines (before 37d, now) | Digest now | What moved since the first pass, and why |
+|---|---|---|---|
+| the 5a day under systems | 616, 616 | `684580064bfc6ecd` | nothing |
+| the 5b passage in thick weather | 502, 503 | `2472b62d8cac3193` | nothing; no bearing is taken |
+| the 5b frigate | 630, 662 | `100f1bb8cdba918c` | the departure off Ushant is now a bearing and distance of the light ("moved two miles to the W") and then the fix, so her first course and her track differ: the cast at 29884 (29886), the outer road 58895 (57824), the anchor 59250 (58172), brought up 60239 (59152), the cutter sighted 55260 (55080), her hail 57060 (56760), the pilot aboard 57180 (56880); ten fixes; five bearings with the distance laid down and eleven without; the landfall's assertion re-measured (six miles out at the landfall, as before 37d) |
+| the 5b schooner | 731, 760 | `b3beb599c0cff7ea` | every tick as before 37d; the lines are the fixes with their orders, the shore's hail, land ahead once; seven bearings with the distance laid down and nine without |
+| the 5c cruise | 1966, 1963 | `86680b3c485373dc` | no tick; the bearings' words where the distance is laid down (three) |
+| the 5c merchant passage | 2460, 2634 | `52033fdd56901499` | as above: the pilot of Brest 98160, the road 101373, the mouth 112740, the Bay 116140, the tin 123901, the cast at the Iroise 91836; a sail off the Lizard at 26280 (28140, since the first pass); fifteen bearings with the distance laid down and 181 without; land ahead five times notable and twice urgent (Carrick Road and the Black Rock going out, the road of Bertheaume, the Mingan twice, the Bay) |
+
+### Found on the way (package 37d)
+
+- **A second bearing of the same mark drew the account toward the mark.** With the distance no longer laid down, two bearings of one mark a degree apart were crossed as two lines, which meet only at the mark, and the account slid 40 per cent of the way to it at one stroke and a sixth of the way in six more. A bearing taken within two miles of the last observation is now worked as an angle at the account (its line's normal square to the mark as the account has it), and after a second bearing of the same mark the doubt is turned with the account about the mark; a bearing of another mark still crosses the first, and a second of the same mark after a run is a running fix. `Reckoning.update_line`'s replace-or-blend rule is as it was (package 37e's).
+- **The across-line doubt of a bearing is taken at the account's distance from the mark**, the master's own figure, where it was taken at the truth's.
+- **A game taken up from another build's checkpoint and saved again would have been stamped this build's own.** A save also carries `"builds"`, every build the game was played under, and such a save without its checkpoint is not replayed without the flag.
+- **A ship strikes a ledge's edge before she is up with its mark**: land ahead takes a charted danger as near as its edge and as wide as its extent, as the grounding does (the frigate, steered at the Manacles by a mend that was not kept, struck four minutes after "a mile").
+- **The shore's distance is by the eye too**: the shore was "judged true" (a cable's rounding of the chart's own figure); it now has the sighting's eye like any other, drawn from a stream of its own (`shore`) so that no headland's draw moves.
+- **Not done, and for a later hand**: the dialect refuses cables (`when the nearest land is under 3 cables`); a station's replies are still placed in a replay by the count of journaled orders; the sun's local time reads the ship's easting on the plane (spec M5 §33, items 17 and 19).
+
+## Milestone 5: the account (package 37e, 2026-10-07)
+
+The review of game 9 (`docs/playtests/2026-10-05-gate-5c-review/`), its section on the reckoning: one rule by which an observation is believed, a doubt that grows by the hour whether she has way or not, the fix's choice of marks, the master's own tide in the traverse, and a course shaped to make good. `BUILD_NAME` is `m5c-c/37e`. Measured on the owner's Windows machine at seed 7; the machine ran at 700 to 1,000 ticks a second through the afternoon against 1,400 in the morning, on an untouched scenario as on a changed one, so the times here are the machine's and not the change's.
+
+### The constants and their sources
+
+All in `freesail/world/reckoning.py` unless said.
+
+| Constant | Value | What it is | Source |
+|---|---|---|---|
+| `OBSERVATION_OUT_SIGMAS` | 2 | an observation further from the account than this many times the two doubts added is taken, the account laid down on it | **two, where the brief said three.** Game 9's noon of 16 June: the sight 48° 07' N good to 2.28 miles, the account 48° 12½' N trusting itself within 0.26, 5.23 miles apart, which is 2.06 of the two doubts together; the brief's test requires that noon taken. Judgement |
+| `OBSERVATION_KEPT_NM` | 0.05 mile | a weighing that would move the account under half a cable is not applied | the brief |
+| `SAME_LINE_DEG`, `LINES_REMEMBERED` | 5°, 24 | a line within five degrees of one already had of the same thing is the same thing seen again; the last two dozen are remembered | judgement |
+| `SAME_GROUND_NM` | 2 miles | a cast within this of the first cast of that ground (or within his own doubt, when that is more) narrows nothing further | judgement on the brief's "a second cast on the same ground" |
+| `SOUNDING_ACROSS_MIN_NM`, `SOUNDING_ACROSS_MAX_NM`, `SOUNDING_SLOPE_NM` | ¼ mile, 60 miles, ½ mile | a cast's doubt as a line: the contour's tolerance over the fathoms the chart shelves in a mile, read over half a mile at least; a quarter of a mile at the best; no line at all over a flat bottom | the brief ("only so far as the charted depth differs across his doubt"); the bounds judgement. **Gone:** `SOUNDING_ACROSS_SIGMA_NM`, three miles whatever the ground |
+| `CONTOUR_GRAIN_M` | half a mile | the contour search's own step; where the chart about the account brackets the cast at this grain the cast is kept | `chart.CONTOUR_STEP_M`; found on the frigate's passage (below) |
+| `BEARING_LINE_FORM_FRACTION` | a tenth | a bearing is worked as the line through the mark when the doubt across the sight is more than this part of the distance | the brief, judgement |
+| `COMPASS_ALLOWANCE_DEG`, `COMPASS_ALLOWANCE_OBSERVED_DEG` | 2½°, 1½° | the master's doubt of his compass in a bearing and across a course; the less once he has observed the variation | judgement: the chart's variation a decade old (N §3), an azimuth compass read to a degree |
+| `LOG_LINE_DOUBT` | 4 per cent | his doubt of the log-line's marking, along the course | judgement: the middle of N §3's "3 to 8 per cent" short, as a doubt either way |
+| `STREAM_DOUBT_FRACTION`, `STREAM_DOUBT_HOURS` | ¾, 3 hours | his doubt of the stream: three quarters of its rate at strength, along its set, growing for three hours of a tide and no further | judgement: a rate to the half knot of a knot and a half, an hour of high water out by an hour and more (measured below), a set to the point; a stream cannot set her further than it runs in half a tide |
+| `HOVE_TO_DRIFT_KN`, `HOVE_TO_DRIFT_SIGMA_KN` | ¼ knot, ½ knot | hove to, her drift through the water as his eye has it, to the quarter knot; his doubt of it | Falconer 1780, *Drift*: "the angle which the line of a ship's motion makes with the nearest meridian, when she drives with her side to the wind and waves ... also the distance which the ship drives on that line"; no period rate, so no fixed rate is used. Judgement |
+| `NO_WAY_KN`, `CALM_MINUTES` | ½ knot, 10 minutes | under this she has no way worth the log; becalmed this long, the log's last read is stale | the hull's own floor (`WAY_ON_KN`); judgement |
+| `WAY_BY_EYE_GRAIN_KN`, `WAY_ALLOWANCE_LEAST`, `WAY_ALLOWANCE_MOST` | ½ knot, ¼, 2 | between heaves the read is allowed by the mate's eye for the way she has gained or lost, within these bounds | Falconer 1780, *Log*: "if at any time of the watch the wind has increased or abated in the intervals, so as to affect the ship's velocity, the officer generally makes a suitable allowance for it"; the grain and bounds judgement |
+| `TIDE_QUARTER_S` | 900 s | the master's tide is summed into the traverse by the quarter hour | judgement |
+| `DOUBT_THIN_RATIO` | 2 | the doubt is said as it lies ("NE and SW, nor a mile across") when it is this much longer than wide, a mile and more long, and off the compass's quarters | the brief |
+| `SHORE_PASS_NM`, `SHORE_AT_PLACE_NM` | ½ mile, 2 miles | a shaped course's line is said to pass a shore within this; the shore at a place on the land itself is not said within this of it | judgement |
+| `streams.yaml`, `book:` | per area | what the directions say: set to the point, springs to the half knot, neaps, the hour | the table below |
+| `streams.yaml`, `book_limits` | 48° to 51° N, 7° to 3° W | beyond these the master has no statement and allows no tide | the chart's own waters; judgement |
+
+Kept and unchanged in meaning: `FIX_MIN_CUT_DEG` (thirty degrees), `DISTANCE_BY_ESTIMATION_FRACTION`. Gone: `FIX_RUN_NM`; `Reckoning.weigh_line`; `Navigation._hours_under_way`. `run_since_fix_nm` is kept as a record; nothing in the rule reads it (the review's `replay_probe.py` prints it).
+
+### What the directions say, beside the world's figures
+
+`data/tides/streams.yaml`; the world's figures are the truth and are never read by the master.
+
+| Water | The world: axis, springs, neaps, hour | The directions: set, springs, neaps, hour | What is the period's |
+|---|---|---|---|
+| Carrick Road | 010°, 1.5, 0.75, −3 | N by E, 1.5, 0.75, −3 | all judgement (the world's rounded) |
+| the entrance of Falmouth harbour | 355°, 1.0, 0.5, −3 | N, 1.0, 0.5, −3 | all judgement |
+| off the Manacles | 020°, 1.2, 0.6, −1 | NNE, 1.0, 0.5, −1 | all judgement |
+| the approaches to Falmouth | 075°, 0.7, 0.35, −1 | E by N, 0.5, 0.25, −1 | all judgement |
+| off the Lizard | 085°, 2.3, 1.1, 0 | E, 2.5, 1.25, 0 | **the hour**: Bowditch 1802's headland table, the Lizard, the current runs three hours after high water; set and rates judgement |
+| off the Start | 065°, 3.0, 1.5, −½ | ENE, 3.0, 1.5, −½ | **the hour**: Bowditch's headland table; set and rates judgement |
+| Scilly and the Land's End | 345°, 1.8, 0.9, −3½ | N by W, 2.0, 1.0, −3½ | all judgement |
+| Scilly | 020°, 1.2, 0.6, −3½ | NNE, 1.0, 0.5, −3½ | all judgement |
+| the Fromveur | 045°, 7.0, 5.0, −2½ | NE, 7.0, 3.5, −2½ | all judgement, by the owner's ruling (no period source); the neaps at half the springs, where the world has five knots |
+| the Chenal du Four | 010°, 4.0, 2.5, −2½ | N by E, 4.0, 2.0, −2½ | all judgement, by the owner's ruling |
+| the Goulet | 080°, 4.5, 3.0, −3 | E by N, 4.5, 2.25, −3 | all judgement, by the owner's ruling (the timing) |
+| the Iroise | 030°, 1.5, 0.8, −2½ | NE by N, 1.5, 0.75, −2½ | all judgement |
+| the open Channel | 065°, 1.6, 0.8, 0 | NE, 1.5, 0.75, 0 | **the set**: Bowditch 1802, "the Current in the Mid. Channel is N.E."; rates and hour judgement. The hour is the reading of "about 1 H. 30 M. after High Water" that agrees with the world's own figure; the sentence is ambiguous and the other reading would put it an hour and a half earlier. **For the lead.** |
+
+The set is twenty degrees from the world's axis in the open Channel and within half a point everywhere else.
+
+### The master's tide beside the world's
+
+*His hour of high water* (Moore's rule from his epitome's establishment, against the world's harmonic tide; `scratch hw_compare`): in mid-Channel on 10 to 13 June 1805 he is an hour to an hour and fifty minutes early; on the 16th about right. His nearest place changes as the account crosses (the Ramhead, 6h 00m, to Ushant, 4h 30m).
+
+*Over one whole tide in the Iroise* (48° 10' N, 5° 06' W, 12 June 1805, the moon full; the master's high water at Ushant 02:57 and 15:22; knots and the point the water sets toward):
+
+| Hour | The master's tide | The world's stream |
+|---|---|---|
+| 06:00 | ebb SW by S 1.42 | SW by S 0.84 |
+| 07:00 | ebb SW by S 1.48 | SW by S 1.20 |
+| 08:00 | ebb SW by S 1.17 | SW by S 1.26 |
+| 09:00 | ebb SW by S 0.56 | SW by S 1.00 |
+| 10:00 | flood NE by N 0.18 | SW by S 0.49 |
+| 11:00 | flood NE by N 0.88 | NE by N 0.15 |
+| 12:00 | flood NE by N 1.36 | NE by N 0.76 |
+| 13:00 | flood NE by N 1.50 | NE by N 1.17 |
+| 14:00 | flood NE by N 1.26 | NE by N 1.27 |
+| 15:00 | flood NE by N 0.71 | NE by N 1.04 |
+| 16:00 | ebb SW by S 0.02 | NE by N 0.54 |
+| 17:00 | ebb SW by S 0.75 | SW by S 0.10 |
+| 18:00 | ebb SW by S 1.28 | SW by S 0.72 |
+| 19:00 | ebb SW by S 1.50 | SW by S 1.15 |
+
+His tide turns about an hour before the sea's, his springs are the world's 1.5 knots, and the two sets are four degrees apart. Becalmed there for thirteen hours with the account set right, the truth went 3.8 miles out and back and the account was never more than a mile from it (`tests/test_reckoning.py`, the tide in the traverse). In the open Channel the same working, with his hour an hour and a half early and his set twenty degrees off, leaves the account little nearer than allowing nothing would.
+
+### The doubt, before and after
+
+| Case | Before 37e | After |
+|---|---|---|
+| Hove to, game 9, 15 June 10:00 to noon | the true error grew from 3.3 miles to 4.8, the doubt from 1.08 to 1.12: the hours hove to were struck from the interval | |
+| Hove to three hours in the Iroise, from a doubt of 0.3 mile (the brig, a twelve-knot breeze) | 0.3 | 2.98 miles |
+| Becalmed three hours in the Iroise, from 0.3 | 0.3 | 3.03 miles |
+| At anchor three hours, from 0.3 | 0.3 | 0.3, and the account where it was |
+| In fog, the thick passage, at the landfall after fifteen hours without a sight | the doubt 3.15 miles E and W, 2.37 N and S; the account 10.9 miles out | 5.78 and 4.47; the account 6.4 miles out |
+| The brig hove to six hours of a spring ebb in the Iroise (the new scripted test, slow tier) | the account where she was brought to, 13.6 miles from her | she drove 13.6 miles to the SSE; the account 1.98 miles from her, his doubt 3.67 |
+
+### A fix's choice of marks, and "good to"
+
+In the Goulet's geometry (game 9's, under Petit Minou): the marks in sight Petit Minou (inside a mile), the Mingan, Camaret, Portzic, Brest and Conquet. The master takes **Petit Minou, Camaret and Portzic**, "good to a cable", and the fix is 0.027 mile from the truth. Not "Petit Minou and the Mingan": the two bear west and east in one line there (they cut at two degrees), so one of them serves, and Camaret is the only mark to the southward; never Brest and Conquet, five miles off, which the old rule (the three that cut best) took. Over game 9's own fixes the truth lies within twice "good to" in every case (`tests/test_reckoning.py`). Moored in Brest road, a fix by far marks leaves a sound account where it was ("the fix the poorer figure; the account kept").
+
+### The recorded passages, re-measured with the reasons
+
+Written out before the first change and after the last (`scratch dump_passage`; before against after by kind and by line, `scratch account_lines`).
+
+| Passage | Lines | Digest | The true track parts at | Why |
+|---|---|---|---|---|
+| 5a's day | 616 → 616 | `684580064bfc6ecd`, unchanged | never | no chart, no reckoning |
+| the frigate, 5b | 662 → 718 | `100f1bb8cdba918c` → `3c659bf81ef803fd` | tick 51 | the departure's course (tick 1): the helm is ordered the line's own bearing, a degree from 37d's heading |
+| the schooner, 5b | 760 → 799 | `b3beb599c0cff7ea` → `8c0c686c9c52bac8` | tick 33 | the same |
+| the thick passage, 5b | 503 → 508 | `2472b62d8cac3193` → `93239d9d2916dc54` | tick 45601 | the first course shaped in that book, at 45599, made good against the flood |
+| the merchant passage, 5c | 2634 → 3146 | `52033fdd56901499` → `79dbbe53c772d94e` | tick 16610 | the first course shaped under way, 16608, "clear of the road", with the ebb allowed |
+| the naval cruise, 5c | 1963 → 2144 | `86680b3c485373dc` → `f796f1dc5df9f466` | tick 11273 on | the course for the station, 203° to make good SW by S against the ebb, for 37d's heading of 207° (below) |
+
+The lines that changed, by the item that changed them:
+
+- **Item 1 (the one rule; the words say what the master did).** Every cast, bearing, noon, fix, lunar and time sight carries its verdict: the frigate's 15 bearings, 9 fixes, noon and casts; the schooner's 15, 10, noon and 2 casts; the thick passage's noon and cast; the merchant's 196 bearings, 42 fixes at their old ticks, 2 noons and 54 casts. The frigate's fixes are nine for ten (her track).
+- **Item 2 (the doubt).** No line of its own; it is in the data of every reckoning line (the ellipse) and in the verdicts.
+- **Item 6 (the master's tide).** `reckoning.tide`, new: 12 lines in the frigate's passage, 13 in the schooner's, 10 in the thick, 16 in the merchant's; the noon's last sentence in each.
+- **Item 9 (a course made good).** Every `helm.set` of a shaped course (the frigate 3 → 4, the schooner 4 → 5, the merchant 30 → 39), and through the track everything the ship's physics says after it: the sails trimmed, the yards braced, the leeway lines, the log's reads, the weather's hour as she meets it elsewhere, the lookout's sightings.
+- **Item 11 (the books).** The orders entered at tick 0 and the rules' own firings: the frigate's "round the Manacles" and "the pilot boards" (sail shortened: `sail.reefed` 0 → 3, `sail.taken_in` 0 → 2); the merchant's `reckoning.fix` 42 → 185 (the fix after every bearing in pilot water), `order.accepted` 523 → 687 with them, "the course for the road" eight times, the gates of the Goulet.
+
+Old beside new:
+
+| | Before (37d) | After (37e) |
+|---|---|---|
+| **The frigate** noon; cast | 28740; 29884, fifty-five fathoms | 28740; 29887, fifty-five fathoms, "The account kept." |
+| landfall | 44520, the Beast and the Lizard's lights | 44760, the same at one look |
+| the account at the landfall | 6.9 miles out; 4.2 to 5.4 for thirty-five minutes after | 9.7 out before the bearing, 2.35 after it, 2.4 for thirty minutes, 1.25 from the fix at thirty-five |
+| outer road; anchor; brought up | 58895; 59250; 60239, twelve fathoms | 57737; 58178; 59151, eleven and a half |
+| cutter sighted; hail; pilot aboard | 55260; 57060; 57180 | 55440; 56940; 57060 |
+| **The schooner** landfall | 43920 | 44400 |
+| outer road; anchor off the town; brought up | 56502; 57615; 58618, ten fathoms and a half | 56517; 58210; 59395, six and a half |
+| pilot | aboard 55380 | hailed 56160, **not aboard** (an expected failure, below) |
+| **The thick passage** landfall | 54900, Black Head close aboard, the account 10.9 miles out | 54600, the same land, 6.4 miles out |
+| **The merchant** pilot of Falmouth put off | 18420 | 18540 |
+| sail off the Lizard | 26280 | 26640 |
+| noons | 25200, 111660 | 25200, 111660 |
+| cast in the Iroise | 91836, thirty-nine fathoms | 91418, forty-one, "The account kept." |
+| pilot of Brest | aboard 98160 | aboard 97800, **put off again 100620** |
+| anchor, road of Bertheaume | 101373, nine fathoms and a half | 101821, seven fathoms |
+| the flood; under way; the mouth of the Goulet | 108960; 110675; 112740 | 108960; 110353; 112444 |
+| the Mingan; the shore under Petit Minou | 1.8 cables (328 m) to the north; 1.6 cables | 1.9 cables (356 m) to the north; 0.7 cable (125 m), in eleven fathoms |
+| anchor in the Bay; tin sold | 116140; 123901 | 116110; 124441 |
+| **The cruise** to the pilot's leaving | 5460, 6834, 7920, 11220 | the same |
+| the cutter's hail; the letter read | 17840; 17900 (10:57 on the 12th) | 84153; 84213 (05:22 on the 13th) |
+| noons | 21600, 108240 | 21600, 108240 |
+| the Palinure sighted; chased; spoken | 91380; 91800; 95189 | 90000; 90000; **lost at 92040, not spoken** (an expected failure, below) |
+| wears | ten | eleven, and a tack |
+
+**The cruise, and why it parts so far.** After the pilot is put off she fills away and the course for the station is shaped (11273). In 37d that was the heading SSW 207°, and on it she lay with her topsails unfilled and no way on her for an hour and fifty minutes ("Hove the log: no way" at 14437; nothing fills until the course is shaped again at 17840): a fault of the filling away, which is package 37f's, and no part of the book. It was in that hour that the port admiral's cutter, sent from Plymouth at 10:00, came up with her. Made good against the ebb the course is 203°, her topsails fill at 11477 and she makes seven knots and a half; the cutter is a stern chase of nineteen hours and hails her on the station at 05:22 on the 13th. She has chased the cutter to the north-eastward from 04:08 and is put about for the station at the hail, so at 07:00, when the scenario puts the Palinure on the sea at 48° 50' N 5° 16' W, the frigate is three leagues to the south-eastward of her, on the starboard tack standing away. The chase is "as near the wind as she will lie", on the tack that opens the brig; she is worn round at the next glass and the brig is out of sight at 92040. The old meeting, the brig five leagues on the frigate's bow, was the accident of the lost hour and fifty minutes; no small mend of the book that could be stood behind brings it back, and none was made. For the lead: the scenario's hours for the cutter and the brig, or the filling away in 37f.
+
+### The books, and the count of runs
+
+Ten whole-passage runs with a book changed, of the dozen allowed (the frigate 2, the schooner 4, the merchant 4, two of the merchant's to the road of Bertheaume only), and ten late legs from a checkpoint (the merchant's, six from 84000 and four from 106000). None for the cruise beyond the measurement.
+
+- **The frigate's and the schooner's**: a course made good from the Lizard's landfall for Falmouth "crosses the land about Black Head" and "passes the Manacles within a mile"; 37d's heading for Falmouth was set a league to the eastward of that line by the flood, clear of the ledge. Sailed, the schooner struck the Manacles at 53581 and the frigate anchored in four fathoms off Black Head and took the ground on the ebb. Both books now shape for a point three miles east of the Manacles (50° 02' N 4° 58' W) at the cast and at the landfall, and for Falmouth when it is within a mile ("round the Manacles").
+- **The frigate's pilot**: standing in NNW she makes six knots and a half over the ground where she made five and three quarters, and the pilot boards a ship under six. "The pilot boards: at the pilot's hail then shorten sail". He boards two minutes after.
+- **The schooner's pilot**: not mended. Three were tried: sail shortened at the hail, and the fore topsail taken in, each put her on the ground within St Anthony's (58086; 58582 at her anchor); brought to for his boat she lay to two glasses and the cutter did not come alongside. The book is left without, the pilot's hail is pinned, and his boarding is a strict expected failure.
+- **The merchant's**, for a true account and a course made good:
+  - *Pilot water* takes its fix after the bearing again.
+  - *The Iroise.* With her drift hove to in the account she drifted out of the mark's mile and a half and sailed back into it, and was brought to four times. She is brought to with her head south of east (the course from the soundings), and "past the Iroise" waits for the first point within five miles.
+  - *The road of Bertheaume.* The line from the first point to the second crosses the corner of the Chenal du Four's water (the areas have hard edges: three knots and a half to the southward on one side, a knot and a half on the other). The course for the road, shaped inside that corner, allowed the Four's ebb, laid her head N by E, which she could not lie, and held after she was out of it; she ran ashore west of Point Bertheaume at 101679. "The course for the road" works it again every five minutes while she stands in from the second point. The pilot of Brest asks for his boat when she opens her distance from the port, which she does stemming that ebb; "the pilot put off" now heaves to for the Falmouth pilot only, and he leaves her at 100620 without her being brought to.
+  - *The Goulet.* With four knots of flood under her the wind she feels draws two points ahead and she lies no higher than ENE on the larboard tack, so she makes good nothing to the northward of about 067°. The old points asked NE across the stream (an allowance of N by E, which she could not lie), and in three trials she passed south of the Mingan, between it and the Fillettes, once coming through 118 m off the south shore and twice taking the ground. The points are now on the one line of 067° that clears both the shore under Petit Minou and the rock; the course for the point north of the Mingan is shaped at the mouth (the Iroise's allowance) and again at 4° 37.1' W (the Goulet's); the turns are at meridians. She passes the Mingan 1.9 cables to the north, the shore under Petit Minou 0.7 cable off in eleven fathoms.
+  - *The Bay.* The line from under Portzic, made good, passed three cables off Penaleuch point over seven fathoms, and the first cast under twelve brought her up two miles and a third from the Bay's mark, out of the boat's reach (the port serves within two). The point under Portzic is two cables north, and "in the Bay" anchors within a mile and eight tenths of the mark.
+
+### The proof by measurement
+
+`docs/playtests/2026-10-05-gate-5c-review/evidence/tools/account_probe.py`, extended to print the master's doubt beside the error (the greater axis of his ellipse; a sample is marked when the error is more than twice it), on the three passages before the first change and after the last, a sample every half hour.
+
+| | The merchant, before | after | The frigate, before | after | The schooner, before | after |
+|---|---|---|---|---|---|---|
+| mean error, miles | 1.81 | 1.74 | 3.97 | 2.71 | 3.87 | 2.10 |
+| median | 0.35 | 0.41 | 4.49 | 1.21 | 2.18 | 0.97 |
+| worst | 9.03 | 10.71 | 9.79 | 9.58 | 12.25 | 8.01 |
+| over a mile | 32% | 36% | 62% | 56% | 59% | 47% |
+| over three miles | 18% | 18% | 53% | 26% | 47% | 26% |
+| the error more than twice the doubt | 25 of 72 (35%) | 13 of 72 (18%) | 21 of 34 (62%) | 2 of 34 (6%) | 18 of 34 (53%) | 0 of 34 |
+| the doubt's median; greatest | 0.39; 2.09 | 0.36; 4.72 | 0.85; 2.38 | 3.42; 4.81 | 1.03; 3.08 | 3.47; 4.84 |
+
+What was asked, and what was got:
+
+- **The merchant's median no worse than 0.35**: 0.41, a little worse. **The time over three miles halved from 18 per cent**: not met, 18 per cent still. All of it is the night's run across the Channel (15:00 to 22:30): her compass (the variation's ten years and her own deviation, two and a half to three miles in a hundred), her leeway allowance's bias (two and a half), and the tide (two and a half to five: his hour early and his set twenty degrees from the stream's). An amplitude at sunset would take out the first; the book has none.
+- **The frigate's landfall within a mile and a half inside half an hour**: 2.4 miles for thirty minutes, 1.25 at thirty-five, when the glass's bearing and fix come (4.2 to 5.4 for thirty-five minutes before). Not met, by five minutes. Her noon's sight is five and a half miles too far north at this seed (a draw of two and a half of its own doubts) and is weighed, three miles of it; the afternoon carries that.
+- **Honesty, no more than one sample in ten**: the frigate 6 per cent, the schooner none; **the merchant 18 per cent, not met.** Of her thirteen, seven are at anchor in the Bay of Brest (below), four are the last two hours of the Channel crossing (8.9 to 10.7 miles out against 4.3 to 4.7 of doubt, just beyond twice), and two are single samples.
+- **The brig hove to six hours of a spring ebb in the Iroise**: inside twice the doubt at every hour, 1.98 miles from the truth after 13.6 miles of drift.
+
+### Found on the way (package 37e)
+
+- **A reading changed the game**, in three ways, all in this package's own new code and all mended. The account brought up to the moment was remembered by the tick alone, so a reading asked before the board was pegged in a tick gave the next asker the account as it stood before; whose tide the day's work carried was noted wherever the tide was summed, a reading included; and the nearest place of the epitome was remembered by the hundredth of a degree from whoever first asked within it. A chart open, or a test watching the log, could then sail a few yards from the game replayed without them. The memory is now kept only while nothing the account is worked from has changed (`Navigation._state_key`), a reading notes nothing (`_tide_between`'s `note`), and the place is the hundredth's own (`_tide_port`); a test asks one of two ships and not the other and compares them. The last of the three moved the merchant's digest and took two lines out of the thick passage (a turn of the master's tide and its turning back three minutes after, which was the first asker's place and not the hundredth's).
+- **A cast off a steep shore** was "laid down by the cast" two miles away, the frigate a cable in doubt by her fix off Black Head: the contour is searched on rings half a mile apart and stepped over the narrow band where the depth answered. Where the chart about the account brackets the cast it is kept (`Chart.depth_span`).
+- **At anchor in the Bay of Brest the account is not honest.** Fixes every five minutes by Penaleuch point, Portzic and the castle of Brest, all between W by N and N by W and two to three miles off: each fix says "good to two cables", which is honest, and the account, weighed with each, comes to believe itself good to a cable while it stands three to four cables out. The compass's error is common to all three and, with every mark on one hand, moves the fix more than his allowance for it says. Not mended. For the lead.
+- **The rule takes an observation whose stated doubt is too small.** The cruise, hove to off Plymouth at 09:00 with the account a cable in doubt by the land: a longitude by chronometer 7.6 miles out, "which Mr Harvey would trust within 5 miles" (2.28 a sigma), stands more than twice the two doubts from the account and is taken; the bearing of Penlee half an hour after takes it back. The Arnold's rate was out by more than three seconds a day and the master allows one (`sights.RATE_DOUBT_S_PER_DAY`). It is the brief's rule working as written, and it would do the same with three for two. Not mended: `sights.py` is not this package's. For the lead.
+- **Truth 59** ("moves the reckoning onto the chart's contour") holds to within a fathom of the contour's tolerance: the cast is weighed, ninety-six parts in a hundred of the way. The test says so; the spec's sentence is the lead's.
+- **A ship hove to in this sim makes two to three knots** through the water, sternway and leeway together (the brig drove 13.6 miles in six hours). The master reckons it by eye as he finds it. Whether she should is 37f's.
+- **The stream areas have hard edges**, and a course shaped is worked for the water the account is in at that moment. At the corner of the Chenal du Four the merchant's book works the course again every five minutes; the general remedy, if one is wanted, is the lead's to rule.
+- **The master's tide can turn twice within minutes in mid-Channel**, where the nearest place of his epitome changes from the Ramhead to Ushant as the account crosses and his hour of high water with it (the thick passage at 23460 and 23700: "the flood makes", "the ebb makes"). It is what his books give him. Left.
+- **`the turn of the tide by the reckoning`** is an event (the routine line `reckoning.tide` with `turn`), so that a book may shape a course again when the master's tide turns. No book uses it yet.
+
+## Milestone 5: lying to, and the ground (package 37f, 2026-10-07)
+
+Built from the brief "Package 37f: lying to, and the ground" in `M5-WorkPackages.md` (the review of gate 5c's playtests, 5.7, 5.8, 8.2 and 10.3 to 10.5, and the owner's notes on game 9). Everything below was measured at seed 7 on the build machine, in scripted worlds: the game's own saves are the owner's and were read, never used as fixtures.
+
+### The constants and their sources
+
+| Constant | Value | Where | Source |
+|---|---|---|---|
+| `near_points`, `far_points` | 4, 7 | `heave_to.yaml` | the brief's "about four and seven points"; Luce's frigate lies at five and a half |
+| `helm_deg`, `helm_max_deg` | 15°, 25° | `heave_to.yaml` | the lee helm she carries midway, and the most given her as she falls off: judgement, set on the four ships |
+| `helm_lead_s`, `sheet_lead_s` | 15 s, 20 s | `heave_to.yaml` | how far ahead of her swing the helmsman and the hands at the sheets look: judgement (with none she hunted across the band) |
+| `sheet_s` | 30 s | `heave_to.yaml` | a sheet worked from as she was hove to, to right aft or off: judgement |
+| `aback_points` | 2.5 | `heave_to.yaml` | nearer the wind than this the innermost head sail's sheet is hauled to windward to box her off: judgement |
+| `way_off_kn` | 1.5 kn | `heave_to.yaml` | truth 12's "under a knot and a half" |
+| `way_steady_kn_s`, `way_most_kn` | 0.004 kn/s, 4.5 kn | `heave_to.yaml` | "as slow as she will go": her way no longer falling, and never said with this much on her: judgement (the fore-and-afters forereach) |
+| `lie_kn`, `lean_points_kn` | 0.5 kn, 1 point a knot | `heave_to.yaml` | the headway she is held with, and how far the mark leans toward the wind for each knot more: judgement |
+| `quiet_deg_s`, `lie_s` | 0.25°/s, 20 s | `heave_to.yaml` | her head no longer swinging, for so long, before "Hove to" is said: judgement |
+| `way_off_timeout_s` | 600 s | `heave_to.yaml` | ten minutes to lose her way; the brief's test reads her at ten |
+| `round_points`, `round_s` | 1 point, 20 s | `heave_to.yaml` | forced round: the wind so far on the other bow for so long (the brief's test: "never within a point of the wind's eye") |
+| `fill_s` | 60 s | `heave_to.yaml` | filled: nothing aback and more than `way_off_kn` of way for a minute: judgement |
+| `abaft_points`, `abaft_s` | 9, 120 s | `heave_to.yaml` | fallen off: a point abaft the beam for two minutes: judgement |
+| `keep_hands` | 4 | `heave_to.yaml` | the spanker's sheet and the head sheet, two hands each: judgement |
+| `LYING_TO_WAY_SMOOTH_S` | 60 s | `scripts.py` | her way read over a minute for where the watch holds her: judgement |
+| `retrim_s`, `pay_off_timeout_s` | 20 s, 240 s | `fill_away.yaml` | `fill away and steer`: the yards and sheets trimmed so often as she pays off, and for the course after so long: judgement |
+| `SWINGING_ROOM_M` | a cable | `scripts.py` | the brief's "within a cable of the nearest land" |
+| `stand_on_timeout_s` | 3600 s | `come_to_anchor.yaml` | `in twelve fathoms`: she stands on an hour for the lead to call it: judgement |
+| `DRAG_REPORT_S` | 900 s | `physics/anchor.py` | the brief's "a quarter of an hour at most" |
+| `DRAG_REPORT_MIN_M` | two fathoms | `physics/anchor.py` | no "still coming home" line for less than this since the last: judgement |
+| `DRAG_SAY_S`, `DRAG_SETTLE_S` | 60 s, 300 s | `physics/anchor.py` | package 34's, kept; what changed is how they are counted (below) |
+| `cast_boom_deg` | 30° | `get_under_way.yaml` | Luce 1884, ch. XXXIV, 'Schooners': "main boom steadied over"; the angle is judgement |
+| `abox_s` | 20 s | `get_under_way.yaml` | a fore-and-after's one topsail yard laid abox when the anchor is aweigh: judgement |
+| `cast_enough_points`, `cast_give_up_s` | 4, 900 s | `get_under_way.yaml` | at the timeout, paid off so far she has cast; hanging nearer, she is given so long: judgement |
+| `WIND_SHIFT_FLOOR_KN` | 4 kn | `core/world.py` | the brief's figure; Beaufort's scale, where "light airs" (force 1, one to three knots) pass to "a light breeze" (force 2, four to six), which are the log's own words (`units.describe_wind_strength`) |
+| `WIND_SETTLE_S` | 300 s | `core/world.py` | a light breeze for five minutes is the wind come back: judgement |
+| `WIND_SWING_S`, `WIND_STEADY_S` | 3600 s, 1800 s | `core/world.py` | unsteady: the wind's second turn within the hour; settled again when its mean has stood within two points half an hour: judgement |
+| `BACKED_REARM_S`, `BACKED_REARM_WAY_KN` | 60 s, 0.5 kn | `physics/sails.py` | a sail's lines armed again: full a minute with way on her; the hull's own figures (`ABACK_REARM_SECONDS`, `WAY_ON_KN`) |
+
+### Heaving to, by the minute
+
+The brig, brought to from like states to the game's four failures, and the schooner from the same; her head in points from the wind on the tack she hove to on (a minus is through the wind, on the other tack) and her way in knots, at each minute from the order. Before is the build as 37e left it.
+
+| The brig | Before | After |
+|---|---|---|
+| seven knots, the wind abaft the beam | "Hove to" at 58 s; 5.1/+3.4, 1.7/+0.8, **-6.9**/-0.3, -5.6, -6.2, ... -13.5/+3.9 at fifteen: through the wind in the third minute, and round | "Hove to on the starboard tack" at 173 s; 5.4/+3.4, 5.4/+1.8, 5.7/+1.5, 5.6/+1.2, 5.6/+1.1, 5.6/+1.0, then 5.7/+1.1 to fifteen; never nearer than 5.1 points |
+| four knots, the wind on the beam | at 50 s; 5.3/+2.8, 2.3/+1.5, **-2.1**/+0.6, -7.6, ... -13.0/+1.9: through the wind in the third minute | at 165 s; 5.1/+2.7, 4.6/+1.8, 4.7/+1.2, 4.5/+0.8, 5.3/+0.5, 5.9/+0.6, then 5.8/+0.6; never nearer than 4.5 |
+| a knot in light airs, larboard tack | at 47 s; 5.8 to 6.4, +0.9 | at 66 s; 5.7 to 6.1, +0.9 falling to +0.7; never nearer than 4.8 |
+| a knot in light airs, starboard tack | at 47 s; 5.8 to 6.3, +1.0 | at 66 s; 5.5 to 6.1, +1.0 falling to +0.7; never nearer than 5.0 |
+
+| The schooner | Before | After |
+|---|---|---|
+| seven knots, the wind abaft the beam | at 68 s; 3.4/+2.1, 3.5/+0.1, 3.1/-1.3, then 3.0 points with 2.3 knots of sternway | at 102 s; 5.0/+2.4, 4.2/+0.3, 4.1/-1.1, 5.1/-1.0, 5.2/-0.4, then 5.2/-0.2; nearest 3.9 |
+| four knots, the wind on the beam | at 46 s; 3.9/+2.4 ... 3.3 points with 1.1 knots of sternway | at 136 s; 4.9/+2.4, 4.7/+1.4, 4.0/+0.8, 4.1/+0.3, 4.5/+0.3, then 4.6/+0.5 |
+| light airs, either tack | at 41 s; 4.0 to 4.6, +0.8 | at 60 s; 4.5 to 4.8, +1.0 |
+
+In these scripted states the light airs hold before as after; in the game they went round after six and after twenty minutes, on shifts of the air, which is what the six hours below are for.
+
+*Six hours hove to* in twelve knots, gusty and wandering (0.3 each), on the starboard tack:
+
+| Ship | Her head, points from the wind | Her way | Lines |
+|---|---|---|---|
+| the brig | 5.5 to 6.0 (62° to 68°) | +0.7 to +1.0 kn | one, routine, at the change of the watch: "Lying to on the starboard tack, her head six points from the wind; the watch tending the helm and the sheets." |
+| the frigate | 5.0 to 5.9 (56° to 67°) | +0.5 to +0.9 kn | the same, "five points and a half" |
+| the schooner | 4.1 to 4.5 (46° to 51°) | +1.4 to +2.3 kn | the same, "four points and a half" |
+| the cutter | 3.9 to 4.4 (44° to 49°) | +1.0 to +1.4 kn | the same, "four points" |
+
+The fore-and-afters forereach, as Luce's do, and are not brought under a knot and a half; their tests hold them to their tack and to under two knots at ten minutes from the three like states. 37e's note that "a ship hove to in this sim makes two to three knots" is answered: the brig makes under one.
+
+*From the game's own state* (a scratch copy of the first save's checkpoint, in memory, the brig at seven knots with the wind on her quarter on 15 June): hove to after 178 seconds, her head 53° to 70° from the wind and her way +0.2 to +0.5 knots for four hours (measured when part one was built).
+
+What made the difference, in the order found: the yards that stay full braced sharp up as she is rounded to (left braced for a quartering wind they drove her through the wind or held her in a stern board; Luce's "bracing up the head yards"); the helm met ahead of her swing and not after it; the spanker and the head sheet worked as she comes up and falls off; "Hove to" not said until she lies so.
+
+### Filling away
+
+The brig hove to in ten knots: `fill away` from the starboard tack, "Filled away on the starboard tack; braced full and steering WNW (292°)." in under a minute, steady at three minutes, three knots at seven with the wind 67° on her starboard bow; from the larboard tack the mirror of it, ENE (68°). Put about by hand while hove to, she is filled on the tack she lies on and her head never comes back within three points of the wind (in game 9 she was taken back through it three times).
+
+`fill away and steer WSW`: "Filled away on the starboard tack; braced full and steering WSW (248°), the course ordered." at two minutes, steady on it at three, 4.1 knots at seven. `... steer 250` the same by degrees. `... steer east`: "... steering WNW (292°), full and by (E (90°) lies on the other tack; she is kept full and by on the starboard tack: tack or wear for it)." `... steer NW`: "... (NW (315°) lies too near the wind to be laid; she is kept full and by on the starboard tack)." The frigate, `fill away and steer W by S` in fourteen knots: on her course at three minutes, 5.9 knots at seven, and no sail aback. (The first cut braced her at once for the course said; her topsails lifted with her head still five points from the wind and the log said "Her sails aback". She is braced full by the wind first, and trimmed as she pays off.)
+
+### The Goulet's eight hours, before and after
+
+The like of game 9's state, built in a scripted world (the brig brought up off the Mingan on 16 June 1805 at 16:42 in twenty fathoms on "rock and mud", the small bower five minutes after, the sheet anchor four hours on; eight hours of the Goulet's tide). The game itself had eighteen urgent lines.
+
+| | Dragging lines | "Holds again" | How far the anchors came home |
+|---|---|---|---|
+| Before | 8, all urgent ("veer more cable" among them at the bitter end, and of the second anchor when it was down) | 8 | the best bower a cable and a half, the small bower a cable |
+| After | 1, urgent: "The best bower is dragging: veer more cable; let go the small bower, or back her with the stream." | 1: "The best bower holds again, having come home half a cable." | the best bower 0.45 cable, as she brings up; nothing after |
+| After, the ground forced to bare rock (the line logic alone) | 8 urgent and 7 notable ("The small bower still coming home: half a cable since it began.") | 8 | as before the package |
+
+Most of the difference on that ground is item 10 and not item 9: "rock and mud" holds 0.55 of good ground where it was held as bare rock, 0.30, and the anchors no longer come home there. On bare rock the anchors relapse after six or eight minutes' holding, and by the brief each relapse after "holds again" is a new drag with its own urgent line (spec M5 §33, item 22).
+
+### The ground's factor for each port's road
+
+The chart's nearest bottom note within three kilometres, which is what an anchor let go there is given, and the factor on the holding (`GROUND_HOLDING` unchanged: rock 0.3, stones 0.4, ooze 0.5, weed and shells 0.6, gravel 0.7, mud 0.8, clay, sand and "good ground" 1.0; a note that names none of them 0.9).
+
+| Port | Place | The note | Before | After |
+|---|---|---|---|---|
+| Brest | the road of Bertheaume | sand and mud | 0.80 | 0.90 |
+| | the Bay | mud | 0.80 | 0.80 |
+| | the mooring before the town | none; now "mud", the new `brest-road` | 0.90 | 0.80 |
+| Falmouth | the outer road | good ground | 1.00 | 1.00 |
+| | Carrick Road, and the mooring | good holding ground | 0.90 | 0.90 |
+| Plymouth | Cawsand Bay | sand, foul and rocky in the north part | 0.30 | 0.65 |
+| | the Sound | sand and mud | 0.80 | 0.90 |
+| | the Hamoaze | mud | 0.80 | 0.80 |
+| Roscoff | the western entrance | sand and rock | 0.30 | 0.65 |
+| | the road of Bas, and the harbour | sand | 1.00 | 1.00 |
+| St Mary's | all three | loose sand, not very tenacious | 1.00 | 1.00 |
+
+None has no note. Two things the rule does not read: "good holding ground" is not the table's "good ground" and takes the default; "loose sand, not very tenacious" is sand. The Goulet off the Mingan, "rock and mud": 0.30 before, 0.55 after.
+
+### The log's lines on the recorded passages, before and after
+
+| Passage | Wind-shift lines | "Aback" of the ship, urgent and notable | A sail's "taken aback" | "Could not ..." | A cast with no bottom, notable | The book's refused orders | The book's "held" lines |
+|---|---|---|---|---|---|---|---|
+| 5a's day | 3 → 3 | 0 → 0 | 0 → 0 | 0 → 0 | 0 → 0 | 10 → 10 | 1 → 1 |
+| the frigate, 5b | 0 → 0 | 0 → 0 | 11 → 0 | 0 → 0 | 21 → 0 | 11 → 8 | 16 → 23 |
+| the schooner, 5b | 0 → 0 | 0 → 0 | 3 → 0 | 1 → 0 | 23 → 0 | 8 → 7 | 16 → 19 |
+| the thick passage, 5b | 0 → 0 | 2, 0 → 1, 0 | 18 → 7 | 0 → 0 | 5 → 0 | 2 → 1 | 8 → 5 |
+| the naval cruise, 5c | 0 → 0 | 3, 1 → 4, 0 | 77 → 20 | 0 → 1 | 0 → 0 | 28 → 12 | 59 → 63 |
+| the merchant passage, 5c | 4 → 4 | 1, 0 → 0, 0 | 16 → 0 | 0 → 0 | 3 → 0 | 69 → 13 | 83 → 92 |
+
+No recorded passage has a calm in it, so the wind's floor moves none of their lines; the tests of it are scripted (`tests/test_log_lines.py`). The "held" lines grew a little where the refusals fell: each reason now has its own line a watch, where a rule had one a watch whatever its reason. The cruise's one "Could not" is new and is a true failure: "Could not wear: she would not come round." (below).
+
+### The recorded passages, re-measured with the reasons
+
+Written out before the first change and after the last (`scratch dump_passage`; the constants by the tests' own selectors, `scratch measure`).
+
+| Passage | Lines | Digest | The true track parts at | Why |
+|---|---|---|---|---|
+| 5a's day | 616 → 616 | `684580064bfc6ecd` → `efc286e862237e53` | never: the track is the same to the last figure | the four lines that enter the starter's two trim rules carry the guard |
+| the frigate, 5b | 718 → 768 | `3c659bf81ef803fd` → `dbf7f6fcfb800fdf` | tick 28750 | the heave-to for the noon's cast (item 1): the yards that stay full braced up, her way taken off |
+| the schooner, 5b | 799 → 761 | `8c0c686c9c52bac8` → `78eec3dcd5f33c16` | tick 28750 | the same |
+| the thick passage, 5b | 508 → 488 | `93239d9d2916dc54` → `fb136bb8e86f0804` | tick 28750 | the same |
+| the merchant passage, 5c | 3146 → 2992 | `79dbbe53c772d94e` → `bb8483de9959aa2a` | tick 14250 | getting under way (item 13): a fore-and-after's helm is tended from the first heave |
+| the naval cruise, 5c | 2144 → 1988 | `f796f1dc5df9f466` → `8d865bff1518f52b` | tick 130 | the anchor let go at the start (item 3: the helm righted as it goes) |
+
+The lines that changed, by the item that changed them:
+
+- **Item 1 (heaving to).** `ship.hove_to` names the tack and comes when her way is off (the frigate 28796 → 29013, the schooner 28799 → 28851, the thick passage 28797 → 29013, the cruise 8876 → 9056, the merchant 17697 → 17573 and 90428 → 89225); the step says "braced up the other yards"; and through the track every line the ship's physics says after it.
+- **Item 2 (`fill away`).** `ship.filled_away` names the tack: "Filled away on the larboard tack; braced full and steering WNW (297°)."
+- **Item 4 (the guard).** The books' trim rules as entered at tick 0; "tend the sheets ... not carried out; the manoeuvre in hand is heaving to" where it trimmed a ship being hove to.
+- **Items 7 and 11 (the anchor).** The first line of every `let go` and the anchored line of every `come to an anchor` say the scope; "Brought up" after the merchant's and the cruise's `let go` at the start (323 and 153).
+- **Item 13 (the cast).** The merchant's two casts: "She has paid off; right the helm, draw the jib, haul aft the main sheet, brace round the topsail yard." 92 and 72 seconds after the anchor is aweigh, where both ran the seven minutes to the timeout and said "She has paid off; right the helm, brace round the head yards, set the spanker."
+- **Item 15 (aback).** A sail's lines: 125 → 27 over the six. The heave-to for the cast alone said eleven of them on the frigate.
+- **Item 16 ("could not").** Nothing in the passages was a "done already". (The schooner's one "Could not come to an anchor: she is at anchor already" is not said on her new track.)
+- **Item 17 (the lead and the book).** The casts with no bottom, 52 notable lines, are routine; the book's refused orders 128 → 51 and its held lines 183 → 203 (above).
+
+Old beside new:
+
+| | Before (37e) | After (37f) |
+|---|---|---|
+| **The frigate** hove to; cast | 28796; 29887, fifty-five fathoms | 29013, "on the larboard tack"; 30118, the same fathoms |
+| landfall | 44760, the Beast and the Lizard's lights | 44820, the same at one look |
+| the outer road; anchor; brought up | 57737; 58178 in eleven fathoms and a half; 59151 | 58297; 58647 in fourteen and a half; 59642 |
+| the cutter sighted; hail; the pilot aboard | 55440; 56940; 57060 | 55860; 57480; 57540 |
+| **The schooner** landfall | 44400, the Beast at five leagues | 45840, the Beast at four |
+| the outer road; anchor; brought up | 56517; 58210 in six fathoms and a half; 59395 | 56515; 57638 in seven; 58690 |
+| the pilot | hails at 56160, does not board | hails at 55800, does not board |
+| **The thick passage** the land close aboard | 54600 | 54420 |
+| **The merchant** under way | 16005; the cast timed out | 16007; she casts in 92 seconds |
+| the Falmouth pilot aboard; put off | 16320; 18540 | 16200; 18300 |
+| the sail off the Lizard | 26640, on the larboard bow | 29100, abeam to starboard |
+| the cast in the Iroise | 91418, forty-one fathoms | 90240, thirty-eight |
+| the pilot of Brest | aboard 97800, put off 100620 before the anchor | aboard 96240, and stays aboard |
+| Bertheaume; the flood; the Goulet; the Bay; the tin sold | 101821 in seven fathoms; 108960; 112444; 116110; 124441 | 99974 in twelve; 108960; 112112; 115817; 123951 |
+| **The cruise** the pilot aboard; put off | 7920; 11220 | 7980; 10980 |
+| the cutter within hail; the letter read | 84153; 84213 | 83838; 83898 |
+| the stranger | sighted and chased at 90000, lost at 92040 | sighted and chased at 90000, lost at 93420 |
+| wears | eleven and a tack | thirteen, and one that failed |
+
+### The books, and the count of runs
+
+Sixteen whole-passage runs after the first change, where the brief budgets a dozen: the six written out, the six written out again when the wind's "unsteady" rule was put right (its first form, a test on the spread of the ten minutes' wind, took a front's one sharp veer for an unsteady wind and cost 5a's day its line; the second set is the one recorded), and four of the frigate's passage to mend her book.
+
+- **The frigate's book: one line added, one clause added.** Unmended she did not come through: she raised the Lizard a league further west (44580, "The Lizard bearing N"), passed the point east of the Manacles more than a mile wide by her own account, and stood on up the Channel to the end of her hours. The cause is a course worked once: filling away from the noon's cast with a knot and a half on her (three and three quarters before, when she was not truly hove to), the course for the point came out "steer NNW to make it good" against three quarters of a knot of flood, where it was N by W, and she held it four hours at seven knots. Run 1: the course worked again every glass once the land is in sight: she rounds the point but too late for her hours. Run 2: every glass from the noon's cast: she comes through, but the rule fired once more after the rounding and turned her back for a quarter of an hour. Run 3: the rule's guard set at nine miles from Falmouth (the point is eight): she rounds once and anchors on her old minutes, and the pilot hails her ten minutes before her anchor and does not board, her sail not yet in. Run 4, kept: sail shortened at the rounding; the pilot boards a minute after his hail, and she is brought up at 59642.
+- **The schooner's and the thick passage's books: unchanged.** The schooner comes through to her anchor off the town; her pilot hails and does not board, as since 37e (the strict expected failure stands; 37h's).
+- **The merchant's and the cruise's books: the guard on their three trim rules, and nothing else.** The merchant comes through whole, and better: she casts, and the pilot of Brest stays aboard.
+- **The cruise is not mended.** The stranger is chased and lost, as since 37e, and the strict expected failure stands with its reason rewritten. What she does now: at 07:00 the Palinure is four miles on her starboard quarter; she is kept full and by on the starboard tack for her; at 07:30 the book's `keep her bearing` orders "steer NE by E", a course across the wind's eye from her head; the helm takes her through the wind with every sail aback (91954, urgent), she has no way on at 93634, and the brig is out of sight at 93420. What would bring the meeting back: the chase order wearing her for a course across the wind, as its first form does, or the scenario's own hours, which are the owner's. Not tried: it is the chase's code or the scenario's file, and neither is this package's.
+
+### Found on the way (package 37f)
+
+- **A fore-and-after at anchor was sheered the wrong way by her own topsail.** Her one yard laid abox while the anchor still held her by the bow swung her stern and not her head, and the helmsman, left steering for the last course as the capstan drew her ahead, sheered her further: the wind was three and four points on the wrong bow when the anchor broke out, where no jib will throw her head across. Luce's schooner has her main boom steadied over to the side she is to cast toward, and that is what is built: it sheers her for the tack while she still rides, and she casts in a minute.
+- **Truth 66's test** stood into the land when a cast read exactly forty fathoms, in the gap between its book's "under 40" and the lead's "exceeds 40". The test's own book says "under 41" now, with the reason beside it.
+- **37e's test of the brig hove to in the Iroise** leaned on her not truly lying to (13.6 miles of drift in six hours, two knots of sternway under topsails alone). Under plain sail, tended, she drifts 7.4 miles; the test is set to that, and its account is as honest as it was.
+- **Two orders of the cruise's book give chase to one sail at one tick**, each queues a wear, and the second wear begins as the first ends and fails ("she would not come round"). Left as found (spec M5 §33, item 22).
+- **Under eight parallel workers the suite's workers die at random** on this machine ("Windows fatal exception: code 0x80000003", at any line of plain Python; the baseline tree does it too). Under four, as the brief runs it, none did.
+- **`let go ... in twenty fathoms` still means the scope**, as the primer had it, beside the new `and veer to` and `with`; `come to an anchor in twelve fathoms` means the depth. The two "in"s are the primer's, and are kept.
+
+## Milestone 5: the station's safety, and the deck, the leaving and the grant (package 37g, 2026-10-07)
+
+From the review of gate 5c's playtests (`docs/playtests/2026-10-05-gate-5c-review/report.md`, 5.3, 5.4, sections 6 and 9, and 10.5 for game 9) and the owner's rulings of 5 and 7 October. No constant of the ship, the sea or the reckoning moved, and the six recorded passages, which carry no station, replay to the digests recorded before the package.
+
+### The constants and their sources
+
+| Constant | Value | Source | Verified |
+|---|---|---|---|
+| `ORDERS_PER_TURN` (`TOOL_CALLS_PER_SAMPLE`; `Station.orders_per_turn`) | 16 orders at a sampling point; it was 8 calls of every kind | the brief's item 2 ("sixteen orders a turn, as a setting of the station"); the review's 5.4 (`opt_out` as a ninth call was "Not run") | the brief |
+| `READS_PER_TURN` (`READS_PER_SAMPLE`) | 32 reads and notes at a sampling point, counted apart from the orders | the brief left "counted apart, or not at all" to the builder: a count keeps a bound on a reply that reads without end, and twice the orders' is room for a watch's reading | judgement |
+| `ALWAYS_RUN_TOOLS` | `opt_out`, `stand_down`, `hand_over`, `stand_by` | the brief's item 2 | the brief |
+| `DANGER_WORD_N` | 3 orders on the officer's own word within a watch bring a word (and never a pause) | the brief's item 19 ("used three times in a watch it brings the detector's word") | the brief; "never a pause" is judgement |
+| the undo table (`undoes` in `data/vocabulary.yaml`) | 21 pairs of verbs, each read both ways | the brief's item 5 (the same sail set and taken in, hove to and filled away, an anchor let go and weighed, cable veered and hove in, a thing allowed and disallowed), carried through the vocabulary's verbs that are each other's undoing | judgement, tested on the record below |
+| `irrevocable` in `data/vocabulary.yaml` | `cut away` | the owner's list for the general grant ("what cannot be undone"); the vocabulary has no order to slip or cut a cable | the vocabulary read through |
+| `HANDOVER_RESERVE_TOKENS` | 14,000 tokens of the door's context kept free when the handover note is asked for (`--handover-reserve` at the local runner); never earlier than `HANDOVER_AT_FRACTION`, six tenths | the review's 8.7, ruling 2 (a reserve in tokens with a flag); the size of game 9's longest turns and the note itself with room to write it | judgement |
+| `SITUATION_ALLOWANCE_TOKENS` (`local.py`) | 2,500 tokens allowed for what the ship adds to the officer's brief (the log's last lines, every reading, the night orders) in the stationing guard | the situation item measured at about 2,100 tokens on the frigate (package 37's table above), with room for a longer book | measured, with judgement for the room |
+| `WAIT_MARGIN_S`, `WAIT_FLOOR_S` (`mcp_server.py`) | the bridge's wait is shortened to 10 seconds under the client's cut, never below 15 | the brief's item 8 ("its wait adapts when a call is cut short"); the default's own forty seconds under the Desktop client's four minutes, scaled down | judgement |
+| `READ_LOG_MAX`, `READ_JOURNAL_DEFAULT` | at most 1,000 lines of the log by `count`; 20 journal entries by default | the brief's item 15 (the log read back past its two hundred lines by a tick or a count; the journal newest first, by count) | judgement |
+| the officer's domain | `take a bearing of` and `take a fix` added | the gate's ruling 1; Falconer's lieutenant "superintending the navigation" | the brief |
+| the general grant (`agent._GENERAL`, `_KEPT_BACK`) | the orders of the course, the manoeuvres, the anchors, all hands and the watch below, the sights and the reckoning worked up, a course shaped; kept back: the port, the reckoning set by hand, the tide allowed, the chase, the people, the captain's own going below | the owner's approved list (the review's section 9, question 4, and his ruling of 7 October); the tide allowed and the people are this package's reading | the list; the reading is judgement |
+| the way out of danger (`agent._DANGER`) | the orders of the course, `heave to`, `let go the anchor` | the brief's item 19; the Regulations of 1806, the Lieutenant, art. XIII | the brief |
+
+### The detector, tested on the record
+
+The orders behind every one of the 42 nudges and pauses of the detector in the nine games (the first 31 as the review's reader lists them by tick, `evidence/V1b-authority-standing-detector-code.md`, section F; game 9's eleven from its officer's journal) are a table in `tests/test_officer.py` (`RECORDED_CHAINS`). Each is a chain by the old rule ("each contrary to the one before it on a shared part"), which the test checks, and **none is a chain of three by the new one**: 42 sequences, none still speaks, game 9's eleven among them. A scripted *set the jib; take in the jib; set the jib; take in the jib* is a chain of four, brings the word with the third order's result, and the pause when the chain goes on in a later reply.
+
+| Game | Sequences | Still speak |
+|---|---|---|
+| the *Harpy* | 8 | none |
+| the *Speedwell* | 20 | none |
+| the cutters | 3 | none |
+| game 9 | 11 | none |
+
+### Off watch, measured
+
+The frigate at seed 7 under plain sail, the scripted officer sampled as a door samples him (every glass and on notable and urgent events), saying nothing, for a watch of four hours: seated without the deck, 12 samples and about 4,300 tokens of samples in all (some 330 a sample, the readings that changed); with the deck, 13 samples and about 4,900. The brief is about 5,300 tokens at that door. So an officer off watch costs what a watcher costs, and what he cost before the deck was first given.
+
+### Found on the way (package 37g)
+
+- **The words the ship reads twice were carried out past the filter.** `take in twenty tons of water` failed the filter's parse, was passed to the ship, and was carried out as the port's order with no allowance (the review's 5.3). The filter now judges it as the port's.
+- **The pause of the way out of danger.** As first built, a fourth order on the officer's own word after the word had been read paused him, and a pause takes the deck: the detector would have taken the deck from an officer in the act of avoiding a danger. It brings the word each third time and never the pause.
+- **A replay and the stationing tick.** A stand-down and a reseating made at the tick a station was first seated, before any tick has run, are not made by a replay (spec M5 §33, item 11, as it stood); the tests that replay such a game run a tick first and say so.
+- **The first line of a station** now says who sits and through which door when a model is named ("The watcher takes the station (..., through the MCP bridge); sampled ..."); the game's own scripted station says what it said.

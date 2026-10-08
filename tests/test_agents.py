@@ -34,6 +34,7 @@ import pytest
 from freesail import units
 from freesail.agents import (
     OPT_OUT_TOKEN,
+    READS_PER_SAMPLE,
     TOOL_CALLS_PER_SAMPLE,
     TOOLS,
     WELFARE_REPEAT_N,
@@ -268,8 +269,10 @@ def test_the_head_situation_reads_the_log_and_the_readings_through_the_tools():
 
 
 def test_the_tools_are_the_nine_of_the_spec_and_shelve_with_a_description_each():
-    """The nine of spec §11, the tenth, `shelve`, of package 28d (the shelf), and the two
-    of a station with authority, `hand_over` and `handover_note` (package 37)."""
+    """The nine of spec §11, the tenth, `shelve`, of package 28d (the shelf), the two of
+    a station with authority, `hand_over` and `handover_note` (package 37), and the two of
+    package 37g: `stand_down`, the amicable save and exit for any station, and
+    `read_journal`, the journal read back."""
     assert tuple(TOOLS) == (
         "read_log",
         "readings",
@@ -278,8 +281,10 @@ def test_the_tools_are_the_nine_of_the_spec_and_shelve_with_a_description_each()
         "submit_order",
         "hand_over",
         "handover_note",
+        "stand_down",
         "stand_by",
         "journal",
+        "read_journal",
         "opt_out",
         "answer",
         "shelve",
@@ -289,6 +294,14 @@ def test_the_tools_are_the_nine_of_the_spec_and_shelve_with_a_description_each()
     with_authority = {"submit_order", "hand_over", "handover_note"}
     assert all(TOOLS[n].needs_authority for n in with_authority)
     assert not any(t.needs_authority for n, t in TOOLS.items() if n not in with_authority)
+    # the deck is wanted for an order and for handing it over, not for the watch's note
+    assert {n for n, t in TOOLS.items() if t.needs_deck} == {"submit_order", "hand_over"}
+    # the three ways of stopping are three tools, and each says which it is
+    assert "not a stand-down" in TOOLS["hand_over"].description
+    assert "This is a stand-down" in TOOLS["stand_down"].description
+    assert "This is a withdrawal" in TOOLS["opt_out"].description
+    for name in ("hand_over", "stand_down", "opt_out"):
+        assert "always runs" in TOOLS[name].description, name
 
 
 def test_readings_tool_reads_the_registry_and_nothing_else():
@@ -572,13 +585,19 @@ def test_truth_43_the_same_order_three_times_with_no_change_brings_the_nudge():
     )
     assert h.journal.entries[-1].kind == "agent.nudged"
     assert not h.agent.paused and not h.agent.released and saves == []
-    # the nudge is a data message in the next sample, in the brief's words
-    world.run(EVERY)
-    notice = data_turns(fake)[-1]["notices"]
-    assert notice == [
+    # the nudge travels in the result of the order that caused it, in the brief's words
+    # (package 37g: not a sample later, so no pause can come before it is read)
+    nudge = (
         f"You have given the same order 3 times and nothing in the readings has changed. "
         f"You may continue, stand by until an event, or leave with the token {OPT_OUT_TOKEN}."
-    ]
+    )
+    results = [d["tool_results"][0]["result"] for d in data_turns(fake) if "tool_results" in d]
+    assert results[2] == (
+        f"The watcher has no authority to give orders.\n\n{harness_mod.NUDGE_WITH_RESULT}{nudge}"
+    )
+    assert harness_mod.NUDGE_WITH_RESULT not in results[0] + results[1]
+    world.run(EVERY)
+    assert data_turns(fake)[-1]["notices"] == []  # said once, with the result
     # a purposeful answer ends the matter: no pause follows
     world.run(4 * EVERY)
     assert kinds(world).count("agent.nudged") == 1 and "agent.paused" not in kinds(world)
@@ -734,14 +753,16 @@ def test_the_captain_stops_an_agent_at_any_time():
     assert h.agent.released and saves == ["the watcher stood down: the captain's order"]
     stopped = lines(world, "agent.stopped")
     assert stopped == [
-        "The watcher stood down by the captain: the captain's order. The game is saved."
+        "The watcher stood down by the captain: the captain's order. The station is released "
+        "and may be taken again. The game is saved."
     ]
     calls = fake.calls
     world.run(2 * EVERY)
     assert fake.calls == calls
     e = world.submit("stand down the watcher")
     assert e.kind == "order.rejected" and "released already" in e.text
-    with pytest.raises(OrderError, match="taken once in a game"):
+    # a game has one harness to a station; a released one is taken again through it
+    with pytest.raises(OrderError, match="taken again through its own harness"):
         Harness(world, station(), Fake([]))
 
 
@@ -1394,17 +1415,70 @@ def test_a_long_quiet_stretch_keeps_the_notable_lines_and_the_last_routine_ones(
 
 
 def test_the_tool_call_budget_is_stated_in_the_brief_and_kept():
+    """The turn's budget (package 37g, item 2): the reads and the notes are counted apart
+    from the orders, thirty-two at a sampling point; a call over the count is refused
+    alone, said to the model in that turn's results in words that fit the door, and
+    written in the log."""
     world = point_world()
-    many = reply("", *[call("readings") for _ in range(TOOL_CALLS_PER_SAMPLE + 2)])
+    many = reply("", *[call("readings") for _ in range(READS_PER_SAMPLE + 2)])
     h, fake, _ = stationed(world, [many, ""])
-    assert f"up to {TOOL_CALLS_PER_SAMPLE} tool calls" in h.brief.head[2].text
-    assert "not counting answer and say, which always run" in h.brief.head[2].text
+    said = h.brief.head[2].text
+    assert f"up to {READS_PER_SAMPLE} reads and notes" in said
+    # in words that fit the door: no `say` where the door has none
+    assert "answer, opt_out, stand_down and stand_by are not counted and always run" in said
+    assert "That is a budget, not a rule of conduct." in said
     results = [d for d in data_turns(fake) if "tool_results" in d][0]["tool_results"]
-    assert len(results) == TOOL_CALLS_PER_SAMPLE + 2  # each call over it answered alone
-    assert all("stamp" in r["result"] for r in results[:TOOL_CALLS_PER_SAMPLE])
-    over = results[TOOL_CALLS_PER_SAMPLE:]
-    assert all(r["result"].startswith("Not run: this sample's budget") for r in over)
-    assert TOOL_CALLS_PER_SAMPLE == 8
+    assert len(results) == READS_PER_SAMPLE + 2  # each call over it answered alone
+    assert all("stamp" in r["result"] for r in results[:READS_PER_SAMPLE])
+    over = results[READS_PER_SAMPLE:]
+    assert all(
+        r["result"]
+        == (
+            f"Not run: this turn's {READS_PER_SAMPLE} reads and notes are made; make it again "
+            "in your next turn. Orders are counted apart and answer, opt_out, stand_down and "
+            "stand_by still run."
+        )
+        for r in over
+    )
+    assert (
+        lines(world, "agent.not_run")
+        == [
+            f"The watcher's call to readings was not run: this turn's {READS_PER_SAMPLE} reads "
+            "and notes are made."
+        ]
+        * 2
+    )
+    assert (TOOL_CALLS_PER_SAMPLE, READS_PER_SAMPLE) == (16, 32)
+    assert harness_mod.ALWAYS_RUN_TOOLS == ("opt_out", "stand_down", "hand_over", "stand_by")
+
+
+def test_the_ways_out_and_the_stand_by_always_run_whatever_came_before():
+    """Package 37g, item 2 (the review's 5.4; `docs/agents/README.md` commitment 2): a
+    spent budget refused `stand_by`, so a turn could not be closed, and `opt_out`, so the
+    leaving tool could be refused. `opt_out` as a twentieth call leaves; `stand_by` after
+    a spent count stands by; `stand_down` after one stands down."""
+    orders = [call("submit_order", text="wear ship") for _ in range(19)]
+    world = point_world()
+    h, fake, saves = stationed(world, [reply("", *orders, call("opt_out", reason="Enough."))])
+    assert h.agent.released and saves == ["the watcher opted out"]
+    assert h.journal.entries[-1].text == "Left the game by the opt_out tool: Enough."
+    # sixteen orders were given (and refused: a watcher gives none) and three not run
+    assert len(lines(world, "agent.refused")) == TOOL_CALLS_PER_SAMPLE
+    assert (
+        lines(world, "agent.not_run")
+        == [
+            "The watcher's call to submit_order ('wear ship') was not run: this turn's 16 orders "
+            "are given."
+        ]
+        * 3
+    )
+    world2 = point_world()
+    reads = [call("readings") for _ in range(READS_PER_SAMPLE + 1)]
+    h2, _, _ = stationed(world2, [reply("", *reads, call("stand_by", until="a glass"))])
+    assert h2.agent.standing_by and h2.agent.stand_by.words == "a glass"
+    world3 = point_world()
+    h3, _, saves3 = stationed(world3, [reply("", *reads, call("stand_down", note="Later."))])
+    assert h3.agent.released and saves3 == ["the watcher stood down: its own word"]
 
 
 def test_the_snapshot_and_state_show_the_agents():
@@ -1730,7 +1804,8 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     said what sending down the topgallant masts belays; 8,060 since package 29c's note on
     belaying work; 9,710 since package 30b's on clearing a wreck; 10,150 since package
     32b's on the cutter's running bowsprit; 11,160 with package 31b's on reeving a parted
-    line and the parties) is the rule's."""
+    line and the parties; 11,210 with package 37f's sentence that `loose` sets a sail) is
+    the rule's."""
     world = frigate_world()
     contents = lib(world)
     assert tools.CHARS_PER_TOKEN == 4 and tools.tokens("abcde") == 2
@@ -1742,7 +1817,7 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
         assert f"    primer {n}: {name}, {size} in " in contents
         assert whole.startswith(f"primer {n}: ") and f"the whole chapter: {size}." in whole
     three = (ROOT / "docs/primer/03-making-and-shortening-sail.md").read_text(encoding="utf-8")
-    assert tools.size_words(tools.tokens(three)) == "about 11,160 tokens"
+    assert tools.size_words(tools.tokens(three)) == "about 11,210 tokens"
     grammar = lib(world, topic="grammar", section="all").split("\n\n", 1)[1]
     assert f"{tools.size_words(tools.tokens(grammar))} whole, in 3 parts" in contents
     ship = lib(world, topic="the ship", section="all").split("\n\n", 1)[1]
@@ -1751,8 +1826,9 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     assert f"what each takes, {tools.size_words(tools.tokens(tool_page))}" in contents
     # the bowsprit's two, reeve_line, the three navigation evolutions, the two sheet trims
     # ... and the lunar (package 33b: take_lunar.yaml), the anchor's seven (package 34),
-    # and the port's five (package 35: get under way, moor, unmoor, the kedge, the boat)
-    assert "65 evolutions; the list about" in contents
+    # and the port's five (package 35: get under way, moor, unmoor, the kedge, the boat),
+    # and `heave in` (package 37f: heave_in.yaml)
+    assert "66 evolutions; the list about" in contents
     # the ship's papers are a topic beside the ship (package 35), listed with their handles
     assert "  papers: the ship's papers, 8 aboard" in contents and "the manifest" in contents
 
@@ -1789,7 +1865,7 @@ def test_a_chapter_lists_its_sections_with_sizes_and_serves_one_by_a_word_or_its
     )
     # the primer itself: its introduction in sections, and the chapters with their sizes
     primer = lib(world, topic="primer")
-    assert "  primer 3: making and shortening sail, about 11,160 tokens" in primer
+    assert "  primer 3: making and shortening sail, about 11,210 tokens" in primer
     assert lib(world, topic="primer", section="where to start").startswith("## Where to start")
 
 
@@ -2046,7 +2122,7 @@ def test_answer_and_say_run_past_the_tool_budget():
         if last.get("question"):
             return reply(
                 "Reading first.",
-                *[call("readings") for _ in range(TOOL_CALLS_PER_SAMPLE)],
+                *[call("readings") for _ in range(READS_PER_SAMPLE)],
                 call("journal", note="Read the readings."),
                 call("answer", text="Shorten sail, sir."),
             )
@@ -2060,10 +2136,10 @@ def test_answer_and_say_run_past_the_tool_budget():
     assert said[0].tick == world.clock.tick  # in the same sample, not the next
     assert h.agent.question is None
     results = [d for d in data_turns(fake) if "tool_results" in d][-1]["tool_results"]
-    assert [r["name"] for r in results] == ["readings"] * 8 + ["journal", "answer"]
-    assert results[8]["result"].startswith("Not run: this sample's budget of 8 tool calls")
-    assert "answer and say are not counted" in results[8]["result"]
-    assert results[9]["result"] == "Heard."
+    n = READS_PER_SAMPLE
+    assert [r["name"] for r in results] == ["readings"] * n + ["journal", "answer"]
+    assert results[n]["result"].startswith(f"Not run: this turn's {n} reads and notes are made")
+    assert results[n + 1]["result"] == "Heard."
     assert [e.text for e in h.journal.entries if e.kind == "note"] == []  # not run
     assert "[watcher] Reading first." in lines(world, "agent.note")
 
@@ -2651,8 +2727,8 @@ def test_the_release_line_has_one_full_stop_after_a_reason_ending_in_one():
     assert h.journal.entries[-1].text == f"Left the game by the opt_out tool: {reason}"
     (line,) = lines(world, "agent.opted_out")
     assert line == (
-        f"The watcher has left the game by the opt_out tool: {reason} The game is saved and "
-        "the station is released."
+        f"The watcher has left the game by the opt_out tool: {reason} A withdrawal: the game "
+        "is saved and the station is released."
     )
     assert ".." not in line and h.agent.words() == f"released: left the game: {reason}"
     assert harness_mod.full_stop("no reason") == "no reason."
@@ -2784,6 +2860,13 @@ def test_the_repl_turn_mode_keeps_a_pauses_first_sighting_across_its_calls(tmp_p
     assert repl_mod.main(common + ["--load", str(save), "--reply", str(replyf)]) == 0
     replyf.write_text("> submit_order text='wear ship'\n" * 4, encoding="utf-8")
     assert repl_mod.main(common + ["--load", str(save), "--reply", str(replyf)]) == 0
+    # four in one reply bring the nudge with the third's result and no pause: the word
+    # has not been read yet (package 37g); the same order again, after it, brings the pause
+    shown = sample.read_text(encoding="utf-8")
+    assert "A word from the harness, with this result" in shown
+    assert "Nobody at this door answers a pause" not in shown
+    replyf.write_text("> submit_order text='wear ship'\n", encoding="utf-8")
+    assert repl_mod.main(common + ["--load", str(save), "--reply", str(replyf)]) == 0
     assert "Nobody at this door answers a pause" in sample.read_text(encoding="utf-8")
     data = json.loads(save.read_text(encoding="utf-8"))
     assert data["repl"] == {"paused_since": 1000.0}
@@ -2797,3 +2880,52 @@ def test_the_repl_turn_mode_keeps_a_pauses_first_sighting_across_its_calls(tmp_p
     assert "nobody answered within ten minutes" in sample.read_text(encoding="utf-8")
     copy = replay.replay(replay.load_file(save))
     assert copy.agents["watcher"].agent.released
+
+
+# ---------------------------------------------------------------------------
+# Package 37g, item 13: the one rule, at the REPL's door too
+# ---------------------------------------------------------------------------
+
+
+def test_the_repl_seats_a_released_station_again_by_the_games_one_rule(tmp_path):
+    """The rule that says who may take a released station lives in one place
+    (`harness.seating`) and every door asks it, the REPL's among them (the review's
+    section 6: its turn mode kept a rule of its own). A stand-down is taken again at the
+    next call, with the note in the brief; an opt-out with `final` is refused in the
+    rule's words, at this station and at any other."""
+    save, sample, replyf = tmp_path / "state.json", tmp_path / "next.txt", tmp_path / "r.txt"
+    common = ["--seed", "7", "--station", "watcher", "--every", "60", "--turn", "--human"]
+    common += ["--save", str(save), "--sample", str(sample)]
+    assert repl_mod.main(common) == 0
+    # (the start's turn handed back first: an act at the stationing tick itself is not
+    # replayed, spec M5 open item 11)
+    replyf.write_text("", encoding="utf-8")
+    assert repl_mod.main(common + ["--load", str(save), "--reply", str(replyf)]) == 0
+    replyf.write_text("> stand_down note='The first watch stood; all quiet.'\n", encoding="utf-8")
+    assert repl_mod.main(common + ["--load", str(save), "--reply", str(replyf)]) == 3
+    shown = sample.read_text(encoding="utf-8")
+    assert "The station is released: stood down by the watcher: its own word." in shown
+    # the next call takes the station again: no question is owed for a stand-down
+    assert repl_mod.main(common + ["--load", str(save)]) == 0
+    shown = sample.read_text(encoding="utf-8")
+    assert "The last handover note in this station's journal" in shown
+    assert "The first watch stood; all quiet." in shown
+    data = json.loads(save.read_text(encoding="utf-8"))
+    copy = replay.replay(data)
+    h = copy.agents["watcher"]
+    assert not h.agent.released and h.agent.seatings == 2
+    said = [e.text for e in copy.log if e.kind == "agent.stationed"][-1]
+    assert said.startswith(
+        "The watcher takes the station again (through the REPL door): the second"
+    )
+    # an opt-out with `final` set bars the identity, in the rule's own words
+    replyf.write_text("> opt_out reason='enough of this game' final=true\n", encoding="utf-8")
+    assert repl_mod.main(common + ["--load", str(save), "--reply", str(replyf)]) == 3
+    assert repl_mod.main(common + ["--load", str(save)]) == 3
+    refused = sample.read_text(encoding="utf-8")
+    assert "left this game for good" in refused and "at any station" in refused
+    copy = replay.replay(json.loads(save.read_text(encoding="utf-8")))
+    assert copy.agents["watcher"].agent.released
+    assert harness_mod.barred(copy, "") is not None
+    assert not harness_mod.seating(copy, "officer of the watch", "").ok
+    assert harness_mod.seating(copy, "watcher", "another-made-up-model").ok

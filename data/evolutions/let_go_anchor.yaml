@@ -9,6 +9,18 @@
 # 568): the physics takes the snatch when the cable comes taut (physics/anchor.py), and a
 # cable that parts is the captain's lesson.
 #
+# Package 37f (the review of gate 5c's playtests, 5.8; the owner's ruling of 2026-10-07):
+# it says its scope as the order is given, and takes one. Its first line is what it will
+# do, "Let go the best bower in 26 fathoms; veering to a hundred and thirty fathoms, five
+# times the depth." (in game 9 the same veer "ran past its number"); with a scope said
+# ("let go the best bower and veer to 45 fathoms", "... with 45 fathoms", "... in 45
+# fathoms") it veers to that and no further. As the anchor goes, a notable line each when
+# the scope will have her swing within a cable of the nearest land as the lookout judges
+# it, when the depth wants more than the cable bent to the anchor, and when the water
+# here at low water by the master's own tide is less than her draught (scripts.py,
+# `_anchoring_warnings`). The record that she is hove to is cleared and the helm righted
+# as it goes, and the World says "Brought up" when she is (core/world.py).
+#
 # Parameters: `anchor` (the best bower, the small bower, the sheet, the stream, the kedge,
 # the second anchor: the one not down); `fathoms` (the scope to veer to; the depth's
 # rule when not said).
@@ -21,7 +33,7 @@ preconditions: []
 timing:
   stand_clear_s: 15      # "Stand clear of the cable! Stream the buoy!": judgement
   veer_fathoms_per_s: 1.0  # the cable "veered away roundly": judgement
-on_start: {log: "Stand clear of the cable; stream the buoy; let go {anchor}!"}
+on_start: {log: "Stand clear of the cable; stream the buoy! Let go {anchor} in {let_go_depth}; {plan}."}
 on_complete: {log: "{anchor_cap} let go in {depth}; {fathoms} of cable veered.", kind: ship.anchored, severity: notable}
 on_fail: {log: "Could not let go {anchor}: {reason}.", kind: evolution.failed, severity: notable}
 # crew: the forecastlemen at the stoppers, the shank painter and the compressors (Lever

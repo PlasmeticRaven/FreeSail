@@ -22,7 +22,7 @@ applies_to: {class: sail}
 script: bend
 params: {aloft: [bend]}
 preconditions:
-  - {check: sail.state == unbent, reason: "The {sail} is bent already ({state}); to change it for a new one, shift it."}
+  - {check: sail.state == unbent, reason: "The {sail} is bent already ({state}); to change it for a new one, shift it.", done: true}
 requires:
   - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
 timing:

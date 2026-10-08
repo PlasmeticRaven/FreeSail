@@ -25,7 +25,7 @@ verb: swifter_in_the_catharpins_on
 applies_to: {class: mast}
 params: {gain: ""}
 preconditions:
-  - {check: not spar.swiftered_in, reason: "The catharpins on the {spar} are swiftered in already."}
+  - {check: not spar.swiftered_in, reason: "The catharpins on the {spar} are swiftered in already.", done: true}
   - {check: not spar.wrecked, reason: "The {spar} is carried away."}
 requires:
   - {check: not wrecked(spar), reason: "the {spar} is carried away"}

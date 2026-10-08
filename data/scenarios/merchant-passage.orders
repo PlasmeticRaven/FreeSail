@@ -22,10 +22,14 @@ standing order "sail on the ebb": at the boat alongside, if the distance to Falm
 # plain sail is made again. When the Falmouth pilot asks to be put off, his cutter coming
 # off for him, she heaves to for the boat (a schooner with her sheets tended outran it,
 # and the pilot was carried to the Iroise), fills away when he is in it, and makes plain
-# sail and shapes her course again.
+# sail and shapes her course again. Package 37e: she heaves to for the Falmouth pilot's
+# boat only (within fifteen miles of Falmouth). The pilot of Brest asks to be put off
+# whenever she opens her distance from the port, which she does for a quarter of an hour
+# stemming the ebb at the entrance of the Chenal du Four (below); hove to for his boat
+# there she was set to the southward with her course unshaped and took the ground.
 standing order "the pilot boards": at the pilot's hail then take in the fore topsail
 standing order "the pilot aboard": at the pilot aboard, if the distance to Falmouth is under 9 miles then set plain sail
-standing order "the pilot put off": at the pilot asks to be put off then heave to
+standing order "the pilot put off": at the pilot asks to be put off, if the distance to Falmouth is under 15 miles then heave to
 standing order "the pilot off": at the pilot off then fill away
 standing order "under way again": at filled away, if the distance to Falmouth is under 15 miles then set plain sail; shape a course for 50 00 N 4 57 W
 
@@ -46,15 +50,20 @@ standing order "across the Channel": when the distance to 49 52 N 5 06 W is unde
 # The yards and the sheets: trimmed when she is steady on a course the book has shaped
 # (the starter book's trim answers a shift of the true wind, not a turn of the ship),
 # on a shift of a point, and the sheets tended every glass (the starter book's rule;
-# Luce 1866 ch. XXIV).
-standing order "trim to the course": at steady on the course then trim sails
-standing order "trim on a shift": when the true wind veers 1 point or backs 1 point then trim sails
-standing order "tend the sheets": every glass then trim the sheets
+# Luce 1866 ch. XXIV). Not while she is hove to (package 37f): each carries the dialect's
+# own guard, since a trim braces a hove-to ship's backed yards round with the rest.
+standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails
+standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets
 
 # The departure and the landfall: a bearing of the land every glass while it is in
 # sight (N §1), so that the account is fixed on the Lizard before the land is lost and
 # on Ushant when it is raised.
-standing order "bearings": every glass, if the land is in sight then take a bearing of the land
+# Package 37d: a bearing gives a line, and the lookout's distance by estimation is laid
+# down with it only when it is the better figure (a landfall on one mark after a long
+# run), so the book takes a fix by cross bearings after the bearing, which stands when
+# one mark only is in sight or the marks cut too fine.
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix
 
 # The course across is worked afresh from the account every hour, after the bearing of
 # the land when there is one, since the leeway and the Channel's stream set her off a
@@ -100,15 +109,32 @@ standing order "the course across": every hour, if the distance to Falmouth is o
 # the Iroise's mark wide by account and cast nothing, the course for the first point is
 # shaped once she is east of the Iroise all the same, since the straight course east
 # from the Iroise ends on the Toulinguet.
+# Package 37e (the account true, the tide and her drift hove to worked into it): the
+# account now follows her out of the mark's mile and a half as she drifts hove to for
+# the cast, and back into it as she fills away, which brought her to four times. So she
+# is brought to with her head still to the southward of east, which it is on the course
+# from the soundings and is not on the course for the first point; and the rule "past the
+# Iroise" waits until the first point is within five miles (six before), so that she comes
+# to the mark on the course from the soundings.
 standing order "the Iroise": when the distance to the soundings seven leagues south-west of Ushant is under 7 miles then shape a course for the Passage de l'Iroise
 standing order "the course for the Iroise": every hour, if the distance to Ushant is over 10 miles and the distance to the Passage de l'Iroise is under 20 miles and the distance to the Passage de l'Iroise is over 2 miles and the distance to the road of Bertheaume is over 9 miles then shape a course for the Passage de l'Iroise
-standing order "bring to in the Iroise": when the distance to the Passage de l'Iroise is under 1.5 miles and the distance to 48 18.3 N 4 43.5 W is over 7 miles then heave to
+standing order "bring to in the Iroise": when the distance to the Passage de l'Iroise is under 1.5 miles and the distance to 48 18.3 N 4 43.5 W is over 7 miles and the heading is east of E then heave to
 standing order "the bottom of the Iroise": at hove to, if the distance to the Passage de l'Iroise is under 5 miles then heave the deep-sea lead
 standing order "fill away after the cast": at a sounding, if the distance to the Passage de l'Iroise is under 5 miles then fill away
 standing order "for Bertheaume": at filled away, if the distance to the Passage de l'Iroise is under 5 miles then shape a course for 48 16.5 N 4 48 W
-standing order "past the Iroise": when the distance to the Passage de l'Iroise is under 6 miles and the distance to 48 16.5 N 4 48 W is under 6 miles then shape a course for 48 16.5 N 4 48 W
+standing order "past the Iroise": when the distance to the Passage de l'Iroise is under 6 miles and the distance to 48 16.5 N 4 48 W is under 5 miles then shape a course for 48 16.5 N 4 48 W
 standing order "mid-channel": when the distance to 48 16.5 N 4 48 W is under 1.5 miles then shape a course for 48 18.3 N 4 43.5 W
 standing order "the road of Bertheaume": when the distance to 48 18.3 N 4 43.5 W is under 1.5 miles then shape a course for the road of Bertheaume
+# Package 37e: a course shaped is made good against the tide the master allows for the
+# waters his account puts her in, and is worked once. The line from the first point to
+# the second crosses the corner of the Chenal du Four's water, where the ebb runs three
+# knots and a half to the southward, and the road is shaped for within a mile of leaving
+# it: an allowance worked there laid her head N by E, which she could not lie, and held
+# after she was out of that water, and she ran on to the shore west of Point Bertheaume.
+# So from the second point in, standing in (her head west of north-east, with way on
+# her), the course for the road is worked again every five minutes, each time for the
+# water she is then in.
+standing order "the course for the road": every 5 minutes, if the distance to 48 18.3 N 4 43.5 W is under 1.5 miles and the heading is west of NE and the speed is over 3 knots then shape a course for the road of Bertheaume
 standing order "in the road": at a sounding, if the depth of water is under 13 fathoms and the distance to the road of Bertheaume is under 1.5 miles and the heading is west of NE and the speed is over 3 knots then come to an anchor
 standing order "the pilot in the road": at the pilot aboard, if the distance to the road of Bertheaume is under 4 miles then come to an anchor
 
@@ -123,35 +149,56 @@ standing order "the pilot in the road": at the pilot aboard, if the distance to 
 # from the account for the Goulet's mouth (she anchored a mile and a half short of the
 # road's mark, whence no fixed heading from the anchor serves).
 standing order "the flood": at the turn to the flood, if the daylight is day and the distance to the road of Bertheaume is under 4 miles then get under way on the larboard tack and steer E
-standing order "for the Goulet": at under way, if the distance to the road of Bertheaume is under 4 miles then set plain sail; shape a course for 48 19.3 N 4 38 W
+# Package 37e: the allowance for the set is the master's own now, in the course shaped
+# (37d's second pass had laid the point a cable and a half south for it). The mouth's
+# point is laid at 48 19.75 N, on the line she is to make good under Petit Minou (below).
+standing order "for the Goulet": at under way, if the distance to the road of Bertheaume is under 4 miles then set plain sail; shape a course for 48 19.75 N 4 38 W
 
 # The Goulet on the flood by the pass north of the Mingan and the Fillettes (Faden 1793,
 # p. 57: range either shore and fear nothing, but not the middle), by points pricked on
-# the chart in the deep water (twenty to forty-five metres by the chart's own grid, and
-# four cables and more from the Mingan and the Fillettes as the chart's features place
-# them, a mile and a half west of the grid's shoals) from the mouth, mid-channel between
-# Petit Minou and the Toulinguet, under Petit Minou, and north of the Mingan and the
-# Fillettes to the inner end under Portzic, and then
-# for the Bay of Brest; in pilot water a bearing is taken every five minutes (from
+# the chart in the deep water from the mouth, under Petit Minou, and north of the Mingan
+# and the Fillettes to the inner end under Portzic, and then for the Bay of Brest.
+# Package 37e, the book set for a true account and a course made good: with the flood
+# running four knots and more to the E by N under her, the wind she feels draws two
+# points ahead and she lies no higher than ENE on the larboard tack, so she makes good
+# no line to the northward of about ENE half E; the points are laid on the one such line
+# that clears both the shore and the rock, from the mouth's point along the north shore
+# under Petit Minou (a cable off it, steep-to in eleven fathoms) to a point two cables
+# and a half north of the Mingan, which she passes two cables off. The course for that
+# point is shaped at the mouth and again when her account is east of 4 37.1 W, where
+# the Goulet's own stream begins by the directions (the first is worked for the
+# Iroise's). The turns are at a meridian, which she cannot miss, and no longer within
+# four cables of a point, which she can: north of the Mingan when her account is east
+# of its meridian (4 35.3 W), and so on, the points from there in mid-channel. The
+# point under Portzic is laid two cables north of the old one (48 20.8 N), since the
+# line from it to the Bay, made good, passed three cables off Penaleuch point in seven
+# fathoms.
+# In pilot water a bearing is taken every five minutes (from
 # fourteen miles off the road of Bertheaume, which is the Iroise's mark, since the marks
 # from there in are reached by account within a mile or two and the account between the
 # log's heaves swings) and the hand lead kept going within six miles of the Goulet's
 # middle, the road to the Bay (the Regulations of 1806, the Pilot's articles; the
 # Master's art. XXIX).
-standing order "the mouth of the Goulet": when the distance to 48 19.3 N 4 38 W is under 0.4 miles then shape a course for 48 19.8 N 4 36.5 W
-standing order "under Petit Minou": when the distance to 48 19.8 N 4 36.5 W is under 0.4 miles then shape a course for 48 20.7 N 4 35 W
-standing order "north of the Mingan": when the distance to 48 20.7 N 4 35 W is under 0.4 miles then shape a course for 48 20.7 N 4 34.3 W
-standing order "north of the Fillettes": when the distance to 48 20.7 N 4 34.3 W is under 0.4 miles then shape a course for 48 21 N 4 33 W
-standing order "under Portzic": when the distance to 48 21 N 4 33 W is under 0.4 miles then shape a course for 48 20.8 N 4 31.5 W
-standing order "into the Bay": when the distance to 48 20.8 N 4 31.5 W is under 0.4 miles then shape a course for the Bay of Brest
-standing order "pilot water": every 5 minutes, if the distance to the road of Bertheaume is under 14 miles and the land is in sight then take a bearing of the land
+standing order "the mouth of the Goulet": when the distance to 48 19.75 N 4 38 W is under 0.4 miles then shape a course for 48 20.45 N 4 35.3 W
+standing order "under Petit Minou": when the reckoning is east of 4 37.1 W and the distance to 48 20.45 N 4 35.3 W is under 2 miles then shape a course for 48 20.45 N 4 35.3 W
+standing order "north of the Mingan": when the reckoning is east of 4 35.3 W and the distance to 48 20.45 N 4 35.3 W is under 1 mile then shape a course for 48 20.5 N 4 34.5 W
+standing order "north of the Fillettes": when the reckoning is east of 4 34.5 W and the distance to 48 20.5 N 4 34.5 W is under 1 mile then shape a course for 48 20.75 N 4 33.5 W
+standing order "under Portzic": when the reckoning is east of 4 33.5 W and the distance to 48 20.75 N 4 33.5 W is under 1 mile then shape a course for 48 21 N 4 31.5 W
+standing order "into the Bay": when the distance to 48 21 N 4 31.5 W is under 0.4 miles then shape a course for the Bay of Brest
+# Package 37e: the fix is taken again after the bearing in pilot water (37d's second
+# pass had left the bearing alone, as a stopgap, the book's points being tuned to an
+# account that lagged her on the flood).
+standing order "pilot water": every 5 minutes, if the distance to the road of Bertheaume is under 14 miles and the land is in sight then take a bearing of the land; take a fix
 standing order "the lead in pilot water": every 5 minutes, if the distance to 48 20.8 N 4 33.9 W is under 6 miles then heave the lead
 
 # The Bay of Brest: anchor where you please in eight, ten or sixteen fathoms on mud
 # (Faden): at the first cast under twelve fathoms within the Bay (the flats inside Portzic
-# rise from eleven fathoms to two in half a mile), or at the Bay's mark;
+# rise from eleven fathoms to two in half a mile), or at the Bay's mark; within a mile
+# and eight tenths of the mark (three before package 37e: the port serves a ship at
+# anchor within two miles of its road, and a cast of eleven fathoms off Penaleuch
+# point brought her up two miles and a third from it, out of the boat's reach);
 # the boat ashore for the prices, and the tin sold at the quay.
-standing order "in the Bay": at a sounding, if the distance to the Bay of Brest is under 3 miles and the depth of water is under 12 fathoms and the speed is over 2 knots then come to an anchor
+standing order "in the Bay": at a sounding, if the distance to the Bay of Brest is under 1.8 miles and the depth of water is under 12 fathoms and the speed is over 2 knots then come to an anchor
 standing order "the mark in the Bay": when the distance to the Bay of Brest is under 0.5 miles then come to an anchor
 standing order "the agent": at brought up, if the distance to Brest is under 6 miles then send the boat ashore with the mate
 standing order "the tin sold": at the boat alongside, if the distance to Brest is under 6 miles then sell forty tons of tin

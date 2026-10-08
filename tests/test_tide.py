@@ -308,3 +308,61 @@ def test_the_lead_reads_the_tide_and_the_master_allows_for_it_by_his_almanac():
     allowance = w.navigation._tide_allowance_m()
     assert 0.0 <= allowance <= units.feet_to_m(15.0)
     assert abs(allowance - w.tide_height_m) < 2.5  # his rule of thumb against the truth
+
+
+# ---------------------------------------------------------------------------
+# The directions (package 37e): what the master's books say of the streams
+# ---------------------------------------------------------------------------
+
+
+def test_the_directions_state_every_water_in_the_periods_form_beside_the_worlds_figures(tide):
+    """Package 37e, item 5: each stream area carries what the sailing directions say of
+    it beside the world's own figures, in the form the period's books give: the point
+    the flood sets toward (a compass point, never a degree), the rate at springs to the
+    half knot and at neaps half of that, and the hour of the tide at which it runs
+    strongest to the half hour; with the source, and what of it is judgement said."""
+    book = T.load_directions()
+    assert [a.id for a in book.areas] == [a.id for a in tide.areas]  # every water, in order
+    for said, world in zip(book.areas, tide.areas, strict=True):
+        assert said.polygon == world.polygon  # the statement is of the same water
+        assert units.parse_compass_point(said.set_point) == pytest.approx(said.set_rad)
+        # the point is the world's axis to the nearest point (a book rounds); the open
+        # Channel's is the period's own word, which is not the world's axis rounded
+        off = abs(units.wrap_pi(said.set_rad - math.radians(world.axis_deg)))
+        if said.id != "mid-channel":
+            assert off <= math.radians(5.7), (said.id, said.set_point, world.axis_deg)
+            assert "set" in said.judgement, said.id
+        else:
+            assert off == pytest.approx(math.radians(20.0)) and "set" not in said.judgement
+        assert (said.spring_kn * 2.0) == round(said.spring_kn * 2.0), said.id  # to the half knot
+        assert said.neap_kn == pytest.approx(said.spring_kn / 2.0), said.id
+        assert abs(said.spring_kn - world.spring_kn) <= 0.5, said.id
+        assert (said.strongest_h * 2.0) == round(said.strongest_h * 2.0), said.id
+        assert abs(said.strongest_h - world.phase_h) <= 0.5, said.id
+        assert said.source and "rates" in said.judgement, said.id  # whose each figure is
+        assert said.rate_kn(1.0) == said.spring_kn and said.rate_kn(0.0) == said.neap_kn
+        assert said.neap_kn < said.rate_kn(0.5) < said.spring_kn
+    # the Fromveur at neaps is the book's half of springs, not the world's five knots
+    # (the owner's ruling of 2026-10-07), and is marked judgement
+    fromveur = book.by_id("the-fromveur")
+    assert (fromveur.set_point, fromveur.spring_kn, fromveur.neap_kn) == ("NE", 7.0, 3.5)
+    assert fromveur.judgement == ("set", "rates", "hour") and "JUDGEMENT" in fromveur.source
+    assert tide.areas[[a.id for a in tide.areas].index("the-fromveur")].neap_kn == 5.0
+    # the open Channel's set is the period's own word for it
+    assert book.by_id("mid-channel").set_point == "NE" and book.areas[-1].polygon is None
+
+
+def test_the_directions_are_looked_up_by_a_position_and_say_nothing_beyond_their_limits():
+    """Package 37e, item 5: the master looks a position up in the directions (his
+    account, never the ship's place), the first water that holds it; beyond the limits
+    of the waters his books cover he has no statement."""
+    book = T.load_directions()
+    assert book.area_at(Position(48.17, -5.10)).id == "the-iroise"
+    assert book.area_at(Position(48.337, -4.60)).id == "the-goulet"
+    assert book.area_at(THE_LIZARD).id == "the-lizard"
+    assert book.area_at(Position(49.3, -5.0)).id == "mid-channel"  # the rest is the Channel
+    south, north, west, east = book.limits
+    assert (south, north, west, east) == (48.0, 51.0, -7.0, -3.0)
+    for beyond in (Position(47.5, -6.0), Position(49.5, -7.5), Position(51.2, -5.0)):
+        assert book.area_at(beyond) is None
+    assert T.load_directions() is book  # read once a process, as the tide's tables are

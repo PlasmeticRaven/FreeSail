@@ -201,6 +201,16 @@ def _starts(candidate: str, typed: str) -> bool:
     return normalise(candidate).startswith(typed)
 
 
+# What follows "allow" (package 37e; `orders/navigation.py`): the three forms, the
+# captain's own set by an example of each shape the grammar takes.
+ALLOW_OFFERS: tuple[str, ...] = (
+    "allow the tide by the book",
+    "allow no set",
+    "allow one knot of set to the east",
+    "allow half a knot of set to the south west",
+)
+
+
 def suggestions(ship: Any, text: str, limit: int = 12) -> list[str]:
     """Whole-line completions for `text`, most useful first."""
     typed = normalise(text)
@@ -288,6 +298,20 @@ def suggestions(ship: Any, text: str, limit: int = 12) -> list[str]:
                 offer(prefix + m)
         return out[:limit]
 
+    if verb == "take a fix":
+        # the fix by cross bearings (package 37d): the marks in sight it may be taken
+        # by, nearest first; a third after two
+        for c in _fix_offers(ship, typed):
+            offer(c)
+        return out[:limit]
+
+    if verb == "allow":
+        # the tide in the reckoning (package 37e): handed back to the master, none, or
+        # the captain's own set, which the words after "allow" give in knots and a point
+        for c in ALLOW_OFFERS:
+            offer(c)
+        return out[:limit]
+
     nouns = _noun_candidates(ship, spec.object, verb)
     if verb == "brace" and not rest and normalise(matched) != "lay":
         for m in _modifiers_for(spec.object, verb, vocab, False):
@@ -312,6 +336,36 @@ def suggestions(ship: Any, text: str, limit: int = 12) -> list[str]:
     modes = {prefix + m for m in _modifiers_for(spec.object, verb, vocab, False)}
     out.sort(key=lambda s: (s not in modes, not s.startswith(prefix + "the "), len(s), s))
     return (work + [s for s in out if s not in work])[:limit]
+
+
+# `take a fix` offers at most this many of the marks in sight, the nearest (judgement:
+# the suggestions are a dozen lines, and the near marks are the ones a fix is taken by).
+FIX_OFFER_MARKS = 6
+
+
+def _fix_offers(ship: Any, typed: str) -> list[str]:
+    """`take a fix by <mark> and <mark>` for the charted marks in sight, nearest first
+    (`Navigation._fix_marks`: never the shore, a sail or a transit), and a third mark
+    once two are typed; nothing on a ship that keeps no reckoning or with fewer than
+    two marks in sight (the bare `take a fix` says why)."""
+    nav = (getattr(ship, "extra", None) or {}).get("navigation")
+    if nav is None or getattr(nav.world, "lookout", None) is None:
+        return []
+    names = [s.feature.name for s in nav._fix_marks()[:FIX_OFFER_MARKS]]
+    if len(names) < 2:
+        return []
+    head = "take a fix by "
+    out = [f"{head}{a}" for a in names]
+    out += [f"{head}{a} and {b}" for a in names for b in names if b != a]
+    if " and " in typed:
+        out += [
+            f"{head}{a} and {b} and {c}"
+            for a in names
+            for b in names
+            for c in names
+            if len({a, b, c}) == 3
+        ]
+    return out
 
 
 def _work_offers(ship: Any, prefix: str, bare_belay: bool) -> list[str]:

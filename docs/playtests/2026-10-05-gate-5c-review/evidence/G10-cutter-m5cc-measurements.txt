@@ -1,0 +1,351 @@
+GAME 10: THE LEAD'S MEASUREMENTS (2026-10-08)
+A merchant cutter, free; seed 7; 12 June 05:00 to 14 June 20:00; build m5c-c/37g (rules e66c4585ea6af66a).
+Officer of the watch: Qwen 3.8 27B (Q4_K_M) under llama.cpp through the local runner, context 102,400 tokens.
+Made from scratch copies of the owner's saves (saves/freesail-seed7-tick183600 and -tick226801), replayed on the
+build that wrote them. Scripts: tools/g10_probe.py, g10_nav.py, g10_context.py, g10_replay_diff.py.
+Distances in nautical miles; fm = fathoms. 'Doubt' is the master's own, as he would state it at that moment
+(the greater half-axis of his ellipse).
+
+################ 1. THE REPLAY AGAINST THE GAME AS PLAYED
+played 4240 lines, replayed 4239 lines; digests equal: False
+--- played
++++ replayed
+@@ -3250 +3250 @@
+-183600 | agent.resumed | the officer of the watch | [officer of the watch] A notable event that speaks of danger: The Nut Rock bearing N, distant a mile: a danger; the officer of the watch is sampled ag
++183600 | agent.stopped | the officer of the watch | The officer of the watch stood down by the local runner: the model server could not be used: The model server at http://127.0.0.1:8080 answered 400: r
+@@ -3252 +3251,0 @@
+-183600 | agent.stopped | the officer of the watch | The officer of the watch stood down by the local runner: the model server could not be used: The model server at http://127.0.0.1:8080 answered 400: r
+true position at the end, played: 49° 48' N, 6° 14' W | replayed: 49° 48' N, 6° 14' W
+station officer of the watch: turns held played 338, replayed 337; journal entries 261 / 261
+
+################ 2. THE ACCOUNT AGAINST THE TRUTH
+== THE ACCOUNT AGAINST THE TRUTH, BY STRETCH
+Falmouth to the Manacles                     12 Jun 07:53 to 12 Jun 10:05 | error median  0.13 max  0.47 nm | doubt median  0.20 | truth within twice the doubt  96%
+Off the Lizard, beating, to the calm         12 Jun 10:05 to 13 Jun 02:30 | error median  1.20 max  2.29 nm | doubt median  2.42 | truth within twice the doubt  95%
+At anchor off the Lizard                     13 Jun 02:30 to 13 Jun 04:41 | error median  1.38 max  1.45 nm | doubt median  3.82 | truth within twice the doubt 100%
+The Lizard to Scilly, in fog                 13 Jun 04:41 to 13 Jun 13:20 | error median  1.23 max  1.78 nm | doubt median  4.07 | truth within twice the doubt 100%
+Fog lifted, to the gig                       13 Jun 13:20 to 13 Jun 18:30 | error median  1.29 max  2.74 nm | doubt median  4.76 | truth within twice the doubt 100%
+The gig to the anchor off the Sound          13 Jun 18:30 to 13 Jun 20:00 | error median  1.68 max  2.12 nm | doubt median  5.95 | truth within twice the doubt 100%
+At anchor off the Sound                      13 Jun 20:00 to 14 Jun 00:06 | error median  0.33 max  0.52 nm | doubt median  0.54 | truth within twice the doubt 100%
+Under way and hove to, to the run in         14 Jun 00:06 to 14 Jun 02:11 | error median  0.60 max  2.18 nm | doubt median  0.58 | truth within twice the doubt  82%
+The run in, to the cast that moved her       14 Jun 02:11 to 14 Jun 04:08 | error median  0.07 max  0.59 nm | doubt median  0.11 | truth within twice the doubt 100%
+After the cast, to the anchor                14 Jun 04:08 to 14 Jun 04:33 | error median  1.01 max  1.02 nm | doubt median  0.26 | truth within twice the doubt   0%
+At anchor in the Sound                       14 Jun 04:33 to 14 Jun 16:00 | error median  0.08 max  1.03 nm | doubt median  0.08 | truth within twice the doubt  70%
+Out of the Sound, to the end                 14 Jun 16:44 to 14 Jun 20:00 | error median  0.14 max  0.99 nm | doubt median  0.30 | truth within twice the doubt  99%
+THE WHOLE GAME                               12 Jun 05:00 to 14 Jun 20:00 | error median  0.72 max  2.74 nm | doubt median  0.93 | truth within twice the doubt  92%
+
+== EVERY OBSERVATION THAT MOVED THE ACCOUNT HALF A MILE OR MORE, OR WAS 'OUT BY IT'
+   (error before is from the series row just before; after is at the event)
+      0 12 Jun 05:00 [reckoning.fix] error before ? nm (doubt ?) -> after 0.021 nm (doubt 0.06)
+         Fixed by cross bearings: St Mawes castle SE, Mylor Point N by E, Falmouth WSW; the lines met within a cable. The account moved two miles to the W by S: 50° 10' N, 5° 02' W by the fix, good to a cable.
+  13876 12 Jun 08:51 [reckoning.fix] error before 0.29 nm (doubt 0.27) -> after 0.079 nm (doubt 0.08)
+         Fixed by cross bearings: the Black Rock N by W, St Anthony's Head NNE, Pendennis Point NW by N; the lines met in a point. The account moved two cables to the ESE: 50° 07' N, 5° 02' W by the fix, good to a cable.
+  26955 12 Jun 12:29 [reckoning.fix] error before 1.67 nm (doubt 0.78) -> after 1.3 nm (doubt 0.50)
+         Fixed by cross bearings: the Lizard NW, Coverack N by W, Lowland Point N by W; the lines met within four cables. The reckoning was out by it; laid down by the fix: moved two miles and a half to the N by W: 49° 52' N, 5° 02' W by the fix, good to five cables.
+  30383 12 Jun 13:26 [reckoning.fix] error before 2.29 nm (doubt 1.88) -> after 0.56 nm (doubt 0.41)
+         Fixed by cross bearings: the Lizard lights NW by N, Black Head N, Rill Point NW by N; the lines met within four cables. The account moved two miles to the SE: 49° 52' N, 5° 07' W by the fix, good to five cables.
+  67989 12 Jun 23:53 [bearing.taken] error before 1.11 nm (doubt 2.47) -> after 1.193 nm (doubt 2.35)
+         The Lizard lights bore N by E, five leagues by estimation: the account moved two cables to the SW.
+ 139989 13 Jun 19:53 [bearing.taken] error before 2.12 nm (doubt 5.99) -> after 0.51 nm (doubt 0.53)
+         Peninnis Head bore NW by N, four miles by estimation: the account moved a mile and a half to the E by N.
+ 154897 14 Jun 00:01 [bearing.taken] error before 0.28 nm (doubt 0.54) -> after 0.094 nm (doubt 0.37)
+         St Agnes light bore NW by W, five miles by estimation: the account moved two cables to the SE by S.
+ 161589 14 Jun 01:53 [bearing.taken] error before 2.18 nm (doubt 1.26) -> after 0.622 nm (doubt 0.66)
+         St Agnes light bore W by N, five miles by estimation: the account moved two miles and a half to the NE.
+ 163531 14 Jun 02:25 [reckoning.fix] error before 0.14 nm (doubt 0.45) -> after 0.137 nm (doubt 0.19)
+         Fixed by cross bearings: St Mary's NW, Peninnis Head WNW, St Agnes light W; the lines met in a point. The account moved two cables to the W by N: 49° 53' N, 6° 15' W by the fix, good to two cables.
+ 169706 14 Jun 04:08 [sounding] error before 0.01 nm (doubt 0.13) -> after 0.993 nm (doubt 0.25)
+         By the deep nine; loose sand, not very tenacious. The reckoning was out by it; laid down by the cast: moved a mile to the N.
+         water under her 8.97 fm (chart 6.4 + tide 4.7 m); chart at the account 7.38 fm; master's tide allowance 3.0 m
+ 183600 14 Jun 08:00 [reckoning.fix] error before 1.02 nm (doubt 0.26) -> after 0.087 nm (doubt 0.11)
+         Fixed by cross bearings: St Agnes S by W, Peninnis Head E by N, Samson N by W; the lines met within two cables. The reckoning was out by it; laid down by the fix: moved a mile to the S by W: 49° 54' N, 6° 20' W by the fix, good to a cable.
+ 215803 14 Jun 16:56 [sounding] error before 0.01 nm (doubt 0.16) -> after 0.989 nm (doubt 0.25)
+         And a quarter nine; loose sand, not very tenacious. The reckoning was out by it; laid down by the cast: moved a mile to the N.
+         water under her 9.24 fm (chart 6.5 + tide 4.99 m); chart at the account 7.4 fm; master's tide allowance 3.0 m
+ 215877 14 Jun 16:57 [reckoning.fix] error before 0.98 nm (doubt 0.25) -> after 0.165 nm (doubt 0.21)
+         Fixed by cross bearings: St Agnes SW, Peninnis Head E by N, the Nut Rock N; the lines met within four cables. The reckoning was out by it; laid down by the fix: moved a mile to the S by W: 49° 54' N, 6° 20' W by the fix, good to two cables.
+ 221480 14 Jun 18:31 [reckoning.fix] error before 0.18 nm (doubt 0.48) -> after 0.071 nm (doubt 0.15)
+         Fixed by cross bearings: Peninnis mill N by W, Annet NW by W, Nornour N by E; the lines met within three cables. The account moved two cables to the WNW: 49° 51' N, 6° 17' W by the fix, good to two cables.
+ 225914 14 Jun 19:45 [reckoning.fix] error before 0.37 nm (doubt 1.36) -> after 0.301 nm (doubt 0.39)
+         Fixed by cross bearings: Annet NW, St Mary's N by W, the daymark on St Martin's N by W; the lines met within eight cables. The account moved two cables to the NNW: 49° 48' N, 6° 15' W by the fix, good to five cables.
+
+== THE RUN IN, 02:15 TO 04:25 ON 14 JUNE: every fix, bearing and cast
+ 162630 02:10 err 0.539 (N -0.08 E +0.53) doubt 0.70 [bearing.taken] St Agnes light bore W by N, five miles by estimation: the account moved a cable to the N by W.
+ 163183 02:19 err 0.191 (N -0.17 E +0.09) doubt 0.47 [bearing.taken] Peninnis Head bore WNW, three miles by estimation: the account moved four cables to the SW.
+ 163186 02:19 err 0.177 (N -0.16 E +0.08) doubt 0.42 [bearing.taken] St Agnes light bore W by N, five miles by estimation: the account kept.
+ 163295 02:21 err 0.156 (N -0.14 E +0.08) doubt 0.43 [ship.wore] Wore ship; braced sharp up on the starboard tack, heading NW by W (308°).
+ 163377 02:22 err 0.146 (N -0.12 E +0.08) doubt 0.43 [sounding] No bottom at twenty fathoms. || true water 40.29 fm, chart at account 38.88 fm, tide 3.08 m, allowed 3.0 m
+ 163531 02:25 err 0.137 (N -0.05 E -0.13) doubt 0.19 [reckoning.fix] Fixed by cross bearings: St Mary's NW, Peninnis Head WNW, St Agnes light W; the lines met in a point. The account moved two cables to the W by N: 49° 53' N, 6° 15' W by the fix, good to two cables.
+ 163867 02:31 err 0.105 (N -0.10 E -0.01) doubt 0.18 [reckoning.fix] Fixed by cross bearings: St Mary's NW by W, Peninnis Head WNW, St Agnes light W; the lines met within two cables. The account moved a cable to the SE: 49° 53' N, 6° 15' W by the fix, good to two cables.
+ 164108 02:35 err 0.086 (N -0.07 E -0.05) doubt 0.15 [reckoning.fix] Fixed by cross bearings: St Mary's NW, Peninnis Head WNW, St Agnes light W; the lines met in a point. 49° 54' N, 6° 15' W by the fix, good to a cable, the fix the poorer figure; the account kept, within a cable of i
+ 164552 02:42 err 0.096 (N -0.05 E -0.08) doubt 0.12 [reckoning.fix] Fixed by cross bearings: St Mary's NW by N, Peninnis Head WNW, St Agnes W; the lines met within two cables. 49° 54' N, 6° 16' W by the fix, good to a cable; the account kept, within a cable of it.
+ 164710 02:45 err 0.114 (N -0.04 E -0.11) doubt 0.16 [sounding] No bottom at twenty fathoms. || true water 35.06 fm, chart at account 33.23 fm, tide 3.47 m, allowed 3.0 m
+ 164948 02:49 err 0.089 (N -0.09 E +0.01) doubt 0.11 [reckoning.fix] Fixed by cross bearings: St Mary's NW by N, Peninnis Head WNW, St Agnes W; the lines met in a point. The account moved a cable to the SE by S: 49° 54' N, 6° 17' W by the fix, good to a cable.
+ 165313 02:55 err 0.084 (N -0.08 E -0.01) doubt 0.09 [reckoning.fix] Fixed by cross bearings: Peninnis Head NW by W, St Mary's NNW, St Agnes W; the lines met in a point. 49° 54' N, 6° 17' W by the fix, good to a cable; the account kept, within a cable of it.
+ 165770 03:02 err 0.078 (N -0.07 E -0.02) doubt 0.10 [reckoning.fix] Fixed by cross bearings: Peninnis Head NW, St Mary's N by W, St Agnes W; the lines met within two cables. 49° 54' N, 6° 18' W by the fix, good to a cable; the account kept, within a cable of it.
+ 166033 03:07 err  0.06 (N -0.05 E -0.03) doubt 0.08 [reckoning.fix] Fixed by cross bearings: Peninnis Head NW by N, St Mary's N, St Agnes W by S; the lines met within two cables. 49° 54' N, 6° 18' W by the fix, good to a cable; the account kept, within half a cable of it.
+ 166453 03:14 err 0.051 (N -0.03 E -0.04) doubt 0.08 [reckoning.fix] Fixed by cross bearings: Peninnis Head N, the Garrison NW by N, Nornour NE by N; the lines met within a cable. 49° 54' N, 6° 18' W by the fix, good to a cable; the account kept, within half a cable of it.
+ 166586 03:16 err  0.06 (N -0.03 E -0.05) doubt 0.09 [sounding] And a half nineteen; loose sand, not very tenacious. The account kept. || true water 19.83 fm, chart at account 17.9 fm, tide 3.98 m, allowed 3.0 m
+ 166885 03:21 err 0.041 (N -0.04 E -0.01) doubt 0.14 [sounding] And a quarter twelve; loose sand, not very tenacious. The account kept. || true water 11.79 fm, chart at account 9.65 fm, tide 4.06 m, allowed 3.0 m
+ 166891 03:21 err 0.012 (N -0.01 E +0.00) doubt 0.05 [reckoning.fix] Fixed by cross bearings: Peninnis Head NE by E, Hugh Town N, the Garrison NNW; the lines met in a point. 49° 54' N, 6° 19' W by the fix, good to a cable; the account kept, within half a cable of it.
+ 167185 03:26 err 0.042 (N +0.00 E +0.04) doubt 0.10 [sounding] By the deep four; loose sand, not very tenacious. The account kept. || true water 4.23 fm, chart at account 2.29 fm, tide 4.13 m, allowed 3.0 m
+ 167196 03:26 err 0.024 (N -0.02 E -0.01) doubt 0.05 [reckoning.fix] Fixed by cross bearings: Peninnis Head ENE, the Garrison N by W, Hugh Town N by E; the lines met in a point. The account moved a cable to the WSW: 49° 54' N, 6° 19' W by the fix, good to a cable.
+ 167421 03:30 err 0.045 (N -0.03 E +0.03) doubt 0.08 [ship.anchored] The best bower let go in five fathoms and a half; twenty-six fathoms of cable veered.
+ 167468 03:31 err 0.065 (N -0.04 E +0.05) doubt 0.08 [ship.brought_up] Brought up by the best bower in five fathoms and a half, twenty-six fathoms of cable; Riding by the best bower to the flood, a windward tide, the wind against the tide.
+ 167501 03:31 err 0.064 (N -0.06 E +0.02) doubt 0.08 [sounding] And a half six; loose sand, not very tenacious. The account kept. || true water 6.82 fm, chart at account 4.2 fm, tide 4.21 m, allowed 3.0 m
+ 167786 03:36 err 0.052 (N -0.05 E -0.02) doubt 0.08 [sounding] By the mark five; loose sand, not very tenacious. The account kept. || true water 5.0 fm, chart at account 4.2 fm, tide 4.28 m, allowed 3.0 m
+ 167924 03:38 err 0.029 (N +0.00 E -0.03) doubt 0.04 [reckoning.fix] Fixed by cross bearings: Peninnis Head E by N, the Garrison N, St Mary's NE; the lines met within a cable. The account moved a cable to the N by W: 49° 54' N, 6° 19' W by the fix, good to a cable.
+ 168786 03:53 err 0.023 (N +0.01 E -0.02) doubt 0.04 [ship.aweigh] The best bower is aweigh.
+ 169177 03:59 err  0.01 (N -0.01 E -0.00) doubt 0.05 [reckoning.fix] Fixed by cross bearings: Peninnis Head E by N, the Garrison N by W, Hugh Town N by E; the lines met in a point. The account moved a cable to the N by E: 49° 54' N, 6° 19' W by the fix, good to a cable.
+ 169599 04:06 err  0.01 (N -0.01 E -0.01) doubt 0.11 [sounding] And a half eight; loose sand, not very tenacious. The account kept. || true water 8.22 fm, chart at account 5.7 fm, tide 4.67 m, allowed 3.0 m
+ 169706 04:08 err 0.993 (N +0.99 E -0.00) doubt 0.25 [sounding] By the deep nine; loose sand, not very tenacious. The reckoning was out by it; laid down by the cast: moved a mile to the N. || true water 8.97 fm, chart at account 7.38 fm, tide 4.7 m, allowed 3.0 m
+ 169913 04:11 err 0.983 (N +0.98 E +0.00) doubt 0.25 [sounding] By the mark ten; loose sand, not very tenacious. The account kept. || true water 9.62 fm, chart at account 7.73 fm, tide 4.73 m, allowed 3.0 m
+ 170058 04:14 err 0.984 (N +0.98 E +0.05) doubt 0.26 [ship.anchored] The small bower let go in nine fathoms; forty-six fathoms of cable veered.
+ 170129 04:15 err 0.987 (N +0.99 E +0.06) doubt 0.26 [ship.brought_up] Brought up by the small bower in nine fathoms, forty-six fathoms of cable; Riding by the small bower to the flood, a windward tide, the wind against the tide.
+ 170253 04:17 err 1.005 (N +1.00 E +0.05) doubt 0.26 [sounding] By the deep nine; loose sand, not very tenacious. The account kept. || true water 9.07 fm, chart at account 8.03 fm, tide 4.79 m, allowed 3.0 m
+ 170360 04:19 err  1.02 (N +1.02 E +0.04) doubt 0.26 [sounding] And a half nine; loose sand, not very tenacious. The account kept. || true water 9.08 fm, chart at account 8.03 fm, tide 4.81 m, allowed 3.0 m
+ 171100 04:31 err 1.021 (N +1.02 E +0.01) doubt 0.26 [sounding] And a quarter nine; loose sand, not very tenacious. The account kept. || true water 9.27 fm, chart at account 8.03 fm, tide 4.93 m, allowed 3.0 m
+
+################ 3. THE HOUR STANDING OFF AND ON BEFORE THE RUN IN (every ten minutes)
+154800 00:00 error 0.27 (N +0.14 E -0.23) doubt 0.54 | head 181.9 way +1.43 kn | wind from  16.5  6.4 kn | hove to False
+155400 00:10 error 0.24 (N +0.16 E -0.17) doubt 0.37 | head  20.3 way +1.05 kn | wind from  18.6  5.8 kn | hove to False
+156000 00:20 error 0.14 (N -0.02 E -0.14) doubt 0.37 | head  44.9 way +1.82 kn | wind from  11.3  6.3 kn | hove to False
+156600 00:30 error 0.29 (N -0.11 E -0.27) doubt 0.37 | head 208.5 way +1.94 kn | wind from  10.5  6.8 kn | hove to False
+157200 00:40 error 0.26 (N +0.01 E -0.26) doubt 0.37 | head  30.1 way +1.89 kn | wind from  20.4  6.2 kn | hove to False
+157800 00:50 error 0.37 (N -0.15 E -0.34) doubt 0.37 | head 206.0 way +0.92 kn | wind from  20.0  6.3 kn | hove to False
+158400 01:00 error 0.59 (N -0.42 E -0.41) doubt 0.41 | head 252.5 way +2.34 kn | wind from  24.2  5.8 kn | hove to False
+159000 01:10 error 1.53 (N -1.00 E -1.16) doubt 0.6 | head  69.7 way +1.50 kn | wind from  19.2  6.0 kn | hove to True
+159600 01:20 error 1.67 (N -1.23 E -1.12) doubt 0.71 | head  72.2 way +0.93 kn | wind from  26.5  5.7 kn | hove to True
+160200 01:30 error 1.67 (N -1.33 E -1.01) doubt 0.82 | head  70.4 way +0.96 kn | wind from  25.1  6.5 kn | hove to True
+160800 01:40 error 1.87 (N -1.59 E -0.98) doubt 1.02 | head  75.4 way +1.02 kn | wind from  29.8  6.8 kn | hove to True
+161400 01:50 error 2.11 (N -1.88 E -0.96) doubt 1.2 | head  74.8 way +1.02 kn | wind from  29.1  6.4 kn | hove to True
+162000 02:00 error 0.60 (N -0.24 E +0.55) doubt 0.68 | head  79.0 way +1.05 kn | wind from  32.9  6.2 kn | hove to True
+162600 02:10 error 0.58 (N -0.19 E +0.55) doubt 0.72 | head  68.7 way +1.02 kn | wind from  23.5  6.5 kn | hove to True
+
+################ 4. THE OFFICER'S CONVERSATION WHEN THE MODEL SERVER REFUSED IT FOR SIZE
+===== freesail-seed7-tick183600.json | end tick 183600
+  station officer of the watch: 193 turns held, 364,961 characters
+  the harness's own count of the conversation: 91,307 tokens (4 characters to a token)
+  budget_tokens 102400, reserve None, threshold/again (88400, 3500), asked_at 8248
+  turns by role: {'operator': 1, 'data': 125, 'model': 67}
+    folded-note turn at 1, 7,690 chars
+  handover asks still in the conversation: 0; folded notes: 1
+  the ten largest turns (chars, index, role, first 110 chars):
+     20,819 [0] operator: {"role": "operator", "content": "This is a message from the harness of FreeSail, a game, and not part of the g
+     15,908 [192] data: {"role": "data", "content": {"tick": 183600, "stamp": "Forenoon watch, 8 bells (08:00)", "reason": "a notable 
+      8,122 [59] data: {"role": "data", "content": {"tick": 165918, "stamp": "Middle watch (03:05)", "reason": "a notable event: Brac
+      7,690 [1] data: {"role": "data", "content": {"tick": 157639, "stamp": "Middle watch (00:47)", "reason": "the handover note", "
+      6,227 [45] data: {"role": "data", "content": {"tick": 163756, "stamp": "Middle watch (02:29)", "reason": "a word from the capta
+      5,960 [42] data: {"role": "data", "content": {"tick": 163295, "stamp": "Middle watch (02:21)", "reason": "wore", "notices": ["Y
+      5,940 [91] data: {"role": "data", "content": {"tick": 167440, "stamp": "Middle watch (03:30)", "reason": "a word from the capta
+      5,362 [53] data: {"role": "data", "content": {"tick": 164239, "stamp": "Middle watch (02:37)", "reason": "a notable event: Brac
+      5,284 [85] data: {"role": "data", "content": {"tick": 167185, "stamp": "Middle watch (03:26)", "reason": "a notable event: By t
+      5,228 [148] data: {"role": "data", "content": {"tick": 169851, "stamp": "Morning watch (04:10)", "reason": "a notable event: Tak
+  of the characters: 3.0% digits, 15.3% punctuation and symbols
+  the server counted the request at 103,679 / 103,122 tokens; that is 3.52 characters to a token if the whole conversation was sent
+  the data turns run from tick 157579 to 183600
+  tools.tokens rule: 100 tokens for 400 characters
+===== freesail-seed7-tick226801.json | end tick 226801
+  station officer of the watch: 338 turns held, 708,952 characters
+  the harness's own count of the conversation: 86,046 tokens (4 characters to a token)
+  budget_tokens 102400, reserve None, threshold/again (88400, 3500), asked_at 8248
+  turns by role: {'operator': 2, 'data': 215, 'model': 121}
+    folded-note turn at 1, 7,690 chars
+  handover asks still in the conversation: 0; folded notes: 1
+  the ten largest turns (chars, index, role, first 110 chars):
+     25,654 [211] data: {"role": "data", "content": {"tick": 199052, "stamp": "Afternoon watch (12:17)", "reason": "a word from the ca
+     25,105 [193] operator: {"role": "operator", "content": "This is a message from the harness of FreeSail, a game, and not part of the g
+     20,819 [0] operator: {"role": "operator", "content": "This is a message from the harness of FreeSail, a game, and not part of the g
+     15,908 [192] data: {"role": "data", "content": {"tick": 183600, "stamp": "Forenoon watch, 8 bells (08:00)", "reason": "a notable 
+     15,533 [228] data: {"role": "data", "content": {"tick": 209645, "stamp": "Afternoon watch (15:14)", "reason": "the boat alongside
+     14,453 [275] data: {"role": "data", "content": {"tick": 215880, "stamp": "First dog watch (16:58)", "reason": "a notable event th
+     12,968 [318] data: {"role": "data", "content": {"tick": 222983, "stamp": "Last dog watch (18:56)", "reason": "a word from the cap
+      8,718 [246] data: {"role": "data", "content": {"tick": 212400, "stamp": "First dog watch, 8 bells (16:00)", "reason": "a notable
+      8,449 [267] data: {"role": "data", "content": {"tick": 215307, "stamp": "First dog watch (16:48)", "reason": "a word from the ca
+      8,122 [59] data: {"role": "data", "content": {"tick": 165918, "stamp": "Middle watch (03:05)", "reason": "a notable event: Brac
+  of the characters: 3.1% digits, 15.4% punctuation and symbols
+  the server counted the request at 103,679 / 103,122 tokens; that is 6.84 characters to a token if the whole conversation was sent
+  the data turns run from tick 157579 to 226800
+  tools.tokens rule: 100 tokens for 400 characters
+
+################ 5. EACH URGENT 'TAKEN ABACK': HER HEAD, THE WIND AND HER WAY
+taken aback (urgent) at tick 12028
+    600 s before: head 108.3, wind from 246.6 (+138.3 deg off the bow),  9.1 kn, way +1.20 kn
+    300 s before: head 122.4, wind from 246.5 (+124.1 deg off the bow), 10.0 kn, way +0.71 kn
+     60 s before: head 160.8, wind from 247.1 ( +86.3 deg off the bow), 10.0 kn, way +1.52 kn
+      0 s before: head 162.3, wind from 246.0 ( +83.7 deg off the bow), 10.0 kn, way +1.13 kn
+    240 s after : head 181.0, wind from 249.5 ( +68.5 deg off the bow), 10.6 kn, way +1.45 kn
+taken aback (urgent) at tick 18354
+    600 s before: head 157.6, wind from 248.0 ( +90.4 deg off the bow),  9.5 kn, way +5.42 kn
+    300 s before: head 157.5, wind from 250.0 ( +92.5 deg off the bow),  8.7 kn, way +5.09 kn
+     60 s before: head 157.5, wind from 244.8 ( +87.3 deg off the bow),  9.0 kn, way +5.12 kn
+      0 s before: head 173.4, wind from 242.6 ( +69.2 deg off the bow),  8.8 kn, way +4.63 kn
+    240 s after : head 187.1, wind from 241.7 ( +54.6 deg off the bow),  9.3 kn, way +1.46 kn
+taken aback (urgent) at tick 33043
+    600 s before: head 290.8, wind from 239.0 ( -51.8 deg off the bow), 10.4 kn, way +3.16 kn
+    300 s before: head 290.3, wind from 235.7 ( -54.6 deg off the bow), 10.3 kn, way +3.33 kn
+     60 s before: head 290.7, wind from 232.9 ( -57.8 deg off the bow), 10.4 kn, way +3.88 kn
+      0 s before: head 290.7, wind from 231.3 ( -59.4 deg off the bow), 10.0 kn, way +3.94 kn
+    240 s after : head 325.6, wind from 283.4 ( -42.2 deg off the bow),  8.6 kn, way +0.93 kn
+taken aback (urgent) at tick 36858
+    600 s before: head 220.5, wind from 280.7 ( +60.2 deg off the bow), 12.8 kn, way +4.98 kn
+    300 s before: head 220.5, wind from 282.0 ( +61.5 deg off the bow), 17.5 kn, way +6.59 kn
+     60 s before: head 219.6, wind from 273.0 ( +53.4 deg off the bow), 17.5 kn, way +5.31 kn
+      0 s before: head 221.0, wind from 276.3 ( +55.3 deg off the bow), 17.5 kn, way +5.41 kn
+    240 s after : head 207.4, wind from 256.3 ( +48.9 deg off the bow), 10.1 kn, way +2.14 kn
+taken aback (urgent) at tick 40139
+    600 s before: head 208.1, wind from 256.3 ( +48.2 deg off the bow),  9.0 kn, way +1.56 kn
+    300 s before: head 204.1, wind from 264.6 ( +60.5 deg off the bow), 12.8 kn, way +1.53 kn
+     60 s before: head 208.6, wind from 260.2 ( +51.6 deg off the bow), 12.8 kn, way +3.33 kn
+      0 s before: head 208.9, wind from 261.0 ( +52.1 deg off the bow), 12.8 kn, way +3.17 kn
+    240 s after : head 194.8, wind from 244.6 ( +49.8 deg off the bow),  9.7 kn, way +1.38 kn
+taken aback (urgent) at tick 75024
+    600 s before: head 338.6, wind from 300.0 ( -38.6 deg off the bow),  4.4 kn, way +0.88 kn
+    300 s before: head 343.0, wind from 304.7 ( -38.3 deg off the bow),  4.5 kn, way +0.72 kn
+     60 s before: head 342.9, wind from 303.5 ( -39.4 deg off the bow),  4.5 kn, way +0.72 kn
+      0 s before: head 336.6, wind from 301.9 ( -34.7 deg off the bow),  4.5 kn, way +0.66 kn
+    240 s after : head 341.2, wind from 304.6 ( -36.6 deg off the bow),  4.2 kn, way +0.45 kn
+taken aback (urgent) at tick 97374
+    600 s before: head 281.5, wind from 344.6 ( +63.1 deg off the bow),  5.2 kn, way +2.41 kn
+    300 s before: head 281.6, wind from 349.8 ( +68.2 deg off the bow),  5.4 kn, way +2.55 kn
+     60 s before: head 281.3, wind from 347.9 ( +66.6 deg off the bow),  5.8 kn, way +2.72 kn
+      0 s before: head 294.0, wind from 348.7 ( +54.7 deg off the bow),  5.7 kn, way +2.00 kn
+    240 s after : head 281.3, wind from 348.0 ( +66.7 deg off the bow),  5.7 kn, way +2.49 kn
+taken aback (urgent) at tick 158239
+    600 s before: head  96.0, wind from  20.1 ( -75.9 deg off the bow),  6.5 kn, way -0.24 kn
+    300 s before: head 274.1, wind from  21.2 (+107.1 deg off the bow),  6.5 kn, way +0.91 kn
+     60 s before: head 280.0, wind from  22.2 (+102.2 deg off the bow),  6.2 kn, way +0.69 kn
+      0 s before: head 288.6, wind from  19.3 ( +90.7 deg off the bow),  6.2 kn, way +0.73 kn
+    240 s after : head 182.8, wind from  24.4 (-158.4 deg off the bow),  5.7 kn, way +1.93 kn
+
+################ 6. THE OFFICER'S EMPTY REPLIES (transcript entry, tick)
+[   5] tick     378 (after 3 orders) RAW: 
+[  31] tick   12372 (after 14 orders) RAW: 
+[ 102] tick   21409 (after 45 orders) RAW: 
+[ 107] tick   26340 (after 47 orders) RAW: 
+[ 119] tick   33375 (after 56 orders) RAW: 
+[ 133] tick   37020 (after 60 orders) RAW: 
+[ 138] tick   40233 (after 61 orders) RAW: 
+[ 154] tick   53299 (after 64 orders) RAW: 
+[ 155] tick   53466 (after 65 orders) RAW: 
+[ 175] tick   75022 (after 86 orders) RAW: 
+[ 177] tick   76924 (after 91 orders) RAW: 
+[ 200] tick   82972 (after 99 orders) RAW: 
+[ 239] tick   99193 (after 115 orders) RAW: 
+[ 276] tick  141078 (after 129 orders) RAW: 
+[ 292] tick  157639 (after 134 orders) RAW: 
+[ 293] tick  158295 (after 134 orders) RAW: 
+[ 307] tick  163560 (after 144 orders) RAW: 
+[ 311] tick  164603 (after 156 orders) RAW: 
+[ 360] tick  183665 (after 202 orders) RAW: 
+[ 365] tick  188258 (after 204 orders) RAW: 
+[ 391] tick  217002 (after 229 orders) RAW: 
+[ 392] tick  217901 (after 231 orders) RAW: 
+
+################ 7. EVERY ORDER REFUSED (79)
+11520   Forenoon watch (08:12) [order.rejected] captain: Order not carried out ('steady on'): 'steady' was understood, but not 'on'; did you mean 'one'? (Punctuation and 'the' are ignored; the rest must be a part, a side, a heading or a modifier such as 'sharp up', 'one reef' or 'a fathom'.)
+14629   Forenoon watch (09:03) [order.rejected] the officer of the watch: Order not carried out ('heave to'): She is hove to already; fill away before heaving to again.
+15883   Forenoon watch (09:24) [order.rejected] the officer of the watch: Order not carried out ('Standing order: on each sample when woken, take a fix as soon as a bearing can be taken, and report it to the captain.'): A standing order is named in quotes: standing order "night routine": at sunset then take in the royals.
+15886   Forenoon watch (09:24) [order.rejected] the officer of the watch: Order not carried out ('standing order "the fix at the waking" by the mate: on each sample when woken, take a fix as soon as a bearing can be taken, and report it to the captain'): A standing order says what to do after 'then': standing order "the fix at the waking": on each sample when woken, take a fix as soon as a bearing can be taken, and r
+15889   Forenoon watch (09:24) [order.rejected] the officer of the watch: Order not carried out ('standing order "the fix at the waking" by the mate: when woken, then take a fix as soon as a bearing can be taken'): 'woken' is not a reading the ship has. A condition names the true wind, the apparent wind, the heading, the speed, the heel, the watch, the strain, the hands on deck, the glass, the sky, the weather, the s
+15900   Forenoon watch (09:25) [order.rejected] the officer of the watch: Order not carried out ('standing order "the fix at the watch" by the mate: when the watch changes, then take a fix as soon as a bearing can be taken'): 'the watch' cannot be 'changes'; the watch is compared by its name: 'is the middle watch'.
+16237   Forenoon watch (09:30) [order.rejected] the officer of the watch: Order not carried out ('standing order "the trim at the wind" by the mate: when the true wind is WSW, then trim the sails'): 'the true wind' cannot be 'wsw'; a wind is compared in knots or points, or as a gust, at the mean or a lull.
+16253   Forenoon watch (09:30) [order.rejected] the officer of the watch: Order not carried out ('standing order "the trim at the freshening" by the mate: when the true wind is 12 knots, then trim the sails'): 'the true wind' cannot be '12 knots'; a wind is compared in knots or points, or as a gust, at the mean or a lull.
+18369   Forenoon watch (10:06) [order.rejected] captain: Order not carried out ('Stead'): 'stead' is not an order this ship understands; did you mean 'steady' or 'steer'? An order begins with a verb such as set, take in, furl, reef, shake out, brace, trim or haul.
+25200   Afternoon watch, 8 bells (12:00) [order.rejected] standing order 'the fix at the watch': Standing order 'the fix at the watch': order not carried out ('take a fix as soon as a bearing can be taken'): As soon as a bearing can be taken is not in sight to take a fix by; in sight: the Lizard, Cadgwith Cove, Black Head, Coverack, St Keverne church, the Lizard lights, the Beast and Lowland Point.
+26759   Afternoon watch (12:25) [order.rejected] captain: Order not carried out ('Haul the weather bowlines'): Nothing done: the square sail is furled; there is no leech to haul out; the larboard topsail bowline is hauled out already.
+33092   Afternoon watch (14:11) [order.rejected] the officer of the watch: Order not carried out ('Put the helm over to starboard; wear her off the wind and fill the sails.'): 'put the helm over to starboard wear her off the wind and fill the sails' is not an order this ship understands. An order begins with a verb such as set, take in, furl, reef, shake out, brace, trim or haul.
+39600   First dog watch, 8 bells (16:00) [order.rejected] standing order 'the fix at the watch': Standing order 'the fix at the watch': order not carried out ('take a fix as soon as a bearing can be taken'): As soon as a bearing can be taken is not in sight to take a fix by; in sight: no charted mark.
+40343   First dog watch (16:12) [order.rejected] the officer of the watch: Order not carried out ('Keep her fully and by on the starboard tack'): 'keep her fully and by on the starboard tack' is not an order this ship understands; did you mean 'keep her full' or 'meet her'? An order begins with a verb such as set, take in, furl, reef, shake out, brace, trim or haul.
+46800   Last dog watch, 4 bells (18:00) [order.rejected] standing order 'the fix at the watch': Standing order 'the fix at the watch': order not carried out ('take a fix as soon as a bearing can be taken'): As soon as a bearing can be taken is not in sight to take a fix by; in sight: no charted mark.
+54000   First watch, 8 bells (20:00) [order.rejected] standing order 'the fix at the watch': Standing order 'the fix at the watch': order not carried out ('take a fix as soon as a bearing can be taken'): As soon as a bearing can be taken is not in sight to take a fix by; in sight: no charted mark.
+65230   First watch (23:07) [order.rejected] the officer of the watch: Order not carried out ('Take a bearing of the Lizard light'): The lizard light is not in sight; did you mean the Lizard lights? In sight: a light on the starboard bow, bearing N.
+66642   First watch (23:30) [order.rejected] captain: Order not carried out ('Haul in the weather bowlines'): Nothing done: the square sail is furled; there is no leech to haul out; the larboard topsail bowline is hauled out already.
+68400   Middle watch, 8 bells (00:00) [order.rejected] standing order 'the fix at the watch': Standing order 'the fix at the watch': order not carried out ('take a fix'): Nothing is in sight to take a fix by; a fix wants two charted marks in sight.
+69789   Middle watch (00:23) [order.rejected] standing order 'Bearings': Standing order 'Bearings': order not carried out ('take a bearing of the land'): Nothing is in sight to take a bearing of.
+75025   Middle watch (01:50) [order.rejected] captain: Order not carried out ('Haul in the starboard jib sheet a quarter fathom'): 'haul' was understood, but not 'a quarter fathom'; did you mean 'an', 'square' or 'fathoms'? (Punctuation and 'the' are ignored; the rest must be a part, a side, a heading or a modifier such as 'sharp up', 'one reef' or 'a fathom'.)
+75053   Middle watch (01:50) [order.rejected] captain: Order not carried out ('Trim the headsail sheets'): There is no such part as the headsail sheets in this ship; did you mean the mainsail sheet, the foresail sheet or the headsails? ('trim' was understood.)
+77761   Middle watch (02:36) [order.rejected] the officer of the watch: Order not carried out ('Take in the topsail'): The topsail: The topsail is in the gear; there is nothing to take in.
+78723   Middle watch (02:52) [order.rejected] standing order 'Trim the Fore and Afts': Standing order 'Trim the Fore and Afts': order not carried out ('trim the fore and aft sails'): She is at anchor; 'trim' must wait till she weighs.
+82800   Morning watch, 8 bells (04:00) [order.rejected] standing order 'the fix at the watch': Standing order 'the fix at the watch': order not carried out ('take a fix'): Nothing is in sight to take a fix by; a fix wants two charted marks in sight.
+84123   Morning watch (04:22) [order.rejected] standing order 'Trim the Fore and Afts': Standing order 'Trim the Fore and Afts': order not carried out ('trim the fore and aft sails'): She is at anchor; 'trim' must wait till she weighs.
+84189   Morning watch (04:23) [order.rejected] standing order 'Bearings': Standing order 'Bearings': order not carried out ('take a bearing of the land'): Nothing is in sight to take a bearing of.
+86089   Morning watch (04:54) [order.rejected] the officer of the watch: Order not carried out ('Trim the fore topsail to the wind'): There is no such part as the fore topsail in this ship; did you mean the foresail, the gaff topsail or the topsails? ('trim' was understood.)
+86094   Morning watch (04:54) [order.rejected] the officer of the watch: Order not carried out ('Trim the topsail to the wind'): 'trim' was understood, but 'to the wind' belongs with 'brace'.
+97200   Forenoon watch, 8 bells (08:00) [order.rejected] standing order 'the fix at the watch': Standing order 'the fix at the watch': order not carried out ('take a fix'): Nothing is in sight to take a fix by; a fix wants two charted marks in sight.
+97352   Forenoon watch (08:02) [order.rejected] the officer of the watch: Order not carried out ('Brace the topsail yard to the wind and trim the topsail'): 'brace' was understood, but not 'and trim the topsail'; did you mean 'hand', 'trim sail', 'either' or 'lie to under the main topsail'? (Punctuation and 'the' are ignored; the rest must be a part, a side, a heading or a modifier such as 'sharp up', 'one reef' or '
+97357   Forenoon watch (08:02) [order.rejected] the officer of the watch: Order not carried out ('Brace the topsail yard to the wind'): The topsail yard cannot be braced so far from the square sail yard while the topsail is set (114° apart, 40° at most); brace the main yards together, or clew up the topsail.
+97365   Forenoon watch (08:02) [order.rejected] the officer of the watch: Order not carried out ('Brace the mainsail yard to the wind'): There is no such part as the mainsail yard in this ship; did you mean the main topsail halyard, the main yards or the mainsail vang? ('brace' was understood.)
+97492   Forenoon watch (08:04) [order.rejected] the officer of the watch: Order not carried out ('Hove the lead'): 'hove the lead' is not an order this ship understands; did you mean 'heave the log' or 'heave the lead'? An order begins with a verb such as set, take in, furl, reef, shake out, brace, trim or haul.
+98589   Forenoon watch (08:23) [order.rejected] standing order 'Bearings': Standing order 'Bearings': order not carried out ('take a bearing of the land'): Nothing is in sight to take a bearing of.
+111600   Afternoon watch, 8 bells (12:00) [order.rejected] standing order 'the fix at the watch': Standing order 'the fix at the watch': order not carried out ('take a fix'): Nothing is in sight to take a fix by; a fix wants two charted marks in sight.
+112989   Afternoon watch (12:23) [order.rejected] standing order 'Bearings': Standing order 'Bearings': order not carried out ('take a bearing of the land'): Nothing is in sight to take a bearing of.
+126000   First dog watch, 8 bells (16:00) [order.rejected] standing order 'the fix at the watch': Standing order 'the fix at the watch': order not carried out ('take a fix'): Nothing is in sight to take a fix by; a fix wants two charted marks in sight.
+127389   First dog watch (16:23) [order.rejected] standing order 'Bearings': Standing order 'Bearings': order not carried out ('take a bearing of the land'): Nothing is in sight to take a bearing of.
+133200   Last dog watch, 4 bells (18:00) [order.rejected] standing order 'the fix at the watch': Standing order 'the fix at the watch': order not carried out ('take a fix'): Nothing is in sight to take a fix by; a fix wants two charted marks in sight.
+134589   Last dog watch (18:23) [order.rejected] standing order 'Bearings': Standing order 'Bearings': order not carried out ('take a bearing of the land'): Nothing is in sight to take a bearing of.
+136389   Last dog watch (18:53) [order.rejected] standing order 'Bearings': Standing order 'Bearings': order not carried out ('take a bearing of the land'): The land is not in sight; in sight: Sail ho! The St Mary's pilots' gig on the larboard quarter, bearing SE by E, distant a cable.
+138189   Last dog watch (19:23) [order.rejected] standing order 'Bearings': Standing order 'Bearings': order not carried out ('take a bearing of the land'): The land is not in sight; in sight: Sail ho! The St Mary's pilots' gig on the starboard bow, bearing NNW, distant five cables.
+140400   First watch, 8 bells (20:00) [order.rejected] standing order 'the fix at the watch': Standing order 'the fix at the watch': order not carried out ('take a fix'): Nothing is in sight to take a fix by; a fix wants two charted marks in sight.
+140430   First watch (20:00) [order.rejected] captain: Order not carried out ('Furl the mainsail'): A gaff sail is not furled on its spar; take it in instead.
+140435   First watch (20:00) [order.rejected] captain: Order not carried out ('Take in the mainsail'): The main sail: The mainsail is in the gear; there is nothing to take in.
+140964   First watch (20:09) [order.rejected] the officer of the watch: Order not carried out ('Let go the small bower to starboard'): no anchoring ground here: 44 fathoms and a half
+141723   First watch (20:22) [order.rejected] standing order 'Trim the Fore and Afts': Standing order 'Trim the Fore and Afts': order not carried out ('trim the fore and aft sails'): She is at anchor; 'trim' must wait till she weighs.
+154800   Middle watch, 8 bells (00:00) [order.rejected] standing order 'the fix at the watch': Standing order 'the fix at the watch': order not carried out ('take a fix'): Only St Agnes light is in sight, and one mark gives a line and no fix: take a bearing of St Agnes light.
+154864   Middle watch (00:01) [order.rejected] the officer of the watch: Order not carried out ('Take a fix'): Only St Agnes light is in sight, and one mark gives a line and no fix: take a bearing of St Agnes light.
+156123   Middle watch (00:22) [order.rejected] standing order 'Trim the Fore and Afts': Standing order 'Trim the Fore and Afts': order not carried out ('trim the fore and aft sails'): She is at anchor; 'trim' must wait till she weighs.
+157609   Middle watch (00:46) [order.rejected] the officer of the watch: Order not carried out ('Put her on the larboard tack'): 'put her on the larboard tack' is not an order this ship understands; did you mean 'meet her'? An order begins with a verb such as set, take in, furl, reef, shake out, brace, trim or haul.
+157923   Middle watch (00:52) [order.rejected] standing order 'Trim the Fore and Afts': Standing order 'Trim the Fore and Afts': order not carried out ('trim the fore and aft sails'): Nothing to trim: the fore staysail is in the gear; the jib is in the gear; the main sail is in the gear; the main gaff topsail is in the gear.
+163175   Middle watch (02:19) [order.rejected] captain: Order not carried out ('take a fix'): Peninnis Head and St Agnes light cut too fine for a fix: they bear WNW and W by N, their lines within 16 degrees of one another, and a fix wants 30. Take a bearing of one for a line, or wait for a mark that cuts better.
+168723   Middle watch (03:52) [order.rejected] standing order 'Trim the Fore and Afts': Standing order 'Trim the Fore and Afts': order not carried out ('trim the fore and aft sails'): She is at anchor; 'trim' must wait till she weighs.
+168939   Middle watch (03:55) [order.rejected] captain: Order not carried out ('Belay get under way'): Nothing in hand or waiting answers to 'get under way': name the work as the log does, its kind ('the reef') or its sail. The work in hand: getting under way, heaving lead (waiting its turn) and wearing ship (waiting its turn).
+169058   Middle watch (03:57) [order.rejected] the officer of the watch: Order not carried out ('Standing order "inshore soundings" by the mate: every 5 minutes then heave the lead'): There is a standing order 'inshore soundings' in the book already; belay it, or give the new one another name.
+169200   Morning watch, 8 bells (04:00) [order.rejected] standing order 'the fix at the watch': Standing order 'the fix at the watch': order not carried out ('take a fix'): Nothing is in sight to take a fix by; a fix wants two charted marks in sight.
+169771   Morning watch (04:09) [order.rejected] captain: Order not carried out ('Moor her'): no anchor is down to moor from; come to an anchor first
+169776   Morning watch (04:09) [order.rejected] captain: Order not carried out ('Come to anchor'): the best bower is aweigh
+169778   Morning watch (04:09) [order.rejected] captain: Order not carried out ('Come to an anchor'): the best bower is aweigh
+169788   Morning watch (04:09) [order.rejected] captain: Order not carried out ('Let go the best bower'): the best bower is aweigh
+169798   Morning watch (04:09) [order.rejected] captain: Order not carried out ('Drop anchor'): the best bower is aweigh
+169803   Morning watch (04:10) [order.rejected] captain: Order not carried out ('Weigh the best bower'): no anchor is down
+170523   Morning watch (04:22) [order.rejected] standing order 'Trim the Fore and Afts': Standing order 'Trim the Fore and Afts': order not carried out ('trim the fore and aft sails'): She is at anchor; 'trim' must wait till she weighs.
+184923   Forenoon watch (08:22) [order.rejected] standing order 'Trim the Fore and Afts': Standing order 'Trim the Fore and Afts': order not carried out ('trim the fore and aft sails'): She is at anchor; 'trim' must wait till she weighs.
+198000   Afternoon watch, 8 bells (12:00) [order.rejected] standing order 'the fix at the watch': Standing order 'the fix at the watch': order not carried out ('take a fix'): Nothing is in sight to take a fix by; a fix wants two charted marks in sight.
+199323   Afternoon watch (12:22) [order.rejected] standing order 'Trim the Fore and Afts': Standing order 'Trim the Fore and Afts': order not carried out ('trim the fore and aft sails'): She is at anchor; 'trim' must wait till she weighs.
+199539   Afternoon watch (12:25) [order.rejected] captain: Order not carried out ('Buy 20 tons of salt fish and 8 tons of pilchards'): St Mary's market has no salt fish and 8 pilchards; it deals in kelp, salt fish, pilchards, potatoes, barley, salt, coal, brandy, salt beef, timber.
+199568   Afternoon watch (12:26) [order.rejected] captain: Order not carried out ('Purchase 8 tons of pilchards'): The boat is away; wait for her.
+209764   Afternoon watch (15:16) [order.rejected] captain: Order not carried out ('You have the deck'): The officer of the watch has the deck already, since Afternoon watch (15:15).
+213723   First dog watch (16:22) [order.rejected] standing order 'Trim the Fore and Afts': Standing order 'Trim the Fore and Afts': order not carried out ('trim the fore and aft sails'): She is at anchor; 'trim' must wait till she weighs.
+215174   First dog watch (16:46) [order.rejected] captain: Order not carried out ('Belay steer e by s'): Nothing in hand or waiting answers to 'steer e by s': name the work as the log does, its kind ('the reef') or its sail. The work in hand: wearing ship, heaving lead (waiting its turn), setting the mainsail (waiting for hands), setting the foresail (waiting for hands), setting the jib (waiting for hands) and settin
+219634   Last dog watch (18:00) [order.rejected] captain: Order not carried out ('Shape a course for a mile west of ushant'): The chart has no place named 'a mile west of ushant'; it names Annet, Black Head, Blanc Sablon, Brest, Béniguet, Cadgwith Cove, Camaret, Camaret road, Cape Cornwall, Carrick Road, Cawsand, Cawsand Bay, and 84 more.
+219650   Last dog watch (18:00) [order.rejected] captain: Order not carried out ('Where is ushant'): Nobody aboard answers to 'ushant'; 'the people' lists them.
+222669   Last dog watch (18:51) [order.rejected] captain: Order not carried out ('Pipe down the larboard watch'): 'pipe down' was understood, but not 'the watch'; did you mean 'either' or 'the watch'? (Punctuation and 'the' are ignored; the rest must be a part, a side, a heading or a modifier such as 'sharp up', 'one reef' or 'a fathom'.)
+222676   Last dog watch (18:51) [order.rejected] captain: Order not carried out ('Pipe down the watch'): 'pipe down' was understood, but not 'the watch'; did you mean 'either' or 'the watch'? (Punctuation and 'the' are ignored; the rest must be a part, a side, a heading or a modifier such as 'sharp up', 'one reef' or 'a fathom'.)
+222696   Last dog watch (18:51) [order.rejected] captain: Order not carried out ('Call the starboard watch'): 'call the starboard watch' is not an order this ship understands; did you mean 'allow' or 'call all hands'? An order begins with a verb such as set, take in, furl, reef, shake out, brace, trim or haul.
+226800   First watch, 8 bells (20:00) [order.rejected] standing order 'the fix at the watch': Standing order 'the fix at the watch': order not carried out ('take a fix'): Nothing is in sight to take a fix by; a fix wants two charted marks in sight.
+
+################ 8. THE STATION'S EVENTS (each line cut at 700 characters)
+72   Morning watch (05:01) [agent.stationed] the officer of the watch: The officer of the watch takes the station (Qwen3.8-27B-0814-Q4_K_M.gguf, through the local runner); sampled every glass and on notable and urgent events.
+10444 * Morning watch (07:54) [agent.deck] captain: Mr Pearce, you have the deck. The officer of the watch has the deck; the captain's standing orders are his night orders.
+20154 * Forenoon watch (10:35) [agent.handover] the officer of the watch: [officer of the watch] Handover note, the watch so far: Watch handover, forenoon watch, 10:35, Mr Pearce with the deck. What happened: We weighed from Carrick Road at 08:08 (best bower, 48 fathoms), the captain conning; I worked the rig. Made out past the Black Rock (she came within about a mile off the bow once, we bore off to miss her), the Old Wall, and the Manacles (passed 2–3 miles to the east, clear now). The Falmouth pilot Mr Tregenza hailed and came aboard about 08:31; we heaved to for him, he was put off in his cutter 09:16, pilotage £5 paid, certificate signed. His news (recorded): Britain at war with the 
+33104 * Afternoon watch (14:11) [agent.deck] captain: The officer of the watch may helm a lee: the course is his to alter, by any of its orders, by the captain's word.
+33105 * Afternoon watch (14:11) [agent.deck] captain: The officer of the watch may helm a weather: the course is his to alter, by any of its orders, by the captain's word.
+33114 * Afternoon watch (14:11) [agent.deck] captain: The officer of the watch may steer: the course is his to alter, by any of its orders, by the captain's word.
+33272   Afternoon watch (14:14) [agent.refused] the officer of the watch: The officer of the watch may not Wear ship. without the captain: a manoeuvre (tacking, wearing, heaving to, filling away) is the captain's. The officer's own word to avoid a danger opens the helm, heaving to and letting go an anchor, and nothing else. 'Wear ship.' not carried out.
+33284 * Afternoon watch (14:14) [agent.deck] captain: The officer of the watch has the captain's general authority to work the ship: the helm and the course along the passage, tacking, wearing, heaving to and filling away, sail, all hands and the watch below, the anchors and their cables, the lead, the log, bearings, fixes and sights, and a course shaped for a position at sea, a mark or the place she is bound. Kept back: the port's business, his standing orders, a new destination, a chase, the reckoning set by hand and the tide allowed in it, sending for a person, and anything that cannot be undone. It has force while he has the deck.
+39693 * First dog watch (16:01) [agent.handover] the officer of the watch: [officer of the watch] Handover note, the watch so far: Watch handover, 8 bells first dog watch, Mr Pearce with the deck. What happened since noon: We wore off the aback at 14:25 (wind had veered to W by N and taken her aback), braced up sharp on the starboard tack. The captain then bore us off to hold the starboard tack as long as the wind stays westerly, coming up a point to SW (220°) and trimming to steady the helm. I set the topgallant at 14:31 in the light breeze. Squalls came and passed (18 knots at 15:06); wind has since backed to W by S, 9–10 knots, gentle. What was ordered (captain): hold starboard tack wh
+82848 * Morning watch (04:00) [agent.handover] the officer of the watch: [officer of the watch] Handover note, the watch so far: Morning watch, 8 bells (04:00), Mr Pearce with the deck. Since 02:00: We'd been becalmed off the Lizard in fog and light variable airs (3–4 kn). The wind kept veering (WNW → W by N → NW by W) and we lost her way, took her aback twice. The captain decided to anchor rather than sit dead in the water. At 02:31 we came to anchor with the best bower in 48 fathoms, veered to 240 fathoms (five times the depth). Took in the topsail, headsails, gaff topsail, and brailed the mainsail — clear of all sail. State now: Riding by the best bower to the flood, the wind (NW 
+99826   Forenoon watch (08:43) [agent.refused] the officer of the watch: The officer of the watch gives standing orders in his own rank, the mate; 'by the officer of the watch' is refused. 'standing order "regular soundings" by the officer of the watch: every half an hour then heave the lead' not carried out.
+138054   Last dog watch (19:20) [agent.asked] captain: Asked the officer of the watch: Can you make out any landmarks yourself?
+140019 * Last dog watch (19:53) [agent.deck] captain: The officer of the watch may come to an anchor, by the captain's word.
+157569 * Middle watch (00:46) [agent.handover] the officer of the watch: [officer of the watch] Handover note, the watch so far: Middle watch (00:44), Mr Pearce with the deck. The day: becalmed off the Lizard in fog, anchored in 48 fathoms; weighed at 04:51 with the wind NW by N and made for Scilly. Ran in fog all day — heaved to once on the officer's own word (fog at a cable, shore showing within a cable at most), the captain overruled it and kept her going; then set standing order 'regular soundings' (lead every half hour) in my own rank. Made landfall at 18:26 (the St Mary's gig), the pilot Mr Mumford aboard at 18:45 (for the brief and news only, NOT true pilotage — the captain's word
+163906   Middle watch (02:31) [agent.refused] the officer of the watch: The officer of the watch may not Tell the captain Peninnis Head is steady and closing on a bearing WNW, two miles off, while we make W at four knots. We are on his last course order of W. If the intention is to pass south of Peninnis for the mouth of St Mary's Sound, we should hold W and keep the lead going; if he wants more water off the head, I can bring her up to NW by W. I am ready to steer whichever he gives.: a station is addressed by the captain. "Tell the captain Peninnis Head is steady and closing on a bearing WNW, two miles off, while we make W at four knots. We are on his last course order of W. If the intenti
+170101   Morning watch (04:15) [agent.asked] captain: Asked the officer of the watch: Why can't we drop the best bower, do you think?
+183600 * Forenoon watch, 8 bells (08:00) [agent.stopped] the officer of the watch: The officer of the watch stood down by the local runner: the model server could not be used: The model server at http://127.0.0.1:8080 answered 400: request (103679 tokens) exceeds the available context size (102400 tokens), try increasing it (3 failed requests in a row). The station is released and may be taken again. The game is saved.
+183608 * Forenoon watch (08:00) [agent.stationed] the officer of the watch: The officer of the watch takes the station again (Qwen3.8-27B-0814-Q4_K_M.gguf, through the local runner): the second seating; it had stood down by the local runner: the model server could not be used: The model server at http://127.0.0.1:8080 answered 400: request (103679 tokens) exceeds the available context size (102400 tokens), try increasing it (3 failed requests in a row).
+209739 * Afternoon watch (15:15) [agent.deck] captain: Mr Pearce, you have the deck. The officer of the watch has the deck; the captain's standing orders are his night orders.
+209744 * Afternoon watch (15:15) [agent.deck] captain: The officer of the watch has the captain's general authority to work the ship: the helm and the course along the passage, tacking, wearing, heaving to and filling away, sail, all hands and the watch below, the anchors and their cables, the lead, the log, bearings, fixes and sights, and a course shaped for a position at sea, a mark or the place she is bound. Kept back: the port's business, his standing orders, a new destination, a chase, the reckoning set by hand and the tide allowed in it, sending for a person, and anything that cannot be undone. It has force while he has the deck.
+212436 * First dog watch (16:00) [agent.deck] captain: The officer of the watch may get under way, the small bower, and for no other anchor, by the captain's word.
+219480 ! First dog watch (17:58) [agent.deck] the officer of the watch: The officer of the watch has given no reply for an hour and has been told so; the deck is the captain's until he gives it again.
+219480   First dog watch (17:58) [agent.nudged] the officer of the watch: The officer of the watch nudged: no reply for an hour.
+219584 * First dog watch (17:59) [agent.deck] captain: Mr Pearce, you have the deck. The officer of the watch has the deck; the captain's standing orders are his night orders.
+226801 * First watch (20:00) [agent.stopped] the officer of the watch: The officer of the watch stood down by the local runner: the model server could not be used: The model server at http://127.0.0.1:8080 answered 400: request (103122 tokens) exceeds the available context size (102400 tokens), try increasing it (3 failed requests in a row). The station is released and may be taken again. The game is saved.

@@ -91,7 +91,13 @@ from freesail.crew import bill, hands
 from freesail.crew.model import Crew, number_words
 from freesail.evolutions import expr, registry
 from freesail.evolutions import trim as yard_trim
-from freesail.evolutions.scripts import SCRIPTS, Script
+from freesail.evolutions.scripts import (
+    HELM_MANOEUVRES,
+    SCRIPTS,
+    Script,
+    keep_lying_to,
+    lying_to_hands_off,
+)
 from freesail.ship.graph import Ship
 from freesail.ship.parts import Line, LineState, Part, Sail, SailState, Spar
 from freesail.ship.schema import YARD_LIKE_CLASSES
@@ -222,6 +228,8 @@ class Instance:
     assignment: hands.Assignment | None = None  # the hands it holds
     all_hands: bool = False  # began as a call for all hands
     short_logged: bool = False
+    # the precondition that failed says what was ordered is done already (package 37f)
+    done_already: bool = False
     wait_line: str = ""  # the line it said when it first had to wait for hands
     given: int | None = None  # the order that started it (`Runner.giving`), for `belay that`
 
@@ -358,6 +366,9 @@ class Runner:
             else:
                 self._tick_steps(ship, inst, dt)
         self._start_waiting(ship)
+        if "hove_to" in ship.extra or "lying_to.hands" in ship.extra:
+            # lying to, the watch tends the helm and the sheets (package 37f)
+            keep_lying_to(ship, dt, wind, self)
 
     def new_log_group(self) -> str:
         """A key for the evolutions of one order that log as one line (a trim's braces)."""
@@ -631,12 +642,14 @@ class Runner:
     ) -> str | None:
         """The reason (in words) of the first condition that does not hold, else None."""
         env = self._env(ship, inst)
+        inst.done_already = False
         for cond in conditions:
             try:
                 ok = expr.evaluate(cond.tree, env)
             except expr.ExpressionError as e:
                 return f"{inst.evo.id}: the check '{cond.text}' could not be read ({e})"
             if not ok:
+                inst.done_already = cond.done
                 return self._format(inst, cond.reason)
         if inst.script is not None:
             return inst.script.check(self._format_context(inst))
@@ -673,6 +686,10 @@ class Runner:
         """Begin an instance whose parts are free. With a crew, it must get its hands
         first; without enough it waits for them and this returns False."""
         crew = self._crew(ship)
+        if crew is not None and inst.evo.id in HELM_MANOEUVRES:
+            # a manoeuvre takes the helm and the sheets from the watch that tended her
+            # lying to, and its hands with them (package 37f)
+            lying_to_hands_off(ship)
         if crew is not None and not self._take_hands(ship, inst, crew):
             return False
         inst.waiting = False
@@ -704,7 +721,10 @@ class Runner:
                 continue
             reason = self._failing_condition(ship, inst, inst.evo.preconditions + inst.evo.requires)
             if reason is not None:
-                self._fail(ship, inst, reason)
+                if inst.done_already:
+                    self._done_already(ship, inst, reason)
+                else:
+                    self._fail(ship, inst, reason)
                 continue
             self._begin(ship, inst)
 
@@ -831,6 +851,28 @@ class Runner:
     def _fail(self, ship: Ship, inst: Instance, reason: str) -> None:
         self._remove(ship, inst)
         self._note(ship, inst, inst.evo.on_fail, reason=reason)
+        key = inst.params.get("log_group")
+        if key:
+            self._group_done(ship, inst, key)
+        self._after_all_hands(ship, inst)
+
+    def _done_already(self, ship: Ship, inst: Instance, reason: str) -> None:
+        """Work that waited its turn and found, when it came, that what was ordered is
+        done already: a routine line in the precondition's own words ("The jib is set
+        already."), and no failed evolution (package 37f; the review of gate 5c's
+        playtests, 8.2: "Could not set the jib: The jib is set already" and its like
+        were notable twenty-five times in game 9, each a failure in the log's count)."""
+        self._remove(ship, inst)
+        text = reason.strip()
+        if text and text[-1] not in ".!?":
+            text += "."
+        data = {
+            "evolution": inst.evo.id,
+            "subject": inst.subject_id,
+            "reason": reason.rstrip("."),
+            "done_already": True,
+        }
+        ship.note("routine", "evolution.done_already", text, inst.subject_id, data)
         key = inst.params.get("log_group")
         if key:
             self._group_done(ship, inst, key)
