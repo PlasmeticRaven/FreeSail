@@ -3434,6 +3434,14 @@ def test_the_fake_officer_and_the_players_seat_keep_their_own_reckoning_and_a_po
     his position is kept under his station, said with his name, and moves nothing; a
     position that is not one is refused in the words of `set the reckoning to`. Neither
     takes the deck, and an order that is not his own reckoning still wants it."""
+    from freesail.agents.agent import CAPTAIN_BRIEF, OFFICER_BRIEF
+
+    # the station briefs point at the lessons, one sentence each (spec M6 §6)
+    assert "Primer 18 is the lessons" in OFFICER_BRIEF
+    assert "'work my reckoning' gives you the master's slate" in OFFICER_BRIEF
+    assert "Primer 18 is the lessons" in CAPTAIN_BRIEF and "the officer's reckoning" in (
+        CAPTAIN_BRIEF
+    )
     world = chart_world()
     account = world.navigation.account_now()
     assert OFFICER_DOMAIN.allows("work my reckoning", "navigation", "1") == (True, "")

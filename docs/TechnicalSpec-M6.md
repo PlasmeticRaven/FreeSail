@@ -315,6 +315,85 @@ the master's at noon in the log and moves nothing; the captain may adopt it with
 reckoning to ...`, which he already has. A master's station a model could hold, whose
 working would be the ship's reckoning, is 6b's wardroom (§11) and takes the same slate.
 
+**As built (package 40b, 2026-10-09).** Two orders of the order language (the vocabulary's
+`work my reckoning` and `my reckoning is`, object `navigation`; `orders.navigation`), so
+that the player at the officer's seat, a model at the station and the captain at either
+place have them by the same words, and a reading:
+
+- `work my reckoning` (`work up my reckoning`, `show me the slate`, ...) answers with
+  `Navigation.slate()`: the master's slate since his last fix, as words and as data. Its
+  kind, `query.slate`, is in `core.world.UNLOGGED_KINDS`: `World.submit` hands the answer
+  back as an Event it does not record, so it is the asker's reply and never a line the
+  whole log keeps (a model reads it in `submit_order`'s result; the console prints it and
+  the server sends it to the pages as a line, kept nowhere). It draws nothing and changes
+  nothing: a ship whose officer asks for it every hour keeps the log, to the digest, of
+  one whose officer does not.
+- `my reckoning is <position>` (the form `set the reckoning to` takes; refused in its
+  words for a position that is not one) keeps the station's own figure in
+  `Navigation.own`, by the station's name (`officer of the watch`, from the officer's
+  station or the player's seat; `captain`, from the prompt or the captain's station),
+  with the person bound to the station (the wardroom file's) and the miles the boards had
+  run when it was given. It moves nothing. It is run on by the log-board: the miles east
+  and north every board has made by account since the departure (`Reckoning.run_east_nm`,
+  `run_north_nm`, which no observation moves) and the board in hand, so that what the
+  sights did to the master's account is the master's and not in it.
+- At noon, the noon's line is followed by one notable line (`reckoning.own_noon`) for each
+  own reckoning held: the station's and the person's, when it was worked, the position run
+  on to noon, its distance and point from the master's account **before the sight**, and
+  whether it lies within what he would trust that account (twice his doubt, as the ellipse
+  lies), and where the observed latitude lies from it. The day's work is then done with
+  it (`own` emptied), as each officer worked his day's work afresh. A noon by order
+  (`observe the sun`) has its own line written after the order's, so the officers' lines
+  follow at the next tick. With none held there is no such line and nothing else moves:
+  the recorded passages have none (package 40b ran the gates' slow truths to prove it).
+- `the officer's reckoning` (`readings.officers_reckoning`) reads the officer of the
+  watch's own as it stands, run on, with its distance from the master's account now;
+  "none held" otherwise. The captain adopts it with `set the reckoning to`.
+- **Who may give them.** Both are in `OFFICER_DOMAIN`'s verbs, so the officer gives them
+  without a word of the captain's, and they want no deck (`tools.own_reckoning_order`:
+  `tools.call` and `PlayerSeat.submit` let them through without it, and from the captain's
+  station they do not take back a deck lent to his book): the lieutenants and the young
+  gentlemen kept their reckonings whatever their watch. A standing order may give neither:
+  the dialect refuses them at entry (`standing.grammar._parse_actions`), and an order under
+  a firing's or the rules-based captain's actor is refused in words
+  (`navigation.own_station`).
+
+**The slate, as data** (for 6b's master's station, which takes the same):
+`Navigation.slate()` returns `(words, data)`, and `data` is
+
+- `from`: where the slate begins: `tick`, `lat_deg`, `lon_deg`, `what` (the departure; the
+  reckoning set by the captain's order; the fix by cross bearings, with its marks and what
+  it did to the account; an observation that laid the account down, "..., which laid the
+  account down"; or, for a checkpoint from before 40b, "the account as it stood"),
+  `ellipse` and `doubt` (the master's sentence) as they stood there;
+- `entries`, in order, each a **board** or a **sight**. A board (laid down by
+  `Navigation.bring_up`, one for every working of the account: the heave of the log, a
+  new board at two points' alteration, a noon, an observation, an order of the
+  reckoning's) is `{kind: "board", from, to (ticks), course_deg (true, as the master laid
+  it down: his variation and his leeway allowed, the helmsman's wander as the traverse
+  board pegged it), hours (under way), knots (her way by the log's read, allowed by eye
+  for what she gained or lost), by_eye, run_nm, close_hauled, hove_to_h, tide (miles east
+  and north he allowed), tide_by ("book", "captain" or "none"), drift (miles east and north
+  hove to), made (what the board made by account, miles east and north)}`; past
+  `SLATE_BOARDS_KEPT` (48) boards the oldest two are summed into one with `carried: true`.
+  A sight is `{kind: "sight", tick, what (the noon latitude, a cast of the lead, a
+  bearing of a mark with the lookout's distance, a transit, a longitude by chronometer, a
+  lunar), how ("weighed" or "kept", the master's verdict), moved (miles east and north the
+  account moved)}`;
+- `in_hand`: the board since the last was laid down, as the mate would chalk it now (no
+  draw), or None;
+- `tide`: the tide he allows now (`Navigation.tide_allowed`).
+
+The slate begins again at the departure, at the reckoning set by hand, at every fix by
+cross bearings whatever it did to the account, and at an observation that laid the
+account down (`Reckoning.begin_slate`, `slate_sight`). Worked by its own figures (from `from`,
+each board's run along its course with its tide and drift, each sight's move) it comes to
+the master's account now, to the rounding (`tests/test_reckoning.py`); worked from its
+words, as a model reads them, to within a tenth of a mile (truth 80). The words give each
+course to the point and the degree, each distance to the tenth of a mile, her way to the
+quarter knot, and the tide and drift as miles toward a point; they do not give the
+account the slate works to, which is the working.
+
 ### 6. The lessons in the primer (`docs/primer/17-lessons.md` new; Opus)
 
 The officer of game 9, asked whether a command would interest it, named what it would want
@@ -329,6 +408,32 @@ its source, the orders in the game's language, what the log says when it goes ri
 the usual mistake. The officer's two conditions are written down as the path to a command,
 and the captain's station brief points at the chapter. A writing package on Opus; the
 primer is the same book for the player and the model (parity).
+
+**As built (package 40b, 2026-10-09).** The chapter is `docs/primer/18-lessons.md` (17 is
+the captain's since package 40), in the README's table, with a word in its "where to
+start" that an officer reads 16 and 18 before a first watch. Six lessons: a landfall on one
+headland (with the amplitude at sunrise and the bearing's distance laid down); the
+officer's own reckoning (§5, the slate worked by the traverse table and judged at noon); a
+pilotage by cross bearings, with the set found between two fixes and allowed; heaving to
+for a pilot; coming to in a tideway (what `let go` veers by itself, what `veer to` and
+`weigh` act on); a night standing off a lee shore. Each is sailed in a scenario of its own
+(`data/scenarios/lesson-landfall.yaml`, `lesson-reckoning.yaml`, `lesson-falmouth.yaml`
+for the three of pilot water, `lesson-lee-shore.yaml`), all the frigate on 14 June 1805
+at seed 7, the weather pinned and no book, so that a reader can sail them at the console
+and the orders are the officer's alone; the log is quoted from one run of each, made once
+with `tools/lesson_run.py` (the orders and their minutes in the tuning notes), and the
+usual mistake from one more run where it is the log's own (a course given hove to, the
+tide left out of the working, a night trimmed for a reach on a lee shore). The rule of each
+is cited from Falconer, the Regulations of 1806, Luce 1866 and Bowditch. A table names
+where each of the things neither the officer nor the owner knew is shown. The officer's
+two conditions close the chapter, in its words, as the path to a command. `OFFICER_BRIEF`
+and `CAPTAIN_BRIEF` gain a sentence each pointing at primer 18 (the officer's says his own
+reckoning is kept with the deck or off watch, the captain's names `the officer's
+reckoning`); the consent files are not touched. `tests/test_primer.py` reads chapter 18's
+blocks as every chapter's (and chapter 17's, which it had not read; chapter 13's stays out,
+its `# rejected: heave short the kedge` refused only with an anchor down, which no preset
+gives), and checks that the lessons' scenarios load at seed 7 with no book and that the
+officer's words stand.
 
 ### 7. Orders and readings for 6a
 
@@ -349,7 +454,12 @@ and the rules-based captain's name, role, intent and state; `stand down the capt
 its book; the world order `captain: <intent>` sets the intent (`orders.CHANNELS` and the
 vocabulary's channels); `--station captain` at the bridge (`take_command`), the runner
 and the REPL; `--seat officer` at the console and the server, and `answer <words>` at the
-seat. `work my reckoning` and `the officer's reckoning` are 40b's.
+seat.
+
+**As built (package 40b).** `work my reckoning` (the master's slate, in the reply and never
+in the log), `my reckoning is <position>` (a station's own reckoning, said after the noon's
+line) and the reading `the officer's reckoning`, all §5's; their forms are in the tables of
+primer 10 and 16.
 
 ### 8. Truths for 6a (behavioural)
 
@@ -368,7 +478,14 @@ seat. `work my reckoning` and `the officer's reckoning` are 40b's.
     patience, the pause at twice it, the book's anchors and the sale as with nobody
     seated), and on the intent scenario in `tests/test_captain.py` (the rules stand in).
 80. An officer's reckoning worked from the slate agrees with the master's within the
-    master's doubt when both are right, and the log shows both at noon. *40b's.*
+    master's doubt when both are right, and the log shows both at noon. *Built by 40b*:
+    `test_truth_80_*` in `tests/test_known_truths.py` (the fake officer, off watch, asks for
+    the slate, works its words by the traverse and gives his own; at noon the line after
+    the noon's has it within one of the master's doubts of his account before the sight
+    (a twentieth of one at seed 7), and the same slate worked without its tide lies further off by about what the
+    tide set her); `tests/test_officer.py` (the fake officer and the player's seat give
+    both orders and are refused a position that is not one) and `tests/test_reckoning.py`
+    (the slate works to the account, never logged, drawing nothing; a book gives neither).
 81. No reading at the captain's station gives the truth by any road (37j's proof extended
     to the new tools). *Built by 40*: `test_truth_81_*` and
     `tests/test_captain.py::test_the_captain_and_the_people_readings_give_who_commands_and_no_truth`.
