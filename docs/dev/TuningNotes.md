@@ -3476,3 +3476,12 @@ The frigate from Brixham road at 02:00 on 12 June 1805, a northerly of fourteen 
 - **St Malo's way out by the Petite Porte is three to five metres at the datum** in the grid: a frigate takes it on the tide, as the pilots say.
 - **Herm and Little Sark read as drying ground in places** (EMODnet's values there are low): at high water springs their low parts are covered. Not patched; the scenario's track keeps clear.
 - **`tests/test_scenarios.py` did not exist**: the brief names it; it is new, with the block's scenario read and begun in the fast tier.
+
+### The suite, as run (package 39a)
+
+On the build machine under a load of twelve to eighteen (other packages' suites beside), once each. `python3 -m ruff check .` and `python3 -m ruff format --check .` clean; `python tools/build_charts.py --check channel-mid` passes (above).
+
+**The recorded passages** (`tests/test_known_truths.py --slow -n 4`, the twelve tests that read the gate-5b and gate-5c passages, chosen by node id: the brief's `-k "gate_5b or gate_5c"` matches the test names alone and selected one test of them): 10 passed, 1 expected failure (the merchant's cast at the Iroise, 37j's), 1 failed, `test_the_pace_on_the_passage_holds_truth_51s_floor` at 323 ticks a second against 500 (the machine's load; passes alone; not re-run). **Every pinned digest, line count and tick held**: the frigate's, the schooner's and the thick passages of gate 5b, the merchant passage and the naval cruise, truth 72's replays, truths 77 and 78. Channel-west untouched.
+
+**The fast tier** (`python3 -m pytest -n 4`, 273 slow tests left out): about 3,040 passed and four failed: `test_the_pace_at_the_merchant_passages_start_with_the_dozen_ships_holds_truth_51s_floor` (the load; passes alone; not re-run), and three tests that read every port, every shipped book or the whole chart's regions and had not met a second region (`test_geo.py`'s chart beside a region, `test_log_lines.py`'s shipped books, `test_tackle_orders.py`'s bottom notes of every port): brought to the block (a commit of their own) and passing, with the files they touch (`test_chart.py`, `test_ports.py`, `test_tide.py`, `test_nations.py`, `test_scenarios.py`) run again whole and passing. The nearest-coast timing in `test_chart.py` passed this time.
+
