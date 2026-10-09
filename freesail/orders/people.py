@@ -90,7 +90,11 @@ def check(ship: Any, order: Order) -> None:
             raise OrderError(
                 "Send for whom? Say 'send for the master', 'pass the word for the carpenter'."
             )
-        if world.people.find(who) is None:
+        from freesail.world.people import ROLE_WORDS, _words
+
+        # a role the game knows ('the pilot', who comes aboard later) is the moment's
+        # business; a name nobody answers to, or no role at all, is the words'
+        if world.people.find(who) is None and _words(who) not in ROLE_WORDS:
             names = ", ".join(x.name for x in world.people.all)
             raise OrderError(f"Nobody aboard answers to '{who}'; the people are {names}.")
     elif verb in ("go below", "come on deck") and rest:

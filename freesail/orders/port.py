@@ -150,30 +150,11 @@ def execute(ship: Any, order: Order) -> Result:
             tons, good = _tons_and_good(rest, verb)
             text, data = ports.trade(verb, tons, good)
             return "market.bargain", text, {"verb": verb, "level": 1} | data
-        # several bargains in one order (package 37l): each struck in turn, as if said
-        # one after another; one that cannot be struck is said and the rest stand
-        texts: list[str] = []
-        done: list[dict[str, Any]] = []
-        failed: list[str] = []
-        for words in bargains:
-            try:
-                tons, good = _tons_and_good(words, verb)
-                text, data = ports.trade(verb, tons, good)
-            except OrderError as e:
-                failed.append(f"'{words}': {str(e).rstrip('.')}")
-                continue
-            texts.append(text)
-            done.append(data)
-        if not done:
-            raise OrderError("; ".join(failed) + ".")
-        text = " ".join(texts)
-        if failed:
-            text += " Not done: " + "; ".join(failed) + "."
-        return (
-            "market.bargain",
-            text,
-            {"verb": verb, "level": 1, "bargains": done, "failed": failed},
-        )
+        # several bargains in one order (package 37l): read whole, weighed together, and
+        # struck together, the boat sent once for them all
+        read = [_tons_and_good(words, verb) for words in bargains]
+        text, data = ports.trade_together(verb, read)
+        return "market.bargain", text, {"verb": verb, "level": 1} | data
     if verb == "demand":
         words = re.sub(r"\b(from|the|yard|chandlers|a|an|spare)\b", " ", rest.lower())
         words = " ".join(words.split())
