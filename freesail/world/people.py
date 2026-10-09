@@ -391,6 +391,11 @@ class People:
             return f"at the {p.task}, {place_words(p.where)}"
         if p.pending is not None:
             return f"sent for, on his way to {PLACES[p.pending[0]].name}"
+        if p.role == "pilot" and getattr(
+            getattr(self.world, "ports", None), "pilot_boat_asked", False
+        ):
+            # package 37h: his charge done, he waits for his boat to put him off
+            return "at the gangway, waiting for his boat"
         if deck is False:
             return OFF_WATCH_WORDS
         if self._asleep(p):
@@ -449,6 +454,12 @@ class People:
         out = []
         for p in self.people:
             role = "" if p.role in ("captain", "commander") else f", {p.role}"
+            if p.role == "pilot" and p.port:
+                # package 37h: the pilot of his port, a supernumerary aboard
+                port = (getattr(getattr(self.world, "ports", None), "ports", None) or {}).get(
+                    p.port
+                )
+                role += f" of {port.name}" if port is not None else ""
             out.append(f"{p.name}{role}: {self.state_words(p)}.")
         return out
 

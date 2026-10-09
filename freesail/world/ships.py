@@ -41,7 +41,10 @@ stream, so a sail on the sea never moves the land's draws and the pinned passage
 machinery: 32b's cutter, which comes off from the port when a ship is in the pilot's
 cruising ground, closes her, lies to under her lee while the pilot boards, and goes back
 (`freesail.world.ports.Ports`). Nothing here is special to any ship: every vessel is a
-hull from a file, her polar drawn from it.
+hull from a file, her polar drawn from it. Package 37h gives her a leg of her own,
+`company`: hailed, the pilot's boat keeps company with the ship at the ship's pace, a
+cable and a half off, until she is slow enough for him to board or her captain sends her
+away, where before she was left astern by a ship standing in faster than she sailed.
 """
 
 from __future__ import annotations
@@ -58,6 +61,7 @@ from freesail.world.geo import Position, bearing_and_distance, horizon_nm
 
 __all__ = [
     "COLOURS_MADE_OUT_NM",
+    "COMPANY_CLOSING_KN",
     "DESCRIPTIONS",
     "GLASS_FACTOR",
     "HAIL_NM",
@@ -145,6 +149,13 @@ SAILING_FACTOR_MIN = 0.85
 BOAT_MASTHEAD_M = 5.0
 BOAT_SEEN_NM = 2.0
 BOAT_PACE_KN = 4.0
+# Keeping company (package 37h; the `company` leg): within the distance the leg names she
+# goes with the ship at the ship's way over the ground, as a pilot's boat keeps company
+# with a ship that has hailed her or that she has hailed; beyond it she closes at the
+# ship's pace and this much more (judgement: a pilot cutter was built to be the fastest
+# thing in her water, and a gig is towed or pulled alongside by the ship's line when she
+# has come up; the far-detail boat is given the pace and not the means).
+COMPANY_CLOSING_KN = 2.0
 
 # The descriptions a scenario may give a far-detail ship: her file, her rig's word (what
 # the tops make out at four miles), and what she is when made out (spec M5 §25: the
@@ -406,8 +417,9 @@ class Vessel:
     what: str = ""  # what she is when made out ("a merchant brig, deep laden")
     goal: str = ""  # the goal in words, for the author and the tests
     # the plan: a list of legs, each ("to", Position, name), ("to_ship", metres),
-    # ("lie_to", seconds) or ("home", Position, name); the first is the one in hand, and
-    # the vessel is done when the list is empty unless she cycles her route
+    # ("company", metres), ("lie_to", seconds) or ("home", Position, name); the first is
+    # the one in hand, and the vessel is done when the list is empty unless she cycles
+    # her route
     plan: list[tuple[Any, ...]] = field(default_factory=list)
     cycle: bool = False
     done: bool = False
@@ -567,6 +579,9 @@ class Vessel:
                 self.lying_to_s = 0.0
                 self.plan.pop(0)
             return
+        if kind == "company":
+            self._keep_company(world, float(leg[1]), dt, wind_from, wind_kn)
+            return
         if kind == "to_ship":
             target = world.position
             if target is None:
@@ -605,6 +620,37 @@ class Vessel:
         self._stream(world, dt)
         if course == bearing and step >= distance - arrive_m:
             self._arrived(world, leg)
+
+    def _keep_company(
+        self, world: Any, within_m: float, dt: float, wind_from: float, wind_kn: float
+    ) -> None:
+        """The `company` leg (package 37h): within `within_m` of the ship she goes with
+        her at her way over the ground, on her course; beyond it she closes straight for
+        her at her own pace or the ship's and `COMPANY_CLOSING_KN` more, whichever is the
+        greater. She keeps company until whoever gave her the leg gives her another (the
+        pilot's boat, `ports.py`)."""
+        target = world.position
+        if target is None:
+            self.plan.pop(0)
+            return
+        east, north = _ship_velocity(world)
+        ship_ms = math.hypot(east, north)
+        bearing, distance = bearing_and_distance(self.position, target)
+        if distance <= within_m:
+            self.position = self.position.advanced(east * dt, north * dt)
+            self.speed_kn = units.ms_to_knots(ship_ms)
+            if ship_ms > 0.05:
+                self.heading_deg = math.degrees(math.atan2(east, north)) % 360.0
+            self.distance_run_m += ship_ms * dt
+            return
+        own = units.knots_to_ms(self.pace_kn(bearing, wind_from, wind_kn))
+        speed = max(own, ship_ms + units.knots_to_ms(COMPANY_CLOSING_KN))
+        step = min(speed * dt, max(0.0, distance - 0.9 * within_m))
+        rad = math.radians(bearing)
+        self.position = self.position.advanced(step * math.sin(rad), step * math.cos(rad))
+        self.heading_deg = bearing
+        self.speed_kn = units.ms_to_knots(speed)
+        self.distance_run_m += step
 
     def _drift(self, world: Any, toward_deg: float, ms: float, dt: float) -> None:
         rad = math.radians(toward_deg)

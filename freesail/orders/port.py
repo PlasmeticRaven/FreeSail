@@ -11,6 +11,11 @@ crew pool, in port.
     take in water [<n> tons]        the water completed from the quay or the yard
     take in provisions [for <n> days]
     enter <n> <rating> seamen       hands from the pool at a bounty, come off after a delay
+    take the pilot                  the answer to the pilot boat's hail (package 37h): she
+                                    shortens sail or heaves to as the hail asked, and he
+                                    boards when the boat can put him aboard
+    decline the pilot               the boat sent back to her station (`we need no pilot`)
+    hail the pilot                  a pilot's boat in sight hailed, and the pilot taken
 
 Each is a verb of `data/vocabulary.yaml` with the object `port`: the grammar takes the
 words after the verb as they are, and this module reads a number, a good, an item or a
@@ -28,11 +33,14 @@ from freesail.orders.errors import OrderError
 from freesail.orders.grammar import Order
 from freesail.orders.prompt import world_of
 
-__all__ = ["NO_PORTS_WORDS", "execute", "number_in"]
+__all__ = ["NO_PORTS_WORDS", "PILOT_VERBS", "execute", "number_in"]
 
 NO_PORTS_WORDS = "There is no port to deal with: the ship is not in a world with a chart."
 
 Result = tuple[str, str, dict[str, Any]]
+
+# The pilot's orders (package 37h), the port's business as the boat and the market are
+PILOT_VERBS = ("take the pilot", "decline the pilot", "hail the pilot")
 
 _NUMBER_WORDS = {
     "a": 1,
@@ -112,6 +120,18 @@ def execute(ship: Any, order: Order) -> Result:
     verb = order.verb
     rest = (order.object or "").strip()
     ports = _ports(ship)
+    if verb in PILOT_VERBS:
+        # package 37h: the answer to the pilot's hail; she shortens sail or heaves to as
+        # the hail asked when she is still too fast for him to board
+        text, data, wants = ports.answer_pilot(verb)
+        if wants:
+            from freesail import orders
+
+            try:
+                orders.handle(ship, wants)
+            except OrderError as e:
+                text += f" ('{wants}' not carried out: {e})"
+        return "port.pilot_answered", text, {"verb": verb, "level": 1} | data
     if verb == "send the boat":
         phrase = order.verb_phrase
         words = rest

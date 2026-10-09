@@ -21,8 +21,10 @@ him.
     you may not tack ship                         and takes it back
     you may work the ship                         his general authority to work the ship
     you have general authority                    (`you have my authority`), which keeps back
-                                                  the port's business, his standing orders, a
-                                                  new destination and what cannot be undone
+                                                  the port's business (the pilot taken or
+                                                  declined at his hail among it, package
+                                                  37h), his standing orders, a new
+                                                  destination and what cannot be undone
     you may not work the ship                     and takes it back
     the officer of the watch                      a reading: who has the deck, since when,
                                                   what his word allows (`api.readings`)
