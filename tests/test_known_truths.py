@@ -3084,8 +3084,12 @@ def test_truth_59_a_cast_of_the_deep_sea_lead_moves_the_reckoning_onto_the_conto
     # there, a mile and a half here), and the line says so; `SOUNDING_ACROSS_SIGMA_NM`,
     # three miles whatever the bottom, is gone
     assert cast.data["how"] == K.WEIGHED
-    assert cast.text.endswith("The account moved five miles to the SE by S.")
-    assert 0.5 < cast.data["line_sigma_nm"] < 3.0
+    # package 37j: the cast reduced by the master's tide above his chart's datum (a metre
+    # and a tenth here), the contour matched within his doubt at another point of it,
+    # where the bottom shelves less: a line of six miles (a mile and a half before), and
+    # the account moved five miles and a half (five) to the SSE (SE by S)
+    assert cast.text.endswith("The account moved five miles and a half to the SSE.")
+    assert 0.5 < cast.data["line_sigma_nm"] < 7.0
     # the lead reads the tide (package 34): the cast is laid on the chart less the master's
     # own allowance for it, by his almanac. Weighed, the account comes ninety-six parts in
     # a hundred of the way to the contour (eight miles of doubt against a mile and a
@@ -3093,9 +3097,15 @@ def test_truth_59_a_cast_of_the_deep_sea_lead_moves_the_reckoning_onto_the_conto
     # truth's "onto the contour" held to the letter only while a cast after a long run
     # replaced the account, which package 37e's one rule no longer does unless the
     # account is plainly out (for the lead to rule: spec M5 §19 truth 59's words, §33)
+    # Package 37j: matched where the bottom shelves less, the line six miles, the account
+    # goes two thirds of the way (eight miles of doubt against six) and stands within
+    # seven fathoms of the cast's depth on the chart, nearer it than the twelve it began
+    # in and nearer the truth; the truth's "onto the contour" is held to that, for the
+    # lead's sentence (spec M5 §19, §33)
     on_the_chart = cast.data["depth_m"] - world.navigation._tide_allowance_m()
-    assert abs(world.chart.depth_at(r.position) - on_the_chart) <= units.fathoms_to_m(
-        K.CONTOUR_TOLERANCE_DEEP_FATHOMS + 1.0
+    assert abs(world.chart.depth_at(r.position) - on_the_chart) <= units.fathoms_to_m(7.0)
+    assert abs(world.chart.depth_at(r.position) - on_the_chart) < abs(
+        world.chart.depth_at(wrong) - on_the_chart
     )
     assert cast.data["moved_nm"] > 4.5
     assert _miles(r.position, world.position) < _miles(wrong, world.position)

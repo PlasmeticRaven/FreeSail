@@ -2426,4 +2426,12 @@ and not this package's; the bound on the depth she rides in is widened to twenty
 - **The log's line of a sighting still carries the mark's true distance and bearing** in
   its data (`lookout.Lookout._line_data`), for the record and the tests; the snapshot's
   reading does not. If the log's data reaches the browser, that is a road left.
+- **Truth 59** (the frigate in forty-six fathoms south of the Lizard, the account nineteen
+  miles off and eight in doubt): the cast reduced by the master's tide above his chart's
+  datum (a metre and a tenth) is matched at another point of the contour, where the bottom
+  shelves less; the line is six miles (a mile and a half before), and the account goes two
+  thirds of the way and stands within seven fathoms of the cast's depth on the chart (37e:
+  within a fathom of the tolerance, ninety-six parts in a hundred). The test holds that,
+  and the truth's sentence ("moves the reckoning onto the chart's contour") is further from
+  the letter than 37e left it: the lead's (spec M5 §19).
 - **The thick passage aground and the Iroise's cast lost**, above: the books, for the lead.
