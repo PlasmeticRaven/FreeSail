@@ -1807,7 +1807,8 @@ def _back_headsails(ship: Ship, order: Order, vocab: Vocabulary) -> Result | Non
     headsail, which has no yard to lay aback, is backed by hauling its sheet over to
     windward, as `haul the fore staysail sheet to windward` does (package 32e; Luce 1884,
     ch. XXXIV, 'Sloops', 'To Heave to'). None when the object is not one or more
-    fore-and-aft sails without a yard; the yards' own refusals then stand."""
+    jibs or staysails without a yard; the yards' own refusals then stand (a spanker or a
+    gaff mainsail is not backed by this order)."""
     from freesail.orders.grammar import parse
 
     try:
