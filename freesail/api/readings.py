@@ -1727,6 +1727,26 @@ def _no_cable_words(world: Any) -> str | None:
     return NO_TACKLE_WORDS if _tackle_of(world) is None else NO_ANCHOR_DOWN_WORDS
 
 
+def _draught(world: Any, _: str | None) -> Angle | None:
+    """`her draught`: the water she draws, from her file, in feet and in the lead's
+    fathoms (package 37k; the review's G8: two officers looked for it and found it only in
+    the low-water warning as an anchor went). The number is metres, as the depth's, so
+    that a standing order compares it as a depth (`when the depth exceeds ...`)."""
+    hull = getattr(getattr(world, "ship", None), "hull", None)
+    spec = getattr(hull, "spec", None)
+    draught = getattr(spec, "draught_m", None)
+    if draught is None:
+        return None
+    from freesail.world.chart import fathoms_words
+    from freesail.world.reckoning import number_words
+
+    feet = int(round(units.m_to_feet(float(draught))))
+    return Angle(
+        float(draught),
+        f"she draws {number_words(feet)} feet of water, {fathoms_words(float(draught))}",
+    )
+
+
 def _ground_tackle(world: Any, _: str | None) -> dict[str, Any] | None:
     """`the ground tackle`: every anchor, its weight, its cable and its state."""
     tackle = _tackle_of(world)
@@ -1780,6 +1800,17 @@ REGISTRY.add(
         _ground_tackle,
         description="the anchors and their cables, each with its weight and state",
         none_words=_no_tackle_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "draught",
+        ("her draught", "the draught", "the ship's draught", "what she draws"),
+        "depth",
+        "fathoms",
+        _draught,
+        description="the water she draws, from her file: 'she draws fifteen feet of water, "
+        "two fathoms and a half' (package 37k)",
     )
 )
 
@@ -2208,6 +2239,7 @@ for _n, _w in _BELL_WORDS.items():
 _event(EventSpec("the change of the watch", "watch.relieved"))
 _event(EventSpec("a strain warning", "strain.warning"))
 _event(EventSpec("a sail shaking", "sail.shivering"))
+_event(EventSpec("her sails lifting", "ship.lifting"))  # package 37k
 _event(EventSpec("a spar carrying away", "spar.carried_away"))
 _event(EventSpec("a sail blown out", "sail.blown_out"))
 _event(EventSpec("all hands called", "crew.all_hands"))
@@ -2436,8 +2468,8 @@ def _needs_pilot(world: Any) -> str | None:
 # strain warnings behind a glass). A station with the deck that stands by is woken by an
 # urgent line, as every station is, and by a notable line of one of these kinds: an
 # anchor dragging or still coming home, fog coming down, land or a sail closing, a spar
-# or a line straining, an evolution failed, the ship taken aback. Kept here as data,
-# beside the events; `speaks_of_danger` is the one test.
+# or a line straining, an evolution failed, the ship taken aback, her sails lifting
+# (package 37k). Kept here as data, beside the events; `speaks_of_danger` is the one test.
 # ---------------------------------------------------------------------------
 
 
@@ -2464,6 +2496,8 @@ DANGER_LINES: tuple[DangerLine, ...] = (
     DangerLine("an evolution failed", "evolution.failed"),
     DangerLine("the ship taken aback", "ship.aback"),
     DangerLine("the pilot's warning", "port.pilot_warns"),
+    # package 37k: her sails lifting, said before she can be aback
+    DangerLine("her sails lifting", "ship.lifting"),
 )
 
 

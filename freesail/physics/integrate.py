@@ -30,7 +30,7 @@ import math
 from freesail import units
 from freesail.physics import anchor as ground_tackle
 from freesail.physics import hull as hp
-from freesail.physics.sails import compute_sail_forces, hold_rig, release_rig
+from freesail.physics.sails import compute_sail_forces, hold_rig, release_rig, sails_in_hand
 from freesail.physics.strain import apply_strain
 from freesail.physics.wind import Wind
 from freesail.ship.graph import Ship
@@ -165,6 +165,49 @@ def _substep(
     d.weather_helm = hp.weather_helm_reading(d.weather_helm, d.rudder, st.awa, h)
 
 
+def _note_lifting(ship: Ship, st: hp.HullState, dt: float, standing: bool) -> None:
+    """ "Her sails lifting" (package 37k): the apparent wind come forward of her luffing
+    angle, and forward of the beam (a header; abaft the beam she is not taken aback by
+    it), for `LIFT_SAY_S`, with way on her in a working breeze, under sail that stands
+    (`standing`: set and not in the hands' work, no manoeuvre in hand, not hove to), free
+    of the anchor and the ground. A notable line once an episode, armed again when she has
+    stood full `LIFT_REARM_S` together; and it is a line that speaks of danger, which wakes
+    a station standing by with the deck, so that the cry of "Taken aback" comes after a
+    warning whenever the wind heads her by degrees (the review's G6: eight urgent cries in
+    game 10, no warning before any)."""
+    d = ship.dyn
+    luff = ship.extra.get("luff_angle")
+    lifting = (
+        standing
+        and isinstance(luff, int | float)
+        and not st.at_anchor
+        and not st.aground
+        and d.u >= units.knots_to_ms(hp.WAY_ON_KN)
+        and units.ms_to_knots(st.aws) >= hp.ABACK_URGENT_AWS_KN
+        and abs(st.awa) < min(float(luff), 0.5 * math.pi)  # forward of the beam: headed
+    )
+    if not lifting:
+        st.seconds_lifting = 0.0
+        st.seconds_full += dt
+        if st.seconds_full >= hp.LIFT_REARM_S:
+            st.lifting_noted = False
+        return
+    st.seconds_full = 0.0
+    st.seconds_lifting += dt
+    if st.lifting_noted or st.seconds_lifting < hp.LIFT_SAY_S:
+        return
+    st.lifting_noted = True
+    side = "starboard" if st.awa >= 0 else "larboard"
+    deg = int(round(units.rad_to_deg(abs(st.awa))))
+    ship.note(
+        "notable",
+        "ship.lifting",
+        f"Her sails lifting, the wind {deg}° on the {side} bow: keep her away, or she will "
+        "be taken aback.",
+        data={"awa": st.awa, "luff_angle": float(luff), "aws": st.aws, "speed": d.speed},
+    )
+
+
 def _rate(opposing_force: float, speed: float) -> float:
     """The damping rate D >= 0 such that `opposing_force == -D * speed`."""
     if abs(speed) < 1e-9:
@@ -235,17 +278,26 @@ def _log_notes(ship: Ship, st: hp.HullState, dt: float) -> None:
     # Sails pressed against the masts means a square sail backed, or nothing set
     # drawing at all; the windage of canvas still being set while the jibs draw
     # is not being taken aback (truth 17: getting under way).
-    set_sails = [s for s in ship.sails.values() if s.is_set]
+    # Package 37k (the review's G6, game 10: two of the eight urgent cries came as sail was
+    # made after weighing, the wind abeam and her way rising): a sail the hands are still
+    # setting, trimming or bracing (`sails_in_hand`) is left out of the judgement, its
+    # thrust with it; she is aback by the sails that stand.
+    in_hand = sails_in_hand(ship)
+    set_sails = [s for s in ship.sails.values() if s.is_set and s.id not in in_hand]
     sail_set = bool(set_sails)
     pressed = any(s.backed for s in set_sails) or not any(s.thrust_kn > 0 for s in set_sails)
+    thrust_n = st.last_thrust_n - 1000.0 * sum(
+        s.thrust_kn for s in ship.sails.values() if s.is_set and s.id in in_hand
+    )
     runner = ship.extra.get("evolutions")
     in_stays = "hove_to" in ship.extra or (
         bool(runner) and any(e.get("subject") in ("ship", ship.name) for e in runner.in_progress())
     )
+    _note_lifting(ship, st, dt, sail_set and not in_stays)
     # A new episode is logged only after a minute clear of the last (package 37c), and the
     # line is urgent only when she had way to lose in a working breeze, free of the anchor
     # and the ground; otherwise it is a notable line saying why it matters less.
-    if sail_set and pressed and st.last_thrust_n < 0 and not in_stays:
+    if sail_set and pressed and thrust_n < 0 and not in_stays:
         if st.seconds_aback == 0.0:
             st.aback_had_way = d.u >= units.knots_to_ms(hp.WAY_ON_KN)
         st.seconds_aback += dt

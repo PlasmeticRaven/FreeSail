@@ -1382,3 +1382,49 @@ def test_the_schooners_lines_take_less_rope_and_her_store_is_her_own():
     sheet = ship.lines["fore.topsail.sheet.larboard"]
     assert scripts.line_fathoms(ship, sheet) == 19.0  # 30 fathoms scaled by her length
     assert scripts.line_fathoms(ship, ship.lines["fore.topsail.yard.halyard"]) == 25.0
+
+
+# ---------------------------------------------------------------------------
+# Package 37k: a tack that could not begin
+# ---------------------------------------------------------------------------
+
+
+def test_a_tack_that_could_not_begin_is_refused_in_its_own_words_not_a_missed_stays():
+    """The review's G7: a tack that waited its turn behind the leadsman and found her off
+    the wind when it came was logged "Squared the yards; she fell off on the starboard
+    tack, to try again or to wear", and her officer gave up tacking in the Sound for two
+    missed stays that never were. It is said as what it is."""
+    from datetime import datetime
+
+    from freesail.api.session import make_world
+    from freesail.core.world import Scenario
+
+    sc = Scenario(
+        start_time=datetime(1805, 6, 1, 10, 0),
+        wind_from_deg=0.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=200.0,
+        ship_speed_kn=5.0,
+        position={"lat_deg": 49.9, "lon_deg": -5.2},
+        region="channel-west",
+    )
+    w = make_world(7, FRIGATE, sc)
+    w.submit("set plain sail")
+    w.run(400)
+    n0 = len(w.log.all())
+    # the lead in the chains holds the ship as the tack is given: it waits its turn
+    assert w.submit("heave the lead").kind == "order.accepted"
+    assert w.submit("tack").kind == "order.accepted"
+    w.run(120)
+    failed = [x for x in w.log.all()[n0:] if x.kind in ("evolution.failed", "ship.fell_off")]
+    assert failed and failed[0].kind == "evolution.failed"
+    assert failed[0].text == (
+        "Could not go about: she is not close-hauled; bring her by the wind before going about."
+    )
+    assert not [x for x in w.log if x.kind in ("ship.missed_stays", "ship.fell_off")]
+    # given with nothing in hand it is refused at the order, as it always was
+    no = w.submit("tack")
+    assert no.kind == "order.rejected" and "She is not close-hauled" in no.text
+    assert registry.get("tack").on_refused is not None

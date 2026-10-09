@@ -310,7 +310,8 @@ def test_the_orders_are_refused_in_words_when_they_cannot_be_done():
     refused(w, "veer to the moon", "Veer how much")
     cutter = road_world(CUTTER, heading=225.0, knots=10.0)
     cutter.run(60)
-    refused(cutter, "let go the sheet anchor", "no anchor aboard answers to")
+    # package 37k: refused at the order, with the anchors she has
+    refused(cutter, "let go the sheet anchor", "she carries no sheet anchor; her anchors are")
     # no anchoring ground: the small bower's one cable of a hundred and twenty fathoms
     # in sixty of water (the best bower has two bent, and would be let go here)
     deep = make_world(
@@ -430,3 +431,212 @@ def test_an_anchor_let_go_after_a_run_of_sixty_miles_lies_in_the_depth_the_lead_
     # the old arithmetic put it sixty miles off, in another depth altogether
     elsewhere = w.chart.depth_at(w.origin.advanced(anchor.ground_x, anchor.ground_y))
     assert elsewhere is None or abs(elsewhere + w.tide_height_m - anchor.depth_m) > 1.0
+
+
+# ---------------------------------------------------------------------------
+# Package 37k: the ground, amended (the review's G8 and part K)
+# ---------------------------------------------------------------------------
+
+
+def getting_under_way(path=CUTTER, until="ship.aweigh", extra_s=0):
+    """A vessel brought up in the outer road, then `get under way`, run until the first
+    line of `until`'s kind or with `until` in its words (and `extra_s` more): the world."""
+    w = road_world(path, heading=225.0, knots=10.0, where=OUTER_ROAD)
+    w.run(60)
+    assert w.submit("let go the best bower").kind == "order.accepted"
+    w.run(900)
+    n0 = len(w.log.all())
+    assert w.submit("get under way").kind == "order.accepted"
+    hit: list = []
+    for _ in range(3600):
+        w.run(1)
+        hit = [e for e in w.log.all()[n0:] if e.kind == until or until in e.text]
+        if hit:
+            break
+    assert hit, until
+    w.run(extra_s)
+    return w
+
+
+# The conditions of game 10's anchor that could not be let go (the review's G8: at 03:53 on
+# the 14th "The best bower is aweigh", the owner belayed getting under way, and at 04:09
+# `let go the best bower`, `come to an anchor` and `drop anchor` were each refused "the
+# best bower is aweigh", `weigh the best bower` "no anchor is down"; the audit's one trial
+# belayed before the anchor was aweigh and found her simply at anchor). Pinned here: the
+# anchor is left aweigh by a belay of getting under way (or of weighing) given after its
+# break-out ("is aweigh", `break_out_s` after the cable is up and down) and before it is
+# catted and fished (`cat_and_fish_s` after it is up to the bows): some six minutes in the
+# cutter in nine fathoms. Before the break-out the belay leaves her at anchor; after the
+# catting the anchor is at the bows. In that window the anchor's state was "aweigh", which
+# neither `let go` (at the bows or a-cockbill only) nor `weigh` (down only) would take.
+LEFT_AWEIGH = {
+    # the moment of the belay: (the line it follows, seconds after, what she is at, where
+    # the anchor is left)
+    "as the anchor breaks out": (
+        "ship.aweigh",
+        0,
+        "casting",
+        "the best bower aweigh and hanging off the ground under the bows, to be let go "
+        "again or catted and fished",
+    ),
+    "up to the bows (game 10)": (
+        "up to the bows",
+        60,
+        "under way",
+        "the best bower aweigh and hanging at the bows, to be let go again or catted and fished",
+    ),
+}
+
+
+@pytest.mark.parametrize("moment", list(LEFT_AWEIGH))
+def test_an_anchor_left_aweigh_by_a_belay_of_getting_under_way_is_let_go_at_once(moment):
+    """Item 1: an anchor at the bows can be let go, and the belay says where it left it."""
+    until, after, doing, words = LEFT_AWEIGH[moment]
+    w = getting_under_way(until=until, extra_s=after)
+    anchor = ground_tackle(w.ship).get("best_bower")
+    assert anchor.state is AnchorState.AWEIGH  # the conditions: aweigh, not yet catted
+    # game 10's own words for the belay, which were refused there as naming no work
+    belayed = w.submit("belay get under way")
+    assert belayed.kind == "work.belayed", belayed.text
+    assert belayed.text == (
+        f"Belayed getting under way; the helm and the yards left as they stand, {doing}; {words}."
+    )
+    assert anchor.state is AnchorState.AWEIGH and not anchor.heaving
+    # `weigh` says where the anchor is, where it said only "no anchor is down"
+    no = w.submit("weigh the best bower")
+    assert no.kind == "order.rejected" and f"no anchor is down: {words}" in no.text
+    # and it is let go at once, from where it hangs
+    t0 = w.clock.tick
+    assert w.submit("let go the best bower").kind == "order.accepted"
+    w.run(120)
+    anchored = [e for e in events(w, "ship.anchored") if e.tick > t0]
+    assert anchored and anchor.down and anchor.ground_x is not None
+
+
+def test_a_belay_before_the_anchor_is_aweigh_leaves_her_riding_and_the_capstan_let_go():
+    """The audit's trial: belayed before the break-out she is simply at anchor; and the
+    cable is no longer marked as being hove in, so that her riding and her dragging are
+    the physics' again (the capstan's mark held them off for good before)."""
+    w = getting_under_way(until="The messenger passed", extra_s=60)
+    anchor = ground_tackle(w.ship).get("best_bower")
+    assert anchor.down and anchor.heaving
+    belayed = w.submit("belay getting under way")
+    assert belayed.kind == "work.belayed"
+    assert belayed.text.startswith(
+        "Belayed getting under way; the helm and the yards left as they stand, heaving short; "
+        "the best bower on the bottom with "
+    )
+    assert belayed.text.endswith(" fathoms of cable out.")
+    assert anchor.down and not anchor.heaving and w.at_anchor
+
+
+def test_a_belay_of_weighing_says_where_it_left_the_anchor_and_it_can_be_let_go():
+    w = road_world(heading=225.0, knots=10.0, where=OUTER_ROAD)
+    w.run(60)
+    w.submit("let go the best bower in twenty fathoms")
+    w.run(300)
+    assert w.submit("weigh").kind == "order.accepted"
+    for _ in range(3600):
+        w.run(1)
+        if events(w, "ship.aweigh"):
+            break
+    belayed = w.submit("belay weighing")
+    assert belayed.kind == "work.belayed"
+    assert belayed.text == (
+        "Belayed weighing anchor; the best bower aweigh and hanging off the ground under the "
+        "bows, to be let go again or catted and fished."
+    )
+    assert w.submit("come to an anchor").kind == "order.accepted"
+
+
+def test_an_anchor_catted_and_not_fished_is_let_go_from_the_cathead():
+    """At the cat-head, "ready to be sunk from the bow at a moment's warning" (Falconer
+    1780, ANCHOR a cock-bill): an anchor catted and not yet fished is let go."""
+    w = road_world(CUTTER, heading=225.0, knots=10.0, where=OUTER_ROAD)
+    w.run(60)
+    anchor = ground_tackle(w.ship).get("best_bower")
+    anchor.state = AnchorState.CATTED
+    assert w.submit("let go the best bower").kind == "order.accepted"
+    w.run(120)
+    assert anchor.down
+
+
+def test_an_anchor_she_does_not_carry_is_refused_at_the_order_whatever_the_hands_are_at():
+    """Item 2: game 10's `let go the sheet anchor` was taken while the cutter was getting
+    under way and failed four minutes later; with nothing in hand it was refused at once
+    (the audit's narrowing). Refused at the order now, in words that name her anchors."""
+    w = getting_under_way(until="The messenger passed")
+    assert w.ship.extra["evolutions"].work()  # the hands are at the capstan
+    for text in (
+        "let go the sheet anchor",
+        "come to an anchor with the sheet anchor",
+        "weigh the sheet anchor",
+        "veer the sheet anchor to thirty fathoms",
+        "cat and fish the sheet anchor",
+    ):
+        e = w.submit(text)
+        assert e.kind == "order.rejected", (text, e.text)
+        assert e.text.endswith(
+            "she carries no sheet anchor; her anchors are the best bower, the small bower and "
+            "the kedge"
+        ), e.text
+    # an anchor she carries waits its turn, as before
+    assert w.submit("let go the small bower").kind == "order.accepted"
+
+
+DEEP_ROAD = {"lat_deg": 49.80, "lon_deg": -5.20}  # forty-six fathoms, south of the Lizard
+OFF_THE_ENTRANCE = {"lat_deg": 50.082, "lon_deg": -5.000}  # thirty fathoms
+
+
+def test_in_the_deep_road_an_anchor_goes_with_a_warning_and_a_short_cable_is_refused():
+    """Item 5: game 10's cutter anchored twice in 45 to 48 fathoms with her best bower,
+    and the small bower in the same water was refused; neither said why. The rule:
+    refused where the anchor's whole cable gives under three times the depth (Luce's old
+    rule, the least she rides by; Falconer's ground "too deep"), naming the anchor that
+    would reach; past twenty fathoms, deeper than any road of the directions, a warning."""
+    from freesail.core.events import Severity
+
+    w = road_world(CUTTER, heading=225.0, knots=10.0, where=DEEP_ROAD)
+    w.run(60)
+    depth = units.m_to_fathoms(w.ship.extra["water_depth_m"])
+    assert 40.0 < depth < 80.0
+    no = w.submit("let go the small bower")
+    assert no.kind == "order.rejected"
+    assert "no anchoring ground here: 46 fathoms" in no.text
+    assert no.text.endswith(
+        ", and the small bower's a hundred and twenty fathoms of cable give less than three "
+        "times the depth, the least she will ride by; the best bower has 240 fathoms"
+    ), no.text
+    assert w.submit("let go the best bower").kind == "order.accepted"
+    w.run(5)
+    (deep,) = [e for e in events(w, "anchor.depth_warning") if "deep water" in e.text]
+    assert deep.severity is Severity.NOTABLE
+    assert deep.text.startswith("46 fathoms")
+    assert deep.text.endswith(
+        " is deep water to anchor in: the roads lie in seventeen fathoms and less, and here "
+        "she rides on a steep cable and will be long heaving it in."
+    )
+    # in thirty fathoms the small bower reaches, with the warning; in a road, no warning
+    w = road_world(CUTTER, heading=225.0, knots=10.0, where=OFF_THE_ENTRANCE)
+    w.run(60)
+    assert w.submit("let go the small bower").kind == "order.accepted"
+    w.run(5)
+    assert [e for e in events(w, "anchor.depth_warning") if "deep water" in e.text]
+    w = road_world(CUTTER, heading=225.0, knots=10.0, where=OUTER_ROAD)
+    w.run(60)
+    assert w.submit("let go the small bower").kind == "order.accepted"
+    w.run(5)
+    assert not [e for e in events(w, "anchor.depth_warning") if "deep water" in e.text]
+
+
+def test_her_draught_is_a_reading():
+    """Item 8: two officers looked for her draught; it was said only in the low-water
+    warning as an anchor went."""
+    w = road_world(CUTTER)
+    feet = round(units.m_to_feet(w.ship.hull.spec.draught_m))
+    assert feet > 0
+    words = w.readings.words("draught")
+    assert words.startswith("she draws ") and " feet of water, " in words
+    assert R.REGISTRY.get("draught").kind == "depth"
+    assert "her draught" in R.REGISTRY.words() and "what she draws" in R.REGISTRY.words()
+    assert w.readings["draught"] == pytest.approx(w.ship.hull.spec.draught_m)

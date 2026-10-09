@@ -29,7 +29,7 @@ from freesail.core.world import Scenario
 from freesail.evolutions import scripts
 from freesail.orders import verbs
 from freesail.orders.errors import OrderError
-from freesail.ship.parts import HelmMode
+from freesail.ship.parts import HelmMode, SailState
 
 FRIGATE = "data/ships/frigate-36.yaml"
 SCHOONER = "data/ships/topsail-schooner.yaml"
@@ -783,3 +783,138 @@ def test_the_starter_books_trim_rules_sleep_through_a_heave_to_and_wake_after_it
         and e.actor in ("standing order 'trim on a shift'", "standing order 'tend the sheets'")
     ]
     assert trimmed, "the trim rules did not wake when she had filled away"
+
+
+# ---------------------------------------------------------------------------
+# Package 37k: heaving to with a sail that is set; the alarm for being taken aback
+# ---------------------------------------------------------------------------
+
+
+def test_a_heave_to_backs_a_sail_that_is_set_and_not_one_being_handed():
+    """Item 3 (the review's G7, game 10): the officer was hauling down the cutter's
+    foresail at the pilot's hail while the captain hove her to; the heave-to backed that
+    same foresail, said "Hove to", and she filled within a minute when it came down. The
+    head sail held to windward is one that is set and stays set, and the line says which."""
+    w = world_for(CUTTER, 290.0, 12.0)
+    foresail = w.ship.sails["fore.staysail"]
+    assert foresail.is_set and w.ship.sails["jib"].is_set
+    assert w.submit("take in the foresail").kind == "order.accepted"
+    w.run(2)
+    assert scripts.being_handed(w.ship, foresail)
+    assert w.submit("heave to").kind == "order.accepted"
+    w.run(20 * 60)
+    steps = [e.text for e in events(w, "evolution.step") if "to windward" in e.text]
+    assert steps and "the jib sheet to windward" in steps[0]
+    assert "foresail" not in steps[0] and "staysail" not in steps[0]
+    assert w.ship.extra["hove_to"]["headsail"] == "jib"
+    assert not foresail.is_set
+    (hove,) = events(w, "ship.hove_to")
+    assert hove.text.startswith("Hove to on the starboard tack, ")
+    assert "hove_to" in w.ship.extra and not events(w, "ship.filled", "ship.forced_round")
+    off = wind_on_bow(w)
+    assert 3.0 * POINT_DEG < off < 8.0 * POINT_DEG
+
+
+def test_a_heave_to_never_lays_a_furled_topsail_to_the_mast():
+    """The sail laid to the mast is one that is set and says so: the brig with her main
+    topsail furled lays her main topgallant aback and lies to; with nothing standing on
+    the main but its course (which a heave-to hauls up), the fore topsail (Luce 1866, ch.
+    XXVI, 'To heave to with the fore topsail to the mast')."""
+    w = world_for(BRIG, 290.0, 12.0)
+    assert w.submit("furl the main topsail").kind == "order.accepted"
+    w.run(600)
+    assert not w.ship.sails["main.topsail"].is_set and w.ship.sails["main.topgallant"].is_set
+    assert w.submit("heave to").kind == "order.accepted"
+    w.run(12 * 60)
+    said = [e.text for e in events(w, "evolution.step") if "aback" in e.text]
+    assert said and said[0].startswith("Braced the main topgallant aback")
+    (hove,) = events(w, "ship.hove_to")
+    assert hove.text == "Hove to on the starboard tack, main topgallant to the mast, helm a-lee."
+    w = world_for(BRIG, 290.0, 12.0)
+    assert w.submit("furl the main topsail").kind == "order.accepted"
+    assert w.submit("furl the main topgallant").kind == "order.accepted"
+    w.run(900)
+    assert not w.ship.sails["main.topgallant"].is_set and w.ship.sails["fore.topsail"].is_set
+    assert w.submit("heave to").kind == "order.accepted"
+    w.run(60)
+    said = [e.text for e in events(w, "evolution.step") if "aback" in e.text]
+    assert said and said[0].startswith("Braced the fore topsail aback")
+
+
+def test_a_sail_still_being_set_or_trimmed_is_left_out_of_the_alarm():
+    """Item 4: in game 10 two of the eight urgent cries of "Taken aback" came as sail was
+    being made after weighing, the wind abeam and her way rising, the sails not yet
+    sheeted and trimmed. A sail the hands are at is not judged; the sails that stand are."""
+    from freesail.physics import integrate
+    from freesail.physics.sails import sails_in_hand
+
+    w = world_for(BRIG, 270.0, 12.0)
+    runner = w.ship.extra["evolutions"]
+    jib = w.ship.sails["flying_jib"]
+    assert not jib.is_set
+    assert w.submit("set the flying jib").kind == "order.accepted"
+    runner.step(w.ship, 1.0, w.wind)
+    assert sails_in_hand(w.ship) == {jib.id}
+    # hoisted and not yet sheeted home and trimmed; every other sail furled, so that the
+    # one sail she has set is the one the hands are at
+    for sl in w.ship.sails.values():
+        if sl.is_set:
+            sl.state = SailState.FURLED
+    jib.state = SailState.SET
+
+    # the sail read as aback and the thrust astern, as the physics gives them for a sail
+    # aback: ten seconds of it is the cry, for a sail that stands
+    def aback(world, seconds=15):
+        st = integrate.hp.hull_state(world.ship)
+        for _ in range(seconds):
+            st.last_thrust_n = -20_000.0
+            for sl in world.ship.sails.values():
+                sl.backed = sl.is_set
+            integrate._log_notes(world.ship, st, 1.0)
+
+    st = integrate.hp.hull_state(w.ship)
+    st.seconds_aback, st.aback_noted, st.aback_lesser = 0.0, False, ""
+    w.ship.drain_notes()
+    aback(w)
+    assert not [n for n in w.ship.drain_notes() if n[1] == "ship.aback"]
+    # the work belayed, the same sail stands and is judged
+    runner.belay(w.ship, runner.work())
+    assert sails_in_hand(w.ship) == set()
+    aback(w)
+    assert len([n for n in w.ship.drain_notes() if n[1] == "ship.aback"]) == 1
+
+
+def test_her_sails_lifting_is_said_before_she_is_taken_aback():
+    """Item 4: "Taken aback" was cried eight times in game 10 "with no warning line before
+    any of them". On a compass course close-hauled the wind heading her by a point at a
+    time: "Her sails lifting", notable, comes first, and the cry after it."""
+    from freesail.api import readings as R
+    from freesail.core.events import Severity
+
+    w = world_for(FRIGATE, 292.0, 14.0)
+    n0 = len(w.log.all())
+    for _ in range(8):
+        shift_the_wind(w, -1.0)  # backing: ahead of her on the starboard bow
+        w.run(40)
+        if [e for e in w.log.all()[n0:] if e.kind == "ship.aback"]:
+            break
+    lines = [e for e in w.log.all()[n0:] if e.kind in ("ship.lifting", "ship.aback")]
+    assert lines and lines[0].kind == "ship.lifting", [(e.kind, e.text) for e in lines]
+    assert lines[0].severity is Severity.NOTABLE
+    assert lines[0].text.startswith("Her sails lifting, the wind ")
+    assert lines[0].text.endswith(
+        " on the starboard bow: keep her away, or she will be taken aback."
+    )
+    assert len([e for e in lines if e.kind == "ship.lifting"]) == 1  # once an episode
+    assert R.speaks_of_danger("ship.lifting", {}) == "her sails lifting"
+    assert R.EVENTS["her sails lifting"].kind == "ship.lifting"
+
+
+def test_no_lifting_line_under_full_and_by_in_a_steady_breeze():
+    """Full and by the helmsman keeps her a margin outside her luffing angle: nothing
+    lifts, and the line is not said."""
+    w = world_for(FRIGATE, 292.0, 14.0)
+    w.submit("keep her full and by")
+    n0 = len(w.log.all())
+    w.run(30 * 60)
+    assert not [e for e in w.log.all()[n0:] if e.kind == "ship.lifting"]

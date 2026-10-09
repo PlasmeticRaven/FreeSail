@@ -111,6 +111,16 @@ ABACK_URGENT_AWS_KN = 4.0
 # air", when she has way on again or the wind is a working one again
 # (`ABACK_URGENT_AWS_KN`); "as she lies at anchor" or "aground", when she does so no
 # longer. So a calm is one line however long it lasts.
+# Her sails lifting (package 37k; the review's G6: "Taken aback" was cried urgently eight
+# times in game 10 "with no warning line before any of them"): the wind come forward of
+# her luffing angle (`ship.extra["luff_angle"]`, the angle the helm's full-and-by keeps
+# FULL_AND_BY_MARGIN outside) for LIFT_SAY_S together, with way on her in a working
+# breeze, under sail that stands and no manoeuvre in hand, is a notable line, said before
+# she can be aback (ABACK_SECONDS, after a sail's own ten seconds aback). Said once an
+# episode, and armed again when she has stood full LIFT_REARM_S. Judgement: five seconds,
+# longer than a sea's lift of the wind and short of the aback's; the rearm the aback's.
+LIFT_SAY_S = 5.0
+LIFT_REARM_S = ABACK_REARM_SECONDS
 LEEWAY_NOTE_THRESHOLD = math.radians(1.0)  # leeway must change by this much to be noted
 LEEWAY_NOTE_INTERVAL = 60.0  # seconds; at most one leeway note per minute
 LEEWAY_MIN_SPEED = 0.25  # m/s; below this leeway is meaningless and read as zero
@@ -143,6 +153,11 @@ class HullState:
     # which lesser line stands said ("anchor", "no_way", "light"; "" for none): package
     # 37f, with a default so that an older save loads
     aback_lesser: str = ""
+    # her sails lifting (package 37k): how long, whether said this episode, how long she
+    # has stood full since; defaults, so that an older save loads
+    seconds_lifting: float = 0.0
+    lifting_noted: bool = False
+    seconds_full: float = 0.0
     beam_ends_noted: bool = False  # "on her beam ends" already logged for this episode
     last_noted_leeway: float = 0.0  # radians, leeway when last written in the log
     seconds_since_leeway_note: float = LEEWAY_NOTE_INTERVAL

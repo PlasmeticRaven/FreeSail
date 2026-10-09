@@ -179,6 +179,8 @@ def _named_anchor(ship: Any, phrase: str, remainder: str) -> tuple[str | None, s
         return named, ""
     tackle = ground_tackle(ship)
     found = _anchor_in_phrase(left)
+    if found is not None and tackle is not None and not tackle.carries(found):
+        return found, ""  # refused by name at the order (`_refuse_unless_carried`)
     if found is not None and tackle is not None and tackle.by_words(found) is not None:
         rest = left
         for words, _name in _PHRASE_ANCHORS:
@@ -188,6 +190,23 @@ def _named_anchor(ship: Any, phrase: str, remainder: str) -> tuple[str | None, s
     if tackle is not None and tackle.by_words(left) is not None:
         return left, ""
     return named, left
+
+
+def _refuse_unless_carried(ship: Any, name: str | None) -> None:
+    """An anchor she does not carry is refused at the order, whatever the hands are at
+    (package 37k; the review's G8, game 10: the cutter's `let go the sheet anchor` was
+    taken while she was getting under way, waited its turn behind the work and failed
+    four minutes later; with nothing in hand it was refused at once). The refusal names
+    the anchors she has."""
+    tackle = ground_tackle(ship)
+    if tackle is None or name is None or tackle.carries(name):
+        return
+    from freesail.ship.parts import ANCHOR_KIND_WORDS
+
+    key = " ".join(w for w in name.lower().split() if w not in ("the", "anchor"))
+    what = ANCHOR_KIND_WORDS.get(key)
+    what = f"no {what}" if what else f"no anchor called '{name}'"
+    raise OrderError(f"she carries {what}; her anchors are {tackle.names_words()}")
 
 
 def execute(ship: Any, order: Order) -> Result:
@@ -219,6 +238,7 @@ def execute(ship: Any, order: Order) -> Result:
         # the number had been: `veer the best bower to 80 fathoms` veered eighty more, and
         # `weigh the small bower` weighed the best bower without a word.
         name, left = _named_anchor(ship, phrase, remainder)
+        _refuse_unless_carried(ship, name)
         if name is not None:
             params["anchor"] = name
         said_to = phrase.endswith(" to") or bool(re.search(r"\bto\b", remainder.lower()))
@@ -297,6 +317,7 @@ def execute(ship: Any, order: Order) -> Result:
         words = _anchor_words(low)
         if words and named is None:
             named = words
+        _refuse_unless_carried(ship, named)
         if named is not None:
             params["anchor"] = named
     elif verb == "get under way":

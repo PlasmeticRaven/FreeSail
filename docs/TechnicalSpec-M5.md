@@ -734,6 +734,27 @@ line. The other anchoring faults of the review (the scope, the depth named in th
   `trim`; sail furled, handed or loosed to dry, yards squared or braced, the upper masts
   and yards sent down or swayed up are taken.
 
+**As built (package 37k, 2026-10-09; the review's G7, G8 and part K): the ground amended.**
+
+- *An anchor at the bows can be let go* (`scripts.LET_GO_STATES`): at the bows, a-cockbill,
+  catted (at the cat-head, not fished) or aweigh (broken out and hanging by its cable).
+  Game 10's anchor that could not be let go was one left aweigh by a belay of getting under
+  way given between the break-out and the catting; `let go` and `come to an anchor` took
+  only an anchor at the bows or a-cockbill, `weigh` only one down. A belay of the anchor's
+  work says where it leaves the anchor (`Script.left_words`, `anchor_left_words`), and lets
+  go the capstan's mark on the cable (`Script.belayed`); `belay get under way` names the
+  work (the ground tackle's verbs in `orders/work.py`).
+- *An anchor she does not carry* is refused at the order with the anchors she has
+  (`GroundTackle.carries`, `orders/ground_tackle._refuse_unless_carried`).
+- *The deep road*: an anchor whose whole cable gives under three times the depth
+  (`SHORT_SCOPE_PER_DEPTH`, the old rule; Falconer's ground "too deep") is refused with the
+  anchor that would reach; past `DEEP_ROAD_FATHOMS` (twenty, deeper than any road of the
+  directions) it goes with a notable warning.
+- *A dragging that relapses* inside `DRAG_HOLDS_AGAIN_S` (a quarter of an hour) is the same
+  dragging: one urgent line, its metres counted on across its spells, "holds again" when it
+  has held that long. The physics' flag still falls after `DRAG_SETTLE_S`.
+- *Her draught* is a reading (`draught`, kind depth).
+
 ### 19. Truths for 5b (behavioural)
 
 | # | Truth |

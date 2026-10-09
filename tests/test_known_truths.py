@@ -2936,6 +2936,12 @@ GATE_5B_DIGEST = "ded18dca91367945"  # dbf7f6fcfb800fdf before package 37h
 # leagues; the outer road 56517 → 56515; the anchor off the town 58210 → 57638 in seven
 # fathoms (six and a half), brought up 59395 → 58690; the pilot's hail 56160 → 55800,
 # and he does not board, as before; 799 → 761 lines.
+# Package 37k (2026-10-09): every tick and the true track held; two lines more, "Her sails
+# lifting" twice on the run in from the Lizard (52912, 53538), the wind come forward of
+# the yards' trim on a compass course (docs/dev/TuningNotes.md, package 37k).
+# c8905673506f717e before package 37k (78eec3dcd5f33c16 on Windows then)
+# (37h and 37k merged 2026-10-09: the figures above are 37h's; the two together are
+# re-measured at 37j's merge, the tuning notes saying both.)
 # Package 37h (2026-10-09): the pilot aboard before she runs in, the expected failure's
 # mark off. Her book gains three lines and a guard (docs/dev/TuningNotes.md, package 37h):
 # `take the pilot` at his hail shortens sail as it asks, the cutter keeps company with her
@@ -2957,8 +2963,10 @@ GATE_5B_SCHOONER_BROUGHT_UP_TICK = 59360  # 58689 before 37h (58690 on Windows)
 GATE_5B_SCHOONER_LINES = 800  # 761 before 37h
 GATE_5B_SCHOONER_DIGEST = "968d3be83036854b"  # c8905673506f717e before 37h
 GATE_5B_THICK_LANDFALL_TICK = 54420
-GATE_5B_THICK_LINES = 488
-GATE_5B_THICK_DIGEST = "fb136bb8e86f0804"
+# Package 37k: every tick held; three lines more, "Her sails lifting" (45989, 49980, and
+# 54445, ten seconds before the cry of "Taken aback" at the land close aboard)
+GATE_5B_THICK_LINES = 491  # 488 before package 37k
+GATE_5B_THICK_DIGEST = "516d0323a5a8b5bd"  # fb136bb8e86f0804 before package 37k
 
 
 def the_landfall(log):
@@ -3937,6 +3945,12 @@ GATE_5C_CRUISE_SPOKEN_TICK = 94091  # within hail at 08:08 under no colours; the
 GATE_5C_CRUISE_CHASE_LOST_TICK = 98100  # the brig out of sight astern at 09:15, for the Start
 GATE_5C_CRUISE_NOON_TICKS = [21600, 108240]
 GATE_5C_CRUISE_WEARS_AT_LEAST = 8  # wore ship on the station, and once for the chase
+# Package 37k (2026-10-09): every tick and the true track held; two lines more, "Her sails
+# lifting" as the chase's course is steered after the brig is spoken (94136) and twenty-five
+# seconds before the book's late "Taken aback" at 14:09 on the 13th (115759, 115784)
+# (docs/dev/TuningNotes.md, package 37k).
+# (37h and 37k merged 2026-10-09: the figures above are 37h's; the two together are
+# re-measured at 37j's merge, the tuning notes saying both.)
 GATE_5C_CRUISE_LINES = 2041  # 2037 before package 37h
 GATE_5C_CRUISE_DIGEST = "301ca2e8aad8b405"  # bb8b2499fde6a0f4 before package 37h
 # the merchant passage's ticks at seed 7
@@ -4007,6 +4021,11 @@ GATE_5C_MERCHANT_FLOOD_TICK = (
 )
 GATE_5C_MERCHANT_GOULET_TICK = 112078  # the mouth of the Goulet (112112 on Windows)
 GATE_5C_MERCHANT_TIN_SOLD_TICK = 123948  # the boat alongside from the quay (123951 on Windows)
+# Package 37k (2026-10-09): every tick and the true track held; one line more, "Her sails
+# lifting, the wind 63° on the larboard bow" in the Goulet (112740), twenty-two seconds
+# before the book's 'trim to the course' trims her (docs/dev/TuningNotes.md, package 37k).
+# (37h and 37k merged 2026-10-09: the figures above are 37h's; the two together are
+# re-measured at 37j's merge, the tuning notes saying both.)
 GATE_5C_MERCHANT_LINES = 3011  # 2994 before package 37h
 GATE_5C_MERCHANT_DIGEST = "5d708ee83c7018ba"  # c52c14c725a5ed1f before package 37h
 

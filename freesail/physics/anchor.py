@@ -52,6 +52,7 @@ __all__ = [
     "CABLE_DAMPING_FRACTION",
     "CABLE_STRETCH_FRACTION",
     "DRAGGING_HOLD_FRACTION",
+    "DRAG_HOLDS_AGAIN_S",
     "DRAG_REPORT_MIN_M",
     "DRAG_REPORT_S",
     "DRAG_SAY_S",
@@ -108,6 +109,11 @@ DRAG_SETTLE_S = 300.0
 # since it last said (judgement: two fathoms, more than a snub moves it).
 DRAG_REPORT_S = 900.0
 DRAG_REPORT_MIN_M = 3.6576
+# The log's "holds again" (package 37k; the review's G8, 37f's own note): only when the
+# anchor has held this long, a quarter of an hour; an anchor that comes home again within
+# it is the same dragging, one urgent line however often it relapses. The physics' flag
+# (`Anchor.dragging`, what the reading says now) still falls after DRAG_SETTLE_S.
+DRAG_HOLDS_AGAIN_S = 900.0
 # The hemp cable's stretch at its breaking strain (Luce 1866, ch. IV: one seventh to one
 # fifth); the stiffness follows.
 CABLE_STRETCH_FRACTION = 0.15
