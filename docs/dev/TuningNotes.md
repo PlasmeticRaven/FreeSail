@@ -3175,3 +3175,8 @@ never anchors in the Bay nor sells the tin. So the one line is not to go into th
 yet. What would carry her: a course across the wind given with no steerage way kept for
 her (full and by on her tack) and judged again when she has way, so that the wear comes
 then; not built, for the lead to rule on.
+
+The suite on the second round: the fast tier 2985 passed and two failed, the merchant
+passage's pace floor (load) and the order dependence in `test_reckoning.py` found before
+this package; the slow tests of the two passages (`-k "schooner or merchant"`) 7 passed, 2
+expected failures, and the schooner's pilot test that fails on the merged tree (above).
