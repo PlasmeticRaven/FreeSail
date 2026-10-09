@@ -447,6 +447,9 @@ class EpitomePort:
     spring_rise_ft: float | None = None
     bearing: str | None = None  # Moore's table: the moon's bearing at high water
     note: str = ""
+    # package 37j: the rise is JUDGEMENT where the period's table gives none (the world's
+    # spring range rounded to the foot, as the directions' rates are)
+    rise_judgement: bool = False
 
     @property
     def establishment_h(self) -> float:
@@ -485,6 +488,7 @@ class Epitome:
                 None if p.get("spring_rise_ft") is None else float(p["spring_rise_ft"]),
                 str(p["bearing"]) if p.get("bearing") else None,
                 str(p.get("note", "")),
+                bool(p.get("rise_judgement", False)),
             )
             for p in t["ports"]
         ]

@@ -420,7 +420,7 @@ class Lookout:
             # a danger is notable; so is everything seen in the look that makes the
             # landfall, and a sail ("Sail ho!", package 35)
             notable = s.seen_as in ("danger", "sail") or first_land
-            data = self._data(s, heading) | {
+            data = self._line_data(s, heading) | {
                 "height_of_eye_m": round(self.height_of_eye_m, 1),
                 "landfall": bool(first_land),
             }
@@ -522,12 +522,32 @@ class Lookout:
     # -- other sail (spec M5 §25; package 36) -------------------------------------------
 
     @staticmethod
-    def _data(s: Sighting, heading_rad: float) -> dict[str, Any]:
-        """A sighting's data for a line or a reading: a sail's without the truth's
-        distance (the captain has her bearing and his estimate, never her position)."""
+    def _line_data(s: Sighting, heading_rad: float) -> dict[str, Any]:
+        """A sighting's data for the log's line: as the reading's, with a mark's true
+        distance and bearing kept for the record (the log is the author's and the
+        tests'; a sail's distance is not in it, as before)."""
         d = s.to_dict()
         if s.seen_as == "sail":
             d.pop("distance_m", None)
+        return d | {
+            "relative": relative_words(math.radians(s.bearing_deg) - heading_rad),
+            "estimate": estimate_words(s.judged_m),
+        }
+
+    @staticmethod
+    def _data(s: Sighting, heading_rad: float) -> dict[str, Any]:
+        """A sighting's data for a line or a reading: without the truth's distance (the
+        captain has his estimate, never the truth's metres), and a mark's bearing to the
+        point the lookout said it by (package 37j: the snapshot to the browser carried
+        the true distance and bearing of every landmark in sight, which with the chart's
+        own places is the true position; a sail's bearing stays as it was, she being no
+        mark)."""
+        d = s.to_dict()
+        d.pop("distance_m", None)
+        if s.seen_as != "sail":
+            d["bearing_deg"] = (
+                units.nearest_point_index(math.radians(s.bearing_deg)) * 11.25 % 360.0
+            )
         return d | {
             "relative": relative_words(math.radians(s.bearing_deg) - heading_rad),
             "estimate": estimate_words(s.judged_m),
@@ -1084,7 +1104,8 @@ class Lookout:
         return {
             "in_sight": True,
             "words": "in sight",
-            "nearest": nearest.to_dict() | {"words": self.words(nearest, heading_rad).rstrip(".")},
+            "nearest": self._data(nearest, heading_rad)
+            | {"words": self.words(nearest, heading_rad).rstrip(".")},
         }
 
 

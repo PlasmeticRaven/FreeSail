@@ -201,6 +201,9 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_readings.py::test_snapshot_reads_its_instruments_from_the_registry[frigate-36]",
         "test_readings.py::test_the_view_is_cached_per_tick_and_per_order",
         "test_reckoning.py::test_the_brig_hove_to_six_hours_of_a_spring_ebb_in_the_iroise_keeps_an_honest_account",
+        # package 37j: two scripted runs of a forenoon and of six boards
+        "test_reckoning.py::test_the_forenoon_of_16_june_sailed_again_keeps_an_honest_doubt_and_the_noon_is_weighed[True]",
+        "test_reckoning.py::test_each_board_is_laid_down_by_itself",
         "test_reckoning.py::test_the_captains_chart_carries_the_account_and_never_the_truth",
         "test_reckoning.py::test_the_hand_lead_and_the_deep_sea_lead_cast_with_their_words_and_the_ground",
         "test_reckoning.py::test_the_log_is_hove_hourly_in_the_frigate_and_two_hourly_in_the_schooner",

@@ -2016,3 +2016,36 @@ def test_what_undoes_what_is_a_table_of_the_vocabulary_and_the_books_rule_is_unc
     copy.write_text(text, encoding="utf-8", newline="\n")
     with pytest.raises(ValueError, match="irrevocable names 'cut and run', which is no verb"):
         load_vocabulary(copy)
+
+
+def test_a_condition_on_the_depth_reads_the_lead_and_the_chart_only_by_the_chart():
+    """Package 37j, item 7: a standing order's condition on the depth reads the last cast
+    of the lead, as the officer of the watch would ("at a sounding, if the depth of water
+    is under 13 fathoms"), and the chart's figure at the account only when the book says
+    `by the chart`; until then `the depth of water` was the chart at her true place, which
+    the books gated on as a sounding machine (the review's G4)."""
+    from freesail.standing.grammar import parse_condition
+
+    w = make_world(
+        7,
+        "data/ships/brig.yaml",
+        Scenario(
+            start_time=datetime(1805, 6, 12, 13, 0),
+            wind_from_deg=225.0,
+            wind_speed_kn=0.0,
+            gustiness=0.0,
+            variability=0.0,
+            position={"lat_deg": 50.12, "lon_deg": -5.03},
+            region="channel-west",
+        ),
+    )
+    lead = parse_condition("the depth of water is under 30 fathoms", w.ship)
+    chart = parse_condition("the depth of water by the chart is under 30 fathoms", w.ship)
+    by_name = parse_condition("the depth is under 30 fathoms", w.ship)
+    assert [c.reading for c in lead.clauses] == ["depth"] == [c.reading for c in by_name.clauses]
+    assert [c.reading for c in chart.clauses] == ["depth_of_water"]
+    assert chart.holds(w.readings, {}) is True
+    assert lead.holds(w.readings, {}) is False  # the lead not yet hove
+    w.submit("heave the lead")
+    w.run(300)
+    assert lead.holds(w.readings, {}) is True

@@ -390,7 +390,7 @@ _HOW = {
     "gust": ("the wind against its mean", "as a gust, at the mean or a lull: 'is a lull'"),
     "glass": ("the glass", "in inches: 'is under 29.5 inches'"),
     "sight": ("the land", "as in sight or not in sight"),
-    "depth": ("the depth of water", "in fathoms: 'is under 10 fathoms'"),
+    "depth": ("the depth by the lead, or by the chart", "in fathoms: 'is under 10 fathoms'"),
     "position": (
         "a position by account",
         "against a latitude or a longitude: 'is north of 49 30 N', 'is west of 6 W'",
@@ -465,6 +465,12 @@ class _Match:
     used: int
 
 
+def _by_the_chart(phrase: str) -> bool:
+    """Whether a depth's words name the chart's figure ("the depth of water by the chart",
+    "the charted depth") and not the lead's."""
+    return "chart" in phrase
+
+
 # The ship herself as a condition's subject (package 33c): "if she is hove to" is the
 # manoeuvre in hand compared.
 _SHE = {"she": "the manoeuvre in hand"}
@@ -504,6 +510,11 @@ def _match_reading(tokens: list[str], i: int, ship: Any, vocab: Vocabulary) -> _
         for form in forms:
             if tokens[i : i + len(form)] == form:
                 rows = R.REGISTRY.by_words(phrase)
+                if any(r.id == "depth_of_water" for r in rows) and not _by_the_chart(phrase):
+                    # package 37j: a condition on the depth reads the last cast of the
+                    # lead, as the officer of the watch would; the chart's figure at the
+                    # account only when the book says "by the chart"
+                    rows = [R.REGISTRY.get("depth")]
                 return _Match(phrase, rows, (), len(form))
     # a sail or a part of this ship by name: "the fore royal", "the royals", "the fore
     # royal yard", "the starboard fore topmast studdingsail"

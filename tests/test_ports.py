@@ -250,7 +250,11 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     assert closed.ports.stance(closed.ports.ports["falmouth"]) == "closed"
     # the reading at sea: the nearest port and its stance, no pilot within reach
     said = frigate.readings.words("port")
-    assert said.startswith("no port within the pilot's cruising ground; the nearest is Falmouth")
+    # package 37j: by the captain's means, the account and its doubt
+    assert said.startswith(
+        "no port within the pilot's cruising ground by account; the nearest is Falmouth, "
+    )
+    assert " by account, " in said and said.endswith(", the account good to a mile")
     assert frigate.readings["port"]["stance"] == "open"
     e = frigate.submit("the pilot")
     assert e.kind == "query.reading" and "no pilot aboard" in e.text

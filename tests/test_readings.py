@@ -653,3 +653,118 @@ def test_the_reckonings_reading_carries_the_tide_allowed_and_the_doubt_as_it_sta
         "work up the reckoning"
     )
     assert given.kind == "standing.given", given.text
+
+
+# ---------------------------------------------------------------------------
+# Package 37j: `the port` and `the depth of water` by the captain's means
+# ---------------------------------------------------------------------------
+
+
+def _at_rest_on_the_chart(lat: float, lon: float):
+    """A ship at rest in a calm on the chart, at a quiet hour; the world's tide made
+    nothing, so that the two ships of the proof below feel the same water."""
+    from datetime import datetime
+
+    w = make_world(
+        7,
+        ROOT / "data/ships/brig.yaml",
+        Scenario(
+            start_time=datetime(1805, 6, 12, 13, 0),
+            wind_from_deg=225.0,
+            wind_speed_kn=0.0,
+            gustiness=0.0,
+            variability=0.0,
+            ship_heading_deg=0.0,
+            position={"lat_deg": lat, "lon_deg": lon},
+            region="channel-west",
+        ),
+    )
+    w.tide, w.tide_state = None, None
+    w.ship.extra.pop("water", None)
+    return w
+
+
+# The lookout's own rows: what the eye sees of the land and the compass's bearing of a
+# mark in sight, which are observations the man on deck makes, by estimate and by compass
+# (spec M5 §12); they differ with where she truly is, as they should, and give no figure
+# of her position but through the master's working of them (`take a bearing`, `take a fix`).
+THE_EYES_ROWS = frozenset({"in_sight", "land", "nearest_land", "bearing_of", "sail", "strangers"})
+# And the sky over her: the moon's altitude and azimuth in the data behind `the moon`
+# (whose words are the same), which is the sky seen from where she is, as a sight is.
+THE_SKYS_ROWS = frozenset({"moon"})
+
+
+def test_no_reading_gives_the_true_position_by_any_road():
+    """Item 7, the proof (the review's G4; as 37e's proved it of the master's tide): two
+    ships of one seed whose true places are four miles apart and whose accounts are one
+    say every reading alike, but the lookout's own. In open water they say all alike; in
+    sight of the Manacles all but what the eye and the compass make of the land. Before
+    package 37j `the depth of water` (the chart at the truth) and `the port` (the true
+    bearing and distance of its road, to a tenth of a mile) differed in both."""
+    from freesail.world.geo import Position
+
+    params = {"mark": "the Lizard", "person": "the master"}
+    for pa, pb, same, eyes in (
+        ((49.0, -6.5), (49.05, -6.42), (49.02, -6.47), frozenset()),
+        ((50.05, -5.0), (50.08, -4.95), (50.06, -4.98), THE_EYES_ROWS),
+    ):
+        a, b = _at_rest_on_the_chart(*pa), _at_rest_on_the_chart(*pb)
+        for w in (a, b):
+            w.navigation.reckoning.set_position(Position(*same), 0, sigma_nm=1.0)
+        for w in (a, b):
+            w.run(600)
+        assert a.navigation.account_now() == b.navigation.account_now()
+        differ = []
+        for row in R.REGISTRY:
+            if row.is_absent or row.parametric in ("sail", "part"):
+                continue
+            param = params.get(row.parametric) if row.parametric else None
+            if a.readings.words(row.id, param) != b.readings.words(row.id, param):
+                differ.append(row.id)
+            if row.id not in eyes | THE_SKYS_ROWS and row.parametric is None:
+                va, vb = a.readings[row.id], b.readings[row.id]
+                assert repr(va) == repr(vb), row.id
+        assert set(differ) <= eyes, differ
+        assert a.readings["depth_of_water"] is not None and a.readings["port"] is not None
+
+
+def test_the_depth_of_water_is_the_charts_at_the_account_and_the_port_is_by_account():
+    """Item 7: `the depth of water` is the chart's depth at the position by account,
+    said as the chart's and never as a cast, with what the chart shows within the
+    account's doubt when that is a fathom or more; `the port` gives the bearing and
+    distance of the port's road by account, with the account's doubt, as `shape a course
+    for` does."""
+    from freesail.world.chart import fathoms_words
+    from freesail.world.geo import Position, bearing_and_distance, destination
+
+    w = _at_rest_on_the_chart(50.05, -5.0)
+    nav = w.navigation
+    off = destination(w.position, 90.0, 3.0 * units.NAUTICAL_MILE)
+    nav.reckoning.set_position(Position(off.lat_deg, off.lon_deg), 0, sigma_nm=0.5)
+    here = nav.account_now()
+    depth = w.readings["depth_of_water"]
+    assert depth == pytest.approx(w.chart.depth_at(here))
+    assert depth != pytest.approx(w.chart.depth_at(w.position))
+    said = w.readings.words("depth_of_water")
+    assert said.startswith(
+        f"{fathoms_words(depth)} at low water by the chart, at the position by account"
+    )
+    assert "cast" not in said and "lead" not in said
+    port = w.readings["port"]
+    road = w.ports.ports["falmouth"].nearest_spot(here)
+    assert port["by"] == "account"
+    assert port["distance_nm"] == pytest.approx(road[1], abs=0.01)
+    bearing = bearing_and_distance(here, road[0].position)[0]
+    assert f"bearing {units.point_name(math.radians(bearing))} by account, " in port["words"]
+    assert ", the account good to " in port["words"]
+    # the snapshot to the browser carries no landmark's true distance, and a mark's
+    # bearing only to the point the lookout said it by
+    snap = queries.snapshot(w)
+    for item in snap["lookout"]["items"]:
+        assert "distance_m" not in item
+        if item["seen_as"] != "sail":
+            assert (item["bearing_deg"] / 11.25) == pytest.approx(
+                round(item["bearing_deg"] / 11.25)
+            )
+    nearest = w.readings["land"]["nearest"]
+    assert nearest is None or "distance_m" not in nearest

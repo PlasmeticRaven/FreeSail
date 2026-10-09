@@ -366,3 +366,22 @@ def test_the_directions_are_looked_up_by_a_position_and_say_nothing_beyond_their
     for beyond in (Position(47.5, -6.0), Position(49.5, -7.5), Position(51.2, -5.0)):
         assert book.area_at(beyond) is None
     assert T.load_directions() is book  # read once a process, as the tide's tables are
+
+
+def test_every_place_of_both_epitomes_has_a_rise_and_what_is_judgement_says_so(tide):
+    """Package 37j, item 3: the master reduces a cast by his own tide, which wants the
+    rise at springs of the nearest place in his table; package 34 gave it only where a
+    period figure was in hand and took a flat three metres elsewhere (Moore's table has
+    none, so a merchant took three metres off every cast whatever the tide). Every place
+    of both tables now has a rise; where the period's table gives none it is marked
+    judgement, and is the world's spring range there rounded to the foot."""
+    for table in ("norie", "moore"):
+        for port in T.Epitome.load(table).ports:
+            assert port.spring_rise_ft is not None, (table, port.name)
+            if port.rise_judgement:
+                _level, consts = tide.constants_at(port.position)
+                spring_range_ft = units.m_to_feet(2.0 * (consts["M2"][0] + consts["S2"][0]))
+                assert abs(port.spring_rise_ft - spring_range_ft) <= 0.6, (table, port.name)
+    # the period's own figures are kept where they were: Fowey's of 1774 for Falmouth
+    falmouth = T.Epitome.load("norie").by_name("Falmouth")
+    assert falmouth.spring_rise_ft == 15.0 and not falmouth.rise_judgement

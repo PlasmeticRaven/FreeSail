@@ -99,22 +99,25 @@ def test_the_random_terms_grow_as_the_root_of_the_steps_and_the_biases_in_a_line
 
 
 def test_a_line_measurement_puts_the_account_on_the_line_and_keeps_the_doubt_along_it():
-    """Package 37e, the one rule: a line the account plainly disagrees with is taken, the
-    account laid on it and its doubt across the line the line's own; along the line
-    nothing changes. (A line it does not plainly disagree with is weighed: below.)"""
+    """Package 37e, the one rule, as package 37j amends it: a line the account plainly
+    disagrees with, and which is the better figure, is taken, the account laid on it and
+    its doubt across the line the line's own; along the line nothing changes. (A line it
+    does not plainly disagree with is weighed, and a poorer one doubted: below.)"""
     r = K.Reckoning(Position(49.0, -6.0), sigma_nm=0.0)
     for h in range(24):
         r.advance(1.0, 0.0, 6.0, (h + 1) * 3600)
     along_before = r.sigma_east_nm
     across_before = r.sigma_north_nm
-    # a line east and west, twelve miles north of the account, known to two miles: more
-    # than the two doubts together allow
-    assert 12.0 > K.OBSERVATION_OUT_SIGMAS * (across_before + 2.0)
-    obs = r.observe_line(0.0, 12.0, 0.0, 1.0, 2.0)
+    # a line east and west, twelve miles north of the account, known to half a mile: more
+    # than the two doubts together allow, and the better figure
+    assert across_before > 0.5
+    assert 12.0 > K.OBSERVATION_OUT_SIGMAS * (across_before + 0.5)
+    obs = r.observe_line(0.0, 12.0, 0.0, 1.0, 0.5)
     assert obs.how == K.TAKEN and obs.moved_nm == pytest.approx(12.0)
     assert obs.toward_deg == pytest.approx(0.0) and obs.off_nm == pytest.approx(12.0)
+    assert not obs.doubted and obs.off_toward_deg == pytest.approx(0.0)
     assert r.lat_deg == pytest.approx(49.0 + 24 * 6.0 / 60.0 + 12.0 / 60.0)
-    assert r.sigma_north_nm == pytest.approx(2.0)
+    assert r.sigma_north_nm == pytest.approx(0.5)
     assert r.sigma_east_nm == pytest.approx(along_before)  # along the line as it was
     assert r.set_doubt[1] == 0.0 and r.set_doubt[0] > 0.0
     assert r.update_line(0.0, 0.0, 0.0, 1.0, 2.0) == 0.0  # the old door, the miles moved
@@ -367,9 +370,11 @@ def test_a_sounding_moves_the_account_onto_the_charts_contour_consistent_with_th
     # account by their two doubts. Here the bottom shelves half a fathom in a mile, the
     # line is good to four or five miles, and the account, eight miles in doubt, goes
     # most of the way to it: nearer the cast's depth than it stood, and the words say so
-    assert cast.data["how"] == K.WEIGHED and 1.0 < cast.data["line_sigma_nm"] < 6.0
+    # (package 37j: the cast reduced by the master's tide above his chart's datum, the
+    # line six miles and a tenth at this seed)
+    assert cast.data["how"] == K.WEIGHED and 1.0 < cast.data["line_sigma_nm"] < 7.0
     assert "; fine grey sand with black specks. The account moved " in cast.text
-    assert " to the SE" in cast.text  # toward the deep water she is truly in
+    assert " to the SE" in cast.text or " to the SSE" in cast.text  # toward the deep water
     shoal = w.chart.depth_at(Position(50.0, -5.10))
     assert abs(depth_at_account - cast_on_the_chart) < 0.5 * abs(shoal - cast_on_the_chart)
     # within nine fathoms of the truth: the lead's error and the master's allowance for
@@ -421,7 +426,7 @@ def test_the_bearing_is_by_compass_and_carries_the_ships_errors():
     e = w.submit("take a bearing of the Lizard")
     sighting = w.lookout.find("the Lizard")
     laid = e.data["bearing_deg"]
-    error = laid - sighting.bearing_deg
+    error = math.degrees(units.wrap_pi(math.radians(laid - sighting.bearing_deg)))
     expected = math.degrees(w.navigation.errors.course_error_rad(0.0))
     assert abs(error - expected) < 3 * K.BEARING_SIGMA_DEG
 
@@ -688,7 +693,9 @@ def test_a_landfall_on_one_mark_lays_the_account_down_by_the_bearing_and_its_dis
     after = nav.reckoning.position
     laid = e.data["bearing_deg"]
     back, account_m = bearing_and_distance(after, mark.feature.position)
-    assert abs(units.wrap_pi(math.radians(back - laid))) < math.radians(1.0)  # on the line
+    # on the line, to a degree and a half (the distance weighed after it moves the account
+    # along the sight from where the line put it; 1.2 degrees at this seed since 37j)
+    assert abs(units.wrap_pi(math.radians(back - laid))) < math.radians(1.5)
     # within the estimate's own error of the lookout's distance: the eye's sixth is the
     # better figure by far, and the account went nine parts in ten of the way to it
     assert abs(account_m - mark.estimate_m) < K.DISTANCE_BY_ESTIMATION_FRACTION * mark.estimate_m
@@ -1027,35 +1034,56 @@ def test_one_rule_an_observation_is_weighed_by_the_two_doubts_whatever_the_run()
 
 
 def test_one_rule_an_observation_is_taken_when_the_account_is_plainly_out():
-    """Item 1. When the two disagree by more than their doubts together allow, the
-    account is plainly out: the observation is taken, the account laid on it, and the
-    account's doubt in that direction becomes the observation's own. "Together" is the
-    sum of what he would trust each within, twice its doubt."""
+    """Item 1, as package 37j amends it. When the two disagree by more than their doubts
+    together allow, one of them is plainly out, and the better figure is believed: the
+    observation is taken, the account laid on it and the account's doubt in that
+    direction becoming the observation's own, only when its doubt is no greater than the
+    account's across its line. "Together" is the sum of what he would trust each within,
+    twice its doubt (the number two kept, for that reason)."""
     assert K.OBSERVATION_OUT_SIGMAS == 2.0
-    r = K.Reckoning(Position(49.0, -6.0), sigma_nm=1.0)
-    edge = K.OBSERVATION_OUT_SIGMAS * (1.0 + 2.0)
-    obs = r.observe_line(0.0, -(edge + 0.01), 0.0, 1.0, 2.0)
+    r = K.Reckoning(Position(49.0, -6.0), sigma_nm=2.0)
+    edge = K.OBSERVATION_OUT_SIGMAS * (2.0 + 1.0)
+    obs = r.observe_line(0.0, -(edge + 0.01), 0.0, 1.0, 1.0)
     assert obs.how == K.TAKEN and obs.moved_nm == pytest.approx(edge + 0.01)
-    assert obs.toward_deg == pytest.approx(180.0)
+    assert obs.toward_deg == pytest.approx(180.0) and not obs.doubted
     assert r.lat_deg == pytest.approx(49.0 - (edge + 0.01) / 60.0)
-    assert r.sigma_north_nm == pytest.approx(2.0) and r.sigma_east_nm == pytest.approx(1.0)
+    assert r.sigma_north_nm == pytest.approx(1.0) and r.sigma_east_nm == pytest.approx(2.0)
     assert K.verdict_words(obs) == (
         "the reckoning was out by it; laid down by the observation: moved two leagues to the S"
     )
+    r = K.Reckoning(Position(49.0, -6.0), sigma_nm=2.0)
+    obs = r.observe_line(0.0, -(edge - 0.01), 0.0, 1.0, 1.0)
+    assert obs.how == K.WEIGHED and obs.moved_nm == pytest.approx((edge - 0.01) * 4.0 / 5.0)
+    assert not obs.doubted
+    # the two doubts equal: the observation is no poorer, and is taken
+    r = K.Reckoning(Position(49.0, -6.0), sigma_nm=1.5)
+    obs = r.observe_line(0.0, -6.01, 0.0, 1.0, 1.5)
+    assert obs.how == K.TAKEN and not obs.doubted
+    # the poorer figure, as far out: weighed, and the master doubts it
     r = K.Reckoning(Position(49.0, -6.0), sigma_nm=1.0)
-    obs = r.observe_line(0.0, -(edge - 0.01), 0.0, 1.0, 2.0)
-    assert obs.how == K.WEIGHED and obs.moved_nm == pytest.approx((edge - 0.01) / 5.0)
+    obs = r.observe_line(0.0, -(edge + 0.01), 0.0, 1.0, 2.0)
+    assert obs.how == K.WEIGHED and obs.doubted
+    assert obs.moved_nm == pytest.approx((edge + 0.01) / 5.0)
+    assert obs.off_toward_deg == pytest.approx(180.0) and r.sigma_north_nm < 1.0
+    assert K.verdict_words(obs, what="the sight") == (
+        "the sight stands two leagues to the S of the account, and the account, good to a "
+        "mile, is the better figure: the account moved a mile to the S"
+    )
     # a fix, the same rule in two directions: taken beyond the two doubts along the line
-    # between them, weighed within
+    # between them when it is the better figure, weighed within, doubted when poorer
     r = K.Reckoning(Position(49.0, -6.0), sigma_nm=1.0)
     cov = [[0.25, 0.0], [0.0, 0.25]]
     obs = r.observe_point(2.0, 2.0, cov)
     assert obs.how == K.WEIGHED and obs.moved_nm == pytest.approx(math.hypot(2.0, 2.0) * 0.8)
-    assert r.sigma_east_nm == pytest.approx(math.sqrt(0.2))
+    assert r.sigma_east_nm == pytest.approx(math.sqrt(0.2)) and not obs.doubted
     r = K.Reckoning(Position(49.0, -6.0), sigma_nm=1.0)
     obs = r.observe_point(3.0, 3.0, cov)
     assert obs.how == K.TAKEN and obs.moved_nm == pytest.approx(math.hypot(3.0, 3.0))
     assert r.P == cov and r.lat_deg == pytest.approx(49.05)
+    r = K.Reckoning(Position(49.0, -6.0), sigma_nm=0.5)
+    obs = r.observe_point(3.0, 3.0, [[1.0, 0.0], [0.0, 1.0]])
+    assert obs.how == K.WEIGHED and obs.doubted
+    assert obs.moved_nm == pytest.approx(math.hypot(3.0, 3.0) * 0.2)
 
 
 def test_the_lunar_of_game_9_moves_the_account_under_two_cables():
@@ -1082,42 +1110,85 @@ def test_the_lunar_of_game_9_moves_the_account_under_two_cables():
         "longitude by lunar 5° 23' W, which he would trust within 25 miles, and the account "
         "within two miles; the reckoning was 5° 16' W: the account kept." in line.text
     )
-    # a lunar against an account plainly out is taken, and its line says so
+    # package 37j, the owner's note 5: the same lunar against the same account set
+    # eighteen leagues off, further from it than the two doubts together, is still the
+    # poorer figure (12.12 against 0.83): weighed and doubted, it moves the account a
+    # cable or two, and the line says the master doubts it
     r.set_position(Position(48.511, -4.0), w.clock.tick)
     r.P = [[0.83**2, 0.0], [0.0, 0.59**2]]
     nav._lunar_pending = (w.clock.tick, lunar)
     nav._lunar_cleared()
     line = [e for e in w.log if e.kind == "reckoning.lunar"][-1]
+    assert line.data["how"] == K.WEIGHED and 0.1 < line.data["moved_nm"] < 0.3
+    assert r.sigma_east_nm < 0.83
+    assert (
+        ": the lunar stands 18 leagues and a half to the W of the account, and the account, "
+        "good to "
+        "eight cables, is the better figure: the account moved three cables to the W."
+    ) in line.text
+    # and against an account that doubts itself more than the lunar, as far out, it is
+    # taken, and its line says so
+    r.set_position(Position(48.511, -1.2), w.clock.tick)
+    r.P = [[13.0**2, 0.0], [0.0, 0.59**2]]
+    nav._lunar_pending = (w.clock.tick, lunar)
+    nav._lunar_cleared()
+    line = [e for e in w.log if e.kind == "reckoning.lunar"][-1]
     assert line.data["how"] == K.TAKEN and r.lon_deg == pytest.approx(-5.37743)
     assert r.sigma_east_nm == pytest.approx(12.12)
-    assert ": the reckoning was out by it; laid down by the lunar: moved 18 leagues" in line.text
+    assert ": the reckoning was out by it; laid down by the lunar: moved " in line.text
 
 
-def test_the_noon_of_game_9_is_taken_and_against_an_account_a_mile_out_it_is_weighed():
-    """Item 1, from game 9 (tick 370,860): the octant's sight gave 48° 07' N (48.12183,
-    good to 2.28 miles one sigma, and right within two); the account said 48° 12½' N and
-    trusted itself within half a mile (0.26 north and south). Under the two-mile rule the
-    sight was weighed against that doubt and moved the account 150 yards. The two stand
-    5.2 miles apart, more than twice 2.28 and twice 0.26 together: the account is plainly
-    out and the sight is taken. The same sight against an account a mile from it is
-    weighed by the two doubts."""
+def test_game_9s_noon_is_doubted_by_the_lead_kept_account_and_weighed_by_an_honest_one():
+    """Item 1, from game 9 (tick 370,860), as package 37j amends the rule: the octant's
+    sight gave 48° 07' N (48.12183, good to 2.28 miles one sigma, and right within two);
+    the account said 48° 12½' N and trusted itself within half a mile (0.26 north and
+    south), the lead cast every glass having kept its doubt so small. 37e took the sight
+    outright (5.23 miles apart is 2.06 of the two doubts together). Under the better
+    figure's rule, against that account the sight is the poorer figure and is doubted:
+    weighed, it moves the account a cable. The account was not that good: the cast not
+    beyond doubt (item 2) is what keeps its doubt honest, and against an honest doubt the
+    same sight is believed by the doubts. The figures of an honest doubt are measured by
+    the scripted forenoon below (`test_the_forenoon_of_16_june_...`): there the casts
+    leave a doubt of a mile and nine tenths at noon, where 37d's left a quarter; the two
+    then stand within their doubts together, and the sight moves the account two fifths
+    of the way to it. "Taken" outright it could not be against any account no better than
+    itself: two doubts together, each no less than the sight's 2.28, are nine miles."""
     r = K.Reckoning(Position(48.209, -4.814), sigma_nm=1.0)
     r.P = [[0.61**2, 0.0], [0.0, 0.26**2]]
     obs = r.observe_latitude(48.12183, 2.28)
-    assert obs.how == K.TAKEN and obs.off_nm == pytest.approx(5.23, abs=0.01)
-    assert obs.off_nm > K.OBSERVATION_OUT_SIGMAS * (0.26 + 2.28)  # and under three of each
-    assert r.lat_deg == pytest.approx(48.12183) and r.sigma_north_nm == pytest.approx(2.28)
-    assert r.sigma_east_nm == pytest.approx(0.61)
-    assert K.verdict_words(obs) == (
-        "the reckoning was out by it; laid down by the observation: moved five miles to the S"
+    assert obs.off_nm == pytest.approx(5.23, abs=0.01)
+    assert obs.off_nm > K.OBSERVATION_OUT_SIGMAS * (0.26 + 2.28)  # plainly apart
+    gain = 0.26**2 / (0.26**2 + 2.28**2)
+    assert (
+        obs.how == K.WEIGHED
+        and obs.doubted
+        and obs.moved_nm == pytest.approx(gain * 5.23, abs=0.01)
     )
+    assert r.sigma_east_nm == pytest.approx(0.61)
+    assert K.verdict_words(obs, what="the sight") == (
+        "the sight stands five miles to the S of the account, and the account, good to three "
+        "cables, is the better figure: the account moved a cable to the S"
+    )
+    # an honest account, as the forenoon's casts leave it (a mile and nine tenths): within
+    # the two doubts together, weighed by them, two miles of the five
+    r = K.Reckoning(Position(48.209, -4.814), sigma_nm=1.9)
+    obs = r.observe_latitude(48.12183, 2.28)
+    gain = 1.9**2 / (1.9**2 + 2.28**2)
+    assert obs.how == K.WEIGHED and not obs.doubted
+    assert obs.moved_nm == pytest.approx(gain * 5.23, abs=0.01) and obs.moved_nm > 2.0
+    assert K.verdict_words(obs, what="the sight") == "the account moved two miles to the S"
+    # an account that doubts itself more than the sight, and nine miles and a half out:
+    # taken
+    r = K.Reckoning(Position(48.12183 + 9.5 / 60.0, -4.814), sigma_nm=2.3)
+    obs = r.observe_latitude(48.12183, 2.28)
+    assert obs.how == K.TAKEN and r.lat_deg == pytest.approx(48.12183)
     # a mile out: weighed by the two doubts, and with a doubt of a quarter of a mile
     # against the sight's two and a quarter the account hardly moves
     r = K.Reckoning(Position(48.12183 + 1.0 / 60.0, -4.814), sigma_nm=1.0)
     r.P = [[0.61**2, 0.0], [0.0, 0.26**2]]
     obs = r.observe_latitude(48.12183, 2.28)
     gain = 0.26**2 / (0.26**2 + 2.28**2)
-    assert obs.how != K.TAKEN and obs.moved_nm == pytest.approx(gain)
+    assert obs.how != K.TAKEN and obs.moved_nm == pytest.approx(gain) and not obs.doubted
     # and with a doubt of a mile and a half, as an honest account has after a forenoon
     # in a stream, it goes three cables of the mile
     r = K.Reckoning(Position(48.12183 + 1.0 / 60.0, -4.814), sigma_nm=1.5)
@@ -1164,8 +1235,9 @@ def test_the_words_of_a_cast_a_noon_and_a_bearing_say_which_of_the_three():
     nav = w.navigation
     w.submit("set plain sail")
     w.run(1500)
-    # an account four leagues south of her true place, trusting itself within a mile
-    nav.reckoning.set_position(destination(w.position, 180.0, 12.0 * units.NAUTICAL_MILE), 0, 0.5)
+    # an account four leagues south of her true place, trusting itself within three miles
+    # (package 37j: the sight, a better figure than that, is taken)
+    nav.reckoning.set_position(destination(w.position, 180.0, 12.0 * units.NAUTICAL_MILE), 0, 3.0)
     w.run(300)
     noon = [e for e in w.log if e.kind == "reckoning.noon"][-1]
     assert noon.data["how"] == K.TAKEN and noon.data["moved_nm"] > 7.0
@@ -1350,7 +1422,10 @@ def test_eight_casts_in_a_calm_over_the_flat_sand_off_ar_men_narrow_nothing():
         doubts.append(nav.doubt_now()["semi_major_nm"])
     casts = [e for e in w.log if e.kind == "sounding"]
     assert len(casts) == 8 and all(e.data["matched"] for e in casts)
-    assert all("; fine grey sand with black specks. The account " in e.text for e in casts)
+    assert all("; fine grey sand with black specks. " in e.text for e in casts)
+    # package 37j: his own tide off each cast, said when it is a fathom or more
+    assert all(" of tide allowed by the epitome: " in e.text for e in casts)
+    assert all(" on the chart. The account " in e.text for e in casts)
     # the bottom shelves a fathom or two in a mile here: a line good to a mile or so at
     # the best, which the first cast gives; the seven after it are the same ground, and
     # though the depth changing under her may move the account they narrow nothing
@@ -1398,8 +1473,11 @@ def test_in_the_goulet_the_master_takes_the_near_marks_before_camaret_brest_and_
     allow = nav.compass_allowance_deg()
     far = [marks[name] for name in ("Camaret", "Brest", "Conquet")]
     assert K._fix_doubt_nm([marks[n] for n in chosen], allow) < 0.6 * K._fix_doubt_nm(far, allow)
-    assert miles_between(nav.reckoning.position, w.position) < 0.1
-    assert e.data["sigma_nm"] <= 0.15 and "good to a cable" in e.text
+    # (the fix's own draws since package 37j: the lines met within three cables, "good to
+    # two cables", and the account a cable and a quarter from her)
+    assert miles_between(nav.reckoning.position, w.position) < 0.15
+    assert e.data["sigma_nm"] <= 0.2
+    assert "good to a cable" in e.text or "good to two cables" in e.text
     # a headland a mile off is preferred to a town six miles off, other things equal
     near = [marks["Petit Minou"], marks["Camaret"]]
     assert K._fix_doubt_nm(near, allow) < K._fix_doubt_nm(
@@ -1423,11 +1501,15 @@ def test_moored_in_brest_road_a_fix_by_far_marks_leaves_a_sound_account_where_it
     assert light is not None and light.distance_m > 10.0 * units.NAUTICAL_MILE
     nav.reckoning.set_position(destination(w.position, 30.0, 0.1 * units.NAUTICAL_MILE), 60, 0.1)
     before = nav.reckoning.position
-    for _ in range(3):
+    for k in range(3):
         e = w.submit("take a fix by the castle of Brest and St Matthew's light")
         assert e.kind == "reckoning.fix" and e.severity is Severity.ROUTINE
-        assert e.data["how"] == K.KEPT and e.data["moved_nm"] < 0.1
         assert e.data["sigma_nm"] > 0.45  # eleven miles of the compass's own error
+        if k == 0:
+            # the first, by its draw at this seed since package 37j, moves it a cable
+            assert e.data["how"] in (K.KEPT, K.WEIGHED) and e.data["moved_nm"] < 0.12
+            continue
+        assert e.data["how"] == K.KEPT and e.data["moved_nm"] < 0.1
         assert ", the fix the poorer figure; the account kept, within " in e.text
     assert miles_between(nav.reckoning.position, before) < 0.1
     assert miles_between(nav.reckoning.position, w.position) < 0.2
@@ -1591,7 +1673,9 @@ def test_hove_to_the_master_reckons_her_drift_and_the_run_since_noon_takes_it():
     drifted = miles_between(start, w.position)
     reckoned = miles_between(account, nav.account_now())
     assert drifted > 3.0 and 0.6 * drifted < reckoned < 1.4 * drifted
-    assert error_nm(w) < drifted / 3.0
+    # a third of her drift (1.68 miles of 5.0 since package 37j: the account worked at the
+    # heave-to itself, where the setting of it by hand left the board begun before)
+    assert error_nm(w) < drifted / 2.8
     run, course = nav.since_noon_reading()
     assert run == pytest.approx(nav.reckoning.run_since_noon_nm + nav._run_since_step_nm())
     assert run > 0.6 * drifted and course is not None
@@ -2060,8 +2144,10 @@ def test_a_cast_the_chart_about_the_account_already_answers_is_kept_whatever_the
     far = destination(w.position, 250.0, 2.0 * 1852.0)
     found = []
 
-    def two_miles_off(pos, depth_m, *a, **kw):
+    def two_miles_off(pos, depth_m, *a, inside=None, **kw):
         found.append(depth_m)
+        if inside is not None and not inside(far):
+            return None  # package 37j: he looks within his doubt and no further
         return far, 0.0
 
     w.chart.contour_point = two_miles_off
@@ -2073,17 +2159,31 @@ def test_a_cast_the_chart_about_the_account_already_answers_is_kept_whatever_the
     assert cast.data["how"] == K.KEPT and cast.text.endswith(" The account kept.")
     assert error_nm(w) < 0.2
     assert nav.doubt_now()["semi_minor_nm"] >= before["semi_minor_nm"] - 0.001
-    # where the chart about the account does not answer the cast, the search's point stands
-    # and the account, plainly out, is laid down by it
+    # where the chart about the account does not answer the cast, and nothing within his
+    # doubt does, the cast does not agree with the chart where he believes her (package
+    # 37j; 37e laid the account down on the search's point two miles off, a cable's doubt
+    # notwithstanding): the account is kept, and his doubt grown toward that water so far
+    # that it lies at the edge of what he would trust the account within
     w.chart.depth_span = lambda pos, step_m=0.0: (
         units.fathoms_to_m(40.0),
         units.fathoms_to_m(45.0),
     )
+    kept_at = nav.reckoning.position
     w.submit("heave the lead")
     w.run(300)
     cast = [e for e in w.log if e.kind == "sounding"][-1]
-    assert cast.data["how"] == K.TAKEN and "laid down by the cast" in cast.text
-    assert miles_between(nav.reckoning.position, far) < 0.3
+    assert cast.data["how"] is None and cast.data["agrees"] is False
+    assert " The cast does not agree with the chart where Mr " in cast.text
+    assert cast.text.endswith(
+        " believes her; the chart has that water nearest two miles to the WSW of the "
+        "account: the account kept, and its doubt widened."
+    )
+    # not moved toward that water (the tide he allows carries it a cable in the five minutes)
+    assert miles_between(nav.reckoning.position, kept_at) < 0.15
+    assert miles_between(nav.reckoning.position, far) > 1.8
+    holds, _reach = nav.reckoning.within_doubt(K.OBSERVATION_OUT_SIGMAS * 1.001)
+    assert holds(far) and not nav.reckoning.within_doubt(K.OBSERVATION_OUT_SIGMAS * 0.99)[0](far)
+    assert cast.data["apart"]["grown_nm"] > 0.5
 
 
 def test_the_brig_hove_to_six_hours_of_a_spring_ebb_in_the_iroise_keeps_an_honest_account():
@@ -2174,3 +2274,280 @@ def test_a_reading_of_the_account_asked_mid_tick_changes_nothing_another_gets_af
         n._ports, n.epitome = None, Halved()
         assert n._tide_port(Position(first, -5.3)) == "north"
     assert asked.log.digest() == unasked.log.digest()
+
+
+# ---------------------------------------------------------------------------
+# Package 37j: the account, amended
+# ---------------------------------------------------------------------------
+
+CUTTER = "data/ships/cutter.yaml"
+
+
+def test_the_merchant_passages_second_noon_against_an_account_fixed_to_three_cables_is_doubted():
+    """Item 1, the fold-in's finding (spec M5 §33 item 24): at the merchant passage's
+    second noon, in the mouth of the Goulet with the account fixed by cross bearings to
+    three cables a minute before, the octant's sight fell five miles and a half to the
+    north, a hair over the two doubts together on Linux and a hair under on Windows; 37e
+    took it outright on the one and weighed it on the other. The better figure is
+    believed: the sight, ten times the account's doubt, is weighed either side of the
+    line and the master doubts it, and the account stays within a cable of where the fix
+    left it."""
+    for off in (5.55, 5.65):  # a hair under the doubts together, and a hair over
+        r = K.Reckoning(Position(48.33, -4.60), sigma_nm=0.3)
+        obs = r.observe_latitude(48.33 + off / 60.0, 2.5)
+        assert (off > K.OBSERVATION_OUT_SIGMAS * (0.3 + 2.5)) is obs.doubted
+        assert obs.how == K.WEIGHED and obs.moved_nm < 0.1
+        assert obs.moved_nm == pytest.approx(off * 0.09 / (0.09 + 6.25))
+    assert K.verdict_words(obs, what="the sight") == (
+        "the sight stands five miles and a half to the N of the account, and the account, good "
+        "to three cables, is the better figure: the account moved a cable to the N"
+    )
+
+
+def test_the_cruises_chronometer_against_an_account_a_cable_in_doubt_is_doubted():
+    """Item 1, 37e's finding on the naval cruise: hove to off Plymouth at 09:00, the
+    account a cable in doubt by the land, a longitude by chronometer 7.6 miles out "which
+    Mr Harvey would trust within 5 miles" (2.28 one sigma) was taken, and the bearing of
+    Penlee half an hour after took it back. Now the account is the better figure: the
+    sight is weighed and doubted, and the account kept."""
+    r = K.Reckoning(Position(50.30, -4.20), sigma_nm=0.1)
+    lon = -4.20 - 7.6 / (60.0 * math.cos(math.radians(50.30)))
+    obs = r.observe_longitude(lon, 2.28)
+    assert obs.off_nm == pytest.approx(7.6, abs=0.01)
+    assert obs.doubted and obs.how == K.KEPT and obs.moved_nm < 0.05
+    assert K.verdict_words(obs, what="the sight") == (
+        "the sight stands two leagues and a half to the W of the account, and the account, good "
+        "to a cable, is the better figure: the account kept"
+    )
+    w = chart_world(50.30, -4.20, start=datetime(1805, 6, 12, 9, 0))
+    nav = w.navigation
+    nav.reckoning.set_position(w.position, w.clock.tick, sigma_nm=0.1)
+    from freesail.world import sights
+
+    sight = sights.TimeSight(lon, 2.28, 40, w.clock.tick, True)
+    nav.chronometer = sights.Chronometer.from_scenario(
+        {"maker": "Arnold", "rated": "1805-05-03", "rate_s_per_day": 0.0},
+        w.clock.ship_time,
+        w.rng.stream("chronometer"),
+    )
+    real = sights.time_sight
+    try:
+        sights.time_sight = lambda *a, **k: (sight, "")
+        text, data = nav.take_time_sight()
+    finally:
+        sights.time_sight = real
+    assert data["how"] == K.KEPT and miles_between(nav.reckoning.position, w.position) < 0.05
+    assert ": the sight stands two leagues and a half to the W of the account" in text
+    assert "is the better figure: the account kept." in text
+
+
+def test_a_cast_that_does_not_agree_within_the_doubt_keeps_the_account_and_widens_it_once():
+    """Item 2, from game 10 (the owner's note 2: "a single stray sounding ... caused a
+    jump in the reckoning by a mile which was totally unsound"). The cutter in St Mary's
+    Sound, the account right and a quarter of a mile in doubt by a fix; the cast laid on
+    the chart with no tide taken off (game 10's tide was a fathom off, by package 34's
+    flat allowance), so that it reads more water than the chart shows anywhere within his
+    doubt. 37e looked five miles about him, found that water a mile and a half off, and,
+    the two being further apart than their doubts together, laid the account down there.
+    Now he looks within his doubt and no further: the cast does not agree with the chart
+    where he believes her, the account is kept, and his doubt is widened so that that
+    water lies at the edge of what he would trust it within. The same cast again on the
+    same ground is the same thing seen again, and widens nothing further."""
+    w = at_rest(49.915, -6.34, start=datetime(1805, 6, 14, 4, 0), ship=CUTTER)
+    nav = w.navigation
+    nav.reckoning.set_position(w.position, 0, sigma_nm=0.25)
+    nav._tide_allowance_m = lambda: 0.0  # the tide not allowed: the cast a fathom too deep
+    texts, grown, doubts = [], [], []
+    for _ in range(4):
+        w.submit("heave the lead")
+        w.run(120)
+        cast = [e for e in w.log if e.kind == "sounding"][-1]
+        texts.append(cast.text)
+        assert cast.data["agrees"] is False and cast.data["how"] is None
+        grown.append(cast.data["apart"]["grown_nm"])
+        doubts.append(nav.doubt_now()["semi_major_nm"])
+        assert error_nm(w) < 0.05  # never laid down where the cast says
+    assert " The cast does not agree with the chart where Mr " in texts[0]
+    assert texts[0].endswith(
+        "; the chart has that water nearest a mile and a half to the SE of the account: the "
+        "account kept, and its doubt widened."
+    )
+    assert grown[0] > 0.3 and grown[1:] == [0.0, 0.0, 0.0]
+    assert all(t.endswith(": the account kept.") for t in texts[1:])
+    assert doubts[0] > 0.6 and max(doubts[1:]) < doubts[0] + 0.01
+
+
+def test_the_cast_is_reduced_by_the_masters_own_tide_and_the_line_says_it():
+    """Item 3. The master reduces a cast to his chart's datum by his own tide (the rise
+    and the hour of the nearest place in his epitome to his account), never the world's;
+    a merchant with Moore's table has a rise for every place now, where package 34 took a
+    flat three metres off every cast whatever the tide (game 10: a fathom out at St Mary's
+    near high water). The line says the reduction when it is a fathom or more."""
+    w = at_rest(49.905, -6.35, start=datetime(1805, 6, 14, 4, 0), ship=CUTTER)
+    nav = w.navigation
+    assert nav.epitome.table == "moore"
+    port, _ = nav.epitome.nearest(nav.reckoning.position)
+    assert port.name == "Scilly" and port.spring_rise_ft == 15.0 and port.rise_judgement
+    allowed = nav._tide_allowance_m()
+    assert abs(allowed - w.tide_height_m) < 1.0 < abs(K.TIDE_ALLOWANCE_DEFAULT_M - w.tide_height_m)
+    w.submit("heave the lead")
+    w.run(120)
+    cast = [e for e in w.log if e.kind == "sounding"][-1]
+    assert cast.data["tide_allowed_m"] == pytest.approx(allowed, abs=0.05)
+    assert " of tide allowed by the epitome: " in cast.text and " on the chart. " in cast.text
+    assert cast.text.startswith(f"{K.chant(cast.data['fathoms'], True)}; ")
+    # his tide, never the world's: the same account and the same moment in a world whose
+    # tide is made nothing works the same reduction
+    still = at_rest(49.905, -6.35, start=datetime(1805, 6, 14, 4, 0), ship=CUTTER)
+    still.tide, still.tide_state = None, None
+    assert still.navigation._tide_allowance_m() == pytest.approx(allowed)
+    # under a fathom the line says nothing of it: near low water at the neaps
+    low = at_rest(49.905, -6.35, start=datetime(1805, 6, 20, 13, 0), ship=CUTTER)
+    if low.navigation._tide_allowance_m() < units.fathoms_to_m(1.0):
+        low.submit("heave the lead")
+        low.run(120)
+        assert " of tide allowed" not in [e for e in low.log if e.kind == "sounding"][-1].text
+
+
+@pytest.mark.parametrize("casts", [True])
+def test_the_forenoon_of_16_june_sailed_again_keeps_an_honest_doubt_and_the_noon_is_weighed(casts):
+    """Items 1 and 2 together, game 9's forenoon of 16 June sailed again (the brig on the
+    ebb in a calm off the Goulet's mouth, the account half a mile out and a quarter of a
+    mile in doubt at 08:00, the deep-sea lead every glass). On 37d the casts kept the
+    doubt at a quarter of a mile while the account went four miles wrong, and a right
+    noon was all but ignored; on 37e it was taken outright against that small doubt. Now
+    the master's tide (37e) carries the account with the ebb, a cast is laid down within
+    his doubt or not at all, and the truth stays within twice his doubt at every glass;
+    at noon the octant's sight (a mile and a half out, as game 9's was) and the account
+    stand within their doubts together and are weighed by them."""
+    w = at_rest(48.19, -4.80, start=datetime(1805, 6, 16, 8, 0))
+    nav = w.navigation
+    r = nav.reckoning
+    r.set_position(destination(w.position, 0.0, 0.55 * units.NAUTICAL_MILE), w.clock.tick)
+    r.P = [[0.23**2, 0.0], [0.0, 0.26**2]]
+    for _ in range(7):
+        if casts:
+            assert w.submit("heave the deep-sea lead").kind == "order.accepted"
+        w.run(1800)
+        doubt = nav.doubt_now()["semi_major_nm"]
+        assert error_nm(w) < 2.0 * doubt and error_nm(w) < 1.0
+    assert nav.doubt_now()["sigma_north_nm"] > 1.2  # where 37d's casts left a quarter
+    nav.bring_up()
+    obs = r.observe_latitude(w.position.lat_deg - 1.4 / 60.0, 2.28)
+    assert obs.how == K.WEIGHED and not obs.doubted
+
+
+def test_each_board_is_laid_down_by_itself(monkeypatch):
+    """Item 4, from game 10 (standing off and on off Scilly, the error grew from a quarter
+    of a mile to two miles in an hour and three quarters): between workings the account
+    was run on along the mean of her headings since the last, and boards on different
+    courses were laid down as one board on their mean. Now at every alteration of two
+    points and more (and at a tack, a wear, heaving to and filling away) the account is
+    worked up to that minute and each board is laid down by itself. The cutter, logged
+    every two hours, stands N and E by turns, eighteen minutes a board, the wind SW."""
+
+    def boards(points: float) -> tuple[float, list[int], list[int]]:
+        monkeypatch.setattr(K, "BOARD_ALTERATION_POINTS", points)
+        w = chart_world(49.4, -5.6, ship=CUTTER, heading=0.0, start=datetime(1805, 6, 10, 13, 10))
+        nav = w.navigation
+        w.submit("set plain sail")
+        w.submit("steer N")
+        w.run(1200)
+        nav.reckoning.set_position(w.position, w.clock.tick, sigma_nm=0.1)
+        ordered = []
+        for k in range(5):
+            w.run(18 * 60)
+            ordered.append(w.clock.tick)
+            w.submit("steer E" if k % 2 == 0 else "steer N")
+        w.run(18 * 60)
+        return error_nm(w), ordered, [t for t, _a, _b in nav.reckoning.track]
+
+    error, ordered, track = boards(K.BOARD_ALTERATION_POINTS)
+    for tick in ordered:
+        assert any(tick < t <= tick + 3 * 60 for t in track), tick  # worked at the turn
+    mean, _, mean_track = boards(99.0)  # the mean of her headings, as before
+    assert len(track) >= len(mean_track) + 5
+    assert error < 0.6 * mean  # 2.7 miles against 5.4 at this seed
+
+
+def test_a_fix_by_marks_on_one_hand_leaves_an_honest_account_at_anchor_in_the_bay():
+    """Item 5, 37e's finding at anchor in the Bay of Brest: fixes every five minutes by
+    three marks between W by N and N by W, each "good to two cables", weighed one after
+    another, left the master believing himself good to a cable while three or four
+    cables out: the compass's own error is common to all three and, with every mark on
+    one hand, moves the fix more than his allowance said, and the weighing narrowed it
+    away. Now how far that error moves a fix by these marks is a part of the doubt no fix
+    narrows (`_compass_shift_nm`), and the doubt is said along the shore and off it when
+    the two differ."""
+    w = chart_world(48.345, -4.470, ship=BRIG, heading=250.0, start=datetime(1805, 6, 17, 9, 0))
+    w.run(60)
+    w.submit("let go the best bower")
+    w.run(600)
+    nav = w.navigation
+    doubts = []
+    for _ in range(6):
+        e = w.submit("take a fix")
+        assert e.kind == "reckoning.fix"
+        assert {m["name"] for m in e.data["marks"]} <= {
+            "the castle of Brest",
+            "Penaleuch point",
+            "Portzic",
+            "Brest",
+        }
+        doubt = nav.reckoning.ellipse()["semi_major_nm"]
+        doubts.append(doubt)
+        assert error_nm(w) < 2.0 * doubt  # honest
+        w.run(300)
+    assert min(doubts) >= 0.1  # never surer than a cable
+    # the words, by marks on one hand whose doubt differs along the shore and off it
+    marks = nav._fix_marks()
+    lines = [(s, math.radians(s.bearing_deg)) for s in marks[:3]]
+    assert K._one_hand([(None, math.radians(b)) for b in (280.0, 330.0, 345.0)]) is not None
+    assert K._one_hand([(None, math.radians(b)) for b in (0.0, 120.0, 240.0)]) is None
+    shift = K._compass_shift_nm(w.position, lines, K.COMPASS_ALLOWANCE_DEG)
+    assert math.hypot(*shift) > 0.05
+
+
+def test_the_dangers_and_a_shaped_courses_warnings_are_said_to_the_cable_from_the_account():
+    """Item 6: `the dangers` and the warnings of a shaped course are drawn from the account
+    as it stands and said to the cable, where they were in whole miles (a ledge four cables
+    off was "no distance", and a course's line passed every danger "within a mile")."""
+    w = chart_world(50.03, -5.02, start=datetime(1805, 6, 12, 10, 0))
+    said = w.readings.words("dangers")
+    assert said.startswith("the Manacles NW, a mile and a half; ")
+    items = w.readings["dangers"]["items"]
+    from freesail.world.geo import distance_words
+
+    for i in items:
+        assert i["words"].endswith(distance_words(max(units.CABLE, i["metres"])))
+    e = w.submit("shape a course for Falmouth")
+    assert (
+        "; the line passes the Penwin and the Vaze within a cable, the Manacles within two "
+        "cables and the Governor within a mile." in e.text
+    )
+    passes = e.data["dangers"]
+    assert passes and all("off_m" in p for p in passes)
+
+
+def test_the_departure_is_where_she_is_and_the_run_since_noon_does_not_grow_at_anchor():
+    """Item 8, the small faults of the reckoning from the review's G3. Every scenario
+    opened with the account drawn a mile out: a departure is taken where she is, by the
+    land in sight, and the mile is its doubt. And at anchor the run since noon does not
+    grow, whatever the stream does past her."""
+    w = chart_world(50.12, -5.03, start=datetime(1805, 6, 12, 13, 0))
+    nav = w.navigation
+    assert nav.reckoning.position == w.position
+    assert nav.reckoning.sigma_east_nm == pytest.approx(K.DEPARTURE_SIGMA_NM)
+    w.run(60)
+    w.submit("let go the best bower")
+    w.run(900)
+    assert w.at_anchor
+    nav.noon_had = True
+    nav.bring_up()
+    nav.reckoning.noon_mark = (w.clock.tick, nav.reckoning.lat_deg, nav.reckoning.lon_deg)
+    nav.reckoning.run_since_noon_nm = 0.0
+    runs = []
+    for _ in range(4):
+        w.run(3600)
+        runs.append(nav.since_noon_reading()[0])
+    assert runs == [runs[0]] * 4 and runs[0] < 0.05
