@@ -18,7 +18,7 @@ tuning notes and a report to the lead at the end.
 | 38 | Fable | The chart stitched: many regions over the corridor, the queries across edges, the climatology's boxes, the tide's gauges, the recipe form for the blocks | launched 2026-10-09 |
 | 39a to 39f | Opus | The six blocks of the voyage to Madeira and the Strait | after 38 |
 | 40 | Fable | The ship's company and the rules-based captain in three layers; the captain's station; the officer's reckoning | approved 2026-10-09; launched after 37m |
-| 40b | Opus | The lessons in the primer | brief to write |
+| 40b | Opus | The lessons in the primer; the officer's own reckoning (spec M6 §5, truth 80; moved from 40 at the owner's word) | brief to write |
 | 41 | Fable | The wardroom: several doors, the pace rule, the deck's conversation, the master's and the lookout's stations, the stand-by on several conditions | brief to write |
 | 42 | Opus | The API door and its security pass; the transcript-driven replay; the consent brief revised once | brief to write |
 | 43 | Fable | The crewed promotion, a model captain of another ship, the far-detail guard, the director's seat hook | brief to write |
@@ -95,7 +95,7 @@ build cannot be fetched from this machine, say so and leave the recipe and its t
 a small synthetic corridor, the fetch for the lead or the owner to run; do not commit a
 corridor that was not built from the source named in the manifest.
 
-## Package 40: the ship's company, the rules-based captain in three layers, the captain's station (`freesail/world/people.py` and `data/people/<ship>.yaml` new for the wardroom as people with stations; `tools/gen_ships.py` for the complement's officers drawn into the ship file; `freesail/world/captains.py` new for intent, plan and behaviour; `data/captains/<role>.yaml` new for the doctrine; `freesail/standing/runtime.py` for a book loaded and unloaded by a state; `freesail/world/scenarios.py` for `intent:` beside `standing_orders:`; `freesail/world/ships.py` for the state machine's far-detail body as an interface (filled by 43); `freesail/orders/navigation.py` only for the planner's use of `shape a course for` and the beating rule; `freesail/orders/stations.py`, `freesail/agents/agent.py`, `tools.py`, `harness.py`, `remote.py`, `mcp_server.py`, `local.py`, `repl.py` for the captain's station and the player's seat; `freesail/agents/fake.py` for the fake captain; `freesail/world/reckoning.py` and `freesail/agents/tools.py` for the officer's reckoning; `freesail/api/readings.py` for `the captain`, `the people`, `the officer's reckoning`; `freesail/ui/console.py` and `ui/server.py` for the player's seat; `docs/agents/Harness.md` a section, `docs/agents/README.md` where the stations are listed; `docs/primer/16-the-officer-of-the-watch.md` and a new `17-the-captain.md`; `docs/TechnicalSpec-M6.md` §2 to §8 as built; `docs/dev/TuningNotes.md`; `tests/test_people.py`, `test_captains.py` new, `test_standing.py`, `test_scenarios.py`, `test_officer.py`, `test_captain.py` new, `test_agents.py`, `test_reckoning.py`, `test_known_truths.py` truths 77 to 81 and the passages re-measured only where the people's lines move them)
+## Package 40: the ship's company, the rules-based captain in three layers, the captain's station (`freesail/world/people.py` and `data/people/<ship>.yaml` new for the wardroom as people with stations; `tools/gen_ships.py` for the complement's officers drawn into the ship file; `freesail/world/captains.py` new for intent, plan and behaviour; `data/captains/<role>.yaml` new for the doctrine; `freesail/standing/runtime.py` for a book loaded and unloaded by a state; `freesail/world/scenarios.py` for `intent:` beside `standing_orders:`; `freesail/world/ships.py` for the state machine's far-detail body as an interface (filled by 43); `freesail/orders/navigation.py` only for the planner's use of `shape a course for` and the beating rule; `freesail/orders/stations.py`, `freesail/agents/agent.py`, `tools.py`, `harness.py`, `remote.py`, `mcp_server.py`, `local.py`, `repl.py` for the captain's station and the player's seat; `freesail/agents/fake.py` for the fake captain; `freesail/api/readings.py` for `the captain` and `the people`; `freesail/ui/console.py` and `ui/server.py` for the player's seat; `docs/agents/Harness.md` a section, `docs/agents/README.md` where the stations are listed; `docs/primer/16-the-officer-of-the-watch.md` and a new `17-the-captain.md`; `docs/TechnicalSpec-M6.md` §2 to §8 as built; `docs/dev/TuningNotes.md`; `tests/test_people.py`, `test_captains.py` new, `test_standing.py`, `test_scenarios.py`, `test_officer.py`, `test_captain.py` new, `test_agents.py`, `test_known_truths.py` truths 77 to 79 and 81 and the passages re-measured only where the people's lines move them)
 
 **Approved by the owner, 2026-10-09**, to run when the lead deems it the moment (after
 37m lands), with this added in his words: the builder is to work this one like a senior
@@ -183,14 +183,11 @@ What to build:
    has, applied to the player's orders; the primer his brief), so that he may hold a lesser
    role under a model captain; the captain's station gives `you may` to the officer's as
    the player does now.
-4. **The officer's own reckoning** (spec M6 §5; G19): `work my reckoning` gives the
-   officer the master's slate (the courses and distances since the last fix, the set
-   allowed, the sights) and takes his own position back, shown beside the master's at noon
-   in the log and moving nothing; the captain may adopt it with `set the reckoning to`.
+4. **The officer's own reckoning** is 40b's (the owner, 2026-10-09, to lessen 40's
+   load): spec M6 §5 and truth 80 go with it.
 5. **Orders and readings**: `the captain` (who holds the station, the book's name, the
    deck); `the people` extended; `stand down the captain`; `you may` from the captain's
-   station; `work my reckoning` and `the officer's reckoning`; the captain's station brief
-   head (M4 §11) saying the voyage.
+   station; the captain's station brief head (M4 §11) saying the voyage.
 6. **The consent brief's revision, drafted and held.** The captain's station is a kind of
    thing the brief does not describe (decision 37): the package drafts the revised brief
    as `docs/playtests/drafts/consent-brief-m6-draft.md` with the sections that change
@@ -201,16 +198,15 @@ What to build:
    cruise under their books with no model seated replay to their digests; 78 a fake
    captain commands the merchant passage by its book and six direct orders, the log the
    same with his six orders under his mark; 79 a silent captain's door passes the deck to
-   his book within the station's patience and the book brings her to the anchor; 80 an
-   officer's reckoning from the slate agrees with the master's within the master's doubt
-   and the log shows both at noon; 81 no reading at the captain's station gives the truth
-   by any road; and the new scenario of item 2, the schooner trading on an intent alone,
+   his book within the station's patience and the book brings her to the anchor; 80 is
+   40b's with the officer's reckoning; 81 no reading at the captain's station gives the
+   truth by any road; and the new scenario of item 2, the schooner trading on an intent alone,
    pinned.
 
 What 40 does not do: the crewed promotion and a model captain of another ship (43); the
 fisherman's doctrine, the lugger and the smack (43b); the master's and the lookout's
 stations, the deck's conversation, the pace rule (41); the API door and the brief revised
-in the repository (42); the lessons (40b); engaging (M7). Tests for each item on the fake
+in the repository (42); the lessons and the officer's own reckoning (40b); engaging (M7). Tests for each item on the fake
 world and the fake doors; the passages re-measured only where the people's lines move
 them, with the reasons.
 

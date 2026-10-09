@@ -589,7 +589,8 @@ In waves, written for the owner's approval in turn, each launched on his word:
 - **40 (Fable): the ship's company and the rules-based captain** (§2, §4), with the
   captain's station (§3) and the officer's reckoning (§5); the consent brief's revision
   drafted for the owner, held until 42.
-- **40b (Opus): the lessons** (§6); the primer's chapter and the forms table.
+- **40b (Opus): the lessons** (§6) and the officer's own reckoning (§5, truth 80; moved
+  from 40 at the owner's word, 2026-10-09); the primer's chapter and the forms table.
 - **41 (Fable): the wardroom** (§11, §12), the pace rule, the deck's conversation, the
   master's and the lookout's stations.
 - **42 (Opus): the API door and its security pass** (§13); the transcript-driven replay
