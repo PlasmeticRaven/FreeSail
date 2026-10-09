@@ -2128,7 +2128,9 @@ def test_a_course_shaped_across_a_headland_or_close_along_the_shore_says_so():
     assert chart.line_shore(Position(49.6, -5.5), Position(49.2, -5.5), 900.0) is None
 
 
-def test_a_cast_the_chart_about_the_account_already_answers_is_kept_whatever_the_search_finds():
+def test_a_cast_the_chart_about_the_account_already_answers_is_kept_whatever_the_search_finds(
+    monkeypatch,
+):
     """Package 37e, item 4 (found on the frigate's passage, 2026-10-07): the contour is
     searched on rings half a mile apart, and off a steep shore the nearest point the
     search finds may be miles away. Where the chart about the account shows less water on
@@ -2150,7 +2152,10 @@ def test_a_cast_the_chart_about_the_account_already_answers_is_kept_whatever_the
             return None  # package 37j: he looks within his doubt and no further
         return far, 0.0
 
-    w.chart.contour_point = two_miles_off
+    # the chart is shared between worlds (`chart.load_chart` caches it), so the search is
+    # replaced for this test alone and put back after: left in place it made the cast
+    # test below find its water sixteen leagues off whenever the file ran in one process
+    monkeypatch.setattr(w.chart, "contour_point", two_miles_off)
     before = nav.doubt_now()
     w.submit("heave the lead")
     w.run(300)
@@ -2164,9 +2169,10 @@ def test_a_cast_the_chart_about_the_account_already_answers_is_kept_whatever_the
     # 37j; 37e laid the account down on the search's point two miles off, a cable's doubt
     # notwithstanding): the account is kept, and his doubt grown toward that water so far
     # that it lies at the edge of what he would trust the account within
-    w.chart.depth_span = lambda pos, step_m=0.0: (
-        units.fathoms_to_m(40.0),
-        units.fathoms_to_m(45.0),
+    monkeypatch.setattr(
+        w.chart,
+        "depth_span",
+        lambda pos, step_m=0.0: (units.fathoms_to_m(40.0), units.fathoms_to_m(45.0)),
     )
     kept_at = nav.reckoning.position
     w.submit("heave the lead")
