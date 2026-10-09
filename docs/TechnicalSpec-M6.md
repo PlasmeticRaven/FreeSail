@@ -116,10 +116,59 @@ owner's word stands over all.
 captain's), with more authority than is described; by the owner's ruling of 7 October
 (decision 37) that puts the question again, once, batched with 6b's changes (§15).
 
-### 4. The rules-based captain (`freesail/world/captains.py` new; `freesail/standing/`; `freesail/world/ships.py`)
+### 4. The rules-based captain (`freesail/world/captains.py` new; `data/captains/*.yaml` new; `freesail/standing/`; `freesail/world/ships.py`)
 
 What the game does when nobody is seated, made explicit and shared between the player's
-ship and every other. A rules-based captain is **a goal, a book and a few judgements**:
+ship and every other. The owner's principles of 2026-10-09 (decision 40): a rules-based
+captain is functional without being pre-planned, never a fixed route that relies on a
+weather; the world's ships go about the business of commerce, war and the sea on any day,
+between any ports, reacting to the weather, to what they see and to their goal, by sound
+game AI; the baseline is stable and detailed enough that nothing goes wacky while the
+world is dynamic, and a director and model captains plug into it to enhance, from no
+seat at all to every ship seated with a director over the whole. So a rules-based captain
+is **intent, plan and behaviour**, in three layers, and a goal, a book and a few
+judgements are how the layers are written:
+
+- **Intent** is the goal and its parameters: trade this cargo from A to B, keep this
+  station between these points, fish this ground from this port, escort this convoy, carry
+  this letter, run home. A scenario's or the world's (§19); the director's to change.
+- **The plan** is a sequence of legs derived from the intent at sea, never written in
+  advance: a passage planner over the chart's own data, the period's common tracks, the
+  headlands to clear with an offing, each port's pilot station, the dangers on a shaped
+  course. Each leg is shaped with the player's own `shape a course for`; a course the wind
+  will not allow is beaten by a rule (stand on the tack that makes the most good, go about
+  when the other tack makes better or when the offing closes); the plan is worked again on
+  an event.
+- **Behaviour** is a state machine whose states are books in the dialect, loaded on
+  entering the state: on passage, beating, hove to for weather, running for shelter, at
+  anchor, in port, investigating a stranger, chasing, evading, keeping station, in
+  distress, and engaging (present from the start, empty until M7). A transition is an event
+  the ship perceives.
+- **Perception** on the player's terms: a captain sees through the lookout's rules, the
+  horizon and the visibility, and reads the glass and the sky as readings; at far detail
+  that is pairwise distance and visibility at the roll-up's cadence. No captain knows where
+  another ship is until his lookout could.
+- **Doctrine as data**, role by role (`data/captains/<role>.yaml`): the stimulus (a
+  stranger made out of a hostile nation, the wind over a force, the visibility under a
+  mile, the land closing within two leagues, a signal) against the role (a King's ship on
+  station, a merchant, a fisherman, a packet, a convoy's commodore) giving the transition
+  and its thresholds. A King's ship on station closes and makes out a stranger, chases an
+  enemy, returns to station; a merchant hauls off from a hostile stranger, heaves to in a
+  gale with sea room, claws off a lee shore without it, runs for the nearest road in thick
+  weather; a fisherman works his ground by day and comes home at evening or when the glass
+  falls. The owner tunes it with a text editor, as the books.
+- **The rule of the road as 1805 had it**: no regulations yet, but the custom that the ship
+  close-hauled on the starboard tack stands on, the larboard-tack ship gives way, and a
+  ship running keeps clear of one by the wind; a reflex at a few cables at near detail,
+  said in the log, and a cheap check of crossings between plans at far detail.
+- **One brain, two bodies.** The same state machine runs at far detail, cheaply: the
+  states resolve into the plan (hove to is no way; beating is the made-good speed along the
+  leg; investigating is a plan toward the stranger), and the crewed promotion (§19)
+  changes the body only, so that behaviour does not change when a ship is promoted. This
+  is the design point held hardest: it is what makes a dozen ships affordable and the one
+  in sight honest.
+
+Written as a goal, a book and a few judgements:
 
 - **The goal** is the scenario's or the vessel's (M5 §25: trade this route, patrol this
   station, carry this letter, run home), with its waypoints and its ports.
@@ -339,7 +388,27 @@ A ship beside the player's is the same ship: crewed, commanded by the rules or b
 sailed under the same physics; and the game can measure its players, rules, local, hosted
 and human, on one course.
 
-### 19. The crewed promotion (`freesail/world/ships.py` `Vessel.promote`; `freesail/core/world.py`)
+### 19. The crewed promotion, and the world's business (`freesail/world/ships.py` `Vessel.promote`; `freesail/world/ports.py`; `freesail/core/world.py`)
+
+**The world generates the business** (the owner, 2026-10-09: the small step now, the
+loop later). Today the dozen ships are scripted in each scenario. In 6c the ports generate
+voyages from their markets and the nations table (a cargo wanted where its price is high,
+from where it is low), the fishing grounds from the coast's features, the naval stations
+from the war; ships are drawn under the seed at the chart's edges and in the ports with
+intents (§4) and leave at the edges when their business is done; a scenario may still name
+its ships, and the recorded passages do, so that they pin. A true supply-and-demand loop,
+prices moved by what the ships carry, is a later milestone's.
+
+**Two new hulls** (the owner, 2026-10-09): a **lugger** and a **smack**, as files from the
+generator (`tools/gen_ships.py`), to exercise the ship generation with a new sail type or
+two and to give the regatta (§21) something very handy and small. The lugger brings the
+lug sail to the generator and the catalogue (the dipping lug and its tack, the proposal's
+§4.4 rig-specific evolution, written with the rig as the running bowsprit was with the
+cutter); the smack is a cutter-rigged fishing vessel with a well, on the cutter's rules.
+Both at far detail in the world's business (the fisherman's role) and at full detail in
+the regatta; the hierarchy truths of M5 §19 extended to six vessels; no verification of
+the figures against a source until M8, as for the cutter and the brig.
+
 
 M5 §25's seam filled: within a stated range of the player a far-detail vessel becomes a
 full part-and-crew ship from her file, with her rules-based captain (§4) issuing orders
@@ -527,7 +596,12 @@ In waves, written for the owner's approval in turn, each launched on his word:
   (§14) if it proves to be plumbing, else to 41. The consent brief revised once here, with
   40's and 41's changes, and the re-asks the owner's.
 - **43 (Fable): the crewed promotion and a model captain of another ship** (§19, §20),
-  the far-detail guard, the director's seat hook (§23).
+  the far-detail guard, the director's seat hook (§23). The captain's three layers of §4
+  (the planner, the state machine, the doctrine files) are 40's; 43 gives them a second
+  body.
+- **43b (Opus): the lugger and the smack** (§19) from the generator, with the lug sail's
+  rules written in the brief by the lead; the world's business (the ports generating
+  voyages) with them.
 - **44 (Opus): the regatta harness and the parity tests** (§21, §22).
 
 Gate 6a is cut after 40b, 6b after 42, 6c after 44; the chart line's blocks land as they
@@ -580,3 +654,11 @@ swept once (item 16, in 38's checks); the hints and phrasings 37l leaves.
    gate waits on it, and gate 5c's officer's watch is not owed.
 7. **The API door's credit**: kept for testing the wardroom with Opus 5.5 and Sonnet 5.5,
    the owner at one of the lowliest stations aboard to observe (§17).
+
+**The owner's principles for the rules-based captain and the world's ships** (later the
+same day; decision 40) are §4 and §19: functional without being pre-planned; a dynamic
+world of ships about their business on any day, reacting by sound game AI; the baseline
+stable and detailed enough that nothing goes wacky, so that a director and model captains
+plug in to enhance, from no seat at all to every ship seated with a director over the
+whole; the small economy now and the loop later; the lugger and the smack this milestone;
+the states from the start, engaging empty.
