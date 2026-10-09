@@ -1100,16 +1100,16 @@ regions:
         north: 48.76
         west: -4.07
         east: -3.95
-    feature_count: 207
+    feature_count: 212
     features_by_kind:
-      anchorage: 19
+      anchorage: 20
       bank: 4
       beacon: 1
       bottom: 10
-      castle: 6
-      church: 7
+      castle: 7
+      church: 8
       drying: 7
-      headland: 36
+      headland: 37
       hill: 2
       island: 23
       ledge: 5
@@ -1119,7 +1119,7 @@ regions:
       rock: 43
       shoal: 6
       tower: 1
-      town: 8
+      town: 9
       transit: 6
   channel-mid:
     title: The Channel east, Lyme Bay to the Needles, the Channel Islands and St Malo

@@ -503,9 +503,10 @@ def test_every_ports_road_and_anchorage_has_its_note_of_the_bottom():
                 continue
             if not whole.bottom_near(spot.position):
                 bare.append((pid, label))
-    # Morlaix's notes are its river's anchorage in channel-west's features file, which
-    # channel-west's index (not rebuilt by package 39a: the lead's decision) does not hold
-    assert bare == [("morlaix", "outer_road"), ("morlaix", "anchorage"), ("morlaix", "mooring")]
+    # Morlaix's note is its river's anchorage in channel-west's features file (the lead
+    # rebuilt channel-west's index from the file at 39a's merge); its outer road and the
+    # town's mooring have none until a period source gives the bottom there
+    assert bare == [("morlaix", "outer_road"), ("morlaix", "mooring")]
     brest = w.ports.ports["brest"]
     assert w.chart.bottom_near(brest.mooring.position) == "mud"
     assert w.chart.feature("brest-road").bottom == "mud"
