@@ -61,7 +61,9 @@
       } else if (f.kind === "spar") {
         var cls = "spar " + f.cls + " " + f.state + (f.busy ? " busy" : "");
         node = el("line", { class: cls, x1: f.pts[0].x.toFixed(2), y1: f.pts[0].y.toFixed(2), x2: f.pts[1].x.toFixed(2), y2: f.pts[1].y.toFixed(2) }, rig);
-        title(node, f.id.replace(/\./g, " ") + " (" + f.cls.replace(/_/g, " ") + ", " + f.state.replace(/_/g, " ") + ")");
+        // a yard's hoist (package 37n): lowered on the cap, or between while it is worked
+        var hoist = f.hoist === 0 ? ", lowered" : f.hoist > 0 && f.hoist < 1 ? ", hoisting or settling" : "";
+        title(node, f.id.replace(/\./g, " ") + " (" + f.cls.replace(/_/g, " ") + ", " + f.state.replace(/_/g, " ") + hoist + ")");
       } else if (f.kind === "sail") {
         var scls = "sail " + f.cls + " " + f.state + (f.backed ? " backed" : "") + (f.reefs ? " reefed" : "") + (f.busy ? " busy" : "");
         node = el("path", { class: scls, d: root.Projection.pathData(f.path, true) }, rig);

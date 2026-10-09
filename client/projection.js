@@ -26,6 +26,13 @@
  *   brace_angle     radians from square, positive = starboard yardarm forward
  *   sheet_angle     radians from the centreline, unsigned; the sail lies to lee
  *   heel            radians, positive = heeled to starboard
+ *
+ * Package 37n (the owner's note 6 of 2026-10-09): a square sail is cut as its ship file's
+ * notes say it was worked, between its yard and the yardarms below (CLEW_SPREAD,
+ * HEAD_SPREAD, `squareCut`), and a yard stands at its hoist: lowered on the cap while its
+ * sail is not set, down with each reef, halfway while the halyards are worked, on the
+ * lower cap with a struck topmast housed beside the lower mast head (YARD_ON_CAP_M,
+ * HOUSED_ABOVE_CAP_M, STEP_HOIST). The frame stays the ship file's rig at its hoists.
  */
 (function (root, factory) {
   if (typeof module === "object" && module.exports) module.exports = factory();
@@ -65,6 +72,34 @@
   // mizen-mast", Steel 1794): it hangs parallel to its mast, this far abaft it (judgement:
   // the after end of the trestle-trees), and the sail on it is placed from the ship file.
   var STAY_ABAFT_M = 0.6;
+  // Package 37n: a square sail as its file has it (the owner's note 6 of 2026-10-09: the
+  // cutter's square sail drawn too short). The ship files' sails are worked by
+  // tools/gen_ships.py on one rule, which their notes state ("between its yard and the
+  // yardarms below (head 0.82 of the yard)"): the clews spread to nine-tenths of the yard
+  // below, and the head is what the area leaves over the depth between the two yards; a
+  // sail with no yard below it (a course, the cutter's square sail) is as broad as
+  // nine-tenths of its own yard, head and foot, and as deep as its area over that. The
+  // viewer drew every square sail the whole yard broad and its area over the whole yard
+  // deep: a tenth too shallow for a course, and a topgallant or royal too deep by a sixth.
+  var CLEW_SPREAD = 0.9; // the clews at nine-tenths of the yard below (gen_ships.py)
+  var HEAD_SPREAD = 0.9; // a sail with no yard below: head and foot nine-tenths of its yard
+  // Package 37n: a yard at its hoist (the owner's note 6). A yard that hoists (one on an
+  // upper mast with a halyard, its square sail bent) stands at the ship file's height while
+  // its sail is set, comes down with each reef by the depth the reef takes out of the sail,
+  // and is lowered on the cap of the mast below while the sail is not set ("sheeted home and
+  // not hoisted", loosed, in the gear, furled); a step of hoisting or settling the halyards
+  // in hand draws it halfway, the work in its stages (docs/design/Presentation.md). Struck
+  // topmasts (strike_topmasts.yaml: "topsail yards lowered on the caps") are housed, the
+  // topmast's head just above the lower cap and its yard on that cap; a yard or a mast sent
+  // down on deck is not drawn, as before. A yard on a lower mast does not move: the lower
+  // yards hang in their slings, and the cutter's square-sail yard, which the file crosses
+  // "as a yard the engine can hoist and brace", is the yard her topsail sheets to.
+  var YARD_ON_CAP_M = 0.3; // a lowered yard's slings above the cap it rests on (judgement)
+  var HOUSED_ABOVE_CAP_M = 0.6; // a housed topmast's head above the lower cap: its own cap's depth (judgement)
+  var HOISTED_STATES = { set: 1, goose_winged: 1, blown_out: 1, wrecked: 1 };
+  // the steps of the square sail's evolutions that move its yard (data/evolutions/*_square.yaml):
+  // hoisting or settling the halyards, halfway; reefing or shaking out, down on the cap
+  var STEP_HOIST = { hoist: 0.5, settle_halyards: 0.5, clew_down: 0.5, reef: 0, shake_out: 0 };
 
   // -- vectors ----------------------------------------------------------------
 
@@ -140,8 +175,15 @@
    *  yardarm. `yard` has the skeleton's `a` (larboard arm) and `b` (starboard arm); `tack`
    *  is the side the wind is on. */
   function gooseWingCorners(yard, down, tack) {
-    if (tack === "larboard") return [yard.a, yard.b, yard.b, add(yard.a, down)];
-    return [yard.a, yard.b, add(yard.b, down), yard.a];
+    return gooseWingOf([yard.a, yard.b, add(yard.b, down), add(yard.a, down)], tack);
+  }
+
+  /** The same from a square sail's own corners [larboard head, starboard head, starboard
+   *  clew, larboard clew] (package 37n: the head inside the yardarms, the clews at the yard
+   *  below's): the lee clew hauled up to the lee end of the head. */
+  function gooseWingOf(c, tack) {
+    if (tack === "larboard") return [c[0], c[1], c[1], c[3]];
+    return [c[0], c[1], c[2], c[0]];
   }
 
   /** The triangle of a goose-winged sail from its corners: [lee yardarm, weather
@@ -224,11 +266,13 @@
     var tack = (snapshot && snapshot.ship && snapshot.ship.tack) || "starboard";
     var wind = windVector(snapshot && snapshot.wind ? snapshot.wind.apparent_angle : Math.PI);
     var busy = {};
+    var stepOn = {}; // the step in hand on each subject (package 37n: a yard's hoist)
     ((snapshot && snapshot.evolutions_in_progress) || []).forEach(function (e) {
-      if (!e.waiting) busy[e.subject] = e.id;
+      if (e.waiting) return;
+      busy[e.subject] = e.id;
+      if (e.step) stepOn[e.subject] = e.step;
     });
 
-    var spars = {};
     var sailsBySpar = {}; // spar id -> sails with a role on it
     graph.sails.forEach(function (s) {
       Object.keys(s.roles || {}).forEach(function (role) {
@@ -274,125 +318,247 @@
       return 0;
     }
 
-    function resolve(id) {
-      if (spars[id]) return spars[id];
-      var spec = sparSpecs[id];
-      if (!spec) return null;
-      var parent = spec.parent ? resolve(spec.parent) : null;
-      var L = spec.length_m || 0;
-      var H = spec.height_m || 0;
-      var r = { id: id, cls: spec.class, spec: spec, parent: parent, state: sparState(id), side: spec.side };
-      if (spec.class === "mast" || (MAST_CLASSES[spec.class] && !parent)) {
-        // a lower mast: its rake (positive aft) carries every point on it aft as it rises
-        r.x = spec.x_m || 0;
-        r.rake = spec.rake || 0;
-        var slope = -Math.tan(r.rake);
-        r.xAt = function (z) { return (spec.x_m || 0) + slope * (z - deck); };
-        r.a = v(r.x, 0, deck);
-        r.b = v(r.xAt(deck + H), 0, deck + H);
-        r.head = r.b;
-        r.foot = r.a;
-      } else if (MAST_CLASSES[spec.class]) {
-        // an upper mast continues the line of the one below
-        r.rake = parent.rake || 0;
-        r.xAt = parent.xAt || function () { return parent.x; };
-        var footZ = parent.head[2];
-        r.x = r.xAt(footZ);
-        r.foot = v(r.x, 0, footZ);
-        r.head = v(r.xAt(footZ + H), 0, footZ + H);
-        r.a = v(r.xAt(footZ - DOUBLING * H), 0, footZ - DOUBLING * H); // the doubling: drawn, not a position
-        r.b = r.head;
-      } else if (spec.class === "bowsprit") {
-        r.x = spec.x_m || 0;
-        r.a = v(r.x, 0, deck);
-        var dz = Math.min(H, L * 0.95);
-        r.b = v(r.x + Math.sqrt(Math.max(L * L - dz * dz, 0)), 0, deck + dz);
-        r.tip = r.b;
-      } else if (HEAD_CLASSES[spec.class]) {
-        var rootP = parent && parent.tip ? parent.tip : v(hull.length_waterline_m / 2, 0, deck);
-        var tipZ = deck + H;
-        var dz2 = Math.max(Math.min(tipZ - rootP[2], L * 0.7), 0);
-        r.x = rootP[0];
-        r.a = rootP;
-        r.b = v(rootP[0] + Math.sqrt(Math.max(L * L - dz2 * dz2, 0)), 0, rootP[2] + dz2);
-        r.tip = r.b;
-      } else if (YARD_CLASSES[spec.class]) {
-        var th = braceAngle(spec);
-        r.x = parent ? (parent.xAt ? parent.xAt(deck + H) : parent.x) : spec.x_m || 0;
-        r.centre = v(r.x, 0, deck + H);
-        r.arm = [Math.sin(th), Math.cos(th), 0]; // direction of the starboard yardarm
-        r.half = L / 2;
-        r.brace = th;
-        var tilt = spec.class === "lateen_yard" ? 0.8 : spec.class === "lug_yard" ? 0.35 : 0;
-        if (tilt) {
-          // a lug or lateen yard slopes up toward its after end
-          r.arm = norm([r.arm[0] * Math.cos(tilt), r.arm[1] * Math.cos(tilt), Math.sin(tilt)]);
-        }
-        r.a = sub(r.centre, mul(r.arm, r.half)); // larboard arm
-        r.b = add(r.centre, mul(r.arm, r.half)); // starboard arm
-        r.normal = [Math.cos(th), -Math.sin(th), 0];
-      } else if (spec.class === "gaff") {
-        r.x = parent ? (parent.xAt ? parent.xAt(deck + H) : parent.x) : spec.x_m || 0;
-        var gDir = sheetDirection(sheetAngleOf(id), tack);
-        r.a = v(r.x, 0, deck + H); // the throat, at the mast
-        r.b = add(r.a, add(mul(gDir, L * Math.cos(GAFF_PEAK_ANGLE)), v(0, 0, L * Math.sin(GAFF_PEAK_ANGLE))));
-        r.dir = gDir;
-      } else if (spec.class === "boom") {
-        r.x = parent ? (parent.xAt ? parent.xAt(deck + H) : parent.x) : spec.x_m || 0;
-        var bDir = sheetDirection(sheetAngleOf(id), tack);
-        r.a = v(r.x, 0, deck + H);
-        r.b = add(r.a, mul(bDir, L));
-        r.dir = bDir;
-      } else if (spec.class === "sprit") {
-        r.x = parent ? parent.x : spec.x_m || 0;
-        var sDir = sheetDirection(sheetAngleOf(id), tack);
-        r.a = v(r.x, 0, deck + 1.0);
-        r.b = add(r.a, add(mul(sDir, L * Math.cos(0.9)), v(0, 0, L * Math.sin(0.9))));
-        r.dir = sDir;
-      } else if (spec.class === "studdingsail_boom") {
-        var rigged = riggedOut(spec);
-        r.rigged = rigged;
-        if (parent && parent.dir && !parent.arm) {
-          // the ringtail boom: run out beyond the end of the gaff sail's boom, along it,
-          // or lashed alongside it when rigged in (Steel 1794: "lashed occasionally to the
-          // outer end of the main-sail-boom")
-          var endP = parent.b;
-          r.x = parent.x;
-          r.dir = parent.dir;
-          r.a = rigged ? endP : sub(endP, mul(parent.dir, L));
-          r.b = rigged ? add(endP, mul(parent.dir, L)) : endP;
-          r.full = [endP, add(endP, mul(parent.dir, L))];
-          r.normal = cross(parent.dir, [0, 0, 1]);
-          r.pivot = parent.a; // it swings with the boom about the mast
-          r.reach = len(sub(parent.b, parent.a)) + L;
-        } else {
-          var ss = sideSign(spec.side);
-          var yard = parent && parent.arm ? parent : null;
-          var arm = yard ? yard.arm : [0, 1, 0];
-          var cx = yard ? yard.x : parent ? parent.x : 0;
-          var reach = yard ? yard.half : 0;
-          // rigged out beyond the yardarm below it; run in along the yard when rigged in
-          r.x = cx;
-          var inboard = v(cx + ss * reach * arm[0], ss * reach * arm[1], deck + H);
-          r.a = rigged ? inboard : add(inboard, mul(arm, -ss * L));
-          r.b = rigged ? add(inboard, mul(arm, ss * L)) : inboard;
-          r.full = [inboard, add(inboard, mul(arm, ss * L))];
-          r.arm = arm;
-          r.normal = yard ? yard.normal : [1, 0, 0];
-          r.pivot = yard ? yard.centre : v(cx, 0, deck + H);
-          r.reach = reach + L;
-        }
-      } else {
-        r.x = parent ? parent.x : spec.x_m || 0;
-        r.a = v(r.x, 0, deck);
-        r.b = v(r.x, 0, deck + H);
-      }
-      spars[id] = r;
-      return r;
-    }
-    graph.spars.forEach(function (s) {
-      resolve(s.id);
+    // -- where each spar is (package 37n) --------------------------------------------
+
+    var halyardOf = {};
+    graph.lines.forEach(function (ln) {
+      if (ln.class === "halyard") halyardOf[ln.of] = ln.id;
     });
+    /** The lower mast a spar stands on, by the ship file's parents. */
+    function chainTop(spec) {
+      var cur = spec;
+      while (cur && cur.parent && sparSpecs[cur.parent]) cur = sparSpecs[cur.parent];
+      return cur ? cur.id : null;
+    }
+    /** The square sail bent to a yard, if any. */
+    function squareSailOn(yardId) {
+      return (
+        (sailsBySpar[yardId] || []).filter(function (s) {
+          return s.class === "square" && (s.roles || {}).yard === yardId;
+        })[0] || null
+      );
+    }
+    /** The yard below each square yard on the same mast, by the ship file's heights: the
+     *  yard whose arms its sail's clews are sheeted to. */
+    var yardBelowId = {};
+    (function () {
+      var yards = graph.spars.filter(function (s) {
+        return s.class === "yard";
+      });
+      yards.forEach(function (y) {
+        var top = chainTop(y);
+        var best = null;
+        yards.forEach(function (o) {
+          if (o === y || chainTop(o) !== top || (o.height_m || 0) >= (y.height_m || 0)) return;
+          if (best === null || o.height_m > best.height_m) best = o;
+        });
+        if (best) yardBelowId[y.id] = best.id;
+      });
+    })();
+    function isUpperMast(spec) {
+      return !!(spec && MAST_CLASSES[spec.class] && spec.parent);
+    }
+    /** A topsail over a bare yard the ship file does not carry (the schooner's fore yard,
+     *  "a bare spread yard for the topsail's foot; it is not a part here", gen_ships.py):
+     *  its sail's foot where that yard is, at its hoist, the file's centre midway down the
+     *  sail as the generator puts a sail's between two yards; {z, depth}, or null for any
+     *  other yard. */
+    function bareFoot(spec) {
+      if (yardBelowId[spec.id] || !isUpperMast(sparSpecs[spec.parent])) return null;
+      var sail = squareSailOn(spec.id);
+      if (!sail) return null;
+      var top = deck + (spec.height_m || 0);
+      var depth = 2 * (top - (sail.centre_height_m || 0));
+      return depth > 0.5 ? { z: top - depth, depth: depth } : null;
+    }
+    /** Whether a yard hoists: on an upper mast, with a halyard and a square sail bent. */
+    function hoists(spec) {
+      return spec.class === "yard" && isUpperMast(sparSpecs[spec.parent]) && !!halyardOf[spec.id] && !!squareSailOn(spec.id);
+    }
+    /** A struck topmast (strike_topmasts.yaml): housed, not on deck. */
+    function housed(spec) {
+      return spec.class === "topmast" && sparState(spec.id) === "sent_down";
+    }
+    /** A yard on a topmast sent down with it, by the strike: lowered on the lower cap. Only
+     *  the strike sends a topmast's yards down; the light yards sent down go on deck. */
+    function onCap(spec) {
+      return spec.class === "yard" && sparState(spec.id) === "sent_down" && (sparSpecs[spec.parent] || {}).class === "topmast";
+    }
+    /** How far up a hoisting yard is: 1 at its hoist, 0 lowered, a half while the halyards
+     *  are worked (STEP_HOIST). */
+    function hoistFraction(spec) {
+      if (onCap(spec)) return 0;
+      var sail = squareSailOn(spec.id);
+      if (!sail) return 1;
+      var h = HOISTED_STATES[sailDyn(sail).state] ? 1 : 0;
+      var step = stepOn[sail.id];
+      if (step !== undefined && STEP_HOIST[step] !== undefined) h = STEP_HOIST[step];
+      return h;
+    }
+
+    /** Every spar placed: `where` false for the ship file's rig, every spar aloft at its own
+     *  height (the view's fixed frame); true for where each is now, a yard at its hoist and a
+     *  struck topmast housed (package 37n). */
+    function placeSpars(where) {
+      var spars = {};
+      function resolve(id) {
+        if (spars[id]) return spars[id];
+        var spec = sparSpecs[id];
+        if (!spec) return null;
+        var parent = spec.parent ? resolve(spec.parent) : null;
+        var L = spec.length_m || 0;
+        var H = spec.height_m || 0;
+        var r = { id: id, cls: spec.class, spec: spec, parent: parent, state: sparState(id), side: spec.side };
+        if (spec.class === "mast" || (MAST_CLASSES[spec.class] && !parent)) {
+          // a lower mast: its rake (positive aft) carries every point on it aft as it rises
+          r.x = spec.x_m || 0;
+          r.rake = spec.rake || 0;
+          var slope = -Math.tan(r.rake);
+          r.xAt = function (z) { return (spec.x_m || 0) + slope * (z - deck); };
+          r.a = v(r.x, 0, deck);
+          r.b = v(r.xAt(deck + H), 0, deck + H);
+          r.head = r.b;
+          r.foot = r.a;
+        } else if (MAST_CLASSES[spec.class]) {
+          // an upper mast continues the line of the one below
+          r.rake = parent.rake || 0;
+          r.xAt = parent.xAt || function () { return parent.x; };
+          var footZ = parent.head[2];
+          if (where && housed(spec)) {
+            // struck (package 37n): lowered through the cap until its head stands just
+            // above the lower cap, its heel down abaft the lower mast head
+            footZ = parent.head[2] + HOUSED_ABOVE_CAP_M - H;
+            r.housed = true;
+          }
+          r.x = r.xAt(footZ);
+          r.foot = v(r.x, 0, footZ);
+          r.head = v(r.xAt(footZ + H), 0, footZ + H);
+          // the doubling: drawn, not a position; a housed mast is drawn from its heel
+          r.a = r.housed ? r.foot : v(r.xAt(footZ - DOUBLING * H), 0, footZ - DOUBLING * H);
+          r.b = r.head;
+        } else if (spec.class === "bowsprit") {
+          r.x = spec.x_m || 0;
+          r.a = v(r.x, 0, deck);
+          var dz = Math.min(H, L * 0.95);
+          r.b = v(r.x + Math.sqrt(Math.max(L * L - dz * dz, 0)), 0, deck + dz);
+          r.tip = r.b;
+        } else if (HEAD_CLASSES[spec.class]) {
+          var rootP = parent && parent.tip ? parent.tip : v(hull.length_waterline_m / 2, 0, deck);
+          var tipZ = deck + H;
+          var dz2 = Math.max(Math.min(tipZ - rootP[2], L * 0.7), 0);
+          r.x = rootP[0];
+          r.a = rootP;
+          r.b = v(rootP[0] + Math.sqrt(Math.max(L * L - dz2 * dz2, 0)), 0, rootP[2] + dz2);
+          r.tip = r.b;
+        } else if (YARD_CLASSES[spec.class]) {
+          var th = braceAngle(spec);
+          // at its hoist (package 37n): the file's height, or lowered on the cap of the mast
+          // below, or between while the halyards are worked; reefed, its sail's depth less
+          // what the reefs take out above the yard below
+          var z = deck + H;
+          r.hoist = 1;
+          if (where && parent && parent.parent && (onCap(spec) || hoists(spec))) {
+            var lowered = parent.parent.head[2] + YARD_ON_CAP_M;
+            var hoisted = z;
+            var sailOn = squareSailOn(id);
+            var belowId = yardBelowId[id];
+            var bare = bareFoot(spec);
+            if (sailOn && !onCap(spec)) {
+              var rf = reefFraction(sailOn, sailDyn(sailOn));
+              if (belowId) {
+                var below = resolve(belowId);
+                var gap = z - (deck + (sparSpecs[belowId].height_m || 0));
+                hoisted = below.centre[2] + gap * rf;
+              } else if (bare) {
+                hoisted = bare.z + bare.depth * rf;
+              }
+            }
+            // never below its cap (a sail set over a yard below that is lowered: the clews
+            // are sheeted to it, and the halyards can bring the yard no lower)
+            hoisted = Math.max(hoisted, lowered);
+            r.hoist = hoistFraction(spec);
+            r.onCap = onCap(spec);
+            z = lowered + r.hoist * (hoisted - lowered);
+          }
+          r.x = parent ? (parent.xAt ? parent.xAt(z) : parent.x) : spec.x_m || 0;
+          r.centre = v(r.x, 0, z);
+          r.arm = [Math.sin(th), Math.cos(th), 0]; // direction of the starboard yardarm
+          r.half = L / 2;
+          r.brace = th;
+          var tilt = spec.class === "lateen_yard" ? 0.8 : spec.class === "lug_yard" ? 0.35 : 0;
+          if (tilt) {
+            // a lug or lateen yard slopes up toward its after end
+            r.arm = norm([r.arm[0] * Math.cos(tilt), r.arm[1] * Math.cos(tilt), Math.sin(tilt)]);
+          }
+          r.a = sub(r.centre, mul(r.arm, r.half)); // larboard arm
+          r.b = add(r.centre, mul(r.arm, r.half)); // starboard arm
+          r.normal = [Math.cos(th), -Math.sin(th), 0];
+        } else if (spec.class === "gaff") {
+          r.x = parent ? (parent.xAt ? parent.xAt(deck + H) : parent.x) : spec.x_m || 0;
+          var gDir = sheetDirection(sheetAngleOf(id), tack);
+          r.a = v(r.x, 0, deck + H); // the throat, at the mast
+          r.b = add(r.a, add(mul(gDir, L * Math.cos(GAFF_PEAK_ANGLE)), v(0, 0, L * Math.sin(GAFF_PEAK_ANGLE))));
+          r.dir = gDir;
+        } else if (spec.class === "boom") {
+          r.x = parent ? (parent.xAt ? parent.xAt(deck + H) : parent.x) : spec.x_m || 0;
+          var bDir = sheetDirection(sheetAngleOf(id), tack);
+          r.a = v(r.x, 0, deck + H);
+          r.b = add(r.a, mul(bDir, L));
+          r.dir = bDir;
+        } else if (spec.class === "sprit") {
+          r.x = parent ? parent.x : spec.x_m || 0;
+          var sDir = sheetDirection(sheetAngleOf(id), tack);
+          r.a = v(r.x, 0, deck + 1.0);
+          r.b = add(r.a, add(mul(sDir, L * Math.cos(0.9)), v(0, 0, L * Math.sin(0.9))));
+          r.dir = sDir;
+        } else if (spec.class === "studdingsail_boom") {
+          var rigged = riggedOut(spec);
+          r.rigged = rigged;
+          if (parent && parent.dir && !parent.arm) {
+            // the ringtail boom: run out beyond the end of the gaff sail's boom, along it,
+            // or lashed alongside it when rigged in (Steel 1794: "lashed occasionally to the
+            // outer end of the main-sail-boom")
+            var endP = parent.b;
+            r.x = parent.x;
+            r.dir = parent.dir;
+            r.a = rigged ? endP : sub(endP, mul(parent.dir, L));
+            r.b = rigged ? add(endP, mul(parent.dir, L)) : endP;
+            r.full = [endP, add(endP, mul(parent.dir, L))];
+            r.normal = cross(parent.dir, [0, 0, 1]);
+            r.pivot = parent.a; // it swings with the boom about the mast
+            r.reach = len(sub(parent.b, parent.a)) + L;
+          } else {
+            var ss = sideSign(spec.side);
+            var yard = parent && parent.arm ? parent : null;
+            var arm = yard ? yard.arm : [0, 1, 0];
+            var cx = yard ? yard.x : parent ? parent.x : 0;
+            var reach = yard ? yard.half : 0;
+            // rigged out beyond the yardarm below it; run in along the yard when rigged in
+            r.x = cx;
+            var inboard = v(cx + ss * reach * arm[0], ss * reach * arm[1], deck + H);
+            r.a = rigged ? inboard : add(inboard, mul(arm, -ss * L));
+            r.b = rigged ? add(inboard, mul(arm, ss * L)) : inboard;
+            r.full = [inboard, add(inboard, mul(arm, ss * L))];
+            r.arm = arm;
+            r.normal = yard ? yard.normal : [1, 0, 0];
+            r.pivot = yard ? yard.centre : v(cx, 0, deck + H);
+            r.reach = reach + L;
+          }
+        } else {
+          r.x = parent ? parent.x : spec.x_m || 0;
+          r.a = v(r.x, 0, deck);
+          r.b = v(r.x, 0, deck + H);
+        }
+        spars[id] = r;
+        return r;
+      }
+      graph.spars.forEach(function (s) {
+        resolve(s.id);
+      });
+      return spars;
+    }
+    var home = placeSpars(false);
+    var spars = placeSpars(true);
 
     // Masts (lower) in order along the ship, and the head rig, for stay landings.
     var lowerMasts = graph.spars
@@ -498,10 +664,12 @@
     /** A spar sent down (the topgallant masts in a gale), or stepped on one: it is on
      *  deck, and it and everything on it are drawn no more than a wrecked spar's
      *  dependents are. A wreck cleared away (package 30b: "cleared") is on deck or over
-     *  the side, and is not drawn either. */
+     *  the side, and is not drawn either. A struck topmast is housed and the yard struck
+     *  with it lies on the lower cap (package 37n): both are drawn where they are. */
     function sentDown(r) {
       for (var cur = r; cur; cur = cur.parent) {
-        if (cur.state === "sent_down" || cur.state === "cleared") return true;
+        if (cur.state === "cleared") return true;
+        if (cur.state === "sent_down" && !cur.housed && !cur.onCap) return true;
       }
       return false;
     }
@@ -511,15 +679,18 @@
     graph.spars.forEach(function (s) {
       var r = spars[s.id];
       if (sentDown(r)) return;
-      figures.push({
+      var fig = {
         kind: "spar",
         id: s.id,
         cls: s.class,
-        state: r.state,
+        // a housed topmast and the yard on the cap are struck, not on deck (package 37n)
+        state: r.housed || r.onCap ? "struck" : r.state,
         side: s.side,
         pts: [r.a, r.b],
         busy: !!busy[s.id],
-      });
+      };
+      if (r.hoist !== undefined) fig.hoist = r.hoist; // a yard: 1 at its hoist, 0 lowered
+      figures.push(fig);
     });
 
     function quadArea(p) {
@@ -678,6 +849,54 @@
       return Math.max(1 - (spec.reef_factor || 0) * reefs, 0.2);
     }
 
+    /** A square sail's corners from its file (package 37n; CLEW_SPREAD, HEAD_SPREAD):
+     *  [larboard head, starboard head, starboard clew, larboard clew], the head along its
+     *  yard where the yard is now and the clews at the arms of the yard below where that is
+     *  now; and the depth it is reckoned by for its belly and its festoons, its own between
+     *  the yards at their hoists, less the reefs. A sail with no yard below hangs from its
+     *  yard as deep as its area over its breadth, less the reefs (a course's reef bands are
+     *  at its head: its foot rises). */
+    function squareCut(spec, dyn, Y) {
+      var L = Y.half * 2;
+      var belowId = yardBelowId[Y.id];
+      var B = belowId ? spars[belowId] : null;
+      var gap = belowId ? (Y.spec.height_m || 0) - (sparSpecs[belowId].height_m || 0) : 0;
+      if (B && B.arm && !sentDown(B) && gap > 0.5) {
+        var foot = CLEW_SPREAD * B.half * 2;
+        var head = Math.min(Math.max((2 * spec.area_m2) / gap - foot, 0.5 * L), L);
+        // the clews at the yard below's arms; where that yard is lowered further than the
+        // sail reaches (a topgallant set over a topsail on the cap), at the sail's own depth
+        var reach = Y.centre[2] - gap * reefFraction(spec, dyn);
+        var fc = B.centre[2] >= reach - 0.05 ? B.centre : v(B.centre[0], B.centre[1], reach);
+        return {
+          corners: [sub(Y.centre, mul(Y.arm, head / 2)), add(Y.centre, mul(Y.arm, head / 2)), add(fc, mul(B.arm, foot / 2)), sub(fc, mul(B.arm, foot / 2))],
+          depth: gap * reefFraction(spec, dyn),
+          head: head,
+          foot: foot,
+        };
+      }
+      var spread = HEAD_SPREAD * L;
+      var bare = bareFoot(Y.spec);
+      if (bare) {
+        // over a bare yard the file does not carry: the foot where that yard is, as broad as
+        // the area leaves over the depth at the hoist
+        var wide = Math.min(Math.max((2 * spec.area_m2) / bare.depth - spread, spread), 2 * L);
+        var fx = Y.parent && Y.parent.xAt ? Y.parent.xAt(bare.z) : Y.x;
+        var fc = v(fx, 0, bare.z);
+        return {
+          corners: [sub(Y.centre, mul(Y.arm, spread / 2)), add(Y.centre, mul(Y.arm, spread / 2)), add(fc, mul(Y.arm, wide / 2)), sub(fc, mul(Y.arm, wide / 2))],
+          depth: bare.depth * reefFraction(spec, dyn),
+          head: spread,
+          foot: wide,
+        };
+      }
+      var deep = (spec.area_m2 / Math.max(spread, 1)) * reefFraction(spec, dyn);
+      var a = sub(Y.centre, mul(Y.arm, spread / 2));
+      var b = add(Y.centre, mul(Y.arm, spread / 2));
+      var down = v(0, 0, -deep);
+      return { corners: [a, b, add(b, down), add(a, down)], depth: deep, head: spread, foot: spread };
+    }
+
     graph.sails.forEach(function (spec) {
       var dyn = sailDyn(spec);
       var roles = spec.roles || {};
@@ -692,15 +911,24 @@
       if (cls === "square" || cls === "lug" || cls === "lateen") {
         var Y = spars[roles.yard];
         if (!Y || !Y.arm) return;
-        var L = Y.half * 2;
-        var depth = (spec.area_m2 / Math.max(L, 1)) * reefFraction(spec, dyn);
-        var down = v(0, 0, -depth);
-        var corners = [Y.a, Y.b, add(Y.b, down), add(Y.a, down)];
+        var corners, depth;
+        if (cls === "square") {
+          // from the file's figures (package 37n): squareCut
+          var cut = squareCut(spec, dyn, Y);
+          corners = cut.corners;
+          depth = cut.depth;
+        } else {
+          // a lug or a lateen: from its yard's ends, its area over the yard
+          var L = Y.half * 2;
+          depth = (spec.area_m2 / Math.max(L, 1)) * reefFraction(spec, dyn);
+          var down = v(0, 0, -depth);
+          corners = [Y.a, Y.b, add(Y.b, down), add(Y.a, down)];
+        }
         if (dyn.state === "goose_winged") {
           // the lee clew hauled up to the yard, the weather clew sheeted home: a triangle
           // from the weather clew to the yard, its foot rising to the lee yardarm (spec M3
           // §9 item 13; physics/sails.py: half the area, its centre out to weather)
-          corners = gooseWingCorners(Y, down, tack);
+          corners = gooseWingOf(corners, tack);
           var gw = sailFigure(spec, dyn, corners, Y.normal, Y, depth);
           gw.path = gooseWingPath(corners, Y.normal, tack, depth);
           gw.centre = gooseWingCentre(corners, tack);
@@ -882,15 +1110,13 @@
       });
       return best;
     }
+    // the yard below on the same mast by the file's heights (package 37n), whatever their
+    // hoists now; it was the nearest yard below within half a metre fore and aft, which a
+    // raked mast's yards could miss
     function yardBelow(Y) {
-      var best = null;
-      Object.keys(spars).forEach(function (id) {
-        var s = spars[id];
-        if (!s.arm || s === Y || s.cls === "studdingsail_boom") return;
-        if (Math.abs(s.x - Y.x) > 0.5 || s.centre[2] >= Y.centre[2]) return;
-        if (best === null || s.centre[2] > best.centre[2]) best = s;
-      });
-      return best;
+      var id = yardBelowId[Y.id];
+      var B = id ? spars[id] : null;
+      return B && B.arm && !sentDown(B) ? B : null;
     }
 
     graph.lines.forEach(function (ln) {
@@ -955,7 +1181,7 @@
 
     figures.push.apply(figures, hullFigures(hull));
 
-    return { figures: figures, hull: hull, spars: spars, stays: stayFoot, frame: fullRigFrame(graph, spars, hull) };
+    return { figures: figures, hull: hull, spars: spars, stays: stayFoot, frame: fullRigFrame(graph, home, hull) };
   }
 
   /** The full rig's reach, for the view's fixed scale (spec M3 §9 item 14): every spar in
@@ -1074,7 +1300,7 @@
       if (p.y > maxY) maxY = p.y;
     }
     skeleton.figures.forEach(function (f) {
-      var g = { kind: f.kind, id: f.id, cls: f.cls, state: f.state, side: f.side, part: f.part, of: f.of, busy: f.busy, backed: f.backed, reefs: f.reefs, piece: f.piece };
+      var g = { kind: f.kind, id: f.id, cls: f.cls, state: f.state, side: f.side, part: f.part, of: f.of, busy: f.busy, backed: f.backed, reefs: f.reefs, piece: f.piece, hoist: f.hoist };
       var all = [];
       if (f.path) {
         g.path = projectPath(f.path, proj);
@@ -1156,6 +1382,7 @@
     windVector: windVector,
     hullFigures: hullFigures,
     gooseWingCorners: gooseWingCorners,
+    gooseWingOf: gooseWingOf,
     gooseWingTriangle: gooseWingTriangle,
     flattenPath: flattenPath,
     splitAtX: splitAtX,
@@ -1165,6 +1392,10 @@
       LOOSE_FOOT_HEIGHT_M: LOOSE_FOOT_HEIGHT_M,
       JIB_LUFF_FRACTION: JIB_LUFF_FRACTION,
       BELLY: BELLY,
+      CLEW_SPREAD: CLEW_SPREAD,
+      HEAD_SPREAD: HEAD_SPREAD,
+      YARD_ON_CAP_M: YARD_ON_CAP_M,
+      HOUSED_ABOVE_CAP_M: HOUSED_ABOVE_CAP_M,
     },
   };
 });
