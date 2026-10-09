@@ -736,6 +736,30 @@ the figures are in `docs/dev/TuningNotes.md`.
    the English side, Bellin's Petit Atlas for the French and the islands, Faden 1793 and the
    Channel pilots for the directions; the lights of 1805 dated (the Casquets, Portland).
    Nations: the islands British, St Malo and Morlaix hostile to a King's ship.
+   **As built (package 39a, 2026-10-09).** `channel-mid`, 48.5 to 51 N and 3 to 1 W,
+   abutting channel-west at 3 W (the south lowered to take St Malo): 35 level-2 tiles and
+   44 level-3 tiles in six harbour patches (Dartmouth and Torbay, Portland and Weymouth,
+   Guernsey, Jersey, Alderney, St Malo), about 9 MB with the coast; the seven tiles of the
+   seam's column are channel-west's and were neither written again nor listed (the tool's
+   seam rule, `tiles another region lists: 7 kept`), and nothing of channel-west's
+   changed; GEBCO's fill under the tiles raised to the chart's datum by the world's mean
+   level (`fill_to_chart_datum`), which St Malo's 6.8 m wants. 123 features from Faden
+   1793, White 1835 and Imray 1874, the lights dated from Trinity House's and the French
+   encyclopaedia's pages (1805 sees the Casquets, Portland's two, the Needles' cliff-top
+   light, Hurst's first, Barfleur and Fréhel); Dartmouth and Torbay, in channel-west's
+   bounds where it has no level-3 tile, are the block's patch and marks; Morlaix's marks in
+   channel-west's features file (its index not rebuilt: the lead's decision). Two patches:
+   St Malo's road from Bellin's 'St Malo et environs' (1764) at full resolution, the
+   Dart's channel from Imray's depths; the islands' and the English harbours' patches left
+   (Bellin's island sheets are at four leagues to the scale, Mackenzie's not found), their
+   ports `datum: unverified`. Eight port files (Dartmouth, Torbay, Weymouth with Portland
+   Road, St Peter Port, St Helier, Alderney, St Malo, Morlaix). The tide: TICON's file has
+   no gauge at St Peter Port, Dartmouth or Portland; Bournemouth and Portsmouth read and
+   held (a twelfth gauge moves every Channel position's blend); the Race, the Swinge, the
+   two Russels, the Déroute and Portland Race as stream areas, the directions' limits to
+   1 W, Moore's table five places more. The scenario `channel-east.yaml`, the frigate from
+   Torbay to Guernsey through the Race on the whole chart; figures in
+   `docs/dev/TuningNotes.md`.
 2. **Biscay north** (`biscay-north`, about 46°N to 48°N, 5°W to 1°W): the Raz de Sein and
    the Penmarks, Lorient and Port Louis, Belle Île and Quiberon, the Loire's mouth to
    Paimboeuf, the Pertuis, La Rochelle and Rochefort with the Basque Roads (where the
