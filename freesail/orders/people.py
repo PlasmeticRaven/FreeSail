@@ -23,7 +23,7 @@ from freesail.orders.errors import OrderError
 from freesail.orders.grammar import Order
 from freesail.orders.prompt import world_of
 
-__all__ = ["NO_PEOPLE_WORDS", "execute"]
+__all__ = ["NO_PEOPLE_WORDS", "check", "execute"]
 
 NO_PEOPLE_WORDS = "There is nobody to send for: the ship is not in a world."
 
@@ -71,3 +71,27 @@ def execute(ship: Any, order: Order) -> Result:
         answer = ports.answer(question or "the channel")
         return "pilot.answered", answer, {"verb": verb, "level": 1, "question": question}
     raise OrderError(f"'{verb}' is not an order about the people this ship knows.")
+
+
+def check(ship: Any, order: Order) -> None:
+    """Read a people's order whole without carrying it out (package 37l): the person sent
+    for is one aboard by his role or his name; the captain's own moves take nothing after
+    them. Where he is and what he is at are the order's own business when it fires."""
+    verb = order.verb
+    rest = (order.object or "").strip()
+    world = world_of(ship)
+    if world is None:
+        return
+    if verb == "send for":
+        who = rest
+        if order.verb_phrase.startswith("call the "):
+            who = order.verb_phrase.removeprefix("call the ") + (f" {rest}" if rest else "")
+        if not who.strip():
+            raise OrderError(
+                "Send for whom? Say 'send for the master', 'pass the word for the carpenter'."
+            )
+        if world.people.find(who) is None:
+            names = ", ".join(x.name for x in world.people.all)
+            raise OrderError(f"Nobody aboard answers to '{who}'; the people are {names}.")
+    elif verb in ("go below", "come on deck") and rest:
+        raise OrderError(f"'{verb}' takes nothing after it; '{rest}' was not understood.")

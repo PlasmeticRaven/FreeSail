@@ -47,9 +47,9 @@ from freesail import units
 from freesail.orders import errors
 from freesail.orders.errors import OrderError
 from freesail.orders.grammar import Order
-from freesail.world.geo import parse_position
+from freesail.world.geo import name_words, parse_position
 
-__all__ = ["NO_RECKONING_WORDS", "execute", "mark_in_sight"]
+__all__ = ["NO_RECKONING_WORDS", "check", "execute", "mark_in_sight", "where_is"]
 
 NO_RECKONING_WORDS = (
     "No reckoning is kept in this ship: the scenario gives her no position, and there is "
@@ -77,19 +77,6 @@ _BY_THE_BOOK = {
     "the tide yourself",
     "by the book",
 }
-_NUMBER_WORDS = {
-    "no": 0.0,
-    "half": 0.5,
-    "half a": 0.5,
-    "a": 1.0,
-    "one": 1.0,
-    "a knot": 1.0,
-    "two": 2.0,
-    "three": 3.0,
-    "four": 4.0,
-    "a quarter": 0.25,
-    "quarter": 0.25,
-}
 
 
 def _whose(ship: Any, text: str) -> str:
@@ -113,16 +100,31 @@ def _navigation(ship: Any) -> Any:
 
 
 def _knots(text: str) -> float:
-    t = text.strip().lower()
-    if t in _NUMBER_WORDS:
-        return _NUMBER_WORDS[t]
-    m = re.match(r"^(\d+(?:\.\d+)?)(?:\s+and\s+a\s+half)?$", t)
-    if m:
-        return float(m.group(1)) + (0.5 if "half" in t else 0.0)
-    for words, value in _NUMBER_WORDS.items():
-        if t.startswith(words + " and a half"):
-            return value + 0.5
-    raise OrderError(f"'{text}' is not a number of knots; say 'allow one knot of set to the east'.")
+    """A number of knots of set ('one', 'half a', 'a knot and a half', '1.5', 'one and a
+    quarter'), by the one reader for numbers (`orders.numbers`; package 37l); 'no' is
+    none."""
+    from freesail.orders import numbers
+
+    t = " ".join(text.strip().lower().replace("-", " ").split())
+    if t == "no":
+        return 0.0
+    t = t.replace(" knot and a half", " and a half").removesuffix(" knot")
+    value = numbers.read_all(t)
+    if value is None:
+        raise OrderError(
+            f"'{text}' is not a number of knots; say 'allow one knot of set to the east'."
+        )
+    return value
+
+
+def _course(words: str) -> float | None:
+    """A direction in words, with its half or quarter point (package 37l), in radians;
+    None when the words are no direction; refused in words when a fraction in them cannot
+    be read."""
+    try:
+        return units.parse_course(words)
+    except units.CourseError as e:
+        raise OrderError(str(e)) from None
 
 
 def _position_in(words: str) -> Any:
@@ -394,6 +396,250 @@ def _fix_names(nav: Any, rest: str) -> list[str]:
     return list(dict.fromkeys(names))
 
 
+# ---------------------------------------------------------------------------
+# A point off a place of the chart (package 37l): `shape a course for a mile west of
+# Ushant`, `... for two miles south of the Lizard`, `... for half a league NW of Bas`
+# ---------------------------------------------------------------------------
+
+_OFF_UNITS_M = {
+    "cable": units.CABLE,
+    "cables": units.CABLE,
+    "mile": units.NAUTICAL_MILE,
+    "miles": units.NAUTICAL_MILE,
+    "league": 3.0 * units.NAUTICAL_MILE,
+    "leagues": 3.0 * units.NAUTICAL_MILE,
+}
+
+
+def _off_a_place(world: Any, said: str) -> tuple[Any, str] | None:
+    """A point laid off from a place of the chart by a distance and a point of the
+    compass ('a mile west of ushant'): (the position, the words for the log); None when
+    the words are not of that form; refused in words when they are and the place is not
+    the chart's or the point is no point."""
+    from freesail.orders import numbers
+    from freesail.world.geo import destination
+
+    words = said.lower().replace("-", " ").split()
+    got = numbers.read(words, 0)
+    if got is None:
+        return None
+    value, used = got
+    unit = words[used] if used < len(words) else ""
+    if unit not in _OFF_UNITS_M:
+        return None
+    rest = words[used + 1 :]
+    if rest[:2] == ["to", "the"]:
+        rest = rest[2:]
+    elif rest[:1] == ["to"]:
+        rest = rest[1:]
+    if "of" not in rest and "off" not in rest:
+        return None
+    k = next(i for i, w in enumerate(rest) if w in ("of", "off"))
+    point_words, place = rest[:k], " ".join(rest[k + 1 :])
+    if not point_words or not place:
+        return None
+    toward = _course(" ".join(point_words))
+    if toward is None:
+        raise OrderError(
+            f"'{' '.join(point_words)}' is not a point of the compass; say 'shape a course "
+            f"for a mile west of {place}'."
+        )
+    chart = getattr(world, "chart", None)
+    feature = chart.find_feature(place) if chart is not None else None
+    if feature is None:
+        raise OrderError(_no_place_words(chart, place))
+    target = destination(feature.position, units.rad_to_deg(toward), value * _OFF_UNITS_M[unit])
+    distance = " ".join(words[: used + 1])
+    return target, f"{distance} {units.point_name(toward, full=True)} of {feature.name}"
+
+
+def _no_place_words(chart: Any, place: str) -> str:
+    """The refusal for a place the chart has not got, with the nearest names it has."""
+    if chart is None:
+        return "No chart of these waters: there is no place to shape a course for."
+    names = sorted({f.name for f in chart.features.values() if f.kind != "transit"})
+    near = errors.nearest(
+        " ".join(name_words(place)), [" ".join(name_words(n)) for n in names], n=2, cutoff=0.75
+    )
+    hint = [n for n in names if " ".join(name_words(n)) in near]
+    if hint:
+        return f"The chart has no place named {place!r}; did you mean {errors.join_names(hint)}?"
+    return f"The chart has no place named {place!r}."
+
+
+# ---------------------------------------------------------------------------
+# Where a mark is (package 37l; game 10, `where is ushant`: "Nobody aboard answers to
+# 'ushant'"): in sight, the lookout's bearing and estimate; else by account, from the
+# master's position (never the truth's) to the chart's place
+# ---------------------------------------------------------------------------
+
+
+def where_is(world: Any, said: str) -> str | None:
+    """`where is <mark>`: the words for a mark of the chart, or None when the chart has
+    no such name. In sight, its bearing by the master's compass and the lookout's
+    estimate; not in sight, its bearing and distance from the account, said as the
+    account's."""
+    from freesail.world.reckoning import miles_words
+
+    chart = getattr(world, "chart", None)
+    nav = getattr(world, "navigation", None)
+    if chart is None or nav is None:
+        return None
+    feature = chart.find_feature(said)
+    if feature is None:
+        words = name_words(said)
+        if words and words[0] == "the":
+            words = words[1:]
+        found = [
+            f
+            for f in chart.features.values()
+            if f.kind != "transit" and words and set(words) <= set(name_words(f.name))
+        ]
+        if len({f.id for f in found}) != 1:
+            return None
+        feature = found[0]
+    seen = nav.bearing_reading(feature.name)
+    if seen is not None:
+        return f"{_head(feature.name)}: in sight, bearing {seen['words']}"
+    from freesail.world.geo import bearing_and_distance
+
+    here = nav.account_now()
+    bearing, metres = bearing_and_distance(here, feature.position)
+    point = units.point_name(math.radians(bearing))
+    miles = miles_words(metres / units.NAUTICAL_MILE)
+    return f"{_head(feature.name)}: not in sight; by account it bears {point}, {miles}"
+
+
+def _head(name: str) -> str:
+    return name[:1].upper() + name[1:]
+
+
+# ---------------------------------------------------------------------------
+# A navigation order read whole without carrying it out (package 37l): a standing order's
+# action is read when it is given, so that a mark the chart has not got or a place it
+# does not name is refused at the giving and not met at sea
+# ---------------------------------------------------------------------------
+
+# The words for a mark that are the lookout's own, or a sail's, never a name of the chart
+_MARK_WORDS = frozenset(
+    {
+        "land",
+        "the land",
+        "shore",
+        "the shore",
+        "coast",
+        "the coast",
+        "headland",
+        "nearest land",
+        "the nearest land",
+        "light",
+        "the light",
+        "nearest light",
+        "the nearest light",
+        "sail",
+        "the sail",
+        "stranger",
+        "the stranger",
+        "brig",
+        "the brig",
+        "cutter",
+        "the cutter",
+        "schooner",
+        "the schooner",
+        "ship",
+        "the ship",
+        "frigate",
+        "the frigate",
+        "pilot cutter",
+        "the pilot cutter",
+    }
+)
+
+
+def _chart_mark(chart: Any, said: str) -> bool:
+    """Whether the words name a mark of the chart: by its name whole, or by words that
+    are all among one feature's name's words ('manacle' for Manacle Point)."""
+    if chart.find_feature(said) is not None:
+        return True
+    words = [w for w in name_words(said) if w not in ("the", "of", "and")]
+    if not words:
+        return False
+    return any(set(words) <= set(_name_words(f.name)) for f in chart.features.values())
+
+
+def check(ship: Any, order: Order) -> None:
+    """Read a navigation order whole, without carrying it out: a mark, the marks of a
+    fix, a place, a position or an allowance in its words that cannot be read, refused
+    in words now. Nothing that depends on the moment (what is in sight, the sky, the
+    hour) is judged here: that is the order's own business when it is carried out. On a
+    ship with no chart nothing is read (the order is refused in words when it fires, as
+    it always was)."""
+    from freesail.orders.prompt import world_of
+
+    verb = order.verb
+    rest = (order.object or "").strip()
+    world = world_of(ship)
+    chart = getattr(world, "chart", None) if world is not None else None
+    if verb == "set the reckoning to":
+        try:
+            parse_position(re.sub(r"\b(degrees?|minutes?)\b", " ", rest))
+        except ValueError:
+            raise OrderError(
+                f"'{rest}' is not a position; say 'set the reckoning to 49 52 N 6 10 W'."
+            ) from None
+        return
+    if verb == "allow":
+        low = " ".join(rest.lower().rstrip(".").split())
+        if not rest or low in _BY_THE_BOOK or low in _NO_SET or low.startswith("no set"):
+            return
+        m = _SET_RE.match(low)
+        if m is None:
+            raise OrderError(
+                "Say how much set and which way: 'allow one knot of set to the east'; or "
+                "'allow no set'; or 'allow the tide by the book'."
+            )
+        _knots(m.group("n"))
+        if _course(m.group("dir")) is None:
+            raise OrderError(f"'{m.group('dir')}' is not a compass point to allow the set toward.")
+        return
+    if chart is None:
+        return
+    if verb == "take a bearing of":
+        if not rest:
+            raise OrderError(
+                "Take a bearing of what? Name a mark of the chart, or say 'the land' or "
+                "'the light'."
+            )
+        key = " ".join(name_words(rest))
+        if key in _MARK_WORDS or _chart_mark(chart, rest):
+            return
+        raise OrderError(
+            _no_place_words(chart, rest).replace("no place named", "no mark named")
+            + " A bearing is taken of a mark of the chart by its name, of the land or of "
+            "the light."
+        )
+    if verb == "take a fix":
+        words = _FIX_LEAD.sub("", rest.strip().rstrip("."))
+        if not words:
+            return
+        for part in (w.strip() for w in _FIX_SPLIT.split(words)):
+            if part and not _chart_mark(chart, part) and not _chart_mark(chart, words):
+                raise OrderError(
+                    f"'{part}' names no mark of the chart. Say 'take a fix', and the master "
+                    "takes the marks in sight that cut best, or 'take a fix by the Lizard "
+                    "and the Manacles'."
+                )
+        return
+    if verb == "shape a course for":
+        if not rest:
+            raise OrderError("Shape a course for where? Name a place of the chart.")
+        if _position_in(rest) is not None or _off_a_place(world, rest) is not None:
+            return
+        if chart.find_feature(rest) is None:
+            raise OrderError(_no_place_words(chart, rest))
+        return
+
+
 def execute(ship: Any, order: Order) -> Result:
     """Carry out a navigation order. The verb is the vocabulary's key."""
     verb = order.verb
@@ -463,7 +709,7 @@ def execute(ship: Any, order: Order) -> Result:
                 "the master."
             )
         knots = _knots(m.group("n"))
-        toward = units.parse_compass_point(m.group("dir"))
+        toward = _course(m.group("dir"))
         if toward is None:
             raise OrderError(f"'{m.group('dir')}' is not a compass point to allow the set toward.")
         text, data = nav.allow_set(knots, toward)
@@ -473,12 +719,19 @@ def execute(ship: Any, order: Order) -> Result:
             raise OrderError("Shape a course for where? Name a place of the chart.")
         nav = _navigation(ship)
         pricked = _position_in(rest)
+        off = _off_a_place(nav.world, rest) if pricked is None else None
         if pricked is not None:
             # a point pricked on the chart (package 36: the books' waypoints through the
             # Goulet and out of Falmouth), the course from the account as for a place
             from freesail.world.geo import format_position
 
             heading, words, shaped = nav.shape_for(pricked, format_position(pricked))
+        elif off is not None:
+            # a point off a place of the chart (package 37l; game 10, `shape a course for
+            # a mile west of ushant`): laid off from the chart's place, and the course
+            # shaped for it from the account as for any point on the chart
+            target, said = off
+            heading, words, shaped = nav.shape_for(target, said)
         else:
             heading, words, shaped = nav.shape_course(rest)
         from freesail.orders import handle
@@ -587,7 +840,7 @@ _LOOKOUT_WORDS = frozenset(
 
 def _name_words(name: str) -> list[str]:
     """A name's words as they are matched: lower case, no article, no punctuation."""
-    words = "".join(c if c.isalnum() or c.isspace() else " " for c in name.lower()).split()
+    words = name_words(name)
     return [w for w in words if w not in ("the", "of", "and")]
 
 

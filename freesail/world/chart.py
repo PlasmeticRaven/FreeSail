@@ -40,7 +40,7 @@ import numpy as np
 import yaml
 
 from freesail import units
-from freesail.world.geo import Position, bearing_and_distance, destination, horizon_nm
+from freesail.world.geo import Position, bearing_and_distance, destination, horizon_nm, name_words
 
 __all__ = [
     "AGROUND_HIGHEST_TIDE_M",
@@ -222,7 +222,7 @@ def luminous_range_nm(nominal_nm: float, visibility_nm: float) -> float:
 
 def _name_key(name: str) -> str:
     """A name as it is matched: lower case, without its article or its punctuation."""
-    words = "".join(c if c.isalnum() or c.isspace() else " " for c in name.lower()).split()
+    words = name_words(name)
     if words and words[0] == "the":
         words = words[1:]
     return " ".join(words)

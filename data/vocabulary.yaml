@@ -157,7 +157,10 @@ verbs:
     object: heading
     level: 1
   come up:
-    synonyms: [luff, luff up, come up to the wind, come to the wind, keep her up, keep your luff]
+    # "Bring her up" (package 37l): her head brought up toward the wind; "bring up"
+    # alone is anchoring (`come to an anchor`), as the period had it.
+    synonyms: [luff, luff up, come up to the wind, come to the wind, keep her up, keep your luff,
+               bring her up]
     object: points
     level: 1
   bear away:
@@ -174,10 +177,14 @@ verbs:
     # 'Conning'): "nothing off" and "no higher" keep her full and by, and
     # "luff and touch her" is the same order given from the other side, as
     # close as she will lie with the sails just full. The log echoes the word.
+    # "Close hauled" and its forms (package 37l; the review of gate 5c's playtests, G17,
+    # the seaman's phrases not taken): the same sailing, by its other name.
     synonyms: [full and by, keep her full and by, sail her full and by, steer full and by,
                bring her by the wind, steer by the wind, keep her by the wind, by the wind,
                bring her to the wind, haul her wind, haul the wind, keep her a good full,
-               a good full and by, nothing off, no higher, luff and touch her]
+               a good full and by, nothing off, no higher, luff and touch her,
+               close hauled, keep her close hauled, sail her close hauled, steer close hauled,
+               sail close hauled, close hauled and full]
     object: none
     level: 1
   # Conning words to the helmsman (Luce 1866, ch. XXIV 'Conning'; Falconer,
@@ -187,8 +194,9 @@ verbs:
   # bring her up to the wind or pay her off, and leave it there until the
   # next helm order.
   steady:
+    # "Steady on" (package 37l; game 10's captain): the same word.
     synonyms: [steady as she goes, steady so, very well thus, thus, keep her so, keep her thus,
-               steady as you go]
+               steady as you go, steady on, steady her]
     object: none
     level: 1
   meet her:
@@ -419,8 +427,22 @@ verbs:
   pipe down:
     # "... clear up the decks and pipe down" ends every all-hands evolution in
     # Luce (ch. XXIII, XXIV); the watch below goes below.
+    # "Pipe down the watch" and a watch by its side (package 37l; game 10): the hands
+    # turned up go below; a watch that has the deck stays on it, and the answer says so.
     synonyms: [pipe the watch below, pipe the hands down, pipe down the hands,
-               send the watch below, pipe down all hands]
+               send the watch below, pipe down all hands, pipe down the watch,
+               pipe down the starboard watch, pipe down the larboard watch,
+               pipe down the port watch, pipe the starboard watch below,
+               pipe the larboard watch below]
+    object: none
+    level: 1
+  # The watch below turned up by itself (package 37l; game 10, `call the starboard
+  # watch`): the same staged arrival as a watch sent to a piece of work (`crew.WatchCall`),
+  # the hands up until piped down; a watch that has the deck is answered so.
+  call the watch:
+    synonyms: [call the starboard watch, call the larboard watch, call the port watch,
+               turn up the starboard watch, turn up the larboard watch, turn up the port watch,
+               call the watch below, turn up the watch below, call up the watch below]
     object: none
     level: 1
   relieve the watch:
@@ -894,7 +916,8 @@ verbs:
     object: station
     level: 2
   you have the deck:
-    synonyms: []
+    # "The deck is yours" (package 37l; the review of gate 5c's playtests, G17)
+    synonyms: [the deck is yours]
     object: station
     level: 2
   i have the deck:
@@ -1067,12 +1090,14 @@ refusals:
 # a sail whose class does not list it, with the first word that does. A
 # `course` is a square sail on a lower yard. Synonyms not listed here at
 # all ("take in", "douse", "hand") suit any sail.
+# Package 37l: a jib and a studding sail (the water sail among them) come down by their
+# halyards, and "lower" is said of them as of a gaff sail.
 take_in_words:
   course: [haul up, clew up]
   square: [clew up]
   gaff: [brail up, brail in, haul up, lower]
-  jibheaded: [haul down]
-  studding: [take in, haul down]
+  jibheaded: [haul down, lower]
+  studding: [take in, haul down, lower]
   lug: [lower]
   lateen: [lower]
   sprit: [lower]
@@ -1446,3 +1471,41 @@ undoes:
 # ---------------------------------------------------------------------------
 irrevocable:
   - cut away
+
+# ---------------------------------------------------------------------------
+# Words the ship does not take, each refused with what to say instead or with the
+# milestone it belongs to (package 37l; the review of gate 5c's playtests, G17: hints that
+# pointed the wrong way, "man the pumps" answered "did you mean 'demand'?", "as you were"
+# answered "'ease' or 'give chase'?"). A line that begins with one of these phrases is
+# refused in its sentence before the grammar reads it (`orders.handle`), and so is a
+# standing order's action (`orders.read_whole`).
+# ---------------------------------------------------------------------------
+refused_phrases:
+  hoist our colours: &colours "Colours and signals are milestone 7's: the ensign, the private signal and the signal book come with the other ships that answer them, and this ship has no flag locker yet."
+  hoist the colours: *colours
+  hoist colours: *colours
+  show our colours: *colours
+  show the colours: *colours
+  show your colours: *colours
+  hoist the ensign: *colours
+  show the ensign: *colours
+  hoist a flag: *colours
+  hoist the flag: *colours
+  make the private signal: *colours
+  make a signal: *colours
+  make the signal: *colours
+  hoist a signal: *colours
+  man the pumps: &pumps "The pumps are not worked in this game yet: she makes no water through her seams or a shot hole, and the well is not sounded (the hull's damage is a later milestone's). 'Sound the well' says so."
+  rig the pumps: *pumps
+  work the pumps: *pumps
+  pump ship: *pumps
+  pump her out: *pumps
+  as you were: "'As you were' is not an order the ship keeps: say 'belay that' to stop the last order's work where it stands, 'belay all work' for everything in hand, or give the order that puts her back ('square the yards', 'steer SW by W')."
+  lay out the stream anchor: &stream "The boat lays out the kedge and no other anchor in this game: say 'lay out a kedge astern' (or to a point, 'lay out a kedge to the NE'), 'let go the stream anchor' from the ship, or 'back the anchor' with the stream."
+  lay out the stream: *stream
+  carry out the stream anchor: *stream
+  carry out the stream: *stream
+  put the helm over: &helm "'Put the helm over' says not which way: say 'helm a-lee' (the helm down, her head coming up to the wind), 'hard a-weather' (the helm up, her head paying off), 'bear away' or 'come up' with the points, or 'steer' a course."
+  put the helm hard over: *helm
+  helm over: *helm
+  put her helm over: *helm

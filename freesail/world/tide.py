@@ -54,7 +54,7 @@ import yaml
 
 from freesail import units
 from freesail.core.moon import julian_day
-from freesail.world.geo import Position, bearing_and_distance
+from freesail.world.geo import Position, bearing_and_distance, name_words
 
 __all__ = [
     "CONSTITUENTS_PATH",
@@ -688,7 +688,7 @@ def _hour_word(h: int) -> str:
 
 
 def _key(name: str) -> str:
-    words = "".join(c if c.isalnum() or c.isspace() else " " for c in name.lower()).split()
+    words = name_words(name)
     if words and words[0] == "the":
         words = words[1:]
     return " ".join(words)

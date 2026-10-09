@@ -88,7 +88,13 @@ from typing import Any
 
 from freesail import units
 from freesail.core.events import Severity
-from freesail.world.geo import Position, bearing_and_distance, estimate_words, format_position
+from freesail.world.geo import (
+    Position,
+    bearing_and_distance,
+    estimate_words,
+    format_position,
+    name_words,
+)
 from freesail.world.lookout import DISTANCE_BY_ESTIMATION_FRACTION as _LOOKOUT_ESTIMATE_FRACTION
 
 __all__ = [
@@ -4668,7 +4674,7 @@ def _head(name: str) -> str:
 
 
 def _key(name: str) -> str:
-    words = "".join(c if c.isalnum() or c.isspace() else " " for c in name.lower()).split()
+    words = name_words(name)
     if words and words[0] == "the":
         words = words[1:]
     return " ".join(words)

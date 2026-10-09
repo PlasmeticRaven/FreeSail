@@ -20,8 +20,10 @@
 The sentence is read from the raw text (the quotes around the name and the colon after
 it are the sentence's own punctuation, which the imperative grammar's normalisation
 drops), then the trigger and condition from the same normalised words the imperative
-grammar reads, with its number words and its noun table, and the orders after `then` by
-`orders.grammar.parse` itself, at give time, so that a misspelt sail is refused when the
+grammar reads, with its number words and its noun table, and the orders after `then`
+read whole by `orders.read_whole` at give time (package 37l: parsed, and then read by the
+order's own reader, its sail, mark, place, anchor, person or number), so that a misspelt
+sail, a mark the chart has not got or a fault in the third order is refused when the
 standing order is given and not when it fires. Every refusal names the word. A word or a
 question to a station after `then` (`tell the watcher ...`, `ask the watcher ...`,
 package 31c) is resolved at give time by `orders.stations.for_standing` to a station
@@ -257,7 +259,7 @@ def _parse_actions(
     order is entered and held until the world has that reading (package 33c; spec M4 §24
     item 4: the starter's `sound the well` was refused at every start since milestone 4a,
     a line of noise in every log)."""
-    from freesail.orders import stations
+    from freesail.orders import read_whole, stations
 
     parts = [p.strip(" .") for p in tail.split(";")]
     actions = [" ".join(p.split()) for p in parts if p.strip()]
@@ -285,7 +287,10 @@ def _parse_actions(
                 f"after 'then' are plain orders to the ship."
             )
         try:
-            imperative.parse(ship, order, vocab)
+            # read whole, as its own reader reads it, and not to its first word (package
+            # 37l; game 10: `take a fix as soon as a bearing can be taken` was entered and
+            # refused at every change of the watch)
+            read_whole(ship, order, vocab)
         except OrderError as e:
             raise OrderError(f"In standing order '{name}', '{order}' is refused: {e}") from None
     return actions, held
@@ -579,6 +584,8 @@ _LT = (
     "is short of",
 )
 _SPEED_UNITS = ("knots", "knot", "kn")
+# "is 12 knots": within half a knot (package 37l; `rules.ABOUT_KN`)
+_ABOUT_WORDS = "half a knot"
 _ANGLE_UNITS = ("degrees", "degree")
 _COUNT_UNITS = ("hands", "men", "hand", "man")
 _GLASS_UNITS = ("inches", "inch")
@@ -937,6 +944,19 @@ def _parse_comparison(
             if word:
                 return row, Comparison(op, word, f"{'not ' if op == 'is_not' else ''}{word}"), n + k
             break
+        # a speed said with 'is' (package 37l; game 10, "when the true wind is 12 knots",
+        # refused six ways before one was taken): the comparison it is, the wind or the
+        # speed at that figure, within half a knot either way, so that a `when` fires as
+        # it comes to it from above or below
+        row = _pick(cands, ("speed",))
+        num = _number(tokens, j, vocab) if row is not None and op == "is" else None
+        if num is not None:
+            value, used = num
+            unit = tokens[j + used] if j + used < stop else ""
+            if unit in _SPEED_UNITS or (not unit and j + used >= stop):
+                k = used + (1 if unit else 0)
+                said = f"{value:g} knots, within {_ABOUT_WORDS}"
+                return row, Comparison("about", float(value), said), n + k
         # the true wind against its ten-minute mean (package 29b): a gust, the mean, a lull
         row = _pick(cands, ("gust",))
         if row is not None:

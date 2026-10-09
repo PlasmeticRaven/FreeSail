@@ -503,6 +503,16 @@ class People:
             raise OrderError(f"Nobody aboard answers to '{words}'; the people are {names}.")
         captain = self.captain
         if p is captain:
+            said = _words(words).removeprefix("mr ").removeprefix("mister ")
+            if p.role not in ("captain", "commander") and said in (p.role, f"the {p.role}"):
+                # a vessel whose master commands (the schooner, the cutter; package 37l,
+                # game 1: `send for the master` was refused and nothing said why)
+                mate = next((x for x in self.people if x.role == "mate"), None)
+                after = f" The mate is {mate.name}; say 'send for the mate'." if mate else ""
+                raise OrderError(
+                    f"In this vessel the {p.role} is the captain: {p.name}, yourself; there "
+                    f"is no sending for yourself.{after}"
+                )
             raise OrderError("You are the captain; there is no sending for yourself.")
         if not p.aboard:
             raise OrderError(f"{p.name} is {place_words(p.where)}; he cannot be sent for.")

@@ -147,3 +147,18 @@ def test_the_readings_and_the_aliases_are_offered_by_the_vocabulary():
             if not cand.endswith(" "):
                 e = world.submit(cand)
                 assert e.kind == "query.reading", (cand, e.kind, e.text)
+
+
+def test_after_a_point_its_half_and_quarter_points_are_offered():
+    """Package 37l: after a whole point, the half and quarter points toward the cardinal
+    points within eight points of it; each one the parser takes and steers to."""
+    ship = frigate()
+    s = suggestions(ship, "steer south by west ", limit=60)
+    assert "steer south by west half west" in s
+    assert "steer south by west quarter south" in s
+    assert "steer south by west three quarters west" in s
+    assert not any(x.endswith(" north") or x.endswith(" east") for x in s)
+    for x in s:
+        if " half " in x or " quarter" in x:
+            handle(ship, x)
+    assert suggestions(ship, "steer south by west half w") == ["steer south by west half west"]

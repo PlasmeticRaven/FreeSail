@@ -86,7 +86,20 @@ def _with_words(ship: Any, phrase: str, said: str, raw: str) -> Result:
         )
     world, view = _view(ship)
     value = view.value(row.id, words)
+    if value is None and head == "where is":
+        # a mark of the chart (package 37l; game 10, `where is ushant`): in sight by the
+        # lookout, else by account from the master's position
+        from freesail.orders.navigation import where_is
+
+        mark = where_is(world, words)
+        if mark is not None:
+            return KIND, f"{mark}.", {"reading": [], "mark": words}
     if value is None:
+        if head == "where is" and getattr(world, "chart", None) is not None:
+            raise OrderError(
+                f"Nobody aboard answers to '{words}', and the chart has no mark of that "
+                "name; 'the people' lists the people."
+            )
         raise OrderError(f"Nobody aboard answers to '{words}'; 'the people' lists them.")
     return (
         KIND,

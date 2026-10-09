@@ -243,6 +243,13 @@ def _evolution_ids(verb: str, vocab: Vocabulary) -> set[str]:
     """The evolutions an order's verb starts: 'reef' -> reef_square, reef_gaff."""
     if verb in NAVIGATION_EVOLUTIONS:
         return {NAVIGATION_EVOLUTIONS[verb]}
+    from freesail.orders.ground_tackle import _EVOLUTIONS as GROUND_TACKLE
+
+    if verb in GROUND_TACKLE:
+        # the ground tackle's and the port's evolutions, which their own module starts:
+        # `belay get under way` (package 37l; game 10, refused for the work's log name
+        # "getting under way") belays the work by the order that started it
+        return {GROUND_TACKLE[verb]}
     if verb == "trim":
         return {str(vocab.evolutions["brace"])}
     mapping = vocab.evolutions.get(verb)

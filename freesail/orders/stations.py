@@ -107,8 +107,12 @@ GENERAL_TAKEN = "you may not work the ship"
 
 # The deck's sentences (package 37): the captain's word that gives and takes it, and his
 # word for the watch. The officer's name before the giving, as the period had it ("Mr
-# Pearce, you have the deck"), is any words before the comma.
-_GIVE_DECK = re.compile(r"^(?:(?P<who>[\w' ]+?)\s*,\s*)?you have the deck\s*$")
+# Pearce, you have the deck"), is any words before the comma, or before the sentence
+# with no comma at all ("Mr Pearce you have the deck"; package 37l, game 10, where it was
+# answered "did you mean 'moor'?"); "the deck is yours" is the same word.
+_GIVE_DECK = re.compile(
+    r"^(?:(?P<who>[\w' ]+?)\s*(?:,\s*|\s+))?(?:you have the deck|the deck is yours)\s*$"
+)
 _TAKE_DECK = re.compile(r"^(?:i have the deck|i'll take the deck|the captain has the deck)\s*$")
 _ALLOW = re.compile(r"^you may (?P<not>not )?(?P<rest>.+)$")
 _HAND_OVER = re.compile(r"^hand over the deck\s*$")
@@ -340,6 +344,12 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
         )
     if verb == "tell":
         station, words = _split_ask(text, ship, verb="tell")
+        held = agents.get(station)
+        if (held is None or not held.started or held.agent.released) and not by:
+            # the captain's own word is kept (a station a replay has yet to seat is held by
+            # nobody yet); a standing order's firing to nobody is refused as it always was,
+            # or a book would fill the journal every glass
+            return _keep_word(ship, station, words)
         agent = _manned(agents, station)
         return (
             "agent.told",
@@ -366,6 +376,32 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
             {"station": station},
         )
     return "agent.resume", agent.resume("the captain"), {"station": station}
+
+
+def _keep_word(ship: Any, station: str, words: str) -> tuple[str, str, dict[str, Any]]:
+    """`tell the <station> <words>` to a station nobody holds (package 37l; the review of
+    gate 5c's playtests, G17: the words were refused and lost): kept in the station's
+    journal and passed to whoever takes it next, in its first sample; the log says so."""
+    from freesail.agents.journal import WORD_KEPT_KIND, Journal
+    from freesail.orders.prompt import world_of
+
+    words = " ".join(str(words).split())
+    if not words:
+        raise OrderError(f"Tell the {station} what? Say the words after the name.")
+    world = world_of(ship)
+    journals = (getattr(ship, "extra", None) or {}).get("agent_journals")
+    if world is None or journals is None:
+        raise OrderError(f"There is no {station} at the station; nobody has been stationed there.")
+    journal = journals.setdefault(station, Journal(station))
+    journal.append(
+        world, f"The captain's word, kept for whoever takes the station: {words}", WORD_KEPT_KIND
+    )
+    return (
+        "agent.told",
+        f"The captain to the {station}: {words} (nobody holds the station; the words are kept "
+        "in its journal for whoever takes it)",
+        {"station": station, "words": words, "kept": True},
+    )
 
 
 def _manned(agents: dict[str, Any], station: str) -> Any:

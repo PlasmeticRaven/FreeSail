@@ -10,9 +10,14 @@
                  | "a fathom" | count "fathoms" | "a little" | "handsomely" | "roundly"
                  | "home" | "aft"
                  | "to" heading | heading
-    heading     := number ["degrees"] | compass-point
+    heading     := number ["degrees"] | compass-point [ fraction ["a" "point"] compass-point ]
                  | count "point"/"points" ("up" | "off" | "to starboard" | "to larboard")
-    count       := number | "half" ["a"] | "a half" | number "and a half"
+    fraction    := "half" | "a half" | "quarter" | "a quarter" | "three quarters"
+                   ("1/2", "1/4", "3/4", "½", "¼", "¾" read as these words)
+    count       := number | "half" ["a"] | "a half" | "a quarter" | number "and a half"
+    number      := figures | a number in words, to the hundreds and thousands
+                   ("sixteen", "a hundred and eighty-five"): `orders.numbers`, the one
+                   reader every order that takes a number uses (package 37l)
     object      := [ "the" ] [ side_word ] noun { "and" [ "the" ] noun } [ side_word ]
 
 How the parser reads a line:
@@ -36,6 +41,11 @@ How the parser reads a line:
    nearest words that would have been understood.
 5. "Take in" with a number of reefs ("take in one reef in the topsails") is
    a reef, not a taking in.
+6. A course is read whole or refused (package 37l; game 10's `steer south by west half
+   west` was steered west, its last word): a half or a quarter point after a compass
+   point is reckoned toward the point named after it, within eight points
+   (`units.read_course`); a fraction with no point after it, two courses in one order,
+   or a course with a count of points, is refused in words.
 
 The parser does not decide what the order *means* for the ship; that is
 `verbs.py`. It only produces an `Order`.
@@ -47,7 +57,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from freesail import units
-from freesail.orders import errors, work
+from freesail.orders import errors, numbers, work
 from freesail.orders.errors import OrderError
 from freesail.orders.resolve import compound_span, noun_table
 from freesail.orders.vocabulary import (
@@ -121,6 +131,14 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
     words = segments[0]
 
     verb_phrase, verb = _match_verb(words, vocab)
+    if vocab.verbs[verb].object == "port" and words[:2] == ["take", "in"]:
+        # 'take in the water sail' is the sail and not the water (package 37l; game 10,
+        # where it was answered "the port's business"): the port's 'take in the water'
+        # gives way to a sail of this ship named after 'take in'
+        after = strip_article(words[2:])
+        span = compound_span(noun_table(ship), after) if after else None
+        if span is not None or after[:2] == ["water", "sail"]:
+            verb_phrase, verb = "take in", "take in"
     rest = words[len(verb_phrase.split()) :]
     if verb == "belay" and verb_phrase in work.STOP_WORDS:
         # a bare "belay" or "avast", or one said of work, belays work (package 29c); said
@@ -180,6 +198,8 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
 
     obj: str | None = None
     side_word: str | None = None
+    if verb == "trim":
+        rest = _sheets_of_sails(ship, rest)
     if spec.object in ("sail", "yards", "line", "wreck"):
         obj, side_word, rest = _match_object(ship, rest, vocab, verb, spec)
         if verb == "trim" and obj is not None:
@@ -260,6 +280,28 @@ def _sail_of_sheet(ship: Ship, obj: str, side_word: str | None) -> tuple[str, st
     return display_name(ship, sails[0]), None
 
 
+def _sheets_of_sails(ship: Ship, words: list[str]) -> list[str]:
+    """For `trim`: 'the headsail sheets', 'the staysail sheets' (package 37l; game 10's
+    captain, refused "no such part as the headsail sheets"), the sheets of a group of
+    sails that is no line of the ship by that name, as the group itself: the trim works
+    each sail's sheet. A line that is a noun of the ship ('the jib sheets') is left as it
+    is, for `_sail_of_sheet`."""
+    ws = strip_article(list(words))
+    unit = next((k for k, w in enumerate(ws) if w in ("sheet", "sheets")), None)
+    if not unit:
+        return words
+    table = noun_table(ship)
+    whole = compound_span(table, ws[: unit + 1])
+    if whole is not None and whole[0] == unit + 1:
+        return words  # a line of the ship by that name
+    head, tail = ws[:unit], ws[unit + 1 :]
+    for cand in (head, [*head[:-1], head[-1] + "s"]):
+        span = compound_span(table, cand)
+        if span is not None and span[0] == len(cand):
+            return [*cand, *tail]
+    return words
+
+
 def _steer_for_a_place(verb: str, verb_phrase: str, words: list[str]) -> str | None:
     """The place after `steer for` (or `head for`, `steer towards`) when the words are no
     heading: the words, for `shape a course for`; None for any other order."""
@@ -278,26 +320,16 @@ def _steer_for_a_place(verb: str, verb_phrase: str, words: list[str]) -> str | N
 # ---------------------------------------------------------------------------
 
 CANVAS_VERBS = ("bend", "shift")
-_CANVAS_NUMBER_WORDS = {
-    "one": 1,
-    "two": 2,
-    "three": 3,
-    "four": 4,
-    "five": 5,
-    "six": 6,
-    "seven": 7,
-    "eight": 8,
-    "nine": 9,
-}
 
 
 def _canvas_number(words: list[str], i: int) -> int | None:
     """'no 1', 'number 1', 'number one' at `i` (the point of "No. 1" is gone by now)."""
     if i + 1 < len(words) and words[i] in ("no", "number"):
         w = words[i + 1]
-        n = int(w) if w.isdigit() else _CANVAS_NUMBER_WORDS.get(w)
-        if n is not None and 1 <= n <= 9:
-            return n
+        got = numbers.read([w], 0) if w not in ("a", "an") else None
+        n = got[0] if got is not None else None
+        if n is not None and n == int(n) and 1 <= n <= 9:
+            return int(n)
     return None
 
 
@@ -448,7 +480,7 @@ def _match_object(
     """
     words = strip_article(list(words))
     table = noun_table(ship)
-    leading_words = set(vocab.numbers) | set(vocab.brace_modes) | _LEADING_WORDS
+    leading_words = set(vocab.numbers) | NUMBER_WORDS | set(vocab.brace_modes) | _LEADING_WORDS
     leading: list[str] = []
     start = 0
     while start <= len(words):
@@ -476,6 +508,9 @@ def _match_object(
 
 
 _PREPOSITIONS = ("in", "of", "from", "on")
+# The words a number may be made of (`orders.numbers`), as modifier words: "sixteen",
+# "eighty", "hundred", "quarter" (not 'and' or 'of', which join nouns)
+NUMBER_WORDS = frozenset(numbers.WORDS - {"and", "of"})
 # Words that may come between the verb and the noun ("shake out two reefs in the
 # topsail", "brace in the fore yards"), besides numbers and brace modes.
 _LEADING_WORDS = frozenset({"reef", "reefs", "in", "of", "from", "on", "all", "close"})
@@ -545,6 +580,7 @@ def _examples(ship: Ship, kind: str) -> str:
 
 def _modifier_words(vocab: Vocabulary) -> set[str]:
     out: set[str] = set()
+    out.update(NUMBER_WORDS)
     for group in (
         vocab.brace_modes,
         vocab.sides,
@@ -588,34 +624,19 @@ def _looks_like_modifiers(words: list[str], vocab: Vocabulary) -> bool:
 
 
 def _count(word: str, vocab: Vocabulary) -> float | None:
-    if word.isdigit():
-        return float(word)
-    try:
-        if word.replace(".", "", 1).isdigit():
-            return float(word)
-    except ValueError:
-        pass
-    return vocab.numbers.get(word)
+    """A number said in one word, in figures or in words ('16', 'sixteen', 'half')."""
+    got = numbers.read([word], 0)
+    return got[0] if got is not None else None
 
 
 def _count_at(words: list[str], i: int, vocab: Vocabulary) -> tuple[float, int] | None:
-    """A count starting at words[i], with halves: (value, words used) or None.
+    """A count starting at words[i], with halves and quarters: (value, words used) or None.
 
-    "two", "half a" (point), "a half" (point), "two and a half" (points).
-    "A point and a half" is read by the caller after the unit.
+    "two", "sixteen", "a hundred and eighty five", "half a" (point), "a half" (point), "a
+    quarter" (fathom), "two and a half" (points): `orders.numbers`, the one reader for
+    numbers (package 37l). "A point and a half" is read by the caller after the unit.
     """
-    w = words[i]
-    nxt = words[i + 1] if i + 1 < len(words) else ""
-    if w == "half":
-        return 0.5, 2 if nxt in ("a", "an") else 1
-    c = _count(w, vocab)
-    if c is None:
-        return None
-    if w in ("a", "an") and nxt == "half":
-        return 0.5, 2
-    if words[i + 1 : i + 4] == ["and", "a", "half"]:
-        return c + 0.5, 4
-    return c, 1
+    return numbers.read(words, i)
 
 
 def _and_a_half(words: list[str], j: int) -> int:
@@ -751,6 +772,14 @@ def _parse_modifiers(
         h = _match_heading(words, i + skip_to, vocab)
         if h is not None:
             heading, text, used = h
+            if "heading" in mods:
+                # two courses in one order (package 37l: `steer south by west half west`
+                # was steered west, its last word): refused, never steered to either
+                raise OrderError(
+                    f"Two courses were given ('{mods['heading_text']}' and '{text}'); say "
+                    f"one. A half or a quarter point is said after the point it is reckoned "
+                    f"from: 'south by west half west', 'S by W 1/2 W'."
+                )
             mods["heading"] = heading
             mods["heading_text"] = text
             i += skip_to + used
@@ -789,20 +818,37 @@ def _parse_modifiers(
 
 
 def _match_heading(words: list[str], i: int, vocab: Vocabulary) -> tuple[float, str, int] | None:
-    """A heading starting at words[i]: (radians, text as said, words used) or None."""
+    """A heading starting at words[i]: (radians, text as said, words used) or None.
+
+    Degrees in figures ('245', '245 degrees') or in words with the word 'degrees' ('two
+    hundred and forty five degrees'); or a course by the card, with its half or quarter
+    point ('south by west half west', 'WNW 1/2 W', 'NE by N 1/4 N'; package 37l), read
+    whole by `units.read_course`, so that it is never steered to its last word. A
+    fraction after a point that cannot be read is refused in words."""
     if i >= len(words):
         return None
     w = words[i]
-    c = _count(w, vocab)
-    if c is not None and w[0].isdigit():
-        used = 1
-        if i + 1 < len(words) and words[i + 1] in ("degrees", "degree"):
-            used = 2
-        return units.wrap_2pi(units.deg_to_rad(c)), f"{c:g} degrees", used
-    # compass point: try the longest run first (up to five words: "north east by north")
-    for k in range(min(5, len(words) - i), 0, -1):
-        phrase = " ".join(words[i : i + k])
-        angle = units.parse_compass_point(phrase)
-        if angle is not None:
-            return angle, units.point_name(angle, full=True), k
-    return None
+    if w[0].isdigit():
+        c = _count(w, vocab)
+        if c is not None:
+            used = 1
+            if i + 1 < len(words) and words[i + 1] in ("degrees", "degree"):
+                used = 2
+            return units.wrap_2pi(units.deg_to_rad(c)), f"{c:g} degrees", used
+    counted = numbers.read(words, i)
+    if counted is not None and words[i + counted[1] : i + counted[1] + 1] in (
+        ["degrees"],
+        ["degree"],
+    ):
+        c = counted[0]
+        return units.wrap_2pi(units.deg_to_rad(c)), f"{c:g} degrees", counted[1] + 1
+    try:
+        course = units.read_course(words, i)
+    except units.CourseError as e:
+        raise OrderError(str(e)) from None
+    if course is None:
+        return None
+    angle, shown, used = course
+    if "¼" in shown or "½" in shown or "¾" in shown:
+        return angle, shown, used
+    return angle, units.point_name(angle, full=True), used

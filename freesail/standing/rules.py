@@ -91,12 +91,18 @@ def officer_words(officer: str) -> str:
 # ---------------------------------------------------------------------------
 
 
+# A speed said with 'is' ("when the true wind is 12 knots"; package 37l) holds within
+# half a knot of the figure either way (judgement: the log gives the wind to the knot, and
+# a band a knot wide is crossed and not leapt by a wind that rises or falls through it).
+ABOUT_KN = 0.5
+
+
 @dataclass(frozen=True)
 class Comparison:
     """How a reading is compared: an operation, its value in the reading's nautical unit
     (or a word, or radians for a compass point), and the words as said."""
 
-    op: str  # gt | lt | backs | veers | shifts | from | forward_of | abaft | side | point |
+    op: str  # gt | lt | about | backs | veers | shifts | from | forward_of | abaft | side | point |
     #          east_of | west_of | is | is_not | straining
     value: Any
     text: str
@@ -182,6 +188,8 @@ class Clause:
         kind = R.REGISTRY.get(self.reading).kind
         if kind == "speed":
             kn = units.ms_to_knots(value)
+            if op == "about":  # "is 12 knots" (package 37l)
+                return abs(kn - v) <= ABOUT_KN
             return kn > v if op == "gt" else kn < v
         if kind == "angle":
             deg = units.rad_to_deg(abs(value))
@@ -208,6 +216,8 @@ class Clause:
             if op == "side":
                 return R.apparent_side(value) == v
             kn = units.ms_to_knots(value)
+            if op == "about":
+                return abs(kn - v) <= ABOUT_KN
             return kn > v if op == "gt" else kn < v
         if kind == "compass":
             if op == "point":

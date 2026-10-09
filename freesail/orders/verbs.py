@@ -313,6 +313,14 @@ def _sail_evolution(
     _no_stray_modifiers(order, allowed)
     res = resolve.resolve(ship, order.object or "", order.side_word, verb)
     mapping: dict[str, str] = vocab.evolutions.get(verb, {})
+    if verb == "furl":
+        # a jib, a staysail or a studding sail (the water sail among them), which is not
+        # furled on a spar, is handed and stowed: `furl` takes it in, as the captain means
+        # (package 37l; the review of gate 5c's playtests, G17: "furl the jibs" was
+        # answered "take it in"); a gaff sail keeps its refusal, which names its own words
+        take_in = vocab.evolutions.get("take in", {})
+        handed = {c: take_in[c] for c in FURLED_AS_TAKEN_IN if c in take_in}
+        mapping = {**handed, **mapping}
     params = _sail_params(order)
 
     sails: list[Sail] = []
@@ -391,6 +399,11 @@ def _sail_evolution(
         "failed_subjects": failed_ids,
     }
     return "evolution.started", text, data
+
+
+# The classes of sail that `furl` takes in (package 37l): handed and stowed, not furled on
+# a spar.
+FURLED_AS_TAKEN_IN = ("jibheaded", "studding")
 
 
 def _sail_params(order: Order) -> dict[str, Any]:
@@ -579,6 +592,10 @@ def _brace(
     verb = order.verb
     mode = order.modifiers.get("brace_mode")
     tack = order.modifiers.get("tack")
+    if verb == "back" and order.object:
+        backed = _back_headsails(ship, order, vocab)
+        if backed is not None:
+            return backed
     if verb in ("square", "back"):
         if mode is not None and mode != {"square": "square", "back": "aback"}[verb]:
             raise OrderError(f"'{verb}' says how already; '{mode}' contradicts it.")
@@ -1785,6 +1802,48 @@ def _yards_off_words(ship: Ship, down: list[Spar], gone: list[Spar]) -> str:
     return " and ".join(clauses)
 
 
+def _back_headsails(ship: Ship, order: Order, vocab: Vocabulary) -> Result | None:
+    """`back the fore staysail` (package 37l; the review of gate 5c's playtests, G17): a
+    headsail, which has no yard to lay aback, is backed by hauling its sheet over to
+    windward, as `haul the fore staysail sheet to windward` does (package 32e; Luce 1884,
+    ch. XXXIV, 'Sloops', 'To Heave to'). None when the object is not one or more
+    fore-and-aft sails without a yard; the yards' own refusals then stand."""
+    from freesail.orders.grammar import parse
+
+    try:
+        res = resolve.resolve(ship, order.object or "", order.side_word, order.verb)
+    except OrderError:
+        return None
+    sails = [ship.parts.get(pid) for pid in res.ids]
+    if not sails or not all(
+        isinstance(s, Sail) and s.cls == "jibheaded" and ship.yard_of(s) is None for s in sails
+    ):
+        return None
+    texts: list[str] = []
+    done: list[dict[str, Any]] = []
+    failed: list[str] = []
+    kind = "line.order"
+    for sail in sails:
+        name = resolve.display_name(ship, sail.id)
+        try:
+            sheet = parse(ship, f"haul the {name} sheet to windward", vocab)
+            kind, text, data = execute(ship, sheet, vocab)
+        except OrderError as e:
+            failed.append(_refused(f"the {name}", e))
+            continue
+        texts.append(text)
+        done.append(data)
+    if not done:
+        if len(failed) == 1:
+            raise OrderError(failed[0][0].upper() + failed[0][1:].rstrip(".") + ".")
+        raise OrderError(f"Nothing done: {errors.sentence_list(failed)}.")
+    head = f"Backed the {res.name}, its sheet hauled to windward: "
+    text = head + " ".join(texts)
+    if failed:
+        text += " Not done: " + errors.sentence_list(failed) + "."
+    return kind, text, {"verb": order.verb, "level": 0, "backed": done, "failed": failed}
+
+
 def _brace_words(angle: float) -> str:
     deg = abs(units.rad_to_deg(angle))
     if deg < 0.5:
@@ -2040,6 +2099,16 @@ def _helm(ship: Ship, order: Order) -> Result:
     windward = 1.0 if dyn.tack == "starboard" else -1.0
 
     if verb == "steer":
+        if "heading" in mods and "points" in mods:
+            # a course and a count of points in one order (package 37l: `steer south by
+            # west half west` was steered west with "half" for a count of points): which
+            # was meant cannot be told, and she is not steered on a guess
+            raise OrderError(
+                f"'{order.text}' gives a course ({mods.get('heading_text', '')}) and a "
+                f"number of points ({_points_words(mods['points'])}); say one. A half or a "
+                f"quarter point is said after the point it is reckoned from, toward "
+                f"another: 'steer south by west half west', 'steer S by W 1/2 W'."
+            )
         if "heading" in mods:
             target = units.wrap_2pi(mods["heading"])
             said = mods.get("heading_text", "")
@@ -2069,6 +2138,11 @@ def _helm(ship: Ship, order: Order) -> Result:
     dyn.target_heading = target
     dyn.steady = False
     shown = units.format_heading(target)
+    said_text = str(mods.get("heading_text", ""))
+    if verb == "steer" and "heading" in mods and any(f in said_text for f in "¼½¾"):
+        # a course with a half or a quarter point (package 37l) is shown as the card has
+        # it, and not as the whole point nearest it
+        shown = f"{said_text} ({units.rad_to_deg(target):.0f}°)"
     if verb == "steer":
         text = f"Helm ordered: steer {shown}."
         if "points" in mods:
@@ -2108,7 +2182,9 @@ def _conn(ship: Ship, order: Order) -> Result:
         shown = units.format_heading(dyn.target_heading)
         if verb == "steady":
             text = f"Helm ordered: steady; steer {shown}."
-            if said != "steady":
+            if said == "steady on":
+                text = f"Helm ordered: steady on {shown}."
+            elif said != "steady":
                 text = f"Helm ordered: {said}; steady on {shown}."
         else:
             text = f"Helm ordered: {said}; met her swing with the helm, steady on {shown}."

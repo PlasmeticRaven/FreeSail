@@ -86,6 +86,18 @@ class Vocabulary:
     # the orders that give up something of the ship's for good (package 37g): kept back
     # from the captain's general authority to work the ship (`agents.tools`)
     irrevocable: tuple[str, ...] = ()
+    # words the ship does not take, each with its sentence (package 37l): "hoist our
+    # colours" is milestone 7's, "as you were" says what to say instead
+    refused_phrases: dict[str, str] = field(default_factory=dict)
+
+    def refused(self, text: str) -> str | None:
+        """The sentence for a line that begins with one of `refused_phrases`, longest
+        first; None for any other line."""
+        said = key(text)
+        for phrase in sorted(self.refused_phrases, key=lambda p: -len(p)):
+            if said == phrase or said.startswith(phrase + " "):
+                return self.refused_phrases[phrase]
+        return None
 
     @property
     def class_bound_take_in_phrases(self) -> frozenset[str]:
@@ -104,6 +116,15 @@ class Vocabulary:
 
 _PUNCT = re.compile(r"[^\w\s,'°]")
 _DECIMAL = re.compile(r"(\d)\.(\d)")
+_FRACTIONS = {
+    "1/2": "half",
+    "1/4": "quarter",
+    "3/4": "three quarters",
+    "½": "half",
+    "¼": "quarter",
+    "¾": "three quarters",
+}
+_FRACTION = re.compile(r"(?<![\d/])(?:1/2|1/4|3/4)(?![\d/])|[½¼¾]")
 
 
 def normalise(text: str) -> str:
@@ -113,6 +134,9 @@ def normalise(text: str) -> str:
     order, and apostrophes are part of words such as "tops'l" and "nor'west".
     """
     t = text.lower().replace("’", "'").replace("‘", "'")
+    # the fractions of a point or a fathom, in figures or signs, as words (package 37l:
+    # 'WNW 1/2 W', 'S by W ½ W', 'a 1/4 fathom')
+    t = _FRACTION.sub(lambda m: f" {_FRACTIONS[m.group(0)]} ", t)
     t = t.replace("-", " ").replace("_", " ").replace("/", " ")
     # keep the point inside a number such as "280.5" through the punctuation sweep
     t = _DECIMAL.sub(lambda m: m.group(1) + "qdotq" + m.group(2), t)
@@ -253,6 +277,9 @@ def load_vocabulary(path: str | Path | None = None) -> Vocabulary:
         if key(str(verb)) not in verbs:
             raise ValueError(f"{p}: irrevocable names '{verb}', which is no verb.")
     vocab.irrevocable = _tuple(data.get("irrevocable"))
+    vocab.refused_phrases = {
+        key(phrase): str(words) for phrase, words in (data.get("refused_phrases") or {}).items()
+    }
     return vocab
 
 
