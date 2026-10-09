@@ -2270,6 +2270,7 @@ def test_a_stand_by_with_the_deck_is_broken_by_danger_refused_what_cannot_end_an
         "a spar or a line straining",
         "an evolution failed",
         "the ship taken aback",
+        "her sails lifting",  # package 37k: said before she is taken aback
     }
     assert R.speaks_of_danger("weather.change", {"weather": "rain"}) is None
     assert R.speaks_of_danger("strain.warning", {}) == "a spar or a line straining"

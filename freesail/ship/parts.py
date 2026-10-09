@@ -968,6 +968,24 @@ class GroundTackle:
                 return a
         return None
 
+    def carries(self, words: str | None) -> bool:
+        """Whether she carries an anchor the words name, whatever its state (package 37k:
+        `let go the sheet anchor` in a cutter, which has none, was taken while the hands
+        were at other work and failed four minutes later): `by_words`, with 'the second
+        anchor' any bower, down or not."""
+        if self.by_words(words) is not None:
+            return True
+        cleaned = "".join(c if c.isalnum() or c.isspace() else " " for c in (words or "").lower())
+        key = " ".join(w for w in cleaned.split() if w not in ("the", "anchor", "anchors", "cable"))
+        return key in ("second", "other", "lee", "weather", "second bower") and bool(self.bowers())
+
+    def names_words(self) -> str:
+        """'the best bower, the small bower and the kedge': her anchors, for a refusal."""
+        names = [a.name for a in self.anchors]
+        if len(names) <= 1:
+            return "".join(names)
+        return ", ".join(names[:-1]) + " and " + names[-1]
+
     def bowers(self) -> list[Anchor]:
         return [a for a in self.anchors if a.kind == "bower"]
 

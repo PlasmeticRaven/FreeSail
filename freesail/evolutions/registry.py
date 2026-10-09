@@ -136,6 +136,10 @@ class Evolution:
     timing: dict[str, float] = field(default_factory=dict)
     path: str = "<memory>"
     belays: bool = False  # an all-hands manoeuvre stops the sail work in hand (spec M3 §3.4)
+    # the line when work that waited its turn finds, as it comes to begin, that it cannot
+    # (a precondition fails): ``on_refused`` in the file, else ``on_fail``'s (package 37k:
+    # a tack that could not begin was said in a missed stay's words)
+    on_refused: Outcome | None = None
 
     @property
     def nominal_duration_s(self) -> float:
@@ -304,6 +308,11 @@ def parse_evolution(data: Any, path: str = "<memory>") -> Evolution:
         timing={str(k): float(v) for k, v in timing.items()},
         path=path,
         belays=belays,
+        on_refused=(
+            _outcome(data["on_refused"], "", "evolution.failed", "notable")
+            if data.get("on_refused")
+            else None
+        ),
     )
 
 

@@ -51,6 +51,11 @@ on_complete: {log: "Tacked; braced up on the {new_tack} tack, heading {new_cours
 # The urgent "Missed stays" line is the script's, at the moment she has (kind
 # ship.missed_stays); this line comes when the yards are square and she has fallen off.
 on_fail: {log: "Squared the yards; she fell off on the {old_tack} tack, to try again or to wear.", kind: ship.fell_off, severity: notable}
+# A tack that waited its turn (behind a cast of the lead, a trim) and could not begin when
+# it came, being off the wind or without way, is said in its own words and not in a
+# missed stay's (package 37k; the review's G7: three "she fell off" lines of the Speedwell
+# shared a tick with a cast of the lead and had no "Ready about" before them).
+on_refused: {log: "Could not go about: {reason}.", kind: evolution.failed, severity: notable}
 # crew (package 19): checked; "Tacking and wearing: weather main-topsail and upper
 # braces" is in every topman's billet: all hands (Luce 1884, ch. XVIII Organization, 'Station Billet').
 crew: {hands: all, rating: ordinary, stations: [all hands]}

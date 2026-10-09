@@ -245,6 +245,13 @@ def _evolution_ids(verb: str, vocab: Vocabulary) -> set[str]:
         return {NAVIGATION_EVOLUTIONS[verb]}
     if verb == "trim":
         return {str(vocab.evolutions["brace"])}
+    from freesail.orders import ground_tackle  # local import: it imports the verbs
+
+    if verb in ground_tackle._EVOLUTIONS:
+        # the ground tackle's verbs start their evolutions from their own table (package
+        # 37k: game 10's `belay get under way` was "Nothing in hand or waiting answers to
+        # 'get under way'" with getting under way the one work in hand)
+        return {ground_tackle._EVOLUTIONS[verb]}
     mapping = vocab.evolutions.get(verb)
     if isinstance(mapping, dict):
         return {str(v) for v in mapping.values()}

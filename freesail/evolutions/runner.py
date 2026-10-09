@@ -456,6 +456,8 @@ class Runner:
             if isinstance(inst.subject, Sail):
                 entry["state"] = inst.subject.state.value
                 entry["reefs"] = inst.subject.reefs
+            if inst.script is not None and not inst.waiting:
+                inst.script.belayed()  # package 37k: the capstan's pawl let go
             self._remove(ship, inst)
             key = inst.params.get("log_group")
             if key:
@@ -470,6 +472,9 @@ class Runner:
             why = "for hands" if inst.waiting_for == WAITING_FOR_HANDS else "its turn"
             return f"not begun, it was waiting {why}"
         subject = inst.subject
+        said = inst.script.left_words() if inst.script is not None else None
+        if said:
+            return said  # the script's own words: where the anchor is left (package 37k)
         if isinstance(subject, Ship):
             phase = inst.script.phase.replace("_", " ") if inst.script is not None else ""
             at = f" at {phase}" if phase and phase not in ("ready", "done") else ""
@@ -723,6 +728,8 @@ class Runner:
             if reason is not None:
                 if inst.done_already:
                     self._done_already(ship, inst, reason)
+                elif inst.evo.on_refused is not None:
+                    self._refused(ship, inst, reason)
                 else:
                     self._fail(ship, inst, reason)
                 continue
@@ -851,6 +858,25 @@ class Runner:
     def _fail(self, ship: Ship, inst: Instance, reason: str) -> None:
         self._remove(ship, inst)
         self._note(ship, inst, inst.evo.on_fail, reason=reason)
+        key = inst.params.get("log_group")
+        if key:
+            self._group_done(ship, inst, key)
+        self._after_all_hands(ship, inst)
+
+    def _refused(self, ship: Ship, inst: Instance, reason: str) -> None:
+        """Work that waited its turn and could not begin when it came (a precondition
+        fails): said in the evolution's own words for it, `on_refused`, and not in its
+        `on_fail`'s, which are for work that began and failed (package 37k; the review's
+        G7: a tack that waited behind the leadsman and found her off the wind was logged
+        "Squared the yards; she fell off on the starboard tack", a missed stay's words,
+        and her officer gave up tacking in the Sound for two missed stays that never
+        were)."""
+        assert inst.evo.on_refused is not None
+        self._remove(ship, inst)
+        said = reason.strip()
+        if len(said) > 1 and said[0].isupper() and said[1].islower():
+            said = said[0].lower() + said[1:]  # it follows a colon
+        self._note(ship, inst, inst.evo.on_refused, reason=said)
         key = inst.params.get("log_group")
         if key:
             self._group_done(ship, inst, key)

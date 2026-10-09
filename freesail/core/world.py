@@ -328,6 +328,10 @@ class World:
     # defaults, so that a checkpoint from an earlier build loads with them.
     _drag_said: dict[str, tuple[int, float]] | None = None
     _brought_up_s: int = 0
+    # Package 37k: for each anchor whose dragging the log has opened, its come-home
+    # figure as last seen and the metres come home since the dragging began, across the
+    # spells of it (the physics counts each spell afresh). A class default, as above.
+    _drag_seen: dict[str, tuple[float, float]] | None = None
 
     def __init__(self, seed: int, scenario: Scenario | None = None, ship: Any = None):
         # the build's stamp, worked once at the start (package 37d)
@@ -743,10 +747,21 @@ class World:
         anchor begins to come home, with the advice that is left to take (not "veer more
         cable" at the bitter end, nor an anchor that is down already). While it goes on,
         a notable line no oftener than `DRAG_REPORT_S`, with how far it has come, and
-        only while it is still moving. "Holds again", routine, when it has not moved for
-        `DRAG_SETTLE_S`; the next drag is then a new one. And when she is brought up by an
-        anchor let go by itself, the log says so, as `come to an anchor` always has."""
-        from freesail.physics.anchor import DRAG_REPORT_MIN_M, DRAG_REPORT_S
+        only while it is still moving. And when she is brought up by an anchor let go by
+        itself, the log says so, as `come to an anchor` always has.
+
+        Package 37k (the review's G8, 37f's own note: on bare rock in a tideway an anchor
+        held six minutes and came home again, and each relapse was a new urgent line,
+        eight in the Goulet's eight hours with its ground forced to rock): a dragging is
+        over only when the anchor has held `DRAG_HOLDS_AGAIN_S`, a quarter of an hour,
+        and then the log says "holds again" with how far it came in all; one that comes
+        home again within that is the same dragging, with no second urgent line, and its
+        metres are counted on from where the first spell left them."""
+        from freesail.physics.anchor import (
+            DRAG_HOLDS_AGAIN_S,
+            DRAG_REPORT_MIN_M,
+            DRAG_REPORT_S,
+        )
 
         tackle = (getattr(self.ship, "extra", None) or {}).get("ground_tackle")
         if not tackle:
@@ -754,15 +769,27 @@ class World:
         said = self._drag_said
         if said is None:
             said = self._drag_said = {}
+        seen = self._drag_seen
+        if seen is None:
+            seen = self._drag_seen = {}
         for anchor in tackle.anchors:
             if not anchor.down:
                 self._dragging.discard(anchor.id)
                 said.pop(anchor.id, None)
+                seen.pop(anchor.id, None)
                 continue
             name = f"{anchor.name[:1].upper()}{anchor.name[1:]}"
+            if anchor.id in self._dragging:
+                # the metres come home since the dragging began: what the physics' figure
+                # has grown by since it was last seen, or the whole of it when a new
+                # spell has begun its count afresh
+                last, total = seen.get(anchor.id, (anchor.drag_m, anchor.drag_m))
+                grown = anchor.drag_m - last if anchor.drag_m >= last else anchor.drag_m
+                seen[anchor.id] = (anchor.drag_m, total + max(grown, 0.0))
             if anchor.dragging and anchor.id not in self._dragging:
                 self._dragging.add(anchor.id)
                 said[anchor.id] = (self.clock.tick, anchor.drag_m)
+                seen[anchor.id] = (anchor.drag_m, anchor.drag_m)
                 # urgent (package 37d; the review of gate 5c's playtests, 8.2 item 13): a
                 # dragging anchor is a ship adrift toward whatever lies to leeward, and
                 # a station standing by must be woken for it
@@ -773,24 +800,24 @@ class World:
                     data=anchor.to_dict(),
                 )
             elif anchor.dragging:
-                at, far = said.get(anchor.id, (self.clock.tick, anchor.drag_m))
+                total = seen.get(anchor.id, (anchor.drag_m, anchor.drag_m))[1]
+                at, far = said.get(anchor.id, (self.clock.tick, total))
                 if (
                     self.clock.tick - at >= DRAG_REPORT_S
-                    and anchor.drag_m - far >= DRAG_REPORT_MIN_M
+                    and total - far >= DRAG_REPORT_MIN_M
                     and anchor.hold_s < 60.0
                 ):
-                    said[anchor.id] = (self.clock.tick, anchor.drag_m)
+                    said[anchor.id] = (self.clock.tick, total)
                     self.record(
                         Severity.NOTABLE,
                         "anchor.coming_home",
-                        f"{name} still coming home: {_come_home_words(anchor.drag_m)} since "
-                        f"it began.",
-                        data=anchor.to_dict(),
+                        f"{name} still coming home: {_come_home_words(total)} since it began.",
+                        data=anchor.to_dict() | {"come_home_m": round(total, 1)},
                     )
-            elif anchor.id in self._dragging:
+            elif anchor.id in self._dragging and anchor.hold_s >= DRAG_HOLDS_AGAIN_S:
                 self._dragging.discard(anchor.id)
                 came = said.pop(anchor.id, (0, 0.0))[1]
-                came = max(came, anchor.drag_m)
+                came = max(came, seen.pop(anchor.id, (0.0, 0.0))[1], anchor.drag_m)
                 self.record(
                     Severity.ROUTINE,
                     "anchor.holding",

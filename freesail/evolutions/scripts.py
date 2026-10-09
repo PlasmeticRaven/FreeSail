@@ -317,11 +317,63 @@ def shift_sheets_over(ship: Ship, new_lee: str, wind: Wind, way: float) -> None:
     draw_sheets(ship, sails, new_lee, full_and_by_apparent(ship, wind, way))
 
 
-def innermost_head_sail(ship: Ship) -> Sail | None:
+def innermost_head_sail(ship: Ship, standing: bool = False) -> Sail | None:
     """The head sail nearest the mast (the fore staysail, or the jib if it is alone): the
-    sheet a fore-and-after hauls to windward to heave to (Luce 1884, ch. XXXIV)."""
+    sheet a fore-and-after hauls to windward to heave to (Luce 1884, ch. XXXIV). With
+    `standing`, of those that are set and not being handed (package 37k)."""
     heads = head_sails(ship)
+    if standing:
+        heads = [sl for sl in heads if not being_handed(ship, sl)]
     return min(heads, key=lambda sl: sl.x_m) if heads else None
+
+
+# The evolutions that take a sail in, furl it or unbend it: a sail they are at, in hand
+# or waiting for hands, is not one a heave-to lays aback (package 37k).
+HANDING_EVOLUTIONS = frozenset(
+    {
+        "take_in_square",
+        "take_in_gaff",
+        "take_in_jibheaded",
+        "take_in_studding",
+        "furl_square",
+        "furl_gaff",
+        "furl_jibheaded",
+        "unbend_sail",
+        "shift_sail",
+    }
+)
+
+
+def being_handed(ship: Ship, sail: Sail) -> bool:
+    """Whether the hands are at taking this sail in, furling or unbending it, or have the
+    order to (package 37k; the review's G7, game 10: the officer was hauling down the
+    cutter's foresail at the pilot's hail while the captain hove her to; the heave-to
+    backed that same foresail, said "Hove to", and she filled within a minute when it
+    came down)."""
+    runner = ship.extra.get("evolutions")
+    for inst in getattr(runner, "instances", None) or ():
+        if inst.evo.id in HANDING_EVOLUTIONS and sail.id in (
+            inst.subject_id,
+            inst.params.get("sail"),
+        ):
+            return True
+    return False
+
+
+def standing_sail_on(ship: Ship, yards: list[Spar]) -> Sail | None:
+    """The first sail on these yards that a heave-to can lay to the mast: set, not being
+    handed, and not a course (the heave-to hauls the courses up); or None."""
+    courses = {sl.id for sl in lowest_square_sails(ship)}
+    for y in yards:
+        sail = ship.sail_of(y)
+        if (
+            sail is not None
+            and sail.is_set
+            and sail.id not in courses
+            and not being_handed(ship, sail)
+        ):
+            return sail
+    return None
 
 
 def working_yards(ship: Ship) -> list[Spar]:
@@ -385,6 +437,33 @@ def yards_to_back(ship: Ship) -> list[Spar]:
 
     chosen = max(masts, key=square_area)
     return [y for y in working_yards(ship) if ship.mast_of(y) is chosen]
+
+
+def yards_to_back_set(ship: Ship) -> list[Spar]:
+    """The yards a heave-to lays aback (package 37k): the main's as `yards_to_back` has
+    them whenever a sail stands on them, set, not being handed and not a course (Luce's
+    "main topsail to the mast"; with the topsail furled and the topgallant set, the
+    topgallant); else those of the mast carrying the most square sail that so stands
+    (Luce 1866, ch. XXVI, 'To heave to with the fore topsail to the mast'). With no such
+    sail, `yards_to_back`'s, and the heave-to refuses in words."""
+    masts = _masts_with_yards(ship)
+
+    def standing_area(mast: Spar) -> float:
+        yards = [y for y in working_yards(ship) if ship.mast_of(y) is mast]
+        return sum(
+            sl.area_m2
+            for y in yards
+            for sl in [ship.sail_of(y)]
+            if sl is not None and sl.cls == "square" and sl is standing_sail_on(ship, [y])
+        )
+
+    best = max(masts, key=standing_area) if masts else None
+    if best is None or standing_area(best) <= 0.0:
+        return yards_to_back(ship)
+    main = yards_to_back(ship)
+    if main and standing_sail_on(ship, main) is not None:
+        return main  # the main topsail to the mast, or what stands on the main (Luce)
+    return [y for y in working_yards(ship) if ship.mast_of(y) is best]
 
 
 def after_gaff_sails(ship: Ship) -> list:
@@ -600,6 +679,18 @@ class Script:
 
     def data(self) -> dict[str, Any]:
         return {"phase": self.phase, "elapsed_s": round(self.t, 1)}
+
+    def left_words(self) -> str | None:
+        """How the work is left when the captain belays it, in words for the log, when
+        the script has more to say than the runner's "the helm and the yards left as
+        they stand" (package 37k: a belay of getting under way says where it has left
+        the anchor); None for the runner's words."""
+        return None
+
+    def belayed(self) -> None:
+        """Called by the runner as the captain belays the work: whatever the script holds
+        that would outlive it is let go (package 37k: the capstan's pawl, an anchor's
+        cable `heaving`)."""
 
     def note(self, text: str, kind: str = "evolution.step") -> None:
         self.ship.note("routine", kind, text, self.ship.name)
@@ -1651,10 +1742,26 @@ class HeaveToScript(Script):
         to windward"), with her topsail to the mast as well if it is set."""
         return len(_masts_with_yards(self.ship)) < 2
 
+    def _backed_name(self) -> str:
+        """The sail laid to the mast, for the log: the first on the backed yards that is
+        set and not being handed (package 37k: says which), else as `sail_name_on`."""
+        from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+        sail = standing_sail_on(self.ship, self.yards)
+        return (
+            part_name(self.ship, sail.id)
+            if sail is not None
+            else sail_name_on(self.ship, self.yards)
+        )
+
     def check(self, words: dict[str, Any]) -> str | None:
-        square_set = any(s.is_set for y in self.yards for s in [self.ship.sail_of(y)] if s)
+        # Package 37k: a sail that is set is laid aback, never one furled or in the gear,
+        # nor one the hands are taking in (`being_handed`); the yards and the head sail
+        # are chosen afresh when the work begins, since it may have waited its turn.
+        self.yards = yards_to_back_set(self.ship)
+        square_set = standing_sail_on(self.ship, self.yards) is not None
         if self.fore_and_after():
-            if not square_set and innermost_head_sail(self.ship) is None:
+            if not square_set and innermost_head_sail(self.ship, standing=True) is None:
                 return "No head sail is set to haul to windward, nor a topsail to lay aback."
             if not square_set:
                 self.yards = []
@@ -1744,7 +1851,7 @@ class HeaveToScript(Script):
         if self.fore_and_after():
             # the fore-and-after's way (Luce 1884, ch. XXXIV, 'To Heave to'): the main
             # sheet flat aft, the staysail sheet to windward, the helm down
-            self.headsail = innermost_head_sail(self.ship)
+            self.headsail = innermost_head_sail(self.ship, standing=True)
             booms = boom_sails(self.ship)
             sheets_to(self.ship, booms, None, None)
             if self.headsail is not None:
@@ -1756,7 +1863,7 @@ class HeaveToScript(Script):
             if self.headsail is not None:
                 words.append(f"{names_of_sails(self.ship, [self.headsail])} sheet to windward")
             if self.yards:
-                words.append(f"braced the {sail_name_on(self.ship, self.yards)} aback")
+                words.append(f"braced the {self._backed_name()} aback")
             text = "; ".join(words) + "; helm a-lee."
             self.note(text[0].upper() + text[1:])
         else:
@@ -1768,7 +1875,7 @@ class HeaveToScript(Script):
             sheets_to(self.ship, head_sails(self.ship), None, None)
             up = "; braced up the other yards" if braced_up else ""
             self.note(
-                f"Braced the {sail_name_on(self.ship, self.yards)} aback{up}; hauled aft the "
+                f"Braced the {self._backed_name()} aback{up}; hauled aft the "
                 "head sheets; helm a-lee."
             )
         # The other fore-and-aft sails that stay drawing (the staysails abaft the fore
@@ -1840,7 +1947,7 @@ class HeaveToScript(Script):
                 self.fail(
                     f"she would not lie to on the {_tack_name(self.sign)} tack, the wind "
                     f"{units.wind_bearing_words(wind_rel(self.ship, wind))}; the "
-                    f"{sail_name_on(self.ship, self.yards)} left aback and the helm amidships"
+                    f"{self._backed_name()} left aback and the helm amidships"
                     if self.yards
                     else f"she would not lie to on the {_tack_name(self.sign)} tack; the helm "
                     "amidships"
@@ -1863,7 +1970,7 @@ class HeaveToScript(Script):
 
             backed = part_name(self.ship, self.headsail.id) + " sheet to windward,"
             return {"backed": backed, "hove_tack": tack}
-        return {"backed": sail_name_on(self.ship, self.yards), "hove_tack": tack}
+        return {"backed": self._backed_name(), "hove_tack": tack}
 
     def data(self) -> dict[str, Any]:
         d = super().data()
@@ -4653,6 +4760,11 @@ class _AnchorScript(Script):
         `weigh the small bower` weighed it, without a word)."""
         riding = self.tackle.riding_by()
         if riding is None:
+            hanging = hanging_anchor(self.tackle, self.params.get("anchor"))
+            if hanging is not None:
+                # package 37k (game 10: `weigh the best bower` was answered "no anchor is
+                # down" with the best bower hanging at the bows after a belay)
+                return f"no anchor is down: {anchor_left_words(hanging)}"
             return "no anchor is down"
         named = self.params.get("anchor")
         if not named:
@@ -4704,6 +4816,17 @@ class _AnchorScript(Script):
                 )
         return ("; " + "; ".join(said)) if said else ""
 
+    def left_words(self) -> str | None:
+        """'the best bower aweigh and hanging at the bows, to be let go again or catted
+        and fished': where the work leaves the anchor (package 37k)."""
+        if self.anchor is None:
+            return None
+        return anchor_left_words(self.anchor)
+
+    def belayed(self) -> None:
+        if self.anchor is not None:
+            self.anchor.heaving = False  # the bars unshipped: she rides by it again
+
     def words(self) -> dict[str, Any]:
         anchor = self.anchor.name if self.anchor is not None else "the anchor"
         fathoms = self.anchor.scope_fathoms if self.anchor is not None else 0.0
@@ -4738,6 +4861,57 @@ def _belay_held_work(ship: Ship) -> None:
     ]
     if held:
         runner.belay(ship, held)
+
+
+# The states of an anchor that can be let go (package 37k): at the bows, catted and
+# fished; a-cockbill; hanging at the cat-head, catted and not fished ("suspended at the
+# cat-head by its stopper, ready to be sunk from the bow at a moment's warning", Falconer
+# 1780, ANCHOR a cock-bill); and aweigh, broken out and hanging by its cable under the
+# hawse, which is let go by letting the cable run. In game 10 the best bower was left
+# aweigh by a belay of getting under way and every order to let it go was refused ("the
+# best bower is aweigh") until it had been catted and fished, fourteen minutes; an
+# anchor hanging at the bows is the one that can be let go soonest.
+LET_GO_STATES = ("at the bows", "a-cockbill", "aweigh", "catted")
+
+
+def can_let_go(anchor: Any) -> bool:
+    return anchor.state.value in LET_GO_STATES
+
+
+def hanging_anchor(tackle: Any, named: Any = None) -> Any:
+    """The anchor the words name if it hangs at the bows (aweigh or catted), else the
+    first that does when none is named; None when none does."""
+    from freesail.ship.parts import AnchorState
+
+    hanging = (AnchorState.AWEIGH, AnchorState.CATTED)
+    if named:
+        anchor = tackle.by_words(named if isinstance(named, str) else None)
+        return anchor if anchor is not None and anchor.state in hanging else None
+    return next((a for a in tackle.anchors if a.state in hanging), None)
+
+
+def anchor_left_words(anchor: Any) -> str:
+    """Where an anchor is, in the forecastle's words, for a belay's line and a refusal
+    (package 37k): 'the best bower on the bottom with forty fathoms of cable out'; 'the
+    best bower aweigh and hanging at the bows, to be let go again or catted and fished';
+    'the best bower at the cat-head, not yet fished, ready to let go'; 'the best bower
+    catted and fished'."""
+    from freesail.ship.parts import AnchorState
+
+    name = anchor.name
+    state = anchor.state
+    if state is AnchorState.DOWN:
+        return f"{name} on the bottom with {_fathoms_words(anchor.scope_fathoms)} of cable out"
+    if state is AnchorState.AWEIGH:
+        where = "off the ground under the bows" if anchor.ground_x is not None else "at the bows"
+        return f"{name} aweigh and hanging {where}, to be let go again or catted and fished"
+    if state is AnchorState.CATTED:
+        return f"{name} at the cat-head, not yet fished, ready to let go"
+    if state is AnchorState.STOWED:
+        return f"{name} catted and fished"
+    if state is AnchorState.READY:
+        return f"{name} a-cockbill, ready to let go"
+    return f"{name} {state.value}"
 
 
 def _let_go(ship: Ship, anchor: Any, depth_m: float) -> None:
@@ -4828,12 +5002,79 @@ def _anchoring_warnings(
     has, the swinging room on the scope to be veered, and the water at low water against
     her draught."""
     for kind, text in (
+        ("anchor.depth_warning", _deep_road_warning(depth_m)),
         ("anchor.scope_warning", _cable_warning(anchor, depth_m, fathoms)),
         ("anchor.scope_warning", _scope_warning(ship, anchor, depth_m, scope_m)),
         ("anchor.depth_warning", _low_water_warning(ship, depth_m)),
     ):
         if text:
             ship.note("notable", kind, text, ship.name, {})
+
+
+# The deep road (package 37k; the review's G8, game 10: the cutter anchored twice in 45
+# to 48 fathoms with nearly the whole of her best bower's cable out, and the officer's
+# `let go the small bower` in the same water was refused). What the period did:
+# Falconer 1780, ANCHOR-ground, "a bottom which is neither too deep, too shallow, nor
+# rocky; as in the first the cable bears too nearly perpendicular, and is thereby apt to
+# jerk the anchor out of the ground"; Luce 1866, ch. XXXIV, p. 568, three times the depth
+# the old rule of scope and five or six the safer; Luce 1884, ch. XXXIV, "Always
+# double-bitt before anchoring in deep water, as at Madeira, and similar anchorages",
+# deep water being the exception he names; and the directions this game's charts are
+# drawn from put the roads of these waters in three to seventeen fathoms (Carrick Road
+# seven to seventeen, St Just Pool fourteen or fifteen, Bertheaume eight to twelve, the
+# Bay of Brest eight to sixteen, St Mary's Road four and five). The rule: an anchor is
+# not let go where its whole cable gives under three times the depth (`_too_deep`, the
+# old rule's scope, the least a ship rides by; the refusal names an anchor whose cable
+# would reach), and past `DEEP_ROAD_FATHOMS` the anchor goes with a notable warning that
+# this is no road (`_deep_road_warning`). Twenty fathoms: deeper than any road of the
+# directions, by three; judgement.
+DEEP_ROAD_FATHOMS = 20.0
+
+
+def _too_deep(tackle: Any, anchor: Any, depth_m: float, where: str) -> str | None:
+    """'no anchoring ground here: forty-four fathoms and a half, and the small bower's
+    hundred and twenty fathoms of cable give less than three times the depth, the least
+    she will ride by; the best bower has two hundred and forty': the refusal when the
+    anchor's whole cable is under three times the depth (Luce's old rule of scope;
+    Falconer's ground too deep), naming an anchor whose cable would reach; else None."""
+    from freesail.physics.anchor import SHORT_SCOPE_PER_DEPTH
+    from freesail.world.reckoning import number_words
+
+    def reaches(a: Any) -> bool:
+        return depth_m <= units.fathoms_to_m(a.cable_fathoms) / SHORT_SCOPE_PER_DEPTH
+
+    if reaches(anchor):
+        return None
+    times = number_words(int(round(SHORT_SCOPE_PER_DEPTH)))
+    cable = _fathoms_words(anchor.cable_fathoms)
+    why = (
+        f"no anchoring ground {where}: {_depth_words(depth_m)}, and {anchor.name}'s {cable} "
+        f"of cable give less than {times} times the depth, the least she will ride by"
+    )
+    other = next(
+        (
+            a
+            for a in (tackle.anchors if tackle is not None else ())
+            if a is not anchor and can_let_go(a) and reaches(a)
+        ),
+        None,
+    )
+    if other is not None:
+        why += f"; {other.name} has {_fathoms_words(other.cable_fathoms)}"
+    return why
+
+
+def _deep_road_warning(depth_m: float) -> str | None:
+    """'Forty-five fathoms is deep water to anchor in: the roads lie in seventeen fathoms
+    and less, and here she rides on a steep cable and will be long heaving it in.': the
+    warning as an anchor goes in more than `DEEP_ROAD_FATHOMS`; else None."""
+    if units.m_to_fathoms(depth_m) <= DEEP_ROAD_FATHOMS:
+        return None
+    return (
+        f"{_cap(_depth_words(depth_m))} is deep water to anchor in: the roads lie in "
+        "seventeen fathoms and less, and here she rides on a steep cable and will be long "
+        "heaving it in."
+    )
 
 
 def _cable_warning(anchor: Any, depth_m: float, fathoms: Any) -> str | None:
@@ -4916,9 +5157,7 @@ class ComeToAnchorScript(_AnchorScript):
         self.anchor = self._named(self.params.get("anchor"))
         if self.anchor is None:
             return f"no anchor aboard answers to '{self.params.get('anchor')}'"
-        from freesail.ship.parts import AnchorState
-
-        if self.anchor.state not in (AnchorState.STOWED, AnchorState.READY):
+        if not can_let_go(self.anchor):
             return f"{self.anchor.name} is {self.anchor.state.value}"
         depth = _water_depth(self.ship)
         if depth is None:
@@ -4930,11 +5169,8 @@ class ComeToAnchorScript(_AnchorScript):
             # has it; she stands on until the lead calls it (package 37f)
             self.let_go_depth = units.fathoms_to_m(float(wanted))
             depth = self.let_go_depth
-        if depth > whole / 3.0:
-            return (
-                f"no anchoring ground {'there' if wanted else 'here'}: {_depth_words(depth)}, "
-                f"and {self.anchor.name} has {_fathoms_words(self.anchor.cable_fathoms)} of cable"
-            )
+        if why := _too_deep(self.tackle, self.anchor, depth, "there" if wanted else "here"):
+            return why
         scope = self.params.get("fathoms")
         if scope and units.fathoms_to_m(float(scope)) < depth:
             return (
@@ -5152,14 +5388,14 @@ class LetGoAnchorScript(_AnchorScript):
             return f"{self.anchor.name} is down already"
         if self.anchor.state is AnchorState.LOST:
             return f"{self.anchor.name} is lost"
-        if self.anchor.state not in (AnchorState.STOWED, AnchorState.READY):
+        if not can_let_go(self.anchor):
             return f"{self.anchor.name} is {self.anchor.state.value}"
         depth = _water_depth(self.ship)
         if depth is None:
             return "no bottom here to anchor in"
         whole = units.fathoms_to_m(self.anchor.cable_fathoms)
-        if depth > whole / 3.0:
-            return f"no anchoring ground here: {_depth_words(depth)}"
+        if (why := _too_deep(self.tackle, self.anchor, depth, "here")) is not None:
+            return why
         scope = self.params.get("fathoms")
         if scope and units.fathoms_to_m(float(scope)) < depth:
             return (
@@ -6101,6 +6337,28 @@ class GetUnderWayScript(_AnchorScript):
                 return
             if self.anchor_phase == "done" and (self.swing is None or self.swing.done):
                 self.finish()
+
+    # what the work was at, for a belay's line (package 37k)
+    _DOING = {
+        "rig_capstan": "the capstan rigging",
+        "heave_short": "heaving short",
+        "loose": "loosing sail",
+        "heave": "heaving in",
+        "break_out": "breaking the anchor out",
+        "cast": "casting",
+        "under_way": "under way",
+    }
+
+    def left_words(self) -> str | None:
+        """'the helm and the yards left as they stand, casting; the best bower aweigh and
+        hanging at the bows, to be let go again or catted and fished' (package 37k: in
+        game 10 a belay of getting under way left the anchor aweigh and said nothing of
+        it, and every order to let it go was refused)."""
+        doing = self._DOING.get(self.phase)
+        head = "the helm and the yards left as they stand" + (f", {doing}" if doing else "")
+        if self.anchor is None:
+            return head
+        return f"{head}; {anchor_left_words(self.anchor)}"
 
     def words(self) -> dict[str, Any]:
         d = super().words()

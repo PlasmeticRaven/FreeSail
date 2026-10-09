@@ -1093,6 +1093,39 @@ def _laid_aback_by_order(ship: Ship, sail: Sail) -> bool:
     return False
 
 
+def sails_in_hand(ship: Ship) -> set[str]:
+    """The sails the hands are at now (package 37k): every sail that a running evolution
+    works, itself, its yard or its sheets (`set the jib`, `trim the fore topsail`, a sheet
+    hauled), as `_laid_aback_by_order` reads a sail's own work; work waiting for hands is
+    not yet at it. The alarm for being taken aback leaves these alone: in game 10 two of
+    its eight urgent cries came as sail was made after weighing, the sails not yet
+    sheeted home and trimmed."""
+    runner = ship.extra.get("evolutions")
+    instances = getattr(runner, "instances", None)
+    if not instances:
+        return set()
+    out: set[str] = set()
+    for inst in instances:
+        if getattr(inst, "waiting", False) or getattr(inst, "paused", False):
+            continue
+        subject = getattr(inst, "subject", None)
+        if isinstance(subject, Sail):
+            out.add(subject.id)
+        elif isinstance(subject, Spar):
+            sail = ship.sail_of(subject)
+            if sail is not None:
+                out.add(sail.id)
+        elif isinstance(subject, Line):
+            for sl in ship.sails.values():
+                if subject in ship.sheets_of(sl):
+                    out.add(sl.id)
+                    break
+        named = (getattr(inst, "params", None) or {}).get("sail")
+        if isinstance(named, str):
+            out.add(named)
+    return out
+
+
 def _record_backed(ship: Ship, sail: Sail, backed: bool, dt: float = 0.0) -> None:
     timers = ship.extra.get("sails.backed_for")
     if not isinstance(timers, dict):

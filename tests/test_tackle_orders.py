@@ -349,8 +349,8 @@ def come_home(world, seconds, every=1, metres=0.2):
 def test_a_dragging_is_urgent_once_and_then_says_how_far_she_has_come():
     """Game 9 in the Goulet: eighteen urgent lines in eight hours, each waking the officer.
     Urgent once, when the anchor begins to come home; while it goes on a notable line a
-    quarter of an hour at most with how far; "holds again" after five minutes still, and
-    then the next drag is a new one."""
+    quarter of an hour at most with how far; "holds again" after a quarter of an hour
+    still (five minutes until package 37k), and then the next drag is a new one."""
     w = at_anchor(FRIGATE)
     n0 = len(w.log.all())
     come_home(w, 35 * 60)
@@ -362,9 +362,10 @@ def test_a_dragging_is_urgent_once_and_then_says_how_far_she_has_come():
     assert said[1].tick - said[0].tick >= 15 * 60 and said[2].tick - said[1].tick >= 15 * 60
     assert said[1].text == "The best bower still coming home: a cable since it began."
     assert said[2].text == "The best bower still coming home: two cables since it began."
-    # five minutes without moving: it holds again, and the line says how far it came
+    # a quarter of an hour without moving (package 37k; five minutes before): it holds
+    # again, and the line says how far it came
     n1 = len(w.log.all())
-    w.run(4 * 60)
+    w.run(14 * 60)
     assert not [e for e in w.log.all()[n1:] if e.kind.startswith("anchor.")]
     w.run(90)
     (holds,) = [e for e in w.log.all()[n1:] if e.kind.startswith("anchor.")]
@@ -375,6 +376,32 @@ def test_a_dragging_is_urgent_once_and_then_says_how_far_she_has_come():
     come_home(w, 3 * 60)
     (again,) = [e for e in w.log.all()[n2:] if e.kind.startswith("anchor.")]
     assert again.kind == "anchor.dragging" and again.severity is Severity.URGENT
+
+
+def test_a_dragging_that_relapses_within_a_quarter_of_an_hour_is_the_same_dragging():
+    """Package 37k (the review's G8; 37f's own note): on bare rock in a tideway an anchor
+    held six minutes and came home again, and each relapse was a new urgent line (eight
+    in the Goulet's eight hours). An anchor that comes home again within a quarter of an
+    hour of its last moving is the same dragging: one urgent line, its metres counted on,
+    and "holds again" only when it has held a quarter of an hour."""
+    w = at_anchor(FRIGATE)
+    n0 = len(w.log.all())
+    for _ in range(4):
+        come_home(w, 3 * 60, metres=0.5)  # ninety metres in three minutes
+        w.run(8 * 60)  # holding eight minutes: past the physics' five, inside the quarter
+    said = [e for e in w.log.all()[n0:] if e.kind.startswith("anchor.")]
+    assert [e.kind for e in said if e.severity is Severity.URGENT] == ["anchor.dragging"]
+    assert not [e for e in said if e.kind == "anchor.holding"]
+    # the notable line counts every spell's metres since the dragging began
+    coming = [e for e in said if e.kind == "anchor.coming_home"]
+    assert coming and coming[-1].text.endswith("since it began.")
+    assert coming[-1].data["come_home_m"] > 2 * 90.0  # three spells' metres, not one's
+    n1 = len(w.log.all())
+    w.run(8 * 60)  # sixteen minutes held in all
+    (holds,) = [e for e in w.log.all()[n1:] if e.kind.startswith("anchor.")]
+    assert holds.kind == "anchor.holding"
+    # four spells of ninety metres: a little short of two cables (185 m a cable)
+    assert holds.text == "The best bower holds again, having come home two cables."
 
 
 def test_an_anchor_that_creeps_a_second_now_and_then_is_not_said_to_drag():
