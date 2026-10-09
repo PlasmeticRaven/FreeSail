@@ -2990,8 +2990,8 @@ made once, and the helm put for a course already judged goes round it
 | a helm order within a point of the wind's eye | steered as given | "N by W (349°) lies in the wind's eye from her head; she will be taken aback.", notable |
 | across the wind's eye, the shorter way, with two knots of way | put about for it: `tack` with `course_deg` | "E by N (79°) lies across the wind's eye from her head; she is put about for it." |
 | the same with under two knots and more than a knot | worn round for it | "...; she has not way enough to stay, and is worn round for it" |
-| across the wind by the stern, more than eight points round, square-rigged with a square sail set and a knot of way | worn round for it: `wear` with `course_deg` | "SE (135°) lies across the wind from her head, by the stern; she is worn round for it." |
-| the same in a fore-and-after (one mast with yards) | gybed by the helm, as she always has been | "...; she gybes for it by the helm." |
+| across the wind by the stern, more than eight points round, with a square sail set (a square-rigged ship, or a fore-and-after with her topsail set) and a knot of way | worn round for it: `wear` with `course_deg` | "SE (135°) lies across the wind from her head, by the stern; she is worn round for it." |
+| the same in a fore-and-after with no square sail set | gybed by the helm, as she always has been | "...; she gybes for it by the helm." |
 | nearer the wind than she will lie, on the other tack | put about or worn for that tack, `full_and_by` | "NE by E (56°) lies too near the wind to be laid; she is put about and kept full and by on the larboard tack." |
 | a course shaped or a chase's nearer the wind than she will lie on her own tack | kept full and by, as since package 35 | "...; she is kept full and by on the starboard tack" |
 | on the tack she is going to, while a tack or a wear is in hand | handed to the manoeuvre | "SW (225°): she is going about, and the course is given her as she comes round." |
@@ -3021,7 +3021,7 @@ within the grant to steer (`tests/test_officer.py`).
 | `EYE_POINTS`, `EYE_ALLOWANCE` | a point either side of the wind, and a degree | `orders/navigation.py` | the owner's "directly into the wind's eye"; a point, since the wind is named to the point and wanders about it, so that the brief's own "N by W lies in the wind's eye" is so in a northerly; judgement |
 | `STAY_MIN_KN` | two knots | `orders/navigation.py` | the tack's own precondition (`tack.yaml`); Luce 1866, ch. XXIV, 'Wearing' (p. 457): wearing is resorted to "when ... the vessel has not sufficient headway for tacking" |
 | `WEAR_FOR_IT_MIN_MS` | half a metre a second, a knot | `orders/navigation.py` | the fold-in's guard, kept |
-| `WAKE_HELM_POINTS` | eight points | `orders/navigation.py` | a turn by the stern of eight points or less keeps the wind abaft the beam at both ends, where a square sail fills however its yard is braced; the fold-in's guard counted turns of more than six points (her close-hauled angle). Found on `tests/test_ports.py`'s St Mary's approach, steered by the bearing a minute at a time: at six points the frigate, running, was worn for a turn of 78 degrees to the other quarter and struck the Nut Rock twelve minutes later; at eight she is steered, as before. Judgement |
+| `WAKE_HELM_POINTS` | eight points (the lead accepted, 2026-10-09) | `orders/navigation.py` | a turn by the stern of eight points or less keeps the wind abaft the beam at both ends, where a square sail fills however its yard is braced; the fold-in's guard counted turns of more than six points (her close-hauled angle). Found on `tests/test_ports.py`'s St Mary's approach, steered by the bearing a minute at a time: at six points the frigate, running, was worn for a turn of 78 degrees to the other quarter and struck the Nut Rock twelve minutes later; at eight she is steered, as before. Judgement |
 | `STEERAGE_WAY_MS` | a tenth of a metre a second | `orders/navigation.py` | the fold-in's guard's own "no way" |
 | `by_the_wind_s` | 120 s | `tack.yaml` | judgement: the frigate luffs from a reach to close-hauled in about a minute in the tests |
 | `BY_THE_WIND_ALLOWANCE` | ten degrees | `evolutions/scripts.py` | the tack's `close_hauled()` allowance (`evolutions/runner.py`) |
@@ -3032,7 +3032,7 @@ she is refused off the wind in package 37k's words, and for a course she is luff
 first. No default is declared for either parameter, so that an evolution's data and the
 recorded passages' digests do not move where no course is given.
 
-### A decision for the lead: the helm's own orders on her own tack
+### The helm's own orders on her own tack (the lead accepted, 2026-10-09)
 
 The brief's rule reads "nearer the wind than she will lie, kept full and by on the tack
 that points nearer, ... unless the order is a plain `steer` into the eye". Built so for a
@@ -3047,8 +3047,10 @@ at a time to find how near she will lie, truth 25 pinching her to five points on
 purpose (Fincham's "just lifting"). Kept full and by, those orders would sail her at six
 points whatever was said, and the truths would measure the helmsman. Pinching her is the
 captain's to order; package 37k's "Her sails lifting" and "Taken aback" say what follows.
-If the lead wants the brief's reading for `steer` on her own tack, it wants first a
-close-hauled angle per ship from her file and another way for the truths to pinch her.
+Put to the lead as a decision and accepted the same day: a `steer` on her own tack is carried
+out however near the wind, since the truths pinch her so. The brief's reading would want
+first a close-hauled angle per ship from her file and another way for the truths to pinch
+her.
 
 ### The recorded passages, re-measured
 
@@ -3099,16 +3101,13 @@ tack as the wind comes over the other quarter, and every square and head sail is
 
 ### Found on the way (package 37m)
 
-- **A topsail schooner gybed by the helm in a long turn is taken aback.** The brief keeps
-  the fold-in's guard: a fore-and-after (one mast with yards) gybes by the helm. The
-  topsail schooner's fore yards are not tended in that turn, and from close-hauled to a
-  broad reach on the other tack they are braced for the old tack when the wind comes
-  over: she is taken aback (in a test of it, `steer SE` from WNW in a northerly, and in
-  the Iroise trial above). The fold-in measured wearing her for every turn by the stern
-  and lost the merchant passage's tide (her hourly courses a hundred degrees apart, each a
-  wear); a turn of more than eight points with a square sail set might be worn and a
-  shorter one gybed, as the square-rigger's now is. For the lead: it is the Iroise cast's
-  remaining fault, and the primer's chapter 5 says it.
+- **A topsail schooner gybed by the helm in a long turn was taken aback**, and is worn now
+  (the lead's ruling on this package's third question, 2026-10-09; below, "The second
+  round"). As first built, the fold-in's guard was kept: a fore-and-after (one mast with
+  yards) gybed by the helm. The topsail schooner's fore yards are not tended in that turn,
+  and from close-hauled to a broad reach on the other tack they were braced for the old
+  tack when the wind came over: she was taken aback (in a test of it, `steer SE` from WNW
+  in a northerly, and in the Iroise trial above).
 - **A tack that waits behind other work and finds her without way to stay** when it
   begins is refused in package 37k's words and the course with it; the line says so and
   the captain gives it again. A wear in its place was not built.
@@ -3142,3 +3141,37 @@ quarter of an hour after the pilot boards, and on the merged tree's own figures 
 aboard 56940, the anchor 57255, which this package measured unchanged with the schooner's
 lines and digest) it is five minutes, so it fails on the merged tree too, whose log is
 the same line for line. For the lead.
+
+### The second round (the lead's rulings of 2026-10-09)
+
+The lead accepted the helm's own orders carried out however near the wind on her own tack
+(above) and the eight points for the wake (the St Mary's case its reason), and ruled on the
+third question: a fore-and-after with a square sail set (the topsail schooner's fore
+topsail and topgallant, the cutter's topsail or square sail) is worn for a turn through
+the wake of more than eight points, as a square-rigged ship is, since her yards must be
+braced round; with no square sail set she gybes by the helm as before
+(`navigation._square_sail_set`, where the guard asked yards on two masts). The test of it
+(`tests/test_ships.py`): the schooner under plain sail given `steer SSW` from NNE in a
+north-westerly is worn and comes to SSW with no line of her being aback; with her square
+sails furled, gybed by the helm.
+
+The passages the rule can touch, measured once on the new build: the schooner of 5b, 761
+lines and `d6031efa9808a2b1`, unchanged; the merchant passage, 2998 lines and
+`54713e8e579fd527`, unchanged from this package's first round (no turn of hers by the stern
+is more than eight points with her topsail set and way on her). No pin moved. The frigate,
+the thick passage and the cruise are square-rigged ships, whose rule is as it was.
+
+**The lead's dropped Iroise rule, once more, as a diagnostic** (the book unchanged): the
+cast comes back (37 fathoms at 90110) and she fills away on the starboard tack at 90206,
+but she does not go on to Bertheaume and the sale. "For Bertheaume" shapes E by N at the
+moment she has filled away, before she has steerage way (the log a quarter of a knot as she
+filled, and the course's line "She has no way on to work an allowance by"); with no way on
+her the judgement leaves a course to the helm as given (`STEERAGE_WAY_MS`), so the new wear
+never comes into it, the helm turns her fourteen points by the stern with her fore yards
+braced for the starboard tack, and she is taken aback at 90453 as before. The pilot of
+Brest boards at 100680 (94380 in the pinned passage), she is aback again at 102056 and
+108322, and she takes the ground at 117761 and four times more on the rising tide, and
+never anchors in the Bay nor sells the tin. So the one line is not to go into the book
+yet. What would carry her: a course across the wind given with no steerage way kept for
+her (full and by on her tack) and judged again when she has way, so that the wear comes
+then; not built, for the lead to rule on.

@@ -137,7 +137,7 @@ A helmsman given a course on the other side of the wind does not simply put the 
 |---|---|
 | on the tack she is on | the helm: she is steered to it |
 | across the wind's eye, the shorter way | put about for it (chapter 5), with way enough to stay (two knots); with less, worn round for it, "when ... the vessel has not sufficient headway for tacking" (Luce 1866, ch. XXIV, 'Wearing') |
-| across the wind by the stern, more than eight points round | worn round for it if she is square-rigged and under sail; a fore-and-after (the schooner, the cutter) gybes by the helm, her boom coming over, as she always has |
+| across the wind by the stern, more than eight points round | worn round for it if she has a square sail set, a square-rigged ship or a fore-and-after with her topsail set, since her yards must be braced round; a fore-and-after with no square sail set gybes by the helm, her boom coming over, as she always has |
 | nearer the wind than six points, on the other tack | put about or worn for that tack, and kept full and by on it |
 | within a point of the wind's eye, given to the helm | steered as given, and the line warns that she will be taken aback |
 
