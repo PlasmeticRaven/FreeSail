@@ -3232,8 +3232,9 @@ same day.
    so either the open browser renders on request and posts the image to the server (no
    new dependency; needs a browser open), or the server renders the chart itself in
    Python (a renderer to write; the ship's view would need the projection ported).
-   Milestone 6's wardroom spec takes it as an open item (M6 §13), decided when the API
-   door exists, since that door is the first that could carry an image.
+   Milestone 6's wardroom spec takes it as an open item (M6 §13). The MCP door carries
+   an image in a tool's result already (the owner, 2026-10-09), so the design does not
+   wait on the API door.
 
 ## Package 37n: the chart's tools and the viewer's details (`client/map.js`, `client/app.js`, `client/style.css` for the compass rose, the lines and the marks; `freesail/ui/server.py` and `freesail/core/world.py` only to keep the player's marks with the game (saved and loaded, never read by the reckoning or the book); `client/projection.js` and `client/view.js` for the cutter's square sail and the yards at their hoist; `tools/gen_ships.py` or `data/ships/cutter.yaml` only if the square sail's figures are the file's fault; `docs/design/Presentation.md`; `docs/dev/TuningNotes.md`; `tests/test_server.py`, `tests/test_view_geometry.py`, `tests/test_canvas.py`)
 

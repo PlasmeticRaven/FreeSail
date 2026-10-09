@@ -278,9 +278,12 @@ handover and at the end, what the server reported it used.
 **Image tools for image-capable doors** (the owner's note 7 of 2026-10-09; the review's
 I7 item 7): `the ship's view` from any angle and `the chart` as the player sees it, as
 images a model may ask for through a door that carries them, and shelve as it shelves the
-library. The API door is the first such door, so the design is decided with it: the open
-browser rendering on request and posting the image to the server, or the server rendering
-the chart in Python. Open until 42; the words come first.
+library. The MCP door carries them already (a tool's result may hold an image, and Claude
+Desktop and Claude Code read it), and the API door will; the local runner only where its
+model does. The design to decide, before the tools are written: the open browser rendering
+on request and posting the image to the server, or the server rendering the chart in
+Python. The words come first; the tools follow in 41 or 42, whichever the lead finds them
+to fit.
 
 ### 14. The replay driven by the transcript (`freesail/core/replay.py`, `freesail/agents/harness.py`)
 
