@@ -2336,6 +2336,127 @@ features:
     source: "White 1835, 'Coast of England', p. 13 ('the Sept Isles'); the light on the Île aux Moines dates from 1835"
     says: "The Seven Islands, off Perros on the north coast of Brittany; their light came in 1835."
 
+  # ---------------------------------------------------------------------------
+  # The Raz de Sein's marks north of 48 N (package 39b, the Biscay north block: they lie
+  # in this region's bounds, so they are this file's; the Raz's stream area is the block's
+  # in data/tides/streams.yaml). Not in this region's index (features/channel-west.
+  # index.json, which only this region's build writes and which no block rewrites): they
+  # are found by name, and the lookout sees them when the region is next built.
+  # ---------------------------------------------------------------------------
+
+  - id: la-vieille
+    kind: rock
+    name: the Old Woman
+    modern: La Vieille (Gorlebella)
+    lat_deg: 48.04056
+    lon_deg: -4.75639
+    height_m: 12
+    source: "Faden 1793, 'Rocks called La Vieille and La Platte', p. 60: west of the Bec du Raz a number of high rocks above water, the highest of which, named La Vieille (the old woman), stands farthest off the land; when you pass by the Raz you steer wide of all these rocks, leaving the Old Woman two cables' length to the landward of you; the encyclopaedia's 'Phare de la Vieille' (read 2026-10-09) for the rock's position (its height judgement)"
+    says: "The Old Woman, the highest and farthest of the rocks off the Bec du Raz: pass the Raz with her two cables to landward of you."
+    fix: "the encyclopaedia's position, left where it puts the rock: the region's grid does not resolve it (6.6 m of water is its shoalest within 400 m), so the rule's move to a head has nothing to move to"
+
+  - id: la-plate
+    kind: rock
+    name: La Platte
+    modern: La Plate
+    lat_deg: 48.04000
+    lon_deg: -4.75800
+    height_m: 0
+    source: "Faden 1793, 'Rocks called La Vieille and La Platte', p. 60: half a cable's length farther toward the sea is another rock, under water, called La Platte (the flat)"
+    says: "La Platte, a rock under water half a cable outside the Old Woman."
+    fix: "Faden's half a cable seaward of the Old Woman; the modern tower of the name stands on it"
+
+  - id: tevennec
+    kind: rock
+    name: the Livenet
+    modern: Tévennec
+    lat_deg: 48.07206
+    lon_deg: -4.79387
+    height_m: 20
+    extent_m: 300
+    source: "Faden 1793, 'Livenet Rock' and 'Stevenec Rock', p. 60: three quarters of a league N E 1/2 N off the Isle of Sains and a good league and a half W N W from the Bec du Raz, a high and big rock called Livenet, encompassed with rocks under water which require great caution in sailing from the Raz, the current setting over them; no passage between the Livenet and the Isle of Sains; the encyclopaedia's 'Phare du Tévennec' (read 2026-10-09) for the position"
+    says: "The Livenet, a high big rock north of the Raz with rocks under water about it, the current setting over them; there is no passage between it and the isle."
+    fix: "the encyclopaedia's position (48.06972 N, 4.79333 W) moved 263 m to the region's shoalest head by the rule"
+
+  - id: pont-des-chats
+    kind: ledge
+    name: the Pont de Chats and the Cornet
+    modern: the ledges east of the Île de Sein
+    lat_deg: 48.04000
+    lon_deg: -4.79500
+    height_m: 1
+    extent_m: 300
+    source: "Faden 1793, 'Isle des Sains, Le Chats, and Le Cornet', p. 60: three quarters of a league eastward of the isle, bearing a little toward the Old Woman, two ledges of rocks, the nearer the island named Le Pont de Chats (the cat's bridge) and the other Le Cornet (the horn); the passage of the Raz lies between those ledges and the Old Woman"
+    says: "The Pont de Chats and the Cornet, two ledges three quarters of a league east of the isle; the passage of the Raz runs between them and the Old Woman."
+    fix: "the pilot's bearing and distance from the isle; not checked against a modern chart"
+
+  - id: raz-passage
+    kind: bottom
+    name: the passage of the Raz
+    modern: le raz de Sein
+    lat_deg: 48.04500
+    lon_deg: -4.77300
+    height_m: 0
+    bottom: "sandy"
+    depth_fathoms: 14
+    source: "Faden 1793, 'Isle des Sains', p. 60: the passage of the Raz lies between those ledges and the Old Woman, with a depth of 14 or 15 fathoms water, sandy bottom; the tides here very strong, the flood bearing to the north and the ebb to the south"
+    says: "The passage of the Raz, fourteen or fifteen fathoms on sand between the Old Woman and the ledges of the isle; the tides very strong, the flood north and the ebb south."
+
+  - id: chaussee-de-sein
+    kind: ledge
+    name: the Pont de Sains
+    modern: la chaussée de Sein
+    lat_deg: 48.04000
+    lon_deg: -4.93000
+    height_m: 1
+    extent_m: 4000
+    source: "Faden 1793, 'Rocks called Le Pont de Sains, or Saints', pp. 60 to 61: from the Isle of Sains a great ridge or ledge of rocks runs W 1/4 S about 3 leagues into the sea, the greatest part under water, the others appearing according to the tides; the farthest in the offing 4 leagues west of the Bec du Raz, a little to the south, and near 9 leagues from Ushant"
+    says: "The Pont de Sains, a great ledge of rocks running three leagues west from the isle, most of it under water; Ar Men is its farthest head."
+    fix: "the middle of the ridge between the isle and Ar Men"
+
+  - id: audierne
+    kind: town
+    name: Hodierne
+    modern: Audierne
+    lat_deg: 48.02150
+    lon_deg: -4.53760
+    height_m: 10
+    source: "Faden 1793, 'Hodierne', p. 65: a tide port which can be entered only at high water, but within it you lie sheltered from all winds; east of the port a very high church, the town on the west side; at the foot of the cliffs high water at 4 o'clock or a little less; SHOM's RAM, 'Audierne (Quai Pelletan)', for the position"
+    says: "Hodierne, a tide port entered only at high water, with a very high church east of it; within, a ship lies sheltered from all winds."
+
+  - id: raz-light
+    kind: light
+    name: the light of the Bec du Raz
+    modern: the feu du Bec du Raz (the Pointe du Raz)
+    lat_deg: 48.03903
+    lon_deg: -4.73769
+    height_m: 79
+    lit: {from: 1839, until: null, range_nm: 20, character: "a fixed light on the point (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Phare du Tévennec' (read 2026-10-09): until 1875 two lights in the sector of Sein, the isle's of 1839 and the fixed light of the first order lit in 1839 on the summit of the Pointe du Raz, the feu du Bec du Raz; not lit in 1805"
+    says: "The light on the Bec du Raz, which was not yet built in 1805."
+
+  - id: tevennec-light
+    kind: light
+    name: the light of the Livenet
+    modern: Phare du Tévennec
+    lat_deg: 48.07206
+    lon_deg: -4.79387
+    height_m: 28
+    lit: {from: 1875, until: null, range_nm: 9, character: "a fixed light, white and red sectors (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Phare du Tévennec' (read 2026-10-09): first lit on 15 March 1875, a fixed light in white and red sectors; not lit in 1805"
+    says: "The light on the Livenet, which was not yet built in 1805."
+
+  - id: la-vieille-light
+    kind: light
+    name: the light of the Old Woman
+    modern: Phare de la Vieille
+    lat_deg: 48.04056
+    lon_deg: -4.75639
+    height_m: 33
+    lit: {from: 1887, until: null, range_nm: 18, character: "a light on the rock (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Phare de la Vieille' (read 2026-10-09): built 1882 to 1887 on the rock of Gorlebella, in service from 1887; not lit in 1805"
+    says: "The light on the Old Woman, which was not yet built in 1805."
+
 # ---------------------------------------------------------------------------
 # The common tracks (spec M6 §4; package 40): see the head of the file.
 # ---------------------------------------------------------------------------

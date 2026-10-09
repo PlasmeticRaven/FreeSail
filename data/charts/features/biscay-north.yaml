@@ -1,0 +1,1172 @@
+# The features of Biscay north, the Raz de Sein to the Pertuis d'Antioche (spec M6 §26;
+# package 39b): hazards, marks, lights with their dates, places, anchorages and bottom
+# notes, in the period's words, each with its source in the references' form
+# (docs/references/README.md), on the rules of channel-west.yaml's head, read from:
+#
+#   Faden 1793      Le Petit Neptune Français; or, French Coasting Pilot (Internet Archive
+#                   lepetitneptunefr00fade), the OCR text, chapter IV, 'Directions for
+#                   sailing on the coast of France in the Bay of Biscay', pp. 65 to 84 (the
+#                   Raz of Fontenay to the Pertuis de Maumusson); 'Tides and Currents',
+#                   pp. 92 to 93; Du Bocage's 'Account of the depths of water and nature of
+#                   the ground, from the Beg du Raz to the mouth of the river of
+#                   Bourdeaux', pp. 93 to 94. In his translation's fathoms and leagues.
+#   Bellin 1764     Petit Atlas Maritime t. V no. 85, 'Carte de l'entrée de la Charente et
+#                   environs de Rochefort' (David Rumsey 6903.572), read at full resolution
+#                   through the collection's IIIF server: the Aix road's patch
+#                   (overrides/biscay-north/aix-basque-roads.yaml) and its names.
+#   encyclopaedia   the French encyclopaedia's pages for the lights and the places named in
+#                   each entry, read 2026-10-09 (positions and dates).
+#   SHOM            the Références Altimétriques Maritimes (data.gouv.fr's record; the WFS
+#                   layer RAM_BDD_WLD_WGS84G_WFS:ram_3857, read 2026-10-09): the tide
+#                   gauges' and the ports' positions where a feature is a port's.
+#
+# The block's marks of the Raz de Sein that lie north of 48 N (La Vieille, the Plate,
+# Tévennec, the Pont des Chats, the Chaussée de Sein, the Raz's passage, Audierne) are
+# channel-west's region and are in channel-west.yaml, as the region's bounds have it.
+#
+# Positions are in the modern frame (WGS 84, the EMODnet DTM 2024 grid the tiles are cut
+# from): first placed from the encyclopaedia's coordinates or the modern chart as each
+# entry says, then checked against the chart's coast and EMODnet's shoalest sounding by
+# channel-west.yaml's rule (a headland, island, town, castle, church, mill, tower to the
+# nearest land within 800 m; a light to the nearest land or shoal head within 400 m; a
+# rock or ledge to the nearest shoal head within 400 m; an anchorage to water holding
+# half the pilot's depth within 800 m); where a position rests on a pilot's bearing and
+# distance alone the entry says so in `fix`. Heights are above the sea for the horizon:
+# JUDGEMENT throughout, from the grid's own land about the mark (Groix 40 m, Belle Isle
+# 46, Houat and Yeu 26 under the mark) and the encyclopaedia's towers where a light's
+# entry cites them (the Baleines' 29 m, Yeu's 54 above the sea).
+#
+# The lights of 1805: the Baleines (Vauban's tower, a fire every night, Faden p. 80) and
+# Chassiron (a fire of wood in two places, p. 81) were lit; Penmarch, Goulphar on Belle
+# Île, the Pilier, Yeu, Groix's Pen Men and the Teignouse were not yet, and carry the
+# year they were first lit so that 1805 does not see them. The tower of Cordouan is
+# biscay-south's (package 39c).
+#
+# The lead reviews this list against the sources before the merge: the citation is on
+# every line for that.
+
+region: biscay-north
+features:
+
+  # ---------------------------------------------------------------------------
+  # The Raz's southern side, the Bay of Audierne and the Penmarks
+  # ---------------------------------------------------------------------------
+
+  - id: raz-soundings
+    kind: bottom
+    name: the soundings two leagues south-west of the Raz
+    modern: the approach to the Raz de Sein from the south
+    lat_deg: 47.9700
+    lon_deg: -4.8400
+    height_m: 0
+    bottom: "very fine grey and white sand"
+    depth_fathoms: 25
+    source: "Faden 1793, Du Bocage's account, p. 93: two leagues S W of the Raz, 25 to 26 fathoms, very fine grey and white sand"
+    says: "Two leagues south-west of the Raz the lead finds twenty-five or twenty-six fathoms on very fine grey and white sand."
+    fix: "the pilot's bearing and distance from the Raz, two leagues (six miles) south-west; the modern grid has 40 to 50 m there"
+
+  - id: la-gamelle
+    kind: ledge
+    name: La Gamelle
+    modern: La Gamelle (the rocks before Audierne)
+    lat_deg: 47.9980
+    lon_deg: -4.5450
+    height_m: 0
+    extent_m: 600
+    source: "Faden 1793, 'Hodierne', p. 65: before it lies E S E and W N W a great rocky bank called La Gamette, distant from the shore a quarter of a league; ships pass between this bank and the land on the east as well as the west side"
+    says: "La Gamelle, a great rocky bank a quarter of a league off Audierne, lying east-south-east and west-north-west; ships pass inside it by either end, steering near the shore."
+    fix: "the pilot's distance from the shore, a quarter of a league south of the harbour's mouth; the modern grid's shoal heads there"
+
+  - id: penmarch-point
+    kind: headland
+    name: the Penmarks
+    modern: Pointe de Penmarc'h (Pointe Saint-Pierre)
+    lat_deg: 47.7983
+    lon_deg: -4.3728
+    height_m: 10
+    source: "Faden 1793, 'Penmark Rocks', p. 65: from Hodierne to the rocks of Penmark the coast runs S E a little southerly, forming a great bay; it is all high land till within a small distance of these rocks, where it sinks into a valley; the encyclopaedia's 'Phare d'Eckmühl' for the point's position"
+    says: "The Penmarks, a low point where the high land of the Bay of Audierne sinks into a valley, with a town and several churches on it and a great number of rocks off it."
+
+  - id: penmarch-town
+    kind: town
+    name: Penmark
+    modern: Penmarc'h (Saint-Guénolé and Kérity)
+    lat_deg: 47.8128
+    lon_deg: -4.3367
+    height_m: 25
+    source: "Faden 1793, 'Penmark Rocks', p. 65: a valley on which you see a town and several churches; the encyclopaedia's 'Penmarch' for the position"
+    says: "The town of Penmark in its valley behind the point, with several church towers, the mark for the rocks."
+
+  - id: penmarch-rocks
+    kind: ledge
+    name: the Rocks of Penmark
+    modern: les Étocs and the rocks of Penmarc'h
+    lat_deg: 47.7938
+    lon_deg: -4.3888
+    height_m: 2
+    extent_m: 800
+    source: "Faden 1793, 'Penmark Rocks', pp. 65 to 66: at full three quarters of a league from this town a great number of rocks are above and under water, with some passages between them for barks and small ships, known only to the people of the place; the coast from the rocks to the river of Pont l'Abbé is full of banks and rocks which extend near a league in breadth"
+    says: "The Rocks of Penmark, a great number above and under water three quarters of a league off the town, with passages known only to the people of the place: give them a wide berth."
+    fix: "the pilot's distance from the town; the Étocs west of the point, where the modern grid's heads stand"
+
+  - id: penmarch-light
+    kind: light
+    name: the Penmarks light
+    modern: the old light of Penmarc'h (beside the Phare d'Eckmühl)
+    lat_deg: 47.7979
+    lon_deg: -4.3735
+    height_m: 41
+    lit: {from: 1835, until: 1897, range_nm: 16, character: "a fixed light (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Phare d'Eckmühl' (read 2026-10-09): before the tower of 1897 the 'Vieille tour' by the chapel of Saint-Pierre, a watch tower and perhaps a fire tower in the fifteenth century, then the 'phare de Penmarc'h', put in service in 1835, forty metres high, the direct predecessor of Eckmühl; not lit in 1805"
+    says: "The Penmarks light, which was not yet built in 1805."
+
+  - id: pont-labbe-road
+    kind: anchorage
+    name: the anchorage under the Isle Tudy
+    modern: the mouth of the river of Pont-l'Abbé, Loctudy and Île-Tudy
+    lat_deg: 47.8372
+    lon_deg: -4.1640
+    height_m: 0
+    depth_fathoms: 2
+    bottom: "sand"
+    source: "Faden 1793, 'River du Pont l'Abbé', p. 66: little frequented and accessible only at high water, almost barred with banks; within, wide enough, with anchorage under the shelter of a little isle called L'Isle Tudy; the encyclopaedia's 'Île-Tudy' and 'Loctudy' for the position"
+    says: "The river of Pont l'Abbé, almost barred with banks and accessible only at high water; within it a ship lies under the shelter of the Isle Tudy."
+
+  - id: benodet-road
+    kind: anchorage
+    name: the anchorage before Benauder
+    modern: the mouth of the Odet at Bénodet
+    lat_deg: 47.8687
+    lon_deg: -4.1082
+    height_m: 0
+    depth_fathoms: 6
+    bottom: "sand"
+    source: "Faden 1793, 'The River of Quimper', p. 66: a rock under water a good quarter of a league without the entrance, south of the eastern point; enter nearer the west side, then re-approach the eastern side till before a town called Benauder, and anchor in 6 or 7 fathoms; the encyclopaedia's 'Bénodet' for the position"
+    says: "The river of Quimper: enter by the west side for the rock under water off the eastern point, then close the eastern shore and anchor before Benauder in six or seven fathoms."
+
+  - id: concarneau
+    kind: town
+    name: Concarneau
+    modern: Concarneau, the Ville close
+    lat_deg: 47.8706
+    lon_deg: -3.9178
+    height_m: 15
+    source: "Faden 1793, 'Concarneau', p. 66: rocks above and under water at the entrance on both sides leaving only a small channel in the middle; the mark to enter, a castle on the east side brought in a line with a mill farther up the country; anchor before Concarneau in 4 or 5 fathoms; the encyclopaedia's 'Ville close de Concarneau'"
+    says: "Concarneau, its walled town and castle on an islet in the harbour; rocks on both sides of the entrance leave a small channel in the middle, the castle in a line with the mill up the country leading in."
+
+  - id: concarneau-road
+    kind: anchorage
+    name: the anchorage before Concarneau
+    modern: the Baie de la Forêt off Concarneau
+    lat_deg: 47.8640
+    lon_deg: -3.9250
+    height_m: 0
+    depth_fathoms: 4
+    bottom: "sand and mud"
+    source: "Faden 1793, 'Concarneau', p. 66: then you may anchor before Concarneau in 4 or 5 fathoms water; the tides at above 4 o'clock"
+    says: "Before Concarneau a ship anchors in four or five fathoms."
+
+  - id: glenan-isles
+    kind: island
+    name: the Isles of Glenan
+    modern: l'archipel des Glénan
+    lat_deg: 47.7220
+    lon_deg: -3.9983
+    height_m: 15
+    extent_m: 4000
+    source: "Faden 1793, 'Isles of Glenan', p. 67: about 3 leagues south of Concarneau harbour, a cluster of small islands making a good haven where a ship may lie under cover from all winds, but the entrance difficult; encompassed on the south and west with rocks above and under water, the north side clear enough; the encyclopaedia's 'Archipel des Glénan'"
+    says: "The Isles of Glenan, a cluster of small low islands three leagues south of Concarneau, encompassed with rocks on the south and the west; the north side is clear enough."
+
+  - id: glenan-road
+    kind: anchorage
+    name: the road north of Glenan
+    modern: the passage between the Glénan and the main
+    lat_deg: 47.7600
+    lon_deg: -3.9800
+    height_m: 0
+    depth_fathoms: 10
+    bottom: "sand"
+    source: "Faden 1793, 'Isles of Glenan', p. 67: you may sail between the main land and Glenan by steering nearer to that island, and there anchor in 10 or 12 fathoms water; there are several rocks under water by the shores of these islands"
+    says: "Between the main and Glenan a ship may anchor in ten or twelve fathoms, keeping nearer the island."
+
+  - id: penfret-light
+    kind: light
+    name: the light of Penfret
+    modern: Phare de Penfret
+    lat_deg: 47.7208
+    lon_deg: -3.9535
+    height_m: 36
+    lit: {from: 1838, until: null, range_nm: 15, character: "a light on the east isle of Glenan (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Phare de Penfret' (read 2026-10-09): the building finished and the light put in service in 1838; not lit in 1805"
+    says: "The light on Penfret, which was not yet built in 1805."
+
+  - id: la-jument-glenan
+    kind: rock
+    name: La Jument
+    modern: La Jument des Glénan
+    lat_deg: 47.6595
+    lon_deg: -4.0172
+    height_m: 0
+    source: "Faden 1793, 'Rock called La Jument, or the Mare', p. 67: a league and one third S S W of the west point of Glenan, almost perpetually under water, the sea breaking over it on the least swell; 40 fathoms close by it, but better to pass at a distance"
+    says: "The Mare, a rock almost always under water a league and a third south-south-west of Glenan; the sea breaks on it at the least swell."
+    fix: "the pilot's bearing and distance from the west point of Glenan; the modern rock of that name, where the grid's head stands"
+
+  - id: isles-aux-moutons
+    kind: island
+    name: the Sheep Islands
+    modern: l'île aux Moutons
+    lat_deg: 47.7763
+    lon_deg: -4.0246
+    height_m: 10
+    source: "Faden 1793, 'Isles aux Moutons, or Sheep Islands', p. 67: to the E N E of the east end of the Glenans (in the modern frame, north-west of them); many rocks under water along their south side, the north or land side clear, and one may anchor in 10 or 12 fathoms"
+    says: "The Sheep Islands, with rocks under water to the south of them and clear water on the land side."
+
+  - id: soundings-south-of-glenan
+    kind: bottom
+    name: the soundings south of Glenan
+    modern: the shelf south of the Glénan
+    lat_deg: 47.3500
+    lon_deg: -4.0000
+    height_m: 0
+    bottom: "grey sand speckled with black"
+    depth_fathoms: 52
+    source: "Faden 1793, Du Bocage's account, p. 94: seven or eight leagues south of Glenan, from 50 to 55 fathoms, grey sand speckled with black"
+    says: "Seven or eight leagues south of Glenan the lead finds fifty to fifty-five fathoms on grey sand speckled with black."
+    fix: "the pilot's distance south of Glenan, seven leagues and a half"
+
+  # ---------------------------------------------------------------------------
+  # Groix, Port Louis and L'Orient
+  # ---------------------------------------------------------------------------
+
+  - id: groix
+    kind: island
+    name: the Isle of Groix
+    modern: Île de Groix
+    lat_deg: 47.6380
+    lon_deg: -3.4650
+    height_m: 45
+    extent_m: 3000
+    source: "Faden 1793, 'Groix, or Grouais', p. 70: directly fronting Port Louis, 2 leagues to the south of it, near a league and a half in length E S E and W N W, with several trees and houses on it; very clear all round except on the S E side"
+    says: "The Isle of Groix, two leagues off Port Louis, a league and a half long, with trees and houses on it; clear all round but for the Cat's End on its south-east side."
+
+  - id: bout-des-chats
+    kind: ledge
+    name: the Cat's End
+    modern: la pointe des Chats and its rocks, Groix
+    lat_deg: 47.6150
+    lon_deg: -3.4150
+    height_m: 1
+    extent_m: 800
+    source: "Faden 1793, 'Groix', p. 70: on the S E side a bank of rocks which stretches half a league into the sea, called Bout des Chats (the cat's end)"
+    says: "The Cat's End, a bank of rocks stretching half a league to sea from the south-east end of Groix."
+    fix: "the pilot's half league from Groix's south-east point; the modern grid's heads off the Pointe des Chats"
+
+  - id: groix-road
+    kind: anchorage
+    name: the road of Groix
+    modern: the anchorage north-east of Groix
+    lat_deg: 47.6560
+    lon_deg: -3.4350
+    height_m: 0
+    depth_fathoms: 12
+    bottom: "sand and little pebbles like coral"
+    source: "Faden 1793, 'Groix', p. 70: between this isle and the land, nearer the land, is a bank with only 12 or 13 feet on it at low water; the anchorage is between this bank and the isle in 10, 12 to 15 fathoms, on a bottom of sand and little pebbles resembling coral"
+    says: "The road of Groix, between the island and the bank toward the land, in ten to fifteen fathoms on sand and little pebbles like coral."
+
+  - id: pen-men-light
+    kind: light
+    name: the light of Pen Men
+    modern: Phare de Pen Men, Groix
+    lat_deg: 47.6487
+    lon_deg: -3.5098
+    height_m: 59
+    lit: {from: 1839, until: null, range_nm: 20, character: "the light on the west end of Groix (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Phare de Pen-Men' (read 2026-10-09): built in 1836 and put in service in 1839 (a light begun near the place in 1798 was not finished); not lit in 1805"
+    says: "The light on the west end of Groix, which was not yet built in 1805."
+
+  - id: port-louis-citadel
+    kind: castle
+    name: the citadel of Port Louis
+    modern: la citadelle de Port-Louis
+    lat_deg: 47.7067
+    lon_deg: -3.3633
+    height_m: 20
+    source: "Faden 1793, 'Port Louis', pp. 67 to 68: an excellent harbour with a very good citadel, a town on the eastern side and a large village on the west; the mark to enter, the edge of the citadel in a line with St Catherine, a little convent on a point within; the encyclopaedia's 'Citadelle de Port-Louis'"
+    says: "The citadel of Port Louis on the point of the harbour's eastern side, the mark for the entrance with the convent of St Catherine within."
+
+  - id: port-louis
+    kind: town
+    name: Port Louis
+    modern: Port-Louis
+    lat_deg: 47.7083
+    lon_deg: -3.3550
+    height_m: 15
+    source: "Faden 1793, 'Port Louis', p. 68: when you are got within the citadel you anchor in 5 or 6 fathoms, or else run aground under the town to the north of it at high tide, the place being dry at every tide; high water at 4 o'clock and a half at full and change; SHOM's RAM, 'Port-Louis (Locmalo)', for the position"
+    says: "Port Louis, the town on the eastern side of the harbour's mouth under its citadel; the shore under it dries at every tide."
+
+  - id: port-louis-road
+    kind: anchorage
+    name: the road of Port Louis
+    modern: the anchorage within the citadel of Port-Louis
+    lat_deg: 47.7130
+    lon_deg: -3.3620
+    height_m: 0
+    depth_fathoms: 5
+    bottom: "mud"
+    source: "Faden 1793, 'Port Louis', p. 68: when you are got within the citadel you cast anchor in 5 or 6 fathoms water; p. 69: a ship drawing above 21 feet cannot make for the road of Pennemané but at high water spring tides, and anchors at Port Louis"
+    says: "Within the citadel of Port Louis a ship anchors in five or six fathoms; a ship of more than twenty-one feet lies here and not at Pennemané."
+
+  - id: pennemane-road
+    kind: anchorage
+    name: the road of Pennemané
+    modern: the anchorage off Pen-Mané, Locmiquélic
+    lat_deg: 47.7333
+    lon_deg: -3.3476
+    height_m: 0
+    depth_fathoms: 4
+    bottom: "mud"
+    source: "Faden 1793, d'Après de Mannevillette's instructions, p. 69: proceed for the road of Pennemané, leaving the rock Paugarne or Quintrec on the starboard hand; a ship drawing above 21 feet cannot make for this road but at high water spring tides"
+    says: "The road of Pennemané above St Michael's island, the anchorage for L'Orient's ships, which a ship of more than twenty-one feet reaches only at high water springs."
+
+  - id: lorient
+    kind: town
+    name: L'Orient
+    modern: Lorient
+    lat_deg: 47.7480
+    lon_deg: -3.3600
+    height_m: 15
+    source: "Faden 1793, 'L'Orient', p. 68: three quarters of a league above Port Louis at the bottom of the bay formed by the confluence of the Plotscorf and Blavet rivers, the place from whence the whole Asiatic trade of the French is carried on; the encyclopaedia's 'Lorient'"
+    says: "L'Orient at the head of the bay where the Scorff meets the Blavet, the port of the French East India trade and a dockyard of the King's ships."
+
+  - id: lorient-tower
+    kind: tower
+    name: the tower of L'Orient
+    modern: la tour de la Découverte, Lorient
+    lat_deg: 47.7493
+    lon_deg: -3.3566
+    height_m: 38
+    source: "Faden 1793, d'Après de Mannevillette's instructions, p. 69: by the middle channel, bring the tower of L'Orient in one with the westernmost bastion of the citadel of Port Louis; the encyclopaedia's 'Lorient' for the signal tower of the enclos (judgement for its height)"
+    says: "The tower of L'Orient over the dockyard, the mark for the middle channel in one with the citadel's western bastion."
+
+  - id: larmor-tower
+    kind: church
+    name: the tower of Larmor
+    modern: l'église Notre-Dame de Larmor
+    lat_deg: 47.7069
+    lon_deg: -3.3836
+    height_m: 30
+    source: "Faden 1793, d'Après de Mannevillette's instructions, p. 68: from Groix or the offing, keep the tower of Larmor N E 1/2 E 1/2 E by compass till one of the mills east of Port Louis is hid by the town walls, which carries you in mid-channel between the Saisies of Larmor and the Sows"
+    says: "The church tower of Larmor on the western shore of the entrance, the leading mark from Groix into the Great Channel."
+
+  - id: les-truies
+    kind: ledge
+    name: the Sows
+    modern: les Truies, the entrance of Lorient
+    lat_deg: 47.6860
+    lon_deg: -3.3790
+    height_m: 1
+    extent_m: 250
+    source: "Faden 1793, d'Après de Mannevillette's instructions, p. 68: coming from the offing to pass to the westward of the Truyes (the Sows) and the Errants, which they call the Great Channel, you sail in mid-channel between the Saisies of Larmor and the Sows"
+    says: "The Sows, rocks off the entrance of Port Louis; the Great Channel runs west of them, between them and the Saisies of Larmor."
+    fix: "d'Après's leading line and the modern grid's heads off the entrance; the rocks' name the modern chart's"
+
+  - id: gavres-point
+    kind: headland
+    name: Gavre
+    modern: la pointe de Gâvres
+    lat_deg: 47.6920
+    lon_deg: -3.3560
+    height_m: 8
+    source: "Faden 1793, d'Après de Mannevillette's instructions, p. 70: a fountain seen on the beach of Gavre in a line with a single tree on the same part of the peninsula; the third entrance, Gavre Channel, only fit for small vessels"
+    says: "The low point of Gavre on the eastern side of the entrance, with the Gavre Channel inside it for small vessels only."
+
+  # ---------------------------------------------------------------------------
+  # Quiberon, Houat and Hedic, the Cardinals and the bay
+  # ---------------------------------------------------------------------------
+
+  - id: quiberon-point
+    kind: headland
+    name: Point Quiberon
+    modern: la pointe du Conguel, Quiberon
+    lat_deg: 47.4770
+    lon_deg: -3.0970
+    height_m: 8
+    source: "Faden 1793, 'Quiberon', p. 70: from Port Louis to Quiberon Point the coast runs S E above 5 1/2 leagues, all low land with downs between; at Point Quiberon is a ledge of rocks which reaches to the isle of Houat"
+    says: "Point Quiberon, the low end of the peninsula; a ledge of rocks runs from it to the isle of Houat."
+
+  - id: quiberon-ledge
+    kind: ledge
+    name: the ledge of Quiberon
+    modern: le plateau de la Teignouse and the Quiberon ledges
+    lat_deg: 47.4606
+    lon_deg: -3.0620
+    height_m: 1
+    extent_m: 800
+    source: "Faden 1793, 'Quiberon', p. 70: at Point Quiberon is a ledge of rocks which reaches to the isle of Houat; 'Houat and Hedic', p. 71: there is no passage between them because of the ledge, contiguous to both (the note: the British ships discovered one, through which Commodore Duff's squadron passed from the Bay of Quiberon in 1759)"
+    says: "The ledge from Point Quiberon to Houat, no passage for the French pilots; the British found one in fifty-nine."
+    fix: "the pilot's words, from the point to Houat; the middle of the modern plateau"
+
+  - id: la-teignouse
+    kind: rock
+    name: La Teignouse
+    modern: la Teignouse
+    lat_deg: 47.4572
+    lon_deg: -3.0458
+    height_m: 3
+    source: "Faden 1793, 'Houat and Hedic', p. 71: a high rock called La Teignouse, wide of all the rest at the N by W end, the mark for passing between Houat and Hedic; the encyclopaedia's 'Phare de la Teignouse' (read 2026-10-09) for the rock's position, between the peninsula of Quiberon and Houat in the prolongation of the Pointe du Conguel"
+    says: "La Teignouse, a high rock standing wide of the rest on the ledge between Quiberon and Houat."
+    fix: "Faden puts it at Houat's N by W end as the mark for the passage between Houat and Hedic; the modern rock of the name, which the light of 1845 marks, is the one taken"
+
+  - id: teignouse-light
+    kind: light
+    name: the Teignouse light
+    modern: Phare de la Teignouse
+    lat_deg: 47.4572
+    lon_deg: -3.0458
+    height_m: 20
+    lit: {from: 1845, until: null, range_nm: 15, character: "a light on the rock (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Phare de la Teignouse' (read 2026-10-09): built from 1843, first lit on 1 January 1845; not lit in 1805"
+    says: "The light on the Teignouse, which was not yet built in 1805."
+
+  - id: houat
+    kind: island
+    name: the Isle of Houat
+    modern: Houat
+    lat_deg: 47.3900
+    lon_deg: -2.9600
+    height_m: 30
+    extent_m: 2500
+    source: "Faden 1793, 'Houat and Hedic Islands', p. 71: about 2 leagues to the south of Point Quiberon, about a league in length E S E and W N W, surrounded on the S E and the north with a multitude of rocks above and under water"
+    says: "The Isle of Houat, a league long, two leagues south of Point Quiberon, beset with rocks to the south-east and the north."
+
+  - id: hoedic
+    kind: island
+    name: the Isle of Hedic
+    modern: Hœdic
+    lat_deg: 47.3400
+    lon_deg: -2.8750
+    height_m: 20
+    source: "Faden 1793, 'Houat and Hedic Islands', p. 71: a great league and a half to the S E of Houat, a round island near half a league in diameter within a multitude of rocks; good anchorage abreast of them in 9 or 10 fathoms on sand and mud"
+    says: "Hedic, a round island half a league across within its rocks, a league and a half south-east of Houat."
+
+  - id: the-cardinals
+    kind: ledge
+    name: the Cardinals
+    modern: les Cardinaux, east of Hœdic
+    lat_deg: 47.3245
+    lon_deg: -2.8355
+    height_m: 4
+    extent_m: 400
+    source: "Faden 1793, 'Cardinaux, or Cardinals', p. 71: half a league to the east of Hedic a cluster of great rocks, the largest above water, some extending two good cables' length; no passage between Hedic and the Cardinals; the tides very strong along these rocks; bound for the rivers of Auray, Vannes, Vilaine or the Croisic, you pass to the east of the Cardinals at a quarter of a league; pilots almost constantly attending at the Cardinals in their shallops (p. 73)"
+    says: "The Cardinals, a cluster of great rocks half a league east of Hedic with no passage inside them; the tides run strongly along them, and the pilots of the rivers wait here in their shallops."
+
+  - id: quiberon-bay
+    kind: anchorage
+    name: the Bay of Quiberon
+    modern: la baie de Quiberon
+    lat_deg: 47.4950
+    lon_deg: -3.0300
+    height_m: 0
+    depth_fathoms: 8
+    bottom: "sand and mud"
+    source: "Faden 1793, 'Entrance of the rivers of Vannes and Auray', p. 73: between the Cardinals and Point Mehan, within the compass of the isles of Houat and Hedic, there is every where good anchorage in 8, 10, or 12 fathoms, according to the distance from the land; the note on p. 71, Commodore Duff's squadron in the Bay of Quiberon in 1759"
+    says: "The Bay of Quiberon within the isles: good anchorage everywhere in eight to twelve fathoms, the fleet's road on this coast."
+
+  - id: point-mehan
+    kind: headland
+    name: Point Mehan
+    modern: Port-Navalo, the entrance of the Gulf of Morbihan
+    lat_deg: 47.5479
+    lon_deg: -2.9134
+    height_m: 10
+    source: "Faden 1793, 'Entrance of the rivers of Vannes and Auray', p. 72: from the east point of the Cardinals to the river of Auray or Vannes the course is 5 leagues N 1/2 W; you pass between the isles on the west of the mouth and Point Mehan near mid-channel in 7 or 8 fathoms; the tides extremely strong, never to be entered without pilots; the encyclopaedia's 'Phare de Port-Navalo' for the position"
+    says: "Point Mehan, the eastern point of the mouth of the rivers of Vannes and Auray, where the tide pours in and out so fast that none enters without a pilot."
+
+  - id: st-gildas-steeple
+    kind: church
+    name: the steeple of St Gildas
+    modern: l'abbatiale de Saint-Gildas-de-Rhuys
+    lat_deg: 47.5000
+    lon_deg: -2.8380
+    height_m: 35
+    source: "Faden 1793, 'Entrance of the rivers of Vannes and Auray', p. 73: a bank on the east shore about a league from Point Mehan, joined to the land and extending above half a league to sea, directly opposite to the high steeple of St. Gildas"
+    says: "The high steeple of St Gildas on the shore of Rhuys, over the bank that runs half a league to sea there."
+
+  # ---------------------------------------------------------------------------
+  # Belle Isle
+  # ---------------------------------------------------------------------------
+
+  - id: belle-isle
+    kind: island
+    name: Belle Isle
+    modern: Belle-Île-en-Mer
+    lat_deg: 47.3300
+    lon_deg: -3.1800
+    height_m: 60
+    extent_m: 9000
+    source: "Faden 1793, 'Belle Isle, or Bellisle', p. 72: five leagues to the S S E of the south-eastern end of Groix, 3 leagues in length, very high and steep almost all round; on the south side a multitude of rocks above and under water near the shore"
+    says: "Belle Isle, three leagues long, high and steep almost all round, with rocks close under its southern shore."
+
+  - id: poulains-point
+    kind: headland
+    name: Colts Point
+    modern: la pointe des Poulains, Belle-Île
+    lat_deg: 47.3886
+    lon_deg: -3.2538
+    height_m: 25
+    source: "Faden 1793, 'Belle Isle', p. 72: the western point of Belle Isle called La Pont des Poulans, from a number of rocks lying west of it named Les Poulans (the colts); the encyclopaedia's 'Phare des Poulains' for the position"
+    says: "Colts Point, the north-western point of Belle Isle, with the rocks called the Colts off it."
+
+  - id: les-poulains
+    kind: ledge
+    name: the Colts
+    modern: the rocks off the pointe des Poulains
+    lat_deg: 47.3913
+    lon_deg: -3.2645
+    height_m: 6
+    extent_m: 500
+    source: "Faden 1793, 'Belle Isle', p. 72: Les Poulans (the colts), some above and others under water, the one that stands widest of the rest above water, a great and high rock; half a league from the shore off Colts Point to the N W several rocks on a level with the water, which are very dangerous"
+    says: "The Colts, rocks above and under water off the north-western point of Belle Isle, the widest a great high rock; others awash half a league to the north-west are very dangerous."
+    fix: "the pilot's words; the modern grid's heads west of the point"
+
+  - id: le-palais
+    kind: town
+    name: Palais
+    modern: Le Palais, Belle-Île
+    lat_deg: 47.3478
+    lon_deg: -3.1530
+    height_m: 30
+    source: "Faden 1793, 'Belle Isle', p. 72: on the north side, about half way along the island, the town and harbour of Palais, which is the most frequented; SHOM's RAM, 'Le Palais (Belle-Île)', for the harbour's position"
+    says: "Palais, the town and harbour on the north side of Belle Isle under its castle, the most frequented of the island's harbours."
+
+  - id: palais-castle
+    kind: castle
+    name: the castle of Palais
+    modern: la citadelle Vauban, Le Palais
+    lat_deg: 47.3489
+    lon_deg: -3.1513
+    height_m: 35
+    source: "Faden 1793, 'Belle Isle', p. 72: the roads on the northern side, under the castle and a league to the east of it, the most frequented; the encyclopaedia's 'Le Palais' for the citadel's position"
+    says: "The castle of Palais on its height over the harbour, the mark for the road under it."
+
+  - id: palais-road
+    kind: anchorage
+    name: the road of Palais
+    modern: the anchorage off Le Palais
+    lat_deg: 47.3570
+    lon_deg: -3.1420
+    height_m: 0
+    depth_fathoms: 10
+    bottom: "sand and mud"
+    source: "Faden 1793, 'Belle Isle', p. 72: a number of roads at this island, the most frequented on the northern side under the castle and a league to the east of it; the anchorage in 8, 10 or 15 fathoms according to the distance from the shore"
+    says: "The road under the castle of Palais, in eight to fifteen fathoms as you are nearer or farther from the shore."
+
+  - id: basse-palais
+    kind: rock
+    name: the Basse Palais
+    modern: a shoal head off Le Palais
+    lat_deg: 47.3578
+    lon_deg: -3.1472
+    height_m: 0
+    dries_m: -8.2
+    source: "Faden 1793, 'Belle Isle', p. 72: a little to the east of the castle and half a league from the shore lies a rock under water, named Basse-Palais, on which are 4 1/2 fathoms at low water"
+    says: "The Basse Palais, a rock under water half a league off the shore east of the castle, with four fathoms and a half on it at low water."
+    fix: "the pilot's bearing and distance from the castle, moved to the modern grid's shoalest head within a mile (6.6 m); four fathoms and a half below the chart's datum taken as the pilot's low water"
+
+  - id: sauzon
+    kind: town
+    name: Sauzon
+    modern: Sauzon, Belle-Île
+    lat_deg: 47.3730
+    lon_deg: -3.2180
+    height_m: 20
+    source: "Faden 1793, 'Belle Isle', p. 72: another harbour a little above Palais called Sauzon, seldom visited, though much better than the former"
+    says: "Sauzon, a harbour north-west of Palais, seldom visited though the better of the two."
+
+  - id: locmaria-road
+    kind: anchorage
+    name: the road under Point Locmaria
+    modern: the anchorage off the east end of Belle-Île
+    lat_deg: 47.3200
+    lon_deg: -3.0550
+    height_m: 0
+    depth_fathoms: 10
+    bottom: "sand"
+    source: "Faden 1793, 'Belle Isle', p. 72: another good road lies on the east side of the island under Point Locmaria; the anchorage in 8, 10 or 15 fathoms"
+    says: "The road under Point Locmaria on the east side of Belle Isle, good with the wind westerly, in eight to fifteen fathoms."
+
+  - id: goulphar-light
+    kind: light
+    name: the light of Belle Isle
+    modern: Phare de Goulphar
+    lat_deg: 47.3108
+    lon_deg: -3.2271
+    height_m: 87
+    lit: {from: 1836, until: null, range_nm: 26, character: "the great light on the south-west side (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Phare de Goulphar' (read 2026-10-09): built 1826 to 1835 on Augustin Fresnel's plans, put in service in January 1836; not lit in 1805"
+    says: "The great light on Belle Isle's south-western cliffs, which was not yet built in 1805."
+
+  - id: soundings-off-belle-isle
+    kind: bottom
+    name: the soundings off Belle Isle
+    modern: the shelf south-west of Belle-Île
+    lat_deg: 47.2000
+    lon_deg: -3.4500
+    height_m: 0
+    bottom: "brown and muddy sand"
+    depth_fathoms: 55
+    source: "Faden 1793, Du Bocage's account, p. 94: four leagues S W 1/2 W from Belle-isle, 55 fathoms; seven leagues S W, 60 fathoms; eight or nine leagues W 1/2 S, 65 fathoms; the same ground, brown and muddy sand"
+    says: "Four leagues south-west of Belle Isle the lead finds fifty-five fathoms on brown muddy sand, deepening to sixty-five eight leagues off."
+    fix: "the pilot's bearing and distance from Belle Isle, four leagues south-west by west"
+
+  - id: soundings-belle-isle-to-yeu
+    kind: bottom
+    name: the soundings between Belle Isle and Yeu
+    modern: the shelf between Belle-Île and Yeu
+    lat_deg: 47.0000
+    lon_deg: -2.7500
+    height_m: 0
+    bottom: "coarse red sand"
+    depth_fathoms: 26
+    source: "Faden 1793, Du Bocage's account, p. 94: between Belle-isle and Isle d'Yeu, from 25 to 28 fathoms, coarse red sand"
+    says: "Between Belle Isle and Yeu twenty-five to twenty-eight fathoms on coarse red sand."
+    fix: "midway on the line between the two islands"
+
+  # ---------------------------------------------------------------------------
+  # The Croisic and the Loire to Paimboeuf
+  # ---------------------------------------------------------------------------
+
+  - id: isle-dumet
+    kind: island
+    name: Isle Dumet
+    modern: l'île Dumet
+    lat_deg: 47.4112
+    lon_deg: -2.6224
+    height_m: 15
+    source: "Faden 1793, 'River Vilaine', p. 73: you must steer round Isle Dumet, running into a number of sandy points which stretch into the sea three quarters of a league and require a good berth; 'Croisic', p. 74: pass between Isle Dumet and the ledge called Le Four"
+    says: "Isle Dumet, with sandy points running three quarters of a league off it; give it a good berth."
+
+  - id: le-four-croisic
+    kind: drying
+    name: the Four
+    modern: le plateau du Four, off Le Croisic
+    lat_deg: 47.3000
+    lon_deg: -2.6330
+    height_m: 1
+    dries_m: 1
+    extent_m: 1500
+    source: "Faden 1793, 'The Loire', p. 74: one league and a half west of Point Croisic lies the point of the bank called The Four, which is dry every tide, almost 2 leagues in length to the south (the note: on this bank the Resolution was wrecked in the sea-fight of November 1759); 'Croisic', p. 74: keep the high steeple of La Tour de Bas on the N E of Point Croisic, or you would infallibly run upon the Four"
+    says: "The Four, a bank dry at every tide a league and a half west of the Croisic and two leagues long to the south; keep the steeple of Batz north-east of the point or you will run upon it."
+    fix: "the pilot's league and a half west of the point; the drying height judgement (dry every tide)"
+
+  - id: le-four-light
+    kind: light
+    name: the light of the Four
+    modern: Phare du Four (Le Croisic)
+    lat_deg: 47.2978
+    lon_deg: -2.6336
+    height_m: 23
+    lit: {from: 1822, until: null, range_nm: 15, character: "a light on the bank (not yet built in 1805)"}
+    source: "Modern chart: the light on the plateau du Four; its year, 1822, UNVERIFIED (from memory: the encyclopaedia's page was not reached for the rate it refused at); not lit in 1805 in either case"
+    says: "The light on the Four, which was not yet built in 1805."
+
+  - id: croisic
+    kind: town
+    name: the Croisic
+    modern: Le Croisic
+    lat_deg: 47.2925
+    lon_deg: -2.5209
+    height_m: 15
+    source: "Faden 1793, 'Croisic', p. 74: the entrance extremely difficult for the rocks that block up the haven and the great currents; rarely visited but by small vessels, and dry every tide; the exports white salt, pilchards and brandy from Nantes; the encyclopaedia's 'Le Croisic'"
+    says: "The Croisic, a salt and pilchard town whose haven, blocked with rocks and dry every tide, only small vessels use."
+
+  - id: batz-steeple
+    kind: church
+    name: the steeple of Batz
+    modern: the church tower of Batz-sur-Mer
+    lat_deg: 47.2775
+    lon_deg: -2.4806
+    height_m: 60
+    source: "Faden 1793, 'Croisic', p. 74: within the point of Croisic comes in view another high steeple of stone called La Tour de Bas, by which marks this coast is easily known; keep it on the N E of Point Croisic to pass inside the Four"
+    says: "The high stone steeple of Batz, by which this low coast is known; kept north-east of the Croisic's point it leads clear of the Four."
+
+  - id: guerande-steeple
+    kind: church
+    name: the steeple of Guerande
+    modern: la collégiale Saint-Aubin de Guérande
+    lat_deg: 47.3279
+    lon_deg: -2.4294
+    height_m: 60
+    source: "Faden 1793, 'Croisic', p. 74: the land all low, and at a small distance you see the town of Guerande with a high pointed steeple; the encyclopaedia's 'Guérande' for the position"
+    says: "The town of Guerande on its rise behind the salt marshes, with a high pointed steeple."
+
+  - id: pierre-percee
+    kind: rock
+    name: the Pierced Rock
+    modern: la Pierre Percée, the approaches of Saint-Nazaire
+    lat_deg: 47.2330
+    lon_deg: -2.2947
+    height_m: 3
+    source: "Faden 1793, 'The Loire', p. 75: east of Croisic steer E S E and S E 1/2 E till you come to the Pierced Rock, or Pierre Percée, which you may sail very close by on its north side in no less than 4 fathoms; then N N E toward the land to within a league of St Nazaire"
+    says: "The Pierced Rock in the mouth of the Loire, which a ship passes close on its north side in four fathoms before hauling up for St Nazaire."
+    fix: "the pilot's course from the Croisic; placed at the modern grid's head south of the Pointe de Chémoulin, its name and position UNVERIFIED against a modern chart"
+
+  - id: saint-nazaire
+    kind: town
+    name: St Nazaire
+    modern: Saint-Nazaire
+    lat_deg: 47.2806
+    lon_deg: -2.2086
+    height_m: 15
+    source: "Faden 1793, 'The Loire', p. 75: range along to St Nazaire and there cast anchor in 6 or 7 fathoms water; the encyclopaedia's 'Saint-Nazaire' for the position"
+    says: "St Nazaire on the north shore of the Loire's mouth, where a ship anchors to wait for the tide and a pilot up the river."
+
+  - id: st-nazaire-road
+    kind: anchorage
+    name: the road of St Nazaire
+    modern: the Loire off Saint-Nazaire
+    lat_deg: 47.2680
+    lon_deg: -2.1980
+    height_m: 0
+    depth_fathoms: 6
+    bottom: "sand and mud"
+    source: "Faden 1793, 'The Loire', p. 75: there cast anchor in 6 or 7 fathoms water; to the N N E of St Nazaire you find at least 3 to 4 fathoms at low water; the currents very violent"
+    says: "Off St Nazaire a ship anchors in six or seven fathoms; the currents of the river are very violent."
+
+  - id: les-morees
+    kind: ledge
+    name: the ledge in the river
+    modern: les Morées, the Loire off Saint-Nazaire
+    lat_deg: 47.2560
+    lon_deg: -2.1900
+    height_m: 0
+    extent_m: 300
+    source: "Faden 1793, 'The Loire', p. 75: to the S S E of St Nazaire, exactly in the middle of the river, lies a ledge of rocks covered at half tide, to avoid which you must always coast the north side of the river"
+    says: "A ledge of rocks in the middle of the river south-south-east of St Nazaire, covered at half tide: keep the north side."
+    fix: "the pilot's bearing from the town, in the middle of the river; the modern grid's shoal there, its name the modern chart's, UNVERIFIED"
+
+  - id: paimboeuf
+    kind: town
+    name: Paimbeuf
+    modern: Paimbœuf
+    lat_deg: 47.2876
+    lon_deg: -2.0306
+    height_m: 10
+    source: "Faden 1793, 'The Loire', p. 75: from St Nazaire to Nantes steer E 1/2 S till you come along the south shore, which you coast till within the bank that lies opposite to the little town of Paimbeuf; SHOM's RAM, TICON's gauge (47.2866 N, 2.0004 W)"
+    says: "Paimbeuf, the little town on the south shore where the ships of Nantes lie to load and discharge, the river above it too shoal for them."
+
+  - id: paimboeuf-road
+    kind: anchorage
+    name: the road of Paimbeuf
+    modern: the Loire off Paimbœuf
+    lat_deg: 47.3022
+    lon_deg: -2.0592
+    height_m: 0
+    depth_fathoms: 7
+    bottom: "sand and mud"
+    source: "Faden 1793, 'The Loire', p. 75: when you are past the bank opposite Paimbeuf, approach the north shore and cast anchor in 7 or 8 fathoms, sand and mud; you may also anchor by the south shore; the river very rarely entered without taking pilots"
+    says: "Above the bank off Paimbeuf a ship anchors in seven or eight fathoms on sand and mud; the river is rarely entered without a pilot."
+
+  # ---------------------------------------------------------------------------
+  # Noirmoutier, Yeu and the coast of Poitou
+  # ---------------------------------------------------------------------------
+
+  - id: le-pilier
+    kind: island
+    name: the Pilier
+    modern: l'île du Pilier
+    lat_deg: 47.0431
+    lon_deg: -2.3600
+    height_m: 15
+    source: "Faden 1793, 'Noirmoustier', p. 76: steer E S E till you come in sight of the small isle called Le Pelier and of the isle of Noirmoustier; approaching the Isle du Pilier you have 9 or 10 fathoms (p. 76); the encyclopaedia's 'Phare du Pilier' for the position"
+    says: "The Pilier, a small isle off the north-west end of Noirmoutier, the mark for the Bay of Bourgneuf."
+
+  - id: pilier-light
+    kind: light
+    name: the light of the Pilier
+    modern: Phare du Pilier
+    lat_deg: 47.0431
+    lon_deg: -2.3600
+    height_m: 33
+    lit: {from: 1829, until: null, range_nm: 18, character: "a light on the isle (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Phare du Pilier' (read 2026-10-09): the first tower, of cut stone 29.5 m high (32.5 m above the sea), built in 1829; not lit in 1805"
+    says: "The light on the Pilier, which was not yet built in 1805."
+
+  - id: noirmoutier
+    kind: town
+    name: Noirmoustier
+    modern: Noirmoutier-en-l'Île
+    lat_deg: 47.0044
+    lon_deg: -2.2533
+    height_m: 15
+    source: "Faden 1793, 'Noirmoustier, and Bay of Bourgneuf', p. 76: steer E 1/2 N till you bring the convent and castle of Noirmoustier together, and so double the Banc des Moines; it is high water about 4 o'clock at full and change; the encyclopaedia's 'Noirmoutier-en-l'Île'"
+    says: "Noirmoustier, its castle and convent in one the mark for doubling the Monks' bank into the Bay of Bourgneuf."
+
+  - id: les-boeufs
+    kind: shoal
+    name: the Oxen
+    modern: le plateau des Bœufs, south-west of Noirmoutier
+    lat_deg: 46.9600
+    lon_deg: -2.4000
+    height_m: 0
+    extent_m: 4000
+    source: "Faden 1793, 'Isle d'Yeu', p. 76: care must be taken of the Beufs (the oxen), a number of banks to the south and S E of Pilier, 2 great leagues wide of Noirmoustier; you must not approach them within 14 or 15 fathoms, for they are very steep to"
+    says: "The Oxen, steep banks south of the Pilier two great leagues off Noirmoustier; keep in fourteen or fifteen fathoms."
+    fix: "the pilot's bearing from the Pilier; the modern plateau's shoal heads"
+
+  - id: isle-dieu
+    kind: island
+    name: the Isle Dieu
+    modern: Île d'Yeu
+    lat_deg: 46.7100
+    lon_deg: -2.3500
+    height_m: 30
+    extent_m: 5000
+    source: "Faden 1793, 'Isle d'Yeu', pp. 76 to 77: a multitude of rocks on the west side, some three quarters of a league off, called Les Chiens Perrins; small rocky shelves along the N E shore; the S W coast clearer; two small harbours fit only for barks, dry every tide; easily known by a pointed steeple; there is commonly a great sea"
+    says: "The Isle Dieu, known by its pointed steeple, rocky on its west side; its two little harbours are for barks and dry every tide."
+
+  - id: chiens-perrins
+    kind: ledge
+    name: the Chiens Perrins
+    modern: les Chiens Perrins, Île d'Yeu
+    lat_deg: 46.7300
+    lon_deg: -2.4100
+    height_m: 1
+    extent_m: 1000
+    source: "Faden 1793, 'Isle d'Yeu', p. 76: a multitude of rocks on the west side, some of which extend about three quarters of a league off the land, called Les Chiens Perrins"
+    says: "The Chiens Perrins, rocks running three quarters of a league off the west side of the Isle Dieu."
+    fix: "the pilot's words; the modern grid's heads off the north-west of the island"
+
+  - id: yeu-road
+    kind: anchorage
+    name: the road of the Isle Dieu
+    modern: the anchorage off Port-Joinville
+    lat_deg: 46.7400
+    lon_deg: -2.3308
+    height_m: 0
+    depth_fathoms: 8
+    bottom: "rough ground"
+    source: "Faden 1793, 'Isle d'Yeu', p. 77: when you would anchor in the road of that island bring the steeple to bear S W, and then lie in 8 or 9 fathoms; but the bottom is not very good, and there is commonly a great sea; the tides set N E and S W"
+    says: "The road of the Isle Dieu, the steeple bearing south-west, in eight or nine fathoms; the bottom is not good and there is commonly a great sea."
+
+  - id: yeu-light
+    kind: light
+    name: the light of the Isle Dieu
+    modern: Phare de l'île d'Yeu (la Petite Foule)
+    lat_deg: 46.7175
+    lon_deg: -2.3819
+    height_m: 54
+    lit: {from: 1830, until: null, range_nm: 20, character: "a light on the Petite Foule (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Phare de l'île d'Yeu' (read 2026-10-09): decided after the loss of the Active on the Basse Flore by the Chiens Perrins in 1827; in 1830 a first fixed white light on a round tower 33 m high, 54 m above the sea; not lit in 1805"
+    says: "The light of the Isle Dieu, which was not yet built in 1805."
+
+  - id: st-gilles
+    kind: town
+    name: St Gilles
+    modern: Saint-Gilles-Croix-de-Vie
+    lat_deg: 46.6967
+    lon_deg: -1.9425
+    height_m: 10
+    source: "Faden 1793, 'Saint Gilles', p. 77: east of Isle d'Yeu the small harbour of St Gilles, a tide port fit only for vessels of 100 or 120 tons; the town cannot be seen from sea, the river known by a great wood near it; SHOM's RAM for the position"
+    says: "St Gilles, a little tide harbour for vessels of a hundred tons, its town hidden from the sea; the river is known by a great wood."
+
+  - id: barges-dolonne
+    kind: ledge
+    name: the Barges d'Olonne
+    modern: les Barges, off Les Sables-d'Olonne
+    lat_deg: 46.4970
+    lon_deg: -1.8450
+    height_m: 1
+    extent_m: 1000
+    source: "Faden 1793, 'Les Barges d'Olonne', p. 77: 7 1/2 leagues from Isle d'Yeu and above 5 from Isle de Ré, stretching near three quarters of a league into the sea, uncovered at low water, no passage across them; about a league west of the harbour of Olonne, with 16 and 18 fathoms very near them; by night do not approach them within 20 fathoms"
+    says: "The Barges d'Olonne, rocks uncovered at low water a league west of Olonne with no passage across them; by night keep in twenty fathoms."
+    fix: "the pilot's league west of the harbour; the modern grid's heads"
+
+  - id: les-sables
+    kind: town
+    name: the Sables d'Olonne
+    modern: Les Sables-d'Olonne
+    lat_deg: 46.4965
+    lon_deg: -1.7836
+    height_m: 15
+    source: "Faden 1793, 'The Harbour of Olonne', p. 78: a tide port where ships lie dry, entered only at high water, between the towns of Les Sables d'Olonne and Le Chaume; known from the sea by a high pointed steeple with two small ones; SHOM's RAM for the position"
+    says: "The Sables d'Olonne, a tide harbour where ships lie dry, between the Sables and the Chaume; known by a high pointed steeple and two small ones."
+
+  - id: roche-bonne
+    kind: shoal
+    name: Roche Bonne
+    modern: le plateau de Rochebonne
+    lat_deg: 46.1900
+    lon_deg: -2.3900
+    height_m: 0
+    extent_m: 5000
+    source: "Faden 1793, 'Roche Bonne and les Banches Vertes', pp. 80 and 84: about 10 1/2 leagues from the west point of Isle de Ré, a league long east to west and half a league broad, many rocks above and under water, appearing even with the water at low tide; the Banches Vertes to the N W, with a passage between in 30 fathoms; steep to, 20 to 40 fathoms near them"
+    says: "Roche Bonne, a rocky bank ten leagues off the Isle of Ré, even with the water at low tide and steep to; the Banches Vertes lie north-west of it."
+    fix: "the pilot's distance from the Baleines; the modern plateau's shoal heads"
+
+  # ---------------------------------------------------------------------------
+  # The Pertuis Breton, Ré and La Rochelle
+  # ---------------------------------------------------------------------------
+
+  - id: pertuis-breton
+    kind: bottom
+    name: the Pertuis Breton
+    modern: le pertuis Breton
+    lat_deg: 46.2750
+    lon_deg: -1.4300
+    height_m: 0
+    bottom: "mud and sand"
+    depth_fathoms: 12
+    source: "Faden 1793, 'Pertuis Breton', pp. 78 to 79: from Olonne the coast runs 6 leagues E S E, the land all low both on the coast of Poitou and the Isle de Ré; sail in mid-channel or nearer the main for the bank of St Martin; without the bank, in the middle of the channel, 12 to 14 fathoms"
+    says: "The Pertuis Breton between the low coast of Poitou and the Isle of Ré, twelve to fourteen fathoms in the middle; the bank of St Martin shoots off the island."
+
+  - id: les-baleines
+    kind: ledge
+    name: the Baleines
+    modern: les Baleineaux and the rocks off the pointe des Baleines
+    lat_deg: 46.2640
+    lon_deg: -1.5850
+    height_m: 0
+    extent_m: 1500
+    source: "Faden 1793, 'The Whales Rocks', pp. 79 to 80: at the west point of Isle de Ré lies a great rocky bank, which is never uncovered, and extends three quarters of a league into the sea, named Les Baleines d'Ars (the whales of Ars)"
+    says: "The Baleines, a great rocky bank never uncovered, running three quarters of a league off the west point of Ré; the tower's fire is lit every night for it."
+    fix: "the pilot's three quarters of a league from the point; the modern grid's heads, where the Baleineaux tower stands"
+
+  - id: baleines-light
+    kind: light
+    name: the tower of the Baleines
+    modern: the old tower of the Baleines (Vauban's), beside the Phare des Baleines
+    lat_deg: 46.2443
+    lon_deg: -1.5603
+    height_m: 29
+    lit: {from: 1682, until: 1854, range_nm: 12, character: "a fire on the tower every night"}
+    source: "Faden 1793, 'The Whales Rocks', p. 80: a great tower is erected on that point and a fire made on it every night, for avoiding this bank; the encyclopaedia's 'Phare des Baleines' (read 2026-10-09): the old tower of 29 m built in 1682 on Vauban's orders and lit in 1682, which stands 80 m north-west of the great light of 1854 that replaced it; the range judgement"
+    says: "The tower of the Baleines on the west point of Ré, where a fire is made every night to warn of the rocks."
+
+  - id: st-martin-de-re
+    kind: town
+    name: St Martin
+    modern: Saint-Martin-de-Ré
+    lat_deg: 46.2036
+    lon_deg: -1.3672
+    height_m: 20
+    source: "Faden 1793, 'Pertuis Breton', p. 78: when you have the church of St Martin bearing S S W you may steer for Isle de Ré and anchor before St Martin; SHOM's RAM for the position"
+    says: "St Martin, the walled town and citadel of the Isle of Ré on its north shore."
+
+  - id: st-martin-road
+    kind: anchorage
+    name: the road of St Martin
+    modern: the anchorage off Saint-Martin-de-Ré
+    lat_deg: 46.2196
+    lon_deg: -1.3549
+    height_m: 0
+    depth_fathoms: 4
+    bottom: "mud and sand"
+    source: "Faden 1793, 'Pertuis Breton', p. 78: cast anchor before St Martin in 3, 4, 5, or 6 fathoms water, mud and sand"
+    says: "Before St Martin a ship anchors in three to six fathoms on mud and sand."
+
+  - id: la-pree-road
+    kind: anchorage
+    name: the road of La Palisse
+    modern: the anchorage under the fort de la Prée, Ré
+    lat_deg: 46.2000
+    lon_deg: -1.3000
+    height_m: 0
+    depth_fathoms: 6
+    bottom: "mud"
+    source: "Faden 1793, 'Pertuis Breton', p. 79: you may anchor in the road of La Palisse, if you think fit, under the fort of La Prée, in 6 or 7 fathoms water, muddy bottom"
+    says: "The road of La Palisse under the fort of La Prée, in six or seven fathoms on mud."
+    fix: "off the fort on Ré's north-east shore; the modern grid has 3.7 m below LAT here and nothing deeper within two miles, a shoaler road than the pilot's (the Pertuis Breton has silted since: UNVERIFIED)"
+
+  - id: chef-de-baie-road
+    kind: anchorage
+    name: the road of Chef de Bois
+    modern: la rade de Chef de Baie, La Rochelle
+    lat_deg: 46.1500
+    lon_deg: -1.2358
+    height_m: 0
+    depth_fathoms: 6
+    bottom: "muddy ground"
+    source: "Faden 1793, 'Pertuis Breton', p. 79: go to the road of Chef de Bois, always following the middle of the channel till you open La Rochelle, then steer east into the road, where you anchor in 5, 6, 7, or 8 fathoms, muddy ground"
+    says: "The road of Chef de Bois off La Rochelle, in five to eight fathoms on mud."
+
+  - id: la-rochelle
+    kind: town
+    name: La Rochelle
+    modern: La Rochelle
+    lat_deg: 46.1591
+    lon_deg: -1.1520
+    height_m: 20
+    source: "Faden 1793, 'Pertuis d'Antioche', p. 81: to enter the port of La Rochelle, or the Digue, coasting pilots are required; at the entrance of the Digue, on the larboard hand, a mast erected to which you pass very close; dry every tide within the Digue and in the harbour; the tides from half an hour after 3 to 4 o'clock; the encyclopaedia's 'Tour de la Lanterne' for the town's towers"
+    says: "La Rochelle, its harbour behind the old Digue and between its towers dry at every tide; a coasting pilot takes a ship in."
+
+  - id: la-lanterne
+    kind: tower
+    name: the lanthorn tower
+    modern: la tour de la Lanterne, La Rochelle
+    lat_deg: 46.1558
+    lon_deg: -1.1571
+    height_m: 55
+    source: "Faden 1793, 'Laverdin', pp. 80 to 81: entering by the Pertuis d'Antioche, keep the lanthorn tower in full view and do not bring it to the point of Chef de Bois, which would infallibly throw you upon the Laverdin; the encyclopaedia's 'Tour de la Lanterne' (read 2026-10-09): of the fifteenth century, 55 m high, the south-west angle of the medieval walls, its lantern turret serving as a light and a seamark (whether it was lit in 1805 is not said: a mark here, not a light)"
+    says: "The lanthorn tower of La Rochelle, the mark for the Laverdin: never bring it to the point of Chef de Bois."
+
+  - id: laverdin
+    kind: rock
+    name: the Laverdin
+    modern: le Lavardin
+    lat_deg: 46.1414
+    lon_deg: -1.2567
+    height_m: 0
+    dries_m: 0.3
+    source: "Faden 1793, 'Laverdin', p. 80: about a small half league wide of the eastern end of Isle de Ré a small bank with not above 2 or 3 feet on it at low water, which dries in spring tides, very dangerous to those who enter or go out by either Pertuis; between it and Isle de Ré from 5 to 6 fathoms"
+    says: "The Laverdin, a small bank with two or three feet on it at low water that dries at springs, between the two Pertuis; give it a berth by the marks."
+    fix: "a small half league east of Ré's eastern end, where the modern chart's tower of the name stands (from memory: the grid does not resolve the head, reading 7 m); the drying height judgement from the pilot's 'dries in spring tides'"
+
+  - id: pointe-de-chassiron
+    kind: headland
+    name: the point of Chassiron
+    modern: la pointe de Chassiron, Oléron
+    lat_deg: 46.0464
+    lon_deg: -1.4110
+    height_m: 20
+    source: "Faden 1793, 'Pertuis d'Antioche', p. 81: on the north-easternmost point of Oleron stands the Tower of Chassiron; the encyclopaedia's 'Phare de Chassiron' for the position"
+    says: "The point of Chassiron, the northern end of the Isle of Oleron, with its light-tower."
+
+  - id: chassiron-light
+    kind: light
+    name: the Tower of Chassiron
+    modern: Phare de Chassiron
+    lat_deg: 46.0467
+    lon_deg: -1.4103
+    height_m: 50
+    lit: {from: 1685, until: null, range_nm: 12, character: "a large fire of wood, in two fire places one above the other"}
+    source: "Faden 1793, 'Pertuis d'Antioche', p. 81: a light-house called the Tower of Chassiron, where a large fire of wood is kept in every night; it has two fire places, one above another, that sailors may easily distinguish it from the Tower of Cordouan; the encyclopaedia's 'Phare de Chassiron' (read 2026-10-09): the first tower finished in 1685, the third light of the French coasts after Cordouan and the Baleines; the second built in 1834 and in service from 1 December 1836; the range and the first tower's height judgement"
+    says: "The Tower of Chassiron on the north point of Oleron, its fire of wood in two places one above the other, so as not to be taken for Cordouan."
+
+  - id: les-antiochats
+    kind: ledge
+    name: the Antioches
+    modern: les Antiochats, off the pointe de Chassiron
+    lat_deg: 46.0550
+    lon_deg: -1.4133
+    height_m: 0
+    extent_m: 1000
+    source: "Faden 1793, 'Pertuis d'Antioche', p. 81: at the end of the northern point of Oleron lies a great bank or ledge of rocks called the Antioches, or Antiochois, which extends full three quarters of a league wide of the coast to the W N W; follow the middle of the channel or steer nigher to Isle de Ré"
+    says: "The Antioches, a great ledge running three quarters of a league off the north point of Oleron: keep the middle of the Pertuis or nearer Ré."
+    fix: "the pilot's three quarters of a league from the point; the modern grid's heads"
+
+  - id: pertuis-dantioche
+    kind: bottom
+    name: the Pertuis d'Antioche
+    modern: le pertuis d'Antioche
+    lat_deg: 46.1000
+    lon_deg: -1.3500
+    height_m: 0
+    bottom: "mud and sand"
+    depth_fathoms: 10
+    source: "Faden 1793, 'Pertuis d'Antioche', p. 81: between Isle de Ré and Oleron, above 2 leagues in breadth; high tide from half an hour after 3 to 4 o'clock at full and change"
+    says: "The Pertuis d'Antioche, two leagues wide between Ré and Oleron, the way into the Basque Road and the Charente."
+
+  # ---------------------------------------------------------------------------
+  # The Isle of Aix, the Basque Road and the Charente
+  # ---------------------------------------------------------------------------
+
+  - id: isle-of-aix
+    kind: island
+    name: the Isle of Aix
+    modern: Île d'Aix
+    lat_deg: 46.0125
+    lon_deg: -1.1736
+    height_m: 15
+    source: "Faden 1793, 'Isle d'Aix, and River of Charente', p. 82: three leagues southward of Chef de Bois, a flat island with a number of small houses and an old church of stone; steer three or four cables' length wide of it; many rocks about it, the most dangerous nearest the continent; Bellin 1764, Petit Atlas Maritime t. V no. 85"
+    says: "The Isle of Aix, a flat island with small houses and an old stone church, at the mouth of the Charente; steer three or four cables wide of it."
+
+  - id: basque-road
+    kind: anchorage
+    name: the Basque Road
+    modern: la rade des Basques
+    lat_deg: 46.0450
+    lon_deg: -1.2600
+    height_m: 0
+    depth_fathoms: 8
+    bottom: "mud"
+    source: "Faden 1793, contents, 'Road of Basque', p. 81, and 'Isle d'Aix', p. 82: the road between the Isles of Ré, Oleron and Aix where the fleet of Rochefort lies; the English officer's directions, pp. 83 to 84: observe not to approach Oleron nearer than 12 or 11 fathoms, nor Isle de Ré nearer than 6 or 7"
+    says: "The Basque Road between Ré, Oleron and Aix, where the squadrons of Rochefort lie and the blockading ships look in on them."
+
+  - id: aix-road
+    kind: anchorage
+    name: the road of Aix
+    modern: the anchorage east of the Île d'Aix
+    lat_deg: 46.0014
+    lon_deg: -1.1518
+    height_m: 0
+    depth_fathoms: 7
+    bottom: "mud"
+    source: "Faden 1793, 'Isle d'Aix', p. 82: bound for Charente, range along the whole length of the isle on the eastern side, steering east till the opening of the river, and anchor between the isle and the river in expectation of a pilot; it is best to anchor near the isle in 7 or 8 fathoms; Bellin 1764, the soundings of the road"
+    says: "The road of Aix between the isle and the Charente, in seven or eight fathoms near the isle, where a ship waits for the Charente's pilot."
+
+  - id: boyart-bank
+    kind: shoal
+    name: the Boyart
+    modern: la longe de Boyard (Fort Boyard, begun on it in 1804)
+    lat_deg: 45.9950
+    lon_deg: -1.2150
+    height_m: 0
+    extent_m: 2000
+    source: "Faden 1793, 'Isle d'Aix', p. 82: off the Isle of Aix, between it and Oleron but nearer to Oleron, a great bank, partly dry at every tide and 2 leagues in length, lying S E and N W as the coast of Oleron; the channel between this bank and Aix a good half league broad, which all ships take; the fort on the bank begun in 1804 and not finished until the 1850s (judgement from the modern record; UNVERIFIED)"
+    says: "The Boyart, a great bank partly dry at every tide between Aix and Oleron; the channel all ships take runs between it and Aix."
+    fix: "the pilot's description; the modern Longe de Boyard's shoal heads"
+
+  - id: fouras
+    kind: castle
+    name: the castle of Fouras
+    modern: le fort Vauban, Fouras
+    lat_deg: 45.9870
+    lon_deg: -1.0960
+    height_m: 20
+    source: "Faden 1793, 'Isle d'Aix', p. 82: one might pass to the north of the Isle of Aix, but it is very dangerous on account of the rocks at the point of Fouras; 'Brouage', p. 82: the Tower of Fouras; Bellin 1764, 'Fouras le Chateau'"
+    says: "The castle of Fouras on its point north of the Charente's mouth, with rocks off it."
+
+  - id: les-palles
+    kind: shoal
+    name: the Palles
+    modern: the banks off the Charente's southern point
+    lat_deg: 45.9745
+    lon_deg: -1.1464
+    height_m: 0
+    extent_m: 2000
+    source: "Faden 1793, 'Isle d'Aix', p. 82: there is a bank at the southern point of the river Charente, called the Palles, which extends a great way into the sea on the side toward the Isle of Aix, and therefore it is best to anchor near the isle; Bellin 1764, 'les Palles'"
+    says: "The Palles, a bank running a great way to sea from the southern point of the Charente toward Aix; anchor near the isle and not near the river."
+    fix: "Bellin's sheet, the bank between Isle Madame and the meridian of Aix; the modern grid's shoals"
+
+  - id: isle-madame
+    kind: island
+    name: Isle Madame
+    modern: l'île Madame
+    lat_deg: 45.9576
+    lon_deg: -1.1213
+    height_m: 10
+    source: "Faden 1793, the English officer's directions, p. 83: the leading mark to avoid the shoals on the west side of the Isle d'Aix, bring Fort Madam open with the S W point of the island; Bellin 1764, 'I. Madame' and the 'Passe aux Boeufs'"
+    says: "Isle Madame at the mouth of the Charente, its fort the leading mark clear of the shoals west of Aix."
+
+  - id: charente-mouth
+    kind: bottom
+    name: the mouth of the Charente
+    modern: l'embouchure de la Charente
+    lat_deg: 45.9570
+    lon_deg: -1.0813
+    height_m: 0
+    bottom: "mud"
+    depth_fathoms: 2
+    source: "Faden 1793, 'Isle d'Aix', p. 82: the Charente is never entered without a pilot; Bellin 1764, the soundings of 2 and 3 in the river's mouth"
+    says: "The mouth of the Charente, two or three fathoms in the channel; never entered without a pilot."
+
+  - id: rochefort
+    kind: town
+    name: Rochefort
+    modern: Rochefort
+    lat_deg: 45.9370
+    lon_deg: -0.9600
+    height_m: 15
+    source: "Bellin 1764, Petit Atlas Maritime t. V no. 85, 'Rochefort' on the Charente; Faden 1793, 'Isle d'Aix', p. 82: the Charente never entered without a pilot; SHOM's RAM, 'Rochefort'"
+    says: "Rochefort, the King's dockyard and arsenal on the Charente five leagues above Aix, where the squadron fits out."
