@@ -2919,32 +2919,239 @@ Not in 37g:
 - A replay driven by the transcript; the con apart from the deck; the captain's and the
   master's stations (Milestone 6); an officer's reckoning of his own.
 
-## After the fold-in of m5c-c (2026-10-08): what the second edition of the review leaves
+## After the fold-in of m5c-c (2026-10-08): the review's part K as five packages
 
 The folder was folded in on 2026-10-08 (decision 38; `docs/dev/M5-CloseOut-5c.md`, "The
-fold-in of m5c-c"). What the review's second edition proposes and the owner has not yet
-had briefed (`docs/playtests/2026-10-05-gate-5c-review/report-2.md`, part K) is sorted
-here for the briefs to come, each on Opus unless it proves to be design:
+fold-in of m5c-c"). What the review's second edition proposes
+(`docs/playtests/2026-10-05-gate-5c-review/report-2.md`, part K, with G3, G7, G8, G10,
+G13, G15 and G17 for the detail) is briefed here as five packages, all on Opus, launched
+together in worktrees on 2026-10-09 at the owner's word and merged by the lead in the
+order 37i, 37h, 37k, 37l, 37j, the recorded passages re-measured at each merge. The owner
+on the fold-in's design decisions (2026-10-09): the lead is under no obligation to keep
+them as they are; they are to be brought up to the specification as the lead proposes.
 
-- **The local runner** (K, first): a reply cut off while the model was thinking is not
-  passed on as its turn (the runner reads why the reply ended, asks once more, and says
-  so); tokens counted by the server's own figure; the handover reserve as a share of the
-  context as well as a number; an oversize request trimmed of its oldest exchanges and
-  asked again, never sent three times; the replay's line at a stand-down by the door.
-- **37e's amendments**: the cast not beyond doubt; the tide's height for the lead; the
-  account worked at each board; the doubt on one hand; and, from the fold-in, an
-  observation taken over the account only when it is the better figure (the merchant
-  passage's second noon on Linux; the owner's note 5 on game 9; the tuning notes'
-  section on the fold-in).
-- **37f's amendments**, and the half-point course.
-- **37h, the pilot**: his warnings aboard; his hail unanswered (decision 36); the pilot
-  cutter that keeps company and says what she waits for. The schooner's lost beat is its
-  test.
-- **The words** of part K, and the three small things 37g's second pass left (G13).
-- **For the lead or Fable**: a far-detail vessel's leg across the coast refused when the
-  scenario loads (the gate's fourteenth item, never ruled); `the port` and `the depth of
-  water` reading from the truth, kept for last by plan; a plain `steer` through the wind
-  (the close-out's question to the owner).
+Common to all five. The head rules of this document hold (a scenario's book tuned once and
+cheaply; the budget is the owner's). Nothing under `docs/agents/consent/` and nothing in
+`docs/agents/ConsentBrief.md` is touched. No model identifier goes into any file of the
+repository. The recorded passages' constants in `tests/test_known_truths.py` are re-pinned
+where a change moves them, with the old figure beside the new and the reason in the
+package's section of `docs/dev/TuningNotes.md`; a passage that moves for a reason the
+package cannot give is a finding, not a pin. The fast tier is run before the report and
+the slow tests of the passages the package touches; the whole suite is the lead's at the
+merge. Each package ends with a section in the tuning notes and a report to the lead: what
+was built, what was found, what was left, each pin moved and why.
+
+## Package 37h: the pilot (`freesail/world/ports.py` for the pilot's hail answered, his boat keeping company, his boarding, his warnings, his leaving and his fee; `freesail/world/people.py` where he is a person aboard; `freesail/orders/port.py` and `data/vocabulary.yaml` for `take the pilot`, `decline the pilot`, `hail the pilot` and their forms; `freesail/orders/stations.py` for the general grant keeping the pilot's taking back with the port's business; `freesail/world/chart.py` only to ask the dangers ahead of her on her true track; `data/ports/*.yaml` for the pilots' words; `freesail/api/readings.py` for the pilot's lines and events; `docs/primer/14-the-port.md`; `docs/dev/TuningNotes.md`; `tests/test_ports.py`, `tests/test_people.py`, `tests/test_known_truths.py` for the schooner's pilot (the mark off) and the passages re-measured)
+
+The review's G10 whole, with the owner's rulings of 5 October in decision 35 ("The pilot")
+and decision 36's last sentence; G8 for the pilot's hail at anchor; game 10's three items
+in part K ("For 37h, when it is written"). Luce 1884 on taking a pilot; the Admiralty
+Regulations of 1808 on pilots (`docs/references/admiralty/`); the period directions in
+`docs/references/` for each port's pilot station, as the port files cite them.
+
+What to build:
+
+1. **Taken or declined at his hail.** `take the pilot` (and `we will take the pilot`,
+   `take him aboard`) answers the hail: she shortens sail or heaves to as the hail asks,
+   the boat closes and he boards. `decline the pilot` (`we need no pilot`, `wave him off`)
+   sends him back. Unanswered, he keeps company, hails once more after a stated interval,
+   and bears away for his station; the line says so. `hail the pilot` is an order to hail
+   his boat when she is in sight and not "did you mean 'haul'?". Under the general grant,
+   taking or declining a pilot is kept back with the port's business (G11).
+2. **His boat closes with the ship.** He boards a ship making under six knots within two
+   cables, as now; a ship that stands in faster is hailed to shorten sail and his boat
+   keeps company at her pace until she does, as a pilot's boat does, instead of being left
+   astern. The schooner of the 5b passage then has him aboard before she runs in: the mark
+   on `test_the_schooners_pilot_boards_before_she_runs_in` comes off, her book changed as
+   little as possible, the lines re-pinned. A hail never asks a ship at anchor to shorten
+   sail.
+3. **His warnings aboard.** With true knowledge of his own waters (the owner's ruling: he
+   is a carrier of the truth, where a reading is not) he warns of a danger ahead on her
+   track within his port's approaches, by name, in time to act, and of the depth where it
+   shoals; in thick weather he cannot see his marks and says so, and warns by the lead and
+   the time run instead. He does not con and does not converse. His warnings are drawn
+   from the true chart and the dangers' names, never put into a reading.
+4. **His leaving and his fee.** He is put off at the anchor, or where the port's directions
+   put him off outward, and asks for his boat once; aboard three times in one game, he
+   takes her nowhere she has not asked to go. The pilotage is paid from the purse at the
+   period's rate for the port (the port file; the directions give the rates where they
+   do), and the log says so. The Brest pilot of game 1 who never left and was never paid is
+   the case to close.
+5. **His words.** The breakwater out of the Plymouth pilot's mouth in 1805
+   (`data/ports/plymouth.yaml`, the audit's line); "the flood" said against the game's own
+   turn of the tide; the pilot cutter that keeps company says what she waits for. The
+   depths in St Mary's Sound against his own directions, and the dangers he names shown by
+   name on the chart's list.
+
+Tests on the fake world: taken, declined, unanswered; the fast ship hailed and the boat
+keeping company; a warning ahead by name and one in thick weather by the lead; the fee
+paid once; the hail at anchor. The three recorded passages with pilots (5b's schooner,
+the merchant passage, the cruise) re-measured and re-pinned, with the reasons.
+
+## Package 37i: the local runner (`freesail/agents/local.py` for the reply's end read, the tokens by the server's figure, the reserve as a share, the oversize request trimmed; `freesail/agents/harness.py` only where the handover's reserve is read; `freesail/core/replay.py` and `freesail/agents/journal.py` for the line the replay drops at a stand-down by the door; `docs/agents/Harness.md` §12 for the runner's settings; `docs/dev/TuningNotes.md`; `tests/test_local_runner.py`, `tests/test_replay.py`)
+
+The review's G15 and part K ("The local runner comes first"); the audit's C7 and N 4.2,
+which read the runner and bore the account out; game 10's record in
+`docs/playtests/2026-10-05-gate-5c-review/evidence/G10-cutter-m5cc-measurements.txt`.
+The runner speaks to llama-server and to Ollama; both are to be served.
+
+What to build, the five faults of game 10:
+
+1. **A reply cut off is not a turn.** The runner reads why the reply ended
+   (`finish_reason` or its Ollama equivalent): a reply cut at the reply limit while the
+   model was thinking, or with no tool call and no text, is asked once more with the
+   reason said in the request; if it is cut again the owner is told and the journal says
+   so, and the turn ends with nothing done rather than with a silent empty reply.
+2. **Tokens by the server's figure.** The prompt and reply token counts the server returns
+   with every reply (`usage`, or Ollama's `prompt_eval_count` and `eval_count`) are what
+   the budget counts, the four-characters-a-token estimate kept only until the first reply
+   and for the context guard before stationing. The audit's figures: at 102,400 the note
+   was asked at 88,400 by the estimate where the server's count stood far nearer the
+   ceiling.
+3. **The handover's reserve as a share.** `--handover-reserve` takes a number or a share of
+   the context (`30000` or `0.3`), the default a share, so that the note is asked for in
+   time at any context size; the larger of the two forms when both are given.
+4. **An oversize request trimmed.** When the server refuses a request for its size, the
+   runner leaves out the oldest exchanges that are not the brief or the latest sample and
+   asks again, saying so once; it never sends the same request a third time.
+5. **The replay's line.** A stand-down by the door (the owner's `stand down the officer`
+   through the bridge, or the runner's own on the token) drops one line of the log at
+   replay: the audit's replay gave 4,239 lines for 4,240. Find it with game 10's save in
+   the review's evidence or a fake of it, mend it, and test it.
+
+The two stopgap settings named in part K (`--handover-reserve 30000`, `--max-reply`) are
+tried on the fake server and their effect stated. Tests on the fake server for each of
+the five. The harness guide's section on the runner says the settings as they now are.
+
+## Package 37j: the account, amended (`freesail/world/reckoning.py` for the rule by which an observation is believed, the cast within the doubt, the account worked at each board, the fix's doubt on one hand, the danger list from the best fix; `freesail/world/tide.py` and `freesail/world/sights.py` where the lead's tide is allowed; `freesail/api/readings.py` and `freesail/world/ports.py` for `the port` and `the depth of water` by the captain's means; `freesail/standing/` only where a condition reads a depth; `docs/TechnicalSpec-M5.md` §13 to §17 and §33; `docs/primer/10-the-reckoning.md` and `13-the-tide-and-the-anchor.md`; `docs/dev/TuningNotes.md`; `tests/test_reckoning.py`, `tests/test_tide.py`, `tests/test_readings.py`, `tests/test_standing.py`, `tests/test_known_truths.py` for every recorded passage re-measured)
+
+The review's G3 (what is left), G4 whole, part K ("The account, amending 37e"); the
+fold-in's finding in the tuning notes' section "the fold-in of m5c-c" and spec M5 §33
+item 24; the owner's note 5 on game 9 (H5); Norie and Bowditch on the day's work and the
+lead (`docs/references/`), Luce on sounding.
+
+What to build:
+
+1. **The one rule, amended: the better figure is believed.** When an observation and the
+   account disagree by more than their doubts together (`OBSERVATION_OUT_SIGMAS`), the
+   one with the smaller doubt is believed: the observation is TAKEN only when its doubt is
+   no greater than the account's across its line, else it is WEIGHED and the line says the
+   master doubts it ("the sight stands five miles north of the account, and the account,
+   fixed to three cables, is kept"). The cases to hold at once: the noon of 16 June in
+   game 9 (a right noon against an account kept falsely small by the lead: item 2 below
+   makes the account's doubt honest, and the noon is then taken), the lunar of game 9's
+   note 5 (poor certainty, weighed), the merchant passage's second noon on Linux (a sight
+   a hair over the doubts together against an account fixed to three cables: weighed, the
+   account within a mile), the cruise's chronometer. The number two is kept and its reason
+   restated.
+2. **The cast not beyond doubt.** A cast of the lead never moves the account further than
+   the account's own doubt: the master looks for the cast's depth and ground within his
+   doubt and no further; where none answers, the line says the cast does not agree with
+   the chart where he believes her, and the account is kept with its doubt grown. The
+   audit: "the one fault of the week that made a sound position unsound in the owner's
+   hands, twice". The lead's casts in soundings then no longer keep the account's doubt
+   falsely small (37e's case in item 1).
+3. **The tide's height for the lead, by his book.** The master reduces a cast to the
+   chart's datum by his own tide from the epitome (37e's master's tide), never the
+   world's, before he compares it with the chart; the line says the reduction when it is
+   a fathom or more.
+4. **The account worked at each board.** At a tack, a wear, heaving to and filling away,
+   and an alteration of course of two points or more, the account is run up to that minute
+   from the log board so that each board is laid down by itself, and the hourly working
+   goes on from there.
+5. **A fix's doubt when its marks lie on one hand.** Marks all on one side give a fix good
+   along the shore and poor off it; the doubt is laid down so, and the line says it.
+6. **The danger list from the best figure.** `the dangers` and the danger warnings of a
+   shaped course are drawn from the account as it stands, to the cable, not in whole
+   miles.
+7. **`the port` and `the depth of water` by the captain's means** (G4, the last step of
+   the plan): `the port` gives the port's bearing and distance by account with the
+   account's doubt, as `shape a course for` already does, and beyond the pilot's ground
+   says only what the chart and the account allow; `the depth of water` is the chart's
+   depth at the account's position, said as the chart's and never as a cast, and a
+   standing order's condition on the depth reads the last cast of the lead, or that chart
+   figure only when the book says `by the chart`. The snapshot to the browser no longer
+   carries the true distance and bearing of the landmarks in sight. A test proves no
+   reading gives the true position by any road, as 37e's did for the tide.
+8. **Small faults of the reckoning** from G3: the run since noon at anchor; every
+   scenario opening with the account a mile out (the departure's doubt is the mile; the
+   position is the truth at the start, as a departure is).
+
+Every recorded passage is re-measured and re-pinned, with the old figure beside the new
+and the reason; the merchant passage's second noon and the gate 5b schooner's noon are the
+cases the tuning notes say in full. The spec's §13 to §17 are brought up to the rule as
+amended.
+
+## Package 37k: the ground and the helm, amended (`freesail/evolutions/scripts.py` and `data/evolutions/` for an anchor at the bows let go, a belay of getting under way, heaving to with a sail that is set, the alarm for being taken aback, the tack that could not begin; `freesail/orders/ground_tackle.py` and `freesail/orders/verbs.py` for an anchor the ship does not carry; `freesail/physics/anchor.py` and `freesail/core/world.py` for a dragging that relapses and anchoring in deep water; `docs/primer/05-going-about.md` and `13-the-tide-and-the-anchor.md`; `docs/dev/TuningNotes.md`; `tests/test_anchor.py`, `tests/test_lying_to.py`, `tests/test_evolutions.py`, `tests/test_orders.py`, `tests/test_known_truths.py` for the passages re-measured)
+
+The review's G7 and G8 (what is left), part K ("The ground and the helm, amending 37f");
+the audit's narrowing of two of them (the anchor left aweigh not reproduced, its
+conditions to be pinned down first; the anchor she does not carry refused already when
+nothing is in hand); Luce on weighing and on heaving to.
+
+What to build:
+
+1. **An anchor at the bows can be let go**, and a belay of getting under way says where
+   it has left the anchor (aweigh and hanging, at the cathead, on the bottom with so many
+   fathoms out). First pin down the conditions of game 10's anchor left aweigh that could
+   not be let go, with the save in the review's evidence or a fake, and test them.
+2. **An anchor the ship does not carry is refused at the order** whatever the hands are at.
+3. **A heave-to backs a sail that is set**, never one that is furled, and says which.
+4. **The alarm for being taken aback** leaves alone a sail that is still being set or
+   trimmed, and a lifting sail is said before she is aback.
+5. **Anchoring in forty fathoms is looked at**: what the period did (Luce; the
+   directions) and what the game does, and a rule for the deep road, with a refusal or a
+   warning where a ship would not anchor.
+6. **A dragging that relapses within a quarter of an hour is the same dragging**: one
+   urgent line, and "holds again" when it has held a quarter of an hour (G8, 37f's own
+   note).
+7. **A tack that could not begin** is refused in its own words, not a missed stay's.
+8. **Her draught** said in a reading or a paper of the ship, where two officers looked for
+   it.
+
+Tests for each; the passages re-measured where the anchor's or the heave-to's lines
+change.
+
+## Package 37l: the words (`freesail/orders/grammar.py` and `verbs.py` for the course with a half point and one reader for numbers in words; `freesail/orders/*` and `data/vocabulary.yaml` for the phrasings; `freesail/standing/grammar.py` for a standing order's action read whole when it is given; `freesail/api/readings.py` for the fog reading's sentence; `freesail/agents/tools.py` and `agent.py` for the drill's count, `stand_down`'s note and the watcher's brief; `docs/primer/07-a-first-passage.md` and the chapter the forms table is in; `docs/dev/TuningNotes.md`; `tests/test_orders.py`, `tests/test_complete.py`, `tests/test_standing.py`, `tests/test_officer.py`, `tests/test_agents.py`)
+
+The review's G17 whole, part K ("Words"), G13's three small things, G5's fog; the
+audit's trials (the half point borne out: "steer west; W (270°)"; a standing order's
+action read to its first word).
+
+What to build:
+
+1. **A course with a half point**, first: `steer south by west half west` and every form
+   of the half and quarter point (`WNW 1/2 W`, `west north west half west`, `NE by N 1/4
+   N`) is read whole and steered to the half point; an unreadable course is refused, never
+   steered to its last word. A test over the whole compass card in words.
+2. **One reader for numbers in words**, used by every order that takes a number: every
+   number to a hundred and the hundreds, "a hundred and eighty-five", "sixteen"; `veer
+   five fathoms`, `take in provisions for sixteen days`, `haul in ... a quarter fathom`.
+3. **A standing order's action is read whole when it is given**, every order of it, so a
+   fault in the third order is refused at the giving and not met at sea; the refusal
+   names the order.
+4. **The phrasings of G17 and game 10**: `steady on`; `trim the headsail sheets`; `buy 20
+   tons of salt fish and 8 tons of pilchards` as two bargains; `shape a course for a mile
+   west of ushant`; `where is ushant` (a mark's bearing and distance by account, or "not
+   in sight"); `pipe down the watch`, `call the starboard watch`; `belay get under way`
+   (the work's name); `put the helm over` as the order it is or struck from the officer's
+   brief; the water sail and the jibs under `take in`, `furl`, `lower` and `clew up`;
+   marks by their names without accents or apostrophes; the hints that point the wrong
+   way (`hail the pilot` is 37h's; `man the pumps`, `as you were`, `Mr Pearce you have
+   the deck`); the seaman's phrases (`hoist our colours` refused as M7's with the
+   reason, `the deck is yours`, `bring her up`, `back the fore staysail`, `close hauled`,
+   `lay out the stream anchor astern`); a `tell` to an unmanned station kept and said;
+   `send for the master` in the schooner, where the master is the captain and the answer
+   says so; "when the true wind is 12 knots" taken as the comparison it is.
+5. **The fog reading's sentence** (G5), and the drill's count (G13: it miscounted once in
+   game 10; trace it and mend it).
+6. **G13's two small things**: `stand_down` asks for a handover note when the station has
+   the deck and takes the stand-down without one otherwise, saying so; the watcher's brief
+   no longer lists the three tools it is refused (`hand_over`, `handover_note`,
+   `submit_order`).
+
+Tests for every phrasing taken and every refusal's words; the primer's orders chapter
+and its forms table say the half point and the numbers.
 
 ## Integration (the lead)
 
