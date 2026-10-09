@@ -24,13 +24,16 @@ from __future__ import annotations
 
 import math
 import re
+import unicodedata
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Any
 
 from freesail import units
 
 __all__ = [
     "EARTH_RADIUS_M",
+    "name_words",
     "HORIZON_NM_PER_ROOT_METRE",
     "LEAGUE_M",
     "Position",
@@ -119,6 +122,26 @@ class Position:
 
 def _wrap_lon(lon: float) -> float:
     return ((lon + 180.0) % 360.0) - 180.0
+
+
+def name_words(name: str) -> list[str]:
+    """A name's words as a name is matched (package 37l; the review of gate 5c's
+    playtests, G17: "The lavandiere is not in sight; did you mean the Lavandière?"):
+    lower case, its accents folded ('Béniguet' is 'beniguet'), its apostrophes dropped
+    ("St Anthony's" is 'st anthonys', said with the apostrophe or without), every other
+    mark of punctuation a space. Remembered by the name: a book's `the distance to
+    <place>` asks it of the same names every tick."""
+    return list(_name_words(str(name)))
+
+
+@lru_cache(maxsize=8192)
+def _name_words(name: str) -> tuple[str, ...]:
+    folded = name.lower()
+    if not folded.isascii():
+        folded = unicodedata.normalize("NFKD", folded)
+        folded = "".join(c for c in folded if not unicodedata.combining(c))
+    folded = folded.replace("'", "").replace("\u2019", "").replace("\u2018", "")
+    return tuple("".join(c if c.isalnum() or c.isspace() else " " for c in folded).split())
 
 
 def bearing_and_distance(a: Position, b: Position) -> tuple[float, float]:

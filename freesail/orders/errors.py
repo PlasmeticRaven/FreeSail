@@ -53,6 +53,10 @@ __all__ = [
 # How many candidates a message lists before saying "and N more".
 MAX_LISTED = 6
 
+# How near in spelling a verb must be to the words said to be offered as a hint (package
+# 37l): 'hail' and 'haul' are 0.75 alike and point the wrong way; 'brase' and 'brace' 0.8.
+VERB_HINT_CUTOFF = 0.8
+
 
 def join_names(names: Iterable[str], conjunction: str = "or", limit: int = MAX_LISTED) -> str:
     """'a, b or c' from a list of names, with 'and N more' past `limit`."""
@@ -103,12 +107,20 @@ def unknown_verb(text: str, verbs: Iterable[str]) -> UnknownVerbError:
     words = text.split()
     # Try the first one or two words: most verbs are one word, some are two.
     # The closer spelling comes first, whichever length found it.
+    # A hint must be near in spelling and not merely share a few letters (package 37l; the
+    # review of gate 5c's playtests, G17: "hail the pilot" was answered "did you mean
+    # 'haul'?", "man the pumps" "'demand'?", "as you were" "'ease' or 'give chase'?"): a
+    # verb that holds the words is hinted only when they are a word of it of four letters
+    # or more, and a likeness in spelling must be close.
     scored: dict[str, float] = {}
     for n in (2, 1):
         if len(words) >= n:
             said = " ".join(words[:n])
-            for h in nearest(said, verbs, n=2):
+            for h in nearest(said, verbs, n=2, cutoff=VERB_HINT_CUTOFF):
                 ratio = difflib.SequenceMatcher(None, said, h).ratio()
+                held = len(said) >= 4 and (h == said or h.startswith(said + " ") or f" {said}" in h)
+                if ratio < VERB_HINT_CUTOFF and not held:
+                    continue
                 scored[h] = max(scored.get(h, 0.0), ratio)
     hints = sorted(scored, key=lambda h: -scored[h])
     hint = ("; did you mean " + join_names(f"'{h}'" for h in hints[:3]) + "?") if hints else "."

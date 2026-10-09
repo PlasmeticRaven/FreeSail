@@ -24,12 +24,25 @@ from typing import Any
 
 from freesail import units
 
-__all__ = ["HANDOVER_KIND", "OWN_KINDS", "Journal", "JournalEntry"]
+__all__ = [
+    "HANDOVER_KIND",
+    "OWN_KINDS",
+    "WORD_KEPT_KIND",
+    "WORD_PASSED_KIND",
+    "Journal",
+    "JournalEntry",
+]
 
 # The kinds of entry that are the model's own words: the journal tool's notes, and the
 # handover and stand-down notes (the harness's lines are every other kind).
 HANDOVER_KIND = "agent.handover"
 OWN_KINDS: tuple[str, ...] = ("note", HANDOVER_KIND)
+# The captain's word to a station nobody holds (package 37l; the review of gate 5c's
+# playtests, G17: "a `tell` to an unmanned station is rejected and its words are lost"):
+# kept in the station's journal, and passed to whoever takes the station next, in its
+# first sample, with a line that says they were passed.
+WORD_KEPT_KIND = "agent.word_kept"
+WORD_PASSED_KIND = "agent.word_passed"
 
 
 @dataclass(frozen=True)
@@ -81,6 +94,14 @@ class Journal:
         """The last handover or stand-down note written at the station, by whoever held
         it (package 37g: every brief for a station taken again carries it whole)."""
         return next((e for e in reversed(self.entries) if e.kind == HANDOVER_KIND), None)
+
+    def kept_words(self) -> list[str]:
+        """The captain's words kept for the station since they were last passed to it
+        (`WORD_KEPT_KIND`), oldest first; [] when there are none."""
+        last = max(
+            (i for i, e in enumerate(self.entries) if e.kind == WORD_PASSED_KIND), default=-1
+        )
+        return [e.text for e in self.entries[last + 1 :] if e.kind == WORD_KEPT_KIND]
 
     def size_words(self) -> str:
         """One line of the journal's size: '41 entries, the latest at Middle watch, 4 bells

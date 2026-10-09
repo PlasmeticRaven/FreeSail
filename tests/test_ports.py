@@ -1000,3 +1000,38 @@ def test_the_pilots_hails_are_notable_lines():
     run_until(w, "port.pilot_aboard", 150)
     hails = events(w, "port.pilot_hail")
     assert hails and all(e.severity is Severity.NOTABLE for e in hails)
+
+
+def test_two_bargains_in_one_order_are_struck_together_and_the_boat_goes_once():
+    """Package 37l (game 10: `buy 20 tons of salt fish and 8 tons of pilchards` was read as
+    one cargo named "salt fish and 8 pilchards"): several bargains in one order are each
+    read, weighed together against the hold and the purse, and struck together, the boat
+    sent once for them all; one that cannot be struck refuses the order and nothing is
+    paid."""
+    w = at_anchor_in(CARRICK_ROAD, ship=SCHOONER, heading=250.0, cargo={"purse_pounds": 500.0})
+    w.submit("send the boat ashore")
+    run_until(w, "market.prices", 240)
+    run_until(w, "boat.alongside", 240)
+    refused = w.submit("buy 3 tons of coal and 2 tons of tea")
+    assert refused.kind == "order.rejected" and "market has no tea" in refused.text
+    assert w.purse.pounds == 500.0 and not w.ports.boat.away
+    e = w.submit("buy 3 tons of coal and 2 tons of pilchards")
+    assert e.kind == "market.bargain", e.text
+    assert e.text.startswith("Bought at Falmouth: 3 tons of coal at ")
+    assert "; 2 tons of pilchards at " in e.text and "paid in all; the boat goes for it" in e.text
+    assert [b["good"] for b in e.data["bargains"]] == ["coal", "pilchards"]
+    assert w.ports.boat.away
+    run_until(w, "market.bought", 240)
+    assert w.hold.goods == {"coal": 3.0, "pilchards": 2.0}
+    assert len(events(w, "market.bought")) == 2
+
+
+def test_belay_get_under_way_belays_the_work_by_the_orders_own_words():
+    """Package 37l (game 10: `belay get under way` was refused; the work is called "getting
+    under way" in the log): the order that started it names it."""
+    w = at_anchor_in(FALMOUTH_OUTER)
+    assert w.submit("get under way").kind == "order.accepted"
+    w.run(30)
+    e = w.submit("belay get under way")
+    assert e.kind == "work.belayed", e.text
+    assert e.text.startswith("Belayed getting under way")

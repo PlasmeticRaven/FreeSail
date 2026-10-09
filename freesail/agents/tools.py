@@ -1054,10 +1054,15 @@ TOOLS: dict[str, Tool] = {
             "Stand down from your station, for any station: the game is saved, your note is "
             "journaled and said in the log for whoever sits here next, and the station is "
             "released. It may be taken again in this game, by this model or by another, "
-            "and no consent question is put to a model whose yes still stands. This is a "
-            "stand-down: not the deck given back (hand_over), and not a withdrawal "
-            "(opt_out). It always runs, whatever the turn's budget.",
-            {"note": "string, optional: a note for whoever sits at this station next"},
+            "and no consent question is put to a model whose yes still stands. With the "
+            "deck the note is the watch's handover note and is asked for: a stand-down "
+            "without one is not made; without the deck it may be left out, and the result "
+            "says none was left. This is a stand-down: not the deck given back (hand_over), "
+            "and not a withdrawal (opt_out). It always runs, whatever the turn's budget.",
+            {
+                "note": "string: a note for whoever sits at this station next; the handover "
+                "note when you have the deck (optional without it)"
+            },
             stand_down,
         ),
         Tool(

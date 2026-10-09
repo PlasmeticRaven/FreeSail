@@ -24,58 +24,65 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from freesail.orders import numbers
 from freesail.orders.errors import OrderError
 from freesail.orders.grammar import Order
 from freesail.orders.prompt import world_of
 
-__all__ = ["NO_PORTS_WORDS", "execute", "number_in"]
+__all__ = ["NO_PORTS_WORDS", "check", "execute", "number_in"]
 
 NO_PORTS_WORDS = "There is no port to deal with: the ship is not in a world with a chart."
 
 Result = tuple[str, str, dict[str, Any]]
 
-_NUMBER_WORDS = {
-    "a": 1,
-    "an": 1,
-    "one": 1,
-    "two": 2,
-    "three": 3,
-    "four": 4,
-    "five": 5,
-    "six": 6,
-    "seven": 7,
-    "eight": 8,
-    "nine": 9,
-    "ten": 10,
-    "eleven": 11,
-    "twelve": 12,
-    "fifteen": 15,
-    "twenty": 20,
-    "twenty five": 25,
-    "thirty": 30,
-    "forty": 40,
-    "fifty": 50,
-    "sixty": 60,
-    "eighty": 80,
-    "a hundred": 100,
-    "two hundred": 200,
-    "three hundred": 300,
-    "seventy": 70,
-    "ninety": 90,
-    "hundred": 100,
-}
-
 
 def number_in(text: str) -> tuple[float | None, str]:
-    """A number in the words (digits or words), and the words without it."""
-    low = " ".join(text.lower().split())
-    m = re.search(r"\b(\d+(?:\.\d+)?)\b", low)
-    if m:
-        return float(m.group(1)), (low[: m.start()] + " " + low[m.end() :]).strip()
-    for words, n in sorted(_NUMBER_WORDS.items(), key=lambda kv: -len(kv[0])):
-        if re.search(rf"\b{words}\b", low):
-            return float(n), re.sub(rf"\b{words}\b", " ", low, count=1).strip()
-    return None, low
+    """A number in the words (figures or words, by the one reader for numbers,
+    `orders.numbers`; package 37l), and the words without it."""
+    return numbers.number_in(text)
+
+
+# The provisions' time in the words (package 37l: `take in provisions for sixteen days`
+# was read as no number and took thirty): days, weeks or months, a month thirty days.
+_DAYS_IN = {"day": 1, "days": 1, "week": 7, "weeks": 7, "month": 30, "months": 30}
+
+
+def _days(rest: str) -> float | None:
+    """How many days of provisions the words ask for ('for sixteen days', 'for a month',
+    'six weeks', '30'); None when they say none; refused in words they cannot be read."""
+    words = [w for w in rest.lower().replace("-", " ").split() if w not in ("for", "the", "of")]
+    if not words:
+        return None
+    got = numbers.read(words, 0)
+    if got is not None:
+        n, used = got
+        unit = words[used : used + 1]
+        if not unit and used == len(words):
+            return n
+        if unit and unit[0] in _DAYS_IN and used + 1 == len(words):
+            return n * _DAYS_IN[unit[0]]
+    raise OrderError(
+        f"'{rest.strip()}' is not a time to provision for; say 'take in provisions for "
+        "thirty days', 'for six weeks' or 'for a month'."
+    )
+
+
+def _bargains(rest: str) -> list[str]:
+    """The words of a buying or a selling as one bargain or several ('20 tons of salt
+    fish and 8 tons of pilchards': two; package 37l, game 10, where it was one cargo
+    named "salt fish and 8 pilchards"): split at each 'and' that a number of tons
+    follows."""
+    words = rest.split()
+    low = [w.lower() for w in words]
+    parts: list[list[str]] = [[]]
+    for k, w in enumerate(words):
+        if low[k] == "and" and parts[-1]:
+            got = numbers.read(low, k + 1)
+            if got is not None and low[k + 1 + got[1] : k + 2 + got[1]] in (["ton"], ["tons"]):
+                parts.append([])
+                continue
+        parts[-1].append(w)
+    return [" ".join(p) for p in parts if p]
 
 
 def _ports(ship: Any) -> Any:
@@ -138,8 +145,15 @@ def execute(ship: Any, order: Order) -> Result:
         text, data = ports.demand(" ".join(words.split()), None)
         return "yard.demanded", text, {"verb": verb, "level": 1} | data
     if verb in ("buy", "sell"):
-        tons, good = _tons_and_good(rest, verb)
-        text, data = ports.trade(verb, tons, good)
+        bargains = _bargains(rest)
+        if len(bargains) == 1:
+            tons, good = _tons_and_good(rest, verb)
+            text, data = ports.trade(verb, tons, good)
+            return "market.bargain", text, {"verb": verb, "level": 1} | data
+        # several bargains in one order (package 37l): read whole, weighed together, and
+        # struck together, the boat sent once for them all
+        read = [_tons_and_good(words, verb) for words in bargains]
+        text, data = ports.trade_together(verb, read)
         return "market.bargain", text, {"verb": verb, "level": 1} | data
     if verb == "demand":
         words = re.sub(r"\b(from|the|yard|chandlers|a|an|spare)\b", " ", rest.lower())
@@ -170,7 +184,7 @@ def execute(ship: Any, order: Order) -> Result:
         text, data = ports.demand("water", n)
         return "yard.demanded", text, {"verb": verb, "level": 1} | data
     if verb == "take in provisions":
-        n, _ = number_in(rest)
+        n = _days(rest)
         if n is None:
             n = 30.0
         text, data = ports.demand("provisions", n)
@@ -187,3 +201,22 @@ def execute(ship: Any, order: Order) -> Result:
         text, data = ports.enter_hands(int(n), rating)
         return "crew.entering", text, {"verb": verb, "level": 1} | data
     raise OrderError(f"'{verb}' is not a port order this ship knows.")
+
+
+def check(ship: Any, order: Order) -> None:
+    """Read a port order whole without carrying it out (package 37l): its tons and its
+    goods, its days of provisions, its hands; whether she is in port, the prices and the
+    purse are the order's own business when it fires."""
+    verb = order.verb
+    rest = (order.object or "").strip()
+    if verb in ("buy", "sell") and not re.search(
+        r"\b(chandlers|yard|sails?|spars?|topmast|cordage)\b", rest.lower()
+    ):
+        for words in _bargains(rest):
+            _tons_and_good(words, verb)
+    elif verb == "take in provisions":
+        _days(rest)
+    elif verb == "enter":
+        n, _ = number_in(rest)
+        if n is None:
+            raise OrderError("Enter how many? Say 'enter six able seamen'.")

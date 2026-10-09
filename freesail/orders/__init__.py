@@ -51,6 +51,7 @@ __all__ = [
     "load_vocabulary",
     "noun_table",
     "parse",
+    "read_whole",
     "resolve_noun",
 ]
 
@@ -84,6 +85,11 @@ def handle(ship: Ship, text: str) -> tuple[str, str, dict[str, Any]]:
         # down the watcher`, `resume the watcher`, `show the watcher's journal`
         return stations.handle(ship, text)
     vocab = load_vocabulary()
+    refused = vocab.refused(text)
+    if refused is not None:
+        # words the ship does not take, refused with what to say instead or with the
+        # milestone they belong to (package 37l; `refused_phrases` in the vocabulary)
+        raise OrderError(refused)
     try:
         order = parse(ship, text, vocab)
     except UnknownVerbError:
@@ -109,6 +115,51 @@ def handle(ship: Ship, text: str) -> tuple[str, str, dict[str, Any]]:
         return _carry_out(ship, order, vocab)
     with giving(text):  # its evolutions carry the order's number, for `belay that`
         return _carry_out(ship, order, vocab)
+
+
+def read_whole(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
+    """Read an order whole without carrying it out (package 37l; the review of gate 5c's
+    playtests, G9: a standing order's action had its first word read when it was given
+    and no more, so that `take a fix as soon as a bearing can be taken` was entered and
+    refused at every change of the watch). The words are parsed, and then read as the
+    order's own reader reads them: a sail, a yard or a line by its name (ambiguous or
+    unknown, refused); a mark, the marks of a fix, a place or a position
+    (`navigation.check`); an anchor, its fathoms and its course (`ground_tackle.check`); a
+    person (`people.check`); tons, days and hands (`port.check`). What depends on the
+    moment (what is in sight, an anchor down, the hands, the port) is left to the order
+    when it is carried out. Returns the order; raises OrderError in words."""
+    vocab = vocab or load_vocabulary()
+    refused = vocab.refused(text)
+    if refused is not None:
+        raise OrderError(refused)
+    order = parse(ship, text, vocab)
+    if order.verb in vocab.group_evolutions or order.verb in vocab.readings:
+        return order
+    kind = vocab.verbs[order.verb].object
+    if kind == "navigation":
+        from freesail.orders import navigation
+
+        navigation.check(ship, order)
+    elif kind == "anchor":
+        from freesail.orders import ground_tackle
+
+        ground_tackle.check(ship, order)
+    elif kind == "person":
+        from freesail.orders import people
+
+        people.check(ship, order)
+    elif kind == "port":
+        from freesail.orders import port
+
+        port.check(ship, order)
+    elif kind in ("sail", "yards", "line", "wreck") and order.object:
+        try:
+            resolve_noun(ship, order.object, order.side_word, order.verb)
+        except (AmbiguousNounError, UnknownNounError):
+            raise
+        except OrderError:
+            pass  # a refusal of the moment (the tack for 'weather'), not of the words
+    return order
 
 
 def _carry_out(ship: Ship, order: Order, vocab: Vocabulary) -> tuple[str, str, dict[str, Any]]:
@@ -154,6 +205,8 @@ def _stores_order(text: str) -> Order | None:
         return None
     rest = low.removeprefix("take in ").strip()
     words = rest.split()
+    if "water sail" in rest:
+        return None  # a sail, not the stores (package 37l)
     if any(w in ("water",) for w in words):
         verb = "take in water"
     elif any(w in ("provisions", "provision") for w in words):

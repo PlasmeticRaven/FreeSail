@@ -158,8 +158,51 @@ def relieve_watch(ship: Ship, order: Order) -> Result:
     return kind, text, data
 
 
+def _watch_said(phrase: str) -> Watch | None:
+    """The watch a phrase names by its side ('call the starboard watch'), or None."""
+    words = phrase.split()
+    if "starboard" in words:
+        return Watch.STARBOARD
+    if "larboard" in words or "port" in words:
+        return Watch.LARBOARD
+    return None
+
+
+def call_watch(ship: Ship, order: Order) -> Result:
+    """`call the starboard watch`, `call the watch below` (package 37l; game 10): the
+    watch below turned up by itself, as a watch sent to a piece of work is (`WatchCall`:
+    a third at once, the rest over the minutes), up until piped down. A watch that has the
+    deck, or all hands up already, is answered so and nothing changes."""
+    _routine(ship, order.verb)
+    crew = crew_of(ship)
+    assert crew is not None
+    when = now_of(ship)
+    deck = bill.watch_on_deck(crew, when)
+    named = _watch_said(order.verb_phrase) or bill.watch_below(deck)
+    data: dict[str, Any] = {"verb": order.verb, "level": 1, "watch": named.value}
+    if crew.all_hands_called:
+        return "crew.order", "All hands are on deck already; they stay up until piped down.", data
+    if named is deck:
+        return "crew.order", f"The {named.value} watch has the deck already.", data
+    if any(c.watch is named for c in ship.extra.get(WATCH_CALLS, [])):
+        return "crew.order", f"The {named.value} watch is coming up already.", data
+    call = WatchCall(crew, named, when)
+    if not call.coming:
+        return "crew.order", f"Every hand of the {named.value} watch is on deck already.", data
+    call.note_at = len(getattr(ship, "notes", []))
+    commit(ship, call)
+    data["coming"] = len(call.coming)
+    return (
+        "crew.order",
+        f"The boatswain's mates call the {named.value} watch at the hatchways; "
+        f"{_hands(len(call.coming))} turning out below. They stay up until piped down.",
+        data,
+    )
+
+
 CREW_VERBS: dict[str, Callable[[Ship, Order], Result]] = {
     "call all hands": call_all_hands,
+    "call the watch": call_watch,
     "pipe down": pipe_down,
     "relieve the watch": relieve_watch,
 }

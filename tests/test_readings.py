@@ -587,8 +587,10 @@ def test_the_nearest_land_is_a_reading_in_the_lookouts_words_and_never_the_chart
 
 def test_the_nearest_land_says_none_within_a_league_and_not_to_be_seen():
     """Item 9: beyond a league, "no land within a league"; when the weather or the night
-    bounds his sight short of that, "not to be seen", with how far he can see (what lies
-    beyond it he cannot say); with no chart, the chart's own absent words."""
+    bounds his sight short of that, none seen within how far he can see, and what lies
+    beyond it not to be told (package 37l, G5: the words were "not to be seen: in this
+    weather the shore shows within a cable at most", read by an officer as land within a
+    cable); with no chart, the chart's own absent words."""
     from types import SimpleNamespace
 
     far = _coast_world(50.20, -4.20)  # seven miles south of Rame Head: the land in sight
@@ -598,7 +600,8 @@ def test_the_nearest_land_says_none_within_a_league_and_not_to_be_seen():
     assert night.daylight == "night" and not night.lookout.moonlit
     assert night.readings["nearest_land"] is None
     assert night.readings.words("nearest_land") == (
-        "not to be seen: by night the shore shows within a mile at most"
+        "none seen within a mile; by night the shore shows no further off than that, and "
+        "land beyond it cannot be told"
     )
     fog = _coast_world(50.300, -4.20)
     assert fog.readings["nearest_land"] is not None
@@ -606,7 +609,8 @@ def test_the_nearest_land_says_none_within_a_league_and_not_to_be_seen():
     fog.lookout.look(fog)
     fog._readings_key = None
     assert fog.readings.words("nearest_land") == (
-        "not to be seen: in this weather the shore shows within a cable at most"
+        "none seen within a cable; in this weather the shore shows no further off than "
+        "that, and land beyond it cannot be told"
     )
     plane = make_world(7, ROOT / "data/ships/frigate-36.yaml", Scenario())
     assert plane.readings["nearest_land"] is None

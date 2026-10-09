@@ -48,6 +48,27 @@ steer three points off
 
 "Two points" alone is refused with "Steer how many points which way? Say 'up', 'off', 'to starboard' or 'to larboard'." *Up* is toward the wind, *off* away from it.
 
+The card of the period is cut finer than the thirty-two points: each point into quarters, a hundred and twenty-eight in all, and a course between two points is said from the nearer whole point toward another within eight points of it, *south by west half west*, *north-east three quarters north* (Bowditch's table; Falconer, *Compass*). The parser reads the whole of it, in words, figures or the signs, and the log shows it as the card has it, with the degrees: "Helm ordered: steer S by W ½ W (197°)."
+
+```orders frigate
+steer south by west half west
+steer S by W 1/2 W
+steer S by W ½ W
+steer west-north-west half west
+steer WNW 1/2 W
+steer NE by N 1/4 N
+steer north-north-east three quarters east
+steer north half east
+# rejected: steer south by west half
+# rejected: steer north half south
+# rejected: steer west two
+# rejected: steer south-west, 245
+```
+
+A course is steered as it was said or not at all. A half with no point after it ("toward which point?"), a fraction reckoned toward a point more than eight points off ("north half south" is no course), two courses in one order, or a course with a count of points after it are refused in words that say how a half point is said; none is steered to the last word of it, which before package 37l is what *south by west half west* got: west, six and a half points from what was said.
+
+Numbers are taken in words as in figures wherever an order wants one: *steer two hundred and forty-five degrees*, *veer five fathoms*, *a hundred and eighty-five fathoms*, *take in provisions for sixteen days*, *haul in the jib sheet a quarter fathom*, *bear away a point and a half*. One reader serves every order (the teens, the tens, the hundreds and a thousand, a half, a quarter and three quarters, *and a half* after a number), and a number it cannot read is refused, never taken as some other.
+
 ## The points of sail
 
 Counting from the wind round to dead astern (Lever, figures 397 and 398; Falconer, *Close-hauled*, *Large*):

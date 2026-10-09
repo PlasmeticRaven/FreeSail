@@ -710,8 +710,14 @@ TABLE: list[tuple[str, str, ok | no]] = [
     ),
     (
         F,
-        'standing order "x": when the true wind exceeds thirty then trim sails',
+        'standing order "x": when the true wind exceeds lots then trim sails',
         no(["what number"]),
+    ),
+    # package 37l: a number in words is a number, by the one reader for numbers
+    (
+        F,
+        'standing order "x": when the true wind exceeds thirty then trim sails',
+        ok("when", reading="true_wind_speed", op="gt", value=30.0),
     ),
     # -- package 31c: the weather's events, the new comparisons, the station verbs ------
     # an event that is a reading's change is kept as a `when` of its condition
@@ -2016,3 +2022,140 @@ def test_what_undoes_what_is_a_table_of_the_vocabulary_and_the_books_rule_is_unc
     copy.write_text(text, encoding="utf-8", newline="\n")
     with pytest.raises(ValueError, match="irrevocable names 'cut and run', which is no verb"):
         load_vocabulary(copy)
+
+
+# ---------------------------------------------------------------------------
+# Package 37l: a standing order's action read whole when it is given (the audit: its
+# first word was read and no more), and "when the true wind is 12 knots"
+# ---------------------------------------------------------------------------
+
+
+def channel(ship: str = "frigate") -> World:
+    """A ship off the Lizard with the chart, for the actions that name a mark or a place."""
+    scenario = Scenario(
+        start_time=datetime(1805, 6, 10, 10, 0),
+        wind_from_deg=225.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=0.0,
+        position={"lat_deg": 49.9, "lon_deg": -5.5},
+        region="channel-west",
+    )
+    return make_world(7, str(SHIP_FILES[ship]), scenario)
+
+
+@pytest.mark.parametrize(
+    "ship,action,named,words",
+    [
+        # the audit's three, each entered before and met at sea
+        (
+            F,
+            "take a fix as soon as a bearing can be taken",
+            "take a fix as soon as a bearing can be taken",
+            "names no mark of the chart",
+        ),
+        (
+            F,
+            "take a bearing of the moon made of cheese",
+            "take a bearing of the moon made of cheese",
+            "The chart has no mark named 'the moon made of cheese'",
+        ),
+        (C, "let go the sheet anchor", "let go the sheet anchor", "She carries no sheet anchor"),
+        # a fault in the third order, refused at the giving and named
+        (
+            F,
+            "heave the lead; trim sails; shape a course for atlantis",
+            "shape a course for atlantis",
+            "The chart has no place named 'atlantis'",
+        ),
+        (F, "heave the lead; trim sails; set the topsail", "set the topsail", "say which"),
+        (F, "heave the lead; veer umpteen fathoms", "veer umpteen fathoms", "not a number of"),
+        (F, "heave the lead; send for the cook's cat", "send for the cook's cat", "Nobody aboard"),
+        (F, "heave the lead; hoist our colours", "hoist our colours", "milestone 7"),
+        (F, "heave the lead; steer south by west half", "steer south by west half", "toward which"),
+        (F, "heave the lead; buy umpteen tons of tin", "buy umpteen tons of tin", "How many tons"),
+        (
+            F,
+            "heave the lead; take in provisions for a good while",
+            "take in provisions for a good while",
+            "not a time to provision for",
+        ),
+    ],
+)
+def test_a_standing_orders_action_is_read_whole_when_it_is_given(
+    ship: str, action: str, named: str, words: str
+):
+    w = channel(ship)
+    e = w.submit(f'standing order "x": every glass then {action}')
+    assert e.kind == "order.rejected", e.text
+    assert f"In standing order 'x', '{named}' is refused: " in e.text, e.text
+    assert words in e.text, e.text
+    assert w.standing.book.get("x") is None
+
+
+@pytest.mark.parametrize(
+    "action",
+    [
+        "take a fix",
+        "take a fix by the Lizard and the Manacles",
+        "take a bearing of the lizard",
+        "take a bearing of the land",
+        "take a bearing of manacle",
+        "shape a course for Falmouth",
+        "shape a course for a mile south of the Lizard",
+        "shape a course for 49 52 N 6 10 W",
+        "let go the best bower",
+        "heave in to eighty fathoms",
+        "veer a hundred and eighty-five fathoms",
+        "send for the master",
+        "steer south by west half west",
+        "tell the watcher the Lizard is abeam",
+        "allow half a knot of set to the south west",
+        "set the reckoning to 49 52 N 6 10 W",
+    ],
+)
+def test_an_action_that_reads_whole_is_entered_whatever_the_moment(action: str):
+    """What depends on the moment (a mark in sight, an anchor down, a port) is the
+    order's business when it fires: read whole, these are entered."""
+    w = channel()
+    e = w.submit(f'standing order "x": every glass then {action}')
+    assert e.kind == "standing.given", e.text
+
+
+def test_the_starter_and_the_scenario_books_still_load_whole():
+    """Every book the game ships is entered as it was: read whole, no action of theirs is
+    refused that was taken before."""
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    for name in ("gate-5b-passage", "merchant-passage", "naval-cruise", "gate-4c-day"):
+        sf = load_scenario(ROOT / "data" / "scenarios" / f"{name}.yaml")
+        world = make_scenario_world(sf)
+        begin(world, sf)
+        refused = [e.text for e in world.log if e.kind == "order.rejected"]
+        assert refused == [], (name, refused)
+
+
+def test_when_the_true_wind_is_twelve_knots_holds_within_half_a_knot(synthetic):
+    """Game 10's officer, six tries at "when the true wind is 12 knots" before one was
+    taken: it is the comparison it is, the wind at twelve knots within half a knot either
+    way, so a `when` fires as the wind comes to it from above or from below."""
+    kn = {"v": 10.0}
+    synthetic("true_wind_speed", lambda w: units.knots_to_ms(kn["v"]))
+    cond = parse_condition("the true wind is 12 knots")
+    (clause,) = cond.clauses
+    assert clause.comparison.op == "about" and clause.comparison.value == 12.0
+    assert clause.comparison.text == "12 knots, within half a knot"
+    for v, holds in ((10.0, False), (11.4, False), (11.6, True), (12.4, True), (12.6, False)):
+        assert clause._one(units.knots_to_ms(v), {}) is holds, v
+    w = point_world()
+    rule_of("when the true wind is twelve knots", w)
+    kn["v"] = 10.0
+    w.run(10)
+    assert firings(w) == []
+    kn["v"] = 11.8
+    w.run(10)
+    assert len(firings(w)) == 1
+    assert parse_condition("the speed is five knots").clauses[0].comparison.op == "about"
+    with pytest.raises(OrderError, match="cannot be"):
+        parse_condition("the true wind is 12 degrees")

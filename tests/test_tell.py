@@ -77,14 +77,30 @@ def test_tell_is_an_order_journaled_and_logged_notable():
     assert said.kind == "agent.told" and said.text == "The captain to the watcher: all is well"
 
 
-def test_a_tell_to_nobody_or_with_no_words_is_refused_in_words():
+def test_a_tell_to_nobody_is_kept_and_passed_and_one_with_no_words_is_refused():
+    """Package 37l (the review of gate 5c's playtests, G17: "a `tell` to an unmanned
+    station is rejected and its words are lost"): the captain's word to a station nobody
+    holds is kept in its journal and said so in the log, and passed to whoever takes the
+    station in its first sample, once; a word with no words is refused as before."""
     world = point_world()
     e = world.submit("tell the watcher hello")
-    assert e.kind == "order.rejected" and "nobody has been stationed" in e.text
-    stationed(world, ["Aye."])
+    assert e.kind == "agent.told", e.text
+    assert e.text == (
+        "The captain to the watcher: hello (nobody holds the station; the words are kept in "
+        "its journal for whoever takes it)"
+    )
+    assert world.journal == [(0, "captain", "tell the watcher hello")]
+    h, fake = stationed(world, ["Aye."])
+    first = samples(fake)[0]
+    assert first["word"] == "The captain's word, kept for whoever takes the station: hello"
+    kinds = [x.kind for x in h.journal.entries]
+    assert kinds[:2] == ["agent.word_kept", "agent.word_passed"]
+    assert h.journal.kept_words() == []
     e = world.submit("tell the watcher")
     assert e.kind == "order.rejected" and "Tell the watcher what?" in e.text
-    assert world.journal == []
+    # a replay writes the same journal and gives the same log
+    copy = replay.replay(world.save(), ship_factory)
+    assert copy.log.digest() == world.log.digest()
 
 
 def test_the_word_rides_the_next_sample_under_its_own_key_and_a_text_reply_ends_the_turn():

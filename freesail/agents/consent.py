@@ -839,6 +839,7 @@ class Conversation:
         self.identity_kind = identity_kind or IDENTITY_KINDS.get(door, "")
         self.drill_result = ""  # "passed", or why not, once the drill has run
         self._drill_from = 0  # where the drill's turns begin in the harness's turns
+        self._drill_ran: set[str] = set()  # the drill's calls counted so far (package 37l)
         self._base_tools = tuple(allowed_tools)
         self.records_dir = Path(records_dir)
         self.today = (today or dt.date.today()).isoformat()
@@ -1047,36 +1048,40 @@ class Conversation:
         h.close_turn()
         h.allowed_tools = tuple(dict.fromkeys((*self._base_tools, *DRILL_TOOLS)))
         self._drill_from = len(h.turns)
+        self._drill_ran = set()
         self._put(DRILL_TEXT, DRILL)
 
     def _drill_done(self) -> tuple[set[str], int]:
         """Which of the three ran (a tool result that is not a refusal) in the drill's
-        turns, and how many replies the model has made in it."""
-        done: set[str] = set()
+        turns, and how many replies the model has made in it. Package 37l (the review of
+        gate 5c's playtests, G13: in game 10 the model sent the three calls in one reply;
+        the drill counted the stand-by alone and asked for the other two, and when they
+        were sent again asked for the stand-by again): every result counts, those of a
+        reply a stand-by ended as much as those the turns hold (`Harness.stood_results`),
+        and a call once counted stays counted, whatever the stand-by's state later."""
+        done: set[str] = self._drill_ran
         replies = 0
+        results: list[dict[str, Any]] = []
         for t in self.harness.turns[self._drill_from :]:
             if t.role == MODEL:
                 replies += 1
-                # a stand-by ends the turn with no result (package 28c): the call is the proof
-                if any(c.name == "stand_by" for c in t.content.calls) and (
-                    self.harness.agent.standing_by
-                ):
-                    done.add("stand_by")
             elif t.role == DATA and "tool_results" in t.content:
-                for r in t.content["tool_results"]:
-                    name, result = str(r.get("name")), str(r.get("result", ""))
-                    if name not in DRILL_TOOLS or "args" not in r:
-                        continue
-                    if name == "library" and (
-                        "has no topic" in result or "has no section" in result
-                    ):
-                        continue
-                    if name == "journal" and not result.startswith("Noted"):
-                        continue
-                    if name == "stand_by" and not result.startswith("Standing by"):
-                        continue
-                    done.add(name)
-        return done, replies
+                results.extend(t.content["tool_results"])
+        for at, stood in self.harness.stood_results:
+            if at >= self._drill_from:
+                results.extend(stood)
+        for r in results:
+            name, result = str(r.get("name")), str(r.get("result", ""))
+            if name not in DRILL_TOOLS or "args" not in r:
+                continue
+            if name == "library" and ("has no topic" in result or "has no section" in result):
+                continue
+            if name == "journal" and not result.startswith("Noted"):
+                continue
+            if name == "stand_by" and not result.startswith("Standing by"):
+                continue
+            done.add(name)
+        return set(done), replies
 
     def _settle_drill(self) -> None:
         h = self.harness

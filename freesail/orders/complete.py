@@ -81,6 +81,17 @@ def _compass_names() -> list[str]:
     return [units.point_full_name(a) for a in units.COMPASS_ABBREVIATIONS]
 
 
+def _towards(name: str) -> list[str]:
+    """The cardinal points a half or a quarter point may be reckoned toward from the point
+    `name`: those within eight points of it ('west' and 'south' from south by west)."""
+    idx = units.COMPASS_NAMES.index(name)
+    out = []
+    for cardinal, at in (("north", 0), ("east", 8), ("south", 16), ("west", 24)):
+        if (at - idx) % 32 in range(1, 9) or (idx - at) % 32 in range(1, 9):
+            out.append(cardinal)
+    return out
+
+
 def _hands_phrases(ship: Any, vocab: Vocabulary) -> list[str]:
     """The hands this ship can name: the two watches, then her company's stations."""
     crew = ship.extra.get("crew") if hasattr(ship, "extra") else None
@@ -287,6 +298,13 @@ def suggestions(ship: Any, text: str, limit: int = 12) -> list[str]:
     if spec.object in ("heading", "points"):
         for name in _compass_names():
             offer(prefix + name)
+            head = normalise(prefix + name)
+            if (typed == head and trailing) or typed.startswith(head + " "):
+                # after a whole point, its half and quarter points toward the cardinal
+                # points within eight points of it (package 37l: 'south by west half west')
+                for frac in ("half", "quarter", "three quarters"):
+                    for toward in _towards(name):
+                        offer(prefix + f"{name} {frac} {toward}")
         for n in ("one point", "two points", "three points", "four points"):
             for side in ("to starboard", "to larboard"):
                 offer(prefix + f"{n} {side}")

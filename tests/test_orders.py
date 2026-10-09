@@ -2424,3 +2424,448 @@ def test_the_three_forms_of_allow_are_offered_and_each_is_taken_and_logged_as_wh
     # a course across a headland says so, and is ordered all the same
     across = w.submit("shape a course for Brest")
     assert across.kind == "helm.set" and "; the line crosses the land about " in across.text
+
+
+# ---------------------------------------------------------------------------
+# Package 37l: the words. A course with a half point, first (game 10: `steer south by west
+# half west` was steered west, its last word); one reader for numbers; the phrasings of
+# the review's G17, each taken or refused with what to say instead
+# ---------------------------------------------------------------------------
+
+_CARDINALS = {0: "north", 8: "east", 16: "south", 24: "west"}
+_FRACTION_SAID = {
+    1: ("quarter", "1/4", "¼"),
+    2: ("half", "1/2", "½"),
+    3: ("three quarters", "3/4", "¾"),
+}
+
+
+def _card(q: int) -> list[tuple[str, float]]:
+    """Every way the card's quarter point `q` (0 to 127) is said: from the whole point at
+    or before it toward the cardinal point ahead (clockwise), and from the whole point
+    after it back toward the cardinal point behind, each in words, figures and the signs,
+    and in the long names and the short; with its heading in degrees."""
+    deg = q * 360.0 / 128
+    k, f = divmod(q, 4)
+    if f == 0:
+        full = units.COMPASS_NAMES[k]
+        return [(full, deg), (units.COMPASS_ABBREVIATIONS[k], deg)]
+    out: list[tuple[str, float]] = []
+    ahead = (k // 8 + 1) * 8 % 32
+    behind_k = (k + 1) % 32
+    behind = (k // 8) * 8
+    for base, frac, toward in ((k, f, ahead), (behind_k, 4 - f, behind)):
+        for said in _FRACTION_SAID[frac]:
+            out.append((f"{units.COMPASS_NAMES[base]} {said} {_CARDINALS[toward]}", deg))
+            out.append(
+                (
+                    f"{units.COMPASS_ABBREVIATIONS[base]} {said} "
+                    f"{units.COMPASS_ABBREVIATIONS[toward]}",
+                    deg,
+                )
+            )
+    return out
+
+
+CARD = [form for q in range(128) for form in _card(q)]
+
+
+def test_the_whole_card_in_words_is_read_to_the_quarter_point():
+    """Item 1 (the course with a half point): every one of the card's 128 quarter points,
+    said from either neighbouring whole point toward a cardinal point, in words, in
+    figures and in the signs, long names and short, is read whole and steered to it."""
+    assert len(CARD) > 128 * 4
+    ship, _ = make("frigate")
+    for said, deg in CARD:
+        o = parse(ship, f"steer {said}")
+        got = units.rad_to_deg(o.modifiers["heading"]) % 360.0
+        assert got == pytest.approx(deg % 360.0, abs=1e-9), (said, got, deg)
+        assert units.parse_course(said) == pytest.approx(math.radians(deg % 360.0), abs=1e-12)
+
+
+@pytest.mark.parametrize(
+    "said,deg,shown",
+    [
+        ("south by west half west", 196.875, "S by W ½ W (197°)"),
+        ("S by W 1/2 W", 196.875, "S by W ½ W (197°)"),
+        ("S by W ½ W", 196.875, "S by W ½ W (197°)"),
+        ("WNW 1/2 W", 286.875, "WNW ½ W (287°)"),
+        ("west north west half west", 286.875, "WNW ½ W (287°)"),
+        ("west-north-west half west", 286.875, "WNW ½ W (287°)"),
+        ("NE by N 1/4 N", 30.9375, "NE by N ¼ N (31°)"),
+        ("north east by north quarter north", 30.9375, "NE by N ¼ N (31°)"),
+        ("NNE 3/4 E", 30.9375, "NNE ¾ E (31°)"),
+        ("north half east", 5.625, "N ½ E (6°)"),
+        ("N by W ½ N", 354.375, "N by W ½ N (354°)"),
+        ("south by west half a point west", 196.875, "S by W ½ W (197°)"),
+    ],
+)
+def test_a_course_with_a_half_point_is_steered_to_it_and_shown_as_the_card_has_it(
+    said: str, deg: float, shown: str
+):
+    ship, _ = make("frigate")
+    kind, text, data = orders.handle(ship, f"steer {said}")
+    assert kind == "helm.order" and text == f"Helm ordered: steer {shown}."
+    assert ship.dyn.helm_mode is HelmMode.HEADING
+    assert units.rad_to_deg(ship.dyn.target_heading) == pytest.approx(deg)
+    assert data["target_heading"] == pytest.approx(math.radians(deg))
+
+
+@pytest.mark.parametrize(
+    "said,words",
+    [
+        ("steer south by west half", ["toward which point", "'south by west half west'"]),
+        ("steer north half south", ["is no course", "within eight points", "'north half east'"]),
+        ("steer west two", ["gives a course", "and a number of points", "say one"]),
+        ("steer south west, 245", ["Two courses were given", "say one"]),
+        ("steer south west 245", ["Two courses were given"]),
+        ("fill away and steer S by W half", ["toward which point"]),
+        ("steer S by W 1/2 Q", ["toward which point"]),
+    ],
+)
+def test_an_unreadable_course_is_refused_and_never_steered_to_its_last_word(
+    said: str, words: list[str]
+):
+    ship, _ = make("frigate")
+    before = (ship.dyn.helm_mode, ship.dyn.target_heading)
+    with pytest.raises(OrderError) as info:
+        orders.handle(ship, said)
+    for w in words:
+        assert w in str(info.value), (said, str(info.value))
+    assert (ship.dyn.helm_mode, ship.dyn.target_heading) == before
+
+
+def test_the_ground_tackle_and_the_set_take_a_course_with_a_half_point():
+    """`get under way ... and steer <course>`, `lay out a kedge to <point>` and `allow ...
+    set to <point>` read the same course; a fraction they cannot read is refused."""
+    from freesail.orders.ground_tackle import _course as tackle_course
+    from freesail.orders.navigation import _course as nav_course
+
+    assert units.rad_to_deg(tackle_course("s by w half w")) == pytest.approx(196.875)
+    assert units.rad_to_deg(nav_course("south west half west")) == pytest.approx(230.625)
+    with pytest.raises(OrderError, match="toward which point"):
+        tackle_course("s by w half")
+
+
+@pytest.mark.parametrize(
+    "said,value,used",
+    [
+        ("sixteen", 16, 1),
+        ("thirteen", 13, 1),
+        ("seventeen", 17, 1),
+        ("nineteen", 19, 1),
+        ("twenty five", 25, 2),
+        ("forty", 40, 1),
+        ("a hundred", 100, 2),
+        ("a hundred and eighty five", 185, 5),
+        ("one hundred eighty five", 185, 4),
+        ("two hundred and five", 205, 4),
+        ("three hundred and sixty", 360, 4),
+        ("a thousand", 1000, 2),
+        ("two thousand three hundred", 2300, 4),
+        ("a", 1, 1),
+        ("an", 1, 1),
+        ("half", 0.5, 1),
+        ("half a", 0.5, 2),
+        ("a half", 0.5, 2),
+        ("a quarter", 0.25, 2),
+        ("quarter", 0.25, 1),
+        ("a quarter of a", 0.25, 4),
+        ("three quarters", 0.75, 2),
+        ("two and a half", 2.5, 4),
+        ("one and a quarter", 1.25, 4),
+        ("16", 16, 1),
+        ("16.5", 16.5, 1),
+        ("a dozen", 12, 2),
+    ],
+)
+def test_one_reader_reads_every_number_in_words_and_figures(said: str, value: float, used: int):
+    """Item 2: every number to a hundred, the hundreds and the thousands, the halves and
+    the quarters, by one reader."""
+    from freesail.orders import numbers
+
+    assert numbers.read(said.split()) == (pytest.approx(value), used)
+
+
+def test_every_number_to_a_hundred_said_in_words_is_read():
+    from freesail.orders import numbers
+
+    units_ = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+    teens = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen"]
+    teens += ["seventeen", "eighteen", "nineteen"]
+    tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
+    for n in range(1, 100):
+        if n < 10:
+            said = units_[n]
+        elif n < 20:
+            said = teens[n - 10]
+        else:
+            said = f"{tens[n // 10]} {units_[n % 10]}".strip()
+        assert numbers.read_all(said) == n, said
+        assert numbers.read_all(f"a hundred and {said}") == 100 + n, said
+
+
+@pytest.mark.parametrize(
+    "text,fathoms",
+    [
+        ("veer five fathoms", 5.0),
+        ("veer sixteen fathoms", 16.0),
+        ("veer a hundred and eighty-five fathoms", 185.0),
+        ("veer to ninety fathoms", 90.0),
+        ("veer 45 fathoms", 45.0),
+        ("heave in twenty five fathoms", 25.0),
+        ("let go the best bower and veer to forty-five fathoms", 45.0),
+    ],
+)
+def test_the_ground_tackles_fathoms_are_read_by_the_one_reader(text: str, fathoms: float):
+    from freesail.orders.ground_tackle import _fathoms
+
+    o = parse(make("frigate")[0], text)
+    n, _ = _fathoms(o.object or "")
+    assert n == pytest.approx(fathoms)
+
+
+def test_a_word_before_fathoms_that_is_no_number_is_refused():
+    from freesail.orders.ground_tackle import _fathoms
+
+    with pytest.raises(OrderError, match="not a number of fathoms"):
+        _fathoms("veer umpteen fathoms")
+
+
+def test_a_quarter_fathom_and_the_provisions_days_and_the_knots_of_set():
+    from freesail.orders.navigation import _knots
+    from freesail.orders.port import _days
+
+    o = parse(make("cutter")[0], "haul in the starboard jib sheet a quarter fathom")
+    assert o.modifiers["fathoms"] == pytest.approx(0.25)
+    o = parse(make("cutter")[0], "ease the main sheet three quarters of a fathom")
+    assert o.modifiers["fathoms"] == pytest.approx(0.75)
+    assert _days("for sixteen days") == 16
+    assert _days("for a month") == 30
+    assert _days("for six weeks") == 42
+    assert _days("thirty") == 30
+    assert _days("") is None
+    with pytest.raises(OrderError, match="not a time to provision for"):
+        _days("for a good while")
+    assert _knots("one and a half") == 1.5
+    assert _knots("half a") == 0.5
+    assert _knots("a knot and a half") == 1.5
+    assert _knots("no") == 0.0
+
+
+def test_two_bargains_in_one_order_are_two():
+    from freesail.orders.port import _bargains
+
+    assert _bargains("20 tons of salt fish and 8 tons of pilchards") == [
+        "20 tons of salt fish",
+        "8 tons of pilchards",
+    ]
+    assert _bargains("twenty tons of fish and chips") == ["twenty tons of fish and chips"]
+    assert _bargains("ten tons of tin and a ton of copper") == [
+        "ten tons of tin",
+        "a ton of copper",
+    ]
+
+
+@pytest.mark.parametrize(
+    "which,text,expect",
+    [
+        # the helm
+        ("frigate", "steady on", ok(kind="helm.order", text=["Helm ordered: steady on N"])),
+        ("frigate", "close hauled", ok(kind="helm.order", text=["keep her full and by"])),
+        ("frigate", "keep her close hauled", ok(kind="helm.order", text=["full and by"])),
+        ("frigate", "bring her up", ok(kind="helm.order", text=["come up a point"])),
+        ("frigate", "bring her up two points", ok(kind="helm.order", text=["two points"])),
+        # the sheets of a group of sails
+        (
+            "cutter",
+            "trim the headsail sheets",
+            ok(kind="sail.trimmed", text=["The sheets of the fore staysail and the jib"]),
+        ),
+        # a headsail backed by its sheet, hauled to windward
+        (
+            "cutter",
+            "back the fore staysail",
+            ok(kind="line.hauled", text=["Backed the fore staysail"]),
+        ),
+        # a jib told to furl is taken in; lower is said of a jib; clew up is refused with
+        # what to say
+        ("cutter", "furl the jib", ok(evo="take_in_jibheaded")),
+        ("cutter", "lower the jib", ok(evo="take_in_jibheaded")),
+        ("cutter", "clew up the jib", no(["hauled down, not clewed up", "'haul down the jib'"])),
+        # the water sail is a sail, not the stores
+        ("schooner", "take in the water sail", ok(evo="take_in_studding")),
+        ("schooner", "lower the water sail", ok(evo="take_in_studding")),
+        ("schooner", "furl the water sail", ok(evo="take_in_studding")),
+        ("schooner", "clew up the water sail", no(["not clewed up", "'take in the water sail'"])),
+        ("frigate", "take in the water sail", no(["There is no such part as the water sail"])),
+        # the words refused with what to say, or the milestone
+        ("frigate", "hoist our colours", no(["milestone 7"])),
+        ("frigate", "show your colours", no(["milestone 7"])),
+        ("frigate", "man the pumps", no(["not worked in this game yet", "Sound the well"])),
+        ("frigate", "as you were", no(["'belay that'"])),
+        (
+            "frigate",
+            "put the helm over",
+            no(["says not which way", "'helm a-lee'", "'hard a-weather'"]),
+        ),
+        ("frigate", "put the helm over to starboard", no(["says not which way"])),
+        ("frigate", "lay out the stream anchor astern", no(["'lay out a kedge astern'"])),
+    ],
+    ids=lambda v: v if isinstance(v, str) else "",
+)
+def test_the_phrasings_of_g17_on_a_ship(which: str, text: str, expect: ok | no):
+    ship, runner = make(which)
+    if which == "cutter":
+        for sid in ("jib", "fore.staysail"):
+            ship.sails[sid].state = SailState.SET
+    if which == "schooner":
+        ship.sails["water_sail"].state = SailState.SET
+    if isinstance(expect, no):
+        with pytest.raises(OrderError) as info:
+            orders.handle(ship, text)
+        for m in expect.mentions:
+            assert m in str(info.value), (text, str(info.value))
+        return
+    kind, line, data = orders.handle(ship, text)
+    assert kind == expect.kind, (text, kind, line)
+    for m in expect.text:
+        assert m in line, (text, line)
+    if expect.evo is not None:
+        assert runner.started and all(e == expect.evo for e, _, _ in runner.started), runner.started
+
+
+@pytest.mark.parametrize(
+    "said,hint",
+    [
+        ("hail the pilot", None),
+        ("man the boats", None),
+        ("as you like it", None),
+        ("mr pearce make sail", None),
+        ("stear south", "'steer'"),
+        ("lett go the anker", "'let go'"),
+    ],
+)
+def test_a_hint_points_the_right_way_or_is_not_given(said: str, hint: str | None):
+    """The hints that pointed the wrong way (`hail the pilot`, "did you mean 'haul'?"): a
+    verb is hinted only when it is near in spelling."""
+    from freesail.orders.errors import UnknownVerbError
+
+    with pytest.raises(UnknownVerbError) as info:
+        parse(make("frigate")[0], said)
+    words = str(info.value)
+    if hint is None:
+        assert "did you mean" not in words, words
+    else:
+        assert hint in words, words
+
+
+def test_marks_by_their_names_without_accents_or_apostrophes():
+    from freesail.world.geo import name_words
+
+    assert name_words("La Lavandière") == ["la", "lavandiere"]
+    assert name_words("St Anthony's Head") == ["st", "anthonys", "head"]
+    assert name_words("St Anthony’s Head") == name_words("st anthonys head")
+    assert name_words("Béniguet") == ["beniguet"]
+    w = voyage("frigate", 49.9, -5.5, "10:00")
+    chart = w.chart
+    feature = chart.find_feature("St Anthony's Head")
+    assert feature is not None and chart.find_feature("st anthonys head") is feature
+    accented = next(f for f in chart.features.values() if any(ord(c) > 127 for c in f.name))
+    from unicodedata import combining, normalize
+
+    folded = "".join(c for c in normalize("NFKD", accented.name) if not combining(c))
+    assert chart.find_feature(folded) is accented, accented.name
+
+
+def test_where_is_a_mark_says_it_in_sight_or_by_account():
+    w = voyage("frigate", 49.9, -5.5, "10:00")
+    seen = w.submit("where is the lizard")
+    assert seen.kind == "query.reading"
+    assert seen.text.startswith("The Lizard: in sight, bearing ")
+    far = w.submit("where is ushant")
+    assert far.kind == "query.reading"
+    assert far.text.startswith("Ushant: not in sight; by account it bears ")
+    assert far.text.endswith(" miles.")
+    person = w.submit("where is mr harvey")
+    assert person.kind == "query.reading" and "Mr Harvey" in person.text
+    nobody = w.submit("where is atlantis")
+    assert nobody.kind == "order.rejected"
+    assert "the chart has no mark of that name" in nobody.text
+
+
+def test_a_course_shaped_for_a_point_off_a_place_of_the_chart():
+    """`shape a course for a mile west of ushant` (game 10): the point laid off from the
+    chart's place by the distance and the point said, and the course shaped for it."""
+    from freesail.world.geo import bearing_and_distance
+
+    w = voyage("frigate", 49.9, -5.5, "10:00")
+    e = w.submit("shape a course for two miles south of the lizard")
+    assert e.kind == "helm.set", e.text
+    assert e.text.startswith("Shaped a course for two miles south of the Lizard: ")
+    lizard = w.chart.find_feature("the Lizard")
+    from freesail.orders.navigation import _off_a_place
+
+    target, said = _off_a_place(w, "two miles south of the lizard")
+    bearing, metres = bearing_and_distance(lizard.position, target)
+    assert bearing == pytest.approx(180.0, abs=0.01)
+    assert metres == pytest.approx(2 * units.NAUTICAL_MILE, rel=1e-6)
+    assert said == "two miles south of the Lizard"
+    target, said = _off_a_place(w, "a mile west of ushant")
+    assert said == "a mile west of Ushant"
+    refused = w.submit("shape a course for a mile west of atlantis")
+    assert refused.kind == "order.rejected" and "no place named 'atlantis'" in refused.text
+    refused = w.submit("shape a course for a mile sideways of the lizard")
+    assert refused.kind == "order.rejected" and "not a point of the compass" in refused.text
+
+
+def test_pipe_down_and_call_a_watch_by_its_side():
+    w = voyage("frigate", 49.9, -5.5, "10:00")
+    deck = w.submit("pipe down the watch")
+    assert deck.kind == "crew.order" and "Nobody is turned up" in deck.text
+    on_deck = w.submit("call the starboard watch")
+    assert on_deck.kind == "crew.order", on_deck.text
+    below = "larboard" if "starboard watch has the deck" in on_deck.text else "starboard"
+    called = w.submit(f"call the {below} watch")
+    assert called.kind == "crew.order"
+    assert called.text.startswith(f"The boatswain's mates call the {below} watch")
+    assert "They stay up until piped down." in called.text
+    again = w.submit("call the watch below")
+    assert again.text == f"The {below} watch is coming up already."
+    w.run(120)
+    piped = w.submit(f"pipe down the {below} watch")
+    assert piped.kind == "crew.piped_down", piped.text
+
+
+def test_send_for_the_master_where_the_master_is_the_captain_says_so():
+    w = voyage("schooner", 49.9, -5.5, "10:00")
+    e = w.submit("send for the master")
+    assert e.kind == "order.rejected"
+    assert "In this vessel the master is the captain" in e.text
+    assert "say 'send for the mate'" in e.text
+    frigate = voyage("frigate", 49.9, -5.5, "10:00")
+    assert frigate.submit("send for the master").kind == "person.sent_for"
+
+
+def test_a_word_to_a_station_nobody_holds_is_kept_and_said():
+    w = voyage("frigate", 49.9, -5.5, "10:00")
+    e = w.submit("tell the watcher keep a sharp lookout for the Lizard light")
+    assert e.kind == "agent.told", e.text
+    assert e.text == (
+        "The captain to the watcher: keep a sharp lookout for the Lizard light (nobody holds "
+        "the station; the words are kept in its journal for whoever takes it)"
+    )
+    journal = w.agent_journals["watcher"]
+    assert journal.kept_words() == [
+        "The captain's word, kept for whoever takes the station: keep a sharp lookout for "
+        "the Lizard light"
+    ]
+    assert w.submit("ask the watcher how she goes").kind == "order.rejected"
+
+
+def test_belay_get_under_way_names_the_work_by_the_order():
+    from freesail.orders import work
+
+    vocab = orders.load_vocabulary()
+    assert work._evolution_ids("get under way", vocab) == {"get_under_way"}
+    assert work._evolution_ids("weigh", vocab) == {"weigh_anchor"}

@@ -201,6 +201,120 @@ def parse_compass_point(text: str) -> float | None:
     return idx * POINT
 
 
+# A course with a half or a quarter point (package 37l; the review of gate 5c's playtests,
+# G17: `steer south by west half west` was steered west, its last word, and the ship was
+# taken aback). The card of the period has 128 quarter points, each named from a point
+# toward a point within eight points of it: "S by W ½ W", "NE ¾ N", "W ¼ S" (Bowditch's
+# table; Falconer 1780, *Compass*). The fraction is said in words or figures ("half",
+# "a quarter", "three quarters", "1/2", "½"; the order's normalising has turned the
+# figures and the signs into the words by now).
+FRACTION_WORDS: dict[tuple[str, ...], float] = {
+    ("half",): 0.5,
+    ("a", "half"): 0.5,
+    ("quarter",): 0.25,
+    ("a", "quarter"): 0.25,
+    ("one", "quarter"): 0.25,
+    ("three", "quarters"): 0.75,
+    ("three", "quarter"): 0.75,
+}
+FRACTION_SIGNS = {0.25: "¼", 0.5: "½", 0.75: "¾"}
+# after the fraction, the words that may name it a point's ("half a point west")
+_OF_A_POINT = (("a", "point"), ("of", "a", "point"), ("point",))
+
+
+class CourseError(ValueError):
+    """Words that begin a course and cannot be read whole: a fraction with no point to
+    reckon it toward, or toward a point that is no way to reckon it."""
+
+
+def _point_at(words: list[str], i: int) -> tuple[int, int] | None:
+    """The compass point (its index, 0 to 31) said at words[i], the longest run of up to
+    five words that names one, and the words it took; None when none begins there."""
+    for k in range(min(5, len(words) - i), 0, -1):
+        idx = _POINT_LOOKUP.get(_normalise_point_text(" ".join(words[i : i + k])))
+        if idx is None:
+            idx = _POINT_LOOKUP.get(_normalise_point_text("".join(words[i : i + k])))
+        if idx is not None:
+            return idx, k
+    return None
+
+
+def read_course(words: list[str], i: int = 0) -> tuple[float, str, int] | None:
+    """A course said at words[i]: a compass point, with a half or a quarter point
+    toward another ('south by west half west', 'wnw half w', 'ne by n quarter n', 'w
+    three quarters s'); (the heading in radians, its name as the card has it, 'S by W ½
+    W', and the words it took), or None when no point begins there. Raises `CourseError`
+    in words when a fraction follows the point and cannot be read whole, so that the
+    order is refused and never steered to part of what was said."""
+    base = _point_at(words, i)
+    if base is None:
+        return None
+    idx, used = base
+    j = i + used
+    frac = None
+    for said, value in sorted(FRACTION_WORDS.items(), key=lambda kv: -len(kv[0])):
+        if tuple(words[j : j + len(said)]) == said:
+            frac, j = value, j + len(said)
+            break
+    name = COMPASS_ABBREVIATIONS[idx]
+    if frac is None:
+        return idx * POINT, name, used
+    for tail in _OF_A_POINT:
+        if tuple(words[j : j + len(tail)]) == tail:
+            j += len(tail)
+            break
+    said = " ".join(words[i:j])
+    toward = _point_at(words, j)
+    if toward is None:
+        raise CourseError(
+            f"'{said}' toward which point? Say the point the {_fraction_words(frac)} is "
+            f"reckoned toward, as '{point_full_name(name)} {_fraction_words(frac)} "
+            f"{_toward_example(idx)}'."
+        )
+    to_idx, to_used = toward
+    diff = (to_idx - idx) % 32
+    if diff == 0 or diff in range(9, 24):
+        raise CourseError(
+            f"'{said} {' '.join(words[j : j + to_used])}' is no course: "
+            f"{_fraction_phrase(frac)} is reckoned from {name} toward a point within eight "
+            f"points of it, as '{point_full_name(name)} {_fraction_words(frac)} "
+            f"{_toward_example(idx)}'."
+        )
+    sign = 1.0 if diff <= 8 else -1.0
+    angle = wrap_2pi(idx * POINT + sign * frac * POINT)
+    shown = f"{name} {FRACTION_SIGNS[frac]} {COMPASS_ABBREVIATIONS[to_idx]}"
+    return angle, shown, j + to_used - i
+
+
+def _fraction_words(frac: float) -> str:
+    return {0.25: "quarter", 0.5: "half", 0.75: "three quarters"}[frac]
+
+
+def _fraction_phrase(frac: float) -> str:
+    return {0.25: "a quarter point", 0.5: "half a point", 0.75: "three quarters of a point"}[frac]
+
+
+def _toward_example(idx: int) -> str:
+    """The cardinal point the next quarter of the card lies toward, clockwise: 'west'
+    after S by W."""
+    return ("east", "south", "west", "north")[(idx // 8) % 4]
+
+
+def parse_course(text: str) -> float | None:
+    """A course in words, whole ('S by W 1/2 W', 'south by west half west', 'NE'), in
+    radians; None when the words are not one course and nothing more. `CourseError`
+    when a fraction cannot be read (`read_course`)."""
+    t = text.lower().replace("½", " half ").replace("¼", " quarter ").replace("¾", " 3/4 ")
+    t = t.replace("1/2", " half ").replace("1/4", " quarter ").replace("3/4", " three quarters ")
+    words = t.replace("-", " ").split()
+    if not words:
+        return None
+    got = read_course(words, 0)
+    if got is None or got[2] != len(words):
+        return None
+    return got[0]
+
+
 def nearest_point_index(angle: float) -> int:
     """Index (0..31) of the compass point nearest to an angle in radians."""
     return int(round(wrap_2pi(angle) / POINT)) % 32

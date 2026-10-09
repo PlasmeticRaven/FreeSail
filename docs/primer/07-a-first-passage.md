@@ -370,6 +370,35 @@ def shorten_sail():
 
 A saved game lists a Python rule by its name and its source; loaded without the script that defined it, the rule is in the book, belayed, and `resume` says why it will not run.
 
+An order after `then` is read whole when the standing order is given, by the reader that will carry it out, and every order of it, not its first word alone: a sail the ship has two of and that is not named which, a mark the chart has not got (`take a bearing of the moon made of cheese`), the marks of a fix that are no marks (`take a fix as soon as a bearing can be taken`), a place the chart does not name, an anchor she does not carry, a number of fathoms or of days that cannot be read: each is refused at the giving, the refusal naming the order, and not met at sea at the first firing. What depends on the moment (what is in sight, an anchor down, whether she is in port) is still the order's business when it fires.
+
+```orders frigate
+# rejected: standing order "three": every glass then heave the lead; trim sails; set the topsail
+# rejected: standing order "fathoms": every glass then heave the lead; veer umpteen fathoms
+```
+
+## Saying it
+
+The ship takes the words a seaman would use and refuses, in words that say what to say instead, the ones she cannot take. A course with a half or a quarter point is read whole (chapter 2): `steer south by west half west` is S by W ½ W (197°). Numbers are read in words as in figures by every order that takes one, from *a quarter* and *half a* to *a hundred and eighty-five*. The helm takes *steady on*, *close hauled* (keep her full and by) and *bring her up* (come up); a headsail is backed by hauling its sheet to windward; a jib, a staysail or the water sail told to *furl* is handed and stowed, which is taking it in; *lower* is said of a jib and a studding sail as of a gaff sail.
+
+```orders frigate plain-sail
+steer south by west half west
+steer WNW 1/2 W
+bear away a point and a half
+steady on
+close hauled
+bring her up a point
+trim the headsail sheets
+furl the jibs
+# rejected: steer south by west half
+# rejected: hoist our colours
+# rejected: as you were
+# rejected: put the helm over
+# rejected: man the pumps
+```
+
+Some words are refused with what to say instead, or with the milestone they wait for: *hoist our colours* is milestone 7's, with the other ships that would answer them; *man the pumps* waits on a hull that makes water; *as you were* is answered with `belay that`; *put the helm over*, which says not which way, with `helm a-lee` and `hard a-weather`. At sea with a chart, `where is Ushant` says where a mark of the chart lies, in sight by the lookout's bearing and estimate, or by account from the master's position ("Ushant: not in sight; by account it bears S by E, 88 miles."), and `shape a course for a mile west of Ushant` lays off a point from a place of the chart (chapter 10). A mark's name is taken without its accents or its apostrophes: *lavandiere* is the Lavandière, *st anthonys head* St Anthony's Head. A word to a station nobody holds (`tell the watcher keep a sharp lookout`) is kept in its journal and passed to whoever takes the station, and the log says so.
+
 ## A day of it, and a word with the watcher
 
 `data/scenarios/gate-4c-day.yaml` is a whole day under standing orders, the wind scripted to veer and rise to a gale in the middle watch and ease at the next dawn: start it with `--scenario data/scenarios/gate-4c-day.yaml` on the console or the browser server, and run it at `speed 60` or `speed 300`, where the log rolls up each hour's routine lines into one line (marked `=`) and keeps every notable and urgent line as it is; an urgent line eases the clock to 1x and says so. With a watcher at its station, `ask the watcher how the sails are drawing` puts a question it answers in the log, and `tell the watcher we make for Falmouth` (or `say to the watcher ...`) gives it a word it hears and owes no answer to.

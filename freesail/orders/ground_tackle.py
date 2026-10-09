@@ -48,16 +48,17 @@ refuses them in words. `orders.handle` hands an order with this object here.
 
 from __future__ import annotations
 
+import math
 import re
 from typing import Any
 
 from freesail.api import readings as _readings
-from freesail.orders import verbs
+from freesail.orders import numbers, verbs
 from freesail.orders.errors import OrderError
 from freesail.orders.grammar import Order
 from freesail.ship.parts import ground_tackle
 
-__all__ = ["NO_TACKLE_WORDS", "execute"]
+__all__ = ["NO_TACKLE_WORDS", "check", "execute"]
 
 # one sentence with the registry's (`api.readings`), which an agent reads
 NO_TACKLE_WORDS = _readings.NO_TACKLE_WORDS
@@ -85,44 +86,42 @@ _EVOLUTIONS = {
 _TACK_RE = re.compile(r"\b(?:on|to)?\s*(?:the\s+)?(starboard|larboard|port)\s+tack\b")
 _COURSE_RE = re.compile(r"\b(?:and\s+)?(?:steer|steering|course)\s+(?P<course>[\w\s]+?)\s*$")
 
-_FATHOMS_RE = re.compile(r"(?P<n>\d+(?:\.\d+)?|[a-z]+(?:\s+and\s+a\s+half)?)\s+fathoms?\b")
-_NUMBER_WORDS = {
-    "ten": 10,
-    "twelve": 12,
-    "fifteen": 15,
-    "twenty": 20,
-    "twenty five": 25,
-    "thirty": 30,
-    "forty": 40,
-    "forty five": 45,
-    "fifty": 50,
-    "sixty": 60,
-    "seventy": 70,
-    "seventy five": 75,
-    "eighty": 80,
-    "ninety": 90,
-    "a hundred": 100,
-    "hundred": 100,
-    "a hundred and twenty": 120,
-}
-
 
 def _fathoms(text: str) -> tuple[float | None, str]:
-    """A number of fathoms in the words, and the words without it."""
-    low = text.lower()
-    for words, n in sorted(_NUMBER_WORDS.items(), key=lambda kv: -len(kv[0])):
-        if re.search(rf"\b{words}\s+fathoms?\b", low):
-            return float(n), re.sub(rf"\b{words}\s+fathoms?\b", " ", low)
-    m = _FATHOMS_RE.search(low)
-    if m is None:
-        return None, low
+    """A number of fathoms in the words ('five fathoms', 'a hundred and eighty-five
+    fathoms', '45 fathoms', 'a fathom and a half'), read by the one reader for numbers
+    (`orders.numbers`; package 37l: `veer five fathoms` was refused while the log wrote "a
+    hundred and eighty-five fathoms"), and the words without it; (None, the words) when
+    none is said. A word before 'fathoms' that is no number is refused in words."""
+    words = " ".join(text.lower().replace("-", " ").split()).split()
+    for i, w in enumerate(words):
+        if w not in ("fathom", "fathoms"):
+            continue
+        # the longest number that ends just before the unit
+        for start in range(max(0, i - 8), i):
+            got = numbers.read(words, start)
+            if got is not None and start + got[1] == i:
+                n = got[0]
+                j = i + 1
+                if words[j : j + 3] == ["and", "a", "half"]:
+                    n, j = n + 0.5, j + 3
+                return n, " ".join(words[:start] + words[j:])
+        if i == 0:
+            return None, " ".join(words)
+        raise OrderError(f"'{words[i - 1]} {w}' is not a number of fathoms I can read.")
+    return None, " ".join(words)
+
+
+def _course(words: str) -> float | None:
+    """A course or a bearing in words, with its half or quarter point (package 37l), in
+    radians; None when the words are no course; refused in words when a fraction in them
+    cannot be read."""
+    from freesail import units
+
     try:
-        n = float(m.group("n"))
-    except ValueError:
-        raise OrderError(
-            f"'{m.group('n')} fathoms' is not a number of fathoms I can read."
-        ) from None
-    return n, low[: m.start()] + " " + low[m.end() :]
+        return units.parse_course(words)
+    except units.CourseError as e:
+        raise OrderError(str(e)) from None
 
 
 def _anchor_words(text: str) -> str | None:
@@ -141,24 +140,32 @@ _CABLE_FILLERS = re.compile(
 )
 # The orders that work a cable already out, each on the anchor named or the one she rides by.
 _CABLE_VERBS = ("veer cable", "heave short", "heave in", "weigh")
+
+
 # "in twelve fathoms", "in 12 fathoms of water": a depth, unless it is "of cable"
-_DEPTH_RE = re.compile(
-    r"\bin\s+(?P<n>\d+(?:\.\d+)?|[a-z]+(?:\s+[a-z]+)??(?:\s+and\s+a\s+half)?)\s+fathoms?"
-    r"(?:\s+of\s+water|\s+water)?\b(?!\s+of\s+cable)"
-)
-
-
 def _depth_said(text: str) -> tuple[float | None, str]:
     """'in twelve fathoms' after `come to an anchor`: the depth to let go in, and the
-    words without it; (None, the words) when none is said."""
-    low = text.lower()
-    m = _DEPTH_RE.search(low)
-    if m is None:
-        return None, text
-    n, _ = _fathoms(m.group("n") + " fathoms")
-    if n is None:
-        return None, text
-    return n, low[: m.start()] + " " + low[m.end() :]
+    words without it; (None, the words) when none is said. 'In twenty fathoms of cable'
+    is the scope and not the depth."""
+    words = " ".join(text.lower().replace("-", " ").split()).split()
+    for i, w in enumerate(words):
+        if w != "in":
+            continue
+        got = numbers.read(words, i + 1)
+        if got is None:
+            continue
+        j = i + 1 + got[1]
+        if words[j : j + 1] not in (["fathom"], ["fathoms"]):
+            continue
+        k = j + 1
+        if words[k : k + 2] == ["of", "cable"]:
+            continue
+        if words[k : k + 2] == ["of", "water"]:
+            k += 2
+        elif words[k : k + 1] == ["water"]:
+            k += 1
+        return got[0], " ".join(words[:i] + words[k:])
+    return None, text
 
 
 def _named_anchor(ship: Any, phrase: str, remainder: str) -> tuple[str | None, str]:
@@ -305,7 +312,7 @@ def execute(ship: Any, order: Order) -> Result:
         if c:
             from freesail import units
 
-            heading = units.parse_compass_point(c.group("course").strip())
+            heading = _course(c.group("course").strip())
             if heading is None:
                 try:
                     heading = units.deg_to_rad(float(c.group("course").strip()))
@@ -328,7 +335,12 @@ def execute(ship: Any, order: Order) -> Result:
         if low:
             from freesail import units
 
-            toward = units.parse_compass_point(low)
+            # 'astern' and 'ahead' (package 37l): from her head as she lies
+            toward = (
+                units.wrap_2pi(float(ship.dyn.heading) + (math.pi if low == "astern" else 0.0))
+                if low in ("astern", "ahead")
+                else _course(low)
+            )
             if toward is None:
                 raise OrderError(
                     f"'{low}' is not a bearing to lay the kedge out on; say 'lay out a kedge to "
@@ -349,6 +361,47 @@ def execute(ship: Any, order: Order) -> Result:
         "failed": [],
     }
     return "evolution.started", text, data
+
+
+class _Reading:
+    """Stands in for the runner while an order is read whole (`check`): it takes the
+    evolution and its params and starts nothing."""
+
+    def __init__(self) -> None:
+        self.started: list[tuple[str, dict[str, Any]]] = []
+
+    def start(self, ship: Any, evolution_id: str, subject_id: str, params: Any = None) -> str:
+        self.started.append((evolution_id, dict(params or {})))
+        return ""
+
+
+def check(ship: Any, order: Order) -> None:
+    """Read a ground-tackle order whole without carrying it out (package 37l: a standing
+    order's action is read when it is given): its anchor's name, its fathoms, its tack,
+    its course and its bearing, refused in words now; and an anchor the ship does not
+    carry by that name. Nothing is started and nothing of the ship's is changed; what
+    depends on the moment (an anchor down, the cable out, the hands) is the order's own
+    business when it fires. A ship with no ground tackle is not read here."""
+    tackle = ground_tackle(ship)
+    if tackle is None:
+        return
+    reading = _Reading()
+    saved = ship.extra.get("evolutions")
+    ship.extra["evolutions"] = reading
+    try:
+        execute(ship, order)
+    finally:
+        if saved is None:
+            ship.extra.pop("evolutions", None)
+        else:
+            ship.extra["evolutions"] = saved
+    for _evo, params in reading.started:
+        name = params.get("anchor")
+        if not name or name in ("second", "other", "lee", "weather", "anchor"):
+            continue
+        if tackle.by_words(str(name)) is None:
+            carried = ", ".join(a.name for a in tackle.anchors)
+            raise OrderError(f"She carries no {name} anchor; her anchors are {carried}.")
 
 
 _PHRASE_ANCHORS = (
