@@ -2336,12 +2336,74 @@ features:
     source: "White 1835, 'Coast of England', p. 13 ('the Sept Isles'); the light on the Île aux Moines dates from 1835"
     says: "The Seven Islands, off Perros on the north coast of Brittany; their light came in 1835."
 
+  # The river of Morlaix (package 39a; data/ports/morlaix.yaml): the marks of the port,
+  # which lies in this region's bounds (3.83 W) and has no harbour patch (a patch here is a
+  # rebuild of this region's harbours, for a later package). Read from Faden's directions
+  # and checked against this region's tiles by the head's rule. This region's index
+  # (features/channel-west.index.json) was rebuilt from this file for them after the
+  # package (no tile or coast of the region changed).
+
+  - id: morlaix
+    kind: town
+    name: Morlaix
+    modern: Morlaix
+    lat_deg: 48.5780
+    lon_deg: -3.8280
+    height_m: 20
+    source: "Faden 1793, 'Morlaix', p. 44: one of the principal harbours of Britanny; anchor in the river in 6 or 7 fathoms"
+    says: "Morlaix, one of the principal harbours of Brittany, at the head of its river three leagues from the sea."
+
+  - id: morlaix-river
+    kind: anchorage
+    name: the river of Morlaix
+    modern: the Morlaix river below Carantec
+    lat_deg: 48.6704
+    lon_deg: -3.8800
+    height_m: 0
+    depth_fathoms: 6
+    bottom: "mud and sand"
+    fix: "Faden: from the small island off the eastern point proceed up till you are above the point on the other side; placed on this region's grid in 8 m, the deepest water within the entrance (the river shoals to under 5 m above it in the grid); the bottom judgement"
+    source: "Faden 1793, 'Morlaix', p. 44: steer for the northernmost point on the east side of the entrance of Morlaix bay W S W till within a mile of its rocks, then S by W for the small island off the point on the east side of the river's entrance, leaving all the rocks with beacons to larboard and the Reguel Islands with Women's Island to starboard, and anchor in 6 or 7 fathoms; the flood comes from the N W"
+    says: "The river of Morlaix within the entrance, six or seven fathoms: the rocks with beacons on the larboard hand going in, and a pilot wanted, for all the ports of this coast are tide-ports."
+
+  - id: chateau-du-taureau
+    kind: castle
+    name: the castle of the Taureau
+    modern: Château du Taureau
+    lat_deg: 48.67750
+    lon_deg: -3.88518
+    height_m: 15
+    fix: "first placed at the modern chart's position, in 4.8 m of this region's grid; moved 160 m west to the grid's land of its rock by the head's rule"
+    source: "Bellin 1764, Petit Atlas Maritime t. V no. 51 (le Taureau), as package 35b read the sheet; the fort's building after 1542 from memory, unverified"
+    says: "The castle of the Taureau on its rock in the mouth of the river of Morlaix, the fort that guards the entrance."
+
+  - id: primel-point
+    kind: headland
+    name: the eastern point of Morlaix bay
+    modern: Pointe de Primel
+    lat_deg: 48.7140
+    lon_deg: -3.8170
+    height_m: 30
+    fix: "Faden's 'northernmost point of land on the east side of the entrance of Morlaix bay', taken for Primel"
+    source: "Faden 1793, 'Morlaix', p. 44: four leagues west of Lanion river is the eastern point of the river of Morlaix; steer for it W S W till within a mile of the rocks off it"
+    says: "The eastern point of Morlaix bay with its rocks a mile off; from it steer south by west for the river."
+
+  - id: st-pol-de-leon
+    kind: church
+    name: the church of St Pol de Léon
+    modern: Cathédrale Saint-Paul-Aurélien, Saint-Pol-de-Léon
+    lat_deg: 48.6857
+    lon_deg: -3.9857
+    height_m: 55
+    source: "Faden 1793, 'St Pol de Leon', p. 44: the coast of St Pol de Léon is a double land; the church of the city has two high spiry steeples, between which the Isle of Bas appears; the height judgement"
+    says: "The church of St Pol de Léon with its two high spires, between which the Isle of Bas appears from the sea."
+
   # ---------------------------------------------------------------------------
   # The Raz de Sein's marks north of 48 N (package 39b, the Biscay north block: they lie
   # in this region's bounds, so they are this file's; the Raz's stream area is the block's
-  # in data/tides/streams.yaml). Not in this region's index (features/channel-west.
-  # index.json, which only this region's build writes and which no block rewrites): they
-  # are found by name, and the lookout sees them when the region is next built.
+  # in data/tides/streams.yaml). This region's index (features/channel-west.index.json)
+  # was rebuilt from this file for them when the block was merged with 39a (no tile or
+  # coast of the region changed).
   # ---------------------------------------------------------------------------
 
   - id: la-vieille

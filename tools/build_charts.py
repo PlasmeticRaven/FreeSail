@@ -186,6 +186,17 @@ SOURCES: dict[str, dict[str, Any]] = {
 #   sources    the ids of `SOURCES` the region's tiles are cut from, in the order they are
 #              laid (the first for the depth and the coast, the next under it where the
 #              first has nothing); each must carry a licence in `ALLOWED_LICENCES`
+#   fill_to_chart_datum
+#              (package 39a; optional, false where absent, as channel-west's recipe is)
+#              GEBCO's fill under EMODnet, the land mostly, raised from mean sea level to
+#              the chart's datum by the world's mean level (`mean_level_grid`); a block
+#              on a coast of large tides sets it, or its low land floods at high water
+# The tile lists, and the seam (package 39a): the level-2 tiles are on one grid for every
+# region, so a region's edge column may be its neighbour's; a tile another region of the
+# manifest lists is that region's, computed with the block (the distance field sees the
+# shore across the seam) but not written, listed or drawn again (`tiles_listed_elsewhere`;
+# the build prints `tiles another region lists: n kept`). The `fetch` box must cover the
+# tiles whole, the seam's column and the harbours' tiles included (`--check` says).
 # Beside the recipe a block adds `data/charts/features/<region>.yaml`, the overrides under
 # `data/charts/overrides/<region>/` and lists the region in a chart of `CHARTS`. The
 # checks a block must pass are printed by `python tools/build_charts.py --check <region>`
@@ -206,6 +217,35 @@ REGIONS: dict[str, dict[str, Any]] = {
             "roscoff": {"south": 48.71, "north": 48.76, "west": -4.07, "east": -3.95},
         },
         "sources": ["emodnet_dtm_2024", "gebco_2025"],
+    },
+    # package 39a (spec M6 §26, block 1): abutting channel-west at 3 W exactly; the south
+    # bound lowered from the brief's 49 N to 48.5 N so that St Malo and its approaches
+    # (48.6 to 48.7 N) are the block's (docs/dev/ChartBlocks.md, the worked example)
+    "channel-mid": {
+        "title": "The Channel east, Lyme Bay to the Needles, the Channel Islands and St Malo",
+        "bounds": {"south": 48.5, "north": 51.0, "west": -3.0, "east": -1.0},
+        # the level-2 tiles that meet the bounds span 48.24 to 51.23 N and 3.36 to 0.80 W
+        # (the seam's column, 3.36 to 2.93 W, is channel-west's and is not written, but
+        # it is computed, so that the distance field knows the shore across the seam);
+        # Dartmouth's level-3 tiles reach 3.64 W
+        # (`--check` prints whether the box covers the tiles whole)
+        "fetch": {"south": 48.15, "north": 51.30, "west": -3.70, "east": -0.70},
+        # the level-3 harbour patches; Dartmouth and Torbay lie west of the bounds, in
+        # channel-west's water, where channel-west lists no level-3 tile: the patch and its
+        # marks are this block's (the bounds' check takes a harbour's box as the block's)
+        "harbours": {
+            "dartmouth-torbay": {"south": 50.30, "north": 50.50, "west": -3.62, "east": -3.47},
+            "portland-weymouth": {"south": 50.50, "north": 50.64, "west": -2.50, "east": -2.38},
+            "guernsey": {"south": 49.40, "north": 49.52, "west": -2.60, "east": -2.42},
+            "jersey": {"south": 49.15, "north": 49.23, "west": -2.22, "east": -2.05},
+            "alderney": {"south": 49.68, "north": 49.75, "west": -2.28, "east": -2.15},
+            "st-malo": {"south": 48.60, "north": 48.70, "west": -2.12, "east": -1.98},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # GEBCO's fill (the land) raised from mean sea level to the chart's datum by the
+        # world's mean level: St Malo's is 6.8 m above LAT, and the low land read as
+        # drying ground covered at high water without it (`mean_level_grid`)
+        "fill_to_chart_datum": True,
     },
     # package 39b: Biscay north, abutting channel-west at 48 N exactly. The southern and
     # eastern bounds are lowered from 46 N and 1 W to 45.9 N and 0.9 W so that Rochefort
@@ -256,7 +296,7 @@ CORRIDORS: dict[str, dict[str, Any]] = {
 CHARTS: dict[str, dict[str, Any]] = {
     "atlantic-east": {
         "title": "The Channel, Biscay and the Iberian coast to Madeira and the Strait",
-        "regions": ["channel-west", "biscay-north"],
+        "regions": ["channel-west", "channel-mid", "biscay-north"],
         "corridor": "atlantic-corridor",
     },
 }
@@ -783,26 +823,6 @@ def tiles_over(
     return out
 
 
-def tiles_listed_elsewhere(
-    region: str, others: dict[str, Any] | None = None
-) -> dict[int, set[str]]:
-    """The seam rule (packages 39a and 39b): the tiles of every level that another region
-    of the last manifest lists (`others`: its regions, read when not given). The level-2
-    tiles are on one grid for every region, so two regions that abut share the tiles that
-    straddle their edge; such a tile is the first region's, and a later region's build
-    does not write it again and does not list it (its grid still covers it, for the
-    distance field and the coast near the edge, and the coast is not drawn over it)."""
-    if others is None:
-        others = _last_manifest().get("regions") or {}
-    taken: dict[int, set[str]] = {}
-    for other, spec in others.items():
-        if other == region:
-            continue
-        for level, records in (spec.get("tiles") or {}).items():
-            taken.setdefault(int(level), set()).update(str(t["name"]) for t in records or [])
-    return taken
-
-
 def cell_centres(level: int, south_sec: int, west_sec: int) -> tuple[np.ndarray, np.ndarray]:
     cell = LEVELS[level]["cell_sec"] / 3600.0
     lats = south_sec / 3600.0 + (np.arange(TILE) + 0.5) * cell
@@ -1044,6 +1064,65 @@ def simplify(points: np.ndarray, tolerance: float) -> np.ndarray:
             stack.append((i, i + 1 + k))
             stack.append((i + 1 + k, j))
     return points[keep]
+
+
+# ---------------------------------------------------------------------------
+# GEBCO's fill raised to the chart's datum (package 39a)
+# ---------------------------------------------------------------------------
+
+TIDES_CONSTITUENTS = ROOT / "data" / "tides" / "constituents.yaml"
+# The grain of the mean level's grid the fill is raised by: the level varies over tens of
+# miles, so a twentieth of a degree is fine and the grid is small.
+FILL_LEVEL_CELL_DEG = 0.05
+
+
+def mean_level_grid(box: dict[str, float]) -> Grid:
+    """Mean sea level above the chart's datum over a box, as the world's tide has it
+    (`data/tides/constituents.yaml`: each gauge's `mean_level_m`, blended by the inverse
+    square of the distance over the gauges within `interpolation.reach_nm`, the nearest
+    alone beyond them, a gauge no nearer than 100 m; `freesail/world/tide.py`), on a grid
+    of FILL_LEVEL_CELL_DEG. GEBCO's heights are about mean sea level and the regions'
+    levels about LAT: where GEBCO fills a region's cells (the land, mostly), its height
+    plus this is the height above the datum the world's tide is reckoned from, so that
+    a low shore stands as high above the world's high water as it does above the sea's
+    (package 39a: at St Malo, whose mean level is 6.8 m above the datum, the low land
+    behind the town read as drying ground and was covered at high water)."""
+    doc = yaml.safe_load(TIDES_CONSTITUENTS.read_text(encoding="utf-8"))
+    interp = doc.get("interpolation") or {}
+    power = float(interp.get("power", 2))
+    reach = float(interp.get("reach_nm", 400.0)) * 1852.0
+    gauges = [
+        (
+            math.radians(float(g["lat_deg"])),
+            math.radians(float(g["lon_deg"])),
+            float(g["mean_level_m"]),
+        )
+        for g in doc["gauges"]
+    ]
+    cell = FILL_LEVEL_CELL_DEG
+    south = math.floor(box["south"] / cell) * cell - cell
+    west = math.floor(box["west"] / cell) * cell - cell
+    rows = int(math.ceil((box["north"] - south) / cell)) + 2
+    cols = int(math.ceil((box["east"] - west) / cell)) + 2
+    radius = 1852.0 * 60.0 * 180.0 / math.pi  # the game's sphere (freesail.world.geo)
+    values = np.zeros((rows, cols), dtype=np.float32)
+    for r in range(rows):
+        la = math.radians(south + (r + 0.5) * cell)
+        for c in range(cols):
+            lo = math.radians(west + (c + 0.5) * cell)
+            found = []
+            for gla, glo, level in gauges:
+                h = (
+                    math.sin((gla - la) / 2) ** 2
+                    + math.cos(la) * math.cos(gla) * math.sin((glo - lo) / 2) ** 2
+                )
+                found.append((2.0 * radius * math.asin(math.sqrt(min(1.0, h))), level))
+            within = [x for x in found if x[0] <= reach] or [min(found)]
+            weights = [1.0 / max(d, 100.0) ** power for d, _ in within]
+            values[r, c] = sum(w * lv for w, (_, lv) in zip(weights, within, strict=True)) / sum(
+                weights
+            )
+    return Grid(south, west, cell, values)
 
 
 # ---------------------------------------------------------------------------
@@ -1301,8 +1380,6 @@ class Build:
             f"{len(features)} features"
         )
         self.check_region(region, features, override_records)
-        # the seam rule: the tiles another region lists are theirs, not written nor listed
-        taken = tiles_listed_elsewhere(region)
         # level 2: the region whole
         out: dict[str, Any] = {
             "title": recipe["title"],
@@ -1316,23 +1393,44 @@ class Build:
             "harbours": recipe["harbours"],
         }
         coast_lines: list[dict[str, Any]] = []
+        # the region's tile lists, and the seam: a tile another region lists is that
+        # region's, computed with this block but neither written again nor listed here
+        tiles2 = tiles_over(2, b["south"], b["north"], b["west"], b["east"])
+        harbour_tiles = {
+            hname: tiles_over(3, hb["south"], hb["north"], hb["west"], hb["east"])
+            for hname, hb in recipe["harbours"].items()
+        }
+        taken = tiles_listed_elsewhere(region)
+        kept = sum(f"2/{tile_name(s, w)}" in taken for s, w in tiles2) + sum(
+            f"3/{tile_name(s, w)}" in taken for ts in harbour_tiles.values() for s, w in ts
+        )
+        self.log(f"  tiles another region lists: {kept} kept (theirs; not written, not listed)")
+        fill_level = None
+        if recipe.get("fill_to_chart_datum"):
+            fill_level = mean_level_grid(fb)
+            self.log(
+                f"  GEBCO's fill raised to the chart's datum by the world's mean level, "
+                f"{float(fill_level.values.min()):.2f} to {float(fill_level.values.max()):.2f} m"
+            )
+        out["fill_to_chart_datum"] = bool(fill_level is not None)
         out["tiles"]["2"] = self._build_level(
             2,
-            tiles_over(2, b["south"], b["north"], b["west"], b["east"]),
+            tiles2,
             g_emod,
             g_emod_max,
             g_gebco,
             patches,
             coast_lines,
             region,
-            taken=taken.get(2),
+            taken=taken,
+            fill_level=fill_level,
         )
         level3: list[dict[str, Any]] = []
-        for hname, hb in recipe["harbours"].items():
+        for hname, ts in harbour_tiles.items():
             self.log(f"  harbour patch {hname}")
             level3 += self._build_level(
                 3,
-                tiles_over(3, hb["south"], hb["north"], hb["west"], hb["east"]),
+                ts,
                 g_emod,
                 g_emod_max,
                 g_gebco,
@@ -1340,7 +1438,8 @@ class Build:
                 None,
                 region,
                 harbour=hname,
-                taken=taken.get(3),
+                taken=taken,
+                fill_level=fill_level,
             )
         out["tiles"]["3"] = level3
         # the coast
@@ -1380,14 +1479,15 @@ class Build:
         coast_lines: list[dict[str, Any]] | None,
         region: str,
         harbour: str | None = None,
-        taken: set[str] | None = None,
+        taken: frozenset[str] | set[str] = frozenset(),
+        fill_level: Grid | None = None,
     ) -> list[dict[str, Any]]:
         """The tiles of one level over the region or a harbour patch: EMODnet sampled,
         GEBCO under it where EMODnet is unknown, the overrides written, the distance
         field derived over the whole block (so a shore beyond a tile's edge counts), and
-        each tile written with its minimum depth. A tile in `taken` (the seam rule:
-        another region lists it) is computed with the block and neither written nor
-        listed, and the coast is not drawn over it."""
+        each tile written with its minimum depth. A tile in `taken` ('<level>/<name>',
+        another region's: the seam) is computed with the block and is not written,
+        listed or drawn in the coast."""
         cell_sec = LEVELS[level]["cell_sec"]
         unit_m = LEVELS[level]["unit_m"]
         souths = sorted({s for s, _ in tiles})
@@ -1401,8 +1501,12 @@ class Build:
         elev = g_emod.sample(lats, lons)
         under = g_gebco.sample(lats, lons)
         # GEBCO under everything: where EMODnet is unknown (the land, mostly) GEBCO's
-        # height relative to mean sea level stands, a few metres high against LAT on land
-        # and never read for depth there
+        # height relative to mean sea level stands. Read against LAT that height is LOW
+        # by mean sea level's height above LAT (package 39a: the low land behind St Malo
+        # was drying ground, covered at high water); a recipe with `fill_to_chart_datum`
+        # raises it by the world's mean level there (`mean_level_grid`)
+        if fill_level is not None:
+            under = under + fill_level.sample(lats, lons)
         unknown = np.isnan(elev)
         elev = np.where(unknown, under, elev)
         if coast_lines is not None:
@@ -1422,19 +1526,13 @@ class Build:
             t0 = time.time()
             segs = contour_segments(elev, lats, lons)
             if taken and len(segs):
-                # the seam rule: no coast over a tile another region lists (its own is drawn)
-                span = cell_sec * TILE / 3600.0
-                mid = segs.mean(axis=1)
-                over = np.zeros(len(segs), dtype=bool)
-                for s, w in tiles:
-                    if tile_name(s, w) in taken:
-                        over |= (
-                            (mid[:, 1] >= s / 3600.0)
-                            & (mid[:, 1] < s / 3600.0 + span)
-                            & (mid[:, 0] >= w / 3600.0)
-                            & (mid[:, 0] < w / 3600.0 + span)
-                        )
-                segs = segs[~over]
+                # the seam: the coast within another region's tiles is that region's
+                mid = segs.mean(axis=1)  # (lon, lat) of each segment's middle
+                corners = [tile_corner_sec(level, float(lat), float(lon)) for lon, lat in mid]
+                theirs = np.array(
+                    [f"{level}/{tile_name(s, w)}" in taken for s, w in corners], dtype=bool
+                )
+                segs = segs[~theirs]
             lines = chain_segments(segs)
             tol = 0.0003  # about 30 m of latitude
             scale = math.cos(mid_lat)
@@ -1457,11 +1555,9 @@ class Build:
         records = []
         folder = CHARTS_DIR / "tiles" / str(level)
         folder.mkdir(parents=True, exist_ok=True)
-        kept = 0
         for s, w in tiles:
-            if taken and tile_name(s, w) in taken:
-                kept += 1
-                continue
+            if f"{level}/{tile_name(s, w)}" in taken:
+                continue  # the seam: another region's tile
             r0 = int(round((s - south0) / cell_sec))
             c0 = int(round((w - west0) / cell_sec))
             block = elev[r0 : r0 + TILE, c0 : c0 + TILE]
@@ -1505,8 +1601,6 @@ class Build:
             f"    written: {len(records)} tiles, {total:,} bytes compressed "
             f"({len(records) * TILE * TILE * 4:,} raw)"
         )
-        if taken is not None:
-            self.log(f"    tiles another region lists: {kept} kept (not written, not listed)")
         return records
 
     # -- the blocks' checks (spec M6 §26; package 38) ----------------------------------
@@ -1545,18 +1639,25 @@ class Build:
             f"  licences: {', '.join(recipe.get('sources') or []) or 'none'} "
             f"({'allowed' if not failures else 'FAILED'})"
         )
-        # 2. the features within the bounds
+        # 2. the features within the bounds, or within one of the region's harbour patches
+        # (package 39a: Dartmouth's patch lies in channel-west's water, where channel-west
+        # has no level-3 tile; the patch and the marks it is drawn from are the block's)
+        boxes = [b, *(recipe.get("harbours") or {}).values()]
         outside = [
             f["id"]
             for f in features
-            if not (
-                b["south"] <= float(f["lat_deg"]) <= b["north"]
-                and b["west"] <= float(f["lon_deg"]) <= b["east"]
+            if not any(
+                x["south"] <= float(f["lat_deg"]) <= x["north"]
+                and x["west"] <= float(f["lon_deg"]) <= x["east"]
+                for x in boxes
             )
         ]
         if outside:
             failures.append(f"features outside the region's bounds: {', '.join(outside)}")
-        self.log(f"  features within the bounds: {len(features) - len(outside)} of {len(features)}")
+        self.log(
+            f"  features within the bounds: {len(features) - len(outside)} of {len(features)}"
+            f" (a harbour patch's box counts as the region's)"
+        )
         # 3. the ids unique across the manifest
         if others is None:
             others = _last_manifest().get("regions") or {}
@@ -1605,31 +1706,33 @@ class Build:
             f"  harbour patches with their datum stated: "
             f"{len(override_records) - len(undated)} of {len(override_records)}"
         )
-        # 6. the fetch box covers the tiles whole (package 39b: the tiles that meet the
-        # bounds reach up to a tile's span, 0.43 degrees at level 2, beyond them, so a
-        # quarter of a degree is not always enough; a tile beyond the fetch box would be
-        # GEBCO's at mean sea level where it should be EMODnet's at LAT)
+        # 6. the fetch box covers the tiles whole (package 39a): the level-2 tiles that
+        # meet the bounds, and the harbour patches' level-3 tiles, reach past the bounds by
+        # up to a tile (0.43 degrees at level 2); where the fetch falls short the tiles'
+        # edge is GEBCO's at mean sea level against EMODnet's LAT (package 38's finding)
         fb = recipe["fetch"]
-        boxes = [(2, b)] + [(3, hb) for hb in (recipe.get("harbours") or {}).values()]
-        uncovered = 0
-        for level, box in boxes:
+        need = [tiles_over(2, b["south"], b["north"], b["west"], b["east"])] + [
+            tiles_over(3, h["south"], h["north"], h["west"], h["east"])
+            for h in (recipe.get("harbours") or {}).values()
+        ]
+        short = []
+        for level, ts in zip([2] + [3] * (len(need) - 1), need, strict=True):
             span = tile_span_sec(level) / 3600.0
-            for s, w in tiles_over(level, box["south"], box["north"], box["west"], box["east"]):
-                s_deg, w_deg = s / 3600.0, w / 3600.0
-                if not (
-                    fb["south"] <= s_deg
-                    and s_deg + span <= fb["north"]
-                    and fb["west"] <= w_deg
-                    and w_deg + span <= fb["east"]
-                ):
-                    uncovered += 1
-        if uncovered:
-            failures.append(
-                f"{uncovered} tiles reach beyond the fetch box: widen `fetch` to cover them whole"
-            )
+            south = min(s for s, _ in ts) / 3600.0
+            west = min(w for _, w in ts) / 3600.0
+            north = max(s for s, _ in ts) / 3600.0 + span
+            east = max(w for _, w in ts) / 3600.0 + span
+            if fb["south"] > south or fb["north"] < north or fb["west"] > west or fb["east"] < east:
+                short.append(
+                    f"level {level} tiles {south:.2f} to {north:.2f} N, "
+                    f"{_lon_words(west, 2)} to {_lon_words(east, 2)}"
+                )
+        if short:
+            failures.append(f"the fetch box does not cover the tiles whole: {'; '.join(short)}")
         self.log(
-            f"  the fetch box covers the tiles whole: "
-            f"{'yes' if not uncovered else 'NO, ' + str(uncovered) + ' tiles beyond it'}"
+            f"  the fetch box covers the tiles whole: {'yes' if not short else 'NO'} "
+            f"({fb['south']:g} to {fb['north']:g} N, {_lon_words(fb['west'])} to "
+            f"{_lon_words(fb['east'])})"
         )
         # 7. the seam (packages 39a and 39b): a tile another region lists is that region's
         taken = tiles_listed_elsewhere(region, others)
@@ -1637,13 +1740,13 @@ class Build:
             2: [
                 t
                 for t in tiles_over(2, b["south"], b["north"], b["west"], b["east"])
-                if tile_name(*t) in taken.get(2, set())
+                if f"2/{tile_name(*t)}" in taken
             ],
             3: [
                 t
                 for hb in (recipe.get("harbours") or {}).values()
                 for t in tiles_over(3, hb["south"], hb["north"], hb["west"], hb["east"])
-                if tile_name(*t) in taken.get(3, set())
+                if f"3/{tile_name(*t)}" in taken
             ],
         }
         self.log(
@@ -2004,16 +2107,19 @@ class Build:
         last_sources = last.get("sources") or {}
         for sid, s in SOURCES.items():
             fetched = [f.record() for f in self.fetched[sid]]
-            # the last manifest's records of the files this run did not fetch, kept
-            # (package 39b: a `--region` build fetched its own extract and dropped the
-            # record of the corridor's, and of the other regions' subsets, which the
-            # carried entries were built from)
-            mine = {f["file"] for f in fetched}
+            # the earlier fetches carried over, the regions' and the corridor's that this
+            # run did not fetch again (package 39a: a block's build fetched the source
+            # anew and the others' records were dropped, the Channel's GEBCO extract
+            # among them when the corridor was built); this run's after them
+            files = {f["file"] for f in fetched}
             carried = [
                 f
                 for f in (last_sources.get(sid) or {}).get("fetched") or []
-                if f.get("file") not in mine
+                if f.get("file") not in files
             ]
+            if fetched:
+                fetched = carried + fetched
+                carried = []
             status = (
                 "fetched"
                 if fetched
@@ -2098,6 +2204,31 @@ def _last_manifest() -> dict[str, Any]:
     if not path.exists():
         return {}
     return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+
+
+def _lon_words(lon: float, places: int | None = None) -> str:
+    """A longitude as the checks print it: '3.45 W', '0.5 E'."""
+    v = abs(float(lon))
+    words = f"{v:.{places}f}" if places is not None else f"{v:g}"
+    return words + (" W" if lon < 0 else " E")
+
+
+def tiles_listed_elsewhere(region: str, others: dict[str, Any] | None = None) -> set[str]:
+    """The seam (packages 39a and 39b): the tiles, as '<level>/<name>', that a region of
+    the last manifest other than `region` lists (`others`: its regions, read when not
+    given). A level's tiles are on one grid for every region, so a region's edge column
+    may meet its neighbour's bounds too; such a tile is the region's that listed it first,
+    and the neighbour's build computes it with its block but neither writes it again nor
+    lists it (`Build.build_region`), and the coast is not drawn over it."""
+    if others is None:
+        others = _last_manifest().get("regions") or {}
+    out: set[str] = set()
+    for other, spec in others.items():
+        if other == region:
+            continue
+        for level, records in (spec.get("tiles") or {}).items():
+            out.update(f"{level}/{t['name']}" for t in records or [])
+    return out
 
 
 def _tiles_present(tiles: dict[str, Any], folder: Path) -> bool:

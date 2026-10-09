@@ -184,6 +184,22 @@ set the reckoning to 49 52 N 6 10 W
 
 The account is set there with a fresh doubt of a mile, and everything the master kept of the run since the last fix is forgotten.
 
+## A reckoning of your own
+
+The lieutenants and the young gentlemen kept a reckoning of their own from the same log-board, and so may you, at the captain's place or the officer of the watch's (chapter 16). `work my reckoning` gives the master's slate since his last fix: where it begins and his doubt there, each board as he laid it down (the course with his variation and leeway allowed, the distance, her way by the log, the tide he allowed), each sight he worked in since and how far it moved his account, and the board in hand. It is a reading for the one who asked, in the reply, and never a line of the log; it draws nothing and changes nothing. `my reckoning is <position>`, in the form `set the reckoning to` takes, gives your own back: kept beside the master's, moving nothing, run on by the log-board, and said at noon in the line after the noon's, with how far and which way it lies from his account before the sight and where the sun's latitude lies from it. It is carried on from that noon figure to the next noon, and the next, until another is given; it is forgotten when the one who gave it leaves the station. `the officer's reckoning` reads the officer of the watch's as it stands, and the captain adopts it, if he will, with `set the reckoning to`. A standing order may give neither: a reckoning is a man's working, never a book's.
+
+```orders frigate
+work my reckoning
+my reckoning is 49 52 N 5 10 W
+the officer's reckoning
+```
+
+```
+* Afternoon watch, 8 bells (12:00)  The officer of the watch's own reckoning (Mr Pearce), worked at 11:31 and run on by the log-board: 49° 39' N, 5° 04' W, on the master's account before the sight, within what he would trust it. The latitude by observation lies five miles N of his.
+```
+
+[Chapter 18](18-lessons.md) works a slate through by the traverse table and has the noon it was judged at.
+
 ## Shaping a course
 
 `shape a course for <place>` reads the reckoning and the chart's places, never the truth. The master lays off the line from where he thinks she is to where the chart puts the place, and the helm is ordered the course to steer so that she makes that line good: against the tide he is allowing at that hour (his own, or yours), with the leeway he allows when she must lie close-hauled, at her way by the log's last read or by eye. The words give both the line and the course, and how long the allowance holds. It is worked once, when the course is shaped, and again each time a standing order shapes one; the master does not alter the helm of himself when the tide turns, so shape it again then (`at the turn of the tide by the reckoning` is an event for the book). Where the chart has no such place the order is refused with the places it has.
@@ -212,6 +228,7 @@ If the account is six miles east of the truth, the course laid off for Falmouth 
 | `the distance run since noon`, `the course made good` | by account; "no noon yet" before the first |
 | `the latitude by observation` | today's, or why there is none |
 | `the master` | his name, his place (on deck, below) and what occupies him |
+| `the officer's reckoning` | the officer of the watch's own reckoning (above), run on by the log-board, how far and which way it lies from the master's account, and whether within what the master would trust it; "none held" until he gives one, and after he leaves the station |
 | `what is in sight`, `the land` | the lookout's, as chapter 9's neighbour built them |
 | `the nearest land` | the nearest shore within a league as the lookout sees it: where it lies from her head, its bearing, its distance by estimation, the coast's name |
 | `the depth of water` | the chart's depth at the position by account, at low water, said as the chart's and never as a cast, with what the chart shows within his doubt when that differs by a fathom or more: "eleven fathoms at low water by the chart, at the position by account; the chart has seven fathoms to fifteen within the account's doubt" |
@@ -242,6 +259,8 @@ Every way the grammar takes each of the master's orders and each of the reckonin
 | `work up the reckoning` | `work the reckoning`, `work up the dead reckoning`, `bring up the reckoning`, `the day's work`, `work up a reckoning`, `work up reckoning`, `work up the reckoning's uncertainty`, `work up the reckoning's doubt` | the account brought up to now, with the master's doubt |
 | `observe the sun` | `take the sun`, `take a sight of the sun`, `take the noon sight`, `take the sun's altitude`, `observe the sun at noon`, `take a meridian altitude` | the noon sight by order, in the quarter of an hour before noon |
 | `set the reckoning to 49 52 N 6 10 W` | `set the reckoning at 49 52 N 6 10 W`, `correct the reckoning to 49 52 N 6 10 W`, `put the reckoning at 49 52 N 6 10 W` | the captain overrides the master |
+| `work my reckoning` | `work up my reckoning`, `work my own reckoning`, `work up my own reckoning`, `show me the slate`, `show me the master's slate` | the master's slate since his last fix, for your own reckoning; in the reply, never in the log |
+| `my reckoning is 49 52 N 6 10 W` | `my own reckoning is 49 52 N 6 10 W`, `my reckoning puts her at 49 52 N 6 10 W`, `my reckoning puts her in 49 52 N 6 10 W` | your own reckoning, kept beside the master's and said after the noon's line; it moves nothing |
 | `allow one knot of set to the east` | `allow for one knot of set to the east`, `allow half a knot of set to the south west`, `allow one and a half knots of set to the east`, `allow a quarter of a knot of set to the south by west half west`, `allow no set` | your own set in the traverse and in a course shaped, in place of the master's tide until you hand it back |
 | `allow the tide by the book` | `allow the tide`, `allow for the tide`, `allow the tide by the directions`, `allow the master's tide`, `work the tide yourself`, `work the tide by the book`, `reckon the tide by the book`, `hand the tide back`, `hand back the tide` | the tide in the reckoning handed back to the master |
 | `shape a course for Falmouth` | `shape a course to Falmouth`, `shape course for Falmouth`, `lay a course for Falmouth`, `set a course for Falmouth`, `make for Falmouth`, `steer for Falmouth`, `head for Falmouth` | the course to steer to make good the line from the account to a place of the chart, the tide allowed |
@@ -255,6 +274,7 @@ Every way the grammar takes each of the master's orders and each of the reckonin
 | `the course made good` | `what is the course made good` | since noon, by account |
 | `the latitude by observation` | `the observed latitude`, `the latitude` | today's noon latitude, or why there is none |
 | `the master` | `what is the master` | his name, his place and what occupies him |
+| `the officer's reckoning` | `the officers reckoning`, `the officer's own reckoning`, `what is the officer's reckoning` | the officer of the watch's own reckoning, run on by the log-board, and where it lies from the master's account; none until he gives one |
 | `where is the Lizard` | `where is Ushant`, `where is lizard` | a mark of the chart: in sight, the lookout's bearing and estimate; else its bearing and distance by account |
 | `what is in sight` | `the sightings`, `sightings` | the lookout's sightings, by bearing and estimated distance |
 | `the land` | `what is the land` | whether any land is in sight, and the nearest |

@@ -28,6 +28,7 @@ from freesail.core.events import Severity
 from freesail.core.world import Scenario, _dragging_advice
 from freesail.physics import anchor as A
 from freesail.ship.parts import AnchorState, ground_tackle
+from freesail.world.chart import load_chart
 
 FRIGATE = "data/ships/frigate-36.yaml"
 SCHOONER = "data/ships/topsail-schooner.yaml"
@@ -491,16 +492,24 @@ def test_every_ports_road_and_anchorage_has_its_note_of_the_bottom():
     """Brest road had none though the pilot says mud: an anchor let go before the town
     lay on no note at all, and held as on unknown ground. On the whole chart, which holds
     every port's water (package 39b: Biscay north's ports beside the Channel's)."""
-    w = road_world(FRIGATE, where={"lat_deg": 49.80, "lon_deg": -5.20}, chart="atlantic-east")
+    w = road_world(FRIGATE, where={"lat_deg": 49.80, "lon_deg": -5.20})
+    # package 39a: every port is loaded on channel-west's chart, but the Channel east's
+    # notes are on the whole chart, which is where its ports are sailed to (and Biscay
+    # north's, package 39b)
+    whole = load_chart("atlantic-east")
+    assert {"lorient", "le-palais", "paimboeuf", "la-rochelle", "rochefort"} <= set(w.ports.ports)
     bare = []
     for pid, port in w.ports.ports.items():
         for label in ("outer_road", "anchorage", "mooring"):
             spot = getattr(port, label, None)
             if spot is None or spot.position is None:
                 continue
-            if not w.chart.bottom_near(spot.position):
+            if not whole.bottom_near(spot.position):
                 bare.append((pid, label))
-    assert bare == []
+    # Morlaix's note is its river's anchorage in channel-west's features file (the lead
+    # rebuilt channel-west's index from the file at 39a's merge); its outer road and the
+    # town's mooring have none until a period source gives the bottom there
+    assert bare == [("morlaix", "outer_road"), ("morlaix", "mooring")]
     brest = w.ports.ports["brest"]
     assert w.chart.bottom_near(brest.mooring.position) == "mud"
     assert w.chart.feature("brest-road").bottom == "mud"

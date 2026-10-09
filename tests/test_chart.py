@@ -14,6 +14,7 @@ Truth 65 and the pace truth are in test_known_truths.py.
 from __future__ import annotations
 
 import importlib.util
+import json
 import math
 import subprocess
 import sys
@@ -841,6 +842,7 @@ def test_the_coasts_distance_at_the_ship_is_the_charts_at_her_position_after_a_l
 
 WHOLE = "atlantic-east"
 CORRIDOR = "atlantic-corridor"
+MID = "channel-mid"  # package 39a
 # The corridor's budget (spec M6 §26: "some 11 MB raw, half that compressed"; with the
 # distance field the tiles compress to under 6 MB, measured in package 38).
 CORRIDOR_BUDGET_BYTES = 8 * 1024 * 1024
@@ -865,11 +867,12 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     under them, its bounds and words the whole's; a region's name still loads a chart of
     that region alone (every scenario of the Channel reads what it read); a name the
     manifest has not is refused in words that list both."""
-    # package 39b: Biscay north beside the Channel
-    assert manifest["charts"][WHOLE]["regions"] == ["channel-west", "biscay-north"]
+    # package 39a: the Channel east beside the Channel west, in the order the voyage
+    # sails them; package 39b: Biscay north after them
+    regions = ["channel-west", MID, "biscay-north"]
+    assert manifest["charts"][WHOLE]["regions"] == regions
     assert manifest["charts"][WHOLE]["corridor"] == CORRIDOR
-    assert whole.region == whole.name == WHOLE
-    assert whole.regions == ["channel-west", "biscay-north"]
+    assert whole.region == whole.name == WHOLE and whole.regions == regions
     assert [lv.level for lv in whole.levels] == [3, 2, 1]
     # the envelope of the regions and the corridor: Biscay north reaches 0.9 W for
     # Rochefort on the Charente (package 39b)
@@ -879,14 +882,20 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     assert not whole.contains(Position(52.0, -5.0))
     assert whole.region_at(LIZARD) == "channel-west" and whole.region_at(OFF_LISBON) is None
     # the features of every region, indexed together, and every region's coast
+    mid = load_chart(MID)
     biscay = load_chart("biscay-north")
-    assert whole.features.keys() == chart.features.keys() | biscay.features.keys()
+    assert whole.features.keys() == (
+        chart.features.keys() | mid.features.keys() | biscay.features.keys()
+    )
     assert all(whole.region_of[fid] == "channel-west" for fid in chart.features)
+    assert all(whole.region_of[fid] == MID for fid in mid.features)
     assert all(whole.region_of[fid] == "biscay-north" for fid in biscay.features)
     assert whole.find_feature("the Lizard") is chart.find_feature("the Lizard") or (
         whole.find_feature("the Lizard").id == chart.find_feature("the Lizard").id
     )
-    assert len(whole.coast_lines()) == len(chart.coast_lines()) + len(biscay.coast_lines())
+    assert len(whole.coast_lines()) == (
+        len(chart.coast_lines()) + len(mid.coast_lines()) + len(biscay.coast_lines())
+    )
     assert len(chart.coast_lines()) > 0 and len(biscay.coast_lines()) > 0
     # the one-region chart as before: its own levels and bounds, no corridor
     assert [lv.level for lv in chart.levels] == [3, 2] and chart.corridor is None
@@ -1141,10 +1150,10 @@ def test_the_recipe_form_the_checks_and_a_region_build_that_leaves_the_rest_unto
     out = capsys.readouterr().out
     for words in (
         "licences: emodnet_dtm_2024, gebco_2025 (allowed)",
-        # package 39b: the Raz de Sein's ten marks north of 48 N in this file
-        "features within the bounds: 217 of 217",
+        # package 39a's five marks of Morlaix and package 39b's ten of the Raz de Sein
+        "features within the bounds: 222 of 222",
         "ids unique across the manifest's regions: yes",
-        "sources in the references' form: 217 of 217",
+        "sources in the references' form: 222 of 222",
         "harbour patches with their datum stated: 5 of 5",
         "passes its checks",
     ):
@@ -1199,6 +1208,133 @@ def test_the_recipe_form_the_checks_and_a_region_build_that_leaves_the_rest_unto
 
 
 # ---------------------------------------------------------------------------
+# Package 39a: the Channel east (spec M6 §26, block 1; docs/dev/ChartBlocks.md)
+# ---------------------------------------------------------------------------
+
+THE_RACE = Position(49.70, -2.06)
+GUERNSEY_GREAT_ROAD = Position(49.4570, -2.5215)
+
+
+def test_the_channel_east_passes_its_checks_and_cites_its_sources(capsys):
+    """The block's checks, printed by the tool and passing; every feature and override
+    citing a source in the references' form; the lights dated so that 1805 sees the
+    Casquets, Portland's two, the Needles' cliff-top light, Hurst's first tower, Barfleur
+    and Fréhel, and none of the later lights."""
+    tool = build_tool()
+    assert tool.main(["--check", MID]) == 0
+    out = capsys.readouterr().out
+    for words in (
+        "licences: emodnet_dtm_2024, gebco_2025 (allowed)",
+        "ids unique across the manifest's regions: yes",
+        "harbour patches with their datum stated: 2 of 2",
+        "the fetch box covers the tiles whole: yes",
+        "passes its checks",
+    ):
+        assert words in out, words
+    features, _ = tool.load_features(MID)
+    assert len(features) >= 100
+    assert f"features within the bounds: {len(features)} of {len(features)}" in out
+    patches, records = tool.load_overrides(MID)
+    assert {r["file"].split("/")[-1] for r in records} == {"st-malo.yaml", "dartmouth-torbay.yaml"}
+    for r in records:
+        assert r["sheet"] and r["source"] and r["units"] and r["datum"]
+        assert r["control_points"]
+    whole = load_chart(WHOLE)
+    lights = [whole.feature(f["id"]) for f in features if f["kind"] == "light"]
+    assert sorted(f.id for f in lights if f.lit_in(1805)) == [
+        "barfleur-light",
+        "casquets-lights",
+        "frehel-light",
+        "hurst-light",
+        "needles-cliff-light",
+        "portland-high-light",
+        "portland-low-light",
+    ]
+    assert whole.feature("needles-light").lit_in(1860) and not whole.feature(
+        "needles-cliff-light"
+    ).lit_in(1860)
+
+
+def test_the_seam_at_3_w_a_tile_channel_west_lists_is_channel_wests(manifest):
+    """The brief's item 2: the level-2 tiles are on one grid for every region and
+    channel-west's easternmost column reaches past 3 W; the Channel east's build kept
+    those tiles channel-west's, neither written again nor listed twice, and its own
+    begin at the next column; every tile it lists is present; GEBCO's fill under its
+    tiles was raised to the chart's datum."""
+    tool = build_tool()
+    west = manifest["regions"]["channel-west"]
+    mid = manifest["regions"][MID]
+    for level in ("2", "3"):
+        theirs = {t["name"] for t in west["tiles"].get(level, [])}
+        ours = {t["name"] for t in mid["tiles"].get(level, [])}
+        assert not theirs & ours, level
+        for name in ours:
+            assert (CHARTS / "tiles" / level / f"{name}.npz").exists(), name
+    span = tool.tile_span_sec(2)
+    seam_column = int(round((-180 * 3600) + math.floor((-3.0 + 180.0) * 3600 / span) * span))
+    assert seam_column == -12096  # 3.36 W to 2.93 W
+    assert all(t["west_sec"] == seam_column for t in west["tiles"]["2"] if t["west_sec"] > -12100)
+    assert min(t["west_sec"] for t in mid["tiles"]["2"]) == seam_column + span
+    taken = tool.tiles_listed_elsewhere(MID)
+    assert {f"2/{t['name']}" for t in west["tiles"]["2"]} <= taken
+    assert mid["fill_to_chart_datum"] is True and "fill_to_chart_datum" not in west
+    # a point a cable either side of the seam reads its own region's tile, and the depth
+    # does not step across it more than the bottom's own slope (the two tiles were cut
+    # from the one EMODnet grid)
+    whole = load_chart(WHOLE)
+    east_edge = (seam_column + span) / 3600.0
+    a, b = Position(50.0, east_edge - 0.002), Position(50.0, east_edge + 0.002)
+    assert whole.level_at(a) == whole.level_at(b) == 2
+    assert abs(whole.depth_at(a) - whole.depth_at(b)) < 1.0
+
+
+def test_a_landfall_on_the_channel_east_by_day_and_by_night():
+    """Ten miles north of the Casquets: by day the rocks, Alderney's land and Burhou; by
+    night the Casquets' three lights alone, lit since 1724; ten miles south of Portland
+    Bill by night, Portland's two lights and nothing of the Start's (1836)."""
+    whole = load_chart(WHOLE)
+    eye = 36.0
+    off = destination(Position(49.7215, -2.3790), 0.0, 10 * units.NAUTICAL_MILE)
+    by_day = {
+        s.feature.id for s in whole.in_sight(off, eye, None, "day", datetime(1805, 6, 12, 12))
+    }
+    assert "casquets-lights" in by_day  # the ledge itself, a danger, is made out only close-to
+    assert by_day & {"st-anne-alderney", "burhou", "ortac"}
+    by_night = whole.in_sight(off, eye, None, "night", datetime(1805, 6, 12, 23, 30))
+    assert {s.feature.id for s in by_night} == {"casquets-lights"}
+    assert {s.seen_as for s in by_night} == {"light"}
+    south_of_portland = destination(Position(50.5135, -2.4570), 180.0, 10 * units.NAUTICAL_MILE)
+    lights = {
+        s.feature.id
+        for s in whole.in_sight(
+            south_of_portland, eye, None, "night", datetime(1805, 6, 12, 23, 30)
+        )
+    }
+    assert lights == {"portland-high-light", "portland-low-light"}
+
+
+def test_the_depth_in_the_channel_easts_roads_and_its_patches():
+    """The Great Road of Guernsey in its nine to sixteen fathoms; Brixham road in its six
+    or seven; the road of St Malo and the Dart at the period patches' depths (Bellin's
+    four brasses and a half, Imray's five fathoms), at level 3."""
+    whole = load_chart(WHOLE)
+    d = whole.depth_at(GUERNSEY_GREAT_ROAD)
+    assert 12.0 < d < 30.0, d
+    assert whole.level_at(GUERNSEY_GREAT_ROAD) == 3
+    brixham = Position(50.4100, -3.4950)
+    assert 8.0 < whole.depth_at(brixham) < 16.0
+    st_malo = Position(48.6460, -2.0410)
+    assert whole.depth_at(st_malo) == pytest.approx(4.5 * 1.624 + 1.5, abs=0.15)
+    dart = Position(50.3490, -3.5712)
+    assert whole.depth_at(dart) == pytest.approx(5 * units.fathoms_to_m(1.0) + 0.8, abs=0.15)
+    assert whole.level_at(dart) == 3
+    tile = whole.levels[0].tile_at(dart.lat_deg, dart.lon_deg)
+    assert tile is not None and tile.level == 3
+    # the Race's water, deep, is the region's level 2
+    assert whole.level_at(THE_RACE) == 2 and whole.depth_at(THE_RACE) > 30.0
+
+
+# ---------------------------------------------------------------------------
 # Package 39b: Biscay north, the second block (spec M6 §26)
 # ---------------------------------------------------------------------------
 
@@ -1225,7 +1361,8 @@ def test_biscay_north_is_a_region_beside_the_channel_that_lists_none_of_its_tile
     }
     shared = every - mine["2"]
     assert len(every) == 60 and len(mine["2"]) == 55 and shared <= theirs["2"] and len(shared) == 5
-    assert tool.tiles_listed_elsewhere(BISCAY, manifest["regions"])[2] >= shared
+    taken = tool.tiles_listed_elsewhere(BISCAY, manifest["regions"])
+    assert {f"2/{name}" for name in shared} <= taken
     total = 0
     for level, tiles in entry["tiles"].items():
         for t in tiles:
@@ -1297,7 +1434,7 @@ def test_the_depths_in_biscay_norths_roads_and_the_period_patch_at_aix():
     to 12 fathoms, the road of Palais in his 8 to 15; the road of Aix where Bellin's five
     brasses are patched (9.1 m below the chart's datum with the RAM's metre), which the
     modern grid has silted to under three metres; the marks of the Raz de Sein in the
-    Channel's file found by name on the whole chart (not yet in its index)."""
+    Channel's file found by name on the whole chart, and in the Channel's index."""
     whole = load_chart(WHOLE)
     assert whole.level_at(Position(47.495, -2.98)) == 3
     assert 8 * units.FATHOM * 0.5 < whole.depth_at(Position(47.495, -2.98)) < 12 * units.FATHOM
@@ -1308,3 +1445,6 @@ def test_the_depths_in_biscay_norths_roads_and_the_period_patch_at_aix():
         f = whole.find_feature(name)
         assert f is not None and whole.region_of[f.id] == REGION, name
     assert whole.find_feature("the Raz").id == "pointe-du-raz"  # the recorded passages' word
+    index = json.loads((CHARTS / "features" / "channel-west.index.json").read_text())
+    indexed = {fid for ids in index["cells"].values() for fid in ids}
+    assert {"la-vieille", "raz-passage", "tevennec-light", "morlaix"} <= indexed

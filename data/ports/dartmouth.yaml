@@ -1,0 +1,124 @@
+# FreeSail: Dartmouth as a port (spec M6 §26, block 1; package 39a). The same form as
+# falmouth.yaml, on package 35's machinery (freesail/world/ports.py); the harbour is the
+# patch data/charts/overrides/channel-mid/dartmouth-torbay.yaml (the Dart's channel at the
+# pilot's depths) and the marks are features/channel-mid.yaml's.
+#
+# Sources. White 1835, 'Coast of England', pp. 39 to 41: well adapted for trading vessels
+# in any number, the entrance narrow and not readily unfolding to a ship from the
+# southward; Stoke Fleming's square steeple marks it until Kingswear Old Castle and St
+# Petrox church come in sight; the Homestone 220 fathoms south of the Blackstone with as
+# little as three feet, the ledges off Proward Point, the Checkstone off the Battery
+# Point; keep the Castle open east of the Blackstone, Kingswear Point in one with the
+# Castle, the westernmost house in Kingswear open of Petrox Point; anchor abreast of
+# Kingswear or Dartmouth; the flaws off the high land, so that no square-rigged vessel
+# enters or leaves but with a leading wind, which "operate strongly against Dartmouth as
+# a rendezvous for cruizers"; the Range in five fathoms only to wait; the flood along the
+# shore from the Homestone to the Castle and across the harbour point to point. Imray
+# 1874, 'Dartmouth', p. 69: the depths in mid-channel; high water full and change 6h 16m,
+# springs rising 14 feet 10 inches.
+#
+# The datum. The patch's depths are Imray's at low water, the datum's height above the
+# chart's UNVERIFIED (the override's head): `datum: unverified` below, as package 35b's
+# ports said where no table was read.
+#
+# The market is the Newfoundland trade Dartmouth lived by and the Devon country's
+# produce, FROM MEMORY and JUDGEMENT as package 35's files are; sterling.
+
+id: dartmouth
+name: Dartmouth
+nation: britain
+source: "White 1835, 'Coast of England', pp. 39 to 41; Imray 1874, 'Dartmouth', p. 69"
+datum: unverified   # the Dart's depths at the pilot's low water; MLWS above LAT not read (the override)
+
+# The outer road is the Range outside the entrance, where a ship waits for the wind and
+# the tide and the pilot; the anchorage is the harbour abreast of Kingswear; the mooring
+# the same water nearer the town for a small vessel. Each spot names its feature and
+# repeats its position, for a world on channel-west's chart alone, which has not these
+# features.
+outer_road:
+  feature: the-range-dartmouth
+  name: the Range
+  lat_deg: 50.3345
+  lon_deg: -3.5490
+  depth_fathoms: 5
+anchorage:
+  feature: dartmouth-harbour
+  name: Dartmouth harbour, abreast of Kingswear
+  lat_deg: 50.3490
+  lon_deg: -3.5712
+  depth_fathoms: 5
+mooring:
+  name: the pool off Dartmouth town
+  lat_deg: 50.3525     # the upper end of the patch's five fathoms, off the quays
+  lon_deg: -3.5750
+  depth_fathoms: 4
+  bottom: mud
+  deep_draught_ft: 14  # judgement: a ship of more draught lies lower down, abreast of Kingswear
+shore:
+  name: the quay at Dartmouth
+  lat_deg: 50.3515
+  lon_deg: -3.5785
+
+pilot:
+  station: the-range-dartmouth
+  cruising_nm: 5                 # judgement: the Dartmouth pilots met ships off the Mewstone and the Range
+  comes_off_by_night: false      # judgement: no light at the harbour's mouth in 1805
+  cutter: data/ships/cutter.yaml
+  names: [Holdsworth, Newman, Seale, Teage, Lidstone, Pinsent, Lamble, Coaker]   # Devon names: judgement
+  skill: 0.9
+  fee_pounds: 4                  # judgement, below Falmouth's; unverified
+  cast: larboard                 # from the harbour the head paying off to the southward, down the river (judgement)
+  course_out_deg: 150            # down the harbour past the Castle and out by the Range
+  words:
+    channel: "The entrance is narrow and does not open till you are near it. Keep the Castle open to the eastward of the Blackstone to pass east of the Homestone, which has sometimes but three feet on it; give the Blackstone half a cable and steer for the harbour's mouth, keeping the westernmost house in Kingswear open of Petrox Point for the Checkstone; then keep the western shore aboard."
+    marks: "The square steeple of Stoke Fleming church by its white house shows you where the harbour lies; then Kingswear Old Castle on the east side and St Petrox church and Dartmouth Castle on the west. Kingswear Point in one with the Castle keeps you off the ledges of Proward Point."
+    anchorage: "Anchor abreast of Kingswear or the town, five fathoms and more in the channel; the Range outside, in five fathoms, is only to wait in, for a southerly wind sends in a sea that leaves nothing but to slip. No square-rigged vessel should come in or go out but with a leading wind: the flaws come off the high land very suddenly."
+    tide: "It is high water here about six o'clock at full and change, springs rising near fifteen feet. The flood runs along the shore from the Homestone to the Castle and crosses the harbour point to point; come in on the flood and go out on the ebb."
+
+tide:
+  establishment: Dartmouth       # the epitome's row (data/tides/establishments.yaml)
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  # price: pounds a ton at the quay, FROM MEMORY and JUDGEMENT (the head)
+  goods:
+    - {good: salt fish, price: 22, origin: britain, note: "Newfoundland cod brought home by the Dartmouth ships; from memory, judgement"}
+    - {good: train oil, price: 30, origin: britain, note: "cod oil from the Newfoundland fishery; judgement"}
+    - {good: cider, price: 12, origin: britain, season: {10: 0.8, 11: 0.8, 5: 1.2, 6: 1.2}, note: "Devon cider by the hogshead; judgement"}
+    - {good: wool, price: 60, origin: britain, note: "Devon wool for the serge makers; judgement"}
+    - {good: salt, price: 25, origin: britain, note: "under the duty, as at Falmouth; from memory"}
+    - {good: coal, price: 2, origin: britain, season: {11: 1.2, 12: 1.2, 1: 1.2, 2: 1.2}, note: "Welsh coal; from memory as at Falmouth"}
+    - {good: canvas, price: 60, origin: britain, note: "Bridport sailcloth; from memory as at Falmouth"}
+    - {good: hemp, price: 70, origin: null, note: "Baltic hemp at war prices; from memory"}
+    - {good: wine, price: 70, origin: portugal, season: {12: 1.1}, note: "Portuguese wine from the Newfoundland ships' return voyages; from memory"}
+    - {good: timber, price: 6, origin: britain, note: "Dart valley oak for the builders; from memory"}
+    - {good: salt beef, price: 55, origin: britain, note: "Irish beef; from memory as at Falmouth"}
+    - {good: tin, price: 122, origin: britain, note: "Cornish tin come round; from memory, a little over Falmouth's"}
+
+dockyard:
+  kind: chandlers                # the river's merchant builders and chandlers; no King's yard
+  items:
+    - {item: topmast, hours: 8, pounds: 40, note: "a spar from the builders on the river: judgement"}
+    - {item: topgallant_mast, hours: 4, pounds: 12}
+    - {item: yard, hours: 6, pounds: 25}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 25, note: "judgement, as at Falmouth"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.06}
+    - {item: water, hours_per_ton: 0.1, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05}
+
+crew_pool:
+  # judgement: Newfoundland men between voyages, and the press about
+  able: {hands: 5, pounds: 3, delay_h: 12}
+  ordinary: {hands: 8, pounds: 2, delay_h: 12}
+  landsman: {hands: 10, pounds: 1, delay_h: 6}
+
+closed_to: []
+
+# The port's tracks (spec M6 §4), for the rules-based captain's planner: out by the Range
+# to the offing south-east of the entrance, clear of the Homestone; in the reverse.
+tracks:
+  to_sea: [the-range-dartmouth, 50 18 N 3 30 W]
+  from_sea: [50 18 N 3 30 W, the-range-dartmouth]
+  in: [dartmouth-harbour]

@@ -3,10 +3,20 @@
 "cells": {
 "192,-19": [
 "bec-de-la-chevre",
-"pointe-du-raz"
+"pointe-du-raz",
+"audierne",
+"raz-light"
 ],
 "192,-20": [
-"ile-de-sein"
+"ile-de-sein",
+"la-vieille",
+"la-plate",
+"tevennec",
+"pont-des-chats",
+"raz-passage",
+"chaussee-de-sein",
+"tevennec-light",
+"la-vieille-light"
 ],
 "192,-21": [
 "ar-men"
@@ -72,7 +82,12 @@
 "194,-16": [
 "roscoff",
 "roscoff-church",
-"ile-verte-roscoff"
+"ile-verte-roscoff",
+"morlaix",
+"morlaix-river",
+"chateau-du-taureau",
+"primel-point",
+"st-pol-de-leon"
 ],
 "194,-17": [
 "ile-de-batz",

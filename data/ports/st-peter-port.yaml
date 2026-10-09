@@ -1,0 +1,127 @@
+# FreeSail: St Peter Port, Guernsey, as a port (spec M6 §26, block 1; package 39a). The
+# same form as falmouth.yaml, on package 35's machinery; the marks are
+# features/channel-mid.yaml's; no patch (below).
+#
+# Sources. Faden 1793, 'Isle of Guernsey' and its four parts, pp. 31 to 34 (Captain
+# Dobree's directions, in period exactly): the town of St Peter on the east coast, a port
+# between two stone piers 35 feet high, the entrance 100 feet wide at the top; the sea
+# rises 28 and 30 feet at springs and 12 or 14 at neaps, flowing at full and change six
+# hours; the Little Russel between Guernsey and Herm, 5 or 6 fathoms at low water neaps,
+# St Martin's Point a sail's breadth west of Brehon (a rock with a stone pyramid twenty
+# feet high) the mark in, the Rousse kept close aboard to larboard for Roustel, the most
+# dangerous rock, never seen but at half ebb; the flood not running in either Russel till
+# the sea is at half its height; the Great Russel between Herm and Sark, convenient for
+# ships of all sorts; the Great Road from St Martin's Point to a mile S S W of Brehon,
+# 25 to 10 1/2 fathoms, very good bottom, half a mile from Cornet Castle. White 1835,
+# 'Guernsey', pp. 94 to 97: the Great Road the anchorage of His Majesty's ships, 9 to 16
+# fathoms on very fine sand, open only from S S W to S by E; the Little Road north of
+# Castle Cornet for the traders, 2 to 4 fathoms; the pier's swell in a southerly gale;
+# high water full and change at six, the springs rising 31 feet at the equinoxes.
+#
+# The datum. Bellin's 'Coste de Normandie depuis l'Ance de Vauville jusqu'à Surville, avec
+# les isles de Grenesey et d'Aurigny' (Petit Atlas Maritime t. V no. 39, David Rumsey
+# 6903.526) was read at the IIIF server's overview: a coastal chart at four common leagues
+# to the scale, its soundings in the offing (30s south of Guernsey, 15 to 18 in the Great
+# Russel), no plan of the roads; no harbour patch rests on it, and `datum: unverified`.
+#
+# The stance: the island is the King's (data/nations.yaml): open to a British ship,
+# hostile to a French one, neutral to the rest. Guernsey's merchants kept the entrepôt of
+# the smugglers' trade (spirits, tea and tobacco bought in bond and run to England), which
+# the market's prices say; FROM MEMORY and JUDGEMENT throughout, sterling.
+
+id: st-peter-port
+name: St Peter Port
+nation: britain
+source: "Faden 1793, 'Isle of Guernsey', pp. 31 to 34; White 1835, 'Guernsey', pp. 94 to 97 and 109"
+datum: unverified   # Bellin's sheet of the islands has no plan of the roads; the grid's depths stand
+
+# The outer road is the Little Russel, where the pilots meet a ship from the north; the
+# anchorage the Great Road off the town, the King's ships'; the mooring the Little Road
+# north of Castle Cornet, the traders'.
+outer_road:
+  feature: the-little-russel
+  name: the Little Russel
+  lat_deg: 49.4750
+  lon_deg: -2.5050
+  depth_fathoms: 5
+anchorage:
+  feature: guernsey-great-road
+  name: the Great Road of Guernsey
+  lat_deg: 49.4570
+  lon_deg: -2.5215
+  depth_fathoms: 12
+mooring:
+  feature: guernsey-little-road
+  name: the Little Road
+  lat_deg: 49.45954
+  lon_deg: -2.52692
+  depth_fathoms: 3
+  bottom: fine muddy sand with sea-weed
+  deep_draught_ft: 13  # judgement: two to four fathoms at low water; a ship of more draught lies in the Great Road
+shore:
+  name: the pier at St Peter Port
+  lat_deg: 49.4555
+  lon_deg: -2.5345
+
+pilot:
+  station: the-little-russel
+  cruising_nm: 7                 # judgement: the Guernsey pilots met ships off the Brayes and in the Great Russel
+  comes_off_by_night: false      # judgement: no light on the island in 1805
+  cutter: data/ships/cutter.yaml
+  names: [Le Marchant, De Garis, Le Page, Tostevin, Ozanne, Bichard, Mauger, Le Lacheur]   # Guernsey names: judgement
+  skill: 0.92                    # judgement: the islanders' knowledge of their own rocks
+  fee_pounds: 3                  # judgement; unverified
+  cast: larboard                 # from the Great Road the head paying off to the northward, for the Little Russel (judgement)
+  course_out_deg: 30             # up the Little Russel, St Martin's Point astern
+  words:
+    channel: "Coming from the north stand for the Anfroques and keep a mile off the Brayes; when St Martin's Point opens a sail's breadth west of Brehon, run in, and keep the Rousse close aboard on the larboard hand, for Roustel lies in mid-channel and shows only at half ebb. By the Great Russel you may stand along Sark at six hundred yards and keep St Martin's Point on the Goubinière till St Martin's church is over Fermain Bay."
+    marks: "St Martin's Point a sail's breadth open west of Brehon's pyramid is the mark through the Little Russel; the little guard-house on the south pier head open south-east of Castle Cornet clears the Têtes d'Aval coming from the Great Russel; keep the town church open north of the castle for the road."
+    anchorage: "The Great Road off the town, half a mile from Castle Cornet, nine to sixteen fathoms on very fine sand: good shelter but from a southerly gale. The Little Road north of the castle, two to four fathoms, is for the traders; the pier dries and takes a great swell in a southerly gale."
+    tide: "It is high water at full and change about six; the springs rise thirty feet. The stream in the Russels does not turn till half tide: the flood runs north-eastward from half flood to half ebb. Go out by the Little Russel on the last of the ebb."
+
+tide:
+  establishment: Guernsey        # the epitome's row (data/tides/establishments.yaml)
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  # Guernsey's entrepôt: spirits, wine and tobacco kept in bond and sold to the run;
+  # FROM MEMORY and JUDGEMENT
+  goods:
+    - {good: brandy, price: 110, origin: france, note: "French brandy in bond, bought for the run to England; judgement"}
+    - {good: geneva, price: 75, origin: batavian-republic, note: "Dutch gin for the run; judgement"}
+    - {good: rum, price: 85, origin: britain, note: "West India rum; judgement"}
+    - {good: wine, price: 45, origin: france, season: {12: 1.1}, note: "Bordeaux claret in the islanders' cellars; judgement"}
+    - {good: tea, price: 180, origin: null, note: "tea for the run; judgement"}
+    - {good: tobacco, price: 65, origin: null, note: "leaf tobacco for the run; judgement"}
+    - {good: salt, price: 14, origin: null, note: "salt free of the English duty; judgement"}
+    - {good: cider, price: 10, origin: britain, note: "the island's cider; judgement"}
+    - {good: granite, price: 1, origin: britain, note: "paving stone for London; judgement"}
+    - {good: salt beef, price: 60, origin: britain, note: "from memory"}
+    - {good: canvas, price: 62, origin: britain, note: "from memory"}
+    - {good: hemp, price: 72, origin: null, note: "from memory"}
+
+dockyard:
+  kind: chandlers                # the island's builders and chandlers; the King's ships drew on Portsmouth
+  items:
+    - {item: topmast, hours: 10, pounds: 44, note: "judgement"}
+    - {item: topgallant_mast, hours: 5, pounds: 13}
+    - {item: yard, hours: 7, pounds: 27}
+    - {item: suit of sails, hours: 60, pounds_per_100m2: 27, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.065}
+    - {item: water, hours_per_ton: 0.12, pounds_per_ton: 0.1, note: "White 1835, p. 109: watered by contract with long hoses at the shore; judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05}
+
+crew_pool:
+  # judgement: island seamen, privateersmen between cruises
+  able: {hands: 4, pounds: 3, delay_h: 12}
+  ordinary: {hands: 6, pounds: 2, delay_h: 12}
+  landsman: {hands: 6, pounds: 1, delay_h: 6}
+
+closed_to: []
+
+tracks:
+  to_sea: [guernsey-great-road, the-little-russel, 49 32 N 2 27 W]
+  from_sea: [49 32 N 2 27 W, the-little-russel, guernsey-great-road]
+  in: [guernsey-great-road]

@@ -1,0 +1,132 @@
+# FreeSail: St Malo as a port (spec M6 §26, block 1; package 39a). The same form as
+# roscoff.yaml, on package 35's machinery; the road is the period patch
+# data/charts/overrides/channel-mid/st-malo.yaml (Bellin's sheet of 1764) and the marks are
+# features/channel-mid.yaml's.
+#
+# Sources. Faden 1793, 'St Malo', pp. 39 to 40: the city in the middle of the sea upon a
+# rocky island joined to the main by a causeway, at the bottom of a very deep bay full of
+# rocks above and below water which project at least three-quarters of a league, with the
+# isles almost barring the entrance; four passages: La Conchée, the easternmost, by the
+# high white rock east of Sézembre; the Petite Porte, nearest Sézembre, a mast for a beacon
+# on a rock under water, the little tower at the city's point in a line with St Servan
+# steeple; the Grande Porte from the west or Cape Fréhel, the huge black rock north of the
+# town in a line with Paramé steeple, the beacon du Jardin to larboard; the Décollées,
+# frequented by none but small vessels; anchor under the city in 6 or 7 fathoms; the
+# Pierre de Rance in the middle of the river's mouth; ships under the town left quite dry
+# on the sand, sheltered from all winds; take a pilot for Solidor or under the town; the
+# tides east and west; 'Baye de la Fresnaye', p. 41: the road to wait for the tide or take
+# a pilot for St Malo. White 1835, 'Coast of France', pp. 84 to 87: the port very
+# difficult of access, completely barred by shelves of sand and rock; the only channels
+# navigable at low water the Grande and Petite Porte; the best anchorage never less than
+# 30 feet; the road of Dinard preferable, sheltered from the prevailing winds; the road of
+# Solidor the ships of war's, 18 feet at the most. Bellin 1764, 'St Malo et environs'
+# (Petit Atlas Maritime t. V no. 44): the Rade de Ranse and its soundings (the override).
+#
+# The datum: the override's, Bellin's brasses at low water of springs (unverified for
+# Bellin), 1.5 m above the chart's datum by SHOM's RAM as the tide study quotes it.
+#
+# The stance. St Malo is French (data/nations.yaml): to a King's ship in June 1805 hostile
+# by the table, Britain and France at war, so no pilot comes off to her and a boat sent in
+# would be taken; to a neutral it is open, its pilots coming off as Brest's do. The city of
+# the corsairs (the prizes it brought in are M7's). The market is its trade: Breton linen
+# and sailcloth, the Newfoundland cod its ships no longer fetched in the war, salt, wine,
+# brandy, the corsairs' prize goods; FROM MEMORY and JUDGEMENT, sterling at the exchange.
+
+id: st-malo
+name: St Malo
+nation: france
+source: "Faden 1793, 'St Malo', pp. 39 to 41; White 1835, 'Coast of France', pp. 84 to 87; Bellin 1764, Petit Atlas Maritime t. V no. 44"
+datum: "low water of spring tides, Bellin 1764 (the override st-malo, unverified for Bellin); 1.5 m above the chart's datum (SHOM's RAM as the tide study quotes it)"
+
+# The outer road is the bay of La Fresnaye under La Latte, where Faden's ship from the sea
+# waits for the tide to go up to St Malo or takes a pilot (p. 41); the pilots' cruising
+# ground reaches Cézembre and the Gates from it; the anchorage the road of St Malo under
+# the walls; the mooring the strand under the town, where ships lie dry at low water.
+outer_road:
+  feature: baie-de-la-fresnaye
+  name: the bay of La Fresnaye
+  lat_deg: 48.65604
+  lon_deg: -2.27528
+  depth_fathoms: 8
+anchorage:
+  feature: st-malo-road
+  name: the road of St Malo
+  lat_deg: 48.6456
+  lon_deg: -2.03702
+  depth_fathoms: 4.5
+mooring:
+  name: the strand under the town
+  lat_deg: 48.6470     # under the walls on the west side, the sand that dries (Faden)
+  lon_deg: -2.0300
+  depth_fathoms: -1.5  # dries: ships lie on the sand at low water
+  bottom: sand
+  deep_draught_ft: 12  # judgement: a vessel that takes the ground; a ship lies in the road
+shore:
+  name: the quay at St Malo
+  lat_deg: 48.6478
+  lon_deg: -2.0262
+
+pilot:
+  station: baie-de-la-fresnaye
+  cruising_nm: 12                # judgement: the Malouin pilots met ships in the bay of La Fresnaye and off Cézembre, ten miles east of it
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml # the stand-in at far detail until the machinery reads `vessel` (35b's fault)
+  vessel:
+    kind: a boat
+    name: the St Malo pilots' boat
+    under: lugsails
+    note: "a chaloupe under lugs (judgement)"
+  names: [Le Breton, Gautier, Lemoine, Robert, Leroux, Guérin, Hamon, Bertin, Lemarchand, Porcher]   # Malouin names: judgement
+  skill: 0.92
+  fee_pounds: 4                  # judgement, in sterling for the one account; unverified
+  cast: larboard                 # from the road the head paying off to the northward, for the Petite Porte (judgement)
+  course_out_deg: 320            # out by the Petite Porte, Cézembre on the starboard hand
+  words:
+    channel: "The port is barred by shelves of sand and rock that dry at low water; there are four passages. At low water take the Great Gate or the Little Gate, west of Cézembre: for the Great Gate bring the huge black rock at the north side of the town in a line with Paramé steeple and leave the beacon of the Jardin on the larboard hand; for the Little Gate keep a cable off Cézembre and leave the beacon mast on the rock under water to larboard. The Conchée passage, east of Cézembre, is for high water."
+    marks: "The great church of St Malo over the walls, the Grand and Little Bay rocks north-west of the city, the high white Conchée with its battery, Cézembre with its convent hidden on the south side; bring the little tower at the end of the town in a line with St Servan steeple to run up to the road."
+    anchorage: "Anchor in the road under the city in four or five fathoms; ships that go in under the town lie dry on the sand at every tide, sheltered from all winds. The road of Dinard across the river is better sheltered from the westerly winds; the road of Solidor before St Servan is the ships of war's, eighteen feet at the most."
+    tide: "The tide rises very fast here, five fathoms and more at springs; it is high water about six at full and change, and the tides are east and west. Come in on the flood, by the Gates at low water if you must."
+
+tide:
+  establishment: St Malo         # the epitome's row (data/tides/establishments.yaml)
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds               # sterling at the exchange, as Brest's
+  goods:
+    - {good: canvas, price: 40, origin: france, note: "Breton sailcloth and linen of the Rennes country; from memory as at Brest"}
+    - {good: linen, price: 90, origin: france, note: "the toiles of Brittany, shipped from St Malo before the war to Cadiz; judgement"}
+    - {good: salt, price: 11, origin: france, note: "Breton salt; from memory as at Brest"}
+    - {good: wine, price: 36, origin: france, season: {12: 1.1}, note: "Bordeaux wine landed from the coasters; from memory as at Brest"}
+    - {good: brandy, price: 95, origin: france, note: "French brandy; from memory as at Brest"}
+    - {good: salt fish, price: 30, origin: france, note: "Newfoundland cod, scarce in the war: the Malouins' fishery stopped; judgement"}
+    - {good: cider, price: 9, origin: france, note: "Breton and Norman cider; judgement"}
+    - {good: butter, price: 50, origin: france, note: "Breton butter; judgement"}
+    - {good: salt beef, price: 70, origin: france, note: "from memory, as at Brest"}
+    - {good: tin, price: 270, origin: britain, note: "English tin under the war's half, as at Brest (truth 69); from memory"}
+    - {good: tobacco, price: 80, origin: null, note: "dear in the war; judgement"}
+
+dockyard:
+  kind: chandlers                # the corsairs' builders and chandlers at St Servan; the navy's yard is Brest's
+  items:
+    - {item: topmast, hours: 10, pounds: 42, note: "judgement"}
+    - {item: topgallant_mast, hours: 5, pounds: 12}
+    - {item: yard, hours: 7, pounds: 26}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 22, note: "Breton canvas at hand: judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.12, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: the corsairs took the seamen the Inscription maritime left
+  able: {hands: 2, pounds: 2, delay_h: 24}
+  ordinary: {hands: 4, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 8, pounds: 1, delay_h: 12}
+
+closed_to: []                    # the table's war with Britain makes the stance
+
+tracks:
+  to_sea: [st-malo-road, 48 39 N 2 03 W, 48 40 N 2 04 W, 48 41 N 2 05 W]
+  from_sea: [48 41 N 2 05 W, 48 40 N 2 04 W, 48 39 N 2 03 W, st-malo-road]
+  in: [st-malo-road]

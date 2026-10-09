@@ -112,6 +112,17 @@ ports:
   brest: france
   st-marys: britain
   roscoff: france
+  # package 39a, the Channel east: the islands the King's (Guernsey, Jersey and Alderney
+  # held of the Crown, not of the realm: a British port in the table), St Malo and Morlaix
+  # France's, hostile to a King's ship and open to a neutral by the wars below
+  dartmouth: britain
+  torbay: britain
+  weymouth: britain
+  st-peter-port: britain
+  st-helier: britain
+  alderney: britain
+  st-malo: france
+  morlaix: france
   # Biscay north (package 39b)
   lorient: france
   le-palais: france

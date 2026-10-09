@@ -3418,3 +3418,76 @@ def test_a_course_across_the_wind_under_the_grant_to_steer_puts_her_about():
     ), [e.text for e in list(world.log)[n0:]]
     runner = world.ship.extra["evolutions"]
     assert [i.evo.id for i in runner.instances] == ["tack"]
+
+
+# ---------------------------------------------------------------------------
+# Package 40b: the officer's own reckoning (spec M6 §5)
+# ---------------------------------------------------------------------------
+
+
+def test_the_fake_officer_and_the_players_seat_keep_their_own_reckoning_and_a_position_is_one():
+    """Spec M6 §5 (package 40b): `work my reckoning` and `my reckoning is <position>` are
+    the officer's own, in his domain and given with the deck or off watch (the
+    lieutenants and the young gentlemen kept theirs whatever their watch): the fake
+    officer at the station gives both through `submit_order` and the player at his seat
+    by the same words. The slate comes back in the reply and is not a line of the log;
+    his position is kept under his station, said with his name, and moves nothing; a
+    position that is not one is refused in the words of `set the reckoning to`. Neither
+    takes the deck, and an order that is not his own reckoning still wants it."""
+    from freesail.agents.agent import CAPTAIN_BRIEF, OFFICER_BRIEF
+
+    # the station briefs point at the lessons, one sentence each (spec M6 §6)
+    assert "Primer 18 is the lessons" in OFFICER_BRIEF
+    assert "'work my reckoning' gives you the master's slate" in OFFICER_BRIEF
+    assert "Primer 18 is the lessons" in CAPTAIN_BRIEF and "the officer's reckoning" in (
+        CAPTAIN_BRIEF
+    )
+    world = chart_world()
+    account = world.navigation.account_now()
+    assert OFFICER_DOMAIN.allows("work my reckoning", "navigation", "1") == (True, "")
+    assert OFFICER_DOMAIN.allows("my reckoning is", "navigation", "1") == (True, "")
+    script = [
+        order("work my reckoning"),
+        order("my reckoning is 49 55 N 4 59 W"),
+        order("my reckoning is somewhere off the Lizard"),
+        order("set the royals"),
+        "",
+    ]
+    h, fake, _ = seated(world, script, deck=False)
+    got = results(fake)
+    assert got[0].startswith("The master's slate since the departure at 10:00: ")
+    assert not [e for e in world.log if e.kind == "query.slate"]
+    person, _rank = officer_rank(world)
+    assert got[1].startswith(f"{person}'s own reckoning: 49° 55' N, 4° 59' W, ")
+    assert world.navigation.own["officer of the watch"]["who"] == person
+    assert "is not a position; say 'my reckoning is 49 52 N 6 10 W'." in got[2]
+    assert got[3].startswith("The officer of the watch has not the deck")
+    assert not h.agent.has_deck
+    assert world.navigation.account_now() == account
+    said = world.readings.words("officers_reckoning")
+    assert said.startswith(f"49° 55' N, 4° 59' W by {person}'s own reckoning, worked at 10:00")
+    # the player at the same station, by the same words, off watch and refused alike
+    other = chart_world()
+    from freesail.agents.seat import seat_player
+
+    seat = seat_player(other, "officer")
+    e = seat.route("work my reckoning")
+    assert e.kind == "query.slate" and e.text == got[0]
+    e = seat.route("my reckoning is 49 55 N 4 59 W")
+    assert e.kind == "reckoning.own" and e.actor == "the officer of the watch (the player)"
+    assert e.text == got[1]
+    e = seat.route("my reckoning is somewhere off the Lizard")
+    assert e.kind == "order.rejected" and "is not a position" in e.text
+    e = seat.route("set the royals")
+    assert e.kind == "agent.refused" and "has not the deck" in e.text
+    assert other.navigation.own["officer of the watch"]["who"] == person
+    # forgotten when the one who gave it leaves the station (the lead's ruling): the
+    # model stood down, the player's seat left
+    assert world.readings["officers_reckoning"] is not None
+    assert world.submit("stand down the officer").kind != "order.rejected"
+    assert world.readings["officers_reckoning"] is None
+    assert not world.navigation.own
+    assert other.readings["officers_reckoning"] is not None
+    seat.route("stand down the officer")
+    assert seat.agent.released
+    assert other.readings["officers_reckoning"] is None

@@ -1,0 +1,58 @@
+# FreeSail: the primer's first lesson, a landfall on one headland (docs/primer/18-lessons.md;
+# package 40b).
+#
+# The frigate thirty-three miles south-south-west of the Lizard an hour after midnight on
+# 14 June 1805, standing in from sea with the westerly on her beam, her account from a
+# departure at the start (a mile in doubt) and nothing since: the master's log-line marked
+# short, his chart's variation ten years old and her own iron on the compass, all of which
+# move the account off the truth by the time the land is raised and none of which is in
+# his doubt. The officer of the watch observes an amplitude at sunrise, shapes a course for
+# a berth off the Lizard, and takes its bearing when the lookout raises it. No book: the
+# lesson's orders are the officer's alone, typed at the prompt as the chapter gives them.
+#     py -m freesail.ui.console --scenario data/scenarios/lesson-landfall.yaml
+# The chapter's run, measured once at seed 7, and the orders with their times, are in
+# docs/dev/TuningNotes.md under package 40b (`tools/lesson_run.py` runs it again).
+#
+# The day's weather is pinned, as the gates' are: a westerly of thirteen knots and a clear
+# sky over the old high, so that the sun is seen rising and the land raised.
+
+name: A landfall on one headland
+seed: 7
+start: 1805-06-14T01:00
+position: 49 26 N 5 28 W
+region: channel-west
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 20
+  speed_kn: 6
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+papers:
+  chart: {year: 1804}
+  epitome: norie
+  almanac: 1805
+
+ports: [falmouth, plymouth, brest]
+
+weather:
+  wind:
+    - {at: 1805-06-14T00:00, from_deg: 270, knots: 13, air_mass: neutral}
+  background:
+    {hpa: 1018, gradient_hpa_per_100km: 0.4, high_toward_deg: 200}
+  systems:
+    - name: the old high over Biscay
+      kind: high
+      radius_km: 900
+      track:
+        - {at: 1805-06-13T12:00, x_km: 300, y_km: -500, hpa: 1024}
+        - {at: 1805-06-15T12:00, x_km: 500, y_km: -600, hpa: 1022}
+  sky: {sky: clear, weather: fine, visibility: the horizon}
+  sea: true
+
+orders:
+  - set plain sail
+  - shape a course for two leagues south of the Lizard

@@ -1,0 +1,115 @@
+# FreeSail: Torbay as a port (spec M6 §26, block 1; package 39a): the bay the Channel
+# fleet ran for in a westerly gale, and Brixham, its fishermen's harbour under the Berry
+# Head. The same form as falmouth.yaml, on package 35's machinery; the marks are
+# features/channel-mid.yaml's; no patch (the bay's depths are the grid's within a metre or
+# two: the Dartmouth override's notes).
+#
+# Sources. Imray 1874, 'Tor Bay', pp. 67 to 68: between Hope Nose and Berry head, N N E and
+# S S W three miles and a half, running in about three miles, 8 to 6 fathoms decreasing to
+# the shore; open to eastward, south-easterly gales sending in a heavy sea; shelter from
+# all winds from N E northerly to S by W; good anchorage over mud and clay; the anchorage
+# usually preferred Brixham roads, Brixham church about S W and Berry head S S E; the
+# Ore-stone and the Thatcher, the foul patch of 3 1/2 fathoms between Paignton and Brixham;
+# Elbury cove the place to run on shore. White 1835, 'Coast of England', p. 39: the Berry
+# Head lofty and precipitous, discerned at seven and eight leagues. Moore 1799 (the
+# catechism, the course from Portland to Torbay): "to anchor in the bay, I would bring the
+# Berry Head to bear S. by E. or S. S. E. and Brixham Church on with the Pier Head; the
+# best anchoring for small ships is 1 1/2 miles from Brixham Pier Head, in 7 fathoms".
+#
+# The datum: no period sheet read and no patch; `datum: unverified`.
+#
+# The market is Brixham's: the trawlers' fish, the Devon cider, and the fleet's wants
+# (water and fresh provisions brought off), FROM MEMORY and JUDGEMENT; sterling.
+
+id: torbay
+name: Torbay
+nation: britain
+source: "Imray 1874, 'Tor Bay', pp. 67 to 68; White 1835, 'Coast of England', p. 39; Moore 1799, the catechism, the course from Portland to Torbay"
+datum: unverified   # no period sheet read for the bay; the grid's depths stand
+
+# The outer road is the bay itself, where the fleet lay; the anchorage Brixham road under
+# the Berry Head, Moore's and Imray's; the mooring Brixham's little harbour, which dries,
+# for the fishing smacks and small craft.
+outer_road:
+  feature: torbay
+  name: Torbay
+  lat_deg: 50.4450
+  lon_deg: -3.5150
+  depth_fathoms: 7
+anchorage:
+  feature: brixham-road
+  name: Brixham road
+  lat_deg: 50.4100
+  lon_deg: -3.4950
+  depth_fathoms: 6
+mooring:
+  name: Brixham harbour
+  lat_deg: 50.3990     # off the pier head; the harbour within dries (judgement)
+  lon_deg: -3.5110
+  depth_fathoms: 2
+  bottom: mud
+  deep_draught_ft: 8   # judgement: the smacks' harbour; a ship lies in the road
+shore:
+  name: the quay at Brixham
+  lat_deg: 50.3960
+  lon_deg: -3.5135
+
+pilot:
+  station: torbay
+  cruising_nm: 8                 # judgement: the Brixham men went out to the fleet well off the Head
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  names: [Upham, Bartlett, Dewdney, Gillard, Pillar, Distin, Saunders, Widger]   # Devon names: judgement
+  skill: 0.9
+  fee_pounds: 3                  # judgement; unverified
+  cast: starboard                # from Brixham road the head paying off to the eastward (judgement)
+  course_out_deg: 70             # out of the bay past the Berry Head to the eastward
+  words:
+    channel: "Coming from the southward round the Berry Head at what distance you please, for it is steep; the south shore is clean, but keep clear of the reef off Shoalstone point half a mile east of Brixham. From the northward keep close to the Ore Stone if you will, but not its west side, for it shoals half a cable off."
+    marks: "Bring the Berry Head south by east or south-south-east and Brixham church on with the pier head, and anchor; the Ore Stone its own length open of the Thatcher leads clear of the shoals on the north side of the bay."
+    anchorage: "Brixham road, six or seven fathoms over mud and clay, Brixham church south-west and the Berry Head south-south-east: sheltered from every wind from north-east round by the west to south by west. An easterly or south-easterly gale sends in a heavy sea: get under way and stand out."
+    tide: "It is high water here about six o'clock at full and change, and there is little stream in the bay; the ebb takes you out past the Head."
+
+tide:
+  establishment: Torbay          # the epitome's row (data/tides/establishments.yaml)
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: fresh fish, price: 10, origin: britain, season: {3: 1.2, 4: 1.2, 9: 0.8, 10: 0.8}, note: "the Brixham trawlers' catch, sold to the fleet and sent inland; judgement"}
+    - {good: cider, price: 11, origin: britain, season: {10: 0.8, 11: 0.8, 5: 1.2, 6: 1.2}, note: "Devon cider; judgement"}
+    - {good: salt, price: 25, origin: britain, note: "under the duty; from memory as at Falmouth"}
+    - {good: coal, price: 2, origin: britain, season: {11: 1.2, 12: 1.2, 1: 1.2, 2: 1.2}, note: "from memory as at Falmouth"}
+    - {good: limestone, price: 1, origin: britain, note: "the Berry Head's limestone for the kilns; judgement"}
+    - {good: canvas, price: 60, origin: britain, note: "from memory as at Falmouth"}
+    - {good: hemp, price: 72, origin: null, note: "Baltic hemp at war prices; from memory"}
+    - {good: wine, price: 72, origin: portugal, season: {12: 1.1}, note: "from memory"}
+    - {good: timber, price: 6, origin: britain, note: "from memory"}
+    - {good: salt beef, price: 56, origin: britain, note: "the fleet's beef by contract; from memory"}
+    - {good: wool, price: 60, origin: britain, note: "Devon wool; judgement"}
+
+dockyard:
+  kind: chandlers                # Brixham's boatbuilders and chandlers; the fleet's stores came from Plymouth
+  items:
+    - {item: topmast, hours: 10, pounds: 42, note: "a spar from the boatbuilders: judgement"}
+    - {item: topgallant_mast, hours: 5, pounds: 13}
+    - {item: yard, hours: 7, pounds: 26}
+    - {item: suit of sails, hours: 60, pounds_per_100m2: 26, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.06}
+    - {item: water, hours_per_ton: 0.12, pounds_per_ton: 0.12, note: "brought off by the boats from the watering place: judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05}
+
+crew_pool:
+  # judgement: fishermen, protected or not; the fleet's press takes the rest
+  able: {hands: 3, pounds: 3, delay_h: 12}
+  ordinary: {hands: 6, pounds: 2, delay_h: 12}
+  landsman: {hands: 8, pounds: 1, delay_h: 6}
+
+closed_to: []
+
+tracks:
+  to_sea: [brixham-road, 50 24 N 3 26 W]
+  from_sea: [50 24 N 3 26 W, brixham-road]
+  in: [brixham-road]

@@ -1,0 +1,113 @@
+# FreeSail: St Helier, Jersey, as a port (spec M6 §26, block 1; package 39a), with the road
+# of St Aubin. The same form as falmouth.yaml, on package 35's machinery; the marks are
+# features/channel-mid.yaml's; no patch (below).
+#
+# Sources. Faden 1793, 'Isle of Jersey', pp. 35 to 36 (Captain Dobree's directions): St
+# Helier the principal town, in the bay of St Aubin, almost in the middle of the southern
+# side, with the best road of the island but dangerous for the numerous rocks round the
+# entrance; defended by several batteries and chiefly by Castle Elizabeth, on a large rock
+# reached dry at low water; with northerly winds anchor a league without the bay in 15 and
+# 20 fathoms; St Ouen's Bay on the west side, 12 and 15 fathoms, sheltered from westerly
+# winds; St Catherine's Bay on the east, good anchorage; the Banc de Vielet off St
+# Clement's Point; the tides very strong through the rocks and round the compass in
+# twelve hours, a N by E and S by W moon making the highest tides. White 1835, 'Coast of
+# France', pp. 62 to 80, has the island's marks for the Déroute and the Ecrehous.
+#
+# The datum. Bellin's 'Suite de la coste de Normandie depuis Surville jusqu'au Mont S.
+# Michel, avec l'isle de Jersey' (Petit Atlas Maritime, David Rumsey 6903.527) is the
+# companion of the Guernsey sheet at the same small scale (four common leagues), with no
+# plan of the bay; no harbour patch rests on it and `datum: unverified`. The bay of St
+# Aubin dries far out at low water springs (the grid has it so): the road below is where
+# the grid holds water at the datum south of the sands, and the harbour dries.
+#
+# The stance: the King's island, open to a British ship. The market is the island's: the
+# Newfoundland cod its merchants traded, its cider and knitted stockings, the entrepôt's
+# spirits; FROM MEMORY and JUDGEMENT, sterling.
+
+id: st-helier
+name: St Helier
+nation: britain
+source: "Faden 1793, 'Isle of Jersey', pp. 35 to 36; White 1835, 'Coast of France', pp. 62 to 80"
+datum: unverified   # Bellin's sheet of Jersey has no plan of the bay; the grid's depths stand
+
+outer_road:
+  name: the offing of St Aubin's Bay
+  lat_deg: 49.1500     # a league without the bay, south of Noirmont and Castle Elizabeth (Faden: 15 and 20 fathoms)
+  lon_deg: -2.1400
+  depth_fathoms: 10
+anchorage:
+  feature: st-aubins-road
+  name: the road of St Aubin
+  lat_deg: 49.1680
+  lon_deg: -2.1450
+  depth_fathoms: 5
+mooring:
+  name: the harbour of St Helier
+  lat_deg: 49.1810     # the old harbour under the town, which dries (judgement)
+  lon_deg: -2.1120
+  depth_fathoms: -1    # dries at low water: a vessel takes the ground
+  bottom: sand
+  deep_draught_ft: 9   # judgement: for vessels that take the ground; a ship lies in the road
+shore:
+  name: the pier at St Helier
+  lat_deg: 49.1825
+  lon_deg: -2.1135
+
+pilot:
+  station: st-aubins-road
+  cruising_nm: 7                 # judgement: the Jersey pilots met ships off the Corbière and Noirmont
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  names: [Le Gros, De Gruchy, Le Brocq, Renouf, Le Feuvre, Pallot, Falle, Amy]   # Jersey names: judgement
+  skill: 0.92
+  fee_pounds: 3                  # judgement; unverified
+  cast: starboard                # from the road the head paying off to the westward, out by Noirmont (judgement)
+  course_out_deg: 200            # out of the bay south-south-west, Noirmont on the starboard hand
+  words:
+    channel: "The best road of the island, but the rocks lie thick about the entrance: come in from the south-west between Noirmont and the Corbière's rocks, the lead going, and never by night. From the east keep a large league off St Clement's Point for the Violet Bank."
+    marks: "Castle Elizabeth on its rock in the bay, St Aubin's fort on its islet at the west side, Noirmont Point the high land at the west of the bay; Mont Orgueil on the east of the island is the mark for every danger toward Normandy."
+    anchorage: "The road of St Aubin, south of the sands between Noirmont and Castle Elizabeth; the bay dries far out at low water and the harbour under the town dries. With a northerly wind lie a league without the bay in fifteen or twenty fathoms."
+    tide: "The tides here are very strong among the rocks and run round the compass in twelve hours; it is high water about six at full and change, and the springs rise thirty feet. Come in on the flood."
+
+tide:
+  establishment: Jersey          # the epitome's row (data/tides/establishments.yaml)
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: salt fish, price: 21, origin: britain, note: "Newfoundland and Gaspé cod of the Jersey merchants; judgement"}
+    - {good: cider, price: 9, origin: britain, season: {10: 0.8, 11: 0.8, 5: 1.2, 6: 1.2}, note: "the island's cider; judgement"}
+    - {good: stockings, price: 200, origin: britain, note: "Jersey knitted stockings, by the ton for the account; judgement"}
+    - {good: brandy, price: 112, origin: france, note: "French brandy in bond for the run; judgement"}
+    - {good: wine, price: 46, origin: france, season: {12: 1.1}, note: "judgement"}
+    - {good: tobacco, price: 66, origin: null, note: "for the run; judgement"}
+    - {good: salt, price: 14, origin: null, note: "free of the English duty; judgement"}
+    - {good: salt beef, price: 60, origin: britain, note: "from memory"}
+    - {good: canvas, price: 62, origin: britain, note: "from memory"}
+    - {good: hemp, price: 72, origin: null, note: "from memory"}
+    - {good: timber, price: 7, origin: britain, note: "from memory"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 10, pounds: 44, note: "the island's shipbuilders: judgement"}
+    - {item: topgallant_mast, hours: 5, pounds: 13}
+    - {item: yard, hours: 7, pounds: 27}
+    - {item: suit of sails, hours: 60, pounds_per_100m2: 27, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.065}
+    - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.1, note: "brought off over the sands at the tide: judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05}
+
+crew_pool:
+  able: {hands: 4, pounds: 3, delay_h: 12}
+  ordinary: {hands: 6, pounds: 2, delay_h: 12}
+  landsman: {hands: 6, pounds: 1, delay_h: 6}
+
+closed_to: []
+
+tracks:
+  to_sea: [st-aubins-road, 49 08 N 2 10 W]
+  from_sea: [49 08 N 2 10 W, st-aubins-road]
+  in: [st-aubins-road]

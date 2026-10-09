@@ -80,26 +80,38 @@ def run_until(world, kind, minutes=240):
 # ---------------------------------------------------------------------------
 
 
-# the port files: the Channel's five, and Biscay north's five (package 39b)
-PORT_FILES = [
+# the port files: the Channel's five, the Channel east's eight (package 39a) and Biscay
+# north's five (package 39b)
+ALL_PORTS = [
+    "alderney",
     "brest",
+    "dartmouth",
     "falmouth",
     "la-rochelle",
     "le-palais",
     "lorient",
+    "morlaix",
     "paimboeuf",
     "plymouth",
     "rochefort",
     "roscoff",
+    "st-helier",
+    "st-malo",
     "st-marys",
+    "st-peter-port",
+    "torbay",
+    "weymouth",
 ]
 
 
 def test_the_five_ports_are_files_on_one_machinery_placed_from_the_chart():
     files = PT.port_files()
-    assert list(files) == PORT_FILES
+    # package 39a added the Channel east's eight (their spots name channel-mid's features
+    # and repeat their positions, so a world on channel-west's chart alone loads them too),
+    # package 39b Biscay north's five
+    assert list(files) == ALL_PORTS
     w = world_at(OFF_THE_LIZARD)
-    assert list(w.ports.ports) == PORT_FILES
+    assert list(w.ports.ports) == ALL_PORTS
     falmouth = w.ports.ports["falmouth"]
     assert falmouth.nation == "britain" and "White 1835" in falmouth.source
     # the roads and the anchorage are the chart's features, not figures of their own
@@ -147,7 +159,7 @@ def test_a_fourth_port_costs_a_file_and_nothing_else(tmp_path):
     )
     text = text.replace("  feature: falmouth-outer-road\n", "  feature: st-michaels-mount\n", 1)
     (fourth / "penzance.yaml").write_text(text, encoding="utf-8")
-    assert list(PT.port_files(fourth)) == sorted([*PORT_FILES, "penzance"])
+    assert list(PT.port_files(fourth)) == sorted([*ALL_PORTS, "penzance"])
     w = world_at(OFF_THE_LIZARD)
     port = PT.load_port(fourth / "penzance.yaml", w.chart)
     assert port.id == "penzance" and port.name == "Penzance"
@@ -237,33 +249,16 @@ def test_the_market_moves_a_price_by_the_season_the_war_and_the_supply_and_no_mo
 def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_stance_the_tables():
     frigate = world_at(OFF_THE_LIZARD)
     assert frigate.ports.ship_nation == "britain"
+    french_ports = {"brest", "roscoff", "st-malo", "morlaix"}
+    # Biscay north's five (package 39b): hostile throughout to a King's ship
+    french_ports |= {"la-rochelle", "le-palais", "lorient", "paimboeuf", "rochefort"}
     assert {p.id: frigate.ports.stance(p) for p in frigate.ports.ports.values()} == {
-        "falmouth": "open",
-        "plymouth": "open",
-        "brest": "hostile",
-        "st-marys": "open",
-        "roscoff": "hostile",
-        # Biscay north (package 39b): hostile throughout to a King's ship
-        "la-rochelle": "hostile",
-        "le-palais": "hostile",
-        "lorient": "hostile",
-        "paimboeuf": "hostile",
-        "rochefort": "hostile",
+        pid: ("hostile" if pid in french_ports else "open") for pid in ALL_PORTS
     }
     schooner = world_at(OFF_THE_LIZARD, ship=SCHOONER)
     assert schooner.ports.ship_nation == "united-states"
     assert {p.id: schooner.ports.stance(p) for p in schooner.ports.ports.values()} == {
-        "falmouth": "neutral",
-        "plymouth": "neutral",
-        "brest": "neutral",
-        "st-marys": "neutral",
-        "roscoff": "neutral",
-        # Biscay north (package 39b): open to a neutral
-        "la-rochelle": "neutral",
-        "le-palais": "neutral",
-        "lorient": "neutral",
-        "paimboeuf": "neutral",
-        "rochefort": "neutral",
+        pid: "neutral" for pid in ALL_PORTS
     }
     french = world_at(OFF_THE_LIZARD, ship=SCHOONER, nation="france")
     assert french.ports.ship_nation == "france"

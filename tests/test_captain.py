@@ -272,6 +272,46 @@ def test_hand_over_lends_the_deck_to_the_book_and_the_next_order_takes_it_back()
     assert "By the captain: setting plain sail." in lines(world, "order.accepted")
 
 
+def test_the_captains_own_reckoning_neither_wants_the_deck_nor_takes_it_back_from_the_book():
+    """Package 40b (spec M6 §5): the captain's station has the officer's two orders of his
+    own reckoning, as it has the player's whole surface, kept under the captain's name;
+    they move nothing, so with the deck lent to his book they are given and the deck
+    stays lent until an order that is the ship's takes it back."""
+    from datetime import datetime
+
+    scenario = Scenario(
+        start_time=datetime(1805, 6, 12, 10, 0),
+        wind_from_deg=225.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": 49.8, "lon_deg": -5.2},
+        region="channel-west",
+    )
+    world = make_world(7, FRIGATE, scenario)
+    h, fake = seated(
+        world,
+        [
+            reply("", call("hand_over", note="The ship is yours, book; I am at my slate.")),
+            "Done.",
+            order("work my reckoning"),
+            order("my reckoning is 49 47 N 5 13 W"),
+            "Done.",
+            order("set plain sail"),
+            "Done.",
+        ],
+    )
+    world.run(1)
+    assert not h.agent.deck and h.agent.deck_lost == "handed over"
+    world.run(EVERY)
+    assert not h.agent.deck and h.agent.deck_lost == "handed over"
+    own = world.navigation.own["captain"]
+    assert own["who"] == h.station.person and own["lat_deg"] == pytest.approx(49 + 47 / 60)
+    assert [t for k, t in his(world) if k == "reckoning.own"]
+    world.run(EVERY)
+    assert h.agent.deck and not h.agent.deck_lost
+
+
 def test_stand_down_the_captain_releases_the_station_and_the_rules_hold_her():
     """`stand down the captain` is the owner's: the station released and said, the game
     saved, the rules-based captain told nobody holds his station."""

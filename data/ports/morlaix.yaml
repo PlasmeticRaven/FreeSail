@@ -1,0 +1,121 @@
+# FreeSail: Morlaix as a port (spec M6 §26, block 1; package 39a). Morlaix (3.83 W) lies in
+# channel-west's bounds: its marks are in features/channel-west.yaml (the brief's item 1),
+# and it has no harbour patch (a patch here is a rebuild of channel-west's harbours, for a
+# later package). The same form as roscoff.yaml, on package 35's machinery.
+#
+# Sources. Faden 1793, 'Morlaix', p. 44: one of the principal harbours of Britanny; to sail
+# in, when the high rock with two horns before the entrance of Lanion river bears east
+# about three miles, steer for the northernmost point of land on the east side of the
+# entrance of Morlaix bay W S W till within a mile of the rocks off it, then S by W for the
+# small island off the point on the east side of the river's entrance, leaving all the
+# rocks with beacons on the larboard side and the Reguel Islands with Women's Island on
+# the starboard; from the small island proceed up till above the point on the other side
+# and anchor in 6 or 7 fathoms; the flood comes from the N W; they are all tide-ports;
+# 'St Pol de Leon', p. 44: the church with two high spiry steeples, between which the Isle
+# of Bas appears; p. 48: at Morlaix and St Pol de Léon a west and south moon. Bellin 1764,
+# Petit Atlas Maritime t. V no. 51 (package 35b's sheet): the entrance of the rivers of
+# Morlaix and St Pol, le Taureau.
+#
+# The datum: no harbour patch (channel-west's harbours are not rebuilt by this package);
+# `datum: unverified`. The river within the entrance is the grid's, five metres and less
+# above the Taureau; the anchorage is placed in the deepest water of the entrance, 8 m.
+#
+# The stance. Morlaix is French: hostile to a King's ship, open to a neutral, as Roscoff
+# and Brest. The market is its trade: the linen of the Léon (the toiles called crées that
+# went to Spain), the royal tobacco manufactory's tobacco, butter, wine; FROM MEMORY and
+# JUDGEMENT, sterling at the exchange.
+
+id: morlaix
+name: Morlaix
+nation: france
+source: "Faden 1793, 'Morlaix' and 'St Pol de Leon', pp. 44 and 48; Bellin 1764, Petit Atlas Maritime t. V no. 51"
+datum: unverified   # no harbour patch; the grid's depths stand
+
+# The outer road is the bay's offing north of the Taureau, where a ship waits for the
+# pilot and the flood; the anchorage the river within the entrance, Faden's; the mooring
+# the quays of the town, three leagues up, which dry.
+outer_road:
+  name: the offing of Morlaix bay
+  lat_deg: 48.7000
+  lon_deg: -3.8800
+  depth_fathoms: 6
+anchorage:
+  feature: morlaix-river
+  name: the river of Morlaix
+  lat_deg: 48.6704
+  lon_deg: -3.8800
+  depth_fathoms: 6
+mooring:
+  name: the quays of Morlaix
+  lat_deg: 48.5800
+  lon_deg: -3.8290
+  depth_fathoms: -1.5  # dries: the town's quays are tidal (judgement)
+  bottom: mud
+  deep_draught_ft: 10  # judgement: the coasters go up on the flood; a ship lies in the river below
+shore:
+  name: the quay at Morlaix
+  lat_deg: 48.5780
+  lon_deg: -3.8280
+
+pilot:
+  station: morlaix-river
+  cruising_nm: 7                 # judgement: the pilots of Morlaix and Carantec met ships off the bay's rocks
+  comes_off_by_night: false      # judgement: no light at the entrance in 1805
+  cutter: data/ships/cutter.yaml # the stand-in at far detail until the machinery reads `vessel` (35b's fault)
+  vessel:
+    kind: a boat
+    name: the Morlaix pilots' boat
+    under: a lugsail and oars
+    note: "a chaloupe under lugs (judgement)"
+  names: [Le Bihan, Le Roux, Guéguen, Le Saint, Corre, Prigent, Le Goff, Inizan, Jacq, Quéméner]   # Léon names: judgement
+  skill: 0.9
+  fee_pounds: 3                  # judgement, in sterling for the one account; unverified
+  cast: larboard                 # from the river the head paying off to the northward, down the channel (judgement)
+  course_out_deg: 340            # down the river past the Taureau to the bay
+  words:
+    channel: "From the eastward bring the horned rock off Lannion river east of you three miles and steer west-south-west for the eastern point of the bay till within a mile of its rocks; then south by west for the small island off the point on the east side of the river's mouth. Leave all the rocks with beacons on the larboard hand and the Reguel islands and Women's Island on the starboard."
+    marks: "The castle of the Taureau on its rock in the mouth of the river; the two spires of St Pol de Léon to the westward, with the Isle of Bas between them seen from the sea."
+    anchorage: "From the small island proceed up till you are above the point on the other side, and anchor in six or seven fathoms. The town's quays are three leagues up and dry; the coasters go up on the flood."
+    tide: "The flood comes from the north-west. It is high water about a quarter past five at full and change, and the springs rise four fathoms: it is a tide-port, like every port of this coast."
+
+tide:
+  establishment: Morlaix         # the epitome's row (data/tides/establishments.yaml)
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: linen, price: 85, origin: france, note: "the crées of the Léon, the linen Morlaix sent to Spain before the war; judgement"}
+    - {good: tobacco, price: 75, origin: france, note: "the royal manufactory's tobacco; judgement"}
+    - {good: butter, price: 48, origin: france, note: "Breton butter; judgement"}
+    - {good: wine, price: 38, origin: france, season: {12: 1.1}, note: "Bordeaux wine landed from the coasters; from memory as at Roscoff"}
+    - {good: brandy, price: 100, origin: france, note: "from memory as at Roscoff"}
+    - {good: salt, price: 12, origin: france, note: "Breton salt; from memory as at Brest"}
+    - {good: canvas, price: 42, origin: france, note: "Breton sailcloth; from memory as at Brest"}
+    - {good: onions, price: 6, origin: france, season: {8: 0.8, 9: 0.8, 10: 0.9, 3: 1.3, 4: 1.3}, note: "the Léon's onions; judgement as at Roscoff"}
+    - {good: salt beef, price: 70, origin: france, note: "from memory, as at Brest"}
+    - {good: tin, price: 170, origin: britain, note: "English tin, run in; from memory as at Roscoff"}
+    - {good: hemp, price: 75, origin: null, note: "from memory"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 10, pounds: 42, note: "judgement"}
+    - {item: topgallant_mast, hours: 5, pounds: 12}
+    - {item: yard, hours: 8, pounds: 26}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05, note: "Breton hemp, as at Brest (judgement)"}
+    - {item: water, hours_per_ton: 0.12, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  able: {hands: 2, pounds: 2, delay_h: 24}
+  ordinary: {hands: 4, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 8, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [morlaix-river, 48 42 N 3 53 W]
+  from_sea: [48 42 N 3 53 W, morlaix-river]
+  in: [morlaix-river]

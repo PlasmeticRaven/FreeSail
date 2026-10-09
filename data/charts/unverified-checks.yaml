@@ -123,7 +123,7 @@ items:
       Goulphar 1836, Pen Men 1839, the Pilier's tower 1829, Yeu 1830, La Vieille 1887,
       Tévennec 1875, the Bec du Raz 1839; the Four of the Croisic's 1822 is from memory and
       marked so. TICON's nine gauges of the block were read by their coordinates and held
-      out of the blend (data/tides/constituents.yaml, `gauges_held`).
+      out of the blend (data/tides/constituents.yaml, `held_gauges`).
 found_on_the_way:
   - >-
     The Internet Archive item the study calls Imray 1848 (sailingdirection00unse_0) is the
@@ -161,5 +161,6 @@ found_on_the_way:
     the Anse de l'Aiguillon (46.33 N, 1.18 W): water behind the shore, closed from the
     sea, left as water. On so low a coast GEBCO's land, above mean sea level, reads as
     ground a metre or two above LAT, which the tide covers at high water springs: the
-    marshes behind the dykes flood in the model. A rule for the tool (a floor under
-    GEBCO's land where EMODnet has none), the lead's to take.
+    marshes behind the dykes flood in the model. Package 39a's `fill_to_chart_datum`
+    (GEBCO's fill raised by the world's mean level) is the rule for it; the block was
+    built beside 39a without the key, and its rebuild with it is the lead's to order.

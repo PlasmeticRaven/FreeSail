@@ -1,0 +1,1428 @@
+# The features of the Channel east (spec M6 §26, block 1; package 39a; docs/dev/ChartBlocks.md):
+# Lyme Bay, Portland and Weymouth, the Dorset coast to the Needles, the Channel Islands, the
+# Cotentin, the bay of St Malo to Cape Fréhel; and Dartmouth and Torbay, whose harbour patch
+# is this block's though their water lies in channel-west's bounds (west of 3 W, where
+# channel-west lists no level-3 tile; the bounds' check takes a harbour patch's box as the
+# block's). The form and the rules are channel-west.yaml's (its head): hazards, marks,
+# lights with their dates, places, anchorages and roads, each with its source in the
+# references' form (docs/references/README.md), read from the pilots named in
+# docs/references/Charts.md:
+#
+#   Faden 1793      Le Petit Neptune Français; or, French Coasting Pilot (Internet Archive
+#                   lepetitneptunefr00fade): Cape Barfleur and its light-house, Cherbourg,
+#                   Cape la Hague (pp. 26 to 29); 'Isles of Jersey, Guernsey, Alderney, &c.
+#                   by Captain Dobree' (pp. 29 to 36); the French coast from the Grand Ance
+#                   to Cape Fréhel (pp. 36 to 41); Morlaix (p. 44, in channel-west.yaml). In
+#                   period exactly: the directions as a master of 1805 read them.
+#   White 1835      Martin White, Sailing Directions for the English Channel (Internet Archive
+#                   sailingdirectio00whitgoog): 'Coast of England' pp. 37 to 45 (the Start
+#                   to the Needles); 'Coast of France' pp. 58 to 90 (Cape la Hague to Cape
+#                   Fréhel, from his own survey); 'Directions for the Channel Islands' pp. 91
+#                   to 167. White surveyed the islands for the Admiralty from 1813; his marks
+#                   are later than 1805, the rocks and the depths are the same rocks.
+#   Imray 1874      James F. Imray, Sailing Directions for the English Channel, part I
+#                   (Internet Archive sailingdirection00unse_0): 'Poole Bay to Start Point'
+#                   pp. 56 to 71 (Weymouth, Portland, Torbay, Dartmouth), the Needles
+#                   pp. 48 to 51.
+#   Bellin 1764     Petit Atlas Maritime t. V no. 44, 'St Malo et environs' (David Rumsey
+#                   6903.531), read at full resolution (the St Malo override's head).
+#   Trinity House   the lighthouse pages of trinityhouse.co.uk, read 2026-10-09: Portland
+#                   Bill (the patent of 26 May 1716, two lighthouses with coal fires, Argand
+#                   lamps in August 1788, a new tower in 1789, the towers of 1869, the one of
+#                   1906), the Casquets (first exhibited 30 October 1724, three lights in a
+#                   triangle; Argand lamps 25 November 1790; revolving 1818), the Needles
+#                   (the cliff-top tower lit 29 September 1786, 144 m above the sea; the
+#                   tower on the rocks 1859), Hurst Point (lit 29 September 1786; a higher
+#                   light added 1812), St Catherine's (1838), Anvil Point (1881), Alderney
+#                   (1912), Berry Head (1906).
+#   the encyclopaedia   fr.wikipedia.org, read 2026-10-09: 'Phare du cap Fréhel' (lit
+#                   November 1702, the winter months only until 1717; reverberating oil lamps
+#                   1774; revolving 1821; the new tower 1845 to 1847), 'Phare de Gatteville'
+#                   (the Rouen chamber's tower lit November 1775, oil reflectors 1780, the new
+#                   tower 1829 to 1835), as Faden 1793 p. 26 has Barfleur's of 1775.
+#
+# Positions are in the modern frame (WGS 84, the EMODnet DTM 2024 grid the tiles are cut
+# from), first placed from the builder's knowledge of the modern chart and the pilots'
+# bearings, then checked against this block's tiles by the rule of channel-west.yaml's
+# head (a headland, island, town, castle, church or tower to the nearest land within 800 m;
+# a light to the nearest land or shoal head within 400 m; a rock, ledge or drying rock to
+# the nearest shoal head within 400 m; an anchorage to the nearest water holding half the
+# pilot's depth within 800 m); where a position rests on a pilot's words alone the entry
+# says so in `fix`. Heights are above the sea for the horizon, the modern chart's or the
+# pilot's. A light's `lit` has `from` and `until`, so that 1805 sees the Casquets, Portland,
+# the Needles' cliff-top light, Hurst's first tower, Barfleur and Fréhel, and not the Start,
+# Berry Head, St Catherine's, Anvil Point, Cap de la Hague, Carteret or the Corbière;
+# `range_nm` is the period lamp's, a judgement from the pilot's words or the elevation.
+# `dries_m` is a danger's head against the chart's datum (LAT taken as the pilot's low
+# water of springs): negative for the water over it, positive for how far it dries.
+#
+# Not here: Morlaix (3.83 W) lies in channel-west's bounds and its marks are in
+# channel-west.yaml (the brief's item 1); the Start, the Skerries' south end and the coast
+# west of Dartmouth are channel-west's.
+
+region: channel-mid
+features:
+
+  # ---------------------------------------------------------------------------
+  # Dartmouth and Torbay (the harbour patch dartmouth-torbay, in channel-west's water)
+  # ---------------------------------------------------------------------------
+
+  - id: dartmouth-castle
+    kind: castle
+    name: Dartmouth Castle
+    modern: Dartmouth Castle
+    lat_deg: 50.34230
+    lon_deg: -3.56371
+    height_m: 20
+    source: "White 1835, 'Coast of England', p. 39: St Petrox church and Dartmouth Castle on the western side of the entrance, just within the Battery Point; p. 40: keep the Castle open to the eastward of the Blackstone"
+    says: "Dartmouth Castle with St Petrox church beside it, on the western side of the harbour's mouth just within the Battery Point."
+
+  - id: kingswear-castle
+    kind: castle
+    name: Kingswear Old Castle
+    modern: Kingswear Castle
+    lat_deg: 50.34070
+    lon_deg: -3.56149
+    height_m: 15
+    source: "White 1835, 'Coast of England', p. 39: the Old Castle of Kingswear stands on the rocks near the water's edge on the eastern side"
+    says: "Kingswear Old Castle, on the rocks at the water's edge on the eastern side of the entrance."
+
+  - id: stoke-fleming-church
+    kind: church
+    name: Stoke Fleming church
+    modern: St Peter's church, Stoke Fleming
+    lat_deg: 50.3236
+    lon_deg: -3.5986
+    height_m: 90
+    source: "White 1835, 'Coast of England', p. 39: the square steeple of Stoke Fleming church, very conspicuous near a white house on the land south-west of the harbour's mouth, marks its position until Kingswear Old Castle and St Petrox church come in sight"
+    says: "The square steeple of Stoke Fleming church by its white house, south-west of the harbour: the mark for Dartmouth before the entrance opens."
+
+  - id: the-blackstone-dartmouth
+    kind: rock
+    name: the Blackstone
+    modern: Blackstone Rocks (Dartmouth)
+    lat_deg: 50.3343
+    lon_deg: -3.5560
+    height_m: 3
+    fix: "White's words alone: a black rugged rock always above water, the south-western of the range off the entrance; placed from the modern chart's rocks off Blackstone Point and checked against the grid; the grid (EMODnet's 1/16 minute, resampled at the harbour patch's level) does not resolve the rock; left where the first placing put it"
+    source: "White 1835, 'Coast of England', pp. 39 to 40: the Blackstone, a very remarkable black rugged rock, always above the water; give it a berth of half a cable"
+    says: "The Blackstone, a black rugged rock always above water off the harbour's mouth; give it half a cable and steer for the entrance."
+
+  - id: the-homestone
+    kind: rock
+    name: the Homestone
+    modern: Homestone Rocks
+    lat_deg: 50.33293
+    lon_deg: -3.56062
+    height_m: 0
+    dries_m: -0.9  # 'on some occasions as little as 3 feet water upon it'
+    fix: "White: 220 fathoms south of the Blackstone; moved 390 m to the grid's shoal head of 6.7 m, the patch of rocks off the entrance (the grid smooths a head of three feet)"
+    source: "White 1835, 'Coast of England', p. 39: the Homestone, 220 fathoms south (S S W 1/2 W) from the Blackstone, has on some occasions as little as 3 feet water; p. 40: the Castle open east of the Blackstone carries you east of it"
+    says: "The Homestone, two hundred and twenty fathoms south of the Blackstone, with sometimes no more than three feet on it; keep the Castle open to the eastward of the Blackstone."
+
+  - id: froward-point
+    kind: headland
+    name: Proward Point
+    modern: Froward Point
+    lat_deg: 50.33477
+    lon_deg: -3.53980
+    height_m: 70
+    source: "White 1835, 'Coast of England', pp. 39 to 40: the ledges which project nearly a quarter of a mile from Proward Point; keep Kingswear Point in one with Dartmouth Castle to avoid them"
+    says: "Proward Point, east of the entrance, with rocky ledges running a quarter of a mile to seaward: keep Kingswear Point in one with Dartmouth Castle."
+
+  - id: the-range-dartmouth
+    kind: anchorage
+    name: the Range
+    modern: the Range, outside Dartmouth
+    lat_deg: 50.3345
+    lon_deg: -3.5490
+    height_m: 0
+    depth_fathoms: 5
+    source: "White 1835, 'Coast of England', p. 40: between the Blackstone and Proward Point is the anchorage called the Range, where vessels occasionally anchor in 5 fathoms, only as preparatory for entering; caught there by southerly winds there is no alternative but slipping"
+    says: "The Range, between the Blackstone and Proward Point, five fathoms: an anchorage only to wait for the harbour, for a southerly wind sends in a sea and leaves nothing but to slip."
+
+  - id: dartmouth-harbour
+    kind: anchorage
+    name: Dartmouth harbour
+    modern: the Dart off Kingswear
+    lat_deg: 50.3490
+    lon_deg: -3.5712
+    height_m: 0
+    depth_fathoms: 5
+    bottom: "mud"
+    fix: "the channel's core abreast of Kingswear, in the Dartmouth override's five fathoms (the grid alone smooths the river to two or three metres)"
+    source: "White 1835, 'Coast of England', p. 40: having passed the Castle keep the western shore on board, and anchor abreast of Kingswear, or Dartmouth, as convenient; no square-rigged vessel should enter or leave except with leading winds, the flaws coming off the high land; between S W by S and S E by E the winds blow truly in; Imray 1874, 'Dartmouth', p. 69: abreast the town 10 to 3 1/2 fathoms at low water; the bottom judgement"
+    says: "Dartmouth harbour, anchored abreast of Kingswear or the town under the high land; a square-rigged ship goes in and out only with a leading wind, for the flaws come off the hills with great force."
+
+  - id: dartmouth
+    kind: town
+    name: Dartmouth
+    modern: Dartmouth
+    lat_deg: 50.3515
+    lon_deg: -3.5790
+    height_m: 20
+    source: "White 1835, 'Coast of England', pp. 39 to 41: well adapted for the reception of trading vessels in any number; the entrance narrow"
+    says: "Dartmouth, a harbour for trading vessels in any number behind a narrow entrance."
+
+  - id: berry-head
+    kind: headland
+    name: the Berry Head
+    modern: Berry Head
+    lat_deg: 50.40125
+    lon_deg: -3.48867
+    height_m: 55
+    source: "White 1835, 'Coast of England', p. 39: the southern boundary of Torbay, lofty and precipitous, discerned at 7 and 8 leagues; Imray 1874, 'Tor Bay', pp. 67 to 68: about 180 feet high, steep to, flat on its summit, seen 20 miles; its lighthouse dates from 1906 (Trinity House)"
+    says: "The Berry Head, lofty and precipitous with a flat top, the south side of Torbay; seen seven or eight leagues off and steep to."
+
+  - id: brixham
+    kind: town
+    name: Brixham
+    modern: Brixham
+    lat_deg: 50.3955
+    lon_deg: -3.5130
+    height_m: 20
+    source: "Imray 1874, 'Tor Bay', p. 68: Brixham harbour; the anchorage usually preferred is Brixham roads"
+    says: "Brixham, the fishermen's harbour under the Berry Head."
+
+  - id: brixham-road
+    kind: anchorage
+    name: Brixham road
+    modern: Brixham Roads, Tor Bay
+    lat_deg: 50.4100
+    lon_deg: -3.4950
+    height_m: 0
+    depth_fathoms: 6
+    bottom: "mud and clay"
+    fix: "Imray's bearings, Brixham church about S W and the Berry Head S S E, in the grid's 10.7 m"
+    source: "Imray 1874, 'Tor Bay', p. 68: the anchorage usually preferred is Brixham roads, with Brixham church about S W and Berry head S S E; the whole bay good anchorage over mud and clay, shelter from all winds from N E northerly to S by W; p. 67: the bay 8 to 6 fathoms deep, decreasing to the shore"
+    says: "Brixham road in Torbay, Brixham church south-west and the Berry Head south-south-east, six fathoms on mud and clay: sheltered from every wind from north-east round by the west to south, open to the easterly gale."
+
+  - id: torbay
+    kind: anchorage
+    name: Torbay
+    modern: Tor Bay
+    lat_deg: 50.4450
+    lon_deg: -3.5150
+    height_m: 0
+    depth_fathoms: 7
+    bottom: "mud and clay"
+    source: "Imray 1874, 'Tor Bay', pp. 67 to 68: between Hope Nose and Berry head, N N E and S S W 3 1/2 miles, running in about 3 miles, 8 to 6 fathoms; open to eastward, south-easterly gales sending in a heavy sea"
+    says: "Torbay, between Hope's Nose and the Berry Head, eight to six fathoms over mud and clay: the fleet's anchorage in a westerly gale, open to the east."
+
+  - id: hopes-nose
+    kind: headland
+    name: Hope's Nose
+    modern: Hope's Nose
+    lat_deg: 50.46296
+    lon_deg: -3.48668
+    height_m: 30
+    source: "Imray 1874, 'Tor Bay', p. 67: Tor bay lies between Hope Nose and Berry head; the Ore-stone, Flat rock, Thatcher and the Shags off it"
+    says: "Hope's Nose, the north point of Torbay, with the Ore Stone and the Thatcher off it."
+
+  - id: the-ore-stone
+    kind: island
+    name: the Ore Stone
+    modern: Orestone
+    lat_deg: 50.4596
+    lon_deg: -3.4742
+    height_m: 30
+    fix: "the grid does not resolve the islet (its least depth 3.4 m within 800 m); left at the modern chart's position"
+    source: "Imray 1874, 'Tor Bay', p. 67: the outermost of the rocks south and west of Hope Nose; vessels entering from the northward may keep close to it, but not the west side, shoal half a cable off"
+    says: "The Ore Stone, the outermost rock off Hope's Nose; a ship coming into Torbay from the north may keep close to it on its seaward side."
+
+  - id: thatcher-rock
+    kind: rock
+    name: the Thatcher
+    modern: Thatcher Rock
+    lat_deg: 50.4575
+    lon_deg: -3.5030
+    height_m: 40
+    fix: "the grid does not resolve the rock, two cables off the shore; left at the modern chart's position"
+    source: "Imray 1874, 'Tor Bay', p. 67: the Thatcher, among the rocks west of Hope Nose; the Ore-stone its own length open of the Thatcher, E 1/2 S, leads clear of the shoals on the north side of the bay"
+    says: "The Thatcher, a high rock in the north side of Torbay; the Ore Stone open of it leads clear of the shoals there."
+
+  # ---------------------------------------------------------------------------
+  # Lyme Bay to Portland
+  # ---------------------------------------------------------------------------
+
+  - id: lyme-regis
+    kind: town
+    name: Lyme
+    modern: Lyme Regis and the Cobb
+    lat_deg: 50.7250
+    lon_deg: -2.9370
+    height_m: 20
+    source: "Imray 1874, 'Poole Bay to Start Point', p. 64: Lyme Regis and its pier, the Cobb; White 1835, 'Remarks on the soundings', p. 5: the soundings from the Start to Lyme Regis"
+    says: "Lyme, with its Cobb, a pier-harbour for small craft at the head of the great bay."
+
+  - id: golden-cap
+    kind: hill
+    name: the Golden Cap
+    modern: Golden Cap
+    lat_deg: 50.7238
+    lon_deg: -2.8460
+    height_m: 191
+    source: "Imray 1874, 'Poole Bay to Start Point', pp. 63 to 64, the coast from Bridport to Lyme; the name and the height the modern chart's"
+    says: "The Golden Cap, the highest cliff of the coast between Lyme and Bridport, its top yellow in the sun."
+
+  - id: chesil-beach
+    kind: place
+    name: the Chesil Beach
+    modern: Chesil Beach
+    lat_deg: 50.6150
+    lon_deg: -2.5400
+    height_m: 10
+    source: "White 1835, 'Coast of England', p. 43: in the vicinity of Chesil Beach the shore is low; Imray 1874, p. 59: strangers alarmed by the Race have run their vessels on shore on Chesil beach, a fatal error"
+    says: "The Chesil Beach, a long bank of pebbles from Abbotsbury to Portland with deep water close to: a ship embayed here in a south-westerly gale is lost."
+
+  - id: portland-high-land
+    kind: hill
+    name: the high land of Portland
+    modern: the Verne, Isle of Portland
+    lat_deg: 50.5640
+    lon_deg: -2.4390
+    height_m: 149
+    source: "White 1835, 'Coast of England', p. 43: the Peninsula of Portland suddenly rises and forms a very remarkable promontory in the form of a wedge declining to the southward; Imray 1874, 'Portland Bill', p. 59: in its highest part 488 feet"
+    says: "The high land of Portland, a wedge rising steeply from the Chesil Beach and declining to the southward to the Bill."
+
+  - id: portland-bill
+    kind: headland
+    name: the Bill of Portland
+    modern: Portland Bill
+    lat_deg: 50.51674
+    lon_deg: -2.45466
+    height_m: 20
+    source: "White 1835, 'Coast of England', pp. 37 to 42: from the Start to Portland E 1/2 S 17 leagues; between them do not come within 30 fathoms until past the meridian of Portland; Imray 1874, 'Portland Bill', p. 59: three to four fathoms at two cables off on the south-east side"
+    says: "The Bill of Portland, the low southern end of the island, with the Race off it; keep without thirty fathoms in thick weather."
+
+  - id: portland-high-light
+    kind: light
+    name: the upper light of Portland
+    modern: Old Higher Lighthouse, Portland
+    lat_deg: 50.5208
+    lon_deg: -2.4560
+    height_m: 60
+    lit: {from: 1716, until: 1906, range_nm: 18, character: "a fixed light, Argand lamps since 1788 (White 1835 has it revolving in two minutes)"}
+    source: "Trinity House, 'Portland Bill Lighthouse' (the patent of 26 May 1716, two lighthouses with coal fires; Argand lamps in August 1788, the upper or old house with two rows of seven; the towers replaced 1869 and 1906); White 1835, 'Coast of England', p. 42: the two lights in one bearing N 53 W lead between the Race and the Shambles; their heights above high water 198 and 131 feet, 1,500 feet apart"
+    says: "The upper light of Portland, the higher of the two; the two lights in one lead between the Race and the Shambles."
+
+  - id: portland-low-light
+    kind: light
+    name: the lower light of Portland
+    modern: Old Lower Lighthouse, Portland (the bird observatory)
+    lat_deg: 50.5172
+    lon_deg: -2.4527
+    height_m: 40
+    lit: {from: 1716, until: 1906, range_nm: 15, character: "a fixed light, lens-lit Argand lamps since 1788"}
+    source: "Trinity House, 'Portland Bill Lighthouse' (the two lighthouses of 1716; the low light's six Argand lamps with Rogers's lenses); White 1835, 'Coast of England', p. 42: the lowest, south-eastern light; Imray 1874, p. 59: the low light visible seaward only between S E by E 1/2 E and W by S 1/2 S"
+    says: "The lower light of Portland; keep the upper light open to the southward of it passing between the Shambles and the Bill on the north-eastern stream."
+
+  - id: portland-bill-light
+    kind: light
+    name: Portland Bill lighthouse
+    modern: Portland Bill Lighthouse
+    lat_deg: 50.51680
+    lon_deg: -2.45479
+    height_m: 43
+    lit: {from: 1906, until: null, range_nm: 25, character: "a group of four flashes every twenty seconds"}
+    source: "Trinity House, 'Portland Bill Lighthouse': built 1906 to replace the high and low lights"
+    says: "The single tower on the Bill, which replaced the two lights in 1906."
+
+  - id: portland-ledge
+    kind: ledge
+    name: Portland Ledge
+    modern: Portland Ledge
+    lat_deg: 50.50329
+    lon_deg: -2.45776
+    height_m: 0
+    dries_m: -5.5  # 'from 3 to 9 fathoms' over it (Imray), the shoalest three
+    extent_m: 1800
+    source: "White 1835, 'Coast of England', p. 41: the rocky ledge which projects somewhat more than a mile in a southerly direction from the Bill, both sides remarkably steep; Imray 1874, 'Portland Ledge', p. 59: a mile S S W from the pitch of the Bill, the soundings over it 3 to 9 fathoms"
+    says: "Portland Ledge, a steep shelf of rock running a mile south-south-west from the Bill with three to nine fathoms on it, the cause of the Race."
+
+  - id: portland-race
+    kind: place
+    name: the Race of Portland
+    modern: Portland Race
+    lat_deg: 50.4950
+    lon_deg: -2.4500
+    height_m: 0
+    source: "White 1835, 'Coast of England', pp. 41 to 42: a periodical ebullition of the sea raging with great violence on the southern side of the Bill, two miles off with northerly winds and half a mile with southerly; east of the ledge on the north-eastern stream, west of it on the south-western; dangerous for small vessels at springs; a channel between the Race and the Bill with 3 to 9 fathoms within a third of a mile of the Bill, with a free wind and slack water"
+    says: "The Race of Portland, raging off the Bill on the ledge: to the eastward of it on the flood stream and to the westward on the ebb, and at springs no place for a small vessel."
+
+  - id: the-shambles
+    kind: bank
+    name: the Shambles
+    modern: The Shambles
+    lat_deg: 50.51194
+    lon_deg: -2.36839
+    height_m: 0
+    dries_m: -3.4  # 'the depths vary from 11 feet to 7 fathoms'
+    extent_m: 3700
+    source: "White 1835, 'Coast of England', p. 41: a dangerous shoal of coarse shingle, sand and shells, its western end S 63 E 2 3/4 miles and its eastern N 87 E 4 1/2 miles from the pitch of the Bill, two miles long and three-quarters broad, from 11 feet to 7 fathoms; always distinguishable by the rippling in fine weather; between it and Portland a good working channel of 9 to 16 fathoms"
+    says: "The Shambles, a bank of shingle and shells two miles long east-south-east of the Bill with only eleven feet on its shoalest part; the ripple shows it in fine weather, and between it and the Bill there is a working channel."
+
+  - id: portland-west-bay
+    kind: anchorage
+    name: Portland West Bay
+    modern: West Bay, Portland
+    lat_deg: 50.5530
+    lon_deg: -2.4930
+    height_m: 0
+    depth_fathoms: 14
+    bottom: "coarse loose gravel or shingle"
+    fix: "White's bearings: the Bill S 30 E, Chesilton village N 78 E, a mile or more off shore"
+    source: "White 1835, 'Coast of England', pp. 42 to 43: on the north-western side of the Bill, very good shelter from S S E to N by E, deep water of 12 to 16 fathoms on coarse loose gravel or shingle; a vessel is on all occasions much safer at sea than in West Bay"
+    says: "Portland West Bay, twelve to sixteen fathoms on coarse shingle a mile off the island: shelter from an easterly wind, a trap in a westerly one."
+
+  - id: portland-road
+    kind: anchorage
+    name: Portland Road
+    modern: Portland Harbour (before the breakwaters)
+    lat_deg: 50.5800
+    lon_deg: -2.4360
+    height_m: 0
+    depth_fathoms: 7
+    bottom: "firm blue clay"
+    source: "Imray 1874, 'Portland Road', p. 60: excellent anchorage on firm solid blue clay, 5 to 10 fathoms within; the breakwater (begun 1849) has sheltered it from the southerly, south-easterly and E S E gales, the only winds which formerly rendered Portland road dangerous; little or no tide"
+    says: "Portland Road, under the north-east side of the island, seven fathoms on blue clay with little tide: good holding, but open to the gales from south-east round to east."
+
+  - id: portland-castle
+    kind: castle
+    name: Portland Castle
+    modern: Portland Castle
+    lat_deg: 50.56867
+    lon_deg: -2.44650
+    height_m: 10
+    source: "Imray 1874, 'Portland Road', p. 60, the road under the castle; the castle's date (1539 to 1541, one of the King's forts) from the encyclopaedia's 'Portland Castle', from memory, unverified"
+    says: "Portland Castle, the low fort on the shore of the road at the north end of the island."
+
+  - id: weymouth
+    kind: town
+    name: Weymouth
+    modern: Weymouth
+    lat_deg: 50.6085
+    lon_deg: -2.4560
+    height_m: 15
+    source: "Imray 1874, 'Weymouth Road and Harbour', p. 58: a very convenient little place for vessels not drawing more than 10 feet, lying afloat at the quays almost always; high water full and change 6h 56m, springs rise 7 feet"
+    says: "Weymouth, a small pier-harbour for vessels of ten feet's draught, with the King's sea-bathing and the town on the beach."
+
+  - id: weymouth-road
+    kind: anchorage
+    name: Weymouth Road
+    modern: Weymouth Bay off the harbour
+    lat_deg: 50.6080
+    lon_deg: -2.4370
+    height_m: 0
+    depth_fathoms: 6
+    bottom: "sand and gravel"
+    source: "Imray 1874, 'Weymouth Road and Harbour', p. 58: good anchorage in from 5 to 8 fathoms at half or three-quarters of a mile E S E from the jetty head on sand and gravel; foul ground within three-quarters of a mile of the northern shore; very little tide"
+    says: "Weymouth Road, five to eight fathoms on sand and gravel three-quarters of a mile east-south-east of the pier head, with scarcely any tide."
+
+  - id: wyke-regis-church
+    kind: church
+    name: Wyke Regis church
+    modern: All Saints, Wyke Regis
+    lat_deg: 50.6017
+    lon_deg: -2.4806
+    height_m: 40
+    source: "White 1835, 'Coast of England', p. 41: Wyke Regis church distinctly open to the northward of the north-east point of Portland, N by W 1/2 W, the leading mark to clear the eastern end of the Shambles; in one with it, over the end of the shoal in 7 fathoms"
+    says: "Wyke Regis church, its tower the mark for the Shambles: open north of Portland's north-east point you pass east of the shoal."
+
+  # ---------------------------------------------------------------------------
+  # The Dorset coast to the Needles, and the back of the Wight
+  # ---------------------------------------------------------------------------
+
+  - id: st-albans-head
+    kind: headland
+    name: St Alban's Head
+    modern: St Aldhelm's Head
+    lat_deg: 50.57736
+    lon_deg: -2.05543
+    height_m: 105
+    source: "White 1835, 'Coast of England', pp. 43 to 44: between Weymouth Bay and St Alban's Head the shore principally cliff; from a league off Portland E 1/2 S 15 miles, and after passing St Alban's Head east 19 miles to the Needles"
+    says: "St Alban's Head, a high square headland with its chapel; from off Portland it lies east by south five leagues."
+
+  - id: kimmeridge-ledges
+    kind: ledge
+    name: Kimmeridge ledges
+    modern: Kimmeridge Ledges
+    lat_deg: 50.59780
+    lon_deg: -2.11800
+    height_m: 0
+    dries_m: 1
+    extent_m: 1200
+    fix: "placed from the modern chart along the shore Imray describes; the shore's drying edge in the grid"
+    source: "Imray 1874, 'Poole Bay to Start Point', pp. 56 to 57: a rocky ledge known as the Kimmeridge ledge runs along the coast about 4 1/2 miles, 5 to 10 fathoms close off it"
+    says: "The Kimmeridge ledges, flat shelves of rock along four miles and a half of the shore west of St Alban's Head, five to ten fathoms close off."
+
+  - id: durlston-head
+    kind: headland
+    name: Durlston Head
+    modern: Durlston Head and Anvil Point
+    lat_deg: 50.5960
+    lon_deg: -1.9550
+    height_m: 60
+    source: "Imray 1874, 'Needles Bight', p. 50: Durlston head, the western limit of the bight in 14 fathoms; Anvil Point's lighthouse dates from 1881 (Trinity House)"
+    says: "Durlston Head by Swanage, the western end of the bight before the Needles; no light here before 1881."
+
+  - id: anvil-point-light
+    kind: light
+    name: Anvil Point lighthouse
+    modern: Anvil Point Lighthouse
+    lat_deg: 50.5920
+    lon_deg: -1.9600
+    height_m: 45
+    lit: {from: 1881, until: null, range_nm: 9, character: "a flash every ten seconds"}
+    source: "Trinity House, 'Anvil Point Lighthouse': built 1881"
+    says: "Anvil Point lighthouse, of 1881."
+
+  - id: old-harry
+    kind: rock
+    name: Old Harry
+    modern: Old Harry Rocks
+    lat_deg: 50.6425
+    lon_deg: -1.9240
+    height_m: 25
+    fix: "the stack off the end of the Foreland, which the grid does not resolve; left at the modern chart's position"
+    source: "White 1835, 'Coast of England', p. 43: the chalk cliff continuing as far as Old Harry, where it again abruptly declines"
+    says: "Old Harry, the chalk stack at the end of the Foreland, where the cliffs fall away to Poole."
+
+  - id: hengistbury-head
+    kind: headland
+    name: Hengistbury Head
+    modern: Hengistbury Head
+    lat_deg: 50.7135
+    lon_deg: -1.7560
+    height_m: 35
+    source: "White 1835, 'Coast of England', p. 38: the strong indraught of the flood into Christchurch, the Needles and Freshwater Bays; p. 43: throughout Christchurch Bay the land generally low; Imray 1874, p. 51: Christchurch ledge"
+    says: "Hengistbury Head, the low headland of Christchurch Bay, with its ledge running out to seaward; the flood sets strongly into the bay."
+
+  - id: the-needles
+    kind: rock
+    name: the Needles
+    modern: The Needles
+    lat_deg: 50.66292
+    lon_deg: -1.58782
+    height_m: 30
+    source: "White 1835, 'Coast of England', p. 43: the western end of the Isle of Wight, the Needle Point, rises perpendicularly, composed wholly of chalk; Imray 1874, 'Needles Bight', p. 50: the Needles rocks very conspicuous"
+    says: "The Needles, the white chalk stacks at the western end of the Wight, very remarkable against the dark land behind."
+
+  - id: needles-cliff-light
+    kind: light
+    name: the Needles light
+    modern: the first Needles lighthouse (on the cliff above Scratchell's Bay)
+    lat_deg: 50.66126
+    lon_deg: -1.57889
+    height_m: 144
+    lit: {from: 1786, until: 1859, range_nm: 20, character: "a fixed light, often lost in the mist at its height"}
+    fix: "Trinity House: atop the cliff overhanging Scratchell's Bay; placed on the cliff top east of the rocks, unverified within a cable or two"
+    source: "Trinity House, 'Needles Lighthouse': erected 1785 to R. Jupp's design and lit 29 September 1786 atop the cliff overhanging Scratchell's Bay, 144 m above sea level, often obscured by sea mists; replaced 1859 by the tower on the outermost rock"
+    says: "The Needles light on the high cliff above the rocks, lit since 1786, which the mist often hides at its great height."
+
+  - id: needles-light
+    kind: light
+    name: the Needles lighthouse
+    modern: Needles Lighthouse
+    lat_deg: 50.6623
+    lon_deg: -1.5913
+    height_m: 24
+    lit: {from: 1859, until: null, range_nm: 17, character: "occulting, with red and green sectors"}
+    fix: "on the outer rock, which the grid does not resolve"
+    source: "Trinity House, 'Needles Lighthouse': the tower on the outermost rock, 1859"
+    says: "The Needles lighthouse on the outer rock, of 1859."
+
+  - id: the-shingles
+    kind: bank
+    name: the Shingles
+    modern: The Shingles
+    lat_deg: 50.69052
+    lon_deg: -1.59034
+    height_m: 0
+    dries_m: 1
+    extent_m: 3500
+    fix: "placed from the modern chart; parts dry; the grid's shoal head of 0.3 m"
+    source: "White 1835, 'Coast of England', p. 44: the Hurst lighthouses in one lead over the Bridge and very closely skirt the eastern side of the Shingles; three buoys mark its edge; Imray 1874, p. 50: the Shingles, from Hurst point W S W 3 miles"
+    says: "The Shingles, a bank of shingle west of the Needles channel, parts of which dry; the buoys mark its eastern edge."
+
+  - id: hurst-castle
+    kind: castle
+    name: Hurst Castle
+    modern: Hurst Castle
+    lat_deg: 50.70954
+    lon_deg: -1.55491
+    height_m: 10
+    source: "White 1835, 'Coast of England', p. 43: Hurst Castle, the base of which is very little elevated above the sea"
+    says: "Hurst Castle, low on the end of the shingle spit at the mouth of the Solent."
+
+  - id: hurst-light
+    kind: light
+    name: the Hurst light
+    modern: the first Hurst Point lighthouse (south-west of the castle)
+    lat_deg: 50.70868
+    lon_deg: -1.55641
+    height_m: 20
+    lit: {from: 1786, until: 1866, range_nm: 12, character: "a fixed light (a second, higher light added in 1812 made the pair in one White's leading mark)"}
+    fix: "Trinity House: sited to the south-west of Hurst Castle; placed on the spit, unverified within a cable"
+    source: "Trinity House, 'Hurst Point Lighthouse': the tower to the south-west of Hurst Castle lit for the first time 29 September 1786; a higher light added in 1812; the low tower replaced in 1866, the high in 1867"
+    says: "The Hurst light on the spit south-west of the castle, lit since 1786; the higher light that makes the leading pair is not built until 1812."
+
+  - id: st-catherines-point
+    kind: headland
+    name: St Catherine Point
+    modern: St Catherine's Point
+    lat_deg: 50.5757
+    lon_deg: -1.2975
+    height_m: 20
+    source: "White 1835, 'Coast of England', p. 38: between Portland Bill and St Catherine Point go not into less water than 25 fathoms; p. 43: from off the Start to off St Catherine N 77 E 31 leagues; p. 220 of the tides: the overfalls off St Catherine Point and Dunnose; its lighthouse dates from 1838 (Trinity House)"
+    says: "St Catherine Point, the southern end of the Wight under the high down, with overfalls off it; unlit until 1838."
+
+  - id: st-catherines-oratory
+    kind: tower
+    name: St Catherine's tower
+    modern: St Catherine's Oratory, St Catherine's Down
+    lat_deg: 50.5938
+    lon_deg: -1.3037
+    height_m: 236
+    source: "Trinity House, 'St Catherine's Lighthouse': a small light set up about 1323 by Walter de Godyton, who erected a chapel, kept until about 1530; the oratory's tower on the down and its height the modern chart's"
+    says: "St Catherine's tower on the high down of the Wight, the chapel's old light-tower, a daymark long unlit."
+
+  - id: dunnose
+    kind: headland
+    name: Dunnose
+    modern: Dunnose (Luccombe)
+    lat_deg: 50.6165
+    lon_deg: -1.1945
+    height_m: 241
+    source: "White 1835, 'Coast of England', p. 43: from the Needles towards St Catherine the land rises gradually, Dunnose being 792 feet above the level of the sea"
+    says: "Dunnose, the highest land of the Wight's back, seven hundred and ninety feet above the sea."
+
+  # ---------------------------------------------------------------------------
+  # Alderney, the Casquets and the Race
+  # ---------------------------------------------------------------------------
+
+  - id: the-casquets
+    kind: ledge
+    name: the Casquets
+    modern: Les Casquets
+    lat_deg: 49.72042
+    lon_deg: -2.38401
+    height_m: 25
+    extent_m: 1200
+    source: "Faden 1793, 'The Caskets', p. 30: a cluster of rocks west of Ortach 3 or 4 miles, some above the sea and the greatest part under water; a ship may pass between them and Ortach keeping nearest to Ortach; White 1835, 'Coast of England', p. 38: the soundings round the Casquets within 3 leagues do not differ from Portland's, so that the one may be mistaken for the other in bad weather"
+    says: "The Casquets, a cluster of rocks seven miles west of Alderney, the greatest part under water, with their three lights; between them and Guernsey the tides run strongly and round the compass in twelve hours."
+
+  - id: casquets-lights
+    kind: light
+    name: the Casquets lights
+    modern: Casquets Lighthouse
+    lat_deg: 49.7218
+    lon_deg: -2.3772
+    height_m: 30
+    lit: {from: 1724, until: null, range_nm: 12, character: "three fixed lights in a triangle (Argand lamps since 1790; revolving from 1818)"}
+    fix: "the rock is smaller than the grid's cell, whose least depth is 3.3 m; the lights stand where the modern chart has the lighthouse"
+    source: "Trinity House, 'Casquets Lighthouse': three towers with closed coal fires in a horizontal triangle, St Peter, St Thomas and Dungeon, first exhibited 30 October 1724; Argand lamps and reflectors 25 November 1790; a revolving apparatus in each tower 1818; Faden 1793, p. 30: three light-houses in the form of a triangle which may be seen 5 or 6 miles off in a dark night; White 1835, p. 38: all three of equal height, 80 feet above high water, appearing as two from six bearings; the range a judgement between Faden's fires and the elevation"
+    says: "The three lights of the Casquets, in a triangle on the great rock; from some bearings they show as two, and a stranger may take the Casquets for Portland."
+
+  - id: ortac
+    kind: rock
+    name: Ortach
+    modern: Ortac
+    lat_deg: 49.72347
+    lon_deg: -2.29314
+    height_m: 24
+    source: "Faden 1793, 'Alderney', p. 30: to the S W of Buron is Ortach, a huge rock, close to which you have 14 and 15 fathoms; White 1835, 'Alderney', p. 125: a remarkable huge misshapen rock between Burhou and the Casquets, many sunken rocks between it and Burhou"
+    says: "Ortach, a huge misshapen rock between Burhou and the Casquets, fourteen fathoms close to it."
+
+  - id: burhou
+    kind: island
+    name: Burhou
+    modern: Burhou
+    lat_deg: 49.73077
+    lon_deg: -2.25870
+    height_m: 25
+    source: "White 1835, 'Alderney', pp. 122 to 123: the rocky islet Burhou, a mile and a half from the west end of Alderney, a small house on it; Faden 1793, p. 30: the isle Buron, which may be approached within pistol shot"
+    says: "Burhou, a rocky islet with a small house on it, a mile and a half from the west end of Alderney across the Swinge."
+
+  - id: the-swinge
+    kind: place
+    name: the Swinge
+    modern: The Swinge
+    lat_deg: 49.7235
+    lon_deg: -2.2400
+    height_m: 0
+    source: "Faden 1793, 'Alderney', p. 30: west of Alderney a channel about a mile wide called Passage au Singe between the western point of the island and the isle of Buron; White 1835, 'Alderney', pp. 123 to 124: its narrowest part between Burhou and the Corbet rock scarcely three-quarters of a mile, with two dangerous overfalls; p. 132: the stream sets straight through both ways six hours and six hours"
+    says: "The Swinge, the passage between Alderney and Burhou, three-quarters of a mile wide at its narrows, with its overfalls and a stream of seven knots at springs."
+
+  - id: pierre-au-vrach
+    kind: rock
+    name: the Pierre au Vrach
+    modern: Pierre au Vraic
+    lat_deg: 49.7050
+    lon_deg: -2.2700
+    height_m: 0
+    dries_m: 0
+    fix: "Faden: south of Ortach, easterly, two large miles; White: 1 1/2 miles from Ortach and as far from Les Etats, in the fair way of the entrance of the Swinge"
+    source: "Faden 1793, 'Alderney', p. 30: the Pierre au Wrach, the wreck stone, of the size and form of a boat, appears only at low water spring tides, 15 and 16 fathoms close to it; White 1835, 'Alderney', p. 123"
+    says: "The Pierre au Vrach, a rock like a boat in the fair way of the Swinge's southern entrance, showing only at low water of springs, sixteen fathoms close round it."
+
+  - id: braye-road
+    kind: anchorage
+    name: Braye Road
+    modern: Braye Harbour (before the breakwater)
+    lat_deg: 49.7285
+    lon_deg: -2.1945
+    height_m: 0
+    depth_fathoms: 6
+    bottom: "fine clean sand"
+    source: "White 1835, 'Alderney', p. 120: the Road of Braye lies before the lower town, a fine sandy bottom with 5 to 10 fathoms, seldom used but as preparatory to entering the pier, not safe in winter for the ground-swell; p. 121: tail clear with 80 fathoms of cable; the pier 408 feet long, both harbours dry at low water neaps"
+    says: "Braye Road before the little town of Alderney, five to ten fathoms on clean sand: a place to wait for the tide into the pier, not to lie in, for the ground-swell comes in without warning."
+
+  - id: braye
+    kind: town
+    name: Braye
+    modern: Braye, Alderney
+    lat_deg: 49.72450
+    lon_deg: -2.19879
+    height_m: 10
+    source: "White 1835, 'Alderney', p. 119: two small towns, St Anne on the heights south of the pier, and Braye contiguous to the pier, principally store-houses; p. 120: the stone pier 26 feet high"
+    says: "Braye, the store-houses by Alderney's pier."
+
+  - id: st-anne-alderney
+    kind: town
+    name: St Anne
+    modern: St Anne, Alderney
+    lat_deg: 49.7140
+    lon_deg: -2.2045
+    height_m: 80
+    source: "White 1835, 'Alderney', p. 119: St Anne on the heights to the southward of the pier; the Telegraph Hill 276 feet above the sea"
+    says: "St Anne, the town of Alderney on the heights above the pier."
+
+  - id: alderney-race
+    kind: place
+    name: the Race of Alderney
+    modern: Alderney Race (Raz Blanchard)
+    lat_deg: 49.7000
+    lon_deg: -2.0700
+    height_m: 0
+    source: "Faden 1793, 'Cape la Hague', p. 29: the Raz Blanchard between Cape la Hague and the east end of Alderney, about 2 1/2 leagues wide; steer about mid-channel or nearer Alderney; the swiftness in spring tides about two leagues an hour; White 1835, 'Alderney', p. 130: when running to the south-westward at springs above 6 1/2 miles an hour and neaps nearly 5, the north-eastern stream greater; the sea breaks in all parts of it in bad weather, though not less than 26 fathoms"
+    says: "The Race of Alderney, between the island and Cape la Hague: steer mid-channel; at springs the stream runs six and seven knots and the sea breaks all over it when wind and tide are opposed."
+
+  - id: the-blanchard
+    kind: shoal
+    name: the Blanchard
+    modern: Blanchard (east of Alderney)
+    lat_deg: 49.72140
+    lon_deg: -2.14216
+    height_m: 0
+    dries_m: -8.2  # 'the least depth of water ... 4 1/2 fathoms'
+    fix: "White's words: outside the tail of the Brinchetais, off the east end; placed from the modern chart"
+    source: "White 1835, 'Alderney', p. 130: the Blanchard, of rock, gravel, granite stones and shells, least water 4 1/2 fathoms on its eastern brink, 9 to 12 fathoms between it and the island"
+    says: "The Blanchard, a bank off the east end of Alderney with four fathoms and a half on its eastern edge, where the Race breaks."
+
+  - id: les-etacs
+    kind: rock
+    name: Les Etats
+    modern: Les Étacs
+    lat_deg: 49.7060
+    lon_deg: -2.2410
+    height_m: 35
+    fix: "the grid does not resolve the rocks off the island's shore; left at the modern chart's position"
+    source: "White 1835, 'Alderney', p. 119: to the southward of the island are Les Etats, Noires-Putes, Coquelihou, Boni and l'Etart; p. 123: keep the north-western head of the Clanque within its breadth of the west side of Les Etats running for the Swinge"
+    says: "Les Etats, high rocks off the south-west end of Alderney; not to be approached within three cables."
+
+  - id: cap-de-la-hague
+    kind: headland
+    name: Cape la Hague
+    modern: Cap de la Hague
+    lat_deg: 49.7245
+    lon_deg: -1.9425
+    height_m: 15
+    source: "Faden 1793, 'Cape la Hague', p. 29: covered rocks a quarter of a league N W of it; not safe within half a league; low land near the sea, high half a league inland; White 1835, 'Coast of France', p. 58: low and sandy, breakers nearly a mile from the strand; the light on the Gros du Raz dates from 1837"
+    says: "Cape la Hague, the low north-west point of Normandy with rocks and breakers a mile off it; give it half a league, and no light on it before 1837."
+
+  - id: nez-de-jobourg
+    kind: headland
+    name: Jobourg-nez
+    modern: Nez de Jobourg
+    lat_deg: 49.6770
+    lon_deg: -1.9425
+    height_m: 128
+    source: "White 1835, 'Coast of France', pp. 60 to 61: three miles S S W of Cape la Hague the coast rises suddenly into a high bluff promontory called Jobourg-nez, the northern boundary of the Ance de Vauville"
+    says: "Jobourg-nez, the high bluff south of Cape la Hague, the north side of the great bay of Vauville."
+
+  # ---------------------------------------------------------------------------
+  # Guernsey, Herm, Jethou and Sark
+  # ---------------------------------------------------------------------------
+
+  - id: st-peter-port
+    kind: town
+    name: St Peter Port
+    modern: St Peter Port
+    lat_deg: 49.4560
+    lon_deg: -2.5370
+    height_m: 30
+    source: "Faden 1793, 'Isle of Guernsey', p. 31: the town of St Peter on the eastern coast, a port between two stone piers 35 feet high, the entrance 100 feet wide at the top; White 1835, 'Guernsey', p. 94: the pier's swell in S S E gales"
+    says: "St Peter Port, the town of Guernsey on its eastern side, with a pier-harbour between two stone piers."
+
+  - id: castle-cornet
+    kind: castle
+    name: Castle Cornet
+    modern: Castle Cornet
+    lat_deg: 49.45213
+    lon_deg: -2.52950
+    height_m: 25
+    source: "White 1835, 'Guernsey', p. 94: south-east of the pier stands the citadel of Castle Cornet, which at low water communicates with the main land; Faden 1793, p. 34: the Great Road half a mile from Cornet Castle"
+    says: "Castle Cornet, the citadel on its rock off the pier, joined to the land at low water."
+
+  - id: guernsey-great-road
+    kind: anchorage
+    name: the Great Road of Guernsey
+    modern: the roads off St Peter Port
+    lat_deg: 49.4570
+    lon_deg: -2.5215
+    height_m: 0
+    depth_fathoms: 12
+    bottom: "very fine sand"
+    source: "Faden 1793, 'The Great and Little Roads', p. 34: from St Martin's Point to a mile S S W of Brehon, 25 to 10 1/2 fathoms, very good bottom, half a mile from Cornet Castle; White 1835, 'Guernsey', pp. 94 to 95: in front of the town and north-east of Castle Cornet, the anchorage of His Majesty's ships, 9 to 16 fathoms on very fine sand, good shelter except from S S W to S by E"
+    says: "The Great Road of Guernsey off St Peter Port and north-east of Castle Cornet, nine to sixteen fathoms on very fine sand: the King's ships' anchorage, open only to the southerly winds."
+
+  - id: guernsey-little-road
+    kind: anchorage
+    name: the Little Road
+    modern: the Pool, St Peter Port
+    lat_deg: 49.45954
+    lon_deg: -2.52692
+    height_m: 0
+    depth_fathoms: 3
+    bottom: "fine muddy sand with sea-weed"
+    source: "White 1835, 'Guernsey', p. 95: north of Castle Cornet between it and the Blanche and Sardrette rocks, used by the traders and small vessels, 2 to 4 fathoms on fine muddy sand with sea-weed, sheltered from almost all winds"
+    says: "The Little Road north of Castle Cornet, two to four fathoms on muddy sand, where the traders lie sheltered from almost every wind."
+
+  - id: brehon
+    kind: beacon
+    name: Brehon
+    modern: Brehon Rock (Brehon Tower)
+    lat_deg: 49.47269
+    lon_deg: -2.49142
+    height_m: 8
+    source: "Faden 1793, 'The Little Russel', p. 31: Brehon, a rock with a stone pyramid 20 feet high between Herm and Guernsey; St Martin's Point a sail's breadth westward of Brehon the mark for entering the Little Russel; White 1835, 'Guernsey', p. 102: St Martin Point just opening west of Brehon Pyramid the best leading mark through the fair way; the fort on it (Brehon Tower) is of the 1850s"
+    says: "Brehon, the rock with its stone pyramid in the Little Russel; St Martin's Point a sail's breadth open west of it leads in."
+
+  - id: roustel
+    kind: rock
+    name: Roustel
+    modern: Roustel
+    lat_deg: 49.4840
+    lon_deg: -2.4945
+    height_m: 0
+    dries_m: 1
+    fix: "Faden: 500 yards W N W of La Rousse; White: exactly in mid-channel, 350 fathoms from the Rousse; placed from the modern chart and the grid; the grid does not resolve the rock; left at the pilots' place"
+    source: "Faden 1793, 'The Little Russel', p. 32: Roustel the most dangerous rock in the Little Russel, never seen but at half ebb, a sunken rock 100 yards N E of it; White 1835, 'Guernsey', p. 102: it does not appear until four hours ebb"
+    says: "Roustel, the most dangerous rock in the Little Russel, in mid-channel and never seen before half ebb; keep St Martin's Point open west of Brehon."
+
+  - id: the-little-russel
+    kind: place
+    name: the Little Russel
+    modern: Little Russel
+    lat_deg: 49.4750
+    lon_deg: -2.5050
+    height_m: 0
+    source: "Faden 1793, 'The Little Russel', pp. 31 to 32: between Guernsey and Herm, 5 or 6 fathoms at low water neap tides; the flood never begins to run in it till the sea is at half its height; White 1835, 'Guernsey', p. 109: the streams set straight through both ways, the flood N E 3/4 E by compass"
+    says: "The Little Russel between Guernsey and Herm, five or six fathoms, narrowed by the rocks off both islands; the stream turns at half tide."
+
+  - id: the-great-russel
+    kind: place
+    name: the Great Russel
+    modern: Big Russel
+    lat_deg: 49.4500
+    lon_deg: -2.4150
+    height_m: 0
+    source: "Faden 1793, 'The Great Russel', pp. 32 to 33: between Herm and Sark, convenient for ships of all sorts and much less embarrassed than the Little Russel; White 1835, 'Guernsey', p. 99: above 2 miles broad and very easy of access even to strangers; from the middle of the Race of Alderney S 43 W 7 leagues"
+    says: "The Great Russel between Herm and Sark, two miles wide and easy of access: the passage for a ship of any size into Guernsey Road."
+
+  - id: herm
+    kind: island
+    name: Herm
+    modern: Herm
+    lat_deg: 49.4710
+    lon_deg: -2.4485
+    height_m: 70
+    source: "White 1835, 'Guernsey', pp. 97 to 98: the island of Herm 3 miles from Guernsey pier, which with Jethou divides the Great and Little Russel, surrounded by a great number of rocks; a mill on it"
+    says: "Herm, with its mill, between the two Russels, ringed with rocks."
+
+  - id: jethou
+    kind: island
+    name: Jethou
+    modern: Jethou
+    lat_deg: 49.4590
+    lon_deg: -2.4625
+    height_m: 82
+    source: "White 1835, 'Guernsey', p. 98: half a mile south-west of Herm lie Jethou and Crevichon, joined by a shingle causeway covered at half-flood; a very good anchorage between Herm and Jethou for a small vessel"
+    says: "Jethou, the high round islet south of Herm, with Crevichon by it."
+
+  - id: st-martins-point
+    kind: headland
+    name: St Martin's Point
+    modern: St Martin's Point, Guernsey
+    lat_deg: 49.4295
+    lon_deg: -2.5440
+    height_m: 40
+    source: "Faden 1793, 'Isle of Guernsey', pp. 31 to 34: St Martin's Point, the S E point of the island, the mark for the Little Russel; anchor within a mile of it; White 1835, 'Guernsey', p. 95"
+    says: "St Martin's Point, the south-east point of Guernsey and the mark of every channel into the road."
+
+  - id: guernsey-great-bank
+    kind: bank
+    name: the Great Bank
+    modern: the bank off Fermain Bay
+    lat_deg: 49.44025
+    lon_deg: -2.51223
+    height_m: 0
+    dries_m: -4.3  # 'only 14 feet water at low water spring tides'
+    extent_m: 2500
+    fix: "White: its south end half a mile E by S of St Martin's Point, a mile and a half long N E by N; the grid's shoal head of 9.7 m"
+    source: "White 1835, 'Guernsey', p. 95: the Great Bank, on some parts only 14 feet at low water spring tides, 1 1/2 miles long and half a mile broad; Faden 1793, p. 34: off Formain Bay a mile from the shore, 3 fathoms on it"
+    says: "The Great Bank off Fermain Bay, a mile and a half long, with only fourteen feet on it at low water of springs."
+
+  - id: les-hanois
+    kind: ledge
+    name: the Hanois
+    modern: Les Hanois
+    lat_deg: 49.43256
+    lon_deg: -2.70302
+    height_m: 3
+    extent_m: 1500
+    source: "Faden 1793, 'Coming by the South Side of Guernsey', p. 33: the Hanovaux, a long chain of rocks always above water half a league from the land, no passage between; pass 3 miles wide of them; the lighthouse on them dates from 1862"
+    says: "The Hanois, a long chain of rocks off the south-west of Guernsey, unlit: pass three miles wide of them."
+
+  - id: pleinmont-point
+    kind: headland
+    name: Pleinmont Point
+    modern: Pleinmont Point
+    lat_deg: 49.4300
+    lon_deg: -2.6690
+    height_m: 100
+    source: "White 1835, 'Guernsey', pp. 91 to 92: Pleinmont Guard-house on the heights, very little removed from the edge of the lofty cliff; Faden 1793, p. 33: the house on Lihou in one with the Guard House on Pleinmont clears the Grunes and the Sambule"
+    says: "Pleinmont Point with its guard-house on the high cliff, the south-west end of Guernsey."
+
+  - id: sark
+    kind: island
+    name: Sark
+    modern: Sark
+    lat_deg: 49.4320
+    lon_deg: -2.3580
+    height_m: 114
+    source: "Faden 1793, 'The Great Russel', p. 33: steer along by the Isle of Sark at 600 yards, no dangers but such as are above water; the windmill on Sark; White 1835, 'Guernsey', p. 100: approach Sark within half a mile without fear"
+    says: "Sark, high and steep, with its windmill; a ship may stand toward it within half a mile in the Great Russel."
+
+  - id: brecqhou
+    kind: island
+    name: Brecqhou
+    modern: Brecqhou
+    lat_deg: 49.4305
+    lon_deg: -2.3880
+    height_m: 50
+    source: "Faden 1793, 'The Great Russel', p. 33: Brecqhou or l'Isle aux Marchands, the Givaud a sunken rock close to its western point; White 1835, 'Guernsey', p. 101"
+    says: "Brecqhou off the west side of Sark, with the Givaud under water close to its western point."
+
+  - id: banc-de-la-schole
+    kind: bank
+    name: the Banc de Chole
+    modern: Banc de la Schôle
+    lat_deg: 49.57019
+    lon_deg: -2.22092
+    height_m: 0
+    dries_m: -3.0  # 'barely 10 feet water on its shoalest part'
+    extent_m: 9000
+    fix: "the pilots' words: about two leagues due south of Alderney, in the line between the Race and the Great Russel, N E and S W; placed on the grid's shoal heads; moved to the grid's shoalest head of the bank, 4.7 m"
+    source: "Faden 1793, 'Alderney', p. 30: La Chole, 12 feet at low water spring tides, two leagues long N E and S W but very narrow; White 1835, 'Guernsey', p. 99: nearly 6 miles long, barely 10 feet on its shoalest part at low water equinoctial tides, the sea breaking dangerously on it in bad weather"
+    says: "The Banc de Chole, a long narrow bank in the way from the Race to the Great Russel with only ten feet on it, where the sea breaks in bad weather."
+
+  - id: roches-douvres
+    kind: ledge
+    name: the Roches Douvres
+    modern: Roches Douvres
+    lat_deg: 49.10620
+    lon_deg: -2.81500
+    height_m: 17
+    extent_m: 3500
+    source: "White 1835, 'Coast of France', p. 89, Beautemps-Beaupré's remarks: the Roches Douvres extend east and west above 2 miles, twelve rocky heads never covered, the highest 56 feet above low water, N 23 E 17 3/4 miles from the Bréhat signal-station; the lighthouse on them dates from 1869"
+    says: "The Roches Douvres, a ledge of twelve heads always above water far out between Guernsey and Bréhat, unlit."
+
+  # ---------------------------------------------------------------------------
+  # Jersey, the Ecrehous, the Paternosters and the Minquiers
+  # ---------------------------------------------------------------------------
+
+  - id: st-helier
+    kind: town
+    name: St Helier
+    modern: St Helier
+    lat_deg: 49.1855
+    lon_deg: -2.1060
+    height_m: 20
+    source: "Faden 1793, 'Isle of Jersey', p. 35: St Helier the principal town of Jersey, in the bay of St Aubin, the best road of the island but dangerous for the rocks round the entrance, defended by several batteries and chiefly by Castle Elizabeth"
+    says: "St Helier, the principal town of Jersey, on the bay of St Aubin under Castle Elizabeth."
+
+  - id: elizabeth-castle
+    kind: castle
+    name: Castle Elizabeth
+    modern: Elizabeth Castle
+    lat_deg: 49.1760
+    lon_deg: -2.1255
+    height_m: 25
+    source: "Faden 1793, 'Isle of Jersey', p. 35: Castle Elizabeth built in the bay on a large rock, to which you may go at low water quite dry"
+    says: "Castle Elizabeth on its rock in the bay, reached dry-shod at low water."
+
+  - id: st-aubins-road
+    kind: anchorage
+    name: the road of St Aubin
+    modern: St Aubin's Bay, outside the drying sands
+    lat_deg: 49.1680
+    lon_deg: -2.1450
+    height_m: 0
+    depth_fathoms: 5
+    bottom: "sand"
+    fix: "placed where the grid holds water at the datum south of the drying sands, between Noirmont and Castle Elizabeth; the depth judgement from the grid, no pilot's figure read for the inner road"
+    source: "Faden 1793, 'Isle of Jersey', p. 35: the best road in the whole island, but dangerous on account of the numerous rocks round the entrance; with northerly winds anchor about a league without the bay in 15 and 20 fathoms"
+    says: "The road of St Aubin, off the sands between Noirmont and Castle Elizabeth; with a northerly wind a ship lies a league without in fifteen or twenty fathoms."
+
+  - id: st-aubins-fort
+    kind: castle
+    name: St Aubin's fort
+    modern: St Aubin's Fort
+    lat_deg: 49.1858
+    lon_deg: -2.1612
+    height_m: 15
+    source: "Faden 1793, 'Isle of Jersey', p. 35: the town and bay defended by several batteries; the fort's position the modern chart's"
+    says: "St Aubin's fort on its islet at the west side of the bay."
+
+  - id: noirmont-point
+    kind: headland
+    name: Noirmont Point
+    modern: Noirmont Point
+    lat_deg: 49.1675
+    lon_deg: -2.1700
+    height_m: 50
+    source: "White 1835, 'Coast of France', p. 70: Seymour Tower (Jersey) in one with Noirmont Point, and the heights over and inland of Noirmont Point, among the marks of the Déroute; the position the modern chart's"
+    says: "Noirmont Point, the high point at the west side of St Aubin's Bay."
+
+  - id: la-corbiere
+    kind: rock
+    name: the Corbière
+    modern: La Corbière
+    lat_deg: 49.1790
+    lon_deg: -2.2490
+    height_m: 10
+    fix: "the grid's land, unmoved"
+    source: "White 1835, 'Channel Islands', p. 92: the Corbière rock with the declining land south-eastward, among the first objects in approaching Jersey from the westward; Faden 1793, p. 35: its S W point 11 leagues N of St Malo; the lighthouse on it dates from 1874"
+    says: "The Corbière, the great rock off the south-west point of Jersey, unlit."
+
+  - id: grosnez-point
+    kind: headland
+    name: Grosnez
+    modern: Grosnez Point
+    lat_deg: 49.2580
+    lon_deg: -2.2460
+    height_m: 60
+    source: "Faden 1793, 'Isle of Jersey', p. 35: its N W point lies S E by S from St Martin's Point in Guernsey 5 or 6 leagues; White 1835, 'Alderney', p. 124: the summit of the high land just open to the northward of Cape Grosnez, a mark through the Swinge"
+    says: "Grosnez, the north-west point of Jersey, with its ruined castle."
+
+  - id: st-ouens-bay
+    kind: anchorage
+    name: St Ouen's Bay
+    modern: St Ouen's Bay
+    lat_deg: 49.22160
+    lon_deg: -2.28352
+    height_m: 0
+    depth_fathoms: 13
+    bottom: "sand"
+    fix: "placed on the grid's water off the bay; Faden gives the depth, not the berth; the grid's 20 m, a mile and a half off the beach"
+    source: "Faden 1793, 'Isle of Jersey', p. 35: the west side forms another large bay called St Owen's Bay wherein large vessels may anchor in 12 and 15 fathoms sheltered from westerly winds; White 1835, p. 92: the five Martello towers on its sandy beach"
+    says: "St Ouen's Bay on the west of Jersey, twelve to fifteen fathoms on sand, its beach lined with towers."
+
+  - id: mont-orgueil
+    kind: castle
+    name: Mont Orgueil
+    modern: Mont Orgueil Castle, Gorey
+    lat_deg: 49.1997
+    lon_deg: -2.0193
+    height_m: 60
+    source: "White 1835, 'Coast of France', pp. 62 to 64: Mont Orgueil (Jersey) in one with the Petite Rousse, and Montorgueil Castle in one with the Maître Isle, among the marks for the Trois Grunes and the Banc Félé"
+    says: "Mont Orgueil, the old castle on its rock over Gorey on the east of Jersey, a mark for every danger between the island and Normandy."
+
+  - id: the-paternosters
+    kind: ledge
+    name: the Paternosters
+    modern: Les Pierres de Lecq (the Paternosters)
+    lat_deg: 49.29538
+    lon_deg: -2.21109
+    height_m: 5
+    extent_m: 3000
+    fix: "the grid's highest head of the ledge, 6.7 m above the datum"
+    source: "Faden 1793, 'Isle of Jersey', pp. 35 to 36: the Pater Nosters about 5 miles off the N W point, stretching above a league east and west, a multitude of rocks several above water; White 1835, 'Coast of France', p. 80: the two high heads of the Paternoster Rocks"
+    says: "The Paternosters, a league of rocks off the north coast of Jersey, a few of them always above water."
+
+  - id: les-ecrehous
+    kind: ledge
+    name: the Ecrehou Rocks
+    modern: Les Écréhou (Maître Île)
+    lat_deg: 49.28794
+    lon_deg: -1.93376
+    height_m: 10
+    extent_m: 5000
+    source: "Faden 1793, 'Rocks of Ecreho', p. 37: always above water and encompassed with other rocks mostly under water, a league long S E and N W; passages between them and Normandy near the land and between them and Jersey near the island; White 1835, 'Coast of France', pp. 62 to 63: low long rugged rocks branching from the Maître Isle, a few huts on it and the Marmotier for the fishing and vraic seasons"
+    says: "The Ecrehou rocks between Jersey and the Cotentin, low and rugged with a few fishermen's huts; pass near the island or near the main, never through."
+
+  - id: les-dirouilles
+    kind: ledge
+    name: the Dirouilles
+    modern: Les Dirouilles
+    lat_deg: 49.29292
+    lon_deg: -1.98297
+    height_m: 3
+    extent_m: 2500
+    fix: "White's words: the western end of the range from the Ecrevière Bank, between the Ecrehous and Jersey; placed from the modern chart; the grid's land of the Dirouilles north-west of the Ecrehous, where the first placing had missed them by two miles"
+    source: "White 1835, 'Coast of France', pp. 63 and 79 to 80: from the south-eastern end of l'Ecrevière Bank to the western end of Les Dirouilles the ledge occupies 9 miles; Les Burons, two high conical rocks in the middle of the range"
+    says: "The Dirouilles, the western end of the Ecrehou ledge, with the two conical Burons in it."
+
+  - id: les-minquiers
+    kind: ledge
+    name: the Minquiers
+    modern: Les Minquiers (Maîtresse Île)
+    lat_deg: 48.97100
+    lon_deg: -2.06200
+    height_m: 9
+    extent_m: 12000
+    source: "Faden 1793, 'The Minquiers', p. 36: south of Jersey 3 or 4 leagues S 1/2 W from St Clement's Point and 5 N by E from Cape Fréhel, a chain of rocks 3 full leagues long E N E and W N W and above a league broad, very dangerous; the greatest part under water, those which show called Les Maisons"
+    says: "The Minquiers, three leagues of rocks south of Jersey, mostly under water and very dangerous, the Maisons showing above them."
+
+  - id: violet-bank
+    kind: drying
+    name: the Violet Bank
+    modern: Violet Bank, Jersey
+    lat_deg: 49.15283
+    lon_deg: -2.02670
+    height_m: 0
+    dries_m: 2
+    extent_m: 4000
+    fix: "Faden's 'Banc de Vielet' off St Clement's Point to the S E; placed on the grid's drying rocks"
+    source: "Faden 1793, 'Isle of Jersey', p. 35: St Clement's Point, the S E point of the island, not to be approached nearer than a large league because of a ledge of rocks called Banc de Vielet which runs from it towards the S E"
+    says: "The Violet Bank off St Clement's, a great flat of rocks drying a league out from the south-east of Jersey."
+
+  # ---------------------------------------------------------------------------
+  # The Cotentin: Cherbourg, Barfleur and the west coast to Granville
+  # ---------------------------------------------------------------------------
+
+  - id: cap-de-flamanville
+    kind: headland
+    name: Cape Flamanville
+    modern: Cap de Flamanville
+    lat_deg: 49.5300
+    lon_deg: -1.8850
+    height_m: 80
+    source: "White 1835, 'Coast of France', pp. 60 to 61: a high bluff point S 1/2 W 8 1/2 miles from Jobourg-nez, the southern boundary of the Ance de Vauville; Faden 1793, 'Grand Ance', p. 36: a very good road a large league south of Cape la Hague, 4 or 5 fathoms, sheltered from N E, east and S E"
+    says: "Cape Flamanville, a high bluff, the south side of the great bay of Vauville where a ship rides sheltered from easterly winds."
+
+  - id: cap-de-carteret
+    kind: headland
+    name: Carteret Ness
+    modern: Cap de Carteret
+    lat_deg: 49.3740
+    lon_deg: -1.8060
+    height_m: 60
+    source: "Faden 1793, 'Nez de Carteret', p. 36: from Cape la Hague the land runs S 1/2 E 7 1/2 leagues, very safe, all high double land; White 1835, 'Coast of France', pp. 61 to 65: its forts and guard-house among the marks of the Déroute; the lighthouse on it dates from 1839"
+    says: "Carteret Ness on the west coast of the Cotentin, with its forts; the shore safe and high, and no light on it before 1839."
+
+  - id: les-trois-grunes
+    kind: ledge
+    name: the Trois Grunes
+    modern: Les Trois Grunes
+    lat_deg: 49.36864
+    lon_deg: -1.90798
+    height_m: 0
+    dries_m: 0.5
+    extent_m: 3000
+    fix: "White: about 3 3/4 miles from Cape Carteret S 86 W; moved 360 m to the grid's shoal head of 4.1 m"
+    source: "White 1835, 'Coast of France', p. 62: a dangerous rocky ledge of numberless small heads and large stones, about 2 miles long and a mile broad, appearing at low water great spring tides; the overfalls very violent"
+    says: "The Trois Grunes, a ledge of small rocky heads three miles and three-quarters west of Carteret, showing only at low water of springs, with violent overfalls."
+
+  - id: cherbourg
+    kind: town
+    name: Cherbourg
+    modern: Cherbourg
+    lat_deg: 49.6390
+    lon_deg: -1.6170
+    height_m: 15
+    source: "Faden 1793, 'Cherbourg', pp. 28 to 29: from Cape Levy two leagues S W; the road directly before the town between the Isle Pelée and Hommet Point; the great digue across the road, begun 1783, unfinished in 1805 (from memory, unverified)"
+    says: "Cherbourg, the French arsenal building at the head of its open road."
+
+  - id: cherbourg-road
+    kind: anchorage
+    name: Cherbourg Road
+    modern: Rade de Cherbourg
+    lat_deg: 49.6560
+    lon_deg: -1.6250
+    height_m: 0
+    depth_fathoms: 7
+    bottom: "fine sand"
+    source: "Faden 1793, 'Cherbourg', p. 28: the Road lies directly before the town between the Isle Pelée on the east and Hommet Point on the west, 6, 7 and 8 fathoms, fine sand, the hold very good, sheltered from E S E to N W, exposed to the east, N E and north"
+    says: "Cherbourg Road before the town, six to eight fathoms on fine sand with good hold, open to the north and east."
+
+  - id: ile-pelee
+    kind: island
+    name: the Isle Pelée
+    modern: Île Pelée
+    lat_deg: 49.67028
+    lon_deg: -1.58544
+    height_m: 10
+    source: "Faden 1793, 'Cherbourg', p. 28: about 2 miles N E of the town a small rocky island called L'Isle Pelée, 800 yards long N N W and S S E, almost always above water; very safe on the side toward the sea"
+    says: "The Isle Pelée, the rocky island with its fort two miles north-east of Cherbourg, the east side of the road."
+
+  - id: cap-levi
+    kind: headland
+    name: Cape Levy
+    modern: Cap Lévi
+    lat_deg: 49.6955
+    lon_deg: -1.4730
+    height_m: 30
+    source: "Faden 1793, 'Cherbourg', p. 28: from Cape Levy to Cherbourg the course is two leagues S W; the lighthouse on it dates from 1858"
+    says: "Cape Levy between Barfleur and Cherbourg, unlit."
+
+  - id: barfleur-light
+    kind: light
+    name: the Barfleur light
+    modern: Phare de Gatteville (the first tower)
+    lat_deg: 49.69639
+    lon_deg: -1.26583
+    height_m: 30
+    lit: {from: 1775, until: null, range_nm: 15, character: "a fixed light, reflectors of oil since 1780 (the new tower of 1835 beside it)"}
+    fix: "the encyclopaedia's position ('Phare de Gatteville', the present tower; the first stood beside it)"
+    source: "Faden 1793, 'Cape Barfleur Light-house', p. 26: the fourth of the light-houses of the Chamber of Commerce of Rouen, 1775, on the point of the rock which forms Cape Gatteville, 88 feet with a 15-foot lanthorn; the encyclopaedia's 'Phare de Gatteville' (lit November 1775, oil reflectors 1780, the new tower 1829 to 1835 lit April 1835); White 1835, 'Coast of France', p. 59: the light on Cape Barfleur single"
+    says: "The Barfleur light on the low rocky point of Gatteville, lit since 1775; after the three lights of the Casquets the next a ship bound up Channel sees."
+
+  - id: race-of-barfleur
+    kind: place
+    name: the Race of Barfleur
+    modern: Raz de Barfleur
+    lat_deg: 49.7150
+    lon_deg: -1.2400
+    height_m: 0
+    source: "White 1835, 'Coast of France', p. 58: during spring tides the sea in the vicinity of Cape Barfleur exhibits a continued sheet of broken water, the tides sometimes six knots, called the Race of Barfleur; in thick weather come no nearer than 26 fathoms"
+    says: "The Race of Barfleur off the cape, a sheet of broken water at springs with the tide at six knots."
+
+  - id: granville
+    kind: town
+    name: Granville
+    modern: Granville
+    lat_deg: 48.8375
+    lon_deg: -1.5980
+    height_m: 40
+    source: "Faden 1793, 'Granville', p. 37: the town on the top of a steep rugged rock almost surrounded by the sea; the harbour dry every tide at the foot of the rock, a jetty of loose stones 180 yards; no road, ships anchor at Cape Lihou on the west end of the rock"
+    says: "Granville, a town on a steep rock almost surrounded by the sea, its harbour dry every tide."
+
+  - id: iles-chausey
+    kind: island
+    name: Chausey
+    modern: Îles Chausey (Grande Île)
+    lat_deg: 48.8710
+    lon_deg: -1.8230
+    height_m: 25
+    source: "Faden 1793, 'Isle de Chausey', p. 38: about 3 leagues west of Granville in a range of rocks 3 miles long; the anchorage on the south side near a fort destroyed by Commodore Howe in 1756; White 1835, 'Coast of France', pp. 80 to 82: the anchorage of ships of war south-east of Port Marie, 7 or 8 fathoms"
+    says: "Chausey, a little island in its maze of rocks west of Granville, where the St Malo people load building stone; anchor on its south side."
+
+  - id: mont-saint-michel
+    kind: tower
+    name: Mount St Michael
+    modern: Mont-Saint-Michel
+    lat_deg: 48.6361
+    lon_deg: -1.5114
+    height_m: 80
+    source: "Faden 1793, 'Mount St Michael', p. 38: a huge rock a league from the shore with a little fortified town and an abbey, inaccessible to ships, dry every tide; the tide rises so quick there that one caught by the flood five miles off cannot escape it even on the swiftest horse"
+    says: "Mount St Michael, the abbey on its rock in the sands at the head of the bay, dry every tide and no place for a ship."
+
+  # ---------------------------------------------------------------------------
+  # The bay of St Malo, Cancale to Cape Fréhel
+  # ---------------------------------------------------------------------------
+
+  - id: pointe-du-grouin
+    kind: headland
+    name: the Grouin of Cancale
+    modern: Pointe du Grouin
+    lat_deg: 48.71300
+    lon_deg: -1.84209
+    height_m: 40
+    source: "Faden 1793, 'Cancalle', p. 38: from Granville to the Point or Grouin of Cancalle the course is S W near 4 leagues; a league east of it three big rocks under which you may anchor in 8 or 10 fathoms"
+    says: "The Grouin of Cancale, the high point at the west side of the bay of Mount St Michael."
+
+  - id: cancale
+    kind: town
+    name: Cancale
+    modern: Cancale
+    lat_deg: 48.6760
+    lon_deg: -1.8520
+    height_m: 40
+    source: "Faden 1793, 'Cancalle', p. 38: N E of the town two rocks within which you may anchor in 5 or 6 fathoms; the tides east and west; White 1835, 'Coast of France', p. 82: good shelter in Cancale Bay out of gun-shot under the Grand Herpin"
+    says: "Cancale, the oystermen's town above its bay, where a ship finds shelter from westerly winds."
+
+  - id: st-malo
+    kind: town
+    name: St Malo
+    modern: Saint-Malo (intra-muros)
+    lat_deg: 48.6490
+    lon_deg: -2.0250
+    height_m: 30
+    source: "Faden 1793, 'St Malo', p. 39: the city in the middle of the sea upon a rocky island joined to the main by a causeway, at the bottom of a very deep bay full of rocks; four passages; Bellin 1764, Petit Atlas Maritime t. V no. 44, the walled town"
+    says: "St Malo, the walled city of the corsairs on its rock joined to the main by a causeway, at the bottom of a bay full of rocks."
+
+  - id: st-malo-church
+    kind: church
+    name: the great church of St Malo
+    modern: Cathédrale Saint-Vincent, Saint-Malo
+    lat_deg: 48.64949
+    lon_deg: -2.02565
+    height_m: 55
+    fix: "the encyclopaedia's position ('Cathédrale Saint-Vincent de Saint-Malo'), the override's control point"
+    source: "White 1835, 'Coast of France', p. 84: entering La Bigne passage bring the great Church of St Malo in one with La Bigne; p. 88: St Malo church just seen east of the hut on Cézembre; the height judgement"
+    says: "The great church of St Malo, its spire over the walls the mark of every passage into the road."
+
+  - id: le-grand-be
+    kind: island
+    name: the Grand Bay
+    modern: Grand Bé
+    lat_deg: 48.65222
+    lon_deg: -2.03333
+    height_m: 25
+    fix: "the encyclopaedia's position ('Grand Bé'), the override's control point"
+    source: "Faden 1793, 'La Conchée', p. 39: the Grand Bay Rock, a big fortified islot near the city on the N W, and the Little Bay Rock close to it on the west, round which you turn into the Rance Road; Bellin 1764, 'le Grand Bay'"
+    says: "The Grand Bay, the fortified islet north-west of the city; round it and the Little Bay into the road."
+
+  - id: fort-royal-st-malo
+    kind: castle
+    name: Fort Royal
+    modern: Fort National, Saint-Malo
+    lat_deg: 48.6537
+    lon_deg: -2.0257
+    height_m: 15
+    source: "White 1835, 'Coast of France', p. 85: the two windmills of Petite Paramé in one with the southern angle of the fortifications upon Fort Royal; Bellin 1764, 'l'Islet' (the fort on its rock north of the town, Vauban's of 1689 from memory)"
+    says: "Fort Royal, the fort on its rock off the north side of the city, dry at low water."
+
+  - id: cezembre
+    kind: island
+    name: Cézembre
+    modern: Île de Cézembre
+    lat_deg: 48.67667
+    lon_deg: -2.07139
+    height_m: 35
+    fix: "the encyclopaedia's position ('Île de Cézembre')"
+    source: "Faden 1793, 'St Malo', p. 39: an isle of good height about 3 miles N W of St Malo with a convent and a mill on its south side, not seen from the sea; the Grande and Petite Porte lie west of it; White 1835, 'Coast of France', p. 85"
+    says: "Cézembre, the high island three miles north-west of St Malo with its convent hidden on the south side; the two Gates pass to the west of it."
+
+  - id: la-conchee
+    kind: rock
+    name: the Conchée
+    modern: Fort de la Conchée
+    lat_deg: 48.67248
+    lon_deg: -2.04327
+    height_m: 15
+    source: "Faden 1793, 'La Conchée', p. 39: the easternmost passage, distinguished by a high white rock called the Conchée east of Sézembre, left on the starboard hand; White 1835, 'Coast of France', p. 84: a huge rock with a battery on it"
+    says: "The Conchée, the high rock with its battery east of Cézembre, which names the eastern passage into St Malo."
+
+  - id: st-malo-road
+    kind: anchorage
+    name: the road of St Malo
+    modern: the Rance road off Saint-Malo (Rade de Saint-Malo)
+    lat_deg: 48.64560
+    lon_deg: -2.03702
+    height_m: 0
+    depth_fathoms: 4.5
+    bottom: "sand"
+    source: "Bellin 1764, Petit Atlas Maritime t. V no. 44, the Rade de Ranse with its anchors and the soundings 4 1/2 and 5 (brasses, unverified); White 1835, 'Coast of France', p. 86: the best anchorage between the Brutart and the Pierres de Rance and the town, never less than 30 feet; Faden 1793, p. 40: anchor under the city in 6 or 7 fathoms; ships under the town left dry on the sand, sheltered from all winds"
+    says: "The road of St Malo in the mouth of the Rance under the city's walls, four or five fathoms at low water; ships that go in under the town lie dry on the sand at every tide."
+
+  - id: pierre-de-rance
+    kind: rock
+    name: the Pierre de Rance
+    modern: Pierre de Rance
+    lat_deg: 48.6400
+    lon_deg: -2.0350
+    height_m: 0
+    dries_m: 0.5
+    fix: "Bellin's sheet: in the mouth of the river between Pointe de Dinard and the town, north of the 7 and 5; White: shows at low water; the grid does not resolve the stone; left at the sheet's place"
+    source: "Faden 1793, 'La Pierre de Rance', p. 40: at the mouth of the Rance, the road of St Malo, a stone under water about the middle of the channel; White 1835, 'Coast of France', p. 86: the Pierres de Rance show at low water; Bellin 1764, 'Pierre de Ranse'"
+    says: "The Pierre de Rance in the middle of the river's mouth, showing at low water; pass on either hand."
+
+  - id: tour-solidor
+    kind: tower
+    name: the tower of Solidor
+    modern: Tour Solidor, Saint-Servan
+    lat_deg: 48.6340
+    lon_deg: -2.0261
+    height_m: 25
+    fix: "the encyclopaedia's position ('Tour Solidor', read 2026-10-09), the St Malo override's control point"
+    source: "White 1835, 'Coast of France', pp. 86 to 87: the Road of Solidor before St Servan within the Bizeul Bank, the general rendezvous of the ships of war, 18 feet at low water at the most; bring the tower of Grand Larron in one with that of Solidor; Bellin 1764, 'Solidor'"
+    says: "The tower of Solidor at St Servan, over the shallow road where the ships of war lie and take the ground."
+
+  - id: dinard-point
+    kind: headland
+    name: Pointe de Dinard
+    modern: Pointe du Moulinet, Dinard
+    lat_deg: 48.6355
+    lon_deg: -2.0545
+    height_m: 15
+    source: "Bellin 1764, 'Pte de Dinart'; White 1835, 'Coast of France', pp. 86 to 87: the Décollet passage between Décollet Point and that of Dinart; the road of Dinart, sheltered against the prevailing winds, preferable to that of St Malo"
+    says: "The point of Dinard on the west side of the Rance's mouth."
+
+  - id: le-grand-jardin
+    kind: rock
+    name: Les Jardins
+    modern: Le Grand Jardin
+    lat_deg: 48.67344
+    lon_deg: -2.07866
+    height_m: 2
+    source: "Faden 1793, 'La Grande Porte', p. 40: the beacon du Jardin, a rock under water at the end of Sézembre, left on the larboard side; White 1835, 'Coast of France', p. 85: a beacon on Les Jardins; the lighthouse on it dates from 1865"
+    says: "Les Jardins, the rocks with a beacon west of Cézembre in the way of the Great Gate."
+
+  - id: fort-la-latte
+    kind: castle
+    name: the castle of La Latte
+    modern: Fort la Latte
+    lat_deg: 48.66992
+    lon_deg: -2.28382
+    height_m: 40
+    source: "Faden 1793, 'Cape Fréhel', p. 41: within the Cape a league E by S, Point la Latte, from a castle of that name on its extreme point; 'Baye de la Fresnaye': range along the coast till within the castle with its bridge open, anchor in 8 or 9 fathoms, coarse gravel"
+    says: "The castle of La Latte on its point a league east of Cape Fréhel, the mark for the bay of La Fresnaye."
+
+  - id: baie-de-la-fresnaye
+    kind: anchorage
+    name: the bay of La Fresnaye
+    modern: Baie de la Fresnaye
+    lat_deg: 48.65604
+    lon_deg: -2.27528
+    height_m: 0
+    depth_fathoms: 8
+    bottom: "coarse gravel"
+    fix: "Faden: within the castle of La Latte with its bridge open, the castle bearing N N W; placed on the grid's water"
+    source: "Faden 1793, 'Baye de la Fresnaye', p. 41: a very good road, 8 or 9 fathoms, coarse gravel, where a ship from Cape Fréhel waits for the tide to go up to St Malo or takes a pilot; White 1835, 'Coast of France', p. 88: very good shelter against off-shore winds and excellent holding ground"
+    says: "The bay of La Fresnaye, eight or nine fathoms on coarse gravel south of La Latte: the road to wait for the tide or the pilot for St Malo."
+
+  - id: cap-frehel
+    kind: headland
+    name: Cape Fréhel
+    modern: Cap Fréhel
+    lat_deg: 48.6855
+    lon_deg: -2.3180
+    height_m: 70
+    source: "Faden 1793, 'Cape Frehel, and Light-house', p. 41: about 4 leagues W N W of St Malo, very high and steep, a thick rock at its pitch little less than a musket-shot off; White 1835, 'Coast of France', p. 89: S 5 W from the Corbière of Jersey nearly 10 leagues, high and steep-to, the high rock Mats de Fréhel never covered"
+    says: "Cape Fréhel, high and steep with its lighthouse, four leagues west-north-west of St Malo."
+
+  - id: frehel-light
+    kind: light
+    name: the Fréhel light
+    modern: Phare du cap Fréhel (the tower of 1702)
+    lat_deg: 48.68417
+    lon_deg: -2.31889
+    height_m: 75
+    lit: {from: 1702, until: null, range_nm: 15, character: "a fixed light, reverberating oil lamps since 1774 (revolving from 1821)"}
+    fix: "the encyclopaedia's position ('Phare du cap Fréhel', the present tower)"
+    source: "the encyclopaedia's 'Phare du cap Fréhel' (the first tower after the Stiff's plans, lit November 1702, in winter only until 1717; a coal fire to 1774, then reverberating oil lamps; revolving 1821; the new tower 1845 to 1847); Faden 1793, p. 41: a remarkable light-house; White 1835, p. 89: the light 246 feet above high water, revolving in 2 1/2 minutes"
+    says: "The light of Fréhel on the high cape, burning since 1702; the only light between Bréhat and the Casquets that a ship bound for St Malo sees."

@@ -174,25 +174,58 @@ interpolation:
   power: 2
   reach_nm: 400
 
-# THE GAUGES OF BISCAY NORTH, READ AND HELD (package 39b). TICON's file holds nine gauges
-# of the block, read 2026-10-09 by their coordinates as package 34 read the eleven (the
-# zip at doi.pangaea.de, SHA-256 7055f8ed1a14abf8...6514; Brest and Le Conquet are the
-# eleven's and agree to the figure). Each named by the station of SHOM's RAM at its
-# coordinates (the WFS layer RAM_BDD_WLD_WGS84G_WFS:ram_3857 of data.gouv.fr's record,
-# Licence Ouverte 2.0, read 2026-10-09), whose NM gives `mean_level_m` (VERIFIED, read
-# from the RAM: not the study's quotation). Paimboeuf has no RAM station: its mean level
-# is the mean of Montoir's 3.69 and Cordemais's 3.78, JUDGEMENT.
-#
-# HELD, NOT BLENDED: the interpolation blends every gauge within `reach_nm` (400 miles),
-# so a gauge of Biscay would enter the blend at every position of the Channel (Falmouth
-# lies 150 to 250 miles from these), moving the eleven's tide there by a fraction of a
-# degree and a centimetre or two and every recorded passage with it. The engine has no
-# rule yet that keeps a gauge to its own water (a gauge's reach, or its chart); until
-# the lead gives it one (docs/dev/TuningNotes.md, package 39b, "Found on the way"), the
-# block's gauges are kept here, read and ready, and the world's tide over Biscay north
-# is the eleven's blend as package 38 left it. `freesail/world/tide.py` reads `gauges:`
-# and not this list.
-gauges_held:
+# THE CHANNEL EAST'S GAUGES (package 39a), READ AND HELD. TICON.txt was read again
+# (the zip at doi.pangaea.de, fetched 2026-10-09, SHA-256 7055f8ed…6514, 1,621,262 bytes),
+# the block's water searched by coordinates (48.4 to 51 N, 3.8 to 0.7 W): the file has
+# Weymouth, St Helier, Saint-Malo and Cherbourg, which are four of the eleven above and
+# whose figures it gives again to the centimetre and the degree (verified), and two more,
+# Bournemouth and Portsmouth, below. It has no gauge at St Peter Port, Dartmouth or
+# Portland (the brief's "which it has is unverified until read": these it has not).
+# The two are HELD, read by nothing: every position of the Channel blends every gauge
+# within `reach_nm`, so a twelfth gauge, however far, moves the tide at every Channel
+# position by a little, and the recorded passages' digests with it (the eleven "do not
+# move", the brief). Blending them is the lead's decision with a re-measure of the
+# passages, or a reach of a gauge's own (a rule the tide lacks; docs/dev/TuningNotes.md).
+# Their mean levels above the chart's datum are UNVERIFIED (no source read for them).
+held_gauges:
+  - id: bournemouth
+    name: Bournemouth
+    lat_deg: 50.7143
+    lon_deg: -1.8749
+    record: "GESLA-2, BODC, 1996 to 2013"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.413, phase_deg: 273.3}
+    S2: {amplitude_m: 0.184, phase_deg: 292.3}
+    N2: {amplitude_m: 0.107, phase_deg: 247.9}
+  - id: portsmouth
+    name: Portsmouth
+    lat_deg: 50.8026
+    lon_deg: -1.1118
+    record: "GESLA-2, BODC, 1991 to 2014"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 1.410, phase_deg: 326.7}
+    S2: {amplitude_m: 0.436, phase_deg: 13.4}
+    N2: {amplitude_m: 0.276, phase_deg: 303.9}
+
+  # THE GAUGES OF BISCAY NORTH, READ AND HELD (package 39b). TICON's file holds nine gauges
+  # of the block, read 2026-10-09 by their coordinates as package 34 read the eleven (the
+  # zip at doi.pangaea.de, SHA-256 7055f8ed1a14abf8...6514; Brest and Le Conquet are the
+  # eleven's and agree to the figure). Each named by the station of SHOM's RAM at its
+  # coordinates (the WFS layer RAM_BDD_WLD_WGS84G_WFS:ram_3857 of data.gouv.fr's record,
+  # Licence Ouverte 2.0, read 2026-10-09), whose NM gives `mean_level_m` (VERIFIED, read
+  # from the RAM: not the study's quotation). Paimboeuf has no RAM station: its mean level
+  # is the mean of Montoir's 3.69 and Cordemais's 3.78, JUDGEMENT.
+  #
+  # HELD, NOT BLENDED: the interpolation blends every gauge within `reach_nm` (400 miles),
+  # so a gauge of Biscay would enter the blend at every position of the Channel (Falmouth
+  # lies 150 to 250 miles from these), moving the eleven's tide there by a fraction of a
+  # degree and a centimetre or two and every recorded passage with it. The engine has no
+  # rule yet that keeps a gauge to its own water (a gauge's reach, or its chart); until
+  # the lead gives it one (docs/dev/TuningNotes.md, package 39b, "Found on the way"), the
+  # block's gauges are kept here, read and ready, and the world's tide over Biscay north
+  # is the eleven's blend as package 38 left it. `freesail/world/tide.py` reads `gauges:`
+  # and not this list (the Channel east's two above, package 39a, are held for the same
+  # reason, under the same key).
   - id: concarneau
     name: Concarneau
     lat_deg: 47.8736

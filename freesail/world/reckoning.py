@@ -140,6 +140,7 @@ __all__ = [
     "SAME_GROUND_NM",
     "SAME_LINE_DEG",
     "SET_DOUBT_EAST_KN",
+    "SLATE_BOARDS_KEPT",
     "SET_DOUBT_NORTH_KN",
     "SHORE_PASS_NM",
     "SOUNDING_ACROSS_MAX_NM",
@@ -569,6 +570,13 @@ DAYS_WORK_MINUTES = 30
 # a week of hourly steps, so a long passage's snapshot stays small).
 TRACK_KEPT = 168
 
+# The master's slate (package 40b; spec M6 §5): the boards since the last fix kept one by
+# one, so many and no more; older boards are summed into one carried board, as the
+# traverse table sums its courses into a difference of latitude and a departure (Falconer
+# 1780, 'Traverse'). Judgement: two days of hourly boards, a frigate's log-board for two
+# days without a fix, longer than any passage of the gates goes unfixed.
+SLATE_BOARDS_KEPT = 48
+
 _NM_PER_DEG = 60.0
 
 
@@ -920,6 +928,14 @@ class Reckoning:
     # package 37j: the read's doubt along the boards since the log was hove, and the drift's
     read_doubt: list[float] | None = None
     drift_doubt: list[float] | None = None
+    # package 40b: the master's slate since the last fix (where it began, and the boards
+    # and the sights since, in order), and the miles east and north the boards have run
+    # since the departure, which no observation moves (an officer's own reckoning is
+    # carried on by them)
+    slate_from: dict[str, Any] | None = None
+    slate: list[dict[str, Any]] | None = None
+    run_east_nm: float = 0.0
+    run_north_nm: float = 0.0
 
     def __init__(self, start: Position, tick: int = 0, sigma_nm: float = DEPARTURE_SIGMA_NM):
         self.lat_deg = start.lat_deg
@@ -956,6 +972,8 @@ class Reckoning:
         # the noon's account, for the run since noon and the course made good
         self.noon_mark: tuple[int, float, float] = (tick, self.lat_deg, self.lon_deg)
         self.run_since_noon_nm = 0.0
+        # the master's slate begins at the departure (package 40b)
+        self.begin_slate(tick, "the departure")
 
     # -- geometry ---------------------------------------------------------------------
 
@@ -1634,6 +1652,73 @@ class Reckoning:
         self._seen = {}
         self.run_since_fix_nm = 0.0
         self.track.append((tick, self.lat_deg, self.lon_deg))
+        self.begin_slate(tick, "the reckoning set by the captain's order")
+
+    # -- the master's slate (package 40b) -----------------------------------------------
+
+    def begin_slate(self, tick: int, what: str) -> None:
+        """The slate wiped and begun again at the account as it stands (spec M6 §5): at
+        the departure, the reckoning set by hand, a fix by cross bearings, and an
+        observation that laid the account down. `what` says which, in words; his doubt
+        there is kept with it."""
+        self.slate_from = {
+            "tick": tick,
+            "lat_deg": self.lat_deg,
+            "lon_deg": self.lon_deg,
+            "what": what,
+            "P": [row[:] for row in self.P],
+        }
+        self.slate = []
+
+    def _slate(self) -> list[dict[str, Any]]:
+        if self.slate is None or self.slate_from is None:
+            # a checkpoint from before package 40b: the slate begins where the account
+            # stands when it is first asked for
+            self.begin_slate(self.last_step_tick, "the account as it stood")
+        assert self.slate is not None
+        return self.slate
+
+    def slate_board(self, board: dict[str, Any]) -> None:
+        """A board laid down by the master (`Navigation.bring_up`): its figures go on the
+        slate, and what it made by account into the run since the departure. Past
+        `SLATE_BOARDS_KEPT` boards the oldest two are summed into one carried board, its
+        course and distance the two boards' made good."""
+        made_e, made_n = board["made"]
+        self.run_east_nm += made_e
+        self.run_north_nm += made_n
+        slate = self._slate()
+        slate.append(board)
+        boards = [i for i, x in enumerate(slate) if x["kind"] == "board"]
+        if len(boards) > SLATE_BOARDS_KEPT:
+            a, b = slate[boards[0]], slate[boards[1]]
+            e = a["made"][0] + b["made"][0]
+            n = a["made"][1] + b["made"][1]
+            slate[boards[1]] = {
+                "kind": "board",
+                "carried": True,
+                "from": a["from"],
+                "to": b["to"],
+                "course_deg": round(math.degrees(math.atan2(e, n)) % 360.0, 1),
+                "hours": round(a["hours"] + b["hours"], 3),
+                "knots": None,
+                "run_nm": round(math.hypot(e, n), 2),
+                "tide": [0.0, 0.0],
+                "drift": [0.0, 0.0],
+                "made": [e, n],
+            }
+            del slate[boards[0]]
+
+    def slate_sight(self, tick: int, what: str, before: Position, how: str) -> None:
+        """An observation the master worked into the account, on the slate with how far
+        it moved the account and which way; one that laid the account down (taken)
+        begins the slate again there."""
+        if how == TAKEN:
+            self.begin_slate(tick, f"{what}, which laid the account down")
+            return
+        de, dn = _offset_from(before.lat_deg, before.lon_deg, self.position)
+        self._slate().append(
+            {"kind": "sight", "tick": tick, "what": what, "how": how, "moved": [de, dn]}
+        )
 
     # -- the ellipse and the words ------------------------------------------------------
 
@@ -1872,6 +1957,11 @@ def master_of(ship: Any) -> Master:
 # The log kinds the runner's two evolutions complete with (`data/evolutions/heave_log.yaml`,
 # `heave_lead.yaml`, `heave_deep_sea_lead.yaml`): the World hands them here and does not
 # record the runner's own line, since the read is not known until the log is in.
+# Package 40b: the line after the noon's that says a station's own reckoning beside the
+# master's, and the station names an own reckoning is kept under.
+OWN_NOON_KIND = "reckoning.own_noon"
+OWN_STATIONS = ("officer of the watch", "captain")
+
 LOG_HOVE_KIND = "log.hove"
 LEAD_HOVE_KIND = "lead.hove"
 NAVIGATION_KINDS = frozenset({LOG_HOVE_KIND, LEAD_HOVE_KIND, LUNAR_TAKEN_KIND})
@@ -1927,6 +2017,11 @@ class Navigation:
     # package 37j: whether she lay to at the last tick pegged, for the board's end at
     # heaving to and filling away (None: not yet looked at)
     _board_lying: bool | None = None
+    # package 40b: the stations' own reckonings held, by the station's name (each a figure
+    # of the station's, worked from the slate and said after the noon's line), and the
+    # lines for them that wait for the next tick after a noon by order
+    own: dict[str, dict[str, Any]] | None = None
+    _own_pending: list[tuple[str, dict[str, Any]]] | None = None
 
     def __init__(self, world: Any, stream: random.Random):
         self.world = world
@@ -2019,6 +2114,11 @@ class Navigation:
         tick (`NAVIGATION_KINDS`), in order."""
         world = self.world
         self._peg()
+        if self._own_pending:
+            # the stations' own reckonings after a noon by order (package 40b)
+            for text, data in self._own_pending:
+                world.record(Severity.NOTABLE, OWN_NOON_KIND, text, data=data)
+            self._own_pending = None
         if self._lunar_pending is not None and world.clock.tick >= self._lunar_pending[0]:
             self._lunar_cleared()
         line = self.master.tick(world.clock.tick)
@@ -2604,6 +2704,7 @@ class Navigation:
                 STEERING_SIGMA_POINTS_SEAWAY if heavy else STEERING_SIGMA_POINTS_SMOOTH
             ),
         )
+        begun = self.reckoning.last_step_tick
         made = self.reckoning.advance(
             w.run_h,
             w.course,
@@ -2622,6 +2723,8 @@ class Navigation:
             course_doubt_rad=math.radians(self.compass_allowance_deg()),
             held=True,
         )
+        # the board on the master's slate, as he laid it down (package 40b)
+        self.reckoning.slate_board(self._board(begun, tick, w, steer, made))
         self._hx = self._hy = 0.0
         self._n = 0
         self._run_n = 0
@@ -2842,10 +2945,13 @@ class Navigation:
                 and bearing_and_distance(r.position, Position(*first))[1]
                 <= max(SAME_GROUND_NM, reach) * units.NAUTICAL_MILE
             )
+            before = r.position
             obs = r.observe_line(de, dn, n_e, n_n, across, narrow=not (same or agrees))
             if not same or obs.how == TAKEN:
                 self._cast_ground = (r.lat_deg, r.lon_deg)  # new ground, and its first cast
             self._moved()
+            lead = "the deep-sea lead" if deep else "the lead"
+            r.slate_sight(tick, f"a cast of {lead}, {fathoms_said(depth_m)}", before, obs.how)
         else:
             # Nothing within his doubt answers the cast: the cast does not agree with the
             # chart where he believes her. The account is kept; and his doubt is grown so
@@ -3197,6 +3303,13 @@ class Navigation:
         how = _worst(line, distance)
         if how != KEPT and moved < OBSERVATION_KEPT_NM:
             how = KEPT
+        r.slate_sight(
+            world.clock.tick,
+            f"a bearing of {found.feature.name}, {units.point_name(laid)}, {estimate} by "
+            "estimation",
+            before,
+            how,
+        )
         applied = distance is not None and distance.how != KEPT
         if how == KEPT:
             verdict = "the account kept"
@@ -3371,6 +3484,8 @@ class Navigation:
             )
         moved_nm = moved_m / units.NAUTICAL_MILE
         bore = ", ".join(f"{s.feature.name} {units.point_name(laid)}" for s, laid in lines)
+        # a fix begins the master's slate again, whatever it did to the account (package 40b)
+        r.begin_slate(world.clock.tick, f"the fix by cross bearings ({bore}), {obs.how}")
         cut = _best_cut_deg(chosen) if len(chosen) == 2 else _least_cut_deg(chosen)
         if hat_m is not None:
             met = (
@@ -3497,10 +3612,12 @@ class Navigation:
             )
         self.bring_up()
         r = self.reckoning
+        before = r.position
         obs = r.observe_bearing(
             near.position, math.radians(b_line), TRANSIT_SIGMA_NM, f"{transit.id}:transit"
         )
         self._moved()
+        r.slate_sight(world.clock.tick, f"the transit of {transit.name}", before, obs.how)
         record = Bearing(
             world.clock.tick,
             transit.id,
@@ -3592,6 +3709,10 @@ class Navigation:
         r = self.reckoning
         run, cmg = r.since_noon()
         account_lat = r.lat_deg
+        # the account and its doubt before the sight, beside which the officers' own
+        # reckonings are said (package 40b): two reckonings, and the sun judging both
+        account = r.position
+        account_doubt = r.ellipse()
         result = sights.noon_sight(world, self.master, self.stream)
         observed: float | None = None
         obs: Observation | None = None
@@ -3604,6 +3725,7 @@ class Navigation:
             # doubts, and taken when the account is plainly out
             obs = r.observe_latitude(observed, result.sight.sigma_nm)
             self._moved()
+            r.slate_sight(tick, "the noon latitude", account, obs.how)
         else:
             self.last_sight = None
             self.sight_refused = result.refusal
@@ -3646,8 +3768,17 @@ class Navigation:
             "tide": self.tide_allowed(),
         }
         self.master.occupy("below", tick + DAYS_WORK_MINUTES * 60, "day's work")
+        # the officers' own reckonings, each a line after the noon's (package 40b): only
+        # when one is held, so that a passage with no officer's reckoning keeps its log
+        owns = self._own_noon_lines(account, account_doubt, observed)
         if automatic:
             world.record(Severity.NOTABLE, "reckoning.noon", text, data=data)
+            for own_text, own_data in owns:
+                world.record(Severity.NOTABLE, OWN_NOON_KIND, own_text, data=own_data)
+        else:
+            # the noon by order: its line is the order's result, written after this
+            # returns, so the officers' lines follow it at the next tick
+            self._own_pending = owns
         return text, data
 
     def work_up(self) -> tuple[str, dict[str, Any]]:
@@ -3683,6 +3814,347 @@ class Navigation:
         text = f"The reckoning set to {format_position(pos)} by the captain's order."
         data = {"reckoning": self.reckoning.words, "lat_deg": pos.lat_deg, "lon_deg": pos.lon_deg}
         return text, data
+
+    # -- the master's slate, and an officer's own reckoning (package 40b; spec M6 §5) ---
+
+    def _board(
+        self, begun: int, tick: int, w: Working, steer: float, made: tuple[float, float]
+    ) -> dict[str, Any]:
+        """A board as the master laid it down, for the slate: from and to (ticks), the
+        course (true, the variation and the leeway allowed as he allows them, the
+        helmsman's wander in it as the traverse board pegged it), the hours run and her
+        way for them (the log's read, or by eye), the run, the tide he allowed and her
+        drift hove to (miles east and north each), and what the board made by account."""
+        tide_by = "none"
+        if abs(w.tide[0]) + abs(w.tide[1]) > 1e-9:
+            tide_by = "captain" if self.reckoning.set_allowance is not None else "book"
+        return {
+            "kind": "board",
+            "from": begun,
+            "to": tick,
+            "course_deg": round(math.degrees(w.course + steer) % 360.0, 1),
+            "hours": round(w.run_h, 3),
+            "knots": round(max(0.0, w.read), 2),
+            "by_eye": w.read_sigma >= SPEED_BY_EYE_SIGMA_KN,
+            "run_nm": round(max(0.0, w.read) * w.run_h, 2),
+            "close_hauled": w.close_hauled,
+            "hove_to_h": round(w.hove_h, 3),
+            "tide": [round(w.tide[0], 3), round(w.tide[1], 3)],
+            "tide_by": tide_by,
+            "drift": [round(w.drift[0], 3), round(w.drift[1], 3)],
+            "made": [made[0], made[1]],
+        }
+
+    def _in_hand(self) -> dict[str, Any] | None:
+        """The board in hand since the last was laid down, as the mate would chalk it
+        now: worked with no draw and nothing changed, as `account_now` is."""
+        w = self._working()
+        if w is None:
+            return None
+        r = self.reckoning
+        run = max(0.0, w.read) * w.run_h
+        made = (
+            run * math.sin(w.course) + w.drift[0] + w.tide[0],
+            run * math.cos(w.course) + w.drift[1] + w.tide[1],
+        )
+        board = self._board(r.last_step_tick, self.world.clock.tick, w, 0.0, made)
+        board["in_hand"] = True
+        return board
+
+    def _time_words(self, tick: int) -> str:
+        """'14:20', or '14:20 on the 11th' when it is not today."""
+        clock = self.world.clock
+        when = clock.start + timedelta(seconds=tick)
+        if when.date() == clock.ship_time.date():
+            return f"{when:%H:%M}"
+        return f"{when:%H:%M} on the {_ordinal(when.day)}"
+
+    def slate(self) -> tuple[str, dict[str, Any]]:
+        """`work my reckoning` (package 40b; spec M6 §5): the master's slate since the
+        last fix, for an officer to work his own reckoning from, as lieutenants and the
+        young gentlemen worked theirs from the same log-board: where it begins (the fix,
+        the departure, the reckoning set by hand, or an observation that laid the account
+        down) and the master's doubt there; each board as he laid it down, with the tide
+        he allowed and her drift hove to; each sight he worked into the account since and
+        how far it moved it; and the board in hand. A reading: nothing is drawn and
+        nothing changed, and the account it would work to is not said (that is the
+        working). The data is the same in figures, for a station that works it by them
+        (the master's own station a model could hold, spec M6 §11, takes the same)."""
+        r = self.reckoning
+        entries = [dict(x) for x in r._slate()]
+        start = dict(r.slate_from or {})
+        p = start.pop("P", r.P)
+        start["ellipse"] = _ellipse_of(p)
+        start["doubt"] = doubt_words(p)
+        in_hand = self._in_hand()
+        where = format_position(Position(start["lat_deg"], start["lon_deg"]))
+        head = (
+            f"The master's slate since {start['what']} at {self._time_words(start['tick'])}: "
+            f'{where} by account then, and his doubt then: "{start["doubt"]}"'
+        )
+        boards = [x for x in entries if x["kind"] == "board"] + ([in_hand] if in_hand else [])
+        sights = [x for x in entries if x["kind"] == "sight"]
+        parts = [head]
+        if boards:
+            said = "; ".join(self._board_words(b) for b in boards)
+            parts.append(
+                "The boards, each course as he laid it down (true, his variation and his "
+                f"leeway allowed) and its distance: {said}."
+            )
+        else:
+            parts.append("No board run since.")
+        if sights:
+            parts.append(
+                "Worked into the account since: "
+                + "; ".join(self._sight_words(x) for x in sights)
+                + "."
+            )
+        tide = self.tide_allowed()
+        parts.append(
+            f"The tide he allows now: {tide['words']}. Work it, and give your own with 'my "
+            "reckoning is <position>'."
+        )
+        data = {
+            "from": start,
+            "entries": entries,
+            "in_hand": in_hand,
+            "tide": tide,
+        }
+        return " ".join(parts), data
+
+    def _board_words(self, b: dict[str, Any]) -> str:
+        course = math.radians(b["course_deg"])
+        span = f"{self._time_words(b['from'])} to {self._time_words(b['to'])}"
+        if b.get("in_hand"):
+            span = f"in hand since {self._time_words(b['from'])}, not yet laid down"
+        if b.get("carried"):
+            return f"{span}, boards summed: {units.point_name(course)} {b['run_nm']:.1f} miles"
+        words = f"{span}, {units.point_name(course)} ({b['course_deg']:03.0f}°) {b['run_nm']:.1f}"
+        words += " miles"
+        if b["hours"] > 0.0 and b["run_nm"] > 0.0:
+            way = "by eye" if b.get("by_eye") else "by the log"
+            # her way to the quarter knot, as the log is read
+            way_kn = round(b["knots"] * 4.0) / 4.0
+            knots = "knot" if way_kn == 1 else "knots"
+            words += f" at {way_kn:g} {knots} {way}"
+        if b.get("close_hauled"):
+            words += ", close-hauled"
+        for key, what in (("tide", "the tide"), ("drift", "her drift hove to")):
+            e, n = b[key]
+            if math.hypot(e, n) >= 0.05:
+                words += (
+                    f", {what} {math.hypot(e, n):.1f} miles to the "
+                    f"{units.point_name(math.atan2(e, n))}"
+                )
+        return words
+
+    def _sight_words(self, x: dict[str, Any]) -> str:
+        e, n = x["moved"]
+        when = self._time_words(x["tick"])
+        if math.hypot(e, n) < OBSERVATION_KEPT_NM:
+            return f"at {when} {x['what']}, the account kept"
+        return (
+            f"at {when} {x['what']}, {x['how']}: the account moved "
+            f"{math.hypot(e, n):.1f} miles to the {units.point_name(math.atan2(e, n))}"
+        )
+
+    def _own_now(self, own: dict[str, Any]) -> Position:
+        """An officer's own reckoning carried on to this moment by the boards the master
+        has laid down since he worked it and the board in hand, as his own log-board
+        would carry it: what the observations did to the master's account is the
+        master's, and not in it."""
+        r = self.reckoning
+        hand_e, hand_n = r.offset_nm(self.account_now())
+        de = r.run_east_nm + hand_e - own["run"][0]
+        dn = r.run_north_nm + hand_n - own["run"][1]
+        return _displaced(Position(own["lat_deg"], own["lon_deg"]), de, dn)
+
+    def own_reckoning(
+        self, station: str, pos: Position, actor: str = "captain"
+    ) -> tuple[str, dict[str, Any]]:
+        """`my reckoning is <position>` (package 40b): a station's own reckoning, kept
+        beside the master's and moving nothing; run on by the boards, and said at each
+        noon in the line after the noon's beside the master's, each day's work beginning
+        from his own noon figure (the lead's ruling on the package's report). A figure of
+        the station's (`station`: 'officer of the watch', 'captain'), carried in the
+        save; given again, it is replaced; forgotten when the holder who gave it leaves
+        the station (`_owns`). `actor` is the order's, which says who that holder is."""
+        r = self.reckoning
+        account = self.account_now()
+        hand_e, hand_n = r.offset_nm(account)
+        own = {
+            "station": station,
+            "who": self._station_person(station),
+            "tick": self.world.clock.tick,
+            "lat_deg": pos.lat_deg,
+            "lon_deg": pos.lon_deg,
+            "run": [r.run_east_nm + hand_e, r.run_north_nm + hand_n],
+            "holder": self._holder_of(actor),
+        }
+        held = dict(self._owns())
+        held[station] = own
+        self.own = held
+        away = self._beside(pos, account, self.doubt_now())
+        text = (
+            f"{_head(own['who'])}'s own reckoning: {format_position(pos)}, {away['words']}; "
+            "kept beside the master's, it moves nothing, and is said at noon."
+        )
+        return text, {"own": own | {k: v for k, v in away.items() if k != "words"}}
+
+    def own_reading(self, station: str) -> dict[str, Any] | None:
+        """A station's own reckoning as it stands now, carried on, with its distance and
+        bearing from the master's account; None when none is held."""
+        own = self._owns().get(station)
+        if own is None:
+            return None
+        now = self._own_now(own)
+        away = self._beside(now, self.account_now(), self.doubt_now())
+        words = (
+            f"{format_position(now)} by {own['who']}'s own reckoning, worked at "
+            f"{self._time_words(own['tick'])} and run on by the log-board, {away['words']}"
+        )
+        return {
+            "lat_deg": now.lat_deg,
+            "lon_deg": now.lon_deg,
+            "words": words,
+            "worked_tick": own["tick"],
+            "who": own["who"],
+        } | {k: v for k, v in away.items() if k != "words"}
+
+    @staticmethod
+    def _beside(
+        pos: Position, account: Position, ellipse: dict[str, Any], of: str = "the master's account"
+    ) -> dict[str, Any]:
+        """Where a reckoning lies from the master's account, in words and figures, and
+        whether it lies within what he would trust the account within (twice his doubt,
+        as the ellipse lies)."""
+        de, dn = _offset_from(account.lat_deg, account.lon_deg, pos)
+        nm = math.hypot(de, dn)
+        sigmas = _sigmas_off(ellipse, de, dn)
+        within = sigmas <= OBSERVATION_OUT_SIGMAS
+        if nm < 0.05:
+            words = f"on {of}"
+        else:
+            from freesail.world.geo import distance_words
+
+            words = (
+                f"{distance_words(nm * units.NAUTICAL_MILE)} "
+                f"{units.point_name(math.atan2(de, dn))} of {of}"
+            )
+        words += ", within what he would trust it" if within else ", outside what he would trust it"
+        return {
+            "words": words,
+            "from_master_nm": round(nm, 2),
+            "from_master_deg": round(math.degrees(math.atan2(de, dn)) % 360.0, 1),
+            "sigmas": round(sigmas, 2),
+            "within": within,
+        }
+
+    def _own_noon_lines(
+        self, account: Position, ellipse: dict[str, Any], observed: float | None
+    ) -> list[tuple[str, dict[str, Any]]]:
+        """The line after the noon's for each own reckoning held (package 40b): his
+        position carried on to noon, its distance and bearing from the master's account
+        before the sight and whether it lies within what the master would trust it, and
+        where the observed latitude lies from it. Each is then carried on from that noon
+        figure, as each day's work began from the last, and said again at the next noon
+        (the lead's ruling on the package's report: it does not lapse)."""
+        held = self._owns()
+        r = self.reckoning
+        hand_e, hand_n = r.offset_nm(self.account_now())
+        out: list[tuple[str, dict[str, Any]]] = []
+        for station in sorted(held, key=lambda s: (s != "officer of the watch", s)):
+            own = held[station]
+            now = self._own_now(own)
+            of = "the master's account" + (" before the sight" if observed is not None else "")
+            away = self._beside(now, account, ellipse, of)
+            text = (
+                f"The {station}'s own reckoning ({own['who']}), worked at "
+                f"{self._time_words(own['tick'])} and run on by the log-board: "
+                f"{format_position(now)}, {away['words']}."
+            )
+            data = {
+                "station": station,
+                "who": own["who"],
+                "worked_tick": own["tick"],
+                "lat_deg": round(now.lat_deg, 5),
+                "lon_deg": round(now.lon_deg, 5),
+            } | {k: v for k, v in away.items() if k != "words"}
+            if observed is not None:
+                off_nm = (observed - now.lat_deg) * _NM_PER_DEG
+                if abs(off_nm) < 0.05:
+                    text += " The latitude by observation is his own."
+                else:
+                    from freesail.world.geo import distance_words
+
+                    side = "N" if off_nm > 0 else "S"
+                    text += (
+                        f" The latitude by observation lies "
+                        f"{distance_words(abs(off_nm) * units.NAUTICAL_MILE)} {side} of his."
+                    )
+                data["observed_off_nm"] = round(off_nm, 2)
+            out.append((text, data))
+            # the next day's work begins from his own noon figure
+            own["lat_deg"], own["lon_deg"] = now.lat_deg, now.lon_deg
+            own["run"] = [r.run_east_nm + hand_e, r.run_north_nm + hand_n]
+            own["noon_tick"] = self.world.clock.tick
+        return out
+
+    def _holder_of(self, actor: str) -> list[Any]:
+        """Who gives an own reckoning, by the order's actor, so that it is forgotten when
+        he leaves the station: a model's harness and its seating (`["harness", n]`), the
+        player's seat and the tick he was seated (`["seat", tick]`), or the player at
+        the prompt (`["player"]`), who is the captain and never leaves."""
+        world = self.world
+        name = actor.split(" (", 1)[0].removeprefix("the ").strip()
+        seat = getattr(world, "player_seat", None)
+        if actor.endswith(" (the player)") and seat is not None:
+            return ["seat", seat.agent.stationed_tick]
+        harness = (getattr(world, "agents", None) or {}).get(name)
+        if actor.startswith("the ") and harness is not None:
+            return ["harness", harness.agent.seatings]
+        return ["player"]
+
+    def _owns(self) -> dict[str, dict[str, Any]]:
+        """The own reckonings still held: one whose holder has left the station (the
+        model's stood down or withdrawn, or taken again in a later seating; the player's
+        seat left) is forgotten here (the lead's ruling on the package's report)."""
+        held = self.own or {}
+        world = self.world
+        keep: dict[str, dict[str, Any]] = {}
+        for station, own in held.items():
+            holder = own.get("holder") or ["player"]
+            if holder[0] == "seat":
+                seat = getattr(world, "player_seat", None)
+                ok = (
+                    seat is not None
+                    and not seat.agent.released
+                    and seat.agent.stationed_tick == holder[1]
+                )
+            elif holder[0] == "harness":
+                harness = (getattr(world, "agents", None) or {}).get(station)
+                ok = (
+                    harness is not None
+                    and not harness.agent.released
+                    and harness.agent.seatings == holder[1]
+                )
+            else:
+                ok = True
+            if ok:
+                keep[station] = own
+        if len(keep) != len(held):
+            self.own = keep or None
+        return keep
+
+    def _station_person(self, station: str) -> str:
+        """The person of the wardroom a station is bound to (spec M6 §2), by name; the
+        station's own name where the world keeps no people."""
+        people = getattr(self.world, "people", None)
+        if people is not None:
+            found = people.holder(station)
+            if found is not None:
+                return found.name
+        return f"the {station}"
 
     def allow_set(self, knots: float, toward_rad: float | None) -> tuple[str, dict[str, Any]]:
         """`allow <n> knots of set to <direction>`: the captain's own set in the traverse,
@@ -4230,8 +4702,10 @@ class Navigation:
         self.bring_up()
         r = self.reckoning
         account_lon = r.lon_deg
+        before = r.position
         obs = r.observe_longitude(sight.longitude_deg, sight.sigma_nm)
         self._moved()
+        r.slate_sight(world.clock.tick, "a longitude by chronometer", before, obs.how)
         self.last_time_sight = sight
         tick = world.clock.tick
         self.master.occupy("below", tick + sights.TIME_SIGHT_WORK_MINUTES * 60, "time sight")
@@ -4329,8 +4803,10 @@ class Navigation:
         # by the one rule (package 37e): in game 9 a lunar "which he would trust within 25
         # miles" replaced an account he trusted within two; weighed, it moves such an
         # account a cable or two, and is taken only when the account is plainly out
+        before = r.position
         obs = r.observe_longitude(lunar.longitude_deg, lunar.sigma_nm)
         self._moved()
+        r.slate_sight(world.clock.tick, f"a lunar of {lunar.body}", before, obs.how)
         of = lunar.body
         master = self.master.name
         text = (
@@ -5197,6 +5673,23 @@ def _compass_shift_nm(
         return 0.0, 0.0
     turn = math.radians(allowance_deg) / units.NAUTICAL_MILE
     return (a11 * g0 - a01 * g1) / det * turn, (a00 * g1 - a01 * g0) / det * turn
+
+
+def _ordinal(n: int) -> str:
+    """'1st', '2nd', '11th', '23rd'."""
+    suffix = "th" if 10 <= n % 100 <= 20 else {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+    return f"{n}{suffix}"
+
+
+def _sigmas_off(ellipse: dict[str, Any], de: float, dn: float) -> float:
+    """How many of the master's doubts a point `de, dn` miles east and north of the
+    account lies off, as the ellipse lies (its semi-axes one sigma each)."""
+    b = math.radians(float(ellipse.get("major_bearing_deg", 0.0)))
+    along = de * math.sin(b) + dn * math.cos(b)
+    across = de * math.cos(b) - dn * math.sin(b)
+    major = max(1e-6, float(ellipse.get("semi_major_nm", 0.0)))
+    minor = max(1e-6, float(ellipse.get("semi_minor_nm", 0.0)))
+    return math.hypot(along / major, across / minor)
 
 
 def _tick_of(world: Any, when: datetime) -> int:

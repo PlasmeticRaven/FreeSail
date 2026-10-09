@@ -315,6 +315,10 @@ def test_the_lead_reads_the_tide_and_the_master_allows_for_it_by_his_almanac():
 # ---------------------------------------------------------------------------
 
 
+# The waters whose rates, springs and neaps, are the period's own (package 39a).
+PERIOD_RATES = {"alderney-race"}
+
+
 def test_the_directions_state_every_water_in_the_periods_form_beside_the_worlds_figures(tide):
     """Package 37e, item 5: each stream area carries what the sailing directions say of
     it beside the world's own figures, in the form the period's books give: the point
@@ -335,11 +339,17 @@ def test_the_directions_state_every_water_in_the_periods_form_beside_the_worlds_
         else:
             assert off == pytest.approx(math.radians(20.0)) and "set" not in said.judgement
         assert (said.spring_kn * 2.0) == round(said.spring_kn * 2.0), said.id  # to the half knot
-        assert said.neap_kn == pytest.approx(said.spring_kn / 2.0), said.id
+        if "rates" in said.judgement:
+            assert said.neap_kn == pytest.approx(said.spring_kn / 2.0), said.id
+        else:
+            # package 39a: where the period gives both rates they are the book's (White
+            # 1835's survey of the Race: neaps not above 5 1/2 against 7 at springs)
+            assert said.id in PERIOD_RATES and said.neap_kn > said.spring_kn / 2.0, said.id
         assert abs(said.spring_kn - world.spring_kn) <= 0.5, said.id
         assert (said.strongest_h * 2.0) == round(said.strongest_h * 2.0), said.id
         assert abs(said.strongest_h - world.phase_h) <= 0.5, said.id
-        assert said.source and "rates" in said.judgement, said.id  # whose each figure is
+        assert said.source, said.id  # whose each figure is
+        assert ("rates" in said.judgement) != (said.id in PERIOD_RATES), said.id
         assert said.rate_kn(1.0) == said.spring_kn and said.rate_kn(0.0) == said.neap_kn
         assert said.neap_kn < said.rate_kn(0.5) < said.spring_kn
     # the Fromveur at neaps is the book's half of springs, not the world's five knots
@@ -362,8 +372,12 @@ def test_the_directions_are_looked_up_by_a_position_and_say_nothing_beyond_their
     assert book.area_at(THE_LIZARD).id == "the-lizard"
     assert book.area_at(Position(49.3, -5.0)).id == "mid-channel"  # the rest is the Channel
     south, north, west, east = book.limits
-    # package 39b: the directions reach Biscay north, one box over both
+    # package 39a: the limits reach east with the Channel east's chart; package 39b: the
+    # directions reach Biscay north, one box over the three
     assert (south, north, west, east) == (45.9, 51.0, -7.0, -0.9)
+    assert book.area_at(Position(49.70, -2.06)).id == "alderney-race"
+    assert book.area_at(Position(50.49, -2.45)).id == "portland-race"
+    assert book.area_at(Position(50.0, -2.5)).id == "mid-channel"
     for beyond in (Position(45.5, -6.0), Position(49.5, -7.5), Position(51.2, -5.0)):
         assert book.area_at(beyond) is None
     assert book.area_at(Position(48.045, -4.77)).id == "raz-de-sein"  # before the Iroise
@@ -438,6 +452,13 @@ def test_the_stream_areas_belong_to_a_chart_and_beyond_them_there_is_no_stream(t
     assert (
         len(channel) == 13 and channel[-1] == "mid-channel" and tide.areas[-1].id == "mid-channel"
     )
+    # package 39a: the Channel east's areas lie east of 3 W, where no Channel west
+    # position reaches, and come before the open Channel, whose bounds hold them
+    names = [a.id for a in tide.areas]
+    for a in tide.areas:
+        if a.chart == "channel-mid":
+            assert a.polygon is not None and min(lon for _, lon in a.polygon) > -3.0, a.id
+            assert names.index(a.id) < names.index("mid-channel")
     mid = tide.area_at(Position(49.3, -5.0))
     assert mid.id == "mid-channel" and mid.bounds is not None
     off_lisbon = tide.area_at(Position(38.6, -9.4))
@@ -477,19 +498,71 @@ def test_far_from_every_place_of_his_table_the_master_says_his_tide_may_be_hours
 
 
 # ---------------------------------------------------------------------------
+# Package 39a: the Channel east (spec M6 §26, block 1)
+# ---------------------------------------------------------------------------
+
+
+def test_the_race_of_alderney_runs_south_west_from_half_ebb_to_half_flood_at_whites_rate(tide):
+    """White 1835, 'Alderney Tides', p. 132: in the Race the south-western stream begins at
+    half-ebb exactly and runs six hours to half-flood, the north-eastern the other six,
+    above seven knots at springs and not above five and a half at neaps: the world's
+    stream there is strongest about high water to the north-east and about low water to
+    the south-west, at springs within White's figures."""
+    race = Position(49.70, -2.06)
+    start = datetime(1805, 6, 12, 0, 0)  # two days after the new moon of 10 June 1805: springs
+    states = [tide.at(race, start + timedelta(minutes=10 * i)) for i in range(6 * 25)]
+    assert {s.area_id for s in states} == {"alderney-race"}
+    fastest = max(states, key=lambda s: s.stream_kn)
+    assert 6.0 < fastest.stream_kn <= 7.5
+    for s in states:
+        if s.stream_kn > 3.0:
+            # north-eastward about high water (the phase near 0), south-westward about low
+            north_east = abs(((s.stream_toward_deg - 30.0) + 180.0) % 360.0 - 180.0) < 1.0
+            assert north_east == (s.phase_deg < 90.0 or s.phase_deg > 270.0), s
+    said = T.load_directions().by_id("alderney-race")
+    assert (said.spring_kn, said.neap_kn, said.strongest_h) == (7.0, 5.5, 0.0)
+    assert said.judgement == ("set",) and "White 1835" in said.source
+
+
+def test_the_channel_easts_gauges_were_read_and_are_held_and_the_eleven_do_not_move(tide):
+    """The brief: TICON's gauges of the block read as package 34 read the file, the
+    eleven gauges and their figures unmoved. The file has Weymouth, St Helier, Saint-Malo
+    and Cherbourg (four of the eleven) and Bournemouth and Portsmouth beside them, which
+    are held, read by nothing (a twelfth gauge would move every Channel position's
+    blend); it has none at St Peter Port, Dartmouth or Portland."""
+    import yaml
+
+    doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
+    # the Channel east's two (Biscay north's nine, package 39b, are held beside them)
+    held = {g["id"]: g for g in doc["held_gauges"] if g["lat_deg"] > 48.5}
+    assert set(held) == {"bournemouth", "portsmouth"}
+    assert all(g["mean_level_m"] is None for g in held.values())  # unverified, not invented
+    assert len(tide.gauges) == 11 and not {g.id for g in tide.gauges} & set(held)
+    assert {"weymouth", "st-helier", "saint-malo", "cherbourg"} <= {g.id for g in tide.gauges}
+    # the tide at Saint-Malo's gauge against SHOM's references there (the RAM as the
+    # constituents' head quotes them: mean high water springs 12.20 m, low 1.50 m)
+    level, consts = tide.constants_at(Position(48.6408, -2.0281))
+    springs = consts["M2"][0] + consts["S2"][0]
+    assert level + springs == pytest.approx(12.20, abs=0.5)
+    assert level - springs == pytest.approx(1.50, abs=0.5)
+
+
+# ---------------------------------------------------------------------------
 # Package 39b: Biscay north's tide (spec M6 §26, the block's item 4)
 # ---------------------------------------------------------------------------
 
 
 def test_the_blocks_gauges_are_read_and_held_out_of_the_blend_that_would_move_the_channel(tide):
-    """TICON's nine gauges of Biscay north are read into `gauges_held:` in the eleven's
+    """TICON's nine gauges of Biscay north are read into `held_gauges:` in the eleven's
     form, their mean levels SHOM's RAM's; the world blends the eleven alone, since a
     gauge of the block within the reach would move the Channel's tide (the finding: the
     engine has no rule yet that keeps a gauge to its own water)."""
     import yaml
 
     doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
-    held = doc["gauges_held"]
+    # the block's nine, after the Channel east's two (package 39a) under the same key
+    held = [g for g in doc["held_gauges"] if g["lat_deg"] < 48.0]
+    assert len(doc["held_gauges"]) == 2 + len(held)
     assert [g["id"] for g in held] == [
         "concarneau",
         "port-tudy",
