@@ -519,6 +519,57 @@ new. The package also writes the recipe form the blocks fill (`REGIONS` in
 `tools/build_charts.py` with a region's harbour groups) and the checks a block must pass
 (the allowed-licence test, the shore swept for GEBCO's fill, M5 §33 item 16).
 
+**As built (package 38, 2026-10-09).** The manifest gained `charts:` (`atlantic-east`:
+the regions it holds, in the order their features are indexed and their coasts drawn,
+and the corridor under them) and `corridors:` (`atlantic-corridor`, level 1 from
+GEBCO_2025's area extract over 32 N to 51 N and 20 W to 1 W, 30 tiles of 5.9 MB
+compressed with their distance field, committed under `tiles/1/atlantic-corridor/`,
+the one level-1 folder `.gitignore` lets through; the source, the licence, the
+extract's checksum and each tile's recorded). `load_chart` takes a chart's name or, as
+before, a region's, which is a chart of that region alone with its own levels and
+bounds, so that every scenario of the Channel reads what it read; the corridor is a
+named chart's. A query asks the finest level with a tile under the point, falls back to
+the corridor at level 1 and the world at level 0 where built, and answers None beyond
+them (a corridor tile reaches past its fetch box; its empty cells answer nothing); the
+features of every region are indexed together, an id given twice an error in words;
+`contains`, `bounds` and `bounds_words` are the whole's (the corridor's envelope).
+**The seam** (measured off Penmarch, where the Channel region's tiles end at 47.81 N):
+the depth steps 1.3 m in seventy (EMODnet at LAT against GEBCO at mean sea level: the
+two sources' own difference, and the corridor's datum is the level's, mean sea level,
+as the brief had it), the shore's distance steps a corridor cell and a quarter (its
+grain), no danger is lost, the shore is hailed once; the field's own read
+(`coast_distance`) falls through to the corridor where a region's tiles end within the
+distance it gives and not between a harbour patch and its region, and the coast's
+trend prefers a region's level to the corridor's, so a Channel scenario on the whole
+chart reads the Channel scenario's breeze. **The lookout's honesty**: where the finest
+level's cell is wider than `lookout.COARSE_CELL_M` (300 m; the corridor's is 930) the
+shore is "the land" and never "the land about" a point, no rock is named (the corridor
+has no features), and the line's data says the level's `use`. The scenario file says
+`chart: atlantic-east` or `region:` or both, the chart winning. **The weather's boxes**:
+`climatology.yaml` is `boxes:` with `bounds` (the Channel's, package 30's table under
+its own name and every figure as it was; Biscay, the Portuguese coast with the summer
+northerlies and the sea off Madeira with the north-east trade, PROVISIONAL and judgement
+in every row, each row's `note` saying so), a scenario seeded from the box she starts
+in (`Weather(box=...)`, the default on the plane), located once a minute; the stated
+simple rule at an edge: the systems in play are kept (centres in the plane), the next
+draw comes from the box she is in, and the background and the gradient move from the
+one box's to the other's over `BOX_BLEND_H` (six hours); the draws are made about a
+centre that steps with her by `CENTRE_STEP_KM` (500 km), which no scenario of the
+Channel reaches. **The tide**: the gauges within `interpolation.reach_nm` (400 miles,
+more than the Channel's region is from Dover, so every Channel position blends the
+eleven as pinned) are blended, a position beyond the reach of every gauge takes the
+nearest alone (`TideState.far`) and the master says it ("so far from any place of the
+table the tide here may differ by hours", beyond `FAR_PLACE_NM`); `streams.yaml`'s areas
+carry `chart:`, an area with no polygon reaches its `bounds:` and no farther, and
+beyond every area the stream is nought (`NO_STREAM`). **The recipe form** is the
+comment over `REGIONS` (`sources` added), `CORRIDORS` and `CHARTS` beside it; `--region`
+and `--corridor` build one and carry every other entry and the sources' earlier fetches
+over; `--check` prints the five checks of `docs/dev/ChartBlocks.md` and the build adds
+the shore's sweep for GEBCO's fill. The ships' plans and the pilots' stations needed
+nothing: a port file is read by its port, whichever region holds it. The recorded
+passages and the gate's day replay to their digests (`tests/test_known_truths.py`);
+the figures are in `docs/dev/TuningNotes.md`.
+
 **The blocks (Opus, one package each, in the order the voyage sails them):**
 
 1. **The Channel east** (`channel-mid`, about 49°N to 51°N, 4°W to 1°W): Dartmouth and
