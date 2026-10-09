@@ -2995,9 +2995,12 @@ GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58213  # brought up (58795 before the merge)
 GATE_5B_SCHOONER_LINES = 761  # merged tree (756 before the merge)
 GATE_5B_SCHOONER_DIGEST = "d6031efa9808a2b1"  # merged tree (a7dd398ae719ff8b before)
 GATE_5B_THICK_LANDFALL_TICK = 53820  # 54420 before package 37j
-GATE_5B_THICK_LINES = 475  # merged tree (473 before the merge)
-GATE_5B_THICK_DIGEST = "bd1cb6f5e036ce3e"  # merged tree (e00caa4f5a665b50 before)
-GATE_5B_THICK_AGROUND_TICK = 56081  # package 37j: on Black Head, after the landfall (a finding)
+# Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
+# puts her about for the starboard tack and keeps her full and by (37j's grounding on
+# Black Head at 56081 gone), 475 → 478 lines (docs/dev/TuningNotes.md, package 37m).
+GATE_5B_THICK_TACKED_TICK = 54063  # put about off Black Head, full and by on the starboard tack
+GATE_5B_THICK_LINES = 478  # package 37m (475 on the merged tree)
+GATE_5B_THICK_DIGEST = "7029e5b4dd6fbe06"  # package 37m (bd1cb6f5e036ce3e on the merged tree)
 
 
 def the_landfall(log):
@@ -3427,17 +3430,24 @@ def test_the_passage_in_thick_weather_makes_its_landfall_wrong_on_the_reckoning(
     assert account.lat_deg > truth.lat_deg  # she believed herself further on
     e = world.navigation.reckoning.ellipse()
     assert 2.0 < e["sigma_east_nm"] < 6.0 and 1.0 < e["sigma_north_nm"] < 6.0
-    # Package 37j, a finding for the lead and no part of the rule: her account eight miles
-    # out, she raises the land about Black Head at 53820 (54420 before), where the book's
-    # "the land" steers S into a south-easterly; "keep her full" bears her away a point
-    # and she is taken aback (53861), lies close-hauled on the larboard tack with the ebb
-    # and her leeway setting her to the westward, is warned of the land ahead at 55320 and
-    # 55620 and takes the ground on Black Head's ledges at 56081, the tide falling. The
-    # landfall falls ten minutes earlier than 37f's on another track, the departure being
-    # laid at the truth and the account worked at every board; the book is not tuned here
-    # (docs/dev/TuningNotes.md, package 37j).
-    aground = [x for x in log if x.kind == "ship.aground"]
-    assert [x.tick for x in aground] == [GATE_5B_THICK_AGROUND_TICK]
+    # Package 37j found her taking the ground on Black Head's ledges at 56081: the book's
+    # "the land" steered S into the south-westerly, too near the wind, and she was taken
+    # aback with no way on and set onto the ledges. Package 37m (the owner's ruling 3 of
+    # 2026-10-09): the same `steer S` is judged against her head and the wind, too near
+    # to be laid on the starboard tack, and she is put about (luffed up and braced up
+    # first, being off the wind) and kept full and by on the starboard tack, standing off
+    # to the southward; the land is out of sight at 54900 and she does not take the
+    # ground (docs/dev/TuningNotes.md, package 37m). The book is not tuned.
+    helm = [x for x in log if x.kind == "helm.order" and x.tick == landfall[0].tick]
+    assert helm and helm[0].text.startswith(
+        "Helm ordered: steer S (180°); S (180°) lies too near the wind to be laid; she is put "
+        "about and kept full and by on the starboard tack."
+    )
+    tacked = [x for x in log if x.kind == "ship.tacked"]
+    assert [x.tick for x in tacked] == [GATE_5B_THICK_TACKED_TICK]
+    assert tacked[0].text.endswith("on the starboard tack, heading S by E (171°), full and by.")
+    assert not [x for x in log if x.kind == "ship.aground"]
+    assert world.ship.dyn.helm_mode.value == "full_and_by"
     assert len(log) == GATE_5B_THICK_LINES and log.digest()[:16] == GATE_5B_THICK_DIGEST
 
 
@@ -3981,10 +3991,17 @@ GATE_5C_CRUISE_WORLD_ORDERS = [
 # right ahead at four leagues 90120 → 90000 and chased at once (90121 → 90000), spoken
 # at 07:59 (94091 → 93979) under no colours and lost to sight astern 98100 → 98040;
 # fourteen wears; 2037 → 2059 lines.
+# Package 37m (2026-10-09; docs/dev/TuningNotes.md, its section): every tick to 20:00 on
+# the 12th stands; there the book's "back to the station" shapes SW by S across the wind's
+# eye from her head, and she is put about for it (two knots and more on her) where the
+# fold-in's guard wore her, so her track parts there. Old beside new: the cutter within
+# hail 83423 → 84631 and the letter read 83483 → 84691; the Palinure sighted and chased
+# at 90000 as before, spoken 93979 → 93663, out of sight astern 98040 → 97560; thirteen
+# wears and a tack in the two days (fourteen wears); 2065 → 2083 lines.
 GATE_5C_CRUISE_CUTTER_HAIL_TICK = (
-    83423  # the admiral's cutter within hail, 05:10 on the 13th (83484)
+    84631  # the admiral's cutter within hail, 05:30 on the 13th (83423 before package 37m)
 )
-GATE_5C_CRUISE_LETTER_READ_TICK = 83483  # the letter read on the quarterdeck a minute after (83544)
+GATE_5C_CRUISE_LETTER_READ_TICK = 84691  # the letter read on the quarterdeck a minute after (83483)
 # Package 37d: the departure fixed by cross bearings off Plymouth and the account a line
 # from each bearing after; every tick to the first noon stands, the station is reached on
 # another track, the Palinure is raised on the larboard bow seven minutes later (91380;
@@ -4017,8 +4034,8 @@ GATE_5C_CRUISE_LETTER_READ_TICK = 83483  # the letter read on the quarterdeck a 
 # open item.
 GATE_5C_CRUISE_STRANGER_SIGHTED_TICK = 90000  # the Palinure, "a sail right ahead" (90120)
 GATE_5C_CRUISE_CHASE_TICK = 90000  # the chase given at the sighting (90121)
-GATE_5C_CRUISE_SPOKEN_TICK = 93979  # within hail at 07:59 under no colours; the chase up (94091)
-GATE_5C_CRUISE_CHASE_LOST_TICK = 98040  # the brig out of sight astern, for the Start (98100)
+GATE_5C_CRUISE_SPOKEN_TICK = 93663  # within hail at 08:01 under no colours; the chase up (93979)
+GATE_5C_CRUISE_CHASE_LOST_TICK = 97560  # the brig out of sight astern, for the Start (98040)
 GATE_5C_CRUISE_NOON_TICKS = [21600, 108240]
 GATE_5C_CRUISE_WEARS_AT_LEAST = 8  # wore ship on the station, and once for the chase
 # Package 37k (2026-10-09): every tick and the true track held; two lines more, "Her sails
@@ -4029,8 +4046,8 @@ GATE_5C_CRUISE_WEARS_AT_LEAST = 8  # wore ship on the station, and once for the 
 # re-measured at 37j's merge, the tuning notes saying both.)
 # (37j merged after 37h and 37k, 2026-10-09: the figures below are 37j's as measured on
 # its branch; the six passages are re-measured on the merged tree by the lead, below.)
-GATE_5C_CRUISE_LINES = 2065  # merged tree (2059 before the merge)
-GATE_5C_CRUISE_DIGEST = "15e7f10b2ca8eb9a"  # merged tree (d3086c7fce4a3a1a before)
+GATE_5C_CRUISE_LINES = 2083  # package 37m (2065 on the merged tree)
+GATE_5C_CRUISE_DIGEST = "348b07dd901580a7"  # package 37m (15e7f10b2ca8eb9a on the merged tree)
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E
@@ -4129,8 +4146,13 @@ GATE_5C_MERCHANT_FLOOD_TICK = (
 # its branch; the six passages are re-measured on the merged tree by the lead, below.)
 GATE_5C_MERCHANT_GOULET_TICK = 112178  # the mouth of the Goulet (112078; 112112 on Windows)
 GATE_5C_MERCHANT_TIN_SOLD_TICK = 125159  # the boat alongside from the quay (123948)
-GATE_5C_MERCHANT_LINES = 2999  # merged tree (2976 before the merge)
-GATE_5C_MERCHANT_DIGEST = "e40b930d5ec5bbaf"  # merged tree (71c32abf23af0510 before)
+# Package 37m (2026-10-09): every tick stands; at anchor in the Bay at 129600 the hourly
+# course for the Iroise, on the other tack with no way on her, is refused as keeping her
+# full and by ("'keep her full and by' must wait till she weighs", the refusal of 126000,
+# not said again) where it was refused as a tack; 2999 → 2998 lines
+# (docs/dev/TuningNotes.md, package 37m).
+GATE_5C_MERCHANT_LINES = 2998  # package 37m (2999 on the merged tree)
+GATE_5C_MERCHANT_DIGEST = "54713e8e579fd527"  # package 37m (e40b930d5ec5bbaf on the merged tree)
 
 
 def _people(world) -> list[dict]:
@@ -4343,7 +4365,9 @@ def test_the_merchant_passage_at_seed_7_has_its_own_constants(gate_5c_merchant):
     "nineteen miles off, is not worked again once Ushant is within ten miles, and she passes "
     "the mark more than a mile and a half off by account; 'bring to in the Iroise' never fires "
     "and the deep-sea lead is not hove there (90241 before). The book is not tuned here "
-    "(docs/dev/TuningNotes.md, package 37j). For the lead.",
+    "(docs/dev/TuningNotes.md, package 37j). For the lead. Package 37m: still so, the cause "
+    "being no course across the wind; with the lead's dropped rule she casts and is then "
+    "taken aback gybing by the helm, a fore-and-after's turn (TuningNotes, package 37m).",
 )
 def test_the_merchant_passage_casts_the_deep_sea_lead_at_the_iroises_mark(gate_5c_merchant):
     """The beat of the merchant passage as pinned until package 37j: brought to once
