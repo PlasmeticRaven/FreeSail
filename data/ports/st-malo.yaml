@@ -38,14 +38,15 @@ nation: france
 source: "Faden 1793, 'St Malo', pp. 39 to 41; White 1835, 'Coast of France', pp. 84 to 87; Bellin 1764, Petit Atlas Maritime t. V no. 44"
 datum: "low water of spring tides, Bellin 1764 (the override st-malo, unverified for Bellin); 1.5 m above the chart's datum (SHOM's RAM as the tide study quotes it)"
 
-# The outer road is the offing of the Grande Porte west of Cézembre, where a ship from the
-# sea waits for the pilot and the tide (Faden's bay of La Fresnaye is the same road for a
-# ship from Cape Fréhel); the anchorage the road of St Malo under the walls; the mooring
-# the strand under the town, where ships lie dry at low water.
+# The outer road is the bay of La Fresnaye under La Latte, where Faden's ship from the sea
+# waits for the tide to go up to St Malo or takes a pilot (p. 41); the pilots' cruising
+# ground reaches Cézembre and the Gates from it; the anchorage the road of St Malo under
+# the walls; the mooring the strand under the town, where ships lie dry at low water.
 outer_road:
-  name: the offing of the Great Gate, without Cézembre
-  lat_deg: 48.6800
-  lon_deg: -2.1000
+  feature: baie-de-la-fresnaye
+  name: the bay of La Fresnaye
+  lat_deg: 48.65604
+  lon_deg: -2.27528
   depth_fathoms: 8
 anchorage:
   feature: st-malo-road
@@ -66,8 +67,8 @@ shore:
   lon_deg: -2.0262
 
 pilot:
-  station: st-malo-road
-  cruising_nm: 8                 # judgement: the Malouin pilots met ships off Cézembre and in the bay of La Fresnaye
+  station: baie-de-la-fresnaye
+  cruising_nm: 12                # judgement: the Malouin pilots met ships in the bay of La Fresnaye and off Cézembre, ten miles east of it
   comes_off_by_night: false
   cutter: data/ships/cutter.yaml # the stand-in at far detail until the machinery reads `vessel` (35b's fault)
   vessel:

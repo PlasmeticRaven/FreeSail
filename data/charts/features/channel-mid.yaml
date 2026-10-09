@@ -198,7 +198,7 @@ features:
     says: "Brixham road in Torbay, Brixham church south-west and the Berry Head south-south-east, six fathoms on mud and clay: sheltered from every wind from north-east round by the west to south, open to the easterly gale."
 
   - id: torbay
-    kind: road
+    kind: anchorage
     name: Torbay
     modern: Tor Bay
     lat_deg: 50.4450
