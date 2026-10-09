@@ -1,0 +1,56 @@
+# FreeSail: the afterguard of the cutter (spec M6 §2; package 40): the master, who
+# commands her (a revenue cutter's, or a hired cutter's in trade), the mate and the
+# boatswain, with a boy to carry the word. The form and the reading are frigate-36.yaml's
+# (see its head); the names are the muster's, drawn under the seed from the english list.
+# The outlines are judgement.
+
+ship: data/ships/cutter.yaml
+
+# The harness's stations bound to a person by his role: the officer of the watch is the
+# mate (spec M5 §29).
+stations:
+  captain: master
+  officer of the watch: mate
+
+wardroom:
+  - role: master
+    post: true
+    rank: master
+    station: the command
+    place: quarterdeck
+    traits: [bold, a Channel pilot by instinct, carries sail till something goes]
+    history: "Bred in the Cornish trade; master of this cutter four years."
+    brief: >-
+      The cutter, her people and her orders are his: the course and the standing orders,
+      the pilot taken or declined, the port's business. He works his own reckoning.
+  - role: mate
+    post: true
+    rank: mate
+    station: the mate's
+    place: quarterdeck
+    traits: [quiet, careful, a good hand at the lead]
+    history: "A fisherman of Cawsand before the cutter; mate of her two years."
+    brief: >-
+      The deck in his watch under the master's standing orders, the sails and the gear;
+      he reports every sail and every shift of wind, and takes the deck when the master
+      gives it.
+  - role: boatswain
+    post: true
+    rank: boatswain
+    station: the rigging and the boat
+    place: deck
+    traits: [strong, slow to speak, a bowsprit man]
+    history: "Twenty years in cutters."
+    brief: >-
+      The rigging, the running bowsprit, the cable, the anchors and the boat.
+  - role: boy
+    drawn: {station: afterguard, rating: landsman}
+    messenger: true
+    rank: boy
+    station: the master's messenger
+    place: quarterdeck
+    traits: [thin, quick, afraid of the master]
+    history: "Shipped at Falmouth last spring."
+    brief: >-
+      Carries the master's word about the cutter (pass the word for, send for).
+    note: A boy as the messenger (judgement).

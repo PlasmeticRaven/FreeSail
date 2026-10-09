@@ -483,6 +483,10 @@ class Rule:
     text: str = ""  # the sentence as given
     source: str = "dialect"  # "dialect", or "python" for package 26's rules
     trusted: bool = False  # a Python rule running in-process (spec §4)
+    # the named book this rule was loaded under (package 40: the rules-based captain's
+    # state books, `Runtime.load_book`); "" for a rule given at the prompt or read from
+    # a file, which is the player's own and no book's to unload
+    book: str = ""
     # -- state kept by the runtime, saved with the book ---------------------------------
     belayed: bool = False
     fired: int = 0
@@ -551,7 +555,7 @@ class Rule:
         return f"{head} then " + "; ".join(self.actions)
 
     def save(self) -> dict[str, Any]:
-        return {
+        d = {
             "name": self.name,
             "text": self.text,
             "given_by": self.given_by,
@@ -561,6 +565,9 @@ class Rule:
             "last_fired_tick": self.last_fired_tick,
             "given_tick": self.given_tick,
         }
+        if self.book:
+            d["book"] = self.book
+        return d
 
     def reset_edge(self) -> None:
         """Forget the duration, the dwell and the clause references: a rule given or

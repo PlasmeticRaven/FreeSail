@@ -3,7 +3,7 @@
     python -m freesail.ui.console [ship] [--seed N] [--time N] [--load SAVE]
                                   [--scenario FILE] [--standing-orders FILE]
                                   [--watcher fake] [--agents-port N] [--lockstep]
-                                  [--consent-records DIR] [--saves DIR]
+                                  [--consent-records DIR] [--saves DIR] [--seat officer]
 
 `--scenario FILE` starts from a scenario file (`freesail.world.scenarios`,
 `data/scenarios/gate-4c-day.yaml`): its ship, start, latitude and weather script, its
@@ -58,6 +58,7 @@ import time
 from typing import Any
 
 from freesail import units
+from freesail.agents.seat import seat_player
 from freesail.api import queries
 from freesail.core import replay as replay_mod
 from freesail.core.events import Event, RollupView, Severity, Shown
@@ -359,7 +360,13 @@ class Console:
             else:
                 self._replay(paths[0], replay_anyway=anyway or self.replay_anyway)
         else:
-            self.world.submit(line)
+            seat = getattr(self.world, "player_seat", None)
+            if seat is not None and not seat.agent.released:
+                # the player's seat at a station (package 40): the line is the owner's
+                # where it is his, the seat's otherwise, judged by its authority
+                seat.route(line)
+            else:
+                self.world.submit(line)
         return True
 
     @staticmethod
@@ -614,6 +621,11 @@ DEFAULT_SEED = 1805
 # Every door that loads or replays a save takes this flag (package 37d): a save of another
 # build that holds a station's transcript is replayed only when it is given.
 REPLAY_ANYWAY_FLAG = "--replay-anyway"
+SEAT_HELP = (
+    "seat the player at a station below the captain's ('officer'): his orders are judged "
+    "by that station's authority and the captain's word (package 40; spec M6 §3)"
+)
+
 REPLAY_ANYWAY_HELP = (
     "replay a save all the same when it was written by another build and holds a "
     "station's transcript (the replay is then not the game that was played); without it "
@@ -681,6 +693,7 @@ def main(argv: list[str] | None = None) -> int:
         help="where the consent records are read and written (default docs/agents/consent)",
     )
     ap.add_argument("--saves", help="where a released station saves the game (default saves/)")
+    ap.add_argument("--seat", help=SEAT_HELP)
     args = ap.parse_args(argv)
 
     world, scenario_file = start_world(args)
@@ -693,6 +706,8 @@ def main(argv: list[str] | None = None) -> int:
         begin(world, scenario_file)
     if args.standing_orders:
         read_standing_orders(world, args.standing_orders)
+    if args.seat:
+        seat_player(world, args.seat, door="console")
 
     console = Console(
         world, compression=args.time, lockstep=args.lockstep, replay_anyway=args.replay_anyway

@@ -2016,7 +2016,7 @@ def test_the_doors_name_the_officers_station(tmp_path):
     assert OFFICER in STATIONS and OFFICER in repl.STATIONS
     for module in (mcp_server, local):
         src = Path(module.__file__).read_text(encoding="utf-8")
-        assert 'choices=["watcher", "officer"]' in src
+        assert 'choices=["watcher", "officer", "captain"]' in src  # the captain's since 40
     assert "take_the_watch" in Path(mcp_server.__file__).read_text(encoding="utf-8")
     assert "handover" in TOOLS["hand_over"].description and TOOLS["hand_over"].needs_authority
     assert TOOLS["handover_note"].needs_authority

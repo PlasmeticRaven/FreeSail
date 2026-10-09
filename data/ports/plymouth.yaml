@@ -94,3 +94,14 @@ crew_pool:
   landsman: {hands: 30, pounds: 1, delay_h: 12}
 
 closed_to: []
+
+# The port's tracks (spec M6 §4; package 40), for the rules-based captain's planner: out
+# of the Sound by the western channel to Cawsand Bay (the pilot's course out, S by W,
+# past the Panther, data/ports/plymouth.yaml above; Imray 1874 p. 80) and so to a point
+# a mile to the westward of the Eddystone, the cruise's own mark
+# (data/scenarios/naval-cruise.orders: "passing a mile to the westward of the Eddystone");
+# `from_sea` the reverse; `in` from Cawsand Bay to the anchorage in the Sound.
+tracks:
+  to_sea: [cawsand-bay, 50 11 N 4 18 W]
+  from_sea: [50 11 N 4 18 W, cawsand-bay]
+  in: [plymouth-sound-anchorage]

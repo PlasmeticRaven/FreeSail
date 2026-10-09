@@ -42,6 +42,13 @@
 #
 # The lead reviews this list against the sources before the merge: the citation is on
 # every line for that.
+#
+# The common tracks (spec M6 §4; package 40), under `tracks:` at the end of the file:
+# the period's tracks between the sea's marks, each an id, a name, a source and the
+# marks in order (a feature by its id, or a position pricked on the chart). The rules-
+# based captain's planner (freesail/world/captains.py) joins them to the ports' own
+# tracks (`tracks:` in data/ports/*.yaml) where the straight line between two places
+# runs across the land or a charted danger; the chart's loader passes the section over.
 
 region: channel-west
 features:
@@ -2328,3 +2335,16 @@ features:
     height_m: 50
     source: "White 1835, 'Coast of England', p. 13 ('the Sept Isles'); the light on the Île aux Moines dates from 1835"
     says: "The Seven Islands, off Perros on the north coast of Brittany; their light came in 1835."
+
+# ---------------------------------------------------------------------------
+# The common tracks (spec M6 §4; package 40): see the head of the file.
+# ---------------------------------------------------------------------------
+tracks:
+  - id: channel-to-brest
+    name: the track from the Channel to Brest, west about Ushant by the Iroise
+    source: "Faden 1793, p. 61: the Passage de l'Iroise, between the isles south of Ushant and the Raz, six leagues wide, the common track to and from Brest; the soundings seven leagues south-west of Ushant (p. 60), the mark a ship from the Channel makes for before she hauls in for the Iroise; the merchant passage's book for the point off the Lizard"
+    marks: [49 52 N 5 06 W, soundings-off-ushant-near, iroise]
+  - id: lizard-to-plymouth
+    name: the track up Channel from the Lizard to Plymouth, a mile to the westward of the Eddystone
+    source: "White 1835 pp. 26 to 31 and Imray 1874 pp. 75 to 85, the coast from the Lizard to Plymouth with the Eddystone kept to the eastward; the naval cruise's book for the point off the Eddystone; judgement for the point off the Deadman"
+    marks: [49 52 N 5 06 W, 50 08 N 4 42 W, 50 11 N 4 18 W]

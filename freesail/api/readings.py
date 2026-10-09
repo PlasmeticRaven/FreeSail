@@ -2564,7 +2564,11 @@ NO_OFFICER_WORDS = "no officer of the watch is stationed; the captain has the de
 def _officer_of_the_watch(world: Any, _: str | None) -> dict[str, Any] | None:
     harness = (getattr(world, "agents", None) or {}).get("officer of the watch")
     if harness is None:
-        return None
+        # the player's seat at the station (package 40; `agents.seat`)
+        seat = getattr(world, "player_seat", None)
+        if seat is None or seat.station.name != "officer of the watch":
+            return None
+        harness = seat
     a = harness.agent
     st = harness.station
     who = st.person or "the officer of the watch"
@@ -2624,6 +2628,73 @@ REGISTRY.add(
         description="who has the deck: the officer of the watch by name and rank, since "
         "when, what the captain told him and what his word allows",
         none_words=_no_officer_words,
+    )
+)
+
+
+def _captain_reading(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the captain` (spec M6 §7; package 40): who holds the captain's station (a model
+    through its door, or nobody: the rules-based captain named), the book's name (the
+    scenario's, or the state he is in), and whose the deck is."""
+    captain = getattr(world, "captain", None)
+    if captain is None:
+        return None
+    from freesail.agents.agent import door_words
+
+    harness = (getattr(world, "agents", None) or {}).get("captain")
+    held = harness is not None and not harness.agent.released
+    words = captain.words()
+    station = "nobody at the captain's station"
+    deck = "the deck the captain's own, by his rules" if captain.active else "the deck the player's"
+    if held:
+        a, st = harness.agent, harness.station
+        who = (
+            f"{harness.model_name}, through {door_words(harness.door)}"
+            if harness.model_name
+            else st.person
+        )
+        station = f"the captain's station held by {who}"
+        if a.deck:
+            deck = f"the deck his, since {a.deck_stamp}"
+        elif getattr(a, "deck_lost", ""):
+            deck = f"the deck lent to his book while the station is {a.deck_lost}"
+            if captain.stand_in and captain.active:
+                deck += "; the rules-based captain's judgements stand in"
+        else:
+            deck = "the deck his book's"
+        words = f"{st.person}: {station}; {deck}"
+        runtime = getattr(world, "standing", None)
+        books = runtime.books_loaded() if runtime is not None else []
+        inherited = captain.book_words()
+        if books:
+            inherited += f"; the books loaded: {', '.join(books)}"
+        words += f"; his book: {inherited}"
+    else:
+        words = f"{words}; {station}; {deck}"
+    return {
+        "words": words,
+        "name": captain.name,
+        "held": held,
+        "model": harness.model_name if held else "",
+        "door": harness.door if held else "",
+        "deck": bool(held and harness.agent.deck),
+        "book": captain.book_words(),
+        "state": captain.state,
+        "intent": captain.intent.words if captain.intent else "",
+        "commands": captain.commands,
+    }
+
+
+REGISTRY.add(
+    Reading(
+        "captain",
+        ("the captain", "who commands"),
+        "ground",
+        "",
+        _captain_reading,
+        description="who commands: the captain's station and who holds it, the book's "
+        "name and whose the deck is; the rules-based captain's intent and state when he "
+        "sails her",
     )
 )
 # the events a station with authority wakes on, and the book may act on: the deck given

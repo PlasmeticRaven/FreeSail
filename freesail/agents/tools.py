@@ -189,6 +189,10 @@ def order_by(e: Any, world: Any = None) -> str:
     actor = str(getattr(e, "actor", "") or "")
     if actor == "captain":
         return "the captain"
+    if actor.startswith("captain's rule "):
+        # the rules-based captain's judgement (package 40), in the state it was made
+        state = actor.removeprefix("captain's rule ").strip("'")
+        return f"the captain, by rule ({state})"
     if actor.startswith("standing order "):
         runtime = getattr(world, "standing", None) if world is not None else None
         name = actor.removeprefix("standing order ").strip("'")
@@ -465,9 +469,15 @@ def submit_order(world: World, station: str, text: str, danger: str = "") -> str
             return _refuse(world, station, text, why)
     said = f"The {station} orders: {text}"
     if st is not None and st.domain is not None and hasattr(world.ship, "parts"):
+        from freesail.orders import stations
         from freesail.standing.runtime import said_as_done
 
-        said = f"By the {station}: {said_as_done(world.ship, text)}"
+        if stations.recognises(text, world.ship) is not None:
+            # a station sentence from the captain's station (package 40): his words to
+            # the officer as he said them, not a gerund of them
+            said = f"By the {station}: {text}"
+        else:
+            said = f"By the {station}: {said_as_done(world.ship, text)}"
     e = world.submit(text, actor=f"the {station}", said=said)
     if how == DANGER and e.kind != "order.rejected":
         # logged notable with the reason, as his and as taken on his own word
@@ -562,7 +572,7 @@ def judge(world: World, station: str, text: str, danger: str = "") -> tuple[str,
     from freesail.orders import stations
     from freesail.standing import grammar as standing
 
-    harness = world.agents[station]
+    harness = _holder(world, station)
     domain = harness.domain
     vocab = load_vocabulary()
     who = f"The {station}"
@@ -578,6 +588,11 @@ def judge(world: World, station: str, text: str, danger: str = "") -> tuple[str,
     if verb is not None or bare is not None:
         return text, _book_check(world, station, bare or text, vocab), ""
     if stations.recognises(text, ship) is not None:
+        if domain.is_captains:
+            # the captain's station addresses the stations as the player does (package
+            # 40): the deck given and taken, the grants, tell and ask, stand down and
+            # resume; the sentence is the captain's own, so the grammar reads it as his
+            return text, "", DOMAIN
         return text, f"{who} may not {text}: {_STATION_WHY}.", ""
     try:
         order = imperative.parse(ship, text, vocab)
@@ -741,7 +756,7 @@ def _standing_by_rank(world: World, station: str, text: str, vocab: Any) -> tupl
     from freesail.orders import stations
     from freesail.standing import grammar as standing
 
-    harness = world.agents[station]
+    harness = _holder(world, station)
     st = harness.station
     who = f"The {station}"
     rank = st.rank or "first lieutenant"
@@ -780,7 +795,7 @@ def _book_check(world: World, station: str, text: str, vocab: Any) -> str:
     orders only; `belay all standing orders` is the captain's."""
     from freesail.standing import grammar as standing
 
-    harness = world.agents[station]
+    harness = _holder(world, station)
     rank = harness.station.rank or "first lieutenant"
     who = f"The {station}"
     try:
@@ -789,6 +804,8 @@ def _book_check(world: World, station: str, text: str, vocab: Any) -> str:
         return ""  # the dialect's own refusal
     if command.verb in ("standing orders", "show standing order"):
         return ""
+    if rank == "captain":
+        return ""  # the captain's station: the book is his own (package 40)
     if command.verb == "belay all standing orders" or command.name is None:
         return f"{who} may not belay all standing orders: the captain's book is his own."
     runtime = (getattr(world.ship, "extra", None) or {}).get("standing")
@@ -920,6 +937,18 @@ def answer(world: World, station: str, text: str) -> str:
 
 def shelve(world: World, station: str, book: str = "") -> str:
     return _harness(world, station).shelve(str(book or ""))
+
+
+def _holder(world: World, station: str) -> Any:
+    """Who holds a station for the authority filter: its harness, or the player's seat
+    at it (package 40; `agents.seat`), which is judged as a model there would be."""
+    harness = world.agents.get(station)
+    if harness is not None:
+        return harness
+    seat = getattr(world, "player_seat", None)
+    if seat is not None and seat.station.name == station:
+        return seat
+    raise KeyError(station)
 
 
 def _harness(world: World, station: str) -> Any:
@@ -1208,13 +1237,35 @@ def call(world: World, station: str, name: str, args: dict[str, Any] | None = No
         and harness is not None
         and harness.station.domain is not None
         and not harness.agent.has_deck
+        and harness.domain is not None
+        and harness.domain.is_captains
+        and not harness.agent.released
+        and not harness.agent.paused
+        and name == "submit_order"
+    ):
+        # the captain's station (package 40): a captain who gives an order has the deck;
+        # it was lent to his book while his door was silent or he handed it over
+        harness.deck_back("an order given")
+    if (
+        tool.needs_deck
+        and harness is not None
+        and harness.station.domain is not None
+        and not harness.agent.has_deck
     ):
         # a station with a domain but not the deck (package 37): the captain gives it
         sentence = (
             f"The {station} has not the deck: the captain gives it with 'you have the "
             "deck', and until then no order is given."
         )
-        if harness.agent.deck_lost:
+        if harness.agent.deck_lost and harness.domain is not None and harness.domain.is_captains:
+            # the captain's station paused (package 40): the deck is his book's, and the
+            # owner's `resume the captain` gives it back (an order takes it back otherwise)
+            how = "paused" if harness.agent.paused else harness.agent.deck_lost
+            sentence = (
+                f"The {station} is {how}: the deck is lent to his book meanwhile, and the "
+                "owner's 'resume the captain' gives it back."
+            )
+        elif harness.agent.deck_lost:
             sentence = (
                 f"The {station} has not the deck: it went to the captain while the station "
                 f"was {harness.agent.deck_lost}, and he gives it again with 'you have the "

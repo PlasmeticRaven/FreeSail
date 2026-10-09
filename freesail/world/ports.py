@@ -378,6 +378,12 @@ class Port:
     letters: list[Message] = field(default_factory=list)  # waiting at the port for the ship
     news: list[str] = field(default_factory=list)  # what the pilot tells, beside the wars
     path: str = ""
+    # The port's tracks (spec M6 §4; package 40), for the rules-based captain's planner:
+    # `to_sea`, the marks from the outer road to the open sea; `from_sea`, the marks from
+    # the common track to the outer road; `in`, from the outer road to the anchorage.
+    # Each mark a feature by its id or a position pricked on the chart, in the directions'
+    # words; a port without them is approached by its outer road and anchorage alone.
+    tracks: dict[str, list[str]] = field(default_factory=dict)
 
     def spots(self) -> list[Spot]:
         return [self.outer_road, self.anchorage, self.mooring]
@@ -520,6 +526,7 @@ def load_port(path: str | Path, chart: Any = None, state: dict[str, Any] | None 
         letters=letters,
         news=[str(x) for x in (state.get("news") or [])],
         path=where,
+        tracks={str(k): [str(m) for m in (v or [])] for k, v in (doc.get("tracks") or {}).items()},
     )
 
 

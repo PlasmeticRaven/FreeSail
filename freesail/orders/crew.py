@@ -98,7 +98,10 @@ def whose_order(ship: Any) -> str:
     from freesail.core.events import STATION_ACTORS
 
     actor = str((getattr(ship, "extra", None) or {}).get("order_actor") or "")
-    return f"{actor}'s" if actor in STATION_ACTORS else "the captain's"
+    # the player's seat at a station gives orders under the station's actor with a word
+    # after it (package 40; `agents.seat`): the lines say they were the station's
+    station = actor.split(" (", 1)[0]
+    return f"{station}'s" if station in STATION_ACTORS else "the captain's"
 
 
 def call_all_hands(ship: Ship, order: Order) -> Result:

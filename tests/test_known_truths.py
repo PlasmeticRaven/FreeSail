@@ -4521,3 +4521,289 @@ def test_the_pace_at_the_merchant_passages_start_with_the_dozen_ships_holds_trut
         world.run(1000)
         best = max(best, 1000 / (time.perf_counter() - t0))
     assert best >= BUILD_MACHINE_FLOOR, f"{best:.0f} ticks a second"
+
+
+# ---------------------------------------------------------------------------
+# Milestone 6a: the ship's company, the rules-based captain, the captain's station
+# (package 40; spec M6 §2 to §4, §7 and §8, truths 77 to 79 and 81; the officer's own
+# reckoning and truth 80 are 40b's)
+# ---------------------------------------------------------------------------
+
+# The schooner trading on an intent alone (data/scenarios/merchant-intent.yaml): the
+# merchant passage's ship, start, weather and world with no book, `intent: trade tin from
+# Falmouth to Brest`, sailed by the rules-based captain and nobody else. Measured on the
+# package's branch, 2026-10-09 (docs/dev/TuningNotes.md, package 40).
+GATE_6A_INTENT = "data/scenarios/merchant-intent.yaml"
+GATE_6A_INTENT_HOURS = 36
+GATE_6A_INTENT_SAVE_TICK = 12 * 3600  # 17:00 on the 12th, the Channel crossing
+GATE_6A_INTENT_FIRST_STATE_TICK = 300  # in port, at his first judgement (JUDGE_FIRST_S)
+GATE_6A_INTENT_BOUGHT_TICK = 300  # 47 tons of tin bought at £120, the boat sent for them
+GATE_6A_INTENT_TONS = 47  # the purse's £6,000 less a twentieth, at the quay's price
+GATE_6A_INTENT_TIN_ABOARD_TICK = 15765  # hoisted in and struck down
+GATE_6A_INTENT_UNDER_WAY_ORDER_TICK = 15780  # "getting under way ... (the tide serves)"
+GATE_6A_INTENT_AWEIGH_TICK = 17037
+GATE_6A_INTENT_STATES = [  # (tick, state): the books loaded and unloaded by name
+    (300, "in port"),
+    (17040, "on passage"),
+    (22920, "beating"),  # the course for the Lizard's offing not laid in the westerly
+    (27600, "on passage"),  # laid again
+    (111840, "in port"),  # anchored in the Bay of Brest
+]
+GATE_6A_INTENT_PILOT_ABOARD_TICKS = [17700, 102540]  # Mr Tregenza out; Mr Le Floch in
+GATE_6A_INTENT_PILOT_LEFT_TICKS = [20040, 121260]
+GATE_6A_INTENT_NOON_TICKS = [25200, 111660]
+GATE_6A_INTENT_ANCHORED_TICKS = [57, 111812]  # Carrick Road; the Bay, twelve and a half fathoms
+GATE_6A_INTENT_BROUGHT_UP_TICK = 112719
+GATE_6A_INTENT_BOAT_FOR_PRICES_TICK = 112800  # the boat sent for the prices once brought up
+GATE_6A_INTENT_SOLD_TICK = 120180  # 47 tons at £270; the purse £13,045
+GATE_6A_INTENT_LINES = 2083
+GATE_6A_INTENT_DIGEST = "4b5a6f997d80eb52"
+
+
+@pytest.fixture(scope="module")
+def gate_6a_intent():
+    return the_scenario_whole(GATE_6A_INTENT, GATE_6A_INTENT_HOURS, GATE_6A_INTENT_SAVE_TICK)
+
+
+def _by_rule(log):
+    return [e for e in log if str(e.actor).startswith("captain's rule ")]
+
+
+def test_truth_77_the_two_scenarios_sail_under_their_books_with_the_captain_named_and_aside(
+    gate_5c_merchant, gate_5c_cruise
+):
+    """Spec M6 §8, truth 77: "The merchant passage and the naval cruise sail under the
+    rules-based captain named, with no model seated, to the same digests as before (the
+    floor is the game as it was)." Each has its captain named (the master of the
+    schooner, the captain of the frigate, by the wardroom file's binding), with no intent,
+    so that he stands aside and the book sails her: not one judgement under his actor,
+    and the digests package 37m pinned (the constants' tests above)."""
+    for (world, _moments, _saved), digest in (
+        (gate_5c_merchant, GATE_5C_MERCHANT_DIGEST),
+        (gate_5c_cruise, GATE_5C_CRUISE_DIGEST),
+    ):
+        cap = world.captain
+        assert cap is not None and cap.name and cap.intent is None
+        assert not cap.active and not cap.commands and cap.books
+        assert cap.name == world.people.holder("captain").name
+        assert not _by_rule(world.log)
+        assert "captain" not in world.agents
+        assert world.log.digest()[:16] == digest
+
+
+def test_the_schooner_on_an_intent_alone_at_seed_7_has_its_own_constants(gate_6a_intent):
+    """The new scenario of package 40 (spec M6 §4, the floor): the schooner with an intent
+    and no book, sailed by the rules-based captain. He buys the tin at the quay's price
+    for what the purse allows, sails on the ebb when the boat is alongside, takes the
+    pilot out, beats off the Lizard when the westerly will not lay the course and lays
+    it again, crosses on the soundings' track, takes the pilot of Brest in the Iroise,
+    anchors in the Bay in twelve fathoms and a half, sends the boat for the prices once
+    brought up, and sells at £270. Every doing is an order under his rule's actor, not
+    journaled; the states are books loaded and unloaded by name."""
+    world, _moments, _saved = gate_6a_intent
+    log = world.log
+    cap = world.captain
+    assert cap.intent is not None and cap.intent.words == "trade tin from Falmouth to Brest"
+    assert cap.active and cap.commands and cap.state == "in port"
+    states = [(e.tick, e.data["state"]) for e in log if e.kind == "captain.state"]
+    assert states == GATE_6A_INTENT_STATES
+    bargains = [e for e in log if e.kind == "market.bargain"]
+    assert [e.tick for e in bargains] == [GATE_6A_INTENT_BOUGHT_TICK, GATE_6A_INTENT_SOLD_TICK]
+    assert f"Bought {GATE_6A_INTENT_TONS} tons of tin at Falmouth at £120" in bargains[0].text
+    assert f"Sold {GATE_6A_INTENT_TONS} tons of tin at Brest at £270" in bargains[1].text
+    assert [e.tick for e in log if e.kind == "market.bought"] == [GATE_6A_INTENT_TIN_ABOARD_TICK]
+    under_way = [e for e in _by_rule(log) if "getting under way" in e.text]
+    assert under_way and under_way[0].tick == GATE_6A_INTENT_UNDER_WAY_ORDER_TICK
+    assert "the tide serves" in under_way[0].text
+    assert [e.tick for e in log if e.kind == "ship.aweigh"] == [GATE_6A_INTENT_AWEIGH_TICK]
+    aboard = [e.tick for e in log if e.kind == "port.pilot_aboard"]
+    assert aboard == GATE_6A_INTENT_PILOT_ABOARD_TICKS
+    assert [e.tick for e in log if e.kind == "port.pilot_left"] == GATE_6A_INTENT_PILOT_LEFT_TICKS
+    assert [e.tick for e in log if e.kind == "reckoning.noon"] == GATE_6A_INTENT_NOON_TICKS
+    assert [e.tick for e in log if e.kind == "ship.anchored"] == GATE_6A_INTENT_ANCHORED_TICKS
+    assert "twelve fathoms and a half" in [e for e in log if e.kind == "ship.anchored"][1].text
+    brought = [e.tick for e in log if e.kind == "ship.brought_up"]
+    assert brought[-1] == GATE_6A_INTENT_BROUGHT_UP_TICK
+    prices = [e for e in _by_rule(log) if "for the prices" in e.text]
+    assert prices and prices[0].tick == GATE_6A_INTENT_BOAT_FOR_PRICES_TICK
+    assert not [e for e in log if e.kind in ("ship.aground", "anchor.dragging")]
+    # every doing of his is an order under his actor (its line and its results carry it)
+    # and never journaled
+    assert any(e.kind == "order.accepted" for e in _by_rule(log))
+    assert {actor for _, actor, _ in world.journal} <= {"captain"}
+    assert len(log) == GATE_6A_INTENT_LINES and log.digest()[:16] == GATE_6A_INTENT_DIGEST
+
+
+def test_the_schooner_on_an_intent_alone_replays_to_the_same_digest(gate_6a_intent):
+    """The captain's judgements are a function of the seed and the journal: the save at
+    its tick replays to the same digest, the captain in the same state."""
+    from freesail.api.session import ship_factory
+    from freesail.core import replay as replay_mod
+
+    _world, _moments, (data, digest, vessels, people) = gate_6a_intent
+    assert data["scenario"]["intent"] == "trade tin from Falmouth to Brest"
+    copy = replay_mod.replay(data, ship_factory)
+    assert copy.clock.tick == data["end_tick"]
+    assert copy.log.digest() == digest
+    assert copy.vessels.to_dict() == vessels
+    assert _people(copy) == people
+    assert copy.captain.state == "on passage"
+
+
+def test_truth_81_no_reading_at_the_captains_station_gives_the_truth_by_any_road():
+    """Spec M6 §8, truth 81: "No reading at the captain's station gives the truth by any
+    road (37j's proof extended to the new tools)." Two ships of one seed in open water,
+    four miles apart in truth and one by account, each with the fake captain seated: the
+    readings tool at the captain's station says the same of both, the station's reading
+    included, and the station has no tool the watcher's has not."""
+    from freesail.agents import Harness, SamplingPolicy
+    from freesail.agents import tools as tools_mod
+    from freesail.agents.agent import CAPTAIN, captain
+    from freesail.agents.fake import captain_of_the_ship
+    from freesail.world.geo import Position
+
+    worlds = []
+    for lat, lon in ((49.0, -6.5), (49.05, -6.42)):
+        sc = Scenario(
+            start_time=datetime(1805, 6, 12, 10, 0),
+            wind_from_deg=270.0,
+            wind_speed_kn=14.0,
+            gustiness=0.0,
+            variability=0.0,
+            position={"lat_deg": lat, "lon_deg": lon},
+            region="channel-west",
+            ports=["falmouth", "plymouth", "brest"],
+        )
+        world = make_world(7, "data/ships/topsail-schooner.yaml", sc)
+        world.navigation.reckoning.set_position(Position(49.02, -6.47), 0, sigma_nm=1.0)
+        h = Harness(
+            world,
+            captain(SamplingPolicy.in_lockstep(600), 3600, world=world),
+            captain_of_the_ship(),
+            save=lambda w, why: None,
+        )
+        h.model_name, h.door = "the fake", "runner"
+        h.start()
+        world.run(600)
+        worlds.append(world)
+    a, b = worlds
+    assert _miles(a.navigation.account_now(), b.navigation.account_now()) < 0.001
+    assert _miles(a.position, b.position) > 3.0
+    ra, rb = tools_mod.readings(a, CAPTAIN), tools_mod.readings(b, CAPTAIN)
+    assert ra == rb
+    assert ra["captain"] == rb["captain"] and "the fake" in ra["captain"]
+    assert set(a.agents[CAPTAIN].tool_names) <= set(tools_mod.TOOLS)
+
+
+# The merchant passage under the fake captain (truths 78 and 79): the passage whole under
+# its book with the fake at the captain's station (freesail/agents/fake.py,
+# `captain_of_the_ship`), sampled every ten minutes in lockstep with an hour's patience,
+# six harmless direct orders one a sample and then silence. Measured on the package's
+# branch, 2026-10-09 (docs/dev/TuningNotes.md, package 40).
+GATE_6A_FAKE_CAPTAIN_ORDERS = [  # three readings asked, a question, `pipe down`, the port
+    "what is the time",
+    "the reckoning",
+    "pipe down",
+    "the tide",
+    "the people",
+    "the port",
+]
+GATE_6A_FAKE_CAPTAIN_ORDER_TICKS = [57, 323, 396, 600, 1200, 1800]  # one a sample, under his mark
+GATE_6A_FAKE_CAPTAIN_DECK_TO_BOOK_TICK = 5400  # an hour after his last order: the deck to his book
+GATE_6A_FAKE_CAPTAIN_PAUSED_TICK = 9000  # twice the patience: paused, the owner asked
+GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 13  # his 7, the harness's 6
+GATE_6A_FAKE_CAPTAIN_DIGEST = "a2cd045b9bcc93f8"
+
+
+def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):
+    """A scenario of gate 5c run whole under its book with the fake captain seated at the
+    start: (world, harness)."""
+    from freesail.agents import Harness, SamplingPolicy
+    from freesail.agents.agent import captain
+    from freesail.agents.fake import captain_of_the_ship
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario(path)
+    world = make_scenario_world(sf)
+    begin(world, sf)
+    st = captain(SamplingPolicy.in_lockstep(600, "notable", "urgent"), 3600, world=world)
+    h = Harness(world, st, captain_of_the_ship(orders, then_silent=True), save=lambda w, why: None)
+    h.model_name, h.door = "the fake", "runner"
+    h.start()
+    run(world, hours * 3600)
+    return world, h
+
+
+@pytest.fixture(scope="module")
+def gate_6a_fake_captain():
+    return the_passage_under_the_fake_captain(
+        GATE_5C_MERCHANT, GATE_5C_MERCHANT_HOURS, GATE_6A_FAKE_CAPTAIN_ORDERS
+    )
+
+
+def _not_the_stations(log):
+    """Every line that is neither the captain's station's nor the harness's about it."""
+    return [
+        (e.kind, e.text)
+        for e in log
+        if not e.kind.startswith("agent.") and e.actor != "the captain"
+    ]
+
+
+def test_truth_78_the_fake_captain_commands_the_merchant_passage_by_its_book_and_six_orders(
+    gate_6a_fake_captain, gate_5c_merchant
+):
+    """Spec M6 §8, truth 78: "A fake captain through the harness commands the merchant
+    passage from Falmouth to Brest by its book and six direct orders, and the log is the
+    same book's log with his six orders in it under his mark." Every line of the passage
+    with nobody seated is in this log, in order, and beside them his six orders under the
+    station's actor (seven lines: `pipe down` answers with the watch's line) and the
+    harness's six about the station; the tin sold at Brest at the same tick."""
+    world, h = gate_6a_fake_captain
+    base, _moments, _saved = gate_5c_merchant
+    log = world.log
+    his = [e for e in log if e.actor == "the captain" and not e.kind.startswith("agent.")]
+    assert [e.tick for e in his if e.kind != "crew.order"] == GATE_6A_FAKE_CAPTAIN_ORDER_TICKS
+    assert [e.kind for e in his].count("order.accepted") == 1  # pipe down
+    assert "By the captain: piping down." in [e.text for e in his]
+    assert _not_the_stations(log) == [(e.kind, e.text) for e in base.log]
+    assert [e.tick for e in log if e.kind == "ship.anchored"] == GATE_5C_MERCHANT_ANCHORED_TICKS
+    sold = [e for e in log if e.kind == "market.bargain" and e.text.startswith("Sold")]
+    assert (
+        sold
+        and sold[0].tick
+        == [e for e in base.log if e.kind == "market.bargain" and e.text.startswith("Sold")][0].tick
+    )
+    assert {actor for _, actor, _ in world.journal} <= {"captain"}  # his are the transcript's
+    assert len(log) == GATE_6A_FAKE_CAPTAIN_LINES
+    assert log.digest()[:16] == GATE_6A_FAKE_CAPTAIN_DIGEST
+
+
+def test_truth_79_a_silent_captains_door_passes_the_deck_to_the_book_and_the_book_brings_her_in(
+    gate_6a_fake_captain,
+):
+    """Spec M6 §8, truth 79: "A silent captain's door passes the deck to his book within
+    the station's patience, the log says so, and the book brings her to the anchor." An
+    hour after his last order the deck passes to his book, urgently; at twice the
+    patience the station is paused and the owner asked, the deck his book's; the book
+    brings her to the road of Bertheaume and the Bay of Brest at the passage's ticks and
+    sells the tin; the station is paused, not released, at the end."""
+    world, h = gate_6a_fake_captain
+    log = world.log
+    deck = [e for e in log if e.kind == "agent.deck"]
+    assert deck[0].tick == 0 and deck[0].text.startswith("The captain's station has the deck")
+    lost = [e for e in deck if e.data.get("deck") == "lost"]
+    assert [e.tick for e in lost] == [GATE_6A_FAKE_CAPTAIN_DECK_TO_BOOK_TICK]
+    assert lost[0].severity is Severity.URGENT
+    assert "the deck passes to his book; the standing orders hold the deck" in lost[0].text
+    paused = [e for e in log if e.kind == "agent.paused"]
+    assert [e.tick for e in paused] == [GATE_6A_FAKE_CAPTAIN_PAUSED_TICK]
+    assert "the deck is his book's" in paused[0].text
+    assert h.agent.paused and not h.agent.deck and not h.agent.released
+    assert not world.captain.active  # a book scenario: the rules stand aside, the book holds
+    anchored = [e for e in log if e.kind == "ship.anchored"]
+    assert [e.tick for e in anchored] == GATE_5C_MERCHANT_ANCHORED_TICKS
+    assert all(e.tick > GATE_6A_FAKE_CAPTAIN_PAUSED_TICK for e in anchored[1:])
+    reading = world.readings["captain"]
+    assert reading["held"] and not reading["deck"]
+    assert "the deck lent to his book while the station is paused" in reading["words"]

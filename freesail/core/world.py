@@ -9,7 +9,7 @@ and `save`. Determinism: same seed, same scenario, same ship, same
 from __future__ import annotations
 
 import math
-from dataclasses import asdict, dataclass, field, replace
+from dataclasses import MISSING, asdict, dataclass, field, fields, replace
 from datetime import datetime, timedelta
 from typing import Any
 
@@ -207,8 +207,24 @@ class Scenario:
     # applies them again (truth 72). A save from before loads with none.
     ships: list[dict[str, Any]] = field(default_factory=list)
     world_orders: list[dict[str, Any]] = field(default_factory=list)
+    # Package 40 (spec M6 §4): the captain's intent in words (`intent: trade tin from
+    # Falmouth to Brest`), by which the rules-based captain sails her when no model holds
+    # his station; "" for a scenario sailed by its book or by the player alone. `books`
+    # names the scenario's standing-orders files, for `the captain` reading, so that a
+    # save says by what she was sailed. A save from before loads with neither.
+    intent: str = ""
+    books: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
+        # a Scenario unpickled from a checkpoint of an earlier build lacks the fields
+        # added since (a default-factory field is no class attribute): each is given its
+        # default here, so that the save and the words read as a new game's would
+        for f in fields(self):
+            if not hasattr(self, f.name):
+                if f.default is not MISSING:
+                    setattr(self, f.name, f.default)
+                elif f.default_factory is not MISSING:
+                    setattr(self, f.name, f.default_factory())
         d = asdict(self)
         d["start_time"] = self.start_time.isoformat()
         return d
@@ -235,6 +251,10 @@ InputEntry = dict[str, Any]
 # The actor a standing order's firing carries (spec M4 §4); `freesail.standing.runtime`
 # writes it and the World knows a firing by it.
 STANDING_ACTOR_PREFIX = "standing order "
+# The actor a rules-based captain's judgement carries (spec M6 §4; package 40;
+# `freesail.world.captains.ACTOR_PREFIX`): a rule's order, like a firing's, not journaled.
+CAPTAIN_RULE_PREFIX = "captain's rule "
+RULE_ACTOR_PREFIXES = (STANDING_ACTOR_PREFIX, CAPTAIN_RULE_PREFIX)
 
 # The motion's words must hold this long before the log says they changed (spec M5 §4;
 # judgement: five minutes, so a roll hovering about "rolling" and "rolling easily" is
@@ -623,9 +643,21 @@ class World:
         # is still shown and saved), so they are kept apart, by station name.
         self.agents: dict[str, Any] = {}
         self.agent_journals: dict[str, Any] = {}
+        # the player's seat at a station below the captain's (package 40; `agents.seat`):
+        # not a harness and not in `agents`; None while he is the captain at the prompt
+        self.player_seat: Any = None
         if getattr(self.ship, "extra", None) is not None:
             self.ship.extra["agents"] = self.agents
             self.ship.extra["agent_journals"] = self.agent_journals
+        # The rules-based captain (spec M6 §4; package 40; `freesail.world.captains`):
+        # named for every ship, with the scenario's book or its intent; his judgements are
+        # given only on an intent, when no model holds the captain's station with the deck,
+        # after the book on every tick, so that the log reads as a captain's.
+        from freesail.world.captains import Captain
+
+        self.captain = Captain(
+            self, intent=self.scenario.intent or None, books=tuple(self.scenario.books)
+        )
         self.record(
             Severity.NOTABLE,
             "world.start",
@@ -1298,7 +1330,9 @@ class World:
         as the book's listing) is answered in the log and not journaled either.
         """
         text = " ".join(text.split())
-        standing = actor.startswith(STANDING_ACTOR_PREFIX)
+        # a firing's order, or a rules-based captain's judgement (package 40): logged as
+        # the rule's and not journaled, a deterministic function of the seed and the journal
+        standing = actor.startswith(RULE_ACTOR_PREFIXES)
         # an agent's station's order (package 37, the officer of the watch): given through
         # `World.submit` with the station's actor and refused by the same grammar, but not
         # journaled, since its replies are its harness's transcript and a replay gives
@@ -1606,6 +1640,11 @@ class World:
         self._tick_sun()
         # the standing orders (spec M4 §4): last, on the tick's settled readings
         self.standing.tick()
+        # the rules-based captain (spec M6 §4; package 40): his judgements after the book,
+        # once a minute, when they are his to give
+        captain = getattr(self, "captain", None)
+        if captain is not None:
+            captain.tick()
         # the agents (spec M4 §11): after the book, so a sample carries the tick whole
         for agent in list(self.agents.values()):
             agent.on_tick()

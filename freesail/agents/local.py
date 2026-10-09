@@ -135,7 +135,7 @@ from typing import Any
 import httpx
 
 from freesail.agents import consent
-from freesail.agents.agent import OFFICER, TURN_ENDS_WORDS, station_name
+from freesail.agents.agent import CAPTAIN, OFFICER, TURN_ENDS_WORDS, station_name
 from freesail.agents.harness import (
     HANDOVER_RESERVE_SHARE,
     HANDOVER_RESERVE_TOKENS,
@@ -461,7 +461,7 @@ class LocalModel:
         consent_cost = len(json.dumps({"role": "system", "content": brief})) // CHARS_PER_TOKEN + 1
         # the watcher's own brief is shorter than the consent brief, as it was when the
         # guard was written; the officer's is measured (package 37g)
-        is_officer = station_name(station) == OFFICER
+        is_officer = station_name(station) in (OFFICER, CAPTAIN)  # a station with authority
         station_cost = station_brief_tokens(station) if is_officer else 0
         brief_cost = max(consent_cost, station_cost)
         tools_cost = len(json.dumps(self.tools_schema())) // CHARS_PER_TOKEN
@@ -472,10 +472,10 @@ class LocalModel:
             got, where = served
         elif self.ctx_size:
             got, where = int(self.ctx_size), "--ctx, as the owner gave it"
-        elif station_name(station) == OFFICER:
+        elif station_name(station) in (OFFICER, CAPTAIN):
             raise DoorError(
                 f"The model server did not say what context it gives {identity}, and no "
-                "--ctx was given: the officer of the watch is not seated without a context "
+                f"--ctx was given: the {station_name(station)} is not seated without a context "
                 "size. With none, the harness can neither ask for the handover note in time "
                 "nor leave out old turns, and the server cuts the conversation unseen. The "
                 f"station needs about {need} tokens (the brief {brief_cost}, the tool "
@@ -1029,10 +1029,11 @@ def station_brief_tokens(station: str) -> int:
     measured at `CHARS_PER_TOKEN`, with `SITUATION_ALLOWANCE_TOKENS` for what the ship
     adds (the log's last lines, every reading, the captain's night orders). No World is
     built for it: the runner is a client."""
-    from freesail.agents.agent import SESSION_PLAY, Brief, officer, watcher
+    from freesail.agents.agent import CAPTAIN, SESSION_PLAY, Brief, captain, officer, watcher
 
-    is_officer = station_name(station) == OFFICER
-    st = officer() if is_officer else watcher()
+    name = station_name(station)
+    is_officer = name in (OFFICER, CAPTAIN)
+    st = officer() if name == OFFICER else captain() if name == CAPTAIN else watcher()
     brief = Brief.build(
         st,
         SESSION_PLAY,
@@ -1218,8 +1219,9 @@ def main(
     ap.add_argument(
         "--station",
         default="watcher",
-        choices=["watcher", "officer"],
-        help="the station asked for: the watcher, or the officer of the watch (package 37)",
+        choices=["watcher", "officer", "captain"],
+        help="the station asked for: the watcher, the officer of the watch (package 37), "
+        "or the captain's station (package 40)",
     )
     ap.add_argument("--session", choices=("play", "test"), default="play")
     ap.add_argument("--ask-again", action="store_true", help="put the consent question again")
@@ -1263,7 +1265,7 @@ def main(
         return EXIT_UNREACHABLE
     context = model.context_size()
     reserve = handover_reserve_tokens(args.handover_reserve, context)
-    if context and station_name(args.station) == OFFICER:
+    if context and station_name(args.station) in (OFFICER, CAPTAIN):
         print(handover_words(args.handover_reserve, context, reserve), file=out, flush=True)
     game = GameClient(args.game, args.station, transport=game_transport, http=game_http)
     try:

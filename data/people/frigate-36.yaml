@@ -1,0 +1,194 @@
+# FreeSail: the wardroom of the frigate (spec M6 §2; package 40). The ship's company as
+# people: every station holder of data/ships/frigate-36.yaml, with his rank, his station
+# aboard, his place when nothing calls him elsewhere, and the character outline the
+# proposal's §3.5 asks for (a few traits, a line of history, a station brief), as data.
+# Read by freesail/world/people.py, which gives each person his outline and binds the
+# harness's stations to a person by role (`stations:` below: the binding is read, never a
+# name in code), and by tools/gen_ships.py, which draws the posts and the people below
+# into the ship file's `crew.posts` and `crew.people`, so that the muster and the people
+# agree (tests/test_people.py proves it). The names are the muster's, drawn under the
+# seed from data/crew/names.yaml; a scenario is free to name any of them (`people:` in
+# the scenario file, with a role and a name). The outlines are judgement, in the period's
+# words where the sources give them: the duties from the Regulations and Instructions
+# (1808 printing) and Luce 1884 ch. XX and XXIII; the characters the writer's.
+#
+# The form of an entry:
+#   role:      the role as the ship file names it (the muster's post, or a role drawn)
+#   post:      true for a post of the muster (crew.posts), in this order
+#   drawn:     {station, rating} for a person drawn from a station at muster (crew.people)
+#   messenger: true for the one who carries the captain's word about the ship
+#   rank:      his rank in words, for the log and the brief
+#   station:   his station aboard, in words
+#   place:     where he is when nothing calls him elsewhere (freesail/world/places.py)
+#   traits:    a few words a narrator draws on
+#   history:   a line of where he has been
+#   brief:     the station brief: what is his to do, in the period's words
+#   note:      the generator's note above the role's line in the ship file (drawn roles)
+
+ship: data/ships/frigate-36.yaml
+
+# The harness's stations (spec M4 §11; M6 §3) bound to a person by his role.
+stations:
+  captain: captain
+  officer of the watch: first lieutenant
+
+wardroom:
+  - role: captain
+    post: true
+    rank: post-captain
+    station: the command
+    place: quarterdeck
+    traits: [exact, sparing of words, quick to a stranger's colours]
+    history: "Made post in the last war; three years in this ship, two of them off Ushant."
+    brief: >-
+      The ship, her people and her orders are his (the Regulations of 1806, the Captain:
+      he is to keep her in constant readiness for sea and to see every officer do his duty).
+      He gives the course and the standing orders, takes the pilot or declines him, does the
+      port's business and answers for the whole.
+  - role: first lieutenant
+    post: true
+    rank: lieutenant
+    station: the first lieutenant's
+    place: quarterdeck
+    traits: [steady, a driver of the hands, a stickler for the watch bill]
+    history: "Passed for lieutenant eleven years ago; first of this ship since she commissioned."
+    brief: >-
+      The ship's working and her people under the captain: the watch bill, the stations, the
+      sail evolutions and the quarterdeck in his watch (Luce 1884 ch. XXIII). He keeps no
+      watch by the bill, and takes the deck when the captain gives it.
+  - role: second lieutenant
+    post: true
+    rank: lieutenant
+    station: the second lieutenant's
+    place: quarterdeck
+    traits: [eager, a good hand at a fix, apt to carry sail]
+    history: "Six years a lieutenant, two of them in the West Indies."
+    brief: >-
+      A watch of his own by the bill (the starboard), the deck in it under the captain's
+      night orders, every strange sail and every shift of wind reported (the Regulations,
+      the Lieutenant, art. IV).
+  - role: third lieutenant
+    post: true
+    rank: lieutenant
+    station: the third lieutenant's
+    place: quarterdeck
+    traits: [young, careful, slow to shorten sail]
+    history: "Made lieutenant last year; his first ship as a commissioned officer."
+    brief: >-
+      A watch of his own by the bill (the larboard), the deck in it under the night orders,
+      the same duties as the second lieutenant's.
+  - role: master
+    post: true
+    rank: master
+    station: the navigation
+    place: quarterdeck
+    traits: [dry, exact with the log board, trusts the lead over the chart]
+    history: "Twenty years at sea; master's mate in a seventy-four before his warrant."
+    brief: >-
+      The reckoning, the sights, the lead and the chart, the stowage and the ground tackle
+      (the Regulations, the Master, art. I to XXIX): he works the account, warns the captain
+      of the dangers and shapes the course the captain orders.
+  - role: boatswain
+    post: true
+    rank: warrant officer
+    station: the rigging and the boats
+    place: deck
+    traits: [loud, knows every rope by its feel, hard on idlers]
+    history: "Rated boatswain after the Nile; this ship's since she fitted out."
+    brief: >-
+      The rigging, the cables, the anchors, the boats and the hands at their stations: he
+      pipes the evolutions and sees the gear overhauled (the Regulations, the Boatswain).
+  - role: gunner
+    post: true
+    rank: warrant officer
+    station: the guns and the magazine
+    place: deck
+    traits: [quiet, methodical, keeps the magazine dry]
+    history: "Gunner's mate at Copenhagen; his warrant since."
+    brief: >-
+      The guns, the carriages, the powder and the shot (the Regulations, the Gunner); the
+      quarters and the drill are his when milestone 7 brings them.
+  - role: carpenter
+    post: true
+    rank: warrant officer
+    station: the hull and the spars
+    place: deck
+    traits: [patient, a hand for a fished spar, sounds the well without being told]
+    history: "Out of the yard at Plymouth; carpenter of a sloop before this ship."
+    brief: >-
+      The hull, the masts, the yards and the pumps (the Regulations, the Carpenter): he
+      sounds the well, fishes a sprung spar and reports a leak to the captain.
+  - role: purser
+    post: true
+    rank: warrant officer
+    station: the stores and the books
+    place: gunroom
+    traits: [careful with a pound, slow to issue, keeps good books]
+    history: "Clerk to a purser in two ships before his own warrant."
+    brief: >-
+      The provisions, the slops and the ship's books (the Regulations, the Purser): the
+      stores demanded and issued, the manifest and the purse kept.
+  - role: surgeon
+    post: true
+    rank: warrant officer
+    station: the sick berth
+    place: gunroom
+    traits: [plain-spoken, reads at night, reports the sick list every morning]
+    history: "Walked the hospitals at Edinburgh; two ships before this one."
+    brief: >-
+      The sick and the hurt, the sick berth and the surgeon's mates (the Regulations, the
+      Surgeon): the sick list to the captain each morning.
+  - role: sailmaker
+    post: true
+    rank: warrant officer
+    station: the sail room
+    place: sail_room
+    traits: [neat, slow, proud of his seams]
+    history: "A sailmaker of Chatham yard before he went to sea."
+    brief: >-
+      The sails, bent and unbent, their repair and the sail room's account (the sailmaker's
+      account among the papers).
+  - role: master-at-arms
+    post: true
+    rank: petty officer
+    station: the discipline
+    place: deck
+    traits: [upright, a soldier's bearing, misses nothing]
+    history: "A sergeant of marines before he was rated to the ship."
+    brief: >-
+      The ship's police: the rounds, the lights out, the small arms and the prisoners
+      (the Regulations, the Master at Arms).
+  - role: master's mate
+    drawn: {station: forecastle, rating: able}
+    rank: master's mate
+    station: the master's assistant
+    place: quarterdeck
+    traits: [handy, keen on the sights, aims at a warrant]
+    history: "An able seaman of the forecastle rated mate to the master this commission."
+    brief: >-
+      Assists the master in the observations and the reckoning (the Regulations, the Master,
+      art. XXVIII), and keeps a watch by the bill.
+    note: >-
+      Two master's mates, able seamen of the forecastle (the Regulations of 1806, the
+      Master, art. XXVIII: the mates and midshipmen assist him in the observations).
+  - role: master's mate
+    drawn: {station: forecastle, rating: able}
+    rank: master's mate
+    station: the master's assistant
+    place: quarterdeck
+    traits: [older, steady, a good hand with the lead]
+    history: "Twelve years before the mast and two as a mate."
+    brief: >-
+      As the first master's mate's.
+  - role: midshipman
+    drawn: {station: afterguard, rating: landsman}
+    messenger: true
+    rank: midshipman
+    station: the captain's messenger
+    place: quarterdeck
+    traits: [quick, fifteen, everywhere at once]
+    history: "Two years in the ship; his father a lieutenant on half pay."
+    brief: >-
+      Carries the captain's word about the ship (pass the word for, send for), keeps a watch
+      by the bill and learns the reckoning from the master.
+    note: A midshipman as the captain's messenger, one of the boys of the afterguard.

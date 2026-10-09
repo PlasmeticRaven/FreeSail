@@ -2809,20 +2809,41 @@ BOATS_NOTE = (
 # deputy-purser and cook"; CARPENTER). The stations and the posts together make the
 # complement; the loader checks it.
 
-FRIGATE_POSTS = (
-    "captain",
-    "first lieutenant",
-    "second lieutenant",
-    "third lieutenant",
-    "master",
-    "boatswain",
-    "gunner",
-    "carpenter",
-    "purser",
-    "surgeon",
-    "sailmaker",
-    "master-at-arms",
+# The wardroom files (spec M6 §2; package 40): `data/people/<ship>.yaml` is the source of
+# each ship's station holders, with their ranks, places and outlines. The posts of the
+# muster and the people drawn from a station at muster are read from it here, so that the
+# ship file's `crew.posts` and `crew.people` and the people the game names agree
+# (tests/test_people.py proves it against the files as written).
+PEOPLE_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "people"
 )
+
+
+def wardroom(stem):
+    """The posts (in the file's order) and the people drawn at muster of a ship's wardroom
+    file, the latter as (role, station, rating, messenger, note) entries for `Builder.people`."""
+    with open(os.path.join(PEOPLE_DIR, stem + ".yaml"), encoding="utf-8") as f:
+        doc = yaml.safe_load(f) or {}
+    entries = doc.get("wardroom") or []
+    posts = tuple(str(e["role"]) for e in entries if e.get("post"))
+    drawn = [
+        (
+            str(e["role"]),
+            str(e["drawn"]["station"]),
+            str(e["drawn"]["rating"]) if e["drawn"].get("rating") else None,
+            bool(e.get("messenger")),
+            " ".join(str(e.get("note") or "").split()) or None,
+        )
+        for e in entries
+        if e.get("drawn")
+    ]
+    return posts, drawn
+
+
+FRIGATE_POSTS, FRIGATE_DRAWN = wardroom("frigate-36")
+SCHOONER_POSTS, SCHOONER_DRAWN = wardroom("topsail-schooner")
+CUTTER_POSTS, CUTTER_DRAWN = wardroom("cutter")
+BRIG_POSTS, BRIG_DRAWN = wardroom("brig")
 
 
 def frigate_crew(b):
@@ -2935,29 +2956,11 @@ def frigate_crew(b):
     # InwardAndOutward.md). Each is drawn from his station at muster, keeping the counts
     # of spec M3 §2.3 as they are: a master's mate an able seaman of the forecastle, a
     # midshipman one of the boys of the afterguard (spec M3 §9 item 6: the boys count as
-    # landsmen).
+    # landsmen). The roles and their notes are the wardroom file's (package 40).
     b.people(
         "The named people beyond the posts (package 35, spec M5 §22): each drawn from his "
         "station at muster, the counts above unchanged; see tools/gen_ships.py.",
-        [
-            (
-                "master's mate",
-                "forecastle",
-                "able",
-                False,
-                "Two master's mates, able seamen of the forecastle (the Regulations of 1806, "
-                "the Master, art. XXVIII: the mates and midshipmen assist him in the "
-                "observations).",
-            ),
-            ("master's mate", "forecastle", "able", False, None),
-            (
-                "midshipman",
-                "afterguard",
-                "landsman",
-                True,
-                "A midshipman as the captain's messenger, one of the boys of the afterguard.",
-            ),
-        ],
+        FRIGATE_DRAWN,
     )
     # The booms (package 30b): the spare spars Luce stows between the fore and main masts
     # (1866, ch. XVII Spare Spars, 'Stowing Booms between the fore and mainmast', 'In two
@@ -3098,13 +3101,18 @@ def schooner_crew(b):
             ),
             (("ratings", "ordinary"), 0.40, "Ordinary: 0.40, judgement."),
             (("ratings", "landsman"), 0.15, "Landsmen: 0.15, judgement."),
+        ]
+        + [
             (
-                ("posts", "master"),
+                ("posts", post),
                 None,
-                "Station holders by post (spec M3 2.3); names are drawn at muster.",
-            ),
-            (("posts", "mate"), None, None),
-            (("posts", "boatswain"), None, None),
+                "Station holders by post (spec M3 2.3); names are drawn at muster."
+                if i == 0
+                else None,
+            )
+            for i, post in enumerate(SCHOONER_POSTS)
+        ]
+        + [
             (
                 ("idlers_by_trade", "cook"),
                 1,
@@ -3125,10 +3133,11 @@ def schooner_crew(b):
         ]
     )
     # The people (package 35, spec M5 §22): the master and a mate are posts already; a boy
-    # of the afterguard carries the word (judgement: a privateer rated no midshipmen).
+    # of the afterguard carries the word (judgement: a privateer rated no midshipmen). The
+    # roles and their notes are the wardroom file's (package 40).
     b.people(
         "The named people beyond the posts (package 35, spec M5 §22); see tools/gen_ships.py.",
-        [("boy", "afterguard", "landsman", True, "A boy as the messenger (judgement).")],
+        SCHOONER_DRAWN,
     )
     # The booms (package 30b): a privateer on a short cruise carried fewer spares than
     # Luce's frigate (1866, ch. XVII 'Stowing Booms', which the frigate's follow), and no
@@ -4026,14 +4035,19 @@ def cutter_crew(b):
             ),
             (("ratings", "ordinary"), 0.3, "Ordinary: 0.30, judgement."),
             (("ratings", "landsman"), 0.1, "Landsmen: 0.10, judgement."),
+        ]
+        + [
             (
-                ("posts", "master"),
+                ("posts", post),
                 None,
                 "Station holders by post (spec M3 2.3): a revenue cutter's master (her "
-                "commander), his mate and the boatswain; names are drawn at muster.",
-            ),
-            (("posts", "mate"), None, None),
-            (("posts", "boatswain"), None, None),
+                "commander), his mate and the boatswain; names are drawn at muster."
+                if i == 0
+                else None,
+            )
+            for i, post in enumerate(CUTTER_POSTS)
+        ]
+        + [
             (
                 ("idlers_by_trade", "cook"),
                 1,
@@ -4053,10 +4067,11 @@ def cutter_crew(b):
         ]
     )
     # The people (package 35, spec M5 §22): a boy of the afterguard carries the word
-    # (judgement: a revenue cutter's company had no midshipman).
+    # (judgement: a revenue cutter's company had no midshipman). The roles and their notes
+    # are the wardroom file's (package 40).
     b.people(
         "The named people beyond the posts (package 35, spec M5 §22); see tools/gen_ships.py.",
-        [("boy", "afterguard", "landsman", True, "A boy as the messenger (judgement).")],
+        CUTTER_DRAWN,
     )
     # The booms (package 30b): a spare topmast and a spare topsail yard, the two spars a
     # cutter could shift at sea (judgement after Luce 1866 ch. XVII, 'Stowing Booms', as
@@ -5028,18 +5043,6 @@ def brig(out_dir="data/ships"):
     )
 
 
-BRIG_POSTS = (
-    "commander",
-    "lieutenant",
-    "master",
-    "boatswain",
-    "gunner",
-    "carpenter",
-    "purser",
-    "surgeon",
-)
-
-
 def brig_crew(b):
     posts_note = (
         "Station holders by post (spec M3 2.3): a brig-sloop's, the commander and his "
@@ -5124,27 +5127,11 @@ def brig_crew(b):
     )
     # The people (package 35, spec M5 §22): a master's mate and a midshipman as the
     # messenger, as the frigate's in small (the Regulations of 1806, the Master, art.
-    # XXVIII).
+    # XXVIII). The roles and their notes are the wardroom file's (package 40).
     b.people(
         "The named people beyond the posts (package 35, spec M5 §22): each drawn from his "
         "station at muster, the counts above unchanged; see tools/gen_ships.py.",
-        [
-            (
-                "master's mate",
-                "forecastle",
-                "able",
-                False,
-                "A master's mate, an able seaman of the forecastle (the Regulations of 1806, "
-                "the Master, art. XXVIII).",
-            ),
-            (
-                "midshipman",
-                "afterguard",
-                "landsman",
-                True,
-                "A midshipman as the messenger, one of the boys of the afterguard.",
-            ),
-        ],
+        BRIG_DRAWN,
     )
     # The booms (package 30b): the frigate's list (Luce 1866 ch. XVII, 'Stowing Booms')
     # scaled to a brig-sloop: one topmast, made alike for either mast "in order that the
