@@ -406,6 +406,8 @@ def test_a_ports_pilot_vessel_comes_off_as_a_boat_seen_within_two_miles_pulling_
     w = world_at(Position(50.06, -5.03), heading=20.0)
     w.ports.ports["falmouth"] = PT.load_port(path, w.chart)
     assert w.ports.ports["falmouth"].pilot.craft == "gig"
+    # package 37h: the pilot boards when he is taken at his hail
+    w.submit('standing order "the pilot": at the pilot\'s hail then take the pilot')
     w.submit("set plain sail")
     for _ in range(150):
         w.run(60)

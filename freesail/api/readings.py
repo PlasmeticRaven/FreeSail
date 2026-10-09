@@ -1858,7 +1858,12 @@ def _pilot(world: Any, _: str | None) -> dict[str, Any] | None:
 
 
 def _no_pilot_words(world: Any) -> str | None:
-    return NO_PILOT_WORDS
+    # package 37h: what the pilot's boat is doing, when one is out for her (hailed and
+    # waiting for an answer, or keeping company to put him aboard)
+    ports = _ports_of(world)
+    waiting = getattr(ports, "waiting_words", None) if ports is not None else None
+    words = waiting() if waiting is not None else None
+    return words or NO_PILOT_WORDS
 
 
 def _port(world: Any, _: str | None) -> dict[str, Any] | None:
@@ -2326,6 +2331,12 @@ _event(EventSpec("sail ho", "lookout.sighting", lambda data: data.get("seen_as")
 _event(EventSpec("the pilot aboard", "port.pilot_aboard", needs=lambda world: _needs_pilot(world)))
 _event(EventSpec("the pilot refused", "port.pilot_refused"))
 _event(EventSpec("the pilot off", "port.pilot_left"))
+# Package 37h: the pilot's warning of a danger or of shoal water ahead (urgent), his
+# boat borne away for her station (declined, or her hail unanswered), and his asking for
+# his boat at the anchor
+_event(EventSpec("the pilot's warning", "port.pilot_warns"))
+_event(EventSpec("the pilot's boat gone", "port.pilot_gone"))
+_event(EventSpec("the pilot asks for his boat", "port.pilot_boat"))
 _event(EventSpec("the boat away", "boat.away"))
 _event(EventSpec("the boat alongside", "boat.alongside"))
 _event(EventSpec("a message", "message.received"))
@@ -2452,6 +2463,7 @@ DANGER_LINES: tuple[DangerLine, ...] = (
     DangerLine("a spar or a line straining", "strain.warning"),
     DangerLine("an evolution failed", "evolution.failed"),
     DangerLine("the ship taken aback", "ship.aback"),
+    DangerLine("the pilot's warning", "port.pilot_warns"),
 )
 
 

@@ -2385,3 +2385,191 @@ Fast tier, `python3 -m pytest -n 4`: 2,877 passed and 3 failed, none of them the
 - **A replay seats a station after the inputs of its tick.** A `tell` given before the station was taken found, in the replay, a station not yet seated; it is held by nobody until it is seated, as in the game.
 - **`steer ... for <place>` and `shape a course for` share the place reader**; a point off a place uses the chart's own name index, so the accents and the apostrophes are folded there too.
 - **Not built, and why.** The stream anchor laid out by the boat: the kedge's evolution lays out the kedge alone, and widening it is the anchor's script (37k's file); refused with what to say. A fog signal stays later, as the review has it. `hail the pilot` is 37h's verb; here only its wrong hint is withdrawn.
+
+## Milestone 5: the pilot (package 37h, 2026-10-09)
+
+Built from the brief "Package 37h: the pilot" in `M5-WorkPackages.md` (the review of gate
+5c, second edition: G10 whole, G8's hail at anchor, and part K's three items for 37h; the
+owner's rulings of 5 and 7 October in decisions 35 and 36). Measured at seed 7 on this
+machine (Linux), in scripted worlds and the five recorded passages.
+
+### What was built
+
+- **Taken or declined at his hail** (`world/ports.py`, `orders/port.py`,
+  `data/vocabulary.yaml`). `take the pilot` (`we will take the pilot`, `take him aboard`)
+  answers the boat's hail; she shortens sail or heaves to as the hail asked when she is
+  still too fast for him, and not twice when the captain or the book has the sail coming
+  in already. `decline the pilot` (`we need no pilot`, `wave him off`) sends the boat back
+  to her station, and none comes off from that port for six hours (package 35's
+  `PILOT_AGAIN_H`). `hail the pilot` hails a pilot's boat in sight (the lookout's
+  sighting, or within hail) and takes him; with none it is refused in words, never "did
+  you mean 'haul'?". Unanswered, the boat keeps company, hails once more after
+  `PILOT_HAIL_AGAIN_S` and bears away for her station, the line saying so: **no pilot
+  boards a ship that has not taken him.** Taking or declining is the vocabulary's object
+  `port`, so a general grant keeps it back with the port's business (`agents/agent.py`'s
+  reason names it; `orders/stations.py`'s words).
+- **His boat closes with the ship** (`world/ships.py`, the `company` leg). From her hail
+  the boat keeps company a cable and a half off: within it she goes with the ship at the
+  ship's way over the ground; beyond it she closes at her own pace or the ship's and
+  `COMPANY_CLOSING_KN` more. He boards within two cables at six knots or under, as before.
+  A ship too fast for him is told so ("The cutter keeps company: she cannot put the pilot
+  aboard at 7 knots, and waits for her to shorten sail or heave to.", at most once in
+  `PILOT_WAITS_SAY_S`), and taken and still too fast at the interval she is hailed once
+  more, to heave to. The hail asks to shorten sail only of a ship over six knots, and
+  never asks a ship at anchor for anything but whether she will take him.
+- **His warnings** (`world/ports.py` `_warn`, `world/chart.py` `dangers_ahead` and
+  `shoal_ahead`). Aboard and within his port's ground, from the true chart and the tide's
+  height now: a charted danger her true track passes within a cable of (beyond its
+  extent) with less than a fathom under her keel, by name, once while he is aboard; the
+  water shoaling to that ahead, at most once in ten minutes; each an urgent line saying
+  on which hand the deeper water lies, a danger line for the stations and an event for the
+  book (`at the pilot's warning`). In thick weather (under a mile) he says once that he
+  cannot see his marks and warns by the lead and the time run: five minutes' run ahead
+  and without the danger's bearing. Nothing of it is in a reading. He does not con.
+- **His leaving and his fee.** Brought up in his port's anchorage or mooring he asks for
+  his boat once ("The pilot asks for his cutter: she is brought up in Carrick Road, and
+  his charge is done."), waits at the gangway (`world/people.py`), and leaves in her
+  from the quay; anchored in the outer road he stays (she waits there for her tide).
+  Outward he leaves a mile beyond the outer road as package 35 had it, asking for his
+  boat once; an inward pilot is put off outward only if she stands out with
+  `PILOT_STANDS_OUT_KN` of way, not as she drifts hove to for him. The pilotage is paid
+  from the purse as he goes, once, at his port file's `fee_pounds`, and the line says so.
+  He is "the pilot of Falmouth" in `the people`, and pilots her in or out by whether she
+  last lay in his port (he "took charge of her" before, and took charge of nothing).
+- **His words.** The breakwater out of the Plymouth pilot's mouth (begun 1812): White's
+  triangle as White gives it. "The flood" is the world's own stream in his road
+  (`Ports._stream_turn`), where it was his high water less six hours twelve minutes. The
+  boat that keeps company says what she waits for, and `the pilot` with no pilot aboard
+  says what his boat is doing ("the Falmouth cutter has hailed and waits for an answer
+  ('take the pilot' or 'decline the pilot')"). The drying rocks are named on the
+  captain's chart (`client/map.js`: the Woolpack, the Spanish Ledge and the Bartholomew
+  were "unnamed but marked", being of the kind `drying`, which was not in the names'
+  list). The primer's chapter 14 is rewritten for all of it.
+
+### The constants and their sources
+
+| Constant | Value | Where | Source |
+|---|---|---|---|
+| `PILOT_HAIL_AGAIN_S` | 600 s | `ports.py` | judgement: two hails ten minutes apart, time to answer a boat and shorten sail; the bearing away ten minutes after the second |
+| `PILOT_COMPANY_M` | a cable and a half | `ports.py` | judgement: within the two cables he boards from (package 35's `PILOT_BOARDS_WITHIN_M`) |
+| `PILOT_WAITS_SAY_S` | 600 s | `ports.py` | judgement: the boat's word at most once in ten minutes |
+| `PILOT_WARN_AHEAD_S`, `PILOT_WARN_MIN_M` | 600 s, three cables | `ports.py` | judgement: "in time to act", a mile at six knots, time to stay, wear or anchor a ship |
+| `PILOT_WARN_ABEAM_M` | a cable | `ports.py` | judgement: a danger the track passes within a cable of, beyond its extent (the chart's rocks are points; `chart.DANGER_PASS_NM` is the account's mile) |
+| `PILOT_UNDER_KEEL_M` | a fathom | `ports.py` | judgement: shoal water is less than a fathom under her keel at the tide's height now |
+| `PILOT_WARN_AGAIN_S` | 600 s | `ports.py` | judgement |
+| `PILOT_THICK_NM`, `PILOT_THICK_AHEAD_S` | a mile, 300 s | `ports.py` | the owner's ruling ("thick weather means he cannot see his marks"); the figures judgement |
+| `PILOT_STANDS_OUT_KN` | 3 kn | `ports.py` | judgement: standing out under sail, not drifting or forereaching hove to |
+| `COMPANY_CLOSING_KN` | 2 kn | `ships.py` | judgement: a pilot cutter was the fastest thing in her water; the far-detail boat is given the pace and not the means |
+| the side looked at for the deeper water | two cables | `chart.shoal_ahead` | judgement |
+| `fee_pounds` | £5 Falmouth, £6 Plymouth, £4 Brest, £3 St Mary's and Roscoff | `data/ports/*.yaml` | package 35's and 35b's, from memory and unverified as the files say; no page in `docs/references/` gives a rate (the Regulations of 1806 speak of the certificate and "the usual rate", not the figure) |
+
+### The flood, before and after
+
+The pilot's "the flood will serve from" at 06:00 on 12 June 1805, the old words against
+the world's own stream in his road:
+
+| Port | High water | Old: high water less 6 h 12 m | New: the stream turns to the flood in the road |
+|---|---|---|---|
+| Plymouth | 17:42 | 11:30 | making now (Cawsand Bay) |
+| Falmouth | 17:07 | 10:55 | 11:05 |
+| Brest | 16:05 | 09:53 | 10:36 |
+
+### St Mary's Sound: the chart's depths against his directions
+
+Measured on the chart at the datum (`chart.depth_at`), in fathoms:
+
+| Where | The chart | The directions |
+|---|---|---|
+| off the Woolpack, a cable and two, S to NW | 4.4 to 6.2 | "immediately off it 7 and 6 fathoms" (Imray p. 106) |
+| the fair way, midway between the Woolpack and the Bartholomew | 5.8 | the fair way |
+| midway between the Woolpack and the Spanish Ledge | 2.1 | (no such passage) |
+| off Peninnis, two cables S to SW | 15.9 to 16.7 | "come no nearer it than fifteen fathoms" |
+| off Peninnis, five cables W | 2.2 | |
+
+The depths agree with his words where his words put the fair way; what does not agree is
+the features file's placing of the three dangers, all on one parallel (49° 54.4' N) with
+the Spanish Ledge a quarter of a mile **east** of the Woolpack, where White and Imray (and
+the feature's own `says`) have it on the larboard hand going in, with the fair way between
+it and the Woolpack. A ship that keeps the Woolpack to starboard and the Spanish to
+larboard by the chart is over two fathoms: the owner's "12, 9½ and then 4 fathoms" over
+ground "the chart has at 2.3". The game's pilot warns from the same chart as the lead, so
+he and the lead agree; he names the Spanish Ledge "on the starboard bow" where his words
+say larboard. Not mended here: it is `data/charts/features/channel-west.yaml` (and its
+index), a chart package's file, and wants the sheets read again.
+
+### The recorded passages, re-measured with the reasons
+
+| Passage | Lines | Digest | What moved, old → new | Why |
+|---|---|---|---|---|
+| the frigate, 5b | 768 → 754 | `dbf7f6fcfb800fdf` → `ded18dca91367945` | the outer road 58297 → 58298, the anchor 58647 → 58650, brought up 59642 → 59643; hail 57480 and aboard 57540 stand | her book's line at the hail is `take the pilot` where it was `shorten sail`: under six knots at the hail she is asked nothing, and the shortening's lines (her sail in at the rounding already) are gone |
+| the schooner, 5b | 761 → 800 | `c8905673506f717e` → `968d3be83036854b` | the pilot aboard at 56580 (never, since 37e); hails 55800 and 56400; the outer road 56515 → 56511; the anchor 57638 → 58244 in eight fathoms and a half (seven); brought up 58689 → 59360 | taken at the hail, the cutter keeps company with her at seven knots; hailed again to heave to, he boards as she comes to the outer road, and she fills away for Carrick Road (her book, below) |
+| the thick passage, 5b | 488 | `fb136bb8e86f0804` | nothing | no cutter comes off |
+| the merchant passage, 5c | 2994 → 3011 | `c52c14c725a5ed1f` → `5d708ee83c7018ba` | the pilot of Brest aboard 96240 → 96180; put off at the anchor in the Bay at 121560 and paid £4 (never before); every other pinned tick stands | the boat closes at her own pace or the ship's and two knots more; brought up in the Bay his charge is done; the lines of the answers, his warnings (the Black Rock outward, the Buzec and the shoal water off Petit Minou) and his boat |
+| the naval cruise, 5c | 2037 → 2041 | `bb8b2499fde6a0f4` → `301ca2e8aad8b405` | the Plymouth pilot aboard 7980 → 7920; every other pinned tick stands | taken at the hail; the boat closes at the better pace |
+
+`test_the_schooners_pilot_boards_before_she_runs_in` has its expected-failure mark off
+and asserts his boarding at 56580, within ten minutes of the outer road and more than ten
+before her anchor.
+
+### The books, and the count of runs
+
+- **The frigate's (5b)**: `at the pilot's hail then take the pilot` for `... shorten sail`.
+- **The schooner's (5b)**: three lines and a guard. `at the pilot's hail then take the
+  pilot`; `at the pilot aboard then fill away`; `at filled away, if the distance to
+  Falmouth is under 5 miles then shape a course for Carrick Road`; and the noon's `stand
+  on` guarded to the noon's own filling away ("if the distance run since noon is under 5
+  miles"), as its cast already is, since unguarded it sent her back to the point east of
+  the Manacles when she filled away for the pilot.
+- **The merchant's (5c)**: `then take in the fore topsail; take the pilot` for `then take in
+  the fore topsail`.
+- **The cruise's (5c)**: `standing order "the pilot boards": at the pilot's hail then take
+  the pilot` added.
+
+Fourteen whole-passage runs, in three rounds. The schooner five times: `take the pilot`
+alone (he boarded off the town a minute before her anchor: her light sails in and her
+topsails reefed, she still made seven); with the fore topsail in and plain sail after (no
+better); with the boat's second hail asking her to heave to (he boarded at the outer road,
+but she lay hove to, drifted, opened her distance and he asked to be put off outward, and
+she anchored in the outer road); with the inward pilot kept aboard while she drifts and
+the book filling away (kept); and once more after the boat's closing pace was mended.
+The frigate twice and the thick passage once. The merchant three times: with `take the
+pilot` alone at the hail, its shortening of sail boarded the Falmouth pilot three minutes
+later and put him off four minutes later, which carried her past the Iroise's mark too
+wide for its cast; with the fore topsail kept before it, he boarded on his old minute but
+was put off three minutes late, the boat closing at the ship's pace and two knots where
+package 35's sailed at her own polar; the closing pace was made the better of the two,
+and the third run is the one pinned. The cruise three times, the second needlessly (the
+same code as the first for her).
+
+### The suite, as run (package 37h)
+
+On a machine shared with four other packages' suites (load 14 to 30 on four cores), at
+`-n 4`: the fast tier 2,751 tests, 2,747 passed and 4 failed. Two were tests already
+mended in this package's tree while the run was under way (the officer's list of the
+lines that speak of danger, the gig of `test_ships.py`), and pass alone; two are timing
+floors: the chart's `coast_at` under two milliseconds (passes alone) and the merchant
+passage's pace at 500 ticks a second, which fails on the base commit too on this machine
+(455 and 494 there against 404 and 433 here, run side by side; the profile of two
+thousand ticks shows the same calls within a seventh of one per cent, so the difference is
+the load). The slow tests of the passages touched (`-k "schooner or merchant_passage or
+naval_cruise or truth_72 or passage_for_gate_5b or thick_weather or cutter_and_the_brig"`,
+seventeen): fifteen passed, the schooner's pilot among them, one expected failure of the
+schooner's hull (not this package's), and the pace floor. `tests/test_ports.py` and
+`tests/test_people.py` with the slow tier: 38 passed.
+
+### Found on the way (package 37h)
+
+- **St Mary's Sound** (above): the features' positions, not the depths, part from the
+  directions. For a chart package.
+- **The grounding line says "no water of water by the chart"** when a rock is awash
+  (`chart.Grounding.words` with a depth of nought): seen on the Black Rock in this
+  package's tests; not this package's file, and left.
+- **No pilot comes off to a ship at anchor**, and `hail the pilot` needs a boat in sight:
+  a ship anchored in the outer road to wait for the tide cannot call one off (the period's
+  jack at the fore). Left: it needs a signal the game has not got.
+- **The pilot's fee is one figure a port**, from memory; the period's rates went by the
+  ship's draught and the distance, and no page in the references gives them.
+- **The officer's domain words still say he may give orders on "the pilot's hail"**
+  (`agents/agent.py`, the officer's brief): that is `ask the pilot`; taking or declining
+  is kept back as the port's business, and the brief's words were not changed (they are
+  the station's brief, and a change re-asks no one but is the lead's to make).

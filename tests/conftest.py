@@ -292,6 +292,13 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_lying_to.py::test_the_tending_costs_the_watch_its_hands_and_the_relief_takes_them_over",
         "test_log_lines.py::test_a_standing_order_with_nothing_to_do_says_so_once_a_watch_for_each_reason",
         "test_tackle_orders.py::test_the_goulets_eight_hours_give_at_most_five_lines_the_first_urgent",
+        # package 37h: the pilot's hail answered and unanswered, his boat in company with a
+        # fast ship, and his leaving at the anchor, each an hour or more of sailing
+        "test_ports.py::test_the_pilot_unanswered_keeps_company_hails_once_more_and_bears_away",
+        "test_ports.py::test_the_pilot_declined_at_his_hail_is_sent_back_and_no_pilot_comes",
+        "test_ports.py::test_a_fast_ship_is_hailed_to_shorten_sail_and_the_boat_keeps_company_until_she_does",
+        "test_ports.py::test_hail_the_pilot_hails_his_boat_in_sight_and_takes_him",
+        "test_ports.py::test_the_pilot_is_put_off_at_the_anchor_and_the_pilotage_paid_once",
     }
 )
 

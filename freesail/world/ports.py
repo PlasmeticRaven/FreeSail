@@ -18,6 +18,25 @@ Luce has it (`freesail.evolutions.scripts.GetUnderWayScript`), the pilot's cours
 and the pilot off into his cutter beyond the outer road, his certificate signed and the
 pilotage paid from the purse (the Regulations of 1806, the Pilot's articles).
 
+**The pilot taken or declined** (package 37h; the owner's rulings of 5 and 7 October
+2026, decisions 35 and 36; the review of gate 5c, G10). The boat's hail asks her to
+shorten sail when she is too fast for him to board, and on its second hail to heave to,
+and never asks a ship at anchor for either. `take the pilot` answers it (she shortens
+sail or heaves to as the hail asked, and the boat keeps company, a cable and a half off
+at the ship's own pace, until he can board); `decline the pilot` sends the boat back to
+her station; `hail the pilot` hails a boat in sight and takes him. Unanswered, the boat
+keeps company, hails once more after `PILOT_HAIL_AGAIN_S` and bears away for her
+station, and the line says so: no pilot boards a ship that has not taken him. Aboard he
+is a carrier of the truth of his own water: within his port's ground he warns of a
+charted danger ahead on her true track, by name, and of the water where it shoals, on
+which hand the deeper water lies (`Ports._warn`, from `chart.Chart.dangers_ahead` and
+`shoal_ahead`, never a reading); in thick weather he says once that he cannot see his
+marks and warns by the lead and the time run, nearer and without the bearing. He does not
+con and does not converse beyond `ask the pilot` (the director's, milestone 6). He is
+put off at the anchor in his port's anchorage or mooring, or outward a mile beyond the
+outer road, and asks for his boat once; the pilotage is paid from the purse at his port's
+rate as he goes, and the log says so.
+
 **The boat** (`send the boat ashore`, `data/evolutions/send_boat.yaml`) is a passage by
 distance at a boat's pace with hands and time, hoisted out and in, carrying a person, a
 message or a purchase; what it brings back comes aboard at the gangway and reaches the
@@ -52,7 +71,7 @@ import yaml
 
 from freesail import units
 from freesail.core.events import Severity
-from freesail.world.geo import Position, bearing_and_distance
+from freesail.world.geo import Position, bearing_and_distance, distance_words
 from freesail.world.people import Message, Person
 from freesail.world.places import Hold, Purse, pounds_words
 
@@ -65,9 +84,20 @@ __all__ = [
     "PILOT_AGAIN_H",
     "PILOT_BOARDS_UNDER_KN",
     "PILOT_BOARDS_WITHIN_M",
+    "PILOT_COMPANY_M",
+    "PILOT_HAIL_AGAIN_S",
     "PILOT_HAIL_WITHIN_M",
     "PILOT_LIES_TO_S",
     "PILOT_OFF_BEYOND_NM",
+    "PILOT_STANDS_OUT_KN",
+    "PILOT_THICK_AHEAD_S",
+    "PILOT_THICK_NM",
+    "PILOT_UNDER_KEEL_M",
+    "PILOT_WAITS_SAY_S",
+    "PILOT_WARN_ABEAM_M",
+    "PILOT_WARN_AGAIN_S",
+    "PILOT_WARN_AHEAD_S",
+    "PILOT_WARN_MIN_M",
     "PORTS_DIR",
     "SUPPLY_CAP",
     "SUPPLY_FLOOR",
@@ -108,6 +138,40 @@ PILOT_LIES_TO_S = 600
 # Outward bound the pilot leaves her a mile beyond the outer road (the Regulations: the
 # captain's certificate names the port or channel he conducted her out of).
 PILOT_OFF_BEYOND_NM = 1.0
+# -- the hail answered (package 37h; decisions 35 and 36): judgement throughout --
+# Unanswered, the boat hails once more ten minutes after her first hail and bears away
+# for her station ten minutes after that (judgement: time enough to answer a boat and
+# shorten sail, and no longer than a pilot would hang on a ship that will not answer).
+PILOT_HAIL_AGAIN_S = 600
+# Hailed, the boat keeps company a cable and a half off, within the two cables he boards
+# from (`ships.Vessel`'s `company` leg, at the ship's pace).
+PILOT_COMPANY_M = 1.5 * units.CABLE
+# A pilot who came aboard inward is put off at the anchor; he asks for his boat beyond the
+# outer road only if she stands out to sea again with this much way on her, not as she
+# drifts or forereaches hove to (judgement).
+PILOT_STANDS_OUT_KN = 3.0
+# Keeping company with a ship too fast for him to board, the boat says what she waits for,
+# at most once in ten minutes (the review of gate 5c, G10: "a line from the pilot cutter
+# saying what she waits for").
+PILOT_WAITS_SAY_S = 600
+# -- his warnings (package 37h; the owner's ruling of 7 October 2026: "He may warn of the
+# shoal water or shore ahead with true knowledge in his water"); judgement throughout --
+# He looks ten minutes' run ahead on her true track, and three cables at the least: a
+# mile at six knots, time enough to stay or wear a ship or to anchor her.
+PILOT_WARN_AHEAD_S = 600
+PILOT_WARN_MIN_M = 3.0 * units.CABLE
+# A danger her track passes within a cable of (beyond its own extent) is one he names.
+PILOT_WARN_ABEAM_M = units.CABLE
+# Shoal water is less than a fathom under her keel at the tide's height now.
+PILOT_UNDER_KEEL_M = units.fathoms_to_m(1.0)
+# He names each danger once while he is aboard, and the shoal water at most once in ten
+# minutes.
+PILOT_WARN_AGAIN_S = 600
+# In thick weather, the visibility under a mile, he cannot see his marks (the owner's
+# ruling: "Thick weather means he cannot see his marks"): he says so once, and warns by the
+# lead and the time run, five minutes' run ahead and without the bearing.
+PILOT_THICK_NM = 1.0
+PILOT_THICK_AHEAD_S = 300
 # At anchor within two miles of the port's roads or mooring she is in port: the boat
 # goes ashore, the market and the yard serve her.
 IN_PORT_NM = 2.0
@@ -502,6 +566,25 @@ class Ports:
     `data/ports/` when the world has a chart and the scenario says nothing), the pilot's
     coming and going, the boat's errands, the market, the yard and the crew pool."""
 
+    # Package 37h's state, each with a plain class default so that a checkpoint written
+    # before it loads (`core.replay`): the answer to the boat's hail ("take", "decline" or
+    # none yet), how many times she has hailed and when last, what her hail asked ("shorten
+    # sail", "heave to" or nothing), when she last said what she waits for; whether the
+    # pilot aboard has asked for his boat, whether he came aboard inward bound, the
+    # dangers he has named, when he last warned of shoal water, and whether he has said
+    # that he cannot see his marks.
+    hail_answer: str = ""
+    hail_count: int = 0
+    hail_tick: int | None = None
+    hail_wants: str = ""
+    waits_said_tick: int | None = None
+    pilot_boat_asked: bool = False
+    pilot_inward: bool = True
+    warned: tuple[str, ...] = ()
+    shoal_warned_tick: int | None = None
+    thick_said: bool = False
+    lay_in: str | None = None  # the port she last lay in, until she is out of its ground
+
     def __init__(self, world: Any) -> None:
         self.world = world
         self.ports: dict[str, Port] = {}
@@ -619,7 +702,7 @@ class Ports:
     def _cutter(self) -> Any:
         return self.world.vessels.get(self.cutter_id) if self.cutter_id else None
 
-    def _launch_cutter(self, port: Port, errand: str) -> None:
+    def _launch_cutter(self, port: Port, errand: str, start: Position | None = None) -> None:
         from freesail.world.ships import Vessel
 
         self._counter += 1
@@ -630,8 +713,9 @@ class Ports:
             # from the pilots' station, the outer road, where the cutter cruises for ships
             # (package 36: she sails by her own polar now, and from the shore of Brest she
             # beat out through the Goulet six hours for a ship in the Iroise; the
-            # cruising ground is measured from the same road)
-            "position": port.outer_road.position,
+            # cruising ground is measured from the same road); for a pilot put off at the
+            # anchor within, from the quay (package 37h)
+            "position": start if start is not None else port.outer_road.position,
             "colours": self.world.nations.get(port.nation).colours,
             "plan": [("to_ship", PILOT_BOARDS_WITHIN_M)],
         }
@@ -650,6 +734,14 @@ class Ports:
         self.cutter_port = port.id
         self.cutter_errand = errand
         self.cutter_hailed = False
+        self._hail_reset()
+
+    def _hail_reset(self) -> None:
+        self.hail_answer = ""
+        self.hail_count = 0
+        self.hail_tick = None
+        self.hail_wants = ""
+        self.waits_said_tick = None
 
     def _ground_speed_kn(self) -> float:
         ship = self.world.ship
@@ -663,6 +755,21 @@ class Ports:
         return units.ms_to_knots(
             math.hypot(dyn.u * ex + dyn.v * ey + wx, dyn.u * ey - dyn.v * ex + wy)
         )
+
+    def _ground_velocity(self) -> tuple[float, float]:
+        """Her way over the ground, metres a second east and north (the truth: the pilot
+        knows where his water is taking her)."""
+        ship = self.world.ship
+        dyn = getattr(ship, "dyn", None)
+        if dyn is None:
+            speed = float(getattr(ship, "speed", 0.0))
+            heading = float(getattr(ship, "heading", 0.0))
+            return speed * math.sin(heading), speed * math.cos(heading)
+        from freesail.physics.integrate import water_velocity
+
+        wx, wy = water_velocity(ship)
+        ex, ey = units.heading_vector(dyn.heading)
+        return dyn.u * ex + dyn.v * ey + wx, dyn.u * ey - dyn.v * ex + wy
 
     def _way_kn(self) -> float:
         """Her way through the water, knots: a ship with none is not under way, whatever
@@ -681,12 +788,22 @@ class Ports:
             return True
         return any(getattr(s, "is_set", False) for s in sails.values())
 
+    def _aground(self) -> bool:
+        extra = getattr(self.world.ship, "extra", None)
+        return bool(extra.get("aground")) if isinstance(extra, dict) else False
+
     def _tick_pilot(self, now: int) -> None:
         world = self.world
         cutter = self._cutter()
         if cutter is None and self.cutter_id is not None:
             # she is home: the errand is over
             self.cutter_id = self.cutter_port = self.cutter_errand = None
+            self.cutter_hailed = False
+            self._hail_reset()
+        self._note_lay_in()
+        if self.pilot is not None and self.pilot_port in self.ports:
+            # aboard, he warns of the dangers ahead in his own water (package 37h)
+            self._warn(self.ports[self.pilot_port], now)
         if self.pilot is None and cutter is None:
             found = self.nearest()
             if found is None:
@@ -698,11 +815,7 @@ class Ports:
             _, d_station = bearing_and_distance(world.position, port.outer_road.position)
             if d_station / units.NAUTICAL_MILE > port.pilot.cruising_nm:
                 return
-            if (
-                world.at_anchor or world.ship.extra.get("aground")
-                if hasattr(world.ship, "extra")
-                else world.at_anchor
-            ):
+            if world.at_anchor or self._aground():
                 return
             if self.declined_until.get(port.id, 0) > now:
                 return
@@ -717,41 +830,52 @@ class Ports:
         if cutter is not None and self.cutter_errand in ("bring", "fetch"):
             port = self.ports[self.cutter_port or ""]
             _, dist = bearing_and_distance(world.position, cutter.position)
-            if dist <= PILOT_HAIL_WITHIN_M and not self.cutter_hailed:
-                self.cutter_hailed = True
-                craft = port.pilot.craft
-                if self.cutter_errand == "bring":
-                    text = (
-                        f"The {craft} hailed: a pilot for {port.name}; shorten sail and he will "
-                        f"come aboard."
-                    )
+            if not self.cutter_hailed and dist <= PILOT_HAIL_WITHIN_M:
+                self._hail(port, cutter, now)
+            if not self.cutter_hailed:
+                return
+            if self.cutter_errand == "fetch" or self.hail_answer == "take":
+                # he boards (or leaves) a ship under six knots within two cables, as
+                # package 35 had it; a faster ship has the boat in company until she is
+                # slow enough, and the boat says what she waits for; taken and still too
+                # fast at the interval, she hails once more, for her to heave to
+                if (
+                    self.cutter_errand == "bring"
+                    and self.hail_count < 2
+                    and self.hail_tick is not None
+                    and now - self.hail_tick >= PILOT_HAIL_AGAIN_S
+                    and self._ground_speed_kn() > PILOT_BOARDS_UNDER_KN
+                ):
+                    self._hail(port, cutter, now, again=True)
+                    return
+                if dist <= PILOT_BOARDS_WITHIN_M:
+                    if self._ground_speed_kn() <= PILOT_BOARDS_UNDER_KN:
+                        cutter.alongside = True
+                        if self.cutter_errand == "bring":
+                            self._pilot_boards(port, cutter, now)
+                        else:
+                            self._pilot_leaves(port, cutter, now)
+                    else:
+                        self._waits(port, now)
+                return
+            # unanswered (package 37h; the owner's ruling of 7 October 2026): the boat
+            # keeps company, hails once more, and bears away for her station
+            if self.hail_tick is not None and now - self.hail_tick >= PILOT_HAIL_AGAIN_S:
+                if self.hail_count < 2:
+                    self._hail(port, cutter, now, again=True)
                 else:
-                    text = f"The {craft} hailed: she has come off for the pilot."
-                # notable (package 37d; the review of gate 5c's playtests, 8.2 item 13):
-                # a hail from a boat alongside is a thing the deck must answer, and at
-                # routine severity it was rolled up and woke no station
-                self._record(
-                    Severity.NOTABLE,
-                    "port.pilot_hail",
-                    text,
-                    {"port": port.id, "errand": self.cutter_errand},
-                )
-            if dist <= PILOT_BOARDS_WITHIN_M and self._ground_speed_kn() <= PILOT_BOARDS_UNDER_KN:
-                cutter.alongside = True
-                if self.cutter_errand == "bring":
-                    self._pilot_boards(port, cutter, now)
-                else:
-                    self._pilot_leaves(port, cutter, now)
+                    self._bear_away(port, cutter, now, unanswered=True)
             return
-        if (
-            self.pilot is not None
-            and (cutter is None or self.cutter_errand is None)
-            and not world.at_anchor
-        ):
+        if self.pilot is not None and (cutter is None or self.cutter_errand is None):
+            port = self.ports[self.pilot_port or ""]
+            if world.at_anchor:
+                self._put_off_at_anchor(port, now)
+                return
+            if self.pilot_boat_asked:
+                return  # he has asked for his boat once (package 37h)
             # the cutter comes off for him again while the one that brought him is still
             # going home (package 36: a frigate under topsails was past the cruising
             # ground before the first was in, and the pilot stayed aboard)
-            port = self.ports[self.pilot_port or ""]
             _, d_road = bearing_and_distance(world.position, port.outer_road.position)
             _, d_anch = bearing_and_distance(world.position, port.anchorage.position)
             d_nm = d_anch / units.NAUTICAL_MILE
@@ -759,13 +883,20 @@ class Ports:
             self._last_distance_nm[port.id] = d_nm
             road_nm = bearing_and_distance(port.anchorage.position, port.outer_road.position)[1]
             beyond = d_nm > road_nm / units.NAUTICAL_MILE + PILOT_OFF_BEYOND_NM
+            # an inward pilot is put off at the anchor; outward only if she stands out to
+            # sea again under way, not as she drifts hove to for him (package 37h: the 5b
+            # schooner, hove to off the outer road, opened her distance and he asked for
+            # his boat)
+            standing_out = not self.pilot_inward or self._way_kn() >= PILOT_STANDS_OUT_KN
             if (
                 beyond
+                and standing_out
                 and last is not None
                 and d_nm > last
                 and d_road / units.NAUTICAL_MILE < port.pilot.cruising_nm
             ):
                 self._launch_cutter(port, "fetch")
+                self.pilot_boat_asked = True
                 # the pilot asks for sail to be shortened as his boat comes off (package
                 # 36: a schooner with her sheets tended outran the cutter and carried the
                 # Falmouth pilot to the Iroise); the same line as the boat's hail, so
@@ -778,6 +909,225 @@ class Ports:
                     f"coming off for him.",
                     {"port": port.id, "asks": True, "errand": "fetch"},
                 )
+
+    def _note_lay_in(self) -> None:
+        """The port she lies in at anchor, kept until she is beyond its pilot's ground:
+        a pilot who boards her before then takes her out (package 37h)."""
+        if self.world.at_anchor:
+            port = self.in_port()
+            spot = port.nearest_spot(self.world.position)[0] if port is not None else None
+            if port is not None and spot is not port.outer_road:
+                # within, in the anchorage or the mooring: the outer road is where a ship
+                # from sea waits for her pilot and her tide to go in
+                self.lay_in = port.id
+            return
+        port = self.ports.get(self.lay_in or "")
+        if port is None:
+            return
+        _, d = bearing_and_distance(self.world.position, port.outer_road.position)
+        if d / units.NAUTICAL_MILE > port.pilot.cruising_nm:
+            self.lay_in = None
+
+    # -- the hail and its answer (package 37h) ---------------------------------------------
+
+    def _hail(self, port: Port, cutter: Any, now: int, again: bool = False) -> None:
+        """The boat's hail within four cables: for the pilot she brings, asking her to
+        shorten sail when she is too fast for him to board and to heave to at the second
+        hail, never either at anchor; or, come off for the pilot aboard, saying so. From
+        the hail the boat keeps company with her (`ships.Vessel`'s `company` leg)."""
+        world = self.world
+        craft = port.pilot.craft
+        if self.cutter_errand == "bring" and self.stance(port) == "closed":
+            # a port closed to her nation: the pilot hails his refusal from the boat
+            # (truth 70), with nothing to answer
+            self.cutter_hailed = True
+            self._pilot_boards(port, cutter, now)
+            return
+        self.cutter_hailed = True
+        cutter.plan = [("company", PILOT_COMPANY_M)]
+        if self.cutter_errand == "fetch":
+            self._record(
+                Severity.NOTABLE,
+                "port.pilot_hail",
+                f"The {craft} hailed: she has come off for the pilot.",
+                {"port": port.id, "errand": "fetch"},
+            )
+            return
+        wants = ""
+        if not world.at_anchor and self._ground_speed_kn() > PILOT_BOARDS_UNDER_KN:
+            wants = "heave to" if again else "shorten sail"
+        self.hail_count += 1
+        self.hail_tick = now
+        self.hail_wants = wants
+        ask = f"; {wants} and he will come aboard" if wants else ", if you will take him"
+        if again and self.hail_answer == "take":
+            text = (
+                f"The {craft} hailed again: she cannot put the pilot aboard at "
+                f"{self._ground_speed_kn():.0f} knots; heave to and he will come aboard."
+            )
+        elif again:
+            text = (
+                f"The {craft} hailed again: a pilot for {port.name}{ask}. Unanswered, she "
+                f"will bear away for {port.outer_road.name}."
+            )
+        else:
+            text = f"The {craft} hailed: a pilot for {port.name}{ask}."
+        # notable (package 37d; the review of gate 5c's playtests, 8.2 item 13): a hail
+        # from a boat alongside is a thing the deck must answer
+        self._record(
+            Severity.NOTABLE,
+            "port.pilot_hail",
+            text,
+            {"port": port.id, "errand": "bring", "wants": wants, "again": again},
+        )
+
+    def _waits(self, port: Port, now: int) -> None:
+        """The boat in company with a ship too fast for him: what she waits for, at most
+        once in `PILOT_WAITS_SAY_S` (the review of gate 5c, G10, game 9 at Brest)."""
+        if self.waits_said_tick is not None and now - self.waits_said_tick < PILOT_WAITS_SAY_S:
+            return
+        self.waits_said_tick = now
+        craft = port.pilot.craft
+        knots = self._ground_speed_kn()
+        doing = "put the pilot aboard" if self.cutter_errand == "bring" else "take the pilot off"
+        self._record(
+            Severity.NOTABLE,
+            "port.pilot_waits",
+            f"The {craft} keeps company: she cannot {doing} at {knots:.0f} knots, and waits "
+            f"for her to shorten sail or heave to.",
+            {"port": port.id, "errand": self.cutter_errand},
+        )
+
+    def _bear_away(self, port: Port, cutter: Any, now: int, unanswered: bool) -> str:
+        """The boat sent back to her station: her hail unanswered (the line said here),
+        or the pilot declined (the words returned, for the order's own line)."""
+        craft = port.pilot.craft
+        words = (
+            f"the {craft} bore away for {port.outer_road.name}; no pilot will come off "
+            f"from {port.name} for six hours"
+        )
+        if unanswered:
+            self._record(
+                Severity.NOTABLE,
+                "port.pilot_gone",
+                f"The {craft} bore away for {port.outer_road.name}, her hail unanswered; no "
+                f"pilot will come off from {port.name} for six hours.",
+                {"port": port.id, "unanswered": True},
+            )
+        cutter.plan = [("home", port.outer_road.position)]
+        cutter.alongside = False
+        self.cutter_errand = None
+        self.declined_until[port.id] = now + int(PILOT_AGAIN_H * 3600)
+        self._hail_reset()
+        return words
+
+    def _boat_in_sight(self, cutter: Any) -> bool:
+        lookout = getattr(self.world, "lookout", None)
+        sightings = getattr(lookout, "sightings", None) or []
+        if any(s.feature.id == f"sail:{cutter.id}" for s in sightings):
+            return True
+        _, dist = bearing_and_distance(self.world.position, cutter.position)
+        return dist <= PILOT_HAIL_WITHIN_M
+
+    def answer_pilot(self, verb: str) -> tuple[str, dict[str, Any], str]:
+        """`take the pilot`, `decline the pilot`, `hail the pilot` (package 37h): the
+        answer to the boat's hail, or the ship's own hail to a boat in sight. Returns the
+        line, its data, and the manoeuvre the hail asked that the order is to carry out
+        ("shorten sail", "heave to" or nothing, when she is still too fast for him);
+        refused in words when there is no boat to answer."""
+        from freesail.orders.errors import OrderError
+
+        world = self.world
+        if self.pilot is not None:
+            port = self.ports.get(self.pilot_port or "")
+            where = f" of {port.name}" if port is not None else ""
+            raise OrderError(
+                f"The pilot, {self.pilot.name}{where}, is aboard already; he is put off at "
+                "the anchor, or outward a mile beyond the outer road."
+            )
+        cutter = self._cutter()
+        if cutter is None or self.cutter_errand != "bring":
+            why = "no pilot's boat is in sight"
+            found = self.nearest()
+            if found is not None:
+                port, _ = found
+                until = self.declined_until.get(port.id, 0)
+                if until > world.clock.tick:
+                    when = world.clock.ship_time + timedelta(seconds=until - world.clock.tick)
+                    why += (
+                        f"; the {port.name} {port.pilot.craft} bore away, and none comes off "
+                        f"before {units.time_stamp(when)}"
+                    )
+            raise OrderError(
+                f"There is no pilot to {verb.split()[0]}: {why}. A pilot comes off by day "
+                "to a ship under way in his port's ground, and hails her."
+            )
+        port = self.ports[self.cutter_port or ""]
+        craft = port.pilot.craft
+        if verb == "hail the pilot" and not self._boat_in_sight(cutter):
+            raise OrderError(
+                f"The {port.name} {craft} is not in sight yet to hail; she is standing out "
+                "toward her, and hails when she is within four cables."
+            )
+        if verb == "decline the pilot":
+            gone = self._bear_away(port, cutter, world.clock.tick, unanswered=False)
+            text = f"Waved off the pilot: we need no pilot for {port.name}; {gone}."
+            return text, {"port": port.id, "answer": "decline"}, ""
+        self.hail_answer = "take"
+        if not self.cutter_hailed:
+            # the ship hails first, or answers before the boat's hail: she closes now
+            self.cutter_hailed = True
+            self.hail_count = max(1, self.hail_count)
+            self.hail_tick = world.clock.tick
+        cutter.plan = [("company", PILOT_COMPANY_M)]
+        wants = ""
+        if not world.at_anchor and self._ground_speed_kn() > PILOT_BOARDS_UNDER_KN:
+            wants = self.hail_wants or "shorten sail"
+        already = wants and self._in_hand(wants)
+        head = (
+            f"Hailed the {craft}: we will take the pilot for {port.name}"
+            if verb == "hail the pilot"
+            else f"Answered the {craft}: we will take the pilot for {port.name}"
+        )
+        if already:
+            # the captain has the sail coming in, or her hove to, already: not twice
+            doing = "the sail is coming in" if wants == "shorten sail" else "she is heaving to"
+            text = head + f"; {doing} already, as she asks."
+            return text, {"port": port.id, "answer": "take", "wants": wants}, ""
+        text = head + (f"; {wants}, as she asks." if wants else ".")
+        return text, {"port": port.id, "answer": "take", "wants": wants}, wants
+
+    def _in_hand(self, wants: str) -> bool:
+        """Whether what the hail asks is in hand already: sail being taken in, reefed or
+        furled for "shorten sail", the heave-to for "heave to" (the book or the captain
+        gave it before the answer)."""
+        extra = getattr(self.world.ship, "extra", None) or {}
+        runner = extra.get("evolutions") if isinstance(extra, dict) else None
+        work = runner.work() if runner is not None and hasattr(runner, "work") else []
+        ids = [str(getattr(getattr(i, "evo", None), "id", "")) for i in work]
+        if wants == "heave to":
+            return "heave_to" in ids
+        return any(i.startswith(("take_in", "reef", "furl")) for i in ids)
+
+    def waiting_words(self) -> str | None:
+        """What the pilot's boat is doing, for the readings when no pilot is aboard."""
+        cutter = self._cutter()
+        if cutter is None or self.cutter_errand != "bring":
+            return None
+        port = self.ports.get(self.cutter_port or "")
+        if port is None:
+            return None
+        craft = f"the {port.name} {port.pilot.craft}"
+        if not self.cutter_hailed:
+            return f"no pilot aboard; {craft} is standing out toward her"
+        if self.hail_answer == "take":
+            return f"no pilot aboard; {craft} keeps company to put him aboard"
+        return (
+            f"no pilot aboard; {craft} has hailed and waits for an answer ('take the "
+            "pilot' or 'decline the pilot')"
+        )
+
+    # -- aboard, and leaving ---------------------------------------------------------------
 
     def _pilot_boards(self, port: Port, cutter: Any, now: int) -> None:
         world = self.world
@@ -800,6 +1150,7 @@ class Ports:
             cutter.alongside = False
             self.cutter_errand = None
             self.declined_until[port.id] = now + int(PILOT_AGAIN_H * 3600)
+            self._hail_reset()
             return
         stream = world.rng.stream("people")
         surname = stream.choice(list(port.pilot.names))
@@ -816,10 +1167,18 @@ class Ports:
         self.pilot = pilot
         self.pilot_port = port.id
         self.pilot_since = now
+        self.pilot_boat_asked = False
+        self.warned = ()
+        self.shoal_warned_tick = None
+        self.thick_said = False
         self._last_distance_nm.pop(port.id, None)
+        # outward bound from the port she last lay in, else inward (package 37h: he
+        # pilots her and does not con her; "took charge of her" was the one phrase
+        # package 35 gave him, and he took charge of nothing)
+        self.pilot_inward = self.lay_in != port.id
         head = (
             f"The pilot, {pilot.name} of {port.name}, came aboard from the {port.pilot.craft} "
-            f"and took charge of her"
+            f"to pilot her {'in' if self.pilot_inward else 'out'}"
         )
         if stance == "neutral":
             head += f" ({nation.adjective} colours being no bar at {port.name})"
@@ -827,7 +1186,12 @@ class Ports:
             Severity.NOTABLE,
             "port.pilot_aboard",
             head + ".",
-            {"port": port.id, "pilot": pilot.to_dict(), "stance": stance},
+            {
+                "port": port.id,
+                "pilot": pilot.to_dict(),
+                "stance": stance,
+                "inward": self.pilot_inward,
+            },
         )
         self._record(
             Severity.NOTABLE,
@@ -848,6 +1212,28 @@ class Ports:
         cutter.plan = [("lie_to", PILOT_LIES_TO_S), ("home", port.shore.position)]
         cutter.alongside = False
         self.cutter_errand = None
+        self._hail_reset()
+
+    def _put_off_at_anchor(self, port: Port, now: int) -> None:
+        """At anchor in his port's anchorage or mooring, brought up, his charge is done:
+        he asks for his boat once, and it comes off for him from the quay (package 37h;
+        the Brest pilot of the review's game 1 never left and was never paid). Anchored
+        in the outer road he stays: she waits there for the tide or the wind to go in."""
+        if self.pilot_boat_asked or self._ground_speed_kn() > 0.5:
+            return
+        pos = self.world.position
+        spot, d_nm = port.nearest_spot(pos)
+        if spot is port.outer_road or d_nm > IN_PORT_NM:
+            return
+        self.pilot_boat_asked = True
+        self._record(
+            Severity.NOTABLE,
+            "port.pilot_boat",
+            f"The pilot asks for his {port.pilot.craft}: she is brought up in {spot.name}, "
+            f"and his charge is done.",
+            {"port": port.id, "spot": spot.name},
+        )
+        self._launch_cutter(port, "fetch", start=port.shore.position)
 
     def _pilot_leaves(self, port: Port, cutter: Any, now: int) -> None:
         world = self.world
@@ -866,26 +1252,145 @@ class Ports:
                     f"being empty"
                 )
         world.people.remove(pilot)
+        if world.at_anchor:
+            spot, _ = port.nearest_spot(world.position)
+            where = f"at the anchor in {spot.name}"
+        else:
+            where = f"clear of {port.outer_road.name}"
         self._record(
             Severity.NOTABLE,
             "port.pilot_left",
-            f"{pilot.name} left her in the {port.pilot.craft}, clear of "
-            f"{port.outer_road.name}{paid}.",
+            f"{pilot.name} left her in the {port.pilot.craft}, {where}{paid}.",
             {"port": port.id, "pilot": pilot.to_dict(), "fee_pounds": fee},
         )
         self.pilot = None
         self.pilot_port = None
         self.pilot_since = None
+        self.pilot_boat_asked = False
+        self.warned = ()
         self.declined_until[port.id] = now + int(PILOT_AGAIN_H * 3600)
         cutter.plan = [("home", port.shore.position)]
         cutter.alongside = False
         self.cutter_errand = None
+        self._hail_reset()
+
+    # -- his warnings (package 37h) ----------------------------------------------------------
+
+    def _warn(self, port: Port, now: int) -> None:
+        """The pilot aboard, under way within his port's ground: a charted danger ahead
+        on her true track with too little water over it, by name and once, or the water
+        shoaling ahead to less than a fathom under her keel, at most once in ten minutes;
+        each an urgent line saying on which hand the deeper water lies. In thick weather
+        he says once that he cannot see his marks, and warns by the lead and the time run
+        (nearer, and without the bearing). From the true chart and the tide's height now
+        (he knows his water); never put into a reading."""
+        from freesail.world.chart import fathoms_words
+
+        world = self.world
+        chart = getattr(world, "chart", None)
+        pos = world.position
+        if chart is None or pos is None or world.at_anchor:
+            return
+        _, d_nm = port.nearest_spot(pos)
+        if d_nm > port.pilot.cruising_nm:
+            return
+        conditions = getattr(world, "conditions", None)
+        visibility = getattr(conditions, "visibility_nm", None) if conditions else None
+        thick = visibility is not None and float(visibility) < PILOT_THICK_NM
+        if thick and not self.thick_said:
+            self.thick_said = True
+            self._record(
+                Severity.NOTABLE,
+                "port.pilot_thick",
+                "The pilot cannot see his marks in this weather; he will warn by the lead "
+                "and the time run, and asks for the lead kept going and the anchor ready.",
+                {"port": port.id},
+            )
+        elif not thick:
+            self.thick_said = False
+        east, north = self._ground_velocity()
+        speed = math.hypot(east, north)
+        if speed < units.knots_to_ms(0.5):
+            return
+        track = math.degrees(math.atan2(east, north)) % 360.0
+        ahead = max(
+            PILOT_WARN_MIN_M, speed * (PILOT_THICK_AHEAD_S if thick else PILOT_WARN_AHEAD_S)
+        )
+        tide = float(getattr(world, "tide_height_m", 0.0) or 0.0)
+        hull = getattr(world.ship, "hull", None)
+        draught = float(hull.spec.draught_m) if hull is not None else 0.0
+        wants = draught + PILOT_UNDER_KEEL_M
+        lead = "The pilot, by the lead and the time run" if thick else "The pilot warns"
+        for f, along, _off, side in chart.dangers_ahead(
+            pos, track, ahead, PILOT_WARN_ABEAM_M, tide, wants
+        ):
+            if f.id in self.warned:
+                continue
+            self.warned = (*self.warned, f.id)
+            deeper = "larboard" if side > 0 else "starboard"
+            where = f"{distance_words(max(along, units.CABLE))} ahead"
+            if not thick:
+                from freesail.world.lookout import relative_words
+
+                dyn = getattr(world.ship, "dyn", None)
+                heading = float(dyn.heading) if dyn is not None else math.radians(track)
+                brg, _ = bearing_and_distance(pos, f.position)
+                where += ", " + relative_words(units.wrap_pi(math.radians(brg) - heading))
+            self._record(
+                Severity.URGENT,
+                "port.pilot_warns",
+                f"{lead}: {f.name} {where}; the deeper water is to {deeper}.",
+                {"port": port.id, "danger": f.id, "deeper": deeper, "thick": thick},
+            )
+            return
+        if self.shoal_warned_tick is not None and now - self.shoal_warned_tick < PILOT_WARN_AGAIN_S:
+            return
+        shoal = chart.shoal_ahead(pos, track, ahead, wants, tide)
+        if shoal is None:
+            return
+        along, depth, side = shoal
+        self.shoal_warned_tick = now
+        water = depth + tide
+        what = "the shore" if water <= 0.0 else f"shoal water, {fathoms_words(water)},"
+        deeper = {1: "starboard", -1: "larboard"}.get(side)
+        hand = f"the deeper water is to {deeper}" if deeper else "the deeper water is astern"
+        self._record(
+            Severity.URGENT,
+            "port.pilot_warns",
+            f"{lead}: {what} {distance_words(along)} ahead; {hand}.",
+            {"port": port.id, "danger": "", "deeper": deeper or "astern", "thick": thick},
+        )
 
     # -- the pilot's words -----------------------------------------------------------------
 
+    def _stream_turn(self, port: Port, now_ut: datetime, flood: bool) -> datetime | None:
+        """The next turn of the stream at the port's outer road to the flood (or the
+        ebb), Universal Time; None while it is running that way now (package 37h: the
+        pilot's "flood" is the world's own stream in his road, where package 35 said it
+        from his high water less six hours and twelve minutes, three hours before the
+        game's own turn off Plymouth). Found by ten minutes over a tide and to the minute
+        about the turn."""
+        tide = self.world.tide
+        where = port.outer_road.position
+        if tide.at(where, now_ut).flood == flood:
+            return None
+        step = timedelta(minutes=10)
+        t = now_ut
+        for _ in range(int(13 * 6)):
+            nxt = t + step
+            if tide.at(where, nxt).flood == flood:
+                for m in range(1, 11):
+                    when = t + timedelta(minutes=m)
+                    if tide.at(where, when).flood == flood:
+                        return when
+                return nxt
+            t = nxt
+        return None
+
     def _tide_words(self, port: Port) -> str:
         """When the tide serves, in the pilot's words: the port's own high water, which
-        he knows (the world's tide at the roads, said to the quarter hour)."""
+        he knows (the world's tide at the roads, said to the quarter hour), and the turn of
+        the stream in his road to the flood or the ebb he goes in on (package 37h)."""
         world = self.world
         tide = getattr(world, "tide", None)
         if tide is None:
@@ -904,20 +1409,18 @@ class Ports:
             else timedelta()
         )
         hw = hw_ut + offset
-        low = hw - timedelta(hours=6, minutes=12)
         enter_on = str(port.tide.get("enter_on", "flood"))
-        now = world.clock.ship_time
         when = time_words(hw.hour + hw.minute / 60.0)
         rise = units.m_to_feet(height)
-        if enter_on == "flood":
-            if low <= now < hw:
-                serves = "the flood is making now and serves"
-            else:
-                serves = (
-                    f"the flood will serve from about {time_words(low.hour + low.minute / 60.0)}"
-                )
+        turn = self._stream_turn(port, now_ut, enter_on == "flood")
+        if turn is None:
+            serves = f"the {enter_on} is making now and serves"
         else:
-            serves = f"the ebb will serve from about {when}"
+            local = turn + offset
+            serves = (
+                f"the {enter_on} will serve from about "
+                f"{time_words(local.hour + local.minute / 60.0)}"
+            )
         return (
             f"high water at {port.name} about {when}, the tide rising some {rise:.0f} feet; "
             f"{serves}"
@@ -1007,10 +1510,18 @@ class Ports:
             bits.append(f"the pilot {self.pilot.name} aboard")
         cutter = self._cutter()
         if cutter is not None:
-            bits.append(
-                f"the pilot {port.pilot.craft} "
-                + ("alongside" if cutter.alongside else "standing out toward her")
-            )
+            if cutter.alongside:
+                doing = "alongside"
+            elif cutter.plan and cutter.plan[0][0] == "company":
+                # package 37h: hailed, she keeps company
+                doing = "keeping company"
+                if self.cutter_errand == "bring" and self.hail_answer != "take":
+                    doing += ", her hail unanswered"
+            elif self.cutter_errand in ("bring", "fetch"):
+                doing = "standing out toward her"
+            else:
+                doing = "going back"
+            bits.append(f"the pilot {port.pilot.craft} {doing}")
         bits.append(self.boat.words())
         return {
             "words": "; ".join(bits),

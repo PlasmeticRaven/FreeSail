@@ -46,10 +46,13 @@ pilot:
   fee_pounds: 6                   # from memory; unverified
   cast: larboard                  # the head paying off to the westward from the Sound, to clear the Shagstone and the Mewstone (judgement)
   course_out_deg: 200             # S by W out of the Sound by the western channel, past the Panther, to Cawsand Bay and the sea
+  # Package 37h (the review of gate 5c, G10; the audit's line 52): White's anchorage is
+  # given within his triangle without "where the breakwater now is", which was begun in
+  # 1812 and is not in the pilot's mouth in 1805 (the chart has the Sound without it).
   words:
     channel: "Coming from the west, round Rame Head and Penlee a third of a mile off until Tor House appears midway between Redding Point and the barrack chimneys on Drake's Island; that leads through Cawsand Bay clear of the Dragstone and the Knap. The eastern channel has three rocky patches of eighteen and twenty-four feet in its fair way, and while the Bolt Head is in sight south of the Mewstone you are without all the shoals."
     marks: "Maker tower, the church on the high ground of Mount Edgcumbe, is the leading mark for the Sound; the Mewstone in one with it clears the shoals of the eastern side. The Citadel on the Hoe stands over the Sound's head, and the tower on Mount Batten at the Catwater's mouth."
-    anchorage: "The best anchorage in the Sound lies within Penlee Point on the west end of where the breakwater now is, Cawsand town on the same, and the Round Tower on Mount Batten: thirty-six feet in its southern part at low water springs, open to the southerly swell. The fleets lie in Cawsand Bay with off-shore winds; the King's ships moor in the Hamoaze above Devil's Point, where the yard is."
+    anchorage: "The best anchorage in the Sound lies within Penlee Point, Cawsand town and the Round Tower on Mount Batten: thirty-six feet in its southern part at low water springs, open to the southerly swell. The fleets lie in Cawsand Bay with off-shore winds; the King's ships moor in the Hamoaze above Devil's Point, where the yard is."
     tide: "The flood runs up the Hamoaze from low water to high and the ebb runs out three knots at springs off Devil's Point; take the Hamoaze on the flood and leave it on the first of the ebb. In the Sound the stream is weak."
 
 tide:

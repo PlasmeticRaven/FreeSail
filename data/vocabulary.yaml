@@ -815,6 +815,24 @@ verbs:
     synonyms: [enter hands, recruit, ship hands, enter men, raise men, enter seamen]
     object: port
     level: 1
+  # Package 37h: the pilot's hail answered (the owner's ruling of 5 October 2026, decision
+  # 35: "an order accepts or declines the pilotage when the pilot first hails, with a
+  # simple form of hailing"). The port's business, so kept back from a general grant.
+  take the pilot:
+    synonyms: [we will take the pilot, we'll take the pilot, take him aboard, take the pilot aboard,
+               take a pilot, take the pilot on board, accept the pilot, we will take him]
+    object: port
+    level: 1
+  decline the pilot:
+    synonyms: [we need no pilot, we want no pilot, wave him off, wave the pilot off, wave off the pilot,
+               decline a pilot, send the pilot back, no pilot thank you]
+    object: port
+    level: 1
+  hail the pilot:
+    synonyms: [hail the pilot boat, hail the pilot's boat, hail the pilot cutter, hail the pilot's cutter,
+               hail the pilot gig, hail the pilot's gig, hail for a pilot, hail the pilots]
+    object: port
+    level: 1
   # Group evolutions: verb phrases with no object, expanded from the list below.
   set plain sail:
     synonyms: [make plain sail, make sail]

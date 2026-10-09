@@ -1313,6 +1313,77 @@ class Chart:
         out.sort(key=lambda t: t[1])
         return out
 
+    def dangers_ahead(
+        self,
+        pos: Position,
+        toward_deg: float,
+        distance_m: float,
+        abeam_m: float,
+        tide_m: float = 0.0,
+        wants_m: float = 0.0,
+    ) -> list[tuple[Feature, float, float, int]]:
+        """The charted dangers ahead of her on a track (package 37h: the pilot's warning,
+        from the true chart he carries in his head; never a reading): those the straight
+        line from `pos` toward `toward_deg` for `distance_m` passes within `abeam_m` of
+        (and the danger's own extent) with less water over them at `tide_m` than
+        `wants_m` (a rock by its head, `Feature.head_above_datum_m`; a shoal by the depth
+        its pilot gives, and none when he gives none). Each with its distance along the
+        track, its distance off it, and its side (+1 starboard, -1 larboard), the nearest
+        along first."""
+        if distance_m <= 0.0:
+            return []
+        end = destination(pos, toward_deg, distance_m)
+        ux, uy = math.sin(math.radians(toward_deg)), math.cos(math.radians(toward_deg))
+        out = []
+        for f, off, _ in self.line_passes(pos, end, abeam_m):
+            head = f.head_above_datum_m()
+            if head is not None:
+                water = tide_m - head
+            elif f.depth_fathoms is not None:
+                water = units.fathoms_to_m(float(f.depth_fathoms)) + tide_m
+            else:
+                continue
+            if water >= wants_m:
+                continue
+            fx, fy = pos.offset_to(f.position)
+            along = fx * ux + fy * uy
+            side = 1 if fx * uy - fy * ux > 0.0 else -1
+            out.append((f, along, off, side))
+        out.sort(key=lambda t: (t[1], t[0].id))
+        return out
+
+    def shoal_ahead(
+        self,
+        pos: Position,
+        toward_deg: float,
+        distance_m: float,
+        wants_m: float,
+        tide_m: float = 0.0,
+        step_m: float = units.CABLE,
+        side_m: float = 2.0 * units.CABLE,
+    ) -> tuple[float, float, int] | None:
+        """Where the water shoals ahead of her on a track (package 37h: the pilot's
+        warning of the depth, from the true chart): the first point a `step_m` apart along
+        the line toward `toward_deg` for `distance_m` where the chart's depth with the
+        tide's `tide_m` over it is less than `wants_m`, as (the distance along, the depth
+        at the datum there, the side the deeper water lies: +1 starboard, -1 larboard, 0
+        neither, by the depth `side_m` either side of it); None when it does not shoal."""
+        steps = int(distance_m // step_m)
+        for k in range(1, steps + 1):
+            p = destination(pos, toward_deg, k * step_m)
+            d = self.depth_at(p)
+            if d is None or d + tide_m >= wants_m:
+                continue
+            starboard = self.depth_at(destination(p, toward_deg + 90.0, side_m))
+            larboard = self.depth_at(destination(p, toward_deg - 90.0, side_m))
+            s = -math.inf if starboard is None else float(starboard)
+            lb = -math.inf if larboard is None else float(larboard)
+            side = 0
+            if max(s, lb) > d:
+                side = 1 if s > lb else -1 if lb > s else 0
+            return k * step_m, float(d), side
+        return None
+
     def line_shore(
         self,
         a: Position,

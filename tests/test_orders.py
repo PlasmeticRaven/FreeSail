@@ -2738,7 +2738,8 @@ def test_the_phrasings_of_g17_on_a_ship(which: str, text: str, expect: ok | no):
 @pytest.mark.parametrize(
     "said,hint",
     [
-        ("hail the pilot", None),
+        # `hail the pilot` is an order since package 37h, merged after this test was
+        # written: its wrong hint ("did you mean 'haul'?") is gone with it
         ("man the boats", None),
         ("as you like it", None),
         ("mr pearce make sail", None),

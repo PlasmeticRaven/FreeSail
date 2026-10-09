@@ -2271,6 +2271,7 @@ def test_a_stand_by_with_the_deck_is_broken_by_danger_refused_what_cannot_end_an
         "a spar or a line straining",
         "an evolution failed",
         "the ship taken aback",
+        "the pilot's warning",  # package 37h
     }
     assert R.speaks_of_danger("weather.change", {"weather": "rain"}) is None
     assert R.speaks_of_danger("strain.warning", {}) == "a spar or a line straining"
@@ -3005,11 +3006,14 @@ def test_the_general_grant_opens_the_ships_working_and_keeps_back_what_it_keeps(
             "is kept back from it"
         ),
         "buy seven tons of tin": (
-            "the port's business (buying and selling, the purse, stores and provisions, the "
-            "boat's errands ashore) is kept back from it"
+            "the port's business (taking or declining a pilot, buying and selling, the purse, "
+            "stores and provisions, the boat's errands ashore) is kept back from it"
         ),
-        "send the boat ashore with the purser": "the port's business (buying and selling",
-        "take in twenty tons of water": "the port's business (buying and selling",
+        "send the boat ashore with the purser": "the port's business (taking or declining",
+        "take in twenty tons of water": "the port's business (taking or declining",
+        # package 37h: the pilot taken or declined at his hail is the port's business
+        "take the pilot": "the port's business (taking or declining a pilot",
+        "decline the pilot": "the port's business (taking or declining a pilot",
         "set the reckoning to 49 52 N 6 10 W": (
             "the reckoning set by hand overrules the master and is kept back from it"
         ),

@@ -806,7 +806,9 @@
     anchorage: "anchor", road: "anchor",
     bottom: "none", transit: "none"
   };
-  var NAMED = { headland: 1, island: 1, town: 1, place: 1, light: 1, castle: 1, rock: 1, ledge: 1, bank: 1, shoal: 1, anchorage: 1, road: 1, hill: 1 };
+  // a drying rock or ledge named as the rest (package 37h: the Woolpack, the Spanish and
+  // the Bartholomew the St Mary's pilot names were "unnamed but marked", the review's G10)
+  var NAMED = { headland: 1, island: 1, town: 1, place: 1, light: 1, castle: 1, rock: 1, ledge: 1, drying: 1, bank: 1, shoal: 1, anchorage: 1, road: 1, hill: 1 };
 
   function lit(feature, year) {
     if (!feature.lit) return true;

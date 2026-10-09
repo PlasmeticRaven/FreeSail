@@ -364,7 +364,9 @@ _GENERAL = (
 
 # What a general grant keeps back, each with the refusal's reason (the owner's approved
 # list: the port's business, the captain's book, a new destination, what cannot be undone;
-# the reckoning set by hand). The captain's book is `tools._book_check`'s; a new
+# the reckoning set by hand). The pilot taken or declined at his hail is the port's
+# business (package 37h; the review of gate 5c, G11), by the vocabulary's object `port`.
+# The captain's book is `tools._book_check`'s; a new
 # destination and the vocabulary's `irrevocable` orders are `tools.authority_check`'s.
 # The chase is in the list the owner approved, under "when Milestone 7 comes" (the review
 # of gate 5c's playtests, section 9, question 4): a new object for the voyage, as a new
@@ -375,8 +377,8 @@ _GENERAL = (
 _KEPT_BACK: tuple[tuple[str, str], ...] = (
     (
         "object:port",
-        "the port's business (buying and selling, the purse, stores and provisions, the "
-        "boat's errands ashore) is kept back from it",
+        "the port's business (taking or declining a pilot, buying and selling, the purse, "
+        "stores and provisions, the boat's errands ashore) is kept back from it",
     ),
     (
         "set the reckoning to",
