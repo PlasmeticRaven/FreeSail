@@ -2319,6 +2319,22 @@ package 35's sailed at her own polar; the closing pace was made the better of th
 and the third run is the one pinned. The cruise three times, the second needlessly (the
 same code as the first for her).
 
+### The suite, as run (package 37h)
+
+On a machine shared with four other packages' suites (load 14 to 30 on four cores), at
+`-n 4`: the fast tier 2,751 tests, 2,747 passed and 4 failed. Two were tests already
+mended in this package's tree while the run was under way (the officer's list of the
+lines that speak of danger, the gig of `test_ships.py`), and pass alone; two are timing
+floors: the chart's `coast_at` under two milliseconds (passes alone) and the merchant
+passage's pace at 500 ticks a second, which fails on the base commit too on this machine
+(455 and 494 there against 404 and 433 here, run side by side; the profile of two
+thousand ticks shows the same calls within a seventh of one per cent, so the difference is
+the load). The slow tests of the passages touched (`-k "schooner or merchant_passage or
+naval_cruise or truth_72 or passage_for_gate_5b or thick_weather or cutter_and_the_brig"`,
+seventeen): fifteen passed, the schooner's pilot among them, one expected failure of the
+schooner's hull (not this package's), and the pace floor. `tests/test_ports.py` and
+`tests/test_people.py` with the slow tier: 38 passed.
+
 ### Found on the way (package 37h)
 
 - **St Mary's Sound** (above): the features' positions, not the depths, part from the
