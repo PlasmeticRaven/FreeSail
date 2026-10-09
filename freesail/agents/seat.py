@@ -310,7 +310,8 @@ class PlayerSeat:
         st = self.station
         if a.released:
             return self.world.submit(text)
-        if not a.deck:
+        if not a.deck and not tools.own_reckoning_order(self.world, text):
+            # his own reckoning he keeps off watch as well (package 40b)
             why = (
                 f"The {st.name} has not the deck ({a.deck_lost or 'the captain has it'}); an "
                 f"order waits for 'you have the deck'. {text!r} not carried out."

@@ -62,7 +62,7 @@ from freesail.agents.seat import seat_player
 from freesail.api import queries
 from freesail.core import replay as replay_mod
 from freesail.core.events import Event, RollupView, Severity, Shown
-from freesail.core.world import Scenario, World
+from freesail.core.world import UNLOGGED_KINDS, Scenario, World
 from freesail.ship.stub import OrderError
 
 HELP = __doc__.split("Driver commands")[1] if __doc__ else ""
@@ -364,9 +364,13 @@ class Console:
             if seat is not None and not seat.agent.released:
                 # the player's seat at a station (package 40): the line is the owner's
                 # where it is his, the seat's otherwise, judged by its authority
-                seat.route(line)
+                e = seat.route(line)
             else:
-                self.world.submit(line)
+                e = self.world.submit(line)
+            if e is not None and e.kind in UNLOGGED_KINDS:
+                # an answer for the one who asked and not a line of the log (package 40b:
+                # the master's slate), printed here as a station reads it in its reply
+                self._print(e.line())
         return True
 
     @staticmethod

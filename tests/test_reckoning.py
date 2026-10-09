@@ -2232,6 +2232,206 @@ def test_the_brig_hove_to_six_hours_of_a_spring_ebb_in_the_iroise_keeps_an_hones
     assert 2.0 < doubt < 6.0  # and no wider than the stream and her drift can have set her
 
 
+# ---------------------------------------------------------------------------
+# Package 40b: the master's slate, and an officer's own reckoning (spec M6 §5)
+# ---------------------------------------------------------------------------
+
+
+def under_way(start: datetime = datetime(1805, 6, 12, 9, 30), seed: int = 7) -> World:
+    """The frigate under plain sail off the Lizard, standing ESE across the ebb on the
+    westerly, her account from a departure at the start."""
+    sc = Scenario(
+        start_time=start,
+        wind_from_deg=270.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=112.0,
+        ship_speed_kn=6.0,
+        position={"lat_deg": 49.75, "lon_deg": -5.45},
+        region=REGION,
+    )
+    w = make_world(seed, FRIGATE, sc)
+    w.submit("set plain sail")
+    w.submit("steer ESE")
+    w.run(600)
+    w.submit("trim sails")
+    return w
+
+
+def worked_from_the_slate(data: dict) -> Position:
+    """The slate's own figures worked by the traverse: from where it begins, each board's
+    run along its course with the tide and the drift, and each sight's move."""
+    start = data["from"]
+    de = dn = 0.0
+    boards = [x for x in data["entries"] if x["kind"] == "board"]
+    if data["in_hand"]:
+        boards.append(data["in_hand"])
+    for b in boards:
+        c = math.radians(b["course_deg"])
+        de += b["run_nm"] * math.sin(c) + b["tide"][0] + b["drift"][0]
+        dn += b["run_nm"] * math.cos(c) + b["tide"][1] + b["drift"][1]
+    for s in data["entries"]:
+        if s["kind"] == "sight":
+            de += s["moved"][0]
+            dn += s["moved"][1]
+    return K._displaced(Position(start["lat_deg"], start["lon_deg"]), de, dn)
+
+
+def test_the_slate_carries_the_boards_and_sights_since_the_last_fix_and_works_to_the_account():
+    """Spec M6 §5 (package 40b): `work my reckoning` gives the master's slate since the
+    last fix: where it begins and his doubt there, each board as he laid it down (the
+    course with his variation and leeway allowed, the hours, her way by the log, the
+    tide he allowed), the sights he worked in since, and the board in hand. Worked by its
+    own figures it comes to the account as the master has it now, to the rounding."""
+    w = under_way()
+    w.run(2 * 3600)
+    e = w.submit("work my reckoning")
+    assert e.kind == "query.slate"
+    assert e.text.startswith("The master's slate since the departure at 09:30: 49° 45' N, ")
+    assert 'his doubt then: "I would not trust the reckoning within a mile' in e.text
+    assert "by the log" in e.text and "the tide" in e.text
+    assert e.text.endswith("Work it, and give your own with 'my reckoning is <position>'.")
+    data = e.data
+    boards = [x for x in data["entries"] if x["kind"] == "board"]
+    assert len(boards) >= 2 and data["in_hand"] is not None
+    assert all(b["tide_by"] == "book" for b in boards if b["run_nm"] > 1.0)
+    assert miles_between(worked_from_the_slate(data), w.navigation.account_now()) < 0.02
+    # the noon's latitude goes on the slate as a sight (or begins it again, taken), and
+    # the slate still works to the account
+    w.run(3600)
+    e = w.submit("work my reckoning")
+    noon = [x for x in w.log if x.kind == "reckoning.noon"]
+    assert noon
+    if "Latitude by observation" in noon[0].text:
+        sights = [x["what"] for x in e.data["entries"] if x["kind"] == "sight"]
+        assert sights == ["the noon latitude"] or e.data["from"]["what"].startswith(
+            "the noon latitude, which laid the account down"
+        )
+    assert miles_between(worked_from_the_slate(e.data), w.navigation.account_now()) < 0.02
+
+
+def test_a_fix_or_the_reckoning_set_by_hand_begins_the_slate_again():
+    """The slate is wiped at a fix by cross bearings, whatever it did to the account, at
+    the reckoning set by hand, and at an observation that laid the account down."""
+    w = bay_world()
+    w.run(60)
+    fix = w.submit("take a fix")
+    assert fix.kind == "reckoning.fix", fix.text
+    e = w.submit("work my reckoning")
+    assert e.text.startswith("The master's slate since the fix by cross bearings (")
+    assert e.data["entries"] == []
+    w.submit("set the reckoning to 50 05 N 5 00 W")
+    e = w.submit("work my reckoning")
+    assert e.text.startswith(
+        "The master's slate since the reckoning set by the captain's order at 10:01: "
+        "50° 05' N, 5° 00' W by account then"
+    )
+    r = w.navigation.reckoning
+    r.slate_sight(w.clock.tick, "a bearing of the Lizard", r.position, K.TAKEN)
+    assert r.slate_from["what"] == "a bearing of the Lizard, which laid the account down"
+
+
+def test_work_my_reckoning_is_answered_never_logged_and_draws_nothing():
+    """The slate is a reading in the reply and not a line the whole log keeps, and it
+    draws nothing and changes nothing: a ship whose officer works his reckoning every
+    hour keeps the log, line for line and to the digest, of one whose officer does not."""
+    a, b = under_way(), under_way()
+    for _ in range(3):
+        n = len(a.log)
+        e = a.submit("work my reckoning")
+        assert e.kind == "query.slate" and len(a.log) == n
+        a.run(3600)
+        b.run(3600)
+    assert a.log.digest() == b.log.digest()
+    assert a.navigation.reckoning.position == b.navigation.reckoning.position
+
+
+def test_my_reckoning_is_kept_beside_the_masters_moves_nothing_and_is_said_after_noon():
+    """`my reckoning is <position>` keeps the station's own figure beside the master's and
+    moves nothing; at noon the line after the noon's says it, run on by the log-board,
+    beside the master's account before the sight, and it is carried on from that noon
+    figure until another is given (the lead's ruling: it does not lapse at noon). A
+    ship with none held has no such line, and every other line is the same."""
+    w = under_way(start=datetime(1805, 6, 12, 10, 30))
+    plain = under_way(start=datetime(1805, 6, 12, 10, 30))
+    w.run(3600)
+    plain.run(3600)
+    nav = w.navigation
+    account = nav.account_now()
+    mine = K._displaced(account, -1.5, 0.0)  # a mile and a half west of the master's
+    e = w.submit(f"my reckoning is {mine.lat_deg:.4f} N {-mine.lon_deg:.4f} W")
+    assert e.kind == "reckoning.own", e.text
+    assert e.text.startswith("Captain ") and "'s own reckoning: " in e.text
+    assert "a mile and a half W of the master's account, within what he would trust it" in (e.text)
+    assert e.text.endswith("kept beside the master's, it moves nothing, and is said at noon.")
+    assert nav.account_now() == account
+    assert w.readings["officers_reckoning"] is None  # it is the captain's own, here
+    w.run(3600)
+    plain.run(3600)
+    log = w.log.all()
+    noon = [i for i, x in enumerate(log) if x.kind == "reckoning.noon"]
+    assert len(noon) == 1
+    own = log[noon[0] + 1]
+    assert own.kind == K.OWN_NOON_KIND and own.severity is Severity.NOTABLE
+    assert own.text.startswith("The captain's own reckoning (Captain ")
+    assert "worked at 11:40 and run on by the log-board: " in own.text
+    assert own.data["from_master_nm"] == pytest.approx(1.5, abs=0.1)
+    assert own.data["within"] is True
+    if "Latitude by observation" in log[noon[0]].text:
+        assert "of the master's account before the sight" in own.text
+        assert "The latitude by observation lies " in own.text
+    # carried on past noon from his own noon figure (the lead's ruling: it does not lapse)
+    mine = nav.own["captain"]
+    assert (round(mine["lat_deg"], 5), round(mine["lon_deg"], 5)) == (
+        own.data["lat_deg"],
+        own.data["lon_deg"],
+    )
+    assert mine["noon_tick"] == own.tick and mine["tick"] == e.tick
+    assert w.submit("my reckoning is 49 40 N 5 0 W").kind == "reckoning.own"
+    assert nav.own["captain"]["lat_deg"] == pytest.approx(49 + 40 / 60)  # replaced
+    assert not [x for x in plain.log if x.kind == K.OWN_NOON_KIND]
+    ours = [
+        (x.kind, x.text)
+        for x in w.log
+        if x.kind not in (K.OWN_NOON_KIND, "reckoning.own") and "my reckoning is" not in x.text
+    ]
+    assert ours == [(x.kind, x.text) for x in plain.log]
+
+
+def test_a_book_gives_neither_order_and_a_position_must_be_one():
+    """A standing order may give neither: the dialect refuses them at entry, and a
+    firing that reached one would be refused in words. A position that is not one is
+    refused in the words of `set the reckoning to`."""
+    w = chart_world(49.8, -5.2)
+    for rule in (
+        'standing order "x": at noon then work my reckoning',
+        'standing order "y": every glass then my reckoning is 49 30 N 5 10 W',
+    ):
+        e = w.submit(rule)
+        assert e.kind == "order.rejected"
+        assert "a man's working from the slate, never a book's" in e.text
+    e = w.submit("work my reckoning", actor="standing order 'x'")
+    assert e.kind == "order.rejected" and "never a book's" in e.text
+    e = w.submit("my reckoning is nowhere")
+    assert e.kind == "order.rejected"
+    assert "'nowhere' is not a position; say 'my reckoning is 49 52 N 6 10 W'." in e.text
+    e = w.submit("work my reckoning at once")
+    assert e.kind == "order.rejected" and "takes nothing after it" in e.text
+
+
+def test_a_slate_from_before_the_package_begins_where_the_account_stands():
+    """A checkpoint written before package 40b holds a reckoning with no slate: it is
+    begun where the account stands when it is first asked for."""
+    w = chart_world(49.8, -5.2)
+    r = w.navigation.reckoning
+    r.slate = None
+    r.slate_from = None
+    e = w.submit("work my reckoning")
+    assert e.kind == "query.slate"
+    assert e.text.startswith("The master's slate since the account as it stood at 10:00: ")
+
+
 def test_a_reading_of_the_account_asked_mid_tick_changes_nothing_another_gets_after_it():
     """Package 37e, found on the naval cruise (2026-10-07): the account brought up to the
     moment is worked once and remembered, and the memory was kept by the tick alone, so

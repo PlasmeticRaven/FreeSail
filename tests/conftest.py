@@ -280,6 +280,9 @@ SLOW_TESTS: frozenset[str] = frozenset(
         # (the whole suite ran 2.2 times faster than in the two runs above).
         "test_known_truths.py::test_truth_60_the_chronometer_within_four_miles_and_a_lunar_shows_it_gaining",
         "test_known_truths.py::test_truth_61_the_lunar_is_refused_in_words_that_say_which_and_answers_within_a_degree",
+        # package 40b: two officers' noons, each fifty minutes of the frigate under sail
+        # (13 s under the build machine's load of the other packages' suites)
+        "test_known_truths.py::test_truth_80_an_officers_own_reckoning_from_the_slate_agrees_with_the_masters_at_noon",
         "test_longitude.py::test_a_bearing_steady_and_closing_is_hailed_for_a_danger_and_the_chart_edge_said",
         "test_longitude.py::test_the_chronometer_is_the_scenarios_and_keeps_greenwich_time_with_its_error",
         "test_longitude.py::test_the_lunar_occupies_the_master_and_two_mates_and_answers_an_hour_later",

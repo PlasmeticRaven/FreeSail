@@ -46,10 +46,11 @@ What the log will say is shown in plain code blocks, copied from a run with seed
 | 15 | [Other sail](15-other-sail.md) | The dozen other ships at far detail and what the lookout makes out of a sail as she nears: the hail, her rig, her colours or none, what she is; the strangers, the glass aloft and the chase; what a world order is and why the captain cannot give one; the two passages of the gate; the forms in a table. |
 | 16 | [The officer of the watch](16-the-officer-of-the-watch.md) | The first station with authority: who the officer is, how the captain gives and takes the deck, what the station may order and may not and why, the night orders and standing orders by rank, standing by with the deck, the handover note, what the harness watches for; the forms in a table. |
 | 17 | [The captain](17-the-captain.md) | The ship's company by name, with the wardroom's ranks, places and outlines and the stations bound to them; the rules-based captain who sails her when nobody is seated, in three layers (intent, plan and behaviour as books of a state) and by perception on the player's terms; the captain's station with the player's whole surface, the deck his by right and lent to his book when his door is silent; the owner's place and the player's seat at a lesser station; the forms in a table. |
+| 18 | [The lessons](18-lessons.md) | Worked passages, each a duty an officer must be able to do alone, sailed at seed 7 and quoted from the log: a landfall on one headland; his own reckoning from the master's slate, judged at noon; a pilotage by cross bearings and the allowance for a set; heaving to for a pilot; coming to an anchor in a tideway; a night standing off a lee shore; each with the rule of the period, the orders, what the log says when it goes right, and the usual mistake; the path to a command. |
 
 ## Where to start
 
-If you have run the gate M1 checklist, go straight to chapter 2, then 4 and 5; chapter 1 is for looking things up. If you have not, chapter 7 is the checklist rewritten as a passage: type it through once, then read chapters 2 to 5 to learn what you did.
+If you have run the gate M1 checklist, go straight to chapter 2, then 4 and 5; chapter 1 is for looking things up. If you have not, chapter 7 is the checklist rewritten as a passage: type it through once, then read chapters 2 to 5 to learn what you did. Before a first watch at the officer's station, yours at the console or a model's, read chapter 16 for the station and chapter 18 for its duties, and sail the lessons.
 
 ## Sources
 

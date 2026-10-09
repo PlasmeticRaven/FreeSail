@@ -567,6 +567,23 @@ verbs:
     synonyms: [set the reckoning at, correct the reckoning to, put the reckoning at]
     object: navigation
     level: 1
+  work my reckoning:
+    # An officer's own reckoning (package 40b; spec M6 §5): the master's slate since the
+    # last fix (the boards as he laid them down, the tide allowed, the sights worked in,
+    # the fix and its doubt), as lieutenants and the young gentlemen worked theirs from
+    # the same log-board. A reading in the station's reply, never a line of the log; the
+    # officer's own and the captain's, never a book's.
+    synonyms: [work up my reckoning, work my own reckoning, work up my own reckoning,
+               show me the slate, show me the master's slate]
+    object: navigation
+    level: 1
+  my reckoning is:
+    # The station's own reckoning given back, a position as `set the reckoning to` takes
+    # it: kept beside the master's, said after the noon's line, and moving nothing; the
+    # captain adopts it, if he will, with `set the reckoning to` (package 40b).
+    synonyms: [my own reckoning is, my reckoning puts her at, my reckoning puts her in]
+    object: navigation
+    level: 1
   allow:
     # `allow <n> knots of set to <direction>`: the captain's own set in the traverse, in
     # the place of the master's own tide until it is handed back (package 37e); `allow no

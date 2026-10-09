@@ -1,0 +1,57 @@
+# FreeSail: the primer's lesson of the officer's own reckoning (docs/primer/18-lessons.md;
+# package 40b; spec M6 §5).
+#
+# The frigate eleven miles south-south-west of the Lizard at half past nine in the
+# forenoon of 14 June 1805, standing east-south-east across the Channel's stream with the
+# westerly on her quarter, her account from a departure at the start. The officer of the
+# watch (the player seated at his station, or a model there) asks for the master's slate
+# before noon, works his own reckoning from it and gives it; at noon the log says his
+# beside the master's, and the sun judges both.
+#     py -m freesail.ui.console --scenario data/scenarios/lesson-reckoning.yaml --seat officer
+# The chapter's run, measured once at seed 7, and the orders with their times, are in
+# docs/dev/TuningNotes.md under package 40b (`tools/lesson_run.py --seat officer` runs it
+# again).
+#
+# The day's weather is pinned: a westerly of twelve knots and a clear sky over the old
+# high, so that the sun is seen at noon.
+
+name: The officer's own reckoning, off the Lizard
+seed: 7
+start: 1805-06-14T09:30
+position: 49 47 N 5 22 W
+region: channel-west
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 112
+  speed_kn: 6
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+papers:
+  chart: {year: 1804}
+  epitome: norie
+  almanac: 1805
+
+ports: [falmouth, plymouth, brest]
+
+weather:
+  wind:
+    - {at: 1805-06-14T00:00, from_deg: 270, knots: 12, air_mass: neutral}
+  background:
+    {hpa: 1018, gradient_hpa_per_100km: 0.4, high_toward_deg: 200}
+  systems:
+    - name: the old high over Biscay
+      kind: high
+      radius_km: 900
+      track:
+        - {at: 1805-06-13T12:00, x_km: 300, y_km: -500, hpa: 1024}
+        - {at: 1805-06-15T12:00, x_km: 500, y_km: -600, hpa: 1022}
+  sky: {sky: clear, weather: fine, visibility: the horizon}
+  sea: true
+
+orders:
+  - set plain sail
+  - steer ESE

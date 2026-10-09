@@ -440,6 +440,11 @@ OFFICER_DOMAIN = Domain(
             # the reckoning set stay the master's for the captain
             "take a bearing of",
             "take a fix",
+            # his own reckoning, from the master's slate, kept beside the master's and
+            # moving nothing (package 40b; spec M6 §5): the lieutenants' and the young
+            # gentlemen's own working, with the deck or off watch
+            "work my reckoning",
+            "my reckoning is",
             # sail handling said of the ship whole (object none)
             "send down the topgallant masts",
             "sway up the topgallant masts",
@@ -838,7 +843,11 @@ OFFICER_BRIEF = (
     "crosses his the captain's stands and the log says yours was countermanded. Look "
     "before you order: among the readings, work_in_hand says what is doing and what waits "
     "for hands, and nearest_land where the shore lies. The library's primer 16 is "
-    "this station's chapter.\n\n"
+    "this station's chapter. Primer 18 is the lessons, each a duty an officer must be "
+    "able to do alone (a landfall on one headland, a pilotage by cross bearings, a night "
+    "off a lee shore) and the path to a command, among them your own reckoning, which "
+    "you keep with the deck or off watch: 'work my reckoning' gives you the master's "
+    "slate, and 'my reckoning is <position>' gives him yours.\n\n"
     "When you stand by with the deck, say until what event or bell, or for a glass at "
     "most: the standing orders hold the deck meanwhile; an urgent line wakes you at once, "
     "and so does a notable line that speaks of danger (an anchor dragging, fog coming "
@@ -961,7 +970,10 @@ CAPTAIN_BRIEF = (
     "shaped (the master says what the line passes), the pilot's words, the tide by the "
     "almanac, the people and where they are. The library's primer 17 is this station's "
     "chapter, and primer 16 says what an officer under you may do and what wants your "
-    "word.\n\n"
+    "word. Primer 18 is the lessons, the duties an officer must do alone before he is "
+    "given a command, with the officer's own reckoning among them: 'the officer's "
+    "reckoning' reads his beside the master's, and 'set the reckoning to' adopts it if "
+    "you will.\n\n"
     "The officer of the watch, where a model or the player holds that station, is yours "
     "to give the deck to ('you have the deck'), to take it from ('I have the deck'), and "
     "to allow by name ('you may tack ship if the land closes within two miles') or by "
