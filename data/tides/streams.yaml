@@ -79,7 +79,9 @@
 # package 34's and 37e's, unmoved; the open Channel's bounds hold every position of the
 # Channel's region with a margin, so no recorded passage reads anything new.
 
-book_limits: {south: 48.0, north: 51.0, west: -7.0, east: -3.0}
+# Package 39a: the limits reach east to 1 W with the Channel east's chart (channel-mid),
+# whose areas follow the Iroise's below; west of 3 W nothing is read differently.
+book_limits: {south: 48.0, north: 51.0, west: -7.0, east: -1.0}
 
 areas:
   - id: carrick-road
@@ -274,6 +276,120 @@ areas:
       strongest_h: -2.5
       judgement: [set, rates, hour]
       source: "JUDGEMENT throughout: the world's figures, themselves judgement, rounded"
+  # The Channel east (package 39a; chart channel-mid): the Race of Alderney, the Swinge,
+  # the Little and Great Russels, the Déroute between the islands and the Cotentin, and
+  # Portland Race, each a polygon in water east of 3 W that no Channel west position
+  # reaches. The period's own figures: White 1835's survey of the islands (pp. 109, 130 to
+  # 134, 161 to 163: in the Race, the Swinge and the Casquet channel the south-western
+  # stream begins at half-ebb exactly and runs six hours to half-flood, the north-eastern
+  # the other six, so the north-eastern is strongest at high water; the Race at springs
+  # above 7 1/2 miles an hour north-eastward and 6 1/2 south-westward, neaps not above
+  # 5 1/2; the Swinge 7 1/2 and 6 1/2; the Russels' streams straight through both ways,
+  # five hours and a half each way); Faden 1793 (p. 32: the flood never begins to run in
+  # the Little or the Great Russel till the sea is at half its height, nor the ebb till it
+  # is half fallen; p. 29: the Race two leagues an hour at springs); Imray 1874 (p. 59:
+  # Portland's spring tides run 5 or 6 knots); Bowditch 1802's headland table as the
+  # study quotes it (Portland: the current runs three hours after high water). White's
+  # directions of the streams are by compass (the variation of his survey about 24 W,
+  # from memory, unverified): the axes below are his points less the variation, rounded,
+  # JUDGEMENT. Where no period source gives a rate (the Russels, the Déroute) the rate is
+  # JUDGEMENT, marked so, and the neaps half the springs.
+  - id: alderney-race
+    chart: channel-mid
+    name: the Race of Alderney
+    polygon: [[49.62, -2.16], [49.62, -1.93], [49.78, -1.93], [49.78, -2.16]]
+    axis_deg: 30
+    spring_kn: 7.0
+    neap_kn: 5.0
+    phase_h: 0.0
+    source: "White 1835, 'Alderney Tides', p. 132: the south-western stream in the Race begins at half-ebb exactly and runs six hours to half-flood, the first 2 1/2 hours W S W and the last S W by compass, the north-eastern the reverse, setting very strongly round Cape la Hague between half-flood and high water; at springs the north-eastern exceeds 7 1/2 miles an hour and the south-western 6 1/2, the neaps not above 5 1/2; p. 130: above 6 1/2 at springs, nearly 5 at neaps; Faden 1793, 'Cape la Hague', p. 29: about two leagues an hour at springs; the axis White's compass points less the variation, judgement"
+    book:
+      set: NE by N
+      spring_kn: 7.0
+      neap_kn: 5.5
+      strongest_h: 0.0
+      judgement: [set]
+      source: "White 1835, 'Alderney Tides', p. 132: the north-eastern stream from half-flood to half-ebb, strongest at high water by the shore; 7 1/2 and 6 1/2 at springs (their mean), neaps not above 5 1/2: the period's own rates, its neaps not half its springs; the set his compass points corrected for the variation, JUDGEMENT"
+  - id: the-swinge
+    chart: channel-mid
+    name: the Swinge
+    polygon: [[49.70, -2.32], [49.70, -2.205], [49.75, -2.205], [49.75, -2.32]]
+    axis_deg: 50
+    spring_kn: 7.0
+    neap_kn: 5.0
+    phase_h: 0.0
+    source: "White 1835, 'Alderney Tides', pp. 132 to 133: the stream in the Passe du Singe between Burhou and the Corbet sets straight through both ways six hours and six hours, beginning south-westward at half-ebb as the Race's; 7 1/2 north-eastward and 6 1/2 south-westward at springs; Faden 1793, p. 30: a channel about a mile wide between the west point of Alderney and Buron; the neaps as the Race's and the axis the channel's, judgement"
+    book:
+      set: NE
+      spring_kn: 7.0
+      neap_kn: 3.5
+      strongest_h: 0.0
+      judgement: [set, rates]
+      source: "White 1835, 'Alderney Tides', pp. 132 to 133: six hours each way, the north-eastern from half-flood, 7 1/2 and 6 1/2 at springs (the spring rate White's, their mean); the neaps half the springs, the period giving none, and the set the channel's, JUDGEMENT"
+  - id: the-little-russel
+    chart: channel-mid
+    name: the Little Russel
+    polygon: [[49.43, -2.535], [49.43, -2.49], [49.52, -2.465], [49.52, -2.52], [49.46, -2.538]]
+    axis_deg: 25
+    spring_kn: 4.0
+    neap_kn: 2.0
+    phase_h: 0.0
+    source: "White 1835, 'Guernsey', p. 109: the streams in the Great and Little Russels set straight through both ways five hours and a half each, in the Little Russel N E 3/4 E by compass nearly; p. 97: in the Great Road the flood N E 1/2 N by compass; Faden 1793, 'The Little Russel', p. 32: the flood never begins to run till the sea is at half its height, nor the ebb till it is half fallen; the rate JUDGEMENT, no figure in the sources read"
+    book:
+      set: NNE
+      spring_kn: 4.0
+      neap_kn: 2.0
+      strongest_h: 0.0
+      judgement: [set, rates]
+      source: "Faden 1793, p. 32: the flood from half tide rising to half tide falling, strongest at high water; the set White's compass point corrected, the rates JUDGEMENT"
+  - id: the-great-russel
+    chart: channel-mid
+    name: the Great Russel
+    polygon: [[49.39, -2.47], [49.39, -2.39], [49.49, -2.37], [49.49, -2.455]]
+    axis_deg: 50
+    spring_kn: 3.5
+    neap_kn: 1.75
+    phase_h: 0.0
+    source: "White 1835, 'Guernsey', p. 109: the flood stream in the Great Russel runs E N E 3/4 E by compass, five hours and a half each way; Faden 1793, p. 32: as in the Little Russel, the flood from half tide; the rate JUDGEMENT, no figure in the sources read"
+    book:
+      set: NE
+      spring_kn: 3.5
+      neap_kn: 1.75
+      strongest_h: 0.0
+      judgement: [set, rates]
+      source: "Faden 1793, p. 32, and White 1835, p. 109, for the hour; the set White's compass point corrected, the rates JUDGEMENT"
+  - id: la-deroute
+    chart: channel-mid
+    name: the Déroute
+    polygon: [[49.10, -2.02], [49.10, -1.62], [49.58, -1.80], [49.58, -2.02]]
+    axis_deg: 345
+    spring_kn: 3.0
+    neap_kn: 1.5
+    phase_h: 0.0
+    source: "White 1835, 'Sercq', p. 118: the Déroute stream sets directly both ways and runs for equal spaces of time; 'Alderney Tides', p. 132: between half-flood and high water the north-eastern stream from the Great Russel and the Déroute runs into and through the Race; Faden 1793, 'Rocks of Ecreho', p. 37: the tides very great between the rocks and their setting not to be determined with certainty; the axis the channel's, the rate JUDGEMENT"
+    book:
+      set: N by W
+      spring_kn: 3.0
+      neap_kn: 1.5
+      strongest_h: 0.0
+      judgement: [set, rates]
+      source: "White 1835, pp. 118 and 132: equal spaces each way, the northward stream running into the Race from half-flood; the set and the rates JUDGEMENT"
+  - id: portland-race
+    chart: channel-mid
+    name: the Race of Portland
+    polygon: [[50.46, -2.53], [50.46, -2.38], [50.522, -2.38], [50.522, -2.53]]
+    axis_deg: 90
+    spring_kn: 5.5
+    neap_kn: 2.75
+    phase_h: 0.0
+    source: "Imray 1874, 'Race of Portland', p. 59: spring tides run at the rate of 5 or 6 knots round the Bill and over the ledge; White 1835, 'Coast of England', p. 42: the north-eastern stream sets directly for and with great velocity over the Shambles, the south-western strongly into the Race; Bowditch 1802's headland table (T §1): at Portland the current runs three hours after high water, so the up-Channel stream runs from three hours before high water to three after and is strongest at high water; the neaps half the springs, judgement"
+    book:
+      set: E
+      spring_kn: 5.5
+      neap_kn: 2.75
+      strongest_h: 0.0
+      judgement: [set, rates]
+      source: "the hour the period's own: Bowditch 1802's headland table, Portland, the current runs 3h 00m after high water; the spring rate Imray 1874's 5 or 6 knots (later than the period); the set White's 'directly for the Shambles' east of the Bill, to the point; the neaps half the springs; the set and the rates JUDGEMENT"
   - id: mid-channel
     chart: channel-west
     name: the open Channel

@@ -1,0 +1,42 @@
+# FreeSail: the captain's orders for the Channel east, Torbay to Guernsey through the Race
+# (spec M6 §26, block 1; package 39a). A short book: the frigate's own, the starter book
+# not loaded.
+
+# The departure: with the anchor down in Brixham road at the start she weighs at once,
+# cast on the larboard tack (the wind northerly, her head paying off to the eastward, the
+# Berry Head south-east of her), and stands out east-north-east for a point a league
+# north-east of the Head; from there she shapes a course for the Race's northern mouth,
+# a point midway between Alderney's east end and Cape la Hague and three miles north of
+# them (Faden 1793 p. 29: steer about mid-channel or nearer to Alderney than to Cape la
+# Hague, whose rocks run a quarter of a league out).
+standing order "weigh": at the anchor let go, if the distance to Torbay is under 5 miles then get under way on the larboard tack and steer ENE
+standing order "out of the bay": at under way, if the distance to Torbay is under 5 miles then set plain sail; shape a course for 50 25 N 3 25 W
+standing order "off the Berry Head": when the distance to 50 25 N 3 25 W is under 1.5 miles then shape a course for 49 46 N 2 02 W
+standing order "the course for the Race": every hour, if the distance to 50 25 N 3 25 W is over 3 miles and the distance to 49 46 N 2 02 W is over 3 miles and the distance to 49 40 N 2 08 W is over 9 miles and the distance to Torbay is over 6 miles and the distance to 49 29 N 2 24 W is over 22 miles then shape a course for 49 46 N 2 02 W
+
+# The Race: south-south-west through it to its southern mouth, two miles south of
+# Alderney's east end; then for the Great Russel's northern mouth, two miles west of the
+# Banc de Chole (White 1835 p. 99: the bank in the direct line from the Race to the
+# Russel; Jerbourg tower in one with La Fauconnière clears its south-west end).
+standing order "into the Race": when the distance to 49 46 N 2 02 W is under 2 miles then shape a course for 49 40 N 2 08 W
+standing order "through the Race": when the distance to 49 40 N 2 08 W is under 2 miles then shape a course for 49 29 N 2 24 W
+standing order "the course through the Race": every hour, if the distance to 49 40 N 2 08 W is under 9 miles and the distance to 49 40 N 2 08 W is over 2 miles and the distance to 49 46 N 2 02 W is under 8 miles then shape a course for 49 40 N 2 08 W
+standing order "the course for the Russel": every hour, if the distance to 49 40 N 2 08 W is over 3 miles and the distance to 49 29 N 2 24 W is over 2 miles and the distance to 49 29 N 2 24 W is under 18 miles then shape a course for 49 29 N 2 24 W
+
+# The Great Russel: down it south of Jethou and the Goubinière, then west-north-west for
+# the Great Road, where she anchors off the town in twelve fathoms or so (White 1835
+# pp. 94 to 95: 9 to 16 fathoms on very fine sand). The Guernsey pilot, if he comes off
+# in the Russel, is taken and she fills away; Alderney's, who hails her in the Race, is
+# not her port's and is let be.
+standing order "the Great Russel": when the distance to 49 29 N 2 24 W is under 1.5 miles then shorten sail; shape a course for 49 26 N 2 28 W
+standing order "south of Jethou": when the distance to 49 26 N 2 28 W is under 1 mile then shape a course for the Great Road of Guernsey
+standing order "the pilot boards": at the pilot's hail, if the distance to the Great Road of Guernsey is under 12 miles then take the pilot
+standing order "the pilot aboard": at the pilot aboard, if the distance to the Great Road of Guernsey is under 12 miles then fill away
+standing order "in the road": when the distance to the Great Road of Guernsey is under 0.4 miles then come to an anchor
+
+# The yards and the sheets, the bearings, and the lead in the islands' water.
+standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails
+standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix
+standing order "the lead among the islands": every 10 minutes, if the distance to the Great Road of Guernsey is under 8 miles then heave the lead

@@ -84,6 +84,18 @@ tables:
       - {name: Plymouth, lat_deg: 50.368, lon_deg: -4.185, hw_h: 6, hw_m: 0, bearing: W, spring_rise_ft: 15, rise_judgement: true}
       - {name: Ramhead, lat_deg: 50.313, lon_deg: -4.225, hw_h: 6, hw_m: 0, bearing: W, spring_rise_ft: 15, rise_judgement: true}
       - {name: Torbay, lat_deg: 50.450, lon_deg: -3.500, hw_h: 6, hw_m: 0, bearing: W, spring_rise_ft: 13, rise_judgement: true}
+      # package 39a, the Channel east: Moore 1799's groups read from the OCR text of the
+      # table by the moon's bearing (Internet Archive bim_eighteenth-century_the-practical-
+      # navigator_moore-john-hamilton_1799), the groups in the order of the bearings as the
+      # study pinned Brest, Ushant, Scilly and Plymouth's; the page image not read, so the
+      # group of each is UNVERIFIED by a column's width. Alderney, which the OCR puts in
+      # the first group (South, 12h), is left out: its real establishment is near 6h 45m and
+      # the OCR's first group is the least certain of all.
+      - {name: Dartmouth, lat_deg: 50.350, lon_deg: -3.567, hw_h: 6, hw_m: 0, bearing: W, spring_rise_ft: 14, rise_judgement: true, note: "Moore 1799's W group (with Plymouth, Ramhead, Torbay, Weymouth, Portland Road); unverified against the page image"}
+      - {name: Portland Road, lat_deg: 50.580, lon_deg: -2.436, hw_h: 6, hw_m: 0, bearing: W, spring_rise_ft: 6, rise_judgement: true, note: "Moore 1799's W group; unverified against the page image"}
+      - {name: Weymouth, lat_deg: 50.608, lon_deg: -2.448, hw_h: 6, hw_m: 0, bearing: W, spring_rise_ft: 6, rise_judgement: true, note: "Moore 1799's W group; unverified against the page image"}
+      - {name: Cape Barfleur, lat_deg: 49.696, lon_deg: -1.266, hw_h: 6, hw_m: 45, bearing: W by N, spring_rise_ft: 16, rise_judgement: true, note: "Moore 1799's W by N group (with the Lizard, the Land's End, Falmouth, Penryn); unverified against the page image"}
+      - {name: the Casquets, lat_deg: 49.722, lon_deg: -2.377, hw_h: 8, hw_m: 15, bearing: NW by W, spring_rise_ft: 18, rise_judgement: true, note: "Moore 1799's NW by W group (with the Isle of Man, the east end of the Isle of Wight, Caen, St Helen's); unverified against the page image; White 1835 p. 134 has 6h 45m at the Casquets: a poorer table's error"}
 
 # Moore's rule of 48 minutes a day: the moon's southing comes later each day by this
 # (Moore 1799, the catechism; Bowditch 1802 uses 49). The true mean is 50 minutes and
