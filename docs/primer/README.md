@@ -30,12 +30,12 @@ What the log will say is shown in plain code blocks, copied from a run with seed
 | | Chapter | What it teaches |
 |---|---|---|
 | 1 | [The ship](01-the-ship.md) | Every part of the frigate *Amazon* and the schooner *Speedwell* by its name, so that you can point at any noun the parser accepts. |
-| 2 | [The wind and the points of sail](02-the-wind-and-the-points-of-sail.md) | True and apparent wind, tacks, close-hauled, full and by, reaching, running; why a square-rigger lies six points off; what `state` reports. |
+| 2 | [The wind and the points of sail](02-the-wind-and-the-points-of-sail.md) | True and apparent wind, tacks, close-hauled, full and by, reaching, running; why a square-rigger lies six points off; what `state` reports; the compass to the quarter point (*south by west half west*) and numbers in words. |
 | 3 | [Making and shortening sail](03-making-and-shortening-sail.md) | Plain sail, the order of setting and taking in, reefing, studding sails; the words of command and what they mean. |
 | 4 | [Trimming](04-trimming.md) | Bracing the yards, tending the sheets, the `trim` order, weather and lee helm. |
 | 5 | [Going about](05-going-about.md) | Tacking as the log shows it, missing stays, wearing, box-hauling, heaving to and filling away. |
 | 6 | [The watch and the log](06-the-watch-and-the-log.md) | Bells and watches, the marks in the log, the console commands, saving and replaying. |
-| 7 | [A first passage](07-a-first-passage.md) | A worked hour on each ship that you can type along with. |
+| 7 | [A first passage](07-a-first-passage.md) | A worked hour on each ship that you can type along with; standing orders, read whole when they are given; the words the ship takes and those it refuses with what to say instead. |
 | 8 | [Where to read more](08-where-to-read-more.md) | The chapters of Luce, Lever and Falconer behind each evolution. |
 | 9 | [The glass and the sky](09-the-glass-and-the-sky.md) | The barometer and its tendency, Beaufort's words for the sky, the weather and the visibility as readings and as lines in the book; the sea in the period's words and the ship's motion in it, what the hands and the gear feel of a seaway; what a captain of 1805 knew of the weather and what he did not. |
 | 10 | [The reckoning](10-the-reckoning.md) | The log-line, the traverse and the master's doubt; the noon sight; the lead and its arming; bearings and the landfall; the captain's override; shaping a course by account; the readings and what the master's words mean; every form of the master's orders and the reckoning's readings in a table. |

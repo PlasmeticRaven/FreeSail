@@ -152,7 +152,7 @@ Within a league of any shore by day (a mile on a dark night, the visibility in t
   Forenoon watch (10:02)  The nearest land: the land about Rame Head, on the larboard bow, bearing NW, nine cables.
 ```
 
-Beyond a league it reads "no land within a league"; by night or in thick weather, when he cannot see so far, "not to be seen" with how far he can see, and what lies beyond that he cannot say. The book compares it in miles, by what he said: `when the nearest land is under half a mile then heave the lead`.
+Beyond a league it reads "no land within a league"; by night or in thick weather, when he cannot see so far, "none seen within a cable; in this weather the shore shows no further off than that, and land beyond it cannot be told" (or "within a mile ... by night"): none is seen as far as he can see, and what lies beyond that he cannot say. (Until package 37l it read "not to be seen: in this weather the shore shows within a cable at most", which an officer took for land within a cable and hove to in mid-Channel.) The book compares it in miles, by what he said: `when the nearest land is under half a mile then heave the lead`.
 
 When she has way on and is standing into the land, the lookout says so without being asked. He watches her course made good, a point either side of it, for the first dry ground at the present state of the tide or a danger that shows:
 
@@ -232,9 +232,10 @@ Every way the grammar takes each of the master's orders and each of the reckonin
 | `work up the reckoning` | `work the reckoning`, `work up the dead reckoning`, `bring up the reckoning`, `the day's work`, `work up a reckoning`, `work up reckoning`, `work up the reckoning's uncertainty`, `work up the reckoning's doubt` | the account brought up to now, with the master's doubt |
 | `observe the sun` | `take the sun`, `take a sight of the sun`, `take the noon sight`, `take the sun's altitude`, `observe the sun at noon`, `take a meridian altitude` | the noon sight by order, in the quarter of an hour before noon |
 | `set the reckoning to 49 52 N 6 10 W` | `set the reckoning at 49 52 N 6 10 W`, `correct the reckoning to 49 52 N 6 10 W`, `put the reckoning at 49 52 N 6 10 W` | the captain overrides the master |
-| `allow one knot of set to the east` | `allow for one knot of set to the east`, `allow half a knot of set to the south west`, `allow no set` | your own set in the traverse and in a course shaped, in place of the master's tide until you hand it back |
+| `allow one knot of set to the east` | `allow for one knot of set to the east`, `allow half a knot of set to the south west`, `allow one and a half knots of set to the east`, `allow a quarter of a knot of set to the south by west half west`, `allow no set` | your own set in the traverse and in a course shaped, in place of the master's tide until you hand it back |
 | `allow the tide by the book` | `allow the tide`, `allow for the tide`, `allow the tide by the directions`, `allow the master's tide`, `work the tide yourself`, `work the tide by the book`, `reckon the tide by the book`, `hand the tide back`, `hand back the tide` | the tide in the reckoning handed back to the master |
 | `shape a course for Falmouth` | `shape a course to Falmouth`, `shape course for Falmouth`, `lay a course for Falmouth`, `set a course for Falmouth`, `make for Falmouth`, `steer for Falmouth`, `head for Falmouth` | the course to steer to make good the line from the account to a place of the chart, the tide allowed |
+| `shape a course for a mile west of the Lizard` | `shape a course for two miles south of the Lizard`, `shape a course for half a league SW of the Lizard`, `shape a course for five cables to the south of the Lizard` | the same, for a point laid off from a place of the chart by a distance and a point of the compass |
 | `the reckoning` | `the dead reckoning`, `the position by account`, `the position`, `what is the reckoning`, `ask the master the reckoning`, `ask the master for the reckoning` | the position by account |
 | `the reckoning's uncertainty` | `the uncertainty`, `the reckoning's doubt`, `the master's doubt`, `what is the reckoning's uncertainty`, `take the reckoning's uncertainty` | the master's doubt in his words |
 | `the depth` | `the last cast`, `the soundings`, `what is the depth` | the last cast, with its age |
@@ -244,6 +245,7 @@ Every way the grammar takes each of the master's orders and each of the reckonin
 | `the course made good` | `what is the course made good` | since noon, by account |
 | `the latitude by observation` | `the observed latitude`, `the latitude` | today's noon latitude, or why there is none |
 | `the master` | `what is the master` | his name, his place and what occupies him |
+| `where is the Lizard` | `where is Ushant`, `where is lizard` | a mark of the chart: in sight, the lookout's bearing and estimate; else its bearing and distance by account |
 | `what is in sight` | `the sightings`, `sightings` | the lookout's sightings, by bearing and estimated distance |
 | `the land` | `what is the land` | whether any land is in sight, and the nearest |
 | `the nearest land` | `the nearest shore`, `what is the nearest land` | the nearest shore within a league as the lookout sees it |

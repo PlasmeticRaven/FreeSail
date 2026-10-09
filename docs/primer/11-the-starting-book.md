@@ -101,7 +101,7 @@ Every form of a trigger, a condition and the book's orders; the test (`tests/tes
 
 | Form | What it waits for, or does |
 |---|---|
-| `when the true wind exceeds 30 knots`, `when the true wind is under 12 knots`, `when the mean wind exceeds 25 knots` | the wind's speed, gusts in it or its ten minutes' mean |
+| `when the true wind exceeds 30 knots`, `when the true wind is under 12 knots`, `when the mean wind exceeds 25 knots`, `when the true wind exceeds thirty knots`, `when the true wind is 12 knots`, `when the speed is five knots` | the wind's speed, gusts in it or its ten minutes' mean; a number in words as in figures; *is 12 knots* holds within half a knot of it, so that it fires as the wind comes to twelve from above or below |
 | `when the true wind veers 1 point`, `when the true wind backs 2 points`, `when the true wind shifts 1 point`, `when the true wind veers 1 point or backs 1 point`, `when the true wind is from the north-west` | the wind's direction, from where it stood when the order last fired |
 | `when the true wind is a gust`, `when the true wind is a lull` | the wind against its mean |
 | `when the apparent wind is forward of 55 degrees`, `when the apparent wind is abaft the beam`, `when the apparent wind is on the starboard bow` | the apparent wind on the bow |
@@ -116,6 +116,8 @@ Every form of a trigger, a condition and the book's orders; the test (`tests/tes
 | `at sunset`, `at sunrise`, `at eight bells`, `at the change of the watch`, `at a squall`, `at a wind shift`, `at the glass falling fast`, `at a strain warning`, `at a sail blown out`, `at noon`, `at a sounding`, `at a landfall`, `at hove to`, `at filled away`, `at tacked`, `at wore` | an event |
 | `every glass`, `every hour`, `every watch`, `every 10 minutes`, `every half an hour` | an interval |
 | `every glass, if the land is in sight`, `at sunrise, if the true wind is under 20 knots`, `at noon, if she is not hove to` | a condition tested at the firing |
+
+The orders after `then` are read whole when the standing order is given, every one of them by the reader that carries it out: a sail named ambiguously, a mark or a place the chart has not got, the marks of a fix that are none, an anchor she does not carry, a number that cannot be read, each refused then with the order named (package 37l).
 
 The book's orders: `standing orders` lists the book, each order with who gave it and its state (standing, belayed, held, fired how often and when last); `show standing order "x"`; `belay standing order "x"` keeps it idle in the book; `resume standing order "x"`; `belay all standing orders`; `strike standing order "x"` (or `cancel`, `remove`) takes it out; and `read the standing orders from <file>` gives every order in a file of them.
 
