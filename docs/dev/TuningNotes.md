@@ -2995,7 +2995,8 @@ made once, and the helm put for a course already judged goes round it
 | nearer the wind than she will lie, on the other tack | put about or worn for that tack, `full_and_by` | "NE by E (56°) lies too near the wind to be laid; she is put about and kept full and by on the larboard tack." |
 | a course shaped or a chase's nearer the wind than she will lie on her own tack | kept full and by, as since package 35 | "...; she is kept full and by on the starboard tack" |
 | on the tack she is going to, while a tack or a wear is in hand | handed to the manoeuvre | "SW (225°): she is going about, and the course is given her as she comes round." |
-| no steerage way (a tenth of a metre a second) | the helm, as before; a course shaped too near on the other tack is kept full and by on hers | |
+| no steerage way, the course on her own tack | the helm, as before | |
+| across the wind (any row above that puts her about, wears or gybes her) with too little way for it (the lead's last round) | kept full and by on her tack, the course held as the helm's intention and judged again when she has the way: `PENDING_STAY_KN` to go about (after `STAY_WAIT_S` with a knot, worn), a knot to wear, steerage way to gybe | "WSW (245°) lies across the wind's eye from her head, and she has no way on her; she is kept full and by on the larboard tack until she has, then put about for it."; then "She has way on her now: ...", notable |
 
 The manoeuvre ends on the course (`evolutions.scripts.CourseToSteer`): a tack, steady by
 the wind on the new tack, steers a course within half a point of close-hauled with the
@@ -3023,6 +3024,8 @@ within the grant to steer (`tests/test_officer.py`).
 | `WEAR_FOR_IT_MIN_MS` | half a metre a second, a knot | `orders/navigation.py` | the fold-in's guard, kept |
 | `WAKE_HELM_POINTS` | eight points (the lead accepted, 2026-10-09) | `orders/navigation.py` | a turn by the stern of eight points or less keeps the wind abaft the beam at both ends, where a square sail fills however its yard is braced; the fold-in's guard counted turns of more than six points (her close-hauled angle). Found on `tests/test_ports.py`'s St Mary's approach, steered by the bearing a minute at a time: at six points the frigate, running, was worn for a turn of 78 degrees to the other quarter and struck the Nut Rock twelve minutes later; at eight she is steered, as before. Judgement |
 | `STEERAGE_WAY_MS` | a tenth of a metre a second | `orders/navigation.py` | the fold-in's guard's own "no way" |
+| `PENDING_STAY_KN` | three knots | `orders/navigation.py` | a course held across the eye is put about when she has gathered a knot more than the tack's least: at two knots, just gathered from rest, the frigate missed stays in the test of it (`tests/test_ships.py`); judgement |
+| `STAY_WAIT_S` | 180 s | `orders/navigation.py` | with a knot and not three for so long, she is worn instead; judgement (a frigate gathers her way from rest in two or three minutes under plain sail) |
 | `by_the_wind_s` | 120 s | `tack.yaml` | judgement: the frigate luffs from a reach to close-hauled in about a minute in the tests |
 | `BY_THE_WIND_ALLOWANCE` | ten degrees | `evolutions/scripts.py` | the tack's `close_hauled()` allowance (`evolutions/runner.py`) |
 | `retrim_s`, `pay_off_timeout_s` | 20 s, 240 s | `tack.yaml` | `fill_away.yaml`'s, for the same paying off |
@@ -3180,3 +3183,56 @@ The suite on the second round: the fast tier 2985 passed and two failed, the mer
 passage's pace floor (load) and the order dependence in `test_reckoning.py` found before
 this package; the slow tests of the two passages (`-k "schooner or merchant"`) 7 passed, 2
 expected failures, and the schooner's pilot test that fails on the merged tree (above).
+
+### The third round (the lead's last round, 2026-10-09): a course held for want of way
+
+Built at the lead's word on the second round's Iroise finding. A course whose turn crosses
+the wind's eye or its wake, given while she has not the way to tack, wear or gybe for it,
+is no longer left to the helm (which turned her across the wind with her yards and sheets
+for the old tack and laid her aback): she is kept full and by on the tack she is on, the
+line says so, the course is held as the helm's intention (`ship.extra["course_pending"]`,
+a plain dict, so a checkpoint carries it), and the runner judges it again each tick
+(`navigation.keep_course_pending`) once she has the way, when the manoeuvre comes and she
+ends on the course ("She has way on her now: ...", notable). The way it waits for: three
+knots to go about (`PENDING_STAY_KN`; at the tack's own two the frigate, just gathered
+from rest in the test, lost her way in stays and missed them), or, after three minutes with
+a knot and not three, a wear (`STAY_WAIT_S`); a knot to wear for a turn by the stern with a
+square sail set; steerage way to gybe without. A course, `keep her full`, a word to the
+wheel or a manoeuvre ordered gives the intention up; an order reckoned in points from her
+course leaves it; at anchor or aground it is let go. A course on her own tack given with
+no way is steered as given, as before. Tested on the frigate (WSW across the eye, held,
+put about at three knots, tacked on WSW) and the schooner (SSW by the stern, held, worn,
+on SSW), and the giving up (`tests/test_ships.py`).
+
+The passages, each measured once on this build: the schooner of 5b (761 lines,
+`d6031efa9808a2b1`) and the merchant passage (2998, `54713e8e579fd527`) unchanged, and the
+thick passage (478, `7029e5b4dd6fbe06`), the frigate of 5b (734, `9a0c4168d6987405`) and
+the cruise (2083, `348b07dd901580a7`) unchanged as well. No pin moved: in none of them is a
+course across the wind given with no way on her (at anchor in the Bay at 129600 the
+merchant's hourly course is held and refused at once as keeping her full and by, the
+refusal of 126000, as in the first round).
+
+**The lead's dropped Iroise rule, a third time, as a diagnostic** (the book unchanged):
+
+- The cast comes back: thirty-seven fathoms at 90110, filled away on the starboard tack at
+  90206.
+- The helm's part now carries her: "for Bertheaume" shapes E by N with no way on her, the
+  course is held, and at 90270, with her way, "She has way on her now: E by N (83°) lies
+  across the wind from her head, by the stern; she is worn round for it"; she wears and is
+  on E by N at 90652, "braced for the course ordered", and is not taken aback.
+- She does not go on to Bertheaume, the Goulet, the Bay and the sale, for two faults of the
+  book's, not the helm's: on E by N within a mile and a half of the mark, "bring to in the
+  Iroise" fires a second time (90782; the rule has no guard against a cast already had),
+  and the second cast (forty-one fathoms at 91813) fills her away on the larboard tack,
+  where "for Bertheaume" shapes the point E by N to make good against a knot of ebb to the
+  SW by S and steers NNE (19°), four points and a half up from the course, with a point and
+  a quarter of leeway; nothing in the book works that course again on the way, and she
+  stands on NNE for two hours (the Black Rocks and the Monks sighted), and takes the ground at
+  99694 at five knots and a half, Ushant's light three leagues to the NW. The pilot of
+  Brest boards at 109500; she takes the ground ten times more and never anchors.
+- So the one line is not enough to go into the book: it wants with it a guard on "bring to
+  in the Iroise" for a cast already had there, and the course for the first point worked
+  again on the way (as the frigate's book works its course for the Manacles every glass,
+  package 37f). Both are the book's, and were not tried.
+
+The suite on the third round: see the report.
