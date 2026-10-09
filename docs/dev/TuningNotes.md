@@ -2163,3 +2163,267 @@ hour and "keep her full and by"; the book's, not the guard's, and left.
 bridge's new wait to fifty seconds exactly, which the monotonic clock makes a few
 microseconds over on Linux and exactly fifty on Windows; it now allows a hundredth.
 
+## Milestone 5: the account, amended (package 37j, 2026-10-09)
+
+The review's part K, "the account, amending 37e", its G3 (what is left) and G4, the
+fold-in's finding at the merchant passage's second noon (spec M5 §33 item 24) and the
+owner's note 5 on game 9. Measured on Linux (this worktree's machine, shared with four
+other packages' work, so the times are not the change's); seed 7 throughout.
+
+### The constants and their sources
+
+All in `freesail/world/reckoning.py` unless said.
+
+| Constant | Value | What it is | Source |
+|---|---|---|---|
+| `OBSERVATION_OUT_SIGMAS` | 2, kept | the two doubts together, beyond which one of the two figures is plainly out | **its reason restated**: two is what the master trusts a figure within (the lunar's and the chronometer's words since 33b), so "plainly out" is "further apart than he would trust the one and the other within". 37e's reason (game 9's noon taken at 2.06 of the doubts together) no longer bears: under the amended rule that noon is believed or doubted by which is the better figure, not by the number. Judgement |
+| the better figure (no constant) | an observation further out than the doubts together is taken only when its doubt across its line is no greater than the account's; else weighed and doubted | | the lead's decision on the fold-in's finding |
+| `CONTOUR_FINEST_M` | a cable | within a doubt under the half-mile grain the contour search steps at a quarter of what he would trust the account within, no finer than this | judgement: the least the log's words say of a distance |
+| `APART_EDGE` | a thousandth | a cast that does not agree within the doubt widens it so that the nearest water that answers lies this part beyond the edge of the trust, so that the same cast again stays apart | judgement |
+| `SAME_GROUND_NM` | 2 miles, kept | also: a cast within this of one that did not agree widens nothing further | 37e's, reused |
+| `data/tides/establishments.yaml`, `spring_rise_ft` | every place of both tables | the rise at springs by which he reduces a cast; `rise_judgement: true` where the period's table gives none | the world's spring range there (twice M2 and S2) rounded to the foot, JUDGEMENT, as 37e's directions' rates are the world's rounded; the period's own figures kept (Fowey's of 1774 for Falmouth, the French ports' and Plymouth's) |
+| the reduction | half the spring rise and half the day's rise by the half-cosine of the hours from his high water | the height above his chart's datum (low water at springs); until 37j half the day's rise times one and the cosine, the height above the day's low water, which at the neaps stood above the datum by half the difference of the rises | Norie's two-thirds and the rule of twelfths worked exactly, as package 34 |
+| `BOARD_ALTERATION_POINTS`, `BOARD_LEAST_S` | 2 points, a minute | the account worked at an alteration of course from the board's mean heading, at heaving to and filling away; a board under a minute not cut again | the brief's two points; Falconer 1780, *Traverse* ("collecting the difference of latitude and departure of each course"); the minute judgement, so that a ship in stays is one board's end and not a dozen |
+| `read_doubt`, `drift_doubt` (`held`) | the log's quarter knot and the drift's half knot kept as biases across the boards | the read's error is one figure until the log is next hove, the drift's while she lies to; with the account worked at every board the sum of their squares by the interval would shrink them | 37e's figures, their form judgement |
+| `ONE_HAND_DEG` | six points and a half | marks of a fix within this arc lie on one hand: the doubt said along the shore and off it when the two differ | judgement: the Bay of Brest's three marks spanned six points, the Lizard's in game 10 three |
+| the compass's part of a fix (`_compass_shift_nm`) | the fix's displacement for one sigma of the compass's allowance | no fix narrows the account's doubt that way below it (nor raises it above what it was) | 37e's covariance term, kept apart |
+| the dangers | to the cable (`geo.distance_words`) | `the dangers` and a shaped course's warnings | the brief |
+| the departure | the scenario's position, a mile in doubt | the account opened a mile out by a draw before | the brief |
+
+Gone: the departure's two draws from the `reckoning` stream (so every draw after them is
+another, and every passage moves from its first tick of the account).
+
+### The four cases of the rule, with their figures
+
+`tests/test_reckoning.py` holds each.
+
+| Case | 37e | 37j |
+|---|---|---|
+| **Game 9's noon of 16 June** (tick 370,860): the octant's 48° 07' N, good to 2.28 miles; the account 48° 12½' N, kept by the lead at 0.26 north and south; 5.23 miles apart, 2.06 of the doubts together | taken: the account laid on the sight | the sight the poorer figure: weighed and doubted, the account moved a cable ("the sight stands five miles to the S of the account, and the account, good to three cables, is the better figure: the account moved a cable to the S") |
+| the same noon against an honest account | | weighed by the doubts: against the mile and nine tenths the forenoon's casts leave (below), two miles of the five |
+| **The lunar of game 9's note 5** (tick 246,131): 12.12 miles one sigma against 0.83 east and west, 2.3 miles apart | kept (weighed): within the doubts together | kept, as before; and set eighteen leagues off, further than the doubts together, it is still the poorer figure: weighed and doubted, three cables moved (37e laid the account down on it) |
+| **The merchant passage's second noon**, on Linux: an octant's sight (2.5 miles) five miles and a half north of an account fixed to three cables a minute before, a hair over the doubts together (a hair under on Windows) | taken on Linux, the account six miles out for a minute; weighed on Windows | weighed on both sides of the line and doubted on the far side; the account within a cable of the fix either way |
+| **The cruise's chronometer** (37e's finding): 7.6 miles out "which Mr Harvey would trust within 5 miles" (2.28), the account a cable in doubt by the land | taken; the bearing of Penlee took it back half an hour after | kept, and doubted |
+
+*Game 9's noon, and the arithmetic of "taken".* The brief asked that noon taken once the
+cast keeps the account's doubt honest. Under the rule as amended it cannot be: it is taken
+only when its doubt (2.28) is no greater than the account's, and the two are then plainly
+apart only beyond twice the two doubts added, at least 9.1 miles; they stood 5.23 apart.
+What item 2 does is the other half: against an honest account the noon is weighed by the
+doubts and moves it most of the way, where against the lead-kept account it is doubted and
+moves a cable. The forenoon sailed again on this build (the brig becalmed off the Goulet's
+mouth on the ebb from 08:00 on 16 June, the account half a mile out and a quarter of a mile
+in doubt as game 9's was, the deep-sea lead every glass; slow test
+`test_the_forenoon_of_16_june_sailed_again_keeps_an_honest_doubt_and_the_noon_is_weighed`):
+
+| 16 June | the error | the doubt E / N |
+|---|---|---|
+| 08:30 | 0.57 | 0.35 / 0.46 |
+| 09:30 | 0.46 | 0.85 / 1.17 |
+| 10:30 | 0.32 | 1.04 / 1.15 |
+| 11:30 | 0.56 | 1.69 / 1.77 |
+| noon, the sight (a mile and a half out, as game 9's) weighed | 1.07 | |
+
+Game 9 (on 37d) had the error four miles and the doubt a quarter at noon. The master's own
+tide (37e) keeps the account with her, and the casts no longer narrow the doubt beyond what
+they can say: the truth within twice the doubt at every glass. Left as a finding: that
+same forenoon begun with game 9's noon account (four miles out, 0.26 in doubt) ends with
+the doubt grown to nine tenths of a mile and the error still four, so a lead-kept account
+already wrong is helped by item 2 and not cured by it; the casts over the flat sand there
+answer within the doubt at the wrong place and are weighed (37e's behaviour, unchanged).
+
+### The cast within the doubt, and the tide under the lead
+
+Game 10's cast (the owner's note 2) reproduced on this build: the cutter in St Mary's Sound
+at 04:00 on 14 June 1805, her account right and a quarter of a mile in doubt, Moore's
+table (no Falmouth, no Scilly rise until now). Package 34's flat three metres against the
+world's 4.66 at that hour; the master's own tide by Scilly's fifteen feet and his hour now
+4.05. The cast laid on the chart with no tide taken off at all (the error larger than game
+10's, to force the case) answers nowhere within his doubt; the chart has that water a mile
+and a half to the SE: "the account kept, and its doubt widened" (to three quarters of a
+mile that way), and three casts more on the same ground keep it and widen nothing (37e
+laid the account down a mile off at the first and kept it there four hours). With his own
+tide taken off the same casts agree with the chart where he is.
+
+The search within the doubt: the trust's ellipse (twice the doubt) by its Mahalanobis
+distance, on rings a quarter of its reach apart and no finer than a cable when the doubt
+is under the half-mile grain; the chart's grain (37e's `depth_span`) first, as before. A
+cast that does not agree grows the doubt along the way to the nearest answering water by
+the Sherman-Morrison form (`Reckoning.widen_toward`), so that the point lies a thousandth
+beyond twice the doubt; the account does not move.
+
+### Each board by itself
+
+The cutter (logged every two hours) standing N and E by turns in a south-westerly,
+eighteen minutes a board, the account set right at the start (`test_each_board_is_laid_down_by_itself`):
+
+| | the account worked | the error after six boards |
+|---|---|---|
+| the mean of her headings (as before) | at the log only | 5.4 miles |
+| each board by itself | at every turn and at the log | 2.7 miles |
+
+The rest of the error is her way by eye between the two-hourly heaves and the log-line.
+With the account worked so much more often, the log's read and her drift by eye are now
+kept as biases across the boards (`read_doubt`, `drift_doubt`); kept as before, as a
+square of each interval, they would have shrunk the doubt by the number of boards.
+
+### The fix on one hand
+
+At anchor in the Bay of Brest (the brig, 17 June, unnamed fixes every five minutes by the
+castle of Brest, Penaleuch point and Portzic, W to NNW): the account 0.12 to 0.18 mile
+from the truth with a doubt of 0.12 to 0.17, the truth within twice the doubt at every
+fix (37e: three cables out while "good to a cable"). The compass's part of a fix is
+computed from the fix's own lines (`_compass_shift_nm`, the same arithmetic as `_fix_of`'s
+covariance term) and floors the account's doubt that way. The words: a fix by marks within
+six points and a half says its doubt along the shore and off it when the two differ. Seven
+of the frigate's nine fixes in the 5b passage, and 86 of the merchant's 193, are by marks
+on one hand.
+
+*Found, for the lead*: the brief says such a fix is "good along the shore and poor off it".
+In this model it is the other way about as often as not: the narrow cut makes it poorer off
+the shore, and the compass's shared error, which with every mark on one hand does not
+cancel, moves it along the shore by the marks' distance times the error (in the Bay of
+Brest geometry, 0.09 off and 0.12 along with the compass, 0.04 along without). The words
+say whichever the figures give.
+
+### The dangers to the cable
+
+From four miles south of the Manacles: "the Manacles NW, a mile and a half; the Penwin and
+the Vaze NNW, a mile and a half; the Gedges NW by N, five miles and a half; ...", and the
+course for Falmouth: "the line passes the Penwin and the Vaze within a cable, the Manacles
+within two cables and the Governor within a mile" (37e: "within a mile" for all three).
+
+### `the port` and `the depth of water`
+
+Two brigs of one seed, their true places four miles apart and one account (the world's
+tide made nothing in both, so that they feel the same water): every reading
+the same, in open water; in sight of the Manacles all but the lookout's own (what is in
+sight, the land, the nearest land, the bearing of a mark; and the moon's altitude in the
+data behind `the moon`). On the tree before 37j `the depth of water` and `the port` differed
+in both ("Falmouth, the outer road bearing N by W, 5.2 miles" against "NW, 4.6 miles").
+
+The merchant passage's two depth conditions ("in the road", "in the Bay") read the lead
+since 37j; the road of Bertheaume is now anchored in at the first cast under thirteen
+fathoms, eight and a half, where the chart's figure at her true place had put her in
+twelve.
+
+### The recorded passages, re-measured with the reasons
+
+Each measured once on this machine (`scratch measure.py`, the log dumped whole; Linux).
+
+| Passage | Lines | Digest | Comes through |
+|---|---|---|---|
+| 5a's day | unchanged | unchanged | no chart, no reckoning |
+| the frigate, 5b | 768 → 746 | `dbf7f6fcfb800fdf` → `e1ecc7767009176c` | yes: pilot aboard, anchored in the outer road |
+| the schooner, 5b | 761 → 756 | `c8905673506f717e` → `a7dd398ae719ff8b` | yes, anchored in eighteen fathoms and a half off St Anthony's; the pilot hails and does not board (as before, an expected failure) |
+| the thick passage, 5b | 488 → 473 | `fb136bb8e86f0804` → `e00caa4f5a665b50` | **no: she takes the ground on Black Head at 56081** (below) |
+| the merchant passage, 5c | 2994 → 2976 | `c52c14c725a5ed1f` → `71c32abf23af0510` | yes, the tin sold in the Bay; **the Iroise's cast not made** (below) |
+| the naval cruise, 5c | 2037 → 2059 | `bb8b2499fde6a0f4` → `d3086c7fce4a3a1a` | yes: the Palinure spoken |
+
+Every true track parts at the first course shaped from the account: the departure is laid
+at the truth (it was drawn a mile out) and the two draws it took are gone from the
+`reckoning` stream, so every draw after them is another; and the account is worked at
+every board. Every tick before the first such course stands in every passage.
+
+Old beside new:
+
+| | Before (the fold-in) | After (37j) |
+|---|---|---|
+| **The frigate** noon | 28740, the sight weighed (37e had laid the account three miles north by a sight five and a half too far north) | 28740: "the account moved eight cables to the NNE", four miles out after it |
+| cast in the Soundings | 30118, "Fifty-five fathoms; ... The account kept." | 30118, with "Two fathoms of tide allowed by the epitome: fifty-three fathoms on the chart." |
+| the account at the cast; at the landfall; after its bearing | | 4.5; 8.5; 2.3 miles |
+| landfall; outer road; anchor; brought up | 44820; 58297; 58647 in fourteen fathoms and a half; 59642 | 45180; 58298; 58646 in eleven and a half; 59606 |
+| cutter sighted; hail; pilot aboard | 55860; 57480; 57540 | 55500; 57120; 57180 |
+| **The schooner** noon | 28740 | 28740: weighed, "the account moved a mile to the SSW" (the octant's 2.8 miles against the account's 3.5, within their doubts together); three miles out after it |
+| landfall; outer road; pilot's hail | 45840; 56515; 55800 | 46200; 56515; 55860 |
+| anchor off the town; brought up | 57638 in seven fathoms; 58689 | 57643 in seventeen and a half; 58795 in eighteen and a half |
+| **The thick passage** landfall | 54420, Black Head close aboard, stood off | 53820, the same, eight miles out by account; aground at 56081 |
+| **The merchant** sail off the Lizard | 29100 abeam, three leagues | 25740 on the larboard bow, four leagues (the one abeam at 29400) |
+| noons | 25200, 111660 | 25200 (weighed, a cable), 111660 ("the account kept") |
+| the Iroise's cast | 90241, thirty-eight fathoms | not made |
+| pilot of Brest aboard; anchor at Bertheaume | 96240; 99974 in twelve fathoms | 94380; 98814 in eight and a half |
+| the flood; the mouth of the Goulet; anchor in the Bay; tin sold | 108960; 112078; 115815; 123948 | 108960; 112178; 116282; 125159 |
+| **The cruise** to the pilot's leaving | 5460, 6834, 7980, 10980 | the same |
+| the chronometer hove to off Plymouth, 09:00 | taken, 7.6 miles out | doubted, the account kept |
+| the cutter's hail; the letter read | 83484; 83544 | 83423; 83483 |
+| the Palinure sighted; chased; spoken; lost | 90120; 90121; 94091; 98100 | 90000; 90000; 93979; 98040 |
+| wears | fourteen | fourteen |
+
+*The merchant passage's second noon, in full.* At the fold-in, in the mouth of the Goulet
+with the account fixed by cross bearings to three cables a minute before, the octant's
+sight fell five miles and a half north of it, a hair over the two doubts together on
+Linux, and 37e's rule took it outright: the account six miles out for a minute, until the
+cast and the bearing after it laid it down again; on Windows the same sight fell a hair
+under and was weighed. Under 37j that sight would be weighed and doubted either side of
+the line and leave the account within a cable of the fix (held in the tests by its
+figures). On this build's track the same noon finds the account within a cable of the
+truth by the morning's fixes and the sight within the two doubts of it: "Noon. Latitude
+by observation 48° 18' N; the reckoning was 48° 20' N: the account kept." The account is
+0.06 mile from the truth after it. The platform difference that turned this up is not
+explained (spec M5 §33 item 24); the rule no longer depends on which side of the line a
+sight falls.
+
+*The 5b schooner's noon, in full.* Before (37e on): the octant's sight weighed against an
+account whose doubt the departure's draw and a forenoon's run had made, the passage's
+account three miles out at the landfall's bearing. Now the departure is at the truth, and at noon
+the account's doubt north and south is three miles and a half (honest: the stream's part
+and the log-line's grown through a forenoon without an observation), the octant's sight
+(two miles and four fifths one sigma, the octant and a seaway's horizon) a mile and nine
+tenths south of it: within their doubts together, and the sight no better a figure than
+the account, so it is weighed by them and moves the account three fifths of the way:
+"Noon. Latitude by observation 49° 21' N; the reckoning was 49° 22' N: the account moved
+a mile to the SSW." The account is three miles from the truth after it (the sight was
+itself out by about two), eight and a half at the landfall, and a mile and a half after
+the Beast's bearing. The frigate's noon is the same case with the sextant: a gap of a mile
+and an eighth, her doubt three miles and a third, the sight's 2.38; weighed, eight cables
+moved.
+
+*The thick passage takes the ground (a finding, the book not tuned).* No sight, the
+account eight miles out by account at the landfall: the land about Black Head close
+aboard at 53820 (54420 before), on the larboard bow nine cables off. The book's "the land"
+steers S into a south-easterly; "keep her full" bears her away a point (53847) and she is
+taken aback (53861), fills on the larboard tack close-hauled, and with her leeway (17 to
+20 degrees) and the ebb setting her to the westward is warned of the land ahead at 55320
+and 55620 and takes the ground on Black Head's ledges at 56081, the tide falling. On 37f's
+track she raised the same land ten minutes later and further off, and the same order
+cleared it. The cause is the track, not the rule: the departure laid at the truth and the
+boards each worked move the course shaped at the noon and the landfall with it. For the
+lead (the book's stand-off, or 37k's helm when she is taken aback).
+
+*The merchant passage casts nothing at the Iroise (a finding, the book not tuned).* "The
+course for the Iroise" is shaped hourly while Ushant is more than ten miles off; on this
+track it is shaped once, at 02:00 from nineteen miles off, and she then passes the
+Passage de l'Iroise more than a mile and a half off by account, so "bring to in the
+Iroise" (within a mile and a half, her head east of E) never fires. The test of the beat
+is an expected failure, as it was before 37d's second pass.
+
+*The schooner's anchor.* "Off the town" fires at the first cast under ten fathoms (six, at
+57312); while she is brought to for the anchor "keep her full" bears her away a point and
+she runs on into the channel between St Anthony's Head and the Black Rock, and lets go in
+seventeen fathoms and a half. Safe, and 37f's (the anchor's evolution and the trim rules)
+and not this package's; the bound on the depth she rides in is widened to twenty fathoms.
+
+### Found on the way (package 37j)
+
+- **Scripts run from the scratchpad imported the main checkout's `freesail`**, not the
+  worktree's (the installed package is the main tree; `python -m pytest` puts the working
+  directory first, a script does not). Probes now put the working directory on the path.
+- **The account's doubt shrank with more frequent workings**, the log's read and her drift
+  hove to having been squared per interval: an existing fault that each bearing, cast or
+  fix already worked (they each bring the account up), and that item 4 would have made
+  much worse. Now kept as biases.
+- **The cast's reduction stood above the day's low water**, not the chart's datum: at the
+  neaps the water stands above the datum at low water by half the difference of the rises.
+  Now the height above the datum; the fall to the day's low water given at an anchor's
+  letting go (37f) is unchanged.
+- **The game 9 noon cannot be "taken" against an honest account** (above). The lead may
+  wish to say in the brief's words what the case holds: doubted against the lead-kept
+  account, weighed by the doubts against an honest one.
+- **A lead-kept account already four miles out is helped and not cured**: the forenoon of
+  16 June begun with game 9's noon account (four miles out, a quarter of a mile in doubt)
+  ends with the doubt grown to nine tenths and the error four, the casts over the flat
+  sand answering within the doubt in the wrong place and being weighed (37e's behaviour).
+- **The log's line of a sighting still carries the mark's true distance and bearing** in
+  its data (`lookout.Lookout._line_data`), for the record and the tests; the snapshot's
+  reading does not. If the log's data reaches the browser, that is a road left.
+- **The thick passage aground and the Iroise's cast lost**, above: the books, for the lead.

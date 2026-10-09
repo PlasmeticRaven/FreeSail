@@ -8,7 +8,7 @@ Wherever the world has a chart (a scenario with a `region`), it has a tide. The 
 
 Three things of the world's tide a captain can see for himself, and the game gives him:
 
-- **The height, in the lead.** A cast in the Roads at high water of springs reads five metres more than the chart's datum; at low water the chart's own figure. The master, laying his cast on the chart, takes off his own allowance for it (below), and the account moves onto the contour his corrected depth says, not the world's.
+- **The height, in the lead.** A cast in the Roads at high water of springs reads five metres more than the chart's datum; at low water the chart's own figure. The master, laying his cast on the chart, takes off his own allowance for it (below), and looks within his doubt for the depth his corrected cast says, not the world's.
 - **The rocks that cover.** A rock the pilot says "shows at half-tide" is in sight at low water and gone at high; the lookout does not hail what the water hides, and the grounding reads the tide over it. The Manacles keep "one head always above water" and are seen at any tide; the Rose, "thirteen feet on them at low water", is never seen and takes a frigate's keel at the bottom of a spring tide and not at the top.
 - **The set.** A ship hove to off the Lizard for six hours goes east or west by the stream's miles, which the log never shows; `state` shows her over the ground, and the account shows where the master thinks she is.
 
@@ -26,7 +26,9 @@ thirteen days old; the rise 15 feet at springs)
 
 `the tide by the almanac` (also `the tide`, `high water by the almanac`) gives it for the nearest place in his table to the account, or for a port by name. Where his table has no such place it says so and gives the nearest it has. The rule's errors are the period's: on the day of full moon his high water is within an hour of the world's, and at the quarters up to an hour out, which is why the Admiralty wanted tide tables and why Whewell was at work on them.
 
-His allowance for the tide under the lead is worked the same way: the spring rise his table gives for the place, two-thirds of it at the quarters, and the height above low water now by the hours from his high water, which is the rule of twelfths worked exactly. It is a rule of thumb against the world's harmonic tide and it is wrong by a foot or two; that is the master's error, and the lead's cast carries it onto the chart.
+His allowance for the tide under the lead is worked the same way, by his own book and never the sea's: the rise at springs his table gives for the nearest place to his account, two-thirds of it at the quarters, and the height now above low water at springs (his chart's datum) by the hours from his high water, which is the rule of twelfths worked exactly. Every place of both tables has its rise: where the period's own table gives none (Moore's gives none at all), the table carries the round figure his sailing directions would give, marked judgement in the data. It is a rule of thumb against the world's harmonic tide and it is wrong by a foot or two, and by a fathom when his hour is an hour out near half tide; that is the master's error, and the lead's cast carries it onto the chart. When what he takes off is a fathom or more, the cast's line says it: "By the deep eleven; loose sand. Two fathoms of tide allowed by the epitome: nine fathoms on the chart. The account kept." Where the cast so reduced answers nothing within his doubt, he keeps his account and says the cast does not agree ([chapter 10](10-the-reckoning.md), the lead).
+
+The fall he reckons to low water from where she lies, which he gives the captain letting go an anchor (below), is the same tide counted from the day's own low water and not from the springs': at the neaps it is the less.
 
 ## The tide in the reckoning
 

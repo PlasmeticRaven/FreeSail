@@ -507,7 +507,87 @@ Bay of Brest, fixes every five minutes by three marks all in one quarter of the 
 leave the account believing itself good to a cable while it stands three cables out; and
 the rule takes an observation whose own stated doubt is too small (the cruise's
 chronometer, 7.6 miles out against a stated doubt of 2.3, laid a good account down off
-Plymouth for half an hour until the next bearing took it back).
+Plymouth for half an hour until the next bearing took it back). *Both answered by package
+37j, below.*
+
+**As built (package 37j, the account amended; the review's part K and the fold-in's
+finding, §33 item 24).** What 37e's paragraphs above say of "taken" and of a cast's search
+is amended by this one.
+
+*The better figure is believed* (`Reckoning.observe_line`, `observe_point`; the lead's
+decision). When an observation and the account stand further apart than
+`OBSERVATION_OUT_SIGMAS` times their two doubts added, one of them is plainly out, and the
+observation is **taken** only when its doubt across its line is no greater than the
+account's; otherwise it is **weighed** as any observation is, the account moving by the
+part its own doubt is of the two, and the line says the master doubts it
+(`Observation.doubted`, `doubted_words`): "the sight stands five miles and a half to the N
+of the account, and the account, good to three cables, is the better figure: the account
+moved a cable to the N". The number two is kept, and for its own reason now: it is what
+he trusts a figure within (the lunar's and the chronometer's words), so that "plainly
+out" is "further apart than he would trust the one and the other within"; 37e's reason
+(game 9's noon taken at 2.06 of the doubts together) no longer bears, that noon being
+believed or doubted by the better figure and not by the number. Held in tests with their
+figures: the merchant passage's second noon (an octant's 2.5 miles against a fix's three
+cables, a hair either side of the doubts together: weighed both ways, the account within
+a cable of the fix); the cruise's chronometer (7.6 miles out against 2.28, the account a
+cable in doubt: kept); game 9's lunar of note 5 (12.12 against 0.83: kept, and set
+eighteen leagues off, still weighed and doubted); and game 9's noon of 16 June, doubted
+against the account the lead had kept at a quarter of a mile, and weighed by the doubts
+against an honest one. "Taken" outright that noon cannot be against any account no
+better than the sight: their doubts together are then nine miles, and the two stood five
+apart (docs/dev/TuningNotes.md, package 37j, has the forenoon sailed again).
+
+*The cast not beyond doubt* (`Navigation._cast`, `Reckoning.within_doubt`,
+`widen_toward`). The master looks for the cast's depth and ground within his doubt
+(`OBSERVATION_OUT_SIGMAS` of it, the ellipse as it lies; `chart.contour_point`'s
+`inside`, the search finer than half a mile within a small doubt, `CONTOUR_FINEST_M`) and
+no further; a cast never moves the account further than its own doubt. The chart's grain
+(37e's `depth_span`) stands. Where nothing within the doubt answers, "the cast does not
+agree with the chart where Mr — believes her; the chart has that water nearest a mile
+and a half to the SE of the account: the account kept, and its doubt widened": the account
+stays, and its doubt is grown toward the nearest water that answers (searched as 37e
+searched, five miles or twice the trust) until that water lies just beyond the edge of
+what he would trust it within (`APART_EDGE`), so that the same cast again stays apart. A
+second cast within `SAME_GROUND_NM` of one that did not agree is the same thing seen
+again and widens nothing further. The data says `agrees` and `apart`.
+
+*The tide's height under the lead by his book* (`_tide_allowance_m`, `_masters_tide`):
+the cast is reduced to the chart's datum (low water at springs) by half the spring rise of
+the nearest place in his epitome to his account and half the day's rise by the
+half-cosine of the hours from his own high water; never the world's tide. Every place of
+both tables has a rise (`data/tides/establishments.yaml`, `rise_judgement` where the
+period's table gives none: the world's spring range rounded to the foot). The line says
+the reduction when it is a fathom or more ("Two fathoms of tide allowed by the epitome:
+nine fathoms on the chart."); the data carries `tide_allowed_m`. The fall to the day's
+low water he gives at an anchor's letting go (`tide_height_by_master_m`, package 37f) is
+counted from the day's own low water and is unchanged in meaning.
+
+*Each board by itself* (`Navigation._board_ends`, `BOARD_ALTERATION_POINTS`,
+`BOARD_LEAST_S`). At heaving to and filling away, and under way whenever her head goes two
+points or more from the mean heading pegged since the last working (a tack, a wear, an
+alteration of course), the account is worked up to that minute and the next board begun
+there; a board shorter than a minute is not cut again. Because the account is now worked
+more often, the log's read and her drift by eye, each one figure for the whole time it
+serves, are kept as biases that grow in a straight line across the boards
+(`Reckoning.read_doubt`, `drift_doubt`, `held`): the read's until the log is next hove
+(`new_read`), the drift's until she fills away (`lay_by_drift`). `Reckoning.advance`
+without `held` (truth 58) is as before.
+
+*A fix's doubt on one hand* (`_compass_shift_nm`, `_one_hand`, `ONE_HAND_DEG`). How far
+the compass's own error, one sigma of what he allows for it, moves a fix by its marks is
+the same in every fix by marks on that hand with that compass; after a fix the account's
+doubt that way is never narrowed below it (nor raised by it above what it was). With the
+marks within six points and a half of one another, "good to" says the doubt as it lies
+when the two differ: "good to a cable along the shore and four cables off it".
+
+*The danger list from the best figure.* `the dangers` and the dangers a shaped course's
+line passes are drawn from the account as it stands and said to the cable
+(`geo.distance_words`): "the line passes the Penwin and the Vaze within a cable, the
+Manacles within two cables and the Governor within a mile".
+
+*The departure* is the scenario's own position (the truth at the start, as a departure
+taken from the land in sight is) with a mile's doubt; until 37j the account opened a mile
+out by a draw. At anchor the run since noon does not grow (tested).
 
 ### 14. Instruments, the sights and the lunar (`freesail/world/sights.py`, `core/moon.py`)
 
@@ -611,6 +691,27 @@ the reckoning`, the master's own tide turning (the routine line `reckoning.tide`
 is also said when by his account she passes into other waters), for a book that would
 shape its course again; the swing at anchor's `the turn of the tide` is unchanged.
 
+**As built (package 37j: `the port` and `the depth of water` by the captain's means, the
+review's G4, the last step of its plan).** `the depth of water` (also `the water`, `the
+depth of water by the chart`, `the depth by the chart`, `the charted depth`) is the
+chart's depth at the position by account, at the chart's datum, said as the chart's and
+never as a cast ("eleven fathoms at low water by the chart, at the position by account;
+the chart has seven fathoms to fifteen within the account's doubt", the span read over
+the doubt's ellipse at twice the doubt). In a standing order's condition the depth reads
+the last cast of the lead (`the depth`), as the officer of the watch would read it, and
+the chart's figure only when the book says `by the chart` (`standing.grammar`); the
+merchant passage's two conditions read the lead since. `the port` gives the port's road
+by its bearing and distance from the position by account with the account's doubt ("Falmouth,
+the outer road bearing N by W by account, five miles, the account good to a mile"), as
+`shape a course for` does, and beyond the pilot's cruising ground "no port within the
+pilot's cruising ground by account; the nearest is Falmouth, NNE by account, seven
+leagues, the account good to a mile"; at anchor in a port she is in it, as anyone aboard
+can see. `the chronometer`'s miles of longitude are worked at the latitude by account. A
+test asks every reading of two ships of one seed four miles apart with one account and
+gets one answer, but the lookout's own rows (what the eye makes of the land and the
+compass's bearing of a mark) and the moon's altitude in the data behind `the moon`
+(`tests/test_readings.py`, `test_no_reading_gives_the_true_position_by_any_road`).
+
 ### 16. The tide (`freesail/world/tide.py`, `data/tides/constituents.yaml`, `streams.yaml`)
 
 As T §5, adopted. **The world's tide**: M2, S2 and N2 at the eleven TICON gauges (St
@@ -628,7 +729,8 @@ captain's tide**: the establishment of the port from his epitome (the ship's pap
 the moon's age from his almanac, worked by Moore's rule of 48 minutes a day, wrong by up
 to an hour as Bowditch admits, and by more when his book's establishment is an old one. The
 difference between the two tides is the play, as the difference between the two positions
-is. **Exposure by the period's means only**: no tide readout, ever; the establishment table
+is. (Package 37j: the master's allowance under the lead is his own epitome's, by a rise
+for every place of his table, §13.) **Exposure by the period's means only**: no tide readout, ever; the establishment table
 by handle; the almanac's moon; the lead against the chart's depth; the landmark's state
 (the Black Rock shows at half tide); the ship riding to the tide at anchor, the cable
 slack at the turn; the set allowed for in the traverse. The primer carries the rule of 48
@@ -678,7 +780,10 @@ The viewer's map becomes the captain's chart: the coast and the features as his 
 has no sounding), the reckoned position and its ellipse, the track by account, the noon
 positions, the bearings taken, the soundings with their ground. The true position is not
 in the snapshot the client receives (`api/queries.py` gives the reckoning; the truth is in
-the save and the tests only). A `--casual` display of the truth is a later option and a
+the save and the tests only). Since package 37j neither is the true distance of any
+landmark in sight, and a mark's bearing in the snapshot is the point the lookout said it
+by (`lookout.Lookout._data`); the log's own line of a sighting keeps them for the record
+(`_line_data`), as it did. A `--casual` display of the truth is a later option and a
 display choice, as the proposal says; nothing in the simulation changes for it.
 
 ### 18. Grounding and anchoring (`freesail/world/ground.py`, `evolutions/anchor_*.yaml`)
@@ -1230,7 +1335,10 @@ in (then 5b), double altitudes, the kedge, interiors beyond a name and a descrip
    outright on one platform and weighed on the other, the two being a hair either side
    of the doubts together; the owner's note 5 on game 9 (a poor lunar overriding the
    better account) is the same thing. For the 37e amendments: take an observation
-   over the account only when it is the better figure. **The helm through the wind.** A chase or a shaped course that
+   over the account only when it is the better figure. *Built by package 37j (§13): the
+   better figure is believed, and on both platforms that noon is now weighed and doubted
+   alike, the line it fell either side of no longer deciding anything; the cause of the
+   platform difference itself is still open.* **The helm through the wind.** A chase or a shaped course that
    would turn a square-rigged ship through the wind's wake is worn for
    (`orders.navigation._course_not_laid`); a plain `steer` through it is left as the helm
    has always had it, and a captain who types one from close-hauled will be taken aback.
