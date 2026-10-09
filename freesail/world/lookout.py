@@ -73,7 +73,7 @@ from typing import Any
 from freesail import units
 from freesail.core.events import Severity
 from freesail.world.chart import CHART_EDGE_NM, NIGHT_LAND_NM, Chart, Feature, Sighting
-from freesail.world.geo import Position, estimate_words
+from freesail.world.geo import Position, estimate_words, name_words
 
 __all__ = [
     "CLOSING_FRACTION",
@@ -209,7 +209,7 @@ def height_of_eye(ship: Any) -> float:
 
 def _key(name: str) -> str:
     """A name as it is matched: lower case, without its article or its punctuation."""
-    words = "".join(c if c.isalnum() or c.isspace() else " " for c in name.lower()).split()
+    words = name_words(name)
     if words and words[0] == "the":
         words = words[1:]
     return " ".join(words)
@@ -920,7 +920,8 @@ class Lookout:
         lookout's own words, the coast's name where the chart has one), with the distance
         as said for the dialect to compare (`when the nearest land is under half a mile
         then ...`), never the chart's own metres; None when no shore is in sight
-        (`no_nearest_land_words` says which: none within a league, or not to be seen)."""
+        (`no_nearest_land_words` says which: none within a league, or none seen within what
+        the night or the weather allows)."""
         shore = next((s for s in self.sightings if s.feature.id == SHORE_ID), None)
         if shore is None:
             return None
@@ -938,17 +939,17 @@ class Lookout:
 
     def no_nearest_land_words(self) -> str:
         """Why `the nearest land` has nothing: no land within a league by day in clear
-        weather; else what the night or the weather lets him see, within which there is
-        none (what lies beyond it he cannot say)."""
-        if self._shore_bound == "night":
+        weather; else none seen within what the night or the weather lets him see, and
+        nothing to be told of what lies beyond it. Package 37l (the review of gate 5c's
+        playtests, G2 and G5): the words were "not to be seen: in this weather the shore
+        shows within a cable at most", which an officer read as land within a cable and
+        hove to in mid-Channel; they now say first that none is seen."""
+        if self._shore_bound in ("night", "weather"):
+            reach = estimate_words(self._shore_limit_nm * units.NAUTICAL_MILE)
+            when = "by night" if self._shore_bound == "night" else "in this weather"
             return (
-                f"not to be seen: by night the shore shows within "
-                f"{estimate_words(self._shore_limit_nm * units.NAUTICAL_MILE)} at most"
-            )
-        if self._shore_bound == "weather":
-            return (
-                f"not to be seen: in this weather the shore shows within "
-                f"{estimate_words(self._shore_limit_nm * units.NAUTICAL_MILE)} at most"
+                f"none seen within {reach}; {when} the shore shows no further off than that, "
+                f"and land beyond it cannot be told"
             )
         return "no land within a league"
 

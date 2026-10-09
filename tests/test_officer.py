@@ -1786,12 +1786,13 @@ def test_what_moved_out_of_the_consent_brief_is_in_the_briefs_of_the_stations():
         ),
         (
             "the three things the officer may do on its own word to avoid a danger",
-            ("put the helm over", "let go an anchor"),
+            ("alter her course by any helm order", "let go an anchor"),
             {
                 "officer": (
                     "on his own word and giving his reason (submit_order with danger='...'), "
-                    "put the helm over, heave to or let go an anchor; the log says that he did "
-                    "and why",
+                    "alter her course by any helm order ('helm a-lee', 'hard a-weather', 'bear "
+                    "away two points', 'steer NW'), heave to or let go an anchor; the log says "
+                    "that he did and why",
                 )
             },
         ),
@@ -1915,7 +1916,7 @@ def test_what_moved_out_of_the_consent_brief_is_in_the_briefs_of_the_stations():
     # each thing once: the officer's station brief no longer says the domain, the grant or
     # the way out of danger again after the head's authority item
     station_brief = officers.split("The station brief:")[1]
-    for once in ("keeps back", "put the helm over", "bearings and fixes", "you have the deck"):
+    for once in ("keeps back", "any helm order", "bearings and fixes", "you have the deck"):
         assert once not in station_brief and officers.count(once) == 1, once
 
 
@@ -3279,3 +3280,111 @@ def test_the_handover_is_asked_for_at_a_reserve_in_tokens_and_of_an_officer_off_
     ]
     assert not h.agent.has_deck and not h.agent.released
     assert h.journal.last_note().text == f"Handover note (the watch so far): {NOTE}"
+
+
+# ---------------------------------------------------------------------------
+# Package 37l: the drill's count, `stand_down`'s note, and the watcher's brief (G13's
+# small things); "put the helm over" out of the officer's brief
+# ---------------------------------------------------------------------------
+
+
+def _drilled(tmp_path, script: list) -> consent.Record:
+    rec = consent.ensure(
+        WEIGHTS,
+        "the officer's test runtime",
+        Fake(script),
+        door="runner",
+        owner=lambda words: "The owner's reply.",
+        records_dir=tmp_path / "consent",
+        out=io.StringIO(),
+        today=TODAY,
+        drills=True,
+    )
+    assert rec is not None
+    return rec
+
+
+def test_the_drill_counts_three_calls_sent_in_one_reply(tmp_path):
+    """Game 10 (G13): the model sent the three calls in one reply; the stand-by ended the
+    turn before their results were added, so the drill counted the stand-by alone and
+    asked for the other two. Every result counts now, those of a reply a stand-by ended
+    among them."""
+    rec = _drilled(
+        tmp_path,
+        [
+            reply("", call("answer", text="Yes.")),
+            "",
+            reply(
+                "",
+                call("library", topic="primer 6", section="watches"),
+                call("journal", note="The drill: a line in the journal."),
+                call("stand_by", until="eight bells"),
+            ),
+        ],
+    )
+    assert rec.verdict == consent.YES and rec.drill == consent.DRILL_PASSED
+
+
+def test_the_drill_keeps_a_stand_by_counted_when_the_other_two_come_after(tmp_path):
+    """Game 10 again: when the two were sent again, the drill asked for the stand-by
+    again, its count read from the stand-by's state at that moment. A call once counted
+    stays counted."""
+    rec = _drilled(
+        tmp_path,
+        [
+            reply("", call("answer", text="Yes.")),
+            "",
+            reply("", call("stand_by", until="eight bells")),
+            reply(
+                "",
+                call("library", topic="primer 6", section="watches"),
+                call("journal", note="The drill: a line in the journal."),
+            ),
+        ],
+    )
+    assert rec.verdict == consent.YES and rec.drill == consent.DRILL_PASSED
+
+
+def test_stand_down_asks_for_the_handover_note_with_the_deck_and_not_without():
+    """G13: `stand_down` took a note and did not insist on one. With the deck the
+    stand-down hands the watch on and wants its note: asked for, and nothing done till it
+    comes; without the deck it is taken with none, and the result says so."""
+    world = frigate_world()
+    h, _, saves = seated(world, [""], deck=True)
+    asked = tools_call(world, "stand_down")
+    assert asked.startswith("You have the deck: a stand-down hands the watch on")
+    assert "nothing has been done yet" in asked
+    assert not h.agent.released and h.agent.has_deck and saves == []
+    stood = tools_call(world, "stand_down", note="Royals in at four bells; watch the glass.")
+    assert stood.startswith("You have stood down") and h.agent.released
+    other = frigate_world()
+    h2, _, _ = seated(other, [""], deck=False)
+    plain = tools_call(other, "stand_down")
+    assert h2.agent.released
+    assert "no note was left (none is asked without the deck)" in plain
+
+
+def test_the_watchers_brief_lists_only_the_tools_it_may_use():
+    """G13: the watcher's brief listed hand_over, handover_note and submit_order, each of
+    which it is refused; the officer's lists them."""
+    watchers = composed(watcher).brief.text()
+    officers = composed(officer).brief.text()
+    listed = watchers.split("The tools you have are: ")[1].split(".")[0].split(", ")
+    for refused in ("hand_over", "handover_note", "submit_order"):
+        assert refused not in listed, refused
+        assert refused in officers.split("The tools you have are: ")[1].split(".")[0]
+    assert "stand_down" in listed and "answer" in listed
+
+
+def test_put_the_helm_over_is_out_of_the_officers_brief_and_refused_with_the_orders():
+    """Game 10: the officer's first try at the way out of danger was "Put the helm over to
+    starboard", the brief's own phrase, and the ship did not take it. The brief names the
+    helm orders; the phrase is refused with them."""
+    officers = composed(officer).brief.text()
+    assert "put the helm over" not in officers.lower()
+    assert "alter her course by any helm order ('helm a-lee', 'hard a-weather'" in officers
+    world = frigate_world()
+    e = world.submit("put the helm over to starboard")
+    assert (
+        e.kind == "order.rejected" and "'helm a-lee'" in e.text and "says not which way" in e.text
+    )

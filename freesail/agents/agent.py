@@ -301,8 +301,9 @@ OFFICER_DOMAIN_WORDS = (
     f"may work the ship'), which keeps back {GENERAL_KEPT_BACK_WORDS}. What he has allowed "
     "stands until he takes it back or the officer leaves the station, and has force only "
     "while the officer has the deck. To avoid an immediate danger the officer may, on his "
-    "own word and giving his reason (submit_order with danger='...'), put the helm over, "
-    "heave to or let go an anchor; the log says that he did and why."
+    "own word and giving his reason (submit_order with danger='...'), alter her course by "
+    "any helm order ('helm a-lee', 'hard a-weather', 'bear away two points', 'steer "
+    "NW'), heave to or let go an anchor; the log says that he did and why."
 )
 
 # The orders that change her course (package 37g, item 16; the gate's ruling 1): judged
@@ -1051,6 +1052,16 @@ class Brief:
         one line of the journal's size. The head's five items keep their order whatever
         it holds (truth 46): the disclosure is first in every brief."""
         readings_lines = "\n".join(f"  {k}: {v}" for k, v in _flatten(readings_words))
+        # the tools the station may use, and not those it is refused (package 37l; the
+        # review of gate 5c's playtests, G13: the watcher's brief listed hand_over,
+        # handover_note and submit_order, each refused it)
+        from freesail.agents.tools import TOOLS
+
+        tool_names = tuple(
+            n
+            for n in tool_names
+            if station.has_authority or n not in TOOLS or not TOOLS[n].needs_authority
+        )
         log_text = "\n".join(f"  {ln}" for ln in log_lines) or "  (the log is empty)"
         authority = station.authority.words(station.name, station.domain)
         if station.has_authority:

@@ -1129,8 +1129,8 @@ REGISTRY.add(
         _nearest_land,
         description="the nearest shore within a league as the lookout sees it: where it "
         "lies from the ship's head, its bearing to the point, its distance by estimation, "
-        "the coast's name; 'no land within a league', or 'not to be seen' by night or in "
-        "thick weather",
+        "the coast's name; 'no land within a league', or by night or in thick weather 'none "
+        "seen within' as far as he can see, and land beyond that not to be told",
         none_words=_no_nearest_land_words,
     )
 )

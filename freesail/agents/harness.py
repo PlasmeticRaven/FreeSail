@@ -186,7 +186,7 @@ from freesail.agents.agent import (
     ordinal_words,
 )
 from freesail.agents.fake import Transcript
-from freesail.agents.journal import HANDOVER_KIND, Journal
+from freesail.agents.journal import HANDOVER_KIND, WORD_PASSED_KIND, Journal
 from freesail.agents.model import DATA, MODEL, OPERATOR, Model, Reply, Sample, ToolCall, Turn
 from freesail.api import readings as R
 from freesail.core.events import Event, Rollup, RollupView, Severity
@@ -616,6 +616,11 @@ class Harness:
         self._stood_at: tuple[str, str] | None = None  # (the stand-by's words, its stamp)
         # the line naming the calls that ran before the stand-by in its reply (package 30b)
         self._ran_before_stand_by: str | None = None
+        # the results of each reply a stand-by ended, with where in the turns it was
+        # (package 37l: a stand-by ends the turn and its reply's results are not added to
+        # the turns, so the consent drill, which counts the three calls by their results,
+        # missed a library read and a journal note sent in the same reply as the stand-by)
+        self.stood_results: list[tuple[int, list[dict[str, Any]]]] = []
         # where the present wait began (the log's length and the stamp): the stand-by's
         # start, or the end of the last sample, for the stand-by digest and `interim`
         self._wait_from: tuple[int, str] = (len(world.log), world.clock.stamp())
@@ -679,6 +684,20 @@ class Harness:
         if not self.model_name:
             return ""
         return f"{self.model_name}, through {door_words(self.door)}"
+
+    def _pass_kept_words(self) -> None:
+        """The captain's words kept for this station while nobody held it (package 37l;
+        `orders.stations`): put to the model in its first sample as his word, and a line
+        in the journal that they were passed, so that they are passed once."""
+        kept = self.journal.kept_words()
+        if not kept:
+            return
+        a = self.agent
+        a.word = "\n".join([*([a.word] if a.word else []), *kept])
+        self.note(
+            f"The captain's words kept while nobody held the station passed to it ({len(kept)}).",
+            kind=WORD_PASSED_KIND,
+        )
 
     def note(self, text: str, kind: str = "note") -> Any:
         """An entry in the station's journal, marked with whose it is (package 37g: a
@@ -749,6 +768,7 @@ class Harness:
         self._sample_seen = len(world.log)
         self.resend_brief()
         if not self.conversation:  # a conversation's first turn is what the caller puts
+            self._pass_kept_words()
             self._sample("the start")
 
     def resend_brief(self) -> Brief:
@@ -1484,6 +1504,7 @@ class Harness:
             self._new_books = []
             # what ran before it, said when the stand-by ends (package 30b)
             self._ran_before_stand_by = _ran_before(results[:-1])
+            self.stood_results.append((len(self.turns) - 1, results))
             if self._nudge_unread and self._nudge_text:
                 # a nudge given in this same reply went with a result the stand-by has
                 # dropped: the sample that ends the stand-by carries it
@@ -2748,6 +2769,7 @@ class Harness:
         self._refresh_station()
         self.resend_brief()
         self._wait_from = (len(world.log), world.clock.stamp())
+        self._pass_kept_words()
         self._sample("seated again")
 
     # -- the agent's own actions (through the tools) --------------------------------------
@@ -3008,13 +3030,23 @@ class Harness:
         stopping: it is not the deck given back, and it is not a withdrawal (no consent
         question follows it)."""
         note = " ".join(str(note).split())
+        if not note and self.agent.has_deck:
+            # with the deck, the watch is handed on with its note (package 37l; the review
+            # of gate 5c's playtests, G13: `stand_down` took a note and did not insist on
+            # one): asked for, and nothing done till it comes
+            return (
+                "You have the deck: a stand-down hands the watch on, and wants its handover "
+                "note. Call stand_down again with the note (what happened, what was "
+                "ordered, what you noticed, what you are watching for); nothing has been "
+                "done yet."
+            )
         if note:
             self._say_handover(note, "standing down, for whoever sits here next")
         self.stand_down("its own word", by=f"the {self.station.name}")
         noted = (
             "your note is journaled and said in the log for whoever sits here next, "
             if note
-            else ""
+            else "no note was left (none is asked without the deck), "
         )
         return (
             f"You have stood down ({LEAVING_WORDS['stand down']}): the game is saved, "
