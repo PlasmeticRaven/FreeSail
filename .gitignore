@@ -19,9 +19,13 @@ Thumbs.db
 freesail-seed*-tick*.json
 day.json
 # the chart levels the tool builds and the repository does not carry (spec M5 §10): the
-# world at 2.5 minutes and the Atlantic at 30 seconds, tools/build_charts.py --world/--atlantic
+# world at 2.5 minutes and the Atlantic at 30 seconds, tools/build_charts.py --world/--atlantic.
+# The corridor at level 1 (spec M6 §26, package 38; tools/build_charts.py --corridor) is the
+# one level-1 folder committed, under its own name: the rule for tiles/1/ gives way for it
+# alone, and the Atlantic beyond it is still fetched and not committed
 data/charts/tiles/0/
-data/charts/tiles/1/
+data/charts/tiles/1/*
+!data/charts/tiles/1/atlantic-corridor/
 # package 37d kept three saves as test fixtures (tests/fixtures/saves/): the rule above would
 # hide them, so they are let through here
 !tests/fixtures/saves/

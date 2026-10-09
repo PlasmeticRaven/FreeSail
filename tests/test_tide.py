@@ -385,3 +385,77 @@ def test_every_place_of_both_epitomes_has_a_rise_and_what_is_judgement_says_so(t
     # the period's own figures are kept where they were: Fowey's of 1774 for Falmouth
     falmouth = T.Epitome.load("norie").by_name("Falmouth")
     assert falmouth.spring_rise_ft == 15.0 and not falmouth.rise_judgement
+
+
+# ---------------------------------------------------------------------------
+# Package 38: the tide's table over a larger sea (spec M6 §26, item 5)
+# ---------------------------------------------------------------------------
+
+
+def test_the_gauges_within_reach_are_blended_and_beyond_every_gauge_the_nearest_alone(tide):
+    """The interpolation is honest about distance: every position of the Channel's
+    region blends the eleven gauges as package 34 pinned it (the reach is more than the
+    farthest point of the region lies from Dover); off Lisbon, beyond the reach of every
+    gauge, the constants are Brest's alone and the state says it is far."""
+    assert tide.reach_m == 400 * units.NAUTICAL_MILE
+    for pos in (THE_LIZARD, Position(48.0, -7.0), Position(51.0, -3.0), Position(48.0, -3.0)):
+        _, consts, nearest_nm, far = tide.constants_about(pos)
+        assert not far and nearest_nm < 100.0
+        # the blend of all eleven: every gauge's distance within the reach
+        assert all(bearing_and_distance(pos, g.position)[1] <= tide.reach_m for g in tide.gauges), (
+            pos
+        )
+    off_lisbon = Position(38.6, -9.4)
+    level, consts, nearest_nm, far = tide.constants_about(off_lisbon)
+    gauge, distance_nm = tide.nearest_gauge(off_lisbon)
+    assert far and gauge.id == "le-conquet"  # the westernmost of the French gauges
+    assert 550.0 < nearest_nm == pytest.approx(distance_nm, abs=1.0)
+    assert level == gauge.mean_level_m
+    for name, (amp, lag) in consts.items():
+        assert amp == pytest.approx(gauge.constants[name][0]) and lag == pytest.approx(
+            gauge.constants[name][1]
+        )
+    state = tide.at(off_lisbon, datetime(1805, 6, 12, 12, 0))
+    assert state.far and state.gauge_nm == pytest.approx(nearest_nm)
+    assert not tide.at(THE_LIZARD, datetime(1805, 6, 12, 12, 0)).far
+
+
+def test_the_stream_areas_belong_to_a_chart_and_beyond_them_there_is_no_stream(tide):
+    """`streams.yaml` takes areas by chart: each names its region, the open Channel's
+    statement reaches the Channel's bounds and no farther, and beyond every tabulated
+    area the world's stream is nought until a block tabulates the water."""
+    assert all(a.chart == "channel-west" for a in tide.areas)
+    mid = tide.area_at(Position(49.3, -5.0))
+    assert mid.id == "mid-channel" and mid.bounds is not None
+    off_lisbon = tide.area_at(Position(38.6, -9.4))
+    assert off_lisbon is T.NO_STREAM and off_lisbon.spring_kn == 0.0
+    state = tide.at(Position(38.6, -9.4), datetime(1805, 6, 12, 12, 0))
+    assert state.stream_kn == 0.0 and state.area_id == "open-sea"
+    assert state.height_m > 0.0  # the height is still the nearest gauge's tide
+
+
+def test_far_from_every_place_of_his_table_the_master_says_his_tide_may_be_hours_out():
+    """The doubt in the master's words: a day's sail and more from the nearest place in
+    his epitome, `the tide by the almanac` says the tide here may differ by hours; near
+    a place of the table it says nothing of the kind (as before)."""
+    from freesail.api.session import make_world
+    from freesail.core.world import Scenario
+
+    def world_at(lat: float, lon: float, chart: str) -> World:
+        sc = Scenario(
+            start_time=datetime(1805, 6, 12, 10, 0),
+            wind_from_deg=270.0,
+            wind_speed_kn=10.0,
+            gustiness=0.0,
+            variability=0.0,
+            position={"lat_deg": lat, "lon_deg": lon},
+            chart=chart,
+        )
+        return make_world(7, "data/ships/frigate-36.yaml", sc)
+
+    far = world_at(38.6, -9.4, "atlantic-east")
+    words = far.navigation.tide_by_almanac()["words"]
+    assert "nearest place in the master's table" in words
+    assert "may differ by hours" in words and "Ushant" in words and "621 miles" in words
+    near = world_at(49.9, -5.2, "atlantic-east")
+    assert "may differ by hours" not in near.navigation.tide_by_almanac()["words"]

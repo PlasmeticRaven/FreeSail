@@ -41,11 +41,35 @@ def lines_of(manifest: dict) -> list[str]:
             f"  {name}: {r.get('title', '')} ({b.get('south')} to {b.get('north')} N, "
             f"{b.get('west')} to {b.get('east')} E)"
         )
+    for name, c in (manifest.get("corridors") or {}).items():
+        b = c.get("bounds") or {}
+        out.append(
+            f"  corridor {name}: level {c.get('level')}, {b.get('south')} to {b.get('north')} N, "
+            f"{b.get('west')} to {b.get('east')} E, {len(c.get('tiles') or [])} tiles, "
+            f"{'committed' if c.get('committed') else 'not committed'}; built by "
+            f"`{c.get('built_by', '?')}`"
+        )
     for level in ("world", "atlantic"):
         lv = manifest.get(level) or {}
         if lv:
             state = "present" if lv.get("tiles") else "not committed"
             out.append(f"  {level}: {state}; built by `{lv.get('built_by', '?')}`")
+    charts = manifest.get("charts") or {}
+    if charts:
+        out.append("")
+        out.append("Charts (package 38: the regions each holds and the corridor under them):")
+        for name, c in charts.items():
+            held = ", ".join(c.get("regions") or []) or "none"
+            corridor = c.get("corridor")
+            out.append(
+                f"  {name}: {c.get('title', '')}; regions {held}"
+                + (f"; corridor {corridor}" if corridor else "")
+                + (
+                    f"; not yet built: {', '.join(c['regions_not_built'])}"
+                    if c.get("regions_not_built")
+                    else ""
+                )
+            )
     notes = manifest.get("notes") or {}
     items = notes.get("items") if isinstance(notes, dict) else None
     if items:

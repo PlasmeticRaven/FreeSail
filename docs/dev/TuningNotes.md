@@ -2966,3 +2966,86 @@ timing tests (`test_chart`'s nearest coast and the merchant passage's pace floor
 this machine whenever other suites run beside them and pass alone, which every package
 reported.
 
+
+## Milestone 6: the chart stitched (package 38, 2026-10-09)
+
+Package 38 (spec M6 §26, as built there; the study `docs/design/ChartData.md` §5 and §6; the brief in `docs/dev/M6-WorkPackages.md`). The chart as the whole manifest, the corridor built and committed, the queries across a region's edge, the climatology's boxes, the tide's table over a larger sea, the recipe form and the blocks' checks. The condition of the merge: nothing in the Channel moves, which the recorded passages and the gate's day prove by their digests (`tests/test_known_truths.py`, run once at the end: see "The suite, as run").
+
+### The constants and their sources
+
+| Constant | Value | Source | Verified |
+|---|---|---|---|
+| the corridor (`build_charts.CORRIDORS["atlantic-corridor"]`) | 32 to 51 N, 20 to 1 W at 30″, fetched 31.9 to 51.1 N, 20.1 to 0.9 W at 15″; datum mean sea level | spec M6 §26; GEBCO_2025's area extract from the grid subsetting application (ESRI ASCII, 113,857,796 bytes, SHA-256 4efbda71…771b, retrieved 2026-10-09; the manifest) | the extract read and sampled; the datum the level's (the manifest's level 1) |
+| `build_charts.CORRIDOR_MIN_BLOCK` | 32 cells (about 30 km) | the shoalest sounding of each block of a corridor tile, folded with its eight neighbours', so the grounding check's short-circuit holds over the open sea of a tile four degrees across that holds a coast somewhere; judgement | measured below |
+| `build_charts.FILL_SWEEP_SHALLOW_M`, `FILL_SWEEP_CELL_DEG` | 3 m, 0.05° | the shore's sweep for GEBCO's fill (M5 §33 item 16: Roscoff's town read a metre of water); judgement | the sweep runs at a region's build (not run here: the Channel's tiles were not rebuilt) |
+| `build_charts.REFERENCE_FORMS` | Trinity House, encyclopaedia, Modern chart, The study, RMG, SHOM | the named modern references the Channel's features file cites beside works with their years (`docs/references/README.md`) | the 207 features pass |
+| `lookout.COARSE_CELL_M` | 300 m | a cell wider than this (the corridor's 926 m against a region's 93) and the shore is "the land" with no name and the line says the level's `use`; judgement | by test |
+| `weather.BOX_BLEND_H` | 6 hours | the background and the gradient move from the box she left to the box she is in over a watch; judgement (W §5 gives no rule; "a stated simple one", the brief) | by test |
+| `weather.CENTRE_STEP_KM` | 500 km | the draws are made about her start and the centre steps to her when she is this far from it; judgement (no scenario of the Channel reaches it: the merchant passages' farthest point is under 150 km from Carrick Road) | by test; the passages' digests |
+| the boxes' bounds (`climatology.yaml`) | channel 47.5 to 52 N, 20 W to 2 E; biscay 43.5 to 47.5 N, 20 to 1 W; portugal 36 to 43.5 N, 20 to 5 W; madeira 30 to 36 N, 22 to 9 W | contiguous over the corridor; the Channel's holds every position of the Channel's region with half a degree's margin; judgement | by test |
+| the three boxes' rows | PROVISIONAL, judgement in every row (each row's `note`) | the Channel's rows with the storm track farther off (Biscay); the Portuguese trades, N to NNE on most days May to September under the Azores high (the Portuguese coast); the north-east trade under the Azores high nearly always in reach (Madeira); from memory of the pilot charts' roses (S3) and the Admiralty's ocean passages, NOT READ | the trade's quarter by test over a fortnight (the Portuguese box northerly on two days in five at the least, Madeira's north or east on three in five); the `check` rows not run against a thousand months |
+| `tide.GAUGE_REACH_NM` (`constituents.yaml interpolation.reach_nm`) | 400 miles | the gauges within it blended as before, beyond the reach of every gauge the nearest alone; set above the Channel region's farthest distance from Dover (about 370 miles from 48 N 7 W) so every Channel position blends the eleven as package 34 pinned; judgement otherwise | by test and the passages' digests |
+| `tide.FAR_PLACE_NM` | 60 miles | a day's sail from any place of the master's table, beyond which `the tide by the almanac` says the tide here may differ by hours; judgement | by test |
+| the open Channel's `bounds` (`streams.yaml mid-channel`) | 47.5 to 52 N, 12 W to 2 E | the water the open Channel's statement covers; beyond every area `tide.NO_STREAM`; judgement | by test |
+
+### The corridor, built
+
+From GEBCO_2025 through the subsetting application's queue, 6 s to download once the queue had cut it (a minute or so); 4,608 by 4,608 cells at 15″ in ESRI ASCII, read in about a minute; sampled at the 30″ cell centres (each the shared corner of four 15″ cells, so the bilinear sample is their mean); the distance field over 2,560 by 3,072 cells in 3 s; 30 tiles of 512 cells, the row from 29.47 N and the column from 22.13 W (whole tiles over the box, their cells beyond the fetch box `NODATA`, which answer nothing and compress to nothing); **5,891,760 bytes compressed** with the distance field and the block minima (31.5 MB raw with the field; the brief's "some 11 MB raw, half that compressed" was the elevation alone), under `data/charts/tiles/1/atlantic-corridor/`, which `.gitignore` lets through alone (`data/charts/tiles/1/*` and `!data/charts/tiles/1/atlantic-corridor/`); each tile's SHA-256 in the manifest, the extract's beside the source. The whole took two runs of the tool (the second for the block minima) of about two minutes each.
+
+### The seam, measured
+
+A track south from 48.0 N 4.55 W (off Penmarch) every 250 m across the Channel region's southern tile edge at 47.81 N, on the whole chart: the finest level 2 then 1; the depth at the crossing 74.03 m (EMODnet, LAT) against 73.91 m (GEBCO, mean sea level) at 300 m spacing, and 1.3 m at the test's 250 m (the sources' own difference; the datums differ by about half the spring range there, 2 m, and the grids by as much the other way); the shore's distance 12,307 m (the region's field and search, 93 m cells) against 13,371 m (the corridor's, 926 m cells), a step of a cell and a quarter at the coarser level's grain; the field's own read (`coast_distance`) 12,316 m against 14,816 m, two and a half cells, since the corridor's land mask is the coarser; the dangers within ten miles of a point inside the region the same set from either chart. The frigate sailed from 47.86 N 4.45 W south for two hours at six knots crosses the edge in the second hour: the shore hailed once (at the start, a mile off), no danger lost, no line that the chart ends, the depth under the keel at every tick (the test, slow tier: about 15 s).
+
+### The queries across an edge against within a region
+
+Microseconds each, the best of three runs of five thousand, on the build machine under a load of 11 to 13 (the lead's slow suite and another session's fast tier running beside this one; the brief: measured once, not re-run):
+
+| Where | depth here | the coast (field) | aground | nearest shore | nearby, 20 miles |
+|---|---|---|---|---|---|
+| within the region, mid Channel, at sea (whole chart) | 20.6 | 18.5 | 5.0 | 11,060 (53 km off, no `within`) | 48.5 |
+| the same, on the region alone | 11.0 | 21.8 | 8.1 | 11,630 | 31.8 |
+| within the region, inshore off the Lizard (whole) | 13.7 | 18.3 | 4.0 | 93 | 240 |
+| the same, on the region alone | 11.8 | 20.3 | 9.3 | 86 | 169 |
+| at the region's edge, off Penmarch (whole) | 13.3 | 47.4 (two levels read) | 67.3 (inshore: the keel's cells) | 509 | 18.7 |
+| the same, on the region alone | 14.3 | 18.6 | 58.5 | 608 | 20.0 |
+| a cable over the edge (whole) | 16.1 | 18.8 | 48.6 | 54 | 16.3 |
+| over the corridor, Biscay, at sea, before the block minima | 11.1 | 14.7 | 52.9 | 977 | 7.2 |
+| the same, with the block minima | | | 9.5 | | |
+| over the corridor, 45 N 20 W, at sea, with the block minima | | | 7.9 | | |
+| over the corridor, off Lisbon, inshore (whole) | 17.8 | 17.7 | 63.8 (the keel's cells) | 59 | 5.5 |
+
+So: the depth and the field the same across the edge as within; the coast's field read at the edge itself costs a second level's read (47 µs against 19) and nothing a cable past it; the grounding check at sea over the corridor cost 53 µs with the tile's one minimum (a corridor tile holds a coast somewhere) and 8 to 10 with the block minima, against 5 to 8 within the region; inshore it reads the keel's cells at 50 to 70 µs wherever she is, as package 32 measured (33 µs alone). The nearest shore with no `within` at mid-Channel is 11 ms on either chart (the search window of a 53-km reach at 93-m cells; the lookout asks it with `within` a league and it answers in microseconds), unchanged. The two-levels read at an edge is the one cost across an edge; a cable past it the corridor alone answers.
+
+### The pace, measured
+
+The gate's day under systems off Falmouth (49° 57′ N, 5° 00′ W), a thousand ticks to settle and the best of three thousands, on the region alone and on the whole chart, in one process: **329 ticks a second on either**, under a load of 13.3 to 13.6 (the same two suites running beside). The floor is 500 alone; the brief says the pace floors fail under load and pass alone, and this one does: the figure to read is that the whole chart costs the gate's day nothing against the region alone, which the two equal figures say. Not re-run.
+
+### The weather's boxes, measured
+
+Seeded from the Channel's box by name or by default at seed 7, 1 July: the systems the same draw for draw over ten days (the test). Seeded off Lisbon in July at seed 7, over a fortnight of hours: the wind's prevailing quarter north on more than two hours in five; off Madeira north or east on more than three in five (the tests' floors; the figures at seed 7 above them). A crossing into Biscay a day out: the background moves from the Channel's 1017 hPa to Biscay's 1018 over six hours, linear, the systems in play kept; a low drawn after the centre stepped 560 km south is born about the new centre. Nothing of this is read by a scenario of the Channel: `locate` changes the box only on a crossing, and the Channel's box holds every Channel scenario's water; the centre steps only beyond 500 km.
+
+### The recorded passages, and the suite
+
+See "The suite, as run (package 38)" below for the run of `tests/test_known_truths.py --slow -n 4`, the proof that no passage moved.
+
+### Found on the way (package 38)
+
+- **The levels' datums differ at a region's edge.** EMODnet's tiles are relative to LAT, GEBCO's corridor to mean sea level (the manifest's level 1, as the brief had it): at a region's edge the chart's depth steps by the two sources' difference, which off Penmarch is a metre and a third in seventy and in general up to half the spring range. The tide's height is added to either, so over the corridor the water under the keel is overstated by that much at low water; a block that wants the corridor honest at its edge should fetch its region whole (the region's EMODnet tiles reach past its bounds). Said in `ChartData.md`'s note.
+- **A region's distance field knows only its own block.** Near a region's edge the field gives the distance to the nearest shore *within the region's block*, which may be farther than the true shore over the corridor. `coast_distance` now reads the corridor's field too where the region's tiles end within the distance the field gives (four set lookups), and takes the nearer; between a harbour patch and its region the finest answers alone, as it always did, so no Channel figure moves.
+- **A corridor tile's one minimum defeats the short-circuit.** A tile four degrees across holds a coast somewhere, so its shoalest sounding is a few metres and the grounding check read the keel's cells every tick over the open sea (53 µs). The corridor's tiles now carry the shoalest sounding of each block of 32 cells, each folded with its neighbours', and the check reads one value (8 to 10 µs at sea). The regions' tiles are unchanged.
+- **A corridor tile reaches past the fetch box.** The tiles are whole (30 over the box), so the row from 29.47 N and the column from 22.13 W hold `NODATA` beyond 31.9 N and 20.1 W; a query there answered a depth of None but a field distance (the chamfer transform ran over the unknown cells); `_dist_cell` and `dist_smooth` now answer None where the elevation is `NODATA`, which no region tile has.
+- **GEBCO's queue** still offers `gebco_2025_global` beside 2026's; the corridor is 2025's, the source the manifest names.
+- **The nearest gauge off Lisbon is Le Conquet**, not Brest, by nine miles of longitude; the master's nearest place is Ushant, 621 miles off, and he says so.
+- **`Weather` objects in the fixture checkpoints lack the boxes' state**: the class gives the defaults an unpickled object needs (`box`, `_centre`, `_blend`, `crossings`), so a save from before this package loads and runs.
+- **The fingerprint test fails while files are being edited**: `rules_fingerprint` is computed once a process and compared afresh; a run started before an edit and compared after it differs. Not a failure of the build; noted for anyone running the suite beside an editor.
+- **Two timing tests fail under the machine's load** (`test_chart`'s nearest coast and the pace floors), as the brief said they would; they pass alone and were not re-run.
+
+### The suite, as run (package 38)
+
+Both runs on the build machine under a load of thirteen to sixteen (the lead's slow suite and another session's fast tier running beside), once each, as the brief asks.
+
+**`python3 -m pytest tests/test_known_truths.py --slow -n 4`** (an hour under that load): 81 passed, 8 expected failures, 6 failed. **Every pinned digest, line count and tick of the recorded passages and of the gate's day held**: the frigate's and the schooner's passages for gate 5b, the thick passage, the merchant passage and the naval cruise, the gate's day under the standing orders and under systems, the saves replayed to their digests. Nothing in the Channel moved. The six failures: five pace floors (`test_truth_51...`, `test_the_pace_on_the_day_under_systems...`, `test_the_pace_on_the_passage...`, `test_the_pace_on_the_gates_day_with_the_region_loaded...`, `test_the_pace_at_the_merchant_passages_start...`: 85 to 163 ticks a second against the floor of 500, the machine's load; the brief says they fail under load and pass alone, and they were not re-run), and `test_the_schooners_pilot_boards_before_she_runs_in`, whose last assertion (`900 < anchored - aboard`) cannot hold with the tree's own pinned ticks: `GATE_5B_SCHOONER_PILOT_ABOARD_TICK` 56940 and `GATE_5B_SCHOONER_ANCHORED_TICK` 57255 are 315 ticks apart in the base commit 61d2b2b as in this branch, both pinned by the K batch's merge, and the ticks themselves are asserted equal two lines before and pass. The test fails on the base tree for the same reason; it is the lead's to resolve (the words say "well before the anchor"; the pins say five minutes), not this package's.
+
+**`python3 -m pytest -n 4`** (the fast tier whole; the first run was stopped by its hour's limit at 72 per cent with no failure, the second ran its two hours): 2,979 passed, 3 failed. `test_chart.py::test_nearest_coast_from_the_distance_field_with_a_name_from_the_index` (the timing the brief names: fails under load, passes alone) and `test_the_pace_at_the_merchant_passages_start...` (163 ticks a second, as above); and once, `test_reckoning.py::test_a_cast_that_does_not_agree_within_the_doubt_keeps_the_account_and_widens_it_once`: the cutter's cast in St Mary's Sound found "that water nearest 16 leagues to the E by N" where the test expects "a mile and a half to the SE". It passes alone on this branch and on the base tree (extracted to the scratchpad and run there), and it passed in two runs made to reproduce it: the chart, tide, weather, geo and reckoning files together on four workers, and the same files in one process ending on it. No test replaces the shared chart or tide tables (grep), nothing on the cast's road reads the clock, and the Channel's chart and tide answer what they answered (the passages' digests). Seen once, under a load of fifteen, in a run whose worker had run other files first; not reproduced; reported to the lead to run on a quiet machine before the merge.
+
+`python3 -m ruff check .` and `python3 -m ruff format --check .` pass.

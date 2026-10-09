@@ -2,9 +2,9 @@
 # Every source with its licence, attribution, URL, retrieval date and checksum; the
 # regions and their tiles; the attribution block the game shows in its about text.
 format: 1
-built: '2026-10-02'
+built: '2026-10-09'
 tool: tools/build_charts.py
-build_hash: e5d396d7a61c0172
+build_hash: b5c83b16c8dfeed3
 levels:
   '0':
     cell_sec: 150.0
@@ -31,6 +31,12 @@ levels:
     use: harbour patches
     datum: lowest astronomical tide
 nodata: -32768
+charts:
+  atlantic-east:
+    title: The Channel, Biscay and the Iberian coast to Madeira and the Strait
+    regions:
+    - channel-west
+    corridor: atlantic-corridor
 regions:
   channel-west:
     title: The western Channel and the Western Approaches, Falmouth to Ushant
@@ -1114,6 +1120,212 @@ regions:
       tower: 1
       town: 8
       transit: 6
+corridors:
+  atlantic-corridor:
+    title: 'The corridor: the Western Approaches, Biscay and the Iberian coast to Madeira'
+    level: 1
+    bounds:
+      south: 32.0
+      north: 51.0
+      west: -20.0
+      east: -1.0
+    fetch:
+      south: 31.9
+      north: 51.1
+      west: -20.1
+      east: -0.9
+    datum: mean sea level
+    source: gebco_2025
+    licence: public-domain
+    fetched_sha256: 4efbda71e1245d7ea512ec51ea72353c61c785d51ae4eb03cae556c29e77771b
+    folder: tiles/1/atlantic-corridor
+    committed: true
+    built_by: python tools/build_charts.py --corridor atlantic-corridor
+    note: 'committed (spec M6 §26, the owner''s ruling 5): the one level-1 folder the repository carries,
+      so that a clone plays the voyage; the runtime reads these tiles under every region of a chart that
+      names the corridor'
+    tiles:
+    - name: 106080_-79680
+      south_sec: 106080
+      west_sec: -79680
+      min_depth_m: 2938.5
+      bytes: 84334
+      sha256: 029cbec76d5014dfb1d3a71552dd4497205c8636b52de10da1edee0ab3b972c5
+    - name: 106080_-64320
+      south_sec: 106080
+      west_sec: -64320
+      min_depth_m: 0.2
+      bytes: 136764
+      sha256: 10b8e53a9e3b56163c6604bd9b34814ab7ef8d5fa8c831b1badd65ca8d3c20df
+    - name: 106080_-48960
+      south_sec: 106080
+      west_sec: -48960
+      min_depth_m: 2.8
+      bytes: 139989
+      sha256: 9a9874c362ab160c379c91c6e3ac25866026a4f93033458424f57f5cd4fa23ff
+    - name: 106080_-33600
+      south_sec: 106080
+      west_sec: -33600
+      min_depth_m: 0.0
+      bytes: 133272
+      sha256: 1ada30fb198a89729af03ad1f24ebdbfdd4bbb61a983cae07562a3be68093e28
+    - name: 106080_-18240
+      south_sec: 106080
+      west_sec: -18240
+      min_depth_m: null
+      bytes: 128215
+      sha256: 48db232912533ad6da610671e1b19f5a32a735ab9468d378abebcc70da619c79
+    - name: 121440_-79680
+      south_sec: 121440
+      west_sec: -79680
+      min_depth_m: 2703.8
+      bytes: 158235
+      sha256: f280caa212c146aebd1ed8f10cfe14161c1c13db1c141b746b973c1863dd4880
+    - name: 121440_-64320
+      south_sec: 121440
+      west_sec: -64320
+      min_depth_m: 162.8
+      bytes: 294082
+      sha256: 26812a344183da7506ecc616f8faec608812560714b248bec3c05b43a7aeedd1
+    - name: 121440_-48960
+      south_sec: 121440
+      west_sec: -48960
+      min_depth_m: 58.0
+      bytes: 272378
+      sha256: 81e78241951fb57d89455bda80e1ea0673a6fb0be1cec951a5b353b530564f09
+    - name: 121440_-33600
+      south_sec: 121440
+      west_sec: -33600
+      min_depth_m: 0.0
+      bytes: 291563
+      sha256: 4b8188a08c734b231b27473cd7abb423016fff56d7a2011d8cc25a9dfa997f37
+    - name: 121440_-18240
+      south_sec: 121440
+      west_sec: -18240
+      min_depth_m: 0.0
+      bytes: 305075
+      sha256: ccccac4f3cf554f290a2c23c8f145eae24a99f7891ee97bc187f112104c3d89e
+    - name: 136800_-79680
+      south_sec: 136800
+      west_sec: -79680
+      min_depth_m: 1810.0
+      bytes: 187712
+      sha256: 8cbc57df1137c8774b07c44904f5727c63e4440a9c65cf2cc3ddae70cd9850db
+    - name: 136800_-64320
+      south_sec: 136800
+      west_sec: -64320
+      min_depth_m: 2222.8
+      bytes: 307630
+      sha256: d9749d5c76d3c2437b640ca34628f27f7e93b41909f52ca6c8dd17442fe8f4af
+    - name: 136800_-48960
+      south_sec: 136800
+      west_sec: -48960
+      min_depth_m: 0.2
+      bytes: 285797
+      sha256: dc817033b565ed26cc8a94379ca3385d49bc74372107c59a46458deeb588a251
+    - name: 136800_-33600
+      south_sec: 136800
+      west_sec: -33600
+      min_depth_m: 0.0
+      bytes: 292370
+      sha256: 00ff375cb0347009579f68ccab27ef764027f3b0aa130bf599d27046554dd082
+    - name: 136800_-18240
+      south_sec: 136800
+      west_sec: -18240
+      min_depth_m: null
+      bytes: 287798
+      sha256: 51de7d719890813c62e0d94499ca4737e7044967ec1dece1dbbdb184552140f4
+    - name: 152160_-79680
+      south_sec: 152160
+      west_sec: -79680
+      min_depth_m: 1786.8
+      bytes: 171267
+      sha256: a3ad56a10d9bffb456a51490621d1ec6c536c50a71bed89d29a81a5683238006
+    - name: 152160_-64320
+      south_sec: 152160
+      west_sec: -64320
+      min_depth_m: 2223.5
+      bytes: 303572
+      sha256: 969a8fce54187442f00e953a3272b58f13e89e2228afd50e3505a08f8bd7b4f2
+    - name: 152160_-48960
+      south_sec: 152160
+      west_sec: -48960
+      min_depth_m: 49.2
+      bytes: 279428
+      sha256: 183d77cb79ecc37dad1c25bbaccd808221c4e56bc0081a4e14d2c8e46aeb06e7
+    - name: 152160_-33600
+      south_sec: 152160
+      west_sec: -33600
+      min_depth_m: 0.0
+      bytes: 278105
+      sha256: 51ce1b89b071b11c73174006445c6e74c5392d142b0fa90318756f427a9c0e50
+    - name: 152160_-18240
+      south_sec: 152160
+      west_sec: -18240
+      min_depth_m: 0.0
+      bytes: 288316
+      sha256: 66eddf94ae5bc3b2cb4275e96a18cc5b480ecb7f846c1e558ab7ac5f1f008673
+    - name: 167520_-79680
+      south_sec: 167520
+      west_sec: -79680
+      min_depth_m: 3223.0
+      bytes: 149540
+      sha256: 3696ae12c2fb9571cc5d869beed01c6ab0bd1af01e0f25c37625f0eae82462a0
+    - name: 167520_-64320
+      south_sec: 167520
+      west_sec: -64320
+      min_depth_m: 894.8
+      bytes: 246312
+      sha256: 16ca6ef2563691f85f9ee69440d9a1f5b235c500cfa454c9ef2442328987ceca
+    - name: 167520_-48960
+      south_sec: 167520
+      west_sec: -48960
+      min_depth_m: 88.8
+      bytes: 264092
+      sha256: d7e6c368a733917b86902a64d0dfb6689262021801d17aea050017fe2354a482
+    - name: 167520_-33600
+      south_sec: 167520
+      west_sec: -33600
+      min_depth_m: 0.0
+      bytes: 224259
+      sha256: 18e47bd6b939118e7e7f3ad986a9312f6c921b1ba9520c4b079cbdbed6cc9acf
+    - name: 167520_-18240
+      south_sec: 167520
+      west_sec: -18240
+      min_depth_m: 0.0
+      bytes: 204998
+      sha256: c07eecb4c07a86629d00c73782edd8b1095246e2a22c368ffcf9d9723ec45726
+    - name: 182880_-79680
+      south_sec: 182880
+      west_sec: -79680
+      min_depth_m: 3432.0
+      bytes: 26013
+      sha256: 500643106be8413ce07f2fe02b899233a800dcdaf4b5f384e870725dcfaec217
+    - name: 182880_-64320
+      south_sec: 182880
+      west_sec: -64320
+      min_depth_m: 597.5
+      bytes: 39137
+      sha256: 918a026c67b9e97be9a8fca4a04d0385f93ac4f651db5c904e33859114194728
+    - name: 182880_-48960
+      south_sec: 182880
+      west_sec: -48960
+      min_depth_m: 105.5
+      bytes: 41590
+      sha256: bce0e292665c3e7c3c4c9a16005cbabeddf26af99c0a38f30657b8d50fb067df
+    - name: 182880_-33600
+      south_sec: 182880
+      west_sec: -33600
+      min_depth_m: 59.0
+      bytes: 38312
+      sha256: 5577c5ca8e7ec38b54e3d95948fdd8c9cf47b285a069e7f2edb2219b629033f5
+    - name: 182880_-18240
+      south_sec: 182880
+      west_sec: -18240
+      min_depth_m: 0.0
+      bytes: 31605
+      sha256: 79ee32f8817ba1725377e657893fdeea77e8f931a4e6516ad98975e7a9b10456
+    bytes: 5891760
 world:
   level: 0
   bounds:
@@ -1152,12 +1364,12 @@ sources:
     - level 1 (the Atlantic)
     - the land under level 2
     fetched:
-    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 47.65, ''north'':
-        51.35, ''west'': -7.4, ''east'': -2.4})'
-      retrieved: '2026-09-30'
-      sha256: 159fff2887ab22b07e9c02427c4c605b9ea424b05b90950545f57f5c6e09312b
-      bytes: 4874675
-      file: gebco_2025_s47.65_n51.35_w-7.40_e-2.40_ascii.zip
+    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 31.9, ''north'':
+        51.1, ''west'': -20.1, ''east'': -0.9})'
+      retrieved: '2026-10-09'
+      sha256: 4efbda71e1245d7ea512ec51ea72353c61c785d51ae4eb03cae556c29e77771b
+      bytes: 113857796
+      file: gebco_2025_s31.90_n51.10_w-20.10_e-0.90_ascii.zip
     status: fetched
   emodnet_dtm_2024:
     name: EMODnet Bathymetry DTM 2024
@@ -1182,7 +1394,7 @@ sources:
       sha256: d34011e01e2061bac9bac92d37f14b86007f4a3be4ba565e0cb203fbf69df790
       bytes: 62031996
       file: emodnet_dtm2024_elevation_max_47.75_51.25_-7.30_-2.50.nc
-    status: fetched
+    status: fetched in an earlier build
   shom_homonim:
     name: SHOM MNT bathymétrique de façade Atlantique (projet HOMONIM), 100 m
     licence: Licence-Ouverte-2.0

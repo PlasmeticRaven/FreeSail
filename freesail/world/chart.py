@@ -25,6 +25,19 @@ registers what the captain may ask (what is in sight, the land, the depth of wat
 `freesail.world.lookout` turns a sighting into the lookout's words by compass bearing and
 an estimated distance. The truth tiles are never drawn: the browser's chart draws the
 coast and the features (`freesail.api.queries.chart_block`).
+
+**The chart is the whole manifest** (spec M6 §26; package 38). `load_chart` takes the
+name of a chart (the manifest's `charts:`, each naming the regions it holds and the
+corridor under them: `atlantic-east`) or, as before, the name of one region, which is a
+chart of that region alone. A query asks the finest level with a tile under the point
+across every region of the chart, falls back to the corridor at level 1 (committed:
+GEBCO at 30" from 32 N to 51 N and 20 W to 1 W, `tiles/1/<corridor>/`) and to the world
+at level 0 where either is built, and answers None beyond them. The features of every
+region are loaded and indexed together, their ids unique across regions (a clash is a
+`ChartError` in words). `contains`, `bounds` and `bounds_words` speak of the whole: the
+envelope of the regions and the corridor. A chart named by a region carries the region's
+own levels and the world's, as it always did, so that nothing a scenario of the Channel
+reads moves; the corridor is a named chart's.
 """
 
 from __future__ import annotations
@@ -464,6 +477,13 @@ class Tile:
     elevation: np.ndarray
     dist: np.ndarray | None
     min_depth_m: float
+    # package 38: a corridor tile spans four degrees and a quarter and nearly always holds
+    # a shore, so its one shoalest sounding would read the keel's cells every tick over the
+    # open sea; the build writes the shoalest sounding of each block of `min_block_cells`
+    # cells too (NaN where a block is all land or unknown), and the short-circuit reads the
+    # block's. None for a tile written without them (the regions', unchanged).
+    min_blocks_m: np.ndarray | None = None
+    min_block_cells: int = 0
 
     @classmethod
     def load(cls, path: Path) -> Tile:
@@ -484,11 +504,23 @@ class Tile:
                 elevation=np.ascontiguousarray(elevation),
                 dist=z["dist"] if "dist" in z.files else None,
                 min_depth_m=float(z["min_depth_m"]),
+                min_blocks_m=z["min_blocks_m"] if "min_blocks_m" in z.files else None,
+                min_block_cells=int(z["min_block_cells"]) if "min_block_cells" in z.files else 0,
             )
 
     @property
     def cells(self) -> int:
         return int(self.elevation.shape[0])
+
+    def min_depth_about(self, row: int, col: int) -> float:
+        """The shoalest sounding about a cell of the tile: the block's where the tile has
+        blocks, else the tile's (NaN where all land or unknown)."""
+        if self.min_blocks_m is None or self.min_block_cells <= 0:
+            return self.min_depth_m
+        # the build folded each block's neighbours into it (a ship at a block's edge has
+        # her ends a cell off): one read
+        n = self.min_block_cells
+        return float(self.min_blocks_m[row // n, col // n])
 
 
 class Level:
@@ -504,6 +536,8 @@ class Level:
         folder: Path,
         names: set[str],
         cache_size: int = 16,
+        paths: dict[str, Path] | None = None,
+        use: str = "",
     ):
         self.level = level
         self.cell_sec = cell_sec
@@ -511,7 +545,14 @@ class Level:
         self.span_sec = cell_sec * tile_cells
         self.unit_m = unit_m
         self.folder = folder
-        self.names = names  # the tiles the manifest lists
+        # the tiles the manifest lists, each by its path (package 38: a level's tiles may
+        # lie in more than one folder, the corridor's beside the Atlantic's at level 1,
+        # and the tiles of several regions beside one another at levels 2 and 3)
+        self.paths: dict[str, Path] = (
+            dict(paths) if paths is not None else {n: folder / f"{n}.npz" for n in names}
+        )
+        self.names = set(self.paths)
+        self.use = use  # the level's `use` as the manifest states it, for the lookout's words
         self._cache: dict[tuple[int, int], Tile] = {}
         self._order: list[tuple[int, int]] = []
         self.cache_size = cache_size
@@ -536,10 +577,8 @@ class Level:
         if t is not None:
             return t
         name = f"{south_sec}_{west_sec}"
-        if name not in self.names:
-            return None
-        path = self.folder / f"{name}.npz"
-        if not path.exists():
+        path = self.paths.get(name)
+        if path is None or not path.exists():
             return None
         t = Tile.load(path)
         self._cache[key] = t
@@ -556,7 +595,7 @@ class Level:
     def has(self, lat: float, lon: float) -> bool:
         row, col = self.global_cell(lat, lon)
         s, w = self.corner_of_cell(int(math.floor(row)), int(math.floor(col)))
-        return f"{s}_{w}" in self.names
+        return f"{s}_{w}" in self.paths
 
     def value(self, row: int, col: int) -> float | None:
         """The elevation in metres at a global cell (row, col), None where unknown."""
@@ -632,6 +671,10 @@ class Level:
             return None
         r = row - int(round((s + 90 * 3600) / self.cell_sec))
         c = col - int(round((w + 180 * 3600) / self.cell_sec))
+        if int(t.elevation[r, c]) == t.nodata:
+            # beyond what the level's source covered (package 38: the corridor's tiles
+            # reach past its fetch box): the field there knows no shore
+            return None
         return float(t.dist[r, c])
 
     @property
@@ -660,7 +703,7 @@ class Level:
                 int(round(-90 * 3600 + ty * self.span_sec)),
                 int(round(-180 * 3600 + tx * self.span_sec)),
             )
-            if t is None or t.dist is None:
+            if t is None or t.dist is None or int(t.elevation[lr, lc]) == t.nodata:
                 return None
             d = t.dist
             v00, v01 = float(d[lr, lc]), float(d[lr, lc + 1])
@@ -726,8 +769,10 @@ _CHARTS: dict[tuple[str, str], Chart] = {}
 
 
 def load_chart(region: str, root: Path = CHARTS_DIR) -> Chart:
-    """The chart of a region by its name in the manifest, shared between Worlds (the
-    tiles are read-only; each World keeps its own position)."""
+    """The chart by its name in the manifest, shared between Worlds (the tiles are
+    read-only; each World keeps its own position): a chart of the manifest's `charts:`
+    (the regions it names and the corridor under them) or a region's name, which is a
+    chart of that one region (package 38; the parameter keeps its name)."""
     key = (str(root), region)
     chart = _CHARTS.get(key)
     if chart is None:
@@ -736,38 +781,105 @@ def load_chart(region: str, root: Path = CHARTS_DIR) -> Chart:
     return chart
 
 
+def chart_names(manifest: dict[str, Any]) -> list[str]:
+    """What `load_chart` accepts: the charts, then the regions, in the manifest's order."""
+    return list(manifest.get("charts") or {}) + list(manifest.get("regions") or {})
+
+
+def _present(entry: dict[str, Any] | None, root: Path) -> dict[str, Path]:
+    """The tiles of a manifest entry (the world's, the Atlantic's or a corridor's) that are
+    actually present on disk, by name and path: the world and the Atlantic are the tool's
+    and not committed (spec M5 §10), the corridor is (spec M6 §26), and the runtime reads
+    what is there and nothing else."""
+    if not entry or not entry.get("tiles"):
+        return {}
+    folder = root / str(entry.get("folder") or f"tiles/{entry['level']}")
+    out = {}
+    for t in entry["tiles"]:
+        path = folder / f"{t['name']}.npz"
+        if path.exists():
+            out[str(t["name"])] = path
+    return out
+
+
 class Chart:
     def __init__(self, region: str, manifest: dict[str, Any], root: Path = CHARTS_DIR):
         regions = manifest.get("regions") or {}
-        if region not in regions:
-            known = ", ".join(sorted(regions)) or "none"
+        charts = manifest.get("charts") or {}
+        corridors = manifest.get("corridors") or {}
+        if region in charts:
+            spec = charts[region]
+            self.regions: list[str] = [str(r) for r in (spec.get("regions") or [])]
+            missing = [r for r in self.regions if r not in regions]
+            if missing:
+                raise ChartError(
+                    f"the chart '{region}' names the region(s) {', '.join(missing)}, which the "
+                    f"manifest has not (it has: {', '.join(sorted(regions)) or 'none'})"
+                )
+            corridor_name = spec.get("corridor")
+            self.corridor: dict[str, Any] | None = (
+                corridors.get(str(corridor_name)) if corridor_name else None
+            )
+            if corridor_name and self.corridor is None:
+                raise ChartError(
+                    f"the chart '{region}' names the corridor '{corridor_name}', which the "
+                    f"manifest has not"
+                )
+            self.spec = dict(spec)
+        elif region in regions:
+            self.regions = [region]
+            self.corridor = None
+            self.spec = regions[region]
+        else:
+            known = ", ".join(chart_names(manifest)) or "none"
             raise ChartError(f"no chart region named '{region}' (the manifest has: {known})")
+        # `region` keeps the name the chart was loaded by (a chart's or a region's), for
+        # the browser's block and the drivers' lines; `regions` are the regions it holds
         self.region = region
+        self.name = region
         self.manifest = manifest
         self.root = root
-        self.spec = regions[region]
-        b = self.spec["bounds"]
-        self.bounds = (float(b["south"]), float(b["north"]), float(b["west"]), float(b["east"]))
-        # the levels, finest first, with the tiles the manifest lists
+        self.region_specs: dict[str, dict[str, Any]] = {r: regions[r] for r in self.regions}
+        # the bounds of the whole: the envelope of the regions and the corridor
+        boxes = [self.region_specs[r]["bounds"] for r in self.regions]
+        if self.corridor is not None:
+            boxes.append(self.corridor["bounds"])
+        if not boxes:
+            raise ChartError(f"the chart '{region}' holds no region and no corridor")
+        self.bounds = (
+            min(float(b["south"]) for b in boxes),
+            max(float(b["north"]) for b in boxes),
+            min(float(b["west"]) for b in boxes),
+            max(float(b["east"]) for b in boxes),
+        )
+        self.region_bounds: dict[str, tuple[float, float, float, float]] = {
+            r: (
+                float(s["bounds"]["south"]),
+                float(s["bounds"]["north"]),
+                float(s["bounds"]["west"]),
+                float(s["bounds"]["east"]),
+            )
+            for r, s in self.region_specs.items()
+        }
+        # the levels, finest first, with the tiles the manifest lists: every region's at
+        # levels 2 and 3, the corridor's at level 1 beside the Atlantic's where that is
+        # built, the world's at level 0 where it is built
         self.levels: list[Level] = []
         level_specs = manifest.get("levels") or {}
-        listed: dict[int, set[str]] = {}
-        for lv, tiles in (self.spec.get("tiles") or {}).items():
-            listed[int(lv)] = {t["name"] for t in tiles}
-        # the world and the Atlantic are the tool's and not committed (spec M5 §10): only
-        # the tiles actually present under tiles/<level>/ count, and none is no level
+        listed: dict[int, dict[str, Path]] = {}
+        for r in self.regions:
+            for lv, tiles in (self.region_specs[r].get("tiles") or {}).items():
+                folder = root / "tiles" / str(int(lv))
+                listed.setdefault(int(lv), {}).update(
+                    {str(t["name"]): folder / f"{t['name']}.npz" for t in tiles}
+                )
         world = manifest.get("world")
-        if world and world.get("tiles"):
-            folder = root / "tiles" / str(world["level"])
-            names = {t["name"] for t in world["tiles"] if (folder / f"{t['name']}.npz").exists()}
-            if names:
-                listed[int(world["level"])] = names
         atlantic = manifest.get("atlantic")
-        if atlantic and atlantic.get("tiles"):
-            folder = root / "tiles" / str(atlantic["level"])
-            names = {t["name"] for t in atlantic["tiles"] if (folder / f"{t['name']}.npz").exists()}
-            if names:
-                listed[int(atlantic["level"])] = names
+        for entry in (atlantic, self.corridor, world):
+            present = _present(entry, root)
+            if present:
+                # the corridor's tiles after the Atlantic's: the corridor is the one committed
+                listed.setdefault(int(entry["level"]), {}).update(present)
         for lv in sorted(listed, reverse=True):
             spec = level_specs.get(str(lv)) or {}
             self.levels.append(
@@ -777,28 +889,52 @@ class Chart:
                     int(spec.get("tile_cells", 512)),
                     float(spec.get("unit_m", 1.0)),
                     root / "tiles" / str(lv),
-                    listed[lv],
+                    set(listed[lv]),
+                    paths=listed[lv],
+                    use=str(spec.get("use", "")),
                 )
             )
-        # the features and their index
+        # the features of every region and their index, together; an id given twice
+        # across regions is an error at load, in words
         self.features: dict[str, Feature] = {}
-        fpath = root / self.spec["features"]
-        if fpath.exists():
-            doc = yaml.safe_load(fpath.read_text(encoding="utf-8")) or {}
-            for d in doc.get("features") or []:
-                f = Feature.from_dict(d)
-                self.features[f.id] = f
-        ipath = root / self.spec.get("index", "")
-        if self.spec.get("index") and ipath.exists():
-            idx = json.loads(ipath.read_text(encoding="utf-8"))
-            self.index_cell_deg = float(idx.get("cell_deg", 0.25))
-            self.index: dict[str, list[str]] = dict(idx.get("cells") or {})
-        else:
-            self.index_cell_deg = 0.25
-            self.index = {}
-            for f in self.features.values():
-                self.index.setdefault(self._cell_key(f.lat_deg, f.lon_deg), []).append(f.id)
-        self.coast_path = root / self.spec.get("coast", "")
+        self.region_of: dict[str, str] = {}
+        self.index_cell_deg = 0.25
+        self.index: dict[str, list[str]] = {}
+        self.coast_paths: list[Path] = []
+        for r in self.regions:
+            rspec = self.region_specs[r]
+            fpath = root / rspec["features"]
+            if fpath.exists():
+                doc = yaml.safe_load(fpath.read_text(encoding="utf-8")) or {}
+                for d in doc.get("features") or []:
+                    f = Feature.from_dict(d)
+                    if f.id in self.features:
+                        raise ChartError(
+                            f"the feature id '{f.id}' is given in both {self.region_of[f.id]} "
+                            f"and {r}; ids are unique across the regions of a chart"
+                        )
+                    self.features[f.id] = f
+                    self.region_of[f.id] = r
+            ipath = root / rspec.get("index", "")
+            if rspec.get("index") and ipath.exists():
+                idx = json.loads(ipath.read_text(encoding="utf-8"))
+                cell = float(idx.get("cell_deg", 0.25))
+                if self.index and cell != self.index_cell_deg:
+                    raise ChartError(
+                        f"{ipath}: the index's cell is {cell} degrees where the chart's other "
+                        f"regions use {self.index_cell_deg}"
+                    )
+                self.index_cell_deg = cell
+                for key, ids in (idx.get("cells") or {}).items():
+                    self.index.setdefault(key, []).extend(str(i) for i in ids)
+            else:
+                for f in self.features.values():
+                    if self.region_of[f.id] == r:
+                        self.index.setdefault(self._cell_key(f.lat_deg, f.lon_deg), []).append(f.id)
+            if rspec.get("coast"):
+                self.coast_paths.append(root / rspec["coast"])
+        # the one region's coast, as the browser's block read it before package 38
+        self.coast_path = self.coast_paths[0] if self.coast_paths else root / ""
 
     # -- geometry ---------------------------------------------------------------------
 
@@ -822,6 +958,36 @@ class Chart:
         for lv in self.levels:
             if lv.has(pos.lat_deg, pos.lon_deg):
                 return lv
+        return None
+
+    def level_at(self, pos: Position) -> int | None:
+        """The finest level with a tile under the point (3 a harbour patch, 2 a region,
+        1 the corridor or the Atlantic, 0 the world); None beyond the chart."""
+        lv = self._finest_level(pos)
+        return None if lv is None else lv.level
+
+    def use_at(self, pos: Position) -> str:
+        """What the finest level under the point is for, as the manifest states it
+        (package 38; spec M6 §26: "the lookout's words are honest about it, by the
+        level's `use`"): 'harbour patches', 'a region: coast and approaches', 'the
+        Atlantic: passages and landfalls', ''; the lookout names the land at a headland's
+        scale and no rock by name where the corridor's cells are the finest."""
+        lv = self._finest_level(pos)
+        return "" if lv is None else lv.use
+
+    def cell_m_at(self, pos: Position) -> float | None:
+        """The width of a cell of the finest level under the point, metres north and
+        south: the grain of what the chart can say there; None beyond the chart."""
+        lv = self._finest_level(pos)
+        return None if lv is None else lv.cell_m
+
+    def region_at(self, pos: Position) -> str | None:
+        """The region of the chart whose bounds hold the point, the first in the chart's
+        order where two overlap; None over the corridor alone or beyond the chart."""
+        for r in self.regions:
+            s, n, w, e = self.region_bounds[r]
+            if s <= pos.lat_deg <= n and w <= pos.lon_deg <= e:
+                return r
         return None
 
     # -- depth here (C §5.5) ------------------------------------------------------------
@@ -850,9 +1016,17 @@ class Chart:
         if lv is None:
             return None
         t = lv.tile_at(pos.lat_deg, pos.lon_deg)
-        if t is None or math.isnan(t.min_depth_m):
+        if t is None:
             return None
-        return t.min_depth_m
+        if t.min_blocks_m is not None:
+            # a corridor tile: the shoalest sounding of the block about her (package 38)
+            fr, fc = lv.global_cell(pos.lat_deg, pos.lon_deg)
+            r = int(math.floor(fr)) - int(round((t.south_sec + 90 * 3600) / lv.cell_sec))
+            c = int(math.floor(fc)) - int(round((t.west_sec + 180 * 3600) / lv.cell_sec))
+            floor = t.min_depth_about(r, c)
+        else:
+            floor = t.min_depth_m
+        return None if math.isnan(floor) else floor
 
     # -- aground (spec §11) -------------------------------------------------------------
 
@@ -1029,14 +1203,42 @@ class Chart:
     def coast_distance(self, pos: Position) -> tuple[float, float] | None:
         """The distance in metres and the bearing toward the nearest shore, from the
         distance field of the finest level that has one: the field's own read and its
-        gradient, microseconds, which the weather's hook reads every tick."""
+        gradient, microseconds, which the weather's hook reads every tick. A region's
+        field knows only the shores of its own block, so where the region's tiles end
+        within the distance it gives (package 38: a region's edge over the corridor) the
+        corridor's or the world's field is read too and the nearer shore taken; between a
+        harbour patch and its region the finest answers alone, as it always did."""
+        best: tuple[float, float] | None = None
+        coarse_only = False
         for lv in self.levels:
+            if coarse_only and lv.level >= 2:
+                continue
             if not lv.has(pos.lat_deg, pos.lon_deg):
                 continue
             found = lv.dist_at(pos.lat_deg, pos.lon_deg)
-            if found is not None:
-                return found
-        return None
+            if found is None:
+                continue
+            if best is None or found[0] < best[0]:
+                best = found
+            if lv.level <= 1 or self._covered_within(lv, pos, found[0]):
+                break
+            coarse_only = True
+        return best
+
+    @staticmethod
+    def _covered_within(lv: Level, pos: Position, distance_m: float) -> bool:
+        """Whether the level has tiles as far as `distance_m` from the point on the four
+        cardinal bearings: when it has, a shore the field does not know cannot lie nearer
+        than the one it gives (four lookups in a set)."""
+        dlat = distance_m / (60.0 * units.NAUTICAL_MILE)
+        dlon = dlat / max(0.1, math.cos(math.radians(pos.lat_deg)))
+        lat, lon = pos.lat_deg, pos.lon_deg
+        return (
+            lv.has(lat + dlat, lon)
+            and lv.has(lat - dlat, lon)
+            and lv.has(lat, lon + dlon)
+            and lv.has(lat, lon - dlon)
+        )
 
     def nearest_shore(self, pos: Position, within_m: float | None = None) -> CoastReading | None:
         """The nearest dry ground (package 37d; C §5.5, "for the lookout"): its distance
@@ -1127,10 +1329,14 @@ class Chart:
         patch's field knows only its own). Land reads nought, so a sample that falls
         ashore pulls the trend toward it and one that falls on the far shore of a channel
         flattens it. Four reads of the field: a few microseconds. None where the chart
-        has no field under the point."""
-        for lv in reversed(self.levels):
-            if not lv.has(pos.lat_deg, pos.lon_deg):
-                continue
+        has no field under the point. The region's own level is preferred to the
+        corridor's where both hold the point (package 38: the coarsest of the levels at
+        3" or finer, so that a scenario on the whole chart reads the trend a scenario on
+        the region alone reads), and the corridor's where the region ends."""
+        levels = [lv for lv in self.levels if lv.level >= 2 and lv.has(pos.lat_deg, pos.lon_deg)]
+        if not levels:
+            levels = [lv for lv in self.levels if lv.has(pos.lat_deg, pos.lon_deg)]
+        for lv in reversed(levels):
             here = lv.dist_smooth(pos.lat_deg, pos.lon_deg)
             if here is None:
                 continue
@@ -1482,11 +1688,15 @@ class Chart:
     # -- for the browser's chart (spec §17, the first half) ---------------------------
 
     def coast_lines(self) -> list[list[list[float]]]:
-        """The coast as polylines of [lon, lat], as the build wrote them."""
-        if not self.coast_path.exists():
-            return []
-        doc = json.loads(self.coast_path.read_text(encoding="utf-8"))
-        return [f["geometry"]["coordinates"] for f in doc.get("features", [])]
+        """The coast as polylines of [lon, lat], as the build wrote them, every region's
+        in the chart's order (package 38); the corridor draws no coast."""
+        out: list[list[list[float]]] = []
+        for path in self.coast_paths:
+            if not path.exists():
+                continue
+            doc = json.loads(path.read_text(encoding="utf-8"))
+            out.extend(f["geometry"]["coordinates"] for f in doc.get("features", []))
+        return out
 
     def attribution(self) -> str:
         return str(self.manifest.get("attribution", ""))

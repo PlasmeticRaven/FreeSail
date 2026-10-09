@@ -1,7 +1,29 @@
 # FreeSail: the monthly climatology the weather systems are seeded from (spec M5 §2; the
-# study docs/design/WeatherSystems.md §1 and §5). Package 30's first pass.
+# study docs/design/WeatherSystems.md §1 and §5). Package 30's first pass; the boxes
+# beyond the Channel package 38's (spec M6 §26).
 #
-# Every row is PROVISIONAL (spec M5 §33 item 1): the direction shares are the study's own
+# THE BOXES (package 38). A scenario's weather is seeded from the box she starts in
+# (`boxes`, each with its `bounds`), and as she sails the next system drawn comes from the
+# box she is in at the drawing; the systems in play are kept across an edge, since a low
+# is a centre in the plane and not the box's, so the field blends by itself over a
+# transit's length, and the background pressure and the mean gradient move from the box
+# she left to the box she is in over `weather.BOX_BLEND_H` hours (a stated simple rule in
+# place of W §5's, which gives none). A position in no box takes the nearest; a scenario
+# with no position takes `default_box`. The Channel's box is package 30's table under its
+# own name, every figure as it was, and nothing a scenario in the Channel draws comes from
+# any other box: the recorded passages replay to their digests (tests/test_known_truths.py).
+# The three boxes beyond it (Biscay; the Portuguese coast with its summer northerlies, the
+# Portuguese trades; the sea off Madeira with the north-east trade) are PROVISIONAL
+# throughout and JUDGEMENT in every row (each row's `note` says what it rests on), from
+# the same kinds of source as the Channel's: the pilot charts' monthly roses by
+# five-degree square (S3, NOT READ from here) and the Admiralty's ocean passages, as
+# remembered, to be replaced by the printed tables when the owner has them and by the
+# CLIWOC extraction (W §1.5) if the first pass proves wrong. Their `check` rows are what
+# a thousand months should give and have not been run against them
+# (tools/climatology_check.py runs the default box).
+#
+# THE CHANNEL'S ROWS, as package 30 wrote them. Every row is PROVISIONAL (spec M5 §33
+# item 1): the direction shares are the study's own
 # averaging of the Channel indices of Mellado-Cano et al. (S1, verified, CC-BY-4.0; the
 # 1750 to 1854 row for west and east, the 1795 to 1815 row for south and north, which
 # the longer row does not give) and the Ushant gust-day counts are Meteo-France's normals
@@ -25,235 +47,981 @@
 # the north, mean and spread), speed_kn, central_hpa (mean, spread, floor), radius_km,
 # life_h, high (probability that one sits within reach; its bearing from the box; its
 # distance; its anomaly; its radius; its life), check (the direction shares in per cent, and
-# Ushant's days a month with a gust of 31 and of 54 knots or more).
+# Ushant's days a month with a gust of 31 and of 54 knots or more; the boxes beyond the
+# Channel name no station and say gust31_days and gust54_days).
 provisional: true
 source: docs/design/WeatherSystems.md sections 1.1, 1.2, 1.3, 5 (2026-09-29)
-months:
-  1:
-    name: January
-    background_hpa: 1013
-    gradient: {hpa_per_100km: 0.12, high_toward_deg: 185}
-    lows_per_month: 7
-    track_bearing_deg: {mean: 65, spread: 25}
-    closest_approach_km: {mean: 150, spread: 450}
-    speed_kn: {min: 15, max: 35}
-    central_hpa: {mean: 977, spread: 14, floor: 950}
-    radius_km: {min: 350, max: 600}
-    life_h: {min: 60, max: 110}
-    high:
-      probability: 0.85
-      bearing_deg: {mean: 350, spread: 110}
-      distance_km: {min: 300, max: 700}
-      anomaly_hpa: {min: 12, max: 25}
-      radius_km: {min: 800, max: 1200}
-      life_h: {min: 48, max: 144}
-    check: {westerly_pct: 29, easterly_pct: 22, southerly_pct: 25, northerly_pct: 17, ushant_gust31_days: 23.6, ushant_gust54_days: 4.5}
-  2:
-    name: February
-    background_hpa: 1014
-    gradient: {hpa_per_100km: 0.12, high_toward_deg: 185}
-    lows_per_month: 6.5
-    track_bearing_deg: {mean: 65, spread: 25}
-    closest_approach_km: {mean: 170, spread: 450}
-    speed_kn: {min: 15, max: 35}
-    central_hpa: {mean: 978, spread: 14, floor: 950}
-    radius_km: {min: 350, max: 600}
-    life_h: {min: 60, max: 110}
-    high:
-      probability: 0.85
-      bearing_deg: {mean: 10, spread: 110}
-      distance_km: {min: 300, max: 700}
-      anomaly_hpa: {min: 12, max: 25}
-      radius_km: {min: 800, max: 1200}
-      life_h: {min: 48, max: 144}
-    check: {westerly_pct: 34, easterly_pct: 17, southerly_pct: 24, northerly_pct: 18, ushant_gust31_days: 19.9, ushant_gust54_days: 3.7}
-  3:
-    name: March
-    background_hpa: 1015
-    gradient: {hpa_per_100km: 0.12, high_toward_deg: 190}
-    lows_per_month: 6
-    track_bearing_deg: {mean: 65, spread: 25}
-    closest_approach_km: {mean: 230, spread: 430}
-    speed_kn: {min: 15, max: 35}
-    central_hpa: {mean: 982, spread: 13, floor: 950}
-    radius_km: {min: 350, max: 600}
-    life_h: {min: 60, max: 110}
-    high:
-      probability: 0.85
-      bearing_deg: {mean: 345, spread: 110}
-      distance_km: {min: 300, max: 700}
-      anomaly_hpa: {min: 12, max: 25}
-      radius_km: {min: 800, max: 1200}
-      life_h: {min: 48, max: 144}
-    check: {westerly_pct: 31, easterly_pct: 23, southerly_pct: 19, northerly_pct: 16, ushant_gust31_days: 18.6, ushant_gust54_days: 2.0}
-  4:
-    name: April
-    background_hpa: 1015
-    gradient: {hpa_per_100km: 0.12, high_toward_deg: 235}
-    lows_per_month: 5
-    track_bearing_deg: {mean: 65, spread: 25}
-    closest_approach_km: {mean: 300, spread: 400}
-    speed_kn: {min: 15, max: 35}
-    central_hpa: {mean: 988, spread: 12, floor: 955}
-    radius_km: {min: 350, max: 600}
-    life_h: {min: 60, max: 110}
-    high:
-      probability: 0.85
-      bearing_deg: {mean: 325, spread: 110}
-      distance_km: {min: 300, max: 700}
-      anomaly_hpa: {min: 12, max: 25}
-      radius_km: {min: 800, max: 1200}
-      life_h: {min: 48, max: 144}
-    check: {westerly_pct: 30, easterly_pct: 23, southerly_pct: 23, northerly_pct: 25, ushant_gust31_days: 15.0, ushant_gust54_days: 0.9}
-  5:
-    name: May
-    background_hpa: 1016
-    gradient: {hpa_per_100km: 0.12, high_toward_deg: 235}
-    lows_per_month: 4
-    track_bearing_deg: {mean: 65, spread: 25}
-    closest_approach_km: {mean: 400, spread: 370}
-    speed_kn: {min: 15, max: 35}
-    central_hpa: {mean: 994, spread: 10, floor: 960}
-    radius_km: {min: 350, max: 600}
-    life_h: {min: 60, max: 110}
-    high:
-      probability: 0.85
-      bearing_deg: {mean: 0, spread: 110}
-      distance_km: {min: 300, max: 700}
-      anomaly_hpa: {min: 12, max: 25}
-      radius_km: {min: 800, max: 1200}
-      life_h: {min: 48, max: 144}
-    check: {westerly_pct: 28, easterly_pct: 23, southerly_pct: 29, northerly_pct: 21, ushant_gust31_days: 11.6, ushant_gust54_days: 0.6}
-  6:
-    name: June
-    background_hpa: 1017
-    gradient: {hpa_per_100km: 0.12, high_toward_deg: 215}
-    lows_per_month: 3.5
-    track_bearing_deg: {mean: 65, spread: 25}
-    closest_approach_km: {mean: 480, spread: 350}
-    speed_kn: {min: 15, max: 35}
-    central_hpa: {mean: 1000, spread: 8, floor: 970}
-    radius_km: {min: 350, max: 600}
-    life_h: {min: 60, max: 110}
-    high:
-      probability: 0.85
-      bearing_deg: {mean: 300, spread: 110}
-      distance_km: {min: 300, max: 700}
-      anomaly_hpa: {min: 12, max: 25}
-      radius_km: {min: 800, max: 1200}
-      life_h: {min: 48, max: 144}
-    check: {westerly_pct: 33, easterly_pct: 15, southerly_pct: 16, northerly_pct: 14, ushant_gust31_days: 7.0, ushant_gust54_days: 0.2}
-  7:
-    name: July
-    background_hpa: 1017
-    gradient: {hpa_per_100km: 0.15, high_toward_deg: 220}
-    lows_per_month: 3
-    track_bearing_deg: {mean: 65, spread: 25}
-    closest_approach_km: {mean: 500, spread: 350}
-    speed_kn: {min: 15, max: 35}
-    central_hpa: {mean: 1002, spread: 7, floor: 972}
-    radius_km: {min: 350, max: 600}
-    life_h: {min: 60, max: 110}
-    high:
-      probability: 0.85
-      bearing_deg: {mean: 240, spread: 110}
-      distance_km: {min: 300, max: 700}
-      anomaly_hpa: {min: 12, max: 25}
-      radius_km: {min: 800, max: 1200}
-      life_h: {min: 48, max: 144}
-    check: {westerly_pct: 44, easterly_pct: 11, southerly_pct: 27, northerly_pct: 15, ushant_gust31_days: 6.3, ushant_gust54_days: 0.1}
-  8:
-    name: August
-    background_hpa: 1016
-    gradient: {hpa_per_100km: 0.15, high_toward_deg: 215}
-    lows_per_month: 3.5
-    track_bearing_deg: {mean: 65, spread: 25}
-    closest_approach_km: {mean: 480, spread: 350}
-    speed_kn: {min: 15, max: 35}
-    central_hpa: {mean: 1000, spread: 8, floor: 970}
-    radius_km: {min: 350, max: 600}
-    life_h: {min: 60, max: 110}
-    high:
-      probability: 0.85
-      bearing_deg: {mean: 240, spread: 110}
-      distance_km: {min: 300, max: 700}
-      anomaly_hpa: {min: 12, max: 25}
-      radius_km: {min: 800, max: 1200}
-      life_h: {min: 48, max: 144}
-    check: {westerly_pct: 41, easterly_pct: 13, southerly_pct: 23, northerly_pct: 16, ushant_gust31_days: 6.0, ushant_gust54_days: 0.0}
-  9:
-    name: September
-    background_hpa: 1016
-    gradient: {hpa_per_100km: 0.12, high_toward_deg: 200}
-    lows_per_month: 4.5
-    track_bearing_deg: {mean: 65, spread: 25}
-    closest_approach_km: {mean: 380, spread: 370}
-    speed_kn: {min: 15, max: 35}
-    central_hpa: {mean: 994, spread: 10, floor: 960}
-    radius_km: {min: 350, max: 600}
-    life_h: {min: 60, max: 110}
-    high:
-      probability: 0.85
-      bearing_deg: {mean: 320, spread: 110}
-      distance_km: {min: 300, max: 700}
-      anomaly_hpa: {min: 12, max: 25}
-      radius_km: {min: 800, max: 1200}
-      life_h: {min: 48, max: 144}
-    check: {westerly_pct: 35, easterly_pct: 19, southerly_pct: 23, northerly_pct: 16, ushant_gust31_days: 9.0, ushant_gust54_days: 0.3}
-  10:
-    name: October
-    background_hpa: 1014
-    gradient: {hpa_per_100km: 0.12, high_toward_deg: 190}
-    lows_per_month: 5.5
-    track_bearing_deg: {mean: 65, spread: 25}
-    closest_approach_km: {mean: 280, spread: 400}
-    speed_kn: {min: 15, max: 35}
-    central_hpa: {mean: 988, spread: 12, floor: 955}
-    radius_km: {min: 350, max: 600}
-    life_h: {min: 60, max: 110}
-    high:
-      probability: 0.85
-      bearing_deg: {mean: 350, spread: 110}
-      distance_km: {min: 300, max: 700}
-      anomaly_hpa: {min: 12, max: 25}
-      radius_km: {min: 800, max: 1200}
-      life_h: {min: 48, max: 144}
-    check: {westerly_pct: 34, easterly_pct: 19, southerly_pct: 26, northerly_pct: 17, ushant_gust31_days: 16.0, ushant_gust54_days: 1.2}
-  11:
-    name: November
-    background_hpa: 1013
-    gradient: {hpa_per_100km: 0.12, high_toward_deg: 185}
-    lows_per_month: 6.5
-    track_bearing_deg: {mean: 65, spread: 25}
-    closest_approach_km: {mean: 200, spread: 450}
-    speed_kn: {min: 15, max: 35}
-    central_hpa: {mean: 982, spread: 13, floor: 950}
-    radius_km: {min: 350, max: 600}
-    life_h: {min: 60, max: 110}
-    high:
-      probability: 0.85
-      bearing_deg: {mean: 30, spread: 110}
-      distance_km: {min: 300, max: 700}
-      anomaly_hpa: {min: 12, max: 25}
-      radius_km: {min: 800, max: 1200}
-      life_h: {min: 48, max: 144}
-    check: {westerly_pct: 35, easterly_pct: 16, southerly_pct: 19, northerly_pct: 15, ushant_gust31_days: 21.3, ushant_gust54_days: 2.8}
-  12:
-    name: December
-    background_hpa: 1013
-    gradient: {hpa_per_100km: 0.12, high_toward_deg: 185}
-    lows_per_month: 7
-    track_bearing_deg: {mean: 65, spread: 25}
-    closest_approach_km: {mean: 150, spread: 450}
-    speed_kn: {min: 15, max: 35}
-    central_hpa: {mean: 977, spread: 14, floor: 950}
-    radius_km: {min: 350, max: 600}
-    life_h: {min: 60, max: 110}
-    high:
-      probability: 0.85
-      bearing_deg: {mean: 20, spread: 110}
-      distance_km: {min: 300, max: 700}
-      anomaly_hpa: {min: 12, max: 25}
-      radius_km: {min: 800, max: 1200}
-      life_h: {min: 48, max: 144}
-    check: {westerly_pct: 32, easterly_pct: 20, southerly_pct: 19, northerly_pct: 24, ushant_gust31_days: 22.8, ushant_gust54_days: 4.0}
+default_box: channel
+boxes:
+  channel:
+    title: "the western Channel and the Western Approaches"
+    bounds: {south: 47.5, north: 52.0, west: -20.0, east: 2.0}
+    provisional: true
+    source: "docs/design/WeatherSystems.md sections 1.1, 1.2, 1.3, 5 (2026-09-29): the Channel indices of Mellado-Cano et al. (S1) and Ushant's gust days (S4); the rest judgement"
+    months:
+      1:
+        name: January
+        background_hpa: 1013
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 185}
+        lows_per_month: 7
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 150, spread: 450}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 977, spread: 14, floor: 950}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 350, spread: 110}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 29, easterly_pct: 22, southerly_pct: 25, northerly_pct: 17, ushant_gust31_days: 23.6, ushant_gust54_days: 4.5}
+      2:
+        name: February
+        background_hpa: 1014
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 185}
+        lows_per_month: 6.5
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 170, spread: 450}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 978, spread: 14, floor: 950}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 10, spread: 110}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 34, easterly_pct: 17, southerly_pct: 24, northerly_pct: 18, ushant_gust31_days: 19.9, ushant_gust54_days: 3.7}
+      3:
+        name: March
+        background_hpa: 1015
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 190}
+        lows_per_month: 6
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 230, spread: 430}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 982, spread: 13, floor: 950}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 345, spread: 110}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 31, easterly_pct: 23, southerly_pct: 19, northerly_pct: 16, ushant_gust31_days: 18.6, ushant_gust54_days: 2.0}
+      4:
+        name: April
+        background_hpa: 1015
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 235}
+        lows_per_month: 5
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 300, spread: 400}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 988, spread: 12, floor: 955}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 325, spread: 110}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 30, easterly_pct: 23, southerly_pct: 23, northerly_pct: 25, ushant_gust31_days: 15.0, ushant_gust54_days: 0.9}
+      5:
+        name: May
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 235}
+        lows_per_month: 4
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 400, spread: 370}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 994, spread: 10, floor: 960}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 0, spread: 110}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 28, easterly_pct: 23, southerly_pct: 29, northerly_pct: 21, ushant_gust31_days: 11.6, ushant_gust54_days: 0.6}
+      6:
+        name: June
+        background_hpa: 1017
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 215}
+        lows_per_month: 3.5
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 480, spread: 350}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 1000, spread: 8, floor: 970}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 300, spread: 110}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 33, easterly_pct: 15, southerly_pct: 16, northerly_pct: 14, ushant_gust31_days: 7.0, ushant_gust54_days: 0.2}
+      7:
+        name: July
+        background_hpa: 1017
+        gradient: {hpa_per_100km: 0.15, high_toward_deg: 220}
+        lows_per_month: 3
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 500, spread: 350}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 1002, spread: 7, floor: 972}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 240, spread: 110}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 44, easterly_pct: 11, southerly_pct: 27, northerly_pct: 15, ushant_gust31_days: 6.3, ushant_gust54_days: 0.1}
+      8:
+        name: August
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.15, high_toward_deg: 215}
+        lows_per_month: 3.5
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 480, spread: 350}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 1000, spread: 8, floor: 970}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 240, spread: 110}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 41, easterly_pct: 13, southerly_pct: 23, northerly_pct: 16, ushant_gust31_days: 6.0, ushant_gust54_days: 0.0}
+      9:
+        name: September
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 200}
+        lows_per_month: 4.5
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 380, spread: 370}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 994, spread: 10, floor: 960}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 320, spread: 110}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 35, easterly_pct: 19, southerly_pct: 23, northerly_pct: 16, ushant_gust31_days: 9.0, ushant_gust54_days: 0.3}
+      10:
+        name: October
+        background_hpa: 1014
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 190}
+        lows_per_month: 5.5
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 280, spread: 400}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 988, spread: 12, floor: 955}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 350, spread: 110}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 34, easterly_pct: 19, southerly_pct: 26, northerly_pct: 17, ushant_gust31_days: 16.0, ushant_gust54_days: 1.2}
+      11:
+        name: November
+        background_hpa: 1013
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 185}
+        lows_per_month: 6.5
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 200, spread: 450}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 982, spread: 13, floor: 950}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 30, spread: 110}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 35, easterly_pct: 16, southerly_pct: 19, northerly_pct: 15, ushant_gust31_days: 21.3, ushant_gust54_days: 2.8}
+      12:
+        name: December
+        background_hpa: 1013
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 185}
+        lows_per_month: 7
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 150, spread: 450}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 977, spread: 14, floor: 950}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 20, spread: 110}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 32, easterly_pct: 20, southerly_pct: 19, northerly_pct: 24, ushant_gust31_days: 22.8, ushant_gust54_days: 4.0}
+  biscay:
+    title: "the Bay of Biscay"
+    bounds: {south: 43.5, north: 47.5, west: -20.0, east: -1.0}
+    provisional: true
+    source: "judgement from the same kinds of source as the Channel's (the pilot charts' roses, NOT READ): the Channel's rows with the storm track farther off and the Azores ridge nearer; package 38"
+    months:
+      1:
+        name: January
+        note: "judgement: the Channel's row with the storm track 150 km farther off (the lows pass north of Biscay; the gale days four-fifths of Ushant's), the Azores ridge to the south-west from May to September; the shares from memory of the pilot charts' roses for the 45 to 50 N square (NOT READ, W §1.1)"
+        background_hpa: 1013
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 200}
+        lows_per_month: 7
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 300, spread: 450}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 977, spread: 14, floor: 950}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.8
+          bearing_deg: {mean: 340, spread: 90}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 36, easterly_pct: 14, southerly_pct: 24, northerly_pct: 16, gust31_days: 18.9, gust54_days: 3.1}
+      2:
+        name: February
+        note: "judgement: the Channel's row with the storm track 150 km farther off (the lows pass north of Biscay; the gale days four-fifths of Ushant's), the Azores ridge to the south-west from May to September; the shares from memory of the pilot charts' roses for the 45 to 50 N square (NOT READ, W §1.1)"
+        background_hpa: 1014
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 200}
+        lows_per_month: 6.5
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 320, spread: 450}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 978, spread: 14, floor: 950}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.8
+          bearing_deg: {mean: 340, spread: 90}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 36, easterly_pct: 13, southerly_pct: 24, northerly_pct: 16, gust31_days: 15.9, gust54_days: 2.6}
+      3:
+        name: March
+        note: "judgement: the Channel's row with the storm track 150 km farther off (the lows pass north of Biscay; the gale days four-fifths of Ushant's), the Azores ridge to the south-west from May to September; the shares from memory of the pilot charts' roses for the 45 to 50 N square (NOT READ, W §1.1)"
+        background_hpa: 1015
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 200}
+        lows_per_month: 6
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 380, spread: 430}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 982, spread: 13, floor: 950}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.8
+          bearing_deg: {mean: 340, spread: 90}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 32, easterly_pct: 18, southerly_pct: 20, northerly_pct: 22, gust31_days: 14.9, gust54_days: 1.4}
+      4:
+        name: April
+        note: "judgement: the Channel's row with the storm track 150 km farther off (the lows pass north of Biscay; the gale days four-fifths of Ushant's), the Azores ridge to the south-west from May to September; the shares from memory of the pilot charts' roses for the 45 to 50 N square (NOT READ, W §1.1)"
+        background_hpa: 1015
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 200}
+        lows_per_month: 5
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 450, spread: 400}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 988, spread: 12, floor: 955}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.8
+          bearing_deg: {mean: 340, spread: 90}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 30, easterly_pct: 18, southerly_pct: 20, northerly_pct: 22, gust31_days: 12, gust54_days: 0.6}
+      5:
+        name: May
+        note: "judgement: the Channel's row with the storm track 150 km farther off (the lows pass north of Biscay; the gale days four-fifths of Ushant's), the Azores ridge to the south-west from May to September; the shares from memory of the pilot charts' roses for the 45 to 50 N square (NOT READ, W §1.1)"
+        background_hpa: 1017
+        gradient: {hpa_per_100km: 0.15, high_toward_deg: 225}
+        lows_per_month: 3.4
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 550, spread: 370}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 994, spread: 10, floor: 960}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.9
+          bearing_deg: {mean: 240, spread: 90}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 30, easterly_pct: 16, southerly_pct: 20, northerly_pct: 22, gust31_days: 9.3, gust54_days: 0.4}
+      6:
+        name: June
+        note: "judgement: the Channel's row with the storm track 150 km farther off (the lows pass north of Biscay; the gale days four-fifths of Ushant's), the Azores ridge to the south-west from May to September; the shares from memory of the pilot charts' roses for the 45 to 50 N square (NOT READ, W §1.1)"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.15, high_toward_deg: 225}
+        lows_per_month: 3
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 630, spread: 350}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 1000, spread: 8, floor: 970}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.9
+          bearing_deg: {mean: 240, spread: 90}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 36, easterly_pct: 11, southerly_pct: 20, northerly_pct: 22, gust31_days: 5.6, gust54_days: 0.1}
+      7:
+        name: July
+        note: "judgement: the Channel's row with the storm track 150 km farther off (the lows pass north of Biscay; the gale days four-fifths of Ushant's), the Azores ridge to the south-west from May to September; the shares from memory of the pilot charts' roses for the 45 to 50 N square (NOT READ, W §1.1)"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.15, high_toward_deg: 225}
+        lows_per_month: 2.5
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 650, spread: 350}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 1002, spread: 7, floor: 972}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.9
+          bearing_deg: {mean: 240, spread: 90}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 44, easterly_pct: 8, southerly_pct: 20, northerly_pct: 22, gust31_days: 5, gust54_days: 0.1}
+      8:
+        name: August
+        note: "judgement: the Channel's row with the storm track 150 km farther off (the lows pass north of Biscay; the gale days four-fifths of Ushant's), the Azores ridge to the south-west from May to September; the shares from memory of the pilot charts' roses for the 45 to 50 N square (NOT READ, W §1.1)"
+        background_hpa: 1017
+        gradient: {hpa_per_100km: 0.15, high_toward_deg: 225}
+        lows_per_month: 3
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 630, spread: 350}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 1000, spread: 8, floor: 970}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.9
+          bearing_deg: {mean: 240, spread: 90}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 42, easterly_pct: 8, southerly_pct: 20, northerly_pct: 22, gust31_days: 4.8, gust54_days: 0}
+      9:
+        name: September
+        note: "judgement: the Channel's row with the storm track 150 km farther off (the lows pass north of Biscay; the gale days four-fifths of Ushant's), the Azores ridge to the south-west from May to September; the shares from memory of the pilot charts' roses for the 45 to 50 N square (NOT READ, W §1.1)"
+        background_hpa: 1017
+        gradient: {hpa_per_100km: 0.15, high_toward_deg: 225}
+        lows_per_month: 3.8
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 530, spread: 370}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 994, spread: 10, floor: 960}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.9
+          bearing_deg: {mean: 240, spread: 90}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 36, easterly_pct: 13, southerly_pct: 20, northerly_pct: 22, gust31_days: 7.2, gust54_days: 0.2}
+      10:
+        name: October
+        note: "judgement: the Channel's row with the storm track 150 km farther off (the lows pass north of Biscay; the gale days four-fifths of Ushant's), the Azores ridge to the south-west from May to September; the shares from memory of the pilot charts' roses for the 45 to 50 N square (NOT READ, W §1.1)"
+        background_hpa: 1014
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 200}
+        lows_per_month: 5.5
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 430, spread: 400}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 988, spread: 12, floor: 955}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.8
+          bearing_deg: {mean: 340, spread: 90}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 36, easterly_pct: 14, southerly_pct: 20, northerly_pct: 22, gust31_days: 12.8, gust54_days: 0.8}
+      11:
+        name: November
+        note: "judgement: the Channel's row with the storm track 150 km farther off (the lows pass north of Biscay; the gale days four-fifths of Ushant's), the Azores ridge to the south-west from May to September; the shares from memory of the pilot charts' roses for the 45 to 50 N square (NOT READ, W §1.1)"
+        background_hpa: 1013
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 200}
+        lows_per_month: 6.5
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 350, spread: 450}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 982, spread: 13, floor: 950}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.8
+          bearing_deg: {mean: 340, spread: 90}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 36, easterly_pct: 13, southerly_pct: 24, northerly_pct: 16, gust31_days: 17, gust54_days: 2}
+      12:
+        name: December
+        note: "judgement: the Channel's row with the storm track 150 km farther off (the lows pass north of Biscay; the gale days four-fifths of Ushant's), the Azores ridge to the south-west from May to September; the shares from memory of the pilot charts' roses for the 45 to 50 N square (NOT READ, W §1.1)"
+        background_hpa: 1013
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 200}
+        lows_per_month: 7
+        track_bearing_deg: {mean: 65, spread: 25}
+        closest_approach_km: {mean: 300, spread: 450}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 977, spread: 14, floor: 950}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.8
+          bearing_deg: {mean: 340, spread: 90}
+          distance_km: {min: 300, max: 700}
+          anomaly_hpa: {min: 12, max: 25}
+          radius_km: {min: 800, max: 1200}
+          life_h: {min: 48, max: 144}
+        check: {westerly_pct: 36, easterly_pct: 14, southerly_pct: 24, northerly_pct: 16, gust31_days: 18.2, gust54_days: 2.8}
+  portugal:
+    title: "the Portuguese coast, Finisterre to the Strait, with the summer northerlies (the Portuguese trades)"
+    bounds: {south: 36.0, north: 43.5, west: -20.0, east: -5.0}
+    provisional: true
+    source: "judgement from the same kinds of source as the Channel's (the pilot charts' roses for the 35 to 45 N squares and the Admiralty's ocean passages, NOT READ): the Portuguese trades of summer under the Azores high and the Iberian thermal low; package 38"
+    months:
+      1:
+        name: January
+        note: "judgement: the winter and the equinoxes off Portugal, the lows passing well north of the coast, south-westerly gales with the deeper of them and a northerly between; the figures from memory of the pilot charts' roses for the 35 to 45 N squares and the Admiralty's ocean passages (NOT READ)"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 250}
+        lows_per_month: 4
+        track_bearing_deg: {mean: 60, spread: 25}
+        closest_approach_km: {mean: 600, spread: 400}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 981, spread: 14, floor: 960}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.75
+          bearing_deg: {mean: 320, spread: 90}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 10, max: 20}
+          radius_km: {min: 1000, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 25, easterly_pct: 10, southerly_pct: 25, northerly_pct: 30, gust31_days: 9, gust54_days: 1}
+      2:
+        name: February
+        note: "judgement: the winter and the equinoxes off Portugal, the lows passing well north of the coast, south-westerly gales with the deeper of them and a northerly between; the figures from memory of the pilot charts' roses for the 35 to 45 N squares and the Admiralty's ocean passages (NOT READ)"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 250}
+        lows_per_month: 4
+        track_bearing_deg: {mean: 60, spread: 25}
+        closest_approach_km: {mean: 620, spread: 400}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 982, spread: 14, floor: 960}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.75
+          bearing_deg: {mean: 320, spread: 90}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 10, max: 20}
+          radius_km: {min: 1000, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 25, easterly_pct: 10, southerly_pct: 24, northerly_pct: 30, gust31_days: 8, gust54_days: 1}
+      3:
+        name: March
+        note: "judgement: the winter and the equinoxes off Portugal, the lows passing well north of the coast, south-westerly gales with the deeper of them and a northerly between; the figures from memory of the pilot charts' roses for the 35 to 45 N squares and the Admiralty's ocean passages (NOT READ)"
+        background_hpa: 1017
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 250}
+        lows_per_month: 3.5
+        track_bearing_deg: {mean: 60, spread: 25}
+        closest_approach_km: {mean: 680, spread: 400}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 986, spread: 13, floor: 960}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.75
+          bearing_deg: {mean: 320, spread: 90}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 10, max: 20}
+          radius_km: {min: 1000, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 22, easterly_pct: 10, southerly_pct: 20, northerly_pct: 35, gust31_days: 7, gust54_days: 0.2}
+      4:
+        name: April
+        note: "judgement: the winter and the equinoxes off Portugal, the lows passing well north of the coast, south-westerly gales with the deeper of them and a northerly between; the figures from memory of the pilot charts' roses for the 35 to 45 N squares and the Admiralty's ocean passages (NOT READ)"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.2, high_toward_deg: 250}
+        lows_per_month: 2.5
+        track_bearing_deg: {mean: 60, spread: 25}
+        closest_approach_km: {mean: 750, spread: 400}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 992, spread: 12, floor: 965}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.75
+          bearing_deg: {mean: 320, spread: 90}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 10, max: 20}
+          radius_km: {min: 1000, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 20, easterly_pct: 10, southerly_pct: 15, northerly_pct: 40, gust31_days: 5, gust54_days: 0.2}
+      5:
+        name: May
+        note: "judgement: the Portuguese trades, the northerly (N to NNE, 15 to 25 knots on most days) under the Azores high and the Iberian thermal low from May to September; the lows pass far north and the few that do not bring a south-westerly; the figures from memory of the pilot charts' roses for the 35 to 45 N squares and the Admiralty's ocean passages (NOT READ)"
+        background_hpa: 1017
+        gradient: {hpa_per_100km: 0.25, high_toward_deg: 285}
+        lows_per_month: 2
+        track_bearing_deg: {mean: 60, spread: 25}
+        closest_approach_km: {mean: 850, spread: 400}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 998, spread: 10, floor: 970}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.92
+          bearing_deg: {mean: 290, spread: 60}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 10, max: 20}
+          radius_km: {min: 1000, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 15, easterly_pct: 10, southerly_pct: 10, northerly_pct: 50, gust31_days: 4, gust54_days: 0.2}
+      6:
+        name: June
+        note: "judgement: the Portuguese trades, the northerly (N to NNE, 15 to 25 knots on most days) under the Azores high and the Iberian thermal low from May to September; the lows pass far north and the few that do not bring a south-westerly; the figures from memory of the pilot charts' roses for the 35 to 45 N squares and the Admiralty's ocean passages (NOT READ)"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.25, high_toward_deg: 285}
+        lows_per_month: 1.5
+        track_bearing_deg: {mean: 60, spread: 25}
+        closest_approach_km: {mean: 930, spread: 400}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 1004, spread: 8, floor: 980}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.92
+          bearing_deg: {mean: 290, spread: 60}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 10, max: 20}
+          radius_km: {min: 1000, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 10, easterly_pct: 10, southerly_pct: 6, northerly_pct: 60, gust31_days: 4, gust54_days: 0.2}
+      7:
+        name: July
+        note: "judgement: the Portuguese trades, the northerly (N to NNE, 15 to 25 knots on most days) under the Azores high and the Iberian thermal low from May to September; the lows pass far north and the few that do not bring a south-westerly; the figures from memory of the pilot charts' roses for the 35 to 45 N squares and the Admiralty's ocean passages (NOT READ)"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.25, high_toward_deg: 285}
+        lows_per_month: 1
+        track_bearing_deg: {mean: 60, spread: 25}
+        closest_approach_km: {mean: 950, spread: 400}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 1006, spread: 7, floor: 982}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.92
+          bearing_deg: {mean: 290, spread: 60}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 10, max: 20}
+          radius_km: {min: 1000, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 8, easterly_pct: 10, southerly_pct: 4, northerly_pct: 70, gust31_days: 5, gust54_days: 0.2}
+      8:
+        name: August
+        note: "judgement: the Portuguese trades, the northerly (N to NNE, 15 to 25 knots on most days) under the Azores high and the Iberian thermal low from May to September; the lows pass far north and the few that do not bring a south-westerly; the figures from memory of the pilot charts' roses for the 35 to 45 N squares and the Admiralty's ocean passages (NOT READ)"
+        background_hpa: 1017
+        gradient: {hpa_per_100km: 0.25, high_toward_deg: 285}
+        lows_per_month: 1
+        track_bearing_deg: {mean: 60, spread: 25}
+        closest_approach_km: {mean: 930, spread: 400}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 1004, spread: 8, floor: 980}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.92
+          bearing_deg: {mean: 290, spread: 60}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 10, max: 20}
+          radius_km: {min: 1000, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 8, easterly_pct: 10, southerly_pct: 4, northerly_pct: 70, gust31_days: 4, gust54_days: 0.2}
+      9:
+        name: September
+        note: "judgement: the Portuguese trades, the northerly (N to NNE, 15 to 25 knots on most days) under the Azores high and the Iberian thermal low from May to September; the lows pass far north and the few that do not bring a south-westerly; the figures from memory of the pilot charts' roses for the 35 to 45 N squares and the Admiralty's ocean passages (NOT READ)"
+        background_hpa: 1017
+        gradient: {hpa_per_100km: 0.25, high_toward_deg: 285}
+        lows_per_month: 2
+        track_bearing_deg: {mean: 60, spread: 25}
+        closest_approach_km: {mean: 830, spread: 400}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 998, spread: 10, floor: 970}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.92
+          bearing_deg: {mean: 290, spread: 60}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 10, max: 20}
+          radius_km: {min: 1000, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 14, easterly_pct: 10, southerly_pct: 8, northerly_pct: 55, gust31_days: 3, gust54_days: 0.2}
+      10:
+        name: October
+        note: "judgement: the winter and the equinoxes off Portugal, the lows passing well north of the coast, south-westerly gales with the deeper of them and a northerly between; the figures from memory of the pilot charts' roses for the 35 to 45 N squares and the Admiralty's ocean passages (NOT READ)"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.2, high_toward_deg: 250}
+        lows_per_month: 3
+        track_bearing_deg: {mean: 60, spread: 25}
+        closest_approach_km: {mean: 730, spread: 400}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 992, spread: 12, floor: 965}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.75
+          bearing_deg: {mean: 320, spread: 90}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 10, max: 20}
+          radius_km: {min: 1000, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 20, easterly_pct: 10, southerly_pct: 16, northerly_pct: 40, gust31_days: 5, gust54_days: 0.2}
+      11:
+        name: November
+        note: "judgement: the winter and the equinoxes off Portugal, the lows passing well north of the coast, south-westerly gales with the deeper of them and a northerly between; the figures from memory of the pilot charts' roses for the 35 to 45 N squares and the Admiralty's ocean passages (NOT READ)"
+        background_hpa: 1017
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 250}
+        lows_per_month: 4
+        track_bearing_deg: {mean: 60, spread: 25}
+        closest_approach_km: {mean: 650, spread: 400}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 986, spread: 13, floor: 960}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.75
+          bearing_deg: {mean: 320, spread: 90}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 10, max: 20}
+          radius_km: {min: 1000, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 25, easterly_pct: 10, southerly_pct: 23, northerly_pct: 32, gust31_days: 8, gust54_days: 1}
+      12:
+        name: December
+        note: "judgement: the winter and the equinoxes off Portugal, the lows passing well north of the coast, south-westerly gales with the deeper of them and a northerly between; the figures from memory of the pilot charts' roses for the 35 to 45 N squares and the Admiralty's ocean passages (NOT READ)"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 250}
+        lows_per_month: 4.5
+        track_bearing_deg: {mean: 60, spread: 25}
+        closest_approach_km: {mean: 600, spread: 400}
+        speed_kn: {min: 15, max: 35}
+        central_hpa: {mean: 981, spread: 14, floor: 960}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 60, max: 110}
+        high:
+          probability: 0.75
+          bearing_deg: {mean: 320, spread: 90}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 10, max: 20}
+          radius_km: {min: 1000, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 26, easterly_pct: 10, southerly_pct: 25, northerly_pct: 30, gust31_days: 9, gust54_days: 1}
+  madeira:
+    title: "the sea off Madeira and the Moroccan coast, with the north-east trade"
+    bounds: {south: 30.0, north: 36.0, west: -22.0, east: -9.0}
+    provisional: true
+    source: "judgement from the same kinds of source as the Channel's (the pilot charts' roses for the 30 to 35 N squares, NOT READ): the north-east trade under the Azores high; package 38"
+    months:
+      1:
+        name: January
+        note: "judgement: the north-east trade off Madeira under the Azores high (N to NE, 10 to 20 knots, the high nearly always in reach), a low rare and far to the north; the figures from memory of the pilot charts' roses for the 30 to 35 N squares (NOT READ)"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.18, high_toward_deg: 320}
+        lows_per_month: 1.5
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 320, spread: 70}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 15, easterly_pct: 12, southerly_pct: 12, northerly_pct: 45, gust31_days: 4, gust54_days: 0.3}
+      2:
+        name: February
+        note: "judgement: the north-east trade off Madeira under the Azores high (N to NE, 10 to 20 knots, the high nearly always in reach), a low rare and far to the north; the figures from memory of the pilot charts' roses for the 30 to 35 N squares (NOT READ)"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.18, high_toward_deg: 320}
+        lows_per_month: 1.5
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 320, spread: 70}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 15, easterly_pct: 12, southerly_pct: 12, northerly_pct: 45, gust31_days: 4, gust54_days: 0.3}
+      3:
+        name: March
+        note: "judgement: the north-east trade off Madeira under the Azores high (N to NE, 10 to 20 knots, the high nearly always in reach), a low rare and far to the north; the figures from memory of the pilot charts' roses for the 30 to 35 N squares (NOT READ)"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.18, high_toward_deg: 320}
+        lows_per_month: 1.2
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 320, spread: 70}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 15, easterly_pct: 12, southerly_pct: 12, northerly_pct: 48, gust31_days: 3, gust54_days: 0}
+      4:
+        name: April
+        note: "judgement: the north-east trade off Madeira under the Azores high (N to NE, 10 to 20 knots, the high nearly always in reach), a low rare and far to the north; the figures from memory of the pilot charts' roses for the 30 to 35 N squares (NOT READ)"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.25, high_toward_deg: 330}
+        lows_per_month: 0.8
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 330, spread: 40}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 8, easterly_pct: 20, southerly_pct: 6, northerly_pct: 55, gust31_days: 2, gust54_days: 0}
+      5:
+        name: May
+        note: "judgement: the north-east trade off Madeira under the Azores high (N to NE, 10 to 20 knots, the high nearly always in reach), a low rare and far to the north; the figures from memory of the pilot charts' roses for the 30 to 35 N squares (NOT READ)"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.25, high_toward_deg: 330}
+        lows_per_month: 0.5
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 330, spread: 40}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 8, easterly_pct: 20, southerly_pct: 6, northerly_pct: 60, gust31_days: 2, gust54_days: 0}
+      6:
+        name: June
+        note: "judgement: the north-east trade off Madeira under the Azores high (N to NE, 10 to 20 knots, the high nearly always in reach), a low rare and far to the north; the figures from memory of the pilot charts' roses for the 30 to 35 N squares (NOT READ)"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.25, high_toward_deg: 330}
+        lows_per_month: 0.3
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 330, spread: 40}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 8, easterly_pct: 20, southerly_pct: 6, northerly_pct: 65, gust31_days: 2, gust54_days: 0}
+      7:
+        name: July
+        note: "judgement: the north-east trade off Madeira under the Azores high (N to NE, 10 to 20 knots, the high nearly always in reach), a low rare and far to the north; the figures from memory of the pilot charts' roses for the 30 to 35 N squares (NOT READ)"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.25, high_toward_deg: 330}
+        lows_per_month: 0.2
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 330, spread: 40}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 8, easterly_pct: 20, southerly_pct: 6, northerly_pct: 70, gust31_days: 3, gust54_days: 0}
+      8:
+        name: August
+        note: "judgement: the north-east trade off Madeira under the Azores high (N to NE, 10 to 20 knots, the high nearly always in reach), a low rare and far to the north; the figures from memory of the pilot charts' roses for the 30 to 35 N squares (NOT READ)"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.25, high_toward_deg: 330}
+        lows_per_month: 0.2
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 330, spread: 40}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 8, easterly_pct: 20, southerly_pct: 6, northerly_pct: 70, gust31_days: 3, gust54_days: 0}
+      9:
+        name: September
+        note: "judgement: the north-east trade off Madeira under the Azores high (N to NE, 10 to 20 knots, the high nearly always in reach), a low rare and far to the north; the figures from memory of the pilot charts' roses for the 30 to 35 N squares (NOT READ)"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.25, high_toward_deg: 330}
+        lows_per_month: 0.4
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 330, spread: 40}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 8, easterly_pct: 20, southerly_pct: 6, northerly_pct: 60, gust31_days: 2, gust54_days: 0}
+      10:
+        name: October
+        note: "judgement: the north-east trade off Madeira under the Azores high (N to NE, 10 to 20 knots, the high nearly always in reach), a low rare and far to the north; the figures from memory of the pilot charts' roses for the 30 to 35 N squares (NOT READ)"
+        background_hpa: 1017
+        gradient: {hpa_per_100km: 0.18, high_toward_deg: 320}
+        lows_per_month: 0.8
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 320, spread: 70}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 15, easterly_pct: 12, southerly_pct: 12, northerly_pct: 52, gust31_days: 2, gust54_days: 0}
+      11:
+        name: November
+        note: "judgement: the north-east trade off Madeira under the Azores high (N to NE, 10 to 20 knots, the high nearly always in reach), a low rare and far to the north; the figures from memory of the pilot charts' roses for the 30 to 35 N squares (NOT READ)"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.18, high_toward_deg: 320}
+        lows_per_month: 1.2
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 320, spread: 70}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 15, easterly_pct: 12, southerly_pct: 12, northerly_pct: 45, gust31_days: 3, gust54_days: 0.3}
+      12:
+        name: December
+        note: "judgement: the north-east trade off Madeira under the Azores high (N to NE, 10 to 20 knots, the high nearly always in reach), a low rare and far to the north; the figures from memory of the pilot charts' roses for the 30 to 35 N squares (NOT READ)"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.18, high_toward_deg: 320}
+        lows_per_month: 1.5
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 320, spread: 70}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 15, easterly_pct: 12, southerly_pct: 12, northerly_pct: 45, gust31_days: 4, gust54_days: 0.3}

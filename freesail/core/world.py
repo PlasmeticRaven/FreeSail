@@ -122,6 +122,12 @@ class Scenario:
     # in it; the depth, the coast, the features in sight and the grounding check read it.
     # None: no chart, and the queries read None ("no chart of these waters").
     region: str | None = None
+    # The chart (spec M6 §26; package 38): a chart of the manifest's `charts:` by its name
+    # (`atlantic-east`: the regions it holds and the corridor under them), loaded in place
+    # of `region` when both are given; `region` is kept as the name of a chart of that one
+    # region, so that every scenario and save before this field works unchanged. A save
+    # from before loads with None.
+    chart: str | None = None
     # The weather script (spec M4 §19, `freesail.world.weather_script`): waypoints as plain
     # dictionaries ({"at": ISO time, "from_deg": degrees, "knots": knots}), saved with the
     # scenario and so followed again by a replay. Empty: the fixed wind above. With a
@@ -362,20 +368,21 @@ class World:
         self.chart: Any = None
         self.lookout: Any = None
         self._aground: bool = False
-        if self.scenario.region:
+        chart_name = self.scenario.chart or self.scenario.region
+        if chart_name:
             from freesail.world.chart import load_chart
             from freesail.world.lookout import Lookout
 
             if self.origin is None:
                 raise ValueError(
-                    f"the scenario names the chart region '{self.scenario.region}' but "
+                    f"the scenario names the chart region '{chart_name}' but "
                     f"gives no position; a chart needs to know where she is."
                 )
-            self.chart = load_chart(self.scenario.region)
+            self.chart = load_chart(chart_name)
             if not self.chart.contains(self.origin):
                 raise ValueError(
                     f"the position {self.origin} lies outside the chart region "
-                    f"'{self.scenario.region}' ({self.chart.bounds_words()})."
+                    f"'{chart_name}' ({self.chart.bounds_words()})."
                 )
             self.lookout = Lookout(self.chart)
         # The tide (spec M5 §16, package 34; `freesail.world.tide`): the world's, wherever
@@ -419,12 +426,21 @@ class World:
         if self.scenario.systems or self.scenario.climatology:
             from freesail.world.weather import Glass, Weather, load_climatology
 
+            climatology = load_climatology() if self.scenario.climatology else None
+            # the box she starts in (package 38; spec M6 §26): by her position, the
+            # climatology's default (the Channel) on the plane
+            box = (
+                climatology.box_at(self.origin.lat_deg, self.origin.lon_deg)
+                if climatology is not None and self.origin is not None
+                else None
+            )
             self.systems = Weather(
                 self.scenario.start_time,
                 self.rng.stream("weather"),
                 seed=self.seed,
                 systems=self.scenario.systems,
-                climatology=load_climatology() if self.scenario.climatology else None,
+                climatology=climatology,
+                box=box,
                 background_hpa=self.scenario.background.get("hpa"),
                 gradient=(
                     (
@@ -1076,6 +1092,13 @@ class World:
         read into the ship's record, the wind's air mass set from the sector (when the
         systems drive the wind)."""
         t = self.clock.ship_time
+        pos = getattr(self, "_position", None)
+        if pos is not None:
+            # where she is, for the climatology's box she is in and the point the next
+            # system is drawn about (package 38); nothing on the plane, and nothing at the
+            # first look, which comes before her position is set (she is at her start,
+            # whose box the systems were seeded from)
+            self.systems.locate(pos.lat_deg, pos.lon_deg, self.ship_x_km, self.ship_y_km)
         self.conditions = self.systems.conditions_at(self.ship_x_km, self.ship_y_km, t)
         if self.scenario.sky:
             # the sky pinned by the scenario (package 33a): laid over the systems' words

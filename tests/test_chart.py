@@ -203,7 +203,11 @@ def test_the_regions_tiles_are_present_committed_and_under_the_brief_size(manife
         text=True,
         check=False,
     ).stdout.split()
-    assert tracked == []
+    # package 38: the corridor's folder is the one thing under tiles/1/ the repository
+    # carries (spec M6 §26); the Atlantic beyond it is still fetched and not committed
+    corridor = manifest["charts"]["atlantic-east"]["corridor"]
+    folder = manifest["corridors"][corridor]["folder"]
+    assert all(t.startswith(f"data/charts/{folder}/") for t in tracked), tracked
 
 
 # ---------------------------------------------------------------------------
@@ -267,13 +271,16 @@ def test_depth_here_off_the_lizard_in_carrick_roads_and_in_mid_channel(chart):
     mid = chart.depth_at(MID_CHANNEL)
     assert 70.0 < off < 90.0 and 8.0 < roads < 40.0 and 85.0 < mid < 100.0
     assert chart.depth_at(Position(50.153, -5.070)) < 0  # Falmouth town stands above the datum
-    # beyond the region nothing answers unless the tool's world level was built here (it
-    # is never committed): then it answers coarsely
+    # beyond the region a chart of the region alone answers nothing, unless the tool's
+    # world level was built here (it is never committed): then it answers coarsely. The
+    # corridor is a named chart's (package 38): `atlantic-east` answers there at level 1
     atlantic = Position(45.0, -20.0)
     if chart._finest_level(atlantic) is None:
         assert chart.depth_at(atlantic) is None
     else:
         assert chart._finest_level(atlantic).level == 0 and chart.depth_at(atlantic) > 3000.0
+    whole = load_chart("atlantic-east")
+    assert whole.level_at(atlantic) == 1 and whole.depth_at(atlantic) > 3000.0
     # the finest level answers first: the harbour patch under Carrick Roads
     assert chart._finest_level(CARRICK_ROADS).level == 3
     assert chart._finest_level(MID_CHANNEL).level == 2
@@ -824,3 +831,339 @@ def test_the_coasts_distance_at_the_ship_is_the_charts_at_her_position_after_a_l
     assert w._coast_trend_of_plane(w.ship_x_km, w.ship_y_km) == w.chart.coast_trend(
         w.position, 3000.0
     )
+
+
+# ---------------------------------------------------------------------------
+# Package 38: the chart stitched (spec M6 §26): the chart as the whole manifest, the
+# corridor committed, the queries across a region's edge and over the corridor, the
+# lookout's honesty at the corridor's scale, the blocks' recipe form and checks
+# ---------------------------------------------------------------------------
+
+WHOLE = "atlantic-east"
+CORRIDOR = "atlantic-corridor"
+# The corridor's budget (spec M6 §26: "some 11 MB raw, half that compressed"; with the
+# distance field the tiles compress to under 6 MB, measured in package 38).
+CORRIDOR_BUDGET_BYTES = 8 * 1024 * 1024
+# Where the Channel region's level-2 tiles end on the south: the tile row's southern edge
+# (47.81 N), off Penmarch, the water deepening gently southward over the corridor.
+EDGE_TRACK_START = Position(48.0, -4.55)
+OFF_LISBON = Position(38.6, -9.4)
+OFF_FINISTERRE = Position(42.9, -9.4)
+FUNCHAL_TOWN = Position(32.65, -16.91)
+BEYOND_THE_CORRIDOR = Position(31.0, -10.0)
+
+
+@pytest.fixture(scope="module")
+def whole() -> Chart:
+    return load_chart(WHOLE)
+
+
+def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_region(
+    whole, chart, manifest
+):
+    """A chart of the manifest's `charts:` holds the regions it names and the corridor
+    under them, its bounds and words the whole's; a region's name still loads a chart of
+    that region alone (every scenario of the Channel reads what it read); a name the
+    manifest has not is refused in words that list both."""
+    assert manifest["charts"][WHOLE]["regions"] == ["channel-west"]
+    assert manifest["charts"][WHOLE]["corridor"] == CORRIDOR
+    assert whole.region == whole.name == WHOLE and whole.regions == ["channel-west"]
+    assert [lv.level for lv in whole.levels] == [3, 2, 1]
+    assert whole.bounds == (32.0, 51.0, -20.0, -1.0)
+    assert whole.bounds_words() == "32 to 51 N, 20 to 1 W"
+    assert whole.contains(OFF_LISBON) and whole.contains(LIZARD)
+    assert not whole.contains(Position(52.0, -5.0))
+    assert whole.region_at(LIZARD) == "channel-west" and whole.region_at(OFF_LISBON) is None
+    # the features of every region, indexed together, and every region's coast
+    assert whole.features.keys() == chart.features.keys()
+    assert all(whole.region_of[fid] == "channel-west" for fid in whole.features)
+    assert whole.find_feature("the Lizard") is chart.find_feature("the Lizard") or (
+        whole.find_feature("the Lizard").id == chart.find_feature("the Lizard").id
+    )
+    assert len(whole.coast_lines()) == len(chart.coast_lines()) > 0
+    # the one-region chart as before: its own levels and bounds, no corridor
+    assert [lv.level for lv in chart.levels] == [3, 2] and chart.corridor is None
+    assert chart.bounds == (48.0, 51.0, -7.0, -3.0)
+    with pytest.raises(C.ChartError, match="atlantic-east, channel-west"):
+        Chart("the-moon", manifest)
+
+
+def test_the_corridor_is_committed_from_gebco_with_its_source_licence_and_checksums(
+    manifest,
+):
+    """Spec M6 §26, the owner's ruling 5: level 1 from GEBCO over 32 N to 51 N and 20 W
+    to 1 W, built by the tool and committed under its own folder, the manifest recording
+    the source, the licence and the checksum of the extract as for every tile, and each
+    tile's own; under the brief's size; the fingerprint of the rules takes the manifest
+    and so the corridor's checksums."""
+    tool = build_tool()
+    entry = manifest["corridors"][CORRIDOR]
+    assert entry["level"] == 1 and entry["committed"] is True
+    assert entry["bounds"] == {"south": 32.0, "north": 51.0, "west": -20.0, "east": -1.0}
+    assert entry["datum"] == "mean sea level" == manifest["levels"]["1"]["datum"]
+    assert entry["source"] == "gebco_2025" and entry["licence"] in tool.ALLOWED_LICENCES
+    fetched = manifest["sources"]["gebco_2025"]["fetched"]
+    assert any(f["sha256"] == entry["fetched_sha256"] for f in fetched)
+    assert entry["folder"] == tool.CORRIDORS[CORRIDOR]["folder"]
+    assert "--corridor" in entry["built_by"]
+    folder = CHARTS / entry["folder"]
+    total = 0
+    for t in entry["tiles"]:
+        path = folder / f"{t['name']}.npz"
+        assert path.exists(), path
+        assert tool.sha256_of(path) == t["sha256"], t["name"]
+        s, w = int(t["south_sec"]), int(t["west_sec"])
+        assert t["name"] == tool.tile_name(s, w)
+        assert (s + 90 * 3600) % tool.tile_span_sec(1) == 0
+        total += path.stat().st_size
+    assert len(entry["tiles"]) == 30 and total == entry["bytes"] < CORRIDOR_BUDGET_BYTES
+    tracked = subprocess.run(
+        ["git", "ls-files", f"data/charts/{entry['folder']}"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    ).stdout.split()
+    assert len(tracked) == len(entry["tiles"]), "the corridor's tiles are committed"
+    # the tile carries the distance field, so a landfall over the corridor is a landfall
+    lv = load_chart(WHOLE).levels[-1]
+    tile = lv.tile_at(OFF_LISBON.lat_deg, OFF_LISBON.lon_deg)
+    assert tile is not None and tile.level == 1 and tile.dist is not None
+
+
+def test_a_query_asks_the_finest_level_and_falls_back_to_the_corridor_and_to_none(whole):
+    """Across the chart: a region's level where the region is, the corridor at level 1
+    beyond it, None beyond the corridor's fetch box; the level's `use` says which."""
+    assert whole.level_at(CARRICK_ROADS) == 3 and whole.level_at(MID_CHANNEL) == 2
+    assert whole.level_at(OFF_LISBON) == 1 and whole.level_at(Position(45.0, -20.0)) == 1
+    assert whole.use_at(MID_CHANNEL) == "a region: coast and approaches"
+    assert whole.use_at(OFF_LISBON) == "the Atlantic: passages and landfalls"
+    assert 30.0 < whole.depth_at(OFF_LISBON) < 200.0
+    assert 100.0 < whole.depth_at(OFF_FINISTERRE) < 200.0
+    assert whole.depth_at(FUNCHAL_TOWN) < 0.0  # the town stands above the sea
+    assert whole.depth_at(BEYOND_THE_CORRIDOR) is None  # a tile, but nothing in it
+    assert whole.coast_distance(BEYOND_THE_CORRIDOR) is None
+    assert whole.tile_min_depth(OFF_LISBON) is not None
+    # the corridor's cell is a kilometre; a region's a hundred metres
+    assert 900.0 < whole.cell_m_at(OFF_LISBON) < 1000.0 and whole.cell_m_at(MID_CHANNEL) < 100.0
+    # the nearest shore and its name over the corridor: the ground itself, no name
+    shore = whole.nearest_shore(OFF_FINISTERRE)
+    assert (
+        shore is not None
+        and 5000.0 < shore.distance_m < 15000.0
+        and 30.0 < shore.bearing_deg < 120.0
+    )
+    assert whole.coast_at(OFF_FINISTERRE).name is None
+    # the grounding check works over the corridor: afloat off Lisbon, aground on the town
+    assert whole.aground(OFF_LISBON, 0.0, 41.8, 4.6, 0.0, 0.0, 10.0) is None
+    assert whole.aground(FUNCHAL_TOWN, 0.0, 41.8, 4.6, 0.0, 0.0, 10.0) is not None
+
+
+def test_no_seam_at_a_regions_edge_over_the_corridor(whole, chart):
+    """Item 2 of the brief: across the Channel region's southern edge the depth has no
+    step beyond the two sources' own difference (EMODnet at its datum against GEBCO at
+    mean sea level, a metre or two in seventy), the shore's distance steps by no more
+    than a corridor cell (its grain), no danger is lost, and the chart of the region
+    alone reads the same within the region."""
+    last: tuple[int, float, float] | None = None  # level, depth, the shore's distance
+    seam_steps: list[tuple[float, float]] = []
+    for k in range(0, 120):
+        p = destination(EDGE_TRACK_START, 180.0, k * 250.0)
+        level = whole.level_at(p)
+        depth = whole.depth_at(p)
+        shore = whole.nearest_shore(p)
+        assert depth is not None and shore is not None and level in (1, 2), p
+        if level == 2:
+            assert whole.depth_at(p) == chart.depth_at(p)
+        else:
+            assert chart.depth_at(p) is None  # the region alone ends here
+        if last is not None:
+            # the sea floor's own steps inshore (Penmarch's rocks) are the floor's; the
+            # step at the seam is the two sources' difference, a metre or two
+            assert abs(depth - last[1]) < 12.0, (p, depth, last)
+            if level != last[0]:
+                seam_steps.append((abs(depth - last[1]), abs(shore.distance_m - last[2])))
+        last = (level, depth, shore.distance_m)
+    assert len(seam_steps) == 1, "the track crosses the edge once"
+    depth_step, shore_step = seam_steps[0]
+    # measured: a step of 1.3 m in the depth and of 1,150 m (a cell and a quarter, the
+    # coarser level's grain) in the shore's distance at the seam off Penmarch
+    assert depth_step < 3.0 and shore_step < 1.5 * whole.levels[-1].cell_m, seam_steps
+    inside = Position(47.9, -4.45)
+    assert {f.id for f, _, _ in whole.dangers_near(inside, 10 * units.NAUTICAL_MILE)} == {
+        f.id for f, _, _ in chart.dangers_near(inside, 10 * units.NAUTICAL_MILE)
+    }
+    # the field's own read falls through to the corridor where the region's tiles end
+    # within the distance it gives, and not before (a harbour patch's region as it was)
+    edge = destination(EDGE_TRACK_START, 180.0, 20 * 250.0)
+    assert whole.level_at(edge) == 2 and whole.coast_distance(edge) is not None
+    assert whole.coast_distance(CARRICK_ROADS) == chart.coast_distance(CARRICK_ROADS)
+    assert whole.coast_trend(MID_CHANNEL, 3000.0) == chart.coast_trend(MID_CHANNEL, 3000.0)
+
+
+def test_a_fake_sailed_across_the_edge_hails_no_landfall_twice_and_loses_no_depth():
+    """The frigate off Penmarch stands south across the region's edge and over the
+    corridor's water for two hours: the shore is hailed once, the depth under the keel
+    reads at every tick, no danger is lost and nothing says the chart ends."""
+    sc = Scenario(
+        start_time=datetime(1805, 6, 1, 10, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=14.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=180.0,
+        ship_speed_kn=6.0,
+        position={"lat_deg": 47.86, "lon_deg": -4.45},
+        chart=WHOLE,
+    )
+    w = make_world(7, FRIGATE, sc)
+    assert w.chart.name == WHOLE and w.chart.level_at(w.position) == 2
+    w.submit("set plain sail")
+    depths = []
+    for _ in range(12):
+        w.run(600)
+        depths.append(w.chart.depth_at(w.position))
+    assert w.chart.level_at(w.position) == 1, "she is over the corridor"
+    assert all(d is not None and d > 20.0 for d in depths)
+    from freesail.world.lookout import SHORE_ID
+
+    shore_lines = [
+        e for e in w.log if e.kind == "lookout.sighting" and e.data.get("id") == SHORE_ID
+    ]
+    assert len(shore_lines) <= 1
+    assert not [e for e in w.log if e.kind == "lookout.chart_edge"]
+    assert not [e for e in w.log if e.kind.startswith("ground.")]
+
+
+def test_the_lookouts_words_are_honest_over_the_corridor():
+    """Where the corridor's cells are the finest the shore is "the land" at a headland's
+    scale, never "the land about" a point, no rock is named, and the line's data says
+    which chart it was read from, by the level's `use` (spec M6 §26)."""
+    from freesail.world.lookout import COARSE_CELL_M
+
+    off_roca = destination(Position(38.78, -9.50), 270.0, 2.0 * units.NAUTICAL_MILE)
+    sc = Scenario(
+        start_time=datetime(1805, 6, 1, 10, 0),
+        wind_from_deg=0.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=180.0,
+        position=off_roca.to_dict(),
+        chart=WHOLE,
+    )
+    w = make_world(7, FRIGATE, sc)
+    assert w.chart.cell_m_at(w.position) > COARSE_CELL_M
+    w.run(60)
+    hails = [e for e in w.log if e.kind == "lookout.sighting"]
+    assert len(hails) == 1 and hails[0].text.startswith("The land ")
+    assert "about" not in hails[0].text and hails[0].data["landfall"] is True
+    assert hails[0].data["scale"] == "the Atlantic: passages and landfalls"
+    assert w.readings["land"]["in_sight"] is True
+    assert not [s for s in w.lookout.sightings if s.seen_as == "danger"]
+
+
+def test_a_feature_id_given_in_two_regions_is_refused_at_load_in_words(tmp_path):
+    """The features of every region are indexed together, their ids unique across
+    regions; a clash is an error at load that names the id and both regions."""
+    root = tmp_path / "charts"
+    (root / "features").mkdir(parents=True)
+    feature = {
+        "id": "the-same-rock",
+        "kind": "rock",
+        "name": "the Same Rock",
+        "lat_deg": 49.0,
+        "lon_deg": -5.0,
+        "source": "judgement",
+        "says": "a rock",
+    }
+    for r in ("west", "east"):
+        (root / "features" / f"{r}.yaml").write_text(
+            yaml.safe_dump({"features": [feature]}), encoding="utf-8"
+        )
+    manifest = {
+        "levels": {"2": {"cell_sec": 3.0, "tile_cells": 512, "unit_m": 0.1}},
+        "charts": {"both": {"regions": ["west", "east"]}},
+        "regions": {
+            r: {
+                "bounds": {"south": 48.0, "north": 51.0, "west": -7.0, "east": -3.0},
+                "tiles": {"2": []},
+                "features": f"features/{r}.yaml",
+            }
+            for r in ("west", "east")
+        },
+    }
+    with pytest.raises(C.ChartError, match="the-same-rock.*both west and east"):
+        Chart("both", manifest, root)
+    assert Chart("west", manifest, root).features.keys() == {"the-same-rock"}
+
+
+def test_the_recipe_form_the_checks_and_a_region_build_that_leaves_the_rest_untouched(
+    tmp_path, capsys, monkeypatch
+):
+    """Item 6: `REGIONS` is the form a block fills (bounds, fetch, harbours, sources),
+    `--check` prints the checks a block must pass and the Channel passes them; the
+    manifest written for one region carries the other regions' and the corridor's
+    entries over as they were, their tiles checked present."""
+    tool = build_tool()
+    for key in ("title", "bounds", "fetch", "harbours", "sources"):
+        assert key in tool.REGIONS["channel-west"], key
+    assert tool.CORRIDORS[CORRIDOR]["level"] == 1 and tool.CHARTS[WHOLE]["corridor"] == CORRIDOR
+    assert tool.main(["--check", "channel-west"]) == 0
+    out = capsys.readouterr().out
+    for words in (
+        "licences: emodnet_dtm_2024, gebco_2025 (allowed)",
+        "features within the bounds: 207 of 207",
+        "ids unique across the manifest's regions: yes",
+        "sources in the references' form: 207 of 207",
+        "harbour patches with their datum stated: 5 of 5",
+        "passes its checks",
+    ):
+        assert words in out, words
+    # a block that fails: a feature outside the bounds, a source not in the form
+    report: list[str] = []
+    build = tool.Build(tmp_path, True, report)
+    bad = [
+        {
+            "id": "x",
+            "kind": "rock",
+            "name": "X",
+            "lat_deg": 40.0,
+            "lon_deg": -5.0,
+            "source": "me",
+            "says": "",
+        },
+    ]
+    with pytest.raises(SystemExit, match="outside the region's bounds.*references' form"):
+        build.check_region("channel-west", bad, [{"file": "o.yaml", "datum": ""}], others={})
+    # the carry-over: a manifest written with nothing built this run keeps the region
+    # and the corridor as the last manifest lists them, and the sources' records
+    fake = tmp_path / "charts"
+    fake.mkdir()
+    last = yaml.safe_load((CHARTS / "manifest.yaml").read_text(encoding="utf-8"))
+    (fake / "manifest.yaml").write_text(yaml.safe_dump(last, sort_keys=False), encoding="utf-8")
+    for level, tiles in last["regions"]["channel-west"]["tiles"].items():
+        (fake / "tiles" / str(level)).mkdir(parents=True, exist_ok=True)
+        for t in tiles:
+            (fake / "tiles" / str(level) / f"{t['name']}.npz").write_bytes(b"")
+    folder = fake / last["corridors"][CORRIDOR]["folder"]
+    folder.mkdir(parents=True)
+    for t in last["corridors"][CORRIDOR]["tiles"]:
+        (folder / f"{t['name']}.npz").write_bytes(b"")
+    (fake / "features").mkdir()
+    (fake / "overrides").mkdir()
+    monkeypatch.setattr(tool, "CHARTS_DIR", fake)
+    build = tool.Build(tmp_path, True, [])
+    path = build.write_manifest({}, {}, {}, {})
+    written = yaml.safe_load(path.read_text(encoding="utf-8"))
+    assert written["regions"]["channel-west"] == last["regions"]["channel-west"]
+    assert written["corridors"][CORRIDOR] == last["corridors"][CORRIDOR]
+    assert written["charts"][WHOLE]["regions"] == ["channel-west"]
+    assert written["sources"]["gebco_2025"]["fetched"] == last["sources"]["gebco_2025"]["fetched"]
+    assert written["sources"]["gebco_2025"]["status"] == "fetched in an earlier build"
+    # a region whose tiles are gone is dropped, and said
+    for p in (fake / "tiles" / "3").glob("*.npz"):
+        p.unlink()
+    report = []
+    tool.Build(tmp_path, True, report).write_manifest({}, {}, {}, {})
+    assert any("channel-west has tiles missing" in line for line in report)
