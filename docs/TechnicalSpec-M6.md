@@ -428,7 +428,10 @@ again, so twelve crewed ships would be near fifty ticks a second, under the sixt
 the owner plays at; if every ship in a region is wanted at once, the vectorised hot loop
 of the proposal's risk table is the likely answer and is sized by that measurement. The
 promotion point and the demotion range are then tuned in the notes, with a hysteresis so
-that a ship near the edge does not flap between bodies. The far-detail guard
+that a ship near the edge does not flap between bodies. Whatever the scheme, its centre
+is wherever the player is (the owner, 2026-10-09): the ship he is aboard, whichever
+station he holds on her, or none; with the player at the door only, the scheme's
+centre is the ship the game follows, which is the one the chart draws. The far-detail guard
 that the gate 5c ruling never had, a leg across the coast refused when the scenario loads,
 is built here with the promotion.
 
