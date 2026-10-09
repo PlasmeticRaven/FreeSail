@@ -3153,6 +3153,44 @@ What to build:
 Tests for every phrasing taken and every refusal's words; the primer's orders chapter
 and its forms table say the half point and the numbers.
 
+## Package 37m: the helm through the wind (`freesail/orders/verbs.py` for `steer` and the points orders when the course lies across the wind; `freesail/orders/navigation.py` for the one rule shared by `steer`, `shape a course for` and `give chase` (`_course_not_laid`); `freesail/evolutions/scripts.py` and `data/evolutions/tack.yaml`, `wear.yaml` for the course given again when the manoeuvre ends; `docs/primer/02-the-wind-and-the-points-of-sail.md` and `05-going-about.md`; `docs/dev/TuningNotes.md`; `tests/test_orders.py`, `tests/test_evolutions.py`, `tests/test_ships.py`, `tests/test_known_truths.py` for the passages re-measured)
+
+The owner's ruling 3 of 2026-10-09 (spec M6 §31; decision 39), after the fold-in's
+question (the tuning notes' section "the fold-in of m5c-c"; spec M5 §33 item 24): a
+plain `steer` through the wind tacks or wears her automatically as the ship and the
+course allow; a course given directly into the wind's eye is steered and she is taken
+aback, the line warning of it. Launched on Opus after 37k lands, since both touch the
+helm and the manoeuvres. Luce on going about and wearing; the fold-in's guard as it
+stands (a square-rigged ship under sail worn for a turn through the wake; any ship worn
+for a turn through the eye; a fore-and-after gybed by the helm).
+
+What to build:
+
+1. **One rule for the three orders.** `steer <course>`, `shape a course for`, `give
+   chase` and the points orders (`come up`, `bear away`, `steer two points to starboard`)
+   go through one judgement of the course against her head and the wind: laid and within
+   her arc, the helm; across the wind's eye, put about when she has way enough to stay,
+   else worn (Luce: a ship that cannot be depended on to stay is worn); through the wake,
+   worn for a square-rigged ship and gybed by the helm for a fore-and-after, with the
+   booms tended; nearer the wind than she will lie, kept full and by on the tack that
+   points nearer, as the shaped course is now, unless the order is a plain `steer` into
+   the eye, which is carried out as given.
+2. **The course given again when the manoeuvre ends.** A tack or a wear ordered for a
+   course ends by steering that course (the evolution takes the course as a parameter and
+   the helm is put for it as she comes round), so that a plain `steer` needs no book to
+   give the course again; the chase and the shaped course use the same.
+3. **The line says what she does**: "NE lies across the wind's eye from her head; she is
+   put about for it", "worn round for it", "N by W lies in the wind's eye from her head;
+   she will be taken aback", in the result and in the log, so that a model captain can
+   countermand.
+4. **The officer's domain** is unchanged: an order that changes her course is the course
+   whatever its words (37g), and a manoeuvre the rule orders for a course within his
+   grant is within it.
+
+Tests for each branch on the frigate and on the schooner; the recorded passages
+re-measured and re-pinned where a book's `steer` now wears or tacks, with the reasons;
+the primer's two chapters say the rule.
+
 ## Integration (the lead)
 
 The lead reviews each package against the studies and the spec, merges each wave, runs

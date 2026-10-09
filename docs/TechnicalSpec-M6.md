@@ -1,6 +1,6 @@
 # FreeSail: Technical Specification, Milestone 6 (Officers and captains)
 
-**Draft of 2026-10-09, for the owner's approval.** Companion to `docs/TechnicalSpec-M0-M2.md`,
+**Draft of 2026-10-09; the owner's seven rulings given the same day (§31, decision 39).** Companion to `docs/TechnicalSpec-M0-M2.md`,
 `-M3.md`, `-M3b.md`, `-M4.md` and `-M5.md`, whose conventions hold. Milestone 6 is three
 short gates and a chart line that runs beside them:
 
@@ -97,14 +97,20 @@ captain commands as the player does: by direct orders, and by writing standing o
 which are his book; when his door is silent the book holds the deck (§4), and the log
 says so as it says it for the officer.
 
-**The owner's place in a game with a model captain.** A ruling is wanted (§31). The
-draft's answer: the player is **the owner at the door**, who may take any station or
-none. With none, he holds what no station holds: the consent question and the drill, the
-stop, `you may` and `stand down` for any station, the save, and the clock. He speaks to
-a station as the harness does now (`tell the captain ...`, `ask the captain ...`), and
-his words reach the station as the owner's and never as another station's. With the
-captain's station, the model captain gives `you may` to the officer as the player does
-now, and the owner's word stands over both.
+**The owner's place, and the player's seat** (the owner's ruling 1, 2026-10-09). The
+player is always **the owner at the door**: whatever station he holds or none, he holds
+what no station holds, the consent question and the drill, the stop, `you may` and `stand
+down` for any station, the save and the clock, and the responsibility when things have
+gone wrong and no remedy can be had. Beside that, **the player and a model are at parity
+for the roles on ships**: the player may take any station on any ship, as a model may,
+through his own door (the console or the browser seats him at a named station with that
+station's authority and the primer as his brief), including a lesser named role under a
+model captain, a passenger on another ship (a station with presence and no orders), or
+none. A model may hold a ship whose officer is the player, or whose captain is another
+model. The owner's words reach a station as the owner's and never as another station's;
+the player's words at a station reach the others as that station's. The captain's
+station, whoever holds it, gives `you may` to the officer as the player does now, and the
+owner's word stands over all.
 
 **What the captain's station adds to the consent brief**: a station not described (the
 captain's), with more authority than is described; by the owner's ruling of 7 October
@@ -190,7 +196,8 @@ The owner's run: the merchant passage with a fake captain by the console; a mode
 (Opus 5.5 through Claude Desktop) on the cutter's free passage, the owner as the owner at
 the door; the frigate's book as her rules-based captain through the cruise; the lessons
 read by a model officer before its watch and the difference, if any, in its journal. The
-lead's own officer's watch, deferred from gate 5c, is taken here or at 6b (§31).
+lead's own officer's watch, deferred from gate 5c, waits on the owner's usage (his ruling
+6) and no gate waits on it.
 
 ---
 
@@ -233,18 +240,19 @@ found by its name and its key. What 6b adds:
 
 ### 12. The pace rule (`freesail/ui/server.py`, `core/world.py`; `freesail/agents/harness.py`)
 
-The owner's testing setting, built as the default: **the clock drops to 1x while any
-model's sample is open**, whoever holds it, at whatever station, on the player's ship or
-another's, and returns to the compression set when every open sample has been answered or
-has stood by. This is lockstep for everyone, which the proposal's §7.3 reserves for
-fairness and testing, generalised: `--lockstep` becomes the rule and a flag relaxes it.
-Beside it, the cost rule: each station's **cadence** (every glass, every watch, on events
+The owner's testing setting, built as the default (his ruling 2): **the clock slows to
+1x while any model's sample is open**, whoever holds it, at whatever station, on the
+player's ship or another's, and returns to the compression set when every open sample has
+been answered or has stood by. It is not lockstep: the ship sails on at the ship's own
+second while the model thinks, and a slow answer lands late, as the proposal's §7.3 has
+it; `--lockstep`, which holds the clock for a door with the floor, stays as the separate
+option for true control in testing or play. Beside it, the cost rule: each station's **cadence** (every glass, every watch, on events
 only) is a setting of the seating, said in its brief, so that a lookout on a small model is
 not sampled as often as the captain. A `pace` reading says the compression, which samples
 are open and since when; the log says when the clock is held for a station longer than a
-stated time, so that a slow door is seen and not suffered. Free-running (the sim does not
-wait; a late order lands late) stays as the flag for the solo player who wants a model to
-think while he sails.
+stated time, so that a slow door is seen and not suffered. Free-running at the set
+compression, with no slowing, stays as the flag for the solo player who wants a model to
+think while he sails at sixty times.
 
 ### 13. The API door (`freesail/agents/api.py` new; `docs/agents/Harness.md` a section; the security pass)
 
@@ -301,10 +309,11 @@ any wardroom game.
 
 ### 17. Gate 6b (outline)
 
-The owner's wardroom game: a model captain through the API door or Claude Desktop, a model
-officer through the other, the owner at the door, on the cutter or the brig; a local
-lookout if the owner likes. The pace rule in play at 60x and at 1x. The lead's own watch
-beside them, if not taken at 6a.
+The owner's wardroom game (his ruling 7): the API door's credit kept for it, Opus 5.5 and
+Sonnet 5.5 at the captain's and the officer's stations through the API door and Claude
+Desktop, the owner at one of the lowliest stations aboard to observe and to have his
+interactions, on the cutter or the brig; a local lookout if he likes. The pace rule in
+play at 60x and at 1x.
 
 ---
 
@@ -447,26 +456,32 @@ new. The package also writes the recipe form the blocks fill (`REGIONS` in
    sheets; the *Derrotero* of Tofiño for the directions. Spain at war with Britain in
    June 1805: hostile to a King's ship, open to a neutral.
 4. **Portugal and Cadiz** (`portugal`, about 36°N to 42°N, 10°W to 6°W): Oporto's bar,
-   the Berlings, Lisbon and the Tagus, Cape St Vincent, Cadiz and its bay, Gibraltar if the
-   owner wants the Strait (a ruling, §31). Tofiño again for the Spanish sheets; the
-   Portuguese coast from the period's English directions (Norie, Faden) and Tofiño's
-   Portuguese sheets; Portugal neutral in 1805, Cadiz blockaded, which the nations table
-   gains as a state of a port.
+   the Berlings, Lisbon and the Tagus, Cape St Vincent, Cadiz and its bay. Tofiño again
+   for the Spanish sheets; the Portuguese coast from the period's English directions
+   (Norie, Faden) and Tofiño's Portuguese sheets; Portugal neutral in 1805, Cadiz
+   blockaded, which the nations table gains as a state of a port.
 5. **Madeira** (`madeira`, about 32°N to 33.5°N, 17.5°W to 16°W): Funchal and its open
    road, Porto Santo, the Desertas; the island's lights and marks as 1805 had them; the
    Portuguese trades in the climatology; the voyage's end as an anchorage in a road with a
    swell. The period sources are thinner (**unverified**: a plan of Funchal Road in the
    English pilots of the 1790s; the Admiralty's survey is later), so the block says what
    it rests on, as 35b did.
+6. **The Strait** (`strait`, about 35.5°N to 36.5°N, 6.5°W to 5°W; the owner's ruling 4,
+   with the Mediterranean to come): Tarifa and the Strait's streams, Gibraltar and its
+   bay, Ceuta, Tangier and the African shore between, Cape Spartel's light. Tofiño for
+   the Spanish side; the period's English directions for the Strait's currents (the
+   constant inset and the tides over it, which the tide model takes as a stream by area);
+   Gibraltar British, Ceuta Spanish, Tangier Moorish (the nations table gains Morocco).
+   Built last, as the door to the Mediterranean's own chart line.
 
-Each block is a port file per port on 35's machinery, a patch per harbour where a period
+Each block (the Strait's included) is a port file per port on 35's machinery, a patch per harbour where a period
 sheet can be read, the features file's marks with their sources in the references'
 form, the tiles rebuilt, the nations index, the tide's gauges and streams where the
 directions give them, a scenario per block that sails its stretch (a free passage, not a
 gate's), and the tuning notes' section. The size of each region is the Channel's (about
-18 MB committed); five of them and the corridor bring the chart to about 110 MB, which the
-owner should rule on (§31), the alternative being the regions as release assets fetched
-by the tool.
+18 MB committed); six of them and the corridor bring the chart to about 130 MB, the
+largest thing in the repository by far. The owner's ruling 5: committed, a price to pay
+for now, made more efficient later or accepted.
 
 The voyage itself, Falmouth to Funchal, is a course for the regatta (§21) and the first
 free passage with no marks for a week: the reckoning by the log and the noon sight alone,
@@ -487,7 +502,7 @@ In waves, written for the owner's approval in turn, each launched on his word:
 - **38 (Fable): the chart stitched**, the corridor, the climatology's boxes, the recipe
   form for the blocks. First, since the blocks wait on it and the regatta's long course
   wants it.
-- **39a to 39e (Opus): the five blocks**, launched as 38 lands, two or three at a time.
+- **39a to 39f (Opus): the six blocks**, launched as 38 lands, two or three at a time.
 - **40 (Fable): the ship's company and the rules-based captain** (§2, §4), with the
   captain's station (§3) and the officer's reckoning (§5); the consent brief's revision
   drafted for the owner, held until 42.
@@ -507,7 +522,8 @@ come and are checked at whichever gate follows.
 ## 29. What this milestone does not do
 
 Combat and everything after a meeting (the hail, the colours, the private signal, the
-prize: M7); the director as an agent (M7b: only its seat hook and the budget's setting are
+prize: M7); the Mediterranean beyond the Strait (its own chart line, after this one); the
+director as an agent (M7b: only its seat hook and the budget's setting are
 here); the deck view and the tutorial (M8); the Gironde and the Tagus as rivers (M8);
 individual hands as people; a model holding the carpenter's, the gunner's or the surgeon's
 station (data for them, no brief); the Atlantic west of 20°W and the world beyond the
@@ -518,20 +534,32 @@ level-0 picture.
 From M5 §33, as they stand after the fold-in and the K batch: the far-detail leg across the
 coast (built in 43); `the port` and `the depth of water` by the captain's means (37j,
 landing); the platform difference in the schooner's passages (item 24: the cause open; the
-comparison by `ci.yml`'s manual run); a plain `steer` through the wind (the owner's ruling,
-§31); the pumps and the well, the carpenter with something to say (M5 I6 item 9: with 40's
+comparison by `ci.yml`'s manual run); a plain `steer` through the wind (the owner's ruling
+3, package 37m); the pumps and the well, the carpenter with something to say (M5 I6 item 9: with 40's
 people if the owner rules it); the datum offsets at three ports (item 3); the GEBCO fill
 swept once (item 16, in 38's checks); the hints and phrasings 37l leaves.
 
-## 31. Rulings wanted from the owner
+## 31. The owner's rulings on the draft (2026-10-09; decision 39)
 
-1. **The owner's place** in a game with a model captain (§3): the owner at the door, able to
-   take any station or none, with the stop, the grants and the clock.
-2. **The pace rule as the default** (§12), with free-running as the flag.
-3. **A plain `steer` through the wind** for a square-rigged ship: refused in words that
-   name the wear, or worn without a word (the fold-in's question).
-4. **Gibraltar and the Strait** in block 4, or the chart ending at Cadiz.
-5. **The chart's size** at about 110 MB committed, or the regions as release assets.
-6. **The lead's own watch**, deferred from gate 5c: at 6a or at 6b.
-7. **The API door's model and effort for the credit**: which model holds which station in
-   the wardroom game, and the owner's own watch on the spend.
+1. **The owner's place.** Always at the door, so that he may and at times must see and
+   act even in a game whose ship he is not aboard; beside that, the player and a model are
+   at parity for the roles on ships: any station on any ship or none, a lesser named role
+   under a model captain, a passenger on another ship, an officer under another model's
+   captain. The player carries the responsibility where things have gone wrong and no
+   remedy can be had (§3).
+2. **The pace rule** as the default: the clock slows to 1x on any model's sampling, not to
+   the model's own pace; lockstep stays a separate option for true control (§12).
+3. **A plain `steer` through the wind** tacks or wears her automatically as the ship and
+   the course allow; a course given directly into the wind's eye is steered and she is
+   taken aback. The lead's refinement, accepted in advance as refinement: the result line
+   says what she does ("across the wind's eye from her head; she is put about for it"), so
+   that a model captain reading it can countermand, and the three orders that bring her
+   to a course (`steer`, `shape a course for`, `give chase`) share one rule. Package 37m,
+   Opus, after 37k lands.
+4. **Gibraltar and the Strait**: yes, as a sixth block, with the African shore in its
+   vicinity, since the Mediterranean is to come (§26).
+5. **The chart's size**: committed, a price to pay for now (§26).
+6. **The lead's own watch**: deferred as long as the lead is comfortable to, the usage
+   being what it is; no gate waits on it (§9).
+7. **The API door's credit**: kept for testing the wardroom with Opus 5.5 and Sonnet 5.5,
+   the owner at one of the lowliest stations aboard to observe (§17).
