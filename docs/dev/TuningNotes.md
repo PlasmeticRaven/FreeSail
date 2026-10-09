@@ -2088,3 +2088,78 @@ The frigate at seed 7 under plain sail, the scripted officer sampled as a door s
 - **The pause of the way out of danger.** As first built, a fourth order on the officer's own word after the word had been read paused him, and a pause takes the deck: the detector would have taken the deck from an officer in the act of avoiding a danger. It brings the word each third time and never the pause.
 - **A replay and the stationing tick.** A stand-down and a reseating made at the tick a station was first seated, before any tick has run, are not made by a replay (spec M5 §33, item 11, as it stood); the tests that replay such a game run a tick first and say so.
 - **The first line of a station** now says who sits and through which door when a model is named ("The watcher takes the station (..., through the MCP bridge); sampled ..."); the game's own scripted station says what it said.
+
+## Milestone 5: the fold-in of m5c-c (2026-10-08)
+
+The owner's local folder `FreeSail-gate-m5c-c` (packages 37b to 37g) merged whole into
+the repository as a branch made at the gate's commit (decision 38; the close-out's
+section). The lead's changes at the fold-in, and what they moved.
+
+| Constant or rule | Value | Why | Standing |
+|---|---|---|---|
+| `core.world.BUILD_NAME` | `m5c-c` | the repository's build, named once per gate; the nine test lines that spelt `m5c-c/37g` read the constant | the owner's ruling 7 |
+| `.gitignore` `!tests/fixtures/saves/` | | the `saves/` rule matches a folder of that name at any depth, and would have dropped the three kept checkpoints without a word (the audit, N 3.9) | |
+| the *Palinure* at 07:00 | 48 32 N 5 23 W (48 50 N 5 16 W) | five leagues on the frigate's bow where she now is at seven, as the scenario's own comment wanted and the audit tried (M 2.4) | tuned to the frigate's track: moves again with the account, the tide or the pilot |
+| `_course_not_laid`, the wake | a turn through the wind's wake is a wear | the chase's 175 degrees round by the stern left the yards braced sharp up and every square sail aback at 91954 (the audit's C1, C2); worn for it as for a turn through the eye | the lead; `tests/test_ships.py`, the two tests at its end |
+| the cruise's book, "a sail on the station" | `make her out` alone | with `give chase` in both the sighting's and the made-out rule, two chases in one second and the second wear failed (79260, 79261) | the lead |
+
+**The guard's three forms, measured.** As first written it wore any vessel for a turn
+through the wake: the cruise came through (the brig spoken at 08:08) but the schooner's
+merchant passage broke, her book's hourly courses across the Channel alternating between
+the soundings south-west of Ushant and the Iroise by a hundred degrees, each a wear
+where the helm had gybed her in a minute: she made the Iroise five hours late and missed
+the tide. Narrowed to a square-rigged ship close-hauled, the merchant passage came back
+and the cruise lost the brig again: the station shaped for from the cutter's hail, with
+the frigate reaching after the chase, took her aback at 83600 as it had at 83957. The
+form kept: a ship with yards on two masts, a square sail set and a knot of way
+(`WEAR_FOR_IT_MIN_MS`) is worn for a turn through the wake; a fore-and-after gybes by
+the helm as she always has, and a ship drifting under bare poles is steered (the chase
+test at `tests/test_ships.py`, "make her out", found the first form wearing a drifting
+frigate).
+
+| Passage | Before (m5c-c, the owner's Windows figures) | After, on this machine |
+|---|---|---|
+| The naval cruise | 1988 lines, `8d865bff1518f52b`; the cutter within hail 83838, the Palinure sighted on the starboard quarter 90000, lost 93420, never spoken; eleven wears; taken aback at 83957 and 91954 | 2037 lines, `bb8b2499fde6a0f4`; the cutter 83484, the Palinure right ahead three leagues 90120, chased at the made-out line 90121 with the course led, spoken 94091, out of sight astern 98100; fourteen wears; no urgent line |
+| The merchant passage | 2992 lines, `bb8483de9959aa2a`; the Bay 115817 | 2994 lines, `c52c14c725a5ed1f`; the Bay 115815; the guard never fired (`worn round for it` nowhere in her log) |
+
+**A platform difference, recorded as an open item.** The whole suite on this machine
+then found more in the same two passages: the merchant passage's cast at the Iroise's
+mark (90241; 90240 on Windows), the mouth of the Goulet (112078; 112112), the tin sold
+(123948; 123951), and the 5b schooner brought up (58689; 58690), her digest moving with
+it and her 761 lines not. The merchant passage's two lines
+and two ticks are not the guard's: measured twice on this machine with the guard in each
+of its forms, she came out the same, and the schooner is never worn. They are between the
+owner's Windows machine, where 37d to 37f pinned her, and Linux, where the gate's
+releases run the suite. The gate's build (m5c) agreed on both (the owner's suite on
+m5c-b ended 2713 passed, this machine's 2708 at the cut plus the five of 37b and 37c); so
+something in 37d to 37f reads a figure the two platforms compute a last digit apart (the
+C library's trigonometry, most likely, at a threshold the account's rules compare) or
+lists a folder in the order the file system gives. Not found by reading; the pins stand
+as this machine measures them, and `ci.yml` gained a manual run of the whole suite on
+both platforms so the two can be compared without a gate (spec M5 §33, item 24).
+
+**What the difference turned up, for the 37e amendments.** At the merchant passage's
+second noon, in the mouth of the Goulet with the account fixed by cross bearings to three
+cables a minute before, the octant's sight falls five miles and a half to the north of
+it: on this machine a hair over the two doubts together (two sigmas of three cables and
+of the octant's two miles and a half), so 37e's one rule takes the sight outright and
+lays the account six miles north, where the cast a minute later and the bearing at the
+five minutes bring it back; on the owner's machine the same sight fell a hair under and
+was weighed, moving the account a few cables. The test now says what happens here and
+that she is laid down again within five minutes. The finding is the owner's note 5 on
+game 9 in another dress (a lunar of poor certainty overriding the better account): an
+observation whose doubt is twenty times the account's is believed over it because the
+two disagree, when the disagreement is the sight's. For the 37e amendments (part K,
+"the doubt on one hand"): when they disagree beyond their doubts together, take the
+observation only when it is the better figure, and weigh or doubt it when the account
+is; with "the cast not beyond doubt", so that an account the lead has kept small does
+not then refuse a right noon.
+
+**What stayed**: a late line in the cruise, at 14:09 on the 13th, "Taken aback: the
+sails pressed against the masts and she lost her way" after the book's own wear at the
+hour and "keep her full and by"; the book's, not the guard's, and left.
+
+**Also mended on the way**: `tests/test_mcp_server.py`'s cut-call test compared the
+bridge's new wait to fifty seconds exactly, which the monotonic clock makes a few
+microseconds over on Linux and exactly fifty on Windows; it now allows a hundredth.
+

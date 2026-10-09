@@ -426,3 +426,61 @@ def test_a_ports_pilot_vessel_comes_off_as_a_boat_seen_within_two_miles_pulling_
     # the three ports of 35 keep the cutter
     for pid in ("falmouth", "plymouth", "brest"):
         assert PT.load_port(PT.port_files()[pid], w.chart).pilot.craft == "cutter"
+
+
+# ---------------------------------------------------------------------------
+# A chase or a course across the wind: worn round for it (the fold-in of m5c-c)
+# ---------------------------------------------------------------------------
+
+
+def _under_way(heading_deg: float):
+    """The frigate under plain sail with way on, steady on `heading_deg` (the wind from
+    315: 25 is close-hauled on the larboard tack), her yards and sheets trimmed."""
+    w = world_at(heading=heading_deg)
+    w.submit("set plain sail")
+    w.submit(f"steer {heading_deg:.0f}")
+    for i in range(1500):
+        if i % 120 == 0:
+            w.submit("trim sails")
+        w.tick()
+    assert float(w.ship.dyn.speed) > 1.0
+    assert abs(units.wrap_pi(float(w.ship.dyn.heading) - math.radians(heading_deg))) < 0.2
+    return w
+
+
+def test_a_chase_through_the_winds_wake_wears_her_and_does_not_leave_the_yards_braced():
+    """The cruise's frigate at 07:30 on the 13th: the chase 175 degrees round, the shorter
+    way by the stern, and a plain helm order turned her with the yards braced sharp up
+    until every square sail was aback (the audit of m5c-c, C1 and C2). A course whose
+    turn passes through the wind's wake is a wear, and she is worn for it as she is for a
+    turn through the eye."""
+    w = _under_way(25.0)
+    # a brig broad on her starboard quarter: the course for her lies by the stern
+    put(w, "merchant brig", 150.0, 4.0, "bound for 48 00 N 5 00 W")
+    w.run(60)
+    e = w.submit("give chase")
+    assert e.kind == "helm.set", e.text
+    assert "lying across the wind from her head, by the stern, she is worn round for it" in e.text
+    assert e.data["helm"]["verb"] == "wear ship", e.data
+    # a course shaped the same way is worn for too
+    w = _under_way(25.0)
+    e = w.submit("shape a course for 48 30 N 5 30 W")
+    assert "by the stern, she is worn round for it" in e.text, e.text
+
+
+def test_a_chase_through_the_winds_eye_is_worn_for_and_a_small_alteration_is_steered():
+    w = _under_way(25.0)
+    # a brig broad on the larboard quarter, across the eye the shorter way: worn round
+    put(w, "merchant brig", 240.0, 4.0, "bound for 48 00 N 5 00 W")
+    w.run(60)
+    e = w.submit("give chase")
+    assert e.kind == "helm.set", e.text
+    assert "lying across the wind's eye from her head, she is worn round for it" in e.text
+    assert e.data["helm"]["verb"] == "wear ship", e.data
+    # a sail a point or two off the bow: the helm put for her bearing, nothing more
+    w = _under_way(25.0)
+    put(w, "merchant brig", 40.0, 4.0, "bound for 48 00 N 5 00 W")
+    w.run(60)
+    e = w.submit("give chase")
+    assert e.kind == "helm.set" and "worn round" not in e.text, e.text
+    assert e.data["helm"]["verb"] == "steer", e.data

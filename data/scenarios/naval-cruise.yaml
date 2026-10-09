@@ -111,7 +111,7 @@ ships:
 world_orders:
   - {at: 1805-06-12T10:00, order: 'message: by a cutter from Plymouth from the port admiral: "Rejoin the squadron off the Black Rocks without delay; the enemy is reported out of Rochefort."'}
   - {at: 1805-06-13T06:00, order: 'weather: waypoint for "the old high over Biscay" at 1805-06-14T12:00 600 -700 1020'}
-  - {at: 1805-06-13T07:00, order: 'ship: a brig-sloop "Palinure" of France at 48 50 N 5 16 W, bound for the Start, no colours'}
+  - {at: 1805-06-13T07:00, order: 'ship: a brig-sloop "Palinure" of France at 48 32 N 5 23 W, bound for the Start, no colours'}
 
 standing_orders:
   - data/scenarios/naval-cruise.orders

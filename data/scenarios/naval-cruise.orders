@@ -65,7 +65,11 @@ standing order "back to the station": every watch, if a stranger in sight is not
 # time possible"); within hail the chase is given up and the course shaped for the
 # station again, since what follows a chase is milestone 7's, and a chase lost over the
 # horizon is given up the same.
-standing order "a sail on the station": at a sail sighted, if the distance to 48 30 N 5 30 W is under 25 miles then make her out; give chase
+# (The sighting's rule only makes her out: the made-out line that follows in the same
+# second is what gives chase, by "more of her". With "give chase" in both, two chases
+# were given in one second and the second wear failed, as 37f's builder and the audit
+# found at ticks 79260 and 79261: the fold-in of m5c-c.)
+standing order "a sail on the station": at a sail sighted, if the distance to 48 30 N 5 30 W is under 25 miles then make her out
 standing order "keep her bearing": every glass, if a stranger in sight is in sight and the distance to 48 30 N 5 30 W is under 40 miles then give chase
 standing order "more of her": at a sail made out, if a stranger in sight is in sight and the distance to 48 30 N 5 30 W is under 40 miles then give chase
 standing order "the chase up": at a sail within hail then shape a course for 48 30 N 5 30 W

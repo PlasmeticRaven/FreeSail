@@ -1210,6 +1210,31 @@ in (then 5b), double altitudes, the kedge, interiors beyond a name and a descrip
      and no pause, since a pause would take the deck from an officer at that moment.
    - Item 11 stands: an act from outside the loop at the stationing tick, before any tick
      has run, is not made by a replay.
+24. From the fold-in of m5c-c (2026-10-08; decision 38; `docs/dev/TuningNotes.md`, its
+   section). **A platform difference in the merchant passage.** Pinned by 37d to 37f on
+   the owner's Windows machine, she comes out two lines longer and anchors in the Bay two
+   ticks earlier on Linux (2994 lines against 2992; 115815 against 115817), her cast at
+   the Iroise's mark a tick later (90241 against 90240), the mouth of the Goulet and the
+   tin sold half a minute sooner (112078 against 112112; 123948 against 123951), and the
+   5b schooner is brought up a tick earlier (58689 against 58690), with the schooner never worn and nothing of the
+   fold-in's in her log; the frigate's passages agree, and the gate's own build agreed on
+   both platforms. Something in those three packages reads a figure the two C
+   libraries compute a last digit apart at a threshold the account's rules compare, or
+   lists a folder in the file system's order. The pins stand as Linux measures them, where
+   the releases run; `ci.yml`'s manual run of the whole suite on both platforms is the
+   way to compare. Open: the cause, and whether the rules that compare near-equal figures
+   should compare them at a coarser grain (a hundredth of a mile) so that both platforms
+   agree by construction. The difference turned up a rule to amend (37e's one rule for
+   an observation): at the merchant passage's second noon a sight of two miles and a
+   half's doubt, five miles and a half from an account fixed to three cables, is taken
+   outright on one platform and weighed on the other, the two being a hair either side
+   of the doubts together; the owner's note 5 on game 9 (a poor lunar overriding the
+   better account) is the same thing. For the 37e amendments: take an observation
+   over the account only when it is the better figure. **The helm through the wind.** A chase or a shaped course that
+   would turn a square-rigged ship through the wind's wake is worn for
+   (`orders.navigation._course_not_laid`); a plain `steer` through it is left as the helm
+   has always had it, and a captain who types one from close-hauled will be taken aback.
+   Open, for the owner: refused in words that name the wear, or worn without a word.
 
 ## 34. The scoping draft's rulings (record)
 

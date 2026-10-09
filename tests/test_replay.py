@@ -1,5 +1,5 @@
 from freesail.core import replay
-from freesail.core.world import Scenario, World
+from freesail.core.world import BUILD_NAME, Scenario, World
 
 
 def make_world() -> World:
@@ -248,7 +248,7 @@ def test_a_save_and_its_checkpoint_carry_the_builds_stamp(tmp_path):
     data = original.save()
     stamp = data["build"]
     assert stamp == world_mod.build_stamp() == replay.stamp_of(data)
-    assert stamp["name"] == world_mod.BUILD_NAME == "m5c-c/37g"
+    assert stamp["name"] == world_mod.BUILD_NAME == "m5c-c"
     assert len(stamp["rules"]) == 16 and int(stamp["rules"], 16) >= 0
     assert data["format"] == world_mod.SAVE_FORMAT == 1
     assert data["engine"] == world_mod.ENGINE_VERSION == "0.0.1"
@@ -261,7 +261,7 @@ def test_a_save_and_its_checkpoint_carry_the_builds_stamp(tmp_path):
     # a save from before the stamp reads as unstamped
     assert replay.stamp_of({"format": 1}) is None
     assert world_mod.build_words(None) == "unstamped, before 37d"
-    assert world_mod.build_words(stamp) == f"m5c-c/37g, rules {stamp['rules']}"
+    assert world_mod.build_words(stamp) == f"{world_mod.BUILD_NAME}, rules {stamp['rules']}"
 
 
 def test_the_fingerprint_is_of_the_code_and_the_data_and_not_of_the_line_endings(tmp_path):
@@ -331,7 +331,7 @@ def test_load_says_which_road_it_took_and_why_a_checkpoint_was_not_taken(tmp_pat
     assert world.log.digest() == digest
     assert report.words == [
         "Replayed from its journal: there is no checkpoint beside the save. The save is "
-        f"this build's (m5c-c/37g, rules {original.save()['build']['rules']})."
+        f"this build's ({BUILD_NAME}, rules {original.save()['build']['rules']})."
     ]
     # not this save's
     other = tmp_path / "other.json"
@@ -386,7 +386,7 @@ def test_another_builds_game_with_a_station_aboard_is_not_replayed_unless_asked(
     assert report.how == "replay" and not report.same_build and report.transcripts == {}
     assert report.words == [
         "The save was written by another build (m5c-c/another, rules 0123456789abcdef); "
-        f"this is m5c-c/37g, rules {here}.",
+        f"this is {BUILD_NAME}, rules {here}.",
         "It was replayed from its journal under this build's rules, since there is no "
         "checkpoint beside the save: the log may differ from the one that was watched.",
     ]
@@ -403,7 +403,7 @@ def test_another_builds_game_with_a_station_aboard_is_not_replayed_unless_asked(
         assert report.words == [
             f"Not replayed: {path}.",
             f"The save was written by another build ({wrote or 'unstamped, before 37d'}); "
-            f"this is m5c-c/37g, rules {here}.",
+            f"this is {BUILD_NAME}, rules {here}.",
             "Its checkpoint was not used: there is no checkpoint beside the save.",
             f"It holds the watcher's transcript ({n} replies), and a replay under this "
             "build's rules would not be the game that was played: a station's orders are "
@@ -430,7 +430,7 @@ def test_another_builds_game_with_a_station_aboard_is_not_replayed_unless_asked(
     assert report.how == "checkpoint" and world.log.digest() == original.log.digest()
     assert report.words == [
         "The checkpoint was written by another build (m5c-c/another, rules "
-        f"0123456789abcdef) and is read by this one (m5c-c/37g, rules {here}): the game "
+        f"0123456789abcdef) and is read by this one ({BUILD_NAME}, rules {here}): the game "
         "goes on from where it was saved, under this build's rules."
     ]
 

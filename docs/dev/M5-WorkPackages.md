@@ -2919,6 +2919,33 @@ Not in 37g:
 - A replay driven by the transcript; the con apart from the deck; the captain's and the
   master's stations (Milestone 6); an officer's reckoning of his own.
 
+## After the fold-in of m5c-c (2026-10-08): what the second edition of the review leaves
+
+The folder was folded in on 2026-10-08 (decision 38; `docs/dev/M5-CloseOut-5c.md`, "The
+fold-in of m5c-c"). What the review's second edition proposes and the owner has not yet
+had briefed (`docs/playtests/2026-10-05-gate-5c-review/report-2.md`, part K) is sorted
+here for the briefs to come, each on Opus unless it proves to be design:
+
+- **The local runner** (K, first): a reply cut off while the model was thinking is not
+  passed on as its turn (the runner reads why the reply ended, asks once more, and says
+  so); tokens counted by the server's own figure; the handover reserve as a share of the
+  context as well as a number; an oversize request trimmed of its oldest exchanges and
+  asked again, never sent three times; the replay's line at a stand-down by the door.
+- **37e's amendments**: the cast not beyond doubt; the tide's height for the lead; the
+  account worked at each board; the doubt on one hand; and, from the fold-in, an
+  observation taken over the account only when it is the better figure (the merchant
+  passage's second noon on Linux; the owner's note 5 on game 9; the tuning notes'
+  section on the fold-in).
+- **37f's amendments**, and the half-point course.
+- **37h, the pilot**: his warnings aboard; his hail unanswered (decision 36); the pilot
+  cutter that keeps company and says what she waits for. The schooner's lost beat is its
+  test.
+- **The words** of part K, and the three small things 37g's second pass left (G13).
+- **For the lead or Fable**: a far-detail vessel's leg across the coast refused when the
+  scenario loads (the gate's fourteenth item, never ruled); `the port` and `the depth of
+  water` reading from the truth, kept for last by plan; a plain `steer` through the wind
+  (the close-out's question to the owner).
+
 ## Integration (the lead)
 
 The lead reviews each package against the studies and the spec, merges each wave, runs

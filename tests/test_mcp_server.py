@@ -1105,7 +1105,10 @@ def test_the_bridges_wait_adapts_when_the_client_cuts_a_waiting_call_short(tmp_p
     b.cut_off(cid)
     t.join(timeout=5)
     assert not t.is_alive()
-    assert b.wait == 60.0 - M.WAIT_MARGIN_S == 50.0 and b.adapted_from == 120.0
+    # the cut is read from the monotonic clock a few microseconds after the minute was
+    # set, so the wait is a hair over fifty on Linux (exactly fifty on Windows, whose
+    # clock is coarser): the fold-in of m5c-c
+    assert abs(b.wait - (60.0 - M.WAIT_MARGIN_S)) < 0.01 and b.adapted_from == 120.0
     assert b.told_owner[-1] == (
         "FreeSail: the client cut a waiting call after 60 seconds; the bridge now waits 50 "
         "seconds at a time (it was 120 seconds)."

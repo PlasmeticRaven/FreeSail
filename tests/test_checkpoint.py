@@ -23,6 +23,7 @@ import pytest
 from freesail.agents import fake as fake_mod
 from freesail.api.session import ship_factory
 from freesail.core import replay as replay_mod
+from freesail.core import world as world_mod
 from freesail.ui.console import station_watcher
 from freesail.world.scenarios import begin, load_scenario, make_scenario_world
 
@@ -215,7 +216,7 @@ def test_a_playtest_save_loads_from_its_checkpoint_and_runs_on_a_glass(name, tmp
     assert report.build is None and report.checkpoint_build is None
     assert len(report.words) == 1 and report.words[0].startswith(
         "The checkpoint was written by another build (unstamped, before 37d) and is read by "
-        "this one (m5c-c/37g, rules "
+        f"this one ({world_mod.BUILD_NAME}, rules "
     )
     assert station in report.transcripts and station in world.agents
     here = replay_mod.build_stamp()
@@ -227,7 +228,7 @@ def test_a_playtest_save_loads_from_its_checkpoint_and_runs_on_a_glass(name, tmp
     with pytest.raises(replay_mod.ReplayRefused) as refused:
         replay_mod.check_replay(data, "again.json")
     assert refused.value.report.words[1].startswith(
-        "The save was written by this build (m5c-c/37g, rules "
+        f"The save was written by this build ({world_mod.BUILD_NAME}, rules "
     ) and refused.value.report.words[1].endswith(
         "but the game in it was played in part under another (unstamped, before 37d) and "
         "taken up from its checkpoint."
@@ -252,7 +253,8 @@ def test_the_cutters_save_is_refused_a_replay_without_the_flag(tmp_path):
     words = refused.value.report.words
     assert words[0] == f"Not replayed: {alone}."
     assert words[1].startswith(
-        "The save was written by another build (unstamped, before 37d); this is m5c-c/37g, "
+        f"The save was written by another build (unstamped, before 37d); this is "
+        f"{world_mod.BUILD_NAME}, "
     )
     assert words[2] == "Its checkpoint was not used: there is no checkpoint beside the save."
     assert words[3].startswith("It holds the officer of the watch's transcript (")

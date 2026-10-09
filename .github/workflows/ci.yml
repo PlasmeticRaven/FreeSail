@@ -27,6 +27,17 @@ on:
       - "**.md"
       - ".gitignore"
       - ".mcp.json"
+  # "Run workflow" in the Actions tab, with the box ticked, runs the whole suite on both
+  # platforms: the recorded passages are pinned on Linux, and the fold-in of m5c-c
+  # found the merchant passage two lines and two ticks apart on the owner's Windows
+  # machine (docs/dev/TuningNotes.md, "the fold-in of m5c-c"); this is how the two are
+  # compared without a gate.
+  workflow_dispatch:
+    inputs:
+      slow:
+        description: "The whole suite (--slow) rather than the fast tier"
+        type: boolean
+        default: false
 
 concurrency:
   group: checks-${{ github.ref }}
@@ -34,7 +45,7 @@ concurrency:
 
 jobs:
   test:
-    name: fast tier (${{ matrix.os }})
+    name: ${{ inputs.slow && 'whole suite' || 'fast tier' }} (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
@@ -58,5 +69,5 @@ jobs:
         run: |
           python -m ruff check .
           python -m ruff format --check .
-      - name: The fast tier
-        run: python -m pytest -n auto --dist loadgroup
+      - name: The fast tier (the whole suite when asked for)
+        run: python -m pytest -n auto --dist loadgroup ${{ inputs.slow && '--slow -rfE' || '' }}

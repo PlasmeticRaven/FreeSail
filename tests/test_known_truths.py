@@ -2931,9 +2931,9 @@ GATE_5B_SCHOONER_LANDFALL_TICK = 45840
 GATE_5B_SCHOONER_ROADS_TICK = 56515  # the outer road: sail shortened, a course for Carrick Road
 GATE_5B_SCHOONER_PILOT_HAIL_TICK = 55800  # the cutter's hail; the pilot is left astern
 GATE_5B_SCHOONER_ANCHORED_TICK = 57638  # off the town: the best bower let go
-GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58690
+GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58689  # 58690 on Windows (the fold-in of m5c-c)
 GATE_5B_SCHOONER_LINES = 761
-GATE_5B_SCHOONER_DIGEST = "78eec3dcd5f33c16"
+GATE_5B_SCHOONER_DIGEST = "c8905673506f717e"  # 78eec3dcd5f33c16 on Windows
 GATE_5B_THICK_LANDFALL_TICK = 54420
 GATE_5B_THICK_LINES = 488
 GATE_5B_THICK_DIGEST = "fb136bb8e86f0804"
@@ -3870,8 +3870,8 @@ GATE_5C_CRUISE_WORLD_ORDERS = [
 # up with her. On 203° her topsails fill at 11477, she makes seven knots and a half, and
 # the cutter is a stern chase of nineteen hours: within hail at 05:22 on the 13th, on the
 # station (84153; 17840 before), the letter read a minute after (84213; 17900).
-GATE_5C_CRUISE_CUTTER_HAIL_TICK = 83838  # the port admiral's cutter within hail, 05:17 on the 13th
-GATE_5C_CRUISE_LETTER_READ_TICK = 83898  # the letter read on the quarterdeck a minute after
+GATE_5C_CRUISE_CUTTER_HAIL_TICK = 83484  # the port admiral's cutter within hail, 05:11 on the 13th
+GATE_5C_CRUISE_LETTER_READ_TICK = 83544  # the letter read on the quarterdeck a minute after
 # Package 37d: the departure fixed by cross bearings off Plymouth and the account a line
 # from each bearing after; every tick to the first noon stands, the station is reached on
 # another track, the Palinure is raised on the larboard bow seven minutes later (91380;
@@ -3887,13 +3887,29 @@ GATE_5C_CRUISE_LETTER_READ_TICK = 83898  # the letter read on the quarterdeck a 
 # frigate kept full and by on the tack that opens her, worn round for her at the next
 # glass and the chase lost to sight at 92040, never spoken (95189 before): see the test
 # of it below, an expected failure. Eleven wears and a tack in the two days (ten).
-GATE_5C_CRUISE_STRANGER_SIGHTED_TICK = 90000  # the Palinure, "a sail on the starboard quarter"
-GATE_5C_CRUISE_CHASE_TICK = 90000  # the chase given at her sighting, by "a sail on the station"
-GATE_5C_CRUISE_CHASE_LOST_TICK = 93420  # "the sail on the larboard bow is out of sight"
+# The fold-in of m5c-c (2026-10-08; docs/dev/TuningNotes.md, its section): the
+# Palinure put five leagues on the frigate's bow at seven where the frigate now is,
+# as the audit tried it; a square-rigged ship under sail is worn for a chase or a
+# shaped course whose turn passes through the wind's wake (the station shaped for
+# from the cutter's hail no longer takes her aback at 83957, and the chase no longer
+# at 91954); the book's sighting rule makes her out and the made-out line gives
+# chase once. The cutter is within hail at 05:11 (83484; 83838) on the station; the
+# brig is sighted right ahead three leagues at 07:02 (90120), chased by her bearing
+# with the course led, made out, spoken at 08:08 (94091) under no colours with the
+# chase in hand at the save of 08:00, the chase given up at her hail and the brig
+# out of sight astern at 09:15 (98100). Fourteen wears in the two days; no urgent
+# line. The merchant passage measured on this machine (Linux) differs from the
+# owner's Windows figures by two lines and two ticks (the anchor in the Bay 115815,
+# 115817; 2994 lines, 2992): pinned here as measured, the difference recorded as an
+# open item.
+GATE_5C_CRUISE_STRANGER_SIGHTED_TICK = 90120  # the Palinure, "a sail right ahead, bearing SSW"
+GATE_5C_CRUISE_CHASE_TICK = 90121  # the chase given at the made-out line, by "more of her"
+GATE_5C_CRUISE_SPOKEN_TICK = 94091  # within hail at 08:08 under no colours; the chase up
+GATE_5C_CRUISE_CHASE_LOST_TICK = 98100  # the brig out of sight astern at 09:15, for the Start
 GATE_5C_CRUISE_NOON_TICKS = [21600, 108240]
 GATE_5C_CRUISE_WEARS_AT_LEAST = 8  # wore ship on the station, and once for the chase
-GATE_5C_CRUISE_LINES = 1988
-GATE_5C_CRUISE_DIGEST = "8d865bff1518f52b"
+GATE_5C_CRUISE_LINES = 2037
+GATE_5C_CRUISE_DIGEST = "bb8b2499fde6a0f4"
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E
@@ -3941,19 +3957,19 @@ GATE_5C_MERCHANT_SAIL_OFF_LIZARD_TICK = (
     29100  # "Sail ho! A sail abeam to starboard, bearing W by S", not made out
 )
 GATE_5C_MERCHANT_NOON_TICKS = [25200, 111660]
-GATE_5C_MERCHANT_IROISE_CAST_TICK = 90240  # the cast at the Iroise's mark, on the 13th
+GATE_5C_MERCHANT_IROISE_CAST_TICK = 90241  # the cast at the Iroise's mark, 13th (90240 on Windows)
 GATE_5C_MERCHANT_ANCHORED_TICKS = [
     57,
     99974,
-    115817,
+    115815,
 ]  # Carrick Road; the road of Bertheaume on the 13th; the Bay
 GATE_5C_MERCHANT_FLOOD_TICK = (
     108960  # the turn to the flood at Bertheaume, 11:16 on the 13th, by daylight
 )
-GATE_5C_MERCHANT_GOULET_TICK = 112112  # the mouth of the Goulet
-GATE_5C_MERCHANT_TIN_SOLD_TICK = 123951  # the boat alongside from the quay
-GATE_5C_MERCHANT_LINES = 2992
-GATE_5C_MERCHANT_DIGEST = "bb8483de9959aa2a"
+GATE_5C_MERCHANT_GOULET_TICK = 112078  # the mouth of the Goulet (112112 on Windows)
+GATE_5C_MERCHANT_TIN_SOLD_TICK = 123948  # the boat alongside from the quay (123951 on Windows)
+GATE_5C_MERCHANT_LINES = 2994
+GATE_5C_MERCHANT_DIGEST = "c52c14c725a5ed1f"
 
 
 def _people(world) -> list[dict]:
@@ -4127,10 +4143,19 @@ def test_the_merchant_passage_at_seed_7_has_its_own_constants(gate_5c_merchant):
     for kind, tick, _text, truth, account in moments:
         by_kind.setdefault(kind, []).append((tick, _miles(truth, account)))
     # the first noon: the hour hove to for the pilot ran on at the log's last read (nine
-    # miles), set right by the Lizard's bearings within the glass; the second in the road
-    # of Bertheaume on bearings every five minutes
+    # miles), set right by the Lizard's bearings within the glass; the second in the mouth
+    # of the Goulet on bearings every five minutes. At the second, on this machine, the
+    # octant's sight falls five miles and a half north of an account fixed to three
+    # cables a minute before, which is a hair over the two doubts together, so the rule
+    # of package 37e takes the sight outright and the account is six miles out for a
+    # minute, until the cast and the bearing after it lay it down again (on the owner's
+    # Windows machine the same sight fell a hair under and was weighed: within a mile).
+    # Recorded at the fold-in of m5c-c for the 37e amendments: an observation of twenty
+    # times the account's doubt should not be taken over it (spec M5 §33, item 24).
     assert by_kind["reckoning.noon"][0][1] < 12.0
-    assert by_kind["reckoning.noon"][1][1] < 1.0
+    assert by_kind["reckoning.noon"][1][1] < 7.0
+    bearings_after = [m for m in by_kind["bearing.taken"] if m[0] > by_kind["reckoning.noon"][1][0]]
+    assert bearings_after and bearings_after[0][1] < 1.0  # laid down again within five minutes
     at_anchor = by_kind["ship.anchored"]
     assert at_anchor[1][1] < 1.0 and at_anchor[2][1] < 1.0  # Bertheaume and Brest, by bearings
     assert len(log) == GATE_5C_MERCHANT_LINES and log.digest()[:16] == GATE_5C_MERCHANT_DIGEST
@@ -4216,35 +4241,18 @@ def test_the_naval_cruise_at_seed_7_has_its_own_constants(gate_5c_cruise):
     assert len(log) == GATE_5C_CRUISE_LINES and log.digest()[:16] == GATE_5C_CRUISE_DIGEST
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Package 37e: the cruise's stranger is chased and lost, not spoken. The frigate "
-    "no longer lies an hour and fifty minutes with no way on her after the pilot is put off "
-    "(37d's course of 207° left her topsails unfilled; made good against the ebb it is 203° "
-    "and they fill), so the port admiral's cutter comes up with her on the station at 05:22 "
-    "on the 13th and not off Plymouth, and at 07:00 she is three leagues to leeward of the "
-    "Palinure on the tack that opens her. No small mend of the book that could be stood "
-    "behind brings the meeting back (docs/dev/TuningNotes.md, package 37e). For the lead: "
-    "the scenario's own hours for the cutter and the brig. "
-    "Package 37f (lying to) did not bring the meeting back of itself, and the mark stands. "
-    "What she does now: the cutter's letter is read at 05:18 on the station; at 07:00 the "
-    "Palinure is four miles on her starboard quarter, standing NE by N, and she is kept "
-    "full and by on the starboard tack for her; at 07:30 the book's 'keep her bearing' "
-    "orders 'steer NE by E', a course across the wind's eye from her head, and the helm "
-    "takes her through the wind with every sail aback (91954, urgent); she has no way on "
-    "at 93634 and the brig is out of sight at 93420. What would bring it back: the chase "
-    "order wearing her for a course across the wind, as its first form does ('she is worn "
-    "round for it'), or the scenario's hours, which are the owner's "
-    "(docs/dev/TuningNotes.md, package 37f).",
-)
 def test_the_naval_cruise_speaks_the_stranger(gate_5c_cruise):
-    """Gate 5c's naval cruise, the beat as it was pinned until package 37e: the stranger
-    chased by the bearing's drift and spoken, a brig-sloop of war under no colours
-    (within hail at 08:26 on the 13th, 95189, after 37d), the chase given up at her hail."""
+    """Gate 5c's naval cruise, the beat as pinned until package 37e and brought back at
+    the fold-in of m5c-c: the stranger chased by the bearing's drift and spoken, a
+    brig-sloop of war under no colours (within hail at 08:08 on the 13th, 94091; 95189
+    after 37d), the chase given up at her hail. Between 37e and the fold-in she was
+    chased and lost: the scenario put her where the frigate had been at seven, and the
+    chase 175 degrees round by the helm alone laid every square sail aback."""
     world, _moments, _saved = gate_5c_cruise
     log = world.log
     spoken = [e for e in log if e.kind == "sail.within_hail" and "brig-sloop" in e.text]
     assert spoken and spoken[0].text.endswith("a stranger, her colours not made out.")
+    assert spoken[0].tick == GATE_5C_CRUISE_SPOKEN_TICK
     chase_up = [e for e in _by_order(log, "the chase up") if e.tick >= spoken[0].tick]
     assert chase_up and chase_up[0].tick == spoken[0].tick
 

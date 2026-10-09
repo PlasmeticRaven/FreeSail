@@ -213,6 +213,9 @@ def _chase_course(world: Any, sighting: Any) -> tuple[float, str]:
 # and the line says so; a course laid but reached by a turn through the wind's eye is
 # worn round for (the book gives the course again after, as the cruise's does).
 COURSE_NOT_LAID_MARGIN_POINTS = 0.5
+# a square-rigged ship with this much way on is worn for a course through the wind's wake
+# (a knot: under that she is drifting, and a wear would not come round)
+WEAR_FOR_IT_MIN_MS = 0.5
 
 
 def _course_not_laid(ship: Any, heading: float) -> tuple[str, str] | None:
@@ -234,17 +237,39 @@ def _course_not_laid(ship: Any, heading: float) -> tuple[str, str] | None:
         # laid; but a helm put over for it turns her the shorter way, and when the wind's
         # eye lies in that arc she is taken aback and lies in irons (a frigate chasing a
         # cutter down wind and shaping back for her station, found on the way): she is
-        # worn round instead (Luce 1866 ch. XXIV), and the course is given again after
+        # worn round instead (Luce 1866 ch. XXIV), and the course is given again after.
+        # The same for a square-rigged ship under sail whose arc passes through the
+        # wind's wake, dead to leeward: the helm alone turns her by the stern with the
+        # yards still braced for the old tack, and as the wind comes over the other
+        # quarter every square sail is laid aback (the cruise's frigate at 07:30 on the
+        # 13th, chasing the Palinure 175 degrees round, and again shaping for her station
+        # from the cutter's hail: the fold-in of m5c-c, the audit's C1 and C2). That turn
+        # is a wear, and wearing her works the yards round with her head. A fore-and-after
+        # (one mast with yards) gybes by the helm, her booms swinging over, as she always
+        # has; a ship with no square sail set, or drifting with no way, has nothing to be
+        # worn for
         if dyn is not None and float(getattr(dyn, "speed", 0.0)) > 0.1:
+            from freesail.evolutions.scripts import _masts_with_yards
+
             now = float(dyn.heading)
             turn = units.wrap_pi(heading - now)
-            to_eye = units.wrap_pi(wind_from - now)
-            if abs(turn) > closest and (turn > 0) == (to_eye > 0) and abs(to_eye) < abs(turn):
-                return (
-                    f"{units.format_heading(heading)} lying across the wind's eye from her "
-                    "head, she is worn round for it",
-                    "wear ship",
+            marks = [(wind_from, "lying across the wind's eye from her head")]
+            square_set = any(sl.is_set and sl.cls == "square" for sl in ship.sails.values())
+            if (
+                len(_masts_with_yards(ship)) >= 2
+                and square_set
+                and float(dyn.speed) > WEAR_FOR_IT_MIN_MS
+            ):
+                marks.append(
+                    (wind_from + math.pi, "lying across the wind from her head, by the stern")
                 )
+            for mark, words in marks:
+                to_mark = units.wrap_pi(mark - now)
+                if abs(turn) > closest and (turn > 0) == (to_mark > 0) and abs(to_mark) < abs(turn):
+                    return (
+                        f"{units.format_heading(heading)} {words}, she is worn round for it",
+                        "wear ship",
+                    )
         return None
     # the wind over the starboard side: her head lies the closest angle to the left of
     # the wind's eye; over the larboard side, to the right

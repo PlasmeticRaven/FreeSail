@@ -63,6 +63,55 @@ messenger and the door, the news by the pilot, a world order never a line from n
 - **A far-detail vessel sails over land between waypoints** (36): a bound to add before a scenario sails one along a shore (a ruling asked at the gate).
 - **Open items added**: 16 (the GEBCO fill over the shore); 3 narrowed (the tide's constituents verified, three datum offsets not).
 
+## The fold-in of m5c-c (2026-10-08)
+
+Between the cut and the verdict the owner played ten games on the gate's build and, at
+his word of 5 October, had the findings built locally in a copy of the gate with no
+commits (`CHANGES-m5c-c.md`, the record of each package; decision 35). The review of
+those games and the audit of the build are
+`docs/playtests/2026-10-05-gate-5c-review/report-2.md` (its parts M and N are the
+audit). The folder was taken whole on 2026-10-08 as the merge of a branch made at the
+gate's commit, so that git carried the four commits made after the cut across it; the
+games under `saves/` and the owner's notes stayed out.
+
+| Package | What | Record |
+|---|---|---|
+| 37b, 37c | A session may come back to its station (decision 34); the wind-shift and taken-aback lines | `CHANGES-m5c-c.md`; the review's F1 |
+| 37d | The build's stamp on a save and its checkpoint, the load's rule and `--replay-anyway`, three playtest checkpoints kept as tests; the lookout's distance judged afresh, the shore always a sighting, `take a fix` | the tuning notes "the saves, and the sight of land"; the review's F3 |
+| 37e | The account: one rule by which an observation is believed, the doubt, the fix's choice of marks, the master's tide in the traverse, a course shaped to make good | the tuning notes "the account"; F4 |
+| 37f | A ship hove to stays hove to; the anchors by name, the dragging line, the ground's words; the log's lines | the tuning notes "lying to, and the ground"; F5 |
+| 37g | A key to each seating; the turn's budget in two counts; the stand-by's wakes; the two detectors; the deck to and fro; the general grant and its held-back list; the three ways of leaving; the consent brief revised once and leaner (decisions 36 and 37) | the tuning notes "the station's safety"; F6; `docs/agents/Harness.md` §13 |
+
+What the lead changed at the fold-in, on the owner's seven rulings (decision 38):
+`.gitignore` lets `tests/fixtures/saves/` through the `saves/` rule; `BUILD_NAME` is
+`m5c-c` and the nine test lines that spelt the build's name read the constant; the
+*Palinure* is put at 48 32 N 5 23 W, five leagues on the frigate's bow at seven, as the
+audit tried it; the cruise's book makes a sighted sail out and lets the made-out line
+give chase, where two chases in one second had made the second wear fail; and the
+handling fault under the cruise's lost chase is mended in `_course_not_laid`: a chase or
+a shaped course whose shorter turn passes through the wind's wake is a wear and she is
+worn for it, as she already was for a turn through the eye (the tuning notes "the
+fold-in of m5c-c"). A plain `steer` through the wind is left as the helm has always had
+it, and is put to the owner: refused in words that name the wear, or worn without a
+word.
+
+The whole suite on this machine after the fold-in: 2984 passed, 8 expected failures
+(seven rulings and the schooner's pilot); the fast tier 2733. Two of the recorded
+passages pinned on the owner's Windows machine by 37d to 37f came out a tick or two
+apart on Linux (the merchant passage and the 5b schooner, the frigate's agreeing): the
+pins stand as Linux measures them, where the releases run, the difference is spec M5
+§33's item 24, and `ci.yml` gained a manual run of the whole suite on both platforms so
+the two can be compared without a gate.
+
+Left as the audit found them, for packages after the fold-in (the review's part K): the
+local runner's five faults (the reply cut off while thinking, tokens counted by the
+server's figure, the handover reserve as a share, the oversize request trimmed, the
+replay's line at a stand-down by the door); the amendments to 37e (the cast not beyond
+doubt, the tide's height for the lead, the account worked at each board, the doubt on
+one hand) and to 37f; the half-point course; 37h, the pilot; `the port` and `the depth
+of water` still read from the truth; a far-detail vessel's leg across the coast (the
+gate's ruling never given); the schooner's pilot and the lost beat it marks.
+
 ## What is handed on
 
 To the gate's verdict: the owner's run and the lead's officer's watch (§29), the consent

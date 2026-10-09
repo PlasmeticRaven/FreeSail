@@ -29,7 +29,8 @@ SAVE_FORMAT = 1
 
 # The build's stamp (package 37d; the review of gate 5c's playtests, section 9 under
 # "Replay"): a save and its checkpoint say which build wrote them. `BUILD_NAME` is set by
-# hand at each package or gate. The fingerprint of the rules is computed once a process,
+# hand at each gate (the repository's: m5c-c, from the fold-in of the owner's local
+# packages 37b to 37g). The fingerprint of the rules is computed once a process,
 # at the first World made (`rules_fingerprint`), from the game's own code and the data a
 # replay reads: every `freesail/**/*.py` and every file under `data/` but the chart's
 # tiles (`data/charts/tiles/`, binary and large; the manifest that lists them is in), in
@@ -40,7 +41,7 @@ SAVE_FORMAT = 1
 # `SAVE_FORMAT` do not move for it, and a save without a stamp is read as "unstamped,
 # before 37d" (`UNSTAMPED_WORDS`). A replay is promised only on the build that wrote the
 # save (`core.replay.load`): the same fingerprint.
-BUILD_NAME = "m5c-c/37g"
+BUILD_NAME = "m5c-c"
 BUILD_RULES_DIGITS = 16
 UNSTAMPED_WORDS = "unstamped, before 37d"
 
