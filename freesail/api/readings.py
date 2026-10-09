@@ -766,7 +766,7 @@ def _officers_reckoning(world: Any, _: str | None) -> dict[str, Any] | None:
     own reckoning, given at his station with `my reckoning is <position>` and run on by
     the log-board since, with how far and which way it lies from the master's account
     and whether within what the master would trust his account; None when he holds
-    none (none given, or the day's work at noon done with it)."""
+    none (none given, or the one who gave it has left the station)."""
     nav = _navigation_of(world)
     if nav is None:
         return None
@@ -779,7 +779,7 @@ def _no_officers_reckoning_words(world: Any) -> str | None:
     return (
         "none held; the officer of the watch gives his own at his station with 'my "
         "reckoning is <position>', worked from the master's slate ('work my reckoning'), "
-        "and the day's work at noon is done with it"
+        "and keeps it until he gives another or leaves the station"
     )
 
 

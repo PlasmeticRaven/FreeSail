@@ -3969,12 +3969,16 @@ class Navigation:
         dn = r.run_north_nm + hand_n - own["run"][1]
         return _displaced(Position(own["lat_deg"], own["lon_deg"]), de, dn)
 
-    def own_reckoning(self, station: str, pos: Position) -> tuple[str, dict[str, Any]]:
+    def own_reckoning(
+        self, station: str, pos: Position, actor: str = "captain"
+    ) -> tuple[str, dict[str, Any]]:
         """`my reckoning is <position>` (package 40b): a station's own reckoning, kept
-        beside the master's and moving nothing; carried on by the boards until noon,
-        when the line after the noon's says it beside the master's, and the day's work
-        is done with it. A figure of the station's (`station`: 'officer of the watch',
-        'captain'), carried in the save; given again, it is replaced."""
+        beside the master's and moving nothing; run on by the boards, and said at each
+        noon in the line after the noon's beside the master's, each day's work beginning
+        from his own noon figure (the lead's ruling on the package's report). A figure of
+        the station's (`station`: 'officer of the watch', 'captain'), carried in the
+        save; given again, it is replaced; forgotten when the holder who gave it leaves
+        the station (`_owns`). `actor` is the order's, which says who that holder is."""
         r = self.reckoning
         account = self.account_now()
         hand_e, hand_n = r.offset_nm(account)
@@ -3985,8 +3989,9 @@ class Navigation:
             "lat_deg": pos.lat_deg,
             "lon_deg": pos.lon_deg,
             "run": [r.run_east_nm + hand_e, r.run_north_nm + hand_n],
+            "holder": self._holder_of(actor),
         }
-        held = dict(self.own or {})
+        held = dict(self._owns())
         held[station] = own
         self.own = held
         away = self._beside(pos, account, self.doubt_now())
@@ -3999,7 +4004,7 @@ class Navigation:
     def own_reading(self, station: str) -> dict[str, Any] | None:
         """A station's own reckoning as it stands now, carried on, with its distance and
         bearing from the master's account; None when none is held."""
-        own = (self.own or {}).get(station)
+        own = self._owns().get(station)
         if own is None:
             return None
         now = self._own_now(own)
@@ -4051,8 +4056,12 @@ class Navigation:
         """The line after the noon's for each own reckoning held (package 40b): his
         position carried on to noon, its distance and bearing from the master's account
         before the sight and whether it lies within what the master would trust it, and
-        where the observed latitude lies from it; then the day's work is done with it."""
-        held = self.own or {}
+        where the observed latitude lies from it. Each is then carried on from that noon
+        figure, as each day's work began from the last, and said again at the next noon
+        (the lead's ruling on the package's report: it does not lapse)."""
+        held = self._owns()
+        r = self.reckoning
+        hand_e, hand_n = r.offset_nm(self.account_now())
         out: list[tuple[str, dict[str, Any]]] = []
         for station in sorted(held, key=lambda s: (s != "officer of the watch", s)):
             own = held[station]
@@ -4085,8 +4094,57 @@ class Navigation:
                     )
                 data["observed_off_nm"] = round(off_nm, 2)
             out.append((text, data))
-        self.own = None
+            # the next day's work begins from his own noon figure
+            own["lat_deg"], own["lon_deg"] = now.lat_deg, now.lon_deg
+            own["run"] = [r.run_east_nm + hand_e, r.run_north_nm + hand_n]
+            own["noon_tick"] = self.world.clock.tick
         return out
+
+    def _holder_of(self, actor: str) -> list[Any]:
+        """Who gives an own reckoning, by the order's actor, so that it is forgotten when
+        he leaves the station: a model's harness and its seating (`["harness", n]`), the
+        player's seat and the tick he was seated (`["seat", tick]`), or the player at
+        the prompt (`["player"]`), who is the captain and never leaves."""
+        world = self.world
+        name = actor.split(" (", 1)[0].removeprefix("the ").strip()
+        seat = getattr(world, "player_seat", None)
+        if actor.endswith(" (the player)") and seat is not None:
+            return ["seat", seat.agent.stationed_tick]
+        harness = (getattr(world, "agents", None) or {}).get(name)
+        if actor.startswith("the ") and harness is not None:
+            return ["harness", harness.agent.seatings]
+        return ["player"]
+
+    def _owns(self) -> dict[str, dict[str, Any]]:
+        """The own reckonings still held: one whose holder has left the station (the
+        model's stood down or withdrawn, or taken again in a later seating; the player's
+        seat left) is forgotten here (the lead's ruling on the package's report)."""
+        held = self.own or {}
+        world = self.world
+        keep: dict[str, dict[str, Any]] = {}
+        for station, own in held.items():
+            holder = own.get("holder") or ["player"]
+            if holder[0] == "seat":
+                seat = getattr(world, "player_seat", None)
+                ok = (
+                    seat is not None
+                    and not seat.agent.released
+                    and seat.agent.stationed_tick == holder[1]
+                )
+            elif holder[0] == "harness":
+                harness = (getattr(world, "agents", None) or {}).get(station)
+                ok = (
+                    harness is not None
+                    and not harness.agent.released
+                    and harness.agent.seatings == holder[1]
+                )
+            else:
+                ok = True
+            if ok:
+                keep[station] = own
+        if len(keep) != len(held):
+            self.own = keep or None
+        return keep
 
     def _station_person(self, station: str) -> str:
         """The person of the wardroom a station is bound to (spec M6 §2), by name; the

@@ -96,8 +96,10 @@ CHAPTERS = [
     "14-the-port.md",  # package 35
     "15-other-sail.md",  # package 36
     "16-the-officer-of-the-watch.md",  # package 37
-    # 13 is left out: its `# rejected: heave short the kedge` is refused only with an
-    # anchor down, which no preset gives (package 40b, a finding)
+    # 13 is left out: its `# rejected: heave short the kedge` is refused by the cable
+    # script's own check when the evolution starts (`scripts._worked`), which the
+    # instant runner does not make, anchor down or not; checking it would refuse the
+    # chapter's other anchor blocks, which work cables with none down (package 40b)
     "17-the-captain.md",  # package 40b: its block was never read
     "18-lessons.md",  # package 40b
 ]

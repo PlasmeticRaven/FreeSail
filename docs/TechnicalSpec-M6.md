@@ -336,13 +336,20 @@ place have them by the same words, and a reading:
   run when it was given. It moves nothing. It is run on by the log-board: the miles east
   and north every board has made by account since the departure (`Reckoning.run_east_nm`,
   `run_north_nm`, which no observation moves) and the board in hand, so that what the
-  sights did to the master's account is the master's and not in it.
+  sights did to the master's account is the master's and not in it. It is kept with who
+  gave it (`holder`: a model's harness and its seating, the player's seat and the tick
+  he was seated, or the player at the prompt), is replaced by a new `my reckoning is`, and
+  is forgotten only when that holder leaves the station: the model stood down or
+  withdrawn (or the station taken again in a later seating), the player's seat left
+  (`Navigation._owns`; the lead's ruling on the package's report).
 - At noon, the noon's line is followed by one notable line (`reckoning.own_noon`) for each
   own reckoning held: the station's and the person's, when it was worked, the position run
   on to noon, its distance and point from the master's account **before the sight**, and
   whether it lies within what he would trust that account (twice his doubt, as the ellipse
-  lies), and where the observed latitude lies from it. The day's work is then done with
-  it (`own` emptied), as each officer worked his day's work afresh. A noon by order
+  lies), and where the observed latitude lies from it. It is then carried on from that
+  noon figure (its base set to the position the line gave), as each day's work began
+  from the last, and said again at the next noon; it does not lapse (the lead's ruling;
+  the package had first emptied `own` at noon). A noon by order
   (`observe the sun`) has its own line written after the order's, so the officers' lines
   follow at the next tick. With none held there is no such line and nothing else moves:
   the recorded passages have none (package 40b ran the gates' slow truths to prove it).
@@ -431,8 +438,8 @@ and `CAPTAIN_BRIEF` gain a sentence each pointing at primer 18 (the officer's sa
 reckoning is kept with the deck or off watch, the captain's names `the officer's
 reckoning`); the consent files are not touched. `tests/test_primer.py` reads chapter 18's
 blocks as every chapter's (and chapter 17's, which it had not read; chapter 13's stays out,
-its `# rejected: heave short the kedge` refused only with an anchor down, which no preset
-gives), and checks that the lessons' scenarios load at seed 7 with no book and that the
+its `# rejected: heave short the kedge` refused by the cable script's own check when the
+evolution starts, which the test's instant runner never makes), and checks that the lessons' scenarios load at seed 7 with no book and that the
 officer's words stand.
 
 ### 7. Orders and readings for 6a

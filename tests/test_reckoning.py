@@ -2350,7 +2350,8 @@ def test_work_my_reckoning_is_answered_never_logged_and_draws_nothing():
 def test_my_reckoning_is_kept_beside_the_masters_moves_nothing_and_is_said_after_noon():
     """`my reckoning is <position>` keeps the station's own figure beside the master's and
     moves nothing; at noon the line after the noon's says it, run on by the log-board,
-    beside the master's account before the sight, and the day's work is done with it. A
+    beside the master's account before the sight, and it is carried on from that noon
+    figure until another is given (the lead's ruling: it does not lapse at noon). A
     ship with none held has no such line, and every other line is the same."""
     w = under_way(start=datetime(1805, 6, 12, 10, 30))
     plain = under_way(start=datetime(1805, 6, 12, 10, 30))
@@ -2380,7 +2381,15 @@ def test_my_reckoning_is_kept_beside_the_masters_moves_nothing_and_is_said_after
     if "Latitude by observation" in log[noon[0]].text:
         assert "of the master's account before the sight" in own.text
         assert "The latitude by observation lies " in own.text
-    assert nav.own is None  # the day's work done with it
+    # carried on past noon from his own noon figure (the lead's ruling: it does not lapse)
+    mine = nav.own["captain"]
+    assert (round(mine["lat_deg"], 5), round(mine["lon_deg"], 5)) == (
+        own.data["lat_deg"],
+        own.data["lon_deg"],
+    )
+    assert mine["noon_tick"] == own.tick and mine["tick"] == e.tick
+    assert w.submit("my reckoning is 49 40 N 5 0 W").kind == "reckoning.own"
+    assert nav.own["captain"]["lat_deg"] == pytest.approx(49 + 40 / 60)  # replaced
     assert not [x for x in plain.log if x.kind == K.OWN_NOON_KIND]
     ours = [
         (x.kind, x.text)

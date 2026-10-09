@@ -1038,7 +1038,8 @@ def execute(ship: Any, order: Order) -> Result:
         station = own_station(ship)
         pos = _position_or_refuse(rest, verb)
         nav = _navigation(ship)
-        text, data = nav.own_reckoning(station, pos)
+        actor = str((getattr(ship, "extra", None) or {}).get("order_actor") or "captain")
+        text, data = nav.own_reckoning(station, pos, actor)
         return "reckoning.own", text, {"verb": verb, "level": 1, "station": station} | data
     if verb == "allow the tide by the book":
         # the tide handed back to the master (package 37e)

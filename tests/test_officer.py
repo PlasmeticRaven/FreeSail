@@ -3481,3 +3481,13 @@ def test_the_fake_officer_and_the_players_seat_keep_their_own_reckoning_and_a_po
     e = seat.route("set the royals")
     assert e.kind == "agent.refused" and "has not the deck" in e.text
     assert other.navigation.own["officer of the watch"]["who"] == person
+    # forgotten when the one who gave it leaves the station (the lead's ruling): the
+    # model stood down, the player's seat left
+    assert world.readings["officers_reckoning"] is not None
+    assert world.submit("stand down the officer").kind != "order.rejected"
+    assert world.readings["officers_reckoning"] is None
+    assert not world.navigation.own
+    assert other.readings["officers_reckoning"] is not None
+    seat.route("stand down the officer")
+    assert seat.agent.released
+    assert other.readings["officers_reckoning"] is None
