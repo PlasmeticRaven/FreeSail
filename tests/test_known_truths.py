@@ -2898,9 +2898,9 @@ GATE_5B_NOON_TICK = 28740
 GATE_5B_CAST_TICK = 30118
 GATE_5B_HOVE_TO_TICK = 29013  # "Hove to on the larboard tack", her way taken off first
 GATE_5B_LANDFALL_TICK = 45180  # 44820 before package 37j
-GATE_5B_ROADS_TICK = 58298  # the outer road: the first cast under twenty fathoms (58297)
-GATE_5B_ANCHORED_TICK = 58646  # the best bower let go (58647)
-GATE_5B_BROUGHT_UP_TICK = 59606  # brought up, the sails furled (59642)
+GATE_5B_ROADS_TICK = 58299  # the outer road, the first cast under twenty fathoms (58298 before)
+GATE_5B_ANCHORED_TICK = 58652  # the best bower let go (58646 before the merge)
+GATE_5B_BROUGHT_UP_TICK = 59628  # brought up, the sails furled (59606 before the merge)
 # Package 33c (spec M5 open item 15): every tick held, every line but the standing
 # runtime's own the same; the lines moved by the held lines said the first time and then
 # once a watch (the frigate 157 to 18, the schooner 155 to 15, the thick passage 31 to
@@ -2941,8 +2941,8 @@ GATE_5B_BROUGHT_UP_TICK = 59606  # brought up, the sails furled (59642)
 GATE_5B_SAIL_SIGHTED_TICK = 55500  # "Sail ho! A sail right ahead", two leagues (55860)
 GATE_5B_PILOT_HAIL_TICK = 57120  # the cutter hails within four cables (57480)
 GATE_5B_PILOT_ABOARD_TICK = 57180  # the pilot aboard, a minute after (57540)
-GATE_5B_LINES = 746  # 768 before package 37j
-GATE_5B_DIGEST = "e1ecc7767009176c"  # dbf7f6fcfb800fdf
+GATE_5B_LINES = 734  # merged tree, 2026-10-09 (746 before the merge)
+GATE_5B_DIGEST = "9a0c4168d6987405"  # merged tree (e1ecc7767009176c before)
 # The schooner, package 37e (old beside new): the landfall 43920 → 44400, the Beast, the
 # Lizard and its lights at one look, the account a cable and a half out after the
 # bearing; the outer road 56502 → 56517; the anchor off the town 57615 → 58210 in six
@@ -2986,17 +2986,17 @@ GATE_5B_DIGEST = "e1ecc7767009176c"  # dbf7f6fcfb800fdf
 # Anthony's Head and the Black Rock: the anchor 57638 → 57643 in seventeen fathoms and a
 # half (seven), brought up 58689 → 58795 in eighteen and a half; 761 → 756 lines.
 GATE_5B_SCHOONER_LANDFALL_TICK = 46200  # 45840 before package 37j
-GATE_5B_SCHOONER_ROADS_TICK = 56515  # the outer road: sail shortened, a course for Carrick Road
+GATE_5B_SCHOONER_ROADS_TICK = 56234  # the outer road: sail shortened (56515 before the merge)
 GATE_5B_SCHOONER_PILOT_HAIL_TICK = 55860  # the cutter's hail; taken at it (55800)
-GATE_5B_SCHOONER_PILOT_HAIL_AGAIN_TICK = 56400  # her second, for her to heave to (37h)
-GATE_5B_SCHOONER_PILOT_ABOARD_TICK = 56580  # the pilot aboard off the outer road (37h)
-GATE_5B_SCHOONER_ANCHORED_TICK = 57643  # off the town: the best bower let go (57638)
-GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58795  # (58689; 58690 on Windows at the fold-in)
-GATE_5B_SCHOONER_LINES = 756  # 761 before package 37j
-GATE_5B_SCHOONER_DIGEST = "a7dd398ae719ff8b"  # c8905673506f717e (78eec3dcd5f33c16 on Windows)
+GATE_5B_SCHOONER_PILOT_HAIL_AGAIN_TICK = 56460  # her second, to heave to (37h; 56400 before)
+GATE_5B_SCHOONER_PILOT_ABOARD_TICK = 56940  # aboard off the outer road (37h; 56580 before)
+GATE_5B_SCHOONER_ANCHORED_TICK = 57255  # off the town: the best bower let go (57643 before)
+GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58213  # brought up (58795 before the merge)
+GATE_5B_SCHOONER_LINES = 761  # merged tree (756 before the merge)
+GATE_5B_SCHOONER_DIGEST = "d6031efa9808a2b1"  # merged tree (a7dd398ae719ff8b before)
 GATE_5B_THICK_LANDFALL_TICK = 53820  # 54420 before package 37j
-GATE_5B_THICK_LINES = 473  # 488
-GATE_5B_THICK_DIGEST = "e00caa4f5a665b50"  # fb136bb8e86f0804
+GATE_5B_THICK_LINES = 475  # merged tree (473 before the merge)
+GATE_5B_THICK_DIGEST = "bd1cb6f5e036ce3e"  # merged tree (e00caa4f5a665b50 before)
 GATE_5B_THICK_AGROUND_TICK = 56081  # package 37j: on Black Head, after the landfall (a finding)
 
 
@@ -4023,8 +4023,8 @@ GATE_5C_CRUISE_WEARS_AT_LEAST = 8  # wore ship on the station, and once for the 
 # re-measured at 37j's merge, the tuning notes saying both.)
 # (37j merged after 37h and 37k, 2026-10-09: the figures below are 37j's as measured on
 # its branch; the six passages are re-measured on the merged tree by the lead, below.)
-GATE_5C_CRUISE_LINES = 2059  # 2037 before package 37j
-GATE_5C_CRUISE_DIGEST = "d3086c7fce4a3a1a"  # bb8b2499fde6a0f4
+GATE_5C_CRUISE_LINES = 2065  # merged tree (2059 before the merge)
+GATE_5C_CRUISE_DIGEST = "15e7f10b2ca8eb9a"  # merged tree (d3086c7fce4a3a1a before)
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E
@@ -4097,7 +4097,7 @@ GATE_5C_MERCHANT_PILOT_ABOARD_TICKS = [
 ]  # Mr Tregenza of Falmouth in the outer road; Mr Le Floch of Brest in the Iroise
 GATE_5C_MERCHANT_PILOT_LEFT_TICKS = [
     18300,
-    121560,
+    121440,  # 121560 before the merge of 37h, 37k and 37j
 ]  # Mr Tregenza put off beyond the outer road, the ship hove to for it; Mr Le Floch at the
 # anchor in the Bay of Brest, from the quay (package 37h)
 GATE_5C_MERCHANT_SAIL_OFF_LIZARD_TICK = (
@@ -4123,8 +4123,8 @@ GATE_5C_MERCHANT_FLOOD_TICK = (
 # its branch; the six passages are re-measured on the merged tree by the lead, below.)
 GATE_5C_MERCHANT_GOULET_TICK = 112178  # the mouth of the Goulet (112078; 112112 on Windows)
 GATE_5C_MERCHANT_TIN_SOLD_TICK = 125159  # the boat alongside from the quay (123948)
-GATE_5C_MERCHANT_LINES = 2976  # 2994 before package 37j
-GATE_5C_MERCHANT_DIGEST = "71c32abf23af0510"  # c52c14c725a5ed1f
+GATE_5C_MERCHANT_LINES = 2999  # merged tree (2976 before the merge)
+GATE_5C_MERCHANT_DIGEST = "e40b930d5ec5bbaf"  # merged tree (71c32abf23af0510 before)
 
 
 def _people(world) -> list[dict]:

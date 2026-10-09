@@ -2913,3 +2913,56 @@ and not this package's; the bound on the depth she rides in is widened to twenty
   and the truth's sentence ("moves the reckoning onto the chart's contour") is further from
   the letter than 37e left it: the lead's (spec M5 §19).
 - **The thick passage aground and the Iroise's cast lost**, above: the books, for the lead.
+
+## Milestone 5: the K batch merged (2026-10-09, the lead)
+
+Six packages built together in worktrees from the briefs of 2026-10-09 (37h the pilot, 37i
+the local runner, 37j the account amended, 37k the ground and the helm amended, 37l the
+words, 37n the chart's tools) and merged in the order 37i, 37n, 37l, 37h, 37k, 37j, each
+package's section above. Three packages re-pinned the recorded passages against the branch
+before the others, so the six passages were measured once more on the merged tree and
+pinned as it gives them (`tests/test_known_truths.py`, the old figure beside each).
+
+| Passage | Merged tree | What moved at the merge beyond the packages' own figures |
+|---|---|---|
+| The frigate, 5b | 734 lines, `9a0c4168d6987405`; the outer road 58299, the anchor 58652, brought up 59628 | the pilot taken at his hail (37h) on 37j's track: the lines of the boat and the fee |
+| The schooner, 5b | 761 lines, `d6031efa9808a2b1`; the second hail 56460, the pilot aboard 56940, the outer road 56234, the anchor 57255, brought up 58213 | 37h's boat keeping company on 37j's track; she anchors in the road an hour and a quarter earlier than 37h's figure on the old track |
+| The thick passage, 5b | 475 lines, `bd1cb6f5e036ce3e`; the landfall 53820, aground on Black Head 56081 | 37k's lifting line twice |
+| The merchant passage | 2999 lines, `e40b930d5ec5bbaf`; the Brest pilot put off at the Bay anchor 121440; the rest 37j's | 37h's pilot and 37k's lines on 37j's track |
+| The naval cruise | 2065 lines, `15e7f10b2ca8eb9a`; every tick 37j's | 37h's pilot and 37k's lines |
+
+**Two passages that no longer come through whole, left for package 37m.** Both are the
+helm through the wind, which the owner ruled on 2026-10-09 (spec M6 §31, ruling 3) and
+which 37m builds: a plain `steer` that the wind will not allow is to be tacked, worn or
+kept full and by, not steered into the wind.
+
+- **The thick passage takes the ground on Black Head.** On 37j's track (the departure laid
+  at the truth, the account worked at each board) the landfall in fog comes at 53820 with
+  Black Head close aboard on the larboard bow, the book's "the land" rule orders `steer S`
+  into a south-easterly, "keep her full" bears her away, she is taken aback at 53861 with
+  no way on, and her leeway and the ebb set her onto the ledges: "Land close ahead" at
+  55620, aground at 56081. The cause is the order the wind will not allow, which is 37m's.
+  The grounding is pinned as the passage's end and said so in the test; the book is not
+  tuned for it (a `heave to` at the landfall would be the period's order in fog and is the
+  one line to try if 37m does not carry her clear).
+- **The merchant passage's cast at the Iroise is lost** (an expected failure since 37j):
+  the course for the Iroise is shaped once from the soundings and the hourly rule is guarded
+  within ten miles of Ushant, so on the new track she passes the mark more than a mile and a
+  half off by account and the bring-to never fires. One rule tried once and dropped (the
+  book's "tuned once and cheaply"): `when the distance to the Passage de l'Iroise is under 4
+  miles and the distance to Ushant is over 10 miles and the heading is east of E then shape
+  a course for the Passage de l'Iroise` brings her to and the cast reads the Iroise
+  (90110), but filling away after it she is taken aback at 90453, the Brest pilot boards two
+  hours late and she never anchors in the road nor sells the tin: the same family of fault,
+  and 37m's before the book is touched again.
+
+**37h against the head rule.** Fourteen whole-passage runs, five on the schooner alone,
+against "tuned once and cheaply"; the package says so itself. The books changed: `take the
+pilot` at the hail in the frigate's, the merchant's and the cruise's; three lines and a
+guard in the schooner's.
+
+**The whole suite on the merged tree**: see the gate's document for the counts; the two
+timing tests (`test_chart`'s nearest coast and the merchant passage's pace floor) fail on
+this machine whenever other suites run beside them and pass alone, which every package
+reported.
+
