@@ -13,6 +13,11 @@
  * before); the library and the ship's papers in a pane of their own (library.js), opened
  * by the button or a `library` line; the option to ease the clock on a station; the
  * map's centre and fit buttons.
+ *
+ * Package 37n, the chart's tools: the rose, the line, the ring, the note and the list of
+ * marks, by the map's buttons or by a key while the focus is off the order line (a click
+ * on the chart gives it the focus): r the rose, l a line, o a ring, n a note, m the list,
+ * Escape puts a tool down. The marks are sent to /api/marks and come back on the socket.
  */
 (function (root) {
   "use strict";
@@ -104,6 +109,7 @@
         document.title = "FreeSail · " + (data.ship ? data.ship.name : "point ship");
         $("ship-name").textContent = data.ship ? data.ship.name + " (" + data.ship.rig + ")" : "point ship";
         log.clear();
+        seaMap.setMarks(data.marks || []); // the player's pencil, kept with the game (37n)
         state.driver = data.snapshot.driver || state.driver;
         // the log as the server shows it now: rolled up at 60x and above (spec M4 §20)
         data.log.forEach(function (e) {
@@ -116,6 +122,8 @@
         log.addRollup(data.rollup);
       } else if (data.type === "snapshot") {
         onSnapshot(data.snapshot);
+      } else if (data.type === "marks") {
+        seaMap.setMarks(data.marks);
       }
     };
   }
@@ -259,6 +267,90 @@
     askHint(s);
   }
 
+  // -- the chart's tools (package 37n) ------------------------------------------------
+  //
+  // The rose and the pencil are the chart's (map.js); here the buttons, the keys, the list
+  // of marks and the server's route (/api/marks). A mark goes to the server, which keeps
+  // it with the game and sends the list back to every page on the socket; nothing else
+  // reads it.
+
+  var MAP_KEYS = { r: "rose", l: "line", o: "ring", n: "note", m: "marks" };
+
+  function markSink() {
+    return {
+      add: function (mark) {
+        if (mark.kind === "note") {
+          $("mark-note-text").value = ""; // a note's words are spent on it
+          seaMap.noteText = "";
+        }
+        post("/api/marks", mark).then(function (r) {
+          if (r && r.detail) note("The chart: " + r.detail);
+        });
+      },
+      remove: function (id) {
+        fetch("/api/marks/" + encodeURIComponent(id), { method: "DELETE" });
+      },
+      changed: drawMarksPane,
+    };
+  }
+
+  function mapTool(what) {
+    if (what === "rose") seaMap.toggleRose();
+    else if (what === "marks") {
+      var pane = $("marks-pane");
+      pane.hidden = !pane.hidden;
+      drawMarksPane();
+    } else {
+      seaMap.useTool(what);
+      if (what === "note" && seaMap.tool === "note" && !$("mark-note-text").value.trim()) {
+        $("marks-pane").hidden = false; // the words first, then the place
+        drawMarksPane();
+        $("mark-note-text").focus();
+      }
+    }
+  }
+
+  function drawMarksPane() {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-tool]"), function (b) {
+      b.classList.toggle("active", seaMap.tool === b.getAttribute("data-tool"));
+    });
+    $("btn-map-rose").classList.toggle("active", !!seaMap.rose.shown);
+    $("btn-map-marks").classList.toggle("active", !$("marks-pane").hidden);
+    var list = $("marks-list");
+    if ($("marks-pane").hidden) return;
+    list.innerHTML = "";
+    var varWest = root.SeaMap.view.variationOf(state.snapshot);
+    if (!seaMap.marks.length) {
+      var none = document.createElement("li");
+      none.className = "none";
+      none.textContent = "No lines, rings or notes laid down.";
+      list.appendChild(none);
+    }
+    seaMap.marks.forEach(function (mark) {
+      var li = document.createElement("li");
+      var words = document.createElement("span");
+      words.textContent = root.SeaMap.view.markWords(mark, varWest);
+      var rm = document.createElement("button");
+      rm.type = "button";
+      rm.textContent = "remove";
+      rm.title = "rub it out";
+      rm.addEventListener("click", function () {
+        seaMap.sink.remove(mark.id);
+      });
+      li.addEventListener("mouseenter", function () {
+        seaMap.lit = mark.id;
+        seaMap.redraw();
+      });
+      li.addEventListener("mouseleave", function () {
+        seaMap.lit = null;
+        seaMap.redraw();
+      });
+      li.appendChild(words);
+      li.appendChild(rm);
+      list.appendChild(li);
+    });
+  }
+
   function note(text) {
     log.append({ tick: state.snapshot ? state.snapshot.tick : 0, ship_time: state.snapshot ? state.snapshot.ship_time : "T", severity: "routine", kind: "client.note", text: text, stamp: "" });
   }
@@ -369,9 +461,42 @@
     $("btn-map-fit").addEventListener("click", function () {
       seaMap.fit();
     });
+    // the chart's tools (package 37n)
+    seaMap.sink = markSink();
+    $("btn-map-rose").addEventListener("click", function () {
+      mapTool("rose");
+    });
+    $("btn-map-marks").addEventListener("click", function () {
+      mapTool("marks");
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-tool]"), function (b) {
+      b.addEventListener("click", function () {
+        mapTool(b.getAttribute("data-tool"));
+      });
+    });
+    $("mark-note-text").addEventListener("input", function () {
+      seaMap.noteText = $("mark-note-text").value;
+    });
+    $("mark-ring-nm").addEventListener("input", function () {
+      var nm = Number($("mark-ring-nm").value);
+      seaMap.ringNm = isFinite(nm) && nm > 0 ? nm : null;
+      seaMap.redraw();
+    });
+    $("btn-marks-clear").addEventListener("click", function () {
+      if (seaMap.marks.length && root.confirm("Rub out every line, ring and note?")) {
+        fetch("/api/marks", { method: "DELETE" });
+      }
+    });
+    drawMarksPane();
 
     document.addEventListener("keydown", function (ev) {
       if (ev.target === input || /^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName || "")) return;
+      if (ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      if (ev.key === "Escape" && seaMap.cancel()) return;
+      if (MAP_KEYS[ev.key]) {
+        mapTool(MAP_KEYS[ev.key]);
+        return;
+      }
       var current = state.facingOverride !== null ? state.facingOverride : state.snapshot ? P.leewardFacing(state.snapshot.ship.tack) : Math.PI / 2;
       if (ev.key === "]") state.facingOverride = U.wrap2pi(current + U.POINT);
       else if (ev.key === "[") state.facingOverride = U.wrap2pi(current - U.POINT);

@@ -2229,3 +2229,82 @@ Game 10's saves are not in the review's evidence folder (only the measurements a
 - **A timeout or a server error** is still asked again up to three times with the request as it then stands, which may be the same request; the brief's "never a third time" is held for refusals for size, where sending it again cannot help. A slow server's timeout is the one case where the same request may well answer.
 - **Ollama's own endpoint** (`/api/chat`) is not used: the runner posts to `/v1/chat/completions` at both servers, and reads Ollama's own fields wherever a server gives them. Ollama does not refuse a request for its size (it cuts the conversation itself), so at Ollama item 4 is the runner's own budget by the server's count, not the refusal.
 - **A thinking budget at the server** (llama-server's reasoning budget) was not tried: the runner asks once more and the owner may raise `--max-reply`.
+
+## Milestone 5: the chart's tools and the viewer's details (package 37n, 2026-10-09)
+
+The owner's notes 5 and 6 of 2026-10-09, and his addition the same day on the bearing
+lines. All of it is the browser's drawing and the server's keeping of the player's marks:
+no constant of the ship, the sea or the reckoning moved, nothing enters the log, the
+journal, the inputs or the snapshot, and every recorded passage replays to its digest
+(the save gains a `chart_marks` list, empty unless the player has pencilled the chart).
+
+### The constants and their sources
+
+| Constant | Value | Source | Verified |
+|---|---|---|---|
+| `CLEW_SPREAD` (`client/projection.js`) | a square sail's clews at 0.9 of the yard below | `tools/gen_ships.py`'s `trapezoid(..., 0.9 * yard_below, depth)` for every topsail, topgallant and royal of the four ships, as the files' notes say ("between its yard and the yardarms below") | the generator |
+| the head of a sail between yards | twice the area over the depth between the yards, less the foot (0.82 of the yard for a topsail, 0.89 for a topgallant or royal, as the generator cut them) | the files' areas and heights | measured: every square sail of the four ships within 5% of its file's area (`test_every_square_sail_is_drawn_to_its_files_area_between_its_yards`) |
+| `HEAD_SPREAD` | a sail with no yard below, head and foot 0.9 of its yard, as deep as its area over that | the generator's courses (`0.42 * yard` deep, `0.9 * yard` broad) and the cutter's square sail (`0.9 * sq_yard * sq_depth`) | the generator |
+| the schooner's topsail | down to her bare fore yard, which the file does not carry: the depth twice the file's height of the yard above its centre (the generator puts the centre midway), the foot what the area leaves | `gen_ships.py`: "the fore yard is a bare spread yard for the topsail's foot; it is not a part here" | the generator |
+| `YARD_ON_CAP_M` | a lowered yard's slings 0.3 m above the cap it rests on | the size of the cap and the parrel | judgement |
+| `HOUSED_ABOVE_CAP_M` | a struck topmast's head 0.6 m above the lower cap | Luce 1866, ch. XXXIV, 'Housing Topmasts' (lowered till the topmast cap is close down on the lower cap): the topmast cap's depth | judgement |
+| `STEP_HOIST` | a yard halfway while `hoist`, `settle_halyards` or `clew_down` is the step in hand; on the cap during `reef` and `shake_out` | the steps of `set_square`, `take_in_square`, `reef_square`, `shake_out_square` | the files; the half is judgement, the snapshot not giving a step's progress |
+| `BEARING_FULL_S` (`client/map.js`) | a bearing drawn full for 1,800 s, a glass | the owner: "an old one becomes useless within a glass or two"; at five to eight knots a glass is two and a half to four miles run, beyond which a line from where it was taken no longer passes near her | the owner's figure; the speeds judgement |
+| `BEARING_DROP_S` | dropped 4 h after it was taken, a watch; at once when a later bearing of the same mark is taken | the owner's "a watch" | the owner's figure |
+| `BEARING_GHOST_ALPHA` | 0.2 at the end of the watch, fading straight from full at the glass | legible as a ghost on the chart's sea | judgement |
+| `ROSE_RADIUS_PX`, grips | 80 px (never more than 0.42 of the chart's shorter side); the centre within 14 px, the rim within 12 | a finger's breadth on the 300-pixel chart | judgement |
+| `MARKS_MAX` (`freesail/ui/server.py`) | 200 marks | a voyage's pencilling, and a save that stays small | judgement |
+| `MARK_RADIUS_MAX_M` | a ring 200 miles at most | the chart's widest view (four hundred miles across) | judgement |
+
+### What was found: the cutter's square sail
+
+The file was right and the viewer wrong. `gen_ships.py` works the cutter's square sail
+from Steel 1794 p. 124 ('Sloop's square-sail, or cross-jack'): 27 ft deep (four-fifths
+of the mainsail's fore leech), bent along nine-tenths of its 46 ft yard, 104 m², and its
+note in `data/ships/cutter.yaml` says so. The viewer drew every square sail the whole
+yard broad and its area over the whole yard deep: 7.4 m, 24 ft, where the sail is 8.2 m,
+the sail squat and a tenth short. The same fault drew every course of the frigate and the
+brig a tenth short, and every topgallant and royal of the frigate, the brig and the cutter
+a sixth too deep, over the yard below (the frigate's fore topgallant 6.95 m deep between
+yards 6.0 m apart); the topsails came out about right by chance, the head and the foot
+averaging to the yard. The schooner's topsail was drawn the yard's breadth and 7.7 m deep
+against the generator's 7.6, near enough by chance again, but square where it is a
+trapezoid. Nothing was regenerated.
+
+Each ship, set and braced square, against her file (head and foot of the drawing; the
+file's area kept within 5%): the frigate's fore course 19.7 m by 9.2 m deep, her fore
+topsail 13.5 m at the head and 19.7 m at the foot between yards 12.6 m apart, her fore
+royal 6.1 m and 9.5 m; the brig's fore topgallant 7.1 m and 11.0 m; the cutter's square
+sail 12.6 m by 8.25 m (27.1 ft), her topsail 8.1 m and 12.6 m, her topgallant 5.3 m and
+8.8 m; the schooner's topsail 10.0 m and 12.4 m, 7.6 m deep.
+
+### The yards at their hoist
+
+From the snapshot as it was: the sail's state (set, goose-winged, blown out or wrecked at
+the hoist; sheeted home, loosed, in the gear, furled or unbent on the cap) and the step of
+the square sail's evolution in hand. The frigate's fore topsail yard: on the
+lower cap at 21.9 m above the water with its sail furled, 25.8 m while it is hoisted,
+29.6 m set, the file's height; reefed once, its sail's reef out of the depth between it
+and the fore yard. A lower yard does not move, nor does the cutter's square-sail yard:
+the file crosses it as a yard and her topsail sheets to it, so lowered with its sail it
+would take the topsail's foot with it. A topgallant set over a topsail on the cap (which
+the sail scripts allow) is drawn at its own hoist with its clews short of the topsail
+yard, not stretched down to it.
+
+### Found on the way (package 37n)
+
+- **The sheets of a raked mast's sails.** The viewer found the yard below a sail's clews
+  by the nearest yard within half a metre fore and aft; on a raked mast with the yards at
+  their hoists that could miss. It is now the yard below on the same mast by the file's
+  heights.
+- **The marks on a replay.** A replay makes none of the marks (they are no input), and a
+  checkpoint holds them with the World. The browser's server takes them up from the save
+  when it loads one, by either road (`start_server_world`). The console's `--load` does
+  not (it draws no chart), so a game loaded at the console and saved there again leaves
+  its marks behind; one line in `console.start_world` or `replay.build_world`
+  (`world.chart_marks = data.get("chart_marks", [])`) would close it, in files this
+  package does not own.
+- **Playwright's own browser was not the one installed**: the headless check of the page
+  used `/opt/pw-browsers/chromium` by its path. The rose, the three tools, the list and the
+  socket's echo worked with no error on the page; the Python tests keep the geometry and
+  the arithmetic.

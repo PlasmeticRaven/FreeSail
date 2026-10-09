@@ -644,3 +644,108 @@ def test_the_client_has_the_shelf(client):
     pop = client.get("/client/library.html")
     assert pop.status_code == 200 and "library.js" in pop.text
     assert client.get("/client/library.js").status_code == 200
+
+
+# -- package 37n: the player's pencil on the chart -------------------------------------------
+
+LINE = {"kind": "line", "points": [{"lat": 49.95, "lon": -5.2}, {"lat": 50.0, "lon": -5.1}]}
+RING = {"kind": "ring", "points": [{"lat": 49.97, "lon": -5.18}], "radius_m": 1852.0}
+NOTE = {"kind": "note", "points": [{"lat": 49.96, "lon": -5.15}], "text": "  the Manacles?  "}
+
+
+def test_the_marks_are_laid_listed_and_rubbed_out():
+    """A line, a ring and a note go to the server, come back with their ids on the hello
+    and on the socket, and are rubbed out one by one or all together; nothing of them is in
+    the log, the journal, the inputs or the snapshot, and the game's digest does not move."""
+    world = world_for(SHIPS[0])
+    digest = world.log.digest()
+    with TestClient(create_app(Driver(world))) as client:
+        with client.websocket_connect("/ws") as ws:
+            assert ws.receive_json()["marks"] == []
+            first = client.post("/api/marks", json=LINE).json()
+            assert first["id"] == "m1" and first["points"] == LINE["points"]
+            pushed = ws.receive_json()
+            while pushed["type"] != "marks":
+                pushed = ws.receive_json()
+            assert [m["id"] for m in pushed["marks"]] == ["m1"]
+        assert client.post("/api/marks", json=RING).json()["radius_m"] == 1852.0
+        assert client.post("/api/marks", json=NOTE).json()["text"] == "the Manacles?"
+        marks = client.get("/api/marks").json()["marks"]
+        assert [m["kind"] for m in marks] == ["line", "ring", "note"]
+        assert [m["id"] for m in marks] == ["m1", "m2", "m3"]
+        with client.websocket_connect("/ws") as ws:
+            assert [m["id"] for m in ws.receive_json()["marks"]] == ["m1", "m2", "m3"]
+        snap = client.get("/api/state").json()
+        assert "chart_marks" not in snap and "Manacles" not in json.dumps(snap)
+        assert client.delete("/api/marks/m2").json()["marks"][1]["id"] == "m3"
+        assert client.delete("/api/marks/m2").status_code == 404
+        assert client.post("/api/marks", json=RING).json()["id"] == "m4"  # never reused
+        assert client.delete("/api/marks").json() == {"marks": []}
+    assert world.log.digest() == digest
+    assert not world.journal and not world.inputs
+    assert all("Manacles" not in e.text for e in world.log.all())
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        {"kind": "arrow", "points": [{"x": 0, "y": 0}]},
+        {"kind": "line", "points": [{"lat": 50, "lon": -5}]},
+        {"kind": "line", "points": [{"lat": 50, "lon": -5}, {"x": 0, "y": 0}]},
+        {"kind": "ring", "points": [{"x": 0, "y": 0}], "radius_m": -3},
+        {"kind": "ring", "points": [{"x": 0, "y": 0}]},
+        {"kind": "note", "points": [{"x": 0, "y": 0}], "text": "   "},
+        {"kind": "note", "points": [{"x": "NaN", "y": 0}], "text": "here"},
+        {"kind": "note", "points": [{"lat": 95, "lon": 0}], "text": "here"},
+    ],
+)
+def test_a_mark_that_does_not_read_is_refused_in_words(client, bad):
+    r = client.post("/api/marks", json=bad)
+    assert r.status_code == 400 and r.json()["detail"]
+    assert client.get("/api/marks").json() == {"marks": []}
+
+
+@pytest.mark.parametrize("checkpoint", [True, False], ids=["checkpoint", "replay"])
+def test_the_marks_are_saved_and_loaded_with_the_game(tmp_path, checkpoint):
+    """The marks are in the save the server writes (and in the download), and come back
+    when the server takes the save up, whether from its checkpoint or by a replay; the
+    replay itself makes none, and the loaded game's digest is the saved game's."""
+    from freesail.api.session import ship_factory
+    from freesail.core import replay
+    from freesail.ui.server import build_world
+
+    world = world_for(SHIPS[0])
+    with TestClient(create_app(Driver(world))) as client:
+        for mark in (LINE, RING, NOTE):
+            client.post("/api/marks", json=mark)
+        client.post("/api/driver", json={"action": "tick", "value": 30})
+        assert len(client.get("/api/save").json()["chart_marks"]) == 3
+    path = replay.save_to_file(world, tmp_path / "pencil.json", checkpoint=checkpoint)
+    saved = json.loads(path.read_text())
+    assert [m["id"] for m in saved["chart_marks"]] == ["m1", "m2", "m3"]
+    assert not replay.replay(saved, ship_factory).chart_marks  # a replay makes none of them
+    loaded = build_world(server_args(load=str(path)))
+    assert loaded.loaded_from == ("checkpoint" if checkpoint else "replay")
+    assert loaded.chart_marks == saved["chart_marks"]
+    assert loaded.log.digest() == world.log.digest()
+    with TestClient(create_app(Driver(loaded))) as client:
+        assert client.post("/api/marks", json=LINE).json()["id"] == "m4"
+
+
+def test_the_client_has_the_charts_tools(client):
+    """The map's buttons, the list of marks and its inputs are on the page; the chart's
+    script carries the rose, the pencil and the bearings' clean-up."""
+    page = client.get("/").text
+    for needle in (
+        'id="btn-map-rose"',
+        'data-tool="line"',
+        'data-tool="ring"',
+        'data-tool="note"',
+        'id="marks-pane"',
+        'id="mark-note-text"',
+        'id="mark-ring-nm"',
+    ):
+        assert needle in page, needle
+    script = client.get("/client/map.js").text
+    for needle in ("drawRose", "drawMarks", "bearingsShown", "BEARING_FULL_S", "BEARING_DROP_S"):
+        assert needle in script, needle

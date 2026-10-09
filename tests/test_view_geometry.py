@@ -146,15 +146,22 @@ def test_a_goose_winged_sail_is_a_triangle_with_its_foot_rising_to_leeward(tmp_p
     tri = [p[-1] for p in got["path"]]  # the path's corners in order
     assert len(tri) == 4 and tri[0] == tri[-1]  # closed: three corners
     lee, weather, clew = tri[0], tri[1], tri[2]
-    assert lee == lee_arm and weather == weather_arm  # the head along the whole yard
-    assert clew[0] == pytest.approx(weather_arm[0]) and clew[1] == pytest.approx(weather_arm[1])
+    # the head along the yard, its ends nine-tenths of the way out to the yardarms as the
+    # ship file's course is cut (package 37n: the earings inside the yardarms)
+    mid = [(p + q) / 2.0 for p, q in zip(a, b, strict=True)]
+
+    def inside(arm):
+        return [m + 0.9 * (x - m) for m, x in zip(mid, arm, strict=True)]
+
+    assert lee == pytest.approx(inside(lee_arm)) and weather == pytest.approx(inside(weather_arm))
+    assert clew[0] == pytest.approx(weather[0]) and clew[1] == pytest.approx(weather[1])
     assert clew[2] < weather_arm[2] - 5.0  # the weather clew sheeted home, well below
     # the foot rises from the weather clew to the lee clew, hauled up to the yard
     assert lee[2] > clew[2]
     corners = got["corners"]
     stbd_clew, larb_clew = corners[2], corners[3]  # a sheet finds its clew by side
     hauled_up = larb_clew if tack == "starboard" else stbd_clew
-    assert hauled_up == lee_arm
+    assert hauled_up == lee
     # its centre lies out to weather, as physics/sails.py puts the goose-wing's force
     side = 1.0 if tack == "starboard" else -1.0
     assert side * got["centre"][1] > 0.0
@@ -518,3 +525,150 @@ def test_a_wreck_cleared_away_is_not_drawn(tmp_path):
     )
     assert boom.id not in got and "fore.topmast.studdingsail_boom.starboard" in got
     assert queries._spar_state(boom) == "cleared"
+
+
+# ---------------------------------------------------------------------------
+# Package 37n: the square sail from its file, and the yards at their hoist
+# ---------------------------------------------------------------------------
+
+SQUARE = (
+    "const sk = P.buildSkeleton(d.graph, d.snap);"
+    "const sails = {}; sk.figures.filter(x => x.kind === 'sail' && x.cls === 'square')"
+    ".forEach(x => sails[x.id] = x.corners);"
+    "const yards = {}; sk.figures.filter(x => x.kind === 'spar' && x.cls === 'yard')"
+    ".forEach(x => yards[x.id] = {z: (x.pts[0][2] + x.pts[1][2]) / 2, hoist: x.hoist,"
+    " state: x.state});"
+    "const masts = {}; sk.figures.filter(x => x.kind === 'spar' && x.cls.endsWith('mast'))"
+    ".forEach(x => masts[x.id] = {pts: x.pts, state: x.state});"
+    "return {sails: sails, yards: yards, masts: masts, bounds: P.project(sk, 1.2, 0).bounds};"
+)
+
+
+def span(p, q) -> float:
+    return math.hypot(q[0] - p[0], q[1] - p[1])
+
+
+def quad_area(c) -> float:
+    """A square sail's area from its corners: a trapezoid, the mean of head and foot by the
+    depth between them (the yards braced square, so the depth is the heights')."""
+    head, foot = span(c[0], c[1]), span(c[3], c[2])
+    return (head + foot) / 2.0 * (c[0][2] - c[3][2])
+
+
+def all_square(path: str, state: SailState = SailState.SET):
+    ship = make_ship(path)
+    for s in ship.sails.values():
+        if s.cls == "square":
+            s.state = state
+    return ship
+
+
+@needs_node
+@pytest.mark.parametrize("path", [FRIGATE, SCHOONER, CUTTER, BRIG])
+def test_every_square_sail_is_drawn_to_its_files_area_between_its_yards(tmp_path, path):
+    """Set, braced square, every square sail's drawn area is the file's within a twentieth,
+    its head within its yard and at the yard's height, and a sail with a yard below it
+    reaches that yard: no sail falls short of the one below or overlaps it (the viewer drew
+    a course a tenth short and a topgallant a sixth too deep)."""
+    ship = all_square(path)
+    for s in ship.spars.values():
+        if s.is_yard:
+            s.brace_angle = 0.0
+    got = run_js(tmp_path, ship_state(ship), SQUARE)
+    graph = queries.ship_graph(ship)
+    yards = {s["id"]: s for s in graph["spars"]}
+    for sail in graph["sails"]:
+        if sail["class"] != "square":
+            continue
+        c = got["sails"][sail["id"]]
+        assert quad_area(c) == pytest.approx(sail["area_m2"], rel=0.05), sail["id"]
+        yard = yards[sail["roles"]["yard"]]
+        assert span(c[0], c[1]) <= yard["length_m"] + 1e-6
+        assert c[0][2] == pytest.approx(got["yards"][yard["id"]]["z"])
+    pairs = (
+        ("fore.topgallant", "fore.topsail.yard"),
+        ("main.royal", "main.topgallant.yard"),
+        ("topgallant", "topsail.yard"),
+        ("topsail", "square_sail.yard"),
+    )
+    for sail, below in pairs:
+        if sail in got["sails"] and below in got["yards"]:
+            assert got["sails"][sail][3][2] == pytest.approx(got["yards"][below]["z"]), sail
+
+
+@needs_node
+def test_the_cutters_square_sail_is_its_files_twenty_seven_feet_deep(tmp_path):
+    """The owner's note 6: the cutter's square sail is Steel's 'Sloop's square-sail, or
+    cross-jack', 27 ft deep and nine-tenths of its 46 ft yard broad (tools/gen_ships.py, as
+    its note in the file says); the viewer drew it 24 ft deep and the yard's whole breadth.
+    The generator's figures were right: the fault was the viewer's."""
+    ship = all_square(CUTTER)
+    got = run_js(tmp_path, ship_state(ship), SQUARE)
+    c = got["sails"]["square_sail"]
+    feet = 0.3048
+    assert (c[0][2] - c[3][2]) / feet == pytest.approx(27.0, abs=0.5)
+    assert span(c[0], c[1]) == pytest.approx(0.9 * ship.spars["square_sail.yard"].length_m)
+    assert "27 ft deep" in (ROOT / CUTTER).read_text()
+
+
+@needs_node
+@pytest.mark.parametrize("path", [FRIGATE, CUTTER])
+def test_a_yard_is_drawn_at_its_hoist(tmp_path, path):
+    """A topsail yard stands at the file's height with its sail set, on the cap of the
+    mast below with its sail furled, halfway while its halyards are hoisted, and down by
+    its reef's depth when reefed; a lower yard never moves; the view's scale is the same
+    whatever the hoists."""
+    sail, yard, lower_mast, lower = {
+        FRIGATE: ("fore.topsail", "fore.topsail.yard", "fore.mast", "fore.yard"),
+        CUTTER: ("topsail", "topsail.yard", "main.mast", "square_sail.yard"),
+    }[path]
+    base = make_ship(path)
+    file_z = base.hull.spec.deck_height_m + base.spars[yard].height_m
+    out = {}
+    for case in ("set", "furled", "hoisting", "reefed"):
+        ship = all_square(path, SailState.FURLED if case == "furled" else SailState.SET)
+        if case == "hoisting":
+            ship.sails[sail].state = SailState.SHEETED
+        if case == "reefed":
+            ship.sails[sail].reefs = 1
+        data = ship_state(ship)
+        if case == "hoisting":
+            data["snap"]["evolutions_in_progress"] = [
+                {"id": "set_square", "subject": sail, "step": "hoist", "waiting": False}
+            ]
+        out[case] = run_js(tmp_path, data, SQUARE)
+    lower_head = max(p[2] for p in out["set"]["masts"][lower_mast]["pts"])
+    assert out["set"]["yards"][yard] == {"z": pytest.approx(file_z), "hoist": 1, "state": "sound"}
+    down = out["furled"]["yards"][yard]
+    assert down["hoist"] == 0 and down["z"] == pytest.approx(lower_head + 0.3)
+    half = out["hoisting"]["yards"][yard]
+    assert half["hoist"] == 0.5 and half["z"] == pytest.approx((down["z"] + file_z) / 2)
+    reefed = out["reefed"]["yards"][yard]["z"]
+    assert down["z"] < reefed < file_z - 0.5
+    for case in out.values():
+        assert case["yards"][lower]["z"] == pytest.approx(out["set"]["yards"][lower]["z"])
+        for k in ("minX", "maxX", "minY", "maxY"):
+            assert case["bounds"][k] == pytest.approx(out["set"]["bounds"][k], abs=1e-6)
+
+
+@needs_node
+def test_struck_topmasts_are_housed_with_their_yards_on_the_caps(tmp_path):
+    """Topmasts struck (strike_topmasts.yaml: the topgallant masts sent down first, the
+    topsail yards "lowered on the caps", the topmasts sent down): the topmast is drawn
+    housed, its head just above the lower cap, the topsail yard on that cap with its sail
+    furled on it; the topgallant masts and yards sent down on deck are not drawn."""
+    ship = all_square(FRIGATE, SailState.FURLED)
+    upper = ("topmast", "topgallant_mast", "royal_mast")
+    for s in ship.spars.values():
+        if s.cls in upper or (s.is_yard and s.parent and ship.spars[s.parent].cls in upper):
+            s.sent_down = True
+    got = run_js(tmp_path, ship_state(ship), SQUARE)
+    lower_head = max(p[2] for p in got["masts"]["fore.mast"]["pts"])
+    topmast = got["masts"]["fore.topmast"]
+    assert topmast["state"] == "struck"
+    assert max(p[2] for p in topmast["pts"]) == pytest.approx(lower_head + 0.6)
+    yard = got["yards"]["fore.topsail.yard"]
+    assert yard["state"] == "struck" and yard["z"] == pytest.approx(lower_head + 0.3)
+    assert "fore.topsail" in got["sails"]  # furled on its yard on the cap
+    assert "fore.topgallant_mast" not in got["masts"]
+    assert "fore.topgallant.yard" not in got["yards"] and "fore.topgallant" not in got["sails"]

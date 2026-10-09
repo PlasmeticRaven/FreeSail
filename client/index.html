@@ -85,10 +85,27 @@
   </section>
 
   <section id="map-panel" class="panel">
-    <div class="panel-head"><span>Map</span><span class="hint">north up; the wheel zooms, a drag pans
-      <button id="btn-map-centre" type="button" title="centre on the ship and follow her">centre</button>
-      <button id="btn-map-fit" type="button" title="the whole track and the ship, as at first">fit</button></span></div>
-    <canvas id="map"></canvas>
+    <div class="panel-head"><span>Map</span><span class="hint">
+      <button id="btn-map-centre" type="button" title="centre on the ship and follow her (the wheel zooms, a drag pans)">centre</button>
+      <button id="btn-map-fit" type="button" title="the whole track and the ship, as at first">fit</button>
+      <!-- package 37n: the chart's tools; the keys work while the chart has the focus -->
+      <button id="btn-map-rose" type="button" title="the protractor rose: drag its centre, turn its rim (r)">rose</button>
+      <button id="btn-map-line" type="button" data-tool="line" title="lay a line between two clicks (l)">line</button>
+      <button id="btn-map-ring" type="button" data-tool="ring" title="lay a ring about a point (o)">ring</button>
+      <button id="btn-map-note" type="button" data-tool="note" title="write a note at a point (n)">note</button>
+      <button id="btn-map-marks" type="button" title="the lines, rings and notes laid down (m)">marks</button></span></div>
+    <div class="map-wrap">
+      <canvas id="map" tabindex="0" aria-label="the captain's chart"></canvas>
+      <!-- the player's pencil, listed (package 37n): kept with the game, read by nothing but the chart -->
+      <div id="marks-pane" class="marks-pane" hidden>
+        <div class="marks-inputs">
+          <label>note <input id="mark-note-text" type="text" maxlength="200" placeholder="the words of the next note"></label>
+          <label>ring <input id="mark-ring-nm" type="number" min="0" step="0.1" placeholder="miles, or click"></label>
+        </div>
+        <ul id="marks-list" class="marks-list"></ul>
+        <div class="marks-foot"><button id="btn-marks-clear" type="button">remove all</button></div>
+      </div>
+    </div>
   </section>
 </main>
 
