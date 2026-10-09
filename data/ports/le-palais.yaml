@@ -1,0 +1,106 @@
+# FreeSail: Palais on Belle Isle as a port (spec M6 §26; package 39b, the Biscay north
+# block), on package 35's machinery; the marks are the features file's.
+#
+# Sources. Faden 1793, Le Petit Neptune Français, 'Belle Isle, or Bellisle', p. 72: "very
+# high and steep almost all round. On the north side, about half way the island, is
+# situated the town and harbour of Palais, which is the most frequented ... There are a
+# number of roads for ships at this island, the most frequented of which are those on the
+# northern side, under the castle, and a league to the east of it ... The anchorage is in
+# 8, 10, or 15 fathoms water, according to the distance from the shore. A little to the
+# east of the castle, and half a league from the shore, lies a rock under water, named
+# Basse-Palais, on which are 4 1/2 fathoms at low water"; Sauzon "seldom visited, though
+# it is much better than the former". The harbour itself is a tide harbour (judgement
+# from the RAM's figures and the modern chart: it dries in part at low water springs).
+#
+# The datum: UNVERIFIED. No period sheet is patched at Palais in this package (Bellin
+# 1764, Petit Atlas Maritime t. V, 'Carte de l'isle de Belle Isle', Rumsey 6903.558, not
+# transcribed); the chart's depths are EMODnet's at LAT, and the period's low water of
+# springs stands 0.80 m above it at Le Palais (SHOM's RAM, BMVE, read 2026-10-09).
+#
+# The stance: French, hostile to a King's ship, open to a neutral (data/nations.yaml).
+# Prices FROM MEMORY or JUDGEMENT; sterling at the exchange.
+
+id: le-palais
+name: Palais
+nation: france
+source: "Faden 1793 p. 72 (Belle Isle); SHOM's RAM for the harbour's position"
+datum: unverified
+
+outer_road:
+  feature: palais-road
+  name: the road under the castle of Palais
+  lat_deg: 47.3570
+  lon_deg: -3.1420
+anchorage:
+  feature: palais-road
+  name: the road under the castle of Palais
+  lat_deg: 47.3570
+  lon_deg: -3.1420
+mooring:
+  name: the harbour of Palais
+  lat_deg: 47.3480
+  lon_deg: -3.1520       # the harbour under the citadel (SHOM's RAM station 'Le Palais')
+  depth_fathoms: 1       # judgement: a tide harbour for coasters
+  bottom: mud
+  deep_draught_ft: 9     # judgement: a deeper ship lies in the road
+shore:
+  feature: le-palais
+  name: the quay at Palais
+  lat_deg: 47.3478
+  lon_deg: -3.1530
+
+pilot:
+  station: palais-road
+  cruising_nm: 4                 # judgement: the island's pilots met ships off the road
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Palais pilots' boat
+    under: a lugsail and oars
+    note: "judgement"
+  names: [Le Gall, Le Corre, Thomas, Le Bayon, Guégan, Le Tallec, Le Gouic]   # judgement
+  skill: 0.85
+  fee_pounds: 2                  # judgement, in sterling for the one account; unverified
+  cast: starboard                # from the road the head paying off to the north-east, clear of the Basse Palais (judgement)
+  course_out_deg: 330            # out to the north-west between the island and Quiberon (judgement)
+  words:
+    channel: "The roads are on the north side, under the castle and a league to the east of it. Mind the Basse Palais, a rock under water half a league off the shore a little east of the castle, with four fathoms and a half on it at low water; and half a league north-west of Colts Point the rocks on a level with the water, which are very dangerous."
+    marks: "The castle of Palais on its height over the town, half way along the north side of the island; Colts Point at the north-west end with the great high rock of the Colts off it."
+    anchorage: "Anchor under the castle in eight, ten or fifteen fathoms as you are nearer or farther from the shore. The harbour is for coasters; Sauzon to the north-west is the better harbour, though seldom used."
+    tide: "No hour is in my book for Palais; the hours of Port Louis and of Point Mehan serve, half past four and a quarter before four at full and change."
+
+tide:
+  establishment: Port Louis      # the epitome has no Palais; the nearest of its places with an hour (Faden's)
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 38, origin: france, season: {12: 1.1}, note: "from memory, a little over Brest's"}
+    - {good: brandy, price: 108, origin: france, note: "from memory"}
+    - {good: salt, price: 12, origin: france, note: "from memory"}
+    - {good: pilchards, price: 25, origin: france, season: {7: 0.8, 8: 0.8, 9: 0.8}, note: "the island's sardines (judgement)"}
+    - {good: barley, price: 9, origin: france, note: "the island's corn (judgement)"}
+    - {good: salt beef, price: 72, origin: france, note: "from memory"}
+    - {good: canvas, price: 44, origin: france, note: "from memory"}
+    - {good: timber, price: 7, origin: france, note: "brought over from the main (judgement)"}
+    - {good: coal, price: 7, origin: britain, note: "from memory"}
+    - {good: hemp, price: 58, origin: null, note: "from memory"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 12, pounds: 46, note: "a spar from the town's shipwrights (judgement)"}
+    - {item: yard, hours: 8, pounds: 28}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.06}
+    - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.07}
+
+crew_pool:
+  able: {hands: 2, pounds: 2, delay_h: 24}
+  ordinary: {hands: 3, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 5, pounds: 1, delay_h: 12}
+
+closed_to: []

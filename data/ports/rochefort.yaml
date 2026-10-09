@@ -1,0 +1,123 @@
+# FreeSail: Rochefort, with the Basque Road and the road of Aix, as a port (spec M6 §26;
+# package 39b, the Biscay north block), on package 35's machinery; the marks are the
+# features file's and the road of Aix is the period patch
+# data/charts/overrides/biscay-north/aix-basque-roads.yaml.
+#
+# Sources. Faden 1793, Le Petit Neptune Français, 'Isle d'Aix, and River of Charente',
+# 'Brouage' and the English officer's directions, pp. 81 to 84: "When you go from La
+# Rochelle to the river of Charente ... you take a pilot at La Rochelle"; the Isle of Aix
+# "a flat island, on which are a number of small houses, with an old church of stone. You
+# steer 3 or 4 cables length wide of this isle"; between Aix and Oleron "a great bank,
+# partly dry at every tide, and 2 leagues in length"; the channel between it and Aix "a
+# good half league in breadth, and is that which all ships take"; "if the ship be bound
+# for Charente, you range along the whole length of the isle on the eastern side,
+# steering eastward till you arrive at the opening of the river Charente, and anchor
+# between the isle and the river, in expectation of a pilot; for the Charente is never
+# entered without a pilot"; the Palles at the river's southern point, "therefore it is
+# best to anchor near the isle in 7 or 8 fathoms water"; the English officer's leading
+# mark, Fort Madam open of the island's south-west point; the tides at Brouage at four
+# o'clock and the currents very strong. Bellin 1764, Petit Atlas Maritime t. V no. 85,
+# 'Carte de l'entrée de la Charente et environs de Rochefort' (Rumsey 6903.572): the
+# road's soundings, the Charente's winding course to Rochefort, Fouras, Isle Madame and
+# the Passe aux Boeufs.
+#
+# The datum: the road of Aix is patched from Bellin's sheet (the override states its
+# datum, low water of spring tides, and SHOM's RAM's BMVE at the Île d'Aix, 1.00 m above
+# the chart's datum, VERIFIED, read 2026-10-09); the river to Rochefort is the modern
+# grid's.
+#
+# The stance. Rochefort is the King of France's arsenal on the Biscay coast and the
+# squadron's port (the naval cruise's "the enemy is reported out of Rochefort"): hostile
+# to a King's ship by the nations table, open to a neutral, whose pilot comes off in the
+# road of Aix as Faden says. Prices FROM MEMORY or JUDGEMENT; sterling at the exchange.
+
+id: rochefort
+name: Rochefort
+nation: france
+source: "Faden 1793 pp. 81-84 (the Isle of Aix, the Charente, Brouage, the English officer's directions); Bellin 1764, Petit Atlas Maritime t. V no. 85"
+datum: "the road of Aix: low water of spring tides (Bellin's sheet, no legend), 1.00 m above the chart's datum (SHOM's RAM, Île d'Aix); the river the modern grid's"
+
+# The outer road is the Basque Road, where a ship from the sea brings up; the anchorage
+# the road of Aix between the isle and the river, where she waits for the pilot of the
+# Charente; the mooring the river at Rochefort, five leagues up, for a ship the pilot
+# takes up.
+outer_road:
+  feature: basque-road
+  name: the Basque Road
+  lat_deg: 46.0450
+  lon_deg: -1.2600
+anchorage:
+  feature: aix-road
+  name: the road of Aix
+  lat_deg: 46.0014
+  lon_deg: -1.1518
+mooring:
+  name: the Charente at Rochefort
+  lat_deg: 45.9420
+  lon_deg: -0.9560       # the river under the arsenal (judgement)
+  depth_fathoms: 3       # judgement: the King's ships came up lightened
+  bottom: mud
+  deep_draught_ft: 18    # judgement: a deeper ship lies in the road of Aix
+shore:
+  feature: rochefort
+  name: the quay of the arsenal at Rochefort
+  lat_deg: 45.9370
+  lon_deg: -0.9600
+
+pilot:
+  station: aix-road
+  cruising_nm: 6                 # judgement: the river's pilots met ships between the Basque Road and the road of Aix
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the pilots' boat of the Charente
+    under: a lugsail and oars
+    note: "judgement"
+  names: [Moreau, Brochard, Pineau, Arnaud, Mesnard, Baudry, Rousseau, Mercier]   # names of Saintonge: judgement
+  skill: 0.9
+  fee_pounds: 4                  # judgement, in sterling for the one account; unverified
+  cast: larboard                 # from the road of Aix the head paying off to the westward for the Basque Road (judgement)
+  course_out_deg: 300            # out between Aix and the Boyart, then for the Pertuis d'Antioche
+  words:
+    channel: "From the Basque Road come in between the Isle of Aix and the Boyart, a good half league wide, which all ships take; steer three or four cables wide of the isle. Do not pass north of Aix for the rocks at the point of Fouras. Bring Fort Madam open with the south-west point of the island, a handspike's length, and you have seven or eight fathoms clear of the shoals."
+    marks: "The Isle of Aix, flat, with its small houses and old stone church; Fort Madam on the Isle Madame at the river's mouth; the castle of Fouras on its point; the Boyart dry in part at every tide."
+    anchorage: "Range along the isle on its eastern side and anchor near it in seven or eight fathoms, between the isle and the river; not near the river, for the Palles run a great way off its southern point. The Charente is never entered without a pilot."
+    tide: "It is high water about four o'clock at full and change, and the tide rises fifteen feet; the currents are very strong at Brouage and in the river. Take the Charente on the flood."
+
+tide:
+  establishment: Brouage
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: brandy, price: 90, origin: france, note: "Cognac brought down the Charente to Tonnay-Charente and Rochefort (judgement: cheapest here)"}
+    - {good: salt, price: 9, origin: france, note: "the salt of Brouage and Marennes at the source; from memory"}
+    - {good: wine, price: 31, origin: france, season: {12: 1.1}, note: "from memory"}
+    - {good: hemp, price: 52, origin: france, note: "for the arsenal's ropery (judgement)"}
+    - {good: timber, price: 5, origin: france, note: "the arsenal's oak (judgement)"}
+    - {good: canvas, price: 41, origin: france, note: "from memory"}
+    - {good: coal, price: 6, origin: britain, note: "from memory"}
+    - {good: salt beef, price: 70, origin: france, note: "from memory"}
+    - {good: biscuit, price: 30, origin: france, note: "the victualling of the squadron (judgement)"}
+    - {good: tin, price: 180, origin: britain, note: "from memory, as Brest's"}
+
+dockyard:
+  kind: yard                     # the arsenal of Rochefort: a yard
+  items:
+    - {item: topmast, hours: 8, pounds: 44, note: "the arsenal sells to a neutral at a price: judgement, as Brest's"}
+    - {item: topgallant_mast, hours: 4, pounds: 14}
+    - {item: yard, hours: 6, pounds: 27}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 22}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.045, note: "the Corderie of Rochefort (judgement)"}
+    - {item: water, hours_per_ton: 0.1, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  able: {hands: 4, pounds: 2, delay_h: 24}
+  ordinary: {hands: 8, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 16, pounds: 1, delay_h: 12}
+
+closed_to: []

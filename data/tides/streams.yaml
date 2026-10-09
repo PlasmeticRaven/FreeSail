@@ -79,7 +79,11 @@
 # package 34's and 37e's, unmoved; the open Channel's bounds hold every position of the
 # Channel's region with a margin, so no recorded passage reads anything new.
 
-book_limits: {south: 48.0, north: 51.0, west: -7.0, east: -3.0}
+# Package 39b: the directions' waters reach Biscay north (45.9 to 48 N, 5 to 0.9 W) with
+# the block's areas above; one box, so the limits are the Channel's and the block's
+# together (south and east widened, from 48.0 and -3.0). Within the box and no area of
+# the block's the statement is the open Channel's, as the world's stream is.
+book_limits: {south: 45.9, north: 51.0, west: -7.0, east: -0.9}
 
 areas:
   - id: carrick-road
@@ -258,6 +262,25 @@ areas:
       strongest_h: -3.0
       judgement: [set, rates, hour]
       source: "JUDGEMENT throughout, by the owner's ruling of 2026-10-07 (no period source for the Goulet's timing): the flood setting in to the nearest point, the spring rate to the half knot, the neaps at half of it, the flood from low water to high"
+  # Package 39b (the Biscay north block): the Raz de Sein, before the Iroise whose
+  # polygon holds it. The block's area by the brief, `chart: atlantic-east` (the water is
+  # channel-west's region, the statement the block's).
+  - id: raz-de-sein
+    chart: atlantic-east
+    name: the Raz de Sein
+    polygon: [[48.015, -4.800], [48.015, -4.745], [48.075, -4.745], [48.075, -4.800]]
+    axis_deg: 0
+    spring_kn: 6.0
+    neap_kn: 3.0
+    phase_h: -2.5
+    source: "Faden 1793, p. 60: in the Raz the tides are very strong, the flood bearing to the north and the ebb to the south; the encyclopaedia's 'Phare de la Vieille' (read 2026-10-09): the current very violent, up to six knots at springs, the guides advising to wait for the turn; the neaps at half the springs and the timing JUDGEMENT, the Four's and the Fromveur's (no open source for the Raz's hour against high water at Brest)"
+    book:
+      set: N
+      spring_kn: 6.0
+      neap_kn: 3.0
+      strongest_h: -2.5
+      judgement: [set, rates, hour]
+      source: "the set is the world's axis to the nearest point, which is the period's own word too (Faden 1793, p. 60: the flood bears to the north and the ebb to the south); the rates the world's (the encyclopaedia's six knots at springs) and the hour the world's own unverified figure, JUDGEMENT"
   - id: the-iroise
     chart: channel-west
     name: the Iroise
@@ -274,6 +297,112 @@ areas:
       strongest_h: -2.5
       judgement: [set, rates, hour]
       source: "JUDGEMENT throughout: the world's figures, themselves judgement, rounded"
+  # Package 39b (the Biscay north block, spec M6 §26): the block's waters, each with its
+  # world's figures and the directions' statement in the same form as the Channel's. No
+  # period source in hand gives a RATE for any of them (Faden 1793 says only 'very strong'
+  # and 'very violent'), so every rate is JUDGEMENT, the neaps half the springs, and the
+  # hours JUDGEMENT on the pattern above (a harbour's mouth or an estuary about -3, a
+  # passage between islands about an hour before high water). The polygons keep clear of
+  # the water the recorded passages' other sail use (the open Channel's south of the
+  # Iroise, where the naval cruise's Diamond patrols within eight miles of 48 N 4 55 W and
+  # its Harpy within ten of 47 50 N 6 W), so no recorded passage reads anything new: the
+  # Bay of Audierne west of 4 27 W and north of 47 45 N stays the open Channel's.
+  - id: islands-passages
+    chart: biscay-north
+    name: the passages of Quiberon, Houat and Hedic
+    polygon: [[47.30, -3.08], [47.30, -2.80], [47.48, -2.80], [47.48, -3.08]]
+    axis_deg: 45
+    spring_kn: 2.5
+    neap_kn: 1.25
+    phase_h: -1.0
+    source: "Faden 1793, 'Cardinaux', p. 71: the tides very strong all along these rocks; 'Entrance of the rivers of Vannes and Auray', p. 73: the tides set S W by W and N E by E; the set, the rates and the hour JUDGEMENT (no rate in the period's books; the modern atlases not read)"
+    book:
+      set: NE
+      spring_kn: 2.5
+      neap_kn: 1.25
+      strongest_h: -1.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT throughout but for Faden's word that the tides are very strong along the Cardinals and set north-east and south-west at the rivers' mouth (pp. 71 and 73): the set the world's to the nearest point, the rates to the half knot, the neaps half"
+  - id: loire-mouth
+    chart: biscay-north
+    name: the mouth of the Loire
+    polygon: [[47.20, -2.32], [47.20, -2.00], [47.32, -2.00], [47.32, -2.32]]
+    axis_deg: 70
+    spring_kn: 3.0
+    neap_kn: 1.5
+    phase_h: -3.0
+    source: "Faden 1793, 'The Loire', p. 75: be very wary of its tides, for the currents are very violent; 'Tides and Currents', p. 93: at Nantes the currents very violent; the flood running up from low water to high as an estuary's (Carrick Road's pattern), the rate and the axis JUDGEMENT"
+    book:
+      set: ENE
+      spring_kn: 3.0
+      neap_kn: 1.5
+      strongest_h: -3.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT throughout: Faden's 'very violent' given a rate, the flood setting up the river to the nearest point, from low water to high"
+  - id: pertuis-breton
+    chart: biscay-north
+    name: the Pertuis Breton
+    polygon: [[46.20, -1.60], [46.20, -1.20], [46.33, -1.20], [46.33, -1.60]]
+    axis_deg: 100
+    spring_kn: 2.0
+    neap_kn: 1.0
+    phase_h: -1.5
+    source: "Faden 1793, 'Pertuis Breton', pp. 78 to 79 (no stream given; great ships wait for the tide to pass the bank off St Martin); the axis along the channel, the rate and the hour JUDGEMENT"
+    book:
+      set: E by S
+      spring_kn: 2.0
+      neap_kn: 1.0
+      strongest_h: -1.5
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT throughout: the world's figures, themselves judgement, rounded"
+  - id: pertuis-dantioche
+    chart: biscay-north
+    name: the Pertuis d'Antioche
+    polygon: [[46.00, -1.50], [46.00, -1.25], [46.20, -1.25], [46.20, -1.50]]
+    axis_deg: 100
+    spring_kn: 2.0
+    neap_kn: 1.0
+    phase_h: -1.5
+    source: "Faden 1793, 'Pertuis d'Antioche', p. 81 (no stream given; high tide from half an hour after 3 to 4 o'clock at full and change); the axis along the passage into the Basque Road, the rate and the hour JUDGEMENT"
+    book:
+      set: E by S
+      spring_kn: 2.0
+      neap_kn: 1.0
+      strongest_h: -1.5
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT throughout: the world's figures, themselves judgement, rounded"
+  - id: aix-road
+    chart: biscay-north
+    name: the road of Aix and the mouth of the Charente
+    polygon: [[45.90, -1.25], [45.90, -1.05], [46.10, -1.05], [46.10, -1.25]]
+    axis_deg: 120
+    spring_kn: 1.5
+    neap_kn: 0.75
+    phase_h: -2.0
+    source: "Faden 1793, 'Isle d'Aix', p. 82, and 'Brouage', p. 83: the currents very strong at Brouage; the road between the isle and the Charente where a ship waits for the river's pilot; the axis toward the river, the rate and the hour JUDGEMENT"
+    book:
+      set: SE by E
+      spring_kn: 1.5
+      neap_kn: 0.75
+      strongest_h: -2.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT throughout: the world's figures, themselves judgement, rounded"
+  - id: open-bay
+    chart: biscay-north
+    name: the open Bay of Biscay
+    polygon: [[45.90, -7.00], [45.90, -0.90], [47.95, -0.90], [47.95, -4.45], [47.75, -4.45], [47.75, -5.00], [47.50, -5.00], [47.50, -7.00]]
+    axis_deg: 45
+    spring_kn: 0.5
+    neap_kn: 0.25
+    phase_h: 0.0
+    source: "judgement: the streams of the open bay are weak and turn round the compass (not modelled: the axis is the flood's toward the Channel); Faden 1793, 'Isle d'Yeu', p. 77, and 'Olonne', p. 78: the tides set N E and S W; no rate in the period's books"
+    book:
+      set: NE
+      spring_kn: 0.5
+      neap_kn: 0.25
+      strongest_h: 0.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT throughout but for Faden's 'the tides set N E and S W' off Yeu and Olonne (pp. 77 to 78): the world's figures rounded"
   - id: mid-channel
     chart: channel-west
     name: the open Channel

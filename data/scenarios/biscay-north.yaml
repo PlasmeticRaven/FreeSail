@@ -1,0 +1,82 @@
+# FreeSail: the Biscay north block's passage (spec M6 §26; package 39b). A free passage,
+# not a gate's: the American cutter, a neutral, from the road of Groix, L'Orient's outer
+# road, down the low coast to the south of Quiberon, through the passage of the
+# Teignouse and into the Bay of Quiberon, where she anchors. The block's water on the
+# whole chart (`chart: atlantic-east`), its marks (data/charts/features/biscay-north.yaml),
+# its ports (L'Orient and Palais, on package 35's machinery) and its streams (the
+# islands' passages and the open bay, data/tides/streams.yaml). Given to either driver
+# with --scenario:
+#     py -m freesail.ui.console --scenario data/scenarios/biscay-north.yaml
+# and printed whole by
+#     py tools/day_log.py data/scenarios/biscay-north.yaml --hours 9 --reckoning
+#
+# The passage as the book beside this file sails it (biscay-north.orders): she lies at
+# anchor in the road of Groix (Faden 1793 p. 70: between the isle and the bank, in 10 to
+# 15 fathoms on sand and little pebbles like coral) at seven in the morning of 12 June
+# 1805; brought up, she weighs and stands away east-south-east before a westerly; L'Orient's
+# pilot comes off in his chaloupe and, unanswered, bears away; she shapes a course for a
+# point off the low coast of Quiberon, then for the south-west end of the Teignouse
+# passage and through it north-eastward (Faden's note, p. 71: the passage the British
+# ships found, by which Commodore Duff's squadron left the bay in 1759), and for the Bay
+# of Quiberon, where she comes to an anchor (Faden p. 73: "every where good anchorage in
+# 8, 10, or 12 fathoms"). The weather is pinned, a westerly of twelve knots falling to
+# eight by evening, the wind free on every leg, so that the passage is the same on every
+# machine. Sailed once at seed 7 for the package's notes (docs/dev/TuningNotes.md,
+# package 39b); not a gate's and not pinned.
+#
+# Why not from the road within the citadel of Port Louis, as the brief's "Lorient to
+# Quiberon" first read: the road is cramped (her thirty-six fathoms of cable swing her
+# within a cable of the shore), and getting under way from it on either tack in a
+# westerly set her on the Port Louis shore before she had way (the first runs, in the
+# notes). A book that warps her out, or a pilot taken at the hail, is the next package's.
+
+name: Biscay north, the cutter from L'Orient to the Bay of Quiberon
+seed: 7
+start: 1805-06-12T07:00
+position: {lat_deg: 47.6560, lon_deg: -3.4350}   # the road of Groix, L'Orient's outer road (Faden 1793 p. 70)
+chart: atlantic-east
+nation: united-states
+ship:
+  file: data/ships/cutter.yaml
+  heading_deg: 270
+  glass: true
+  instrument: octant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.9}
+
+papers:
+  chart: {year: 1804}
+  epitome: norie                  # the better table, which has the block's places (data/tides/establishments.yaml)
+  almanac: 1805
+
+cargo:
+  purse_pounds: 500
+
+ports: [lorient, le-palais]
+
+weather:
+  wind:
+    - {at: 1805-06-12T05:00, from_deg: 270, knots: 12, air_mass: neutral}
+    - {at: 1805-06-12T14:00, from_deg: 275, knots: 10}
+    - {at: 1805-06-12T20:00, from_deg: 280, knots: 8}
+  background:
+    {hpa: 1019, gradient_hpa_per_100km: 0.4, high_toward_deg: 250}
+  systems:
+    - name: the high over the Bay
+      kind: high
+      radius_km: 900
+      track:
+        - {at: 1805-06-11T12:00, x_km: -400, y_km: -200, hpa: 1024}
+        - {at: 1805-06-13T12:00, x_km: -300, y_km: -150, hpa: 1023}
+  sky: {sky: clear, weather: fine, visibility: the horizon}
+  sea: true
+
+standing_orders:
+  - data/scenarios/biscay-north.orders
+
+orders:
+  - let go the best bower

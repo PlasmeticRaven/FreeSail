@@ -1,0 +1,25 @@
+# FreeSail: the cutter's book for the Biscay north passage (data/scenarios/biscay-north.yaml;
+# package 39b), L'Orient to the Bay of Quiberon. Short, as the brief has it: the points of
+# the passage by the account, the sails trimmed, the land's bearings, the anchor.
+
+# Brought up in the road of Groix, L'Orient's outer road, she weighs and stands away to the
+# east-south-east before the westerly for a point off the low coast of Quiberon.
+standing order "out of the road": at brought up, if the distance to 47 39.36 N 3 26.1 W is under 1 mile then get under way on the starboard tack and steer ESE
+standing order "away": at under way, if the distance to 47 39.36 N 3 26.1 W is under 2 miles then set plain sail; shape a course for 47 36 N 3 15 W
+
+# Down the low coast of Quiberon and through the Teignouse passage into the bay.
+standing order "off the coast": when the distance to 47 36 N 3 15 W is under 1 mile then shape a course for 47 27 N 3 8.4 W
+standing order "off Quiberon": when the distance to 47 27 N 3 8.4 W is under 1 mile then shape a course for 47 25.5 N 3 4.8 W
+standing order "the Teignouse": when the distance to 47 25.5 N 3 4.8 W is under 0.5 miles then shape a course for 47 27.6 N 3 0.6 W
+standing order "into the bay": when the distance to 47 27.6 N 3 0.6 W is under 0.8 miles then shape a course for the Bay of Quiberon; shorten sail
+# The anchor within a mile and a half of the bay's mark by account: anywhere there is
+# good anchorage (Faden), and her account runs half a mile to a mile wide here, the
+# course for the bay shaped with the passage's flood allowed where the bay's is weaker.
+# At four cables, and at a mile, she passed the mark by account and stood on toward
+# Point Mehan's shoals (the first runs, in the notes).
+standing order "the anchor": when the distance to the Bay of Quiberon is under 1.5 miles then come to an anchor
+
+# The ship's routines on the way.
+standing order "trim to the course": at steady on the course then trim sails
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point then trim sails
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix

@@ -75,6 +75,22 @@ tables:
       - {name: Guernsey, lat_deg: 49.455, lon_deg: -2.537, hw_h: 6, hw_m: 30, spring_rise_ft: 22, rise_judgement: true}
       - {name: Alderney, lat_deg: 49.717, lon_deg: -2.200, hw_h: 6, hw_m: 45, spring_rise_ft: 17, rise_judgement: true}
       - {name: Cherbourg, lat_deg: 49.651, lon_deg: -1.636, hw_h: 7, hw_m: 45, spring_rise_ft: 17}
+      # Package 39b, Biscay north: the hours of Faden 1793 (Le Petit Neptune Français, the
+      # directions pp. 65 to 83 and 'Tides and Currents' pp. 92 to 93), not Whewell's (his
+      # Daussy was not read for these ports); the rises of Faden's table of the tides (the
+      # coast of Poitou, La Rochelle and the roads of Ré 15 feet; the south coast of
+      # Bretagne 18 feet, the OCR's '«8', taken by the world's figure as judgement). A
+      # moon's bearing is turned to the hour as Moore's table has it, a point to 45 minutes.
+      - {name: Hodierne, lat_deg: 48.022, lon_deg: -4.538, hw_h: 4, hw_m: 0, spring_rise_ft: 18, rise_judgement: true, note: "Faden p. 65: at the foot of the cliffs high water at 4 o'clock, or a little less"}
+      - {name: the Penmarks, lat_deg: 47.798, lon_deg: -4.373, hw_h: 3, hw_m: 45, spring_rise_ft: 17, rise_judgement: true, note: "Faden pp. 66 and 92: from a fraction after 3 to 4 o'clock (the fraction illegible in the OCR), the mean taken"}
+      - {name: Concarneau, lat_deg: 47.871, lon_deg: -3.918, hw_h: 4, hw_m: 0, spring_rise_ft: 18, rise_judgement: true, note: "Faden p. 66: the tides are at above 4 o'clock"}
+      - {name: Port Louis, lat_deg: 47.708, lon_deg: -3.355, hw_h: 4, hw_m: 30, spring_rise_ft: 18, rise_judgement: true, note: "Faden pp. 68 and 70: high water at 4 o'clock and a half at new and full moon (p. 92 says 4); his rise in spring tides illegible in the OCR"}
+      - {name: Point Mehan, lat_deg: 47.548, lon_deg: -2.913, hw_h: 3, hw_m: 45, spring_rise_ft: 19, rise_judgement: true, note: "Faden pp. 73 and 92: at the entrance of the rivers of Vannes and Auray high water at 45 minutes after 3"}
+      - {name: Noirmoustier, lat_deg: 47.004, lon_deg: -2.253, hw_h: 4, hw_m: 0, spring_rise_ft: 18, rise_judgement: true, note: "Faden pp. 76 and 93: at Noirmoustier and the Bay of Bourgneuf high water about 4 o'clock"}
+      - {name: St Gilles, lat_deg: 46.697, lon_deg: -1.943, hw_h: 3, hw_m: 0, spring_rise_ft: 15, note: "Faden p. 77: the moon in the N E and S W makes high water (S W is 3 o'clock); the rise the coast of Poitou's"}
+      - {name: the Isle of Ré, lat_deg: 46.204, lon_deg: -1.367, hw_h: 3, hw_m: 45, spring_rise_ft: 15, note: "Faden pp. 81 and 93: in the Pertuis d'Antioche high tide from half an hour after 3 to 4 o'clock; the tide rises 15 feet in the roads of Ré"}
+      - {name: La Rochelle, lat_deg: 46.159, lon_deg: -1.152, hw_h: 3, hw_m: 45, spring_rise_ft: 15, note: "Faden p. 81: the tides from half an hour after 3 to 4 o'clock at new and full moon; the tide rises 15 feet at La Rochelle"}
+      - {name: Brouage, lat_deg: 45.862, lon_deg: -1.068, hw_h: 4, hw_m: 0, spring_rise_ft: 15, note: "Faden pp. 83 and 93: at Brouage high water at 4 o'clock and the currents very strong; the rise the coast of Poitou's, which his table holds Brouage in"}
   moore:
     title: "Moore's table of high water by the moon's bearing (Moore 1799), a point to every three quarters of an hour"
     ports:
