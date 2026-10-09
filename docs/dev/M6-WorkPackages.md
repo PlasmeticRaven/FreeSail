@@ -17,7 +17,7 @@ tuning notes and a report to the lead at the end.
 |---|---|---|---|
 | 38 | Fable | The chart stitched: many regions over the corridor, the queries across edges, the climatology's boxes, the tide's gauges, the recipe form for the blocks | launched 2026-10-09 |
 | 39a to 39f | Opus | The six blocks of the voyage to Madeira and the Strait | after 38 |
-| 40 | Fable | The ship's company and the rules-based captain in three layers; the captain's station; the officer's reckoning | brief to write |
+| 40 | Fable | The ship's company and the rules-based captain in three layers; the captain's station; the officer's reckoning | preliminary brief, 2026-10-09, for the owner |
 | 40b | Opus | The lessons in the primer | brief to write |
 | 41 | Fable | The wardroom: several doors, the pace rule, the deck's conversation, the master's and the lookout's stations, the stand-by on several conditions | brief to write |
 | 42 | Opus | The API door and its security pass; the transcript-driven replay; the consent brief revised once | brief to write |
@@ -94,3 +94,119 @@ Tests for each; the whole suite's passages unchanged to the digest. Where the co
 build cannot be fetched from this machine, say so and leave the recipe and its tests on
 a small synthetic corridor, the fetch for the lead or the owner to run; do not commit a
 corridor that was not built from the source named in the manifest.
+
+## Package 40: the ship's company, the rules-based captain in three layers, the captain's station (`freesail/world/people.py` and `data/people/<ship>.yaml` new for the wardroom as people with stations; `tools/gen_ships.py` for the complement's officers drawn into the ship file; `freesail/world/captains.py` new for intent, plan and behaviour; `data/captains/<role>.yaml` new for the doctrine; `freesail/standing/runtime.py` for a book loaded and unloaded by a state; `freesail/world/scenarios.py` for `intent:` beside `standing_orders:`; `freesail/world/ships.py` for the state machine's far-detail body as an interface (filled by 43); `freesail/orders/navigation.py` only for the planner's use of `shape a course for` and the beating rule; `freesail/orders/stations.py`, `freesail/agents/agent.py`, `tools.py`, `harness.py`, `remote.py`, `mcp_server.py`, `local.py`, `repl.py` for the captain's station and the player's seat; `freesail/agents/fake.py` for the fake captain; `freesail/world/reckoning.py` and `freesail/agents/tools.py` for the officer's reckoning; `freesail/api/readings.py` for `the captain`, `the people`, `the officer's reckoning`; `freesail/ui/console.py` and `ui/server.py` for the player's seat; `docs/agents/Harness.md` a section, `docs/agents/README.md` where the stations are listed; `docs/primer/16-the-officer-of-the-watch.md` and a new `17-the-captain.md`; `docs/TechnicalSpec-M6.md` §2 to §8 as built; `docs/dev/TuningNotes.md`; `tests/test_people.py`, `test_captains.py` new, `test_standing.py`, `test_scenarios.py`, `test_officer.py`, `test_captain.py` new, `test_agents.py`, `test_reckoning.py`, `test_known_truths.py` truths 77 to 81 and the passages re-measured only where the people's lines move them)
+
+**Preliminary brief, 2026-10-09, for the owner's reading.** Spec M6 §1 to §9 whole, with
+decisions 39 and 40; the proposal's §3.5 (station holders and their outlines), §7.1 (the
+roles as authority levels) and §7.4; M4 §11 (the harness's contract) and M5 §22 (people
+as data and a line) and §29 (the officer's station as it stands); the review's G19 (the
+officer's own reckoning, the wardroom); Luce 1884 and the Regulations of 1808 on the
+duties of the captain, the lieutenants and the master
+(`docs/references/admiralty/`, `docs/references/luce/`). On Fable: the three layers are
+design, and the captain's station is the first with the player's whole surface. Built on
+38 and 37m as they land; launched on the owner's word.
+
+What to build:
+
+1. **The ship's company as people.** Each of the four ships (and the two to come, 43b)
+   gains its wardroom in `data/people/<ship>.yaml`: the captain (the master in trade),
+   the lieutenants (three on the frigate, one on the brig-sloop), the master and his mates,
+   the boatswain, the gunner, the carpenter, the purser and the surgeon on the frigate; the
+   mate on the small vessels. Each a person as M5 §22 has it, with a rank, a station, a
+   place aboard, a state (on deck, below, asleep, at a task, sick), a skill as M3 has it,
+   and a short outline (a few traits, a line of history, a station brief) as data; the
+   names drawn from the period's lists under the seed, a scenario free to name any. The
+   generator draws the complement's officers into the ship file so that the muster and the
+   people agree. The harness's stations bind to a person by data (`station: first
+   lieutenant`), the officer of the watch to the first lieutenant or the mate as now, and
+   the binding is read, never a name in code. `the people` lists them with places and
+   states; `send for`, `pass the word for`, `go below`, `come on deck` move them as M5's
+   orders do; a person at a task is occupied until it ends. The crew of M3 stay counts.
+2. **The rules-based captain in three layers** (`captains.py`; spec M6 §4; decision 40).
+   - *Intent*: the goal and its parameters, read from the scenario (`intent: trade tin from
+     Falmouth to Brest`, `intent: keep the station off Ushant between ... and ...`,
+     `intent: carry this letter to ...`, `intent: run home to ...`) or from a world order
+     (`npc <id>: goal ...`, which M5 §26 has), with the port's and the nation's part.
+   - *The plan*: legs derived at sea from the intent over the chart: the port's pilot
+     station, the common tracks the features file names, the headlands cleared with an
+     offing, the dangers on a shaped course; each leg shaped with `shape a course for`; a
+     course the wind will not allow beaten by a rule (stand on the tack that makes the most
+     good, go about when the other tack makes better or when the offing closes, as a
+     standing order the captain writes for the leg); the plan worked again on an event (the
+     wind shifted past a point, a danger ahead, the glass falling, a stranger). Written as
+     orders and standing orders the captain gives, so the log reads as a captain's.
+   - *Behaviour*: a state machine whose states are books in the dialect, loaded on entering
+     and unloaded on leaving (the runtime gains a book's name and a load and unload by
+     name): on passage, beating, hove to for weather, running for shelter, at anchor, in
+     port, investigating a stranger, chasing, evading, keeping station, in distress, and
+     engaging, present and empty until M7. A transition is an event the ship perceives
+     (the lookout's, the glass's, the depth's, a signal's), judged by the doctrine.
+   - *Doctrine as data*: `data/captains/<role>.yaml` for the King's ship on station, the
+     merchant, the packet, the convoy's commodore (the fisherman is 43b's): the stimulus
+     against the role giving the transition and its thresholds, with the source or
+     "judgement" beside each figure, in the form the port files use.
+   - *Perception on the player's terms*: a captain sees through the lookout and reads the
+     glass and the sky as readings; nothing in `captains.py` reads the world's truth, and a
+     test proves it as 37j's does for the readings.
+   - *The rule of the road as 1805 had it*, at near detail: the ship close-hauled on the
+     starboard tack stands on, the larboard-tack ship gives way, a ship running keeps
+     clear of one by the wind; a reflex at a few cables, said in the log.
+   - *The far-detail body as an interface*: the state machine's states resolve into a
+     far-detail plan (hove to is no way; beating the made-good speed; investigating a plan
+     toward the stranger); 40 writes the interface and resolves two states (on passage,
+     hove to) on the far-detail vessels of the recorded passages without moving a pin; 43
+     fills the rest with the crewed promotion.
+   - *The floor*: the captain holds the player's ship when the player and every model are
+     absent and the scenario gives an intent instead of a book; a scenario with a book is
+     sailed by its book as now, so the recorded passages do not move. A new test scenario
+     with an intent and no book, the schooner trading tin Falmouth to Brest, comes through
+     to the sale under the captain alone, and is pinned (truth 77 as amended below).
+3. **The captain's station** (spec M6 §3): the third station, with the player's whole
+   surface (every reading, every order at every level, the standing orders as his book,
+   the port's business, the people, the papers, the deck to give and take); its brief says
+   the voyage, the ship, the people, the book he inherits, and the contract as the
+   officer's (the token, the three ways of leaving, the journal, the turn's budget, the
+   conflict-rule detector over his own orders, the stand-by naming an event or a bell
+   while his book holds the deck); his door silent past the station's patience, the deck
+   passes to his book and the rules-based captain's judgements stand in, said in the log,
+   as the officer's does. `--station captain` at every door; the fake captain in `fake.py`
+   proving each commitment of `docs/agents/README.md` at this station. **The owner's place
+   and the player's seat** (decision 39, ruling 1): the owner is always at the door with
+   the stop, the grants, the save and the clock, and his words reach a station as the
+   owner's; the console and the browser can seat the player at a named station below the
+   captain's with that station's authority (the authority filter the officer's station
+   has, applied to the player's orders; the primer his brief), so that he may hold a lesser
+   role under a model captain; the captain's station gives `you may` to the officer's as
+   the player does now.
+4. **The officer's own reckoning** (spec M6 §5; G19): `work my reckoning` gives the
+   officer the master's slate (the courses and distances since the last fix, the set
+   allowed, the sights) and takes his own position back, shown beside the master's at noon
+   in the log and moving nothing; the captain may adopt it with `set the reckoning to`.
+5. **Orders and readings**: `the captain` (who holds the station, the book's name, the
+   deck); `the people` extended; `stand down the captain`; `you may` from the captain's
+   station; `work my reckoning` and `the officer's reckoning`; the captain's station brief
+   head (M4 §11) saying the voyage.
+6. **The consent brief's revision, drafted and held.** The captain's station is a kind of
+   thing the brief does not describe (decision 37): the package drafts the revised brief
+   as `docs/playtests/drafts/consent-brief-m6-draft.md` with the sections that change
+   marked, and the station briefs that go with it, for the owner's approval; it does not
+   change `docs/agents/ConsentBrief.md`, which 42 revises once with 41's changes, and no
+   model is seated at the captain's station before the re-asks.
+7. **Truths** (spec M6 §8, numbered on from 76): 77 the merchant passage and the naval
+   cruise under their books with no model seated replay to their digests; 78 a fake
+   captain commands the merchant passage by its book and six direct orders, the log the
+   same with his six orders under his mark; 79 a silent captain's door passes the deck to
+   his book within the station's patience and the book brings her to the anchor; 80 an
+   officer's reckoning from the slate agrees with the master's within the master's doubt
+   and the log shows both at noon; 81 no reading at the captain's station gives the truth
+   by any road; and the new scenario of item 2, the schooner trading on an intent alone,
+   pinned.
+
+What 40 does not do: the crewed promotion and a model captain of another ship (43); the
+fisherman's doctrine, the lugger and the smack (43b); the master's and the lookout's
+stations, the deck's conversation, the pace rule (41); the API door and the brief revised
+in the repository (42); the lessons (40b); engaging (M7). Tests for each item on the fake
+world and the fake doors; the passages re-measured only where the people's lines move
+them, with the reasons.
+
