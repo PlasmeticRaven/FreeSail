@@ -1,0 +1,82 @@
+# The road of St Malo, the Rance's mouth under the city, as the 1760s had it (spec M6 §26,
+# block 1; package 39a). A period patch, hand-made and rasterised by tools/build_charts.py
+# at levels 2 and 3 (the harbour patch `st-malo` in the tool's recipe).
+#
+# The sheet. Bellin, 'St Malo et environs', Petit Atlas Maritime (Paris, 1764), t. V no. 44:
+# David Rumsey Map Collection 6903.531 (on the Internet Archive as
+# dr_st-malo-et-environs-6903531), read 2026-10-09 at full resolution (11,273 by 6,951
+# pixels) through the collection's IIIF server; the image is the collection's (CC BY-NC-SA)
+# and is not committed: the facts below are transcribed from it. The sheet is engraved
+# north up; its scale is 'Echelle de quatre cent toises'; it has no legend for its
+# soundings, which are read as brasses (the Dépôt's brasse of five feet, BRASSE_M in the
+# tool, the study's unverified 1.624 m) at low water of spring tides (the Dépôt's practice;
+# unverified for Bellin's own sheets, as package 35b found at Roscoff).
+#
+# The georeference: a similarity fitted by least squares to the five control points below
+# (the sheet's pixel to the modern frame, tools' scratch script outside the repository),
+# 0.995 metres a pixel and the sheet turned 4.9 degrees; the residuals 71 to 102 metres,
+# the size of the channel's core. The sheet's own scale bar measures 0.85 metres a pixel
+# against the fit's 0.995: Bellin's drawing and his bar disagree by a sixth, and the fit is
+# the one the positions use.
+#
+# What the sheet gives and the modern grid does not: the deep water of the road and of the
+# river's mouth below Dinard a metre to four deeper than EMODnet's survey has it (the
+# Rance's barrage of 1966 has silted its mouth since; judgement). So: the channel's core is
+# patched at the sheet's depths in three pieces where the grid's channel and the sheet's
+# soundings agree in place (the road at 4 1/2, the mouth off the Pierre de Rance at 7, the
+# reach toward Solidor at 6); the soundings on the banks and in the offing, which the grid
+# matches within a metre or two, are left to it and recorded in the notes. The drying
+# sands (the Talards, the Bas Sablons, the strand under the walls), the town and the
+# islets the grid already has as the sheet draws them.
+
+region: channel-mid
+name: st-malo
+sheet: "Bellin 1764, 'St Malo et environs', Petit Atlas Maritime t. V no. 44 (David Rumsey 6903.531, Internet Archive dr_st-malo-et-environs-6903531), read at full resolution"
+source: "Faden 1793, 'St Malo', pp. 39 to 40: anchor under the city in 6 or 7 fathoms; ships under the town left quite dry on the sand; White 1835, 'Coast of France', p. 86: the best anchorage between the Brutart and the Pierres de Rance and the town, never less than 30 feet"
+units: brasses
+datum: "low water of spring tides (the sheet has no legend for its soundings; read as the Dépôt's low water of spring tides, unverified for Bellin)"
+# Mean low water springs above the modern chart datum (the zéro hydrographique) at
+# Saint-Malo: 1.50 m, SHOM's Références Altimétriques Maritimes (BMVE 1.50, PMVE 12.20) as
+# the tide study quotes them (data/tides/constituents.yaml's head; T §1); read by the study
+# from the RAM's CSV and not by this package.
+datum_above_chart_datum_m: 1.5
+control_points:
+  - {name: "the Petit Bé (the sheet's le Petit Bay)", lat_deg: 48.6525, lon_deg: -2.038333, note: "the fort on the islet, the encyclopaedia's position (fr.wikipedia 'Petit Bé', read 2026-10-09); residual 74 m"}
+  - {name: "the Grand Bé (the sheet's le Grand Bay)", lat_deg: 48.652222, lon_deg: -2.033333, note: "the battery on the islet, the encyclopaedia's position ('Grand Bé'); residual 102 m"}
+  - {name: "the tower of Solidor", lat_deg: 48.634, lon_deg: -2.0261, note: "the encyclopaedia's 'Tour Solidor' (built 1369 to 1382, unmoved); residual 77 m"}
+  - {name: "the cathedral of St Malo (the cruciform church within the walls)", lat_deg: 48.64949, lon_deg: -2.025648, note: "the encyclopaedia's 'Cathédrale Saint-Vincent de Saint-Malo'; residual 71 m"}
+  - {name: "the Isle Harbour (the sheet's l'Isle Erbou)", lat_deg: 48.6528, lon_deg: -2.06944, note: "the building on the islet, the encyclopaedia's 'Fort Harbour'; the sheet draws the islet long and narrow on its sands; residual 72 m"}
+patches:
+  - name: "the road of St Malo, four brasses and a half"
+    kind: depth
+    depth: 4.5
+    polygon:
+      - [48.6480, -2.0435]
+      - [48.6480, -2.0400]
+      - [48.6440, -2.0395]
+      - [48.6440, -2.0428]
+    source: "Bellin 1764, the Rade de Ranse: 4 1/2 by its anchor (georeferenced to 48.6459, -2.0402) and 5 north of it (48.6488, -2.0467); Faden 1793, p. 40: anchor under the city in 6 or 7 fathoms"
+    note: "Four brasses and a half at low water springs, 8.8 m below the chart's datum with the 1.5 m correction; the grid 7.8 m at the sounding's place. The polygon is the grid's channel core under the sounding."
+  - name: "the mouth of the Rance off the Pierre de Rance, seven brasses"
+    kind: depth
+    depth: 7
+    polygon:
+      - [48.6430, -2.0445]
+      - [48.6430, -2.0410]
+      - [48.6400, -2.0410]
+      - [48.6400, -2.0445]
+    source: "Bellin 1764, the 7 between the Balise des Pourceaux and the Pierre de Ranse (georeferenced to 48.6415, -2.0406)"
+    note: "Seven brasses, 12.9 m below the chart's datum; the grid 8.5 m at the sounding and 9.4 m on the polygon's mean (the build's note), the river's mouth deeper in 1764 by four metres (the Rance silted since its barrage, judgement). The polygon is the grid's channel core, 50 m west of the sounding's place, within the residuals."
+  - name: "the reach toward Solidor, six brasses"
+    kind: depth
+    depth: 6
+    polygon:
+      - [48.6375, -2.0415]
+      - [48.6375, -2.0375]
+      - [48.6350, -2.0375]
+      - [48.6350, -2.0415]
+    source: "Bellin 1764, the 6 below the Pointe de la Cité (georeferenced to 48.6363, -2.0378)"
+    note: "Six brasses, 11.2 m below the chart's datum; the grid 9.0 m there. The polygon is the grid's channel core about the sounding."
+notes:
+  - "Read from the sheet and not patched (the modern grid's figure beside it): 5 north-west of the road toward the Pourceaux (9.6 m with the correction; the grid 8.5 m); 4 1/2 off the Petit Bé on the bank's edge (8.8; the grid 4.5, the edge within the residuals); 5 by the Pierre de Rance (9.6; the grid 6.0, on the bank's slope); 4 1/2 by le Buron, 5 off l'Isle Erbou, 3 1/2 and 4 1/2 in the offing to the north and north-east (the grid within two metres)."
+  - "Bellin's marks, kept as the features file has them: the Grand and Petit Bé, l'Islet (Fort Royal), the Pierre de Ranse, the Balise des Pourceaux, Solidor, the Pointe de Dinart, the Grand and Petit Talar (the drying sands east of the town), les Pilliers, les Hongreaux, le Hal and the Roche Bonne north-east of the town."
