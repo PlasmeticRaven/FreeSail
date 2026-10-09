@@ -64,8 +64,12 @@ region's, its tide and its weather are rows in tables that already reach its wat
    beside it: a scenario with no `ports:` list (the gate 5b passages) loads every port
    file on the Channel's chart alone, where the block's features are not, and the spot
    falls back to its own position (without it the load is refused and every such
-   passage with it). `test_ports.py` names the port files in a list: the block adds its
-   own.
+   passage with it). The port is entered in the ports' index of `data/nations.yaml`
+   (`ports:`, which `test_nations.py` holds equal to the files), and `test_ports.py`
+   names the port files in a list: the block adds its own to both. Every road, anchorage
+   and mooring has a note of the bottom (an anchorage or a bottom feature with `bottom:`)
+   within three kilometres (`test_tackle_orders.py`), and every book the game ships
+   names places of the whole chart (`test_log_lines.py`).
 6. **The tide**: the block's gauges read from TICON's file (`TICON.txt` in the zip at
    doi.pangaea.de, as package 34 read it, by their coordinates; the form is the
    eleven's: the record, the mean level above the chart's datum with its source, M2, S2

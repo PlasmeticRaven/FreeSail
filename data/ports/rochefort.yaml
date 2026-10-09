@@ -57,7 +57,6 @@ mooring:
   name: the Charente below Soubise
   lat_deg: 45.9479       # the highest reach of the river the chart holds as water: above it to
   lon_deg: -0.9995       # Rochefort the river is narrower than the modern grid's cell (the finding)
-  depth_fathoms: 2       # judgement: the river's channel at low water, which the grid has at 1.2 m
   bottom: mud
   deep_draught_ft: 12    # judgement: a deeper ship lies in the road of Aix, as the King's ships did
 shore:

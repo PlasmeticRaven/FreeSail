@@ -40,7 +40,6 @@ mooring:
   name: the harbour of Palais
   lat_deg: 47.3480
   lon_deg: -3.1520       # the harbour under the citadel (SHOM's RAM station 'Le Palais')
-  depth_fathoms: 1       # judgement: a tide harbour for coasters
   bottom: mud
   deep_draught_ft: 9     # judgement: a deeper ship lies in the road
 shore:

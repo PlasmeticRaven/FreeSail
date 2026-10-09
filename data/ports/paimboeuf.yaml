@@ -47,7 +47,6 @@ mooring:
   name: the quay of Paimboeuf
   lat_deg: 47.2905
   lon_deg: -2.0310       # under the town, on the south shore (judgement)
-  depth_fathoms: 2       # judgement
   bottom: mud
   deep_draught_ft: 12    # judgement: a deeper ship lies in the road
 shore:

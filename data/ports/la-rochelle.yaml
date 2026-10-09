@@ -44,7 +44,7 @@ mooring:
   name: the harbour of La Rochelle
   lat_deg: 46.1570
   lon_deg: -1.1530       # within the towers (the encyclopaedia's 'Tour de la Lanterne')
-  depth_fathoms: -0.5    # dries: "dry every tide, both within the Digue and in the harbour" (Faden p. 81); the height judgement
+  # dries: "dry every tide, both within the Digue and in the harbour" (Faden p. 81); no figure for the height is read, and the chart has the ground 2.5 m above the datum there
   bottom: mud
   deep_draught_ft: 10    # judgement: the harbour is for vessels that take the ground; a ship lies in the road
 shore:

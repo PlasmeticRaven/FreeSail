@@ -741,6 +741,30 @@ the figures are in `docs/dev/TuningNotes.md`.
    Paimboeuf, the Pertuis, La Rochelle and Rochefort with the Basque Roads (where the
    cruise's enemy is "reported out of Rochefort"). The Neptune François and Bellin for the
    sheets; the French pilots for the directions. Hostile throughout.
+   **As built (package 39b, 2026-10-09).** `biscay-north`, 45.9 N to 48 N and 5 W to
+   0.9 W (the south and the east lowered a tenth so that Rochefort lies within, the tiles
+   the same), abutting `channel-west` at 48 N: 55 level-2 tiles and 37 level-3 in six
+   harbour groups, 12.0 MB with its coast and features, committed; the five tiles that
+   straddle 48 N are the Channel's (the seam rule, `tiles_listed_elsewhere`, printed by
+   `--check`: "tiles another region lists: 5 kept") and no file the Channel lists
+   changed. 100 marks from Faden 1793 (the Penmarks to the Pertuis and Rochefort), the
+   lights of 1805 the Baleines and Chassiron, those of the 1830s dated out; the Raz de
+   Sein's ten marks in `channel-west.yaml`, its bounds' (found by name, not in its index
+   until the Channel's next build). One period patch, the road of Aix from Bellin's
+   sheet of 1764 (five brasses where the modern grid has silted to under three metres,
+   the datum the RAM's 1.00 m); five port files (L'Orient, Palais, Paimboeuf, La
+   Rochelle, Rochefort), French, hostile to a King's ship and open to a neutral. The
+   tide: TICON's nine gauges of the block read and **held** out of the blend (a gauge
+   within the 400 miles' reach moves the Channel's tide: the engine wants a gauge's own
+   water, the lead's decision), so the world's tide over the block is still the eleven's
+   blend, two hours late at Aix; six stream areas (the Raz before the Iroise, the
+   islands' passages, the Loire's mouth, the two Pertuis, the road of Aix, the open bay)
+   with the directions' statements and their limits widened to 45.9 N and 0.9 W; ten
+   places of Faden's in the epitome. The weather: Biscay's box stays PROVISIONAL (no
+   printed table read). The scenario `biscay-north.yaml`: the cutter from the road of
+   Groix to the Bay of Quiberon by the Teignouse, at anchor in ten fathoms and a half
+   at 13:11. The recorded passages replay to their digests. The figures are in
+   `docs/dev/TuningNotes.md`.
 3. **Biscay south and Galicia** (`biscay-south`, about 43°N to 46°N, 9°W to 1°W): the
    Gironde to Bordeaux's river mouth (the river itself is M8's), Santander, Ferrol and
    Corunna, Vigo. Tofiño's *Atlas Marítimo de España* of 1789 (public domain; the scans at
