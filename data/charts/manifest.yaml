@@ -4,7 +4,7 @@
 format: 1
 built: '2026-10-09'
 tool: tools/build_charts.py
-build_hash: b5c83b16c8dfeed3
+build_hash: 7aa9ea5416e1de46
 levels:
   '0':
     cell_sec: 150.0
@@ -36,6 +36,7 @@ charts:
     title: The Channel, Biscay and the Iberian coast to Madeira and the Strait
     regions:
     - channel-west
+    - channel-mid
     corridor: atlantic-corridor
 regions:
   channel-west:
@@ -1120,6 +1121,564 @@ regions:
       tower: 1
       town: 8
       transit: 6
+  channel-mid:
+    title: The Channel east, Lyme Bay to the Needles, the Channel Islands and St Malo
+    bounds:
+      south: 48.5
+      north: 51.0
+      west: -3.0
+      east: -1.0
+    levels:
+    - 2
+    - 3
+    tiles:
+      '2':
+      - name: 173664_-10560
+        south_sec: 173664
+        west_sec: -10560
+        min_depth_m: -10.6
+        bytes: 131547
+      - name: 173664_-9024
+        south_sec: 173664
+        west_sec: -9024
+        min_depth_m: -18.3
+        bytes: 121762
+      - name: 173664_-7488
+        south_sec: 173664
+        west_sec: -7488
+        min_depth_m: -6.7
+        bytes: 110989
+      - name: 173664_-5952
+        south_sec: 173664
+        west_sec: -5952
+        min_depth_m: null
+        bytes: 107634
+      - name: 173664_-4416
+        south_sec: 173664
+        west_sec: -4416
+        min_depth_m: null
+        bytes: 107687
+      - name: 175200_-10560
+        south_sec: 175200
+        west_sec: -10560
+        min_depth_m: -6.1
+        bytes: 197906
+      - name: 175200_-9024
+        south_sec: 175200
+        west_sec: -9024
+        min_depth_m: -11.2
+        bytes: 193641
+      - name: 175200_-7488
+        south_sec: 175200
+        west_sec: -7488
+        min_depth_m: -13.9
+        bytes: 196277
+      - name: 175200_-5952
+        south_sec: 175200
+        west_sec: -5952
+        min_depth_m: -1.9
+        bytes: 124034
+      - name: 175200_-4416
+        south_sec: 175200
+        west_sec: -4416
+        min_depth_m: null
+        bytes: 111950
+      - name: 176736_-10560
+        south_sec: 176736
+        west_sec: -10560
+        min_depth_m: -23.8
+        bytes: 188335
+      - name: 176736_-9024
+        south_sec: 176736
+        west_sec: -9024
+        min_depth_m: -30.7
+        bytes: 195101
+      - name: 176736_-7488
+        south_sec: 176736
+        west_sec: -7488
+        min_depth_m: -21.8
+        bytes: 184509
+      - name: 176736_-5952
+        south_sec: 176736
+        west_sec: -5952
+        min_depth_m: -2.3
+        bytes: 105470
+      - name: 176736_-4416
+        south_sec: 176736
+        west_sec: -4416
+        min_depth_m: -7.1
+        bytes: 126562
+      - name: 178272_-10560
+        south_sec: 178272
+        west_sec: -10560
+        min_depth_m: 0.0
+        bytes: 173635
+      - name: 178272_-9024
+        south_sec: 178272
+        west_sec: -9024
+        min_depth_m: -6.2
+        bytes: 207141
+      - name: 178272_-7488
+        south_sec: 178272
+        west_sec: -7488
+        min_depth_m: -12.8
+        bytes: 201050
+      - name: 178272_-5952
+        south_sec: 178272
+        west_sec: -5952
+        min_depth_m: -8.1
+        bytes: 193225
+      - name: 178272_-4416
+        south_sec: 178272
+        west_sec: -4416
+        min_depth_m: -2.6
+        bytes: 187254
+      - name: 179808_-10560
+        south_sec: 179808
+        west_sec: -10560
+        min_depth_m: 41.4
+        bytes: 126692
+      - name: 179808_-9024
+        south_sec: 179808
+        west_sec: -9024
+        min_depth_m: 47.4
+        bytes: 152903
+      - name: 179808_-7488
+        south_sec: 179808
+        west_sec: -7488
+        min_depth_m: 39.0
+        bytes: 180958
+      - name: 179808_-5952
+        south_sec: 179808
+        west_sec: -5952
+        min_depth_m: 38.5
+        bytes: 208052
+      - name: 179808_-4416
+        south_sec: 179808
+        west_sec: -4416
+        min_depth_m: 26.6
+        bytes: 188610
+      - name: 181344_-10560
+        south_sec: 181344
+        west_sec: -10560
+        min_depth_m: -0.8
+        bytes: 140501
+      - name: 181344_-9024
+        south_sec: 181344
+        west_sec: -9024
+        min_depth_m: -1.8
+        bytes: 169944
+      - name: 181344_-7488
+        south_sec: 181344
+        west_sec: -7488
+        min_depth_m: -1.4
+        bytes: 168532
+      - name: 181344_-5952
+        south_sec: 181344
+        west_sec: -5952
+        min_depth_m: -3.0
+        bytes: 175732
+      - name: 181344_-4416
+        south_sec: 181344
+        west_sec: -4416
+        min_depth_m: -3.0
+        bytes: 183319
+      - name: 182880_-10560
+        south_sec: 182880
+        west_sec: -10560
+        min_depth_m: null
+        bytes: 105785
+      - name: 182880_-9024
+        south_sec: 182880
+        west_sec: -9024
+        min_depth_m: null
+        bytes: 112698
+      - name: 182880_-7488
+        south_sec: 182880
+        west_sec: -7488
+        min_depth_m: null
+        bytes: 110215
+      - name: 182880_-5952
+        south_sec: 182880
+        west_sec: -5952
+        min_depth_m: -2.5
+        bytes: 110602
+      - name: 182880_-4416
+        south_sec: 182880
+        west_sec: -4416
+        min_depth_m: -3.6
+        bytes: 116464
+      '3':
+      - name: 180832_-13120
+        south_sec: 180832
+        west_sec: -13120
+        min_depth_m: 0.0
+        bytes: 75137
+        harbour: dartmouth-torbay
+      - name: 180832_-12864
+        south_sec: 180832
+        west_sec: -12864
+        min_depth_m: 9.3
+        bytes: 93805
+        harbour: dartmouth-torbay
+      - name: 180832_-12608
+        south_sec: 180832
+        west_sec: -12608
+        min_depth_m: 38.4
+        bytes: 71340
+        harbour: dartmouth-torbay
+      - name: 181088_-13120
+        south_sec: 181088
+        west_sec: -13120
+        min_depth_m: 0.0
+        bytes: 64771
+        harbour: dartmouth-torbay
+      - name: 181088_-12864
+        south_sec: 181088
+        west_sec: -12864
+        min_depth_m: 0.0
+        bytes: 85397
+        harbour: dartmouth-torbay
+      - name: 181088_-12608
+        south_sec: 181088
+        west_sec: -12608
+        min_depth_m: 9.7
+        bytes: 76508
+        harbour: dartmouth-torbay
+      - name: 181344_-13120
+        south_sec: 181344
+        west_sec: -13120
+        min_depth_m: 0.0
+        bytes: 52872
+        harbour: dartmouth-torbay
+      - name: 181344_-12864
+        south_sec: 181344
+        west_sec: -12864
+        min_depth_m: -2.9
+        bytes: 66111
+        harbour: dartmouth-torbay
+      - name: 181344_-12608
+        south_sec: 181344
+        west_sec: -12608
+        min_depth_m: -3.2
+        bytes: 79410
+        harbour: dartmouth-torbay
+      - name: 181600_-13120
+        south_sec: 181600
+        west_sec: -13120
+        min_depth_m: null
+        bytes: 50786
+        harbour: dartmouth-torbay
+      - name: 181600_-12864
+        south_sec: 181600
+        west_sec: -12864
+        min_depth_m: -2.1
+        bytes: 63892
+        harbour: dartmouth-torbay
+      - name: 181600_-12608
+        south_sec: 181600
+        west_sec: -12608
+        min_depth_m: 0.0
+        bytes: 67370
+        harbour: dartmouth-torbay
+      - name: 181600_-9024
+        south_sec: 181600
+        west_sec: -9024
+        min_depth_m: 1.3
+        bytes: 98304
+        harbour: portland-weymouth
+      - name: 181600_-8768
+        south_sec: 181600
+        west_sec: -8768
+        min_depth_m: 5.7
+        bytes: 93676
+        harbour: portland-weymouth
+      - name: 181856_-9024
+        south_sec: 181856
+        west_sec: -9024
+        min_depth_m: -1.8
+        bytes: 92742
+        harbour: portland-weymouth
+      - name: 181856_-8768
+        south_sec: 181856
+        west_sec: -8768
+        min_depth_m: -0.1
+        bytes: 90745
+        harbour: portland-weymouth
+      - name: 182112_-9024
+        south_sec: 182112
+        west_sec: -9024
+        min_depth_m: -0.3
+        bytes: 57872
+        harbour: portland-weymouth
+      - name: 182112_-8768
+        south_sec: 182112
+        west_sec: -8768
+        min_depth_m: 0.0
+        bytes: 68478
+        harbour: portland-weymouth
+      - name: 177760_-9536
+        south_sec: 177760
+        west_sec: -9536
+        min_depth_m: -3.0
+        bytes: 81474
+        harbour: guernsey
+      - name: 177760_-9280
+        south_sec: 177760
+        west_sec: -9280
+        min_depth_m: -29.8
+        bytes: 81997
+        harbour: guernsey
+      - name: 177760_-9024
+        south_sec: 177760
+        west_sec: -9024
+        min_depth_m: 0.4
+        bytes: 84245
+        harbour: guernsey
+      - name: 177760_-8768
+        south_sec: 177760
+        west_sec: -8768
+        min_depth_m: -4.1
+        bytes: 103017
+        harbour: guernsey
+      - name: 178016_-9536
+        south_sec: 178016
+        west_sec: -9536
+        min_depth_m: -4.6
+        bytes: 99379
+        harbour: guernsey
+      - name: 178016_-9280
+        south_sec: 178016
+        west_sec: -9280
+        min_depth_m: -5.6
+        bytes: 84726
+        harbour: guernsey
+      - name: 178016_-9024
+        south_sec: 178016
+        west_sec: -9024
+        min_depth_m: -30.7
+        bytes: 134680
+        harbour: guernsey
+      - name: 178016_-8768
+        south_sec: 178016
+        west_sec: -8768
+        min_depth_m: -6.4
+        bytes: 107115
+        harbour: guernsey
+      - name: 176736_-8000
+        south_sec: 176736
+        west_sec: -8000
+        min_depth_m: 0.1
+        bytes: 64529
+        harbour: jersey
+      - name: 176736_-7744
+        south_sec: 176736
+        west_sec: -7744
+        min_depth_m: -1.7
+        bytes: 81199
+        harbour: jersey
+      - name: 176736_-7488
+        south_sec: 176736
+        west_sec: -7488
+        min_depth_m: -2.0
+        bytes: 88067
+        harbour: jersey
+      - name: 176992_-8000
+        south_sec: 176992
+        west_sec: -8000
+        min_depth_m: -11.7
+        bytes: 57453
+        harbour: jersey
+      - name: 176992_-7744
+        south_sec: 176992
+        west_sec: -7744
+        min_depth_m: -5.3
+        bytes: 60301
+        harbour: jersey
+      - name: 176992_-7488
+        south_sec: 176992
+        west_sec: -7488
+        min_depth_m: -21.8
+        bytes: 59403
+        harbour: jersey
+      - name: 178784_-8256
+        south_sec: 178784
+        west_sec: -8256
+        min_depth_m: -7.8
+        bytes: 94182
+        harbour: alderney
+      - name: 178784_-8000
+        south_sec: 178784
+        west_sec: -8000
+        min_depth_m: -4.8
+        bytes: 94998
+        harbour: alderney
+      - name: 178784_-7744
+        south_sec: 178784
+        west_sec: -7744
+        min_depth_m: 4.4
+        bytes: 92271
+        harbour: alderney
+      - name: 179040_-8256
+        south_sec: 179040
+        west_sec: -8256
+        min_depth_m: -0.9
+        bytes: 95711
+        harbour: alderney
+      - name: 179040_-8000
+        south_sec: 179040
+        west_sec: -8000
+        min_depth_m: 0.0
+        bytes: 92265
+        harbour: alderney
+      - name: 179040_-7744
+        south_sec: 179040
+        west_sec: -7744
+        min_depth_m: 10.6
+        bytes: 88270
+        harbour: alderney
+      - name: 174944_-7744
+        south_sec: 174944
+        west_sec: -7744
+        min_depth_m: -1.6
+        bytes: 80337
+        harbour: st-malo
+      - name: 174944_-7488
+        south_sec: 174944
+        west_sec: -7488
+        min_depth_m: -6.7
+        bytes: 87827
+        harbour: st-malo
+      - name: 174944_-7232
+        south_sec: 174944
+        west_sec: -7232
+        min_depth_m: -4.9
+        bytes: 44160
+        harbour: st-malo
+      - name: 175200_-7744
+        south_sec: 175200
+        west_sec: -7744
+        min_depth_m: 0.0
+        bytes: 96096
+        harbour: st-malo
+      - name: 175200_-7488
+        south_sec: 175200
+        west_sec: -7488
+        min_depth_m: 0.0
+        bytes: 107116
+        harbour: st-malo
+      - name: 175200_-7232
+        south_sec: 175200
+        west_sec: -7232
+        min_depth_m: 0.0
+        bytes: 102878
+        harbour: st-malo
+    coast: coast/channel-mid.geojson
+    features: features/channel-mid.yaml
+    index: features/channel-mid.index.json
+    overrides:
+    - file: overrides/channel-mid/dartmouth-torbay.yaml
+      sheet: no period sheet read (Mackenzie's survey of the coast east of Plymouth not reached from this
+        machine); the channel's depths from Imray 1874's directions
+      source: Imray 1874, 'Dartmouth', p. 69; White 1835, 'Coast of England', pp. 39 to 41
+      units: fathoms
+      datum: low water (Imray's 'at low water', taken as low water of spring tides; UNVERIFIED)
+      datum_above_chart_datum_m: 0.8
+      control_points:
+      - name: Dartmouth Castle and St Petrox church
+        lat_deg: 50.3423
+        lon_deg: -3.5637
+        note: the features file's position (the modern chart's, moved 120 m to the grid's land); the patch
+          is drawn on the grid, not georeferenced from a sheet
+      - name: Kingswear Castle
+        lat_deg: 50.3407
+        lon_deg: -3.5615
+        note: the features file's position
+      patches: 2
+    - file: overrides/channel-mid/st-malo.yaml
+      sheet: Bellin 1764, 'St Malo et environs', Petit Atlas Maritime t. V no. 44 (David Rumsey 6903.531,
+        Internet Archive dr_st-malo-et-environs-6903531), read at full resolution
+      source: 'Faden 1793, ''St Malo'', pp. 39 to 40: anchor under the city in 6 or 7 fathoms; ships under
+        the town left quite dry on the sand; White 1835, ''Coast of France'', p. 86: the best anchorage
+        between the Brutart and the Pierres de Rance and the town, never less than 30 feet'
+      units: brasses
+      datum: low water of spring tides (the sheet has no legend for its soundings; read as the Dépôt's
+        low water of spring tides, unverified for Bellin)
+      datum_above_chart_datum_m: 1.5
+      control_points:
+      - name: the Petit Bé (the sheet's le Petit Bay)
+        lat_deg: 48.6525
+        lon_deg: -2.038333
+        note: the fort on the islet, the encyclopaedia's position (fr.wikipedia 'Petit Bé', read 2026-10-09);
+          residual 74 m
+      - name: the Grand Bé (the sheet's le Grand Bay)
+        lat_deg: 48.652222
+        lon_deg: -2.033333
+        note: the battery on the islet, the encyclopaedia's position ('Grand Bé'); residual 102 m
+      - name: the tower of Solidor
+        lat_deg: 48.634
+        lon_deg: -2.0261
+        note: the encyclopaedia's 'Tour Solidor' (built 1369 to 1382, unmoved); residual 77 m
+      - name: the cathedral of St Malo (the cruciform church within the walls)
+        lat_deg: 48.64949
+        lon_deg: -2.025648
+        note: the encyclopaedia's 'Cathédrale Saint-Vincent de Saint-Malo'; residual 71 m
+      - name: the Isle Harbour (the sheet's l'Isle Erbou)
+        lat_deg: 48.6528
+        lon_deg: -2.06944
+        note: the building on the islet, the encyclopaedia's 'Fort Harbour'; the sheet draws the islet
+          long and narrow on its sands; residual 72 m
+      patches: 3
+    harbours:
+      dartmouth-torbay:
+        south: 50.3
+        north: 50.5
+        west: -3.62
+        east: -3.47
+      portland-weymouth:
+        south: 50.5
+        north: 50.64
+        west: -2.5
+        east: -2.38
+      guernsey:
+        south: 49.4
+        north: 49.52
+        west: -2.6
+        east: -2.42
+      jersey:
+        south: 49.15
+        north: 49.23
+        west: -2.22
+        east: -2.05
+      alderney:
+        south: 49.68
+        north: 49.75
+        west: -2.28
+        east: -2.15
+      st-malo:
+        south: 48.6
+        north: 48.7
+        west: -2.12
+        east: -1.98
+    fill_to_chart_datum: true
+    feature_count: 123
+    features_by_kind:
+      anchorage: 15
+      bank: 4
+      beacon: 1
+      castle: 10
+      church: 3
+      drying: 1
+      headland: 21
+      hill: 2
+      island: 10
+      ledge: 10
+      light: 10
+      place: 7
+      rock: 13
+      shoal: 1
+      tower: 3
+      town: 12
 corridors:
   atlantic-corridor:
     title: 'The corridor: the Western Approaches, Biscay and the Iberian coast to Madeira'
@@ -1364,12 +1923,24 @@ sources:
     - level 1 (the Atlantic)
     - the land under level 2
     fetched:
+    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 47.65, ''north'':
+        51.35, ''west'': -7.4, ''east'': -2.4})'
+      retrieved: '2026-09-30'
+      sha256: 159fff2887ab22b07e9c02427c4c605b9ea424b05b90950545f57f5c6e09312b
+      bytes: 4874675
+      file: gebco_2025_s47.65_n51.35_w-7.40_e-2.40_ascii.zip
     - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 31.9, ''north'':
         51.1, ''west'': -20.1, ''east'': -0.9})'
       retrieved: '2026-10-09'
       sha256: 4efbda71e1245d7ea512ec51ea72353c61c785d51ae4eb03cae556c29e77771b
       bytes: 113857796
       file: gebco_2025_s31.90_n51.10_w-20.10_e-0.90_ascii.zip
+    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 48.05, ''north'':
+        51.4, ''west'': -3.8, ''east'': -0.6})'
+      retrieved: '2026-10-09'
+      sha256: 4d15aeff1942d361425c1cd2d395b2ad99d3e89cfc5e2d0bf73d12a3adb1256a
+      bytes: 2702066
+      file: gebco_2025_s48.05_n51.40_w-3.80_e-0.60_ascii.zip
     status: fetched
   emodnet_dtm_2024:
     name: EMODnet Bathymetry DTM 2024
@@ -1394,7 +1965,17 @@ sources:
       sha256: d34011e01e2061bac9bac92d37f14b86007f4a3be4ba565e0cb203fbf69df790
       bytes: 62031996
       file: emodnet_dtm2024_elevation_max_47.75_51.25_-7.30_-2.50.nc
-    status: fetched in an earlier build
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation%5B(48.15):(51.3)%5D%5B(-3.7):(-0.7)%5D
+      retrieved: '2026-10-09'
+      sha256: cb1fd46b19bcb41bcdaa92031a103574973888ccf87400b109b24dbf9ae78fdc
+      bytes: 34912544
+      file: emodnet_dtm2024_elevation_48.15_51.30_-3.70_-0.70.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation_max%5B(48.15):(51.3)%5D%5B(-3.7):(-0.7)%5D
+      retrieved: '2026-10-09'
+      sha256: f10cc85bfed9691ab71db8fce31dd3a7d567c490e307a98dc32599f010325878
+      bytes: 34912184
+      file: emodnet_dtm2024_elevation_max_48.15_51.30_-3.70_-0.70.nc
+    status: fetched
   shom_homonim:
     name: SHOM MNT bathymétrique de façade Atlantique (projet HOMONIM), 100 m
     licence: Licence-Ouverte-2.0

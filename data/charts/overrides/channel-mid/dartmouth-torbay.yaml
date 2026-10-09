@@ -1,0 +1,62 @@
+# The harbour of Dartmouth, the Dart's channel from St Petrox to the town (spec M6 §26,
+# block 1; package 39a). A patch hand-made from the pilots' words, rasterised by
+# tools/build_charts.py at level 3 (the harbour patch `dartmouth-torbay` in the tool's
+# recipe; the level-2 tiles here are channel-west's and are not rebuilt by this block).
+#
+# The sheet. No period sheet was read: Mackenzie's survey of this coast, engraved by Hurd,
+# was not found from this machine (the RMG's collections search answered the keywords
+# with unrelated objects), and Bellin's Petit Atlas has no plan of an English harbour. The
+# depths rest on the pilots, as each patch says: Imray 1874, 'Dartmouth', p. 69 ("the
+# depth in mid-channel at low water decreases gradually from 10 to 5 fathoms in the
+# Range, then increases again to 11 and 12 fathoms just within St Petrox castle, and
+# afterwards shoals in the river to abreast the town, where it varies from 10 to 3 1/2
+# fathoms"), which is the harbour as it was before any work changed it; and White 1835,
+# 'Coast of England', pp. 39 to 41 (keep the western shore aboard and anchor abreast of
+# Kingswear or Dartmouth).
+#
+# Why a patch: EMODnet's grid, at a sixteenth of a minute, smooths the narrow river to two
+# and three metres at the datum, where the pilots have five to twelve fathoms; a ship of
+# any draught grounded at low water in the anchorage the directions give. The patch lays
+# the channel's core, about a hundred metres wide, at the pilot's depths, within the
+# grid's water; the banks and the shores are the grid's.
+
+region: channel-mid
+name: dartmouth-torbay
+sheet: "no period sheet read (Mackenzie's survey of the coast east of Plymouth not reached from this machine); the channel's depths from Imray 1874's directions"
+source: "Imray 1874, 'Dartmouth', p. 69; White 1835, 'Coast of England', pp. 39 to 41"
+units: fathoms
+datum: "low water (Imray's 'at low water', taken as low water of spring tides; UNVERIFIED)"
+# Mean low water springs above the modern chart datum at Dartmouth: UNVERIFIED (no table
+# read). 0.8 m is Devonport's figure as the Plymouth override has it (from memory of the
+# modern tables, unverified there too), the nearest port's in the repository, taken here
+# for want of Dartmouth's own.
+datum_above_chart_datum_m: 0.8
+control_points:
+  - {name: "Dartmouth Castle and St Petrox church", lat_deg: 50.3423, lon_deg: -3.5637, note: "the features file's position (the modern chart's, moved 120 m to the grid's land); the patch is drawn on the grid, not georeferenced from a sheet"}
+  - {name: "Kingswear Castle", lat_deg: 50.3407, lon_deg: -3.5615, note: "the features file's position"}
+patches:
+  - name: "the Dart within St Petrox castle, eleven fathoms"
+    kind: depth
+    depth: 11
+    polygon:
+      - [50.3418, -3.5680]
+      - [50.3418, -3.5652]
+      - [50.3470, -3.5660]
+      - [50.3470, -3.5688]
+    source: "Imray 1874, 'Dartmouth', p. 69: 11 and 12 fathoms just within St Petrox castle"
+    note: "Eleven fathoms at low water, 20.9 m below the chart's datum with the 0.8 m correction; the grid has 4.9 m here on the mean (the build's note). The polygon is the channel's core within the grid's water."
+  - name: "the Dart abreast of Kingswear and the town, five fathoms"
+    kind: depth
+    depth: 5
+    polygon:
+      - [50.3470, -3.5688]
+      - [50.3470, -3.5660]
+      - [50.3500, -3.5708]
+      - [50.3535, -3.5738]
+      - [50.3535, -3.5762]
+      - [50.3500, -3.5732]
+    source: "Imray 1874, 'Dartmouth', p. 69: the river shoals to abreast the town, where it varies from 10 to 3 1/2 fathoms; White 1835, p. 40: anchor abreast of Kingswear or Dartmouth"
+    note: "Five fathoms, 9.9 m below the chart's datum: the lower part of Imray's ten to three and a half, JUDGEMENT within his range (no sounding of a place read); the grid has 0.9 m here on the mean (the build's note)."
+notes:
+  - "Imray 1874, p. 69: high water at Dartmouth full and change 6h 16m, springs rise 14 feet 10 inches, neaps 11 feet 2 inches; the Range 10 to 5 fathoms (the grid agrees within two metres, not patched)."
+  - "Torbay needs no patch: its 8 to 6 fathoms over mud and clay (Imray 1874, p. 67) are the grid's within a metre or two; the Brixham breakwater (begun in the 1840s) is not in the grid."

@@ -1,0 +1,111 @@
+# FreeSail: Alderney, Braye and its road, as a port (spec M6 §26, block 1; package 39a).
+# The same form as falmouth.yaml, on package 35's machinery; the marks are
+# features/channel-mid.yaml's; no patch (below).
+#
+# Sources. White 1835, 'Alderney', pp. 119 to 125: the island three miles and a half long,
+# its approach on all sides but the north difficult and dangerous; two small towns, St Anne
+# on the heights and Braye by the pier, principally store-houses; two small harbours,
+# Longy and Braye, both drying at low water neaps; Braye's stone pier 26 feet high and 408
+# long, very poor shelter in a gale between S S W and N W at springs; the Road of Braye
+# before the lower town, a fine sandy bottom in 5 to 10 fathoms, seldom used but as
+# preparatory to entering the pier, not safe in winter for the ground-swell; the eastern
+# mill in one with the pier head the mark; enter the pier on a rising tide between
+# half-flood and high water, more than 8 feet between the beacons. Faden 1793, 'Alderney',
+# pp. 29 to 30: the Race on the east, the Passage au Singe on the west, the Caskets seven
+# miles off; the little port of Longy under the Fort. Water is not to be had in quantity,
+# nor wood or refreshments (White, p. 135).
+#
+# The datum. Bellin's sheet of Guernsey and Alderney (Petit Atlas Maritime t. V no. 39;
+# David Rumsey 6903.526) has the island at four common leagues to the scale, no plan of
+# Braye: no harbour patch, and `datum: unverified`. The grid has no breakwater across Braye
+# (Victoria's, of 1847 to 1864, is not in it), which is the road as 1805 had it.
+#
+# The market is the island's small one, with the smugglers' entrepôt that Alderney shared
+# with Guernsey; FROM MEMORY and JUDGEMENT, sterling.
+
+id: alderney
+name: Alderney
+nation: britain
+source: "White 1835, 'Alderney', pp. 119 to 125 and 135; Faden 1793, 'Alderney', pp. 29 to 30"
+datum: unverified   # Bellin's sheet of the islands has no plan of Braye; the grid's depths stand
+
+outer_road:
+  feature: braye-road
+  name: Braye Road
+  lat_deg: 49.7285
+  lon_deg: -2.1945
+  depth_fathoms: 6
+anchorage:
+  feature: braye-road
+  name: Braye Road
+  lat_deg: 49.7285
+  lon_deg: -2.1945
+  depth_fathoms: 6
+mooring:
+  name: Braye pier
+  lat_deg: 49.7250     # within the pier head; the harbour dries at low water neaps (White)
+  lon_deg: -2.1975
+  depth_fathoms: -0.5
+  bottom: sand
+  deep_draught_ft: 8   # White: more than 8 feet between the beacons on a rising tide
+shore:
+  name: the pier at Braye
+  lat_deg: 49.7240
+  lon_deg: -2.1980
+
+pilot:
+  station: braye-road
+  cruising_nm: 6                 # judgement: the island's pilots met ships off the Swinge and the Race's mouth
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  names: [Gaudion, Le Cocq, Herivel, Sanford, Duplain, Le Ber, Allen, Simon]   # Alderney names: judgement
+  skill: 0.93                    # judgement: the Race and the Swinge want their own men
+  fee_pounds: 3                  # judgement; unverified
+  cast: starboard                # from the road the head paying off to the eastward, for the Race (judgement)
+  course_out_deg: 20             # north out of the road, clear of the Grande Braye
+  words:
+    channel: "Get to the island so as to go into the pier without anchoring, on a rising tide between half flood and high water. Through the Swinge from the southward keep the north-west head of the Clanque within its breadth of the west side of Les Etats, to pass east of the Pierre au Vrach; give Burhou two cables and the Corbet one."
+    marks: "The eastern mill above St Anne in one with the pier head leads in east of the Bouillonnaise and the Grande Braye; the Nannels open south of the Grande Braye for the berth in the road."
+    anchorage: "Braye Road before the lower town, five to ten fathoms on clean sand, tailing clear with eighty fathoms of cable; it is a place to wait for the tide into the pier, not to lie in, for the ground-swell comes in without warning, and a northerly wind and the tide together will heave a ship in bodily."
+    tide: "It is high water at Alderney at a quarter before seven at full and change; the springs rise eighteen feet and a half. The Race and the Swinge run south-westward from half ebb to half flood and north-eastward the other six hours, seven knots at springs; time the passage to have the stream with you."
+
+tide:
+  establishment: Alderney        # the epitome's row (data/tides/establishments.yaml)
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: brandy, price: 112, origin: france, note: "French brandy in bond for the run; judgement"}
+    - {good: geneva, price: 76, origin: batavian-republic, note: "for the run; judgement"}
+    - {good: tea, price: 182, origin: null, note: "for the run; judgement"}
+    - {good: tobacco, price: 66, origin: null, note: "for the run; judgement"}
+    - {good: wine, price: 46, origin: france, note: "judgement"}
+    - {good: salt, price: 14, origin: null, note: "judgement"}
+    - {good: fresh fish, price: 10, origin: britain, note: "the island's fishermen; judgement"}
+    - {good: salt beef, price: 62, origin: britain, note: "dear on a small island; from memory"}
+    - {good: canvas, price: 64, origin: britain, note: "from memory"}
+    - {good: hemp, price: 74, origin: null, note: "from memory"}
+
+dockyard:
+  kind: chandlers                # the island's store-houses at Braye; no builders of size
+  items:
+    - {item: topmast, hours: 14, pounds: 48, note: "a spar from the store-houses, if one is to be had: judgement"}
+    - {item: topgallant_mast, hours: 6, pounds: 14}
+    - {item: yard, hours: 9, pounds: 29}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.07}
+    - {item: water, hours_per_ton: 0.3, pounds_per_ton: 0.2, note: "White 1835, p. 135: water not to be obtained in any quantity even for a small vessel's crew; judgement"}
+    - {item: provisions, hours_per_day: 0.08, pounds_per_man_day: 0.07, note: "refreshments scarce (White): judgement"}
+
+crew_pool:
+  able: {hands: 2, pounds: 3, delay_h: 18}
+  ordinary: {hands: 3, pounds: 2, delay_h: 18}
+  landsman: {hands: 4, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [braye-road, 49 46 N 2 11 W]
+  from_sea: [49 46 N 2 11 W, braye-road]
+  in: [braye-road]

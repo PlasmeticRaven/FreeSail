@@ -80,11 +80,30 @@ def run_until(world, kind, minutes=240):
 # ---------------------------------------------------------------------------
 
 
+ALL_PORTS = [
+    "alderney",
+    "brest",
+    "dartmouth",
+    "falmouth",
+    "morlaix",
+    "plymouth",
+    "roscoff",
+    "st-helier",
+    "st-malo",
+    "st-marys",
+    "st-peter-port",
+    "torbay",
+    "weymouth",
+]
+
+
 def test_the_five_ports_are_files_on_one_machinery_placed_from_the_chart():
     files = PT.port_files()
-    assert list(files) == ["brest", "falmouth", "plymouth", "roscoff", "st-marys"]
+    # package 39a added the Channel east's eight (their spots name channel-mid's features
+    # and repeat their positions, so a world on channel-west's chart alone loads them too)
+    assert list(files) == ALL_PORTS
     w = world_at(OFF_THE_LIZARD)
-    assert list(w.ports.ports) == ["brest", "falmouth", "plymouth", "roscoff", "st-marys"]
+    assert list(w.ports.ports) == ALL_PORTS
     falmouth = w.ports.ports["falmouth"]
     assert falmouth.nation == "britain" and "White 1835" in falmouth.source
     # the roads and the anchorage are the chart's features, not figures of their own
@@ -132,14 +151,7 @@ def test_a_fourth_port_costs_a_file_and_nothing_else(tmp_path):
     )
     text = text.replace("  feature: falmouth-outer-road\n", "  feature: st-michaels-mount\n", 1)
     (fourth / "penzance.yaml").write_text(text, encoding="utf-8")
-    assert list(PT.port_files(fourth)) == [
-        "brest",
-        "falmouth",
-        "penzance",
-        "plymouth",
-        "roscoff",
-        "st-marys",
-    ]
+    assert list(PT.port_files(fourth)) == sorted([*ALL_PORTS, "penzance"])
     w = world_at(OFF_THE_LIZARD)
     port = PT.load_port(fourth / "penzance.yaml", w.chart)
     assert port.id == "penzance" and port.name == "Penzance"
@@ -229,21 +241,14 @@ def test_the_market_moves_a_price_by_the_season_the_war_and_the_supply_and_no_mo
 def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_stance_the_tables():
     frigate = world_at(OFF_THE_LIZARD)
     assert frigate.ports.ship_nation == "britain"
+    french_ports = {"brest", "roscoff", "st-malo", "morlaix"}
     assert {p.id: frigate.ports.stance(p) for p in frigate.ports.ports.values()} == {
-        "falmouth": "open",
-        "plymouth": "open",
-        "brest": "hostile",
-        "st-marys": "open",
-        "roscoff": "hostile",
+        pid: ("hostile" if pid in french_ports else "open") for pid in ALL_PORTS
     }
     schooner = world_at(OFF_THE_LIZARD, ship=SCHOONER)
     assert schooner.ports.ship_nation == "united-states"
     assert {p.id: schooner.ports.stance(p) for p in schooner.ports.ports.values()} == {
-        "falmouth": "neutral",
-        "plymouth": "neutral",
-        "brest": "neutral",
-        "st-marys": "neutral",
-        "roscoff": "neutral",
+        pid: "neutral" for pid in ALL_PORTS
     }
     french = world_at(OFF_THE_LIZARD, ship=SCHOONER, nation="france")
     assert french.ports.ship_nation == "france"

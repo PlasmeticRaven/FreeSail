@@ -79,6 +79,15 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "brest": "france",
         "st-marys": "britain",  # package 35b
         "roscoff": "france",
+        # package 39a, the Channel east: the islands the King's, St Malo and Morlaix French
+        "dartmouth": "britain",
+        "torbay": "britain",
+        "weymouth": "britain",
+        "st-peter-port": "britain",
+        "st-helier": "britain",
+        "alderney": "britain",
+        "st-malo": "france",
+        "morlaix": "france",
     }
     for pid, path in port_files().items():
         assert load_port(path, chart).nation == table.port_nations[pid]

@@ -1,0 +1,117 @@
+# FreeSail: Weymouth and Portland Road as a port (spec M6 §26, block 1; package 39a). The
+# same form as falmouth.yaml, on package 35's machinery; the marks are
+# features/channel-mid.yaml's; no patch (the harbour patch `portland-weymouth` is the grid
+# alone: EMODnet's grid has no breakwater across Portland Road, which is the road as 1805
+# had it, open to the east).
+#
+# Sources. Imray 1874, 'Weymouth Road and Harbour', p. 58: good anchorage in 5 to 8
+# fathoms half or three-quarters of a mile E S E of the jetty head, sand and gravel, foul
+# ground within three-quarters of a mile of the north shore, very little tide; the harbour
+# convenient for vessels not drawing more than 10 feet, about 7 feet at low and 14 at high
+# water springs within; high water full and change 6h 56m, springs rise 7 feet. 'Portland
+# Road', p. 60: excellent anchorage on firm solid blue clay, 5 to 10 fathoms, little or no
+# tide; the breakwater (begun 1849) has sheltered it from the southerly, south-easterly
+# and E S E gales, "the only winds which formerly rendered Portland road dangerous".
+# Moore 1799 (the catechism, Portland): take care of the Shambles; sailing into the Road
+# from the westward keep close to the Bill with the lead going, and when round the East
+# Point haul up and anchor against the Pier in 9 or 10 fathoms; sailing out keep Wyke
+# church open of the stone pier to clear the Shambles to the eastward. White 1835, 'Coast
+# of England', pp. 41 to 43: the Shambles, the Race, West Bay.
+#
+# The datum: no period sheet read and no patch; `datum: unverified`.
+#
+# The market is Weymouth's coasting trade and Portland's stone, FROM MEMORY and JUDGEMENT;
+# the King's summers at Weymouth (from 1789) make the town's provisions dear in the
+# season. Sterling.
+
+id: weymouth
+name: Weymouth
+nation: britain
+source: "Imray 1874, 'Weymouth Road and Harbour', p. 58, and 'Portland Road', p. 60; Moore 1799, the catechism, Portland; White 1835, 'Coast of England', pp. 41 to 43"
+datum: unverified   # no period sheet read; the grid's depths stand
+
+# The outer road is Weymouth Road off the pier, where the pilot comes off; the anchorage
+# is Portland Road under the castle, the ships of war's; the mooring the harbour within the
+# piers, for a vessel of ten feet.
+outer_road:
+  feature: weymouth-road
+  name: Weymouth Road
+  lat_deg: 50.6080
+  lon_deg: -2.4370
+  depth_fathoms: 6
+anchorage:
+  feature: portland-road
+  name: Portland Road
+  lat_deg: 50.5800
+  lon_deg: -2.4360
+  depth_fathoms: 7
+mooring:
+  name: Weymouth harbour
+  lat_deg: 50.6085     # the harbour's mouth between the piers (judgement)
+  lon_deg: -2.4500
+  depth_fathoms: 1.2   # 'about 7 feet at low ... water spring-tides' within (Imray)
+  bottom: soft mud
+  deep_draught_ft: 10  # Imray: convenient for vessels not drawing more than 10 feet
+shore:
+  name: the quay at Weymouth
+  lat_deg: 50.6080
+  lon_deg: -2.4545
+
+pilot:
+  station: weymouth-road
+  cruising_nm: 6                 # judgement: the Weymouth and Portland pilots met ships off the Bill and the Shambles
+  comes_off_by_night: false      # judgement: Portland's lights showed the way, but the pilots came off by day
+  cutter: data/ships/cutter.yaml
+  names: [Pearce, Comben, Attwooll, Stone, Elliott, Lano, Comben, Pettit]   # Dorset and Portland names: judgement
+  skill: 0.9
+  fee_pounds: 3                  # judgement; unverified
+  cast: starboard                # from the road the head paying off to the eastward (judgement)
+  course_out_deg: 110            # out past the Shambles' eastern end
+  words:
+    channel: "From the westward keep close to the Bill with the lead going, between the Race and the Shambles with the two lights in one, or through the inner channel close to the Bill at slack water with a free wind; when round the east point haul up for the Road. From the eastward mind the Shambles: Wyke church open to the northward of Portland's north-east point leads east of them."
+    marks: "The two lights of Portland in one, north-north-west, lead between the Race and the Shambles; Wyke Regis church open of the north-east point of Portland clears the Shambles to the east; going out, keep Wyke church open of the stone pier."
+    anchorage: "Portland Road under the castle, seven fathoms on blue clay with little tide, good hold; it is open to the east and south-east and a gale from there sends in a sea. Weymouth Road off the pier, five to eight fathoms on sand and gravel; the harbour within the piers is for vessels of ten feet."
+    tide: "There is little tide in the Road; off the Bill the stream runs five or six knots at springs, the flood to the eastward over the Shambles and the ebb into the Race. Take the Bill at slack water."
+
+tide:
+  establishment: Portland        # the epitome's row (data/tides/establishments.yaml; Norie's Portland Bill)
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: stone, price: 1, origin: britain, note: "Portland stone, by the ton at the quarry's pier; from memory, judgement"}
+    - {good: salt, price: 25, origin: britain, note: "under the duty; from memory as at Falmouth"}
+    - {good: coal, price: 2, origin: britain, season: {11: 1.2, 12: 1.2, 1: 1.2, 2: 1.2}, note: "from memory as at Falmouth"}
+    - {good: beer, price: 15, origin: britain, note: "Dorchester beer by the barrel; judgement"}
+    - {good: canvas, price: 58, origin: britain, note: "Bridport sailcloth, made near by; from memory"}
+    - {good: cordage, price: 65, origin: britain, note: "Bridport rope and twine; judgement"}
+    - {good: hemp, price: 70, origin: null, note: "Baltic hemp at war prices; from memory"}
+    - {good: wine, price: 72, origin: portugal, season: {12: 1.1}, note: "from memory"}
+    - {good: timber, price: 6, origin: britain, note: "from memory"}
+    - {good: salt beef, price: 56, origin: britain, season: {7: 1.1, 8: 1.1, 9: 1.1}, note: "dearer in the King's summer at Weymouth; judgement"}
+    - {good: wool, price: 58, origin: britain, note: "Dorset wool; judgement"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 10, pounds: 42, note: "judgement"}
+    - {item: topgallant_mast, hours: 5, pounds: 13}
+    - {item: yard, hours: 7, pounds: 26}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 24, note: "Bridport canvas at hand: judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.055, note: "Bridport rope: judgement"}
+    - {item: water, hours_per_ton: 0.12, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.055}
+
+crew_pool:
+  able: {hands: 3, pounds: 3, delay_h: 12}
+  ordinary: {hands: 6, pounds: 2, delay_h: 12}
+  landsman: {hands: 10, pounds: 1, delay_h: 6}
+
+closed_to: []
+
+tracks:
+  to_sea: [portland-road, 50 33 N 2 16 W, 50 28 N 2 16 W]
+  from_sea: [50 28 N 2 16 W, 50 33 N 2 16 W, portland-road]
+  in: [portland-road]

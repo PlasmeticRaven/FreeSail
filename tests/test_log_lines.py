@@ -559,7 +559,9 @@ def test_the_shipped_books_enter_whole():
 
     from freesail.standing.book import read_orders_file
 
-    w = chart_world(OFF_THE_LIZARD)
+    # package 39a: on the whole chart, which holds every region's places (the Channel
+    # east's book names Torbay and the Great Road of Guernsey)
+    w = chart_world(OFF_THE_LIZARD, chart="atlantic-east")
     w.run(2)
     books = sorted(Path("data").rglob("*.orders"))
     assert books

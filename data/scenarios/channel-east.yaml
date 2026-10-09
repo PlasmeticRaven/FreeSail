@@ -1,0 +1,79 @@
+# FreeSail: the Channel east, Torbay to Guernsey through the Race (spec M6 §26, block 1;
+# package 39a). A free passage of the block's stretch, not a gate's and not pinned: the
+# frigate from Brixham road in Torbay to the Great Road of Guernsey by the Race of
+# Alderney, on the whole chart (`chart: atlantic-east`), so that she sails off channel-
+# west's tiles into channel-mid's across the seam at 3 W. Given to either driver with
+# --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/channel-east.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/channel-east.yaml
+# and printed whole, with the account against the truth, by
+#     py tools/day_log.py data/scenarios/channel-east.yaml --hours 20 --reckoning
+#
+# The passage as the book beside this file sails it (channel-east.orders): she lies at
+# anchor in Brixham road at two in the morning of 12 June 1805, the wind northerly; she
+# weighs and shapes a course east-south-east for the Race's northern mouth, sixty-six
+# miles, timed to carry the south-western stream through the Race from half-ebb at
+# Alderney (about half past ten by the world's tide that day: White 1835 p. 132, the
+# stream turning to the south-west at half-ebb exactly and running six hours); through
+# the Race she shapes for the mouth of the Great Russel, two miles west of the Banc de
+# Chole, then down the Russel south of Jethou and the Goubinière (Faden 1793 p. 33: St
+# Martin's Point on the Goubinière until St Martin's church is over Fermain Bay) and in
+# to the Great Road off St Peter Port, where she anchors; the Guernsey pilot, if he comes
+# off to her in the Russel, is taken. Her own book holds all she needs: the starter book
+# is not loaded.
+#
+# The weather is pinned (a northerly of fourteen knots under a high to the west, backing
+# north-north-westerly and falling through the day, the sky clear), so that the passage
+# is the same on every machine; the sea and the motion are kept. Its figures at seed 7
+# are in docs/dev/TuningNotes.md (package 39a), measured once: not a gate's, not pinned.
+
+name: The Channel east, Torbay to Guernsey through the Race
+seed: 7
+start: 1805-06-12T02:00
+position: {lat_deg: 50.4100, lon_deg: -3.4950}   # Brixham road (Imray 1874 p. 68; Moore 1799's seven fathoms)
+chart: atlantic-east
+nation: britain
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 10
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.95}
+
+papers:
+  chart: {year: 1804}
+  epitome: norie                  # a ship of war's
+  almanac: 1805
+
+cargo:
+  purse_pounds: 200
+
+ports: [torbay, dartmouth, weymouth, alderney, st-peter-port, st-helier]
+
+weather:
+  wind:
+    - {at: 1805-06-12T01:00, from_deg: 5, knots: 14, air_mass: neutral}
+    - {at: 1805-06-12T12:00, from_deg: 350, knots: 12}
+    - {at: 1805-06-13T00:00, from_deg: 340, knots: 10}
+  background:
+    {hpa: 1020, gradient_hpa_per_100km: 0.4, high_toward_deg: 300}
+  systems:
+    - name: the high over the Irish Sea
+      kind: high
+      radius_km: 900
+      track:
+        - {at: 1805-06-11T12:00, x_km: -400, y_km: 300, hpa: 1026}
+        - {at: 1805-06-13T12:00, x_km: -500, y_km: 200, hpa: 1024}
+  sky: {sky: clear, weather: fine, visibility: the horizon}
+  sea: true
+
+standing_orders:
+  - data/scenarios/channel-east.orders
+
+orders:
+  - let go the best bower
