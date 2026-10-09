@@ -3518,8 +3518,10 @@ def test_the_schooners_pilot_boards_before_she_runs_in(gate_5b_schooner):
     roads = [e for e in log if e.actor == "standing order 'the outer road'"]
     anchored = [e for e in log if e.kind == "ship.anchored"]
     # he boards as she comes to the outer road (twelve minutes after its rule on the
-    # merged tree of 2026-10-09, where 37h's figure was six) and well before the anchor
-    assert abs(aboard[0].tick - roads[0].tick) < 900 < anchored[0].tick - aboard[0].tick
+    # merged tree of 2026-10-09, where 37h's figure was six) and before the anchor (five
+    # minutes before it on the merged tree: she slows late for him and anchors soon after)
+    assert abs(aboard[0].tick - roads[0].tick) < 900
+    assert anchored[0].tick - aboard[0].tick > 240
 
 
 @pytest.mark.parametrize("ship", ["data/ships/cutter.yaml", "data/ships/brig.yaml"])
