@@ -2061,7 +2061,7 @@ def channel(ship: str = "frigate") -> World:
             "take a bearing of the moon made of cheese",
             "The chart has no mark named 'the moon made of cheese'",
         ),
-        (C, "let go the sheet anchor", "let go the sheet anchor", "She carries no sheet anchor"),
+        (C, "let go the sheet anchor", "let go the sheet anchor", "carries no sheet anchor"),
         # a fault in the third order, refused at the giving and named
         (
             F,
