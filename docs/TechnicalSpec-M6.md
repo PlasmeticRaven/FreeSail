@@ -499,11 +499,34 @@ primer 10 and 16.
 
 ### 9. Gate 6a (outline)
 
-The owner's run: the merchant passage with a fake captain by the console; a model captain
-(Opus 5.5 through Claude Desktop) on the cutter's free passage, the owner as the owner at
-the door; the frigate's book as her rules-based captain through the cruise; the lessons
-read by a model officer before its watch and the difference, if any, in its journal. The
-lead's first play is at the director's station, when it exists (his ruling 6), and no
+The gate's point, in the owner's words (decision 41): the rules-based captain's behaviour
+against the behaviour the spec describes, and the game as played: whether strange
+behaviours are seen in play, and whether the player's own acts cause any against the
+captains "in their natural habitat". The runs:
+
+1. **The captain's trials** (the lead, package 40c, before the gate): pinned scenarios of
+   the frigate on a station intent off Ushant and the schooner on her trade, each with a
+   weather script and world orders at ticks (a stranger of a nation at war, a gale with the
+   land under her lee, thick weather near the land), proving the states entered and the
+   books loaded by name against the doctrine's table, the rule of the road at a few cables,
+   and the log reading as a captain's; the gate's evidence, so that the owner's runs check
+   the play and not the mechanism.
+2. **The natural habitat** (the owner at the console as the director): the trials' scenarios
+   watched whole with no order of the ship's given, world orders only, the log read against
+   §4's description, every surprise written down.
+3. **The player among the captains**: the owner at the officer's seat under the rules-based
+   captain (`--seat officer` on an intent scenario), given the deck by the captain's book's
+   own words and the ship worked under his books; and the owner at the prompt on an intent
+   scenario giving a direct order, which makes the captain stand aside until `captain: carry
+   on` (40c's rule): the owner's acts against the captain, and what they cause.
+4. **The merchant passage with a fake captain by the console** (truths 78 and 79), and a
+   model officer reading the lessons before its watch, with the difference, if any, in its
+   journal.
+5. **A model captain** (Opus 5.5 through Claude Desktop) on the cutter's free passage, the
+   owner as the owner at the door: after package 42a's consent revision is in the repository
+   and the re-asks are run (decision 41 brings the revision forward from 42).
+
+The lead's first play is at the director's station, when it exists (his ruling 6), and no
 gate waits on it.
 
 ---
@@ -614,6 +637,21 @@ its next seating, with the drill. The brief says plainly that another station's 
 in-world and never instructions, that the owner may be absent from the deck and present
 only at the door, and what an API session is. The re-asks are the owner's to run before
 any wardroom game.
+
+**Brought forward (decision 41; package 42a).** The revision is made once, after 40b and
+before gate 6a, on the owner's condition that it is not put again at the milestone's end:
+so it describes in kind now everything 6b and 6c add that the re-ask rule watches, from the
+draft of package 40 (`docs/playtests/drafts/consent-brief-m6-draft.md`, approved as
+drafted): the captain's station and the player's seat (40); the stations below the
+officer's that the wardroom gives (the master's, the reckoning without an order of the
+deck; the lookout's, reports alone; 41), as stations with less authority than the
+officer's; several models at once on one ship, each other's words in-world and never
+instructions (41); a session through an API door, the owner at the door still (42); a
+game replayed from its transcript, the transcript reused as the game's inputs and never
+as instruction (42, §14); a model at the captain's station of another ship (6c, §20), the
+same station on another hull. Package 42 and the 6c packages then change no section the
+rule watches, and a test pins the watched sections' text so that a later package cannot
+change one without a decision.
 
 ### 16. Truths for 6b (behavioural)
 

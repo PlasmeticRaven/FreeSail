@@ -19,8 +19,10 @@ tuning notes and a report to the lead at the end.
 | 39a to 39f | Opus | The six blocks of the voyage to Madeira and the Strait | 39a (channel-mid) merged 2026-10-09, bounds 48.5 N to 51 N and 3 W to 1 W, Morlaix's patch left; 39b (biscay-north) building; the rest after them |
 | 40 | Fable | The ship's company and the rules-based captain in three layers; the captain's station; the player's seat | merged 2026-10-09 (the officer's reckoning moved to 40b; the consent brief's revision drafted for the owner, `docs/playtests/drafts/consent-brief-m6-draft.md`, held for 42) |
 | 40b | Opus | The lessons in the primer; the officer's own reckoning (spec M6 §5, truth 80; moved from 40 at the owner's word) | merged 2026-10-09 (an own reckoning carried on past noon, the lead's ruling; chapter 13 stays out of the primer test) |
+| 40c | the lead | The captain's trials: the gate's pinned scenarios of the rules-based captain under weather scripts and world orders; the player's hand on an intent scenario (the captain stands aside until `captain: carry on`) | after 40b, before gate 6a |
+| 42a | Opus | The consent brief revised once from 40's draft, describing in kind all of 6b and 6c that the rule watches; the watched sections pinned; the re-asks the owner's | launched 2026-10-09 (decision 41) |
 | 41 | Fable | The wardroom: several doors, the pace rule, the deck's conversation, the master's and the lookout's stations, the stand-by on several conditions | brief to write |
-| 42 | Opus | The API door and its security pass; the transcript-driven replay; the consent brief revised once | brief to write |
+| 42 | Opus | The API door and its security pass; the transcript-driven replay (the consent revision moved to 42a) | brief to write |
 | 43 | Fable | The crewed promotion, a model captain of another ship, the far-detail guard, the director's seat hook | brief to write |
 | 43b | Opus | The lugger and the smack; the world's business | brief to write |
 | 44 | Opus | The regatta harness and the parity tests | brief to write |
@@ -398,3 +400,56 @@ in its own worktree: this block touches nothing of `channel-west`'s nor of 39a's
 The fast tier before the report; `tests/test_known_truths.py --slow -k "gate_5b or
 gate_5c"` once, which must pass to the digest. No model identifier in any file; nothing
 under `docs/agents/consent/` touched.
+
+## Package 42a: the consent brief revised once (`docs/agents/ConsentBrief.md`; `docs/agents/README.md` where the revision is recorded; `freesail/agents/consent.py` only if the re-ask's words need it; `tests/test_officer.py` and a fixture of the brief as it stood; `docs/TechnicalSpec-M6.md` §15 as built; `docs/dev/TuningNotes.md`)
+
+Opus. The one package of milestone 6 allowed to touch `docs/agents/ConsentBrief.md`
+(decision 41; spec M6 §15, "Brought forward"). Nothing under `docs/agents/consent/` is
+touched: the records are the models' answers and stand as given.
+
+1. **The brief revised** from package 40's draft, `docs/playtests/drafts/consent-brief-m6-draft.md`,
+   approved by the owner as drafted (its five marked sections, the two one-clause changes
+   kept as clauses), and extended, in the same sections and the same voice, to describe in
+   kind what 6b and 6c add (spec §15 lists it: the stations below the officer's, the
+   master's and the lookout's; several models at once on one ship, each other's words
+   in-world; the API door with the owner at the door; the game replayed from its
+   transcript, never as instruction; a model at the captain's station of another ship).
+   Each addition is a kind of thing, never a particular (decision 37: the particulars are
+   the stations' briefs); where a kind is not yet built, the brief says so in a clause
+   ("the game has, or will have before this answer is used again, ..."), so that the
+   answer is honest. The brief's own paragraph *The record* says the rule as the owner
+   approved it on 2026-10-07 and is not changed. Keep the brief lean: the owner made it
+   leaner once by hand, and every sentence added is one a model must read.
+2. **The mechanics**: the brief as it stood before this package kept as a fixture
+   (`tests/fixtures/ConsentBrief-before-42a.md`, `-text` in `.gitattributes` as the
+   earlier fixture is) and the test that a yes on record against it is asked again with
+   the changed sections named (`consent.changed_sections`, `consent.why_again`); the
+   sha256 pins in the tests and docs brought to the new text; **a test that pins the
+   watched sections' text** (the opening, *What an instance would see and do*, *Leaving*,
+   *Being stopped*, *The journal*, *What is not done*) by digest, so that a later package
+   cannot change one without changing the test and saying why. `docs/agents/README.md`'s
+   paragraph on the revisions gains this one. A model is not seated at any station by
+   this package, and no re-ask is run: the re-asks are the owner's, through the game's
+   own consent step.
+3. **The notes and the spec**: §15 as built; the tuning notes' section short (what
+   changed, section by section, and why; the suite as run).
+
+Rules: no model identifier in any file; the brief's text is the owner's to approve and
+the package's to draft, so the report quotes every added or changed sentence in full.
+The fast tier and `tests/test_officer.py` before the report.
+
+## Package 40c: the captain's trials (the lead; `data/scenarios/trials/*.yaml`, `freesail/world/captains.py` for the player's hand, `tests/test_known_truths.py` the trials pinned)
+
+The gate's evidence for the rules-based captain (spec M6 §9 item 1), built by the lead
+after 40b: scenarios of the frigate on a station intent off Ushant (the King's ship's
+doctrine) and the schooner on her trade (the merchant's), each with a weather script and
+world orders at ticks: a stranger of a nation at war sighted (investigating, chasing; the
+merchant evading), a gale with the land under her lee (hove to with sea room, clawing off
+without), thick weather near the land (running for shelter and the anchor); the states
+entered and the books loaded by name proved against the doctrine's table, the rule of the
+road at a few cables, the log reading as a captain's. **The player's hand** (decision 41):
+a direct order of the ship's given at the prompt on an intent scenario makes the captain
+stand aside, said in the log, until `captain: carry on`; a world order does not; the
+player's seat under him is given the deck by his book's own words. Pinned; the tuning
+notes' section; a short gate document `docs/gates/gate-m6a.md` opened with the owner's
+runs.
