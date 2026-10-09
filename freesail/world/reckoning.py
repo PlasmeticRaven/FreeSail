@@ -167,6 +167,8 @@ __all__ = [
     "chant",
     "doubt_miles_words",
     "doubt_words",
+    "doubted_words",
+    "fathoms_said",
     "ground_words",
     "knots_words",
     "miles_words",
@@ -296,9 +298,11 @@ LEEWAY_DOUBT_POINTS = 0.25
 SET_DOUBT_EAST_KN = 0.2
 SET_DOUBT_NORTH_KN = 0.03
 # What the master takes off a cast for the tide before he lays it on the chart's
-# low-water contours (package 34): half the spring rise of the nearest place in his
-# epitome, or this where the table gives no rise (judgement: the Channel's mean level
-# over the datum, about three metres, T §1).
+# low-water contours (package 34): the height of his own tide above the datum, by the
+# spring rise of the nearest place in his epitome, or this where the table gives no rise
+# (judgement: the Channel's mean level over the datum, about three metres, T §1). Since
+# package 37j every place of both tables has a rise (`data/tides/establishments.yaml`),
+# and this serves only a table without one.
 TIDE_ALLOWANCE_DEFAULT_M = 3.0
 # The master's rise at the quarters as a part of the spring rise (Norie 1805, the tide
 # table's note: the neap rise "about two-thirds" of the spring's; judgement in the figure,
@@ -309,12 +313,13 @@ TIDE_HOURS = 12.0 + 25.0 / 60.0
 SYNODIC_MONTH_DAYS = 29.53
 
 # A departure: the reckoning begins where the land was last seen, a mile in doubt
-# (judgement: a bearing of a headland and its distance by estimation).
+# (judgement: a bearing of a headland and its distance by estimation). The account is
+# laid at the scenario's own position (package 37j); the mile is the doubt only.
 DEPARTURE_SIGMA_NM = 1.0
 
 # ---------------------------------------------------------------------------
 # The one rule by which an observation is believed (package 37e; the review of gate 5c's
-# playtests, section 10: the owner's game 9)
+# playtests, section 10: the owner's game 9; amended by package 37j)
 # ---------------------------------------------------------------------------
 # Until package 37e there were three rules. A line taken after a run of two miles
 # replaced the account across it and before that was weighed (`FIX_RUN_NM`): so in game 9
@@ -326,18 +331,29 @@ DEPARTURE_SIGMA_NM = 1.0
 # `observe_point`):
 #   - an observation is WEIGHED against the account by their two doubts, whatever the run
 #     since the last one;
-#   - when the two disagree by more than their doubts together allow, the account is
-#     plainly out: the observation is TAKEN, the account laid on it, and the account's
-#     doubt in that direction becomes the observation's own;
+#   - when the two disagree by more than their doubts together allow, one of them is
+#     plainly out, and THE BETTER FIGURE IS BELIEVED (package 37j, the lead's decision on
+#     the fold-in's finding): the observation is TAKEN, the account laid on it and the
+#     account's doubt in that direction become the observation's own, only when its doubt
+#     is no greater than the account's across its line; else it is WEIGHED, as any
+#     observation is, and the line says the master doubts it ("the sight stands five
+#     miles to the N of the account, and the account, good to three cables, is the
+#     better figure");
 #   - an account that the weighing moved less than half a cable was KEPT.
+# Package 37e took the observation whenever the two disagreed so: so an octant's sight
+# good to two miles and a half laid down an account fixed to three cables a minute before
+# (the merchant passage's second noon, on Linux; on Windows the same sight fell a hair
+# under the line and was weighed), and a lunar of poor certainty overrode the better
+# account (the owner's note 5 on game 9). The disagreement there was the sight's.
 # "Their doubts together" is the sum of what he would trust each within, and he trusts a
 # figure within `OBSERVATION_OUT_SIGMAS` of its doubt: two, the figure the lunar's and the
-# chronometer's words have used since package 33b (`sights.LUNAR_TRUST_SIGMAS`).
-# JUDGEMENT. The brief of 37e named three; by game 9's own figures (the octant's sight
-# good to 2.28 miles one sigma, the account believing itself good to 0.26, the two 5.2
-# miles apart) the noon of 16 June stands 2.06 of the two doubts together from the
-# account, so three would not have taken it, and that noon taken is one of the brief's
-# own tests. Two takes it; docs/dev/TuningNotes.md, package 37e, has the figures.
+# chronometer's words have used since package 33b (`sights.LUNAR_TRUST_SIGMAS`), so that
+# "plainly out" is "further apart than he would trust the one and the other within".
+# JUDGEMENT, kept by package 37j for that reason and no other. (37e chose two over its
+# brief's three so that game 9's noon of 16 June, 2.06 of the two doubts together from an
+# account the lead had kept falsely small, was taken; under the amended rule that noon is
+# taken only because the account's doubt is honest, `Navigation._cast`: a cast no longer
+# narrows it beyond what the lead can say. docs/dev/TuningNotes.md, packages 37e and 37j.)
 OBSERVATION_OUT_SIGMAS = 2.0
 # An account the weighing moved less than this was kept: half a cable (judgement: the
 # least the log's words say, `geo.distance_words`).
@@ -415,6 +431,21 @@ BEARING_LINE_FORM_FRACTION = 0.1
 # miles of the line are not tried: a course for a town ends at the town (JUDGEMENT).
 SHORE_PASS_NM = 0.5
 SHORE_AT_PLACE_NM = 2.0
+# Each board laid down by itself (package 37j; the review of game 10: standing off and on
+# the account was run on along the mean of her headings since the last working, and the
+# boards, which ought nearly to cancel, did not: the error grew from a quarter of a mile
+# to two miles in an hour and three quarters). At a tack, a wear, heaving to and filling
+# away, and an alteration of course of `BOARD_ALTERATION_POINTS` or more from the mean
+# heading pegged since the last working, the account is worked up to that minute from the
+# log-board and the hourly working goes on from there (Falconer 1780, 'Traverse': "an
+# assemblage of various courses ... The true course and distance resulting from this
+# diversity of courses is discovered by collecting the difference of latitude and
+# departure of each course", each course by itself and never their mean). Two points,
+# JUDGEMENT (the brief's); a board shorter than `BOARD_LEAST_S` under way is not cut again
+# (JUDGEMENT: a minute, so that a ship in stays, her head swinging through eight points,
+# is one board's end and the next's beginning and not a dozen).
+BOARD_ALTERATION_POINTS = 2.0
+BOARD_LEAST_S = 60
 # Becalmed so long, the log's last read is no longer her way when she gathers it again,
 # and it is judged by eye until the log is next hove (JUDGEMENT: ten minutes; a ship in
 # stays has no way for a minute and is not becalmed).
@@ -460,8 +491,18 @@ SOUNDING_SLOPE_NM = 0.5
 # the weighing (the depth changing under her says she is moving), and leaves its doubt
 # as it was.
 SAME_GROUND_NM = 2.0
+# A cast that does not agree with the chart within his doubt widens it so that the nearest
+# water of that depth lies just beyond the edge of what he would trust the account within,
+# by this part of it (package 37j; judgement: the same cast again then stays apart and is
+# not weighed in, which only the doubt's own growth by the hours, or another ground, can
+# change).
+APART_EDGE = 0.001
 CONTOUR_SEARCH_MIN_NM = 5.0
 CONTOUR_GRAIN_M = 0.5 * units.NAUTICAL_MILE  # the contour search's own step (`chart.py`)
+# Within a doubt smaller than that grain the search is made finer, to a quarter of what he
+# would trust the account within and no finer than a cable (package 37j; JUDGEMENT: the
+# least the log's words say of a distance, `geo.distance_words`).
+CONTOUR_FINEST_M = units.CABLE
 CONTOUR_TOLERANCE_HAND_FATHOMS = 0.75
 CONTOUR_TOLERANCE_DEEP_FATHOMS = 2.5
 
@@ -612,6 +653,17 @@ def age_words(seconds: float) -> str:
         return "an hour ago" if hours == 1 else f"{number_words(hours)} hours ago"
     days = hours // 24
     return "a day ago" if days == 1 else f"{number_words(days)} days ago"
+
+
+def fathoms_said(depth_m: float) -> str:
+    """A depth in the master's words to the half fathom: 'two fathoms and a half', 'fifty
+    fathoms', 'half a fathom' (package 37j: the tide he allows off a cast)."""
+    halves = max(0, round(units.m_to_fathoms(depth_m) * 2.0))
+    whole, half = divmod(halves, 2)
+    if whole == 0:
+        return "half a fathom" if half else "no water"
+    words = f"{number_words(whole)} fathom{'s' if whole != 1 else ''}"
+    return f"{words} and a half" if half else words
 
 
 def chant(fathoms: float, hand: bool) -> str:
@@ -814,6 +866,11 @@ class Observation:
     account_sigma_nm: float = 0.0
     sigma_nm: float = 0.0
     repeat: bool = False
+    # package 37j: the two stood further apart than their doubts together and the
+    # observation was the poorer figure, so it was weighed and not taken, and the master
+    # doubts it; and which way the observation stood from the account
+    doubted: bool = False
+    off_toward_deg: float = 0.0
 
     @property
     def moved(self) -> bool:
@@ -833,6 +890,7 @@ class Observation:
             "account_sigma_nm": round(self.account_sigma_nm, 2),
             "sigma_nm": round(self.sigma_nm, 2),
             "repeat": self.repeat,
+            "doubted": self.doubted,
         }
 
 
@@ -859,6 +917,9 @@ class Reckoning:
     run_doubt: list[float] | None = None
     course_doubt: list[float] | None = None
     _seen: dict[str, tuple[float, float]] | None = None
+    # package 37j: the read's doubt along the boards since the log was hove, and the drift's
+    read_doubt: list[float] | None = None
+    drift_doubt: list[float] | None = None
 
     def __init__(self, start: Position, tick: int = 0, sigma_nm: float = DEPARTURE_SIGMA_NM):
         self.lat_deg = start.lat_deg
@@ -875,6 +936,8 @@ class Reckoning:
         # compass, across them
         self.run_doubt = [0.0, 0.0]
         self.course_doubt = [0.0, 0.0]
+        self.read_doubt = [0.0, 0.0]
+        self.drift_doubt = [0.0, 0.0]
         # the lines already had, by the thing observed: the same thing seen again from
         # the same place tells him nothing new
         self._seen = {}
@@ -920,12 +983,37 @@ class Reckoning:
 
     def _biases(self) -> list[list[float]]:
         """The bias vectors whose outer products are in the covariance: the leeway's,
-        the stream's, the log-line's and the compass's."""
+        the stream's, the log-line's, the compass's and the log's read since it was last
+        hove (package 37j)."""
         if self.run_doubt is None:  # a checkpoint from before package 37e
             self.run_doubt = [0.0, 0.0]
         if self.course_doubt is None:
             self.course_doubt = [0.0, 0.0]
-        return [self.leeway_doubt, self._stream_doubt(), self.run_doubt, self.course_doubt]
+        if self.read_doubt is None:  # a checkpoint from before package 37j
+            self.read_doubt = [0.0, 0.0]
+        return [
+            self.leeway_doubt,
+            self._stream_doubt(),
+            self.run_doubt,
+            self.course_doubt,
+            self.read_doubt,
+        ]
+
+    def _drift_doubt(self) -> list[float]:
+        if self.drift_doubt is None:  # a checkpoint from before package 37j
+            self.drift_doubt = [0.0, 0.0]
+        return self.drift_doubt
+
+    def new_read(self) -> None:
+        """The log hove again (package 37j): the last read's error is in the doubt as it
+        stands, and the new read's begins from nothing."""
+        self._biases()
+        self.read_doubt = [0.0, 0.0]
+
+    def lay_by_drift(self) -> None:
+        """She has filled away (package 37j): the drift's error is in the doubt as it
+        stands, and the next time she lies to his eye judges it afresh."""
+        self.drift_doubt = [0.0, 0.0]
 
     # -- the advance --------------------------------------------------------------------
 
@@ -947,6 +1035,7 @@ class Reckoning:
         stream: tuple[str, float, float, float] | None = None,
         run_doubt: float = 0.0,
         course_doubt_rad: float = 0.0,
+        held: bool = False,
     ) -> tuple[float, float]:
         """The traverse for one interval: the run `speed_kn` for `hours` along the course
         the master lays down (`course_rad`, already corrected as he corrects it), with
@@ -967,7 +1056,14 @@ class Reckoning:
         his log-line's marking, and `course_doubt_rad` the angle he doubts the course by
         for his compass's own error. With none of these it is the traverse of package
         33a, and the captain's own set, if he has ordered one, is applied here for the
-        clock's hours."""
+        clock's hours.
+
+        `held` (package 37j; `Navigation` passes it): the log's read and her drift by eye
+        are each one figure for the whole time it serves (the read until the log is next
+        hove, the drift while she lies to), so their doubts are kept as biases that grow in
+        a straight line across the boards (`read_doubt`, `drift_doubt`): an interval cut
+        at every board (item 4 of the package) must not shrink them, as the sum of their
+        squares by the interval would."""
         if hours < 0.0:
             return 0.0, 0.0
         clock = hours if clock_hours is None else max(hours, clock_hours)
@@ -988,17 +1084,33 @@ class Reckoning:
         steer_sigma = units.points_to_rad(
             STEERING_SIGMA_POINTS_SEAWAY if heavy_sea else STEERING_SIGMA_POINTS_SMOOTH
         )
-        s_along = read_sigma_kn * hours
+        s_along = 0.0 if held else read_sigma_kn * hours
         s_across = run * steer_sigma
         c, s = math.cos(course), math.sin(course)
         # R diag(s_along², s_across²) Rᵀ with R the course's rotation (east, north)
         q_ee = s_along**2 * s * s + s_across**2 * c * c
         q_nn = s_along**2 * c * c + s_across**2 * s * s
         q_en = (s_along**2 - s_across**2) * s * c
-        self.P[0][0] += q_ee + also_sigma_nm**2
-        self.P[1][1] += q_nn + also_sigma_nm**2
+        drift_var = 0.0 if held else also_sigma_nm**2
+        self.P[0][0] += q_ee + drift_var
+        self.P[1][1] += q_nn + drift_var
         self.P[0][1] += q_en
         self.P[1][0] += q_en
+        if held:
+            # the read's error along every board run on it, and the drift's either way
+            self._biases()
+            read = self.read_doubt
+            assert read is not None
+            old_r = list(read)
+            read[0] += read_sigma_kn * hours * s
+            read[1] += read_sigma_kn * hours * c
+            self._add_outer(read, +1.0)
+            self._add_outer(old_r, -1.0)
+            drift = self._drift_doubt()
+            for i in (0, 1):
+                old = drift[i]
+                drift[i] = old + also_sigma_nm
+                self.P[i][i] += drift[i] * drift[i] - old * old
         # the biases grow in a straight line: the set doubt east and north, by the
         # clock's hours
         for i, kn in ((0, SET_DOUBT_EAST_KN), (1, SET_DOUBT_NORTH_KN)):
@@ -1108,6 +1220,9 @@ class Reckoning:
             vec[1] -= gain * along * n_n
         self.set_doubt[0] *= 1.0 - gain * abs(n_e)
         self.set_doubt[1] *= 1.0 - gain * abs(n_n)
+        drift = self._drift_doubt()
+        drift[0] *= 1.0 - gain * abs(n_e)
+        drift[1] *= 1.0 - gain * abs(n_n)
 
     def _across(self, n_e: float, n_n: float) -> float:
         """The account's variance across a line whose unit normal is (n_e, n_n)."""
@@ -1147,12 +1262,18 @@ class Reckoning:
           moves toward the line by the part its own doubt is of the two, and its doubt
           across the line narrows; along the line nothing changes.
         - **Taken.** When the two disagree by more than their doubts together allow
-          (`OBSERVATION_OUT_SIGMAS` of each, added), the account is plainly out: it is
+          (`OBSERVATION_OUT_SIGMAS` of each, added), one of them is plainly out, and the
+          better figure is believed (package 37j): when the observation's doubt is no
+          greater than the account's across the line, the account is out, and it is
           laid on the line and its doubt across the line becomes the observation's own.
           This is Falconer 1780, 'Dead-reckoning' (the reckoning "is always to be
           corrected, as often as any good observation ... can be obtained"), kept for
-          the case it was written for and no longer applied to a poor sight of a good
-          account.
+          the case it was written for: a *good* observation.
+        - **Doubted.** When they so disagree and the observation is the poorer figure,
+          it is weighed as above, and the master doubts it (`Observation.doubted`, and
+          the line says so, `verdict_words`): a sight of two miles and a half against an
+          account fixed to three cables moves it a cable, and does not lay it down five
+          miles off (package 37e did; the merchant passage's second noon).
         - **The same thing seen again tells him nothing new.** `thing` names what was
           observed (a mark's bearing, a mark's distance by the eye, the lead's cast); a
           second line of the same thing lying within `SAME_LINE_DEG` of the first
@@ -1177,9 +1298,16 @@ class Reckoning:
         account_sigma = math.sqrt(prior)
         again = self._again(thing, n_e, n_n, however)
         shared = r if shared_sigma_nm is None else min(r, shared_sigma_nm * shared_sigma_nm)
+        off_toward = math.degrees(math.atan2(n_e * z, n_n * z)) % 360.0
         if again and prior <= shared * (1.0 + 1e-9):
-            return Observation(KEPT, 0.0, 0.0, abs(z), account_sigma, sigma_nm, True)
-        if take and abs(z) > OBSERVATION_OUT_SIGMAS * (account_sigma + sigma_nm):
+            return Observation(
+                KEPT, 0.0, 0.0, abs(z), account_sigma, sigma_nm, True, off_toward_deg=off_toward
+            )
+        # package 37j: plainly out, the better figure is believed
+        out = abs(z) > OBSERVATION_OUT_SIGMAS * (account_sigma + sigma_nm)
+        better = sigma_nm <= account_sigma
+        doubted = out and not better
+        if take and out and better:
             self._move(n_e * z, n_n * z)
             # P = (I - n nᵀ) P (I - n nᵀ) + R n nᵀ: the doubt along the line kept, across
             # it the measurement's own
@@ -1199,7 +1327,9 @@ class Reckoning:
             pn_n = p[1][0] * n_e + p[1][1] * n_n
             s = prior + r  # n P n + R
             if s <= 0.0:
-                return Observation(KEPT, 0.0, 0.0, abs(z), account_sigma, sigma_nm, again)
+                return Observation(
+                    KEPT, 0.0, 0.0, abs(z), account_sigma, sigma_nm, again, doubted, off_toward
+                )
             k_e, k_n = pn_e / s, pn_n / s  # the gain
             moved_e, moved_n = k_e * z, k_n * z
             self._move(moved_e, moved_n)
@@ -1222,6 +1352,8 @@ class Reckoning:
             account_sigma,
             sigma_nm,
             again,
+            doubted and how != TAKEN,
+            off_toward,
         )
 
     def observe_point(
@@ -1230,18 +1362,23 @@ class Reckoning:
         dn: float,
         cov: list[list[float]],
         lines: list[tuple[str, float, float, float]] | None = None,
+        common: tuple[float, float] | None = None,
     ) -> Observation:
         """A point measurement by the same rule: a fix `de, dn` miles east and north of
         the reckoning whose own doubt is `cov` (square miles, east and north). Taken
-        when the account is plainly out (the two farther apart than their doubts
-        together allow, measured along the line between them): the account is laid on
-        the fix and its doubt becomes the fix's own, a new departure. Weighed otherwise,
-        so that a good fix still rules a doubtful account and a poor one cannot move a
-        good account. `lines` are the fix's lines of bearing (the thing, the unit normal
-        and the part of the line's doubt that is the same each time, as a variance): a
-        fix by the same marks from the same place cannot narrow the doubt across a line
-        below that part, and where every line is one already had and the account's doubt
-        across each is no greater, it is not applied."""
+        when the two are farther apart than their doubts together allow, measured along
+        the line between them, and the fix is the better figure there (package 37j):
+        the account is laid on the fix and its doubt becomes the fix's own, a new
+        departure. Weighed otherwise, so that a good fix still rules a doubtful account
+        and a poor one cannot move a good account; when they so disagree and the fix is
+        the poorer, it is doubted. `lines` are the fix's lines of bearing (the thing,
+        the unit normal and the part of the line's doubt that is the same each time, as
+        a variance): a fix by the same marks from the same place cannot narrow the doubt
+        across a line below that part, and where every line is one already had and the
+        account's doubt across each is no greater, it is not applied. `common` is how far
+        the compass's own error (one sigma of what he allows for it) moves this fix,
+        miles east and north (package 37j): the same in every fix by marks on that hand
+        with that compass, so the account's doubt that way is never narrowed below it."""
         lines = lines or []
         again = [self._again(thing, n_e, n_n) for thing, n_e, n_n, _ in lines]
         apart = math.hypot(de, dn)
@@ -1249,6 +1386,7 @@ class Reckoning:
             u_e, u_n = de / apart, dn / apart
         else:
             u_e, u_n = 1.0, 0.0
+        off_toward = math.degrees(math.atan2(u_e, u_n)) % 360.0 if apart > 0.0 else 0.0
         account_sigma = math.sqrt(self._across(u_e, u_n))
         fix_sigma = math.sqrt(
             max(
@@ -1264,9 +1402,18 @@ class Reckoning:
                 self._across(n_e, n_n) <= shared * (1.0 + 1e-9) for _, n_e, n_n, shared in lines
             )
         ):
-            return Observation(KEPT, 0.0, 0.0, apart, account_sigma, fix_sigma, True)
+            return Observation(
+                KEPT, 0.0, 0.0, apart, account_sigma, fix_sigma, True, off_toward_deg=off_toward
+            )
         p = self.P
-        if apart > OBSERVATION_OUT_SIGMAS * (account_sigma + fix_sigma):
+        common_prior = 0.0
+        if common is not None and math.hypot(*common) > 0.0:
+            size = math.hypot(*common)
+            common_prior = self._across(common[0] / size, common[1] / size)
+        out = apart > OBSERVATION_OUT_SIGMAS * (account_sigma + fix_sigma)
+        better = fix_sigma <= account_sigma
+        doubted = out and not better
+        if out and better:
             self._move(de, dn)
             self.P = [[cov[0][0], cov[0][1]], [cov[1][0], cov[1][1]]]
             self.set_doubt = [0.0, 0.0]
@@ -1274,13 +1421,25 @@ class Reckoning:
             self.stream_doubt = [0.0, 0.0]
             self.run_doubt = [0.0, 0.0]
             self.course_doubt = [0.0, 0.0]
+            self.read_doubt = [0.0, 0.0]
+            self.drift_doubt = [0.0, 0.0]
             moved_e, moved_n = de, dn
             how = TAKEN
         else:
             s00, s01, s11 = p[0][0] + cov[0][0], p[0][1] + cov[0][1], p[1][1] + cov[1][1]
             det = s00 * s11 - s01 * s01
             if det <= 0.0:
-                return Observation(KEPT, 0.0, 0.0, apart, account_sigma, fix_sigma, all(again))
+                return Observation(
+                    KEPT,
+                    0.0,
+                    0.0,
+                    apart,
+                    account_sigma,
+                    fix_sigma,
+                    all(again),
+                    doubted,
+                    off_toward,
+                )
             i00, i01, i11 = s11 / det, -s01 / det, s00 / det  # S⁻¹
             k = [  # K = P S⁻¹
                 [p[0][0] * i00 + p[0][1] * i01, p[0][0] * i01 + p[0][1] * i11],
@@ -1305,11 +1464,21 @@ class Reckoning:
                 vec[1] = n - k[1][0] * e - k[1][1] * n
             self.set_doubt[0] *= max(0.0, 1.0 - k[0][0])
             self.set_doubt[1] *= max(0.0, 1.0 - k[1][1])
+            drift = self._drift_doubt()
+            drift[0] *= max(0.0, 1.0 - k[0][0])
+            drift[1] *= max(0.0, 1.0 - k[1][1])
             self._clean()
             for (_thing, n_e, n_n, shared), seen in zip(lines, again, strict=True):
                 if seen:
                     self._floor(n_e, n_n, shared)
             how = WEIGHED if math.hypot(moved_e, moved_n) >= OBSERVATION_KEPT_NM else KEPT
+        # the compass's own error moves every fix by marks on one hand alike: a fix does
+        # not make the account surer that way than the compass allows (package 37j), nor
+        # less sure than it was
+        if common is not None and how != TAKEN:
+            size = math.hypot(*common)
+            if size > 0.0:
+                self._floor(common[0] / size, common[1] / size, min(size * size, common_prior))
         self._clean()
         self.run_since_fix_nm = 0.0
         return Observation(
@@ -1320,7 +1489,66 @@ class Reckoning:
             account_sigma,
             fix_sigma,
             bool(lines) and all(again),
+            doubted and how != TAKEN,
+            off_toward,
         )
+
+    def within_doubt(self, sigmas: float) -> tuple[Any, float]:
+        """What the master would trust the account within (package 37j): a test of a
+        point, true when it lies within `sigmas` of the doubt as the ellipse lies (the
+        Mahalanobis distance), and the reach of that region in miles (its greater
+        semi-axis)."""
+        p = self.P
+        det = p[0][0] * p[1][1] - p[0][1] * p[1][0]
+        reach = sigmas * self.ellipse()["semi_major_nm"]
+        lat, lon = self.lat_deg, self.lon_deg
+        if det <= 1e-12:
+
+            def holds(point: Position) -> bool:
+                de, dn = _offset_from(lat, lon, point)
+                return math.hypot(de, dn) <= reach + 1e-9
+
+            return holds, reach
+        i00, i01, i11 = p[1][1] / det, -p[0][1] / det, p[0][0] / det
+        limit = sigmas * sigmas * (1.0 + 1e-9)
+
+        def holds(point: Position) -> bool:
+            de, dn = _offset_from(lat, lon, point)
+            return de * (i00 * de + i01 * dn) + dn * (i01 * de + i11 * dn) <= limit
+
+        return holds, reach
+
+    def widen_toward(self, de: float, dn: float, sigmas: float) -> float:
+        """The doubt grown toward a point `de, dn` miles east and north so that the point
+        lies `sigmas` of the doubt off (package 37j, a cast that does not agree within his
+        doubt: the nearest water that answers it lies then at the edge of what he would
+        trust the account within). The account does not move. Returns how far the doubt
+        grew along that way, miles one sigma (nought when the point lay within already)."""
+        d2 = de * de + dn * dn
+        if d2 <= 0.0:
+            return 0.0
+        d = math.sqrt(d2)
+        u_e, u_n = de / d, dn / d
+        p = self.P
+        det = p[0][0] * p[1][1] - p[0][1] * p[1][0]
+        before = math.sqrt(self._across(u_e, u_n))
+        if det <= 1e-12:
+            a = 1.0 / max(self._across(u_e, u_n), 1e-12)
+        else:
+            a = (
+                u_e * (p[1][1] * u_e - p[0][1] * u_n) + u_n * (-p[1][0] * u_e + p[0][0] * u_n)
+            ) / det
+        # with P' = P + k u uT, uT P'^-1 u = a / (1 + k a) (Sherman and Morrison), and the
+        # point d u lies `sigmas` off when that is sigmas squared over d squared
+        k = d2 / (sigmas * sigmas) - 1.0 / a
+        if k <= 0.0:
+            return 0.0
+        p[0][0] += k * u_e * u_e
+        p[1][1] += k * u_n * u_n
+        p[0][1] += k * u_e * u_n
+        p[1][0] += k * u_e * u_n
+        self._clean()
+        return math.sqrt(self._across(u_e, u_n)) - before
 
     def update_line(self, de: float, dn: float, n_e: float, n_n: float, sigma_nm: float) -> float:
         """`observe_line` for a caller that wants only the miles moved."""
@@ -1401,6 +1629,8 @@ class Reckoning:
         self.stream_doubt = [0.0, 0.0]
         self.run_doubt = [0.0, 0.0]
         self.course_doubt = [0.0, 0.0]
+        self.read_doubt = [0.0, 0.0]
+        self.drift_doubt = [0.0, 0.0]
         self._seen = {}
         self.run_since_fix_nm = 0.0
         self.track.append((tick, self.lat_deg, self.lon_deg))
@@ -1536,22 +1766,45 @@ def trust_words(sigma_nm: float) -> str:
     return f"within {doubt_miles_words(OBSERVATION_OUT_SIGMAS * sigma_nm)}"
 
 
-def verdict_words(obs: Observation, by: str = "the observation") -> str:
+def verdict_words(obs: Observation, by: str = "the observation", what: str | None = None) -> str:
     """What the master did, as the clause that ends an observation's line (package 37e:
     the words are a model's whole view of it). Taken: "the reckoning was out by it;
     laid down by the observation: moved six miles to the S". Weighed: "the account
-    moved four cables to the N". Kept: "the account kept"."""
+    moved four cables to the N". Kept: "the account kept". Doubted (package 37j), the
+    observation the poorer figure and further from the account than the two doubts
+    together: "the sight stands five miles to the N of the account, and the account,
+    good to three cables, is the better figure: the account kept" (`doubted_words`;
+    `what` names the observation there, `by` unless said)."""
     from freesail.world.geo import distance_words
 
     if obs.how == KEPT:
-        return "the account kept"
-    went = (
-        f"moved {distance_words(obs.moved_nm * units.NAUTICAL_MILE)} to the "
-        f"{units.point_name(math.radians(obs.toward_deg))}"
+        base = "the account kept"
+    else:
+        went = (
+            f"moved {distance_words(obs.moved_nm * units.NAUTICAL_MILE)} to the "
+            f"{units.point_name(math.radians(obs.toward_deg))}"
+        )
+        if obs.how == TAKEN:
+            return f"the reckoning was out by it; laid down by {by}: {went}"
+        base = f"the account {went}"
+    if obs.doubted:
+        return f"{doubted_words(obs, what or by)}: {base}"
+    return base
+
+
+def doubted_words(obs: Observation, what: str = "the observation") -> str:
+    """The master's doubt of an observation (package 37j): "the sight stands five miles
+    to the N of the account, and the account, good to three cables, is the better
+    figure"."""
+    from freesail.world.geo import distance_words
+
+    off = distance_words(max(units.CABLE, obs.off_nm * units.NAUTICAL_MILE))
+    side = units.point_name(math.radians(obs.off_toward_deg))
+    good = doubt_miles_words(obs.account_sigma_nm)
+    return (
+        f"{what} stands {off} to the {side} of the account, and the account, good to "
+        f"{good}, is the better figure"
     )
-    if obs.how == TAKEN:
-        return f"the reckoning was out by it; laid down by {by}: {went}"
-    return f"the account {went}"
 
 
 # ---------------------------------------------------------------------------
@@ -1667,19 +1920,24 @@ class Navigation:
     _now: Any = None
     _doubt: Any = None
     _cast_ground: tuple[float, float] | None = None  # where the ground's first cast was laid
+    # package 37j: where the account stood at the last cast that did not agree with the chart
+    _apart_ground: tuple[float, float] | None = None
     _ports: Any = None
     _highs: Any = None
+    # package 37j: whether she lay to at the last tick pegged, for the board's end at
+    # heaving to and filling away (None: not yet looked at)
+    _board_lying: bool | None = None
 
     def __init__(self, world: Any, stream: random.Random):
         self.world = world
         self.stream = stream
         origin: Position = world.origin
         self.errors = CompassErrors.draw(stream)
-        # the departure: where the land was last seen, drawn a mile in doubt
-        de = stream.gauss(0.0, DEPARTURE_SIGMA_NM)
-        dn = stream.gauss(0.0, DEPARTURE_SIGMA_NM)
+        # the departure: where she is, a mile in doubt (package 37j: the position at the
+        # start is the truth, as a departure taken from the land in sight is, and the
+        # mile is the doubt and no error; until then every scenario opened with the
+        # account drawn a mile out, which no departure is)
         self.reckoning = Reckoning(origin, world.clock.tick)
-        self.reckoning._move(de, dn)
         # the master is named from the ship's list, which the composer musters after the
         # World is made (`api.session.attach_crew`), so he is looked up at his first call
         self._master: Master | None = None
@@ -1810,9 +2068,16 @@ class Navigation:
             old = int(getattr(self, "_hove_to_n", 0))
             self._run_n = max(0, self._n - old)
             self._riding_n, self._hove_n = old, 0
-        self._n += 1
         way_kn = units.ms_to_knots(_speed_through_water(ship))
         lying_to = "hove_to" in (getattr(ship, "extra", None) or {})
+        was_lying = bool(self._board_lying)
+        if self._board_ends(lying_to, way_kn):
+            # each board laid down by itself (package 37j): the account worked up to this
+            # minute before the new board is pegged
+            self.bring_up()
+            if was_lying and not lying_to:
+                self.reckoning.lay_by_drift()
+        self._n += 1
         if lying_to:
             # a read of the log taken while she lies to is no read of her way when she
             # has filled away: by eye then, until the log is next hove
@@ -1857,6 +2122,25 @@ class Navigation:
             self._tide_from = tick
             self._tide_riding_n = 0
             self._now = None
+
+    def _board_ends(self, lying_to: bool, way_kn: float) -> bool:
+        """Whether the board pegged so far ends at this tick (package 37j): she has hove
+        to or filled away, or under way her head has gone `BOARD_ALTERATION_POINTS` or
+        more from the mean heading of the board (a tack, a wear, an alteration of course),
+        the board being `BOARD_LEAST_S` long at least."""
+        was = self._board_lying
+        self._board_lying = lying_to
+        if self._n <= 0:
+            return False
+        if was is not None and was != lying_to:
+            return True
+        if lying_to or way_kn < NO_WAY_KN or self._riding():
+            return False
+        if (self._run_n or 0) < BOARD_LEAST_S:
+            return False
+        mean = math.atan2(self._hx, self._hy)
+        turned = abs(units.wrap_pi(float(self.world.ship.heading) - mean))
+        return turned >= units.points_to_rad(BOARD_ALTERATION_POINTS)
 
     def _riding(self) -> bool:
         """At anchor or aground (package 34): the ship goes nowhere by the master's
@@ -2278,6 +2562,8 @@ class Navigation:
             r._biases()
             ghost.run_doubt = list(r.run_doubt or (0.0, 0.0))
             ghost.course_doubt = list(r.course_doubt or (0.0, 0.0))
+            ghost.read_doubt = list(r.read_doubt or (0.0, 0.0))
+            ghost.drift_doubt = list(r._drift_doubt())
             ghost.advance(
                 w.run_h,
                 w.course,
@@ -2293,6 +2579,7 @@ class Navigation:
                 stream=w.stream,
                 run_doubt=LOG_LINE_DOUBT,
                 course_doubt_rad=math.radians(self.compass_allowance_deg()),
+                held=True,
             )
             p = ghost.P
         out = _ellipse_of(p) | {"words": doubt_words(p)}
@@ -2333,6 +2620,7 @@ class Navigation:
             stream=w.stream,
             run_doubt=LOG_LINE_DOUBT,
             course_doubt_rad=math.radians(self.compass_allowance_deg()),
+            held=True,
         )
         self._hx = self._hy = 0.0
         self._n = 0
@@ -2425,6 +2713,7 @@ class Navigation:
         )
         read = max(0.0, round(read * 4.0) / 4.0)
         self.bring_up(read)
+        self.reckoning.new_read()
         self.last_log_read_kn = read
         self.last_log_tick = world.clock.tick
         self._eye_at_read = self._eye_now_kn()
@@ -2489,36 +2778,48 @@ class Navigation:
         depth_m = units.fathoms_to_m(fathoms)
         self.bring_up()
         r = self.reckoning
-        radius = max(CONTOUR_SEARCH_MIN_NM, 2.0 * r.ellipse()["semi_major_nm"])
         tolerance = CONTOUR_TOLERANCE_DEEP_FATHOMS if deep else CONTOUR_TOLERANCE_HAND_FATHOMS
-        # the master allows for the tide he does not know the state of (package 34; T §2:
-        # "the period judged the height between the tides by eye and by the lead"): half
-        # the spring rise of the nearest place in his table, the mean level, which is
-        # wrong by up to half the range either way (judgement on the study's words)
+        give = units.fathoms_to_m(tolerance)
+        # The tide's height by his own book (package 37j; package 34's flat three metres
+        # where his table gave no rise, and in game 10 the cast at St Mary's read nearly a
+        # fathom more than the chart where she truly was, and was laid down a mile off):
+        # the cast reduced to the chart's datum by the rise and the hour his epitome gives
+        # for the nearest place in it to his account, never the world's tide
         allowed_m = self._tide_allowance_m()
         on_chart_m = max(0.0, depth_m - allowed_m)
+
+        def ground_of(p: Position, d: float) -> str:
+            return ground_words(chart, p, d)
+
+        # The cast not beyond doubt (package 37j). He looks for the cast's depth and
+        # ground within his doubt (`OBSERVATION_OUT_SIGMAS` of it, the ellipse as it lies)
+        # and no further: a cast says only that the bottom is not what was expected, and
+        # never moves the account further than the account's own doubt.
+        holds, reach_nm = r.within_doubt(OBSERVATION_OUT_SIGMAS)
+        reach_nm = max(CONTOUR_GRAIN_M / units.NAUTICAL_MILE, reach_nm)
+        step_m = min(CONTOUR_GRAIN_M, max(CONTOUR_FINEST_M, reach_nm * units.NAUTICAL_MILE / 4.0))
         found = chart.contour_point(
             r.position,
             on_chart_m,
-            units.fathoms_to_m(tolerance),
-            radius * units.NAUTICAL_MILE,
+            give,
+            reach_nm * units.NAUTICAL_MILE,
             ground=ground,
-            ground_of=lambda p, d: ground_words(chart, p, d),
+            ground_of=ground_of,
+            step_m=step_m,
+            inside=holds,
         )
-        # The chart's own grain. The contour is searched on rings half a mile apart, and
-        # where the bottom is steep (a shore close aboard) or the tide stands otherwise
-        # than he allowed, the nearest point the search finds may be miles off although
-        # the chart about his account shows less water on one hand and more on the other
-        # than the cast: then the cast agrees with the account as nearly as the chart can
-        # say, and he keeps it, narrowing nothing (the lead, 2026-10-07: the frigate a
-        # cable out by her fix off Black Head was "laid down by the cast" two miles away)
+        # The chart's own grain. Where the chart about his account shows less water on one
+        # hand and more on the other than the cast, the cast agrees with the account as
+        # nearly as the chart can say, and he keeps it, narrowing nothing (package 37e: the
+        # frigate a cable out by her fix off Black Head was "laid down by the cast" two
+        # miles away)
         agrees = False
         if found is None or bearing_and_distance(r.position, found[0])[1] > CONTOUR_GRAIN_M:
             least, most = chart.depth_span(r.position, CONTOUR_GRAIN_M)
-            give = units.fathoms_to_m(tolerance)
             if least - give <= on_chart_m <= most + give:
                 found, agrees = (r.position, 0.0), True
         obs: Observation | None = None
+        apart: dict[str, Any] | None = None
         if found is not None:
             point, normal_deg = found
             de, dn = r.offset_nm(point)
@@ -2545,10 +2846,75 @@ class Navigation:
             if not same or obs.how == TAKEN:
                 self._cast_ground = (r.lat_deg, r.lon_deg)  # new ground, and its first cast
             self._moved()
+        else:
+            # Nothing within his doubt answers the cast: the cast does not agree with the
+            # chart where he believes her. The account is kept; and his doubt is grown so
+            # far, toward the nearest water of that depth and ground the chart shows
+            # beyond it, that that water lies at the edge of what he would trust it
+            # within: he no longer swears she is not there.
+            beyond_nm = max(CONTOUR_SEARCH_MIN_NM, 2.0 * reach_nm)
+            far = chart.contour_point(
+                r.position,
+                on_chart_m,
+                give,
+                beyond_nm * units.NAUTICAL_MILE,
+                ground=ground,
+                ground_of=ground_of,
+            )
+            apart = {"beyond_nm": beyond_nm}
+            # a second cast on the ground of one that did not agree is the same thing seen
+            # again (the chart's error there, or his tide's), and widens nothing further
+            was = self._apart_ground
+            again = (
+                was is not None
+                and bearing_and_distance(r.position, Position(*was))[1]
+                <= SAME_GROUND_NM * units.NAUTICAL_MILE
+            )
+            if far is not None:
+                de, dn = r.offset_nm(far[0])
+                grown = 0.0
+                if not again:
+                    # just beyond the edge, so that the same cast again stays apart
+                    grown = r.widen_toward(de, dn, OBSERVATION_OUT_SIGMAS * (1.0 + APART_EDGE))
+                    self._apart_ground = (r.lat_deg, r.lon_deg)
+                    self._moved()
+                apart |= {
+                    "nearest_nm": round(math.hypot(de, dn), 2),
+                    "toward": units.point_name(math.atan2(de, dn)),
+                    "grown_nm": round(grown, 2),
+                    "again": again,
+                }
         text = f"{chant(fathoms, not deep)}; {ground}."
+        if allowed_m >= units.fathoms_to_m(1.0):
+            # the reduction said when it is a fathom or more (package 37j)
+            text += (
+                f" {_head(fathoms_said(allowed_m))} of tide allowed by the epitome: "
+                f"{fathoms_said(on_chart_m)} on the chart."
+            )
         if obs is not None:
             text += f" {_head(verdict_words(obs, 'the cast'))}."
-        self._record_cast(tick, depth_m, ground, text, deep, obs)
+        elif apart is not None:
+            if "nearest_nm" in apart:
+                from freesail.world.geo import distance_words
+
+                where = (
+                    f"; the chart has that water nearest "
+                    f"{distance_words(apart['nearest_nm'] * units.NAUTICAL_MILE)} to the "
+                    f"{apart['toward']} of the account"
+                )
+                kept = (
+                    "the account kept"
+                    if apart["again"]
+                    else "the account kept, and its doubt widened"
+                )
+            else:
+                where = f", nor within {miles_words(apart['beyond_nm'])} of the account"
+                kept = "the account kept"
+            text += (
+                f" The cast does not agree with the chart where {self.master.name} believes "
+                f"her{where}: {kept}."
+            )
+        self._record_cast(tick, depth_m, ground, text, deep, obs, allowed_m=allowed_m, apart=apart)
 
     def _sounding_sigma_nm(
         self, point: Position, tolerance_fathoms: float, reach_nm: float = SOUNDING_SLOPE_NM
@@ -2585,42 +2951,58 @@ class Navigation:
 
     def tide_height_by_master_m(self) -> float:
         """The tide's height above low water now by the master's own reckoning (his
-        epitome's rise and hour, `_tide_allowance_m`): what the water where she lies
-        will fall by to low water, as he would tell the captain letting go an anchor
-        (package 37f). Never the world's tide."""
-        return self._tide_allowance_m()
+        epitome's rise and hour, `_masters_tide`): what the water where she lies will
+        fall by to low water, as he would tell the captain letting go an anchor (package
+        37f). Never the world's tide."""
+        tide = self._masters_tide()
+        if tide is None:
+            return TIDE_ALLOWANCE_DEFAULT_M
+        _spring_m, range_m, phase = tide
+        return 0.5 * range_m * (1.0 + math.cos(phase))
 
     def _tide_allowance_m(self) -> float:
         """What the master takes off a cast for the tide before he lays it on the chart:
-        his own tide, never the world's (decision 29). The rise at the nearest place in
-        his epitome by the moon's age (the spring rise at full and change, two-thirds of
-        it at the quarters: Norie's rule of thumb, `NEAP_RISE_OF_SPRING`), and the height
-        above low water now by the time from his high water (`tide_by_almanac`) as the
-        half-cosine of the tide's twelve hours and twenty-five minutes, which is the rule
-        of twelfths worked exactly; `TIDE_ALLOWANCE_DEFAULT_M` where the table gives no
-        rise for the place."""
+        his own tide, never the world's (decision 29), the height above his chart's
+        datum, which is low water at springs (package 37j: until then the height above
+        the day's low water, which at the neaps stands above the datum by half the
+        difference of the two rises). Half the spring rise of the nearest place in his
+        epitome to his account, and half the day's rise (the spring rise at full and
+        change, two-thirds of it at the quarters: Norie's rule of thumb,
+        `NEAP_RISE_OF_SPRING`) by the half-cosine of the time from his high water
+        (`tide_by_almanac`) over the tide's twelve hours and twenty-five minutes, which
+        is the rule of twelfths worked exactly; `TIDE_ALLOWANCE_DEFAULT_M` where the table
+        gives no rise for the place."""
+        tide = self._masters_tide()
+        if tide is None:
+            return TIDE_ALLOWANCE_DEFAULT_M
+        spring_m, range_m, phase = tide
+        return 0.5 * spring_m + 0.5 * range_m * math.cos(phase)
+
+    def _masters_tide(self) -> tuple[float, float, float] | None:
+        """The master's own tide at his account now: the spring rise of the nearest place
+        in his epitome, the day's rise by the moon's age, and the phase from his nearest
+        high water (radians, nought at high water); None where his table gives no rise
+        there. His epitome, his almanac and his account, and nothing of the world's."""
         epitome = getattr(self, "epitome", None)
         if epitome is None:
-            return TIDE_ALLOWANCE_DEFAULT_M
+            return None
         port, _ = epitome.nearest(self.reckoning.position)
         if port.spring_rise_ft is None:
-            return TIDE_ALLOWANCE_DEFAULT_M
+            return None
         age = self.almanac_age_days()
         springs = abs(math.cos(2.0 * math.pi * age / SYNODIC_MONTH_DAYS))
-        range_m = units.feet_to_m(port.spring_rise_ft) * (
-            NEAP_RISE_OF_SPRING + (1.0 - NEAP_RISE_OF_SPRING) * springs
-        )
+        spring_m = units.feet_to_m(port.spring_rise_ft)
+        range_m = spring_m * (NEAP_RISE_OF_SPRING + (1.0 - NEAP_RISE_OF_SPRING) * springs)
         now = self.world.clock.ship_time
         day = now.date()
         highs = epitome.high_waters(port, age, day) + epitome.high_waters(
             port, age + 1.0, day + timedelta(days=1)
         )
         if not highs:
-            return 0.5 * range_m
+            return spring_m, range_m, 0.5 * math.pi
         nearest = min(highs, key=lambda t: abs((t - now).total_seconds()))
         hours = (now - nearest).total_seconds() / 3600.0
-        phase = 2.0 * math.pi * hours / TIDE_HOURS
-        return 0.5 * range_m * (1.0 + math.cos(phase))
+        return spring_m, range_m, 2.0 * math.pi * hours / TIDE_HOURS
 
     def _record_cast(
         self,
@@ -2630,6 +3012,8 @@ class Navigation:
         text: str,
         deep: bool,
         obs: Observation | None = None,
+        allowed_m: float | None = None,
+        apart: dict[str, Any] | None = None,
     ) -> None:
         r = self.reckoning
         cast = Sounding(tick, depth_m, ground, text, r.lat_deg, r.lon_deg, deep)
@@ -2654,6 +3038,11 @@ class Navigation:
                 "matched": obs is not None,
                 "how": None if obs is None else obs.how,
                 "line_sigma_nm": None if obs is None else round(obs.sigma_nm, 2),
+                # package 37j: the master's own tide taken off before he laid it on the
+                # chart, and a cast that did not agree with the chart within his doubt
+                "tide_allowed_m": None if allowed_m is None else round(allowed_m, 2),
+                "agrees": None if depth_m is None else apart is None,
+                "apart": apart,
             },
         )
 
@@ -2823,12 +3212,17 @@ class Navigation:
                 verdict = f"the reckoning was out by it; laid down by {by}: {went}"
             else:
                 verdict = f"the account {went}"
+        if line.doubted and how != TAKEN:
+            # package 37j: the bearing's line the poorer figure and plainly apart from the
+            # account, weighed and doubted
+            verdict = f"{doubted_words(line, 'the line of the bearing')}: {verdict}"
         aside = f"; {by_account} by the account" if differs else ""
         text = f"{said}{aside}: {verdict}."
         return text, record.to_dict() | {
             "reckoning": r.words,
             "how": how,
             "line": line.how,
+            "doubted": line.doubted and how != TAKEN,
             "distance": None if distance is None else distance.how,
             "moved_nm": round(moved, 2),
             "moved_toward": units.point_name(math.radians(toward_deg)),
@@ -2953,7 +3347,11 @@ class Navigation:
             had.append((f"{s.feature.id}:bearing", math.cos(laid), -math.sin(laid), shared))
         de, dn = r.offset_nm(fix)
         off_m = math.hypot(de, dn) * units.NAUTICAL_MILE
-        obs = r.observe_point(de, dn, cov, had)
+        # how far the compass's own error, one sigma of what he allows for it, moves this
+        # fix: the same in every fix by marks on this hand, and never narrowed below
+        # (package 37j)
+        common = _compass_shift_nm(fix, lines, allowance)
+        obs = r.observe_point(de, dn, cov, had, common)
         self._moved()
         self._last_bearing_mark = None
         toward, moved_m = bearing_and_distance(before, r.position)
@@ -2984,10 +3382,26 @@ class Navigation:
             met = f"the lines cut at {5 * round(cut / 5.0):.0f} degrees"
         sigma_m = math.sqrt(max(0.0, _greatest_eigen(cov))) * units.NAUTICAL_MILE
         good = distance_words(max(units.CABLE, sigma_m))
+        # package 37j: marks all on one hand fix her one way better than the other, and
+        # the doubt is said as it lies, along the shore and off it
+        hand = _one_hand(lines)
+        if hand is not None:
+            along_m, off_shore_m = _along_and_off_nm(cov, hand)
+            along_m *= units.NAUTICAL_MILE
+            off_shore_m *= units.NAUTICAL_MILE
+            a_words = distance_words(max(units.CABLE, along_m))
+            o_words = distance_words(max(units.CABLE, off_shore_m))
+            if a_words != o_words:
+                good = f"{a_words} along the shore and {o_words} off it"
         by_fix = f"{format_position(fix)} by the fix, good to {good}"
         went = f"moved {distance_words(moved_m)} to the {units.point_name(math.radians(toward))}"
         if obs.how == TAKEN:
             tail = f"The reckoning was out by it; laid down by the fix: {went}: {by_fix}."
+        elif obs.how == WEIGHED and obs.doubted:
+            tail = (
+                f"{_head(by_fix)}, the fix the poorer figure: "
+                f"{doubted_words(obs, 'it')}; the account {went}."
+            )
         elif obs.how == WEIGHED:
             tail = f"The account {went}: {by_fix}."
         else:
@@ -3015,6 +3429,8 @@ class Navigation:
             "cut_deg": round(cut, 1),
             "hat_m": None if hat_m is None else round(hat_m),
             "how": obs.how,
+            "doubted": obs.doubted,
+            "one_hand": hand is not None,
             "moved_nm": round(moved_nm, 2),
             "moved_toward": units.point_name(math.radians(toward)),
             "off_nm": round(off_m / units.NAUTICAL_MILE, 2),
@@ -3203,7 +3619,7 @@ class Navigation:
         if observed is not None and obs is not None:
             head = (
                 f"Noon. Latitude by observation {_lat_words(observed)}; the reckoning was "
-                f"{_lat_words(account_lat)}: {verdict_words(obs)}."
+                f"{_lat_words(account_lat)}: {verdict_words(obs, what='the sight')}."
             )
         else:
             head = f"Noon. No sight; {result.refusal}. Latitude by account {lat_words}."
@@ -3374,11 +3790,24 @@ class Navigation:
             if feature is not None:
                 passes = [p for p in passes if p[0].id != feature.id]
             crossed = [f.name for f, _off, crosses in passes if crosses]
-            near = [f.name for f, _off, crosses in passes if not crosses]
+            # package 37j: how near, to the cable, from the account as it stands (it was
+            # "within a mile" for all)
+            from freesail.world.geo import distance_words
+
+            near = [
+                f"{f.name} within "
+                f"{distance_words(max(units.CABLE, off - float(getattr(f, 'extent_m', 0.0))))}"
+                for f, off, crosses in passes
+                if not crosses
+            ]
             if crossed:
                 said.append(f"the line crosses {_and(crossed)}")
             if near:
-                said.append(f"the line passes {_and(near)} within a mile")
+                said.append(f"the line passes {_and(near)}")
+            data["dangers"] = [
+                {"id": f.id, "name": f.name, "off_m": round(off), "crosses": crosses}
+                for f, off, crosses in passes
+            ]
             shore = self._line_shore(r.position, target, feature)
             if shore is not None:
                 said.append(shore["words"])
@@ -3580,6 +4009,8 @@ class Navigation:
         if not found:
             return None
         items = []
+        from freesail.world.geo import distance_words
+
         for f, bearing, dist in found:
             heading = math.radians(bearing)
             laid = (heading + self.errors.course_error_rad(heading)) % units.TWO_PI
@@ -3590,8 +4021,10 @@ class Navigation:
                     "kind": f.kind,
                     "bearing": laid,
                     "metres": dist,
+                    # to the cable, from the account as it stands (package 37j; whole
+                    # miles before, so that a ledge four cables off was "no distance")
                     "words": f"{f.name} {units.point_name(laid)}, "
-                    f"{miles_words(dist / units.NAUTICAL_MILE)}",
+                    f"{distance_words(max(units.CABLE, dist))}",
                 }
             )
         words = "; ".join(i["words"] for i in items[:8])
@@ -3603,6 +4036,33 @@ class Navigation:
             "items": items,
             "within_nm": radius,
         }
+
+    def chart_depths_within_doubt(self) -> tuple[float, float]:
+        """The least and the greatest depth the chart shows within what the master would
+        trust the account within (`OBSERVATION_OUT_SIGMAS` of the doubt as it stands, the
+        ellipse as it lies), at the account and on sixteen bearings at the half and the
+        edge of it; the land counted as no water (package 37j, `the depth of water`). The
+        account and its doubt only."""
+        chart = self.world.chart
+        here = self.account_now()
+        e = self.doubt_now()
+        a = OBSERVATION_OUT_SIGMAS * float(e["semi_major_nm"])
+        b = OBSERVATION_OUT_SIGMAS * float(e["semi_minor_nm"])
+        lie = math.radians(float(e["major_bearing_deg"]))
+        depths = []
+        points = [here]
+        for k in range(16):
+            t = 2.0 * math.pi * k / 16.0
+            # a point on the ellipse: along its greater axis by cos, its lesser by sin
+            along, across = a * math.cos(t), b * math.sin(t)
+            de = along * math.sin(lie) + across * math.cos(lie)
+            dn = along * math.cos(lie) - across * math.sin(lie)
+            for part in (0.5, 1.0):
+                points.append(_displaced(here, part * de, part * dn))
+        for p in points:
+            d = chart.depth_at(p)
+            depths.append(0.0 if d is None else float(d))
+        return min(depths), max(depths)
 
     def no_dangers_words(self) -> str:
         from freesail.world.chart import DANGERS_WITHIN_NM
@@ -3778,7 +4238,8 @@ class Navigation:
             f"{'Forenoon' if sight.forenoon else 'Afternoon'}. The sun's altitude for the time: "
             f"longitude by chronometer {sight.words}, {c.name} {sight.days_since_rated} days"
             f"{where}; the reckoning was {_lon_words(account_lon)}. {self.master.name} would "
-            f"trust it within {miles_words(trust)}{_beside_words(obs)}: {verdict_words(obs)}."
+            f"trust it within {miles_words(trust)}{_beside_words(obs)}: "
+            f"{verdict_words(obs, what='the sight')}."
         )
         data = {
             "sight": sight.to_dict(),
@@ -3943,7 +4404,7 @@ class Navigation:
             return None
         world = self.world
         t = world.clock.ship_time
-        lat = world.position.lat_deg if world.position is not None else 50.0
+        lat = self.reckoning.lat_deg  # his latitude by account (package 37j: no truth)
         doubt = c.doubt_nm(t, lat)
         trust = _round_miles(2.0 * doubt) if c.going else 0
         words = c.words(world)
@@ -4288,6 +4749,13 @@ def _allowed(part: float) -> float:
     return min(WAY_ALLOWANCE_MOST, max(WAY_ALLOWANCE_LEAST, part))
 
 
+def _offset_from(lat_deg: float, lon_deg: float, other: Position) -> tuple[float, float]:
+    """Miles east and north from a place to `other`, as `Reckoning.offset_nm` lays them."""
+    de = (other.lon_deg - lon_deg) * _NM_PER_DEG * math.cos(math.radians(lat_deg))
+    dn = (other.lat_deg - lat_deg) * _NM_PER_DEG
+    return de, dn
+
+
 def _displaced(pos: Position, de: float, dn: float) -> Position:
     """A position so many miles east and north of another, as the traverse lays it."""
     lat = pos.lat_deg + dn / _NM_PER_DEG
@@ -4459,7 +4927,7 @@ def _beside_words(obs: Observation) -> str:
     observation's, when the observation is the poorer figure and the account was kept
     (the lunar of game 9: "which he would trust within 25 miles, and the account within
     two: the account kept")."""
-    if obs.how == KEPT and obs.poorer:
+    if obs.how == KEPT and obs.poorer and not obs.doubted:
         return f", and the account {trust_words(obs.account_sigma_nm)}"
     return ""
 
@@ -4663,6 +5131,68 @@ def _fix_of(
             # crossing stands from the fix, twice over
             hat = 2.0 * max(math.hypot(c[0], c[1]) for c in corners) if corners else 0.0
     return p, cov, hat
+
+
+# Marks all on one hand (package 37j): the bearings of a fix's marks lie within this arc
+# of the compass, six points and a half (JUDGEMENT; in the Bay of Brest the three marks of 37e's
+# finding bore from W by N to N by W, and off the Lizard in game 10 from NW to N by W).
+ONE_HAND_DEG = 73.125
+
+
+def _one_hand(lines: list[tuple[Any, float]]) -> float | None:
+    """The mean bearing of a fix's marks (radians, toward them) when they lie all on one
+    hand (`ONE_HAND_DEG`), else None."""
+    bearings = sorted(laid % units.TWO_PI for _s, laid in lines)
+    if len(bearings) < 2:
+        return None
+    gaps = [b - a for a, b in zip(bearings, bearings[1:], strict=False)]
+    gaps.append(bearings[0] + units.TWO_PI - bearings[-1])
+    span = units.TWO_PI - max(gaps)  # the least arc that holds them all
+    if span > math.radians(ONE_HAND_DEG):
+        return None
+    e = sum(math.sin(b) for b in bearings)
+    n = sum(math.cos(b) for b in bearings)
+    return math.atan2(e, n)
+
+
+def _along_and_off_nm(cov: list[list[float]], toward: float) -> tuple[float, float]:
+    """A fix's doubt along the shore (square to the mean bearing of its marks) and off
+    it (along that bearing), in miles."""
+    r = (math.sin(toward), math.cos(toward))
+    t = (r[1], -r[0])
+
+    def sigma(v: tuple[float, float]) -> float:
+        q = v[0] * (cov[0][0] * v[0] + cov[0][1] * v[1]) + v[1] * (
+            cov[1][0] * v[0] + cov[1][1] * v[1]
+        )
+        return math.sqrt(max(0.0, q))
+
+    return sigma(t), sigma(r)
+
+
+def _compass_shift_nm(
+    fix: Position, lines: list[tuple[Any, float]], allowance_deg: float
+) -> tuple[float, float]:
+    """How far a turn of the compass by `allowance_deg` moves a fix by these lines, miles
+    east and north: each line swings about its mark by the mark's distance times the
+    turn, and the fix by the weighted sum (the same arithmetic as `_fix_of`'s compass
+    term). Large when the marks lie on one hand, nothing when they lie all round."""
+    a00 = a01 = a11 = g0 = g1 = 0.0
+    for s, laid in lines:
+        away = bearing_and_distance(fix, s.feature.position)[1]
+        sigma = _bearing_sigma_nm(away) * units.NAUTICAL_MILE
+        w = 1.0 / (sigma * sigma)
+        n_e, n_n = math.cos(laid), -math.sin(laid)
+        a00 += w * n_e * n_e
+        a01 += w * n_e * n_n
+        a11 += w * n_n * n_n
+        g0 += w * away * n_e
+        g1 += w * away * n_n
+    det = a00 * a11 - a01 * a01
+    if abs(det) < 1e-18:
+        return 0.0, 0.0
+    turn = math.radians(allowance_deg) / units.NAUTICAL_MILE
+    return (a11 * g0 - a01 * g1) / det * turn, (a00 * g1 - a01 * g0) / det * turn
 
 
 def _tick_of(world: Any, when: datetime) -> int:

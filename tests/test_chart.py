@@ -409,9 +409,8 @@ def test_the_readings_on_a_ship_with_a_chart_and_on_one_without():
     with_chart = chart_world(50.12, -5.03)
     r = with_chart.readings
     assert 15.0 < r["depth_of_water"] < 25.0
-    assert r.words("depth_of_water").endswith("fathoms") or "and a half" in r.words(
-        "depth_of_water"
-    )
+    # package 37j: the chart's figure at the account, said as the chart's and never a cast
+    assert " at low water by the chart, at the position by account" in r.words("depth_of_water")
     assert r["land"]["in_sight"] is True and r["land"]["nearest"]["id"] in {
         "pendennis-castle",
         "black-rock-falmouth",
@@ -449,7 +448,9 @@ def test_the_dialect_reads_the_land_and_the_depth_of_water():
     are the standing dialect's for nothing, as every reading is (spec M5 §15; the two hunks
     the package's report named, applied by the lead at the merge after 31c landed): `when
     the land is in sight`, `when the land is not in sight`, `when the depth of water is under
-    10 fathoms`, evaluated against the world's own readings."""
+    10 fathoms`, evaluated against the world's own readings. Since package 37j a condition
+    on the depth reads the last cast of the lead, as the officer of the watch would, and
+    the chart's figure at the account only when the book says `by the chart`."""
     from freesail.standing.grammar import parse_condition
 
     inshore = chart_world(50.12, -5.03)  # Falmouth's mouth: land in sight, shallow water
@@ -457,12 +458,24 @@ def test_the_dialect_reads_the_land_and_the_depth_of_water():
     for text, near, far in (
         ("the land is in sight", True, False),
         ("the land is not in sight", False, True),
-        ("the depth of water is under 30 fathoms", True, False),
-        ("the depth of water exceeds 30 fathoms", False, True),
+        ("the depth of water by the chart is under 30 fathoms", True, False),
+        ("the depth of water by the chart exceeds 30 fathoms", False, True),
+        ("the charted depth is under 30 fathoms", True, False),
+        # no cast yet: the lead has said nothing, and the condition reads false either way
+        ("the depth of water is under 30 fathoms", False, False),
+        ("the depth of water exceeds 30 fathoms", False, False),
     ):
         c = parse_condition(text, inshore.ship)
         assert c.holds(inshore.readings, {}) is near, text
         assert c.holds(offing.readings, {}) is far, text
+    lead = parse_condition("the depth of water is under 30 fathoms", inshore.ship)
+    assert [x.reading for x in lead.clauses] == ["depth"]
+    chart = parse_condition("the depth of water by the chart is under 30 fathoms", inshore.ship)
+    assert [x.reading for x in chart.clauses] == ["depth_of_water"]
+    inshore.submit("heave the lead")
+    inshore.run(300)
+    assert inshore.readings["depth"] is not None
+    assert lead.holds(inshore.readings, {}) is True
 
 
 def test_she_takes_the_ground_and_the_log_says_so_once_and_comes_off_again():

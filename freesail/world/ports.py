@@ -1480,31 +1480,64 @@ class Ports:
 
     # -- readings' words ---------------------------------------------------------------------
 
+    def nearest_by_account(self) -> tuple[Port, float, Any] | None:
+        """The nearest port by its roads from the position by account (package 37j), the
+        miles to them and the spot; None without a reckoning or a port."""
+        nav = getattr(self.world, "navigation", None)
+        if nav is None or not self.ports:
+            return None
+        here = nav.account_now()
+        best = None
+        for port in self.ports.values():
+            spot, d = port.nearest_spot(here)
+            if best is None or d < best[1]:
+                best = (port, d, spot)
+        return best
+
     def port_words(self) -> dict[str, Any] | None:
         """`the port`: the nearest port within the pilot's cruising ground or in which she
-        lies, its stance to her, the pilot, the cutter and the boat."""
-        found = self.nearest()
+        lies, its stance to her, the pilot, the cutter and the boat. Since package 37j by
+        the captain's means (the review's G4: it gave the true bearing and distance of
+        the port's road to a tenth of a mile, and the officers steered by it): its bearing
+        and distance from the position by account, with the account's doubt, as `shape a
+        course for` gives them, and beyond the pilot's ground what the chart and the
+        account allow. At anchor in a port she is in it, as anyone aboard can see."""
+        from freesail.world.geo import distance_words
+        from freesail.world.reckoning import doubt_miles_words
+
+        found = self.nearest_by_account()
         if found is None:
             return None
-        port, d_nm = found
-        pos = self.world.position
-        if d_nm > max(port.pilot.cruising_nm, 10.0):
+        port, d_nm, spot = found
+        nav = self.world.navigation
+        here = nav.account_now()
+        bearing = bearing_and_distance(here, spot.position)[0]
+        point = units.point_name(math.radians(bearing))
+        good = doubt_miles_words(float(nav.doubt_now()["semi_major_nm"]))
+        stance = self.stance(port)
+        if d_nm > max(port.pilot.cruising_nm, 10.0) and self.in_port() is None:
             return {
-                "words": f"no port within the pilot's cruising ground; the nearest is {port.name}, "
-                f"{d_nm:.0f} miles off",
+                "words": f"no port within the pilot's cruising ground by account; the nearest "
+                f"is {port.name}, {point} by account, {distance_words(d_nm * units.NAUTICAL_MILE)}"
+                f", the account good to {good}",
                 "port": port.id,
-                "stance": self.stance(port),
+                "stance": stance,
                 "distance_nm": round(d_nm, 1),
+                "by": "account",
                 "pilot": None,
             }
-        stance = self.stance(port)
-        spot, d_spot = port.nearest_spot(pos)
-        bearing = bearing_and_distance(pos, spot.position)[0]
-        if self.in_port() is port:
+        in_port = self.in_port()
+        if in_port is not None:
+            # at anchor in a port she is in it, and in the road she let go in, as anyone
+            # aboard can see: the port's business is the world's, and says no figure
+            port, spot = in_port, in_port.nearest_spot(self.world.position)[0]
+            stance = self.stance(port)
             where = f"at anchor in {port.name}, {spot.name}"
         else:
-            point = units.point_name(math.radians(bearing))
-            where = f"{port.name}, {spot.name} bearing {point}, {d_spot:.1f} miles"
+            where = (
+                f"{port.name}, {spot.name} bearing {point} by account, "
+                f"{distance_words(d_nm * units.NAUTICAL_MILE)}, the account good to {good}"
+            )
         bits = [where, f"the port {stance} to {self.world.nations.get(self.ship_nation).people}"]
         if self.pilot is not None:
             bits.append(f"the pilot {self.pilot.name} aboard")
@@ -1527,7 +1560,8 @@ class Ports:
             "words": "; ".join(bits),
             "port": port.id,
             "stance": stance,
-            "distance_nm": round(d_spot, 2),
+            "distance_nm": round(d_nm, 2),
+            "by": "account",
             "pilot": self.pilot.to_dict() if self.pilot else None,
             "boat_away": self.boat.away,
         }

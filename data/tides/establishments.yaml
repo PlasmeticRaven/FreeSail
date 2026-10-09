@@ -29,6 +29,20 @@
 # the French ports' from the RAM's modern mean springs (T §1), judgement for a period
 # table.
 #
+# THE RISE FOR EVERY PLACE (package 37j). The master reduces a cast of the lead to his
+# chart's datum by his own tide (`freesail/world/reckoning.py`, `_tide_allowance_m`): the
+# rise at springs of the nearest place in his table, two-thirds of it at the quarters, and
+# the hour from high water. Package 34 gave the rise only where a period figure was in
+# hand and took a flat three metres elsewhere, so a merchant with Moore's table (which
+# gives none) took three metres off every cast whatever the tide: in game 10, at St
+# Mary's near high water of a seventeen-foot tide, the cast read nearly a fathom more than
+# his chart at his own right position and was laid down a mile off. Every place now has a
+# rise. Where the period's table gives none (`rise_judgement: true`) it is the world's
+# spring range at the place (the constants' M2 and S2, twice their sum) rounded to the
+# foot, as the directions' rates in streams.yaml are the world's rounded: JUDGEMENT, the
+# statement a master's sailing directions would have made ("the tide rises fifteen feet
+# at springs") and not a figure read from a period page.
+#
 # `moore`: Moore's New Practical Navigator (1799), the table by the moon's bearing at high
 # water, a point of the compass to every 45 minutes ("S. by W." 12h 45m, "S.S.W." 1h 30m,
 # ... "W." 6h 00m), in the manner of the seventeenth-century pilots; the study could pin
@@ -41,35 +55,35 @@ tables:
   norie:
     title: "the epitome's table of high water at full and change (Norie 1803, Table XLI, the figures Dessiou's and Daussy's as Whewell 1833 quotes them)"
     ports:
-      - {name: Scilly, lat_deg: 49.914, lon_deg: -6.317, hw_h: 4, hw_m: 10, note: "Dessiou; Lubbock 4h 30m"}
-      - {name: the Land's End, lat_deg: 50.066, lon_deg: -5.716, hw_h: 4, hw_m: 20}
-      - {name: Mount's Bay, lat_deg: 50.100, lon_deg: -5.530, hw_h: 4, hw_m: 30}
-      - {name: the Lizard, lat_deg: 49.959, lon_deg: -5.207, hw_h: 4, hw_m: 30}
+      - {name: Scilly, lat_deg: 49.914, lon_deg: -6.317, hw_h: 4, hw_m: 10, spring_rise_ft: 15, rise_judgement: true, note: "Dessiou; Lubbock 4h 30m"}
+      - {name: the Land's End, lat_deg: 50.066, lon_deg: -5.716, hw_h: 4, hw_m: 20, spring_rise_ft: 15, rise_judgement: true}
+      - {name: Mount's Bay, lat_deg: 50.100, lon_deg: -5.530, hw_h: 4, hw_m: 30, spring_rise_ft: 15, rise_judgement: true}
+      - {name: the Lizard, lat_deg: 49.959, lon_deg: -5.207, hw_h: 4, hw_m: 30, spring_rise_ft: 15, rise_judgement: true}
       - {name: Falmouth, lat_deg: 50.153, lon_deg: -5.055, hw_h: 5, hw_m: 15, spring_rise_ft: 15, note: "Falmouth Harbour, Dessiou; the rise Fowey's of 1774"}
       - {name: Fowey, lat_deg: 50.333, lon_deg: -4.634, hw_h: 5, hw_m: 15, spring_rise_ft: 15}
-      - {name: the Eddystone, lat_deg: 50.183, lon_deg: -4.267, hw_h: 5, hw_m: 15}
+      - {name: the Eddystone, lat_deg: 50.183, lon_deg: -4.267, hw_h: 5, hw_m: 15, spring_rise_ft: 15, rise_judgement: true}
       - {name: Plymouth, lat_deg: 50.368, lon_deg: -4.185, hw_h: 5, hw_m: 33, spring_rise_ft: 16, note: "the mean establishment"}
-      - {name: Dartmouth, lat_deg: 50.350, lon_deg: -3.567, hw_h: 6, hw_m: 0}
-      - {name: Torbay, lat_deg: 50.450, lon_deg: -3.500, hw_h: 6, hw_m: 0}
-      - {name: Portland, lat_deg: 50.515, lon_deg: -2.457, hw_h: 5, hw_m: 30, note: "Portland Bill"}
-      - {name: Dover, lat_deg: 51.117, lon_deg: 1.318, hw_h: 10, hw_m: 50}
-      - {name: Ushant, lat_deg: 48.459, lon_deg: -5.054, hw_h: 3, hw_m: 47}
+      - {name: Dartmouth, lat_deg: 50.350, lon_deg: -3.567, hw_h: 6, hw_m: 0, spring_rise_ft: 14, rise_judgement: true}
+      - {name: Torbay, lat_deg: 50.450, lon_deg: -3.500, hw_h: 6, hw_m: 0, spring_rise_ft: 13, rise_judgement: true}
+      - {name: Portland, lat_deg: 50.515, lon_deg: -2.457, hw_h: 5, hw_m: 30, spring_rise_ft: 6, rise_judgement: true, note: "Portland Bill"}
+      - {name: Dover, lat_deg: 51.117, lon_deg: 1.318, hw_h: 10, hw_m: 50, spring_rise_ft: 19, rise_judgement: true}
+      - {name: Ushant, lat_deg: 48.459, lon_deg: -5.054, hw_h: 3, hw_m: 47, spring_rise_ft: 18, rise_judgement: true}
       - {name: Brest, lat_deg: 48.383, lon_deg: -4.495, hw_h: 3, hw_m: 48, spring_rise_ft: 19}
-      - {name: Morlaix, lat_deg: 48.655, lon_deg: -3.872, hw_h: 5, hw_m: 15}
+      - {name: Morlaix, lat_deg: 48.655, lon_deg: -3.872, hw_h: 5, hw_m: 15, spring_rise_ft: 24, rise_judgement: true}
       - {name: St Malo, lat_deg: 48.641, lon_deg: -2.028, hw_h: 6, hw_m: 0, spring_rise_ft: 35}
-      - {name: Jersey, lat_deg: 49.183, lon_deg: -2.117, hw_h: 6, hw_m: 10}
-      - {name: Guernsey, lat_deg: 49.455, lon_deg: -2.537, hw_h: 6, hw_m: 30}
-      - {name: Alderney, lat_deg: 49.717, lon_deg: -2.200, hw_h: 6, hw_m: 45}
+      - {name: Jersey, lat_deg: 49.183, lon_deg: -2.117, hw_h: 6, hw_m: 10, spring_rise_ft: 30, rise_judgement: true}
+      - {name: Guernsey, lat_deg: 49.455, lon_deg: -2.537, hw_h: 6, hw_m: 30, spring_rise_ft: 22, rise_judgement: true}
+      - {name: Alderney, lat_deg: 49.717, lon_deg: -2.200, hw_h: 6, hw_m: 45, spring_rise_ft: 17, rise_judgement: true}
       - {name: Cherbourg, lat_deg: 49.651, lon_deg: -1.636, hw_h: 7, hw_m: 45, spring_rise_ft: 17}
   moore:
     title: "Moore's table of high water by the moon's bearing (Moore 1799), a point to every three quarters of an hour"
     ports:
-      - {name: Brest, lat_deg: 48.383, lon_deg: -4.495, hw_h: 3, hw_m: 45, bearing: "SW by W"}
-      - {name: Ushant, lat_deg: 48.459, lon_deg: -5.054, hw_h: 4, hw_m: 30, bearing: WSW}
-      - {name: Scilly, lat_deg: 49.914, lon_deg: -6.317, hw_h: 4, hw_m: 30, bearing: WSW}
-      - {name: Plymouth, lat_deg: 50.368, lon_deg: -4.185, hw_h: 6, hw_m: 0, bearing: W}
-      - {name: Ramhead, lat_deg: 50.313, lon_deg: -4.225, hw_h: 6, hw_m: 0, bearing: W}
-      - {name: Torbay, lat_deg: 50.450, lon_deg: -3.500, hw_h: 6, hw_m: 0, bearing: W}
+      - {name: Brest, lat_deg: 48.383, lon_deg: -4.495, hw_h: 3, hw_m: 45, bearing: "SW by W", spring_rise_ft: 18, rise_judgement: true}
+      - {name: Ushant, lat_deg: 48.459, lon_deg: -5.054, hw_h: 4, hw_m: 30, bearing: WSW, spring_rise_ft: 18, rise_judgement: true}
+      - {name: Scilly, lat_deg: 49.914, lon_deg: -6.317, hw_h: 4, hw_m: 30, bearing: WSW, spring_rise_ft: 15, rise_judgement: true}
+      - {name: Plymouth, lat_deg: 50.368, lon_deg: -4.185, hw_h: 6, hw_m: 0, bearing: W, spring_rise_ft: 15, rise_judgement: true}
+      - {name: Ramhead, lat_deg: 50.313, lon_deg: -4.225, hw_h: 6, hw_m: 0, bearing: W, spring_rise_ft: 15, rise_judgement: true}
+      - {name: Torbay, lat_deg: 50.450, lon_deg: -3.500, hw_h: 6, hw_m: 0, bearing: W, spring_rise_ft: 13, rise_judgement: true}
 
 # Moore's rule of 48 minutes a day: the moon's southing comes later each day by this
 # (Moore 1799, the catechism; Bowditch 1802 uses 49). The true mean is 50 minutes and

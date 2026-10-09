@@ -576,16 +576,47 @@ def _no_nearest_land_words(world: Any) -> str | None:
     return NO_CHART_WORDS if lookout is None else lookout.no_nearest_land_words()
 
 
+class Depth(float):
+    """A depth in metres that carries its words (package 37j: the chart's depth at the
+    account, said as the chart's and never as a cast); the dialect compares the number,
+    an agent reads the words."""
+
+    words: str = ""
+
+    def __new__(cls, value: float, words: str = "") -> Depth:
+        self = super().__new__(cls, value)
+        self.words = words
+        return self
+
+
 def _depth_of_water(world: Any, _: str | None) -> float | None:
-    """The depth of water by the chart at the ship's position, in metres at the datum
-    (the tide of package 34 goes on top): the world's own number, which the lead of
-    package 33 casts for with its error and its age; None without a chart or where the
-    chart has nothing."""
+    """`the depth of water`: the chart's depth at the position by account, in metres at
+    the chart's datum (package 37j, the captain's means; until then it was the chart's
+    depth at the ship's true position, which a cast less it turned into the height of
+    the tide and the officers steered by as "a sounding machine", the review's G4).
+    Said as the chart's ("eleven fathoms at low water by the chart, at the position by
+    account"), with what the chart shows within the account's doubt when that differs
+    by a fathom or more ("the chart has seven fathoms to fifteen within the doubt");
+    never a cast, which is `the depth`. None without a chart, a reckoning, or where the
+    chart has nothing at the account (on the land)."""
     chart = getattr(world, "chart", None)
-    pos = getattr(world, "position", None)
-    if chart is None or pos is None:
+    nav = getattr(world, "navigation", None)
+    if chart is None or nav is None:
         return None
-    return chart.depth_at(pos)
+    here = nav.account_now()
+    depth = chart.depth_at(here)
+    if depth is None:
+        return None
+    from freesail.world.chart import fathoms_words
+
+    words = f"{fathoms_words(depth)} at low water by the chart, at the position by account"
+    least, most = nav.chart_depths_within_doubt()
+    if most - least >= units.fathoms_to_m(1.0):
+        words += (
+            f"; the chart has {fathoms_words(max(0.0, least))} to {fathoms_words(most)} "
+            f"within the account's doubt"
+        )
+    return Depth(depth, words)
 
 
 def _no_chart_words(world: Any) -> str | None:
@@ -1137,11 +1168,19 @@ REGISTRY.add(
 REGISTRY.add(
     Reading(
         "depth_of_water",
-        ("the depth of water", "the water"),
+        (
+            "the depth of water",
+            "the water",
+            "the depth of water by the chart",
+            "the depth by the chart",
+            "the charted depth",
+        ),
         "depth",
         "fathoms",
         _depth_of_water,
-        description="the depth of water by the chart at the datum, in fathoms",
+        description="the chart's depth at the position by account, at the chart's datum, in "
+        "fathoms; never a cast (that is `the depth`). In a standing order's condition it "
+        "reads the last cast of the lead, and the chart only when the book says 'by the chart'",
         none_words=_no_chart_words,
     )
 )

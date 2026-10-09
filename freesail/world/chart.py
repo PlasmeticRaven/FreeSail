@@ -958,6 +958,7 @@ class Chart:
         ground: str = "",
         ground_of: Any = None,
         step_m: float = CONTOUR_STEP_M,
+        inside: Any = None,
     ) -> tuple[Position, float] | None:
         """The depth contour a cast is matched to (spec M5 §13; package 33a): the nearest
         point to `pos` within `radius_m` whose depth is within `tolerance_m` of the cast's
@@ -965,8 +966,10 @@ class Chart:
         ground when either is empty); with the bearing across the contour there, toward
         deeper water, from the depth's gradient. Searched on rings a `step_m` apart,
         nearest first; None when no point of the chart within reach answers the cast.
-        The reckoning is moved onto this point and its doubt across the contour shrunk
-        (`reckoning.Reckoning.update_line`); the truth is never read here."""
+        `inside(point)`, when given, leaves out the points it says no to (package 37j: the
+        master looks within his doubt and no further). The reckoning is moved onto this
+        point and its doubt across the contour shrunk (`reckoning.Reckoning.update_line`);
+        the truth is never read here."""
         if depth_m is None:
             return None
         rings = int(radius_m // step_m)
@@ -978,6 +981,8 @@ class Chart:
                 n = max(8, int(round(2.0 * math.pi * r / step_m)))
                 candidates = [destination(pos, 360.0 * i / n, r) for i in range(n)]
             for p in candidates:
+                if inside is not None and not inside(p):
+                    continue
                 d = self.depth_at(p)
                 if d is None or abs(d - depth_m) > tolerance_m:
                     continue

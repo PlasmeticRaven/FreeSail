@@ -497,7 +497,7 @@ def test_the_chart_queries_read_the_account_and_say_so():
     # the course for Falmouth from south of the Lizard runs by the Manacles
     e = w.submit("shape a course for Falmouth")
     assert e.kind == "helm.set" and "by account" in e.text
-    assert "the line" in e.text and ("within a mile" in e.text or "crosses" in e.text)
+    assert "the line" in e.text and (" within " in e.text or "crosses" in e.text)  # to the cable
     # a line clear of every danger says nothing of them
     clear = chart_world(49.3, -5.6, start=datetime(1805, 6, 5, 9, 0))
     e = clear.submit("shape a course for Ushant")
