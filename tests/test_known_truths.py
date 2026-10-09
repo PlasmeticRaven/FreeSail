@@ -4557,7 +4557,9 @@ GATE_6A_INTENT_BROUGHT_UP_TICK = 112719
 GATE_6A_INTENT_BOAT_FOR_PRICES_TICK = 112800  # the boat sent for the prices once brought up
 GATE_6A_INTENT_SOLD_TICK = 120180  # 47 tons at £270; the purse £13,045
 GATE_6A_INTENT_LINES = 2083
-GATE_6A_INTENT_DIGEST = "4b5a6f997d80eb52"
+# measured on the merged tree: the judgement a sentence of its own after a shaped course's
+# line, as the cruise (4b5a6f997d80eb52 on the package's branch, every tick the same)
+GATE_6A_INTENT_DIGEST = "09afd9c2697c7c33"
 
 
 @pytest.fixture(scope="module")
