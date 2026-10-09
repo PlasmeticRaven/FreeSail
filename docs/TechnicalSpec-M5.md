@@ -1359,7 +1359,13 @@ in (then 5b), double altitudes, the kedge, interiors beyond a name and a descrip
    over the account only when it is the better figure. *Built by package 37j (§13): the
    better figure is believed, and on both platforms such a noon is now weighed, and
    doubted on the far side of the line, the account within a cable of the fix either
-   way; the cause of the platform difference itself is still open.* **The helm through the wind.** A chase or a shaped course that
+   way; the cause of the platform difference itself is still open.* *After the K batch,
+   37m and 38 (`ci.yml`'s whole-suite run of 2026-10-09 on both platforms): the Windows
+   difference is down to a tick each in two passages (the Brest pilot put off at 121500
+   against 121440, the 5b schooner brought up at 58212 against 58213); a difference in
+   the naval cruise's digest on both runners was the lead's own, a line's wording changed
+   after 37m's merge and the cruise not measured again, and is re-pinned.*
+   **The helm through the wind.** A chase or a shaped course that
    would turn a square-rigged ship through the wind's wake is worn for
    (`orders.navigation._course_not_laid`); a plain `steer` through it is left as the helm
    has always had it, and a captain who types one from close-hauled will be taken aback.

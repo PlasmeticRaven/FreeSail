@@ -34,7 +34,7 @@ py -m pytest -n 4
 ```
 py -m pytest -n 4 --slow
 ```
-*The whole suite, about twenty minutes on four workers: ends `2984 passed, 8 xfailed`; seven are your rulings on truths 3, 11, 18, 24, 26, 28 and 31, unchanged since milestone 3b, and the eighth is the merchant passage's cast at the Iroise, passed too wide by account on package 37j's track and left with its recipe in the tuning notes (the schooner's pilot, the eighth at the fold-in, boards since 37h). The counts are the fold-in's; the K batch's are the CI run's of 2026-10-09 on both platforms.*
+*The whole suite, about twenty minutes on four workers: ends `2984 passed, 8 xfailed`; seven are your rulings on truths 3, 11, 18, 24, 26, 28 and 31, unchanged since milestone 3b, and the eighth is the merchant passage's cast at the Iroise, passed too wide by account on package 37j's track and left with its recipe in the tuning notes (the schooner's pilot, the eighth at the fold-in, boards since 37h). The counts are the fold-in's. After the K batch, 37m and 38, `ci.yml`'s manual run of the whole suite on both platforms (2026-10-09, at `b068e6e`) ended `3260 passed, 8 xfailed` on Linux and `3261 passed, 8 xfailed` on Windows, with one real failure, the readings' cache test steering east from close-hauled, which 37m now rightly puts about for (fixed at the next commit), and the rest the lead's or the platform's: the naval cruise's digest had moved with the lead's change of wording after 37m's merge and is re-pinned, Windows puts the Brest pilot off and brings the 5b schooner up a tick apart from Linux, and the pace floors fail on the CI runners (382 to 402 ticks a second against 500).*
 
 ## The passages
 

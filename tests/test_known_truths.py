@@ -4049,7 +4049,9 @@ GATE_5C_CRUISE_WEARS_AT_LEAST = 8  # wore ship on the station, and once for the 
 # (37j merged after 37h and 37k, 2026-10-09: the figures below are 37j's as measured on
 # its branch; the six passages are re-measured on the merged tree by the lead, below.)
 GATE_5C_CRUISE_LINES = 2083  # package 37m (2065 on the merged tree)
-GATE_5C_CRUISE_DIGEST = "348b07dd901580a7"  # package 37m (15e7f10b2ca8eb9a on the merged tree)
+# the judgement a sentence of its own after a shaped course's line (the lead, after 37m;
+# 348b07dd901580a7 at package 37m, 15e7f10b2ca8eb9a on the merged tree before it)
+GATE_5C_CRUISE_DIGEST = "24428443ec6992f9"
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E

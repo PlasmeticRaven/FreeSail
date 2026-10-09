@@ -3319,3 +3319,36 @@ Both runs on the build machine under a load of thirteen to sixteen (the lead's s
 **`python3 -m pytest -n 4`** (the fast tier whole; the first run was stopped by its hour's limit at 72 per cent with no failure, the second ran its two hours): 2,979 passed, 3 failed. `test_chart.py::test_nearest_coast_from_the_distance_field_with_a_name_from_the_index` (the timing the brief names: fails under load, passes alone) and `test_the_pace_at_the_merchant_passages_start...` (163 ticks a second, as above); and once, `test_reckoning.py::test_a_cast_that_does_not_agree_within_the_doubt_keeps_the_account_and_widens_it_once`: the cutter's cast in St Mary's Sound found "that water nearest 16 leagues to the E by N" where the test expects "a mile and a half to the SE". It passes alone on this branch and on the base tree (extracted to the scratchpad and run there), and it passed in two runs made to reproduce it: the chart, tide, weather, geo and reckoning files together on four workers, and the same files in one process ending on it. No test replaces the shared chart or tide tables (grep), nothing on the cast's road reads the clock, and the Channel's chart and tide answer what they answered (the passages' digests). Seen once, under a load of fifteen, in a run whose worker had run other files first; not reproduced; reported to the lead to run on a quiet machine before the merge.
 
 `python3 -m ruff check .` and `python3 -m ruff format --check .` pass.
+
+## Milestone 5: the whole suite in CI after 37m and 38 (2026-10-09, the lead)
+
+`ci.yml`'s manual run of the whole suite on both platforms (`workflow_dispatch`, `slow`
+true, run 37931760201 at `b068e6e`, the tree with the K batch, 37m and 38 merged): Linux
+3260 passed, 8 expected failures, 5 failed; Windows 3261 passed, 8 expected failures,
+4 failed. The failures, read from the jobs' logs:
+
+- **One real, on both platforms**: `test_readings.py`'s cache test ordered `steer east`
+  from her head at 293° close-hauled on the starboard tack in a north wind and read the
+  course at once as east. Since 37m that course lies across the wind's eye and she is put
+  about for it, the helm holding the close-hauled course on the larboard tack (67°) until
+  she is round; the reading was right and the test's course was not. The test now steers
+  west, laid on her tack. (It failed on this machine too.)
+- **The naval cruise's digest, on both platforms**: `24428443ec6992f9` against the pin
+  `348b07dd901580a7`, the lines (2083) and every tick agreeing. Taken at first for a
+  difference between machines (the two runners agreeing with each other against this
+  one); the test run alone here gives the runners' digest. The cause is the lead's: the
+  commit after 37m's merge made the judgement a sentence of its own after a shaped
+  course's line, and the cruise's thirteen wears are shaped courses, so every one of
+  those lines changed by a character; the cruise was not measured again, the other five
+  passages having no judged shaped course. Re-pinned. The lesson is the standing one: a
+  change to any line's words is a change to the digests, and the passages are measured
+  after it, however small.
+- **Windows alone, a tick each**: the merchant passage's Brest pilot put off at 121500
+  against 121440 (the pin's window `[18300, 121440]` ends on the Linux tick), the 5b
+  schooner brought up at 58212 against 58213. The same family as item 24's.
+- **The pace floors, Linux alone**: 382 to 402 ticks a second against the floor of 500
+  in the pace tests; the CI runners are slower than this machine, and the floors stand
+  as floors for the build machine.
+
+The eight expected failures are the seven rulings and the merchant's cast at the Iroise,
+as the gate's document says.
