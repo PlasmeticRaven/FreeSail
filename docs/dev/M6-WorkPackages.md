@@ -16,9 +16,9 @@ tuning notes and a report to the lead at the end.
 | Package | Builder | What | State |
 |---|---|---|---|
 | 38 | Fable | The chart stitched: many regions over the corridor, the queries across edges, the climatology's boxes, the tide's gauges, the recipe form for the blocks | launched 2026-10-09 |
-| 39a to 39f | Opus | The six blocks of the voyage to Madeira and the Strait | after 38 |
+| 39a to 39f | Opus | The six blocks of the voyage to Madeira and the Strait | 39a (channel-mid) and 39b (biscay-north) launched 2026-10-09 with 40b; the rest after them |
 | 40 | Fable | The ship's company and the rules-based captain in three layers; the captain's station; the player's seat | merged 2026-10-09 (the officer's reckoning moved to 40b; the consent brief's revision drafted for the owner, `docs/playtests/drafts/consent-brief-m6-draft.md`, held for 42) |
-| 40b | Opus | The lessons in the primer; the officer's own reckoning (spec M6 §5, truth 80; moved from 40 at the owner's word) | brief to write |
+| 40b | Opus | The lessons in the primer; the officer's own reckoning (spec M6 §5, truth 80; moved from 40 at the owner's word) | launched 2026-10-09 with 39a and 39b |
 | 41 | Fable | The wardroom: several doors, the pace rule, the deck's conversation, the master's and the lookout's stations, the stand-by on several conditions | brief to write |
 | 42 | Opus | The API door and its security pass; the transcript-driven replay; the consent brief revised once | brief to write |
 | 43 | Fable | The crewed promotion, a model captain of another ship, the far-detail guard, the director's seat hook | brief to write |
@@ -240,3 +240,161 @@ For the owner:
    the log` moves the next bearing's words (a finding, unchanged). The lead's
    recommendation: leave it; it is true of any order that draws, and splitting the
    streams would move every pin for no gain in play.
+
+## Package 40b: the lessons in the primer, and the officer's own reckoning (`docs/primer/18-lessons.md` new, the README's row and chapters 10 and 16 where the forms tables and the pointers go; `freesail/orders/navigation.py` and `freesail/world/reckoning.py` for the officer's reckoning; `freesail/agents/agent.py` for the captain's and the officer's briefs pointing at the chapter; `freesail/agents/tools.py` only if the station needs a word the order language does not give; `docs/TechnicalSpec-M6.md` §5 and §6 as built; `docs/dev/TuningNotes.md`; `tests/test_primer.py` as it stands, `tests/test_reckoning.py`, `tests/test_officer.py`, `tests/test_known_truths.py` truth 80)
+
+Opus. Two things, a writing package and a small step in the reckoning, from spec M6 §5
+and §6 and the review's G19 (`docs/playtests/2026-10-05-gate-5c-review/report-2.md`,
+§G19, which the package reads first, with the officer's own words of game 9 that it
+quotes). Package 40 built the captain's station and the player's seat beside it; this
+package writes for both.
+
+1. **The lessons** (§6), a new primer chapter `docs/primer/18-lessons.md` (17 is the
+   captain's since package 40; the spec's `17-lessons.md` becomes 18, said in §6 as
+   built), the README's chapters table and its "where to start" line. Worked passages,
+   each a duty an officer must be able to do alone: a landfall on one headland; a pilotage
+   by cross bearings; heaving to for a pilot; coming to in a tideway; a night standing off
+   a lee shore; and, from what neither the officer nor the owner knew the ship could do, the
+   allowance for a set (`allow ... knots of set`), the amplitude (`observe an amplitude`),
+   what `let go` veers by itself, what `veer to` and `weigh` act on, and when a bearing's
+   distance is laid down. Each lesson gives the period's rule with its source in the
+   references' form (`docs/references/README.md`; Luce, Norie, Moore, Falconer, Bowditch
+   and the pilots the primer already cites), the orders in the game's language as a fenced
+   block that `tests/test_primer.py` checks as it checks every chapter's (the presets and
+   the instant runner are there to be used; a lesson's orders are played, not imagined),
+   what the log says when it goes right, quoted from a run of the lesson on the game at a
+   named seed and scenario (the quotation measured once, and the seed said), and the usual
+   mistake with what the log says then. The officer's two conditions of game 9 ("a few
+   more landfalls on my own reckoning", "taken her in and out of a road or two without
+   your hand on the con") are written down at the chapter's end as the path to a command,
+   in those words. The primer is the same book for the player and the model (parity): the
+   chapter reads to both, and says so once. `CAPTAIN_BRIEF` and `OFFICER_BRIEF` in
+   `freesail/agents/agent.py` gain one sentence each pointing at the chapter (the
+   station briefs are not part of the consent question, and the consent files are not
+   touched). The forms tables of chapters 10 and 16 gain the new orders of item 2.
+2. **The officer's own reckoning** (§5; truth 80). An officer may keep a reckoning of his
+   own from the same log board, tide table and sights, as lieutenants and the young
+   gentlemen did. Two orders in the order language, so that the player at the officer's
+   station (package 40's seat) and a model at it have them by the same words: `work my
+   reckoning` gives the master's slate since the last fix (the courses steered and the
+   distances by the log, the set allowed, the sights taken, the last fix and its doubt), as
+   a reading in the station's reply and not a line the whole log keeps; `my reckoning is
+   <position>` (a position in the form `set the reckoning to` takes) gives his own back,
+   kept beside the master's and moving nothing: it is a figure of the station's, carried
+   in the save, and at noon the log's reckoning line is followed by one line saying the
+   officer's position and its distance and bearing from the master's, only when an
+   officer's reckoning is held (so no recorded passage's digest moves: none has an
+   officer). The captain adopts it, if he will, with `set the reckoning to ...`, which he
+   has; the captain's station has both orders too, since it has the player's whole surface,
+   and a standing order may not give either. Truth 80, in `tests/test_known_truths.py`:
+   an officer's reckoning worked from the slate by the slate's own figures agrees with the
+   master's within the master's doubt when both are right, and the log shows both at
+   noon; a test in `tests/test_officer.py` that the fake officer and the player's seat can
+   give both orders and are refused a position that is not one. The master's station a
+   model could hold (6b's wardroom) takes the same slate; say in §5 as built what the
+   slate is, as data, so that 41 reads it.
+3. **The spec and the notes**: §5 and §6 as built; the tuning notes' section with the
+   lessons' seeds and runs, what was found, and the suite as run.
+
+Not this package's: the gate (the lead cuts 6a after this package); a model reading the
+lessons (the gate's); the master's station (41). Tuned once and cheaply: a lesson's run is
+made once at its seed and quoted, not iterated to a prettier log. The fast tier before
+the report and the officer's and the reckoning's test files; the recorded passages do not
+move, and the package says it checked (`tests/test_known_truths.py --slow -k "gate_5b or
+gate_5c"` once, or the lead runs it at the merge).
+
+## Package 39a: the Channel east block (`channel-mid`; `tools/build_charts.py` `REGIONS` and `CHARTS`; `data/charts/` the region's tiles, coast, index and manifest entry, `features/channel-mid.yaml`, `overrides/channel-mid/`; `data/ports/*.yaml` new per port; `data/nations.yaml` if a nation is new; `data/tides/constituents.yaml`, `streams.yaml`, `establishments.yaml`; `data/scenarios/channel-east.yaml` new; `docs/references/Charts.md`, `docs/dev/ChartBlocks.md` where the how-to proves wrong; `docs/TechnicalSpec-M6.md` §26 as built; `docs/dev/TuningNotes.md`; `tests/test_chart.py`, `test_ports.py`, `test_tide.py`, `test_scenarios.py`)
+
+Opus. The first of the six blocks of spec M6 §26, built as `docs/dev/ChartBlocks.md` says
+(read it whole first, and the recipe form over `REGIONS` in `tools/build_charts.py`, and
+package 38's section of the tuning notes for what it found). Package 38 made the chart the
+whole manifest; this block adds a region beside `channel-west` and touches nothing of it.
+
+1. **The region** `channel-mid`: Dartmouth and Torbay, Portland and Weymouth; Guernsey and
+   St Peter Port, Jersey and St Aubin's, Alderney and the Race; St Malo. Bounds 49°N to
+   51°N and **3°W to 1°W, abutting `channel-west` at 3°W exactly** (its east bound), the
+   fetch box widened as the form says. Morlaix (3.83°W) lies in `channel-west`'s bounds:
+   it gets its port file and its marks in `features/channel-west.yaml` (the features file
+   is data and no tile), and no harbour patch in this package; say so as a left item (a
+   patch at Morlaix is a rebuild of `channel-west`'s harbours, for a later package).
+2. **The seam.** The level-2 tiles are on one grid for every region, and `channel-west`'s
+   easternmost column reaches past 3°W; a tile `channel-west` lists in the manifest is
+   `channel-west`'s: the build does not write it again and does not list it under
+   `channel-mid` (a rule to add to the tool, small and in the build's own code, printed
+   as a check: `tiles another region lists: n kept`). After the build `git status` shows
+   no change under `data/charts/tiles/` or `coast/` for any tile or file `channel-west`
+   listed before, and the report says so. The datum finding of 38 (EMODnet's LAT against
+   the corridor's mean sea level at a region's edge): fetch the region whole, as 38 says.
+3. **The period data** for the harbour patches and the marks: Mackenzie's Hurd sheets for
+   the English side, Bellin's Petit Atlas for the French and the islands, Faden 1793 and
+   the Channel pilots for the directions; the lights of 1805 dated (the Casquets, Portland,
+   and any other the directions give), so that 1805 sees what 1805 had. Where a sheet
+   cannot be fetched or read from this machine the patch is left and the port file says
+   `datum: unverified` as 35b did; never a figure invented.
+4. **The nations**: the islands British; St Malo and Morlaix hostile to a King's ship, open
+   to a neutral. **The tide**: TICON's gauges of the block read as package 34 read the
+   file (St Helier, St Peter Port, Weymouth or Portland, Dartmouth, St Malo: which it has
+   is unverified until read); the Race of Alderney, the Swinge, the Little Russel and the
+   stream between the islands and the Cotentin as stream areas by the directions, the
+   Portland Race as an area; the master's epitome places. The eleven gauges and their
+   figures do not move. **The weather**: the Channel's box covers it; nothing.
+5. **A scenario** `channel-east.yaml`: a free passage of the block's stretch (the frigate
+   from Torbay to St Peter Port through the Race, or the schooner Weymouth to St Malo:
+   the package's choice), `chart: atlantic-east`, sailed once at seed 7 to the anchor by a
+   short book, its figures in the notes; not a gate's, not pinned.
+6. **The build**: `python tools/build_charts.py --region channel-mid` through the proxy,
+   the checks printed and passing, the tiles committed (about 18 MB), the manifest with
+   every other entry carried over. The lead merges this block's manifest entry with 39b's
+   by hand: keep the region's entry self-contained and say in the report the exact lines
+   added to `charts.atlantic-east.regions` and to `sources`.
+7. **The notes and the spec**: §26 as built for this block; the tuning notes' section
+   (the sources with their licences, the patches' datums and residuals, the checks as
+   printed, the scenario's run, what was found on the way, the suite as run).
+
+The fast tier before the report; `tests/test_known_truths.py --slow -k "gate_5b or
+gate_5c"` once, which must pass to the digest, `channel-west` being untouched. No model
+identifier in any file; nothing under `docs/agents/consent/` touched.
+
+## Package 39b: the Biscay north block (`biscay-north`; the same files as 39a under its own names; `data/scenarios/biscay-north.yaml` new)
+
+Opus. The second block of spec M6 §26, built as `docs/dev/ChartBlocks.md` says (read it
+whole first, with the recipe form over `REGIONS` in `tools/build_charts.py` and package
+38's section of the tuning notes). Package 39a builds the Channel east at the same time
+in its own worktree: this block touches nothing of `channel-west`'s nor of 39a's.
+
+1. **The region** `biscay-north`: the Raz de Sein and the Penmarks, Lorient and Port
+   Louis, Belle Île and Quiberon, the Loire's mouth to Paimboeuf, the Pertuis, La
+   Rochelle and Rochefort with the Basque Roads (where the cruise's enemy is "reported out
+   of Rochefort"). Bounds 46°N to **48°N, abutting `channel-west` at 48°N exactly** (its
+   south bound), 5°W to 1°W, the fetch box widened as the form says. The Raz de Sein
+   (48.03°N) and the Chaussée de Sein lie in `channel-west`'s bounds: their marks go in
+   `features/channel-west.yaml` (data, no tile) if they are not there, and the Raz's
+   stream area is this block's with `chart: atlantic-east`.
+2. **The seam**, as 39a's item 2: a tile `channel-west` lists is `channel-west`'s, not
+   written again nor listed twice (a rule to add to the tool, printed as a check; 39a adds
+   the same rule, and the lead keeps one at the merge: write it small and in one place,
+   where the region's tile list is made). After the build `git status` shows no change to
+   any tile or coast file `channel-west` listed before, and the report says so. Fetch the
+   region whole, for 38's datum finding.
+3. **The period data**: the Neptune François and Bellin for the sheets, the French pilots
+   for the directions; the lights of 1805 dated (Penmarch, Belle Île's Goulphar, the tower
+   of Cordouan is 39c's, Chassiron and the Baleines on the Pertuis). Where a sheet cannot
+   be fetched or read, the patch is left and the port file says `datum: unverified`; never
+   a figure invented.
+4. **The nations**: hostile throughout to a King's ship, open to a neutral. **The tide**:
+   TICON's gauges of the block as package 34 read the file (Brest is the eleven's; Le
+   Conquet too; Concarneau, Port-Tudy, Saint-Nazaire, La Rochelle-Pallice: unverified
+   until read); the streams of the Raz, the Four is `channel-west`'s, the Pertuis
+   d'Antioche and Breton, the Loire's mouth by the directions; the epitome's places. **The
+   weather**: Biscay's box is PROVISIONAL; a printed climatic table read for the block
+   replaces its row and says so in the row's `note`, else nothing.
+5. **A scenario** `biscay-north.yaml`: a free passage of the block's stretch (the frigate
+   from the Iroise round the Penmarks to the Basque Roads, or the cutter Lorient to
+   Quiberon: the package's choice), `chart: atlantic-east`, sailed once at seed 7 to the
+   anchor by a short book; its figures in the notes; not a gate's, not pinned.
+6. **The build** and 7. **the notes and the spec**, as 39a's items 6 and 7 under this
+   block's name.
+
+The fast tier before the report; `tests/test_known_truths.py --slow -k "gate_5b or
+gate_5c"` once, which must pass to the digest. No model identifier in any file; nothing
+under `docs/agents/consent/` touched.
