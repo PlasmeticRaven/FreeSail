@@ -1,6 +1,6 @@
 # Gate M5c: Ports, nations and other sail
 
-**Verdict:** Passed (owner, 2026-10-08): a pass on the gate's build as cut, on the naval cruise sailed on 7 October and the ten games of 2 to 8 October; a provisional pass on m5c-c, the owner's local packages 37b to 37g folded in on 2026-10-08 (decision 38), to stand once the fold-in satisfies both. The lead's own officer's watch is deferred at the owner's word.
+**Verdict:** Passed (owner, 2026-10-08): a pass on the gate's build as cut, on the naval cruise sailed on 7 October and the ten games of 2 to 8 October; a provisional pass on m5c-c, the owner's local packages 37b to 37g folded in on 2026-10-08 (decision 38), to stand once the fold-in satisfies both. The lead's own officer's watch is withdrawn at the owner's word (2026-10-09, decision 39): the lead's first play is at the director's station.
 
 **Cut 2026-10-02** at package 37's merge (decision 32). The owner's verdict and the lead's officer's watch together decide it (spec M5 §29); the owner's was given on 2026-10-08 and the lead's watch deferred.
 

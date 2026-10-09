@@ -196,8 +196,8 @@ The owner's run: the merchant passage with a fake captain by the console; a mode
 (Opus 5.5 through Claude Desktop) on the cutter's free passage, the owner as the owner at
 the door; the frigate's book as her rules-based captain through the cruise; the lessons
 read by a model officer before its watch and the difference, if any, in its journal. The
-lead's own officer's watch, deferred from gate 5c, waits on the owner's usage (his ruling
-6) and no gate waits on it.
+lead's first play is at the director's station, when it exists (his ruling 6), and no
+gate waits on it.
 
 ---
 
@@ -559,7 +559,10 @@ swept once (item 16, in 38's checks); the hints and phrasings 37l leaves.
 4. **Gibraltar and the Strait**: yes, as a sixth block, with the African shore in its
    vicinity, since the Mediterranean is to come (§26).
 5. **The chart's size**: committed, a price to pay for now (§26).
-6. **The lead's own watch**: deferred as long as the lead is comfortable to, the usage
-   being what it is; no gate waits on it (§9).
+6. **The lead's own watch**: withdrawn rather than deferred (the owner, later the same
+   day). The lead's first play is at the director's station (M7b), the role it is expected
+   to excel in, on a cruise that is not preplanned, as the owner's own playtests were, so
+   that it sees the door as it is; taken when the week's Fable usage is near its end. No
+   gate waits on it, and gate 5c's officer's watch is not owed.
 7. **The API door's credit**: kept for testing the wardroom with Opus 5.5 and Sonnet 5.5,
    the owner at one of the lowliest stations aboard to observe (§17).
