@@ -92,6 +92,10 @@ def build_world(data: dict[str, Any], ship_factory: ShipFactory | None = None) -
     scenario = Scenario.from_dict(data["scenario"])
     ship = ship_factory(data["ship_ref"], scenario) if ship_factory else None
     world = World(seed=data["seed"], scenario=scenario, ship=ship)
+    # the player's pencil on the chart (package 37n), carried as the save has it, so that
+    # a game loaded at the console and saved again keeps it; the browser's server reads
+    # and cleans it for the chart (`ui.server.take_marks`); a replay makes none of it
+    world.chart_marks = [dict(m) for m in data.get("chart_marks") or [] if isinstance(m, dict)]
     # Systems that need the World itself (the crew, mustered from its seed and kept by its
     # clock) are attached now, before the first order, as `make_world` attaches them.
     on_world = (getattr(ship, "extra", None) or {}).pop("on_world", None)
