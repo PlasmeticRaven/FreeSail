@@ -4089,7 +4089,7 @@ class Navigation:
         place of the epitome's table to the account, by Moore's rule of 48 minutes and
         the table's establishment; in the master's words, with the next high water from
         now. Never the world's tide."""
-        from freesail.world.tide import time_words
+        from freesail.world.tide import FAR_PLACE_NM, time_words
 
         world = self.world
         table = self.epitome
@@ -4125,6 +4125,10 @@ class Navigation:
                 f"High water at {port.name}, the nearest place in the master's table "
                 f"({miles_words(distance_nm)} off), about {when} by the epitome"
             )
+            if distance_nm > FAR_PLACE_NM:
+                # the table over a larger sea (package 38): a place a day's sail and more
+                # from every port of his table is a guess, and he says so
+                head += "; so far from any place of the table the tide here may differ by hours"
         age_words = f"the moon {_age_words(age)} old"
         table_words = f"{port.name} {port.establishment_words} at full and change"
         next_words = (

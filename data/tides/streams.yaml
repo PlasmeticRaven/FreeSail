@@ -68,11 +68,22 @@
 # sentence, agree (docs/dev/TuningNotes.md, package 37e, has both measured).
 # `book_limits` are the waters the directions cover, which are his chart's: beyond them
 # he has no statement and allows no tide.
+#
+# AREAS BY CHART (package 38; spec M6 §26). Each area carries `chart:`, the region of
+# data/charts/manifest.yaml whose water it is (a word for the reader and for the blocks,
+# which add their areas under their own region's name; the arithmetic reads the polygon).
+# An area with no polygon covers the box its `bounds:` give and no more: the open
+# Channel's statement is the Channel's, not Biscay's, and beyond every tabulated area the
+# world's stream is nought (`tide.NO_STREAM`) until a block tabulates the water, the
+# Strait's inset and its tides among them. The eleven areas below and their figures are
+# package 34's and 37e's, unmoved; the open Channel's bounds hold every position of the
+# Channel's region with a margin, so no recorded passage reads anything new.
 
 book_limits: {south: 48.0, north: 51.0, west: -7.0, east: -3.0}
 
 areas:
   - id: carrick-road
+    chart: channel-west
     name: Carrick Road
     polygon: [[50.147, -5.075], [50.147, -5.005], [50.215, -5.005], [50.215, -5.075]]
     axis_deg: 10
@@ -88,6 +99,7 @@ areas:
       judgement: [set, rates, hour]
       source: "JUDGEMENT throughout: the world's figures rounded (no period statement in hand for the Road's stream)"
   - id: falmouth-entrance
+    chart: channel-west
     name: the entrance of Falmouth harbour
     polygon: [[50.125, -5.075], [50.125, -5.005], [50.147, -5.005], [50.147, -5.075]]
     axis_deg: 355
@@ -103,6 +115,7 @@ areas:
       judgement: [set, rates, hour]
       source: "JUDGEMENT throughout: the world's figures rounded"
   - id: the-manacles
+    chart: channel-west
     name: off the Manacles
     polygon: [[50.02, -5.09], [50.02, -4.98], [50.09, -4.98], [50.09, -5.09]]
     axis_deg: 20
@@ -118,6 +131,7 @@ areas:
       judgement: [set, rates, hour]
       source: "JUDGEMENT throughout: the world's figures rounded (1.2 knots to the half knot is one)"
   - id: falmouth-approaches
+    chart: channel-west
     name: the approaches to Falmouth
     polygon: [[50.03, -5.12], [50.03, -4.85], [50.125, -4.85], [50.125, -5.12]]
     axis_deg: 75
@@ -133,6 +147,7 @@ areas:
       judgement: [set, rates, hour]
       source: "JUDGEMENT throughout: the world's figures rounded (0.7 knots to the half knot is a half)"
   - id: the-lizard
+    chart: channel-west
     name: off the Lizard
     polygon: [[49.78, -5.40], [49.78, -5.05], [49.97, -5.05], [49.97, -5.40]]
     axis_deg: 85
@@ -148,6 +163,7 @@ areas:
       judgement: [set, rates]
       source: "the hour is the period's own: Bowditch 1802's headland table, the Lizard, 'the time the current runs after high water' 3h 00m, so the east-going stream runs from three hours before high water to three after and is strongest at high water; the set and the rates are the world's rounded, JUDGEMENT"
   - id: start-point
+    chart: channel-west
     name: off the Start
     polygon: [[50.10, -3.75], [50.10, -3.50], [50.23, -3.50], [50.23, -3.75]]
     axis_deg: 65
@@ -163,6 +179,7 @@ areas:
       judgement: [set, rates]
       source: "the hour is the period's own: Bowditch 1802's headland table, the Start, the current runs 2h 30m after high water, so its strength is half an hour before high water; the set and the rates are the world's rounded, JUDGEMENT"
   - id: scilly-and-lands-end
+    chart: channel-west
     name: between Scilly and the Land's End
     polygon: [[49.85, -6.28], [49.85, -5.68], [50.12, -5.68], [50.12, -6.28]]
     axis_deg: 345
@@ -178,6 +195,7 @@ areas:
       judgement: [set, rates, hour]
       source: "JUDGEMENT throughout: the world's figures rounded (1.8 knots to the half knot is two)"
   - id: scilly
+    chart: channel-west
     name: round Scilly
     polygon: [[49.83, -6.50], [49.83, -6.28], [50.00, -6.28], [50.00, -6.50]]
     axis_deg: 20
@@ -193,6 +211,7 @@ areas:
       judgement: [set, rates, hour]
       source: "JUDGEMENT throughout: the world's figures rounded"
   - id: the-fromveur
+    chart: channel-west
     name: the Fromveur
     polygon: [[48.38, -5.08], [48.38, -4.92], [48.50, -4.92], [48.50, -5.08]]
     axis_deg: 45
@@ -208,6 +227,7 @@ areas:
       judgement: [set, rates, hour]
       source: "JUDGEMENT throughout, by the owner's ruling of 2026-10-07 (no period source for the Fromveur, T §1 and §6): the set to the nearest point, the spring rate to the half knot, the neaps at half of it, the hour the world's own unverified figure"
   - id: chenal-du-four
+    chart: channel-west
     name: the Chenal du Four
     polygon: [[48.28, -4.90], [48.28, -4.74], [48.52, -4.74], [48.52, -4.90]]
     axis_deg: 10
@@ -223,6 +243,7 @@ areas:
       judgement: [set, rates, hour]
       source: "JUDGEMENT throughout, by the owner's ruling of 2026-10-07 (no period source for the Four): the set to the nearest point, the spring rate to the half knot, the neaps at half of it, the hour the world's own unverified figure"
   - id: the-goulet
+    chart: channel-west
     name: the Goulet de Brest
     polygon: [[48.29, -4.62], [48.29, -4.42], [48.37, -4.42], [48.37, -4.62]]
     axis_deg: 80
@@ -238,6 +259,7 @@ areas:
       judgement: [set, rates, hour]
       source: "JUDGEMENT throughout, by the owner's ruling of 2026-10-07 (no period source for the Goulet's timing): the flood setting in to the nearest point, the spring rate to the half knot, the neaps at half of it, the flood from low water to high"
   - id: the-iroise
+    chart: channel-west
     name: the Iroise
     polygon: [[47.95, -5.25], [47.95, -4.60], [48.45, -4.60], [48.45, -5.25]]
     axis_deg: 30
@@ -253,8 +275,10 @@ areas:
       judgement: [set, rates, hour]
       source: "JUDGEMENT throughout: the world's figures, themselves judgement, rounded"
   - id: mid-channel
+    chart: channel-west
     name: the open Channel
     polygon: null
+    bounds: {south: 47.5, north: 52.0, west: -12.0, east: 2.0}
     axis_deg: 65
     spring_kn: 1.6
     neap_kn: 0.8

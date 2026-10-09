@@ -92,6 +92,17 @@ CONSTANTS_CELL_DEG = 0.01
 # The nearest a gauge is taken to be, for the inverse-square weight (a ship moored on the
 # gauge itself takes its constants whole).
 GAUGE_FLOOR_M = 100.0
+# How far a gauge's constants reach (package 38; spec M6 §26, "the interpolation between
+# gauges honest about distance"): the gauges within this of a position are blended as
+# before, and a position beyond it from every gauge takes the nearest alone, its doubt
+# said (`TideState.far`), and no blend across a coast. The file's `interpolation.reach_nm`
+# sets it; 400 miles by default, which is more than the farthest point of the Channel's
+# region lies from Dover, so that every Channel position blends the eleven gauges as
+# package 34 pinned it.
+GAUGE_REACH_NM = 400.0
+# A place beyond this many miles from the nearest place in the master's table is far
+# enough that his tide there is a guess he says so of (judgement: a day's sail).
+FAR_PLACE_NM = 60.0
 
 # Slack water, "the turn": the stream under a tenth of its rate, which it is within six
 # degrees of the tide's phase (twelve minutes) either side of the turn (judgement: what
@@ -175,11 +186,25 @@ class StreamArea:
     neap_kn: float
     phase_h: float
     source: str = ""
+    # package 38: the chart the area belongs to (`chart:` in the file, a region or a chart
+    # of data/charts/manifest.yaml; a word for the reader and the blocks, not read by the
+    # arithmetic), and for an area with no polygon the box it covers (`bounds:`), beyond
+    # which it does not reach: the open Channel's statement is the Channel's and not
+    # Biscay's, and beyond every area there is no stream until a block tabulates one
+    chart: str = ""
+    bounds: tuple[float, float, float, float] | None = None  # south, north, west, east
 
     def contains(self, pos: Position) -> bool:
         if self.polygon is None:
-            return True
+            if self.bounds is None:
+                return True
+            s, n, w, e = self.bounds
+            return s <= pos.lat_deg <= n and w <= pos.lon_deg <= e
         return _point_in_polygon(pos.lat_deg, pos.lon_deg, self.polygon)
+
+
+# Beyond every tabulated area (package 38): no stream, until a block adds the area.
+NO_STREAM = StreamArea("open-sea", "the open sea, no stream tabulated", None, 0.0, 0.0, 0.0, 0.0)
 
 
 def _point_in_polygon(lat: float, lon: float, poly: tuple[tuple[float, float], ...]) -> bool:
@@ -213,6 +238,10 @@ class TideState:
     area_id: str
     axis_deg: float
     rate_kn: float  # the area's rate now, between its neap and its spring figure
+    # package 38: the nearest gauge's distance in miles, and whether the place lies
+    # beyond the reach of every gauge (the nearest alone then, its doubt to be said)
+    gauge_nm: float = 0.0
+    far: bool = False
 
     @property
     def stream_kn(self) -> float:
@@ -259,6 +288,13 @@ class TideState:
 class Tide:
     """The world's tide: the gauges, the stream areas and the arithmetic."""
 
+    # a Tide pickled before package 38 (a checkpoint of an older save) lacks the reach and
+    # the cache in its new form: the defaults a class gives an unpickled object
+    reach_m: float = GAUGE_REACH_NM * units.NAUTICAL_MILE
+    _about_cache: (
+        dict[tuple[int, int], tuple[float, dict[str, tuple[float, float]], float, bool]] | None
+    ) = None
+
     def __init__(self, constituents: dict[str, Any], streams: dict[str, Any]):
         self.speeds: dict[str, float] = {
             str(k): float(v["speed_deg_per_h"]) for k, v in constituents["constituents"].items()
@@ -278,10 +314,13 @@ class Tide:
                     consts,
                 )
             )
-        self.power = float((constituents.get("interpolation") or {}).get("power", 2))
+        interpolation = constituents.get("interpolation") or {}
+        self.power = float(interpolation.get("power", 2))
+        self.reach_m = float(interpolation.get("reach_nm", GAUGE_REACH_NM)) * units.NAUTICAL_MILE
         self.areas: list[StreamArea] = []
         for a in streams["areas"]:
             poly = a.get("polygon")
+            box = a.get("bounds")
             self.areas.append(
                 StreamArea(
                     str(a["id"]),
@@ -292,21 +331,44 @@ class Tide:
                     float(a["neap_kn"]),
                     float(a["phase_h"]),
                     str(a.get("source", "")),
+                    str(a.get("chart", "")),
+                    (
+                        float(box["south"]),
+                        float(box["north"]),
+                        float(box["west"]),
+                        float(box["east"]),
+                    )
+                    if box
+                    else None,
                 )
             )
-        self._cache: dict[tuple[int, int], tuple[float, dict[str, tuple[float, float]]]] = {}
+        self._about_cache = {}
 
     # -- the constants at a place -------------------------------------------------------
 
     def constants_at(self, pos: Position) -> tuple[float, dict[str, tuple[float, float]]]:
         """The mean level above datum and the (amplitude, phase lag) of each constituent
         at a position: the inverse-distance-squared mean over the gauges of the complex
-        constants A e^{-ig} (the cotidal and corange geometry in its simplest form)."""
+        constants A e^{-ig} (the cotidal and corange geometry in its simplest form).
+        Over the gauges within `reach_m` of the place (package 38): beyond the reach of
+        every gauge the nearest alone, which `constants_about` says."""
+        level, consts, _, _ = self.constants_about(pos)
+        return level, consts
+
+    def constants_about(
+        self, pos: Position
+    ) -> tuple[float, dict[str, tuple[float, float]], float, bool]:
+        """`constants_at` with the nearest gauge's distance in miles and whether the
+        place lies beyond the reach of every gauge (the nearest alone then: honest about
+        the distance, and no blend across a coast)."""
         key = (
             int(math.floor(pos.lat_deg / CONSTANTS_CELL_DEG)),
             int(math.floor(pos.lon_deg / CONSTANTS_CELL_DEG)),
         )
-        found = self._cache.get(key)
+        cache = self._about_cache
+        if cache is None:
+            cache = self._about_cache = {}
+        found = cache.get(key)
         if found is not None:
             return found
         # Evaluated at the cell's centre, not at the point that happened to ask first: the
@@ -317,10 +379,16 @@ class Tide:
             (key[0] + 0.5) * CONSTANTS_CELL_DEG,
             (key[1] + 0.5) * CONSTANTS_CELL_DEG,
         )
+        distances = [bearing_and_distance(centre, g.position)[1] for g in self.gauges]
+        nearest = min(distances)
+        within = [g for g, d in zip(self.gauges, distances, strict=True) if d <= self.reach_m]
+        far = not within
+        if far:
+            within = [self.gauges[distances.index(nearest)]]
         total = 0.0
         level = 0.0
         sums: dict[str, complex] = {name: 0j for name in self.speeds}
-        for g in self.gauges:
+        for g in within:
             _, d = bearing_and_distance(centre, g.position)
             w = 1.0 / max(d, GAUGE_FLOOR_M) ** self.power
             total += w
@@ -331,17 +399,25 @@ class Tide:
         for name, z in sums.items():
             z /= total
             consts[name] = (abs(z), (-math.degrees(cmath.phase(z))) % 360.0)
-        out = (level / total, consts)
-        if len(self._cache) > 256:
-            self._cache.clear()
-        self._cache[key] = out
+        out = (level / total, consts, nearest / units.NAUTICAL_MILE, far)
+        if len(cache) > 256:
+            cache.clear()
+        cache[key] = out
         return out
 
+    def nearest_gauge(self, pos: Position) -> tuple[Gauge, float]:
+        """The nearest gauge to a position and its distance in miles."""
+        best = min(self.gauges, key=lambda g: bearing_and_distance(pos, g.position)[1])
+        return best, bearing_and_distance(pos, best.position)[1] / units.NAUTICAL_MILE
+
     def area_at(self, pos: Position) -> StreamArea:
+        """The stream area a position lies in: the first whose polygon holds it, else the
+        first with no polygon whose bounds do (or that has none); beyond every area
+        `NO_STREAM` (package 38), until a block tabulates the water."""
         for a in self.areas:
             if a.contains(pos):
                 return a
-        return self.areas[-1]
+        return NO_STREAM
 
     # -- the tide at a place and a moment -----------------------------------------------
 
@@ -357,6 +433,7 @@ class Tide:
 
     def at(self, pos: Position, when_ut: datetime) -> TideState:
         level, z, neap, spring = self._z(pos, when_ut)
+        _, _, gauge_nm, far = self.constants_about(pos)
         phase = math.degrees(cmath.phase(z)) % 360.0
         amplitude = abs(z)
         area = self.area_at(pos)
@@ -382,6 +459,8 @@ class Tide:
             area_id=area.id,
             axis_deg=area.axis_deg,
             rate_kn=rate_kn,
+            gauge_nm=gauge_nm,
+            far=far,
         )
 
     def height_at(self, pos: Position, when_ut: datetime) -> float:

@@ -156,5 +156,20 @@ gauges:
 # mid-Channel; the north Cornish coast, whose tide is the Bristol Channel's, lies outside
 # the game's play and gets the south coast's gauges, which is wrong there by half an hour
 # and a third of the range, and is said so here).
+#
+# THE TABLE OVER A LARGER SEA (package 38; spec M6 §26). The blocks of the voyage to
+# Madeira add gauges here as they are built (from TICON's file, which holds the Iberian
+# and the Madeiran gauges by their coordinates: which of Vigo, Leixões, Cascais, Lagos,
+# Cadiz, Tarifa and Funchal it has is UNVERIFIED here and read when a block is built;
+# each with its record, its mean level above the chart's datum from a stated source and
+# its three constituents), in the same form as the eleven
+# below, whose figures do not move. The interpolation is honest about distance: only the
+# gauges within `reach_nm` of a position are blended, and a position beyond the reach of
+# every gauge takes the nearest alone, which the world marks (`TideState.far`) and the
+# master's words say ("the nearest place in the master's table, two hundred miles off");
+# no blend across a coast. The reach, 400 miles, is more than the farthest point of the
+# Channel's region lies from Dover (about 370), so that every position of the Channel
+# blends the eleven as package 34 pinned it; judgement otherwise.
 interpolation:
   power: 2
+  reach_nm: 400
