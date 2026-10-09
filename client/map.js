@@ -23,12 +23,47 @@
  * truth, which the snapshot does not carry; the doubt grows with the estimate (a bar
  * along the bearing, a sixth of the estimate either way, the lookout's own error, the
  * same rule as the held estimate of 33b), and the words beside it are what has been
- * made out: "a sail", "a brig, standing to the eastward", her colours. */
+ * made out: "a sail", "a brig, standing to the eastward", her colours.
+ *
+ * Package 37n: the chart's tools (the owner's note 5 of 2026-10-09). A protractor rose the
+ * player drags by its centre and turns by its rim: its outer ring true degrees, north up,
+ * its inner ring the thirty-two points of the compass turned by the variation the master
+ * allows (snap.reckoning.variation, the account's and never the world's), and its index a
+ * line through the centre across the chart whose bearing is read beside it; shown and
+ * hidden by `r` or the button; its place and its turn kept in this browser only
+ * (localStorage). And the player's pencil: a line laid between two clicks, a ring about a
+ * point (its radius typed, or a second click), a note at a point; listed in a small pane,
+ * each removable; kept with the game by the server (/api/marks, `World.chart_marks`, saved
+ * and loaded with the save) and read by nothing but this chart. The old bearing lines are
+ * cleaned from the drawing (BEARING_FULL_S, BEARING_DROP_S): the snapshot keeps them all.
+ * Nothing here reads or draws a true position: a mark is where the player put it on the
+ * chart, and the rose stands where he puts it. */
 (function (root) {
   "use strict";
   var U = root.Units || (typeof require === "function" ? require("./units.js") : null);
   var TRACK_SECONDS = 3600;
   var M_PER_DEG = 60 * U.NAUTICAL_MILE; // a degree of latitude: sixty miles of 1852 m
+
+  // The bearings taken, cleaned from the chart's drawing (the owner's addition to 37n,
+  // 2026-10-09: the bearing lines were the worst clutter in play, and an old one is
+  // useless within a glass or two, the ship having run on from where it was taken). A
+  // bearing is drawn full for a glass after it is taken (half an hour: at five to eight
+  // knots she has run two and a half to four miles from where it was taken), fades to a
+  // ghost over
+  // the rest of the watch, and is dropped a watch after it was taken (four hours: the
+  // officer who took it has gone below), or at once when a later bearing of the same mark
+  // replaces it. The noons and the player's own lines and marks are not cleaned, and the
+  // snapshot keeps every bearing: this is the drawing, not the record.
+  var BEARING_FULL_S = 1800; // a glass
+  var BEARING_DROP_S = 4 * 3600; // a watch
+  var BEARING_GHOST_ALPHA = 0.2; // how faint an old bearing is at the end of its watch
+
+  // The rose (package 37n): its radius on the screen, and how near the centre or the rim a
+  // press takes it (pixels; judgement, a finger's breadth).
+  var ROSE_RADIUS_PX = 80;
+  var ROSE_CENTRE_GRIP_PX = 14;
+  var ROSE_RIM_GRIP_PX = 12;
+  var MARKS_MAX = 200; // the server's bound on the pencil (freesail/ui/server.py)
 
   // -- the view: a scale (pixels a metre) and a centre in the frame's metres -------------
 
@@ -101,7 +136,128 @@
     return Math.round(step / U.NAUTICAL_MILE) + " miles";
   }
 
+  // -- the chart's tools, pure (package 37n) ---------------------------------------------
+
+  /** The bearings to draw at `tick`, each with its strength: a bearing replaced by a later
+   *  one of the same mark is dropped, as is one older than a watch; one older than a glass
+   *  fades towards a ghost. [{bearing, alpha}], in the snapshot's order. */
+  function bearingsShown(bearings, tick) {
+    var latest = {};
+    (bearings || []).forEach(function (b) {
+      var key = b.id || b.name;
+      if (b.tick > tick) return; // not yet taken at this tick (a drawing of the past)
+      if (latest[key] === undefined || b.tick >= latest[key]) latest[key] = b.tick;
+    });
+    var out = [];
+    (bearings || []).forEach(function (b) {
+      var age = tick - b.tick;
+      if (age < 0 || b.tick < latest[b.id || b.name] || age > BEARING_DROP_S) return;
+      var alpha = 1;
+      if (age > BEARING_FULL_S) {
+        alpha = 1 - ((1 - BEARING_GHOST_ALPHA) * (age - BEARING_FULL_S)) / (BEARING_DROP_S - BEARING_FULL_S);
+      }
+      out.push({ bearing: b, alpha: alpha });
+    });
+    return out;
+  }
+
+  /** The bearing (degrees true, from north clockwise) and the distance (miles) from one
+   *  point on the chart to another: latitude and longitude on the chart (the plane sailing
+   *  at the middle latitude, as the master works a short run), the plane's metres on it. */
+  function measure(a, b) {
+    var dx, dy;
+    if (a.lat !== undefined) {
+      var mid = (((a.lat + b.lat) / 2) * Math.PI) / 180;
+      dx = (b.lon - a.lon) * Math.cos(mid) * M_PER_DEG;
+      dy = (b.lat - a.lat) * M_PER_DEG;
+    } else {
+      dx = b.x - a.x;
+      dy = b.y - a.y;
+    }
+    var brg = ((Math.atan2(dx, dy) * 180) / Math.PI + 360) % 360;
+    return { bearing_deg: brg, distance_nm: Math.hypot(dx, dy) / U.NAUTICAL_MILE };
+  }
+
+  function threeFigures(d) {
+    var n = Math.round(d) % 360;
+    return (n < 10 ? "00" : n < 100 ? "0" : "") + n + "°";
+  }
+
+  /** A bearing in the chart's words: true in degrees, and by the compass in points with the
+   *  variation the master allows (west positive: the magnetic bearing is the true one and
+   *  the variation west); without a variation (the plane), true alone. */
+  function bearingWords(trueDeg, varWest) {
+    var t = threeFigures(trueDeg) + " true";
+    if (varWest === null || varWest === undefined) return t + ", " + U.pointName((trueDeg * Math.PI) / 180);
+    var mag = (((trueDeg + varWest) % 360) + 360) % 360;
+    return t + ", " + U.pointName((mag * Math.PI) / 180) + " by the compass (" + threeFigures(mag) + ")";
+  }
+
+  /** A distance as the chart's hand writes it: cables under a mile, miles to a tenth. */
+  function distanceWords(nm) {
+    if (nm < 1) return Math.max(1, Math.round(nm * 10)) + (Math.round(nm * 10) === 1 ? " cable" : " cables");
+    return nm.toFixed(1) + " miles";
+  }
+
+  /** A point on the chart in words: latitude and longitude to the minute, or the plane's
+   *  miles from the start. */
+  function placeWords(at) {
+    if (!at) return "";
+    if (at.lat === undefined) return "x " + (at.x / U.NAUTICAL_MILE).toFixed(2) + " nm, y " + (at.y / U.NAUTICAL_MILE).toFixed(2) + " nm";
+    function dm(v, pos, neg) {
+      var a = Math.abs(v);
+      var d = Math.floor(a);
+      var m = Math.round((a - d) * 60);
+      if (m === 60) {
+        d += 1;
+        m = 0;
+      }
+      return d + "°" + (m < 10 ? "0" : "") + m + "' " + (v >= 0 ? pos : neg);
+    }
+    return dm(at.lat, "N", "S") + ", " + dm(at.lon, "E", "W");
+  }
+
+  /** A mark of the player's pencil in the list's words. */
+  function markWords(mark, varWest) {
+    var p = mark.points || [];
+    if (mark.kind === "line" && p.length === 2) {
+      var m = measure(p[0], p[1]);
+      return "line " + bearingWords(m.bearing_deg, varWest) + ", " + distanceWords(m.distance_nm) + (mark.text ? ": " + mark.text : "");
+    }
+    if (mark.kind === "ring") {
+      return "ring of " + distanceWords(mark.radius_m / U.NAUTICAL_MILE) + " about " + placeWords(p[0]) + (mark.text ? ": " + mark.text : "");
+    }
+    return "note at " + placeWords(p[0]) + ": " + (mark.text || "");
+  }
+
+  /** What a press at (px, py) takes of a rose centred at (cx, cy) with radius r: "centre",
+   *  "rim" or null. */
+  function roseHit(cx, cy, r, px, py) {
+    var d = Math.hypot(px - cx, py - cy);
+    if (d <= ROSE_CENTRE_GRIP_PX) return "centre";
+    if (Math.abs(d - r) <= ROSE_RIM_GRIP_PX) return "rim";
+    return null;
+  }
+
+  /** The bearing (degrees from north, clockwise) of the pixel (px, py) from (cx, cy): the
+   *  rose's index turned to it (the canvas's y runs down; north is up). */
+  function bearingOfPixel(cx, cy, px, py) {
+    return ((Math.atan2(px - cx, cy - py) * 180) / Math.PI + 360) % 360;
+  }
+
   var view = {
+    BEARING_FULL_S: BEARING_FULL_S,
+    BEARING_DROP_S: BEARING_DROP_S,
+    BEARING_GHOST_ALPHA: BEARING_GHOST_ALPHA,
+    MARKS_MAX: MARKS_MAX,
+    bearingsShown: bearingsShown,
+    measure: measure,
+    bearingWords: bearingWords,
+    distanceWords: distanceWords,
+    placeWords: placeWords,
+    markWords: markWords,
+    roseHit: roseHit,
+    bearingOfPixel: bearingOfPixel,
     ZOOM_STEP: ZOOM_STEP,
     MAX_SCALE: MAX_SCALE,
     MIN_SCALE: MIN_SCALE,
@@ -127,14 +283,51 @@
     this.view = null;
     this.drawn = null; // the last drawing's {snap, frame, view, cw, ch}, for the hand
     this.drag = null;
+    // package 37n: the player's pencil (the server's, given by app.js), the tool in hand
+    // ("line", "ring", "note" or null), its first point laid, where the hand is over the
+    // chart, the mark lit from the list, and the sink that sends a mark to the server
+    this.marks = [];
+    this.tool = null;
+    this.pending = null;
+    this.hover = null;
+    this.lit = null;
+    this.sink = null; // {add(mark), remove(id), changed()}: app.js
+    this.ringNm = null; // a radius typed in the pane, miles
+    this.noteText = ""; // the words of the next note, typed in the pane
+    this.rose = loadRose(); // {shown, at, index_deg}: this browser's only
+    this.roseDrawn = null; // {cx, cy, r} where it was last drawn
     this.listen();
   }
+
+  var ROSE_KEY = "freesail.chart.rose";
+
+  function loadRose() {
+    try {
+      var kept = JSON.parse(root.localStorage.getItem(ROSE_KEY) || "null");
+      if (kept && typeof kept === "object") return { shown: !!kept.shown, at: kept.at || null, index_deg: Number(kept.index_deg) || 0 };
+    } catch (e) {
+      // no storage here (Node, a private window): the rose starts hidden
+    }
+    return { shown: false, at: null, index_deg: 0 };
+  }
+
+  Map.prototype.keepRose = function () {
+    try {
+      root.localStorage.setItem(ROSE_KEY, JSON.stringify(this.rose));
+    } catch (e) {
+      // kept for this page only
+    }
+  };
 
   /** The wheel and the drag on the canvas. */
   Map.prototype.listen = function () {
     var self = this;
     var canvas = this.canvas;
     if (!canvas || !canvas.addEventListener) return;
+    function local(ev) {
+      var r = canvas.getBoundingClientRect();
+      return [ev.clientX - r.left, ev.clientY - r.top];
+    }
     canvas.addEventListener(
       "wheel",
       function (ev) {
@@ -149,24 +342,342 @@
     );
     canvas.addEventListener("pointerdown", function (ev) {
       if (!self.drawn || ev.button !== 0) return;
-      self.drag = { x: ev.clientX, y: ev.clientY, from: self.drawn.view, moved: false };
+      if (canvas.focus) canvas.focus(); // the chart's keys (app.js) while the hand is on it
+      var p = local(ev);
+      var rd = self.rose.shown ? self.roseDrawn : null;
+      var grip = rd ? roseHit(rd.cx, rd.cy, rd.r, p[0], p[1]) : null;
+      // the rose's centre drags it and its rim turns it; anywhere else the chart pans
+      self.drag = { x: ev.clientX, y: ev.clientY, from: self.drawn.view, moved: false, rose: grip };
       if (canvas.setPointerCapture) canvas.setPointerCapture(ev.pointerId);
       canvas.classList.add("dragging");
     });
     canvas.addEventListener("pointermove", function (ev) {
       var d = self.drag;
-      if (!d) return;
+      var p = local(ev);
+      if (!d) {
+        if (self.tool && self.drawn) {
+          self.hover = self.placeAt(p[0], p[1]); // the rubber band of the line being laid
+          self.redraw();
+        }
+        return;
+      }
       var dx = ev.clientX - d.x, dy = ev.clientY - d.y;
       if (!d.moved && Math.abs(dx) + Math.abs(dy) < 3) return;
       d.moved = true;
-      self.hold(panBy(d.from, dx, dy));
+      if (d.rose === "centre") {
+        self.rose.at = self.placeAt(p[0], p[1]);
+        self.redraw();
+      } else if (d.rose === "rim") {
+        var rd = self.roseDrawn;
+        self.rose.index_deg = bearingOfPixel(rd.cx, rd.cy, p[0], p[1]);
+        self.redraw();
+      } else {
+        self.hold(panBy(d.from, dx, dy));
+      }
     });
-    function end() {
+    function end(ev) {
+      var d = self.drag;
       self.drag = null;
       canvas.classList.remove("dragging");
+      if (!d) return;
+      if (d.rose && d.moved) self.keepRose();
+      // a click (no drag) with a tool in hand lays its point
+      if (!d.moved && !d.rose && self.tool && ev && ev.type === "pointerup") {
+        var p = local(ev);
+        self.lay(self.placeAt(p[0], p[1]));
+      }
     }
     canvas.addEventListener("pointerup", end);
     canvas.addEventListener("pointercancel", end);
+    canvas.addEventListener("pointerleave", function () {
+      if (self.hover) {
+        self.hover = null;
+        self.redraw();
+      }
+    });
+  };
+
+  /** The place on the chart under the pixel (px, py): latitude and longitude on the chart,
+   *  the plane's metres on the plane; null before the first drawing. */
+  Map.prototype.placeAt = function (px, py) {
+    var d = this.drawn;
+    if (!d) return null;
+    var m = fromPixels(d.view, d.cw, d.ch, px, py);
+    return d.frame.at(m[0], m[1]);
+  };
+
+  // -- the tools (package 37n) ---------------------------------------------------------
+
+  /** Take up a tool ("line", "ring", "note"), or put it down (the same again, or null). */
+  Map.prototype.useTool = function (tool) {
+    this.tool = this.tool === tool ? null : tool;
+    this.pending = null;
+    this.hover = null;
+    if (this.canvas && this.canvas.classList) this.canvas.classList.toggle("laying", !!this.tool);
+    if (this.sink && this.sink.changed) this.sink.changed();
+    this.redraw();
+  };
+
+  /** Lay the tool's next point at `at`: a line's two ends, a ring's centre and then its
+   *  radius (or its centre alone when a radius is typed), a note's place. */
+  Map.prototype.lay = function (at) {
+    if (!at || !this.tool) return;
+    var mark = null;
+    if (this.tool === "line") {
+      if (!this.pending) this.pending = at;
+      else mark = { kind: "line", points: [this.pending, at] };
+    } else if (this.tool === "ring") {
+      if (this.ringNm > 0) mark = { kind: "ring", points: [at], radius_m: this.ringNm * U.NAUTICAL_MILE };
+      else if (!this.pending) this.pending = at;
+      else mark = { kind: "ring", points: [this.pending], radius_m: measure(this.pending, at).distance_nm * U.NAUTICAL_MILE };
+    } else if (this.tool === "note") {
+      var text = (this.noteText || "").trim();
+      if (!text && root.prompt) text = (root.prompt("The note:") || "").trim();
+      if (text) mark = { kind: "note", points: [at], text: text };
+    }
+    if (mark) {
+      if (mark.kind === "ring" && !(mark.radius_m > 0)) mark = null;
+    }
+    if (mark) {
+      this.pending = null;
+      this.hover = null;
+      this.tool = null;
+      if (this.canvas && this.canvas.classList) this.canvas.classList.remove("laying");
+      if (this.sink && this.sink.add) this.sink.add(mark);
+      if (this.sink && this.sink.changed) this.sink.changed();
+    }
+    this.redraw();
+  };
+
+  /** The marks as the server keeps them (on the hello and after every change). */
+  Map.prototype.setMarks = function (marks) {
+    this.marks = Array.isArray(marks) ? marks : [];
+    if (this.sink && this.sink.changed) this.sink.changed();
+    this.redraw();
+  };
+
+  /** Show or hide the rose; shown where it was, or in the middle of the chart when that
+   *  is off the chart now. */
+  Map.prototype.toggleRose = function () {
+    this.rose.shown = !this.rose.shown;
+    var d = this.drawn;
+    if (this.rose.shown && d) {
+      var c = this.rose.at ? d.frame.from(this.rose.at) : null;
+      var q = c ? toPixels(d.view, d.cw, d.ch, c[0], c[1]) : null;
+      if (!q || q[0] < 0 || q[0] > d.cw || q[1] < 0 || q[1] > d.ch) this.rose.at = this.placeAt(d.cw / 2, d.ch / 2);
+    }
+    this.keepRose();
+    if (this.sink && this.sink.changed) this.sink.changed();
+    this.redraw();
+  };
+
+  /** Escape: the tool put down, the half-laid mark forgotten. */
+  Map.prototype.cancel = function () {
+    if (!this.tool && !this.pending) return false;
+    this.useTool(null);
+    return true;
+  };
+
+  /** The variation the master allows, west positive (the account's), or null on the plane. */
+  function variationOf(snap) {
+    var v = snap && snap.reckoning && snap.reckoning.variation;
+    return v && typeof v.deg_west === "number" ? v.deg_west : null;
+  }
+  view.variationOf = variationOf;
+
+  // The player's pencil: lines, rings and notes in the chart's ink, a little lighter than
+  // its print; the one lit from the list heavier. A mark laid on the other frame (the
+  // plane's in a world with a chart) is not drawn.
+  Map.prototype.drawMarks = function (ctx, snap, frame, toPx, scale, inkColour) {
+    var self = this;
+    var varWest = variationOf(snap);
+    ctx.save();
+    ctx.font = "italic 11px serif";
+    ctx.textBaseline = "middle";
+    ctx.strokeStyle = inkColour;
+    ctx.fillStyle = inkColour;
+    function px(at) {
+      var m = at ? frame.from(at) : null;
+      return m ? toPx(m[0], m[1]) : null;
+    }
+    function line(a, b, label) {
+      ctx.beginPath();
+      ctx.moveTo(a[0], a[1]);
+      ctx.lineTo(b[0], b[1]);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(a[0], a[1], 2, 0, 2 * Math.PI);
+      ctx.arc(b[0], b[1], 2, 0, 2 * Math.PI);
+      ctx.fill();
+      if (label) {
+        ctx.textAlign = "left";
+        ctx.fillText(label, (a[0] + b[0]) / 2 + 5, (a[1] + b[1]) / 2 - 7);
+      }
+    }
+    function lineLabel(p0, p1) {
+      var m = measure(p0, p1);
+      return threeFigures(m.bearing_deg) + " " + distanceWords(m.distance_nm);
+    }
+    this.marks.forEach(function (mark) {
+      var pts = (mark.points || []).map(px);
+      if (!pts.length || pts.some(function (q) { return !q; })) return;
+      ctx.globalAlpha = 0.85;
+      ctx.lineWidth = mark.id && mark.id === self.lit ? 2.5 : 1.2;
+      ctx.setLineDash([]);
+      if (mark.kind === "line" && pts.length === 2) {
+        line(pts[0], pts[1], (mark.text ? mark.text + "  " : "") + lineLabel(mark.points[0], mark.points[1]));
+      } else if (mark.kind === "ring") {
+        var r = Math.max(2, mark.radius_m * scale);
+        ctx.setLineDash([5, 3]);
+        ctx.beginPath();
+        ctx.arc(pts[0][0], pts[0][1], r, 0, 2 * Math.PI);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.arc(pts[0][0], pts[0][1], 1.5, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.textAlign = "center";
+        ctx.fillText((mark.text ? mark.text + ", " : "") + distanceWords(mark.radius_m / U.NAUTICAL_MILE), pts[0][0], pts[0][1] - r - 7);
+      } else if (mark.kind === "note") {
+        var q = pts[0];
+        ctx.beginPath();
+        ctx.moveTo(q[0] - 3, q[1] - 3);
+        ctx.lineTo(q[0] + 3, q[1] + 3);
+        ctx.moveTo(q[0] - 3, q[1] + 3);
+        ctx.lineTo(q[0] + 3, q[1] - 3);
+        ctx.stroke();
+        ctx.textAlign = "left";
+        ctx.fillText(mark.text || "", q[0] + 6, q[1]);
+      }
+    });
+    // the mark being laid: from its first point to the hand, with its figures
+    if (this.tool && this.pending) {
+      var a = px(this.pending);
+      var b = this.hover ? px(this.hover) : null;
+      if (a && b) {
+        ctx.globalAlpha = 0.6;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        if (this.tool === "ring") {
+          var rr = Math.hypot(b[0] - a[0], b[1] - a[1]);
+          ctx.beginPath();
+          ctx.arc(a[0], a[1], rr, 0, 2 * Math.PI);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.textAlign = "center";
+          ctx.fillText(distanceWords(measure(this.pending, this.hover).distance_nm), a[0], a[1] - rr - 7);
+        } else {
+          line(a, b, lineLabel(this.pending, this.hover) + "  (" + bearingWords(measure(this.pending, this.hover).bearing_deg, varWest) + ")");
+        }
+      }
+    }
+    ctx.restore();
+  };
+
+  // The protractor rose (package 37n): north up, its outer ring the true degrees, its inner
+  // ring the compass's points turned by the variation the master allows (a westerly
+  // variation puts the compass's north west of true north), its index a line through the
+  // centre right across the chart, and the index's bearing written under it.
+  Map.prototype.drawRose = function (ctx, snap, frame, toPx, cw, ch, inkColour) {
+    if (!this.rose.shown) {
+      this.roseDrawn = null;
+      return;
+    }
+    var c = this.rose.at ? frame.from(this.rose.at) : null;
+    var q = c ? toPx(c[0], c[1]) : [cw / 2, ch / 2];
+    var r = Math.max(30, Math.min(ROSE_RADIUS_PX, 0.42 * Math.min(cw, ch)));
+    var cx = q[0], cy = q[1];
+    this.roseDrawn = { cx: cx, cy: cy, r: r };
+    var varWest = variationOf(snap);
+    var DEG = Math.PI / 180;
+    function at(brgDeg, rad) {
+      return [cx + rad * Math.sin(brgDeg * DEG), cy - rad * Math.cos(brgDeg * DEG)];
+    }
+    ctx.save();
+    ctx.strokeStyle = inkColour;
+    ctx.fillStyle = "rgba(244,241,234,0.45)"; // the horn of the protractor, the chart under it
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx, cy, r - 16, 0, 2 * Math.PI);
+    ctx.stroke();
+    // the true degrees: every five, longer every ten, figures every thirty
+    ctx.fillStyle = inkColour;
+    ctx.font = "9px serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    for (var d = 0; d < 360; d += 5) {
+      var len = d % 10 === 0 ? 6 : 3;
+      var p0 = at(d, r), p1 = at(d, r - len);
+      ctx.beginPath();
+      ctx.moveTo(p0[0], p0[1]);
+      ctx.lineTo(p1[0], p1[1]);
+      ctx.stroke();
+      if (d % 30 === 0) {
+        var t = at(d, r - 11);
+        ctx.fillText(String(d), t[0], t[1]);
+      }
+    }
+    // the compass's thirty-two points, turned by the variation: its north at the true
+    // bearing 360 less the variation west
+    var turn = varWest === null ? 0 : -varWest;
+    var inner = r - 18;
+    for (var k = 0; k < 32; k++) {
+      var b = turn + k * 11.25;
+      var l = k % 8 === 0 ? 14 : k % 4 === 0 ? 10 : k % 2 === 0 ? 7 : 4;
+      var s0 = at(b, inner), s1 = at(b, inner - l);
+      ctx.beginPath();
+      ctx.moveTo(s0[0], s0[1]);
+      ctx.lineTo(s1[0], s1[1]);
+      ctx.stroke();
+    }
+    // the fleur at the compass's north, and its letters at the four cardinal points
+    var nTip = at(turn, inner - 2), nL = at(turn - 4, inner - 14), nR = at(turn + 4, inner - 14);
+    ctx.beginPath();
+    ctx.moveTo(nTip[0], nTip[1]);
+    ctx.lineTo(nL[0], nL[1]);
+    ctx.lineTo(nR[0], nR[1]);
+    ctx.closePath();
+    ctx.fill();
+    ctx.font = "10px serif";
+    ["N", "E", "S", "W"].forEach(function (name, i) {
+      if (i === 0) return;
+      var lp = at(turn + i * 90, inner - 20);
+      ctx.fillText(name, lp[0], lp[1]);
+    });
+    // the centre, where it is dragged
+    ctx.beginPath();
+    ctx.arc(cx, cy, 3, 0, 2 * Math.PI);
+    ctx.stroke();
+    // the index: right across the chart, faint, and firm from the centre to the rim
+    var idx = this.rose.index_deg;
+    var far = Math.hypot(cw, ch);
+    var e0 = at(idx, far), e1 = at(idx + 180, far), rim = at(idx, r);
+    ctx.globalAlpha = 0.5;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    ctx.moveTo(e1[0], e1[1]);
+    ctx.lineTo(e0[0], e0[1]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(rim[0], rim[1]);
+    ctx.stroke();
+    // the reading, under the rose
+    ctx.font = "11px serif";
+    ctx.fillStyle = inkColour;
+    ctx.fillText(bearingWords(idx, varWest), cx, cy + r + 12);
+    if (varWest !== null) {
+      var vw = Math.abs(varWest);
+      ctx.fillText("variation " + vw.toFixed(1) + "° " + (varWest >= 0 ? "W" : "E") + " allowed", cx, cy + r + 25);
+    }
+    ctx.restore();
   };
 
   /** Zoom by `factor` about the pixel (px, py); following the ship, about the ship. */
@@ -428,14 +939,17 @@
     ctx.font = "10px serif";
     ctx.textAlign = "left";
     ctx.textBaseline = "middle";
-    // the bearings: a line from the mark along the reciprocal of the bearing laid down
-    (rk.bearings || []).forEach(function (b) {
+    // the bearings: a line from the mark along the reciprocal of the bearing laid down; an
+    // old one fading and dropped, a replaced one dropped (package 37n: bearingsShown)
+    bearingsShown(rk.bearings, snap.tick).forEach(function (shown) {
+      var b = shown.bearing;
       var m = toPx.apply(null, frame.of(b.mark_lat_deg, b.mark_lon_deg));
       var ang = (b.bearing_deg + 180) * Math.PI / 180;
       var len = 20 * U.NAUTICAL_MILE * scale;
       ctx.save();
       ctx.setLineDash([6, 4]);
       ctx.strokeStyle = trackColour;
+      ctx.globalAlpha = shown.alpha;
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(m[0], m[1]);
@@ -632,6 +1146,9 @@
       ctx.stroke();
     }
 
+    // the player's pencil (package 37n), over the account and under the ship
+    this.drawMarks(ctx, snap, frame, toPx, scale, inkColour);
+
     // the hull symbol: a small pointed shape, bow toward the heading, at the reckoned
     // position on the chart
     var s = toPx(s0[0], s0[1]);
@@ -727,6 +1244,15 @@
       ctx.textAlign = "left";
       ctx.fillText("in sight: " + snap.lookout.words, 12, 100);
     }
+    // the tool in hand, in words, top middle
+    if (this.tool) {
+      ctx.textAlign = "center";
+      ctx.font = "12px sans-serif";
+      var asks = { line: this.pending ? "click the line's other end" : "click where the line begins", ring: this.pending ? "click at the ring's radius" : this.ringNm > 0 ? "click the ring's centre (" + this.ringNm + " miles)" : "click the ring's centre", note: "click where the note goes" };
+      ctx.fillText(asks[this.tool] + "; Escape puts the tool down", cw / 2, 16);
+    }
+    // the rose over everything (package 37n)
+    this.drawRose(ctx, snap, frame, toPx, cw, ch, inkColour);
   };
 
   Map.view = view;

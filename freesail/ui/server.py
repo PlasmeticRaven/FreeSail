@@ -40,6 +40,9 @@ Routes (spec §9.2):
                         library, as the model's `library` tool serves it, for the
                         browser's pane; /api/library/topics the topics and their
                         sections, /api/library/papers the ship's papers (`shelf_routes`)
+    GET  /api/marks     the player's lines, rings and notes on the chart (package 37n);
+                        POST one, DELETE /api/marks/{id} one or /api/marks all
+                        (`mark_routes`): kept with the game, read by the chart alone
     WS   /ws          every log event as it happens, and a snapshot every
                         tick at 1x, every 10 ticks at 10x, every 60 at 60x and up;
                         at 60x and up the log is rolled up (spec M4 §20): the notable
@@ -91,6 +94,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import math
 import sys
 import threading
 import time
@@ -260,6 +264,12 @@ class Driver:
     def emit_snapshot(self) -> None:
         self._ticks_since_snapshot = 0
         self._emit({"type": "snapshot", "snapshot": self.snapshot()})
+
+    def emit_marks(self) -> None:
+        """The player's marks on the chart to every page (package 37n), after a change."""
+        with self.lock:
+            marks = [dict(m) for m in self.world.chart_marks]
+        self._emit({"type": "marks", "marks": marks})
 
     # -- commands -----------------------------------------------------------
 
@@ -705,6 +715,159 @@ def shelf_routes(lock: Any, world: Callable[[], World]) -> APIRouter:
     return router
 
 
+# ---------------------------------------------------------------------------
+# The player's pencil on the chart (package 37n)
+# ---------------------------------------------------------------------------
+#
+# The lines, rings and notes the player lays on the captain's chart in the browser
+# (`client/map.js`; the owner's note 5 of 2026-10-09). The server keeps them on the World
+# (`World.chart_marks`), so that every save carries them (`World.save`, the checkpoint
+# beside it), and gives them back when a save is taken up here (`take_marks`). They are the
+# player's own: never in the log, the journal, the readings or the snapshot, and read by
+# nothing but the chart; a model's door does not see them. A mark is a place or two on the
+# chart as the player clicked them (latitude and longitude on the chart, the plane's metres
+# on the plane), never a position of the truth's.
+
+MARK_KINDS = ("line", "ring", "note")
+MARKS_MAX = 200  # a voyage's pencilling, and a save that stays small (judgement)
+MARK_TEXT_MAX = 200  # characters in a note or a label
+MARK_RADIUS_MAX_M = 200 * units.NAUTICAL_MILE  # a ring no wider than the chart's widest view
+
+
+def _mark_point(p: Any) -> dict[str, float]:
+    """A point of a mark: {lat, lon} on the chart or {x, y} on the plane, finite numbers."""
+    if not isinstance(p, dict):
+        raise ValueError("A mark's point is {lat, lon} or {x, y}.")
+    keys = ("lat", "lon") if "lat" in p or "lon" in p else ("x", "y")
+    try:
+        out = {k: float(p[k]) for k in keys}
+    except (KeyError, TypeError, ValueError):
+        raise ValueError("A mark's point is {lat, lon} or {x, y}, in numbers.") from None
+    if not all(math.isfinite(v) for v in out.values()):
+        raise ValueError("A mark's point must be a finite place.")
+    if keys[0] == "lat" and not (-90.0 <= out["lat"] <= 90.0 and -180.0 <= out["lon"] <= 180.0):
+        raise ValueError("A mark's latitude and longitude are out of range.")
+    return out
+
+
+def clean_mark(body: Any) -> dict[str, Any]:
+    """A mark as the client sends it, checked and cut to its fields: `kind` (line, ring,
+    note), `points` (two for a line, one for a ring or a note, all on one frame),
+    `radius_m` for a ring, `text` for a note (and an optional label on a line or a ring).
+    ValueError, in words, for anything else."""
+    if not isinstance(body, dict):
+        raise ValueError("A mark is an object.")
+    kind = str(body.get("kind") or "")
+    if kind not in MARK_KINDS:
+        raise ValueError(f"A mark is a {', a '.join(MARK_KINDS[:-1])} or a {MARK_KINDS[-1]}.")
+    raw = body.get("points")
+    want = 2 if kind == "line" else 1
+    if not isinstance(raw, list) or len(raw) != want:
+        raise ValueError(f"A {kind} has {'two points' if want == 2 else 'one point'}.")
+    points = [_mark_point(p) for p in raw]
+    if len({tuple(sorted(p)) for p in points}) != 1:
+        raise ValueError("A line's two ends are on one chart.")
+    mark: dict[str, Any] = {"kind": kind, "points": points}
+    text = body.get("text")
+    if text is not None:
+        text = " ".join(str(text).split())[:MARK_TEXT_MAX]
+        if text:
+            mark["text"] = text
+    if kind == "note" and not mark.get("text"):
+        raise ValueError("A note wants some words.")
+    if kind == "ring":
+        try:
+            radius = float(body.get("radius_m"))
+        except (TypeError, ValueError):
+            raise ValueError("A ring wants its radius in metres.") from None
+        if not (math.isfinite(radius) and 0.0 < radius <= MARK_RADIUS_MAX_M):
+            raise ValueError("A ring's radius is more than nothing and less than 200 miles.")
+        mark["radius_m"] = radius
+    return mark
+
+
+def take_marks(world: World, data: dict[str, Any]) -> None:
+    """The marks of a save, given back to the World it was taken up into (a replay makes
+    none; a checkpoint holds the same). Marks that do not read are left out, not refused:
+    the game loads whatever the pencil did."""
+    kept = []
+    for i, m in enumerate(data.get("chart_marks") or []):
+        try:
+            mark = clean_mark(m)
+        except ValueError:
+            continue
+        mark["id"] = str(m.get("id") or f"m{i + 1}")
+        kept.append(mark)
+    world.chart_marks = kept[:MARKS_MAX]
+
+
+def _next_mark_id(marks: list[dict[str, Any]]) -> str:
+    n = 0
+    for m in marks:
+        tail = str(m.get("id", ""))[1:]
+        if tail.isdigit():
+            n = max(n, int(tail))
+    return f"m{n + 1}"
+
+
+def mark_routes(driver: Driver) -> APIRouter:
+    """The chart's pencil (package 37n):
+
+        GET    /api/marks          {"marks": [...]}: every mark kept with the game
+        POST   /api/marks          a mark (`clean_mark`) -> the mark with its id
+        DELETE /api/marks/{id}     rub one out
+        DELETE /api/marks          rub them all out
+
+    Every change goes to every page on the socket as {"type": "marks", "marks": [...]}."""
+    router = APIRouter()
+
+    def changed() -> list[dict[str, Any]]:
+        marks = [dict(m) for m in driver.world.chart_marks]
+        driver.emit_marks()
+        return marks
+
+    @router.get("/api/marks")
+    def api_marks() -> JSONResponse:
+        with driver.lock:
+            return JSONResponse({"marks": [dict(m) for m in driver.world.chart_marks]})
+
+    @router.post("/api/marks")
+    def api_marks_add(body: dict[str, Any]) -> JSONResponse:
+        try:
+            mark = clean_mark(body)
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e)) from None
+        with driver.lock:
+            marks = list(driver.world.chart_marks)
+            if len(marks) >= MARKS_MAX:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"The chart holds {MARKS_MAX} marks; rub some out first.",
+                )
+            mark["id"] = _next_mark_id(marks)
+            driver.world.chart_marks = [*marks, mark]
+            changed()
+        return JSONResponse(mark)
+
+    @router.delete("/api/marks/{mark_id}")
+    def api_marks_remove(mark_id: str) -> JSONResponse:
+        with driver.lock:
+            marks = list(driver.world.chart_marks)
+            left = [m for m in marks if m.get("id") != mark_id]
+            if len(left) == len(marks):
+                raise HTTPException(status_code=404, detail=f"No mark {mark_id} on the chart.")
+            driver.world.chart_marks = left
+            return JSONResponse({"marks": changed()})
+
+    @router.delete("/api/marks")
+    def api_marks_clear() -> JSONResponse:
+        with driver.lock:
+            driver.world.chart_marks = []
+            return JSONResponse({"marks": changed()})
+
+    return router
+
+
 def create_app(
     driver: Driver,
     client_dir: Path = CLIENT_DIR,
@@ -735,6 +898,7 @@ def create_app(
     driver.desk = router.desk  # type: ignore[attr-defined]
     app.include_router(router)
     app.include_router(shelf_routes(driver.lock, lambda: driver.world))  # package 33d
+    app.include_router(mark_routes(driver))  # package 37n: the chart's pencil
 
     @app.get("/")
     def index() -> FileResponse:
@@ -835,6 +999,8 @@ def create_app(
                 "ship": queries.ship_graph(ship) if hasattr(ship, "spars") else None,
                 "snapshot": driver.snapshot(),
                 "log": driver.shown_log(500),
+                # the player's pencil on the chart (package 37n), for the chart alone
+                "marks": [dict(m) for m in driver.world.chart_marks],
             }
             driver.add_listener(listener)
         try:
@@ -904,8 +1070,17 @@ def build_world(args: argparse.Namespace) -> World:
     """The server's World from its command line, as the console's (`console.start_world`):
     a save replayed (`--load`), a scenario file (`--scenario`, its orders given later by
     `main`), or the ship, seed, wind and heading."""
-    world, _ = start_world(args)
+    world, _ = start_server_world(args)
     return world
+
+
+def start_server_world(args: argparse.Namespace) -> tuple[World, Any]:
+    """`console.start_world`, and a save's marks on the chart taken up with it (package
+    37n): the console draws no chart and leaves them in the file."""
+    world, scenario_file = start_world(args)
+    if getattr(args, "load", None):
+        take_marks(world, replay_mod.load_file(args.load))
+    return world, scenario_file
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -950,7 +1125,7 @@ def main(argv: list[str] | None = None) -> int:
 
     import uvicorn
 
-    world, scenario_file = start_world(args)
+    world, scenario_file = start_server_world(args)
     if args.watcher:
         station_watcher(world, args.watcher, out=sys.stdout)
     if scenario_file is not None:

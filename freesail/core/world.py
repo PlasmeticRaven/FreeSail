@@ -328,6 +328,14 @@ class World:
     # defaults, so that a checkpoint from an earlier build loads with them.
     _drag_said: dict[str, tuple[int, float]] | None = None
     _brought_up_s: int = 0
+    # Package 37n (the owner's note 5 of 2026-10-09): the player's pencil on the captain's
+    # chart, the lines, rings and notes he lays down in the browser, kept with the game:
+    # saved as `"chart_marks"` and taken up again by the door that draws the chart
+    # (`freesail.ui.server`); a checkpoint carries them with the rest. Read by nothing in
+    # the simulation, the reckoning, the standing orders or a station: not in the log, the
+    # journal, the readings or the snapshot. A tuple as the class default, so that a
+    # checkpoint from an earlier build loads with none.
+    chart_marks: list[dict[str, Any]] | tuple[()] = ()
 
     def __init__(self, seed: int, scenario: Scenario | None = None, ship: Any = None):
         # the build's stamp, worked once at the start (package 37d)
@@ -1639,6 +1647,9 @@ class World:
             # M5 §26, package 36); a replay applies the scenario's again from the scenario
             # and the harness's from `inputs`
             "world_orders": [dict(o) for o in self.world_orders],
+            # the player's pencil on the chart (package 37n), for the chart alone; a replay
+            # makes none of it, and the door that draws the chart takes it up from here
+            "chart_marks": [dict(m) for m in self.chart_marks],
         }
 
 

@@ -160,6 +160,88 @@ def test_a_place_held_on_the_chart_stays_as_the_reckoning_moves(tmp_path):
 
 
 @needs_node
+@needs_node
+def test_old_bearing_lines_fade_and_are_dropped_from_the_drawing(tmp_path):
+    """Package 37n, the owner's addition: a bearing is drawn full for a glass after it is
+    taken, fades over the rest of a watch, is dropped after the watch, and at once when a
+    later bearing of the same mark replaces it; the snapshot's list itself is not touched."""
+    bearings = [
+        {"tick": 0, "id": "lizard", "bearing_deg": 10.0},
+        {"tick": 0, "id": "manacles", "bearing_deg": 300.0},
+        {"tick": 5000, "id": "dodman", "bearing_deg": 40.0},
+        {"tick": 9000, "id": "lizard", "bearing_deg": 20.0},
+        {"tick": 9500, "id": "black_head", "bearing_deg": 80.0},
+    ]
+    out = run_js(
+        tmp_path,
+        MAP,
+        bearings,
+        """
+        const V = M.view;
+        const at = t => V.bearingsShown(d, t).map(s => [s.bearing.id, s.bearing.tick, s.alpha]);
+        return {early: at(1000), later: at(10000), old: at(14500), n: d.length,
+                full: V.BEARING_FULL_S, drop: V.BEARING_DROP_S, ghost: V.BEARING_GHOST_ALPHA};
+        """,
+    )
+    assert (out["full"], out["drop"]) == (1800, 4 * 3600)  # a glass, a watch
+    # within the glass every bearing is full; the first Lizard is not yet replaced
+    assert [(i, a) for i, _, a in out["early"]] == [("lizard", 1), ("manacles", 1)]
+    later = {(i, t): a for i, t, a in out["later"]}
+    assert ("lizard", 0) not in later  # replaced by the later bearing of the Lizard
+    assert later[("lizard", 9000)] == 1 and later[("black_head", 9500)] == 1
+    assert out["ghost"] < later[("manacles", 0)] < later[("dodman", 5000)] < 1  # fading
+    old = {i for i, _, _ in out["old"]}
+    assert "manacles" not in old and "dodman" in old  # dropped after the watch
+    assert out["n"] == 5  # the record untouched
+
+
+@needs_node
+def test_the_charts_tools_read_bearings_and_distances(tmp_path):
+    """Package 37n: a line's bearing and length by the plane sailing at the middle
+    latitude; a bearing true and by the compass with the variation the master allows; the
+    rose's grips and its index turned to the hand; a mark in the list's words."""
+    out = run_js(
+        tmp_path,
+        MAP,
+        {},
+        """
+        const V = M.view;
+        const north = V.measure({lat: 50, lon: -5}, {lat: 50.1, lon: -5});
+        const east = V.measure({lat: 50, lon: -5}, {lat: 50, lon: -4.9});
+        const plane = V.measure({x: 0, y: 0}, {x: -1852, y: -1852});
+        return {
+          north: north, east: east, plane: plane,
+          words: V.bearingWords(45, 24), plain: V.bearingWords(45, null),
+          cables: V.distanceWords(0.4), miles: V.distanceWords(3.25),
+          hit: [V.roseHit(100, 100, 80, 105, 103), V.roseHit(100, 100, 80, 100, 25),
+                V.roseHit(100, 100, 80, 140, 100)],
+          turn: [V.bearingOfPixel(100, 100, 100, 20), V.bearingOfPixel(100, 100, 180, 100),
+                 V.bearingOfPixel(100, 100, 20, 100)],
+          ring: V.markWords(
+            {kind: 'ring', points: [{lat: 49.9625, lon: -5.2}], radius_m: 3704}, 24),
+          note: V.markWords({kind: 'note', points: [{x: 0, y: 1852}], text: 'shoal?'}, null),
+          line: V.markWords({kind: 'line', points: [{x: 0, y: 0}, {x: 0, y: 926}]}, null),
+          variation: V.variationOf({reckoning: {variation: {deg_west: 24.5}}}),
+          none: V.variationOf({reckoning: null}),
+        };
+        """,
+    )
+    assert out["north"]["bearing_deg"] == pytest.approx(0.0)
+    assert out["north"]["distance_nm"] == pytest.approx(6.0)
+    assert out["east"]["bearing_deg"] == pytest.approx(90.0)
+    assert out["east"]["distance_nm"] == pytest.approx(6.0 * 0.6428, rel=1e-3)  # cos 50°
+    assert out["plane"]["bearing_deg"] == pytest.approx(225.0)
+    assert out["words"] == "045° true, ENE by the compass (069°)"
+    assert out["plain"] == "045° true, NE"
+    assert (out["cables"], out["miles"]) == ("4 cables", "3.3 miles")
+    assert out["hit"] == ["centre", "rim", None]
+    assert out["turn"] == [0, 90, 270]
+    assert out["ring"] == "ring of 2.0 miles about 49°58' N, 5°12' W"
+    assert out["note"] == "note at x 0.00 nm, y 1.00 nm: shoal?"
+    assert out["line"] == "line 000° true, N, 5 cables"
+    assert (out["variation"], out["none"]) == (24.5, None)
+
+
 def test_the_library_pane_renders_the_models_markdown(tmp_path):
     """The pane's renderer: a primer chapter's headings, tables and code from the very
     text the tool serves, nothing of the page let through as markup, and a
