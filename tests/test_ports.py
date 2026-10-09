@@ -31,11 +31,13 @@ THE_SOUND = {"lat_deg": 50.345, "lon_deg": -4.150}  # Plymouth Sound, within the
 START = datetime(1805, 6, 10, 10, 0)
 
 
-def world_at(where, ship=FRIGATE, heading=20.0, speed=0.0, start=START, wind=225.0, **kw):
+def world_at(
+    where, ship=FRIGATE, heading=20.0, speed=0.0, start=START, wind=225.0, wind_kn=12.0, **kw
+):
     sc = Scenario(
         start_time=start,
         wind_from_deg=wind,
-        wind_speed_kn=12.0,
+        wind_speed_kn=wind_kn,
         gustiness=0.0,
         variability=0.0,
         ship_heading_deg=heading,
@@ -58,6 +60,11 @@ def at_anchor_in(where, ship=FRIGATE, heading=200.0, **kw):
 
 def events(world, kind):
     return [e for e in world.log if e.kind == kind]
+
+
+# Package 37h: the pilot boards only when he is taken at his hail; the book's line for it,
+# as the gate's own books have it
+TAKE_THE_PILOT = 'standing order "the pilot": at the pilot\'s hail then take the pilot'
 
 
 def run_until(world, kind, minutes=240):
@@ -263,27 +270,30 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
 
 def test_the_pilot_comes_off_in_his_cutter_hails_boards_and_is_a_person_aboard():
     """The frigate standing in for Falmouth from five miles south under plain sail: the
-    cutter is a sail the lookout hails, then the hail, then the pilot aboard from the
-    cutter within two cables at six knots or under; he is a person with a name from the
-    port's list, the readings have him, and he answers from his port's words."""
+    cutter is a sail the lookout hails, then the hail, then (taken at the hail by the
+    book's line, package 37h) the pilot aboard from the cutter within two cables at six
+    knots or under; he is a person with a name from the port's list, the readings have
+    him, and he answers from his port's words."""
     w = world_at(SOUTH_OF_FALMOUTH, heading=0.0, speed=4.0)
+    w.submit(TAKE_THE_PILOT)
     w.submit("set plain sail")
     aboard = run_until(w, "port.pilot_aboard", 150)
     sails = [e for e in events(w, "lookout.sighting") if e.data.get("seen_as") == "sail"]
     hail = events(w, "port.pilot_hail")[0]
     assert sails and sails[0].text.startswith("Sail ho!")
     assert sails[0].tick < hail.tick < aboard.tick
-    assert (
-        hail.text
-        == "The cutter hailed: a pilot for Falmouth; shorten sail and he will come aboard."
-    )
+    # under six knots at the hail: she is asked nothing but whether she will take him
+    assert hail.text == "The cutter hailed: a pilot for Falmouth, if you will take him."
+    taken = [e for e in events(w, "port.pilot_answered") if e.data["answer"] == "take"]
+    assert taken and hail.tick <= taken[0].tick <= hail.tick + 1
+    assert taken[0].text == "Answered the cutter: we will take the pilot for Falmouth."
     assert hail.tick - sails[0].tick >= 60 and (aboard.tick - hail.tick) % 60 == 0
     pilot = w.ports.pilot
     assert pilot is not None and pilot.role == "pilot" and pilot.port == "falmouth"
     surname = pilot.name.removeprefix("Mr ")
     assert surname in w.ports.ports["falmouth"].pilot.names
-    assert aboard.text.startswith(
-        f"The pilot, {pilot.name} of Falmouth, came aboard from the cutter"
+    assert aboard.text == (
+        f"The pilot, {pilot.name} of Falmouth, came aboard from the cutter to pilot her in."
     )
     assert aboard.data["pilot"]["name"] == pilot.name
     # he is one of the people, and the readings have him
@@ -708,6 +718,7 @@ def test_the_port_is_a_function_of_the_seed_and_a_checkpoint_mid_errand_resumes_
     p1 = world_at(SOUTH_OF_FALMOUTH, heading=0.0, speed=4.0)
     p2 = world_at(SOUTH_OF_FALMOUTH, heading=0.0, speed=4.0)
     for w in (p1, p2):
+        w.submit(TAKE_THE_PILOT)
         w.submit("set plain sail")
         run_until(w, "port.pilot_aboard", 150)
     assert p1.ports.pilot.name == p2.ports.pilot.name
@@ -795,6 +806,7 @@ def test_the_pilot_boards_from_seaward_and_the_frigate_anchors_in_st_marys_road(
     with the wind at ESE: the pilot's boat is sighted, hails, and the pilot boards with his
     port's words; she runs up the Sound and comes to an anchor in the Road, in port."""
     w = world_at({"lat_deg": 49.885, "lon_deg": -6.300}, heading=309.0, speed=4.0, wind=120.0)
+    w.submit(TAKE_THE_PILOT)
     w.submit("set plain sail")
     anchored = stand_in(w, ST_MARYS_IN)
     sails = [e for e in events(w, "lookout.sighting") if e.data.get("seen_as") == "sail"]
@@ -802,15 +814,13 @@ def test_the_pilot_boards_from_seaward_and_the_frigate_anchors_in_st_marys_road(
     aboard = events(w, "port.pilot_aboard")[0]
     assert sails and sails[0].tick < hail.tick < aboard.tick < anchored.tick
     assert sails[0].text.startswith("Sail ho!")
-    assert hail.text == (
-        "The gig hailed: a pilot for St Mary's; shorten sail and he will come aboard."
-    )
+    assert hail.text.startswith("The gig hailed: a pilot for St Mary's")
     pilot = w.ports.pilot
     assert pilot is not None and pilot.port == "st-marys"
     assert pilot.name.removeprefix("Mr ") in w.ports.ports["st-marys"].pilot.names
     # the port's file says a gig, which 36 reads (`pilot.vessel`)
     assert aboard.text == (
-        f"The pilot, {pilot.name} of St Mary's, came aboard from the gig and took charge of her."
+        f"The pilot, {pilot.name} of St Mary's, came aboard from the gig to pilot her in."
     )
     said = events(w, "port.pilot_words")[0].text
     assert said.startswith("The pilot says: Strangers do not attempt the harbours of Scilly")
@@ -828,14 +838,15 @@ def test_the_pilot_boards_a_neutral_off_the_isle_of_bas_and_she_anchors_in_the_r
     the Isle of Bas: the Roscoff pilot boards (her colours no bar at a French port) and she
     comes to an anchor in the road under the island, in the patch's depth."""
     w = world_at({"lat_deg": 48.736, "lon_deg": -4.17}, ship=SCHOONER, heading=90.0, speed=4.0)
+    w.submit(TAKE_THE_PILOT)
     w.submit("set plain sail")
     anchored = stand_in(w, BATZ_IN)
     aboard = events(w, "port.pilot_aboard")[0]
     pilot = w.ports.pilot
     assert pilot is not None and pilot.port == "roscoff"
     assert aboard.text == (
-        f"The pilot, {pilot.name} of Roscoff, came aboard from the boat and took charge of "
-        "her (American colours being no bar at Roscoff)."
+        f"The pilot, {pilot.name} of Roscoff, came aboard from the boat to pilot her in "
+        "(American colours being no bar at Roscoff)."
     )
     assert aboard.data["stance"] == "neutral" and aboard.tick < anchored.tick
     said = events(w, "port.pilot_words")[0].text
@@ -996,7 +1007,253 @@ def test_the_pilots_hails_are_notable_lines():
     from freesail.core.events import Severity
 
     w = world_at(SOUTH_OF_FALMOUTH, heading=0.0, speed=4.0)
+    w.submit(TAKE_THE_PILOT)
     w.submit("set plain sail")
     run_until(w, "port.pilot_aboard", 150)
     hails = events(w, "port.pilot_hail")
     assert hails and all(e.severity is Severity.NOTABLE for e in hails)
+
+
+# ---------------------------------------------------------------------------
+# Package 37h: the pilot taken or declined at his hail, his boat in company, his
+# warnings, his leaving and his fee (the review of gate 5c, G10; decisions 35 and 36)
+# ---------------------------------------------------------------------------
+
+
+def _hailed(w, minutes=150):
+    hail = run_until(w, "port.pilot_hail", minutes)
+    return hail, w.ports._cutter()
+
+
+def _cables(w, vessel):
+    from freesail.world.geo import bearing_and_distance
+
+    return bearing_and_distance(w.position, vessel.position)[1] / units.CABLE
+
+
+def test_the_pilot_unanswered_keeps_company_hails_once_more_and_bears_away():
+    """The owner's ruling of 7 October 2026: "The pilot may keep company, hail once more,
+    and bear away." Hove to at the hail and never answered, the frigate is hailed again
+    ten minutes later, and ten minutes after that the cutter bears away for her station,
+    the line saying so; the boat kept company the while, and no pilot boarded."""
+    w = world_at(SOUTH_OF_FALMOUTH, heading=0.0, speed=4.0)
+    w.submit("set plain sail")
+    hail, cutter = _hailed(w)
+    assert hail.text == "The cutter hailed: a pilot for Falmouth, if you will take him."
+    w.submit("heave to")
+    assert w.readings.words("pilot") == (
+        "no pilot aboard; the Falmouth cutter has hailed and waits for an answer ('take the "
+        "pilot' or 'decline the pilot')"
+    )
+    apart = []
+    for _ in range(25):
+        w.run(60)
+        if w.ports.cutter_errand == "bring":
+            apart.append(_cables(w, cutter))
+    hails = events(w, "port.pilot_hail")
+    gone = events(w, "port.pilot_gone")
+    assert [e.tick - hail.tick for e in hails] == [0, PT.PILOT_HAIL_AGAIN_S]
+    assert hails[1].text == (
+        "The cutter hailed again: a pilot for Falmouth, if you will take him. Unanswered, she "
+        "will bear away for the outer road."
+    )
+    assert [e.tick - hail.tick for e in gone] == [2 * PT.PILOT_HAIL_AGAIN_S]
+    assert gone[0].text == (
+        "The cutter bore away for the outer road, her hail unanswered; no pilot will come off "
+        "from Falmouth for six hours."
+    )
+    # in company until she bore away, once she had closed from her hail at four cables
+    assert apart and max(apart[3:]) <= 2.0
+    assert not events(w, "port.pilot_aboard") and w.ports.pilot is None
+    assert w.ports.declined_until["falmouth"] == gone[0].tick + int(PT.PILOT_AGAIN_H * 3600)
+    assert cutter.plan[0][0] == "home"
+
+
+def test_the_pilot_declined_at_his_hail_is_sent_back_and_no_pilot_comes():
+    """`decline the pilot` (`we need no pilot`, `wave him off`): the boat bears away for
+    her station at once and none comes off for six hours; afterwards `take the pilot` is
+    refused in words that say why, and `hail the pilot` is no longer read as 'haul'."""
+    w = world_at(SOUTH_OF_FALMOUTH, heading=0.0, speed=4.0)
+    e = w.submit("hail the pilot")
+    assert e.kind == "order.rejected" and "haul" not in e.text
+    assert "There is no pilot to hail: no pilot's boat is in sight." in e.text
+    w.submit("set plain sail")
+    _hailed(w)
+    e = w.submit("we need no pilot")
+    assert e.kind == "port.pilot_answered" and e.text == (
+        "Waved off the pilot: we need no pilot for Falmouth; the cutter bore away for the "
+        "outer road; no pilot will come off from Falmouth for six hours."
+    )
+    w.submit("heave to")
+    w.run(3600)
+    assert not events(w, "port.pilot_aboard") and len(events(w, "port.pilot_hail")) == 1
+    e = w.submit("take the pilot")
+    assert e.kind == "order.rejected"
+    assert "the Falmouth cutter bore away, and none comes off before" in e.text
+
+
+def test_a_fast_ship_is_hailed_to_shorten_sail_and_the_boat_keeps_company_until_she_does():
+    """He boards a ship under six knots within two cables, as package 35 had it; the
+    frigate standing in at eight is hailed to shorten sail, `take the pilot` shortens it as
+    the hail asks, and the cutter keeps company at her pace, saying what she waits for,
+    until she is slow enough, instead of being left astern."""
+    w = world_at(SOUTH_OF_FALMOUTH, heading=0.0, speed=4.0, wind_kn=22.0)
+    w.submit("set plain sail")
+    hail, cutter = _hailed(w)
+    assert w.ports._ground_speed_kn() > PT.PILOT_BOARDS_UNDER_KN
+    assert hail.text == (
+        "The cutter hailed: a pilot for Falmouth; shorten sail and he will come aboard."
+    )
+    assert hail.data["wants"] == "shorten sail"
+    e = w.submit("take the pilot")
+    assert e.text == (
+        "Answered the cutter: we will take the pilot for Falmouth; shorten sail, as she asks."
+    )
+    w.run(5)  # the hands go to the sail at the next second
+    taking_in = [x for x in w.log if x.kind.startswith("evolution.") and 0 <= x.tick - e.tick <= 5]
+    assert taking_in  # the hands at the sail
+    apart, fast = [], []
+    for _ in range(60):
+        w.run(60)
+        if w.ports.pilot is not None:
+            break
+        apart.append(_cables(w, cutter))
+        fast.append(w.ports._ground_speed_kn())
+    aboard = events(w, "port.pilot_aboard")
+    waits = events(w, "port.pilot_waits")
+    assert aboard and waits and waits[0].tick < aboard[0].tick
+    assert waits[0].text.startswith("The cutter keeps company: she cannot put the pilot aboard at")
+    assert waits[0].text.endswith("knots, and waits for her to shorten sail or heave to.")
+    assert max(fast) > PT.PILOT_BOARDS_UNDER_KN  # she stood on fast a while ...
+    assert max(apart[2:]) <= 2.0  # ... and the boat kept company with her
+    assert aboard[0].text.endswith("came aboard from the cutter to pilot her in.")
+
+
+def test_hail_the_pilot_hails_his_boat_in_sight_and_takes_him():
+    """`hail the pilot` with the cutter in sight and not yet within hail: the ship hails
+    her, the pilot is taken, the boat closes and keeps company and he boards, the boat
+    hailing nothing of her own."""
+    w = world_at(SOUTH_OF_FALMOUTH, heading=0.0, speed=4.0)
+    w.submit("set plain sail")
+    for _ in range(30):
+        w.run(60)
+        if [e for e in events(w, "lookout.sighting") if e.data.get("seen_as") == "sail"]:
+            break
+    e = w.submit("hail the pilot")
+    assert e.kind == "port.pilot_answered"
+    assert e.text == "Hailed the cutter: we will take the pilot for Falmouth."
+    aboard = run_until(w, "port.pilot_aboard", 90)
+    assert aboard.tick > e.tick and not events(w, "port.pilot_hail")
+
+
+def _pilot_aboard(w, port="falmouth"):
+    from freesail.world.people import Person
+
+    pilot = w.people.add(Person(f"pilot-{port}-1", "Mr Pascoe", "pilot", 0.9, port=port))
+    w.ports.pilot, w.ports.pilot_port, w.ports.pilot_since = pilot, port, w.clock.tick
+    return pilot
+
+
+def _standing_for(feature_id, off_m=2000.0):
+    """The frigate `off_m` south of a charted danger, standing north for it under plain
+    sail with the wind at west, the Falmouth pilot aboard."""
+    from freesail.world.geo import destination
+
+    probe = world_at(SOUTH_OF_FALMOUTH)
+    start = destination(probe.chart.feature(feature_id).position, 180.0, off_m)
+    w = world_at(
+        {"lat_deg": start.lat_deg, "lon_deg": start.lon_deg},
+        heading=0.0,
+        speed=5.0,
+        wind=270.0,
+    )
+    _pilot_aboard(w)
+    w.submit("set plain sail")
+    w.submit("steer north")
+    return w
+
+
+def test_the_pilot_warns_of_a_danger_ahead_by_name_in_time_to_act():
+    """With true knowledge of his own water (the owner's ruling) he names the Black Rock on
+    her track as an urgent line, saying on which hand the deeper water lies, minutes
+    before she strikes it; once, and never in a reading. He does not con: she stands on."""
+    from freesail.api.readings import EVENTS, speaks_of_danger
+    from freesail.core.events import Severity
+
+    w = _standing_for("black-rock-falmouth")
+    struck = run_until(w, "ship.aground", 40)
+    warns = events(w, "port.pilot_warns")
+    rock = [e for e in warns if e.data["danger"] == "black-rock-falmouth"]
+    assert len(rock) == 1 and rock[0].severity is Severity.URGENT
+    assert rock[0].text == (
+        "The pilot warns: the Black Rock five cables ahead, right ahead; the deeper water is "
+        "to starboard."
+    )
+    assert struck.tick - rock[0].tick >= 300  # in time to act
+    assert speaks_of_danger(rock[0].kind, rock[0].data) == "the pilot's warning"
+    assert EVENTS["the pilot's warning"].kind == "port.pilot_warns"
+    for name in ("pilot", "port", "people"):
+        assert "Black Rock" not in w.readings.words(name)
+
+
+def test_in_thick_weather_he_cannot_see_his_marks_and_warns_by_the_lead():
+    """Thick weather: he says once that he cannot see his marks, and warns of the Black Rock
+    by the lead and the time run, nearer and without its bearing."""
+    from types import SimpleNamespace
+
+    w = _standing_for("black-rock-falmouth")
+    w.conditions = SimpleNamespace(visibility_nm=0.2)
+    run_until(w, "ship.aground", 40)
+    thick = events(w, "port.pilot_thick")
+    assert len(thick) == 1 and thick[0].text == (
+        "The pilot cannot see his marks in this weather; he will warn by the lead and the "
+        "time run, and asks for the lead kept going and the anchor ready."
+    )
+    rock = [e for e in events(w, "port.pilot_warns") if e.data["danger"]]
+    assert [e.text for e in rock] == [
+        "The pilot, by the lead and the time run: the Black Rock three cables ahead; the "
+        "deeper water is to starboard."
+    ]
+    assert rock[0].data["thick"] is True
+
+
+def test_the_pilot_is_put_off_at_the_anchor_and_the_pilotage_paid_once():
+    """The Brest pilot of the review's game 1 never left and was never paid: brought up in
+    Carrick Road, the Falmouth pilot asks for his boat once, waits for her at the gangway,
+    and leaves in her from the quay; the pilotage is paid from the purse at his port's rate,
+    once, and the log says so."""
+    w = at_anchor_in(CARRICK_ROAD, cargo={"purse_pounds": 100.0})
+    _pilot_aboard(w)
+    asked = run_until(w, "port.pilot_boat", 5)
+    assert asked.text == (
+        "The pilot asks for his cutter: she is brought up in Carrick Road, and his charge is done."
+    )
+    assert "Mr Pascoe, pilot of Falmouth: at the gangway, waiting for his boat." in (
+        w.readings.words("people")
+    )
+    left = run_until(w, "port.pilot_left", 120)
+    assert left.text == (
+        "Mr Pascoe left her in the cutter, at the anchor in Carrick Road; the pilotage, £5, "
+        "paid and his certificate signed."
+    )
+    w.run(3 * 3600)
+    assert len(events(w, "port.pilot_boat")) == 1 and len(events(w, "port.pilot_left")) == 1
+    assert w.purse.pounds == 95.0
+    paid = [x[1:] for x in w.purse.entries if "pilotage" in str(x[2])]
+    assert paid == [(-5.0, "pilotage, Falmouth")]
+    assert w.ports.pilot is None and w.people.find("the pilot") is None
+
+
+def test_a_hail_never_asks_a_ship_at_anchor_to_shorten_sail():
+    """The review of gate 5c (G8, G10): his hail asked an anchored ship to shorten sail. A
+    boat that comes up with her at anchor asks only whether she will take him, and he
+    boards her as she lies."""
+    w = at_anchor_in(FALMOUTH_OUTER)
+    w.ports._launch_cutter(w.ports.ports["falmouth"], "bring")
+    hail, _ = _hailed(w, 10)
+    assert hail.text == "The cutter hailed: a pilot for Falmouth, if you will take him."
+    assert hail.data["wants"] == ""
+    e = w.submit("take the pilot")
+    assert e.text == "Answered the cutter: we will take the pilot for Falmouth."
+    aboard = run_until(w, "port.pilot_aboard", 10)
+    assert aboard.text.endswith("came aboard from the cutter to pilot her in.")

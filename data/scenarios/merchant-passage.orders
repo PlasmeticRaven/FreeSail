@@ -27,7 +27,13 @@ standing order "sail on the ebb": at the boat alongside, if the distance to Falm
 # whenever she opens her distance from the port, which she does for a quarter of an hour
 # stemming the ebb at the entrance of the Chenal du Four (below); hove to for his boat
 # there she was set to the southward with her course unshaped and took the ground.
-standing order "the pilot boards": at the pilot's hail then take in the fore topsail
+# Package 37h: the pilot boards only when he is taken at his hail (the owner's rulings of
+# 5 and 7 October 2026); the book takes him after the fore topsail, and `take the pilot`
+# then shortens no more sail, the sail coming in already as the hail asks. (With `take the
+# pilot` alone, its shortening of sail boarded the Falmouth pilot three minutes later and
+# put him off four minutes later, and the passage passed the Iroise's mark too wide for
+# its cast.)
+standing order "the pilot boards": at the pilot's hail then take in the fore topsail; take the pilot
 standing order "the pilot aboard": at the pilot aboard, if the distance to Falmouth is under 9 miles then set plain sail
 standing order "the pilot put off": at the pilot asks to be put off, if the distance to Falmouth is under 15 miles then heave to
 standing order "the pilot off": at the pilot off then fill away

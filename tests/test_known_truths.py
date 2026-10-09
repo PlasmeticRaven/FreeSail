@@ -2870,13 +2870,22 @@ GATE_5B_THICK_HOURS = 16
 # (the course worked each glass; the heave-to's per-sail lines gone, the casts that find
 # no bottom routine, the held lines once a watch for each reason). The thick passage:
 # the land close aboard 54600 → 54420; 508 → 488 lines. The schooner: below.
+# Package 37h (2026-10-09; the pilot taken at his hail, docs/dev/TuningNotes.md, its
+# section): the pilot boards only when he is taken, and the book's line at his hail is
+# `take the pilot` where it was `shorten sail` (the frigate under six knots at the hail is
+# asked nothing, and her sail, shortened at the rounding, is not shortened again). Every
+# tick to the hail stands (the cutter sighted 55860, her hail 57480, the pilot aboard
+# 57540); the outer road 58297 → 58298, the anchor 58647 → 58650 in fifteen fathoms
+# (fourteen and a half), brought up 59642 → 59643; 768 → 754 lines (the shortening's
+# lines at the hail gone; the answer's and the pilot's own lines). The thick passage, with
+# no cutter, is untouched.
 GATE_5B_NOON_TICK = 28740
 GATE_5B_CAST_TICK = 30118
 GATE_5B_HOVE_TO_TICK = 29013  # "Hove to on the larboard tack", her way taken off first
 GATE_5B_LANDFALL_TICK = 44820
-GATE_5B_ROADS_TICK = 58297  # the outer road: the first cast under twenty fathoms
-GATE_5B_ANCHORED_TICK = 58647  # the best bower let go
-GATE_5B_BROUGHT_UP_TICK = 59642  # brought up, the sails furled
+GATE_5B_ROADS_TICK = 58298  # the outer road: the first cast under twenty fathoms (58297)
+GATE_5B_ANCHORED_TICK = 58650  # the best bower let go (58647)
+GATE_5B_BROUGHT_UP_TICK = 59643  # brought up, the sails furled (59642)
 # Package 33c (spec M5 open item 15): every tick held, every line but the standing
 # runtime's own the same; the lines moved by the held lines said the first time and then
 # once a watch (the frigate 157 to 18, the schooner 155 to 15, the thick passage 31 to
@@ -2914,8 +2923,8 @@ GATE_5B_BROUGHT_UP_TICK = 59642  # brought up, the sails furled
 GATE_5B_SAIL_SIGHTED_TICK = 55860  # "Sail ho! A sail right ahead", two leagues
 GATE_5B_PILOT_HAIL_TICK = 57480  # the cutter hails within four cables; sail shortened before it
 GATE_5B_PILOT_ABOARD_TICK = 57540  # the pilot aboard, eighteen minutes before the anchor
-GATE_5B_LINES = 768
-GATE_5B_DIGEST = "dbf7f6fcfb800fdf"
+GATE_5B_LINES = 754  # 768 before package 37h
+GATE_5B_DIGEST = "ded18dca91367945"  # dbf7f6fcfb800fdf before package 37h
 # The schooner, package 37e (old beside new): the landfall 43920 → 44400, the Beast, the
 # Lizard and its lights at one look, the account a cable and a half out after the
 # bearing; the outer road 56502 → 56517; the anchor off the town 57615 → 58210 in six
@@ -2927,13 +2936,26 @@ GATE_5B_DIGEST = "dbf7f6fcfb800fdf"
 # leagues; the outer road 56517 → 56515; the anchor off the town 58210 → 57638 in seven
 # fathoms (six and a half), brought up 59395 → 58690; the pilot's hail 56160 → 55800,
 # and he does not board, as before; 799 → 761 lines.
+# Package 37h (2026-10-09): the pilot aboard before she runs in, the expected failure's
+# mark off. Her book gains three lines and a guard (docs/dev/TuningNotes.md, package 37h):
+# `take the pilot` at his hail shortens sail as it asks, the cutter keeps company with her
+# at seven knots and hails again ten minutes later for her to heave to, which the same
+# line answers; he boards as she comes to the outer road, she fills away when he is
+# aboard and shapes for Carrick Road (the noon's "stand on" guarded to the noon's own
+# filling away). Every tick to the hail stands; old beside new: the hails 55800 → 55800
+# and 56400, the outer road 56515 → 56511, the pilot aboard at 56580 (never before), the
+# anchor 57638 → 58244 in eight fathoms and a half (seven), brought up 58689 → 59360;
+# 761 → 800 lines (the hails, the answers, the boat's waiting, the heave-to and the fill
+# away, the pilot's words and his warning of the Black Rock as she anchors).
 GATE_5B_SCHOONER_LANDFALL_TICK = 45840
-GATE_5B_SCHOONER_ROADS_TICK = 56515  # the outer road: sail shortened, a course for Carrick Road
-GATE_5B_SCHOONER_PILOT_HAIL_TICK = 55800  # the cutter's hail; the pilot is left astern
-GATE_5B_SCHOONER_ANCHORED_TICK = 57638  # off the town: the best bower let go
-GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58689  # 58690 on Windows (the fold-in of m5c-c)
-GATE_5B_SCHOONER_LINES = 761
-GATE_5B_SCHOONER_DIGEST = "c8905673506f717e"  # 78eec3dcd5f33c16 on Windows
+GATE_5B_SCHOONER_ROADS_TICK = 56511  # the outer road: sail shortened (56515 before 37h)
+GATE_5B_SCHOONER_PILOT_HAIL_TICK = 55800  # the cutter's hail; taken at it
+GATE_5B_SCHOONER_PILOT_HAIL_AGAIN_TICK = 56400  # her second, for her to heave to (37h)
+GATE_5B_SCHOONER_PILOT_ABOARD_TICK = 56580  # the pilot aboard off the outer road (37h)
+GATE_5B_SCHOONER_ANCHORED_TICK = 58244  # off the town: the best bower let go (57638)
+GATE_5B_SCHOONER_BROUGHT_UP_TICK = 59360  # 58689 before 37h (58690 on Windows)
+GATE_5B_SCHOONER_LINES = 800  # 761 before 37h
+GATE_5B_SCHOONER_DIGEST = "968d3be83036854b"  # c8905673506f717e before 37h
 GATE_5B_THICK_LANDFALL_TICK = 54420
 GATE_5B_THICK_LINES = 488
 GATE_5B_THICK_DIGEST = "fb136bb8e86f0804"
@@ -3387,10 +3409,13 @@ def test_the_schooner_sails_the_passage_with_her_octant_and_the_log_every_two_ho
     assert roads and roads[0].tick == GATE_5B_SCHOONER_ROADS_TICK
     town = [e for e in log if e.actor == "standing order 'off the town'"]
     assert town and "coming to an anchor" in town[0].text
-    # the pilot's cutter comes off and hails her (package 35); whether he boards is the
-    # test after this one
-    hail = [e for e in log if e.kind == "port.pilot_hail"]
-    assert [e.tick for e in hail] == [GATE_5B_SCHOONER_PILOT_HAIL_TICK]
+    # the pilot's cutter comes off and hails her (package 35), and again for her to heave
+    # to (package 37h); his boarding is the test after this one
+    hail = [e for e in log if e.kind == "port.pilot_hail" and e.data.get("errand") == "bring"]
+    assert [e.tick for e in hail] == [
+        GATE_5B_SCHOONER_PILOT_HAIL_TICK,
+        GATE_5B_SCHOONER_PILOT_HAIL_AGAIN_TICK,
+    ]
     anchored = [e for e in log if e.kind == "ship.anchored"]
     brought_up = [e for e in log if e.kind == "ship.brought_up"]
     assert [e.tick for e in anchored] == [GATE_5B_SCHOONER_ANCHORED_TICK]
@@ -3405,25 +3430,24 @@ def test_the_schooner_sails_the_passage_with_her_octant_and_the_log_every_two_ho
     assert len(log) == GATE_5B_SCHOONER_LINES and log.digest()[:16] == GATE_5B_SCHOONER_DIGEST
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Package 37e: from the point east of the Manacles the schooner stands in NNW at "
-    "seven knots; the Falmouth cutter hails her and the pilot, who boards a ship making under "
-    "six over the ground, is left astern. Three mends of her book were tried inside the "
-    "budget and none kept: sail shortened at the hail, and the fore topsail taken in, each "
-    "put her on the ground within St Anthony's; brought to for the boat, the cutter did not "
-    "come alongside in two glasses (docs/dev/TuningNotes.md, package 37e). For the lead. "
-    "Package 37f left the mark as it found it (the pilot is package 37h's): he hails her at "
-    "55800 and does not board.",
-)
 def test_the_schooners_pilot_boards_before_she_runs_in(gate_5b_schooner):
     """Package 35's beat of the schooner's passage, as it was pinned until package 37e:
     the pilot aboard before she runs in, American colours no bar at Falmouth, the port
-    neutral to her (55380 then, a minute after the hail)."""
+    neutral to her (55380 then, a minute after the hail). Package 37e left him astern of
+    her at seven knots and the test was marked an expected failure; package 37h takes him
+    at his hail, his cutter keeps company with her and hails again for her to heave to,
+    and he boards as she comes to the outer road, before her anchor off the town."""
     world, _ = gate_5b_schooner
-    aboard = [e for e in world.log if e.kind == "port.pilot_aboard"]
-    assert len(aboard) == 1 and aboard[0].tick > GATE_5B_SCHOONER_PILOT_HAIL_TICK
-    assert "American colours being no bar at Falmouth" in aboard[0].text
+    log = world.log
+    aboard = [e for e in log if e.kind == "port.pilot_aboard"]
+    assert [e.tick for e in aboard] == [GATE_5B_SCHOONER_PILOT_ABOARD_TICK]
+    assert aboard[0].tick > GATE_5B_SCHOONER_PILOT_HAIL_TICK
+    assert aboard[0].text.endswith("to pilot her in (American colours being no bar at Falmouth).")
+    taken = [e for e in log if e.kind == "port.pilot_answered"]
+    assert [e.data["wants"] for e in taken] == ["shorten sail", "heave to"]
+    roads = [e for e in log if e.actor == "standing order 'the outer road'"]
+    anchored = [e for e in log if e.kind == "ship.anchored"]
+    assert abs(aboard[0].tick - roads[0].tick) < 600 < anchored[0].tick - aboard[0].tick
 
 
 @pytest.mark.parametrize("ship", ["data/ships/cutter.yaml", "data/ships/brig.yaml"])
@@ -3854,7 +3878,12 @@ GATE_5C_CRUISE_UNDER_WAY_TICK = 6834  # under way on the starboard tack, S by W
 # two of the book's orders each gave chase to the admiral's cutter at one tick, each
 # queued a wear, and the second began as the first ended and "by the wind" took its helm;
 # 2144 → 1988 lines (the heave-to's and the wears' per-sail lines gone, 77 to 20).
-GATE_5C_CRUISE_PILOT_ABOARD_TICK = 7980  # Mr Tozer aboard from the cutter off the Sound, 08:13
+# Package 37h (2026-10-09; docs/dev/TuningNotes.md, its section): the book takes the
+# pilot at his hail (`take the pilot`), and his boat, hailing at four cables, keeps
+# company and closes at her own pace or the frigate's and two knots more: he is aboard
+# a minute sooner, 7980 → 7920. Every other tick stands; 2037 → 2041 lines (the answer,
+# the order's line), the digest with them.
+GATE_5C_CRUISE_PILOT_ABOARD_TICK = 7920  # Mr Tozer aboard off the Sound, 08:12 (7980)
 GATE_5C_CRUISE_PILOT_LEFT_TICK = 10980  # put off into his cutter, the ship hove to for it, 09:03
 GATE_5C_CRUISE_WORLD_ORDERS = [
     (14400, "the scenario"),
@@ -3908,8 +3937,8 @@ GATE_5C_CRUISE_SPOKEN_TICK = 94091  # within hail at 08:08 under no colours; the
 GATE_5C_CRUISE_CHASE_LOST_TICK = 98100  # the brig out of sight astern at 09:15, for the Start
 GATE_5C_CRUISE_NOON_TICKS = [21600, 108240]
 GATE_5C_CRUISE_WEARS_AT_LEAST = 8  # wore ship on the station, and once for the chase
-GATE_5C_CRUISE_LINES = 2037
-GATE_5C_CRUISE_DIGEST = "bb8b2499fde6a0f4"
+GATE_5C_CRUISE_LINES = 2041  # 2037 before package 37h
+GATE_5C_CRUISE_DIGEST = "301ca2e8aad8b405"  # bb8b2499fde6a0f4 before package 37h
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E
@@ -3946,13 +3975,23 @@ GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack,
 # reason, where "in the Bay ... she is at anchor already" was said twenty-six times and
 # "tend the sheets ... She is at anchor" twenty-one; "Brought up" said in Carrick Road at
 # the start; the casts that find no bottom routine). docs/dev/TuningNotes.md, package 37f.
+# Package 37h (2026-10-09; docs/dev/TuningNotes.md, its section): the book takes the
+# pilot at his hail after its fore topsail (`take the pilot`, which shortens no more sail
+# with the sail coming in already). Every tick of the passage stands but two: the pilot
+# of Brest aboard 96240 → 96180 (his boat keeps company and closes at the ship's pace and
+# two knots more), and he is put off at the anchor in the Bay of Brest at 121560, the
+# pilotage paid (he stayed aboard to the end before: game 1's Brest pilot, never put off
+# and never paid). 2994 → 3011 lines (the answers, the pilot's warnings of the Black Rock,
+# the Buzec and the shoal water off Petit Minou, his asking for his boat and her coming).
 GATE_5C_MERCHANT_PILOT_ABOARD_TICKS = [
     16200,
-    96240,
-]  # Mr Tregenza of Falmouth in the outer road; Mr Le Floch of Brest in the Iroise
+    96180,
+]  # Mr Tregenza of Falmouth in the outer road; Mr Le Floch of Brest in the Iroise (96240)
 GATE_5C_MERCHANT_PILOT_LEFT_TICKS = [
     18300,
-]  # Mr Tregenza put off into his cutter beyond the outer road, the ship hove to for it
+    121560,
+]  # Mr Tregenza put off beyond the outer road, the ship hove to for it; Mr Le Floch at the
+# anchor in the Bay of Brest, from the quay (package 37h)
 GATE_5C_MERCHANT_SAIL_OFF_LIZARD_TICK = (
     29100  # "Sail ho! A sail abeam to starboard, bearing W by S", not made out
 )
@@ -3968,8 +4007,8 @@ GATE_5C_MERCHANT_FLOOD_TICK = (
 )
 GATE_5C_MERCHANT_GOULET_TICK = 112078  # the mouth of the Goulet (112112 on Windows)
 GATE_5C_MERCHANT_TIN_SOLD_TICK = 123948  # the boat alongside from the quay (123951 on Windows)
-GATE_5C_MERCHANT_LINES = 2994
-GATE_5C_MERCHANT_DIGEST = "c52c14c725a5ed1f"
+GATE_5C_MERCHANT_LINES = 3011  # 2994 before package 37h
+GATE_5C_MERCHANT_DIGEST = "5d708ee83c7018ba"  # c52c14c725a5ed1f before package 37h
 
 
 def _people(world) -> list[dict]:
@@ -4063,6 +4102,17 @@ def test_the_merchant_passage_at_seed_7_has_its_own_constants(gate_5c_merchant):
     assert [e.tick for e in aboard] == GATE_5C_MERCHANT_PILOT_ABOARD_TICKS
     assert [e.tick for e in left] == GATE_5C_MERCHANT_PILOT_LEFT_TICKS
     assert "Mr Tregenza of Falmouth" in aboard[0].text and "of Brest" in aboard[1].text
+    assert aboard[0].text.endswith("to pilot her out (American colours being no bar at Falmouth).")
+    # package 37h: each taken at his hail by the book, and the pilot of Brest put off at the
+    # anchor in the Bay and paid, once
+    taken = [e for e in log if e.kind == "port.pilot_answered"]
+    assert [e.data["answer"] for e in taken] == ["take", "take"]
+    assert left[1].text.startswith("Mr Le Floch left her in the cutter, at the anchor in the Bay")
+    assert "the pilotage, £4, paid" in left[1].text
+    assert [e.kind for e in log if e.kind == "port.pilot_boat"] == ["port.pilot_boat"]
+    assert any(
+        e.data["danger"] == "black-rock-falmouth" for e in log if e.kind == "port.pilot_warns"
+    )
     # package 37f: the fore-and-after casts, and is not said to at a timeout
     aweigh = [e for e in log if e.kind == "ship.aweigh"]
     paid_off = [e for e in log if e.kind == "evolution.step" and "paid off" in e.text]

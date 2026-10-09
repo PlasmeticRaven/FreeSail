@@ -22,7 +22,7 @@ standing order "soundings": when the speed is under 3 knots and the distance run
 # Once the cast is had she fills away, and when the fill-away has left the helm the
 # course for Falmouth is shaped afresh from the account.
 standing order "fill away after the cast": at a sounding, if the distance run since noon is under 5 miles then fill away
-standing order "stand on": at filled away then shape a course for 50 02 N 4 58 W
+standing order "stand on": at filled away, if the distance run since noon is under 5 miles then shape a course for 50 02 N 4 58 W
 
 # The landfall: the first land seen gives a bearing, and the course for Falmouth is
 # shaped from the reckoning.
@@ -45,6 +45,17 @@ standing order "round the Manacles": when the distance to 50 02 N 4 58 W is unde
 # on the ground within St Anthony's (she ran the entrance slower, on the ebb); brought to
 # for his boat she lay to two glasses and the cutter did not come alongside. For the
 # lead: `docs/dev/TuningNotes.md`, package 37e.
+# Package 37h: the pilot boards only when he is taken at his hail, and the cutter keeps
+# company with her at her own pace once she has hailed. `take the pilot` shortens sail as
+# the hail asks; with her light sails in and her topsails reefed she still makes seven
+# knots, and the cutter hails again ten minutes later for her to heave to, which the same
+# line answers. He boards as she comes to the outer road, and she fills away for Carrick
+# Road (unmended she lay hove to and drifted, and anchored in the outer road). The noon's
+# "stand on" is guarded to the noon's own filling away, as its cast is, so that this one
+# does not send her back to the point east of the Manacles.
+standing order "the pilot boards": at the pilot's hail then take the pilot
+standing order "the pilot aboard": at the pilot aboard then fill away
+standing order "in with the pilot": at filled away, if the distance to Falmouth is under 5 miles then shape a course for Carrick Road
 
 # Running in: the hand lead every glass once the land is in sight and the run since
 # noon says she is closing the coast, and every ten minutes within the thirty-five

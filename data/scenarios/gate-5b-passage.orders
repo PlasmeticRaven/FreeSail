@@ -70,7 +70,9 @@ standing order "the course for the point": every glass, if the distance run sinc
 # ground. Until 37e she stood in N by E at five knots and three quarters and he boarded
 # of himself; from the point east of the Manacles she stands in NNW with the wind freer,
 # at six and a half, and he was left astern. So sail is shortened at his hail, as he asks.
-standing order "the pilot boards": at the pilot's hail then shorten sail
+# Package 37h: he boards only when he is taken at his hail, and `take the pilot` shortens
+# sail as the hail asks when she is too fast for his boat; the book takes him.
+standing order "the pilot boards": at the pilot's hail then take the pilot
 
 # Running in: the hand lead every glass once the land is in sight and the run since
 # noon says she is closing the coast (Master, art. XXVI: "always sounding to inform

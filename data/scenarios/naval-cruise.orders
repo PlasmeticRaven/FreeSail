@@ -18,6 +18,8 @@
 # westward of the Eddystone.
 standing order "the yard": at the anchor let go, if the distance to Plymouth is under 5 miles then take in provisions for thirty days
 standing order "under way": at the yard's stores aboard then get under way on the starboard tack and steer S by W
+# Package 37h: the pilot boards only when he is taken at his hail; the book takes him.
+standing order "the pilot boards": at the pilot's hail then take the pilot
 standing order "the pilot put off": at the pilot asks to be put off then heave to
 standing order "the pilot off": at the pilot off then fill away
 standing order "for the station": at filled away, if the distance to Plymouth is under 25 miles then set plain sail; shape a course for 48 30 N 5 30 W

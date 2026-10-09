@@ -259,3 +259,21 @@ def test_the_people_are_a_function_of_the_seed_and_the_journal_and_a_checkpoint_
     assert [p.role for p in bare.people.all] == ["captain"]
     with pytest.raises(OrderError):
         bare.people.send_for("the master")
+
+
+def test_the_pilot_is_a_person_aboard_of_his_port_and_waits_for_his_boat():
+    """Package 37h: the pilot aboard is one of the people, said as the pilot of his port
+    (a supernumerary, the Regulations' Pilot's art. I), found by 'the pilot' and by his
+    surname, and at the gangway once he has asked for his boat."""
+    w = world_for()
+    pilot = w.people.add(PE.Person("pilot-falmouth-1", "Mr Hocking", "pilot", 0.9, port="falmouth"))
+    w.ports.pilot, w.ports.pilot_port = pilot, "falmouth"
+    assert w.people.find("the pilot") is pilot and w.people.find("Hocking") is pilot
+    said = w.readings.words("people")
+    assert "Mr Hocking, pilot of Falmouth: on the quarterdeck." in said
+    w.ports.pilot_boat_asked = True
+    w.run(1)  # the readings are the tick's
+    assert "Mr Hocking, pilot of Falmouth: at the gangway, waiting for his boat." in (
+        w.readings.words("people")
+    )
+    assert w.people.where_is("the pilot")["state"] == "at the gangway, waiting for his boat"
