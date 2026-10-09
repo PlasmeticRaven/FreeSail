@@ -1,0 +1,119 @@
+# FreeSail: the wardroom of the brig (spec M6 §2; package 40): the brig-sloop's, the
+# commander and his lieutenant, then the master and the standing and warrant officers,
+# with a master's mate and a midshipman as the frigate's in small. The merchant brig of
+# the trade (the same file's other description) sails with the same posts under the
+# names the muster draws. The form and the reading are frigate-36.yaml's (see its head);
+# the names are the muster's, drawn under the seed from the english list. The outlines
+# are judgement, in the period's words where the sources give them.
+
+ship: data/ships/brig.yaml
+
+# The harness's stations bound to a person by his role: the officer of the watch is the
+# lieutenant (spec M5 §29).
+stations:
+  captain: commander
+  officer of the watch: lieutenant
+
+wardroom:
+  - role: commander
+    post: true
+    rank: commander
+    station: the command
+    place: quarterdeck
+    traits: [ambitious, quick, wants a frigate]
+    history: "First lieutenant of a frigate until his promotion a year ago; this brig his first command."
+    brief: >-
+      The brig, her people and her orders are his (the Regulations, the Captain): the course
+      and the standing orders, the pilot, the port's business, the whole answered for.
+  - role: lieutenant
+    post: true
+    rank: lieutenant
+    station: the lieutenant's
+    place: quarterdeck
+    traits: [steady, a good seaman, a little deaf from the guns]
+    history: "Passed for lieutenant five years ago; the brig's only lieutenant."
+    brief: >-
+      The ship's working under the commander, a watch of his own by the bill and the deck
+      in it under the night orders; every strange sail and every shift of wind reported
+      (the Regulations, the Lieutenant, art. IV).
+  - role: master
+    post: true
+    rank: master
+    station: the navigation
+    place: quarterdeck
+    traits: [young for a master, exact, proud of his chronometer work]
+    history: "Second master of a seventy-four before his warrant to the brig."
+    brief: >-
+      The reckoning, the sights, the lead and the chart, the stowage and the ground tackle
+      (the Regulations, the Master): he works the account, warns of the dangers and shapes
+      the course the commander orders.
+  - role: boatswain
+    post: true
+    rank: warrant officer
+    station: the rigging and the boats
+    place: deck
+    traits: [old, hoarse, knows the brig's gear by heart]
+    history: "Boatswain of two sloops before this brig."
+    brief: >-
+      The rigging, the cables, the anchors, the boats and the hands at their stations.
+  - role: gunner
+    post: true
+    rank: warrant officer
+    station: the carronades and the magazine
+    place: deck
+    traits: [careful, slow, sober]
+    history: "Gunner's mate in the Channel fleet; his warrant two years old."
+    brief: >-
+      The carronades, the powder and the shot; the quarters when milestone 7 brings them.
+  - role: carpenter
+    post: true
+    rank: warrant officer
+    station: the hull and the spars
+    place: deck
+    traits: [handy, cheerful, a cooper too at need]
+    history: "Out of Portsmouth yard."
+    brief: >-
+      The hull, the masts, the yards and the pumps: he sounds the well and reports a leak.
+  - role: purser
+    post: true
+    rank: warrant officer
+    station: the stores and the books
+    place: gunroom
+    traits: [thin, anxious, a good clerk]
+    history: "His first warrant."
+    brief: >-
+      The provisions, the slops and the books; the stores demanded and the manifest kept.
+  - role: surgeon
+    post: true
+    rank: warrant officer
+    station: the sick berth
+    place: gunroom
+    traits: [sociable, a fiddler, careful with his mates]
+    history: "Surgeon's mate in a frigate before his own warrant."
+    brief: >-
+      The sick and the hurt; the sick list to the commander each morning.
+  - role: master's mate
+    drawn: {station: forecastle, rating: able}
+    rank: master's mate
+    station: the master's assistant
+    place: quarterdeck
+    traits: [handy, keen on the sights, aims at a warrant]
+    history: "An able seaman of the forecastle rated mate to the master this commission."
+    brief: >-
+      Assists the master in the observations and the reckoning (the Regulations, the Master,
+      art. XXVIII), and keeps a watch by the bill.
+    note: >-
+      A master's mate, an able seaman of the forecastle (the Regulations of 1806, the
+      Master, art. XXVIII).
+  - role: midshipman
+    drawn: {station: afterguard, rating: landsman}
+    messenger: true
+    rank: midshipman
+    station: the commander's messenger
+    place: quarterdeck
+    traits: [quick, fourteen, everywhere at once]
+    history: "A year in the brig; his first ship."
+    brief: >-
+      Carries the commander's word about the brig (pass the word for, send for), keeps a
+      watch by the bill and learns the reckoning from the master.
+    note: A midshipman as the messenger, one of the boys of the afterguard.

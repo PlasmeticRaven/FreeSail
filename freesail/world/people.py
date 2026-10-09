@@ -24,15 +24,33 @@ log and refuses a second call on him in words (`People.occupy`, `People.free`).
 A **message** reaches the captain where he is, through what the ship models (truth 68):
 it comes aboard in the boat or with the pilot (`People.message_aboard`), the messenger
 carries it to the cabin door or the quarterdeck (`PASS_THE_WORD_S` later), and the log
-says each step in order; never a line from nowhere. The harness's stations may later
-bind to a person (M6); here a person is data and a line.
+says each step in order; never a line from nowhere.
+
+**The wardroom** (spec M6 §2; package 40). Each ship's station holders are people with a
+rank, a station aboard, a place, a state and a character outline (the proposal's §3.5: a
+few traits, a line of history, a station brief), written as data in
+`data/people/<ship>.yaml` (`load_wardroom`, `Wardroom`) and read here: a person of the
+muster is given his outline by his role, in the file's order where a role is held twice
+(the two master's mates). The harness's stations bind to a person by the file's
+`stations:` (`People.holder`: the captain's station to the captain, the officer of the
+watch's to the first lieutenant or the mate), and the binding is read, never a name in
+code; a ship without a file keeps the old rule (the officer the first lieutenant, the
+lieutenant or the mate; the captain whoever commands). The generator draws the same
+file's posts and drawn roles into the ship file, so the muster and the people agree. The
+names stay the muster's, drawn under the seed; a scenario may name any person by his
+role (`people: [{role: master, name: Mr Pentreath}]` renames the master; a role the
+muster has not got is a person added, as before).
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+import functools
+from dataclasses import dataclass, field
 from datetime import timedelta
+from pathlib import Path
 from typing import Any
+
+import yaml
 
 from freesail import units
 from freesail.core.events import Severity
@@ -40,12 +58,21 @@ from freesail.world.places import PLACES, place_words
 
 __all__ = [
     "PASS_THE_WORD_S",
+    "PEOPLE_DIR",
     "ROLE_WORDS",
     "WATCH_KEEPERS",
     "Message",
+    "Outline",
     "People",
     "Person",
+    "Wardroom",
+    "load_wardroom",
+    "wardroom_path",
 ]
+
+# The wardroom files, one a ship file, by the ship file's stem (`frigate-36.yaml` reads
+# `data/people/frigate-36.yaml`).
+PEOPLE_DIR = Path(__file__).resolve().parents[2] / "data" / "people"
 
 # The messenger's time to find a man about the ship and bring him aft, or to carry a
 # letter from the gangway to the cabin door: a minute (judgement; a frigate is a hundred
@@ -105,10 +132,132 @@ ROLE_WORDS: dict[str, str] = {
 }
 
 
+@dataclass(frozen=True)
+class Outline:
+    """A station holder's character outline (the proposal's §3.5; spec M6 §2), as the
+    wardroom file gives it: his rank, his station aboard in words, his place when
+    nothing calls him elsewhere, a few traits, a line of history and a station brief."""
+
+    role: str
+    rank: str = ""
+    station: str = ""
+    place: str = ""
+    traits: tuple[str, ...] = ()
+    history: str = ""
+    brief: str = ""
+    post: bool = False  # a post of the muster (crew.posts)
+    drawn: dict[str, str] = field(default_factory=dict)  # {station, rating} for a drawn role
+    messenger: bool = False
+    note: str = ""  # the generator's note above the role's line in the ship file
+
+    def words(self, name: str) -> str:
+        """The outline in a sentence or two, for a brief and for `where is`."""
+        head = f"{name}, {self.rank}" if self.rank else name
+        parts = [head]
+        if self.traits:
+            parts[0] += f": {', '.join(self.traits)}"
+        if self.history:
+            parts.append(self.history.rstrip("."))
+        text = ". ".join(parts) + "."
+        if self.brief:
+            text += (
+                f" His station, {self.station}: {self.brief.strip()}"
+                if self.station
+                else (f" His station: {self.brief.strip()}")
+            )
+        return " ".join(text.split())
+
+
+@dataclass(frozen=True)
+class Wardroom:
+    """One ship's wardroom file read: the outlines in the file's order, and the harness's
+    stations each bound to a role."""
+
+    path: str
+    ship_file: str
+    outlines: tuple[Outline, ...]
+    stations: dict[str, str]  # the harness's station name -> a role
+
+    @property
+    def posts(self) -> list[str]:
+        return [o.role for o in self.outlines if o.post]
+
+    @property
+    def drawn(self) -> list[Outline]:
+        return [o for o in self.outlines if o.drawn]
+
+    def role_of(self, station: str) -> str | None:
+        return self.stations.get(" ".join(str(station).lower().split()))
+
+
+def wardroom_path(ship_file: str | Path | None) -> Path | None:
+    """The wardroom file a ship file reads, or None when the ship has none."""
+    if not ship_file:
+        return None
+    p = PEOPLE_DIR / f"{Path(str(ship_file)).stem}.yaml"
+    return p if p.is_file() else None
+
+
+@functools.lru_cache(maxsize=16)
+def _wardroom(path: str) -> Wardroom:
+    raw = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
+    if not isinstance(raw, dict):
+        raise ValueError(f"{path}: a wardroom file is a mapping of ship, stations and wardroom.")
+    outlines: list[Outline] = []
+    for i, entry in enumerate(raw.get("wardroom") or []):
+        if not isinstance(entry, dict) or not str(entry.get("role") or "").strip():
+            raise ValueError(f"{path}, wardroom {i + 1}: an entry is a mapping with a role.")
+        drawn = entry.get("drawn") or {}
+        if drawn and not isinstance(drawn, dict):
+            raise ValueError(f"{path}, wardroom {i + 1}: drawn is {{station, rating}}.")
+        place = str(entry.get("place") or "").replace(" ", "_")
+        if place and place not in PLACES:
+            raise ValueError(
+                f"{path}, wardroom {i + 1}: '{place}' is no place aboard ({', '.join(PLACES)})."
+            )
+        outlines.append(
+            Outline(
+                role=" ".join(str(entry["role"]).lower().split()),
+                rank=str(entry.get("rank") or "").strip(),
+                station=str(entry.get("station") or "").strip(),
+                place=place,
+                traits=tuple(str(t).strip() for t in (entry.get("traits") or [])),
+                history=str(entry.get("history") or "").strip(),
+                brief=" ".join(str(entry.get("brief") or "").split()),
+                post=bool(entry.get("post")),
+                drawn={str(k): str(v) for k, v in drawn.items()},
+                messenger=bool(entry.get("messenger")),
+                note=" ".join(str(entry.get("note") or "").split()),
+            )
+        )
+    stations = {
+        " ".join(str(k).lower().split()): " ".join(str(v).lower().split())
+        for k, v in (raw.get("stations") or {}).items()
+    }
+    roles = {o.role for o in outlines}
+    for station, role in stations.items():
+        if role not in roles:
+            raise ValueError(
+                f"{path}, stations: the {station}'s station is bound to '{role}', which the "
+                "wardroom has not got."
+            )
+    return Wardroom(path, str(raw.get("ship") or ""), tuple(outlines), stations)
+
+
+def load_wardroom(ship_file: str | Path | None) -> Wardroom | None:
+    """The wardroom file of a ship file (`data/people/<stem>.yaml`), read once; None for
+    a ship without one. Raises ValueError in words for a file that cannot be read."""
+    p = wardroom_path(ship_file)
+    return _wardroom(str(p)) if p is not None else None
+
+
 @dataclass
 class Person:
     """One of the named few. `mirror` is package 33a's `Master` for the master, whose
-    place and occupation the reckoning keeps; this person reads and writes through it."""
+    place and occupation the reckoning keeps; this person reads and writes through it.
+    `outline` is his character outline from the wardroom file (package 40), None for a
+    person the file does not know (the pilot, a scenario's supercargo); `station` is the
+    harness's station bound to him by the file ("" for none)."""
 
     id: str
     name: str  # "Mr Harvey", "Captain Bowen", "the pilot, Mr Pascoe of Falmouth"
@@ -127,6 +276,19 @@ class Person:
     sailor_id: str | None = None
     port: str | None = None  # the pilot's port
     up: bool = False  # called from his watch below: not asleep again until his watch
+    outline: Outline | None = None
+    station: str = ""
+
+    @property
+    def rank(self) -> str:
+        """His rank in words: the outline's, else his role."""
+        return self.outline.rank if self.outline is not None and self.outline.rank else self.role
+
+    def outline_words(self) -> str:
+        """His outline in a sentence or two; his name and role alone without one."""
+        if self.outline is None:
+            return f"{self.name}, {self.role}."
+        return self.outline.words(self.name)
 
     @property
     def where(self) -> str:
@@ -161,7 +323,7 @@ class Person:
         return self.name.split()[-1].rstrip(",")
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        d = {
             "id": self.id,
             "name": self.name,
             "role": self.role,
@@ -170,6 +332,11 @@ class Person:
             "aboard": self.aboard,
             "occupied_with": self.task,
         }
+        if self.outline is not None:
+            d["rank"] = self.rank
+        if self.station:
+            d["station"] = self.station
+        return d
 
 
 @dataclass
@@ -264,7 +431,8 @@ class People:
                 p.watch = ("starboard", "larboard")[turn % 2]
                 turn += 1
         # the officers start on the quarterdeck, the standing officers and the idlers'
-        # chiefs at their stations below or on deck (judgement: where their work is)
+        # chiefs at their stations below or on deck (judgement: where their work is; the
+        # wardroom file says where, below, and this is the rule for a ship without one)
         for p in self.people:
             if p.role == "sailmaker":
                 p.where = "sail_room"
@@ -272,21 +440,58 @@ class People:
                 p.where = "gunroom"
             elif p.role in ("carpenter", "boatswain", "gunner", "master-at-arms"):
                 p.where = "deck"
+        self._attach_wardroom()
         self._scenario_people()
+
+    def _ship_file(self) -> str | None:
+        """The ship file she was made from (`ShipSpec.source`), which names her wardroom
+        file; None for a point ship."""
+        spec = getattr(self.world.ship, "spec", None)
+        source = getattr(spec, "source", None)
+        return str(source) if source else None
+
+    def _attach_wardroom(self) -> None:
+        """The wardroom file's outlines given to the people by role (package 40), the
+        places it names, and the harness's stations bound to a person by its data."""
+        try:
+            wardroom = load_wardroom(self._ship_file())
+        except ValueError:
+            wardroom = None
+        self._wardroom = wardroom
+        if wardroom is None:
+            return
+        given: dict[str, int] = {}
+        for p in self.people:
+            same = [o for o in wardroom.outlines if o.role == p.role]
+            if not same:
+                continue
+            n = given.get(p.role, 0)
+            given[p.role] = n + 1
+            p.outline = same[min(n, len(same) - 1)]
+            if p.outline.place and p.mirror is None:
+                p.where = p.outline.place
+        for station, role in wardroom.stations.items():
+            holder = next((p for p in self.people if p.role == role), None)
+            if holder is not None:
+                holder.station = station
 
     def _scenario_people(self) -> None:
         """The scenario's `people:` (spec M5 §27; package 36): a person beyond the muster
-        ({role, name, skill, place, ashore}), or, named by a role the muster fills with
-        no name given, that man's skill and place set (a lunarian master: `{role: master,
-        skill: 0.95}`; the master's skill is the reckoning's, through his mirror)."""
+        ({role, name, skill, place, ashore}), or, named by a role the muster fills, that
+        man's skill and place set (a lunarian master: `{role: master, skill: 0.95}`; the
+        master's skill is the reckoning's, through his mirror) and, since package 40,
+        his name when the scenario gives one (`{role: master, name: Mr Pentreath}`: the
+        muster's name is replaced, the sailor's with it)."""
         world = self.world
         for spec in getattr(world.scenario, "people", None) or []:
             role = str(spec.get("role") or "").strip().lower()
             name = str(spec.get("name") or "").strip()
             if not role:
                 continue
-            found = None if name else next((p for p in self.people if p.role == role), None)
+            found = next((p for p in self.people if p.role == role), None)
             if found is not None:
+                if name:
+                    self._rename(found, name)
                 if spec.get("skill") is not None:
                     found.skill = float(spec["skill"])
                     if found.mirror is not None:
@@ -311,12 +516,60 @@ class People:
                 )
             )
 
+    def _rename(self, p: Person, name: str) -> None:
+        """A person named by the scenario (package 40): the log's form of address from
+        the name given (`Captain Bowen` from `Bowen` or `Captain Bowen`), the muster's
+        sailor renamed with him, and the master's mirror told."""
+        words = name.split()
+        bare = name
+        for title in ("captain", "commander", "mr", "mister", "the"):
+            if words and words[0].lower().rstrip(".") == title:
+                bare = " ".join(words[1:])
+                break
+        p.name = _address(p.role, bare) if bare else name
+        if p.mirror is not None:
+            p.mirror.name = p.name
+        crew = (getattr(self.world.ship, "extra", None) or {}).get("crew")
+        if crew is not None and p.sailor_id is not None:
+            sailor = crew.by_id.get(p.sailor_id)
+            if sailor is not None:
+                sailor.name = bare or name
+
     # -- finding ------------------------------------------------------------------
 
     @property
     def all(self) -> list[Person]:
         self._build()
         return self.people
+
+    @property
+    def wardroom(self) -> Wardroom | None:
+        """The ship's wardroom file as read (package 40); None for a ship without one."""
+        self._build()
+        return getattr(self, "_wardroom", None)
+
+    def holder(self, station: str) -> Person | None:
+        """The person of the ship's company a harness station is bound to (spec M6 §2:
+        `station: first lieutenant` in the wardroom file; read, never a name in code).
+        A ship without a file keeps the rule of package 37: the officer of the watch is
+        the first lieutenant, the lieutenant or the mate, and the captain's station is
+        whoever commands."""
+        self._build()
+        key = " ".join(str(station).lower().split())
+        for p in self.people:
+            if p.station == key:
+                return p
+        wardroom = getattr(self, "_wardroom", None)
+        if wardroom is not None and wardroom.role_of(key) is not None:
+            return None  # bound to a role the muster has not filled
+        if key == "captain":
+            return self.captain if self.people else None
+        if key == "officer of the watch":
+            for role in ("first lieutenant", "lieutenant", "mate"):
+                found = self.find(role)
+                if found is not None:
+                    return found
+        return None
 
     @property
     def captain(self) -> Person:
@@ -387,6 +640,8 @@ class People:
         deck = self._at_the_station(p)
         if deck is True:
             return ON_DECK_WORDS
+        if self._in_command(p):
+            return f"in command, {place_words(p.where)}"
         if p.occupied:
             return f"at the {p.task}, {place_words(p.where)}"
         if p.pending is not None:
@@ -417,6 +672,15 @@ class People:
         if harness.station.person != p.name:
             return None
         return bool(harness.agent.deck)
+
+    def _in_command(self, p: Person) -> bool:
+        """Whether a model holds the captain's station in this person's place and has the
+        deck (package 40): then he is in command, wherever he stands."""
+        agents = getattr(self.world, "agents", None) or {}
+        harness = agents.get("captain")
+        if harness is None or harness.agent.released:
+            return False
+        return harness.station.person == p.name and bool(harness.agent.deck)
 
     def _asleep(self, p: Person) -> bool:
         """A watch-keeper in his watch below at night is asleep (Luce 1884 ch. XX: the
@@ -471,7 +735,14 @@ class People:
             "place": self.effective_place(p),
             "words": f"{p.name}, {self.state_words(p)}",
             "state": self.state_words(p),
+            "outline": p.outline_words(),
         }
+
+    def wardroom_lines(self) -> list[str]:
+        """The people with their outlines, one a line, the captain first (package 40):
+        what a narrator draws on and what a model taking a station is handed."""
+        self._build()
+        return [p.outline_words() for p in self.people]
 
     # -- occupying and moving ----------------------------------------------------------
 

@@ -807,16 +807,23 @@ OFFICER_PATIENCE_S = 2 * A_GLASS_S
 def officer_rank(world: Any) -> tuple[str, str]:
     """The person of the ship's company whose place the officer of the watch takes
     (spec M5 §22; package 35's people), as (his name, his rank among
-    `standing.rules.RANKS`): the first lieutenant on a frigate, the lieutenant on a
-    brig-sloop, the mate on a schooner or a cutter; the first lieutenant by name alone
-    where the world keeps no people (a point world)."""
+    `standing.rules.RANKS`): bound by the wardroom file's data since package 40
+    (`People.holder`: `station: first lieutenant`), which is the first lieutenant on a
+    frigate, the lieutenant on a brig-sloop, the mate on a schooner or a cutter; the first
+    lieutenant by name alone where the world keeps no people (a point world)."""
+    return station_holder(world, OFFICER, ("the first lieutenant", "first lieutenant"))
+
+
+def station_holder(world: Any, station: str, default: tuple[str, str]) -> tuple[str, str]:
+    """The person a harness station is bound to by the wardroom file (package 40), as
+    (his name as the log says it, his role); `default` where the world keeps no people
+    or the file binds nobody."""
     people = getattr(world, "people", None)
     if people is not None:
-        for role in ("first lieutenant", "lieutenant", "mate"):
-            found = people.find(role)
-            if found is not None:
-                return found.name, role
-    return "the first lieutenant", "first lieutenant"
+        found = people.holder(station)
+        if found is not None:
+            return found.name, found.role
+    return default
 
 
 def officer(
