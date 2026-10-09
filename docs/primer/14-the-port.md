@@ -58,12 +58,15 @@ The hold's room comes from the ship's file by the generator's rule (a tenth of t
 
 ## The pilot
 
-Standing in for Falmouth under sail in daylight, within six miles of Carrick Road, you will have a sail reported on the bow: the pilot cutter, coming off. She is a vessel of the world (package 32b's cutter at far detail), moved once a minute, seen by the lookout at the distance his horizon and the weather allow, and made out as she closes: first "a sail", then "a cutter standing out from the land", then the Falmouth pilot's cutter. Within four cables she hails: "a pilot for Falmouth; shorten sail and he will come aboard." Within two cables, with your way under six knots, he boards:
+Standing in for Falmouth under sail in daylight, within six miles of Carrick Road, you will have a sail reported on the bow: the pilot cutter, coming off. She is a vessel of the world (package 32b's cutter at far detail), moved once a minute, seen by the lookout at the distance his horizon and the weather allow, and made out as she closes: first "a sail", then "a cutter standing out from the land", then the Falmouth pilot's cutter. Within four cables she hails, and **the hail is yours to answer**: a pilot comes aboard only when the captain takes him.
 
 ```
 Sail ho! A sail on the larboard bow, bearing N by W, distant six miles.
 The cutter hailed: a pilot for Falmouth; shorten sail and he will come aboard.
-The pilot, Mr Tregenza of Falmouth, came aboard from the cutter and took charge of her.
+Answered the cutter: we will take the pilot for Falmouth; shorten sail, as she asks.
+The cutter keeps company: she cannot put the pilot aboard at 8 knots, and waits for her
+to shorten sail or heave to.
+The pilot, Mr Tregenza of Falmouth, came aboard from the cutter to pilot her in.
 The pilot says: Keep the fair way and the lead going; there is a narrow deep channel of
 sixteen or eighteen fathoms all the way into Carrick Road. The Black Rock lies nearly in
 the middle of the entrance and shows itself at half tide; the eastern channel is the
@@ -72,11 +75,51 @@ The pilot's news: Britain at war with the Batavian Republic, France and Spain; t
 United States, Portugal and Denmark at peace with all.
 ```
 
-He is a person from then on, with a name from the port's list and his port's knowledge, and `the people` has him on the quarterdeck. He does not steer her: the helm and the sail are yours, as the Regulations of 1806 left them to the captain, and he answers what you ask. `ask the pilot about the channel`, `... for the marks`, `... about the anchorage`, `... when the tide serves` and `... for the news` each give the port file's words for it; the tide's answer is the world's high water at the port in the ship's clock, which is what a pilot knew and the captain's epitome did not. `the pilot` reads him and the tide at once:
+`take the pilot` (or `we will take the pilot`, `take him aboard`) answers the hail. He boards from his boat within two cables of a ship making six knots or under over the ground; a ship faster than that is hailed to shorten sail, and `take the pilot` shortens it as the hail asks. The boat then keeps company with her at her own pace, a cable and a half off, saying what she waits for, until she is slow enough: she is no longer left astern by a ship that stands in at seven knots. A hail to a ship already slow enough asks nothing but whether she will take him ("a pilot for Falmouth, if you will take him"), and a hail to a ship at anchor never asks her to shorten sail. `decline the pilot` (`we need no pilot`, `wave him off`) sends the boat back to her station, and none comes off from that port for six hours. **Unanswered**, the boat keeps company, hails once more ten minutes later (at that hail she asks a ship still too fast to heave to), and ten minutes after that bears away for her station, the log saying so: the owner's ruling, and the end of the pilots who boarded outward-bound ships unasked and were paid for no pilotage. `hail the pilot` hails a pilot's boat in sight that has not yet hailed, and takes him; with no boat in sight it is refused in words. A book answers the hail as the captain does, and the gate's books do:
+
+```
+standing order "the pilot boards": at the pilot's hail then take the pilot
+```
+
+Taking or declining a pilot is the port's business: an officer of the watch with the captain's general authority may not do it (chapter 16), unless the captain names it.
+
+```orders frigate plain-sail
+standing order "the pilot boards": at the pilot's hail then take the pilot
+```
+
+He is a person from then on, with a name from the port's list and his port's knowledge, and `the people` has him on the quarterdeck, "pilot of Falmouth". **He does not con her**: the helm and the sail are yours, as the Regulations of 1806 left them to the captain, and he answers what you ask. What he does besides is **warn**. He knows his own water as the chart does not know it for you (the owner's ruling: he is a carrier of the truth, where a reading is not), and within his port's ground he names a charted danger ahead on her track, in time to act (ten minutes' run, and three cables at the least), and the water where it shoals to less than a fathom under her keel, saying on which hand the deeper water lies. Each is an urgent line, so it wakes a station standing by, and an event for the book (`at the pilot's warning`):
+
+```
+The pilot warns: the Black Rock five cables ahead, right ahead; the deeper water is to
+starboard.
+The pilot warns: shoal water, three fathoms, four cables ahead; the deeper water is to
+larboard.
+```
+
+He names each danger once while he is aboard, and the shoal water at most once in ten minutes. His warnings are never put into a reading: `the dangers` is still the captain's chart against the captain's account (chapter 10). In thick weather, under a mile, he cannot see his marks and says so once, and warns by the lead and the time run instead: nearer, five minutes' run, and without the danger's bearing.
+
+```
+The pilot cannot see his marks in this weather; he will warn by the lead and the time
+run, and asks for the lead kept going and the anchor ready.
+The pilot, by the lead and the time run: the Black Rock three cables ahead; the deeper
+water is to starboard.
+```
+
+`ask the pilot about the channel`, `... for the marks`, `... about the anchorage`, `... when the tide serves` and `... for the news` each give the port file's words for it; the tide's answer is the world's high water at the port in the ship's clock, and the turn of the stream in his road to the flood he goes in on, which is what a pilot knew and the captain's epitome did not. `the pilot` reads him and the tide at once; with no pilot aboard it says what his boat is doing:
 
 ```
 The pilot: Mr Tregenza of Falmouth aboard; high water at Falmouth about four o'clock in
-the afternoon, 16 feet above the datum; the flood is making now and serves.
+the afternoon, the tide rising some 16 feet; the flood is making now and serves.
+The pilot: no pilot aboard; the Falmouth cutter has hailed and waits for an answer ('take
+the pilot' or 'decline the pilot').
+```
+
+**His leaving and his fee.** Brought up in his port's anchorage or mooring, his charge is done: he asks for his boat once, waits at the gangway, and leaves in her from the quay. Anchored in the outer road he stays aboard, since a ship from sea waits there for her tide to go in. Outward bound he leaves her a mile beyond the outer road, asking for sail to be shortened as his boat comes off for him (`at the pilot asks to be put off`), and the boat keeps company until she is slow enough. Either way the pilotage is paid from the purse at his port's rate as he goes, once, and the log says so:
+
+```
+The pilot asks for his cutter: she is brought up in Carrick Road, and his charge is done.
+Mr Tregenza left her in the cutter, at the anchor in Carrick Road; the pilotage, £5, paid
+and his certificate signed.
 ```
 
 ```orders frigate plain-sail
@@ -216,7 +259,7 @@ A tack or a course the ship does not know is refused in the words; at sea, with 
 
 ## St Mary's, in Scilly
 
-St Mary's is the first port of the Approaches and the natural start of a passage up Channel, and the port a King's ship puts into when the Atlantic has used her hard. It is a file like the others (`data/ports/st-marys.yaml`) on the Scilly patch the chart already carries. White's word for strangers is "not to attempt the harbours of Scilly without pilots", and the pilots are worth having: they come off "from one quarter or the other, even in the worst weather, as soon as the signal for that purpose is made". The isles' pilots came off in gigs, six oars and a lugsail; the file says so, and the game brings the pilot off in the pilot cutter until its pilot vessel is taken from the port's file, so the log calls her a cutter.
+St Mary's is the first port of the Approaches and the natural start of a passage up Channel, and the port a King's ship puts into when the Atlantic has used her hard. It is a file like the others (`data/ports/st-marys.yaml`) on the Scilly patch the chart already carries. White's word for strangers is "not to attempt the harbours of Scilly without pilots", and the pilots are worth having: they come off "from one quarter or the other, even in the worst weather, as soon as the signal for that purpose is made". The isles' pilots came off in gigs, six oars and a lugsail; the file says so, and the game brings him off in her (package 36 reads the file's `pilot.vessel`), so the log calls her the gig. The Woolpack, the Spanish Ledge and the Bartholomew he names are drying rocks, named on the captain's chart as the other rocks are (package 37h). One thing to know before you take the Sound: the chart's soundings agree with his words in the fair way between the Woolpack and the Bartholomew (six fathoms at low water, where he says six and seven off the Woolpack) and off Peninnis (fifteen to eighteen fathoms two cables to the south, his fifteen), but the chart has the Spanish Ledge to the eastward of the Woolpack, where his words put it on the larboard hand going in, and the water between those two is two fathoms. His warnings read the same chart as the lead, so he and the lead agree with each other; the tuning notes for package 37h have the figures.
 
 The way in from the Channel is St Mary's Sound, between St Mary's and St Agnes, "by far the best and safest channel" (Imray): the Great Minalto in one with the north-east side of the Great Mincarlo carries a ship between the Woolpack to starboard and the Spanish and Bartholomew ledges to larboard, and when the daymark on St Martin's opens west of Bants Carn she steers north by east for the anchorage. **St Mary's Road**, between St Mary's and Samson, is the one anchorage for a large ship, four and five fathoms on loose sand that does not hold well, sheltered from every wind but those between west-north-west and south-west; in those, White says, run to sea through Crow Sound at a proper time of tide. **The Pool** off Hugh Town is for small craft: a ship drawing more than nine feet lies in the Road, so the frigate, the schooner and the brig anchor there and only the cutter takes the Pool. The outer road is the mouth of the Sound, and the pilot leaves her a mile beyond it outward bound.
 
@@ -225,8 +268,9 @@ Standing in for the Sound from the south-east of Peninnis with the wind at east-
 ```
 Sail ho! A cutter standing out from the land on the starboard bow, bearing N by W,
 distant two miles.
-The cutter hailed: a pilot for St Mary's; shorten sail and he will come aboard.
-The pilot, Mr Woodcock of St Mary's, came aboard from the cutter and took charge of her.
+The gig hailed: a pilot for St Mary's; shorten sail and he will come aboard.
+Answered the gig: we will take the pilot for St Mary's; shorten sail, as she asks.
+The pilot, Mr Woodcock of St Mary's, came aboard from the gig to pilot her in.
 The pilot says: Strangers do not attempt the harbours of Scilly without a pilot. St Mary's
 Sound, between St Mary's and St Agnes, is by far the best and safest way into the Road ...
 Anchor in St Mary's Road with Hangman Island its own breadth open north of the Nut Rock, a
@@ -247,9 +291,10 @@ What Roscoff does when a ship stands in depends on her colours, which is the nat
 
 ```
 Sail ho! A sail right ahead, bearing E, distant three leagues.
-The cutter hailed: a pilot for Roscoff; shorten sail and he will come aboard.
-The pilot, Mr Cabioch of Roscoff, came aboard from the cutter and took charge of her
-(American colours being no bar at Roscoff).
+The boat hailed: a pilot for Roscoff, if you will take him.
+Answered the boat: we will take the pilot for Roscoff.
+The pilot, Mr Cabioch of Roscoff, came aboard from the boat to pilot her in (American
+colours being no bar at Roscoff).
 The pilot says: The western passage is the easier. Come to the end of the isle within
 cannon-shot, where a single rock stands about a third of the way to the main: that is the
 Lavandière ...
@@ -274,7 +319,10 @@ The market is the trade the port lived by, brandy, geneva, rum, tea and tobacco 
 | `the stores` | | the water by the ton and the provisions by the day |
 | `the epitome` | | the table of the establishments the captain carries |
 | `the port` | | the nearest port, its roads, its stance, the pilot, the cutter and the boat |
-| `the pilot` | `the pilot's words` | the pilot aboard and when the tide serves; "no pilot aboard" |
+| `the pilot` | `the pilot's words` | the pilot aboard and when the tide serves; "no pilot aboard", and what his boat is doing |
+| `take the pilot` | `we will take the pilot`, `take him aboard` | the answer to the pilot boat's hail; she shortens sail or heaves to as the hail asked |
+| `decline the pilot` | `we need no pilot`, `wave him off` | the boat sent back to her station; none comes off for six hours |
+| `hail the pilot` | `hail the pilot boat`, `hail the pilot's cutter` | a pilot's boat in sight hailed, and the pilot taken |
 | `a sail in sight` | `the pilot cutter` | the other sail the lookout sees, nearest first |
 | `the boat` | | the boat and its errand |
 | `the boats` | | every boat she carries, by length, oars and crew |
@@ -289,8 +337,8 @@ The market is the trade the port lived by, brandy, geneva, rum, tea and tobacco 
 | `moor` | `moor ship`, `moor with the small bower` | a second anchor laid, a cable each way, the hawse open |
 | `unmoor` | `get to single anchor` | the lee anchor hove up |
 | `lay out a kedge` | `lay out a kedge to the NE`, `carry out the kedge` | the kedge carried out by the boat and let go on the bearing |
-| `at the pilot aboard` | `at the pilot off`, `at the pilot refused`, `at the boat alongside`, `at a message`, `at a sail sighted`, `at moored`, `at got under way`, `at the hands entered` | the events, for the book |
+| `at the pilot aboard` | `at the pilot's hail`, `at the pilot's warning`, `at the pilot's boat gone`, `at the pilot asks for his boat`, `at the pilot off`, `at the pilot refused`, `at the boat alongside`, `at a message`, `at a sail sighted`, `at moored`, `at got under way`, `at the hands entered` | the events, for the book |
 
 ## Where it comes from
 
-The pilot is the Regulations of 1806, the Pilot's articles (borne as a supernumerary, the captain's certificate, the hand lead kept going in pilot water) and the Master's art. XXIX; the roads are White 1835 ('Coast of England', Falmouth pp. 26 to 27 and Plymouth pp. 31 to 35), Imray 1874 (pp. 78 to 90) and Moore 1799's catechism for Falmouth, Faden 1793 for Brest; St Mary's is White 1835 pp. 13 to 17 and Imray 1874 pp. 104 to 108, Roscoff Faden 1793 pp. 45 to 46, La Barre 1825, Norie 1839, Imray 1874 pp. 211 to 212, the King's council's arrêt of 3 September 1769 on the rum warehoused there, and Bellin's sheet of 1764 for its chart (package 35b; the tuning notes say what is judgement); the pilot's words in each file are those pages' directions. Getting under way is Luce 1866 ch. XXI, 'Remarks on Casting' and 'To get under way and stand out on a wind'; mooring and unmooring Luce ch. XXXIV and Lever 1808, 'Mooring' (the open hawse); the kedge Falconer 1780, KEDGE, and Lever p. 100; the boats Luce 1866, 'Boats', and Falconer, LONG-BOAT and YAWL; the yard's supply the Regulations' Captain's art. XVI and the standing officers' expense books. The nations table's dates are from memory and say so; the market's prices are from memory and say so; the rules that move them, the pilot's distances and the boat's times are judgement, named with their reasons in `docs/dev/TuningNotes.md`, package 35. The design is spec M5 §22 to §24 and `docs/design/InwardAndOutward.md`.
+The pilot is the Regulations of 1806, the Pilot's articles (borne as a supernumerary, the captain's certificate, the hand lead kept going in pilot water) and the Master's art. XXIX; the roads are White 1835 ('Coast of England', Falmouth pp. 26 to 27 and Plymouth pp. 31 to 35), Imray 1874 (pp. 78 to 90) and Moore 1799's catechism for Falmouth, Faden 1793 for Brest; St Mary's is White 1835 pp. 13 to 17 and Imray 1874 pp. 104 to 108, Roscoff Faden 1793 pp. 45 to 46, La Barre 1825, Norie 1839, Imray 1874 pp. 211 to 212, the King's council's arrêt of 3 September 1769 on the rum warehoused there, and Bellin's sheet of 1764 for its chart (package 35b; the tuning notes say what is judgement); the pilot's words in each file are those pages' directions. Getting under way is Luce 1866 ch. XXI, 'Remarks on Casting' and 'To get under way and stand out on a wind'; mooring and unmooring Luce ch. XXXIV and Lever 1808, 'Mooring' (the open hawse); the kedge Falconer 1780, KEDGE, and Lever p. 100; the boats Luce 1866, 'Boats', and Falconer, LONG-BOAT and YAWL; the yard's supply the Regulations' Captain's art. XVI and the standing officers' expense books. The nations table's dates are from memory and say so; the market's prices are from memory and say so; the rules that move them, the pilot's distances and the boat's times are judgement, named with their reasons in `docs/dev/TuningNotes.md`, package 35; the hail answered, the boat in company, his warnings and his leaving at the anchor are package 37h's, on the owner's rulings of 5 and 7 October 2026, and their figures are judgement named there. The design is spec M5 §22 to §24 and `docs/design/InwardAndOutward.md`.
