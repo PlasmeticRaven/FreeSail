@@ -1,10 +1,11 @@
 # Files whose bytes are digested or read whole, kept as committed on every platform:
 # a checkout that turned their line endings would move the consent brief's digest (the
-# records in docs/agents/consent/ carry it, and the re-ask rule compares it), the digest
-# of the brief kept as a test fixture (tests/test_officer.py pins it), and the
-# checkpoints kept as fixtures (gzip). Found at the fold-in of m5c-c, when the Windows
-# job of ci.yml checked the fixture out with CR LF.
+# records in docs/agents/consent/ carry it, and the re-ask rule compares it), the digests
+# of the briefs kept as test fixtures (tests/test_officer.py pins them: before package
+# 37g, and before package 42a), and the checkpoints kept as fixtures (gzip). Found at the
+# fold-in of m5c-c, when the Windows job of ci.yml checked the fixture out with CR LF.
 docs/agents/ConsentBrief.md -text
 tests/fixtures/ConsentBrief-before-37g.md -text
+tests/fixtures/ConsentBrief-before-42a.md -text
 tests/fixtures/saves/*.checkpoint binary
 tests/fixtures/saves/*.json -text
