@@ -2708,6 +2708,7 @@ def test_the_journal_is_written_while_standing_by_and_the_stand_by_goes_on(tmp_p
     assert h.transcript[-1] == {
         "tick": 60,
         "after_orders": 0,
+        "after_inputs": 0,
         "door": "journal",
         "reason": "The glass steady at thirty.",
         "by": "out of turn",

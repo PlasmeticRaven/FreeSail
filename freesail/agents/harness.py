@@ -143,6 +143,7 @@ result, and a door that sends tool definitions reads the list from `offered_tool
 
 from __future__ import annotations
 
+import dataclasses
 import json
 import re
 import time
@@ -205,6 +206,7 @@ __all__ = [
     "DANGER_WORD_N",
     "HANDOVER_AT_FRACTION",
     "HANDOVER_KEEP_TURNS",
+    "HANDOVER_RESERVE_SHARE",
     "HANDOVER_RESERVE_TOKENS",
     "IN_FLIGHT",
     "ORDER_TOOLS",
@@ -320,17 +322,28 @@ STAND_BY_WITH_DECK_MAX_S = A_GLASS_S
 # is lost), and asks again when it has grown by another tenth without one.
 HANDOVER_AT_FRACTION = 0.6
 HANDOVER_ASK_AGAIN_FRACTION = 0.1
-# The threshold as a reserve in tokens (package 37g, item 8; the report's 8.2, item 14):
-# a fixed fraction is the wrong shape, since the room the note needs is the same at every
-# size. The harness asks for the note when the conversation has left less than this much
-# of the door's context, and never earlier than the fraction above (which is already the
-# most a context of 32,000 bears). Fourteen thousand: the reply budget (4,096), the tool
-# definitions (about 2,200) and about 8,000 for the sample that carries the ask, what the
-# model reads first and the note itself (the review's reader V1a, K, measured: "about
-# 8,000 is comfortable and 4,000 the least"). So at 65,536 the ask comes at about 0.79 of
-# the context and at 102,400 at about 0.86. The local runner's `--handover-reserve`
-# changes it for a seating; it is asked again when the conversation has grown by a
-# quarter of the reserve without a note.
+# The threshold as a reserve of the door's context (package 37g, item 8, as package 37i
+# amends it): the harness asks for the note when the conversation has left less than the
+# reserve, and never earlier than the fraction above (which is already the most a context
+# of 32,000 bears). 37g made the reserve 14,000 tokens; game 10 (the review of gate 5c,
+# G15) showed that at 102,400 it left the ask to 88,400 by the four-character count while
+# the server's own count stood far nearer the ceiling, and both seatings ended when the
+# server refused the conversation for its size. So the default is a share (package 37i,
+# item 3): three tenths, the room for two of game 10's largest samples (25,654
+# characters, about 7,300 tokens by the server's count) with the reply budget (4,096) and
+# the tool definitions (about 2,200), at 102,400 the review's stopgap of 30,000 (30,720),
+# and between the six tenths game 7 ran 31 hours on and 37g's 0.86; and never less than
+# 37g's 14,000 (`HANDOVER_RESERVE_TOKENS`: the reply budget, the tool definitions and
+# the 8,000 the review's reader measured as comfortable for the sample, the reading and
+# the note), the larger of the two, since three tenths of a small context leave less
+# (at 32,768, 9,830: the review's 3,500 of room after the reply and the tools, under its
+# least of 4,000). At 65,536 the ask comes at 45,875 and at 102,400 at 71,680; below
+# about 35,000 the six tenths govern, as they did before 37g. The local runner's
+# `--handover-reserve` sets it for a seating, as tokens or as a share (sent as tokens);
+# it is asked again when the conversation has grown by a quarter of the reserve without
+# a note. The conversation is measured by the server's own count where the door gives it
+# (`Reply.served_tokens`; package 37i, item 2), else by the four-character rule.
+HANDOVER_RESERVE_SHARE = 0.3
 HANDOVER_RESERVE_TOKENS = 14000
 # The turns kept whole after the note, besides the brief (judgement: the last two
 # exchanges, a sample and its reply with their results, so that the note and the turn in
@@ -904,6 +917,13 @@ class Harness:
     def on_tick(self) -> None:
         self._tick_step()
         if self.started:
+            self._play_door_acts(between_ticks=False)
+
+    def on_between_ticks(self) -> None:
+        """A replay between two ticks, before the inputs of the tick it has reached
+        (`core.replay.replay`): the acts from outside the loop due here are made, as a
+        door made them in play, after the World's whole tick (package 37i, item 5)."""
+        if self.started:
             self._play_door_acts()
 
     def due_to_start(self) -> bool:
@@ -925,9 +945,13 @@ class Harness:
 
     def on_input(self) -> None:
         """After any input a replay gives again (an order refused or answered, a driver's
-        line: neither reaches `on_order`): a restored station due here is seated."""
+        line: neither reaches `on_order`): a restored station due here is seated, and the
+        acts from outside the loop made after this input in play are made (package 37i:
+        before it, only at a seating, so that an act after a driver's line at the save's
+        last tick was never made)."""
         if self.due_to_start():
             self.start()
+        if self.started:
             self._play_door_acts()
 
     def _tick_step(self) -> None:
@@ -1000,7 +1024,9 @@ class Harness:
         stationed after the orders of its tick starts here."""
         self._order_step()
         if self.started:
-            self._play_door_acts()
+            # an order may come inside the World's tick (a standing order's firing), where
+            # no door's act was made in play: one of this tick waits for the tick's end
+            self._play_door_acts(between_ticks=False)
 
     def _order_step(self) -> None:
         if self._start_at is not None:
@@ -2142,13 +2168,23 @@ class Harness:
         station changed: `reason` the identity, `by` the door's key), which writes the
         log's line; and "hand_over" and "stand_down_note" (`reason` the note), the two
         tools called while the game has the floor, so that no way of stopping waits for
-        a turn. An act this build does not know is left alone."""
+        a turn. An act this build does not know is left alone.
+
+        Package 37i adds "cut_off" (`reason` the door's words, `by` the door): no reply was
+        to be had for the open turn, which ends with nothing done (`_cut_off`). Each act
+        is recorded with the count of inputs before it as well as of orders, and a replay
+        makes an act of the tick it is at only between ticks, where a door makes it
+        (`on_between_ticks`)."""
         if self.agent.released and act not in ACTS_ON_A_RELEASED_STATION:
             return None
         world = self.world
         entry: dict[str, Any] = {
             "tick": world.clock.tick,
             "after_orders": len(world.journal),
+            # every input before it (package 37i): a refused order, a query and a
+            # driver's line are inputs and no orders, and a replay makes the act after
+            # as many as were given in play
+            "after_inputs": len(world.inputs),
             "door": act,
             "reason": reason,
             "by": by,
@@ -2185,7 +2221,21 @@ class Harness:
             return tools.call(world, self.station.name, "stand_down", {"note": reason})
         elif act == "stand_down":
             self.stand_down(reason, by=by)
+        elif act == "cut_off":
+            self._cut_off(reason, by)
         return None
+
+    def _cut_off(self, words: str, by: str) -> None:
+        """No reply was to be had for the open turn (package 37i, item 1; the review of
+        gate 5c, G15: one reply in twenty of game 10's officer was lost to the thinking
+        limit, passed on as an empty reply with no word to anyone): the door asked once
+        more and was cut off again, so the turn ends with nothing done and the journal
+        says why. It is no reply of the model's and nothing is said in the log; the turn
+        is counted as one in which nothing was said, as an empty reply was."""
+        said = full_stop(f"No reply reached the game through {by}: {words}")
+        self.note(said, kind=CUT_OFF_KIND)
+        if self._open is not None and not self.agent.released:
+            self._end_sample()
 
     def _asked(self, identity: str, verdict: str) -> None:
         """The consent question was put again to an identity that had left this station
@@ -2255,15 +2305,20 @@ class Harness:
             return "Noted in the journal; your turns are still paused."
         return "Noted in the journal; the game still has the floor until your next turn."
 
-    def _play_door_acts(self) -> None:
+    def _play_door_acts(self, between_ticks: bool = True) -> None:
         """A replay makes the recorded stops from outside the loop at their points (a
         reseat among them, package 37, and the consent question's answer, package 37g,
-        which are the acts made on a released station)."""
+        which are the acts made on a released station). A door makes its act between two
+        of the World's ticks, never inside one, so an act of the tick the World is at is
+        made only `between_ticks` (package 37i, item 5: game 10's officer, stood down by
+        the runner at 08:00 on the 14th after a danger had woken him, was stood down in
+        the replay by the order of a standing order fired inside that tick, before the
+        harness's own step had woken him: one line short, and another digest)."""
         m = self.model
         if not isinstance(m, Playback):
             return
         while True:
-            e = m.next_act()
+            e = m.next_act(None if between_ticks else self.world.clock.tick)
             if e is None:
                 return
             act = str(e["door"])
@@ -2562,22 +2617,39 @@ class Harness:
         )
 
     def _conversation_size(self) -> int:
-        """The tokens of the conversation since the latest brief, at the harness's rule."""
+        """The tokens of the conversation since the latest brief: by the model server's
+        own count where the door gives it (package 37i, item 2: the request that brought
+        the latest reply as the server counted it, `Reply.served_tokens`, and what came
+        after it at the harness's rule), and never less than the harness's own rule (four
+        characters a token), which is all there is before the first such reply and at a
+        door that gives none. The larger of the two, since the server's count is of the
+        request as the door sent it, which leaves out what the door's budget left out."""
         start = max((i for i, t in enumerate(self.turns) if t.role == OPERATOR), default=0)
-        return sum(
+        each = [
             tools.tokens(json.dumps(t.to_dict(), ensure_ascii=False)) for t in self.turns[start:]
-        )
+        ]
+        estimate = sum(each)
+        for k in range(len(each) - 1, 0, -1):
+            t = self.turns[start + k]
+            served = getattr(t.content, "served_tokens", None) if t.role == MODEL else None
+            if served and served.get("prompt"):
+                return max(estimate, int(served["prompt"]) + sum(each[k:]))
+        return estimate
 
     def handover_threshold(self) -> tuple[int, int] | None:
         """Where the handover note is asked for, and by how much the conversation must
-        grow before it is asked again (package 37g, item 8): when it has left less than
-        the reserve of the door's context (`reserve_tokens`, the door's own, else
-        `HANDOVER_RESERVE_TOKENS`), and never earlier than `HANDOVER_AT_FRACTION` of it.
-        None when the door has said no context."""
+        grow before it is asked again (package 37g, item 8; package 37i, item 3): when it
+        has left less than the reserve of the door's context (`reserve_tokens`, the door's
+        own, which the local runner sends in tokens whether the owner gave it as tokens or
+        as a share; else `HANDOVER_RESERVE_SHARE` of the context and never less than
+        `HANDOVER_RESERVE_TOKENS`), and never earlier than
+        `HANDOVER_AT_FRACTION` of it. None when the door has said no context."""
         budget = self.budget_tokens
         if not budget:
             return None
-        reserve = int(self.reserve_tokens or HANDOVER_RESERVE_TOKENS)
+        reserve = int(
+            self.reserve_tokens or max(HANDOVER_RESERVE_SHARE * budget, HANDOVER_RESERVE_TOKENS)
+        )
         at_fraction = HANDOVER_AT_FRACTION * budget
         if budget - reserve > at_fraction:
             return int(budget - reserve), max(1, reserve // 4)
@@ -2609,7 +2681,14 @@ class Harness:
         body = self.turns[start + 1 :]
         if len(body) <= HANDOVER_KEEP_TURNS + 1:
             return  # nothing older than the kept turns to fold
-        kept = body[-HANDOVER_KEEP_TURNS:]
+        # the server's count of a request before the fold is not the folded
+        # conversation's: the next reply brings the count afresh (package 37i)
+        kept = [
+            Turn(MODEL, dataclasses.replace(t.content, served_tokens=None))
+            if t.role == MODEL and getattr(t.content, "served_tokens", None)
+            else t
+            for t in body[-HANDOVER_KEEP_TURNS:]
+        ]
         cut = start + 1 + len(body) - HANDOVER_KEEP_TURNS
         folded = Turn(
             DATA,
@@ -3204,7 +3283,10 @@ class Playback(Transcript):
     def _due(self, e: dict[str, Any]) -> bool:
         w = self.world
         tick = int(e.get("tick") or 0)
-        return w.clock.tick >= tick and len(w.journal) >= int(e.get("after_orders") or 0)
+        if w.clock.tick < tick or len(w.journal) < int(e.get("after_orders") or 0):
+            return False
+        # an act made after an input that is no order (package 37i; absent before it)
+        return "door" not in e or len(w.inputs) >= int(e.get("after_inputs") or 0)
 
     def reply(self, turns: Any) -> Reply | None:
         if self.at >= len(self.entries):
@@ -3216,12 +3298,16 @@ class Playback(Transcript):
         self.calls += 1
         return Reply.from_dict(e["reply"])
 
-    def next_act(self) -> dict[str, Any] | None:
-        """The next stop from outside the loop, when it is the next entry and is due."""
+    def next_act(self, inside_tick: int | None = None) -> dict[str, Any] | None:
+        """The next stop from outside the loop, when it is the next entry and is due;
+        `inside_tick`, the tick the World is inside: an act of that tick waits for its
+        end (package 37i)."""
         if self.at >= len(self.entries):
             return None
         e = self.entries[self.at]
         if "door" not in e or not self._due(e):
+            return None
+        if inside_tick is not None and int(e.get("tick") or 0) >= inside_tick:
             return None
         self.at += 1
         return e
@@ -3269,6 +3355,9 @@ def restore(world: World, data: dict[str, Any], model: Model | None = None) -> l
         out.append(h)
     return out
 
+
+# The journal's kind for a turn that ended with no reply to be had (package 37i).
+CUT_OFF_KIND = "agent.cut_off"
 
 # The acts from outside the loop that are made on a released station (`door_act`).
 ACTS_ON_A_RELEASED_STATION = ("reseat", "asked")

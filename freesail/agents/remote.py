@@ -105,7 +105,15 @@ from freesail.agents.agent import (
     watcher,
 )
 from freesail.agents.harness import Harness, Playback, full_stop
-from freesail.agents.model import DATA, MODEL, OPERATOR, Reply, ToolCall, Turn
+from freesail.agents.model import (
+    DATA,
+    MODEL,
+    OPERATOR,
+    Reply,
+    ToolCall,
+    Turn,
+    served_tokens_of,
+)
 
 if TYPE_CHECKING:
     from freesail.core.world import World
@@ -600,15 +608,22 @@ class Desk:
 
     def reply(self, name: str, body: dict[str, Any]) -> dict[str, Any]:
         """`POST /api/agents/<station>/reply` with `{text, calls: [{name, args}], raw,
-        since?}`: the reply delivered through the harness (the token scan first, over
-        the raw output or the text and every argument); the answer carries the turns
-        from `since` (default: those the delivery made, the reply itself first) and whose
-        the floor is now."""
+        served_tokens?, cut_off?, since?}`: the reply delivered through the harness (the
+        token scan first, over the raw output or the text and every argument); the
+        answer carries the turns from `since` (default: those the delivery made, the
+        reply itself first) and whose the floor is now. `served_tokens` is the model
+        server's own count, which the harness measures the conversation by (package 37i,
+        item 2). `cut_off`, the door's words, says that no reply was to be had (the local
+        runner's: cut off at the reply limit, or empty, twice): at a station the turn
+        ends with nothing done and the journal says so (`Harness.door_act` "cut_off");
+        in the consent conversation the empty reply is taken as before."""
         reply = Reply(
             str(body.get("text") or ""),
             tuple(ToolCall.from_dict(c) for c in body.get("calls") or []),
             body.get("raw") if body.get("raw") is None else str(body.get("raw")),
+            served_tokens_of(body.get("served_tokens")),
         )
+        cut = " ".join(str(body.get("cut_off") or "").split())
         with self.lock:
             seat = self._seat(name, body.get("key"))
             since = body.get("since")
@@ -617,6 +632,8 @@ class Desk:
                 return self._answer(seat, before) | {"words": seat.words}
             if seat.phase == CONSENT:
                 out = self._consent_reply(seat, reply)
+            elif cut:
+                out = self._cut_off(seat, cut)
             else:
                 out = self._station_reply(seat, reply)
             self.changed()
@@ -740,6 +757,18 @@ class Desk:
         lost = " Your words were not logged." if reply.text.strip() else ""
         ran = " Nothing was run." if reply.calls else ""
         return {"out_of_turn": True, "words": f"{self.no_floor_words(seat)}{lost}{ran}"}
+
+    def _cut_off(self, seat: Seat, words: str) -> dict[str, Any]:
+        """No reply was to be had for the open turn (package 37i, item 1): the turn ends
+        with nothing done, the journal says why, and the act is recorded for the replay."""
+        h = seat.harness
+        assert h is not None
+        if h.agent.released:
+            return {"words": self.released_words(seat)}
+        if h.open_sample is None:
+            return {"out_of_turn": True, "words": self.no_floor_words(seat)}
+        h.door_act("cut_off", words, DOORS[seat.door][1])
+        return {}
 
     def _stand_by_out_of_turn(self, h: Harness, reply: Reply) -> dict[str, Any] | None:
         """A stand-by asked for while the game has the floor and the model is waiting for
@@ -1200,11 +1229,16 @@ class GameClient:
         path = f"/api/agents/{self.name}/turns"
         return self._took(self._request("GET", path, params=params))
 
-    def reply(self, reply: Reply, advance: bool = True) -> dict[str, Any]:
+    def reply(
+        self, reply: Reply, advance: bool = True, cut_off: str | None = None
+    ) -> dict[str, Any]:
         """Deliver a reply; the answer carries the turns from the cursor. `advance=False`
         leaves the cursor where it is (a read made beside a call that is waiting, whose
-        own poll reads the turns on from there)."""
+        own poll reads the turns on from there). `cut_off`, the door's words, says that no
+        reply was to be had (package 37i, item 1): the turn ends with nothing done."""
         body = reply.to_dict() | {"since": self.cursor, "key": self.key}
+        if cut_off:
+            body["cut_off"] = cut_off
         path = f"/api/agents/{self.name}/reply"
         answer = self._request("POST", path, json=body)
         return self._took(answer) if advance else answer

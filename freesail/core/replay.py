@@ -120,6 +120,12 @@ def replay(
         inputs = [{"tick": t, "actor": a, "order": o} for t, a, o in data["journal"]]
     i = 0
     while True:
+        # between two ticks, before this tick's inputs: a station's acts from outside the
+        # loop are made here and after an input, where a door made them in play, and never
+        # inside the World's tick (package 37i: game 10's last save replayed one line short
+        # when a standing order's firing inside the tick made the door's stand-down early)
+        for agent in list(world.agents.values()):
+            agent.on_between_ticks()
         while i < len(inputs) and int(inputs[i]["tick"]) == world.clock.tick:
             _give(world, inputs[i])
             i += 1

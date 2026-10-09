@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import io
 import json
+import math
 import threading
 import time
 from pathlib import Path
@@ -92,6 +93,12 @@ class Server:
             body = json.loads(request.content)
             self.bodies.append(body)
             msg = self.replies.pop(0) if self.replies else message("")
+            if callable(msg):  # a reply made from the request (package 37i)
+                msg = msg(body)
+            if "__status__" in msg:  # a refusal, as the server words it
+                return httpx.Response(msg["__status__"], json=msg["json"])
+            if "__response__" in msg:  # the whole response: its end and its counts
+                return httpx.Response(200, json=msg["__response__"])
             return httpx.Response(200, json={"choices": [{"index": 0, "message": msg}]})
         return httpx.Response(404)
 
@@ -877,25 +884,473 @@ def test_no_officer_is_seated_without_a_context_size_and_the_guard_measures_his_
         )
 
 
-def test_the_handover_reserve_is_a_flag_sent_with_the_station_request(tmp_path):
-    """`--handover-reserve N`: the tokens of the context kept free when the harness asks
-    for the handover note, sent with the station request and kept on the harness; unset,
-    the harness's own."""
+# ---------------------------------------------------------------------------
+# Package 37i: the local runner (the review of gate 5c, G15 and part K; the five faults
+# of game 10), on the fake server in both of its forms: llama-server's (and Ollama's
+# OpenAI-compatible endpoint's) `finish_reason` and `usage`, and Ollama's own
+# `done_reason`, `prompt_eval_count` and `eval_count`
+# ---------------------------------------------------------------------------
+
+
+def answered(
+    msg: dict[str, Any], finish: str = "stop", prompt: int | None = None, completion: int = 0
+) -> dict[str, Any]:
+    """A whole response in the OpenAI form, with why it ended and the server's counts."""
+    resp: dict[str, Any] = {"choices": [{"index": 0, "message": msg, "finish_reason": finish}]}
+    if prompt is not None:
+        resp["usage"] = {
+            "prompt_tokens": prompt,
+            "completion_tokens": completion,
+            "total_tokens": prompt + completion,
+        }
+    return {"__response__": resp}
+
+
+def ollama_answered(
+    msg: dict[str, Any], done_reason: str = "stop", prompt: int | None = None, completion: int = 0
+) -> dict[str, Any]:
+    """A whole response in Ollama's own form."""
+    resp: dict[str, Any] = {"model": "made-up:7b", "message": msg, "done": True}
+    resp["done_reason"] = done_reason
+    if prompt is not None:
+        resp["prompt_eval_count"] = prompt
+        resp["eval_count"] = completion
+    return {"__response__": resp}
+
+
+def server_count(body: dict[str, Any], chars_per_token: float = 3.5) -> int:
+    """The fake server's own count of a request, as a server counts it: the text of each
+    message and its calls, and the tool definitions, at 3.5 characters a token (game 10's
+    figure for its model and samples, the review's G15: the four-character rule ran 12 to
+    17 per cent short), with four tokens a message for the chat template."""
+    chars = len(json.dumps(body.get("tools") or []))
+    for m in body["messages"]:
+        chars += len(str(m.get("content") or "")) + len(json.dumps(m.get("tool_calls") or []))
+    return math.ceil(chars / chars_per_token) + 4 * len(body["messages"])
+
+
+def counted(msg: dict[str, Any] | None = None, form: str = "llama", per: float = 3.5):
+    """A reply made from the request, carrying the server's count of it."""
+
+    def make(body: dict[str, Any]) -> dict[str, Any]:
+        n = server_count(body, per)
+        if form == "ollama":
+            return ollama_answered(msg or {"role": "assistant", "content": "Aye."}, "stop", n, 3)
+        return answered(msg or message("Aye."), "stop", n, 3)
+
+    return make
+
+
+THINKING = {"role": "assistant", "content": "", "reasoning_content": "The wind backs; " * 40}
+
+
+def test_a_reply_cut_off_while_thinking_is_asked_once_more_with_the_reason_said():
+    """Item 1 (game 10: 22 of 414 replies cut at the reply limit while the model thought,
+    passed on as empty turns with no word to anyone). The runner reads why the reply
+    ended; a reply cut at the limit while the model thought is asked for once more in the
+    same request with the reason said at its end, and the owner is told."""
+    told: list[str] = []
+    server = llama([answered(THINKING, "length", 9000, 4096), answered(message("All quiet."))])
+    m = model_for(server, say=told.append)
+    world = point_world()
+    h = Harness(world, watcher(SamplingPolicy.in_lockstep(600)), m)
+    h.start()
+    first, second = server.bodies
+    assert second["messages"][:-1] == first["messages"][:-1]
+    asked = second["messages"][-1]["content"]
+    assert asked.startswith(first["messages"][-1]["content"])  # one user message, not two
+    assert asked.endswith(
+        "From the local runner, not the game: your last reply was cut off at the reply limit "
+        "(4,096 tokens) while you were still thinking, and nothing of it reached the game: no "
+        "words and no call. This is the same turn, asked once more; think more briefly, and "
+        "answer with a call or with words."
+    )
+    assert told == [
+        "The model's reply was cut off at the reply limit (4,096 tokens) while it was still "
+        "thinking; it is asked once more, with the reason."
+    ]
+    assert [e.text for e in world.log if e.kind == "agent.note"] == ["[watcher] All quiet."]
+    assert len(h.transcript) == 1 and m.finish == "stop" and m.cut_off is None
+    # Ollama's own form: done_reason, and the thinking in the message
+    thought = {"role": "assistant", "content": "", "thinking": "Which way is the tide?"}
+    olla = Server(
+        [
+            ollama_answered(thought, "length"),
+            ollama_answered({"role": "assistant", "content": "Aye."}),
+        ],
+        props=None,
+    )
+    m = model_for(olla)
+    world = point_world()
+    Harness(world, watcher(SamplingPolicy.in_lockstep(600)), m).start()
+    assert len(olla.bodies) == 2
+    assert "while you were still thinking" in olla.bodies[1]["messages"][-1]["content"]
+    assert [e.text for e in world.log if e.kind == "agent.note"] == ["[watcher] Aye."]
+    # an unclosed <think> in the content is thinking too; cut and then empty, the turn
+    # has no reply
+    server = llama([answered(message("<think>The tide turns at"), "length"), message("")])
+    m = model_for(server)
+    r = m.reply([Turn(OPERATOR, "brief"), Turn(DATA, {"reason": "x"})])
+    assert r is not None and r.is_silent and len(server.bodies) == 2
+    assert m.cut_off == (
+        "The model's reply was cut off at the reply limit (4,096 tokens) while it was still "
+        "thinking, and came empty again when asked once more; the turn ended with nothing done"
+    )
+    # an empty reply, however it ended, is asked again with its own words
+    server = llama([answered(message(""), "stop"), message("Here.")])
+    m = model_for(server)
+    r = m.reply([Turn(OPERATOR, "brief"), Turn(DATA, {"reason": "x"})])
+    assert r is not None and r.text == "Here." and m.cut_off is None
+    assert server.bodies[1]["messages"][-1]["content"].endswith(
+        "your last reply came with no words and no call, so nothing reached the game. This is "
+        "the same turn, asked once more; answer with a call or with words."
+    )
+    # a reply cut at the limit with words in it is a reply, and is passed on
+    server = llama([answered(message("The wind is "), "length")])
+    r = model_for(server).reply([Turn(OPERATOR, "b"), Turn(DATA, {"reason": "x"})])
+    assert r.text == "The wind is"
+
+
+def test_a_reply_cut_off_twice_ends_the_turn_with_nothing_done_and_the_journal_says_so(
+    tmp_path,
+):
+    """Item 1, through the game: cut off again when asked once more, the owner is told,
+    the turn ends with nothing done (no empty reply is passed on as the model's) and the
+    station's journal says why; the act is recorded, and the save replays to the same
+    log and the same journal."""
+    from freesail.api.session import ship_factory
+    from freesail.core import replay
+
+    game = Game(tmp_path)
+    consent.Record(GGUF, "t", "2026-09-26", consent.YES, answer="Yes.").write(game.records)
+    cut = answered(THINKING, "length", None)
+    server = llama([cut, cut, message("Awake now.")])
+    got = run_runner(game, server, [])
+    game.wait_for(game.floor_is_the_games(0))
+    h = game.harness
+    with game.driver.lock:
+        assert [e for e in h.transcript if "reply" in e] == []  # no reply reached the game
+        act = h.transcript[0]
+        assert act["door"] == "cut_off" and act["by"] == "the local runner"
+        assert act["after_inputs"] == len(game.world.inputs)
+        entry = h.journal.entries[-1]
+        assert entry.kind == "agent.cut_off"
+        assert entry.text == (
+            "No reply reached the game through the local runner: The model's reply was cut "
+            "off at the reply limit (4,096 tokens) while it was still thinking, and was cut "
+            "off again when asked once more; the turn ended with nothing done."
+        )
+        assert game.lines("agent.note") == []
+    game.driver.tick(A_GLASS_S)
+    game.wait_for(game.floor_is_the_games(1))
+    assert game.lines("agent.note") == ["[watcher] Awake now."]
+    with game.driver.lock:
+        game.world.submit("stand down the watcher")
+    assert finished(got) == L.EXIT_RELEASED
+    assert len(server.bodies) == 3
+    text = got["out"].getvalue()
+    assert "it is asked once more, with the reason." in text
+    assert (
+        "the turn ended with nothing done, and the station's journal says so. A larger "
+        "--max-reply (now 4,096) gives it more room." in text
+    )
+    with game.driver.lock:
+        data = json.loads(json.dumps(game.world.save()))
+        digest = game.world.log.digest()
+        journal = game.world.agent_journals["watcher"].save()
+    copy = replay.replay(data, ship_factory)
+    assert copy.log.digest() == digest
+    assert copy.agent_journals["watcher"].save() == journal
+
+
+def test_the_budget_counts_by_the_servers_figure_from_the_first_reply_on():
+    """Item 2. The four-character rule stands alone only until the first reply; from then
+    on each message is measured by the ratio of the server's own count of the last
+    request to the runner's measure of it, in llama-server's `usage` and in Ollama's
+    `prompt_eval_count` alike; a count under half the measure is taken for a partial one
+    and not used; and the reply carries the counts to the game."""
+    turns = [Turn(OPERATOR, "B" * 400)]
+    for k in range(10):
+        turns.append(Turn(DATA, {"reason": f"sample {k}", "log": ["x" * 2000]}))
+        turns.append(Turn(MODEL, Reply(text=f"reply {k}")))
+    turns.append(Turn(DATA, {"reason": "the last", "log": []}))
+    for server in (llama([counted()]), Server([counted(form="ollama")])):
+        m = model_for(server)
+        m._props_read = True
+        assert m.ratio is None
+        r = m.reply(turns)
+        n = server_count(server.bodies[0])
+        assert m.served == {"prompt": n, "reply": 3} and r.served_tokens == m.served
+        assert m.ratio == n / m._sent_measure and 1.1 < m.ratio < 1.2  # game 10's short count
+    # the budget: what the four-character rule says fits does not by the server's count
+    probe = L.LocalModel(ENDPOINT, ctx_size=10**6)
+    probe._props_read = True
+    sent = probe.messages(turns)
+    need = sum(probe.measure(x) for x in sent) + probe.measure(probe.tools_schema())
+    m = L.LocalModel(ENDPOINT, ctx_size=need + L.REPLY_MAX_TOKENS + 10)
+    m._props_read = True
+    m.messages(turns)
+    assert m.dropped_turns == 0
+    m.ratio = 4 / 3.5
+    kept = m.messages(turns)
+    assert m.dropped_turns > 0 and json.loads(kept[-1]["content"])["reason"] == "the last"
+    # a count too small to be of the whole request (a cached prompt) is not used
+    server = llama([answered(message("Aye."), "stop", 10, 3)])
+    m = model_for(server)
+    m._props_read = True
+    r = m.reply(turns)
+    assert m.ratio is None and m.served is None and r.served_tokens is None
+    # the counts go to the game with the reply, and come back with the turn
+    back = Reply.from_dict(Reply("a", served_tokens={"prompt": 5}).to_dict())
+    assert back.served_tokens == {"prompt": 5}
+    assert "served_tokens" not in Reply("a").to_dict()
+
+
+def officer_world():
+    from freesail.api.session import make_world
+
+    return make_world(
+        7, str(ROOT / "data/ships/frigate-36.yaml"), Scenario(gustiness=0.0, variability=0.0)
+    )
+
+
+def test_the_handover_is_asked_for_by_the_servers_count():
+    """Item 2 at the harness: the officer's conversation is measured by the server's own
+    count of the request that brought the latest reply where the runner gives it (the
+    larger of that and the four-character rule), so the note is asked for where the
+    server's count, and not the short one, crosses the reserve."""
+    from freesail.agents.agent import officer
+
+    def seat(with_counts: bool) -> Harness:
+        world = officer_world()
+        reply = counted(per=2.5) if with_counts else message("Aye.")
+        m = model_for(Server([reply]))
+        m._props_read = True
+        h = Harness(world, officer(SamplingPolicy.in_lockstep(600), world=world), m)
+        h.budget_tokens = 20000  # the threshold: 20,000 less three tenths, 14,000
+        h.start()
+        return h
+
+    by_count = seat(True)
+    served = by_count.turns[-1].content.served_tokens["prompt"]
+    plain = seat(False)
+    assert plain._conversation_size() < 14000 <= served  # the short count alone would not ask
+    assert by_count._conversation_size() >= served
+    assert any("handover note" in n for n in by_count.agent.notices)
+    assert not any("handover note" in n for n in plain.agent.notices)
+    # after the fold, the count of a request before it is not the folded conversation's
+    padding = [Turn(DATA, {"reason": f"older {k}", "log": []}) for k in range(8)]
+    by_count.turns[1:1] = padding
+    by_count._fold_handover("The watch so far.")
+    assert by_count.turns[1].content["handover"] == "The watch so far."
+    kept = [t.content for t in by_count.turns if t.role == MODEL]
+    assert all(r.served_tokens is None for r in kept)
+
+
+def test_the_handover_reserve_is_tokens_or_a_share_and_the_larger_when_both(tmp_path):
+    """Item 3. `--handover-reserve` takes tokens or a share of the context, given twice
+    the larger counts, and is sent in tokens with the station request; unset, the
+    harness's own share, three tenths, so that the note is asked for in time at any
+    size (37g's 14,000 tokens left it to 88,400 of 102,400)."""
     from freesail.agents import harness as harness_mod
     from freesail.agents.remote import GameClient
 
+    assert L.reserve_form("30000") == ("tokens", 30000.0)
+    assert L.reserve_form("30,000") == ("tokens", 30000.0)
+    assert L.reserve_form("0.3") == ("share", 0.3) and L.reserve_form("30%") == ("share", 0.3)
+    for bad in ("0", "-5", "1.5", "lots", "100%"):
+        with pytest.raises(Exception, match="neither a number of tokens"):
+            L.reserve_form(bad)
+    assert L.handover_reserve_tokens(None, 102400) is None
+    assert L.handover_reserve_tokens([("tokens", 30000.0)], 102400) == 30000
+    assert L.handover_reserve_tokens([("share", 0.3)], 102400) == 30720
+    both = [("tokens", 30000.0), ("share", 0.3)]
+    assert L.handover_reserve_tokens(both, 102400) == 30720
+    assert L.handover_reserve_tokens([("tokens", 40000.0), ("share", 0.3)], 102400) == 40000
+    assert L.handover_reserve_tokens([("share", 0.3)], None) is None
+    assert L.handover_words(both, 102400, 30720) == (
+        "The handover note is asked for when the conversation, by the server's own count, "
+        "has left less than 30,720 of the 102,400 tokens (--handover-reserve 30,000 tokens "
+        "and 0.3 of the context, the larger), and never before 0.6 of them: at about 71,680."
+    )
+    assert L.handover_words(None, 32768, None).endswith(
+        "(the harness's own share, 0.3 of the context and never less than 14,000 tokens), "
+        "and never before 0.6 of them: at about 19,660."
+    )
+    with pytest.raises(SystemExit):
+        L.main(["--handover-reserve", "lots"], out=io.StringIO())
+    # sent with the station request in tokens, kept on the harness and in the save
     game = Game(tmp_path)
     client = GameClient("http://testserver", http=game.http)
     consent.Record("made-up-weights", "r", "2026-09-26", consent.YES, answer="Yes.").write(
         game.records
     )
-    first = client.station("made-up-weights", "runner", context_tokens=32768, handover_reserve=9000)
+    first = client.station(
+        "made-up-weights", "runner", context_tokens=102400, handover_reserve=30720
+    )
     assert first["phase"] == "station"
     h = game.world.agents["watcher"]
-    assert h.budget_tokens == 32768 and h.reserve_tokens == 9000
-    assert h.handover_threshold() == (32768 - 9000, 9000 // 4)
-    assert game.world.save()["agents"][0]["reserve_tokens"] == 9000
-    usage = io.StringIO()
-    with pytest.raises(SystemExit):
-        L.main(["--help"], out=usage)
+    assert h.budget_tokens == 102400 and h.reserve_tokens == 30720
+    assert h.handover_threshold() == (102400 - 30720, 30720 // 4)
+    assert game.world.save()["agents"][0]["reserve_tokens"] == 30720
+    # unset: the harness's own share
+    h.reserve_tokens = None
+    assert harness_mod.HANDOVER_RESERVE_SHARE == 0.3
     assert harness_mod.HANDOVER_RESERVE_TOKENS == 14000
+    assert h.handover_threshold() == (102400 - 30720, 7680)
+    h.budget_tokens = 32768  # a small context: 14,000 at least, so six tenths govern
+    assert h.handover_threshold() == (int(0.6 * 32768), int(0.1 * 32768))
+
+
+def refusing(ctx: int, per: float = 3.5, always: bool = False, words_only: bool = False):
+    """A fake llama-server that refuses a request over its context with its own count,
+    as llama-server does (400, `exceed_context_size_error`, `n_prompt_tokens`, `n_ctx`),
+    or in words alone with no count, and answers one that fits."""
+
+    def make(body: dict[str, Any]) -> dict[str, Any]:
+        n = server_count(body, per)
+        if always or n > ctx:
+            if words_only:
+                err: Any = "the input length exceeds the context length"
+            else:
+                err = {
+                    "code": 400,
+                    "message": "the request exceeds the available context size, try increasing it",
+                    "type": "exceed_context_size_error",
+                    "n_prompt_tokens": max(n, ctx + 1) if always else n,
+                    "n_ctx": ctx,
+                }
+            return {"__status__": 400, "json": {"error": err}}
+        return answered(message("Aye."), "stop", n, 3)
+
+    return make
+
+
+def long_watch(samples: int = 14) -> list[Turn]:
+    """A brief, the handover note folded in after it, and a long run of samples."""
+    turns = [Turn(OPERATOR, "B" * 2000)]
+    turns.append(
+        Turn(
+            DATA,
+            {"reason": "the handover note", "handover": "N" * 800, "folded": "f", "readings": {}},
+        )
+    )
+    for k in range(samples):
+        turns.append(Turn(DATA, {"reason": f"sample {k}", "log": ["x" * 3000]}))
+        turns.append(Turn(MODEL, Reply(text=f"reply {k}")))
+    turns.append(Turn(DATA, {"reason": "the last", "log": ["y" * 100]}))
+    return turns
+
+
+def test_a_request_refused_for_its_size_is_asked_again_smaller_and_never_the_same():
+    """Item 4 (game 10: the server refused at 103,679 and 103,122 tokens, the runner sent
+    the same request three times and stood the station down). The runner takes the
+    server's own count from the refusal, leaves out the oldest exchanges that are not the
+    brief, the handover note or the latest sample, says so once, and asks again; it never
+    sends the same request again, and stands the station down with the numbers only when
+    the server goes on refusing smaller requests."""
+    turns = long_watch()
+    probe = L.LocalModel(ENDPOINT, ctx_size=10**6)
+    probe._props_read = True
+    full = probe.messages(turns)
+    measure = sum(probe.measure(x) for x in full) + probe.measure(probe.tools_schema())
+    ctx = measure + 200  # fits by the four-character rule, not by the server's count
+    told: list[str] = []
+    server = llama([refusing(ctx), refusing(ctx), refusing(ctx)])
+    m = model_for(server, ctx_size=ctx + L.REPLY_MAX_TOKENS, say=told.append)
+    m._props_read = True
+    r = m.reply(turns)
+    assert r is not None and r.text == "Aye." and m.failed is None
+    first, second = server.bodies
+    assert first["messages"] == full and second["messages"] != full
+    assert len(second["messages"]) < len(full) and m.dropped_turns > 0
+    assert second["messages"][0]["role"] == "system"
+    assert json.loads(second["messages"][1]["content"])["handover"] == "N" * 800
+    assert json.loads(second["messages"][-1]["content"])["reason"] == "the last"
+    n = server_count(first)
+    assert told == [
+        f"The model server refused the request for its size ({n:,} tokens by its count; the "
+        f"context is {ctx:,}). The oldest exchanges are left out (never the brief, the "
+        "handover note or the latest sample) and it is asked again; from now on the runner "
+        "measures by the server's count."
+    ]
+    assert m.served_ctx == ctx and m.ratio > 1.1
+    # a server that goes on refusing: each request smaller, none sent twice, and at the
+    # third refusal in the turn the station is stood down with the numbers
+    server = llama([refusing(ctx, always=True)] * 5)
+    m = model_for(server, ctx_size=ctx + L.REPLY_MAX_TOKENS)
+    m._props_read = True
+    assert m.reply(turns) is None
+    bodies = [json.dumps(b["messages"]) for b in server.bodies]
+    assert len(bodies) == L.OVERSIZE_TRIES == 3 and len(set(bodies)) == 3
+    assert [len(b) for b in bodies] == sorted((len(b) for b in bodies), reverse=True)
+    assert "The server refused 3 requests for their size in one turn" in (m.failed or "")
+    # a refusal in words with no count: the runner measures by more (`OVERSIZE_STEP`)
+    server = llama([refusing(ctx, words_only=True), counted()])
+    m = model_for(server, ctx_size=ctx + L.REPLY_MAX_TOKENS)
+    m._props_read = True
+    assert m.reply(turns).text == "Aye."
+    assert server.bodies[1]["messages"] != server.bodies[0]["messages"]
+    # no context size known to trim against: stood down in words, not asked again
+    server = llama([refusing(ctx, words_only=True)])
+    m = model_for(server)
+    m._props_read = True
+    assert m.reply(turns) is None and "state it with --ctx" in (m.failed or "")
+    assert len(server.bodies) == 1
+
+
+def test_the_two_stopgap_settings_on_the_fake_server():
+    """Part K's two stopgaps, tried on the fake server (they were untried). A larger
+    `--max-reply` lets a model that thinks past 4,096 tokens answer, where the default
+    is cut off twice and the turn ends with nothing done. `--handover-reserve 30000`, at
+    game 10's context and with the four-character rule alone, has the note asked for
+    well under the ceiling by the server's count, where 37g's 14,000 asked for it only
+    once there was no room left for the reply; with this package's count and default
+    share the ask comes at about seven tenths by the server's count."""
+    from freesail.agents.agent import officer
+
+    def thinker(body: dict[str, Any]) -> dict[str, Any]:
+        if body["max_tokens"] < 6000:  # this model thinks for 6,000 tokens
+            return answered(THINKING, "length", None, body["max_tokens"])
+        return answered(message("Aye."), "stop", None, 6100)
+
+    turns = [Turn(OPERATOR, "brief"), Turn(DATA, {"reason": "x"})]
+    short = model_for(llama([thinker, thinker]))
+    assert short.reply(turns).is_silent and short.cut_off is not None
+    roomy = model_for(llama([thinker]), max_reply=8192)
+    assert roomy.reply(turns).text == "Aye." and roomy.cut_off is None
+    # the reserve: an officer's conversation grown sample by sample at game 10's context
+    world = officer_world()
+    h = Harness(world, officer(SamplingPolicy.in_lockstep(600), world=world), model_for(llama()))
+    ctx = 102400
+    h.budget_tokens = ctx
+    runner = L.LocalModel(ENDPOINT)
+    runner._props_read = True
+    schema = runner.tools_schema()
+
+    def count(ts: list[Turn]) -> int:
+        return server_count({"messages": runner.messages(ts), "tools": schema})
+
+    log = [{"tick": k, "text": f"By the deep {k % 20}; the account kept. " * 4} for k in range(24)]
+    ts = [Turn(OPERATOR, "B" * 18000)]
+    asked: dict[str, int] = {}
+    settings = {"37g": 14000, "stopgap": 30000, "37i": None}
+    while len(asked) < len(settings):
+        ts.append(Turn(DATA, {"reason": "a glass", "log": log}))
+        before = count(ts)
+        ts.append(Turn(MODEL, Reply(text="Noted.", served_tokens={"prompt": before})))
+        for name, reserve in settings.items():
+            if name in asked:
+                continue
+            h.reserve_tokens = reserve
+            # before this package no reply carried the server's count
+            h.turns = (
+                ts
+                if name == "37i"
+                else [Turn(MODEL, Reply(text=t.content.text)) if t.role == MODEL else t for t in ts]
+            )
+            if h._conversation_size() >= h.handover_threshold()[0]:
+                asked[name] = count(ts)
+    assert asked["37g"] > ctx - L.REPLY_MAX_TOKENS  # too late: no room left for the reply
+    assert ctx - asked["stopgap"] > 14000  # in time, with room to write the note
+    assert 0.68 * ctx < asked["37i"] < 0.74 * ctx  # about seven tenths, by the server's count
