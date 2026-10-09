@@ -1,0 +1,110 @@
+# FreeSail: La Rochelle as a port (spec M6 §26; package 39b, the Biscay north block), on
+# package 35's machinery; the marks are the features file's.
+#
+# Sources. Faden 1793, Le Petit Neptune Français, 'Pertuis Breton', 'Laverdin' and
+# 'Pertuis d'Antioche', pp. 78 to 81: by the Pertuis Breton, past St Martin and the bank
+# in mid-channel, "go to the road of Chef de Bois, always following the middle of the
+# channel, till you open La Rochelle, and then steer east into the road, where you
+# anchor in 5, 6, 7, or 8 fathoms water; muddy ground"; the Laverdin, "a small bank with
+# not above 2 or 3 feet on it at low water, and which dries in spring tides, is very
+# dangerous": by the Pertuis d'Antioche "keep the lanthorn tower in full view, and not
+# bring it to the point of Chef de Bois, which would infallibly throw you upon the
+# Laverdin"; "If you would enter the port of La Rochelle, or the Digue, coasting pilots
+# are required. At the entrance of the Digue, on the larboard side in entering, there is
+# a mast erected, to which you pass very close. It is dry every tide, both within the
+# Digue, and in the harbour of La Rochelle. The tides are from half an hour after 3 to 4
+# o'clock, at the new and full moon"; the tide rises 15 feet at La Rochelle (the table).
+#
+# The datum: UNVERIFIED. No period sheet is patched at La Rochelle in this package
+# (Bellin 1764, Petit Atlas Maritime t. V, 'Carte des rades de la Rochelle et environs',
+# Rumsey 6903.569, not transcribed); the chart's depths are EMODnet's at LAT, and the
+# period's low water of springs stands 1.00 m above it at La Rochelle-La Pallice (SHOM's
+# RAM, BMVE, read 2026-10-09).
+#
+# The stance: French, hostile to a King's ship, open to a neutral. Prices FROM MEMORY or
+# JUDGEMENT; sterling at the exchange.
+
+id: la-rochelle
+name: La Rochelle
+nation: france
+source: "Faden 1793 pp. 78-81 (the Pertuis Breton, the Laverdin, the Pertuis d'Antioche, La Rochelle) and the table's rise"
+datum: unverified
+
+outer_road:
+  feature: chef-de-baie-road
+  name: the road of Chef de Bois
+  lat_deg: 46.1500
+  lon_deg: -1.2358
+anchorage:
+  feature: chef-de-baie-road
+  name: the road of Chef de Bois
+  lat_deg: 46.1500
+  lon_deg: -1.2358
+mooring:
+  name: the harbour of La Rochelle
+  lat_deg: 46.1570
+  lon_deg: -1.1530       # within the towers (the encyclopaedia's 'Tour de la Lanterne')
+  # dries: "dry every tide, both within the Digue and in the harbour" (Faden p. 81); no figure for the height is read, and the chart has the ground 2.5 m above the datum there
+  bottom: mud
+  deep_draught_ft: 10    # judgement: the harbour is for vessels that take the ground; a ship lies in the road
+shore:
+  feature: la-rochelle
+  name: the quay at La Rochelle
+  lat_deg: 46.1591
+  lon_deg: -1.1520
+
+pilot:
+  station: chef-de-baie-road
+  cruising_nm: 5                 # judgement: the coasting pilots take a ship in from the road
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the coasting pilots' boat of La Rochelle
+    under: a lugsail and oars
+    note: "judgement"
+  names: [Guillon, Bouhier, Rondeau, Garnier, Gautier, Bonnin, Chauvet, Texier]   # names of the Aunis coast: judgement
+  skill: 0.9
+  fee_pounds: 3                  # judgement, in sterling for the one account; unverified
+  cast: starboard                # from the road the head paying off to the westward for the Pertuis (judgement)
+  course_out_deg: 250            # out by the Pertuis d'Antioche, the lanthorn tower astern
+  words:
+    channel: "By the Pertuis Breton keep nearer the coast of Laleu than the Isle of Ré till the Bay of Moran is hidden by the point of La Repentie, then steer straight for the road of Chef de Bois. By the Pertuis d'Antioche keep the lanthorn tower in full view and never bring it to the point of Chef de Bois, which would throw you upon the Laverdin."
+    marks: "The lanthorn tower of La Rochelle and the point of Chef de Bois; the Laverdin, a small bank with two or three feet on it at low water that dries at springs, a small half league east of the end of Ré."
+    anchorage: "In the road of Chef de Bois anchor in five to eight fathoms on mud. The harbour and the Digue dry at every tide; at the entrance of the Digue pass very close to the mast on the larboard hand."
+    tide: "The tide is high from half after three to four o'clock at full and change, and rises fifteen feet at springs."
+
+tide:
+  establishment: La Rochelle
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: brandy, price: 95, origin: france, note: "the brandies of Aunis and Saintonge shipped here (judgement: below Brest's)"}
+    - {good: wine, price: 30, origin: france, season: {12: 1.1}, note: "the wines of Aunis; from memory"}
+    - {good: salt, price: 9, origin: france, note: "the salt of Ré and Oleron at the source; from memory"}
+    - {good: canvas, price: 42, origin: france, note: "from memory"}
+    - {good: hemp, price: 55, origin: null, note: "from memory"}
+    - {good: timber, price: 6, origin: france, note: "from memory"}
+    - {good: coal, price: 6, origin: britain, note: "from memory"}
+    - {good: sugar, price: 78, origin: null, note: "the old West India trade of La Rochelle, scarce in the war (judgement)"}
+    - {good: salt beef, price: 70, origin: france, note: "from memory"}
+    - {good: tin, price: 180, origin: britain, note: "from memory, as Brest's"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 10, pounds: 44, note: "the town's shipwrights (judgement)"}
+    - {item: yard, hours: 7, pounds: 27}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.12, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  able: {hands: 3, pounds: 2, delay_h: 24}
+  ordinary: {hands: 6, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 12, pounds: 1, delay_h: 12}
+
+closed_to: []

@@ -15,14 +15,17 @@ region's, its tide and its weather are rows in tables that already reach its wat
    (the region's box in degrees; the level-2 tiles that meet it are built whole, and the
    block's features must lie within it or within one of its harbour patches' boxes),
    `fetch` (the EMODnet subset: it must cover **the tiles** whole, not the bounds; a
-   level-2 tile is 0.43° across, so the tiles reach past the bounds by up to that, and
-   the harbour patches' level-3 tiles too: `--check` says whether the box covers them,
-   package 39a's first box missed Dartmouth's by a fifth of a degree), `harbours` (the
-   level-3 patches as boxes, about 15′ by 15′ each, one per port of the block, named as
-   the port file's road and the override name them), `sources` (the ids of `SOURCES` the
-   tiles are cut from, in the order they are laid: EMODnet for the depth and the coast,
-   GEBCO under it), and `fill_to_chart_datum: true` for every block from 39a on (below,
-   "GEBCO's fill"). A source not yet in `SOURCES` (Tofiño's sheets are period data, not a
+   level-2 tile is 0.43° across, so the tiles reach past the bounds by up to that where
+   the tile grid falls badly, and the harbour patches' level-3 tiles too: a quarter of a
+   degree is not always enough, and `--check` says whether the box covers them; package
+   39a's first box missed Dartmouth's by a fifth of a degree, and Biscay north's southern
+   row starts 0.32° below its bound, package 39b), `harbours` (the level-3 patches as
+   boxes, about 15′ by 15′ each, one per port of the block, named as the port file's road
+   and the override name them), `sources` (the ids of `SOURCES` the tiles are cut from,
+   in the order they are laid: EMODnet for the depth and the coast, GEBCO under it), and
+   `fill_to_chart_datum: true` for every block from 39a on (below, "GEBCO's fill"; Biscay
+   north, package 39b, was built beside 39a and without it, and wants a rebuild with it).
+   A source not yet in `SOURCES` (Tofiño's sheets are period data, not a
    source of the tiles; a modern grid beyond EMODnet's reach would be) is added there
    with its licence id, which must be in `ALLOWED_LICENCES`, and the licence text under
    `docs/references/licences/`.
@@ -36,48 +39,81 @@ region's, its tide and its weather are rows in tables that already reach its wat
    unique across the manifest (`check_region` refuses a clash), every source in the
    references' form (`docs/references/README.md`: a work and its year, a section and a
    page; or a named modern reference), and the lights dated so that 1805 sees what 1805
-   had.
+   had. A danger's `extent_m` is a radius within which its head stands solid
+   (`Chart.danger_under`: a ship within it with less water over the head than she draws
+   is aground), so it is kept under a kilometre and laid over the foul ground itself, not
+   over the water beside it (the Channel's largest is the Seven Stones' 1,500 m; package
+   39b's first draft gave the Four of the Croisic five kilometres and the Boyart four,
+   which closed the channel all ships take into the road of Aix). A mark that lies in
+   another region's bounds goes in that region's features file, and is **not indexed**
+   until that region's `index.json` is rebuilt from its file: the index is the other
+   region's, which a block's build never writes; until then the mark is found by name
+   and the lookout does not see it (39a's marks of Morlaix and 39b's of the Raz de Sein
+   in `channel-west.yaml`; the lead rebuilt its index from the file at their merges,
+   `build_index` over its features, and its counts in the manifest, no tile or coast
+   touched).
 4. **The overrides** under `data/charts/overrides/<region>/`, one file per harbour patch
    read from a period sheet, each stating its `sheet`, its `source`, its `units`
    (fathoms, feet, brasses, metres), its `datum` in words and `datum_above_chart_datum_m`
-   (the sheet's low water above the chart's LAT, in metres, from the modern tables or
-   marked unverified), its `control_points` with their residuals, and its `patches`
-   (depth, drying, land, sea polygons).
+   (the sheet's low water above the chart's LAT, in metres, from the modern tables: a
+   number, which the check refuses when it is absent, since package 39b; before, a
+   missing key was read as nought and passed), its `control_points` with their residuals,
+   and its `patches` (depth, drying, land, sea polygons). Where the datum's height cannot
+   be read, there is no patch: the port file says `datum: unverified` instead. SHOM's
+   Références Altimétriques Maritimes are readable from the build network as the WFS
+   layer `RAM_BDD_WLD_WGS84G_WFS:ram_3857` of `services.data.shom.fr/INSPIRE/wfs`
+   (GeoJSON, every station's NM, PMVE, BMVE; Licence Ouverte 2.0): the French and
+   Biscay datums are read from it, not from memory.
 5. **The port files** `data/ports/<port>.yaml` on package 35's machinery, with the road,
    the pilot's station, the nation and the port's state (Cadiz blockaded is a state of a
    port, M6 §26); the nations index `data/nations.yaml` where a nation is new (Morocco,
-   for Tangier), and every new port in its `ports:` index (`tests/test_nations.py` reads
-   the index against the files). **Every spot that names a feature repeats its
-   `lat_deg` and `lon_deg`**: a scenario with no `ports:` list (the gate-5b passages)
-   loads every port file on its own region's chart, which has not the block's features,
-   and a spot with a feature and no position is refused at load. A port of a block is
-   loaded into the Channel's recorded passages that way: it moves no digest only while
-   it is nowhere nearer to their tracks than the ports they had (the pilot and the
-   readings take the nearest port), which a block far down the voyage is, and the
-   Channel east was (package 39a). Where no period sheet is read for its harbour the file
-   says `datum: unverified` (a top-level key the machinery does not read).
-6. **The tide**: the block's gauges in `data/tides/constituents.yaml` (TICON's file,
-   `TICON.txt` as package 34 read it, holds the Iberian and the Madeiran gauges by their
-   coordinates: which of Vigo, Leixões, Cascais, Lagos, Cadiz, Tarifa and Funchal it
-   has is **unverified** here and read when the block is built; the form is the
-   eleven's: the record, the mean level above the chart's datum with its source, M2, S2
-   and N2) and its
-   stream areas in `data/tides/streams.yaml`, each with `chart: <region>` and, for an
-   area with no polygon, `bounds:`; the places of the master's epitome in
-   `establishments.yaml`, Norie's and Moore's, with `rise_judgement` where the period gives
-   no rise. The eleven gauges and their figures do not move. **A new gauge moves every
-   Channel position's tide**: the blend is over every gauge within `reach_nm` (400 miles,
-   the Channel's whole region), so a twelfth gauge however far changes the tide off
-   Falmouth by a little and the recorded passages' digests with it. Package 39a read
-   Bournemouth and Portsmouth from TICON and **held** them (`held_gauges:` in the file,
-   read by nothing) for the lead's decision; a block in Biscay or beyond is more than
-   400 miles from much of the Channel but not from all of it (Brest to the Gironde is
-   about 260): measure before adding, or hold. The stream areas go before the open
-   Channel's (`mid-channel`, whose bounds hold the Channel east and Biscay's north), in
-   water no recorded passage reaches, and `book_limits` grows to take the block's water
-   (a single box: 39a took it east to 1 W). `tests/test_tide.py` holds every book
-   statement to the period's form (the set to a point, the springs to the half knot, the
-   neaps half the springs unless the period gives both rates, `PERIOD_RATES`).
+   for Tangier). **Every spot that names a `feature:` repeats its `lat_deg` and
+   `lon_deg` beside it**: a scenario with no `ports:` list (the gate-5b passages) loads
+   every port file on the Channel's chart alone, where the block's features are not, and
+   the spot falls back to its own position (without it the load is refused, and every
+   such passage with it). A port of a block is loaded into the Channel's recorded
+   passages that way: it moves no digest only while it is nowhere nearer to their tracks
+   than the ports they had (the pilot and the readings take the nearest port), which a
+   block far down the voyage is, and the Channel east was (package 39a). Where no period
+   sheet is read for its harbour the file says `datum: unverified` (a top-level key the
+   machinery does not read). The port is entered in the ports' index of
+   `data/nations.yaml` (`ports:`, which `tests/test_nations.py` holds equal to the
+   files), and `tests/test_ports.py` names the port files in a list: the block adds its
+   own to both. Every road, anchorage and mooring has a note of the bottom (an anchorage
+   or a bottom feature with `bottom:`) within three kilometres (`test_tackle_orders.py`,
+   on the whole chart), and every book the game ships names places of the whole chart
+   (`test_log_lines.py`).
+6. **The tide**: the block's gauges read from TICON's file (`TICON.txt` in the zip at
+   doi.pangaea.de, as package 34 read it, by their coordinates; which of Vigo, Leixões,
+   Cascais, Lagos, Cadiz, Tarifa and Funchal it has is **unverified** here and read when
+   the block is built; the form is the eleven's: the record, the mean level above the
+   chart's datum with its source, M2, S2 and N2), **held** under `held_gauges:` in
+   `data/tides/constituents.yaml` and not in `gauges:`, each block's after the last
+   (package 39a's Bournemouth and Portsmouth, package 39b's nine of Biscay north). **A new
+   gauge moves every Channel position's tide**: the interpolation blends every gauge
+   within `reach_nm` (400 miles, the Channel's whole region) of a position, so a gauge
+   added to `gauges:`, however far, enters the blend at Falmouth and moves every recorded
+   passage's digest (Brest to the Gironde is about 260 miles); until the engine gives a
+   gauge its own water (a reach or a chart of its own: the lead's decision, the finding
+   of 39a and of 39b), the block's gauges wait there, read and verified, and the world's
+   tide over the block is the eleven's blend, which over Biscay is the Channel's tide and
+   wrong. The stream areas in `data/tides/streams.yaml`, each with `chart: <region>` (and,
+   for an area with no polygon, `bounds:`) and its `book:` in the period's form
+   (`tests/test_tide.py` holds every statement to it: the set to a point, the springs to
+   the half knot, the neaps half the springs unless the period gives both rates,
+   `PERIOD_RATES`), are looked up first-match: an area within another's polygon goes
+   before it (the Raz before the Iroise), and the block's areas go before `mid-channel`,
+   whose statement in the directions has no polygon and answers for every position
+   within `book_limits`, a single box the block widens to hold its water (39a took it
+   east to 1 W, 39b south to 45.9 N and east to 0.9 W). Keep the polygons off the water
+   the recorded passages' other sail use (the naval cruise's Diamond within eight miles
+   of 48 N 4 55 W and Harpy within ten of 47 50 N 6 W; the merchant passage's Palinure
+   from the Raz and Hirondelle from Sein), or their digests move with them. The places
+   of the master's epitome in `establishments.yaml`, Norie's and Moore's, with
+   `rise_judgement` where the period gives no rise: such a rise is the world's spring
+   range at the place to the foot (`test_tide.py` holds it), which over a block whose
+   gauges are held is the Channel's blend and not the place's own. The eleven gauges and
+   their figures do not move.
 7. **The weather**: nothing, unless the block's water lies in no box of
    `data/weather/climatology.yaml` (the four boxes cover the corridor whole); a block
    that reads a printed climatic table replaces a PROVISIONAL row and says so in the
@@ -88,8 +124,14 @@ region's, its tide and its weather are rows in tables that already reach its wat
    into `.cache/charts` (the network through the proxy reaches GEBCO's and EMODnet's
    services), builds the region's tiles at levels 2 and 3 and its coast and index,
    prints the checks (below), and writes the manifest with every other region, the
-   corridor and the sources' earlier fetches carried over as they were. The tiles are
-   committed (the owner's ruling 5; a region is about 18 MB).
+   corridor and the sources' earlier fetches carried over as they were (since 39a and
+   39b each source's records of the files this run did not fetch are kept before this
+   run's: a `--region` build had dropped the corridor's GEBCO extract and the other
+   regions' subsets, the Channel's GEBCO extract among them). **The seam** (below): a
+   tile another region of the manifest lists is that region's, and the build neither
+   writes it again, lists it nor draws its coast (`tiles_listed_elsewhere`). After the build
+   `git status` shows no change to any tile, coast or index file another region lists.
+   The tiles are committed (the owner's ruling 5; a region is about 12 to 18 MB).
 10. **The tuning notes' section** and the report to the lead, as every package.
 
 ## The checks a block must pass
@@ -108,19 +150,27 @@ the tool refusing to build on a failure:
   reference (Trinity House, an encyclopaedia page with its date read, the modern chart,
   the study, an RMG or SHOM record);
 - **the harbour patches' datum stated**: every override has `datum` and
-  `datum_above_chart_datum_m`;
-- **the fetch box covers the tiles whole** (package 39a): the level-2 tiles that meet
-  the bounds and the harbours' level-3 tiles, the seam's column included;
-- **the seam** (package 39a; at the build): `tiles another region lists: n kept`, the
-  tiles of the block's lists that another region of the manifest lists, which stay that
-  region's;
+  `datum_above_chart_datum_m`, a number (since package 39b: before, a missing key was
+  read as nought and passed);
+- **the fetch box covers the tiles whole** (packages 39a and 39b): every level-2 tile
+  that meets the bounds, the seam's included, and every harbour's level-3 tile lies
+  within `fetch`;
+- **the tiles another region lists** (packages 39a and 39b): how many of the block's
+  tiles another region of the manifest lists, which stay that region's, not written and
+  not listed (`tiles another region lists: n kept`, at the check by level and again at
+  the build);
 - **the shore swept for GEBCO's fill** (spec M5 §33 item 16): at the build, the cells
   where EMODnet has nothing and GEBCO's fill reads water shallower than three metres,
   clustered and printed largest first, for the block to patch (a town, an islet) or to
-  say are water (with the fill raised to the datum, below, what is left is mostly real
+  say are water. With the fill raised to the datum (below) what is left is mostly real
   water EMODnet lacks: the Channel east's ten largest were Poole, Christchurch,
   Portsmouth and Langstone harbours, the Fleet behind the Chesil Beach, and the foot of
-  Sark's western cliffs).
+  Sark's western cliffs. On a low coast it finds the marshes and the lakes behind the
+  shore (Biscay north: the Brière, the lake of Grand-Lieu, the Marais poitevin), closed
+  from the sea and left as water, said in the notes; Biscay north, built without the
+  raise, also shows the fault the raise mends: GEBCO's land, its heights above mean sea
+  level read as above LAT, stands as ground that dries, and at high water springs the
+  model floods the marsh behind a dyke.
 
 ## The seam, and GEBCO's fill (package 39a)
 
@@ -150,11 +200,23 @@ them), so that a low shore stands as high above the world's high water as it doe
 the sea's; the sweep's suspects fell from 37,348 cells to 2,772. Channel-west's recipe
 has not the key, so its tiles, if rebuilt, come out as before (the Roscoff town patch
 was the same fault mended by hand). Every block on a coast of large tides sets it.
+Biscay north's recipe (package 39b, built beside 39a) has not the key either: its
+sweep found 34,053 cells in 267 places, the marshes behind its dykes among them, which
+flood at high water springs; the rebuild with the key is the lead's to order.
 
 A block's test file asserts the same of its own files through `tests/test_chart.py`'s
 helpers (the manifest's licences, the sources cited), and adds the block's own truths:
 a landfall on its coast by day and by night, a depth in its road, a tide at its gauge
-within the atlas's figure, the scenario sailed to a digest.
+within the atlas's figure (once its gauges are blended), the scenario sailed. Several
+tests of the whole chart were written when it held the Channel alone (its regions, its
+features, the seam off Penmarch over the corridor, the directions' limits, the stream
+areas' chart, the port files' list): a block updates them to hold its region beside the
+others, as 39b did.
+
+The recorded passages are the proof that a block moved nothing of the Channel: run
+`python -m pytest tests/test_known_truths.py --slow -n 4` whole. A `-k "gate_5b or
+gate_5c"` selects the tests by their names and not by their fixtures, and so runs one
+test of the passages' many (39b found it so).
 
 ## The worked example: the Channel east block (`channel-mid`, package 39a, as built)
 

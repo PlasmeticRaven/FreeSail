@@ -80,13 +80,20 @@ def run_until(world, kind, minutes=240):
 # ---------------------------------------------------------------------------
 
 
+# the port files: the Channel's five, the Channel east's eight (package 39a) and Biscay
+# north's five (package 39b)
 ALL_PORTS = [
     "alderney",
     "brest",
     "dartmouth",
     "falmouth",
+    "la-rochelle",
+    "le-palais",
+    "lorient",
     "morlaix",
+    "paimboeuf",
     "plymouth",
+    "rochefort",
     "roscoff",
     "st-helier",
     "st-malo",
@@ -100,7 +107,8 @@ ALL_PORTS = [
 def test_the_five_ports_are_files_on_one_machinery_placed_from_the_chart():
     files = PT.port_files()
     # package 39a added the Channel east's eight (their spots name channel-mid's features
-    # and repeat their positions, so a world on channel-west's chart alone loads them too)
+    # and repeat their positions, so a world on channel-west's chart alone loads them too),
+    # package 39b Biscay north's five
     assert list(files) == ALL_PORTS
     w = world_at(OFF_THE_LIZARD)
     assert list(w.ports.ports) == ALL_PORTS
@@ -242,6 +250,8 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     frigate = world_at(OFF_THE_LIZARD)
     assert frigate.ports.ship_nation == "britain"
     french_ports = {"brest", "roscoff", "st-malo", "morlaix"}
+    # Biscay north's five (package 39b): hostile throughout to a King's ship
+    french_ports |= {"la-rochelle", "le-palais", "lorient", "paimboeuf", "rochefort"}
     assert {p.id: frigate.ports.stance(p) for p in frigate.ports.ports.values()} == {
         pid: ("hostile" if pid in french_ports else "open") for pid in ALL_PORTS
     }
@@ -1301,3 +1311,49 @@ def test_a_hail_never_asks_a_ship_at_anchor_to_shorten_sail():
     assert e.text == "Answered the cutter: we will take the pilot for Falmouth."
     aboard = run_until(w, "port.pilot_aboard", 10)
     assert aboard.text.endswith("came aboard from the cutter to pilot her in.")
+
+
+# ---------------------------------------------------------------------------
+# Package 39b: Biscay north's ports (spec M6 §26)
+# ---------------------------------------------------------------------------
+
+BISCAY_NORTH = ["la-rochelle", "le-palais", "lorient", "paimboeuf", "rochefort"]
+GROIX_ROAD = {"lat_deg": 47.656, "lon_deg": -3.435}
+
+
+def test_biscay_norths_ports_stand_on_the_blocks_marks_and_on_their_own_positions_without_them():
+    """The block's five ports on 35's machinery: on the whole chart their roads are the
+    block's features; on the Channel's chart alone (the gate 5b passages load every port
+    file, the block's features absent) each spot falls back to its own position, the
+    same place; every port French, hostile to a King's ship and open to a neutral; the
+    datum of each said, Rochefort's from Bellin's patch of the road of Aix, the rest
+    unverified (no period sheet patched)."""
+    import yaml
+
+    whole = world_at(GROIX_ROAD, chart="atlantic-east")
+    channel = world_at(OFF_THE_LIZARD)
+    for pid in BISCAY_NORTH:
+        port, alone = whole.ports.ports[pid], channel.ports.ports[pid]
+        assert port.nation == "france" and "Faden 1793" in port.source
+        for key in ("outer_road", "anchorage", "mooring", "shore"):
+            a, b = getattr(port, key), getattr(alone, key)
+            assert abs(a.position.lat_deg - b.position.lat_deg) < 1e-4, (pid, key)
+            assert abs(a.position.lon_deg - b.position.lon_deg) < 1e-4, (pid, key)
+            if a.feature_id:
+                assert whole.chart.feature(a.feature_id) is not None, (pid, key)
+                assert channel.chart.feature(a.feature_id) is None
+        assert port.anchorage.depth_m is not None and alone.anchorage.depth_m is None
+        doc = yaml.safe_load(open(f"data/ports/{pid}.yaml", encoding="utf-8"))
+        if pid == "rochefort":
+            assert "Bellin" in doc["datum"] or "1.00 m" in doc["datum"]
+        else:
+            assert doc["datum"] == "unverified"
+    # the roads in the block's water, the pilot's station the outer road
+    lorient = whole.ports.ports["lorient"]
+    assert lorient.outer_road.feature_id == "groix-road" == lorient.pilot.station
+    assert lorient.mooring.deep_draught_ft == 21  # Faden p. 69: Pennemané for 21 feet and less
+    assert whole.chart.region_at(lorient.anchorage.position) == "biscay-north"
+    assert whole.ports.nearest()[0].id == "lorient"
+    assert whole.ports.stance(lorient) == "hostile"  # the frigate, British
+    neutral = world_at(GROIX_ROAD, ship=SCHOONER, chart="atlantic-east")
+    assert all(neutral.ports.stance(neutral.ports.ports[p]) == "neutral" for p in BISCAY_NORTH)

@@ -1,0 +1,112 @@
+# FreeSail: Paimboeuf in the Loire, the outport of Nantes, as a port (spec M6 §26; package
+# 39b, the Biscay north block), on package 35's machinery; the marks are the features
+# file's.
+#
+# Sources. Faden 1793, Le Petit Neptune Français, 'The Loire, or River of Nantes', pp. 74
+# to 76: from Belle Isle to Nantes pass between the Croisic's point and the bank of the
+# Four, steer E S E and S E 1/2 E to the Pierced Rock and close on its north side "in no
+# less than 4 fathoms", then N N E toward the land, keeping off a rocky point marked by a
+# mill in a line with a country house, and "range along to St. Nazaire, and there cast
+# anchor in 6 or 7 fathoms water"; "to the S S E of St. Nazaire, exactly in the middle of
+# the river, lies a ledge of rocks, covered at half tide ... be very wary of its tides,
+# for the currents are very violent"; from St Nazaire "steer E 1/2 S till you come along
+# the south shore, which you coast along till within the bank that lies opposite to the
+# little town of Paimbeuf; when you are past the said bank, you approach the north
+# shore, and cast anchor in 7 or 8 fathoms water, sand and mud ... This river is very
+# rarely entered without taking pilots." Nantes's ships load and discharge at Paimboeuf,
+# the river above too shoal for them (judgement from the period's practice; the river
+# itself is milestone 8's).
+#
+# The datum: UNVERIFIED. No period sheet is patched in the Loire in this package (Bellin
+# 1764, Petit Atlas Maritime t. V, 'Cours de la rivière de Loire depuis la mer jusqu'à
+# Nantes', Rumsey 6903.560, not transcribed); the chart's depths are EMODnet's at LAT
+# (the modern channel, dredged), and the period's low water of springs stands 0.85 m
+# above it at Saint-Nazaire (SHOM's RAM, BMVE, read 2026-10-09; Paimboeuf has no station
+# of the RAM: Montoir's is 0.75).
+#
+# The stance: French, hostile to a King's ship, open to a neutral. Prices FROM MEMORY or
+# JUDGEMENT; sterling at the exchange.
+
+id: paimboeuf
+name: Paimboeuf
+nation: france
+source: "Faden 1793 pp. 74-76 (the Croisic, the Loire, St Nazaire, Paimbeuf)"
+datum: unverified
+
+outer_road:
+  feature: st-nazaire-road
+  name: the road of St Nazaire
+  lat_deg: 47.2680
+  lon_deg: -2.1980
+anchorage:
+  feature: paimboeuf-road
+  name: the road of Paimboeuf
+  lat_deg: 47.3022
+  lon_deg: -2.0592
+mooring:
+  name: the quay of Paimboeuf
+  lat_deg: 47.2905
+  lon_deg: -2.0310       # under the town, on the south shore (judgement)
+  bottom: mud
+  deep_draught_ft: 12    # judgement: a deeper ship lies in the road
+shore:
+  feature: paimboeuf
+  name: the quay of Paimboeuf
+  lat_deg: 47.2876
+  lon_deg: -2.0306
+
+pilot:
+  station: st-nazaire-road
+  cruising_nm: 8                 # judgement: the river's pilots met ships off the Croisic and at St Nazaire
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the pilots' boat of St Nazaire
+    under: a lugsail and oars
+    note: "judgement"
+  names: [Guérin, Le Pape, Halgand, Bréhéret, Moyon, Lehuédé, Gergaud, Mahé]   # names of the Guérandais and the Pays de Retz: judgement
+  skill: 0.9
+  fee_pounds: 4                  # judgement, in sterling for the one account; unverified
+  cast: starboard                # down the river on the ebb, the head paying off to the westward (judgement)
+  course_out_deg: 250            # down the river and out by the north side of the Pierced Rock
+  words:
+    channel: "From the Croisic's point steer east-south-east and south-east a half east to the Pierced Rock and pass close on its north side in four fathoms; then north-north-east toward the land, keeping off the rocky point till the mill comes in a line with the country house on the bank; then range along the north side to St Nazaire. Keep the north side: south-south-east of St Nazaire a ledge in the middle of the river covers at half tide."
+    marks: "The steeples of Batz and Guerande on the low coast, the Pierced Rock at the river's mouth, the mill and the country house for the rocky point, and the town of Paimboeuf on the south shore."
+    anchorage: "Anchor off St Nazaire in six or seven fathoms; for Paimboeuf steer east a half south along the south shore till within the bank before the town, then close the north shore and anchor in seven or eight fathoms on sand and mud."
+    tide: "Be very wary of the tides here, for the currents are very violent; take the river on the flood and come down on the ebb."
+
+tide:
+  establishment: Point Mehan     # the epitome has no hour for the Loire (Faden gives the moon's bearing); the nearest of its places with one
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 32, origin: france, season: {12: 1.1}, note: "the wines of Anjou and the Nantais at the river; from memory"}
+    - {good: brandy, price: 100, origin: france, note: "the Nantes brandy Faden names for the Croisic's trade (p. 74); from memory"}
+    - {good: salt, price: 10, origin: france, note: "Guérande salt at the source; from memory"}
+    - {good: sugar, price: 75, origin: null, note: "colonial sugar, the old trade of Nantes, scarce in the war (judgement)"}
+    - {good: canvas, price: 41, origin: france, note: "from memory"}
+    - {good: hemp, price: 52, origin: france, note: "the hemp of Anjou (judgement)"}
+    - {good: timber, price: 5, origin: france, note: "from memory"}
+    - {good: coal, price: 6, origin: britain, note: "from memory"}
+    - {good: salt beef, price: 68, origin: france, note: "from memory"}
+    - {good: tin, price: 175, origin: britain, note: "from memory, as Brest's"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 10, pounds: 44, note: "the river's shipwrights (judgement)"}
+    - {item: yard, hours: 7, pounds: 27}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.12, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  able: {hands: 3, pounds: 2, delay_h: 24}
+  ordinary: {hands: 6, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 12, pounds: 1, delay_h: 12}
+
+closed_to: []

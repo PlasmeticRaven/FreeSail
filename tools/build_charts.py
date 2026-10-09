@@ -247,6 +247,28 @@ REGIONS: dict[str, dict[str, Any]] = {
         # drying ground covered at high water without it (`mean_level_grid`)
         "fill_to_chart_datum": True,
     },
+    # package 39b: Biscay north, abutting channel-west at 48 N exactly. The southern and
+    # eastern bounds are lowered from 46 N and 1 W to 45.9 N and 0.9 W so that Rochefort
+    # on the Charente (45.94 N, 0.96 W) and the river's mouth lie within them: the tiles
+    # are the same (the row from 45.68 N and the column to 0.80 W meet 46 N and 1 W
+    # already). The northern row of level-2 tiles (47.81 to 48.24 N) is channel-west's
+    # west of 2.93 W and is not written again (the seam rule, `tiles_listed_elsewhere`);
+    # the fetch box covers it whole all the same, so that the block's distance field and
+    # coast near 48 N read EMODnet and not GEBCO's fill (package 38's datum finding).
+    "biscay-north": {
+        "title": "Biscay north, the Raz de Sein to the Pertuis d'Antioche",
+        "bounds": {"south": 45.9, "north": 48.0, "west": -5.0, "east": -0.9},
+        "fetch": {"south": 45.6, "north": 48.3, "west": -5.15, "east": -0.7},
+        "harbours": {
+            "lorient-port-louis": {"south": 47.66, "north": 47.76, "west": -3.42, "east": -3.30},
+            "belle-ile-palais": {"south": 47.33, "north": 47.37, "west": -3.18, "east": -3.12},
+            "quiberon": {"south": 47.46, "north": 47.55, "west": -3.12, "east": -3.00},
+            "loire-paimboeuf": {"south": 47.24, "north": 47.31, "west": -2.25, "east": -2.00},
+            "la-rochelle": {"south": 46.13, "north": 46.17, "west": -1.24, "east": -1.14},
+            "aix-basque-roads": {"south": 45.97, "north": 46.08, "west": -1.32, "east": -1.08},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+    },
 }
 
 # The corridor (spec M6 §26; package 38; the owner's ruling 5): level 1 from GEBCO over
@@ -274,7 +296,7 @@ CORRIDORS: dict[str, dict[str, Any]] = {
 CHARTS: dict[str, dict[str, Any]] = {
     "atlantic-east": {
         "title": "The Channel, Biscay and the Iberian coast to Madeira and the Strait",
-        "regions": ["channel-west", "channel-mid"],
+        "regions": ["channel-west", "channel-mid", "biscay-north"],
         "corridor": "atlantic-corridor",
     },
 }
@@ -1128,7 +1150,10 @@ def load_overrides(region: str) -> tuple[list[Patch], list[dict[str, Any]]]:
     for path in sorted(folder.glob("*.yaml")) if folder.exists() else []:
         doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
         unit = UNIT_M[str(doc.get("units", "fathoms")).lower()]
-        above = float(doc.get("datum_above_chart_datum_m", 0.0))
+        # the sheet's low water above the chart's datum: stated, or the check refuses the
+        # file (package 39b: a missing key read as 0.0 passed the check unstated)
+        stated = doc.get("datum_above_chart_datum_m")
+        above = float(stated) if isinstance(stated, (int, float)) else 0.0
         for p in doc.get("patches") or []:
             kind = str(p.get("kind", "depth"))
             if kind == "depth":
@@ -1162,7 +1187,7 @@ def load_overrides(region: str) -> tuple[list[Patch], list[dict[str, Any]]]:
                 "source": doc.get("source"),
                 "units": doc.get("units"),
                 "datum": doc.get("datum"),
-                "datum_above_chart_datum_m": above,
+                "datum_above_chart_datum_m": stated if isinstance(stated, (int, float)) else None,
                 "control_points": doc.get("control_points"),
                 "patches": len(doc.get("patches") or []),
             }
@@ -1592,7 +1617,9 @@ class Build:
         every feature id is unique across the manifest's regions (`others`: the last
         manifest's regions, read when not given); every feature's source is in the
         references' form; every harbour patch (override) states its datum and the
-        datum's height above the chart's. A failure is a `SystemExit` in words, after
+        datum's height above the chart's; the fetch box covers the tiles that meet the
+        bounds and the harbours whole; and how many of the region's tiles another region
+        lists, kept as theirs (packages 39a and 39b). A failure is a `SystemExit` in words, after
         every check has been printed; the shore's sweep for GEBCO's fill is the build's
         (`_sweep_fill`), since it needs the grids."""
         recipe = REGIONS[region]
@@ -1706,6 +1733,25 @@ class Build:
             f"  the fetch box covers the tiles whole: {'yes' if not short else 'NO'} "
             f"({fb['south']:g} to {fb['north']:g} N, {_lon_words(fb['west'])} to "
             f"{_lon_words(fb['east'])})"
+        )
+        # 7. the seam (packages 39a and 39b): a tile another region lists is that region's
+        taken = tiles_listed_elsewhere(region, others)
+        shared = {
+            2: [
+                t
+                for t in tiles_over(2, b["south"], b["north"], b["west"], b["east"])
+                if f"2/{tile_name(*t)}" in taken
+            ],
+            3: [
+                t
+                for hb in (recipe.get("harbours") or {}).values()
+                for t in tiles_over(3, hb["south"], hb["north"], hb["west"], hb["east"])
+                if f"3/{tile_name(*t)}" in taken
+            ],
+        }
+        self.log(
+            f"  tiles another region lists: {len(shared[2]) + len(shared[3])} kept "
+            f"(level 2: {len(shared[2])}, level 3: {len(shared[3])}; not written, not listed)"
         )
         for line in failures:
             self.log(f"  FAILED: {line}")
@@ -2088,7 +2134,7 @@ class Build:
                 "datum": s["datum"],
                 "home": s["home"],
                 "used_for": s["used_for"],
-                "fetched": fetched or carried,
+                "fetched": carried + fetched,
                 "status": status,
             }
         hand = sorted((CHARTS_DIR / "features").glob("*.yaml")) + sorted(
@@ -2167,14 +2213,17 @@ def _lon_words(lon: float, places: int | None = None) -> str:
     return words + (" W" if lon < 0 else " E")
 
 
-def tiles_listed_elsewhere(region: str) -> set[str]:
-    """The seam (package 39a): the tiles, as '<level>/<name>', that a region of the last
-    manifest other than `region` lists. A level's tiles are on one grid for every region,
-    so a region's edge column may meet its neighbour's bounds too; such a tile is the
-    region's that listed it first, and the neighbour's build computes it with its block
-    but neither writes it again nor lists it (`Build.build_region`)."""
+def tiles_listed_elsewhere(region: str, others: dict[str, Any] | None = None) -> set[str]:
+    """The seam (packages 39a and 39b): the tiles, as '<level>/<name>', that a region of
+    the last manifest other than `region` lists (`others`: its regions, read when not
+    given). A level's tiles are on one grid for every region, so a region's edge column
+    may meet its neighbour's bounds too; such a tile is the region's that listed it first,
+    and the neighbour's build computes it with its block but neither writes it again nor
+    lists it (`Build.build_region`), and the coast is not drawn over it."""
+    if others is None:
+        others = _last_manifest().get("regions") or {}
     out: set[str] = set()
-    for other, spec in (_last_manifest().get("regions") or {}).items():
+    for other, spec in others.items():
         if other == region:
             continue
         for level, records in (spec.get("tiles") or {}).items():

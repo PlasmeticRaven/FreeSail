@@ -206,3 +206,104 @@ held_gauges:
     M2: {amplitude_m: 1.410, phase_deg: 326.7}
     S2: {amplitude_m: 0.436, phase_deg: 13.4}
     N2: {amplitude_m: 0.276, phase_deg: 303.9}
+
+  # THE GAUGES OF BISCAY NORTH, READ AND HELD (package 39b). TICON's file holds nine gauges
+  # of the block, read 2026-10-09 by their coordinates as package 34 read the eleven (the
+  # zip at doi.pangaea.de, SHA-256 7055f8ed1a14abf8...6514; Brest and Le Conquet are the
+  # eleven's and agree to the figure). Each named by the station of SHOM's RAM at its
+  # coordinates (the WFS layer RAM_BDD_WLD_WGS84G_WFS:ram_3857 of data.gouv.fr's record,
+  # Licence Ouverte 2.0, read 2026-10-09), whose NM gives `mean_level_m` (VERIFIED, read
+  # from the RAM: not the study's quotation). Paimboeuf has no RAM station: its mean level
+  # is the mean of Montoir's 3.69 and Cordemais's 3.78, JUDGEMENT.
+  #
+  # HELD, NOT BLENDED: the interpolation blends every gauge within `reach_nm` (400 miles),
+  # so a gauge of Biscay would enter the blend at every position of the Channel (Falmouth
+  # lies 150 to 250 miles from these), moving the eleven's tide there by a fraction of a
+  # degree and a centimetre or two and every recorded passage with it. The engine has no
+  # rule yet that keeps a gauge to its own water (a gauge's reach, or its chart); until
+  # the lead gives it one (docs/dev/TuningNotes.md, package 39b, "Found on the way"), the
+  # block's gauges are kept here, read and ready, and the world's tide over Biscay north
+  # is the eleven's blend as package 38 left it. `freesail/world/tide.py` reads `gauges:`
+  # and not this list (the Channel east's two above, package 39a, are held for the same
+  # reason, under the same key).
+  - id: concarneau
+    name: Concarneau
+    lat_deg: 47.8736
+    lon_deg: -3.9072
+    record: "GESLA-2, REFMAR, 1999 to 2014"
+    mean_level_m: 3.06
+    M2: {amplitude_m: 1.481, phase_deg: 99.0}
+    S2: {amplitude_m: 0.539, phase_deg: 131.9}
+    N2: {amplitude_m: 0.308, phase_deg: 79.2}
+  - id: port-tudy
+    name: Port-Tudy, Groix
+    lat_deg: 47.6443
+    lon_deg: -3.4459
+    record: "GESLA-2, REFMAR, 1966 to 2014"
+    mean_level_m: 3.19
+    M2: {amplitude_m: 1.488, phase_deg: 98.7}
+    S2: {amplitude_m: 0.541, phase_deg: 131.4}
+    N2: {amplitude_m: 0.311, phase_deg: 78.9}
+  - id: le-crouesty
+    name: Le Crouesty
+    lat_deg: 47.5427
+    lon_deg: -2.8952
+    record: "GESLA-2, REFMAR, 1996 to 2014"
+    mean_level_m: 3.32
+    M2: {amplitude_m: 1.629, phase_deg: 103.2}
+    S2: {amplitude_m: 0.589, phase_deg: 136.2}
+    N2: {amplitude_m: 0.339, phase_deg: 83.7}
+  - id: saint-nazaire
+    name: Saint-Nazaire
+    lat_deg: 47.2669
+    lon_deg: -2.2016
+    record: "GESLA-2, REFMAR, 1957 to 2014"
+    mean_level_m: 3.61
+    M2: {amplitude_m: 1.737, phase_deg: 104.6}
+    S2: {amplitude_m: 0.622, phase_deg: 138.4}
+    N2: {amplitude_m: 0.358, phase_deg: 85.7}
+  - id: paimboeuf
+    name: Paimboeuf
+    lat_deg: 47.2866
+    lon_deg: -2.0004
+    record: "GESLA-2, REFMAR, 2011 to 2014"
+    mean_level_m: 3.74
+    M2: {amplitude_m: 1.866, phase_deg: 111.1}
+    S2: {amplitude_m: 0.646, phase_deg: 146.8}
+    N2: {amplitude_m: 0.374, phase_deg: 94.3}
+  - id: saint-gildas
+    name: Pointe de Saint-Gildas
+    lat_deg: 47.1404
+    lon_deg: -2.2464
+    record: "GESLA-2, REFMAR, 1962 to 2014"
+    mean_level_m: 3.44
+    M2: {amplitude_m: 1.688, phase_deg: 100.3}
+    S2: {amplitude_m: 0.614, phase_deg: 133.3}
+    N2: {amplitude_m: 0.350, phase_deg: 81.0}
+  - id: les-sables-dolonne
+    name: Les Sables-d'Olonne
+    lat_deg: 46.4974
+    lon_deg: -1.7935
+    record: "GESLA-2, REFMAR, 1965 to 2014"
+    mean_level_m: 3.31
+    M2: {amplitude_m: 1.560, phase_deg: 97.3}
+    S2: {amplitude_m: 0.560, phase_deg: 129.7}
+    N2: {amplitude_m: 0.325, phase_deg: 77.5}
+  - id: la-rochelle-pallice
+    name: La Rochelle-Pallice
+    lat_deg: 46.1585
+    lon_deg: -1.2206
+    record: "GESLA-2, REFMAR, 1941 to 2014"
+    mean_level_m: 3.90
+    M2: {amplitude_m: 1.748, phase_deg: 98.6}
+    S2: {amplitude_m: 0.630, phase_deg: 131.6}
+    N2: {amplitude_m: 0.364, phase_deg: 79.6}
+  - id: ile-daix
+    name: Île d'Aix
+    lat_deg: 46.0074
+    lon_deg: -1.1743
+    record: "GESLA-2, REFMAR, 1973 to 2014"
+    mean_level_m: 3.96
+    M2: {amplitude_m: 1.781, phase_deg: 97.7}
+    S2: {amplitude_m: 0.642, phase_deg: 131.2}
+    N2: {amplitude_m: 0.371, phase_deg: 78.6}

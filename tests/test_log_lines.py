@@ -554,7 +554,8 @@ def test_a_name_the_chart_nearly_has_is_answered_with_that_name():
 
 
 def test_the_shipped_books_enter_whole():
-    """Every book the game ships names places the chart has."""
+    """Every book the game ships names places the chart has: the whole chart since the
+    blocks (package 39b: Biscay north's book names the Bay of Quiberon)."""
     from pathlib import Path
 
     from freesail.standing.book import read_orders_file

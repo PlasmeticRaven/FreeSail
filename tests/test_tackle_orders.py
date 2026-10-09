@@ -490,11 +490,14 @@ def test_a_note_of_two_grounds_is_the_mean_of_them_and_not_the_worst():
 
 def test_every_ports_road_and_anchorage_has_its_note_of_the_bottom():
     """Brest road had none though the pilot says mud: an anchor let go before the town
-    lay on no note at all, and held as on unknown ground."""
+    lay on no note at all, and held as on unknown ground. On the whole chart, which holds
+    every port's water (package 39b: Biscay north's ports beside the Channel's)."""
     w = road_world(FRIGATE, where={"lat_deg": 49.80, "lon_deg": -5.20})
     # package 39a: every port is loaded on channel-west's chart, but the Channel east's
-    # notes are on the whole chart, which is where its ports are sailed to
+    # notes are on the whole chart, which is where its ports are sailed to (and Biscay
+    # north's, package 39b)
     whole = load_chart("atlantic-east")
+    assert {"lorient", "le-palais", "paimboeuf", "la-rochelle", "rochefort"} <= set(w.ports.ports)
     bare = []
     for pid, port in w.ports.ports.items():
         for label in ("outer_road", "anchorage", "mooring"):

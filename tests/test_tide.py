@@ -372,13 +372,17 @@ def test_the_directions_are_looked_up_by_a_position_and_say_nothing_beyond_their
     assert book.area_at(THE_LIZARD).id == "the-lizard"
     assert book.area_at(Position(49.3, -5.0)).id == "mid-channel"  # the rest is the Channel
     south, north, west, east = book.limits
-    # package 39a: the limits reach east to 1 W with the Channel east's chart
-    assert (south, north, west, east) == (48.0, 51.0, -7.0, -1.0)
+    # package 39a: the limits reach east with the Channel east's chart; package 39b: the
+    # directions reach Biscay north, one box over the three
+    assert (south, north, west, east) == (45.9, 51.0, -7.0, -0.9)
     assert book.area_at(Position(49.70, -2.06)).id == "alderney-race"
     assert book.area_at(Position(50.49, -2.45)).id == "portland-race"
     assert book.area_at(Position(50.0, -2.5)).id == "mid-channel"
-    for beyond in (Position(47.5, -6.0), Position(49.5, -7.5), Position(51.2, -5.0)):
+    for beyond in (Position(45.5, -6.0), Position(49.5, -7.5), Position(51.2, -5.0)):
         assert book.area_at(beyond) is None
+    assert book.area_at(Position(48.045, -4.77)).id == "raz-de-sein"  # before the Iroise
+    assert book.area_at(Position(47.27, -2.20)).id == "loire-mouth"
+    assert book.area_at(Position(47.0, -3.0)).id == "open-bay"
     assert T.load_directions() is book  # read once a process, as the tide's tables are
 
 
@@ -438,7 +442,16 @@ def test_the_stream_areas_belong_to_a_chart_and_beyond_them_there_is_no_stream(t
     """`streams.yaml` takes areas by chart: each names its region, the open Channel's
     statement reaches the Channel's bounds and no farther, and beyond every tabulated
     area the world's stream is nought until a block tabulates the water."""
-    assert {a.chart for a in tide.areas} == {"channel-west", "channel-mid"}
+    import yaml
+
+    manifest = yaml.safe_load(open("data/charts/manifest.yaml", encoding="utf-8"))
+    names = set(manifest["charts"]) | set(manifest["regions"])
+    assert all(a.chart in names for a in tide.areas), [a.chart for a in tide.areas]
+    # the Channel's areas as package 34 and 37e made them, and the blocks' beside them
+    channel = [a.id for a in tide.areas if a.chart == "channel-west"]
+    assert (
+        len(channel) == 13 and channel[-1] == "mid-channel" and tide.areas[-1].id == "mid-channel"
+    )
     # package 39a: the Channel east's areas lie east of 3 W, where no Channel west
     # position reaches, and come before the open Channel, whose bounds hold them
     names = [a.id for a in tide.areas]
@@ -477,7 +490,9 @@ def test_far_from_every_place_of_his_table_the_master_says_his_tide_may_be_hours
     far = world_at(38.6, -9.4, "atlantic-east")
     words = far.navigation.tide_by_almanac()["words"]
     assert "nearest place in the master's table" in words
-    assert "may differ by hours" in words and "Ushant" in words and "621 miles" in words
+    # package 39b: the nearest place of the table off Lisbon is now Brouage, of the Biscay
+    # block's places, 571 miles off (it was Ushant, 621)
+    assert "may differ by hours" in words and "Brouage" in words and "571 miles" in words
     near = world_at(49.9, -5.2, "atlantic-east")
     assert "may differ by hours" not in near.navigation.tide_by_almanac()["words"]
 
@@ -518,7 +533,8 @@ def test_the_channel_easts_gauges_were_read_and_are_held_and_the_eleven_do_not_m
     import yaml
 
     doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
-    held = {g["id"]: g for g in doc["held_gauges"]}
+    # the Channel east's two (Biscay north's nine, package 39b, are held beside them)
+    held = {g["id"]: g for g in doc["held_gauges"] if g["lat_deg"] > 48.5}
     assert set(held) == {"bournemouth", "portsmouth"}
     assert all(g["mean_level_m"] is None for g in held.values())  # unverified, not invented
     assert len(tide.gauges) == 11 and not {g.id for g in tide.gauges} & set(held)
@@ -529,3 +545,71 @@ def test_the_channel_easts_gauges_were_read_and_are_held_and_the_eleven_do_not_m
     springs = consts["M2"][0] + consts["S2"][0]
     assert level + springs == pytest.approx(12.20, abs=0.5)
     assert level - springs == pytest.approx(1.50, abs=0.5)
+
+
+# ---------------------------------------------------------------------------
+# Package 39b: Biscay north's tide (spec M6 §26, the block's item 4)
+# ---------------------------------------------------------------------------
+
+
+def test_the_blocks_gauges_are_read_and_held_out_of_the_blend_that_would_move_the_channel(tide):
+    """TICON's nine gauges of Biscay north are read into `held_gauges:` in the eleven's
+    form, their mean levels SHOM's RAM's; the world blends the eleven alone, since a
+    gauge of the block within the reach would move the Channel's tide (the finding: the
+    engine has no rule yet that keeps a gauge to its own water)."""
+    import yaml
+
+    doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
+    # the block's nine, after the Channel east's two (package 39a) under the same key
+    held = [g for g in doc["held_gauges"] if g["lat_deg"] < 48.0]
+    assert len(doc["held_gauges"]) == 2 + len(held)
+    assert [g["id"] for g in held] == [
+        "concarneau",
+        "port-tudy",
+        "le-crouesty",
+        "saint-nazaire",
+        "paimboeuf",
+        "saint-gildas",
+        "les-sables-dolonne",
+        "la-rochelle-pallice",
+        "ile-daix",
+    ]
+    for g in held:
+        assert 46.0 <= g["lat_deg"] <= 48.0 and -4.0 <= g["lon_deg"] <= -1.0, g["id"]
+        assert g["record"].startswith("GESLA-2, REFMAR") and 3.0 <= g["mean_level_m"] <= 4.0
+        for name in ("M2", "S2", "N2"):
+            assert 0.2 < g[name]["amplitude_m"] < 2.0 and 70.0 < g[name]["phase_deg"] < 150.0
+    assert len(tide.gauges) == 11 and not {g.id for g in tide.gauges} & {g["id"] for g in held}
+    # what blending them would do: the tide at Falmouth moves (and with it every passage)
+    blended = T.Tide({**doc, "gauges": doc["gauges"] + held}, {"areas": []})
+    _, here = tide.constants_at(FALMOUTH)
+    _, there = blended.constants_at(FALMOUTH)
+    assert abs(here["M2"][1] - there["M2"][1]) > 0.05  # degrees of phase
+    # over the block the world's tide is the eleven's blend, and wrong there: off the Isle
+    # of Aix its M2 lags 160 degrees where the gauge's own is 97.7 (two hours late, the
+    # Channel's later tide of St Malo and Jersey in the blend), and its range is the
+    # Channel's (the finding; the gauges blended would give the gauge's own)
+    _, aix = tide.constants_at(Position(46.0074, -1.1743))
+    assert 150.0 < aix["M2"][1] < 170.0
+    _, own = blended.constants_at(Position(46.0074, -1.1743))
+    assert abs(own["M2"][1] - 97.7) < 1.0
+
+
+def test_the_blocks_stream_areas_keep_off_the_recorded_passages_other_sail(tide):
+    """The Raz before the Iroise whose polygon holds it, the block's areas before the open
+    Channel's; the open bay's polygon keeps clear of the water where the naval cruise's
+    Diamond (eight miles about 48 N 4 55 W) and Harpy (ten about 47 50 N 6 W) patrol, so
+    that the recorded passages read the streams they read."""
+    from freesail.world.geo import destination
+
+    ids = [a.id for a in tide.areas]
+    assert ids.index("raz-de-sein") < ids.index("the-iroise") < ids.index("open-bay")
+    assert ids.index("open-bay") < ids.index("mid-channel")
+    assert tide.area_at(Position(48.045, -4.77)).id == "raz-de-sein"
+    for centre, miles in ((Position(48.0, -4.9167), 8.0), (Position(47.8333, -6.0), 10.0)):
+        for bearing in range(0, 360, 15):
+            for frac in (0.25, 0.5, 0.75, 1.0):
+                p = destination(centre, float(bearing), frac * miles * units.NAUTICAL_MILE)
+                assert tide.area_at(p).id in ("mid-channel", "the-iroise", "raz-de-sein"), p
+    assert tide.area_at(Position(47.40, -3.00)).id == "islands-passages"
+    assert tide.area_at(Position(46.05, -1.20)).id == "aix-road"

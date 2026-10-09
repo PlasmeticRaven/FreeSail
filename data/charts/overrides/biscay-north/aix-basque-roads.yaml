@@ -1,0 +1,71 @@
+# The road of Aix and the channel toward the Charente as the period's sheet has them (spec
+# M6 §26; C §3.3, §5.2; package 39b, the Biscay north block). A period patch, hand-made and
+# rasterised by tools/build_charts.py at levels 2 and 3 (the harbour patch
+# `aix-basque-roads` in the tool's recipe).
+#
+# The sheet. Bellin, 'Carte de l'entrée de la Charente et environs de Rochefort', Petit
+# Atlas Maritime (Paris, 1764), t. V no. 85: David Rumsey Map Collection 6903.572, on the
+# Internet Archive as dr_carte-de-ientree-de-la-charente-et-environs-de-rochefort-6903572,
+# read 2026-10-09 at full resolution (5,837 by 6,920 pixels) through the collection's IIIF
+# server; the image is CC BY-NC-SA 3.0 and is not committed (the crops stay in the
+# build's cache): the facts below are transcribed from it. North up; its scale "Echelle
+# d'une Lieue Commune"; no legend for its soundings, which are read as brasses (BRASSE_M,
+# the study's unverified figure) at low water of spring tides (the Dépôt's practice,
+# unverified for Bellin's own sheets), as package 35b read his Roscoff.
+#
+# The georeference: a similarity fitted by least squares to the five control points
+# below, 4.69 metres a pixel and the sheet turned 0.6 degrees; the residuals 230 to 600
+# metres, which is a small plate's drawing (the Isle of Aix drawn smaller than it is) and
+# more than Roscoff's. So the patch is the channel's middle only, where Bellin's channel
+# between the Palles and the Fouras shore is two kilometres wide: a corridor 600 metres
+# wide down the line of his soundings from the anchorage to the 9, at the least of them,
+# 5 brasses, and a narrower one of 3 toward the river's mouth. The banks either side are
+# left to the modern grid.
+#
+# What the sheet says against the modern grid (the finding). Bellin's road and channel
+# hold 5 to 10 brasses (9 to 17 m below the chart's datum with the correction) where the
+# modern grid has 1 to 3 m of water within half a kilometre of every sounding: the road
+# of Aix has silted since (the ships of the line lay here in 1809). West of the meridian
+# of Aix his 5 and 6 brasses agree with the grid within three metres, and are not patched.
+# Every sounding read and the grid beside it is in `notes`.
+
+region: biscay-north
+name: aix-basque-roads
+sheet: "Bellin 1764, 'Carte de l'entrée de la Charente et environs de Rochefort', Petit Atlas Maritime t. V no. 85 (David Rumsey 6903.572, Internet Archive dr_carte-de-ientree-de-la-charente-et-environs-de-rochefort-6903572), read at full resolution through the IIIF server"
+source: "Faden 1793, 'Isle d'Aix, and River of Charente', p. 82: anchor between the isle and the river in expectation of a pilot; it is best to anchor near the isle in 7 or 8 fathoms; the Palles at the river's southern point"
+units: brasses
+datum: "low water of spring tides (the sheet has no legend for its soundings; read as the Dépôt's low water of spring tides, unverified for Bellin)"
+# Mean low water springs above the modern chart datum (the zéro hydrographique) at the Île
+# d'Aix: 1.00 m, SHOM's Références Altimétriques Maritimes (BMVE 1.00, PMVE 6.15, NM
+# 3.96), read 2026-10-09 from the RAM's WFS layer: VERIFIED.
+datum_above_chart_datum_m: 1.0
+control_points:
+  - {name: "the north-west point of the Isle of Aix", lat_deg: 46.0250, lon_deg: -1.1826, note: "the sheet's island at pixel 1130, 1730; the modern grid's shore; residual 507 m"}
+  - {name: "the east point of the Isle of Aix", lat_deg: 46.0160, lon_deg: -1.1541, note: "pixel 1405, 1915; the modern grid's shore; residual 438 m"}
+  - {name: "the south point of the Isle of Aix, the fort", lat_deg: 46.0098, lon_deg: -1.1778, note: "pixel 1090, 2050, the star of the fort; the modern grid's shore; residual 228 m"}
+  - {name: "Pointe de l'Aiguille (the sheet's Pte de l'Eguille, with its redoubt)", lat_deg: 46.0049, lon_deg: -1.1263, note: "pixel 1847, 2274; the land's end of the Fouras peninsula in the modern grid; residual 600 m"}
+  - {name: "the north-west end of the Isle Madame's land by the Palles", lat_deg: 45.9711, lon_deg: -1.1441, note: "pixel 1771, 3021; the modern grid's land, the island not resolved from the main; residual 482 m"}
+patches:
+  - name: "the road of Aix and the channel toward the Charente, five brasses"
+    kind: depth
+    depth: 5
+    polygon:
+      - [45.9976, -1.13793]
+      - [45.9952, -1.14487]
+      - [45.9789, -1.13317]
+      - [45.9813, -1.12623]
+    source: "Bellin 1764, the soundings 6 at the anchor (georeferenced to 45.9964 N, 1.1414 W), 8, 5, 10 and 9 down the channel between the Palles and Fouras to 45.9801 N, 1.1297 W; Faden 1793, p. 82: anchor near the isle in 7 or 8 fathoms"
+    note: "Five brasses at low water springs, 9.1 m below the chart's datum with the 1.0 m correction: the least of the channel's soundings, as a corridor 600 m wide on their line. The modern grid has 1 to 3 m here."
+  - name: "the approach to the Charente, three brasses"
+    kind: depth
+    depth: 3
+    polygon:
+      - [45.9811, -1.12796]
+      - [45.9791, -1.13144]
+      - [45.9697, -1.11884]
+      - [45.9717, -1.11536]
+    source: "Bellin 1764, the soundings 3 and 3 between the channel's 9 and the river's mouth (georeferenced to 45.9764 N, 1.1241 W and 45.9707 N, 1.1171 W)"
+    note: "Three brasses at low water springs, 5.9 m below the chart's datum, a corridor 400 m wide; the modern grid has the ground at or above the datum here. The river's mouth itself (Bellin's 2 and 2) is left to the grid, the georeference's error being the river's width."
+notes:
+  - "Read from the sheet and not patched (the modern grid within 500 m beside each, metres above the chart's datum): about the isle 2, 3, 2, 2 and 3 brasses close east and south of it (-6.0 to +3.5: the isle's flats, which the grid has); west of the meridian of Aix 6, 6, 5, 5, 5, 6 and 4 (-13.6 to -1.4: agreeing within three metres); 4 west of the anchorage (-4.1 to -2.0); the Charente's mouth 2 and 2 (+0.7 to +4.9)."
+  - "The sheet's names: Isle Daix, Isle d'Enette (the rocks west of the Pointe de l'Aiguille, Fort Énet's later), Pte du Rocher, Pte de l'Epée, Fouras le Chateau, Redoute, I. Madame, Passe aux Boeufs, les Palles, les Longes, la Noras, les Bigres, Lestrie, les Faignes, Grand Garçon, Pointe de Piedmont, Port des Barques, Riv. de Charente, Rochefort, Soubize, St Nazaire, Brouage, Chenal de Brouage, le Charlus, les Vasses de Brouage, Roche d'Erre and Isle d'Erre, Bourcefranc, Hieres."

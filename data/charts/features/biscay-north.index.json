@@ -1,0 +1,169 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"183,-4": [
+"charente-below-soubise",
+"rochefort"
+],
+"183,-5": [
+"boyart-bank",
+"fouras",
+"les-palles",
+"isle-madame",
+"charente-mouth"
+],
+"184,-10": [
+"roche-bonne"
+],
+"184,-5": [
+"chef-de-baie-road",
+"la-rochelle",
+"la-rochelle-harbour",
+"la-lanterne",
+"isle-of-aix",
+"aix-road"
+],
+"184,-6": [
+"st-martin-de-re",
+"st-martin-road",
+"la-pree-road",
+"laverdin",
+"pointe-de-chassiron",
+"chassiron-light",
+"les-antiochats",
+"pertuis-dantioche",
+"basque-road"
+],
+"184,-7": [
+"baleines-light"
+],
+"185,-6": [
+"pertuis-breton"
+],
+"185,-7": [
+"les-baleines"
+],
+"185,-8": [
+"barges-dolonne",
+"les-sables"
+],
+"186,-10": [
+"isle-dieu",
+"chiens-perrins",
+"yeu-road",
+"yeu-light"
+],
+"186,-8": [
+"st-gilles"
+],
+"187,-10": [
+"les-boeufs"
+],
+"188,-10": [
+"pierre-percee",
+"le-pilier",
+"pilier-light",
+"noirmoutier"
+],
+"188,-11": [
+"soundings-belle-isle-to-yeu"
+],
+"188,-14": [
+"soundings-off-belle-isle"
+],
+"189,-10": [
+"batz-steeple",
+"guerande-steeple"
+],
+"189,-11": [
+"isle-dumet",
+"le-four-croisic",
+"le-four-light",
+"croisic"
+],
+"189,-12": [
+"houat",
+"hoedic",
+"the-cardinals"
+],
+"189,-13": [
+"quiberon-point",
+"quiberon-ledge",
+"la-teignouse",
+"teignouse-light",
+"quiberon-bay",
+"belle-isle",
+"le-palais",
+"palais-castle",
+"palais-road",
+"basse-palais",
+"sauzon",
+"locmaria-road",
+"goulphar-light"
+],
+"189,-14": [
+"poulains-point",
+"les-poulains"
+],
+"189,-16": [
+"soundings-south-of-glenan"
+],
+"189,-9": [
+"saint-nazaire",
+"st-nazaire-road",
+"les-morees",
+"paimboeuf",
+"paimboeuf-road"
+],
+"190,-12": [
+"point-mehan",
+"st-gildas-steeple"
+],
+"190,-14": [
+"groix",
+"bout-des-chats",
+"groix-road",
+"port-louis-citadel",
+"port-louis",
+"port-louis-road",
+"pennemane-road",
+"lorient",
+"lorient-tower",
+"larmor-tower",
+"les-truies",
+"gavres-point"
+],
+"190,-15": [
+"pen-men-light"
+],
+"190,-16": [
+"glenan-isles",
+"penfret-light"
+],
+"190,-17": [
+"la-jument-glenan"
+],
+"191,-16": [
+"concarneau",
+"concarneau-road",
+"glenan-road"
+],
+"191,-17": [
+"pont-labbe-road",
+"benodet-road",
+"isles-aux-moutons"
+],
+"191,-18": [
+"penmarch-point",
+"penmarch-town",
+"penmarch-rocks",
+"penmarch-light"
+],
+"191,-19": [
+"la-gamelle"
+],
+"191,-20": [
+"raz-soundings"
+]
+}
+}

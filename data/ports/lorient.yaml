@@ -1,0 +1,122 @@
+# FreeSail: Port Louis and L'Orient as a port (spec M6 §26; package 39b, the Biscay north
+# block), on package 35's machinery (freesail/world/ports.py); the marks are the features
+# file's (data/charts/features/biscay-north.yaml).
+#
+# Sources. Faden 1793, Le Petit Neptune Français, 'Port Louis', 'L'Orient', d'Après de
+# Mannevillette's instructions for the entrance, and 'Groix', pp. 67 to 70: Port Louis
+# "an excellent harbour, with a very good citadel, and a town on the eastern side"; the
+# rocks without the port toward the east "render its entrance rather difficult"; the mark
+# to enter, the edge of the citadel in a line with St Catherine; "when you are got within
+# the citadel, you cast anchor in 5 or 6 fathoms water, or else run aground under the
+# town ... at low water you cannot come under the town, the place being dry at every
+# tide"; L'Orient three quarters of a league above, "the place from whence the whole
+# Asiatic trade of the French is carried on"; d'Après's Great Channel west of the Sows
+# and the Errants on the tower of Larmor, the middle channel on the tower of L'Orient in
+# one with the citadel's western bastion, the road of Pennemané above St Michael's
+# island, which "a ship drawing above 21 feet" makes only at high water springs; high
+# water at half past four at full and change; the road of Groix between the island and
+# the bank, in 10 to 15 fathoms on sand and little pebbles like coral.
+#
+# The datum: UNVERIFIED. No period sheet is patched at Port Louis in this package (Bellin
+# 1764, Petit Atlas Maritime t. V, 'Carte de l'Orient et du Port Louis', Rumsey 6903.553,
+# is reachable at full resolution through the Rumsey IIIF server and was not
+# transcribed); the chart's depths are EMODnet's at the lowest astronomical tide, and
+# the period's low water of springs stands 1.00 m above it at Port-Louis (Locmalo)
+# (SHOM's RAM, BMVE, read 2026-10-09) for the patch that a later package makes.
+#
+# The stance. L'Orient is French (data/nations.yaml): hostile to a King's ship in June
+# 1805 by the nations table, open to a neutral, whose pilot comes off at the Great
+# Channel as Brest's does in the Iroise. The prices are FROM MEMORY or JUDGEMENT, as the
+# other French ports' are; sterling at the exchange.
+
+id: lorient
+name: L'Orient
+nation: france
+source: "Faden 1793 pp. 67-70 (Port Louis, L'Orient, d'Après de Mannevillette's instructions, Groix); the epitome's row (Faden's hour)"
+datum: unverified
+
+# The outer road is the road of Groix, where a ship from the sea brings up for the
+# pilot and the tide; the anchorage is within the citadel of Port Louis, for any
+# draught; the mooring is the road of Pennemané for L'Orient's ships, which a ship of
+# more than twenty-one feet does not make.
+outer_road:
+  feature: groix-road
+  name: the road of Groix
+  lat_deg: 47.6560
+  lon_deg: -3.4350
+anchorage:
+  feature: port-louis-road
+  name: the road within the citadel of Port Louis
+  lat_deg: 47.7130
+  lon_deg: -3.3620
+mooring:
+  feature: pennemane-road
+  name: the road of Pennemané
+  lat_deg: 47.7333
+  lon_deg: -3.3476
+  deep_draught_ft: 21    # Faden p. 69: a ship drawing above 21 feet makes this road only at high water springs, and anchors at Port Louis
+shore:
+  feature: lorient
+  name: the quay at L'Orient
+  lat_deg: 47.7480
+  lon_deg: -3.3600
+
+pilot:
+  station: groix-road
+  cruising_nm: 6                 # judgement: the pilots of Port Louis met ships between Groix and the Great Channel
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml # the stand-in at far detail, as at Brest
+  vessel:
+    kind: a boat
+    name: the Port Louis pilots' chaloupe
+    under: lugsails
+    note: "a Breton chaloupe under lugs (judgement)"
+  names: [Le Pallec, Le Gurun, Jégo, Le Bihan, Guillemot, Le Floch, Kerneur, Le Garrec]   # Breton names of the Vannetais coast: judgement
+  skill: 0.9
+  fee_pounds: 4                  # judgement, in sterling for the one account, as Brest's; unverified
+  cast: starboard                # from the road within the citadel the head paying off to the southward for the Great Channel (judgement)
+  course_out_deg: 200            # out by the Great Channel, the tower of Larmor astern (d'Après's line reversed)
+  words:
+    channel: "From Groix or the offing keep the tower of Larmor north-east by east a half east by compass till one of the mills east of Port Louis is hid by the town walls; that carries you in mid-channel between the Saisies of Larmor and the Sows. When the high land of Pennemané comes in one with the westernmost corner of the citadel, steer in that line between the Mare, which has a beacon, and the foot of the citadel."
+    marks: "The citadel of Port Louis on its point, and within it the convent of St Catherine: bring the edge of the citadel in a line with St Catherine to enter. The tower of L'Orient in one with the citadel's western bastion is the middle channel's mark, east of the Errants."
+    anchorage: "Within the citadel anchor in five or six fathoms; the ground under the town dries at every tide. For L'Orient go on to the road of Pennemané above St Michael's island, which a ship of more than twenty-one feet makes only at high water springs; she lies at Port Louis."
+    tide: "It is high water between Port Louis and L'Orient at half past four at full and change. Take the entrance on the flood."
+
+tide:
+  establishment: Port Louis
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds               # sterling at the exchange, as Brest's (a livre a tenth of a pound, from memory)
+  goods:
+    - {good: wine, price: 36, origin: france, season: {12: 1.1}, note: "Bordeaux and Nantes wine by the coasters; from memory, as Brest's"}
+    - {good: brandy, price: 105, origin: france, note: "from memory, as Brest's"}
+    - {good: salt, price: 11, origin: france, note: "Guérande salt brought round; from memory"}
+    - {good: pilchards, price: 26, origin: france, season: {7: 0.8, 8: 0.8, 9: 0.8, 2: 1.3, 3: 1.3}, note: "the sardines of Port Louis and Groix, pressed in casks, cheap in the season (judgement)"}
+    - {good: canvas, price: 40, origin: france, note: "Breton sailcloth; from memory, as Brest's"}
+    - {good: hemp, price: 55, origin: null, note: "from memory, as Brest's"}
+    - {good: timber, price: 5, origin: france, note: "the dockyard's oak from the Blavet; from memory"}
+    - {good: coal, price: 6, origin: britain, season: {11: 1.2, 12: 1.2, 1: 1.2, 2: 1.2}, note: "scarce under the blockade; from memory"}
+    - {good: tea, price: 160, origin: null, note: "the East India company's old trade, its sales long over: what comes in by neutrals (judgement)"}
+    - {good: salt beef, price: 70, origin: france, note: "from memory, as Brest's"}
+    - {good: tin, price: 180, origin: britain, note: "English tin, scarce under the blockade; from memory, as Brest's"}
+
+dockyard:
+  kind: yard                     # L'Orient's dockyard of the King's ships: a yard
+  items:
+    - {item: topmast, hours: 8, pounds: 45, note: "the arsenal sells to a neutral at a price: judgement, as Brest's"}
+    - {item: topgallant_mast, hours: 4, pounds: 14}
+    - {item: yard, hours: 6, pounds: 28}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 22}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.1, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: the Inscription maritime takes the coast's seamen for the fleet
+  able: {hands: 4, pounds: 2, delay_h: 24}
+  ordinary: {hands: 8, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 16, pounds: 1, delay_h: 12}
+
+closed_to: []

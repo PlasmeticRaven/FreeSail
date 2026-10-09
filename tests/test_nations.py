@@ -88,6 +88,12 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "alderney": "britain",
         "st-malo": "france",
         "morlaix": "france",
+        # Biscay north (package 39b)
+        "lorient": "france",
+        "le-palais": "france",
+        "paimboeuf": "france",
+        "la-rochelle": "france",
+        "rochefort": "france",
     }
     for pid, path in port_files().items():
         assert load_port(path, chart).nation == table.port_nations[pid]

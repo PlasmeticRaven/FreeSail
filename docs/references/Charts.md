@@ -99,6 +99,31 @@ features (`features/channel-mid.yaml`, 123 entries) and two overrides read from:
 | TICON (Piccioni and others, 2019) | the zip at doi.pangaea.de, fetched again 2026-10-09 | The block's gauges by their coordinates: Weymouth, St Helier, Saint-Malo and Cherbourg (the eleven's, verified again), Bournemouth and Portsmouth (held, `data/tides/constituents.yaml`). CC BY 4.0. |
 | Mackenzie's survey of the coast east of Plymouth (Hurd's engraving) | the RMG's collections search | Not found from this machine (the search answered the keywords with unrelated objects); no English sheet read for a patch. |
 
+## Biscay north (package 39b)
+
+The second block of spec M6 §26, `biscay-north` (45.9 N to 48 N, 5 W to 0.9 W, abutting
+the Channel's region at 48 N; its southern and eastern bounds lowered a tenth from 46 N
+and 1 W so that Rochefort on the Charente lies within them, at no cost in tiles). Its
+tiles are cut from the same two grids as the Channel's, fetched for the region on
+2026-10-09: EMODnet's DTM 2024 by its ERDDAP service (`elevation` and `elevation_max`
+over 45.6 to 48.3 N, 5.15 to 0.7 W, two classic netCDF subsets of 44 MB, CC BY 4.0) and
+GEBCO_2025's area extract (45.5 to 48.4 N, 5.25 to 0.6 W, ESRI ASCII, 3.6 MB, public
+domain), their checksums in the manifest. 55 tiles at level 2 and 37 at level 3 in six
+harbour groups (L'Orient and Port Louis, Palais, Quiberon, the Loire to Paimboeuf, La
+Rochelle, the road of Aix and the Basque Road); 12.0 MB with the coast and the features.
+The northern row of level-2 tiles, which straddles 48 N, is the Channel's and was
+neither written again nor listed (the seam rule); its files are byte for byte as they
+were.
+
+| Work | Where read | What was taken |
+|---|---|---|
+| Faden, *Le Petit Neptune François*, 1793, chapter IV ('the coast of France in the Bay of Biscay'), pp. 65 to 84; 'Tides and Currents', pp. 92 to 93; Du Bocage's soundings, pp. 93 to 94; the Raz, pp. 60 to 61 | Internet Archive `lepetitneptunefr00fade`, the OCR text | The 100 marks of `features/biscay-north.yaml` and the ten of the Raz de Sein in `features/channel-west.yaml` (La Vieille and La Platte, the Livenet, the Pont de Chats and the Cornet, the Pont de Sains, the passage of the Raz in 14 or 15 fathoms, Hodierne); the directions of the five port files; the tides' hours of the epitome's new places and the rises of Faden's table (15 feet on the coast of Poitou; 18 on the south coast of Bretagne, the OCR's «8); the stream areas' sets (the Raz's flood north, the islands' north-east and south-west). In his translation's fathoms and leagues. |
+| Bellin, *Carte de l'entrée de la Charente et environs de Rochefort*, *Petit Atlas Maritime* t. V no. 85, 1764 | Rumsey 6903.572 (Internet Archive `dr_carte-de-ientree-de-la-charente-et-environs-de-rochefort-6903572`), read 2026-10-09 at full resolution (5,837 by 6,920 pixels) through the Rumsey IIIF server; the crops cached outside the repository (CC BY-NC-SA 3.0) and none committed | The soundings of the road of Aix and the channel toward the Charente (5 to 10 brasses where the modern grid has 1 to 3 m), the isles, Fouras, the Palles and the names; georeferenced by five control points (residuals 230 to 600 m); the override `overrides/biscay-north/aix-basque-roads.yaml` patches the channel's middle at five brasses and its approach to the river at three. |
+| Bellin's other sheets of the block, *Petit Atlas Maritime* t. V, 1764 | Rumsey 6903.553 (L'Orient and Port Louis), 6903.556 (the Morbihan and Quiberon), 6903.558 (Belle Isle), 6903.560 (the Loire to Nantes), 6903.569 (the roads of La Rochelle), through the same IIIF server | Nothing: reachable at full resolution and not transcribed; the four port files without a patch say `datum: unverified`. |
+| SHOM, *Références Altimétriques Maritimes* | the WFS layer `RAM_BDD_WLD_WGS84G_WFS:ram_3857` of `services.data.shom.fr/INSPIRE/wfs`, GeoJSON, read 2026-10-09 (data.gouv.fr's record, Licence Ouverte 2.0) | The mean levels (NM) of the nine gauges held and the low water of springs (BMVE) at every port of the block: the road of Aix's patch takes the Île d'Aix's 1.00 m, VERIFIED. |
+| TICON (Piccioni et al. 2019), `TICON.txt` | the zip at doi.pangaea.de (PANGAEA 896587), fetched 2026-10-09, SHA-256 7055f8ed…6514, CC BY 4.0 | Nine gauges of the block by their coordinates (Concarneau, Port-Tudy, Le Crouesty, Saint-Nazaire, Paimboeuf, the Pointe de Saint-Gildas, Les Sables-d'Olonne, La Rochelle-Pallice, the Île d'Aix): M2, S2 and N2, held out of the blend (`held_gauges`, after the Channel east's two). |
+| The French encyclopaedia's pages | fr.wikipedia.org through its API, read 2026-10-09, slowly (most requests refused for their rate) | The lights' dates and positions: the Baleines (Vauban's tower 1682, replaced 1854), Chassiron (1685; its second tower 1836), Penmarch (1835), Goulphar (1836), Pen Men (1839), Penfret (1838), the Teignouse (1845), the Pilier (1829), Yeu (1830), La Vieille (1887), Tévennec (1875) and the Bec du Raz (1839); La Vieille's and Tévennec's positions and the Raz's six knots at springs; the tower of the Lanterne at La Rochelle. |
+
 ## The unverified list, checked
 
 Each item of the study's §7 was checked from the build network on 2026-09-30 and the
