@@ -2966,3 +2966,179 @@ timing tests (`test_chart`'s nearest coast and the merchant passage's pace floor
 this machine whenever other suites run beside them and pass alone, which every package
 reported.
 
+## Milestone 5: the helm through the wind (package 37m, 2026-10-09)
+
+Built from the brief "Package 37m: the helm through the wind" in `M5-WorkPackages.md`, on
+the owner's ruling 3 of 2026-10-09 (spec M6 §31; decision 39): a plain `steer` through the
+wind tacks or wears her as the ship and the course allow; a course given directly into
+the wind's eye is steered and she is taken aback, the line warning of it; `steer`, `shape
+a course for` and `give chase` share one rule. Measured at seed 7 on this machine (Linux,
+shared with another package's worktree, so no time here is the change's).
+
+### The rule
+
+`orders.navigation.judge_course` judges a course against her head and the wind for every
+order that gives her one: `steer <course>`, the points orders (`come up`, `bear away`,
+`steer two points to starboard`), `shape a course for` and `give chase`. The helm's orders
+come through `verbs._helm`, the master's through `navigation.execute`; the judgement is
+made once, and the helm put for a course already judged goes round it
+(`verbs.steer_as_given`).
+
+| The course, against her head and the wind | What she does | The line |
+|---|---|---|
+| on the tack she is on, laid | the helm, as before | as before, unchanged to the byte |
+| a helm order within a point of the wind's eye | steered as given | "N by W (349°) lies in the wind's eye from her head; she will be taken aback.", notable |
+| across the wind's eye, the shorter way, with two knots of way | put about for it: `tack` with `course_deg` | "E by N (79°) lies across the wind's eye from her head; she is put about for it." |
+| the same with under two knots and more than a knot | worn round for it | "...; she has not way enough to stay, and is worn round for it" |
+| across the wind by the stern, more than eight points round, square-rigged with a square sail set and a knot of way | worn round for it: `wear` with `course_deg` | "SE (135°) lies across the wind from her head, by the stern; she is worn round for it." |
+| the same in a fore-and-after (one mast with yards) | gybed by the helm, as she always has been | "...; she gybes for it by the helm." |
+| nearer the wind than she will lie, on the other tack | put about or worn for that tack, `full_and_by` | "NE by E (56°) lies too near the wind to be laid; she is put about and kept full and by on the larboard tack." |
+| a course shaped or a chase's nearer the wind than she will lie on her own tack | kept full and by, as since package 35 | "...; she is kept full and by on the starboard tack" |
+| on the tack she is going to, while a tack or a wear is in hand | handed to the manoeuvre | "SW (225°): she is going about, and the course is given her as she comes round." |
+| no steerage way (a tenth of a metre a second) | the helm, as before; a course shaped too near on the other tack is kept full and by on hers | |
+
+The manoeuvre ends on the course (`evolutions.scripts.CourseToSteer`): a tack, steady by
+the wind on the new tack, steers a course within half a point of close-hauled with the
+yards as they are, and pays off to one further off the wind with its yards and sheets
+trimmed every twenty seconds as the wind draws aft (the same rule as `fill away and steer`,
+package 37f); put about for a course from a reach, she is luffed up and braced up first
+("Luff up and brace up: she is brought by the wind to go about.") and put about when she
+is by the wind or after two minutes. A wear comes to the course on the new tack instead
+of to close-hauled, the yards following the wind round and trimmed to the course's wind
+when she is steady on it, and the spanker hauled out then ("On her course. Haul out the
+spanker!"). The completion lines say so ("Tacked; braced up for the course ordered on the
+larboard tack, heading E by N (79°).", "Wore ship; braced for the course ordered on the
+larboard tack, heading SE (135°).", "..., full and by."); `tack` and `wear` by their own
+words end and read as they always have. The officer's domain is unchanged (item 4): an
+order of the course is judged by its words, and the manoeuvre the rule orders for it is
+within the grant to steer (`tests/test_officer.py`).
+
+### The constants and their sources
+
+| Constant | Value | Where | Source |
+|---|---|---|---|
+| `COURSE_NOT_LAID_MARGIN_POINTS` | half a point, for a course shaped and a chase's; none for the helm's own orders | `orders/navigation.py` | package 35's rule, kept; the helm's orders are laid at the close-hauled angle itself (below, "A decision for the lead") |
+| `EYE_POINTS`, `EYE_ALLOWANCE` | a point either side of the wind, and a degree | `orders/navigation.py` | the owner's "directly into the wind's eye"; a point, since the wind is named to the point and wanders about it, so that the brief's own "N by W lies in the wind's eye" is so in a northerly; judgement |
+| `STAY_MIN_KN` | two knots | `orders/navigation.py` | the tack's own precondition (`tack.yaml`); Luce 1866, ch. XXIV, 'Wearing' (p. 457): wearing is resorted to "when ... the vessel has not sufficient headway for tacking" |
+| `WEAR_FOR_IT_MIN_MS` | half a metre a second, a knot | `orders/navigation.py` | the fold-in's guard, kept |
+| `WAKE_HELM_POINTS` | eight points | `orders/navigation.py` | a turn by the stern of eight points or less keeps the wind abaft the beam at both ends, where a square sail fills however its yard is braced; the fold-in's guard counted turns of more than six points (her close-hauled angle). Found on `tests/test_ports.py`'s St Mary's approach, steered by the bearing a minute at a time: at six points the frigate, running, was worn for a turn of 78 degrees to the other quarter and struck the Nut Rock twelve minutes later; at eight she is steered, as before. Judgement |
+| `STEERAGE_WAY_MS` | a tenth of a metre a second | `orders/navigation.py` | the fold-in's guard's own "no way" |
+| `by_the_wind_s` | 120 s | `tack.yaml` | judgement: the frigate luffs from a reach to close-hauled in about a minute in the tests |
+| `BY_THE_WIND_ALLOWANCE` | ten degrees | `evolutions/scripts.py` | the tack's `close_hauled()` allowance (`evolutions/runner.py`) |
+| `retrim_s`, `pay_off_timeout_s` | 20 s, 240 s | `tack.yaml` | `fill_away.yaml`'s, for the same paying off |
+
+The tack's precondition is `close_hauled() or params.course_deg != none`: by its own word
+she is refused off the wind in package 37k's words, and for a course she is luffed up
+first. No default is declared for either parameter, so that an evolution's data and the
+recorded passages' digests do not move where no course is given.
+
+### A decision for the lead: the helm's own orders on her own tack
+
+The brief's rule reads "nearer the wind than she will lie, kept full and by on the tack
+that points nearer, ... unless the order is a plain `steer` into the eye". Built so for a
+course shaped and a chase's (as before) and for any course on the other tack. For the
+helm's own orders on the tack she is on it is not: they are carried out as given however
+near the wind, and only within a point of the eye does the line warn. The reasons: the
+close-hauled angle every judgement reads is six points for every ship
+(`close_hauled_true_angle`; no ship file sets `close_hauled_angle`), where the schooner
+lies half a point nearer (truth 2) and the frigate holds three knots at 58 degrees
+(chapter 2); and truths 1, 2, 24, 25, 26, 31 and 32 steer her up by `steer` two degrees
+at a time to find how near she will lie, truth 25 pinching her to five points on
+purpose (Fincham's "just lifting"). Kept full and by, those orders would sail her at six
+points whatever was said, and the truths would measure the helmsman. Pinching her is the
+captain's to order; package 37k's "Her sails lifting" and "Taken aback" say what follows.
+If the lead wants the brief's reading for `steer` on her own tack, it wants first a
+close-hauled angle per ship from her file and another way for the truths to pinch her.
+
+### The recorded passages, re-measured
+
+Each measured once after the change (`the_passage`, `the_scenario_whole`); the three that
+moved once more on the tree before it (`61d2b2b`, exported to a scratch directory), which
+matched the merged tree's pins, so that the first line where each parts is known: the
+thick passage at the landfall (53820), the cruise at 72000, the merchant passage at
+129600.
+
+| Passage | Lines | Digest | Ticks | Why |
+|---|---|---|---|---|
+| the thick passage, 5b | 475 → 478 | `bd1cb6f5e036ce3e` → `7029e5b4dd6fbe06` | every tick to the landfall (53820) stands; aground on Black Head at 56081 → not aground; put about off Black Head and full and by on the starboard tack at 54063 | below |
+| the merchant passage, 5c | 2999 → 2998 | `e40b930d5ec5bbaf` → `54713e8e579fd527` | every tick stands | at anchor in the Bay at 129600 the hourly course for the Iroise, on the other tack with no way on her, is refused as keeping her full and by, the refusal of 126000 and not said again, where it was refused as a tack |
+| the naval cruise, 5c | 2065 → 2083 | `15e7f10b2ca8eb9a` → `348b07dd901580a7` | every tick to 20:00 on the 12th (72000) stands; the cutter within hail 83423 → 84631, the letter read 83483 → 84691; the Palinure sighted and chased at 90000 as before, spoken 93979 → 93663, out of sight astern 98040 → 97560; the noons as before | at 72000 the book's "back to the station" shapes SW by S across the wind's eye from her head, and with two knots and more on her she is put about for it where the fold-in's guard wore her; her track parts there. Thirteen wears and a tack in the two days (fourteen wears); no urgent line but the book's late "Taken aback" at 115784, as before |
+| the frigate, 5b | 734, unchanged | `9a0c4168d6987405`, unchanged | unchanged | no order of hers crosses the wind |
+| the schooner, 5b | 761, unchanged | `d6031efa9808a2b1`, unchanged | unchanged | the same |
+
+**The thick passage comes through.** At the landfall in fog (53820, Black Head nine
+cables on the larboard bow) the book's "the land" gives `steer S` with the wind at SW by
+W: S lies too near the wind to be laid on the starboard tack, and she is put about for
+it ("she is put about and kept full and by on the starboard tack"), the shorter way being
+through the wind's eye. Being off the wind she is luffed up and braced
+up first (71 seconds; her head comes up toward the land as she does), put about, and
+tacked at 54063 "heading S by E (171°), full and by"; the land is out of sight at 54900
+and she stands off to the southward to the end of the passage. Her pinned grounding and
+the test's words for it are gone; the passage is pinned as it now ends (the tack's tick,
+the helm full and by, no `ship.aground`). One urgent line is left, as there was one
+before: "Taken aback" at 54411, five minutes after the tack, full and by with a knot and
+a half on her in a gust; the book's "trim on a shift" braces her to the wind at 54641. That
+is the full-and-by helmsman at low way after a long manoeuvre, not the rule, and is left.
+
+**The merchant passage's cast at the Iroise does not come back.** Its cause is 37j's and
+is not the helm's: the course for the Passage de l'Iroise is shaped once from the
+soundings and the hourly rule is guarded within ten miles of Ushant, so she passes the
+mark more than a mile and a half off by account and "bring to in the Iroise" never fires;
+nothing in that is a course across the wind. The expected-failure mark stays. As a
+diagnostic only (the book is not changed), the lead's dropped rule ("the Iroise by
+account", `shape a course for the Passage de l'Iroise` within four miles of it, the
+heading east of E) was run once on this build: she is brought to and the cast reads the
+Iroise at 90110, as in the lead's trial, and filling away she is again taken aback at
+90453. The cause, found here: filled away close-hauled on the starboard tack (SW by W)
+with next to no way on her (the log a quarter of a knot as she filled), the book's "for
+Bertheaume" shapes E by N, fourteen points round by the stern on the larboard tack; with no steerage way the judgement
+gives it to the helm as given (her line says nothing more), and with way it would be a fore-and-after's gybe by the
+helm, which is the same turn. Her fore yards are still braced sharp up for the starboard
+tack as the wind comes over the other quarter, and every square and head sail is aback
+(the fore staysail at 90427, the fore topsail at 90443). See "Found on the way".
+
+### Found on the way (package 37m)
+
+- **A topsail schooner gybed by the helm in a long turn is taken aback.** The brief keeps
+  the fold-in's guard: a fore-and-after (one mast with yards) gybes by the helm. The
+  topsail schooner's fore yards are not tended in that turn, and from close-hauled to a
+  broad reach on the other tack they are braced for the old tack when the wind comes
+  over: she is taken aback (in a test of it, `steer SE` from WNW in a northerly, and in
+  the Iroise trial above). The fold-in measured wearing her for every turn by the stern
+  and lost the merchant passage's tide (her hourly courses a hundred degrees apart, each a
+  wear); a turn of more than eight points with a square sail set might be worn and a
+  shorter one gybed, as the square-rigger's now is. For the lead: it is the Iroise cast's
+  remaining fault, and the primer's chapter 5 says it.
+- **A tack that waits behind other work and finds her without way to stay** when it
+  begins is refused in package 37k's words and the course with it; the line says so and
+  the captain gives it again. A wear in its place was not built.
+- **The shorter way off a lee shore.** The judgement turns her the shorter way; in the
+  thick passage the eye was the shorter by a few degrees and she was luffed up toward
+  Black Head, nine cables off, before going about. A captain would wear off a lee shore in
+  fog; the rule knows no land.
+- **The shaped course at anchor**: a course shaped at anchor was refused as the manoeuvre
+  the old guard picked ("'tack' must wait till she weighs"); it is refused now as the
+  helm's order or as keeping her full and by, whichever the judgement gives with no way
+  on her.
+
+### The suite, as run (package 37m)
+
+`ruff check` and `ruff format --check` clean. The fast tier (`pytest -n 4`), on a machine
+whose load stood at twelve to sixteen on four cores: 2983 passed and four failed. Two are
+the timing tests every package reports (`test_chart`'s nearest coast, the merchant
+passage's pace floor). One was this package's and is mended
+(`test_catalogue`'s frozen tack timings, which now carry the three a tack for a course
+reads, as 37f's fill away does). One is not this package's:
+`test_reckoning.py::test_a_cast_that_does_not_agree_within_the_doubt_keeps_the_account_and_widens_it_once`
+fails when the whole file is run in one process and passes alone, on this branch and
+on the tree before it (`61d2b2b`) alike: an order dependence in that file, for the lead.
+
+The slow tier of the truths (`tests/test_known_truths.py --slow -n 4`): 83 passed, 8
+expected failures (the Iroise cast's among them), four failed. Three are the pace floors
+(truth 51's frigate, the day under systems, the gate's day with the region loaded: 477
+ticks a second against the floor's 500 under that load). The fourth is not this package's:
+`test_the_schooners_pilot_boards_before_she_runs_in` asks that she anchor more than a
+quarter of an hour after the pilot boards, and on the merged tree's own figures (the pilot
+aboard 56940, the anchor 57255, which this package measured unchanged with the schooner's
+lines and digest) it is five minutes, so it fails on the merged tree too, whose log is
+the same line for line. For the lead.
