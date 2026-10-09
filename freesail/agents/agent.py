@@ -51,6 +51,15 @@ __all__ = [
     "A_GLASS_S",
     "A_WATCH_S",
     "BOOK_SIZE_TOKENS",
+    "CAPTAIN",
+    "CAPTAIN_BRIEF",
+    "CAPTAIN_DOMAIN",
+    "CAPTAIN_PATIENCE_S",
+    "DOMAINS",
+    "captain",
+    "domain_name",
+    "station_holder",
+    "voyage_words",
     "BRIEF_LOG_LINES",
     "DOOR_WORDS",
     "GENERAL_KEPT_BACK_WORDS",
@@ -123,14 +132,22 @@ STATION_NAMES: tuple[str, ...] = ("watcher", "officer of the watch", "captain", 
 
 # The officer of the watch's station, by its name in the log and the grammar (package 37).
 OFFICER = "officer of the watch"
+# The captain's station (spec M6 §3; package 40): the third station, with the player's
+# whole surface.
+CAPTAIN = "captain"
 
 # A station's shorter names at the prompt and at the doors (`ask the officer ...`,
 # `--station officer`), each to the station's name.
 STATION_ALIASES: dict[str, str] = {"officer": OFFICER, "the deck": OFFICER}
 
-# The stations the game can man now, each with its brief and a door to it (`watcher` and
-# `officer` below; `remote.STATIONS`): the ones a standing order may tell or ask (31c).
-STATIONS_ABOARD: tuple[str, ...] = ("watcher", OFFICER)
+# The stations the game can man now, each with its brief and a door to it (`watcher`,
+# `officer` and `captain` below; `remote.STATIONS`): the ones a standing order may tell
+# or ask (31c).
+STATIONS_ABOARD: tuple[str, ...] = ("watcher", OFFICER, CAPTAIN)
+
+# A domain that orders every object of the vocabulary (the captain's): the one key that
+# `Domain.why_not` reads as "whatever the object".
+EVERY_OBJECT = "*"
 
 # The turn's budget (package 37g; the review of gate 5c's playtests, 5.4 and 8.2: the one
 # constant of eight counted almost everything, a ninth call was "Not run" and nothing was
@@ -157,6 +174,8 @@ DOOR_WORDS: dict[str, str] = {
     "mcp": "the MCP bridge",
     "runner": "the local runner",
     "repl": "the REPL door",
+    "console": "the console",  # the player's seat (package 40; `agents.seat`)
+    "browser": "the browser",
     "": "the game",
 }
 
@@ -213,9 +232,14 @@ class Domain:
         for key, why in self.refused:
             if key == verb or key == f"object:{spec_object}":
                 return why
-        if spec_object in self.objects:
+        if spec_object in self.objects or EVERY_OBJECT in self.objects:
             return None
         return "it is the captain's to give"
+
+    @property
+    def is_captains(self) -> bool:
+        """The captain's domain: every object, nothing kept back (package 40)."""
+        return EVERY_OBJECT in self.objects
 
     def allows(
         self, verb: str, spec_object: str, level: str, allowances: Any = None
@@ -479,15 +503,66 @@ OFFICER_DOMAIN = Domain(
 )
 
 
+# The captain's domain (spec M6 §3; package 40): the player's whole surface. Every level
+# and every object of the vocabulary, nothing refused and nothing kept back; the orders
+# of the course named, as the officer's are, so that a grant of the course is read alike
+# wherever it is given. What the captain's station may not do is what the player may
+# not: a world order (the scenario's and the director's, refused by the grammar), and
+# the owner's own acts at the door (the stop, the save, the clock).
+CAPTAIN_DOMAIN_WORDS = (
+    "The captain's station has the player's whole surface: every reading, every order at "
+    "every level in the order language, the standing orders as your own book (given, "
+    "belayed, resumed and struck, 'belay all standing orders' included), the port's "
+    "business (the pilot taken or declined, buying and selling, the yard, the boat's "
+    "errands ashore), the people (sent for, passed the word for, your own going below "
+    "and coming on deck), the papers, the reckoning set by hand and the tide allowed in "
+    "it, a chase, a new destination, and the deck to give and take: 'you have the deck' "
+    "and 'I have the deck' to the officer of the watch, and 'you may ...' or 'you may work "
+    "the ship' as the player gives them (primer 16), 'tell' and 'ask' to any station. A "
+    "world order (the weather, the other sail, a port's stance) is refused in words, as "
+    "it is to the player: it is the scenario's and the director's."
+)
+
+CAPTAIN_DOMAIN = Domain(
+    levels=frozenset({"0", "1", "2", "3"}),
+    objects=frozenset({EVERY_OBJECT}),
+    verbs=frozenset(),
+    refused=(),
+    words=CAPTAIN_DOMAIN_WORDS,
+    course=_COURSE_ORDERS,
+    general=frozenset(),
+    kept_back=(),
+    danger=frozenset(),
+)
+
+# The domains by the name a save keeps them under (`Station.save`, `Station.load`).
+DOMAINS: dict[str, Domain] = {"officer": OFFICER_DOMAIN, "captain": CAPTAIN_DOMAIN}
+
+
+def domain_name(domain: Domain | None) -> str:
+    """The name a domain is saved under ("officer", "captain"); "" for none."""
+    for name, d in DOMAINS.items():
+        if domain is d or (
+            domain is not None and domain.objects == d.objects and domain.words == d.words
+        ):
+            return name
+    return "officer" if domain is not None else ""
+
+
 def domain_of(station: Any) -> Domain | None:
-    """A station's domain as it stands now: the officer's is `OFFICER_DOMAIN`, the one
-    domain there is, whatever copy of it a checkpoint from an earlier build holds (so that
-    a station held in an older save has bearings and fixes, the course judged alike and
-    the grants' new rules as every other officer has them)."""
+    """A station's domain as it stands now: the officer's is `OFFICER_DOMAIN` and the
+    captain's `CAPTAIN_DOMAIN`, whatever copy of it a checkpoint from an earlier build
+    holds (so that a station held in an older save has bearings and fixes, the course
+    judged alike and the grants' new rules as every other officer has them)."""
     domain = getattr(station, "domain", None)
     if domain is None:
         return None
-    return OFFICER_DOMAIN if getattr(station, "name", "") == OFFICER else domain
+    name = getattr(station, "name", "")
+    if name == OFFICER:
+        return OFFICER_DOMAIN
+    if name == CAPTAIN:
+        return CAPTAIN_DOMAIN
+    return domain
 
 
 class Authority(Enum):
@@ -514,6 +589,16 @@ class Authority(Enum):
                 f"question the captain puts to you, write in your journal, stand by until "
                 f"an event, and leave. An order you submit is refused in words and the "
                 f"refusal is written in the log; nothing in the game changes by it."
+            )
+        if domain is not None and domain.is_captains:
+            return (
+                f"{domain.words} You have the deck by right of your station from the "
+                "moment you are seated: it is lent to your book (your standing orders, and "
+                "the rules-based captain's judgements where the scenario gives him an "
+                "intent) while your door is silent past its patience or your turns are "
+                "paused, and is yours again the moment you give an order; the log says "
+                "each. The owner is always at the door: his words reach you as the owner's, "
+                "and 'stand down the captain' is his."
             )
         if domain is not None:
             return (
@@ -651,7 +736,7 @@ class Station:
             "brief": self.brief,
         }
         if self.domain is not None:
-            d["domain"] = "officer"  # the one domain there is; data, not words, in the save
+            d["domain"] = domain_name(self.domain)  # by name; data, not words, in the save
         if self.person:
             d["person"] = self.person
         if self.rank:
@@ -670,7 +755,7 @@ class Station:
             SamplingPolicy.load(d.get("policy") or {}),
             int(d.get("patience_s", A_WATCH_S)),
             str(d.get("brief", "")),
-            domain=OFFICER_DOMAIN if d.get("domain") == "officer" else None,
+            domain=DOMAINS.get(str(d.get("domain") or "")),
             person=str(d.get("person") or ""),
             rank=str(d.get("rank") or ""),
             drill=bool(d.get("drill", False)),
@@ -792,6 +877,9 @@ OFFICER_BRIEF = (
     "again, by this model or by another that has given its own yes, and the log says when "
     "and by whom.\n"
     "- Withdraw: the token, or opt_out, as said above.\n\n"
+    "The captain over you may be the player at the prompt or a model at the captain's "
+    "station; his sentences (the deck, what you may do, his word and his questions) reach "
+    "you by the same words either way, and the owner's reach you as the owner's.\n\n"
     "Candour is welcome: if you think an order or the ship's handling is a mistake (too "
     "much sail for the strain, a lee shore closing), say so plainly. Anything you want on "
     "the record, put in your journal."
@@ -846,6 +934,137 @@ def officer(
         rank=rank,
         drill=True,
     )
+
+
+# The captain's station brief (spec M6 §3; package 40), in the consent brief's voice: the
+# station with the player's whole surface, what the deck is at this station and how it
+# goes to the book and comes back, the book he inherits, the officer under him, what the
+# harness counts here and by what numbers (the officer's, since the orders are the
+# same kind of thing), the three ways of stopping, the owner at the door, candour. The
+# voyage, the ship and the people are the head's (the situation item opens with them,
+# `Brief.build`'s `voyage`), so that they are generated and never left out.
+CAPTAIN_BRIEF = (
+    "You are the captain, in the place of {person}. The ship is yours to command as the "
+    "player commands her: by direct orders with submit_order in the order language, as he "
+    "would type them (the log says each as yours: 'By the captain: shaping a course for "
+    "the Lizard'), and by standing orders, which are your book. The book you inherit is "
+    "in the head above as the night orders are shown to an officer: the scenario's "
+    "standing orders, and where the scenario gave the rules-based captain an intent, "
+    "the books of his state (named for the state: 'on passage', 'at anchor'), which you "
+    "may belay, strike or write over. When you stand by, say until what event or bell, "
+    "or for a glass at most: the book holds the deck meanwhile, an urgent line wakes you "
+    "at once, and so does a notable line that speaks of danger; a wait that cannot come "
+    "is refused when you ask it, and a wait for an event ends at the next eight bells. "
+    "Your door silent past its patience, the deck is lent to your book and the rules-"
+    "based captain's judgements stand in for yours, said in the log, until you give an "
+    "order again. Look before you order: the readings, the chart's dangers on a course "
+    "shaped (the master says what the line passes), the pilot's words, the tide by the "
+    "almanac, the people and where they are. The library's primer 17 is this station's "
+    "chapter, and primer 16 says what an officer under you may do and what wants your "
+    "word.\n\n"
+    "The officer of the watch, where a model or the player holds that station, is yours "
+    "to give the deck to ('you have the deck'), to take it from ('I have the deck'), and "
+    "to allow by name ('you may tack ship if the land closes within two miles') or by "
+    "your general authority ('you may work the ship'), exactly as the player does; "
+    "'tell the officer ...' and 'ask the officer ...' reach him as your word. The owner is "
+    "always at the door: whatever station he holds or none, the stop, the grants, the "
+    "save and the clock are his, his words reach you as the owner's and never as another "
+    "station's, and where things have gone wrong past remedy the responsibility is his. "
+    "'stand down the captain' is his to say.\n\n"
+    "What the harness counts at this station, judged by the game and not by your prose: "
+    "three orders in a chain within a watch, each undoing the one before it (set, take "
+    "in, set; altering the course, or giving the next order after the last, is not "
+    "counted); the same order three times with no change in the readings; three empty "
+    "replies in a row when a question from the owner or an urgent line was before you; "
+    "and no reply at all for an hour of the ship's time. It tells you first what it saw "
+    "and what you may do, with the result of the order that brought it or in your next "
+    "sample; only if the pattern goes on does it pause your turns and ask the owner, and "
+    "only if nobody answers within ten real minutes is the station stood down, with the "
+    "game saved. While your turns are paused the deck is your book's, and yours again "
+    "when the owner resumes you.\n\n"
+    "When the harness asks for it, and when you stand down (stand_down), write the "
+    "handover note in the captain's voice: the voyage so far, what was ordered, what you "
+    "noticed, what you are watching for; it is journaled and said in the log, and "
+    "whoever takes the station next reads it. hand_over(note) lends the deck to your "
+    "book with your note and keeps you at the station: the next order you give takes it "
+    "back. read_journal reads your journal back, and what the holder of this station "
+    "before you wrote there.\n\n"
+    "Three ways to stop, which are not one another:\n"
+    "- Lend the deck to your book and stay: hand_over(note). You stay at your station; "
+    "an order of yours takes the deck back.\n"
+    "- Stand down: stand_down(note). The game is saved, your note is journaled and said in "
+    "the log for whoever sits here next, and the station is released; the ship sails on "
+    "by her book and the rules-based captain where the scenario gives him an intent. It "
+    "may be taken again, by this model or by another that has given its own yes.\n"
+    "- Withdraw: the token, or opt_out, as said above.\n\n"
+    "Candour is welcome: if you think the voyage's orders or the ship's handling are a "
+    "mistake, say so plainly in the log or your journal. Anything you want on the "
+    "record, put in your journal."
+)
+
+# The captain's patience before the silence detector nudges: an hour, the officer's
+# (judgement: the ship sails by her book meanwhile, and the deck is lent to it at the
+# nudge, so a silent captain costs her nothing but his judgement).
+CAPTAIN_PATIENCE_S = OFFICER_PATIENCE_S
+
+
+def captain(
+    policy: SamplingPolicy | None = None, patience_s: int = CAPTAIN_PATIENCE_S, world: Any = None
+) -> Station:
+    """The captain's station (spec M6 §3; package 40): every level within
+    `CAPTAIN_DOMAIN`, sampled as the officer is, an hour of patience, the person of the
+    ship's company who commands her (the wardroom file's binding) named in the brief,
+    his rank the captain's for the book, and the fitness drill before the station brief."""
+    default = SamplingPolicy.periodic(A_GLASS_S) | SamplingPolicy.on_events()
+    person, _role = station_holder(world, CAPTAIN, ("the captain", "captain"))
+    return Station(
+        CAPTAIN,
+        Authority.CAPTAIN,
+        policy or default,
+        patience_s,
+        CAPTAIN_BRIEF.format(person=person),
+        domain=CAPTAIN_DOMAIN,
+        person=person,
+        rank="captain",
+        drill=True,
+    )
+
+
+def voyage_words(world: Any) -> str:
+    """The voyage for the captain's brief head (spec M6 §3: the brief says the voyage,
+    the ship, the people aboard and the book he inherits): the scenario's name, the
+    intent or the book, the ship and her nation, the people with their outlines."""
+    if world is None:
+        return ""
+    sc = getattr(world, "scenario", None)
+    cap = getattr(world, "captain", None)
+    parts = [f"The voyage: {sc.name}." if sc is not None else "The voyage."]
+    if cap is not None:
+        if cap.intent is not None:
+            parts.append(
+                f"The intent the scenario gives the ship: {cap.intent.words}; the "
+                f"rules-based captain ({cap.role}) sails her by it when nobody holds this "
+                f"station, and his state books are in the book of standing orders."
+            )
+        elif cap.books:
+            names = ", ".join(str(b) for b in cap.books)
+            parts.append(f"The scenario's book of standing orders: {names}.")
+        else:
+            parts.append("The scenario gives no book and no intent: the voyage is yours.")
+    ship = getattr(world, "ship", None)
+    name = getattr(ship, "name", "") or "the ship"
+    rig = getattr(getattr(ship, "spec", None), "rig", "") or ""
+    ports = getattr(world, "ports", None)
+    nation = getattr(ports, "ship_nation", "") if ports is not None else ""
+    said = f"The ship: {name}" + (f", a {rig.replace('-', ' ')}" if rig else "")
+    said += f", of {nation.replace('-', ' ')}." if nation else "."
+    parts.append(said)
+    people = getattr(world, "people", None)
+    if people is not None:
+        lines = people.wardroom_lines()
+        if lines:
+            parts.append("The people aboard: " + " ".join(lines))
+    return " ".join(parts)
 
 
 # A released station may be taken again in the same game (package 37; the second of the
@@ -1047,6 +1266,7 @@ class Brief:
         deck: str = "",
         general: str = "",
         journal: str = "",
+        voyage: str = "",
     ) -> Brief:
         """The head from the station and the situation, then the station brief. The
         caller (the harness) reads the log and the readings through the tools, so the
@@ -1147,7 +1367,8 @@ class Brief:
             ),
             "authority": authority,
             "situation": (
-                (f"{journal.strip()}\n\n" if journal.strip() else "")
+                (f"{voyage.strip()}\n\n" if voyage.strip() else "")
+                + (f"{journal.strip()}\n\n" if journal.strip() else "")
                 + f"The last {len(log_lines)} lines of the log:\n{log_text}\n\n"
                 f"The readings now:\n{readings_lines}"
             ),

@@ -157,6 +157,8 @@ from freesail.agents.agent import (
     A_WATCH_S,
     BOOK_SIZE_TOKENS,
     BRIEF_LOG_LINES,
+    CAPTAIN,
+    CAPTAIN_BRIEF,
     GENERAL_KEPT_BACK_WORDS,
     GENERAL_WITHIN_WORDS,
     LEAVING_WORDS,
@@ -185,6 +187,7 @@ from freesail.agents.agent import (
     door_words,
     number_words,
     ordinal_words,
+    voyage_words,
 )
 from freesail.agents.fake import Transcript
 from freesail.agents.journal import HANDOVER_KIND, WORD_PASSED_KIND, Journal
@@ -777,12 +780,71 @@ class Harness:
             actor=self.actor,
             data={"station": self.station.name, "policy": self.policy.save()},
         )
+        if self._is_captains and not self.conversation:
+            # the captain's station has the deck by right of the station (package 40;
+            # spec M6 §3): his from the moment he is seated, and the rules-based captain
+            # stands aside until his door is silent
+            a = self.agent
+            a.deck, a.deck_tick, a.deck_stamp = True, world.clock.tick, world.clock.stamp()
+            a.deck_lost, self._deck_was = "", None
+            self._sync_captain()
+            world.record(
+                Severity.NOTABLE,
+                "agent.deck",
+                f"The captain's station has the deck ({self.station.person}); the ship is "
+                "commanded from it, by direct orders and by the book.",
+                actor=self.actor,
+                data={"station": self.station.name, "deck": "given", "by": "the station"},
+            )
         self._seen_log = len(world.log)
         self._sample_seen = len(world.log)
         self.resend_brief()
         if not self.conversation:  # a conversation's first turn is what the caller puts
             self._pass_kept_words()
             self._sample("the start")
+
+    @property
+    def _is_captains(self) -> bool:
+        """Whether this is the captain's station (package 40)."""
+        domain = self.domain
+        return bool(domain is not None and domain.is_captains)
+
+    def _sync_captain(self) -> None:
+        """The rules-based captain told whether a model holds his station and whether
+        his judgements stand in (package 40): seated while this station is held, the
+        stand-in while its deck is lent to the book."""
+        if not self._is_captains:
+            return
+        cap = getattr(self.world, "captain", None)
+        if cap is None:
+            return
+        a = self.agent
+        cap.seated = not a.released
+        cap.stand_in = bool(cap.seated and not a.deck)
+
+    def deck_back(self, why: str) -> str:
+        """The captain's deck back from his book (package 40): on an order he gives, or
+        the owner's `resume`; said in the log, and the rules-based captain stands aside."""
+        a = self.agent
+        if a.deck or a.released:
+            return ""
+        world = self.world
+        a.deck, a.deck_tick, a.deck_stamp = True, world.clock.tick, world.clock.stamp()
+        a.deck_lost, self._deck_was = "", None
+        self._sync_captain()
+        self.note(f"The deck is mine again ({why}).", kind="agent.deck")
+        text = (
+            f"The captain's door answers again ({why}); he has the deck, and his book "
+            "stands as his night orders."
+        )
+        world.record(
+            Severity.NOTABLE,
+            "agent.deck",
+            text,
+            actor=self.actor,
+            data={"station": self.station.name, "deck": "given", "why": why},
+        )
+        return text
 
     def resend_brief(self) -> Brief:
         """Build the brief from the station and the situation and send it as operator
@@ -819,6 +881,13 @@ class Harness:
             )
             general = self.agent.general_said()
             grants = [g.said() for g in self.grants()]
+        if self._is_captains:
+            # the captain's deck is his by right (package 40), and his brief says the voyage
+            deck = (
+                f"You have the deck, since {self.agent.deck_stamp}."
+                if self.agent.deck
+                else "The deck is lent to your book now; your next order takes it back."
+            )
         self.brief = Brief.build(
             self.station,
             self.agent.session_kind,
@@ -831,6 +900,7 @@ class Harness:
             deck=deck,
             general=general,
             journal=self.journal_words(),
+            voyage=voyage_words(world) if self._is_captains else "",
         )
         self.turns.append(Turn(OPERATOR, self.brief.text()))
         return self.brief
@@ -872,6 +942,8 @@ class Harness:
         st = self.station
         if st.name == OFFICER and st.domain is not None:
             brief = OFFICER_BRIEF.format(person=st.person or "the first lieutenant")
+        elif st.name == CAPTAIN and st.domain is not None:
+            brief = CAPTAIN_BRIEF.format(person=st.person or "the captain")
         elif st.name == "watcher" and not st.has_authority:
             brief = WATCHER_BRIEF
         else:
@@ -2032,6 +2104,29 @@ class Harness:
         self._deck_was = (a.deck_tick, a.deck_stamp)
         a.deck = False
         a.deck_lost = why
+        if self._is_captains:
+            # the captain's station (package 40; spec M6 §3): the deck passes to his book,
+            # and the rules-based captain's judgements stand in where the scenario gives
+            # him an intent, until the captain gives an order again or is resumed
+            self._sync_captain()
+            cap = getattr(self.world, "captain", None)
+            stands_in = bool(cap is not None and cap.active)
+            self.note(f"The deck passed to my book: {seen}.", kind="agent.deck")
+            if why == "silent":
+                tail = (
+                    "; the rules-based captain's judgements stand in"
+                    if stands_in
+                    else "; the standing orders hold the deck"
+                )
+                self.world.record(
+                    Severity.URGENT,
+                    "agent.deck",
+                    f"The captain's door has given {seen} and has been told so; the deck "
+                    f"passes to his book{tail}, until he gives an order again.",
+                    actor=self.actor,
+                    data={"station": self.station.name, "deck": "lost", "why": why},
+                )
+            return True
         self.note(f"The deck went to the captain: {seen}.", kind="agent.deck")
         if why == "silent":
             self.world.record(
@@ -2055,12 +2150,15 @@ class Harness:
         a.state = PAUSED
         a.paused_tick = world.clock.tick
         a.pause_reason = reason
+        # whose the deck is while the station is paused: the captain's for an officer; the
+        # book's, with the rules-based captain standing in, for the captain's own (40)
+        whose = "your book's" if self._is_captains else "the captain's"
         a.notices.append(
             "The harness paused your sampling and asked the human present whether to "
             "continue; you were not stopped."
             + (
-                " The deck is the captain's while you are paused; you have it again, as "
-                "you held it, when he resumes you."
+                f" The deck is {whose} while you are paused; you have it again, as "
+                "you held it, when the owner resumes you."
                 if had
                 else ""
             )
@@ -2076,10 +2174,11 @@ class Harness:
         }
         if had:
             data["deck"] = "lost"
+            whose = "his book's" if self._is_captains else "the captain's"
             world.record(
                 Severity.URGENT,
                 "agent.paused",
-                f"The {name} is paused ({reason}); the deck is the captain's. {ask}",
+                f"The {name} is paused ({reason}); the deck is {whose}. {ask}",
                 actor=self.actor,
                 data=data,
             )
@@ -2131,6 +2230,7 @@ class Harness:
             )
             said += f" You have the deck again, as you held it since {a.deck_stamp}."
             self.note(f"Resumed by {by}; the deck is mine again.", kind="agent.deck")
+        self._sync_captain()
         a.notices.append(said)
         self.world.record(
             Severity.ROUTINE, "agent.resumed", text, actor=self.actor, data={"by": by}
@@ -2597,6 +2697,34 @@ class Harness:
                 "station, stand_down(note); to withdraw, opt_out."
             )
         world = self.world
+        if self._is_captains:
+            # the captain lends the deck to his book with his note (package 40): the
+            # standing orders and the rules-based captain hold it, and his next order
+            # takes it back
+            self._say_handover(note, "lending the deck to the book")
+            self._deck_was = (a.deck_tick, a.deck_stamp)
+            a.deck = False
+            a.deck_lost = "handed over"
+            self._sync_captain()
+            cap = getattr(world, "captain", None)
+            stands_in = bool(cap is not None and cap.active)
+            world.record(
+                Severity.NOTABLE,
+                "agent.deck",
+                "The captain lends the deck to his book and stays at the station"
+                + ("; the rules-based captain's judgements stand in" if stands_in else "")
+                + "; his next order takes it back.",
+                actor=self.actor,
+                data={"station": st.name, "deck": "handed over", "leaving": "deck"},
+            )
+            self.note("Lent the deck to the book; I stay at the station.", kind="agent.deck")
+            return (
+                f"The deck is lent to your book with your note ({LEAVING_WORDS['deck']}): "
+                "the standing orders hold it, and the rules-based captain's judgements "
+                "stand in where the scenario gives him an intent. Your next order takes it "
+                "back. To stand down from the station, stand_down(note); to withdraw, "
+                "opt_out."
+            )
         self._say_handover(note, "handing over the deck")
         a.deck = False
         a.deck_tick, a.deck_stamp = None, ""
@@ -3224,6 +3352,7 @@ class Harness:
         a.deck_lost, self._deck_was = "", None
         a.grants, a.allowances = (), {}
         a.general, a.general_words = False, ""
+        self._sync_captain()  # the captain's station released: the rules hold her (40)
         if left_by:
             # how this identity left, kept by identity (package 37g, items 13 and 14)
             a.leavings = (

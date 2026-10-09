@@ -83,6 +83,24 @@ lists them with their places; `send for`, `pass the word for`, `go below`, `come
 deck` move them as M5's orders do; the officer's `where the officer is` of 37g reads the
 same state.
 
+**As built (package 40, 2026-10-09).** The wardroom files `data/people/frigate-36.yaml`,
+`topsail-schooner.yaml`, `cutter.yaml` and `brig.yaml` hold, for each ship, the posts the
+generator draws into the ship file's complement (`tools/gen_ships.py` reads them; the
+four ship files regenerate identical) and the wardroom's entries: role, post or drawn
+rating, messenger, rank, station, place at the start, traits, a line of history, a
+brief and a note. `people.Wardroom` and `Outline` read them; each person of the muster is
+given the file's outline by his role, in the file's order where a role is held twice
+(`Person.outline`, `rank`, `station`, `outline_words`); the names are drawn under the seed
+as before. **Stations are bound by data**: `People.holder(station)` is the person whose
+entry says `station: captain` or `station: officer of the watch`, and the harness's
+`agent.station_holder` reads it; a ship without a file keeps package 37's rule. A scenario
+may name any person of the muster (`people: - {role: master, name: Mr Travers}`). `the
+people` says who is in command: the person at the captain's station with the deck, or,
+when nobody holds it and the rules-based captain sails her by an intent, the person the
+station is bound to. The person's dict that rides the log's lines (`person.came`) is not
+changed, so that no recorded passage's digest moves for the file: the rank and the
+station are read from the person and from `People.wardroom_lines`. `tests/test_wardroom.py`.
+
 ### 3. The captain's station (`freesail/agents/agent.py`, `tools.py`, `harness.py`; `docs/agents/ConsentBrief.md` revised once, with 6b)
 
 The captain's station is the third station and the first with the player's whole
@@ -111,6 +129,51 @@ model. The owner's words reach a station as the owner's and never as another sta
 the player's words at a station reach the others as that station's. The captain's
 station, whoever holds it, gives `you may` to the officer as the player does now, and the
 owner's word stands over all.
+
+**As built (package 40, 2026-10-09).** `agent.CAPTAIN`, `CAPTAIN_DOMAIN` (every level,
+every object: `EVERY_OBJECT`, nothing kept back, `Domain.is_captains`), `Authority.CAPTAIN`,
+`CAPTAIN_BRIEF` and the `captain()` station factory, the person from the wardroom file's
+binding; `DOMAINS` saves and loads a station's domain by name. The brief head's situation
+item opens with the voyage (`agent.voyage_words`: the scenario's name, the intent or the
+book, the ship and her nation, the people with their outlines) and the authority item
+carries the book he inherits. **The deck is his by right of the station**: `Harness.start`
+gives it with a notable line; `tools.judge` lets the stations' sentences through for the
+captain's domain, so `you have the deck`, `you may ...`, `tell` and `ask` go to the officer
+from this station by the player's own words, logged `By the captain: you have the deck.`;
+a plain order is logged as a captain's (`By the captain: shaping a course for ...`) and
+not journaled, the station's replies being its transcript. **His door silent or paused**,
+`Harness._lose_deck` lends the deck to his book (urgent, `the rules-based captain's
+judgements stand in` where the scenario gives an intent; `the standing orders hold the
+deck` otherwise) and `Harness._sync_captain` tells the rules-based captain he stands in;
+`tools.call` gives the deck back on his next `submit_order` (`Harness.deck_back`, notable);
+`hand_over` lends it with his note and he stays; `resume the captain` and `stand down the
+captain` are the owner's (`Harness._release` tells the rules the station is empty). The
+fake captain (`fake.captain_of_the_ship`) takes the command, gives the orders it is
+handed one a sample, answers questions, and stands by or falls silent. `--station
+captain` at the MCP bridge (the prompt `take_command`), the local runner and the REPL;
+`remote.STATIONS` has the factory. `tests/test_captain.py`. No model is seated at this
+station before the consent brief's revision, drafted as
+`docs/playtests/drafts/consent-brief-m6-draft.md`, is approved and the re-asks run (§15).
+
+**The player's seat, as built** (`freesail/agents/seat.py`; `--seat officer` at the
+console and the server). `PlayerSeat` is not a harness and not in `world.agents`: it lives
+on the World as `player_seat` and on the ship as `extra["player_seat"]`, with the officer's
+`Station`, an `AgentState` and the station's journal, and borrows the harness's deck and
+grant methods whole (`give_deck`, `take_deck`, `allow`, `disallow`, `allow_general`,
+`disallow_general`), so that the player is given the deck and allowed things by the same
+rules and lines. The three places that look a station up fall back to it: the orders'
+station sentences (`orders.stations._held`), the authority filter (`tools._holder`) and
+the reading `the officer of the watch`. A line typed at the prompt while the seat is held
+goes through `PlayerSeat.route`: the stations' sentences, a world order and `answer ...`
+are the owner's; everything else is the seat's, judged by `tools.judge` with the officer's
+domain, refused without the deck or outside it as a driver's line (an input, so a replay
+says it again), and given under the seat's actor `the officer of the watch (the player)`,
+which the World journals (`crew.whose_order` reads the station before the bracket). The
+seating is a driver's line (`seat.taken`) that a replay seats the player again at
+(`core.replay._give`); a checkpoint carries the seat. `tell` keeps the words with what he
+was told, `ask` stands at the prompt until `answer <words>`. One seat at a time, the
+officer's only (`SEAT_STATIONS`); a door asking for a station the player holds is refused
+as it is for a station a model holds.
 
 **What the captain's station adds to the consent brief**: a station not described (the
 captain's), with more authority than is described; by the owner's ruling of 7 October
@@ -192,6 +255,56 @@ door is silent: the deck passes to the book, as it does for the officer, and the
 stand in for the captain's. He is the floor and the parity baseline: the regatta (6c)
 sails him first on every course.
 
+**As built (package 40, 2026-10-09; `freesail/world/captains.py`, `data/captains/*.yaml`).**
+`Intent` is read from the scenario's words (`intent:` beside `standing_orders:`;
+`read_intent` against the chart's places and the ports' goods: `trade <goods> from A to
+B`, `keep the station between A and B`, `carry a letter to A`, `run home to A`, `make a
+passage to A`), or given by the world order `captain: <intent>` (the scenario's and the
+director's; refused at the prompt as every world order is). `Doctrine` is the role's file
+(`merchant`, `kings-ship`, `packet`, `commodore`; `role_for` by the ship's nation and
+rig): thresholds with their sources, a book for each of the twelve states in the dialect
+with placeholders the captain fills from his plan (`{mark}`, `{radius}`, `{port}`,
+`{anchorage}`, `{anchorage_fathoms}`, `{cast_in}`, `{course_in}`, `{light_sail}` and the
+thresholds), and the transitions as rows (`from`, `on`, `to`, `unless`). `Planner` works
+the legs over the chart's own data: each port's `tracks` (`to_sea`, `from_sea`, `in`, in
+`data/ports/*.yaml`) and the common tracks of a region (`tracks:` in
+`data/charts/features/<region>.yaml`, which the features loader ignores and `load_tracks`
+reads), joined by a shortest path over the marks whose lines the shore clears
+(`chart.line_shore`, `line_passes`), a headland rounded with its offing (`OFFING_NM`), the
+port's road, anchorage and pilot water as the port's data. `Captain` is the state machine:
+`tick` judges every `JUDGE_EVERY_S` after `JUDGE_FIRST_S`, perceives through the readings
+registry only (`Perception.read`: the mean wind, the heading and speed, the visibility,
+the daylight, the land and the nearest land, the anchor, the manoeuvre, the strangers, the
+port, the pilot, the boat, the manifest, the purse, the prices, the tide by the almanac,
+the glass's tendency, the dangers), enters a state by loading its book under the state's
+name (`Runtime.load_book`, `Rule.book`; the player's own rules are kept and listed beside
+it) and leaves it by unloading, fires the transitions the doctrine gives on the stimuli
+it perceives, and makes the few judgements in code: buying the cargo when the boat is
+alongside and the purse allows (`tons = min(room, purse * 0.95 / price)`), sailing on the
+tide that serves (`_tide_serves`, by the almanac), the boat sent for the prices once
+brought up, selling at the port of the intent, the anchor on a foul berth
+(`ANCHORAGE_FATHOMS`, the anchorage's book rule), the lee shore (`DANGER_BERTH_NM`), the
+stranger investigated, chased, evaded or lost by the role, and **the rule of the road as
+1805 had it** (`_rule_of_the_road`: the starboard-tack ship close-hauled stands on, the
+larboard-tack ship gives way, a ship running keeps clear of one by the wind; at
+`ROAD_CABLES`, never for a pilot boat or a sail spoken). Every doing is an order through
+`World.submit` under the actor `captain's rule '<state>'` with a said line (`By the
+captain, <state>: <gerund> (<why>)`), not journaled, replayed by the rules, and a
+checkpoint holds him. `captains.resolve_state` is the far-detail interface: a far ship's
+`Vessel.state` resolves into her plan for two states (`on passage`: her legs; `hove to for
+weather`: no way, the plan saved in `saved_plan`), and refuses the rest until the crewed
+promotion (43). **The floor**: `data/scenarios/merchant-intent.yaml`, the schooner with
+`intent: trade tin from Falmouth to Brest` and no book, buys forty-seven tons on the boat's
+return, sails on the ebb by the eastern channel, beats off the Lizard and lays the course
+again, casts for the soundings south-west of Ushant, takes the pilot of Brest in the
+Iroise, anchors in the Bay in twelve fathoms and a half, sends for the prices and sells
+at £270, by rules alone and with no model seated (pinned in `tests/test_known_truths.py`).
+**Nothing in `captains.py` reads the world's truth**: a test greps the module for every
+road to it, and two ships of one seed whose true places differ and whose accounts are one
+are perceived alike (`tests/test_captains.py`). The merchant passage and the naval cruise
+keep their books and their digests: a scenario with a book and no intent has its captain
+named and standing aside (truth 77).
+
 ### 5. The officer's own reckoning (`freesail/world/reckoning.py`; `freesail/agents/tools.py`)
 
 G19's small step, true to the period: an officer may keep a reckoning of his own from the
@@ -225,19 +338,40 @@ the officer with the same grammar as the player's; `work my reckoning` and `the
 officer's reckoning`; `stand down the captain`; the station's name at each door
 (`--station captain`). The captain's station brief head (M4 §11) says the voyage.
 
+**As built (package 40).** `the people` (`readings.people`) says each person's rank by the
+wardroom file and who is in command; `the captain` (`the captain`, `who commands`;
+`readings.captain`) says who holds the station and through which door, whose the deck is
+(his, lent to his book, or the rules' own), the book he sails by and the books loaded,
+and the rules-based captain's name, role, intent and state; `stand down the captain` and
+`resume the captain` are the owner's through the stations grammar; `you have the deck`,
+`you may ...`, `tell` and `ask` from the captain's station are judged as the captain's own;
+`show the standing orders` lists a state's book beside the player's, each rule marked with
+its book; the world order `captain: <intent>` sets the intent (`orders.CHANNELS` and the
+vocabulary's channels); `--station captain` at the bridge (`take_command`), the runner
+and the REPL; `--seat officer` at the console and the server, and `answer <words>` at the
+seat. `work my reckoning` and `the officer's reckoning` are 40b's.
+
 ### 8. Truths for 6a (behavioural)
 
 77. The merchant passage and the naval cruise sail under the rules-based captain named,
     with no model seated, to the same digests as before (the floor is the game as it was).
+    *Built by 40*: `test_truth_77_*` in `tests/test_known_truths.py`, the captain named
+    and standing aside on both, the digests as pinned by 37m; and the new scenario of the
+    schooner trading on an intent alone (`merchant-intent.yaml`) pinned whole.
 78. A fake captain through the harness commands the merchant passage from Falmouth to Brest
     by its book and six direct orders, and the log is the same book's log with his six
-    orders in it under his mark.
+    orders in it under his mark. *Built by 40*: `test_truth_78_*` (the passage whole) and
+    `tests/test_captain.py` (its first two hours).
 79. A silent captain's door passes the deck to his book within the station's patience, the
-    log says so, and the book brings her to the anchor.
+    log says so, and the book brings her to the anchor. *Built by 40*: `test_truth_79_*`
+    on the same run (the six orders given, then silence: the deck to the book at the
+    patience, the pause at twice it, the book's anchors and the sale as with nobody
+    seated), and on the intent scenario in `tests/test_captain.py` (the rules stand in).
 80. An officer's reckoning worked from the slate agrees with the master's within the
-    master's doubt when both are right, and the log shows both at noon.
+    master's doubt when both are right, and the log shows both at noon. *40b's.*
 81. No reading at the captain's station gives the truth by any road (37j's proof extended
-    to the new tools).
+    to the new tools). *Built by 40*: `test_truth_81_*` and
+    `tests/test_captain.py::test_the_captain_and_the_people_readings_give_who_commands_and_no_truth`.
 
 ### 9. Gate 6a (outline)
 

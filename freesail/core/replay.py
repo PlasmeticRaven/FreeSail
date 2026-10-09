@@ -150,6 +150,16 @@ def _give(world: World, entry: dict[str, Any]) -> None:
         return
     line = entry["line"]
     world.record_driver(line["severity"], line["kind"], line["text"], line.get("data"))
+    data = line.get("data") or {}
+    if line["kind"] == "seat.taken":
+        # the player seated at a station by a driver (package 40; `agents.seat`): seated
+        # again here, before the orders he gave from it
+        from freesail.agents.seat import seat_player
+
+        seat_player(world, str(data.get("station", "")), str(data.get("door", "")), quiet=True)
+    elif data.get("seat") and getattr(world, "player_seat", None) is not None:
+        # a line of the seat's (a refusal, an answer): applied to it as when it was made
+        world.player_seat.replayed(line["kind"], line["text"], data)
 
 
 def replay_world(world: World, ship_factory: ShipFactory | None = None) -> World:

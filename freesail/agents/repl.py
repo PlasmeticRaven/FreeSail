@@ -82,6 +82,7 @@ from freesail.agents.agent import (
     TURN_ENDS_WORDS,
     SamplingPolicy,
     Station,
+    captain,
     officer,
     station_name,
     watcher,
@@ -125,9 +126,9 @@ REPLY_HINT = (
     'with >, such as > answer text="yes" or > readings.'
 )
 
-# The stations this door seats, by their factories: the watcher, and the officer of the
-# watch (`--station officer`; package 37).
-STATIONS = {"watcher": watcher, "officer of the watch": officer}
+# The stations this door seats, by their factories: the watcher, the officer of the
+# watch (`--station officer`; package 37) and the captain (`--station captain`; package 40).
+STATIONS = {"watcher": watcher, "officer of the watch": officer, "captain": captain}
 
 
 # ---------------------------------------------------------------------------

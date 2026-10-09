@@ -260,9 +260,11 @@ def _aboard(ship: Any) -> tuple[str, ...]:
     """The stations a standing order may address: those the game can man now, and any
     this game has manned."""
     extra = getattr(ship, "extra", None) or {}
-    names = list(STATIONS_ABOARD)
+    # not the captain's station (package 40): a standing order speaks for the captain,
+    # whoever holds his station, and never tells or asks him
+    names = [n for n in STATIONS_ABOARD if n != "captain"]
     for name in list(extra.get("agents") or {}) + list(extra.get("agent_journals") or {}):
-        if name not in names:
+        if name not in names and name != "captain":
             names.append(name)
     return tuple(names)
 
@@ -317,6 +319,7 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
     verb = recognises(text, ship)
     extra = getattr(ship, "extra", None) or {}
     agents = extra.get("agents")
+    seat = extra.get("player_seat")  # the player's seat at a station (package 40)
     journals = extra.get("agent_journals") or {}
     if agents is None:
         raise OrderError("This world has no stations for agents; it was made without them.")
@@ -335,10 +338,10 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
             raise OrderError(
                 f"'{norm}' is the captain's own word to the {OFFICER}, not a standing order's."
             )
-        return _deck(ship, agents, verb, text)
+        return _deck(ship, agents, verb, text, seat)
     if verb == "ask":
         station, question = _split_ask(text, ship)
-        agent = _manned(agents, station)
+        agent = _manned(agents, station, seat)
         return (
             "agent.asked",
             agent.put_question(question, by=by, officer=officer),
@@ -346,13 +349,13 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
         )
     if verb == "tell":
         station, words = _split_ask(text, ship, verb="tell")
-        held = agents.get(station)
+        held = _held(agents, station, seat)
         if (held is None or not held.started or held.agent.released) and not by:
             # the captain's own word is kept (a station a replay has yet to seat is held by
             # nobody yet); a standing order's firing to nobody is refused as it always was,
             # or a book would fill the journal every glass
             return _keep_word(ship, station, words)
-        agent = _manned(agents, station)
+        agent = _manned(agents, station, seat)
         return (
             "agent.told",
             agent.put_word(words, by=by, officer=officer),
@@ -370,7 +373,7 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
     m = (_STAND_DOWN if verb == "stand down" else _RESUME).match(norm)
     assert m is not None
     station = _station_in(m.group("who") or m.groupdict().get("who2") or "", ship) or ""
-    agent = _manned(agents, station)
+    agent = _manned(agents, station, seat)
     if verb == "stand down":
         return (
             "agent.stand_down",
@@ -406,24 +409,34 @@ def _keep_word(ship: Any, station: str, words: str) -> tuple[str, str, dict[str,
     )
 
 
-def _manned(agents: dict[str, Any], station: str) -> Any:
-    agent = agents.get(station)
+def _manned(agents: dict[str, Any], station: str, seat: Any = None) -> Any:
+    agent = _held(agents, station, seat)
     if agent is None:
         raise OrderError(f"There is no {station} at the station; nobody has been stationed there.")
     return agent
 
 
+def _held(agents: dict[str, Any], station: str, seat: Any = None) -> Any:
+    """Who holds a station: its harness, or the player's seat at it (package 40;
+    `agents.seat`), to which the captain's sentences go as to a harness."""
+    agent = agents.get(station)
+    if agent is None and seat is not None and seat.station.name == station:
+        return None if seat.agent.released else seat
+    return agent
+
+
 def _deck(
-    ship: Any, agents: dict[str, Any], verb: str, text: str
+    ship: Any, agents: dict[str, Any], verb: str, text: str, seat: Any = None
 ) -> tuple[str, str, dict[str, Any]]:
-    """The deck's sentences (package 37), carried out by the officer's harness."""
+    """The deck's sentences (package 37), carried out by the officer's harness, or by
+    the player's seat at the station (package 40)."""
     deck = normalise(text).replace(" , ", ", ")
     if _HAND_OVER.match(deck):
         raise OrderError(
             f"'hand over the deck' is the {OFFICER}'s own order, given with his note; the "
             "captain takes the deck with 'I have the deck'."
         )
-    agent = agents.get(OFFICER)
+    agent = _held(agents, OFFICER, seat)
     if agent is None:
         raise OrderError(
             f"There is no {OFFICER} at the station; a model's door seats one first "

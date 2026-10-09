@@ -334,6 +334,17 @@ TAKE_THE_WATCH = (
     "each of your turns."
 )
 
+# ...and to take the captain's station (package 40): the deck is the model's by right of
+# the station, the owner at the door.
+TAKE_COMMAND = (
+    "Please connect to the FreeSail game through its tools and read what its harness sends "
+    "you first. If it offers you the captain's station, read the voyage, the ship, the "
+    "people and the book you inherit in the brief, and command her as the brief describes: "
+    "by direct orders and by standing orders of your own, the deck yours from the start "
+    "and lent to your book while you are silent; hand the floor back with say or stand_by "
+    "at each of your turns. The owner is at the door and his words reach you as the owner's."
+)
+
 CONSENT, STATION, STOPPED = "consent", "station", "stopped"
 
 # The model name `.mcp.json` carries until the owner sets it: the bridge stations nobody
@@ -1194,6 +1205,16 @@ def build_server(bridge: Bridge) -> MCPServer:
     def take_the_watch() -> str:
         return TAKE_THE_WATCH
 
+    @srv.prompt(
+        name="take_command",
+        description=(
+            "Ask the model to connect to the FreeSail game as the captain and command her "
+            "by her brief (the bridge started with --station captain; package 40)."
+        ),
+    )
+    def take_command() -> str:
+        return TAKE_COMMAND
+
     return srv
 
 
@@ -1212,8 +1233,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--station",
         default="watcher",
-        choices=["watcher", "officer"],
-        help="the station asked for: the watcher, or the officer of the watch (package 37)",
+        choices=["watcher", "officer", "captain"],
+        help=(
+            "the station asked for: the watcher, the officer of the watch (package 37) or "
+            "the captain (package 40)"
+        ),
     )
     ap.add_argument(
         "--wait",

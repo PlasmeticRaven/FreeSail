@@ -67,7 +67,9 @@ def test_every_station_holder_has_his_outline_his_rank_and_his_place_from_the_fi
     for p in people.all:
         assert p.outline is not None, p.role
         assert p.outline.traits and p.outline.history and p.outline.brief, p.role
-        assert p.rank == p.outline.rank and p.to_dict()["rank"] == p.rank
+        assert p.rank == p.outline.rank
+        # the rank and the station are not in the dict that rides the log (the digests)
+        assert "rank" not in p.to_dict() and "station" not in p.to_dict()
     captain = people.captain
     assert captain.rank == "post-captain"
     words = captain.outline_words()

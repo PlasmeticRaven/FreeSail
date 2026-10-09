@@ -37,6 +37,8 @@ __all__ = [
     "Item",
     "Transcript",
     "call",
+    "captain_of_the_ship",
+    "keep_the_command",
     "narrator",
     "officer_of_the_watch",
     "reply",
@@ -242,3 +244,45 @@ def keep_the_deck(last: dict[str, Any], turns: Sequence[Turn]) -> Reply:
 
 def officer_of_the_watch() -> Fake:
     return Fake([keep_the_deck], loop=True)
+
+
+# The scripted captain (package 40; spec M6 §3, truths 78 and 79): takes the station,
+# notes it in the journal, gives the direct orders it was handed one a sample (in
+# `orders`), answers a question from the readings, and otherwise stands by until eight
+# bells, the book holding the deck meanwhile; with `then_silent` it answers nothing once
+# its orders are given, so that the silent door passes the deck to the book (truth 79).
+
+
+def keep_the_command(orders: Sequence[str] = (), then_silent: bool = False) -> Any:
+    given: list[str] = list(orders)
+    state = {"i": 0, "took": False}
+
+    def turn(last: dict[str, Any], turns: Sequence[Turn]) -> Reply:
+        if "tool_results" in last:
+            return Reply()
+        question = last.get("question")
+        if question:
+            text = narrate(last, turns)
+            answer = text.calls[0].args["text"] if text.calls else text.text or "Nothing to report."
+            return Reply(calls=(ToolCall("answer", {"text": answer}),))
+        if not state["took"]:
+            state["took"] = True
+            return Reply(
+                text="I have the command.",
+                calls=(ToolCall("journal", {"note": "Took the command; the book read."}),),
+            )
+        if state["i"] < len(given):
+            text = given[state["i"]]
+            state["i"] += 1
+            return Reply(calls=(ToolCall("submit_order", {"text": text}),))
+        if then_silent:
+            return Reply()
+        return Reply(calls=(ToolCall("stand_by", {"until": "eight bells"}),))
+
+    return turn
+
+
+def captain_of_the_ship(orders: Sequence[str] = (), then_silent: bool = False) -> Fake:
+    """The fake at the captain's station: `orders` given one a sample after it has taken
+    the command, then standing by until eight bells (or silent, `then_silent`)."""
+    return Fake([keep_the_command(orders, then_silent)], loop=True)

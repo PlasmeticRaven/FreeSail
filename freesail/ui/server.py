@@ -117,6 +117,7 @@ from freesail.ui.console import (
     ALARM_SPEED,
     REPLAY_ANYWAY_FLAG,
     REPLAY_ANYWAY_HELP,
+    SEAT_HELP,
     SPEED_WORDS,
     book_words,
     check_agents_unattended,
@@ -398,7 +399,13 @@ class Driver:
             if path is not None:
                 # `save PATH`, as in the console: writing the disk is the driver's too
                 return self._save(path)
-            e = self.world.submit(text)
+            seat = getattr(self.world, "player_seat", None)
+            if seat is not None and not seat.agent.released:
+                # the player's seat at a station (package 40): the line is the owner's
+                # where it is his, the seat's otherwise, judged by its authority
+                e = seat.route(text)
+            else:
+                e = self.world.submit(text)
             # a question put to a station is answered on the order (spec M4 §12)
             if not self._ease_for_station():
                 self.emit_snapshot()
@@ -1121,6 +1128,7 @@ def main(argv: list[str] | None = None) -> int:
         help="where the consent records are read and written (default docs/agents/consent)",
     )
     ap.add_argument("--saves", help="where a released station saves the game (default saves/)")
+    ap.add_argument("--seat", help=SEAT_HELP)
     args = ap.parse_args(argv)
 
     import uvicorn
@@ -1136,6 +1144,10 @@ def main(argv: list[str] | None = None) -> int:
         begin(world, scenario_file)
     if args.standing_orders:
         read_standing_orders(world, args.standing_orders)
+    if args.seat:
+        from freesail.agents.seat import seat_player
+
+        seat_player(world, args.seat, door="browser")
     # package 33c (decision 30): the starter book is a choice; the opening words, on the
     # terminal and as the browser's first driver line, say how to load it or begin with none
     opening = book_words(world)

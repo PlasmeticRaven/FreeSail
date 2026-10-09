@@ -95,11 +95,13 @@ from freesail.agents import consent, tools
 from freesail.agents import harness as harness_mod
 from freesail.agents.agent import (
     A_GLASS_S,
+    CAPTAIN,
     OFFICER,
     OPT_OUT_TOKEN,
     SESSION_PLAY,
     SESSION_TEST,
     SamplingPolicy,
+    captain,
     officer,
     station_name,
     watcher,
@@ -165,8 +167,9 @@ DOORS: dict[str, tuple[str, str]] = {
 CONSENT_TOOLS_AT = {"mcp": ("answer", "opt_out"), "runner": consent.CONSENT_TOOLS}
 
 # The stations a door may ask for, each by its factory `(policy, world=...)`: the watcher,
-# and the officer of the watch (package 37), which the doors name `officer`.
-STATIONS = {"watcher": watcher, OFFICER: officer}
+# the officer of the watch (package 37), which the doors name `officer`, and the captain
+# (package 40).
+STATIONS = {"watcher": watcher, OFFICER: officer, CAPTAIN: captain}
 
 CONSENT, STATION, STOPPED = "consent", "station", "stopped"
 
