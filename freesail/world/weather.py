@@ -75,6 +75,9 @@ def _seconds(when: datetime) -> float:
 __all__ = [
     "AIR_MASSES",
     "BACKGROUND_HPA",
+    "BOX_BLEND_H",
+    "Box",
+    "CENTRE_STEP_KM",
     "Climatology",
     "Conditions",
     "Glass",
@@ -156,6 +159,16 @@ COLD_FRONT_TURN_DEG_PER_H = 6.0
 # at twice its radius).
 BOX_HALF_KM = 250.0
 SYSTEM_REACH_KM = 900.0
+# The boxes of the climatology beyond the Channel (package 38; spec M6 §26). When she
+# crosses from one box into another the background pressure and the mean gradient move
+# from the one box's to the other's over this many hours (judgement: a hectopascal or two
+# over a watch, under the change a system brings) and the next system drawn comes from
+# the box she is in; the systems in play are kept, being centres in the plane. The point
+# the draws are made about, "the box's centre", is her start, and moves with her by whole
+# steps of this many kilometres (a voyage's weather drawn about the ship; a cruise's about
+# her ground, which no scenario of the Channel leaves, so no recorded passage moves).
+BOX_BLEND_H = 6.0
+CENTRE_STEP_KM = 500.0
 # A high sits nearer than this to be "under a high" (in radii; judgement).
 UNDER_HIGH_RADII = 1.0
 
@@ -310,6 +323,16 @@ def inches(hpa: float) -> float:
     return hpa / HPA_PER_INCH
 
 
+def _gradient_vector(gradient: tuple[float, float] | None) -> tuple[float, float]:
+    """A mean gradient (hPa per 100 km, the bearing toward high pressure) as hPa per km
+    east and north; (0, 0) for none."""
+    if gradient is None:
+        return (0.0, 0.0)
+    strength, toward = gradient
+    b = math.radians(toward)
+    return (strength / 100.0 * math.sin(b), strength / 100.0 * math.cos(b))
+
+
 def _bearing_deg(dx: float, dy: float) -> float:
     return math.degrees(math.atan2(dx, dy)) % 360.0
 
@@ -368,23 +391,73 @@ class MonthTable:
 
 
 @dataclass(frozen=True)
-class Climatology:
+class Box:
+    """One box of the climatology (package 38; spec M6 §26): its twelve months, its
+    bounds in degrees (south, north, west, east; None for a table with none, the old
+    form of the file), and what it rests on."""
+
+    name: str
+    title: str
     months: dict[int, MonthTable]
+    bounds: tuple[float, float, float, float] | None
     provisional: bool
     source: str
 
     def month(self, m: int) -> MonthTable:
         return self.months[m]
 
+    def contains(self, lat_deg: float, lon_deg: float) -> bool:
+        if self.bounds is None:
+            return True
+        s, n, w, e = self.bounds
+        return s <= lat_deg <= n and w <= lon_deg <= e
+
+    def distance_deg(self, lat_deg: float, lon_deg: float) -> float:
+        """How far outside the box a point lies, in degrees (0 within it): the nearest
+        box is the one a point in no box takes."""
+        if self.bounds is None:
+            return 0.0
+        s, n, w, e = self.bounds
+        dlat = max(s - lat_deg, 0.0, lat_deg - n)
+        dlon = max(w - lon_deg, 0.0, lon_deg - e) * math.cos(math.radians(lat_deg))
+        return math.hypot(dlat, dlon)
+
+
+@dataclass(frozen=True)
+class Climatology:
+    """The climatology's boxes (`data/weather/climatology.yaml`, package 38): `months`
+    and `month` are the default box's (the Channel's, package 30's table as it was), so
+    that every reader before the boxes reads what it read; `box_at` chooses by position."""
+
+    months: dict[int, MonthTable]
+    provisional: bool
+    source: str
+    boxes: dict[str, Box] = field(default_factory=dict)
+    default: str = "channel"
+
+    def month(self, m: int) -> MonthTable:
+        return self.months[m]
+
+    @property
+    def default_box(self) -> Box:
+        return self.boxes[self.default]
+
+    def box_at(self, lat_deg: float, lon_deg: float) -> Box:
+        """The box whose bounds hold the point, the first in the file's order where two
+        overlap; the nearest box when none does."""
+        for b in self.boxes.values():
+            if b.contains(lat_deg, lon_deg):
+                return b
+        return min(self.boxes.values(), key=lambda b: (b.distance_deg(lat_deg, lon_deg), b.name))
+
 
 def _pair(d: Mapping[str, Any], *keys: str) -> tuple[float, ...]:
     return tuple(float(d[k]) for k in keys)
 
 
-def load_climatology(path: str | Path = CLIMATOLOGY_PATH) -> Climatology:
-    raw = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+def _month_tables(rows: Mapping[Any, Any], where: str) -> dict[int, MonthTable]:
     months: dict[int, MonthTable] = {}
-    for m, row in raw["months"].items():
+    for m, row in rows.items():
         m = int(m)
         high = row["high"]
         months[m] = MonthTable(
@@ -408,11 +481,52 @@ def load_climatology(path: str | Path = CLIMATOLOGY_PATH) -> Climatology:
             check={k: float(v) for k, v in row["check"].items()},
         )
     if sorted(months) != list(range(1, 13)):
-        raise WeatherError(f"{path}: the climatology needs all twelve months.")
+        raise WeatherError(f"{where}: the climatology needs all twelve months.")
+    return months
+
+
+def load_climatology(path: str | Path = CLIMATOLOGY_PATH) -> Climatology:
+    """The climatology's boxes from the file (package 38), or the one table of the file's
+    old form (`months:` at the top) as a box named `channel` with no bounds."""
+    raw = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    provisional = bool(raw.get("provisional", True))
+    source = str(raw.get("source", ""))
+    boxes: dict[str, Box] = {}
+    if raw.get("boxes"):
+        for name, spec in raw["boxes"].items():
+            b = spec.get("bounds")
+            bounds = (
+                (float(b["south"]), float(b["north"]), float(b["west"]), float(b["east"]))
+                if b
+                else None
+            )
+            boxes[str(name)] = Box(
+                name=str(name),
+                title=str(spec.get("title", name)),
+                months=_month_tables(spec["months"], f"{path}, box {name}"),
+                bounds=bounds,
+                provisional=bool(spec.get("provisional", provisional)),
+                source=str(spec.get("source", source)),
+            )
+        default = str(raw.get("default_box") or next(iter(boxes)))
+        if default not in boxes:
+            raise WeatherError(f"{path}: the default box '{default}' is not among the boxes.")
+    else:
+        default = "channel"
+        boxes[default] = Box(
+            default,
+            "the Channel",
+            _month_tables(raw["months"], str(path)),
+            None,
+            provisional,
+            source,
+        )
     return Climatology(
-        months=months,
-        provisional=bool(raw.get("provisional", True)),
-        source=str(raw.get("source", "")),
+        months=boxes[default].months,
+        provisional=provisional,
+        source=source,
+        boxes=boxes,
+        default=default,
     )
 
 
@@ -734,6 +848,12 @@ class Weather:
     """
 
     LOW_SLOTS = 3
+    # the boxes' state as a Weather pickled before package 38 (a checkpoint of an older
+    # save) lacks it: the defaults a class gives an unpickled object
+    box: Box | None = None
+    _centre: tuple[float, float] = (0.0, 0.0)
+    _blend: tuple[datetime, float, tuple[float, float], float, tuple[float, float]] | None = None
+    crossings: int = 0
 
     def __init__(
         self,
@@ -744,12 +864,24 @@ class Weather:
         climatology: Climatology | None = None,
         background_hpa: float | None = None,
         gradient: tuple[float, float] | None = None,
+        box: Box | str | None = None,
     ):
         self.start = start
         self.now = start
         self.seed = int(seed)
         self._stream = stream
         self.climatology = climatology
+        # the box she starts in (package 38): the climatology's default when none is said
+        if isinstance(box, str):
+            if climatology is None or box not in climatology.boxes:
+                raise WeatherError(f"The climatology has no box named {box!r}.")
+            box = climatology.boxes[box]
+        self.box: Box | None = (
+            box if box is not None else (climatology.default_box if climatology else None)
+        )
+        self._centre = (0.0, 0.0)  # the point the draws are made about, km from the origin
+        self._blend: tuple[datetime, float, tuple[float, float]] | None = None
+        self.crossings = 0  # how many box edges she has crossed (the tests' count)
         self.systems: list[System] = [_system_from_dict(d, start) for d in systems]
         self.scripted = bool(self.systems)
         self.draws = 0  # how many systems have been drawn (the test of "nothing random")
@@ -761,25 +893,65 @@ class Weather:
         self._serial = 0
         if background_hpa is not None:
             self._background = float(background_hpa)
-        elif climatology is not None:
-            self._background = climatology.month(start.month).background_hpa
+        elif self.box is not None:
+            self._background = self.box.month(start.month).background_hpa
         else:
             self._background = BACKGROUND_HPA
         # The mean gradient the box sits on (the Azores high to the south, the Icelandic
         # low to the north; W §1.1's westerly on a third of days is this flow), as hPa per
         # km east and north; the climatology's by month, a scenario's if it gives one.
-        if gradient is None and climatology is not None and not self.scripted:
-            gradient = climatology.month(start.month).gradient
-        self._gradient = (0.0, 0.0)
-        if gradient is not None:
-            strength, toward = gradient
-            b = math.radians(toward)
-            self._gradient = (strength / 100.0 * math.sin(b), strength / 100.0 * math.cos(b))
+        if gradient is None and self.box is not None and not self.scripted:
+            gradient = self.box.month(start.month).gradient
+        self._gradient = _gradient_vector(gradient)
         if not self.scripted and climatology is not None:
             if stream is None:
                 raise WeatherError("Seeding from the climatology needs the world's weather stream.")
             self._seed_at_start()
         self.advance(start)
+
+    # -- the boxes (package 38) ------------------------------------------------------
+
+    def locate(self, lat_deg: float, lon_deg: float, x_km: float, y_km: float) -> None:
+        """Where she is, once a minute from the World: the box she is in, and the point
+        the draws are made about. Crossing into another box starts the blend of the
+        background and the gradient toward the new box's (`BOX_BLEND_H`) and the next
+        draw comes from its table; the centre steps to her when she is `CENTRE_STEP_KM`
+        from it. Nothing is drawn here, so a day replays as before."""
+        if self.climatology is None or self.scripted or self.box is None:
+            return
+        box = self.climatology.box_at(lat_deg, lon_deg)
+        if box is not self.box:
+            self.crossings += 1
+            self.box = box
+            table = box.month(self.now.month)
+            self._blend = (
+                self.now,
+                self._background,
+                self._gradient,
+                table.background_hpa,
+                _gradient_vector(table.gradient),
+            )
+        cx, cy = self._centre
+        if math.hypot(x_km - cx, y_km - cy) >= CENTRE_STEP_KM:
+            self._centre = (x_km, y_km)
+
+    def _apply_blend(self, when: datetime) -> None:
+        """The background and the gradient on their way from the box she left to the box
+        she is in: a straight line over `BOX_BLEND_H` hours from the crossing."""
+        if self._blend is None:
+            return
+        since, from_hpa, from_grad, to_hpa, to_grad = self._blend
+        share = (when - since).total_seconds() / 3600.0 / BOX_BLEND_H
+        if share >= 1.0:
+            self._background, self._gradient = to_hpa, to_grad
+            self._blend = None
+            return
+        share = max(0.0, share)
+        self._background = from_hpa + (to_hpa - from_hpa) * share
+        self._gradient = (
+            from_grad[0] + (to_grad[0] - from_grad[0]) * share,
+            from_grad[1] + (to_grad[1] - from_grad[1]) * share,
+        )
 
     # -- the systems' names, for the director and the scenario author only ----
 
@@ -850,6 +1022,8 @@ class Weather:
 
     def _table(self, when: datetime) -> MonthTable:
         assert self.climatology is not None
+        if self.box is not None:
+            return self.box.month(when.month)
         return self.climatology.month(when.month)
 
     def _seed_at_start(self) -> None:
@@ -918,8 +1092,9 @@ class Weather:
         b = math.radians(bearing)
         tx, ty = math.sin(b), math.cos(b)
         nx, ny = -ty, tx  # the left-hand normal: north of an eastward track
-        x0 = closest * nx - SYSTEM_REACH_KM * tx
-        y0 = closest * ny - SYSTEM_REACH_KM * ty
+        cx, cy = self._centre  # the point the draws are made about (package 38)
+        x0 = cx + closest * nx - SYSTEM_REACH_KM * tx
+        y0 = cy + closest * ny - SYSTEM_REACH_KM * ty
         warm = (bearing + 45.0 + r.gauss(0.0, 12.0)) % 360.0
         cold = (bearing + 135.0 + r.gauss(0.0, 15.0)) % 360.0
         return System(
@@ -950,7 +1125,8 @@ class Weather:
         distance = r.uniform(*t.high_distance_km)
         drift_kmh = r.uniform(2.0, 8.0) * 1.852
         drift = math.radians(r.gauss(t.track_bearing_deg[0], 40.0))
-        x0, y0 = distance * math.sin(bearing), distance * math.cos(bearing)
+        cx, cy = self._centre
+        x0, y0 = cx + distance * math.sin(bearing), cy + distance * math.cos(bearing)
         return System(
             name=f"high {self._serial}",
             kind="high",
@@ -974,6 +1150,7 @@ class Weather:
         by their velocity and live by their curve, and a seeded one that has left the box
         or died is dropped and, when its slot's gap has passed, replaced by a draw."""
         self.now = when
+        self._apply_blend(when)
         for s in self.systems:
             if s.scripted:
                 x, y, hpa = _track_at(s.track, s.track_times, when)
@@ -998,13 +1175,13 @@ class Weather:
             hours = (when - s.born).total_seconds() / 3600.0
             s.x_km = s.x0_km + s.vx_kmh * hours
             s.y_km = s.y0_km + s.vy_kmh * hours
-            past = (s.x_km * s.vx_kmh + s.y_km * s.vy_kmh) / max(
-                math.hypot(s.vx_kmh, s.vy_kmh), 1e-9
-            )
+            cx, cy = self._centre
+            rx, ry = s.x_km - cx, s.y_km - cy
+            past = (rx * s.vx_kmh + ry * s.vy_kmh) / max(math.hypot(s.vx_kmh, s.vy_kmh), 1e-9)
             dead = (
                 age >= s.life_h
                 or past > SYSTEM_REACH_KM
-                or math.hypot(s.x_km, s.y_km) > 4 * SYSTEM_REACH_KM
+                or math.hypot(rx, ry) > 4 * SYSTEM_REACH_KM
             )
             if dead:
                 s.gone = True

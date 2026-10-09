@@ -17,6 +17,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 import pytest
+import yaml
 
 from freesail import units
 from freesail.api import queries
@@ -693,3 +694,145 @@ def test_from_the_harpys_own_weather_the_wind_no_longer_turns_as_the_ship_moves(
     assert sum(1 for t in turns(moving) if t >= 2.0 * units.POINT) == 0
     # and there was a breeze to turn: some knots of it the whole run, as on the day
     assert units.ms_to_knots(min(breeze)) > 1.0 and units.ms_to_knots(max(breeze)) < 10.0
+
+
+# ---------------------------------------------------------------------------
+# Package 38: the climatology's boxes (spec M6 §26, item 4)
+# ---------------------------------------------------------------------------
+
+
+def test_the_climatology_has_four_boxes_the_channels_as_it_was_and_three_provisional():
+    """The Channel's box keeps its name and every figure (the rows package 30 wrote, read
+    by `month` as before); Biscay, the Portuguese coast and the sea off Madeira are
+    PROVISIONAL and judgement in every row, each row saying what it rests on; the boxes
+    cover the corridor between them, contiguous, and a position in no box takes the
+    nearest."""
+    clim = load_climatology()
+    assert clim.default == "channel" and list(clim.boxes) == [
+        "channel",
+        "biscay",
+        "portugal",
+        "madeira",
+    ]
+    channel = clim.boxes["channel"]
+    assert channel.months is clim.months and channel.bounds == (47.5, 52.0, -20.0, 2.0)
+    assert clim.month(1).check["westerly_pct"] == 29.0 and clim.month(7).lows_per_month == 3.0
+    assert clim.month(6).high_bearing_deg == (300.0, 110.0)  # W §1: the Azores ridge
+    for name in ("biscay", "portugal", "madeira"):
+        box = clim.boxes[name]
+        assert box.provisional and "judgement" in box.source
+    raw = yaml.safe_load(W.CLIMATOLOGY_PATH.read_text(encoding="utf-8"))
+    for name in ("biscay", "portugal", "madeira"):
+        for m, row in raw["boxes"][name]["months"].items():
+            assert row["note"].startswith("judgement"), (name, m)
+    assert "note" not in raw["boxes"]["channel"]["months"][1]
+    # by position: the Channel, Biscay, Portugal, Madeira; the nearest beyond
+    assert clim.box_at(49.9, -5.0).name == "channel"
+    assert clim.box_at(45.0, -20.0).name == "biscay"
+    assert clim.box_at(38.7, -9.5).name == "portugal"
+    assert clim.box_at(32.6, -16.9).name == "madeira"
+    assert clim.box_at(36.1, -5.5).name == "portugal"  # the Strait's western door
+    assert clim.box_at(55.0, -30.0).name == "channel"
+    # the Portuguese trades and the north-east trade in the gradient's bearing
+    assert clim.boxes["portugal"].month(7).gradient == (0.25, 285.0)
+    assert clim.boxes["madeira"].month(7).gradient == (0.25, 330.0)
+
+
+def test_a_scenario_is_seeded_from_the_box_she_starts_in_and_the_channel_draws_as_before():
+    """Seeded from the Channel's box by name or by default, the systems are the same
+    draw for draw (nothing in the Channel moves); seeded off Lisbon in July the draws
+    come from the Portuguese box and the wind over a week blows mostly from the north,
+    the Portuguese trades; off Madeira from the north-east."""
+    clim = load_climatology()
+    start = datetime(1805, 7, 1)
+    a = Weather(start, Rng(7).stream("weather"), seed=7, climatology=clim)
+    b = Weather(start, Rng(7).stream("weather"), seed=7, climatology=clim, box="channel")
+    assert a.box is clim.boxes["channel"] and b.box is a.box
+    for h in range(0, 10 * 24):
+        t = start + timedelta(hours=h)
+        a.advance(t)
+        b.advance(t)
+        assert [(s.name, s.x_km, s.y_km, s.anomaly_hpa) for s in a.systems] == [
+            (s.name, s.x_km, s.y_km, s.anomaly_hpa) for s in b.systems
+        ]
+
+    def quarters(box: str) -> dict[str, int]:
+        w = Weather(start, Rng(7).stream("weather"), seed=7, climatology=clim, box=box)
+        counts = {"N": 0, "E": 0, "S": 0, "W": 0, None: 0}
+        for h in range(0, 14 * 24):
+            w.advance(start + timedelta(hours=h))
+            direction, speed = w.surface_wind_at(0.0, 0.0)
+            q = W.quarter_of(direction, speed)
+            counts[q] += 1
+        return counts
+
+    portugal = quarters("portugal")
+    madeira = quarters("madeira")
+    assert portugal["N"] > portugal["S"] and portugal["N"] >= 0.4 * sum(portugal.values())
+    assert madeira["N"] + madeira["E"] >= 0.6 * sum(madeira.values())
+
+
+def test_crossing_into_another_box_blends_the_background_over_six_hours_and_draws_from_it():
+    """The stated simple rule at a box's edge: the systems in play are kept, the
+    background pressure and the gradient move from the one box's to the other's over
+    BOX_BLEND_H hours, and the next system drawn comes from the box she is in; the
+    draws are made about a centre that steps with her by CENTRE_STEP_KM, so a voyage's
+    weather is drawn about the ship."""
+    clim = load_climatology()
+    start = datetime(1805, 7, 1)
+    w = Weather(start, Rng(7).stream("weather"), seed=7, climatology=clim, box="channel")
+    before = [s.name for s in w.systems]
+    channel_hpa = w.background_hpa
+    w.locate(49.0, -5.0, 0.0, 0.0)
+    assert w.crossings == 0 and w.box.name == "channel"
+    # she sails into Biscay: 300 km south of her start, a day out
+    w.advance(start + timedelta(hours=24))
+    w.locate(46.0, -5.0, 0.0, -330.0)
+    assert w.crossings == 1 and w.box.name == "biscay"
+    biscay_hpa = clim.boxes["biscay"].month(7).background_hpa
+    assert [s.name for s in w.systems if not s.gone] and set(before) & {s.name for s in w.systems}
+    w.advance(start + timedelta(hours=24, minutes=1))
+    assert abs(w.background_hpa - channel_hpa) < abs(biscay_hpa - channel_hpa)
+    w.advance(start + timedelta(hours=24) + timedelta(hours=W.BOX_BLEND_H / 2.0))
+    assert w.background_hpa == pytest.approx(0.5 * (channel_hpa + biscay_hpa))
+    w.advance(start + timedelta(hours=24) + timedelta(hours=W.BOX_BLEND_H))
+    assert w.background_hpa == biscay_hpa
+    # the centre steps to her once she is CENTRE_STEP_KM from it
+    assert w._centre == (0.0, 0.0)
+    w.locate(44.0, -5.0, 0.0, -560.0)
+    assert w._centre == (0.0, -560.0)
+    drawn = w.draws
+    seen: list[tuple[float, float]] = []
+    for h in range(25, 120 * 24):
+        w.advance(start + timedelta(hours=h))
+        for s in w.systems:
+            if s.kind == "low" and s.born > start + timedelta(hours=24):
+                if (s.x0_km, s.y0_km) not in seen:
+                    seen.append((s.x0_km, s.y0_km))
+    assert w.draws > drawn and seen
+    # a low drawn since is born about the new centre, not the origin: up its track from
+    # its closest point to the centre, within the reach
+    assert all(abs(y + 560.0) < 2 * W.SYSTEM_REACH_KM for _, y in seen), seen
+
+
+def test_a_world_off_lisbon_seeds_from_the_portuguese_box_and_one_in_the_channel_from_its_own():
+    """Through the World: the box by her start, located once a minute as she sails."""
+
+    def world_at(lat: float, lon: float) -> World:
+        sc = Scenario(
+            start_time=datetime(1805, 7, 1, 10, 0),
+            gustiness=0.0,
+            variability=0.0,
+            position={"lat_deg": lat, "lon_deg": lon},
+            chart="atlantic-east",
+            climatology=True,
+        )
+        return make_world(7, FRIGATE, sc)
+
+    lisbon = world_at(38.6, -9.4)
+    channel = world_at(49.9, -5.0)
+    assert lisbon.systems.box.name == "portugal" and channel.systems.box.name == "channel"
+    plane = World(seed=7, scenario=Scenario(start_time=T0, climatology=True))
+    assert plane.systems.box.name == "channel"
+    channel.run(120)
+    assert channel.systems.crossings == 0
