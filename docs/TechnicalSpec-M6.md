@@ -224,6 +224,10 @@ found by its name and its key. What 6b adds:
   domain is the reckoning, the sights, the lead and the chart queries; the deck is not his.
 - **The lookout's station**, for a small model (M5 open item 6): the masthead's sightings
   put into words, `make her out`, the warning of a danger ahead; no order but `hail`.
+- **The stand-by on several conditions** (the owner's note 3 of 2026-10-09; the review's
+  I7 item 3): `stand by until <x>, or <y>, or <z>` takes a list of conditions in the
+  standing dialect's own words, any of which wakes the station, so that the stand-by's
+  conditions are at parity with the book's.
 - **The deck's conversation.** A station addresses another by its person's name or its
   station (`ask the master for a course`, `tell the first lieutenant to shorten sail`,
   `say`), and the words are a log line on the quarterdeck or in the cabin with a place and
@@ -270,6 +274,13 @@ no key, no URL and no account detail is ever in the repository, and a test greps
 shapes of one. The consent brief's record of the door: a session through an API is a kind
 of session the brief names (§15). Cost is the owner's to watch; the door says, at each
 handover and at the end, what the server reported it used.
+
+**Image tools for image-capable doors** (the owner's note 7 of 2026-10-09; the review's
+I7 item 7): `the ship's view` from any angle and `the chart` as the player sees it, as
+images a model may ask for through a door that carries them, and shelve as it shelves the
+library. The API door is the first such door, so the design is decided with it: the open
+browser rendering on request and posting the image to the server, or the server rendering
+the chart in Python. Open until 42; the words come first.
 
 ### 14. The replay driven by the transcript (`freesail/core/replay.py`, `freesail/agents/harness.py`)
 

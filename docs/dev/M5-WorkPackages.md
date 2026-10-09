@@ -3191,6 +3191,80 @@ Tests for each branch on the frigate and on the schooner; the recorded passages
 re-measured and re-pinned where a book's `steer` now wears or tacks, with the reasons;
 the primer's two chapters say the rule.
 
+## The owner's notes of 2026-10-09, from the playtests, and where each goes
+
+Seven notes the owner was not sure survived the review's editing, read by the lead the
+same day.
+
+1. **Lead soundings on the chart read "NaN fm rock and mud".** A depth that is not a
+   number reaching the chart's figures. The client now draws any depth that is not a
+   finite number as "no bottom" (`client/map.js`, the lead's fix); the source, a cast whose
+   `depth_m` is NaN with a ground, is looked for at 37j's merge in the soundings' record
+   (`reckoning.Sounding`, `_record_cast`) and closed there.
+2. **The reckoned track is cleaned up too aggressively**: the chart keeps the last 168
+   hourly positions by account (`reckoning.TRACK_KEPT`, a week), so an eight-day game
+   loses its first days, and the owner wants the whole reckoned voyage on the chart. The
+   lead changes it after 37j lands (the file is 37j's): the whole track kept, thinned to a
+   point a watch beyond the last week, so that a long voyage's snapshot stays small.
+3. **Stand by until x, or y, or z**: several conditions on one stand-by, and the
+   stand-by's conditions at parity with the standing dialect's (the review's I7 item 3).
+   A harness item for milestone 6's wardroom package (spec M6 §11 and §12): the stand-by
+   takes a list of conditions in the dialect's own words, any of which wakes the station.
+4. **A `keep` prefix for continuous orders**: `keep the sails trimmed`, `keep the lead
+   going`, `keep her full and by` (which exists), carried out by the hands until `avast`,
+   `belay` or a stated stop; in the dialect a `keep` order is a standing order written
+   short (`keep X until Y` compiles to a rule at the right cadence with a stop condition),
+   so that it journals, conflicts and belays as one. Package 37o, Opus, after 37l lands
+   (the words are 37l's files).
+5. **A movable compass rose on the chart, and simple lines and markers for charting**:
+   the browser's chart gains a protractor rose the player drags and turns, and lines and
+   marks he lays down (a bearing line, a danger ring, a note), kept with the game and
+   drawn on the chart only, never read by the reckoning. Package 37n, Opus, now (the
+   client is untouched by the K batch).
+6. **The cutter's square sail is too short in the viewer**, and yards hoisted and
+   lowered are not drawn though the simulation hoists and sends them (31b's `sway` and
+   `send down`). Package 37n with the chart's tools: the sail's geometry from the file's
+   figures, and a yard drawn at its hoist.
+7. **Image tools for image-capable doors**: `the ship's view` from any angle and `the
+   chart` as the player sees it (the account, the track, the marks, the coast), as images a
+   model may ask for and shelve like the library (the review's I7 item 7, "after the same
+   things exist as words"). Design first: the client's canvases are the only renderers,
+   so either the open browser renders on request and posts the image to the server (no
+   new dependency; needs a browser open), or the server renders the chart itself in
+   Python (a renderer to write; the ship's view would need the projection ported).
+   Milestone 6's wardroom spec takes it as an open item (M6 §13), decided when the API
+   door exists, since that door is the first that could carry an image.
+
+## Package 37n: the chart's tools and the viewer's details (`client/map.js`, `client/app.js`, `client/style.css` for the compass rose, the lines and the marks; `freesail/ui/server.py` and `freesail/core/world.py` only to keep the player's marks with the game (saved and loaded, never read by the reckoning or the book); `client/projection.js` and `client/view.js` for the cutter's square sail and the yards at their hoist; `tools/gen_ships.py` or `data/ships/cutter.yaml` only if the square sail's figures are the file's fault; `docs/design/Presentation.md`; `docs/dev/TuningNotes.md`; `tests/test_server.py`, `tests/test_view_geometry.py`, `tests/test_canvas.py`)
+
+The owner's notes 5 and 6 above; `docs/design/Presentation.md` for the chart and the
+viewer as designed; spec M5 §17 (the captain's chart draws the account and never the
+truth). On Opus, launched 2026-10-09 beside the K batch, since none of the five touches
+the client.
+
+What to build:
+
+1. **A movable compass rose**: a protractor rose on the chart the player drags by its
+   centre and turns by its rim, graduated in points and degrees with the variation of the
+   year applied as the chart's rose is, so that a bearing or a course can be read off
+   between two points; shown and hidden by a key; its place kept in the browser only.
+2. **Lines and marks**: a line laid between two clicks (a bearing line from a mark, a
+   danger bearing), a ring of a given radius about a point, a short note at a point; each
+   drawn in the chart's hand, removable, listed in a small pane; kept with the game (saved
+   and loaded with the snapshot's own machinery), never read by anything but the chart.
+   A model's door does not see them (they are the player's pencil), unless 37o's image
+   tools later draw them.
+3. **The cutter's square sail** drawn to the file's hoist and spread (today it is too
+   short vertically); check the other three vessels' square sails against their files
+   while there.
+4. **Yards at their hoist**: a yard that the simulation has hoisted, lowered, swayed up
+   or sent down is drawn where it is (the topsail yard down on the cap with the sail
+   furled; a yard sent down drawn on deck or not at all, as the period's view shows it),
+   from the state the snapshot already carries or one field added to it.
+
+Tests for the marks saved and loaded, for the sail's geometry against the file's figures,
+and for a yard's drawn hoist; the design note brought up to date.
+
 ## Integration (the lead)
 
 The lead reviews each package against the studies and the spec, merges each wave, runs

@@ -447,7 +447,9 @@
     (rk.soundings || []).forEach(function (s) {
       var q = toPx.apply(null, frame.of(s.lat_deg, s.lon_deg));
       ctx.fillStyle = inkColour;
-      var fm = s.depth_m === null || s.depth_m === undefined ? "no bottom" : Math.round(s.depth_m / U.FATHOM) + " fm";
+      // a depth that is not a finite number is drawn as no bottom, never as "NaN fm" (the
+      // owner's note of 2026-10-09; the source is looked for in the soundings' record)
+      var fm = !Number.isFinite(s.depth_m) ? "no bottom" : Math.round(s.depth_m / U.FATHOM) + " fm";
       ctx.fillText(fm + (s.ground ? " " + s.ground : ""), q[0] + 4, q[1] - 6);
       ctx.beginPath();
       ctx.arc(q[0], q[1], 2, 0, 2 * Math.PI);
