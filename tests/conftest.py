@@ -116,6 +116,8 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_catalogue.py::test_the_other_three_wear_and_heave_to[data/ships/topsail-schooner.yaml]",
         "test_chart.py::test_a_save_on_the_chart_replays_to_the_same_digest",
         "test_chart.py::test_she_takes_the_ground_and_the_log_says_so_once_and_comes_off_again",
+        # package 38: the frigate sailed two hours across the region's edge (about 15 s)
+        "test_chart.py::test_a_fake_sailed_across_the_edge_hails_no_landfall_twice_and_loses_no_depth",
         # package 37d: the kept saves run on a watch (a glass in the fast tier)
         "test_checkpoint.py::test_a_playtest_save_loads_from_its_checkpoint_and_runs_on_a_watch[m5c-b-harpy-tick602100]",
         "test_checkpoint.py::test_a_playtest_save_loads_from_its_checkpoint_and_runs_on_a_watch[m5c-cutter-tick34091]",

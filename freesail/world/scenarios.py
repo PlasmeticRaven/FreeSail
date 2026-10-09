@@ -12,6 +12,9 @@ the captain's first orders:
                                      # frame (spec M5 §9); the sun then reads the ship's
     region: channel-west             # a chart region of data/charts/manifest.yaml (spec M5
                                      # §10): the depth, the coast, the lookout's features
+    chart: atlantic-east             # or a chart of the manifest's `charts:` (spec M6 §26,
+                                     # package 38): its regions and the corridor under them;
+                                     # `region` is a chart of that one region, as before
     ship:
       file: data/ships/frigate-36.yaml
       heading_deg: 180
@@ -125,7 +128,8 @@ class ScenarioFile:
         out = [f"Scenario: {self.scenario.name} ({self.path})."]
         if self.scenario.position:
             where = format_position(Position.from_dict(self.scenario.position))
-            chart = f", on the chart of {self.scenario.region}" if self.scenario.region else ""
+            name = self.scenario.chart or self.scenario.region
+            chart = f", on the chart of {name}" if name else ""
             out.append(f"She starts at {where}{chart}.")
         if self.script is not None:
             out += ["The weather: " + self.script.lines()[0]]
@@ -240,10 +244,15 @@ def load_scenario(path: str | Path) -> ScenarioFile:
         sc.latitude_deg = position.lat_deg
     if raw.get("region") is not None:
         sc.region = str(raw["region"])
-        if sc.position is None:
-            raise ScenarioError(
-                f"{where}: the chart region '{sc.region}' needs a position (49 52 N 6 10 W)."
-            )
+    if raw.get("chart") is not None:
+        # the chart whole (spec M6 §26; package 38): the file may say either or both, the
+        # chart winning; a region's name is a chart of that one region
+        sc.chart = str(raw["chart"])
+    if (sc.chart or sc.region) and sc.position is None:
+        raise ScenarioError(
+            f"{where}: the chart region '{sc.chart or sc.region}' needs a position "
+            f"(49 52 N 6 10 W)."
+        )
     ship = raw.get("ship") or {}
     wind = raw.get("wind") or {}
     sc.glass = bool(ship.get("glass", raw.get("glass", False)))

@@ -310,10 +310,11 @@ def _rebind(world: World) -> None:
     if not lineage or lineage[-1] != here:
         lineage.append(here)
     world.played_under = lineage
-    if world.scenario.region:
+    chart_name = getattr(world.scenario, "chart", None) or world.scenario.region
+    if chart_name:
         from freesail.world.chart import load_chart
 
-        world.chart = load_chart(world.scenario.region)
+        world.chart = load_chart(chart_name)
         if world.lookout is not None:
             world.lookout.chart = world.chart
         if world.systems is not None:

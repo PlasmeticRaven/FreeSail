@@ -131,6 +131,12 @@ READING_MAX = 8
 SHORE_CLOSE_NM = 3.0
 SHORE_CLOSE_ABOARD_NM = 1.0
 SHORE_ID = "the-shore"
+# The grain beyond which the chart under her is the corridor's or the world's and not a
+# region's (package 38; spec M6 §26, "the lookout's words are honest about it, by the
+# level's `use`"): a cell wider than this (a region's are 93 m, the corridor's 930 m) and
+# the shore is "the land" at a headland's scale, never "the land about" a named point,
+# and the sighting's data says which chart it was read from (`scale`). Judgement.
+COARSE_CELL_M = 300.0
 
 # The distance off by estimation (spec §12's words, "twelve miles by estimation"; package
 # 33a, moved here by 33b): the eye's judgement of a headland's distance from its height
@@ -529,6 +535,10 @@ class Lookout:
         d = s.to_dict()
         if s.seen_as == "sail":
             d.pop("distance_m", None)
+        if s.feature.id == SHORE_ID and s.feature.says:
+            # the shore read from the corridor or the world (package 38): the line says
+            # which chart it was read from, at a headland's scale
+            d["scale"] = s.feature.says
         return d | {
             "relative": relative_words(math.radians(s.bearing_deg) - heading_rad),
             "estimate": estimate_words(s.judged_m),
@@ -768,9 +778,19 @@ class Lookout:
         shore = self.chart.nearest_shore(pos, within_m=limit * units.NAUTICAL_MILE)
         if shore is None:
             return None
-        coast = self.chart.coast_at(pos, shore)
+        cell = self.chart.cell_m_at(pos)
+        coarse = cell is not None and cell > COARSE_CELL_M
+        coast = None if coarse else self.chart.coast_at(pos, shore)
         name = f"the land about {coast.name}" if coast is not None and coast.name else "the land"
-        land = Feature(SHORE_ID, "headland", name, pos.lat_deg, pos.lon_deg, height_m=0.0)
+        land = Feature(
+            SHORE_ID,
+            "headland",
+            name,
+            pos.lat_deg,
+            pos.lon_deg,
+            height_m=0.0,
+            says=self.chart.use_at(pos) if coarse else "",
+        )
         return Sighting(land, shore.bearing_deg, shore.distance_m, "land")
 
     # -- land ahead (package 37d) --------------------------------------------------------

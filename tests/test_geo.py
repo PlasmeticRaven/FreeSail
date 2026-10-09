@@ -216,3 +216,46 @@ def test_the_scenario_file_reads_the_position_and_the_region(tmp_path):
     r.write_text("name: x\nposition: nowhere\n", encoding="utf-8")
     with pytest.raises(ScenarioError, match="position"):
         load_scenario(r)
+
+
+# ---------------------------------------------------------------------------
+# Package 38: `chart:` beside `region:` (spec M6 §26)
+# ---------------------------------------------------------------------------
+
+
+def test_the_scenario_file_reads_a_chart_beside_a_region_and_a_save_before_it_loads(tmp_path):
+    """`chart: atlantic-east` loads the chart whole; `region:` is a chart of that one
+    region as before; a file may say both, the chart winning; a chart needs a position
+    too; a save from before the field loads with none."""
+    p = tmp_path / "off-lisbon.yaml"
+    p.write_text(
+        "name: Off Lisbon\nstart: 1805-06-01T10:00\nposition: 38 36 N 9 24 W\n"
+        "chart: atlantic-east\nship: {heading_deg: 180}\n",
+        encoding="utf-8",
+    )
+    sf = load_scenario(p)
+    assert sf.scenario.chart == "atlantic-east" and sf.scenario.region is None
+    assert "on the chart of atlantic-east." in sf.lines()[1]
+    w = point_world(chart="atlantic-east", position={"lat_deg": 38.6, "lon_deg": -9.4})
+    assert w.chart.name == "atlantic-east" and w.chart.level_at(w.position) == 1
+    both = point_world(
+        chart="atlantic-east", region="channel-west", position={"lat_deg": 49.0, "lon_deg": -6.0}
+    )
+    assert both.chart.name == "atlantic-east" and both.chart.regions == ["channel-west"]
+    data = both.save()
+    assert data["scenario"]["chart"] == "atlantic-east"
+    copy = replay_mod.replay(data, None)
+    assert copy.chart.name == "atlantic-east"
+    old = dict(data["scenario"])
+    del old["chart"]
+    assert (
+        Scenario.from_dict(old).chart is None and Scenario.from_dict(old).region == "channel-west"
+    )
+    q = tmp_path / "bad.yaml"
+    q.write_text("name: x\nchart: atlantic-east\n", encoding="utf-8")
+    with pytest.raises(ScenarioError, match="needs a position"):
+        load_scenario(q)
+    with pytest.raises(ValueError, match="outside the chart region 'atlantic-east'"):
+        point_world(chart="atlantic-east", position={"lat_deg": 55.0, "lon_deg": -20.0})
+    with pytest.raises(ValueError, match="no chart region named"):
+        point_world(chart="the-moon", position={"lat_deg": 49.0, "lon_deg": -6.0})

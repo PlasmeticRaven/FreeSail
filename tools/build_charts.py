@@ -2,9 +2,17 @@
 files (spec M5 §10; the study `docs/design/ChartData.md` §5.4; package 32).
 
     python tools/build_charts.py [--cache DIR] [--region channel-west] [--world]
-                                 [--atlantic] [--skip-fetch] [--report FILE]
+                                 [--atlantic] [--corridor atlantic-corridor]
+                                 [--check channel-west] [--skip-fetch] [--report FILE]
 
-Run by a developer, never by the game. The steps, as the study lists them:
+Run by a developer, never by the game. Since package 38 (spec M6 §26) the manifest holds
+more than one region and the charts over them: `--region` builds one region and leaves
+every other region's tiles and manifest entry as they were; `--corridor` builds the
+corridor at level 1 from GEBCO over the voyage's whole water (32 N to 51 N, 20 W to 1 W),
+which is committed under its own folder; `--check` prints the checks a block must pass
+(`Build.check_region`; docs/dev/ChartBlocks.md) without fetching or building; `CHARTS`
+names the charts and the regions each holds, and the manifest's `charts:` lists those
+that are built. The steps of a region's build, as the study lists them:
 
 1. **Fetch** each source of the region's recipe into a cache outside the repository
    (`--cache`, default `.cache/charts` under the repository root, which git ignores),
@@ -50,6 +58,7 @@ import struct
 import sys
 import time
 import urllib.request
+import warnings
 import zipfile
 import zlib
 from dataclasses import dataclass
@@ -164,6 +173,23 @@ SOURCES: dict[str, dict[str, Any]] = {
 # The regions' recipes
 # ---------------------------------------------------------------------------
 
+# The form a block fills (spec M6 §26; package 38; docs/dev/ChartBlocks.md), one entry a
+# region. Every key is read:
+#   title      the region in words, for the manifest and the browser's chart
+#   bounds     the region's bounds in degrees (south, north, west, east): the level-2
+#              tiles that meet them are built whole, and the block's features must lie
+#              within them (`check_region`)
+#   fetch      the EMODnet subset fetched: the bounds widened so that the tiles that meet
+#              them are covered whole (a quarter of a degree about is enough)
+#   harbours   the level-3 harbour patches (C §5.2: 15' x 15' each), as tile groups, each
+#              a box; a port file's road or an override's sheet names one
+#   sources    the ids of `SOURCES` the region's tiles are cut from, in the order they are
+#              laid (the first for the depth and the coast, the next under it where the
+#              first has nothing); each must carry a licence in `ALLOWED_LICENCES`
+# Beside the recipe a block adds `data/charts/features/<region>.yaml`, the overrides under
+# `data/charts/overrides/<region>/` and lists the region in a chart of `CHARTS`. The
+# checks a block must pass are printed by `python tools/build_charts.py --check <region>`
+# and at every build of the region.
 REGIONS: dict[str, dict[str, Any]] = {
     "channel-west": {
         "title": "The western Channel and the Western Approaches, Falmouth to Ushant",
@@ -179,11 +205,58 @@ REGIONS: dict[str, dict[str, Any]] = {
             # package 35b: Roscoff's harbour and the channel of the Isle of Bas
             "roscoff": {"south": 48.71, "north": 48.76, "west": -4.07, "east": -3.95},
         },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+    },
+}
+
+# The corridor (spec M6 §26; package 38; the owner's ruling 5): level 1 from GEBCO over
+# the voyage's whole water, 32 N to 51 N and 20 W to 1 W at 30", built by `--corridor`
+# and COMMITTED under `tiles/1/<name>/` (the one level-1 folder git keeps: .gitignore),
+# so that a clone plays the voyage where no region is built yet. The recipe's form is a
+# region's less the harbours: the bounds, the fetch box, the datum (mean sea level, as
+# the level has it: GEBCO's own) and the source.
+CORRIDORS: dict[str, dict[str, Any]] = {
+    "atlantic-corridor": {
+        "title": "The corridor: the Western Approaches, Biscay and the Iberian coast to Madeira",
+        "level": 1,
+        "bounds": {"south": 32.0, "north": 51.0, "west": -20.0, "east": -1.0},
+        "fetch": {"south": 31.9, "north": 51.1, "west": -20.1, "east": -0.9},
+        "datum": "mean sea level",
+        "source": "gebco_2025",
+        "folder": "tiles/1/atlantic-corridor",
+    },
+}
+
+# The charts (spec M6 §26; package 38): each names the regions it holds, in the order
+# their features are indexed and their coasts drawn, and the corridor under them. A
+# region named here and not yet built is left out of the manifest's chart with a note;
+# a block adds its region here when its tiles are built (docs/dev/ChartBlocks.md).
+CHARTS: dict[str, dict[str, Any]] = {
+    "atlantic-east": {
+        "title": "The Channel, Biscay and the Iberian coast to Madeira and the Strait",
+        "regions": ["channel-west"],
+        "corridor": "atlantic-corridor",
     },
 }
 
 WORLD = {"level": 0, "south": -90.0, "north": 90.0, "west": -180.0, "east": 180.0}
 ATLANTIC = {"level": 1, "south": -60.0, "north": 70.0, "west": -100.0, "east": 20.0}
+
+# A corridor tile's blocks of cells whose shoalest sounding is kept beside the tile's
+# (package 38): 32 cells of 30" are about 30 km, so the grounding check's short-circuit
+# holds over the open sea of a tile that holds a coast somewhere in its four degrees.
+CORRIDOR_MIN_BLOCK = 32
+
+# The shore swept for GEBCO's fill (spec M5 §33 item 16; package 38): where EMODnet has
+# no value and GEBCO's fill under it reads water shallower than this, the cell may be a
+# town or a rock the fifteen-second cell straddled (Roscoff's town read a metre of water
+# in package 35b). The sweep prints the places, clustered by this many degrees.
+FILL_SWEEP_SHALLOW_M = 3.0
+FILL_SWEEP_CELL_DEG = 0.05
+# The references' form (docs/references/README.md, "How to cite in data files"): a work
+# and its year ("White 1835, 'Coast of England', p. 16"), or one of the named modern
+# references the Channel's file uses; a source in neither form is printed by the check.
+REFERENCE_FORMS = ("Trinity House", "encyclopaedia", "Modern chart", "The study", "RMG", "SHOM")
 
 GEBCO_APP = "https://download.gebco.net"
 GEBCO_ZIP_URL = (
@@ -1182,6 +1255,7 @@ class Build:
             f"  {len(patches)} override patches in {len(override_records)} files; "
             f"{len(features)} features"
         )
+        self.check_region(region, features, override_records)
         # level 2: the region whole
         out: dict[str, Any] = {
             "title": recipe["title"],
@@ -1279,6 +1353,9 @@ class Build:
         # and never read for depth there
         unknown = np.isnan(elev)
         elev = np.where(unknown, under, elev)
+        if coast_lines is not None:
+            # the shore swept for GEBCO's fill (spec M5 §33 item 16), once, over the region
+            self._sweep_fill(unknown, under, lats, lons)
         shoal = g_emod_max.sample(lats, lons)
         elev, written = apply_patches(elev, lats, lons, patches, self.log)
         shoal = np.where(written, elev, shoal)
@@ -1359,6 +1436,282 @@ class Build:
             f"({len(tiles) * TILE * TILE * 4:,} raw)"
         )
         return records
+
+    # -- the blocks' checks (spec M6 §26; package 38) ----------------------------------
+
+    def check_region(
+        self,
+        region: str,
+        features: list[dict[str, Any]],
+        override_records: list[dict[str, Any]],
+        others: dict[str, Any] | None = None,
+    ) -> list[str]:
+        """The checks a block must pass, printed (docs/dev/ChartBlocks.md): the recipe's
+        sources carry allowed licences; every feature lies within the region's bounds;
+        every feature id is unique across the manifest's regions (`others`: the last
+        manifest's regions, read when not given); every feature's source is in the
+        references' form; every harbour patch (override) states its datum and the
+        datum's height above the chart's. A failure is a `SystemExit` in words, after
+        every check has been printed; the shore's sweep for GEBCO's fill is the build's
+        (`_sweep_fill`), since it needs the grids."""
+        recipe = REGIONS[region]
+        b = recipe["bounds"]
+        failures: list[str] = []
+        self.log(f"Checks for the block {region}:")
+        # 1. the licences
+        for sid in recipe.get("sources") or []:
+            s = SOURCES.get(sid)
+            if s is None:
+                failures.append(f"the recipe names the source '{sid}', which SOURCES has not")
+            elif s["licence"] not in ALLOWED_LICENCES:
+                failures.append(f"the source {sid} carries the licence {s['licence']}, not allowed")
+        if not recipe.get("sources"):
+            failures.append("the recipe names no sources")
+        self.log(
+            f"  licences: {', '.join(recipe.get('sources') or []) or 'none'} "
+            f"({'allowed' if not failures else 'FAILED'})"
+        )
+        # 2. the features within the bounds
+        outside = [
+            f["id"]
+            for f in features
+            if not (
+                b["south"] <= float(f["lat_deg"]) <= b["north"]
+                and b["west"] <= float(f["lon_deg"]) <= b["east"]
+            )
+        ]
+        if outside:
+            failures.append(f"features outside the region's bounds: {', '.join(outside)}")
+        self.log(f"  features within the bounds: {len(features) - len(outside)} of {len(features)}")
+        # 3. the ids unique across the manifest
+        if others is None:
+            others = _last_manifest().get("regions") or {}
+        clashes = []
+        mine = {f["id"] for f in features}
+        for other, spec in others.items():
+            if other == region:
+                continue
+            path = CHARTS_DIR / spec.get("features", f"features/{other}.yaml")
+            if not path.exists():
+                continue
+            doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+            theirs = {f["id"] for f in doc.get("features") or []}
+            for fid in sorted(mine & theirs):
+                clashes.append(f"{fid} (also in {other})")
+        if clashes:
+            failures.append(f"feature ids given in another region too: {', '.join(clashes)}")
+        self.log(
+            f"  ids unique across the manifest's regions: "
+            f"{'yes' if not clashes else 'NO, ' + str(len(clashes)) + ' clash'}"
+        )
+        # 4. the sources in the references' form
+        odd = [
+            f["id"]
+            for f in features
+            if not re.search(r"\b1[5-9]\d\d\b|\b20\d\d\b", str(f["source"]))
+            and not any(form in str(f["source"]) for form in REFERENCE_FORMS)
+        ]
+        if odd:
+            failures.append(
+                f"feature sources not in the references' form (a work and its year, or a "
+                f"named reference): {', '.join(odd)}"
+            )
+        self.log(
+            f"  sources in the references' form: {len(features) - len(odd)} of {len(features)}"
+        )
+        # 5. the harbour patches' datum stated
+        undated = [
+            r["file"]
+            for r in override_records
+            if not str(r.get("datum") or "").strip() or r.get("datum_above_chart_datum_m") is None
+        ]
+        if undated:
+            failures.append(f"overrides without a datum stated: {', '.join(undated)}")
+        self.log(
+            f"  harbour patches with their datum stated: "
+            f"{len(override_records) - len(undated)} of {len(override_records)}"
+        )
+        for line in failures:
+            self.log(f"  FAILED: {line}")
+        if failures:
+            raise SystemExit(f"the block {region} fails its checks: {'; '.join(failures)}")
+        self.log(
+            "  the block passes its checks (the shore's sweep for GEBCO's fill is the build's)."
+        )
+        return failures
+
+    def _sweep_fill(
+        self, unknown: np.ndarray, under: np.ndarray, lats: np.ndarray, lons: np.ndarray
+    ) -> None:
+        """The shore swept for GEBCO's fill (spec M5 §33 item 16): the cells EMODnet
+        leaves unknown where GEBCO's fill reads water shallower than FILL_SWEEP_SHALLOW_M,
+        which may be a town or a rock its fifteen-second cell straddled, clustered by
+        FILL_SWEEP_CELL_DEG and printed largest first (the ten largest), for the block to
+        patch or to say are water."""
+        suspect = unknown & (under < 0.0) & (under > -FILL_SWEEP_SHALLOW_M)
+        rr, cc = np.nonzero(suspect)
+        total = int(len(rr))
+        if total == 0:
+            self.log("  the shore swept for GEBCO's fill: nothing suspect")
+            return
+        keys = np.floor(lats[rr] / FILL_SWEEP_CELL_DEG).astype(np.int64) * 100000 + np.floor(
+            lons[cc] / FILL_SWEEP_CELL_DEG
+        ).astype(np.int64)
+        cells, counts = np.unique(keys, return_counts=True)
+        order = np.argsort(-counts)
+        self.log(
+            f"  the shore swept for GEBCO's fill: {total} cells where EMODnet has nothing and "
+            f"GEBCO reads under {FILL_SWEEP_SHALLOW_M:g} m of water, in {len(cells)} places of "
+            f"{FILL_SWEEP_CELL_DEG:g} degrees; the largest:"
+        )
+        for k in order[:10]:
+            key = int(cells[k])
+            lat_cell, lon_cell = divmod(key, 100000)
+            if lon_cell > 50000:  # a negative longitude's cell wrapped by divmod
+                lon_cell -= 100000
+                lat_cell += 1
+            self.log(
+                f"    {int(counts[k])} cells about {(lat_cell + 0.5) * FILL_SWEEP_CELL_DEG:.2f} N, "
+                f"{abs((lon_cell + 0.5) * FILL_SWEEP_CELL_DEG):.2f} "
+                f"{'W' if lon_cell < 0 else 'E'}"
+            )
+
+    # -- the corridor (spec M6 §26; package 38) --------------------------------------
+
+    def build_corridor(self, name: str) -> dict[str, Any]:
+        """Level 1 over the corridor's box from GEBCO's area extract: the extract at 15"
+        sampled at the level's 30" cell centres (bilinear at the shared corner of four
+        cells, which is their mean), NODATA beyond the fetch box, the distance field over
+        the block so that a landfall is a landfall at a headland's scale, and each tile
+        written under the corridor's own folder with its minimum depth; the manifest's
+        entry records the source, the licence and the checksum of the extract."""
+        recipe = CORRIDORS[name]
+        level = int(recipe["level"])
+        b = recipe["bounds"]
+        source = SOURCES[recipe["source"]]
+        if source["licence"] not in ALLOWED_LICENCES:
+            raise SystemExit(f"the corridor's source carries {source['licence']}, not allowed")
+        self.log(f"Corridor {name}: {recipe['title']}")
+        self.log("Fetching the source:")
+        fetched = fetch_gebco_extract(recipe["fetch"], self.cache, self.skip_fetch, self.log)
+        self.fetched[recipe["source"]].append(fetched)
+        self.log("Reading it:")
+        with zipfile.ZipFile(fetched.path) as z:
+            asc = next(n for n in z.namelist() if n.endswith(".asc"))
+            tmp = self.cache / "gebco" / asc
+            if not tmp.exists():
+                with z.open(asc) as f:
+                    tmp.write_bytes(f.read())
+        grid = read_esri_ascii(tmp)
+        self.log(f'  GEBCO {grid.cols}x{grid.rows} at {grid.cell * 3600:.1f}"')
+        cell_sec = LEVELS[level]["cell_sec"]
+        unit_m = LEVELS[level]["unit_m"]
+        tiles = tiles_over(level, b["south"], b["north"], b["west"], b["east"])
+        souths = sorted({s for s, _ in tiles})
+        wests = sorted({w for _, w in tiles})
+        rows, cols = len(souths) * TILE, len(wests) * TILE
+        south0, west0 = souths[0], wests[0]
+        lats = south0 / 3600.0 + (np.arange(rows) + 0.5) * cell_sec / 3600.0
+        lons = west0 / 3600.0 + (np.arange(cols) + 0.5) * cell_sec / 3600.0
+        self.log(f"  level {level}: {len(tiles)} tiles, {cols}x{rows} cells")
+        elev = grid.sample(lats, lons)
+        land = (elev > 0.0) & ~np.isnan(elev)
+        mid_lat = math.radians(float(lats[rows // 2]))
+        cell_ns = cell_sec * M_PER_SEC_LAT
+        cell_ew = cell_ns * math.cos(mid_lat)
+        t0 = time.time()
+        dist = distance_field(land, cell_ns, cell_ew)
+        self.log(f"    distance field in {time.time() - t0:.1f} s")
+        folder = CHARTS_DIR / str(recipe["folder"])
+        folder.mkdir(parents=True, exist_ok=True)
+        for old in folder.glob("*.npz"):
+            old.unlink()  # the corridor is rebuilt whole
+        records = []
+        for s, w in tiles:
+            r0 = int(round((s - south0) / cell_sec))
+            c0 = int(round((w - west0) / cell_sec))
+            block = elev[r0 : r0 + TILE, c0 : c0 + TILE]
+            if np.all(np.isnan(block)):
+                continue
+            dblock = dist[r0 : r0 + TILE, c0 : c0 + TILE]
+            sea = (block < 0.0) & ~np.isnan(block)
+            min_depth = float(-np.max(block[sea])) if sea.any() else float("nan")
+            dist_cells = np.clip(np.rint(dblock / cell_ns), 0, 65535).astype(np.uint16)
+            # the shoalest sounding of each block of CORRIDOR_MIN_BLOCK cells, so that the
+            # grounding check's short-circuit holds over the open sea of a tile that spans
+            # a coast (a corridor tile is four degrees and a quarter across)
+            n = CORRIDOR_MIN_BLOCK
+            blocks = block.reshape(TILE // n, n, TILE // n, n)
+            sea_blocks = np.where(np.isnan(blocks) | (blocks >= 0.0), np.nan, blocks)
+            with np.errstate(invalid="ignore"):
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore", category=RuntimeWarning)
+                    min_blocks = -np.nanmax(sea_blocks, axis=(1, 3)).astype(np.float32)
+            # each block takes the shoalest of itself and its eight neighbours, so that a
+            # ship at a block's edge (her ends a cell off) reads one value at the runtime
+            padded = np.pad(min_blocks, 1, mode="constant", constant_values=np.nan)
+            stack = np.stack(
+                [
+                    padded[i : i + min_blocks.shape[0], j : j + min_blocks.shape[1]]
+                    for i in range(3)
+                    for j in range(3)
+                ]
+            )
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", category=RuntimeWarning)
+                min_blocks = np.nanmin(stack, axis=0).astype(np.float32)
+            tname = tile_name(s, w)
+            path = folder / f"{tname}.npz"
+            np.savez_compressed(
+                path,
+                elevation=differenced(to_int16(block, unit_m)),
+                predictor=np.int16(2),
+                dist=dist_cells,
+                level=np.int16(level),
+                unit_m=np.float32(unit_m),
+                cell_sec=np.float32(cell_sec),
+                south_sec=np.int64(s),
+                west_sec=np.int64(w),
+                nodata=np.int16(NODATA),
+                min_depth_m=np.float32(min_depth),
+                min_blocks_m=min_blocks,
+                min_block_cells=np.int16(n),
+            )
+            records.append(
+                {
+                    "name": tname,
+                    "south_sec": s,
+                    "west_sec": w,
+                    "min_depth_m": None if math.isnan(min_depth) else round(min_depth, 1),
+                    "bytes": path.stat().st_size,
+                    "sha256": sha256_of(path),
+                }
+            )
+        total = sum(r["bytes"] for r in records)
+        self.log(
+            f"    written: {len(records)} tiles, {total:,} bytes compressed "
+            f"({len(records) * TILE * TILE * 4:,} raw with the distance field)"
+        )
+        return {
+            "title": recipe["title"],
+            "level": level,
+            "bounds": dict(b),
+            "fetch": dict(recipe["fetch"]),
+            "datum": recipe["datum"],
+            "source": recipe["source"],
+            "licence": source["licence"],
+            "fetched_sha256": fetched.sha256,
+            "folder": recipe["folder"],
+            "committed": True,
+            "built_by": f"python tools/build_charts.py --corridor {name}",
+            "note": (
+                "committed (spec M6 §26, the owner's ruling 5): the one level-1 folder the "
+                "repository carries, so that a clone plays the voyage; the runtime reads these "
+                "tiles under every region of a chart that names the corridor"
+            ),
+            "tiles": records,
+            "bytes": total,
+        }
 
     # -- the world and the Atlantic ----------------------------------------------------
 
@@ -1473,13 +1826,73 @@ class Build:
     # -- the manifest ----------------------------------------------------------------
 
     def write_manifest(
-        self, regions: dict[str, Any], gebco_levels: dict[str, Any], notes: dict[str, Any]
+        self,
+        regions: dict[str, Any],
+        gebco_levels: dict[str, Any],
+        notes: dict[str, Any],
+        corridors: dict[str, Any] | None = None,
     ) -> Path:
+        """The manifest, whole: the regions and the corridors built this run beside those
+        the last manifest lists and this run did not touch (package 38: a `--region` or a
+        `--corridor` build leaves every other's tiles and entry as they were, their tiles
+        checked present), the sources with every fetch this run made and, for a source
+        this run did not fetch, the last manifest's record of it (the checksums the carried
+        entries were built from), the charts over the regions present, and the notes."""
         for sid, s in SOURCES.items():
             if s["licence"] not in ALLOWED_LICENCES:
                 raise SystemExit(f"source {sid} carries the licence {s['licence']}, not allowed")
+        last = _last_manifest()
+        regions = dict(regions)
+        for name, spec in (last.get("regions") or {}).items():
+            if name in regions:
+                continue
+            if name not in REGIONS:
+                self.log(f"The last manifest's region {name} is not in REGIONS: dropped.")
+                continue
+            if not _tiles_present(spec.get("tiles") or {}, CHARTS_DIR / "tiles"):
+                self.log(f"The last manifest's region {name} has tiles missing: dropped.")
+                continue
+            regions[name] = spec
+            self.log(f"The region {name} kept as the last manifest lists it.")
+        corridors = dict(corridors or {})
+        for name, spec in (last.get("corridors") or {}).items():
+            if name in corridors or name not in CORRIDORS:
+                continue
+            folder = CHARTS_DIR / str(spec.get("folder") or f"tiles/{spec.get('level', 1)}")
+            if not all((folder / f"{t['name']}.npz").exists() for t in spec.get("tiles") or []):
+                self.log(f"The last manifest's corridor {name} has tiles missing: dropped.")
+                continue
+            corridors[name] = spec
+            self.log(f"The corridor {name} kept as the last manifest lists it.")
+        # the order of the recipes, so that the manifest reads the same whatever was built
+        regions = {k: regions[k] for k in REGIONS if k in regions}
+        corridors = {k: corridors[k] for k in CORRIDORS if k in corridors}
+        charts: dict[str, Any] = {}
+        for cname, cspec in CHARTS.items():
+            present = [r for r in cspec["regions"] if r in regions]
+            absent = [r for r in cspec["regions"] if r not in regions]
+            corridor = cspec.get("corridor")
+            if corridor and corridor not in corridors:
+                self.log(f"The chart {cname} names the corridor {corridor}, not built: left out.")
+                corridor = None
+            charts[cname] = {
+                "title": cspec["title"],
+                "regions": present,
+                **({"corridor": corridor} if corridor else {}),
+                **({"regions_not_built": absent} if absent else {}),
+            }
         sources = {}
+        last_sources = last.get("sources") or {}
         for sid, s in SOURCES.items():
+            fetched = [f.record() for f in self.fetched[sid]]
+            carried = []
+            if not fetched:
+                carried = list((last_sources.get(sid) or {}).get("fetched") or [])
+            status = (
+                "fetched"
+                if fetched
+                else ("fetched in an earlier build" if carried else "not fetched in this build")
+            )
             sources[sid] = {
                 "name": s["name"],
                 "licence": s["licence"],
@@ -1489,8 +1902,8 @@ class Build:
                 "datum": s["datum"],
                 "home": s["home"],
                 "used_for": s["used_for"],
-                "fetched": [f.record() for f in self.fetched[sid]],
-                "status": "fetched" if self.fetched[sid] else "not fetched in this build",
+                "fetched": fetched or carried,
+                "status": status,
             }
         hand = sorted((CHARTS_DIR / "features").glob("*.yaml")) + sorted(
             (CHARTS_DIR / "overrides").glob("*/*.yaml")
@@ -1498,9 +1911,9 @@ class Build:
         h = hashlib.sha256(Path(__file__).read_bytes())
         for p in hand:
             h.update(p.read_bytes())
-        for fs in self.fetched.values():
-            for f in fs:
-                h.update(f.sha256.encode())
+        for sid in SOURCES:
+            for f in sources[sid]["fetched"]:
+                h.update(str(f["sha256"]).encode())
         attribution = (
             "Chart data built from open sources, not for navigation. "
             + " ".join(SOURCES[sid]["attribution"] for sid in ("gebco_2025", "emodnet_dtm_2024"))
@@ -1526,7 +1939,12 @@ class Build:
                 for k, v in LEVELS.items()
             },
             "nodata": NODATA,
+            # the charts (spec M6 §26; package 38): each the regions it holds and the
+            # corridor under them; `load_chart` takes a chart's name or a region's
+            "charts": charts,
             "regions": regions,
+            # the corridor (package 38): level 1 over the voyage's water, committed
+            "corridors": corridors,
             # the world and the Atlantic are built by --world and --atlantic on the
             # developer's machine and never committed (spec M5 §10): the manifest says so,
             # lists their tiles only when this build made them, and the runtime reads
@@ -1546,6 +1964,23 @@ class Build:
             encoding="utf-8",
         )
         return path
+
+
+def _last_manifest() -> dict[str, Any]:
+    """The manifest as it stands before this build, or {} when there is none."""
+    path = CHARTS_DIR / "manifest.yaml"
+    if not path.exists():
+        return {}
+    return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+
+
+def _tiles_present(tiles: dict[str, Any], folder: Path) -> bool:
+    """Whether every tile a region's manifest entry lists is on disk."""
+    for level, records in tiles.items():
+        for t in records or []:
+            if not (folder / str(level) / f"{t['name']}.npz").exists():
+                return False
+    return True
 
 
 def _fetched_level(
@@ -1578,7 +2013,24 @@ def main(argv: list[str] | None = None) -> int:
         "--cache", type=Path, default=DEFAULT_CACHE, help="the fetch cache, outside the repository"
     )
     ap.add_argument(
-        "--region", action="append", default=None, help="a region to build (default: all)"
+        "--region",
+        action="append",
+        default=None,
+        help="a region to build; every other region's tiles and manifest entry are left as "
+        "they are (default: every region, unless --corridor or --check is given)",
+    )
+    ap.add_argument(
+        "--corridor",
+        action="append",
+        default=None,
+        help="a corridor to build from GEBCO at level 1 (atlantic-corridor), committed",
+    )
+    ap.add_argument(
+        "--check",
+        action="append",
+        default=None,
+        help="print the checks a block must pass for a region, without fetching or building "
+        "(the shore's sweep for GEBCO's fill needs the build)",
     )
     ap.add_argument("--world", action="store_true", help="build level 0 from GEBCO's global tiles")
     ap.add_argument("--atlantic", action="store_true", help="build level 1 (not committed)")
@@ -1599,10 +2051,32 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     report: list[str] = []
     build = Build(args.cache, args.skip_fetch, report)
+    if args.check:
+        # the block's checks alone (package 38): the hand-made files against the recipe
+        # and the last manifest; nothing fetched, nothing written
+        for region in args.check:
+            if region not in REGIONS:
+                raise SystemExit(f"no recipe for the region {region!r} in REGIONS")
+            _, override_records = load_overrides(region)
+            features, _ = load_features(region)
+            build.check_region(region, features, override_records)
+        if args.report:
+            args.report.write_text("\n".join(report) + "\n", encoding="utf-8")
+        return 0
     args.cache.mkdir(parents=True, exist_ok=True)
     regions = {}
-    for region in args.region or list(REGIONS):
+    wanted = args.region
+    if wanted is None and not args.corridor:
+        wanted = list(REGIONS)
+    for region in wanted or []:
+        if region not in REGIONS:
+            raise SystemExit(f"no recipe for the region {region!r} in REGIONS")
         regions[region] = build.build_region(region)
+    corridors = {}
+    for name in args.corridor or []:
+        if name not in CORRIDORS:
+            raise SystemExit(f"no recipe for the corridor {name!r} in CORRIDORS")
+        corridors[name] = build.build_corridor(name)
     gebco_levels = build.build_gebco_levels(args.world, args.atlantic)
     if args.reuse_world and "0" not in gebco_levels:
         # the world level as the last manifest lists it, its tiles checked present
@@ -1623,7 +2097,7 @@ def main(argv: list[str] | None = None) -> int:
             build.log("The world level kept as the last manifest lists it (--reuse-world).")
     notes_path = args.notes or CHARTS_DIR / "unverified-checks.yaml"
     notes = yaml.safe_load(notes_path.read_text(encoding="utf-8")) if notes_path.exists() else {}
-    path = build.write_manifest(regions, gebco_levels, notes)
+    path = build.write_manifest(regions, gebco_levels, notes, corridors)
     build.log(f"Manifest written: {path}")
     if args.report:
         args.report.write_text("\n".join(report) + "\n", encoding="utf-8")

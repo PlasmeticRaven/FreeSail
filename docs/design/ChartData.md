@@ -277,6 +277,19 @@ A tile is 512 × 512 cells at its level; a region is whichever tiles exist at le
 and 3. A query asks the finest level that has a tile under the point and falls back to
 the next. Adding a region later is adding tiles and a features file, nothing else.
 
+*Note (package 38, 2026-10-09; spec M6 §26).* The runtime held one region until
+milestone 6's first package: the manifest now has `charts:` (a chart names the regions
+it holds and the corridor under them) and `corridors:` (level 1 over the voyage's water,
+32 N to 51 N and 20 W to 1 W, from GEBCO at 30″, committed, with the distance field the
+table above gave the two finer levels alone, so that a landfall over the corridor is a
+landfall at a headland's scale), and a query asks the finest level across every region
+of the chart before the corridor. "Adding a region later" is now exactly that, plus a
+line in the chart's list; `docs/dev/ChartBlocks.md` says how. Two things the study did
+not foresee: the levels' datums differ at a region's edge (LAT within, mean sea level
+over the corridor: a step of a metre or two in deep water, said in the tuning notes), and
+a region's distance field knows only its own block's shores, so the query reads the
+corridor's field too where the region's tiles end within the distance it gives.
+
 ### 5.3 Disk
 
 Raw int16, before compression; compressed sizes are a guess at a factor of two to four
