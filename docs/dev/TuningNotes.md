@@ -3536,3 +3536,31 @@ None. The officer's line after the noon's is written only when an own reckoning 
 3. **Chapter 13 in the primer test**: not small, left (Found on the way, above, says why).
 
 The suite after the second round: ruff clean; the four named files 722 passed, 9 slow left out; the fast tier (`python3 -m pytest -n 4 -q`) 3075 passed, 274 slow left out, none failed. The slow tier was not run again (the lead runs it at the merge).
+
+## Milestone 6: the consent brief revised once (package 42a, 2026-10-09)
+
+Package 42a (decision 41; spec M6 §15, "Brought forward"; the brief in `docs/dev/M6-WorkPackages.md`). The one package of the milestone that touches `docs/agents/ConsentBrief.md`; nothing under `docs/agents/consent/` was touched, no model was seated and no re-ask was run. The brief below the rule is package 40's draft (`docs/playtests/drafts/consent-brief-m6-draft.md`, approved by the owner as drafted) to the character, its markers taken out by a script that asserts every replacement, with the additions for 6b and 6c in the same sections and the same voice, each a kind of thing (decision 37). 1,958 words below the rule, with the placeholders unfilled: 1,371 on 2026-10-07, 1,708 in the draft, so the additions are 250 words.
+
+### What changed, section by section, and why
+
+- **The opening.** From the draft: the captain's station exists, with the player's whole surface; the player may hold any station; the owner is always at the door. Added: the lookout (reports what is seen) and the master (works the ship's reckoning) as stations; the captain as of "a ship, the player's or another in the same world"; which kinds exist today and which are to come ("described now so that an answer covers them", the brief's honest clause for kinds not yet built); the owner at the door "whatever the door", the three doors named, the API door as "a model's own API called by the game with no chat client between", and that he may hold no station and be at the door alone (spec §15: the owner may be absent from the deck; what an API session is).
+- **What an instance would see and do.** From the draft: the captain's paragraph, and the captain over the officer. Added: the lookout and the master give no order of the deck (less authority than the officer's: not "below the officer", since `you may` reaches the master from the captain, §11); a captain of another ship keeps the station when she is far from the player's, worked by courses, sail and the plan of her passage (§20, the station across the far-detail switch); several stations held at once speak as a ship's people do, another station's words lines of the game under the speaker's name, never the operator's (§11, the deck's conversation; §15).
+- **Leaving** and **The journal.** The draft's one clause each (the captain lends the deck to its book and stays; the captain's handover note), kept as clauses at the owner's word. Nothing added.
+- **Being stopped.** From the draft: a captain's deck lent to its book while it is paused or silent. Added: a paused or silent lookout or master has its work done by the ship's own people (the master's figure falling back on the simulated master's, §11, G19's third step).
+- **What is not done.** Added: an API door's key is the developer's and in nothing the game sends, writes or saves (§13's security pass; without it "no credentials pass through the harness" would not be true of the API door); a saved game may be replayed from its record, each instance's acts given again as the game's inputs with no model asked (§14; a use of the record the transcript policy did not name).
+- **The record** and **Answering**: unchanged, to the character (asserted by the script and by the test).
+
+The head above the rule says the revision, and is not sent. Against the brief of 2026-10-07 the re-ask rule names all six watched sections, and so it does against the brief before 37g and for every yes on file (seven identities: the newest yes of each is against one of four earlier briefs); the notice reads "in 6 sections that bear on what it was told: **the opening**; **What an instance would see and do**; **Leaving**; **Being stopped**; **What is not done**; **The journal**".
+
+### Pins moved
+
+- The brief's digest: `288d0b18e34d76a8` to `d096d22a5842772f` (pinned now, `BRIEF_DIGEST` in `tests/test_officer.py`; it was not pinned before). The six watched sections pinned by the digest of their folded text (`WATCHED_SECTION_DIGESTS`).
+- The 37g test: four sections named against the brief before 37g, now six.
+- The brief's word bound: under 1,500 words as sent at the runner door, now under 2,000 (1,994).
+- The moved-out guard for the officer's resumption: "resumes" alone became "when he resumes" and "resumes you", since the draft's captain sentence, approved as drafted, says the owner "resumes" a paused captain.
+
+No recorded passage is touched: the package changes no code.
+
+### The suite, as run (package 42a)
+
+`python3 -m ruff check .` and `python3 -m ruff format --check .` clean. The three files the brief names (`python3 -m pytest tests/test_officer.py tests/test_captain.py tests/test_agents.py -q`): 180 passed, 15 slow left out. The fast tier (`python3 -m pytest -n 4 -q`, 274 slow tests left out): every test passed, none failed, with the other packages' suites running on the machine. The slow tier was not run: the package changes no code and moves no passage.
