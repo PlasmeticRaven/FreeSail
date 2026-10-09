@@ -3214,8 +3214,10 @@ same day.
    going`, `keep her full and by` (which exists), carried out by the hands until `avast`,
    `belay` or a stated stop; in the dialect a `keep` order is a standing order written
    short (`keep X until Y` compiles to a rule at the right cadence with a stop condition),
-   so that it journals, conflicts and belays as one. Package 37o, Opus, after 37l lands
-   (the words are 37l's files).
+   so that it journals, conflicts and belays as one. **Struck by the owner the same day**:
+   a step too far for now, the sails being trimmed as often as is reasonable by ways the
+   game already has, and not the most generalisable thing beside them; the thought is kept
+   here. No package.
 5. **A movable compass rose on the chart, and simple lines and markers for charting**:
    the browser's chart gains a protractor rose the player drags and turns, and lines and
    marks he lays down (a bearing line, a danger ring, a note), kept with the game and
