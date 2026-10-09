@@ -20,6 +20,7 @@ from freesail import units
 from freesail.api.queries import snapshot
 from freesail.api.session import make_world
 from freesail.core.world import Scenario
+from freesail.ship.parts import SailState
 from freesail.world import ships as S
 from freesail.world.geo import Position, bearing_and_distance, destination, horizon_nm
 
@@ -561,7 +562,7 @@ def test_a_steer_too_near_the_wind_on_the_other_tack_puts_her_about_and_keeps_he
     assert w.ship.dyn.helm_mode.value == "full_and_by"
 
 
-def test_a_steer_through_the_wake_wears_the_frigate_and_gybes_the_schooner():
+def test_a_steer_through_the_wake_wears_a_ship_with_a_square_sail_set_and_else_gybes():
     w = _under_way(25.0)
     e = w.submit("steer SSW")
     assert "SSW (202°) lies across the wind from her head, by the stern; she is worn " in e.text
@@ -571,8 +572,22 @@ def test_a_steer_through_the_wake_wears_the_frigate_and_gybes_the_schooner():
         "Wore ship; braced for the course ordered on the starboard tack, heading SSW (202°)."
     )
     assert _on(w, 202.5)
-    # a fore-and-after gybes by the helm, her boom coming over, as she always has
+    # the topsail schooner with her fore topsail and topgallant set is worn as well, her
+    # yards to be braced round (the lead's ruling on package 37m: gybed by the helm they
+    # were still braced for the old tack and laid her aback)
     w = _under_way(25.0, SCHOONER)
+    e = w.submit("steer SSW")
+    given = e.tick
+    assert "by the stern; she is worn round for it" in e.text, e.text
+    wore = _until(w, "ship.wore")
+    assert "for the course ordered" in wore.text, wore.text
+    assert _on(w, 202.5)
+    assert not [x for x in w.log if x.kind == "ship.aback" and x.tick >= given]
+    # with no square sail set a fore-and-after gybes by the helm, her boom coming over
+    w = _under_way(25.0, SCHOONER)
+    for sail in w.ship.sails.values():
+        if sail.cls == "square":
+            sail.state = SailState.FURLED
     e = w.submit("steer SSW")
     assert e.text == (
         "Helm ordered: steer SSW (202°); SSW (202°) lies across the wind from her head, by "

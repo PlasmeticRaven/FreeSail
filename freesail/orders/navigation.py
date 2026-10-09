@@ -239,9 +239,9 @@ EYE_ALLOWANCE = units.deg_to_rad(1.0)
 # knots); under it a ship that must cross the wind's eye is worn, "when ... the vessel
 # has not sufficient headway for tacking" (Luce 1866, ch. XXIV, 'Wearing').
 STAY_MIN_KN = 2.0
-# A square-rigged ship with this much way on is worn for a course through the wind's wake
-# (a knot: under that she is drifting, and a wear would not come round); and a ship that
-# must cross the wind's eye without way to stay is worn with no less.
+# A vessel with a square sail set and this much way on is worn for a course through the
+# wind's wake (a knot: under that she is drifting, and a wear would not come round); and
+# a ship that must cross the wind's eye without way to stay is worn with no less.
 WEAR_FOR_IT_MIN_MS = 0.5
 # A turn by the stern of eight points or less keeps the wind abaft the beam at both ends,
 # where a square sail fills however its yard is braced: running, the wind brought from one
@@ -298,14 +298,14 @@ def _crosses(now: float, to: float, wind_from: float) -> str | None:
     return None
 
 
-def _square_rigged_under_sail(ship: Any) -> bool:
-    """Yards on two masts and a square sail set: a ship whose turn by the stern is a wear
-    (the fold-in of m5c-c; a fore-and-after, one mast with yards, gybes by the helm)."""
-    from freesail.evolutions.scripts import _masts_with_yards
-
-    return len(_masts_with_yards(ship)) >= 2 and any(
-        sl.is_set and sl.cls == "square" for sl in ship.sails.values()
-    )
+def _square_sail_set(ship: Any) -> bool:
+    """A square sail set: a vessel whose long turn by the stern is a wear, her yards to be
+    braced round as the wind comes over (the fold-in of m5c-c for a square-rigged ship;
+    the lead's ruling on package 37m for a fore-and-after with a square sail set, the
+    topsail schooner's fore topsail and topgallant, the cutter's square sail and topsail,
+    whose yards gybed by the helm were still braced for the old tack and laid her aback).
+    With none set, a fore-and-after gybes by the helm, her boom coming over."""
+    return any(sl.is_set and sl.cls == "square" for sl in ship.sails.values())
 
 
 def manoeuvre_in_hand(ship: Any) -> Any:
@@ -332,8 +332,9 @@ def judge_course(ship: Any, course: float, helm_order: bool, points: bool = Fals
     (`come up`, `bear away`, `steer two points off`). Laid and on the tack she is on, the
     helm; across the wind's eye, put about when she has way enough to stay, else worn
     (Luce 1866, ch. XXIV, 'Wearing': "when ... the vessel has not sufficient headway for
-    tacking"); through the wind's wake, worn if square-rigged and under sail, gybed by the
-    helm if a fore-and-after; nearer the wind than she will lie, kept full and by on the
+    tacking"); through the wind's wake, worn if she has a square sail set (a square-rigged
+    ship, or a fore-and-after with her topsail set), gybed by the helm if a fore-and-after
+    with none; nearer the wind than she will lie, kept full and by on the
     tack that points nearer it, put about or worn for that tack when it is the other; a
     helm order in the wind's eye is steered as given, and the line says she will be taken
     aback. A tack or a wear in hand takes a course on the tack she is going to (an order
@@ -421,7 +422,7 @@ def judge_course(ship: Any, course: float, helm_order: bool, points: bool = Fals
                 full_and_by,
                 said_tack,
             )
-    elif _square_rigged_under_sail(ship):
+    elif _square_sail_set(ship):
         if speed > WEAR_FOR_IT_MIN_MS:
             way = "she is worn round for it" if laid else "she is worn round"
             return Judgement("wear", target, f"{what}; {way}{tail}", full_and_by, said_tack)
