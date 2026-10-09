@@ -129,6 +129,29 @@ bring her by the wind
 
 `keep her full` (or `full and by`, *bring her by the wind*, *steer by the wind*) hands the helmsman the standing task: he steers as close as she will lie with the sails drawing, and follows the wind as it shifts. On the frigate that is about 58° apparent, 70° true, at five and a half knots; a good full, a few degrees off the closest she can point, because the sails draw better there. Luce's *Nothing off!*, *No higher!* and *Luff and touch her!* are the same order given from either side of it, and the log echoes the word you used: "Helm ordered: no higher; keep her full and by." `come up` (*luff*) and `bear away` (*keep away*, *bear up*, *bear off*, *fall off*, *off the wind*, *steer off the wind*, *bear off the wind*) move the ordered course by a point, or the number of points you give (halves are taken: *half a point*, *a point and a half*), and put her on a fixed compass course from then on; say `keep her full` again to go back to sailing by the wind. *By and large* is not a helm order but a description of how she sails, and the ship refuses it. Falconer, *Luff*: "the order from the pilot to the steersman to put the helm towards the lee-side of the ship, in order to make the ship sail nearer the direction of the wind."
 
+### A course across the wind
+
+A helmsman given a course on the other side of the wind does not simply put the helm over: turned the shorter way she would come head to wind with her yards braced for the old tack and be taken aback, or swing her stern through the wind with every square sail pressed back against the masts. Every order that gives her a course (`steer`, `come up`, `bear away`, `steer two points to starboard`, and the master's `shape a course for` and `give chase`, chapters 10 and 15) is judged by one rule against her head and the wind, and the line says what she does, so that you can countermand it:
+
+| The course | What she does |
+|---|---|
+| on the tack she is on | the helm: she is steered to it |
+| across the wind's eye, the shorter way | put about for it (chapter 5), with way enough to stay (two knots); with less, worn round for it, "when ... the vessel has not sufficient headway for tacking" (Luce 1866, ch. XXIV, 'Wearing') |
+| across the wind by the stern, more than eight points round | worn round for it if she is square-rigged and under sail; a fore-and-after (the schooner, the cutter) gybes by the helm, her boom coming over, as she always has |
+| nearer the wind than six points, on the other tack | put about or worn for that tack, and kept full and by on it |
+| within a point of the wind's eye, given to the helm | steered as given, and the line warns that she will be taken aback |
+
+The tack or the wear ends by steering the course (chapter 5), so you need not give it again. A course shaped or a chase's nearer the wind than she will lie on the tack she is on is not steered: she is kept full and by, as the pilot's course is. Your own `steer` on the tack she is on is carried out however near the wind it is: pinching her, the sails "just lifting", is yours to order (Fincham's rule, truth 25), and her sails lifting and her being taken aback are said as they come (chapter 5). With no way on her, gathering way from rest or drifting, the helm is put over as you say and nothing more.
+
+```
+  Morning watch (04:25)  Helm ordered: steer E by N (79°); E by N (79°) lies across the wind's eye from her head; she is put about for it. All hands about ship.
+  Morning watch (04:25)  Helm ordered: steer SE (135°); SE (135°) lies across the wind from her head, by the stern; she is worn round for it. Stations for wearing ship.
+  Morning watch (04:25)  Helm ordered: steer NE by E (56°); NE by E (56°) lies too near the wind to be laid; she is put about and kept full and by on the larboard tack. All hands about ship.
+* Morning watch (04:25)  Helm ordered: steer N by W (349°); N by W (349°) lies in the wind's eye from her head; she will be taken aback.
+```
+
+Those are the frigate's, close-hauled on the starboard tack heading WNW in a northerly; the last is notable, and is followed within seconds by her sails lifting and "Taken aback". `tack`, `wear` and `heave to` by their own words are unchanged: they are the manoeuvre, not a course.
+
 ### Conning the helm
 
 The rest of the conning words (Luce 1866, ch. XXIV, 'Conning'; Falconer, *Helm*) speak to the wheel rather than to the course, and the game takes them as they were meant:

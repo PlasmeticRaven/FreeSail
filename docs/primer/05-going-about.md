@@ -44,7 +44,7 @@ put her about
 # rejected: tack ship on the larboard tack
 ```
 
-After a tack the yards are braced sharp up for the new tack by the evolution and the sheets are trimmed for a full-and-by wind on the new tack; `trim sails` or the book's tending routine (chapter 4) brings them to the wind she settles at, and your helm order is the new close-hauled course. Say `keep her full` if you want the helmsman sailing by the wind rather than by compass.
+After a tack the yards are braced sharp up for the new tack by the evolution and the sheets are trimmed for a full-and-by wind on the new tack; `trim sails` or the book's tending routine (chapter 4) brings them to the wind she settles at, and your helm order is the new close-hauled course. Say `keep her full` if you want the helmsman sailing by the wind rather than by compass. A tack ordered for a course (below, *Going about for a course*) ends on that course instead.
 
 ### In studding-sails first, and the bowlines
 
@@ -132,6 +132,39 @@ The log:
 ```
 
 The yards follow the wind round in stages as the watch braces the after yards and then the head yards, about a third of a degree a second, so the log has no "mainsail haul": the trim changes continuously as she turns. Half a knot of way is enough to start a wear. Nine minutes from order to *Wore ship*, which is what Luce allows a frigate (six to twelve; truth 11 of the tuning notes). She loses about a sixth of a mile to leeward doing it, less than the quarter to half a mile Luce's wear costs, because the script comes to as soon as the wind is aft instead of running her off for a spell; the map in the browser client shows it. The game does not haul up the mainsail and spanker for the wear as Luce does; a careful master gives `haul up the mainsail` and `brail up the spanker` first and sets them again after.
+
+## Going about for a course
+
+You need not say `tack` or `wear` to change tack: a course on the other side of the wind, given by `steer`, by the points orders or by the master's `shape a course for` and `give chase`, puts her about or wears her as the ship and the course allow (chapter 2, *A course across the wind*; the owner's ruling of 2026-10-09). Across the wind's eye she is put about if she has way enough to stay, two knots, and worn round if she has not; across the wind by the stern, more than eight points round, a square-rigged ship under sail is worn and a fore-and-after gybes by the helm. The manoeuvre is the same `tack` or `wear` as above, carrying the course, and ends by steering it:
+
+- **Put about for a course**, she tacks as above and, steady by the wind on the new tack, is given the course: one within half a point of close-hauled is steered with the yards braced up; one further off the wind she pays off to, her yards trimmed every twenty seconds to the wind as it draws aft and to the course's own wind at the last, as filling away for a course does (below). From a reach she is first luffed up and braced up ("Luff up and brace up: she is brought by the wind to go about."), and put about when she is by the wind, or after two minutes whatever.
+- **Worn round for a course**, she comes to the course on the new tack instead of to close-hauled, the yards following the wind round and trimmed to the course's wind when she is steady on it, and the spanker hauled out then ("On her course. Haul out the spanker!").
+- **A course nearer the wind than she will lie** on the other tack: put about or worn for that tack, and kept full and by on it.
+
+The frigate close-hauled on the starboard tack heading WNW in a northerly, given `steer E by N`:
+
+```
+  Morning watch (04:25)  Order: steer E by N.
+  Morning watch (04:25)  Helm ordered: steer E by N (79°); E by N (79°) lies across the wind's eye from her head; she is put about for it. All hands about ship.
+* Morning watch (04:25)  All hands! (to tack ship)
+  Morning watch (04:25)  Ready about. Helm's a-lee; ease off the head sheets; haul aft the spanker sheet.
+  Morning watch (04:25)  Rise tacks and sheets. Mainsail haul.
+  Morning watch (04:26)  Let go and haul. Draw jib; trim aft the head sheets.
+* Morning watch (04:32)  Tacked; braced up for the course ordered on the larboard tack, heading E by N (79°).
+  Morning watch (04:32)  Steady on E by N (79°).
+```
+
+and `steer SE`, which lies by the stern:
+
+```
+  Morning watch (04:25)  Helm ordered: steer SE (135°); SE (135°) lies across the wind from her head, by the stern; she is worn round for it. Stations for wearing ship.
+  Morning watch (04:25)  Stand by to wear ship. Up helm; brail up the spanker; brace in the after yards.
+  Morning watch (04:26)  Wind aft. Squared the head yards; shifted over the sheets; hauled out and braced up.
+  Morning watch (04:28)  On her course. Haul out the spanker!
+* Morning watch (04:31)  Wore ship; braced for the course ordered on the larboard tack, heading SE (135°).
+```
+
+A course given while she is going about or wearing, on the tack she is going to, is handed to the manoeuvre: "SW (225°): she is going about, and the course is given her as she comes round." One on the tack she is leaving is judged from where her head is then, and a second manoeuvre follows the first. An order reckoned in points (`bear away a point`) in the middle of a manoeuvre goes to the helm, as it always did. A tack that waited behind other work and finds her without way to stay when its turn comes is refused in its own words, as above, and the course with it: give it again.
 
 ## Box-hauling
 
@@ -329,5 +362,7 @@ The later word for wearing a fore-and-aft vessel is *gybe*, and the parser takes
 * Morning watch (04:28)  Wore ship; braced sharp up on the larboard tack, heading ENE (68°).
   Morning watch (04:28)  Steady on ENE (68°).
 ```
+
+Given a course on the other side of the wind by the stern, more than eight points round, a fore-and-after is not worn: she gybes by the helm, her boom coming over as the wind crosses her stern, as she always has ("SE (135°) lies across the wind from her head, by the stern; she gybes for it by the helm."). The topsail schooner's yards are not tended in that turn: gybed from close-hauled they are still braced for the old tack when the wind comes over, and she is taken aback before she pays off on to the course; `wear ship`, or `square the yards` first, is the seamanlike order for so long a turn. Across the wind's eye she is put about as any ship is.
 
 What she does not do yet: gybe as a thing of its own. There is no separate evolution to shift the main boom over with the wind aft; wearing (and so `gybe`) does it silently inside the evolution, and running by the lee costs nothing. Both are later work.
