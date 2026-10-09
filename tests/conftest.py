@@ -57,6 +57,8 @@ DAY_FIXTURES: dict[str, frozenset[str]] = {
             "gate_5b_schooner",  # package 37e: the schooner's passage, read by two tests
             "gate_5c_merchant",  # package 36: the merchant passage, 36 hours
             "gate_5c_cruise",  # package 36: the naval cruise, 48 hours
+            "gate_6a_intent",  # package 40: the schooner on an intent alone, 36 hours
+            "gate_6a_fake_captain",  # package 40: the merchant passage under the fake captain
         }
     ),
     "test_ships_hierarchy.py": frozenset(
