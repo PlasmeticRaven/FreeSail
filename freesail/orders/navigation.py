@@ -11,6 +11,11 @@
     work up the reckoning           the day's work on demand
     observe the sun                 the noon sight by order, at noon
     set the reckoning to <lat> <long>   the captain overrides the master
+    work my reckoning               the master's slate since the last fix, for a station's
+                                    own reckoning; a reading in the reply, never a line
+                                    of the log (package 40b; spec M6 §5)
+    my reckoning is <lat> <long>    a station's own reckoning, kept beside the master's and
+                                    said after the noon's line; it moves nothing
     allow <n> knots of set to <direction>   the captain's own set in the traverse, in the
                                     place of the master's tide until it is handed back
     allow no set                    the captain's word that there is none
@@ -50,12 +55,62 @@ from freesail.orders.errors import OrderError
 from freesail.orders.grammar import Order
 from freesail.world.geo import name_words, parse_position
 
-__all__ = ["NO_RECKONING_WORDS", "check", "execute", "mark_in_sight", "where_is"]
+__all__ = [
+    "NO_RECKONING_WORDS",
+    "OWN_RECKONING_VERBS",
+    "OWN_REFUSED_WORDS",
+    "SLATE_KIND",
+    "check",
+    "execute",
+    "mark_in_sight",
+    "own_station",
+    "where_is",
+]
 
 NO_RECKONING_WORDS = (
     "No reckoning is kept in this ship: the scenario gives her no position, and there is "
     "no sea to be lost on."
 )
+
+# An officer's own reckoning (package 40b; spec M6 §5): the slate asked for and his own
+# position given back, by the station that keeps it. A book gives neither: a reckoning
+# is a man's working, and the standing dialect refuses both at entry
+# (`standing.grammar`).
+OWN_RECKONING_VERBS = ("work my reckoning", "my reckoning is")
+# The slate's kind: a reading answered in the station's reply and never written in the
+# log (`core.world.UNLOGGED_KINDS`), as the brief of package 40b has it.
+SLATE_KIND = "query.slate"
+OWN_REFUSED_WORDS = (
+    "A reckoning of one's own is a man's working from the slate, never a book's: "
+    "'work my reckoning' and 'my reckoning is' are given at a station, not by a standing "
+    "order."
+)
+
+
+def own_station(ship: Any) -> str:
+    """The station whose own reckoning an order works or gives, by the order's actor
+    (`core.world.ORDER_ACTOR`): the officer of the watch's (a model's or the player's
+    seat), or the captain's (the player at the prompt, or the captain's station).
+    Refused in words for a standing order's firing and the rules-based captain's
+    judgement, and for a station that keeps no reckoning."""
+    from freesail.core.world import RULE_ACTOR_PREFIXES
+    from freesail.world.reckoning import OWN_STATIONS
+
+    actor = str((getattr(ship, "extra", None) or {}).get("order_actor") or "captain")
+    if actor.startswith(RULE_ACTOR_PREFIXES):
+        raise OrderError(OWN_REFUSED_WORDS)
+    station = actor.split(" (", 1)[0].removeprefix("the ").strip()
+    if station in OWN_STATIONS:
+        return station
+    raise OrderError(f"The {station} keeps no reckoning of his own.")
+
+
+def _position_or_refuse(rest: str, verb: str) -> Any:
+    try:
+        return parse_position(re.sub(r"\b(degrees?|minutes?)\b", " ", rest))
+    except ValueError:
+        raise OrderError(f"'{rest}' is not a position; say '{verb} 49 52 N 6 10 W'.") from None
+
 
 Result = tuple[str, str, dict[str, Any]]
 
@@ -864,6 +919,13 @@ def check(ship: Any, order: Order) -> None:
                 f"'{rest}' is not a position; say 'set the reckoning to 49 52 N 6 10 W'."
             ) from None
         return
+    if verb == "my reckoning is":
+        _position_or_refuse(rest, verb)
+        return
+    if verb == "work my reckoning":
+        if rest:
+            raise OrderError("'work my reckoning' takes nothing after it.")
+        return
     if verb == "allow":
         low = " ".join(rest.lower().rstrip(".").split())
         if not rest or low in _BY_THE_BOOK or low in _NO_SET or low.startswith("no set"):
@@ -963,6 +1025,21 @@ def execute(ship: Any, order: Order) -> Result:
             ) from None
         text, data = nav.set_reckoning(pos)
         return "reckoning.set", _whose(ship, text), {"verb": verb, "level": 1} | data
+    if verb == "work my reckoning":
+        # the master's slate (package 40b): a reading in the reply, never in the log
+        station = own_station(ship)
+        if rest:
+            raise OrderError("'work my reckoning' takes nothing after it.")
+        nav = _navigation(ship)
+        text, data = nav.slate()
+        return SLATE_KIND, text, {"verb": verb, "level": 1, "station": station} | data
+    if verb == "my reckoning is":
+        # the station's own reckoning beside the master's, moving nothing (package 40b)
+        station = own_station(ship)
+        pos = _position_or_refuse(rest, verb)
+        nav = _navigation(ship)
+        text, data = nav.own_reckoning(station, pos)
+        return "reckoning.own", text, {"verb": verb, "level": 1, "station": station} | data
     if verb == "allow the tide by the book":
         # the tide handed back to the master (package 37e)
         nav = _navigation(ship)

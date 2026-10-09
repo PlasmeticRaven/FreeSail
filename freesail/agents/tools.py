@@ -939,6 +939,25 @@ def shelve(world: World, station: str, book: str = "") -> str:
     return _harness(world, station).shelve(str(book or ""))
 
 
+def own_reckoning_order(world: World, text: str) -> bool:
+    """Whether the words are one of a station's own reckoning's orders, `work my
+    reckoning` or `my reckoning is <position>` (package 40b; spec M6 §5): the station
+    keeps its own reckoning with the deck or off watch, as the lieutenants and the young
+    gentlemen did, so these two want no deck, and from the captain's station they do not
+    take back a deck lent to his book."""
+    from freesail.orders import grammar as imperative
+    from freesail.orders.navigation import OWN_RECKONING_VERBS
+
+    ship = world.ship
+    if not hasattr(ship, "parts"):
+        return False
+    try:
+        order = imperative.parse(ship, " ".join(str(text).split()), load_vocabulary())
+    except OrderError:
+        return False
+    return order.verb in OWN_RECKONING_VERBS
+
+
 def _holder(world: World, station: str) -> Any:
     """Who holds a station for the authority filter: its harness, or the player's seat
     at it (package 40; `agents.seat`), which is judged as a model there would be."""
@@ -1232,8 +1251,13 @@ def call(world: World, station: str, name: str, args: dict[str, Any] | None = No
             data={"order": what, "tool": name},
         )
         return sentence
+    # a station's own reckoning is kept with the deck or off watch, and moves nothing, so
+    # it neither wants the deck nor takes it back (package 40b)
+    needs_deck = tool.needs_deck and not (
+        name == "submit_order" and own_reckoning_order(world, str(args.get("text", "")))
+    )
     if (
-        tool.needs_deck
+        needs_deck
         and harness is not None
         and harness.station.domain is not None
         and not harness.agent.has_deck
@@ -1247,7 +1271,7 @@ def call(world: World, station: str, name: str, args: dict[str, Any] | None = No
         # it was lent to his book while his door was silent or he handed it over
         harness.deck_back("an order given")
     if (
-        tool.needs_deck
+        needs_deck
         and harness is not None
         and harness.station.domain is not None
         and not harness.agent.has_deck

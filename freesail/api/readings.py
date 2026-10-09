@@ -761,6 +761,28 @@ def _master(world: Any, _: str | None) -> dict[str, Any] | None:
     return m.to_dict() | {"words": f"{m.name}, {m.place}{busy}"}
 
 
+def _officers_reckoning(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the officer's reckoning` (package 40b; spec M6 §5, §7): the officer of the watch's
+    own reckoning, given at his station with `my reckoning is <position>` and run on by
+    the log-board since, with how far and which way it lies from the master's account
+    and whether within what the master would trust his account; None when he holds
+    none (none given, or the day's work at noon done with it)."""
+    nav = _navigation_of(world)
+    if nav is None:
+        return None
+    return nav.own_reading("officer of the watch")
+
+
+def _no_officers_reckoning_words(world: Any) -> str | None:
+    if _navigation_of(world) is None:
+        return NO_RECKONING_WORDS
+    return (
+        "none held; the officer of the watch gives his own at his station with 'my "
+        "reckoning is <position>', worked from the master's slate ('work my reckoning'), "
+        "and the day's work at noon is done with it"
+    )
+
+
 def _miles(nm: float) -> str:
     n = round(nm)
     if n <= 0:
@@ -1286,6 +1308,19 @@ REGISTRY.add(
         _master,
         description="the master: his name, his place and what occupies him",
         none_words=_no_reckoning_words,
+    )
+)
+# Package 40b: the officer of the watch's own reckoning beside the master's (spec M6 §5).
+REGISTRY.add(
+    Reading(
+        "officers_reckoning",
+        ("the officer's reckoning", "the officers reckoning", "the officer's own reckoning"),
+        "position",
+        "",
+        _officers_reckoning,
+        description="the officer of the watch's own reckoning, run on by the log-board, and "
+        "where it lies from the master's account; none until he gives one",
+        none_words=_no_officers_reckoning_words,
     )
 )
 # `a sail in sight` was registered absent here from milestone 4 to package 34; package 35

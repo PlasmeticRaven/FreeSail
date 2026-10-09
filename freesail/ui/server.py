@@ -112,7 +112,7 @@ from freesail.api import queries
 from freesail.core import replay as replay_mod
 from freesail.core.events import Event, Rollup, RollupView, Severity, Shown, kept, rolls_up
 from freesail.core.events import rollup as rolled
-from freesail.core.world import World
+from freesail.core.world import UNLOGGED_KINDS, World
 from freesail.ui.console import (
     ALARM_SPEED,
     REPLAY_ANYWAY_FLAG,
@@ -406,6 +406,10 @@ class Driver:
                 e = seat.route(text)
             else:
                 e = self.world.submit(text)
+            if e is not None and e.kind in UNLOGGED_KINDS:
+                # an answer for the player who asked and not a line of the log (package
+                # 40b: the master's slate): sent to the pages as a line is, kept nowhere
+                self._emit({"type": "event", "event": event_dict(e)})
             # a question put to a station is answered on the order (spec M4 §12)
             if not self._ease_for_station():
                 self.emit_snapshot()

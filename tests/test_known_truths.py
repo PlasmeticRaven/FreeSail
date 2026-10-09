@@ -4809,3 +4809,104 @@ def test_truth_79_a_silent_captains_door_passes_the_deck_to_the_book_and_the_boo
     reading = world.readings["captain"]
     assert reading["held"] and not reading["deck"]
     assert "the deck lent to his book while the station is paused" in reading["words"]
+
+
+# Truth 80 (spec M6 §5, §8; package 40b): an officer's own reckoning, worked from the
+# master's slate by the slate's own words, as a model at the station reads them.
+_SLATE_POINT = r"([NESW]+(?: by [NESW]+)?)"
+_SLATE_FROM = re.compile(r"(\d+)° (\d+)' ([NS]), (\d+)° (\d+)' ([EW]) by account then")
+_SLATE_BOARD = re.compile(r"\((\d{3})°\) (\d+\.\d) miles([^;]*)")
+_SLATE_ALSO = re.compile(r"(?:the tide|her drift hove to) (\d+\.\d) miles to the " + _SLATE_POINT)
+_SLATE_SIGHT = re.compile(r"moved (\d+\.\d) miles to the " + _SLATE_POINT)
+
+
+def work_the_slate(words: str, with_the_tide: bool = True) -> tuple[float, float]:
+    """The traverse worked from the slate's words alone: where it begins, each board's
+    course and distance and the tide and drift with it, each sight's move; (lat, lon)."""
+    m = _SLATE_FROM.search(words)
+    assert m, words
+    lat = (int(m.group(1)) + int(m.group(2)) / 60.0) * (1 if m.group(3) == "N" else -1)
+    lon = (int(m.group(4)) + int(m.group(5)) / 60.0) * (1 if m.group(6) == "E" else -1)
+    boards = words.split("and its distance: ", 1)[1].split(". ", 1)[0]
+    de = dn = 0.0
+    for course, miles, rest in _SLATE_BOARD.findall(boards):
+        c = math.radians(float(course))
+        de += float(miles) * math.sin(c)
+        dn += float(miles) * math.cos(c)
+        for also in _SLATE_ALSO.finditer(rest):
+            if with_the_tide or not also.group(0).startswith("the tide"):
+                a = units.parse_compass_point(also.group(2))
+                de += float(also.group(1)) * math.sin(a)
+                dn += float(also.group(1)) * math.cos(a)
+    for miles, point in _SLATE_SIGHT.findall(words):
+        a = units.parse_compass_point(point)
+        de += float(miles) * math.sin(a)
+        dn += float(miles) * math.cos(a)
+    lat += dn / 60.0
+    lon += de / (60.0 * math.cos(math.radians(lat)))
+    return lat, lon
+
+
+def _the_officers_own_noon(with_the_tide: bool):
+    """The frigate standing ESE off the Lizard across the stream, the fake officer seated
+    off watch at twenty to twelve: he asks for the slate, works it from its words, and
+    gives his own reckoning; then noon."""
+    from freesail.agents import Fake, Harness, SamplingPolicy, call, reply
+    from freesail.agents.agent import officer
+
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, 11, 10),
+        wind_from_deg=270.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=112.0,
+        ship_speed_kn=6.0,
+        position={"lat_deg": 49.75, "lon_deg": -5.45},
+        region="channel-west",
+    )
+    world = make_world(7, "data/ships/frigate-36.yaml", sc)
+    world.submit("set plain sail")
+    world.submit("steer ESE")
+    world.run(600)
+    world.submit("trim sails")
+    world.run(1800)
+
+    def work_it(last, turns):
+        words = str(last["tool_results"][0]["result"])
+        lat, lon = work_the_slate(words, with_the_tide)
+        return reply("", call("submit_order", text=f"my reckoning is {lat:.4f} N {-lon:.4f} W"))
+
+    script = [reply("", call("submit_order", text="work my reckoning")), work_it, "Worked.", ""]
+    h = Harness(
+        world,
+        officer(SamplingPolicy.in_lockstep(3600), world=world),
+        Fake(script),
+        save=lambda w, why: None,
+    )
+    h.start()
+    run(world, 1800)
+    return world, h
+
+
+def test_truth_80_an_officers_own_reckoning_from_the_slate_agrees_with_the_masters_at_noon():
+    """Spec M6 §8, truth 80: "An officer's reckoning worked from the slate agrees with the
+    master's within the master's doubt when both are right, and the log shows both at
+    noon." The officer works the slate's words (the departure, each board's course and
+    distance and the tide allowed) by the traverse and gives his own reckoning off
+    watch: at noon the noon's line is followed by his, which lies within one of the
+    master's doubts of the master's account before the sight. Worked without the tide
+    the slate gave him, his own lies further off by about what the tide set her."""
+    world, _h = _the_officers_own_noon(with_the_tide=True)
+    log = world.log.all()
+    noon = [i for i, e in enumerate(log) if e.kind == "reckoning.noon"]
+    assert len(noon) == 1
+    own = log[noon[0] + 1]
+    assert own.kind == "reckoning.own_noon" and own.severity is Severity.NOTABLE
+    assert own.text.startswith("The officer of the watch's own reckoning (")
+    assert "worked at 11:50 and run on by the log-board: " in own.text
+    assert own.data["within"] is True and own.data["sigmas"] <= 1.0
+    assert own.data["from_master_nm"] < 0.5
+    careless, _ = _the_officers_own_noon(with_the_tide=False)
+    other = [e for e in careless.log if e.kind == "reckoning.own_noon"][0]
+    assert other.data["from_master_nm"] > own.data["from_master_nm"] + 0.5

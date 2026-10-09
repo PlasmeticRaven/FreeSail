@@ -290,9 +290,16 @@ def _parse_actions(
             # read whole, as its own reader reads it, and not to its first word (package
             # 37l; game 10: `take a fix as soon as a bearing can be taken` was entered and
             # refused at every change of the watch)
-            read_whole(ship, order, vocab)
+            parsed = read_whole(ship, order, vocab)
         except OrderError as e:
             raise OrderError(f"In standing order '{name}', '{order}' is refused: {e}") from None
+        from freesail.orders.navigation import OWN_RECKONING_VERBS, OWN_REFUSED_WORDS
+
+        if parsed.verb in OWN_RECKONING_VERBS:
+            # a reckoning of one's own is a station's working, never a book's (package 40b)
+            raise OrderError(
+                f"In standing order '{name}', '{order}' is refused: {OWN_REFUSED_WORDS}"
+            )
     return actions, held
 
 

@@ -256,6 +256,12 @@ STANDING_ACTOR_PREFIX = "standing order "
 CAPTAIN_RULE_PREFIX = "captain's rule "
 RULE_ACTOR_PREFIXES = (STANDING_ACTOR_PREFIX, CAPTAIN_RULE_PREFIX)
 
+# The answers to an order that are the asker's alone and never a line of the log (package
+# 40b): the master's slate, which an officer works his own reckoning from. `submit` hands
+# such an answer back as an Event it does not record; a station reads it in its tool's
+# result, and the console and the browser show it to the player who asked.
+UNLOGGED_KINDS = frozenset({"query.slate"})
+
 # The motion's words must hold this long before the log says they changed (spec M5 §4;
 # judgement: five minutes, so a roll hovering about "rolling" and "rolling easily" is
 # not a line a minute).
@@ -1375,6 +1381,18 @@ class World:
                 f"{head} not carried out ({text!r}): {e}",
                 actor=actor,
                 data={"order": text, "reason": str(e)},
+            )
+        if kind in UNLOGGED_KINDS:
+            # a reading for the one who asked and for nobody else (package 40b: the
+            # master's slate), answered and not written in the log
+            return Event(
+                tick=self.clock.tick,
+                ship_time=self.clock.ship_time,
+                severity=Severity.ROUTINE,
+                kind=kind,
+                text=log_text,
+                actor=actor,
+                data=data,
             )
         if kind.startswith("query."):
             return self.record(Severity.ROUTINE, kind, log_text, actor=actor, data=data)
