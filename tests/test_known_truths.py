@@ -3471,7 +3471,11 @@ def test_the_schooner_sails_the_passage_with_her_octant_and_the_log_every_two_ho
     # dragging and nothing aground
     roads = [e for e in log if e.actor == "standing order 'the outer road'"]
     assert roads and roads[0].tick == GATE_5B_SCHOONER_ROADS_TICK
-    town = [e for e in log if e.actor == "standing order 'off the town'"]
+    # the order accepted, not the conflict line said first since 37h ('the pilot boards'
+    # and 'off the town' fire together as she comes to the road; the later stands)
+    town = [
+        e for e in log if e.actor == "standing order 'off the town'" and e.kind == "order.accepted"
+    ]
     assert town and "coming to an anchor" in town[0].text
     # the pilot's cutter comes off and hails her (package 35), and again for her to heave
     # to (package 37h); his boarding is the test after this one
@@ -3513,7 +3517,9 @@ def test_the_schooners_pilot_boards_before_she_runs_in(gate_5b_schooner):
     assert [e.data["wants"] for e in taken] == ["shorten sail", "heave to"]
     roads = [e for e in log if e.actor == "standing order 'the outer road'"]
     anchored = [e for e in log if e.kind == "ship.anchored"]
-    assert abs(aboard[0].tick - roads[0].tick) < 600 < anchored[0].tick - aboard[0].tick
+    # he boards as she comes to the outer road (twelve minutes after its rule on the
+    # merged tree of 2026-10-09, where 37h's figure was six) and well before the anchor
+    assert abs(aboard[0].tick - roads[0].tick) < 900 < anchored[0].tick - aboard[0].tick
 
 
 @pytest.mark.parametrize("ship", ["data/ships/cutter.yaml", "data/ships/brig.yaml"])
