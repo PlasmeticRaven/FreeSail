@@ -415,8 +415,20 @@ full part-and-crew ship from her file, with her rules-based captain (§4) issuin
 through the same channel, her own lookout, her own account, her own book; beyond it she is
 demoted to far detail with her state folded back (position, heading, sails set, damage
 when M7 brings it). A hard cap on full-sim ships (M0-M2 §8's risk table: the cap is the
-budget) with the nearest promoted first; the pace truth of M5 §30 holds with the cap full.
-The promotion point and the demotion range are tuned in the notes. The far-detail guard
+budget) with the nearest promoted first, and a ship in dealings with the player (a chase,
+a hail, a boat between them) before a nearer one that is not; the pace truth of M5 §30
+holds with the cap full. **The range and the cap are chosen from a measurement, not
+guessed** (the owner, 2026-10-09): the first thing 43 does is tick twelve fully crewed
+ships under rules-based captains at once in the Channel region and measure the pace, so
+that the promotion range, the cap and the strategy (the horizon's range with hysteresis
+and a cap, or every ship in a region promoted) are set from what the machine gives. What
+the pace truths say today: the frigate under her book ticks at five to six hundred a
+second on the build machine and the dozen far-detail ships cost about a third of that
+again, so twelve crewed ships would be near fifty ticks a second, under the sixty times
+the owner plays at; if every ship in a region is wanted at once, the vectorised hot loop
+of the proposal's risk table is the likely answer and is sized by that measurement. The
+promotion point and the demotion range are then tuned in the notes, with a hysteresis so
+that a ship near the edge does not flap between bodies. The far-detail guard
 that the gate 5c ruling never had, a leg across the coast refused when the scenario loads,
 is built here with the promotion.
 
@@ -428,10 +440,19 @@ her owner), her readings and her own account, under the pace rule of §12 and th
 compression. She sees the player's ship as the player sees hers: a sail, made out as she
 nears, by the lookout's words. What follows a meeting, the hail, the colours, the private
 signal, the chase to a conclusion, is M7's; in 6c she trades, cruises, keeps company or
-evades. Her demotion while a model holds her is a stand-down of the station with its note,
-said in the log, and the far-detail plan takes her on; the owner's compression decides how
-often this happens, which is why the pace rule is the testing setting. The director's
-seating of such a captain is §23.
+evades.
+
+**A station keeps across the switch** (the owner's clarification, 2026-10-09; decision
+40). A model at a station on another ship, or the player seated there, is not stood down
+by her demotion to far detail: the station moves up a command layer, as the rules-based
+captain's own state machine does, and works the far body in its own shape, the plan
+layer, with courses shaped, sail made or shortened as a state, heaving to, the chase and
+the intent's changes, and with the readings the far body has (her place by the plan's
+account, the wind, the weather, what her lookout can see at the far body's cadence); the
+sample says which shape she is in. The crewed promotion brings the full surface back
+beneath the same station with no reseat, and the log says both. One rule for the rules,
+a model and the player, and the same for the player's own ship if it is ever demoted
+(it is not, in this milestone). The director's seating of such a captain is §23.
 
 ### 21. The regatta harness (`tools/regatta.py` new; `data/regatta/*.yaml` new; `tests/test_regatta.py`)
 
