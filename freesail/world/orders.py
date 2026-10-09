@@ -58,8 +58,9 @@ __all__ = [
     "recognises",
 ]
 
-# The channels a world order speaks on, in the spec's order (§26).
-CHANNELS = ("weather", "ship", "message", "port", "person")
+# The channels a world order speaks on, in the spec's order (§26), and `captain` (spec M6
+# §4; package 40): the rules-based captain's intent given or changed, the director's seam.
+CHANNELS = ("weather", "ship", "message", "port", "person", "captain")
 
 # The captain's grammar refuses a world order in these words (truth 71).
 REFUSAL = (
@@ -69,7 +70,9 @@ REFUSAL = (
     "and reads what the lookout sees."
 )
 
-_HEAD = re.compile(r"^\s*(weather|ship|message|port|person)\b\s*(\"[^\"]*\"|[\w-]+)?\s*:", re.I)
+_HEAD = re.compile(
+    r"^\s*(weather|ship|message|port|person|captain)\b\s*(\"[^\"]*\"|[\w-]+)?\s*:", re.I
+)
 
 
 class WorldOrderError(ValueError):
@@ -113,7 +116,32 @@ def apply(world: Any, order: WorldOrder) -> tuple[str, dict[str, Any]]:
         return _message(world, body)
     if order.channel == "port":
         return _port(world, body)
+    if order.channel == "captain":
+        return _captain(world, body)
     return _person(world, body)
+
+
+# ---------------------------------------------------------------------------
+# captain (package 40): the rules-based captain's intent, the director's seam
+# ---------------------------------------------------------------------------
+
+_CAPTAIN = re.compile(r"^captain\s*:\s*(?:intent\s+)?(?P<words>.+?)\s*$", re.I)
+
+
+def _captain(world: Any, body: str) -> tuple[str, dict[str, Any]]:
+    """`captain: intent trade tin from Falmouth to Brest` (or `captain: trade ...`): the
+    player's ship's rules-based captain given an intent, or his intent changed; he sails
+    by it when no model holds the captain's station. Refused in words when the intent
+    cannot be read."""
+    m = _CAPTAIN.match(body)
+    captain = getattr(world, "captain", None)
+    if m is None or captain is None:
+        raise WorldOrderError("A captain order is 'captain: intent <the intent in words>'.")
+    try:
+        words = captain.set_intent(m.group("words"))
+    except ValueError as e:
+        raise WorldOrderError(str(e)) from None
+    return words, {"intent": captain.intent.words if captain.intent else ""}
 
 
 # ---------------------------------------------------------------------------

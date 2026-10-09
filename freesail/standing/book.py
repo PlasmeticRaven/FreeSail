@@ -254,8 +254,9 @@ class Book:
         out = [f"Standing orders ({n}):"] if n > 1 else ["Standing orders (1):"]
         clock = self._clock()
         for r in self.rules:
+            book = f", the book '{r.book}'" if getattr(r, "book", "") else ""
             out.append(
-                f'  "{r.name}" ({r.officer}): {r.body_words()}. '
+                f'  "{r.name}" ({r.officer}{book}): {r.body_words()}. '
                 f"{r.state_words(clock)[0].upper()}{r.state_words(clock)[1:]}."
             )
         return out

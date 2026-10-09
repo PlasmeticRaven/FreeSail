@@ -439,6 +439,12 @@ class Vessel:
     height_override_m: float | None = None
     seen_within_nm: float | None = None
     pace_override_kn: float | None = None
+    # the state machine's state her far-detail body resolves (spec M6 §4, "one brain,
+    # two bodies"; package 40, `captains.resolve_state`): on passage is her plan, hove
+    # to for weather is no way with the plan kept to resume; the rest are 43's with the
+    # crewed promotion. A vessel in a checkpoint from before loads on passage.
+    state: str = "on passage"
+    saved_plan: list[tuple[Any, ...]] | None = None
 
     @property
     def height_m(self) -> float:

@@ -332,10 +332,10 @@ class Person:
             "aboard": self.aboard,
             "occupied_with": self.task,
         }
-        if self.outline is not None:
-            d["rank"] = self.rank
-        if self.station:
-            d["station"] = self.station
+        # the wardroom's rank and station (package 40) are not here: this dict rides the
+        # log's lines as data (`person.came`), which every pinned passage's digest is over,
+        # and the people's lines do not move for a file that says who is who. They are
+        # read from the person (`rank`, `station`, `outline_words`) and `wardroom_lines`.
         return d
 
 
@@ -674,12 +674,18 @@ class People:
         return bool(harness.agent.deck)
 
     def _in_command(self, p: Person) -> bool:
-        """Whether a model holds the captain's station in this person's place and has the
-        deck (package 40): then he is in command, wherever he stands."""
+        """Whether this person is in command (package 40): a model holds the captain's
+        station in his place and has the deck; or nobody holds it and the rules-based
+        captain sails her by an intent, in which case the person the station is bound to
+        commands. Then he is in command, wherever he stands. A scenario with a book and
+        no intent says nothing: the book sails her, as it always did."""
         agents = getattr(self.world, "agents", None) or {}
         harness = agents.get("captain")
         if harness is None or harness.agent.released:
-            return False
+            cap = getattr(self.world, "captain", None)
+            if cap is None or not cap.commands:
+                return False
+            return self.holder("captain") is p
         return harness.station.person == p.name and bool(harness.agent.deck)
 
     def _asleep(self, p: Person) -> bool:

@@ -1,0 +1,101 @@
+# FreeSail: the doctrine of a merchant master (spec M6 §4; decision 40; package 40). Read
+# by freesail/world/captains.py: the thresholds the captain judges by (each with its
+# source or "judgement" beside it, in the form the port files use), the books of each
+# state of his machine (standing orders in the dialect, with placeholders the captain
+# fills from his plan: {mark} the leg's mark, {reached} the miles within which it is
+# reached, {road} and {anchorage} the destination port's, {port} its name, {cast_in} and
+# {course_in} the tack and course to go in from the road, {light_sail} the sail taken in
+# at the pilot's hail by the ship's own names, and any threshold below by its name), and
+# the transitions: from a state, on a stimulus the ship perceives (the readings alone),
+# to a state, unless another stimulus holds; the first row that holds fires, once a
+# minute. The owner tunes this file with a text editor, as the books.
+#
+# The merchant hauls off from a hostile stranger, heaves to in a gale with sea room,
+# claws off a lee shore without it, runs for the nearest road in thick weather, takes
+# the pilot at an open port, and does the port's business.
+
+role: merchant
+name: a merchant master
+source: "spec M6 §4; the merchant passage's book (data/scenarios/merchant-passage.orders) for the routines; Beaufort's scale for the gale; Faden 1793 for the common tracks"
+
+thresholds:
+  gale_kn: {value: 34, source: "Beaufort's force 8, a fresh gale, 34 to 40 knots, in which a merchantman of 1805 shortened to close-reefed topsails and lay to with sea room (judgement on the scale)"}
+  gale_over_kn: {value: 28, source: "she fills away when the wind has eased under force 7, a moderate gale (judgement)"}
+  shorten_sail_kn: {value: 30, source: "the starter book's 'shorten sail for weather' at thirty knots, where the strain truths begin to bite (docs/dev/TuningNotes.md)"}
+  sea_room_nm: {value: 10, source: "a night's drift hove to at a knot to leeward (truth 28) with a league to spare; judgement"}
+  lee_shore_nm: {value: 6, source: "two leagues: spec M6 §4, 'the land closing within two leagues' with the wind onshore"}
+  shelter_land_nm: {value: 12, source: "thick weather is run from when the land is within four leagues, where a road may be found in a watch's sail; judgement"}
+  shelter_within_nm: {value: 20, source: "the nearest open road run for in thick weather when it is within a watch's sail at five knots; judgement"}
+  stranger_hostile_nm: {value: 6, source: "a stranger of a nation at war made out within two leagues is hauled off from: her colours are made out at two miles, her rig at four (freesail/world/ships.py), so this is the first the merchant can know; judgement"}
+  offing_nm: {value: 3, source: "a headland given an offing of a league, and the beating book goes about when the nearest land is within it; judgement, after the merchant book's berth of two or three miles for the open sea's marks"}
+  leg_reached_nm: {value: 2, source: "the open sea's marks are reached by account within two miles, since the account is a mile or two out by the afternoon (the merchant book's comments)"}
+  anchor_within_nm: {value: 0.5, source: "the port's anchorage mark reached within half a mile by account; the merchant book's 'the mark in the Bay'"}
+  road_cables: {value: 3, source: "the rule of the road's reflex at a few cables (spec M6 §4); the hail is at four (freesail/world/ships.py HAIL_NM)"}
+
+books:
+  on passage:
+    - 'standing order "the leg": every hour, if the distance to {mark} is over {reached} miles then shape a course for {mark}'
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets'
+    - 'standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix'
+    - 'standing order "pilot water": every 5 minutes, if the distance to {road} is under 14 miles and the land is in sight then take a bearing of the land; take a fix'
+    - 'standing order "the lead in pilot water": every 5 minutes, if the distance to {anchorage} is under 6 miles then heave the lead'
+    - 'standing order "the anchorage": at a sounding, if the distance to {anchorage} is under 1.8 miles and the depth of water is under {anchorage_fathoms} fathoms and the speed is over 2 knots then come to an anchor'
+    - 'standing order "shorten sail for weather": when the true wind exceeds {shorten_sail_kn} knots for 2 minutes then shorten sail'
+    - 'standing order "the pilot boards": at the pilot''s hail then take in the {light_sail}; take the pilot'
+    - 'standing order "the pilot aboard": at the pilot aboard then set plain sail'
+    - 'standing order "the pilot put off": at the pilot asks to be put off then heave to'
+    - 'standing order "the pilot off": at the pilot off then fill away'
+    - 'standing order "under way again": at filled away then set plain sail'
+  beating:
+    - 'standing order "the leg": every glass, if the distance to {mark} is over {reached} miles then shape a course for {mark}'
+    - 'standing order "the offing": when the nearest land is under {offing_nm} miles then tack ship'
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets'
+    - 'standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix'
+    - 'standing order "shorten sail for weather": when the true wind exceeds {shorten_sail_kn} knots for 2 minutes then shorten sail'
+  hove to for weather:
+    - 'standing order "bearings hove to": every glass, if the land is in sight then take a bearing of the land; take a fix'
+  running for shelter:
+    - 'standing order "the leg": every glass, if the distance to {mark} is over {reached} miles then shape a course for {mark}'
+    - 'standing order "the lead": every 10 minutes then heave the lead'
+    - 'standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix'
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "the pilot boards": at the pilot''s hail then take in the {light_sail}; take the pilot'
+    - 'standing order "the pilot aboard": at the pilot aboard then set plain sail'
+  at anchor:
+    - 'standing order "the tide to go in": at the turn to the flood, if the daylight is day then get under way on the {cast_in} tack and steer {course_in}'
+    - 'standing order "under way for the port": at under way then set plain sail'
+  in port: []
+  investigating a stranger: []
+  chasing: []
+  evading:
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets'
+    - 'standing order "make all sail to haul off": at steady on the course, if the true wind is under {shorten_sail_kn} knots then make all sail'
+  keeping station: []
+  in distress: []
+  engaging: []
+
+transitions:
+  - {from: in port, on: under way, to: on passage}
+  - {from: on passage, on: anchored in port, to: in port}
+  - {from: on passage, on: aground, to: in distress}
+  - {from: on passage, on: hostile stranger, to: evading}
+  - {from: on passage, on: gale, to: hove to for weather, unless: lee shore}
+  - {from: on passage, on: thick near the land, to: running for shelter}
+  - {from: on passage, on: course not laid, to: beating}
+  - {from: beating, on: course laid, to: on passage}
+  - {from: beating, on: hostile stranger, to: evading}
+  - {from: beating, on: gale, to: hove to for weather, unless: lee shore}
+  - {from: beating, on: anchored in port, to: in port}
+  - {from: hove to for weather, on: gale over, to: on passage}
+  - {from: hove to for weather, on: lee shore, to: on passage}
+  - {from: running for shelter, on: sheltered, to: at anchor}
+  - {from: running for shelter, on: weather clear, to: on passage}
+  - {from: running for shelter, on: aground, to: in distress}
+  - {from: evading, on: stranger lost, to: on passage}
+  - {from: evading, on: gale, to: hove to for weather, unless: lee shore}
+  - {from: at anchor, on: under way, to: on passage}
+  - {from: in distress, on: afloat, to: on passage}

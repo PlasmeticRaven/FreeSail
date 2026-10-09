@@ -1415,14 +1415,16 @@ reading_words:
 # ---------------------------------------------------------------------------
 # The world-order channel (spec M5 §26; package 36; `freesail/world/orders.py`): orders
 # to the world, not to the ship, given only by a scenario file at a time or by the lead's
-# harness, never by the captain. A line at the prompt that opens with one of these
+# harness, never by the captain (the `captain:` channel, package 40, is the exception:
+# it sets the rules-based captain's intent, which is the scenario's to give). A line at
+# the prompt that opens with one of these
 # channels' words and a colon, or with the words below, is refused with the sentence
 # here (truth 71); the captain orders his ship, sends the boat and reads what the
 # lookout sees. The channels are the channel's own (`orders.CHANNELS`); a test keeps the
 # two lists one.
 # ---------------------------------------------------------------------------
 world_orders:
-  channels: [weather, ship, message, port, person]
+  channels: [weather, ship, message, port, person, captain]
   words: [world order, order to the world, order the world]
   refusal: "That is an order to the world, not to the ship: the weather, the other sail, a message, a port and the people ashore are the scenario's and the director's to order, journaled at the driver's mark; the captain orders his ship, sends the boat and reads what the lookout sees."
 

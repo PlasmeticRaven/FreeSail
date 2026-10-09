@@ -1,0 +1,104 @@
+# FreeSail: the doctrine of a King's ship on station (spec M6 §4; decision 40; package
+# 40). The form is merchant.yaml's (see its head). A King's ship on station closes and
+# makes out every stranger, chases an enemy (a stranger of a nation at war, or one that
+# shows no colours within two miles), gives the chase up within hail or when she is lost
+# to sight (what follows a chase is milestone 7's), and returns to her station; she keeps
+# the station as the squadron off Ushant kept it, by the wind on one tack and the other,
+# wearing at the end of every second hour (the cruise's book,
+# data/scenarios/naval-cruise.orders, which this doctrine generalises: {station} and
+# {radius} are the intent's). In a gale with sea room she heaves to; a lee shore she
+# claws off. The placeholders and the stimuli are merchant.yaml's.
+
+role: kings-ship
+name: the captain of a King's ship on station
+source: "spec M6 §4; the naval cruise's book for the station and the chase (Luce 1884 p. 553 on keeping the chase on the same bearing); the blockade's logs for wearing watch by watch; Beaufort's scale"
+
+thresholds:
+  gale_kn: {value: 40, source: "Beaufort's force 8 to 9: a King's ship carries on under close-reefed topsails longer than a merchantman and heaves to at a strong gale; judgement on the scale"}
+  gale_over_kn: {value: 32, source: "she fills away when the wind has eased under force 8; judgement"}
+  shorten_sail_kn: {value: 30, source: "the starter book's thirty knots"}
+  sea_room_nm: {value: 10, source: "as the merchant's; judgement"}
+  lee_shore_nm: {value: 6, source: "two leagues, spec M6 §4"}
+  shelter_land_nm: {value: 0, source: "a King's ship on station does not run for shelter in thick weather; she keeps the sea (the blockade's practice); nought turns the stimulus off"}
+  shelter_within_nm: {value: 0, source: "none: see shelter_land_nm"}
+  stranger_hostile_nm: {value: 0, source: "a King's ship hauls off from nobody; nought turns the stimulus off (evading is for a ship that cannot fight, milestone 7's judgement)"}
+  stranger_chase_nm: {value: 25, source: "a stranger within twenty-five miles of the station is chased, as the cruise's book has it (the distance from the station, not the stranger)"}
+  offing_nm: {value: 3, source: "a league; judgement"}
+  leg_reached_nm: {value: 2, source: "as the merchant's"}
+  anchor_within_nm: {value: 0.5, source: "as the merchant's"}
+  road_cables: {value: 3, source: "spec M6 §4"}
+  station_wear_hours: {value: 2, source: "the cruise's book: wore ship at the end of every second hour"}
+
+books:
+  on passage:
+    - 'standing order "the leg": every hour, if the distance to {mark} is over {reached} miles then shape a course for {mark}'
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets'
+    - 'standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix'
+    - 'standing order "the morning sight": at two bells, if the daylight is day then take a sight for the longitude'
+    - 'standing order "shorten sail for weather": when the true wind exceeds {shorten_sail_kn} knots for 2 minutes then shorten sail'
+    - 'standing order "the pilot boards": at the pilot''s hail then take the pilot'
+    - 'standing order "the pilot put off": at the pilot asks to be put off then heave to'
+    - 'standing order "the pilot off": at the pilot off then fill away'
+    - 'standing order "under way again": at filled away then set plain sail'
+    - 'standing order "a sail on passage": at a sail sighted then make her out'
+    - 'standing order "the lead in pilot water": every 5 minutes, if the distance to {anchorage} is under 6 miles then heave the lead'
+    - 'standing order "the anchorage": at a sounding, if the distance to {anchorage} is under 1.8 miles and the depth of water is under {anchorage_fathoms} fathoms and the speed is over 2 knots then come to an anchor'
+  beating:
+    - 'standing order "the leg": every glass, if the distance to {mark} is over {reached} miles then shape a course for {mark}'
+    - 'standing order "the offing": when the nearest land is under {offing_nm} miles then tack ship'
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets'
+    - 'standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix'
+  hove to for weather:
+    - 'standing order "bearings hove to": every glass, if the land is in sight then take a bearing of the land; take a fix'
+  running for shelter: []
+  at anchor:
+    - 'standing order "the tide to go in": at the turn to the flood, if the daylight is day then get under way on the {cast_in} tack and steer {course_in}'
+    - 'standing order "under way for the port": at under way then set plain sail'
+  in port: []
+  investigating a stranger:
+    - 'standing order "close the stranger": every glass, if a stranger in sight is in sight then give chase'
+    - 'standing order "more of her": at a sail made out, if a stranger in sight is in sight then make her out'
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+  chasing:
+    - 'standing order "keep her bearing": every glass, if a stranger in sight is in sight then give chase'
+    - 'standing order "more of her": at a sail made out, if a stranger in sight is in sight then give chase'
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets'
+  evading: []
+  keeping station:
+    - 'standing order "wear at the hour": every 2 hours, if a stranger in sight is not in sight and the distance to {station} is under {radius_out} miles then wear ship'
+    - 'standing order "by the wind": at wore then keep her full and by'
+    - 'standing order "back to the station": every watch, if a stranger in sight is not in sight and the distance to {station} is over {radius} miles then shape a course for {station}'
+    - 'standing order "a sail on the station": at a sail sighted then make her out'
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets'
+    - 'standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix'
+    - 'standing order "the morning sight": at two bells, if the daylight is day then take a sight for the longitude'
+    - 'standing order "shorten sail for weather": when the true wind exceeds {shorten_sail_kn} knots for 2 minutes then shorten sail'
+  in distress: []
+  engaging: []
+
+transitions:
+  - {from: in port, on: under way, to: on passage}
+  - {from: on passage, on: anchored in port, to: in port}
+  - {from: on passage, on: aground, to: in distress}
+  - {from: on passage, on: gale, to: hove to for weather, unless: lee shore}
+  - {from: on passage, on: course not laid, to: beating}
+  - {from: beating, on: course laid, to: on passage}
+  - {from: beating, on: gale, to: hove to for weather, unless: lee shore}
+  - {from: hove to for weather, on: gale over, to: on passage}
+  - {from: hove to for weather, on: lee shore, to: on passage}
+  - {from: keeping station, on: stranger, to: investigating a stranger}
+  - {from: keeping station, on: gale, to: hove to for weather, unless: lee shore}
+  - {from: investigating a stranger, on: enemy made out, to: chasing}
+  - {from: investigating a stranger, on: friend made out, to: keeping station}
+  - {from: investigating a stranger, on: stranger spoken, to: keeping station}
+  - {from: investigating a stranger, on: stranger lost, to: keeping station}
+  - {from: chasing, on: stranger spoken, to: keeping station}
+  - {from: chasing, on: stranger lost, to: keeping station}
+  - {from: at anchor, on: under way, to: on passage}
+  - {from: in distress, on: afloat, to: on passage}

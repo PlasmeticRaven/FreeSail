@@ -113,3 +113,18 @@ crew_pool:
   landsman: {hands: 12, pounds: 1, delay_h: 6}
 
 closed_to: []                    # nations the port is closed to without war (a decree, a quarantine)
+
+# The port's tracks (spec M6 §4; package 40), for the rules-based captain's planner: the
+# marks a ship takes leaving and entering, each a feature of the chart by its id or a
+# position pricked on it, in the directions' words. `to_sea`: from the Road by the eastern
+# channel to the outer road (the pilot's course out, S by E), then a point off the
+# Manacles' meridian and a point six miles south-east of the Lizard, the merchant
+# passage's own marks (data/scenarios/merchant-passage.orders: "from the outer road a
+# course a little east of south to a point off the Manacles' meridian ... then
+# south-south-west for a point six miles south-east of the Lizard"). `from_sea` is the
+# reverse; `in` from the outer road to Carrick Road (White 1835 p. 27: the eastern
+# channel the better).
+tracks:
+  to_sea: [falmouth-outer-road, 50 00 N 4 57 W, 49 52 N 5 06 W]
+  from_sea: [49 52 N 5 06 W, 50 00 N 4 57 W, falmouth-outer-road]
+  in: [carrick-road]

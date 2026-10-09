@@ -508,12 +508,21 @@ def load_scenario(path: str | Path) -> ScenarioFile:
         # the fixed wind fields say the wind at the start, for anyone reading the save
         sc.wind_from_deg, sc.wind_speed_kn = first.from_deg, first.knots
     seed = raw.get("seed")
+    standing_orders = [str(x) for x in raw.get("standing_orders") or []]
+    # Package 40 (spec M6 §4): the captain's intent beside the book (`intent:`), read
+    # against the chart and the ports when the world is made (`freesail.world.captains`);
+    # the books' names kept with the scenario for `the captain` reading
+    if raw.get("intent") is not None:
+        sc.intent = " ".join(str(raw["intent"]).split())
+        if not isinstance(raw["intent"], str) or not sc.intent:
+            raise ScenarioError(f"{where}, intent: the captain's intent in words.")
+    sc.books = list(standing_orders)
     return ScenarioFile(
         path=str(path),
         scenario=sc,
         seed=int(seed) if seed is not None else None,
         ship_file=str(ship["file"]) if ship.get("file") else None,
-        standing_orders=[str(x) for x in raw.get("standing_orders") or []],
+        standing_orders=standing_orders,
         orders=[str(x) for x in raw.get("orders") or []],
     )
 

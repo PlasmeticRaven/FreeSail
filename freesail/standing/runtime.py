@@ -232,6 +232,95 @@ class Runtime:
         if rule.trigger.kind == "every":
             rule.next_due_tick = self.world.clock.tick + rule.trigger.interval_s
 
+    # -- a book by name (package 40; spec M6 §4) -----------------------------------------
+
+    def load_book(self, name: str, lines: list[str], actor: str, quiet: bool = False) -> list[str]:
+        """A named book loaded: each line a standing order in the dialect, parsed against
+        the ship and entered in the book under the name (`Rule.book`), the state of the
+        rules-based captain's machine whose book it is; a line the ship refuses is said
+        in the log and the rest still load; one line says what was loaded unless
+        `quiet`. Returns the names of the rules entered. A rule of the same name already
+        in the book (the player's own, or the state's reloaded for a new leg) is struck
+        first when it is this book's, and refused when it is another's."""
+        from freesail.standing import grammar as standing
+
+        world = self.world
+        ship = world.ship
+        names: list[str] = []
+        for text in lines:
+            try:
+                rule = standing.parse_standing(ship, text, given_tick=world.clock.tick)
+            except OrderError as e:
+                world.record(
+                    Severity.ROUTINE,
+                    "order.rejected",
+                    f"The book '{name}' could not carry one of its orders ({text!r}): {e}",
+                    actor=actor,
+                    data={"order": text, "reason": str(e), "book": name},
+                )
+                continue
+            same = self.book.get(rule.name)
+            if same is not None and same.book == name:
+                self.book.rules.remove(same)
+            elif same is not None:
+                world.record(
+                    Severity.ROUTINE,
+                    "order.rejected",
+                    f"The book '{name}' has a standing order '{rule.name}', and the book "
+                    f"holds one of that name already ({same.officer}'s); the book's is kept.",
+                    actor=actor,
+                    data={"order": text, "book": name},
+                )
+                continue
+            rule.book = name
+            try:
+                self.book.add(rule)
+            except OrderError as e:
+                world.record(
+                    Severity.ROUTINE,
+                    "order.rejected",
+                    f"The book '{name}' could not enter '{rule.name}': {e}",
+                    actor=actor,
+                    data={"order": text, "reason": str(e), "book": name},
+                )
+                continue
+            names.append(rule.name)
+        if names and not quiet:
+            world.record(
+                Severity.ROUTINE,
+                "standing.book_loaded",
+                f"The book '{name}' loaded: {', '.join(names)}.",
+                actor=actor,
+                data={"book": name, "names": list(names)},
+            )
+        return names
+
+    def unload_book(self, name: str, actor: str, quiet: bool = False) -> list[str]:
+        """The named book unloaded: every rule entered under it struck from the book;
+        one line says so unless `quiet`. Returns the names struck."""
+        gone = [r for r in self.book.rules if r.book == name]
+        if not gone:
+            return []
+        self.book.rules = [r for r in self.book.rules if r.book != name]
+        names = [r.name for r in gone]
+        if not quiet:
+            self.world.record(
+                Severity.ROUTINE,
+                "standing.book_unloaded",
+                f"The book '{name}' unloaded: {', '.join(names)}.",
+                actor=actor,
+                data={"book": name, "names": list(names)},
+            )
+        return names
+
+    def books_loaded(self) -> list[str]:
+        """The names of the books whose rules are in the book, in their first order."""
+        out: list[str] = []
+        for r in self.book.rules:
+            if r.book and r.book not in out:
+                out.append(r.book)
+        return out
+
     # -- the tick ------------------------------------------------------------------------
 
     def tick(self) -> None:
