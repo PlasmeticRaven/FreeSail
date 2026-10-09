@@ -1020,7 +1020,9 @@ def execute(ship: Any, order: Order) -> Result:
             _, helm_text, helm_data = steer_degrees(ship, units.rad_to_deg(heading))
         else:
             helm_text, helm_data = carry_out(ship, judged)
-            words = words.rstrip(".") + f"; {judged.words}."
+            # the judgement as a sentence of its own after the course's, so that the
+            # allowance's sentence keeps its full stop (package 37m's held course)
+            words = words.rstrip(".") + f". {judged.words}."
         data = {"verb": verb, "level": 1, "place": rest, "heading": heading} | shaped
         data["helm"] = helm_data
         if judged.branch != "helm":
