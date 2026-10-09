@@ -431,14 +431,15 @@ def test_a_ports_pilot_vessel_comes_off_as_a_boat_seen_within_two_miles_pulling_
 
 
 # ---------------------------------------------------------------------------
-# A chase or a course across the wind: worn round for it (the fold-in of m5c-c)
+# A chase or a course across the wind: put about, worn or gybed for it (the fold-in of
+# m5c-c; package 37m, the owner's ruling 3 of 2026-10-09)
 # ---------------------------------------------------------------------------
 
 
-def _under_way(heading_deg: float):
-    """The frigate under plain sail with way on, steady on `heading_deg` (the wind from
+def _under_way(heading_deg: float, ship: str = FRIGATE):
+    """The ship under plain sail with way on, steady on `heading_deg` (the wind from
     315: 25 is close-hauled on the larboard tack), her yards and sheets trimmed."""
-    w = world_at(heading=heading_deg)
+    w = world_at(heading=heading_deg, ship=ship)
     w.submit("set plain sail")
     w.submit(f"steer {heading_deg:.0f}")
     for i in range(1500):
@@ -450,35 +451,61 @@ def _under_way(heading_deg: float):
     return w
 
 
+def _until(w, kind: str, seconds: int = 1200):
+    """Run until a line of `kind`; the line."""
+    n0 = len(w.log)
+    for _ in range(seconds):
+        w.tick()
+        found = [e for e in list(w.log)[n0:] if e.kind == kind]
+        if found:
+            return found[0]
+    raise AssertionError(f"no {kind} in {seconds} s")
+
+
+def _on(w, course_deg: float, within_deg: float = 6.0) -> bool:
+    d = w.ship.dyn
+    return abs(units.wrap_pi(float(d.heading) - math.radians(course_deg))) < math.radians(
+        within_deg
+    )
+
+
 def test_a_chase_through_the_winds_wake_wears_her_and_does_not_leave_the_yards_braced():
     """The cruise's frigate at 07:30 on the 13th: the chase 175 degrees round, the shorter
     way by the stern, and a plain helm order turned her with the yards braced sharp up
     until every square sail was aback (the audit of m5c-c, C1 and C2). A course whose
-    turn passes through the wind's wake is a wear, and she is worn for it as she is for a
-    turn through the eye."""
+    turn passes through the wind's wake is a wear, and she is worn for it; since package
+    37m the wear ends on the chase's course, with no book to give it again."""
     w = _under_way(25.0)
     # a brig broad on her starboard quarter: the course for her lies by the stern
     put(w, "merchant brig", 150.0, 4.0, "bound for 48 00 N 5 00 W")
     w.run(60)
     e = w.submit("give chase")
     assert e.kind == "helm.set", e.text
-    assert "lying across the wind from her head, by the stern, she is worn round for it" in e.text
+    assert "lies across the wind from her head, by the stern; she is worn round for it" in e.text
     assert e.data["helm"]["verb"] == "wear ship", e.data
+    course = e.data["course_deg"]
+    wore = _until(w, "ship.wore")
+    assert "for the course ordered" in wore.text, wore.text
+    assert w.ship.dyn.helm_mode.value == "heading"
+    assert abs(math.degrees(w.ship.dyn.target_heading) - course) < 1.0
+    assert _on(w, course)
     # a course shaped the same way is worn for too
     w = _under_way(25.0)
     e = w.submit("shape a course for 48 30 N 5 30 W")
-    assert "by the stern, she is worn round for it" in e.text, e.text
+    assert "by the stern; she is worn round for it" in e.text, e.text
+    assert e.data["judged"] == "wear"
 
 
-def test_a_chase_through_the_winds_eye_is_worn_for_and_a_small_alteration_is_steered():
+def test_a_chase_through_the_winds_eye_puts_her_about_and_a_small_alteration_is_steered():
     w = _under_way(25.0)
-    # a brig broad on the larboard quarter, across the eye the shorter way: worn round
+    # a brig broad on the larboard quarter, across the eye the shorter way: put about,
+    # having way enough to stay (package 37m; the fold-in wore her)
     put(w, "merchant brig", 240.0, 4.0, "bound for 48 00 N 5 00 W")
     w.run(60)
     e = w.submit("give chase")
     assert e.kind == "helm.set", e.text
-    assert "lying across the wind's eye from her head, she is worn round for it" in e.text
-    assert e.data["helm"]["verb"] == "wear ship", e.data
+    assert "lies across the wind's eye from her head; she is put about for it" in e.text
+    assert e.data["helm"]["verb"] == "tack ship", e.data
     # a sail a point or two off the bow: the helm put for her bearing, nothing more
     w = _under_way(25.0)
     put(w, "merchant brig", 40.0, 4.0, "bound for 48 00 N 5 00 W")
@@ -486,3 +513,123 @@ def test_a_chase_through_the_winds_eye_is_worn_for_and_a_small_alteration_is_ste
     e = w.submit("give chase")
     assert e.kind == "helm.set" and "worn round" not in e.text, e.text
     assert e.data["helm"]["verb"] == "steer", e.data
+
+
+@pytest.mark.parametrize("ship", [FRIGATE, SCHOONER])
+def test_a_steer_across_the_winds_eye_puts_her_about_and_the_tack_ends_on_the_course(ship):
+    """The owner's ruling 3: a plain `steer` through the wind tacks her as the ship and
+    the course allow, the line saying so; the tack ends steering the course."""
+    w = _under_way(25.0, ship)
+    e = w.submit("steer 245")
+    assert e.kind == "helm.order", e.text
+    assert e.text.startswith("Helm ordered: steer WSW (245°); WSW (245°) lies across the ")
+    assert "wind's eye from her head; she is put about for it. All hands about ship." in e.text
+    assert e.data["judged"] == "tack" and e.data["helm"]["verb"] == "tack ship"
+    tacked = _until(w, "ship.tacked")
+    assert tacked.text.endswith("on the starboard tack, heading WSW (245°), the course ordered.")
+    assert w.ship.dyn.helm_mode.value == "heading"
+    assert w.ship.dyn.target_heading == pytest.approx(math.radians(245.0))
+    assert not [x for x in w.log if x.kind == "ship.missed_stays"]
+
+
+@pytest.mark.parametrize("ship", [FRIGATE, SCHOONER])
+def test_a_steer_into_the_winds_eye_is_steered_as_given_and_the_line_warns(ship):
+    """A course given directly into the wind's eye is steered, and she is taken aback:
+    the line says so, notable, so that a captain may countermand (the owner's ruling)."""
+    w = _under_way(25.0, ship)
+    for said, course in (("steer NW", 315.0), ("steer NW by N", 326.25)):
+        e = w.submit(said)
+        assert e.kind == "helm.order", e.text
+        assert "lies in the wind's eye from her head; she will be taken aback." in e.text, said
+        assert e.severity.value == "notable" and e.data["judged"] == "aback"
+        assert w.ship.dyn.target_heading == pytest.approx(math.radians(course))
+    # two points from it is not the eye: on her own tack it is steered as given (pinched)
+    e = w.submit("steer N")
+    assert e.text == "Helm ordered: steer N (0°)." and "judged" not in e.data
+
+
+@pytest.mark.parametrize("ship", [FRIGATE, SCHOONER])
+def test_a_steer_too_near_the_wind_on_the_other_tack_puts_her_about_and_keeps_her_full(ship):
+    w = _under_way(25.0, ship)
+    e = w.submit("steer W by N")
+    assert (
+        "W by N (281°) lies too near the wind to be laid; she is put about and kept full and "
+        "by on the starboard tack." in e.text
+    ), e.text
+    tacked = _until(w, "ship.tacked")
+    assert tacked.text.endswith(", full and by."), tacked.text
+    assert w.ship.dyn.helm_mode.value == "full_and_by"
+
+
+def test_a_steer_through_the_wake_wears_the_frigate_and_gybes_the_schooner():
+    w = _under_way(25.0)
+    e = w.submit("steer SSW")
+    assert "SSW (202°) lies across the wind from her head, by the stern; she is worn " in e.text
+    assert e.data["judged"] == "wear"
+    wore = _until(w, "ship.wore")
+    assert wore.text == (
+        "Wore ship; braced for the course ordered on the starboard tack, heading SSW (202°)."
+    )
+    assert _on(w, 202.5)
+    # a fore-and-after gybes by the helm, her boom coming over, as she always has
+    w = _under_way(25.0, SCHOONER)
+    e = w.submit("steer SSW")
+    assert e.text == (
+        "Helm ordered: steer SSW (202°); SSW (202°) lies across the wind from her head, by "
+        "the stern; she gybes for it by the helm."
+    )
+    assert e.data["judged"] == "gybe" and e.data["helm_mode"] == "heading"
+    runner = w.ship.extra["evolutions"]
+    assert not [i for i in runner.instances if i.evo.id in ("tack", "wear")]
+
+
+def test_a_steer_across_the_eye_without_way_to_stay_wears_her():
+    """Luce 1866, ch. XXIV, 'Wearing': worn "when ... the vessel has not sufficient
+    headway for tacking"."""
+    w = _under_way(25.0)
+    d = w.ship.dyn
+    d.u, d.v = units.knots_to_ms(1.5), 0.0
+    d.speed = units.knots_to_ms(1.5)
+    e = w.submit("steer 245")
+    assert "lies across the wind's eye from her head; she has not way enough to stay, and is " in (
+        e.text
+    )
+    assert e.data["judged"] == "wear", e.text
+
+
+def test_from_a_reach_she_is_luffed_up_and_put_about_for_a_course_across_the_eye():
+    w = _under_way(60.0)
+    e = w.submit("steer 245")
+    assert e.data["judged"] == "tack", e.text
+    luff = _until(w, "helm.order")
+    assert luff.text == "Luff up and brace up: she is brought by the wind to go about."
+    tacked = _until(w, "ship.tacked", 1500)
+    assert "WSW (245°)" in tacked.text and "the course ordered" in tacked.text
+
+
+def test_a_course_given_while_she_is_going_about_is_steered_when_she_is_round():
+    w = _under_way(25.0)
+    w.submit("tack")
+    w.run(30)
+    e = w.submit("steer SW")
+    assert e.text == (
+        "Helm ordered: steer SW (225°); SW (225°): she is going about, and the course is "
+        "given her as she comes round."
+    )
+    assert e.data["judged"] == "in_hand"
+    # a point off, reckoned from her course, is left to the helm as it always was
+    e = w.submit("bear away a point")
+    assert "judged" not in e.data
+    tacked = _until(w, "ship.tacked")
+    assert "the course ordered" in tacked.text or "for the course ordered" in tacked.text
+
+
+def test_a_steer_on_her_own_tack_and_a_drifting_ship_are_steered_as_given():
+    w = _under_way(25.0)
+    for said in ("steer NNE", "steer E", "come up a point", "bear away two points"):
+        e = w.submit(said)
+        assert e.kind == "helm.order" and "judged" not in e.data, (said, e.text)
+    # no steerage way: steered as given, as it always was
+    w = world_at(heading=25.0)
+    e = w.submit("steer 245")
+    assert e.text == "Helm ordered: steer WSW (245°)." and "judged" not in e.data

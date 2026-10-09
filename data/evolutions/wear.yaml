@@ -18,7 +18,13 @@ timing:
   wear_estimate_s: 480   # what the state snapshot shows as remaining at the start
   steady_deg: 5          # within this of the new course counts as steady
 on_start: {log: "Stations for wearing ship."}
-on_complete: {log: "Wore ship; braced sharp up on the {new_tack} tack, heading {new_course}.", kind: ship.wore, severity: notable}
+# Parameters (package 37m): `course_deg`, the course she is worn for by `steer`, a course
+# shaped or a chase (`orders.navigation.judge_course`): she comes to it on the new tack,
+# her yards following the wind and trimmed to the course's wind when she is steady on it;
+# `full_and_by`, kept full and by on the new tack. Ordered by its own word she has neither,
+# and comes to close-hauled as she always has.
+# (no defaults declared: absent, they read as none, `freesail/evolutions/expr.py`)
+on_complete: {log: "Wore ship; {braced} on the {new_tack} tack, heading {new_course}{course_words}.", kind: ship.wore, severity: notable}
 on_fail: {log: "Could not wear: {reason}.", kind: evolution.failed, severity: notable}
 # crew (package 19): checked; all hands, as for tacking (Luce 1884, ch. XVIII Organization, 'Station Billet').
 crew: {hands: all, rating: ordinary, stations: [all hands]}

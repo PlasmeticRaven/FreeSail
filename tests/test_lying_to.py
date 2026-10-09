@@ -585,7 +585,12 @@ def test_lain_a_try_anchored_and_weighed_she_takes_a_course_at_the_first_order()
             break
     assert not world.at_anchor and "hove_to" not in world.ship.extra
     e = world.submit("steer SW")
-    assert e.kind == "helm.order" and e.text == "Helm ordered: steer SW (225°).", e.text
+    # (the wind is from the SW: steered as given into the wind's eye, and the line says
+    # what that does, package 37m)
+    assert e.kind == "helm.order" and e.text == (
+        "Helm ordered: steer SW (225°); SW (225°) lies in the wind's eye from her head; she "
+        "will be taken aback."
+    ), e.text
     e = world.submit("fill away")
     assert e.kind == "order.rejected" and "She is not hove to" in e.text
 

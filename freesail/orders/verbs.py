@@ -2060,7 +2060,30 @@ def _not_riding(ship: Ship, order: Order) -> None:
         raise OrderError(f"She is at anchor; '{order.verb_phrase}' must wait till she weighs.")
 
 
-def _helm(ship: Ship, order: Order) -> Result:
+def steer_as_given(ship: Ship, text: str) -> Result:
+    """`steer <course>` carried out as given, with no judgement of the course against
+    the wind (package 37m: a course shaped, a chase's or a manoeuvre's, whose judgement
+    has been made already)."""
+    from freesail.orders.grammar import parse
+
+    order = parse(ship, text, load_vocabulary())
+    _not_riding(ship, order)
+    return _helm(ship, order, judge=False)
+
+
+def manoeuvre_for_course(ship: Ship, evolution: str, params: dict[str, Any]) -> Result:
+    """A tack or a wear ordered for a course (package 37m): `params` carries the course
+    (`course_deg`) and whether she is kept full and by at the end (`full_and_by`); the
+    manoeuvre ends by steering it (`evolutions.scripts.CourseToSteer`)."""
+    from freesail.orders.grammar import parse
+
+    vocab = load_vocabulary()
+    order = parse(ship, "tack ship" if evolution == "tack" else "wear ship", vocab)
+    _not_riding(ship, order)
+    return _ship_evolution(ship, order, vocab, params)
+
+
+def _helm(ship: Ship, order: Order, judge: bool = True) -> Result:
     dyn = ship.dyn
     mods = order.modifiers
     verb = order.verb
@@ -2135,9 +2158,18 @@ def _helm(ship: Ship, order: Order) -> Result:
         target = units.wrap_2pi(base + sign * units.points_to_rad(points))
         said = _points_words(points)
 
-    dyn.helm_mode = HelmMode.HEADING
-    dyn.target_heading = target
-    dyn.steady = False
+    # the one judgement of the course against her head and the wind (package 37m; the
+    # owner's ruling 3 of 2026-10-09): across the wind she is put about, worn or gybed for
+    # it, the manoeuvre ending on it; nearer the wind than she will lie on the other tack,
+    # put about or worn for that tack and kept full and by; in the wind's eye, steered as
+    # given and warned; and the line says which
+    judged = None
+    if judge:
+        from freesail.orders.navigation import judge_course
+
+        judged = judge_course(ship, target, helm_order=True, points="heading" not in mods)
+        if judged.branch == "helm":
+            judged = None
     shown = units.format_heading(target)
     said_text = str(mods.get("heading_text", ""))
     if verb == "steer" and "heading" in mods and any(f in said_text for f in "¼½¾"):
@@ -2150,12 +2182,38 @@ def _helm(ship: Ship, order: Order) -> Result:
             text = f"Helm ordered: steer {said}; {shown}."
     else:
         text = f"Helm ordered: {verb} {said}; steer {shown}."
+    if judged is not None and judged.branch not in ("aback", "gybe"):
+        # put about, worn, kept full and by, or handed to the manoeuvre in hand: the helm
+        # is the manoeuvre's or the full-and-by's, and the line says what she does
+        from freesail.orders.navigation import carry_out
+
+        carried, helm_data = carry_out(ship, judged)
+        text = f"{text[:-1]}; {judged.words}." + (f" {carried}" if carried else "")
+        data = {
+            "helm_mode": dyn.helm_mode.value,
+            "verb": verb,
+            "points": mods.get("points"),
+            "course": target,
+            "judged": judged.branch,
+            "helm": helm_data,
+        }
+        return "helm.order", text, data
+    dyn.helm_mode = HelmMode.HEADING
+    dyn.target_heading = target if judged is None else judged.course
+    dyn.steady = False
     data = {
         "helm_mode": HelmMode.HEADING.value,
-        "target_heading": target,
+        "target_heading": dyn.target_heading,
         "verb": verb,
         "points": mods.get("points"),
     }
+    if judged is not None:
+        # steered into the wind's eye as given (she will be taken aback), or round by the
+        # stern for a fore-and-after, her boom coming over: said, and notable for the eye
+        text = f"{text[:-1]}; {judged.words}."
+        data["judged"] = judged.branch
+        if judged.branch == "aback":
+            data["notable"] = True
     return "helm.order", text, data
 
 
@@ -2681,7 +2739,9 @@ def _shift_spar(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
 # ---------------------------------------------------------------------------
 
 
-def _ship_evolution(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
+def _ship_evolution(
+    ship: Ship, order: Order, vocab: Vocabulary, course: dict[str, Any] | None = None
+) -> Result:
     allowed = {"tack", "manner", "hands_from"}
     if order.verb == "fill away":
         allowed.add("heading")  # "fill away and steer SW by W" (package 37f)
@@ -2739,6 +2799,8 @@ def _ship_evolution(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
             inst.evo.id in ("heave_to", "lie_a_try") and inst.script is not None for inst in in_hand
         ):
             raise OrderError("She is heaving to already.")
+    if course:
+        params.update(course)  # a tack or a wear for a course (package 37m)
     runner = runner_of(ship)
     extra, call = crew_orders.take_hands_from(ship, order, [evo])
     params.update(extra)

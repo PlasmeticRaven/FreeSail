@@ -41,6 +41,7 @@ from __future__ import annotations
 
 import math
 import re
+from dataclasses import dataclass
 from typing import Any
 
 from freesail import units
@@ -209,100 +210,276 @@ def _chase_course(world: Any, sighting: Any) -> tuple[float, str]:
     return course, words
 
 
+# ---------------------------------------------------------------------------
+# The helm through the wind (package 37m; the owner's ruling 3 of 2026-10-09, spec M6 §31,
+# decision 39): one judgement of a course against her head and the wind, shared by
+# `steer <course>`, the points orders (`come up`, `bear away`, `steer two points to
+# starboard`), `shape a course for` and `give chase`. She is steered, put about, worn,
+# gybed or kept full and by as the ship and the course allow, and the line says which,
+# so that a captain reading it may countermand.
+# ---------------------------------------------------------------------------
+
 # A course shaped nearer the wind than close-hauled and half a point is not laid
 # (package 35's rule for the pilot's course, `evolutions.scripts`): she is kept full and
-# by on the tack that points nearer the course, put about for it when it is the other,
-# and the line says so; a course laid but reached by a turn through the wind's eye is
-# worn round for (the book gives the course again after, as the cruise's does).
+# by on the tack that points nearer the course. The helm's own orders (`steer`, the
+# points orders) are laid at the close-hauled angle itself, and on the tack she is on
+# they are carried out as given however near the wind: pinching her is the captain's to
+# order (Fincham 1843, art. 99, the sails "just lifting"; truths 1, 2 and 25 steer her
+# up so), and the line warns when the course lies in the wind's eye.
 COURSE_NOT_LAID_MARGIN_POINTS = 0.5
-# a square-rigged ship with this much way on is worn for a course through the wind's wake
-# (a knot: under that she is drifting, and a wear would not come round)
+# "The wind's eye": the point the wind blows from. A helm order within a point of it is a
+# course in the wind's eye, steered as given and said to take her aback (the owner's
+# ruling 3); judgement, a point either side, since the wind is named to the point and
+# wanders about it.
+EYE_POINTS = 1.0
+# the point either side of it taken whole: N by W is in the eye of a northerly, though the
+# wind's own figure wanders a degree from its point
+EYE_ALLOWANCE = units.deg_to_rad(1.0)
+# Way enough to stay: the tack's own precondition (`data/evolutions/tack.yaml`, two
+# knots); under it a ship that must cross the wind's eye is worn, "when ... the vessel
+# has not sufficient headway for tacking" (Luce 1866, ch. XXIV, 'Wearing').
+STAY_MIN_KN = 2.0
+# A square-rigged ship with this much way on is worn for a course through the wind's wake
+# (a knot: under that she is drifting, and a wear would not come round); and a ship that
+# must cross the wind's eye without way to stay is worn with no less.
 WEAR_FOR_IT_MIN_MS = 0.5
+# A turn by the stern of eight points or less keeps the wind abaft the beam at both ends,
+# where a square sail fills however its yard is braced: running, the wind brought from one
+# quarter to the other, it is the helm's, the trim following (the St Mary's pilot's
+# approach in `tests/test_ports.py`, steered by the bearing a minute at a time, came 78
+# degrees round from a run and was worn for it, and she struck the Nut Rock). A longer
+# turn brings the wind forward of the beam on the new side with the yards still braced
+# for the old: what laid every square sail aback in the cruise's chase (the fold-in of
+# m5c-c, whose guard counted turns of more than six points). Judgement.
+WAKE_HELM_POINTS = 8.0
+# Under this she has no steerage way: the course is steered as given, as it always was,
+# for there is no turn to judge (a ship gathering way from rest, a ship drifting).
+STEERAGE_WAY_MS = 0.1
+
+# The manoeuvres a course is handed to while they are in hand (`give_course`).
+COURSE_MANOEUVRES = ("tack", "wear")
 
 
-def _course_not_laid(ship: Any, heading: float) -> tuple[str, str] | None:
-    """When a course shaped lies too near the wind to be laid: (the words, the helm order
-    that stands in for it: 'keep her full and by' on the tack that points nearer the
-    course, 'tack' when that is the other tack); None when the course is laid."""
+@dataclass(frozen=True)
+class Judgement:
+    """What the helm is to do for a course: `branch` is 'helm' (steered as given),
+    'aback' (steered as given, in the wind's eye), 'full_and_by' (kept full and by on the
+    tack she is on), 'tack' or 'wear' (the manoeuvre ordered for the course), 'gybe'
+    (steered round by the stern, a fore-and-after's boom coming over), or 'in_hand' (a
+    tack or a wear in hand takes the course as she comes round). `course` is the heading
+    she is to have at the end (radians true): the course, or the close-hauled course on
+    the tack she is kept full and by on; `words` the clause the line says."""
+
+    branch: str
+    course: float
+    words: str = ""
+    full_and_by: bool = False
+    tack: str = ""
+
+
+def _side(x: float) -> str:
+    """The tack of a heading `x` radians from the wind's eye: the wind over the starboard
+    side when her head lies to the left of it."""
+    return "starboard" if x < 0.0 else "larboard"
+
+
+def _crosses(now: float, to: float, wind_from: float) -> str | None:
+    """Which of the wind's eye ('eye') and its wake ('wake') the shorter turn from her
+    head `now` to `to` passes through; None when it passes through neither, the course
+    lying on the tack she is on. A turn through the wake of `WAKE_HELM_POINTS` or less is
+    the helm's (`WAKE_HELM_POINTS`)."""
+    turn = units.wrap_pi(to - now)
+    for mark, name in ((wind_from, "eye"), (wind_from + math.pi, "wake")):
+        to_mark = units.wrap_pi(mark - now)
+        if to_mark != 0.0 and (turn > 0) == (to_mark > 0) and abs(to_mark) < abs(turn):
+            if name == "wake" and abs(turn) <= WAKE_HELM_POINTS * units.POINT + 1e-9:
+                return None
+            return name
+    return None
+
+
+def _square_rigged_under_sail(ship: Any) -> bool:
+    """Yards on two masts and a square sail set: a ship whose turn by the stern is a wear
+    (the fold-in of m5c-c; a fore-and-after, one mast with yards, gybes by the helm)."""
+    from freesail.evolutions.scripts import _masts_with_yards
+
+    return len(_masts_with_yards(ship)) >= 2 and any(
+        sl.is_set and sl.cls == "square" for sl in ship.sails.values()
+    )
+
+
+def manoeuvre_in_hand(ship: Any) -> Any:
+    """The tack or the wear in hand (begun and running), or None."""
+    runner = (getattr(ship, "extra", None) or {}).get("evolutions")
+    for inst in reversed(getattr(runner, "instances", None) or []):
+        script = getattr(inst, "script", None)
+        if (
+            inst.evo.id in COURSE_MANOEUVRES
+            and script is not None
+            and not inst.waiting
+            and script.status == "running"
+            and script.phase != "ready"
+        ):
+            return inst
+    return None
+
+
+def judge_course(ship: Any, course: float, helm_order: bool, points: bool = False) -> Judgement:
+    """The one judgement of a course (radians true) against her head and the wind.
+
+    `helm_order` is true for the helm's own orders (`steer`, the points orders), false for
+    a course shaped or a chase's; `points` for an order reckoned from her course in points
+    (`come up`, `bear away`, `steer two points off`). Laid and on the tack she is on, the
+    helm; across the wind's eye, put about when she has way enough to stay, else worn
+    (Luce 1866, ch. XXIV, 'Wearing': "when ... the vessel has not sufficient headway for
+    tacking"); through the wind's wake, worn if square-rigged and under sail, gybed by the
+    helm if a fore-and-after; nearer the wind than she will lie, kept full and by on the
+    tack that points nearer it, put about or worn for that tack when it is the other; a
+    helm order in the wind's eye is steered as given, and the line says she will be taken
+    aback. A tack or a wear in hand takes a course on the tack she is going to (an order
+    reckoned in points is left to the helm there, as it always was)."""
     from freesail.evolutions.scripts import close_hauled_true_angle
     from freesail.orders.prompt import world_of
 
     world = world_of(ship)
     wind = getattr(world, "wind", None)
-    if wind is None:
-        return None
+    dyn = getattr(ship, "dyn", None)
+    if wind is None or dyn is None:
+        return Judgement("helm", course)
     wind_from = float(wind.direction_from)
     closest = close_hauled_true_angle(ship)
-    off = abs(units.wrap_pi(heading - wind_from))
-    dyn = getattr(ship, "dyn", None)
-    if off >= closest + COURSE_NOT_LAID_MARGIN_POINTS * units.POINT:
-        # laid; but a helm put over for it turns her the shorter way, and when the wind's
-        # eye lies in that arc she is taken aback and lies in irons (a frigate chasing a
-        # cutter down wind and shaping back for her station, found on the way): she is
-        # worn round instead (Luce 1866 ch. XXIV), and the course is given again after.
-        # The same for a square-rigged ship under sail whose arc passes through the
-        # wind's wake, dead to leeward: the helm alone turns her by the stern with the
-        # yards still braced for the old tack, and as the wind comes over the other
-        # quarter every square sail is laid aback (the cruise's frigate at 07:30 on the
-        # 13th, chasing the Palinure 175 degrees round, and again shaping for her station
-        # from the cutter's hail: the fold-in of m5c-c, the audit's C1 and C2). That turn
-        # is a wear, and wearing her works the yards round with her head. A fore-and-after
-        # (one mast with yards) gybes by the helm, her booms swinging over, as she always
-        # has; a ship with no square sail set, or drifting with no way, has nothing to be
-        # worn for
-        if dyn is not None and float(getattr(dyn, "speed", 0.0)) > 0.1:
-            from freesail.evolutions.scripts import _masts_with_yards
+    shown = units.format_heading(course)
+    x = units.wrap_pi(course - wind_from)
+    off = abs(x)
+    said_tack = _side(x)
+    speed = float(getattr(dyn, "speed", 0.0))
+    now = float(dyn.heading)
+    margin = 0.0 if helm_order else COURSE_NOT_LAID_MARGIN_POINTS * units.POINT
+    laid = off >= closest + margin
 
-            now = float(dyn.heading)
-            turn = units.wrap_pi(heading - now)
-            marks = [(wind_from, "lying across the wind's eye from her head")]
-            square_set = any(sl.is_set and sl.cls == "square" for sl in ship.sails.values())
-            if (
-                len(_masts_with_yards(ship)) >= 2
-                and square_set
-                and float(dyn.speed) > WEAR_FOR_IT_MIN_MS
-            ):
-                marks.append(
-                    (wind_from + math.pi, "lying across the wind from her head, by the stern")
-                )
-            for mark, words in marks:
-                to_mark = units.wrap_pi(mark - now)
-                if abs(turn) > closest and (turn > 0) == (to_mark > 0) and abs(to_mark) < abs(turn):
-                    return (
-                        f"{units.format_heading(heading)} {words}, she is worn round for it",
-                        "wear ship",
-                    )
-        return None
-    # the wind over the starboard side: her head lies the closest angle to the left of
-    # the wind's eye; over the larboard side, to the right
-    starboard = units.wrap_2pi(wind_from - closest)
-    larboard = units.wrap_2pi(wind_from + closest)
-    nearer = (
-        "starboard"
-        if abs(units.wrap_pi(heading - starboard)) <= abs(units.wrap_pi(heading - larboard))
-        else "larboard"
+    in_hand = manoeuvre_in_hand(ship)
+    if in_hand is not None:
+        if points:
+            return Judgement("helm", course)
+        going_to = "larboard" if in_hand.script.sign > 0 else "starboard"
+        if said_tack == going_to:
+            doing = "going about" if in_hand.evo.id == "tack" else "wearing"
+            words = (
+                f"{shown}: she is {doing}, and the course is given her as she comes round"
+                if laid
+                else f"{shown} lies too near the wind to be laid; she is {doing}, and is kept "
+                f"full and by on the {going_to} tack as she comes round"
+            )
+            if laid:
+                return Judgement("in_hand", course, words, tack=going_to)
+            sign = 1.0 if going_to == "larboard" else -1.0
+            by_the_wind = units.wrap_2pi(wind_from + sign * closest)
+            return Judgement("in_hand", by_the_wind, words, full_and_by=True, tack=going_to)
+
+    if helm_order and off <= EYE_POINTS * units.POINT + EYE_ALLOWANCE:
+        # the owner's ruling: a course given directly into the wind's eye is steered
+        aback = f"{shown} lies in the wind's eye from her head; she will be taken aback"
+        return Judgement("aback", course, aback)
+    own = _side(units.wrap_pi(now - wind_from))
+    crossing = _crosses(now, course, wind_from) if speed > STEERAGE_WAY_MS else None
+    if crossing is None:
+        if laid or helm_order:
+            return Judgement("helm", course)
+        # a course too near the wind on the tack she is on, or with no way on her to put
+        # her about: kept full and by on her tack
+        words = (
+            f"{shown} lies too near the wind to be laid; she is kept full and by on the {own} tack"
+        )
+        if own != said_tack:
+            words = (
+                f"{shown} lies too near the wind to be laid on the {said_tack} tack, and she "
+                f"has no way on her to go about; she is kept full and by on the {own} tack"
+            )
+        return Judgement("full_and_by", course, words, full_and_by=True, tack=own)
+    # through the wind: the course, or the close-hauled course on the tack nearer it
+    if laid:
+        target, full_and_by = course, False
+        what = f"{shown} lies across the wind's eye from her head"
+    else:
+        sign = 1.0 if said_tack == "larboard" else -1.0
+        target, full_and_by = units.wrap_2pi(wind_from + sign * closest), True
+        what = f"{shown} lies too near the wind to be laid"
+    crossing = _crosses(now, target, wind_from) or crossing
+    if laid and crossing == "wake":
+        what = f"{shown} lies across the wind from her head, by the stern"
+    tail = f" and kept full and by on the {said_tack} tack" if full_and_by else ""
+    if crossing == "eye":
+        if speed >= units.knots_to_ms(STAY_MIN_KN):
+            way = "she is put about for it" if laid else "she is put about"
+            return Judgement("tack", target, f"{what}; {way}{tail}", full_and_by, said_tack)
+        if speed > WEAR_FOR_IT_MIN_MS:
+            way = "worn round for it" if laid else "worn round"
+            return Judgement(
+                "wear",
+                target,
+                f"{what}; she has not way enough to stay, and is {way}{tail}",
+                full_and_by,
+                said_tack,
+            )
+    elif _square_rigged_under_sail(ship):
+        if speed > WEAR_FOR_IT_MIN_MS:
+            way = "she is worn round for it" if laid else "she is worn round"
+            return Judgement("wear", target, f"{what}; {way}{tail}", full_and_by, said_tack)
+    else:
+        way = (
+            "she gybes for it by the helm"
+            if laid
+            else f"she gybes by the helm and is steered close-hauled on the {said_tack} tack"
+        )
+        return Judgement("gybe", target, f"{what}; {way}", full_and_by, said_tack)
+    # too little way to go about or to wear: the helm, as it always was
+    if laid or helm_order:
+        return Judgement("helm", course)
+    return Judgement(
+        "full_and_by",
+        course,
+        f"{shown} lies too near the wind to be laid on the {said_tack} tack, and she has not "
+        f"way enough to go about; she is kept full and by on the {own} tack",
+        full_and_by=True,
+        tack=own,
     )
-    said = f"{units.format_heading(heading)} lying too near the wind to be laid"
-    if dyn is not None and getattr(dyn, "tack", None) == nearer:
-        return f"{said}, she is kept full and by on the {nearer} tack", "keep her full and by"
-    return f"{said}, she is put about for the {nearer} tack", "tack"
 
 
-def _helm_for(ship: Any, not_laid: tuple[str, str]) -> tuple[str, str, dict[str, Any]]:
-    """The helm order that stands in for a course not laid or across the eye, given; a
-    tack refused because she is not by the wind brings her by the wind instead (the book
-    gives the course again at its next glass, and the tack is accepted then)."""
-    from freesail.orders import handle
+def carry_out(ship: Any, judged: Judgement) -> tuple[str, dict[str, Any]]:
+    """Put a judgement other than the plain helm's into effect: (the helm's or the
+    manoeuvre's own words, its data). A tack or a wear is ordered with the course it is
+    for and ends by steering it (`evolutions.scripts.CourseToSteer`); refused, the order
+    is refused with the judgement's words and the reason."""
+    from freesail.orders import handle, verbs
 
-    words, order = not_laid
-    try:
-        _, helm_text, helm_data = handle(ship, order)
-    except OrderError as exc:
-        if order != "tack" or "close-hauled" not in str(exc):
-            raise
-        _, helm_text, helm_data = handle(ship, "keep her full and by")
-        words = words.replace("she is put about for", "she is brought by the wind to go about for")
-    return words, helm_text, helm_data
+    if judged.branch == "in_hand":
+        inst = manoeuvre_in_hand(ship)
+        inst.script.give_course(units.rad_to_deg(judged.course), judged.full_and_by)
+        return "", {"verb": inst.evo.id, "in_hand": True}
+    if judged.branch == "full_and_by":
+        _, text, data = handle(ship, "keep her full and by")
+        return text, data
+    if judged.branch in COURSE_MANOEUVRES:
+        params: dict[str, Any] = {"course_deg": round(units.rad_to_deg(judged.course), 3)}
+        if judged.full_and_by:
+            params["full_and_by"] = True
+        try:
+            _, text, data = verbs.manoeuvre_for_course(ship, judged.branch, params)
+        except OrderError as exc:
+            said = judged.words[:1].upper() + judged.words[1:]
+            raise OrderError(f"{said}; that could not be done: {exc}") from None
+        return text, data
+    # the helm: steered as given, or round by the stern for a fore-and-after
+    _, text, data = steer_degrees(ship, units.rad_to_deg(judged.course))
+    return text, data
+
+
+def steer_degrees(ship: Any, degrees: float) -> Result:
+    """The helm put for a course in whole degrees, as `steer <degrees>` puts it, with no
+    judgement of it (the judgement has been made)."""
+    from freesail.orders import verbs
+
+    return verbs.steer_as_given(ship, f"steer {degrees:.0f}")
 
 
 def _world_with_lookout(ship: Any) -> Any:
@@ -734,23 +911,24 @@ def execute(ship: Any, order: Order) -> Result:
             heading, words, shaped = nav.shape_for(target, said)
         else:
             heading, words, shaped = nav.shape_course(rest)
-        from freesail.orders import handle
-
-        not_laid = _course_not_laid(ship, heading)
-        if not_laid:
-            # the course lies nearer the wind than she will sail: said, not steered, and
-            # she is kept full and by on the tack that points nearer it, put about for it
-            # when that is the other tack (as the pilot's course is said and not steered,
-            # package 35; the book's helm rules have no other guard)
-            said, helm_text, helm_data = _helm_for(ship, not_laid)
-            words = words.rstrip(".") + f"; {said}."
+        # the one judgement of the course against her head and the wind (package 37m):
+        # steered when it is laid on her tack; put about, worn or gybed for it across the
+        # wind, the manoeuvre ending on it; kept full and by when it lies nearer the wind
+        # than she will sail (as the pilot's course is said and not steered, package 35),
+        # put about or worn for the tack that points nearer it when that is the other
+        judged = judge_course(ship, heading, helm_order=False)
+        if judged.branch == "helm":
+            _, helm_text, helm_data = steer_degrees(ship, units.rad_to_deg(heading))
         else:
-            _, helm_text, helm_data = handle(ship, f"steer {units.rad_to_deg(heading):.0f}")
+            helm_text, helm_data = carry_out(ship, judged)
+            words = words.rstrip(".") + f"; {judged.words}."
         data = {"verb": verb, "level": 1, "place": rest, "heading": heading} | shaped
         data["helm"] = helm_data
-        if not_laid:
+        if judged.branch != "helm":
+            data["judged"] = judged.branch
+        if judged.full_and_by:
             data["course_not_laid"] = True
-        return "helm.set", f"{words} {helm_text}", data
+        return "helm.set", f"{words} {helm_text}".rstrip(), data
     # other sail (spec M5 §25; package 36): the glass aloft, and the chase
     if verb == "make her out":
         world = _world_with_lookout(ship)
@@ -780,16 +958,16 @@ def execute(ship: Any, order: Order) -> Result:
         point = units.point_name(math.radians(sighting.bearing_deg))
         who = lookout.sail_name(sighting.feature.id, sighting.feature.name)
         course, drift_words = _chase_course(world, sighting)
-        from freesail.orders import handle
-
-        across = _course_not_laid(ship, math.radians(course))
-        if across:
-            # the course lies across the wind's eye from her head: worn round for it
-            said, helm_text, helm_data = _helm_for(ship, across)
-            drift_words += f"; {said}"
+        judged = judge_course(ship, math.radians(course), helm_order=False)
+        if judged.branch == "helm":
+            _, helm_text, helm_data = steer_degrees(ship, course)
         else:
-            _, helm_text, helm_data = handle(ship, f"steer {course:.0f}")
+            # the course lies across the wind from her head: put about, worn or gybed for
+            # it, the manoeuvre ending on it (package 37m)
+            helm_text, helm_data = carry_out(ship, judged)
+            drift_words += f"; {judged.words}"
         words = f"Gave chase to {who} {relative}, bearing {point}{drift_words}. {helm_text}"
+        words = words.rstrip()
         data = {
             "verb": verb,
             "level": 1,

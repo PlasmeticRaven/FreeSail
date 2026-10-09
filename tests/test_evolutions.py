@@ -1428,3 +1428,124 @@ def test_a_tack_that_could_not_begin_is_refused_in_its_own_words_not_a_missed_st
     no = w.submit("tack")
     assert no.kind == "order.rejected" and "She is not close-hauled" in no.text
     assert registry.get("tack").on_refused is not None
+
+
+# ---------------------------------------------------------------------------
+# Package 37m: a tack or a wear ordered for a course ends on it
+# ---------------------------------------------------------------------------
+
+
+def _braced_up_on_starboard(path: str, off_deg: float = 55.0):
+    ship = load_ship(path)
+    runner = Runner(ship)
+    wind = make_wind(from_deg=90.0, knots=10.0)
+    close_hauled_on_starboard(ship, wind, off_deg=off_deg)
+    for y in ship.spars.values():
+        if y.is_yard:
+            y.brace_angle = y.brace_limit
+    return ship, runner, wind
+
+
+@pytest.mark.parametrize("path", SHIPS)
+def test_a_tack_for_a_course_off_the_wind_pays_off_to_it_and_steers_it(path):
+    """The owner's ruling 3 of 2026-10-09: a `steer` across the wind's eye puts her about,
+    and the tack ends by steering the course (`params["course_deg"]`), so that no book
+    need give it again: by the wind on the new tack she pays off to it, her yards trimmed
+    to the wind as it draws aft (as filling away for a course does)."""
+    ship, runner, wind = _braced_up_on_starboard(path)
+    course = 190.0  # a hundred degrees off a wind from the east, on the larboard tack
+    assert runner.start(ship, "tack", "ship", {"course_deg": course}) == "All hands about ship."
+    _, notes = run(runner, ship, wind, turner(0.4))
+    assert kinds(notes)[-1] == "ship.tacked", texts(notes)
+    assert texts(notes)[-1] == (
+        "Tacked; braced up for the course ordered on the larboard tack, heading S by W (190°)."
+    )
+    assert ship.dyn.helm_mode is HelmMode.HEADING
+    assert ship.dyn.target_heading == pytest.approx(math.radians(course))
+    assert abs(units.wrap_pi(ship.dyn.heading - math.radians(course))) < math.radians(6)
+    # the yards trimmed to the course's wind, not left braced sharp up
+    for y in ship.spars.values():
+        if y.is_yard and y.brace_limit > 0:
+            assert -y.brace_limit < y.brace_angle < -0.5 * y.brace_limit, y.id
+    assert runner.in_progress() == []
+
+
+def test_a_tack_for_a_course_too_near_the_wind_ends_full_and_by():
+    ship, runner, wind = _braced_up_on_starboard(FRIGATE)
+    runner.start(ship, "tack", "ship", {"course_deg": 150.0, "full_and_by": True})
+    _, notes = run(runner, ship, wind, turner(0.4))
+    assert texts(notes)[-1].startswith("Tacked; braced up on the larboard tack, heading ")
+    assert texts(notes)[-1].endswith(", full and by.")
+    assert ship.dyn.helm_mode is HelmMode.FULL_AND_BY
+
+
+def test_a_tack_for_a_course_from_off_the_wind_is_luffed_up_first():
+    """Ordered by its own word the tack is refused off the wind (package 37k's words);
+    ordered for a course she is luffed up and braced up first, then put about."""
+    ship, runner, wind = _braced_up_on_starboard(FRIGATE, off_deg=100.0)
+    for y in ship.spars.values():
+        if y.is_yard:
+            y.brace_angle = 0.5 * y.brace_limit
+    with pytest.raises(OrderError, match="not close-hauled"):
+        runner.start(ship, "tack", "ship")
+    runner.start(ship, "tack", "ship", {"course_deg": 200.0})
+    _, notes = run(runner, ship, wind, turner(0.4))
+    words = texts(notes)
+    assert words[0] == "Luff up and brace up: she is brought by the wind to go about."
+    assert any(w.startswith("Ready about") for w in words[1:])
+    assert kinds(notes)[-1] == "ship.tacked"
+    assert ship.dyn.target_heading == pytest.approx(math.radians(200.0))
+
+
+@pytest.mark.parametrize("path", SHIPS)
+def test_a_wear_for_a_course_comes_to_it_with_the_yards_trimmed_for_it(path):
+    from freesail.evolutions import scripts
+
+    ship, runner, wind = _braced_up_on_starboard(path, off_deg=67.5)
+    course = 190.0
+    runner.start(ship, "wear", "ship", {"course_deg": course})
+    _, notes = run(runner, ship, wind, turner(0.5))
+    assert kinds(notes)[-1] == "ship.wore", texts(notes)
+    assert texts(notes)[-1] == (
+        "Wore ship; braced for the course ordered on the larboard tack, heading S by W (190°)."
+    )
+    assert ship.dyn.helm_mode is HelmMode.HEADING
+    assert ship.dyn.target_heading == pytest.approx(math.radians(course))
+    ch = 6 * units.POINT
+    for y in ship.spars.values():
+        if y.is_yard and y.brace_limit > 0:
+            want = scripts.trim_angle(-math.radians(100.0), y.brace_limit, ch)
+            assert y.brace_angle == pytest.approx(want, abs=0.02), y.id
+
+
+def test_a_course_handed_to_the_tack_in_hand_is_steered_when_she_is_round():
+    ship, runner, wind = _braced_up_on_starboard(FRIGATE)
+    runner.start(ship, "tack", "ship")
+    for _ in range(20):
+        runner.step(ship, 1.0, wind)
+        turner(0.4)(ship, 1.0, wind)
+    from freesail.orders.navigation import manoeuvre_in_hand
+
+    ship.extra["evolutions"] = runner
+    inst = manoeuvre_in_hand(ship)
+    assert inst is not None and inst.evo.id == "tack"
+    inst.script.give_course(170.0, False)
+    _, notes = run(runner, ship, wind, turner(0.4))
+    assert texts(notes)[-1] == (
+        "Tacked; braced up for the course ordered on the larboard tack, heading S by E (170°)."
+    )
+    assert ship.dyn.target_heading == pytest.approx(math.radians(170.0))
+
+
+def test_a_tack_and_a_wear_by_their_own_word_end_as_they_always_have():
+    """No course: the completion lines' words are those of before package 37m."""
+    ship, runner, wind = _braced_up_on_starboard(FRIGATE)
+    runner.start(ship, "tack", "ship")
+    _, notes = run(runner, ship, wind, turner(0.4))
+    assert texts(notes)[-1] == "Tacked; braced up on the larboard tack, heading SSE (158°)."
+    ship, runner, wind = _braced_up_on_starboard(FRIGATE, off_deg=67.5)
+    runner.start(ship, "wear", "ship")
+    _, notes = run(runner, ship, wind, turner(0.5))
+    assert texts(notes)[-1] == (
+        "Wore ship; braced sharp up on the larboard tack, heading SSE (158°)."
+    )
