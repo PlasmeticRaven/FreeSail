@@ -83,7 +83,7 @@ cwt, 120 fathoms of 19-inch cable: at the bows. The sheet anchor, 47 cwt, 120 fa
 the bows. The kedge, 6 cwt, 120 fathoms of 9.5-inch cable: at the bows.
 ```
 
-The anchors are named as the forecastle names them: `the best bower` (the starboard one), `the small bower`, `the sheet anchor`, `the stream anchor`, `the kedge`, and `the second anchor` for whichever bower is not yet down. `the anchor` alone is the one she rides by, or the best bower.
+The anchors are named as the forecastle names them: `the best bower` (the starboard one), `the small bower`, `the sheet anchor`, `the stream anchor`, `the kedge`, and `the second anchor` for whichever bower is not yet down. `the anchor` alone is the one she rides by, or the best bower. An anchor she does not carry is refused as the order is given, whatever the hands are at, with the anchors she has: "she carries no sheet anchor; her anchors are the best bower, the small bower and the kedge".
 
 ## Coming to an anchor
 
@@ -119,7 +119,9 @@ best bower to the flood, wind and tide together.
 
 "Brought up" is said for an anchor let go by itself as it is for the whole evolution, when the cable has come taut and her way is gone; it is the event `brought up` for a standing order or a stand-by.
 
-**Three warnings come as the anchor goes**, each a notable line of its own and none of them a refusal. *Her swinging room:* at anchor she swings about it with the wind and the tide, by the cable along the ground and her own length, and when that circle comes within a cable of the nearest land as the lookout judges it, "With eighty-four fathoms out she will swing within a cable of the land to the eastward." (or "onto the land"). A shorter scope, or another berth, is the answer. *Her cable:* when the depth wants more than the cable bent to that anchor, "The small bower has a hundred and twenty fathoms of cable bent to it, and five times the depth wants a hundred and fifty-four fathoms: she will have all of it and no more." *The water at low water:* "By the master's tide there will be two fathoms here at low water, and she draws 15 feet.", when the depth the lead finds, less the fall the master reckons to low water by his own tide, is less than her draught.
+**Three warnings come as the anchor goes**, each a notable line of its own and none of them a refusal. *Her swinging room:* at anchor she swings about it with the wind and the tide, by the cable along the ground and her own length, and when that circle comes within a cable of the nearest land as the lookout judges it, "With eighty-four fathoms out she will swing within a cable of the land to the eastward." (or "onto the land"). A shorter scope, or another berth, is the answer. *Her cable:* when the depth wants more than the cable bent to that anchor, "The small bower has a hundred and twenty fathoms of cable bent to it, and five times the depth wants a hundred and fifty-four fathoms: she will have all of it and no more." *The water at low water:* "By the master's tide there will be two fathoms here at low water, and she draws 15 feet.", when the depth the lead finds, less the fall the master reckons to low water by his own tide, is less than her draught. Her draught itself is a reading, `her draught` (or `the draught`, `what she draws`): "she draws fifteen feet of water, two fathoms and a half".
+
+**The deep road.** The roads of the directions lie in three to seventeen fathoms (Carrick Road seven to seventeen, Bertheaume eight to twelve, the Bay of Brest eight to sixteen); Falconer's anchoring ground is "neither too deep, too shallow, nor rocky", the first because "the cable bears too nearly perpendicular, and is thereby apt to jerk the anchor out of the ground", and Luce has the cable double-bitted before "anchoring in deep water, as at Madeira", which he names as the exception it was. So an anchor goes in more than twenty fathoms with a fourth warning, "46 fathoms and a half is deep water to anchor in: the roads lie in seventeen fathoms and less, and here she rides on a steep cable and will be long heaving it in."; and an anchor whose whole cable gives less than three times the depth, the old rule of scope and the least a ship rides by, is not let go at all, in words that name the anchor that would reach: "no anchoring ground here: 46 fathoms and a half, and the small bower's a hundred and twenty fathoms of cable give less than three times the depth, the least she will ride by; the best bower has 240 fathoms". The best bower, with two cables spliced, reaches into eighty fathoms; the others into forty.
 
 ```orders frigate
 let go the anchor
@@ -160,7 +162,7 @@ At single anchor she lies to the stream when it runs, and to the wind when it is
   stream.
 ```
 
-While it goes on there is no second urgent line. A notable one says how far she has come, a quarter of an hour apart at the most and only while she is still moving: "The best bower still coming home: a cable since it began." When the anchor has not moved for five minutes it "holds again, having come home a cable and a half", routinely; and the next drag after that is a new one, with its own urgent line. An anchor whose cable is slack is not said to drag.
+While it goes on there is no second urgent line. A notable one says how far she has come, a quarter of an hour apart at the most and only while she is still moving: "The best bower still coming home: a cable since it began." When the anchor has not moved for a quarter of an hour it "holds again, having come home a cable and a half", routinely, the distance counted over the whole of it; and the next drag after that is a new one, with its own urgent line. An anchor that holds a few minutes and comes home again inside the quarter of an hour, as on bare rock in a tideway, is the same dragging and is not cried again. An anchor whose cable is slack is not said to drag.
 
 **The ground decides how much she holds.** The anchor's depth and bottom are read where it lies, from the chart's note: good ground and sand and clay hold as the rule says, mud eight tenths of it, shells and weed six, stones four, rock three. A note of two grounds holds as the mean of them: "rock and mud" in the Goulet a little over half, "sand and rock" off Roscoff two thirds. Every port's road and anchorage has its note, Brest road among them (mud).
 
@@ -176,6 +178,8 @@ back the anchor
 ## Weighing
 
 `heave short` rigs the capstan and heaves the cable in to a short stay, a cable and a half the depth, where she is ready to go the moment the anchor is broken out. `weigh` (also `weigh anchor`, `up anchor`, `get under way`) heaves short if she is not, heaves the cable up and down, breaks the anchor out, heaves it up to the bows, cats and fishes it, and reports her under way; the time is by the scope, at the capstan's rate of a fathom in ten seconds with all hands at the bars. `cat and fish the anchor` secures an anchor left aweigh.
+
+**An anchor at the bows can be let go.** Weighing or getting under way belayed (`belay getting under way`, `belay get under way`, `belay weighing`) says where it has left the anchor: "the best bower on the bottom with forty fathoms of cable out", before it broke out; "the best bower aweigh and hanging at the bows, to be let go again or catted and fished", between the break-out and the catting, some six minutes; or catted and fished, after. An anchor hanging at the bows, aweigh or at the cat-head, is the readiest of all to be let go, and `let go`, `come to an anchor` and `drop anchor` take it as they take one at the bows; `weigh` says where it hangs. (In game 10 the best bower was left aweigh by such a belay in fog with the flood setting her, and every order to let it go was refused until it had been catted and fished, fourteen minutes.)
 
 With two anchors down, `weigh the small bower` weighs that one and leaves her riding by the other: the other's cable is veered as she comes over the anchor she is heaving up, and the last line says how she is left, "The small bower catted and fished; she rides by the best bower, sixty fathoms out." `weigh` alone weighs the anchor she rides by. If the cable that is to hold her meanwhile is too short to let her come over the anchor, the order is refused in words that say what would do it: "the best bower cannot be hove up while the small bower holds her: to come over it she must have a hundred and ten fathoms of the small bower's cable, which is a hundred fathoms in all. Weigh the small bower first, or unmoor; she rides by the best bower".
 
@@ -206,9 +210,10 @@ Sail is yours to make: the anchor's evolutions set none, and a ship weighing in 
 | `the ground tackle` | `the anchors`, `the cables` | what she carries and where each anchor is |
 | `the anchor` | | down, dragging, aweigh, catted, at the bows, lost; aground |
 | `the cable` | | the scope and the strain against the rating |
+| `her draught` | `the draught`, `the ship's draught`, `what she draws` | the water she draws, in feet and in fathoms |
 | `the tide by the almanac` | `the tide`, `high water by the almanac` | the master's high water today, by his epitome |
 
-A dragging anchor is an urgent line of the log, once for each dragging: it wakes a station that is standing by, and the clock eases for it. The lines that follow while it goes on are notable, and "holds again" is routine.
+A dragging anchor is an urgent line of the log, once for each dragging, however often it relapses inside a quarter of an hour: it wakes a station that is standing by, and the clock eases for it. The lines that follow while it goes on are notable, and "holds again" is routine.
 
 The events for the book: `the anchor let go`, `brought up`, `the anchor aweigh`, `the anchor weighed` (or `under way`), `the anchor dragging`, `the cable parted`, `aground` (or `the ground taken`), `afloat`, `the turn of the tide` (and, by which way she swung, `the turn to the flood`, `the turn to the ebb`).
 
