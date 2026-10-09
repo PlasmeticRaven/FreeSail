@@ -266,7 +266,9 @@ class Judgement:
     'aback' (steered as given, in the wind's eye), 'full_and_by' (kept full and by on the
     tack she is on), 'tack' or 'wear' (the manoeuvre ordered for the course), 'gybe'
     (steered round by the stern, a fore-and-after's boom coming over), or 'in_hand' (a
-    tack or a wear in hand takes the course as she comes round). `course` is the heading
+    tack or a wear in hand takes the course as she comes round), or 'pending' (across the
+    wind with too little way: kept full and by and the course held till she has way,
+    `keep_course_pending`). `course` is the heading
     she is to have at the end (radians true): the course, or the close-hauled course on
     the tack she is kept full and by on; `words` the clause the line says."""
 
@@ -275,6 +277,8 @@ class Judgement:
     words: str = ""
     full_and_by: bool = False
     tack: str = ""
+    crossing: str = ""  # 'eye' or 'wake', for a course held till she has way ('pending')
+    helm_order: bool = False
 
 
 def _side(x: float) -> str:
@@ -324,7 +328,13 @@ def manoeuvre_in_hand(ship: Any) -> Any:
     return None
 
 
-def judge_course(ship: Any, course: float, helm_order: bool, points: bool = False) -> Judgement:
+def judge_course(
+    ship: Any,
+    course: float,
+    helm_order: bool,
+    points: bool = False,
+    stay_kn: float = STAY_MIN_KN,
+) -> Judgement:
     """The one judgement of a course (radians true) against her head and the wind.
 
     `helm_order` is true for the helm's own orders (`steer`, the points orders), false for
@@ -382,20 +392,14 @@ def judge_course(ship: Any, course: float, helm_order: bool, points: bool = Fals
         aback = f"{shown} lies in the wind's eye from her head; she will be taken aback"
         return Judgement("aback", course, aback)
     own = _side(units.wrap_pi(now - wind_from))
-    crossing = _crosses(now, course, wind_from) if speed > STEERAGE_WAY_MS else None
+    crossing = _crosses(now, course, wind_from)
     if crossing is None:
         if laid or helm_order:
             return Judgement("helm", course)
-        # a course too near the wind on the tack she is on, or with no way on her to put
-        # her about: kept full and by on her tack
+        # a course too near the wind on the tack she is on: kept full and by on her tack
         words = (
             f"{shown} lies too near the wind to be laid; she is kept full and by on the {own} tack"
         )
-        if own != said_tack:
-            words = (
-                f"{shown} lies too near the wind to be laid on the {said_tack} tack, and she "
-                f"has no way on her to go about; she is kept full and by on the {own} tack"
-            )
         return Judgement("full_and_by", course, words, full_and_by=True, tack=own)
     # through the wind: the course, or the close-hauled course on the tack nearer it
     if laid:
@@ -409,8 +413,9 @@ def judge_course(ship: Any, course: float, helm_order: bool, points: bool = Fals
     if laid and crossing == "wake":
         what = f"{shown} lies across the wind from her head, by the stern"
     tail = f" and kept full and by on the {said_tack} tack" if full_and_by else ""
+    square = _square_sail_set(ship)
     if crossing == "eye":
-        if speed >= units.knots_to_ms(STAY_MIN_KN):
+        if speed >= units.knots_to_ms(stay_kn):
             way = "she is put about for it" if laid else "she is put about"
             return Judgement("tack", target, f"{what}; {way}{tail}", full_and_by, said_tack)
         if speed > WEAR_FOR_IT_MIN_MS:
@@ -422,27 +427,40 @@ def judge_course(ship: Any, course: float, helm_order: bool, points: bool = Fals
                 full_and_by,
                 said_tack,
             )
-    elif _square_sail_set(ship):
+    elif square:
         if speed > WEAR_FOR_IT_MIN_MS:
             way = "she is worn round for it" if laid else "she is worn round"
             return Judgement("wear", target, f"{what}; {way}{tail}", full_and_by, said_tack)
-    else:
+    elif speed > STEERAGE_WAY_MS:
         way = (
             "she gybes for it by the helm"
             if laid
             else f"she gybes by the helm and is steered close-hauled on the {said_tack} tack"
         )
         return Judgement("gybe", target, f"{what}; {way}", full_and_by, said_tack)
-    # too little way to go about or to wear: the helm, as it always was
-    if laid or helm_order:
-        return Judgement("helm", course)
+    # too little way to go about, to wear or to gybe (package 37m, the lead's last round):
+    # not left to the helm, which would turn her across the wind with her yards and sheets
+    # for the old tack and lay her aback (the merchant passage filling away after the
+    # Iroise's cast), but kept full and by on her tack, the course held as the helm's
+    # intention and judged again when she has the way (`keep_course_pending`)
+    then = (
+        "put about"
+        if crossing == "eye" and laid
+        else "worn"
+        if square or crossing == "eye"
+        else "gybed"
+    )
+    then += " for it" if laid else f" for the {said_tack} tack and kept full and by"
+    lacking = "has no way on her" if speed <= STEERAGE_WAY_MS else "has not way enough on her"
     return Judgement(
-        "full_and_by",
+        "pending",
         course,
-        f"{shown} lies too near the wind to be laid on the {said_tack} tack, and she has not "
-        f"way enough to go about; she is kept full and by on the {own} tack",
-        full_and_by=True,
-        tack=own,
+        f"{what}, and she {lacking}; she is kept full and by on the {own} tack until she has, "
+        f"then {then}",
+        full_and_by,
+        own,
+        crossing=crossing or "",
+        helm_order=helm_order,
     )
 
 
@@ -460,6 +478,17 @@ def carry_out(ship: Any, judged: Judgement) -> tuple[str, dict[str, Any]]:
     if judged.branch == "full_and_by":
         _, text, data = handle(ship, "keep her full and by")
         return text, data
+    if judged.branch == "pending":
+        # kept full and by on her tack, the course held till she has way (the helm's order
+        # clears any intention held before it, and this one is held after it)
+        _, text, data = handle(ship, "keep her full and by")
+        ship.extra[COURSE_PENDING] = {
+            "course_deg": round(units.rad_to_deg(judged.course), 3),
+            "helm_order": judged.helm_order,
+            "crossing": judged.crossing,
+            "waited_s": 0.0,
+        }
+        return text, data | {"course_pending": ship.extra[COURSE_PENDING]["course_deg"]}
     if judged.branch in COURSE_MANOEUVRES:
         params: dict[str, Any] = {"course_deg": round(units.rad_to_deg(judged.course), 3)}
         if judged.full_and_by:
@@ -473,6 +502,75 @@ def carry_out(ship: Any, judged: Judgement) -> tuple[str, dict[str, Any]]:
     # the helm: steered as given, or round by the stern for a fore-and-after
     _, text, data = steer_degrees(ship, units.rad_to_deg(judged.course))
     return text, data
+
+
+# The course held as the helm's intention while she has not the way to go about, wear or
+# gybe for it (`ship.extra`, a plain dict, so that a checkpoint carries it).
+COURSE_PENDING = "course_pending"
+# Held for a turn across the wind's eye, she waits this long, seconds, with way enough to
+# wear and not to stay, for the way to stay, and is then worn (judgement: a frigate
+# gathers her two knots from rest in two or three minutes under plain sail).
+STAY_WAIT_S = 180.0
+# Held for a turn across the eye, she is put about when she has gathered this much way,
+# a knot more than the tack's least: at the tack's own two knots, just gathered from rest,
+# the frigate missed stays in the test of it (`tests/test_ships.py`), her way not yet her
+# own. Under it after `STAY_WAIT_S`, she is worn. Judgement.
+PENDING_STAY_KN = 3.0
+
+
+def keep_course_pending(ship: Any, dt: float) -> None:
+    """Each tick (`evolutions.runner.Runner.step`): a course held for want of way is judged
+    again once she has it: `PENDING_STAY_KN` to tack for a turn across the eye (or, after
+    `STAY_WAIT_S` with the way to wear, to wear); the way to wear for a turn by the stern
+    with a square sail set; steerage way to gybe without. The manoeuvre then comes, and
+    she ends on the course. At anchor or aground the intention is let go."""
+    pending = (getattr(ship, "extra", None) or {}).get(COURSE_PENDING)
+    if not pending:
+        return
+    extra = ship.extra
+    tackle = extra.get("ground_tackle")
+    if extra.get("aground") or (tackle is not None and tackle.at_anchor()):
+        extra.pop(COURSE_PENDING, None)
+        return
+    speed = float(ship.dyn.speed)
+    if pending["crossing"] == "eye":
+        if speed > WEAR_FOR_IT_MIN_MS:
+            pending["waited_s"] = float(pending.get("waited_s", 0.0)) + dt
+        ready = speed >= units.knots_to_ms(PENDING_STAY_KN) or (
+            speed > WEAR_FOR_IT_MIN_MS and pending["waited_s"] >= STAY_WAIT_S
+        )
+    elif _square_sail_set(ship):
+        ready = speed > WEAR_FOR_IT_MIN_MS
+    else:
+        ready = speed > STEERAGE_WAY_MS
+    if not ready:
+        return
+    extra.pop(COURSE_PENDING, None)
+    course = math.radians(float(pending["course_deg"]))
+    judged = judge_course(
+        ship, course, helm_order=bool(pending["helm_order"]), stay_kn=PENDING_STAY_KN
+    )
+    try:
+        if judged.branch == "helm":
+            _, text, data = steer_degrees(ship, units.rad_to_deg(course))
+        else:
+            text, data = carry_out(ship, judged)
+    except OrderError as exc:
+        ship.note(
+            "notable",
+            "helm.course_given",
+            f"She has way on her, but the course held for her could not be given: {exc}",
+            ship.name,
+        )
+        return
+    said = judged.words or f"{units.format_heading(course)} is steered"
+    ship.note(
+        "notable",
+        "helm.course_given",
+        f"She has way on her now: {said}. {text}".rstrip(),
+        ship.name,
+        {"judged": judged.branch, "course_deg": pending["course_deg"], "helm": data},
+    )
 
 
 def steer_degrees(ship: Any, degrees: float) -> Result:

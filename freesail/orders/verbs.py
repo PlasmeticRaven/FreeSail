@@ -2083,6 +2083,13 @@ def manoeuvre_for_course(ship: Ship, evolution: str, params: dict[str, Any]) -> 
     return _ship_evolution(ship, order, vocab, params)
 
 
+def _drop_course_pending(ship: Ship) -> None:
+    """Let go the course held for want of way (`navigation.keep_course_pending`)."""
+    extra = getattr(ship, "extra", None)
+    if isinstance(extra, dict):
+        extra.pop("course_pending", None)
+
+
 def _helm(ship: Ship, order: Order, judge: bool = True) -> Result:
     dyn = ship.dyn
     mods = order.modifiers
@@ -2105,6 +2112,11 @@ def _helm(ship: Ship, order: Order, judge: bool = True) -> Result:
         # manoeuvre is in hand (the lead, 2026-09-30: "keep her full" fired in the twenty
         # seconds between "heave to" and the yards aback, on every passage of gate 5b).
         raise OrderError("She is hove to; fill away before giving her a course.")
+    if "heading" in mods or verb == "keep her full" or verb in HELM_VERBS:
+        # a course, full and by, or a word to the wheel: whatever course was held for want
+        # of way is given up for it (package 37m; an order reckoned in points from her
+        # course leaves it)
+        _drop_course_pending(ship)
 
     if verb == "keep her full":
         dyn.helm_mode = HelmMode.FULL_AND_BY
@@ -2810,6 +2822,7 @@ def _ship_evolution(
         _settle_call(ship, call, False)
         raise
     _settle_call(ship, call, True)
+    _drop_course_pending(ship)  # a manoeuvre ordered gives up a course held for want of way
     if order.verb_phrase.split()[0] in ("gybe", "jibe"):
         # The later word for wearing a fore-and-aft vessel: the boom comes
         # over as the wind crosses the stern. The period word is wear.

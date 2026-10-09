@@ -639,12 +639,71 @@ def test_a_course_given_while_she_is_going_about_is_steered_when_she_is_round():
     assert "the course ordered" in tacked.text or "for the course ordered" in tacked.text
 
 
-def test_a_steer_on_her_own_tack_and_a_drifting_ship_are_steered_as_given():
+def test_a_steer_on_her_own_tack_is_steered_as_given_with_way_or_without():
     w = _under_way(25.0)
     for said in ("steer NNE", "steer E", "come up a point", "bear away two points"):
         e = w.submit(said)
         assert e.kind == "helm.order" and "judged" not in e.data, (said, e.text)
-    # no steerage way: steered as given, as it always was
+    # no steerage way, a course on her own tack: steered as given, as it always was
     w = world_at(heading=25.0)
+    e = w.submit("steer 60")
+    assert e.text == "Helm ordered: steer NE by E (60°)." and "judged" not in e.data
+
+
+def _stopped(w) -> None:
+    """Her way taken off her where she lies, as after filling away from lying to."""
+    d = w.ship.dyn
+    d.u, d.v, d.speed = 0.0, 0.0, 0.0
+
+
+def test_a_course_across_the_eye_with_no_way_is_held_and_she_is_put_about_when_she_has_it():
+    """The lead's last round on package 37m: a course across the wind given while she
+    has no steerage way is not left to the helm, which would turn her across the wind with
+    her yards for the old tack and lay her aback (the merchant passage filling away after
+    the Iroise's cast); she is kept full and by on her tack, the course held as the helm's
+    intention, and judged again when she has the way to stay."""
+    w = _under_way(25.0)
+    _stopped(w)
     e = w.submit("steer 245")
-    assert e.text == "Helm ordered: steer WSW (245°)." and "judged" not in e.data
+    assert e.text == (
+        "Helm ordered: steer WSW (245°); WSW (245°) lies across the wind's eye from her head, "
+        "and she has no way on her; she is kept full and by on the larboard tack until she "
+        "has, then put about for it. Helm ordered: keep her full and by."
+    )
+    assert e.data["judged"] == "pending" and w.ship.dyn.helm_mode.value == "full_and_by"
+    assert w.ship.extra["course_pending"]["course_deg"] == pytest.approx(245.0)
+    given = _until(w, "helm.course_given", 600)
+    assert given.text.startswith("She has way on her now: WSW (245°) lies across the wind's eye")
+    assert "she is put about for it" in given.text
+    assert "course_pending" not in w.ship.extra
+    tacked = _until(w, "ship.tacked")
+    assert tacked.text.endswith("heading WSW (245°), the course ordered.")
+    assert w.ship.dyn.target_heading == pytest.approx(math.radians(245.0))
+
+
+def test_a_course_by_the_stern_with_no_way_is_held_and_the_schooner_worn_when_she_has_it():
+    w = _under_way(25.0, SCHOONER)
+    _stopped(w)
+    e = w.submit("steer SSW")
+    assert "lies across the wind from her head, by the stern, and she has no way on her; she " in (
+        e.text
+    )
+    assert "until she has, then worn for it" in e.text, e.text
+    given = _until(w, "helm.course_given", 600)
+    assert "she is worn round for it" in given.text, given.text
+    wore = _until(w, "ship.wore")
+    assert "for the course ordered" in wore.text and _on(w, 202.5)
+
+
+def test_a_course_held_for_want_of_way_is_given_up_for_another_order():
+    w = _under_way(25.0)
+    _stopped(w)
+    w.submit("steer 245")
+    assert "course_pending" in w.ship.extra
+    w.submit("bear away a point")  # reckoned from her course: the intention stands
+    assert "course_pending" in w.ship.extra
+    w.submit("steer 40")  # a course: the intention given up
+    assert "course_pending" not in w.ship.extra
+    w.submit("steer 245")
+    w.submit("keep her full")
+    assert "course_pending" not in w.ship.extra
