@@ -137,10 +137,25 @@ The watcher's repeat detector (the same order three times with no change in the 
 
 **Three ways of stopping, which are not one another.** The deck given back (`hand_over`, or the captain's `I have the deck`): he stays. A stand-down (the `stand_down` tool, for any station, with a note for whoever sits there next, which with the deck is the handover note and is asked for before the stand-down is made; or the captain's `stand down the officer`): the game is saved and the station released, to be taken again by the same model or by another that has given its own yes, no question put to a model whose yes still stands. A withdrawal (the token, before the order is read, or `opt_out`): the brief says the token is to be named and not written unless meant; an instance of that model is seated again only after the consent question has been put again, with the fact that an instance left and the reason it gave, and a no then is kept. `opt_out` with `final=true` leaves the game for good: that model is not seated again in it, at any station, while the station stays open to another; `final` is read from the tool's own setting and from nothing else. Each says in its result and in the log which of the three it was, and the log says when a station is taken again, and by whom.
 
+## His own reckoning, and the lessons
+
+The officer keeps a reckoning of his own, as the lieutenants and the young gentlemen kept theirs from the same log-board, **with the deck or off watch**: `work my reckoning` gives him the master's slate since the last fix, in his reply and not in the log, and `my reckoning is <position>` gives the master his, kept beside the master's account and said after the noon's line, moving nothing ([chapter 10](10-the-reckoning.md)). Both are his own, within his domain without a word of the captain's, and neither wants the deck; a standing order may give neither. The captain reads it with `the officer's reckoning` and adopts it, if he will, with `set the reckoning to`, which stays his.
+
+```orders frigate plain-sail
+work my reckoning
+my reckoning is 49 52 N 5 10 W
+the officer's reckoning
+```
+
+[Chapter 18](18-lessons.md) is the lessons: worked passages, each a duty an officer must be able to do alone (a landfall on one headland, his own reckoning judged at noon, a pilotage by cross bearings, heaving to for a pilot, coming to in a tideway, a night off a lee shore), with what the log says when it goes right and the usual mistake, and the path to a command in the words of the officer who asked for it.
+
 ## The forms, in a table
 
 | Form | Also taken | What it does |
 |---|---|---|
+| `work my reckoning` | `work up my reckoning`, `show me the slate` | the master's slate since his last fix, in the officer's reply; with the deck or off watch |
+| `my reckoning is 49 52 N 6 10 W` | `my own reckoning is 49 52 N 6 10 W` | his own reckoning, kept beside the master's and said after the noon's line; it moves nothing |
+| `the officer's reckoning` | `what is the officer's reckoning` | the officer's own reckoning as it stands, and where it lies from the master's |
 | `you have the deck` | `Mr Pearce, you have the deck` | the officer takes the deck, with the captain's night orders and everything his word allows |
 | `I have the deck` | `the captain has the deck` | the captain takes the deck back and no more; the officer stays at his station, off watch |
 | `you may tack ship if the land closes within two miles` | `you may wear ship`, `you may call all hands` | the captain's word allows a named thing, his condition kept as said |

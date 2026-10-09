@@ -1,0 +1,56 @@
+# FreeSail: the primer's lesson of a night standing off a lee shore (docs/primer/
+# 18-lessons.md; package 40b).
+#
+# The frigate twelve miles south of the Nare Head at eight in the evening of 14 June 1805,
+# a fresh southerly blowing straight on the coast between the Lizard and the Deadman, the
+# Manacles to the westward and the Gull rock and the Deadman to the eastward. She stands
+# off and on through the night under reefed topsails, tacking at the turn of each board,
+# the lead going every glass, and must have her offing at daylight. No book: the orders
+# are the officer's alone, typed at the prompt as the chapter gives them.
+#     py -m freesail.ui.console --scenario data/scenarios/lesson-lee-shore.yaml
+# The chapter's run, measured once at seed 7, and the orders with their times, are in
+# docs/dev/TuningNotes.md under package 40b (`tools/lesson_run.py` runs it again).
+#
+# The night's weather is pinned: a southerly of twenty knots and a clear sky over the
+# old high, the moon two days past full.
+
+name: A night off a lee shore, the Nare Head to the Deadman
+seed: 7
+start: 1805-06-14T20:00
+position: 50 00 N 4 55 W
+region: channel-west
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 112
+  speed_kn: 6
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+papers:
+  chart: {year: 1804}
+  epitome: norie
+  almanac: 1805
+
+ports: [falmouth, plymouth, brest]
+
+weather:
+  wind:
+    - {at: 1805-06-14T00:00, from_deg: 180, knots: 20, air_mass: neutral}
+  background:
+    {hpa: 1012, gradient_hpa_per_100km: 0.8, high_toward_deg: 200}
+  systems:
+    - name: the old high over Biscay
+      kind: high
+      radius_km: 900
+      track:
+        - {at: 1805-06-13T12:00, x_km: 300, y_km: -500, hpa: 1020}
+        - {at: 1805-06-15T12:00, x_km: 500, y_km: -600, hpa: 1018}
+  sky: {sky: clear, weather: fine, visibility: the horizon}
+  sea: true
+
+orders:
+  - set plain sail
+  - keep her full and by

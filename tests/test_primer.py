@@ -96,6 +96,10 @@ CHAPTERS = [
     "14-the-port.md",  # package 35
     "15-other-sail.md",  # package 36
     "16-the-officer-of-the-watch.md",  # package 37
+    # 13 is left out: its `# rejected: heave short the kedge` is refused only with an
+    # anchor down, which no preset gives (package 40b, a finding)
+    "17-the-captain.md",  # package 40b: its block was never read
+    "18-lessons.md",  # package 40b
 ]
 
 DRIVER_COMMANDS = frozenset(
@@ -334,6 +338,31 @@ def test_every_chapter_exists_and_is_listed_in_the_readme():
         assert (PRIMER / name).exists(), f"missing chapter {name}"
         if name != "README.md":
             assert name in readme, f"README.md does not link {name}"
+
+
+def test_the_lessons_name_their_scenarios_each_loads_at_seed_7_and_the_officers_words_stand():
+    """Package 40b (spec M6 §6): chapter 18's lessons are quoted from runs of their own
+    scenarios at seed 7, which the chapter names and a reader can sail; and the officer
+    of the ninth game's two conditions are written down in its words."""
+    from freesail.world.scenarios import load_scenario
+
+    text = (PRIMER / "18-lessons.md").read_text(encoding="utf-8")
+    named = set(re.findall(r"data/scenarios/(lesson-[a-z-]+\.yaml)", text))
+    assert named == {
+        "lesson-landfall.yaml",
+        "lesson-reckoning.yaml",
+        "lesson-falmouth.yaml",
+        "lesson-lee-shore.yaml",
+    }
+    for name in sorted(named):
+        sf = load_scenario(ROOT / "data" / "scenarios" / name)
+        assert sf.seed == 7 and sf.scenario.region == "channel-west", name
+        assert not sf.standing_orders, name  # the lesson's orders are the officer's alone
+    assert (
+        '"to have made a few more landfalls on my own reckoning, and taken her in and out of '
+        'a road or two without your hand on the con"'
+    ) in text
+    assert "seed 7" in text
 
 
 def test_the_primer_shows_enough_orders():
