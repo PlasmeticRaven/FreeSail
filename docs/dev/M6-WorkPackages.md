@@ -17,7 +17,7 @@ tuning notes and a report to the lead at the end.
 |---|---|---|---|
 | 38 | Fable | The chart stitched: many regions over the corridor, the queries across edges, the climatology's boxes, the tide's gauges, the recipe form for the blocks | launched 2026-10-09 |
 | 39a to 39f | Opus | The six blocks of the voyage to Madeira and the Strait | after 38 |
-| 40 | Fable | The ship's company and the rules-based captain in three layers; the captain's station; the officer's reckoning | approved 2026-10-09; launched after 37m |
+| 40 | Fable | The ship's company and the rules-based captain in three layers; the captain's station; the player's seat | merged 2026-10-09 (the officer's reckoning moved to 40b; the consent brief's revision drafted for the owner, `docs/playtests/drafts/consent-brief-m6-draft.md`, held for 42) |
 | 40b | Opus | The lessons in the primer; the officer's own reckoning (spec M6 §5, truth 80; moved from 40 at the owner's word) | brief to write |
 | 41 | Fable | The wardroom: several doors, the pace rule, the deck's conversation, the master's and the lookout's stations, the stand-by on several conditions | brief to write |
 | 42 | Opus | The API door and its security pass; the transcript-driven replay; the consent brief revised once | brief to write |
@@ -210,3 +210,33 @@ in the repository (42); the lessons and the officer's own reckoning (40b); engag
 world and the fake doors; the passages re-measured only where the people's lines move
 them, with the reasons.
 
+
+### Package 40, as merged (2026-10-09): what the lead found and the owner's decisions
+
+Merged `--no-ff` at `49d09b7` after the K batch, 37m and 38. No pin of the recorded
+passages moved; the schooner on an intent alone (`data/scenarios/merchant-intent.yaml`,
+36 hours, Falmouth to Brest and the tin sold by rules alone) and the merchant passage
+under the fake captain are pinned as truths 77 to 79 and 81 (`tests/test_known_truths.py`,
+the two new day fixtures in the slow tier). The officer's own reckoning is 40b's. The
+package's findings are in the tuning notes; the lead's probe of the station's bounds: a
+world order from the captain's station is refused by the grammar as it is to the player,
+`resume the captain` from the station is refused, and `stand down the captain` from the
+station itself is accepted (the station released, the rules holding her), which is a
+model leaving by another road than the token and is left as it is.
+
+For the owner:
+
+1. **The consent brief's revision**, drafted as
+   `docs/playtests/drafts/consent-brief-m6-draft.md` with the changed sections marked and
+   their reasons: approve as drafted, or fold the two one-clause changes (*Leaving*, *The
+   journal*) into their neighbours so the re-ask names three sections rather than five.
+   The lead's recommendation: approve as drafted; the re-ask names what changed and a
+   clause is a change. Package 42 puts it in the repository and the owner runs the
+   re-asks through the game's own consent step. No model is seated at the captain's
+   station before then.
+2. **A standing order may not tell or ask the captain's station** (kept refused, as the
+   book speaks for the captain). The lead's recommendation: keep.
+3. **The log's heave and the bearings' errors draw one stream**, so a captain's `heave
+   the log` moves the next bearing's words (a finding, unchanged). The lead's
+   recommendation: leave it; it is true of any order that draws, and splitting the
+   streams would move every pin for no gain in play.
