@@ -3394,3 +3394,27 @@ def test_put_the_helm_over_is_out_of_the_officers_brief_and_refused_with_the_ord
     assert (
         e.kind == "order.rejected" and "'helm a-lee'" in e.text and "says not which way" in e.text
     )
+
+
+def test_a_course_across_the_wind_under_the_grant_to_steer_puts_her_about():
+    """Package 37m, item 4: the officer's domain is unchanged. `steer` across the wind's
+    eye is an order of the course whatever it does to her (37g), and under the captain's
+    grant to steer the tack the rule orders for it is within the grant; `tack ship` by its
+    own word is not."""
+    world = frigate_world()  # the wind at north
+    world.submit("set plain sail")
+    world.submit("steer 70")
+    world.run(1500)
+    seated(world, ["Aye."], when_done=Reply())
+    world.submit("you may steer")
+    judge = tools_mod.judge
+    assert judge(world, OFFICER, "steer 290")[1:] == ("", tools_mod.GRANT)
+    assert judge(world, OFFICER, "tack ship")[1].startswith("The officer of the watch may not")
+    n0 = len(world.log)
+    tools_call(world, "submit_order", text="steer 290")
+    said = [e for e in list(world.log)[n0:] if e.kind == "helm.order"]
+    assert said and "lies across the wind's eye from her head; she is put about for it" in (
+        said[0].text
+    ), [e.text for e in list(world.log)[n0:]]
+    runner = world.ship.extra["evolutions"]
+    assert [i.evo.id for i in runner.instances] == ["tack"]

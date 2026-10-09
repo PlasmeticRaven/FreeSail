@@ -704,6 +704,112 @@ class Script:
 
 
 # ---------------------------------------------------------------------------
+# The course a manoeuvre is ordered for (package 37m)
+# ---------------------------------------------------------------------------
+
+# Luffed up to go about for a course from off the wind, she is by the wind when her
+# apparent wind is within this of her close-hauled angle (the tack's own `close_hauled()`
+# allowance, `evolutions.runner`), or after `by_the_wind_s` whatever.
+BY_THE_WIND_ALLOWANCE = units.deg_to_rad(10.0)
+
+
+class CourseToSteer:
+    """The course a tack or a wear was ordered for (package 37m; the owner's ruling 3 of
+    2026-10-09): `steer <course>`, `shape a course for` or `give chase` across the wind
+    puts her about or wears her (`orders.navigation.judge_course`), and the manoeuvre ends
+    by steering the course (`params["course_deg"]`), or, ordered for a course too near the
+    wind to be laid, kept full and by on the new tack (`params["full_and_by"]`), so that a
+    book need not give the course again. A course handed to the manoeuvre while it is in
+    hand (`give_course`) is taken the same way. With no course the manoeuvre ends
+    close-hauled on a compass course, as it always has."""
+
+    def __init__(self, params: dict[str, Any]):
+        course = params.get("course_deg")
+        self.course: float | None = (
+            None if course is None else units.wrap_2pi(units.deg_to_rad(float(course)))
+        )
+        self.full_and_by = bool(params.get("full_and_by"))
+        self.not_laid = ""  # why the course could not be given her at the end, in words
+
+    @property
+    def given(self) -> bool:
+        return self.course is not None
+
+    def give(self, course_deg: float, full_and_by: bool) -> None:
+        self.course = units.wrap_2pi(units.deg_to_rad(float(course_deg)))
+        self.full_and_by = bool(full_and_by)
+
+    def off(self, wind_from: float, sign: float) -> float:
+        """The course's angle off the wind on the tack `sign` (+1 starboard), negative
+        when it lies on the other tack."""
+        assert self.course is not None
+        return sign * units.wrap_pi(wind_from - self.course)
+
+    def heading(self, ship: Ship, wind_from: float, sign: float) -> tuple[float, bool]:
+        """The heading she ends on, on the tack `sign`, and whether she is kept full and
+        by: the course when it lies on that tack at the close-hauled angle or more (the
+        judgement laid it so; a shaped course had its half point more); else close-hauled,
+        and `not_laid` says why when the course was to be steered."""
+        ch = close_hauled_true_angle(ship)
+        by_the_wind = units.wrap_2pi(wind_from - sign * ch)
+        if self.course is None:
+            return by_the_wind, False
+        if self.full_and_by:
+            self.not_laid = ""
+            return by_the_wind, True
+        off = self.off(wind_from, sign)
+        said = units.format_heading(self.course)
+        if off < 0.0:
+            self.not_laid = f"{said} lies on the other tack now"
+            return by_the_wind, True
+        if off < ch - units.deg_to_rad(1.0):
+            self.not_laid = f"{said} lies too near the wind to be laid now"
+            return by_the_wind, True
+        self.not_laid = ""
+        return self.course, False
+
+    def words(self, braced: str, paid_off: bool) -> dict[str, str]:
+        """The completion line's words: how she was braced, and the course's clause."""
+        if self.course is None:
+            return {"braced": braced, "course_words": ""}
+        if self.not_laid:
+            return {"braced": braced, "course_words": f", full and by ({self.not_laid})"}
+        if self.full_and_by:
+            return {"braced": braced, "course_words": ", full and by"}
+        if paid_off:
+            return {"braced": f"{braced} for the course ordered", "course_words": ""}
+        return {"braced": braced, "course_words": ", the course ordered"}
+
+    def data(self) -> dict[str, Any]:
+        if self.course is None:
+            return {}
+        return {
+            "course_ordered_deg": round(units.rad_to_deg(self.course), 1),
+            "full_and_by": self.full_and_by or bool(self.not_laid),
+        }
+
+
+def _by_the_wind_now(ship: Ship) -> bool:
+    """Her apparent wind no further aft than her close-hauled angle and the tack's
+    allowance (`evolutions.runner`, `close_hauled()`): by the wind to go about."""
+    luff = float(ship.extra.get("luff_angle", units.deg_to_rad(45.0)))
+    target = luff + units.deg_to_rad(5.0)
+    return abs(ship.dyn.apparent_wind_angle) - target <= BY_THE_WIND_ALLOWANCE
+
+
+def _end_on_course(ship: Ship, steer: CourseToSteer, heading: float, full_and_by: bool) -> None:
+    """The helm left on the course at the manoeuvre's end: kept full and by, or steering
+    the heading."""
+    dyn = ship.dyn
+    dyn.steady = False
+    if full_and_by:
+        dyn.helm_mode = HelmMode.FULL_AND_BY
+    else:
+        dyn.helm_mode = HelmMode.HEADING
+        dyn.target_heading = heading
+
+
+# ---------------------------------------------------------------------------
 # Tack
 # ---------------------------------------------------------------------------
 
@@ -763,9 +869,27 @@ class TackScript(Script):
         self.shifted: list[Sail] = []  # the staysails abaft the fore mast, a foresail
         self.squaring: YardSwing | None = None
         self.miss_reason = ""
+        # package 37m: the course she is put about for, and her paying off to it
+        self.steer = CourseToSteer(params)
+        self.paying: YardSwing | None = None
+
+    # class defaults for the fields package 37m added (a checkpoint from an earlier build)
+    steer: CourseToSteer | None = None
+    paying: YardSwing | None = None
+    paid_off = False
+    pay_t = 0.0
+    retrim_in = 0.0
+    last_trim = False
+    by_wind_drawn = False
 
     def holds(self) -> set[str]:
         return {self.ship.name} | {y.id for y in self.head + self.after}
+
+    def give_course(self, course_deg: float, full_and_by: bool) -> None:
+        """A course handed to the tack in hand (package 37m): steered when she is round."""
+        if self.steer is None:
+            self.steer = CourseToSteer({})
+        self.steer.give(course_deg, full_and_by)
 
     # -- the vessel's way ------------------------------------------------------------
 
@@ -793,7 +917,53 @@ class TackScript(Script):
             self.phase = "in_studding_sails"
             self.note(studding.begin_words())
             return
-        self._ready_about()
+        self._go_about()
+
+    def _go_about(self) -> None:
+        """Ready about; or, put about for a course from off the wind (package 37m), luffed
+        up and braced up first and then put about as from close-hauled: Luce's tack
+        begins by the wind (1866, ch. XXIV, 'Tacking'), and the tack ordered by its own
+        word is refused off the wind ("bring her by the wind before going about",
+        `tack.yaml`); bringing her to it first for a course is judgement."""
+        if self.steer is None or not self.steer.given or _by_the_wind_now(self.ship):
+            self._ready_about()
+            return
+        self.t = 0.0
+        dyn = self.ship.dyn
+        sign = 1.0 if dyn.tack == "starboard" else -1.0
+        sharp = sharp_up_targets(self.ship, self.head, self.after)
+        yards = self.head + self.after
+        self.swing = YardSwing(
+            yards,
+            [sign * sharp.get(y.id, y.brace_limit) for y in yards],
+            self.timing_value("brace_s", 45.0),
+        )
+        # the helmsman luffs her up full and by; the heading she comes to is close-hauled
+        dyn.helm_mode = HelmMode.FULL_AND_BY
+        ch = close_hauled_true_angle(self.ship)
+        dyn.target_heading = units.wrap_2pi(estimated_wind_from(self.ship) - sign * ch)
+        dyn.steady = False
+        self.by_wind_drawn = False
+        self.phase = "by_the_wind"
+        self.note("Luff up and brace up: she is brought by the wind to go about.", "helm.order")
+
+    def _by_the_wind(self, dt: float, wind: Wind, factor: float) -> None:
+        """Luffing up to go about: the yards braced up and the sheets drawn for the wind
+        she comes to; ready about when she is by the wind or `by_the_wind_s` has passed."""
+        self.t += dt
+        ship = self.ship
+        if not self.by_wind_drawn:
+            self.by_wind_drawn = True
+            sign = 1.0 if ship.dyn.tack == "starboard" else -1.0
+            sails = head_sails(ship) + boom_sails(ship) + shifted_sails(ship)
+            draw_sheets(
+                ship, sails, _lee_name(sign), full_and_by_apparent(ship, wind, ship.dyn.speed)
+            )
+        braced = self.swing is None or self.swing.advance(dt, factor)
+        late = self.t >= self.timing_value("by_the_wind_s", 120.0)
+        if (braced and _by_the_wind_now(ship)) or late:
+            self.swing = None
+            self._ready_about()
 
     def _ready_about(self) -> None:
         self.t = 0.0  # the stays are timed from "ready about"
@@ -829,7 +999,13 @@ class TackScript(Script):
             assert self.studding is not None
             if self.studding.advance(dt, factor):
                 self.note(self.studding.end_words())
-                self._ready_about()
+                self._go_about()
+            return
+        if self.phase == "by_the_wind":
+            self._by_the_wind(dt, wind, factor)
+            return
+        if self.phase == "pay_off":
+            self._pay_off(dt, wind, factor)
             return
         self.t += dt
         dyn = self.ship.dyn
@@ -945,7 +1121,71 @@ class TackScript(Script):
             if error <= units.deg_to_rad(self.timing_value("steady_deg", 5.0)) or (
                 self.t_steady >= self.timing_value("steady_timeout_s", 120.0)
             ):
+                if self.steer is not None and self.steer.given:
+                    self._to_the_course(wind)
+                else:
+                    self.finish()
+
+    # -- the course she was put about for (package 37m) ---------------------------------
+
+    def _to_the_course(self, wind: Wind) -> None:
+        """Steady by the wind on the new tack: the course she was put about for is given
+        her. Kept full and by, the helmsman sails her by the wind; a course within half a
+        point of close-hauled is steered with the yards as they are; one further off the
+        wind she pays off to, her yards and sheets trimmed as the wind draws aft (as
+        filling away for a course does, `FillAwayScript._pay_off`)."""
+        assert self.steer is not None
+        new_sign = -self.sign
+        heading, full_and_by = self.steer.heading(self.ship, wind.direction_from, new_sign)
+        self.new_course = heading
+        ch = close_hauled_true_angle(self.ship)
+        if full_and_by or self.steer.off(wind.direction_from, new_sign) <= ch + 0.5 * POINT:
+            _end_on_course(self.ship, self.steer, heading, full_and_by)
+            self.finish()
+            return
+        dyn = self.ship.dyn
+        dyn.helm_mode = HelmMode.HEADING
+        dyn.target_heading = heading
+        dyn.steady = False
+        self.phase = "pay_off"
+        self.paid_off = True
+        self.pay_t = 0.0
+        self.retrim_in = 0.0
+        self.last_trim = False
+        self.paying = None
+
+    def _pay_off(self, dt: float, wind: Wind, factor: float) -> None:
+        """Paying off to the course: the yards trimmed to the wind on her bow every
+        `retrim_s` as it draws aft, and to the course's own wind at the last."""
+        ship = self.ship
+        new_sign = -self.sign
+        ship.dyn.target_heading = self.new_course
+        self.pay_t += dt
+        self.retrim_in -= dt
+        if self.paying is not None and self.paying.advance(dt, factor):
+            self.paying = None
+        if self.last_trim:
+            if self.paying is None:
                 self.finish()
+            return
+        ch = close_hauled_true_angle(ship)
+        on_course = new_sign * units.wrap_pi(wind.direction_from - self.new_course)
+        now = new_sign * wind_rel(ship, wind)
+        there = now >= on_course - 0.5 * POINT
+        late = self.pay_t >= self.timing_value("pay_off_timeout_s", 240.0)
+        every = self.timing_value("retrim_s", 20.0)
+        if there or late:
+            aim = on_course if there else max(ch, min(now, on_course))
+            self.last_trim = True
+        elif self.retrim_in > 0.0:
+            return
+        else:
+            aim = max(ch, min(now, on_course))
+            self.retrim_in = every
+        yards = self.head + self.after
+        targets = [trim_angle(new_sign * aim, y.brace_limit, ch) for y in yards]
+        self.paying = YardSwing(yards, targets, every)
+        draw_sheets(ship, self.heads + self.booms + self.shifted, _lee_name(new_sign), aim)
 
     def _draw_on_new_tack(self, new_lee: str, wind: Wind) -> None:
         """The sheets drawn on the new tack's lee side, for the full-and-by wind she is
@@ -1023,16 +1263,21 @@ class TackScript(Script):
             return self.swing.remaining_s() + 30.0
         if self.phase == "missed" and self.squaring is not None:
             return self.squaring.remaining_s()
+        if self.phase == "by_the_wind":
+            return brace_s + 60.0 + 2 * brace_s + 30.0
+        if self.phase == "pay_off":
+            return max(0.0, self.timing_value("pay_off_timeout_s", 240.0) - self.pay_t)
         return 30.0
 
     def words(self) -> dict[str, Any]:
         old = "starboard" if self.sign > 0 else "larboard"
         new = "larboard" if self.sign > 0 else "starboard"
+        steer = self.steer if self.steer is not None else CourseToSteer({})
         return {
             "old_tack": old,
             "new_tack": new,
             "new_course": units.format_heading(self.new_course),
-        }
+        } | steer.words("braced up", self.paid_off)
 
     def data(self) -> dict[str, Any]:
         d = super().data()
@@ -1044,6 +1289,8 @@ class TackScript(Script):
                 "way_gone_at_s": self.way_gone_at,
             }
         )
+        if self.steer is not None:
+            d.update(self.steer.data())
         return d
 
 
@@ -1073,10 +1320,24 @@ class WearScript(Script):
         self.bowlined: list[str] = []  # sails whose bowlines were hauled out before wearing
         self.studding: StuddingSailsIn | None = None
         self.brailed: list = []  # the driver brailed up at "up helm" (package 32b)
+        # package 37m: the course she is worn for, and whether her yards are trimmed for
+        # it rather than braced sharp up
+        self.steer = CourseToSteer(params)
+
+    # class defaults for the fields package 37m added (a checkpoint from an earlier build)
+    steer: CourseToSteer | None = None
+    for_the_course = False
+    full_and_by = False
 
     def holds(self) -> set[str]:
         held = {self.ship.name} | {y.id for y in self.head + self.after}
         return held | {s.id for s in after_gaff_sails(self.ship)}
+
+    def give_course(self, course_deg: float, full_and_by: bool) -> None:
+        """A course handed to the wear in hand (package 37m): she comes to it."""
+        if self.steer is None:
+            self.steer = CourseToSteer({})
+        self.steer.give(course_deg, full_and_by)
 
     def begin(self, words: dict[str, Any]) -> None:
         # the studding sails first, if any are set or their booms out (spec 3b §7)
@@ -1166,36 +1427,73 @@ class WearScript(Script):
                     "and braced up."
                 )
         if self.phase == "come_to":
-            self.new_course = units.wrap_2pi(wind.direction_from + self.sign * ch)
-            dyn.target_heading = self.new_course
-            dyn.steady = False
             sharp_up = -self.sign  # braced sharp up for the new tack
+            course_rel = 0.0
+            steer = self.steer if self.steer is not None and self.steer.given else None
+            if steer is not None:
+                # worn for a course (package 37m): she comes to it on the new tack, or by
+                # the wind when it is not to be laid there
+                self.new_course, self.full_and_by = steer.heading(
+                    self.ship, wind.direction_from, sharp_up
+                )
+                course_rel = units.wrap_pi(wind.direction_from - self.new_course)
+                self.for_the_course = (
+                    not self.full_and_by and sharp_up * course_rel > ch + 0.5 * POINT
+                )
+            else:
+                self.new_course = units.wrap_2pi(wind.direction_from + self.sign * ch)
+            changed = abs(units.wrap_pi(dyn.target_heading - self.new_course)) > 1e-6
+            dyn.target_heading = self.new_course
+            if steer is None or changed:
+                # (on a course ordered, the helmsman's "steady" stands while the yards are
+                # trimmed to it, and is said once)
+                dyn.steady = False
             error = abs(units.wrap_pi(dyn.heading - self.new_course))
             steady = error <= units.deg_to_rad(self.timing_value("steady_deg", 5.0))
             # The driver brailed up at "up helm" is hauled out as she comes to, once she is
             # by the wind: hauled out with the wind aft, the brig's (a fifth of her plain
             # sail) rounded her up through the wind before the helm could meet her.
             if steady and self.brailed:
-                self.note("By the wind." + self._haul_out())
-            # The after yards go sharp up at once to bring her to; the head yards
-            # follow the wind, keeping their sails full, until she is by the wind.
-            # (All yards end at their limits, as at milestone 2: spec 3b §2.2 asks
-            # the after yards' trim of the tack's final trim and the orders only.)
-            after_done = move_toward(
-                self.after, [sharp_up * y.brace_limit for y in self.after], max_step
-            )
-            if steady:
-                head_done = move_toward(
-                    self.head, [sharp_up * y.brace_limit for y in self.head], max_step
-                )
+                said = "On her course." if self.for_the_course else "By the wind."
+                self.note(said + self._haul_out())
+            if self.for_the_course:
+                # the yards follow the wind round as she comes to the course, and are
+                # trimmed to the course's own wind when she is steady on it ("When the wind
+                # draws on the other beam, meet her with the helm, jib, and lee head braces
+                # as she comes to", Luce 1884, ch. XXIV, 'Remarks on Wearing': braced to
+                # the wind of her course, not past it)
+                if steady:
+                    yards = self.after + self.head
+                    targets = [trim_angle(course_rel, y.brace_limit, ch) for y in yards]
+                    after_done = head_done = move_toward(yards, targets, max_step)
+                else:
+                    follow_wind(self.after + self.head, rel, ch, max_step)
+                    after_done = head_done = False
             else:
-                follow_wind(self.head, rel, ch, max_step)
-                head_done = False
+                # The after yards go sharp up at once to bring her to; the head yards
+                # follow the wind, keeping their sails full, until she is by the wind.
+                # (All yards end at their limits, as at milestone 2: spec 3b §2.2 asks
+                # the after yards' trim of the tack's final trim and the orders only.)
+                after_done = move_toward(
+                    self.after, [sharp_up * y.brace_limit for y in self.after], max_step
+                )
+                if steady:
+                    head_done = move_toward(
+                        self.head, [sharp_up * y.brace_limit for y in self.head], max_step
+                    )
+                else:
+                    follow_wind(self.head, rel, ch, max_step)
+                    head_done = False
             if steady and after_done and head_done:
+                if self.for_the_course:
+                    sails = head_sails(self.ship) + boom_sails(self.ship)
+                    draw_sheets(self.ship, sails + shifted_sails(self.ship), _lee_name(sharp_up))
                 # "When by the wind, right the helm, trim the yards, Haul taut the lifts
                 # and weather braces! Steady out the bowlines!" (Luce 1884, 'Wearing')
-                if steady_out_bowlines(self.ship, self.bowlined, sharp_up):
+                elif steady_out_bowlines(self.ship, self.bowlined, sharp_up):
                     self.note("Haul taut the lifts and weather braces. Steady out the bowlines.")
+                if steer is not None:
+                    _end_on_course(self.ship, steer, self.new_course, self.full_and_by)
                 self.finish()
 
     def remaining_s(self) -> float:
@@ -1205,11 +1503,19 @@ class WearScript(Script):
     def words(self) -> dict[str, Any]:
         old = "starboard" if self.sign > 0 else "larboard"
         new = "larboard" if self.sign > 0 else "starboard"
+        steer = self.steer if self.steer is not None else CourseToSteer({})
+        braced = "braced" if self.for_the_course else "braced sharp up"
         return {
             "old_tack": old,
             "new_tack": new,
             "new_course": units.format_heading(self.new_course),
-        }
+        } | steer.words(braced, self.for_the_course)
+
+    def data(self) -> dict[str, Any]:
+        d = super().data()
+        if self.steer is not None:
+            d.update(self.steer.data())
+        return d
 
 
 # ---------------------------------------------------------------------------

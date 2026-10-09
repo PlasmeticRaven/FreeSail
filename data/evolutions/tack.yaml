@@ -27,7 +27,7 @@ applies_to: {class: ship}
 script: tack
 preconditions:
   - {check: dyn.speed >= knots(2), reason: "She has not way enough on her to stay: {speed} through the water."}
-  - {check: close_hauled(), reason: "She is not close-hauled; bring her by the wind before going about."}
+  - {check: close_hauled() or params.course_deg != none, reason: "She is not close-hauled; bring her by the wind before going about."}
 timing:
   brace_s: 45            # to swing the after yards, and again the head yards; and to square them on a miss
   stays_timeout_s: 180   # hung in stays this long from the moment her way went, and she has missed stays
@@ -43,11 +43,21 @@ timing:
                                 # no period source gives the way a ship must keep to stay, and a hull
                                 # moving under a length a minute has no steerage-way (package 32e)
   steady_deg: 5          # within this of the new course counts as steady
+  by_the_wind_s: 120     # put about for a course from off the wind (package 37m): luffed up and
+                         # braced up first, and ready about when by the wind or after this long
+  retrim_s: 20           # paying off to the course after the tack, the yards trimmed this often
+  pay_off_timeout_s: 240 # and to the course's own wind after this long (as fill_away.yaml)
   steady_timeout_s: 300  # or after this long on the new course order (package 10: at 120 s
                          # the frigate was called tacked while still gathering way nine
                          # degrees off her course; she is steady in about five and a half)
 on_start: {log: "All hands about ship."}
-on_complete: {log: "Tacked; braced up on the {new_tack} tack, heading {new_course}.", kind: ship.tacked, severity: notable}
+# Parameters (package 37m): `course_deg`, the course she is put about for by `steer`, a
+# course shaped or a chase (`orders.navigation.judge_course`), given her when she is round
+# (paying off to it, her yards trimmed, when it lies off the wind); `full_and_by`, kept
+# full and by on the new tack. With a course the tack is taken off the wind too, luffed up
+# and braced up first. Ordered by its own word she has neither, and ends as she always has.
+# (no defaults declared: absent, they read as none, `freesail/evolutions/expr.py`)
+on_complete: {log: "Tacked; {braced} on the {new_tack} tack, heading {new_course}{course_words}.", kind: ship.tacked, severity: notable}
 # The urgent "Missed stays" line is the script's, at the moment she has (kind
 # ship.missed_stays); this line comes when the yards are square and she has fallen off.
 on_fail: {log: "Squared the yards; she fell off on the {old_tack} tack, to try again or to wear.", kind: ship.fell_off, severity: notable}

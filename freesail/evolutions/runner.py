@@ -369,6 +369,11 @@ class Runner:
         if "hove_to" in ship.extra or "lying_to.hands" in ship.extra:
             # lying to, the watch tends the helm and the sheets (package 37f)
             keep_lying_to(ship, dt, wind, self)
+        if "course_pending" in ship.extra:
+            # a course across the wind held for want of way, given when she has it (37m)
+            from freesail.orders.navigation import keep_course_pending
+
+            keep_course_pending(ship, dt)
 
     def new_log_group(self) -> str:
         """A key for the evolutions of one order that log as one line (a trim's braces)."""

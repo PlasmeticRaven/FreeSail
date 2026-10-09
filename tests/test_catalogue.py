@@ -121,6 +121,8 @@ M2_TIMINGS = {
     # package 32e: the miss-stays rule reads the vessel (way_gone_fraction and
     # way_gone_lengths_per_min in place of min_speed_kn; stays_timeout_s counted from the
     # moment her way is gone); brace_s, steady_deg and steady_timeout_s stand
+    # package 37m: milestone 2's stand; the three after steady_deg are a tack ordered for a
+    # course, luffed up from a reach first and paying off to the course after it
     "tack": {
         "brace_s": 45.0,
         "stays_timeout_s": 180.0,
@@ -128,6 +130,9 @@ M2_TIMINGS = {
         "way_gone_fraction": 0.25,
         "way_gone_lengths_per_min": 1.0,
         "steady_deg": 5.0,
+        "by_the_wind_s": 120.0,
+        "retrim_s": 20.0,
+        "pay_off_timeout_s": 240.0,
         "steady_timeout_s": 300.0,
     },
     "take_in_gaff": [90.0],
