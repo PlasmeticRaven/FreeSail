@@ -242,10 +242,13 @@ def test_the_view_is_cached_per_tick_and_per_order():
     w.tick()
     b = w.readings
     assert b is not a, "a new tick, a new view"
-    w.submit("steer east")
+    # a course laid on the tack she is on (package 37m: east from her head on the starboard
+    # tack lies across the wind's eye, and she would be put about for it, the course given
+    # her only as she comes round)
+    w.submit("steer west")
     c = w.readings
     assert c is not b, "an order writes a log line and may change the ship at once"
-    assert c["course"] == pytest.approx(math.pi / 2), "the course ordered, read at once"
+    assert c["course"] == pytest.approx(3 * math.pi / 2), "the course ordered, read at once"
     # the view itself remembers what it read: a getter is called once per (id, part)
     calls = []
     original = R.REGISTRY.get("speed")
