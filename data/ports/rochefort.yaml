@@ -39,8 +39,9 @@ datum: "the road of Aix: low water of spring tides (Bellin's sheet, no legend), 
 
 # The outer road is the Basque Road, where a ship from the sea brings up; the anchorage
 # the road of Aix between the isle and the river, where she waits for the pilot of the
-# Charente; the mooring the river at Rochefort, five leagues up, for a ship the pilot
-# takes up.
+# Charente; the mooring the river below Soubise, the highest reach the chart holds as
+# water (the river to Rochefort, five leagues up, is narrower than the modern grid's cell:
+# the arsenal's quay is the shore, and no ship of the chart reaches it).
 outer_road:
   feature: basque-road
   name: the Basque Road
@@ -52,12 +53,13 @@ anchorage:
   lat_deg: 46.0014
   lon_deg: -1.1518
 mooring:
-  name: the Charente at Rochefort
-  lat_deg: 45.9420
-  lon_deg: -0.9560       # the river under the arsenal (judgement)
-  depth_fathoms: 3       # judgement: the King's ships came up lightened
+  feature: charente-below-soubise
+  name: the Charente below Soubise
+  lat_deg: 45.9479       # the highest reach of the river the chart holds as water: above it to
+  lon_deg: -0.9995       # Rochefort the river is narrower than the modern grid's cell (the finding)
+  depth_fathoms: 2       # judgement: the river's channel at low water, which the grid has at 1.2 m
   bottom: mud
-  deep_draught_ft: 18    # judgement: a deeper ship lies in the road of Aix
+  deep_draught_ft: 12    # judgement: a deeper ship lies in the road of Aix, as the King's ships did
 shore:
   feature: rochefort
   name: the quay of the arsenal at Rochefort

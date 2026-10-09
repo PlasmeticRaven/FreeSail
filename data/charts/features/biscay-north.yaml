@@ -1000,6 +1000,18 @@ features:
     source: "Faden 1793, 'Pertuis d'Antioche', p. 81: to enter the port of La Rochelle, or the Digue, coasting pilots are required; at the entrance of the Digue, on the larboard hand, a mast erected to which you pass very close; dry every tide within the Digue and in the harbour; the tides from half an hour after 3 to 4 o'clock; the encyclopaedia's 'Tour de la Lanterne' for the town's towers"
     says: "La Rochelle, its harbour behind the old Digue and between its towers dry at every tide; a coasting pilot takes a ship in."
 
+  - id: la-rochelle-harbour
+    kind: bottom
+    name: the harbour of La Rochelle
+    modern: le Vieux-Port, La Rochelle
+    lat_deg: 46.1554
+    lon_deg: -1.1594
+    height_m: 0
+    bottom: "mud"
+    source: "Faden 1793, 'Pertuis d'Antioche', p. 81: it is dry every tide, both within the Digue and in the harbour of La Rochelle; the road of Chef de Bois muddy ground (p. 79); the harbour's mud judgement from the road's"
+    says: "The harbour of La Rochelle between its towers, dry at every tide on mud."
+    fix: "the harbour's mouth by the towers, where the modern grid has the ground at 2.5 m above the datum"
+
   - id: la-lanterne
     kind: tower
     name: the lanthorn tower
@@ -1160,6 +1172,18 @@ features:
     depth_fathoms: 2
     source: "Faden 1793, 'Isle d'Aix', p. 82: the Charente is never entered without a pilot; Bellin 1764, the soundings of 2 and 3 in the river's mouth"
     says: "The mouth of the Charente, two or three fathoms in the channel; never entered without a pilot."
+
+  - id: charente-below-soubise
+    kind: bottom
+    name: the Charente below Soubise
+    modern: la Charente between Port-des-Barques and Soubise
+    lat_deg: 45.9479
+    lon_deg: -0.9995
+    height_m: 0
+    bottom: "mud"
+    source: "Bellin 1764, Petit Atlas Maritime t. V no. 85, the Charente's course from its mouth by Soubize to Rochefort; Faden 1793, 'Isle d'Aix', p. 82: the Charente never entered without a pilot; the bottom JUDGEMENT (an estuary's mud, no figure in the sources)"
+    says: "The Charente winding up past Soubise toward Rochefort, a muddy river taken only with a pilot."
+    fix: "the highest reach of the river that the modern grid holds as water (1.2 m below the datum); above it to Rochefort the river is narrower than the grid's cell"
 
   - id: rochefort
     kind: town

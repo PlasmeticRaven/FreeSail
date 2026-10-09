@@ -865,22 +865,29 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     under them, its bounds and words the whole's; a region's name still loads a chart of
     that region alone (every scenario of the Channel reads what it read); a name the
     manifest has not is refused in words that list both."""
-    assert manifest["charts"][WHOLE]["regions"] == ["channel-west"]
+    # package 39b: Biscay north beside the Channel
+    assert manifest["charts"][WHOLE]["regions"] == ["channel-west", "biscay-north"]
     assert manifest["charts"][WHOLE]["corridor"] == CORRIDOR
-    assert whole.region == whole.name == WHOLE and whole.regions == ["channel-west"]
+    assert whole.region == whole.name == WHOLE
+    assert whole.regions == ["channel-west", "biscay-north"]
     assert [lv.level for lv in whole.levels] == [3, 2, 1]
-    assert whole.bounds == (32.0, 51.0, -20.0, -1.0)
-    assert whole.bounds_words() == "32 to 51 N, 20 to 1 W"
+    # the envelope of the regions and the corridor: Biscay north reaches 0.9 W for
+    # Rochefort on the Charente (package 39b)
+    assert whole.bounds == (32.0, 51.0, -20.0, -0.9)
+    assert whole.bounds_words() == "32 to 51 N, 20 to 0.9 W"
     assert whole.contains(OFF_LISBON) and whole.contains(LIZARD)
     assert not whole.contains(Position(52.0, -5.0))
     assert whole.region_at(LIZARD) == "channel-west" and whole.region_at(OFF_LISBON) is None
     # the features of every region, indexed together, and every region's coast
-    assert whole.features.keys() == chart.features.keys()
-    assert all(whole.region_of[fid] == "channel-west" for fid in whole.features)
+    biscay = load_chart("biscay-north")
+    assert whole.features.keys() == chart.features.keys() | biscay.features.keys()
+    assert all(whole.region_of[fid] == "channel-west" for fid in chart.features)
+    assert all(whole.region_of[fid] == "biscay-north" for fid in biscay.features)
     assert whole.find_feature("the Lizard") is chart.find_feature("the Lizard") or (
         whole.find_feature("the Lizard").id == chart.find_feature("the Lizard").id
     )
-    assert len(whole.coast_lines()) == len(chart.coast_lines()) > 0
+    assert len(whole.coast_lines()) == len(chart.coast_lines()) + len(biscay.coast_lines())
+    assert len(chart.coast_lines()) > 0 and len(biscay.coast_lines()) > 0
     # the one-region chart as before: its own levels and bounds, no corridor
     assert [lv.level for lv in chart.levels] == [3, 2] and chart.corridor is None
     assert chart.bounds == (48.0, 51.0, -7.0, -3.0)
@@ -960,41 +967,61 @@ def test_a_query_asks_the_finest_level_and_falls_back_to_the_corridor_and_to_non
 
 
 def test_no_seam_at_a_regions_edge_over_the_corridor(whole, chart):
-    """Item 2 of the brief: across the Channel region's southern edge the depth has no
-    step beyond the two sources' own difference (EMODnet at its datum against GEBCO at
-    mean sea level, a metre or two in seventy), the shore's distance steps by no more
-    than a corridor cell (its grain), no danger is lost, and the chart of the region
-    alone reads the same within the region."""
-    last: tuple[int, float, float] | None = None  # level, depth, the shore's distance
-    seam_steps: list[tuple[float, float]] = []
+    """Item 2 of package 38's brief, with Biscay north beside the Channel (package 39b):
+    south from off the Penmarks the track crosses the Channel's bound (48 N) and its last
+    row of tiles (to 47.81 N, the seam's tiles the Channel's) into Biscay north's, all
+    EMODnet's at level 2: no step beyond the floor's own; west from the open bay it
+    crosses Biscay north's western tiles onto the corridor, where the depth has no step
+    beyond the two sources' own difference (EMODnet at its datum against GEBCO at mean
+    sea level) and the shore's distance none beyond a corridor cell (its grain); no
+    danger is lost, and each region's chart alone reads the same within its own tiles."""
+    biscay = load_chart("biscay-north")
+    last: tuple[int, float] | None = None
     for k in range(0, 120):
         p = destination(EDGE_TRACK_START, 180.0, k * 250.0)
+        depth = whole.depth_at(p)
+        assert depth is not None and whole.level_at(p) == 2, p
+        mine = chart.depth_at(p) if chart.depth_at(p) is not None else biscay.depth_at(p)
+        # one region's tile or the other's (at the tiles' edge the whole interpolates
+        # across both, a region alone within its own)
+        assert abs(mine - depth) < 0.5, p
+        if p.lat_deg < 47.80:
+            assert chart.depth_at(p) is None  # the Channel's tiles end at 47.81 N
+        if 47.82 < p.lat_deg < 48.0:
+            # within Biscay north's bounds, on the seam's tiles, which are the Channel's:
+            # the block's chart alone has none there (the whole chart is the one to sail)
+            assert biscay.depth_at(p) is None and whole.region_at(p) == "biscay-north"
+        if last is not None:
+            assert abs(depth - last[1]) < 12.0, (p, depth, last)  # the floor's own steps
+        last = (2, depth)
+    # west across Biscay north's western tiles onto the corridor
+    start = Position(47.5, -4.95)
+    last3: tuple[int, float, float] | None = None
+    seam_steps: list[tuple[float, float]] = []
+    for k in range(0, 120):
+        p = destination(start, 270.0, k * 250.0)
         level = whole.level_at(p)
         depth = whole.depth_at(p)
         shore = whole.nearest_shore(p)
         assert depth is not None and shore is not None and level in (1, 2), p
         if level == 2:
-            assert whole.depth_at(p) == chart.depth_at(p)
+            assert biscay.depth_at(p) == depth
         else:
-            assert chart.depth_at(p) is None  # the region alone ends here
-        if last is not None:
-            # the sea floor's own steps inshore (Penmarch's rocks) are the floor's; the
-            # step at the seam is the two sources' difference, a metre or two
-            assert abs(depth - last[1]) < 12.0, (p, depth, last)
-            if level != last[0]:
-                seam_steps.append((abs(depth - last[1]), abs(shore.distance_m - last[2])))
-        last = (level, depth, shore.distance_m)
+            assert biscay.depth_at(p) is None  # the region alone ends here
+        if last3 is not None and level != last3[0]:
+            seam_steps.append((abs(depth - last3[1]), abs(shore.distance_m - last3[2])))
+        last3 = (level, depth, shore.distance_m)
     assert len(seam_steps) == 1, "the track crosses the edge once"
     depth_step, shore_step = seam_steps[0]
-    # measured: a step of 1.3 m in the depth and of 1,150 m (a cell and a quarter, the
-    # coarser level's grain) in the shore's distance at the seam off Penmarch
+    # measured (39b): 0.5 m in the depth and 1,273 m (a corridor cell and a third) in
+    # the shore's distance at Biscay north's western edge, 47 30 N 5 04 W
     assert depth_step < 3.0 and shore_step < 1.5 * whole.levels[-1].cell_m, seam_steps
     inside = Position(47.9, -4.45)
     assert {f.id for f, _, _ in whole.dangers_near(inside, 10 * units.NAUTICAL_MILE)} == {
         f.id for f, _, _ in chart.dangers_near(inside, 10 * units.NAUTICAL_MILE)
-    }
-    # the field's own read falls through to the corridor where the region's tiles end
-    # within the distance it gives, and not before (a harbour patch's region as it was)
+    } | {f.id for f, _, _ in biscay.dangers_near(inside, 10 * units.NAUTICAL_MILE)}
+    # the field's own read where a region's tiles end within the distance it gives, and
+    # a harbour patch's region as it was
     edge = destination(EDGE_TRACK_START, 180.0, 20 * 250.0)
     assert whole.level_at(edge) == 2 and whole.coast_distance(edge) is not None
     assert whole.coast_distance(CARRICK_ROADS) == chart.coast_distance(CARRICK_ROADS)
@@ -1002,18 +1029,19 @@ def test_no_seam_at_a_regions_edge_over_the_corridor(whole, chart):
 
 
 def test_a_fake_sailed_across_the_edge_hails_no_landfall_twice_and_loses_no_depth():
-    """The frigate off Penmarch stands south across the region's edge and over the
-    corridor's water for two hours: the shore is hailed once, the depth under the keel
-    reads at every tick, no danger is lost and nothing says the chart ends."""
+    """The frigate in the open bay stands west across Biscay north's western tiles and
+    over the corridor's water for two hours (package 38 sailed her south from off the
+    Penmarks, which is Biscay north's water since 39b): the depth under the keel reads at
+    every tick, no landfall is hailed twice and nothing says the chart ends."""
     sc = Scenario(
         start_time=datetime(1805, 6, 1, 10, 0),
-        wind_from_deg=270.0,
+        wind_from_deg=0.0,
         wind_speed_kn=14.0,
         gustiness=0.0,
         variability=0.0,
-        ship_heading_deg=180.0,
+        ship_heading_deg=270.0,
         ship_speed_kn=6.0,
-        position={"lat_deg": 47.86, "lon_deg": -4.45},
+        position={"lat_deg": 47.5, "lon_deg": -4.95},
         chart=WHOLE,
     )
     w = make_world(7, FRIGATE, sc)
@@ -1113,9 +1141,10 @@ def test_the_recipe_form_the_checks_and_a_region_build_that_leaves_the_rest_unto
     out = capsys.readouterr().out
     for words in (
         "licences: emodnet_dtm_2024, gebco_2025 (allowed)",
-        "features within the bounds: 207 of 207",
+        # package 39b: the Raz de Sein's ten marks north of 48 N in this file
+        "features within the bounds: 217 of 217",
         "ids unique across the manifest's regions: yes",
-        "sources in the references' form: 207 of 207",
+        "sources in the references' form: 217 of 217",
         "harbour patches with their datum stated: 5 of 5",
         "passes its checks",
     ):
@@ -1167,3 +1196,115 @@ def test_the_recipe_form_the_checks_and_a_region_build_that_leaves_the_rest_unto
     report = []
     tool.Build(tmp_path, True, report).write_manifest({}, {}, {}, {})
     assert any("channel-west has tiles missing" in line for line in report)
+
+
+# ---------------------------------------------------------------------------
+# Package 39b: Biscay north, the second block (spec M6 §26)
+# ---------------------------------------------------------------------------
+
+BISCAY = "biscay-north"
+
+
+def test_biscay_north_is_a_region_beside_the_channel_that_lists_none_of_its_tiles(manifest, capsys):
+    """The block's recipe, built and committed: its bounds abut the Channel's at 48 N;
+    the level-2 tiles that straddle the edge are the Channel's (the seam rule, printed as
+    a check) and are neither written again nor listed; its harbour patches and its one
+    override, the road of Aix from Bellin's sheet with its datum stated; under the
+    region's size; the checks pass."""
+    tool = build_tool()
+    entry = manifest["regions"][BISCAY]
+    assert entry["bounds"] == {"south": 45.9, "north": 48.0, "west": -5.0, "east": -0.9}
+    assert entry["bounds"] == tool.REGIONS[BISCAY]["bounds"]
+    channel = manifest["regions"][REGION]["tiles"]
+    mine = {lv: {t["name"] for t in ts} for lv, ts in entry["tiles"].items()}
+    theirs = {lv: {t["name"] for t in ts} for lv, ts in channel.items()}
+    assert not mine["2"] & theirs["2"] and not mine["3"] & theirs["3"]
+    b = entry["bounds"]
+    every = {
+        tool.tile_name(*t) for t in tool.tiles_over(2, b["south"], b["north"], b["west"], b["east"])
+    }
+    shared = every - mine["2"]
+    assert len(every) == 60 and len(mine["2"]) == 55 and shared <= theirs["2"] and len(shared) == 5
+    assert tool.tiles_listed_elsewhere(BISCAY, manifest["regions"])[2] >= shared
+    total = 0
+    for level, tiles in entry["tiles"].items():
+        for t in tiles:
+            path = CHARTS / "tiles" / str(level) / f"{t['name']}.npz"
+            assert path.exists(), path
+            total += path.stat().st_size
+    total += (CHARTS / entry["coast"]).stat().st_size + (CHARTS / entry["features"]).stat().st_size
+    assert total < REGION_BUDGET_BYTES, f"{total / 1e6:.1f} MB"
+    assert set(entry["harbours"]) >= {"lorient-port-louis", "aix-basque-roads", "la-rochelle"}
+    [aix] = entry["overrides"]
+    assert aix["file"] == "overrides/biscay-north/aix-basque-roads.yaml"
+    assert aix["units"] == "brasses" and aix["datum_above_chart_datum_m"] == 1.0
+    assert aix["patches"] == 2 and "Bellin 1764" in aix["sheet"]
+    assert tool.main(["--check", BISCAY]) == 0
+    out = capsys.readouterr().out
+    for words in (
+        "licences: emodnet_dtm_2024, gebco_2025 (allowed)",
+        "ids unique across the manifest's regions: yes",
+        "harbour patches with their datum stated: 1 of 1",
+        "the fetch box covers the tiles whole: yes",
+        "tiles another region lists: 5 kept (level 2: 5, level 3: 0; not written, not listed)",
+        "passes its checks",
+    ):
+        assert words in out, words
+    # an override without its datum's height is refused (it was read as nought before)
+    report: list[str] = []
+    build = tool.Build(CHARTS, True, report)
+    with pytest.raises(SystemExit, match="overrides without a datum stated: o.yaml"):
+        build.check_region(
+            BISCAY,
+            [],
+            [{"file": "o.yaml", "datum": "low water", "datum_above_chart_datum_m": None}],
+            others={},
+        )
+
+
+def test_biscay_norths_lights_are_dated_and_its_coast_is_raised_by_day_and_by_night():
+    """1805 sees the Baleines and Chassiron, the two lights the period's pilot names lit,
+    and not the lights of the 1830s (Penmarch, Belle Isle's Goulphar, Groix's Pen Men,
+    the Pilier, Yeu); off Belle Isle by day its land and its castle are in sight, off
+    Chassiron by night its fire and the Baleines', and off Goulphar by night in 1805
+    nothing, where in 1840 its light."""
+    whole = load_chart(WHOLE)
+    lights = [f for f in whole.features.values() if f.kind == "light"]
+    lit = sorted(f.id for f in lights if whole.region_of[f.id] == BISCAY and f.lit_in(1805))
+    assert lit == ["baleines-light", "chassiron-light"]
+    for fid, year in (("penmarch-light", 1835), ("goulphar-light", 1836), ("pen-men-light", 1839)):
+        assert not whole.feature(fid).lit_in(1805) and whole.feature(fid).lit_in(year)
+    assert not whole.feature("baleines-light").lit_in(1860)  # Vauban's tower, out in 1854
+    eye = 10.0
+    off_belle_isle = destination(Position(47.33, -3.18), 315.0, 12 * units.NAUTICAL_MILE)
+    day = {
+        s.feature.id: s
+        for s in whole.in_sight(off_belle_isle, eye, None, "day", datetime(1805, 6, 12, 12))
+    }
+    assert {"belle-isle", "poulains-point", "palais-castle"} <= set(day)
+    assert day["belle-isle"].seen_as == "land"
+    off_chassiron = destination(Position(46.0467, -1.4103), 270.0, 8 * units.NAUTICAL_MILE)
+    night = whole.in_sight(off_chassiron, eye, None, "night", datetime(1805, 6, 12, 23, 30))
+    assert [s.feature.id for s in night] == ["chassiron-light", "baleines-light"]
+    off_goulphar = destination(Position(47.3108, -3.2271), 225.0, 10 * units.NAUTICAL_MILE)
+    assert whole.in_sight(off_goulphar, eye, None, "night", datetime(1805, 6, 12, 23, 30)) == []
+    later = whole.in_sight(off_goulphar, eye, None, "night", datetime(1840, 6, 12, 23, 30))
+    assert [s.feature.id for s in later] == ["goulphar-light"]
+
+
+def test_the_depths_in_biscay_norths_roads_and_the_period_patch_at_aix():
+    """The roads at level 3, each in the pilot's water: the Bay of Quiberon in Faden's 8
+    to 12 fathoms, the road of Palais in his 8 to 15; the road of Aix where Bellin's five
+    brasses are patched (9.1 m below the chart's datum with the RAM's metre), which the
+    modern grid has silted to under three metres; the marks of the Raz de Sein in the
+    Channel's file found by name on the whole chart (not yet in its index)."""
+    whole = load_chart(WHOLE)
+    assert whole.level_at(Position(47.495, -2.98)) == 3
+    assert 8 * units.FATHOM * 0.5 < whole.depth_at(Position(47.495, -2.98)) < 12 * units.FATHOM
+    assert 8 * units.FATHOM * 0.5 < whole.depth_at(Position(47.357, -3.142)) < 15 * units.FATHOM
+    assert whole.depth_at(Position(45.988, -1.1365)) == pytest.approx(5 * 1.624 + 1.0, abs=0.1)
+    assert whole.feature("aix-road") is not None and whole.region_of["aix-road"] == BISCAY
+    for name in ("the Old Woman", "the Livenet", "the passage of the Raz", "Hodierne"):
+        f = whole.find_feature(name)
+        assert f is not None and whole.region_of[f.id] == REGION, name
+    assert whole.find_feature("the Raz").id == "pointe-du-raz"  # the recorded passages' word

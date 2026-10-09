@@ -241,7 +241,10 @@ def test_the_scenario_file_reads_a_chart_beside_a_region_and_a_save_before_it_lo
     both = point_world(
         chart="atlantic-east", region="channel-west", position={"lat_deg": 49.0, "lon_deg": -6.0}
     )
-    assert both.chart.name == "atlantic-east" and both.chart.regions == ["channel-west"]
+    assert both.chart.name == "atlantic-east" and both.chart.regions == [
+        "channel-west",
+        "biscay-north",
+    ]
     data = both.save()
     assert data["scenario"]["chart"] == "atlantic-east"
     copy = replay_mod.replay(data, None)

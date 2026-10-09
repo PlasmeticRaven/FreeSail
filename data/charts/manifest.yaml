@@ -4,7 +4,7 @@
 format: 1
 built: '2026-10-09'
 tool: tools/build_charts.py
-build_hash: fc8d95fcaad2d4c1
+build_hash: c6301c7333d2fad1
 levels:
   '0':
     cell_sec: 150.0
@@ -1701,10 +1701,10 @@ regions:
         north: 46.08
         west: -1.32
         east: -1.08
-    feature_count: 98
+    feature_count: 100
     features_by_kind:
       anchorage: 18
-      bottom: 7
+      bottom: 9
       castle: 3
       church: 4
       drying: 1
