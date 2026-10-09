@@ -533,6 +533,7 @@ def test_a_reply_out_of_turn_reads_leaves_or_is_refused_in_words(tmp_path):
     assert g.harness.transcript[-1] == {
         "tick": 0,
         "after_orders": 0,
+        "after_inputs": 0,
         "door": "speak",
         "reason": "Hello there.",
         "by": "its own word",
@@ -543,6 +544,7 @@ def test_a_reply_out_of_turn_reads_leaves_or_is_refused_in_words(tmp_path):
     assert g.harness.transcript[-1] == {
         "tick": 0,
         "after_orders": 0,
+        "after_inputs": 0,
         "door": "leave",
         "reason": "I am going",
         "by": "the token",

@@ -3242,7 +3242,7 @@ def test_the_way_out_of_danger_is_the_officers_own_word_for_the_helm_a_heave_to_
 def test_the_handover_is_asked_for_at_a_reserve_in_tokens_and_of_an_officer_off_watch():
     """The report's 8.7, ruling 2: the note was asked for at six tenths of the context
     whatever its size, so on a large context it was asked for with half the window to
-    spare. It is asked for when the conversation has left less than a reserve in tokens
+    spare. It is asked for when the conversation has left less than a reserve of the context
     (the door's own, `--handover-reserve`, else the harness's), never earlier than the
     six tenths, and not at all where the door says no context. And it is the station's
     note, not the deck's: an officer seated without the deck is asked and writes it."""
@@ -3262,9 +3262,10 @@ def test_the_handover_is_asked_for_at_a_reserve_in_tokens_and_of_an_officer_off_
     again = harness_mod.HANDOVER_ASK_AGAIN_FRACTION
     h.budget_tokens = 16384  # a small context: the reserve is most of it, so the fraction governs
     assert h.handover_threshold() == (int(0.6 * 16384), int(again * 16384))
-    h.budget_tokens = 131072  # a large one: the reserve governs
-    assert harness_mod.HANDOVER_RESERVE_TOKENS == 14000
-    assert h.handover_threshold() == (131072 - 14000, 3500)
+    h.budget_tokens = 131072  # a large one: the reserve governs, a share (package 37i)
+    assert harness_mod.HANDOVER_RESERVE_SHARE == 0.3
+    reserve = int(0.3 * 131072)
+    assert h.handover_threshold() == (131072 - reserve, reserve // 4)
     h.reserve_tokens = 30000  # the door's own
     assert h.handover_threshold() == (131072 - 30000, 7500)
     assert h.save()["reserve_tokens"] == 30000

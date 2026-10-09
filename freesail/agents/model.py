@@ -63,11 +63,18 @@ class Reply:
     """What the model said: free text and tool calls, in the order it gave them. `raw`
     is the whole output as the door received it, where the door has it as text; the
     harness scans it for the opt-out token before anything else reads the reply, and
-    scans the text and the arguments when there is no raw output."""
+    scans the text and the arguments when there is no raw output.
+
+    `served_tokens` is the model server's own count where the door has it (package 37i:
+    the local runner's `{"prompt": N, "reply": M}`, the request that brought this reply
+    and the reply itself, thinking included): the harness measures the conversation by
+    it for the handover note. It is kept in the transcript, so that a replay measures
+    alike, and is absent from a reply that has none."""
 
     text: str = ""
     calls: tuple[ToolCall, ...] = ()
     raw: str | None = None
+    served_tokens: dict[str, int] | None = field(default=None, compare=False)
 
     @property
     def is_silent(self) -> bool:
@@ -90,7 +97,10 @@ class Reply:
         return "\n".join(self.pieces())
 
     def to_dict(self) -> dict[str, Any]:
-        return {"text": self.text, "calls": [c.to_dict() for c in self.calls], "raw": self.raw}
+        d = {"text": self.text, "calls": [c.to_dict() for c in self.calls], "raw": self.raw}
+        if self.served_tokens:
+            d["served_tokens"] = dict(self.served_tokens)
+        return d
 
     @classmethod
     def from_dict(cls, d: dict[str, Any]) -> Reply:
@@ -98,7 +108,21 @@ class Reply:
             str(d.get("text") or ""),
             tuple(ToolCall.from_dict(c) for c in (d.get("calls") or [])),
             d.get("raw"),
+            served_tokens_of(d.get("served_tokens")),
         )
+
+
+def served_tokens_of(value: Any) -> dict[str, int] | None:
+    """A door's served counts as a reply carries them (`{"prompt": N, "reply": M}`, each
+    a whole number of tokens), or None for anything else."""
+    if not isinstance(value, dict):
+        return None
+    out: dict[str, int] = {}
+    for k in ("prompt", "reply"):
+        v = value.get(k)
+        if isinstance(v, int) and not isinstance(v, bool) and v >= 0:
+            out[k] = v
+    return out or None
 
 
 @dataclass

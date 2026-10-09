@@ -5,7 +5,8 @@ client of the running game and of the endpoint, and builds no World.
 
     python -m freesail.agents.local --game http://localhost:8000 --endpoint http://localhost:8080
         [--model NAME] [--seed N] [--temperature T] [--ctx N] [--station watcher]
-        [--session play|test] [--ask-again] [--handover-reserve N]
+        [--session play|test] [--ask-again] [--handover-reserve N|SHARE]
+        [--max-reply N] [--request-timeout S]
 
 It reads the served model's identity (`LocalModel.identity`), stations it through the
 game's agent API with that identity (`remote.GameClient`; the game runs the consent gate:
@@ -56,19 +57,52 @@ neither the server nor `--ctx` gives a context size** (the gate's ruling 2, the 
 8.7): without one nothing is asked for and nothing is trimmed, and the server cuts the
 conversation unseen (the two Ollama officers of gate 5c's playtests).
 
-**The handover's reserve** (package 37g, item 8): `--handover-reserve N` is the tokens
-of the context kept free when the harness asks for the handover note, sent with the
-station request; unset, the harness's own (`harness.HANDOVER_RESERVE_TOKENS`).
+**The handover's reserve** (package 37g, item 8; package 37i, item 3): the part of the
+context kept free when the harness asks for the handover note. `--handover-reserve`
+takes tokens (`30000`) or a share of the context (`0.3`, or `30%`), and may be given
+twice, once in each form, when the larger counts; the runner sends it in tokens with the
+station request. Unset, the harness's own: three tenths of the context
+(`harness.HANDOVER_RESERVE_SHARE`) and never less than 14,000 tokens
+(`HANDOVER_RESERVE_TOKENS`), the larger; and never earlier than six tenths of it.
 
-**The budget.** The conversation grows a sample at a time. When the context size is
-known (`--ctx-size`, else the server's `n_ctx` from `/props`), the oldest turns are left
-out of the request, whole exchanges at a time, so that the system message and the latest
-turns fit with `REPLY_RESERVE_TOKENS` to spare; a brief that alone does not fit stops the
-run with the numbers. A sample after the first carries only the readings that changed
-(package 31c), so the first sample kept when older ones are left out is sent with every
-reading as the samples before it made them (`READINGS_WHOLE`): nothing is withheld.
-Tokens are estimated at `CHARS_PER_TOKEN` characters each (the harness's one rule,
-`tools.CHARS_PER_TOKEN`, which the library's sizes use too).
+**The budget, by the server's count** (package 37i, item 2). The conversation grows a
+sample at a time. When the context size is known (`--ctx-size`, else the server's), the
+oldest turns are left out of the request, whole exchanges at a time, so that the system
+message, the handover note folded in after it and the latest turns fit with the reply
+budget to spare; a brief that alone does not fit stops the run with the numbers. A
+sample after the first carries only the readings that changed (package 31c), so the
+first sample kept when older ones are left out is sent with every reading as the samples
+before it made them (`READINGS_WHOLE`): nothing is withheld. Each message is measured at
+`CHARS_PER_TOKEN` characters a token (the harness's one rule) and then scaled by the
+server's own figure: every reply carries the tokens the server counted for the request
+and the reply (`usage`'s `prompt_tokens` and `completion_tokens` at llama-server and at
+Ollama's OpenAI-compatible endpoint; `prompt_eval_count` and `eval_count` in Ollama's
+own form), and the runner keeps the ratio of the server's count to its own measure of
+what it sent. So the four-character rule stands alone only until the first reply, and in
+the context guard before stationing. Game 10 (the review of gate 5c, G15) had the rule
+12 to 17 per cent short for its model and samples. The server's count also goes to the
+game with the reply (`Reply.served_tokens`), where the harness measures the conversation
+by it for the handover note. A count under half the runner's own measure is taken for a
+partial one (a server that counts only what it did not have cached) and not used.
+
+**A reply cut off is not a turn** (package 37i, item 1). The runner reads why each reply
+ended (`finish_reason`, or Ollama's `done_reason`). A reply cut at the reply limit while
+the model was still thinking (no words and no call, its reasoning apart or in an
+unclosed `<think>`), or any reply with no words and no call, is asked for once more in
+the same request with the reason said at its end, in the runner's own words; the owner is
+told at this terminal. If that one is cut off or empty too, the owner is told, the turn
+ends with nothing done and the station's journal says why (`GameClient.reply`'s
+`cut_off`; the harness's "cut_off" act): no empty reply is passed on as the model's.
+
+**A request refused for its size** (package 37i, item 4). When the server refuses a
+request because it does not fit the context (llama-server's `exceed_context_size_error`,
+or words to that effect), the runner takes the server's own count of it from the refusal
+where it is given, measures by it, leaves out the oldest exchanges that are not the
+brief, the handover note or the latest sample, says so once at this terminal, and asks
+again at once. It never sends the same request again: each retry is smaller, and when
+nothing more can be left out, or the server has refused `OVERSIZE_TRIES` requests in
+one turn, the station is stood down with the numbers. Game 10's two seatings both ended
+on the same request sent three times.
 
 **The shelf** (package 28d). The runner keeps the game's turns as the game serves them
 and builds each request's messages from them afresh, so a book the model shelved (or
@@ -90,7 +124,10 @@ Tested against `httpx.MockTransport` only (`tests/test_local_runner.py`), never 
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import json
+import math
+import re
 import sys
 from collections.abc import Callable, Sequence
 from typing import Any
@@ -99,7 +136,11 @@ import httpx
 
 from freesail.agents import consent
 from freesail.agents.agent import OFFICER, TURN_ENDS_WORDS, station_name
-from freesail.agents.harness import conversation_text
+from freesail.agents.harness import (
+    HANDOVER_RESERVE_SHARE,
+    HANDOVER_RESERVE_TOKENS,
+    conversation_text,
+)
 from freesail.agents.model import DATA, MODEL, OPERATOR, Reply, ToolCall, Turn
 from freesail.agents.remote import GameClient, GameError, turn_from_dict
 from freesail.agents.tools import CHARS_PER_TOKEN, TOOLS, parameters_schema, tool_names
@@ -135,6 +176,41 @@ READINGS_WHOLE = (
 # Tokens kept free for the reply in the context budget: the reply budget itself.
 REPLY_RESERVE_TOKENS = REPLY_MAX_TOKENS
 
+# Why a reply ended, as the servers say it when it was cut at the reply limit:
+# llama-server's and the OpenAI form's `finish_reason`, Ollama's `done_reason`.
+CUT_AT_THE_LIMIT = ("length", "max_tokens")
+
+# A count from the server under this share of the runner's own measure of the same
+# request is taken for a partial count (a server that counts only the part of the prompt
+# it did not have cached) and not used (judgement: the four-character rule ran 12 to 17
+# per cent short in game 10, never by half; a count that low is not of the whole).
+PARTIAL_COUNT_SHARE = 0.5
+
+# How much more the runner measures by when the server refuses a request for its size and
+# gives no count of its own in the refusal (judgement: game 10's short count, 12 to 17
+# per cent, rounded up). With the server's count in the refusal, that count is used.
+OVERSIZE_STEP = 1.15
+
+# The most requests the server may refuse for their size in one turn before the station is
+# stood down (judgement: the first refusal is answered by the server's own count and one
+# smaller request ordinarily fits; a third smaller still that is refused says the context
+# the runner was told of is not the one the server has).
+OVERSIZE_TRIES = 3
+
+# What the runner says to the model when it asks once more for a reply that was cut off
+# or empty (package 37i, item 1): its own words, at the end of the same request.
+CUT_WORDS = (
+    "From the local runner, not the game: your last reply was cut off at the reply limit "
+    "({limit:,} tokens) while you were still thinking, and nothing of it reached the game: "
+    "no words and no call. This is the same turn, asked once more; think more briefly, and "
+    "answer with a call or with words."
+)
+EMPTY_WORDS = (
+    "From the local runner, not the game: your last reply came with no words and no call, "
+    "so nothing reached the game. This is the same turn, asked once more; answer with a "
+    "call or with words."
+)
+
 # How long one request may take, in real seconds. The reply budget, not the clock, is
 # what bounds a reply; the timeout is for a server that has hung. Playtest 6 (Qwen3.8
 # 27B through Ollama, 2026-09-28) showed 180 s cutting off honest replies: a thinking
@@ -168,6 +244,16 @@ SITUATION_ALLOWANCE_TOKENS = 2500
 IDENTITY_HASH_KEYS: tuple[str, ...] = ("model_sha256", "model_hash")
 
 
+# An unclosed or closed `<think>` block at the head of the content, where a server does
+# not give the reasoning apart: what is left is what the model said.
+THINKING = re.compile(r"(?s)^\s*<think>.*?(?:</think>|$)")
+
+# A refusal's words, read for its size: "the request exceeds the available context size",
+# "the input length exceeds the context length"; and the counts in them, "(103679 tokens)".
+OVERSIZE_WORDS = ("exceed", "too long", "too large", "longer than", "larger than")
+TOKENS_IN_WORDS = re.compile(r"(\d[\d,]*)\s*tokens")
+
+
 class DoorError(Exception):
     """The endpoint could not be used; the message says why, in words for the owner."""
 
@@ -191,6 +277,7 @@ class LocalModel:
         timeout: float = REQUEST_TIMEOUT_S,
         on_reply: Callable[[Reply], None] | None = None,
         max_reply: int = REPLY_MAX_TOKENS,
+        say: Callable[[str], None] | None = None,
     ):
         base = endpoint.strip().rstrip("/")
         base = base.removesuffix("/v1")
@@ -213,6 +300,17 @@ class LocalModel:
         self.dropped_turns = 0  # turns left out of the last request for the budget
         self._props: dict[str, Any] | None = None
         self._props_read = False
+        # the server's own count (package 37i): the ratio of its count of a request to
+        # the runner's four-character measure of it, None until the first reply; the
+        # last request's measure; the last reply's counts as the server gave them
+        self.ratio: float | None = None
+        self._sent_measure = 0
+        self.served: dict[str, int] | None = None
+        # why the last reply ended as the server said it, and the words when no reply was
+        # to be had for the turn (cut off or empty twice; the runner tells the game)
+        self.finish: str = ""
+        self.cut_off: str | None = None
+        self.say = say  # words for the owner at the runner's terminal
 
     # -- the server ------------------------------------------------------------------
 
@@ -446,9 +544,10 @@ class LocalModel:
             for n in names
         ]
 
-    def messages(self, turns: Sequence[Turn]) -> list[dict[str, Any]]:
+    def messages(self, turns: Sequence[Turn], notice: str = "") -> list[dict[str, Any]]:
         """The turns as chat messages, from the latest operator turn on (a door taking
-        over a restored station sends the brief again, `Harness.take_over`)."""
+        over a restored station sends the brief again, `Harness.take_over`); `notice`, the
+        runner's own words at the end (a reply asked for once more, package 37i)."""
         start = 0
         for i, t in enumerate(turns):
             if t.role == OPERATOR:
@@ -460,6 +559,7 @@ class LocalModel:
         # that carries only the changes, the same sample with every reading (package 31c)
         picture: dict[str, Any] = {}
         whole: dict[int, dict[str, Any]] = {}
+        pinned: set[int] = set()  # the handover note folded in after the brief
 
         def answer_the_ids() -> None:
             # a turn that ended on a stand-by has no results (package 28c); the protocol
@@ -527,21 +627,53 @@ class LocalModel:
                         if d.get("readings_are"):
                             all_of = {**d, "readings_are": READINGS_WHOLE}
                             whole[len(out)] = all_of | {"readings": dict(picture)}
+                    if d.get("handover") and d.get("folded"):
+                        pinned.add(len(out))
                     out.append({"role": "user", "content": json.dumps(d, ensure_ascii=False)})
-        return self._budget(out, whole)
+        if notice:
+            answer_the_ids()
+            if out and out[-1]["role"] == "user":
+                # one user message, not two in a row, which some chat templates refuse
+                out[-1] = {"role": "user", "content": f"{out[-1]['content']}\n\n{notice}"}
+            else:
+                out.append({"role": "user", "content": notice})
+        return self._budget(out, whole, pinned)
+
+    def measure(self, thing: Any) -> int:
+        """The runner's own measure of a message or of the tool definitions: four
+        characters a token (`CHARS_PER_TOKEN`), before the server's figure scales it."""
+        return len(json.dumps(thing, ensure_ascii=False)) // CHARS_PER_TOKEN + 1
+
+    def scaled(self, measure: int) -> int:
+        """A measure in the server's tokens: by the ratio of its count to the runner's
+        measure of the last request (package 37i, item 2), and as it is until the first
+        reply."""
+        return measure if self.ratio is None else int(math.ceil(measure * self.ratio))
 
     def _budget(
-        self, messages: list[dict[str, Any]], whole: dict[int, dict[str, Any]] | None = None
+        self,
+        messages: list[dict[str, Any]],
+        whole: dict[int, dict[str, Any]] | None = None,
+        pinned: set[int] | None = None,
     ) -> list[dict[str, Any]]:
         self.dropped_turns = 0
         ctx = self.context_size()
+        tools_measure = self.measure(self.tools_schema())
         if not ctx or not messages:
+            self._sent_measure = sum(self.measure(m) for m in messages) + tools_measure
             return messages
-        cost = [len(json.dumps(m, ensure_ascii=False)) // CHARS_PER_TOKEN + 1 for m in messages]
-        tools_cost = len(json.dumps(self.tools_schema())) // CHARS_PER_TOKEN
+        measures = [self.measure(m) for m in messages]
+        cost = [self.scaled(m) for m in measures]
+        tools_cost = self.scaled(tools_measure)
         room = ctx - self.max_reply - tools_cost
-        head = messages[0] if messages[0]["role"] == "system" else None
-        head_cost = cost[0] if head is not None else 0
+        # the brief, and the handover note folded in after it, are never left out
+        lead = 0
+        if messages[0]["role"] == "system":
+            lead = 1
+            while lead < len(messages) - 1 and lead in (pinned or set()):
+                lead += 1
+        head = messages[:lead]
+        head_cost = sum(cost[:lead])
         if head_cost > room:
             raise DoorError(
                 f"The brief is about {head_cost} tokens and the context is {ctx} tokens, of "
@@ -549,9 +681,9 @@ class LocalModel:
                 "tool definitions; start the server with a larger --ctx-size "
                 "(docs/agents/Harness.md)."
             )
-        body = messages[1:] if head is not None else messages
-        body_cost = cost[1:] if head is not None else cost
-        offset = 1 if head is not None else 0
+        body = messages[lead:]
+        body_cost = cost[lead:]
+        offset = lead
         whole = dict(whole or {})
         total = head_cost + sum(body_cost)
         first = 0
@@ -575,16 +707,18 @@ class LocalModel:
             # the samples before the first kept are left out: it carries every reading as
             # they made them (package 31c), and if that does not fit, more goes
             msg = {"role": "user", "content": json.dumps(whole.pop(at), ensure_ascii=False)}
-            c = len(json.dumps(msg, ensure_ascii=False)) // CHARS_PER_TOKEN + 1
+            c = self.scaled(self.measure(msg))
             total += c - body_cost[first]
             body = [*body[:first], msg, *body[first + 1 :]]
             body_cost = [*body_cost[:first], c, *body_cost[first + 1 :]]
         self.dropped_turns = first
-        return ([head] if head is not None else []) + body[first:]
+        sent = head + body[first:]
+        self._sent_measure = sum(self.measure(m) for m in sent) + tools_measure
+        return sent
 
-    def request_body(self, turns: Sequence[Turn]) -> dict[str, Any]:
+    def request_body(self, turns: Sequence[Turn], notice: str = "") -> dict[str, Any]:
         body: dict[str, Any] = {
-            "messages": self.messages(turns),
+            "messages": self.messages(turns, notice),
             "stream": False,
             "max_tokens": self.max_reply,  # the reply budget: a runaway stops here
         }
@@ -644,48 +778,245 @@ class LocalModel:
             self.failed = words if final else f"{words} ({n} failed requests in a row)"
 
     def reply(self, turns: Sequence[Turn]) -> Reply | None:
-        """One request, one reply. A failure returns None (the sample stays open) with
-        the words in `last_error`, and the caller asks again; `failed` is set after
+        """One turn's reply. A failure returns None (the sample stays open) with the words
+        in `last_error`, and the caller asks again; `failed` is set after
         `FAILURES_TO_STAND_DOWN` failures in a row, and then every later call returns None
         at once, so the World never waits on a dead server; the drivers stand the station
-        down on it."""
+        down on it. Package 37i: a reply cut off while the model thought, or empty, is
+        asked for once more with the reason said; cut off or empty again, `cut_off` holds
+        the words and an empty reply is returned, which the runner does not pass on as the
+        model's (the game ends the turn with nothing done). A request the server refuses
+        for its size is asked again at once, smaller, by the server's own count."""
         if self.failed is not None:
             return None
-        try:
-            body = self.request_body(turns)
-            r = self.client.post("/v1/chat/completions", json=body)
-        except DoorError as e:
-            self._failure(str(e), final=True)
-            return None
-        except httpx.TimeoutException:
-            self._failure(
-                f"The model server did not answer within {self.timeout:g} s; the sample is "
-                "left open."
+        self.cut_off = None
+        notice = ""
+        first_cut = ""
+        refused = 0
+        last_messages: list[dict[str, Any]] | None = None
+        while True:
+            try:
+                body = self.request_body(turns, notice)
+                if body["messages"] == last_messages:
+                    # the same request is never sent again after a refusal for its size:
+                    # measure by more until another exchange is left out
+                    self.ratio = (self.ratio or 1.0) * OVERSIZE_STEP
+                    continue
+                r = self.client.post("/v1/chat/completions", json=body)
+            except DoorError as e:
+                self._failure(str(e), final=True)
+                return None
+            except httpx.TimeoutException:
+                self._failure(
+                    f"The model server did not answer within {self.timeout:g} s; the sample "
+                    "is left open."
+                )
+                return None
+            except httpx.ConnectError as e:
+                self._failure(self._refused(e))
+                return None
+            except httpx.HTTPError as e:
+                self._failure(f"The model server at {self.base} did not answer: {e}.")
+                return None
+            if r.status_code != 200:
+                size = self._refused_for_size(r)
+                if size is None:
+                    self._failure(
+                        f"The model server at {self.base} answered {r.status_code}: "
+                        f"{_error_words(r)}"
+                    )
+                    return None
+                refused += 1
+                words = self._oversize_words(size)
+                if not self.context_size():
+                    self._failure(
+                        f"{words} The runner knows no context size to leave old exchanges "
+                        "out against; state it with --ctx (docs/agents/Harness.md).",
+                        final=True,
+                    )
+                    return None
+                if refused >= OVERSIZE_TRIES:
+                    self._failure(
+                        f"{words} The server refused {refused} requests for their size in one "
+                        "turn, each smaller than the last; the context it has is not the one "
+                        "the runner was told of.",
+                        final=True,
+                    )
+                    return None
+                if refused == 1:
+                    self._tell(
+                        f"{words} The oldest exchanges are left out (never the brief, the "
+                        "handover note or the latest sample) and it is asked again; from now "
+                        "on the runner measures by the server's count."
+                    )
+                last_messages = body["messages"]
+                continue
+            read = self._read(r)
+            if read is None:
+                self._failure(
+                    f"The model server at {self.base} sent a reply the runner cannot read."
+                )
+                return None
+            message, finish, counts = read
+            self.failures = 0
+            self.last_error = None
+            self.finish = finish
+            self._take_count(counts)
+            self.exchanges.append(message)
+            reply = self.parse(message)
+            why = self._no_reply(reply, message, finish)
+            if why is None:
+                if self.served:
+                    reply = dataclasses.replace(reply, served_tokens=dict(self.served))
+                if self.on_reply is not None:
+                    self.on_reply(reply)
+                return reply
+            if not first_cut:
+                first_cut = why
+                notice = CUT_WORDS.format(limit=self.max_reply) if why == "cut" else EMPTY_WORDS
+                self._tell(f"{self._cut_words(why)}; it is asked once more, with the reason.")
+                last_messages = None
+                continue
+            # cut off or empty again: the turn ends with nothing done
+            self.cut_off = (
+                f"{self._cut_words(first_cut)}, and {self._cut_words(why, again=True)} when "
+                "asked once more; the turn ended with nothing done"
             )
-            return None
-        except httpx.ConnectError as e:
-            self._failure(self._refused(e))
-            return None
-        except httpx.HTTPError as e:
-            self._failure(f"The model server at {self.base} did not answer: {e}.")
-            return None
-        if r.status_code != 200:
-            self._failure(
-                f"The model server at {self.base} answered {r.status_code}: {_error_words(r)}"
+            self._tell(
+                f"{self.cut_off}, and the station's journal says so. "
+                + (
+                    f"A larger --max-reply (now {self.max_reply:,}) gives it more room."
+                    if "cut off" in self.cut_off
+                    else ""
+                )
             )
+            return Reply(text="", calls=(), raw=reply.raw)
+
+    # -- the reply's end, the server's count, a refusal for size (package 37i) ----------
+
+    def _tell(self, words: str) -> None:
+        if self.say is not None:
+            self.say(words.strip())
+
+    @staticmethod
+    def _read(r: httpx.Response) -> tuple[dict[str, Any], str, tuple[int, int] | None] | None:
+        """The response message, why it ended and the server's counts (prompt, reply),
+        from the OpenAI form (`choices[0].message`, `finish_reason`, `usage`: llama-server,
+        and Ollama's OpenAI-compatible endpoint) or Ollama's own (`message`, `done_reason`,
+        `prompt_eval_count` and `eval_count`). None when it is neither."""
+        try:
+            data = r.json()
+        except ValueError:
+            return None
+        if not isinstance(data, dict):
+            return None
+        choices = data.get("choices")
+        if isinstance(choices, list) and choices and isinstance(choices[0], dict):
+            message = choices[0].get("message")
+            finish = choices[0].get("finish_reason")
+        else:
+            message = data.get("message")
+            finish = data.get("done_reason")
+        if not isinstance(message, dict):
+            return None
+        counts: tuple[int, int] | None = None
+        usage = data.get("usage")
+        prompt = (usage or {}).get("prompt_tokens") if isinstance(usage, dict) else None
+        reply = (usage or {}).get("completion_tokens") if isinstance(usage, dict) else None
+        if prompt is None:
+            prompt, reply = data.get("prompt_eval_count"), data.get("eval_count")
+        if isinstance(prompt, int) and not isinstance(prompt, bool) and prompt > 0:
+            counts = (prompt, reply if isinstance(reply, int) and reply >= 0 else 0)
+        return message, str(finish or ""), counts
+
+    def _take_count(self, counts: tuple[int, int] | None) -> None:
+        """The server's count of the request just answered: the ratio to the runner's own
+        measure of it is what the budget measures by from now on (package 37i, item 2),
+        unless the count is so far under the measure that it cannot be of the whole."""
+        self.served = None
+        if counts is None or not self._sent_measure:
+            return
+        prompt, reply = counts
+        if prompt < PARTIAL_COUNT_SHARE * self._sent_measure:
+            return
+        self.ratio = prompt / self._sent_measure
+        self.served = {"prompt": prompt, "reply": reply}
+
+    @staticmethod
+    def _no_reply(reply: Reply, message: dict[str, Any], finish: str) -> str | None:
+        """Why a reply is none (package 37i, item 1): "cut" when it was cut at the reply
+        limit while the model was thinking (no words and no call; its reasoning apart, or
+        an unclosed `<think>`), "empty" when it has no words and no call however it
+        ended; None for a reply to pass on."""
+        said = THINKING.sub("", str(reply.text or "")).strip()
+        if said or reply.calls:
+            return None
+        thinking = bool(
+            message.get("reasoning_content")
+            or message.get("reasoning")
+            or message.get("thinking")
+            or "<think>" in str(reply.text or "")
+        )
+        return "cut" if finish in CUT_AT_THE_LIMIT and thinking else "empty"
+
+    def _cut_words(self, why: str, again: bool = False) -> str:
+        if why == "cut":
+            if again:
+                return "was cut off again"
+            return (
+                f"The model's reply was cut off at the reply limit ({self.max_reply:,} tokens) "
+                "while it was still thinking"
+            )
+        if again:
+            return "came empty again"
+        return "The model's reply came with no words and no call"
+
+    def _refused_for_size(self, r: httpx.Response) -> tuple[int | None, int | None] | None:
+        """A refusal because the request does not fit the context: the server's count of
+        the request and the context it has, each where the refusal gives it; None for any
+        other answer (llama-server: 400 with `exceed_context_size_error`, its message "the
+        request exceeds the available context size", and `n_prompt_tokens` and `n_ctx`)."""
+        if r.status_code < 400:
             return None
         try:
-            message = r.json()["choices"][0]["message"]
-        except (ValueError, KeyError, IndexError, TypeError):
-            self._failure(f"The model server at {self.base} sent a reply the runner cannot read.")
+            err = r.json().get("error")
+        except (ValueError, AttributeError):
+            err = None
+        info = err if isinstance(err, dict) else {}
+        words = str(info.get("message") or err or r.text or "").lower()
+        kind = str(info.get("type") or "").lower()
+        if "exceed_context" not in kind and not (
+            "context" in words and any(w in words for w in OVERSIZE_WORDS)
+        ):
             return None
-        self.failures = 0
-        self.last_error = None
-        self.exchanges.append(message)
-        reply = self.parse(message)
-        if self.on_reply is not None:
-            self.on_reply(reply)
-        return reply
+
+        def number(v: Any) -> int | None:
+            return v if isinstance(v, int) and not isinstance(v, bool) and v > 0 else None
+
+        asked = number(info.get("n_prompt_tokens"))
+        ctx = number(info.get("n_ctx"))
+        if asked is None:
+            found = [int(n.replace(",", "")) for n in TOKENS_IN_WORDS.findall(words)]
+            if found:
+                asked = found[0]
+                if ctx is None and len(found) > 1:
+                    ctx = found[1]
+        return asked, ctx
+
+    def _oversize_words(self, size: tuple[int | None, int | None]) -> str:
+        """Measure by the server's count of the refused request (or `OVERSIZE_STEP` more
+        when it gave none), take the context it names, and say what was refused."""
+        asked, ctx = size
+        if ctx and (self.served_ctx is None or ctx < self.served_ctx):
+            self.served_ctx = ctx
+        before = self.ratio or 1.0
+        if asked and self._sent_measure:
+            self.ratio = max(asked / self._sent_measure, before)
+        else:
+            self.ratio = before * OVERSIZE_STEP
+        counted = f" ({asked:,} tokens by its count" if asked else " (no count given"
+        held = f"; the context is {ctx:,})" if ctx else ")"
+        return f"The model server refused the request for its size{counted}{held}."
 
     def close(self) -> None:
         self.client.close()
@@ -714,6 +1045,72 @@ def station_brief_tokens(station: str) -> int:
     )
     cost = len(json.dumps({"role": "system", "content": brief.text()})) // CHARS_PER_TOKEN + 1
     return cost + SITUATION_ALLOWANCE_TOKENS
+
+
+def reserve_form(text: str) -> tuple[str, float]:
+    """One `--handover-reserve`: tokens (`30000`) or a share of the context (`0.3`,
+    `30%`), as ("tokens", n) or ("share", s); refused in words otherwise."""
+    t = str(text).strip().replace(",", "").replace("_", "")
+    try:
+        if t.endswith("%"):
+            share = float(t[:-1]) / 100.0
+            if 0.0 < share < 1.0:
+                return "share", share
+        else:
+            value = float(t)
+            if 0.0 < value < 1.0:
+                return "share", value
+            if value >= 1.0 and value == int(value):
+                return "tokens", float(int(value))
+    except ValueError:
+        pass
+    raise argparse.ArgumentTypeError(
+        f"{text!r} is neither a number of tokens (30000) nor a share of the context "
+        "between 0 and 1 (0.3, or 30%)"
+    )
+
+
+def handover_reserve_tokens(
+    forms: Sequence[tuple[str, float]] | None, context: int | None
+) -> int | None:
+    """The reserve to send with the station request, in tokens (package 37i, item 3): the
+    larger of the forms the owner gave, a share taken of the context; None when none was
+    given (the harness's own share then), or when only a share was and no context is
+    known."""
+    if not forms:
+        return None
+    values = [
+        int(v) if kind == "tokens" else int(v * context)
+        for kind, v in forms
+        if kind == "tokens" or context
+    ]
+    return max(values) if values else None
+
+
+def handover_words(
+    forms: Sequence[tuple[str, float]] | None, context: int, reserve: int | None
+) -> str:
+    """One line for the owner: where the handover note will be asked for."""
+    from freesail.agents.harness import HANDOVER_AT_FRACTION
+
+    if reserve is None:
+        reserve = int(max(HANDOVER_RESERVE_SHARE * context, HANDOVER_RESERVE_TOKENS))
+        how = (
+            f"the harness's own share, {HANDOVER_RESERVE_SHARE:g} of the context and never "
+            f"less than {HANDOVER_RESERVE_TOKENS:,} tokens"
+        )
+    else:
+        given = " and ".join(
+            f"{int(v):,} tokens" if kind == "tokens" else f"{v:g} of the context"
+            for kind, v in forms or ()
+        )
+        how = f"--handover-reserve {given}" + (", the larger" if len(forms or ()) > 1 else "")
+    at = max(context - reserve, int(HANDOVER_AT_FRACTION * context))
+    return (
+        f"The handover note is asked for when the conversation, by the server's own count, "
+        f"has left less than {reserve:,} of the {context:,} tokens ({how}), and never "
+        f"before {HANDOVER_AT_FRACTION:g} of them: at about {at:,}."
+    )
 
 
 def _error_words(r: httpx.Response) -> str:
@@ -828,12 +1225,17 @@ def main(
     ap.add_argument("--ask-again", action="store_true", help="put the consent question again")
     ap.add_argument(
         "--handover-reserve",
-        type=int,
+        type=reserve_form,
+        action="append",
+        metavar="N|SHARE",
         help=(
-            "the tokens of the context kept free when the harness asks the officer for the "
-            "handover note (default: the harness's own, 14000; the note is asked for when "
-            "the conversation has left less than this, and never before six tenths of the "
-            "context)"
+            "the part of the context kept free when the harness asks the officer for the "
+            "handover note, in tokens (30000) or as a share of the context (0.3, or 30%%); "
+            "given twice, once in each form, the larger counts (default: the harness's own "
+            f"share, {HANDOVER_RESERVE_SHARE:g}, and never less than "
+            f"{HANDOVER_RESERVE_TOKENS} tokens; the note is asked for when the conversation, "
+            "by the server's own count, has left less than this, and never before six "
+            "tenths of the context)"
         ),
     )
     args = ap.parse_args(argv)
@@ -848,6 +1250,7 @@ def main(
         on_reply=echo_reply(out),
         max_reply=args.max_reply,
         timeout=args.request_timeout,
+        say=lambda words: print(words, file=out, flush=True),
     )
     try:
         identity = model.identity()
@@ -858,6 +1261,10 @@ def main(
     except DoorError as e:
         print(str(e), file=out, flush=True)
         return EXIT_UNREACHABLE
+    context = model.context_size()
+    reserve = handover_reserve_tokens(args.handover_reserve, context)
+    if context and station_name(args.station) == OFFICER:
+        print(handover_words(args.handover_reserve, context, reserve), file=out, flush=True)
     game = GameClient(args.game, args.station, transport=game_transport, http=game_http)
     try:
         first = game.station(
@@ -870,8 +1277,8 @@ def main(
             # the context this door gives the model, for the handover note (package 37;
             # spec M4 open item 9b): the harness asks for the note when the conversation
             # has left less than a reserve of it (`--handover-reserve`; package 37g)
-            context_tokens=model.context_size(),
-            handover_reserve=args.handover_reserve,
+            context_tokens=context,
+            handover_reserve=reserve,
         )
     except GameError as e:
         print(e.words, file=out, flush=True)
@@ -953,6 +1360,12 @@ def run(
                     a = game.release(f"the model server could not be used: {why}")
                     print(a.get("words") or "", file=out, flush=True)
                     return EXIT_RELEASED
+                if model.cut_off:
+                    # no reply to be had for the turn (package 37i, item 1): the game ends
+                    # it with nothing done and the journal says why; no empty reply is
+                    # passed on as the model's
+                    a = took(game.reply(Reply(), cut_off=model.cut_off))
+                    continue
                 a = took(game.reply(r))
                 continue
             a = took(game.turns(wait=poll_wait))

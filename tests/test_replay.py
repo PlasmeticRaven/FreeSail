@@ -543,3 +543,78 @@ def test_an_officer_seated_at_tick_0_after_a_drivers_line_replays_in_his_place()
     old = replay.replay(data, ship_factory)
     assert len(old.log) == len(world.log) and old.log.digest() != world.log.digest()
     assert sorted(e.text for e in old.log) == sorted(e.text for e in world.log)
+
+
+# ---------------------------------------------------------------------------
+# Package 37i, item 5: the line the replay dropped at a stand-down by the door (the
+# review of gate 5c, G14 and the audit's C7: game 10's last save replayed to 4,239 lines
+# for 4,240, the line missing at 08:00 on the 14th, "A notable event that speaks of
+# danger: The Nut Rock ...; the officer of the watch is sampled again")
+# ---------------------------------------------------------------------------
+
+
+def _stood_down_by_the_door(driver_line: bool = False) -> World:
+    """A fake of game 10's moment: the officer stands by; at the bell a standing order
+    fires an order inside the World's tick and the harness's own step, at the end of the
+    same tick, wakes him; the door (the runner, its server refusing) stands him down
+    between that tick and the next, after a driver's line when `driver_line`."""
+    from freesail.agents import Harness, SamplingPolicy
+    from freesail.agents.agent import officer
+    from freesail.agents.model import Reply, ToolCall
+    from freesail.agents.remote import RemoteModel
+    from freesail.api.session import make_world
+
+    world = make_world(7, FRIGATE, Scenario(wind_from_deg=0.0, gustiness=0.0, variability=0.0))
+    world.submit('standing order "the topsails": every glass then set the topsails')
+    h = Harness(
+        world,
+        officer(SamplingPolicy.in_lockstep(1800, "notable", "urgent"), world=world),
+        RemoteModel(),  # a door that answers late, between ticks, as the runner does
+        save=lambda w, why: None,
+    )
+    h.start()
+    h.deliver(Reply("", (ToolCall("stand_by", {"until": "one bell"}),)))
+    assert h.agent.standing_by
+    while h.open_sample is None:
+        world.tick()
+    if driver_line:
+        world.record_driver("routine", "driver.compression", "The compression eased.")
+    h.door_act("stand_down", "the model server could not be used", "the local runner")
+    return world
+
+
+def test_a_stand_down_by_the_door_replays_with_every_line_in_its_place():
+    """The fault, found on a fake of the save (game 10's own saves are not in the
+    review's evidence): a door's act is made between ticks, but a replay made it at the
+    first order of its tick and of the count of orders before it, which a standing
+    order's firing gives inside the World's tick, before the harness's own step has
+    woken the station. So the stand-down came first, the station was released before
+    its waking was written, and the log was one line short. A replay now makes an act of
+    the tick it is at only between ticks, after as many inputs as were given before it."""
+    import json
+
+    from freesail.api.session import ship_factory
+
+    world = _stood_down_by_the_door()
+    kinds = [e.kind for e in world.log if e.tick == world.clock.tick]
+    assert kinds[-3:] == ["order.accepted", "agent.resumed", "agent.stopped"]
+    data = json.loads(json.dumps(world.save()))
+    copy = replay.replay(data, ship_factory)
+    assert len(copy.log) == len(world.log)  # 4,239 for 4,240 in game 10
+    assert copy.log.digest() == world.log.digest()
+    name = "officer of the watch"
+    assert copy.agent_journals[name].save() == world.agent_journals[name].save()
+    # a driver's line between the waking and the act (an input, and no order): the act is
+    # recorded after it and made after it
+    world = _stood_down_by_the_door(driver_line=True)
+    data = json.loads(json.dumps(world.save()))
+    act = data["agents"][0]["transcript"][-1]
+    assert act["door"] == "stand_down" and act["after_inputs"] == len(world.inputs)
+    copy = replay.replay(data, ship_factory)
+    assert copy.log.digest() == world.log.digest()
+    # a save from before the count (game 10's): every line is there, the line and the act
+    # in another order
+    del act["after_inputs"]
+    old = replay.replay(data, ship_factory)
+    assert len(old.log) == len(world.log)
+    assert sorted(e.text for e in old.log) == sorted(e.text for e in world.log)
