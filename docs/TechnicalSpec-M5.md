@@ -1336,13 +1336,37 @@ in (then 5b), double altitudes, the kedge, interiors beyond a name and a descrip
    of the doubts together; the owner's note 5 on game 9 (a poor lunar overriding the
    better account) is the same thing. For the 37e amendments: take an observation
    over the account only when it is the better figure. *Built by package 37j (§13): the
-   better figure is believed, and on both platforms that noon is now weighed and doubted
-   alike, the line it fell either side of no longer deciding anything; the cause of the
-   platform difference itself is still open.* **The helm through the wind.** A chase or a shaped course that
+   better figure is believed, and on both platforms such a noon is now weighed, and
+   doubted on the far side of the line, the account within a cable of the fix either
+   way; the cause of the platform difference itself is still open.* **The helm through the wind.** A chase or a shaped course that
    would turn a square-rigged ship through the wind's wake is worn for
    (`orders.navigation._course_not_laid`); a plain `steer` through it is left as the helm
    has always had it, and a captain who types one from close-hauled will be taken aback.
    Open, for the owner: refused in words that name the wear, or worn without a word.
+25. From package 37j (2026-10-09): the account amended (§13, §15 to §17;
+   `docs/dev/TuningNotes.md`, its section). Open, for the lead:
+   - **Game 9's noon of 16 June cannot be "taken" against an honest account** under the
+     rule as amended: taken wants the sight no poorer than the account, and the two are
+     then plainly apart only beyond twice their doubts added, at least nine miles; they
+     stood five apart. It is doubted against the account the lead kept at a quarter of a
+     mile, and weighed by the doubts against an honest one; the forenoon sailed again
+     keeps the doubt honest (the truth within twice it at every glass). A lead-kept
+     account already four miles out is helped and not cured: casts over the flat sand
+     answer within the doubt in the wrong place and are weighed, as in 37e.
+   - **The thick 5b passage takes the ground on Black Head** at 56081, after its landfall
+     at 53820: the book's "the land" steers S into a south-easterly, "keep her full" bears
+     her away and she is taken aback, and her leeway and the ebb set her onto the ledges.
+     The track, not the rule (the departure at the truth, each board worked). The book's
+     stand-off, or 37k's helm, to rule.
+   - **The merchant passage makes no cast at the Iroise's mark**: the course for the
+     Passage de l'Iroise is shaped once from nineteen miles off and not again within ten
+     of Ushant, and she passes the mark wide by account (an expected failure).
+   - **A fix by marks on one hand is as often poorer along the shore as off it**: the
+     compass's shared error moves it along the shore, the narrow cut off it; "good to"
+     says whichever the figures give.
+   - **The log's line of a sighting keeps the mark's true distance and bearing** in its
+     data, for the record; the snapshot's reading does not. If the log's data reaches the
+     browser, it is a road the proof of §15 does not cover.
 
 ## 34. The scoping draft's rulings (record)
 
