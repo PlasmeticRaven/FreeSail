@@ -495,7 +495,8 @@ def test_far_from_every_place_of_his_table_the_master_says_his_tide_may_be_hours
     assert "nearest place in the master's table" in words
     # package 39b: the nearest place of the table off Lisbon was Brouage, 571 miles off
     # (it was Ushant, 621); package 39d put Lisbon in the table (Tofiño's 2h), so the far
-    # place is the open sea west of Portugal, Lisbon 252 miles off
+    # place is the open sea west of Portugal, Lisbon 252 miles off (package 39e's Funchal
+    # is 511)
     assert "may differ by hours" in words and "Lisbon" in words and "252 miles" in words
     near_lisbon = world_at(38.6, -9.4, "atlantic-east").navigation.tide_by_almanac()["words"]
     assert "Lisbon" in near_lisbon and "may differ by hours" not in near_lisbon
@@ -636,7 +637,12 @@ def test_portugals_gauges_are_read_and_held_and_the_worlds_tide_there_is_le_conq
     import yaml
 
     doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
-    held = {g["id"]: g for g in doc["held_gauges"] if 36.4 <= g["lat_deg"] <= 42.0}
+    # (the block's box by longitude too: package 39e's islands lie in its latitudes)
+    held = {
+        g["id"]: g
+        for g in doc["held_gauges"]
+        if 36.4 <= g["lat_deg"] <= 42.0 and -10.0 <= g["lon_deg"] <= -6.0
+    }
     assert list(held) == ["cascais", "lagos", "huelva", "bonanza", "cadiz"]
     assert (held["huelva"]["mean_level_m"], held["bonanza"]["mean_level_m"]) == (1.96, 1.54)
     assert held["cadiz"]["mean_level_m"] is None  # unverified, not invented

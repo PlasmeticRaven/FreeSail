@@ -1,0 +1,107 @@
+# FreeSail: Ponta Delgada on St Michael's as a port (spec M6 §26, block 5 as decision 44
+# widened it; package 39e), on package 35's machinery; the marks are the features
+# file's (data/charts/features/azores.yaml).
+#
+# Sources. Tofiño 1789, Derrotero ... de las Islas Azores, 'Isla de San Miguel', pp. 190
+# to 197: the mole of the town of Punta Delgada, "the principal of the whole island, with
+# much trade in its fruits with the other Azores and with Lisbon", a mile and a half N E
+# of the point of the same name, low, of stone, with a castle defending the anchorage;
+# the road "uncovered to the winds and seas of the second, third and part of the fourth
+# quadrant" with two anchorages, the principal south of the town in 30 or 40 brazas,
+# sand, the islet of Rosto de Cão on with the church of S Roque and the tower of the
+# great church on a large country house north of it; the other W S W of the Punta de Agua
+# in 20 to 30 brazas, to be taken only in great urgency; the island the most considerable
+# of the nine, 53,756 people, its flax made into linens sent to Pernambuco, its wheat
+# exported; the city the best place for large ships to water and provision, its fishing
+# boats fit to carry it off. No hour of high water for St Michael's in Norie's Table XLI
+# (1805): Angra Bay's serves.
+#
+# The datum: UNVERIFIED. No period plan read, no override; TICON's Ponta Delgada gauge is
+# held with no mean level read.
+#
+# The stance: Portuguese, neutral, open to every nation. Prices FROM MEMORY or
+# JUDGEMENT; sterling at the exchange.
+
+id: ponta-delgada
+name: Ponta Delgada
+nation: portugal
+source: "Tofiño 1789, 'Isla de San Miguel', pp. 190 to 197"
+datum: unverified
+
+outer_road:
+  feature: ponta-delgada-road
+  name: Ponta Delgada Road
+  lat_deg: 37.7290
+  lon_deg: -25.6650
+anchorage:
+  feature: ponta-delgada-road
+  name: Ponta Delgada Road
+  lat_deg: 37.7290
+  lon_deg: -25.6650
+mooring:
+  name: the road under the town
+  lat_deg: 37.7330
+  lon_deg: -25.6650      # the grid's 26 m, fourteen fathoms, off the mole (judgement)
+  bottom: sand
+  deep_draught_ft: 15    # judgement
+shore:
+  feature: ponta-delgada-town
+  name: the mole of Ponta Delgada
+  lat_deg: 37.7410
+  lon_deg: -25.6680
+
+pilot:
+  station: ponta-delgada-road
+  cruising_nm: 3                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a fishing boat of Ponta Delgada
+    under: a lugsail and oars
+    note: "Tofiño 1789 p. 197: the fishing boats of the city, fit to carry off water and provisions"
+  names: [Medeiros, Raposo, Câmara, Pacheco, Furtado, Botelho, Arruda]   # names of St Michael's: judgement
+  skill: 0.85
+  fee_pounds: 1                  # judgement, in sterling for the one account; unverified
+  cast: larboard                 # off the road to the south (judgement)
+  course_out_deg: 180            # out of the open bay to the south (judgement)
+  words:
+    channel: "The coast of the bay is clean; the Ponta da Galera is its eastern end, the point of Ponta Delgada with its castle the western."
+    marks: "The islet of Rosto de Cão, the only high steep land at the bottom of the bay, on with the church of São Roque; the tower of the great church on the large country house north of it."
+    anchorage: "Anchor south of the town in thirty or forty brazas on sand with those marks on. The road is open from the east round by the south to the west: put to sea when it comes on to blow from that side."
+    tide: "No hour for St Michael's in my book; Angra's serves, a quarter before twelve on the full and change."
+
+tide:
+  establishment: Angra Bay       # the epitome has no St Michael's; the nearest of its places with an hour
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: barley, price: 8, origin: portugal, note: "the island exports great quantities of corn (Tofiño 1789 p. 196); judgement"}
+    - {good: linen, price: 85, origin: portugal, note: "the island's linens, sent to Pernambuco (Tofiño p. 196); judgement"}
+    - {good: salt beef, price: 50, origin: portugal, note: "large cattle, abundant (Tofiño p. 196); judgement"}
+    - {good: wine, price: 40, origin: portugal, note: "only enough for its own use (Tofiño p. 196); judgement"}
+    - {good: salt fish, price: 28, origin: null, note: "from memory"}
+    - {good: timber, price: 7, origin: portugal, note: "wood abundant in places (Tofiño p. 196); judgement"}
+    - {good: canvas, price: 65, origin: britain, note: "from memory"}
+    - {good: brandy, price: 95, origin: portugal, note: "from memory"}
+    - {good: sugar, price: 60, origin: portugal, note: "Brazil sugar by way of Lisbon; from memory"}
+    - {good: tobacco, price: 90, origin: portugal, note: "the Crown's monopoly; from memory"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 16, pounds: 45, note: "judgement"}
+    - {item: yard, hours: 10, pounds: 26}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.08}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05}
+
+crew_pool:
+  able: {hands: 2, pounds: 2, delay_h: 24}
+  ordinary: {hands: 3, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 6, pounds: 1, delay_h: 12}
+
+closed_to: []

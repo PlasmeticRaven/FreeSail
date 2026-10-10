@@ -841,11 +841,16 @@ def test_the_coasts_distance_at_the_ship_is_the_charts_at_her_position_after_a_l
 # ---------------------------------------------------------------------------
 
 WHOLE = "atlantic-east"
+# package 39e: Madeira and the Western Islands, after the coast's blocks
+ISLANDS = ["madeira", "azores"]
 CORRIDOR = "atlantic-corridor"
 MID = "channel-mid"  # package 39a
 # The corridor's budget (spec M6 §26: "some 11 MB raw, half that compressed"; with the
 # distance field the tiles compress to under 6 MB, measured in package 38).
 CORRIDOR_BUDGET_BYTES = 8 * 1024 * 1024
+# package 39e: the corridor widened to 32 W for the Western Islands, 48 tiles of 9.7 MB
+# (held for the owner's word: the test reads whichever corridor the manifest has)
+CORRIDOR_WIDENED_BUDGET_BYTES = 12 * 1024 * 1024
 # Where the Channel region's level-2 tiles end on the south: the tile row's southern edge
 # (47.81 N), off Penmarch, the water deepening gently southward over the corridor.
 EDGE_TRACK_START = Position(48.0, -4.55)
@@ -874,14 +879,17 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     # sails them; package 39b: Biscay north after them
     regions = ["channel-west", MID, "biscay-north"]
     regions += ["portugal"]  # package 39d
+    regions += ISLANDS  # package 39e: the islands after the coast's blocks
     assert manifest["charts"][WHOLE]["regions"] == regions
     assert manifest["charts"][WHOLE]["corridor"] == CORRIDOR
     assert whole.region == whole.name == WHOLE and whole.regions == regions
     assert [lv.level for lv in whole.levels] == [3, 2, 1]
     # the envelope of the regions and the corridor: Biscay north reaches 0.9 W for
-    # Rochefort on the Charente (package 39b)
-    assert whole.bounds == (32.0, 51.0, -20.0, -0.9)
-    assert whole.bounds_words() == "32 to 51 N, 20 to 0.9 W"
+    # Rochefort on the Charente (package 39b), the Western Islands 31.5 W (package 39e;
+    # 32 W with the corridor widened to them)
+    west = min(-31.5, float(manifest["corridors"][CORRIDOR]["bounds"]["west"]))
+    assert whole.bounds == (32.0, 51.0, west, -0.9)
+    assert whole.bounds_words() == f"32 to 51 N, {abs(west):g} to 0.9 W"
     assert whole.contains(OFF_LISBON) and whole.contains(LIZARD)
     assert not whole.contains(Position(52.0, -5.0))
     assert whole.region_at(LIZARD) == "channel-west" and whole.region_at(OFF_MOROCCO) is None
@@ -890,11 +898,13 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     mid = load_chart(MID)
     biscay = load_chart("biscay-north")
     portugal = load_chart("portugal")  # package 39d
+    islands = [load_chart(r) for r in ISLANDS]
     assert whole.features.keys() == (
         chart.features.keys()
         | mid.features.keys()
         | biscay.features.keys()
         | portugal.features.keys()
+        | set().union(*(i.features.keys() for i in islands))
     )
     assert all(whole.region_of[fid] == "channel-west" for fid in chart.features)
     assert all(whole.region_of[fid] == MID for fid in mid.features)
@@ -908,6 +918,7 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
         + len(mid.coast_lines())
         + len(biscay.coast_lines())
         + len(portugal.coast_lines())
+        + sum(len(i.coast_lines()) for i in islands)
     )
     assert len(chart.coast_lines()) > 0 and len(biscay.coast_lines()) > 0
     # the one-region chart as before: its own levels and bounds, no corridor
@@ -928,7 +939,11 @@ def test_the_corridor_is_committed_from_gebco_with_its_source_licence_and_checks
     tool = build_tool()
     entry = manifest["corridors"][CORRIDOR]
     assert entry["level"] == 1 and entry["committed"] is True
-    assert entry["bounds"] == {"south": 32.0, "north": 51.0, "west": -20.0, "east": -1.0}
+    # package 39e: the tool's recipe reaches 32 W; the widened tiles are the owner's to
+    # commit, so the entry is the corridor as package 38 built it or as 39e widened it
+    widened = entry["bounds"]["west"] == tool.CORRIDORS[CORRIDOR]["bounds"]["west"] == -32.0
+    west = -32.0 if widened else -20.0
+    assert entry["bounds"] == {"south": 32.0, "north": 51.0, "west": west, "east": -1.0}
     assert entry["datum"] == "mean sea level" == manifest["levels"]["1"]["datum"]
     assert entry["source"] == "gebco_2025" and entry["licence"] in tool.ALLOWED_LICENCES
     fetched = manifest["sources"]["gebco_2025"]["fetched"]
@@ -945,7 +960,8 @@ def test_the_corridor_is_committed_from_gebco_with_its_source_licence_and_checks
         assert t["name"] == tool.tile_name(s, w)
         assert (s + 90 * 3600) % tool.tile_span_sec(1) == 0
         total += path.stat().st_size
-    assert len(entry["tiles"]) == 30 and total == entry["bytes"] < CORRIDOR_BUDGET_BYTES
+    budget = CORRIDOR_WIDENED_BUDGET_BYTES if widened else CORRIDOR_BUDGET_BYTES
+    assert len(entry["tiles"]) == (48 if widened else 30) and total == entry["bytes"] < budget
     tracked = subprocess.run(
         ["git", "ls-files", f"data/charts/{entry['folder']}"],
         cwd=ROOT,

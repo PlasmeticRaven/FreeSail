@@ -106,6 +106,18 @@ tables:
       - {name: San Lucar, lat_deg: 36.790, lon_deg: -6.405, hw_h: 3, hw_m: 0, spring_rise_ft: 18, rise_judgement: true, note: "Tofiño 1789, p. 108: on the days of new and full moon high water at three in the afternoon (the bar of the Guadalquivir)"}
       - {name: Ayamonte, lat_deg: 37.170, lon_deg: -7.398, hw_h: 3, hw_m: 0, spring_rise_ft: 11, note: "Tofiño 1789, p. 101: the water rises more than two brazas on the days of new and full moon, high water at three in the afternoon (the bar of the Guadiana)"}
       - {name: Cadiz, lat_deg: 36.548, lon_deg: -6.276, hw_h: 2, hw_m: 0, spring_rise_ft: 10, note: "Tofiño 1789, p. 119: on the days of new and full moon high water at two in the afternoon and the tide rises eleven feet (Castilian), twelve the days after, six at the quarters"}
+      # Package 39e, Madeira and the Western Islands: Norie's own Table XLI of 1805 (the
+      # edition the study did not read; Internet Archive norie-1805-a-new-and-complete-
+      # epitome-of-practical-navigation, the page images of pp. 248 to 250 read through the
+      # archive's IIIF server 2026-10-10, the OCR having lost the columns): Angra Bay,
+      # Terceira, 11h 45m and 8 feet; Fayal Road 2h 20m and 4 1/2 feet; Funchal 12h 4m and
+      # 7 feet. No row for St Michael's. Tofiño 1789 ('Isla del Fayal', p. 224) has Fayal's
+      # high water at half past twelve with eight Spanish feet at springs, and TICON's
+      # constants put Horta's tide within five degrees of Angra's: Norie's Fayal is a
+      # poorer figure, kept as his, the master's error to make.
+      - {name: Funchal, lat_deg: 32.640, lon_deg: -16.907, hw_h: 12, hw_m: 4, spring_rise_ft: 7, note: "Norie 1805, Table XLI p. 250 (the page image): Funchal, Madeira, 12h 4m, 7 feet; the Oriental Navigator 1801 p. 24: the tides rise and fall about 7 1/2 feet"}
+      - {name: Angra Bay, lat_deg: 38.652, lon_deg: -27.215, hw_h: 11, hw_m: 45, spring_rise_ft: 8, note: "Norie 1805, Table XLI p. 248 (the page image): Angra Bay, Terceira, 11h 45m, 8 feet"}
+      - {name: Fayal Road, lat_deg: 38.530, lon_deg: -28.612, hw_h: 2, hw_m: 20, spring_rise_ft: 4.5, note: "Norie 1805, Table XLI p. 249 (the page image, the hour's first figure faint): Fayal Road, Azores, 2h 20m, 4 1/2 feet; Tofiño 1789 p. 224 has half past twelve and eight Spanish feet"}
   moore:
     title: "Moore's table of high water by the moon's bearing (Moore 1799), a point to every three quarters of an hour"
     ports:
