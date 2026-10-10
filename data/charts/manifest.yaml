@@ -2,9 +2,9 @@
 # Every source with its licence, attribution, URL, retrieval date and checksum; the
 # regions and their tiles; the attribution block the game shows in its about text.
 format: 1
-built: '2026-10-09'
+built: '2026-10-10'
 tool: tools/build_charts.py
-build_hash: c6301c7333d2fad1
+build_hash: 7146307384eaf32c
 levels:
   '0':
     cell_sec: 150.0
@@ -38,6 +38,7 @@ charts:
     - channel-west
     - channel-mid
     - biscay-north
+    - portugal
     corridor: atlantic-corridor
 regions:
   channel-west:
@@ -2275,6 +2276,743 @@ regions:
       shoal: 4
       tower: 2
       town: 15
+  portugal:
+    title: Portugal and Cadiz, the Minho to the bay of Cadiz
+    bounds:
+      south: 36.4
+      north: 42.0
+      west: -10.0
+      east: -6.0
+    levels:
+    - 2
+    - 3
+    tiles:
+      '2':
+      - name: 130656_-36672
+        south_sec: 130656
+        west_sec: -36672
+        min_depth_m: 2904.9
+        bytes: 62706
+      - name: 130656_-35136
+        south_sec: 130656
+        west_sec: -35136
+        min_depth_m: 1016.3
+        bytes: 209906
+      - name: 130656_-33600
+        south_sec: 130656
+        west_sec: -33600
+        min_depth_m: 717.7
+        bytes: 289249
+      - name: 130656_-32064
+        south_sec: 130656
+        west_sec: -32064
+        min_depth_m: 711.4
+        bytes: 337175
+      - name: 130656_-30528
+        south_sec: 130656
+        west_sec: -30528
+        min_depth_m: 664.9
+        bytes: 297935
+      - name: 130656_-28992
+        south_sec: 130656
+        west_sec: -28992
+        min_depth_m: 241.4
+        bytes: 229405
+      - name: 130656_-27456
+        south_sec: 130656
+        west_sec: -27456
+        min_depth_m: 396.5
+        bytes: 262755
+      - name: 130656_-25920
+        south_sec: 130656
+        west_sec: -25920
+        min_depth_m: 22.8
+        bytes: 235859
+      - name: 130656_-24384
+        south_sec: 130656
+        west_sec: -24384
+        min_depth_m: 0.0
+        bytes: 170685
+      - name: 130656_-22848
+        south_sec: 130656
+        west_sec: -22848
+        min_depth_m: 0.0
+        bytes: 140808
+      - name: 132192_-36672
+        south_sec: 132192
+        west_sec: -36672
+        min_depth_m: 2099.0
+        bytes: 197760
+      - name: 132192_-35136
+        south_sec: 132192
+        west_sec: -35136
+        min_depth_m: 820.2
+        bytes: 338538
+      - name: 132192_-33600
+        south_sec: 132192
+        west_sec: -33600
+        min_depth_m: -61.0
+        bytes: 281424
+      - name: 132192_-32064
+        south_sec: 132192
+        west_sec: -32064
+        min_depth_m: -23.1
+        bytes: 211373
+      - name: 132192_-30528
+        south_sec: 132192
+        west_sec: -30528
+        min_depth_m: -22.8
+        bytes: 182692
+      - name: 132192_-28992
+        south_sec: 132192
+        west_sec: -28992
+        min_depth_m: -6.2
+        bytes: 204542
+      - name: 132192_-27456
+        south_sec: 132192
+        west_sec: -27456
+        min_depth_m: -6.1
+        bytes: 171678
+      - name: 132192_-25920
+        south_sec: 132192
+        west_sec: -25920
+        min_depth_m: 0.0
+        bytes: 151498
+      - name: 132192_-24384
+        south_sec: 132192
+        west_sec: -24384
+        min_depth_m: 0.0
+        bytes: 111218
+      - name: 132192_-22848
+        south_sec: 132192
+        west_sec: -22848
+        min_depth_m: 0.0
+        bytes: 65815
+      - name: 133728_-36672
+        south_sec: 133728
+        west_sec: -36672
+        min_depth_m: 2358.7
+        bytes: 110219
+      - name: 133728_-35136
+        south_sec: 133728
+        west_sec: -35136
+        min_depth_m: 776.2
+        bytes: 306284
+      - name: 133728_-33600
+        south_sec: 133728
+        west_sec: -33600
+        min_depth_m: -41.7
+        bytes: 260825
+      - name: 133728_-32064
+        south_sec: 133728
+        west_sec: -32064
+        min_depth_m: -22.1
+        bytes: 133892
+      - name: 133728_-27456
+        south_sec: 133728
+        west_sec: -27456
+        min_depth_m: -5.5
+        bytes: 106322
+      - name: 133728_-25920
+        south_sec: 133728
+        west_sec: -25920
+        min_depth_m: 0.0
+        bytes: 106479
+      - name: 135264_-36672
+        south_sec: 135264
+        west_sec: -36672
+        min_depth_m: 1827.7
+        bytes: 298383
+      - name: 135264_-35136
+        south_sec: 135264
+        west_sec: -35136
+        min_depth_m: 346.4
+        bytes: 321154
+      - name: 135264_-33600
+        south_sec: 135264
+        west_sec: -33600
+        min_depth_m: 29.5
+        bytes: 193405
+      - name: 135264_-32064
+        south_sec: 135264
+        west_sec: -32064
+        min_depth_m: -23.9
+        bytes: 140386
+      - name: 136800_-36672
+        south_sec: 136800
+        west_sec: -36672
+        min_depth_m: 1708.2
+        bytes: 133119
+      - name: 136800_-35136
+        south_sec: 136800
+        west_sec: -35136
+        min_depth_m: 249.7
+        bytes: 369345
+      - name: 136800_-33600
+        south_sec: 136800
+        west_sec: -33600
+        min_depth_m: -16.8
+        bytes: 284077
+      - name: 136800_-32064
+        south_sec: 136800
+        west_sec: -32064
+        min_depth_m: -7.2
+        bytes: 126480
+      - name: 138336_-36672
+        south_sec: 138336
+        west_sec: -36672
+        min_depth_m: 37.8
+        bytes: 303198
+      - name: 138336_-35136
+        south_sec: 138336
+        west_sec: -35136
+        min_depth_m: -44.9
+        bytes: 250261
+      - name: 138336_-33600
+        south_sec: 138336
+        west_sec: -33600
+        min_depth_m: -9.7
+        bytes: 164645
+      - name: 138336_-32064
+        south_sec: 138336
+        west_sec: -32064
+        min_depth_m: -5.5
+        bytes: 108036
+      - name: 139872_-36672
+        south_sec: 139872
+        west_sec: -36672
+        min_depth_m: 73.6
+        bytes: 233488
+      - name: 139872_-35136
+        south_sec: 139872
+        west_sec: -35136
+        min_depth_m: -21.5
+        bytes: 209405
+      - name: 139872_-33600
+        south_sec: 139872
+        west_sec: -33600
+        min_depth_m: -1.6
+        bytes: 108324
+      - name: 141408_-36672
+        south_sec: 141408
+        west_sec: -36672
+        min_depth_m: 132.5
+        bytes: 311002
+      - name: 141408_-35136
+        south_sec: 141408
+        west_sec: -35136
+        min_depth_m: -33.0
+        bytes: 328332
+      - name: 141408_-33600
+        south_sec: 141408
+        west_sec: -33600
+        min_depth_m: -13.0
+        bytes: 174615
+      - name: 142944_-36672
+        south_sec: 142944
+        west_sec: -36672
+        min_depth_m: 715.6
+        bytes: 279192
+      - name: 142944_-35136
+        south_sec: 142944
+        west_sec: -35136
+        min_depth_m: 118.6
+        bytes: 239950
+      - name: 142944_-33600
+        south_sec: 142944
+        west_sec: -33600
+        min_depth_m: -33.8
+        bytes: 165518
+      - name: 142944_-32064
+        south_sec: 142944
+        west_sec: -32064
+        min_depth_m: -7.1
+        bytes: 105585
+      - name: 144480_-36672
+        south_sec: 144480
+        west_sec: -36672
+        min_depth_m: 627.5
+        bytes: 224286
+      - name: 144480_-35136
+        south_sec: 144480
+        west_sec: -35136
+        min_depth_m: 113.2
+        bytes: 240080
+      - name: 144480_-33600
+        south_sec: 144480
+        west_sec: -33600
+        min_depth_m: -4.2
+        bytes: 147933
+      - name: 144480_-32064
+        south_sec: 144480
+        west_sec: -32064
+        min_depth_m: -6.8
+        bytes: 109189
+      - name: 146016_-36672
+        south_sec: 146016
+        west_sec: -36672
+        min_depth_m: 1859.5
+        bytes: 200352
+      - name: 146016_-35136
+        south_sec: 146016
+        west_sec: -35136
+        min_depth_m: 156.6
+        bytes: 332186
+      - name: 146016_-33600
+        south_sec: 146016
+        west_sec: -33600
+        min_depth_m: 6.7
+        bytes: 155213
+      - name: 146016_-32064
+        south_sec: 146016
+        west_sec: -32064
+        min_depth_m: -8.5
+        bytes: 122205
+      - name: 147552_-36672
+        south_sec: 147552
+        west_sec: -36672
+        min_depth_m: 2534.2
+        bytes: 96831
+      - name: 147552_-35136
+        south_sec: 147552
+        west_sec: -35136
+        min_depth_m: 156.2
+        bytes: 327185
+      - name: 147552_-33600
+        south_sec: 147552
+        west_sec: -33600
+        min_depth_m: 32.1
+        bytes: 205480
+      - name: 147552_-32064
+        south_sec: 147552
+        west_sec: -32064
+        min_depth_m: -6.8
+        bytes: 135662
+      - name: 149088_-36672
+        south_sec: 149088
+        west_sec: -36672
+        min_depth_m: 2080.6
+        bytes: 253746
+      - name: 149088_-35136
+        south_sec: 149088
+        west_sec: -35136
+        min_depth_m: 193.9
+        bytes: 290349
+      - name: 149088_-33600
+        south_sec: 149088
+        west_sec: -33600
+        min_depth_m: 16.0
+        bytes: 221061
+      - name: 149088_-32064
+        south_sec: 149088
+        west_sec: -32064
+        min_depth_m: -5.4
+        bytes: 146946
+      - name: 150624_-36672
+        south_sec: 150624
+        west_sec: -36672
+        min_depth_m: 1934.1
+        bytes: 278046
+      - name: 150624_-35136
+        south_sec: 150624
+        west_sec: -35136
+        min_depth_m: 173.4
+        bytes: 294949
+      - name: 150624_-33600
+        south_sec: 150624
+        west_sec: -33600
+        min_depth_m: 1.8
+        bytes: 156995
+      - name: 150624_-32064
+        south_sec: 150624
+        west_sec: -32064
+        min_depth_m: -2.2
+        bytes: 145915
+      '3':
+      - name: 147808_-31552
+        south_sec: 147808
+        west_sec: -31552
+        min_depth_m: 13.4
+        bytes: 51171
+        harbour: oporto-douro
+      - name: 147808_-31296
+        south_sec: 147808
+        west_sec: -31296
+        min_depth_m: -3.5
+        bytes: 56442
+        harbour: oporto-douro
+      - name: 147808_-31040
+        south_sec: 147808
+        west_sec: -31040
+        min_depth_m: null
+        bytes: 52039
+        harbour: oporto-douro
+      - name: 148064_-31552
+        south_sec: 148064
+        west_sec: -31552
+        min_depth_m: -6.3
+        bytes: 73719
+        harbour: oporto-douro
+      - name: 148064_-31296
+        south_sec: 148064
+        west_sec: -31296
+        min_depth_m: -6.9
+        bytes: 56050
+        harbour: oporto-douro
+      - name: 148064_-31040
+        south_sec: 148064
+        west_sec: -31040
+        min_depth_m: null
+        bytes: 51611
+        harbour: oporto-douro
+      - name: 138848_-34112
+        south_sec: 138848
+        west_sec: -34112
+        min_depth_m: 31.1
+        bytes: 60551
+        harbour: lisbon-tagus
+      - name: 138848_-33856
+        south_sec: 138848
+        west_sec: -33856
+        min_depth_m: 7.7
+        bytes: 76969
+        harbour: lisbon-tagus
+      - name: 138848_-33600
+        south_sec: 138848
+        west_sec: -33600
+        min_depth_m: 4.8
+        bytes: 82467
+        harbour: lisbon-tagus
+      - name: 138848_-33344
+        south_sec: 138848
+        west_sec: -33344
+        min_depth_m: -2.4
+        bytes: 80222
+        harbour: lisbon-tagus
+      - name: 138848_-33088
+        south_sec: 138848
+        west_sec: -33088
+        min_depth_m: null
+        bytes: 44717
+        harbour: lisbon-tagus
+      - name: 138848_-32832
+        south_sec: 138848
+        west_sec: -32832
+        min_depth_m: -0.6
+        bytes: 49230
+        harbour: lisbon-tagus
+      - name: 139104_-34112
+        south_sec: 139104
+        west_sec: -34112
+        min_depth_m: -2.4
+        bytes: 76945
+        harbour: lisbon-tagus
+      - name: 139104_-33856
+        south_sec: 139104
+        west_sec: -33856
+        min_depth_m: -1.2
+        bytes: 83601
+        harbour: lisbon-tagus
+      - name: 139104_-33600
+        south_sec: 139104
+        west_sec: -33600
+        min_depth_m: -6.2
+        bytes: 94349
+        harbour: lisbon-tagus
+      - name: 139104_-33344
+        south_sec: 139104
+        west_sec: -33344
+        min_depth_m: -7.5
+        bytes: 76980
+        harbour: lisbon-tagus
+      - name: 139104_-33088
+        south_sec: 139104
+        west_sec: -33088
+        min_depth_m: -1.5
+        bytes: 82253
+        harbour: lisbon-tagus
+      - name: 139104_-32832
+        south_sec: 139104
+        west_sec: -32832
+        min_depth_m: -0.7
+        bytes: 81167
+        harbour: lisbon-tagus
+      - name: 139360_-34112
+        south_sec: 139360
+        west_sec: -34112
+        min_depth_m: -26.3
+        bytes: 54713
+        harbour: lisbon-tagus
+      - name: 139360_-33856
+        south_sec: 139360
+        west_sec: -33856
+        min_depth_m: null
+        bytes: 50687
+        harbour: lisbon-tagus
+      - name: 139360_-33600
+        south_sec: 139360
+        west_sec: -33600
+        min_depth_m: null
+        bytes: 53808
+        harbour: lisbon-tagus
+      - name: 139360_-33344
+        south_sec: 139360
+        west_sec: -33344
+        min_depth_m: null
+        bytes: 55180
+        harbour: lisbon-tagus
+      - name: 139360_-33088
+        south_sec: 139360
+        west_sec: -33088
+        min_depth_m: 0.1
+        bytes: 52054
+        harbour: lisbon-tagus
+      - name: 139360_-32832
+        south_sec: 139360
+        west_sec: -32832
+        min_depth_m: 0.0
+        bytes: 82011
+        harbour: lisbon-tagus
+      - name: 138336_-32320
+        south_sec: 138336
+        west_sec: -32320
+        min_depth_m: -5.9
+        bytes: 100975
+        harbour: setubal
+      - name: 138336_-32064
+        south_sec: 138336
+        west_sec: -32064
+        min_depth_m: -9.0
+        bytes: 103357
+        harbour: setubal
+      - name: 138592_-32320
+        south_sec: 138592
+        west_sec: -32320
+        min_depth_m: -1.2
+        bytes: 62844
+        harbour: setubal
+      - name: 138592_-32064
+        south_sec: 138592
+        west_sec: -32064
+        min_depth_m: 0.0
+        bytes: 66260
+        harbour: setubal
+      - name: 133216_-31552
+        south_sec: 133216
+        west_sec: -31552
+        min_depth_m: 0.8
+        bytes: 67530
+        harbour: lagos
+      - name: 133216_-31296
+        south_sec: 133216
+        west_sec: -31296
+        min_depth_m: 12.0
+        bytes: 78587
+        harbour: lagos
+      - name: 133472_-31552
+        south_sec: 133472
+        west_sec: -31552
+        min_depth_m: -3.3
+        bytes: 54012
+        harbour: lagos
+      - name: 133472_-31296
+        south_sec: 133472
+        west_sec: -31296
+        min_depth_m: -23.1
+        bytes: 68283
+        harbour: lagos
+      - name: 132960_-28736
+        south_sec: 132960
+        west_sec: -28736
+        min_depth_m: -6.2
+        bytes: 85211
+        harbour: faro
+      - name: 132960_-28480
+        south_sec: 132960
+        west_sec: -28480
+        min_depth_m: -5.7
+        bytes: 93998
+        harbour: faro
+      - name: 133216_-28736
+        south_sec: 133216
+        west_sec: -28736
+        min_depth_m: -3.4
+        bytes: 44275
+        harbour: faro
+      - name: 133216_-28480
+        south_sec: 133216
+        west_sec: -28480
+        min_depth_m: -2.5
+        bytes: 46824
+        harbour: faro
+      - name: 131168_-23104
+        south_sec: 131168
+        west_sec: -23104
+        min_depth_m: 21.9
+        bytes: 72560
+        harbour: cadiz-bay
+      - name: 131168_-22848
+        south_sec: 131168
+        west_sec: -22848
+        min_depth_m: 0.0
+        bytes: 101823
+        harbour: cadiz-bay
+      - name: 131168_-22592
+        south_sec: 131168
+        west_sec: -22592
+        min_depth_m: 0.0
+        bytes: 87227
+        harbour: cadiz-bay
+      - name: 131168_-22336
+        south_sec: 131168
+        west_sec: -22336
+        min_depth_m: 0.0
+        bytes: 43088
+        harbour: cadiz-bay
+      - name: 131424_-23104
+        south_sec: 131424
+        west_sec: -23104
+        min_depth_m: 15.9
+        bytes: 63785
+        harbour: cadiz-bay
+      - name: 131424_-22848
+        south_sec: 131424
+        west_sec: -22848
+        min_depth_m: 0.0
+        bytes: 103220
+        harbour: cadiz-bay
+      - name: 131424_-22592
+        south_sec: 131424
+        west_sec: -22592
+        min_depth_m: 0.0
+        bytes: 87137
+        harbour: cadiz-bay
+      - name: 131424_-22336
+        south_sec: 131424
+        west_sec: -22336
+        min_depth_m: 0.0
+        bytes: 42874
+        harbour: cadiz-bay
+      - name: 131680_-23104
+        south_sec: 131680
+        west_sec: -23104
+        min_depth_m: 0.0
+        bytes: 81553
+        harbour: cadiz-bay
+      - name: 131680_-22848
+        south_sec: 131680
+        west_sec: -22848
+        min_depth_m: 0.0
+        bytes: 75085
+        harbour: cadiz-bay
+      - name: 131680_-22592
+        south_sec: 131680
+        west_sec: -22592
+        min_depth_m: 0.0
+        bytes: 44870
+        harbour: cadiz-bay
+      - name: 131680_-22336
+        south_sec: 131680
+        west_sec: -22336
+        min_depth_m: null
+        bytes: 35346
+        harbour: cadiz-bay
+    coast: coast/portugal.geojson
+    features: features/portugal.yaml
+    index: features/portugal.index.json
+    overrides:
+    - file: overrides/portugal/cadiz-bay.yaml
+      sheet: Tofiño 1789, 'Plano del Puerto de Cadiz', Atlas Marítimo de España (the Universidad de Sevilla's
+        copy, Internet Archive A062039040, page 24), read at full resolution through the Archive's IIIF
+        service
+      source: 'Tofiño 1789, Derrotero de las costas de España en el Océano Atlántico, ''Descripción de
+        la Bahía de Cadiz'', pp. 111 to 120: the channel of Puntales, the Baxo de Santo Domingo, the Corral,
+        the Caño del Trocadero and the Carraca'
+      units: brazas
+      datum: low water of spring tides, the sheet's own note (diez pies entre la baxamar y plea-mar)
+      datum_above_chart_datum_m: 0.4
+      control_points:
+      - name: the lantern of San Sebastián
+        lat_deg: 36.52838
+        lon_deg: -6.31589
+        note: the sheet's round tower at pixel 3585, 3618; the encyclopaedia's 'Faro de San Sebastián'
+          (read 2026-10-10); residual 136 m
+      - name: the castle of Santa Catalina of Cadiz (the sheet's K)
+        lat_deg: 36.53285
+        lon_deg: -6.30799
+        note: pixel 3600, 3365; the encyclopaedia's 'Castillo de Santa Catalina (Cádiz)'; residual 176
+          m
+      - name: the Puerta de Tierra
+        lat_deg: 36.52613
+        lon_deg: -6.28873
+        note: pixel 4005, 3085, the land gate in the walls across the isthmus; the encyclopaedia's 'Puertas
+          de Tierra'; residual 25 m
+      - name: the castle of Puntales
+        lat_deg: 36.5086
+        lon_deg: -6.26145
+        note: pixel 4822, 2804; the encyclopaedia's 'Castillo de San Lorenzo del Puntal'; residual 232
+          m
+      - name: the castle of Santa Catalina del Puerto
+        lat_deg: 36.5804
+        lon_deg: -6.26527
+        note: pixel 2980, 1655; the encyclopaedia's 'Castillo de Santa Catalina del Puerto'; residual
+          251 m
+      - name: the old castle of Rota (the sheet's B)
+        lat_deg: 36.61692
+        lon_deg: -6.35824
+        note: pixel 572, 2797; the encyclopaedia's 'Castillo de Luna (Rota)'; residual 225 m
+      patches: 3
+    harbours:
+      oporto-douro:
+        south: 41.12
+        north: 41.17
+        west: -8.71
+        east: -8.6
+      lisbon-tagus:
+        south: 38.62
+        north: 38.72
+        west: -9.45
+        east: -9.09
+      setubal:
+        south: 38.46
+        north: 38.53
+        west: -8.94
+        east: -8.85
+      lagos:
+        south: 37.06
+        north: 37.12
+        west: -8.7
+        east: -8.63
+      faro:
+        south: 36.95
+        north: 37.03
+        west: -7.98
+        east: -7.85
+      cadiz-bay:
+        south: 36.45
+        north: 36.64
+        west: -6.4
+        east: -6.18
+    fill_mean_level_m: 2.0
+    fill_to_chart_datum: true
+    skip_dry_tiles: true
+    feature_count: 139
+    features_by_kind:
+      anchorage: 21
+      bank: 1
+      bottom: 5
+      castle: 11
+      church: 6
+      headland: 15
+      hill: 6
+      island: 2
+      ledge: 5
+      light: 15
+      place: 6
+      rock: 11
+      shoal: 7
+      tower: 5
+      town: 23
 corridors:
   atlantic-corridor:
     title: 'The corridor: the Western Approaches, Biscay and the Iberian coast to Madeira'
@@ -2543,6 +3281,12 @@ sources:
       sha256: b8da42b6ba9be39b214549e816032de9bf47c2fdff391b8dc62d584cf92c39b0
       bytes: 3589389
       file: gebco_2025_s45.50_n48.40_w-5.25_e-0.60_ascii.zip
+    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 36.1, ''north'':
+        42.45, ''west'': -10.4, ''east'': -5.7})'
+      retrieved: '2026-10-10'
+      sha256: 6b3747741445c99041f6c7b8990879cfe7af21376559b139cde0339f8f544185
+      bytes: 8064872
+      file: gebco_2025_s36.10_n42.45_w-10.40_e-5.70_ascii.zip
     status: fetched
   emodnet_dtm_2024:
     name: EMODnet Bathymetry DTM 2024
@@ -2587,6 +3331,16 @@ sources:
       sha256: 5fd8a47512be535a3f22ca6cc919167f8501821df08e7fc111e2704fc904ea65
       bytes: 44379320
       file: emodnet_dtm2024_elevation_max_45.60_48.30_-5.15_-0.70.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation%5B(36.2):(42.35)%5D%5B(-10.3):(-5.8)%5D
+      retrieved: '2026-10-10'
+      sha256: df2f512fe857dde1aefc7ed192b5f69169accd252e26f0e4a1fca3e1d3b1b84e
+      bytes: 102149028
+      file: emodnet_dtm2024_elevation_36.20_42.35_-10.30_-5.80.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation_max%5B(36.2):(42.35)%5D%5B(-10.3):(-5.8)%5D
+      retrieved: '2026-10-10'
+      sha256: d7ddaacb15570556d7422104d35604a250b14975841fb7b75b59cfbf33762820
+      bytes: 102148668
+      file: emodnet_dtm2024_elevation_max_36.20_42.35_-10.30_-5.80.nc
     status: fetched
   shom_homonim:
     name: SHOM MNT bathymétrique de façade Atlantique (projet HOMONIM), 100 m
