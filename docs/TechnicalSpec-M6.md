@@ -644,6 +644,56 @@ on request and posting the image to the server, or the server rendering the char
 Python. The words come first; the tools follow in 41 or 42, whichever the lead finds them
 to fit.
 
+**As built (package 42, 2026-10-10).** `freesail/agents/api.py`: a runner on the local
+runner's loop (`local.run`), a client of the game's agent API under the door `api`, and of
+the Messages API through the official SDK (`anthropic` 1.x, in the `agents` extra, imported
+by the door alone). `--model` has no default; the door asks the Models API what that name
+is, and the name the server reports is the consent record's identity (the record's form
+for a served identity, "the model's name as its API reports it"), with the context it
+gives sent to the game for the handover note; a reply the server says another model wrote
+is not passed on and the station is stood down (no server-side fallback is ever asked, the
+consent being per model). The wire is the runner's translation in the Messages API's shape:
+the latest brief the system prompt, cached with the tool definitions; a sample a user
+message of its JSON; tool results `tool_result` blocks by the API's own ids; the model's
+earlier turns sent back as the API gave them, thinking blocks and signatures with them; the
+request's own cache breakpoint on the conversation's last block. Every request is streamed
+and the final message taken whole from the stream. `--effort` sets `output_config.effort`
+with adaptive thinking; **thinking cannot be switched off on the current models** (the API
+refuses it), so the brief's "off when not asked" is the model's own default instead. The
+harness's conversation is not append-only (the shelf's stubs, the handover's fold), and the
+API binds a thinking block to the conversation before it, so every request sets
+`thinking.block_binding.prefix_mismatch_behavior: drop_block` (the
+`thinking-binding-controls` beta): a block whose conversation changed is dropped, not
+refused. The server's counts (in, out, cache read and written) go to the game with each
+reply and are said at each handover and at the end. A reply cut off at `max_tokens` with a
+call or no words is asked once more (37i's rule), then the turn ends with nothing done; a
+`refusal` is not asked again and the journal says why. **The security pass**: the key from
+the platform's credential store through `keyring` (service `freesail`, account
+`anthropic-api`; `--store-key` prompts without echo and writes nothing else), else the
+environment (`FREESAIL_API_KEY`, `ANTHROPIC_API_KEY`), else `--key-file` outside the
+repository; handed to the SDK and so to the request's header alone; the door refuses to
+start for a key file inside the repository or a folder the game keeps, the key in a word it
+would send the game, a base URL with a credential, or the SDK's logging on
+(`refusal_to_start`); what it keeps of an exchange is the two bodies, scanned for the key
+before an `--exchanges` file is written; a test greps the repository for the shapes of a
+key. The OpenRouter dialect (`--dialect openrouter`) is the local runner's chat-completions
+with the key in the header, its own account and environment names and base URL, the
+reported model checked; it marks nothing for a cache and keeps no total. **The pictures**
+(`freesail/agents/pictures.py`): the lead's decision, the open page draws them. The tools
+`chart` and `ship_view(facing)` are offered at the doors that carry an image (`mcp`,
+`api`); the browser's server registers a painter (`ui.server.Easel`) that sends the page
+`{"type": "picture", ...}` on the socket and waits up to five seconds for its post
+(`POST /api/picture/{id}`, a PNG of at most 1,568 pixels on its longer side and 1.5 MB);
+the page draws the chart's canvas as it stands, or the ship's view again at the facing in
+an offscreen SVG with its styles written in, onto a canvas (`client/app.js`). The picture
+is a book (shelved, or gone back after its turns, it is no longer sent), held by the
+painter in memory (the newest 24) and fetched by the door by its id with the seating's key;
+the transcript notes that it was shown, with its size and the facing, and no picture is in
+the journal, the transcript, the log or the save. With no page open the tool says so and
+gives the readings the picture would have shown. Tested against a local server in the
+Messages API's shape (`tests/test_api_door.py`, truth 86) and the MCP bridge's own client
+(`tests/test_mcp_server.py`); no model was seated.
+
 ### 14. The replay driven by the transcript (`freesail/core/replay.py`, `freesail/agents/harness.py`)
 
 Decision 36 left it for this milestone: a replay promised on any build. Today a station's
@@ -655,6 +705,39 @@ that a replay applies them at their ticks whatever the build's sampling would ha
 and the transcript becomes the record and not the replay's source. Item 11 of M5 §33 (an
 act at the stationing tick) closes with it. A save of 6b replays on any later build to the
 same log; a save of before replays as now, from its checkpoint.
+
+**As built (package 42, 2026-10-10).** `freesail/core/acts.py`. A harness's entry points
+(its seating, its step on a tick, on an order and between ticks, a reply delivered, a
+door's act, a pause, a stand-down, a leaving, the unattended check) carry `acts.frame`, and
+while one runs every thing the station does to the World is journaled in
+`World.station_acts` with its tick and the count of inputs before it: `seated` (the
+station's definition and its whole state, from which a replay builds it), `order` (an order
+under the station's actor, with its words for the log; given again, so that what it writes,
+and the stations it reaches, follow), `line` (a line of the station's in the log, written
+again as it was: its words, a refusal, a stand-by, a waking, a nudge, a pause, a leaving),
+`note` (an entry in its journal) and `state` (what changed of its agent's state and the
+harness's own fields: the deck, a stand-by, the grants, a pause, who sits there; journaled
+before each order it gives and at the end of each act). A driver's line, the player's
+orders and what the World writes of itself are inputs or consequences of inputs as
+before; an order given inside an order is the outer one's. The save carries the list and
+each station's `acts` flag (its acts whole from before it started). **The replay's rule**
+(`core.replay.road_of`): a save of another build whose stations' acts are whole is
+replayed by them, each given at its tick after as many inputs as came before it in play,
+the stations driven by them (`Harness.driven`: they sample nothing and ask no model) until
+the replay ends, when they take the game up where it stands, their record the save's
+transcript; a save of this build is replayed from its transcript as before, which rebuilds
+the station's conversation (the REPL's turn mode depends on it), to the same log; a save
+of before has no acts, replays as before, and the load's words say so ("a save from before
+package 42, whose stations' acts are not inputs"). Truth 85's second half
+(`test_truth_85_a_game_with_three_stations_replays_on_a_build_whose_sampling_differs`): the
+captain's, the officer's and the watcher's stations an hour at play; on a build that
+samples each station at every other turn of its interval the transcript's road gives
+another log and the acts' road the one that was played, digest for digest. M5 §33 item 11
+closes with it (a door's act at the stationing tick is an input at tick 0, given before the
+first tick; `test_a_door_act_at_the_stationing_tick_is_made_by_a_replay`, by both roads).
+A tool that changes the World by a road other than an order, a line, the journal or the
+station's state must journal its own act (`acts.record`, `acts.APPLIERS`), or a replay by
+the acts will not make it.
 
 ### 15. Consent: one revision for 6a and 6b (`docs/agents/ConsentBrief.md`; `docs/agents/consent/`)
 
