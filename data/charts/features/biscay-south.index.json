@@ -1,0 +1,233 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"168,-35": [
+"vigo",
+"vigo-road"
+],
+"168,-36": [
+"cies",
+"cies-road",
+"monte-ferro",
+"estelas",
+"monte-real",
+"bayona-road",
+"silleiro",
+"silleiro-reef"
+],
+"169,-35": [
+"pontevedra-road",
+"rande-narrows"
+],
+"169,-36": [
+"ons",
+"biduido",
+"cabo-home"
+],
+"169,-37": [
+"salvora"
+],
+"170,-36": [
+"curota"
+],
+"170,-37": [
+"corrubedo"
+],
+"171,-37": [
+"corcubion",
+"corcubion-road",
+"lobeira-grande",
+"monte-louro",
+"meixidos",
+"muros",
+"muros-road"
+],
+"171,-38": [
+"finisterre",
+"finisterre-light-1853",
+"turdeiro",
+"finisterre-town",
+"costeira-road"
+],
+"172,-37": [
+"cabo-vilano",
+"bufardo",
+"vilano-light-1854",
+"camarinas-road",
+"quebranta",
+"muxia"
+],
+"172,-38": [
+"cabo-tourinan"
+],
+"173,-11": [
+"cabo-ogono",
+"izaro"
+],
+"173,-12": [
+"machichaco",
+"machichaco-light-1852"
+],
+"173,-13": [
+"galea-point",
+"lucero-point",
+"serantes",
+"bilbao-concha",
+"bilbao-bar",
+"portugalete",
+"castro-urdiales",
+"castro-road"
+],
+"173,-14": [
+"santona-mount",
+"santona-road",
+"laredo"
+],
+"173,-15": [
+"santa-marina-island"
+],
+"173,-16": [
+"cabo-mayor",
+"cabo-mayor-light-1839",
+"mouro-island",
+"sardinero-road",
+"horadada",
+"santander",
+"santander-road",
+"santander-bank"
+],
+"173,-18": [
+"san-vicente-barquera"
+],
+"173,-20": [
+"llanes"
+],
+"173,-21": [
+"ribadesella"
+],
+"173,-33": [
+"ferrol-arsenal",
+"ferrol-road"
+],
+"173,-34": [
+"cabo-priorino",
+"segano-point",
+"la-muela",
+"carino-road",
+"san-felipe-castle",
+"palma-castle",
+"hercules-light",
+"san-anton-castle",
+"pedrido",
+"corunna-road",
+"jasentes"
+],
+"173,-35": [
+"baldayo-shoals"
+],
+"173,-36": [
+"sisarga"
+],
+"173,-6": [
+"bayonne"
+],
+"173,-7": [
+"biarritz",
+"larrun",
+"st-jean-de-luz-road",
+"socoa-fort",
+"sainte-barbe-tower"
+],
+"173,-8": [
+"cabo-higuer",
+"fuenterrabia",
+"jaizkibel",
+"pasajes-mouth",
+"bancha-grande",
+"pasajes-road",
+"mota-castle",
+"santa-clara-island",
+"bancha-san-sebastian",
+"san-sebastian-road"
+],
+"173,-9": [
+"igueldo-light",
+"guetaria-island",
+"guetaria-road"
+],
+"174,-15": [
+"cabo-ajo"
+],
+"174,-22": [
+"cabo-lastres"
+],
+"174,-23": [
+"gijon",
+"santa-catalina-gijon",
+"cabo-torres",
+"gijon-road"
+],
+"174,-24": [
+"cabo-penas",
+"penas-shoals",
+"penas-light-1852"
+],
+"174,-25": [
+"cabo-vidio"
+],
+"174,-26": [
+"cabo-busto"
+],
+"174,-27": [
+"luarca"
+],
+"174,-29": [
+"ribadeo",
+"ribadeo-road"
+],
+"174,-31": [
+"vivero-road"
+],
+"174,-33": [
+"cedeira-road"
+],
+"174,-34": [
+"cabo-prior",
+"gabeiras"
+],
+"174,-7": [
+"adour-bar"
+],
+"175,-31": [
+"estaca-de-bares",
+"estaca-light-1850"
+],
+"175,-32": [
+"cabo-ortegal",
+"aguillones"
+],
+"178,-5": [
+"cap-ferret",
+"arcachon-road"
+],
+"178,-6": [
+"arcachon-banks"
+],
+"182,-5": [
+"coubre-point",
+"coubre-wooden-tower",
+"st-palais-steeple",
+"royan",
+"royan-road",
+"grave-point",
+"verdon-road",
+"soulac-church",
+"cordouan-light",
+"cordouan-rocks",
+"gironde-mouth"
+],
+"183,-5": [
+"maumusson"
+]
+}
+}

@@ -191,6 +191,12 @@ SOURCES: dict[str, dict[str, Any]] = {
 #              GEBCO's fill under EMODnet, the land mostly, raised from mean sea level to
 #              the chart's datum by the world's mean level (`mean_level_grid`); a block
 #              on a coast of large tides sets it, or its low land floods at high water
+#   dry_tiles_to_corridor
+#              (package 39c; optional, false where absent) a level-2 tile with no cell of
+#              water at the datum, the inland country a wide block's box takes in, is
+#              computed with the block (the distance field sees its shore) and neither
+#              written nor listed: the corridor answers there at level 1, as beyond the
+#              bounds. Biscay south's sixty such tiles were 7 MB of its 26
 # The tile lists, and the seam (package 39a): the level-2 tiles are on one grid for every
 # region, so a region's edge column may be its neighbour's; a tile another region of the
 # manifest lists is that region's, computed with the block (the distance field sees the
@@ -269,6 +275,33 @@ REGIONS: dict[str, dict[str, Any]] = {
         },
         "sources": ["emodnet_dtm_2024", "gebco_2025"],
     },
+    # package 39c: Biscay south and Galicia, abutting biscay-north at 45.9 N exactly and
+    # the Portuguese block at 42.0 N. The western bound is moved from the brief's 9.0 W to
+    # 9.33 W, the column's own edge, so that Cape Finisterre (9.27 W), Touriñán and Cape
+    # Vilán lie within it: the tiles are the same (the column from 9.33 W meets 9.0 W
+    # already). The tiles that meet the bounds span 41.84 to 46.11 N and 9.33 to 0.80 W;
+    # the northern row's ten from 5.12 W east are biscay-north's (the seam rule) and are
+    # computed, not written. The southern row (41.84 to 42.27 N) meets the Portuguese
+    # block's bound too: whichever region the manifest lists first keeps it.
+    "biscay-south": {
+        "title": "Biscay south and Galicia, the Gironde to the Minho",
+        "bounds": {"south": 42.0, "north": 45.9, "west": -9.33, "east": -0.9},
+        "fetch": {"south": 41.8, "north": 46.15, "west": -9.4, "east": -0.75},
+        "harbours": {
+            "royan-verdon": {"south": 45.54, "north": 45.64, "west": -1.10, "east": -0.98},
+            "santander": {"south": 43.42, "north": 43.49, "west": -3.84, "east": -3.75},
+            "gijon": {"south": 43.53, "north": 43.57, "west": -5.70, "east": -5.64},
+            "ferrol": {"south": 43.44, "north": 43.50, "west": -8.34, "east": -8.20},
+            "corunna": {"south": 43.34, "north": 43.40, "west": -8.42, "east": -8.36},
+            "vigo": {"south": 42.20, "north": 42.28, "west": -8.80, "east": -8.66},
+            "bayona": {"south": 42.10, "north": 42.14, "west": -8.88, "east": -8.82},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # the Gironde's springs rise near five metres: the fill raised, as 39a's
+        "fill_to_chart_datum": True,
+        # the box takes in Castile, León and the Landes: their dry tiles are the corridor's
+        "dry_tiles_to_corridor": True,
+    },
 }
 
 # The corridor (spec M6 §26; package 38; the owner's ruling 5): level 1 from GEBCO over
@@ -296,7 +329,7 @@ CORRIDORS: dict[str, dict[str, Any]] = {
 CHARTS: dict[str, dict[str, Any]] = {
     "atlantic-east": {
         "title": "The Channel, Biscay and the Iberian coast to Madeira and the Strait",
-        "regions": ["channel-west", "channel-mid", "biscay-north"],
+        "regions": ["channel-west", "channel-mid", "biscay-north", "biscay-south"],
         "corridor": "atlantic-corridor",
     },
 }
@@ -1424,6 +1457,7 @@ class Build:
             region,
             taken=taken,
             fill_level=fill_level,
+            dry_to_corridor=bool(recipe.get("dry_tiles_to_corridor")),
         )
         level3: list[dict[str, Any]] = []
         for hname, ts in harbour_tiles.items():
@@ -1481,13 +1515,16 @@ class Build:
         harbour: str | None = None,
         taken: frozenset[str] | set[str] = frozenset(),
         fill_level: Grid | None = None,
+        dry_to_corridor: bool = False,
     ) -> list[dict[str, Any]]:
         """The tiles of one level over the region or a harbour patch: EMODnet sampled,
         GEBCO under it where EMODnet is unknown, the overrides written, the distance
         field derived over the whole block (so a shore beyond a tile's edge counts), and
         each tile written with its minimum depth. A tile in `taken` ('<level>/<name>',
         another region's: the seam) is computed with the block and is not written,
-        listed or drawn in the coast."""
+        listed or drawn in the coast; with `dry_to_corridor` (package 39c) a tile with no
+        cell of water at the datum, the inland country, is computed and not written or
+        listed either, the corridor answering there."""
         cell_sec = LEVELS[level]["cell_sec"]
         unit_m = LEVELS[level]["unit_m"]
         souths = sorted({s for s, _ in tiles})
@@ -1553,6 +1590,7 @@ class Build:
                 f"    coast: {len(segs)} segments, {len(lines)} lines in {time.time() - t0:.1f} s"
             )
         records = []
+        dry = 0
         folder = CHARTS_DIR / "tiles" / str(level)
         folder.mkdir(parents=True, exist_ok=True)
         for s, w in tiles:
@@ -1564,6 +1602,9 @@ class Build:
             shoal_block = shoal[r0 : r0 + TILE, c0 : c0 + TILE]
             dblock = dist[r0 : r0 + TILE, c0 : c0 + TILE]
             sea = (block < 0.0) & ~np.isnan(block)
+            if dry_to_corridor and not sea.any():
+                dry += 1
+                continue  # the inland country: the corridor's (package 39c)
             if sea.any():
                 shoalest = np.where(np.isnan(shoal_block), block, shoal_block)
                 min_depth = float(-np.max(shoalest[sea]))
@@ -1601,6 +1642,8 @@ class Build:
             f"    written: {len(records)} tiles, {total:,} bytes compressed "
             f"({len(records) * TILE * TILE * 4:,} raw)"
         )
+        if dry_to_corridor:
+            self.log(f"    dry tiles left to the corridor: {dry} (no water at the datum)")
         return records
 
     # -- the blocks' checks (spec M6 §26; package 38) ----------------------------------
