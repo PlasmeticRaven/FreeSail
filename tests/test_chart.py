@@ -850,6 +850,9 @@ CORRIDOR_BUDGET_BYTES = 8 * 1024 * 1024
 # (47.81 N), off Penmarch, the water deepening gently southward over the corridor.
 EDGE_TRACK_START = Position(48.0, -4.55)
 OFF_LISBON = Position(38.6, -9.4)
+# package 39d: off Lisbon is the Portugal block's now; the corridor's own coast is Morocco's
+# (no block reaches south of 35.5 N on the Atlantic side)
+OFF_MOROCCO = Position(34.0, -7.0)
 OFF_FINISTERRE = Position(42.9, -9.4)
 FUNCHAL_TOWN = Position(32.65, -16.91)
 BEYOND_THE_CORRIDOR = Position(31.0, -10.0)
@@ -870,6 +873,7 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     # package 39a: the Channel east beside the Channel west, in the order the voyage
     # sails them; package 39b: Biscay north after them
     regions = ["channel-west", MID, "biscay-north"]
+    regions += ["portugal"]  # package 39d
     assert manifest["charts"][WHOLE]["regions"] == regions
     assert manifest["charts"][WHOLE]["corridor"] == CORRIDOR
     assert whole.region == whole.name == WHOLE and whole.regions == regions
@@ -880,21 +884,30 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     assert whole.bounds_words() == "32 to 51 N, 20 to 0.9 W"
     assert whole.contains(OFF_LISBON) and whole.contains(LIZARD)
     assert not whole.contains(Position(52.0, -5.0))
-    assert whole.region_at(LIZARD) == "channel-west" and whole.region_at(OFF_LISBON) is None
+    assert whole.region_at(LIZARD) == "channel-west" and whole.region_at(OFF_MOROCCO) is None
+    assert whole.region_at(OFF_LISBON) == "portugal"  # package 39d
     # the features of every region, indexed together, and every region's coast
     mid = load_chart(MID)
     biscay = load_chart("biscay-north")
+    portugal = load_chart("portugal")  # package 39d
     assert whole.features.keys() == (
-        chart.features.keys() | mid.features.keys() | biscay.features.keys()
+        chart.features.keys()
+        | mid.features.keys()
+        | biscay.features.keys()
+        | portugal.features.keys()
     )
     assert all(whole.region_of[fid] == "channel-west" for fid in chart.features)
     assert all(whole.region_of[fid] == MID for fid in mid.features)
     assert all(whole.region_of[fid] == "biscay-north" for fid in biscay.features)
+    assert all(whole.region_of[fid] == "portugal" for fid in portugal.features)
     assert whole.find_feature("the Lizard") is chart.find_feature("the Lizard") or (
         whole.find_feature("the Lizard").id == chart.find_feature("the Lizard").id
     )
     assert len(whole.coast_lines()) == (
-        len(chart.coast_lines()) + len(mid.coast_lines()) + len(biscay.coast_lines())
+        len(chart.coast_lines())
+        + len(mid.coast_lines())
+        + len(biscay.coast_lines())
+        + len(portugal.coast_lines())
     )
     assert len(chart.coast_lines()) > 0 and len(biscay.coast_lines()) > 0
     # the one-region chart as before: its own levels and bounds, no corridor
@@ -951,17 +964,17 @@ def test_a_query_asks_the_finest_level_and_falls_back_to_the_corridor_and_to_non
     """Across the chart: a region's level where the region is, the corridor at level 1
     beyond it, None beyond the corridor's fetch box; the level's `use` says which."""
     assert whole.level_at(CARRICK_ROADS) == 3 and whole.level_at(MID_CHANNEL) == 2
-    assert whole.level_at(OFF_LISBON) == 1 and whole.level_at(Position(45.0, -20.0)) == 1
+    assert whole.level_at(OFF_MOROCCO) == 1 and whole.level_at(Position(45.0, -20.0)) == 1
     assert whole.use_at(MID_CHANNEL) == "a region: coast and approaches"
-    assert whole.use_at(OFF_LISBON) == "the Atlantic: passages and landfalls"
-    assert 30.0 < whole.depth_at(OFF_LISBON) < 200.0
+    assert whole.use_at(OFF_MOROCCO) == "the Atlantic: passages and landfalls"
+    assert 30.0 < whole.depth_at(OFF_MOROCCO) < 200.0
     assert 100.0 < whole.depth_at(OFF_FINISTERRE) < 200.0
     assert whole.depth_at(FUNCHAL_TOWN) < 0.0  # the town stands above the sea
     assert whole.depth_at(BEYOND_THE_CORRIDOR) is None  # a tile, but nothing in it
     assert whole.coast_distance(BEYOND_THE_CORRIDOR) is None
-    assert whole.tile_min_depth(OFF_LISBON) is not None
+    assert whole.tile_min_depth(OFF_MOROCCO) is not None
     # the corridor's cell is a kilometre; a region's a hundred metres
-    assert 900.0 < whole.cell_m_at(OFF_LISBON) < 1000.0 and whole.cell_m_at(MID_CHANNEL) < 100.0
+    assert 900.0 < whole.cell_m_at(OFF_MOROCCO) < 1000.0 and whole.cell_m_at(MID_CHANNEL) < 100.0
     # the nearest shore and its name over the corridor: the ground itself, no name
     shore = whole.nearest_shore(OFF_FINISTERRE)
     assert (
@@ -970,8 +983,8 @@ def test_a_query_asks_the_finest_level_and_falls_back_to_the_corridor_and_to_non
         and 30.0 < shore.bearing_deg < 120.0
     )
     assert whole.coast_at(OFF_FINISTERRE).name is None
-    # the grounding check works over the corridor: afloat off Lisbon, aground on the town
-    assert whole.aground(OFF_LISBON, 0.0, 41.8, 4.6, 0.0, 0.0, 10.0) is None
+    # the grounding check works over the corridor: afloat off Morocco, aground on the town
+    assert whole.aground(OFF_MOROCCO, 0.0, 41.8, 4.6, 0.0, 0.0, 10.0) is None
     assert whole.aground(FUNCHAL_TOWN, 0.0, 41.8, 4.6, 0.0, 0.0, 10.0) is not None
 
 
@@ -1078,7 +1091,9 @@ def test_the_lookouts_words_are_honest_over_the_corridor():
     which chart it was read from, by the level's `use` (spec M6 §26)."""
     from freesail.world.lookout import COARSE_CELL_M
 
-    off_roca = destination(Position(38.78, -9.50), 270.0, 2.0 * units.NAUTICAL_MILE)
+    # package 39d: the Rock of Lisbon is the Portugal block's; the corridor's coast is
+    # Morocco's, two miles off the shore by Rabat
+    off_roca = destination(Position(33.955, -6.94), 300.0, 2.0 * units.NAUTICAL_MILE)
     sc = Scenario(
         start_time=datetime(1805, 6, 1, 10, 0),
         wind_from_deg=0.0,
@@ -1448,3 +1463,144 @@ def test_the_depths_in_biscay_norths_roads_and_the_period_patch_at_aix():
     index = json.loads((CHARTS / "features" / "channel-west.index.json").read_text())
     indexed = {fid for ids in index["cells"].values() for fid in ids}
     assert {"la-vieille", "raz-passage", "tevennec-light", "morlaix"} <= indexed
+
+
+# ---------------------------------------------------------------------------
+# Package 39d: Portugal and Cadiz, the fourth block (spec M6 §26)
+# ---------------------------------------------------------------------------
+
+PORTUGAL = "portugal"
+
+
+def test_portugal_is_a_region_of_its_own_tiles_with_the_dry_land_left_to_the_corridor(
+    manifest, capsys
+):
+    """The block's recipe, built and committed: its bounds abut Biscay south's 42 N and the
+    Strait's 36.4 N; no tile of another region listed (neither neighbour is built yet);
+    the level-2 tiles all land are computed and not written (`skip_dry_tiles`), the
+    corridor answering there; GEBCO's fill raised by the coast's own mean level; its one
+    override, Cadiz's inner bay from Tofiño's plan in brazas with its datum stated;
+    under the region's size; the checks pass."""
+    tool = build_tool()
+    entry = manifest["regions"][PORTUGAL]
+    assert entry["bounds"] == {"south": 36.4, "north": 42.0, "west": -10.0, "east": -6.0}
+    assert entry["bounds"] == tool.REGIONS[PORTUGAL]["bounds"]
+    assert entry["fill_to_chart_datum"] and entry["fill_mean_level_m"] == 2.0
+    assert entry["skip_dry_tiles"] is True
+    mine = {lv: {t["name"] for t in ts} for lv, ts in entry["tiles"].items()}
+    for other, spec in manifest["regions"].items():
+        if other != PORTUGAL:
+            theirs = {t["name"] for t in spec["tiles"].get("2") or []}
+            assert not mine["2"] & theirs, other
+    b = entry["bounds"]
+    every = [tool.tiles_over(2, b["south"], b["north"], b["west"], b["east"])]
+    assert len(every[0]) == 140 and len(mine["2"]) == 68  # 72 all land, not written
+    whole = load_chart(WHOLE)
+    madrid_way = Position(39.5, -7.0)  # the Alentejo: no tile of the block, the corridor's land
+    assert whole.region_at(madrid_way) is None and whole.level_at(madrid_way) == 1
+    assert whole.depth_at(madrid_way) < 0.0
+    total = 0
+    for level, tiles in entry["tiles"].items():
+        for t in tiles:
+            path = CHARTS / "tiles" / str(level) / f"{t['name']}.npz"
+            assert path.exists(), path
+            total += path.stat().st_size
+    total += (CHARTS / entry["coast"]).stat().st_size + (CHARTS / entry["features"]).stat().st_size
+    assert total < REGION_BUDGET_BYTES, f"{total / 1e6:.1f} MB"
+    assert set(entry["harbours"]) == {
+        "oporto-douro",
+        "lisbon-tagus",
+        "setubal",
+        "lagos",
+        "faro",
+        "cadiz-bay",
+    }
+    [cadiz] = entry["overrides"]
+    assert cadiz["file"] == "overrides/portugal/cadiz-bay.yaml"
+    assert cadiz["units"] == "brazas" and cadiz["datum_above_chart_datum_m"] == 0.4
+    assert cadiz["patches"] == 3 and "Tofiño 1789" in cadiz["sheet"]
+    assert tool.UNIT_M["brazas"] == pytest.approx(1.6718, abs=1e-4)
+    assert tool.main(["--check", PORTUGAL]) == 0
+    out = capsys.readouterr().out
+    for words in (
+        "licences: emodnet_dtm_2024, gebco_2025 (allowed)",
+        "ids unique across the manifest's regions: yes",
+        "harbour patches with their datum stated: 1 of 1",
+        "the fetch box covers the tiles whole: yes",
+        "tiles another region lists: 0 kept",
+        "passes its checks",
+    ):
+        assert words in out, words
+
+
+def test_portugals_lights_of_1805_and_its_coast_raised_by_day_and_by_night():
+    """1805 sees the lights Tofiño's survey and the encyclopaedia date before it: the
+    Senhora da Luz, the Rock, the Guide, São Julião and the Bugio, Carvoeiro and Espichel
+    (1790), the convent's on Cape St Vincent, the lantern of San Sebastián; not the
+    Berlenga's (1842), Cape St Vincent's tower (1846), Santa Maria's (1851), Mondego's
+    (1858) or Chipiona's (1867). Off the Rock by night its light and the Guide's; off the
+    Berlings by day the island, its fort and Carvoeiro, by night in 1805 nothing, in 1850
+    the Berlenga's light."""
+    whole = load_chart(WHOLE)
+    lights = [f for f in whole.features.values() if f.kind == "light"]
+    lit = sorted(f.id for f in lights if whole.region_of[f.id] == PORTUGAL and f.lit_in(1805))
+    assert lit == [
+        "bugio-light",
+        "carvoeiro-light",
+        "espichel-light",
+        "guia-light",
+        "roca-light",
+        "san-sebastian-light",
+        "sao-juliao-light",
+        "senhora-da-luz-light",
+        "st-vincent-convent-light",
+    ]
+    for fid, year in (
+        ("berlenga-light", 1842),
+        ("st-vincent-light", 1846),
+        ("santa-maria-light", 1851),
+        ("mondego-light", 1858),
+        ("chipiona-light", 1867),
+    ):
+        assert not whole.feature(fid).lit_in(1805) and whole.feature(fid).lit_in(year), fid
+    assert not whole.feature("st-vincent-convent-light").lit_in(1850)
+    eye = 10.0
+    off_the_rock = destination(Position(38.7804, -9.499), 270.0, 8 * units.NAUTICAL_MILE)
+    night = whole.in_sight(off_the_rock, eye, None, "night", datetime(1805, 6, 12, 23, 30))
+    assert [s.feature.id for s in night] == ["roca-light", "guia-light"]
+    off_berlings = destination(Position(39.415, -9.508), 300.0, 8 * units.NAUTICAL_MILE)
+    day = {
+        s.feature.id: s
+        for s in whole.in_sight(off_berlings, eye, None, "day", datetime(1805, 6, 12, 12))
+    }
+    assert {"berlenga", "berlenga-fort", "cabo-carvoeiro"} <= set(day)
+    assert day["berlenga"].seen_as == "land"
+    assert whole.in_sight(off_berlings, eye, None, "night", datetime(1805, 6, 12, 23, 30)) == []
+    later = whole.in_sight(off_berlings, eye, None, "night", datetime(1850, 6, 12, 23, 30))
+    assert [s.feature.id for s in later] == ["berlenga-light"]
+
+
+def test_the_depths_in_portugals_roads_and_the_period_patch_at_cadiz():
+    """The roads at level 3, each in its pilot's water: Cascais road in Tofiño's eight to
+    twenty brazas, the bay of Lagos clean and deep, the road before Lisbon; the channel of
+    Puntales at Tofiño's 4 2/6 brazas (7.6 m below the chart's datum with the 0.4 m of
+    low water springs above LAT), where the modern grid has 4 to 7 m and the shipyard's
+    land; the Cabezuela, built over by the free-trade zone, water again in 1805."""
+    whole = load_chart(WHOLE)
+    braza = 1.6718
+    cascais = Position(38.691, -9.41)
+    assert whole.level_at(cascais) == 3
+    assert 8 * braza * 0.5 < whole.depth_at(cascais) < 20 * braza
+    assert whole.depth_at(Position(37.092, -8.655)) > 10.0  # the bay of Lagos
+    assert whole.depth_at(Position(38.704, -9.145)) > 5.0  # before Lisbon
+    channel = Position(36.5130, -6.2555)
+    assert whole.depth_at(channel) == pytest.approx((4 + 2 / 6) * braza + 0.4, abs=0.1)
+    assert whole.depth_at(Position(36.5180, -6.2670)) == pytest.approx(
+        (1 + 4 / 6) * braza + 0.4, abs=0.1
+    )
+    for name in ("the road of Belém", "Cascais road", "the channel of Puntales", "the Berlinga"):
+        f = whole.find_feature(name)
+        assert f is not None and whole.region_of[f.id] == PORTUGAL, name
+    index = json.loads((CHARTS / "features" / "portugal.index.json").read_text())
+    indexed = {fid for ids in index["cells"].values() for fid in ids}
+    assert {"belem-road", "san-sebastian-light", "douro-within-bar"} <= indexed
