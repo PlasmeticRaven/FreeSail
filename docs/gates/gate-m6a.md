@@ -1,6 +1,6 @@
 # Gate M6a: People, the captain's station, and the wardroom (6a and 6b as one)
 
-**Verdict:** open. The build `m6a`, to be cut at package 37p's and 42's merge (the owner's word of 2026-10-10, decision 44: one gate for 6a and 6b, carrying the yards and the helm by the wind with it), after
+**Verdict:** open. The build `m6a`, cut 2026-10-10 at package 37p's merge, the last in (branch `gates/m6a`, tag `gate-m6a`, the release's zip; the owner's word of 2026-10-10, decision 44: one gate for 6a and 6b, carrying the yards and the helm by the wind with it), after
 packages 40 (the ship's company, the rules-based captain in three layers, the captain's
 station and the player's seat), 40b (the lessons and the officer's own reckoning) and 40c
 (the captain's trials), 37p (the yards and the helm by the wind, the ship in a gale), 41 (the wardroom), 42a (the consent brief revised) and 42 (the API door, the replay by acts, the pictures). The chart blocks 39a and 39b landed before it and are checked here
@@ -95,9 +95,17 @@ written down whether or not it is a fault.
   `trial-station-lee-shore`: *hove to at 09:24 when the wind is over forty with sea room;
   filled away for the land under her lee, on passage then beating for the station to
   windward, hove to again with sea room, by turns through the afternoon; never aground.*
-  The known fault (the tuning notes, package 40c, "found on the way"): between the turns
-  she lies aback with no way for hours and is driven up-Channel; the captain's orders are
-  right and the ship's recovery is not. Write down what else you see.
+  Package 40c found her lying aback with no way for hours between the turns and driven
+  up-Channel; package 37p answered it (the tuning notes, "the gale trials, before and
+  after"): *aback eleven minutes in the twenty hours of the station trial where she was
+  aback for 290, the longest stretch under three minutes; lying a-try under the
+  close-reefed main topsail and the storm staysails at a knot and a third over the
+  ground; the mizzen storm staysail blown out in a gust of the whole gale and nothing
+  else lost.* What remains, and is the captain's, not the ship's: after the gale the
+  station trial beats for the station under the main topsail and two staysails to the
+  end, the captain's state going to hove to for a minute and back and the beating book
+  not making sail again. Write down what else you see, in particular the helm's
+  over-swing in light airs after she is boxed off.
 - [ ] **3. The natural habitat: the merchant.** `trial-trade-stranger` and
   `trial-trade-thick`: *the schooner bound for Falmouth hauls off from the French brig
   within two miles at 05:01 and resumes her passage when the brig is lost at 06:14, takes

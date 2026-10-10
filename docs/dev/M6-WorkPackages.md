@@ -24,7 +24,7 @@ tuning notes and a report to the lead at the end.
 | 41 | Fable | The wardroom: several doors, the pace rule, the deck's conversation, the master's and the lookout's stations, the stand-by on several conditions | merged 2026-10-10 (stations bound at run time, a passenger station, the pace rule as one object the drivers share; no pin moved) |
 | 42 | Opus | The API door and its security pass; the transcript-driven replay; the chart and the ship's view as images through the doors that carry one (the consent revision moved to 42a) | merged 2026-10-10 (the key from the credential store first; the acts beside the log; the pictures from the open page; OpenRouter on a mock only; thinking cannot be switched off on the current models, so no-effort is the model's default) |
 | 43 | Fable | The crewed promotion, a model captain of another ship, the far-detail guard, the director's seat hook | brief to write |
-| 37p | Opus | The yards and the helm by the wind, and the ship in a gale: three levels of bracing, the helm's mark the highest sail set, storm canvas, the recovery from aback; every passage re-pinned once | approved and launched 2026-10-10; before gate 6a's runs |
+| 37p | Opus | The yards and the helm by the wind, and the ship in a gale: three levels of bracing, the helm's mark the highest sail set, storm canvas, the recovery from aback; every passage re-pinned once | merged 2026-10-10, with 41 and 42 merged in its worktree; gate 6a cut after it |
 | 43b | Opus | The lugger and the smack; the world's business | brief to write |
 | 44 | Opus | The regatta harness and the parity tests | brief to write |
 
@@ -559,6 +559,48 @@ behaviour in a sea beyond truth 28's drift; the lugger's lugs (43b). Tuned once 
 cheaply: the trim's steps and the storm line are set from the sources and the trials, not
 iterated for a prettier passage. The fast tier before the report, and the whole slow tier
 once at the end, since every pin moves.
+
+## Package 37p, as merged (2026-10-10)
+
+Merged with 41 and 42 resolved in its worktree; the lead's ruling that a say heard by
+nobody carries its place and hearers like any other (the log is the ear) folded in and
+truth 78 re-pinned for it. The tuning notes' section (`docs/dev/TuningNotes.md`, "the yards
+and the helm by the wind, and the ship in a gale") carries the constants and their sources,
+the step and the mark tuned once, the gale trials before and after, what was found on the
+way and every pin moved with its reason; spec M5 §33 item 26 is its record. The measure:
+the station and the lee-shore trials aback 11 and 70 minutes in twenty hours where they
+were aback 290 and 412, the longest stretch under three minutes where it was an hour and
+more; lying a-try under the close-reefed main topsail and the storm staysails at 1.3 to
+1.4 knots over the ground; nothing aground, no sail lost but the mizzen storm staysail in
+a gust of the whole gale.
+
+**Open for the owner**, none of them blocking the gate:
+
+1. **Two strict expected failures** left for the lead in the slow tier: `back and fill`
+   shoots through the wind under the keel's grip astern, and the schooner's studding-sail
+   set-up is caught in irons. Both are evolutions the gate's runs do not touch; a short
+   package or 43's physics work takes them.
+2. **The drift lying to** is 1.6 knots on the mean through the water in forty-five knots
+   (truth 28), the brief's measure a knot to a knot and a half; the hull's resistance
+   astern is still its resistance ahead (spec 3b §9, the owner's ruling) and the builder
+   did not tune further. Left as it stands unless the owner's runs find her driven too
+   fast.
+3. **The trade-off of the period's trim**: full and by the frigate now lies 67.5° from
+   the true wind at 5.1 knots where she lay 76° at 6.8, a quarter slower through the water
+   and a sixth more made good to windward; every passage by the wind took longer and was
+   re-pinned. Luce's own half point a level put her at 93°, so the step is two degrees.
+   The owner may want a feel for it at the helm before it is called settled.
+4. **The starter book's heavy weather** sets the storm staysails by one order,
+   `set the storm staysails`, folded into the routine (three orders where there were four);
+   truth 37 keeps the old copies of the book as they were.
+5. **The captain after the gale** (40c's ground, not this package's): the station trial
+   beats for the station under the main topsail and two staysails to the end, the
+   captain's state flipping to hove to for a minute and back, the beating book not making
+   sail again. The gate's item 2 says so; 43 or a small captain's patch takes it.
+6. **The sternway yaw's fade-in** (none under a knot astern, whole from two) is
+   judgement, taken so that truth 17's frigate getting under way from rest is not thrown
+   about by the first inch of sternway; the full-and-by helm still over-swings in light
+   airs after a box-off (the gripe with no way on, which predates the package).
 
 ## Package 41: the wardroom (`freesail/agents/agent.py` for the master's and the lookout's stations, their domains and briefs, the cadence; `harness.py` for the conversation, the stand-by on several conditions, `you may` down the ranks; `tools.py` for the new tools and the authority filter at the new stations; `remote.py`, `mcp_server.py`, `local.py`, `repl.py` for the doors; `seat.py` for the player at the master's and the lookout's; `fake.py` for the fake master and lookout; `freesail/core/world.py` and `freesail/ui/server.py` for the pace rule and the `pace` reading; `freesail/api/readings.py`; `freesail/world/reckoning.py` only where the master's figure replaces the ship's; `freesail/world/captains.py` where the rules-based captain is the captain over a seated officer; `freesail/standing/grammar.py` only if the stand-by's conditions need a form the dialect lacks; `docs/agents/Harness.md`, `docs/agents/README.md`; the primer's chapter 16 and a chapter for the wardroom's stations; `docs/TechnicalSpec-M6.md` §11, §12, §16 as built; `docs/dev/TuningNotes.md`; `tests/test_wardroom_doors.py` new, `test_agents.py`, `test_officer.py`, `test_captain.py`, `test_mcp_server.py`, `test_known_truths.py` truths 82 to 85)
 
