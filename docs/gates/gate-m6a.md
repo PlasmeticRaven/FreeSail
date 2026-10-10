@@ -1,6 +1,6 @@
 # Gate M6a: People and the captain's station
 
-**Verdict:** open. Cut by the lead at package 40c's merge (2026-10-09; decision 41), after
+**Verdict:** open. The build `m6a`, cut 2026-10-10 at package 40c's merge (decision 41), after
 packages 40 (the ship's company, the rules-based captain in three layers, the captain's
 station and the player's seat), 40b (the lessons and the officer's own reckoning) and 40c
 (the captain's trials). The chart blocks 39a and 39b landed before it and are checked here
@@ -39,7 +39,7 @@ keep a reckoning of his own; and the primer teaches the duties.*
 
 ## What you need
 
-Python 3.11 or newer (`py`), the branch checked out fresh, and for item 7 Claude Desktop
+Python 3.11 or newer (`py`), the gate zip from the release `gate-m6a` extracted to a fresh folder (or the branch `gates/m6a`), and for item 7 Claude Desktop
 with the bridge configured as at gate 5c, once package 42a's consent revision is approved
 and the re-asks run.
 

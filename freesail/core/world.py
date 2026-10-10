@@ -41,7 +41,7 @@ SAVE_FORMAT = 1
 # `SAVE_FORMAT` do not move for it, and a save without a stamp is read as "unstamped,
 # before 37d" (`UNSTAMPED_WORDS`). A replay is promised only on the build that wrote the
 # save (`core.replay.load`): the same fingerprint.
-BUILD_NAME = "m5c-c"
+BUILD_NAME = "m6a"
 BUILD_RULES_DIGITS = 16
 UNSTAMPED_WORDS = "unstamped, before 37d"
 
