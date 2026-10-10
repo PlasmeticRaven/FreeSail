@@ -76,6 +76,7 @@ from freesail.orders.errors import OrderError
 from freesail.orders.vocabulary import normalise
 
 __all__ = [
+    "CONVERSATION_VERBS",
     "GENERAL_GRANT",
     "GENERAL_TAKEN",
     "STANDING_STATION_VERBS",
@@ -91,6 +92,8 @@ __all__ = [
 STATION_VERBS: tuple[str, ...] = (
     "ask",
     "tell",
+    "say",
+    "hail",
     "stand down",
     "resume",
     "show the journal of",
@@ -101,6 +104,13 @@ STATION_VERBS: tuple[str, ...] = (
     "you may work the ship",
     "you may not work the ship",
 )
+
+# The deck's conversation (spec M6 §11; package 41): the sentences every station may
+# give, with the deck or without, and the player at the prompt or at his seat: a word
+# said in a place aboard (`say`; the lookout's `hail` from the masthead), a word to a
+# station (`tell`) and a question put to one (`ask`). The rest of the station sentences
+# are the captain's own (the owner's, and the captain's station's).
+CONVERSATION_VERBS: tuple[str, ...] = ("say", "hail", "tell", "ask")
 
 # The general grant's two sentences, by their verbs in the vocabulary (package 37g, item
 # 18): the words a captain would type for each are its synonyms there.
@@ -116,8 +126,17 @@ _GIVE_DECK = re.compile(
     r"^(?:(?P<who>[\w' ]+?)\s*(?:,\s*|\s+))?(?:you have the deck|the deck is yours)\s*$"
 )
 _TAKE_DECK = re.compile(r"^(?:i have the deck|i'll take the deck|the captain has the deck)\s*$")
-_ALLOW = re.compile(r"^you may (?P<not>not )?(?P<rest>.+)$")
+# `you may ...` to the officer, or to a station named before the comma (package 41:
+# 'master, you may heave to'; 'Mr Ellis, you may heave the lead'), as the deck's giving
+# names him
+_ALLOW = re.compile(r"^(?:(?P<who>[^,]+?)\s*,\s*)?you may (?P<not>not )?(?P<rest>.+)$")
 _HAND_OVER = re.compile(r"^hand over the deck\s*$")
+# the deck's conversation (package 41): `say <words>` (not `say to the <station>`, which
+# is `tell`), and the lookout's `hail <words>` (`hail the deck <words>`)
+_SAY = re.compile(r"^say\s+(?!to\s+(?:the\s+)?)(?P<q>.+)$")
+_HAIL = re.compile(
+    r"^hail\s+(?:the\s+deck\s+)?(?!(?:the\s+)?pilot|for\s+a\s+pilot|pilots\b)(?P<q>.+)$"
+)
 
 # The station verbs a standing order may give (package 31c): a word and a question. The
 # rest are the captain's own acts on a station, never a routine's.
@@ -141,12 +160,52 @@ _JOURNAL = re.compile(
 
 
 def _known(ship: Any) -> tuple[str, ...]:
+    """The stations' names the sentences know: the kinds', the ship's own bound by hand
+    (`world.stations`, package 41) and any this game has manned."""
     extra = getattr(ship, "extra", None) or {}
-    names = list(STATION_NAMES)
+    stations = extra.get("stations")
+    # the World's binding where the ship has one (a station unbound is no longer known
+    # by name); the kinds' names where she has none (a ship alone, a point world). The
+    # seats that are the game's and not the ship's (the director's, M7b) are known by
+    # name whatever the binding says, so that 'ask the director' is refused in words.
+    if stations is not None:
+        names = list(stations.names())
+        names += [n for n in STATION_NAMES if n not in STATIONS_ABOARD and n not in names]
+    else:
+        names = list(STATION_NAMES)
     for name in list(extra.get("agents") or {}) + list(extra.get("agent_journals") or {}):
-        if name not in names:
+        if name not in names and (stations is None or stations.aboard(name)):
             names.append(name)
     return tuple(sorted(names, key=lambda n: -len(n)))
+
+
+def _person_station(who: str, ship: Any) -> tuple[str, int] | None:
+    """A station addressed by its person's name or his role (package 41: 'tell the first
+    lieutenant to shorten sail', 'ask Mr Ellis for a course'): the station bound to the
+    person the words name, and how many words name him; None when none does. The
+    person's words first, longest first ('the first lieutenant' before 'the first')."""
+    extra = getattr(ship, "extra", None) or {}
+    stations = extra.get("stations")
+    if stations is None:
+        return None
+    world = stations.world
+    people = getattr(world, "people", None)
+    if people is None:
+        return None
+    words = who.split()
+    for n in range(min(4, len(words)), 0, -1):
+        head = " ".join(words[:n])
+        try:
+            person = people.find(head)
+        except Exception:
+            person = None
+        if person is None:
+            continue
+        for name in stations.names():
+            holder = stations.holder(name)
+            if holder is person:
+                return name, n
+    return None
 
 
 def _station_in(who: str, ship: Any) -> str | None:
@@ -159,19 +218,22 @@ def _station_in(who: str, ship: Any) -> str | None:
         # the deck's own sentences, never 'ask the deck'
         if alias != "the deck" and (who == alias or who.startswith(alias + " ")):
             return name
-    return None
+    found = _person_station(who, ship)
+    return found[0] if found is not None else None
 
 
-def _alias_words(who: str) -> int:
-    """How many words of `who` name the station: the station's own name or its alias."""
+def _alias_words(who: str, ship: Any = None) -> int:
+    """How many words of `who` name the station: the station's own name, its alias, or
+    its person's name or role (package 41)."""
     who = " ".join(who.split())
-    for name in sorted(STATION_NAMES, key=lambda n: -len(n)):
+    for name in sorted(_known(ship) if ship is not None else STATION_NAMES, key=lambda n: -len(n)):
         if who == name or who.startswith(name + " "):
             return len(name.split())
     for alias in STATION_ALIASES:
         if who == alias or who.startswith(alias + " "):
             return len(alias.split())
-    return 0
+    found = _person_station(who, ship) if ship is not None else None
+    return found[1] if found is not None else 0
 
 
 def _general(text: str) -> tuple[str, str] | None:
@@ -217,6 +279,10 @@ def recognises(text: str, ship: Any = None) -> str | None:
     m = _ALLOW.match(deck)
     if m is not None:
         return "you may not" if m.group("not") else "you may"
+    if _HAIL.match(norm):
+        return "hail"
+    if _SAY.match(norm) and not _TELL.match(norm):
+        return "say"
     for verb, pattern in (
         ("show the journal of", _JOURNAL),
         ("stand down", _STAND_DOWN),
@@ -231,12 +297,29 @@ def recognises(text: str, ship: Any = None) -> str | None:
         if verb in ("ask", "tell"):
             # "ask the watcher how ..." : the station is the head of `who` + `q`
             whole = f"{who} {m.group('q') or ''}"
-            if _station_in(whole, ship) is not None:
-                return verb
-            continue
+            station = _station_in(whole, ship)
+            if station is None:
+                continue
+            if verb == "ask" and station == "master" and _held_now(ship, station) is None:
+                # `ask the master the reckoning` with nobody at the master's station is
+                # the reading's own form (package 33c: a reading asked 'after ask the
+                # master'), answered by the ship's own master as it always was; with a
+                # model or the player at the station, the question goes to him (41)
+                return None
+            return verb
         if _station_in(who, ship) is not None:
             return verb
     return None
+
+
+def _held_now(ship: Any, station: str) -> Any:
+    """Who holds a station now: a harness or the player's seat, not released; None."""
+    extra = getattr(ship, "extra", None) or {}
+    agents = extra.get("agents") or {}
+    held = _held(agents, station, extra.get("player_seat"))
+    if held is None or held.agent.released or not getattr(held, "started", True):
+        return None
+    return held
 
 
 def _split_ask(text: str, ship: Any, verb: str = "ask") -> tuple[str, str]:
@@ -249,20 +332,30 @@ def _split_ask(text: str, ship: Any, verb: str = "ask") -> tuple[str, str]:
         if verb == "tell":
             raise OrderError("Tell whom? Say 'tell the watcher <words>'.")
         raise OrderError("Ask whom? Say 'ask the watcher <question>'.")
-    # the question is what follows the station's name (or its alias) in the text as said
-    n = _alias_words(normalise(rest)) or len(station.split())
+    # the question is what follows the station's name (or its alias, or its person's
+    # name) in the text as said
+    n = _alias_words(normalise(rest), ship) or len(station.split())
     words = rest.split()
     question = " ".join(words[n:]).lstrip(",:").strip()
+    # 'tell the first lieutenant to shorten sail', 'ask the master for a course': the
+    # leading 'to' or 'for' is the sentence's, not the words'
+    for lead in ("to ", "for "):
+        if question.lower().startswith(lead) and len(question.split()) > 1:
+            question = question[len(lead) :]
+            break
     return station, question
 
 
 def _aboard(ship: Any) -> tuple[str, ...]:
-    """The stations a standing order may address: those the game can man now, and any
-    this game has manned."""
+    """The stations a standing order may address: those the ship has now (the binding
+    on the World, package 41; the kinds where the ship keeps none), and any this game
+    has manned."""
     extra = getattr(ship, "extra", None) or {}
+    stations = extra.get("stations")
     # not the captain's station (package 40): a standing order speaks for the captain,
     # whoever holds his station, and never tells or asks him
-    names = [n for n in STATIONS_ABOARD if n != "captain"]
+    bound = list(stations.names()) if stations is not None else list(STATIONS_ABOARD)
+    names = [n for n in bound if n != "captain"]
     for name in list(extra.get("agents") or {}) + list(extra.get("agent_journals") or {}):
         if name not in names and name != "captain":
             names.append(name)
@@ -315,6 +408,114 @@ def _speaker(ship: Any) -> tuple[str, str]:
     return f"standing order '{firing.name}'", firing.officer
 
 
+def _station_speaking(ship: Any) -> dict[str, str] | None:
+    """The station that speaks the sentence being given (package 41; the deck's
+    conversation): a model at its station, or the player at his seat, by the order's
+    actor (`core.world.ORDER_ACTOR`): {station, words ('the master (Mr Ellis)'), place
+    ('on the quarterdeck')}; None for the captain at the prompt, a standing order's
+    firing and the rules-based captain, whose sentences are the captain's own."""
+    from freesail.agents.agent import place_of
+    from freesail.orders.prompt import world_of
+    from freesail.world.places import place_words
+
+    extra = getattr(ship, "extra", None) or {}
+    actor = str(extra.get("order_actor") or "")
+    if not actor.startswith("the "):
+        return None
+    station = actor.split(" (", 1)[0].removeprefix("the ").strip()
+    world = world_of(ship)
+    if world is None:
+        return None
+    from freesail.agents.harness import holder_of
+
+    held = holder_of(world, station)
+    if held is None:
+        return None
+    person = getattr(held.station, "person", "")
+    if person in ("", f"the {station}", "a person aboard"):
+        who = f"the {station}"  # nobody named at it: the station alone
+    else:
+        who = f"the {station} ({person})"
+    if actor.endswith("(the player)"):
+        who += ", the player"
+    place = place_of(world, station)
+    where = "from the masthead" if place == "masthead" else place_words(place)
+    return {"station": station, "words": who, "place": where, "place_id": place}
+
+
+def _say(ship: Any, verb: str, text: str) -> tuple[str, str, dict[str, Any]]:
+    """`say <words>` and the lookout's `hail <words>` (package 41): the words a line in
+    the log with where the speaker stood, heard by every station in the same place
+    (the player at the prompt is where the captain is: the quarterdeck, or the cabin
+    when he has gone below); a hail from the masthead is heard on deck. From a station
+    the line is the station's own kind (`agent.hail` for the lookout, which wakes a
+    station with the deck that stands by; `agent.spoke` otherwise); from the player, the
+    captain's `agent.spoke`."""
+    from freesail.agents.agent import CAPTAIN, LOOKOUT, place_of
+    from freesail.agents.harness import _stations_held
+    from freesail.orders.prompt import world_of
+    from freesail.world.places import place_words
+
+    norm = " ".join(text.split())
+    m = (_HAIL if verb == "hail" else _SAY).match(normalise(norm))
+    words = (m.group("q") if m else "").strip(" ,:")
+    # the words as said, not normalised
+    said = norm.split(None, 1)[1] if " " in norm else ""
+    if said.lower().startswith("the deck "):
+        said = said[len("the deck ") :]
+    words = said.strip(" ,:") or words
+    if not words:
+        raise OrderError(f"{verb.capitalize()} what? Say the words after '{verb}'.")
+    world = world_of(ship)
+    if world is None:
+        raise OrderError("There is nobody to hear it: the ship is not in a world.")
+    speaker = _station_speaking(ship)
+    if speaker is None:
+        if verb == "hail":
+            raise OrderError(
+                "A hail is the lookout's, from the masthead; on the quarterdeck say the "
+                "words with 'say <words>', or tell a station with 'tell the <station> ...'."
+            )
+        station, who = CAPTAIN, "the captain"
+        place = place_of(world, CAPTAIN)
+        where = place_words(place)
+        kind = "agent.spoke"
+        is_hail = False
+    else:
+        station, who, where, place = (
+            speaker["station"],
+            speaker["words"],
+            speaker["place"],
+            speaker["place_id"],
+        )
+        stations = getattr(world, "stations", None)
+        is_hail = (stations.kind_of(station) if stations is not None else station) == LOOKOUT
+        kind = "agent.hail" if is_hail else "agent.spoke"
+    if is_hail:
+        where = "from the masthead" if place == "masthead" else f"a hail, {where}"
+    heard_at = {"quarterdeck", "deck"} if is_hail else {place}
+    hearers = []
+    for other in _stations_held(world):
+        if other.station.name == station:
+            continue
+        if place_of(world, other.station.name) in heard_at:
+            other.hear(f"{who[:1].upper()}{who[1:]}, {where}: {words}")
+            hearers.append(other.station.name)
+    data = {
+        "station": station,
+        "words": words,
+        "place": place,
+        "where": where,
+        "hail": is_hail,
+        "heard_by": hearers,
+    }
+    if is_hail or (speaker is not None and station != CAPTAIN):
+        # a hail, and a station's word on deck, are notable (a station with authority
+        # speaks notably, package 37g); the player's own say is routine, as his orders
+        data["notable"] = True
+    return kind, f"{who[:1].upper()}{who[1:]}, {where}: {words}", data
+
+
 def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
     verb = recognises(text, ship)
     extra = getattr(ship, "extra", None) or {}
@@ -326,6 +527,9 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
     norm = normalise(text).replace(" , ", " ")
     by, officer = _speaker(ship)
     said_by = {"by": by} if by else {}
+    speaker = _station_speaking(ship) if not by else None
+    if verb in ("say", "hail"):
+        return _say(ship, verb, text)
     if verb in (
         "you have the deck",
         "i have the deck",
@@ -342,10 +546,13 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
     if verb == "ask":
         station, question = _split_ask(text, ship)
         agent = _manned(agents, station, seat)
+        if speaker is not None and speaker["station"] == station:
+            raise OrderError(f"The {station} asks itself nothing; ask another station.")
         return (
             "agent.asked",
-            agent.put_question(question, by=by, officer=officer),
-            {"station": station, "question": question, **said_by},
+            agent.put_question(question, by=by, officer=officer, speaker=speaker),
+            {"station": station, "question": question, **said_by}
+            | ({"speaker": speaker["station"]} if speaker else {}),
         )
     if verb == "tell":
         station, words = _split_ask(text, ship, verb="tell")
@@ -358,8 +565,9 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
         agent = _manned(agents, station, seat)
         return (
             "agent.told",
-            agent.put_word(words, by=by, officer=officer),
-            {"station": station, "words": words, **said_by},
+            agent.put_word(words, by=by, officer=officer, speaker=speaker),
+            {"station": station, "words": words, **said_by}
+            | ({"speaker": speaker["station"]} if speaker else {}),
         )
     if verb == "show the journal of":
         m = _JOURNAL.match(norm)
@@ -436,12 +644,28 @@ def _deck(
             f"'hand over the deck' is the {OFFICER}'s own order, given with his note; the "
             "captain takes the deck with 'I have the deck'."
         )
-    agent = _held(agents, OFFICER, seat)
+    # a grant to a station named before the comma (package 41: 'master, you may heave
+    # to'), the officer's otherwise; the deck's own sentences are the officer's
+    target = OFFICER
+    if verb in ("you may", "you may not"):
+        m_who = _ALLOW.match(deck)
+        who_said = " ".join((m_who.group("who") or "").split()) if m_who else ""
+        if who_said:
+            named = _station_in(who_said, ship)
+            if named is None:
+                raise OrderError(
+                    f"'{who_said}' names no station aboard to allow a thing to; say the "
+                    "station or its person before the comma ('master, you may heave to')."
+                )
+            target = named
+    agent = _held(agents, target, seat)
     if agent is None:
-        raise OrderError(
-            f"There is no {OFFICER} at the station; a model's door seats one first "
-            "(docs/agents/Harness.md), and then the captain gives the deck."
-        )
+        if target == OFFICER:
+            raise OrderError(
+                f"There is no {OFFICER} at the station; a model's door seats one first "
+                "(docs/agents/Harness.md), and then the captain gives the deck."
+            )
+        raise OrderError(f"There is no {target} at the station; nobody has been stationed there.")
     if verb == "you have the deck":
         m = _GIVE_DECK.match(deck)
         assert m is not None
@@ -473,18 +697,18 @@ def _deck(
     m = _ALLOW.match(deck)
     assert m is not None
     rest = m.group("rest").strip(" .")
-    grant = read_grant(ship, None, rest, said=True)
+    grant = read_grant(ship, None, rest, said=True, station=target)
     if verb == "you may not":
         return (
             "agent.deck",
             agent.disallow(grant.verb, grant=grant),
-            {"station": OFFICER, "disallowed": grant.verb, "thing": grant.thing},
+            {"station": target, "disallowed": grant.verb, "thing": grant.thing},
         )
     _not_his_already(agent, grant, rest)
     return (
         "agent.deck",
         agent.allow(grant.verb, grant.words, grant=grant),
-        {"station": OFFICER, "allowed": grant.verb, "words": grant.words, "thing": grant.thing},
+        {"station": target, "allowed": grant.verb, "words": grant.words, "thing": grant.thing},
     )
 
 
@@ -589,7 +813,9 @@ def thing_named(ship: Any, verb: str, phrase: str, said: str) -> tuple[str, str]
     return None
 
 
-def read_grant(ship: Any, verb: str | None, rest: str, said: bool = False) -> Grant:
+def read_grant(
+    ship: Any, verb: str | None, rest: str, said: bool = False, station: str = OFFICER
+) -> Grant:
     """The captain's grant from his words (package 37g, item 17). With `verb` None, `rest`
     is everything after `you may`: the order is the vocabulary's verb they begin with,
     longest first (refused in words when they begin with none, or when two orders are
@@ -604,7 +830,7 @@ def read_grant(ship: Any, verb: str | None, rest: str, said: bool = False) -> Gr
         verb, phrase, words = _verb_and_phrase(rest)
         if verb is None:
             raise OrderError(
-                f"'{rest}' names no order the {OFFICER} could be allowed; say the order's "
+                f"'{rest}' names no order the {station} could be allowed; say the order's "
                 "words first ('you may tack ship if the land closes within two miles'), or "
                 "'you may work the ship' for his general authority."
             )
@@ -678,7 +904,8 @@ def _not_his_already(agent: Any, grant: Grant, rest: str) -> None:
         else " No longer order begins with that word; say the order as the officer would "
         "give it ('you may steer', 'you may tack ship')."
     )
+    station = getattr(getattr(agent, "station", None), "name", OFFICER)
     raise OrderError(
-        f"'{rest}' reads as the order '{grant.verb}', which the {OFFICER} may give "
+        f"'{rest}' reads as the order '{grant.verb}', which the {station} may give "
         f"already, so it would allow nothing.{named}"
     )

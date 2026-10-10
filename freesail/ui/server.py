@@ -115,10 +115,15 @@ from freesail.core.events import rollup as rolled
 from freesail.core.world import UNLOGGED_KINDS, World
 from freesail.ui.console import (
     ALARM_SPEED,
+    FREE_RUNNING_HELP,
+    PACE_FREE,
+    PACE_LOCKSTEP,
+    PACE_RULE,
     REPLAY_ANYWAY_FLAG,
     REPLAY_ANYWAY_HELP,
     SEAT_HELP,
     SPEED_WORDS,
+    Pace,
     book_words,
     check_agents_unattended,
     clamp_compression,
@@ -173,11 +178,17 @@ class Driver:
         compression: float = 1.0,
         lockstep: bool = False,
         ease_on_station: bool = False,
+        free_running: bool = False,
     ):
         self.world = world
         self.compression = clamp_compression(compression)
         self.world.compression = self.compression
         self.lockstep = lockstep
+        # the pace rule (spec M6 §12; package 41): 1x while a model's sample is open,
+        # the default; lockstep and free-running the two other rules
+        self.pace = Pace(
+            world, PACE_LOCKSTEP if lockstep else PACE_FREE if free_running else PACE_RULE
+        )
         # `--ease-on-station` (package 33d): the clock eased to 1x when a station is sampled
         # or speaks, as an urgent line eases it; off unless asked for
         self.ease_on_station = bool(ease_on_station)
@@ -245,6 +256,8 @@ class Driver:
         if self.lockstep:  # the clock waits for a door that has the floor
             out["lockstep"] = True
             out["waiting_for"] = self.held_for()
+        # the pace (package 41): the rule, the rate now and the samples open
+        out["pace"] = self.pace.state(self.compression)
         return out
 
     def held_for(self) -> str | None:
@@ -491,7 +504,10 @@ class Driver:
 
     def _tick_owed(self, owed: float, period: float) -> float:
         if self.running:
-            owed += self.compression * period
+            with self.lock:
+                # the pace rule (package 41): 1x while a model's sample is open
+                rate = self.pace.rate(self.compression)
+            owed += rate * period
             n = int(owed)
             owed -= n
             if n:
@@ -1133,6 +1149,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     ap.add_argument("--saves", help="where a released station saves the game (default saves/)")
     ap.add_argument("--seat", help=SEAT_HELP)
+    ap.add_argument("--free-running", action="store_true", help=FREE_RUNNING_HELP)
     args = ap.parse_args(argv)
 
     import uvicorn
@@ -1167,6 +1184,7 @@ def main(argv: list[str] | None = None) -> int:
         compression=args.time,
         lockstep=args.lockstep,
         ease_on_station=args.ease_on_station,
+        free_running=args.free_running,
     )
     app = create_app(
         driver,
@@ -1178,7 +1196,13 @@ def main(argv: list[str] | None = None) -> int:
     print(f"FreeSail server. Seed {world.seed}. Open http://{args.host}:{args.port}/")
     print(
         f"A model's door connects to http://localhost:{args.port} (docs/agents/Harness.md)"
-        + ("; the clock waits for it (--lockstep)." if args.lockstep else ".")
+        + (
+            "; the clock waits for it (--lockstep)."
+            if args.lockstep
+            else "; the clock runs free of it (--free-running)."
+            if args.free_running
+            else "; the clock slows to 1x while a model's sample is open (the pace rule)."
+        )
     )
     uvicorn.run(app, host=args.host, port=args.port, log_level="warning")
     return 0

@@ -142,7 +142,7 @@ from mcp.server.mcpserver import Context
 from mcp.server.mcpserver.tools import Tool as McpTool
 
 from freesail.agents import tools
-from freesail.agents.agent import OPT_OUT_TOKEN
+from freesail.agents.agent import CADENCES, OPT_OUT_TOKEN
 from freesail.agents.model import DATA, MODEL, OPERATOR, Reply, ToolCall, Turn
 from freesail.agents.remote import GameClient, GameError, turn_from_dict
 from freesail.agents.repl import render_turn
@@ -400,9 +400,11 @@ class Bridge:
         tell_owner: Callable[[str], None] | None = None,
         slice_s: float = WAIT_SLICE_S,
         progress_every: float = PROGRESS_EVERY_S,
+        cadence: str = "",
     ):
         self.game = game
         self.identity = identity
+        self.cadence = cadence  # this seating's cadence, when the owner asked one (41)
         self.wait = max(0.0, min(float(wait), WAIT_CEILING_MAX_S))
         self.slice_s = float(slice_s)
         self.progress_every = float(progress_every)
@@ -520,6 +522,7 @@ class Bridge:
                 session_kind=self.session_kind,
                 client=self.client_words(),
                 ask_again=self.ask_again,
+                cadence=self.cadence,
             )
         except GameError as e:
             if e.status in (403, 409):
@@ -1233,10 +1236,21 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--station",
         default="watcher",
-        choices=["watcher", "officer", "captain"],
         help=(
-            "the station asked for: the watcher, the officer of the watch (package 37) or "
-            "the captain (package 40)"
+            "the station asked for, by its name aboard: the watcher, the officer of the "
+            "watch ('officer', package 37), the captain (package 40), the master, the "
+            "lookout or a passenger (package 41); the game refuses in words a station the "
+            "ship has not got"
+        ),
+    )
+    ap.add_argument(
+        "--cadence",
+        choices=list(CADENCES),
+        default=None,
+        help=(
+            "this seating's cadence (spec M6 §12): 'glass' (every glass and on the notable "
+            "and urgent events, the default), 'watch' (every watch and on them), or "
+            "'events' (on events only); the station's own lines are kept whatever it is"
         ),
     )
     ap.add_argument(
@@ -1260,6 +1274,7 @@ def main(argv: list[str] | None = None) -> int:
         wait=args.wait,
         session_kind=args.session,
         ask_again=args.ask_again,
+        cadence=args.cadence or "",
     )
     server = build_server(bridge)
     _to_stderr(

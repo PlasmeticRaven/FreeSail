@@ -27,6 +27,8 @@ readings, and an answer to a question.
 
 from __future__ import annotations
 
+import math
+import re
 from collections.abc import Callable, Sequence
 from typing import Any
 
@@ -39,11 +41,15 @@ __all__ = [
     "call",
     "captain_of_the_ship",
     "keep_the_command",
+    "lookout_at_the_masthead",
+    "master_of_the_reckoning",
     "narrator",
     "officer_of_the_watch",
+    "passenger_aboard",
     "reply",
     "say",
     "silence",
+    "work_the_slate",
 ]
 
 Item = (
@@ -286,3 +292,166 @@ def captain_of_the_ship(orders: Sequence[str] = (), then_silent: bool = False) -
     """The fake at the captain's station: `orders` given one a sample after it has taken
     the command, then standing by until eight bells (or silent, `then_silent`)."""
     return Fake([keep_the_command(orders, then_silent)], loop=True)
+
+
+# The scripted master (package 41; spec M6 §11, truth 80's working at the master's
+# station): the traverse worked from the slate's words alone, as a model reads them.
+_SLATE_POINT = r"([NESW]+(?: by [NESW]+)?)"
+_SLATE_FROM = re.compile(r"(\d+)° (\d+)' ([NS]), (\d+)° (\d+)' ([EW]) by account then")
+_SLATE_BOARD = re.compile(r"\((\d{3})°\) (\d+\.\d) miles([^;]*)")
+_SLATE_ALSO = re.compile(r"(?:the tide|her drift hove to) (\d+\.\d) miles to the " + _SLATE_POINT)
+_SLATE_SIGHT = re.compile(r"moved (\d+\.\d) miles to the " + _SLATE_POINT)
+
+
+def work_the_slate(words: str, with_the_tide: bool = True) -> tuple[float, float]:
+    """The traverse worked from the slate's words alone: where it begins, each board's
+    course and distance and the tide and drift with it, each sight's move; (lat, lon)."""
+    from freesail import units
+
+    m = _SLATE_FROM.search(words)
+    assert m, words
+    lat = (int(m.group(1)) + int(m.group(2)) / 60.0) * (1 if m.group(3) == "N" else -1)
+    lon = (int(m.group(4)) + int(m.group(5)) / 60.0) * (1 if m.group(6) == "E" else -1)
+    boards = words.split("and its distance: ", 1)[1].split(". ", 1)[0]
+    de = dn = 0.0
+    for course, miles, rest in _SLATE_BOARD.findall(boards):
+        c = math.radians(float(course))
+        de += float(miles) * math.sin(c)
+        dn += float(miles) * math.cos(c)
+        for also in _SLATE_ALSO.finditer(rest):
+            if with_the_tide or not also.group(0).startswith("the tide"):
+                a = units.parse_compass_point(also.group(2))
+                de += float(also.group(1)) * math.sin(a)
+                dn += float(also.group(1)) * math.cos(a)
+    for miles, point in _SLATE_SIGHT.findall(words):
+        a = units.parse_compass_point(point)
+        de += float(miles) * math.sin(a)
+        dn += float(miles) * math.cos(a)
+    lat += dn / 60.0
+    lon += de / (60.0 * math.cos(math.radians(lat)))
+    return lat, lon
+
+
+def _position_words(lat: float, lon: float) -> str:
+    ns = "N" if lat >= 0 else "S"
+    ew = "E" if lon >= 0 else "W"
+    return f"{abs(lat):.4f} {ns} {abs(lon):.4f} {ew}"
+
+
+def keep_the_reckoning(with_the_tide: bool = True, answer_in_time: bool = True) -> Any:
+    """The built-in master's turn (package 41): when a sample's notice hands him the
+    slate for a working, he works it by the traverse and gives his figure for the
+    working's moment ('my reckoning is ...'), which the ship's account takes; with
+    `answer_in_time` false he stands by instead and the ship's master's figure stands
+    (G19's third step, the other way). A question is answered from the readings; off a
+    working he notes the glass and stands by until noon or a fix."""
+    state = {"took": False}
+
+    def turn(last: dict[str, Any], turns: Sequence[Turn]) -> Reply:
+        if "tool_results" in last:
+            return Reply()
+        question = last.get("question")
+        if question:
+            text = narrate(last, turns)
+            answer = text.calls[0].args["text"] if text.calls else text.text or "Nothing to report."
+            return Reply(calls=(ToolCall("answer", {"text": answer}),))
+        if not state["took"]:
+            state["took"] = True
+            return Reply(
+                text="I have the reckoning, sir.",
+                calls=(
+                    ToolCall("journal", {"note": "Took the master's station; the slate read."}),
+                ),
+            )
+        notice = next(
+            (n for n in last.get("notices") or [] if "The reckoning is to be worked" in str(n)),
+            None,
+        )
+        if notice is not None:
+            if not answer_in_time:
+                return Reply(
+                    text="I shall want longer than that.",
+                    calls=(ToolCall("stand_by", {"until": "noon, or a fix, or eight bells"}),),
+                )
+            lat, lon = work_the_slate(str(notice), with_the_tide)
+            return Reply(
+                calls=(
+                    ToolCall(
+                        "submit_order", {"text": f"my reckoning is {_position_words(lat, lon)}"}
+                    ),
+                )
+            )
+        return Reply(calls=(ToolCall("stand_by", {"until": "noon, or a fix, or eight bells"}),))
+
+    return turn
+
+
+def master_of_the_reckoning(with_the_tide: bool = True, answer_in_time: bool = True) -> Fake:
+    """The fake at the master's station: the slate worked by the traverse as truth 80's
+    fake officer works it, the figure given within the working's time (or not,
+    `answer_in_time`)."""
+    return Fake([keep_the_reckoning(with_the_tide, answer_in_time)], loop=True)
+
+
+def keep_a_lookout(last: dict[str, Any], turns: Sequence[Turn]) -> Reply:
+    """The built-in lookout's turn (package 41): a hail for each sighting, each sail
+    made out and each sail lost in the sample's log, in a lookout's words; a question
+    answered; nothing when nothing is seen; then standing by for the masthead's events
+    or the glass."""
+    if "tool_results" in last:
+        return Reply()
+    question = last.get("question")
+    if question:
+        r = readings_so_far(turns)
+        seen = r.get("in_sight") or r.get("lookout") or "nothing in sight"
+        return Reply(calls=(ToolCall("answer", {"text": f"From the masthead: {seen}."}),))
+    hails = []
+    for line in last.get("log") or []:
+        kind = str(line.get("kind") or "")
+        if kind == "lookout.sighting":
+            hails.append(
+                f"Sail ho! {line['text']}"
+                if "sail" in str(line["text"]).lower()
+                else f"Land ho! {line['text']}"
+            )
+        elif kind in (
+            "lookout.made_out",
+            "lookout.sail_lost",
+            "lookout.land_ahead",
+            "lookout.closing",
+        ):
+            hails.append(f"Deck there! {line['text']}")
+    if hails:
+        return Reply(
+            calls=tuple(ToolCall("submit_order", {"text": f"hail {h}"}) for h in hails[:3])
+        )
+    return Reply(
+        calls=(ToolCall("stand_by", {"until": "a sighting, or a sail lost, or eight bells"}),)
+    )
+
+
+def lookout_at_the_masthead() -> Fake:
+    """The fake at the lookout's station: a hail for what the masthead sees, nothing
+    else."""
+    return Fake([keep_a_lookout], loop=True)
+
+
+def passenger_aboard(remarks: Sequence[str] = ()) -> Fake:
+    """The fake at a passenger's station (package 41): says each remark on the
+    quarterdeck one a sample, answers a question, and otherwise stands by until eight
+    bells."""
+    given = list(remarks)
+    state = {"i": 0}
+
+    def turn(last: dict[str, Any], turns: Sequence[Turn]) -> Reply:
+        if "tool_results" in last:
+            return Reply()
+        if last.get("question"):
+            return Reply(calls=(ToolCall("answer", {"text": "A passenger knows nothing of it."}),))
+        if state["i"] < len(given):
+            text = given[state["i"]]
+            state["i"] += 1
+            return Reply(calls=(ToolCall("submit_order", {"text": f"say {text}"}),))
+        return Reply(calls=(ToolCall("stand_by", {"until": "eight bells"}),))
+
+    return Fake([turn], loop=True)

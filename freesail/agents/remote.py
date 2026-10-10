@@ -95,16 +95,14 @@ from freesail.agents import consent, tools
 from freesail.agents import harness as harness_mod
 from freesail.agents.agent import (
     A_GLASS_S,
-    CAPTAIN,
-    OFFICER,
+    CADENCES,
     OPT_OUT_TOKEN,
     SESSION_PLAY,
     SESSION_TEST,
+    STATION_FACTORIES,
     SamplingPolicy,
-    captain,
-    officer,
+    cadence_policy,
     station_name,
-    watcher,
 )
 from freesail.agents.harness import Harness, Playback, full_stop
 from freesail.agents.model import (
@@ -166,10 +164,46 @@ DOORS: dict[str, tuple[str, str]] = {
 # MCP `opt_out` too, since the chat's text never reaches the game (package 28).
 CONSENT_TOOLS_AT = {"mcp": ("answer", "opt_out"), "runner": consent.CONSENT_TOOLS}
 
-# The stations a door may ask for, each by its factory `(policy, world=...)`: the watcher,
-# the officer of the watch (package 37), which the doors name `officer`, and the captain
-# (package 40).
-STATIONS = {"watcher": watcher, OFFICER: officer, CAPTAIN: captain}
+# The kinds of station, each by its factory `(policy, world=...)` (`agent.STATION_FACTORIES`:
+# the watcher, the officer of the watch, which the doors name `officer`, the captain, the
+# master, the lookout, a passenger). Which stations a game's ship has, under which names
+# and held by whom, is the World's binding (`world.stations`, package 41): a door asks for
+# a station by its name there, and is refused in words for one the ship has not got.
+STATIONS = STATION_FACTORIES
+
+
+def station_factory(world: Any, name: str) -> tuple[str, Any]:
+    """The station's name as the ship binds it and its factory, or (name, None) when the
+    ship has no such station."""
+    name = station_name(name)
+    stations = getattr(world, "stations", None)
+    if stations is None:
+        return name, STATION_FACTORIES.get(name)
+    return name, stations.factory(name)
+
+
+def stations_aboard(world: Any) -> tuple[str, ...]:
+    stations = getattr(world, "stations", None)
+    return stations.names() if stations is not None else tuple(STATION_FACTORIES)
+
+
+def make_station(world: Any, name: str, policy: SamplingPolicy | None) -> Any:
+    """The `Station` for a name the ship binds, under that name (a station bound by hand
+    under another name than its kind's keeps the name it was bound under)."""
+    name, make = station_factory(world, name)
+    if make is None:
+        raise DeskError(
+            404,
+            f"There is no station '{name}' aboard; the stations: "
+            f"{', '.join(stations_aboard(world))}.",
+        )
+    st = make(policy, world=world)
+    if st.name != name:
+        import dataclasses
+
+        st = dataclasses.replace(st, name=name)
+    return st
+
 
 CONSENT, STATION, STOPPED = "consent", "station", "stopped"
 
@@ -217,6 +251,7 @@ class Seat:
     session_kind: str = SESSION_PLAY
     context_tokens: int | None = None  # the door's context, for the handover (package 37)
     reserve_tokens: int | None = None  # the handover's reserve, when the door gave one (37g)
+    cadence: str = ""  # the seating's cadence, when the door asked one (package 41)
     key: str = ""  # the seating's key, given once to the door that stationed (package 37g)
     left_at: str = ""  # the station this identity left by its own word, when it is asked again
     phase: str = CONSENT
@@ -313,9 +348,12 @@ class Desk:
         model_name = " ".join(str(body.get("model_name") or "").split())
         door = str(body.get("door") or "").strip().lower()
         name = station_name(name)
-        if name not in STATIONS:
+        cadence = " ".join(str(body.get("cadence") or "").lower().split())
+        if cadence and cadence not in CADENCES:
             raise DeskError(
-                404, f"There is no station '{name}'; the stations: {', '.join(STATIONS)}."
+                400,
+                f"There is no cadence '{cadence}'; a seating's cadence is one of "
+                f"{', '.join(CADENCES)} (spec M6 §12).",
             )
         if not model_name:
             raise DeskError(
@@ -329,6 +367,14 @@ class Desk:
         session = SESSION_TEST if kind == "test" else SESSION_PLAY
         with self.lock:
             world = self.world()
+            _name, make = station_factory(world, name)
+            if make is None:
+                # the ship has no such station: the binding on the World decides (41)
+                raise DeskError(
+                    404,
+                    f"There is no station '{name}' aboard; the stations: "
+                    f"{', '.join(stations_aboard(world))}.",
+                )
             seat = self.seats.get(name)
             if seat is not None and seat.world is not None and seat.world is not world:
                 seat = None  # the game was replaced (the console's replay): a new seat
@@ -380,6 +426,7 @@ class Desk:
                 reserve_tokens=int(reserve) if reserve else None,
                 key=_new_key(),
                 world=world,
+                cadence=cadence,
             )
             ask_again = bool(body.get("ask_again"))
             opted_out = decided.ask_again and not ask_again
@@ -515,11 +562,17 @@ class Desk:
             existing.take_over(model, save=self._saver(seat), door_note=note)
             h = existing
         else:
-            every, events = A_GLASS_S, frozenset({"notable", "urgent"})
-            policy = SamplingPolicy(every, events, lockstep=self.lockstep)
+            _name, make = station_factory(world, seat.station)
+            kind = next((k for k, f in STATION_FACTORIES.items() if f is make), seat.station)
+            policy = cadence_policy(seat.cadence, kind, self.lockstep) if seat.cadence else None
+            if policy is None:
+                # the station's own default cadence, in lockstep when the game is
+                every, events = A_GLASS_S, frozenset({"notable", "urgent"})
+                policy = SamplingPolicy(every, events, lockstep=self.lockstep)
+                policy = cadence_policy("glass", kind, self.lockstep) or policy
             h = Harness(
                 world,
-                STATIONS[seat.station](policy, world=world),
+                make_station(world, seat.station, policy),
                 model,
                 session_kind=seat.session_kind,
                 save=self._saver(seat),
@@ -1072,7 +1125,7 @@ def _new_key() -> str:
 
 def _drills(name: str, world: Any) -> bool:
     """Whether the station asks for the fitness drill before its brief (package 37)."""
-    make = STATIONS.get(name)
+    _name, make = station_factory(world, name)
     return bool(make is not None and make(world=world).drill)
 
 
@@ -1203,6 +1256,7 @@ class GameClient:
         ask_again: bool = False,
         context_tokens: int | None = None,
         handover_reserve: int | None = None,
+        cadence: str = "",
     ) -> dict[str, Any]:
         body: dict[str, Any] = {
             "model_name": model_name,
@@ -1212,6 +1266,8 @@ class GameClient:
             "client": client,
             "ask_again": ask_again,
         }
+        if cadence:
+            body["cadence"] = cadence  # the seating's cadence (package 41; spec M6 §12)
         if context_tokens:
             body["context_tokens"] = int(context_tokens)  # for the handover (package 37)
         if handover_reserve:

@@ -135,7 +135,7 @@ from typing import Any
 import httpx
 
 from freesail.agents import consent
-from freesail.agents.agent import CAPTAIN, OFFICER, TURN_ENDS_WORDS, station_name
+from freesail.agents.agent import CADENCES, CAPTAIN, OFFICER, TURN_ENDS_WORDS, station_name
 from freesail.agents.harness import (
     HANDOVER_RESERVE_SHARE,
     HANDOVER_RESERVE_TOKENS,
@@ -1029,11 +1029,12 @@ def station_brief_tokens(station: str) -> int:
     measured at `CHARS_PER_TOKEN`, with `SITUATION_ALLOWANCE_TOKENS` for what the ship
     adds (the log's last lines, every reading, the captain's night orders). No World is
     built for it: the runner is a client."""
-    from freesail.agents.agent import CAPTAIN, SESSION_PLAY, Brief, captain, officer, watcher
+    from freesail.agents.agent import SESSION_PLAY, STATION_FACTORIES, Brief, watcher
 
     name = station_name(station)
-    is_officer = name in (OFFICER, CAPTAIN)
-    st = officer() if name == OFFICER else captain() if name == CAPTAIN else watcher()
+    make = STATION_FACTORIES.get(name, watcher)  # a station of its kind's name; else the least
+    st = make()
+    is_officer = st.has_authority
     brief = Brief.build(
         st,
         SESSION_PLAY,
@@ -1219,9 +1220,17 @@ def main(
     ap.add_argument(
         "--station",
         default="watcher",
-        choices=["watcher", "officer", "captain"],
-        help="the station asked for: the watcher, the officer of the watch (package 37), "
-        "or the captain's station (package 40)",
+        help="the station asked for, by its name aboard: the watcher, the officer of the "
+        "watch ('officer', package 37), the captain's station (package 40), the master, "
+        "the lookout or a passenger (package 41); the game refuses in words a station the "
+        "ship has not got",
+    )
+    ap.add_argument(
+        "--cadence",
+        choices=list(CADENCES),
+        default=None,
+        help="this seating's cadence (spec M6 §12): 'glass' (the default), 'watch' or "
+        "'events' (on events only; the station's own lines are kept whatever it is)",
     )
     ap.add_argument("--session", choices=("play", "test"), default="play")
     ap.add_argument("--ask-again", action="store_true", help="put the consent question again")
@@ -1265,7 +1274,7 @@ def main(
         return EXIT_UNREACHABLE
     context = model.context_size()
     reserve = handover_reserve_tokens(args.handover_reserve, context)
-    if context and station_name(args.station) in (OFFICER, CAPTAIN):
+    if context and station_name(args.station) not in ("watcher",):
         print(handover_words(args.handover_reserve, context, reserve), file=out, flush=True)
     game = GameClient(args.game, args.station, transport=game_transport, http=game_http)
     try:
@@ -1281,6 +1290,7 @@ def main(
             # has left less than a reserve of it (`--handover-reserve`; package 37g)
             context_tokens=context,
             handover_reserve=reserve,
+            cadence=args.cadence or "",
         )
     except GameError as e:
         print(e.words, file=out, flush=True)

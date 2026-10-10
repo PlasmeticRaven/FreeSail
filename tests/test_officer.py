@@ -470,10 +470,11 @@ def test_the_grammar_refuses_the_officer_as_it_refuses_the_captain():
     captain = world.submit("let the wind veer two points").text
     assert got[0] == captain and "not carried out" in got[0]
     assert "There is no such part as the fore skysail" in got[1]
-    assert got[2] == (
-        "The officer of the watch may not ask the watcher how she lies: a station is "
-        "addressed by the captain."
-    )
+    # the deck's conversation is the officer's since package 41: `ask the watcher` is his
+    # to give, and the ship answers that nobody holds that station, as it answers the
+    # captain's own
+    assert got[2] == world.submit("ask the watcher how she lies").text
+    assert "There is no watcher at the station" in got[2]
     assert got[3].startswith("The true wind:")
 
 
@@ -2238,7 +2239,9 @@ def test_the_doors_name_the_officers_station(tmp_path):
     assert OFFICER in STATIONS and OFFICER in repl.STATIONS
     for module in (mcp_server, local):
         src = Path(module.__file__).read_text(encoding="utf-8")
-        assert 'choices=["watcher", "officer", "captain"]' in src  # the captain's since 40
+        # the stations are the World's binding since package 41: the flag takes any
+        # name aboard, and the game refuses one the ship has not got
+        assert '"--station"' in src and "choices=" not in src.split('"--station"')[1][:200]
     assert "take_the_watch" in Path(mcp_server.__file__).read_text(encoding="utf-8")
     assert "handover" in TOOLS["hand_over"].description and TOOLS["hand_over"].needs_authority
     assert TOOLS["handover_note"].needs_authority
@@ -2495,6 +2498,7 @@ def test_a_stand_by_with_the_deck_is_broken_by_danger_refused_what_cannot_end_an
         "the ship taken aback",
         "the pilot's warning",  # package 37h
         "her sails lifting",  # package 37k: said before she is taken aback
+        "a hail from the masthead",  # package 41: the lookout's station hails the deck
     }
     assert R.speaks_of_danger("weather.change", {"weather": "rain"}) is None
     assert R.speaks_of_danger("strain.warning", {}) == "a spar or a line straining"

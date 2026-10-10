@@ -11,6 +11,9 @@ ship: data/ships/topsail-schooner.yaml
 stations:
   captain: master
   officer of the watch: mate
+  # the master's station is the mate's too (spec M6 §11; package 41): the schooner's
+  # master commands her, and her mate keeps the reckoning in his place
+  master: mate
 
 wardroom:
   - role: master
