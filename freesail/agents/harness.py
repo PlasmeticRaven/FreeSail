@@ -193,6 +193,7 @@ from freesail.agents.fake import Transcript
 from freesail.agents.journal import HANDOVER_KIND, WORD_PASSED_KIND, Journal
 from freesail.agents.model import DATA, MODEL, OPERATOR, Model, Reply, Sample, ToolCall, Turn
 from freesail.api import readings as R
+from freesail.core import acts
 from freesail.core.events import Event, Rollup, RollupView, Severity
 from freesail.orders.errors import OrderError
 
@@ -567,6 +568,12 @@ class Harness:
     first_model_name: str | None = None
     first_door: str | None = None
     reserve_tokens: int | None = None
+    # Package 42 (spec M6 §14; `core.acts`): a station replayed by its acts is driven by
+    # them and samples nothing (`driven`); the state last journaled of it, and whether its
+    # acts are journaled from before it started, so that a save may be replayed by them.
+    driven = False
+    _acts_last: dict[str, Any] | None = None
+    _acts_complete = False
 
     def __init__(
         self,
@@ -751,6 +758,7 @@ class Harness:
 
     # -- start -------------------------------------------------------------------------
 
+    @acts.frame
     def start(self) -> None:
         """Take the station now: the brief as the one operator turn, the first sample."""
         world = self.world
@@ -971,6 +979,21 @@ class Harness:
         if self._open is not None:
             self.turns.append(Turn(DATA, self._as_told(self._open.to_dict())))
 
+    def take_up_after_replay(self, transcript: list[dict[str, Any]]) -> None:
+        """A station a replay drove by its acts (package 42) takes up the game where it
+        stands: it samples again from now, its record the save's transcript, its model a
+        spent playback that a door takes over (`take_over`), whose conversation begins at
+        its brief."""
+        world = self.world
+        self.driven = False
+        self.transcript = [dict(e) for e in transcript]
+        self._open = None
+        self._seen_log = self._sample_seen = len(world.log)
+        self._latest = self._horizon = (len(world.log), {})
+        self._wait_from = (len(world.log), world.clock.stamp())
+        self._acts_last = acts.state_of(self)
+        self._acts_complete = True
+
     def _always_run_words(self) -> str:
         """The tools no budget refuses, in words that fit the door (package 37g, item 2;
         the review's 5.4: the message named `say` at a door that has none, and a local
@@ -1006,11 +1029,13 @@ class Harness:
 
     # -- the hooks the World calls -----------------------------------------------------
 
+    @acts.frame
     def on_tick(self) -> None:
         self._tick_step()
         if self.started:
             self._play_door_acts(between_ticks=False)
 
+    @acts.frame
     def on_between_ticks(self) -> None:
         """A replay between two ticks, before the inputs of the tick it has reached
         (`core.replay.replay`): the acts from outside the loop due here are made, as a
@@ -1035,6 +1060,7 @@ class Harness:
             return len(world.inputs) >= self._start_after_inputs
         return len(world.journal) >= self._start_after_orders
 
+    @acts.frame
     def on_input(self) -> None:
         """After any input a replay gives again (an order refused or answered, a driver's
         line: neither reaches `on_order`): a restored station due here is seated, and the
@@ -1109,6 +1135,7 @@ class Harness:
         if reason is not None:
             self._fold(reason)
 
+    @acts.frame
     def on_order(self) -> None:
         """After an order is logged: a stand-down the captain ordered is carried out now
         (after the order is journaled, so the save holds it), and a question is served
@@ -1519,6 +1546,7 @@ class Harness:
         finally:
             self._sampling = False
 
+    @acts.frame
     def deliver(self, reply: Reply) -> None:
         """Take a reply for the open sample from outside the model call."""
         if self._open is None:
@@ -2139,6 +2167,7 @@ class Harness:
             )
         return True
 
+    @acts.frame
     def pause(self, reason: str) -> None:
         a = self.agent
         world = self.world
@@ -2237,6 +2266,7 @@ class Harness:
         )
         return text
 
+    @acts.frame
     def check_unattended(self, now: float | None = None, since: float | None = None) -> bool:
         """The unattended bound, the only one (package 31c): called from the driver's own
         clock with its monotonic time (`now`, for a test's clock or a driver's own); stands
@@ -2265,6 +2295,7 @@ class Harness:
             return True
         return False
 
+    @acts.frame
     def door_act(self, act: str, reason: str, by: str, final: bool = False) -> Any:
         """A stop that comes from outside the loop, which a replay could not otherwise
         know of: a door's release (the door closed, the client went away, Ctrl-C), the
@@ -3262,6 +3293,7 @@ class Harness:
             "yes still stands."
         )
 
+    @acts.frame
     def stand_down(self, reason: str, by: str = "the captain") -> None:
         """Journal `agent.stopped` with the reason, release the station, save. The save
         comes last so that the file holds the exit: the journal entry, the log line and
@@ -3286,6 +3318,7 @@ class Harness:
         self._release(f"stood down by {by}: {reason}", STOOD_DOWN, by=by)
         self._save(f"the {self.station.name} stood down: {reason}")
 
+    @acts.frame
     def leave(self, reason: str, how: str = "the token", final: bool = False) -> None:
         """The opt-out: journal `agent.opted_out`, release, save, end the loop (the save
         last, so that the file holds the exit). The line says which of the three ways of
@@ -3406,6 +3439,9 @@ class Harness:
             ),
             "first_door": self.door if self.first_door is None else self.first_door,
             "reserve_tokens": self.reserve_tokens,
+            # package 42: whether every act of the station is in the save's `station_acts`,
+            # from before it started, so that another build replays it by them
+            "acts": bool(self._acts_complete),
         }
 
     def snapshot(self) -> dict[str, Any]:
@@ -3476,6 +3512,21 @@ class Playback(Transcript):
     @property
     def spent(self) -> bool:
         return self.at >= len(self.entries)
+
+
+def driven_station(world: World, seated: dict[str, Any]) -> Harness:
+    """A station built by a replay of its acts where its `seated` act stands (package 42;
+    `core.acts`): driven by its acts, asking no model."""
+    h = Harness(
+        world,
+        Station.load(seated["station"]),
+        Playback(world, []),
+        session_kind=str(seated.get("session_kind") or SESSION_TEST),
+        door_note=str(seated.get("door_note") or ""),
+    )
+    h.driven = True
+    h._acts_complete = True
+    return h
 
 
 def restore(world: World, data: dict[str, Any], model: Model | None = None) -> list[Harness]:

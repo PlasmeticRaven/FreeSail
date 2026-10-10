@@ -346,7 +346,7 @@ def replay_save(
         report = replay_mod.check_replay(data, path, replay_anyway)
     except replay_mod.ReplayRefused as refused:
         raise SystemExit("\n".join(refused.report.words)) from None
-    world = replay_mod.replay(data, ship_factory)
+    world = replay_mod.replay(data, ship_factory, road=report.road)
     if out is not None:
         for line in report.words:
             print(line, file=out, flush=True)
