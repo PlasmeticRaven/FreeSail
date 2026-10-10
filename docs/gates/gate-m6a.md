@@ -1,9 +1,9 @@
 # Gate M6a: People and the captain's station
 
-**Verdict:** open. The build `m6a`, cut 2026-10-10 at package 40c's merge (decision 41), after
+**Verdict:** open. The build `m6a`, to be cut at package 37p's merge (the owner's word of 2026-10-10: the gate carries the yards and the helm by the wind, so that one cut serves), after
 packages 40 (the ship's company, the rules-based captain in three layers, the captain's
 station and the player's seat), 40b (the lessons and the officer's own reckoning) and 40c
-(the captain's trials). The chart blocks 39a and 39b landed before it and are checked here
+(the captain's trials) and 37p (the yards and the helm by the wind, the ship in a gale). The chart blocks 39a and 39b landed before it and are checked here
 as they come (spec M6 §28). The owner's runs decide it; the lead's first play is at the
 director's station when it exists and no gate waits on it.
 
