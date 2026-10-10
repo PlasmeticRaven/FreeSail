@@ -2,15 +2,24 @@
 # azores.yaml; package 39e), Funchal Road to Angra Road. Short, as the brief has it: the
 # points of the passage by the account, the landfall, the anchor. The reckoning is the
 # log's and the noon sight's alone until the land is raised (no bearing is asked of a
-# sea without marks); the points are wide, five miles and three, for an account days old.
+# sea without marks). Across the open sea the legs change on the meridians by account (a
+# point's distance missed by an account days old would send her on past it), and each
+# leg's course is shaped again every glass from the account, since the starting book's
+# "keep her full" bears her away a point at a time off a course shaped once.
 
-# Across: a point north of St Mary's and St Michael's, then the channel between St
-# Michael's and Terceira (every channel between the nine islands navigable, Tofiño 1789
-# p. 211), then a point two miles south of the Cabras.
-standing order "north of St Michaels": when the distance to 37 36 N 24 0 W is under 5 miles then shape a course for 38 24 N 26 24 W
-standing order "between the islands": when the distance to 38 24 N 26 24 W is under 3 miles then shape a course for 38 36 N 27 6 W
-standing order "past the Cabras": when the distance to 38 36 N 27 6 W is under 1 mile then shape a course for Angra Road; shorten sail
-standing order "Angra": when the distance to Angra Road is under 1.5 miles and the depth of water by the chart is under 40 fathoms then come to an anchor
+# Off: eight miles south-south-west of the road, clear of the island, before the course
+# for the islands (the straight line from the road runs over Madeira).
+standing order "off Funchal": when the distance to 32 30 N 17 0 W is under 3 miles then shape a course for 37 36 N 24 0 W
+
+# Across: north of St Mary's and St Michael's, then the channel between St Michael's and
+# Terceira (every channel between the nine islands navigable, Tofiño 1789 p. 211), then
+# a point south of the Cabras, and Angra.
+standing order "the first leg": every glass, if the reckoning is east of 23 50 W and the reckoning is west of 17 5 W then shape a course for 37 36 N 24 0 W
+standing order "the second leg": every glass, if the reckoning is west of 23 50 W and the reckoning is east of 26 15 W then shape a course for 38 24 N 26 24 W
+standing order "the third leg": every glass, if the reckoning is west of 26 15 W and the reckoning is east of 27 5 W then shape a course for 38 34 N 27 8 W
+standing order "for Angra": every glass, if the reckoning is west of 27 5 W and the distance to Angra Road is over 2 miles then shape a course for Angra Road
+standing order "past the Cabras": when the reckoning is west of 27 5 W then shorten sail
+standing order "Angra": every 2 minutes, if the distance to Angra Road is under 1 mile and the depth of water by the chart is under 40 fathoms and the speed is over 1 knot then come to an anchor
 
 # The landfall: a bearing of the land when it is raised, and a fix when two marks serve.
 standing order "landfall": at a landfall then take a bearing of the land

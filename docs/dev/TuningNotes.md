@@ -4005,3 +4005,105 @@ Measured once at the end on this tree at seed 7, by running the pinned tests and
 ### Merged with packages 41 and 42 (2026-10-10)
 
 `claude/dreamy-darwin-d77nty` merged in: only these notes conflicted (41's and 42's sections stand before this one); the captain's book, the vocabulary, the readings, the spec and the test files merged clean, 41's rules-based captain beside this package's gale books. The lead's change folded in: `harness.say_aboard` puts the say's place, hearers and `where` in its data whoever heard it (the owner's ruling of 2026-10-10, the log is the ear), so that truth 78's fake captain's "I have the command." to an empty quarterdeck carries them, and `GATE_6A_FAKE_CAPTAIN_DIGEST` moves from `aa42746f61de91d1` to `b00ac08c3f63e84c`, every line's text the same. Every other pin of `tests/test_known_truths.py` and `tests/test_captain_trials.py` held on the merged tree under `--slow` (measured again by the same pass), as neither package moves a tick of the world; the pace floors under load excepted (truth 51 472, the gate's day with its region 487 ticks a second against 500).
+
+## Milestone 6: Madeira and the Western Islands, the corridor widened (package 39e, 2026-10-10)
+
+Package 39e (spec M6 §26, block 5, widened to the Azores by decision 44; the brief in `docs/dev/M6-WorkPackages.md`; built as `docs/dev/ChartBlocks.md` says, which this package corrected where it proved wrong). Two regions alone in the ocean, `madeira` and `azores`; their tiles, coasts, indexes and marks; five port files; the islands' gauges read and held, Norie's hours, Fayal's channel; an Azores weather box; the lookout's rule at a peak's height; the corridor widened to 32 W, built, proven and **held uncommitted for the owner's word**; two scenarios. The condition: nothing of the Channel moves, which the recorded passages prove by their digests ("The suite, as run").
+
+### The constants and their sources
+
+| Constant | Value | Source | Verified |
+|---|---|---|---|
+| `REGIONS["madeira"]` bounds, fetch | 32 to 33.5 N, 17.5 to 16 W; fetched 31.5 to 33.85 N, 17.95 to 15.65 W | the brief's bounds; the fetch covers the tiles that meet them (31.60 to 33.73 N, 17.87 to 15.73 W) | `--check`: the fetch box covers the tiles whole |
+| `REGIONS["azores"]` bounds, fetch | 36.5 to 40 N, 31.5 to 24.5 W; fetched 36.2 to 40.25 N, 31.6 to 24.15 W | the brief's bounds (Flores and Corvo at 31.1 to 31.3 W within them); the tiles 36.29 to 40.13 N, 31.52 to 24.27 W | the same |
+| the harbour groups | Funchal (3 tiles), Porto Santo (2); Angra (2), Ponta Delgada (2), Horta and the Fayal channel (3) | one per port's road; boxes of 0.03 to 0.15° (judgement) | built |
+| `fill_to_chart_datum` | true for both; the world's mean level 3.98 m over Madeira and 3.20 to 3.98 m over the Azores | the nearest of the eleven alone (the islands' gauges are held): the fill stands as high above the world's tide as above the sea's | the sweep below |
+| `CORRIDORS["atlantic-corridor"]` bounds, fetch | west to 32.0 W, fetched to 32.1 W (was 20 and 20.1) | the brief; the tiles from 34.93 W (the column's whole, NODATA west of 32.1 W as before west of 20.1) | built and held (below) |
+| `CHARTS["atlantic-east"]["regions"]` | the coast's three, then `madeira`, `azores` | the voyage's order: the islands after the coast's blocks (39c, 39d and 39f go between at the merge) | the tests |
+| `build_charts.save_tile`, `TILE_ZIP_DATE` | every tile's zip entries dated 1980-01-01 | the lead's ruling of 2026-10-10: a rebuild's byte-identity is to mean array-identity | a rebuild of the islands' tiles byte-identical; the test |
+| `chart.SEARCH_HEIGHT_M` | 300 m | the in-sight search's old reach (`horizon_nm(0, 300)`); a feature taller is looked for wherever she is | the Channel's tallest mark is 241 m: `tall` empty on its charts |
+| `chart.CLEAR_VISIBILITY_NM` | 12 miles | the weather's "the horizon" (`weather.VISIBILITY_NM`); in it a peak is seen to its own horizon (Tofiño 1789 p. 226: the Peak "may be seen in clear weather" 32 leagues off) | the test: seen at 112 miles, not at 114 |
+| the held gauges | Funchal, Ponta Delgada, Angra, Horta, Santa Cruz das Flores (TICON) | TICON.txt read 2026-10-10 (the zip's SHA-256 7055f8ed…6514, unchanged); the longest record of each | the constants read; no mean level read (null) |
+| the epitome's three places (`norie`) | Funchal 12h 4m, 7 ft; Angra Bay 11h 45m, 8 ft; Fayal Road 2h 20m, 4 1/2 ft | Norie 1805, Table XLI pp. 248 to 250, the page images | read; Fayal's hour against Tofiño's half past twelve (below) |
+| `streams.yaml` `fayal-channel` | NE 3 knots at springs, 1.5 at neaps, strongest 3 h before high water | Tofiño 1789 pp. 224 to 225 (the axis and the springs' rate); the neaps and the hour JUDGEMENT | `test_tide.py`'s form test |
+| `book_waters` | the Western Islands' box, 36.5 to 40 N, 31.5 to 24.5 W | so that the open Channel's statement does not answer for the ocean between; judgement | the test |
+| the `azores` weather box | 34 to 43.5 N, 33 to 20 W; winter westerlies and gales, the Azores high over the islands in summer | PROVISIONAL and JUDGEMENT in every row, from memory of the pilot charts' roses (NOT READ); Madeira's box first where they meet | `test_weather.py` |
+
+### The sources, fetched
+
+EMODnet's DTM 2024 (`elevation` and `elevation_max`) over Madeira's box (20.0 MB each) and the Azores' (111.4 MB each), GEBCO_2025's area extracts for the two (2.6 and 11.5 MB) and for the widened corridor (193.3 MB, 7,488 by 4,608 cells at 15″), all retrieved 2026-10-10 through the proxy into a fresh cache (`.cache/charts-39e`), their checksums in the manifest (the corridor's in the held manifest); one poll of GEBCO's queue was reset by the proxy, and `_get_json` now asks again. TICON's zip (CC BY 4.0) from store.pangaea.de; the OCR texts of the Oriental Navigator (1801 and 1794), Howe's sketch of 1787, Tofiño's *Derrotero* of 1789, Norie's *Epitome* of 1805, Herbert's *New Directory* (1791), Ashe's and Boid's books on the Azores (1813, 1834; read, not cited) and Moore 1799 (no row of the islands) from the Internet Archive (public domain); Norie's Table XLI as page images through the archive's IIIF server; eleven light pages of the Portuguese encyclopaedia (its API refused for its rate). Everything fetched lies under `.cache/` and was read by the tool or by scripts kept outside it, with `python3 -I`.
+
+### The patches and their datums
+
+None. No period plan of a road was read: Tofiño names his plans of Angra and of the port of Fayal ("véase su plano") and they were not found; the English plan of Funchal Road the spec names was not found; Vidal's survey is of the 1840s. Every port file says `datum: unverified`, and no mean level above a chart's datum was read for any gauge of the islands. EMODnet's grid has no modern mole at Funchal or Ponta Delgada at its sixteenth of a minute (the Loo stands as a rock off the beach), so the roads are 1805's without a patch.
+
+### The checks, as printed (`python tools/build_charts.py --check madeira --check azores`)
+
+```
+Checks for the block madeira:
+  licences: emodnet_dtm_2024, gebco_2025 (allowed)
+  features within the bounds: 28 of 28 (a harbour patch's box counts as the region's)
+  ids unique across the manifest's regions: yes
+  sources in the references' form: 28 of 28
+  harbour patches with their datum stated: 0 of 0
+  the fetch box covers the tiles whole: yes (31.5 to 33.85 N, 17.95 W to 15.65 W)
+  tiles another region lists: 0 kept (level 2: 0, level 3: 0; not written, not listed)
+  the block passes its checks (the shore's sweep for GEBCO's fill is the build's).
+Checks for the block azores:
+  licences: emodnet_dtm_2024, gebco_2025 (allowed)
+  features within the bounds: 59 of 59 (a harbour patch's box counts as the region's)
+  ids unique across the manifest's regions: yes
+  sources in the references' form: 59 of 59
+  harbour patches with their datum stated: 0 of 0
+  the fetch box covers the tiles whole: yes (36.2 to 40.25 N, 31.6 W to 24.15 W)
+  tiles another region lists: 0 kept (level 2: 0, level 3: 0; not written, not listed)
+  the block passes its checks (the shore's sweep for GEBCO's fill is the build's).
+```
+
+The tool has no check of a corridor (`--check` takes a region); the corridor's build prints its source's licence refusal and the tests hold its entry (`test_chart.py`).
+
+At the build the shore's sweep for GEBCO's fill printed 156 cells in 29 places over Madeira (the largest 32 cells about 32.73 N 16.73 W, the low land of Caniçal under Lorenzo Point; 16 about 33.08 N 16.28 W, Porto Santo's north-east end; 12 about 32.62 N 16.93 W, the beach under Funchal) and 548 in 100 over the Azores (30 about 38.68 N 27.28 W, Terceira's south-west shore; 25 about 38.73 N 27.08 W, the bay of Praya; 23 about 38.58 N 28.62 W, Fayal's east shore by Espalamaca; 20 about 37.73 N 25.68 W, Ponta Delgada's front): single cells of the shore line between EMODnet's last wet cell and GEBCO's land on steep volcanic coasts, left as they are.
+
+### The corridor widened, measured (held uncommitted)
+
+`python3 tools/build_charts.py --corridor atlantic-corridor --cache .cache/charts-39e`, the recipe's west bound at 32 W: 48 tiles (18 added in three new columns from 34.93 W), 9,746,887 bytes, the distance field in 3.6 s. **Every one of the 30 existing tiles changed**, compared array by array against the committed ones (a scratch script; numpy's old writer dated each zip entry with the clock, so the bytes alone would have differed in any case):
+
+| What changed | Where | How much |
+|---|---|---|
+| the old west column's empty strip filled | the six tiles from 22.13 W (`*_-79680`) | 53,680, 124,929 (three tiles), 124,932 and 8,784 cells that were `NODATA` (22.13 to 20.1 W) now GEBCO's |
+| the distance field, where the Azores are the nearest land | the west column, and `136800_-64320` | up to 613 cells (568 km) in `136800_-79680`, 564 and 484 in its neighbours, 56 in `136800_-64320`; 41,903 to 259,313 cells a tile in the west column |
+| the half-metre ties of a new sampling origin | every tile | ±1 m in 1 to 2,121 cells a tile (the bilinear mean of four 15″ cells falls on a half-metre and rounds the other way when the grid's origin moves), 0 to 11 cells a tile turning between land and sea; the field a cell at most, in 2 to 2,340 cells; the block minima in 1 to 156 blocks |
+
+No recorded passage and no trial reads the corridor: every one is `region: channel-west`, and a chart named by a region has no corridor (`Chart.__init__`, `self.corridor = None`); the scenarios on `chart: atlantic-east` are 39a's and 39b's (not pinned), whose water is the regions'. The lead confirmed it and ruled the widening be committed; the permission system refused the commit in this worktree (the brief's rule had said to stop and not commit), and the lead put it to the owner. **The rebuild is held** at `.cache/39e-corridor-widened/` (`atlantic-corridor/`, 48 tiles written by `save_tile`; `manifest-with-corridor.yaml`), its arrays identical to the first rebuild's, and is applied in this worktree by two commands:
+
+    python3 tools/build_charts.py --corridor atlantic-corridor --cache .cache/charts-39e --skip-fetch
+    git add data/charts/tiles/1/atlantic-corridor data/charts/manifest.yaml
+
+(the second after the owner's word). The tool's recipe is committed at 32 W, and `tests/test_chart.py` reads whichever corridor the manifest has.
+
+### The schooner's passage, sailed once (`data/scenarios/madeira.yaml`, seed 7)
+
+The American schooner from Funchal Road at 06:00 on 14 June 1805, her anchor just weighed, before a westerly of twelve knots going round by the north to the north-east trade in the afternoon (pinned): the shore boat of Funchal hails at 06:05 and, unanswered, bears away at 06:25; off the Brazen Head at 06:40 and the course shaped two miles south of Lorenzo Point; at 09:07 for a point south of Porto Santo; noon by observation 32° 50′ N against the reckoning's 32° 52′; at 13:06 for the road, the fore topgallant taken in and the topsail reefed; Porto Santo's boat hails at 14:08 and bears away; **at anchor in Porto Santo Road in sixteen fathoms at 14:31**, brought up at 14:48 in fifteen and a half. Under way again at 15:18 on the larboard tack to the south-east; north-east of Lorenzo Point at 19:32, round it at 21:07, the land about Machico raised at 22:57 (the account 2.4 miles out after five hours of the night with no mark), the Brazen Head a mile off at midnight, the fore topsail and the mainsail taken in at 00:20, **at anchor in Funchal Road in thirty-three fathoms at 00:39** on the 15th (the directions' thirty-six or thirty-eight), brought up at 00:58. Thirty hours: 871 lines, digest `4ef28afd9f994876` (the build machine; `tools/day_log.py data/scenarios/madeira.yaml --hours 30 --reckoning`); the account at the end within a cable of the truth. Not a gate's, not pinned.
+
+Nine first runs found the book's faults and two of the engine's, kept here for the next block's book (the findings below): started within the anchor's distance of Funchal Road she let go at once; with a north-westerly all day the road of Porto Santo lay to windward and the planner, which keeps her full and by on one tack and never beats, stood her off a hundred and sixty miles; a point missed by a mile and a half when a fix moved her account sent her on past it; the way out's points met again on the way home turned her back; the islet off Porto Santo's south-west end lay on a course shaped for the road; and at both roads the anchor let go by a distance alone fell in water too deep for her cable (the bank falls from eighteen fathoms to ninety within three quarters of a mile at Funchal, to a hundred and eighty within a mile at Porto Santo), was refused, and was not asked again: she sailed on onto the beach.
+
+FROG_PLACEHOLDER
+
+### Found on the way (package 39e)
+
+- **The corridor's widening rewrites every one of its tiles** (above): the brief's premise, "the tiles are whole on a fixed grid and the source the same", missed the old west column's `NODATA` beyond the fetch box, the distance field's new nearest land and the half-metre ties of a new sampling origin; and numpy's `savez_compressed` dated every zip entry with the clock, so no rebuild was byte-identical even of the same arrays. The tool's tiles are written by `save_tile` now (the lead's ruling), and a rebuild from the same cache is byte for byte the same (the islands' 178 level-2 tiles and the corridor's 48 rebuilt and compared). The existing regions' tiles keep their old bytes. **No pinned scenario reads the corridor** (every recorded passage and trial is `region: channel-west`, whose chart has no corridor), as the slow tier proves for the tree as committed; the widened corridor is held for the owner's word.
+- **The lookout could not see a peak.** `Chart.in_sight` searched the index to the horizon of an object of 300 m and the weather's clearest visibility is twelve miles, so the Peak of Pico (2,351 m) was seen at twelve miles at the most; a feature taller than `SEARCH_HEIGHT_M` is now looked for wherever she is and, in "the horizon" visibility, seen to its own geographic horizon (113 miles from a frigate's masthead). No feature of the Channel is taller than 241 m: nothing it sees moves. The weather has no cloud on a hill: Madeira, which the directions say is often hid in cloud till close aboard, is seen at ninety miles in clear weather (a finding for the weather's package).
+- **EMODnet does not hold the small islets** of the Azores: the Formigas (66 m of water at their place, nothing under 34 m within eight kilometres), the Cabras off Angra (a shoal awash), the islet of Vila Franca, the Mosteiros and the islets of the Magdalena; nor the Dollabarat shoal, nor Tofiño's Bank of Fayal (22 feet), where the grid has 90 to 150 m. The Formigas stand in the world by their feature (a rock of 9 m with 600 m of solid ground about it); the rest are marks, said in each `fix`.
+- **The islands' tide is the Channel's.** The world's tide over the islands is the nearest of the eleven alone (Le Conquet's, a range of five metres and more, where Funchal's gauge gives two); the five gauges read lie beyond the 400 miles' reach of every Channel position, so blending them would move no Channel digest, but they want a mean level above a chart's datum each, which no open source gave here. Held, as the brief has them: the lead's to blend once the levels are read (the Portuguese hydrographic office's tables).
+- **Tofiño's bearings are true**, by the Punta Delgada and the Galera; **Norie's Fayal Road** (2h 20m, 4 1/2 feet) disagrees with Tofiño's survey (half past twelve, eight Spanish feet) and with the gauges, which put Horta within five degrees of Angra (Norie's 11h 45m): the epitome keeps Norie's figure, the master's error to make. TICON's two records of Ponta Delgada disagree by 36 degrees in M2 (the shorter BODC series); the longer UHSLC series agrees with its neighbours and is taken.
+- **The directions' limits are one box**, and within it the open Channel's statement answers where no area does: widened to the islands it would give the Channel's north-easterly stream to the whole ocean between. A second kind of water, `book_waters`, where only an area with a polygon answers (`tide.Directions.waters`, the code's one change for the tide); the Channel's lookup is unchanged.
+- **The engine's planner never beats to windward.** `shape a course` for a place to windward keeps her full and by on one tack ("lies too near the wind to be laid; she is kept full and by on the larboard tack") and never puts about for it: a road to windward is never fetched, and a book must have the wind free on every leg (both scenarios' weather is pinned so). A finding for the captain's and the officer's packages.
+- **The condition `the distance run since noon` is none before the first noon**, where the reading says "before the first noon, the run since the departure" (docs/primer/10): a book's "under 25 miles" is never true on the first morning. The schooner's book uses daylight instead.
+- **An anchor refused is not asked again.** A `when` order that lets go by a distance near a road on a steep bank is refused for the depth ("no anchoring ground here: 165 fathoms") and does not fire again while its condition stays true; the books ask every two minutes while she has way on (`every 2 minutes, if ... and the speed is over 1 knot`).
+- **The depth warning speaks of the Channel**: "33 fathoms is deep water to anchor in: the roads lie in seventeen fathoms and less" at Funchal, whose road is thirty-six fathoms by the directions. The warning's figure wants to be the port's (a finding for the anchor's code).
+- **Sea passages are no places.** A `place` is land the lookout raises and a fix may use: the passage between Madeira and the Desertas was hailed "four leagues off" and served as a mark in a fix. The islands' three passages are `bottom` notes (not raised, found by name). Channel-mid's "Race of Portland" is a `place` the same way (not this package's file).
+- **Open sea is dear**: 131 of the Azores' 153 level-2 tiles hold no land and lie three miles and more from it, 260 KB each (the multibeam relief compresses badly; Madeira's are 107 KB): 40.5 MB, against the owner's "about 18". Writing only the tiles within ten miles of land would be 33 tiles and 10.4 MB, the corridor answering the rest at 30″, once the corridor reaches the islands (a recipe rule for the lead and the owner).
+- **The proxy reset one poll of GEBCO's queue**, and the build fell over; `_get_json` asks again (four times, ten to forty seconds apart).
+- **Wikimedia's API refused the build network for its rate**; the encyclopaedia's pages themselves served. The Internet Archive's IIIF server serves any page of a scanned book cropped and scaled, which read Norie's columns the OCR lost.
+
+SUITE_PLACEHOLDER

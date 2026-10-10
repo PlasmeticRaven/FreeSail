@@ -20,8 +20,9 @@
 # depth answers nothing and the ship sails on as over deep water.
 #
 # The passage as the book beside this file sails it (azores.orders): she weighs from
-# Funchal Road at six in the morning of 15 June 1805 and shapes a course west-north-west
-# before the north-east trade for a point north of St Mary's and St Michael's, then for
+# Funchal Road at six in the morning of 15 June 1805, stands off south-south-west eight
+# miles clear of the island and shapes a course north-west before the north-east trade,
+# west of Madeira, for a point north of St Mary's and St Michael's, then for
 # the channel between St Michael's and Terceira, then past the Cabras for Angra Road,
 # where she anchors east of Monte Brasil (Tofiño 1789 p. 204: ships of war in 30 or 40
 # brazas, sand). The weather is pinned, the trade from the north-east and east-north-east
@@ -36,7 +37,7 @@ position: {lat_deg: 32.6380, lon_deg: -16.9060}   # Funchal Road (the Oriental N
 chart: atlantic-east
 ship:
   file: data/ships/frigate-36.yaml
-  heading_deg: 270
+  heading_deg: 200
   glass: true
   instrument: sextant
 wind:
@@ -76,4 +77,4 @@ standing_orders:
 
 orders:
   - set plain sail
-  - shape a course for 37 36 N 24 0 W
+  - shape a course for 32 30 N 17 0 W
