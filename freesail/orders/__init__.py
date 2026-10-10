@@ -261,7 +261,14 @@ def _group_evolution(
     # hands: "setting plain sail"
     first, _, rest = order.verb.partition(" ")
     group = f"{gerund(first)} {rest}".strip()
-    for line in vocab.group_evolutions[order.verb]:
+    lines = list(vocab.group_evolutions[order.verb])
+    if order.verb == "shorten sail":
+        # package 37p: the jibs by their ratings, and the storm staysails over the storm
+        # line, as the wind has risen (`orders.storm`)
+        from freesail.orders import storm
+
+        lines += storm.shorten_sail_lines(ship, storm.true_wind_kn(ship))
+    for line in lines:
         try:
             sub = parse(ship, line, vocab)
         except UnknownNounError:

@@ -35,7 +35,7 @@ standing order "gale canvas": when the true wind exceeds 36 knots for 5 minutes
 # hour, the storm staysail comes in, the topgallant masts go up, the reefs come out and the
 # plain sail is set again. The storm staysail's being set is what says there was a gale.
 standing order "make sail after the gale": when the fore storm staysail is set and the true wind is under 25 knots for 30 minutes
-    then take in the fore storm staysail; sway up the topgallant masts; shake out the reefs in the topsails; set plain sail
+    then take in the storm staysails; sway up the topgallant masts; shake out the reefs in the topsails; set plain sail
 
 # The topgallants again once their masts are up: the plain sail of the order above cannot
 # set a topgallant whose mast is still on deck. The masts go up before the reefs come out

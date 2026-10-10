@@ -48,11 +48,12 @@ standing order "trim on a shift": when the true wind veers 1 point or backs 1 po
 standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets
 ```
 
-**Heavy weather, and the storm staysail.** Forty knots is a gale; five minutes tells a gale from a squall. The close reef leads, because the hands go to the first clause first and the topsails must be reefed before the weather comes; the topgallant masts come down next, the fore topmast staysail in, and the storm staysail is bent, and set by the companion order as soon as it is bent and furled.
+**Shortening sail, and the head sails.** The book's thirty knots gives `shorten sail`, and since package 37p `shorten sail` does more than its list as the wind rises (chapter 9): a jib loaded near its rating comes in before a gust blows it out, the courses are reefed with the second reef and the mainsail and the spanker taken in with the third, and the storm staysails go up over forty knots or when the fore topmast staysail is loaded near its rating. In the captain's trials, before it did, the frigate's jib and fore topmast staysail blew out of their bolt-ropes and she lay aback for an hour with nothing set forward.
+
+**Heavy weather, and the storm staysails.** Forty knots is a gale; five minutes tells a gale from a squall. The close reef leads, because the hands go to the first clause first and the topsails must be reefed before the weather comes; the topgallant masts come down next; and `set the storm staysails` bends them from the sail room, sets each as soon as it is bent, and takes in the head sails and the spanker it replaces once it is set, so that she is never left with nothing forward. Lying to is not the book's: whether she has the sea room to lie to is the captain's judgement (`lie a-try`, chapter 9).
 
 ```orders frigate
-standing order "heavy weather": when the true wind exceeds 40 knots for 5 minutes then close reef the topsails; send down the topgallant masts; take in the fore topmast staysail; bend the fore storm staysail
-standing order "storm staysail": when the fore storm staysail is furled and the true wind exceeds 40 knots then set the fore storm staysail
+standing order "heavy weather": when the true wind exceeds 40 knots for 5 minutes then close reef the topsails; send down the topgallant masts; set the storm staysails
 ```
 
 **The well.** Sounding the well every glass is the pump routine of Luce's day. The ship has no well yet, so the order is entered in the book and held, the line that enters it saying why, and it never fires until the well is a reading; it is kept so that the book is complete when the well arrives.

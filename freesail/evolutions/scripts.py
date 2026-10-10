@@ -54,6 +54,7 @@ from freesail.ship import parts
 from freesail.ship.graph import Ship
 from freesail.ship.parts import HelmMode, LineState, Sail, SailState, Spar, sync_catharpins
 from freesail.ship.schema import YARD_LIKE_CLASSES
+from freesail.ship.stub import OrderError
 
 if TYPE_CHECKING:
     from freesail.physics.wind import Wind
@@ -1559,6 +1560,7 @@ HELM_MANOEUVRES = frozenset(
         "tack",
         "wear",
         "boxhaul",
+        "box_off",
         "wear_short_round",
         "lie_a_try",
         "scud",
@@ -2234,9 +2236,11 @@ class HeaveToScript(Script):
         off_kn = self.timing_value("way_off_kn", 1.5)
         most_kn = self.timing_value("way_most_kn", 4.5)
         ahead_kn = units.ms_to_knots(dyn.u)
+        # her way no longer changing, ahead or astern (package 37p: with sternway she lies
+        # to with the way she has, drifting, where the heave-to waited for a way that
+        # never came and failed in the captain's trials' gale, five knots astern)
         settled = (
-            abs(self.slowing) <= self.timing_value("way_steady_kn_s", 0.004)
-            and -off_kn < ahead_kn < most_kn
+            abs(self.slowing) <= self.timing_value("way_steady_kn_s", 0.004) and ahead_kn < most_kn
         )
         way_off = way < off_kn or settled
         if near <= self.off <= far and way_off and quiet:
@@ -2246,7 +2250,7 @@ class HeaveToScript(Script):
         if self.quiet_s >= self.timing_value("lie_s", 20.0):
             self._hove_to()
         elif self.t >= self.timing_value("way_off_timeout_s", 600.0):
-            if POINT < self.off < 8 * POINT and way < most_kn:
+            if POINT < self.off < 8 * POINT and ahead_kn < most_kn:
                 self._hove_to()  # on her tack, the wind before the beam: she lies to
             else:
                 dyn.target_rudder = 0.0
@@ -2271,12 +2275,19 @@ class HeaveToScript(Script):
 
     def words(self) -> dict[str, Any]:
         tack = _tack_name(self.sign)
+        astern = units.ms_to_knots(-self.ship.dyn.u)
+        drifting = ""
+        if astern >= self.timing_value("way_off_kn", 1.5):
+            # package 37p: she lies to with the way she has, and the line says so
+            from freesail.crew.model import number_words  # local import: the words' home
+
+            drifting = f"; she has {number_words(round(astern))} knots of sternway, and drifts"
         if not self.yards and getattr(self, "headsail", None) is not None:
             from freesail.evolutions.runner import part_name  # local import to avoid a cycle
 
             backed = part_name(self.ship, self.headsail.id) + " sheet to windward,"
-            return {"backed": backed, "hove_tack": tack}
-        return {"backed": self._backed_name(), "hove_tack": tack}
+            return {"backed": backed, "hove_tack": tack, "drifting": drifting}
+        return {"backed": self._backed_name(), "hove_tack": tack, "drifting": drifting}
 
     def data(self) -> dict[str, Any]:
         d = super().data()
@@ -4270,6 +4281,133 @@ class BoxHaulScript(Script):
             "new_tack": new,
             "new_course": units.format_heading(self.new_course),
         }
+
+
+class BoxOffScript(BoxHaulScript):
+    """Box her off (package 37p; Luce 1866, ch. XXV, Wind Baffling, 'To Box Off': "if she
+    still comes to against the helm, ... Up mainsail and spanker! ... Brace abox the head
+    yards! If the wind is not already on the port bow this will effect your object, by
+    boxing her off; and when the after sails fill, let go and haul as in tacking").
+
+    She has come to against the helm, or been taken aback, on the tack the wind is on: the
+    mainsail and spanker are hauled up, the after yards squared and the head yards braced
+    abox at once (box-hauling's `box` phase, no luffing first), and the helm put for the
+    way she has, a-lee with sternway, up with headway (`BoxHaulScript`'s rule). The head
+    yards aback press her head off to leeward; when she has fallen off `fill_off_deg`
+    from the wind on the same tack, the after sails will take: "let go and haul", every
+    yard braced sharp up for that tack (the after yards the sharper, spec 3b §2.2), the
+    mainsail and spanker set again, and the helm keeps her full and by. If she goes round
+    by the stern instead (the wind on the other bow already, Luce's next case), she comes
+    to on the other tack as a box-haul ends. The helm full and by orders it itself after
+    `BOX_OFF_AFTER_S` aback (`keep_full_and_by`)."""
+
+    def begin(self, words: dict[str, Any]) -> None:
+        dyn = self.ship.dyn
+        self.sign = 1.0 if dyn.tack == "starboard" else -1.0
+        helm = units.deg_to_rad(self.timing_value("helm_deg", 25.0))
+        dyn.helm_mode = HelmMode.RUDDER
+        dyn.steady = False
+        dyn.target_rudder = self.sign * helm if dyn.u < 0.0 else -self.sign * helm
+        self._box()
+
+    def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        if self.phase != "haul":
+            rel = wind_rel(self.ship, wind)
+            off = units.deg_to_rad(self.timing_value("fill_off_deg", 80.0))
+            if self.phase == "fall_off" and self.sign * rel >= off:
+                self._haul(factor)
+                return
+            super().tick(dt, wind, factor)
+            return
+        self.t += dt
+        assert self.swing is not None
+        if self.swing.advance(dt, factor):
+            self.finish()
+
+    def _haul(self, factor: float) -> None:
+        """'Let go and haul!': every yard braced sharp up for her tack, the mainsail and
+        spanker set again, and the helm keeps her full and by."""
+        self.phase = "haul"
+        ship = self.ship
+        words = self._restore()
+        head, after = self.head, self.after
+        sharp = sharp_up_targets(ship, head, after)
+        yards = head + after
+        targets = [self.sign * sharp.get(y.id, y.brace_limit) for y in yards]
+        self.swing = YardSwing(yards, targets, self.timing_value("brace_s", 45.0))
+        dyn = ship.dyn
+        dyn.helm_mode = HelmMode.FULL_AND_BY
+        dyn.target_rudder = 0.0
+        dyn.steady = False
+        self.new_course = dyn.heading
+        tack = _tack_name(self.sign)
+        self.note(f"Her after sails take. Let go and haul! Brace up for the {tack} tack.{words}")
+
+    def remaining_s(self) -> float:
+        return max(0.0, self.timing_value("box_estimate_s", 240.0) - self.t)
+
+    def words(self) -> dict[str, Any]:
+        return {"tack": _tack_name(self.sign), "new_tack": _tack_name(self.sign)}
+
+
+# Taken aback full and by, the helm boxes her off itself after this long (package 37p;
+# the brief's two minutes: long enough for a gust's heading to pass and for the shifted
+# helm to pay her off with the sternway she gathers, `physics/hull.py`; short of the hour
+# the captain's trials lay aback). Judgement.
+BOX_OFF_AFTER_S = 120.0
+# In irons (package 37p): going astern faster than this with her head in the wind, full
+# and by; judgement, the sternway at which the keel's grip astern begins to act
+# (`hull.STERNWAY_YAW_FROM_KN`), below which she is only losing her way.
+IN_IRONS_KN = 1.0
+
+
+def keep_full_and_by(ship: Ship, runner: Any, dt: float = 1.0) -> None:
+    """Once a tick, from the runner: the helmsman keeping her full and by who finds her
+    aback `BOX_OFF_AFTER_S` together (`physics.hull`'s count of her net thrust astern with
+    her sails pressed), or in irons as long (her head in the wind, her sails shaking and
+    not pressed, going astern faster than `IN_IRONS_KN`: the lee-shore trial's last hours,
+    an hour and more at a knot and a half astern with the helm hard over), with no
+    manoeuvre in hand, not lying to and free of the anchor and the ground, has her boxed
+    off (`BoxOffScript`), once an episode, with a line that says why."""
+    dyn = ship.dyn
+    if dyn.helm_mode is not HelmMode.FULL_AND_BY:
+        return
+    st = ship.extra.get("hull")
+    if st is None:
+        return
+    aback = float(getattr(st, "seconds_aback", 0.0))
+    memo = st.extra
+    if dyn.u < -units.knots_to_ms(IN_IRONS_KN):
+        memo["in_irons_s"] = float(memo.get("in_irons_s", 0.0)) + dt
+    else:
+        memo.pop("in_irons_s", None)
+    irons = float(memo.get("in_irons_s", 0.0))
+    if aback <= 0.0 and irons <= 0.0:
+        memo.pop("boxed_off", None)
+        return
+    if max(aback, irons) < BOX_OFF_AFTER_S or memo.get("boxed_off"):
+        return
+    if "hove_to" in ship.extra or ship.extra.get("aground"):
+        return
+    tackle = ship.extra.get("ground_tackle")
+    if tackle is not None and any(a.down for a in tackle.anchors):
+        return
+    for inst in getattr(runner, "instances", None) or ():
+        if inst.evo.id in HELM_MANOEUVRES or inst.evo.id == "box_off":
+            return
+    memo["boxed_off"] = True
+    why = "aback" if aback >= BOX_OFF_AFTER_S else "in irons, going astern,"
+    ship.note(
+        "notable",
+        "helm.box_off",
+        f"Two minutes {why} and she will not pay off: box her off!",
+        ship.name,
+        {"seconds_aback": round(aback), "seconds_in_irons": round(irons)},
+    )
+    try:
+        runner.start(ship, "box_off", "ship", {})
+    except OrderError as e:
+        ship.note("notable", "evolution.failed", f"Could not box her off: {e}", ship.name)
 
 
 def _topsails_on(ship: Ship, yards: list[Spar]) -> list:
@@ -7237,6 +7375,7 @@ SCRIPTS: dict[str, type[Script]] = {
     "loose_to_dry": LooseToDryScript,
     "furl_all": FurlAllScript,
     "boxhaul": BoxHaulScript,
+    "box_off": BoxOffScript,
     "lie_a_try": LieATryScript,
     "scud": ScudScript,
     "back_and_fill": BackAndFillScript,

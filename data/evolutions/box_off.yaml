@@ -1,0 +1,41 @@
+# Box her off (scripted, BoxOffScript in scripts.py; package 37p): she has come to
+# against the helm, or been taken aback, and is recovered on the tack the wind is on
+# (Luce 1866, ch. XXV, Wind Baffling, 'Coming to against the Helm', 'To Box Off': "if
+# she still comes to against the helm, Main clew-garnets and buntlines! Spanker brails!
+# Up mainsail and spanker! Man weather head braces! ... Brace abox the head yards! If
+# the wind is not already on the port bow this will effect your object, by boxing her
+# off; and when the after sails fill, let go and haul as in tacking").
+#   box       "Up mainsail and spanker! Square away the after yards! Brace abox the
+#             head yards!" over brace_s, at once (box-hauling's box phase; no luffing
+#             first); the helm a-lee with sternway, up with headway
+#   fall_off  the head yards aback press her head off to leeward; the helm shifted as
+#             her way changes
+#   haul      her head fill_off_deg from the wind on the same tack: "let go and haul",
+#             every yard braced sharp up for the tack over brace_s, the mainsail and
+#             spanker set again, the helm full and by
+# If she goes round by the stern instead she comes to on the other tack as a box-haul
+# ends. The helm full and by orders it itself when she has been aback two minutes
+# (scripts.BOX_OFF_AFTER_S). Every figure is box-hauling's but fill_off_deg, judgement:
+# a point abaft her close-hauled angle, so that braced up the after sails are full at once.
+id: box_off
+verb: box_off
+applies_to: {class: ship}
+script: box_off
+preconditions: []
+timing:
+  helm_deg: 25
+  brace_s: 45
+  brace_rate_deg_s: 1.0
+  fill_off_deg: 80        # her head this far from the wind on her tack: let go and haul
+  steady_deg: 5
+  box_timeout_s: 900
+  box_estimate_s: 240
+on_start: {log: "Box her off! Stand by the head braces."}
+on_complete: {log: "Boxed her off; braced sharp up on the {tack} tack, full and by.", kind: ship.boxed_off, severity: notable}
+on_fail: {log: "Could not box her off: {reason}.", kind: evolution.failed, severity: notable}
+# crew: "Man weather head braces!" and the clew-garnets and spanker brails: all hands, as
+# for box-hauling (Luce 1884, ch. XXIV, 'Box-hauling').
+crew: {hands: all, rating: ordinary, stations: [all hands]}
+# A manoeuvre: it stops the sail work in hand, which holds and resumes after (spec M3 §3.4).
+belays: true
+source: "Luce 1866, ch. XXV Wind Baffling, 'Coming to against the Helm', 'To Box Off'; Luce 1884, ch. XXIV, 'Box-hauling'"

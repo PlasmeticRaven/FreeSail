@@ -119,17 +119,24 @@ def test_wrecked_yards_are_reported_not_trimmed():
 
 
 def test_trim_targets_follow_the_lift_peak():
+    """The lowest yard follows the lift peak to its limit; since package 37p the yard
+    above it is braced in from it by the trim's step (`trim.UPPER_YARDS_IN_DEG`, the
+    period's trim by the wind, tests/test_gale.py)."""
     ship, runner = frigate(41.0)
     handle(ship, "trim the yards")
+    from freesail.evolutions.trim import UPPER_YARDS_IN_DEG
     from freesail.physics.sails import SAIL_CLASSES
 
     cls = SAIL_CLASSES["square"]
     best = cls.alpha[max(range(len(cls.lift)), key=lambda i: cls.lift[i])]
     chord = units.deg_to_rad(41.0) - best
-    yard = ship.spars["fore.topsail.yard"]
-    expected = min(math.pi / 2 - max(chord, 0.0), yard.brace_limit)
-    got = {s: p["target_angle"] for _, s, p in runner.started}["fore.topsail.yard"]
-    assert got == pytest.approx(expected)
+    course = ship.spars["fore.yard"]
+    expected = min(math.pi / 2 - max(chord, 0.0), course.brace_limit)
+    got = {s: p["target_angle"] for _, s, p in runner.started}
+    assert got["fore.yard"] == pytest.approx(expected)
+    topsail = ship.spars["fore.topsail.yard"]
+    step = units.deg_to_rad(UPPER_YARDS_IN_DEG)
+    assert got["fore.topsail.yard"] == pytest.approx(min(expected - step, topsail.brace_limit))
 
 
 def test_backing_a_topsail_lays_the_whole_masts_yards_aback():

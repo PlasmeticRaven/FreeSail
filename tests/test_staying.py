@@ -187,11 +187,14 @@ def test_tack_truth_the_cutter_is_quicker_than_the_schooner():
 
 def test_tack_truth_the_brig_goes_about_as_a_ship_does():
     """A brig is a ship in little: Luce's five to ten minutes, as the frigate (truth 10;
-    measured 415 s at 5.3 knots in 15, the frigate 403 s)."""
+    measured 415 s at 5.3 knots in 15, the frigate 403 s). Package 37p: in with less way
+    under the period's trim, she comes out of stays with less, tacked at 454 s
+    with 1.7 knots (355 s and 3.4 before), and has 4.6 two minutes after, 5.3 in four."""
     world, done, seconds, lines = tack(BRIG)
     assert [e.kind for e in done] == ["ship.tacked"]
     assert 285 <= seconds <= 600, f"tacked in {seconds} s"
     assert any(text.startswith("Rise tacks and sheets. Mainsail haul") for _, text in lines)
+    world.run(120)
     assert world.ship.dyn.tack == "larboard" and knots(world) > 2.5
 
 

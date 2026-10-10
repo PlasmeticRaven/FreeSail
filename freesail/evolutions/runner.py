@@ -95,6 +95,7 @@ from freesail.evolutions.scripts import (
     HELM_MANOEUVRES,
     SCRIPTS,
     Script,
+    keep_full_and_by,
     keep_lying_to,
     lying_to_hands_off,
 )
@@ -369,6 +370,15 @@ class Runner:
         if "hove_to" in ship.extra or "lying_to.hands" in ship.extra:
             # lying to, the watch tends the helm and the sheets (package 37f)
             keep_lying_to(ship, dt, wind, self)
+        # full and by, aback or in irons two minutes: the helm has her boxed off (37p)
+        keep_full_and_by(ship, self, dt)
+        # the true wind's mean as the deck has it, for `shorten sail`'s storm line; and a
+        # storm staysail being bent, set when it is (package 37p, `orders.storm`)
+        ship.extra["true_wind_kn"] = units.ms_to_knots(float(getattr(wind, "base_speed", 0.0)))
+        if "storm_canvas_pending" in ship.extra:
+            from freesail.orders.storm import keep_storm_canvas
+
+            keep_storm_canvas(ship)
         if "course_pending" in ship.extra:
             # a course across the wind held for want of way, given when she has it (37m)
             from freesail.orders.navigation import keep_course_pending

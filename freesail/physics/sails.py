@@ -352,6 +352,10 @@ def compute_sail_forces(ship: Ship, wind: Wind, dt: float = 0.0) -> SailForces:
     luff_angle: float | None = None
     luff_sum = 0.0
     luff_area = 0.0
+    square_rigged = _square_rigged(ship)
+    square_lifts: list[tuple[int, float, str]] = []
+    by_hand = ship.extra.get("yards_by_hand") or ()
+    by_hand_full: dict[str, float] = {}
 
     for d in rig.drawing:
         sail = d.sail
@@ -427,6 +431,17 @@ def compute_sail_forces(ship: Ship, wind: Wind, dt: float = 0.0) -> SailForces:
         luff_sum += sail_luff * luff_weight
         luff_area += luff_weight
         luff_angle = luff_sum / luff_area
+        if square_rigged and sail.cls == "square" and d.square_chord is not None:
+            # the deck's apparent wind at which this sail begins to lift: its own luff
+            # less what its height frees the wind it feels (package 37p, the helm's mark)
+            lifts = sail_luff - (abs(flow.awa) - abs(deck.awa))
+            square_lifts.append((_yard_level(ship, sail), lifts, sail.id))
+        if by_hand and d.square_chord is not None:
+            yard = _trim_yard(ship, sail)
+            if yard is not None and yard.id in by_hand:
+                # how full a sail on a yard braced by hand stands (package 37p): the wind
+                # it feels beyond its luff, radians; under nought it shivers
+                by_hand_full[sail.id] = abs(flow.awa) - sail_luff
 
     for sail in rig.idle:
         sail.backed = False  # a sail that is not drawing cannot be aback
@@ -455,6 +470,11 @@ def compute_sail_forces(ship: Ship, wind: Wind, dt: float = 0.0) -> SailForces:
         ship.extra.pop("luff_angle", None)
     else:
         ship.extra["luff_angle"] = luff_angle
+    _note_helm_mark(ship, square_lifts)
+    if by_hand_full:
+        ship.extra["by_hand_full"] = by_hand_full
+    else:
+        ship.extra.pop("by_hand_full", None)
 
     return SailForces(
         thrust_n=thrust,
@@ -788,6 +808,83 @@ def _apparent(ship: Ship, wind: Wind, height: float) -> _Flow:
 
 def _chain_intact(ship: Ship, sail: Sail) -> bool:
     return not any(sp.wrecked or sp.sent_down for sp in ship.spar_chain(sail))
+
+
+# ---------------------------------------------------------------------------
+# The helm's mark (package 37p)
+# ---------------------------------------------------------------------------
+
+# The levels of yards, lowest first: the courses and the crossjack on the lower masts,
+# the topsail yards on the topmasts, and so on (`evolutions/trim.py` reads the same).
+YARD_LEVELS = ("mast", "topmast", "topgallant_mast", "royal_mast")
+
+
+def _square_rigged(ship: Ship) -> bool:
+    """Whether her yards stand on two masts or more (a ship, a brig), kept per ship: her
+    helm steers full and by the highest square sail set. A fore-and-after with a square
+    topsail on one mast (the topsail schooner, the cutter) sails by her fore-and-aft
+    canvas with the topsail shaking, and keeps the mean of her sails (package 4)."""
+    rigged = ship.extra.get("sails.square_rigged")
+    if not isinstance(rigged, bool):
+        masts = {
+            ship.mast_of(sp).id
+            for sp in ship.spars.values()
+            if sp.is_yard and ship.mast_of(sp) is not None
+        }
+        rigged = len(masts) >= 2
+        ship.extra["sails.square_rigged"] = rigged
+    return rigged
+
+
+def _yard_level(ship: Ship, sail: Sail) -> int:
+    """The level of a square sail's yard: 0 a course, 1 a topsail, 2 a topgallant, 3 a
+    royal (kept per sail, the rig being fixed)."""
+    memo = ship.extra.setdefault("sails.yard_level", {})
+    level = memo.get(sail.id)
+    if level is None:
+        yard = _trim_yard(ship, sail)
+        parent = ship.parent_of(yard) if yard is not None else None
+        cls = parent.cls if parent is not None else "mast"
+        level = YARD_LEVELS.index(cls) if cls in YARD_LEVELS else 0
+        memo[sail.id] = level
+    return level
+
+
+def _note_helm_mark(ship: Ship, lifts: list[tuple[int, float, str]]) -> None:
+    """The helmsman's mark, full and by (package 37p; Luce 1884, ch. XXIV, p. 418n: "the
+    upper yards being in, when the main royal is just lifting all the other sails are a
+    'clean full and by,' which makes it a good sail to steer by"): of the square sails
+    drawing on the highest level set, the one that lifts first, with the deck's apparent
+    wind at which it lifts (`helm_mark`, `helm_mark_sail`); and the angle at which the
+    first of the rest lifts (`helm_rest`: the lower sails, the mainsail's weather leech
+    first, Luce 1866, ch. XXIV), the warning that she is too near; and whether the mark's
+    level is the only one set (`helm_mark_alone`: the topsails with the courses and the
+    light sails in, where no lower sail stands the fuller for it). None of them on a
+    fore-and-after, or with no square sail drawing."""
+    extra = ship.extra
+    if not lifts:
+        for key in (
+            "helm_mark",
+            "helm_mark_sail",
+            "helm_rest",
+            "helm_rest_sail",
+            "helm_mark_alone",
+        ):
+            extra.pop(key, None)
+        return
+    top = max(level for level, _, _ in lifts)
+    mark = max((x for x in lifts if x[0] == top), key=lambda x: x[1])
+    rest = [x for x in lifts if x[2] != mark[2]]
+    extra["helm_mark"] = mark[1]
+    extra["helm_mark_sail"] = mark[2]
+    extra["helm_mark_alone"] = all(level == top for level, _, _ in lifts)
+    if rest:
+        first = max(rest, key=lambda x: x[1])
+        extra["helm_rest"] = first[1]
+        extra["helm_rest_sail"] = first[2]
+    else:
+        extra.pop("helm_rest", None)
+        extra.pop("helm_rest_sail", None)
 
 
 def _is_driving(ship: Ship, sail: Sail) -> bool:

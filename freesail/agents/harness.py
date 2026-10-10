@@ -4127,12 +4127,11 @@ def say_aboard(
         if place_of(world, other.station.name) in heard_at:
             other.hear(f"{_cap(who)}, {where}: {text}")
             hearers.append(other.station.name)
-    if hearers or hail:
-        # where he stood and who heard him are the line's data when there was somebody
-        # to hear (or it is a hail, its own kind); words said to nobody are the note they
-        # always were, so that no recorded passage's digest moves (truth 78's fake
-        # captain says 'I have the command.' to an empty quarterdeck)
-        data.update({"place": place, "hail": hail, "heard_by": hearers, "where": where})
+    # where he stood and who heard him are the line's data, whether anybody heard or not
+    # (the owner's ruling of 2026-10-10: the log is the ear, and a say's data does not
+    # depend on who was seated; truth 78's fake captain says 'I have the command.' to an
+    # empty quarterdeck, heard by nobody, and its pin moved with it)
+    data.update({"place": place, "hail": hail, "heard_by": hearers, "where": where})
     severity = Severity.NOTABLE if (has_authority or hail) else Severity.ROUTINE
     # the line's words are the station's as they always were ('[watcher] ...'); where
     # he stood and who heard him are its data, and the kind says a hail

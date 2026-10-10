@@ -3105,7 +3105,7 @@ def test_a_named_grant_means_what_it_says_and_several_of_one_order_stand_togethe
     assert e.kind == "order.rejected" and (
         "'set the reckoning' reads as the order 'set', which the officer of the watch may give "
         "already, so it would allow nothing. The longer orders that begin with the same word: "
-        "'you may set the reckoning to'." in e.text
+        "'you may set the storm staysails', 'you may set the reckoning to'." in e.text
     )
     e = world.submit("you may let go")
     assert e.kind == "order.rejected" and "'you may let go the anchor'" in e.text
@@ -3629,6 +3629,10 @@ def test_a_course_across_the_wind_under_the_grant_to_steer_puts_her_about():
     own word is not."""
     world = frigate_world()  # the wind at north
     world.submit("set plain sail")
+    # braced up for the course (package 37p: with her yards left square she lay aback
+    # going astern at three knots, and was judged to have way enough to stay; with the
+    # keel's grip astern she falls off and fills and comes to again, and has not)
+    world.submit("brace sharp up on the larboard tack")
     world.submit("steer 70")
     world.run(1500)
     seated(world, ["Aye."], when_done=Reply())

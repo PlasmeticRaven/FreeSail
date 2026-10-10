@@ -194,7 +194,7 @@ def load_vocabulary(path: str | Path | None = None) -> Vocabulary:
     brace_modes: dict[str, float | str] = {}
     for phrase, target in (data.get("brace_modes") or {}).items():
         if isinstance(target, str):
-            if target not in ("limit", "aback", "wind"):
+            if target not in ("limit", "aback", "wind", "about"):
                 raise ValueError(
                     f"{p}: brace mode '{phrase}' is '{target}'; "
                     f"say degrees, 'limit', 'aback' or 'wind'."

@@ -17,7 +17,11 @@
 # tack between near_points and far_points from the wind, with less than way_off_kn of
 # way and her head quiet for lie_s; or at way_off_timeout_s if she is on her tack with
 # the wind before the beam. The backed yards and the tack are then remembered in
-# ship.extra["hove_to"], the record that she is hove to.
+# ship.extra["hove_to"], the record that she is hove to. Way off means headway: with
+# sternway she is hove to as she lies, drifting, and the line says how fast she goes
+# astern (package 37p, the captains' trials: in a gale she gathered four knots astern
+# under the backed topsail and the evolution waited for her way to come off, failing at
+# the end of its time and leaving her aback).
 #
 # She is kept there. While the record stands the watch on deck tends the helm and the
 # spanker and jib sheets, without an order and with one routine line a watch, to hold
@@ -66,7 +70,7 @@ timing:
   abaft_s: 120            # for this long
   keep_hands: 4           # the hands the tending costs the watch: the spanker and head sheets
 on_start: {log: "Hands to the after braces; heave to."}
-on_complete: {log: "Hove to on the {hove_tack} tack, {backed} to the mast, helm a-lee.", kind: ship.hove_to, severity: notable}
+on_complete: {log: "Hove to on the {hove_tack} tack, {backed} to the mast, helm a-lee{drifting}.", kind: ship.hove_to, severity: notable}
 on_fail: {log: "Could not heave to: {reason}.", kind: evolution.failed, severity: notable}
 # crew (package 19): the after braces; the marines "divide at the gear of main and
 # mizzen top-sails" (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship', 'Idlers, Firemen, Marines').

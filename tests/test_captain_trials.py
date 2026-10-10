@@ -42,15 +42,18 @@ def books(world: World) -> list[str]:
 
 # -- the King's ship on her station -----------------------------------------------------
 
+# package 37p: chasing at 9240 and keeping station again at 9840 (7260 and 7980 before),
+# within hail at 9798 (7972 before): the stranger made out half an hour later, the
+# frigate by the wind under the period's trim (TuningNotes, package 37p)
 TRIAL_STATION_STRANGER_STATES = [
     (300, "keeping station"),
     (7200, "investigating a stranger"),
-    (7260, "chasing"),
-    (7980, "keeping station"),
+    (9240, "chasing"),
+    (9840, "keeping station"),
 ]
-TRIAL_STATION_STRANGER_WITHIN_HAIL_TICK = 7972
-TRIAL_STATION_STRANGER_LINES = 889
-TRIAL_STATION_STRANGER_DIGEST = "01fb6bd6ab67f42c"
+TRIAL_STATION_STRANGER_WITHIN_HAIL_TICK = 9798
+TRIAL_STATION_STRANGER_LINES = 961  # package 37p (889 before)
+TRIAL_STATION_STRANGER_DIGEST = "11dc95ebe098c244"  # package 37p (01fb6bd6ab67f42c before)
 
 
 @pytest.fixture(scope="module")
@@ -79,15 +82,18 @@ def test_the_station_is_to_seaward_of_its_place_and_the_stranger_is_chased(stati
     assert w.log.digest()[:16] == TRIAL_STATION_STRANGER_DIGEST
 
 
+# package 37p: lying a-try from 19440 to 37740 (before, the land under her lee by 25860
+# as she drove up-Channel aback, and hove to again at 26520), on passage and keeping
+# station again at 37740 and 37860, the gale's second hove-to at 43320
 TRIAL_STATION_GALE_FIRST_STATES = [
     (300, "keeping station"),
     (19440, "hove to for weather"),
-    (25860, "on passage"),
-    (25920, "keeping station"),
-    (26520, "hove to for weather"),
+    (37740, "on passage"),
+    (37860, "keeping station"),
+    (43320, "hove to for weather"),
 ]
-TRIAL_STATION_GALE_LINES = 745
-TRIAL_STATION_GALE_DIGEST = "4c544addc681f505"
+TRIAL_STATION_GALE_LINES = 1423  # package 37p (745 before)
+TRIAL_STATION_GALE_DIGEST = "6bd09ffa7b4cefad"  # package 37p (4c544addc681f505 before)
 
 
 @pytest.fixture(scope="module")
@@ -101,9 +107,11 @@ def test_in_a_gale_with_sea_room_she_heaves_to_and_claws_off_a_lee_shore_by_turn
     to fills her away (on passage, then beating for the station to windward); the two
     thresholds apart (`no sea room` against `lee shore`) so that she does not heave to and
     fill away by turns at one line. She never takes the ground. The lead's finding on the
-    way (docs/dev/TuningNotes.md, package 40c): between the turns she lies aback with no
-    way for hours and is driven up-Channel at four knots, which is the ship's and the
-    helm's to answer, not the captain's."""
+    way (docs/dev/TuningNotes.md, package 40c): between the turns she lay aback with no
+    way for hours and was driven up-Channel at four knots. Since package 37p she lies
+    a-try under the close-reefed main topsail and the storm staysails for five hours,
+    drifting at a knot and a half over the ground, and is aback eleven minutes in the
+    twenty hours, never three together."""
     w = station_gale
     st = states(w)
     assert st[:5] == TRIAL_STATION_GALE_FIRST_STATES
@@ -114,17 +122,15 @@ def test_in_a_gale_with_sea_room_she_heaves_to_and_claws_off_a_lee_shore_by_turn
     assert w.log.digest()[:16] == TRIAL_STATION_GALE_DIGEST
 
 
+# package 37p: lying a-try from 19440 and on passage from 37740 to the end (before,
+# beating at 37860, hove to again at 42900, on passage 45120 and beating 45180)
 TRIAL_STATION_LEE_SHORE_STATES = [
     (300, "keeping station"),
     (19440, "hove to for weather"),
     (37740, "on passage"),
-    (37860, "beating"),
-    (42900, "hove to for weather"),
-    (45120, "on passage"),
-    (45180, "beating"),
 ]
-TRIAL_STATION_LEE_SHORE_LINES = 570
-TRIAL_STATION_LEE_SHORE_DIGEST = "dca2273da941e096"
+TRIAL_STATION_LEE_SHORE_LINES = 1668  # package 37p (570 before)
+TRIAL_STATION_LEE_SHORE_DIGEST = "2b0c13f40e670548"  # package 37p (dca2273da941e096 before)
 
 
 @pytest.fixture(scope="module")
@@ -134,9 +140,11 @@ def station_lee_shore():
 
 def test_with_ushant_under_her_lee_she_is_not_left_hove_to_onto_it(station_lee_shore):
     """Started five miles west of Ushant with a westerly gale coming on: hove to once she
-    has sea room, filled away for the land under her lee, beating off, and never aground
-    (the first trial grounded her in thirty-seven minutes on a course shaped for the
-    island)."""
+    has sea room, and never aground (the first trial grounded her in thirty-seven minutes
+    on a course shaped for the island). Before package 37p she drove to leeward aback at
+    four knots and was filled away for the land under her lee and beat off; since, she
+    lies a-try at a knot and a third over the ground until the gale is done, the land
+    never within the lee-shore line, and goes on passage after it."""
     w = station_lee_shore
     assert states(w) == TRIAL_STATION_LEE_SHORE_STATES
     assert not [e for e in w.log if e.kind == "ship.aground"]
@@ -146,17 +154,19 @@ def test_with_ushant_under_her_lee_she_is_not_left_hove_to_onto_it(station_lee_s
 
 # -- the merchant on her passage ----------------------------------------------------------
 
+# package 37p: on passage again at 8100 (8040), at anchor 33960 (34080) and 40980
+# (39720), the bower let go at 34292 and 41307 (34413 and 40105)
 TRIAL_TRADE_STRANGER_STATES = [
     (300, "on passage"),
     (3660, "evading"),
-    (8040, "on passage"),
-    (34080, "at anchor"),
+    (8100, "on passage"),
+    (33960, "at anchor"),
     (38160, "on passage"),
-    (39720, "at anchor"),
+    (40980, "at anchor"),
 ]
-TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [34413, 40105]
-TRIAL_TRADE_STRANGER_LINES = 1193
-TRIAL_TRADE_STRANGER_DIGEST = "a04a80a960eabc53"
+TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [34292, 41307]
+TRIAL_TRADE_STRANGER_LINES = 1252  # package 37p (1193 before)
+TRIAL_TRADE_STRANGER_DIGEST = "0efa38e1d5d2f172"  # package 37p (a04a80a960eabc53 before)
 
 
 @pytest.fixture(scope="module")
@@ -188,14 +198,15 @@ def test_the_merchant_hauls_off_from_a_privateer_and_waits_in_the_road_for_a_win
     assert w.log.digest()[:16] == TRIAL_TRADE_STRANGER_DIGEST
 
 
+# package 37p: at anchor at 17280 (17220), the bower let go at 17688 (17669)
 TRIAL_TRADE_THICK_STATES = [
     (300, "on passage"),
     (300, "running for shelter"),
-    (17220, "at anchor"),
+    (17280, "at anchor"),
 ]
-TRIAL_TRADE_THICK_ANCHORED_TICK = 17669
-TRIAL_TRADE_THICK_LINES = 539
-TRIAL_TRADE_THICK_DIGEST = "10fee882c789666e"
+TRIAL_TRADE_THICK_ANCHORED_TICK = 17688
+TRIAL_TRADE_THICK_LINES = 553  # package 37p (539 before)
+TRIAL_TRADE_THICK_DIGEST = "50901cf162ea95aa"  # package 37p (10fee882c789666e before)
 
 
 @pytest.fixture(scope="module")

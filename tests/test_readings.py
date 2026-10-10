@@ -29,10 +29,12 @@ def world_for(path: Path, heading: float = 293.0) -> World:
         path,
         Scenario(wind_from_deg=0.0, wind_speed_kn=15.0, ship_heading_deg=heading, gustiness=0.0),
     )
-    w.submit("set plain sail")
-    w.run(900)
+    # braced up before the sail is set (package 37p: with her yards square sixty-seven
+    # degrees from the wind she gathered sternway and the keel's grip astern paid her off,
+    # and the schooner's sheets, which hold their trim, came to stand for another wind)
     w.submit("brace sharp up on the starboard tack")
-    w.run(300)
+    w.submit("set plain sail")
+    w.run(1200)
     return w
 
 
@@ -204,12 +206,20 @@ def test_a_sail_shaking_and_aback_read_from_the_physics(world: World):
     # its sheets on what is now the weather side; before, the free tending flattened her
     # sheets as she came up and she stalled at some thirty-four degrees apparent with her
     # fore-and-aft canvas still drawing (the docstring of sails.py then)
+    # (package 37p: read as she comes to the wind, before the sternway she gathers there
+    # pays her head off again, `hull.sternway_yaw`)
     world.submit("trim sails")
     world.run(150)
     world.submit("steer north")
-    world.run(600)
-    awa = units.rad_to_deg(abs(ship.dyn.apparent_wind_angle))
-    assert awa < (45 if ship.spec.rig == "topsail-schooner" else 25), awa
+    limit = 45 if ship.spec.rig == "topsail-schooner" else 25
+    schooner = ship.spec.rig == "topsail-schooner"
+    for _ in range(40):
+        world.run(15)
+        awa = units.rad_to_deg(abs(ship.dyn.apparent_wind_angle))
+        # the schooner read once she has lost her way in irons, as the docstring says
+        if awa < limit and (not schooner or abs(ship.dyn.u) < units.knots_to_ms(0.5)):
+            break
+    assert awa < limit, awa
     for s in ship.sails.values():
         if not s.is_set:
             continue

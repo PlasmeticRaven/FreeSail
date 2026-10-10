@@ -1395,6 +1395,74 @@ in (then 5b), double altitudes, the kedge, interiors beyond a name and a descrip
      data, for the record; the snapshot's reading does not. If the log's data reaches the
      browser, it is a road the proof of §15 does not cover.
 
+26. From package 37p (2026-10-10): **the yards and the helm by the wind, and the ship in a
+   gale** (`docs/dev/M6-WorkPackages.md`, its brief; `docs/dev/TuningNotes.md`, its
+   section). Built:
+   - *The trim by level.* `brace sharp up` is as it was, every yard at its rigging's limit.
+     `trim sails` on a wind is the period's trim: the lowest yard of each mast braced up
+     and each level above braced in from the one below (`trim.UPPER_YARDS_IN_DEG`, two
+     degrees, the model's step for Luce's half point, Luce 1884 p. 418 and its footnote's
+     three reasons), the after yards then staggered as before; a yard trimmed by name takes
+     the angle the whole trim gives it. At a topsail's third reef the lowest yards are eased
+     a point (`trim.HEAVY_WEATHER_EASE_DEG`; "observing not to brace the topsail or lower
+     yards too sharp", Luce 1884 ch. XXIX). The yards by hand in points: `brace the fore
+     yards in a point`, `up half a point`, `brace the yards to four points` (from the
+     keel), `brace the mizzen yards about`; given, they stay until the next trim or brace,
+     and the log says what shivers or fills on them.
+   - *The helm's mark.* In a ship or a brig, full and by, the helmsman keeps the highest
+     square sail set just lifting (`hull.MARK_MARGIN`, two degrees fuller than its luff, or
+     than the first of the rest if that lifts before it) and the rest full; fuller as she
+     loses her way (`hull.full_for_way`, two points with no way, none with four knots);
+     never nearer than the old rule (the mean of the luffs and eight degrees) when the mark
+     is a reefed topsail or the only level of square sail set. The lift of the lower sails
+     is said as "Kept her away" full and by and as the old warning steering by compass. A
+     fore-and-after keeps the mean of her sails' luffs as before.
+   - *Aback and sternway.* Going astern the keel's lift acts near the stern
+     (`hull.sternway_yaw`, a quarter of her length abaft amidships), faded in from a knot
+     astern to two, so that the sails' push to leeward swings her head off; full and by
+     with sternway the helm is shifted hard over; `box her off` (Luce 1866 ch. XXV,
+     `BoxOffScript`), which the helm orders itself after two minutes aback, or in irons
+     going astern faster than a knot (`scripts.IN_IRONS_KN`); `heave to` completes with
+     the way she has, drifting, and says so.
+   - *Storm canvas.* `set the storm staysails` (bent where they are not, set when bent,
+     the head sails and the spanker they replace taken in when they are set); `shorten
+     sail` takes in a jib at three quarters of its rating, reduces the after sail with the
+     reefs (the courses reefed at the second, the mainsail and the spanker in at the
+     third) and sets the storm staysails over forty knots or when the fore topmast
+     staysail is near its rating (`orders/storm.py`); over the storm line a head sail the
+     fore storm staysail is to replace is taken in at once if it comes near its rating
+     before the storm staysail is up; the starter's heavy weather and the captains' gale
+     books say so; the captain lies to under the close-reefed topsail (`lie a-try`) in
+     place of heaving to with it aback, and makes sail again after the gale.
+   Open, for the lead:
+   - **The model's ship gripes with no way on her.** Her sails' centre of effort lies abaft
+     the lateral plane's at rest and the rudder cannot answer it under a knot, so a ship
+     that loses her way near the wind comes to and is taken aback; with the keel's grip
+     astern at full strength from the first inch of sternway she was held in a cycle of
+     luffing, sternway and falling off (truth 17, the readings' frigate, the schooner's
+     tack, the cutter's cast), which is why the grip fades in from a knot. Under her
+     topsails alone in thirty knots, aback head to wind, she pays off and fills in three
+     minutes and comes to again in the next two. A centre of lateral resistance that moves
+     with her way, or the helmsman's helm at low speed, is the place; not this package's.
+     Two tests stand as strict expected failures on it: the frigate's `back and fill`
+     and the schooner's studding sails set up from rest at nine points.
+   - **The full-and-by angle under plain sail is nearer and slower**: the frigate lies six
+     points from the wind at 5.1 knots in fifteen, where the old rule had her at 76 degrees
+     and 6.8 knots; a sixth more to windward, a quarter less through the water. Passages
+     that beat are changed by it (the tuning notes' re-measure).
+   - **The upper yards' limits stand sharper than the lower** in every ship file (two
+     degrees a level, from Fincham art. 102), where Luce's third reason has the lighter
+     yards wanting a greater angle from the keel. The trim by level braces them in from
+     the lower yards whatever their limits, so it does not matter to `trim sails`; it
+     does to `brace sharp up`.
+   - **The storm staysails blow out in the gusts of a whole gale** (fifty knots and more
+     in the station trials' gusts, the mizzen's at 10:01 in both); their ratings are spec
+     3b §6.4's and were not this package's to change.
+   - **Lying to drifts faster than truth 28's knot and a half**: 1.6 knots on the hour's
+     mean in truth 28's forty-five knots and 2.1 in the station trials' lying to (1.4
+     over the ground), from 4.4; the hull's resistance astern is still its resistance
+     ahead (the owner's ruling, spec 3b §9).
+
 ## 34. The scoping draft's rulings (record)
 
 The questions put to the owner on 2026-09-29 and the rulings: 1, a real sea with older

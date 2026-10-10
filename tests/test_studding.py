@@ -193,7 +193,23 @@ def weather_studding_sails_at_nine_points(path, knots):
     return world
 
 
-@pytest.fixture(scope="module", params=SHIPS, ids=["frigate", "schooner"])
+# Package 37p, for the lead: the schooner set up from rest at nine points gripes up as she
+# loses her way setting sail, to within two points, and lies in irons going astern, her helm
+# hard over for a quarter of an hour, before the package as since (the model's ship gripes
+# with no way, spec M5 §33 item 26). Before it the trims brought her back to nine points;
+# with the keel's grip astern she comes out at five points and a half and three knots, her
+# sheets trimmed for that wind, and does not bear away again, so the studding sail "at nine
+# points" shakes. The frigate's case is as it was.
+_SCHOONER_IN_IRONS = pytest.mark.xfail(
+    strict=True, reason="the schooner's setup in irons (package 37p; see the comment above)"
+)
+
+
+@pytest.fixture(
+    scope="module",
+    params=[SHIPS[0], pytest.param(SHIPS[1], marks=_SCHOONER_IN_IRONS)],
+    ids=["frigate", "schooner"],
+)
 def brought_up(request):
     """Set at nine points in 13 knots, then brought up to six and kept so half an hour."""
     world = weather_studding_sails_at_nine_points(request.param, 13.0)

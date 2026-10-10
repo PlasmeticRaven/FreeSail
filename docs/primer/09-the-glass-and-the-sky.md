@@ -122,6 +122,49 @@ The log says the motion when its words have changed and held for five minutes:
   Morning watch (05:52)  Pitching heavily, the sea under her stern.
 ```
 
+## A gale: storm canvas, lying to, and boxing her off
+
+Luce's order of reducing sail to a gale is the game's (Luce 1884, ch. XXIX, 'Reducing Sail to a Gale'; his journal's scale, Luce 1866, ch. XXVIII: "7. Moderate gale; double reefed topsails. 8. Fresh gale; treble reefed topsails and reefed courses. 9. Strong gale; close reefs. 10. Whole gale; close reefed main topsail"). `shorten sail` takes in the light sails and reefs the topsails once each time it is given, as chapter 3 says, and as the wind rises it does more:
+
+- **the jibs by their ratings.** A jib whose load is three quarters of what its canvas is rated for is taken in, the outermost first, before a gust blows it out of the bolt-ropes ("To take in the jib when blowing hard, it is always better to run the ship off if possible");
+- **the after sail with the head sail.** With the second reef in the topsails the courses are reefed; with the third, the mainsail is hauled up and the spanker taken in, so that a ship that has lost her jibs does not come to against her helm with her mainsail and spanker driving her stern off;
+- **the storm staysails** over forty knots of wind, or sooner if the fore topmast staysail is loaded near its rating.
+
+**Set the storm staysails** is the order for them, in any wind: each storm staysail the ship carries in her sail room is bent if it is not, set as soon as it is bent, and what it replaces taken in once it is set, so that she is never without a head sail while the hands rouse it up ("To set fore-storm staysail, and haul down fore topmast staysail, proceed as in taking in jib and setting fore topmast staysail", Luce 1884, p. 477). The fore storm staysail replaces the fore topmast staysail and the jibs; the mizzen's (the brig's main storm staysail) replaces the spanker as the after sail. A schooner or a cutter carries a storm jib in the jib's place, and it is shifted for the jib.
+
+```orders frigate plain-sail
+set the storm staysails
+shorten sail
+```
+
+```
+  First watch (21:16)  Order: set the storm staysails.
+  First watch (21:16)  Bend sail! Rouse up the fore storm staysail from the sail room. Bend sail! Rouse up the mizzen storm staysail from the sail room. The fore storm staysail and mizzen storm staysail to be set as soon as they are bent.
+  ...
+  First watch (21:41)  Clear away the fore storm staysail; man the halyards.
+  First watch (21:43)  Set the fore storm staysail.
+  First watch (21:43)  The fore storm staysail set in place of the fore topmast staysail and the jib.
+```
+
+**Lying to in a gale** is under the close-reefed main topsail, braced up, and the storm staysails, the helm a little a-lee: `lie a-try` (chapter 5's evolutions) takes in every other square sail and the jibs and brails up the spanker. "After she has recovered from the first shock of the sea, and has lost her headway, she will, with the helm a-lee, and under a proper arrangement of the sails, lie to, coming up and falling off two or three points, and drifting bodily to leeward" (Luce 1884, ch. XXIX); "in a gale, with a heavy sea, vessels lying to will come up and fall off four or five points" (the same, ch. XXIV). So she does in the game: the frigate in forty-five knots comes up to three points and falls off to the beam every two minutes or so, and drifts to leeward at a knot and a half to two through the water (before package 37p she lay steady head to sea and went astern at four and a half). `heave to`, with the main topsail to the mast, is for a working breeze; given in a gale with no way to take off, it lies her to with the way she has, and the line says she drifts ("Hove to on the starboard tack, main topsail to the mast, helm a-lee; she has three knots of sternway, and drifts.").
+
+**Taken aback** (Luce 1866, ch. XXV, Wind Baffling). A ship that comes to against her helm, or is caught by a shift, has her sails pressed back against the masts and gathers sternway. Going astern her keel grips the water near the stern, and the sails' push to leeward then swings her head off; the helmsman keeping her full and by shifts the helm hard over for the sternway ("the moment she gets sternboard, shift the helm, and she will fall off briskly"), and as the sails fill and she gathers way he brings her by the wind again. If she will not pay off, **box her off**: "Up mainsail and spanker! ... Brace abox the head yards! ... and when the after sails fill, let go and haul as in tacking". The after yards are squared, the head yards laid aback to press her head off; when she has fallen off seven points from the wind on her tack, a point beyond her close-hauled angle, every yard is braced up for it, the mainsail and spanker set again, and she is kept full and by. The helmsman orders it himself when she has been aback two minutes with the helm full and by, or two minutes in irons, her head in the wind and her sails shaking, going astern faster than a knot ("Two minutes in irons, going astern, and she will not pay off: box her off!"):
+
+```orders frigate plain-sail
+box her off
+box off
+```
+
+```
+* Forenoon watch (10:12)  Two minutes aback and she will not pay off: box her off!
+  Forenoon watch (10:12)  Up mainsail and spanker! Square away the after yards! Brace abox the head yards!
+  Forenoon watch (10:13)  Her head falls off.
+  Forenoon watch (10:14)  Her after sails take. Let go and haul! Brace up for the starboard tack. Board the main tack and haul aft the sheet! Haul out the spanker!
+* Forenoon watch (10:15)  Boxed her off; braced sharp up on the starboard tack, full and by.
+```
+
+The captain of chapter 17 does all of this by his doctrine: in a gale with sea room he shortens sail and lies her to, his book's lines take another reef and set the storm staysails as the wind rises again, send down the topgallant masts (`lie a-try` has hauled the courses up in their gear); and when the wind has been under twenty-five knots for half an hour after it, the topgallant masts go up, the reefs come out and plain sail is set ("After the gale abates, sail should not be made upon the vessel too rapidly", Luce 1884, p. 479).
+
 ## What a captain of 1805 did not know
 
 He knew the glass falls before a southerly gale, that the wind will back as the gale comes on and veer through west as it passes, and that the glass rises after; and that a slow rise with drying air is fair weather and a rapid one unsettled. He did not know the shape of the thing. Dove's law of the gyration of the wind is 1828; Redfield's rotary storms 1831; Reid's *Law of Storms* 1838; Buys Ballot's rule, that with your back to the wind the low pressure is on your left hand, 1857. Nothing in the game names a front, a centre or an isobar in any line you read, and nothing gives the pressure in any unit but inches, because those are the century after. The rules above can be discovered from the readings the game gives, as they were.

@@ -201,6 +201,7 @@ def test_only_the_manoeuvres_belay_the_work_in_hand():
         "tack",
         "wear",
         "boxhaul",
+        "box_off",  # package 37p: boxing her off when she is taken aback
         "wear_short_round",
         "lie_a_try",
         "come_to_anchor",
