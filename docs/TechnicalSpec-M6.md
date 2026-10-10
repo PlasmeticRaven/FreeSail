@@ -305,6 +305,35 @@ are perceived alike (`tests/test_captains.py`). The merchant passage and the nav
 keep their books and their digests: a scenario with a book and no intent has its captain
 named and standing aside (truth 77).
 
+**The trials, as built (package 40c, 2026-10-09, the lead; `data/scenarios/trials/`,
+`tests/test_captain_trials.py`).** Five scenarios sailed by the captain alone under a
+weather script and the scenario's world orders, pinned by the states he enters: the
+King's ship on her station with a stranger (investigating, chasing, within hail, the
+station again), in a gale with sea room (hove to, filled away for the land under her lee,
+beating, by turns) and with Ushant five miles under her lee when it comes on; the merchant
+with a privateer within two miles (evading, the passage resumed, the voyage done in port)
+and in thick weather (running for shelter, at anchor in the outer road until it clears).
+What they changed in the captain: the station off a place is the point the radius from it
+with the most sea room, to the westward among equals (`station_off`), never the place;
+`aground` is `in distress` from every state at sea; `under way` is false while an anchor is
+being brought to (the work in hand read); the nearest shore by the account on the chart
+stands in for the lookout's in thick weather and by night (a lee shore, the land's
+nearness); a King's ship is known by her wardroom file's binding of the captain's station,
+read by the ship's source and not by mustering her people; a passage, a letter or a run
+home is done at its destination; a sailing state entered while she lies to fills her away
+first, and the gale rows heave her to only with sea room (`no sea room`, `sea_room_nm`)
+and leave it for a lee shore within `lee_shore_nm`; the at-anchor book goes in only when
+the visibility is better than a mile; a port's spot is filled by its chart name. **The
+player's hand** (decision 41; `Captain.player_hand`, `carry_on`; the world order `captain:
+carry on`): an order of the ship's at the prompt once the captain is in command strikes
+his book and he stands aside, said once (`captain.aside`), until the world order gives
+her back and his plan is worked afresh; a reading, a station's sentence, the scenario's
+opening orders and the player's seat under him are not a hand; `the captain` says he
+stands aside. What the trials found in the ship and not the captain is in the tuning
+notes (the ship aback in a gale for hours, driven to leeward; `shorten sail` and the
+headsails), for a package of its own.
+
+
 ### 5. The officer's own reckoning (`freesail/world/reckoning.py`; `freesail/agents/tools.py`)
 
 G19's small step, true to the period: an officer may keep a reckoning of his own from the

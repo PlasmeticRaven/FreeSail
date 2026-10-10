@@ -136,9 +136,15 @@ def _captain(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     m = _CAPTAIN.match(body)
     captain = getattr(world, "captain", None)
     if m is None or captain is None:
-        raise WorldOrderError("A captain order is 'captain: intent <the intent in words>'.")
+        raise WorldOrderError(
+            "A captain order is 'captain: intent <the intent in words>' or 'captain: carry on'."
+        )
     try:
-        words = captain.set_intent(m.group("words"))
+        if m.group("words").strip().lower() == "carry on":
+            # decision 41 (package 40c): the ship given back to him after the player's hand
+            words = captain.carry_on()
+        else:
+            words = captain.set_intent(m.group("words"))
     except ValueError as e:
         raise WorldOrderError(str(e)) from None
     return words, {"intent": captain.intent.words if captain.intent else ""}

@@ -3617,3 +3617,130 @@ On the build machine under the load of the other packages' suites running beside
 **`python3 -m pytest -n 4 -q`**, the fast tier (273 slow tests left out), twice: the first run, 3,042 tests, failed four, three of them this block's (the nations' port index, the shipped books' places, the bottom's notes by every road: fixed, above) and the pace at the merchant passage's start (the load). The second, after the fixes: 3,041 passed, 1 failed, `test_replay.py::test_the_fingerprint_is_of_the_code_and_the_data_and_not_of_the_line_endings`, whose rules' fingerprint is computed once a process and compared afresh, and four port files were edited during the run (package 38's note); it passes alone (run once after). The test of the nearest coast's timing in `test_chart.py` passed both times.
 
 `python3 -m ruff check .` and `python3 -m ruff format --check .` clean; `python tools/build_charts.py --check biscay-north` passes as printed above.
+
+## Milestone 6: the captain's trials (package 40c, 2026-10-09, the lead)
+
+Built from the brief "Package 40c: the captain's trials" in `M6-WorkPackages.md` (decision
+41): five scenarios in `data/scenarios/trials/` sailed by the rules-based captain on an
+intent alone under a weather script and the scenario's world orders, each sixteen hours at
+seed 7, pinned in `tests/test_captain_trials.py` (the slow tier) by the states he enters
+with their ticks, the lines and the digest; and the player's hand on an intent scenario.
+Every figure is this machine's, measured once at the end on the merged tree.
+
+### What the trials found, and what was changed for them
+
+The first run of every trial found a fault, which is what they are for. In the order found:
+
+- **The station was the island.** `keep the station off Ushant` shaped a course for
+  Ushant, and the frigate took the ground on it within the hour in every trial of the
+  King's ship. The station is now the point the intent's radius from the place with the
+  most sea room about it, read on the chart in his hands over sixteen bearings and to the
+  westward among equals (`captains.station_off`): off Ushant within 15 miles it is
+  48 33.3 N 5 26.6 W, to the west-south-west, where the squadron's station lay. (The first
+  version of the helper passed radians to a function that takes degrees and put every
+  sample north of the island; found by printing the samples.)
+- **Aground kept the station's book.** No state at sea had a row for `aground`; every
+  doctrine now has one from each (`in distress`, afloat again `on passage`).
+- **The anchor came home at once.** `come to an anchor` is work, not a manoeuvre, and the
+  minute after he ordered it the `under way` row fired (the anchor not yet down), his
+  course shaped again cancelled the evolution, and he ordered the anchor again, every
+  minute. The perception now reads `work in hand` and `under way` is false while an anchor
+  is being brought to.
+- **The land in fog was nowhere.** The nearest land was the lookout's alone, so in thick
+  weather the merchant never ran for shelter and a lee shore by night was never a lee
+  shore. The perception now carries the nearest shore by his account on the chart
+  (`Chart.coast_distance` from `account_now`, the player's own figure), used where the
+  lookout gives none.
+- **The schooner's master was a King's captain.** `role_for` judged a King's ship by the
+  muster's roles, and the muster is built with the World before the company is mustered,
+  so a `bound for` intent on the schooner got the King's ship's doctrine (no shelter, no
+  hauling off). The judgement now reads the wardroom file's binding of the captain's
+  station by the ship's own source (`captain` or `commander` for a King's ship; a master
+  for a merchantman or a hired cutter), building nobody.
+- **The voyage never ended.** A `bound for` intent at its anchorage was not done, so the
+  captain sailed her again on the next tide, out of Carrick Road by a plan folded back on
+  itself, and onto the Black Rock. A passage, a letter or a run home is done at its
+  destination's anchorage, or in port there.
+- **Hove to onto Ushant.** Lying to in the gale with the island under her lee, the `lee
+  shore` row took him to `on passage`, where every course was refused ("she is hove to;
+  fill away before giving her a course") until she drove ashore. A sailing state entered
+  while she lies to fills her away first, and once a minute until she fills when the
+  heave-to is still in hand (`_work`), the leg shaped at `ship.filled_away`; and the gale
+  rows heave her to only with sea room (`unless: no sea room`, the land to leeward beyond
+  `sea_room_nm`, ten miles) and leave it for a lee shore within `lee_shore_nm` (six), the
+  two apart so that she does not fill away and heave to by turns at one line.
+- **In through the fog.** The at-anchor book's "the tide to go in" took the merchant into
+  Falmouth in fog at six knots and a half with the pilot aboard, and onto the Black Rock;
+  it now waits for the visibility to be better than a mile.
+- **Beating in pilot water.** Up the Goulet with a four-knot flood under her, the
+  allowance to make good the track brought the steered course up to the wind, the
+  course was "not laid", the `beating` row fired and she took the ground on the
+  Fillettes; the schooner for Falmouth did the same on the Black Rock. In pilot water (a
+  port's inner track or its anchorage) a course not laid is never beaten: where the rhumb
+  line to the mark is itself laid she is conned along it with the stream under her, as a
+  pilot conns (`_conn_for`); where the wind is foul for the line she comes to an anchor
+  where she is and waits (`_inner_leg`), the at-anchor book trying again on the flood.
+- **The at-anchor book unloaded a minute too soon.** The `under way` row fires when the
+  anchor is off the ground, and the book's "at under way then set plain sail" was
+  unloaded before the ship said she was under way; the schooner left the road under her
+  topsail alone at a knot and a half. He gives the sail himself at `ship.under_way` when
+  he has come from the anchor (`weighing`).
+- **The lead's own fault, found by the intent scenario's pin.** The first fill-away rule
+  undid any heave-to, the book's for the Falmouth pilot's boat included: the pilot was
+  carried to Brest, no Brest pilot came off, and she beat up the Goulet without one. The
+  rule is confined to the captain's own heave-to (`_business["filling"]`), and the intent
+  scenario replays to its pin.
+- **`{road}` was "the outer road".** The port file's name for a spot is not the chart's
+  (`Falmouth outer road`), so the book's `pilot water` rule could not be entered; the
+  fills read the spot's feature by its chart name.
+- **The player's hand** (decision 41): an order of the ship's at the prompt once the
+  captain is in command strikes his book and he stands aside, said once (`captain.aside`);
+  `captain: carry on` gives her back, his plan worked afresh; a reading, a station's
+  sentence and the scenario's opening orders (before his first judgement, which a replay
+  gives again as the captain's) are not a hand; the seat under him is not.
+
+### The trials, as pinned
+
+Twenty hours each at seed 7, on this machine.
+
+| Trial | The states, with their ticks | Lines, digest |
+|---|---|---|
+| The station and a stranger (`trial-station-stranger`) | keeping station 300; investigating a stranger 7200 (the Palinure put on the sea three leagues north, standing south); chasing 7260; within hail 7972; keeping station 7980 | 889, `01fb6bd6ab67f42c` |
+| The station in a gale (`trial-station-gale`) | keeping station 300; hove to 19440 (the wind over forty); on passage 25860 (the land under her lee); keeping station 25920; hove to 26520; on passage 28620; beating 28680; hove to 32340; on passage 33060; beating 33120; hove to 42900; on passage 43200; beating 43260 | 745, `4c544addc681f505` |
+| Ushant under her lee (`trial-station-lee-shore`) | keeping station 300; hove to 19440; on passage 37740; beating 37860; hove to 42900; on passage 45120; beating 45180 | 570, `dca2273da941e096` |
+| The merchant and a privateer (`trial-trade-stranger`) | on passage 300; evading 3660 (the brig within two miles, French); on passage 8040 (lost to sight); the pilot taken 33180; at anchor 34080 in the outer road (the wind does not serve to enter Falmouth), the bower let go 34413; on passage 38160 on the flood, conned by the rhumb line; at anchor again 39720 (40105), and there at the end | 1193, `a04a80a960eabc53` |
+| The merchant in thick weather (`trial-trade-thick`) | on passage 300; running for shelter 300 (the Lizard two leagues off by account, the fog); at anchor 17220, the bower let go in the outer road 17669, and there she stays | 539, `10fee882c789666e` |
+
+No trial takes the ground as pinned. The schooner on an intent alone (`merchant-intent.yaml`,
+truth 77) is unmoved by any of this: 2083 lines, `09afd9c2697c7c33`, as 40 and the merge
+pinned her, measured again at the end.
+
+### Found on the way, for other packages
+
+- **The ship in a gale lies aback for hours and is driven up-Channel at four knots.** In
+  both gale trials, after the book reefs the topsails the helm kept "full and by" lets her
+  come up to forty degrees, she is taken aback ("her sails aback; she had no way on to
+  lose", once a minute from 08:20 to 09:15), the jib and the fore topmast staysail blow
+  out at 06:43 (shortening sail never takes in the headsails), and with no way she drifts
+  at sixty-five degrees of leeway and four knots over the ground, from the station to
+  49 N 3 40 W by the evening. The captain's judgements are right throughout; the ship's
+  recovery from aback with no way in a gale, the helm's full and by under reefed
+  topsails, and the headsails in `shorten sail` are the helm's and the sails' to answer
+  (37m's and 37k's ground), a Fable package for the lead to brief. The gale trials pin
+  the behaviour as it stands and will be re-pinned when it is fixed.
+- **`shorten sail` with nothing left to shorten is refused**, "Could not shorten sail:
+  'take in the studdingsails': Nothing done", which the captain's `hove to for weather`
+  entry meets after the book has reefed everything; a refusal line a glass, cosmetic.
+- **The director has no door at the console.** The trials' world orders are the
+  scenario's at their times; the owner who wants to put a stranger on the sea at his own
+  moment edits the scenario file. The director's seat hook is 43's (spec M6 §23).
+- **A hired cutter's captain is a master** by the wardroom file, so a cutter on a station
+  intent gets the merchant's doctrine for `bound for` and the King's for `keep the
+  station` (the station intent is a King's ship's by its kind). Say in the cutter's
+  wardroom file which she is when 43b gives her a role.
+
+### The suite, as run
+
+Ruff clean. `tests/test_captain_trials.py` with the captain's tests and the intent
+fixtures of the known truths under `--slow` (the counts in the merge's record); the fast
+tier run by the lead at the merge.

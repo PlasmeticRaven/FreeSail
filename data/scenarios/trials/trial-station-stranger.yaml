@@ -1,0 +1,54 @@
+# FreeSail: a captain's trial (spec M6 §9 item 1; decision 41; package 40c, the lead).
+# The frigate on a station off Ushant, a stranger with no colours put on the sea by the director two hours in, three leagues to the north of her and standing south: investigating, the enemy made out, the chase, and the station kept again.
+# The rules-based captain of freesail/world/captains.py sails her by the intent alone, no
+# book; the trial proves the states he enters and the books he loads against the doctrine
+# (data/captains/kings-ship.yaml). Pinned in tests/test_captain_trials.py at seed 7 and
+# measured in docs/dev/TuningNotes.md (package 40c). The gate's owner runs it with no order
+# of the ship's given, world orders only (spec M6 §9 item 2).
+
+name: A captain's trial, the station off Ushant and a stranger
+seed: 7
+start: 1805-06-14T04:00
+position: 48 30 N 5 25 W
+region: channel-west
+nation: britain
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 200
+  speed_kn: 6
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+intent: keep the station off Ushant within 15 miles
+
+papers:
+  chart: {year: 1804}
+  epitome: norie
+  almanac: 1805
+
+ports: [falmouth, plymouth, brest]
+
+weather:
+  wind:
+    - {at: 1805-06-14T00:00, from_deg: 270, knots: 14, air_mass: neutral}
+    - {at: 1805-06-15T12:00, from_deg: 280, knots: 12}
+  background:
+    {hpa: 1018, gradient_hpa_per_100km: 0.4, high_toward_deg: 200}
+  systems:
+    - name: the old high over Biscay
+      kind: high
+      radius_km: 900
+      track:
+        - {at: 1805-06-13T12:00, x_km: 300, y_km: -500, hpa: 1022}
+        - {at: 1805-06-15T12:00, x_km: 500, y_km: -600, hpa: 1020}
+  sky: {sky: clear, weather: fine, visibility: the horizon}
+  sea: true
+
+world_orders:
+  - {at: 1805-06-14T06:00, order: 'ship: a brig-sloop "Palinure" of France at 48 44 N 5 20 W, bound for 48 15 N 5 30 W, no colours'}
+
+orders:
+  - set plain sail

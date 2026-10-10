@@ -65,7 +65,7 @@ books:
     - 'standing order "the pilot boards": at the pilot''s hail then take in the {light_sail}; take the pilot'
     - 'standing order "the pilot aboard": at the pilot aboard then set plain sail'
   at anchor:
-    - 'standing order "the tide to go in": at the turn to the flood, if the daylight is day then get under way on the {cast_in} tack and steer {course_in}'
+    - 'standing order "the tide to go in": at the turn to the flood, if the daylight is day and the visibility is not a mile and the visibility is not a cable then get under way on the {cast_in} tack and steer {course_in}'
     - 'standing order "under way for the port": at under way then set plain sail'
   in port: []
   investigating a stranger: []
@@ -79,16 +79,25 @@ books:
   engaging: []
 
 transitions:
+  # aground from any state at sea is distress (package 40c, the captain's trials: the
+  # frigate on the rocks of Ushant kept her station's book)
+  - {from: keeping station, on: aground, to: in distress}
+  - {from: beating, on: aground, to: in distress}
+  - {from: hove to for weather, on: aground, to: in distress}
+  - {from: investigating a stranger, on: aground, to: in distress}
+  - {from: chasing, on: aground, to: in distress}
+  - {from: evading, on: aground, to: in distress}
+  - {from: at anchor, on: aground, to: in distress}
   - {from: in port, on: under way, to: on passage}
   - {from: on passage, on: anchored in port, to: in port}
   - {from: on passage, on: aground, to: in distress}
   - {from: on passage, on: hostile stranger, to: evading}
-  - {from: on passage, on: gale, to: hove to for weather, unless: lee shore}
+  - {from: on passage, on: gale, to: hove to for weather, unless: no sea room}
   - {from: on passage, on: thick near the land, to: running for shelter}
   - {from: on passage, on: course not laid, to: beating}
   - {from: beating, on: course laid, to: on passage}
   - {from: beating, on: hostile stranger, to: evading}
-  - {from: beating, on: gale, to: hove to for weather, unless: lee shore}
+  - {from: beating, on: gale, to: hove to for weather, unless: no sea room}
   - {from: beating, on: anchored in port, to: in port}
   - {from: hove to for weather, on: gale over, to: on passage}
   - {from: hove to for weather, on: lee shore, to: on passage}
@@ -96,6 +105,6 @@ transitions:
   - {from: running for shelter, on: weather clear, to: on passage}
   - {from: running for shelter, on: aground, to: in distress}
   - {from: evading, on: stranger lost, to: on passage}
-  - {from: evading, on: gale, to: hove to for weather, unless: lee shore}
+  - {from: evading, on: gale, to: hove to for weather, unless: no sea room}
   - {from: at anchor, on: under way, to: on passage}
   - {from: in distress, on: afloat, to: on passage}
