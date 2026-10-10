@@ -248,7 +248,7 @@ def test_a_save_and_its_checkpoint_carry_the_builds_stamp(tmp_path):
     data = original.save()
     stamp = data["build"]
     assert stamp == world_mod.build_stamp() == replay.stamp_of(data)
-    assert stamp["name"] == world_mod.BUILD_NAME == "m5c-c"
+    assert stamp["name"] == world_mod.BUILD_NAME == "m6a"
     assert len(stamp["rules"]) == 16 and int(stamp["rules"], 16) >= 0
     assert data["format"] == world_mod.SAVE_FORMAT == 1
     assert data["engine"] == world_mod.ENGINE_VERSION == "0.0.1"
