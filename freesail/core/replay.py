@@ -569,6 +569,10 @@ def load_report(
     # and saved again keeps it; the browser's server reads and cleans it for the chart
     # (`ui.server.take_marks`)
     world.chart_marks = [dict(m) for m in data.get("chart_marks") or [] if isinstance(m, dict)]
+    # the stations bound and unbound by hand (package 41): a replay re-makes none of it
+    # (the world order that will drive it is M7b's), so a load gives the save's back
+    if hasattr(world, "stations"):
+        world.stations.load(data.get("stations"))
     return world, report
 
 

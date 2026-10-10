@@ -13,6 +13,8 @@ ship: data/ships/brig.yaml
 stations:
   captain: commander
   officer of the watch: lieutenant
+  # the master's station (spec M6 §11; package 41): the brig-sloop's master
+  master: master
 
 wardroom:
   - role: commander

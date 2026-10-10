@@ -472,7 +472,10 @@ class People:
                 p.where = p.outline.place
         for station, role in wardroom.stations.items():
             holder = next((p for p in self.people if p.role == role), None)
-            if holder is not None:
+            if holder is not None and not holder.station:
+                # a person bound to two stations (package 41: the cutter's mate is the
+                # officer of the watch and the master's station) keeps the first in his
+                # outline's words; `holder` reads the file's map for either
                 holder.station = station
 
     def _scenario_people(self) -> None:
@@ -556,12 +559,14 @@ class People:
         whoever commands."""
         self._build()
         key = " ".join(str(station).lower().split())
+        wardroom = getattr(self, "_wardroom", None)
+        role = wardroom.role_of(key) if wardroom is not None else None
+        if role is not None:
+            # the file's binding, by role (package 41: a person may hold two stations)
+            return next((p for p in self.people if p.role == role), None)
         for p in self.people:
             if p.station == key:
                 return p
-        wardroom = getattr(self, "_wardroom", None)
-        if wardroom is not None and wardroom.role_of(key) is not None:
-            return None  # bound to a role the muster has not filled
         if key == "captain":
             return self.captain if self.people else None
         if key == "officer of the watch":

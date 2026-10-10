@@ -274,6 +274,8 @@ MOTION_WORDS_HOLD_S = 300
 AGENT_LOG_KINDS: tuple[str, ...] = (
     "agent.stationed",  # an agent took a station; its policy in words
     "agent.note",  # the free text of a reply: the watcher's narration, routine
+    "agent.hail",  # the lookout's words, a hail from the masthead (package 41), notable
+    "agent.spoke",  # the player's `say` on the quarterdeck (an order, journaled; 41)
     "agent.said",  # an `answer` to an `ask`, notable
     "agent.asked",  # the captain's `ask the <station> ...` (an order, journaled)
     "agent.told",  # the captain's `tell the <station> ...` (an order, journaled), notable
@@ -588,10 +590,15 @@ class World:
         from freesail.world.places import Hold, Papers, Places, Purse, Stores
         from freesail.world.ports import Ports
         from freesail.world.ships import Vessels
+        from freesail.world.stations import Stations
 
         self.nations = load_nations()
         self.places = Places(getattr(self.ship, "name", ""))
         self.people = People(self)
+        # the ship's stations as data, bound at run time (package 41; spec M6 §11): which
+        # stations she has and who holds each, the wardroom file's `stations:` the
+        # starting state; the doors, the seat and the briefs ask it
+        self.stations = Stations(self)
         self.papers = Papers(self)
         self.vessels = Vessels(self)
         hold_spec = getattr(getattr(self.ship, "spec", None), "hold", None)
@@ -655,6 +662,8 @@ class World:
         if getattr(self.ship, "extra", None) is not None:
             self.ship.extra["agents"] = self.agents
             self.ship.extra["agent_journals"] = self.agent_journals
+            # the stations aboard, for the orders' station sentences (package 41)
+            self.ship.extra["stations"] = self.stations
         # The rules-based captain (spec M6 §4; package 40; `freesail.world.captains`):
         # named for every ship, with the scenario's book or its intent; his judgements are
         # given only on an intent, when no model holds the captain's station with the deck,
@@ -1767,6 +1776,9 @@ class World:
             # the player's pencil on the chart (package 37n), for the chart alone; a replay
             # makes none of it, and the door that draws the chart takes it up from here
             "chart_marks": [dict(m) for m in self.chart_marks],
+            # the stations bound and unbound by hand (package 41), for the reader and a
+            # load; a replay re-makes a binding from the world order that made it (M7b)
+            "stations": self.stations.to_dict() if hasattr(self, "stations") else {},
         }
 
 
