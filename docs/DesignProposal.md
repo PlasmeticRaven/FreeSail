@@ -550,7 +550,7 @@ Each milestone ends in something you can run, and in a **gate**: a report writte
 
 **M6. Officers and captains.** LLM agents at station authority aboard the player's ship first; then rules-based and LLM NPC captains of separate ships; the regatta harness; parity tests. *Proves: parity; the game can be played by a model.*
 
-**M7. Powder.** Guns, shot, damage into the part graph, a two-ship action, prize resolution. *Proves: combat is the same system.*
+**M7. Powder.** Guns, shot, damage into the part graph, a two-ship action, prize resolution; and the sails at fine control (settling the halyards, the vangs, a sail kept shivering by command; the owner's notes in `docs/design/NotesForM7.md`). *Proves: combat is the same system.*
 
 **M7b. The director.** The director agent on the world-order channel with a brief, a hidden director's log, and a replay view. Depends on M5's world orders and M6's agent plumbing; small once both exist.
 
