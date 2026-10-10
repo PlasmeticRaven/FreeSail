@@ -109,7 +109,10 @@ ALL_PORTS = [
 ]
 # package 39d, Portugal and Cadiz: the block's five, the list kept in the files' order
 PORTUGAL_PORTS = ["cadiz", "lagos", "lisbon", "oporto", "setubal"]
-ALL_PORTS = sorted(ALL_PORTS + PORTUGAL_PORTS)
+# Madeira and the Western Islands' five (package 39e), Portuguese: neutral to a King's
+# ship and to an American, open to their own; in the files' order with the rest
+ISLANDS_PORTS = ["angra", "funchal", "horta", "ponta-delgada", "porto-santo"]
+ALL_PORTS = sorted(ALL_PORTS + PORTUGAL_PORTS + ISLANDS_PORTS)
 
 
 def test_the_five_ports_are_files_on_one_machinery_placed_from_the_chart():
@@ -267,6 +270,7 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     # with Britain, not her own)
     french_ports |= {"cadiz"}
     neutral_ports = set(PORTUGAL_PORTS) - {"cadiz"}
+    neutral_ports |= set(ISLANDS_PORTS)  # package 39e: the islands Portuguese, neutral
     assert {p.id: frigate.ports.stance(p) for p in frigate.ports.ports.values()} == {
         pid: ("hostile" if pid in french_ports else "neutral" if pid in neutral_ports else "open")
         for pid in ALL_PORTS

@@ -98,6 +98,11 @@ book_limits:
   - {south: 45.9, north: 51.0, west: -7.0, east: -0.9}
   - {south: 42.0, north: 45.9, west: -9.33, east: -0.9}  # Biscay south and Galicia (package 39c)
   - {south: 36.4, north: 42.0, west: -10.0, east: -6.0}  # Portugal and Cadiz (package 39d)
+  - {south: 36.5, north: 40.0, west: -31.5, east: -24.5}  # the Western Islands (package 39e)
+# Package 39e: the Western Islands' box is the region's bounds, far out in the ocean; the
+# only statement within it is the channel between Fayal and Pico (Tofiño's, below), and
+# elsewhere among the islands the master has none (the open Channel's is of its own
+# bounds, package 39d's rule, so it does not reach the sea between).
 
 areas:
   - id: carrick-road
@@ -721,6 +726,23 @@ areas:
       strongest_h: 0.0
       judgement: [set, rates, hour]
       source: "JUDGEMENT throughout: the world's figures rounded (no statement in Tofiño 1789 for the open coast)"
+  # package 39e: the channel between Fayal and Pico, Tofiño's (the Western Islands)
+  - id: fayal-channel
+    chart: azores
+    name: the channel between Fayal and Pico
+    polygon: [[38.48, -28.61], [38.48, -28.52], [38.56, -28.52], [38.56, -28.61]]
+    axis_deg: 45
+    spring_kn: 3.0
+    neap_kn: 1.5
+    phase_h: -3.0
+    source: "Tofiño 1789, 'Isla del Fayal', pp. 224 to 225: when the tide rises the water runs through this channel to the N E, and when it falls to the S W, its greatest speed three miles; on the day of new or full moon high water at half past twelve; the axis and the springs' rate his, the neaps half the springs and the hour (strongest at half flood, the stream running with the rising tide) JUDGEMENT"
+    book:
+      set: NE
+      spring_kn: 3.0
+      neap_kn: 1.5
+      strongest_h: -3.0
+      judgement: [set, rates, hour]
+      source: "Tofiño 1789, 'Isla del Fayal', pp. 224 to 225: the flood N E and the ebb S W through the channel, three miles at the most; the set is the world's axis to the nearest point and the period's own word; the neaps half the springs and the hour JUDGEMENT"
   - id: mid-channel
     chart: channel-west
     name: the open Channel

@@ -1,0 +1,723 @@
+# The features of the Western Islands, the Azores (spec M6 §26, block 5 as decision 44
+# widened it; package 39e): the nine islands, their roads and their marks as 1805 had
+# them, in the period's words, each with its source in the references' form
+# (docs/references/README.md), on the rules of channel-west.yaml's head, read from:
+#
+#   Tofiño 1789     Vicente Tofiño de San Miguel, Derrotero de las costas de España en el
+#                   Océano Atlántico, y de las Islas Azores ó Terceras (Madrid, 1789;
+#                   Internet Archive derroterodelasco00tofi_0), the OCR text, 'Derrotero
+#                   de las Islas Azores ó Terceras', pp. 190 to 235: San Miguel pp. 190 to
+#                   197, Santa María pp. 197 to 201, the Hormigas (the Formigas) pp. 201 to
+#                   202, Tercera and the road of Angra pp. 203 to 209, San Jorge pp. 209 to
+#                   212, Graciosa pp. 212 to 215, Pico pp. 215 to 219, Fayal and its road
+#                   pp. 219 to 227 (the Peak's height and its horizon pp. 225 to 226),
+#                   Flores pp. 227 to 232, Cuervo p. 233. In period exactly: the Spanish
+#                   survey of the islands made in 1788 from Angra and Fayal. In Spanish:
+#                   the names here are the English pilots' where they had one (Fayal, St
+#                   Michael's, St Mary's, St George's, the Formigas or Ants), the
+#                   Portuguese otherwise; his depths are in brazas of two varas, 1.672 m,
+#                   given here in English fathoms (0.914 to the braza) with his figure in
+#                   the source; his Spanish feet (pies, a third of the vara, 0.279 m) the
+#                   same.
+#   Norie 1805      J. W. Norie, A New and Complete Epitome of Practical Navigation, 1805,
+#                   the table of latitudes and longitudes (the Azores, the longitudes lost
+#                   to the OCR's columns) and Table XLI (p. 250; the page image read for
+#                   Funchal, the Azores' rows not legible in the OCR).
+#   encyclopaedia   the Portuguese encyclopaedia's pages for the lights, read 2026-10-10
+#                   (pt.wikipedia.org): the Ponta do Arnel's, lit 26 November 1876, "the
+#                   first light set up in the Azores"; the Ferraria's 1901; Gonçalo Velho's
+#                   on Santa Maria 15 November 1927; the Contendas' 1 February 1934; the
+#                   Ponta do Topo's 1927; the Ponta da Ilha's 1946; the Ribeirinha's on
+#                   Fayal 1 November 1919; Santa Clara's at Ponta Delgada 15 June 1945. No
+#                   light stood in the islands in 1805.
+#
+# No period plan of a road was transcribed (Tofiño's plans of Angra and of the port of
+# Fayal are named in his text, "véase su plano", and were not found from this machine),
+# so no override is patched and the port files say `datum: unverified`.
+#
+# Positions are in the modern frame (WGS 84, the EMODnet DTM 2024 grid the tiles are cut
+# from): first placed from the modern chart (from memory) and Tofiño's bearings and
+# distances, then checked against the region's tiles by channel-west.yaml's rule (a
+# headland, island, town, castle or hill to the nearest land within 800 m; a light to the
+# nearest land within 400 m; a rock to the nearest shoal head within 400 m; an anchorage
+# to water holding half the pilot's depth within 800 m), each move in `fix`. Heights are
+# above the sea for the horizon, the modern chart's from memory (UNVERIFIED) unless the
+# entry says otherwise. The islands' peaks stand far above the search's reach
+# (`chart.SEARCH_HEIGHT_M`, 300 m) and are seen to their own horizon in clear weather;
+# the Peak of Pico is the voyage's landfall.
+#
+# The lead reviews this list against the sources before the merge: the citation is on
+# every line for that.
+
+region: azores
+features:
+
+  # ---------------------------------------------------------------------------
+  # St Michael's (São Miguel)
+  # ---------------------------------------------------------------------------
+
+  - id: ponta-delgada-town
+    kind: town
+    name: Ponta Delgada
+    modern: Ponta Delgada
+    lat_deg: 37.7410
+    lon_deg: -25.6680
+    height_m: 20
+    source: "Tofiño 1789, 'Isla de San Miguel', pp. 190 to 191: the mole of the town of Punta Delgada, the principal of the whole island, with much trade in its fruits with the other islands and with Lisbon, a mile and a half N E of the point of the same name"
+    says: "Ponta Delgada, the chief town of St Michael's, along the shore of its open bay."
+
+  - id: ponta-delgada-point
+    kind: headland
+    name: the point of Ponta Delgada
+    modern: Ponta de Santa Clara
+    lat_deg: 37.7332
+    lon_deg: -25.6900
+    height_m: 10
+    source: "Tofiño 1789, 'Isla de San Miguel', pp. 190 to 191: the Punta Delgada, in latitude 37 43 5x N, low, of stone, with a castle that defends its anchorage"
+    says: "The point of Ponta Delgada, low and of stone, with a castle on it, a mile and a half south-west of the town."
+    fix: "moved 90 m to the grid's land"
+
+  - id: ponta-delgada-road
+    kind: anchorage
+    name: Ponta Delgada Road
+    modern: the anchorage off Ponta Delgada
+    lat_deg: 37.7290
+    lon_deg: -25.6650
+    height_m: 0
+    depth_fathoms: 32
+    bottom: "sand"
+    source: "Tofiño 1789, 'Isla de San Miguel', p. 191: the road, open to the winds and seas of the second, third and part of the fourth quadrant, offers two anchorages, the principal south of the town in 30 or 40 brazas, sand, the islet of Rosto de Cão on with the church of S Roque, and the tower of the great church by a large country house north of it"
+    says: "Ponta Delgada Road, open from east round by south to west: anchor south of the town in thirty or forty brazas on sand, the Rosto de Cão on with the church of São Roque."
+    fix: "moved 450 m south to the grid's 51 m, the pilot's thirty brazas"
+
+  - id: rosto-de-cao
+    kind: island
+    name: the islet of Rosto de Cão
+    modern: Ilhéu de São Roque (Rosto de Cão)
+    lat_deg: 37.7540
+    lon_deg: -25.6300
+    height_m: 20
+    source: "Tofiño 1789, 'Isla de San Miguel', p. 191: the islet of Rastro de Cans bears N 70 E three miles from the Punta Delgada; easy to know, being the only high and steep land seen at the bottom of the bay, at the western end of a beach"
+    says: "The islet of Rosto de Cão, the only high steep land at the bottom of the bay, the leading mark for Ponta Delgada Road with the church of São Roque."
+
+  - id: galera-point
+    kind: headland
+    name: the Ponta da Galera
+    modern: Ponta da Galera
+    lat_deg: 37.7080
+    lon_deg: -25.5130
+    height_m: 10
+    source: "Tofiño 1789, 'Isla de San Miguel', p. 191: S 75 E seven miles and a half from the Punta Delgada is that of the Galera, low, of stone, with islets at its foot and a battery; between the two points the coast forms a great bay"
+    says: "The Ponta da Galera, low and of stone with islets at its foot and a battery, the east end of the great bay of Ponta Delgada."
+    fix: "the first placing lay in the bay with no land within 800 m; placed on the grid's southernmost land east of the bay, by Caloura, which Tofiño's S 75 E 7 1/2 miles from the point of Ponta Delgada fits within a mile and five degrees (his bearings true: this pair proves it, a magnetic bearing would put it twenty degrees off)"
+
+  - id: vila-franca-islet
+    kind: island
+    name: the islet of Villa Franca
+    modern: Ilhéu de Vila Franca do Campo
+    lat_deg: 37.7060
+    lon_deg: -25.4420
+    height_m: 62
+    source: "Tofiño 1789, 'Isla de San Miguel', p. 192: S 83 E two and a quarter miles from the Punta de la Galera is the middle of the islet of Villafranca, high and steep on the S and S W, low on the S E, with a little harbour mouth north for four or five small craft, two feet at its entrance at low water"
+    says: "The islet of Villa Franca, high and steep on its south side, with a little harbour inside it that dries."
+    fix: "the grid does not resolve the islet (9 m of water at its place, the shore's land 600 m north): its place the modern chart's, from memory, unverified"
+
+  - id: vila-franca-road
+    kind: anchorage
+    name: the anchorage of Villa Franca
+    modern: the channel between the Ilhéu de Vila Franca and the shore
+    lat_deg: 37.7097
+    lon_deg: -25.4386
+    height_m: 0
+    depth_fathoms: 10
+    bottom: "sand"
+    source: "Tofiño 1789, 'Isla de San Miguel', p. 192: the channel the islet forms with the coast, about three cables wide, is the principal anchorage of Villafranca, with 10 and 11 brazas, sand; ships moor N and S with a cable ashore to the islet, which is too small to shelter them from E S E round by S to S S W"
+    says: "Villa Franca's anchorage between the islet and the shore, ten or eleven brazas on sand, moored north and south with a line to the islet; open from east-south-east to south-south-west."
+    fix: "moved 190 m to the grid's 9 m, half the pilot's ten brazas, between the islet's place and the shore"
+
+  - id: pico-da-vara
+    kind: hill
+    name: the high land of the east end of St Michael's
+    modern: Pico da Vara
+    lat_deg: 37.8090
+    lon_deg: -25.2150
+    height_m: 1103
+    source: "Tofiño 1789, 'Isla de San Miguel', p. 193: this part of the island is the highest, for from close to its shores rise very high mountains, which fall away westward as the island narrows in its middle; the height the modern chart's (from memory, unverified)"
+    says: "The high mountains of the east end of St Michael's, the island's highest land."
+
+  - id: arnel-point
+    kind: headland
+    name: the Ponta do Arnel
+    modern: Ponta do Arnel
+    lat_deg: 37.8240
+    lon_deg: -25.1370
+    height_m: 60
+    source: "Tofiño 1789, 'Isla de San Miguel', pp. 193 to 194: N three quarters of a mile from the Punta de la Marquesa is that called del Arnel, lower than the former, with a little harbour of the same name, very bad, unsheltered and its bottom stone; the Marquesa the most easterly of the island, latitude 37 48 10 N"
+    says: "The Ponta do Arnel, the east end of St Michael's, with a poor little boat harbour under it."
+
+  - id: arnel-light
+    kind: light
+    name: the light of the Ponta do Arnel
+    modern: Farol da Ponta do Arnel
+    lat_deg: 37.8250
+    lon_deg: -25.1360
+    height_m: 66
+    lit: {from: 1876, until: null, range_nm: 19, character: "an occulting light (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Farol da Ponta do Arnel' (pt.wikipedia, read 2026-10-10): in service 26 November 1876, the first light of the Azores; focal height 66 m"
+    says: "The light of the Ponta do Arnel, which was not yet built in 1805."
+
+  - id: ferraria-point
+    kind: headland
+    name: the Ponta da Ferraria
+    modern: Ponta da Ferraria
+    lat_deg: 37.8580
+    lon_deg: -25.8516
+    height_m: 50
+    source: "Tofiño 1789, 'Isla de San Miguel', p. 190: the Punta de la Ferrería, the most westerly of the island, in latitude 37 54 15 N; high and steep, a low point running out from its foot, from which a reef runs S W a league with 7 to 10 brazas, stone, on which the sea breaks much in a heavy swell"
+    says: "The Ponta da Ferraria, the west end of St Michael's, high and steep; a reef runs a league south-west from its foot, and in a heavy sea it breaks."
+    fix: "moved 120 m to the grid's land"
+
+  - id: ferraria-light
+    kind: light
+    name: the light of the Ferraria
+    modern: Farol da Ponta da Ferraria
+    lat_deg: 37.8600
+    lon_deg: -25.8510
+    height_m: 107
+    lit: {from: 1901, until: null, range_nm: 27, character: "three flashes (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Farol da Ferraria' (pt.wikipedia, read 2026-10-10): built 1901; focal height 107 m"
+    says: "The light of the Ferraria, which was not yet built in 1805."
+
+  - id: mosteiros-islets
+    kind: island
+    name: the Mosteiros
+    modern: Ilhéus dos Mosteiros
+    lat_deg: 37.8930
+    lon_deg: -25.8330
+    height_m: 50
+    source: "Tofiño 1789, 'Isla de San Miguel', p. 196: between the Punta de Matogos and the Ferrería are the islets Mosteiros, the greatest high, steep and flat on its top, with a hole through which the sea passes, and four smaller on its land side"
+    says: "The Mosteiros, high steep islets off the west end of St Michael's, the greatest with a hole through it."
+    fix: "the grid does not resolve the islets (30 m of water at their place): their place the modern chart's, from memory, unverified"
+
+  - id: ribeira-grande
+    kind: town
+    name: Ribeira Grande
+    modern: Ribeira Grande
+    lat_deg: 37.8210
+    lon_deg: -25.5200
+    height_m: 15
+    source: "Tofiño 1789, 'Isla de San Miguel', p. 195: the town of Riveira grande, large and rich, with a great beach, the only one on the north coast, but so unsheltered that only in a very smooth sea can one land on it"
+    says: "Ribeira Grande on the north coast of St Michael's, a rich town on an open beach where a boat lands only in a smooth sea."
+
+  # ---------------------------------------------------------------------------
+  # St Mary's (Santa Maria) and the Formigas
+  # ---------------------------------------------------------------------------
+
+  - id: santa-maria-town
+    kind: town
+    name: the town of St Mary's
+    modern: Vila do Porto
+    lat_deg: 36.9440
+    lon_deg: -25.1450
+    height_m: 30
+    source: "Tofiño 1789, 'Isla de Santa María', pp. 199 to 201: the port of Santa María, where is the town of that name, capital of the island, very unsheltered and exposed to the southerlies; small craft only anchor in it, and in summer"
+    says: "The town of St Mary's over its little open port, exposed to the southerly winds."
+
+  - id: santa-maria-high-land
+    kind: hill
+    name: the Pico Alto of St Mary's
+    modern: Pico Alto, Santa Maria
+    lat_deg: 36.9850
+    lon_deg: -25.0880
+    height_m: 587
+    source: "Tofiño 1789, 'Isla de Santa María', p. 197: the eastern part of this island is high and broken, the western low and even; in the first some mountains and peaks, the highest called Pico alto; its coasts clean and steep-to; the height the modern chart's (from memory, unverified)"
+    says: "The Pico Alto of St Mary's, over the high broken east of the island; the west end is low and even."
+
+  - id: castelo-point
+    kind: headland
+    name: the Ponta do Castelo
+    modern: Ponta do Castelo, Santa Maria
+    lat_deg: 36.9290
+    lon_deg: -25.0170
+    height_m: 80
+    source: "Tofiño 1789, 'Isla de Santa María', p. 197: the Punta do Castelo is the south-easternmost of the island, in latitude 36 56 47 N; high, with a cleft that forms a peak like a sentry box; one may anchor N N E of it near the point in 10 brazas, sand"
+    says: "The Ponta do Castelo, the south-east point of St Mary's, high, with a peak on it like a sentry box."
+
+  - id: goncalo-velho-light
+    kind: light
+    name: the light of the Ponta do Castelo
+    modern: Farol de Gonçalo Velho
+    lat_deg: 36.9300
+    lon_deg: -25.0170
+    height_m: 115
+    lit: {from: 1927, until: null, range_nm: 25, character: "flashing (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Farol de Gonçalo Velho' (pt.wikipedia, read 2026-10-10): in service 15 November 1927; focal height 115 m"
+    says: "The light of the Ponta do Castelo, which was not yet built in 1805."
+
+  - id: sao-lourenco-road
+    kind: anchorage
+    name: the port of St Lawrence
+    modern: Baía de São Lourenço, Santa Maria
+    lat_deg: 36.9941
+    lon_deg: -25.0499
+    height_m: 0
+    depth_fathoms: 14
+    bottom: "sand, very clean"
+    source: "Tofiño 1789, 'Isla de Santa María', pp. 198 and 201: the port of San Lorenzo, formed by the islet of its name and the Punta dos Matos, a long mile apart; the bottom sand and very clean, 10 brazas between the points increasing outward, but not to anchor in more than 20, beyond which it is bad; the best anchorage of the island; water got by digging in the sand of the beach"
+    says: "The port of St Lawrence on the east side of St Mary's, the island's best anchorage: ten to twenty brazas on clean sand, and water dug from the beach."
+    fix: "the first placing was on the grid's land; moved 470 m to the grid's 13 m in the bay, the pilot's ten brazas between the points"
+
+  - id: formigas
+    kind: rock
+    name: the Formigas, or Ants
+    modern: Ilhéus das Formigas
+    lat_deg: 37.2710
+    lon_deg: -24.7800
+    height_m: 9
+    extent_m: 600
+    source: "Tofiño 1789, 'Islotes llamados las Hormigas', pp. 201 to 202: stones the navigators thought a grave risk between St Mary's and St Michael's, but surveyed they are all visible, together and clean, and ships of all sizes may pass north or south of them; the whole runs N 50 E and S 50 W six cables; the Hormigón, a round thick rock 10 or 12 varas high, the highest of them, the first seen; at a distance they look like a city; latitude 37 17 10 N; Norie 1805, the table: 'Formigas, or Ants'"
+    says: "The Formigas, or Ants, a cluster of black rocks six cables long, the highest ten or twelve varas, like a city at a distance; all of them visible and clean, and a ship may pass either side."
+    fix: "the modern chart's place, from memory; the grid has neither the rocks nor any water under 34 m within eight kilometres of them, so the Formigas stand in the world by this feature alone (a rock of 9 m and 600 m of solid ground about it, `Chart.danger_under`)"
+
+  - id: dollabarat
+    kind: shoal
+    name: the shoal south-east of the Formigas
+    modern: Recife Dollabarat
+    lat_deg: 37.2320
+    lon_deg: -24.7230
+    height_m: 0
+    source: "Tofiño 1789, 'Islotes llamados las Hormigas', p. 202: the pilots of St Mary's agree that the Hormigas have a shoal that runs far out on their S E part; sounded with two of them aboard looking for its least water, not less than 11 brazas was found on it; in a heavy sea it must break; the modern chart's Dollabarat reef about three miles south-east of the Formigas (from memory, unverified), which the grid has at its least depth"
+    says: "A shoal south-east of the Formigas that breaks in a heavy sea; the Spanish survey found no less than eleven brazas on it, but give it a berth."
+    fix: "the modern chart's place, from memory; the grid has 100 m there and no water under 34 m within eight kilometres: no shoal in the world, as Tofiño found none under eleven brazas"
+
+  # ---------------------------------------------------------------------------
+  # Terceira and the road of Angra
+  # ---------------------------------------------------------------------------
+
+  - id: monte-brasil
+    kind: hill
+    name: Monte Brasil
+    modern: Monte Brasil
+    lat_deg: 38.6447
+    lon_deg: -27.2337
+    height_m: 205
+    source: "Tofiño 1789, 'Isla Tercera', p. 203: in the middle and most southerly part of this island rises Monte del Brasil, high enough and sheer to the sea, with two pillars on its top that serve as look-outs, falling gently to the north, on whose skirt is the citadel of San Juan; the pillars in latitude 38 38 1x N"
+    says: "Monte Brasil, high and sheer to the sea with its two look-out pillars on top, the citadel on its northern skirt and Angra beyond."
+    fix: "moved 42 m to the grid's land"
+
+  - id: angra-town
+    kind: town
+    name: Angra
+    modern: Angra do Heroísmo
+    lat_deg: 38.6560
+    lon_deg: -27.2190
+    height_m: 25
+    source: "Tofiño 1789, 'Isla Tercera', p. 203: the city of Angra, the residence of the Captain General, the Bishop and the government of all the islands, spreads over the plain from the citadel; its mole of hazardous access in any swell"
+    says: "Angra, the city of the Captain General and the Bishop, at the head of its bay under Monte Brasil."
+
+  - id: angra-citadel
+    kind: castle
+    name: the citadel of St John
+    modern: Fortaleza de São João Baptista
+    lat_deg: 38.6510
+    lon_deg: -27.2270
+    height_m: 40
+    source: "Tofiño 1789, 'Isla Tercera', pp. 203 to 204: on the northern skirt of Monte Brasil the citadel or castle of San Juan, the principal defence of the whole island and of the city; from it walls and batteries run round the eastern skirt of the mount to the castle of San Antonio"
+    says: "The citadel of St John on the skirt of Monte Brasil, the defence of the island and of Angra."
+
+  - id: angra-san-sebastian
+    kind: castle
+    name: the castle of St Sebastian
+    modern: Forte de São Sebastião, Angra
+    lat_deg: 38.6545
+    lon_deg: -27.2100
+    height_m: 20
+    source: "Tofiño 1789, 'Isla Tercera', pp. 203 to 204: N 41 30 E six tenths of a mile from the top of Monte Brasil is the castle of San Sebastian; between it and that of San Antonio is the anchorage; at its foot the little beach called the Puerto de las Pipas, where the fishing boats are hauled up and one may land when the swell forbids the mole"
+    says: "The castle of St Sebastian on the east side of Angra's bay, with the little beach of the Pipas at its foot where a boat lands when the mole cannot be used."
+
+  - id: angra-road
+    kind: anchorage
+    name: Angra Road
+    modern: the anchorage east of Monte Brasil
+    lat_deg: 38.6440
+    lon_deg: -27.2160
+    height_m: 0
+    depth_fathoms: 32
+    bottom: "sand"
+    source: "Tofiño 1789, 'Isla Tercera', p. 204: ships of some size and all ships of war anchor east of Monte del Brasil in 30 or 40 brazas, sand, and must be ready to make sail the moment a wind from the second or third quadrant is announced; merchant ships moor in four within the line of the castles of San Antonio and San Sebastian, open to the second and part of the third quadrant, and in winter are often lost on the coast"
+    says: "Angra Road: a ship of war anchors east of Monte Brasil in thirty or forty brazas on sand, ready to put to sea at the first of a southerly or south-easterly; the merchants moor within, between the castles, and lose ships there in winter."
+
+  - id: ilheus-das-cabras
+    kind: island
+    name: the Cabras
+    modern: Ilhéus das Cabras
+    lat_deg: 38.6287
+    lon_deg: -27.1481
+    height_m: 146
+    source: "Tofiño 1789, 'Isla Tercera', p. 205: the islands Cabras bear S 80 30 E four miles from the top of Monte Brasil, two thirds of a mile from the nearest coast; two, the eastern the greater and higher, sheer on its south side, like a wedge seen east to west; between them and the coast any ship may pass in 9, 12 and 13 brazas, sand"
+    says: "The Cabras, two islets four miles east of Monte Brasil, the eastern high and sheer to the south like a wedge; a ship may pass inside them in nine to thirteen brazas."
+    fix: "the grid does not resolve the islets as land: placed on its shoal head awash (0.1 m under the datum) 600 m east of the first placing, two thirds of a mile off the coast as Tofiño has them; a ship grounds on that head"
+
+  - id: contendas-point
+    kind: headland
+    name: the Pico das Contendas
+    modern: Ponta das Contendas
+    lat_deg: 38.6410
+    lon_deg: -27.0820
+    height_m: 80
+    source: "Tofiño 1789, 'Isla Tercera', p. 205: the coast runs east to the Pico de las Contiendas, notable for standing out into the sea and forming three peaks on its summit"
+    says: "The Pico das Contendas, standing out to sea with three peaks on its top, the south-east corner of Terceira."
+
+  - id: contendas-light
+    kind: light
+    name: the light of the Contendas
+    modern: Farol das Contendas
+    lat_deg: 38.6430
+    lon_deg: -27.0830
+    height_m: 53
+    lit: {from: 1934, until: null, range_nm: 23, character: "four flashes, white and red (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Farol das Contendas' (pt.wikipedia, read 2026-10-10): lit 1 February 1934 (its tower built 1882); focal height 53 m"
+    says: "The light of the Contendas, which was not yet built in 1805."
+
+  - id: praia-terceira
+    kind: town
+    name: Praya
+    modern: Praia da Vitória
+    lat_deg: 38.7320
+    lon_deg: -27.0660
+    height_m: 15
+    source: "Tofiño 1789, 'Isla Tercera', p. 206: between the Malmerenda and the Baxíos a great bay with a beach and a town at its head called Praya, with batteries to defend this only accessible place of the island"
+    says: "Praya at the head of its great sandy bay on the east side of Terceira."
+
+  - id: praia-road
+    kind: anchorage
+    name: Praya Road
+    modern: the bay of Praia da Vitória
+    lat_deg: 38.7280
+    lon_deg: -27.0420
+    height_m: 0
+    depth_fathoms: 23
+    bottom: "sand"
+    source: "Tofiño 1789, 'Isla Tercera', pp. 206 to 207: the bay is clean with much depth and good holding, room for a squadron, sheltered from the third and fourth quadrants but wholly open to the first and second; the most convenient anchorage with the Malmerenda on the islet of Caneiros and the tower of Santa Cruz bearing W, in 25 brazas, sand"
+    says: "Praya Road, room for a squadron on good sandy ground in twenty-five brazas, sheltered from the west but open to every easterly wind."
+
+  - id: santa-barbara
+    kind: hill
+    name: the Serra de Santa Bárbara
+    modern: Serra de Santa Bárbara
+    lat_deg: 38.7300
+    lon_deg: -27.3220
+    height_m: 1021
+    source: "Tofiño 1789, 'Isla Tercera', pp. 207 to 208: near the Punta Gorda rises a notable mount called the Pico de Santa Bárbara with a look-out on its top; the island has a ridge running nearly east and west whose western end is the highest, called Santa Bárbara or the Serreta; the height the modern chart's (from memory, unverified)"
+    says: "The Serra de Santa Bárbara, the high western end of Terceira, with a look-out on its top."
+
+  # ---------------------------------------------------------------------------
+  # St George's (São Jorge) and Graciosa
+  # ---------------------------------------------------------------------------
+
+  - id: velas-town
+    kind: town
+    name: Velas
+    modern: Velas, São Jorge
+    lat_deg: 38.6800
+    lon_deg: -28.2060
+    height_m: 15
+    source: "Tofiño 1789, 'Isla de San Jorge', p. 210: at the head of the bay the natives call the port of Velas, sheltered from the first and fourth quadrants and part of the second, is the town of Velas, the principal of the island, with a little mole of three brazas, stone"
+    says: "Velas, the chief town of St George's, at the head of its little bay."
+
+  - id: velas-road
+    kind: anchorage
+    name: the anchorage of Velas
+    modern: the bay of Velas
+    lat_deg: 38.6760
+    lon_deg: -28.2030
+    height_m: 0
+    depth_fathoms: 8
+    bottom: "fine black sand"
+    source: "Tofiño 1789, 'Isla de San Jorge', p. 210: the usual anchorage of this bay is S S E of the mole in nine brazas, fine black sand; ships moor in two, N W and S E"
+    says: "The anchorage of Velas, south-south-east of the mole in nine brazas of fine black sand, moored north-west and south-east."
+
+  - id: esperanca
+    kind: hill
+    name: the high land of St George's
+    modern: Pico da Esperança
+    lat_deg: 38.6500
+    lon_deg: -28.0700
+    height_m: 1053
+    source: "Tofiño 1789, 'Isla de San Jorge', pp. 209 to 211 (the island's coasts, high and steep); the height the modern chart's (from memory, unverified)"
+    says: "The long high ridge of St George's."
+
+  - id: topo-point
+    kind: headland
+    name: the Ponta do Topo
+    modern: Ponta do Topo and its islet
+    lat_deg: 38.5500
+    lon_deg: -27.7571
+    height_m: 50
+    source: "Tofiño 1789, 'Isla de San Jorge', p. 209: the Punta del Topo, the south-eastern of the island, bears S 76 W 30 miles from the top of Monte Brasil, latitude 38 30 45 N; of middling height with stones about it, the islet of the same name to its east, very low, surrounded by stones, with a passage for any ship between the point and a stone in the middle"
+    says: "The Ponta do Topo, the east end of St George's, with its low islet off it."
+    fix: "moved 180 m to the grid's land"
+
+  - id: topo-light
+    kind: light
+    name: the light of the Ponta do Topo
+    modern: Farol da Ponta do Topo
+    lat_deg: 38.5500
+    lon_deg: -27.7571
+    height_m: 62
+    lit: {from: 1927, until: null, range_nm: 20, character: "three flashes (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Farol da Ponta do Topo' (pt.wikipedia, read 2026-10-10): inaugurated 1927 (15 July); focal height 62 m"
+    says: "The light of the Ponta do Topo, which was not yet built in 1805."
+    fix: "moved 90 m to the grid's land"
+
+  - id: graciosa-town
+    kind: town
+    name: Santa Cruz of Graciosa
+    modern: Santa Cruz da Graciosa
+    lat_deg: 39.0860
+    lon_deg: -28.0070
+    height_m: 15
+    source: "Tofiño 1789, 'Isla Graciosa', pp. 213 to 214: the bay and town of Santa Cruz, the principal of the island, near which on the S W three little hills each with a church on its top serve to know the island; no anchorage in the bay, the bottom being stone"
+    says: "Santa Cruz of Graciosa, with three little hills each crowned by a church behind it; no anchorage before it."
+
+  - id: graciosa-high-land
+    kind: hill
+    name: the high land of Graciosa
+    modern: the Caldeira of Graciosa
+    lat_deg: 39.0230
+    lon_deg: -27.9700
+    height_m: 402
+    source: "Tofiño 1789, 'Isla Graciosa', pp. 214 to 215: the island is mountainous, and seen from N E to S W at a distance looks like two islands, the hills over Punta Blanca and over the Carrapacho leaving low land between them that the sea's horizon hides; the height the modern chart's (from memory, unverified)"
+    says: "The hills of Graciosa, which at a distance look like two islands."
+
+  - id: graciosa-praia-road
+    kind: anchorage
+    name: Praya of Graciosa
+    modern: the anchorage off Praia, Graciosa
+    lat_deg: 39.0579
+    lon_deg: -27.9527
+    height_m: 0
+    depth_fathoms: 32
+    bottom: "sand"
+    source: "Tofiño 1789, 'Isla Graciosa', p. 213: the best anchorage of the island in 30 or 40 brazas, sand, the Islita de Abaxo a little open of the west end of the islet of Praya; here goods are shipped with most ease and ships are safe to get away with any wind, sheltered only from the third and fourth quadrants"
+    says: "Praya of Graciosa, the island's best anchorage, thirty or forty brazas on sand off the east side."
+
+  # ---------------------------------------------------------------------------
+  # Pico
+  # ---------------------------------------------------------------------------
+    fix: "moved 600 m east to the grid's 30 m, half the pilot's thirty to forty brazas and more"
+
+  - id: peak-of-pico
+    kind: hill
+    name: the Peak of Pico
+    modern: Montanha do Pico
+    lat_deg: 38.4686
+    lon_deg: -28.3994
+    height_m: 2351
+    source: "Tofiño 1789, 'Isla del Fayal', pp. 225 to 226: measured from a base on the beach of Orta, the vertical height of the Peak above the sea 2935 varas castellanas, 1258 toesas (2453 m); the tangent from its top to the sea's horizon 32 maritime leagues, so that at that distance it may be seen in clear weather; a cone with a sharp point, its skirts to half its height clothed in vines; its summit often covered with cloud; the height here the modern chart's 2351 m (from memory, unverified), Tofiño's a hundred metres more"
+    says: "The Peak of Pico, a single cone rising out of the sea to its sharp summit, seen thirty leagues off in clear weather; the vines climb half its height."
+
+  - id: madalena
+    kind: town
+    name: the Magdalena
+    modern: Madalena, Pico
+    lat_deg: 38.5360
+    lon_deg: -28.5280
+    height_m: 10
+    source: "Tofiño 1789, 'Isla del Pico', p. 217: the port of the Magdalena, a very small cove with a town, where most of the island's fruits are shipped for Fayal in small rowing craft"
+    says: "The Magdalena on Pico, the little port whence the island's wine goes over to Fayal in boats."
+
+  - id: madalena-islets
+    kind: island
+    name: the islets of the Magdalena
+    modern: Ilhéus da Madalena (Em Pé and Deitado)
+    lat_deg: 38.5380
+    lon_deg: -28.5400
+    height_m: 70
+    source: "Tofiño 1789, 'Isla del Pico', p. 217: N 71 W half a mile from the point of the Magdalena are the islets of that name, high and steep, the northern the lesser, two tenths of a mile apart N E and S W, surrounded by stones but with 6, 7 and 8 brazas close to; between them and the coast a passage for small craft only"
+    says: "The two high steep islets off the Magdalena, with deep water close to them on the Fayal side."
+    fix: "the grid does not resolve the islets (8 m of water at their place): their place the modern chart's, from memory, unverified"
+
+  - id: lajes-do-pico
+    kind: town
+    name: Lagens of Pico
+    modern: Lajes do Pico
+    lat_deg: 38.3950
+    lon_deg: -28.2560
+    height_m: 10
+    source: "Tofiño 1789, 'Isla del Pico', p. 216: between the Arrife and the Misterio de San Juan the lagoon and town of Lagens, the lagoon opening to the sea by a bar which coasting craft enter at high water"
+    says: "Lagens on the south side of Pico, with a lagoon behind its bar that the coasters enter at high water."
+
+  - id: ponta-da-ilha
+    kind: headland
+    name: the east point of Pico
+    modern: Ponta da Ilha
+    lat_deg: 38.4101
+    lon_deg: -28.0300
+    height_m: 30
+    source: "Tofiño 1789, 'Isla del Pico', pp. 215 to 216: the point called de la Isla is the south-easternmost of the island of Pico, with a reef a cable long to the east, latitude 38 22 5x N, of middling height and steep"
+    says: "The Ponta da Ilha, the east end of Pico, with a reef a cable off it."
+    fix: "moved 150 m to the grid's land"
+
+  - id: ponta-da-ilha-light
+    kind: light
+    name: the light of the Ponta da Ilha
+    modern: Farol da Ponta da Ilha
+    lat_deg: 38.4102
+    lon_deg: -28.0300
+    height_m: 29
+    lit: {from: 1946, until: null, range_nm: 24, character: "three flashes (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Farol da Ponta da Ilha' (pt.wikipedia, read 2026-10-10): built 1946; focal height 29 m"
+    says: "The light of the Ponta da Ilha, which was not yet built in 1805."
+
+  # ---------------------------------------------------------------------------
+  # Fayal and its road
+  # ---------------------------------------------------------------------------
+    fix: "moved 30 m to the grid's land"
+
+  - id: horta-town
+    kind: town
+    name: the town of Fayal
+    modern: Horta
+    lat_deg: 38.5340
+    lon_deg: -28.6290
+    height_m: 20
+    source: "Tofiño 1789, 'Isla del Fayal', p. 222: the bay between the Punta de Espalamaca and the mount of N S de la Guia, at whose head a great beach of black sand runs to the Monte Caimado, along which stands the Villa de Orta, with two notable buildings: the Jesuits' college near the shore and the convent of the Carmen on a height at the west of the town"
+    says: "The town of Fayal, Horta, along its black-sand beach, the Jesuits' college by the shore and the Carmen on the height behind."
+
+  - id: monte-da-guia
+    kind: hill
+    name: the Mount of Our Lady of the Guide
+    modern: Monte da Guia
+    lat_deg: 38.5222
+    lon_deg: -28.6216
+    height_m: 145
+    source: "Tofiño 1789, 'Isla del Fayal', pp. 219 to 220: the little mount of Nuestra Señora de la Guia, of fair height, lying N N W and S S E with a hermitage on its top, the south-easternmost of the island, latitude 38 30 55 N; joined to the north by a tongue of sand to a smaller black one called the Caimado, where the town begins; west of it the cove of Porto Pim"
+    says: "Monte da Guia with its hermitage on top, the south side of Fayal's road, joined to the town by a neck of sand."
+    fix: "moved 320 m to the grid's land"
+
+  - id: espalamaca-point
+    kind: headland
+    name: the Point of Espalamaca
+    modern: Ponta da Espalamaca
+    lat_deg: 38.5480
+    lon_deg: -28.6071
+    height_m: 120
+    source: "Tofiño 1789, 'Isla del Fayal', pp. 221 to 222: S 2 W nine tenths of a mile from the Punta de Yoao Diaz is that of Espalamaca, high and steep with a little round front, a look-out on its top; the northern point of the bay of the Villa de Orta, the Guia the southern, bearing S 27 W and N 27 E of each other a mile and eight tenths"
+    says: "The Point of Espalamaca, high and steep with a look-out on top, the north side of Fayal's road."
+    fix: "moved 180 m to the grid's land"
+
+  - id: horta-road
+    kind: anchorage
+    name: Fayal Road
+    modern: the road of Horta
+    lat_deg: 38.5300
+    lon_deg: -28.6070
+    height_m: 0
+    depth_fathoms: 34
+    bottom: "sand and small shell"
+    source: "Tofiño 1789, 'Isla del Fayal', pp. 222 to 224: the regular anchorage is before the Villa de Orta, the best of all the islands for its easy entrance and its shelter, except from N to N E and from S E to S W; to sail at once on those winds anchor in 35 or 40 brazas, sand, about a mile and a quarter from the town, the Punta de Yoao Diaz a little open of Espalamaca and the line of the college and the Carmen a little open, the college to the south; in summer in 25 brazas, and smaller vessels nearer the town in 15 or 20; all the bottom from mid-channel toward Fayal sand and small shell, but rock under the sand off Espalamaca toward the Magdalena islets and from the Guia to the bank"
+    says: "Fayal Road, the best in the islands: a mile and a quarter off the town in thirty-five or forty brazas on sand, ready to sail if it comes on to blow from the south-east; in summer closer in, in twenty-five."
+
+  - id: fayal-bank
+    kind: shoal
+    name: the Bank of Fayal
+    modern: the shoal in the southern approach to Horta
+    lat_deg: 38.5120
+    lon_deg: -28.5990
+    height_m: 0
+    source: "Tofiño 1789, 'Isla del Fayal', p. 222: the bank lies S 11 30 E two miles and a tenth from the Punta de Espalamaca and S 65 E a mile and six tenths from the hermitage of the Guia, with 22 Spanish feet at its least at low water, lying N N E and S S W twenty brazas long and ten broad; its marks the spire of the college on the north corner of the Carmen, and the Punta de Yoao Diaz on the middle of the red cliff; the bottom stone four cables about it; ships pass between it and the Guia, or between it and Pico"
+    says: "The Bank of Fayal in the road's southern entrance, with twenty-two feet on it at low water: the college's spire on the north corner of the Carmen is its mark; pass between it and the Guia."
+    fix: "the two bearings and distances of the pilot, crossed (true bearings: they agree within 300 m); the grid has 90 to 150 m within a mile of the place and no bank: a danger of the period's chart the modern grid does not hold, kept as the pilot's words and no shoal in the world"
+
+  - id: porto-pim
+    kind: anchorage
+    name: Porto Pim
+    modern: Porto Pim, Horta
+    lat_deg: 38.5227
+    lon_deg: -28.6289
+    height_m: 0
+    depth_fathoms: 3
+    bottom: "sand"
+    source: "Tofiño 1789, 'Isla del Fayal', pp. 219 to 220: west of the Monte Caimado a cove with a beach called Puerto Pin, where small vessels go to load and unload in fine weather, much exposed to the winds of the third quadrant; the depth and bottom the modern chart's (from memory, unverified)"
+    says: "Porto Pim, the little sandy cove behind the Guia, for small craft in fine weather only."
+    fix: "the first placing was on the grid's land; moved 230 m to the cove's 4 m"
+
+  - id: cabeco-gordo
+    kind: hill
+    name: the Caldeira of Fayal
+    modern: Cabeço Gordo
+    lat_deg: 38.5770
+    lon_deg: -28.7110
+    height_m: 1043
+    source: "Tofiño 1789, 'Isla del Fayal', p. 225: the whole island is mountainous, its greatest heights almost in its centre, a circle of high mountains enclosing a space called with propriety the Caldeira, its mouth a league round; the height the modern chart's (from memory, unverified)"
+    says: "The high ring of the Caldeira in the middle of Fayal."
+
+  - id: ribeirinha-light
+    kind: light
+    name: the light of the Ribeirinha
+    modern: Farol da Ribeirinha
+    lat_deg: 38.5948
+    lon_deg: -28.6035
+    height_m: 136
+    lit: {from: 1919, until: 1998, range_nm: 20, character: "three flashes (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Farol da Ribeirinha' (pt.wikipedia, read 2026-10-10): begun May 1915, inaugurated 1 November 1919, ruined by the earthquake of 9 July 1998; focal height 136 m; its position the page's"
+    says: "The light of the Ribeirinha on Fayal, which was not yet built in 1805."
+    fix: "the page's position falls in the grid's water under the cliff; moved 130 m to the grid's land"
+
+  - id: fayal-pico-channel
+    kind: bottom
+    name: the channel between Fayal and Pico
+    modern: Canal do Faial
+    lat_deg: 38.5100
+    lon_deg: -28.5650
+    height_m: 0
+    bottom: "sand and small shell from mid-channel toward Fayal; rock within a mile or a mile and a half of Pico"
+    source: "Tofiño 1789, 'Isla del Fayal', pp. 224 to 225: working up to the anchorage with scant winds of the first quadrant, end the boards on the Pico side a mile or a mile and a half off, for closer the bottom is rock and the high mountains cause gusts and calms; on the day of new or full moon high water at half past twelve, the water rising eight feet at the greatest and five at the least; the flood runs N E through this channel and the ebb S W, at most three miles"
+    says: "The channel between Fayal and Pico: the flood runs north-east and the ebb south-west, three miles at the most; keep a mile off Pico, where the mountains throw down gusts and calms."
+
+  # ---------------------------------------------------------------------------
+  # Flores and Corvo
+  # ---------------------------------------------------------------------------
+
+  - id: flores-santa-cruz
+    kind: town
+    name: Santa Cruz of Flores
+    modern: Santa Cruz das Flores
+    lat_deg: 39.4540
+    lon_deg: -31.1270
+    height_m: 15
+    source: "Tofiño 1789, 'Isla de Flores', pp. 228 to 229: the castle of Santa Cruz, very near the town of that name, the principal of the island, where its fruits are shipped for the others; the Punta de Santa Cruz the easternmost of Flores"
+    says: "Santa Cruz of Flores, on the east side of the island, where its goods are shipped."
+
+  - id: flores-road
+    kind: anchorage
+    name: the anchorage of Santa Cruz of Flores
+    modern: the anchorage off Santa Cruz das Flores
+    lat_deg: 39.4470
+    lon_deg: -31.1150
+    height_m: 0
+    depth_fathoms: 34
+    bottom: "sand"
+    source: "Tofiño 1789, 'Isla de Flores', pp. 228 to 229 and 232: the principal anchorage of the island, sheltered from the fourth quadrant and part of the third, in 35 or 40 brazas, sand, the nearest to Santa Cruz; in these anchorages a ship lies a little more than a mile from the land, for very near it the bottom is rock, and much farther off too"
+    says: "The anchorage of Santa Cruz of Flores, thirty-five or forty brazas on sand a mile and more off, sheltered from the west; nearer in the bottom is rock."
+
+  - id: flores-high-land
+    kind: hill
+    name: the high land of Flores
+    modern: Morro Alto
+    lat_deg: 39.4600
+    lon_deg: -31.2200
+    height_m: 914
+    source: "Tofiño 1789, 'Isla de Flores', p. 232: the island of Flores is very mountainous, more so to the south than the north, and from the S E with the town of Santa Cruz a notable peak is seen in the interior; the height the modern chart's (from memory, unverified)"
+    says: "The mountains of Flores, the westernmost of the islands, with a notable peak in the interior."
+
+  - id: corvo
+    kind: island
+    name: Corvo
+    modern: Ilha do Corvo (Morro dos Homens)
+    lat_deg: 39.7050
+    lon_deg: -31.1050
+    height_m: 718
+    source: "Tofiño 1789, 'Isla del Cuervo', p. 233: N 28 E eight and three quarter miles from the northernmost point of Flores is the southern point of Cuervo, the Pesqueiro alto, very low and of stone, latitude 39 40 45 N; the island very high, with a mount at each end that at a distance look like one but seen from N W to S E make a saddle; anchorage in 25 or 30 brazas, sand and good holding, by the Porto da Casa; the height the modern chart's (from memory, unverified)"
+    says: "Corvo, the northernmost of the islands, very high, its two mountains like a saddle seen from the north-west."

@@ -502,3 +502,68 @@ held_gauges:
     M2: {amplitude_m: 1.032, phase_deg: 57.1}
     S2: {amplitude_m: 0.374, phase_deg: 83.0}
     N2: {amplitude_m: 0.219, phase_deg: 40.6}
+
+  # THE GAUGES OF MADEIRA AND THE WESTERN ISLANDS, READ AND HELD (package 39e). TICON's
+  # file holds five gauges of the islands, read 2026-10-10 by their coordinates as package
+  # 34 read the eleven (the zip at doi.pangaea.de, the same SHA-256 7055f8ed1a14abf8...6514):
+  # Funchal, Ponta Delgada, Angra, Horta and Santa Cruz das Flores (the file names no
+  # station; the names are the ports' at the coordinates). Where the file has two records
+  # of a gauge the longest is taken: Angra's of 1976 to 1983 (its record of 1957 to 1962
+  # agrees to the centimetre and half a degree); Ponta Delgada's UHSLC series of 1978 to
+  # 2012, whose phases agree with Angra's and Horta's within five degrees, where the file's
+  # shorter BODC series of 1978 to 1998 has M2 at 42.6 cm and 27.5 degrees, 36 degrees
+  # earlier (a clock's or a station's error in that series, unverified which). No mean level
+  # above a chart's datum was read for any of them (the Portuguese hydrographic office's
+  # tables were not reached): `mean_level_m` is null, UNVERIFIED, not invented.
+  #
+  # HELD, NOT BLENDED, as the brief has it, though these gauges lie beyond the 400 miles'
+  # reach of every Channel position (Funchal is about a thousand miles from Brest), so that
+  # blending them would move no Channel tide: the world's tide over the islands is then
+  # the nearest of the eleven alone (Le Conquet's, its range four times the islands'),
+  # until the lead blends them (they want a mean level each first). The springs' range at
+  # Funchal by these constants is 1.97 m, Norie's seven feet (data/tides/establishments.yaml).
+  - id: funchal
+    name: Funchal
+    lat_deg: 32.6400
+    lon_deg: -16.9067
+    record: "GESLA-2, UHSLC, 1976 to 2013"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.719, phase_deg: 45.8}
+    S2: {amplitude_m: 0.264, phase_deg: 67.9}
+    N2: {amplitude_m: 0.152, phase_deg: 30.5}
+  - id: ponta-delgada
+    name: Ponta Delgada
+    lat_deg: 37.7350
+    lon_deg: -25.6717
+    record: "GESLA-2, UHSLC, 1978 to 2012"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.487, phase_deg: 63.0}
+    S2: {amplitude_m: 0.176, phase_deg: 83.3}
+    N2: {amplitude_m: 0.106, phase_deg: 48.3}
+  - id: angra
+    name: Angra do Heroísmo
+    lat_deg: 38.6500
+    lon_deg: -27.2400
+    record: "GESLA-2, UHSLC, 1976 to 1983"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.447, phase_deg: 64.4}
+    S2: {amplitude_m: 0.163, phase_deg: 84.0}
+    N2: {amplitude_m: 0.098, phase_deg: 49.4}
+  - id: horta
+    name: Horta
+    lat_deg: 38.5333
+    lon_deg: -28.6217
+    record: "GESLA-2, UHSLC, 1984 to 1986"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.414, phase_deg: 59.5}
+    S2: {amplitude_m: 0.153, phase_deg: 78.4}
+    N2: {amplitude_m: 0.091, phase_deg: 44.9}
+  - id: santa-cruz-das-flores
+    name: Santa Cruz das Flores
+    lat_deg: 39.3783
+    lon_deg: -31.1683
+    record: "GESLA-2, UHSLC, 2006 to 2013"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.368, phase_deg: 60.8}
+    S2: {amplitude_m: 0.132, phase_deg: 79.8}
+    N2: {amplitude_m: 0.082, phase_deg: 45.7}

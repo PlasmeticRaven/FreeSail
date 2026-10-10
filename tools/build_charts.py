@@ -57,6 +57,7 @@ import re
 import struct
 import sys
 import time
+import urllib.error
 import urllib.request
 import warnings
 import zipfile
@@ -354,6 +355,41 @@ REGIONS: dict[str, dict[str, Any]] = {
         # in them: not written (the corridor answers there; the brief's 18 MB a region)
         "skip_dry_tiles": True,
     },
+    # package 39e: Madeira and the Western Islands, two regions standing alone in the ocean
+    # inside the corridor (spec M6 §26, block 5, widened by decision 44), no other region's
+    # tile within a degree of either. Madeira: Funchal and its open road, Porto Santo, the
+    # Desertas. The level-2 tiles that meet the bounds span 31.60 to 33.73 N and 17.87 to
+    # 15.73 W; the fetch covers them whole (`--check`).
+    "madeira": {
+        "title": "Madeira, Porto Santo and the Desertas",
+        "bounds": {"south": 32.0, "north": 33.5, "west": -17.5, "east": -16.0},
+        "fetch": {"south": 31.5, "north": 33.85, "west": -17.95, "east": -15.65},
+        "harbours": {
+            "funchal": {"south": 32.62, "north": 32.66, "west": -16.95, "east": -16.87},
+            "porto-santo": {"south": 33.03, "north": 33.07, "west": -16.37, "east": -16.30},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # GEBCO's fill raised by the world's mean level (docs/dev/ChartBlocks.md): over the
+        # islands the world's tide is the nearest gauge's alone while the block's gauges
+        # are held, and the fill stands as high above that tide as above the sea's
+        "fill_to_chart_datum": True,
+    },
+    # package 39e: the Western Islands (the Azores), 36.5 to 40 N and 31.5 to 24.5 W: the
+    # nine islands, Flores and Corvo at the western bound, Santa Maria and the Formigas at
+    # the south-east. The level-2 tiles that meet the bounds span 36.29 to 40.13 N and
+    # 31.52 to 24.27 W (153 tiles, most of them the deep sea between the islands).
+    "azores": {
+        "title": "The Western Islands (the Azores)",
+        "bounds": {"south": 36.5, "north": 40.0, "west": -31.5, "east": -24.5},
+        "fetch": {"south": 36.2, "north": 40.25, "west": -31.6, "east": -24.15},
+        "harbours": {
+            "angra": {"south": 38.63, "north": 38.67, "west": -27.25, "east": -27.19},
+            "ponta-delgada": {"south": 37.72, "north": 37.75, "west": -25.70, "east": -25.63},
+            "horta-pico": {"south": 38.50, "north": 38.56, "west": -28.65, "east": -28.50},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        "fill_to_chart_datum": True,
+    },
 }
 
 # The corridor (spec M6 §26; package 38; the owner's ruling 5): level 1 from GEBCO over
@@ -366,8 +402,8 @@ CORRIDORS: dict[str, dict[str, Any]] = {
     "atlantic-corridor": {
         "title": "The corridor: the Western Approaches, Biscay and the Iberian coast to Madeira",
         "level": 1,
-        "bounds": {"south": 32.0, "north": 51.0, "west": -20.0, "east": -1.0},
-        "fetch": {"south": 31.9, "north": 51.1, "west": -20.1, "east": -0.9},
+        "bounds": {"south": 32.0, "north": 51.0, "west": -32.0, "east": -1.0},
+        "fetch": {"south": 31.9, "north": 51.1, "west": -32.1, "east": -0.9},
         "datum": "mean sea level",
         "source": "gebco_2025",
         "folder": "tiles/1/atlantic-corridor",
@@ -387,6 +423,9 @@ CHARTS: dict[str, dict[str, Any]] = {
             "biscay-north",
             "biscay-south",  # package 39c
             "portugal",  # package 39d
+            # package 39e: the islands, after the coast's blocks
+            "madeira",
+            "azores",
         ],
         "corridor": "atlantic-corridor",
     },
@@ -538,9 +577,19 @@ def fetch_gebco_extract(box: dict[str, float], cache: Path, skip: bool, log: Any
     return fetch_url(f"{GEBCO_APP}/api/queue/download/{basket_id}", path, skip, log)
 
 
-def _get_json(url: str) -> Any:
-    with urllib.request.urlopen(url, timeout=120) as r:
-        return json.load(r)
+def _get_json(url: str, tries: int = 4) -> Any:
+    """A JSON answer from GEBCO's app, asked again after a reset (package 39e: the proxy
+    reset one poll of the queue's status in a run, and the build fell over with it)."""
+    for attempt in range(tries):
+        try:
+            with urllib.request.urlopen(url, timeout=120) as r:
+                return json.load(r)
+        except (urllib.error.URLError, ConnectionError) as e:
+            if attempt == tries - 1:
+                raise
+            print(f"  {url}: {e}; asking again", flush=True)
+            time.sleep(10 * (attempt + 1))
+    raise AssertionError("unreachable")
 
 
 def fetch_emodnet(var: str, box: dict[str, float], cache: Path, skip: bool, log: Any) -> Fetched:
@@ -925,6 +974,26 @@ def to_int16(values: np.ndarray, unit_m: float) -> np.ndarray:
     scaled = np.rint(values / unit_m)
     out = np.where(np.isnan(scaled), NODATA, np.clip(scaled, -32767, 32767)).astype(np.int16)
     return out
+
+
+# A tile's zip entries carry this date, not the time of the write (package 39e): numpy's
+# `savez_compressed` stamps each entry with the clock, so a rebuild of the same arrays
+# came out with other bytes and byte-identity proved nothing. From package 39e on every
+# tile the tool writes goes through `save_tile`, and the same arrays give the same bytes;
+# the tiles written before it keep their bytes until they are rebuilt.
+TILE_ZIP_DATE = (1980, 1, 1, 0, 0, 0)
+
+
+def save_tile(path: Path, **arrays: Any) -> None:
+    """A tile as numpy's compressed `.npz` (one `<name>.npy` entry an array, deflated, as
+    `np.load` reads it), every entry dated TILE_ZIP_DATE so that the file is a function of
+    its arrays alone."""
+    with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as z:
+        for key, value in arrays.items():
+            info = zipfile.ZipInfo(f"{key}.npy", date_time=TILE_ZIP_DATE)
+            info.compress_type = zipfile.ZIP_DEFLATED
+            with z.open(info, "w") as f:
+                np.lib.format.write_array(f, np.asanyarray(value), allow_pickle=False)
 
 
 def differenced(values: np.ndarray) -> np.ndarray:
@@ -1683,7 +1752,7 @@ class Build:
             dist_cells = np.clip(np.rint(dblock / cell_ns), 0, 65535).astype(np.uint16)
             name = tile_name(s, w)
             path = folder / f"{name}.npz"
-            np.savez_compressed(
+            save_tile(
                 path,
                 elevation=differenced(to_int16(block, unit_m)),
                 predictor=np.int16(2),
@@ -1997,7 +2066,7 @@ class Build:
                 min_blocks = np.nanmin(stack, axis=0).astype(np.float32)
             tname = tile_name(s, w)
             path = folder / f"{tname}.npz"
-            np.savez_compressed(
+            save_tile(
                 path,
                 elevation=differenced(to_int16(block, unit_m)),
                 predictor=np.int16(2),
@@ -2133,7 +2202,7 @@ class Build:
                 block = np.where(block > clip, np.float32(clip), block)
             name = tile_name(s, w)
             path = folder / f"{name}.npz"
-            np.savez_compressed(
+            save_tile(
                 path,
                 elevation=differenced(to_int16(block, unit_m)),
                 predictor=np.int16(2),

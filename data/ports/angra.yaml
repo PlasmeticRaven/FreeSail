@@ -1,0 +1,109 @@
+# FreeSail: Angra on Terceira, the main port and road of the Western Islands, as a port
+# (spec M6 §26, block 5 as decision 44 widened it; package 39e), on package 35's
+# machinery; the marks are the features file's (data/charts/features/azores.yaml).
+#
+# Sources. Tofiño 1789, Derrotero ... de las Islas Azores, 'Isla Tercera' and 'Fondeadero
+# de Angra', pp. 203 to 209: Terceira the principal of the nine islands, the residence of
+# the Captain General, the Bishop and the government of all of them; Monte Brasil, sheer
+# to the sea with its two look-out pillars, the citadel of San Juan on its northern skirt;
+# the anchorage between the castles of San Antonio and San Sebastian, where the merchant
+# ships moor in four or at single anchor, trusting to their ground tackle, "uncovered to
+# the winds and seas of the second and part of the third quadrant", which in winter blow
+# so that the people abandon their ships and they are dashed on the coast; "the ships of
+# some size and all ships of war anchor east of Monte Brasil in 30 or 40 brazas, sand,
+# and must be ready to make sail the moment the wind is announced from the second or
+# third quadrant"; the mole of hazardous access in any swell, the little beach of the
+# Pipas under San Sebastian where a boat lands when the mole cannot be used; the country
+# boats come off as soon as a ship anchors, and water, wood and every provision are had
+# with ease and cheap. Norie 1805, Table XLI p. 248 (the page image): Angra Bay, Terceira,
+# high water 11h 45m on full and change, rising 8 feet.
+#
+# The datum: UNVERIFIED. Tofiño's plan of the anchorage ("véase su plano") was not found
+# from this machine; no override; TICON's Angra gauge is held with no mean level read.
+#
+# The stance: Portuguese, neutral in 1805 and open to every nation (data/nations.yaml).
+# Prices FROM MEMORY or JUDGEMENT; sterling at the exchange.
+
+id: angra
+name: Angra
+nation: portugal
+source: "Tofiño 1789, 'Isla Tercera' and 'Fondeadero de Angra', pp. 203 to 209; Norie 1805, Table XLI p. 248"
+datum: unverified
+
+outer_road:
+  feature: angra-road
+  name: Angra Road, east of Monte Brasil
+  lat_deg: 38.6440
+  lon_deg: -27.2160
+anchorage:
+  feature: angra-road
+  name: Angra Road, east of Monte Brasil
+  lat_deg: 38.6440
+  lon_deg: -27.2160
+mooring:
+  name: the merchants' moorings between the castles
+  lat_deg: 38.6485
+  lon_deg: -27.2125      # the grid's 25 m, within the line of San Antonio and San Sebastian
+  bottom: sand
+  deep_draught_ft: 15    # judgement: a ship of war lies outside, as Tofiño says
+shore:
+  feature: angra-town
+  name: the mole of Angra
+  lat_deg: 38.6560
+  lon_deg: -27.2190
+
+pilot:
+  station: angra-road
+  cruising_nm: 3                 # judgement: the country boats come off as soon as a ship anchors
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a country boat of Angra
+    under: oars
+    note: "Tofiño 1789 p. 205: the country's boats come off as soon as a ship anchors"
+  names: [Borges, Ávila, Toste, Bettencourt, Machado, Cardoso, Mendonça]   # names of Terceira: judgement
+  skill: 0.85
+  fee_pounds: 1                  # judgement, in sterling for the one account; unverified
+  cast: starboard                # off the road to the south-east, clear of Monte Brasil (judgement)
+  course_out_deg: 150            # out to sea before a southerly is upon her (judgement)
+  words:
+    channel: "The road is clean to the east of Monte Brasil; the Cabras lie four miles east of the mount and any ship may pass inside them in nine to thirteen brazas."
+    marks: "Monte Brasil, sheer to the sea with its two look-out pillars on top; the citadel of St John on its northern skirt; the castle of St Sebastian on the east side of the bay."
+    anchorage: "A ship of war anchors east of Monte Brasil in thirty or forty brazas on sand, and must be ready to sail the moment the wind shows from the south-east or the south: the road is open to them, and in winter the merchants who moor within lose their ships on the rocks."
+    tide: "High water in Angra Bay at a quarter before twelve on the full and change; the tide rises eight feet."
+
+tide:
+  establishment: Angra Bay
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: barley, price: 9, origin: portugal, note: "Terceira's corn, which it exports to Lisbon and Madeira (Tofiño 1789 p. 208); judgement"}
+    - {good: wine, price: 40, origin: portugal, note: "the island's wine, enough for its own use and not so good as Pico's (Tofiño p. 208); judgement"}
+    - {good: salt beef, price: 50, origin: portugal, note: "the island's cattle, cheap (Tofiño p. 208); judgement"}
+    - {good: linen, price: 90, origin: portugal, note: "the islands' flax and linen; judgement"}
+    - {good: salt fish, price: 28, origin: null, note: "Newfoundland cod; from memory"}
+    - {good: timber, price: 8, origin: portugal, note: "firewood not dear (Tofiño p. 209); judgement"}
+    - {good: canvas, price: 65, origin: britain, note: "from memory"}
+    - {good: brandy, price: 95, origin: portugal, note: "from memory"}
+    - {good: sugar, price: 60, origin: portugal, note: "Brazil sugar by way of Lisbon; from memory"}
+    - {good: tobacco, price: 90, origin: portugal, note: "the Crown's monopoly; from memory"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 16, pounds: 45, note: "judgement: a small island's shipwrights"}
+    - {item: yard, hours: 10, pounds: 26}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.08}
+    - {item: water, hours_per_ton: 0.2, pounds_per_ton: 0.1, note: "watering easy at Angra (Tofiño p. 209)"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05, note: "provisions abundant and cheap (Tofiño p. 208)"}
+
+crew_pool:
+  able: {hands: 2, pounds: 2, delay_h: 24}
+  ordinary: {hands: 3, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 6, pounds: 1, delay_h: 12}
+
+closed_to: []

@@ -119,13 +119,15 @@ region's, its tide and its weather are rows in tables that already reach its wat
 6. **The tide**: the block's gauges read from TICON's file (`TICON.txt` in the zip at
    doi.pangaea.de, as package 34 read it, by their coordinates; Vigo it has (package 39c,
    the IEO's and Puertos del Estado's series; its UHSLC series has every phase an hour
-   early, a clock off: take the longest record and compare the others); which of Tarifa
-   and Funchal it has is **unverified** here and read when the block is built (package 39d
+   early, a clock off: take the longest record and compare the others); whether it has
+   Tarifa is **unverified** here and read when the block is built (package 39d
    read Cascais, Lagos, Huelva, Bonanza and Cadiz, and found no Leixões, Lisbon or
-   Setúbal); the form is the eleven's: the record, the mean level above the
+   Setúbal; package 39e Funchal, Ponta Delgada, Angra, Horta and Santa Cruz das Flores);
+   the form is the eleven's: the record, the mean level above the
    chart's datum with its source, M2, S2 and N2), **held** under `held_gauges:` in
    `data/tides/constituents.yaml` and not in `gauges:`, each block's after the last
-   (package 39a's Bournemouth and Portsmouth, package 39b's nine of Biscay north). **A new
+   (package 39a's Bournemouth and Portsmouth, package 39b's nine of Biscay north, package
+   39e's five of the islands, which no Channel position's reach meets). **A new
    gauge moves every Channel position's tide**: the interpolation blends every gauge
    within `reach_nm` (400 miles, the Channel's whole region) of a position, so a gauge
    added to `gauges:`, however far, enters the blend at Falmouth and moves every recorded
@@ -173,7 +175,13 @@ region's, its tide and its weather are rows in tables that already reach its wat
    tile another region of the manifest lists is that region's, and the build neither
    writes it again, lists it nor draws its coast (`tiles_listed_elsewhere`). After the build
    `git status` shows no change to any tile, coast or index file another region lists.
-   The tiles are committed (the owner's ruling 5; a region is about 12 to 18 MB).
+   The tiles are committed (the owner's ruling 5; a region is about 12 to 18 MB, but a
+   region that is mostly open sea costs more: the Azores' 153 level-2 tiles are 40 MB,
+   package 39e, below). **Every tile is written by `save_tile`** (package 39e), its zip
+   entries dated alike, so that the same arrays give the same bytes: from 39e on a
+   rebuild's byte-identity means array-identity, and a tile that changed in its bytes
+   changed in its arrays. The tiles written before it keep their bytes (numpy's
+   `savez_compressed` dated each entry with the clock) until they are rebuilt.
 10. **The tuning notes' section** and the report to the lead, as every package.
 
 ## The checks a block must pass
@@ -360,3 +368,55 @@ hour Bowditch's; the rest judgement, marked.
 What the block need not do: nothing of `freesail/` changes for a block, unless its
 water wants a rule the engine lacks, which is a finding for the tuning notes and the
 lead, not a patch in the block.
+
+## Out in the ocean: the islands and the corridor (package 39e)
+
+Madeira and the Western Islands are two regions with no neighbour (`madeira`, `azores`),
+so the seam rule keeps nothing (`tiles another region lists: 0 kept`); what they found:
+
+- **Widening the corridor rewrites it.** The corridor is whole tiles on the level-1 grid,
+  but a tile reaches past its fetch box, and the cells beyond are `NODATA`: the old west
+  column ran from 22.13 W with nothing west of 20.1 W. Moving the west bound to 32 W fills
+  those cells, the distance field changes wherever new land is the nearest (the Azores,
+  up to 613 cells in that column), and the bilinear sample at a new origin breaks the
+  half-metre ties the other way (±1 m in a few hundred to two thousand cells of every
+  tile, a land cell or eleven turning to sea). So a corridor's widening changes every
+  existing tile in its arrays as well as its bytes. No recorded passage or trial reads
+  the corridor (they are `region: channel-west`, whose chart has no corridor); the
+  widening to 32 W is built and held for the owner's word (package 39e's report). A
+  rebuild from the same cache is now byte-identical (`save_tile`).
+- **A peak is seen beyond the search's reach.** `Chart.in_sight` searched the index
+  only as far as the horizon of an object of 300 m, and the weather's clearest
+  visibility is twelve miles: the Peak of Pico (2,351 m, seen thirty leagues off by the
+  directions) could not be seen at forty. A feature taller than `chart.SEARCH_HEIGHT_M`
+  is now looked for wherever she is, and in the clearest weather
+  (`chart.CLEAR_VISIBILITY_NM`, the weather's "the horizon") seen to its own geographic
+  horizon; no feature of the Channel is so tall, so nothing its lookout sees moves.
+- **EMODnet does not hold every islet.** The Formigas, the Cabras off Angra, the islets
+  of Vila Franca, the Mosteiros and the Magdalena are water in the grid (the Formigas'
+  place has 66 m, nothing under 34 m within eight kilometres). An islet the grid lacks is
+  the feature's alone: a rock with a height and an `extent_m` grounds a ship
+  (`danger_under`), an island is a mark; check every islet against the tiles.
+- **A block's gauges beyond every Channel position's reach** (the islands' are a thousand
+  miles from Brest) would move no Channel tide if blended, but they want a mean level
+  each, which no open source gave here: they are held as the brief has them, and the
+  world's tide over the islands is the nearest of the eleven alone (Le Conquet's, four
+  times the islands' range). The fill raise (`fill_to_chart_datum`) follows that tide.
+- **The directions' limits were one box over the coast**, and within it the open
+  Channel's statement answered where no area did; a block far out in the ocean puts its
+  water in a box of its own in `book_limits` (package 39d's list of boxes, the open
+  Channel's statement of its own bounds) rather than widening one box over the sea
+  between.
+- **Open sea is dear.** 131 of the Azores' 153 level-2 tiles hold no land and lie more
+  than three miles from it, and the multibeam relief compresses badly (260 KB a tile,
+  against Madeira's 107): 40 MB. Writing only the tiles within ten miles of land would be
+  33 tiles and 10 MB, the corridor answering the rest at 30″ (a recipe rule for the
+  lead, which wants the corridor widened first).
+- **Tofiño's bearings are true**: the Punta Delgada to the Galera, "S 75 E seven miles
+  and a half", fits the grid's points within five degrees and a mile, where a magnetic
+  bearing would be twenty degrees out.
+- **Norie's Table XLI** (1805), whose columns the OCR loses, is legible in the page
+  images through the Internet Archive's IIIF server
+  (`https://iiif.archive.org/iiif/<item>$<leaf>/full/900,/0/default.jpg`, the leaf from
+  the archive's full-text search); the encyclopaedia's pages serve where its API refuses
+  for its rate.
