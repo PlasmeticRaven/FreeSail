@@ -232,12 +232,13 @@ features:
     says: "The light of the Ponta do Pargo, which was not yet built in 1805."
 
   - id: madeira-desertas-passage
-    kind: place
+    kind: bottom
     name: the passage between Madeira and the Desertas
     modern: the channel between Ponta de São Lourenço and the Ilhéu Chão
     lat_deg: 32.6600
     lon_deg: -16.6100
     height_m: 0
+    bottom: "no ground at 50 or 60 fathoms but almost close over to the Madeira side"
     source: "Oriental Navigator 1801, p. 23 (Howe 1787 the same): between the Desertas and Madeira is a clear passage 8 miles broad, and no danger but what can be seen, but no soundings in it except at 50 or 60 fathoms almost close over to the Madeira side; in the season of the breezes there is a strong current through this passage towards the S W"
     says: "The passage between Madeira and the Desertas, eight miles broad and clear, with no soundings but close over on the Madeira side; in the summer's north-easterlies a strong current sets through it to the south-west."
 
@@ -291,12 +292,13 @@ features:
     fix: "the first placing lay 1.7 km off the island's land in the grid (no land within the rule's 800 m); placed on the grid's summit of the Bugio, 218 m (its modern height 388)"
 
   - id: desertas-inner-passage
-    kind: place
+    kind: bottom
     name: the passage between the two Desertas
     modern: the strait between Deserta Grande and Bugio
     lat_deg: 32.4700
     lon_deg: -16.4950
     height_m: 0
+    bottom: "no soundings, or at least very deep water"
     source: "Oriental Navigator 1801, p. 23 (Howe 1787 the same: a vessel of 200 tons came through it in the night in April 1762, mistaking it for the broad one): the passage between the two Desertas is clear, though bounded on each side by breakers, or rather by a surf, but not to be attempted unless from necessity, being very narrow, with no soundings, and a ship liable to be becalmed in it by the northernmost Deserter, which overlaps the Bugio"
     says: "The narrow passage between the two Desertas, surf on either hand and no soundings: not to be attempted but from necessity, for the Flat Deserter becalms a ship in it."
 

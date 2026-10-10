@@ -666,12 +666,13 @@ features:
     fix: "the page's position falls in the grid's water under the cliff; moved 130 m to the grid's land"
 
   - id: fayal-pico-channel
-    kind: place
+    kind: bottom
     name: the channel between Fayal and Pico
     modern: Canal do Faial
     lat_deg: 38.5100
     lon_deg: -28.5650
     height_m: 0
+    bottom: "sand and small shell from mid-channel toward Fayal; rock within a mile or a mile and a half of Pico"
     source: "Tofiño 1789, 'Isla del Fayal', pp. 224 to 225: working up to the anchorage with scant winds of the first quadrant, end the boards on the Pico side a mile or a mile and a half off, for closer the bottom is rock and the high mountains cause gusts and calms; on the day of new or full moon high water at half past twelve, the water rising eight feet at the greatest and five at the least; the flood runs N E through this channel and the ebb S W, at most three miles"
     says: "The channel between Fayal and Pico: the flood runs north-east and the ebb south-west, three miles at the most; keep a mile off Pico, where the mountains throw down gusts and calms."
 

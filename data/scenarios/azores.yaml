@@ -1,0 +1,79 @@
+# FreeSail: the Western Islands' passage (spec M6 §26, block 5 as decision 44 widened
+# it; package 39e). A free passage, not a gate's: the frigate from Funchal Road to Angra
+# Road on Terceira, some six hundred miles across the corridor west of 20 W, the
+# reckoning by the log and the noon sight alone until the land is raised, the landfall
+# on the Peak of Pico, which stands 2,351 m and "may be seen in clear weather" from 32
+# leagues (Tofiño 1789, 'Isla del Fayal', p. 226): the lookout's horizon rule at that
+# height (`chart.SEARCH_HEIGHT_M`, `chart.CLEAR_VISIBILITY_NM`). The block's water on the
+# whole chart (`chart: atlantic-east`), its marks (data/charts/features/madeira.yaml and
+# azores.yaml) and its ports. Given to either driver with --scenario:
+#     py -m freesail.ui.console --scenario data/scenarios/azores.yaml
+# and printed whole by
+#     py tools/day_log.py data/scenarios/azores.yaml --hours 132 --reckoning
+#
+# THE CORRIDOR. West of 20 W the sea between Madeira and the islands is the corridor's
+# at level 1, which the tool's recipe takes to 32 W (tools/build_charts.py `CORRIDORS`).
+# The rebuilt corridor is held uncommitted (package 39e's report: the existing tiles
+# change, which the brief's rule put to the owner); until it is committed the passage
+# crosses a strip west of 20.1 W where the chart has no cell (the old west column's
+# empty strip) and the sea between 22.1 W and the islands' region, where the chart's
+# depth answers nothing and the ship sails on as over deep water.
+#
+# The passage as the book beside this file sails it (azores.orders): she weighs from
+# Funchal Road at six in the morning of 15 June 1805 and shapes a course west-north-west
+# before the north-east trade for a point north of St Mary's and St Michael's, then for
+# the channel between St Michael's and Terceira, then past the Cabras for Angra Road,
+# where she anchors east of Monte Brasil (Tofiño 1789 p. 204: ships of war in 30 or 40
+# brazas, sand). The weather is pinned, the trade from the north-east and east-north-east
+# of ten to fourteen knots, clear, so that the passage is the same on every machine and
+# the Peak is seen as far as the horizon lets it. Sailed once at seed 7 for the package's
+# notes (docs/dev/TuningNotes.md, package 39e); not a gate's and not pinned.
+
+name: The Western Islands, the frigate from Funchal to Angra
+seed: 7
+start: 1805-06-15T06:00
+position: {lat_deg: 32.6380, lon_deg: -16.9060}   # Funchal Road (the Oriental Navigator 1801 p. 24)
+chart: atlantic-east
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 270
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+papers:
+  chart: {year: 1804}
+  epitome: norie
+  almanac: 1805
+
+ports: [funchal, ponta-delgada, angra, horta]
+
+weather:
+  wind:
+    - {at: 1805-06-15T04:00, from_deg: 40, knots: 14, air_mass: neutral}
+    - {at: 1805-06-16T12:00, from_deg: 50, knots: 13}
+    - {at: 1805-06-17T12:00, from_deg: 60, knots: 12}
+    - {at: 1805-06-18T12:00, from_deg: 70, knots: 11}
+    - {at: 1805-06-19T12:00, from_deg: 70, knots: 10}
+    - {at: 1805-06-21T00:00, from_deg: 70, knots: 10}
+  background:
+    {hpa: 1024, gradient_hpa_per_100km: 0.25, high_toward_deg: 330}
+  systems:
+    - name: the Azores high
+      kind: high
+      radius_km: 1500
+      track:
+        - {at: 1805-06-14T12:00, x_km: -900, y_km: 900, hpa: 1029}
+        - {at: 1805-06-21T12:00, x_km: -1000, y_km: 1000, hpa: 1028}
+  sky: {sky: clear, weather: fine, visibility: the horizon}
+  sea: true
+
+standing_orders:
+  - data/standing_orders/starter.orders
+  - data/scenarios/azores.orders
+
+orders:
+  - set plain sail
+  - shape a course for 37 36 N 24 0 W

@@ -848,6 +848,9 @@ MID = "channel-mid"  # package 39a
 # The corridor's budget (spec M6 §26: "some 11 MB raw, half that compressed"; with the
 # distance field the tiles compress to under 6 MB, measured in package 38).
 CORRIDOR_BUDGET_BYTES = 8 * 1024 * 1024
+# package 39e: the corridor widened to 32 W for the Western Islands, 48 tiles of 9.7 MB
+# (held for the owner's word: the test reads whichever corridor the manifest has)
+CORRIDOR_WIDENED_BUDGET_BYTES = 12 * 1024 * 1024
 # Where the Channel region's level-2 tiles end on the south: the tile row's southern edge
 # (47.81 N), off Penmarch, the water deepening gently southward over the corridor.
 EDGE_TRACK_START = Position(48.0, -4.55)
@@ -926,7 +929,11 @@ def test_the_corridor_is_committed_from_gebco_with_its_source_licence_and_checks
     tool = build_tool()
     entry = manifest["corridors"][CORRIDOR]
     assert entry["level"] == 1 and entry["committed"] is True
-    assert entry["bounds"] == {"south": 32.0, "north": 51.0, "west": -20.0, "east": -1.0}
+    # package 39e: the tool's recipe reaches 32 W; the widened tiles are the owner's to
+    # commit, so the entry is the corridor as package 38 built it or as 39e widened it
+    widened = entry["bounds"]["west"] == tool.CORRIDORS[CORRIDOR]["bounds"]["west"] == -32.0
+    west = -32.0 if widened else -20.0
+    assert entry["bounds"] == {"south": 32.0, "north": 51.0, "west": west, "east": -1.0}
     assert entry["datum"] == "mean sea level" == manifest["levels"]["1"]["datum"]
     assert entry["source"] == "gebco_2025" and entry["licence"] in tool.ALLOWED_LICENCES
     fetched = manifest["sources"]["gebco_2025"]["fetched"]
@@ -943,7 +950,8 @@ def test_the_corridor_is_committed_from_gebco_with_its_source_licence_and_checks
         assert t["name"] == tool.tile_name(s, w)
         assert (s + 90 * 3600) % tool.tile_span_sec(1) == 0
         total += path.stat().st_size
-    assert len(entry["tiles"]) == 30 and total == entry["bytes"] < CORRIDOR_BUDGET_BYTES
+    budget = CORRIDOR_WIDENED_BUDGET_BYTES if widened else CORRIDOR_BUDGET_BYTES
+    assert len(entry["tiles"]) == (48 if widened else 30) and total == entry["bytes"] < budget
     tracked = subprocess.run(
         ["git", "ls-files", f"data/charts/{entry['folder']}"],
         cwd=ROOT,
