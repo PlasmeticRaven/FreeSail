@@ -103,6 +103,11 @@ FATHOM_M = 1.8288  # six feet of 0.3048 m
 # built, and the override records the unit it used).
 BRASSE_M = 1.624
 UNIT_M = {"metres": 1.0, "m": 1.0, "fathoms": FATHOM_M, "feet": 0.3048, "brasses": BRASSE_M}
+# package 39f: Tofiño's braza, "de á dos varas castellanas" by his plan's legend (the
+# Castilian vara of Burgos 0.8359 m FROM MEMORY, unverified here as the brasse is: 1.6718
+# m), for the Spanish sheets of the Strait
+BRAZA_M = 1.6718
+UNIT_M["brazas"] = BRAZA_M
 
 # ---------------------------------------------------------------------------
 # Sources and licences (C §2, §6)
@@ -269,6 +274,28 @@ REGIONS: dict[str, dict[str, Any]] = {
         },
         "sources": ["emodnet_dtm_2024", "gebco_2025"],
     },
+    # package 39f: the Strait, abutting `portugal` (package 39d) at 36.4 N exactly, so that
+    # Cadiz and its bay are that block's and Cape Trafalgar this one's. The level-2 tiles
+    # that meet the bounds span 35.44 to 36.72 N and 6.77 to 4.64 W; the northern row
+    # (36.29 to 36.72 N) west of 5.92 W meets `portugal`'s bounds too, and is the region's
+    # that the manifest lists first (the seam rule, `tiles_listed_elsewhere`): built here
+    # while `portugal` is not in the manifest, kept as `portugal`'s once it is.
+    "strait": {
+        "title": "The Strait, Cape Trafalgar and Cape Spartel to Gibraltar and Ceuta",
+        "bounds": {"south": 35.5, "north": 36.4, "west": -6.5, "east": -5.0},
+        "fetch": {"south": 35.35, "north": 36.8, "west": -6.85, "east": -4.55},
+        "harbours": {
+            "gibraltar-algeciras": {"south": 36.04, "north": 36.19, "west": -5.46, "east": -5.33},
+            "tarifa": {"south": 35.995, "north": 36.02, "west": -5.62, "east": -5.595},
+            "ceuta": {"south": 35.88, "north": 35.91, "west": -5.33, "east": -5.28},
+            "tangier": {"south": 35.77, "north": 35.80, "west": -5.83, "east": -5.78},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # GEBCO's fill raised by the world's mean level: over the Strait the world's tide is
+        # the nearest gauge's alone (the eleven lie beyond the reach; the block's gauges are
+        # held), so the fill stands as high above the world's high water as above the sea's
+        "fill_to_chart_datum": True,
+    },
 }
 
 # The corridor (spec M6 §26; package 38; the owner's ruling 5): level 1 from GEBCO over
@@ -296,7 +323,14 @@ CORRIDORS: dict[str, dict[str, Any]] = {
 CHARTS: dict[str, dict[str, Any]] = {
     "atlantic-east": {
         "title": "The Channel, Biscay and the Iberian coast to Madeira and the Strait",
-        "regions": ["channel-west", "channel-mid", "biscay-north"],
+        "regions": [
+            "channel-west",
+            "channel-mid",
+            "biscay-north",
+            # package 39f: the Strait, the voyage's last (its own line, so that the four
+            # blocks' additions merge as lines)
+            "strait",
+        ],
         "corridor": "atlantic-corridor",
     },
 }

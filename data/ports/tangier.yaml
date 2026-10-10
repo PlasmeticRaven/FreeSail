@@ -1,0 +1,109 @@
+# FreeSail: Tangier as a port (spec M6 §26; package 39f, the Strait block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/strait.yaml).
+#
+# Sources. Tofiño 1787, Derrotero del Mediterráneo, 'Costa de África', pp. 22 to 23: the
+# bay of Tangier between its point and Malabata, with commodious anchorage for any
+# vessel in 10 to 13 brazas, sand, before the city, keeping Malabata on Europa Point to
+# clear the shoal in the bottom of the bay; moor NW and SE with the longest cable NW, and
+# buoy the cables for the hard roots of great weeds in the ground; both points with reefs.
+# Purdy 1826, pp. 5 to 6: the antient Tingis, now a place of little consideration, about
+# 6,000 inhabitants; the Spaniards visit it for eggs, fowls, vegetables and fruit; the
+# chief exports cattle and vegetables taken to Gibraltar for the garrison, a grant of
+# the Emperor's great-grandfather Muley Ismael, which his successors have not infringed
+# (Jackson's words: the Emperor apparently prefers the English to any other European
+# power); 9 to 12 fathoms, sand, broken coral all over the bay; easterly winds send a
+# heavy swell in; at full and change the tide in the bay rises 5 feet, the flood setting
+# westward till 12 o'clock, not a mile and a half from the shore.
+#
+# The datum: UNVERIFIED. No period sheet is patched at Tangier in this package (Tofiño's
+# atlas has no plan of the bay); the chart's depths are EMODnet's at the lowest
+# astronomical tide. EMODnet's grid has the modern port's moles at its sixteenth of a
+# minute in part (the bay's south-west corner reads two to three metres): the road is
+# laid off the town in the period's depth.
+#
+# The stance. Tangier is the Emperor of Morocco's (the nations table): Morocco at peace
+# with every nation in June 1805, so the port is neutral to all, the British, the
+# Spaniards and the French alike, and open to its own. Prices FROM MEMORY or JUDGEMENT;
+# sterling at the exchange.
+
+id: tangier
+name: Tangier
+nation: morocco
+source: "Tofiño 1787 pp. 22-23 (the bay of Tangier); Purdy 1826 pp. 5-6 and 8"
+datum: unverified
+
+outer_road:
+  name: the mouth of Tangier Bay
+  lat_deg: 35.8000
+  lon_deg: -5.7900
+anchorage:
+  feature: tangier-road
+  name: Tangier road
+  lat_deg: 35.7879
+  lon_deg: -5.7941
+mooring:
+  name: close in before the town
+  lat_deg: 35.7919
+  lon_deg: -5.8048
+  depth_fathoms: 4
+  bottom: sand with broken coral
+  deep_draught_ft: 15    # judgement: four fathoms close in
+shore:
+  name: the beach before Tangier
+  lat_deg: 35.7860
+  lon_deg: -5.8060
+
+pilot:
+  station: tangier-road
+  cruising_nm: 3                 # judgement: the bay's boats
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a Moorish boat of the bay
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Hamet, Ali, Mohammed, Abdallah, Yusuf, Kasem, Larbi, Tahar]   # judgement
+  skill: 0.85
+  fee_pounds: 1                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 30             # out of the bay to the north-east
+  words:
+    channel: "Enter the bay keeping Cape Malabata in one with Europa Point, which clears the rocky ledge in the bottom of the bay; with an easterly wind you may borrow toward Malabata at pleasure."
+    marks: "The town on the west side of the bay under its kasbah; Cape Malabata on Europa Point; the north end of Gibraltar open of Malabata from the anchorage."
+    anchorage: "Anchor before the town in nine or ten fathoms, sand; moor north-west and south-east with the longest cable north-west, and buoy the cables, for the roots of great weeds and the broken coral chafe them. The Levanter sends a heavy swell into the bay."
+    tide: "At full and change the tide in the bay rises five feet; the flood sets west along the shore till noon."
+
+tide:
+  establishment: Tangier
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: cattle, price: 20, origin: morocco, note: "the bullocks for Gibraltar's garrison (Purdy 1826 p. 5); judgement"}
+    - {good: fresh beef, price: 25, origin: morocco, note: "judgement"}
+    - {good: oranges, price: 5, origin: morocco, note: "judgement"}
+    - {good: barley, price: 12, origin: morocco, note: "judgement"}
+    - {good: wax, price: 120, origin: morocco, note: "Barbary wax; judgement"}
+    - {good: hides, price: 45, origin: morocco, note: "judgement"}
+    - {good: wool, price: 30, origin: morocco, note: "Barbary wool; judgement"}
+    - {good: almonds, price: 40, origin: morocco, note: "judgement"}
+    - {good: eggs and fowls, price: 4, origin: morocco, note: "what the Spaniards come for (Purdy 1826 p. 5); judgement"}
+    - {good: vegetables, price: 3, origin: morocco, note: "Purdy 1826 p. 5: taken to Gibraltar; judgement"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 60, note: "a spar from Gibraltar's or the Spaniards' stores, slowly; judgement"}
+    - {item: cordage, hours: 4, pounds_per_fathom: 0.08, note: "judgement"}
+    - {item: water, hours_per_ton: 0.2, pounds_per_ton: 0.1, note: "judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.04, note: "the Barbary fresh provisions; judgement"}
+
+crew_pool:
+  able: {hands: 0, pounds: 2, delay_h: 24}
+  ordinary: {hands: 0, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 0, pounds: 1, delay_h: 24}
+
+closed_to: []

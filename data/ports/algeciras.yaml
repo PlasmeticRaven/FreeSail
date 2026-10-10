@@ -1,0 +1,109 @@
+# FreeSail: Algeciras as a port (spec M6 §26; package 39f, the Strait block), on package
+# 35's machinery; the marks are the features file's (data/charts/features/strait.yaml).
+#
+# Sources. Tofiño 1787, Derrotero del Mediterráneo, 'Descripción de la Bahía de Algeciras
+# y Gibraltar', pp. 12 to 20: the Isla Verde, fortified, with its chains of rock like
+# moles; the mole of the city half a mile NW of the isle, the Rio de la Miel by the
+# southern houses, entered at high water by the vessels of the country; the Galera, a
+# rock awash half a cable ENE of the mole; the best and safest anchorage of the bay, for
+# all weather and every class of vessel, from the middle of the city toward the Rio
+# Palmones and the Puente Mayorga, sand in parts and mud in others, up to 25 brazas a
+# long mile off; the Palmones, where the largest vessels of Algeciras's trade lie in
+# winter; Getares Bay south of San García, good ground but open to the easterly swell.
+# Purdy 1826, p. 4: Algeciras formerly a considerable port, agreeably situate on a gentle
+# slope by the sea-side. Tofiño 1786, the bay's plan: the soundings about the isle and
+# the town, the bay's patch.
+#
+# The datum: the bay's patch states it (overrides/strait/gibraltar-algeciras.yaml), the
+# road the modern grid's.
+#
+# The stance. Algeciras is Spain's, the gunboats' port against Gibraltar: hostile to a
+# King's ship in June 1805 by the nations table, open to a neutral. Prices FROM MEMORY
+# or JUDGEMENT; sterling at the exchange.
+
+id: algeciras
+name: Algeciras
+nation: spain
+source: "Tofiño 1787 pp. 12-20 (the Bay of Algeciras and Gibraltar); Purdy 1826 p. 4"
+datum: "the town's water: Tofiño's plan of 1786 in brazas of two Castilian varas, read as low water, JUDGEMENT above the chart's datum (overrides/strait/gibraltar-algeciras.yaml); the road the modern grid's"
+
+outer_road:
+  feature: getares-bay
+  name: Getares Bay
+  lat_deg: 36.0950
+  lon_deg: -5.4300
+anchorage:
+  feature: algeciras-road
+  name: the road of Algeciras
+  lat_deg: 36.1520
+  lon_deg: -5.4250
+mooring:
+  name: off the mole of Algeciras
+  lat_deg: 36.1315
+  lon_deg: -5.4405
+  depth_fathoms: 2
+  bottom: sand
+  deep_draught_ft: 10    # judgement: Tofiño's plan has 2 to 4 brazas close off the town (the bay's patch); a deeper ship lies in the road
+shore:
+  name: the mole of Algeciras
+  lat_deg: 36.1300
+  lon_deg: -5.4460
+
+pilot:
+  station: getares-bay
+  cruising_nm: 4                 # judgement: the bay's boats
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Algeciras pilots' falucho
+    under: a lateen sail and oars
+    note: "Tofiño's 'faluchos' that pass the channels by the Isla Verde; judgement"
+  names: [Gómez, Ruiz, Moreno, Vallecillo, Pérez, Sánchez, Romero, Delgado]   # Andalusian names: judgement
+  skill: 0.9
+  fee_pounds: 2                  # judgement, in sterling for the one account; unverified
+  cast: starboard                # from the road off the town the head paying off to the eastward (judgement)
+  course_out_deg: 150            # out of the bay between Cabrita and Europa
+  words:
+    channel: "Coming from the west, keep San Roque open east of the rocks off Cape Carnero to clear the Pearl, give the points inside a good berth, and stand up the bay to the road between the town and the Palmones."
+    marks: "The tower of San García on its point; the Green Island with its chains of rock like moles before the town; the Galera, awash, half a cable from the mole."
+    anchorage: "The best anchorage of the bay is from the middle of the town toward the Palmones, sand and mud, up to twenty-five brazas a long mile off; keep off the line of the two towers of the Almiranta and the Pólvora, where the ground is gravel and stone, and sound before you let go."
+    tide: "It is high water in the bay at one in the afternoon at full and change; the greatest tides rise five or six feet. Small craft enter the river of La Miel at high water."
+
+tide:
+  establishment: Gibraltar
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds               # reals at the exchange; judgement
+  goods:
+    - {good: wine, price: 34, origin: spain, note: "Andalusian wine; from memory"}
+    - {good: brandy, price: 95, origin: spain, note: "from memory"}
+    - {good: oranges, price: 7, origin: spain, note: "judgement"}
+    - {good: salt, price: 10, origin: spain, note: "the salt of Cadiz bay; judgement"}
+    - {good: salt fish, price: 30, origin: spain, note: "the tunny of the almadrabas of Zahara and Tarifa; judgement"}
+    - {good: charcoal, price: 6, origin: spain, note: "the cork-oak woods behind the bay; judgement"}
+    - {good: timber, price: 6, origin: spain, note: "judgement"}
+    - {good: salt beef, price: 70, origin: null, note: "from memory"}
+    - {good: canvas, price: 50, origin: spain, note: "from memory"}
+    - {good: hemp, price: 60, origin: null, note: "from memory"}
+
+dockyard:
+  kind: chandlers                # the gunboats' station, no yard of the King of Spain's (Cadiz's arsenal of La Carraca is the yard)
+  items:
+    - {item: topmast, hours: 12, pounds: 50, note: "judgement"}
+    - {item: topgallant_mast, hours: 6, pounds: 15}
+    - {item: yard, hours: 8, pounds: 30}
+    - {item: suit of sails, hours: 72, pounds_per_100m2: 26}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.06}
+    - {item: water, hours_per_ton: 0.1, pounds_per_ton: 0.1, note: "the river of La Miel; judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05}
+
+crew_pool:
+  # judgement: the Matrícula takes the coast's seamen for the King's ships and the gunboats
+  able: {hands: 3, pounds: 2, delay_h: 24}
+  ordinary: {hands: 6, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 12, pounds: 1, delay_h: 12}
+
+closed_to: []

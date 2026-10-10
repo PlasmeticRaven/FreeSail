@@ -1,0 +1,103 @@
+# FreeSail: Tarifa as a port (spec M6 §26; package 39f, the Strait block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/strait.yaml).
+#
+# Sources. Tofiño 1787, Derrotero del Mediterráneo, pp. 4 to 9: the Isle of Tarifa, small,
+# round and even, with its tower, parted from the reef that runs S from Santa Catalina
+# by a channel a cable wide with 8 feet at low water; the Marroquina half a musket shot
+# SW of the tower; the city on the sea's edge between Santa Catalina and the Punta del
+# Camorro; small craft anchor between the isle and the city, sheltered from SW by NW to
+# NE, and must be hauled up in a cove E of the city with other winds; the great ships
+# may anchor in good weather in 16 to 20 brazas E of the isle before the sea gate; high
+# water at noon at full and change, rising 7 to 8 feet at the greatest. Purdy 1826,
+# pp. 3 and 353: 15 to 18 fathoms; the anchorage near Tarifa is not secure.
+#
+# The datum: UNVERIFIED. No period sheet is patched at Tarifa in this package (Tofiño's
+# chart of the Strait gives the road's soundings at its own scale and no plan of the
+# road was found); the chart's depths are EMODnet's at the lowest astronomical tide.
+#
+# The stance. Tarifa is Spain's: hostile to a King's ship in June 1805, open to a
+# neutral. Prices FROM MEMORY or JUDGEMENT; sterling at the exchange.
+
+id: tarifa
+name: Tarifa
+nation: spain
+source: "Tofiño 1787 pp. 4-9 (the Isle of Tarifa, the city, the roads, the tide); Purdy 1826 pp. 3, 8, 353"
+datum: unverified
+
+outer_road:
+  name: off the Isle of Tarifa
+  lat_deg: 35.9950
+  lon_deg: -5.5850
+anchorage:
+  feature: tarifa-road
+  name: Tarifa road
+  lat_deg: 36.0060
+  lon_deg: -5.5980
+mooring:
+  name: between the isle and the town
+  lat_deg: 36.0090
+  lon_deg: -5.6020
+  depth_fathoms: 3
+  bottom: sand
+  deep_draught_ft: 9     # judgement: the small craft's berth; a ship lies in the road E of the isle
+shore:
+  name: the sea gate of Tarifa
+  lat_deg: 36.0125
+  lon_deg: -5.6050
+
+pilot:
+  station: tarifa-road
+  cruising_nm: 4                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a Tarifa falucho
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Trujillo, Iglesias, Quiñones, Castro, Valdés, Muñoz, Serrano, Lobato]   # Andalusian names: judgement
+  skill: 0.88
+  fee_pounds: 2                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 110            # out east of the isle into the Strait
+  words:
+    channel: "Coming from the west keep two miles off the shore past the Cabezos and the rock of Valdevaqueros, Tarifa's lighthouse-tower bearing east by south; give the Marroquina half a musket shot west of the isle a wide berth and come round the isle's outer side, which is clean and bold."
+    marks: "The hermitage of Santa Catalina on its little hill, which seems an island from the west; the tower on the isle; the Punta del Camorro east of the town, foul a cable off."
+    anchorage: "The great ships anchor in fair weather east of the isle before the sea gate in sixteen to twenty brazas; small craft between the isle and the town. The road is not secure: weigh at the first sign of an easterly."
+    tide: "It is high water at noon at full and change; the greatest tides rise seven or eight feet. Along the shore the flood runs west and the ebb east, strong; in the middle of the Strait the current sets east."
+
+tide:
+  establishment: Tarifa
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: salt fish, price: 28, origin: spain, note: "the almadraba's tunny; judgement"}
+    - {good: wine, price: 34, origin: spain, note: "from memory"}
+    - {good: brandy, price: 95, origin: spain, note: "from memory"}
+    - {good: cattle, price: 30, origin: spain, note: "the Lances' pasture; judgement"}
+    - {good: salt, price: 10, origin: spain, note: "judgement"}
+    - {good: salt beef, price: 70, origin: null, note: "from memory"}
+    - {good: oranges, price: 7, origin: spain, note: "judgement"}
+    - {good: charcoal, price: 6, origin: spain, note: "the cork-oak woods of the sierras; judgement"}
+    - {good: timber, price: 6, origin: spain, note: "judgement"}
+    - {good: canvas, price: 52, origin: spain, note: "from memory, as Algeciras's"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 16, pounds: 55, note: "a small town; judgement"}
+    - {item: topgallant_mast, hours: 8, pounds: 17}
+    - {item: yard, hours: 10, pounds: 32}
+    - {item: cordage, hours: 3, pounds_per_fathom: 0.07}
+    - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.05}
+
+crew_pool:
+  able: {hands: 2, pounds: 2, delay_h: 24}
+  ordinary: {hands: 4, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 8, pounds: 1, delay_h: 12}
+
+closed_to: []

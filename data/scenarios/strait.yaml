@@ -1,0 +1,84 @@
+# FreeSail: the Strait block's passage (spec M6 §26, block 6; package 39f). A free passage,
+# not a gate's: the frigate, a King's ship, from off Cape Trafalgar through the Strait to
+# Gibraltar road, the land of both shores in sight, the current from the ocean setting
+# east under her in the middle of the Strait. The block's water on the whole chart
+# (`chart: atlantic-east`), its marks (data/charts/features/strait.yaml), its ports
+# (Gibraltar, and Tarifa, Algeciras, Ceuta and Tangier on package 35's machinery) and its
+# streams (the shores' tides and the middle's constant current, data/tides/streams.yaml).
+# Given to either driver with --scenario:
+#     py -m freesail.ui.console --scenario data/scenarios/strait.yaml
+# and printed whole by
+#     py tools/day_log.py data/scenarios/strait.yaml --hours 10 --reckoning
+#
+# WHERE SHE STARTS. The brief has her from Cadiz bay, which is the block `portugal`'s
+# (package 39d, 36.4 N and north), built beside this one and not in this block's manifest:
+# she starts instead under way five miles south-west of Cape Trafalgar, in this block's own
+# water, at five in the morning of 12 June 1805, as if out of Cadiz the evening before. The
+# chart's fall-back to the corridor would carry her the first miles out of Cadiz without
+# that block, but its port and marks would not be there to start from; the lead may move
+# her start into the bay once both blocks are merged.
+#
+# WITH THE INSET, NOT AGAINST IT. The brief says "against the inset": the inset sets east,
+# into the Mediterranean (Purdy 1826, p. 8: "the current from the Atlantic Ocean sets
+# generally to the East"; Tofiño 1787, p. 21: "las corrientes generales para el E."), so a
+# ship bound from Cadiz to Gibraltar has it with her, and the westerly of the season fair:
+# it is the passage out of the Mediterranean that has it against her. The book hauls her
+# in for the Spanish shore past Tarifa so that the current does not carry her east of the
+# Rock (Purdy 1826, p. 9).
+#
+# The weather is pinned, a westerly of thirteen knots, the Poniente, so that the passage is
+# the same on every machine. Sailed once at seed 7 for the package's notes
+# (docs/dev/TuningNotes.md, package 39f); not a gate's and not pinned.
+
+name: The Strait, the frigate from off Cape Trafalgar to Gibraltar road
+seed: 7
+start: 1805-06-12T05:00
+position: {lat_deg: 36.1330, lon_deg: -6.1670}   # five miles south-west of Cape Trafalgar, outside the Aceytera
+chart: atlantic-east
+nation: britain
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 115
+  speed_kn: 6
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.95}
+
+papers:
+  chart: {year: 1804}
+  epitome: norie                  # a ship of war's, which has the Strait's places (data/tides/establishments.yaml)
+  almanac: 1805
+
+cargo:
+  purse_pounds: 200
+
+ports: [gibraltar, tarifa, algeciras, ceuta, tangier]
+
+weather:
+  wind:
+    - {at: 1805-06-12T04:00, from_deg: 270, knots: 13, air_mass: neutral}
+    - {at: 1805-06-12T12:00, from_deg: 265, knots: 12}
+    - {at: 1805-06-12T20:00, from_deg: 260, knots: 10}
+  background:
+    {hpa: 1018, gradient_hpa_per_100km: 0.4, high_toward_deg: 270}
+  systems:
+    - name: the Azores high
+      kind: high
+      radius_km: 1200
+      track:
+        - {at: 1805-06-11T12:00, x_km: -900, y_km: 100, hpa: 1025}
+        - {at: 1805-06-13T12:00, x_km: -850, y_km: 100, hpa: 1024}
+  sky: {sky: clear, weather: fine, visibility: the horizon}
+  sea: true
+
+standing_orders:
+  - data/scenarios/strait.orders
+
+orders:
+  - set plain sail
+  - shape a course for 35 57 N 5 48 W

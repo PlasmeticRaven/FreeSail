@@ -1,0 +1,1082 @@
+# The features of the Strait, Cape Roche and Cape Trafalgar to Gibraltar, Ceuta and Cape
+# Spartel (spec M6 §26, block 6; package 39f): hazards, marks, lights with their dates,
+# places, anchorages and bottom notes, in the period's words, each with its source in the
+# references' form (docs/references/README.md), on the rules of channel-west.yaml's head,
+# read from:
+#
+#   Tofiño 1787     Vicente Tofiño de San Miguel, Derrotero de las costas de España en el
+#                   Mediterráneo y su correspondiente de África (Madrid, Ibarra, 1787;
+#                   Internet Archive derroterodelasco00tofi), the OCR text: 'Descripción de
+#                   las costas de Europa y África que forman el Estrecho de Gibraltar',
+#                   pp. 1 to 11; 'Descripción de la Bahía de Algeciras y Gibraltar', pp. 12
+#                   to 22; 'Costa de África', pp. 22 to 27. His soundings are brazas of two
+#                   Castilian varas (1.672 m; the plan's legend, below) and his feet the
+#                   pie de Burgos (0.279 m), his miles of sixty to the degree.
+#   Tofiño 1789     the same, Derrotero de las costas de España en el Océano Atlántico
+#                   (Internet Archive bub_gb_04Yq4fsvB8gC), 'Descripción de la costa de
+#                   Andalucía', pp. 127 to 130: Conil, Cape Roche, the Laja de Conil, the
+#                   sand bank and the Aceytera off Cape Trafalgar.
+#   Tofiño 1786     his 'Plano geométrico de la Bahía de Algeciras y Gibraltar' (Atlas
+#                   Marítimo de España, 1789; David Rumsey 13360.037), read at full
+#                   resolution through the collection's IIIF server: its legend's letters
+#                   and its soundings, the bay's patch (overrides/strait/gibraltar-
+#                   algeciras.yaml).
+#   Purdy 1826      John Purdy, The New Sailing Directory for the Mediterranean Sea
+#                   (Internet Archive newsailingdirec01purdgoog), pp. 1 to 9 ('Strait of
+#                   Gibraltar', 'Bay of Gibraltar', 'Cape Spartel and Tangier Bay',
+#                   'Tangier to Ceuta', 'Ceuta and Tetuan', 'The Tides and Current of the
+#                   Strait'), pp. 349 to 353; much of it Tofiño's in English, with the
+#                   English ships' notes of 1799 to 1824. Later than the period, and the
+#                   nearest English directions read: where it adds to Tofiño the entry
+#                   says so.
+#   encyclopaedia   the Spanish and English encyclopaedias' pages for the lights and the
+#                   places named in each entry, read 2026-10-10 (dates and positions).
+#
+# Positions are in the modern frame (WGS 84, the EMODnet DTM 2024 grid the tiles are cut
+# from): first placed from the modern chart, the encyclopaedia's coordinates or Tofiño's
+# bearings and distances as each entry says, then checked against the block's tiles by
+# channel-west.yaml's rule (a headland, island, town, castle, church, tower to the
+# nearest land within 800 m; a light to the nearest land within 400 m; a rock or ledge
+# to the shoalest head within 400 m; an anchorage to water holding half the pilot's
+# depth within 800 m); a move is said in `fix`. Tofiño's survey is the period's best of
+# these waters (his bases measured, his marks by two theodolites), so where his bearings
+# put a sunken danger the entry keeps them. Heights are above the sea for the horizon:
+# the Rock's Purdy's 1,400 feet, the rest JUDGEMENT from the grid's land about the mark.
+#
+# The lights of 1805: NONE in the block. Every light of the Strait is later (Tarifa's
+# on the island, first recorded in 1826 and UNVERIFIED before it, Europa Point's of 1841,
+# Ceuta's of 1855, Trafalgar's of 1860, Spartel's of 1864, Carnero's of 1874), and each
+# carries its year so that 1805 does not see it. Tofiño 1787 names no light between Cadiz
+# and Malaga; the lamp the friars kept in the tower of Our Lady of Europe had no shrine
+# to keep it after 1704, when the shrine ceased to be used and was taken for military use
+# (the encyclopaedia's 'Shrine of Our Lady of Europe', read 2026-10-10; the lamp's end
+# JUDGEMENT from that). A ship enters the Strait by night on the land's loom and
+# the moon.
+#
+# Cadiz and its bay (36.5 N) are the block `portugal`'s (package 39d), whose bounds abut
+# these at 36.4 N; Cape Roche, Conil and Cape Trafalgar are this block's.
+#
+# The lead reviews this list against the sources before the merge: the citation is on
+# every line for that.
+
+region: strait
+features:
+
+  # ---------------------------------------------------------------------------
+  # Cape Roche, Conil and Cape Trafalgar
+  # ---------------------------------------------------------------------------
+
+  - id: cape-roche
+    kind: headland
+    name: Cape Roche
+    modern: Cabo Roche
+    lat_deg: 36.2953
+    lon_deg: -6.1418
+    height_m: 25
+    source: "Tofiño 1789, 'Descripción de la costa de Andalucía', p. 127: from Cape Roche to Conil the coast is beach with some points of rock nothing salient"
+    says: "Cape Roche, a low point of rock between the beaches of Sancti Petri and Conil."
+
+  - id: conil
+    kind: town
+    name: Conil
+    modern: Conil de la Frontera
+    lat_deg: 36.2770
+    lon_deg: -6.0880
+    height_m: 30
+    source: "Tofiño 1789, 'Riachuelo de Conil', p. 127: at the foot of the Atalaya a rivulet where the coasting craft enter at high water, its mouth dry at low"
+    says: "Conil, its watch-tower over a little river the coasters enter at high water; the mouth is dry at low water."
+
+  - id: conil-atalaya
+    kind: tower
+    name: the Atalaya of Conil
+    modern: Torre de Guzmán, Conil
+    lat_deg: 36.2765
+    lon_deg: -6.0875
+    height_m: 40
+    source: "Tofiño 1789, 'Laja de Conil', p. 127: the Atalaya of Conil, from which the Laja is laid off"
+    says: "The Atalaya of Conil, the tower over the town, the mark the Laja is reckoned from."
+
+  - id: castilobos-tower
+    kind: tower
+    name: the tower of Castilobos
+    modern: Torre de Castilobos (Castilnovo)
+    lat_deg: 36.2520
+    lon_deg: -6.0740
+    height_m: 12
+    source: "Tofiño 1789, 'Torre de Castilobo', p. 127: S 25° 50' E 1 6/10 miles from the Atalaya the tower of Castilobo, square, on the beach, which is very low"
+    says: "The tower of Castilobos, square, standing on the low beach south of Conil."
+    fix: "Tofiño's bearing and distance from the Atalaya of Conil"
+
+  - id: laja-de-conil
+    kind: ledge
+    name: the Laja of Conil
+    modern: Laja de Conil (the shoals off Castilnovo)
+    lat_deg: 36.2310
+    lon_deg: -6.1030
+    height_m: 0
+    extent_m: 500
+    dries_m: -3.3
+    source: "Tofiño 1789, 'Laja de Conil', pp. 127 to 128: S 15° W 3 miles scant from the Atalaya of Conil, and S 54° 10' W and S 39° 30' W 2 miles scant from the tower of Castilobo, its north and south ends; 3 to 4 brazas at those points, breaking when there is a swell, and 2 to 4 1/2 brazas of rock over the rest"
+    says: "The Laja of Conil, a ledge of rock with two to four brazas over it three miles south-south-west of the Atalaya; it breaks when there is a swell."
+    fix: "Tofiño's bearings from the Atalaya and from Castilobo, the ends' middle; 2 brazas (3.3 m) the least he gives"
+
+  - id: trafalgar-bank
+    kind: bank
+    name: the sand bank off Cape Trafalgar
+    modern: the Placer de Meca (the sand west of Cape Trafalgar)
+    lat_deg: 36.1810
+    lon_deg: -6.1060
+    height_m: 0
+    depth_fathoms: 2.7
+    bottom: "sand"
+    source: "Tofiño 1789, 'Placer de arena', p. 128: N 83° W 4 miles scant from Cape Trafalgar the NW end of a great bank of sand that runs NW and SE a mile and a half and half a mile NE and SW, with 3 brazas in its least and 8 to 10 all about its edge; its SE end S 76° W 3 miles scant from the cape"
+    says: "A great bank of sand four miles west of Cape Trafalgar, three brazas on its shoalest and eight to ten about its edge."
+    fix: "Tofiño's two bearings and distances from the cape, the middle; 3 brazas (5.0 m) as English fathoms"
+
+  - id: cape-trafalgar
+    kind: headland
+    name: Cape Trafalgar
+    modern: Cabo de Trafalgar
+    lat_deg: 36.1830
+    lon_deg: -6.0350
+    height_m: 20
+    source: "Tofiño 1787, 'Cabo Trafalgár', p. 1: the most westerly northern point of the Strait, in latitude 36° 10′ 15″; low, of broken land, salient, with a watch tower near its end; the encyclopaedia's 'Cabo de Trafalgar' (read 2026-10-10) for the position"
+    says: "Cape Trafalgar, the north-west point of the Strait: low and broken land, salient, with a watch-tower near its end."
+
+  - id: trafalgar-tower
+    kind: tower
+    name: the tower of Cape Trafalgar
+    modern: Torre de Trafalgar (the almenara beside the lighthouse)
+    lat_deg: 36.1832
+    lon_deg: -6.0345
+    height_m: 22
+    source: "Tofiño 1787, 'Cabo Trafalgár', p. 1: a watch tower near its end; Tofiño 1789, p. 129: the Torre de Trafalgar, the mark of the Aceytera"
+    says: "The watch-tower on Cape Trafalgar, the mark the Aceytera and the sand bank are laid off from."
+
+  - id: trafalgar-light
+    kind: light
+    name: the light of Cape Trafalgar
+    modern: Faro de Cabo Trafalgar
+    lat_deg: 36.1829
+    lon_deg: -6.0352
+    height_m: 50
+    lit: {from: 1860, until: null, range_nm: 19, character: "a light on the cape (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Faro de Cabo Trafalgar' (es, read 2026-10-10): raised in 1860 beside the almenara, to Eduardo Saavedra's project of 1857; not lit in 1805"
+    says: "The light of Cape Trafalgar, which was not yet built in 1805."
+
+  - id: aceitera
+    kind: ledge
+    name: the Aceytera
+    modern: Bajo de la Aceitera (Los Bajos de Trafalgar)
+    lat_deg: 36.1660
+    lon_deg: -6.0710
+    height_m: 0
+    extent_m: 600
+    dries_m: -2.5
+    source: "Tofiño 1789, 'Aceytera', pp. 128 to 129: S 80° 15' W 2 miles scant from Cape Trafalgar its NW end, S 60° 20' W the same distance its least water, S 53° 44' W its SE end; a chain of rocks a mile NNW and SSE and two cables NE and SW, its least water a braza and a half at low water, up to 5 1/2 in places; between it and the cape a ripple that seems a breaker, 'la Risa del Cabo', the eddies of the currents (p. 130)"
+    says: "The Aceytera, a chain of rocks two miles south-west of Cape Trafalgar with a braza and a half on its shoalest at low water; between it and the cape the water boils like a breaker, the Laugh of the Cape."
+    fix: "Tofiño's bearing and distance of the least water from the tower; 1 1/2 brazas (2.5 m) at low water"
+
+  - id: trafalgar-rocky-flat
+    kind: rock
+    name: the rocky flat north-west of Cape Trafalgar
+    modern: the rocks off the Playa de Zahora
+    lat_deg: 36.2013
+    lon_deg: -6.0546
+    height_m: 0
+    extent_m: 150
+    dries_m: -2.1
+    source: "Tofiño 1789, 'Cabo Trafalgar', p. 127: from a point of rock a mile and a half NW of the cape a flat of rock runs a cable and a half SW, with only 1 1/4 brazas at its end, then 6, 8 and more"
+    says: "A flat of rock a mile and a half north-west of Cape Trafalgar, running out a cable and a half with a braza and a quarter at its end."
+    fix: "Tofiño's distance from the cape, the flat's end; 1 1/4 brazas (2.1 m); moved 400 m to the shoalest head of EMODnet's grid within 400 m (-2.5 m)"
+
+  - id: meca-heights
+    kind: hill
+    name: the heights of Meca
+    modern: Altos de Meca (the Sierra de la Breña)
+    lat_deg: 36.2050
+    lon_deg: -5.9900
+    height_m: 150
+    source: "Tofiño 1787, 'Altos de Meca', p. 2: a level ridge of more than moderate height divided in two; Tofiño 1789, p. 127: very flat on its summit, green with brush and patches of white sand, the mark for the cape"
+    says: "The heights of Meca, a level ridge divided in two, green with brush and white with patches of sand: the mark for Cape Trafalgar."
+
+  - id: barbate-road
+    kind: anchorage
+    name: the road of Barbate
+    modern: Ensenada de Barbate
+    lat_deg: 36.1700
+    lon_deg: -5.9350
+    height_m: 0
+    depth_fathoms: 7
+    bottom: "clean ground"
+    source: "Tofiño 1787, 'Ensenada de Barbate', p. 2: in its middle a good anchorage, clean, in what brazas you will, before a white gully east of the river; here the Glorioso, dismasted, saved herself at anchor in 1746"
+    says: "The road of Barbate, between Cape Trafalgar and Cape Plata: good clean anchorage in any depth before the white gully east of the river."
+    fix: "the road's middle; the depth JUDGEMENT (Tofiño's 'the brazas you will')"
+
+  - id: barbate-reef
+    kind: ledge
+    name: the reef off the river of Barbate
+    modern: the rocks off the mouth of the Barbate
+    lat_deg: 36.1824
+    lon_deg: -5.9307
+    height_m: 0
+    extent_m: 700
+    dries_m: -2.0
+    source: "Tofiño 1787, 'Ensenada de Barbate', p. 2: SW of the river's mouth and near it a reef with 7 and 10 feet over it, lying E and W half a league; the river's entrance very narrow, 15 feet at high water"
+    says: "A reef with seven and ten feet over it, half a league long east and west, south-west of the mouth of the river of Barbate."
+    fix: "Tofiño's place south-west of the river's mouth; 7 feet of Burgos (2.0 m); moved 380 m to the shoalest head of EMODnet's grid within 400 m (0.4 m)"
+
+  - id: zahara-bay
+    kind: anchorage
+    name: the bay of Zahara
+    modern: Ensenada de Zahara de los Atunes
+    lat_deg: 36.1341
+    lon_deg: -5.8507
+    height_m: 0
+    depth_fathoms: 5
+    bottom: "sand"
+    source: "Tofiño 1787, 'Ensenada de Sara', pp. 2 to 3: 7 1/10 miles S 73° 14' E of Cape Trafalgar its NW point, rising to a mountain with two towers; the bay commodious and in good weather proper for small craft"
+    says: "The bay of Zahara under its mountain with two towers, commodious in good weather for small craft."
+    fix: "the bay's middle; the depth JUDGEMENT; moved 120 m to water holding half the pilot's depth"
+
+  - id: camarinal-point
+    kind: headland
+    name: the point of the Camarinal
+    modern: Cabo de Gracia (where the Faro de Camarinal stands)
+    lat_deg: 36.0884
+    lon_deg: -5.8100
+    height_m: 60
+    source: "Tofiño 1787, 'Punta del Camarinal', p. 3: the SE side of the bay of Zahara, a low salient point with rocks to be given a third of a league's berth, the point of middling height with a watch tower; the encyclopaedia's 'Punta Camarinal' (es, read 2026-10-10): the Faro de Camarinal stands on the cape now called de Gracia, west of the point that now bears the name"
+    says: "The point of the Camarinal, of middling height with a watch-tower; its rocks want a third of a league's berth."
+    fix: "moved 40 m to the nearest land of the tiles"
+
+  - id: camarinal-rocks
+    kind: ledge
+    name: the rocks of the Camarinal
+    modern: the rocks off Cabo de Gracia
+    lat_deg: 36.0868
+    lon_deg: -5.8111
+    height_m: 0
+    extent_m: 400
+    source: "Tofiño 1787, 'Punta del Camarinal', p. 3: a low salient point with stones that must be given a third of a league's berth"
+    says: "The rocks off the Camarinal: give them a third of a league."
+    fix: "moved 400 m to the shoalest head of EMODnet's grid within 400 m (-3.6 m)"
+
+  - id: cape-plata
+    kind: headland
+    name: Cape Plata
+    modern: Punta Camarinal (the foot of the Sierra de la Plata)
+    lat_deg: 36.0810
+    lon_deg: -5.7960
+    height_m: 80
+    source: "Tofiño 1787, 'Cabo de Plata', p. 3: it comes down from the mountain of the same name, declining insensibly to its point, and shows well salient with some stones; between it and the Camarinal a bay with a beach, shelter from the E and NE in 8 to 10 brazas"
+    says: "Cape Plata, falling insensibly from its mountain to a salient point with some stones."
+
+  - id: bolonia-bay
+    kind: anchorage
+    name: the bay of Bolonia
+    modern: Ensenada de Bolonia
+    lat_deg: 36.0759
+    lon_deg: -5.7658
+    height_m: 0
+    depth_fathoms: 8
+    bottom: "sand"
+    source: "Tofiño 1787, 'Punta Paloma', p. 3: between Cape Plata and Punta Paloma the bay of Bolonia, good anchorage and shelter for every kind of vessel in what depth you will at half a cannon shot from the coast, with no more berth to give than to the Camarinal and Cape Plata"
+    says: "The bay of Bolonia: good anchorage for every kind of vessel at half a cannon-shot from the beach."
+    fix: "half a cannon shot off the beach; the depth JUDGEMENT; moved 140 m to water holding half the pilot's depth"
+
+  - id: punta-paloma
+    kind: headland
+    name: Punta Paloma
+    modern: Punta Paloma
+    lat_deg: 36.0620
+    lon_deg: -5.7170
+    height_m: 40
+    source: "Tofiño 1787, 'Torre y punta Paloma', p. 3: S 72° E 4 1/2 miles of Cape Plata the tower and point of Paloma, surrounded with great low stones; the encyclopaedia's 'Punta Paloma' (es, read 2026-10-10)"
+    says: "Punta Paloma with its tower, girt with great low stones; the Cabezos lie off it."
+
+  - id: valdevaqueros
+    kind: anchorage
+    name: the bay of Valdevaqueros
+    modern: Ensenada de Valdevaqueros
+    lat_deg: 36.0640
+    lon_deg: -5.6900
+    height_m: 0
+    depth_fathoms: 4
+    bottom: "sand"
+    source: "Tofiño 1787, 'Ensenada de Valdebaqueros', p. 3: Punta Paloma and the point and tower of the Peña form the bay of Valdebaqueros, with shelter and anchorage for small vessels"
+    says: "The bay of Valdevaqueros, an anchorage for small vessels between Punta Paloma and the tower of the Peña."
+    fix: "the depth JUDGEMENT"
+
+  - id: pena-tower
+    kind: tower
+    name: the tower of the Peña
+    modern: Torre de la Peña, Tarifa
+    lat_deg: 36.0542
+    lon_deg: -5.6588
+    height_m: 40
+    source: "Tofiño 1787, pp. 3 and 5: S 78° E 3 1/2 miles of Punta Paloma the point and tower of the Peña, on a rock eighty-four steps high at the foot of the Sierra de Enmedio"
+    says: "The tower of the Peña on its rock at the foot of the Sierra de Enmedio, the mark for the Cabezos."
+    fix: "moved 640 m to the nearest land of the tiles"
+
+  - id: arroyo-del-puerco
+    kind: bank
+    name: the shoal of Arroyo del Puerco
+    modern: Bajo de Arroyo del Puerco
+    lat_deg: 36.0300
+    lon_deg: -5.7270
+    height_m: 0
+    depth_fathoms: 4.6
+    bottom: "rock"
+    source: "Tofiño 1787, 'Arroyo del Puerco', p. 7: a mile W of the Cabezos and 2 1/2 from Punta Paloma, a flat of stones a mile long NE and SW, narrow, with 5 to 6 brazas at three quarters flood; 15 to 20 between it and the coast"
+    says: "Arroyo del Puerco, a narrow flat of stones a mile long with five or six brazas over it, a mile west of the Cabezos."
+    fix: "Tofiño's distances from the Cabezos and Punta Paloma; 5 brazas (8.4 m) as English fathoms"
+
+  - id: cabezos
+    kind: rock
+    name: the Cabezos
+    modern: Bajo de los Cabezos
+    lat_deg: 36.0190
+    lon_deg: -5.7050
+    height_m: 0
+    extent_m: 500
+    dries_m: -0.5
+    source: "Tofiño 1787, 'Los Cabezos', p. 6: the most dangerous shoals for their little water and for lying farthest out; three, in the form of a horseshoe over three quarters of a mile WNW and ESE, so little water at low water springs that it comes to mid-leg on those who gather shellfish; the easternmost N 76° 54' W of the tower of the Isle of Tarifa 4 8/10 miles and S 46° 5' W 3 1/2 miles of the Peña; rare the year no vessel is lost on them; Purdy 1826, p. 2"
+    says: "The Cabezos, three heads in a horseshoe nearly five miles west of the Isle of Tarifa, so shoal at low water springs that the shell-gatherers wade on them to mid-leg: rare is the year a vessel is not lost there."
+    fix: "Tofiño's theodolite bearing and distance from the tower of the Isle of Tarifa; the head's water JUDGEMENT from his 'mid-leg' (half a metre)"
+
+  - id: valdevaqueros-rock
+    kind: rock
+    name: the rock of Valdevaqueros
+    modern: Piedra de Valdevaqueros (Bajo de la Peña)
+    lat_deg: 36.0350
+    lon_deg: -5.6790
+    height_m: 0
+    extent_m: 150
+    dries_m: -3.1
+    source: "Tofiño 1787, 'Baxo de Valdebaqueros', p. 7: N 58° W of the tower of the Isle of Tarifa 4 miles a small rock called of Valdebaqueros or of the Peña, 2 3/4 brazas at high water, 5 close by, rock, and 7 a little farther; between it and the tower of the Peña a channel a mile and a quarter wide with 10 brazas, sand, in its middle; Purdy 1826, p. 3: 4 1/2 fathoms rocky bottom very near to it"
+    says: "The rock of Valdevaqueros, with under three brazas over it at high water, four miles west-north-west of the Isle of Tarifa; the channel inside it, a mile and a quarter wide, carries ten brazas."
+    fix: "Tofiño's bearing and distance from the tower of the Isle of Tarifa (his league from the Peña agrees not; Purdy's channel of a mile and a quarter is taken); the head 2 3/4 brazas at high water less the rise, JUDGEMENT"
+
+  # ---------------------------------------------------------------------------
+  # Tarifa and the Spanish shore to Cape Carnero
+  # ---------------------------------------------------------------------------
+
+  - id: tarifa-island
+    kind: island
+    name: the Isle of Tarifa
+    modern: Isla de las Palomas, Tarifa
+    lat_deg: 36.0062
+    lon_deg: -5.6085
+    height_m: 15
+    source: "Tofiño 1787, 'Isla de Tarifa', pp. 4 to 5: small, round and even, low on its SE side where the tower is and higher on the NW; parted from the reef that runs S from Santa Catalina by a channel a cable wide with 8 feet at low water; very clean and bold on all its outer side; the encyclopaedia's 'Punta de Tarifa' (es, read 2026-10-10)"
+    says: "The Isle of Tarifa, small, round and even, the southernmost land of Europe; very clean and bold on its outer side."
+    fix: "moved 560 m to the nearest land of the tiles"
+
+  - id: tarifa-island-tower
+    kind: tower
+    name: the tower of the Isle of Tarifa
+    modern: the tower on the Isla de las Palomas (where the lighthouse now stands)
+    lat_deg: 36.0061
+    lon_deg: -5.6090
+    height_m: 25
+    source: "Tofiño 1787, 'Isla de Tarifa', pp. 4 to 5: the tower on the low SE side of the isle, the station of his theodolite for the Cabezos"
+    says: "The tower on the Isle of Tarifa, the point the Strait's dangers are laid off from."
+    fix: "moved 700 m to the nearest land of the tiles"
+
+  - id: tarifa-light
+    kind: light
+    name: the light of Tarifa
+    modern: Faro de Punta de Tarifa
+    lat_deg: 36.0061
+    lon_deg: -5.6090
+    height_m: 41
+    lit: {from: 1826, until: null, range_nm: 18, character: "a revolving light on the isle's tower (not lit in 1805 by Tofiño's survey)"}
+    source: "The encyclopaedia's 'Faro de Punta de Tarifa' (es, read 2026-10-10): the almenara of Philip II's coastal towers turned to a light, 'it must have been built in the second half of the eighteenth century', the first document a plan of 1826 whose legend reads 'Fanal giratorio y torre de Tarifa'; Purdy 1826, 'Strait of Gibraltar', p. 2: 'the lighthouse of Tarifa'; Tofiño 1787, pp. 4 to 6, describes the isle's tower and its theodolite station and names no light, nor any between Cadiz and Malaga. The year the first record's, 1826; the light's first lighting UNVERIFIED (between 1787 and 1826), and 1805 taken without it on Tofiño's silence"
+    says: "The light of Tarifa, which was not yet lit in 1805."
+    fix: "the tower's place on the tiles (the isle is narrower than the grid's cell; no land within 400 m of the light's own position)"
+
+  - id: marroquina
+    kind: rock
+    name: the Marroquina
+    modern: Piedra Marroquina
+    lat_deg: 36.0001
+    lon_deg: -5.6116
+    height_m: 0
+    extent_m: 100
+    dries_m: 0.0
+    source: "Tofiño 1787, 'Piedra Marroquina', p. 5: a small rock, covered at times by the sea, half a musket shot from the isle on the SW side of the tower"
+    says: "The Marroquina, a small rock awash half a musket-shot south-west of the tower of the Isle of Tarifa."
+    fix: "Tofiño's half a musket shot SW of the tower; awash; moved 200 m to the shoalest head of EMODnet's grid within 400 m (-4.9 m)"
+
+  - id: santa-catalina-tarifa
+    kind: church
+    name: the hermitage of Santa Catalina
+    modern: Ermita de Santa Catalina, Tarifa
+    lat_deg: 36.0125
+    lon_deg: -5.6118
+    height_m: 25
+    source: "Tofiño 1787, 'Lances de Tarifa', p. 4: the hermitage of Santa Catalina on a little hill joined to the coast by a low neck of white sand, so that it seems an island seen from the west"
+    says: "The hermitage of Santa Catalina on its little hill by Tarifa, which seems an island seen from the west."
+
+  - id: tarifa
+    kind: town
+    name: Tarifa
+    modern: Tarifa
+    lat_deg: 36.0135
+    lon_deg: -5.6040
+    height_m: 25
+    source: "Tofiño 1787, 'Punta del Camorro', p. 8: between Santa Catalina and the Punta del Camorro the city of Tarifa on the sea's edge at the foot of Monte Cabrito"
+    says: "Tarifa, walled, on the sea's edge at the foot of its little mountain."
+
+  - id: tarifa-road
+    kind: anchorage
+    name: Tarifa road
+    modern: the anchorage east of the Isla de las Palomas
+    lat_deg: 36.0060
+    lon_deg: -5.5980
+    height_m: 0
+    depth_fathoms: 16
+    bottom: "sand"
+    source: "Tofiño 1787, 'Punta del Camorro', pp. 8 to 9: the great ships may anchor in good weather in 16 to 20 brazas E of the isle, before the sea gate; small craft between the isle and the town, sheltered from SW by NW to NE; Purdy 1826, p. 3: 15 to 18 fathoms; p. 353: the anchorage near Tarifa is not secure"
+    says: "Tarifa road, east of the isle before the sea gate, in sixteen to twenty brazas: good in fair weather and no more."
+    fix: "Tofiño's place E of the isle; 18 brazas (30 m) as English fathoms"
+
+  - id: camorro-point
+    kind: headland
+    name: the Punta del Camorro
+    modern: Punta del Camorro, Tarifa
+    lat_deg: 36.0170
+    lon_deg: -5.5980
+    height_m: 30
+    source: "Tofiño 1787, 'Punta del Camorro', p. 8: a mile ENE of Santa Catalina, high, thick and steep; Purdy 1826, p. 352: very dangerous, with many rocks about it, one a cable's length from the shore"
+    says: "The Punta del Camorro east of Tarifa, high and steep, with rocks about it a cable off."
+
+  - id: guadalmesi-point
+    kind: headland
+    name: the point of Guadalmesí
+    modern: Punta de Guadalmesí
+    lat_deg: 36.0352
+    lon_deg: -5.5213
+    height_m: 40
+    source: "Tofiño 1787, 'Punta de Gualmesí', p. 9: N 64° 50' E of the tower of the Isle of Tarifa 4 3/4 miles, high, little salient and sheer, with a watch tower; E of it a cove in a valley full of gardens; the encyclopaedia's 'Torre de Guadalmesí' (es, read 2026-10-10): built from 1588"
+    says: "The point of Guadalmesí, high and sheer, with its watch-tower and a valley of gardens behind it."
+    fix: "Tofiño's bearing and distance from the tower of the Isle of Tarifa; moved 180 m to the nearest land of the tiles"
+
+  - id: acebuche-point
+    kind: headland
+    name: the points of Acebuche
+    modern: Punta del Acebuche
+    lat_deg: 36.0501
+    lon_deg: -5.4717
+    height_m: 30
+    source: "Tofiño 1787, 'Punta del Acebuche', p. 9: N 74° E 2 1/4 miles of Guadalmesí the eastern point of Acebuche, even and little salient, the western close by, both girt with stones that show; Purdy 1826, p. 352: the most difficult point in the Strait to weather with the wind west, for its eddies"
+    says: "The two points of Acebuche, girt with stones: with a westerly wind the hardest point of the Strait to weather, for its eddies."
+    fix: "Tofiño's bearing and distance from Guadalmesí; moved 780 m to the nearest land of the tiles"
+
+  - id: tolmo-cove
+    kind: anchorage
+    name: the cove of Tolmo
+    modern: Ensenada del Tolmo
+    lat_deg: 36.0480
+    lon_deg: -5.4950
+    height_m: 0
+    depth_fathoms: 6
+    bottom: "good holding ground"
+    source: "Tofiño 1787, p. 9: N 69° W of the western Acebuche about a mile the cove of Tolmo with a castle for its guard; good anchorage for small vessels sheltered from E by N to NW in 6 to 8 brazas, good holding ground"
+    says: "The cove of Tolmo under its castle: good anchorage for small vessels in six to eight brazas, good holding ground."
+
+  - id: frayle-point
+    kind: headland
+    name: the Punta del Frayle
+    modern: Punta del Fraile
+    lat_deg: 36.0529
+    lon_deg: -5.4628
+    height_m: 60
+    source: "Tofiño 1787, 'Punta del Frayle', p. 9: N 65° 30' E a long mile of the western Acebuche, coming down from a great height with a watch tower half way down; an islet close to it like a friar, and stones about"
+    says: "The Friar's Point, falling from a great height with a watch-tower half way down, and an islet off it like a friar."
+    fix: "Tofiño's bearing and distance from the western Acebuche; moved 220 m to the nearest land of the tiles"
+
+  - id: punta-carnero
+    kind: headland
+    name: Cape Carnero
+    modern: Punta Carnero
+    lat_deg: 36.0772
+    lon_deg: -5.4264
+    height_m: 40
+    source: "Tofiño 1787, 'Punta Carnero', p. 10: it comes down from a mountain with uneven slope to its end, of middling height, with a castle and a watch tower; Purdy 1826, p. 3: Cape Carnero, or Cabrita Point; the encyclopaedia's 'Faro de Punta Carnero' (es, read 2026-10-10) for the position"
+    says: "Cape Carnero, Cabrita Point, the western point of Gibraltar Bay, with its castle and watch-tower."
+
+  - id: carnero-light
+    kind: light
+    name: the light of Cape Carnero
+    modern: Faro de Punta Carnero
+    lat_deg: 36.0770
+    lon_deg: -5.4262
+    height_m: 41
+    lit: {from: 1874, until: null, range_nm: 16, character: "a light on the point (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Faro de Punta Carnero' (es, read 2026-10-10): projected by Jaime Font in 1864, inaugurated in 1874; not lit in 1805"
+    says: "The light of Cape Carnero, which was not yet built in 1805."
+
+  - id: palomas-algeciras
+    kind: island
+    name: Pigeon Island
+    modern: Isla de las Palomas, Algeciras (Punta Carnero)
+    lat_deg: 36.0727
+    lon_deg: -5.4303
+    height_m: 6
+    source: "Tofiño 1787, 'Isla Paloma', p. 10: S 35° W of Punta Carnero a third of a mile the easternmost of the Isla de las Palomas, low and broken; a cable NW of it the Cabritas, two small flat islets, and W of them seven stones that show and some covered"
+    says: "Pigeon Island under Cape Carnero, low and broken, with the Cabritas and their stones west of it."
+    fix: "Tofiño's bearing and distance from the point"
+
+  - id: la-perla
+    kind: rock
+    name: the Pearl
+    modern: Bajo de la Perla (Pearl Rock)
+    lat_deg: 36.0484
+    lon_deg: -5.4325
+    height_m: 0
+    extent_m: 150
+    dries_m: -2.7
+    source: "Tofiño 1787, 'Baxo de la Perla', pp. 10 to 11: S 9° W of Punta Carnero 1 3/4 miles the Perla, with 2 1/2 to 4 brazas over it, rock, and 7 to 10 two ships' lengths off on either side; its marks the peaked rock off Carnero in one with the middle of San Roque, and the east end of Pigeon Island on the second peak from Carnero; Purdy 1826, p. 3: 9 or 10 feet in one spot at low water"
+    says: "The Pearl, a rock with nine or ten feet on its shoalest at low water a mile and three-quarters south of Cape Carnero; keep San Roque open east of the rocks off the cape and you are inside it."
+    fix: "Tofiño's bearing and distance from the point; the head Purdy's 9 feet (2.7 m) at low water, shoaler than Tofiño's 2 1/2 brazas"
+
+  # ---------------------------------------------------------------------------
+  # The Bay of Gibraltar
+  # ---------------------------------------------------------------------------
+
+  - id: getares-bay
+    kind: anchorage
+    name: Getares Bay
+    modern: Ensenada de Getares
+    lat_deg: 36.0950
+    lon_deg: -5.4300
+    height_m: 0
+    depth_fathoms: 14
+    bottom: "fine gravel and sand"
+    source: "Tofiño 1787, 'Ensenada de Getares', p. 12: Punta San García and Carnero form a great bay with depth enough and of good quality, dangerous with winds from NE to SE for the sea that comes in; a quarter of a mile E of Carnero 20 to 30 brazas, fine gravel and sand; Purdy 1826, p. 4: 16 to 27 fathoms, fine gravel and sand"
+    says: "Getares Bay, between San García and Cape Carnero: good ground in twenty brazas, open to the easterly swell."
+    fix: "the bay's middle; the depth JUDGEMENT within Tofiño's 20 to 30 brazas"
+
+  - id: san-garcia-tower
+    kind: tower
+    name: the tower of San García
+    modern: Torre de San García, Algeciras
+    lat_deg: 36.1052
+    lon_deg: -5.4315
+    height_m: 25
+    source: "Tofiño 1787, 'Torre de S. García', p. 12: from the eastern southern part of Punta Carnero to the tower of San García 1 7/10 miles N 6° 47' W, on the middle of a salient front named the Punta de San García, with a fort between; Tofiño 1786, the plan's letter L"
+    says: "The tower of San García on its point, a fort beside it, the north point of Getares Bay."
+    fix: "Tofiño's bearing and distance from Punta Carnero; moved 100 m to the nearest land of the tiles"
+
+  - id: isla-verde
+    kind: island
+    name: the Green Island
+    modern: Isla Verde, Algeciras (within the modern port's works)
+    lat_deg: 36.1236
+    lon_deg: -5.4329
+    height_m: 10
+    source: "Tofiño 1787, 'Isla Verde', p. 13: N 7° 1' W of Punta Carnero 2 1/2 miles the middle of the isle of Algeciras called Verde or de las Palomas, of middling height, fortified, a quarter of a mile N 87° E of the nearest coast; from it to the SSW and NNE chains of rocks that show, so straight they seem moles or walls; Tofiño 1786, the plan's letter N"
+    says: "The Green Island before Algeciras, fortified, with its chains of rock running out like moles."
+    fix: "the middle of the isle on Tofiño's plan of 1786 as the bay's patch georeferences it (Tofiño 1787's bearing and distance from Punta Carnero put it 400 m south-west); the modern port's works stand over it, which the patch takes off"
+
+  - id: algeciras
+    kind: town
+    name: Algeciras
+    modern: Algeciras
+    lat_deg: 36.1310
+    lon_deg: -5.4520
+    height_m: 25
+    source: "Tofiño 1787, 'Muelle de Algeciras', p. 13: N 57° 18' W of the Isla Verde about half a mile the mole of the city of Algeciras, which stretches E along the sea, the Rio de la Miel by its southern houses, entered at high water by the vessels of the country; Purdy 1826, p. 4: agreeably situate on a gentle slope by the sea-side"
+    says: "Algeciras on its gentle slope by the sea, its mole and the little river of La Miel."
+
+  - id: la-galera
+    kind: rock
+    name: the Galera
+    modern: La Galera (under the modern port of Algeciras)
+    lat_deg: 36.1283
+    lon_deg: -5.4403
+    height_m: 0
+    extent_m: 60
+    dries_m: 0.0
+    source: "Tofiño 1787, 'La Galera, baxo', p. 14: half a cable ENE of the mole a rock awash, parted in two, with a reef by its NE side; a quarter of a mile N 5° E of it a little flat with only two brazas"
+    says: "The Galera, a rock awash half a cable from the mole of Algeciras."
+    fix: "the two rocks at the mole's end on Tofiño's plan of 1786, as the bay's patch georeferences it (within the patch's water; the modern port's fill stands there)"
+
+  - id: algeciras-road
+    kind: anchorage
+    name: the road of Algeciras
+    modern: the anchorage between Algeciras and the Palmones
+    lat_deg: 36.1520
+    lon_deg: -5.4250
+    height_m: 0
+    depth_fathoms: 14
+    bottom: "sand and mud"
+    source: "Tofiño 1787, 'Fondeaderos', p. 18: the best and safest anchorage for all weather and every class of vessel is from the middle of the city of Algeciras toward the Rio Palmones and Puente Mayorga, sand in parts and mud in others, up to 25 brazas a long mile from the shore; to be preferred between the Rinconcillo and the Palmones; sound before letting go, for the depth falls off; Purdy 1826, p. 4"
+    says: "The road of Algeciras, the best anchorage of the bay, sand and mud between the town and the river Palmones; sound before you let go, for the ground falls off to great depths."
+    fix: "Tofiño's ground between the Rinconcillo and the Palmones; 15 brazas (25 m) as English fathoms, JUDGEMENT within his 'up to 25'"
+
+  - id: palmones
+    kind: place
+    name: the river Palmones
+    modern: Río Palmones
+    lat_deg: 36.1720
+    lon_deg: -5.4370
+    height_m: 0
+    source: "Tofiño 1787, 'Rio Palmones', p. 14: about 2 1/2 long miles N of the Isla Verde its mouth, its points shoal and the south one running far E at low water; a great river, where the largest vessels of the trade of Algeciras shelter in winter"
+    says: "The mouth of the Palmones, where the trading vessels of Algeciras lie in winter; its points run shoal."
+
+  - id: punta-mala
+    kind: castle
+    name: the castle of Punta Mala
+    modern: Punta Mala, Puente Mayorga
+    lat_deg: 36.1786
+    lon_deg: -5.3880
+    height_m: 15
+    source: "Tofiño 1787, 'Punta Mala', p. 15: of some height, with the castle of its name; N 56° 15' W of the castle of San Felipe 8209 feet of Burgos, the base of the plan; Tofiño 1786, the plan's letter f"
+    says: "Punta Mala with its castle, on the north shore of the bay."
+    fix: "moved 460 m to the nearest land of the tiles"
+
+  - id: punta-mala-reef
+    kind: ledge
+    name: the reef of Punta Mala
+    modern: the rocks off Punta Mala
+    lat_deg: 36.1730
+    lon_deg: -5.3905
+    height_m: 0
+    extent_m: 300
+    source: "Tofiño 1787, 'Arrecife', p. 15: from Punta Mala a reef runs SW about two cables, some stones showing and others hidden, all round the point, so that its neighbourhood is dangerous"
+    says: "The reef of Punta Mala, two cables to the south-west, some heads showing and some hidden."
+
+  - id: fort-san-felipe
+    kind: castle
+    name: the fort of San Felipe
+    modern: the west end of the Spanish lines, La Línea de la Concepción
+    lat_deg: 36.1659
+    lon_deg: -5.3655
+    height_m: 10
+    source: "Tofiño 1787, 'Castillo de San Felipe', p. 16: S 56° 15' E of the castle of Punta Mala, the western end of our line; N 16° W of the watch tower on the height of the Mount of Gibraltar; Tofiño 1786, the plan's letter h; Purdy 1826, p. 4: Fort S. Philip, at the west end of the Spanish lines"
+    says: "Fort San Felipe, the western end of the Spanish lines across the neck of Gibraltar."
+    fix: "Tofiño's base from Punta Mala, 8209 feet of Burgos (2.29 km); moved 340 m to the nearest land of the tiles"
+
+  - id: fort-santa-barbara
+    kind: castle
+    name: the fort of Santa Bárbara
+    modern: the east end of the Spanish lines
+    lat_deg: 36.1620
+    lon_deg: -5.3500
+    height_m: 10
+    source: "Tofiño 1787, 'Castillo de Santa Bárbara', p. 16: the eastern end of our line, its flagstaff and San Felipe's in one N 84° W; Tofiño 1786, the plan's letter y"
+    says: "Fort Santa Bárbara, the eastern end of the Spanish lines, on the Mediterranean shore of the neck."
+
+  - id: san-roque
+    kind: town
+    name: San Roque
+    modern: San Roque
+    lat_deg: 36.2105
+    lon_deg: -5.3845
+    height_m: 110
+    source: "Tofiño 1787, 'Baxo de la Perla', p. 11: San Roque, well known for standing on the top of a little hill with no other town about it to be mistaken for; Purdy 1826, p. 3"
+    says: "San Roque on its hill north of the bay, the mark for clearing the Pearl."
+
+  - id: carbonera
+    kind: hill
+    name: the Sierra Carbonera
+    modern: Sierra Carbonera
+    lat_deg: 36.1880
+    lon_deg: -5.3540
+    height_m: 280
+    source: "Tofiño 1787, p. 21: from the watch tower of the Pedrera the land rises to a high sierra, long and even, called the Carbonera, with a watch tower on its height 3 miles from the north end of the Mount; in thick weather it is taken for the Mount, and the Mount for Apes' Hill, and ships are lost in the Tunara"
+    says: "The Sierra Carbonera, high, long and even, three miles north of the Rock: in thick weather it is taken for the Rock, and ships are lost on the shore of the Tunara."
+
+  - id: gibraltar-rock
+    kind: hill
+    name: the Rock of Gibraltar
+    modern: the Rock of Gibraltar
+    lat_deg: 36.1350
+    lon_deg: -5.3460
+    height_m: 427
+    source: "Tofiño 1787, 'Monte de Gibraltar', p. 16: from the low ground of our line it rises at once to its notable height, its summit uneven with peaks to the south; seen 40 miles in clear weather, seeming an island and higher at its north than its south (p. 20); Purdy 1826, p. 4: 1,400 feet above the level of the sea"
+    says: "The Rock of Gibraltar, fourteen hundred feet, sheer to the east and falling to the town on the west; in clear weather it is seen forty miles off like an island."
+
+  - id: gibraltar
+    kind: town
+    name: Gibraltar
+    modern: Gibraltar
+    lat_deg: 36.1400
+    lon_deg: -5.3530
+    height_m: 20
+    source: "Tofiño 1787, p. 17: the west side of the Mount gives at its foot some level ground on which the town stands along the front of the walls; Purdy 1826, p. 4: about 5,000 inhabitants and the garrison as many more"
+    says: "The town of Gibraltar under the Rock, along the line wall: five thousand souls and as many of the garrison."
+
+  - id: old-mole
+    kind: mark
+    name: the Old Mole
+    modern: the Old Mole (now within the reclaimed waterfront)
+    lat_deg: 36.1445
+    lon_deg: -5.3565
+    height_m: 4
+    source: "Tofiño 1787, 'Muelles de Gibraltar', p. 17: at the northern beginning of the city the Old Mole runs out 1100 feet about NW by W, and 1 1/2 miles farther S the New Mole 700 feet NW; Tofiño 1786, the plan's letter o; Purdy 1826, p. 4"
+    says: "The Old Mole at the north end of the town, a thousand feet into the bay."
+
+  - id: gibraltar-road
+    kind: anchorage
+    name: Gibraltar road
+    modern: the anchorage off the town of Gibraltar
+    lat_deg: 36.1440
+    lon_deg: -5.3640
+    height_m: 0
+    depth_fathoms: 10
+    bottom: "sand"
+    source: "Tofiño 1787, p. 18: from the Puente Mayorga to San Felipe and to the Old Mole the ground is good and more even, and under the cannon of the place is the anchorage of the English, the small vessels within, the great outside; before the space between the moles good anchorage in what water you will at a third of a mile from the wall (p. 19); Purdy 1826, pp. 4 and 9: during war ships generally anchor off the New Mole"
+    says: "Gibraltar road off the Old Mole under the guns of the place, the small vessels inside and the great ones without; good ground, sand."
+    fix: "a third of a mile off the Old Mole; the depth JUDGEMENT (Tofiño's 'the water you will'; his plan's 4 to 17 brazas)"
+
+  - id: new-mole
+    kind: mark
+    name: the New Mole
+    modern: the South Mole's root (the New Mole of the eighteenth century)
+    lat_deg: 36.1230
+    lon_deg: -5.3524
+    height_m: 4
+    source: "Tofiño 1787, 'Muelles de Gibraltar', p. 17: the New Mole 700 feet NW, which with an elbow of the coast forms a shelter for some vessels, of which the ships of war avail themselves in winter in 5 or 6 brazas the outermost; Tofiño 1786, the plan's letter q"
+    says: "The New Mole, under which the King's ships moor in winter in five or six brazas."
+    fix: "moved 340 m to the nearest land of the tiles"
+
+  - id: new-mole-anchorage
+    kind: anchorage
+    name: the anchorage under the New Mole
+    modern: off the South Mole, Gibraltar
+    lat_deg: 36.1264
+    lon_deg: -5.3569
+    height_m: 0
+    depth_fathoms: 5
+    bottom: "sand"
+    source: "Tofiño 1787, p. 17: the ships of war moor under the New Mole in winter in 5 or 6 brazas the outermost; Purdy 1826, p. 9: during war, ships generally anchor off the New Mole"
+    says: "Under the New Mole, where the King's ships moor in winter in five or six brazas."
+    fix: "5 1/2 brazas (9.2 m) as English fathoms; moved 375 m to the tiles' water of that depth under the mole (the modern grid has 38 m where first placed)"
+
+  - id: europa-point
+    kind: headland
+    name: Europa Point
+    modern: Europa Point
+    lat_deg: 36.1109
+    lon_deg: -5.3450
+    height_m: 30
+    source: "Tofiño 1787, p. 17: the Mount descends to the south in two flats, the end of the lower named Punta de Europa, the northern eastern point of the Strait, in latitude 36° 6′ 30″; p. 19: pass it at a reasonable distance, for the Mount shelters from the E and throws back the W, and the currents are very strong with eddies near it"
+    says: "Europa Point, the south end of the Rock, falling in two flats: pass it at a reasonable distance, for the currents run strong with eddies about it."
+    fix: "moved 140 m to the nearest land of the tiles"
+
+  - id: europa-light
+    kind: light
+    name: the light of Europa Point
+    modern: Europa Point Lighthouse
+    lat_deg: 36.1109
+    lon_deg: -5.3451
+    height_m: 49
+    lit: {from: 1841, until: null, range_nm: 16, character: "a fixed light (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Europa Point Lighthouse' (en, read 2026-10-10): the first stone laid on 26 April 1838 and the light inaugurated on 1 August 1841; before it sailors had the lamp of the shrine of Our Lady of Europe, whose shrine ceased to be used in 1704 (the encyclopaedia's 'Shrine of Our Lady of Europe'; the lamp's end JUDGEMENT); not lit in 1805"
+    says: "The light of Europa Point, which was not yet built in 1805."
+    fix: "moved 80 m to the nearest land of the tiles"
+
+  - id: devils-tower
+    kind: tower
+    name: the Devil's Tower
+    modern: the Devil's Tower (its site by Devil's Tower Road)
+    lat_deg: 36.1500
+    lon_deg: -5.3445
+    height_m: 15
+    source: "Tofiño 1786, the plan's letter p, 'Torre del Diablo'; Purdy 1826, p. 9: having run up the bay so far as to open the Devil's Tower, which stands at the NE end of Gibraltar, steer for it and anchor in what depth you prefer"
+    says: "The Devil's Tower at the north-east foot of the Rock; open it from the bay and steer for it to anchor."
+
+  - id: back-of-the-rock
+    kind: anchorage
+    name: the anchorage at the back of the Rock
+    modern: off Catalan Bay, the east side of Gibraltar
+    lat_deg: 36.1310
+    lon_deg: -5.3339
+    height_m: 0
+    depth_fathoms: 20
+    bottom: "sand"
+    source: "Purdy 1826, p. 9: should you be carried by the current behind, or to the eastward of, the Rock, good anchorage may be found in 20 fathoms, with Europa and Cabrita Points in one and the Devil's Tower just open; gradual soundings to the Rock, shoaling to 4 fathoms; Tofiño 1786, the plan's soundings of 3 to 10 brazas close under its east side"
+    says: "At the back of the Rock, if the current carry you past Europa, good anchorage in twenty fathoms with Europa and Cabrita Points in one."
+    fix: "Purdy's marks, JUDGEMENT to a cable; the bottom JUDGEMENT; moved 220 m to water holding half the pilot's depth"
+
+  # ---------------------------------------------------------------------------
+  # The African shore, Cape Spartel to Ceuta and Tetuan
+  # ---------------------------------------------------------------------------
+
+  - id: cape-spartel
+    kind: headland
+    name: Cape Spartel
+    modern: Cap Spartel
+    lat_deg: 35.7894
+    lon_deg: -5.9216
+    height_m: 300
+    source: "Tofiño 1787, 'Cabo Espartel', p. 22: the western southern point of the Strait, in latitude 35° 48′ 40″, S 11° 49′ E of the tower of Cape Trafalgar; of more than middling height, its summit seen close from the west hummocked and its high land like a galley's awning; clean, with some stones close in that may be approached at will; Purdy 1826, p. 5: so high as to be seen at 14 or 15 leagues in clear weather; the encyclopaedia's 'Cape Spartel' (en, read 2026-10-10)"
+    says: "Cape Spartel, the north-west point of Barbary, high, its top like a galley's awning; seen fourteen or fifteen leagues off in clear weather, and clean to the shore."
+    fix: "moved 80 m to the nearest land of the tiles"
+
+  - id: spartel-light
+    kind: light
+    name: the light of Cape Spartel
+    modern: Phare du Cap Spartel
+    lat_deg: 35.7893
+    lon_deg: -5.9231
+    height_m: 95
+    lit: {from: 1864, until: null, range_nm: 22, character: "a light on the cape (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Faro del Cabo Espartel' (es, read 2026-10-10): built in 1861 and put in service in 1864 by the Sultan Mohammed IV; not lit in 1805"
+    says: "The light of Cape Spartel, which was not yet built in 1805."
+    fix: "moved 160 m to the nearest land of the tiles"
+
+  - id: fraylecillo
+    kind: island
+    name: the Fraylecillo
+    modern: the islet east of Cap Spartel
+    lat_deg: 35.7900
+    lon_deg: -5.8950
+    height_m: 8
+    source: "Tofiño 1787, 'Punta de Tánger', p. 22: a mile and a half E of the cape a small islet close to the land, called the Fraylecillo"
+    says: "The Fraylecillo, a little islet close to the shore a mile and a half east of Cape Spartel."
+    fix: "Tofiño's distance from the cape"
+
+  - id: tangier-point
+    kind: headland
+    name: Tangier Point
+    modern: the point of the kasbah of Tangier
+    lat_deg: 35.7890
+    lon_deg: -5.8130
+    height_m: 50
+    source: "Tofiño 1787, 'Punta de Tánger', p. 22: from the cape to the Punta de Tánger, 4 1/2 miles E, the coast high, clean and a little salient, without beach till the cove and river of the Jews a mile W of the point; Purdy 1826, p. 5"
+    says: "Tangier Point under the kasbah, high, with its reef two cables out."
+
+  - id: tangier-point-reef
+    kind: ledge
+    name: the reef of Tangier Point
+    modern: the rocks off the kasbah of Tangier
+    lat_deg: 35.7915
+    lon_deg: -5.8093
+    height_m: 0
+    extent_m: 370
+    source: "Tofiño 1787, 'Arrecifes', p. 23: both the Punta de Tánger and Malabata have reefs, the first running out two cables, the ground about it gravel and small stones; Purdy 1826, p. 5"
+    says: "A reef runs two cables round Tangier Point; the ground about it is gravel and small stones."
+    fix: "moved 240 m to the shoalest head of EMODnet's grid within 400 m (-3.5 m)"
+
+  - id: tangier
+    kind: town
+    name: Tangier
+    modern: Tanger (the medina)
+    lat_deg: 35.7860
+    lon_deg: -5.8100
+    height_m: 40
+    source: "Purdy 1826, 'Tangier Bay', p. 5: the antient Tingis, now a place of little consideration, about 6,000 inhabitants; the chief exports cattle and vegetables taken to Gibraltar for the garrison, a grant of the Emperor's great-grandfather Muley Ismael (Jackson's words)"
+    says: "Tangier, the Moorish town on the west side of its bay, whence the garrison of Gibraltar has its cattle."
+
+  - id: tangier-road
+    kind: anchorage
+    name: Tangier road
+    modern: the bay of Tangier
+    lat_deg: 35.7879
+    lon_deg: -5.7941
+    height_m: 0
+    depth_fathoms: 9
+    bottom: "sand, with the hard roots of great weeds and broken coral"
+    source: "Tofiño 1787, 'Punta de Malabata', pp. 22 to 23: the bay of Tangier with commodious anchorage for any vessel in 10 to 13 brazas, sand, before the city, keeping Malabata on Europa Point to clear the shoal in its bottom; moor NW and SE with the longest cable NW, and buoy the cables, for the hard roots of great weeds in the ground; Purdy 1826, p. 5: 9 to 12 fathoms, broken coral all over the bay, the best spot 9 1/2 fathoms; easterly winds send a heavy swell in"
+    says: "Tangier road before the town in nine or ten fathoms, sand: buoy your cables, for the bottom's weed-roots and coral chafe them, and the Levanter sends a heavy swell in."
+    fix: "Tofiño's 10 to 13 brazas; 9 1/2 fathoms Purdy's best spot; moved 80 m to water holding half the pilot's depth"
+
+  - id: tangier-shoal
+    kind: rock
+    name: the shoal in Tangier Bay
+    modern: the rocky ledge in the bottom of Tangier Bay
+    lat_deg: 35.7806
+    lon_deg: -5.7915
+    height_m: 0
+    extent_m: 60
+    dries_m: -3.7
+    source: "Tofiño 1787, p. 22: a shoal in the bottom of the bay S 70° E of the Punta de Tánger and S 36 1/2° W of Malabata; Purdy 1826, p. 5: on its shoalest part only 12 feet, five fathoms on rocky bottom close to it, about three quarters of a mile off the shore and not more than 3 or 4 fathoms long; Cape Malabat in a line with Europa Point leads clear of it"
+    says: "A rocky ledge in the bottom of Tangier Bay with twelve feet on its shoalest: keep Malabata on with Europa Point and you clear it."
+    fix: "the meeting of Tofiño's two bearings, JUDGEMENT to a cable; the head Purdy's 12 feet (3.7 m); moved 400 m to the shoalest head of EMODnet's grid within 400 m (-7.9 m)"
+
+  - id: cape-malabata
+    kind: headland
+    name: Cape Malabata
+    modern: Cap Malabata
+    lat_deg: 35.8166
+    lon_deg: -5.7478
+    height_m: 80
+    source: "Tofiño 1787, 'Punta de Malabata', p. 22: 3 miles from the Punta de Tánger, salient and thick; its reef not so far out as Tangier's and running N (p. 23); Purdy 1826, p. 5: the eastern point of Tangier Bay"
+    says: "Cape Malabata, the eastern point of Tangier Bay, salient and thick, with a reef running north from it."
+    fix: "moved 20 m to the nearest land of the tiles"
+
+  - id: alcazar-point
+    kind: headland
+    name: the Punta del Alcázar
+    modern: Ksar es-Seghir point
+    lat_deg: 35.8454
+    lon_deg: -5.5590
+    height_m: 60
+    source: "Tofiño 1787, 'Punta del Alcázar', p. 23: 9 1/2 miles N 74° E of Malabata, high and steep with a reef; between, the coves Cala de Bacas and Cala Grande with anchorage for a calm in 10 to 20 brazas close to the land; Purdy 1826, p. 6"
+    says: "The Punta del Alcázar, high and steep with its reef; the coves west of it give anchorage for a calm close to the land."
+    fix: "moved 520 m to the nearest land of the tiles"
+
+  - id: cires-point
+    kind: headland
+    name: the Punta de Cires
+    modern: Punta Cires
+    lat_deg: 35.9068
+    lon_deg: -5.4775
+    height_m: 30
+    source: "Tofiño 1787, 'Punta de Ciris', p. 23: low, rising evenly to a well-marked cornered mountain called the Cuchillo de Ciris; its islet runs two cables N, S 48° 18' E of the tower of the Isle of Tarifa; Purdy 1826, p. 6: the Gap of Ciris"
+    says: "The Punta de Cires, low, with an islet two cables off it, rising to the sharp-cornered mountain the Spaniards call the Knife of Cires."
+    fix: "moved 520 m to the nearest land of the tiles"
+
+  - id: perejil
+    kind: island
+    name: Parsley Island
+    modern: Isla de Perejil (Leila)
+    lat_deg: 35.9105
+    lon_deg: -5.4182
+    height_m: 70
+    source: "Tofiño 1787, 'Isla del Peregíl', p. 24: high, all of rock, lying along the coast less than a cable from it, the channel 8 palms deep for small craft only; 20 brazas close along its outside; hard to tell from the foot of Sierra Bullones for its colour; Purdy 1826, p. 6: 18 fathoms close to the outside; the encyclopaedia's 'Perejil Island' (en, read 2026-10-10) for the position"
+    says: "Parsley Island, high and all of rock, close along the shore under Apes' Hill and of its colour, so that it is hard to make out; eighteen fathoms close to its outside."
+    fix: "moved 380 m to the nearest land of the tiles"
+
+  - id: punta-leona
+    kind: headland
+    name: Point Leona
+    modern: Punta Leona (Ras Leona)
+    lat_deg: 35.9137
+    lon_deg: -5.4018
+    height_m: 60
+    source: "Tofiño 1787, 'Punta Leona', p. 24: salient, of regular height and steep, with a ruined tower, the northernmost of the coast of Africa; between it and Peregil in case of need 8 brazas; Purdy 1826, p. 6"
+    says: "Point Leona, steep, with a ruined tower: the northernmost land of Africa."
+    fix: "moved 660 m to the nearest land of the tiles"
+
+  - id: apes-hill
+    kind: hill
+    name: Apes' Hill
+    modern: Jebel Musa (the Sierra Bullones of the Spaniards)
+    lat_deg: 35.8978
+    lon_deg: -5.4128
+    height_m: 839
+    source: "Tofiño 1787, p. 20: seen with the Mount, isolated, from 40 miles in clear weather, and taken for it in thick weather; Purdy 1826, p. 6: directly south, true, from the bay of Gibraltar the Jibbel D'Zatute, or Apes' Hill, the Sierra Bullones of the Spaniards and the Abyla of the antients; p. 8n: when it and the top of Gibraltar are capped with cloud the Levanter will last; the height the modern chart's"
+    says: "Apes' Hill, the African pillar, seen like an island forty miles off: when it and the Rock are capped with cloud the Levanter will blow some time."
+
+  - id: benzu-cove
+    kind: anchorage
+    name: Benzú Cove
+    modern: Ensenada de Benzú
+    lat_deg: 35.9170
+    lon_deg: -5.3850
+    height_m: 0
+    depth_fathoms: 18
+    bottom: "sand"
+    source: "Tofiño 1787, 'Ensenada de Benzús', p. 25: between Point Leona and the Torre Blanca, anchorage in 20 brazas sand two cables from the land for every kind of vessel, sheltered from W by S to E; open only from NW to NE; Point Leona in one with Tarifa N 62° W; Purdy 1826, p. 7: 18 fathoms, sand"
+    says: "Benzú Cove under Point Leona, eighteen fathoms of sand two cables off, sheltered from the west round by the south to the east."
+
+  - id: torre-blanca
+    kind: headland
+    name: White-tower Point
+    modern: Punta Blanca (Benzú)
+    lat_deg: 35.9144
+    lon_deg: -5.3716
+    height_m: 50
+    source: "Tofiño 1787, 'Torre Blanca', pp. 24 to 25: 1 3/4 miles S 83° E of Point Leona, high, sheer, dark tending to red, with the ruins of a tower and islets at its foot; Purdy 1826, p. 6"
+    says: "White-tower Point, high and dark red, the ruin of a tower on it and islets at its foot."
+    fix: "moved 80 m to the nearest land of the tiles"
+
+  - id: torre-blanca-laja
+    kind: rock
+    name: the rock off White-tower Point
+    modern: the rock east of Punta Blanca
+    lat_deg: 35.9177
+    lon_deg: -5.3685
+    height_m: 0
+    extent_m: 60
+    dries_m: -1.7
+    source: "Tofiño 1787, p. 25: a musket shot S 83° E of the outermost islet of the Punta de Torre Blanca a flat the size of a ship's hull, all rock, 3 to 4 brazas, but only a braza where it rises highest over a boat's length; 9 to 10 brazas, rock, between it and the coast; Purdy 1826, p. 6n"
+    says: "A rock the size of a ship's hull a musket-shot east of White-tower Point, a braza on its shoalest: open the walls of old Ceuta by Red Point before you bring the tower on Apes' Hill."
+    fix: "a musket shot (about 200 m) from the point's outer islet; 1 braza (1.7 m); moved 360 m to the shoalest head of EMODnet's grid within 400 m (-7.3 m)"
+
+  - id: ceuta
+    kind: town
+    name: Ceuta
+    modern: Ceuta
+    lat_deg: 35.8890
+    lon_deg: -5.3190
+    height_m: 25
+    source: "Tofiño 1787, 'Almina de Ceuta', pp. 26 to 27: the city, parted from the Almina, fortified between it and the main land; the suburb at the western foot of the Almina's six lesser hills; Purdy 1826, p. 7: taken from the Moors by John of Portugal early in the fifteenth century, ceded to Spain in 1688; on the land side, like Gibraltar, impregnable"
+    says: "Ceuta, the Spanish fortress on its neck of land below the Acho, as impregnable to the land as Gibraltar."
+
+  - id: the-acho
+    kind: castle
+    name: the Acho of Ceuta
+    modern: the fortress of Monte Hacho
+    lat_deg: 35.8984
+    lon_deg: -5.2946
+    height_m: 200
+    source: "Tofiño 1787, 'Almina de Ceuta', p. 26: the eastern southern point of the Strait; its Acho a modern castle on the highest of the Almina's hills, in latitude 35° 54′ 4″; Purdy 1826, p. 7; the encyclopaedia's 'Monte Hacho' (en, read 2026-10-10)"
+    says: "The Acho, the castle on the highest hill of the Almina, the south-east point of the Strait."
+    fix: "moved 80 m to the nearest land of the tiles"
+
+  - id: almina-light
+    kind: light
+    name: the light of the Almina
+    modern: Faro de Punta Almina
+    lat_deg: 35.8979
+    lon_deg: -5.2823
+    height_m: 145
+    lit: {from: 1855, until: null, range_nm: 22, character: "a light on the Almina (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Faro de Punta Almina' (es, read 2026-10-10): projected by Juan Martínez de la Villa in 1851 and inaugurated on 1 December 1855; not lit in 1805"
+    says: "The light of the Almina of Ceuta, which was not yet built in 1805."
+    fix: "moved 140 m to the nearest land of the tiles"
+
+  - id: ceuta-road
+    kind: anchorage
+    name: Ceuta road
+    modern: the north bay of Ceuta
+    lat_deg: 35.8953
+    lon_deg: -5.3145
+    height_m: 0
+    depth_fathoms: 10
+    bottom: "sand with a few loose stones"
+    source: "Tofiño 1787, 'Punta de Santa Catalina', p. 26: between the islets of El Campo and those of Santa Catalina the anchorage of Ceuta in 8 to 14 brazas, sand with some loose stones, with the Calle del Obispo open; elsewhere gravel; moor NE and SW with the longest cable NE; Purdy 1826, p. 7: 13 to 8 fathoms; p. 8: Captain Knight's survey of 1799, spots of foul ground in 10 to 17 fathoms"
+    says: "Ceuta road in the lesser bay, eight to fourteen brazas of sand with a few loose stones, the Bishop's Street open: moor north-east and south-west."
+    fix: "Tofiño's ground between El Campo and Santa Catalina; 11 brazas (18 m) as English fathoms; moved 60 m to water holding half the pilot's depth"
+
+  - id: santa-catalina-ceuta
+    kind: headland
+    name: the Punta de Santa Catalina
+    modern: Punta de Santa Catalina, Ceuta
+    lat_deg: 35.9008
+    lon_deg: -5.2928
+    height_m: 15
+    source: "Tofiño 1787, 'Punta de Santa Catalina', p. 26: E by S 3 1/4 miles of the Torre Blanca, the northernmost of the Almina, low with islets; all the Almina girt with stones that barely show, the farthest half a cable off"
+    says: "The Punta de Santa Catalina, the low north point of the Almina, with islets and stones half a cable off."
+    fix: "moved 380 m to the nearest land of the tiles"
+
+  - id: cape-negro
+    kind: headland
+    name: Cape Negro
+    modern: Cabo Negro (Ras Tarf)
+    lat_deg: 35.6805
+    lon_deg: -5.2738
+    height_m: 100
+    source: "Purdy 1826, 'Ceuta and Tetuan', p. 7: the Great Bay of Ceuta formed by the Almina in the north and Cape Negro in the south, 11 miles long and three deep, with anchorage near the shore in any depth through almost its whole extent; Cape Negro of moderate height, uneven, with a round tower and girt with islets"
+    says: "Cape Negro, of moderate height with a round tower, the south point of the great bay of Ceuta."
+    fix: "moved 120 m to the nearest land of the tiles"
+
+  - id: tetuan-road
+    kind: anchorage
+    name: Tetuan road
+    modern: the watering place south of Cabo Negro (Martil)
+    lat_deg: 35.6200
+    lon_deg: -5.2350
+    height_m: 0
+    depth_fathoms: 20
+    bottom: "sand"
+    source: "Purdy 1826, 'Ceuta and Tetuan', pp. 7 to 8: the river of Tetuan a league and a half S of Cape Negro, the city more than a league up the country; during the late war our fleets often watered and victualled here; Captain Knight's survey of 1799: at the watering place in the south part of the bay ships ride in perfect safety on a sandy bottom in 18 to 22 fathoms at two miles from the shore; the casks rolled over the beach into the river; the native Moors civil"
+    says: "Tetuan road, where the fleets water: a sandy bottom in eighteen to twenty-two fathoms two miles off, the casks rolled over the beach into the river; the Moors are civil."
+    fix: "two miles off the river's mouth, Knight's 1799 marks to a mile"
