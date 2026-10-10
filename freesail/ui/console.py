@@ -550,7 +550,7 @@ class Console:
         self._print(f"Replaying {path} to tick {data['end_tick']}...")
         from freesail.api.session import ship_factory
 
-        self.world = replay_mod.replay(data, ship_factory)
+        self.world = replay_mod.replay(data, ship_factory, road=report.road)
         self._attach()
         self.pace = Pace(self.world, self.pace.rule)
         restore_python_rules(self.world, data)  # attached, so its lines are printed

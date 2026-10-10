@@ -288,6 +288,8 @@ def test_the_tools_are_the_nine_of_the_spec_and_shelve_with_a_description_each()
         "opt_out",
         "answer",
         "shelve",
+        "chart",  # the pictures (package 42), offered at the doors that carry one
+        "ship_view",
     )
     for t in TOOLS.values():
         assert t.description.endswith(".") and len(t.description) > 40

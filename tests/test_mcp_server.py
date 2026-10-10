@@ -1161,3 +1161,71 @@ def test_a_call_whose_key_is_refused_stops_the_bridge_and_it_does_not_take_the_s
     assert first.phase == M.STOPPED
     assert first.call("readings", {}).startswith("No station is offered in this session: ")
     assert isinstance(second.call("readings", {}), str) and second.phase == M.STATION
+
+
+# ---------------------------------------------------------------------------
+# Package 42, item 4: the chart and the ship's view as pictures through the bridge
+# ---------------------------------------------------------------------------
+
+
+def test_the_chart_and_the_ships_view_come_as_images_drawn_by_the_open_page(tmp_path):
+    """A tool's result may hold an image, and Claude Desktop and Claude Code read it: the
+    chart and the ship's view are drawn by the game's open page on the tool's request and
+    come back as an image after their words; the transcript keeps a note that each was
+    shown, with its size and the angle asked, and never the picture. With no page open the
+    tool says so and gives the readings the picture would have shown."""
+    import base64
+
+    from messages_api import png
+
+    g = Game(tmp_path)
+    yes_on_record(tmp_path / "consent")
+    asked: list[dict[str, Any]] = []
+
+    def page(message: dict[str, Any]) -> None:
+        if message.get("type") != "picture":
+            return
+        asked.append(dict(message))
+        pid = message["id"]
+
+        def post() -> None:
+            g.http.post(
+                f"/api/picture/{pid}?width=6&height=5",
+                content=png(6, 5),
+                headers={"content-type": "image/png"},
+            )
+
+        threading.Thread(target=post, daemon=True).start()
+
+    b = g.bridge()
+
+    async def script(c):
+        names = [t.name for t in (await c.list_tools()).tools]
+        await c.call_tool("readings", {})  # the brief comes first
+        none = await c.call_tool("chart", {})
+        g.driver.add_listener(page)
+        chart = await c.call_tool("chart", {})
+        ship = await c.call_tool("ship_view", {"facing": "90"})
+        wrong = await c.call_tool("ship_view", {"facing": "the moon"})
+        return names, none, chart, ship, wrong
+
+    names, none, chart, ship, wrong = session(b, script)
+    assert {"chart", "ship_view"} <= set(names)
+    assert "No browser page is open on this game" in text(none)
+    assert '"reckoning"' in text(none) and not [c for c in none.content if c.type == "image"]
+    for result in (chart, ship):
+        images = [c for c in result.content if c.type == "image"]
+        assert len(images) == 1 and images[0].mime_type == "image/png"
+        assert base64.standard_b64decode(images[0].data) == png(6, 5)
+    assert "The chart as the player sees it" in text(chart) and "6 by 5 pixels" in text(chart)
+    assert "seen from the starboard beam" in text(ship)
+    assert [a["view"] for a in asked] == ["chart", "ship"] and asked[1]["facing"] == 90.0
+    assert "not a place to stand" in text(wrong)
+    notes = [n for e in g.harness.transcript for n in e.get("shown", [])]
+    notes += [e for e in g.harness.transcript if e.get("door") == "read"]
+    assert notes, g.harness.transcript
+    assert "iVBOR" not in json.dumps(g.harness.transcript)  # no picture in the record
+    # the picture is held for the doors that fetch it, and asked for with the seating's key
+    pid = [c for c in chart.content if c.type == "image"] and asked[0]["id"]
+    got = g.http.get(f"/api/agents/watcher/picture/{pid}")
+    assert got.status_code == 409  # no key: refused in words

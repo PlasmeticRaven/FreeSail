@@ -26,8 +26,12 @@ kind (a second passenger as `supercargo`), so that the set is the ship's own.
 
 Nothing here makes a person from words or gives the story's reasons: those are the
 director's (M7b). The save carries the bindings made (`to_dict`, `load`), and a
-checkpoint carries the object; a replay re-makes a binding only from the world order
-that made it, so a binding made by hand in a test is the test's own.
+checkpoint carries the object. **Each bind and unbind is an input** (package 42): kept in
+`World.inputs` at its tick (`{"binding": {"op", "name", "person", "kind", "why"}}`) and
+made again there by a replay (`core.replay._give`, with `quiet`), by either of its roads,
+so that a binding made by hand, or by the world order to come, replays with the game; a
+station a binding stands down journals its acts inside it, which a replay by the acts
+gives in their place.
 """
 
 from __future__ import annotations
@@ -161,7 +165,22 @@ class Stations:
 
     # -- the two operations -----------------------------------------------------------
 
-    def bind(self, name: str, person: Person | str | None, kind: str | None = None) -> str:
+    def _input(self, op: str, name: str, **rest: Any) -> None:
+        """The binding's change kept as an input (package 42), before it is made, so that
+        what it makes (a station stood down) is journaled after it."""
+        world = self.world
+        inputs = getattr(world, "inputs", None)
+        if inputs is not None:
+            entry = {"op": op, "name": name, **{k: v for k, v in rest.items() if v}}
+            inputs.append({"tick": world.clock.tick, "binding": entry})
+
+    def bind(
+        self,
+        name: str,
+        person: Person | str | None,
+        kind: str | None = None,
+        quiet: bool = False,
+    ) -> str:
         """Bind a station to a person (one of the ship's company, by his `Person` or his
         name; None or "" for nobody named). `kind` names the station's kind for a new
         name (a station named as its kind needs none); a kind that is none is refused in
@@ -182,13 +201,15 @@ class Stations:
             people = getattr(self.world, "people", None)
             if people is not None and people.find(who) is None:
                 raise ValueError(f"{who} is not one of the ship's company; nobody by that name.")
+        if not quiet:
+            self._input("bind", key, person=who, kind=kind)
         self._unbound.discard(key)
         self._bound[key] = Binding(key, kind, who)
         held = (f" ({who})" if who else " (nobody named)") + (
             f", a {kind}'s station" if kind != key else ""
         )
         text = f"The {key}'s station is bound{held}."
-        self.world.record(
+        self._record(
             Severity.ROUTINE,
             BOUND_KIND,
             text,
@@ -196,7 +217,7 @@ class Stations:
         )
         return text
 
-    def unbind(self, name: str, why: str = "") -> str:
+    def unbind(self, name: str, why: str = "", quiet: bool = False) -> str:
         """The station is no longer aboard: a model holding it is released with a line
         saying why, as `stand down` does (the game saved, the station's journal kept),
         the player's seat at it stood down, and a door asking for it afterwards refused
@@ -206,6 +227,8 @@ class Stations:
             raise ValueError(f"There is no {key}'s station aboard to unbind.")
         world = self.world
         why = " ".join(str(why or "").split()) or "the station is no longer aboard"
+        if not quiet:
+            self._input("unbind", key, why=why)
         reason = f"the {key}'s station is unbound: {why}"
         held = (getattr(world, "agents", None) or {}).get(key)
         if held is not None and not held.agent.released:
@@ -216,8 +239,16 @@ class Stations:
         self._bound.pop(key, None)
         self._unbound.add(key)
         text = f"The {key}'s station is unbound: {why}."
-        world.record(Severity.ROUTINE, UNBOUND_KIND, text, data={"station": key, "why": why})
+        self._record(Severity.ROUTINE, UNBOUND_KIND, text, data={"station": key, "why": why})
         return text
+
+    def _record(self, *args: Any, **kw: Any) -> Any:
+        """The binding's own line: the input's, never a station's act, even when a
+        station's act made the change (package 42)."""
+        from freesail.core import acts
+
+        with acts.aside(self.world):
+            return self.world.record(*args, **kw)
 
     # -- the save -----------------------------------------------------------------------
 

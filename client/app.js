@@ -18,6 +18,13 @@
  * marks, by the map's buttons or by a key while the focus is off the order line (a click
  * on the chart gives it the focus): r the rose, l a line, o a ring, n a note, m the list,
  * Escape puts a tool down. The marks are sent to /api/marks and come back on the socket.
+ *
+ * Package 42, the pictures: a model's `chart` or `ship_view` tool asks the open page, on
+ * the socket ({type: "picture", id, view, facing, max_px}), for the chart as the player
+ * sees it or the ship from the facing asked; the page draws it with its own drawing (the
+ * chart's canvas as it stands; the ship's view drawn again in an offscreen SVG at that
+ * facing, its styles written into it, onto a canvas), scales it to max_px on its longer
+ * side and posts it as a PNG to /api/picture/{id}, or says why it could not.
  */
 (function (root) {
   "use strict";
@@ -124,8 +131,105 @@
         onSnapshot(data.snapshot);
       } else if (data.type === "marks") {
         seaMap.setMarks(data.marks);
+      } else if (data.type === "picture") {
+        paintFor(data);
       }
     };
+  }
+
+  // -- the pictures (package 42) -----------------------------------------------------
+
+  /** A canvas no larger than `maxPx` on its longer side, drawn from `source`. */
+  function fitted(source, maxPx) {
+    var w = source.width, h = source.height;
+    var k = Math.min(1, (maxPx || 1568) / Math.max(w, h, 1));
+    if (k >= 1) return source;
+    var c = document.createElement("canvas");
+    c.width = Math.max(1, Math.round(w * k));
+    c.height = Math.max(1, Math.round(h * k));
+    c.getContext("2d").drawImage(source, 0, 0, c.width, c.height);
+    return c;
+  }
+
+  function chartPicture() {
+    if (state.snapshot) seaMap.draw(state.snapshot);
+    return Promise.resolve(seaMap.canvas);
+  }
+
+  var STYLED = ["fill", "fill-opacity", "stroke", "stroke-width", "stroke-opacity", "stroke-dasharray", "opacity", "font-size", "font-family", "display", "visibility"];
+
+  function shipPicture(req) {
+    if (!state.ship || !state.snapshot) return Promise.reject(new Error("the viewer has no ship drawn yet"));
+    var snap = state.snapshot;
+    var facing = req.facing === null || req.facing === undefined ? P.leewardFacing(snap.ship.tack) : U.rad(req.facing);
+    var w = Math.max(svg.clientWidth || 0, 640), h = Math.max(svg.clientHeight || 0, 480);
+    var off = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    off.setAttribute("class", svg.getAttribute("class") || "");
+    off.setAttribute("width", w);
+    off.setAttribute("height", h);
+    off.style.position = "absolute";
+    off.style.left = "-10000px";
+    document.body.appendChild(off);
+    try {
+      var scene = P.project(P.buildSkeleton(state.ship, snap), facing, snap.ship.heel);
+      root.ShipView.render(off, scene, {
+        name: state.ship.name,
+        facingWords: req.facing_words || facingWords(facing),
+        heelWords: U.formatSigned(snap.ship.heel, "to starboard", "to larboard"),
+      });
+      // the page's styles written into the picture, which an image does not read
+      Array.prototype.forEach.call(off.querySelectorAll("*"), function (node) {
+        var cs = getComputedStyle(node);
+        var said = STYLED.map(function (k) { return k + ":" + cs.getPropertyValue(k); }).join(";");
+        node.setAttribute("style", said);
+      });
+      var text = new XMLSerializer().serializeToString(off);
+    } finally {
+      document.body.removeChild(off);
+    }
+    return new Promise(function (ok, no) {
+      var img = new Image();
+      img.onload = function () {
+        var c = document.createElement("canvas");
+        c.width = w;
+        c.height = h;
+        c.getContext("2d").drawImage(img, 0, 0, w, h);
+        ok(c);
+      };
+      img.onerror = function () { no(new Error("the ship's view did not draw")); };
+      img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(text);
+    });
+  }
+
+  function paintFor(req) {
+    var made;
+    try {
+      made = req.view === "chart" ? chartPicture() : shipPicture(req);
+    } catch (e) {
+      made = Promise.reject(e);
+    }
+    made
+      .then(function (canvas) {
+        var c = fitted(canvas, req.max_px);
+        return new Promise(function (ok, no) {
+          c.toBlob(function (blob) {
+            if (blob) ok({ blob: blob, w: c.width, h: c.height });
+            else no(new Error("the canvas gave no picture"));
+          }, "image/png");
+        });
+      })
+      .then(function (p) {
+        if (req.max_bytes && p.blob.size > req.max_bytes) throw new Error("the picture is larger than the bound");
+        return fetch("/api/picture/" + req.id + "?width=" + p.w + "&height=" + p.h, {
+          method: "POST",
+          headers: { "Content-Type": "image/png" },
+          body: p.blob,
+        });
+      })
+      .catch(function (e) {
+        var why = encodeURIComponent(String((e && e.message) || e));
+        fetch("/api/picture/" + req.id + "?failed=" + why, { method: "POST" });
+      });
   }
 
   function post(path, body) {

@@ -88,6 +88,9 @@ class Journal:
             by=by,
         )
         self.entries.append(entry)
+        from freesail.core import acts
+
+        acts.note(world, self.station, entry)  # a station's own entry, as its act (42)
         return entry
 
     def last_note(self) -> JournalEntry | None:

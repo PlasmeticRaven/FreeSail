@@ -91,7 +91,11 @@ __all__ = [
     "library",
     "log_line",
     "opt_out",
+    "PICTURE_DOORS",
+    "PICTURE_TOOLS",
+    "chart",
     "parameters_schema",
+    "ship_view",
     "read_journal",
     "read_log",
     "readings",
@@ -137,7 +141,13 @@ FIND_LIMIT = 8
 
 # The tools whose results may be books (the harness gives each a handle): every library
 # read, and a read_log longer than `agent.BOOK_SIZE_TOKENS`.
-BOOK_TOOLS: tuple[str, ...] = ("library", "read_log", "read_journal")
+BOOK_TOOLS: tuple[str, ...] = ("library", "read_log", "read_journal", "chart", "ship_view")
+
+# The tools that make a picture (package 42, item 4; `agents.pictures`), and the doors
+# that carry one (an MCP client reads an image in a tool's result; the API door sends it
+# as an image block): offered only there.
+PICTURE_TOOLS: tuple[str, ...] = ("chart", "ship_view")
+PICTURE_DOORS: tuple[str, ...] = ("mcp", "api")
 
 
 def tokens(text: str) -> int:
@@ -944,6 +954,41 @@ def shelve(world: World, station: str, book: str = "") -> str:
     return _harness(world, station).shelve(str(book or ""))
 
 
+def _picture(world: World, view: str, facing: str = "") -> Any:
+    """A picture of a view (package 42, item 4): `{"picture": its note, "words": ...}`, which
+    a door that carries images shows by the picture's id; where none can be had, the words
+    why and the readings the picture would have shown."""
+    from freesail.agents import pictures as P
+
+    _, said = P.facing_of(facing) if view == P.SHIP else (None, "")
+    made = P.paint(world, view, facing if view == P.SHIP else "")
+    if isinstance(made, P.Picture):
+        return {"picture": made.note(), "words": made.words()}
+    keys = P.CHART_WORDS if view == P.CHART else P.SHIP_WORDS
+    every = readings_words(world)
+    shown = {k: every[k] for k in keys if k in every}
+    what = "the chart" if view == P.CHART else f"the ship seen from {said}"
+    return {
+        "words": f"{made}, so there is no picture of {what}; the readings it would have "
+        "shown, in words, instead.",
+        "readings": shown,
+    }
+
+
+def chart(world: World, station: str) -> Any:
+    return _picture(world, "chart")
+
+
+def ship_view(world: World, station: str, facing: str = "") -> Any:
+    from freesail.agents import pictures as P
+
+    try:
+        P.facing_of(facing)
+    except ValueError as e:
+        return str(e)
+    return _picture(world, P.SHIP, facing)
+
+
 def own_reckoning_order(world: World, text: str) -> bool:
     """Whether the words are one of a station's own reckoning's orders, `work my
     reckoning` or `my reckoning is <position>` (package 40b; spec M6 §5): the station
@@ -1208,12 +1253,37 @@ TOOLS: dict[str, Tool] = {
             {"book": "string, optional: 'book 7', a topic's name, or nothing for all"},
             shelve,
         ),
+        Tool(
+            "chart",
+            "The chart as the player sees it, as a picture: the coast, the soundings and "
+            "the marks, the ship's track and her reckoning, the bearings and the player's "
+            "pencil, at the scale and the centre he has it. Drawn by the game's open "
+            "browser page; with none open, the readings it would have shown, in words. A "
+            "picture is a book: shelve puts it back.",
+            {},
+            chart,
+        ),
+        Tool(
+            "ship_view",
+            "The ship as the game's viewer draws her, as a picture: her hull, spars and "
+            "sails as they are set, from where you stand. Drawn by the game's open browser "
+            "page; with none open, the readings it would have shown, in words. A picture is "
+            "a book: shelve puts it back.",
+            {
+                "facing": "string, optional: where you stand, in degrees from the bow, "
+                "clockwise (0 right ahead, 90 the starboard beam, 180 right astern, 270 the "
+                "larboard beam), or 'leeward' (the default, abeam to leeward)",
+            },
+            ship_view,
+        ),
     )
 }
 
 
-def tool_names() -> tuple[str, ...]:
-    return tuple(TOOLS)
+def tool_names(pictures: bool = False) -> tuple[str, ...]:
+    """The tools in the table's order; the picture tools only when asked for (a door that
+    carries an image; package 42)."""
+    return tuple(n for n in TOOLS if pictures or n not in PICTURE_TOOLS)
 
 
 def parameters_schema(name: str) -> dict[str, Any]:
@@ -1376,6 +1446,21 @@ def book_of(name: str, args: dict[str, Any], result: Any) -> tuple[str, str] | N
         if args.get("count") is not None:
             again += f", count={int(args['count'])}"
         return title, again + ")"
+    if (
+        name in PICTURE_TOOLS
+        and isinstance(result, dict)
+        and isinstance(result.get("picture"), dict)
+    ):
+        # a picture is a book (package 42): shelved, it is no longer sent
+        pic = result["picture"]
+        size = f"{pic.get('width')} by {pic.get('height')} pixels"
+        if pic.get("view") == "chart":
+            return f"the chart at {pic.get('stamp')}, {size}", "chart()"
+        facing = str(pic.get("facing") or "abeam to leeward")
+        return (
+            f"the ship from {facing} at {pic.get('stamp')}, {size}",
+            f"ship_view(facing='{args.get('facing') or 'leeward'}')",
+        )
     if name == "read_journal" and isinstance(result, dict) and "entries" in result:
         # a long read of the journal is a book too (package 37g): the two long games'
         # journals came to about ten thousand tokens each

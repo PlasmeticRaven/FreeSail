@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from freesail import units
+from freesail.core import acts
 from freesail.core.clock import TICK_SECONDS as TICK_S
 from freesail.core.clock import Clock
 from freesail.core.events import STATION_ACTORS, Event, Log, Severity
@@ -370,6 +371,12 @@ class World:
     # journal, the readings or the snapshot. A tuple as the class default, so that a
     # checkpoint from an earlier build loads with none.
     chart_marks: list[dict[str, Any]] | tuple[()] = ()
+    # Package 42 (spec M6 §14; `core.acts`): what the stations put into the World, each at
+    # its tick after its count of inputs, which a replay gives again whatever its sampling;
+    # and the stations acting now. Class defaults, so that a checkpoint from before reads:
+    # it journals no station's acts (a station of before has acts in no list).
+    station_acts: list[dict[str, Any]] | None = None
+    _acts_frames: list[Any] | None = None
     # Package 37k: for each anchor whose dragging the log has opened, its come-home
     # figure as last seen and the metres come home since the dragging began, across the
     # spells of it (the physics counts each spell afresh). A class default, as above.
@@ -509,6 +516,8 @@ class World:
         )
         self.journal: list[JournalEntry] = []
         self.inputs: list[InputEntry] = []
+        self.station_acts = []  # the stations' acts (package 42; `core.acts`)
+        self._acts_frames = []
         # The compression the driver runs the clock at (game seconds a real second). The
         # World never reads it: the log's views do (the roll-up in an agent's samples, spec
         # M4 §20 and open item 8), and the driver sets it. Not saved, not in the digest.
@@ -698,7 +707,7 @@ class World:
         data: dict[str, Any] | None = None,
     ) -> Event:
         sev = severity if isinstance(severity, Severity) else Severity(severity)
-        return self.log.append(
+        e = self.log.append(
             Event(
                 tick=self.clock.tick,
                 ship_time=self.clock.ship_time,
@@ -710,6 +719,9 @@ class World:
                 data=data or {},
             )
         )
+        if self._acts_frames:
+            acts.line(self, e)  # a station's line, journaled as its act (package 42)
+        return e
 
     # -- the sun -------------------------------------------------------------
 
@@ -1345,6 +1357,9 @@ class World:
         as the book's listing) is answered in the log and not journaled either.
         """
         text = " ".join(text.split())
+        if actor in STATION_ACTORS and acts.capturing(self):
+            # a station's order, journaled as its act and then given (package 42)
+            return acts.order(self, text, actor, said, routine)
         # a firing's order, or a rules-based captain's judgement (package 40): logged as
         # the rule's and not journaled, a deterministic function of the seed and the journal
         standing = actor.startswith(RULE_ACTOR_PREFIXES)
@@ -1776,6 +1791,9 @@ class World:
             # the player's pencil on the chart (package 37n), for the chart alone; a replay
             # makes none of it, and the door that draws the chart takes it up from here
             "chart_marks": [dict(m) for m in self.chart_marks],
+            # the stations' acts (package 42, spec M6 §14): a replay on another build gives
+            # them again at their ticks, whatever its sampling would ask
+            "station_acts": acts.saved(self),
             # the stations bound and unbound by hand (package 41), for the reader and a
             # load; a replay re-makes a binding from the world order that made it (M7b)
             "stations": self.stations.to_dict() if hasattr(self, "stations") else {},

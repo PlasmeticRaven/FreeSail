@@ -195,7 +195,7 @@ def test_the_request_carries_the_brief_the_samples_and_the_tools_and_nothing_els
     assert body["messages"][0]["content"] == h.brief.text()
     sample = json.loads(body["messages"][1]["content"])
     assert sample["reason"] == "the start" and "readings" in sample
-    assert [t["function"]["name"] for t in body["tools"]] == list(TOOLS)
+    assert [t["function"]["name"] for t in body["tools"]] == list(tools.tool_names())
     for t in body["tools"]:
         name = t["function"]["name"]
         assert t["type"] == "function"

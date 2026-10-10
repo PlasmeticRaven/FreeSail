@@ -187,6 +187,7 @@ IDENTITY_KINDS = {
     "runner": "the served file's name, as the model server reports it",
     "mcp": "the owner's typed name for the model behind the MCP client",
     "repl": "the owner's typed name at the terminal",
+    "api": "the model's name as its API reports it",
 }
 
 # The sections of the brief whose change puts the question again (package 37; `docs/
@@ -229,6 +230,12 @@ DOOR_TEXT = {
         "You answer with the answer tool, the only tool in this conversation. Anything you "
         "write outside it is shown to me at the terminal, and I reply before you answer; "
         "nothing is decided until you call answer."
+    ),
+    "api": (
+        "You answer with the answer tool, the only tool in this conversation. This "
+        "conversation reaches you through your own API, called by the game with no chat "
+        "client between; anything you write outside the tool is shown to me at the door's "
+        "terminal, and I reply before you answer; nothing is decided until you call answer."
     ),
     "repl": (
         "This conversation is at a terminal, one reply a turn: type, then send with a blank "

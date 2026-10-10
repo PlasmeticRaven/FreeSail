@@ -220,6 +220,7 @@ READS_PER_TURN = 32
 DOOR_WORDS: dict[str, str] = {
     "mcp": "the MCP bridge",
     "runner": "the local runner",
+    "api": "the API door",
     "repl": "the REPL door",
     "console": "the console",  # the player's seat (package 40; `agents.seat`)
     "browser": "the browser",
