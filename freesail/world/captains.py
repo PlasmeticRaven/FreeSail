@@ -395,9 +395,23 @@ def role_for(world: Any, intent: Intent | None) -> str:
 
 
 def _is_kings_ship(world: Any) -> bool:
-    people = getattr(world, "people", None)
-    captain = people.captain if people is not None else None
-    return bool(captain is not None and captain.role in ("captain", "commander"))
+    """A King's ship by her wardroom file's binding of the captain's station (package
+    40c): a captain or a commander commands her; a master commands a merchantman or a
+    hired cutter. Read from the file by the ship's own source, never by building the
+    people: the captain is made with the World, before her company is mustered, and a
+    muster built then would be a point ship's (a captain and the master alone)."""
+    from freesail.world.people import load_wardroom
+
+    spec = getattr(getattr(world, "ship", None), "spec", None)
+    source = getattr(spec, "source", None)
+    role = None
+    if source:
+        try:
+            wardroom = load_wardroom(str(source))
+        except ValueError:
+            wardroom = None
+        role = wardroom.role_of("captain") if wardroom is not None else None
+    return role in ("captain", "commander")
 
 
 # ---------------------------------------------------------------------------
@@ -453,6 +467,38 @@ def plain_position(p: Position) -> str:
         return f"{d} {m:04.1f} {hemi}"
 
     return f"{dm(p.lat_deg, 'N', 'S')} {dm(p.lon_deg, 'E', 'W')}"
+
+
+# A station "off" a place (package 40c, the captain's trials): the place itself is the land
+# (Ushant), and a course shaped for it runs her ashore. The station is the point the
+# intent's radius from the place with the most sea room about it, read on the chart in
+# his hands (the distance to the nearest shore at each of sixteen bearings, the farthest
+# taken; ties to the westward, the open Atlantic's side), as the squadron's station lay
+# to seaward of the Black Rocks.
+STATION_BEARINGS = 16
+
+
+def station_off(world: Any, place: Position, radius_nm: float) -> Position:
+    chart = getattr(world, "chart", None)
+    best: tuple[float, float, Position] | None = None
+    for i in range(STATION_BEARINGS):
+        bearing_deg = 360.0 * i / STATION_BEARINGS
+        there = destination(place, bearing_deg, radius_nm * units.NAUTICAL_MILE)
+        room = math.inf
+        if chart is not None:
+            try:
+                found = chart.coast_distance(there)
+            except Exception:  # noqa: BLE001 - beyond the chart's field
+                found = None
+            if found is not None:
+                room = float(found[0])
+        # the room to the nearest league, and among equals the westward bearing (the
+        # open Atlantic's side, where the squadron's station lay)
+        west = -math.sin(math.radians(bearing_deg))
+        key = (round(room / (3.0 * units.NAUTICAL_MILE)), west)
+        if best is None or key > (best[0], best[1]):
+            best = (key[0], key[1], there)
+    return best[2] if best is not None else place
 
 
 def _mark(world: Any, words: str) -> tuple[str, Position] | None:
@@ -695,8 +741,9 @@ class Planner:
         if intent.kind == "station":
             place = self._place(intent.destination)
             if place is not None:
-                legs += self._sea_legs(legs[-1].position if legs else start, place[1])
-                legs.append(Leg(place[0], place[1], "station", intent.radius_nm))
+                mark = station_off(self.world, place[1], intent.radius_nm)
+                legs += self._sea_legs(legs[-1].position if legs else start, mark)
+                legs.append(Leg(plain_position(mark), mark, "station", intent.radius_nm))
             return legs
         port_to = self._port(intent.destination)
         if port_to is not None:
@@ -765,6 +812,9 @@ class Perception:
     nearest_land_bearing: str = ""
     anchor_down: bool = False
     aground: bool = False
+    anchoring: bool = False
+    coast_by_account_nm: float | None = None
+    coast_by_account_bearing_deg: float | None = None
     manoeuvre: str = ""
     strangers: list[dict[str, Any]] = field(default_factory=list)
     in_port: str = ""  # the port she lies in, by the port's reading
@@ -812,6 +862,27 @@ class Perception:
             p.anchor_down = anchor.get("state") == "down"
             p.aground = anchor.get("state") == "aground"
         p.manoeuvre = str(view.value("manoeuvre_in_hand") or "")
+        work = view.value("work_in_hand")
+        if isinstance(work, dict):
+            # an anchor being brought to (package 40c): the evolution is work, not a
+            # manoeuvre, and she is not under way again while it is in hand
+            doing = list(work.get("doing") or []) + list(work.get("waiting") or [])
+            p.anchoring = any("anchor" in str(w) for w in doing)
+        # the nearest shore by his account on the chart in his hands (package 40c, the
+        # captain's trials): in thick weather or by night the lookout sees no land, and
+        # the captain judges a lee shore or the land's nearness by his reckoning
+        nav = getattr(world, "navigation", None)
+        chart = getattr(world, "chart", None)
+        if nav is not None and chart is not None:
+            try:
+                here = nav.account_now()
+                found = chart.coast_distance(here) if here is not None else None
+            except Exception:  # noqa: BLE001 - a chart with no field here
+                found = None
+            if found is not None:
+                metres, toward = found
+                p.coast_by_account_nm = float(metres) / units.NAUTICAL_MILE
+                p.coast_by_account_bearing_deg = float(toward)
         strangers = view.value("strangers")
         if isinstance(strangers, dict):
             p.strangers = list(strangers.get("items") or [])
@@ -886,6 +957,7 @@ STIMULI: tuple[str, ...] = (
     "gale",
     "gale over",
     "lee shore",
+    "no sea room",
     "thick near the land",
     "weather clear",
     "hostile stranger",
@@ -925,6 +997,10 @@ class Captain:
         self.leg_shaped_tick: int | None = None
         self.stand_in = False  # a model's door silent: the judgements stand in
         self.seated = False  # a model holds the captain's station
+        # the player's hand (decision 41; package 40c): a direct order of the ship's given
+        # at the prompt on an intent scenario makes him stand aside, his book struck,
+        # until `captain: carry on` gives her back to him
+        self.aside = False
         self.last_judged = -1
         self._seen_log = 0
         self._road_said: dict[str, int] = {}
@@ -963,7 +1039,9 @@ class Captain:
     def commands(self) -> bool:
         """Whether his judgements are given now: an intent, and no model at the
         captain's station with the deck (or that model's door silent, the stand-in)."""
-        return self.active and (not self.seated or self.stand_in)
+        return (
+            self.active and (not self.seated or self.stand_in) and not getattr(self, "aside", False)
+        )
 
     def book_words(self) -> str:
         if self.state is not None:
@@ -986,6 +1064,10 @@ class Captain:
                 what += f"; the leg for {self.legs[self.leg_i].words}"
             if self.error:
                 what += f"; the intent refused: {self.error}"
+            if getattr(self, "aside", False):
+                what += (
+                    "; standing aside at the player's order ('captain: carry on' gives her back)"
+                )
             return what
         return f"{head}, by {self.book_words()}"
 
@@ -995,6 +1077,7 @@ class Captain:
             "role": self.role,
             "intent": self.intent.to_dict() if self.intent else None,
             "state": self.state,
+            "aside": bool(getattr(self, "aside", False)),
             "books": list(self.books),
             "legs": [leg.to_dict() for leg in self.legs],
             "leg": self.leg_i,
@@ -1019,6 +1102,42 @@ class Captain:
             self._leave(self.state)
             self.state = None
         return f"the captain's intent: {self.intent.words}"
+
+    def player_hand(self, text: str) -> None:
+        """The player's hand on an intent scenario (decision 41): an order of the ship's
+        given at the prompt while the captain commands makes him stand aside, said once
+        in the log; his state's book is struck so that no rule of his fights the player's
+        helm, his intent and his plan kept for `captain: carry on`."""
+        if not self.commands or self.state is None:
+            # not yet in command (the scenario's opening orders come before his first
+            # judgement, and a replay gives them again as the captain's): no hand
+            return
+        self.aside = True
+        state = self.state
+        self._leave(state)
+        self.state = None
+        words = f" and his book '{state}' struck"
+        self.world.record(
+            Severity.NOTABLE,
+            "captain.aside",
+            f"{self.name} stands aside at your order ({text!r}){words}; "
+            "'captain: carry on' gives her back to him.",
+            actor=actor_for(state),
+            data={"order": text, "state": state, "intent": self.intent_words},
+        )
+
+    def carry_on(self) -> str:
+        """`captain: carry on`: the captain commands again from where she is, his plan
+        worked afresh at his next judgement; the words for the journal."""
+        if not self.active:
+            raise ValueError("The captain has no intent to carry on with; give him one first.")
+        if not getattr(self, "aside", False):
+            raise ValueError(f"{self.name} is not standing aside; he commands her.")
+        self.aside = False
+        self.legs, self.leg_i, self.leg_shaped_tick = [], 0, None
+        self._business = {}
+        self.last_judged = -1
+        return f"{self.name} carries on: {self.intent.words if self.intent else ''}"
 
     # -- the tick ---------------------------------------------------------------------
 
@@ -1082,7 +1201,7 @@ class Captain:
             actor=actor_for(state),
             data={"state": state, "from": old, "book": loaded, "intent": self.intent_words},
         )
-        self._on_enter(state)
+        self._on_enter(state, old)
 
     def _leave(self, state: str) -> None:
         runtime = getattr(self.world, "standing", None)
@@ -1111,7 +1230,7 @@ class Captain:
             fills["mark"] = leg.words
             fills["reached"] = f"{leg.reached_nm:g}"
         if self.intent is not None:
-            station = _mark(self.world, self.intent.destination)
+            station = self._station_mark()
             if self.intent.kind == "station" and station is not None:
                 fills["station"] = station[0]
                 fills["radius"] = f"{self.intent.radius_nm:g}"
@@ -1120,8 +1239,11 @@ class Captain:
             port = self._port_of(self.intent.destination)
             if port is not None:
                 fills["port"] = port.name
-                fills["road"] = port.outer_road.name
-                fills["anchorage"] = port.anchorage.name
+                # the spot by its chart name where it has a feature (Falmouth's outer road
+                # is 'the outer road' in the port file, which no 'distance to' reads;
+                # package 40c), else the port file's name
+                fills["road"] = self._spot_words(port.outer_road)
+                fills["anchorage"] = self._spot_words(port.anchorage)
                 depth_m = getattr(port.anchorage, "depth_m", None)
                 fills["anchorage_fathoms"] = (
                     f"{units.m_to_fathoms(float(depth_m)) + 2.0:.0f}"
@@ -1139,6 +1261,15 @@ class Captain:
                 )
         fills["light_sail"] = self._light_sail()
         return fills
+
+    def _spot_words(self, spot: Any) -> str:
+        feature = getattr(spot, "feature_id", None) or getattr(spot, "feature", None)
+        chart = getattr(self.world, "chart", None)
+        if feature and chart is not None:
+            f = chart.feature(str(feature))
+            if f is not None:
+                return str(f.name)
+        return str(getattr(spot, "name", "") or "")
 
     def _light_sail(self) -> str:
         """The sail taken in at the pilot's hail, by the ship's own names: the fore
@@ -1167,14 +1298,43 @@ class Captain:
             else None
         )
 
-    def _on_enter(self, state: str) -> None:
+    def _fill_away_first(self) -> None:
+        """A state that sails her, entered hove to (the gale over, or the land under her
+        lee while she lies to): filled away first, or every course is refused (package
+        40c, the captain's trials: the frigate drifted onto Ushant hove to, her courses
+        refused)."""
+        manoeuvre = str(self.world.readings.value("manoeuvre_in_hand") or "")
+        if manoeuvre in ("hove to", "heaving to"):
+            # his own heave-to (the weather's) to undo: a heave-to the book orders for a
+            # pilot's boat is the book's, and is not touched
+            self._business["filling"] = True
+        if manoeuvre == "hove to":
+            self.give("fill away", why="to make sail")
+
+    def _on_enter(self, state: str, old: str | None = None) -> None:
         """What is ordered on entering a state, beyond the book."""
         world = self.world
         if state == "hove to for weather":
             self.give("shorten sail")
             self.give("heave to")
-        elif state in ("on passage", "beating", "running for shelter"):
+            return
+        lying_to = False
+        if old == "at anchor" and state in ("on passage", "beating", "running for shelter"):
+            # the at-anchor book's "at under way then set plain sail" is unloaded here,
+            # before the anchor is catted and the ship says she is under way (package
+            # 40c: the schooner left the road under her topsail alone): he gives it at
+            # `ship.under_way` himself (`_work`)
+            self._business["weighing"] = True
+        if state != "at anchor":
+            self._fill_away_first()
+            manoeuvre = str(world.readings.value("manoeuvre_in_hand") or "")
+            lying_to = manoeuvre in ("hove to", "heaving to")
+        if state in ("on passage", "beating", "running for shelter"):
             self._business.pop("sailing", None)
+            # a course while she lies to is refused; it is shaped when she has filled
+            # away (`_work`, at `ship.filled_away`)
+            if lying_to:
+                return
             if self.legs and self.leg_i < len(self.legs) and self.legs[self.leg_i].kind != "out":
                 self._shape_leg()
         elif state == "investigating a stranger":
@@ -1182,10 +1342,9 @@ class Captain:
         elif state == "chasing":
             self.give("give chase")
         elif state == "keeping station":
-            if self.intent is not None:
-                station = _mark(world, self.intent.destination)
-                if station is not None:
-                    self.give(f"shape a course for {station[0]}")
+            station = self._station_mark()
+            if station is not None:
+                self.give(f"shape a course for {station[0]}")
         elif state == "evading":
             self._haul_off(Perception.read(world))
 
@@ -1210,20 +1369,34 @@ class Captain:
         if name == "gale over":
             return p.wind_kn < float(th("gale_over_kn", 28))
         if name == "lee shore":
-            if p.nearest_land_nm is None or p.wind_from_deg is None or not p.nearest_land_bearing:
+            if p.wind_from_deg is None:
                 return False
-            if p.nearest_land_nm > float(th("lee_shore_nm", 6)):
+            # the land as the lookout sees it, else as the account lays it on the chart
+            dist, land = p.nearest_land_nm, _point_deg(p.nearest_land_bearing or "")
+            if dist is None or land is None:
+                dist, land = p.coast_by_account_nm, p.coast_by_account_bearing_deg
+            if dist is None or land is None or dist > float(th("lee_shore_nm", 6)):
                 return False
             toward = (p.wind_from_deg + 180.0) % 360.0
-            land = _point_deg(p.nearest_land_bearing)
-            return land is not None and abs(
-                units.wrap_pi(math.radians(land - toward))
-            ) < math.radians(67.5)
+            return abs(units.wrap_pi(math.radians(land - toward))) < math.radians(67.5)
+        if name == "no sea room":
+            # the land to leeward within the sea room a night's drift hove to wants
+            # (package 40c): she heaves to only with sea room, and leaves it for a lee
+            # shore within `lee_shore_nm`, the two thresholds apart so that she does not
+            # heave to and fill away by turns at one line
+            if p.wind_from_deg is None:
+                return False
+            dist, land = p.nearest_land_nm, _point_deg(p.nearest_land_bearing or "")
+            if dist is None or land is None:
+                dist, land = p.coast_by_account_nm, p.coast_by_account_bearing_deg
+            if dist is None or land is None or dist > float(th("sea_room_nm", 10)):
+                return False
+            toward = (p.wind_from_deg + 180.0) % 360.0
+            return abs(units.wrap_pi(math.radians(land - toward))) < math.radians(67.5)
         if name == "thick near the land":
             thick = p.visibility in ("a mile", "a cable")
-            near = p.nearest_land_nm is not None and p.nearest_land_nm < float(
-                th("shelter_land_nm", 12)
-            )
+            dist = p.nearest_land_nm if p.nearest_land_nm is not None else p.coast_by_account_nm
+            near = dist is not None and dist < float(th("shelter_land_nm", 12))
             return thick and near and self._shelter_port(p) is not None
         if name == "weather clear":
             return p.visibility not in ("a mile", "a cable")
@@ -1254,13 +1427,14 @@ class Captain:
                 for s in p.strangers
             )
         if name == "course not laid":
-            return bool(self._business.get("course_not_laid"))
+            # in pilot water a foul wind is waited out at anchor, not beaten (`_passage`)
+            return bool(self._business.get("course_not_laid")) and not self._inner_leg()
         if name == "course laid":
             return not self._business.get("course_not_laid")
         if name == "at the road":
             return bool(self._waiting_at_road)
         if name == "under way":
-            return not p.anchor_down and not p.aground
+            return not p.anchor_down and not p.aground and not p.anchoring
         if name == "anchored":
             return p.anchor_down
         if name == "anchored in port":
@@ -1284,6 +1458,21 @@ class Captain:
         if state is None:
             return
         kinds = {e.kind for e in events}
+        if self._business.get("filling") and p.manoeuvre == "hove to":
+            # a sailing state entered while she was still heaving to for the weather
+            # (package 40c): the fill away waits for the heave-to to finish, and is given
+            # here once a minute until she fills, every course being refused while she
+            # lies to; a heave-to of the book's (the pilot's boat) is not his to undo
+            self.give("fill away", why="to make sail")
+            return
+        sailing = ("on passage", "beating", "running for shelter")
+        if "ship.under_way" in kinds and self._business.pop("weighing", False):
+            self.give("set plain sail", why="under way from the anchor")
+        filled = "ship.filled_away" in kinds and state in sailing
+        if filled and self._business.pop("filling", False):
+            # his own fill away done (not the book's after a pilot): the leg shaped now
+            if self.legs and self.leg_i < len(self.legs) and self.legs[self.leg_i].kind != "out":
+                self._shape_leg(why="filled away")
         if state in ("on passage", "beating", "running for shelter"):
             self._passage(p, events, kinds)
         elif state == "in port":
@@ -1320,12 +1509,58 @@ class Captain:
         if "ship.filled_away" in kinds and p.manoeuvre not in ("hove to", "heaving to"):
             if leg.kind != "out":
                 self._shape_leg()
+        if self._business.get("course_not_laid") and self._inner_leg():
+            # a course not laid in pilot water (package 40c, the captain's trials: the
+            # schooner beat up the Goulet and took the ground on the Fillettes). Most often
+            # it is the allowance for the stream that brings the steered course up to the
+            # wind, the stream running along the channel; then she is conned for the mark
+            # by the rhumb line with the stream under her, as a pilot conns. A wind foul
+            # for the line itself is waited out at anchor, the at-anchor book trying again
+            # on the flood by day.
+            self._business.pop("course_not_laid", None)
+            if self._conn_for(leg, p):
+                return
+            port = self._port_of(leg.port)
+            where = port.name if port is not None else leg.words
+            self._waiting_at_road = True
+            self.give("come to an anchor", why=f"the wind does not serve to enter {where}")
+            self._enter("at anchor")
+            return
         dist = self._distance_by_account(leg)
         if dist is not None and (dist <= leg.reached_nm or self._passed(leg)):
             self._leg_reached(leg, p)
             return
         if "lookout.land_ahead" in kinds and leg.kind != "out":
             self._shape_leg(why="land ahead")
+
+    def _conn_for(self, leg: Leg, p: Perception) -> bool:
+        """The helm given the rhumb line to the leg's mark by account, as a pilot conns
+        her up a channel with the stream under her, when that line is laid; False when
+        the wind is foul for the line itself."""
+        from freesail.evolutions.scripts import close_hauled_true_angle
+
+        nav = getattr(self.world, "navigation", None)
+        here = nav.account_now() if nav is not None else None
+        if here is None or p.wind_from_deg is None:
+            return False
+        bearing, _ = bearing_and_distance(here, leg.position)
+        off = abs(units.wrap_pi(math.radians(bearing - p.wind_from_deg)))
+        closest = close_hauled_true_angle(self.world.ship)
+        if off < closest + math.radians(5.0):
+            return False
+        point = units.point_name(math.radians(bearing))
+        e = self.give(f"steer {point}", why=f"conning her for {leg.words}, the stream under her")
+        return e.kind != "order.rejected"
+
+    def _inner_leg(self) -> bool:
+        """Whether the leg in hand is a port's inner track (its `in` marks or its
+        anchorage): pilot water, where a course the wind will not allow is not beaten."""
+        if not self.legs or self.leg_i >= len(self.legs):
+            return False
+        leg = self.legs[self.leg_i]
+        return bool(leg.port) and (
+            leg.kind == "anchorage" or (leg.kind == "to" and leg.reached_nm <= 0.5)
+        )
 
     def _passed(self, leg: Leg) -> bool:
         """Whether the account has run past a mark of an inner track without reaching
@@ -1355,6 +1590,9 @@ class Captain:
         if leg.kind == "anchorage":
             self.give("come to an anchor", why=f"at {leg.words}")
             self._advance()
+            if self.intent is not None and self.intent.kind in ("passage", "home", "letter"):
+                # the voyage's end (package 40c): she is not sailed again on the tide
+                self.intent.done = True
             return
         if leg.kind == "station":
             self._enter("keeping station")
@@ -1449,6 +1687,9 @@ class Captain:
         port = self._port_of(p.in_port)
         if port is None:
             return
+        if self.intent.kind in ("passage", "home", "letter") and port.id == self.intent.destination:
+            # the voyage's end (package 40c): she is not sailed again on the tide
+            self.intent.done = True
         if self.intent.kind == "trade":
             if port.id == self.intent.origin and not p.hold.get(self.intent.cargo):
                 self._buy(port, p)
@@ -1512,10 +1753,23 @@ class Captain:
 
     # -- the station, the strangers ----------------------------------------------------
 
+    def _station_mark(self) -> tuple[str, Position] | None:
+        """The station's mark: the point off the place (`station_off`), as words the
+        dialect reads and as a position."""
+        if self.intent is None:
+            return None
+        place = _mark(self.world, self.intent.destination)
+        if place is None:
+            return None
+        if self.intent.kind != "station":
+            return place
+        mark = station_off(self.world, place[1], self.intent.radius_nm)
+        return plain_position(mark), mark
+
     def _on_station(self, p: Perception) -> bool:
         if self.intent is None:
             return False
-        station = _mark(self.world, self.intent.destination)
+        station = self._station_mark()
         if station is None:
             return False
         found = self.world.readings.value("distance_to", station[0])

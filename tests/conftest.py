@@ -61,6 +61,9 @@ DAY_FIXTURES: dict[str, frozenset[str]] = {
             "gate_6a_fake_captain",  # package 40: the merchant passage under the fake captain
         }
     ),
+    "test_captain_trials.py": frozenset(  # package 40c: the captain's trials, 16 hours each
+        {"station_stranger", "station_gale", "station_lee_shore", "trade_stranger", "trade_thick"}
+    ),
     "test_ships_hierarchy.py": frozenset(
         {
             "frigate_sweep",
