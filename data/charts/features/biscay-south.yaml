@@ -1558,7 +1558,7 @@ features:
     says: "Monte Ferro, round and reddish with a watch on it, the north side of Bayona's port."
     fix: "placed on the grid's land of Monteferro north of the bay of Bayona"
 
-  - id: estelas
+  - id: estelas-of-bayona
     kind: rock
     name: the Estelas
     modern: Illas Estelas

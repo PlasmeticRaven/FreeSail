@@ -1,0 +1,108 @@
+# FreeSail: Setúbal and the bar of the Sado as a port (spec M6 §26; package 39d, the
+# Portugal and Cadiz block), on package 35's machinery (freesail/world/ports.py); the marks
+# are the features file's (data/charts/features/portugal.yaml).
+#
+# Sources. Tofiño 1789, Derrotero de las costas de España en el Océano Atlántico,
+# 'Derrotero de la Costa de Portugal', pp. 90 to 91: Sesimbra's road close to the beach in
+# seven or eight brazas; "close east of Cape Sampinedra is the entrance of the bar of
+# Setúbal, of which no more can be given than Pimentel gives". Pimentel (quoted): on the
+# north side of the entrance a new fortress, and within a gunshot the old tower of Outão
+# with two sentry boxes toward the sea; put the bow on the first sentry box and bring the
+# castle of São Filipe, on a height up the river on the same north side, a little south of
+# it; then three red cliffs on a rock between the tower and São Filipe, one in another,
+# "the true marks for entering at the present time"; at high water springs the bar has
+# five brazas, at low twenty-six palmos, at the quarters four and three and a half; to go
+# out, the same marks, waiting for the flood or the slack.
+#
+# The datum: UNVERIFIED. No period sheet of the Sado is patched; the chart's depths are
+# EMODnet's at the lowest astronomical tide, the Zero Hidrográfico 2.0 m below the Cascais
+# datum offshore (EPSG 10393).
+#
+# The stance. Portuguese, neutral in June 1805: open to all. The salt of Setúbal is its
+# trade (the Baltic and the Newfoundland fishery took it); prices FROM MEMORY or JUDGEMENT,
+# in sterling at the exchange.
+
+id: setubal
+name: Setúbal
+nation: portugal
+source: "Tofiño 1789, Derrotero, pp. 90 to 91 (Sesimbra, Cape Espichel, the bar of Setúbal), with Pimentel's directions quoted"
+datum: unverified
+
+outer_road:
+  feature: sesimbra-road
+  name: the road of Sesimbra
+  lat_deg: 38.4400
+  lon_deg: -9.1030
+anchorage:
+  feature: setubal-road
+  name: the road before Setúbal
+  lat_deg: 38.5120
+  lon_deg: -8.8950
+mooring:
+  feature: setubal-road
+  name: the road before Setúbal
+  lat_deg: 38.5120
+  lon_deg: -8.8950
+shore:
+  name: the quay at Setúbal
+  lat_deg: 38.5225
+  lon_deg: -8.8930
+
+pilot:
+  station: sesimbra-road
+  cruising_nm: 8                 # judgement: the bar's pilots met ships between Espichel and the bar
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the pilots' boat of Setúbal
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Fonseca, Dias, Nunes, Mendes, Correia, Marques, Vieira, Alves]   # Portuguese names: judgement
+  skill: 0.9
+  fee_pounds: 4                  # judgement; unverified
+  cast: starboard                # from the road before the town the head paying off to the southward, down the river (judgement)
+  course_out_deg: 230            # out over the bar under Outão, then for the offing (judgement)
+  words:
+    channel: "Put the bow on the first sentry box of the old tower of Outão, the one toward the new fortress, and bring the castle of São Filipe on its height up the river a little to the south of it; then the three red cliffs on the rock between the tower and São Filipe one in another: those are the true marks for entering now."
+    marks: "Cape Espichel, sheer, white to the north and red to the south, with its hermitage; the mountain of São Luís behind it lying east and west; the old tower of Outão with its two sentry boxes at the mouth, and the castle of São Filipe above the town."
+    anchorage: "Within the bar ride before the town in the river; outside, the road of Sesimbra close to the beach in seven or eight brazas, for farther off the bottom is stone. Weigh from Sesimbra before any southerly."
+    tide: "At high water springs the bar has five brazas, at low twenty-six palmos; at the quarters four and three and a half. Go in on the flood, and out on the flood or at the slack."
+
+tide:
+  establishment: Lisbon          # no place of the epitome nearer; Tofiño gives no hour for Setúbal
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: salt, price: 6, origin: portugal, note: "the salt of Setúbal at its source, the Baltic's and the fishery's; from memory"}
+    - {good: wine, price: 27, origin: portugal, note: "the muscatel of Setúbal; from memory"}
+    - {good: oranges, price: 13, origin: portugal, season: {12: 0.8, 1: 0.8, 2: 0.8, 6: 1.4, 7: 1.5}, note: "judgement, as Lisbon's"}
+    - {good: olive oil, price: 45, origin: portugal, note: "from memory"}
+    - {good: cork, price: 18, origin: portugal, note: "the cork of the Alentejo; judgement"}
+    - {good: fresh fish, price: 8, origin: portugal, note: "the sardines of the Sado; judgement"}
+    - {good: salt fish, price: 30, origin: britain, note: "from memory, as Lisbon's"}
+    - {good: canvas, price: 43, origin: null, note: "judgement"}
+    - {good: salt beef, price: 72, origin: null, note: "from memory, as the Channel's"}
+    - {good: coal, price: 8, origin: britain, note: "from memory"}
+    - {good: timber, price: 6, origin: portugal, note: "judgement"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 12, pounds: 45, note: "judgement"}
+    - {item: topgallant_mast, hours: 6, pounds: 14}
+    - {item: yard, hours: 8, pounds: 28}
+    - {item: suit of sails, hours: 72, pounds_per_100m2: 24}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.12, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  able: {hands: 3, pounds: 2, delay_h: 24}
+  ordinary: {hands: 6, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 12, pounds: 1, delay_h: 12}
+
+closed_to: []

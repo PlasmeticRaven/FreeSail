@@ -133,12 +133,13 @@ tiles). Its tiles are cut from the same two grids, fetched for the region on 202
 EMODnet's DTM 2024 by its ERDDAP service (`elevation` and `elevation_max` over 41.8 to
 46.15 N, 9.4 to 0.75 W, two classic netCDF subsets of 138.9 MB, CC BY 4.0) and
 GEBCO_2025's area extract (41.7 to 46.25 N, 9.5 to 0.65 W, ESRI ASCII in a zip of 11.8
-MB, public domain), their checksums in the manifest. 130 tiles at level 2 (the ten of the
-northern row that Biscay north lists are its, the seam rule; the sixty with no water at
-the datum, inland Castile, León and the Landes, left to the corridor by the recipe's
-`dry_tiles_to_corridor`) and 30 at level 3 in seven harbour groups (Royan and Verdon,
-Santander, Gijón, Ferrol, Corunna, Vigo, Bayona); about 19.7 MB with the coast and the
-features. No override: no period sheet's datum at a Spanish port was read.
+MB, public domain), their checksums in the manifest. 129 tiles at level 2 (the ten of the
+northern row that Biscay north lists are its and the two of the southern row that
+Portugal lists are Portugal's, the seam rule; the 59 with no water at the datum, inland
+Castile, León and the Landes, computed and not written, `skip_dry_tiles`) and 30 at level
+3 in seven harbour groups (Royan and Verdon, Santander, Gijón, Ferrol, Corunna, Vigo,
+Bayona); GEBCO's fill raised by the French gauges' mean level, 2.5 m
+(`fill_mean_level_m`); about 19.3 MB with the coast and the features. No override: no period sheet's datum at a Spanish port was read.
 
 | Work | Where read | What was taken |
 |---|---|---|
@@ -148,6 +149,31 @@ features. No override: no period sheet's datum at a Spanish port was read.
 | The Lighthouse Directory (R. Rowlett, University of North Carolina at Chapel Hill, ibiblio.org/lighthouse), its pages for Spain's Basque Country, Cantabria, Asturias and Galicia and France's Aquitaine | read 2026-10-10 (the encyclopaedias refused every request for its rate) | The lights' years: Cordouan 1611 (the conical tower completed 1788), Monte Igueldo 1778 to 1855, the Tower of Hercules restored from 1785; not yet in 1805 Cape Mayor 1839, Estaca de Bares 1850, Machichaco 1852, Peñas 1852, Finisterre 1853, Villano 1854. |
 | SHOM, *Références Altimétriques Maritimes* | the WFS layer `RAM_BDD_WLD_WGS84G_WFS:ram_3857`, GeoJSON, read 2026-10-10 (Licence Ouverte 2.0) | The mean levels (NM) of the four French gauges held (Le Verdon-sur-Mer 3.33 m, Arcachon 2.48, Boucau-Bayonne 2.53, Saint-Jean-de-Luz 2.51); the low water of springs at Le Verdon (1.05 m) and Royan (1.20 m) for Royan's port file. |
 | TICON (Piccioni et al. 2019), `TICON.txt` | the zip at doi.pangaea.de, fetched 2026-10-10, SHA-256 7055f8ed…6514 (the same file), CC BY 4.0 | Eleven gauges of the block by their coordinates (Le Verdon, Arcachon, Boucau-Bayonne, Socoa, Bilbao, Santander, Gijón, Ferrol, A Coruña, Vilagarcía, Vigo): M2, S2 and N2, held out of the blend. |
+## Portugal and Cadiz (package 39d)
+
+The fourth block of spec M6 §26, `portugal` (36.4 N to 42 N, 10 W to 6 W, abutting
+Biscay south at 42 N and the Strait at 36.4 N; neither neighbour built at this block's
+build). Its tiles are cut from the same two grids as the others', fetched for the region on
+2026-10-10: EMODnet's DTM 2024 by its ERDDAP service (`elevation` and `elevation_max` over
+36.2 to 42.35 N, 10.3 to 5.8 W, two classic netCDF subsets of 102 MB, CC BY 4.0) and
+GEBCO_2025's area extract (36.1 to 42.45 N, 10.4 to 5.7 W, ESRI ASCII in a zip of 8.1 MB,
+public domain), their checksums in the manifest. 68 tiles at level 2 (of the 140 that meet
+the bounds: the 72 all of land, Portugal's and Spain's interior, are computed for the
+distance field and not written, the corridor answering there) and 48 at level 3 in six
+harbour groups (the Douro, the Tagus from Cascais to Lisbon, Setúbal, Lagos, Faro, the bay
+of Cadiz); GEBCO's fill under them raised to the chart's datum by the coast's own mean
+level, 2.0 m (below); about 18 MB with the coast and the features.
+
+| Work | Where read | What was taken |
+|---|---|---|
+| Tofiño de San Miguel, *Derrotero de las costas de España en el Océano Atlántico, y de las Islas Azores ó Terceras*, Madrid 1789 | Internet Archive `A302201` (the Universidad de Sevilla's copy), the OCR text; the copies `derroterodelasco00tofi_0` and `bub_gb_04Yq4fsvB8gC` beside it | The coast of Portugal from the Minho to Cape St Vincent (pp. 74 to 93, his frigate's survey of 1786 to 1788 with Pimentel's Portuguese directions quoted), the Berlings (pp. 83 to 84), Cape St Vincent to Trafalgar (pp. 94 to 110), the bay of Cadiz by the instruction of the King's pilots (pp. 111 to 120), San Sebastián to Trafalgar (pp. 121 to 128, the Strait's from 36.4 N): the 139 marks of `features/portugal.yaml`, the directions of the five port files, the hours of high water at Lisbon, Cadiz, San Lucar and Ayamonte and the rises at Cadiz and Ayamonte in the epitome, the lights he names (the Senhora da Luz, the Rock's lantern, the Guide, San Sebastián's). In his brazas of six Castilian feet and his leagues of twenty to the degree. In period exactly. Public domain. |
+| Tofiño, *Plano del Puerto de Cadiz*, *Atlas Marítimo de España*, Madrid 1789 | Internet Archive `A062039040` (the Universidad de Sevilla's copy, Public Domain Mark), page 24, read 2026-10-10 at full resolution (7,830 by 5,061 pixels) through the Archive's IIIF service; the crops cached outside the repository and none committed | The plan's notes (the soundings in brazas of six feet, reduced to low water of springs of ten feet's range), its soundings in the inner bay and the shoals' names; georeferenced by six control points (residuals 25 to 251 m): the Cadiz override `overrides/portugal/cadiz-bay.yaml`. The atlas's other sheets of the coast (pages 20 to 23 and 28 to 29) are general charts and were not transcribed. |
+| Puertos del Estado, REDMAR's reports for Huelva (`GLOB_2_3_3329`) and Bonanza (`GLOB_2_3_3333`), and the list of stations (`INT_3`) | bancodatos.puertos.es, the PDFs, read 2026-10-10 | The mean sea level and the lowest astronomical tide above each gauge's zero (Huelva 203 and 7 cm, Bonanza 173 and 19), and the observed low water of springs (47 cm at both): the two gauges' mean levels and the Cadiz patch's datum (0.40 m, Huelva's, put for Cadiz). Reused under Puertos del Estado's open-data terms (attribution). |
+| EPSG's record 10393 (the Instituto Hidrográfico's transformation, revised 2023-08-07) | epsg.io, read 2026-10-10 | The Zero Hidrográfico 2.08 m below the Cascais datum in the Tagus and 2.0 m offshore: the Cascais and Lagos gauges' mean levels (judgement) and the block's fill level. |
+| TICON (Piccioni et al. 2019), `TICON.txt` | the zip at store.pangaea.de (PANGAEA 896587), fetched 2026-10-10, SHA-256 7055f8ed…6514, CC BY 4.0 | Five records of the block by their coordinates: Cascais, Lagos, Huelva, Bonanza, Cadiz (held, `data/tides/constituents.yaml`); no gauge at Leixões, Lisbon or Setúbal. |
+| The Portuguese and Spanish encyclopaedias' pages | pt. and es.wikipedia.org, read 2026-10-10 one page at a time (the API refused the build network for its rate) | The lights' dates and positions: the Senhora da Luz (in service 1761), the Rock (1772), the Guide (a light at the hermitage from 1523, the tower 1761), São Julião (1761), the Bugio (the tower 1775), Carvoeiro (1790), Espichel (the tower 1790), Cape St Vincent (the convent's light relit 1606, the tower 1846), the Berlenga (1842), Santa Maria (1851), Mondego (1858), Outão (built 1880), Chipiona (1867), San Sebastián's (a light at least from the sixteenth century); the castles of Cadiz's bay and Rota (the override's control points). |
+| Huddart, *The Oriental Navigator*, 1794 and 1801; Imray's *Memoir of the North and South Atlantic*, 1847 (Internet Archive `bim_eighteenth-century_the-oriental-navigator-_1794`, `orientalnavigat00huddgoog`, `memoirofnorthsou00jameiala`) | the OCR texts | Nothing: the *Oriental Navigator* has Madeira and the Canaries and no Lisbon; the 1847 item is the volume of Africa and the Americas. No printed table of the Portuguese coast's winds was read, and the climatology's box stays PROVISIONAL. |
+| Moore, *The New Practical Navigator*, 1799 | the OCR text read for package 39a | His table of latitudes and high water names Oporto, the Rock, Lisbon, Espichel, St Vincent and Cadiz, but its hours' column is lost in the OCR: no row taken. |
 
 ## The unverified list, checked
 

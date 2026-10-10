@@ -107,6 +107,9 @@ ALL_PORTS = [
     "vigo",
     "weymouth",
 ]
+# package 39d, Portugal and Cadiz: the block's five, the list kept in the files' order
+PORTUGAL_PORTS = ["cadiz", "lagos", "lisbon", "oporto", "setubal"]
+ALL_PORTS = sorted(ALL_PORTS + PORTUGAL_PORTS)
 
 
 def test_the_five_ports_are_files_on_one_machinery_placed_from_the_chart():
@@ -260,8 +263,13 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     # Biscay south and Galicia's (package 39c): the Gironde's French, the rest Spain's,
     # at war with Britain since December 1804
     french_ports |= {"royan", "santander", "ferrol", "corunna", "vigo"}
+    # package 39d: Cadiz Spain's, hostile; the Portuguese ports neutral (Portugal at peace
+    # with Britain, not her own)
+    french_ports |= {"cadiz"}
+    neutral_ports = set(PORTUGAL_PORTS) - {"cadiz"}
     assert {p.id: frigate.ports.stance(p) for p in frigate.ports.ports.values()} == {
-        pid: ("hostile" if pid in french_ports else "open") for pid in ALL_PORTS
+        pid: ("hostile" if pid in french_ports else "neutral" if pid in neutral_ports else "open")
+        for pid in ALL_PORTS
     }
     schooner = world_at(OFF_THE_LIZARD, ship=SCHOONER)
     assert schooner.ports.ship_nation == "united-states"
@@ -1365,6 +1373,96 @@ def test_biscay_norths_ports_stand_on_the_blocks_marks_and_on_their_own_position
     assert whole.ports.stance(lorient) == "hostile"  # the frigate, British
     neutral = world_at(GROIX_ROAD, ship=SCHOONER, chart="atlantic-east")
     assert all(neutral.ports.stance(neutral.ports.ports[p]) == "neutral" for p in BISCAY_NORTH)
+
+
+# ---------------------------------------------------------------------------
+# Package 39d: Portugal and Cadiz's ports, and a port's state (spec M6 §26)
+# ---------------------------------------------------------------------------
+
+OFF_CADIZ = {"lat_deg": 36.57, "lon_deg": -6.42}  # the blockaders' station, five miles west
+
+
+def test_portugals_ports_stand_on_the_blocks_marks_and_on_their_own_positions_without_them():
+    """The block's five ports on 35's machinery: on the whole chart their roads are the
+    block's features, on the Channel's chart alone (every port file loaded there) each
+    spot falls back to its own position, the same place; Portugal's four neutral, open
+    to all, and Cadiz Spain's; the datum of each said, Cadiz's from Tofiño's plan."""
+    import yaml
+
+    whole = world_at(OFF_CADIZ, chart="atlantic-east")
+    channel = world_at(OFF_THE_LIZARD)
+    for pid in PORTUGAL_PORTS:
+        port, alone = whole.ports.ports[pid], channel.ports.ports[pid]
+        assert "Tofiño 1789" in port.source
+        assert port.nation == ("spain" if pid == "cadiz" else "portugal")
+        for key in ("outer_road", "anchorage", "mooring", "shore"):
+            a, b = getattr(port, key), getattr(alone, key)
+            assert abs(a.position.lat_deg - b.position.lat_deg) < 1e-4, (pid, key)
+            assert abs(a.position.lon_deg - b.position.lon_deg) < 1e-4, (pid, key)
+            if a.feature_id:
+                assert whole.chart.feature(a.feature_id) is not None, (pid, key)
+                assert whole.chart.region_at(a.position) == "portugal", (pid, key)
+        doc = yaml.safe_load(open(f"data/ports/{pid}.yaml", encoding="utf-8"))
+        assert ("Tofiño" in doc["datum"]) if pid == "cadiz" else doc["datum"] == "unverified"
+    assert whole.ports.nearest()[0].id == "cadiz"
+    lisbon = whole.ports.ports["lisbon"]
+    assert lisbon.outer_road.feature_id == "cascais-road" == lisbon.pilot.station
+    assert lisbon.anchorage.feature_id == "belem-road" and lisbon.anchorage.depth_m > 20.0
+    # Oporto's river is not on the chart above the Foz: a deep ship lies in the road
+    oporto = whole.ports.ports["oporto"]
+    assert oporto.mooring_for(units.feet_to_m(16.0)) is oporto.anchorage
+    for pid in ("oporto", "lisbon", "setubal", "lagos"):
+        assert whole.ports.stance(whole.ports.ports[pid]) == "neutral"  # the frigate, British
+
+
+def test_cadiz_is_blockaded_closed_to_the_blockaders_enemies_and_watched_by_their_ships():
+    """Package 39d (spec M6 §26): Cadiz's file says `state: blockaded` and who keeps the
+    blockade and where; the port is closed to Spain's own ships and her ally's, whose
+    pilot hails his refusal in the blockade's words; to the King's ship it is hostile, as
+    Spain's ports are, and to a neutral the table's; `the port` says the blockade; the
+    world lists it for the world's business to read; a scenario lifts it or lays one."""
+    american = world_at(OFF_CADIZ, ship=SCHOONER, chart="atlantic-east")
+    cadiz = american.ports.ports["cadiz"]
+    assert cadiz.state == "blockaded" and cadiz.blockaded_by == "britain"
+    [listed] = american.ports.blockades()
+    assert listed["port"] == "cadiz" and listed["by"] == "britain"
+    assert listed["station"] is not None and listed["station"].lat_deg == pytest.approx(36.55)
+    assert american.ports.watched_by(cadiz) == "britain"
+    assert american.ports.stance(cadiz) == "neutral"
+    assert "blockaded by the British" in american.readings.words("port")
+    frigate = world_at(OFF_CADIZ, chart="atlantic-east")
+    assert frigate.ports.stance(frigate.ports.ports["cadiz"]) == "hostile"
+    # a Spanish schooner standing in for the road: the pilot hails his refusal
+    spaniard = world_at(
+        OFF_CADIZ, ship=SCHOONER, heading=90.0, speed=4.0, chart="atlantic-east", nation="spain"
+    )
+    assert spaniard.ports.stance(spaniard.ports.ports["cadiz"]) == "closed"
+    spaniard.submit("set plain sail")
+    refused = run_until(spaniard, "port.pilot_refused", 120)
+    assert refused.text.startswith(
+        "The pilot hailed from the boat: Cadiz is blockaded by the British squadron; no "
+        "pilot will take the Spaniards in past their ships."
+    )
+    assert spaniard.ports.pilot is None and refused.data["stance"] == "closed"
+    # the scenario lifts the blockade, or lays one on another port
+    lifted = world_at(
+        OFF_CADIZ,
+        ship=SCHOONER,
+        chart="atlantic-east",
+        nation="spain",
+        ports={
+            "cadiz": {"state": "open"},
+            "lisbon": {"state": "blockaded", "blockade": {"by": "france"}},
+        },
+    )
+    assert lifted.ports.ports["cadiz"].state == "open"
+    assert [b["port"] for b in lifted.ports.blockades()] == ["lisbon"]
+    assert lifted.ports.stance(lifted.ports.ports["cadiz"]) == "open"
+    assert lifted.ports.stance(lifted.ports.ports["lisbon"]) == "neutral"  # Spain is France's ally
+    with pytest.raises(ValueError, match="names its blockaders"):
+        world_at(OFF_CADIZ, chart="atlantic-east", ports={"lisbon": {"state": "blockaded"}})
+    with pytest.raises(ValueError, match="state 'besieged' is not one of open, blockaded"):
+        world_at(OFF_CADIZ, chart="atlantic-east", ports={"lisbon": {"state": "besieged"}})
 
 
 # ---------------------------------------------------------------------------

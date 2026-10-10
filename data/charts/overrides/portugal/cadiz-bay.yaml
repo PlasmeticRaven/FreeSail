@@ -1,0 +1,93 @@
+# The inner bay of Cadiz as Tofiño's plan of 1789 has it (spec M6 §26; C §3.3, §5.2;
+# package 39d, the Portugal and Cadiz block). A period patch, hand-made and rasterised by
+# tools/build_charts.py at levels 2 and 3 (the harbour patch `cadiz-bay` in the tool's
+# recipe).
+#
+# The sheet. Tofiño de San Miguel, 'Plano del Puerto de Cadiz', Atlas Marítimo de España
+# (Madrid, 1789), the copy of the Biblioteca de la Universidad de Sevilla (A 062/039-040),
+# on the Internet Archive as A062039040 (Public Domain Mark), page 24 at full resolution
+# (7,830 by 5,061 pixels) through the Archive's IIIF service, read 2026-10-10; the crops
+# stay in the build's cache and none is committed. The sheet's own notes: "Los numeros de
+# la Sonda son brazas de seis pies de Castilla cada una, y por consiguiente los numeros
+# quebrados son pies, ó sextos de braza. La Sonda está reducida á la baxa mar de mareas
+# vivas, en que haya de diferencia diez pies entre la baxamar y plea-mar" (the soundings
+# in brazas of six Castilian feet, the fractions feet, reduced to low water of spring
+# tides of ten feet's range); A sand, C gravel, L ooze, P stone, F mud. The braza at six
+# pies, the pie a third of the vara of Burgos (0.8359 m): 1.6718 m, the standard tables'
+# figure FROM MEMORY, unverified, as the tool's BRASSE_M is for the French sheets.
+#
+# The datum: low water of spring tides, the sheet's own. Its height above the modern
+# chart's datum (LAT) is taken from Puertos del Estado's REDMAR report for Huelva
+# (GLOB_2_3_3329, the series 1997 to 2017, read 2026-10-10): the observed mean low water
+# of springs (BMVM O) 47 cm above the gauge's zero and the lowest astronomical tide (BMMI)
+# 7 cm above it, so 0.40 m. Cadiz has no REDMAR gauge (its gauge is the IEO's, TICON's
+# record of 1961 to 2012), and Huelva's is put for it because the two tides are one:
+# TICON gives Cadiz M2 1.032 m at 57.1 degrees and S2 0.374 at 83.0, Huelva 1.040 at
+# 57.4 and 0.378 at 84.1 (the transfer JUDGEMENT; the figure VERIFIED for Huelva).
+#
+# The georeference: a similarity fitted by least squares to the six control points
+# below, 3.48 metres a pixel and the sheet turned 54 degrees (the plan is drawn with the
+# bay's mouth to the top); residuals 25 to 251 m. So the patches keep two hundred metres
+# off every shore the sheet and the grid share.
+#
+# What the sheet says against the modern grid (the finding). The inner bay between the
+# isthmus of Cadiz, Puntales, Matagorda and the Trocadero is built over in the modern
+# grid: the free-trade zone on the Cabezuela, the shipyard of Matagorda and Puerto Real
+# and the port's own fills stand as land or as two to six metres of water where Tofiño
+# sounded four to seven brazas and more (the soundings and the grid beside them in
+# `notes`). The patches give 1805's water back: the channel of Puntales, by which every
+# ship goes up to the Carraca and the Trocadero, at its least sounding, and the water
+# either side of it.
+
+region: portugal
+name: cadiz-bay
+sheet: "Tofiño 1789, 'Plano del Puerto de Cadiz', Atlas Marítimo de España (the Universidad de Sevilla's copy, Internet Archive A062039040, page 24), read at full resolution through the Archive's IIIF service"
+source: "Tofiño 1789, Derrotero de las costas de España en el Océano Atlántico, 'Descripción de la Bahía de Cadiz', pp. 111 to 120: the channel of Puntales, the Baxo de Santo Domingo, the Corral, the Caño del Trocadero and the Carraca"
+units: brazas
+datum: "low water of spring tides, the sheet's own note (diez pies entre la baxamar y plea-mar)"
+# BMVM O 47 cm less BMMI 7 cm at Huelva (REDMAR GLOB_2_3_3329): VERIFIED for Huelva, put
+# for Cadiz by the constants' agreement (JUDGEMENT)
+datum_above_chart_datum_m: 0.4
+control_points:
+  - {name: "the lantern of San Sebastián", lat_deg: 36.52838, lon_deg: -6.31589, note: "the sheet's round tower at pixel 3585, 3618; the encyclopaedia's 'Faro de San Sebastián' (read 2026-10-10); residual 136 m"}
+  - {name: "the castle of Santa Catalina of Cadiz (the sheet's K)", lat_deg: 36.53285, lon_deg: -6.30799, note: "pixel 3600, 3365; the encyclopaedia's 'Castillo de Santa Catalina (Cádiz)'; residual 176 m"}
+  - {name: "the Puerta de Tierra", lat_deg: 36.52613, lon_deg: -6.28873, note: "pixel 4005, 3085, the land gate in the walls across the isthmus; the encyclopaedia's 'Puertas de Tierra'; residual 25 m"}
+  - {name: "the castle of Puntales", lat_deg: 36.50860, lon_deg: -6.26145, note: "pixel 4822, 2804; the encyclopaedia's 'Castillo de San Lorenzo del Puntal'; residual 232 m"}
+  - {name: "the castle of Santa Catalina del Puerto", lat_deg: 36.58040, lon_deg: -6.26527, note: "pixel 2980, 1655; the encyclopaedia's 'Castillo de Santa Catalina del Puerto'; residual 251 m"}
+  - {name: "the old castle of Rota (the sheet's B)", lat_deg: 36.61692, lon_deg: -6.35824, note: "pixel 572, 2797; the encyclopaedia's 'Castillo de Luna (Rota)'; residual 225 m"}
+patches:
+  - name: "the channel of Puntales, four brazas and two feet"
+    kind: depth
+    depth: 4.333
+    polygon:
+      - [36.51676, -6.25305]
+      - [36.51397, -6.25054]
+      - [36.50973, -6.25786]
+      - [36.51253, -6.26036]
+    source: "Tofiño 1789, the line of soundings from Matagorda to Puntales: 6, 6 1/6, 6 3/6, 6 2/6, 6 1/6, 5 2/6, 4 3/6, 4 2/6, 4 2/6 brazas on gravel; the Derrotero, p. 116: for Puntales steer for the castle of Matagorda till the Torregorda opens east of Puntales"
+    note: "The least of the channel's soundings, 4 2/6 brazas (7.2 m) at low water springs, 7.6 m below the chart's datum with the 0.4 m correction; a corridor two hundred metres off either castle. The modern grid has 4 to 7 m here and land at its northern end."
+  - name: "the water east of the channel toward the Trocadero, four brazas and a half"
+    kind: depth
+    depth: 4.5
+    polygon:
+      - [36.5133, -6.25021]
+      - [36.50867, -6.245]
+      - [36.50474, -6.25179]
+      - [36.51006, -6.25656]
+    source: "Tofiño 1789, the soundings east of the channel: 4 3/6, 7 2/6, 7 2/6, 6 2/6, 5 3/6, 5 2/6, 5 1/6, 4 3/6 brazas, gravel and sand; 4 ooze, 5 and 7 1/6 by the mouth of the Trocadero"
+    note: "4 3/6 brazas (7.5 m), 7.9 m below the chart's datum; the modern grid has land (the shipyard's fill) over a third of it and 4 to 7 m in the rest."
+  - name: "the Cabezuela de Poniente before the isthmus, a braza and four feet"
+    kind: depth
+    depth: 1.667
+    polygon:
+      - [36.52265, -6.26785]
+      - [36.51758, -6.26119]
+      - [36.51401, -6.26222]
+      - [36.51303, -6.2661]
+      - [36.51843, -6.27147]
+      - [36.52132, -6.27088]
+    source: "Tofiño 1789, 'La Cabezuela de Poniente': 3 3/6, 2 4/6, 2 2/6, 2 3/6, 1 4/6, 2 brazas on sand and gravel; 7 2/6 and 5 3/6 at its northern edge"
+    note: "The shoal's least, 1 4/6 brazas (2.8 m), 3.2 m below the chart's datum; the modern grid has the free-trade zone's fill as land over a quarter of it."
+notes:
+  - "Read from the sheet and set beside the modern grid (metres below the chart's datum, the georeferenced position): the channel of Puntales 6 (10.0 against nought, the Matagorda end), 6 1/6 (10.3 against 7.0), 6 3/6 (11.1 against 6.6), 6 2/6 (11.4 against 6.6), 5 2/6 (9.8 against 6.3), 4 3/6 (8.1 against 5.3), 4 2/6 (8.1 against 4.2); east of it 7 2/6 (12.8 against land), 4 (6.7 against land), 6 3/6 (11.4 against 5.4), 5 3/6 (9.8 against 5.3); the Cabezuela 2 (3.3 against land), 1 4/6 (3.1 against 1.6); before Los Corrales 3 4/6 to 7 5/6 (6.1 to 13.1 against 6.2 to 8.5 where the grid is water, and land at the Cabezuela's end), not patched beyond the Cabezuela."
+  - "Not patched: the shoals of the bay's mouth. The grid holds the Diamante at about 7 m, the Galera at 8.5 and the Fraile at 9.7 below the datum, three to five metres deeper than the Derrotero's least water (13, 11 and 15 feet); but the plan itself sounds them 3 1/6 brazas on the Diamante and 2 1/3 on the Galera (19 and 14 feet), not the Derrotero's figures, and each shoal is 500 to 600 m long, the size of the georeference's error: the features file names them with the Derrotero's least water, and the patch is the lead's to order on a better georeference. The Puercas the grid has drying (2.2 m above the datum), as Tofiño says. The Caño del Trocadero and the Carraca's channel are narrower than the georeference's error."

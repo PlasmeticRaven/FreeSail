@@ -1,0 +1,40 @@
+# FreeSail: the schooner's book for the Portugal passage (data/scenarios/portugal.yaml;
+# package 39d), Oporto to Lisbon. Short, as the brief has it: the points of the passage
+# by the account, the sails trimmed, the land's bearings, the pilot, the anchor.
+
+# Brought up in the road off the bar of Oporto, she weighs on the larboard tack and stands
+# away south-south-west before the northerly, five or six miles off the low coast.
+standing order "out of the road": at brought up, if the distance to 41 9 N 8 42 W is under 1 mile then get under way on the larboard tack and steer SSW
+standing order "away": at under way, if the distance to 41 9 N 8 42 W is under 2 miles then set plain sail; shape a course for 40 40 N 8 55 W
+
+# Down the coast: off Aveiro, off Cape Mondego, and through the passage between the
+# Berlings and Cape Carvoeiro by its middle (Tofiño p. 84: clean, fifteen to thirty-five
+# brazas).
+standing order "off Aveiro": when the reckoning is south of 40 42 N then shape a course for 40 11 N 9 3 W
+standing order "off Mondego": when the reckoning is south of 40 13 N then shape a course for 39 23.4 N 9 27.6 W
+standing order "the Berlings passage": when the reckoning is south of 39 25 N then shape a course for 38 47 N 9 36 W
+
+# The long legs end on a latitude by account, not a distance to the mark: the first run,
+# with a mile's ring about the passage's mark, passed two miles east of it (the account
+# moved three miles at the first sight of Carvoeiro's light) and stood on to the
+# southward; a second, shaping each leg's course again every hour, wore her round at
+# every shaping and set her on the shore of Pederneira (the notes).
+
+# Round the Rock of Lisbon five miles off, then for Cascais, the bar's Great Pass between
+# the Cachopo and the flat of the Bugio, and up the river to the road of Belém.
+standing order "off the Rock": when the reckoning is south of 38 49 N then shape a course for 38 39 N 9 27 W
+standing order "off Cascais": when the distance to 38 39 N 9 27 W is under 1 mile then shorten sail; shape a course for 38 38.4 N 9 21.6 W
+standing order "the Great Pass": when the distance to 38 38.4 N 9 21.6 W is under 0.5 miles then shape a course for 38 39.6 N 9 19.5 W
+standing order "over the bar": when the distance to 38 39.6 N 9 19.5 W is under 0.5 miles then shape a course for 38 40.8 N 9 17.4 W
+standing order "into the river": when the distance to 38 40.8 N 9 17.4 W is under 0.5 miles then shape a course for the road of Belém
+
+# The Lisbon pilot from Cascais, taken at his hail; the anchor by the tower of Belém.
+standing order "the pilot boards": at the pilot's hail, if the distance to the road of Belém is under 15 miles then take the pilot
+standing order "the pilot aboard": at the pilot aboard, if the distance to the road of Belém is under 15 miles then fill away
+standing order "the anchor": when the distance to the road of Belém is under 0.5 miles then come to an anchor
+
+# The ship's routines on the way.
+standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix
+standing order "the lead over the bar": every 10 minutes, if the distance to the road of Belém is under 6 miles then heave the lead

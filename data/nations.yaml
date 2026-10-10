@@ -7,8 +7,10 @@
 # read from this table and the port's own closures (`freesail/world/nations.py`,
 # `Nations.stance`): a port is open to its own nation, hostile to a nation its own is at
 # war with, closed to a nation it names under `closed_to` without war (a decree, a
-# quarantine, a prefect's order), and neutral to the rest. Prizes, convoys and blockades
-# are M7's; the table is theirs to read.
+# quarantine, a prefect's order), and neutral to the rest. A port's blockade is its port
+# file's `state: blockaded` (package 39d: closed to the blockaders' enemies, the table's to
+# the rest; Cadiz). Prizes, convoys and the blockading squadrons are M7's; the table is
+# theirs to read.
 #
 # The wars are given with the date each began and the source the builder has for it. The
 # sources are standard histories read from memory (no page is in docs/references/), and
@@ -137,3 +139,10 @@ ports:
   ferrol: spain
   corunna: spain
   vigo: spain
+  # Portugal and Cadiz (package 39d): Portugal neutral, open to all; Cadiz Spain's, and
+  # blockaded (its port file's `state:`), closed to the blockaders' enemies
+  oporto: portugal
+  lisbon: portugal
+  setubal: portugal
+  lagos: portugal
+  cadiz: spain

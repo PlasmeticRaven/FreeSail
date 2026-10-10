@@ -85,11 +85,19 @@
 # the block's areas below. One box, so the limits are the Channel's and the two blocks'
 # together (from 48.0 N and 1 W, south to 45.9 N and east to 0.9 W). Within the box and no
 # block's area the statement is the open Channel's, as the world's stream is.
-# Package 39c: south to 42.0 N and west to 9.33 W with Biscay south and Galicia, whose
-# areas (the open bay among them, to 47.5 N west of 7 W) answer for all of the box's new
-# water south of 47.5 N; north of it, west of 7 W, the open Channel's statement, as the
-# world's stream there is mid-Channel's (its bounds reach 12 W).
-book_limits: {south: 42.0, north: 51.0, west: -9.33, east: -0.9}
+# Package 39d: the limits are a list of boxes, each block its own (`tide.Directions.boxes`):
+# one box over the Channel and Portugal would have taken in the Western Approaches west of
+# 7 W, where the master had no statement, and Biscay south between. Portugal and Cadiz's
+# box is the block's bounds, every position of it in one of the block's areas below. The
+# open Channel's statement, which has no polygon, is of its own `bounds:` and no farther
+# in the book as in the world (`tide.BookStream.bounds`, package 39d; before, the book's
+# open Channel answered for every position within the limits).
+# Package 39c: Biscay south and Galicia's box is the block's bounds likewise, every position
+# of it in one of its areas below (the open bay of `open-bay-south` the rest).
+book_limits:
+  - {south: 45.9, north: 51.0, west: -7.0, east: -0.9}
+  - {south: 42.0, north: 45.9, west: -9.33, east: -0.9}  # Biscay south and Galicia (package 39c)
+  - {south: 36.4, north: 42.0, west: -10.0, east: -6.0}  # Portugal and Cadiz (package 39d)
 
 areas:
   - id: carrick-road
@@ -527,10 +535,8 @@ areas:
   # form. Tofiño 1789 gives one rate (Santander's ebb, three miles an hour) and two sets
   # (the Sisarga passage's flood from the west, the Ferrol narrows' violence at the
   # equinoxes); Faden 1793 the Gironde's "currents very strong"; every other figure is
-  # JUDGEMENT on the pattern above. The open bay reaches north to 47.5 N west of 7 W, the
-  # water the directions' limits now take in (book_limits) that no area held, so that the
-  # master's statement there is the bay's and not the open Channel's; the recorded
-  # passages' other sail keep east of 7 W and north of 47.5 N.
+  # JUDGEMENT on the pattern above. The open bay is the block's bounds, its box in
+  # `book_limits`; the recorded passages' other sail keep north of 47.5 N.
   - id: gironde-passes
     chart: biscay-south
     name: the passes of the Gironde
@@ -598,7 +604,7 @@ areas:
   - id: open-bay-south
     chart: biscay-south
     name: the bay of Biscay and the coast of Galicia
-    polygon: [[42.00, -9.33], [42.00, -0.90], [45.90, -0.90], [45.90, -7.00], [47.50, -7.00], [47.50, -9.33]]
+    polygon: [[42.00, -9.33], [42.00, -0.90], [45.90, -0.90], [45.90, -9.33]]
     axis_deg: 45
     spring_kn: 0.5
     neap_kn: 0.25
@@ -611,6 +617,110 @@ areas:
       strongest_h: 0.0
       judgement: [set, rates, hour]
       source: "JUDGEMENT throughout: the world's figures rounded"
+  # Package 39d (the Portugal and Cadiz block, spec M6 §26): the bars of the Douro, the
+  # Tagus and the Sado, the river before Lisbon, the bay of Cadiz and the open coast. The
+  # period's book for this coast is Tofiño 1789's Derrotero, which gives one rate (the
+  # ebb before Lisbon "up to seven miles an hour", the flood "not so strong") and no
+  # hour: every rate here is JUDGEMENT but where it says, the neaps half the springs, the
+  # hours JUDGEMENT on the pattern above (a bar or an estuary about -3). The coast's
+  # summer current to the southward is no tide and is not modelled (the Strait's inset is
+  # package 39f's). Far from every recorded passage: nothing of the Channel reads them.
+  - id: douro-bar
+    chart: portugal
+    name: the bar of Oporto
+    polygon: [[41.13, -8.70], [41.13, -8.65], [41.16, -8.65], [41.16, -8.70]]
+    axis_deg: 90
+    spring_kn: 2.0
+    neap_kn: 1.0
+    phase_h: -3.0
+    source: "Tofiño 1789, pp. 78 to 79: the bar's mouth changes after a gale and a pilot of the land is called; Pimentel of Aveiro's, the next bar south: anchor at once when near, for the water runs much; the axis into the river, the rate and the hour JUDGEMENT"
+    book:
+      set: E
+      spring_kn: 2.0
+      neap_kn: 1.0
+      strongest_h: -3.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT throughout: the world's figures rounded (Tofiño gives no rate for the bar of Oporto)"
+  - id: tagus-river
+    chart: portugal
+    name: the Tagus before Lisbon
+    polygon: [[38.66, -9.26], [38.66, -9.08], [38.73, -9.08], [38.73, -9.26]]
+    axis_deg: 80
+    spring_kn: 4.0
+    neap_kn: 2.0
+    phase_h: -3.0
+    source: "Tofiño 1789, p. 88: moor east and west with good anchors and no buoys, for the force of the ebb runs up to seven miles an hour and makes anchors drag; the flood has not so much force; p. 89: entering on the ebb make all the sail possible to overcome the stream; the world's rectilinear stream takes four knots both ways (the ebb's seven its strongest off the city, the flood weaker), JUDGEMENT, the flood up the river from low water to high"
+    book:
+      set: E by N
+      spring_kn: 4.0
+      neap_kn: 2.0
+      strongest_h: -3.0
+      judgement: [set, rates, hour]
+      source: "Tofiño 1789, p. 88, that the ebb runs up to seven miles an hour before Lisbon and the flood less: the book's four knots each way at springs is the world's, JUDGEMENT; the set up the river to the nearest point"
+  - id: tagus-bar
+    chart: portugal
+    name: the bar of Lisbon
+    polygon: [[38.60, -9.42], [38.60, -9.26], [38.66, -9.26], [38.70, -9.30], [38.70, -9.42]]
+    axis_deg: 70
+    spring_kn: 2.5
+    neap_kn: 1.25
+    phase_h: -3.0
+    source: "Tofiño 1789, pp. 86 and 89: the entrance is of a bar and dangerous, take a pilot who knows the eddies of the tides (las revesas de las mareas), the want of which has lost many ships; Pimentel: south of the line of Belém and the King's castle the waters part in different sets and make such eddies that a ship loses her steerage; the axis into the river, the rate and the hour JUDGEMENT"
+    book:
+      set: ENE
+      spring_kn: 2.5
+      neap_kn: 1.25
+      strongest_h: -3.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT throughout but for Tofiño's and Pimentel's word of the eddies over the bar: the world's figures rounded"
+  - id: sado-bar
+    chart: portugal
+    name: the bar of Setúbal
+    polygon: [[38.45, -8.96], [38.45, -8.86], [38.53, -8.86], [38.53, -8.96]]
+    axis_deg: 60
+    spring_kn: 2.0
+    neap_kn: 1.0
+    phase_h: -3.0
+    source: "Tofiño 1789, p. 91, Pimentel: to go out by the same marks, waiting for the flood to be making or the slack; the axis into the river, the rate and the hour JUDGEMENT"
+    book:
+      set: NE by E
+      spring_kn: 2.0
+      neap_kn: 1.0
+      strongest_h: -3.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT throughout: the world's figures rounded"
+  - id: cadiz-bay
+    chart: portugal
+    name: the bay of Cadiz
+    polygon: [[36.47, -6.36], [36.47, -6.18], [36.62, -6.18], [36.62, -6.36]]
+    axis_deg: 115
+    spring_kn: 1.5
+    neap_kn: 0.75
+    phase_h: -3.0
+    source: "Tofiño 1789, p. 119: along the edges from the Fraile to the Cochinos the waters draw strongly into the channels among the shoals on the ebb, and on the flood toward the Diamante near it, to be minded in the boards; the axis into the bay toward Puntales, the rate and the hour JUDGEMENT"
+    book:
+      set: ESE
+      spring_kn: 1.5
+      neap_kn: 0.75
+      strongest_h: -3.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT throughout but for Tofiño's word that the flood draws toward the Diamante and the ebb through the shoals' channels: the world's figures rounded"
+  - id: portuguese-coast
+    chart: portugal
+    name: the coast of Portugal and Andalusia
+    polygon: [[36.40, -10.0], [36.40, -6.0], [42.0, -6.0], [42.0, -10.0]]
+    axis_deg: 0
+    spring_kn: 0.5
+    neap_kn: 0.25
+    phase_h: 0.0
+    source: "judgement: Tofiño's Derrotero gives no stream for the open coast; the tidal streams of an open shelf are weak and turn round the compass (not modelled: the axis the flood's along the coast to the northward); the summer current to the southward is not a tide and is not here"
+    book:
+      set: N
+      spring_kn: 0.5
+      neap_kn: 0.25
+      strongest_h: 0.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT throughout: the world's figures rounded (no statement in Tofiño 1789 for the open coast)"
   - id: mid-channel
     chart: channel-west
     name: the open Channel

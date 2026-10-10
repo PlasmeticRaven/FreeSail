@@ -5,7 +5,9 @@ The table is small on purpose. What the game reads from it now is the **stance**
 port toward a ship (spec M5 §23: open, neutral, closed, hostile), which decides whether
 the pilot comes off and whether she is entered at all (`Nations.stance`), and the words
 of a nation's colours for the lookout's "a stranger, her colours not made out" (package
-36). Prizes, convoys and blockades are milestone 7's; the table is theirs to read.
+36). A blockaded port (package 39d; its file's `state:`) is closed to the blockaders'
+enemies (`Nations.stance`'s `blockaded_by`). Prizes, convoys and the blockading squadrons
+are milestone 7's; the table is theirs to read.
 
 The wars change in play: the news of a war declared or a peace made arrives by the pilot
 or the boat (never a line from nowhere) and moves the table (`declare_war`, `make_peace`),
@@ -98,12 +100,22 @@ class Nations:
         a, b = _key(a), _key(b)
         return any({a, b} == set(pair) for pair in self.allies)
 
-    def stance(self, port_nation: str, ship_nation: str, closed_to: Any = ()) -> str:
+    def stance(
+        self,
+        port_nation: str,
+        ship_nation: str,
+        closed_to: Any = (),
+        blockaded_by: str | None = None,
+    ) -> str:
         """A port's stance toward a ship (spec M5 §23): open to its own nation; hostile to
         a nation its own is at war with; closed to a nation the port, or its nation's
         table entry, closes its ports to without war; neutral to the rest. `closed_to`
-        is the port file's own list."""
+        is the port file's own list. A blockaded port (package 39d; `blockaded_by`, the
+        blockaders' nation) is closed to the blockaders' enemies, its own nation's ships
+        among them, and is the table's to everyone else."""
         port_nation, ship_nation = _key(port_nation), _key(ship_nation)
+        if blockaded_by and self.at_war(blockaded_by, ship_nation):
+            return "closed"
         if port_nation == ship_nation:
             return "open"
         if self.at_war(port_nation, ship_nation):

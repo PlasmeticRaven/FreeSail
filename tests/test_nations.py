@@ -100,9 +100,33 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "ferrol": "spain",
         "corunna": "spain",
         "vigo": "spain",
+        # Portugal and Cadiz (package 39d)
+        "oporto": "portugal",
+        "lisbon": "portugal",
+        "setubal": "portugal",
+        "lagos": "portugal",
+        "cadiz": "spain",
     }
     for pid, path in port_files().items():
         assert load_port(path, chart).nation == table.port_nations[pid]
+
+
+def test_a_blockaded_port_is_closed_to_the_blockaders_enemies_and_the_tables_to_the_rest():
+    """Package 39d (spec M6 §26, Cadiz blockaded): a port's blockade by a nation closes
+    it to every nation at war with the blockaders, the port's own among them, and leaves
+    it the table's to the blockaders and to the rest; a peace made with the blockaders
+    opens it again by the same rule."""
+    table = N.load_nations()  # its own: a peace is made below
+    by = "britain"
+    assert table.stance("spain", "spain", blockaded_by=by) == "closed"  # her own, past the squadron
+    assert table.stance("spain", "france", blockaded_by=by) == "closed"  # Spain's ally
+    assert table.stance("spain", "britain", blockaded_by=by) == "hostile"  # the war, as before
+    assert table.stance("spain", "united-states", blockaded_by=by) == "neutral"
+    assert table.stance("spain", "portugal", blockaded_by=by) == "neutral"
+    assert table.stance("spain", "spain") == "open"  # unblockaded, as before
+    assert table.make_peace("britain", "spain")
+    assert table.stance("spain", "spain", blockaded_by=by) == "open"
+    assert table.stance("spain", "britain", blockaded_by=by) == "neutral"
 
 
 def test_the_news_moves_the_table_and_the_market_reads_it(chart):

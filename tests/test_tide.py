@@ -373,19 +373,17 @@ def test_the_directions_are_looked_up_by_a_position_and_say_nothing_beyond_their
     assert book.area_at(Position(49.3, -5.0)).id == "mid-channel"  # the rest is the Channel
     south, north, west, east = book.limits
     # package 39a: the limits reach east with the Channel east's chart; package 39b: the
-    # directions reach Biscay north, one box over the three; package 39c: south to 42 N
-    # and west to 9.33 W with Biscay south and Galicia
-    assert (south, north, west, east) == (42.0, 51.0, -9.33, -0.9)
+    # directions reach Biscay north, one box over the three (package 39d: the first of the
+    # boxes, a box a block)
+    assert (south, north, west, east) == (45.9, 51.0, -7.0, -0.9)
     assert book.area_at(Position(49.70, -2.06)).id == "alderney-race"
     assert book.area_at(Position(50.49, -2.45)).id == "portland-race"
     assert book.area_at(Position(50.0, -2.5)).id == "mid-channel"
-    for beyond in (Position(41.5, -9.0), Position(49.5, -9.5), Position(51.2, -5.0)):
+    for beyond in (Position(47.0, -8.0), Position(49.5, -7.5), Position(51.2, -5.0)):
         assert book.area_at(beyond) is None
-    # package 39c: the bay south of Biscay north is Biscay south's open water, west of the
-    # Channel's box too (to 47.5 N), and its own waters go before it
+    # package 39c: the bay south of Biscay north is Biscay south's open water, its own
+    # waters before it
     assert book.area_at(Position(45.5, -6.0)).id == "open-bay-south"
-    assert book.area_at(Position(47.0, -8.0)).id == "open-bay-south"
-    assert book.area_at(Position(49.5, -7.5)).id == "mid-channel"
     assert book.area_at(Position(45.60, -1.10)).id == "gironde-passes"
     assert book.area_at(Position(43.47, -3.77)).id == "santander-mouth"
     assert book.area_at(Position(43.36, -8.83)).id == "sisarga-passage"
@@ -470,9 +468,12 @@ def test_the_stream_areas_belong_to_a_chart_and_beyond_them_there_is_no_stream(t
             assert names.index(a.id) < names.index("mid-channel")
     mid = tide.area_at(Position(49.3, -5.0))
     assert mid.id == "mid-channel" and mid.bounds is not None
-    off_lisbon = tide.area_at(Position(38.6, -9.4))
-    assert off_lisbon is T.NO_STREAM and off_lisbon.spring_kn == 0.0
-    state = tide.at(Position(38.6, -9.4), datetime(1805, 6, 12, 12, 0))
+    # package 39d: off Lisbon is the bar of Lisbon's water now; the open ocean west of
+    # Portugal is beyond every area
+    assert tide.area_at(Position(38.6, -9.4)).id == "tagus-bar"
+    far_out = tide.area_at(Position(37.0, -14.0))
+    assert far_out is T.NO_STREAM and far_out.spring_kn == 0.0
+    state = tide.at(Position(37.0, -14.0), datetime(1805, 6, 12, 12, 0))
     assert state.stream_kn == 0.0 and state.area_id == "open-sea"
     assert state.height_m > 0.0  # the height is still the nearest gauge's tide
 
@@ -496,12 +497,15 @@ def test_far_from_every_place_of_his_table_the_master_says_his_tide_may_be_hours
         )
         return make_world(7, "data/ships/frigate-36.yaml", sc)
 
-    far = world_at(38.6, -9.4, "atlantic-east")
+    far = world_at(37.0, -14.0, "atlantic-east")
     words = far.navigation.tide_by_almanac()["words"]
     assert "nearest place in the master's table" in words
-    # package 39b: the nearest place of the table off Lisbon was Brouage, of the Biscay
-    # block's places, 571 miles off (it was Ushant, 621); package 39c: Vigo, 221 miles
-    assert "may differ by hours" in words and "Vigo" in words and "221 miles" in words
+    # package 39b: the nearest place of the table off Lisbon was Brouage, 571 miles off
+    # (it was Ushant, 621); package 39d put Lisbon in the table (Tofiño's 2h), so the far
+    # place is the open sea west of Portugal, Lisbon 252 miles off
+    assert "may differ by hours" in words and "Lisbon" in words and "252 miles" in words
+    near_lisbon = world_at(38.6, -9.4, "atlantic-east").navigation.tide_by_almanac()["words"]
+    assert "Lisbon" in near_lisbon and "may differ by hours" not in near_lisbon
     near = world_at(49.9, -5.2, "atlantic-east")
     assert "may differ by hours" not in near.navigation.tide_by_almanac()["words"]
 
@@ -571,8 +575,10 @@ def test_the_blocks_gauges_are_read_and_held_out_of_the_blend_that_would_move_th
     doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
     # the block's nine, after the Channel east's two (package 39a) under the same key
     held = [g for g in doc["held_gauges"] if 45.9 <= g["lat_deg"] < 48.0]
-    south = [g for g in doc["held_gauges"] if g["lat_deg"] < 45.9]  # package 39c's
-    assert len(doc["held_gauges"]) == 2 + len(held) + len(south)
+    south = [g for g in doc["held_gauges"] if 42.0 <= g["lat_deg"] < 45.9]  # package 39c's
+    # (Portugal and Cadiz's five, package 39d, after them, south of 42 N)
+    north_of_42 = [g for g in doc["held_gauges"] if g["lat_deg"] >= 42.0]
+    assert len(north_of_42) == 2 + len(held) + len(south)
     assert [g["id"] for g in held] == [
         "concarneau",
         "port-tudy",
@@ -639,7 +645,7 @@ def test_biscay_souths_gauges_are_read_and_held_and_the_worlds_tide_there_is_lat
     import yaml
 
     doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
-    south = [g for g in doc["held_gauges"] if g["lat_deg"] < 45.9]
+    south = [g for g in doc["held_gauges"] if 42.0 <= g["lat_deg"] < 45.9]
     assert [g["id"] for g in south] == [
         "le-verdon",
         "arcachon",
@@ -671,10 +677,10 @@ def test_biscay_souths_gauges_are_read_and_held_and_the_worlds_tide_there_is_lat
 
 def test_biscay_souths_stream_areas_are_the_blocks_and_before_the_open_channel(tide):
     """The block's five areas carry `chart: biscay-south` and go before the open
-    Channel's; the open bay holds the block's water and the bay west of 7 W to 47.5 N, so
-    that no position of the directions' widened limits south of 47.5 N reads the Channel's
-    statement; the recorded passages' other sail (east of 7 W, north of 47.5 N) read the
-    streams they read."""
+    Channel's; the block's box of the directions' limits is its bounds (package 39d made
+    the limits a box a block), every position of it in one of its areas, the open bay the
+    rest; west of 7 W north of 45.9 N stays beyond them; the recorded passages' other sail
+    read the streams they read."""
     ids = [a.id for a in tide.areas]
     mine = [
         "gironde-passes",
@@ -687,9 +693,72 @@ def test_biscay_souths_stream_areas_are_the_blocks_and_before_the_open_channel(t
     assert all(ids.index(i) < ids.index("mid-channel") for i in mine)
     assert {a.chart for a in tide.areas if a.id in mine} == {"biscay-south"}
     book = T.load_directions()
-    for lat in (42.1, 43.0, 44.5, 45.95, 47.4):
-        for lon in (-9.3, -8.0, -6.0, -3.0):
+    assert (42.0, 45.9, -9.33, -0.9) in book.boxes
+    for lat in (42.1, 43.0, 44.5, 45.8):
+        for lon in (-9.3, -8.0, -6.0, -3.0, -1.0):
             said = book.area_at(Position(lat, lon))
-            if lat < 45.9 or lon < -7.0:
-                assert said is not None and said.id != "mid-channel", (lat, lon)
+            assert said is not None and said.id != "mid-channel", (lat, lon)
+    assert book.area_at(Position(47.0, -8.0)) is None
     assert tide.area_at(Position(47.8333, -6.0)).id == "mid-channel"  # Harpy's water
+
+
+# ---------------------------------------------------------------------------
+# Package 39d: Portugal and Cadiz's tide (spec M6 §26, the block's item 4)
+# ---------------------------------------------------------------------------
+
+
+def test_portugals_gauges_are_read_and_held_and_the_worlds_tide_there_is_le_conquets(tide):
+    """TICON's five records of the block (Cascais, Lagos, Huelva, Bonanza, Cadiz; none at
+    Leixões, Lisbon or Setúbal) read into `held_gauges:` in the eleven's form, the mean
+    levels REDMAR's where read and judgement or none where not; held, so the world's tide
+    over the block is still the nearest of the eleven alone, far, which is twice the
+    range and an hour and three-quarters late (the finding)."""
+    import yaml
+
+    doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
+    held = {g["id"]: g for g in doc["held_gauges"] if 36.4 <= g["lat_deg"] <= 42.0}
+    assert list(held) == ["cascais", "lagos", "huelva", "bonanza", "cadiz"]
+    assert (held["huelva"]["mean_level_m"], held["bonanza"]["mean_level_m"]) == (1.96, 1.54)
+    assert held["cadiz"]["mean_level_m"] is None  # unverified, not invented
+    for g in held.values():
+        assert 0.9 < g["M2"]["amplitude_m"] < 1.1 and 55.0 < g["M2"]["phase_deg"] < 65.0
+    assert len(tide.gauges) == 11 and not {g.id for g in tide.gauges} & set(held)
+    level, consts, nearest_nm, far = tide.constants_about(Position(38.6917, -9.4167))
+    assert far and nearest_nm > 550.0 and consts["M2"][0] > 2.0  # Le Conquet's
+    # blended, the block's own gauges would give Cascais its own tide and move no Channel
+    # position (every one beyond the reach of them all)
+    with_levels = [g for g in held.values() if g["mean_level_m"] is not None]  # not Cadiz
+    blended = T.Tide({**doc, "gauges": doc["gauges"] + with_levels}, {"areas": []})
+    _, own = blended.constants_at(Position(38.6917, -9.4167))
+    assert own["M2"][0] == pytest.approx(0.996, abs=0.01)
+    _, here = tide.constants_at(FALMOUTH)
+    _, there = blended.constants_at(FALMOUTH)
+    assert here["M2"] == pytest.approx(there["M2"])
+
+
+def test_the_directions_reach_portugal_by_their_own_box_and_the_open_channel_keeps_its_own():
+    """`book_limits` is a box a block (package 39d): Portugal's water has the block's
+    statements (the bars, the river before Lisbon, Cadiz bay, the open coast), the
+    Western Approaches west of 7 W have none (Biscay south has its own box, 39c), and the open
+    Channel's statement answers within its own bounds and no farther."""
+    book = T.load_directions()
+    assert book.boxes[0] == book.limits == (45.9, 51.0, -7.0, -0.9)
+    assert (36.4, 42.0, -10.0, -6.0) in book.boxes
+    for pos, area in (
+        (Position(38.65, -9.33), "tagus-bar"),
+        (Position(38.70, -9.15), "tagus-river"),
+        (Position(41.145, -8.68), "douro-bar"),
+        (Position(36.55, -6.28), "cadiz-bay"),
+        (Position(38.0, -9.5), "portuguese-coast"),
+    ):
+        assert book.area_at(pos).id == area, pos
+    # (package 39c: 44 N 8 W is Biscay south's box now; the bay west of it beyond)
+    for beyond in (Position(44.0, -12.0), Position(49.5, -7.5), Position(37.0, -14.0)):
+        assert book.area_at(beyond) is None, beyond
+    mid = book.by_id("mid-channel")
+    assert mid.polygon is None and mid.bounds == (47.5, 52.0, -12.0, 2.0)
+    assert mid.contains(Position(49.3, -5.0)) and not mid.contains(Position(44.0, -8.0))
+    lisbon = T.Epitome.load("norie").by_name("Lisbon")
+    assert (lisbon.hw_h, lisbon.hw_m) == (2, 0) and lisbon.rise_judgement
+    cadiz = T.Epitome.load("norie").by_name("Cadiz")
+    assert cadiz.spring_rise_ft == 10.0 and not cadiz.rise_judgement
