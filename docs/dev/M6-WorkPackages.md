@@ -16,7 +16,7 @@ tuning notes and a report to the lead at the end.
 | Package | Builder | What | State |
 |---|---|---|---|
 | 38 | Fable | The chart stitched: many regions over the corridor, the queries across edges, the climatology's boxes, the tide's gauges, the recipe form for the blocks | launched 2026-10-09 |
-| 39a to 39f | Opus | The six blocks of the voyage to Madeira and the Strait (39c to 39f briefed 2026-10-10; decision 44) | 39a (channel-mid) merged 2026-10-09, bounds 48.5 N to 51 N and 3 W to 1 W, Morlaix's patch left; 39b (biscay-north) merged 2026-10-10; 39c (biscay-south), 39d (portugal), 39e (madeira and azores, the corridor widened) and 39f (strait) launched together 2026-10-10 after gate 6a's cut, in four worktrees |
+| 39a to 39f | Opus | The six blocks of the voyage to Madeira and the Strait (39c to 39f briefed 2026-10-10; decision 44) | 39a (channel-mid) merged 2026-10-09, bounds 48.5 N to 51 N and 3 W to 1 W, Morlaix's patch left; 39b (biscay-north) merged 2026-10-10; 39c (biscay-south), 39d (portugal), 39e (madeira and azores, the corridor widened) and 39f (strait) launched together 2026-10-10 after gate 6a's cut, in four worktrees; 39d merged first, 2026-10-10 |
 | 40 | Fable | The ship's company and the rules-based captain in three layers; the captain's station; the player's seat | merged 2026-10-09 (the officer's reckoning moved to 40b; the consent brief's revision drafted for the owner, `docs/playtests/drafts/consent-brief-m6-draft.md`, held for 42) |
 | 40b | Opus | The lessons in the primer; the officer's own reckoning (spec M6 §5, truth 80; moved from 40 at the owner's word) | merged 2026-10-09 (an own reckoning carried on past noon, the lead's ruling; chapter 13 stays out of the primer test) |
 | 40c | the lead | The captain's trials: the gate's pinned scenarios of the rules-based captain under weather scripts and world orders; the player's hand on an intent scenario (the captain stands aside until `captain: carry on`) | merged 2026-10-10; gate 6a opened (`docs/gates/gate-m6a.md`); the fast tier on the merged tree 3093 passed, none failed |
@@ -807,6 +807,31 @@ No recorded passage's pin moves (nothing here touches a tick of the world; a pin
 moves is a finding). Not this package's: the wardroom's stations and the pace rule (41);
 the re-asks (the owner's). The fast tier before the
 report and the slow tests of the files touched.
+
+## Package 39d, as merged (2026-10-10, the first of the four)
+
+Everything the brief asked for; the whole slow tier of the truths held every pin. The
+block is 68 written tiles of the 140 that meet its bounds, the 72 dry ones left to the
+corridor by a new recipe key (`skip_dry_tiles`), and GEBCO's land raised by the coast's
+own mean level (`fill_mean_level_m: 2.0`, where the world's Le Conquet figure made the
+unsurveyed estuaries dry): both keys are the pattern for the blocks that follow. Tofiño's
+*Derrotero* of 1789 gives the 139 marks and his plan of Cadiz the one patch (in brazas,
+0.40 m above the chart's datum by Huelva's gauge, judgement at Cadiz); the English
+directions the brief named were not found. Cadiz blockaded is a port's state read by the
+stances: closed to the blockaders' enemies, the pilot refusing in the blockade's words,
+`Ports.blockades()` and `watched_by()` for 6c's world's business; nothing draws the
+squadron or stops a neutral. The book's limits are a list of boxes, one per block. The
+schooner Oporto to Belém sailed once (741 lines, `303bfecbb8096c03`), the bower dragging
+in the ebb at Belém as Tofiño warns.
+
+**The lead's rulings at the merge.** The five Portuguese gauges stay held unblended until
+Biscay south's are in and the cross-Bay blend can be judged whole. The two recipe keys and
+the list form of `book_limits` are kept as the pattern for 39c, 39e and 39f, who resolve
+against this head. The four seam tiles the block shares by name with Biscay south and the
+Strait are `portugal`'s, merged first; the neighbours drop theirs at their merge by the
+seam rule. The marks south of 36.4 N that Tofiño gives (pp. 121 to 128: Sancti Petri to
+Cape Trafalgar) are the Strait's and were left for it. Whether a blockade also closes the
+port to neutrals, as the period's law did, is 6c's or milestone 7's (an open item).
 
 ## Packages 39c to 39f: the last four blocks of the chart line (the same files as 39a and 39b under each block's names; `data/scenarios/<block>.yaml` and `.orders` new per block; `docs/TechnicalSpec-M6.md` §26 as built; `docs/dev/TuningNotes.md`)
 
