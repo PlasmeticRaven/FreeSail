@@ -237,13 +237,16 @@ def test_the_scenario_file_reads_a_chart_beside_a_region_and_a_save_before_it_lo
     assert sf.scenario.chart == "atlantic-east" and sf.scenario.region is None
     assert "on the chart of atlantic-east." in sf.lines()[1]
     w = point_world(chart="atlantic-east", position={"lat_deg": 38.6, "lon_deg": -9.4})
-    assert w.chart.name == "atlantic-east" and w.chart.level_at(w.position) == 1
+    # package 39d: off Lisbon is the Portugal block's region (level 3 in the Tagus's patch)
+    assert w.chart.name == "atlantic-east" and w.chart.region_at(w.position) == "portugal"
+    w = point_world(chart="atlantic-east", position={"lat_deg": 38.6, "lon_deg": -11.0})
+    assert w.chart.level_at(w.position) == 1  # the corridor beyond the block's tiles
     both = point_world(
         chart="atlantic-east", region="channel-west", position={"lat_deg": 49.0, "lon_deg": -6.0}
     )
     assert both.chart.name == "atlantic-east"
-    # package 39a's Channel east and package 39b's Biscay north
-    assert both.chart.regions == ["channel-west", "channel-mid", "biscay-north"]
+    # package 39a's Channel east and package 39b's Biscay north, package 39d's Portugal
+    assert both.chart.regions == ["channel-west", "channel-mid", "biscay-north", "portugal"]
     data = both.save()
     assert data["scenario"]["chart"] == "atlantic-east"
     copy = replay_mod.replay(data, None)

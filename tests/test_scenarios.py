@@ -3,6 +3,7 @@ passage of its block's stretch on the whole chart, read and begun in the fast ti
 runs are measured once and recorded in docs/dev/TuningNotes.md, not pinned (not a gate's).
 
 Package 39a: the Channel east, the frigate from Torbay to Guernsey through the Race.
+Package 39d: Portugal and Cadiz, the schooner from Oporto to Lisbon.
 """
 
 from __future__ import annotations
@@ -47,5 +48,36 @@ def test_the_channel_east_is_a_passage_on_the_whole_chart_from_torbay_to_guernse
     assert chart.region_at(race) == "channel-mid" and chart.depth_at(race) > 30.0
     assert world.tide.area_at(race).id == "alderney-race"
     # the book is read whole, every order accepted by the dialect
+    assert begin(world, sf) >= 10
+    assert not [e for e in world.log if e.kind == "order.rejected"]
+
+
+# Package 39d: Portugal and Cadiz, the schooner from Oporto to Lisbon.
+PORTUGAL = ROOT / "data" / "scenarios" / "portugal.yaml"
+
+
+def test_portugal_is_a_passage_on_the_whole_chart_from_oporto_to_the_road_of_belem():
+    """The scenario names the chart, starts in the road off the bar of Oporto on the
+    block's harbour patch, loads Oporto and Lisbon (Portuguese, neutral to the American)
+    and its own book; the road of Belém is the chart's by name, the bar of Lisbon the
+    block's water with its stream; the book is read whole."""
+    sf = load_scenario(PORTUGAL)
+    sc = sf.scenario
+    assert sc.chart == "atlantic-east" and sf.seed == 7
+    assert sf.standing_orders == ["data/scenarios/portugal.orders"]
+    world = make_scenario_world(sf)
+    chart = world.chart
+    assert "portugal" in chart.regions and chart.region_at(world.position) == "portugal"
+    start = world.position
+    assert chart.level_at(start) == 3  # the oporto-douro harbour patch
+    assert 10.0 < chart.depth_at(start) < 25.0
+    assert list(world.ports.ports) == ["oporto", "lisbon"]
+    assert {world.ports.stance(p) for p in world.ports.ports.values()} == {"neutral"}
+    road = chart.find_feature("the road of Belém")
+    assert road is not None and road.id == "belem-road"
+    _, run_m = bearing_and_distance(start, road.position)
+    assert 145.0 < run_m / 1852.0 < 160.0  # a hundred and fifty miles direct
+    bar = Position(38.655, -9.33)
+    assert chart.depth_at(bar) > 10.0 and world.tide.area_at(bar).id == "tagus-bar"
     assert begin(world, sf) >= 10
     assert not [e for e in world.log if e.kind == "order.rejected"]

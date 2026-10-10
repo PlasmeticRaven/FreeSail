@@ -1,0 +1,135 @@
+# FreeSail: Cadiz and its bay as a port (spec M6 §26; package 39d, the Portugal and Cadiz
+# block), on package 35's machinery (freesail/world/ports.py); the marks are the features
+# file's (data/charts/features/portugal.yaml) and the inner bay the period patch
+# data/charts/overrides/portugal/cadiz-bay.yaml.
+#
+# Sources. Tofiño 1789, Derrotero de las costas de España en el Océano Atlántico,
+# 'Descripción de la Bahía de Cadiz', pp. 111 to 120, the instruction of the King's body
+# of pilots of Cadiz, "employed only in the entering and leaving of the ships of war and
+# merchants of every nation", given to him by the Captain of the Port: the shoals of the
+# mouth (the Olla, the Cochinos, the Puercas, the Freidera, the Fraile, the Diamante, the
+# Galera), the entry beating between the Puercas and the Diamante and the marks for it,
+# the entry with a fair wind on Medina in one with Puerto Real, the anchorage within the
+# shoals in four to seven brazas on ooze, the channel of Puntales, the Trocadero and the
+# Carraca; outside, the road in ten or eleven brazas on ooze; high water at two at new
+# and full moon and the tide rising eleven feet (Castilian); moor with the best anchor to
+# the east or south-east. 'desde el Castillo de S. Sebastian', p. 121: the castle on its
+# reef, a round tower with a great lantern seen three to three and a half leagues on a
+# moonless night. Tofiño 1789, 'Plano del Puerto de Cadiz' (the Cadiz override).
+#
+# The datum: the inner bay (the channel of Puntales, the water toward the Trocadero, the
+# Cabezuela) is patched from Tofiño's plan, its soundings at low water of springs, 0.40 m
+# above the chart's datum (REDMAR's Huelva, the tides the same: the override says how);
+# the rest of the bay is the modern grid's.
+#
+# The state: BLOCKADED (spec M6 §26, "Cadiz blockaded", the owner's line for the chart;
+# package 39d's machinery, `state:` and `blockade:` below). Spain is at war with Britain in
+# June 1805 (data/nations.yaml): to a King's ship the port is hostile, as any Spanish port
+# is; the blockade closes it to the blockaders' enemies, Spain's own ships and France's
+# among them, whom no pilot will take in past the squadron; a neutral is the table's
+# (neutral), the squadron's searching of her 6c's and milestone 7's. The squadron's
+# station and its dates are JUDGEMENT and FROM MEMORY: Orde's squadron lay off Cadiz from
+# the winter of 1804 till Villeneuve's fleet passed in April 1805, and a British squadron
+# watched the port again from the summer of 1805 (Collingwood's in August, before
+# Trafalgar); the day is unverified, and the scenario may lift the blockade (`state: open`).
+#
+# Prices FROM MEMORY or JUDGEMENT, in sterling at the exchange; the trade of the Indies
+# (Cadiz's monopoly broken in 1778, its trade still the greatest of Spain's) under the
+# blockade's want.
+
+id: cadiz
+name: Cadiz
+nation: spain
+source: "Tofiño 1789, Derrotero, 'Descripción de la Bahía de Cadiz', pp. 111 to 120, and the coast from the castle of San Sebastián, pp. 121 to 122; Tofiño 1789, 'Plano del Puerto de Cadiz'"
+datum: "the inner bay: low water of spring tides (Tofiño's plan, its own note), 0.40 m above the chart's datum (REDMAR's Huelva, put for Cadiz); the rest the modern grid's"
+
+state: blockaded
+blockade:
+  by: britain
+  since: "1805 (FROM MEMORY, unverified: Orde's squadron off Cadiz to April 1805, a British squadron again from the summer)"
+  station:
+    name: off Cadiz, the squadron's station west of San Sebastián
+    lat_deg: 36.5500          # judgement: some five miles west of the lantern, outside the shoals
+    lon_deg: -6.4200
+  source: "spec M6 §26 (the chart line: Cadiz blockaded); the squadron's dates and station FROM MEMORY and JUDGEMENT"
+
+outer_road:
+  feature: cadiz-outer-road
+  name: the outer road of Cadiz
+  lat_deg: 36.5700
+  lon_deg: -6.3350
+anchorage:
+  feature: cadiz-bay-anchorage
+  name: the bay of Cadiz within the shoals
+  lat_deg: 36.5480
+  lon_deg: -6.2760
+mooring:
+  feature: puntales-channel
+  name: the channel of Puntales
+  lat_deg: 36.5130
+  lon_deg: -6.2550
+shore:
+  name: the mole of Cadiz by the Puerta del Mar
+  lat_deg: 36.5345
+  lon_deg: -6.2905
+
+pilot:
+  station: cadiz-outer-road
+  cruising_nm: 8                 # judgement: the King's pilots met ships off San Sebastián and Rota
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the King's pilots' falucho
+    under: a lateen sail
+    note: "judgement"
+  names: [Romero, Sánchez, García, Moreno, Fernández, Ruiz, Domínguez, Vela]   # Andalusian names: judgement
+  skill: 0.95                    # the King's body of pilots of Cadiz (Tofiño p. 111)
+  fee_pounds: 5                  # judgement; unverified
+  cast: larboard                 # from within the shoals the head paying off to the westward for the Puercas' channel (judgement)
+  course_out_deg: 300            # out between the Puercas and the Diamante (judgement)
+  words:
+    channel: "Beating in, give the Olla a berth off San Sebastián and bring the castle of Santa Catalina del Puerto by the road of Xerez till the Carmelites' two belfries open, clear of the Cochinos; then board between the Puercas and the Diamante, not opening Medina from Puerto Real on either board till the tower of Santo Domingo shows past the point of San Felipe. With a fair wind keep Medina in one with Puerto Real."
+    marks: "The lantern of San Sebastián on its round tower at the western end of the city; the castle of Santa Catalina on its point across the bay, and the Morro of Xerez behind; the Carmelites' church with its two belfries on the Alameda; Medina on its hill inland and Puerto Real on the shore within."
+    anchorage: "Within the shoals anchor where you please in four to seven brazas, ooze, by your draught, and moor with your best anchor to the east or south-east, the strongest winds. If you cannot get in, anchor outside the shoals in ten or eleven brazas, ooze, with the tower of San Sebastián south-east. For Puntales steer for Matagorda till the Torregorda opens east of Puntales."
+    tide: "It is high water at Cadiz at two in the afternoon at new and full moon, and the tide rises eleven feet, six at the quarters. On the ebb the water draws hard into the channels of the shoals from the Fraile to the Cochinos; on the flood toward the Diamante."
+
+tide:
+  establishment: Cadiz
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 30, origin: spain, note: "the wines of Xerez and El Puerto at their source; from memory"}
+    - {good: salt, price: 7, origin: spain, note: "the salinas of the Isla de León; from memory"}
+    - {good: olive oil, price: 44, origin: spain, note: "from memory"}
+    - {good: sugar, price: 70, origin: spain, note: "the Indies' sugar, dear under the blockade; judgement"}
+    - {good: tobacco, price: 85, origin: spain, note: "judgement"}
+    - {good: cocoa, price: 110, origin: spain, note: "the Caracas cocoa of the Indies' trade; judgement"}
+    - {good: indigo, price: 300, origin: spain, note: "the Indies' trade; judgement"}
+    - {good: oranges, price: 14, origin: spain, season: {12: 0.8, 1: 0.8, 2: 0.8, 6: 1.4, 7: 1.5}, note: "judgement"}
+    - {good: canvas, price: 48, origin: null, note: "scarce under the blockade; judgement"}
+    - {good: hemp, price: 62, origin: null, note: "scarce under the blockade; judgement"}
+    - {good: salt beef, price: 80, origin: null, note: "the fleet's victualling; judgement"}
+    - {good: coal, price: 10, origin: britain, note: "judgement"}
+
+dockyard:
+  kind: yard                     # the King's arsenal of the Carraca
+  items:
+    - {item: topmast, hours: 8, pounds: 46, note: "the arsenal of the Carraca sells to a neutral at a price: judgement, as Brest's"}
+    - {item: topgallant_mast, hours: 4, pounds: 14}
+    - {item: yard, hours: 6, pounds: 28}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 23}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.1, pounds_per_ton: 0.12}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.07}
+
+crew_pool:
+  # judgement: the matrícula takes the coast's seamen for the fleet
+  able: {hands: 4, pounds: 2, delay_h: 24}
+  ordinary: {hands: 8, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 16, pounds: 1, delay_h: 12}
+
+closed_to: []

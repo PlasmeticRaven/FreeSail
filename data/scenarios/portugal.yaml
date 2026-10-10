@@ -1,0 +1,82 @@
+# FreeSail: the Portugal and Cadiz block's passage (spec M6 §26; package 39d). A free
+# passage, not a gate's: the American topsail schooner, a neutral, from the road off the bar
+# of Oporto down the coast of Portugal before the summer's northerly, through the passage
+# between the Berlings and Cape Carvoeiro, round the Rock of Lisbon, over the bar of
+# Lisbon by the Great Pass and up the Tagus to the road of Belém, where she anchors for the
+# health office. The block's water on the whole chart (`chart: atlantic-east`), its marks
+# (data/charts/features/portugal.yaml), its ports (Oporto and Lisbon, on package 35's
+# machinery) and its streams (the coast, the bar of Lisbon and the river,
+# data/tides/streams.yaml). Given to either driver with --scenario:
+#     py -m freesail.ui.console --scenario data/scenarios/portugal.yaml
+# and printed whole by
+#     py tools/day_log.py data/scenarios/portugal.yaml --hours 30 --reckoning
+#
+# The passage as the book beside this file sails it (portugal.orders): she lies at anchor
+# in the road off the bar of Oporto at six in the morning of 12 June 1805 (Tofiño 1789,
+# p. 78: in bad weather the port is not to be sought; she has loaded her wine and lies
+# outside for a wind); she weighs and runs south-south-west before a northerly, five
+# leagues off the low coast of Aveiro (Tofiño p. 80: clean, ten to twelve brazas half a
+# league off, hard to know for want of marks), off Cape Mondego, and through the
+# passage between the Berlings and Cape Carvoeiro (p. 84: five miles and a half wide and
+# clean, fit for squadrons); round the Rock of Lisbon five miles off, past Cascais, where
+# the pilots of the bar live, and the Lisbon pilot is taken at his hail; in by the Great
+# Pass between the Cachopo and the flat of the Bugio (pp. 86 to 88) and up to the road of
+# Belém, where she comes to an anchor (p. 88: fifteen or eighteen brazas, every ship to
+# wait for the health office). The weather is pinned, the northerly of the Portuguese
+# summer at fifteen knots backing a little and easing by the second evening (Tofiño's
+# Derrotero gives no table of the winds; the climatology's box for the coast is
+# PROVISIONAL and the scenario does not read it), so that the passage is the same on every
+# machine. Sailed once at seed 7 for the package's notes (docs/dev/TuningNotes.md,
+# package 39d); not a gate's and not pinned.
+
+name: Portugal, the schooner from Oporto to Lisbon
+seed: 7
+start: 1805-06-12T06:00
+position: {lat_deg: 41.1500, lon_deg: -8.7000}   # the road off the bar of Oporto (Tofiño 1789 p. 78)
+chart: atlantic-east
+nation: united-states
+ship:
+  file: data/ships/topsail-schooner.yaml
+  heading_deg: 0
+  glass: true
+  instrument: octant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.9}
+
+papers:
+  chart: {year: 1804}
+  epitome: norie                  # the better table, which has Lisbon (Tofiño's hour; data/tides/establishments.yaml)
+  almanac: 1805
+
+cargo:
+  purse_pounds: 500
+
+ports: [oporto, lisbon]
+
+weather:
+  wind:
+    - {at: 1805-06-12T04:00, from_deg: 0, knots: 15, air_mass: neutral}
+    - {at: 1805-06-12T18:00, from_deg: 350, knots: 16}
+    - {at: 1805-06-13T06:00, from_deg: 345, knots: 13}
+    - {at: 1805-06-13T18:00, from_deg: 340, knots: 11}
+  background:
+    {hpa: 1020, gradient_hpa_per_100km: 0.5, high_toward_deg: 290}
+  systems:
+    - name: the high of the Western Islands
+      kind: high
+      radius_km: 1200
+      track:
+        - {at: 1805-06-11T12:00, x_km: -900, y_km: 200, hpa: 1027}
+        - {at: 1805-06-14T12:00, x_km: -850, y_km: 150, hpa: 1026}
+  sky: {sky: clear, weather: fine, visibility: the horizon}
+  sea: true
+
+standing_orders:
+  - data/scenarios/portugal.orders
+
+orders:
+  - let go the best bower
