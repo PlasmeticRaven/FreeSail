@@ -19,8 +19,11 @@ server = ["fastapi>=0.110", "uvicorn[standard]>=0.29"]
 # MCP server (its version 2, where the server class is MCPServer, once FastMCP), and httpx
 # for the local runner (and for the server's tests); and gguf, llama.cpp's reader of a
 # model file's header (ReaderField.contents is in 0.16 and not in 0.10), for
-# tools/context_budget.py (package 28d).
-agents = ["mcp>=2.2,<3", "httpx>=0.27", "gguf>=0.16"]
+# tools/context_budget.py (package 28d); the Anthropic SDK for the API door (package 42;
+# its 1.x, streaming with the final message taken whole, and the thinking-binding
+# controls) and keyring, through which the door reads its key from the platform's
+# credential store.
+agents = ["mcp>=2.2,<3", "httpx>=0.27", "gguf>=0.16", "anthropic>=1.13,<2", "keyring>=25"]
 
 [build-system]
 requires = ["setuptools>=68"]

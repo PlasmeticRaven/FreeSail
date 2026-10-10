@@ -4910,3 +4910,112 @@ def test_truth_80_an_officers_own_reckoning_from_the_slate_agrees_with_the_maste
     careless, _ = _the_officers_own_noon(with_the_tide=False)
     other = [e for e in careless.log if e.kind == "reckoning.own_noon"][0]
     assert other.data["from_master_nm"] > own.data["from_master_nm"] + 0.5
+
+
+# ---------------------------------------------------------------------------
+# Truths 85 (its second half) and 86 (spec M6 §16; package 42). 85: a game saved with
+# three stations seated replays from its journal on a build whose sampling differs, to
+# the same log (the stations' acts are its inputs, `core.acts`). 86: the API door's test
+# server receives no key in any body, and the journal, the transcript and the save hold
+# none (`agents.api`, against `tests/messages_api.py`, a local server in the Messages API's
+# shape; no network).
+# ---------------------------------------------------------------------------
+
+
+def test_truth_85_a_game_with_three_stations_replays_on_a_build_whose_sampling_differs(
+    tmp_path, monkeypatch
+):
+    """Spec M6 §16, truth 85, its second half: "A game saved with three stations seated
+    ... replays from its journal on a build whose sampling differs, to the same log." The
+    captain's, the officer's and the watcher's stations, fakes in lockstep, an hour of
+    play; the save stamped as another build's; that build samples each station at every
+    other turn of its interval. Replayed by the stations' acts (the load's road), the log
+    is the one that was played, digest for digest, each journal the same; by the
+    transcript, as before this package, it is another. Loaded from its checkpoint, the
+    three are at their stations."""
+    import json
+
+    from test_replay import OTHER_BUILD, _restamp, three_stations
+
+    from freesail.agents import harness as harness_mod
+    from freesail.api.session import ship_factory
+    from freesail.core import replay
+
+    world = three_stations()
+    with_checkpoint = replay.save_to_file(world, tmp_path / "kept.json")
+    loaded, how = replay.load(with_checkpoint, ship_factory)
+    assert how == "checkpoint" and len(loaded.agents) == 3
+    path = replay.save_to_file(world, tmp_path / "game.json", checkpoint=False)
+    _restamp(path, OTHER_BUILD)
+    before = harness_mod.Harness._policy_due
+
+    def sparser(self, new):
+        p = self.policy
+        if p.every_s and self.agent.stationed_tick is not None:
+            since = self.world.clock.tick - self.agent.stationed_tick
+            if since > 0 and since % p.every_s == 0 and since % (2 * p.every_s):
+                return None
+        return before(self, new)
+
+    monkeypatch.setattr(harness_mod.Harness, "_policy_due", sparser)
+    data = json.loads(path.read_text())
+    copy, report = replay.load_report(path, ship_factory)
+    assert report.road == replay.BY_ACTS
+    assert copy.log.digest() == world.log.digest()
+    assert len(copy.agents) == 3
+    for name, journal in world.agent_journals.items():
+        assert copy.agent_journals[name].save() == journal.save()
+    other = replay.replay(data, ship_factory, road=replay.BY_TRANSCRIPT)
+    assert other.log.digest() != world.log.digest()
+
+
+def test_truth_86_the_api_doors_server_receives_no_key_in_any_body_and_the_game_keeps_none(
+    tmp_path, monkeypatch
+):
+    """Spec M6 §16, truth 86: "The API door's test server receives no key in any body, and
+    the journal, the transcript and the save hold none." The door seats a model whose
+    consent is on record at the watcher's station of the browser game, through the local
+    test server; it keeps watch for a glass, writes in its journal, and stands down. The key
+    is in every request's header and in no request's body; the journal, the transcript,
+    the save, the consent records and the door's own words hold none of it."""
+    pytest.importorskip("anthropic")
+    pytest.importorskip("keyring")
+    pytest.importorskip("fastapi")
+    import json
+
+    from messages_api import MODEL, Game, MessagesServer, fake_store, finished, run_door
+
+    from freesail.agents import consent
+
+    fake_store(monkeypatch)
+    key = "sk" + "-ant-" + "api03-" + "Hk2mVq9W" * 6
+    game = Game(tmp_path)
+    consent.Record(MODEL, "t", "2026-10-10", consent.YES, answer="Yes.").write(game.records)
+    replies = [
+        {"content": [{"type": "text", "text": f"A quiet start; no {key[:6]} here."}]},
+        {
+            "content": [
+                {"type": "tool_use", "name": "journal", "input": {"note": "Kept the glass."}},
+                {"type": "tool_use", "name": "stand_down", "input": {"note": "All well."}},
+            ]
+        },
+    ]
+    with MessagesServer(key, replies) as srv:
+        got = run_door(game, ["--model", MODEL, "--base-url", srv.url], {"FREESAIL_API_KEY": key})
+        game.wait_for(game.floor_is_the_games(0))
+        game.driver.tick(1800)  # a glass
+        assert finished(got) == 3
+        requests = list(srv.requests)
+    assert len([r for r in requests if r["method"] == "POST"]) == 2
+    assert all(r["headers"].get("x-api-key") == key for r in requests)
+    assert not any(key in r["body"] for r in requests)
+    h = game.harness
+    assert h.agent.released and "stood down" in h.agent.released_reason
+    assert key not in json.dumps(h.transcript)
+    assert key not in json.dumps(game.world.agent_journals["watcher"].save())
+    assert key not in json.dumps(game.world.save())
+    kept = [p for p in tmp_path.rglob("*") if p.is_file()]
+    assert any(p.suffix == ".json" for p in kept)  # the stand-down's save
+    for p in kept:
+        assert key.encode() not in p.read_bytes(), p
+    assert key not in got["out"].getvalue()

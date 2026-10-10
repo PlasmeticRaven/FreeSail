@@ -149,7 +149,13 @@ TURNS_WAIT_MAX_S = 120.0
 POLL_RECHECK_S = 0.25
 
 # The tools that run out of turn: they read and change nothing in the game (`tools.py`).
-READ_ONLY_TOOLS: tuple[str, ...] = ("read_log", "readings", "state", "library")
+READ_ONLY_TOOLS: tuple[str, ...] = (
+    "read_log",
+    "readings",
+    "state",
+    "library",
+    *tools.PICTURE_TOOLS,  # the chart and the ship's view as pictures (package 42)
+)
 
 # ...and with them, out of turn, `shelve`, which changes only what the model is shown, and
 # `journal`, which changes nothing in the game (package 31c; playtest 11's finding 5: the
@@ -160,11 +166,20 @@ ASIDE_TOOLS: tuple[str, ...] = (*READ_ONLY_TOOLS, "shelve", "journal")
 DOORS: dict[str, tuple[str, str]] = {
     "mcp": ("the MCP bridge (freesail.agents.mcp_server)", "the MCP bridge"),
     "runner": ("the local runner (freesail.agents.local)", "the local runner"),
+    "api": ("the API door (freesail.agents.api)", "the API door"),
 }
 
 # The tools of the consent conversation at each door: `answer`, as everywhere, and over
 # MCP `opt_out` too, since the chat's text never reaches the game (package 28).
-CONSENT_TOOLS_AT = {"mcp": ("answer", "opt_out"), "runner": consent.CONSENT_TOOLS}
+CONSENT_TOOLS_AT = {
+    "mcp": ("answer", "opt_out"),
+    "runner": consent.CONSENT_TOOLS,
+    "api": consent.CONSENT_TOOLS,
+}
+
+# The doors with a terminal of their own, where the owner answers what the model writes in
+# the consent conversation and has his word after the answer (the runner's `owner>`).
+TERMINAL_DOORS = ("runner", "api")
 
 # The stations a door may ask for, each by its factory `(policy, world=...)`: the watcher,
 # the officer of the watch (package 37), which the doors name `officer`, and the captain
@@ -460,7 +475,7 @@ class Desk:
             tells=seat.door == "mcp",
             # the developer's turn after the answer, at the door's terminal (the runner's
             # owner> prompt); over MCP the chat is the owner's, and the result says so
-            owner_after=seat.door == "runner",
+            owner_after=seat.door in TERMINAL_DOORS,
             # the fitness drill after a yes, for a station that asks it (package 37), unless
             # one passed on record is carried (the question put again after an opt-out)
             drill=_drills(seat.station, seat.world) and not drill_carried,
@@ -907,6 +922,21 @@ class Desk:
                 self._seat(name, key)
             return str(tools.library(self.world(), name, topic or "contents", section, find))
 
+    def picture(self, name: str, picture_id: str, key: str | None = None) -> Any:
+        """`GET /api/agents/<station>/picture/<id>?key=K`: a picture a tool of the
+        station's made (package 42, item 4), as the painter holds it, for the door that
+        shows it; wants the seating's key, as every read for a held station does. 404 when
+        it is not held (never made, or dropped for newer ones)."""
+        from freesail.agents import pictures
+
+        with self.lock:
+            self._seat(name, key)
+            painter = pictures.painter_of(self.world())
+        pic = painter.get(str(picture_id)) if painter is not None else None
+        if pic is None:
+            raise DeskError(404, f"The game holds no picture '{picture_id}'.")
+        return pic
+
     # -- what the drivers and the viewer show ------------------------------------------
 
     def holding(self) -> str | None:
@@ -1261,6 +1291,21 @@ class GameClient:
         params = {"topic": topic, "section": section, "find": find, "key": self.key}
         answer = self._request("GET", path, params=params)
         return str(answer.get("text", ""))
+
+    def picture(self, picture_id: str) -> tuple[str, bytes] | None:
+        """A picture the game holds for this seating (package 42): its media type and its
+        bytes; None when the game holds it no more."""
+        import httpx
+
+        path = f"/api/agents/{self.name}/picture/{picture_id}"
+        try:
+            r = self.http.request("GET", f"{self.base}{path}", params={"key": self.key})
+        except httpx.HTTPError:
+            return None
+        if r.status_code != 200:
+            return None
+        media = str(r.headers.get("content-type") or "image/png").split(";")[0].strip()
+        return media, bytes(r.content)
 
     def reset(self) -> None:
         """Forget the seating (package 37g, item 8): the game answered that it holds no

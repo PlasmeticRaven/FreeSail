@@ -752,9 +752,11 @@ class Harness:
     def tool_names(self) -> tuple[str, ...]:
         """The tools this harness runs, in the table's order: all of `tools.TOOLS`, or
         the allow-list when one is set."""
+        # the picture tools at a door that carries an image (package 42)
+        names = tools.tool_names(self.door in tools.PICTURE_DOORS)
         if self.allowed_tools is None:
-            return tools.tool_names()
-        return tuple(n for n in tools.tool_names() if n in self.allowed_tools)
+            return names
+        return tuple(n for n in names if n in self.allowed_tools)
 
     # -- start -------------------------------------------------------------------------
 
@@ -1561,9 +1563,15 @@ class Harness:
 
     def _take_reply(self, reply: Reply) -> None:
         world = self.world
-        self.transcript.append(
-            {"tick": world.clock.tick, "after_orders": len(world.journal), "reply": reply.to_dict()}
-        )
+        entry = {
+            "tick": world.clock.tick,
+            "after_orders": len(world.journal),
+            "reply": reply.to_dict(),
+        }
+        played = getattr(self.model, "given", None)
+        if isinstance(self.model, Playback) and played and played.get("shown"):
+            entry["shown"] = [dict(n) for n in played["shown"]]  # the record's own note (42)
+        self.transcript.append(entry)
         self.turns.append(Turn(MODEL, reply))
         # 1. the token, before anything else reads the reply
         for piece in reply.pieces():
@@ -1746,6 +1754,16 @@ class Harness:
             self._nudge_for_result = None
             return result
         result = tools.call(self.world, self.station.name, c.name, c.args)
+        if (
+            c.name in tools.PICTURE_TOOLS
+            and isinstance(result, dict)
+            and isinstance(result.get("picture"), dict)
+            and self.transcript
+            and "reply" in self.transcript[-1]
+        ):
+            # a picture shown (package 42, item 4): a note of it, with its size and the
+            # angle asked, is kept with the reply that asked it; the picture is not
+            self.transcript[-1].setdefault("shown", []).append(dict(result["picture"]))
         found = tools.book_of(c.name, c.args, result) if c.name in tools.BOOK_TOOLS else None
         if found is None:
             return result
@@ -2948,7 +2966,7 @@ class Harness:
         relieved = was != identity
         a.relieved = was if relieved else ""
         self.model_name = identity
-        self.door = by if by in ("mcp", "runner", "repl", "") else self.door
+        self.door = by if by in ("mcp", "runner", "api", "repl", "") else self.door
         through = door_words(by)
         a.seatings += 1
         a.state = STATIONED
@@ -3471,6 +3489,8 @@ class Playback(Transcript):
     transcripts of packages 27 and 28, each taken at its own sample) is given as soon as
     its tick is reached, which is where it was taken. `None` while nothing is due."""
 
+    given: dict[str, Any] | None = None  # the last entry given (package 42)
+
     def __init__(self, world: World, entries: list[dict[str, Any]]):
         super().__init__([Reply.from_dict(e["reply"]) for e in entries if "reply" in e])
         self.world = world
@@ -3493,6 +3513,7 @@ class Playback(Transcript):
             return None
         self.at += 1
         self.calls += 1
+        self.given = e  # the entry given, whose note of a picture shown is kept (42)
         return Reply.from_dict(e["reply"])
 
     def next_act(self, inside_tick: int | None = None) -> dict[str, Any] | None:
