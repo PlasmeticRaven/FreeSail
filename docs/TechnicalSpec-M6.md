@@ -1098,6 +1098,8 @@ comparison by `ci.yml`'s manual run); a plain `steer` through the wind (the owne
 3, package 37m); the pumps and the well, the carpenter with something to say (M5 I6 item 9: with 40's
 people if the owner rules it); the datum offsets at three ports (item 3); the GEBCO fill
 swept once (item 16, in 38's checks); the hints and phrasings 37l leaves.
+- **The roach of the square sails** (the owner, 2026-10-10, on the aquatint of the Nimble cutter in `docs/references/images/`): the foot of a square topsail was cut with a deep roach, and the viewer's sails show none; the roach should be a variable of the sail model and drawn, for the vessel library (M8) or the viewer's next pass.
+
 
 ## 31. The owner's rulings on the draft (2026-10-09; decision 39)
 
