@@ -82,7 +82,7 @@ def run_until(world, kind, minutes=240):
 
 # the port files: the Channel's five, the Channel east's eight (package 39a) and Biscay
 # north's five (package 39b)
-ALL_PORTS = [
+_CHANNEL_AND_BISCAY_PORTS = [
     "alderney",
     "brest",
     "dartmouth",
@@ -102,6 +102,9 @@ ALL_PORTS = [
     "torbay",
     "weymouth",
 ]
+# package 39f: the Strait's five, in their own list (the blocks' lists merge as lines)
+STRAIT_PORTS = ["algeciras", "ceuta", "gibraltar", "tangier", "tarifa"]
+ALL_PORTS = sorted([*_CHANNEL_AND_BISCAY_PORTS, *STRAIT_PORTS])
 
 
 def test_the_five_ports_are_files_on_one_machinery_placed_from_the_chart():
@@ -252,9 +255,12 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     french_ports = {"brest", "roscoff", "st-malo", "morlaix"}
     # Biscay north's five (package 39b): hostile throughout to a King's ship
     french_ports |= {"la-rochelle", "le-palais", "lorient", "paimboeuf", "rochefort"}
-    assert {p.id: frigate.ports.stance(p) for p in frigate.ports.ports.values()} == {
-        pid: ("hostile" if pid in french_ports else "open") for pid in ALL_PORTS
-    }
+    # the Strait's (package 39f): the Spanish shore and Ceuta hostile, Gibraltar the King's,
+    # Tangier the Emperor of Morocco's, at peace with all and neutral to her
+    hostile = french_ports | {"algeciras", "ceuta", "tarifa"}
+    stances = {pid: ("hostile" if pid in hostile else "open") for pid in ALL_PORTS}
+    stances["tangier"] = "neutral"
+    assert {p.id: frigate.ports.stance(p) for p in frigate.ports.ports.values()} == stances
     schooner = world_at(OFF_THE_LIZARD, ship=SCHOONER)
     assert schooner.ports.ship_nation == "united-states"
     assert {p.id: schooner.ports.stance(p) for p in schooner.ports.ports.values()} == {
@@ -1357,3 +1363,57 @@ def test_biscay_norths_ports_stand_on_the_blocks_marks_and_on_their_own_position
     assert whole.ports.stance(lorient) == "hostile"  # the frigate, British
     neutral = world_at(GROIX_ROAD, ship=SCHOONER, chart="atlantic-east")
     assert all(neutral.ports.stance(neutral.ports.ports[p]) == "neutral" for p in BISCAY_NORTH)
+
+
+# ---------------------------------------------------------------------------
+# Package 39f: the Strait's ports (spec M6 §26, block 6)
+# ---------------------------------------------------------------------------
+
+OFF_EUROPA = {"lat_deg": 36.100, "lon_deg": -5.370}
+
+
+def test_the_straits_ports_stand_on_the_blocks_marks_and_the_stances_of_three_nations():
+    """The block's five ports on 35's machinery: on the whole chart their roads are the
+    block's features; on the Channel's chart alone (the gate 5b passages load every port
+    file) each spot falls back to its own position, the same place. Gibraltar the King's,
+    open to a King's ship and hostile to a Spaniard; Algeciras, Tarifa and Ceuta Spain's,
+    hostile to her and open to a neutral; Tangier the Emperor of Morocco's, at peace with
+    all and neutral to every flag. The datums said: the bay's patch for Gibraltar and
+    Algeciras, unverified for the rest."""
+    import yaml
+
+    whole = world_at(OFF_EUROPA, chart="atlantic-east")
+    channel = world_at(OFF_THE_LIZARD)
+    for pid in STRAIT_PORTS:
+        port, alone = whole.ports.ports[pid], channel.ports.ports[pid]
+        assert "Tofiño 1787" in port.source or "Purdy 1826" in port.source
+        for key in ("outer_road", "anchorage", "mooring", "shore"):
+            a, b = getattr(port, key), getattr(alone, key)
+            assert abs(a.position.lat_deg - b.position.lat_deg) < 1e-4, (pid, key)
+            assert abs(a.position.lon_deg - b.position.lon_deg) < 1e-4, (pid, key)
+            if a.feature_id:
+                assert whole.chart.feature(a.feature_id) is not None, (pid, key)
+                assert channel.chart.feature(a.feature_id) is None
+        assert whole.chart.region_at(port.anchorage.position) == "strait"
+        doc = yaml.safe_load(open(f"data/ports/{pid}.yaml", encoding="utf-8"))
+        if pid in ("gibraltar", "algeciras"):
+            assert "Tofiño" in doc["datum"] and "JUDGEMENT" in doc["datum"]
+        else:
+            assert doc["datum"] == "unverified"
+    gib = whole.ports.ports["gibraltar"]
+    assert gib.nation == "britain" and gib.anchorage.feature_id == "gibraltar-road"
+    assert whole.ports.nearest()[0].id == "gibraltar"
+    stances = {pid: whole.ports.stance(whole.ports.ports[pid]) for pid in STRAIT_PORTS}
+    assert stances == {
+        "algeciras": "hostile",
+        "ceuta": "hostile",
+        "gibraltar": "open",
+        "tangier": "neutral",
+        "tarifa": "hostile",
+    }
+    neutral = world_at(OFF_EUROPA, ship=SCHOONER, chart="atlantic-east")
+    assert {neutral.ports.stance(neutral.ports.ports[p]) for p in STRAIT_PORTS} == {"neutral"}
+    spaniard = world_at(OFF_EUROPA, ship=SCHOONER, chart="atlantic-east", nation="spain")
+    assert spaniard.ports.stance(spaniard.ports.ports["gibraltar"]) == "hostile"
+    assert spaniard.ports.stance(spaniard.ports.ports["ceuta"]) == "open"
+    assert spaniard.ports.stance(spaniard.ports.ports["tangier"]) == "neutral"

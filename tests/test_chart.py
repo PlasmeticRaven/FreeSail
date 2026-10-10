@@ -869,7 +869,7 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     manifest has not is refused in words that list both."""
     # package 39a: the Channel east beside the Channel west, in the order the voyage
     # sails them; package 39b: Biscay north after them
-    regions = ["channel-west", MID, "biscay-north"]
+    regions = ["channel-west", MID, "biscay-north", "strait"]  # package 39f: the Strait
     assert manifest["charts"][WHOLE]["regions"] == regions
     assert manifest["charts"][WHOLE]["corridor"] == CORRIDOR
     assert whole.region == whole.name == WHOLE and whole.regions == regions
@@ -884,17 +884,25 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     # the features of every region, indexed together, and every region's coast
     mid = load_chart(MID)
     biscay = load_chart("biscay-north")
+    strait = load_chart("strait")  # package 39f
     assert whole.features.keys() == (
-        chart.features.keys() | mid.features.keys() | biscay.features.keys()
+        chart.features.keys()
+        | mid.features.keys()
+        | biscay.features.keys()
+        | strait.features.keys()
     )
     assert all(whole.region_of[fid] == "channel-west" for fid in chart.features)
     assert all(whole.region_of[fid] == MID for fid in mid.features)
     assert all(whole.region_of[fid] == "biscay-north" for fid in biscay.features)
+    assert all(whole.region_of[fid] == "strait" for fid in strait.features)
     assert whole.find_feature("the Lizard") is chart.find_feature("the Lizard") or (
         whole.find_feature("the Lizard").id == chart.find_feature("the Lizard").id
     )
     assert len(whole.coast_lines()) == (
-        len(chart.coast_lines()) + len(mid.coast_lines()) + len(biscay.coast_lines())
+        len(chart.coast_lines())
+        + len(mid.coast_lines())
+        + len(biscay.coast_lines())
+        + len(strait.coast_lines())
     )
     assert len(chart.coast_lines()) > 0 and len(biscay.coast_lines()) > 0
     # the one-region chart as before: its own levels and bounds, no corridor
@@ -1448,3 +1456,118 @@ def test_the_depths_in_biscay_norths_roads_and_the_period_patch_at_aix():
     index = json.loads((CHARTS / "features" / "channel-west.index.json").read_text())
     indexed = {fid for ids in index["cells"].values() for fid in ids}
     assert {"la-vieille", "raz-passage", "tevennec-light", "morlaix"} <= indexed
+
+
+# ---------------------------------------------------------------------------
+# Package 39f: the Strait (spec M6 §26, block 6)
+# ---------------------------------------------------------------------------
+
+STRAIT = "strait"
+
+
+def test_the_strait_is_a_region_built_to_its_bounds_with_its_patch_and_its_checks(manifest, capsys):
+    """The block's recipe, built and committed to its bounds exactly, abutting `portugal`
+    (package 39d) at 36.4 N, which no manifest of this package holds: the fifteen level-2
+    tiles that meet the bounds, the four harbour groups' level-3 tiles, the coast, the
+    features; under the region's size; the one override, the water about the Green Island
+    from Tofiño's plan of 1786, with its unit (the braza of two Castilian varas) and its
+    datum stated; the checks pass."""
+    tool = build_tool()
+    entry = manifest["regions"][STRAIT]
+    assert entry["bounds"] == {"south": 35.5, "north": 36.4, "west": -6.5, "east": -5.0}
+    assert entry["bounds"] == tool.REGIONS[STRAIT]["bounds"] and entry["fill_to_chart_datum"]
+    assert STRAIT in manifest["charts"][WHOLE]["regions"]
+    b = entry["bounds"]
+    every = {
+        tool.tile_name(*t) for t in tool.tiles_over(2, b["south"], b["north"], b["west"], b["east"])
+    }
+    assert {t["name"] for t in entry["tiles"]["2"]} == every and len(every) == 15
+    others = {k: v for k, v in manifest["regions"].items() if k != STRAIT}
+    for spec in others.values():
+        assert not {t["name"] for t in spec["tiles"].get("2") or []} & every
+    total = 0
+    for level, tiles in entry["tiles"].items():
+        for t in tiles:
+            path = CHARTS / "tiles" / str(level) / f"{t['name']}.npz"
+            assert path.exists(), path
+            total += path.stat().st_size
+    total += (CHARTS / entry["coast"]).stat().st_size + (CHARTS / entry["features"]).stat().st_size
+    assert total < REGION_BUDGET_BYTES, f"{total / 1e6:.1f} MB"
+    assert set(entry["harbours"]) == {"gibraltar-algeciras", "tarifa", "ceuta", "tangier"}
+    [bay] = entry["overrides"]
+    assert bay["file"] == "overrides/strait/gibraltar-algeciras.yaml"
+    assert bay["units"] == "brazas" and bay["datum_above_chart_datum_m"] == 0.3
+    assert bay["patches"] == 3 and "Tofiño 1786" in bay["sheet"]
+    assert tool.UNIT_M["brazas"] == pytest.approx(2 * 0.8359, abs=1e-3)
+    assert tool.main(["--check", STRAIT]) == 0
+    out = capsys.readouterr().out
+    for words in (
+        "licences: emodnet_dtm_2024, gebco_2025 (allowed)",
+        "ids unique across the manifest's regions: yes",
+        "harbour patches with their datum stated: 1 of 1",
+        "the fetch box covers the tiles whole: yes",
+        "passes its checks",
+    ):
+        assert words in out, words
+
+
+def test_the_strait_has_no_light_in_1805_and_its_land_is_raised_by_day():
+    """1805 sees no light between Cape Trafalgar and Ceuta: every light of the Strait is
+    later (Tarifa's, Europa's of 1841, the Almina's of 1855, Trafalgar's of 1860,
+    Spartel's of 1864, Carnero's of 1874), dated so; by night off Tarifa in 1805 the
+    lookout raises no light, in 1870 Tarifa's and the Almina's. By day in the middle of
+    the Strait both shores are in sight, the Rock and Apes' Hill among them."""
+    whole = load_chart(WHOLE)
+    lights = [f for f in whole.features.values() if f.kind == "light"]
+    mine = [f for f in lights if whole.region_of[f.id] == STRAIT]
+    assert len(mine) == 6 and not [f.id for f in mine if f.lit_in(1805)]
+    for fid, year in (
+        ("europa-light", 1841),
+        ("almina-light", 1855),
+        ("trafalgar-light", 1860),
+        ("spartel-light", 1864),
+        ("carnero-light", 1874),
+    ):
+        assert not whole.feature(fid).lit_in(year - 1) and whole.feature(fid).lit_in(year), fid
+    eye = 10.0
+    mid_strait = Position(35.96, -5.55)
+    assert whole.region_at(mid_strait) == STRAIT
+    assert whole.in_sight(mid_strait, eye, None, "night", datetime(1805, 6, 12, 23, 30)) == []
+    later = {
+        s.feature.id
+        for s in whole.in_sight(mid_strait, eye, None, "night", datetime(1870, 6, 12, 23, 30))
+    }
+    assert {"tarifa-light", "almina-light"} <= later
+    day = {
+        s.feature.id
+        for s in whole.in_sight(mid_strait, eye, None, "day", datetime(1805, 6, 12, 12))
+    }
+    assert {"gibraltar-rock", "apes-hill"} <= day
+    assert {"tarifa", "punta-leona"} & day
+
+
+def test_the_depths_in_the_straits_roads_its_dangers_and_the_green_islands_patch():
+    """The roads in the pilot's water: Gibraltar road off the Old Mole, Tangier's and
+    Ceuta's in Tofiño's brazas; the Laja of Conil where Tofiño laid it, a shoal of five
+    metres in the grid; the Cabezos and the Pearl, which the grid does not resolve, kept
+    where Tofiño's theodolites put them as dangers with their heads; the Green Island off
+    Algeciras an island again in the water of 1786, where the modern port's fill stands."""
+    whole = load_chart(WHOLE)
+    for fid, low, high in (
+        ("gibraltar-road", 5.0, 30.0),
+        ("tangier-road", 6.0, 25.0),
+        ("ceuta-road", 6.0, 30.0),
+        ("algeciras-road", 10.0, 45.0),
+    ):
+        f = whole.feature(fid)
+        assert low < whole.depth_at(f.position) < high, fid
+    laja = whole.feature("laja-de-conil")
+    assert whole.depth_at(laja.position) < 8.0 and laja.kind == "ledge"
+    for fid in ("cabezos", "la-perla", "aceitera"):
+        f = whole.feature(fid)
+        assert f.kind in ("rock", "ledge") and f.dries_m is not None and f.dries_m < 0.5, fid
+    green = whole.feature("isla-verde").position
+    assert whole.elevation_at(green) > 5.0  # the isle, land
+    inside = Position(36.1275, -5.4395)  # between the isle and the town, the sheet's 2 brazas
+    assert whole.depth_at(inside) == pytest.approx(2 * 1.6718 + 0.3, abs=0.2)
+    assert whole.region_at(inside) == STRAIT and whole.level_at(inside) == 3
