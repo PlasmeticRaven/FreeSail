@@ -24,6 +24,7 @@ tuning notes and a report to the lead at the end.
 | 41 | Fable | The wardroom: several doors, the pace rule, the deck's conversation, the master's and the lookout's stations, the stand-by on several conditions | brief to write |
 | 42 | Opus | The API door and its security pass; the transcript-driven replay (the consent revision moved to 42a) | brief to write |
 | 43 | Fable | The crewed promotion, a model captain of another ship, the far-detail guard, the director's seat hook | brief to write |
+| 37p | Opus | The yards and the helm by the wind, and the ship in a gale: three levels of bracing, the helm's mark the highest sail set, storm canvas, the recovery from aback; every passage re-pinned once | brief written 2026-10-10, for the owner's approval; before gate 6a's runs |
 | 43b | Opus | The lugger and the smack; the world's business | brief to write |
 | 44 | Opus | The regatta harness and the parity tests | brief to write |
 
@@ -453,3 +454,108 @@ stand aside, said in the log, until `captain: carry on`; a world order does not;
 player's seat under him is given the deck by his book's own words. Pinned; the tuning
 notes' section; a short gate document `docs/gates/gate-m6a.md` opened with the owner's
 runs.
+
+## Package 37p: the yards and the helm by the wind, and the ship in a gale (`freesail/evolutions/trim.py` for the yards' stagger by level; `freesail/orders/verbs.py`, `grammar.py` and `data/vocabulary.yaml` for the bracing orders; `freesail/physics/integrate.py` for the helm in full and by, the lift as its cue and the recovery from aback; `freesail/evolutions/scripts.py` for `shorten sail`'s headsails and storm canvas, heaving to without way, boxing off; `data/standing_orders/starter.orders` and `data/captains/*.yaml` for the gale's book lines; the primer's chapters 2, 4, 9 and 11; `docs/TechnicalSpec-M5.md` §33 an item; `docs/dev/TuningNotes.md`; `tests/test_trim.py`, `test_physics.py` or their kin, `test_captain_trials.py`, `test_known_truths.py` re-pinned once)
+
+Opus, from the lead's rules below; the gale trials of package 40c are the measure (decision
+42's conversation of 2026-10-10 is the ground: the owner's reading of Luce against the
+helm's fault). Run before gate 6a's runs, so that the owner can judge whether its changes
+want a re-cut of the gate or a version on the same gate. Every recorded passage will move,
+since the trim of every ship moves: re-pinned once, at the end, with the reasons.
+
+**The sources, held.** Luce 1884 *Text-Book of Seamanship*, "Working to windward", p. 414
+(the quartermaster's words: "Nothing off!", "Very well thus!", "No higher!", "Keep her a
+good full and by! or simply Full and by! meaning close by the wind with the sails full", a
+small helm) and the footnote on p. 418 ("The upper yards should be braced in more than the
+lower, first, because the larger sail having greater curvature than the smaller must have
+its yard braced up to a sharper angle, that the plane of both may have the same angle with
+the keel; second, because the upper portion of the sail being attached to the yard
+approaches nearer to a plane than the lower part which bellies out, hence the upper part
+need not be so sharp; and thirdly, the lighter yards and braces require a greater angle for
+their support. Further, the upper yards being in, when the main royal is just lifting all
+the other sails are a 'clean full and by', which makes it a good sail to steer by"), with
+Fincham's 19¼° for the main yard beside it. Luce 1866 *Seamanship*: ch. XXIV, the footnote
+on conning ("As the leech of the mainsail reaches farthest to windward, it will be the
+first to lift in coming to the wind"); ch. XXV, wind baffling (coming to against the helm,
+boxing off, chapelling, taken aback: with headway the helm a-lee, "haul up the mainsail
+and spanker, and square the after yards; the moment she gets sternboard, shift the helm,
+and she will fall off briskly"); ch. XXVI, heaving to; ch. XXVII, reefing; ch. XXIII,
+taking in sail in a gale; ch. XXVIII, storms. Fincham 1843 §94 to §96 (the sails "so
+trimmed as just to touch at the same time", the after yards commonly sharper than the
+fore, the head yards less sharp with a sea on the weather bow) and his table of angles
+(p. 42). Steel 1794 vol. II §25 (the sails 40° with the keel close-hauled, better 30 in
+great ships) and its FULL-AND-BY ("neither too nigh the direction nor to deviate to
+leeward"); Lever 1808 (the yards sharp up, the weather leeches hauled forward by the
+bowlines, "so suited with sail as nearly to steer herself ... with a small helm"). **Said
+in the spec**: the steering mark by the royal is Luce 1884's wording; its reasons and
+Fincham's "touch together" are the period's, and the game takes the rule as 1805's on
+them.
+
+1. **Three levels of bracing.** (a) `brace sharp up` as it is: every yard as sharp as its
+   rigging allows, for the evolutions and for pointing. (b) `trim sails` becomes the
+   period's trim and the default the books use: each level of yards braced to the wind
+   with the level above it braced in more than the level below (the courses' yards
+   sharpest, the topsail yards in by a step, the topgallant and royal yards by another),
+   the after yards' stagger kept as it is (`AFTER_YARDS_SHARPER_DEG`), the steps as
+   constants with Luce's three reasons as their source and the figures judgement, tuned
+   once so that with the ship close-hauled under all plain sail the highest sail set lifts
+   first and the rest stand "a clean full" (the test). (c) The yards by hand, in the deck's
+   words: `brace the fore yards in a point`, `brace the main yards up half a point`, `brace
+   the yards to four points` (from the keel, the weather yardarms forward), `square the
+   fore yards`, `brace the mizzen yards about`; a mast's yards or all; points and halves,
+   never degrees at the prompt (the log may say the angle in brackets as the helm's lines
+   do). Given, the yards stay as given until the next trim or brace: in a fluky wind the
+   captain sets them and lets them take the wind as they may, and the log says what shivers
+   or fills. The forms in the primer's chapter 4 and the forms table.
+2. **The helm in full and by.** The helmsman's mark is the highest sail set: he keeps her
+   so that it is just lifting and the rest full (Luce's "clean full and by"); after any
+   change of sail (a sail taken in, reefed, set) the mark is the new highest sail and the
+   angle is found again from it, within a minute. The lift of the lower sails (the
+   mainsail's weather leech first, Luce 1866) is the warning that she is too near: the helm
+   bears away itself, with a small helm, and the log says "kept her away" once; the line
+   "her sails lifting ... keep her away, or she will be taken aback" stays as the warning
+   to a captain steering a course by compass, where the helm does not act. Under reefed
+   topsails with the light sails in, the mark is the topsail and the angle wider: she is
+   never brought up to the old angle. The quartermaster's words `nothing off`, `no higher`
+   and `very well thus` as helm orders, if they fall out of the work cheaply (they are
+   Luce's; optional).
+3. **Storm canvas.** `shorten sail` takes in the headsails as the wind rises (the jib
+   first, before it blows out of the bolt-ropes: the sail's own rating is the rule), and
+   sets the storm staysails that the ship files already carry in the sail room (the fore
+   storm staysail; the mizzen's) when the wind is over the storm-sail line, so that she
+   keeps steerage way and a sail to lie to under; the order `set the storm staysails` for
+   the captain, and the gale lines of the starter book and the captains' "hove to for
+   weather" books saying it (close-reefed topsails, the storm staysails, lying to under
+   the main staysail or the close-reefed main topsail as Luce ch. XXVI has it). A ship with
+   nothing set at all in a gale is the fault the trials found; after this package the log
+   never says "no sail is set" with the wind over thirty knots unless the captain ordered
+   it so.
+4. **Heaving to without way, and the recovery from aback.** `heave to` must complete with
+   the way she has: with sternway or none, the yards are braced for lying to as Luce has
+   it and she lies to, drifting, with the log saying so, rather than the evolution waiting
+   for a way that never comes. Taken aback with no way (the trials' "her sails aback; she
+   had no way on to lose", once a minute for an hour), she pays off: the wind on the backed
+   sails and the helm shifted with the sternway bring her head off (`integrate.py`, the
+   aback state yawing to leeward and gathering sternway until the sails fill), and the
+   order `box her off` (Luce ch. XXV, boxing off) does it by the script that already
+   exists for box-hauling where the helm's own paying off is too slow; the helm in full and
+   by orders it itself after two minutes aback, and the books have the line. The measure:
+   in the gale trials she is never aback longer than a glass, and the frigate's drift
+   lying to under storm canvas is a knot to a knot and a half through the water (truth 28,
+   a night's drift hove to) and not four knots over the ground.
+5. **Re-measured once**: the six recorded passages, the gate's day, the two intent
+   fixtures and the five trials, re-pinned at the end with the old figure beside each and
+   the reason in the tuning notes (the trim moves every tick's drive; where a passage's
+   outcome changes, say what changed in play and not only the digest). The pace floors
+   not re-run under load.
+6. **The notes and the spec**: §33 an item (the trim by level with its sources, the helm's
+   mark, the gale); the primer's chapters 2 (the mark the helmsman steers by), 4 (the
+   three levels of bracing and the forms), 9 (the gale: storm canvas, lying to, boxing
+   off) and 11 (the starter book's gale lines); the tuning notes' section with the
+   constants and their sources, the trials before and after, and the suite.
+
+Not this package's: a gale's damage beyond what the sails' ratings already do; the hull's
+behaviour in a sea beyond truth 28's drift; the lugger's lugs (43b). Tuned once and
+cheaply: the trim's steps and the storm line are set from the sources and the trials, not
+iterated for a prettier passage. The fast tier before the report, and the whole slow tier
+once at the end, since every pin moves.
