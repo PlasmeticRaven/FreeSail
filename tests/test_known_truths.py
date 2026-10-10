@@ -2962,7 +2962,8 @@ GATE_5B_SAIL_SIGHTED_TICK = 55500  # "Sail ho! A sail right ahead", two leagues 
 GATE_5B_PILOT_HAIL_TICK = 57120  # the cutter hails within four cables (57480)
 GATE_5B_PILOT_ABOARD_TICK = 57180  # the pilot aboard, a minute after (57540)
 GATE_5B_LINES = 732  # package 37p (734 on the merged tree, 746 before the merge)
-GATE_5B_DIGEST = "750b3c658d6973c3"  # package 37p (9a0c4168d6987405 before)
+# decision 45, the pilot's news: 750b3c658d6973c3 before; package 37p (9a0c4168d6987405 before)
+GATE_5B_DIGEST = "20e87b7f9096f304"
 # The schooner, package 37e (old beside new): the landfall 43920 → 44400, the Beast, the
 # Lizard and its lights at one look, the account a cable and a half out after the
 # bearing; the outer road 56502 → 56517; the anchor off the town 57615 → 58210 in six
@@ -3013,7 +3014,8 @@ GATE_5B_SCHOONER_PILOT_ABOARD_TICK = 56940  # aboard off the outer road (37h; 56
 GATE_5B_SCHOONER_ANCHORED_TICK = 57257  # off the town, the best bower let go (57255 before 37p)
 GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58224  # brought up (58213 before package 37p)
 GATE_5B_SCHOONER_LINES = 762  # package 37p (761 before)
-GATE_5B_SCHOONER_DIGEST = "70018ada5004a81e"  # package 37p (d6031efa9808a2b1 before)
+# decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
+GATE_5B_SCHOONER_DIGEST = "2c930a75e94a175f"
 GATE_5B_THICK_LANDFALL_TICK = 53820  # 54420 before package 37j
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
@@ -4074,7 +4076,8 @@ GATE_5C_CRUISE_WEARS_AT_LEAST = 8  # wore ship on the station, and once for the 
 GATE_5C_CRUISE_LINES = 2177  # package 37p (2083 since package 37m)
 # the judgement a sentence of its own after a shaped course's line (the lead, after 37m;
 # 348b07dd901580a7 at package 37m, 15e7f10b2ca8eb9a on the merged tree before it)
-GATE_5C_CRUISE_DIGEST = "f603c2724a58fef1"  # package 37p (24428443ec6992f9 before)
+# decision 45, the pilot's news: f603c2724a58fef1 before; package 37p (24428443ec6992f9 before)
+GATE_5C_CRUISE_DIGEST = "2bba9b084d3e88a3"
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E
@@ -4179,7 +4182,8 @@ GATE_5C_MERCHANT_TIN_SOLD_TICK = 125110  # the boat alongside from the quay (125
 # not said again) where it was refused as a tack; 2999 → 2998 lines
 # (docs/dev/TuningNotes.md, package 37m).
 GATE_5C_MERCHANT_LINES = 3015  # package 37p (2998 since package 37m)
-GATE_5C_MERCHANT_DIGEST = "59ed46c3625c766d"  # package 37p (54713e8e579fd527 before)
+# decision 45, the pilot's news: 59ed46c3625c766d before; package 37p (54713e8e579fd527 before)
+GATE_5C_MERCHANT_DIGEST = "c5b94f5b43a10a48"
 
 
 def _people(world) -> list[dict]:
@@ -4584,7 +4588,8 @@ GATE_6A_INTENT_SOLD_TICK = 119640  # 47 tons at £270; the purse £13,045 (12018
 GATE_6A_INTENT_LINES = 2019  # package 37p (2083 before)
 # measured on the merged tree: the judgement a sentence of its own after a shaped course's
 # line, as the cruise (4b5a6f997d80eb52 on the package's branch, every tick the same)
-GATE_6A_INTENT_DIGEST = "71b1cddbd0e4ec9f"  # package 37p (09afd9c2697c7c33 before)
+# decision 45, the pilot's news: 71b1cddbd0e4ec9f before; package 37p (09afd9c2697c7c33 before)
+GATE_6A_INTENT_DIGEST = "bbb8a8e5405f9511"
 
 
 @pytest.fixture(scope="module")
@@ -4743,7 +4748,8 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 13  # his 7, the harness's
 # the merge of 37p with 41 and 42 (2026-10-10): his "I have the command." to an empty
 # quarterdeck carries its place and its hearers (none) in its data, as every say does now
 # (the owner's ruling of 2026-10-10); aa42746f61de91d1 at 37p, a2cd045b9bcc93f8 before it
-GATE_6A_FAKE_CAPTAIN_DIGEST = "b00ac08c3f63e84c"
+# decision 45, the pilot's news: b00ac08c3f63e84c before
+GATE_6A_FAKE_CAPTAIN_DIGEST = "9793dab8a6f4d4ee"
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):

@@ -166,7 +166,8 @@ TRIAL_TRADE_STRANGER_STATES = [
 ]
 TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [34292, 41307]
 TRIAL_TRADE_STRANGER_LINES = 1252  # package 37p (1193 before)
-TRIAL_TRADE_STRANGER_DIGEST = "0efa38e1d5d2f172"  # package 37p (a04a80a960eabc53 before)
+# decision 45, the pilot's news: 0efa38e1d5d2f172 before; package 37p (a04a80a960eabc53 before)
+TRIAL_TRADE_STRANGER_DIGEST = "ee34f4a9db0a5c8c"
 
 
 @pytest.fixture(scope="module")
@@ -206,7 +207,8 @@ TRIAL_TRADE_THICK_STATES = [
 ]
 TRIAL_TRADE_THICK_ANCHORED_TICK = 17688
 TRIAL_TRADE_THICK_LINES = 553  # package 37p (539 before)
-TRIAL_TRADE_THICK_DIGEST = "50901cf162ea95aa"  # package 37p (10fee882c789666e before)
+# decision 45, the pilot's news: 50901cf162ea95aa before; package 37p (10fee882c789666e before)
+TRIAL_TRADE_THICK_DIGEST = "03c66821e0c356b3"
 
 
 @pytest.fixture(scope="module")

@@ -4274,3 +4274,16 @@ The cutter, American, at anchor in the road under the Isles of Bayona at 06:00 o
 On the final tree, merged with the branch head after package 39e's Madeira and Western Islands joined it: `python3 -m ruff check .` and `python3 -m ruff format --check .` clean; `python3 tools/build_charts.py --check biscay-south` passes its checks ("tiles another region lists: 12 kept"). The fast tier (`python3 -m pytest -n 4 -q -p no:cacheprovider`, 279 slow tests left out): 3194 passed and one failed, the same pace floor at the merchant passage's start (325 ticks a second against 500), under load, not run again. The slow tier of the truths, once and whole: 99 passed, 8 expected failures, one failed, the pace on the gate's day with its region (488 ticks a second against 500), under load; every digest pin held.
 
 Before, on the tree merged with package 39d's Portugal alone: `python3 -m ruff check .` and `python3 -m ruff format --check .` clean; `python3 tools/build_charts.py --check biscay-south` passes its checks (above). The fast tier (`python3 -m pytest -n 4 -q -p no:cacheprovider`, 279 slow tests left out): 3184 passed and one failed, `test_the_pace_at_the_merchant_passages_start_with_the_dozen_ships_holds_truth_51s_floor` (199 ticks a second against the floor of 500), a pace floor under the load of the other blocks' builds and suites on the build machine (a load average of 10 to 17), not run again. The slow tier of the truths, once and whole (`python3 -m pytest tests/test_known_truths.py --slow -n 4 -q -p no:cacheprovider`): 96 passed, 8 expected failures, and 4 failed, all pace floors under the same load (the passage 157, truth 51's frigate 111, the day under systems 114, the gate's day with its region 116 ticks a second against 500); every digest pin of the recorded passages held, so nothing of the Channel or of Biscay north moved. Before the merge the fast tier had run 3173 passed and three failed: two the nearest-coast timing and a pace floor under load, and `test_reckoning.py`'s open water, which lay within the directions' widened limits and was moved west to 45.5 N, 12 W (mended).
+
+### The pilot's news and eight pins (the lead, 2026-10-10, decision 45)
+
+The Strait block's Morocco joined the pilot's news ("... Denmark and Morocco at peace
+with all") and moved the digest of every passage that takes a pilot. The owner ruled that
+the news names only the nations at war with Britain and what the news lately changed
+(`Nations.wars_words`): the line lost its "at peace with all" clause once, and the eight
+digests moved once for it, every line count the same: `GATE_5B_DIGEST`, `_SCHOONER_`,
+`GATE_5C_CRUISE_`, `_MERCHANT_` (truth 77 with it), `GATE_6A_INTENT_`,
+`_FAKE_CAPTAIN_` (truth 78), `TRIAL_TRADE_STRANGER_` and `TRIAL_TRADE_THICK_`; the old
+figure beside each. Measured once on the branch head after 39c, 39d, 39e and the widened
+corridor, and confirmed by a second run of the two files whole. The table may now grow
+with the chart without moving them.
