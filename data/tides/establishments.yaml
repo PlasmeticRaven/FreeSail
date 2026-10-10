@@ -91,6 +91,15 @@ tables:
       - {name: the Isle of Ré, lat_deg: 46.204, lon_deg: -1.367, hw_h: 3, hw_m: 45, spring_rise_ft: 15, note: "Faden pp. 81 and 93: in the Pertuis d'Antioche high tide from half an hour after 3 to 4 o'clock; the tide rises 15 feet in the roads of Ré"}
       - {name: La Rochelle, lat_deg: 46.159, lon_deg: -1.152, hw_h: 3, hw_m: 45, spring_rise_ft: 15, note: "Faden p. 81: the tides from half an hour after 3 to 4 o'clock at new and full moon; the tide rises 15 feet at La Rochelle"}
       - {name: Brouage, lat_deg: 45.862, lon_deg: -1.068, hw_h: 4, hw_m: 0, spring_rise_ft: 15, note: "Faden pp. 83 and 93: at Brouage high water at 4 o'clock and the currents very strong; the rise the coast of Poitou's, which his table holds Brouage in"}
+      # package 39f, the Strait: Tofiño 1787's hours (his survey's own observations, the
+      # period's best for these waters) and Purdy 1826's where Tofiño gives none (p. 8, read
+      # from the page image); Tofiño's feet are the pie de Burgos (0.279 m), turned to
+      # English feet. Purdy's figures are largely Tofiño's in English: JUDGEMENT that a ship
+      # of war's table of 1805 had them.
+      - {name: Cape Trafalgar, lat_deg: 36.183, lon_deg: -6.035, hw_h: 5, hw_m: 15, spring_rise_ft: 18, rise_judgement: true, note: "Purdy 1826, p. 8: from Cadiz the flood sets towards Cape Trafalgar, where it is high water at full and change at about V 1/4; no rise given: the world's spring range there, which is Le Conquet's while the Strait's gauges are held, JUDGEMENT"}
+      - {name: Tarifa, lat_deg: 36.001, lon_deg: -5.609, hw_h: 0, hw_m: 0, spring_rise_ft: 7, note: "Tofiño 1787, 'Marea', p. 9: high water at Tarifa on the day of conjunction about 12 at noon, rising 7 to 8 feet of Burgos at the greatest (7 English); Purdy 1826, p. 8: about XI 1/4"}
+      - {name: Gibraltar, lat_deg: 36.130, lon_deg: -5.360, hw_h: 1, hw_m: 0, spring_rise_ft: 5, note: "Tofiño 1787, 'Mareas', pp. 21 to 22: in the bay high water at one in the afternoon at conjunction and opposition, the greatest tides 5 to 6 feet of Burgos (5 English); Purdy 1826, p. 8: XII 1/4, rising about 5 feet"}
+      - {name: Tangier, lat_deg: 35.788, lon_deg: -5.800, hw_h: 0, hw_m: 0, spring_rise_ft: 5, note: "Purdy 1826, p. 8: near Tangier high water at 12; p. 6: at full and change the tide in the bay rises 5 feet"}
   moore:
     title: "Moore's table of high water by the moon's bearing (Moore 1799), a point to every three quarters of an hour"
     ports:
@@ -112,6 +121,11 @@ tables:
       - {name: Weymouth, lat_deg: 50.608, lon_deg: -2.448, hw_h: 6, hw_m: 0, bearing: W, spring_rise_ft: 6, rise_judgement: true, note: "Moore 1799's W group; unverified against the page image"}
       - {name: Cape Barfleur, lat_deg: 49.696, lon_deg: -1.266, hw_h: 6, hw_m: 45, bearing: W by N, spring_rise_ft: 16, rise_judgement: true, note: "Moore 1799's W by N group (with the Lizard, the Land's End, Falmouth, Penryn); unverified against the page image"}
       - {name: the Casquets, lat_deg: 49.722, lon_deg: -2.377, hw_h: 8, hw_m: 15, bearing: NW by W, spring_rise_ft: 18, rise_judgement: true, note: "Moore 1799's NW by W group (with the Isle of Man, the east end of the Isle of Wight, Caen, St Helen's); unverified against the page image; White 1835 p. 134 has 6h 45m at the Casquets: a poorer table's error"}
+      # package 39f, the Strait: Gibraltar in Moore 1799's South group (with the Isle of
+      # Alderney, Southampton, Beachy and the Thames' sands), as the OCR of his table by the
+      # moon's bearing reads it; UNVERIFIED against the page image (the first group the
+      # least certain of the OCR's, as 39a found); the rise Purdy 1826's 5 feet (p. 8)
+      - {name: Gibraltar, lat_deg: 36.130, lon_deg: -5.360, hw_h: 0, hw_m: 0, bearing: S, spring_rise_ft: 5, note: "Moore 1799's S group (12 o'clock); unverified against the page image; the rise Purdy 1826's (p. 8)"}
 
 # Moore's rule of 48 minutes a day: the moon's southing comes later each day by this
 # (Moore 1799, the catechism; Bowditch 1802 uses 49). The true mean is 50 minutes and

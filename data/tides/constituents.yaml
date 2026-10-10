@@ -307,3 +307,61 @@ held_gauges:
     M2: {amplitude_m: 1.781, phase_deg: 97.7}
     S2: {amplitude_m: 0.642, phase_deg: 131.2}
     N2: {amplitude_m: 0.371, phase_deg: 78.6}
+
+  # THE STRAIT'S GAUGES, READ AND HELD (package 39f). TICON's file read 2026-10-10 by
+  # coordinates over 35.3 to 36.6 N and 6.7 to 4.8 W (the zip at doi.pangaea.de, SHA-256
+  # 7055f8ed1a14abf8...6514, the same file): Ceuta, Tarifa, Algeciras and Gibraltar, each
+  # its longest record (Ceuta's IEO series, which its UHSLC and BODC series agree with to
+  # a millimetre and a degree; Tarifa's and the bay's Puertos del Estado series of 2009
+  # to 2015 agree as well and are shorter); none at Tangier (the brief's "which it has is
+  # unverified until read": this it has not); Cadiz's, at 36.53 N, is the block
+  # `portugal`'s. Their mean levels above the chart's datum are UNVERIFIED (no published
+  # level read): the sum of TICON's forty amplitudes, an upper bound on the mean level
+  # above the lowest astronomical tide, is 0.73 m at Gibraltar, 0.79 m at Algeciras,
+  # 1.00 m at Tarifa and 0.78 m at Ceuta, for whoever reads a table.
+  #
+  # HELD, NOT BLENDED, as the brief has it. Unlike Biscay's, these lie beyond the reach
+  # (400 miles) of every position of the Channel's and Biscay north's regions (Brest is
+  # 745 miles from Tarifa, Biscay north's nearest corner 619), so blending them would
+  # move no recorded passage: what they would move is the world's tide over the Strait
+  # and the Iberian coast within 400 miles of them, which is now Le Conquet's alone (the
+  # nearest of the eleven, 734 miles off: an M2 of 2.0 m where Gibraltar's is 0.31, its
+  # high water two hours later, 110.7 degrees of M2 against 52.9, its mean level 3.98 m
+  # above the datum where Gibraltar's is under a metre), and the far place off Lisbon.
+  # The lead's decision with the other blocks' (docs/dev/TuningNotes.md, package 39f).
+  - id: ceuta
+    name: Ceuta
+    lat_deg: 35.9000
+    lon_deg: -5.3167
+    record: "GESLA-2, IEO, 1944 to 2012"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.301, phase_deg: 48.8}
+    S2: {amplitude_m: 0.114, phase_deg: 75.4}
+    N2: {amplitude_m: 0.063, phase_deg: 34.9}
+  - id: tarifa
+    name: Tarifa
+    lat_deg: 36.0000
+    lon_deg: -5.6000
+    record: "GESLA-2, IEO, 1944 to 2012"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.413, phase_deg: 41.6}
+    S2: {amplitude_m: 0.157, phase_deg: 68.9}
+    N2: {amplitude_m: 0.087, phase_deg: 26.9}
+  - id: algeciras
+    name: Algeciras
+    lat_deg: 36.1167
+    lon_deg: -5.4333
+    record: "GESLA-2, IEO, 1943 to 2012"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.323, phase_deg: 48.2}
+    S2: {amplitude_m: 0.120, phase_deg: 74.5}
+    N2: {amplitude_m: 0.066, phase_deg: 33.6}
+  - id: gibraltar
+    name: Gibraltar
+    lat_deg: 36.1167
+    lon_deg: -5.3500
+    record: "GESLA-2, UHSLC, 1961 to 2000"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.307, phase_deg: 52.9}
+    S2: {amplitude_m: 0.113, phase_deg: 79.5}
+    N2: {amplitude_m: 0.063, phase_deg: 38.1}
