@@ -16,7 +16,7 @@ tuning notes and a report to the lead at the end.
 | Package | Builder | What | State |
 |---|---|---|---|
 | 38 | Fable | The chart stitched: many regions over the corridor, the queries across edges, the climatology's boxes, the tide's gauges, the recipe form for the blocks | launched 2026-10-09 |
-| 39a to 39f | Opus | The six blocks of the voyage to Madeira and the Strait (39c to 39f briefed 2026-10-10; decision 44) | 39a (channel-mid) merged 2026-10-09, bounds 48.5 N to 51 N and 3 W to 1 W, Morlaix's patch left; 39b (biscay-north) merged 2026-10-10; 39c (biscay-south), 39d (portugal), 39e (madeira and azores, the corridor widened) and 39f (strait) launched together 2026-10-10 after gate 6a's cut, in four worktrees; 39d merged first, 2026-10-10; 39e merged 2026-10-10, its widened corridor held for the owner's word; 39c merged 2026-10-10; 39f built and held for the owner's ruling on the pilot's news, given 2026-10-10 (decision 45): the news names Britain's wars and what lately changed, the pins re-measured once by the lead; 39f merged after it |
+| 39a to 39f | Opus | The six blocks of the voyage to Madeira and the Strait (39c to 39f briefed 2026-10-10; decision 44) | 39a (channel-mid) merged 2026-10-09, bounds 48.5 N to 51 N and 3 W to 1 W, Morlaix's patch left; 39b (biscay-north) merged 2026-10-10; 39c (biscay-south), 39d (portugal), 39e (madeira and azores, the corridor widened) and 39f (strait) launched together 2026-10-10 after gate 6a's cut, in four worktrees; 39d merged first, 2026-10-10; 39e merged 2026-10-10, its widened corridor held for the owner's word; 39c merged 2026-10-10; 39f built and held for the owner's ruling on the pilot's news, given 2026-10-10 (decision 45): the news names Britain's wars and what lately changed, the pins re-measured once by the lead; 39f merged 2026-10-10, the last: the chart line complete from the Channel to the Strait and the Western Islands |
 | 40 | Fable | The ship's company and the rules-based captain in three layers; the captain's station; the player's seat | merged 2026-10-09 (the officer's reckoning moved to 40b; the consent brief's revision drafted for the owner, `docs/playtests/drafts/consent-brief-m6-draft.md`, held for 42) |
 | 40b | Opus | The lessons in the primer; the officer's own reckoning (spec M6 §5, truth 80; moved from 40 at the owner's word) | merged 2026-10-09 (an own reckoning carried on past noon, the lead's ruling; chapter 13 stays out of the primer test) |
 | 40c | the lead | The captain's trials: the gate's pinned scenarios of the rules-based captain under weather scripts and world orders; the player's hand on an intent scenario (the captain stands aside until `captain: carry on`) | merged 2026-10-10; gate 6a opened (`docs/gates/gate-m6a.md`); the fast tier on the merged tree 3093 passed, none failed |
@@ -900,6 +900,36 @@ positions unmoved by any of them); whether to read the Spanish mean levels from 
 tiles to the corridor (57 of this block's tiles are deeper than 1,000 m, some 2.4 MB;
 39e's open-sea tiles are the larger case); the Galea light at Bilbao, 1782 by the
 Lighthouse Directory and unnamed by Tofiño in 1789, left unlit and unverified.
+
+## Package 39f, as merged (2026-10-10, the last of the four)
+
+The Strait as briefed: 12 level-2 tiles (one all-land left out) and 14 level-3 in four
+harbour groups, 4 MB; a hundred marks from Tofiño 1787 and 1789 and Purdy 1826, the twelve
+south of Cadiz that 39d left among them (Tofiño's distances on that stretch run about a
+fifth short, his chain from Sancti Petri closing on Cape Roche only with each distance
+increased by a quarter: a danger with two bearings placed where they meet, one with a
+single bearing by the scaled distance, marked judgement); no light lit in 1805 (Tarifa's
+first record 1826, Europa 1841, Spartel 1864); Gibraltar bay patched from Tofiño's plan of
+1786 in brazas, the datum a judgement 0.3 m above the lowest tide; Gibraltar British, the
+Spanish ports hostile to a King's ship and open to a neutral, Tangier Moorish; Morocco in
+the nations table, its stances toward Britain and Spain sourced (Purdy, Lempriere), toward
+the United States from the encyclopaedia, the rest judgement; four TICON gauges held with
+no mean level; the Strait's constant inset from the Atlantic a `current:` by area under
+the tidal stream, added as a velocity in the world and carried into the master's account,
+his doubt, his words and his shaped courses, nought for every area that names none; the
+box in `book_limits`; Norie's and Moore's hours. The frigate from off Trafalgar (Cadiz bay
+being portugal's) to Gibraltar bay sailed once, anchored off the Old Mole in nine fathoms.
+The builder merged 39d, then the head with 39e, 39c, the widened corridor and the news
+rule's re-pin, in its worktree; on the final tree the fast tier passed whole and the
+truths' slow tier held every pin (one pace floor at 429 against 500 with the run's own
+workers beside it). Its Morocco in the pilot's news is what brought decision 45.
+
+**Open, recorded:** blending the Strait's held gauges (the world's tide over the Strait is
+Le Conquet's, 734 miles off, and a blend would move no Channel or Biscay position; the
+recipe would then take `fill_mean_level_m` and the region be rebuilt); a weather box for
+the Strait's Levanter and Poniente, which needs a printed table; Tangier has no gauge in
+TICON; the braza's vara of Burgos from memory; a pace measurement with the port files of
+six blocks loaded in every world, which the lead takes at the merge.
 
 ## Packages 39c to 39f: the last four blocks of the chart line (the same files as 39a and 39b under each block's names; `data/scenarios/<block>.yaml` and `.orders` new per block; `docs/TechnicalSpec-M6.md` §26 as built; `docs/dev/TuningNotes.md`)
 
