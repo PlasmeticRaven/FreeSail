@@ -1,0 +1,109 @@
+# FreeSail: Lagos and its bay as a port (spec M6 §26; package 39d, the Portugal and Cadiz
+# block), on package 35's machinery (freesail/world/ports.py); the marks are the features
+# file's (data/charts/features/portugal.yaml).
+#
+# Sources. Tofiño 1789, Derrotero de las costas de España en el Océano Atlántico,
+# 'Descripción de la Costa de Portugal y España desde el Cabo de S. Vicente', pp. 94 to
+# 97: the point of Piedade in 37 6' 54" N, of middling height with a hermitage and a
+# little shoal half a cable off its south side, the western point of the bay of Lagos; the
+# great church of Lagos in 37 8' 30" N; in the bay a river navigable for small vessels,
+# which needs knowledge to enter; "in this bay of Lagos in summer one may lie at anchor,
+# it being very capacious and clean, for within a cable of the point there are ten brazas;
+# it is sheltered from the winds of the first and fourth quadrants, the rest are on the
+# shore. For ships of the line the best place is twenty brazas E N E of the point a mile
+# off, where they can make sail with any wind; a frigate nearer the land in sixteen, and a
+# small vessel in eight before the city, where she has some shelter from the south-west."
+# In his brazas (1.6718 m).
+#
+# The datum: UNVERIFIED. No period sheet is patched; the chart's depths are EMODnet's at
+# the lowest astronomical tide.
+#
+# The stance. Portuguese, neutral in June 1805: open to all. The King's ships watered and
+# victualled in the bay (judgement for the period); prices FROM MEMORY or JUDGEMENT, in
+# sterling at the exchange.
+
+id: lagos
+name: Lagos
+nation: portugal
+source: "Tofiño 1789, Derrotero, pp. 94 to 97 (Cape St Vincent, Sagres, the point of Piedade, the bay of Lagos)"
+datum: unverified
+
+outer_road:
+  feature: lagos-road
+  name: the bay of Lagos
+  lat_deg: 37.0920
+  lon_deg: -8.6550
+anchorage:
+  feature: lagos-road
+  name: the bay of Lagos
+  lat_deg: 37.0920
+  lon_deg: -8.6550
+mooring:
+  feature: lagos-town-road
+  name: the anchorage before Lagos
+  lat_deg: 37.0990
+  lon_deg: -8.6570
+  deep_draught_ft: 14            # judgement: Tofiño's small vessel lies in eight brazas before the town, a frigate farther out in sixteen
+shore:
+  name: the beach at Lagos
+  lat_deg: 37.1015
+  lon_deg: -8.6720
+
+pilot:
+  station: lagos-road
+  cruising_nm: 5                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the fishermen's boat of Lagos
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Cabrita, Guerreiro, Viegas, Gonçalves, Domingues, Fernandes, Mestre, Correia]   # names of the Algarve: judgement
+  skill: 0.85
+  fee_pounds: 3                  # judgement; unverified
+  cast: starboard                # from the bay the head paying off to the southward (judgement)
+  course_out_deg: 180            # out of the bay past the point of Piedade (judgement)
+  words:
+    channel: "The bay is clean and capacious: round the point of Piedade at a cable, minding the little shoal off its south side, and stand in."
+    marks: "Cape St Vincent and its convent to the westward, the mountains of Monchique over the land; the point of Piedade with its hermitage at the western end of the bay, and the great church of Lagos."
+    anchorage: "A ship of the line lies in twenty brazas a mile east-north-east of the point, where she can make sail with any wind; a frigate nearer in, in sixteen; a small vessel in eight before the town, with some shelter from the south-west. Sheltered from the northerly and westerly winds; the rest are on the shore, and in winter it is no anchorage."
+    tide: "The river of Lagos is entered only with knowledge and on the flood; the bay has no stream to speak of."
+
+tide:
+  establishment: Lisbon          # no place of the epitome nearer; Tofiño gives no hour for Lagos
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 26, origin: portugal, note: "the Algarve's; from memory"}
+    - {good: figs, price: 18, origin: portugal, note: "the figs of the Algarve; judgement"}
+    - {good: almonds, price: 40, origin: portugal, note: "judgement"}
+    - {good: oranges, price: 12, origin: portugal, season: {12: 0.8, 1: 0.8, 2: 0.8, 6: 1.4, 7: 1.5}, note: "judgement"}
+    - {good: salt fish, price: 22, origin: portugal, note: "the tunny of the almadravas, salted; judgement"}
+    - {good: salt, price: 8, origin: portugal, note: "from memory"}
+    - {good: olive oil, price: 44, origin: portugal, note: "from memory"}
+    - {good: canvas, price: 45, origin: null, note: "judgement"}
+    - {good: salt beef, price: 74, origin: null, note: "judgement"}
+    - {good: coal, price: 9, origin: britain, note: "judgement"}
+    - {good: timber, price: 7, origin: portugal, note: "judgement"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 14, pounds: 48, note: "judgement: a small town's spars"}
+    - {item: topgallant_mast, hours: 6, pounds: 15}
+    - {item: yard, hours: 8, pounds: 29}
+    - {item: suit of sails, hours: 80, pounds_per_100m2: 25}
+    - {item: cordage, hours: 3, pounds_per_fathom: 0.055}
+    - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.06}
+
+crew_pool:
+  able: {hands: 2, pounds: 2, delay_h: 36}
+  ordinary: {hands: 4, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 8, pounds: 1, delay_h: 12}
+
+closed_to: []
