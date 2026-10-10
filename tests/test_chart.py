@@ -1497,7 +1497,8 @@ def test_portugal_is_a_region_of_its_own_tiles_with_the_dry_land_left_to_the_cor
     assert len(every[0]) == 140 and len(mine["2"]) == 68  # 72 all land, not written
     whole = load_chart(WHOLE)
     madrid_way = Position(39.5, -7.0)  # the Alentejo: no tile of the block, the corridor's land
-    assert whole.region_at(madrid_way) is None and whole.level_at(madrid_way) == 1
+    # within the region's bounds (`region_at` is by the bounds), read from the corridor
+    assert whole.region_at(madrid_way) == PORTUGAL and whole.level_at(madrid_way) == 1
     assert whole.depth_at(madrid_way) < 0.0
     total = 0
     for level, tiles in entry["tiles"].items():
