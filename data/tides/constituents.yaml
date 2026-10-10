@@ -308,6 +308,128 @@ held_gauges:
     S2: {amplitude_m: 0.642, phase_deg: 131.2}
     N2: {amplitude_m: 0.371, phase_deg: 78.6}
 
+  # THE GAUGES OF BISCAY SOUTH AND GALICIA, READ AND HELD (package 39c). TICON's file holds
+  # eleven gauges of the block, read 2026-10-10 by their coordinates as package 34 read the
+  # eleven (the zip at doi.pangaea.de, SHA-256 7055f8ed1a14abf8...6514, the same file):
+  # four French (REFMAR) and seven Spanish (Puertos del Estado's REDMAR, 'gesla.pde'; the
+  # Instituto Español de Oceanografía's, 'gesla.ieo'; the UHSLC's). No gauge at Bordeaux
+  # within the block (the river's, milestone 8's). Where the file has two records of a
+  # gauge the longest is taken, as package 34 did: Corunna's UHSLC series (1943 to 2012)
+  # and the IEO's agree to a millimetre and a fifth of a degree; Santander's IEO and PdE
+  # series to a centimetre and half a degree; Vigo's IEO series and the PdE's agree, but
+  # its UHSLC series (1943 to 1990) has every phase about 29.4° earlier, M2's speed in an
+  # hour: that record's clock is an hour off (a finding, not used).
+  # `mean_level_m`: the French gauges' from SHOM's RAM (NM, the WFS layer
+  # RAM_BDD_WLD_WGS84G_WFS:ram_3857, read 2026-10-10: Le Verdon-sur-Mer, Arcachon,
+  # Boucau-Bayonne, and Saint-Jean-de-Luz for Socoa's gauge, the RAM's station on the same
+  # spot), VERIFIED; the Spanish gauges' null, UNVERIFIED (no published level above the
+  # chart's datum read: Puertos del Estado's and the Instituto Hidrográfico's tables were
+  # not reached from this machine).
+  #
+  # HELD, NOT BLENDED, for the reason above (package 39b): within 400 miles of a position
+  # a gauge enters the blend, and Le Verdon lies some 250 miles from Ushant. The world's
+  # tide over this block is the eleven's blend (Brest's water, some 300 miles off at
+  # Corunna) until the lead gives a gauge its own water.
+  - id: le-verdon
+    name: Le Verdon-sur-Mer
+    lat_deg: 45.5685
+    lon_deg: -1.0616
+    record: "GESLA-2, REFMAR, 1959 to 2014"
+    mean_level_m: 3.33
+    M2: {amplitude_m: 1.518, phase_deg: 108.5}
+    S2: {amplitude_m: 0.501, phase_deg: 142.8}
+    N2: {amplitude_m: 0.304, phase_deg: 90.3}
+  - id: arcachon
+    name: Arcachon (Eyrac)
+    lat_deg: 44.6650
+    lon_deg: -1.1636
+    record: "GESLA-2, REFMAR, 1967 to 2014"
+    mean_level_m: 2.48
+    M2: {amplitude_m: 1.343, phase_deg: 118.8}
+    S2: {amplitude_m: 0.438, phase_deg: 158.6}
+    N2: {amplitude_m: 0.264, phase_deg: 103.8}
+  - id: boucau-bayonne
+    name: Boucau-Bayonne
+    lat_deg: 43.5273
+    lon_deg: -1.5148
+    record: "GESLA-2, REFMAR, 1967 to 2014"
+    mean_level_m: 2.53
+    M2: {amplitude_m: 1.223, phase_deg: 96.6}
+    S2: {amplitude_m: 0.426, phase_deg: 129.2}
+    N2: {amplitude_m: 0.256, phase_deg: 76.8}
+  - id: socoa
+    name: Socoa (Saint-Jean-de-Luz)
+    lat_deg: 43.3952
+    lon_deg: -1.6816
+    record: "GESLA-2, REFMAR, 1942 to 2014"
+    mean_level_m: 2.51
+    M2: {amplitude_m: 1.328, phase_deg: 92.5}
+    S2: {amplitude_m: 0.463, phase_deg: 124.8}
+    N2: {amplitude_m: 0.280, phase_deg: 72.5}
+  - id: bilbao
+    name: Bilbao
+    lat_deg: 43.3570
+    lon_deg: -3.0500
+    record: "GESLA-2, Puertos del Estado, 1992 to 2015"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 1.311, phase_deg: 92.4}
+    S2: {amplitude_m: 0.459, phase_deg: 124.3}
+    N2: {amplitude_m: 0.278, phase_deg: 72.8}
+  - id: santander
+    name: Santander
+    lat_deg: 43.4614
+    lon_deg: -3.7908
+    record: "GESLA-2, IEO, 1943 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 1.308, phase_deg: 95.3}
+    S2: {amplitude_m: 0.453, phase_deg: 127.9}
+    N2: {amplitude_m: 0.274, phase_deg: 76.2}
+  - id: gijon
+    name: Gijón
+    lat_deg: 43.5580
+    lon_deg: -5.6980
+    record: "GESLA-2, Puertos del Estado, 1995 to 2015"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 1.290, phase_deg: 91.1}
+    S2: {amplitude_m: 0.451, phase_deg: 123.3}
+    N2: {amplitude_m: 0.271, phase_deg: 71.5}
+  - id: ferrol
+    name: Ferrol
+    lat_deg: 43.4630
+    lon_deg: -8.3260
+    record: "GESLA-2, Puertos del Estado, 2007 to 2015"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 1.185, phase_deg: 86.7}
+    S2: {amplitude_m: 0.414, phase_deg: 117.6}
+    N2: {amplitude_m: 0.251, phase_deg: 67.6}
+  - id: corunna
+    name: A Coruña
+    lat_deg: 43.3667
+    lon_deg: -8.4000
+    record: "GESLA-2, UHSLC, 1943 to 2012"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 1.178, phase_deg: 86.0}
+    S2: {amplitude_m: 0.413, phase_deg: 116.1}
+    N2: {amplitude_m: 0.248, phase_deg: 66.9}
+  - id: vilagarcia
+    name: Vilagarcía de Arousa
+    lat_deg: 42.6010
+    lon_deg: -8.7700
+    record: "GESLA-2, Puertos del Estado, 1997 to 2015"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 1.140, phase_deg: 79.6}
+    S2: {amplitude_m: 0.399, phase_deg: 109.2}
+    N2: {amplitude_m: 0.241, phase_deg: 61.1}
+  - id: vigo
+    name: Vigo
+    lat_deg: 42.2380
+    lon_deg: -8.7333
+    record: "GESLA-2, IEO, 1943 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 1.090, phase_deg: 77.2}
+    S2: {amplitude_m: 0.382, phase_deg: 105.8}
+    N2: {amplitude_m: 0.232, phase_deg: 58.5}
+
   # THE GAUGES OF PORTUGAL AND CADIZ, READ AND HELD (package 39d). TICON's file read
   # 2026-10-10 by coordinates over the block (36.3 to 42.1 N, 10.1 to 5.9 W; the zip at
   # store.pangaea.de, SHA-256 7055f8ed...6514, the same file): five records, Cascais, Lagos,

@@ -131,6 +131,14 @@ ports:
   paimboeuf: france
   la-rochelle: france
   rochefort: france
+  # Biscay south and Galicia (package 39c): the Gironde's road French as Biscay north's
+  # ports; the Spanish ports at war with Britain since December 1804 (the wars above),
+  # hostile to a King's ship and open to a neutral
+  royan: france
+  santander: spain
+  ferrol: spain
+  corunna: spain
+  vigo: spain
   # Portugal and Cadiz (package 39d): Portugal neutral, open to all; Cadiz Spain's, and
   # blockaded (its port file's `state:`), closed to the blockaders' enemies
   oporto: portugal

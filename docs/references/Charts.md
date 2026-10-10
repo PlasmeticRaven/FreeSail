@@ -124,6 +124,31 @@ were.
 | TICON (Piccioni et al. 2019), `TICON.txt` | the zip at doi.pangaea.de (PANGAEA 896587), fetched 2026-10-09, SHA-256 7055f8ed…6514, CC BY 4.0 | Nine gauges of the block by their coordinates (Concarneau, Port-Tudy, Le Crouesty, Saint-Nazaire, Paimboeuf, the Pointe de Saint-Gildas, Les Sables-d'Olonne, La Rochelle-Pallice, the Île d'Aix): M2, S2 and N2, held out of the blend (`held_gauges`, after the Channel east's two). |
 | The French encyclopaedia's pages | fr.wikipedia.org through its API, read 2026-10-09, slowly (most requests refused for their rate) | The lights' dates and positions: the Baleines (Vauban's tower 1682, replaced 1854), Chassiron (1685; its second tower 1836), Penmarch (1835), Goulphar (1836), Pen Men (1839), Penfret (1838), the Teignouse (1845), the Pilier (1829), Yeu (1830), La Vieille (1887), Tévennec (1875) and the Bec du Raz (1839); La Vieille's and Tévennec's positions and the Raz's six knots at springs; the tower of the Lanterne at La Rochelle. |
 
+## Biscay south and Galicia (package 39c)
+
+The third block of spec M6 §26, `biscay-south` (42.0 N to 45.9 N, 9.33 W to 0.9 W,
+abutting Biscay north at 45.9 N and the Portuguese block at 42.0 N; its west moved from
+the brief's 9.0 W to the tile column's edge so that Finisterre lies within, at no cost in
+tiles). Its tiles are cut from the same two grids, fetched for the region on 2026-10-10:
+EMODnet's DTM 2024 by its ERDDAP service (`elevation` and `elevation_max` over 41.8 to
+46.15 N, 9.4 to 0.75 W, two classic netCDF subsets of 138.9 MB, CC BY 4.0) and
+GEBCO_2025's area extract (41.7 to 46.25 N, 9.5 to 0.65 W, ESRI ASCII in a zip of 11.8
+MB, public domain), their checksums in the manifest. 129 tiles at level 2 (the ten of the
+northern row that Biscay north lists are its and the two of the southern row that
+Portugal lists are Portugal's, the seam rule; the 59 with no water at the datum, inland
+Castile, León and the Landes, computed and not written, `skip_dry_tiles`) and 30 at level
+3 in seven harbour groups (Royan and Verdon, Santander, Gijón, Ferrol, Corunna, Vigo,
+Bayona); GEBCO's fill raised by the French gauges' mean level, 2.5 m
+(`fill_mean_level_m`); about 19.3 MB with the coast and the features. No override: no period sheet's datum at a Spanish port was read.
+
+| Work | Where read | What was taken |
+|---|---|---|
+| Tofiño, *Derrotero de las costas de España en el Océano Atlántico, y de las Islas Azores ó Terceras*, Madrid 1789 (t. II) | Internet Archive `A302201` (the Universidad de Sevilla's copy, public domain mark), the OCR text, checked against `bub_gb_04Yq4fsvB8gC` (the Bayerische Staatsbibliothek's); fetched 2026-10-10 | The marks of `features/biscay-south.yaml` from Cabo Prior to the Minho (pp. 1 to 73) and from the river of Bayonne to Cabo Prior (pp. 131 to 189): the capes, isles, rocks and roads with their depths in brazas and their grounds, the entrances of Passages, St Sebastian, Bilbao, Santoña, Santander, Ribadeo, Ferrol, Corunna, Camariñas, Corcubión, Muros, Pontevedra and Vigo, the hours of high water and the rises in pies de Burgos (the epitome's rows), Santander's ebb of three miles an hour; the lanthorn of St Sebastian and the Tower of Hercules lit. The volume also covers Portugal to Cape Trafalgar and the Azores (for packages 39d and 39e). |
+| Tofiño, *Atlas Marítimo de España*, 1789 | Internet Archive `A062039040` (the Universidad de Sevilla's copy, public domain mark), its IIIF server, read 2026-10-10; 46 sheets at about 7,500 by 5,000 pixels | The 'Plano de la rya y puerto de Ferrol' (1789) and the 'Plano del puerto de Santander' (1788) read for names and soundings (their notes: brazas of two varas castellanas at low water of spring tides); not transcribed as patches, no datum's height being read. Among its sheets also Corcubión and Pontevedra, Portugalete, Cadiz's bay and Angra. |
+| Faden, *Le Petit Neptune François*, 1793, Magin's 'Sailing Instructions for the Entrance of the Gironde', pp. 84 to 88; 'Coast of Arcasson', 'Bassin d'Arcasson', 'Bayonne', 'St. Jean de Luz', pp. 89 to 92; 'Tides and Currents', p. 93 | Internet Archive `lepetitneptunefr00fade`, the OCR text | The Gironde's marks and channels, the Tower of Cordouan and its fire (the footnote, p. 85), the roads of Verdon and Royan, Arcachon's banks and road, the bar of Bayonne, St Jean de Luz and Socoa; the hours of high water. |
+| The Lighthouse Directory (R. Rowlett, University of North Carolina at Chapel Hill, ibiblio.org/lighthouse), its pages for Spain's Basque Country, Cantabria, Asturias and Galicia and France's Aquitaine | read 2026-10-10 (the encyclopaedias refused every request for its rate) | The lights' years: Cordouan 1611 (the conical tower completed 1788), Monte Igueldo 1778 to 1855, the Tower of Hercules restored from 1785; not yet in 1805 Cape Mayor 1839, Estaca de Bares 1850, Machichaco 1852, Peñas 1852, Finisterre 1853, Villano 1854. |
+| SHOM, *Références Altimétriques Maritimes* | the WFS layer `RAM_BDD_WLD_WGS84G_WFS:ram_3857`, GeoJSON, read 2026-10-10 (Licence Ouverte 2.0) | The mean levels (NM) of the four French gauges held (Le Verdon-sur-Mer 3.33 m, Arcachon 2.48, Boucau-Bayonne 2.53, Saint-Jean-de-Luz 2.51); the low water of springs at Le Verdon (1.05 m) and Royan (1.20 m) for Royan's port file. |
+| TICON (Piccioni et al. 2019), `TICON.txt` | the zip at doi.pangaea.de, fetched 2026-10-10, SHA-256 7055f8ed…6514 (the same file), CC BY 4.0 | Eleven gauges of the block by their coordinates (Le Verdon, Arcachon, Boucau-Bayonne, Socoa, Bilbao, Santander, Gijón, Ferrol, A Coruña, Vilagarcía, Vigo): M2, S2 and N2, held out of the blend. |
 ## Portugal and Cadiz (package 39d)
 
 The fourth block of spec M6 §26, `portugal` (36.4 N to 42 N, 10 W to 6 W, abutting

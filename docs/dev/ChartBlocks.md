@@ -34,7 +34,12 @@ region's, its tide and its weather are rows in tables that already reach its wat
    tiles of Iberian land, 7.6 MB of its 21.7, have no water and are computed for the
    field and not written; the corridor answers there). The units of an override are
    `UNIT_M`'s; Tofiño's Spanish sheets are in `brazas` (six pies de Castilla, 1.6718 m,
-   package 39d).
+   package 39d). Biscay south (package 39c) uses both: `fill_mean_level_m: 2.5` (the
+   French gauges' 2.48 to 2.53 m; the Spanish ones' are not read) and `skip_dry_tiles`
+   (its tiles of Castile, León and the Landes). A bound may be moved to its tile
+   column's or row's edge to take in a mark at no cost in tiles, as Biscay south's west
+   was to 9.33 W for Finisterre (the brief's 9.0 W left the cape out; the column from
+   9.33 W meets 9.0 W already).
    A source not yet in `SOURCES` (Tofiño's sheets are period data, not a
    source of the tiles; a modern grid beyond EMODnet's reach would be) is added there
    with its licence id, which must be in `ALLOWED_LICENCES`, and the licence text under
@@ -61,7 +66,22 @@ region's, its tide and its weather are rows in tables that already reach its wat
    and the lookout does not see it (39a's marks of Morlaix and 39b's of the Raz de Sein
    in `channel-west.yaml`; the lead rebuilt its index from the file at their merges,
    `build_index` over its features, and its counts in the manifest, no tile or coast
-   touched).
+   touched). A block's own index is written by its build alone: marks added after the
+   first build (the build is best made early, to fetch) are found by id and not by the
+   lookout, nor a port's road by its note of the bottom, until the block is built again
+   with `--skip-fetch` (package 39c, whose first tests failed so). When the encyclopaedias
+   refuse the build network for its rate (39b, 39c: every request answered 429), the
+   lights' years are read from the Lighthouse Directory (R. Rowlett, ibiblio.org/
+   lighthouse, a page a country's coast), which gives the year each station was first lit.
+   The period's Spanish sources are on the Internet Archive in full: Tofiño's *Derrotero de
+   las costas de España en el Océano Atlántico* (1789; A302201, the Universidad de
+   Sevilla's copy, and bub_gb_04Yq4fsvB8gC), which covers Galicia, the Cantabrian coast
+   from the river of Bayonne, Portugal to Cape Trafalgar and the Azores; and his *Atlas
+   Marítimo de España* (A062039040, 46 sheets at about 7,500 by 5,000 pixels through the
+   archive's IIIF server: among them the plans of Ferrol, Santander, Portugalete,
+   Corcubión and Pontevedra, Cadiz's bay and Angra on Terceira). His soundings are brazas
+   of two varas castellanas (1.672 m) at low water of spring tides, his tides in pies de
+   Burgos; his longitudes are from Cadiz's meridian.
 4. **The overrides** under `data/charts/overrides/<region>/`, one file per harbour patch
    read from a period sheet, each stating its `sheet`, its `source`, its `units`
    (fathoms, feet, brasses, metres), its `datum` in words and `datum_above_chart_datum_m`
@@ -97,8 +117,10 @@ region's, its tide and its weather are rows in tables that already reach its wat
    on the whole chart), and every book the game ships names places of the whole chart
    (`test_log_lines.py`).
 6. **The tide**: the block's gauges read from TICON's file (`TICON.txt` in the zip at
-   doi.pangaea.de, as package 34 read it, by their coordinates; which of Vigo and
-   Tarifa it has is **unverified** here and read when the block is built (package 39d
+   doi.pangaea.de, as package 34 read it, by their coordinates; Vigo it has (package 39c,
+   the IEO's and Puertos del Estado's series; its UHSLC series has every phase an hour
+   early, a clock off: take the longest record and compare the others); whether it has
+   Tarifa is **unverified** here and read when the block is built (package 39d
    read Cascais, Lagos, Huelva, Bonanza and Cadiz, and found no Leixões, Lisbon or
    Setúbal; package 39e Funchal, Ponta Delgada, Angra, Horta and Santa Cruz das Flores);
    the form is the eleven's: the record, the mean level above the
@@ -125,7 +147,8 @@ region's, its tide and its weather are rows in tables that already reach its wat
    took the first box east to 1 W, 39b south to 45.9 N and east to 0.9 W; one box over
    the Channel and Portugal would have taken in the Western Approaches west of 7 W and
    Biscay south between): give the block an area over its whole box (Portugal's
-   `portuguese-coast`, after its bars and rivers) so that no position of the box is
+   `portuguese-coast`, after its bars and rivers; Biscay south's `open-bay-south`, after
+   its passes and narrows, package 39c) so that no position of the box is
    without a statement. Keep the polygons off the water
    the recorded passages' other sail use (the naval cruise's Diamond within eight miles
    of 48 N 4 55 W and Harpy within ten of 47 50 N 6 W; the merchant passage's Palinure
@@ -215,6 +238,12 @@ field knows only its own block, so within a cable or two of the seam it may give
 shore farther than the true one, until the neighbour is rebuilt (a finding, not a fix).
 Abut the bounds on the neighbour's (3 W, 48 N) rather than overlapping them: the
 features of the two then never share a box, and a query takes the one tile there is.
+**An isle the grid lacks.** EMODnet's sixteenth of a minute interpolates its soundings
+across an isle a few hundred metres long, so the tiles have water where Santa Clara at St
+Sebastian, Mouro at Santander and the Estelas stand forty metres high (package 39c): the
+block's features give such an isle as a `rock` of its height and an `extent_m` of its
+size, so that a ship cannot sail through it; a land patch is better, where a sheet can
+be read with its datum.
 
 **GEBCO's fill.** Where EMODnet has no value (the land, mostly, and some harbours and
 lagoons it does not survey) the tiles take GEBCO's height, which is about mean sea level,
@@ -237,8 +266,11 @@ row of tiles: Portugal's northern row (41.84 to 42.27 N) and southern row (36.29
 neighbour is in the manifest, so each block writes the row's tiles and lists them (four of
 them both Portugal's and a neighbour's: `2/150624_-32064` and `-33600` with Biscay south,
 `2/130656_-22848` and `-24384` with the Strait); at the merge the
-lead keeps one listing (the seam rule makes the first region in the manifest the owner),
-and the files of the other block's copy of those tiles are dropped. The copies differ
+lead keeps one listing (the seam rule makes the region that listed a tile first its
+owner, whatever the regions' order), and the files of the other block's copy of those
+tiles are dropped: Portugal was merged first, so Biscay south (package 39c) took
+Portugal's two files at the merge, dropped its own listing of them, and rebuilt with
+`--skip-fetch`, whereupon the rule kept them Portugal's. The copies differ
 only by each block's distance field, its patches and its fill level. A mark across a
 neighbour's bound goes in the report for the lead, not in a file that does not exist yet
 (Portugal's Sancti Petri, Cape Roche and Trafalgar are the Strait's).

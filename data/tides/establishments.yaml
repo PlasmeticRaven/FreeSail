@@ -91,6 +91,21 @@ tables:
       - {name: the Isle of Ré, lat_deg: 46.204, lon_deg: -1.367, hw_h: 3, hw_m: 45, spring_rise_ft: 15, note: "Faden pp. 81 and 93: in the Pertuis d'Antioche high tide from half an hour after 3 to 4 o'clock; the tide rises 15 feet in the roads of Ré"}
       - {name: La Rochelle, lat_deg: 46.159, lon_deg: -1.152, hw_h: 3, hw_m: 45, spring_rise_ft: 15, note: "Faden p. 81: the tides from half an hour after 3 to 4 o'clock at new and full moon; the tide rises 15 feet at La Rochelle"}
       - {name: Brouage, lat_deg: 45.862, lon_deg: -1.068, hw_h: 4, hw_m: 0, spring_rise_ft: 15, note: "Faden pp. 83 and 93: at Brouage high water at 4 o'clock and the currents very strong; the rise the coast of Poitou's, which his table holds Brouage in"}
+      # Package 39c, Biscay south and Galicia: the French corner's hours Faden 1793's (the
+      # Gironde p. 88, Arcasson pp. 90 and 93, Bayonne pp. 91 and 93), the Spanish ports'
+      # Tofiño 1789's Derrotero (the page in each row), every one "at three in the
+      # afternoon" on the days of conjunction and opposition. Tofiño's rises are in pies
+      # de Burgos (0.2786 m, a third of the vara; UNVERIFIED here, from memory) and are
+      # turned to English feet and rounded (thirteen and a half pies are twelve feet).
+      - {name: the Tower of Cordouan, lat_deg: 45.586, lon_deg: -1.174, hw_h: 4, hw_m: 30, spring_rise_ft: 15, note: "Faden p. 88: on the new and full moons high water to the northward of the Tower of Cordouan at 30 min. after 4 o'clock, and to the south of it 15 min. later; the perpendicular rise 14 or 15 feet, in the neap tides only 7 or 8"}
+      - {name: Arcasson, lat_deg: 44.665, lon_deg: -1.165, hw_h: 3, hw_m: 15, spring_rise_ft: 15, rise_judgement: true, note: "Faden pp. 90 and 93: in the Bassin of Arcasson at new and full moon high water at a quarter after 3 o'clock; no rise given"}
+      - {name: Bayonne, lat_deg: 43.527, lon_deg: -1.515, hw_h: 3, hw_m: 0, spring_rise_ft: 11, note: "Faden p. 91: at Bayonne high water at 3 o'clock, or a little later; Tofiño 1789 p. 132: at full and change at three in the afternoon, rising 12 pies, 8 or 9 at the quarters"}
+      - {name: Passages, lat_deg: 43.338, lon_deg: -1.929, hw_h: 3, hw_m: 0, spring_rise_ft: 11, note: "Tofiño 1789 p. 145: at conjunction and opposition high water at three in the afternoon and the tide rises 12 pies, 8 to 10 at the quarters, 15 at the equinoxes and solstices"}
+      - {name: Santander, lat_deg: 43.462, lon_deg: -3.805, hw_h: 3, hw_m: 0, spring_rise_ft: 12, note: "Tofiño 1789 p. 172: at conjunction and opposition high water at three in the afternoon, the tide rising 13 1/2 pies, 9 or 10 at the quarters"}
+      - {name: Cape Ortegal, lat_deg: 43.771, lon_deg: -7.869, hw_h: 3, hw_m: 0, spring_rise_ft: 14, note: "Tofiño 1789 p. 189: on all this coast (Ribadeo to Cape Prior) high water at conjunction and opposition at three in the afternoon, with little difference, the mean rise fifteen pies"}
+      - {name: Ferrol, lat_deg: 43.480, lon_deg: -8.240, hw_h: 3, hw_m: 0, spring_rise_ft: 12, note: "Tofiño 1789 p. 6: at the new and full moons high water at three in the afternoon, the tides rising 13 to 14 pies de Burgos, a foot or a foot and a half more at the equinoxes"}
+      - {name: Corunna, lat_deg: 43.366, lon_deg: -8.390, hw_h: 3, hw_m: 0, spring_rise_ft: 12, note: "Tofiño 1789 p. 14: the tides the same as Ferrol's"}
+      - {name: Vigo, lat_deg: 42.240, lon_deg: -8.725, hw_h: 3, hw_m: 0, spring_rise_ft: 12, note: "Tofiño 1789 p. 71: the tides at conjunction and opposition at three in the afternoon, rising 13 to 14 pies"}
       # Package 39d, Portugal and Cadiz: the hours of high water at new and full moon that
       # Tofiño 1789's Derrotero gives (the Spanish survey of the coast, 1786 to 1788, in
       # period exactly; the better table's figures for this coast, as Faden's are for

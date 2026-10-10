@@ -1,0 +1,30 @@
+# FreeSail: the cutter's book for the Biscay south and Galicia passage
+# (data/scenarios/biscay-south.yaml; package 39c), Vigo round Finisterre to Corunna. Short,
+# as the brief has it: the points of the passage by the account, the sails trimmed, the
+# land's bearings, the anchor.
+
+# Brought up under the Isles of Bayona, she weighs and stands out by the north passage,
+# between the Point of the Caballo and Cape del Hombre (Tofiño 1789 p. 69).
+standing order "out of the road": at brought up, if the distance to 42 13.44 N 8 53.52 W is under 1 mile then get under way on the larboard tack and steer N
+standing order "away": at under way, if the distance to 42 13.44 N 8 53.52 W is under 2 miles then set plain sail; shape a course for 42 18 N 8 55 W
+
+# Up the coast of Galicia outside the islands and the Meixido, round the capes a league off.
+standing order "the north passage": when the distance to 42 18 N 8 55 W is under 2 miles then shape a course for 42 27 N 9 6 W
+standing order "off Salvora": when the distance to 42 27 N 9 6 W is under 2 miles then shape a course for 42 46 N 9 18 W
+standing order "off the Meixido": when the distance to 42 46 N 9 18 W is under 2 miles then shape a course for 42 53 N 9 22 W
+standing order "off Finisterre": when the distance to 42 53 N 9 22 W is under 2 miles then shape a course for 43 4 N 9 23 W
+standing order "off Toriñana": when the distance to 43 4 N 9 23 W is under 2 miles then shape a course for 43 12 N 9 18 W
+standing order "off Villano": when the distance to 43 12 N 9 18 W is under 2 miles then shape a course for 43 25 N 8 52 W
+
+# Outside Sisarga for Corunna, in under the Tower of Hercules between the Jasentes and Mera.
+standing order "off Sisarga": when the distance to 43 25 N 8 52 W is under 2 miles then shape a course for 43 26 N 8 26 W
+# North of the Tower of Hercules before turning in: the line from Sisarga straight for the
+# harbour's mouth crosses the Tower's peninsula (the first run went aground under it).
+standing order "north of the Tower": when the distance to 43 26 N 8 26 W is under 1.5 miles then shape a course for 43 23 N 8 21 W
+standing order "for the harbour": when the distance to 43 23 N 8 21 W is under 0.8 miles then shape a course for the harbour of Corunna; shorten sail
+standing order "the anchor": when the distance to the harbour of Corunna is under 0.8 miles then come to an anchor
+
+# The ship's routines on the way.
+standing order "trim to the course": at steady on the course then trim sails
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point then trim sails
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix

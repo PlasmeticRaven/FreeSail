@@ -289,6 +289,38 @@ REGIONS: dict[str, dict[str, Any]] = {
         },
         "sources": ["emodnet_dtm_2024", "gebco_2025"],
     },
+    # package 39c: Biscay south and Galicia, abutting biscay-north at 45.9 N exactly and
+    # the Portuguese block at 42.0 N. The western bound is moved from the brief's 9.0 W to
+    # 9.33 W, the column's own edge, so that Cape Finisterre (9.27 W), Touriñán and Cape
+    # Vilán lie within it: the tiles are the same (the column from 9.33 W meets 9.0 W
+    # already). The tiles that meet the bounds span 41.84 to 46.11 N and 9.33 to 0.80 W;
+    # the northern row's ten from 5.12 W east are biscay-north's and the southern row's
+    # two that hold water at 9.33 to 8.48 W are portugal's, merged first (the seam rule):
+    # computed, not written.
+    "biscay-south": {
+        "title": "Biscay south and Galicia, the Gironde to the Minho",
+        "bounds": {"south": 42.0, "north": 45.9, "west": -9.33, "east": -0.9},
+        "fetch": {"south": 41.8, "north": 46.15, "west": -9.4, "east": -0.75},
+        "harbours": {
+            "royan-verdon": {"south": 45.54, "north": 45.64, "west": -1.10, "east": -0.98},
+            "santander": {"south": 43.42, "north": 43.49, "west": -3.84, "east": -3.75},
+            "gijon": {"south": 43.53, "north": 43.57, "west": -5.70, "east": -5.64},
+            "ferrol": {"south": 43.44, "north": 43.50, "west": -8.34, "east": -8.20},
+            "corunna": {"south": 43.34, "north": 43.40, "west": -8.42, "east": -8.36},
+            "vigo": {"south": 42.20, "north": 42.28, "west": -8.80, "east": -8.66},
+            "bayona": {"south": 42.10, "north": 42.14, "west": -8.88, "east": -8.82},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # GEBCO's fill raised to the chart's datum by the coast's own mean level, 2.5 m:
+        # SHOM's RAM gives NM 2.48 at Arcachon, 2.53 at Boucau-Bayonne and 2.51 at
+        # Saint-Jean-de-Luz (3.33 at Le Verdon); the Spanish coast's not read, the same
+        # taken (judgement). Not the world's, which over the block is the Channel's blend,
+        # 3.9 to 6.8 m, while the block's gauges are held
+        "fill_to_chart_datum": True,
+        "fill_mean_level_m": 2.5,
+        # the box takes in Castile, León and the Landes: their dry tiles are the corridor's
+        "skip_dry_tiles": True,
+    },
     # package 39d (spec M6 §26, block 4): Portugal and Cadiz, abutting biscay-south at
     # 42.0 N and the Strait at 36.4 N exactly (Cadiz and its bay, 36.45 to 36.64 N, the
     # block's; Trafalgar, 36.18 N, the Strait's), 10 W to 6 W. The level-2 tiles that meet
@@ -389,6 +421,7 @@ CHARTS: dict[str, dict[str, Any]] = {
             "channel-west",
             "channel-mid",
             "biscay-north",
+            "biscay-south",  # package 39c
             "portugal",  # package 39d
             # package 39e: the islands, after the coast's blocks
             "madeira",
