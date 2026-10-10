@@ -1,0 +1,47 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"129,-66": [
+"bugio-deserta",
+"desertas-inner-passage"
+],
+"130,-67": [
+"sao-lourenco-point",
+"sao-lourenco-light",
+"madeira-desertas-passage",
+"ilheu-chao",
+"sail-rock",
+"deserta-grande"
+],
+"130,-68": [
+"funchal-town",
+"loo-rock",
+"funchal-citadel",
+"funchal-road",
+"funchal-road-east",
+"funchal-landing",
+"brazen-head",
+"funchal-west-point",
+"valley-of-funchal",
+"machico"
+],
+"131,-68": [
+"madeira-high-land"
+],
+"131,-69": [
+"tristao-point"
+],
+"131,-70": [
+"pargo-point",
+"pargo-light"
+],
+"132,-66": [
+"porto-santo-town",
+"porto-santo-road",
+"porto-santo-hummocks",
+"porto-santo-west-islet",
+"ilheu-de-cima",
+"ilheu-de-cima-light"
+]
+}
+}

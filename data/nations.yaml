@@ -153,6 +153,14 @@ ports:
   paimboeuf: france
   la-rochelle: france
   rochefort: france
+  # Biscay south and Galicia (package 39c): the Gironde's road French as Biscay north's
+  # ports; the Spanish ports at war with Britain since December 1804 (the wars above),
+  # hostile to a King's ship and open to a neutral
+  royan: france
+  santander: spain
+  ferrol: spain
+  corunna: spain
+  vigo: spain
   # Portugal and Cadiz (package 39d): Portugal neutral, open to all; Cadiz Spain's, and
   # blockaded (its port file's `state:`), closed to the blockaders' enemies
   oporto: portugal
@@ -160,6 +168,13 @@ ports:
   setubal: portugal
   lagos: portugal
   cadiz: spain
+  # Madeira and the Western Islands (package 39e): Portuguese, neutral in 1805 by the
+  # Treaty of Badajoz and open to every nation by the wars below
+  funchal: portugal
+  porto-santo: portugal
+  angra: portugal
+  ponta-delgada: portugal
+  horta: portugal
   # the Strait (package 39f): Gibraltar the King's, the Spanish shore and Ceuta Spain's,
   # Tangier the Emperor of Morocco's
   gibraltar: britain

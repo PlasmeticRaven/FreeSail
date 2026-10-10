@@ -1,0 +1,102 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"147,-101": [
+"santa-maria-town",
+"santa-maria-high-land",
+"castelo-point",
+"goncalo-velho-light",
+"sao-lourenco-road"
+],
+"148,-99": [
+"dollabarat"
+],
+"149,-100": [
+"formigas"
+],
+"150,-102": [
+"vila-franca-islet",
+"vila-franca-road"
+],
+"150,-103": [
+"ponta-delgada-town",
+"ponta-delgada-point",
+"ponta-delgada-road",
+"galera-point"
+],
+"151,-101": [
+"pico-da-vara",
+"arnel-point",
+"arnel-light"
+],
+"151,-103": [
+"rosto-de-cao",
+"ribeira-grande"
+],
+"151,-104": [
+"ferraria-point",
+"ferraria-light",
+"mosteiros-islets"
+],
+"153,-113": [
+"ponta-da-ilha",
+"ponta-da-ilha-light"
+],
+"153,-114": [
+"peak-of-pico",
+"lajes-do-pico"
+],
+"154,-109": [
+"monte-brasil",
+"angra-town",
+"angra-citadel",
+"angra-san-sebastian",
+"angra-road",
+"ilheus-das-cabras",
+"contendas-point",
+"contendas-light",
+"praia-terceira",
+"praia-road"
+],
+"154,-110": [
+"santa-barbara"
+],
+"154,-112": [
+"topo-point",
+"topo-light"
+],
+"154,-113": [
+"velas-town",
+"velas-road",
+"esperanca"
+],
+"154,-115": [
+"madalena",
+"madalena-islets",
+"horta-town",
+"monte-da-guia",
+"espalamaca-point",
+"horta-road",
+"fayal-bank",
+"porto-pim",
+"cabeco-gordo",
+"ribeirinha-light",
+"fayal-pico-channel"
+],
+"156,-112": [
+"graciosa-high-land",
+"graciosa-praia-road"
+],
+"156,-113": [
+"graciosa-town"
+],
+"157,-125": [
+"flores-santa-cruz",
+"flores-road",
+"flores-high-land"
+],
+"158,-125": [
+"corvo"
+]
+}
+}

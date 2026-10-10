@@ -1025,3 +1025,253 @@ boxes:
           radius_km: {min: 1200, max: 1800}
           life_h: {min: 120, max: 360}
         check: {westerly_pct: 15, easterly_pct: 12, southerly_pct: 12, northerly_pct: 45, gust31_days: 4, gust54_days: 0.3}
+  # package 39e: the Western Islands (the Azores), under the Azores high; PROVISIONAL
+  # and judgement in every row (each row's `note`), from the same kinds of source as
+  # the boxes above, NOT READ. West of the Portuguese coast's box and north of
+  # Madeira's, which comes first where the two meet (34 to 36 N, 22 to 20 W).
+  azores:
+    title: "the Western Islands (the Azores) and the sea about them, under the Azores high"
+    bounds: {south: 34.0, north: 43.5, west: -33.0, east: -20.0}
+    provisional: true
+    source: "judgement from the same kinds of source as the Channel's (the pilot charts' roses for the 35 to 40 N squares, NOT READ): westerlies and gales in winter, the Azores high over the islands in summer; package 39e"
+    months:
+      1:
+        name: January
+        note: "judgement: the Western Islands in winter, on the southern edge of the westerlies: the Azores high weak and to the south, lows passing to the north and the deeper ones over the islands with south-westerly gales and a north-westerly behind (the temporales of the third and fourth quadrant, Tofiño 1789 p. 196, the islands' winter weather); the figures from memory of the pilot charts' roses for the 35 to 40 N squares (NOT READ), PROVISIONAL"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.5, high_toward_deg: 190}
+        lows_per_month: 4
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 450, spread: 300}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 995, spread: 8, floor: 970}
+        radius_km: {min: 400, max: 800}
+        life_h: {min: 48, max: 120}
+        high:
+          probability: 0.5
+          bearing_deg: {mean: 200, spread: 60}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 8, max: 16}
+          radius_km: {min: 1200, max: 2000}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 40, easterly_pct: 10, southerly_pct: 22, northerly_pct: 22, gust31_days: 7, gust54_days: 1.0}
+      2:
+        name: February
+        note: "judgement: the Western Islands in winter, on the southern edge of the westerlies: the Azores high weak and to the south, lows passing to the north and the deeper ones over the islands with south-westerly gales and a north-westerly behind (the temporales of the third and fourth quadrant, Tofiño 1789 p. 196, the islands' winter weather); the figures from memory of the pilot charts' roses for the 35 to 40 N squares (NOT READ), PROVISIONAL"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.5, high_toward_deg: 190}
+        lows_per_month: 4
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 450, spread: 300}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 995, spread: 8, floor: 970}
+        radius_km: {min: 400, max: 800}
+        life_h: {min: 48, max: 120}
+        high:
+          probability: 0.5
+          bearing_deg: {mean: 200, spread: 60}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 8, max: 16}
+          radius_km: {min: 1200, max: 2000}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 40, easterly_pct: 10, southerly_pct: 22, northerly_pct: 22, gust31_days: 7, gust54_days: 1.0}
+      3:
+        name: March
+        note: "judgement: the Western Islands in winter, on the southern edge of the westerlies: the Azores high weak and to the south, lows passing to the north and the deeper ones over the islands with south-westerly gales and a north-westerly behind (the temporales of the third and fourth quadrant, Tofiño 1789 p. 196, the islands' winter weather); the figures from memory of the pilot charts' roses for the 35 to 40 N squares (NOT READ), PROVISIONAL"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.5, high_toward_deg: 190}
+        lows_per_month: 4
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 450, spread: 300}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 995, spread: 8, floor: 970}
+        radius_km: {min: 400, max: 800}
+        life_h: {min: 48, max: 120}
+        high:
+          probability: 0.5
+          bearing_deg: {mean: 200, spread: 60}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 8, max: 16}
+          radius_km: {min: 1200, max: 2000}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 40, easterly_pct: 10, southerly_pct: 22, northerly_pct: 22, gust31_days: 7, gust54_days: 1.0}
+      4:
+        name: April
+        note: "judgement: the Western Islands between the seasons, the high building (spring) or weakening (autumn) over the islands, a low now and then from the west; the figures from memory of the pilot charts' roses for the 35 to 40 N squares (NOT READ), PROVISIONAL"
+        background_hpa: 1021
+        gradient: {hpa_per_100km: 0.3, high_toward_deg: 210}
+        lows_per_month: 2.5
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 700, spread: 350}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 995, spread: 8, floor: 970}
+        radius_km: {min: 400, max: 800}
+        life_h: {min: 48, max: 120}
+        high:
+          probability: 0.75
+          bearing_deg: {mean: 220, spread: 70}
+          distance_km: {min: 500, max: 1200}
+          anomaly_hpa: {min: 8, max: 16}
+          radius_km: {min: 1200, max: 2000}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 32, easterly_pct: 14, southerly_pct: 18, northerly_pct: 26, gust31_days: 4, gust54_days: 0.4}
+      5:
+        name: May
+        note: "judgement: the Western Islands in summer under the Azores high itself, its centre near or a little west and south of the islands, light and variable winds and calms with a northerly to north-easterly on its eastern side, lows rare and far north; the figures from memory of the pilot charts' roses for the 35 to 40 N squares (NOT READ), PROVISIONAL"
+        background_hpa: 1024
+        gradient: {hpa_per_100km: 0.15, high_toward_deg: 240}
+        lows_per_month: 1
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 1100, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 995, spread: 8, floor: 970}
+        radius_km: {min: 400, max: 800}
+        life_h: {min: 48, max: 120}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 240, spread: 80}
+          distance_km: {min: 200, max: 800}
+          anomaly_hpa: {min: 8, max: 16}
+          radius_km: {min: 1200, max: 2000}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 22, easterly_pct: 18, southerly_pct: 16, northerly_pct: 32, gust31_days: 2, gust54_days: 0.1}
+      6:
+        name: June
+        note: "judgement: the Western Islands in summer under the Azores high itself, its centre near or a little west and south of the islands, light and variable winds and calms with a northerly to north-easterly on its eastern side, lows rare and far north; the figures from memory of the pilot charts' roses for the 35 to 40 N squares (NOT READ), PROVISIONAL"
+        background_hpa: 1024
+        gradient: {hpa_per_100km: 0.15, high_toward_deg: 240}
+        lows_per_month: 1
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 1100, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 995, spread: 8, floor: 970}
+        radius_km: {min: 400, max: 800}
+        life_h: {min: 48, max: 120}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 240, spread: 80}
+          distance_km: {min: 200, max: 800}
+          anomaly_hpa: {min: 8, max: 16}
+          radius_km: {min: 1200, max: 2000}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 22, easterly_pct: 18, southerly_pct: 16, northerly_pct: 32, gust31_days: 2, gust54_days: 0.1}
+      7:
+        name: July
+        note: "judgement: the Western Islands in summer under the Azores high itself, its centre near or a little west and south of the islands, light and variable winds and calms with a northerly to north-easterly on its eastern side, lows rare and far north; the figures from memory of the pilot charts' roses for the 35 to 40 N squares (NOT READ), PROVISIONAL"
+        background_hpa: 1024
+        gradient: {hpa_per_100km: 0.15, high_toward_deg: 240}
+        lows_per_month: 1
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 1100, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 995, spread: 8, floor: 970}
+        radius_km: {min: 400, max: 800}
+        life_h: {min: 48, max: 120}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 240, spread: 80}
+          distance_km: {min: 200, max: 800}
+          anomaly_hpa: {min: 8, max: 16}
+          radius_km: {min: 1200, max: 2000}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 22, easterly_pct: 18, southerly_pct: 16, northerly_pct: 32, gust31_days: 2, gust54_days: 0.1}
+      8:
+        name: August
+        note: "judgement: the Western Islands in summer under the Azores high itself, its centre near or a little west and south of the islands, light and variable winds and calms with a northerly to north-easterly on its eastern side, lows rare and far north; the figures from memory of the pilot charts' roses for the 35 to 40 N squares (NOT READ), PROVISIONAL"
+        background_hpa: 1024
+        gradient: {hpa_per_100km: 0.15, high_toward_deg: 240}
+        lows_per_month: 1
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 1100, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 995, spread: 8, floor: 970}
+        radius_km: {min: 400, max: 800}
+        life_h: {min: 48, max: 120}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 240, spread: 80}
+          distance_km: {min: 200, max: 800}
+          anomaly_hpa: {min: 8, max: 16}
+          radius_km: {min: 1200, max: 2000}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 22, easterly_pct: 18, southerly_pct: 16, northerly_pct: 32, gust31_days: 2, gust54_days: 0.1}
+      9:
+        name: September
+        note: "judgement: the Western Islands in summer under the Azores high itself, its centre near or a little west and south of the islands, light and variable winds and calms with a northerly to north-easterly on its eastern side, lows rare and far north; the figures from memory of the pilot charts' roses for the 35 to 40 N squares (NOT READ), PROVISIONAL"
+        background_hpa: 1024
+        gradient: {hpa_per_100km: 0.15, high_toward_deg: 240}
+        lows_per_month: 1
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 1100, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 995, spread: 8, floor: 970}
+        radius_km: {min: 400, max: 800}
+        life_h: {min: 48, max: 120}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 240, spread: 80}
+          distance_km: {min: 200, max: 800}
+          anomaly_hpa: {min: 8, max: 16}
+          radius_km: {min: 1200, max: 2000}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 22, easterly_pct: 18, southerly_pct: 16, northerly_pct: 32, gust31_days: 2, gust54_days: 0.1}
+      10:
+        name: October
+        note: "judgement: the Western Islands between the seasons, the high building (spring) or weakening (autumn) over the islands, a low now and then from the west; the figures from memory of the pilot charts' roses for the 35 to 40 N squares (NOT READ), PROVISIONAL"
+        background_hpa: 1021
+        gradient: {hpa_per_100km: 0.3, high_toward_deg: 210}
+        lows_per_month: 2.5
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 700, spread: 350}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 995, spread: 8, floor: 970}
+        radius_km: {min: 400, max: 800}
+        life_h: {min: 48, max: 120}
+        high:
+          probability: 0.75
+          bearing_deg: {mean: 220, spread: 70}
+          distance_km: {min: 500, max: 1200}
+          anomaly_hpa: {min: 8, max: 16}
+          radius_km: {min: 1200, max: 2000}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 32, easterly_pct: 14, southerly_pct: 18, northerly_pct: 26, gust31_days: 4, gust54_days: 0.4}
+      11:
+        name: November
+        note: "judgement: the Western Islands in winter, on the southern edge of the westerlies: the Azores high weak and to the south, lows passing to the north and the deeper ones over the islands with south-westerly gales and a north-westerly behind (the temporales of the third and fourth quadrant, Tofiño 1789 p. 196, the islands' winter weather); the figures from memory of the pilot charts' roses for the 35 to 40 N squares (NOT READ), PROVISIONAL"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.5, high_toward_deg: 190}
+        lows_per_month: 4
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 450, spread: 300}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 995, spread: 8, floor: 970}
+        radius_km: {min: 400, max: 800}
+        life_h: {min: 48, max: 120}
+        high:
+          probability: 0.5
+          bearing_deg: {mean: 200, spread: 60}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 8, max: 16}
+          radius_km: {min: 1200, max: 2000}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 40, easterly_pct: 10, southerly_pct: 22, northerly_pct: 22, gust31_days: 7, gust54_days: 1.0}
+      12:
+        name: December
+        note: "judgement: the Western Islands in winter, on the southern edge of the westerlies: the Azores high weak and to the south, lows passing to the north and the deeper ones over the islands with south-westerly gales and a north-westerly behind (the temporales of the third and fourth quadrant, Tofiño 1789 p. 196, the islands' winter weather); the figures from memory of the pilot charts' roses for the 35 to 40 N squares (NOT READ), PROVISIONAL"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.5, high_toward_deg: 190}
+        lows_per_month: 4
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 450, spread: 300}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 995, spread: 8, floor: 970}
+        radius_km: {min: 400, max: 800}
+        life_h: {min: 48, max: 120}
+        high:
+          probability: 0.5
+          bearing_deg: {mean: 200, spread: 60}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 8, max: 16}
+          radius_km: {min: 1200, max: 2000}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 40, easterly_pct: 10, southerly_pct: 22, northerly_pct: 22, gust31_days: 7, gust54_days: 1.0}

@@ -1,0 +1,110 @@
+# FreeSail: Santander as a port (spec M6 §26; package 39c, the Biscay south and Galicia
+# block), on package 35's machinery; the marks are the features file's
+# (data/charts/features/biscay-south.yaml).
+#
+# Sources. Tofiño 1789, Derrotero de las costas de España en el Océano Atlántico, 'Puerto
+# de Santander', pp. 168 to 172: Cape Mayor with its watch-tower the western point, the
+# Isles of Mouro and Santa Marina in the mouth; with fresh winds of the third and fourth
+# quadrant no entering, but with the flood gain the Promontorio, a good clean anchorage,
+# or anchor in the Concha off the Sardinero in ten or twelve brazas sand, Cape Menor on
+# with Cape Mayor; the best channel between the bank and the sand of the Puntal, three
+# and a half to four brazas at low water; anchor before the great church in four to six
+# brazas sand, moored NE and SW with the tide; no entrance without a pilot of the
+# country, the channel changing; high water at three at full and change, rising thirteen
+# and a half feet at springs and nine or ten at the quarters; the ebb runs harder than
+# the flood, three miles an hour, and sets SE in the mouth; the south wind in winter
+# makes the anchors drag. The Atlas's 'Plano del puerto de Santander' (1788) for the
+# soundings, two to four brazas before the city.
+#
+# The datum: UNVERIFIED. The 1788 plan was read at full resolution and not transcribed as
+# a patch in this package: the low water of springs above the chart's datum at Santander
+# is not read from a published table (TICON gives the constants; the datum's height is
+# the lead's to have read), and the modern bay is reclaimed land and a dredged channel
+# where the plan has sand and two brazas (a finding for a later patch).
+#
+# The stance. Santander is Spanish: hostile to a King's ship in June 1805, open to a
+# neutral (data/nations.yaml). Prices FROM MEMORY or JUDGEMENT; sterling at the exchange.
+
+id: santander
+name: Santander
+nation: spain
+source: "Tofiño 1789, Derrotero, pp. 168-172 ('Puerto de Santander', the Sardinero, the channels, the tides and the ebb); Atlas Marítimo de España, 'Plano del puerto de Santander' (1788)"
+datum: unverified
+
+outer_road:
+  feature: sardinero-road
+  name: the road of the Sardinero
+  lat_deg: 43.4794
+  lon_deg: -3.7753
+anchorage:
+  feature: santander-road
+  name: the road before Santander
+  lat_deg: 43.4584
+  lon_deg: -3.8005
+mooring:
+  feature: santander-road
+  name: the road before Santander, moored NE and SW
+  lat_deg: 43.4584
+  lon_deg: -3.8005
+shore:
+  feature: santander
+  name: the mole of Santander
+  lat_deg: 43.4625
+  lon_deg: -3.8050
+
+pilot:
+  station: sardinero-road
+  cruising_nm: 5                 # judgement: the pilots of the place met ships in the Concha
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the pilots' launch of Santander
+    under: oars and a lugsail
+    note: "a Cantabrian trainera (judgement)"
+  names: [Gutiérrez, Bustamante, Ruiz, Cobo, Pérez, Velarde, Ceballos, Gómez]   # Cantabrian names: judgement
+  skill: 0.9
+  fee_pounds: 3                  # judgement, in sterling for the one account; unverified
+  cast: starboard                # from the road the head paying off to the eastward for the mouth (judgement)
+  course_out_deg: 90             # out by the channel past the Oradada and between Mouro and the Point of the Port
+  words:
+    channel: "With winds of the first or second quadrant enter between Santa Marina and Mouro, or between Mouro and the Point of the Port, which they call the Bar, six brazas. Get two cables south of the Oradada and steer for Mount Castillo till the islet opens a lane with the Point of the Port; keep it so till north and south with the Point of Promontorio, then a little more south, the lane widening, till north and south with San Martín's battery; then for the peak that shows south of Mount Castillo till north and south with the mole, and haul north for the road."
+    marks: "Cape Mayor and its watch-tower; the Isles of Mouro and Santa Marina; the Oradada, an islet pierced like a bridge; the battery of San Martín; the great church of Santander; the Puntal's long sand on the south side."
+    anchorage: "Before the great church in four to six brazas sand, moored NE and SW with the tide. These marks serve only for the channel as it now lies: do not enter without a pilot of the country. With a fresh westerly gain the Promontorio on the flood, or anchor off the Sardinero in ten or twelve brazas sand."
+    tide: "High water at three in the afternoon at full and change; the tide rises thirteen and a half feet at springs and nine or ten at the quarters. The ebb runs harder than the flood, three miles an hour, and in the mouth turns SE toward the bay south of Santa Marina: it has set many on shore."
+
+tide:
+  establishment: Santander
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wool, price: 70, origin: spain, note: "the merino wool of Castile shipped by Santander (judgement)"}
+    - {good: wine, price: 30, origin: spain, note: "from memory"}
+    - {good: brandy, price: 95, origin: spain, note: "from memory"}
+    - {good: salt, price: 12, origin: spain, note: "from memory"}
+    - {good: timber, price: 5, origin: spain, note: "the oak of the Montaña for Guarnizo's yard (judgement)"}
+    - {good: canvas, price: 42, origin: null, note: "from memory"}
+    - {good: salt beef, price: 72, origin: spain, note: "from memory"}
+    - {good: tobacco, price: 90, origin: null, note: "the Crown's monopoly; from memory"}
+    - {good: barley, price: 9, origin: spain, note: "the grain of Castile brought down to the coast (judgement)"}
+    - {good: hemp, price: 56, origin: null, note: "from memory"}
+
+dockyard:
+  kind: chandlers                # Guarnizo's yard builds the King's ships up the bay; the town sells to a neutral as a chandler (judgement)
+  items:
+    - {item: topmast, hours: 10, pounds: 45, note: "the town's shipwrights (judgement)"}
+    - {item: topgallant_mast, hours: 5, pounds: 15}
+    - {item: yard, hours: 7, pounds: 30}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.055}
+    - {item: water, hours_per_ton: 0.12, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  able: {hands: 3, pounds: 2, delay_h: 24}
+  ordinary: {hands: 6, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 12, pounds: 1, delay_h: 12}
+
+closed_to: []

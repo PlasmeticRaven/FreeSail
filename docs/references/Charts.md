@@ -124,6 +124,31 @@ were.
 | TICON (Piccioni et al. 2019), `TICON.txt` | the zip at doi.pangaea.de (PANGAEA 896587), fetched 2026-10-09, SHA-256 7055f8ed…6514, CC BY 4.0 | Nine gauges of the block by their coordinates (Concarneau, Port-Tudy, Le Crouesty, Saint-Nazaire, Paimboeuf, the Pointe de Saint-Gildas, Les Sables-d'Olonne, La Rochelle-Pallice, the Île d'Aix): M2, S2 and N2, held out of the blend (`held_gauges`, after the Channel east's two). |
 | The French encyclopaedia's pages | fr.wikipedia.org through its API, read 2026-10-09, slowly (most requests refused for their rate) | The lights' dates and positions: the Baleines (Vauban's tower 1682, replaced 1854), Chassiron (1685; its second tower 1836), Penmarch (1835), Goulphar (1836), Pen Men (1839), Penfret (1838), the Teignouse (1845), the Pilier (1829), Yeu (1830), La Vieille (1887), Tévennec (1875) and the Bec du Raz (1839); La Vieille's and Tévennec's positions and the Raz's six knots at springs; the tower of the Lanterne at La Rochelle. |
 
+## Biscay south and Galicia (package 39c)
+
+The third block of spec M6 §26, `biscay-south` (42.0 N to 45.9 N, 9.33 W to 0.9 W,
+abutting Biscay north at 45.9 N and the Portuguese block at 42.0 N; its west moved from
+the brief's 9.0 W to the tile column's edge so that Finisterre lies within, at no cost in
+tiles). Its tiles are cut from the same two grids, fetched for the region on 2026-10-10:
+EMODnet's DTM 2024 by its ERDDAP service (`elevation` and `elevation_max` over 41.8 to
+46.15 N, 9.4 to 0.75 W, two classic netCDF subsets of 138.9 MB, CC BY 4.0) and
+GEBCO_2025's area extract (41.7 to 46.25 N, 9.5 to 0.65 W, ESRI ASCII in a zip of 11.8
+MB, public domain), their checksums in the manifest. 129 tiles at level 2 (the ten of the
+northern row that Biscay north lists are its and the two of the southern row that
+Portugal lists are Portugal's, the seam rule; the 59 with no water at the datum, inland
+Castile, León and the Landes, computed and not written, `skip_dry_tiles`) and 30 at level
+3 in seven harbour groups (Royan and Verdon, Santander, Gijón, Ferrol, Corunna, Vigo,
+Bayona); GEBCO's fill raised by the French gauges' mean level, 2.5 m
+(`fill_mean_level_m`); about 19.3 MB with the coast and the features. No override: no period sheet's datum at a Spanish port was read.
+
+| Work | Where read | What was taken |
+|---|---|---|
+| Tofiño, *Derrotero de las costas de España en el Océano Atlántico, y de las Islas Azores ó Terceras*, Madrid 1789 (t. II) | Internet Archive `A302201` (the Universidad de Sevilla's copy, public domain mark), the OCR text, checked against `bub_gb_04Yq4fsvB8gC` (the Bayerische Staatsbibliothek's); fetched 2026-10-10 | The marks of `features/biscay-south.yaml` from Cabo Prior to the Minho (pp. 1 to 73) and from the river of Bayonne to Cabo Prior (pp. 131 to 189): the capes, isles, rocks and roads with their depths in brazas and their grounds, the entrances of Passages, St Sebastian, Bilbao, Santoña, Santander, Ribadeo, Ferrol, Corunna, Camariñas, Corcubión, Muros, Pontevedra and Vigo, the hours of high water and the rises in pies de Burgos (the epitome's rows), Santander's ebb of three miles an hour; the lanthorn of St Sebastian and the Tower of Hercules lit. The volume also covers Portugal to Cape Trafalgar and the Azores (for packages 39d and 39e). |
+| Tofiño, *Atlas Marítimo de España*, 1789 | Internet Archive `A062039040` (the Universidad de Sevilla's copy, public domain mark), its IIIF server, read 2026-10-10; 46 sheets at about 7,500 by 5,000 pixels | The 'Plano de la rya y puerto de Ferrol' (1789) and the 'Plano del puerto de Santander' (1788) read for names and soundings (their notes: brazas of two varas castellanas at low water of spring tides); not transcribed as patches, no datum's height being read. Among its sheets also Corcubión and Pontevedra, Portugalete, Cadiz's bay and Angra. |
+| Faden, *Le Petit Neptune François*, 1793, Magin's 'Sailing Instructions for the Entrance of the Gironde', pp. 84 to 88; 'Coast of Arcasson', 'Bassin d'Arcasson', 'Bayonne', 'St. Jean de Luz', pp. 89 to 92; 'Tides and Currents', p. 93 | Internet Archive `lepetitneptunefr00fade`, the OCR text | The Gironde's marks and channels, the Tower of Cordouan and its fire (the footnote, p. 85), the roads of Verdon and Royan, Arcachon's banks and road, the bar of Bayonne, St Jean de Luz and Socoa; the hours of high water. |
+| The Lighthouse Directory (R. Rowlett, University of North Carolina at Chapel Hill, ibiblio.org/lighthouse), its pages for Spain's Basque Country, Cantabria, Asturias and Galicia and France's Aquitaine | read 2026-10-10 (the encyclopaedias refused every request for its rate) | The lights' years: Cordouan 1611 (the conical tower completed 1788), Monte Igueldo 1778 to 1855, the Tower of Hercules restored from 1785; not yet in 1805 Cape Mayor 1839, Estaca de Bares 1850, Machichaco 1852, Peñas 1852, Finisterre 1853, Villano 1854. |
+| SHOM, *Références Altimétriques Maritimes* | the WFS layer `RAM_BDD_WLD_WGS84G_WFS:ram_3857`, GeoJSON, read 2026-10-10 (Licence Ouverte 2.0) | The mean levels (NM) of the four French gauges held (Le Verdon-sur-Mer 3.33 m, Arcachon 2.48, Boucau-Bayonne 2.53, Saint-Jean-de-Luz 2.51); the low water of springs at Le Verdon (1.05 m) and Royan (1.20 m) for Royan's port file. |
+| TICON (Piccioni et al. 2019), `TICON.txt` | the zip at doi.pangaea.de, fetched 2026-10-10, SHA-256 7055f8ed…6514 (the same file), CC BY 4.0 | Eleven gauges of the block by their coordinates (Le Verdon, Arcachon, Boucau-Bayonne, Socoa, Bilbao, Santander, Gijón, Ferrol, A Coruña, Vilagarcía, Vigo): M2, S2 and N2, held out of the blend. |
 ## Portugal and Cadiz (package 39d)
 
 The fourth block of spec M6 §26, `portugal` (36.4 N to 42 N, 10 W to 6 W, abutting
@@ -186,6 +211,31 @@ moved, each in `fix`, and 5 of the twelve marks of Sancti Petri added at the mer
 Laja de Plaste, the Marrajotes and the Laja of Cape Roche, which EMODnet's grid does not
 resolve, kept where Tofiño's bearings put them; the Laja of Conil a five-metre shoal of
 the grid exactly at his bearings).
+
+## Madeira and the Western Islands (package 39e)
+
+The fifth block of spec M6 §26, widened by decision 44 to the Azores: two regions alone
+in the ocean, `madeira` (32 to 33.5 N, 17.5 to 16 W) and `azores` (36.5 to 40 N, 31.5 to
+24.5 W). Their tiles are cut from the same two grids, fetched on 2026-10-10 into a fresh
+cache: EMODnet's DTM 2024 (`elevation` and `elevation_max`, 31.5 to 33.85 N and 17.95 to
+15.65 W, 20.0 MB each; 36.2 to 40.25 N and 31.6 to 24.15 W, 111.4 MB each; CC BY 4.0)
+and GEBCO_2025's area extracts (2.6 MB and 11.5 MB, public domain), their checksums in
+the manifest. Madeira 25 level-2 tiles and 5 level-3 tiles (Funchal, Porto Santo), the
+Azores 153 and 7 (Angra, Ponta Delgada, Horta and the Fayal channel); about 3.4 and
+40.5 MB with their coasts. **The corridor widened to 32 W**: a third GEBCO extract
+(31.9 to 51.1 N, 32.1 to 0.9 W, ESRI ASCII in a zip of 193.3 MB, SHA-256 69c4dbf9…eb9c,
+retrieved 2026-10-10) and 48 tiles built from it; held uncommitted for the owner's word,
+since every existing corridor tile changes with it (docs/dev/TuningNotes.md, package 39e).
+
+| Work | Where read | What was taken |
+|---|---|---|
+| *The Oriental Navigator*, second edition, Laurie and Whittle, 1801 | Internet Archive `orientalnavigat00huddgoog`, the OCR text, 'Directions for sailing from the British Channel towards Porto Santo, Madeira, the Canaries ...', pp. 22 to 25 (the first edition of 1794, `bim_eighteenth-century_the-oriental-navigator-_1794`, the ECCO microfilm's OCR) | Madeira's marks and Funchal Road: the Desertas and the Bugio, the small island like a low wall and the high pyramid rock taken for a ship, the passage eight miles broad and its south-westerly current in the breezes, the passage between the Desertas not to be attempted, the low point west of the town and the Brazen Head, the Loo and its fort, the Citadel, the berth in 18 to 30 fathoms on sand with two cables on the anchor, the ground east and west of it, the landing within the Loo, the surf, the land and sea breezes, the south-westers of January to March, the tide's rise of 7 1/2 feet; Porto Santo's road in 12 fathoms and its hummocks seen 15 or 20 leagues off. |
+| The Hon. Thomas Howe, 'Madeira. The annexed sketch of the South Side of Madeira and the Desertas', 1787 | Internet Archive `bim_eighteenth-century_madeira-the-annexed-ske_howe-hon-thomas_1787`, the OCR text | The text the Oriental Navigator follows nearly word for word (the Desertas, the passage, the breezes of the valley of Funchal); the vessel of 200 tons through the Desertas' narrow passage in April 1762. |
+| Vicente Tofiño de San Miguel, *Derrotero de las costas de España en el Océano Atlántico, y de las Islas Azores ó Terceras*, Madrid, 1789 | Internet Archive `derroterodelasco00tofi_0`, the OCR text, pp. 190 to 235 (public domain) | The 59 marks of `features/azores.yaml`: every island's points, towns, roads and anchorages with their depths in brazas and their grounds, the Formigas surveyed (all visible, a shoal to the S E with no less than eleven brazas), Monte Brasil and the castles of Angra, the Cabras, Praya, the Peak of Pico measured at 2935 varas and seen 32 leagues in clear weather, the Bank of Fayal with 22 Spanish feet and its marks, Fayal Road and its marks, high water at Fayal at half past twelve and the rise eight feet, the stream through the channel N E and S W at three miles; the port files' directions. His bearings are true (the Punta Delgada and the Galera prove it). His plans of Angra and of Fayal ("véase su plano") were not found. |
+| J. W. Norie, *A New and Complete Epitome of Practical Navigation*, 1805 | Internet Archive `norie-1805-a-new-and-complete-epitome-of-practical-navigation`: the OCR text for the table of latitudes and longitudes (the longitudes lost to the columns), and the page images of Table XLI, pp. 248 to 250, through the archive's IIIF server, read 2026-10-10 | High water at full and change: Funchal 12h 4m, 7 feet; Angra Bay, Terceira, 11h 45m, 8 feet; Fayal Road 2h 20m (the first figure faint), 4 1/2 feet: the epitome's three places of the islands. No row for St Michael's. |
+| William Herbert, *A New Directory for the East-Indies*, 1791 | Internet Archive `newdirectoryfore00herb`, the OCR text, p. 273 | Read, not cited: the passage from the Lizard to between Madeira and Porto Santo; the variation in Fayal Road in 1764. |
+| TICON (Piccioni et al. 2019), `TICON.txt` | the zip at store.pangaea.de (PANGAEA 896587), fetched 2026-10-10, the same SHA-256 7055f8ed…6514, CC BY 4.0 | Five gauges of the islands by their coordinates: Funchal (1976 to 2013), Ponta Delgada (1978 to 2012; the file's shorter BODC series of the same place 36 degrees earlier in M2), Angra (1976 to 1983, its 1957 to 1962 series agreeing), Horta (1984 to 1986), Santa Cruz das Flores (2006 to 2013): M2, S2 and N2, held (`held_gauges`), no mean level read. |
+| The Portuguese encyclopaedia's pages | pt.wikipedia.org, the pages themselves (the API refused for its rate), read 2026-10-10 | The lights' dates, every one after 1805: the Ponta de São Lourenço 30 September 1870 ("the oldest light of Madeira"), the Ilhéu de Cima built 1900, the Ponta do Pargo 5 June 1922; the Ponta do Arnel 26 November 1876 ("the first light of the Azores"), the Ferraria 1901, Gonçalo Velho 15 November 1927, the Ponta do Topo 1927, the Contendas 1 February 1934, the Ponta da Ilha 1946, the Ribeirinha 1 November 1919 to 1998, Santa Clara at Ponta Delgada 1945; positions where the page gives them (São Lourenço, the Ilhéu de Cima, the Ribeirinha). |
 
 ## The unverified list, checked
 

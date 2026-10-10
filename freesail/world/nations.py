@@ -151,21 +151,32 @@ class Nations:
         return False
 
     def wars_words(self) -> str:
-        """'Britain at war with France, Spain and the Batavian Republic; the United States,
-        Portugal and Denmark at peace with all', each war said once."""
-        said: set[str] = set()
-        parts = []
-        for n in self.nations.values():
-            if n.id in said:
-                continue
-            enemies = [e for e in self.enemies_of(n.id) if e not in said]
+        """The pilot's news of the wars: 'Britain at war with the Batavian Republic, France
+        and Spain', and what the news lately changed ('peace made between Britain and
+        France'; a war declared between two others). A nation at peace with all is not
+        news (the owner's ruling of 2026-10-10, decision 45): the table grows with the
+        chart, the pilot's word does not."""
+        parts: list[str] = []
+        said: set[frozenset[str]] = set()
+        britain = self.nations.get("britain")
+        if britain is not None:
+            enemies = self.enemies_of(britain.id)
             if enemies:
                 names = [self.nations[e].name for e in enemies]
-                parts.append(f"{n.name} at war with {_and(names)}")
-                said.add(n.id)
-        quiet = [n.name for n in self.nations.values() if not self.enemies_of(n.id)]
-        if quiet:
-            parts.append(f"{_and(quiet)} at peace with all")
+                parts.append(f"{britain.name} at war with {_and(names)}")
+                said.update(frozenset((britain.id, e)) for e in enemies)
+            else:
+                parts.append(f"{britain.name} at peace with all")
+        for _kind, a, b, _when in self.news:
+            pair = frozenset((a, b))
+            if pair in said or a not in self.nations or b not in self.nations:
+                continue
+            said.add(pair)
+            first, second = self.nations[a].name, self.nations[b].name
+            if self.at_war(a, b):
+                parts.append(f"{first} at war with {second}")
+            else:
+                parts.append(f"peace made between {first} and {second}")
         return "; ".join(parts) if parts else "every nation at peace"
 
     def to_dict(self) -> dict[str, Any]:

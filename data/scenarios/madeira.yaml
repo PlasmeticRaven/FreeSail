@@ -1,0 +1,79 @@
+# FreeSail: the Madeira block's passage (spec M6 §26, block 5; package 39e). A free
+# passage, not a gate's: the American schooner, a neutral, from Funchal Road out round
+# Lorenzo Point, the east end of Madeira, across to Porto Santo Road, and back to Funchal.
+# The block's water on the whole chart (`chart: atlantic-east`), its marks
+# (data/charts/features/madeira.yaml) and its ports (Funchal and Porto Santo, on package
+# 35's machinery). Given to either driver with --scenario:
+#     py -m freesail.ui.console --scenario data/scenarios/madeira.yaml
+# and printed whole by
+#     py tools/day_log.py data/scenarios/madeira.yaml --hours 30 --reckoning
+#
+# The passage as the book beside this file sails it (madeira.orders): she is in Funchal
+# Road (the Oriental Navigator 1801 p. 24: eighteen to thirty fathoms, sand, south-east
+# of the Loo) at six in the morning of 14 June 1805, her anchor just weighed; she stands
+# off south-east, clear of the Brazen Head, then east along the island's south side for
+# a point two miles south of Lorenzo Point, round it into the passage between Madeira and
+# the Desertas and north-east for Porto Santo Road, which she comes up to from the
+# south, clear of the islet off its south-west end, and anchors in twelve fathoms (p. 22).
+# Brought up, she weighs again for
+# Funchal, comes back round the point and in to the road from the eastward, and anchors.
+# The weather is pinned, a westerly of twelve knots in the morning (a day off the
+# season's north-east trade) going round by the north to the trade in the afternoon,
+# judgement, so that both ways are free (the planner shapes no board to windward: a road
+# to windward is never fetched) and the passage is the same on every machine. Sailed once
+# at seed 7 for the package's notes
+# (docs/dev/TuningNotes.md, package 39e); not a gate's and not pinned.
+
+name: Madeira, the schooner from Funchal Road to Porto Santo and back
+seed: 7
+start: 1805-06-14T06:00
+position: {lat_deg: 32.6380, lon_deg: -16.9060}   # Funchal Road (the Oriental Navigator 1801 p. 24)
+chart: atlantic-east
+nation: united-states
+ship:
+  file: data/ships/topsail-schooner.yaml
+  heading_deg: 135
+  glass: true
+  instrument: octant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.9}
+
+papers:
+  chart: {year: 1804}
+  epitome: norie                  # the better table, which has Funchal (data/tides/establishments.yaml)
+  almanac: 1805
+
+cargo:
+  purse_pounds: 500
+
+ports: [funchal, porto-santo]
+
+weather:
+  wind:
+    - {at: 1805-06-14T04:00, from_deg: 270, knots: 12, air_mass: neutral}
+    - {at: 1805-06-14T13:00, from_deg: 275, knots: 11}
+    - {at: 1805-06-14T15:00, from_deg: 315, knots: 10}
+    - {at: 1805-06-14T17:00, from_deg: 30, knots: 12}
+    - {at: 1805-06-15T08:00, from_deg: 45, knots: 13}
+  background:
+    {hpa: 1022, gradient_hpa_per_100km: 0.3, high_toward_deg: 300}
+  systems:
+    - name: the high to the north-west
+      kind: high
+      radius_km: 1200
+      track:
+        - {at: 1805-06-13T12:00, x_km: -700, y_km: 600, hpa: 1027}
+        - {at: 1805-06-16T12:00, x_km: -650, y_km: 650, hpa: 1026}
+  sky: {sky: detached clouds, weather: fine, visibility: the horizon}
+  sea: true
+
+standing_orders:
+  - data/scenarios/madeira.orders
+
+orders:
+  - set plain sail
+  - shape a course for 32 36.5 N 16 50 W

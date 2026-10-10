@@ -49,9 +49,21 @@ def test_the_eight_nations_and_the_wars_of_june_1805(table):
     assert table.wars_words().startswith(
         "Britain at war with the Batavian Republic, France and Spain"
     )
-    assert (
-        "the United States, Portugal, Denmark and Morocco at peace with all" in table.wars_words()
-    )
+    # a nation at peace with all is not news (decision 45): the table grows with the chart
+    # and the pilot's word does not
+    words = table.wars_words()
+    assert words == "Britain at war with the Batavian Republic, France and Spain", words
+    for quiet in ("United States", "Portugal", "Denmark"):
+        assert quiet not in words
+    # what the news lately changed is said after Britain's wars (a table of its own: the
+    # fixture is shared)
+    moved = N.load_nations()
+    assert moved.make_peace("britain", "france", "1805-06-12")
+    assert moved.declare_war("united-states", "denmark", "1805-06-13", "the pilot's news")
+    assert moved.wars_words() == (
+        "Britain at war with the Batavian Republic and Spain; "
+        "peace made between Britain and France; the United States at war with Denmark"
+    ), moved.wars_words()
 
 
 def test_morocco_is_at_peace_with_all_and_its_ports_neutral_to_every_flag(table):
@@ -69,6 +81,8 @@ def test_morocco_is_at_peace_with_all_and_its_ports_neutral_to_every_flag(table)
         if other != "morocco":
             assert table.stance("morocco", other) == "neutral", other
     assert table.stance("morocco", "morocco") == "open"
+    # at peace with all, so not the pilot's news (decision 45)
+    assert "Morocco" not in table.wars_words()
     doc = yaml.safe_load(open(N.NATIONS_PATH, encoding="utf-8"))
     relations = doc["nations"]["morocco"]["relations"]
     assert set(relations) == set(table.nations) - {"morocco"}
@@ -133,12 +147,24 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "paimboeuf": "france",
         "la-rochelle": "france",
         "rochefort": "france",
+        # Biscay south and Galicia (package 39c): the Gironde's road French, the rest Spain's
+        "royan": "france",
+        "santander": "spain",
+        "ferrol": "spain",
+        "corunna": "spain",
+        "vigo": "spain",
         # Portugal and Cadiz (package 39d)
         "oporto": "portugal",
         "lisbon": "portugal",
         "setubal": "portugal",
         "lagos": "portugal",
         "cadiz": "spain",
+        # Madeira and the Western Islands (package 39e): Portuguese
+        "funchal": "portugal",
+        "porto-santo": "portugal",
+        "angra": "portugal",
+        "ponta-delgada": "portugal",
+        "horta": "portugal",
         # the Strait (package 39f)
         "gibraltar": "britain",
         "algeciras": "spain",

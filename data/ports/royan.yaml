@@ -1,0 +1,110 @@
+# FreeSail: Royan and the roads of the Gironde as a port (spec M6 §26; package 39c, the
+# Biscay south and Galicia block), on package 35's machinery; the marks are the features
+# file's (data/charts/features/biscay-south.yaml). The river above the roads, to
+# Bordeaux, is milestone 8's: the port is the river's mouth, where a ship for Bordeaux
+# waits for the tide and the river's pilot.
+#
+# Sources. Faden 1793, Le Petit Neptune Français, Magin's 'Sailing Instructions for the
+# Entrance of the Gironde, or River of Bourdeaux', pp. 84 to 88: the Tower of Cordouan;
+# the five channels among the banks, of Charentais, of Matelier (25 to 26 feet at low
+# water, for the largest ships), of Lescameau, of La Porte and des Graves; beyond the
+# English Bar, from Point Terre Negre to Royan, clean with deep water; ships beyond Grave
+# Point anchor in the road of Verdon or in that of Royan; high water north of Cordouan at
+# half past four at full and change and a quarter of an hour later south of it, the rise
+# 14 or 15 feet, 7 or 8 at neaps; the variation 21° 15' W; Du Bocage's continuation to
+# Bordeaux (p. 89), the river's, not this port's.
+#
+# The datum: UNVERIFIED. No period sheet of the Gironde's mouth is patched in this
+# package; the chart's depths are EMODnet's at LAT, and the period's low water of springs
+# stands 1.05 m above it at Le Verdon-sur-Mer and 1.20 m at Royan (SHOM's RAM, BMVE, read
+# 2026-10-10) for the patch that a later package makes.
+#
+# The stance. Royan is French (data/nations.yaml): hostile to a King's ship in June 1805,
+# open to a neutral, as the other French ports of Biscay are. Prices FROM MEMORY or
+# JUDGEMENT; sterling at the exchange.
+
+id: royan
+name: Royan
+nation: france
+source: "Faden 1793 pp. 84-88 (Magin's instructions for the entrance of the Gironde: Cordouan, the channels, the roads of Verdon and Royan, the tides)"
+datum: unverified
+
+# The outer road is Verdon's within Grave Point, where ships from the sea bring up; the
+# anchorage and the mooring are Royan's road on the north shore.
+outer_road:
+  feature: verdon-road
+  name: the road of Verdon
+  lat_deg: 45.5520
+  lon_deg: -1.0480
+anchorage:
+  feature: royan-road
+  name: the road of Royan
+  lat_deg: 45.6150
+  lon_deg: -1.0450
+mooring:
+  feature: royan-road
+  name: the road of Royan
+  lat_deg: 45.6150
+  lon_deg: -1.0450
+shore:
+  feature: royan
+  name: the landing at Royan
+  lat_deg: 45.6235
+  lon_deg: -1.0290
+
+pilot:
+  station: gironde-mouth
+  cruising_nm: 8                 # judgement: the pilots of Royan met ships off the passes
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the pilots' boat of Royan
+    under: lugsails
+    note: "judgement"
+  names: [Renaud, Coudreau, Gaboriaud, Proust, Duprat, Chauvin, Robin, Moinet]   # names of Saintonge: judgement
+  skill: 0.9
+  fee_pounds: 4                  # judgement, in sterling for the one account; unverified
+  cast: larboard                 # from the road the head paying off to the westward for the passes (judgement)
+  course_out_deg: 250            # out by the Channel des Graves past Grave Point
+  words:
+    channel: "From the offing steer for the Tower of Cordouan E by N half N, the best course for the Channel of Matelier, 25 or 26 feet at low water, for the largest ships, till Soulac church bears SE by E half E; then north for the breakers of Point de Cuivre. By the Channel des Graves shape for Soulac church on with the beacon, then for Grave Point ENE till Cordouan bears NW, and coast along a league and a half off till past Ruffiat."
+    marks: "The Tower of Cordouan on its rocks; the Wooden Tower and the beacons on Point la Coubre; Soulac's church in its sands; Grave Point; Royan's windmills and St Peter's church; the steeple of St Palais."
+    anchorage: "Beyond Grave Point anchor in the road of Verdon, St George's windmills on with the middle of the sand-downs of Terrier de l'Attache, or in the road of Royan, St Peter's church on with the point. Keep off the rocks of Cordouan on the ebb: the current sets on them."
+    tide: "North of Cordouan it is high water at half past four at full and change, south of it a quarter of an hour later; the rise fourteen or fifteen feet, seven or eight at neaps. A strong wind into the river makes a good tide; one out of it, a lesser."
+
+tide:
+  establishment: the Tower of Cordouan
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 28, origin: france, season: {11: 0.9, 12: 0.9}, note: "the wine of Bordeaux brought down the river (judgement: cheapest here after the vintage)"}
+    - {good: brandy, price: 92, origin: france, note: "from memory"}
+    - {good: salt, price: 9, origin: france, note: "the salt of Marennes and the Seudre close by; from memory"}
+    - {good: canvas, price: 41, origin: france, note: "from memory"}
+    - {good: coal, price: 6, origin: britain, note: "from memory"}
+    - {good: salt beef, price: 70, origin: france, note: "from memory"}
+    - {good: hemp, price: 55, origin: null, note: "from memory"}
+    - {good: timber, price: 5, origin: france, note: "the pines of the Médoc (judgement)"}
+    - {good: tin, price: 180, origin: britain, note: "from memory, as Brest's"}
+    - {good: biscuit, price: 30, origin: france, note: "judgement"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 10, pounds: 45, note: "the town's shipwrights (judgement)"}
+    - {item: topgallant_mast, hours: 5, pounds: 15}
+    - {item: yard, hours: 7, pounds: 30}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.055}
+    - {item: water, hours_per_ton: 0.12, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  able: {hands: 3, pounds: 2, delay_h: 24}
+  ordinary: {hands: 6, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 12, pounds: 1, delay_h: 12}
+
+closed_to: []

@@ -1,0 +1,374 @@
+# The features of Madeira, Porto Santo and the Desertas (spec M6 §26, block 5; package
+# 39e): the voyage's end, Funchal and its open road, with the island's marks as 1805 had
+# them, in the period's words, each with its source in the references' form
+# (docs/references/README.md), on the rules of channel-west.yaml's head, read from:
+#
+#   Oriental Navigator 1801   The Oriental Navigator; or, New Directions for Sailing to
+#                   and from the East Indies (Laurie and Whittle, the second edition,
+#                   1801; Internet Archive orientalnavigat00huddgoog), the OCR text,
+#                   'Directions for sailing from the British Channel towards Porto Santo,
+#                   Madeira, the Canaries ...', pp. 22 to 25. The first edition (1794,
+#                   Internet Archive bim_eighteenth-century_the-oriental-navigator-_1794)
+#                   is in period too; its OCR is the ECCO microfilm's and was read only
+#                   where the second's was doubtful. In English fathoms and leagues.
+#   Howe 1787       The Hon. Thomas Howe, 'Madeira. The annexed sketch of the South Side
+#                   of Madeira and the Desertas' (Internet Archive bim_eighteenth-century_
+#                   madeira-the-annexed-ske_howe-hon-thomas_1787), the text the Oriental
+#                   Navigator follows nearly word for word: the Desertas, the passage, the
+#                   land and sea breezes of the valley of Funchal.
+#   Norie 1805      J. W. Norie, A New and Complete Epitome of Practical Navigation, 1805
+#                   (Internet Archive norie-1805-a-new-and-complete-epitome-of-practical-
+#                   navigation), the table of latitudes and longitudes: Funchal 32 37 30 N,
+#                   Lorenzo Point 32 43, Tristam Point, the South Point of the Desertas
+#                   32 22 (the longitudes lost to the OCR's columns).
+#   encyclopaedia   the Portuguese encyclopaedia's pages for the lights, read 2026-10-10
+#                   (pt.wikipedia.org; the API refused for its rate, the pages served):
+#                   the light of the Ponta de São Lourenço lit 30 September 1870, "the
+#                   oldest light of Madeira"; the Ilhéu de Cima's built 1900; the Ponta do
+#                   Pargo's lit 5 June 1922. No light stood in the island in 1805.
+#
+# No period plan of Funchal road was read (the Admiralty's survey is Vidal's, of the
+# 1840s; a plan in the English pilots of the 1790s is named in spec M6 §26 and was not
+# found from this machine), so no override is patched and the port files say `datum:
+# unverified`. The road is EMODnet's at its sixteenth of a minute, and EMODnet's grid has
+# no modern mole: the Loo is a rock off the beach as the directions have it.
+#
+# Positions are in the modern frame (WGS 84, the EMODnet DTM 2024 grid the tiles are cut
+# from): first placed from the modern chart (from memory) and the pilot's bearings, then
+# checked against the region's tiles by channel-west.yaml's rule (a headland, island,
+# town, castle or hill to the nearest land within 800 m; a light to the nearest land
+# within 400 m; a rock to the nearest shoal head within 400 m; an anchorage to water
+# holding half the pilot's depth within 800 m), each move in `fix`. Heights are above the
+# sea for the horizon, the modern chart's from memory (UNVERIFIED) unless the entry says
+# otherwise. The island's peaks stand far above the search's reach (`chart.SEARCH_HEIGHT_M`,
+# 300 m) and are seen to their own horizon in clear weather; the directions' warning that
+# Madeira "is frequently covered with clouds, so that it is scarce visible at 5 or 6
+# leagues distance" is the weather's, which has no cloud on a hill (a finding).
+#
+# The lead reviews this list against the sources before the merge: the citation is on
+# every line for that.
+
+region: madeira
+features:
+
+  # ---------------------------------------------------------------------------
+  # Funchal and its road
+  # ---------------------------------------------------------------------------
+
+  - id: funchal-town
+    kind: town
+    name: Funchal
+    modern: Funchal, the old town by the Sé
+    lat_deg: 32.6490
+    lon_deg: -16.9080
+    height_m: 30
+    source: "Oriental Navigator 1801, pp. 23 to 24: the valley of Funchal, the town, the road and the castle; Norie 1805, the table of latitudes: Funchal 32 37 30 N"
+    says: "Funchal, the town white up the valley behind its beach, the ships riding in the road before it."
+
+  - id: loo-rock
+    kind: castle
+    name: the Loo Rock
+    modern: the Fortaleza de Nossa Senhora da Conceição do Ilhéu (the Pontinha)
+    lat_deg: 32.6418
+    lon_deg: -16.9130
+    height_m: 25
+    source: "Oriental Navigator 1801, p. 24: in steering in for the road you will see the Loo, a large rock a little to the westward of the town, on which there is a fort, bearing N by E 3/4 E or N by E by compass"
+    says: "The Loo, a large rock with a fort on it a little west of the town: bring it to bear north by east and stand in for the road."
+    fix: "moved 30 m to the grid's land (the rock stands 7 m in the grid's cell)"
+
+  - id: funchal-citadel
+    kind: castle
+    name: the Citadel of Funchal
+    modern: the Fortaleza de São João Baptista do Pico
+    lat_deg: 32.6520
+    lon_deg: -16.9180
+    height_m: 110
+    source: "Oriental Navigator 1801, p. 24: the Citadel, called also the Spanish Castle, a brown square fort on a hill over the W N W part of the town"
+    says: "The Citadel, the Spanish Castle, a brown square fort on its hill over the west of the town: keep it well open east of the Loo and you are on the best ground."
+
+  - id: funchal-road
+    kind: anchorage
+    name: Funchal Road
+    modern: the anchorage off Funchal
+    lat_deg: 32.6380
+    lon_deg: -16.9060
+    height_m: 0
+    depth_fathoms: 24
+    bottom: "sand"
+    source: "Oriental Navigator 1801, p. 24: the best anchorage is in from 18 to 30 fathoms, sand, to the south-eastward of the Loo Rock, having the Citadel well open to the eastward of the Loo Rock; to the westward of this the ground is sand and rock; to the eastward stiff clay, but deep water, and near the east edge of the bank, which is very steep on that side, foul ground and rocky; let go in 36 or 38 fathoms with two cables on the anchor"
+    says: "Funchal Road: the best berth is in eighteen to thirty fathoms on sand south-east of the Loo, the Citadel well open east of it. The bank is steep: a ship that comes in with a fresh easterly scarcely brings up till she has veered a good way."
+
+  - id: funchal-road-east
+    kind: bottom
+    name: the ground east of Funchal Road
+    modern: the steep edge of the bank off the eastern town
+    lat_deg: 32.6400
+    lon_deg: -16.8960
+    height_m: 0
+    depth_fathoms: 40
+    bottom: "stiff clay, foul and rocky at the bank's steep east edge"
+    source: "Oriental Navigator 1801, p. 24: to the eastward stiff clay, but deep water, and near the east edge of the bank, which is very steep on this side, foul ground and rocky"
+    says: "East of the road the ground is stiff clay in deep water, and at the bank's steep edge foul and rocky."
+    fix: "judgement: half a mile east of the road's berth, where the grid's bank falls steeply"
+
+  - id: funchal-landing
+    kind: place
+    name: the landing within the Loo
+    modern: the beach west of the Pontinha
+    lat_deg: 32.6440
+    lon_deg: -16.9140
+    height_m: 2
+    source: "Oriental Navigator 1801, p. 24: there is generally a surf on the beach, early in the year particularly, which prevents landing in a ship's boat anywhere except within (to the north-westward of) the Loo Rock, about half a mile from the town; therefore the boats of that place are employed for goods, watering, &c."
+    says: "The only landing for a ship's boat when the surf runs is within the Loo, half a mile west of the town; the town's own boats carry the goods and the water."
+
+  - id: brazen-head
+    kind: headland
+    name: the Brazen Head
+    modern: Ponta do Garajau (Cabo Garajau)
+    lat_deg: 32.6360
+    lon_deg: -16.8533
+    height_m: 120
+    source: "Oriental Navigator 1801, pp. 23 to 24: the Brazen Head is a high steep cliff to the eastward of the road, whose form in some directions appears not unlike the stern of a very large ship; vessels coming too close to it have frequently been baffled by eddy winds and calms"
+    says: "The Brazen Head, a high steep cliff east of the road like the stern of a great ship: keep off it, or lose the breeze in its eddies and tow in."
+    fix: "moved 100 m to the grid's land at the cliff's foot"
+
+  - id: funchal-west-point
+    kind: headland
+    name: the low point west of Funchal
+    modern: Ponta da Cruz
+    lat_deg: 32.6350
+    lon_deg: -16.9400
+    height_m: 15
+    source: "Oriental Navigator 1801, p. 23: after you have passed the Desertas you ought to steer for the low point to the westward of Funchal town, and not keep too near the Brazen Head, until you are almost off the town, and then haul directly in for the road"
+    says: "The low point west of the town, the mark to steer for after passing the Desertas, until the town is open and you haul in for the road."
+
+  - id: valley-of-funchal
+    kind: place
+    name: the valley of Funchal
+    modern: the amphitheatre of Funchal
+    lat_deg: 32.6650
+    lon_deg: -16.9150
+    height_m: 300
+    source: "Oriental Navigator 1801, p. 23: off the valley of Funchal there are regular land and sea breezes in summer, the sea breeze setting in from the south-westward in the forenoon, the land breeze off shore about ten at night; these do not extend above three or four miles off shore; one instance of a hurricane down the valley blowing every ship out of the road in January"
+    says: "The valley of Funchal, whose land breeze comes down at night and whose sea breeze sets in from the south-west in the forenoon, neither of them reaching above three or four miles off."
+
+  # ---------------------------------------------------------------------------
+  # The island
+  # ---------------------------------------------------------------------------
+
+  - id: madeira-high-land
+    kind: hill
+    name: the high land of Madeira
+    modern: Pico Ruivo
+    lat_deg: 32.7590
+    lon_deg: -16.9430
+    height_m: 1862
+    source: "Oriental Navigator 1801, p. 23: the island of Madeira is very high land, except the east end; but it is frequently covered with clouds, so that it is scarce visible at 5 or 6 leagues distance, and even sometimes you get quite close before you discover it; the height the modern chart's (from memory, unverified)"
+    says: "The high land of Madeira, its peaks over a mile high, too often hid in cloud: some ships are close in before they see it."
+
+  - id: sao-lourenco-point
+    kind: headland
+    name: Lorenzo Point
+    modern: Ponta de São Lourenço
+    lat_deg: 32.7423
+    lon_deg: -16.6877
+    height_m: 50
+    source: "Oriental Navigator 1801, p. 23: the island is very high land, except the east end, which terminates in a low rugged point; Norie 1805, the table of latitudes: Madeira, Lorenzo Point 32 43 N"
+    says: "Lorenzo Point, the east end of Madeira, low and rugged, with its islets off it."
+    fix: "moved 42 m to the grid's land"
+
+  - id: sao-lourenco-light
+    kind: light
+    name: the light of Lorenzo Point
+    modern: Farol da Ponta de São Lourenço (on the Ilhéu do Farol)
+    lat_deg: 32.7295
+    lon_deg: -16.6593
+    height_m: 103
+    lit: {from: 1870, until: null, range_nm: 20, character: "a flashing light (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Farol da Ponta de São Lourenço' (pt.wikipedia, read 2026-10-10): built 1867 to 1870, lit 30 September 1870, the oldest light of Madeira; focal height 103 m; its position the page's"
+    says: "The light on the islet off Lorenzo Point, which was not yet built in 1805."
+    fix: "the page's position falls in the grid's water off the islet; moved 256 m to the islet's land in the grid"
+
+  - id: machico
+    kind: town
+    name: Machico
+    modern: Machico
+    lat_deg: 32.7180
+    lon_deg: -16.7640
+    height_m: 15
+    source: "Oriental Navigator 1801, p. 23 (the east end of the island); the town and its bay the modern chart's (from memory, unverified), the island's first landing place"
+    says: "Machico in its bay under the east end, the island's oldest town."
+
+  - id: tristao-point
+    kind: headland
+    name: Tristam Point
+    modern: Ponta do Tristão
+    lat_deg: 32.8647
+    lon_deg: -17.1632
+    height_m: 100
+    source: "Norie 1805, the table of latitudes: Madeira, Tristam Point; the position the modern chart's (from memory, unverified)"
+    says: "Tristam Point, the north-west point of Madeira."
+    fix: "moved 301 m to the grid's land"
+
+  - id: pargo-point
+    kind: headland
+    name: the west point of Madeira
+    modern: Ponta do Pargo
+    lat_deg: 32.8140
+    lon_deg: -17.2630
+    height_m: 290
+    source: "Oriental Navigator 1801, p. 24: the small vessels from North America and the Western Islands come in generally round the west end of Madeira, but they are frequently becalmed a considerable time under the high land there; the point's position and height the encyclopaedia's 'Farol da Ponta do Pargo' (read 2026-10-10: a cliff 290 m high)"
+    says: "The west end of Madeira, high cliffs: ships coming round it from the Western Islands lie becalmed under the high land."
+
+  - id: pargo-light
+    kind: light
+    name: the light of the Ponta do Pargo
+    modern: Farol da Ponta do Pargo
+    lat_deg: 32.8137
+    lon_deg: -17.2627
+    height_m: 312
+    lit: {from: 1922, until: null, range_nm: 26, character: "three flashes (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Farol da Ponta do Pargo' (pt.wikipedia, read 2026-10-10): built and lit 1922 (5 June), focal height 312 m on a cliff of 290"
+    says: "The light of the Ponta do Pargo, which was not yet built in 1805."
+
+  - id: madeira-desertas-passage
+    kind: bottom
+    name: the passage between Madeira and the Desertas
+    modern: the channel between Ponta de São Lourenço and the Ilhéu Chão
+    lat_deg: 32.6600
+    lon_deg: -16.6100
+    height_m: 0
+    bottom: "no ground at 50 or 60 fathoms but almost close over to the Madeira side"
+    source: "Oriental Navigator 1801, p. 23 (Howe 1787 the same): between the Desertas and Madeira is a clear passage 8 miles broad, and no danger but what can be seen, but no soundings in it except at 50 or 60 fathoms almost close over to the Madeira side; in the season of the breezes there is a strong current through this passage towards the S W"
+    says: "The passage between Madeira and the Desertas, eight miles broad and clear, with no soundings but close over on the Madeira side; in the summer's north-easterlies a strong current sets through it to the south-west."
+
+  # ---------------------------------------------------------------------------
+  # The Desertas
+  # ---------------------------------------------------------------------------
+
+  - id: ilheu-chao
+    kind: island
+    name: the small island off the Flat Deserter
+    modern: Ilhéu Chão
+    lat_deg: 32.5822
+    lon_deg: -16.5419
+    height_m: 98
+    source: "Oriental Navigator 1801, p. 23 (Howe 1787 the same): at 6 or 7 leagues distance a small island off the northernmost extreme becomes discernible like a low wall"
+    says: "A small flat island off the north end of the Desertas, like a low wall."
+    fix: "moved 201 m to the grid's land"
+
+  - id: sail-rock
+    kind: rock
+    name: the high rock off the Desertas
+    modern: Farilhão (Sail Rock), off the Ilhéu Chão
+    lat_deg: 32.5960
+    lon_deg: -16.5470
+    height_m: 50
+    extent_m: 100
+    source: "Oriental Navigator 1801, p. 23 (Howe 1787 the same): close to this is a high rock like a pyramid, frequently mistaken for a large ship under sail"
+    says: "A high rock like a pyramid off the north end of the Desertas, often taken for a great ship under sail."
+    fix: "the pilot's 'close to' the small island; the modern chart's Sail Rock north of it (from memory); the grid does not resolve the rock (its shoalest within 400 m is 6.7 m under water), left where placed"
+
+  - id: deserta-grande
+    kind: island
+    name: the Flat Deserter
+    modern: Deserta Grande
+    lat_deg: 32.5153
+    lon_deg: -16.5097
+    height_m: 479
+    source: "Oriental Navigator 1801, pp. 22 to 23 (Howe 1787 the same): the Desertas, or as the English sailors call them the Deserters, lie nearly north and south by compass, the largest inclined to the N N westward; when they bear W by N about 10 leagues distant they appear two separate islands, the northernmost, or Flat Deserter, nearly even, long and high"
+    says: "The Flat Deserter, the long high even island of the Desertas."
+    fix: "moved 42 m to the grid's land"
+
+  - id: bugio-deserta
+    kind: island
+    name: the Bugio
+    modern: Bugio (Deserta do Sul)
+    lat_deg: 32.4144
+    lon_deg: -16.4771
+    height_m: 388
+    source: "Oriental Navigator 1801, p. 23 (Howe 1787 the same): the southernmost, or Bugio, appearing in two hummocks, almost as high and about two-thirds as long; Norie 1805, the table of latitudes: the South Point of the Desertas 32 22 N"
+    says: "The Bugio, the southern Deserter, in two hummocks nearly as high as the Flat one."
+    fix: "the first placing lay 1.7 km off the island's land in the grid (no land within the rule's 800 m); placed on the grid's summit of the Bugio, 218 m (its modern height 388)"
+
+  - id: desertas-inner-passage
+    kind: bottom
+    name: the passage between the two Desertas
+    modern: the strait between Deserta Grande and Bugio
+    lat_deg: 32.4700
+    lon_deg: -16.4950
+    height_m: 0
+    bottom: "no soundings, or at least very deep water"
+    source: "Oriental Navigator 1801, p. 23 (Howe 1787 the same: a vessel of 200 tons came through it in the night in April 1762, mistaking it for the broad one): the passage between the two Desertas is clear, though bounded on each side by breakers, or rather by a surf, but not to be attempted unless from necessity, being very narrow, with no soundings, and a ship liable to be becalmed in it by the northernmost Deserter, which overlaps the Bugio"
+    says: "The narrow passage between the two Desertas, surf on either hand and no soundings: not to be attempted but from necessity, for the Flat Deserter becalms a ship in it."
+
+  # ---------------------------------------------------------------------------
+  # Porto Santo
+  # ---------------------------------------------------------------------------
+
+  - id: porto-santo-town
+    kind: town
+    name: the town of Porto Santo
+    modern: Vila Baleira
+    lat_deg: 33.0620
+    lon_deg: -16.3390
+    height_m: 10
+    source: "Oriental Navigator 1801, p. 22: Porto Santo lies about 12 or 14 leagues to the north-eastward of Madeira, and has a very good road on the south-west side, where good water and refreshments can be got; Norie 1805, the table of latitudes: Porto Santo, Town"
+    says: "The town of Porto Santo behind its long sand beach."
+
+  - id: porto-santo-road
+    kind: anchorage
+    name: Porto Santo Road
+    modern: the anchorage off Vila Baleira
+    lat_deg: 33.0440
+    lon_deg: -16.3370
+    height_m: 0
+    depth_fathoms: 12
+    bottom: "sand"
+    source: "Oriental Navigator 1801, p. 22: a very good road on the south-west side, wherein you may anchor in 12 fathoms, and where good water and refreshments can be got; the bottom sand the modern chart's (from memory, unverified)"
+    says: "Porto Santo Road, open to the south-west, good holding in twelve fathoms off the town."
+    fix: "the first placing was on the grid's land; moved 800 m south-east to the grid's 25 m, the pilot's twelve fathoms (beyond the rule's half depth, which a cell nearer met at 11 m)"
+
+  - id: porto-santo-hummocks
+    kind: hill
+    name: the hummocks of Porto Santo
+    modern: Pico do Facho
+    lat_deg: 33.0840
+    lon_deg: -16.3170
+    height_m: 517
+    source: "Oriental Navigator 1801, p. 22: Porto Santo is very remarkable, and may be seen in fine weather 15 or 20 leagues off; when you first make it you will discover two or three very high hummocks, by which it is distinguished from either Madeira or the Desertas; the height the modern chart's (from memory, unverified)"
+    says: "The hummocks of Porto Santo, two or three very high ones, by which the island is known from Madeira and the Desertas."
+
+  - id: porto-santo-west-islet
+    kind: island
+    name: the islet off the south-west end of Porto Santo
+    modern: Ilhéu de Baixo (Ilhéu da Cal)
+    lat_deg: 33.0113
+    lon_deg: -16.3890
+    height_m: 170
+    source: "Oriental Navigator 1801, p. 22 (the south-west side and its road); the islet's name and height the modern chart's (from memory, unverified)"
+    says: "The high islet off the south-west end of Porto Santo, the road's western shelter."
+    fix: "moved 95 m to the grid's land"
+
+  - id: ilheu-de-cima
+    kind: island
+    name: the islet off the east end of Porto Santo
+    modern: Ilhéu de Cima
+    lat_deg: 33.0534
+    lon_deg: -16.2813
+    height_m: 124
+    source: "Oriental Navigator 1801, p. 22 (Porto Santo); the encyclopaedia's 'Farol do Ilhéu de Cima' (read 2026-10-10) for the islet's position and its light's height"
+    says: "The islet off the east end of Porto Santo."
+    fix: "moved 216 m to the grid's land"
+
+  - id: ilheu-de-cima-light
+    kind: light
+    name: the light of the Ilhéu de Cima
+    modern: Farol do Ilhéu de Cima
+    lat_deg: 33.0527
+    lon_deg: -16.2808
+    height_m: 124
+    lit: {from: 1900, until: null, range_nm: 21, character: "three flashes (not yet built in 1805)"}
+    source: "The encyclopaedia's 'Farol do Ilhéu de Cima' (pt.wikipedia, read 2026-10-10): built 1900 (the page gives no day of its lighting), focal height 124 m; its position the page's"
+    says: "The light on the islet off Porto Santo, which was not yet built in 1805."
+    fix: "the page's position falls in the grid's water off the islet; moved 280 m to the islet's land in the grid"

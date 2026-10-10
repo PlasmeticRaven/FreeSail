@@ -1250,6 +1250,42 @@ the figures are in `docs/dev/TuningNotes.md`.
    the national libraries, **unverified** which are at full resolution) for the Spanish
    sheets; the *Derrotero* of Tofiño for the directions. Spain at war with Britain in
    June 1805: hostile to a King's ship, open to a neutral.
+   **As built (package 39c, 2026-10-10).** `biscay-south`, 42.0 N to 45.9 N and 9.33 W
+   to 0.9 W, abutting `biscay-north` at 45.9 N and the Portuguese block at 42.0 N (the
+   west moved from the brief's 9.0 W to the tile column's edge so that Finisterre,
+   Touriñán and Villano lie within, the tiles the same): 129 level-2 tiles and 30 level-3
+   in seven harbour groups (Royan and Verdon, Santander, Gijón, Ferrol, Corunna, Vigo,
+   Bayona), about 19.3 MB with its coast and features, committed; the ten tiles of the
+   northern row that Biscay north lists are its and the two of the southern row that
+   Portugal lists are Portugal's (the seam rule, "tiles another region lists: 12 kept"),
+   and the 59 tiles with no water at the datum (Castile, León, the Landes) are computed
+   and not written (`skip_dry_tiles`, package 39d's key); no file another region lists
+   changed. GEBCO's fill raised to the datum by the French gauges' mean level, 2.5 m
+   (`fill_mean_level_m`). 136 marks from
+   Tofiño's *Derrotero* of 1789 (the Atlantic volume, read whole for the coast from the
+   river of Bayonne to Cabo Prior and from Cabo Prior to the Minho) and Faden 1793 for
+   the Gironde and Arcachon; the lights of 1805 the Tower of Cordouan, the Tower of
+   Hercules and the lanthorn of St Sebastian on Igueldo, those of 1839 to 1854 (Cape
+   Mayor, the Estaca, Machichaco, Peñas, Finisterre, Villano) dated out from the
+   Lighthouse Directory; four small isles the grid has as water (Santa Clara, Mouro,
+   Santa Marina, the Estelas) given as rocks of their height and extent. No period patch:
+   Tofiño's plans of Ferrol and Santander were read at full resolution from his *Atlas
+   Marítimo* of 1789, but no table of the low water of springs above the Spanish chart's
+   datum was reached, and the how-to makes no patch without it; the port files say
+   `datum: unverified`. Five port files (Royan with the roads of Verdon and Royan,
+   Santander, Ferrol, Corunna, Vigo with the road under the Isles of Bayona), Spain's
+   hostile to a King's ship and open to a neutral, Royan France's. The tide: TICON's
+   eleven gauges of the block read and held (four French with the RAM's mean levels,
+   seven Spanish with theirs unverified), so the world's tide over Galicia is still the
+   Channel's blend, two hours late at Santander; five stream areas (the Gironde's
+   passes, Santander's mouth with Tofiño's three-knot ebb, Ferrol's narrows, the Sisarga
+   passage with his flood from the west, the open bay over the block's box), the block's
+   box among the directions' limits; nine places in the epitome, the Spanish
+   ports' "at three in the afternoon". The weather: Biscay's box and the Portuguese
+   coast's hold the block; both stay PROVISIONAL (no printed table read). The scenario
+   `biscay-south.yaml`: the cutter from the road under the Isles of Bayona round
+   Finisterre to Corunna. The recorded passages replay to their digests. The figures
+   are in `docs/dev/TuningNotes.md`.
 4. **Portugal and Cadiz** (`portugal`, about 36°N to 42°N, 10°W to 6°W): Oporto's bar,
    the Berlings, Lisbon and the Tagus, Cape St Vincent, Cadiz and its bay. Tofiño again
    for the Spanish sheets; the Portuguese coast from the period's English directions
@@ -1315,6 +1351,41 @@ the figures are in `docs/dev/TuningNotes.md`.
    swell. The period sources are thinner (**unverified**: a plan of Funchal Road in the
    English pilots of the 1790s; the Admiralty's survey is later), so the block says what
    it rests on, as 35b did.
+   **As built (package 39e, 2026-10-10), with the Western Islands of decision 44.** Two
+   regions alone in the ocean, no tile of theirs another's: `madeira`, 32 to 33.5 N and
+   17.5 to 16 W, 25 level-2 tiles and 5 level-3 (Funchal, Porto Santo), 3.4 MB; and
+   `azores`, 36.5 to 40 N and 31.5 to 24.5 W, 153 level-2 tiles and 7 level-3 (Angra,
+   Ponta Delgada, Horta and the Fayal channel), 40.5 MB, most of it open sea (131 tiles
+   with no land within three miles; a rule writing only the tiles near land would save
+   30 MB once the corridor reaches them: the lead's). Both committed after the coast's
+   blocks in `atlantic-east`, GEBCO's fill raised by the world's mean level. 28 marks of
+   Madeira from the Oriental Navigator of 1801 (Howe's sketch of 1787 under it) and Norie
+   1805, 59 of the islands from Tofiño's *Derrotero* of 1789, every light dated after
+   1805 (Madeira's first the Ponta de São Lourenço's of 1870, the Azores' the Arnel's of
+   1876); the Formigas, the Cabras and three more islets are water in EMODnet's grid and
+   stand as the features' alone. No period plan was read for a road (Tofiño names his
+   plans of Angra and of Fayal; not found), so no override and every port `datum:
+   unverified`. Five port files (Funchal, Porto Santo, Angra, Ponta Delgada, Fayal),
+   Portuguese and neutral to all. The tide: TICON's five gauges of the islands read and
+   held (no mean level read; they lie beyond the reach of every Channel position, so
+   their blending is the lead's to order once they have one); Norie's Table XLI of 1805
+   read from the page images for Funchal (12h 4m, 7 feet), Angra Bay and Fayal Road;
+   Tofiño's stream between Fayal and Pico, in a box of the directions' limits of its
+   own (`book_limits`, package 39d's list of boxes), where the open Channel's statement,
+   of its own bounds, does not reach. The
+   weather: an Azores box, PROVISIONAL and judgement. **The lookout at a peak's height**:
+   a feature taller than `chart.SEARCH_HEIGHT_M` (300 m) is looked for wherever she is,
+   and in the clearest weather seen to its own geographic horizon
+   (`chart.CLEAR_VISIBILITY_NM`): the Peak of Pico from 113 miles at a frigate's
+   masthead; no feature of the Channel is so tall. **The corridor widened to 32 W** in the
+   tool's recipe and built from a fresh GEBCO extract (48 tiles): every one of its 30
+   existing tiles changes with it (the old west column's empty strip filled, the field
+   where the Azores are the nearest land, the half-metre ties of a new sampling origin),
+   which no pinned scenario reads; the rebuild is held uncommitted for the owner's word,
+   and the chart's tiles are written from now on so that the same arrays give the same
+   bytes (`save_tile`). Two scenarios: the schooner from Funchal Road to Porto Santo and
+   back (`madeira.yaml`), the frigate from Funchal to Angra (`azores.yaml`, sailed on the
+   widened corridor in the working tree); figures in `docs/dev/TuningNotes.md`.
 6. **The Strait** (`strait`, about 35.5°N to 36.5°N, 6.5°W to 5°W; the owner's ruling 4,
    with the Mediterranean to come): Tarifa and the Strait's streams, Gibraltar and its
    bay, Ceuta, Tangier and the African shore between, Cape Spartel's light. Tofiño for

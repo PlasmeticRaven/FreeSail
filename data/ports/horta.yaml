@@ -1,0 +1,111 @@
+# FreeSail: Fayal Road and the town of Horta as a port (spec M6 §26, block 5 as decision
+# 44 widened it; package 39e), on package 35's machinery; the marks are the features
+# file's (data/charts/features/azores.yaml).
+#
+# Sources. Tofiño 1789, Derrotero ... de las Islas Azores, 'Isla del Fayal' and
+# 'Advertencias para la entrada en Fayal', pp. 219 to 227: the regular anchorage before
+# the Villa de Orta, "the best anchorage of all the islands, as much for its easy entrance
+# as for its shelter from the winds", except from N to N E and from S E to S W, the S E
+# most hurtful in winter; to be able to sail when those winds come, anchor in 35 or 40
+# brazas, sand, about a mile and a quarter from the town, with the Punta de Yoao Diaz a
+# little open of Espalamaca and the line of the Jesuits' college and the Carmen a little
+# open, the college to the south: from there a ship may sail with any wind, even a fresh
+# south-easter; in summer in 25 brazas, and smaller vessels nearer the town in 15 or 20;
+# the bank in the southern approach with 22 Spanish feet, its marks the college's spire
+# on the Carmen's north corner; working up from the S W with scant north-easterlies, end
+# the boards on the Pico side a mile or a mile and a half off; high water on full and
+# change at half past twelve, rising eight Spanish feet at the most and five at the least,
+# the flood running N E through the channel and the ebb S W, three miles at the most;
+# wells near the shore give good water for the ships. Norie 1805, Table XLI p. 249 (the
+# page image): Fayal Road, high water 2h 20m, rising 4 1/2 feet (a poorer figure than
+# Tofiño's; the epitome keeps Norie's).
+#
+# The datum: UNVERIFIED. Tofiño's plan of the port of Fayal was not found from this
+# machine; no override; TICON's Horta gauge is held with no mean level read.
+#
+# The stance: Portuguese, neutral, open to every nation. Prices FROM MEMORY or
+# JUDGEMENT; sterling at the exchange.
+
+id: horta
+name: Fayal
+nation: portugal
+source: "Tofiño 1789, 'Isla del Fayal', pp. 219 to 227; Norie 1805, Table XLI p. 249"
+datum: unverified
+
+outer_road:
+  feature: horta-road
+  name: Fayal Road
+  lat_deg: 38.5300
+  lon_deg: -28.6070
+anchorage:
+  feature: horta-road
+  name: Fayal Road
+  lat_deg: 38.5300
+  lon_deg: -28.6070
+mooring:
+  name: the summer berth nearer the town
+  lat_deg: 38.5320
+  lon_deg: -28.6150      # the grid's 36 m, twenty brazas, Tofiño's smaller vessels' berth
+  bottom: sand and small shell
+  deep_draught_ft: 15    # judgement
+shore:
+  feature: horta-town
+  name: the beach of Horta
+  lat_deg: 38.5340
+  lon_deg: -28.6290
+
+pilot:
+  station: horta-road
+  cruising_nm: 3                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a boat of Fayal
+    under: oars
+    note: "judgement"
+  names: [Silveira, Dutra, Terra, Goulart, Bettencourt, Garcia, Lacerda]   # names of Fayal: judgement
+  skill: 0.85
+  fee_pounds: 1                  # judgement, in sterling for the one account; unverified
+  cast: starboard                # off the road to the south-east (judgement)
+  course_out_deg: 135            # out between the bank and Pico (Tofiño p. 224)
+  words:
+    channel: "From the north all is clean. From the south pass between the bank and the Guia, or between the bank and Pico; working up, end your boards a mile or a mile and a half off Pico, for the bottom is rock nearer and the mountain throws down gusts and calms."
+    marks: "The bank has twenty-two feet at low water: the spire of the college on the north corner of the Carmen is on it. For the berth, the Point of João Dias a little open of Espalamaca and the college a little open south of the Carmen."
+    anchorage: "Anchor a mile and a quarter off the town in thirty-five or forty brazas on sand, and you may sail with any wind, even a fresh south-easter; in summer in twenty-five, smaller vessels in fifteen or twenty nearer the town."
+    tide: "High water in Fayal Road at twenty minutes past two on the full and change, the tide rising four feet and a half, by my book; the Spaniards make it half past twelve. The flood runs north-east through the channel and the ebb south-west, three miles at the most."
+
+tide:
+  establishment: Fayal Road
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 45, origin: portugal, note: "Pico's wine shipped from Fayal, much of it for England, like Oporto's (Tofiño 1789 p. 218); judgement"}
+    - {good: brandy, price: 90, origin: portugal, note: "the poorer wine made into aguardiente (Tofiño p. 218); judgement"}
+    - {good: barley, price: 10, origin: portugal, note: "judgement"}
+    - {good: salt beef, price: 50, origin: portugal, note: "Pico's cattle, more than it can eat (Tofiño p. 218); judgement"}
+    - {good: salt fish, price: 28, origin: null, note: "from memory"}
+    - {good: timber, price: 6, origin: portugal, note: "Pico's firewood abundant (Tofiño p. 218); judgement"}
+    - {good: canvas, price: 65, origin: britain, note: "from memory"}
+    - {good: cordage, price: 75, origin: britain, note: "from memory"}
+    - {good: sugar, price: 60, origin: portugal, note: "Brazil sugar by way of Lisbon; from memory"}
+    - {good: tobacco, price: 90, origin: portugal, note: "the Crown's monopoly; from memory"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 16, pounds: 45, note: "judgement"}
+    - {item: yard, hours: 10, pounds: 26}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.08}
+    - {item: water, hours_per_ton: 0.2, pounds_per_ton: 0.1, note: "wells near the shore give the ships good water (Tofiño 1789 p. 225)"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05}
+
+crew_pool:
+  able: {hands: 3, pounds: 2, delay_h: 24}
+  ordinary: {hands: 3, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 5, pounds: 1, delay_h: 12}
+
+closed_to: []

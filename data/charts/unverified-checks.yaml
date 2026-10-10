@@ -164,3 +164,16 @@ found_on_the_way:
     marshes behind the dykes flood in the model. Package 39a's `fill_to_chart_datum`
     (GEBCO's fill raised by the world's mean level) is the rule for it; the block was
     built beside 39a without the key, and its rebuild with it is the lead's to order.
+  - >-
+    Package 39c, Biscay south and Galicia (built with `fill_to_chart_datum` and
+    `fill_mean_level_m: 2.5`, the French gauges' mean level): the shore's sweep for
+    GEBCO's fill found 5,675 cells in 310 places, the largest the marshes of Santoña
+    (43.43 N, 3.48 W), the inner ria of Arosa (42.48 to 42.53 N, 8.83 to 8.88 W), the
+    marshes of Carnota and the lagoon of Louro (42.78 to 42.83 N, 9.12 W), the banks of
+    the passes of Arcachon (44.58 to 44.62 N, 1.23 to 1.28 W) and the Adour's mouth
+    (43.53 N, 1.53 W): water EMODnet's survey does not reach, left as water. EMODnet's
+    grid also has water over several small isles that stand forty metres high (Santa
+    Clara at St Sebastian, Mouro and Santa Marina at Santander, the Estelas off
+    Monteferro): its sixteenth of a minute interpolates the soundings across them; the
+    features file gives each as a rock of its height and extent so that a ship cannot
+    sail through it, and a land patch for each is a later package's.

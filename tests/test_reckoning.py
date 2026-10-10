@@ -1897,7 +1897,9 @@ def test_the_captains_set_replaces_the_masters_tide_until_he_hands_it_back():
     assert refused.kind == "order.rejected" and "allow the tide by the book" in refused.text
     # beyond the directions' limits (by his account) he has no statement, and allows none
     # (package 39b: the limits reach Biscay north, 45.9 N; beyond them south of it)
-    r.set_position(Position(45.5, -6.0), w.clock.tick)
+    # (package 39c: the limits reach Biscay south and Galicia, 42 N and 9.33 W; the bay
+    # west of them is beyond)
+    r.set_position(Position(45.5, -12.0), w.clock.tick)
     assert w.readings.words("reckoning").endswith("the tide allowed: none, in open water")
     r.set_position(w.position, w.clock.tick)
     # the standing dialect takes all three as actions

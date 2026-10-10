@@ -1,0 +1,40 @@
+# FreeSail: the schooner's book for the Madeira passage (data/scenarios/madeira.yaml;
+# package 39e), Funchal Road to Porto Santo Road and back. Short, as the brief has it:
+# the points of the passage by the account, the sails trimmed, the land's bearings, the
+# anchor. Out by day before the morning's westerly, by a point off the Brazen Head
+# and one two miles south of Lorenzo Point (the Oriental Navigator 1801 pp. 23 to 24: keep
+# off the Brazen Head, mid-channel in the passage), and up to Porto Santo Road from the
+# south, clear of the islet off its south-west end; home before the afternoon's
+# north-easterly by points of their own, coming in to Funchal Road from the eastward as
+# the directions bring a ship in. The way out's
+# points are hers by day only and the way home's after a run of 25 miles since noon, so
+# that no point of either way is met on the other. Both roads are on a steep bank (a mile
+# off Porto Santo's the water is 180 fathoms): she anchors by the chart's depth near the
+# road, not by a distance alone; at Funchal, where the bank falls from eighteen fathoms to
+# ninety within three quarters of a mile and the chart's eighteen lie a cable or two off
+# the beach, she comes in under her headsails and foresail and lets go half a mile short
+# of the berth, asking again every two minutes until she rides (the directions: let go
+# in thirty-six or thirty-eight fathoms and veer a long way).
+
+# Out.
+standing order "off the Brazen Head": when the distance to 32 36.5 N 16 50 W is under 1.5 miles and daylight is day then shape a course for 32 41 N 16 38 W
+standing order "round Lorenzo Point": when the distance to 32 41 N 16 38 W is under 1.5 miles and daylight is day then shape a course for 32 58 N 16 22.5 W
+standing order "south of the road": when the distance to 32 58 N 16 22.5 W is under 1.5 miles then shape a course for Porto Santo Road; shorten sail
+standing order "Porto Santo": when the distance to Porto Santo Road is under 0.8 miles and the depth of water by the chart is under 15 fathoms then come to an anchor
+
+# Brought up in Porto Santo Road, she weighs again for Funchal: off to the south-east,
+# clear of the islet off the south-west end and four miles from the way out's point south
+# of the road, then for a point north-east of Lorenzo Point and round it.
+standing order "out of Porto Santo": at brought up, if the distance to Porto Santo Road is under 2 miles then get under way on the larboard tack and steer SE
+standing order "away for Funchal": at under way, if the distance to Porto Santo Road is under 2 miles then set plain sail; shape a course for 32 58 N 16 16 W
+standing order "home off the road": when the distance to 32 58 N 16 16 W is under 2 miles then shape a course for 32 45 N 16 30 W
+standing order "home north-east of the point": when the distance to 32 45 N 16 30 W is under 2 miles then shape a course for 32 39.5 N 16 35.5 W
+standing order "home round the point": when the distance to 32 39.5 N 16 35.5 W is under 2 miles and the distance run since noon exceeds 25 miles then shape a course for 32 36 N 16 52 W
+standing order "home past the Brazen Head": when the distance to 32 36 N 16 52 W is under 1 mile and the distance run since noon exceeds 25 miles then shape a course for Funchal Road; shorten sail
+standing order "slow for the road": when the distance to Funchal Road is under 1.2 miles and the distance run since noon exceeds 20 miles then take in the fore topsail; take in the mainsail
+standing order "Funchal": every 2 minutes, if the distance to Funchal Road is under 0.5 miles and the distance run since noon exceeds 20 miles and the speed is over 1 knot then come to an anchor
+
+# The ship's routines on the way.
+standing order "trim to the course": at steady on the course then trim sails
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point then trim sails
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix

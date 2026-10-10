@@ -1,0 +1,1616 @@
+# The features of Biscay south and Galicia, the Gironde to the Minho (spec M6 §26, the
+# blocks' item 3; package 39c): hazards, marks, lights with their dates, places,
+# anchorages and bottom notes, in the period's words, each with its source in the
+# references' form (docs/references/README.md), on the rules of channel-west.yaml's head,
+# read from:
+#
+#   Tofiño 1789     Vicente Tofiño de San Miguel, Derrotero de las costas de España en el
+#                   Océano Atlántico, y de las Islas Azores ó Terceras (Madrid 1789), the
+#                   Atlantic volume of the Derrotero, its pages headed 'Tom. II'; the
+#                   OCR text of the Universidad de Sevilla's copy (Internet Archive
+#                   A302201, public domain mark), checked against the Bayerische
+#                   Staatsbibliothek's (bub_gb_04Yq4fsvB8gC). 'Descripción de la costa
+#                   comprehendida desde Cabo Prior hasta la embocadura del río Miño',
+#                   pp. 1 to 73; 'Derrotero de las costas de España en el Océano
+#                   Cantábrico y golfo de Gascuña', from the river of Bayonne to Cabo
+#                   Prior, pp. 131 to 189. His soundings are brazas of two varas
+#                   castellanas (1.672 m: the vara of Burgos 0.8359 m, unverified here,
+#                   the encyclopaedia's figure from memory) at low water of spring tides,
+#                   and his heights of tide pies de Burgos (a third of the vara); an
+#                   anchorage's `depth_fathoms` is his brazas turned to English fathoms
+#                   (x 0.914) and rounded to the half, and his figure is in the source.
+#                   His longitudes are from the meridian of Cadiz, and are not used: the
+#                   positions are the modern chart's.
+#   Tofiño 1789,    Atlas Marítimo de España (the Universidad de Sevilla's copy, Internet
+#   Atlas           Archive A062039040, public domain mark), the plans of Ferrol (1789)
+#                   and Santander (1788), read at full resolution (some 7,500 by 5,000
+#                   pixels) through the archive's IIIF server: the names and the
+#                   soundings the Derrotero's pages refer to.
+#   Faden 1793      Le Petit Neptune Français; or, French Coasting Pilot (Internet Archive
+#                   lepetitneptunefr00fade), the OCR text: Magin's 'Sailing Instructions
+#                   for the Entrance of the Gironde, or River of Bourdeaux', pp. 84 to 88
+#                   (the Tower of Cordouan's footnote, p. 85); 'Coast of Arcasson',
+#                   'Bassin d'Arcasson', 'Bayonne' and 'St. Jean de Luz', pp. 89 to 92;
+#                   'Tides and Currents', p. 93. In his translation's fathoms and leagues.
+#   Lighthouse      the Lighthouse Directory (R. Rowlett, University of North Carolina
+#   Directory       at Chapel Hill, ibiblio.org/lighthouse), its pages for Spain's Basque
+#                   Country, Cantabria, Asturias and Galicia and France's Aquitaine, read
+#                   2026-10-10: the lights' years (the encyclopaedias refused the build
+#                   network for its rate); the lights of the 1830s to 1860s carry the
+#                   year they were first lit so that 1805 does not see them.
+#
+# The block's bounds are 42.0 to 45.9 N and 9.33 to 0.9 W: Pointe de la Coubre and the
+# Pertuis de Maumusson (45.7 to 45.8 N) are the block's marks though their water lies on
+# biscay-north's southern row of tiles (the seam rule keeps the tiles theirs; the chart
+# reads the finest tile there is). The Minho's mouth, Mount Santa Tecla and La Guardia
+# (41.87 to 41.9 N) are the Portuguese block's (package 39d), south of 42 N.
+#
+# Positions are in the modern frame (WGS 84, the EMODnet DTM 2024 grid the tiles are cut
+# from): first placed from the modern chart as each entry names it, then checked against
+# the block's tiles and EMODnet's shoalest sounding by channel-west.yaml's rule (a
+# headland, island, town, castle, church, mill, tower to the nearest land within 800 m; a
+# light to the nearest land within 400 m; a rock or ledge to the nearest shoal head within
+# 400 m; an anchorage to water holding half the pilot's depth within 800 m); where a
+# position rests on the pilot's bearing and distance alone the entry says so in `fix`.
+# Heights are above the sea for the horizon: JUDGEMENT throughout, from the grid's own
+# land about the mark and the pilot's words ("muy alta", "de mediana altura"), but for
+# Cordouan's (Faden's 175 French feet, the lanthorn included).
+#
+# The lights of 1805: the Tower of Cordouan (a fire of coals every night, Faden p. 85), the
+# Tower of Hercules at Corunna ("un pequeño farol que sirve de linterna", Tofiño p. 10)
+# and the lanthorn of St Sebastian on Mount Igueldo (seen seven or eight leagues by night,
+# Tofiño pp. 149 to 150) were lit; the Derrotero names no other Spanish light on this
+# coast. The lights of the nineteenth century (Finisterre, Villano, Cape Mayor,
+# Machichaco, Peñas and the rest) are dated out where their year was read.
+#
+# The lead reviews this list against the sources before the merge: the citation is on
+# every line for that.
+
+region: biscay-south
+features:
+
+  # ---------------------------------------------------------------------------
+  # The Gironde: Point la Coubre, Cordouan and the roads of Royan and Verdon
+  # ---------------------------------------------------------------------------
+
+  - id: coubre-point
+    kind: headland
+    name: Point la Coubre
+    modern: Pointe de la Coubre
+    lat_deg: 45.6955
+    lon_deg: -1.2330
+    height_m: 15
+    source: "Faden 1793, 'Entrance of the Gironde', pp. 84 to 85: from Oleron or the entrance of Maumusson to Point La Coubre keep off at sea, because of several points of banks stretching off from Oleron; the banks of Point La Coubre on the north side of the Channel of Charentais"
+    says: "Point la Coubre, the low northern point of the river of Bourdeaux, with its banks and breakers off it."
+
+  - id: coubre-wooden-tower
+    kind: beacon
+    name: the Wooden Tower on Point la Coubre
+    modern: the sea mark of 1700s on Pointe de la Coubre (gone; the modern light stands near)
+    lat_deg: 45.6940
+    lon_deg: -1.2300
+    height_m: 20
+    source: "Faden 1793, 'To enter by the Channel of Charentais', p. 85: the Tower of Cordouan and the Wooden Tower on Point la Coubre are necessarily to be seen; sail toward Cordouan S by E till you bring the Wooden Tower to bear east; p. 86: the two beacons, or marks, on Point La Coubre"
+    says: "The Wooden Tower on Point la Coubre, the mark for the northern channels of the Gironde."
+
+  - id: maumusson
+    kind: place
+    name: the Pertuis de Maumusson
+    modern: the Pertuis de Maumusson, between Oléron and the coast of Arvert
+    lat_deg: 45.7980
+    lon_deg: -1.2350
+    height_m: 0
+    source: "Faden 1793, 'Entrance of the Gironde', pp. 83 to 84: to pass through Maumusson it is necessary to have a pilot; the banks change very often; between the point of Maumusson and the end of Oleron are several banks"
+    says: "The Pertuis de Maumusson between Oleron and the coast of Arvert, its banks changing often: no passage without a pilot."
+    fix: "placed in the pass's water between Oleron's south end and the coast of Arvert"
+
+  - id: st-palais-steeple
+    kind: church
+    name: the steeple of St Palais
+    modern: the church of Saint-Palais-sur-Mer
+    lat_deg: 45.6440
+    lon_deg: -1.0890
+    height_m: 25
+    source: "Faden 1793, 'The Channel of Lescameau', p. 87: the Steeple of St. Palais on with the beacon, or a sail's breadth open with the Wood; 'Channel des Graves', p. 88: the Castle of St. Palais"
+    says: "The steeple of St Palais, which brought on with the beacon leads in by the channel of Lescameau."
+
+  - id: royan
+    kind: town
+    name: Royan
+    modern: Royan
+    lat_deg: 45.6235
+    lon_deg: -1.0290
+    height_m: 20
+    source: "Faden 1793, 'Entrance of the Gironde', pp. 85 to 88: all that part of the river beyond the English Bar, from Point Terre Negre to Royan, is clean, with deep water; Royan and its windmills a mark of the Channel des Graves; St. Peter's Church of Royan on with the Point a mark of the anchorage"
+    says: "Royan on the north shore of the river's mouth, its windmills and St Peter's church the marks of the road."
+
+  - id: royan-road
+    kind: anchorage
+    name: the road of Royan
+    modern: the anchorage off Royan in the Gironde's mouth
+    lat_deg: 45.6150
+    lon_deg: -1.0450
+    height_m: 0
+    bottom: "sand and mud"
+    source: "Faden 1793, 'Channel des Graves', p. 88: when ships have sailed beyond Grave Point they generally come to an anchor in the road of Verdon, or in that of Royan; St. Peter's Church of Royan on with the Point, or Meche's Windmills E by N; the ground judgement (the river's)"
+    says: "The road of Royan, where a ship lies within Grave Point for the tide and the river's pilot."
+
+  - id: grave-point
+    kind: headland
+    name: Grave Point
+    modern: Pointe de Grave
+    lat_deg: 45.5714
+    lon_deg: -1.0650
+    height_m: 8
+    source: "Faden 1793, 'The Channel of La Porte' and 'Channel des Graves', pp. 87 to 88: steer to the east, giving to Point Grave a sufficient birth to double it; take a greater offing to round Grave Point with greater safety"
+    says: "Grave Point, the low southern point of the river's mouth, to be given a good berth in rounding it."
+    fix: "moved 90 m to the grid's land at the point"
+
+  - id: verdon-road
+    kind: anchorage
+    name: the road of Verdon
+    modern: the anchorage of Le Verdon within the Pointe de Grave
+    lat_deg: 45.5520
+    lon_deg: -1.0480
+    height_m: 0
+    bottom: "sand and mud"
+    source: "Faden 1793, 'Channel des Graves', p. 88: they generally come to an anchor in the road of Verdon; the marks for the best anchoring ground St. George's Windmills on with the middle of the two sand-downs called Terrier de l'Attache; when you set sail from the road of Verdon to go to Bourdeaux you steer towards Meche's Windmills SE by E; the ground judgement"
+    says: "The road of Verdon within Grave Point, where ships for Bourdeaux wait for the tide and their pilot."
+
+  - id: soulac-church
+    kind: church
+    name: the church of Soulac
+    modern: Notre-Dame-de-la-fin-des-Terres, Soulac-sur-Mer
+    lat_deg: 45.5130
+    lon_deg: -1.1250
+    height_m: 25
+    source: "Faden 1793, 'Channel des Graves', pp. 87 to 88: the Church of Soulac on with the beacon; shape your course toward the Church or the Windmill of Soulac between ESE and E by S"
+    says: "The church of Soulac in its sand-hills, which brought on with the beacon leads in by the Channel des Graves."
+
+  - id: cordouan-light
+    kind: light
+    name: the Tower of Cordouan
+    modern: the Phare de Cordouan
+    lat_deg: 45.5863
+    lon_deg: -1.1736
+    height_m: 60
+    lit: {from: 1611, until: null, range_nm: 18, character: "a light of lamps and reflectors on the high conical tower raised by 1788 (before it, a fire of coals in the lanthorn of 1727)"}
+    source: "Faden 1793, 'Entrance of the Gironde', p. 85 and its footnote: the entrance of the River of Bourdeaux is easily known by a fine light-house, commonly called Tower of Cordouan, of the greatest utility in lighting ships during the night; begun in 1584 by Louis de Foix and finished in 1611; an iron lanthorn in 1727; a fire of 225 pounds of coals lighted every night; the Lighthouse Directory (R. Rowlett, ibiblio.org/lighthouse), 'France: Aquitaine', read 2026-10-10: Cordouan (2), 1611, Argand reflectors installed in 1782 and the old superstructure replaced by the conical tower completed in 1788, its focal plane 60 m; the range judgement"
+    says: "The Tower of Cordouan on its rocks in the mouth of the river of Bourdeaux, its light burning all night high on the new tower."
+
+  - id: cordouan-rocks
+    kind: ledge
+    name: the rocks of Cordouan
+    modern: the plateau de Cordouan
+    lat_deg: 45.5900
+    lon_deg: -1.1800
+    height_m: 0
+    extent_m: 900
+    source: "Faden 1793, 'To enter by the Channel of Charentais', p. 85: remain at a proper distance from the rocks of Cordouan, where the current catches generally the ships which come too near them during the ebb, or at half tide going down; 'The Channel of La Porte', p. 87: the Tower of Cordouan, which you are to range along very near"
+    says: "The rocks of Cordouan about the tower, where the ebb sets a ship that comes too near them."
+    fix: "the extent cut to the plateau about the tower, under a kilometre, so that the channels on either side stay open"
+
+  - id: gironde-mouth
+    kind: place
+    name: the mouth of the river of Bourdeaux
+    modern: the mouth of the Gironde
+    lat_deg: 45.6000
+    lon_deg: -1.1100
+    height_m: 0
+    source: "Faden 1793, 'Entrance of the Gironde', p. 85: the disposition of the rocky and sandy banks which lie at the mouth of this river makes five channels: the Channel of Charentais, of Matelier or of Saintonge, of Lescameau, of La Porte and the Channel des Graves; p. 93: at the mouth of the river of Bourdeaux the currents are very strong"
+    says: "The mouth of the river of Bourdeaux, five channels among its banks and its currents very strong."
+
+  # ---------------------------------------------------------------------------
+  # The coast of Arcasson and the Basque coast of France
+  # ---------------------------------------------------------------------------
+
+  - id: arcachon-banks
+    kind: bank
+    name: the Banks of Arcasson
+    modern: the banks of the Passes du Bassin d'Arcachon
+    lat_deg: 44.5700
+    lon_deg: -1.2600
+    height_m: 0
+    depth_fathoms: 2.5
+    source: "Faden 1793, 'Bassin d'Arcasson', pp. 89 to 90: before the Bassin of Arcasson there are several banks, which block up the entrance and leave only two little channels; both entrances of this Bason have not above 2 or 3 fathoms water at low tide; one may easily descry the Banks of Arcasson when near them, for the sea breaks there continually"
+    says: "The Banks of Arcasson before the bason, the sea breaking on them continually; two or three fathoms in the channels at low water."
+
+  - id: cap-ferret
+    kind: headland
+    name: the northern point of Arcasson
+    modern: the Cap Ferret
+    lat_deg: 44.6350
+    lon_deg: -1.2500
+    height_m: 10
+    source: "Faden 1793, 'Bassin d'Arcasson', pp. 89 to 90: one channel along the northern point of the harbour; the marks to know when you are near Arcasson are a low, level land, destitute of trees, on the north side of its entrance, and on the south side high downs, which appear like little mountains"
+    says: "The northern point of Arcasson, a low level land without trees, the high downs to the south of the entrance."
+    fix: "the modern point; the spit has grown southward since the period"
+
+  - id: arcachon-road
+    kind: anchorage
+    name: the anchorage within the Bason of Arcasson
+    modern: the channel off Arcachon within the Bassin
+    lat_deg: 44.6650
+    lon_deg: -1.1900
+    height_m: 0
+    depth_fathoms: 10
+    source: "Faden 1793, 'Bassin d'Arcasson', p. 89: when you have doubled that point you steer along close by the southern shore, as the lead guides, and cast anchor where you please in 10 or 15 fathoms water, or farther inwards in 3 or 4 fathoms; the tides at half after 3 o'clock at new and full moon"
+    says: "Within the Bason of Arcasson a ship anchors along the southern shore in ten or fifteen fathoms."
+
+  - id: adour-bar
+    kind: shoal
+    name: the bar of Bayonne
+    modern: the bar of the Adour
+    lat_deg: 43.5290
+    lon_deg: -1.5300
+    height_m: 0
+    depth_fathoms: 0.5
+    source: "Faden 1793, 'Bayonne', p. 91: the bar of Bayonne being very subject to change, you are obliged to take a pilot; at low water not above 3 or 4 feet deep, so that there is no entrance but at high water; Tofiño 1789, 'Río, barra y puerto de Bayona', pp. 131 to 133: in June 1787 five to six feet at low water of spring tides, and rarely more; a square pyramidal tower on a sand hill on the west bank, a mile within, with a mast to bring in one with it for the best water"
+    says: "The bar of Bayonne, three to six feet at low water and shifting with every gale: a pilot, and high water, to pass it."
+
+  - id: bayonne
+    kind: town
+    name: Bayonne
+    modern: Bayonne
+    lat_deg: 43.4920
+    lon_deg: -1.4750
+    height_m: 20
+    source: "Tofiño 1789, 'Río, barra y puerto de Bayona', p. 134: a fine city a league up the river, a free port of much commerce, where the King of France has a kind of arsenal for corvettes and store-ships, and the masts of the Pyrenees; Faden 1793, 'Bayonne', p. 91: you anchor before the city, below the bridge, in 4, 5 or 6 fathoms"
+    says: "Bayonne, a league up the Adour, a free port with the King of France's yard for corvettes and the Pyrenees' masts."
+
+  - id: biarritz
+    kind: town
+    name: Biarritz
+    modern: Biarritz
+    lat_deg: 43.4830
+    lon_deg: -1.5590
+    height_m: 30
+    source: "Tofiño 1789, p. 134: between the river of Bayonne and Bidart the village of Biarits"
+    says: "The village of Biarritz on its cliffs south of the Adour."
+
+  - id: larrun
+    kind: hill
+    name: the mountain of Larrun
+    modern: La Rhune
+    lat_deg: 43.3090
+    lon_deg: -1.6355
+    height_m: 905
+    source: "Tofiño 1789, 'Puerto de Socoa', pp. 136 to 137: the knowledge of this port from the offing is given by the mountains Larrun and la Batallera; Larrun is the first mountain from the east, high and sharp with a hermitage on its summit, through which runs the line between the two kingdoms; the height the modern chart's"
+    says: "Larrun, high and sharp with a hermitage on its summit on the line between France and Spain: the mark for St Jean de Luz from the offing."
+
+  - id: st-jean-de-luz-road
+    kind: anchorage
+    name: the Bay of St Jean de Luz
+    modern: the bay of Saint-Jean-de-Luz
+    lat_deg: 43.3960
+    lon_deg: -1.6760
+    height_m: 0
+    depth_fathoms: 6
+    bottom: "sand with rocks that cut the cables"
+    source: "Faden 1793, 'St. Jean de Luz', pp. 91 to 92: at the farther end of a bay which affords anchorage in 5, 6, 7 or 8 fathoms water, but the bottom is full of rocks which cut the cables; the harbour under the town dry every tide and to be entered at high water; Tofiño 1789, pp. 135 to 137: the river of St Jean de Luz four feet at low water between its moles; within the bay the ground not of the best, rocky patches among the sand"
+    says: "The Bay of St Jean de Luz, five to eight fathoms, but the ground full of rocks that cut the cables; the harbour dries."
+
+  - id: socoa-fort
+    kind: castle
+    name: the tower of Socoa
+    modern: the Fort de Socoa
+    lat_deg: 43.3950
+    lon_deg: -1.6870
+    height_m: 15
+    source: "Tofiño 1789, 'Puerto de Socoa', p. 135: on the point of Socoa a round tower with a fortification at its foot, from which a mole runs SE a cable, the little port nearly dry at low water; Faden 1793, p. 92: the harbour of Socoa, dry every tide, receives all the great ships of the place"
+    says: "The round tower of Socoa on the western point of the bay, its little harbour behind the moles drying at low water."
+
+  - id: sainte-barbe-tower
+    kind: tower
+    name: the tower on the eastern point of St Jean de Luz
+    modern: the Pointe Sainte-Barbe
+    lat_deg: 43.3985
+    lon_deg: -1.6620
+    height_m: 25
+    source: "Faden 1793, 'St. Jean de Luz', p. 92: the marks to know St. Jean de Luz are a high tower, situated on the extremity of the eastern point of the bay, and on which a fire is lighted; Tofiño 1789, p. 134: the eastern point of the bay, Santa Bárbara, of middling height and steep, with a battery"
+    says: "The high tower on the eastern point of the Bay of St Jean de Luz, on which a fire is lighted."
+
+  # ---------------------------------------------------------------------------
+  # Guipúzcoa: Cape Higuer, Passages, St Sebastian, Guetaria
+  # ---------------------------------------------------------------------------
+
+  - id: cabo-higuer
+    kind: headland
+    name: Cape Higuer
+    modern: Cabo Higuer
+    lat_deg: 43.3930
+    lon_deg: -1.7950
+    height_m: 40
+    source: "Tofiño 1789, 'Cabo la Higuera', p. 138: three miles W of the tower of Socoa; of middling height, with an islet surrounded by rocks to its NE leaving a passage for small craft only; the western point of the bay and river of Fuenterrabía"
+    says: "Cape Higuer, of middling height with an islet and rocks off it, the western point of the bay of Fuenterrabía."
+
+  - id: fuenterrabia
+    kind: town
+    name: Fuenterrabía
+    modern: Hondarribia
+    lat_deg: 43.3680
+    lon_deg: -1.7930
+    height_m: 25
+    source: "Tofiño 1789, p. 138: the Bidasoa the bound of the kingdoms of Spain and France, Fuenterrabía on its western bank and Hendaye on the eastern; a foot of water at low water within the bar; p. 139: ships of any class may anchor in the bay in 6 or 8 brazas, sand, SE of Cape Higuer before its castle"
+    says: "Fuenterrabía, the Spanish fortress on the Bidasoa, the river barred with sand and the bound of the two kingdoms."
+
+  - id: jaizkibel
+    kind: hill
+    name: Mount Jaysquivel
+    modern: Jaizkibel
+    lat_deg: 43.3450
+    lon_deg: -1.8600
+    height_m: 540
+    source: "Tofiño 1789, p. 137 and p. 146: the mountain Jaysquivel, the last of the Pyrenees to the sea, rises from Cape Higuer and ends at Passages, the first high land on the shore, its summit a level ridge; on its western fall lies the port of Passages; the height the modern chart's"
+    says: "Mount Jaysquivel, the last of the Pyrenees, a long level ridge from Cape Higuer to Passages."
+
+  - id: pasajes-mouth
+    kind: place
+    name: the mouth of Passages
+    modern: the entrance of the port of Pasaia
+    lat_deg: 43.3385
+    lon_deg: -1.9290
+    height_m: 0
+    source: "Tofiño 1789, 'Puerto de Pasages', pp. 139 to 140: the mouth in 43° 20' 10\" N; two low points of rock, Arando grande and Arando chico, narrow it to 92 brazas; within, 50 to 70 brazas wide; p. 146: from the offing an opening like the letter V a league east of the castle of St Sebastian"
+    says: "The mouth of Passages, a cleft in the high land like a V between the rocks of Arando, ninety brazas wide."
+
+  - id: bancha-grande
+    kind: rock
+    name: the Bancha grande
+    modern: a sunken head off the western point of the entrance of Pasaia
+    lat_deg: 43.3400
+    lon_deg: -1.9320
+    height_m: 0
+    dries_m: -4.2
+    source: "Tofiño 1789, 'Baxos a la entrada', pp. 141 to 142: N 21° W 79 brazas from the point of Arando chico, 66 brazas off the shore, a sunken peak with only two and a half brazas on it at low water, five to six about it; it breaks when there is a sea"
+    says: "The Bancha grande, a sunken head with two and a half brazas on it off the western rocks of Passages, breaking in a sea."
+    fix: "the pilot's bearing and distance from the point; the dries_m his two and a half brazas"
+
+  - id: pasajes-road
+    kind: anchorage
+    name: the harbour of Passages
+    modern: the inner harbour of Pasaia below San Pedro
+    lat_deg: 43.3238
+    lon_deg: -1.9208
+    height_m: 0
+    depth_fathoms: 3.5
+    bottom: "mud"
+    source: "Tofiño 1789, pp. 141 and 143: between the castle of Santa Isabel and the tower of San Sebastián the only anchorage for ships drawing more than ten feet; anchor in three and a half or four brazas and run lines ashore to the pierced rocks; the great harbour beyond nearly dry at low water; the high water at three o'clock at full and change, the rise twelve feet, eight to ten at the quarters (p. 145); the ground judgement"
+    says: "Passages within its narrows, three and a half to four brazas, the ship moored with lines to the rocks."
+    fix: "moved 190 m into the grid's water of the inner harbour"
+
+  - id: igueldo-light
+    kind: light
+    name: the lanthorn of St Sebastian
+    modern: the old light of Monte Igueldo, San Sebastián
+    lat_deg: 43.3205
+    lon_deg: -2.0080
+    height_m: 180
+    lit: {from: 1778, until: 1855, range_nm: 21, character: "a lanthorn on a very white tower on the summit of Mount Igueldo"}
+    source: "Tofiño 1789, 'Concha y muelles de San Sebastián', pp. 147 and 149 to 150: the tower and lanthorn of San Sebastián on the summit of Mount Igueldo; the castle of la Mota and the lanthorn are seen in clear weather ten to twelve leagues, for the tower is very white, and by night the lanthorn shows the place, so well disposed that it is seen seven to eight leagues; the range his seven leagues of twenty to the degree; the Lighthouse Directory (R. Rowlett, ibiblio.org/lighthouse), 'Spain: Basque Country', read 2026-10-10: Monte Igueldo (1), 1778, its focal plane about 180 m, too high for foggy weather, replaced by the lower light of 1855"
+    says: "The lanthorn of St Sebastian on Mount Igueldo, a very white tower whose light is seen seven or eight leagues."
+
+  - id: mota-castle
+    kind: castle
+    name: the castle of la Mota
+    modern: the Castillo de la Mota on Monte Urgull
+    lat_deg: 43.3250
+    lon_deg: -1.9870
+    height_m: 120
+    source: "Tofiño 1789, 'Ciudad de San Sebastián', p. 146: Mount Orgullo of middling height, with the great castle of la Mota on its summit in 43° 19' 30\" N; at its foot on the land side the city of San Sebastián, capital of Guipúzcoa"
+    says: "The castle of la Mota on Mount Orgullo above St Sebastian, seen ten or twelve leagues in clear weather."
+
+  - id: santa-clara-island
+    kind: rock
+    name: the Isle of Santa Clara
+    modern: Isla de Santa Clara
+    lat_deg: 43.3217
+    lon_deg: -1.9978
+    height_m: 40
+    extent_m: 200
+    source: "Tofiño 1789, p. 147: in the middle of the Concha's mouth the Isle of Santa Clara with a hermitage; the passage between it and Mount Igueldo closed by reefs; that between it and Mount Orgullo clean, with 9 and 10 brazas"
+    says: "The Isle of Santa Clara in the Concha's mouth: pass between it and the castle's hill, in nine or ten brazas."
+    fix: "the grid has water over the isle (EMODnet's cell interpolates the soundings across it): kept where the modern chart has it, a rock of its height and extent so that it stands solid"
+
+  - id: bancha-san-sebastian
+    kind: rock
+    name: the Bancha of St Sebastian
+    modern: a rocky shoal north of Isla de Santa Clara
+    lat_deg: 43.3248
+    lon_deg: -1.9975
+    height_m: 0
+    dries_m: -5.0
+    extent_m: 200
+    source: "Tofiño 1789, 'La Bancha', p. 149: N 17° 30' W and N 37° 30' W of the hermitage of Santa Clara, two tenths of a mile, the ends of the least water of the Bancha, three and three and a half brazas; a rocky shoal parallel to the island and of about its size, three to six and a half brazas, which breaks in a sea; 7 to 11 brazas all about"
+    says: "The Bancha, a rocky shoal of three brazas north of Santa Clara, breaking when there is a sea: keep the church of San Bartolomé on the mountain of Ordaburu to enter."
+    fix: "the pilot's two bearings and distance from the hermitage; the dries_m his three brazas"
+
+  - id: san-sebastian-road
+    kind: anchorage
+    name: the Concha of St Sebastian
+    modern: the bay of La Concha, San Sebastián
+    lat_deg: 43.3185
+    lon_deg: -1.9915
+    height_m: 0
+    depth_fathoms: 4
+    bottom: "sand, rock near the isle"
+    source: "Tofiño 1789, pp. 147 to 148: SE of the isle a short cable the anchorage for great ships, room for one or two at most in four and a half and five brazas, moored with four cables against the sea and the backwash from the beach; near the isle the ground rock, elsewhere clean and good holding; small craft south of the isle in two and a half and three brazas"
+    says: "The Concha of St Sebastian, four and a half to five brazas for one ship or two, moored all fours."
+
+  - id: guetaria-island
+    kind: island
+    name: the Isle of San Antón of Guetaria
+    modern: San Antón (el Ratón de Getaria)
+    lat_deg: 43.3064
+    lon_deg: -2.2032
+    height_m: 60
+    source: "Tofiño 1789, 'Guetaria', p. 151: S 87° 30' W seven and a half miles from the lanthorn of San Sebastián, the north end of the Isle of San Antonio of Guetaria with a hermitage on its summit; high, joined to the shore where the town stands by a mole"
+    says: "The Isle of San Antón of Guetaria, high, with a hermitage, joined to the town by its mole."
+    fix: "moved to the grid's land of the isle's root by the mole; the isle's seaward part is under the grid's cell"
+
+  - id: guetaria-road
+    kind: anchorage
+    name: the road of Guetaria
+    modern: the anchorage east of the mole of Getaria
+    lat_deg: 43.3045
+    lon_deg: -2.1920
+    height_m: 0
+    depth_fathoms: 7.5
+    bottom: "sand"
+    source: "Tofiño 1789, 'Guetaria', p. 151: east of the mole good anchorage for great ships in 7 to 10 brazas, sand, sheltered from the winds of the third and fourth quadrants to NNW, open to the north and east; with a hard westerly and bound for Passages it is wiser to wait here"
+    says: "The road of Guetaria east of the mole, seven to ten brazas on sand, sheltered from the westerlies but open to the north."
+
+  # ---------------------------------------------------------------------------
+  # Biscay: Cape Ogoño and Machichaco, the Concha of Bilbao, Castro, Santoña
+  # ---------------------------------------------------------------------------
+
+  - id: cabo-ogono
+    kind: headland
+    name: Cape Ogoño
+    modern: Cabo Ogoño
+    lat_deg: 43.4148
+    lon_deg: -2.6400
+    height_m: 280
+    source: "Tofiño 1789, 'Cabo Ogoño', p. 154: high, round, steep to the sea and red, a good point of knowledge, for there is no other like it on the whole coast; the little place of Elanchove close east of it"
+    says: "Cape Ogoño, high, round, sheer and red: no other like it on the coast."
+    fix: "moved 400 m to the grid's land at the cape"
+
+  - id: izaro
+    kind: island
+    name: the Isle of Isaro
+    modern: Isla de Izaro
+    lat_deg: 43.4270
+    lon_deg: -2.6855
+    height_m: 40
+    source: "Tofiño 1789, 'Isla Isaro', p. 154: N 74° 30' W two miles from Cape Ogoño, lying WNW and ESE, of middling height in its middle and very low at its ends, ringed with shoals and rocks; a passage between it and the coast in 12 brazas"
+    says: "The Isle of Isaro off the mouth of Mundaca, ringed with rocks; twelve brazas between it and the shore."
+    fix: "moved 270 m to the grid's one cell of the isle"
+
+  - id: machichaco
+    kind: headland
+    name: Cape Machichaco
+    modern: Cabo Matxitxako
+    lat_deg: 43.4550
+    lon_deg: -2.7530
+    height_m: 120
+    source: "Tofiño 1789, 'Cabo Machichaco', p. 155: in 43° 28' N; not very high at its end, steep, with rocks close at its foot, the land rising evenly to a high round green hill with a notch half way up, which tells it from the mountains about it; from it Passages bears S 77° E 34 miles"
+    says: "Cape Machichaco, low at its end and rising to a green hill with a notch half way up."
+
+  - id: machichaco-light-1852
+    kind: light
+    name: the light of Machichaco
+    modern: the Faro de Machichaco
+    lat_deg: 43.4555
+    lon_deg: -2.7510
+    height_m: 80
+    lit: {from: 1852, until: null, range_nm: 20, character: "a light on the cape (not yet built in 1805)"}
+    source: "the Lighthouse Directory (R. Rowlett, ibiblio.org/lighthouse), 'Spain: Basque Country', read 2026-10-10: Cabo Machichaco (1), 1852, the first light; not lit in 1805; the range judgement"
+    says: "The light of Machichaco, which was not yet built in 1805."
+
+  - id: galea-point
+    kind: headland
+    name: the Point of la Galea
+    modern: Punta Galea
+    lat_deg: 43.3735
+    lon_deg: -3.0350
+    height_m: 60
+    source: "Tofiño 1789, 'Punta de la Galea', p. 157: from Plencia the coast moderately high, even and steep, white, which from a distance looks like a sand; the Point of la Galea the eastern point of the Concha of Bilbao, Luzuero the western, three miles apart; the castle of la Galea on the height; p. 160: the white land of la Galea, which cannot be mistaken"
+    says: "The Point of la Galea, its white cliffs the mark of the Concha of Bilbao."
+
+  - id: lucero-point
+    kind: headland
+    name: the Point of Luzuero
+    modern: Punta Lucero
+    lat_deg: 43.3630
+    lon_deg: -3.0950
+    height_m: 200
+    source: "Tofiño 1789, pp. 159 to 160: from the Point of Puerto Sevallo the coast runs west to the Point of Luzuero and then bends round in a great bluff of high barren land ending in a sharp mountain they call Mount Luzuero; of the three sharp mountains seen from Santoña the northernmost is Luzuero"
+    says: "The Point of Luzuero, the western point of the Concha of Bilbao, under its sharp mountain."
+    fix: "placed at the grid's northern tip of the land of Luzuero; the modern breakwater of the outer port runs from it"
+
+  - id: serantes
+    kind: hill
+    name: the Peak of Serantes
+    modern: Monte Serantes
+    lat_deg: 43.3360
+    lon_deg: -3.0640
+    height_m: 450
+    source: "Tofiño 1789, pp. 159 to 160: between Siérvana and Santurce rises the Peak of Serantes; of the three sharp mountains that show the Concha from Santoña the middle and highest is Serantes; the height the modern chart's"
+    says: "The Peak of Serantes, the highest of the three sharp mountains about the Concha of Bilbao."
+
+  - id: bilbao-concha
+    kind: anchorage
+    name: the Concha of Bilbao
+    modern: the Abra of Bilbao
+    lat_deg: 43.3660
+    lon_deg: -3.0580
+    height_m: 0
+    depth_fathoms: 14.5
+    bottom: "sand"
+    source: "Tofiño 1789, 'Entrada en el río de Bilbao', p. 160: if there is no tide to enter, or the wind will not serve, anchor in the Concha; the best place in the middle between the Points of Luzuero and la Galea, la Galea in one with Cape Villano, in 16 brazas sand, with room to let go another anchor if she drags; in summer farther in, in 10 or 12 brazas, all sand"
+    says: "The Concha of Bilbao, sixteen brazas on sand between Luzuero and la Galea, where a ship waits for the tide over the bar."
+
+  - id: bilbao-bar
+    kind: shoal
+    name: the bar of Bilbao
+    modern: the bar of the river of Bilbao off Santurtzi (the modern port's works over it)
+    lat_deg: 43.3370
+    lon_deg: -3.0280
+    height_m: 0
+    depth_fathoms: 0.5
+    source: "Tofiño 1789, 'Entrada en el río de Bilbao', p. 159: the entrance of the river is a bar, which begins off Santurce and shifts; at present four and a half feet at low water, and in winter very dangerous; the mark, the great church of Portugalete in one with the church of Gestaos, S 33° 30' E, but it changes with the bar: no entrance without a pilot; the pilot major and all the pilots live at Santurce (p. 158)"
+    says: "The bar of Bilbao off Santurce, four and a half feet at low water and shifting: the pilot major of Santurce takes a ship over it."
+
+  - id: portugalete
+    kind: town
+    name: Portugalete
+    modern: Portugalete
+    lat_deg: 43.3200
+    lon_deg: -3.0190
+    height_m: 30
+    source: "Tofiño 1789, 'Villa de Portugalete', p. 158: on the western bank three and a half tenths of a mile from the river's mouth, the most convenient anchorage for ships of some burden, the deepest of the river, with moles and guns set in them to moor to; in 43° 20' 10\" N; Bilbao three leagues up"
+    says: "Portugalete on the river of Bilbao, where ships of burden lie moored to the guns in the moles."
+
+  - id: castro-urdiales
+    kind: town
+    name: Castro
+    modern: Castro Urdiales
+    lat_deg: 43.3830
+    lon_deg: -3.2153
+    height_m: 25
+    source: "Tofiño 1789, 'Ensenada de Castro', pp. 161 to 162: a bay not very deep formed by the Point of Cotolino and the Isle of Santa Ana, joined to the land by a bridge, with a hermitage that is seen from far off; two moles shelter the coasting craft, dry at low water but at the north mole's head, where the pataches always float"
+    says: "Castro on its bay, the Isle of Santa Ana and its hermitage, the moles shelter for the coasters."
+    fix: "moved 25 m to the grid's land"
+
+  - id: castro-road
+    kind: anchorage
+    name: the Concha of Castro
+    modern: the bay of Castro Urdiales
+    lat_deg: 43.3840
+    lon_deg: -3.2070
+    height_m: 0
+    depth_fathoms: 7
+    bottom: "sand and mud"
+    source: "Tofiño 1789, p. 162: a ship may anchor in the Concha of Castro SE of the mole in 7 and 8 brazas sand and mud, with a line ashore to the Isle of Santa Ana; but only in fine weather or to wait for the tide; good help of boats, cables and anchors in the town"
+    says: "The Concha of Castro, seven or eight brazas on sand and mud, for fine weather or to wait the tide."
+
+  - id: santona-mount
+    kind: hill
+    name: the Mount of Santoña
+    modern: Monte Buciero
+    lat_deg: 43.4600
+    lon_deg: -3.4650
+    height_m: 370
+    source: "Tofiño 1789, 'Puerto de Santoña', p. 164: the port is formed by the Mount of Santoña, high and steep, and the coast to its south; p. 166: the low marshy land behind the Arenal de Berría makes the mount look an island from the sea"
+    says: "The Mount of Santoña, high and steep, which from the sea looks an island."
+
+  - id: santona-road
+    kind: anchorage
+    name: the road of Santoña
+    modern: the channel before the town of Santoña
+    lat_deg: 43.4368
+    lon_deg: -3.4557
+    height_m: 0
+    depth_fathoms: 6.5
+    bottom: "sand"
+    source: "Tofiño 1789, 'Entrada en el Puerto de Santoña', pp. 165 to 166: with six to ten brazas in mid-channel up to the town, anchor before it in 6 or 8 brazas sand and moor E and W with the tide, which rises twelve to thirteen feet at full and change and eight to nine at the quarters; the bar 16 to 18 feet at low water of springs (p. 164)"
+    says: "The road of Santoña before the town, six to eight brazas on sand, over a bar of sixteen feet at low water."
+    fix: "moved 650 m to the grid's channel, six metres at the datum, before the town"
+
+  - id: laredo
+    kind: town
+    name: Laredo
+    modern: Laredo
+    lat_deg: 43.4100
+    lon_deg: -3.4170
+    height_m: 20
+    source: "Tofiño 1789, p. 164: the coast bends east to the town of Laredo, from which a great beach runs round the bay to the Puntal of the passage, the mouth of the port of Santoña"
+    says: "Laredo on the east side of Santoña's bay, a great beach between."
+
+  # ---------------------------------------------------------------------------
+  # Santander
+  # ---------------------------------------------------------------------------
+
+  - id: cabo-ajo
+    kind: headland
+    name: Cape Ajo
+    modern: Cabo de Ajo
+    lat_deg: 43.5126
+    lon_deg: -3.5850
+    height_m: 40
+    source: "Tofiño 1789, 'Cabo Ajo', p. 167: three miles W of Cape Quejo, rather lower, even on its summit, sheer to half its height with a little point at its foot"
+    says: "Cape Ajo, even on its summit and sheer to half its height."
+    fix: "moved 50 m to the grid's land"
+
+  - id: cabo-mayor
+    kind: headland
+    name: Cape Mayor
+    modern: Cabo Mayor
+    lat_deg: 43.4916
+    lon_deg: -3.7910
+    height_m: 50
+    source: "Tofiño 1789, 'Cabo Mayor', p. 168: in 43° 30' 10\" N, the western and northern point of the port of Santander, of middling height, steep, with a watch-tower; Cape Menor half a mile S 44° E of it, lower, with a battery"
+    says: "Cape Mayor with its watch-tower, the western point of Santander's bay."
+    fix: "moved 50 m to the grid's land"
+
+  - id: cabo-mayor-light-1839
+    kind: light
+    name: the light of Cape Mayor
+    modern: the Faro de Cabo Mayor
+    lat_deg: 43.4905
+    lon_deg: -3.7905
+    height_m: 90
+    lit: {from: 1839, until: null, range_nm: 20, character: "a light on the cape (not yet built in 1805)"}
+    source: "the Lighthouse Directory (R. Rowlett, ibiblio.org/lighthouse), 'Spain: Cantabria', read 2026-10-10: Cabo Mayor, 1839, built on a royal order of 1833; not lit in 1805; the range judgement"
+    says: "The light of Cape Mayor, which was not yet built in 1805."
+
+  - id: mouro-island
+    kind: rock
+    name: the Isle of Mouro
+    modern: Isla de Mouro
+    lat_deg: 43.4770
+    lon_deg: -3.7570
+    height_m: 30
+    extent_m: 80
+    source: "Tofiño 1789, 'Isla Mouro', p. 169: S 51° E a mile and seven tenths from Cape Mayor; high and steep with a little stack on its east side and a shoal of two brazas a cable to its NW, otherwise clean and deep; the ships enter between it and Santa Marina or between it and the Point of the Port, which they call the Bar, six brazas"
+    says: "The Isle of Mouro in the mouth of Santander, high and steep: enter on either side of it."
+    fix: "the grid has three metres of water over the isle: kept where the modern chart has it, a rock of its height and extent so that it stands solid"
+
+  - id: santa-marina-island
+    kind: rock
+    name: the Isle of Santa Marina
+    modern: Isla de Santa Marina
+    lat_deg: 43.4760
+    lon_deg: -3.7265
+    height_m: 30
+    extent_m: 150
+    source: "Tofiño 1789, 'Isla Santa Marina', p. 168: very close to the coast, leaving a passage for boats only; it forms the eastern point of the port of Santander; Atlas, 'Plano del puerto de Santander' (1788): 'Ysla Santa Marina'"
+    says: "The Isle of Santa Marina, the eastern point of Santander's mouth, close under the land."
+    fix: "the grid has a metre of water over the isle: kept where the modern chart has it, a rock of its height and extent so that it stands solid"
+
+  - id: sardinero-road
+    kind: anchorage
+    name: the road of the Sardinero
+    modern: the anchorage off El Sardinero, Santander
+    lat_deg: 43.4794
+    lon_deg: -3.7753
+    height_m: 0
+    depth_fathoms: 10
+    bottom: "sand, rock to the south"
+    source: "Tofiño 1789, 'Punta del Puerto', p. 169: between Cape Menor and the Point of the Port a bay with a beach called the Sardinero, off which ships anchor when the wind and tide will not let them in: Cape Menor in one with Cape Mayor, three cables from the first, in 10 or 12 brazas sand; not farther south, where the ground is rock"
+    says: "The road of the Sardinero outside Santander, ten or twelve brazas on sand, Cape Menor on with Cape Mayor."
+    fix: "moved 300 m off the beach into nine metres"
+
+  - id: horadada
+    kind: island
+    name: the Oradada
+    modern: La Horadada (Peña Horadada), Santander
+    lat_deg: 43.4625
+    lon_deg: -3.7793
+    height_m: 10
+    source: "Tofiño 1789, 'Isla Oradada', pp. 169 to 170: S 56° 30' W three cables from the Point of the Port, a pierced islet forming a perfect bridge, clean all round; the leading islet for the channel: bring it in a lane with the Point of the Port"
+    says: "The Oradada, the pierced islet in Santander's mouth, its arch a bridge: the mark for the channel."
+    fix: "moved 25 m to the grid's land at the Magdalena; the islet itself is under the grid's cell"
+
+  - id: santander
+    kind: town
+    name: Santander
+    modern: Santander
+    lat_deg: 43.4625
+    lon_deg: -3.8050
+    height_m: 20
+    source: "Tofiño 1789, 'Muelle y Ciudad de Santander', p. 170: the mole and city on the shore, in 43° 28' 20\" N; the little basin of the mole only for vessels that lie dry at low water; at Guarnizo up the bay ships of all rates are built and careened"
+    says: "Santander on the north shore of its bay, the mole's basin drying at low water."
+
+  - id: santander-road
+    kind: anchorage
+    name: the road before Santander
+    modern: the bay of Santander before the old town
+    lat_deg: 43.4584
+    lon_deg: -3.8005
+    height_m: 0
+    depth_fathoms: 4
+    bottom: "sand"
+    source: "Tofiño 1789, pp. 171 to 172: the best channel between the bank and the sand of the Puntal, not very wide, three and a half to four brazas at low water; north and south with the mole, being past the bank, haul north and anchor before the great church in 4 or 6 brazas sand, moored NE and SW with the tide; no entrance without a pilot of the country, the channel changing; Atlas, 'Plano del puerto de Santander' (1788), the soundings of 2 to 4 brazas before the city"
+    says: "The road before Santander, four to six brazas on sand off the great church, by a channel that shifts: a pilot of the place to enter."
+    fix: "moved 215 m into the grid's water; the modern dredged channel lies beside it"
+
+  - id: santander-bank
+    kind: drying
+    name: the sand bank of Santander
+    modern: the sands of the bay of Santander (now the city's reclaimed shore and the dredged channel)
+    lat_deg: 43.4600
+    lon_deg: -3.7900
+    height_m: 0
+    dries_m: 0.5
+    extent_m: 500
+    source: "Tofiño 1789, p. 170: from the Point of Promontorio begins a sand bank which partly dries at low water and reaches to the meridian of the mole, leaving the Canal del Norte, now very narrow and used by none, between it and the north shore; p. 172: the ebb runs harder than the flood, three miles an hour, and sets SE in the mouth toward the bay south of Santa Marina; Atlas, 'Plano del puerto de Santander' (1788), the bank drawn dry with one and one and a half brazas about it"
+    says: "The sand bank in Santander's bay, partly dry at low water, between the north channel and the south."
+    fix: "the middle of the bank as the 1788 plan draws it between the Point of San Martín and the Puntal, placed by its names; how far it dries no figure is read, half a metre judgement"
+
+  # ---------------------------------------------------------------------------
+  # Asturias: Gijón and Cape Peñas
+  # ---------------------------------------------------------------------------
+
+  - id: san-vicente-barquera
+    kind: town
+    name: San Vicente de la Barquera
+    modern: San Vicente de la Barquera
+    lat_deg: 43.3860
+    lon_deg: -4.3970
+    height_m: 25
+    source: "Tofiño 1789, 'San Vicente de la Barquera', p. 175: the port only for brigantines and small craft of no more than 12 feet; its bar scarcely covered at low water of springs; the Isle of the Callo makes two entrances"
+    says: "San Vicente de la Barquera, a barred port for brigantines, the Isle of the Callo in its mouth."
+
+  - id: llanes
+    kind: town
+    name: Llanes
+    modern: Llanes
+    lat_deg: 43.4210
+    lon_deg: -4.7530
+    height_m: 20
+    source: "Tofiño 1789, 'Vigía de Jarri y río de Llanes', p. 177: the river of Llanes very narrow, its bar only two feet at low water, the shoal la Osa in its entrance; the mountain and castle of Soberrón two miles inland the mark of this coast"
+    says: "Llanes, its narrow river barred with two feet at low water."
+
+  - id: ribadesella
+    kind: town
+    name: Ribadesella
+    modern: Ribadesella
+    lat_deg: 43.4640
+    lon_deg: -5.0610
+    height_m: 20
+    source: "Tofiño 1789, 'Rivadesella', p. 178: the port has a bar of sand from the Point of the Caballo to the sands west of it, only five feet at low water of springs, within 15 to 30 feet in the short space of the anchorage"
+    says: "Ribadesella, a barred port of five feet at low water, deeper within."
+
+  - id: cabo-lastres
+    kind: headland
+    name: Cape Lastres
+    modern: Cabo Lastres
+    lat_deg: 43.5335
+    lon_deg: -5.2960
+    height_m: 80
+    source: "Tofiño 1789, 'Cabo Lastres', p. 179: N 44° W a mile and six tenths from the Point Misiera, high, steep and red, with a reef to its north; the Concha of Lastres ESE of the town, sand, clean and of very good holding"
+    says: "Cape Lastres, high, steep and red, a reef off its north side."
+    fix: "moved to the grid's land at the cape, a kilometre west of the first placing"
+
+  - id: gijon
+    kind: town
+    name: Gijon
+    modern: Gijón
+    lat_deg: 43.5450
+    lon_deg: -5.6620
+    height_m: 25
+    source: "Tofiño 1789, 'Ermita de Santa Catalina de Gijón', p. 180: S 81° 30' W a mile and a tenth from the Point of Servigón the hermitage of Santa Catalina on a very steep promontory; on its south fall the town of Gijón; pp. 180 to 181: the mole of Gijón for small craft only, dry at low water, by a bar of nine feet at low water of springs"
+    says: "Gijon under the steep hill of Santa Catalina, its mole drying at low water behind a bar of nine feet."
+
+  - id: santa-catalina-gijon
+    kind: church
+    name: the hermitage of Santa Catalina of Gijon
+    modern: the hill of Santa Catalina, Cimadevilla, Gijón
+    lat_deg: 43.5475
+    lon_deg: -5.6650
+    height_m: 50
+    source: "Tofiño 1789, p. 180: the hermitage of Santa Catalina on a promontory of very steep land, the town of Gijón on its south fall"
+    says: "The hermitage of Santa Catalina on its steep promontory above Gijon."
+
+  - id: cabo-torres
+    kind: headland
+    name: Cape Torres
+    modern: Cabo Torres
+    lat_deg: 43.5700
+    lon_deg: -5.6990
+    height_m: 60
+    source: "Tofiño 1789, 'Cabo de Torres y concha de Gijón', p. 180: N 40° 30' W two miles and a tenth from the hermitage of Santa Catalina, Cape Torres with the islet Orrio at its foot, leaving a passage for boats; between them the Concha of Gijón"
+    says: "Cape Torres, the western point of the Concha of Gijon, the islet Orrio at its foot."
+
+  - id: gijon-road
+    kind: anchorage
+    name: the Concha of Gijon
+    modern: the bay of Gijón (the port of El Musel now over its western side)
+    lat_deg: 43.5564
+    lon_deg: -5.6855
+    height_m: 0
+    depth_fathoms: 11.5
+    bottom: "fine dark sand"
+    source: "Tofiño 1789, pp. 180 to 181: in summer the best anchorage for a ship of the line or a frigate where the islet Orrio of Cape Torres is in one with the town of Candás and the hermitage of Santa Cruz with the Point of Otero, in 12 1/2 brazas fine dark sand; always ready to make sail if the wind comes on hard from the sea, which happens even in summer; the hard winds commonly NE and lasting two or three days"
+    says: "The Concha of Gijon, twelve and a half brazas on fine dark sand, a summer road to be left the moment it blows from the sea."
+    fix: "the anchorage by the pilot's transits, in the Concha's middle; the modern breakwaters of El Musel lie west of it; moved 200 m into thirteen metres by the grid"
+
+  - id: cabo-penas
+    kind: headland
+    name: Cape Peñas
+    modern: Cabo de Peñas
+    lat_deg: 43.6560
+    lon_deg: -5.8490
+    height_m: 100
+    source: "Tofiño 1789, 'Isla Gaviera y Cabo de Peñas', p. 182: the cape shows to the north a bluff of nearly a mile, high, steep, whitish and level; off its NW, N and NE the shoals called Conos, Menendalbaros, Romanilla and Somosllungo, which run out to various distances and break unequally; as a general rule great ships should not pass within four miles of Cape Peñas"
+    says: "Cape Peñas, a high whitish bluff with shoals off it: no great ship within four miles."
+
+  - id: penas-shoals
+    kind: shoal
+    name: the shoals of Cape Peñas
+    modern: the reefs north of Cabo de Peñas (the Erbosa and its heads)
+    lat_deg: 43.6700
+    lon_deg: -5.8550
+    height_m: 0
+    source: "Tofiño 1789, p. 182: N 16° W half a mile from the westernmost of Cape Peñas the Isle Hervosa, low with islets about it; to the NW, N and NE of the cape the shoals Conos, Menendalbaros, Romanilla and Somosllungo, which break unequally; pass no nearer than four miles with great ships"
+    says: "The shoals off Cape Peñas, Conos, Menendalbaros, Romanilla and Somosllungo, breaking unequally: give the cape four miles."
+    fix: "a mark of the foul ground north of the cape by the pilot's bearing to the Hervosa; the heads themselves not placed, the grid's"
+
+  - id: penas-light-1852
+    kind: light
+    name: the light of Cape Peñas
+    modern: the Faro de Cabo de Peñas
+    lat_deg: 43.6550
+    lon_deg: -5.8500
+    height_m: 115
+    lit: {from: 1852, until: null, range_nm: 20, character: "a light on the cape (not yet built in 1805)"}
+    source: "the Lighthouse Directory (R. Rowlett, ibiblio.org/lighthouse), 'Spain: Asturias', read 2026-10-10: Cabo Peñas, station established 1852; not lit in 1805; the range judgement"
+    says: "The light of Cape Peñas, which was not yet built in 1805."
+
+  - id: cabo-vidio
+    kind: headland
+    name: Cape Vidio
+    modern: Cabo Vidío
+    lat_deg: 43.5920
+    lon_deg: -6.2434
+    height_m: 80
+    source: "Tofiño 1789, 'Cabo Bidio', p. 182: S 88° W fourteen miles from Cape Negro, of middling height and sheer; between, the shoals of Robllo and Amvales where the sea runs very high, the river of Pravia, Cudillero and the Concha of Artedo"
+    says: "Cape Vidio, of middling height and sheer."
+    fix: "moved 50 m to the grid's land"
+
+  - id: cabo-busto
+    kind: headland
+    name: Cape Busto
+    modern: Cabo Busto
+    lat_deg: 43.5700
+    lon_deg: -6.4670
+    height_m: 60
+    source: "Tofiño 1789, 'Cabo Busto', p. 183: S 79° 30' W nine and a half miles from Cape Vidio, high and steep with a reef to the WNW they call the Moura; ENE of it seven tenths of a mile the islet Serrón like a pyramid, which tells the cape"
+    says: "Cape Busto, high and steep, the pyramid islet of Serrón east of it and the reef of the Moura to the west."
+
+  - id: luarca
+    kind: town
+    name: Luarca
+    modern: Luarca
+    lat_deg: 43.5480
+    lon_deg: -6.5344
+    height_m: 20
+    source: "Tofiño 1789, 'Punta de Mugeres', p. 183: the western point of the little port of Luarca, only for pataches and other small craft"
+    says: "Luarca, a little port for small craft under the Point of Mugeres."
+    fix: "moved 50 m to the grid's land"
+
+  # ---------------------------------------------------------------------------
+  # Galicia's north coast: Ribadeo to Cape Prior
+  # ---------------------------------------------------------------------------
+
+  - id: ribadeo
+    kind: town
+    name: Ribadeo
+    modern: Ribadeo
+    lat_deg: 43.5370
+    lon_deg: -7.0420
+    height_m: 25
+    source: "Tofiño 1789, 'Puerto de Rivadeo', pp. 184 to 185: the port of Ribadeo divides the principality of Asturias from the kingdom of Galicia; known from the sea by the mountains Mondigo, very high and sharp with white stones on its top like a building, and San Marcos, low and round with a hermitage"
+    says: "Ribadeo on its ria, the bound of Asturias and Galicia."
+
+  - id: ribadeo-road
+    kind: anchorage
+    name: the road of Ribadeo
+    modern: the ria of Ribadeo off the castle of San Damián
+    lat_deg: 43.5440
+    lon_deg: -7.0334
+    height_m: 0
+    depth_fathoms: 4.5
+    bottom: "sand"
+    source: "Tofiño 1789, p. 185: a ship of 16 to 18 feet keeps mid-channel till abreast the Point of Castrelius, then hauls to the west shore and anchors before the castle of San Damián or a little south of it in 5 brazas sand; she must moor all fours for the narrowness of the channel, and the south wind blows very hard"
+    says: "The road of Ribadeo before the castle of San Damián, five brazas on sand, moored all fours in the narrow channel."
+    fix: "moved 260 m into the grid's channel, four metres at the datum"
+
+  - id: vivero-road
+    kind: anchorage
+    name: the ria of Vivero
+    modern: the ria of Viveiro
+    lat_deg: 43.6800
+    lon_deg: -7.6119
+    height_m: 0
+    depth_fathoms: 4.5
+    bottom: "clayey mud"
+    source: "Tofiño 1789, 'Ría de Vivero', p. 186: very clean and deep, a ship may ply in it in all safety; the best anchorage the easternmost of the Isle Queimada by the south and east of the Isle Gaveira, the Point of the Puntal by the southernmost houses of Sillero, in 5 brazas clayey mud; moor E and W; weigh from time to time, for the anchors bite so that the cables part"
+    says: "The ria of Vivero, clean and deep, five brazas on clayey mud where the anchors bite hard."
+    fix: "the anchorage by the pilot's transits in the ria's middle; the modern chart's; moved 250 m into the ria's water, under five metres by the grid"
+
+  - id: estaca-de-bares
+    kind: headland
+    name: the Point of la Estaca
+    modern: Punta da Estaca de Bares
+    lat_deg: 43.7850
+    lon_deg: -7.6830
+    height_m: 80
+    source: "Tofiño 1789, 'Punta de la Estaca', p. 187: in 43° 47' 50\" N; the most northern point of the coast of Cantabria, the bluff it makes with Cape Vares high and steep; the ria of the Barquero within, very clean and deep, an excellent shelter for any ship to leeward of Ortegal in hard weather"
+    says: "The Point of la Estaca, the northernmost of Spain, high and steep, the ria of the Barquero within it."
+    fix: "moved 460 m to the grid's land at the point"
+
+  - id: estaca-light-1850
+    kind: light
+    name: the light of the Estaca de Bares
+    modern: the Faro de Estaca de Bares
+    lat_deg: 43.7860
+    lon_deg: -7.6841
+    height_m: 100
+    lit: {from: 1850, until: null, range_nm: 20, character: "a light on the point (not yet built in 1805)"}
+    source: "the Lighthouse Directory (R. Rowlett, ibiblio.org/lighthouse), 'Spain: Galicia: Northern', read 2026-10-10: Estaca de Bares, 1850; not lit in 1805; the range judgement"
+    says: "The light of the Estaca de Bares, which was not yet built in 1805."
+    fix: "moved 150 m to the grid's land"
+
+  - id: cabo-ortegal
+    kind: headland
+    name: Cape Ortegal
+    modern: Cabo Ortegal
+    lat_deg: 43.7710
+    lon_deg: -7.8690
+    height_m: 100
+    source: "Tofiño 1789, 'Cabo Ortegal', pp. 187 to 188: high and steep, a shoal half a mile N by W of it; the watch of the Capelada on the highest of this bluff a mile and four tenths south of the cape, a good mark of Ortegal from the sea; p. 189: from Ortegal to Cape Prior many rocky patches that break in a heavy sea; the currents set strongly toward the land; with a steady wind any ship may pass two miles off Ortegal"
+    says: "Cape Ortegal, high and steep, the Aguillones off it and a shoal half a mile to the north: pass two miles off."
+
+  - id: aguillones
+    kind: rock
+    name: the Aguillones
+    modern: Os Aguillóns, off Cabo Ortegal
+    lat_deg: 43.7760
+    lon_deg: -7.8700
+    height_m: 15
+    source: "Tofiño 1789, p. 187: they call Aguillones a cluster of islets NNW of the cape, joined together, leaving a narrow passage with the cape"
+    says: "The Aguillones, a cluster of islets off Cape Ortegal."
+
+  - id: cedeira-road
+    kind: anchorage
+    name: the port of Cedeira
+    modern: the ria of Cedeira
+    lat_deg: 43.6577
+    lon_deg: -8.0571
+    height_m: 0
+    depth_fathoms: 2.5
+    bottom: "sand"
+    source: "Tofiño 1789, 'Puerto de Cedeira', pp. 188 to 189: only for small vessels for its small extent and little water, but good holding and easy to enter; the castle's flagstaff in one with the Point Pantin, anchor in 2 1/2 to 3 brazas sand, moored N and S; the NW sea troubles it much"
+    says: "The little port of Cedeira, two and a half to three brazas on sand, troubled by the north-west sea."
+    fix: "moved 480 m into the ria's water, two and a half metres by the grid"
+
+  - id: cabo-prior
+    kind: headland
+    name: Cape Prior
+    modern: Cabo Prior
+    lat_deg: 43.5670
+    lon_deg: -8.3150
+    height_m: 100
+    source: "Tofiño 1789, 'Cabo Prior', p. 1: in 43° 34' N; of moderate height, steep and well known by its two beaches, of San Jurjo, whose sands meet behind it in a plain, so that seen from a distance it looks an island; p. 189: a bluff of a mile and two tenths, rocks a cable and a half off its east side"
+    says: "Cape Prior, steep, its two beaches meeting behind it so that it looks an island from a distance."
+
+  - id: gabeiras
+    kind: island
+    name: the Gaveyras
+    modern: Illas Gabeiras
+    lat_deg: 43.5220
+    lon_deg: -8.3170
+    height_m: 25
+    source: "Tofiño 1789, p. 1: S 11° 18' W a league from Cape Prior two islets they call the Gaveyras, high, steep and half a mile off the coast, the passage within them for feluccas only; Atlas, 'Plano de la rya y puerto de Ferrol' (1789): 'Yslas Gabeiras'"
+    says: "The Gaveyras, two high steep islets half a mile off the coast between Cape Prior and Ferrol."
+
+  # ---------------------------------------------------------------------------
+  # Ferrol
+  # ---------------------------------------------------------------------------
+
+  - id: cabo-priorino
+    kind: headland
+    name: Cape Prioriño
+    modern: Cabo Prioriño Grande
+    lat_deg: 43.4634
+    lon_deg: -8.3455
+    height_m: 60
+    source: "Tofiño 1789, p. 1: S by W of the Gaveyras a short league, Cape Prioriño, the northern of the ria of Ferrol, a sand between from the lagoon of Doniños; less high than Cape Prior and clean; over it a mountain called Monte Ventoso with a watch on its summit; Prioriño chico half a mile S 48° E of it, which gives a perfect knowledge of the ria"
+    says: "Cape Prioriño, the northern point of the ria of Ferrol, Monte Ventoso and its watch above it."
+    fix: "moved 135 m to the grid's land"
+
+  - id: segano-point
+    kind: headland
+    name: the Point of Segaño
+    modern: Punta Segaño (Mugardos)
+    lat_deg: 43.4546
+    lon_deg: -8.3104
+    height_m: 30
+    source: "Tofiño 1789, 'Ría del Ferrol', p. 2: S 77° 45' E a mile and two tenths from Prioriño chico the Point and Battery of Segaño, the southern of the ria, high and steep"
+    says: "The Point of Segaño, high and steep, the southern point of the ria of Ferrol, with its battery."
+    fix: "moved 330 m to the grid's land at the point"
+
+  - id: la-muela
+    kind: rock
+    name: the Muela
+    modern: a sunken rock off Punta Segaño
+    lat_deg: 43.4590
+    lon_deg: -8.3105
+    height_m: 0
+    dries_m: -1.7
+    source: "Tofiño 1789, 'Ría del Ferrol', pp. 2 to 3: close to the Point of Segaño a stone called the Muela with only one braza of water on it at low water, full of weed with great leaves that float and make one think the stone is seen; the size of twice a frigate's boat; 48 brazas from the great round stones of the point; to be minded in entering and leaving with scant winds"
+    says: "The Muela, a sunken rock with one braza on it off the Point of Segaño, its weed floating over it at low water."
+    fix: "the pilot's forty-eight brazas off the point; the dries_m his one braza"
+
+  - id: carino-road
+    kind: anchorage
+    name: the bay of Cariño
+    modern: the bay of Cariño, within Cabo Prioriño
+    lat_deg: 43.4630
+    lon_deg: -8.3230
+    height_m: 0
+    depth_fathoms: 7.5
+    bottom: "sand"
+    source: "Tofiño 1789, 'Ría del Ferrol', pp. 3 and 6: between Prioriño chico and the castle of San Carlos the coast forms a bay with a beach called of Cariño, three batteries in it; with a contrary wind not too fresh a ship gains it and anchors in 8, 14 and more brazas sand, sheltered from the NW to the N and NE, where she can fetch the channel at the first SSW wind"
+    says: "The bay of Cariño within Cape Prioriño, eight to fourteen brazas on sand, where a ship waits for a wind to take the narrows."
+
+  - id: san-felipe-castle
+    kind: castle
+    name: the castle of San Felipe
+    modern: the Castillo de San Felipe, Ferrol
+    lat_deg: 43.4627
+    lon_deg: -8.2820
+    height_m: 20
+    source: "Tofiño 1789, 'Ría del Ferrol', p. 3: seven tenths of a mile E 16° 30' N of San Carlos the castle of San Felipe, its walls washed by the sea in a very low battery, with many more above commanding the entrance; p. 5: from it a little reef runs 32 brazas south with two and two thirds brazas on it at low water"
+    says: "The castle of San Felipe at the narrows of Ferrol, its low battery washed by the sea."
+    fix: "moved 75 m to the grid's land"
+
+  - id: palma-castle
+    kind: castle
+    name: the castle of la Palma
+    modern: the Castillo de La Palma, Mugardos
+    lat_deg: 43.4600
+    lon_deg: -8.2710
+    height_m: 15
+    source: "Tofiño 1789, 'Ría del Ferrol', pp. 4 to 5: E 25° N half a mile from the castle of San Martín the castle of la Palma, and from it a reef as long as San Felipe's to the NW; the narrows only two tenths of a mile wide on this side"
+    says: "The castle of la Palma on the south side of Ferrol's narrows, a reef off it to the north-west."
+
+  - id: ferrol-arsenal
+    kind: town
+    name: Ferrol and the King's arsenal
+    modern: Ferrol, the naval arsenal
+    lat_deg: 43.4800
+    lon_deg: -8.2400
+    height_m: 25
+    source: "Tofiño 1789, 'Ría del Ferrol', p. 4: east of la Graña half a long mile the old town of Ferrol with a little mole; east of the town the Royal Arsenal; Atlas, 'Plano de la rya y puerto de Ferrol' (1789): the arsenal and its basin drawn, the observatory of the Guardias Marinas in 43° 29' 30\" N"
+    says: "Ferrol and the King of Spain's arsenal, the basin and the docks within the narrows."
+
+  - id: ferrol-road
+    kind: anchorage
+    name: the harbour of Ferrol
+    modern: the inner ria of Ferrol before the arsenal
+    lat_deg: 43.4720
+    lon_deg: -8.2450
+    height_m: 0
+    depth_fathoms: 5
+    bottom: "mud"
+    source: "Tofiño 1789, 'Entrada en la Ría y Puerto del Ferrol', p. 5: past the narrows a ship anchors where she pleases, the common moor NW and SE; a third of the way from the corner of the basin's mole to the Point of the Seyxo a rocky patch of five and two thirds brazas, as long as three boats, which cuts cables; Atlas, 'Plano de la rya y puerto de Ferrol' (1789): five to eight brazas before the arsenal, the ground L (mud); the depth his five and a half"
+    says: "The harbour of Ferrol within the narrows, five to eight brazas on mud before the arsenal."
+
+  # ---------------------------------------------------------------------------
+  # Corunna
+  # ---------------------------------------------------------------------------
+
+  - id: hercules-light
+    kind: light
+    name: the Tower of Hercules
+    modern: the Torre de Hércules, A Coruña
+    lat_deg: 43.3858
+    lon_deg: -8.4065
+    height_m: 100
+    lit: {from: 1789, until: null, range_nm: 10, character: "a small lanthorn on the very high square tower (lit by the Derrotero's year; its first year not read)"}
+    source: "Tofiño 1789, 'Puerto de la Coruña', pp. 9 to 10: S 30° W five and three tenths miles from Cape Prioriño grande the Tower of Hercules, which is very high and square and has a small lamp that serves as a light, NW by N of the city of Corunna a mile off; the Lighthouse Directory (R. Rowlett, ibiblio.org/lighthouse), 'Spain: Galicia: Western', read 2026-10-10: the Roman tower put back in service by the thirteenth century, a ruin by the seventeenth, its complete restoration ordered by Carlos III in 1785, its focal plane now 106 m, the height taken; the range judgement from a small lamp"
+    says: "The Tower of Hercules, very high and square, a small lanthorn burning on it a mile from Corunna."
+
+  - id: san-anton-castle
+    kind: castle
+    name: the castle of San Antón
+    modern: the Castillo de San Antón, A Coruña
+    lat_deg: 43.3655
+    lon_deg: -8.3885
+    height_m: 15
+    source: "Tofiño 1789, p. 10: S 8° E a mile and two tenths from the Point of Pradeyras the castle of San Antonio on an isolated rock, the NE point of the port, with shoals 60 brazas to its south"
+    says: "The castle of San Antón on its rock, the eastern point of Corunna's harbour."
+
+  - id: pedrido
+    kind: ledge
+    name: the Pedrido
+    modern: the rocks between the Punta de Praderas and San Antón (now under the port's works)
+    lat_deg: 43.3720
+    lon_deg: -8.3880
+    height_m: 0
+    extent_m: 350
+    source: "Tofiño 1789, p. 10: between the point and the castle some islets they call the Pedrido, with a reef to the NNE of more than two cables, some of its stones showing at low water and covered at high; ENE of the reef a cable and a half a shoal with three brazas, the most dangerous of the port: keep two and a half or three cables off the Pedrido while it bears SSW to WSW"
+    says: "The Pedrido, islets and a reef north of San Antón that show at low water: keep two or three cables off them."
+    fix: "between the Punta de Praderas and San Antón as the pilot has it; the grid's shoal heads; the modern port's breakwater lies over the ground"
+
+  - id: corunna-road
+    kind: anchorage
+    name: the harbour of Corunna
+    modern: the harbour of A Coruña inside San Antón
+    lat_deg: 43.3590
+    lon_deg: -8.3900
+    height_m: 0
+    depth_fathoms: 6
+    bottom: "mud, with weed in places"
+    source: "Tofiño 1789, 'Entrada en el Puerto de la Coruña', p. 13: steer for the castle of San Diego, passing a cable from San Antonio; for a ship of the line the best berth is with San Antonio N by E 1/2 E in 6 or 7 brazas mud; for a frigate with it NE or NE by E; in some parts much weed which makes the anchors drag in hard winds; the common moor N and S (p. 14); the port would be excellent for ships of the line if it were deeper"
+    says: "The harbour of Corunna inside San Antón, six or seven brazas on mud, weed in places that lets the anchors drag."
+
+  - id: jasentes
+    kind: shoal
+    name: the Jasentes and the Basuril
+    modern: the Xacentes bank north of A Coruña
+    lat_deg: 43.4040
+    lon_deg: -8.3880
+    height_m: 0
+    depth_fathoms: 5.5
+    source: "Tofiño 1789, p. 11: N 77° W of the Seyxo blanco and N 48° E of the Tower of Hercules the middle of a rocky bank lying NE and SW a mile, 6 to 19 brazas, which all breaks with a great sea from the N or NW; its SW part they call the Basuril, the rest the Jasentes; in a gale from the north the best passage is between the Jasentes and the coast under the Tower"
+    says: "The Jasentes, a rocky bank of six brazas and more north-east of the Tower of Hercules, all breaking in a northerly gale."
+    fix: "the middle of the bank by the pilot's two bearings; the depth his six brazas"
+
+  - id: sisarga
+    kind: island
+    name: the Isle of Sisarga
+    modern: Illas Sisargas
+    lat_deg: 43.3610
+    lon_deg: -8.8430
+    height_m: 70
+    source: "Tofiño 1789, 'Isla Sisarga', p. 17: at low water one isle and at high water three, the great one to the west, round and level on its summit; p. 14: the usual practice, not able to take the port by day, is to pass the night over Sisarga or farther west; with winds of the third quadrant the water runs hard from Sisarga toward Ortegal (p. 15)"
+    says: "The Isle of Sisarga, round and level on its summit, where ships bound for Ferrol or Corunna stand off and on by night."
+
+  - id: baldayo-shoals
+    kind: ledge
+    name: the Shoals of Baldayo
+    modern: the Baixos de Baldaio
+    lat_deg: 43.3200
+    lon_deg: -8.6650
+    height_m: 0
+    extent_m: 900
+    source: "Tofiño 1789, 'Playa y Baxos de Baldayo', p. 16: N of the islet off the beach a mile, a reef of stones lying N and S two miles, the Shoals of Baldayo; at low water up to seven stones show and only the middle one at high; ships pass inside them by a channel of half a mile with 16 brazas"
+    says: "The Shoals of Baldayo, seven stones at low water and one at high, with a channel of sixteen brazas inside them."
+    fix: "the middle of the reef by the pilot's bearing from the beach; the grid's heads"
+
+  # ---------------------------------------------------------------------------
+  # The Costa da Morte: Villano, Camariñas, Toriñana, Finisterre, Corcubión
+  # ---------------------------------------------------------------------------
+
+  - id: cabo-vilano
+    kind: headland
+    name: Cape Villano
+    modern: Cabo Vilán
+    lat_deg: 43.1600
+    lon_deg: -9.2110
+    height_m: 60
+    source: "Tofiño 1789, 'Cabo Villano', p. 25: in 43° 11' 12\" N; of stone, sheer, not very high, but close to it a red peak rising sharp that looks like a tower from afar; a great sand-coloured patch half a league east of it near Balea de Tosta"
+    says: "Cape Villano, sheer and not high, a sharp red peak beside it that looks like a tower."
+
+  - id: bufardo
+    kind: rock
+    name: the Bufardo
+    modern: a sunken head NW of Cabo Vilán
+    lat_deg: 43.1620
+    lon_deg: -9.2150
+    height_m: 0
+    dries_m: -1.0
+    source: "Tofiño 1789, 'Baxo del Bufardo', p. 25: NW of the cape a cable and a half the shoal of the Bufardo, of small extent, a peak of sunken rocks that breaks with little sea, deep water all round; it may be passed between it and the cape, but commonly outside"
+    says: "The Bufardo, a sunken peak a cable and a half off Cape Villano that breaks with a little sea."
+    fix: "the pilot's bearing and distance from the cape; no depth given, a metre under the datum judgement for a head that breaks with little sea"
+
+  - id: vilano-light-1854
+    kind: light
+    name: the light of Cape Villano
+    modern: the Faro de Cabo Vilán
+    lat_deg: 43.1595
+    lon_deg: -9.2110
+    height_m: 105
+    lit: {from: 1854, until: null, range_nm: 20, character: "a light on the cape (not yet built in 1805)"}
+    source: "the Lighthouse Directory (R. Rowlett, ibiblio.org/lighthouse), 'Spain: Galicia: Western', read 2026-10-10: Cabo Vilán, station established 1854; not lit in 1805; the range judgement"
+    says: "The light of Cape Villano, which was not yet built in 1805."
+
+  - id: camarinas-road
+    kind: anchorage
+    name: the road of Camariñas
+    modern: the ria of Camariñas off the town
+    lat_deg: 43.1260
+    lon_deg: -9.1730
+    height_m: 0
+    depth_fathoms: 6
+    bottom: "mud"
+    source: "Tofiño 1789, 'Ría de Camariñas', pp. 26 and 29: the regular anchorage SE or ESE of the mole for any vessel in five to seven brazas mud; with two or three boards a ship gains the town and anchors half a mile off in six or seven brazas mud, moored E and W, for the wind that does most harm is the south; behind her a creek of soft mud where ships without cables have run themselves to save the hull"
+    says: "The road of Camariñas half a mile off the town, six or seven brazas on mud, moored east and west."
+
+  - id: quebranta
+    kind: rock
+    name: the Quebranta
+    modern: the Quebranta shoal in the mouth of the ria of Camariñas
+    lat_deg: 43.1450
+    lon_deg: -9.2350
+    height_m: 0
+    extent_m: 300
+    source: "Tofiño 1789, 'Quebranta grande', p. 27: a rocky bank NW and SE half a long mile, three to seven and a half brazas, but at its north end a peak like a buoy that shows at low water; from Cape Villano S 43° W a mile and a quarter; the Quebranta chica its SE end with five brazas, breaking in a sea"
+    says: "The Quebranta, a rocky bank in the mouth of Camariñas whose northern head shows like a buoy at low water."
+    fix: "the pilot's bearing and distance from Cape Villano; the grid's shoalest head"
+
+  - id: muxia
+    kind: town
+    name: Mugía
+    modern: Muxía
+    lat_deg: 43.1027
+    lon_deg: -9.2164
+    height_m: 20
+    source: "Tofiño 1789, pp. 26 to 27: S 52° 30' W a mile and three quarters from the new castle the town of Mugía on the beach of a clean bay; on the north fall of the mountain the chapel of Our Lady of the Barca on the Point of the Cruces, the southern point of the ria's mouth"
+    says: "Mugía on the south side of the ria, the chapel of Our Lady of the Barca on its point."
+    fix: "moved 160 m to the grid's land"
+
+  - id: cabo-tourinan
+    kind: headland
+    name: Cape Toriñana
+    modern: Cabo Touriñán
+    lat_deg: 43.0540
+    lon_deg: -9.2920
+    height_m: 60
+    source: "Tofiño 1789, 'Cabo Toriñana', p. 30: S 38° W five miles from the Point of Buytre, salient, not very high, steep, and seen NE to SW like a galley's awning; from the offing not easily seen, for it is projected on very high land; a shoal two cables W of it, and a high round islet with two peaks SSW of it close"
+    says: "Cape Toriñana, low and like a galley's awning, a shoal two cables to its west."
+
+  - id: finisterre
+    kind: headland
+    name: Cape Finisterre
+    modern: Cabo Fisterra
+    lat_deg: 42.8820
+    lon_deg: -9.2720
+    height_m: 140
+    source: "Tofiño 1789, 'Cabo Finis Terrae', p. 31: half a league S 21° 30' E of the Nave of Finisterre; not so high as the Nave nor so round, more uneven on its summit, not very sheer; easily known from the offing, for between it and the Nave the coast forms a bay with a beach and lower land, and the coast falls away east south of the cape; the mountain of Lezaro to the east, its summit like the teeth of a saw"
+    says: "Cape Finisterre, uneven on its summit, the high round Nave north of it and the saw-toothed Lezaro to the east."
+
+  - id: finisterre-light-1853
+    kind: light
+    name: the light of Cape Finisterre
+    modern: the Faro de Fisterra
+    lat_deg: 42.8825
+    lon_deg: -9.2715
+    height_m: 140
+    lit: {from: 1853, until: null, range_nm: 23, character: "a light on the cape (not yet built in 1805)"}
+    source: "the Lighthouse Directory (R. Rowlett, ibiblio.org/lighthouse), 'Spain: Galicia: Western', read 2026-10-10: Cabo Finisterre, 1853; not lit in 1805; the range judgement"
+    says: "The light of Cape Finisterre, which was not yet built in 1805."
+
+  - id: turdeiro
+    kind: rock
+    name: the Turdeyro
+    modern: a sunken head south of Cabo Fisterra
+    lat_deg: 42.8770
+    lon_deg: -9.2720
+    height_m: 0
+    dries_m: -4.2
+    source: "Tofiño 1789, p. 32: south of the cape about three cables a shoal the size of a launch with two and a half brazas, called the Turdeyro"
+    says: "The Turdeyro, a head of two and a half brazas three cables south of Cape Finisterre."
+    fix: "the pilot's bearing and distance from the cape; the dries_m his two and a half brazas"
+
+  - id: finisterre-town
+    kind: town
+    name: Finisterre
+    modern: Fisterra
+    lat_deg: 42.9070
+    lon_deg: -9.2640
+    height_m: 20
+    source: "Tofiño 1789, p. 32: half a long league NNE and N of the cape, in a little bay, the town of Finisterre, fishermen, with a little mole for their feluccas and a battery on the north point of the bay"
+    says: "Finisterre, a fishing town with a little mole and a battery, under the cape."
+
+  - id: costeira-road
+    kind: anchorage
+    name: the Costeyra
+    modern: the bay of Langosteira, Fisterra
+    lat_deg: 42.9170
+    lon_deg: -9.2520
+    height_m: 0
+    depth_fathoms: 11
+    bottom: "sand"
+    source: "Tofiño 1789, 'Fondeadero de la Costeyra', pp. 32 to 33: SW of the Point of Sardineyro and ENE of the town a bay called the Costeyra, a good anchorage sheltered from the NE, N and NW in 12 to 24 brazas sand, much used in summer when the north-easters are constant; at the first sign of winds of the second or third quadrant she must make sail and get an offing, for all are on-shore"
+    says: "The Costeyra under Finisterre, twelve to twenty-four brazas on sand, a summer road in the north-easters, to be left at the first sign of a southerly."
+
+  - id: corcubion
+    kind: town
+    name: Corcubión
+    modern: Corcubión
+    lat_deg: 42.9440
+    lon_deg: -9.1920
+    height_m: 20
+    source: "Tofiño 1789, 'Ría de Corcubión', pp. 33 to 34: the ria runs two miles north between the Point of Cé and the Point of la Galera, high and clean; on its west side the town of Corcubión, on its east the town of Cé; two forts about its middle, the Cardinal's on the west and the Prince's on the east, seven tenths of a mile apart"
+    says: "Corcubión on the west side of its ria, the forts of the Cardinal and the Prince below it."
+
+  - id: corcubion-road
+    kind: anchorage
+    name: the ria of Corcubión
+    modern: the ria of Corcubión between its forts
+    lat_deg: 42.9364
+    lon_deg: -9.1852
+    height_m: 0
+    depth_fathoms: 11
+    bottom: "clean"
+    source: "Tofiño 1789, 'Ría de Corcubión', p. 34: good for any vessel, deep enough and clean; in its middle between the two castles, the regular anchorage for ships of the line, twelve brazas, shoaling regularly toward both shores; in winter not far in, for a south wind sends in a sea; moor along the ria, the best anchor to the south (p. 37)"
+    says: "The ria of Corcubión between its two forts, twelve brazas, the road for ships of the line; the south wind its danger."
+    fix: "moved 160 m into the ria's water, ten metres by the grid"
+
+  - id: lobeira-grande
+    kind: island
+    name: the Lobeyra grande
+    modern: Illa Lobeira Grande
+    lat_deg: 42.8801
+    lon_deg: -9.1852
+    height_m: 15
+    source: "Tofiño 1789, 'Lobeyra grande', p. 35: S 87° 45' E four and a half miles from Cape Finisterre, an isle made of islets lying NW and SE, clean all round half a cable off; between the two Lobeyras a passage of three quarters of a mile with 20 to 26 brazas"
+    says: "The Lobeyra grande, a low isle of islets across the mouth of Corcubión, clean half a cable off."
+    fix: "moved 360 m to the grid's one cell above the datum; the isle is lower in the grid than it stands"
+
+  # ---------------------------------------------------------------------------
+  # Muros, Arousa and Pontevedra
+  # ---------------------------------------------------------------------------
+
+  - id: monte-louro
+    kind: hill
+    name: Mount Loyro
+    modern: Monte Louro
+    lat_deg: 42.7530
+    lon_deg: -9.0870
+    height_m: 240
+    source: "Tofiño 1789, 'Monte Loyro', p. 39: high and round with two peaks, the southern the higher with a watch-house on its summit in 42° 45' 47\" N; Cape Finisterre N 44° 50' W of it five leagues; very well known by its figure and by standing at the water's edge, the northern and eastern point of the ria of Muros"
+    says: "Mount Loyro, high and round with two peaks and a watch, standing alone at the mouth of the ria of Muros."
+
+  - id: meixidos
+    kind: rock
+    name: the Meixido
+    modern: the Baixo Meixidos
+    lat_deg: 42.7830
+    lon_deg: -9.1900
+    height_m: 0
+    dries_m: -0.8
+    extent_m: 180
+    source: "Tofiño 1789, 'Baxo el Meixido', pp. 39 to 40: N 78° 15' W five and a half miles from the watch of Mount Loyro, several flat rocks in a circle a cable across, one with only half a braza on it, which breaks with a little sea; all break with much; a channel a league wide between it and the coast"
+    says: "The Meixido, flat rocks with half a braza on them five and a half miles off Mount Loyro, breaking with a little sea."
+    fix: "the pilot's bearing and distance from the watch of Mount Loyro; the dries_m his half braza"
+
+  - id: muros
+    kind: town
+    name: Muros
+    modern: Muros
+    lat_deg: 42.7760
+    lon_deg: -9.0570
+    height_m: 20
+    source: "Tofiño 1789, 'Castillo y Pueblo de Muros', p. 41: within the Atalaya half a mile a castle at the water's edge, from which the beach and the town of Muros begin, middling, with some pataches for trade and many fishing boats at its anchorage"
+    says: "Muros on the north shore of its ria, a castle at the water's edge and many fishing boats."
+
+  - id: muros-road
+    kind: anchorage
+    name: the road of Muros
+    modern: the anchorage before Muros
+    lat_deg: 42.7738
+    lon_deg: -9.0500
+    height_m: 0
+    depth_fathoms: 7.5
+    bottom: "mud"
+    source: "Tofiño 1789, 'Entrada en la Ría de Muros', p. 45: with northerly winds stand in close to Mount Loyro, leaving the Leyxones to port, mind the reef of the Point of Boujo, and with a board or two gain off the town and anchor in eight or ten brazas mud, moored N and S, for the easterly that comes off the land raises a sea and has lost some vessels"
+    says: "The road of Muros off the town, eight to ten brazas on mud, moored north and south against the easterly."
+    fix: "moved 25 m into nine and a half metres"
+
+  - id: curota
+    kind: hill
+    name: the mountain of the Curota
+    modern: Monte A Curota
+    lat_deg: 42.6200
+    lon_deg: -8.9700
+    height_m: 500
+    source: "Tofiño 1789, pp. 45 and 57: the mountain they call the Curota, the highest of all this coast, somewhat inland, thick, and from its summit to a quarter of its height seemingly cut sheer on the face toward the west; it must stay on the north of the ria of Pontevedra when coming from the offing"
+    says: "The Curota, the highest mountain of this coast, its western face seemingly cut sheer."
+
+  - id: corrubedo
+    kind: headland
+    name: Cape Corrovedo
+    modern: Cabo Corrubedo
+    lat_deg: 42.5760
+    lon_deg: -9.0890
+    height_m: 20
+    source: "Tofiño 1789, 'Cabo Corrovedo', p. 47: low, salient and surrounded by stones, Mount Loyro's watch N 3° 17' E of it eleven and a half miles; SW to WSW of it a league a reef of rocks lying NW and SE, placed by the fishermen's reports, which breaks in a sea; the channel between it and the cape has fifteen brazas but all breaks in a gale"
+    says: "Cape Corrovedo, low and ringed with stones, a reef a league off it that breaks in a gale."
+
+  - id: salvora
+    kind: island
+    name: the Isle of Salvora
+    modern: Illa de Sálvora
+    lat_deg: 42.4663
+    lon_deg: -9.0100
+    height_m: 70
+    source: "Tofiño 1789, 'Isla Salvora', p. 48: lying NNW and SSE a mile and a half, uninhabited, high in its middle and very low at its ends, reddish; a line of islets runs from it to the coast that looks like a little convoy under sail; the ria of Arosa behind it not surveyed, being known useless, full of shoals on which its own people often ground (p. 49)"
+    says: "The Isle of Salvora, high in the middle and low at its ends, its islets like a convoy under sail, in the mouth of the ria of Arosa."
+    fix: "moved 150 m to the grid's land"
+
+  - id: ons
+    kind: island
+    name: the Isle of Ons
+    modern: Illa de Ons
+    lat_deg: 42.3800
+    lon_deg: -8.9330
+    height_m: 110
+    source: "Tofiño 1789, 'Isla Ons', pp. 50 to 51: its NNE end in 42° 24' 45\" N; lying NNE and SSW nearly three miles, of moderate height, level on its summit, rugged on the west with stones near it, cleaner on the east with two little landing beaches; inhabited once, now only rabbits; the Isle Onza south of it"
+    says: "The Isle of Ons, level on its summit, lying across the mouth of the ria of Pontevedra."
+
+  - id: pontevedra-road
+    kind: anchorage
+    name: the road of Marín
+    modern: the ria of Pontevedra between Punta Pesqueira and Illa Tambo
+    lat_deg: 42.3970
+    lon_deg: -8.7150
+    height_m: 0
+    depth_fathoms: 6.5
+    bottom: "mud"
+    source: "Tofiño 1789, 'Fondeadero de Marín', p. 54: ships of great draught as ships of the line and frigates can go in only between the Point of la Pesquera and the Isle Tamba, in seven or eight brazas mud, open to the sea of the westerlies, which makes the ria useless for them, particularly in winter; small vessels anchor off Marín in three or four brazas gravel"
+    says: "The road of Marín in the ria of Pontevedra, seven or eight brazas on mud between the Pesquera and Tamba, open to the westerly sea."
+
+  # ---------------------------------------------------------------------------
+  # Vigo and Bayona
+  # ---------------------------------------------------------------------------
+
+  - id: cies
+    kind: island
+    name: the Isles of Bayona
+    modern: Illas Cíes
+    lat_deg: 42.2250
+    lon_deg: -8.9040
+    height_m: 190
+    source: "Tofiño 1789, 'Islas Cíes ó Bayonas', p. 60: two isles lying nearly N and S three and a half long miles, uninhabited, high and uneven on their summits, very sheer on the west and less on the east, where there are two little beaches; the northern the larger, joined by a low sand that the sea crosses in a gale; the passage between the two, the Porta, a third of a cable wide with six or seven brazas"
+    says: "The Isles of Bayona across the mouth of Vigo, high and sheer to the west, the Porta between them."
+
+  - id: cies-road
+    kind: anchorage
+    name: the road under the Isles of Bayona
+    modern: the anchorage east of Illas Cíes, off the sand that joins Monteagudo and do Faro
+    lat_deg: 42.2240
+    lon_deg: -8.8920
+    height_m: 0
+    depth_fathoms: 11
+    bottom: "sand"
+    source: "Tofiño 1789, 'Descripción de la Ría de Vigo', p. 63: ships bound north also anchor east of the Isles of Cíes or Bayona in twelve brazas, the same ground (sand), off the sand where the greater isle seems divided, to wait for fair weather"
+    says: "The road under the Isles of Bayona, twelve brazas on sand east of the isles, where ships wait for a wind."
+
+  - id: biduido
+    kind: rock
+    name: the Biduido
+    modern: the Baixo Bondaña / Biduído shoal north of Illas Cíes
+    lat_deg: 42.2790
+    lon_deg: -8.9180
+    height_m: 0
+    dries_m: -5.9
+    source: "Tofiño 1789, 'Baxo de Biduido', p. 61: N 27° W half a league from the Point of the Caballo, the north end of the isles, a shoal with three and a half brazas at low water, steep on the north, six or seven on the south; of much consideration in entering and leaving Vigo; a stone the size of a boat"
+    says: "The Biduido, a head of three and a half brazas half a league north of the Isles of Bayona, to be minded entering Vigo by the north passage."
+    fix: "the pilot's bearing and distance from the Point of the Caballo; the dries_m his three and a half brazas"
+
+  - id: cabo-home
+    kind: headland
+    name: Cape del Hombre
+    modern: Cabo Home
+    lat_deg: 42.2520
+    lon_deg: -8.8720
+    height_m: 60
+    source: "Tofiño 1789, p. 59: three and a half miles S 12° 30' W from the Point of Osas, all very high sheer land with a watch-tower on the mountain, Cape del Hombre; with the Point of Subrido the northern cape of the ria of Vigo"
+    says: "Cape del Hombre, the northern point of the ria of Vigo, under its high land."
+
+  - id: vigo
+    kind: town
+    name: Vigo
+    modern: Vigo
+    lat_deg: 42.2389
+    lon_deg: -8.7238
+    height_m: 30
+    source: "Tofiño 1789, 'Ensenada y fondeadero de Vigo', p. 66: the town of Vigo regular and compact from the water's edge, a battery in 42° 14' 50\" N; behind it an old castle, and the castle of Castro on a height seen from the whole ria; a great number of fishing boats, some pataches and some vessels for the American trade"
+    says: "Vigo rising from the water, its battery at the shore and the castle of Castro above."
+    fix: "moved 160 m to the grid's land; the modern quays stand before the old shore"
+
+  - id: vigo-road
+    kind: anchorage
+    name: the road of Vigo
+    modern: the ria of Vigo before the town
+    lat_deg: 42.2440
+    lon_deg: -8.7350
+    height_m: 0
+    depth_fathoms: 10
+    bottom: "mud"
+    source: "Tofiño 1789, 'Ensenada y fondeadero de Vigo', p. 66: between the hermitage of Our Lady of la Guía and the town a bay with a clean deep beach, before which is the regular anchorage in eight to fourteen brazas mud, moored NNW and SSE, the best anchor to the NNW, well sheltered by the Isles of Bayona from the westerly to south-westerly that send in the most sea; the tides at full and change at three in the afternoon, rising thirteen to fourteen feet (p. 71)"
+    says: "The road of Vigo before the town, eight to fourteen brazas on mud, sheltered by the Isles of Bayona."
+
+  - id: rande-narrows
+    kind: place
+    name: the narrows of Rande
+    modern: the Estrecho de Rande
+    lat_deg: 42.2870
+    lon_deg: -8.6600
+    height_m: 0
+    source: "Tofiño 1789, p. 65: the Point of Bestias with that of Randa, a third of a mile apart, the narrowest throat of the ria, both very clean and sheer with two ruined castles, and seventeen brazas mud between them; within, a great bay of little water, where ships without anchors or cables may lie in the mud without risk"
+    says: "The narrows of Rande, a third of a mile between two ruined castles, seventeen brazas in the throat."
+
+  - id: monte-ferro
+    kind: hill
+    name: Monte Ferro
+    modern: Monteferro
+    lat_deg: 42.1540
+    lon_deg: -8.8420
+    height_m: 120
+    source: "Tofiño 1789, 'Monte Ferro', p. 68: thick and round with a watch-house on its summit, reddish; its south fall the north and east coast of the port of Bayona, its west fall called Cape Sentido"
+    says: "Monte Ferro, round and reddish with a watch on it, the north side of Bayona's port."
+    fix: "placed on the grid's land of Monteferro north of the bay of Bayona"
+
+  - id: estelas-of-bayona
+    kind: rock
+    name: the Estelas
+    modern: Illas Estelas
+    lat_deg: 42.1470
+    lon_deg: -8.8640
+    height_m: 20
+    extent_m: 200
+    source: "Tofiño 1789, p. 68: west of Cape Sentido an isle of middling size called Estela de tierra, and west of it another, Estela de la mar, with a closed reef between; from the second a reef runs west three cables called of Laxe, visible at low water: it forms the south side of the south passage of Vigo and the north side of the entrance of Bayona"
+    says: "The Estelas off Monte Ferro, the reef of Laxe running west from them between the south passage of Vigo and the road of Bayona."
+    fix: "the grid has a shoal of a metre or two where the isles are: placed west of Monteferro as the modern chart has them, a rock of their height and extent so that they stand solid"
+
+  - id: monte-real
+    kind: castle
+    name: the castle of Monte Real at Bayona
+    modern: the fortress of Monterreal, Baiona
+    lat_deg: 42.1228
+    lon_deg: -8.8469
+    height_m: 30
+    source: "Tofiño 1789, 'Puerto de Bayona', p. 71: the port small and full of shoals, its best shelter SE of the Point of la Tenaza, the north point of Monte Real, a little isthmus of moderate height on which stand the walls of a great castle, the town at its foot not seen till within the port; to enter it a pilot is indispensable"
+    says: "The castle of Monte Real at Bayona on its point, the little port within it full of shoals."
+    fix: "moved 80 m to the grid's land"
+
+  - id: bayona-road
+    kind: anchorage
+    name: the road of Bayona
+    modern: the bay of Baiona within Monterreal
+    lat_deg: 42.1200
+    lon_deg: -8.8390
+    height_m: 0
+    bottom: "sand"
+    source: "Tofiño 1789, 'Puerto de Bayona', p. 71: its greatest shelter SE of the Point of la Tenaza, which has a reef of more than a cable; a pilot indispensable, else she is exposed to be lost; the ground judgement"
+    says: "The road of Bayona under the castle, shoal and foul: not without a pilot."
+
+  - id: silleiro
+    kind: headland
+    name: Cape Silleyro
+    modern: Cabo Silleiro
+    lat_deg: 42.1050
+    lon_deg: -8.8978
+    height_m: 70
+    source: "Tofiño 1789, 'Cabo Silleyro', p. 72: high, angular, stone-coloured; from its NW fall a very low point runs out with a reef of a quarter of a mile, part of which shows at low water and the rest all breaks with any sea; from Silleyro southward the coast high and nearly even to the Minho, with no opening (p. 69)"
+    says: "Cape Silleyro, high and stone-coloured, a low reef a quarter of a mile off its north-west side."
+    fix: "moved 100 m to the grid's land"
+
+  - id: silleiro-reef
+    kind: ledge
+    name: the reef of Cape Silleyro
+    modern: the reef off Cabo Silleiro
+    lat_deg: 42.1100
+    lon_deg: -8.9050
+    height_m: 0
+    extent_m: 400
+    source: "Tofiño 1789, 'Cabo Silleyro', p. 72: from the cape's NW fall a very low point with a reef the same way of a quarter of a mile; at low water part of it shows and the rest all breaks with the least sea"
+    says: "The reef of Cape Silleyro, a quarter of a mile to the north-west, showing at low water and breaking with any sea."
+    fix: "the pilot's quarter of a mile NW of the cape; the grid's heads"

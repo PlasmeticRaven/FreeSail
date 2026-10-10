@@ -1,0 +1,115 @@
+# FreeSail: Funchal and its open road as a port (spec M6 §26, block 5: the voyage's end
+# "as an anchorage in a road with a swell"; package 39e), on package 35's machinery; the
+# marks are the features file's (data/charts/features/madeira.yaml).
+#
+# Sources. The Oriental Navigator 1801, 'Directions for sailing from the British Channel
+# towards Porto Santo, Madeira ...', pp. 22 to 25 (Howe 1787 the same in its words): bound
+# into Funchal road from the eastward with the wind north-easterly, go through the
+# passage between the Desertas and Madeira, steer for the low point west of the town and
+# not too near the Brazen Head, then haul in for the road; the Loo bearing N by E 3/4 E
+# or N by E by compass; let go the larboard anchor in 36 or 38 fathoms with two cables on
+# it, for coming in with a fresh easterly "you scarcely bring up till you have veered the
+# splice out a good way"; ride with a whole cable, the splice so placed that you may cut
+# near it if obliged to put to sea; a ship-buoy on the cable and the kedge out to the
+# westward; the best anchorage 18 to 30 fathoms, sand, south-east of the Loo, the Citadel
+# well open east of it; the surf on the beach, landing only within the Loo, the town's
+# boats carrying goods and water; the south-westers and south-south-easters of January
+# to March, which throw in "a very large hollow swell" and which large ships ride out and
+# small ones do well to put to sea from; the land wind at night, the sea breeze from the
+# south-west in the forenoon. Norie 1805, Table XLI p. 250 (the page image): high water
+# at Funchal at 12h 4m on full and change, rising 7 feet.
+#
+# The datum: UNVERIFIED. No period plan of the road was read (the Admiralty's is Vidal's,
+# of the 1840s), no override is patched, and no mean level above a chart's datum was read
+# for TICON's Funchal gauge (data/tides/constituents.yaml, held): the road is EMODnet's
+# depths at LAT, and they put the pilot's berth of 18 to 30 fathoms where the bank falls
+# from 30 to 55 m within two cables (the steep bank the directions warn of).
+#
+# The stance: Portuguese, neutral in 1805 and open to every nation (data/nations.yaml).
+# No pilot is taken into an open road: the "pilot" here is the town's boat that comes
+# off to every ship, its master the man who knows the ground (judgement). Prices FROM
+# MEMORY or JUDGEMENT; sterling at the exchange.
+
+id: funchal
+name: Funchal
+nation: portugal
+source: "the Oriental Navigator 1801, pp. 22 to 25 (Howe 1787); Norie 1805, Table XLI p. 250"
+datum: unverified
+
+outer_road:
+  feature: funchal-road
+  name: Funchal Road
+  lat_deg: 32.6380
+  lon_deg: -16.9060
+anchorage:
+  feature: funchal-road
+  name: Funchal Road
+  lat_deg: 32.6380
+  lon_deg: -16.9060
+mooring:
+  name: the inner berth south-east of the Loo
+  lat_deg: 32.6390
+  lon_deg: -16.9100      # the grid's 34 m, eighteen fathoms, the pilot's least
+  bottom: sand
+  deep_draught_ft: 20    # judgement: the road is deep; the berth is for any ship
+shore:
+  feature: funchal-landing
+  name: the landing within the Loo
+  lat_deg: 32.6440
+  lon_deg: -16.9140
+
+pilot:
+  station: funchal-road
+  cruising_nm: 3                 # judgement: the town's boats meet a ship off the road
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a shore boat of Funchal
+    under: oars
+    note: "judgement: the Oriental Navigator's 'the boats of that place are employed for goods, watering, &c.'"
+  names: [Freitas, Gonçalves, Sousa, Rodrigues, Fernandes, Teixeira, Abreu, Câmara]   # names of Madeira: judgement
+  skill: 0.85
+  fee_pounds: 1                  # judgement, the boat's hire in sterling for the one account; unverified
+  cast: starboard                # off the road with the land wind at night, the head to the south (judgement)
+  course_out_deg: 180            # stand directly off from the road with the land wind (the Oriental Navigator p. 25)
+  words:
+    channel: "From the eastward come through between the Desertas and the island, keep mid-channel and do not borrow on the Madeira shore too soon; then steer for the low point west of the town and keep off the Brazen Head, or you will lose the breeze in its eddies and have to tow."
+    marks: "The Loo, the rock with the fort a little west of the town: bring it north by east and haul in. The Citadel, the brown square fort on the hill over the west of the town: keep it well open east of the Loo and you are on the best ground."
+    anchorage: "Let go in thirty-six or thirty-eight fathoms with two cables on the anchor, for the bank is steep and you will veer a long way before you bring up; ride with a whole cable, the splice where you can cut, a buoy on it and the kedge out to the westward. The best berth is eighteen to thirty fathoms on sand south-east of the Loo."
+    tide: "High water at Funchal at noon or a few minutes after on the full and change; the tide rises and falls about seven feet. The current along the south side runs with the wind in the offing."
+
+tide:
+  establishment: Funchal
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 110, origin: portugal, season: {9: 0.9, 10: 0.9}, note: "Madeira wine by the pipe, two pipes to the ton; from memory, the price of the English houses of Funchal; cheaper at the vintage (judgement)"}
+    - {good: salt beef, price: 70, origin: null, note: "Irish beef brought in by the Indiamen's victuallers; from memory"}
+    - {good: salt fish, price: 30, origin: null, note: "Newfoundland cod, the island's staple import; from memory"}
+    - {good: barley, price: 12, origin: portugal, note: "the Western Islands' corn, which Madeira imports (Tofiño 1789 p. 208: Terceira exports grain to Lisbon and to Madeira); judgement"}
+    - {good: sugar, price: 60, origin: portugal, note: "Brazil sugar by way of Lisbon; from memory"}
+    - {good: canvas, price: 60, origin: britain, note: "English sailcloth in the merchants' stores; from memory"}
+    - {good: cordage, price: 70, origin: britain, note: "from memory"}
+    - {good: timber, price: 8, origin: portugal, note: "the island's chestnut and til, scarce; judgement"}
+    - {good: brandy, price: 100, origin: portugal, note: "Portuguese aguardente; from memory"}
+    - {good: tobacco, price: 90, origin: portugal, note: "Brazil roll tobacco by way of Lisbon, the Crown's monopoly; from memory"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 16, pounds: 50, note: "a spar from the English merchants' stores, dear (judgement)"}
+    - {item: yard, hours: 10, pounds: 30}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.07}
+    - {item: water, hours_per_ton: 0.3, pounds_per_ton: 0.2, note: "brought off in the town's boats through the surf (the Oriental Navigator p. 24)"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.08}
+
+crew_pool:
+  able: {hands: 3, pounds: 2, delay_h: 24}
+  ordinary: {hands: 4, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 6, pounds: 1, delay_h: 12}
+
+closed_to: []

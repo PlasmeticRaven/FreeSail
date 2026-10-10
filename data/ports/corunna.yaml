@@ -1,0 +1,113 @@
+# FreeSail: Corunna (La Coruña, the Groyne) as a port (spec M6 §26; package 39c, the
+# Biscay south and Galicia block), on package 35's machinery; the marks are the features
+# file's (data/charts/features/biscay-south.yaml).
+#
+# Sources. Tofiño 1789, Derrotero de las costas de España en el Océano Atlántico, 'Puerto
+# de la Coruña', pp. 9 to 14: the Tower of Hercules, very high and square with a small
+# lamp, a mile NW by N of the city; the castle of San Antonio on its isolated rock the NE
+# point of the port; the Pedrido and its reef, and a shoal of three brazas a cable and a
+# half ENE of it, the most dangerous of the port; the Jasentes and the Basuril, a rocky
+# bank of 6 to 19 brazas NE of the Tower that all breaks in a great northerly sea; to
+# enter in fine weather steer for the Seyxo blanco and Monte de Mera till the castle of San
+# Diego opens by San Antonio, then for San Diego passing a cable off San Antonio; a ship
+# of the line best with San Antonio N by E 1/2 E in six or seven brazas mud, a frigate
+# with it NE or NE by E; much weed in places that lets the anchors drag; the common moor N
+# and S; the tides those of Ferrol; never to be closed by night, for the currents and the
+# fogs; the practice, not able to take the port by day, to spend the night off Sisarga.
+#
+# The datum: UNVERIFIED. No period plan of Corunna's harbour was found in the Atlas's
+# copy read (the Ferrol plan's sheet takes the coast no farther south than the Gaveyras);
+# the chart's depths are EMODnet's at LAT, the modern port's works standing where the
+# Pedrido and the old beach were.
+#
+# The stance. Corunna is Spanish: hostile to a King's ship in June 1805, open to a
+# neutral (data/nations.yaml); the packets of the Falmouth service had sailed to it in
+# peace (from memory, not used). Prices FROM MEMORY or JUDGEMENT; sterling at the
+# exchange.
+
+id: corunna
+name: Corunna
+nation: spain
+source: "Tofiño 1789, Derrotero, pp. 9-15 ('Puerto de la Coruña', its shoals and marks, the entrance in fair weather and in a northerly gale, the tides as Ferrol's)"
+datum: unverified
+
+# The road is the harbour inside San Antón for every draught; the mooring the same water
+# farther in, where a smaller ship lies "mas dentro".
+outer_road:
+  feature: corunna-road
+  name: the harbour of Corunna
+  lat_deg: 43.3590
+  lon_deg: -8.3900
+anchorage:
+  feature: corunna-road
+  name: the harbour of Corunna
+  lat_deg: 43.3590
+  lon_deg: -8.3900
+mooring:
+  feature: corunna-road
+  name: the harbour of Corunna, moored north and south
+  lat_deg: 43.3590
+  lon_deg: -8.3900
+shore:
+  feature: san-anton-castle
+  name: the mole of Corunna
+  lat_deg: 43.3655
+  lon_deg: -8.3885
+
+pilot:
+  station: corunna-road
+  cruising_nm: 6                 # judgement: the port's pilots met ships between the Tower and Mera
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the pilots' launch of Corunna
+    under: a lugsail and oars
+    note: "a Galician lancha (judgement)"
+  names: [Varela, Rodríguez, Vázquez, Mosquera, Sanjurjo, Otero, Barreiro, Ares]   # Galician names: judgement
+  skill: 0.9
+  fee_pounds: 4                  # judgement, in sterling for the one account; unverified
+  cast: starboard                # from the harbour the head paying off to the northward for the mouth (judgement)
+  course_out_deg: 20             # out between San Diego and San Antón, then north-east of the Pedrido
+  words:
+    channel: "In fair weather steer for the Seyxo blanco and Monte de Mera till the castle of San Diego opens by San Antonio, which clears the Pedrido, its reef and the three-braza shoal beyond it; then steer for San Diego, passing a cable off San Antonio. In a northerly gale pass between the Jasentes and the coast under the Tower of Hercules, the Tower's foot always in sight, two cables off the Buey, then ESE for Mera's battery till San Diego opens."
+    marks: "The Tower of Hercules, very high and square; the castle of San Antonio on its rock; the castle of San Diego; the battery on Monte de Mera, its hill black; the Seyxo blanco with its white vein like a road."
+    anchorage: "A ship of the line with San Antonio N by E half E in six or seven brazas mud; a frigate with it NE or NE by E; smaller vessels farther in. Moor north and south; in places much weed lets the anchors drag in hard winds."
+    tide: "The tides are those of Ferrol: high water at three in the afternoon at full and change, rising thirteen or fourteen feet. Do not close the land by night: the currents and the tide set ships out of their reckoning, and the fogs are frequent."
+
+tide:
+  establishment: Corunna
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 30, origin: spain, note: "from memory"}
+    - {good: brandy, price: 95, origin: spain, note: "from memory"}
+    - {good: salt, price: 12, origin: spain, note: "from memory"}
+    - {good: pilchards, price: 24, origin: spain, season: {7: 0.8, 8: 0.8, 9: 0.8}, note: "the sardines of the rias (judgement)"}
+    - {good: salt fish, price: 30, origin: spain, note: "from memory"}
+    - {good: linen, price: 60, origin: spain, note: "Galician linen (judgement)"}
+    - {good: canvas, price: 42, origin: null, note: "from memory"}
+    - {good: salt beef, price: 72, origin: spain, note: "from memory"}
+    - {good: tobacco, price: 90, origin: null, note: "the Crown's monopoly; from memory"}
+    - {good: hemp, price: 56, origin: null, note: "from memory"}
+    - {good: coal, price: 7, origin: britain, note: "scarce under the war; from memory"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 10, pounds: 45, note: "the town's shipwrights (judgement)"}
+    - {item: topgallant_mast, hours: 5, pounds: 15}
+    - {item: yard, hours: 7, pounds: 30}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.055}
+    - {item: water, hours_per_ton: 0.12, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  able: {hands: 3, pounds: 2, delay_h: 24}
+  ordinary: {hands: 6, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 12, pounds: 1, delay_h: 12}
+
+closed_to: []

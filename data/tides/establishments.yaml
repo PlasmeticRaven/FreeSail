@@ -91,6 +91,21 @@ tables:
       - {name: the Isle of Ré, lat_deg: 46.204, lon_deg: -1.367, hw_h: 3, hw_m: 45, spring_rise_ft: 15, note: "Faden pp. 81 and 93: in the Pertuis d'Antioche high tide from half an hour after 3 to 4 o'clock; the tide rises 15 feet in the roads of Ré"}
       - {name: La Rochelle, lat_deg: 46.159, lon_deg: -1.152, hw_h: 3, hw_m: 45, spring_rise_ft: 15, note: "Faden p. 81: the tides from half an hour after 3 to 4 o'clock at new and full moon; the tide rises 15 feet at La Rochelle"}
       - {name: Brouage, lat_deg: 45.862, lon_deg: -1.068, hw_h: 4, hw_m: 0, spring_rise_ft: 15, note: "Faden pp. 83 and 93: at Brouage high water at 4 o'clock and the currents very strong; the rise the coast of Poitou's, which his table holds Brouage in"}
+      # Package 39c, Biscay south and Galicia: the French corner's hours Faden 1793's (the
+      # Gironde p. 88, Arcasson pp. 90 and 93, Bayonne pp. 91 and 93), the Spanish ports'
+      # Tofiño 1789's Derrotero (the page in each row), every one "at three in the
+      # afternoon" on the days of conjunction and opposition. Tofiño's rises are in pies
+      # de Burgos (0.2786 m, a third of the vara; UNVERIFIED here, from memory) and are
+      # turned to English feet and rounded (thirteen and a half pies are twelve feet).
+      - {name: the Tower of Cordouan, lat_deg: 45.586, lon_deg: -1.174, hw_h: 4, hw_m: 30, spring_rise_ft: 15, note: "Faden p. 88: on the new and full moons high water to the northward of the Tower of Cordouan at 30 min. after 4 o'clock, and to the south of it 15 min. later; the perpendicular rise 14 or 15 feet, in the neap tides only 7 or 8"}
+      - {name: Arcasson, lat_deg: 44.665, lon_deg: -1.165, hw_h: 3, hw_m: 15, spring_rise_ft: 15, rise_judgement: true, note: "Faden pp. 90 and 93: in the Bassin of Arcasson at new and full moon high water at a quarter after 3 o'clock; no rise given"}
+      - {name: Bayonne, lat_deg: 43.527, lon_deg: -1.515, hw_h: 3, hw_m: 0, spring_rise_ft: 11, note: "Faden p. 91: at Bayonne high water at 3 o'clock, or a little later; Tofiño 1789 p. 132: at full and change at three in the afternoon, rising 12 pies, 8 or 9 at the quarters"}
+      - {name: Passages, lat_deg: 43.338, lon_deg: -1.929, hw_h: 3, hw_m: 0, spring_rise_ft: 11, note: "Tofiño 1789 p. 145: at conjunction and opposition high water at three in the afternoon and the tide rises 12 pies, 8 to 10 at the quarters, 15 at the equinoxes and solstices"}
+      - {name: Santander, lat_deg: 43.462, lon_deg: -3.805, hw_h: 3, hw_m: 0, spring_rise_ft: 12, note: "Tofiño 1789 p. 172: at conjunction and opposition high water at three in the afternoon, the tide rising 13 1/2 pies, 9 or 10 at the quarters"}
+      - {name: Cape Ortegal, lat_deg: 43.771, lon_deg: -7.869, hw_h: 3, hw_m: 0, spring_rise_ft: 14, note: "Tofiño 1789 p. 189: on all this coast (Ribadeo to Cape Prior) high water at conjunction and opposition at three in the afternoon, with little difference, the mean rise fifteen pies"}
+      - {name: Ferrol, lat_deg: 43.480, lon_deg: -8.240, hw_h: 3, hw_m: 0, spring_rise_ft: 12, note: "Tofiño 1789 p. 6: at the new and full moons high water at three in the afternoon, the tides rising 13 to 14 pies de Burgos, a foot or a foot and a half more at the equinoxes"}
+      - {name: Corunna, lat_deg: 43.366, lon_deg: -8.390, hw_h: 3, hw_m: 0, spring_rise_ft: 12, note: "Tofiño 1789 p. 14: the tides the same as Ferrol's"}
+      - {name: Vigo, lat_deg: 42.240, lon_deg: -8.725, hw_h: 3, hw_m: 0, spring_rise_ft: 12, note: "Tofiño 1789 p. 71: the tides at conjunction and opposition at three in the afternoon, rising 13 to 14 pies"}
       # Package 39d, Portugal and Cadiz: the hours of high water at new and full moon that
       # Tofiño 1789's Derrotero gives (the Spanish survey of the coast, 1786 to 1788, in
       # period exactly; the better table's figures for this coast, as Faden's are for
@@ -106,6 +121,18 @@ tables:
       - {name: San Lucar, lat_deg: 36.790, lon_deg: -6.405, hw_h: 3, hw_m: 0, spring_rise_ft: 18, rise_judgement: true, note: "Tofiño 1789, p. 108: on the days of new and full moon high water at three in the afternoon (the bar of the Guadalquivir)"}
       - {name: Ayamonte, lat_deg: 37.170, lon_deg: -7.398, hw_h: 3, hw_m: 0, spring_rise_ft: 11, note: "Tofiño 1789, p. 101: the water rises more than two brazas on the days of new and full moon, high water at three in the afternoon (the bar of the Guadiana)"}
       - {name: Cadiz, lat_deg: 36.548, lon_deg: -6.276, hw_h: 2, hw_m: 0, spring_rise_ft: 10, note: "Tofiño 1789, p. 119: on the days of new and full moon high water at two in the afternoon and the tide rises eleven feet (Castilian), twelve the days after, six at the quarters"}
+      # Package 39e, Madeira and the Western Islands: Norie's own Table XLI of 1805 (the
+      # edition the study did not read; Internet Archive norie-1805-a-new-and-complete-
+      # epitome-of-practical-navigation, the page images of pp. 248 to 250 read through the
+      # archive's IIIF server 2026-10-10, the OCR having lost the columns): Angra Bay,
+      # Terceira, 11h 45m and 8 feet; Fayal Road 2h 20m and 4 1/2 feet; Funchal 12h 4m and
+      # 7 feet. No row for St Michael's. Tofiño 1789 ('Isla del Fayal', p. 224) has Fayal's
+      # high water at half past twelve with eight Spanish feet at springs, and TICON's
+      # constants put Horta's tide within five degrees of Angra's: Norie's Fayal is a
+      # poorer figure, kept as his, the master's error to make.
+      - {name: Funchal, lat_deg: 32.640, lon_deg: -16.907, hw_h: 12, hw_m: 4, spring_rise_ft: 7, note: "Norie 1805, Table XLI p. 250 (the page image): Funchal, Madeira, 12h 4m, 7 feet; the Oriental Navigator 1801 p. 24: the tides rise and fall about 7 1/2 feet"}
+      - {name: Angra Bay, lat_deg: 38.652, lon_deg: -27.215, hw_h: 11, hw_m: 45, spring_rise_ft: 8, note: "Norie 1805, Table XLI p. 248 (the page image): Angra Bay, Terceira, 11h 45m, 8 feet"}
+      - {name: Fayal Road, lat_deg: 38.530, lon_deg: -28.612, hw_h: 2, hw_m: 20, spring_rise_ft: 4.5, note: "Norie 1805, Table XLI p. 249 (the page image, the hour's first figure faint): Fayal Road, Azores, 2h 20m, 4 1/2 feet; Tofiño 1789 p. 224 has half past twelve and eight Spanish feet"}
       # package 39f, the Strait: Tofiño 1787's hours (his survey's own observations, the
       # period's best for these waters) and Purdy 1826's where Tofiño gives none (p. 8, read
       # from the page image); Tofiño's feet are the pie de Burgos (0.279 m), turned to

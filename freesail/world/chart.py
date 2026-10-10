@@ -94,6 +94,19 @@ TWILIGHT_FACTOR = 0.5
 # than half lit, `sights.moonlit`) the land is seen at a league (judgement: a coast under
 # a full moon shows at three miles where a dark one shows at one).
 MOONLIT_LAND_NM = 3.0
+# The index search for what is in sight reaches the horizon of an object this high (the
+# Channel's tallest mark is 241 m); a feature taller than it (the Peak of Pico, 2,351 m,
+# seen thirty leagues off by the directions; package 39e) is looked for wherever the
+# ship is, beside the search, so that the horizon rule holds at its height.
+SEARCH_HEIGHT_M = 300.0
+# The weather's clearest visibility, "the horizon" (`weather.VISIBILITY_NM`: the
+# masthead's horizon for the sea and low land, twelve miles). In it a feature taller
+# than SEARCH_HEIGHT_M is seen to its own geographic horizon, as the directions have a
+# peak "in clear weather" (Tofiño 1789, 'Isla del Fayal', p. 226: the Peak's tangent to
+# the sea's horizon 32 leagues, "puede verse en dia claro"); in any thicker weather the
+# visibility bounds it as it bounds the rest. No feature of the Channel is so tall, so
+# nothing the Channel's lookout sees moves (package 39e).
+CLEAR_VISIBILITY_NM = 12.0
 # A light in thick weather (package 33b; playtest 13's finding that the Lizard's lights
 # were not seen ten miles off in the squalls' rain). The pilots say a light is seen "in
 # clear weather" at its range (Imray 1874, 'Plymouth to Land's End', p. 94: the Lizard
@@ -933,6 +946,9 @@ class Chart:
                         self.index.setdefault(self._cell_key(f.lat_deg, f.lon_deg), []).append(f.id)
             if rspec.get("coast"):
                 self.coast_paths.append(root / rspec["coast"])
+        # the features taller than the search's reach (package 39e: the Peak of Pico),
+        # looked for at every look beside the index's
+        self.tall: list[Feature] = [f for f in self.features.values() if f.height > SEARCH_HEIGHT_M]
         # the one region's coast, as the browser's block read it before package 38
         self.coast_path = self.coast_paths[0] if self.coast_paths else root / ""
 
@@ -1432,12 +1448,17 @@ class Chart:
         eye_nm = horizon_nm(height_of_eye_m)
         night_land = MOONLIT_LAND_NM if moonlit else NIGHT_LAND_NM
         # the farthest anything could be seen bounds the index search
-        reach_nm = min(vis_nm, eye_nm + horizon_nm(0.0, 300.0))
+        reach_nm = min(vis_nm, eye_nm + horizon_nm(0.0, SEARCH_HEIGHT_M))
         if daylight != "day":
             reach_nm = max(reach_nm, 30.0)
         out: list[Sighting] = []
         year = when.year
-        for f in self.nearby(pos, reach_nm * units.NAUTICAL_MILE):
+        candidates = self.nearby(pos, reach_nm * units.NAUTICAL_MILE)
+        if self.tall:
+            # a peak beyond the search's reach is judged by its own horizon (package 39e)
+            ids = {f.id for f in candidates}
+            candidates += [f for f in self.tall if f.id not in ids]
+        for f in candidates:
             seen_as = self._seen_as(f, daylight, year)
             if seen_as is None:
                 continue
@@ -1446,6 +1467,9 @@ class Chart:
             bearing, distance = bearing_and_distance(pos, f.position)
             nm = distance / units.NAUTICAL_MILE
             limit = min(vis_nm, horizon_nm(height_of_eye_m, f.height))
+            if seen_as == "land" and f.height > SEARCH_HEIGHT_M and vis_nm >= CLEAR_VISIBILITY_NM:
+                # a peak in clear weather: its own horizon (package 39e)
+                limit = horizon_nm(height_of_eye_m, f.height)
             if seen_as == "light":
                 rng = float((f.lit or {}).get("range_nm") or 0.0)
                 luminous = luminous_range_nm(rng, vis_nm) if rng else vis_nm

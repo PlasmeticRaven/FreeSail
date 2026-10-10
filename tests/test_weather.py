@@ -713,16 +713,18 @@ def test_the_climatology_has_four_boxes_the_channels_as_it_was_and_three_provisi
         "biscay",
         "portugal",
         "madeira",
+        # package 39e: the Western Islands
+        "azores",
     ]
     channel = clim.boxes["channel"]
     assert channel.months is clim.months and channel.bounds == (47.5, 52.0, -20.0, 2.0)
     assert clim.month(1).check["westerly_pct"] == 29.0 and clim.month(7).lows_per_month == 3.0
     assert clim.month(6).high_bearing_deg == (300.0, 110.0)  # W §1: the Azores ridge
-    for name in ("biscay", "portugal", "madeira"):
+    for name in ("biscay", "portugal", "madeira", "azores"):
         box = clim.boxes[name]
         assert box.provisional and "judgement" in box.source
     raw = yaml.safe_load(W.CLIMATOLOGY_PATH.read_text(encoding="utf-8"))
-    for name in ("biscay", "portugal", "madeira"):
+    for name in ("biscay", "portugal", "madeira", "azores"):
         for m, row in raw["boxes"][name]["months"].items():
             assert row["note"].startswith("judgement"), (name, m)
     assert "note" not in raw["boxes"]["channel"]["months"][1]
@@ -731,6 +733,10 @@ def test_the_climatology_has_four_boxes_the_channels_as_it_was_and_three_provisi
     assert clim.box_at(45.0, -20.0).name == "biscay"
     assert clim.box_at(38.7, -9.5).name == "portugal"
     assert clim.box_at(32.6, -16.9).name == "madeira"
+    # package 39e: the Western Islands, and the sea between them and Madeira
+    assert clim.box_at(38.65, -27.2).name == "azores"
+    assert clim.box_at(35.0, -21.0).name == "madeira"  # Madeira's box first where they meet
+    assert clim.box_at(40.0, -21.0).name == "azores"
     assert clim.box_at(36.1, -5.5).name == "portugal"  # the Strait's western door
     assert clim.box_at(55.0, -30.0).name == "channel"
     # the Portuguese trades and the north-east trade in the gradient's bearing

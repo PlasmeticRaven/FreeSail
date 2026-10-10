@@ -1,0 +1,77 @@
+# FreeSail: the Biscay south and Galicia block's passage (spec M6 §26; package 39c). A free
+# passage, not a gate's: the American cutter, a neutral, from the road under the Isles of
+# Bayona (Vigo's outer road) out by the north passage, up the coast of Galicia outside
+# Ons, Salvora and the Meixido, round Cape Finisterre, Toriñana and Villano, outside
+# Sisarga, and into the harbour of Corunna, where she anchors. The block's water on the
+# whole chart (`chart: atlantic-east`), its marks (data/charts/features/biscay-south.yaml),
+# its ports (Vigo and Corunna, on package 35's machinery) and its streams (the open bay
+# and the passage of Sisarga, data/tides/streams.yaml). Given to either driver with
+# --scenario:
+#     py -m freesail.ui.console --scenario data/scenarios/biscay-south.yaml
+# and printed whole by
+#     py tools/day_log.py data/scenarios/biscay-south.yaml --hours 30 --reckoning
+#
+# The passage as the book beside this file sails it (biscay-south.orders): she lies at
+# anchor under the Isles of Bayona (Tofiño 1789 p. 63: ships bound north wait east of the
+# isles in twelve brazas, sand) at six in the morning of 12 June 1805; she weighs and
+# stands out by the north passage, keeping south of the Isle Onza's meridian clear of the
+# Biduido (p. 69), then shapes her course outside the islands and the Meixido (pp. 39 to
+# 40), round the capes a league off, and outside Sisarga for Corunna, where she comes in
+# under the Tower of Hercules and anchors inside San Antón (pp. 13 to 14). The weather is
+# pinned, a south-westerly of fourteen knots veering west-north-west and easing, the wind
+# free on every leg and fair for Corunna's mouth (the Derrotero's winds for it are of the
+# first and fourth quadrants: with the first run's southerly she could not fetch in), so
+# that the passage is the same on every machine. Sailed once at seed 7 for the package's
+# notes (docs/dev/TuningNotes.md, package 39c); not a gate's and not pinned.
+
+name: Biscay south and Galicia, the cutter from Vigo round Finisterre to Corunna
+seed: 7
+start: 1805-06-12T06:00
+position: {lat_deg: 42.2240, lon_deg: -8.8920}   # the road under the Isles of Bayona (Tofiño 1789 p. 63)
+chart: atlantic-east
+nation: united-states
+ship:
+  file: data/ships/cutter.yaml
+  heading_deg: 0
+  glass: true
+  instrument: octant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.9}
+
+papers:
+  chart: {year: 1804}
+  epitome: norie                  # the better table, which has the block's places (data/tides/establishments.yaml)
+  almanac: 1805
+
+cargo:
+  purse_pounds: 500
+
+ports: [vigo, corunna]
+
+weather:
+  wind:
+    - {at: 1805-06-12T04:00, from_deg: 225, knots: 14, air_mass: neutral}
+    - {at: 1805-06-12T14:00, from_deg: 250, knots: 13}
+    - {at: 1805-06-12T22:00, from_deg: 285, knots: 12}
+    - {at: 1805-06-13T06:00, from_deg: 300, knots: 10}
+  background:
+    {hpa: 1015, gradient_hpa_per_100km: 0.5, high_toward_deg: 160}
+  systems:
+    - name: the low to the north-west
+      kind: low
+      radius_km: 900
+      track:
+        - {at: 1805-06-11T12:00, x_km: -700, y_km: 600, hpa: 1006}
+        - {at: 1805-06-13T12:00, x_km: -500, y_km: 800, hpa: 1009}
+  sky: {sky: clear, weather: fine, visibility: the horizon}
+  sea: true
+
+standing_orders:
+  - data/scenarios/biscay-south.orders
+
+orders:
+  - let go the best bower
