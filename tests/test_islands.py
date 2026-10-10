@@ -77,7 +77,9 @@ def test_the_islands_stand_alone_in_the_chart_after_the_coasts_blocks(manifest, 
     raised to the chart's datum; the recipe's corridor reaches 32 W (its tiles the
     owner's to commit: package 39e's report)."""
     tool = build_tool()
-    assert manifest["charts"][WHOLE]["regions"][-2:] == ISLANDS
+    regions = manifest["charts"][WHOLE]["regions"]
+    after = regions.index("portugal") + 1  # the coast's last block; the Strait after them (39f)
+    assert regions[after : after + 2] == ISLANDS
     others = {r for r in manifest["regions"] if r not in ISLANDS}
     for name in ISLANDS:
         spec = manifest["regions"][name]
