@@ -146,6 +146,10 @@ class Sample:
     # what the captain told the station (`tell the watcher ...`, package 29): no answer is
     # owed; absent when nothing was told
     word: str | None = None
+    # what was said within the station's hearing by another station or the player (the
+    # deck's conversation, package 41), each line under the speaker's name and with where
+    # he stood; absent when nothing was
+    heard: list[str] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
@@ -153,11 +157,13 @@ class Sample:
             d.pop("stood_by", None)
         if d.get("word") is None:
             d.pop("word", None)
+        if not d.get("heard"):
+            d.pop("heard", None)
         # the harness's notices first after the stamp and the reason (the first of them,
         # after a stand-by, says that the model stood by: package 28c), then the question
         # and the stand-by's digest, then the log and the readings; a door that sends the
         # sample as JSON sends it in this order
-        first = ("tick", "stamp", "reason", "notices", "question", "word", "stood_by")
+        first = ("tick", "stamp", "reason", "notices", "question", "word", "heard", "stood_by")
         return {k: d[k] for k in first if k in d} | {k: v for k, v in d.items() if k not in first}
 
 

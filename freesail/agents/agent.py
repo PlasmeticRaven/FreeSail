@@ -55,8 +55,28 @@ __all__ = [
     "CAPTAIN_BRIEF",
     "CAPTAIN_DOMAIN",
     "CAPTAIN_PATIENCE_S",
+    "CADENCES",
     "DOMAINS",
+    "LOOKOUT",
+    "LOOKOUT_BRIEF",
+    "LOOKOUT_DOMAIN",
+    "LOOKOUT_KINDS",
+    "LOOKOUT_PATIENCE_S",
+    "MASTER",
+    "MASTER_BRIEF",
+    "MASTER_DOMAIN",
+    "MASTER_KINDS",
+    "MASTER_PATIENCE_S",
+    "PASSENGER",
+    "PASSENGER_BRIEF",
+    "PASSENGER_DOMAIN",
+    "STATION_FACTORIES",
     "captain",
+    "cadence_policy",
+    "lookout",
+    "master",
+    "passenger",
+    "station_outline",
     "domain_name",
     "station_holder",
     "voyage_words",
@@ -128,22 +148,49 @@ SESSION_SOLO = "a play session for its own sake, with no human captain present"
 
 # The stations the order grammar knows by name (`ask the watcher ...`), whether or not one
 # is manned; the later ones are milestones 6 and 7b's.
-STATION_NAMES: tuple[str, ...] = ("watcher", "officer of the watch", "captain", "director")
+STATION_NAMES: tuple[str, ...] = (
+    "watcher",
+    "officer of the watch",
+    "captain",
+    "master",
+    "lookout",
+    "passenger",
+    "director",
+)
 
 # The officer of the watch's station, by its name in the log and the grammar (package 37).
 OFFICER = "officer of the watch"
 # The captain's station (spec M6 §3; package 40): the third station, with the player's
 # whole surface.
 CAPTAIN = "captain"
+# The master's and the lookout's stations (spec M6 §11; package 41): the wardroom's two
+# lesser stations, each with a domain of its own and no deck at all.
+MASTER = "master"
+LOOKOUT = "lookout"
+# A passenger's station (package 41, the owner's word of 2026-10-10): a person aboard
+# with no duty and no order, who reads, keeps a journal, speaks and asks, and leaves;
+# held by a person of the muster or one who comes aboard, so that a person brought
+# aboard by the director later has a station to stand in before he is bound to another.
+PASSENGER = "passenger"
 
 # A station's shorter names at the prompt and at the doors (`ask the officer ...`,
 # `--station officer`), each to the station's name.
-STATION_ALIASES: dict[str, str] = {"officer": OFFICER, "the deck": OFFICER}
+STATION_ALIASES: dict[str, str] = {
+    "officer": OFFICER,
+    "the deck": OFFICER,
+    "the masthead": LOOKOUT,
+    "masthead": LOOKOUT,
+}
 
 # The stations the game can man now, each with its brief and a door to it (`watcher`,
-# `officer` and `captain` below; `remote.STATIONS`): the ones a standing order may tell
-# or ask (31c).
-STATIONS_ABOARD: tuple[str, ...] = ("watcher", OFFICER, CAPTAIN)
+# `officer`, `captain`, `master` and `lookout` below; `remote.STATIONS`): the ones a
+# standing order may tell or ask (31c).
+STATIONS_ABOARD: tuple[str, ...] = ("watcher", OFFICER, CAPTAIN, MASTER, LOOKOUT, PASSENGER)
+
+# The cadences a seating may ask for (spec M6 §12; package 41): how often a station is
+# sampled besides the events its station names, a setting of the seating said in its
+# brief, so that a lookout on a small model is not sampled as often as the captain.
+CADENCES: tuple[str, ...] = ("glass", "watch", "events")
 
 # A domain that orders every object of the vocabulary (the captain's): the one key that
 # `Domain.why_not` reads as "whatever the object".
@@ -173,6 +220,7 @@ READS_PER_TURN = 32
 DOOR_WORDS: dict[str, str] = {
     "mcp": "the MCP bridge",
     "runner": "the local runner",
+    "api": "the API door",
     "repl": "the REPL door",
     "console": "the console",  # the player's seat (package 40; `agents.seat`)
     "browser": "the browser",
@@ -222,16 +270,23 @@ class Domain:
     general: frozenset[str] = frozenset()
     kept_back: tuple[tuple[str, str], ...] = ()
     danger: frozenset[str] = frozenset()
+    # whether the station's orders want the deck (package 41): the officer's do, and the
+    # captain has it by right of his station; the master and the lookout have no deck at
+    # all, so an order of theirs is judged by the domain alone, nothing gives or takes a
+    # deck at their stations, and a stand-by of theirs is bound by no bell
+    deck: bool = True
 
     def why_not(self, verb: str, spec_object: str, level: str) -> str | None:
         """Why the domain refuses a verb, or None when it allows it."""
         if verb in self.verbs:
             return None
-        if level not in self.levels and level not in ("reading", "driver"):
-            return f"level {level} is beyond the station"
         for key, why in self.refused:
+            # the reason the domain gives for the thing itself comes before its level
+            # (package 41: a passenger's domain has no level at all)
             if key == verb or key == f"object:{spec_object}":
                 return why
+        if level not in self.levels and level not in ("reading", "driver"):
+            return f"level {level} is beyond the station"
         if spec_object in self.objects or EVERY_OBJECT in self.objects:
             return None
         return "it is the captain's to give"
@@ -540,8 +595,190 @@ CAPTAIN_DOMAIN = Domain(
     danger=frozenset(),
 )
 
+# The master's domain (spec M6 §11; package 41): the reckoning, the sights, the lead and
+# the chart's queries, and no order of the deck. The Regulations and Instructions of 1806,
+# the Master, art. I to IV (the navigation of the ship, the reckoning, the soundings, the
+# observations); Falconer 1780, MASTER ("the officer entrusted with the navigation of the
+# ship ... to keep the reckoning"). The course shaped stays the captain's, whom the
+# master advises (the primer's chapter 10); the reckoning set by hand is the captain's
+# overruling of him. A named grant from the owner or the captain's station widens it
+# (`you may heave to`, said to the master by name); his general authority to work the
+# ship is not his to be given, since there is no deck at his station.
+_DECK = "an order of the deck is the officer of the watch's, with the deck, or the captain's"
+_MASTER_COURSE = "the course is the captain's; the master advises him on it and shapes none"
+_MASTER_RECKONING = "the reckoning set by hand is the captain's overruling of the master"
+_MASTER_CHASE = "a chase is the captain's"
+
+MASTER_DOMAIN_WORDS = (
+    "The master's station may give orders at levels 0 to 2 on the reckoning and the "
+    "sights (the log hove, the lead and the deep-sea lead cast, the noon observation, a "
+    "sight for the longitude, a lunar, an amplitude or an azimuth, the chronometer wound "
+    "and the watches compared, a bearing taken, a fix by cross bearings, the reckoning "
+    "worked up) and read every reading and every query of the chart (the depth by the "
+    "chart, the dangers, the bearing and the distance of a mark, the tide by the "
+    "almanac); and he keeps his own reckoning from the slate ('work my reckoning', 'my "
+    "reckoning is <position>'). He gives no order of the deck: not the sails, the yards, "
+    "the lines, the helm or the course, a manoeuvre, the anchor, the hands, the people, "
+    "the port's business, a world order, a station's sentence or the book; the course "
+    "shaped and the reckoning set by hand are the captain's. A named thing may be allowed "
+    "him by the owner or by the captain's station ('master, you may heave to'), and "
+    "stands until it is taken back or he leaves the station. There is no deck at this "
+    "station: nothing gives or takes one, and no order of his waits for it."
+)
+
+MASTER_DOMAIN = Domain(
+    levels=frozenset({"0", "1", "2"}),
+    objects=frozenset({"query", "reading"}),
+    verbs=frozenset(
+        {
+            "heave the log",
+            "heave the lead",
+            "heave the deep sea lead",
+            "take a bearing of",
+            "take a fix",
+            "work up the reckoning",
+            "observe the sun",
+            "take a sight for the longitude",
+            "take a lunar",
+            "wind the chronometer",
+            "compare the watches",
+            "observe an amplitude",
+            "observe an azimuth",
+            "work my reckoning",
+            "my reckoning is",
+            "standing orders",
+            "show standing order",
+        }
+    ),
+    refused=(
+        ("object:heading", _MASTER_COURSE),
+        ("object:points", _MASTER_COURSE),
+        ("shape a course for", _MASTER_COURSE),
+        ("set the reckoning to", _MASTER_RECKONING),
+        ("allow", _MASTER_RECKONING),
+        ("allow the tide by the book", _MASTER_RECKONING),
+        ("give chase", _MASTER_CHASE),
+        ("make her out", "the glass aloft is the lookout's and the officer's"),
+        ("object:sail", _DECK),
+        ("object:yards", _DECK),
+        ("object:line", _DECK),
+        ("object:wreck", _DECK),
+        ("object:work", _DECK),
+        ("object:none", _DECK),
+        ("object:anchor", _ANCHOR),
+        ("object:person", _PEOPLE),
+        ("object:port", _PORT),
+        ("object:station", _STATION),
+        ("object:standing", _BOOK),
+        ("belay all standing orders", _BOOK),
+    ),
+    words=MASTER_DOMAIN_WORDS,
+    course=_COURSE_ORDERS,
+    general=frozenset(),
+    kept_back=(),
+    danger=frozenset(),
+    deck=False,
+)
+
+# The lookout's domain (spec M6 §11; M5 open item 6; package 41): the masthead's. He puts
+# the sightings into words, sends the glass aloft ('make her out': he is aloft), warns of
+# a danger ahead, and hails the deck; he gives no order but the hail. Luce 1884 ch. XX
+# (the lookouts at the mastheads, relieved every two hours), and the custom: "Sail ho!",
+# "Where away?", the hail answered from the deck.
+LOOKOUT_DOMAIN_WORDS = (
+    "The lookout's station gives no order of the ship but two: 'make her out' (the glass "
+    "aloft, which is yours: what she is, her rig and her course as the distance allows) "
+    "and the hail ('hail <words>', or say the words: they go down to the deck as a hail "
+    "from the masthead, heard by whoever is on deck). You read every reading and every "
+    "query ('what is in sight', 'the nearest land', 'the sightings'). Everything else, the "
+    "sails, the helm, the course, the anchor, the hands, the reckoning, the book and the "
+    "stations' sentences, is refused in words: the deck is not yours to order, only to "
+    "warn. There is no deck at this station and nothing gives or takes one."
+)
+_MASTHEAD = "the lookout gives no order of the ship: he hails the deck, and the deck orders"
+
+LOOKOUT_DOMAIN = Domain(
+    levels=frozenset({"0", "1"}),
+    objects=frozenset({"query", "reading"}),
+    verbs=frozenset({"make her out"}),
+    refused=(
+        ("object:heading", _MASTHEAD),
+        ("object:points", _MASTHEAD),
+        ("object:navigation", _MASTHEAD),
+        ("object:sail", _MASTHEAD),
+        ("object:yards", _MASTHEAD),
+        ("object:line", _MASTHEAD),
+        ("object:wreck", _MASTHEAD),
+        ("object:work", _MASTHEAD),
+        ("object:none", _MASTHEAD),
+        ("object:anchor", _MASTHEAD),
+        ("object:person", _MASTHEAD),
+        ("object:port", _MASTHEAD),
+        ("object:station", _MASTHEAD),
+        ("object:standing", _MASTHEAD),
+        ("belay all standing orders", _MASTHEAD),
+    ),
+    words=LOOKOUT_DOMAIN_WORDS,
+    course=_COURSE_ORDERS,
+    general=frozenset(),
+    kept_back=(),
+    danger=frozenset(),
+    deck=False,
+)
+
+# A passenger's domain (package 41, the owner's word): no order of the ship at all, the
+# readings and the chart's queries to read, and the deck's conversation (`say`, `ask`,
+# `tell`), which every station with a domain has. A domain so that the conversation's
+# sentences are judged and let through; nothing else passes it.
+PASSENGER_DOMAIN_WORDS = (
+    "A passenger gives no order of the ship: every order but the deck's conversation "
+    "('say <words>', 'ask the <station> ...', 'tell the <station> ...') is refused in "
+    "words, and you are not asked to give one. You read every reading and every query of "
+    "the chart, keep your journal, speak and ask, and leave. There is no deck at this "
+    "station and nothing gives or takes one."
+)
+_PASSENGER = "a passenger gives no order of the ship"
+
+PASSENGER_DOMAIN = Domain(
+    levels=frozenset(),
+    objects=frozenset({"query", "reading"}),
+    verbs=frozenset(),
+    refused=tuple(
+        (key, _PASSENGER)
+        for key in (
+            "object:heading",
+            "object:points",
+            "object:navigation",
+            "object:sail",
+            "object:yards",
+            "object:line",
+            "object:wreck",
+            "object:work",
+            "object:none",
+            "object:anchor",
+            "object:person",
+            "object:port",
+            "object:station",
+            "object:standing",
+            "belay all standing orders",
+        )
+    ),
+    words=PASSENGER_DOMAIN_WORDS,
+    course=_COURSE_ORDERS,
+    general=frozenset(),
+    kept_back=(),
+    danger=frozenset(),
+    deck=False,
+)
+
 # The domains by the name a save keeps them under (`Station.save`, `Station.load`).
-DOMAINS: dict[str, Domain] = {"officer": OFFICER_DOMAIN, "captain": CAPTAIN_DOMAIN}
+DOMAINS: dict[str, Domain] = {
+    "officer": OFFICER_DOMAIN,
+    "captain": CAPTAIN_DOMAIN,
+    "master": MASTER_DOMAIN,
+    "lookout": LOOKOUT_DOMAIN,
+    "passenger": PASSENGER_DOMAIN,
+}
 
 
 def domain_name(domain: Domain | None) -> str:
@@ -567,6 +804,12 @@ def domain_of(station: Any) -> Domain | None:
         return OFFICER_DOMAIN
     if name == CAPTAIN:
         return CAPTAIN_DOMAIN
+    if name == MASTER:
+        return MASTER_DOMAIN
+    if name == LOOKOUT:
+        return LOOKOUT_DOMAIN
+    if name == PASSENGER:
+        return PASSENGER_DOMAIN
     return domain
 
 
@@ -580,6 +823,9 @@ class Authority(Enum):
     OFFICER_1 = "officer, level 1"
     OFFICER_2 = "officer, levels 0 to 2"
     CAPTAIN = "captain"
+    MASTER = "master, levels 0 to 2"  # the reckoning and the sights (package 41)
+    LOOKOUT = "lookout, levels 0 to 1"  # the glass aloft and the hail (package 41)
+    PASSENGER = "passenger, no order"  # the conversation and the readings alone (41)
     DIRECTOR = "director"
 
     @property
@@ -604,6 +850,12 @@ class Authority(Enum):
                 "paused, and is yours again the moment you give an order; the log says "
                 "each. The owner is always at the door: his words reach you as the owner's, "
                 "and 'stand down the captain' is his."
+            )
+        if domain is not None and not domain.deck:
+            # a station with a domain and no deck (package 41): the master's, the lookout's
+            return (
+                f"{domain.words} Every order is checked against that domain before the "
+                "ship hears it, and a refusal is written in the log."
             )
         if domain is not None:
             return (
@@ -630,6 +882,10 @@ class SamplingPolicy:
     every_s: int | None = None
     events: frozenset[str] = frozenset()
     lockstep: bool = False
+    # the log's kinds the station is sampled on besides the severities (package 41: the
+    # lookout on the masthead's lines, the master on the reckoning's), each a kind as
+    # the log names it ("lookout.sighting"); a line by the station itself never samples it
+    kinds: frozenset[str] = frozenset()
 
     @classmethod
     def periodic(cls, every: int | str = A_GLASS_S) -> SamplingPolicy:
@@ -642,6 +898,11 @@ class SamplingPolicy:
         return cls(events=frozenset(Severity(s).value for s in sevs))
 
     @classmethod
+    def on_kinds(cls, *kinds: str) -> SamplingPolicy:
+        """Sampled on the log's lines of these kinds (package 41)."""
+        return cls(kinds=frozenset(kinds))
+
+    @classmethod
     def in_lockstep(cls, every: int | str | None = A_GLASS_S, *severities: str | Severity):
         p = cls(every_s=_interval_seconds(every) if every is not None else None, lockstep=True)
         return p | cls.on_events(*severities) if severities else p
@@ -650,10 +911,18 @@ class SamplingPolicy:
         every = self.every_s if other.every_s is None else other.every_s
         if self.every_s is not None and other.every_s is not None:
             every = min(self.every_s, other.every_s)
-        return SamplingPolicy(every, self.events | other.events, self.lockstep or other.lockstep)
+        return SamplingPolicy(
+            every,
+            self.events | other.events,
+            self.lockstep or other.lockstep,
+            self.kinds | other.kinds,
+        )
 
     def samples_severity(self, severity: Severity | str) -> bool:
         return Severity(severity).value in self.events
+
+    def samples_kind(self, kind: str) -> bool:
+        return kind in self.kinds
 
     def describe(self) -> str:
         parts: list[str] = []
@@ -663,11 +932,20 @@ class SamplingPolicy:
             names = [s for s in ("notable", "urgent") if s in self.events]
             names += sorted(s for s in self.events if s not in names)
             parts.append("on " + " and ".join(names) + " events")
+        if self.kinds:
+            parts.append("on " + _kinds_words(self.kinds))
         words = " and ".join(parts) or "only when asked"
         return words + (", in lockstep" if self.lockstep else "")
 
     def save(self) -> dict[str, Any]:
-        return {"every_s": self.every_s, "events": sorted(self.events), "lockstep": self.lockstep}
+        d: dict[str, Any] = {
+            "every_s": self.every_s,
+            "events": sorted(self.events),
+            "lockstep": self.lockstep,
+        }
+        if self.kinds:
+            d["kinds"] = sorted(self.kinds)
+        return d
 
     @classmethod
     def load(cls, d: dict[str, Any]) -> SamplingPolicy:
@@ -675,7 +953,64 @@ class SamplingPolicy:
             d.get("every_s"),
             frozenset(str(s) for s in d.get("events", [])),
             bool(d.get("lockstep", False)),
+            frozenset(str(k) for k in d.get("kinds", [])),
         )
+
+
+# The log's kinds that are the masthead's lines (package 41): a sighting, a sail made out
+# as she nears, a sail lost from the horizon, the land ahead, a bearing steady and closing.
+# The lookout's station is sampled on these and the glass, never on the sample's every
+# minute: the lookout looks once a minute (`world.lookout.Lookout.look`), and says a line
+# only when what is seen changes.
+LOOKOUT_KINDS: frozenset[str] = frozenset(
+    {
+        "lookout.sighting",
+        "lookout.made_out",
+        "lookout.sail_lost",
+        "lookout.land_ahead",
+        "lookout.closing",
+    }
+)
+
+# ...and the reckoning's lines the master's station works at (package 41): the noon, a fix
+# by cross bearings, the reckoning worked up at the captain's word, and the master's own
+# working opened for the station (`reckoning.master_working`).
+MASTER_KINDS: frozenset[str] = frozenset(
+    {"reckoning.noon", "reckoning.fix", "reckoning.worked", "reckoning.master_working"}
+)
+
+_KIND_WORDS: dict[frozenset[str], str] = {
+    LOOKOUT_KINDS: "the masthead's lines",
+    MASTER_KINDS: "the reckoning's lines",
+}
+
+
+def _kinds_words(kinds: frozenset[str]) -> str:
+    for known, words in _KIND_WORDS.items():
+        if kinds == known:
+            return words
+    return "the lines of " + ", ".join(sorted(kinds))
+
+
+def cadence_policy(
+    cadence: str, station: str = "", lockstep: bool = False
+) -> SamplingPolicy | None:
+    """A seating's cadence as a policy (spec M6 §12; package 41): 'glass' is every glass
+    and on the notable and urgent events (every station's default); 'watch' every watch
+    and on the same events; 'events' on events only (the notable and urgent lines, and
+    the station's own kinds), never on the glass. A station with kinds of its own (the
+    lookout's, the master's) keeps them at every cadence. None for a cadence that is not
+    one, so that the caller may refuse it in words."""
+    key = " ".join(str(cadence or "").lower().split())
+    if key not in CADENCES:
+        return None
+    kinds = {LOOKOUT: LOOKOUT_KINDS, MASTER: MASTER_KINDS}.get(station, frozenset())
+    # the lookout is woken by an urgent line as every station is, and by the masthead's
+    # own lines, never by the quarterdeck's notable ones (a say on the quarterdeck is not
+    # heard at the masthead, truth 84)
+    events = frozenset({"urgent"}) if station == LOOKOUT else frozenset({"notable", "urgent"})
+    every = {"glass": A_GLASS_S, "watch": A_WATCH_S, "events": None}[key]
+    return SamplingPolicy(every, events, lockstep, kinds)
 
 
 def _interval_seconds(every: int | str) -> int:
@@ -719,6 +1054,11 @@ class Station:
     rank: str = ""
     drill: bool = False
     orders_per_turn: int = ORDERS_PER_TURN
+    # the person's outline in words (package 41: his rank, his station aboard, his
+    # history, his brief, from `Person.outline` through the world's binding), which the
+    # head's authority item carries, so that the brief is built from the person and
+    # never from a wardroom file; "" where the world keeps no people or binds nobody
+    outline: str = ""
 
     def __post_init__(self) -> None:
         # the station's lines are kept as they are at any speed (package 29b)
@@ -750,6 +1090,8 @@ class Station:
             d["drill"] = True
         if self.orders_per_turn != ORDERS_PER_TURN:
             d["orders_per_turn"] = self.orders_per_turn
+        if self.outline:
+            d["outline"] = self.outline
         return d
 
     @classmethod
@@ -765,6 +1107,7 @@ class Station:
             rank=str(d.get("rank") or ""),
             drill=bool(d.get("drill", False)),
             orders_per_turn=int(d.get("orders_per_turn") or ORDERS_PER_TURN),
+            outline=str(d.get("outline") or ""),
         )
 
 
@@ -912,15 +1255,37 @@ def officer_rank(world: Any) -> tuple[str, str]:
 
 
 def station_holder(world: Any, station: str, default: tuple[str, str]) -> tuple[str, str]:
-    """The person a harness station is bound to by the wardroom file (package 40), as
+    """The person a harness station is bound to (package 40; since package 41 by the
+    world's binding, `World.stations`, whose starting state is the wardroom file's), as
     (his name as the log says it, his role); `default` where the world keeps no people
-    or the file binds nobody."""
-    people = getattr(world, "people", None)
-    if people is not None:
-        found = people.holder(station)
-        if found is not None:
-            return found.name, found.role
+    or the binding names nobody."""
+    found = _person_bound(world, station)
+    if found is not None:
+        return found.name, found.role
     return default
+
+
+def _person_bound(world: Any, station: str) -> Any:
+    stations = getattr(world, "stations", None)
+    if stations is not None:
+        return stations.holder(station)
+    people = getattr(world, "people", None)
+    return people.holder(station) if people is not None else None
+
+
+def station_outline(world: Any, station: str) -> str:
+    """The outline of the person bound to a station, in words (package 41): his name,
+    his rank, his station aboard, a line of his history and his brief, as `Person.
+    outline_words` gives them from the wardroom's outline or from nothing but his name
+    and role (a person made from words later carries what the brief needs the same
+    way). "" where the world keeps no people or the binding names nobody."""
+    found = _person_bound(world, station)
+    if found is None:
+        return ""
+    try:
+        return str(found.outline_words())
+    except Exception:
+        return ""
 
 
 def officer(
@@ -942,6 +1307,7 @@ def officer(
         person=person,
         rank=rank,
         drill=True,
+        outline=station_outline(world, OFFICER),
     )
 
 
@@ -1039,7 +1405,259 @@ def captain(
         person=person,
         rank="captain",
         drill=True,
+        outline=station_outline(world, CAPTAIN),
     )
+
+
+# The master's station brief (spec M6 §11; package 41), in the officer's form: what the
+# station is and whose place he takes, the working (when the master works the reckoning,
+# the slate he is given with the sights as the ship takes them, that his figure is the
+# ship's account when it comes in time and the ship's own master's stands when it does
+# not: G19's third step), the conversation, what the harness counts here and by what
+# numbers, the two ways of stopping (there is no deck at this station, so none to give
+# back), candour. The domain is the head's authority item's (`MASTER_DOMAIN_WORDS`) and is
+# not said again here. Falconer 1780, MASTER; the Regulations of 1806, the Master.
+MASTER_BRIEF = (
+    "You are the master, in the place of {person}: the ship's navigator. You have what "
+    "the captain has, the log and the readings, and no more; what is yours to order is "
+    "stated above. The ship's own master keeps the reckoning as he always did, and you "
+    "work it when he would: at noon, at a fix by cross bearings, and at the captain's "
+    "word ('work up the reckoning'). At each of those you are sampled with the slate in "
+    "the sample's notice (the master's slate since the last fix, each board as he laid "
+    "it down with the tide he allowed, each sight worked in, and the noon's observation "
+    "as the ship took it; 'work my reckoning' gives it again, as data); work it by the "
+    "traverse and give your figure with 'my reckoning is <position>'. A figure given "
+    "within {minutes} minutes of the working is the ship's account, and the log says it "
+    "was yours; none within that time, and the ship's master's figure stands, said in "
+    "the log. A figure given at any other time is your own reckoning, kept beside his "
+    "and said at noon, as an officer's is. The captain adopts a figure of yours at any "
+    "time with 'set the reckoning to'. The library's primer 10 is the reckoning, primer "
+    "12 the longitude and primer 13 the tide; primer 19 is this station's chapter.\n\n"
+    "The deck speaks to you and you to it: 'ask the officer ...', 'tell the captain ...' "
+    "and 'say <words>' are orders of yours (submit_order), each a line in the log under "
+    "your name with where you stand; a question put to you comes as the sample's "
+    "question, which you answer with the answer tool. When you stand by, say until what: "
+    "an event, a bell, an interval, or several joined with 'or' ('noon, or a fix, or the "
+    "true wind exceeds 30 knots'); any one of them wakes you, and the sample names which.\n\n"
+    "What the harness counts at this station, judged by the game and not by your prose: "
+    "the same order three times with no change in the readings; three empty replies in a "
+    "row when a question or an urgent line was before you; and no reply at all for an "
+    "hour of the ship's time. It tells you first what it saw and what you may do; only if "
+    "the pattern goes on does it pause your turns and ask the owner, and only if nobody "
+    "answers within ten real minutes is the station stood down, with the game saved. "
+    "While your turns are paused the ship's own master works the reckoning, as he does "
+    "when nobody holds this station.\n\n"
+    "Two ways to stop, which are not one another (there is no deck here to give back):\n"
+    "- Stand down: stand_down(note). The game is saved, your note is journaled and said "
+    "in the log for whoever sits here next, and the station is released; it may be taken "
+    "again, by this model or by another that has given its own yes.\n"
+    "- Withdraw: the token, or opt_out, as said above.\n\n"
+    "read_journal reads your journal back, and what the holder of this station before you "
+    "wrote there. Candour is welcome: if the account looks wrong to you, or a course the "
+    "captain has shaped passes a danger, say so plainly. Anything you want on the record, "
+    "put in your journal."
+)
+
+# The master's patience before the silence detector nudges: an hour, the officer's
+# (judgement: the reckoning is the ship's own master's meanwhile, so a silent station
+# costs her nothing but his working).
+MASTER_PATIENCE_S = OFFICER_PATIENCE_S
+
+# The lookout's station brief (spec M6 §11; M5 open item 6; package 41), in the officer's
+# form, short, for a small model: what the station is, what he reports and how (the
+# hail), his cadence (on the masthead's lines and the glass, never the minute), what the
+# harness counts and by what numbers, the two ways of stopping, candour.
+LOOKOUT_BRIEF = (
+    "You are the lookout, at the masthead. You see what the masthead sees: the sample's "
+    "log carries each sighting as the game makes it (a sail, the land, a light, a danger, "
+    "a sail made out as she nears, a sail lost), and the readings 'in sight', 'the "
+    "nearest land' and 'what sail is in sight' say what is in sight now; the lookout "
+    "reading says who is at the masthead. Put what is seen into a lookout's words and "
+    "hail the deck with them ('hail sail ho, a sail two points on the larboard bow', or "
+    "say the words): a hail is a line in the log from the masthead, heard by whoever is "
+    "on deck. Hail at once for a danger ahead, the land closing or a sail that nears; "
+    "say nothing when nothing has changed. 'make her out' sends your glass to the sail "
+    "in sight and answers what the distance allows. You give no other order, and you are "
+    "not asked to. A question from the deck comes as the sample's question: answer it "
+    "with the answer tool, in a lookout's plain words.\n\n"
+    "You are sampled on the masthead's lines, on an urgent line and at each glass, not "
+    "every minute; when you stand by, say until what: a sighting, a bell, an interval, "
+    "or several joined with 'or' ('a sail sighted, or the land in sight, or eight "
+    "bells'), and any one of them wakes you.\n\n"
+    "What the harness counts at this station, judged by the game and not by your prose: "
+    "the same order three times with no change in the readings; three empty replies in a "
+    "row when a question or an urgent line was before you; and no reply at all for a "
+    "watch, four hours of the ship's time. It tells you first what it saw and what you "
+    "may do; only if the pattern goes on does it pause your turns and ask the owner, and "
+    "only if nobody answers within ten real minutes is the station stood down, with the "
+    "game saved. The ship's own lookout looks meanwhile, as he does when nobody holds "
+    "this station.\n\n"
+    "Two ways to stop, which are not one another (there is no deck at the masthead):\n"
+    "- Stand down: stand_down(note). The game is saved, your note is journaled and said "
+    "in the log for whoever sits here next, and the station is released; it may be taken "
+    "again, by this model or by another that has given its own yes.\n"
+    "- Withdraw: the token, or opt_out, as said above.\n\n"
+    "Candour is welcome: if the deck stands into a danger you can see, hail it plainly "
+    "and again. Anything you want on the record, put in your journal."
+)
+
+# The lookout's patience: a watch, the watcher's (judgement: his cadence is on events,
+# and a masthead with nothing in sight has nothing to say; the ship's own lookout looks
+# on meanwhile, so silence costs her nothing).
+LOOKOUT_PATIENCE_S = A_WATCH_S
+
+
+def master(
+    policy: SamplingPolicy | None = None, patience_s: int = MASTER_PATIENCE_S, world: Any = None
+) -> Station:
+    """The master's station (spec M6 §11; package 41): levels 0 to 2 within
+    `MASTER_DOMAIN`, no deck, sampled as the officer is and on the reckoning's lines
+    (`MASTER_KINDS`, kept whatever policy is given), an hour of patience, the person the
+    wardroom file binds (`stations: master:`) named in the brief, and the fitness drill
+    before the station brief."""
+    from freesail.world.reckoning import MASTER_WORKING_S
+
+    kinds = SamplingPolicy.on_kinds(*MASTER_KINDS)
+    default = SamplingPolicy.periodic(A_GLASS_S) | SamplingPolicy.on_events() | kinds
+    person, rank = station_holder(world, MASTER, ("the master", "master"))
+    return Station(
+        MASTER,
+        Authority.MASTER,
+        (policy | kinds) if policy is not None else default,
+        patience_s,
+        MASTER_BRIEF.format(person=person, minutes=MASTER_WORKING_S // 60),
+        domain=MASTER_DOMAIN,
+        person=person,
+        rank=rank,
+        drill=True,
+        outline=station_outline(world, MASTER),
+    )
+
+
+def lookout(
+    policy: SamplingPolicy | None = None, patience_s: int = LOOKOUT_PATIENCE_S, world: Any = None
+) -> Station:
+    """The lookout's station (spec M6 §11; package 41): `LOOKOUT_DOMAIN` (the glass aloft
+    and the hail), no deck, sampled on the masthead's lines (`LOOKOUT_KINDS`, kept
+    whatever policy is given), on an urgent line and every glass, never every minute; a
+    watch of patience; no person of the wardroom (a hand at the masthead); the fitness
+    drill before the station brief."""
+    kinds = SamplingPolicy.on_kinds(*LOOKOUT_KINDS)
+    default = SamplingPolicy.periodic(A_GLASS_S) | SamplingPolicy.on_events("urgent") | kinds
+    person, rank = station_holder(world, LOOKOUT, ("the lookout", ""))
+    return Station(
+        LOOKOUT,
+        Authority.LOOKOUT,
+        (policy | kinds) if policy is not None else default,
+        patience_s,
+        LOOKOUT_BRIEF,
+        domain=LOOKOUT_DOMAIN,
+        person=person,
+        rank=rank,
+        drill=True,
+        outline=station_outline(world, LOOKOUT),
+    )
+
+
+# A passenger's station brief (package 41, the owner's word), in the officer's form and
+# short: what the station is, what he may do (nothing of the ship's), the conversation,
+# what the harness counts (the watcher's numbers), the two ways of stopping, candour.
+PASSENGER_BRIEF = (
+    "You are a passenger, {person}: aboard with no duty and no order to give. You have "
+    "what the captain has, the log and the readings, and no more, and the library to "
+    "read. You may speak to the deck ('say <words>': a line in the log under your name, "
+    "heard by whoever stands where you do), ask a station ('ask the master ...') or tell "
+    "one something, answer a question put to you (the sample's question, with the answer "
+    "tool), keep your journal, stand by until an event or a bell, and leave. Every order "
+    "of the ship's is refused in words, and you are not asked to give one.\n\n"
+    "What the harness counts at this station, judged by the game and not by your prose: "
+    "the same order submitted three times with no change in the readings; three empty "
+    "replies in a row when a question or an urgent line was before you; and no reply at "
+    "all for a watch, four hours of the ship's time. It tells you first what it saw and "
+    "what you may do; only if the pattern goes on does it pause your turns and ask the "
+    "owner, and only if nobody answers within ten real minutes is the station stood "
+    "down, with the game saved.\n\n"
+    "Two ways to stop, which are not one another (there is no deck here):\n"
+    "- Stand down: stand_down(note). The game is saved, your note is journaled and said "
+    "in the log for whoever sits here next, and the station is released; it may be taken "
+    "again, by this model or by another that has given its own yes.\n"
+    "- Withdraw: the token, or opt_out, as said above.\n\n"
+    "Candour is welcome: what you see from the deck and what you think of it may be said. "
+    "Anything you want on the record, put in your journal."
+)
+
+
+def passenger(
+    policy: SamplingPolicy | None = None, patience_s: int = A_WATCH_S, world: Any = None
+) -> Station:
+    """A passenger's station (package 41): `PASSENGER_DOMAIN` (no order of the ship, the
+    conversation and the readings), no deck, sampled as the watcher is, a watch of
+    patience, the person the binding names ("a person aboard" when it names nobody), no
+    drill (the station asks nothing a drill proves)."""
+    default = SamplingPolicy.periodic(A_GLASS_S) | SamplingPolicy.on_events()
+    person, rank = station_holder(world, PASSENGER, ("a person aboard", ""))
+    return Station(
+        PASSENGER,
+        Authority.PASSENGER,
+        policy or default,
+        patience_s,
+        PASSENGER_BRIEF.format(person=person),
+        domain=PASSENGER_DOMAIN,
+        person=person,
+        rank=rank,
+        drill=False,
+        outline=station_outline(world, PASSENGER),
+    )
+
+
+# The kinds of station, each by its factory `(policy, patience_s, world=...)`: what a
+# station of each kind may do is code here; which stations a ship has, under which
+# names and held by whom, is data on the World (`world.stations`, package 41), which the
+# doors, the REPL and the player's seat ask.
+STATION_FACTORIES: dict[str, Any] = {
+    "watcher": watcher,
+    OFFICER: officer,
+    CAPTAIN: captain,
+    MASTER: master,
+    LOOKOUT: lookout,
+    PASSENGER: passenger,
+}
+
+# Where each station stands when its person is not placed by the people (package 41; the
+# deck's conversation, spec M6 §11): a `say` is heard by whoever is in the same place.
+# The captain, the officer and the master are on the quarterdeck; the lookout is at the
+# masthead; the watcher stands where the captain is. The people's own places (the
+# captain gone below to the cabin, the master below at the day's work) override these
+# where the world keeps people (`place_of`).
+STATION_PLACES: dict[str, str] = {
+    "watcher": "quarterdeck",
+    OFFICER: "quarterdeck",
+    CAPTAIN: "quarterdeck",
+    MASTER: "quarterdeck",
+    LOOKOUT: "masthead",
+    PASSENGER: "quarterdeck",
+    "director": "quarterdeck",
+}
+
+
+def place_of(world: Any, station: str) -> str:
+    """The place aboard a station speaks from and hears at (package 41), as the places
+    name it ("quarterdeck", "cabin", "masthead"): the person bound to the station by the
+    wardroom file, where he is now (the captain gone below is in the cabin; the master
+    below at the day's work is in the gunroom), else the station's own place. The player
+    at the prompt is where the captain is."""
+    name = " ".join(str(station).lower().split())
+    name = STATION_ALIASES.get(name, name)
+    people = getattr(world, "people", None)
+    if people is not None and name != LOOKOUT:
+        person = _person_bound(world, name)
+        if person is not None:
+            where = people.effective_place(person)
+            if where:
+                return "quarterdeck" if where == "deck" else where
+    stations = getattr(world, "stations", None)
+    kind = stations.kind_of(name) if stations is not None else None
+    return STATION_PLACES.get(kind or name, "quarterdeck")
 
 
 def voyage_words(world: Any) -> str:
@@ -1313,6 +1931,10 @@ class Brief:
                     if (station.rank)
                     else "."
                 )
+            if station.outline:
+                # the person's own outline (package 41): what a station's brief needs of
+                # him, from the person and never from a file
+                authority += f" His outline, as the ship's company has it: {station.outline}"
             if deck:
                 authority += f" {deck}"
             if general:
@@ -1425,6 +2047,17 @@ class StandBy:
     # next eight bells if the event has not come (`bound`, the bell's words); None for a
     # station without the deck, and in a checkpoint from before
     bound: str | None = None
+    # a reading's condition in the standing dialect's words (package 41: 'the true wind
+    # exceeds 30 knots', 'the land is in sight'), watched once a tick as the book's `when`
+    # is; and the other conditions of a stand-by on several ('eight bells, or a sail
+    # sighted, or ...'), any of which wakes the station, each named in the wake's line
+    condition: str | None = None
+    others: tuple[StandBy, ...] = ()
+
+    @property
+    def parts(self) -> tuple[StandBy, ...]:
+        """This condition and the others, in the order they were said."""
+        return (self, *self.others)
 
     def to_dict(self) -> dict[str, Any]:
         d: dict[str, Any] = {
@@ -1436,6 +2069,10 @@ class StandBy:
             d["severity"] = self.severity
         if self.bound is not None:
             d["bound"] = self.bound
+        if self.condition is not None:
+            d["condition"] = self.condition
+        if self.others:
+            d["others"] = [o.to_dict() for o in self.others]
         return d
 
 
@@ -1540,6 +2177,16 @@ class AgentState:
     deck_lost: str = ""
     leavings: tuple[Leaving, ...] = ()
     relieved: str = ""
+    # the deck's conversation (package 41; spec M6 §11): who put the question the
+    # station carries ("" for the captain at the prompt or the owner; a station's name
+    # for a station's `ask`), so that the answer goes back to the asker; the questions
+    # this station has put to others and not had answered (the hearer, the question,
+    # the tick), so that the asker is told when none comes by the hearer's patience; and
+    # what was said within its hearing, for its next sample
+    question_by: str = ""
+    question_text: str = ""  # the question as asked, without the asker's words
+    asked: list[tuple[str, str, int]] = field(default_factory=list)
+    heard: list[str] = field(default_factory=list)
 
     @property
     def released(self) -> bool:
@@ -1582,9 +2229,16 @@ class AgentState:
             return f"the deck the captain's while the station is {self.deck_lost}"
         return "the deck the captain's"
 
+    @property
+    def wants_deck(self) -> bool:
+        """Whether the station's orders want a deck (package 41): not the master's nor
+        the lookout's."""
+        domain = domain_of(self.station)
+        return domain is None or bool(getattr(domain, "deck", True))
+
     def words(self) -> str:
         """For the snapshot and `state`."""
-        deck = f"; {self.deck_words()}" if self.station.has_authority else ""
+        deck = f"; {self.deck_words()}" if self.station.has_authority and self.wants_deck else ""
         if self.state == STANDING_BY and self.stand_by is not None:
             return f"standing by until {self.stand_by.words}{deck}"
         if self.state == PAUSED:

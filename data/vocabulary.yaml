@@ -962,6 +962,79 @@ verbs:
     synonyms: [the officer's journal, show the officer's journal, show the journal of the officer]
     object: station
     level: 2
+  # The master's, the lookout's and a passenger's stations (package 41; spec M6 §11):
+  # the same sentences to each.
+  ask the master:
+    synonyms: []
+    object: station
+    level: 2
+  tell the master:
+    synonyms: [say to the master]
+    object: station
+    level: 2
+  stand down the master:
+    synonyms: [stand the master down]
+    object: station
+    level: 2
+  resume the master:
+    synonyms: [continue the master]
+    object: station
+    level: 2
+  show the master's journal:
+    synonyms: [the master's journal, show the journal of the master]
+    object: station
+    level: 2
+  ask the lookout:
+    synonyms: [ask the masthead]
+    object: station
+    level: 2
+  tell the lookout:
+    synonyms: [say to the lookout, tell the masthead]
+    object: station
+    level: 2
+  stand down the lookout:
+    synonyms: [stand the lookout down]
+    object: station
+    level: 2
+  resume the lookout:
+    synonyms: [continue the lookout]
+    object: station
+    level: 2
+  show the lookout's journal:
+    synonyms: [the lookout's journal, show the journal of the lookout]
+    object: station
+    level: 2
+  ask the passenger:
+    synonyms: []
+    object: station
+    level: 2
+  tell the passenger:
+    synonyms: [say to the passenger]
+    object: station
+    level: 2
+  stand down the passenger:
+    synonyms: [stand the passenger down]
+    object: station
+    level: 2
+  resume the passenger:
+    synonyms: [continue the passenger]
+    object: station
+    level: 2
+  show the passenger's journal:
+    synonyms: [the passenger's journal, show the journal of the passenger]
+    object: station
+    level: 2
+  # The deck's conversation (package 41; spec M6 §11): a word said in a place aboard,
+  # heard by whoever stands there (the player's, on the quarterdeck; a station's, under
+  # its name), and the lookout's hail from the masthead, heard on deck.
+  say:
+    synonyms: []
+    object: station
+    level: 2
+  hail:
+    synonyms: [hail the deck]
+    object: station
+    level: 2
   you have the deck:
     # "The deck is yours" (package 37l; the review of gate 5c's playtests, G17)
     synonyms: [the deck is yours]

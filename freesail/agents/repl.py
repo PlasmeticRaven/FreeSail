@@ -79,13 +79,11 @@ from freesail.agents import consent
 from freesail.agents import harness as harness_mod
 from freesail.agents.agent import (
     A_GLASS_S,
+    STATION_FACTORIES,
     TURN_ENDS_WORDS,
     SamplingPolicy,
     Station,
-    captain,
-    officer,
     station_name,
-    watcher,
 )
 from freesail.agents.fake import Transcript
 from freesail.agents.model import MODEL, OPERATOR, Reply, ToolCall, Turn
@@ -126,9 +124,11 @@ REPLY_HINT = (
     'with >, such as > answer text="yes" or > readings.'
 )
 
-# The stations this door seats, by their factories: the watcher, the officer of the
-# watch (`--station officer`; package 37) and the captain (`--station captain`; package 40).
-STATIONS = {"watcher": watcher, "officer of the watch": officer, "captain": captain}
+# The kinds of station this door seats, by their factories (`agent.STATION_FACTORIES`:
+# the watcher, the officer of the watch (`--station officer`; package 37), the captain
+# (package 40), the master, the lookout and a passenger (package 41)). Which stations the
+# game's ship has is the World's binding (`world.stations`), asked when the World exists.
+STATIONS = STATION_FACTORIES
 
 
 # ---------------------------------------------------------------------------
@@ -346,7 +346,7 @@ def replay_save(
         report = replay_mod.check_replay(data, path, replay_anyway)
     except replay_mod.ReplayRefused as refused:
         raise SystemExit("\n".join(refused.report.words)) from None
-    world = replay_mod.replay(data, ship_factory)
+    world = replay_mod.replay(data, ship_factory, road=report.road)
     if out is not None:
         for line in report.words:
             print(line, file=out, flush=True)
@@ -383,13 +383,18 @@ def open_world(
 
 
 def _station(args: argparse.Namespace, world: World | None = None) -> Station:
-    try:
-        make = STATIONS[station_name(args.station)]
-    except KeyError:
-        raise SystemExit(
-            f"No station '{args.station}'; the stations: {', '.join(STATIONS)}."
-        ) from None
-    return make(SamplingPolicy.in_lockstep(int(args.every), "notable", "urgent"), world=world)
+    name = station_name(args.station)
+    stations = getattr(world, "stations", None)
+    make = stations.factory(name) if stations is not None else STATIONS.get(name)
+    if make is None:
+        aboard = stations.names() if stations is not None else tuple(STATIONS)
+        raise SystemExit(f"No station '{args.station}' aboard; the stations: {', '.join(aboard)}.")
+    st = make(SamplingPolicy.in_lockstep(int(args.every), "notable", "urgent"), world=world)
+    if st.name != name:
+        import dataclasses
+
+        st = dataclasses.replace(st, name=name)  # bound by hand under its own name (41)
+    return st
 
 
 def _save_fn(path: str):

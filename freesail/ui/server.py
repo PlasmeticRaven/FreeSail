@@ -71,6 +71,13 @@ hosts too on `--agents-port`): a language model's door is a client of this game.
                                         reference library
     GET  /api/agents                    the stations and their states (the snapshot's
                                         `agents` is the same list)
+    GET  /api/agents/{station}/picture/{id}  ?key=K: a picture a tool of the station's
+                                        made, its bytes (package 42; `agents.pictures`)
+
+The pictures (package 42, item 4; `Easel`): a tool's request for the chart or the ship's
+view goes to the open page as `{"type": "picture", "id", "view", "facing", "max_px",
+"max_bytes"}` on the socket; the page draws it as the player sees it and posts it back,
+`POST /api/picture/{id}?width=W&height=H` with the image as the body (or `?failed=WORDS`).
 
 `--lockstep` holds the clock while a door has the floor (a sample open for it), for
 testing at 1x and for competitive play; without it the game runs at its compression and
@@ -103,8 +110,8 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, FastAPI, HTTPException, WebSocket, WebSocketDisconnect
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi import APIRouter, FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from freesail import units
@@ -115,10 +122,15 @@ from freesail.core.events import rollup as rolled
 from freesail.core.world import UNLOGGED_KINDS, World
 from freesail.ui.console import (
     ALARM_SPEED,
+    FREE_RUNNING_HELP,
+    PACE_FREE,
+    PACE_LOCKSTEP,
+    PACE_RULE,
     REPLAY_ANYWAY_FLAG,
     REPLAY_ANYWAY_HELP,
     SEAT_HELP,
     SPEED_WORDS,
+    Pace,
     book_words,
     check_agents_unattended,
     clamp_compression,
@@ -173,11 +185,17 @@ class Driver:
         compression: float = 1.0,
         lockstep: bool = False,
         ease_on_station: bool = False,
+        free_running: bool = False,
     ):
         self.world = world
         self.compression = clamp_compression(compression)
         self.world.compression = self.compression
         self.lockstep = lockstep
+        # the pace rule (spec M6 §12; package 41): 1x while a model's sample is open,
+        # the default; lockstep and free-running the two other rules
+        self.pace = Pace(
+            world, PACE_LOCKSTEP if lockstep else PACE_FREE if free_running else PACE_RULE
+        )
         # `--ease-on-station` (package 33d): the clock eased to 1x when a station is sampled
         # or speaks, as an urgent line eases it; off unless asked for
         self.ease_on_station = bool(ease_on_station)
@@ -245,6 +263,8 @@ class Driver:
         if self.lockstep:  # the clock waits for a door that has the floor
             out["lockstep"] = True
             out["waiting_for"] = self.held_for()
+        # the pace (package 41): the rule, the rate now and the samples open
+        out["pace"] = self.pace.state(self.compression)
         return out
 
     def held_for(self) -> str | None:
@@ -491,7 +511,10 @@ class Driver:
 
     def _tick_owed(self, owed: float, period: float) -> float:
         if self.running:
-            owed += self.compression * period
+            with self.lock:
+                # the pace rule (package 41): 1x while a model's sample is open
+                rate = self.pace.rate(self.compression)
+            owed += rate * period
             n = int(owed)
             owed -= n
             if n:
@@ -543,6 +566,125 @@ def event_dict(e: Event) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # The app
 # ---------------------------------------------------------------------------
+
+
+class Easel:
+    """The browser's painting of the chart and the ship's view, on a tool's request
+    (package 42, item 4; `agents.pictures`): the request goes to every open page through
+    the driver's listeners, the first page to post its picture back answers it, and the
+    pictures are kept here, the newest `pictures.KEPT`, for the doors to fetch by id. The
+    tool waits for the post holding the World's lock; the post itself takes no lock."""
+
+    def __init__(self, driver: Driver, wait_s: float | None = None):
+        from collections import OrderedDict
+
+        from freesail.agents import pictures
+
+        self.driver = driver
+        self.wait_s = pictures.PAINT_WAIT_S if wait_s is None else float(wait_s)
+        self._lock = threading.Lock()
+        self._pending: dict[str, dict[str, Any]] = {}
+        self._kept: OrderedDict[str, Any] = OrderedDict()
+
+    def paint(self, view: str, facing: str, stamp: str) -> Any:
+        import secrets
+
+        from freesail.agents import pictures as P
+
+        if not self.driver._listeners:
+            return "No browser page is open on this game (the picture is drawn by the open page)"
+        deg, said = P.facing_of(facing) if view == P.SHIP else (None, "")
+        pid = secrets.token_hex(8)
+        slot: dict[str, Any] = {"event": threading.Event(), "post": None, "why": ""}
+        with self._lock:
+            self._pending[pid] = slot
+        self.driver._emit(
+            {
+                "type": "picture",
+                "id": pid,
+                "view": view,
+                "facing": deg,
+                "facing_words": said,
+                "max_px": P.MAX_PX,
+                "max_bytes": P.MAX_BYTES,
+            }
+        )
+        answered = slot["event"].wait(self.wait_s)
+        with self._lock:
+            self._pending.pop(pid, None)
+        if not answered:
+            return (
+                f"The open page did not send its picture within {self.wait_s:g} seconds (a page "
+                "in a background tab may not draw)"
+            )
+        if slot["why"]:
+            return f"The open page could not draw it ({slot['why']})"
+        media, data, width, height = slot["post"]
+        pic = P.Picture(pid, media, data, width, height, view, said, stamp)
+        with self._lock:
+            self._kept[pid] = pic
+            while len(self._kept) > P.KEPT:
+                self._kept.popitem(last=False)
+        return pic
+
+    def post(self, pid: str, media: str, data: bytes, width: int, height: int, failed: str) -> str:
+        """The page's picture for a request: "" when taken, else why not (an unknown or an
+        answered request, a picture too large or of no kind a door shows)."""
+        from freesail.agents import pictures as P
+
+        with self._lock:
+            slot = self._pending.get(pid)
+            if slot is None or slot["event"].is_set():
+                return "no request waits for that picture"
+            if failed:
+                slot["why"] = " ".join(failed.split())[:200]
+            elif media not in P.MEDIA_TYPES:
+                slot["why"] = f"a picture of the kind {media or 'unnamed'}, which no door shows"
+            elif len(data) > P.MAX_BYTES:
+                slot["why"] = f"a picture of {len(data):,} bytes, past the bound of {P.MAX_BYTES:,}"
+            elif not data:
+                slot["why"] = "an empty picture"
+            else:
+                w, h = _png_size(data) if media == "image/png" else (None, None)
+                slot["post"] = (media, bytes(data), w or int(width), h or int(height))
+            slot["event"].set()
+        return "" if slot["post"] is not None else slot["why"]
+
+    def get(self, pid: str) -> Any:
+        with self._lock:
+            return self._kept.get(pid)
+
+
+def _png_size(data: bytes) -> tuple[int | None, int | None]:
+    """A PNG's width and height from its header, or (None, None) when it is no PNG."""
+    if len(data) < 24 or data[:8] != b"\x89PNG\r\n\x1a\n":
+        return None, None
+    return int.from_bytes(data[16:20], "big"), int.from_bytes(data[20:24], "big")
+
+
+def picture_routes(easel: Easel) -> APIRouter:
+    """The page's post of a picture it drew (package 42, item 4). No lock is taken: the
+    tool that asked holds the World's while it waits."""
+    from freesail.agents import pictures as P
+
+    router = APIRouter()
+
+    @router.post("/api/picture/{pid}")
+    async def api_picture(
+        pid: str, request: Request, width: int = 0, height: int = 0, failed: str = ""
+    ) -> JSONResponse:
+        size = int(request.headers.get("content-length") or 0)
+        if size > P.MAX_BYTES:
+            easel.post(pid, "", b"", 0, 0, f"a picture of {size:,} bytes, past the bound")
+            raise HTTPException(status_code=413, detail="The picture is larger than the bound.")
+        data = b"" if failed else await request.body()
+        media = str(request.headers.get("content-type") or "").split(";")[0].strip()
+        why = easel.post(pid, media, data, width, height, failed)
+        if why:
+            raise HTTPException(status_code=409, detail=f"Not taken: {why}.")
+        return JSONResponse({"taken": pid})
+
+    return router
 
 
 def agent_routes(lock: Any, world: Callable[[], World], **desk_options: Any) -> APIRouter:
@@ -600,6 +742,14 @@ def agent_routes(lock: Any, world: Callable[[], World], **desk_options: Any) -> 
             return {"text": desk.library(*args)}
 
         return call(read, station, topic, section, find, key)
+
+    @router.get("/api/agents/{station}/picture/{pid}")
+    def api_agent_picture(station: str, pid: str, key: str = "") -> Response:
+        try:
+            pic = desk.picture(station, pid, key)
+        except DeskError as e:
+            raise HTTPException(status_code=e.status, detail=e.words) from None
+        return Response(content=pic.data, media_type=pic.media_type)
 
     router.desk = desk  # type: ignore[attr-defined]
     return router
@@ -910,6 +1060,13 @@ def create_app(
     app.include_router(router)
     app.include_router(shelf_routes(driver.lock, lambda: driver.world))  # package 33d
     app.include_router(mark_routes(driver))  # package 37n: the chart's pencil
+    # package 42: the chart and the ship's view drawn by the open page for a tool
+    from freesail.agents import pictures
+
+    easel = Easel(driver)
+    pictures.set_painter(driver.world, easel)
+    app.state.easel = easel
+    app.include_router(picture_routes(easel))
 
     @app.get("/")
     def index() -> FileResponse:
@@ -1133,6 +1290,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     ap.add_argument("--saves", help="where a released station saves the game (default saves/)")
     ap.add_argument("--seat", help=SEAT_HELP)
+    ap.add_argument("--free-running", action="store_true", help=FREE_RUNNING_HELP)
     args = ap.parse_args(argv)
 
     import uvicorn
@@ -1167,6 +1325,7 @@ def main(argv: list[str] | None = None) -> int:
         compression=args.time,
         lockstep=args.lockstep,
         ease_on_station=args.ease_on_station,
+        free_running=args.free_running,
     )
     app = create_app(
         driver,
@@ -1178,7 +1337,13 @@ def main(argv: list[str] | None = None) -> int:
     print(f"FreeSail server. Seed {world.seed}. Open http://{args.host}:{args.port}/")
     print(
         f"A model's door connects to http://localhost:{args.port} (docs/agents/Harness.md)"
-        + ("; the clock waits for it (--lockstep)." if args.lockstep else ".")
+        + (
+            "; the clock waits for it (--lockstep)."
+            if args.lockstep
+            else "; the clock runs free of it (--free-running)."
+            if args.free_running
+            else "; the clock slows to 1x while a model's sample is open (the pace rule)."
+        )
     )
     uvicorn.run(app, host=args.host, port=args.port, log_level="warning")
     return 0

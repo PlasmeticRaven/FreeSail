@@ -173,7 +173,13 @@ seating is a driver's line (`seat.taken`) that a replay seats the player again a
 (`core.replay._give`); a checkpoint carries the seat. `tell` keeps the words with what he
 was told, `ask` stands at the prompt until `answer <words>`. One seat at a time, the
 officer's only (`SEAT_STATIONS`); a door asking for a station the player holds is refused
-as it is for a station a model holds.
+as it is for a station a model holds. **Since package 41** the seat takes the lesser
+stations too (`--seat master`, `--seat lookout`, `--seat passenger`; `seat.seat_station`
+reads the name through the ship's binding, so a station bound to a named person is the
+seat's by that name), each with its station's authority and no deck (`PlayerSeat` asks the
+domain whether it has a deck before it asks for one), and the conversation's sentences
+(`say`, `tell`, `ask`) typed at the prompt are the seat's station's, under its name and
+place; the owner's sentences stay the owner's.
 
 **What the captain's station adds to the consent brief**: a station not described (the
 captain's), with more authority than is described; by the owner's ruling of 7 October
@@ -601,6 +607,102 @@ found by its name and its key. What 6b adds:
   three stations seated saves and loads from its checkpoint with all three, and a station
   re-seated after a load reads its own journal.
 
+**As built (package 41, 2026-10-10; `docs/agents/Harness.md` §15, `docs/primer/19-the-wardroom.md`,
+`tests/test_wardroom_doors.py`, truths 82 to 85).** No model is seated: the fakes
+(`fake.master_of_the_reckoning`, `lookout_at_the_masthead`, `passenger_aboard`) prove the
+work, and the pace rule moved no tick of any recorded passage (no pin moved).
+
+- **The stations are data on the ship, bound at run time** (the owner's word through the
+  lead, 2026-10-10, recorded here as agreed): the set of stations and which person holds
+  each is a binding on the World (`world.stations`, `freesail/world/stations.py`
+  `Stations`/`Binding`), the wardroom file's `stations:` only its starting state (built by
+  `people.People`), saved in the checkpoint and the save (`"stations"`) and restored by the
+  replay's `load_report`. Two operations: `bind(name, person, kind=None)` and `unbind(name,
+  why)`, each a log line (`station.bound`, `station.unbound`). A bound station is one a door
+  may ask for (`remote.Desk.station` refuses a name not bound, naming the ones she has;
+  `--station` at the MCP bridge, the local runner and the REPL takes any name, no list of
+  choices); a station unbound while a model holds it releases that model as `stand down`
+  does, by the ship, with the line saying why (`Stations.unbind` → `Harness.stand_down`,
+  or the seat's `request_stand_down`). The kinds of station are the code's
+  (`agent.STATION_FACTORIES`: watcher, officer, captain, master, lookout, passenger; a
+  binding carries its kind), the stations aboard are the ship's. A station's brief is built
+  from its person's outline (`agent.station_outline`: `Person.outline` with rank, station
+  and history, carried on the `Station` and into the head's authority item), and the
+  holder is read through the binding first (`agent.station_holder`), so a station bound
+  to a new person at run time is taken by a door under that person's name with his
+  outline, and no station's list, holder or brief is hard-coded against a wardroom file.
+  `person: "Mr Fox" comes aboard as master` and the boat road are M7b's. **A passenger's
+  station** (`agent.PASSENGER`, `PASSENGER_DOMAIN` with no verbs and no levels) is added
+  generically: a person of the muster or one who comes aboard, with the readings, the
+  journal, `say`, `ask`, an answer and leaving; a brief in the officer's form, short
+  (`PASSENGER_BRIEF`); no consent change (the watcher's authority or less).
+- **The master's station** (`agent.MASTER`, `MASTER_DOMAIN`: the sights, the log and lead,
+  `work up the reckoning`, `my reckoning is`, the chart's queries; refused by name: the
+  course, `shape a course`, `set the reckoning`, `you may`, the chase, `make her out`, the
+  deck's objects; `Domain.deck = False`, so no `give_deck`/`take_deck`/`allow_general` at
+  it and no deck item in its head). The working: `Navigation.master_working` opens at the
+  noon, at a fix and at the captain's `work up the reckoning` (`_open_working`; by order it
+  is pending until the order has run, so the slate the model is given is the ship's after
+  it), the station sampled on the reckoning's own kinds (`MASTER_KINDS`:
+  `reckoning.noon`, `.fix`, `.worked`, `.master_working`) with the slate in the sample's
+  notice (`Harness._station_notices`, `working_notice`); a `my reckoning is` within
+  `MASTER_WORKING_S` (30 minutes, `DAYS_WORK_MINUTES`) is adopted as the ship's account
+  (`_adopt_master_figure`: his offset from the working's account applied to the account
+  now, the slate begun again, the notable line *The master's figure is the ship's account*);
+  past it `_tick_working` closes the working with `reckoning.master_stood` (*the master's
+  figure stands*; G19's third step), and a figure then is his own reckoning beside the
+  master's as the officer's is (§5). `the master` reads the holder and the working open
+  when the station is held. The fake master works the slate by the traverse
+  (`fake.work_the_slate`, moved from the tests). The cutter's and the schooner's master's
+  station is bound to the mate (`data/people/cutter.yaml`, `topsail-schooner.yaml`: a
+  person may hold two stations; `People.holder` reads the wardroom's map first).
+- **The lookout's station** (`agent.LOOKOUT`, `LOOKOUT_DOMAIN`, verbs `{make her out}`;
+  `the masthead` an alias): sampled on the masthead's lines (`LOOKOUT_KINDS`:
+  `lookout.sighting`, `.made_out`, `.sail_lost`, `.land_ahead`, `.closing`), an urgent line
+  and its glass, never a notable line of the quarterdeck (truth 84) and never the minute;
+  `hail <words>` is a notable line from the masthead (`agent.hail`), heard by whoever is on
+  deck, a danger line (`readings.DANGER_LINES`, *a hail from the masthead*) that wakes an
+  officer standing by with the deck; the player's `hail` is refused (he is not aloft). `the
+  lookout` / `who is at the masthead` reads the holder, what is in sight and the last hail.
+  Patience a watch (`LOOKOUT_PATIENCE_S`); the master's and the passenger's the officer's
+  two glasses, a watch.
+- **The stand-by on several conditions** (`harness._read_stand_by`, `_one_stand_by`,
+  `StandBy.parts`): `until` split on *or* into pieces each read by the standing dialect
+  (an event, a bell, an interval, a reading's condition), a piece that does not read joined
+  back to the next (so the dialect's own *or* inside a condition, `veers 1 point or backs 1
+  point`, still reads as one); each part watched by its own index (`_stand_by_watch`); the
+  waking sample names which (*X (one of: ...)*); a piece no reading can take is refused in
+  the dialect's words with the cure. The deck's bound at eight bells stands.
+- **The deck's conversation** (`orders.stations`: `_SAY`, `_HAIL`, `CONVERSATION_VERBS`;
+  `harness.say_aboard`, `deliver_answer`, `hear`, `_tick_asked`): `say <words>` is a log
+  line with the speaker's station, place (`agent.place_of`: the people's places first,
+  `STATION_PLACES` else) and `heard_by` (`_stations_held`: the started harnesses and the
+  seat in that place), carried as `Sample.heard` in each hearer's next sample under the
+  speaker's name, no sample forced; `tell <station> <words>` and `ask <station> <words>`
+  from a station go as the owner's do, under the speaker's name and place (`put_word`,
+  `put_question` with `speaker=`); an answer returns to the asker as a word
+  (`AgentState.question_by`), and the asker is told once by the asked station's patience
+  when none comes (`NO_ANSWER_WORDS`, `AgentState.asked`). A say in the owner's order box
+  is the captain's on the quarterdeck; `ask the master <reading>` with nobody at the
+  master's station stays the reading's own form. A station is refused asking itself.
+  Nothing a station says is operator text (`model.Turn` DATA; the speaker's name on every
+  line).
+- **Who may give what** (`orders.stations._deck`, `read_grant(station=)`,
+  `tools.judge`): the owner to any station; the captain's station to the officer's and the
+  master's, `<station or person>, you may <thing>` naming its target; the officer and the
+  master may give no station's sentence but the conversation's; nothing upward. The
+  **rules-based captain over a seated officer** (`captains.Captain._deck_by_rule`): on an
+  intent scenario with nobody at the captain's station he gives the deck to a held
+  officer's station at his judgement in his book's words (`agent.deck`, data `by="rule"`),
+  and takes it back, saying so, in a state that needs the deck (`CAPTAIN_ON_DECK_STATES`:
+  hove to for weather, running for shelter, investigating a stranger, chasing, evading,
+  distress), giving it again in a quiet one.
+- **Three doors and the save**: three stations through three in-process doors in the
+  tests (`TestClient` against `remote.Desk`, each with its key and its cadence); a game
+  with three seated saved and loaded from its checkpoint, each re-seated station reading
+  its own journal (truth 85's first half; the transcript-driven replay on a build whose
+  sampling differs is package 42's).
+
 ### 12. The pace rule (`freesail/ui/server.py`, `core/world.py`; `freesail/agents/harness.py`)
 
 The owner's testing setting, built as the default (his ruling 2): **the clock slows to
@@ -616,6 +718,30 @@ are open and since when; the log says when the clock is held for a station longe
 stated time, so that a slow door is seen and not suffered. Free-running at the set
 compression, with no slowing, stays as the flag for the solo player who wants a model to
 think while he sails at sixty times.
+
+**As built (package 41, 2026-10-10; `freesail/ui/console.py` `Pace`, `ui/server.py`;
+`agent.cadence_policy`).** The rule lives in the drivers and not in the World: `Pace` is
+the one object both the console and the server ask (`Pace.rate()`) for how many of the
+ship's seconds the next real second owes, and the World's tick is untouched, so every
+recorded passage replays to its digest under any of the three paces and no pin moved. Three
+paces: `pace` (the default: `rate()` is 1 while `harness.open_samples(world)` names any
+model's sample open, whoever holds it, the set compression otherwise; a `Playback` is not a
+model and holds nothing), `lockstep` (`--lockstep`, unchanged), `free` (`--free-running`,
+new at both drivers: the set compression whatever is open). The world records the rule
+(`world.pace_rule`) so that a save says what pace it was played at. `Pace.state()` is the
+server's `state()["pace"]` and the console's *Clock* row; `the pace` reads the set
+compression, the rule, the open samples and since when (`readings.pace`, kind `driver`,
+`DRIVER_KINDS`, outside the samples' readings); the log says once per holding, as a
+driver's line (`driver.pace`), when the clock has been held at 1x for a station longer
+than `PACE_HELD_SAID_S` (120 real seconds). **The cadence** is a setting of the seating
+(`--cadence glass|watch|events` at every door, `remote.Desk.station` body `cadence`,
+`Seat.cadence`; `agent.CADENCES`): `glass` every glass and on the notable and urgent
+lines (the default), `watch` every watch and the same lines, `events` the lines only; a
+station with kinds of its own keeps them at every cadence, and the lookout's events are
+the urgent lines only. The brief's door note says the cadence in words
+(`SamplingPolicy.describe`). The pace truth of M5 §30 measured with three stations at a
+glass each at 60x is in `docs/dev/TuningNotes.md` under package 41, with the load the
+machine carried.
 
 ### 13. The API door (`freesail/agents/api.py` new; `docs/agents/Harness.md` a section; the security pass)
 
@@ -644,6 +770,56 @@ on request and posting the image to the server, or the server rendering the char
 Python. The words come first; the tools follow in 41 or 42, whichever the lead finds them
 to fit.
 
+**As built (package 42, 2026-10-10).** `freesail/agents/api.py`: a runner on the local
+runner's loop (`local.run`), a client of the game's agent API under the door `api`, and of
+the Messages API through the official SDK (`anthropic` 1.x, in the `agents` extra, imported
+by the door alone). `--model` has no default; the door asks the Models API what that name
+is, and the name the server reports is the consent record's identity (the record's form
+for a served identity, "the model's name as its API reports it"), with the context it
+gives sent to the game for the handover note; a reply the server says another model wrote
+is not passed on and the station is stood down (no server-side fallback is ever asked, the
+consent being per model). The wire is the runner's translation in the Messages API's shape:
+the latest brief the system prompt, cached with the tool definitions; a sample a user
+message of its JSON; tool results `tool_result` blocks by the API's own ids; the model's
+earlier turns sent back as the API gave them, thinking blocks and signatures with them; the
+request's own cache breakpoint on the conversation's last block. Every request is streamed
+and the final message taken whole from the stream. `--effort` sets `output_config.effort`
+with adaptive thinking; **thinking cannot be switched off on the current models** (the API
+refuses it), so the brief's "off when not asked" is the model's own default instead. The
+harness's conversation is not append-only (the shelf's stubs, the handover's fold), and the
+API binds a thinking block to the conversation before it, so every request sets
+`thinking.block_binding.prefix_mismatch_behavior: drop_block` (the
+`thinking-binding-controls` beta): a block whose conversation changed is dropped, not
+refused. The server's counts (in, out, cache read and written) go to the game with each
+reply and are said at each handover and at the end. A reply cut off at `max_tokens` with a
+call or no words is asked once more (37i's rule), then the turn ends with nothing done; a
+`refusal` is not asked again and the journal says why. **The security pass**: the key from
+the platform's credential store through `keyring` (service `freesail`, account
+`anthropic-api`; `--store-key` prompts without echo and writes nothing else), else the
+environment (`FREESAIL_API_KEY`, `ANTHROPIC_API_KEY`), else `--key-file` outside the
+repository; handed to the SDK and so to the request's header alone; the door refuses to
+start for a key file inside the repository or a folder the game keeps, the key in a word it
+would send the game, a base URL with a credential, or the SDK's logging on
+(`refusal_to_start`); what it keeps of an exchange is the two bodies, scanned for the key
+before an `--exchanges` file is written; a test greps the repository for the shapes of a
+key. The OpenRouter dialect (`--dialect openrouter`) is the local runner's chat-completions
+with the key in the header, its own account and environment names and base URL, the
+reported model checked; it marks nothing for a cache and keeps no total. **The pictures**
+(`freesail/agents/pictures.py`): the lead's decision, the open page draws them. The tools
+`chart` and `ship_view(facing)` are offered at the doors that carry an image (`mcp`,
+`api`); the browser's server registers a painter (`ui.server.Easel`) that sends the page
+`{"type": "picture", ...}` on the socket and waits up to five seconds for its post
+(`POST /api/picture/{id}`, a PNG of at most 1,568 pixels on its longer side and 1.5 MB);
+the page draws the chart's canvas as it stands, or the ship's view again at the facing in
+an offscreen SVG with its styles written in, onto a canvas (`client/app.js`). The picture
+is a book (shelved, or gone back after its turns, it is no longer sent), held by the
+painter in memory (the newest 24) and fetched by the door by its id with the seating's key;
+the transcript notes that it was shown, with its size and the facing, and no picture is in
+the journal, the transcript, the log or the save. With no page open the tool says so and
+gives the readings the picture would have shown. Tested against a local server in the
+Messages API's shape (`tests/test_api_door.py`, truth 86) and the MCP bridge's own client
+(`tests/test_mcp_server.py`); no model was seated.
+
 ### 14. The replay driven by the transcript (`freesail/core/replay.py`, `freesail/agents/harness.py`)
 
 Decision 36 left it for this milestone: a replay promised on any build. Today a station's
@@ -655,6 +831,58 @@ that a replay applies them at their ticks whatever the build's sampling would ha
 and the transcript becomes the record and not the replay's source. Item 11 of M5 §33 (an
 act at the stationing tick) closes with it. A save of 6b replays on any later build to the
 same log; a save of before replays as now, from its checkpoint.
+
+**As built (package 42, 2026-10-10).** `freesail/core/acts.py`. A harness's entry points
+(its seating, its step on a tick, on an order and between ticks, a reply delivered, a
+door's act, a pause, a stand-down, a leaving, the unattended check) carry `acts.frame`, and
+while one runs every thing the station does to the World is journaled in
+`World.station_acts` with its tick and the count of inputs before it: `seated` (the
+station's definition and its whole state, from which a replay builds it), `order` (an order
+under the station's actor, with its words for the log; given again, so that what it writes,
+and the stations it reaches, follow), `line` (a line of the station's in the log, written
+again as it was: its words, a refusal, a stand-by, a waking, a nudge, a pause, a leaving),
+`note` (an entry in its journal) and `state` (what changed of its agent's state and the
+harness's own fields: the deck, a stand-by, the grants, a pause, who sits there; journaled
+before each order it gives and at the end of each act). A driver's line, the player's
+orders and what the World writes of itself are inputs or consequences of inputs as
+before; an order given inside an order is the outer one's. The save carries the list and
+each station's `acts` flag (its acts whole from before it started). **The replay's rule**
+(`core.replay.road_of`): a save of another build whose stations' acts are whole is
+replayed by them, each given at its tick after as many inputs as came before it in play,
+the stations driven by them (`Harness.driven`: they sample nothing and ask no model) until
+the replay ends, when they take the game up where it stands, their record the save's
+transcript; a save of this build is replayed from its transcript as before, which rebuilds
+the station's conversation (the REPL's turn mode depends on it), to the same log; a save
+of before has no acts, replays as before, and the load's words say so ("a save from before
+package 42, whose stations' acts are not inputs"). Truth 85's second half
+(`test_truth_85_a_game_with_three_stations_replays_on_a_build_whose_sampling_differs`): the
+captain's, the officer's and the watcher's stations an hour at play; on a build that
+samples each station at every other turn of its interval the transcript's road gives
+another log and the acts' road the one that was played, digest for digest. M5 §33 item 11
+closes with it (a door's act at the stationing tick is an input at tick 0, given before the
+first tick; `test_a_door_act_at_the_stationing_tick_is_made_by_a_replay`, by both roads).
+A tool that changes the World by a road other than an order, a line, the journal or the
+station's state must journal its own act (`acts.record`, `acts.APPLIERS`), or a replay by
+the acts will not make it.
+
+**With the wardroom (the merge of packages 41 and 42, 2026-10-10).** Each of 41's roads by
+which a station changes the World is an act or an input: a say on the quarterdeck and a
+hail from the masthead are the station's lines, their hearers' `heard` their state (the
+player's seat at a lesser station journaled beside the harnesses, `seat_state`, since a
+station's act changes it: what it heard, a station's answer to its question); a tell or an
+ask from a station, its `you may` and the master's `my reckoning is` (whose adoption,
+`Navigation._adopt_master_figure`, runs inside the order) are its orders, given again; the
+stand-by on several conditions is its state (`StandBy.others`); the master's working told
+to his station marks the navigation's working (`working_told`, an act with its applier);
+and `World.stations.bind` and `unbind` are inputs (`{"binding": ...}`, made again with
+`quiet` by either road), a station stood down inside an unbinding giving its acts in their
+place before the binding's own line. The test: five fake stations (the captain's, the
+officer's, the master's, the lookout's and a passenger's) for an hour of the cutter off the
+Lizard, with a say heard on the quarterdeck, the captain's tell to the master, a hail, a
+stand-by on two conditions, the master's figure adopted at noon and the passenger's station
+unbound under its fake: both roads to the log that was played and its journals, and the
+acts' road on a build that samples each station at every other glass
+(`tests/test_replay.py::test_five_stations_of_the_wardroom_replay_by_their_acts_on_a_build_whose_sampling_differs`).
 
 ### 15. Consent: one revision for 6a and 6b (`docs/agents/ConsentBrief.md`; `docs/agents/consent/`)
 
@@ -717,6 +945,19 @@ No model was seated and no re-ask run.
     replays from its journal on a build whose sampling differs, to the same log.
 86. The API door's test server receives no key in any body, and the journal, the transcript
     and the save hold none.
+
+**As built (package 41, 2026-10-10; `tests/test_known_truths.py` truths 82 to 85, on the
+cutter's free passage with the fakes).** 82: the fake captain and the fake officer through
+two in-process doors, the captain's `you have the deck` and `you may work the ship` by
+`submit_order`, each order in the log under its own station's mark (`order.accepted` by
+*the captain* and by *the officer of the watch*). 83: the pace held at 1x with the officer's
+sample open and back at 60x when it is answered; a `stand_by` releases it. 84: a `say` on
+the quarterdeck in the officer's next sample as `heard`, and not in the lookout's at the
+masthead. 85: three seated (the captain's and the officer's fakes, the player at the
+master's seat) saved and loaded from the checkpoint with three, each re-seated station
+reading its own journal; the second half (replayed from its journal on a build whose
+sampling differs, to the same log) is package 42's and is not claimed here. 86 is package
+42b's.
 
 ### 17. Gate 6b (outline)
 
@@ -1098,6 +1339,8 @@ comparison by `ci.yml`'s manual run); a plain `steer` through the wind (the owne
 3, package 37m); the pumps and the well, the carpenter with something to say (M5 I6 item 9: with 40's
 people if the owner rules it); the datum offsets at three ports (item 3); the GEBCO fill
 swept once (item 16, in 38's checks); the hints and phrasings 37l leaves.
+- **The roach of the square sails** (the owner, 2026-10-10, on the aquatint of the Nimble cutter in `docs/references/images/`): the foot of a square topsail was cut with a deep roach, and the viewer's sails show none; the roach should be a variable of the sail model and drawn, for the vessel library (M8) or the viewer's next pass.
+
 
 ## 31. The owner's rulings on the draft (2026-10-09; decision 39)
 

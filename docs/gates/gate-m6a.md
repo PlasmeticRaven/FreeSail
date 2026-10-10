@@ -1,10 +1,10 @@
-# Gate M6a: People and the captain's station
+# Gate M6a: People, the captain's station, and the wardroom (6a and 6b as one)
 
-**Verdict:** open. Cut by the lead at package 40c's merge (2026-10-09; decision 41), after
+**Verdict:** open. The build `m6a`, to be cut at package 37p's and 42's merge (the owner's word of 2026-10-10, decision 44: one gate for 6a and 6b, carrying the yards and the helm by the wind with it), after
 packages 40 (the ship's company, the rules-based captain in three layers, the captain's
 station and the player's seat), 40b (the lessons and the officer's own reckoning) and 40c
-(the captain's trials). The chart blocks 39a and 39b landed before it and are checked here
-as they come (spec M6 §28). The owner's runs decide it; the lead's first play is at the
+(the captain's trials), 37p (the yards and the helm by the wind, the ship in a gale), 41 (the wardroom), 42a (the consent brief revised) and 42 (the API door, the replay by acts, the pictures). The chart blocks 39a and 39b landed before it and are checked here
+as they come (spec M6 §28); 39c to 39f run after the cut and are no part of its question. The owner's runs decide it; the lead's first play is at the
 director's station when it exists and no gate waits on it.
 
 **The gate's point, in the owner's words** (decision 41): the rules-based captain's
@@ -36,10 +36,16 @@ keep a reckoning of his own; and the primer teaches the duties.*
    model.
 6. **The captain's trials**: five pinned scenarios of the captain under weather and world
    orders.
+7. **The wardroom** (6b, spec M6 §10 to §12): several models at several stations through
+   several doors, the master's, the lookout's and a passenger's stations beside the
+   officer's and the captain's, the deck's conversation, the stand-by on several
+   conditions, the pace rule, and a model seated through an API door with no chat client
+   between; a game with them in it saved, replayed by their acts on any later build, and
+   the chart and the ship's view as pictures through the doors that carry one.
 
 ## What you need
 
-Python 3.11 or newer (`py`), the branch checked out fresh, and for item 7 Claude Desktop
+Python 3.11 or newer (`py`), the gate zip from the release `gate-m6a` extracted to a fresh folder (or the branch `gates/m6a`), and for item 7 Claude Desktop
 with the bridge configured as at gate 5c, once package 42a's consent revision is approved
 and the re-asks run.
 
@@ -129,6 +135,35 @@ written down whether or not it is a fault.
   deck his by right; `you may` and `tell` to the officer by his own words; the handover
   note in the captain's voice.*
 
+## Items of 6b: the wardroom
+
+Spec M6 §17, the owner's ruling 7 of decision 39: the API door's credit kept for this.
+The re-asks of the revised consent brief (42a) come first, through the game's own consent
+step, for every model to be seated.
+
+- [ ] **9. The wardroom game.** Opus 5.5 and Sonnet 5.5 at the captain's and the officer's
+  stations, one through the API door (`docs/agents/Harness.md`, the API door's section:
+  `--store-key` once, then `python -m freesail.agents.api --station captain --model <name>`)
+  and one through Claude Desktop, on the cutter's or the brig's free passage, the owner at
+  a lowly station (`--seat master`, `--seat lookout` or `--seat passenger` at the console)
+  to observe and to have his interactions; a local lookout if you like. *The captain's
+  brief head saying the voyage; `you have the deck` and `you may` from the captain's
+  station to the officer's by its own words; the conversation on the quarterdeck under
+  each speaker's name, heard by you where you stand; a stand-by on two conditions and the
+  wake naming which; the master's figure adopted at noon or the ship's own standing when
+  none came; the door saying what the server reported it used at each handover.*
+- [ ] **10. The pace rule in play**, at 60x and at 1x: *the clock at 1x while any sample is
+  open and back at 60x when all are answered, the `pace` reading saying which samples are
+  open and since when, the log's line once when a door holds the clock past two minutes;
+  `--lockstep` and `--free-running` as the two other ways.*
+- [ ] **11. The pictures.** From a station through Claude Desktop or the API door, `chart`
+  and `ship_view` with a facing, the browser page open: *the picture as you see it at that
+  moment, shelved like a book and gone from the turns after three; with no page open, the
+  words instead.*
+- [ ] **12. The replay by acts.** A save of this game with the stations seated, replayed on
+  the console (`--load`): *from its transcript on this build; the acts kept beside the log
+  so that a later build replays it the same with no model asked.*
+
 ## The report
 
 The verdict and the rulings go in this document and in `docs/DesignProposal.md`; the
@@ -136,6 +171,5 @@ playtest records under `docs/playtests/`.
 
 ## What this gate does not do
 
-The wardroom of several doors, the pace rule and the API door (6b); other ships with
-captains, the crewed promotion, the regatta (6c); the chart blocks beyond 39a and 39b, which
-are checked at the gate that follows them.
+Other ships with captains, the crewed promotion, the regatta and the two new hulls (6c); the
+chart blocks beyond 39a and 39b, which are checked at the gate that follows them.

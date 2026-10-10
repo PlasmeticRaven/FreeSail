@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from freesail import units
+from freesail.core import acts
 from freesail.core.clock import TICK_SECONDS as TICK_S
 from freesail.core.clock import Clock
 from freesail.core.events import STATION_ACTORS, Event, Log, Severity
@@ -41,7 +42,7 @@ SAVE_FORMAT = 1
 # `SAVE_FORMAT` do not move for it, and a save without a stamp is read as "unstamped,
 # before 37d" (`UNSTAMPED_WORDS`). A replay is promised only on the build that wrote the
 # save (`core.replay.load`): the same fingerprint.
-BUILD_NAME = "m5c-c"
+BUILD_NAME = "m6a"
 BUILD_RULES_DIGITS = 16
 UNSTAMPED_WORDS = "unstamped, before 37d"
 
@@ -274,6 +275,8 @@ MOTION_WORDS_HOLD_S = 300
 AGENT_LOG_KINDS: tuple[str, ...] = (
     "agent.stationed",  # an agent took a station; its policy in words
     "agent.note",  # the free text of a reply: the watcher's narration, routine
+    "agent.hail",  # the lookout's words, a hail from the masthead (package 41), notable
+    "agent.spoke",  # the player's `say` on the quarterdeck (an order, journaled; 41)
     "agent.said",  # an `answer` to an `ask`, notable
     "agent.asked",  # the captain's `ask the <station> ...` (an order, journaled)
     "agent.told",  # the captain's `tell the <station> ...` (an order, journaled), notable
@@ -368,6 +371,12 @@ class World:
     # journal, the readings or the snapshot. A tuple as the class default, so that a
     # checkpoint from an earlier build loads with none.
     chart_marks: list[dict[str, Any]] | tuple[()] = ()
+    # Package 42 (spec M6 §14; `core.acts`): what the stations put into the World, each at
+    # its tick after its count of inputs, which a replay gives again whatever its sampling;
+    # and the stations acting now. Class defaults, so that a checkpoint from before reads:
+    # it journals no station's acts (a station of before has acts in no list).
+    station_acts: list[dict[str, Any]] | None = None
+    _acts_frames: list[Any] | None = None
     # Package 37k: for each anchor whose dragging the log has opened, its come-home
     # figure as last seen and the metres come home since the dragging began, across the
     # spells of it (the physics counts each spell afresh). A class default, as above.
@@ -507,6 +516,8 @@ class World:
         )
         self.journal: list[JournalEntry] = []
         self.inputs: list[InputEntry] = []
+        self.station_acts = []  # the stations' acts (package 42; `core.acts`)
+        self._acts_frames = []
         # The compression the driver runs the clock at (game seconds a real second). The
         # World never reads it: the log's views do (the roll-up in an agent's samples, spec
         # M4 §20 and open item 8), and the driver sets it. Not saved, not in the digest.
@@ -588,10 +599,15 @@ class World:
         from freesail.world.places import Hold, Papers, Places, Purse, Stores
         from freesail.world.ports import Ports
         from freesail.world.ships import Vessels
+        from freesail.world.stations import Stations
 
         self.nations = load_nations()
         self.places = Places(getattr(self.ship, "name", ""))
         self.people = People(self)
+        # the ship's stations as data, bound at run time (package 41; spec M6 §11): which
+        # stations she has and who holds each, the wardroom file's `stations:` the
+        # starting state; the doors, the seat and the briefs ask it
+        self.stations = Stations(self)
         self.papers = Papers(self)
         self.vessels = Vessels(self)
         hold_spec = getattr(getattr(self.ship, "spec", None), "hold", None)
@@ -655,6 +671,8 @@ class World:
         if getattr(self.ship, "extra", None) is not None:
             self.ship.extra["agents"] = self.agents
             self.ship.extra["agent_journals"] = self.agent_journals
+            # the stations aboard, for the orders' station sentences (package 41)
+            self.ship.extra["stations"] = self.stations
         # The rules-based captain (spec M6 §4; package 40; `freesail.world.captains`):
         # named for every ship, with the scenario's book or its intent; his judgements are
         # given only on an intent, when no model holds the captain's station with the deck,
@@ -689,7 +707,7 @@ class World:
         data: dict[str, Any] | None = None,
     ) -> Event:
         sev = severity if isinstance(severity, Severity) else Severity(severity)
-        return self.log.append(
+        e = self.log.append(
             Event(
                 tick=self.clock.tick,
                 ship_time=self.clock.ship_time,
@@ -701,6 +719,9 @@ class World:
                 data=data or {},
             )
         )
+        if self._acts_frames:
+            acts.line(self, e)  # a station's line, journaled as its act (package 42)
+        return e
 
     # -- the sun -------------------------------------------------------------
 
@@ -1336,6 +1357,9 @@ class World:
         as the book's listing) is answered in the log and not journaled either.
         """
         text = " ".join(text.split())
+        if actor in STATION_ACTORS and acts.capturing(self):
+            # a station's order, journaled as its act and then given (package 42)
+            return acts.order(self, text, actor, said, routine)
         # a firing's order, or a rules-based captain's judgement (package 40): logged as
         # the rule's and not journaled, a deterministic function of the seed and the journal
         standing = actor.startswith(RULE_ACTOR_PREFIXES)
@@ -1767,6 +1791,12 @@ class World:
             # the player's pencil on the chart (package 37n), for the chart alone; a replay
             # makes none of it, and the door that draws the chart takes it up from here
             "chart_marks": [dict(m) for m in self.chart_marks],
+            # the stations' acts (package 42, spec M6 §14): a replay on another build gives
+            # them again at their ticks, whatever its sampling would ask
+            "station_acts": acts.saved(self),
+            # the stations bound and unbound by hand (package 41), for the reader and a
+            # load; a replay re-makes a binding from the world order that made it (M7b)
+            "stations": self.stations.to_dict() if hasattr(self, "stations") else {},
         }
 
 

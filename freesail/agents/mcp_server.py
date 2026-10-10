@@ -125,6 +125,7 @@ a game served by FastAPI's `TestClient`; no network, no model.
 from __future__ import annotations
 
 import argparse
+import base64
 import functools
 import inspect
 import json
@@ -142,7 +143,7 @@ from mcp.server.mcpserver import Context
 from mcp.server.mcpserver.tools import Tool as McpTool
 
 from freesail.agents import tools
-from freesail.agents.agent import OPT_OUT_TOKEN
+from freesail.agents.agent import CADENCES, OPT_OUT_TOKEN
 from freesail.agents.model import DATA, MODEL, OPERATOR, Reply, ToolCall, Turn
 from freesail.agents.remote import GameClient, GameError, turn_from_dict
 from freesail.agents.repl import render_turn
@@ -367,10 +368,50 @@ def _to_stderr(text: str) -> None:
         print(text.encode(enc, "replace").decode(enc), file=sys.stderr, flush=True)
 
 
+# The pictures a call's result named (package 42, item 4), on the worker thread that ran
+# the call: the MCP wrapper fetches each from the game and returns it as an image beside
+# the words, which Claude Desktop and Claude Code read. The picture is never in the text.
+_SHOWN = threading.local()
+
+
 def _text(value: Any) -> str:
     if isinstance(value, str):
         return value
+    if isinstance(value, dict) and isinstance(value.get("picture"), dict):
+        shown = getattr(_SHOWN, "ids", None)
+        if shown is not None and value["picture"].get("id"):
+            shown.append(str(value["picture"]["id"]))
+        handle = f"{value['book']}\n" if value.get("book") else ""
+        return f"{handle}{value.get('words') or 'The picture.'}"
     return json.dumps(value, indent=1, ensure_ascii=False)
+
+
+def _with_pictures(bridge: Bridge, run: Callable[[], str]) -> Any:
+    """A call's result with the pictures it named, fetched from the game, as images after
+    its words (package 42); the words alone for a call that named none."""
+    _SHOWN.ids = []
+    try:
+        text = run()
+        ids = list(_SHOWN.ids)
+    finally:
+        _SHOWN.ids = None
+    if not ids:
+        return text
+    from mcp.types import ImageContent, TextContent
+
+    out: list[Any] = [TextContent(type="text", text=text)]
+    for pid in ids:
+        got = bridge.game.picture(pid)
+        if got is None:
+            out.append(TextContent(type="text", text="The picture is no longer held by the game."))
+            continue
+        media, data = got
+        out.append(
+            ImageContent(
+                type="image", data=base64.standard_b64encode(data).decode("ascii"), mime_type=media
+            )
+        )
+    return out
 
 
 def _is_sample(t: Turn) -> bool:
@@ -400,9 +441,11 @@ class Bridge:
         tell_owner: Callable[[str], None] | None = None,
         slice_s: float = WAIT_SLICE_S,
         progress_every: float = PROGRESS_EVERY_S,
+        cadence: str = "",
     ):
         self.game = game
         self.identity = identity
+        self.cadence = cadence  # this seating's cadence, when the owner asked one (41)
         self.wait = max(0.0, min(float(wait), WAIT_CEILING_MAX_S))
         self.slice_s = float(slice_s)
         self.progress_every = float(progress_every)
@@ -520,6 +563,7 @@ class Bridge:
                 session_kind=self.session_kind,
                 client=self.client_words(),
                 ask_again=self.ask_again,
+                cadence=self.cadence,
             )
         except GameError as e:
             if e.status in (403, 409):
@@ -1101,9 +1145,10 @@ def _tool(bridge: Bridge, name: str, description: str, schema: dict[str, Any], p
         if args is None:
             args = {k: v for k, v in kwargs.items() if v is not None}
         call_id = bridge.begin_call()
-        run = functools.partial(
+        call = functools.partial(
             bridge.call, name, args, _client(ctx), call_id=call_id, progress=_progress(ctx)
         )
+        run = functools.partial(_with_pictures, bridge, call)
         try:
             # the call runs on a worker thread; a cancellation from the client leaves it
             # to finish there and marks it cut off, so its result goes to the next call
@@ -1145,6 +1190,7 @@ def build_server(bridge: Bridge) -> MCPServer:
     mcp_tools = [
         _tool(bridge, name, t.description, tools.parameters_schema(name), list(t.params))
         for name, t in tools.TOOLS.items()
+        if name in tools.tool_names(pictures=True)  # the pictures this door carries (42)
     ]
     mcp_tools.append(_tool(bridge, "say", SAY_DESCRIPTION, SAY_SCHEMA, ["text"]))
     srv = MCPServer("freesail", instructions=INSTRUCTIONS, tools=mcp_tools)
@@ -1233,10 +1279,21 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--station",
         default="watcher",
-        choices=["watcher", "officer", "captain"],
         help=(
-            "the station asked for: the watcher, the officer of the watch (package 37) or "
-            "the captain (package 40)"
+            "the station asked for, by its name aboard: the watcher, the officer of the "
+            "watch ('officer', package 37), the captain (package 40), the master, the "
+            "lookout or a passenger (package 41); the game refuses in words a station the "
+            "ship has not got"
+        ),
+    )
+    ap.add_argument(
+        "--cadence",
+        choices=list(CADENCES),
+        default=None,
+        help=(
+            "this seating's cadence (spec M6 §12): 'glass' (every glass and on the notable "
+            "and urgent events, the default), 'watch' (every watch and on them), or "
+            "'events' (on events only); the station's own lines are kept whatever it is"
         ),
     )
     ap.add_argument(
@@ -1260,6 +1317,7 @@ def main(argv: list[str] | None = None) -> int:
         wait=args.wait,
         session_kind=args.session,
         ask_again=args.ask_again,
+        cadence=args.cadence or "",
     )
     server = build_server(bridge)
     _to_stderr(

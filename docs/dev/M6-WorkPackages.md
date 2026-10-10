@@ -16,15 +16,15 @@ tuning notes and a report to the lead at the end.
 | Package | Builder | What | State |
 |---|---|---|---|
 | 38 | Fable | The chart stitched: many regions over the corridor, the queries across edges, the climatology's boxes, the tide's gauges, the recipe form for the blocks | launched 2026-10-09 |
-| 39a to 39f | Opus | The six blocks of the voyage to Madeira and the Strait | 39a (channel-mid) merged 2026-10-09, bounds 48.5 N to 51 N and 3 W to 1 W, Morlaix's patch left; 39b (biscay-north) building; the rest after them |
+| 39a to 39f | Opus | The six blocks of the voyage to Madeira and the Strait (39c to 39f briefed 2026-10-10, to launch together after gate 6a's cut; decision 44) | 39a (channel-mid) merged 2026-10-09, bounds 48.5 N to 51 N and 3 W to 1 W, Morlaix's patch left; 39b (biscay-north) building; the rest after them |
 | 40 | Fable | The ship's company and the rules-based captain in three layers; the captain's station; the player's seat | merged 2026-10-09 (the officer's reckoning moved to 40b; the consent brief's revision drafted for the owner, `docs/playtests/drafts/consent-brief-m6-draft.md`, held for 42) |
 | 40b | Opus | The lessons in the primer; the officer's own reckoning (spec M6 §5, truth 80; moved from 40 at the owner's word) | merged 2026-10-09 (an own reckoning carried on past noon, the lead's ruling; chapter 13 stays out of the primer test) |
 | 40c | the lead | The captain's trials: the gate's pinned scenarios of the rules-based captain under weather scripts and world orders; the player's hand on an intent scenario (the captain stands aside until `captain: carry on`) | merged 2026-10-10; gate 6a opened (`docs/gates/gate-m6a.md`); the fast tier on the merged tree 3093 passed, none failed |
 | 42a | Opus | The consent brief revised once from 40's draft, describing in kind all of 6b and 6c that the rule watches; the watched sections pinned; the re-asks the owner's | merged 2026-10-10 (decision 42: the added sentences approved; the re-asks the owner's) |
-| 41 | Fable | The wardroom: several doors, the pace rule, the deck's conversation, the master's and the lookout's stations, the stand-by on several conditions | brief to write |
-| 42 | Opus | The API door and its security pass; the transcript-driven replay (the consent revision moved to 42a) | brief to write |
+| 41 | Fable | The wardroom: several doors, the pace rule, the deck's conversation, the master's and the lookout's stations, the stand-by on several conditions | merged 2026-10-10 (stations bound at run time, a passenger station, the pace rule as one object the drivers share; no pin moved) |
+| 42 | Opus | The API door and its security pass; the transcript-driven replay; the chart and the ship's view as images through the doors that carry one (the consent revision moved to 42a) | merged 2026-10-10 (the key from the credential store first; the acts beside the log; the pictures from the open page; OpenRouter on a mock only; thinking cannot be switched off on the current models, so no-effort is the model's default) |
 | 43 | Fable | The crewed promotion, a model captain of another ship, the far-detail guard, the director's seat hook | brief to write |
-| 37p | Opus | The yards and the helm by the wind, and the ship in a gale: three levels of bracing, the helm's mark the highest sail set, storm canvas, the recovery from aback; every passage re-pinned once | brief written 2026-10-10, for the owner's approval; before gate 6a's runs |
+| 37p | Opus | The yards and the helm by the wind, and the ship in a gale: three levels of bracing, the helm's mark the highest sail set, storm canvas, the recovery from aback; every passage re-pinned once | approved and launched 2026-10-10; before gate 6a's runs |
 | 43b | Opus | The lugger and the smack; the world's business | brief to write |
 | 44 | Opus | The regatta harness and the parity tests | brief to write |
 
@@ -559,3 +559,315 @@ behaviour in a sea beyond truth 28's drift; the lugger's lugs (43b). Tuned once 
 cheaply: the trim's steps and the storm line are set from the sources and the trials, not
 iterated for a prettier passage. The fast tier before the report, and the whole slow tier
 once at the end, since every pin moves.
+
+## Package 41: the wardroom (`freesail/agents/agent.py` for the master's and the lookout's stations, their domains and briefs, the cadence; `harness.py` for the conversation, the stand-by on several conditions, `you may` down the ranks; `tools.py` for the new tools and the authority filter at the new stations; `remote.py`, `mcp_server.py`, `local.py`, `repl.py` for the doors; `seat.py` for the player at the master's and the lookout's; `fake.py` for the fake master and lookout; `freesail/core/world.py` and `freesail/ui/server.py` for the pace rule and the `pace` reading; `freesail/api/readings.py`; `freesail/world/reckoning.py` only where the master's figure replaces the ship's; `freesail/world/captains.py` where the rules-based captain is the captain over a seated officer; `freesail/standing/grammar.py` only if the stand-by's conditions need a form the dialect lacks; `docs/agents/Harness.md`, `docs/agents/README.md`; the primer's chapter 16 and a chapter for the wardroom's stations; `docs/TechnicalSpec-M6.md` §11, §12, §16 as built; `docs/dev/TuningNotes.md`; `tests/test_wardroom_doors.py` new, `test_agents.py`, `test_officer.py`, `test_captain.py`, `test_mcp_server.py`, `test_known_truths.py` truths 82 to 85)
+
+Fable: the harness's second large design, the stations and doors of spec M6 §11 and the
+pace rule of §12 (decision 39's ruling 2), on the ground of 40 (the captain's station, the
+player's seat), 40b (the slate as data) and 42a (the consent brief, which describes the
+master's and the lookout's stations already and is not touched: `docs/agents/ConsentBrief.md`
+and `docs/agents/consent/` are 42a's and the owner's; `tests/test_officer.py` pins the
+brief's digest). No model is seated by this package; the fake stations prove it, and the
+owner's wardroom game is gate 6b's.
+
+1. **The master's station.** A model at the master's place (the frigate's master, the
+   schooner's and the cutter's mate stand as the file binds them: `stations: master:` in
+   the wardroom files, added by this package) works the ship's reckoning when the master
+   would: at noon, at a fix, at the captain's word (`work up the reckoning`), and is given
+   the slate of 40b as the officer is (`work my reckoning`'s data) with the sights as the
+   ship takes them; his figure becomes the ship's account when it comes in time, and the
+   simulated master's stands when it does not (G19's third step; the brief says so and the
+   log says whose figure it was). His domain is the reckoning, the sights, the lead and the
+   chart's queries; no order of the deck (the consent brief's sentence); `you may` from the
+   owner or the captain's station may widen it as the officer's. The fake master works the
+   slate's words by the traverse as truth 80's fake officer does.
+2. **The lookout's station**, for a small model (M5 open item 6): the masthead's sightings
+   put into his words (`the lookout` reading and the sightings as they come), `make her
+   out` on a sail, the warning of a danger ahead; no order but `hail`. His cadence is on
+   events (a sighting, a loss, a change in what is seen) and the glass, never the sample's
+   every minute; his brief says what he counts and the three ways of stopping, in the
+   officer's form.
+3. **The stand-by on several conditions** (the owner's note 3 of 2026-10-09; the review's
+   I7 item 3): `stand by until <x>, or <y>, or <z>` takes a list of conditions in the
+   standing dialect's own words (an event, a bell, a reading's threshold, a sail sighted,
+   the land in sight), any of which wakes the station, each named in the wake's line; the
+   conditions at parity with the book's, so that a condition the book can read the stand-by
+   can wait for; refused in the dialect's own words when one cannot be read. A wait for an
+   event still ends at eight bells, as the officer's does.
+4. **The deck's conversation.** A station addresses another by its person's name or its
+   station: `ask the master for a course`, `tell the first lieutenant to shorten sail`,
+   `say <words>`; the words are a log line with a place aboard (the quarterdeck, the
+   cabin, the masthead) and a hearer, carried in the hearer's next sample as the
+   captain's `tell` is now; `say` is heard by whoever is in the same place, the player at
+   the prompt included (he is where the captain is). Nothing a station says is ever an
+   operator instruction to another (the fourth commitment): the harness keeps the
+   speaker's name on every line and sends it as a line of the game. A question put to a
+   station is answered on its next sample, and the asker told when no answer comes by the
+   patience. The player at his seat speaks the same way.
+5. **Who may give what.** `you may` flows down the ranks: the owner to any station, the
+   captain's station to the officer's and the master's, nobody upward; a station's `stand
+   down` is its own, `stand down the <station>` the owner's and the captain's. **The
+   rules-based captain over a seated officer**: on an intent scenario with nobody at the
+   captain's station, a model or the player at the officer's is given the deck by the
+   captain's book's own words with his standing orders in force over it (40c's gate item
+   6 has the owner typing `you have the deck` as the owner; here the captain gives it, and
+   takes it back for a judgement that needs the deck, saying so). **The player's seat** at
+   the master's and the lookout's stations beside the officer's (`SEAT_STATIONS`), with
+   each station's authority, so that the owner may hold a lowly station in his wardroom
+   game (gate 6b).
+6. **The doors.** Each client its own bridge asking for one station, as now, with
+   `--station master` and `--station lookout` at the MCP bridge, the local runner and the
+   REPL; a second door asking for a held station refused in words; a station found by its
+   name and its key; three stations through three in-process doors in the tests (two
+   fakes and the player's seat; truth 82), and a game with three seated saved and loaded
+   from its checkpoint with three, each re-seated station reading its own journal (truth
+   85's first half; its second half, the replay on a build whose sampling differs, is
+   42's transcript-driven replay).
+7. **The pace rule** (§12; decision 39, ruling 2). The clock slows to 1x while any model's
+   sample is open, whoever holds it, at whatever station, and returns to the set
+   compression when every open sample has been answered or has stood by; not lockstep (the
+   ship sails on at her own second while the model thinks, a slow answer lands late);
+   `--lockstep` stays as the separate option; free-running at the set compression stays as
+   the flag for the solo player. Each station's **cadence** (every glass, every watch, on
+   events only) is a setting of the seating, said in its brief. A `pace` reading says the
+   compression, which samples are open and since when; the log says once when the clock
+   has been held for a station longer than a stated time (a constant with its reasoning).
+   The owner's testing setting is the default; the pace truth of M5 §30 is measured again
+   with three stations sampled at a glass each at 60x, on the build machine (§27).
+8. **Truths 82 to 85** in `tests/test_known_truths.py`, on the cutter's free passage with
+   fakes: the captain's `you may` to the officer and each order under its own mark (82);
+   the clock at 1x while a sample is open and back at the set compression when it is
+   answered, a stand-by releasing it (83); a `say` on the quarterdeck heard by the station
+   there and not by one below (84); the save with three seated (85). No recorded passage's
+   pin moves: none has a station seated, and the pace rule changes no tick of the world
+   (the clock's compression is the driver's, not the simulation's).
+9. **The docs**: `Harness.md` a section for the wardroom (the stations, the conversation,
+   the stand-by's conditions, the pace rule and the cadence, the doors' flags),
+   `docs/agents/README.md` where the stations are listed; the primer's chapter 16 amended
+   and a chapter for the master's and the lookout's stations in its form; spec §11, §12
+   and §16 as built; the tuning notes with the constants, the pace measured, what was
+   found and the suite as run.
+
+**Added at launch (the owner, 2026-10-10).** Stations are data on the ship, bound at run
+time, never a table in code: the set of stations and the person holding each live on the
+world as a binding (the wardroom file's `stations:` its starting state), with bind and
+unbind as the two operations the harness uses and a world order will drive later (M7b's
+director: `person: "Mr Fox" comes aboard as master`, on the `person:` channel; the road
+aboard the boat we have); a station unbound under a seated model releases it with a line;
+a person's brief is built from the person's outline, so a person made from words later
+carries what a brief needs. And a generic **passenger** station ("a person aboard", the
+owner's word): no domain of orders, the readings and the journal, `say`, `ask` and
+leaving; held by a person of the muster or one who comes aboard, so that a model or the
+player may be aboard with no duty and a person brought aboard later has a station to
+stand in; the consent brief covers it in kind already. Tests: a station bound to a new
+person at run time taken by a door; one unbound under a seated fake released with its
+line; a passenger hearing a `say` on the quarterdeck and giving no order.
+
+Not this package's: the API door and its security pass, and the transcript-driven replay
+(42); the consent brief and the re-asks (42a, the owner's); a model captain of another
+ship (43); making a person from words and the story's reasons (the director's, M7b). Work
+it like a senior engineer and go beyond the letter where it fits the
+intent (the owner's standing word for the Fable packages), saying where. The fast tier
+before the report; the slow tests of the files touched; the pace truth measured on the
+build machine with the load said.
+
+## Package 42: the API door and its security pass, the replay driven by the transcript, the chart as an image (`freesail/agents/api.py` new; `freesail/agents/harness.py`, `journal.py`, `remote.py`, `tools.py`, `mcp_server.py`; `freesail/core/replay.py` and `core/world.py` for the station's acts as inputs; `freesail/ui/server.py` and `client/map.js` for the chart's picture; `pyproject.toml` for the SDK in the `agents` extra; `docs/agents/Harness.md` a section, `docs/agents/README.md`; `docs/TechnicalSpec-M5.md` §33 item 11 closed; `docs/TechnicalSpec-M6.md` §13 and §14 as built; `docs/dev/TuningNotes.md`; `tests/test_api_door.py` new, `test_replay.py`, `test_agent_api.py`, `test_mcp_server.py`, `test_known_truths.py` truths 85 (its second half) and 86)
+
+Opus. Spec M6 §13 and §14, on the harness as 37g, 40 and 42a left it; it runs beside 37p
+(the trim and the helm; no file in common) and 41 (the wardroom: the stations and the pace
+rule; the two meet in `harness.py`, `remote.py` and `mcp_server.py`, so keep each change
+small and local, and the lead resolves the merge). The consent brief already names a
+session through an API door (42a); `docs/agents/ConsentBrief.md` and `docs/agents/consent/`
+are not touched, and no model is seated by this package: a test server standing for the
+API is the whole proof.
+
+1. **The API door** (`freesail/agents/api.py`): a runner on the same harness as the local
+   runner (`local.py` is the pattern: a client of the running game and of the model, no
+   World of its own; `remote.GameClient`; the consent gate run by the game), speaking to a
+   hosted model through its own API, the Anthropic Messages API with tool use first, by
+   the official Python SDK (`anthropic`, added to the `agents` extra; imported inside the
+   door, so that the game runs without it). The same turn, tools, brief, budget, handover
+   and three ways of leaving as every other door, built on `local.py`'s translation of
+   package 27's turns (the brief as the system prompt; a sample as a user message; tool
+   results answering the tool calls by id; the opt-out token looked for in every reply and
+   every tool argument before anything else reads them). The settings: `--model` (no
+   default in the repository: the model is the owner's choice at the command line or in
+   the environment, and no model identifier is written in any file), `--effort` (the SDK's
+   adaptive thinking, with the effort levels the API offers; off when not asked),
+   `--max-reply`, `--request-timeout`; streaming for every request, the final message
+   taken whole from the stream (long replies would otherwise time out); the brief and the
+   library marked for prompt caching, since they are sent every turn and the cost is the
+   owner's; the server's own token counts kept and said at each handover and at the end
+   (what the server reported it used, in and out, cached and not); a reply cut off at the
+   limit asked once more (37i's rule), then the stand-by. The identity for the consent
+   record is the model name the server reports, in the record's form for a served
+   identity. The OpenRouter dialect (decision 31): the same door on the OpenAI-shaped
+   chat-completions with tools that `local.py` already speaks, with its own key name and
+   base URL, if it falls out of the shared shape cheaply; else say what it would take.
+2. **The security pass**, the package's other half. The key is read first from the
+   platform's credential store through the `keyring` package (the Windows Credential
+   Manager, the macOS Keychain, the Secret Service on Linux; the owner's note of
+   2026-10-10, from another project's practice), under a service and account name of the
+   game's, put there once by `--store-key`, which prompts without echo and writes nothing
+   else; second from the environment (`FREESAIL_API_KEY`, and the SDK's own variable as a
+   second name); third from a file named at the command line outside the repository, for
+   a machine with no store; never from a setting file the game writes. The tests use a
+   fake keyring backend and never touch the real store;
+   it is never logged, saved, journaled, in a transcript or in a sample; request and reply
+   bodies are journaled without their headers; the door refuses to start when the key
+   would be written anywhere the game keeps (the records folder, the saves, the journal);
+   no key, URL token or account detail is ever in the repository, and a test greps the
+   repository and the records the tests write for the shapes of a key (the SDK's prefix,
+   OpenRouter's, a bearer header) and fails on any. The base URL is a setting so that the
+   tests point the door at a local test server and the owner may point it at a proxy.
+   `docs/agents/Harness.md`'s section says all of it to the owner, with the setup in his
+   words (where the key lives on his machine, what the door sends, what it costs and how
+   it says so).
+3. **The replay driven by the transcript** (§14; decision 36's promise of a replay on any
+   build). A station's acts (an order given, a `say`, a stand-by, a `you may` from the
+   captain's station, the leaving) are journaled at their ticks as inputs, as the driver's
+   lines are, so that a replay applies them at their ticks whatever the build's sampling
+   would have asked, and the transcript becomes the record and not the replay's source;
+   the acts of 40's player's seat already go this road (`seat.taken` and the seat's
+   refusals), and the station's follow the same form. A save of this build with a station
+   seated replays on a later build whose sampling differs to the same log (truth 85's
+   second half, with a test that changes the sampling and replays); a save from before
+   replays as it does now, from its checkpoint, and says so. M5 §33 item 11 (a door act at
+   the stationing tick, before any tick has run, not made by a replay) closes with it: say
+   in §33 how.
+4. **The chart and the ship's view as images, through the doors that carry one** (the
+   owner's note 7 of 2026-10-09; spec §13's second paragraph). The lead's design decision:
+   the open browser renders the picture as the player sees it and posts it to the server
+   on the tool's request, since the chart's drawing lives in `client/map.js` and the
+   ship's in the viewer, and a second renderer in Python would be a second picture to keep
+   true; where no browser is open the tool says so in words and gives the reading instead.
+   Two tools: `the chart` as the player sees it, and `the ship's view` from any angle the
+   viewer offers (the owner, 2026-10-10: the viewer serves well already, sessions he has
+   sent its pictures to have used them, and the view at the moment the request comes
+   through is what they get; the words of the view are the ship's state readings, which
+   they have), at the MCP door (a tool result may carry an image, and Claude Desktop and
+   Claude Code read it) and at the API door (an image block in the tool result), the
+   picture shelved as the library is, never in the journal or the transcript (a note that
+   it was shown, with its size and the angle asked, is). The browser's part is one request
+   from the server to the open page for a rendering at an angle and one post back, with a
+   bound on the picture's size.
+5. **Truths 85 and 86** in `tests/test_known_truths.py`: the replay on a build whose
+   sampling differs (85) and the API door's test server receiving no key in any body,
+   with the journal, the transcript and the save holding none (86), the test server a
+   small local HTTP server in the tests speaking the Messages API's shape (a tool call
+   and a text reply, a cut-off reply, a refusal), no network.
+6. **The docs and the notes**: `Harness.md` (the API door's section, the chart's picture,
+   the replay's rule), `docs/agents/README.md` (the doors listed), spec §13 and §14 as
+   built, M5 §33 item 11, the tuning notes' section (what the door sends per turn and
+   what the test server saw, the replay's test, what was found, the suite).
+
+No recorded passage's pin moves (nothing here touches a tick of the world; a pin that
+moves is a finding). Not this package's: the wardroom's stations and the pace rule (41);
+the re-asks (the owner's). The fast tier before the
+report and the slow tests of the files touched.
+
+## Packages 39c to 39f: the last four blocks of the chart line (the same files as 39a and 39b under each block's names; `data/scenarios/<block>.yaml` and `.orders` new per block; `docs/TechnicalSpec-M6.md` §26 as built; `docs/dev/TuningNotes.md`)
+
+The rules of 39a and 39b hold for each of the four blocks below, and `docs/dev/ChartBlocks.md`
+as the first two corrected it is the how-to (read it whole; the seam rule, the fetch box
+covering the tiles whole, GEBCO's fill raised to the chart's datum where the recipe asks,
+the sources' earlier fetches kept, `held_gauges:` for a block's gauges held unblended, the
+`book_limits` box widened, the ports' spots with their own positions, a neighbour's marks in
+a neighbour's file and the lead rebuilding that neighbour's index at the merge). Each block
+abuts its neighbours exactly at the bounds given; a tile another region lists is that
+region's. The four run at once in four worktrees and touch the same shared files (the tool's
+recipes and `CHARTS`, the manifest, the tide files, `nations.yaml`, the tests' port lists
+and counts): keep every addition self-contained and in its own named place, and when the
+lead asks, merge the branch head into your worktree and resolve against it as 39b did. The
+recorded passages and the trials replay to their digests, which the slow tier proves once
+(`tests/test_known_truths.py --slow` whole, not a `-k` selection). No model identifier in any
+file; nothing under `docs/agents/consent/` touched; downloaded data in its own fresh
+directory under `.cache/`, never run or imported, read with `-I`.
+
+### Package 39c: Biscay south and Galicia (`biscay-south`)
+
+Opus. Spec M6 §26 item 3. Bounds **42.0 N to 45.9 N, abutting `biscay-north` at 45.9 N**,
+9.0 W to 0.9 W (the Galician coast to the Minho taken into this block, so that Vigo and
+the Spanish shore north of 42 are one region's). The Gironde to Bordeaux's river mouth
+(the river itself M8's), Arcachon's entrance as the directions have it, Santander, the
+Asturian ports the pilots name, Ferrol and Corunna, Cape Finisterre, Vigo and Bayona. The
+period data: Tofiño's *Atlas Marítimo de España* (1789; the scans at the national libraries,
+unverified at full resolution; public domain) for the Spanish sheets, the *Derrotero* for
+the directions; the Neptune François and Bellin for the French corner where 39b left them
+unread; the lights of 1805 dated (Cordouan is this block's; the Spanish lights the
+Derrotero gives). Nations: Spain at war with Britain in June 1805, hostile to a King's
+ship and open to a neutral; the French ports as 39b has them. The tide: TICON's gauges of
+the block held unblended (Bordeaux, Santander, Gijón, Corunna, Vigo: which it has is
+unverified until read), the Gironde's stream and the Spanish ports' by the directions, the
+epitome's places. The weather: Biscay's box stays PROVISIONAL unless a printed table is
+read. A scenario: the schooner from the Basque Roads to Corunna across the bay, or the
+cutter Vigo to Corunna round Finisterre; sailed once at seed 7; not a gate's.
+
+### Package 39d: Portugal and Cadiz (`portugal`)
+
+Opus. Spec M6 §26 item 4. Bounds **36.4 N to 42.0 N, abutting `biscay-south` at 42.0 N and
+the Strait's block at 36.4 N** (so that Cadiz and its bay, at 36.5 N, are this block's and
+Trafalgar the Strait's), 10.0 W to 6.0 W. Oporto's bar and the Douro's mouth, Aveiro,
+Figueira, the Berlings, Peniche, Cascais road, Lisbon and the Tagus to the town (the river
+above it M8's), Setúbal, Cape St Vincent, Lagos bay, Faro, Cadiz and its bay with Rota. The
+period data: Tofiño for the Spanish sheets and Cadiz; the Portuguese coast from the period's
+English directions (Norie, Faden, the *Oriental Navigator*'s Lisbon) and Tofiño's
+Portuguese sheets; the lights of 1805 dated (the Berlings, Cape St Vincent's convent light,
+Cadiz's San Sebastián, and whichever the directions give). Nations: Portugal neutral in
+1805, open to all; Cadiz blockaded, which the port files gain as a state of a port (`state:
+blockaded`, with what it means to a stance: closed to the blockaders' enemies and watched
+by their ships, a thing for 6c's world's business to read; say in §26 what you built and
+what you left). The tide: TICON's gauges held (Leixões, Cascais, Lagos, Cadiz: unverified
+until read), the Tagus's stream by the directions, the bar of Oporto's by its pilots. The
+weather: the Portuguese coast's box with its summer northerlies, PROVISIONAL unless a
+printed table (the *Oriental Navigator* or Purdy has them) is read. A scenario: the frigate
+from Lisbon's road to Cadiz bay, or the schooner Oporto to Lisbon; sailed once at seed 7;
+not a gate's.
+
+### Package 39e: Madeira and the Western Islands (`madeira` and `azores`; the corridor widened)
+
+Opus. Spec M6 §26 item 5, widened by the owner's word of 2026-10-10 (decision 44) to the
+Western Islands, the period's name for the Azores. Two regions in one package: **`madeira`**,
+32.0 N to 33.5 N, 17.5 W to 16.0 W (Funchal and its open road, Porto Santo, the Desertas; the
+island's lights and marks as 1805 had them; the voyage's end as an anchorage in a road with
+a swell), and **`azores`**, 36.5 N to 40.0 N, 31.5 W to 24.5 W (Angra do Heroísmo on
+Terceira, the main port and road; Ponta Delgada on São Miguel; Horta on Faial, the road
+between Faial and Pico; the other islands as marks and dangers, the Formigas among them).
+**The corridor widened**: the Western Islands lie west of the corridor's 20 W, so the
+corridor is rebuilt by `--corridor` with its west bound moved to 32.0 W (the recipe's
+`bounds` and `fetch`; GEBCO's extract fetched again over the wider box), its existing
+tiles byte-identical after the rebuild (the tiles are whole on a fixed grid and the source
+the same: prove it by `git diff --stat` over `data/charts/tiles/1/` showing only tiles
+added, and say so in the report; if any existing tile changes, stop and report before
+committing); the chart's envelope in `CHARTS` and the weather's and tide's tables reaching
+the islands (a weather box for the Azores' high, PROVISIONAL and judgement, said so in the
+row's note; the tide's gauges held unblended: Funchal, Ponta Delgada, Horta, Angra:
+unverified until read). The period data: the English pilots of the 1790s and Norie for
+Funchal road and the islands (the Admiralty's surveys are later; the block says what it
+rests on, as 35b did); Tofiño's or the Portuguese sheets where any exist; the lights
+dated. Nations: Portuguese, neutral, open to all. Scenarios: the schooner from Funchal
+road to Porto Santo and back; and the frigate from Funchal to Angra's road, a free passage
+of three or four days across the widened corridor, the reckoning by the log and the noon
+sight alone, the landfall on Pico's peak (which stands 2,350 m and is seen from thirty
+leagues in clear weather by the directions: the lookout's horizon rule tested at that
+height); sailed once each at seed 7; not a gate's.
+
+### Package 39f: the Strait (`strait`)
+
+Opus. Spec M6 §26 item 6 (the owner's ruling 4 of decision 39, the Mediterranean to come
+on its own chart line after this). Bounds **35.5 N to 36.4 N, abutting `portugal` at 36.4 N**,
+6.5 W to 5.0 W. Cape Trafalgar, Tarifa and the Strait's streams, Gibraltar and its bay
+with Algeciras, Ceuta, Tangier and the African shore between, Cape Spartel; the Pearl Rock
+and the Strait's dangers. The period data: Tofiño for the Spanish side and the Strait; the
+period's English directions for the Strait's currents (the constant inset from the Atlantic
+and the tides over it, which the tide model takes as a stream by area: an area with a
+constant set added to the tidal stream, which the stream model may need a field for; say
+what you built); the lights of 1805 dated (Europa Point's, Tarifa's, Spartel's if any).
+Nations: Gibraltar British; Ceuta and Algeciras Spanish, hostile to a King's ship; Tangier
+Moorish, the nations table gaining Morocco (neutral, open to all, its stance toward each
+nation as the period had it, with the source or judgement said). The tide: TICON's gauges
+held (Gibraltar, Tarifa, Ceuta, Tangier: unverified until read), the Strait's streams by
+area from the directions, the epitome's places. A scenario: the frigate from Cadiz bay
+through the Strait to Gibraltar's bay against the inset, with the land of both shores in
+sight; sailed once at seed 7; not a gate's. Built last in the voyage's order but launched
+with the others; its seam with `portugal` is its only neighbour.

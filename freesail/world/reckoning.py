@@ -566,6 +566,16 @@ LUNAR_TAKEN_KIND = "lunar.taken"
 # hour before the sun's noon (`sights.SIGHT_ON_DECK_MINUTES`).
 DAYS_WORK_MINUTES = 30
 
+# The master's station's working (spec M6 §11; package 41; G19's third step): when the
+# ship's own master works the reckoning (at noon, at a fix by cross bearings, at the
+# captain's word), a model or the player at the master's station is given the slate and
+# this long to give his figure, which is then the ship's account; past it the ship's own
+# master's figure stands and the log says so. The day's work itself: the time the master
+# is below working the traverse and the sight (`DAYS_WORK_MINUTES`), which is the
+# period's own measure of how long the working takes, so a figure within it comes "in
+# time" and one after it is the station's own reckoning beside the master's (judgement).
+MASTER_WORKING_S = DAYS_WORK_MINUTES * 60
+
 # The track by account kept for the chart: the last so many hourly positions (judgement:
 # a week of hourly steps, so a long passage's snapshot stays small).
 TRACK_KEPT = 168
@@ -1960,7 +1970,12 @@ def master_of(ship: Any) -> Master:
 # Package 40b: the line after the noon's that says a station's own reckoning beside the
 # master's, and the station names an own reckoning is kept under.
 OWN_NOON_KIND = "reckoning.own_noon"
-OWN_STATIONS = ("officer of the watch", "captain")
+OWN_STATIONS = ("officer of the watch", "captain", "master")
+
+# The master's station's working (package 41): the line that opens it, and the line that
+# closes it unanswered.
+MASTER_WORKING_KIND = "reckoning.master_working"
+MASTER_STOOD_KIND = "reckoning.master_stood"
 
 LOG_HOVE_KIND = "log.hove"
 LEAD_HOVE_KIND = "lead.hove"
@@ -2022,6 +2037,11 @@ class Navigation:
     # lines for them that wait for the next tick after a noon by order
     own: dict[str, dict[str, Any]] | None = None
     _own_pending: list[tuple[str, dict[str, Any]]] | None = None
+    # package 41: the master's station's working, open while the station may give the
+    # ship's account ({what, tick, until, lat_deg, lon_deg}; None otherwise), and one
+    # waiting to be opened at the next tick, after the order's own line
+    master_working: dict[str, Any] | None = None
+    _working_pending: str | None = None
 
     def __init__(self, world: Any, stream: random.Random):
         self.world = world
@@ -2119,6 +2139,12 @@ class Navigation:
             for text, data in self._own_pending:
                 world.record(Severity.NOTABLE, OWN_NOON_KIND, text, data=data)
             self._own_pending = None
+        if self._working_pending is not None:
+            # the master's station's working after a noon, a fix or a work-up by order
+            # (package 41): opened after the order's own line
+            what, self._working_pending = self._working_pending, None
+            self._open_working(what)
+        self._tick_working()
         if self._lunar_pending is not None and world.clock.tick >= self._lunar_pending[0]:
             self._lunar_cleared()
         line = self.master.tick(world.clock.tick)
@@ -3528,6 +3554,8 @@ class Navigation:
             poorer = ", the fix the poorer figure" if obs.poorer or obs.repeat else ""
             tail = f"{_head(by_fix)}{poorer}; the account kept, {within}."
         text = f"Fixed by cross bearings: {bore}; {met}. {tail}"
+        # a fix is a working for the master's station too (package 41)
+        self._working_pending = "a fix by cross bearings"
         data = {
             "marks": [
                 {
@@ -3775,10 +3803,13 @@ class Navigation:
             world.record(Severity.NOTABLE, "reckoning.noon", text, data=data)
             for own_text, own_data in owns:
                 world.record(Severity.NOTABLE, OWN_NOON_KIND, own_text, data=own_data)
+            # the master's station's working (package 41), in the noon's own tick
+            self._open_working("the noon")
         else:
             # the noon by order: its line is the order's result, written after this
             # returns, so the officers' lines follow it at the next tick
             self._own_pending = owns
+            self._working_pending = "the noon"
         return text, data
 
     def work_up(self) -> tuple[str, dict[str, Any]]:
@@ -3802,6 +3833,164 @@ class Navigation:
             "ellipse": r.ellipse(),
             "run_since_noon_nm": round(run, 1),
             "tide": tide,
+        }
+        # the captain's word is a working for the master's station too (package 41)
+        self._working_pending = "the reckoning worked up at the captain's word"
+        return text, data
+
+    # -- the master's station's working (package 41; spec M6 §11) ------------------------
+
+    def _master_station(self) -> Any:
+        """Who holds the master's station now, a model's harness or the player's seat,
+        able to give a figure (not released, not paused); None otherwise."""
+        world = self.world
+        held = (getattr(world, "agents", None) or {}).get("master")
+        if held is None:
+            seat = getattr(world, "player_seat", None)
+            if seat is not None and seat.station.name == "master":
+                held = seat
+        if held is None or not getattr(held, "started", True):
+            return None
+        a = held.agent
+        if a.released or a.paused:
+            return None
+        return held
+
+    def _open_working(self, what: str) -> None:
+        """The master's station given the slate to work the reckoning (package 41): a
+        working is open for `MASTER_WORKING_S` from now, said in the log, and a figure
+        within it is the ship's account. Nothing is opened, and nothing said, when nobody
+        holds the station: a passage with no master seated keeps its log."""
+        held = self._master_station()
+        if held is None:
+            return
+        world = self.world
+        tick = world.clock.tick
+        pos = self.account_now()
+        until = tick + MASTER_WORKING_S
+        self.master_working = {
+            "what": what,
+            "tick": tick,
+            "until": until,
+            "lat_deg": pos.lat_deg,
+            "lon_deg": pos.lon_deg,
+            "told": False,
+        }
+        who = held.station.person or "the master's station"
+        world.record(
+            Severity.ROUTINE,
+            MASTER_WORKING_KIND,
+            f"The master's station ({who}) has the slate to work {what}; a figure within "
+            f"{MASTER_WORKING_S // 60} minutes, by {self._time_words(until)}, is the ship's "
+            "account.",
+            data={"what": what, "until": until, "station": "master"},
+        )
+
+    def _tick_working(self) -> None:
+        """A working left unanswered past its time (package 41): the ship's own master's
+        figure stands, said in the log, and the working closes."""
+        w = self.master_working
+        if w is None:
+            return
+        world = self.world
+        tick = world.clock.tick
+        held = self._master_station()
+        if held is not None and tick < int(w["until"]):
+            return
+        self.master_working = None
+        why = (
+            "nobody held the station to give one"
+            if held is None
+            else f"none came within {MASTER_WORKING_S // 60} minutes"
+        )
+        world.record(
+            Severity.ROUTINE,
+            MASTER_STOOD_KIND,
+            f"No figure came from the master's station for {w['what']} ({why}); the ship's "
+            f"master's account stands: {format_position(self.account_now())}.",
+            data={"what": w["what"], "station": "master", "why": why},
+        )
+
+    def working_notice(self) -> str | None:
+        """What the master's station is told once while a working is open (package 41):
+        the slate's words with the sight the ship took, and by when a figure is wanted.
+        None when no working is open or it has been told already."""
+        w = self.master_working
+        if w is None or w.get("told"):
+            return None
+        w["told"] = True
+        words, _data = self.slate()
+        sight = ""
+        if self.last_sight is not None and self.sight_day == self.world.clock.ship_time.date():
+            sight = (
+                f" The noon's observation as the ship took it: latitude {self.last_sight.words}."
+            )
+        return (
+            f"The reckoning is to be worked, {w['what']}, as of {self._time_words(w['tick'])}: "
+            f"work the slate and give your figure for that moment with 'my reckoning is "
+            f"<position>' by {self._time_words(int(w['until']))} ({MASTER_WORKING_S // 60} "
+            f"minutes); it is then the ship's account, and the log says it was yours; past "
+            f"that time the ship's master's figure stands. {words}{sight}"
+        )
+
+    def _adopt_master_figure(
+        self, pos: Position, actor: str, holder: Any
+    ) -> tuple[str, dict[str, Any]]:
+        """The master's station's figure made the ship's account (package 41): given for
+        the working's moment, it is carried on by what the account has run since, the
+        doubt kept as the ship's master had it (a figure worked from the same boards
+        has the same doubt), the slate begun again at it, and the line says whose figure
+        it was and how far from the ship's master's it lay."""
+        from freesail.world.geo import distance_words
+
+        w = self.master_working
+        assert w is not None
+        world = self.world
+        tick = world.clock.tick
+        r = self.reckoning
+        self.bring_up()
+        had = Position(float(w["lat_deg"]), float(w["lon_deg"]))
+        de, dn = _offset_from(had.lat_deg, had.lon_deg, pos)
+        moved = _displaced(r.position, de, dn)
+        r.lat_deg, r.lon_deg = moved.lat_deg, moved.lon_deg
+        r.track.append((tick, r.lat_deg, r.lon_deg))
+        r.begin_slate(tick, "the master's station's figure")
+        self._moved()
+        self.master_working = None
+        who = self._station_person("master")
+        through = ""
+        if getattr(holder, "model_name", ""):
+            from freesail.agents.agent import door_words
+
+            through = f" ({holder.model_name}, through {door_words(holder.door)})"
+        nm = math.hypot(de, dn)
+        apart = (
+            "on the ship's master's own figure"
+            if nm < OBSERVATION_KEPT_NM
+            else (
+                f"{distance_words(nm * units.NAUTICAL_MILE)} "
+                f"{units.point_name(math.atan2(de, dn))} of the ship's master's "
+                f"{format_position(had)}"
+            )
+        )
+        text = (
+            f"The master's figure is the ship's account: {format_position(pos)} as of "
+            f"{self._time_words(int(w['tick']))} for {w['what']}, {apart}; worked at the "
+            f"master's station by {who}{through}, and the account runs on from it."
+        )
+        data = {
+            "own": {
+                "station": "master",
+                "who": who,
+                "tick": tick,
+                "lat_deg": pos.lat_deg,
+                "lon_deg": pos.lon_deg,
+            },
+            "adopted": True,
+            "what": w["what"],
+            "from_master_nm": round(nm, 2),
+            "reckoning": r.words,
+            "notable": True,
         }
         return text, data
 
@@ -3980,6 +4169,12 @@ class Navigation:
         save; given again, it is replaced; forgotten when the holder who gave it leaves
         the station (`_owns`). `actor` is the order's, which says who that holder is."""
         r = self.reckoning
+        if station == "master" and self.master_working is not None:
+            # the master's station's figure within a working (package 41): the ship's
+            # account, and not a reckoning kept beside it
+            holder = self._master_station()
+            if holder is not None and self.world.clock.tick <= int(self.master_working["until"]):
+                return self._adopt_master_figure(pos, actor, holder)
         account = self.account_now()
         hand_e, hand_n = r.offset_nm(account)
         own = {

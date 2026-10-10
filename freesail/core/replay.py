@@ -51,6 +51,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from freesail.core import acts as acts_mod
 from freesail.core.world import SAVE_FORMAT, Scenario, World, build_stamp, build_words
 
 ShipFactory = Callable[[dict[str, Any], Scenario], Any]
@@ -87,8 +88,39 @@ def load_file(path: str | Path) -> dict[str, Any]:
     return data
 
 
-def build_world(data: dict[str, Any], ship_factory: ShipFactory | None = None) -> World:
-    """Construct the world at tick 0 from a save, without running it."""
+# The two roads of a replay with a station aboard (package 42): by its transcript, its
+# replies handed back where the replaying build's sampling opens its turns (a save of this
+# build: the station's conversation is rebuilt with the game), or by its acts, each given
+# at its tick after its count of inputs whatever the sampling (`core.acts`).
+BY_TRANSCRIPT, BY_ACTS = "transcript", "acts"
+
+
+def acts_whole(data: dict[str, Any]) -> bool:
+    """Whether every station of a save has its acts in it, from before it started
+    (package 42), so that it may be replayed by them."""
+    agents = data.get("agents") or []
+    return "station_acts" in data and all(bool(a.get("acts")) for a in agents)
+
+
+def road_of(data: dict[str, Any], road: str | None = None) -> str:
+    """The road a replay of the save takes: as asked; else by its transcript when the
+    save is this build's own game, or when its stations' acts are not whole in it; by its
+    acts otherwise (another build's game with its stations' acts in it)."""
+    if road in (BY_TRANSCRIPT, BY_ACTS):
+        if road == BY_ACTS and data.get("agents") and not acts_whole(data):
+            raise ValueError("this save's stations' acts are not in it (a save from before 42)")
+        return road
+    if not data.get("agents") or not acts_whole(data):
+        return BY_TRANSCRIPT
+    own = same_build(stamp_of(data)) and all(same_build(b) for b in played_under(data))
+    return BY_TRANSCRIPT if own else BY_ACTS
+
+
+def build_world(
+    data: dict[str, Any], ship_factory: ShipFactory | None = None, road: str = BY_TRANSCRIPT
+) -> World:
+    """Construct the world at tick 0 from a save, without running it. By its acts, the
+    stations are built where their `seated` acts stand, not here."""
     scenario = Scenario.from_dict(data["scenario"])
     ship = ship_factory(data["ship_ref"], scenario) if ship_factory else None
     world = World(seed=data["seed"], scenario=scenario, ship=ship)
@@ -97,7 +129,7 @@ def build_world(data: dict[str, Any], ship_factory: ShipFactory | None = None) -
     on_world = (getattr(ship, "extra", None) or {}).pop("on_world", None)
     if on_world is not None:
         on_world(world)
-    if data.get("agents"):
+    if data.get("agents") and road == BY_TRANSCRIPT:
         # the agents at their stations (spec M4 §11): each is stationed when the replay
         # reaches its tick and its recorded replies are played back, so the log is the same
         from freesail.agents.harness import restore
@@ -110,15 +142,39 @@ def replay(
     data: dict[str, Any],
     ship_factory: ShipFactory | None = None,
     until_tick: int | None = None,
+    road: str | None = None,
 ) -> World:
     """Rebuild a world and run it to `until_tick` (default: the save's end tick),
-    re-submitting journaled orders at their ticks."""
-    world = build_world(data, ship_factory)
+    re-submitting journaled orders at their ticks. A save with a station aboard replays
+    by the road `road_of` gives (package 42): by its transcript, or by its stations' acts,
+    each given at its tick after as many inputs as came before it in play."""
+    road = road_of(data, road)
+    world = build_world(data, ship_factory, road)
     end = data["end_tick"] if until_tick is None else min(until_tick, data["end_tick"])
     inputs = data.get("inputs")
     if inputs is None:
         inputs = [{"tick": t, "actor": a, "order": o} for t, a, o in data["journal"]]
+    station_acts = list(data.get("station_acts") or []) if road == BY_ACTS else []
     i = 0
+    j = 0
+
+    def give_acts(within: tuple[int, str] | None = None) -> None:
+        # the stations' acts due here: of this tick, after as many inputs as are given;
+        # `within`, the acts of a station made inside the input about to be given
+        nonlocal j
+        upto = i if within is None else within[0]
+        while (
+            j < len(station_acts)
+            and int(station_acts[j]["tick"]) <= world.clock.tick
+            and int(station_acts[j].get("after_inputs") or 0) <= upto
+            and (within is None or station_acts[j].get("station") == within[1])
+        ):
+            act = station_acts[j]
+            acts_mod.give(world, act, lambda seated: driven_station(world, seated))
+            if world.station_acts is not None:
+                world.station_acts.append(dict(act))  # the record, kept for a save of it
+            j += 1
+
     while True:
         # between two ticks, before this tick's inputs: a station's acts from outside the
         # loop are made here and after an input, where a door made them in play, and never
@@ -126,17 +182,41 @@ def replay(
         # when a standing order's firing inside the tick made the door's stand-down early)
         for agent in list(world.agents.values()):
             agent.on_between_ticks()
+        give_acts()
         while i < len(inputs) and int(inputs[i]["tick"]) == world.clock.tick:
+            unbinding = (inputs[i].get("binding") or {}).get("op") == "unbind"
+            if unbinding and station_acts:
+                # a station stood down by its unbinding: its acts inside the input come
+                # where they came, before the binding's own line (package 42)
+                give_acts(within=(i + 1, str(inputs[i]["binding"]["name"])))
             _give(world, inputs[i])
             i += 1
             # a station seated after this input, whatever it was (package 37d: a driver's
             # line and a refused order are inputs and no orders), is seated here
             for agent in list(world.agents.values()):
                 agent.on_input()
+            give_acts()
         if world.clock.tick >= end:
             break
         world.tick()
+    if road == BY_ACTS:
+        # the stations take up the game where the replay leaves them, their record the
+        # save's transcript as far as the replay went
+        records = {str((r.get("station") or {}).get("name")): r for r in data.get("agents") or []}
+        for name, h in world.agents.items():
+            kept = [
+                e
+                for e in (records.get(name) or {}).get("transcript") or []
+                if int(e.get("tick") or 0) <= world.clock.tick
+            ]
+            h.take_up_after_replay(kept)
     return world
+
+
+def driven_station(world: World, seated: dict[str, Any]) -> Any:
+    from freesail.agents.harness import driven_station as build
+
+    return build(world, seated)
 
 
 def _give(world: World, entry: dict[str, Any]) -> None:
@@ -147,6 +227,18 @@ def _give(world: World, entry: dict[str, Any]) -> None:
         return
     if "world_order" in entry:
         world.world_order(str(entry["world_order"]), source=str(entry.get("source", "")))
+        return
+    if "binding" in entry:
+        # a station bound or unbound (package 41), an input since package 42
+        b = entry["binding"]
+        stations = getattr(world, "stations", None)
+        if stations is not None:
+            if b.get("op") == "unbind":
+                stations.unbind(str(b["name"]), str(b.get("why") or ""), quiet=True)
+            else:
+                stations.bind(
+                    str(b["name"]), b.get("person") or None, b.get("kind") or None, quiet=True
+                )
         return
     line = entry["line"]
     world.record_driver(line["severity"], line["kind"], line["text"], line.get("data"))
@@ -187,6 +279,7 @@ class _Pickler(pickle.Pickler):
             state["_readings_view"] = None
             state["_readings_key"] = None
             state.pop("load_report", None)  # how this run was loaded is not the game's state
+            state["_acts_frames"] = []  # the stations acting now (package 42), none at rest
             return _new, (cls,), state
         if name == "freesail.core.events.Log":
             state = dict(obj.__dict__)
@@ -315,6 +408,11 @@ def read_checkpoint(path: str | Path) -> tuple[dict[str, Any], World]:
 def _rebind(world: World) -> None:
     # the builds the game has been played under (package 37d): this one joins them when it
     # takes the game up; a checkpoint from before the stamp has none, and begins with None
+    if getattr(world, "station_acts", None) is None:
+        # a checkpoint from before package 42: its stations' acts are in no list, and a
+        # station seated from here on journals its own
+        world.station_acts = []
+        world._acts_frames = []
     lineage = [None] if world.played_under is None else list(world.played_under)
     here = build_stamp()
     if not lineage or lineage[-1] != here:
@@ -405,6 +503,7 @@ class LoadReport:
     checkpoint: str = ""
     transcripts: dict[str, int] = field(default_factory=dict)
     anyway: bool = False
+    road: str = BY_TRANSCRIPT  # how a replay gives a station's part back (package 42)
     words: list[str] = field(default_factory=list)
 
 
@@ -488,10 +587,23 @@ def check_replay(
         ]
         return report
     held = _transcript_words(report.transcripts)
+    if acts_whole(data):
+        # its stations' acts are inputs (package 42, spec M6 §14): replayed by them, each
+        # at its tick whatever this build's sampling would ask
+        report.road = BY_ACTS
+        report.words = [
+            wrote,
+            f"It was replayed by its stations' acts, since {why}: {held} is the record, and "
+            "every act of the station is given again at its tick, after the inputs that came "
+            "before it, whatever this build's sampling would ask. The log may differ from the "
+            "one that was watched only where this build's rules differ.",
+        ]
+        return report
     differs = (
         f"It holds {held}, and a replay under this build's rules would not be the game that "
         "was played: a station's orders are not in the journal, and its recorded replies are "
-        "handed back wherever today's rules open a sample."
+        "handed back wherever today's rules open a sample (a save from before package 42, "
+        "whose stations' acts are not inputs)."
     )
     if replay_anyway:
         report.words = [
@@ -563,12 +675,16 @@ def load_report(
                     ]
                 return world, report
     report = check_replay(data, path, replay_anyway, why)
-    world = replay(data, ship_factory)
+    world = replay(data, ship_factory, road=report.road)
     # the player's pencil on the chart (package 37n): a replay makes none of it, and a
     # load gives the save's back as the save has it, so that a game loaded at the console
     # and saved again keeps it; the browser's server reads and cleans it for the chart
     # (`ui.server.take_marks`)
     world.chart_marks = [dict(m) for m in data.get("chart_marks") or [] if isinstance(m, dict)]
+    # the stations bound and unbound by hand (package 41): a replay re-makes none of it
+    # (the world order that will drive it is M7b's), so a load gives the save's back
+    if hasattr(world, "stations"):
+        world.stations.load(data.get("stations"))
     return world, report
 
 

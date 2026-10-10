@@ -35,14 +35,19 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from freesail.agents.agent import (
+    CAPTAIN,
+    LOOKOUT,
+    MASTER,
     OFFICER,
+    PASSENGER,
     RELEASED,
     SESSION_PLAY,
+    STATION_FACTORIES,
     STOOD_DOWN,
     AgentState,
     domain_of,
     door_words,
-    officer,
+    station_name,
 )
 from freesail.agents.harness import Harness
 from freesail.agents.journal import Journal
@@ -64,10 +69,43 @@ __all__ = [
     "seat_words",
 ]
 
-# The stations the player may be seated at from a driver's flag: those with authority
+# The stations the player may be seated at from a driver's flag: those with a domain
 # below the captain's (the captain's is the player's own surface at the prompt, and the
-# watcher's has no orders to judge). The flag's word, to the station's name.
-SEAT_STATIONS: dict[str, str] = {"officer": OFFICER, OFFICER: OFFICER}
+# watcher's has no orders to judge): the officer's, and since package 41 the master's,
+# the lookout's and a passenger's. The flag's word, to the station's name; a station
+# bound by hand under another name is found by the world's binding (`seat_station`).
+SEAT_STATIONS: dict[str, str] = {
+    "officer": OFFICER,
+    OFFICER: OFFICER,
+    "master": MASTER,
+    "lookout": LOOKOUT,
+    "masthead": LOOKOUT,
+    "passenger": PASSENGER,
+}
+# The kinds the player is not seated at.
+NOT_A_SEAT: tuple[str, ...] = (CAPTAIN, "watcher")
+
+
+def seat_station(world: Any, station: str) -> tuple[str, Any]:
+    """The station's name and its factory for a seat (package 41): by the flag's word, or
+    by any station the world's binding has, whose kind is one with a domain below the
+    captain's. Refused in words otherwise."""
+    key = station_name(" ".join(str(station).lower().split()))
+    name = SEAT_STATIONS.get(key, key)
+    stations = getattr(world, "stations", None)
+    kind = stations.kind_of(name) if stations is not None else name
+    if kind is None or kind in NOT_A_SEAT or kind not in STATION_FACTORIES:
+        aboard = (
+            [n for n in stations.names() if stations.kind_of(n) not in NOT_A_SEAT]
+            if stations is not None
+            else sorted(set(SEAT_STATIONS.values()))
+        )
+        raise OrderError(
+            f"The player is not seated at the {station}: a seat is a station with a domain "
+            f"below the captain's ({', '.join(aboard)})."
+        )
+    return name, STATION_FACTORIES[kind]
+
 
 # The driver's line that seats the player (an input: a replay seats him again at it).
 SEAT_KIND = "seat.taken"
@@ -103,12 +141,7 @@ class PlayerSeat:
     _deck_was: Any = None  # the harness's field the borrowed methods write
 
     def __init__(self, world: World, station: str = OFFICER, door: str = "console"):
-        name = SEAT_STATIONS.get(" ".join(str(station).lower().split()))
-        if name is None:
-            raise OrderError(
-                f"The player is not seated at the {station}: a seat is a station with "
-                f"authority below the captain's ({', '.join(sorted(set(SEAT_STATIONS.values())))})."
-            )
+        name, make = seat_station(world, station)
         held = world.agents.get(name)
         if held is not None and not held.agent.released:
             raise OrderError(
@@ -119,7 +152,12 @@ class PlayerSeat:
         if old is not None and not old.agent.released:
             raise OrderError(f"The player is seated already, at the {old.station.name}'s station.")
         self.world = world
-        self.station = officer(world=world)  # the one seat there is; a list grows here
+        self.station = make(world=world)
+        if self.station.name != name:
+            # a station bound by hand under its own name (package 41)
+            import dataclasses
+
+            self.station = dataclasses.replace(self.station, name=name)
         self.agent = AgentState(self.station, session_kind=SESSION_PLAY)
         self.agent.stationed_tick = world.clock.tick
         self.agent.last_heard_tick = world.clock.tick
@@ -158,11 +196,32 @@ class PlayerSeat:
     def _is_captains(self) -> bool:
         return False
 
+    @property
+    def _wants_deck(self) -> bool:
+        domain = self.domain
+        return domain is None or bool(getattr(domain, "deck", True))
+
+    @property
+    def who_words(self) -> str:
+        person = self.station.person
+        name = self.station.name
+        if person in ("", f"the {name}", "a person aboard"):
+            return f"the {name}"
+        return f"the {name} ({person})"
+
     def _sync_captain(self) -> None:
         return None
 
     def note(self, text: str, kind: str = "note") -> Any:
         return self.journal.append(self.world, text, kind=kind, by=self.model_name)
+
+    def hear(self, line: str) -> None:
+        """What was said within the seat's hearing (package 41): the player reads the log,
+        so it is kept with what he was told and journaled, for the reading."""
+        if self.agent.released:
+            return
+        self.agent.heard.append(line)
+        self.note(f"Heard: {line}", kind="agent.heard")
 
     # the harness's deck and grants, whole (package 37g): the same rules, the same lines
     give_deck = Harness.give_deck
@@ -177,9 +236,16 @@ class PlayerSeat:
 
     # -- the captain's word to the seat ------------------------------------------------
 
-    def put_word(self, words: str, by: str = "", officer: str = "the captain") -> str:
+    def put_word(
+        self,
+        words: str,
+        by: str = "",
+        officer: str = "the captain",
+        speaker: dict[str, str] | None = None,
+    ) -> str:
         """`tell the officer ...`: the words are the player's to read in the log; kept
-        with what he was told, as the reading says them."""
+        with what he was told, as the reading says them. `speaker` (package 41) is
+        another station telling him."""
         a = self.agent
         words = " ".join(str(words).split())
         if not words:
@@ -188,15 +254,27 @@ class PlayerSeat:
             raise OrderError(
                 f"There is no {self.station.name} at the station now; {a.released_reason}."
             )
+        if speaker is not None:
+            who = f"{speaker['words'][:1].upper()}{speaker['words'][1:]}"
+            a.told.append(f"{who}, {speaker['place']}: {words}")
+            self.note(f"Told by {speaker['words']}: {words}", kind="agent.told")
+            return f"{who}, {speaker['place']}, to the {self.station.name}: {words}"
         a.told.append(words)
         self.note(f"Told by {by or officer}: {words}", kind="agent.told")
         if by:
             return f"By {by}: {officer} to the {self.station.name}: {words}"
         return f"The captain to the {self.station.name}: {words}"
 
-    def put_question(self, question: str, by: str = "", officer: str = "the captain") -> str:
+    def put_question(
+        self,
+        question: str,
+        by: str = "",
+        officer: str = "the captain",
+        speaker: dict[str, str] | None = None,
+    ) -> str:
         """`ask the officer ...`: the question stands at the prompt until the player
-        answers it ('answer <words>')."""
+        answers it ('answer <words>'). `speaker` (package 41) is another station
+        asking: the answer goes back to it."""
         a = self.agent
         question = " ".join(question.split()).rstrip("?")
         if not question:
@@ -206,8 +284,18 @@ class PlayerSeat:
                 f"There is no {self.station.name} at the station now; {a.released_reason}."
             )
         a.question = question
-        self.note(f"Asked by {by or officer}: {question}?", kind="agent.asked")
+        a.question_by = speaker["station"] if speaker else ""
         tail = " (the player answers at the prompt: 'answer <words>')"
+        if speaker is not None:
+            from freesail.agents.harness import holder_of
+
+            asker = holder_of(self.world, speaker["station"])
+            if asker is not None:
+                asker.agent.asked.append((self.station.name, question, self.world.clock.tick))
+            who = f"{speaker['words'][:1].upper()}{speaker['words'][1:]}"
+            self.note(f"Asked by {speaker['words']}: {question}?", kind="agent.asked")
+            return f"{who}, {speaker['place']}, asks the {self.station.name}: {question}?{tail}"
+        self.note(f"Asked by {by or officer}: {question}?", kind="agent.asked")
         if by:
             return f"By {by}: {officer} asks the {self.station.name}: {question}?{tail}"
         return f"Asked the {self.station.name}: {question}?{tail}"
@@ -222,11 +310,10 @@ class PlayerSeat:
         asked = a.question
         head = f"The {self.station.name} answers"
         words = f"{head} ({asked}?): {text}" if asked else f"{head}: {text}"
-        return self._driver_line(
-            "agent.answered",
-            words,
-            {"station": self.station.name, "text": text, "question": asked or ""},
-        )
+        data = {"station": self.station.name, "text": text, "question": asked or ""}
+        if a.question_by:
+            data["to"] = a.question_by
+        return self._driver_line("agent.answered", words, data)
 
     def _driver_line(self, kind: str, words: str, data: dict[str, Any]) -> Event:
         """A line of the seat's that is an input (a refusal, an answer): recorded as the
@@ -241,8 +328,22 @@ class PlayerSeat:
         note, and a question answered. Called when the line is made and when a replay
         writes it again (`core.replay`), so that the seat is the same either way."""
         if kind == "agent.answered":
-            self.agent.question = None
+            asker = data.get("to") or self.agent.question_by
+            question = str(data.get("question") or "")
+            self.agent.question, self.agent.question_by = None, ""
             self.note(words, kind=kind)
+            if asker:
+                # the answer back to the station that asked (package 41)
+                from freesail.agents.harness import deliver_answer
+
+                deliver_answer(
+                    self.world,
+                    str(asker),
+                    self.station.name,
+                    self.who_words,
+                    question,
+                    str(data.get("text") or ""),
+                )
         elif kind == "agent.refused":
             self.note(f"Refused: {words}", kind=kind)
 
@@ -295,8 +396,11 @@ class PlayerSeat:
             return self.answer(line[len("answer") :])
         if self.agent.released or world_orders.recognises(line):
             return self.world.submit(line)
-        if stations.recognises(line, self.world.ship) is not None:
+        sentence = stations.recognises(line, self.world.ship)
+        if sentence is not None and sentence not in stations.CONVERSATION_VERBS:
             return self.world.submit(line)
+        # the deck's conversation is the seat's own (package 41): the player at his
+        # station says, tells and asks as that station
         return self.submit(line)
 
     def submit(self, text: str, danger: str = "") -> Event:
@@ -310,8 +414,15 @@ class PlayerSeat:
         st = self.station
         if a.released:
             return self.world.submit(text)
-        if not a.deck and not tools.own_reckoning_order(self.world, text):
-            # his own reckoning he keeps off watch as well (package 40b)
+        if (
+            not a.deck
+            and self._wants_deck
+            and not tools.own_reckoning_order(self.world, text)
+            and not tools.conversation_order(self.world, text)
+        ):
+            # his own reckoning he keeps off watch as well (package 40b), and the deck's
+            # conversation wants no deck (package 41); a station with no deck at all
+            # (the master's, the lookout's, a passenger's) is judged by its domain alone
             why = (
                 f"The {st.name} has not the deck ({a.deck_lost or 'the captain has it'}); an "
                 f"order waits for 'you have the deck'. {text!r} not carried out."
@@ -334,14 +445,19 @@ def seat_player(
     that says so, then the seat; a replay that reaches the line seats him again
     (`core.replay`, `quiet`). The seat that stands at the station already is returned as
     it is."""
-    name = SEAT_STATIONS.get(" ".join(str(station).lower().split()), station)
+    name, make = seat_station(world, station)
     old = seat_of(world, name)
     if old is not None:
         return old
+    deckless = not bool(getattr(make(world=world).domain, "deck", True))
     words = (
         f"The player takes the {name}'s station ({seat_words(name, door)}); his orders are "
-        "judged by the station's authority and the captain's word, and the deck is the "
-        "captain's until he gives it."
+        "judged by the station's authority and the captain's word, and "
+        + (
+            "there is no deck at it."
+            if deckless
+            else "the deck is the captain's until he gives it."
+        )
     )
     if not quiet:
         world.record_driver(

@@ -84,13 +84,18 @@ __all__ = [
     "authority_check",
     "book_of",
     "call",
+    "conversation_order",
     "hand_over",
     "handover_note",
     "journal",
     "library",
     "log_line",
     "opt_out",
+    "PICTURE_DOORS",
+    "PICTURE_TOOLS",
+    "chart",
     "parameters_schema",
+    "ship_view",
     "read_journal",
     "read_log",
     "readings",
@@ -136,7 +141,13 @@ FIND_LIMIT = 8
 
 # The tools whose results may be books (the harness gives each a handle): every library
 # read, and a read_log longer than `agent.BOOK_SIZE_TOKENS`.
-BOOK_TOOLS: tuple[str, ...] = ("library", "read_log", "read_journal")
+BOOK_TOOLS: tuple[str, ...] = ("library", "read_log", "read_journal", "chart", "ship_view")
+
+# The tools that make a picture (package 42, item 4; `agents.pictures`), and the doors
+# that carry one (an MCP client reads an image in a tool's result; the API door sends it
+# as an image block): offered only there.
+PICTURE_TOOLS: tuple[str, ...] = ("chart", "ship_view")
+PICTURE_DOORS: tuple[str, ...] = ("mcp", "api")
 
 
 def tokens(text: str) -> int:
@@ -219,8 +230,8 @@ def readings_words(world: World) -> dict[str, Any]:
     view = world.readings
     out: dict[str, Any] = {}
     for row in R.REGISTRY:
-        if row.is_absent or row.parametric is not None:
-            continue
+        if row.is_absent or row.parametric is not None or row.kind in R.DRIVER_KINDS:
+            continue  # the driver's own rows (the pace) are read, never carried (41)
         out[row.id] = view.words(row.id)
     ship = world.ship
     sails = getattr(ship, "sails", None)
@@ -473,8 +484,8 @@ def submit_order(world: World, station: str, text: str, danger: str = "") -> str
         from freesail.standing.runtime import said_as_done
 
         if stations.recognises(text, world.ship) is not None:
-            # a station sentence from the captain's station (package 40): his words to
-            # the officer as he said them, not a gerund of them
+            # a station sentence from the captain's station (package 40), or the deck's
+            # conversation from any (package 41): the words as said, not a gerund of them
             said = f"By the {station}: {text}"
         else:
             said = f"By the {station}: {said_as_done(world.ship, text)}"
@@ -587,11 +598,15 @@ def judge(world: World, station: str, text: str, danger: str = "") -> tuple[str,
     bare = standing.bare_book_sentence(ship, text)
     if verb is not None or bare is not None:
         return text, _book_check(world, station, bare or text, vocab), ""
-    if stations.recognises(text, ship) is not None:
+    sentence = stations.recognises(text, ship)
+    if sentence is not None:
         if domain.is_captains:
             # the captain's station addresses the stations as the player does (package
             # 40): the deck given and taken, the grants, tell and ask, stand down and
             # resume; the sentence is the captain's own, so the grammar reads it as his
+            return text, "", DOMAIN
+        if sentence in stations.CONVERSATION_VERBS:
+            # the deck's conversation is every station's (package 41): say, tell, ask
             return text, "", DOMAIN
         return text, f"{who} may not {text}: {_STATION_WHY}.", ""
     try:
@@ -939,6 +954,41 @@ def shelve(world: World, station: str, book: str = "") -> str:
     return _harness(world, station).shelve(str(book or ""))
 
 
+def _picture(world: World, view: str, facing: str = "") -> Any:
+    """A picture of a view (package 42, item 4): `{"picture": its note, "words": ...}`, which
+    a door that carries images shows by the picture's id; where none can be had, the words
+    why and the readings the picture would have shown."""
+    from freesail.agents import pictures as P
+
+    _, said = P.facing_of(facing) if view == P.SHIP else (None, "")
+    made = P.paint(world, view, facing if view == P.SHIP else "")
+    if isinstance(made, P.Picture):
+        return {"picture": made.note(), "words": made.words()}
+    keys = P.CHART_WORDS if view == P.CHART else P.SHIP_WORDS
+    every = readings_words(world)
+    shown = {k: every[k] for k in keys if k in every}
+    what = "the chart" if view == P.CHART else f"the ship seen from {said}"
+    return {
+        "words": f"{made}, so there is no picture of {what}; the readings it would have "
+        "shown, in words, instead.",
+        "readings": shown,
+    }
+
+
+def chart(world: World, station: str) -> Any:
+    return _picture(world, "chart")
+
+
+def ship_view(world: World, station: str, facing: str = "") -> Any:
+    from freesail.agents import pictures as P
+
+    try:
+        P.facing_of(facing)
+    except ValueError as e:
+        return str(e)
+    return _picture(world, P.SHIP, facing)
+
+
 def own_reckoning_order(world: World, text: str) -> bool:
     """Whether the words are one of a station's own reckoning's orders, `work my
     reckoning` or `my reckoning is <position>` (package 40b; spec M6 §5): the station
@@ -956,6 +1006,18 @@ def own_reckoning_order(world: World, text: str) -> bool:
     except OrderError:
         return False
     return order.verb in OWN_RECKONING_VERBS
+
+
+def conversation_order(world: World, text: str) -> bool:
+    """Whether the words are the deck's conversation (package 41): `say <words>`, `hail
+    <words>`, `tell the <station> ...` or `ask the <station> ...`, which every station
+    gives with the deck or without."""
+    from freesail.orders import stations
+
+    ship = world.ship
+    if not hasattr(ship, "parts"):
+        return False
+    return stations.recognises(" ".join(str(text).split()), ship) in stations.CONVERSATION_VERBS
 
 
 def _holder(world: World, station: str) -> Any:
@@ -1191,12 +1253,37 @@ TOOLS: dict[str, Tool] = {
             {"book": "string, optional: 'book 7', a topic's name, or nothing for all"},
             shelve,
         ),
+        Tool(
+            "chart",
+            "The chart as the player sees it, as a picture: the coast, the soundings and "
+            "the marks, the ship's track and her reckoning, the bearings and the player's "
+            "pencil, at the scale and the centre he has it. Drawn by the game's open "
+            "browser page; with none open, the readings it would have shown, in words. A "
+            "picture is a book: shelve puts it back.",
+            {},
+            chart,
+        ),
+        Tool(
+            "ship_view",
+            "The ship as the game's viewer draws her, as a picture: her hull, spars and "
+            "sails as they are set, from where you stand. Drawn by the game's open browser "
+            "page; with none open, the readings it would have shown, in words. A picture is "
+            "a book: shelve puts it back.",
+            {
+                "facing": "string, optional: where you stand, in degrees from the bow, "
+                "clockwise (0 right ahead, 90 the starboard beam, 180 right astern, 270 the "
+                "larboard beam), or 'leeward' (the default, abeam to leeward)",
+            },
+            ship_view,
+        ),
     )
 }
 
 
-def tool_names() -> tuple[str, ...]:
-    return tuple(TOOLS)
+def tool_names(pictures: bool = False) -> tuple[str, ...]:
+    """The tools in the table's order; the picture tools only when asked for (a door that
+    carries an image; package 42)."""
+    return tuple(n for n in TOOLS if pictures or n not in PICTURE_TOOLS)
 
 
 def parameters_schema(name: str) -> dict[str, Any]:
@@ -1252,10 +1339,24 @@ def call(world: World, station: str, name: str, args: dict[str, Any] | None = No
         )
         return sentence
     # a station's own reckoning is kept with the deck or off watch, and moves nothing, so
-    # it neither wants the deck nor takes it back (package 40b)
+    # it neither wants the deck nor takes it back (package 40b); nor does the deck's
+    # conversation (package 41: say, tell and ask are any station's, with the deck or
+    # without); and a station with no deck at all (the master's, the lookout's, a
+    # passenger's) is judged by its domain alone
     needs_deck = tool.needs_deck and not (
-        name == "submit_order" and own_reckoning_order(world, str(args.get("text", "")))
+        name == "submit_order"
+        and (
+            own_reckoning_order(world, str(args.get("text", "")))
+            or conversation_order(world, str(args.get("text", "")))
+        )
     )
+    if (
+        needs_deck
+        and harness is not None
+        and harness.domain is not None
+        and not getattr(harness.domain, "deck", True)
+    ):
+        needs_deck = False
     if (
         needs_deck
         and harness is not None
@@ -1345,6 +1446,21 @@ def book_of(name: str, args: dict[str, Any], result: Any) -> tuple[str, str] | N
         if args.get("count") is not None:
             again += f", count={int(args['count'])}"
         return title, again + ")"
+    if (
+        name in PICTURE_TOOLS
+        and isinstance(result, dict)
+        and isinstance(result.get("picture"), dict)
+    ):
+        # a picture is a book (package 42): shelved, it is no longer sent
+        pic = result["picture"]
+        size = f"{pic.get('width')} by {pic.get('height')} pixels"
+        if pic.get("view") == "chart":
+            return f"the chart at {pic.get('stamp')}, {size}", "chart()"
+        facing = str(pic.get("facing") or "abeam to leeward")
+        return (
+            f"the ship from {facing} at {pic.get('stamp')}, {size}",
+            f"ship_view(facing='{args.get('facing') or 'leeward'}')",
+        )
     if name == "read_journal" and isinstance(result, dict) and "entries" in result:
         # a long read of the journal is a book too (package 37g): the two long games'
         # journals came to about ten thousand tokens each

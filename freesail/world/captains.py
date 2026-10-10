@@ -137,6 +137,24 @@ ACTOR_PREFIX = "captain's rule "
 JUDGE_EVERY_S = 60
 JUDGE_FIRST_S = 300
 
+# The states in which the rules-based captain keeps the deck himself over a seated officer
+# (package 41, spec M6 §11: he takes it back "for a judgement that needs the deck"): the
+# gale and the shelter, a stranger investigated, chased or evaded, distress, and the
+# engagement to come; in the rest (in port, at anchor, on passage, beating, keeping
+# station) the officer holds the deck under his book, as the Regulations' lieutenant
+# kept the watch under the captain's directions (judgement on the states' kinds).
+CAPTAIN_ON_DECK_STATES: frozenset[str] = frozenset(
+    {
+        "hove to for weather",
+        "running for shelter",
+        "investigating a stranger",
+        "chasing",
+        "evading",
+        "in distress",
+        "engaging",
+    }
+)
+
 # The states the far-detail body resolves in this package (spec M6 §4, "one brain, two
 # bodies"; 43 fills the rest with the crewed promotion): on passage is her plan, hove to
 # is no way.
@@ -1162,6 +1180,77 @@ class Captain:
         self._transitions(p)
         self._work(p, events)
         self._rule_of_the_road(p)
+        self._deck_by_rule()
+
+    # -- the deck to a seated officer (package 41; spec M6 §11) --------------------------
+
+    def _officer_held(self) -> Any:
+        """A model or the player at the officer of the watch's station, seated and able
+        to hold the deck (not released, not paused); None otherwise."""
+        from freesail.agents.harness import holder_of
+
+        held = holder_of(self.world, "officer of the watch")
+        if held is None or not getattr(held, "started", True):
+            return None
+        a = held.agent
+        if a.released or a.paused:
+            return None
+        return held
+
+    def _deck_by_rule(self) -> None:
+        """The rules-based captain over a seated officer (package 41, item 5): on an
+        intent scenario with nobody at the captain's station, a model or the player at
+        the officer's is given the deck by the captain's own words, his standing orders
+        (the state's book) in force over it, and he takes it back for a judgement that
+        needs the deck (`CAPTAIN_ON_DECK_STATES`: the gale, the shelter, a stranger, the
+        chase, distress), saying so, and gives it again when the state is a quiet one.
+        A deck the harness took from a silent or paused officer is not given again by
+        rule: that is the owner's `resume` or his word."""
+        if self.seated or self.state is None:
+            return
+        held = self._officer_held()
+        if held is None:
+            return
+        a = held.agent
+        world = self.world
+        wants = self.state not in CAPTAIN_ON_DECK_STATES
+        actor = actor_for(self.state)
+        if wants and not a.deck and not a.deck_lost:
+            try:
+                words = held.give_deck(by=self.name)
+            except Exception:  # refused in words (no authority, paused): no deck by rule
+                return
+            world.record(
+                Severity.NOTABLE,
+                "agent.deck",
+                f"{words} ({self.name}, by his rule, {self.state}; his standing orders "
+                "stand over it.)",
+                actor=actor,
+                data={
+                    "station": "officer of the watch",
+                    "deck": "given",
+                    "by": "rule",
+                    "state": self.state,
+                },
+            )
+        elif not wants and a.deck:
+            try:
+                words = held.take_deck(by=self.name)
+            except Exception:
+                return
+            world.record(
+                Severity.NOTABLE,
+                "agent.deck",
+                f"{words} ({self.name} takes the deck for a judgement that needs it: "
+                f"{self.state}.)",
+                actor=actor,
+                data={
+                    "station": "officer of the watch",
+                    "deck": "taken",
+                    "by": "rule",
+                    "state": self.state,
+                },
+            )
 
     # -- states ------------------------------------------------------------------------
 

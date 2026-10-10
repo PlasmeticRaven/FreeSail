@@ -705,7 +705,10 @@ def _at_rest_on_the_chart(lat: float, lon: float):
 # mark in sight, which are observations the man on deck makes, by estimate and by compass
 # (spec M5 §12); they differ with where she truly is, as they should, and give no figure
 # of her position but through the master's working of them (`take a bearing`, `take a fix`).
-THE_EYES_ROWS = frozenset({"in_sight", "land", "nearest_land", "bearing_of", "sail", "strangers"})
+THE_EYES_ROWS = frozenset(
+    # ...and the lookout's station (package 41), which says what is in sight
+    {"in_sight", "land", "nearest_land", "bearing_of", "sail", "strangers", "lookout"}
+)
 # And the sky over her: the moon's altitude and azimuth in the data behind `the moon`
 # (whose words are the same), which is the sky seen from where she is, as a sight is.
 THE_SKYS_ROWS = frozenset({"moon"})

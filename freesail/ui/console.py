@@ -191,6 +191,122 @@ def check_agents_unattended(world: World) -> None:
         agent.check_unattended()
 
 
+# The pace rule (spec M6 §12; decision 39, ruling 2; package 41). The owner's testing
+# setting, built as the default: the clock slows to 1x while any model's sample is open,
+# whoever holds it, at whatever station, and returns to the set compression when every
+# open sample has been answered or has stood by. Not lockstep: the ship sails on at her
+# own second while the model thinks, and a slow answer lands late; `--lockstep` holds
+# the clock for a door with the floor and stays the separate option; `--free-running`
+# runs at the set compression with no slowing, the flag for the solo player who wants a
+# model to think while he sails at sixty times. The rule is the driver's: it moves no
+# tick of the world, only how many of them a real second brings.
+PACE_RULE, PACE_LOCKSTEP, PACE_FREE = "pace", "lockstep", "free"
+
+# The log says once when the clock has been held at 1x for a station this long, in real
+# seconds, so that a slow door is seen and not suffered (judgement: the MCP bridge holds
+# a call open 200 s by default under the Desktop client's four-minute cut, and a reply
+# through it in gate 5c's games came within a minute as a rule; two minutes of the ship
+# at her own second is when the player at sixty times notices his evening has stopped,
+# and is still under the bridge's own wait, so the line comes before the door's).
+PACE_HELD_SAID_S = 120.0
+
+
+class Pace:
+    """A driver's pace: which rule it runs under, the samples it holds the clock for and
+    since when on the driver's own clock, and the line said once for a long hold."""
+
+    def __init__(self, world: World, rule: str = PACE_RULE):
+        self.world = world
+        self.rule = rule
+        world.pace_rule = rule  # type: ignore[attr-defined]
+        self.since: dict[str, float] = {}
+        self.said: set[str] = set()
+
+    def open(self) -> list[dict[str, Any]]:
+        from freesail.agents.harness import open_samples
+
+        return open_samples(self.world)
+
+    def rate(self, compression: float, now: float | None = None) -> float:
+        """The compression the clock runs at now: 1x while a sample is open under the
+        pace rule, the set compression otherwise. Keeps the hold's start per station
+        and says the long hold once (`PACE_HELD_SAID_S`)."""
+        if self.rule != PACE_RULE:
+            self.since.clear()
+            self.said.clear()
+            return compression
+        now = time.monotonic() if now is None else now
+        held = self.open()
+        names = {o["station"] for o in held}
+        for o in held:
+            self.since.setdefault(o["station"], now)
+        for name in list(self.since):
+            if name not in names:
+                del self.since[name]
+                self.said.discard(name)
+        for o in held:
+            name = o["station"]
+            for_s = now - self.since[name]
+            if for_s >= PACE_HELD_SAID_S and name not in self.said:
+                self.said.add(name)
+                self.world.record_driver(
+                    "routine",
+                    "driver.pace",
+                    f"The clock has been held at 1x for the {name} for {int(for_s)} real "
+                    f"seconds; its sample has been open since {o['since']} ({o['reason']}).",
+                    data={"station": name, "for_s": int(for_s), "since": o["since"]},
+                )
+        return 1.0 if names else compression
+
+    def state(self, compression: float, now: float | None = None) -> dict[str, Any]:
+        """For the snapshot and `state`: the rule, the set compression, the rate now, and
+        each open sample with since when and for how many real seconds."""
+        now = time.monotonic() if now is None else now
+        held = self.open() if self.rule == PACE_RULE else []
+        return {
+            "rule": self.rule,
+            "compression": compression,
+            "rate": 1.0 if held else compression,
+            "held": bool(held),
+            "open": [dict(o, for_s=int(now - self.since.get(o["station"], now))) for o in held],
+        }
+
+    def words(self, compression: float) -> str:
+        """One line for the owner: 'The clock runs at 60x; held at 1x while the captain's
+        sample is open (since 04:10, the glass).'"""
+        d = self.state(compression)
+        if d["rule"] == PACE_LOCKSTEP:
+            return (
+                f"The clock runs at {compression:g}x, in lockstep (it waits for a door with "
+                "the floor)."
+            )
+        if d["rule"] == PACE_FREE:
+            return f"The clock runs free at {compression:g}x: no model's sample slows it."
+        if not d["open"]:
+            return f"The clock runs at {compression:g}x; no sample is open."
+        held = "; ".join(
+            f"the {o['station']}'s since {o['since']} ({o['reason']}, {o['for_s']} s)"
+            for o in d["open"]
+        )
+        return f"The clock is held at 1x (set {compression:g}x) while a sample is open: {held}."
+
+
+def pace_rule_of(args: Any) -> str:
+    """The pace rule a driver's flags ask for: `--lockstep`, `--free-running`, else the
+    pace rule (the default)."""
+    if getattr(args, "lockstep", False):
+        return PACE_LOCKSTEP
+    if getattr(args, "free_running", False):
+        return PACE_FREE
+    return PACE_RULE
+
+
+FREE_RUNNING_HELP = (
+    "run at the set compression with no slowing while a model's sample is open (the solo "
+    "player's flag; the default is the pace rule of spec M6 §12, 1x while a sample is open)"
+)
+
+
 def restore_python_rules(world: World, data: dict) -> None:
     """A save's standing orders written in Python (spec M4 §4) have no journal line to
     replay them by; list them in the loaded book, belayed, with the sentence."""
@@ -207,12 +323,18 @@ class Console:
         out=sys.stdout,
         lockstep: bool = False,
         replay_anyway: bool = False,
+        free_running: bool = False,
     ):
         self.world = world
         self.replay_anyway = replay_anyway  # `--replay-anyway` given at the start
         self.compression = clamp_compression(compression)
         self.world.compression = self.compression
         self.lockstep = lockstep
+        # the pace rule (package 41): 1x while a sample is open, unless in lockstep or
+        # free-running
+        self.pace = Pace(
+            world, PACE_LOCKSTEP if lockstep else PACE_FREE if free_running else PACE_RULE
+        )
         self.desk: Any = None  # the agent API's stations, with --agents-port
         self.running = False
         self.out = out
@@ -322,6 +444,8 @@ class Console:
             held = self.held_for()
             if held is not None:
                 self._print(f"The clock waits for {held} (--lockstep).")
+            elif self.world.agents:
+                self._print(self.pace.words(self.compression))
         elif self._is_muster(line):
             # a query, like `state`: printed, never journaled (spec M3 §5.1)
             for s in queries.muster_lines(self.world):
@@ -426,8 +550,9 @@ class Console:
         self._print(f"Replaying {path} to tick {data['end_tick']}...")
         from freesail.api.session import ship_factory
 
-        self.world = replay_mod.replay(data, ship_factory)
+        self.world = replay_mod.replay(data, ship_factory, road=report.road)
         self._attach()
+        self.pace = Pace(self.world, self.pace.rule)
         restore_python_rules(self.world, data)  # attached, so its lines are printed
         self._print(f"Replayed. Log digest {self.world.log.digest()[:16]}. Clock held.")
         for line in report.words:
@@ -474,7 +599,10 @@ class Console:
 
     def _tick_owed(self, owed: float, period: float) -> float:
         if self.running:
-            owed += self.compression * period
+            with self.lock:
+                # the pace rule (package 41): 1x while a model's sample is open
+                rate = self.pace.rate(self.compression)
+            owed += rate * period
             n = int(owed)
             owed -= n
             with self.lock:
@@ -698,6 +826,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     ap.add_argument("--saves", help="where a released station saves the game (default saves/)")
     ap.add_argument("--seat", help=SEAT_HELP)
+    ap.add_argument("--free-running", action="store_true", help=FREE_RUNNING_HELP)
     args = ap.parse_args(argv)
 
     world, scenario_file = start_world(args)
@@ -714,7 +843,11 @@ def main(argv: list[str] | None = None) -> int:
         seat_player(world, args.seat, door="console")
 
     console = Console(
-        world, compression=args.time, lockstep=args.lockstep, replay_anyway=args.replay_anyway
+        world,
+        compression=args.time,
+        lockstep=args.lockstep,
+        replay_anyway=args.replay_anyway,
+        free_running=args.free_running,
     )
     if scenario_file is not None:
         for line in scenario_file.lines():

@@ -752,13 +752,48 @@ def _no_sight_words(world: Any) -> str | None:
 
 
 def _master(world: Any, _: str | None) -> dict[str, Any] | None:
-    """`the master`: his name and his place (spec §22's minimum), and what occupies him."""
+    """`the master`: his name and his place (spec §22's minimum), and what occupies him;
+    and the master's station (package 41) when a model or the player holds it, through
+    which door, with a working open for it and until when."""
     nav = _navigation_of(world)
     if nav is None:
         return None
     m = nav.master
     busy = f", at the {m.occupied_with}" if m.occupied_with else ""
-    return m.to_dict() | {"words": f"{m.name}, {m.place}{busy}"}
+    out = m.to_dict() | {"words": f"{m.name}, {m.place}{busy}"}
+    held = _station_held(world, "master")
+    if held is not None:
+        out["words"] += f"; the master's station held by {held['who']}"
+        working = getattr(nav, "master_working", None)
+        if working is not None:
+            out["words"] += (
+                f", with the slate to work {working['what']} by {nav._time_words(working['until'])}"
+            )
+            out["working"] = {"what": working["what"], "until": working["until"]}
+        out["station"] = held
+    return out
+
+
+def _station_held(world: Any, station: str) -> dict[str, Any] | None:
+    """Who holds a station now (package 41): a model's harness or the player's seat, in
+    words with the door, its state and whether it is released; None when nobody does."""
+    from freesail.agents.agent import door_words
+
+    harness = (getattr(world, "agents", None) or {}).get(station)
+    if harness is None:
+        seat = getattr(world, "player_seat", None)
+        if seat is None or seat.station.name != station:
+            return None
+        harness = seat
+    a = harness.agent
+    if a.released:
+        return None
+    who = (
+        f"{harness.model_name}, through {door_words(harness.door)}"
+        if harness.model_name
+        else (harness.station.person or f"the {station}")
+    )
+    return {"who": who, "person": harness.station.person, "state": a.state, "words": a.words()}
 
 
 def _officers_reckoning(world: Any, _: str | None) -> dict[str, Any] | None:
@@ -1306,7 +1341,8 @@ REGISTRY.add(
         "person",
         "",
         _master,
-        description="the master: his name, his place and what occupies him",
+        description="the master: his name, his place and what occupies him; and the "
+        "master's station, when a model or the player holds it (package 41)",
         none_words=_no_reckoning_words,
     )
 )
@@ -2747,6 +2783,152 @@ _event(
 )
 _event(EventSpec("a handover", "agent.handover"))
 _event(EventSpec("a standing order countermanded", "standing.countermanded"))
+
+# ---------------------------------------------------------------------------
+# Package 41: the lookout's station and the pace (spec M6 §11, §12). Two rows of their
+# own, changing nothing above: who is at the masthead, with his last hail; and the clock's
+# pace, which is the driver's (a row the samples never carry, `DRIVER_KINDS`).
+# ---------------------------------------------------------------------------
+
+# the lookout's hail from the masthead speaks of danger to a station with the deck that
+# stands by (the owner's lookout warns of a danger ahead, spec M6 §11)
+DANGER_LINES = (*DANGER_LINES, DangerLine("a hail from the masthead", "agent.hail"))
+_event(EventSpec("a hail from the masthead", "agent.hail"))
+_event(EventSpec("a word on deck", "agent.spoke"))
+
+
+def _lookout_station(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the lookout`: who is at the masthead (a model through its door, the player's
+    seat, or the ship's own lookout), what is in sight by the last look, and his last
+    hail; None without a chart."""
+    lookout = _lookout_of(world)
+    if lookout is None:
+        return None
+    seen = lookout.reading(float(world.ship.heading))
+    held = _station_held(world, "lookout")
+    who = held["who"] if held is not None else "the ship's own lookout"
+    words = f"at the masthead: {who}; in sight: {seen.get('words', 'nothing')}"
+    last = next(
+        (e for e in reversed(world.log.all()) if e.kind == "agent.hail"),
+        None,
+    )
+    if last is not None:
+        words += f"; his last hail, at {units.time_stamp(last.ship_time)}: {last.text}"
+    return {
+        "words": words,
+        "held": held is not None,
+        "who": who,
+        "in_sight": seen,
+        "last_hail": last.text if last is not None else None,
+    }
+
+
+REGISTRY.add(
+    Reading(
+        "lookout",
+        ("the lookout", "who is at the masthead"),
+        "ground",
+        "",
+        _lookout_station,
+        description="the lookout's station: who is at the masthead, what is in sight by "
+        "the last look, and his last hail",
+        none_words=lambda world: NO_CHART_WORDS,
+    )
+)
+
+
+def _stations(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the stations` (package 41): the ship's stations as the world binds them, each
+    with the person who holds it and who is seated at it now (a model through its door,
+    the player's seat), as data and in words."""
+    stations = getattr(world, "stations", None)
+    if stations is None:
+        return None
+    rows = []
+    for name in stations.names():
+        b = stations.binding(name)
+        if b is None:
+            continue
+        held = _station_held(world, name)
+        rows.append(
+            {
+                "station": name,
+                "kind": b.kind,
+                "person": b.person,
+                "held_by": held["who"] if held is not None else "",
+            }
+        )
+    words = "; ".join(
+        f"the {r['station']}"
+        + (f" ({r['person']})" if r["person"] else " (nobody named)")
+        + (f", held by {r['held_by']}" if r["held_by"] else "")
+        for r in rows
+    )
+    return {"words": words, "stations": rows}
+
+
+REGISTRY.add(
+    Reading(
+        "stations",
+        ("the stations",),
+        "ground",
+        "",
+        _stations,
+        description="the ship's stations as the world binds them: each with the person "
+        "who holds it and who is seated at it now",
+    )
+)
+
+# The driver's own rows (package 41): read at the prompt and by a station's query, never
+# carried in a sample's readings nor counted in the welfare detector's digest, since the
+# clock's pace is no reading of the ship and changes as samples open and close.
+DRIVER_KINDS: tuple[str, ...] = ("driver",)
+KINDS["driver"] = "the driver's own: the clock's pace, read and never compared"
+
+
+def _pace(world: Any, _: str | None) -> dict[str, Any]:
+    """`the pace` (spec M6 §12): the compression the driver has set, the rule it runs
+    under (the pace rule, lockstep or free-running), which samples are open and since
+    when, and whether the clock is held at 1x for them now."""
+    from freesail.agents.harness import open_samples
+
+    compression = float(getattr(world, "compression", 1.0) or 1.0)
+    rule = str(getattr(world, "pace_rule", "pace") or "pace")
+    held = open_samples(world)
+    at_one = bool(held) and rule == "pace"
+    if rule == "lockstep":
+        words = f"the clock runs at {compression:g}x, in lockstep"
+    elif rule == "free":
+        words = f"the clock runs free at {compression:g}x, no sample slowing it"
+    elif at_one:
+        words = f"the clock is held at 1x (set {compression:g}x) while a sample is open"
+    else:
+        words = f"the clock runs at {compression:g}x; no sample is open"
+    if held:
+        words += ": " + "; ".join(
+            f"the {o['station']}'s since {o['since']} ({o['reason']})" for o in held
+        )
+    return {
+        "words": words,
+        "compression": compression,
+        "rate": 1.0 if at_one else compression,
+        "rule": rule,
+        "open": held,
+    }
+
+
+REGISTRY.add(
+    Reading(
+        "pace",
+        ("the pace", "the clock's pace", "the clocks pace"),
+        "driver",
+        "",
+        _pace,
+        description="the clock's pace: the compression set, the rule (the pace rule, "
+        "lockstep or free-running), which samples are open and since when (the "
+        "driver's own row, not in a sample's readings)",
+    )
+)
 
 
 # ---------------------------------------------------------------------------
