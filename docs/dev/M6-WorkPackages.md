@@ -22,7 +22,7 @@ tuning notes and a report to the lead at the end.
 | 40c | the lead | The captain's trials: the gate's pinned scenarios of the rules-based captain under weather scripts and world orders; the player's hand on an intent scenario (the captain stands aside until `captain: carry on`) | merged 2026-10-10; gate 6a opened (`docs/gates/gate-m6a.md`); the fast tier on the merged tree 3093 passed, none failed |
 | 42a | Opus | The consent brief revised once from 40's draft, describing in kind all of 6b and 6c that the rule watches; the watched sections pinned; the re-asks the owner's | merged 2026-10-10 (decision 42: the added sentences approved; the re-asks the owner's) |
 | 41 | Fable | The wardroom: several doors, the pace rule, the deck's conversation, the master's and the lookout's stations, the stand-by on several conditions | approved and launched 2026-10-10, beside 37p |
-| 42 | Opus | The API door and its security pass; the transcript-driven replay; the chart as an image through the doors that carry one (the consent revision moved to 42a) | brief written 2026-10-10, for the owner's approval; to run beside 37p and 41 |
+| 42 | Opus | The API door and its security pass; the transcript-driven replay; the chart and the ship's view as images through the doors that carry one (the consent revision moved to 42a) | brief written 2026-10-10, for the owner's approval; to run beside 37p and 41 |
 | 43 | Fable | The crewed promotion, a model captain of another ship, the far-detail guard, the director's seat hook | brief to write |
 | 37p | Opus | The yards and the helm by the wind, and the ship in a gale: three levels of bracing, the helm's mark the highest sail set, storm canvas, the recovery from aback; every passage re-pinned once | approved and launched 2026-10-10; before gate 6a's runs |
 | 43b | Opus | The lugger and the smack; the world's business | brief to write |
@@ -735,17 +735,22 @@ API is the whole proof.
    replays as it does now, from its checkpoint, and says so. M5 §33 item 11 (a door act at
    the stationing tick, before any tick has run, not made by a replay) closes with it: say
    in §33 how.
-4. **The chart as an image, through the doors that carry one** (the owner's note 7 of
-   2026-10-09; spec §13's second paragraph). The lead's design decision: the open browser
-   renders the chart as the player sees it and posts the picture to the server on the
-   tool's request, since the chart's drawing lives in `client/map.js` and a second
-   renderer in Python would be a second chart to keep true; where no browser is open the
-   tool says so in words and gives the chart's words instead (`the chart` reading). The
-   tool `the chart` at the MCP door (a tool result may carry an image, and Claude Desktop
-   and Claude Code read it) and at the API door (an image block in the tool result), the
+4. **The chart and the ship's view as images, through the doors that carry one** (the
+   owner's note 7 of 2026-10-09; spec §13's second paragraph). The lead's design decision:
+   the open browser renders the picture as the player sees it and posts it to the server
+   on the tool's request, since the chart's drawing lives in `client/map.js` and the
+   ship's in the viewer, and a second renderer in Python would be a second picture to keep
+   true; where no browser is open the tool says so in words and gives the reading instead.
+   Two tools: `the chart` as the player sees it, and `the ship's view` from any angle the
+   viewer offers (the owner, 2026-10-10: the viewer serves well already, sessions he has
+   sent its pictures to have used them, and the view at the moment the request comes
+   through is what they get; the words of the view are the ship's state readings, which
+   they have), at the MCP door (a tool result may carry an image, and Claude Desktop and
+   Claude Code read it) and at the API door (an image block in the tool result), the
    picture shelved as the library is, never in the journal or the transcript (a note that
-   it was shown, with its size, is). `the ship's view` from any angle is M8's, with the
-   2.5D view; say so where the tool is listed.
+   it was shown, with its size and the angle asked, is). The browser's part is one request
+   from the server to the open page for a rendering at an angle and one post back, with a
+   bound on the picture's size.
 5. **Truths 85 and 86** in `tests/test_known_truths.py`: the replay on a build whose
    sampling differs (85) and the API door's test server receiving no key in any body,
    with the journal, the transcript and the save holding none (86), the test server a
@@ -758,5 +763,5 @@ API is the whole proof.
 
 No recorded passage's pin moves (nothing here touches a tick of the world; a pin that
 moves is a finding). Not this package's: the wardroom's stations and the pace rule (41);
-the ship's view as a picture (M8); the re-asks (the owner's). The fast tier before the
+the re-asks (the owner's). The fast tier before the
 report and the slow tests of the files touched.
